@@ -179,84 +179,189 @@ private:
      */
     void uiSetupRunningState(bool state);
 
-    void createActions();       /**< Creates all actions for user interface of MainWindow class. */
-    void createMenus();         /**< Creates all menus for user interface of MainWindow class. */
-    void createToolBars();      /**< Creates all tool bars for user interface of MainWindow class. */
-    void initStatusBar();       /**< Creates QToolBar for user interface of MainWindow class. */
-    void createPluginDockWindow();                          /**< Creates plugin dock widget.*/
-    void createLogDockWindow();                             /**< Creates log dock widget.*/
-    void updatePluginSetupWidget(QSharedPointer<SCSHAREDLIB::IPlugin> pPlugin);       /**< Sets the plugin setup widget to central widget of MainWindow class depending on the current plugin selected in m_pDockWidgetPlugins.*/
-    void initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::IPlugin> > lPlugins);         /**< Adds the plugin visualization widget to central widget of MainWindow class if the pipeline was started.*/
+    //=========================================================================================================
+    /**
+     * Creates all actions for user interface of MainWindow class.
+     */
+    void createActions();
+
+    //=========================================================================================================
+    /**
+     * Creates all menus for user interface of MainWindow class.
+     */
+    void createMenus();
+
+    //=========================================================================================================
+    /**
+     * Creates all tool bars for user interface of MainWindow class.
+     */
+    void createToolBars();
+
+    //=========================================================================================================
+    /**
+     * Creates QToolBar for user interface of MainWindow class.
+     */
+    void initStatusBar();
+
+    //=========================================================================================================
+    /**
+     * Creates plugin dock widget.
+     */
+    void createPluginDockWindow();
+
+    //=========================================================================================================
+    /**
+     * Creates log dock widget.
+     */
+    void createLogDockWindow();
+
+    //=========================================================================================================
+    /**
+     * Sets the plugin setup widget to central widget of MainWindow class depending on the current plugin
+     * selected in m_pDockWidgetPlugins.
+     */
+    void updatePluginSetupWidget(QSharedPointer<SCSHAREDLIB::IPlugin> pPlugin);
+
+    //=========================================================================================================
+    /**
+     * Adds the plugin visualization widget to central widget of MainWindow class if the pipeline was started.
+     */
+    void initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::IPlugin> > lPlugins);
+
+    //=========================================================================================================
+    /**
+     * Stops the main application timer.
+     */
     void onControlWidgetsChanged(QList<QWidget*>& lControlWidgets,
                                  const QString& sPluginName);
-    void updateConnectionWidget(QSharedPointer<SCSHAREDLIB::PluginConnectorConnection> pConnection); /**< Sets the connection widget to central widget of MainWindow class depending on the current arrow selected in m_pDockWidgetPlugins.*/
-    void newConfiguration();            /**< Implements new configuration tasks.*/
-    void openConfiguration();           /**< Implements open configuration tasks.*/
-    void saveConfiguration();           /**< Implements save configuration tasks.*/
-    void helpContents();                /**< Implements help contents action.*/
-    void about();                       /**< Implements about action.*/
-    void setMinLogLevel();              /**< Sets minimal log level as current log level.*/
-    void setNormalLogLevel();           /**< Sets normal log level as current log level.*/
-    void setMaxLogLevel();              /**< Sets maximal log level as current log level.*/
-    void startMeasurement();            /**< Runs application.*/
-    void stopMeasurement();             /**< Stops application.*/
-    void updateTime();                  /**< Updates m_pTime and is called through timeout() of m_pTimer.*/
 
-    StartUpWidget* m_pStartUpWidget;    /**< holds the StartUpWidget.*/
+    //=========================================================================================================
+    /**
+     * Sets the connection widget to central widget of MainWindow class depending on the current arrow selected
+     * in m_pDockWidgetPlugins.
+     */
+    void updateConnectionWidget(QSharedPointer<SCSHAREDLIB::PluginConnectorConnection> pConnection);
+
+    //=========================================================================================================
+    /**
+     * Implements new configuration tasks.
+     */
+    void newConfiguration();
+
+    //=========================================================================================================
+    /**
+     * Implements open configuration tasks.
+     */
+    void openConfiguration();
+
+    //=========================================================================================================
+    /**
+     * Implements save configuration tasks.
+     */
+    void saveConfiguration();
+
+    //=========================================================================================================
+    /**
+     * Implements help contents action.
+     */
+    void helpContents();
+
+    //=========================================================================================================
+    /**
+     * Implements about action.
+     */
+    void about();
+
+    //=========================================================================================================
+    /**
+     * Sets minimal log level as current log level.
+     */
+    void setMinLogLevel();
+
+    //=========================================================================================================
+    /**
+     * Sets normal log level as current log level.
+     */
+    void setNormalLogLevel();
+
+    //=========================================================================================================
+    /**
+     * Sets maximal log level as current log level.
+     */
+    void setMaxLogLevel();
+
+    //=========================================================================================================
+    /**
+     * Runs the created plugin pipeline.
+     */
+    void startMeasurement();
+
+    //=========================================================================================================
+    /**
+     * Stops the created plugin pipeline.
+     */
+    void stopMeasurement();
+
+    //=========================================================================================================
+    /**
+     * Updates m_pTime and is called through timeout() of m_pTimer.
+     */
+    void updateTime();
 
     bool m_bIsRunning;                  /**< whether program/plugins is/are started.*/
 
-    DISPLIB::MultiView* m_pRunWidget;                            /**< The run widget */
-    QShortcut* m_pRunWidgetClose;                       /**< Run widget close shortcut */
-    QSharedPointer<SCSHAREDLIB::DisplayManager> m_pDisplayManager;   /**< display manager */
+    int                                 m_iTimeoutMSec;                 /**< Holds milliseconds after which timer timeouts.*/
 
-    QAction*                            m_pActionNewConfig;         /**< new configuration */
-    QAction*                            m_pActionOpenConfig;        /**< open configuration */
-    QAction*                            m_pActionSaveConfig;        /**< save configuration */
-    QAction*                            m_pActionExit;              /**< exit application */
+    QPointer<QShortcut>                 m_pRunWidgetClose;              /**< Run widget close shortcut */
 
-    QActionGroup*                       m_pActionGroupLgLv;         /**< group log level */
-    QAction*                            m_pActionMinLgLv;           /**< set minimal log level */
-    QAction*                            m_pActionNormLgLv;          /**< set normal log level */
-    QAction*                            m_pActionMaxLgLv;           /**< set maximal log level */
+    QPointer<QActionGroup>              m_pActionGroupLgLv;             /**< group log level */
+    QPointer<QAction>                   m_pActionNewConfig;             /**< new configuration */
+    QPointer<QAction>                   m_pActionOpenConfig;            /**< open configuration */
+    QPointer<QAction>                   m_pActionSaveConfig;            /**< save configuration */
+    QPointer<QAction>                   m_pActionExit;                  /**< exit application */
+    QPointer<QAction>                   m_pActionMinLgLv;               /**< set minimal log level */
+    QPointer<QAction>                   m_pActionNormLgLv;              /**< set normal log level */
+    QPointer<QAction>                   m_pActionMaxLgLv;               /**< set maximal log level */
+    QPointer<QAction>                   m_pActionHelpContents;          /**< open help contents */
+    QPointer<QAction>                   m_pActionAbout;                 /**< show about dialog */
+    QPointer<QAction>                   m_pActionQuickControl;          /**< Show quick control widget. */
+    QPointer<QAction>                   m_pActionRun;                   /**< run application */
+    QPointer<QAction>                   m_pActionStop;                  /**< stop application */
 
-    QAction*                            m_pActionHelpContents;      /**< open help contents */
-    QAction*                            m_pActionAbout;             /**< show about dialog */
-    QPointer<QAction>                   m_pActionQuickControl;      /**< Show quick control widget. */
+    QList<QAction*>                     m_qListDynamicPluginActions;    /**< dynamic plugin actions */
+    QList<QAction*>                     m_qListDynamicDisplayActions;   /**< dynamic display actions */
+    QList<QWidget*>                     m_qListDynamicControlWidgets;   /**< dynamic display widgets */
 
-    QAction*                            m_pActionRun;               /**< run application */
-    QAction*                            m_pActionStop;              /**< stop application */
+    QPointer<QMenu>                     m_pMenuFile;                    /**< Holds the file menu.*/
+    QPointer<QMenu>                     m_pMenuView;                    /**< Holds the view menu.*/
+    QPointer<QMenu>                     m_pMenuLgLv;                    /**< Holds the log level sub menu.*/
+    QPointer<QMenu>                     m_pMenuHelp;                    /**< Holds the help menu.*/
 
-    QList< QAction* >                   m_qListDynamicPluginActions;    /**< dynamic plugin actions */
-    QList< QAction* >                   m_qListDynamicDisplayActions;   /**< dynamic display actions */
-    QList< QWidget* >                   m_qListDynamicControlWidgets;   /**< dynamic display widgets */
+    QPointer<QDockWidget>               m_pPluginGuiDockWidget;         /**< Dock widget which holds the plugin gui. */
+    QPointer<QDockWidget>               m_pDockWidget_Log;              /**< Holds the dock widget containing the log.*/
 
-    QMenu*                              m_pMenuFile;    /**< Holds the file menu.*/
-    QMenu*                              m_pMenuView;    /**< Holds the view menu.*/
-    QMenu*                              m_pMenuLgLv;    /**< Holds the log level sub menu.*/
-    QMenu*                              m_pMenuHelp;    /**< Holds the help menu.*/
+    QPointer<QToolBar>                  m_pToolBar;                     /**< Holds the tool bar.*/
+    QPointer<QToolBar>                  m_pDynamicPluginToolBar;        /**< Holds the plugin tool bar.*/
 
-    QToolBar*                           m_pToolBar;                 /**< Holds the tool bar.*/
-    QToolBar*                           m_pDynamicPluginToolBar;    /**< Holds the plugin tool bar.*/
+    QPointer<QLabel>                    m_pLabelTime;                   /**< Holds the display label for the running time.*/
 
-    QLabel*                             m_pLabelTime;      /**< Holds the display label for the running time.*/
-    QSharedPointer<QTimer>              m_pTimer;           /**< timer of the main application*/
-    QSharedPointer<QTime>               m_pTime;            /**< Holds current time output, updated with timeout of timer.*/
-    int                                 m_iTimeoutMSec;     /**< Holds milliseconds after which timer timeouts.*/
+    QPointer<QTextBrowser>              m_pTextBrowser_Log;             /**< Holds the text browser for the log.*/
 
-    QDockWidget*                        m_pPluginGuiDockWidget;         /**< Dock widget which holds the plugin gui. */
-    PluginGui*                          m_pPluginGui;
-    QSharedPointer<SCSHAREDLIB::PluginManager>       m_pPluginManager;       /**< Holds log dock widget.*/
-    QSharedPointer<SCSHAREDLIB::PluginSceneManager>  m_pPluginSceneManager;  /**< Plugin scene manager which manages the plugin graph */
+    QPointer<StartUpWidget>             m_pStartUpWidget;               /**< holds the StartUpWidget.*/
 
-    QDockWidget*                        m_pDockWidget_Log;              /**< Holds the dock widget containing the log.*/
-    QTextBrowser*                       m_pTextBrowser_Log;             /**< Holds the text browser for the log.*/
+    QPointer<DISPLIB::MultiView>        m_pRunWidget;                   /**< The run widget */
 
     LogLevel                            m_eLogLevelCurrent;             /**< Holds the current log level.*/
 
-    QSharedPointer<QWidget>             m_pAboutWindow;                 /**< Holds the widget containing the about information.*/
-    QSharedPointer<DISPLIB::QuickControlView> m_pQuickControlView;            /**< quick control widget. */
+    QPointer<PluginGui>                 m_pPluginGui;                   /**< Holds the plugin GUI.*/
 
+    QSharedPointer<QTimer>                              m_pTimer;               /**< timer of the main application*/
+    QSharedPointer<QTime>                               m_pTime;                /**< Holds current time output, updated with timeout of timer.*/
+    QSharedPointer<SCSHAREDLIB::PluginManager>          m_pPluginManager;       /**< Holds log dock widget.*/
+    QSharedPointer<SCSHAREDLIB::PluginSceneManager>     m_pPluginSceneManager;  /**< Plugin scene manager which manages the plugin graph */
+    QSharedPointer<QWidget>                             m_pAboutWindow;         /**< Holds the widget containing the about information.*/
+    QSharedPointer<DISPLIB::QuickControlView>           m_pQuickControlView;    /**< quick control widget. */
+    QSharedPointer<SCSHAREDLIB::DisplayManager>         m_pDisplayManager;      /**< display manager */
 };
 }// NAMESPACE
 
