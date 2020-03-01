@@ -84,14 +84,6 @@ Averaging::~Averaging()
 
 //=============================================================================================================
 
-QList<QPointer<QWidget> > Averaging::getControlWidgets()
-{
-    // Return empty list since we do not have any control parameters for the FissSimulator during the ongoing measurement.
-    return QList<QPointer<QWidget> >();
-}
-
-//=============================================================================================================
-
 QSharedPointer<IPlugin> Averaging::clone() const
 {
     QSharedPointer<Averaging> pAveragingClone(new Averaging);
@@ -187,13 +179,10 @@ void Averaging::update(SCMEASLIB::Measurement::SPtr pMeasurement)
                 }
             }
 
-            if(m_pAveragingSettingsView) {
-                m_pAveragingSettingsView->setStimChannels(m_mapStimChsIndexNames);
-            }
+            initPluginControlWidgets();
 
-            if(m_pArtifactSettingsView) {
-                m_pArtifactSettingsView->setChInfo(m_pFiffInfo->chs);
-            }
+            emit stimChannelsChanged(m_mapStimChsIndexNames);
+            emit fiffChInfoChanged(m_pFiffInfo->chs);
         }
 
         // Append new data
@@ -218,40 +207,87 @@ void Averaging::init()
 
     // Output
     m_pAveragingOutput = PluginOutputData<RealTimeEvokedSet>::create(this, "AveragingOut", "Averaging Output Data");
-    m_pAveragingOutput->data()->setName(QString("Plugin/%1").arg(this->getName()));//Provide name to auto store widget settings
+    m_pAveragingOutput->data()->setName(this->getName());//Provide name to auto store widget settings
     m_outputConnectors.append(m_pAveragingOutput);
+}
 
-    //Add control widgets to output data (will be used by QuickControlView by the measurements display)
-    m_pAveragingSettingsView = AveragingSettingsView::SPtr::create(QString("Plugin/%1").arg(this->getName()));
+//=============================================================================================================
 
-    m_pAveragingSettingsView->setObjectName("group_tab_Averaging_Settings");
+void Averaging::initPluginControlWidgets()
+{
+    if(m_pFiffInfo) {
+        QList<QWidget*> plControlWidgets;
 
-    connect(m_pAveragingSettingsView.data(), &AveragingSettingsView::changeNumAverages,
-            this, &Averaging::onChangeNumAverages);
-    connect(m_pAveragingSettingsView.data(), &AveragingSettingsView::changeBaselineFrom,
-            this, &Averaging::onChangeBaselineFrom);
-    connect(m_pAveragingSettingsView.data(), &AveragingSettingsView::changeBaselineTo,
-            this, &Averaging::onChangeBaselineTo);
-    connect(m_pAveragingSettingsView.data(), &AveragingSettingsView::changePostStim,
-            this, &Averaging::onChangePostStim);
-    connect(m_pAveragingSettingsView.data(), &AveragingSettingsView::changePreStim,
-            this, &Averaging::onChangePreStim);
-    connect(m_pAveragingSettingsView.data(), &AveragingSettingsView::changeStimChannel,
-            this, &Averaging::onChangeStimChannel);
-    connect(m_pAveragingSettingsView.data(), &AveragingSettingsView::changeBaselineActive,
-            this, &Averaging::onChangeBaselineActive);
-    connect(m_pAveragingSettingsView.data(), &AveragingSettingsView::resetAverage,
-            this, &Averaging::onResetAverage);
+        //Add control widgets to output data (will be used by QuickControlView by the measurements display)
+        AveragingSettingsView* pAveragingSettingsView = new AveragingSettingsView(QString("Plugin/%1").arg(this->getName()));
 
-    //m_pAveragingOutput->data()->addControlWidget(m_pAveragingSettingsView);
+        pAveragingSettingsView->setObjectName("group_tab_Averaging_Settings");
 
-    m_pArtifactSettingsView = ArtifactSettingsView::SPtr::create(QString("Plugin/%1").arg(this->getName()));
-    m_pArtifactSettingsView->setObjectName("group_tab_Averaging_Artifact");
+        connect(pAveragingSettingsView, &AveragingSettingsView::changeNumAverages,
+                this, &Averaging::onChangeNumAverages);
+        connect(pAveragingSettingsView, &AveragingSettingsView::changeBaselineFrom,
+                this, &Averaging::onChangeBaselineFrom);
+        connect(pAveragingSettingsView, &AveragingSettingsView::changeBaselineTo,
+                this, &Averaging::onChangeBaselineTo);
+        connect(pAveragingSettingsView, &AveragingSettingsView::changePostStim,
+                this, &Averaging::onChangePostStim);
+        connect(pAveragingSettingsView, &AveragingSettingsView::changePreStim,
+                this, &Averaging::onChangePreStim);
+        connect(pAveragingSettingsView, &AveragingSettingsView::changeStimChannel,
+                this, &Averaging::onChangeStimChannel);
+        connect(pAveragingSettingsView, &AveragingSettingsView::changeBaselineActive,
+                this, &Averaging::onChangeBaselineActive);
+        connect(pAveragingSettingsView, &AveragingSettingsView::resetAverage,
+                this, &Averaging::onResetAverage);
+        connect(this, &Averaging::stimChannelsChanged,
+                pAveragingSettingsView, &AveragingSettingsView::setStimChannels);
+        connect(this, &Averaging::evokedSetChanged,
+                pAveragingSettingsView, &AveragingSettingsView::setDetectedEpochs);
 
-    connect(m_pArtifactSettingsView.data(), &ArtifactSettingsView::changeArtifactThreshold,
-            this, &Averaging::onChangeArtifactThreshold);
+        plControlWidgets.append(pAveragingSettingsView);
 
-    //m_pAveragingOutput->data()->addControlWidget(m_pArtifactSettingsView);
+        ArtifactSettingsView* pArtifactSettingsView = new ArtifactSettingsView(QString("Plugin/%1").arg(this->getName()));
+        pArtifactSettingsView->setObjectName("group_tab_Averaging_Artifact");
+
+        connect(pArtifactSettingsView, &ArtifactSettingsView::changeArtifactThreshold,
+                this, &Averaging::onChangeArtifactThreshold);
+        connect(this, &Averaging::fiffChInfoChanged,
+                pArtifactSettingsView, &ArtifactSettingsView::setChInfo);
+
+        plControlWidgets.append(pArtifactSettingsView);
+
+        emit pluginControlWidgetsChanged(plControlWidgets, this->getName());
+
+        // Init RtAve
+        int iCurrentStimChIdx = m_mapStimChsIndexNames.value(pAveragingSettingsView->getCurrentStimCh());
+
+        if(!m_mapStimChsIndexNames.contains(pAveragingSettingsView->getCurrentStimCh())) {
+            qDebug() << "Averaging::run() - Current stim channel is not present in data. Setting to first found stim channel instead.";
+            iCurrentStimChIdx = m_mapStimChsIndexNames.first();
+        }
+
+        // Init Real-Time average
+        int iPreStimSamples = ((float)pAveragingSettingsView->getPreStimSeconds()/1000)*m_pFiffInfo->sfreq;
+        int iPostStimSamples = ((float)pAveragingSettingsView->getPostStimSeconds()/1000)*m_pFiffInfo->sfreq;
+        int iBaselineFromSamples = ((float)pAveragingSettingsView->getBaselineFromSeconds()/1000)*m_pFiffInfo->sfreq;
+        int iBaselineToSamples = ((float)pAveragingSettingsView->getBaselineToSeconds()/1000)*m_pFiffInfo->sfreq;
+
+        m_pRtAve = RtAve::SPtr::create(pAveragingSettingsView->getNumAverages(),
+                                       iPreStimSamples,
+                                       iPostStimSamples,
+                                       pAveragingSettingsView->getBaselineFromSeconds(),
+                                       pAveragingSettingsView->getBaselineToSeconds(),
+                                       iCurrentStimChIdx,
+                                       m_pFiffInfo);
+
+        connect(m_pRtAve.data(), &RtAve::evokedStim,
+                this, &Averaging::appendEvoked);
+
+        m_pRtAve->setBaselineFrom(iBaselineFromSamples, pAveragingSettingsView->getBaselineFromSeconds());
+        m_pRtAve->setBaselineTo(iBaselineToSamples, pAveragingSettingsView->getBaselineToSeconds());
+        m_pRtAve->setBaselineActive(pAveragingSettingsView->getDoBaselineCorrection());
+        m_pRtAve->setArtifactReduction(pArtifactSettingsView->getThresholdMap());
+    }
 }
 
 //=============================================================================================================
@@ -377,9 +413,7 @@ void Averaging::appendEvoked(const FIFFLIB::FiffEvokedSet& evokedSet,
     m_qVecEvokedData.push_back(evokedSet);
     m_lResponsibleTriggerTypes = lResponsibleTriggerTypes;
 
-    if(m_pAveragingSettingsView) {
-        m_pAveragingSettingsView->setDetectedEpochs(evokedSet);
-    }
+    emit evokedSetChanged(evokedSet);
 
     m_qMutex.unlock();
 }
@@ -409,34 +443,6 @@ void Averaging::run()
         qDebug() << "Averaging::run() - No stim channels were found. Averaging plugin was not started.";
         return;
     }
-
-    int iCurrentStimChIdx = m_mapStimChsIndexNames.value(m_pAveragingSettingsView->getCurrentStimCh());
-
-    if(!m_mapStimChsIndexNames.contains(m_pAveragingSettingsView->getCurrentStimCh())) {
-        qDebug() << "Averaging::run() - Current stim channel is not present in data. Setting to first found stim channel instead.";
-        iCurrentStimChIdx = m_mapStimChsIndexNames.first();
-    }
-
-    // Init Real-Time average    
-    int iPreStimSamples = ((float)m_pAveragingSettingsView->getPreStimSeconds()/1000)*m_pFiffInfo->sfreq;
-    int iPostStimSamples = ((float)m_pAveragingSettingsView->getPostStimSeconds()/1000)*m_pFiffInfo->sfreq;
-    int iBaselineFromSamples = ((float)m_pAveragingSettingsView->getBaselineFromSeconds()/1000)*m_pFiffInfo->sfreq;
-    int iBaselineToSamples = ((float)m_pAveragingSettingsView->getBaselineToSeconds()/1000)*m_pFiffInfo->sfreq;
-
-    m_pRtAve = RtAve::SPtr::create(m_pAveragingSettingsView->getNumAverages(),
-                                   iPreStimSamples,
-                                   iPostStimSamples,
-                                   m_pAveragingSettingsView->getBaselineFromSeconds(),
-                                   m_pAveragingSettingsView->getBaselineToSeconds(),
-                                   iCurrentStimChIdx,
-                                   m_pFiffInfo);
-    m_pRtAve->setBaselineFrom(iBaselineFromSamples, m_pAveragingSettingsView->getBaselineFromSeconds());
-    m_pRtAve->setBaselineTo(iBaselineToSamples, m_pAveragingSettingsView->getBaselineToSeconds());
-    m_pRtAve->setBaselineActive(m_pAveragingSettingsView->getDoBaselineCorrection());
-    m_pRtAve->setArtifactReduction(m_pArtifactSettingsView->getThresholdMap());
-
-    connect(m_pRtAve.data(), &RtAve::evokedStim,
-            this, &Averaging::appendEvoked);
 
     m_bProcessData = true;
 

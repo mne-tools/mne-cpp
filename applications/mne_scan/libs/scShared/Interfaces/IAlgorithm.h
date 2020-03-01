@@ -62,7 +62,6 @@ namespace SCSHAREDLIB
  */
 class IAlgorithm : public IPlugin
 {
-//ToDo virtual methods of IMeasurementSink && IMeasurementSource
 public:
     typedef QSharedPointer<IAlgorithm> SPtr;               /**< Shared pointer type for IAlgorithm. */
     typedef QSharedPointer<const IAlgorithm> ConstSPtr;    /**< Const shared pointer type for IAlgorithm. */
