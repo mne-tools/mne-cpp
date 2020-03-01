@@ -6,9 +6,9 @@ nav_order: 3
 ---
 # Real time Head Monitoring
 
-This guide gives introductions on how to enable and use real-time head monitoring during your measurement. Prerequisitory are enabled head position indicator (HPI) coils. These are coils, driven at a specific frequency, that help estimating the current head position. A general explanation about the method can be found in the appendix of this guide. 
+This guide gives introductions on how to enable and use real-time head monitoring during your measurement. Prerequisitory are enabled head position indicator (HPI) coils. These are coils, driven at a specific frequency, that help estimating the current head position. 
 
-## Prerequisories
+## Prerequisite
 
 Before you can vosualize the head movement during your measurement you have to make sure two things:
 
@@ -16,6 +16,7 @@ Before you can vosualize the head movement during your measurement you have to m
 2. Make sure you have digitized the subjects head accordingly and you have access to the data. Be aware of the order you digitize the subjects hpi coils. Following picture shows in wich order MNE-CPP assignes the head positions. Try to stay consistend.
 
 ## Setup
+
 The HpiView is a functionality that can be added to all Sensor Plugins like `FiffSimulator` or `FieldTripBuffer`. Following steps will show you the necessary steps to setup the real time Head Monitoring. To visualize a subjects head movement, you need to setup a datastream first. There are following usecases:
 
 1. Setup Datastream
@@ -25,7 +26,7 @@ The HpiView is a functionality that can be added to all Sensor Plugins like `Fif
 
     * Streaming data from a MEG device in real-time:
 
-    To connect the VectorView MEG-Device to MNE-Scan you should use the [FieldTripBuffer](../development/ftbufferplugin.md).
+    To connect the VectorView MEG-Device to MNE-Scan you should use the [FieldTripBuffer-Plugin](../development/ftbufferplugin.md).
 
 2. Open the HPI View
 
@@ -53,8 +54,8 @@ Picture
 Picture
 
 1. Choose if you want to use:
-    * Signa Space Projection
-    * Compensators
+    * Signal Space Projection `SSP`
+    * `Compensators`
 
 2. Enter the frequencies each coil is driven with. The labeling 1,2,3,4 also refering to the position mentioned in the beginning of this guide.
 
@@ -72,10 +73,10 @@ Picture
 
 Here you can choose what elemnts you want to visualize in the monitoring section. These elements are following:
 
- * Device: VectorView or BabyMEG
- * Head
+ * Device: `VectorView` or `BabyMEG`
+ * Head: `Average` and `Tracked`
  
-In `Head` you can choose if you want to see the head visualiztion and tracked digitizers. 
+In `Head` you can choose if you want to see the scled average head visualiztion and tracked digitizers. In `Device` if and which sensor layout you want to visualize.
 
 
 
