@@ -117,8 +117,9 @@ public:
                                 const QString& sName);
 
 private:
-    QPointer<QSplitter> m_pSplitterHorizontal;      /**< The horizontal QSplitter. */
-    QPointer<QSplitter> m_pSplitterVertical;        /**< The vertical QSplitter. */
+    QPointer<QSplitter>     m_pSplitterHorizontal;      /**< The horizontal QSplitter. */
+    QPointer<QSplitter>     m_pSplitterVertical;        /**< The vertical QSplitter. */
+    QPointer<QTabWidget>    m_pVerticalTabWidget;       /**< The vertically aligned tab widget. */
 };
 
 }// NAMESPACE

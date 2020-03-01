@@ -42,6 +42,7 @@
 #include <scShared/Management/displaymanager.h>
 
 #include <scDisp/measurementwidget.h>
+#include <scDisp/realtimemultisamplearraywidget.h>
 
 #include <disp/viewers/multiview.h>
 
@@ -575,7 +576,9 @@ void MainWindow::initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::IPlugin> 
                             }
                         }
 
-                        if(sCurPluginName == "Fiff Simulator" || sCurPluginName == "Noise Reduction") {
+                        // RealTimeMultiSampleArrayWidget are always displayed as the most lowet vertical widget in the multiview.
+                        // Please note that multiple RealTimeMultiSampleArrayWidget are tabbified
+                        if(qobject_cast<RealTimeMultiSampleArrayWidget *>(pWidget)) {
                             m_pRunWidget->addWidgetV(pWidget,
                                                      sCurPluginName);
                         } else {
