@@ -122,6 +122,7 @@ RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<RealTimeEvokedSe
     font.setPointSize(20);
     m_pLabelInit->setFont(font);
     m_pRTESetLayout->addWidget(m_pLabelInit);
+    m_pRTESetLayout->setContentsMargins(0,0,0,0);
 
     //Create toolboxes with butterfly and 2D layout plot
     m_pToolBox = new QToolBox(this);
