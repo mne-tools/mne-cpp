@@ -144,25 +144,26 @@ MainWindow::~MainWindow()
 {
     clear();
 
-    //clean
-    if(m_pToolBar)
-    {
-        if(m_pLabelTime)
+    if(m_pToolBar) {
+        if(m_pLabelTime) {
             delete m_pLabelTime;
+        }
         m_pLabelTime = NULL;
         delete m_pToolBar;
     }
 
-    if(m_pDynamicPluginToolBar)
+    if(m_pDynamicPluginToolBar) {
         delete m_pDynamicPluginToolBar;
+    }
 }
 
 //=============================================================================================================
 
 void MainWindow::clear()
 {
-    if(m_bIsRunning)
+    if(m_bIsRunning) {
         this->stopMeasurement();
+    }
 }
 
 //=============================================================================================================
@@ -364,12 +365,13 @@ void MainWindow::createActions()
     m_pActionGroupLgLv->addAction(m_pActionMinLgLv);
     m_pActionGroupLgLv->addAction(m_pActionNormLgLv);
     m_pActionGroupLgLv->addAction(m_pActionMaxLgLv);
-    if (m_eLogLevelCurrent == _LogLvMin){
-        m_pActionMinLgLv->setChecked(true);}
-    else if (m_eLogLevelCurrent == _LogLvNormal){
-        m_pActionNormLgLv->setChecked(true);}
-    else {
-        m_pActionMaxLgLv->setChecked(true);}
+    if (m_eLogLevelCurrent == _LogLvMin) {
+        m_pActionMinLgLv->setChecked(true);
+    } else if (m_eLogLevelCurrent == _LogLvNormal) {
+        m_pActionNormLgLv->setChecked(true);
+    } else {
+        m_pActionMaxLgLv->setChecked(true);
+    }
 
     //Help QMenu
     m_pActionHelpContents = new QAction(tr("Help &Contents"), this);
@@ -601,7 +603,6 @@ void MainWindow::initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::IPlugin> 
 void MainWindow::onControlWidgetsChanged(QList<QWidget*>& lControlWidgets,
                                          const QString& sPluginName)
 {
-    //Quick Control Widget
     if(m_pQuickControlView) {
         m_pQuickControlView->addWidgets(lControlWidgets, sPluginName);
     }
@@ -617,7 +618,9 @@ void MainWindow::updateConnectionWidget(SCSHAREDLIB::PluginConnectorConnection::
 
 //=============================================================================================================
 
-void MainWindow::writeToLog(const QString& logMsg, LogKind lgknd, LogLevel lglvl)
+void MainWindow::writeToLog(const QString& logMsg,
+                            LogKind lgknd,
+                            LogLevel lglvl)
 {
     if(lglvl<=m_eLogLevelCurrent)
     {
@@ -650,8 +653,7 @@ void MainWindow::startMeasurement()
 {
     writeToLog(tr("Starting real-time measurement..."), _LogKndMessage, _LogLvMin);
 
-    if(!m_pPluginSceneManager->startPlugins())
-    {
+    if(!m_pPluginSceneManager->startPlugins()) {
         QMessageBox::information(0, tr("MNE Scan - Start"), QString(QObject::tr("Not able to start at least one sensor plugin!")), QMessageBox::Ok);
         return;
     }
