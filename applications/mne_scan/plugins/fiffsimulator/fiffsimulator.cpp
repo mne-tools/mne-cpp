@@ -192,26 +192,18 @@ bool FiffSimulator::stop()
         m_pFiffSimulatorProducer->stop();
     }
 
-    //Wait until this thread is stopped
-    m_qMutex.lock();
-    //m_bIsRunning = false;
-    m_qMutex.unlock();
+    requestInterruption();
 
-    if(this->isRunning())
-    {
+    if(this->isRunning()) {
         //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
         m_pRawMatrixBuffer_In->releaseFromPop();
-
         m_pRawMatrixBuffer_In->clear();
-
         m_pRTMSA_FiffSimulator->data()->clear();
     }
 
     if(m_pHPIWidget) {
         m_pHPIWidget->hide();
     }
-
-    requestInterruption();
 
     return true;
 }
