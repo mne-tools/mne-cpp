@@ -106,12 +106,10 @@ public:
     /**
      * Constructs a RealTimeEvokedSetWidget which is a child of parent.
      *
-     * @param [in] pRTESet       pointer to real-time evoked set measurement.
      * @param [in] pTime         pointer to application time.
      * @param [in] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
      */
-    RealTimeEvokedSetWidget(QSharedPointer<SCMEASLIB::RealTimeEvokedSet> pRTESet,
-                            QSharedPointer<QTime> &pTime,
+    RealTimeEvokedSetWidget(QSharedPointer<QTime> &pTime,
                             QWidget* parent = 0);
 
     //=========================================================================================================
@@ -124,15 +122,9 @@ public:
     /**
      * Is called when new data are available.
      *
-     * @param [in] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
+     * @param [in] pMeasurement  pointer to measurement.
      */
     virtual void update(SCMEASLIB::Measurement::SPtr pMeasurement);
-
-    //=========================================================================================================
-    /**
-     * Is called when new data are available.
-     */
-    virtual void getData();
 
     //=========================================================================================================
     /**

@@ -76,7 +76,9 @@ public:
      * @param[in] name       connection name
      * @param[in] descr      connection description
      */
-    PluginOutputData(IPlugin *parent, const QString &name, const QString &descr);
+    PluginOutputData(IPlugin *parent,
+                     const QString &name,
+                     const QString &descr);
 
     //=========================================================================================================
     /**
@@ -94,7 +96,9 @@ public:
      *
      * @return the created PluginOutputData
      */
-    static inline QSharedPointer< PluginOutputData<T> > create(IPlugin *parent, const QString &name, const QString &descr);
+    static inline QSharedPointer< PluginOutputData<T> > create(IPlugin *parent,
+                                                               const QString &name,
+                                                               const QString &descr);
 
     //=========================================================================================================
     /**

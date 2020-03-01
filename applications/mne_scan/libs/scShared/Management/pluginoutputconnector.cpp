@@ -49,7 +49,9 @@ using namespace SCSHAREDLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PluginOutputConnector::PluginOutputConnector(IPlugin *parent, const QString &name, const QString &descr)
+PluginOutputConnector::PluginOutputConnector(IPlugin *parent,
+                                             const QString &name,
+                                             const QString &descr)
 : PluginConnector(parent, name, descr)
 {
 }
