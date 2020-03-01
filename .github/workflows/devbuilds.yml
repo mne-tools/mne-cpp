@@ -197,7 +197,7 @@ jobs:
         cd applications\mne_scan\plugins\brainflowboard
         qmake -makefile brainflowboard.pro
         jom -j2
-        xcopy .\brainflow\installed\lib ..\..\..\bin
+        xcopy .\brainflow\installed\lib\* ..\..\..\bin\ /s /i
     - name: Package binaries
       run: |
         7z a mne-cpp-windows-x86_64.zip ./bin
