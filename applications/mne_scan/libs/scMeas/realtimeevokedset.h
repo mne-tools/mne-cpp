@@ -64,6 +64,11 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+namespace FIFFLIB {
+    class FiffEvokedSet;
+    class FiffInfo;
+}
+
 //=============================================================================================================
 // DEFINE NAMESPACE SCMEASLIB
 //=============================================================================================================
@@ -163,7 +168,7 @@ public:
      *
      * @return the reference to the current info.
      */
-    inline FIFFLIB::FiffInfo::SPtr info();
+    inline QSharedPointer<FIFFLIB::FiffInfo> info();
 
     //=========================================================================================================
     /**
@@ -174,7 +179,7 @@ public:
      * @param [in] lResponsibleTriggerTypes  List of all trigger types which lead to the recent emit of a new evoked set.
      */
     virtual void setValue(const FIFFLIB::FiffEvokedSet &v,
-                          const FIFFLIB::FiffInfo::SPtr& p_fiffinfo,
+                          const QSharedPointer<FIFFLIB::FiffInfo>& p_fiffinfo,
                           const QStringList& lResponsibleTriggerTypes);
 
     //=========================================================================================================
@@ -184,7 +189,7 @@ public:
      *
      * @return the last attached value.
      */
-    virtual FIFFLIB::FiffEvokedSet::SPtr& getValue();
+    virtual QSharedPointer<FIFFLIB::FiffEvokedSet>& getValue();
 
     //=========================================================================================================
     /**
@@ -225,27 +230,27 @@ private:
      *
      * @param[in] p_fiffInfo     Info to init from
      */
-    void init(FIFFLIB::FiffInfo::SPtr p_fiffInfo);
+    void init(QSharedPointer<FIFFLIB::FiffInfo> p_fiffInfo);
 
-    mutable QMutex                      m_qMutex;           /**< Mutex to ensure thread safety */
+    mutable QMutex                          m_qMutex;           /**< Mutex to ensure thread safety */
 
-    FIFFLIB::FiffEvokedSet::SPtr        m_pFiffEvokedSet;   /**< Evoked data set*/
+    QSharedPointer<FIFFLIB::FiffEvokedSet>  m_pFiffEvokedSet;   /**< Evoked data set*/
 
-    QStringList                         m_lResponsibleTriggerTypes; /**< List of all trigger types which lead to the recent emit of a new evoked set. */
+    QStringList                             m_lResponsibleTriggerTypes; /**< List of all trigger types which lead to the recent emit of a new evoked set. */
 
-    FIFFLIB::FiffInfo::SPtr             m_pFiffInfo;        /**< Fiff info */
+    QSharedPointer<FIFFLIB::FiffInfo>       m_pFiffInfo;        /**< Fiff info */
 
-    QString                             m_sXMLLayoutFile;   /**< Layout file name. */
+    QString                                 m_sXMLLayoutFile;   /**< Layout file name. */
 
-    qint32                              m_iPreStimSamples;  /**< Number of pre-stimulus samples */
+    qint32                                  m_iPreStimSamples;  /**< Number of pre-stimulus samples */
 
-    QList<QColor>                       m_qListChColors;    /**< Channel color for butterfly plot.*/
+    QList<QColor>                           m_qListChColors;    /**< Channel color for butterfly plot.*/
 
-    QList<RealTimeSampleArrayChInfo>    m_qListChInfo;      /**< Channel info list.*/
+    QList<RealTimeSampleArrayChInfo>        m_qListChInfo;      /**< Channel info list.*/
 
-    bool                                m_bInitialized;     /**< If values are stored.*/
+    bool                                    m_bInitialized;     /**< If values are stored.*/
 
-    QPair<qint32,qint32>                m_pairBaseline;     /**< Baseline information min max.*/
+    QPair<qint32,qint32>                    m_pairBaseline;     /**< Baseline information min max.*/
 };
 
 //=============================================================================================================
@@ -308,7 +313,7 @@ inline QList<RealTimeSampleArrayChInfo>& RealTimeEvokedSet::chInfo()
 
 //=============================================================================================================
 
-inline FIFFLIB::FiffInfo::SPtr RealTimeEvokedSet::info()
+inline QSharedPointer<FIFFLIB::FiffInfo> RealTimeEvokedSet::info()
 {
     QMutexLocker locker(&m_qMutex);
     return m_pFiffInfo;

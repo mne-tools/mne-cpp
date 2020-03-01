@@ -150,15 +150,19 @@ RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<QTime> &pTime,
 RealTimeEvokedSetWidget::~RealTimeEvokedSetWidget()
 {
     // Store Settings
-    if(!m_pRTESet->getName().isEmpty())
-    {
-        QSettings settings;
+    if(m_bInitialized) {
+        if(!m_pRTESet->getName().isEmpty())
+        {
+            QSettings settings;
 
-        //Store current view toolbox index - butterfly or 2D layout
-        if(m_pToolBox) {
-            settings.setValue(QString("RTESW/%1/selectedView").arg(m_pRTESet->getName()), m_pToolBox->currentIndex());
+            //Store current view toolbox index - butterfly or 2D layout
+            if(m_pToolBox) {
+                settings.setValue(QString("RTESW/%1/selectedView").arg(m_pRTESet->getName()), m_pToolBox->currentIndex());
+            }
         }
     }
+
+    delete m_pActionSelectSensors;
 }
 
 //=============================================================================================================
