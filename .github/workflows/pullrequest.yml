@@ -78,8 +78,7 @@ jobs:
         cd applications\mne_scan\plugins\brainflowboard\brainflow
         mkdir build
         cd build
-        set "installed_path=%cd%\..\installed"
-        cmake -G "Visual Studio 15 2017" -A x64 -DMSVC_RUNTIME=dynamic -DCMAKE_SYSTEM_VERSION=8.1 -DCMAKE_INSTALL_PREFIX=%installed_path% ..
+        cmake -G "Visual Studio 15 2017" -A x64 -DMSVC_RUNTIME=dynamic -DCMAKE_SYSTEM_VERSION=8.1 -DCMAKE_INSTALL_PREFIX="%GITHUB_WORKSPACE%\applications\mne_scan\plugins\brainflowboard\brainflow\installed" ..
         cmake --build . --target install --config Release
         cd ..\..
         # Setup VS compiler
