@@ -73,6 +73,7 @@ QuickControlView::QuickControlView(const QString &sSettingsPath,
 {
     ui->setupUi(this);
     ui->m_pTabWidget->setTabBarAutoHide(true);
+    ui->m_pTabWidget->setMovable(true);
 
     //Init opacity slider
     connect(ui->m_horizontalSlider_opacity, &QSlider::valueChanged,
