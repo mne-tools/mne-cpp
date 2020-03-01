@@ -188,7 +188,7 @@ jobs:
         cd applications\mne_scan\plugins\brainflowboard\brainflow
         mkdir build
         cd build
-        cmake -G "Visual Studio 15 2017" -A x64 -DMSVC_RUNTIME=dynamic -DCMAKE_SYSTEM_VERSION=8.1 -DCMAKE_INSTALL_PREFIX=$env:GITHUB_WORKSPACE\applications\mne_scan\plugins\brainflowboard\brainflow\installed" ..
+        cmake -G "Visual Studio 15 2017" -A x64 -DMSVC_RUNTIME=dynamic -DCMAKE_SYSTEM_VERSION=8.1 -DCMAKE_INSTALL_PREFIX="$env:GITHUB_WORKSPACE\applications\mne_scan\plugins\brainflowboard\brainflow\installed" ..
         cmake --build . --target install --config Release
     - name: Compile and configure BrainFlow plugin
       run: |
