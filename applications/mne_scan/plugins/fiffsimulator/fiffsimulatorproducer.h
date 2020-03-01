@@ -138,7 +138,6 @@ private:
     QMutex producerMutex;
 
     FiffSimulator*  m_pFiffSimulator;   /**< Holds a pointer to corresponding MneRtClient.*/
-    bool            m_bIsRunning;       /**< Whether MneRtClientProducer is running.*/
 
     QSharedPointer<COMMUNICATIONLIB::RtDataClient> m_pRtDataClient;   /**< The data client.*/
     bool m_bDataClientIsConnected;                  /**< If the data client is connected.*/

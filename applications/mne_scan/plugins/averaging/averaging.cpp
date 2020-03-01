@@ -131,6 +131,9 @@ bool Averaging::stop()
     }
 
     m_qMutex.unlock();
+
+    wait();
+
     return true;
 }
 
