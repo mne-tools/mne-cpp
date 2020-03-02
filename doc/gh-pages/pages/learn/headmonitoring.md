@@ -10,23 +10,21 @@ This guide gives introductions on how to enable and use real-time head monitorin
 
 ## Prerequisite
 
-Before you can vosualize the head movement during your measurement you have to make sure two things:
+Before you can visualize the head movement during your measurement, you have to ensure two things:
 
 1. Enable continious HPI (cHPi) during your measurement.
 2. Make sure you have digitized the subjects head accordingly and you have access to the data. Be aware of the order you digitize the subjects hpi coils. Following picture shows in wich order MNE-CPP assignes the head positions. Try to stay consistend.
 
+![](../../images/mne_scan_hpi_pos.png)
+
 ## Setup
 
-The HpiView is a functionality that can be added to all Sensor Plugins like `FiffSimulator` or `FieldTripBuffer`. Following steps will show you the necessary steps to setup the real time Head Monitoring. To visualize a subjects head movement, you need to setup a datastream first. There are following usecases:
+The HpiView is a functionality that can be added to all Sensor Plugins like `FiffSimulator` or `FieldTripBuffer`. Following steps will show you the necessary steps to setup the real time head monitoring. 
 
 1. Setup Datastream
-    * Streaming Simulated Data:
+    * Streaming Simulated Data via [FiffSimulator](/prerecordeddata.md).
 
-    To visualize the head position in prerecordet data, follow the steps described [here](/prerecordeddata.md).
-
-    * Streaming data from a MEG device in real-time:
-
-    To connect the VectorView MEG-Device to MNE-Scan you should use the [FieldTripBuffer-Plugin](../development/ftbufferplugin.md).
+    * Streaming data from a MEG device in real-time, i.e. with the [FieldTripBuffer-Plugin](../development/ftbufferplugin.md).
 
 2. Open the HPI View
 
@@ -36,28 +34,28 @@ The HpiView is a functionality that can be added to all Sensor Plugins like `Fif
 
 ## The HPI View
 
-The HPI-View panel can be divided in two sections, namely the monitoring section and the control section. The monitoring sections shows an average head model that is aligned and scaled to tracked landmarks like LPA, RPA and Nasion. 
+The HPI-View panel can be divided in two sections, namely the monitoring section and the control section. The monitoring sections shows an average head model that is aligned and scaled to tracked landmarks like LPA, RPA, Nasion and hpi coils. 
 
-picture average head aligned with fiducials and hpi coils
+![](../../images/mne_scan_hpi_view.png)
 
 The control panel is on the right side and can also be divided into several sections. How to use them and what you can controle with them is shown below.    
 
 ### Load Digitizers
 
-Picture
+![](../../images/mne_scan_hpi_load.png)
 
 * Click the button `Load Digitizers` and navigate to the subjects digitzed data wich is stored in `.fif` format.  
-* The display will how you how many digitizers of each kind you have loaded. 
+* The display will show how many digitizers of each kind were have loaded. 
 
 ### HPI-Fitting
 
-Picture
+![](../../images/mne_scan_hpi_fit.png)
 
 1. Choose if you want to use:
     * Signal Space Projection `SSP`
     * `Compensators`
 
-2. Enter the frequencies each coil is driven with. The labeling 1,2,3,4 also refering to the position mentioned in the beginning of this guide.
+2. Enter the hpi coil frequencies. The labeling 1,2,3,4 referes to the positions mentioned in the beginning of this guide.
 
 3. Do an intitial hpi fit or enable continious HPi fitting. 
 
@@ -69,7 +67,7 @@ Picture
 
 ### 3D-Control
 
-Picture
+![](../../images/mne_scan_hpi_control.png)
 
 Here you can choose what elemnts you want to visualize in the monitoring section. These elements are following:
 
