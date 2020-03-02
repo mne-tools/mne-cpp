@@ -45,6 +45,9 @@
 #include <anShared/Management/communicator.h>
 #include "fiffrawview.h"
 #include "fiffrawviewdelegate.h"
+#include <disp/viewers/scalingview.h>
+#include "../dataloader/dataloader.h"
+#include "../dataloader/FormFiles/dataloadercontrol.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -128,6 +131,20 @@ void RawDataViewer::onNewModelAvalible(QSharedPointer<AbstractModel> pNewModel)
         m_pFiffRawView->initMVCSettings(m_pRawModel, m_pRawDelegate);
         qDebug() << "[RawDataViewer::onNewModelAvailable] New model added; " << pNewModel->getModelPath();
     }
+//    QPushButton* button = new QPushButton("This is a test :)");
+//    m_pControlDock->setWidget(button);
+
+
+    QLabel* mylabel = new QLabel(pNewModel->getModelName());
+
+
+    DISPLIB::ScalingView* scalingWidget = new DISPLIB::ScalingView("Test", m_pRawModel->getFiffInfo()->chs);
+
+    Layout->addWidget(mylabel);
+    Layout->addWidget(scalingWidget);
+
+    Container->setLayout(Layout);
+    Container->show();
 }
 
 //=============================================================================================================
@@ -157,11 +174,14 @@ QDockWidget *RawDataViewer::getControl()
     if(!m_pControlDock) {
         m_pControlDock = new QDockWidget(tr("Raw Data Viewer"));
         m_pControlDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-        m_pControlDock->setWidget(m_pRawDataViewerControl);
+        //m_pControlDock->setWidget(m_pRawDataViewerControl);
+        Layout = new QVBoxLayout;
+        Container = new QWidget;
+        m_pControlDock->setWidget(Container);
     }
 
-    // return m_pControlDock;
-    return Q_NULLPTR;
+    return m_pControlDock;
+    //return Q_NULLPTR;
 }
 
 //=============================================================================================================
