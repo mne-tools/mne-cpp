@@ -279,7 +279,7 @@ protected:
     QSharedPointer<RTPROCESSINGLIB::RtHpi>         m_pRtHPI;            /**< The real-time HPI object. */
 
     QPointer<DISP3DLIB::BemTreeItem>            m_pBemHeadAvr;          /**< TThe fsaverage BEM head model. */
-
+    QPointer<DISP3DLIB::DigitizerSetTreeItem>   m_pAvrFid;              /**< The 3D item pointing to the average fiducials. */
     QPointer<DISP3DLIB::DigitizerSetTreeItem>   m_pTrackedDigitizer;    /**< The 3D item pointing to the tracked digitizers. */
 
     double                                      m_dMaxHpiFitError;      /**< The maximum HPI fitting error allowed.*/
