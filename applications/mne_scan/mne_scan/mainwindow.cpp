@@ -91,16 +91,10 @@ const char* pluginDir = "/mne_scan_plugins";        /**< holds path to plugins.*
 MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
 , m_pStartUpWidget(new StartUpWidget(this))
-, m_pRunWidget(NULL)
 , m_pDisplayManager(new SCSHAREDLIB::DisplayManager(this))
 , m_bIsRunning(false)
-, m_pToolBar(NULL)
-, m_pDynamicPluginToolBar(NULL)
-, m_pLabelTime(NULL)
-, m_pTimer(NULL)
 , m_pTime(new QTime(0, 0))
 , m_iTimeoutMSec(1000)
-, m_pPluginGui(NULL)
 , m_pPluginManager(new SCSHAREDLIB::PluginManager(this))
 , m_pPluginSceneManager(new SCSHAREDLIB::PluginSceneManager(this))
 , m_eLogLevelCurrent(_LogLvMax)
@@ -120,10 +114,10 @@ MainWindow::MainWindow(QWidget *parent)
     m_pPluginManager->loadPlugins(qApp->applicationDirPath()+pluginDir);
 
     // Quick control selection
-    m_pQuickControlView = QuickControlView::SPtr::create(QString("MNESCAN/MainWindow"),
-                                                         "MNE Scan",
-                                                         Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint,
-                                                         this);
+    m_pQuickControlView = new QuickControlView(QString("MNESCAN/MainWindow"),
+                                                       "MNE Scan",
+                                                       Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint,
+                                                       this);
     createActions();
     createMenus();
     createToolBars();
@@ -142,28 +136,18 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    clear();
+    if(m_bIsRunning) {
+        this->stopMeasurement();
+    }
 
     if(m_pToolBar) {
         if(m_pLabelTime) {
             delete m_pLabelTime;
         }
-        m_pLabelTime = NULL;
         delete m_pToolBar;
     }
 
-    if(m_pDynamicPluginToolBar) {
-        delete m_pDynamicPluginToolBar;
-    }
-}
-
-//=============================================================================================================
-
-void MainWindow::clear()
-{
-    if(m_bIsRunning) {
-        this->stopMeasurement();
-    }
+    delete m_pDynamicPluginToolBar;
 }
 
 //=============================================================================================================
@@ -511,8 +495,6 @@ void MainWindow::createLogDockWindow()
 
     m_pDockWidget_Log->hide();
 
-    //dock->setVisible(false);
-
     m_pMenuView->addAction(m_pDockWidget_Log->toggleViewAction());
 }
 
@@ -524,18 +506,14 @@ void MainWindow::updatePluginSetupWidget(SCSHAREDLIB::IPlugin::SPtr pPlugin)
     m_qListDynamicDisplayActions.clear();
     m_qListDynamicControlWidgets.clear();
 
-    if(!pPlugin.isNull())
-    {
+    if(!pPlugin.isNull()) {
         // Add Dynamic Plugin Actions
         m_qListDynamicPluginActions.append(pPlugin->getPluginActions());
 
-        if(pPlugin.isNull())
-        {
+        if(pPlugin.isNull()) {
             QWidget* pWidget = new QWidget;
             setCentralWidget(pWidget);
-        }
-        else
-        {
+        } else {
             if(!m_bIsRunning) {
                 setCentralWidget(pPlugin->setupWidget());
             }
@@ -665,6 +643,7 @@ void MainWindow::startMeasurement()
     uiSetupRunningState(true);
     startTimer(m_iTimeoutMSec);
 
+    delete m_pRunWidget;
     m_pRunWidget = new MultiView(this);
     setCentralWidget(m_pRunWidget);
 
