@@ -88,11 +88,11 @@ namespace DISP3DLIB
 class DISP3DSHARED_EXPORT Renderable3DEntity : public Qt3DCore::QEntity
 {
     Q_OBJECT
-    Q_PROPERTY(float scale READ scaleValue WRITE setScale NOTIFY scaleChanged)
+    Q_PROPERTY(float scale READ scaleValue WRITE applyScale NOTIFY scaleChanged)
     Q_PROPERTY(float rotX READ rotX WRITE setRotX NOTIFY rotXChanged)
     Q_PROPERTY(float rotY READ rotY WRITE setRotY NOTIFY rotYChanged)
     Q_PROPERTY(float rotZ READ rotZ WRITE setRotZ NOTIFY rotZChanged)
-    Q_PROPERTY(QVector3D position READ position WRITE setPosition NOTIFY positionChanged)
+    Q_PROPERTY(QVector3D position READ position WRITE applyPosition NOTIFY positionChanged)
 
 public:
     typedef QSharedPointer<Renderable3DEntity> SPtr;             /**< Shared pointer type for Renderable3DEntity class. */
@@ -133,7 +133,8 @@ public:
      * @param[in] transform     The new entity's transform.
      * @param[in] bApplyInverse Whether to apply the inverse. False by default.
      */
-    virtual void setTransform(const FIFFLIB::FiffCoordTrans& transform, bool bApplyInverse = false);
+    virtual void setTransform(const FIFFLIB::FiffCoordTrans& transform,
+                              bool bApplyInverse = false);
 
     //=========================================================================================================
     /**
@@ -150,7 +151,8 @@ public:
      * @param[in] transform     The new entity's transform.
      * @param[in] bApplyInverse Whether to apply the inverse. False by default.
      */
-    virtual void applyTransform(const FIFFLIB::FiffCoordTrans& transform, bool bApplyInverse = false);
+    virtual void applyTransform(const FIFFLIB::FiffCoordTrans& transform,
+                                bool bApplyInverse = false);
 
     //=========================================================================================================
     /**
@@ -194,6 +196,14 @@ public:
 
     //=========================================================================================================
     /**
+     * Applies the current rotation around the x-axis.
+     *
+     * @param[in] rotX     The x-axis rotation value.
+     */
+    virtual void applyRotX(float rotX);
+
+    //=========================================================================================================
+    /**
      * Sets the current rotation around the x-axis.
      *
      * @param[in] rotX     The x-axis rotation value.
@@ -202,7 +212,15 @@ public:
 
     //=========================================================================================================
     /**
-     * Sets the current rotation around the y-axis.
+     * Applies the current rotation around the y-axis.
+     *
+     * @param[in] rotY     The y-axis rotation value.
+     */
+    virtual void applyRotY(float rotY);
+
+    //=========================================================================================================
+    /**
+     * Sets the current rotation around the x-axis.
      *
      * @param[in] rotY     The y-axis rotation value.
      */
@@ -210,7 +228,15 @@ public:
 
     //=========================================================================================================
     /**
-     * Sets the current rotation around the z-axis.
+     * Applies the current rotation around the z-axis.
+     *
+     * @param[in] rotZ     The z-axis rotation value.
+     */
+    virtual void applyRotZ(float rotZ);
+
+    //=========================================================================================================
+    /**
+     * Sets the current rotation around the x-axis.
      *
      * @param[in] rotZ     The z-axis rotation value.
      */
@@ -218,19 +244,27 @@ public:
 
     //=========================================================================================================
     /**
+     * Applies the current position/translation.
+     *
+     * @param[in] position     The position/translation value.
+     */
+    virtual void applyPosition(const QVector3D& position);
+
+    //=========================================================================================================
+    /**
      * Sets the current position/translation.
      *
      * @param[in] position     The position/translation value.
      */
-    virtual void setPosition(QVector3D position);
+    virtual void setPosition(const QVector3D& position);
 
     //=========================================================================================================
     /**
-     * Call this function whenever you want to change the visibilty of the 3D rendered content.
+     * Applies the current scale.
      *
-     * @param[in] state     The visiblity flag.
+     * @param[in] scale     The new scaling value.
      */
-    virtual void setVisible(bool state);
+    virtual void applyScale(float scale);
 
     //=========================================================================================================
     /**
@@ -239,6 +273,14 @@ public:
      * @param[in] scale     The new scaling value.
      */
     virtual void setScale(float scale);
+
+    //=========================================================================================================
+    /**
+     * Call this function whenever you want to change the visibilty of the 3D rendered content.
+     *
+     * @param[in] state     The visiblity flag.
+     */
+    virtual void setVisible(bool state);
 
     //=========================================================================================================
     /**
@@ -260,7 +302,7 @@ public:
      */
     virtual QVariant getMaterialParameter(const QString &sParameterName);
 
-protected: 
+protected:
     //=========================================================================================================
     /**
      * Sets the value of a specific parameter of the materials for this entity.
@@ -284,12 +326,6 @@ protected:
      */
     virtual QPair<bool, QVariant> getMaterialParameterRecursive(QObject * pObject,
                                                                 const QString &sParameterName);
-
-    //=========================================================================================================
-    /**
-     * Update the set transformation with the currently set translation and rotation values.
-     */
-    virtual void updateTransform();
 
     QPointer<Qt3DCore::QTransform>              m_pTransform;            /**< The main transformation. */
 
