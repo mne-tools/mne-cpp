@@ -84,7 +84,10 @@ Renderable3DEntity::Renderable3DEntity(Qt3DCore::QEntity* parent)
 , m_fRotX(0.0f)
 , m_fRotY(0.0f)
 , m_fRotZ(0.0f)
+, m_position(QVector3D(0.0f,0.0f,0.0f))
 {
+    m_pTransform = new Qt3DCore::QTransform();
+    this->addComponent(m_pTransform);
 }
 
 //=============================================================================================================
@@ -119,11 +122,6 @@ Renderable3DEntity::~Renderable3DEntity()
 
 void Renderable3DEntity::setTransform(const Qt3DCore::QTransform& transform)
 {
-    if(!m_pTransform) {
-        m_pTransform = new Qt3DCore::QTransform();
-        this->addComponent(m_pTransform);
-    }
-
     m_pTransform->setMatrix(transform.matrix());
 }
 
@@ -131,11 +129,6 @@ void Renderable3DEntity::setTransform(const Qt3DCore::QTransform& transform)
 
 void Renderable3DEntity::setTransform(const FiffCoordTrans& transform, bool bApplyInverse)
 {
-    if(!m_pTransform) {
-        m_pTransform = new Qt3DCore::QTransform();
-        this->addComponent(m_pTransform);
-    }
-
     Qt3DCore::QTransform transform3d;
 
     if(bApplyInverse) {
@@ -183,11 +176,6 @@ void Renderable3DEntity::setTransform(const FiffCoordTrans& transform, bool bApp
 
 void Renderable3DEntity::applyTransform(const Qt3DCore::QTransform& transform)
 {
-    if(!m_pTransform) {
-        m_pTransform = new Qt3DCore::QTransform();
-        this->addComponent(m_pTransform);
-    }
-
     m_pTransform->setMatrix(transform.matrix() * m_pTransform->matrix());
 }
 
@@ -195,11 +183,6 @@ void Renderable3DEntity::applyTransform(const Qt3DCore::QTransform& transform)
 
 void Renderable3DEntity::applyTransform(const FiffCoordTrans& transform, bool bApplyInverse)
 {
-    if(!m_pTransform) {
-        m_pTransform = new Qt3DCore::QTransform();
-        this->addComponent(m_pTransform);
-    }
-
     Qt3DCore::QTransform transform3d;
 
     if(bApplyInverse) {
@@ -280,15 +263,51 @@ QVector3D Renderable3DEntity::position() const
 
 //=============================================================================================================
 
+void Renderable3DEntity::applyRotX(float rotX)
+{
+    if(m_fRotX == rotX) {
+        return;
+    }
+
+    m_fRotX += rotX;
+    emit rotXChanged(m_fRotX);
+
+    QMatrix4x4 m = m_pTransform->matrix();
+    m.rotate(rotX, QVector3D(1.0f, 0.0f, 0.0f));
+    m_pTransform->setMatrix(m);
+}
+
+//=============================================================================================================
+
 void Renderable3DEntity::setRotX(float rotX)
 {
     if(m_fRotX == rotX) {
         return;
     }
 
+    // Revert X rotation translation because we are in the set (not apply) function
+    QMatrix4x4 m = m_pTransform->matrix();
+    m.rotate(-m_fRotX + rotX, QVector3D(1.0f, 0.0f, 0.0f));
+    m_pTransform->setMatrix(m);
+
     m_fRotX = rotX;
-    emit rotXChanged(rotX);
-    updateTransform();
+    emit rotXChanged(m_fRotX);
+}
+
+//=============================================================================================================
+
+void Renderable3DEntity::applyRotY(float rotY)
+{
+    if(m_fRotY == rotY) {
+        return;
+    }
+
+    m_fRotY += rotY;
+    emit rotYChanged(m_fRotY);
+
+    QMatrix4x4 m = m_pTransform->matrix();
+    m.rotate(rotY, QVector3D(0.0f, 1.0f, 0.0f));
+    m_pTransform->setMatrix(m);
 }
 
 //=============================================================================================================
@@ -299,9 +318,29 @@ void Renderable3DEntity::setRotY(float rotY)
         return;
     }
 
+    // Revert X rotation translation because we are in the set (not apply) function
+    QMatrix4x4 m = m_pTransform->matrix();
+    m.rotate(-m_fRotY + rotY, QVector3D(0.0f, 1.0f, 0.0f));
+    m_pTransform->setMatrix(m);
+
     m_fRotY = rotY;
-    emit rotYChanged(rotY);
-    updateTransform();
+    emit rotYChanged(m_fRotY);
+}
+
+//=============================================================================================================
+
+void Renderable3DEntity::applyRotZ(float rotZ)
+{
+    if(m_fRotZ == rotZ) {
+        return;
+    }
+
+    m_fRotZ += rotZ;
+    emit rotZChanged(m_fRotZ);
+
+    QMatrix4x4 m = m_pTransform->matrix();
+    m.rotate(rotZ, QVector3D(0.0f, 0.0f, 1.0f));
+    m_pTransform->setMatrix(m);
 }
 
 //=============================================================================================================
@@ -312,32 +351,63 @@ void Renderable3DEntity::setRotZ(float rotZ)
         return;
     }
 
+    // Revert X rotation translation because we are in the set (not apply) function
+    QMatrix4x4 m = m_pTransform->matrix();
+    m.rotate(-m_fRotZ + rotZ, QVector3D(0.0f, 0.0f, 1.0f));
+    m_pTransform->setMatrix(m);
+
     m_fRotZ = rotZ;
-    emit rotZChanged(rotZ);
-    updateTransform();
+    emit rotZChanged(m_fRotZ);
 }
 
 //=============================================================================================================
 
-void Renderable3DEntity::setPosition(QVector3D position)
+void Renderable3DEntity::applyPosition(const QVector3D& position)
 {
     if(m_position == position) {
         return;
     }
 
-    m_position = position;
-    emit positionChanged(position);
-    updateTransform();
+    m_position += position;
+    emit positionChanged(m_position);
+
+    QMatrix4x4 m = m_pTransform->matrix();
+    m.translate(position);
+    m_pTransform->setMatrix(m);
 }
 
 //=============================================================================================================
 
-void Renderable3DEntity::setVisible(bool state)
+void Renderable3DEntity::setPosition(const QVector3D& position)
 {
-    for(int i = 0; i < this->childNodes().size(); ++i) {
-        this->childNodes()[i]->setEnabled(state);
+    if(m_position == position) {
+        return;
     }
-    this->setEnabled(state);
+
+    // Revert present translation because we are in the set (not apply) function
+    QMatrix4x4 m = m_pTransform->matrix();
+    m.translate(-m_position + position);
+    m_pTransform->setMatrix(m);
+
+    m_position = position;
+    emit positionChanged(m_position);
+}
+
+
+//=============================================================================================================
+
+void Renderable3DEntity::applyScale(float scale)
+{
+    if(m_fScale == scale) {
+        return;
+    }
+
+    m_fScale *= scale;
+    emit scaleChanged(m_fScale);
+
+    QMatrix4x4 m = m_pTransform->matrix();
+    m.scale(scale);
+    m_pTransform->setMatrix(m);
 }
 
 //=============================================================================================================
@@ -348,9 +418,23 @@ void Renderable3DEntity::setScale(float scale)
         return;
     }
 
+    // Revert present scaling because we are in the set (not apply) function
+    QMatrix4x4 m = m_pTransform->matrix();
+    m.scale(scale/m_fScale);
+    m_pTransform->setMatrix(m);
+
     m_fScale = scale;
-    emit scaleChanged(scale);
-    updateTransform();
+    emit scaleChanged(m_fScale);
+}
+
+//=============================================================================================================
+
+void Renderable3DEntity::setVisible(bool state)
+{
+    for(int i = 0; i < this->childNodes().size(); ++i) {
+        this->childNodes()[i]->setEnabled(state);
+    }
+    this->setEnabled(state);
 }
 
 //=============================================================================================================
@@ -390,7 +474,7 @@ void Renderable3DEntity::setMaterialParameterRecursive(QObject * pObject,
 //=============================================================================================================
 
 QPair<bool, QVariant> Renderable3DEntity::getMaterialParameterRecursive(QObject * pObject,
-                                                           const QString &sParameterName)
+                                                                        const QString &sParameterName)
 {
     if(QParameter* pParameter = dynamic_cast<QParameter*>(pObject)) {
         if(pParameter->name() == sParameterName) {
@@ -407,25 +491,4 @@ QPair<bool, QVariant> Renderable3DEntity::getMaterialParameterRecursive(QObject 
     }
 
     return QPair<bool, QVariant>(false, QVariant());
-}
-
-//=============================================================================================================
-
-void Renderable3DEntity::updateTransform()
-{
-    QMatrix4x4 m;
-
-    //Do the translation after rotating, otherwise rotation around the x,y,z axis would be screwed up
-    m.scale(m_fScale);
-    m.rotate(m_fRotX, QVector3D(1.0f, 0.0f, 0.0f));
-    m.rotate(m_fRotY, QVector3D(0.0f, 1.0f, 0.0f));
-    m.rotate(m_fRotZ, QVector3D(0.0f, 0.0f, 1.0f));
-    m.translate(m_position);
-
-    if(!m_pTransform) {
-        m_pTransform = new Qt3DCore::QTransform();
-        this->addComponent(m_pTransform);
-    }
-
-    m_pTransform->setMatrix(m);
 }
