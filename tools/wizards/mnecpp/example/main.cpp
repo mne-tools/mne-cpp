@@ -67,8 +67,8 @@
  */
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(ApplicationLogger::CustomLogWriter);
-    QApplication a(argc, argv);
+    qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
+    QCoreApplication a(argc, argv);
 
     // Command Line Parser
     QCommandLineParser parser;
@@ -82,9 +82,6 @@ int main(int argc, char *argv[])
     parser.process(a);
 
     // Add exampel code here
-
-    return a.exec();
-}
 
     return a.exec();
 }
