@@ -576,3 +576,9 @@ void FiffRawViewModel::updateEndStartFlags()
     m_bStartOfFileReached = m_iFiffCursorBegin == absoluteFirstSample();
     m_bEndOfFileReached = (m_iFiffCursorBegin + m_iTotalBlockCount * m_iSamplesPerBlock) == absoluteLastSample();
 }
+
+//=============================================================================================================
+
+FIFFLIB::FiffInfo* FiffRawViewModel::getFiffInfo() {
+    return m_pFiffInfo.data();
+}

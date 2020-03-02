@@ -260,6 +260,8 @@ public:
 
     inline double pixelDifference() const;
 
+    FIFFLIB::FiffInfo* getFiffInfo();
+
 public slots:
 
     /**
