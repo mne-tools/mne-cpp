@@ -309,41 +309,48 @@ void MainWindow::createActions()
     m_pActionNewConfig = new QAction(QIcon(":/images/new.png"), tr("&New configuration"), this);
     m_pActionNewConfig->setShortcuts(QKeySequence::New);
     m_pActionNewConfig->setStatusTip(tr("Create a new configuration"));
-    connect(m_pActionNewConfig, &QAction::triggered, this, &MainWindow::newConfiguration);
+    connect(m_pActionNewConfig.data(), &QAction::triggered,
+            this, &MainWindow::newConfiguration);
 
     m_pActionOpenConfig = new QAction(tr("&Open configuration..."), this);
     m_pActionOpenConfig->setShortcuts(QKeySequence::Open);
     m_pActionOpenConfig->setStatusTip(tr("Open an existing configuration"));
-    connect(m_pActionOpenConfig, &QAction::triggered, this, &MainWindow::openConfiguration);
+    connect(m_pActionOpenConfig.data(), &QAction::triggered,
+            this, &MainWindow::openConfiguration);
 
     m_pActionSaveConfig = new QAction(QIcon(":/images/save.png"), tr("&Save configuration..."), this);
     m_pActionSaveConfig->setShortcuts(QKeySequence::Save);
     m_pActionSaveConfig->setStatusTip(tr("Save the current configuration"));
-    connect(m_pActionSaveConfig, &QAction::triggered, this, &MainWindow::saveConfiguration);
+    connect(m_pActionSaveConfig.data(), &QAction::triggered,
+            this, &MainWindow::saveConfiguration);
 
     m_pActionExit = new QAction(tr("E&xit"), this);
     m_pActionExit->setShortcuts(QKeySequence::Quit);
     m_pActionExit->setStatusTip(tr("Exit the application"));
-    connect(m_pActionExit, &QAction::triggered, this, &MainWindow::close);
+    connect(m_pActionExit.data(), &QAction::triggered,
+            this, &MainWindow::close);
 
     //View QMenu
     m_pActionMinLgLv = new QAction(tr("&Minimal"), this);
     m_pActionMinLgLv->setCheckable(true);
     m_pActionMinLgLv->setShortcut(tr("Ctrl+1"));
     m_pActionMinLgLv->setStatusTip(tr("Set log level to minimal"));
-    connect(m_pActionMinLgLv, &QAction::triggered, this, &MainWindow::setMinLogLevel);
+    connect(m_pActionMinLgLv.data(), &QAction::triggered,
+            this, &MainWindow::setMinLogLevel);
 
     m_pActionNormLgLv = new QAction(tr("&Normal"), this);
     m_pActionNormLgLv->setCheckable(true);
     m_pActionNormLgLv->setShortcut(tr("Ctrl+2"));
     m_pActionNormLgLv->setStatusTip(tr("Set log level to normal"));
-    connect(m_pActionNormLgLv, &QAction::triggered, this, &MainWindow::setNormalLogLevel);
+    connect(m_pActionNormLgLv.data(), &QAction::triggered,
+            this, &MainWindow::setNormalLogLevel);
 
     m_pActionMaxLgLv = new QAction(tr("Maximal"), this);
     m_pActionMaxLgLv->setCheckable(true);
     m_pActionMaxLgLv->setShortcut(tr("Ctrl+3"));
     m_pActionMaxLgLv->setStatusTip(tr("Set log level to maximal"));
-    connect(m_pActionMaxLgLv, &QAction::triggered, this, &MainWindow::setMaxLogLevel);
+    connect(m_pActionMaxLgLv.data(), &QAction::triggered,
+            this, &MainWindow::setMaxLogLevel);
 
     m_pActionGroupLgLv = new QActionGroup(this);
     m_pActionGroupLgLv->addAction(m_pActionMinLgLv);
@@ -361,22 +368,26 @@ void MainWindow::createActions()
     m_pActionHelpContents = new QAction(tr("Help &Contents"), this);
     m_pActionHelpContents->setShortcuts(QKeySequence::HelpContents);
     m_pActionHelpContents->setStatusTip(tr("Show the help contents"));
-    connect(m_pActionHelpContents, &QAction::triggered, this, &MainWindow::helpContents);
+    connect(m_pActionHelpContents.data(), &QAction::triggered,
+            this, &MainWindow::helpContents);
 
     m_pActionAbout = new QAction(tr("&About"), this);
     m_pActionAbout->setStatusTip(tr("Show the application's About box"));
-    connect(m_pActionAbout, &QAction::triggered, this, &MainWindow::about);
+    connect(m_pActionAbout.data(), &QAction::triggered,
+            this, &MainWindow::about);
 
     //QToolbar
     m_pActionRun = new QAction(QIcon(":/images/run.png"), tr("Run (F5)"), this);
     m_pActionRun->setShortcut(tr("F5"));
     m_pActionRun->setStatusTip(tr("Runs (F5) ")+CInfo::AppNameShort());
-    connect(m_pActionRun, &QAction::triggered, this, &MainWindow::startMeasurement);
+    connect(m_pActionRun.data(), &QAction::triggered,
+            this, &MainWindow::startMeasurement);
 
     m_pActionStop = new QAction(QIcon(":/images/stop.png"), tr("Stop (F6)"), this);
     m_pActionStop->setShortcut(tr("F6"));
     m_pActionStop->setStatusTip(tr("Stops (F6) ")+CInfo::AppNameShort());
-    connect(m_pActionStop, &QAction::triggered, this, &MainWindow::stopMeasurement);
+    connect(m_pActionStop.data(), &QAction::triggered,
+            this, &MainWindow::stopMeasurement);
 
     //Display Toolbar
     m_pActionQuickControl = new QAction(QIcon(":/images/quickControl.png"), tr("Show quick control widget"),this);
@@ -470,10 +481,10 @@ void MainWindow::createPluginDockWindow()
 
     addDockWidget(Qt::LeftDockWidgetArea, m_pPluginGuiDockWidget);
 
-    connect(m_pPluginGui, &PluginGui::selectedPluginChanged,
+    connect(m_pPluginGui.data(), &PluginGui::selectedPluginChanged,
             this, &MainWindow::updatePluginSetupWidget);
 
-    connect(m_pPluginGui, &PluginGui::selectedConnectionChanged,
+    connect(m_pPluginGui.data(), &PluginGui::selectedConnectionChanged,
             this, &MainWindow::updateConnectionWidget);
 
     m_pMenuView->addAction(m_pPluginGuiDockWidget->toggleViewAction());
@@ -600,22 +611,16 @@ void MainWindow::writeToLog(const QString& logMsg,
                             LogKind lgknd,
                             LogLevel lglvl)
 {
-    if(lglvl<=m_eLogLevelCurrent)
-    {
-        if(lgknd == _LogKndError)
-        {
+    if(lglvl<=m_eLogLevelCurrent) {
+        if(lgknd == _LogKndError) {
             m_pTextBrowser_Log->insertHtml("<font color=red><b>Error:</b> "+logMsg+"</font>");
-
-        }
-        else if(lgknd == _LogKndWarning)
-        {
+        } else if(lgknd == _LogKndWarning)  {
             m_pTextBrowser_Log->insertHtml("<font color=blue><b>Warning:</b> "+logMsg+"</font>");
-        }
-        else
-        {
+        } else {
             m_pTextBrowser_Log->insertHtml(logMsg);
         }
         m_pTextBrowser_Log->insertPlainText("\n"); // new line
+
         //scroll down to the newest entry
         QTextCursor c = m_pTextBrowser_Log->textCursor();
         c.movePosition(QTextCursor::End);
@@ -661,6 +666,7 @@ void MainWindow::stopMeasurement()
 
     m_pActionQuickControl->setVisible(false);
     m_pQuickControlView->setVisible(false);
+    m_pQuickControlView->clear();
 
     m_pPluginGui->uiSetupRunningState(false);
     uiSetupRunningState(false);

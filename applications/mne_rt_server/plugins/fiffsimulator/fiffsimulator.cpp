@@ -305,8 +305,10 @@ void FiffSimulator::init()
                 if (t_qFileMeas.open(QIODevice::ReadOnly))
                 {
                     m_sResourceDataPath = sFileName;
-                    std::cout << "\tLoad simulation file: " << sFileName.toUtf8().constData() << std::endl;
+                    qInfo() << "[FiffSimulator::init] Load simulation file " << sFileName;
                     t_qFileMeas.close();
+                } else {
+                    qInfo() << "[FiffSimulator::init] Trying to open simulation file " << sFileName << "read from FiffSimulation.cfg failed. Opening sample_audvis_raw.fif instead.";
                 }
             }
         }

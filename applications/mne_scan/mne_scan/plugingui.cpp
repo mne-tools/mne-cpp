@@ -413,6 +413,7 @@ void PluginGui::itemInserted(PluginItem *item)
 {
     if(item) {
         m_pCurrentPlugin = item->plugin();
+        emit selectedPluginChanged(m_pCurrentPlugin);
     }
 
     m_pButtonGroupPointers->button(int(PluginScene::MovePluginItem))->setChecked(true);
