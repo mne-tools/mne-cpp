@@ -77,7 +77,9 @@ namespace MNESCAN
 class PluginGui : public QMainWindow
 {
     Q_OBJECT
+
     friend class PluginScene;
+
 public:
     PluginGui(SCSHAREDLIB::PluginManager *pPluginManager, SCSHAREDLIB::PluginSceneManager *pPluginSceneManager);
 
@@ -96,7 +98,8 @@ public:
      * @param [in] sPath         The path to the file.
      * @param [in] sFileName     The file name to load the configuration from.
      */
-    void loadConfig(const QString& sPath, const QString& sFileName);
+    void loadConfig(const QString& sPath,
+                    const QString& sFileName);
 
     //=========================================================================================================
     /**
@@ -105,7 +108,8 @@ public:
      * @param [in] sPath         The path to the file.
      * @param [in] sFileName     The file name to store the configuration to.
      */
-    void saveConfig(const QString& sPath, const QString& sFileName);
+    void saveConfig(const QString& sPath,
+                    const QString& sFileName);
 
     inline SCSHAREDLIB::IPlugin::SPtr getCurrentPlugin();
 

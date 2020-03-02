@@ -134,12 +134,6 @@ public:
 
     //=========================================================================================================
     /**
-     * Garbage collection
-     */
-    void clear();
-
-    //=========================================================================================================
-    /**
      * This event handler is called when Qt receives a window close request from the window system.
      *
      * @param [in] event     close event
@@ -312,9 +306,8 @@ private:
 
     int                                 m_iTimeoutMSec;                 /**< Holds milliseconds after which timer timeouts.*/
 
-    QPointer<QShortcut>                 m_pRunWidgetClose;              /**< Run widget close shortcut */
-
     QPointer<QActionGroup>              m_pActionGroupLgLv;             /**< group log level */
+
     QPointer<QAction>                   m_pActionNewConfig;             /**< new configuration */
     QPointer<QAction>                   m_pActionOpenConfig;            /**< open configuration */
     QPointer<QAction>                   m_pActionSaveConfig;            /**< save configuration */
@@ -355,12 +348,13 @@ private:
 
     QPointer<PluginGui>                 m_pPluginGui;                   /**< Holds the plugin GUI.*/
 
+    QPointer<DISPLIB::QuickControlView> m_pQuickControlView;            /**< quick control widget. */
+
     QSharedPointer<QTimer>                              m_pTimer;               /**< timer of the main application*/
     QSharedPointer<QTime>                               m_pTime;                /**< Holds current time output, updated with timeout of timer.*/
     QSharedPointer<SCSHAREDLIB::PluginManager>          m_pPluginManager;       /**< Holds log dock widget.*/
     QSharedPointer<SCSHAREDLIB::PluginSceneManager>     m_pPluginSceneManager;  /**< Plugin scene manager which manages the plugin graph */
     QSharedPointer<QWidget>                             m_pAboutWindow;         /**< Holds the widget containing the about information.*/
-    QSharedPointer<DISPLIB::QuickControlView>           m_pQuickControlView;    /**< quick control widget. */
     QSharedPointer<SCSHAREDLIB::DisplayManager>         m_pDisplayManager;      /**< display manager */
 };
 }// NAMESPACE

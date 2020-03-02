@@ -69,7 +69,8 @@ using namespace MNESCAN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PluginGui::PluginGui(SCSHAREDLIB::PluginManager *pPluginManager, SCSHAREDLIB::PluginSceneManager *pPluginSceneManager)
+PluginGui::PluginGui(SCSHAREDLIB::PluginManager *pPluginManager,
+                     SCSHAREDLIB::PluginSceneManager *pPluginSceneManager)
 : m_pPluginManager(pPluginManager)
 , m_pPluginSceneManager(pPluginSceneManager)
 , m_pCurrentPlugin(0)
@@ -410,7 +411,10 @@ void PluginGui::actionGroupTriggered(QAction* action)
 
 void PluginGui::itemInserted(PluginItem *item)
 {
-    Q_UNUSED(item);
+    if(item) {
+        m_pCurrentPlugin = item->plugin();
+    }
+
     m_pButtonGroupPointers->button(int(PluginScene::MovePluginItem))->setChecked(true);
     m_pPluginScene->setMode(PluginScene::Mode(m_pButtonGroupPointers->checkedId()));
 }
