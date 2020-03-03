@@ -120,6 +120,14 @@ public:
     virtual QSize sizeHint(const QStyleOptionViewItem &option,
                            const QModelIndex &index) const override;
 
+    //=========================================================================================================
+    /**
+     * Set the signal color.
+     *
+     * @param [in] signalColor  The new signal color.
+     */
+    void setSignalColor(const QColor& signalColor);
+
 private:
     //=========================================================================================================
     /**

@@ -119,6 +119,14 @@ public:
      */
     void setScalingMap(const QMap<qint32, float>& scaleMap);
 
+    //=========================================================================================================
+    /**
+     * Set the signal color.
+     *
+     * @param [in] signalColor  The new signal color.
+     */
+    void setSignalColor(const QColor& signalColor);
+
 private:
     //=========================================================================================================
     /**
