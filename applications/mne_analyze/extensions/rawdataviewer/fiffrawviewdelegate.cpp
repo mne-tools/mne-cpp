@@ -253,3 +253,10 @@ void FiffRawViewDelegate::createPlotPath(const QStyleOptionViewItem &option,
     }
 }
 
+//=============================================================================================================
+
+void FiffRawViewDelegate::setSignalColor(const QColor& signalColor)
+{
+    m_penNormal.setColor(signalColor);
+    m_penNormalBad.setColor(signalColor);
+}
