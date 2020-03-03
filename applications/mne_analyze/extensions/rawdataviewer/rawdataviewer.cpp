@@ -45,6 +45,7 @@
 #include <anShared/Management/communicator.h>
 #include "fiffrawview.h"
 #include "fiffrawviewdelegate.h"
+#include <disp/viewers/fiffrawviewsettings.h>
 #include <disp/viewers/scalingview.h>
 #include "../dataloader/dataloader.h"
 #include "../dataloader/FormFiles/dataloadercontrol.h"
@@ -135,8 +136,18 @@ void RawDataViewer::onNewModelAvalible(QSharedPointer<AbstractModel> pNewModel)
         connect(scalingWidget, &DISPLIB::ScalingView::scalingChanged,
                 m_pFiffRawView, &FiffRawView::setScalingMap);
 
-        m_pControlDock->setWidget(m_pContainer);
+        DISPLIB::FiffRawViewSettings* viewWidget = new DISPLIB::FiffRawViewSettings("Test");
+        viewWidget->setWidgetList();
+        connect(viewWidget, &DISPLIB::FiffRawViewSettings::signalColorChanged,
+                m_pFiffRawView, &FiffRawView::setSignalColor);
+
+        m_pFiffRawView->setSignalColor(viewWidget->getSignalColor());
+
+
         m_pLayout->addWidget(scalingWidget);
+        m_pLayout->addWidget(viewWidget);
+
+        m_pControlDock->setWidget(m_pContainer);
         m_pContainer->setLayout(m_pLayout);
         m_pContainer->show();
     }

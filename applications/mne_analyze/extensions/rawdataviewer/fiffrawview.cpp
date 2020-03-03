@@ -182,3 +182,10 @@ void FiffRawView::setScalingMap(const QMap<qint32, float>& scaleMap)
     m_qMapChScaling = scaleMap;
     m_pModel->setScaling(scaleMap);
 }
+
+//=============================================================================================================
+
+void FiffRawView::setSignalColor(const QColor& signalColor)
+{
+    m_pDelegate->setSignalColor(signalColor);
+}
