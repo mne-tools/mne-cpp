@@ -378,7 +378,7 @@ QList<FiffDigPoint> HpiView::readPolhemusDig(const QString& fileName)
         ui->m_spinBox_freqCoil4->hide();
 
         m_vCoilFreqs.clear();
-        m_vCoilFreqs << 155 << 165 << 190;
+        m_vCoilFreqs << 166 << 154 << 161;
     } else {
         ui->m_label_gofCoil4->show();
         ui->m_label_gofCoil4Description->show();
@@ -386,7 +386,7 @@ QList<FiffDigPoint> HpiView::readPolhemusDig(const QString& fileName)
         ui->m_spinBox_freqCoil4->show();
 
         m_vCoilFreqs.clear();
-        m_vCoilFreqs << 155 << 165 << 190 << 200;
+        m_vCoilFreqs << 166 << 154 << 161 << 158;
     }
 
     // align fiducials and scale average head
@@ -427,7 +427,6 @@ void HpiView::alignFiducials(const QString& fileNameDigData)
                                         1,
                                         0,
                                         scales);
-    m_scale = scales[0];
 
     QMatrix4x4 eye;
     QMatrix4x4 invMat;
@@ -435,7 +434,7 @@ void HpiView::alignFiducials(const QString& fileNameDigData)
     // use inverse transform
     for(int r = 0; r < 3; ++r) {
         for(int c = 0; c < 3; ++c) {
-            invMat(r,c) = t_digData->head_mri_t_adj->invrot(r,c);
+            invMat(r,c) = t_digData->head_mri_t_adj->invrot(r,c) * scales[0];
         }
         eye(r,r) = 1;
     }
@@ -445,24 +444,22 @@ void HpiView::alignFiducials(const QString& fileNameDigData)
 
     Qt3DCore::QTransform identity;
     identity.setMatrix(eye);
-    Qt3DCore::QTransform m_tFid;
-    m_tFid.setMatrix(invMat);
+    m_tAlignment.setMatrix(invMat);
 
     // Update loaded average fiducials
-    m_pAvrFid->setTransform(m_tFid);
-//    QList<QStandardItem*> itemList = m_pAvrFid->findChildren(Data3DTreeModelItemTypes::DigitizerItem);
-//    for(int j = 0; j < itemList.size(); ++j) {
-//        if(DigitizerTreeItem* pDigItem = dynamic_cast<DigitizerTreeItem*>(itemList.at(j))) {
-//            pDigItem->setTransform(m_tFid);
-//        }
-//    }
+//    m_pAvrFid->setTransform(m_tAlignment);
+    QList<QStandardItem*> itemList = m_pAvrFid->findChildren(Data3DTreeModelItemTypes::DigitizerItem);
+    for(int j = 0; j < itemList.size(); ++j) {
+        if(DigitizerTreeItem* pDigItem = dynamic_cast<DigitizerTreeItem*>(itemList.at(j))) {
+            pDigItem->setTransform(m_tAlignment);
+        }
+    }
 
     // Update average head - apply scaling and transformation
     QList<QStandardItem*> itemListB = m_pBemHeadAvr->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
     for(int j = 0; j < itemListB.size(); ++j) {
         if(BemSurfaceTreeItem* pBemItem = dynamic_cast<BemSurfaceTreeItem*>(itemListB.at(j))) {
-            pBemItem->setScale(m_scale);
-            pBemItem->applyTransform(m_tFid);
+            pBemItem->setTransform(m_tAlignment);
         }
     }
 
@@ -510,7 +507,7 @@ void HpiView::onBtnLoadPolhemusFile()
 {
     //Get file location
     QString fileName_HPI = QFileDialog::getOpenFileName(this,
-            tr("Open digitizer file"),"", tr("Fiff file (*.fif)"));
+            tr("Open digitizer file"),"/autofs/cluster/fusion/rd454/git/mne-cpp/bin/MNE-sample-data/chpi/raw", tr("Fiff file (*.fif)"));
 
     if(!fileName_HPI.isEmpty()) {
         ui->m_lineEdit_filePath->setText(fileName_HPI);
@@ -593,7 +590,7 @@ void HpiView::onSSPCompUsageChanged()
 
 void HpiView::updateErrorLabels()
 {
-    //Update gof labels and m_tFid from m to mm
+    //Update gof labels and m_tAlignment from m to mm
     QString sGof("0mm");
     if(m_vGof.size() > 0) {
         sGof = QString::number(m_vGof[0]*1000,'f',2)+QString("mm");
@@ -698,28 +695,31 @@ void HpiView::update3DView()
     if(m_pTrackedDigitizer && m_pFiffInfo && m_pBemHeadAvr) {
         //Prepare new transform head->device
         QMatrix4x4 mat;
+        QMatrix4x4 eye;
+        eye.fill(0);
         for(int r = 0; r < 4; ++r) {
             for(int c = 0; c < 4; ++c) {
                 mat(r,c) = m_pFiffInfo->dev_head_t.invtrans(r,c);
             }
+            eye(r,r) = 1;
         }
 
-        Qt3DCore::QTransform transform;
-        transform.setMatrix(mat);
+        Qt3DCore::QTransform tHeadDev;
+        tHeadDev.setMatrix(mat);
 
         //Update fast scan / tracked digitizer
         QList<QStandardItem*> itemList = m_pTrackedDigitizer->findChildren(Data3DTreeModelItemTypes::DigitizerItem);
         for(int j = 0; j < itemList.size(); ++j) {
             if(DigitizerTreeItem* pDigItem = dynamic_cast<DigitizerTreeItem*>(itemList.at(j))) {
-                pDigItem->setTransform(transform);
+                pDigItem->setTransform(tHeadDev);
             }
         }
 
         itemList = m_pAvrFid->findChildren(Data3DTreeModelItemTypes::DigitizerItem);
         for(int j = 0; j < itemList.size(); ++j) {
             if(DigitizerTreeItem* pDigItem = dynamic_cast<DigitizerTreeItem*>(itemList.at(j))) {
-                pDigItem->setTransform(m_tFid);
-                pDigItem->setTransform(transform);
+                pDigItem->setTransform(m_tAlignment);
+                pDigItem->applyTransform(tHeadDev);
             }
         }
 
@@ -727,10 +727,8 @@ void HpiView::update3DView()
         itemList = m_pBemHeadAvr->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
         for(int j = 0; j < itemList.size(); ++j) {
             if(BemSurfaceTreeItem* pBemItem = dynamic_cast<BemSurfaceTreeItem*>(itemList.at(j))) {
-                pBemItem->setScale(m_scale);
-                pBemItem->applyTransform(m_tFid);
-                pBemItem->applyTransform(transform);
-
+                pBemItem->setTransform(m_tAlignment);
+                pBemItem->applyTransform(tHeadDev);
             }
         }
     }
