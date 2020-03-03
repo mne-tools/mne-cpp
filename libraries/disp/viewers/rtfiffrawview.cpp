@@ -181,7 +181,11 @@ void RtFiffRawView::init(QSharedPointer<FIFFLIB::FiffInfo> &info)
 
 void RtFiffRawView::addData(const QList<Eigen::MatrixXd> &data)
 {
-    m_pModel->addData(data);
+    if(!data.isEmpty()) {
+        m_pModel->addData(data);
+    } else {
+        qWarning() << "[RtFiffRawView::addData] Received data list is empty.";
+    }
 }
 
 //=============================================================================================================
