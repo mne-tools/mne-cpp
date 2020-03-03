@@ -85,14 +85,12 @@ FiffSimulator::FiffSimulator()
 , m_iBufferSize(-1)
 , m_iActiveConnectorId(0)
 , m_bDoContinousHPI(false)
+, m_bIsRunning(false)
 {
     // We need to use a blocking queued signal here since the dataReceived signal is emmited
     // in a different thread. The onDataReceived function will be called in the main thread.
     connect(m_pFiffSimulatorProducer.data(), &FiffSimulatorProducer::dataReceived,
             this, &FiffSimulator::onDataReceived, Qt::BlockingQueuedConnection);
-
-    connect(m_pFiffSimulatorProducer.data(), &FiffSimulatorProducer::dataConnectionChanged,
-            this, &FiffSimulator::onDataConnectionChanged);
 
     //init channels when fiff info is available
     connect(this, &FiffSimulator::fiffInfoAvailable,
@@ -142,8 +140,6 @@ void FiffSimulator::init()
     // Start FiffSimulatorProducer
     m_pFiffSimulatorProducer->start();
 
-
-
     //Try to connect the cmd client on start up using localhost connection
     this->connectCmdClient();
 }
@@ -160,11 +156,21 @@ void FiffSimulator::unload()
 bool FiffSimulator::start()
 {
     if(m_bCmdClientIsConnected && m_pFiffInfo) {
+        m_bIsRunning = true;
+
         //Set buffer size
         (*m_pRtCmdClient)["bufsize"].pValues()[0].setValue(m_iBufferSize);
         (*m_pRtCmdClient)["bufsize"].send();
 
         m_pFiffSimulatorProducer->start();
+
+        // Wait one sec so the producer can update the m_iDataClientId accordingly
+        msleep(1000);
+
+        // Start Measurement at rt_Server
+        (*m_pRtCmdClient)["start"].pValues()[0].setValue(m_pFiffSimulatorProducer->m_iDataClientId);
+        (*m_pRtCmdClient)["start"].send();
+
         return true;
     }
 
@@ -175,6 +181,8 @@ bool FiffSimulator::start()
 
 bool FiffSimulator::stop()
 {
+    m_bIsRunning = false;
+
     if(m_pFiffSimulatorProducer->isRunning()) {
         m_pFiffSimulatorProducer->stop();
     }
@@ -232,17 +240,6 @@ void FiffSimulator::onDataReceived(const MatrixXf& matData)
 
     //emit values
     m_pRTMSA_FiffSimulator->data()->setValue(matValue.cast<double>());
-}
-
-//=============================================================================================================
-
-void FiffSimulator::onDataConnectionChanged(bool bDataClientIsConnected)
-{
-    if(bDataClientIsConnected) {
-        // Start Measurement at rt_Server
-        (*m_pRtCmdClient)["start"].pValues()[0].setValue(m_pFiffSimulatorProducer->m_iDataClientId);
-        (*m_pRtCmdClient)["start"].send();
-    }
 }
 
 //=============================================================================================================

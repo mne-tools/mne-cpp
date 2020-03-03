@@ -80,6 +80,7 @@ FiffSimulatorProducer::~FiffSimulatorProducer()
 
 void FiffSimulatorProducer::connectDataClient(QString p_sRtSeverIP)
 {
+    qDebug() << "FiffSimulatorProducer::connectDataClient m_bDataClientIsConnected" << m_bDataClientIsConnected;
     if(m_pRtDataClient.isNull()) {
         m_pRtDataClient = QSharedPointer<RtDataClient>(new RtDataClient);
     } else if(m_bDataClientIsConnected) {
@@ -129,7 +130,6 @@ void FiffSimulatorProducer::disconnectDataClient()
 
 void FiffSimulatorProducer::start()
 {
-
     QThread::start();
 }
 
