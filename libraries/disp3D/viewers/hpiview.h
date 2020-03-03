@@ -233,17 +233,6 @@ protected:
      */
     void update3DView();
 
-    //=========================================================================================================
-    /**
-     * Computes the transformation matrix between two sets of 3D points.
-     *
-     * @param[in] NH     The first set of input 3D points (row-wise order).
-     * @param[in] BT     The second set of input 3D points (row-wise order).
-     *
-     * @return Returns the transformation matrix.
-     */
-    static Eigen::Matrix4f computeTransformation(Eigen::MatrixXf NH, Eigen::MatrixXf BT);
-
 //    //=========================================================================================================
 //    /**
 //    * Align the MEG fiducials to the MRI fiducials.
@@ -268,8 +257,7 @@ protected:
     Eigen::MatrixXd                             m_matProjectors;        /**< Holds the matrix with the SSP and compensator projectors.*/
     Eigen::MatrixXd                             m_matCompProjectors;    /**< Holds the matrix with the SSP and compensator projectors.*/
 
-    Qt3DCore::QTransform                        m_tAlignment;                 /**< Transformation matrix avr_tracked fiducials */
-    FIFFLIB::FiffCoordTrans                     m_tAvr;                 /**< Transformation matrix head_mri for average head */
+    Qt3DCore::QTransform                        m_tAlignment;           /**< Transformation matrix alignment fiducials/tracked in head space */
 
     QSharedPointer<DISP3DLIB::View3D>           m_pView3D;              /**< The 3D view. */
     QSharedPointer<DISP3DLIB::Data3DTreeModel>  m_pData3DModel;         /**< The Disp3D model. */
@@ -277,7 +265,6 @@ protected:
     QSharedPointer<RTPROCESSINGLIB::RtHpi>         m_pRtHPI;            /**< The real-time HPI object. */
 
     QPointer<DISP3DLIB::BemTreeItem>            m_pBemHeadAvr;          /**< TThe fsaverage BEM head model. */
-    QPointer<DISP3DLIB::DigitizerSetTreeItem>   m_pAvrFid;              /**< The 3D item pointing to the average fiducials. */
     QPointer<DISP3DLIB::DigitizerSetTreeItem>   m_pTrackedDigitizer;    /**< The 3D item pointing to the tracked digitizers. */
 
     double                                      m_dMaxHpiFitError;      /**< The maximum HPI fitting error allowed.*/

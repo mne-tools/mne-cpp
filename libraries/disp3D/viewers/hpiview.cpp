@@ -197,25 +197,17 @@ HpiView::HpiView(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
     BemTreeItem* pVVItem = m_pData3DModel->addBemData("Device", "VectorView", t_sensorVVSurfaceBEM);
     pVVItem->setCheckState(Qt::Unchecked);
 
-    // load transformation matrix head_mri from average head
-    QFile file (QCoreApplication::applicationDirPath() + "/resources/general/hpiAlignment/fsaverage-trans.fif");
-    FiffCoordTrans m_tAvr(file);
-
     // Add average head surface
     QFile t_fileHeadAvr(QCoreApplication::applicationDirPath() + "/resources/general/hpiAlignment/fsaverage-head.fif");;
     MNEBem t_BemHeadAvr(t_fileHeadAvr);
     m_pBemHeadAvr = m_pData3DModel->addBemData("Head", "Average", t_BemHeadAvr);
     m_pBemHeadAvr->setCheckState(Qt::Checked);
 
-    QFile t_file_FidAvr(QCoreApplication::applicationDirPath() + "/resources/general/hpiAlignment/fsaverage-fiducials.fif");
-    FiffDigPointSet t_DigFidAvr(t_file_FidAvr);
-    m_pAvrFid = m_pData3DModel->addDigitizerData("Head", "avr", t_DigFidAvr);
-
     //Always on top
     //this->setWindowFlags(this->windowFlags() | Qt::WindowStaysOnTopHint);
 
     //Init coil freqs
-    m_vCoilFreqs << 155 << 165 << 190 << 200;
+    m_vCoilFreqs << 166 << 154 << 161 << 158;
 
     //Init data
     m_matValue.resize(0,0);
@@ -401,7 +393,6 @@ void HpiView::alignFiducials(const QString& fileNameDigData)
 {
     //Calculate the alignment of the fiducials
     MneMshDisplaySurfaceSet* pMneMshDisplaySurfaceSet = new MneMshDisplaySurfaceSet();
-    QFile t_fileHeadAvr (QCoreApplication::applicationDirPath() + "/resources/general/hpiAlignment/fsaverage-head.fif");
     MneMshDisplaySurfaceSet::add_bem_surface(pMneMshDisplaySurfaceSet,
                                              QCoreApplication::applicationDirPath() + "/resources/general/hpiAlignment/fsaverage-head.fif",
                                              FIFFV_BEM_SURF_ID_HEAD,
@@ -428,7 +419,6 @@ void HpiView::alignFiducials(const QString& fileNameDigData)
                                         0,
                                         scales);
 
-    QMatrix4x4 eye;
     QMatrix4x4 invMat;
 
     // use inverse transform
@@ -436,34 +426,22 @@ void HpiView::alignFiducials(const QString& fileNameDigData)
         for(int c = 0; c < 3; ++c) {
             invMat(r,c) = t_digData->head_mri_t_adj->invrot(r,c) * scales[0];
         }
-        eye(r,r) = 1;
     }
     invMat(0,3) = t_digData->head_mri_t_adj->invmove(0);
     invMat(1,3) = t_digData->head_mri_t_adj->invmove(1);
     invMat(2,3) = t_digData->head_mri_t_adj->invmove(2);
 
     Qt3DCore::QTransform identity;
-    identity.setMatrix(eye);
     m_tAlignment.setMatrix(invMat);
 
-    // Update loaded average fiducials
-//    m_pAvrFid->setTransform(m_tAlignment);
-    QList<QStandardItem*> itemList = m_pAvrFid->findChildren(Data3DTreeModelItemTypes::DigitizerItem);
-    for(int j = 0; j < itemList.size(); ++j) {
-        if(DigitizerTreeItem* pDigItem = dynamic_cast<DigitizerTreeItem*>(itemList.at(j))) {
-            pDigItem->setTransform(m_tAlignment);
-        }
-    }
-
     // Update average head - apply scaling and transformation
-    QList<QStandardItem*> itemListB = m_pBemHeadAvr->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
-    for(int j = 0; j < itemListB.size(); ++j) {
-        if(BemSurfaceTreeItem* pBemItem = dynamic_cast<BemSurfaceTreeItem*>(itemListB.at(j))) {
+    QList<QStandardItem*> itemList = m_pBemHeadAvr->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
+    for(int j = 0; j < itemList.size(); ++j) {
+        if(BemSurfaceTreeItem* pBemItem = dynamic_cast<BemSurfaceTreeItem*>(itemList.at(j))) {
             pBemItem->setTransform(m_tAlignment);
         }
     }
 
-//    update3DView(););
     delete pMneMshDisplaySurfaceSet;
 }
 
@@ -715,14 +693,6 @@ void HpiView::update3DView()
             }
         }
 
-        itemList = m_pAvrFid->findChildren(Data3DTreeModelItemTypes::DigitizerItem);
-        for(int j = 0; j < itemList.size(); ++j) {
-            if(DigitizerTreeItem* pDigItem = dynamic_cast<DigitizerTreeItem*>(itemList.at(j))) {
-                pDigItem->setTransform(m_tAlignment);
-                pDigItem->applyTransform(tHeadDev);
-            }
-        }
-
         // Update average head
         itemList = m_pBemHeadAvr->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
         for(int j = 0; j < itemList.size(); ++j) {
@@ -732,72 +702,4 @@ void HpiView::update3DView()
             }
         }
     }
-}
-
-//*************************************************************************************************************
-
-Eigen::Matrix4f HpiView::computeTransformation(Eigen::MatrixXf NH, MatrixXf BT)
-{
-    MatrixXf xdiff, ydiff, zdiff, C, Q;
-    Matrix4f transFinal = Matrix4f::Identity(4,4);
-    Matrix4f Rot = Matrix4f::Zero(4,4);
-    Matrix4f Trans = Matrix4f::Identity(4,4);
-    double meanx,meany,meanz,normf;
-
-    for(int i = 0; i < 15; ++i) {
-        // Calculate mean translation for all points -> centroid of both data sets
-        xdiff = NH.col(0) - BT.col(0);
-        ydiff = NH.col(1) - BT.col(1);
-        zdiff = NH.col(2) - BT.col(2);
-
-        meanx = xdiff.mean();
-        meany = ydiff.mean();
-        meanz = zdiff.mean();
-
-        // Apply translation -> bring both data sets to the same center location
-        for (int j = 0; j < BT.rows(); ++j) {
-            BT(j,0) = BT(j,0) + meanx;
-            BT(j,1) = BT(j,1) + meany;
-            BT(j,2) = BT(j,2) + meanz;
-        }
-
-        // Estimate rotation component
-        C = BT.transpose() * NH;
-
-        JacobiSVD< MatrixXf > svd(C ,Eigen::ComputeThinU | ComputeThinV);
-
-        Q = svd.matrixU() * svd.matrixV().transpose();
-
-        //Handle special reflection case
-        if(Q.determinant() < 0) {
-            Q(0,2) = Q(0,2) * -1;
-            Q(1,2) = Q(1,2) * -1;
-            Q(2,2) = Q(2,2) * -1;
-        }
-
-        // Apply rotation on translated points
-        BT = BT * Q;
-
-        // Calculate GOF
-        normf = (NH.transpose()-BT.transpose()).norm();
-
-        // Store rotation part to transformation matrix
-        Rot(3,3) = 1;
-        for(int j = 0; j < 3; ++j) {
-            for(int k = 0; k < 3; ++k) {
-                Rot(j,k) = Q(k,j);
-            }
-        }
-
-        // Store translation part to transformation matrix
-        Trans(0,3) = meanx;
-        Trans(1,3) = meany;
-        Trans(2,3) = meanz;
-
-        // Safe rotation and translation to final matrix for next iteration step
-        // This step is safe to do since we change one of the input point sets (BT)
-        // ToDo: Replace this for loop with a least square solution process
-        transFinal = Rot * Trans * transFinal;
-    }
-    return transFinal;
 }
