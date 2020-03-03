@@ -39,7 +39,7 @@ cd ..
 
 * After steps above make sure that you have brainflowboard uncommented in plugins.pro
 * Build MNE Scan application
-* BrainFlow has several dynamic libraries and JSON file which must be in your search path before you run BrainFlow based app, so you need to copypaste BoardController.dll DataHandler.dll and brainflow_boards.json to your executable folder from brainflow\installed\lib
+* BrainFlow has several dynamic libraries and JSON file which must be in your search path before you run BrainFlow based app, so you need to copypaste all dynamic libraries and brainflow_boards.json to your executable folder from brainflow\installed\lib
 
 ## BrainFlowBoard plugin UI
 
