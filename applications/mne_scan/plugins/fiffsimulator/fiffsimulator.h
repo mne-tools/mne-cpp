@@ -160,14 +160,6 @@ protected:
      */
     void onDataReceived(const Eigen::MatrixXf& matData);
 
-    //=========================================================================================================
-    /**
-     * Called whenever the data connection to the server changed
-     *
-     * @param[in] bDataClientIsConnected      Whether the client is connected to the server.
-     */
-    void onDataConnectionChanged(bool bDataClientIsConnected);
-
     virtual void run();
 
     //=========================================================================================================
@@ -243,6 +235,7 @@ protected:
 
     bool                    m_bCmdClientIsConnected;        /**< If the command client is connected.*/
     bool                    m_bDoContinousHPI;              /**< Whether to do continous HPI.*/
+    bool                    m_bIsRunning;                   /**< Whether this plugin is running or not.*/
 
     QString                 m_sFiffSimulatorIP;             /**< The IP Adress of mne_rt_server.*/
     QString                 m_sFiffSimulatorClientAlias;    /**< The rt server client alias.*/
