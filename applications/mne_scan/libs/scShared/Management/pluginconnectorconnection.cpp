@@ -106,7 +106,7 @@ bool PluginConnectorConnection::createConnection()
             QSharedPointer< PluginInputData<RealTimeMultiSampleArray> > receiverRTMSA = m_pReceiver->getInputConnectors()[j].dynamicCast< PluginInputData<RealTimeMultiSampleArray> >();
             if(senderRTMSA && receiverRTMSA)
             {
-                // We need to use BlockingQueuedConnection here because the FiffSimulator is still dispatching its data from a different thread via the run method
+                // We need to use BlockingQueuedConnection here because the FiffSimulator is still dispatching its data from a different thread via the direct connect signal method
                 m_qHashConnections.insert(QPair<QString,QString>(m_pSender->getOutputConnectors()[i]->getName(),
                                                                  m_pReceiver->getInputConnectors()[j]->getName()),
                                           connect(m_pSender->getOutputConnectors()[i].data(), &PluginOutputConnector::notify,

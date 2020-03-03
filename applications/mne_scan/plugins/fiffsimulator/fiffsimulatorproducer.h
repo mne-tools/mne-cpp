@@ -114,6 +114,7 @@ public:
      * Stops the MneRtClientProducer by stopping the producer's thread.
      */
     void stop();
+    void start();
 
 signals:
     //=========================================================================================================
@@ -147,7 +148,6 @@ private:
     qint32 m_iDataClientId;
 
     bool m_bFlagInfoRequest;    /**< Read Fiff Info flag */
-    bool m_bFlagMeasuring;      /**< Read Fiff raw Buffers */
 };
 } // NAMESPACE
 
