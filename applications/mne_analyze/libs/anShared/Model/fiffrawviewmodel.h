@@ -260,7 +260,50 @@ public:
 
     inline double pixelDifference() const;
 
-    FIFFLIB::FiffInfo* getFiffInfo();
+    //=========================================================================================================
+    /**
+     * Returns current scaling
+     *
+     * @return the current scaling
+     */
+    inline const QMap< qint32,float >& getScaling() const;
+
+    //=========================================================================================================
+    /**
+     * Returns Fiff Info
+     *
+     * @return saved Fiff Info
+     */
+    FIFFLIB::FiffInfo* getFiffInfo() const;
+
+    //=========================================================================================================
+    /**
+     * Returns the kind of channel at the given row index
+     *
+     * @param[in] index     index of the row we are requesting the kind
+     *
+     * @return the kind of channel the index row is
+     */
+    qint32 getKind(const qint32 &index) const;
+
+    //=========================================================================================================
+    /**
+     * Returns the unit of the channel at the given row index
+     *
+     * @param[in] index     index of the row we are requesting the unit
+     *
+     * @return the unit of the channel the index row is
+     */
+    qint32 getUnit(const qint32 &index) const;
+
+
+    //=========================================================================================================
+    /**
+     * Set scaling channel scaling
+     *
+     * @param[in] p_qMapChScaling    Map of scaling factors
+     */
+    void setScaling(const QMap< qint32,float >& p_qMapChScaling);
 
 public slots:
 
@@ -348,6 +391,8 @@ private:
     QSharedPointer<FIFFLIB::FiffIO>     m_pFiffIO;              /**< Fiff IO */
     QSharedPointer<FIFFLIB::FiffInfo>   m_pFiffInfo;            /**< Fiff info of whole fiff file */
     QList<FIFFLIB::FiffChInfo>          m_ChannelInfoList;      /**< List of FiffChInfo objects that holds the corresponding channels information */
+
+    QMap<qint32,float>                  m_qMapChScaling;                            /**< Channel scaling map. */
 };
 
 //=============================================================================================================
@@ -415,6 +460,13 @@ inline void FiffRawViewModel::setDataColumnWidth(int iWidth) {
 
 inline double FiffRawViewModel::pixelDifference() const {
     return m_dDx;
+}
+
+//=============================================================================================================
+
+inline const QMap< qint32,float >& FiffRawViewModel::getScaling() const
+{
+    return m_qMapChScaling;
 }
 
 //=============================================================================================================
