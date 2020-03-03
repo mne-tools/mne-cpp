@@ -1,6 +1,7 @@
 ---
 title: Creating a new plugin
 parent: MNE Scan Development
+grand_parent: Develop
 nav_order: 8
 ---
 # Creating a new plugin

@@ -1,6 +1,7 @@
 ---
 title: EEG amplifiers in MNE Scan
 parent: MNE Scan Development
+grand_parent: Develop
 nav_order: 1
 ---
 # EEG amplifiers in MNE Scan
