@@ -75,6 +75,7 @@ BrainFlowSetupWidget::BrainFlowSetupWidget(BrainFlowBoard *board, QWidget *paren
     ui->boardId->addItem("Ganglion Wifi");
     ui->boardId->addItem("Cyton Wifi");
     ui->boardId->addItem("Cyton Daisy Wifi");
+    ui->boardId->addItem("BrainBit");
     ui->boardId->setCurrentIndex(1); // Synthetic board is default
 
     connect(ui->prepareSession, &QPushButton::clicked, this, &BrainFlowSetupWidget::prepareSession);
@@ -111,7 +112,7 @@ void BrainFlowSetupWidget::prepareSession()
     int dataType = ui->dataType->currentIndex();
 
     int boardIndex = ui->boardId->currentIndex();
-    int boardId = (int)BoardIds::SYNTHETIC_BOARD;;
+    int boardId = (int)BoardIds::SYNTHETIC_BOARD;
     switch (boardIndex)
     {
         case 0:
@@ -137,6 +138,9 @@ void BrainFlowSetupWidget::prepareSession()
             break;
         case 7:
             boardId = (int)BoardIds::CYTON_DAISY_WIFI_BOARD;
+            break;
+        case 8:
+            boardId = (int)BoardIds::BRAINBIT_BOARD;
             break;
     }
 
