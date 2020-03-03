@@ -1,10 +1,10 @@
 ---
-title: FieldTrip Buffer in MNE Scan
-parent: Develop
-nav_order: 4
+title: FieldTrip Buffer
+parent: MNE Scan Development
+nav_order: 7
 ---
 
-# MNE Scan FieldTrip Buffer Plugin
+# FieldTrip Buffer
 
 The plugin interface with a FieldTrip Buffer running at a given address. It does not implement the buffer itself, only a client. It is non-invasive, and does not even have access to the MEG device directly, only the data pushed to the buffer.
 

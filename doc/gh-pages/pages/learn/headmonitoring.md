@@ -6,9 +6,9 @@ nav_order: 3
 ---
 # Real-time Head Monitoring
 
-This guide gives introductions on how to enable and use real-time head monitoring during your measurement. Prerequisites are enabled head position indicator (HPI) coils. These are coils, driven at a specific frequency, that help to estimate the current head position. 
+This guide shows how to enable and use real-time head monitoring during your MEG measurement. Currently, this only works with Neuromag/Elekta/MEGIN devices.
 
-## Prerequisite
+## Prerequisites
 
 Before you can visualize the head movement during your measurement, you have to ensure two things:
 
@@ -19,12 +19,11 @@ Before you can visualize the head movement during your measurement, you have to 
 
 ## Setup
 
-The HpiView is a functionality that can be added to all Sensor Plugins like `FiffSimulator` or `FieldTripBuffer`. The following steps will show you everything necessary to set up the real-time head monitoring. 
+The HpiView is a functionality that can be added to all Sensor Plugins like `FiffSimulator` or `FieldTripBuffer`. The following steps will show you the necessary steps to set up the real-time head monitoring in MNE Scan: 
 
-1. Setup Datastream
-    * Streaming Simulated Data via [FiffSimulator](/prerecordeddata.md).
-
-    * Streaming data from a MEG device in real-time, i.e. with the [FieldTripBuffer-Plugin](../development/ftbufferplugin.md).
+1. Setup the data streaming
+    * Stream pre-recorded data via [FiffSimulator](/prerecordeddata.md).
+    * Stream data from a MEG device connected via the [FieldTripBuffer-Plugin](../development/ftbufferplugin.md).
 
 2. Open the HPI View
 
@@ -34,11 +33,11 @@ The HpiView is a functionality that can be added to all Sensor Plugins like `Fif
 
 ## The HPI View
 
-The HPI-View panel can be divided into two sections, namely the monitoring section and the control section. The monitoring sections show an average head model that is aligned and scaled to tracked landmarks like LPA, RPA, Nasion and HPI coils. 
+The HPI-View panel can be divided into two sections, namely the monitoring section and the control section. The monitoring section shows an average head model that is aligned and scaled to tracked landmarks like LPA, RPA, Nasion and HPI coils. 
 
 ![](../../images/mne_scan_hpi_view.png)
 
-The control panel is on the right side and can also be divided into several sections. How to use them and what you can control with them is shown below.    
+The control panel can be found on the right side and is divided into several sections. How to use them and what you can control is exaplained in the fwollowing.    
 
 ### Load Digitizers
 
@@ -51,27 +50,23 @@ The control panel is on the right side and can also be divided into several sect
 
 ![](../../images/mne_scan_hpi_fit.png)
 
-1. Choose if you want to use:
-    * Signal Space Projection `SSP`
-    * `Compensators`
+1. Choose if you want to Signal Space Projection (`SSP`) or `Compensators`.
 
 2. Enter the HPI coil frequencies. The labeling 1,2,3,4 refers to the positions mentioned at the beginning of this guide.
 
-3. Do an initial HPI fit or enable continuous HPi fitting. 
+3. Do an initial HPI fit or enable continuous HPi fitting. Make sure you have started the measuring pipeline via the play button first.
 
-4. The Error in mm is shown for each coil and on average. The error is namely the distance between the calculated his position and the digitized his position. 
+4. The `Fitting errors` in mm are shown for each coil and in form of an average over all coils. The error is calculated as the distance between the estimated HPI coil and the digitized HPI positions.
 
-5. Choose a threshold that defines until which error the calculated HPI-fit should be applied. 
+5. Choose a threshold that defines an acceptable error. 
 
-6. The calculating device to head transformation matrix is also shown.
+6. For convenience the last device to head transformation matrix is shown.
 
 ### 3D-Control
 
 ![](../../images/mne_scan_hpi_control.png)
 
-Here you can choose what elements you want to visualize in the monitoring section. These elements are the following:
+Here you can choose what elements you want to visualize in the monitoring section. These elements include:
 
- * Device: `VectorView` or `BabyMEG`
- * Head: `Average` and `Tracked`
- 
-In `Head` you can choose if you want to see the scaled average head visualization and tracked digitizers. In `Device` if and which sensor layout you want to visualize.
+ * Device > `VectorView` or `BabyMEG` features the different helmet surfaces.
+ * Head > `Average`, `Tracked` and `Fitted` features the averaged head surface, digitized and aligned landmarks as well as the estimated HPI coil locations, respectivley.

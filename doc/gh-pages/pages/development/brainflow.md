@@ -1,8 +1,8 @@
 ---
 title: BrainFlow
-parent: EEG amplifier in MNE Scan
+parent: MNE Scan Development
 grand_parent: Develop
-nav_order: 5
+nav_order: 6
 ---
 # BrainFlow
 

@@ -1,7 +1,7 @@
 ---
 title: MNE-CPP with QtWasm
 parent: Develop
-nav_order: 5
+nav_order: 3
 ---
 # MNE-CPP with QtWasm
 

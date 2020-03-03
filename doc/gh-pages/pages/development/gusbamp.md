@@ -1,8 +1,8 @@
 ---
 title: GUSBAmp
-parent: EEG amplifier in MNE Scan
+parent: MNE Scan Development
 grand_parent: Develop
-nav_order: 2
+nav_order: 3
 ---
 # GUSBAmp
 

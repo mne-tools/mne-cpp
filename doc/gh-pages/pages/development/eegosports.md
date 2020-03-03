@@ -1,8 +1,8 @@
 ---
 title: EEGoSports
-parent: EEG amplifier in MNE Scan
+parent: MNE Scan Development
 grand_parent: Develop
-nav_order: 3
+nav_order: 4
 ---
 # EEGoSports
 
