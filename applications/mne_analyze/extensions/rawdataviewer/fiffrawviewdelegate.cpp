@@ -92,6 +92,11 @@ void FiffRawViewDelegate::paint(QPainter *painter,
                 painter->setBrushOrigin(option.rect.topLeft());
                 painter->fillRect(option.rect, brush);
                 painter->restore();
+            } else {
+                painter->save();
+                painter->setBrushOrigin(option.rect.topLeft());
+                painter->fillRect(option.rect, backgroundBrush);
+                painter->restore();
             }
 
             //Get data

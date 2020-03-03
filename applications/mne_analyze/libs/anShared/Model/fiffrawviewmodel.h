@@ -57,6 +57,7 @@
 #include <QMutex>
 #include <QBuffer>
 #include <QFile>
+#include <QColor>
 
 //=============================================================================================================
 // Eigen INCLUDES
@@ -305,6 +306,14 @@ public:
      */
     void setScaling(const QMap< qint32,float >& p_qMapChScaling);
 
+    //=========================================================================================================
+    /**
+     * Set the background color
+     *
+     * @param[in] color    The background color
+     */
+    void setBackgroundColor(const QColor& color);
+
 public slots:
 
     /**
@@ -393,6 +402,8 @@ private:
     QList<FIFFLIB::FiffChInfo>          m_ChannelInfoList;      /**< List of FiffChInfo objects that holds the corresponding channels information */
 
     QMap<qint32,float>                  m_qMapChScaling;                            /**< Channel scaling map. */
+
+    QColor                              m_colBackground;                            /**< The background color.*/
 };
 
 //=============================================================================================================

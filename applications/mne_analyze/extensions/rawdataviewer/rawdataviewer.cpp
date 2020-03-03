@@ -140,8 +140,11 @@ void RawDataViewer::onNewModelAvalible(QSharedPointer<AbstractModel> pNewModel)
         viewWidget->setWidgetList();
         connect(viewWidget, &DISPLIB::FiffRawViewSettings::signalColorChanged,
                 m_pFiffRawView, &FiffRawView::setSignalColor);
+        connect(viewWidget, &DISPLIB::FiffRawViewSettings::backgroundColorChanged,
+                m_pFiffRawView, &FiffRawView::setBackgroundColor);
 
         m_pFiffRawView->setSignalColor(viewWidget->getSignalColor());
+        m_pFiffRawView->setBackgroundColor(viewWidget->getBackgroundColor());
 
 
         m_pLayout->addWidget(scalingWidget);

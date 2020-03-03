@@ -189,3 +189,14 @@ void FiffRawView::setSignalColor(const QColor& signalColor)
 {
     m_pDelegate->setSignalColor(signalColor);
 }
+
+//=============================================================================================================
+
+void FiffRawView::setBackgroundColor(const QColor& backgroundColor)
+{
+    m_backgroundColor = backgroundColor;
+
+    if(m_pModel) {
+        m_pModel->setBackgroundColor(m_backgroundColor);
+    }
+}
