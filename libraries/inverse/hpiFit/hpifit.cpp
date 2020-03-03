@@ -168,15 +168,7 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
     coil.dpfiterror = VectorXd::Zero(iNumCoils);
     coil.dpfitnumitr = VectorXd::Zero(iNumCoils);
 
-    // Generate simulated data
-    MatrixXd matSimsig(iSamLoc,iNumCoils*2);
-    VectorXd vecTime = VectorXd::LinSpaced(iSamLoc, 0, iSamLoc-1) *1.0/iSamF;
-
-    for(int i = 0; i < iNumCoils; ++i) {
-        matSimsig.col(i) = sin(2*M_PI*vecCoilfreq[i]*vecTime.array());
-        matSimsig.col(i+iNumCoils) = cos(2*M_PI*vecCoilfreq[i]*vecTime.array());
-    }
-
+    //qDebug() << "invSimsigR rxc :" << invSimsigR.rows() << " x " << invSimsigR.cols();
     // Create digitized HPI coil position matrix
     MatrixXd matHeadHPI(iNumCoils,3);
 
@@ -203,10 +195,6 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
         matProjectorsInnerind.col(i) = matProjectorsRows.col(m_vInnerind.at(i));
     }
 
-    MatrixXd matTopo(m_vInnerind.size(), iNumCoils*2);
-    MatrixXd matAmp(m_vInnerind.size(), iNumCoils);
-    MatrixXd matAmpC(m_vInnerind.size(), iNumCoils);
-
     // Get the data from inner layer channels
     MatrixXd matInnerdata(m_vInnerind.size(), t_mat.cols());
 
@@ -214,23 +202,65 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
         matInnerdata.row(j) << t_mat.row(m_vInnerind[j]);
     }
 
+    // Generate simulated data
+    MatrixXd matSimsig(iSamLoc,iNumCoils*4);
+    MatrixXd matInvSimsig = matSimsig.transpose();      // inverse
+    MatrixXd matInvSimsigR = matInvSimsig;              // reordered
+    VectorXd vecTime = VectorXd::LinSpaced(iSamLoc, 0, iSamLoc-1) *1.0/iSamF;
+
+    // ToDo: get linefreq from fiffInfo
+    int iLineFreq  = 60; // in Hz
+
+    for(int i = 0; i < iNumCoils; ++i) {
+        matSimsig.col(i) = sin(2*M_PI*vecCoilfreq[i]*vecTime.array());
+        matSimsig.col(i+iNumCoils) = cos(2*M_PI*vecCoilfreq[i]*vecTime.array());
+        matSimsig.col(i+2*iNumCoils) = sin(2*M_PI*iLineFreq*i*vecTime.array());
+        matSimsig.col(i+3*iNumCoils) = cos(2*M_PI*iLineFreq*i*vecTime.array());
+    }
+    matSimsig.col(14) = RowVectorXd::LinSpaced(iSamLoc, -0.5, 0.5);
+    matSimsig.col(15).fill(1);
+
+    matInvSimsig = UTILSLIB::MNEMath::pinv(matSimsig);
+
+    // reorder for faster computation
+    RowVectorXi vecIndex(2*iNumCoils);
+    vecIndex << 0,4,1,5,2,6,3,7;
+    for(int i = 0; i < vecIndex.size(); ++i) {
+        matInvSimsigR.row(i) = matInvSimsig.row(vecIndex(i));
+    }
+
     // Calculate topo
-    matTopo = matInnerdata * UTILSLIB::MNEMath::pinv(matSimsig).transpose(); // matTopo: # of good inner channel x 8
+    MatrixXd matTopo(m_vInnerind.size(), iNumCoils*2);
+    MatrixXd matAmp(m_vInnerind.size(), iNumCoils);
+    MatrixXd matAmpC(m_vInnerind.size(), iNumCoils);
+
+    matTopo = matInvSimsigR * matInnerdata.transpose(); // topo: # of good inner channel x 8
+    //qDebug() << "topo rxc :" << topo.rows() << " x " << topo.cols();
+    for(int i = 0; i < iNumCoils; ++i) {
+        int from = 2*i;
+        MatrixXd m = matTopo.block(from,0,2,matTopo.cols());
+        JacobiSVD<MatrixXd> svd(m, ComputeThinU | ComputeThinV);
+        matAmp.col(i) = svd.singularValues()(0) * svd.matrixV().col(0);
+    }
 
     // Select sine or cosine component depending on the relative size
-    matAmp  = matTopo.leftCols(iNumCoils); // amp: # of good inner channel x 4
-    matAmpC = matTopo.rightCols(iNumCoils);
+//    amp  = topo.leftCols(numCoils); // amp: # of good inner channel x 4
+//    ampC = topo.rightCols(numCoils);
 
-    for(int j = 0; j < iNumCoils; ++j) {
-       float fNS = 0.0;
-       float fNC = 0.0;
-       fNS = matAmp.col(j).array().square().sum();
-       fNC = matAmpC.col(j).array().square().sum();
+//    for(int j = 0; j < numCoils; ++j) {
+//       float nS = 0.0;
+//       float nC = 0.0;
+//       for(int i = 0; i < innerind.size(); ++i) {
+//           nS += amp(i,j)*amp(i,j);
+//           nC += ampC(i,j)*ampC(i,j);
+//       }
 
-       if(fNC > fNS) {
-           matAmp.col(j) = matAmpC.col(j);
-       }
-    }
+//       if(nC > nS) {
+//         for(int i = 0; i < innerind.size(); ++i) {
+//           amp(i,j) = ampC(i,j);
+//         }
+//       }
+//    }
 
     //Find good seed point/starting point for the coil position in 3D space
     //Find biggest amplitude per pickup coil (sensor) and store corresponding sensor channel index
@@ -327,6 +357,8 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
         }
 
         UTILSLIB::IOUtils::write_eigen_matrix(matCoilPos, QString("%1/%2_coilPosSeed_mat").arg(sHPIResourceDir).arg(sTimeStamp));
+
+        UTILSLIB::IOUtils::write_eigen_matrix(vecGoF, QString("%1/%2_gof_mat").arg(sHPIResourceDir).arg(sTimeStamp));
 
         UTILSLIB::IOUtils::write_eigen_matrix(coil.pos, QString("%1/%2_coilPos_mat").arg(sHPIResourceDir).arg(sTimeStamp));
 
