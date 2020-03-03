@@ -201,13 +201,13 @@ HpiView::HpiView(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
     QFile t_fileHeadAvr(QCoreApplication::applicationDirPath() + "/resources/general/hpiAlignment/fsaverage-head.fif");;
     MNEBem t_BemHeadAvr(t_fileHeadAvr);
     m_pBemHeadAvr = m_pData3DModel->addBemData("Head", "Average", t_BemHeadAvr);
-    m_pBemHeadAvr->setCheckState(Qt::Checked);
+    m_pBemHeadAvr->setCheckState(Qt::Unchecked);
 
     //Always on top
     //this->setWindowFlags(this->windowFlags() | Qt::WindowStaysOnTopHint);
 
     //Init coil freqs
-    m_vCoilFreqs << 166 << 154 << 161 << 158;
+    m_vCoilFreqs << 155 << 165 << 190 << 200;
 
     //Init data
     m_matValue.resize(0,0);
@@ -370,7 +370,7 @@ QList<FiffDigPoint> HpiView::readPolhemusDig(const QString& fileName)
         ui->m_spinBox_freqCoil4->hide();
 
         m_vCoilFreqs.clear();
-        m_vCoilFreqs << 166 << 154 << 161;
+        m_vCoilFreqs << 155 << 165 << 190;
     } else {
         ui->m_label_gofCoil4->show();
         ui->m_label_gofCoil4Description->show();
@@ -378,7 +378,7 @@ QList<FiffDigPoint> HpiView::readPolhemusDig(const QString& fileName)
         ui->m_spinBox_freqCoil4->show();
 
         m_vCoilFreqs.clear();
-        m_vCoilFreqs << 166 << 154 << 161 << 158;
+        m_vCoilFreqs << 155 << 165 << 190 << 200;
     }
 
     // align fiducials and scale average head
@@ -424,6 +424,7 @@ void HpiView::alignFiducials(const QString& fileNameDigData)
     // use inverse transform
     for(int r = 0; r < 3; ++r) {
         for(int c = 0; c < 3; ++c) {
+            // also apply scaling factor
             invMat(r,c) = t_digData->head_mri_t_adj->invrot(r,c) * scales[0];
         }
     }
@@ -434,7 +435,7 @@ void HpiView::alignFiducials(const QString& fileNameDigData)
     Qt3DCore::QTransform identity;
     m_tAlignment.setMatrix(invMat);
 
-    // Update average head - apply scaling and transformation
+    // align and scale average head (now in head space)
     QList<QStandardItem*> itemList = m_pBemHeadAvr->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
     for(int j = 0; j < itemList.size(); ++j) {
         if(BemSurfaceTreeItem* pBemItem = dynamic_cast<BemSurfaceTreeItem*>(itemList.at(j))) {
@@ -485,7 +486,7 @@ void HpiView::onBtnLoadPolhemusFile()
 {
     //Get file location
     QString fileName_HPI = QFileDialog::getOpenFileName(this,
-            tr("Open digitizer file"),"/autofs/cluster/fusion/rd454/git/mne-cpp/bin/MNE-sample-data/chpi/raw", tr("Fiff file (*.fif)"));
+            tr("Open digitizer file"),"", tr("Fiff file (*.fif)"));
 
     if(!fileName_HPI.isEmpty()) {
         ui->m_lineEdit_filePath->setText(fileName_HPI);
@@ -671,25 +672,13 @@ void HpiView::storeResults(const FiffCoordTrans& devHeadTrans, const FiffDigPoin
 void HpiView::update3DView()
 {
     if(m_pTrackedDigitizer && m_pFiffInfo && m_pBemHeadAvr) {
-        //Prepare new transform head->device
-        QMatrix4x4 mat;
-        QMatrix4x4 eye;
-        eye.fill(0);
-        for(int r = 0; r < 4; ++r) {
-            for(int c = 0; c < 4; ++c) {
-                mat(r,c) = m_pFiffInfo->dev_head_t.invtrans(r,c);
-            }
-            eye(r,r) = 1;
-        }
-
-        Qt3DCore::QTransform tHeadDev;
-        tHeadDev.setMatrix(mat);
 
         //Update fast scan / tracked digitizer
         QList<QStandardItem*> itemList = m_pTrackedDigitizer->findChildren(Data3DTreeModelItemTypes::DigitizerItem);
         for(int j = 0; j < itemList.size(); ++j) {
             if(DigitizerTreeItem* pDigItem = dynamic_cast<DigitizerTreeItem*>(itemList.at(j))) {
-                pDigItem->setTransform(tHeadDev);
+                // apply inverse to get from head to device space
+                pDigItem->setTransform(m_pFiffInfo->dev_head_t,true);
             }
         }
 
@@ -698,7 +687,8 @@ void HpiView::update3DView()
         for(int j = 0; j < itemList.size(); ++j) {
             if(BemSurfaceTreeItem* pBemItem = dynamic_cast<BemSurfaceTreeItem*>(itemList.at(j))) {
                 pBemItem->setTransform(m_tAlignment);
-                pBemItem->applyTransform(tHeadDev);
+                // apply inverse to get from head to device space
+                pBemItem->applyTransform(m_pFiffInfo->dev_head_t,true);
             }
         }
     }
