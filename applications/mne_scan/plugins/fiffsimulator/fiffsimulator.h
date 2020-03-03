@@ -152,6 +152,8 @@ public:
     virtual QWidget* setupWidget();
 
 protected:
+    void onDataReceived(const Eigen::MatrixXf& matData);
+
     virtual void run();
 
     //=========================================================================================================
@@ -219,7 +221,6 @@ protected:
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pRTMSA_FiffSimulator;     /**< The RealTimeMultiSampleArray to provide the rt_server Channels.*/
 
     QSharedPointer<FiffSimulatorProducer>           m_pFiffSimulatorProducer;   /**< Holds the FiffSimulatorProducer.*/
-    QSharedPointer<IOBUFFER::RawMatrixBuffer>       m_pRawMatrixBuffer_In;      /**< Holds incoming raw data. */
     QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo;                /**< Fiff measurement info.*/
     QSharedPointer<COMMUNICATIONLIB::RtCmdClient>   m_pRtCmdClient;             /**< The command client.*/
     QSharedPointer<DISP3DLIB::HpiView>              m_pHPIWidget;               /**< HPI widget. */

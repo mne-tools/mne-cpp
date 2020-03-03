@@ -101,7 +101,11 @@ QuickControlView::~QuickControlView()
 
 void QuickControlView::clear()
 {
-    qDeleteAll(this->findChildren<QWidget*>("", Qt::FindDirectChildrenOnly));
+    while(ui->m_pTabWidget->count() != 0) {
+        QWidget* pTabWidget = ui->m_pTabWidget->widget(ui->m_pTabWidget->count()-1);
+        ui->m_pTabWidget->removeTab(ui->m_pTabWidget->count()-1);
+        delete pTabWidget;
+    }
 }
 
 //=============================================================================================================

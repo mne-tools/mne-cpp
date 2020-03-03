@@ -641,7 +641,6 @@ void MainWindow::startMeasurement()
         return;
     }
 
-    m_pQuickControlView->clear();
     m_pActionQuickControl->setVisible(true);
 
     m_pPluginGui->uiSetupRunningState(true);

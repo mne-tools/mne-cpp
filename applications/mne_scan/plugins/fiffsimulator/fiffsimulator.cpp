@@ -83,10 +83,12 @@ FiffSimulator::FiffSimulator()
 , m_sFiffSimulatorIP("127.0.0.1")//("172.21.16.88")
 , m_pFiffSimulatorProducer(new FiffSimulatorProducer(this))
 , m_iBufferSize(-1)
-, m_pRawMatrixBuffer_In(0)
 , m_iActiveConnectorId(0)
 , m_bDoContinousHPI(false)
 {
+    connect(m_pFiffSimulatorProducer.data(), &FiffSimulatorProducer::dataReceived,
+            this, &FiffSimulator::onDataReceived, Qt::DirectConnection);
+
     //Init HPI
     m_pActionComputeHPI = new QAction(QIcon(":/images/latestFiffInfoHPI.png"), tr("Compute HPI"),this);
     m_pActionComputeHPI->setStatusTip(tr("Compute HPI"));
@@ -156,14 +158,6 @@ bool FiffSimulator::start()
         (*m_pRtCmdClient)["bufsize"].pValues()[0].setValue(m_iBufferSize);
         (*m_pRtCmdClient)["bufsize"].send();
 
-        // Buffer
-        m_qMutex.lock();
-        m_pRawMatrixBuffer_In = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(8,m_pFiffInfo->nchan,m_iBufferSize));
-        m_qMutex.unlock();
-
-        // Start threads
-        QThread::start();
-
         m_pFiffSimulatorProducer->start();
 
         while(!m_pFiffSimulatorProducer->m_bFlagMeasuring)
@@ -186,15 +180,6 @@ bool FiffSimulator::stop()
 {
     if(m_pFiffSimulatorProducer->isRunning()) {
         m_pFiffSimulatorProducer->stop();
-    }
-
-    requestInterruption();
-
-    if(this->isRunning()) {
-        //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
-        m_pRawMatrixBuffer_In->releaseFromPop();
-        m_pRawMatrixBuffer_In->clear();
-        m_pRTMSA_FiffSimulator->data()->clear();
     }
 
     if(m_pHPIWidget) {
@@ -229,33 +214,35 @@ QWidget* FiffSimulator::setupWidget()
 
 //=============================================================================================================
 
+void FiffSimulator::onDataReceived(const MatrixXf& matData)
+{
+    QMutexLocker locker (&m_qMutex);
+    MatrixXf matValue = matData;
+
+    //Update HPI data (for single and continous HPI fitting)
+    updateHPI(matValue);
+
+    //Do continous HPI fitting and write result to data block
+    if(m_bDoContinousHPI) {
+        doContinousHPI(matValue);
+    }
+
+    //emit values
+    m_pRTMSA_FiffSimulator->data()->setValue(matValue.cast<double>());
+}
+
+//=============================================================================================================
+
 void FiffSimulator::run()
 {
-    MatrixXf matValue;
-
-    while(!isInterruptionRequested()) {
-        //pop matrix
-        matValue = m_pRawMatrixBuffer_In->pop();
-
-        //Update HPI data (for single and continous HPI fitting)
-        updateHPI(matValue);
-
-        //Do continous HPI fitting and write result to data block
-        if(m_bDoContinousHPI) {
-            doContinousHPI(matValue);
-        }
-
-        //emit values
-        m_pRTMSA_FiffSimulator->data()->setValue(matValue.cast<double>());
-    }
 }
 
 //=============================================================================================================
 
 void FiffSimulator::initConnector()
 {
-    if(m_pFiffInfo)
-    {
+    QMutexLocker locker (&m_qMutex);
+    if(m_pFiffInfo) {
         m_pRTMSA_FiffSimulator->data()->initFromFiffInfo(m_pFiffInfo);
         m_pRTMSA_FiffSimulator->data()->setMultiArraySize(1);
         m_pRTMSA_FiffSimulator->data()->setVisibility(true);

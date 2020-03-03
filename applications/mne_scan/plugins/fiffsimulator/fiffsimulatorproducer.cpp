@@ -75,7 +75,6 @@ FiffSimulatorProducer::~FiffSimulatorProducer()
 {
     if(this->isRunning()) {
         stop();
-        wait();
     }
 }
 
@@ -148,12 +147,6 @@ void FiffSimulatorProducer::stop()
         (*m_pFiffSimulator->m_pRtCmdClient)["stop-all"].send();
     }
 
-    if(m_pFiffSimulator->m_pRawMatrixBuffer_In)
-    {
-        //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the push function (acquire statement)
-        m_pFiffSimulator->m_pRawMatrixBuffer_In->releaseFromPush();
-    }
-
     requestInterruption();
     wait();
 }
@@ -171,7 +164,7 @@ void FiffSimulatorProducer::run()
         msleep(100);
         this->connectDataClient(m_pFiffSimulator->m_sFiffSimulatorIP);
         ++count;
-        if(count > 10)
+        if(count > 10 || !m_pFiffSimulator->isRunning())
             return;
     }
 
@@ -179,9 +172,7 @@ void FiffSimulatorProducer::run()
 
     m_bFlagMeasuring = true;
 
-    //
     // Inits
-    //
     MatrixXf t_matRawBuffer;
 
     fiff_int_t kind;
@@ -189,11 +180,9 @@ void FiffSimulatorProducer::run()
     qint32 from = 0;
     qint32 to = -1;
 
-    while(!isInterruptionRequested())
-    {
+    while(!isInterruptionRequested()) {
         producerMutex.lock();
-        if(m_bFlagInfoRequest)
-        {
+        if(m_bFlagInfoRequest) {
             m_pFiffSimulator->m_qMutex.lock();
             m_pFiffSimulator->m_pFiffInfo = m_pRtDataClient->readInfo();
             emit m_pFiffSimulator->fiffInfoAvailable();
@@ -203,18 +192,16 @@ void FiffSimulatorProducer::run()
         }
         producerMutex.unlock();
 
-        if(m_bFlagMeasuring)
-        {
+        if(m_bFlagMeasuring) {
             m_pRtDataClient->readRawBuffer(m_pFiffSimulator->m_pFiffInfo->nchan, t_matRawBuffer, kind);
 
-            if(kind == FIFF_DATA_BUFFER)
-            {
+            if(kind == FIFF_DATA_BUFFER) {
                 to += t_matRawBuffer.cols();
                 from += t_matRawBuffer.cols();
-                m_pFiffSimulator->m_pRawMatrixBuffer_In->push(&t_matRawBuffer);
-            }
-            else if(FIFF_DATA_BUFFER == FIFF_BLOCK_END)
+                emit dataReceived(t_matRawBuffer);
+            } else if(FIFF_DATA_BUFFER == FIFF_BLOCK_END) {
                 m_bFlagMeasuring = false;
+            }
         }
     }
 
