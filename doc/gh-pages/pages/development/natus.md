@@ -1,8 +1,8 @@
 ---
 title: Natus
-parent: EEG amplifier in MNE Scan
+parent: MNE Scan Development
 grand_parent: Develop
-nav_order: 4
+nav_order: 5
 ---
 # Natus
 

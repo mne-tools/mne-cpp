@@ -1,9 +1,9 @@
 ---
-title: Create a MNE Scan plugin
-parent: Develop
-nav_order: 6
+title: Creating a new plugin
+parent: MNE Scan Development
+nav_order: 8
 ---
-# Create a MNE Scan plugin
+# Creating a new plugin
 
 |**Please note:** The information provided on this page might be outdated and will be updated soon.|
 

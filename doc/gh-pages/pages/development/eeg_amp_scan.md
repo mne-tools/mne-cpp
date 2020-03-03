@@ -1,10 +1,9 @@
 ---
-title: EEG amplifier in MNE Scan
-has_children: true
-parent: Develop
-nav_order: 3
+title: EEG amplifiers in MNE Scan
+parent: MNE Scan Development
+nav_order: 1
 ---
-# EEG amplifier in MNE Scan
+# EEG amplifiers in MNE Scan
 
 |**Please note:** The information provided on this page might be outdated and will be updated soon.|
 
