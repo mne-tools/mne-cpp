@@ -127,6 +127,14 @@ public:
      */
     void setSignalColor(const QColor& signalColor);
 
+    //=========================================================================================================
+    /**
+     * Broadcast the background color changes made in the QuickControl widget
+     *
+     * @param [in] backgroundColor  The new background color.
+     */
+    void setBackgroundColor(const QColor& backgroundColor);
+
 private:
     //=========================================================================================================
     /**
@@ -134,13 +142,15 @@ private:
      */
     void resizeEvent(QResizeEvent* event);
 
-    QPointer<QTableView>        m_pTableView;
+    QPointer<QTableView>                                m_pTableView;
 
-    QSharedPointer<ANSHAREDLIB::FiffRawViewModel> m_pModel;
+    QSharedPointer<ANSHAREDLIB::FiffRawViewModel>       m_pModel;
 
-    QSharedPointer<FiffRawViewDelegate> m_pDelegate;
+    QSharedPointer<FiffRawViewDelegate>                 m_pDelegate;
 
-    QMap<qint32,float>          m_qMapChScaling;                /**< Channel scaling values. */
+    QMap<qint32,float>                                  m_qMapChScaling;                /**< Channel scaling values. */
+
+    QColor                                              m_backgroundColor;              /**< Current background color. */
 
 signals:
     void tableViewDataWidthChanged(int iWidth);
