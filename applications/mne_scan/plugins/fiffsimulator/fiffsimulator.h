@@ -152,7 +152,21 @@ public:
     virtual QWidget* setupWidget();
 
 protected:
+    //=========================================================================================================
+    /**
+     * Disptaches the incoming data to the corresponding displays and connected plugins
+     *
+     * @param[in] matData      The incoming data block.
+     */
     void onDataReceived(const Eigen::MatrixXf& matData);
+
+    //=========================================================================================================
+    /**
+     * Called whenever the data connection to the server changed
+     *
+     * @param[in] bDataClientIsConnected      Whether the client is connected to the server.
+     */
+    void onDataConnectionChanged(bool bDataClientIsConnected);
 
     virtual void run();
 

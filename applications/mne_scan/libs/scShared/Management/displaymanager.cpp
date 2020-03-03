@@ -106,9 +106,9 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
 
             qListActions.append(rtmsaWidget->getDisplayActions());
 
-            // We need to use BlockingQueuedConnection here because the FiffSimulator is still dispatching its data from a different thread via the run method
+            // We need to use BlockingQueuedConnection here because the FiffSimulator is still dispatching its data from a different thread via the direct connect signal method
             connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
-                    rtmsaWidget, &RealTimeMultiSampleArrayWidget::update, Qt::BlockingQueuedConnection);
+                    rtmsaWidget, &RealTimeMultiSampleArrayWidget::update, Qt::AutoConnection);
 
             vboxLayout->addWidget(rtmsaWidget);
             rtmsaWidget->init();
