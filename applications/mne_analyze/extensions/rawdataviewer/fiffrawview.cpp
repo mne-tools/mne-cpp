@@ -103,6 +103,9 @@ FiffRawView::~FiffRawView()
 void FiffRawView::initMVCSettings(const QSharedPointer<FiffRawViewModel>& pModel,
                                   const QSharedPointer<FiffRawViewDelegate>& pDelegate)
 {
+    m_pModel = pModel;
+    m_pDelegate = pDelegate;
+
     m_pTableView->setModel(pModel.data());
     m_pTableView->setItemDelegate(pDelegate.data());
 
@@ -170,4 +173,12 @@ void FiffRawView::resizeEvent(QResizeEvent * event)
     }
 
     return QWidget::resizeEvent(event);
+}
+
+//=============================================================================================================
+
+void FiffRawView::setScalingMap(const QMap<qint32, float>& scaleMap)
+{
+    m_qMapChScaling = scaleMap;
+    m_pModel->setScaling(scaleMap);
 }

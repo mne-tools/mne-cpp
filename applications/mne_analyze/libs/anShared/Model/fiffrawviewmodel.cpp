@@ -579,6 +579,30 @@ void FiffRawViewModel::updateEndStartFlags()
 
 //=============================================================================================================
 
-FIFFLIB::FiffInfo* FiffRawViewModel::getFiffInfo() {
+FIFFLIB::FiffInfo* FiffRawViewModel::getFiffInfo() const
+{
     return m_pFiffInfo.data();
+}
+
+//=============================================================================================================
+
+void FiffRawViewModel::setScaling(const QMap< qint32,float >& p_qMapChScaling)
+{
+    beginResetModel();
+    m_qMapChScaling = p_qMapChScaling;
+    endResetModel();
+}
+
+//=============================================================================================================
+
+qint32 FiffRawViewModel::getKind(const qint32 &index) const
+{
+    return m_ChannelInfoList.at(index).kind;
+}
+
+//=============================================================================================================
+
+qint32 FiffRawViewModel::getUnit(const qint32 &index) const
+{
+    return m_ChannelInfoList.at(index).unit;
 }

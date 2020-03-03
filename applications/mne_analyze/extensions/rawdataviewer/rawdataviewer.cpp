@@ -130,21 +130,16 @@ void RawDataViewer::onNewModelAvalible(QSharedPointer<AbstractModel> pNewModel)
         m_pRawModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
         m_pFiffRawView->initMVCSettings(m_pRawModel, m_pRawDelegate);
         qDebug() << "[RawDataViewer::onNewModelAvailable] New model added; " << pNewModel->getModelPath();
+
+        DISPLIB::ScalingView* scalingWidget = new DISPLIB::ScalingView("Test", m_pRawModel->getFiffInfo()->chs);
+        connect(scalingWidget, &DISPLIB::ScalingView::scalingChanged,
+                m_pFiffRawView, &FiffRawView::setScalingMap);
+
+        m_pControlDock->setWidget(m_pContainer);
+        m_pLayout->addWidget(scalingWidget);
+        m_pContainer->setLayout(m_pLayout);
+        m_pContainer->show();
     }
-//    QPushButton* button = new QPushButton("This is a test :)");
-//    m_pControlDock->setWidget(button);
-
-
-    QLabel* mylabel = new QLabel(pNewModel->getModelName());
-
-
-    DISPLIB::ScalingView* scalingWidget = new DISPLIB::ScalingView("Test", m_pRawModel->getFiffInfo()->chs);
-
-    Layout->addWidget(mylabel);
-    Layout->addWidget(scalingWidget);
-
-    Container->setLayout(Layout);
-    Container->show();
 }
 
 //=============================================================================================================
@@ -174,10 +169,12 @@ QDockWidget *RawDataViewer::getControl()
     if(!m_pControlDock) {
         m_pControlDock = new QDockWidget(tr("Raw Data Viewer"));
         m_pControlDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-        //m_pControlDock->setWidget(m_pRawDataViewerControl);
-        Layout = new QVBoxLayout;
-        Container = new QWidget;
-        m_pControlDock->setWidget(Container);
+
+        m_pLayout = new QVBoxLayout;
+        m_pContainer = new QWidget;
+
+        QLabel* tempLabel = new QLabel("No file loaded.");
+        m_pControlDock->setWidget(tempLabel);
     }
 
     return m_pControlDock;

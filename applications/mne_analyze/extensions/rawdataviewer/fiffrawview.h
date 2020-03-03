@@ -50,6 +50,7 @@
 #include <QSharedPointer>
 #include <QWidget>
 #include <QPointer>
+#include <QMap>
 
 //=============================================================================================================
 // Eigen INCLUDES
@@ -110,6 +111,14 @@ public:
     void initMVCSettings(const QSharedPointer<ANSHAREDLIB::FiffRawViewModel> &pModel,
                          const QSharedPointer<FiffRawViewDelegate>& pDelegate);
 
+    //=========================================================================================================
+    /**
+     * Broadcast channel scaling
+     *
+     * @param [in] scaleMap QMap with scaling values which is to be broadcasted to the model.
+     */
+    void setScalingMap(const QMap<qint32, float>& scaleMap);
+
 private:
     //=========================================================================================================
     /**
@@ -117,7 +126,13 @@ private:
      */
     void resizeEvent(QResizeEvent* event);
 
-    QPointer<QTableView> m_pTableView;
+    QPointer<QTableView>        m_pTableView;
+
+    QSharedPointer<ANSHAREDLIB::FiffRawViewModel> m_pModel;
+
+    QSharedPointer<FiffRawViewDelegate> m_pDelegate;
+
+    QMap<qint32,float>          m_qMapChScaling;                /**< Channel scaling values. */
 
 signals:
     void tableViewDataWidthChanged(int iWidth);
