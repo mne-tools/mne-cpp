@@ -51,6 +51,7 @@
 #include <QtConcurrent/QtConcurrent>
 #include <QElapsedTimer>
 #include <QFile>
+#include <QBrush>
 
 //=============================================================================================================
 // Eigen INCLUDES
@@ -218,6 +219,10 @@ void FiffRawViewModel::initFiffData(QIODevice& p_IODevice)
 QVariant FiffRawViewModel::data(const QModelIndex &index, int role) const
 {
     // early filtering of unimplemented display roles
+    if (role == Qt::BackgroundRole) {
+        return QVariant(QBrush(m_colBackground));
+    }
+
     if (role != Qt::DisplayRole) {
         qDebug() << "[FiffRawViewModel] Role " << role << " not implemented yet !";
         return QVariant();
@@ -234,17 +239,18 @@ QVariant FiffRawViewModel::data(const QModelIndex &index, int role) const
             QVariant result;
 
             switch (role) {
-            case Qt::DisplayRole:
-                // in order to avoid extensive copying of data, we simply give out smartpointers to the matrices (wrapped inside the ChannelData container)
-                // wait until its save to access data (that is if no data insertion is going on right now)
-                m_dataMutex.lock();
+                case Qt::DisplayRole: {
+                    // in order to avoid extensive copying of data, we simply give out smartpointers to the matrices (wrapped inside the ChannelData container)
+                    // wait until its save to access data (that is if no data insertion is going on right now)
+                    m_dataMutex.lock();
 
-                // wrap in ChannelData container and then wrap into QVariant
-                result.setValue(ChannelData(m_lData, index.row()));
+                    // wrap in ChannelData container and then wrap into QVariant
+                    result.setValue(ChannelData(m_lData, index.row()));
 
-                m_dataMutex.unlock();
+                    m_dataMutex.unlock();
 
-                return result;
+                    return result;
+                }
             }
         }
 
@@ -605,4 +611,11 @@ qint32 FiffRawViewModel::getKind(const qint32 &index) const
 qint32 FiffRawViewModel::getUnit(const qint32 &index) const
 {
     return m_ChannelInfoList.at(index).unit;
+}
+
+//=============================================================================================================
+
+void FiffRawViewModel::setBackgroundColor(const QColor& color)
+{
+    m_colBackground = color;
 }
