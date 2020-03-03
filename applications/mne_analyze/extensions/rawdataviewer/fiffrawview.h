@@ -135,6 +135,14 @@ public:
      */
     void setBackgroundColor(const QColor& backgroundColor);
 
+    //=========================================================================================================
+    /**
+     * Sets new zoom factor
+     *
+     * @param [in] zoomFac  time window size;
+     */
+    void setZoom(double zoomFac);
+
 private:
     //=========================================================================================================
     /**
@@ -151,6 +159,9 @@ private:
     QMap<qint32,float>                                  m_qMapChScaling;                /**< Channel scaling values. */
 
     QColor                                              m_backgroundColor;              /**< Current background color. */
+
+    float                                               m_fDefaultSectionSize;          /**< Default row height */
+    float                                               m_fZoomFactor;                  /**< Zoom factor */
 
 signals:
     void tableViewDataWidthChanged(int iWidth);

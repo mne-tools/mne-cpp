@@ -70,6 +70,7 @@ using namespace ANSHAREDLIB;
 
 FiffRawView::FiffRawView(QWidget *parent)
 : QWidget(parent)
+, m_fDefaultSectionSize(80.0f)
 {
     m_pTableView = new QTableView;
 
@@ -199,4 +200,13 @@ void FiffRawView::setBackgroundColor(const QColor& backgroundColor)
     if(m_pModel) {
         m_pModel->setBackgroundColor(m_backgroundColor);
     }
+}
+
+//=============================================================================================================
+
+void FiffRawView::setZoom(double zoomFac)
+{
+    m_fZoomFactor = zoomFac;
+
+    m_pTableView->verticalHeader()->setDefaultSectionSize(m_fZoomFactor*m_fDefaultSectionSize);//Row Height
 }
