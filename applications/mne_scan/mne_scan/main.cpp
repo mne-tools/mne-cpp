@@ -78,8 +78,6 @@ using namespace UTILSLIB;
 // GLOBAL DEFINTIONS
 //=============================================================================================================
 
-QSharedPointer<MainWindow> mainWin;
-
 //=============================================================================================================
 // MAIN
 //=============================================================================================================
@@ -115,9 +113,9 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
 
     //Store application info to use QSettings
-    QCoreApplication::setOrganizationName("MNE-CPP");
-    QCoreApplication::setOrganizationDomain("www.mne-cpp.org");
-    QCoreApplication::setApplicationName(CInfo::AppNameShort());
+    QApplication::setOrganizationName("MNE-CPP");
+    QApplication::setOrganizationDomain("www.mne-cpp.org");
+    QApplication::setApplicationName(CInfo::AppNameShort());
 
     SCMEASLIB::MeasurementTypes::registerTypes();
 
@@ -133,10 +131,10 @@ int main(int argc, char *argv[])
         splashscreen->showMessage("Loading modules.."+ QString::number(p)+"%");
     }
 
-    mainWin = QSharedPointer<MainWindow>(new MainWindow);
-    mainWin->show();
+    MainWindow mainWin;
+    mainWin.show();
 
-    splashscreen->finish(mainWin.data());
+    splashscreen->finish(&mainWin);
 
     QSurfaceFormat fmt;
     fmt.setSamples(10);
