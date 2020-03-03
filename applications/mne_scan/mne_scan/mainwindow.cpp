@@ -484,6 +484,10 @@ void MainWindow::createPluginDockWindow()
     connect(m_pPluginGui.data(), &PluginGui::selectedPluginChanged,
             this, &MainWindow::updatePluginSetupWidget);
 
+    if(m_pPluginGui->getCurrentPlugin()) {
+        updatePluginSetupWidget(m_pPluginGui->getCurrentPlugin());
+    }
+
     connect(m_pPluginGui.data(), &PluginGui::selectedConnectionChanged,
             this, &MainWindow::updateConnectionWidget);
 
