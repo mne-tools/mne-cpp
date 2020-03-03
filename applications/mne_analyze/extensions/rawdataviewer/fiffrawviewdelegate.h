@@ -133,7 +133,8 @@ private:
     void createPlotPath(const QStyleOptionViewItem &option,
                         QPainterPath& path,
                         ANSHAREDLIB::ChannelData &data,
-                        double dDx) const;
+                        double dDx,
+                        const QModelIndex &index) const;
 
     QPen        m_penGrid;                  /**< Pen for drawing the data grid. */
     QPen        m_penNormal;                /**< Pen for drawing the data when data is plotted normally without freeze on.  */
