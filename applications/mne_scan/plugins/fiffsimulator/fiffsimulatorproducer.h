@@ -114,7 +114,6 @@ public:
      * Stops the MneRtClientProducer by stopping the producer's thread.
      */
     void stop();
-    void start();
 
 signals:
     //=========================================================================================================
@@ -124,8 +123,6 @@ signals:
      * @param[in] p_bStatus  connection status
      */
     void dataConnectionChanged(bool p_bStatus);
-
-    void dataReceived(const Eigen::MatrixXf& matData);
 
 protected:
     //=========================================================================================================
