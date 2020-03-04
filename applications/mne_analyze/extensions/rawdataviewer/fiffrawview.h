@@ -143,6 +143,14 @@ public:
      */
     void setZoom(double zoomFac);
 
+    //=========================================================================================================
+    /**
+     * Sets new time window size
+     *
+     * @param [in] T  time window size;
+     */
+    void setWindowSize(int T);
+
 private:
     //=========================================================================================================
     /**
@@ -162,6 +170,8 @@ private:
 
     float                                               m_fDefaultSectionSize;          /**< Default row height */
     float                                               m_fZoomFactor;                  /**< Zoom factor */
+
+    qint32                                              m_iT;                           /**< Display window size in seconds */
 
 signals:
     void tableViewDataWidthChanged(int iWidth);
