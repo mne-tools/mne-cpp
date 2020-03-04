@@ -126,13 +126,6 @@ void FiffSimulatorProducer::disconnectDataClient()
 
 //=============================================================================================================
 
-void FiffSimulatorProducer::start()
-{
-    QThread::start();
-}
-
-//=============================================================================================================
-
 void FiffSimulatorProducer::stop()
 {
     requestInterruption();
@@ -143,23 +136,22 @@ void FiffSimulatorProducer::stop()
 
 void FiffSimulatorProducer::run()
 {
-    // Connect data client
-    this->connectDataClient(m_pFiffSimulator->m_sFiffSimulatorIP);
+    // Connect data client in the same thread we receive data from it
+    connectDataClient(m_pFiffSimulator->m_sFiffSimulatorIP);
 
     qint32 count = 0;
     while(m_pRtDataClient->state() != QTcpSocket::ConnectedState) {
         msleep(100);
         this->connectDataClient(m_pFiffSimulator->m_sFiffSimulatorIP);
         ++count;
-        if(count > 10)
+        if(count > 10) {
             return;
+        }
     }
 
     // Inits
     MatrixXf t_matRawBuffer;
-
     fiff_int_t kind;
-
     qint32 from = 0;
     qint32 to = -1;
 
@@ -168,14 +160,14 @@ void FiffSimulatorProducer::run()
         if(m_bFlagInfoRequest) {
             m_pFiffSimulator->m_qMutex.lock();
             m_pFiffSimulator->m_pFiffInfo = m_pRtDataClient->readInfo();
-            emit m_pFiffSimulator->fiffInfoAvailable();
             m_pFiffSimulator->m_qMutex.unlock();
-
+            emit m_pFiffSimulator->fiffInfoAvailable();
             m_bFlagInfoRequest = false;
         }
         producerMutex.unlock();
 
-        if(m_pFiffSimulator->m_pFiffInfo) {
+        // Only perform data reading if the measurement was started
+        if(m_pFiffSimulator->isRunning()) {
             m_pRtDataClient->readRawBuffer(m_pFiffSimulator->m_pFiffInfo->nchan,
                                            t_matRawBuffer,
                                            kind);
@@ -184,7 +176,10 @@ void FiffSimulatorProducer::run()
                 to += t_matRawBuffer.cols();
                 from += t_matRawBuffer.cols();
                 if(!isInterruptionRequested()) {
-                    emit dataReceived(t_matRawBuffer);
+                    m_pFiffSimulator->m_pRawMatrixBuffer_In->push(&t_matRawBuffer);
+                } else {
+                    m_pFiffSimulator->m_pRawMatrixBuffer_In->releaseFromPush();
+                    break;
                 }
             } else if(FIFF_DATA_BUFFER == FIFF_BLOCK_END) {
                 break;
@@ -192,5 +187,6 @@ void FiffSimulatorProducer::run()
         }
     }
 
+    // Disconnect data client in the same thread from where we connected to it
     disconnectDataClient();
 }
