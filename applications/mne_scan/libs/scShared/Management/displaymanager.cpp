@@ -106,7 +106,7 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
 
             qListActions.append(rtmsaWidget->getDisplayActions());
 
-            // We need to use BlockingQueuedConnection here because the FiffSimulator is still dispatching its data from a different thread via the direct connect signal method
+            // We need to use BlockingQueuedConnection here because the FiffSimulator is dispatching its data from the main thread
             connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
                     rtmsaWidget, &RealTimeMultiSampleArrayWidget::update, Qt::AutoConnection);
 

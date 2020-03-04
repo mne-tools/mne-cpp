@@ -68,5 +68,5 @@ SUBDIRS += \
 #    rtcmusic \
     averaging \
 #    covariance \
-#    noisereduction \
+    noisereduction \
 #    neuronalconnectivity \
