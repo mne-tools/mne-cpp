@@ -89,7 +89,7 @@ using namespace Eigen;
  * ToDo: get correct GoF; vGof that is passed to fitHPI does not represent the actual GoF
  *
  */
-void writePos(const float time, QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, Eigen::MatrixXd& position, const QVector<double>& vGoF)
+void writePos(const float time, QSharedPointer<FiffInfo> pFiffInfo, MatrixXd& position, const QVector<double>& vGoF)
 {
     // Write quaternions and time in position matrix. Format is the same like MaxFilter's .pos files.
     QMatrix3x3 rot;
@@ -131,7 +131,7 @@ void writePos(const float time, QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, Eig
  * @param[out] state            The status that shows if devHead is updated or not
  *
  */
-bool compareResults(FIFFLIB::FiffCoordTrans& devHeadT, const FIFFLIB::FiffCoordTrans& devHeadTNew, float treshRot, float treshTrans)
+bool compareResults(FiffCoordTrans& devHeadT, const FiffCoordTrans& devHeadTNew, float treshRot, float treshTrans)
 {
     QMatrix3x3 rot;
     QMatrix3x3 rotNew;
@@ -199,8 +199,8 @@ int main(int argc, char *argv[])
     QFile t_fileIn(parser.value(inputOption));
 
     FiffRawData raw(t_fileIn);
-    QSharedPointer<FiffInfo> pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FiffInfo(raw.info));
-    FIFFLIB::FiffCoordTrans& devHeadTrans = pFiffInfo->dev_head_t;
+    QSharedPointer<FiffInfo> pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(raw.info));
+    FiffCoordTrans devHeadTrans = pFiffInfo->dev_head_t;
 
     // Set up the reading parameters
     RowVectorXi picks = pFiffInfo->pick_types(true, false, false);
@@ -223,7 +223,7 @@ int main(int argc, char *argv[])
 
     // To fit at specific times outcommend the following block
 //    // Read Quaternion File
-//    Eigen::MatrixXd pos;
+//    MatrixXd pos;
 //    qInfo() << "Specify the path to your position file (.txt)";
 //    UTILSLIB::IOUtils::read_eigen_matrix(pos, QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/ref_hpiFit_pos.txt");
 //    RowVectorXd time = pos.col(0);
