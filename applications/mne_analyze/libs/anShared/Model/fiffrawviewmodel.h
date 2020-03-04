@@ -316,6 +316,30 @@ public:
 
     void setWindowSize(const int& iNumSeconds);
 
+    //=========================================================================================================
+    /**
+     * distanceTimeSpacerChanged changes the distance of the time spacers
+     *
+     * @param value the new distance for the time spacers
+     */
+    void distanceTimeSpacerChanged(int value);
+
+    //=========================================================================================================
+    /**
+     * Returns the current number for the time spacers
+     *
+     * @return the current number for the time spacers
+     */
+    int getNumberOfTimeSpacers() const;
+
+    //=========================================================================================================
+    /**
+     * Returns the number of vertical lines (one per second)
+     *
+     * @return number of vertical lines
+     */
+    inline qint32 numVLines() const;
+
 public slots:
 
     /**
@@ -406,6 +430,8 @@ public:
     QMap<qint32,float>                  m_qMapChScaling;                            /**< Channel scaling map. */
 
     QColor                              m_colBackground;                            /**< The background color.*/
+
+    int                                 m_iDistanceTimerSpacer;                     /**< The distance for the horizontal time spacers in the view in ms */
 };
 
 //=============================================================================================================
@@ -480,6 +506,13 @@ inline double FiffRawViewModel::pixelDifference() const {
 inline const QMap< qint32,float >& FiffRawViewModel::getScaling() const
 {
     return m_qMapChScaling;
+}
+
+//=============================================================================================================
+
+inline qint32 FiffRawViewModel::numVLines() const
+{
+    return (m_iVisibleWindowSize - 1);
 }
 
 //=============================================================================================================

@@ -144,6 +144,19 @@ private:
                         double dDx,
                         const QModelIndex &index) const;
 
+    //=========================================================================================================
+    /**
+     * createTimeSpacersPath Creates the QPointer path for the vertical time spacers.
+     *
+     * @param[in] index      Used to locate data in a data model.
+     * @param[in] option     Describes the parameters used to draw an item in a view widget
+     * @param[in,out] path   The QPointerPath to create for the data plot.
+     * @param[in] data       Data for the given row.
+     */
+    void createTimeSpacersPath(const QModelIndex &index,
+                               const QStyleOptionViewItem &option,
+                               QPainterPath& path) const;
+
     QPen        m_penGrid;                  /**< Pen for drawing the data grid. */
     QPen        m_penNormal;                /**< Pen for drawing the data when data is plotted normally without freeze on.  */
     QPen        m_penNormalSelected;        /**< Pen for drawing the data when data is plotted normally without freeze on and channel is selected.  */

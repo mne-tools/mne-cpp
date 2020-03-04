@@ -111,6 +111,19 @@ void FiffRawViewDelegate::paint(QPainter *painter,
 
                 QPainterPath path = QPainterPath(QPointF(option.rect.x()+pos, option.rect.y()));
 
+                //Plot time spacers
+                createTimeSpacersPath(index,
+                                      option,
+                                      path);
+
+                painter->save();
+                painter->setPen(QPen(Qt::black, 1, Qt::DashLine));
+                painter->drawPath(path);
+                painter->restore();
+
+                path = QPainterPath(QPointF(option.rect.x()+pos, option.rect.y()));
+
+                //Plot data
                 createPlotPath(option,
                                path,
                                data,
@@ -121,6 +134,7 @@ void FiffRawViewDelegate::paint(QPainter *painter,
                 painter->save();
                 painter->translate(0, t_fPlotHeight/2);
 
+                //Set colors
                 if(bIsBadChannel) {
                     if(option.state & QStyle::State_Selected)
                         painter->setPen(m_penNormalSelectedBad);
@@ -135,6 +149,7 @@ void FiffRawViewDelegate::paint(QPainter *painter,
 
                 painter->drawPath(path);
                 painter->restore();
+
             }
             break;
         }
@@ -175,8 +190,6 @@ void FiffRawViewDelegate::createPlotPath(const QStyleOptionViewItem &option,
 {
 
     const FiffRawViewModel* t_pModel = static_cast<const FiffRawViewModel*>(index.model());
-
-    qDebug() << "HERE ->" << t_pModel->m_iVisibleWindowSize;
 
     qint32 kind = t_pModel->getKind(index.row());
 
@@ -266,4 +279,35 @@ void FiffRawViewDelegate::setSignalColor(const QColor& signalColor)
 {
     m_penNormal.setColor(signalColor);
     m_penNormalBad.setColor(signalColor);
+}
+
+//=============================================================================================================
+
+void FiffRawViewDelegate::createTimeSpacersPath(const QModelIndex &index,
+                                                const QStyleOptionViewItem &option,
+                                                QPainterPath& path) const
+{
+
+    qDebug() << "1";
+    const FiffRawViewModel* t_pModel = static_cast<const FiffRawViewModel*>(index.model());
+    qDebug() << "2";
+    if(t_pModel->getNumberOfTimeSpacers() > 0)
+    {
+        qDebug() << "3";
+        //vertical lines
+        float distanceSec = float (option.rect.width())/(t_pModel->numVLines()+1);
+        float distanceSpacers = distanceSec/(t_pModel->getNumberOfTimeSpacers()+1);
+
+        float yStart = option.rect.topLeft().y();
+
+        float yEnd = option.rect.bottomRight().y();
+
+        for(qint8 t = 0; t < t_pModel->numVLines()+1; ++t) {
+            for(qint8 i = 0; i < t_pModel->getNumberOfTimeSpacers(); ++i) {
+                float x = (distanceSec*t)+(distanceSpacers*(i+1));
+                path.moveTo(x,yStart);
+                path.lineTo(x,yEnd);
+            }
+        }
+    }
 }

@@ -219,3 +219,12 @@ void FiffRawView::setWindowSize(int T)
     m_pModel->setWindowSize(T);
     m_pModel->setDataColumnWidth(m_pTableView->width()-m_pTableView->columnWidth(0));
 }
+
+//=============================================================================================================
+
+void FiffRawView::setDistanceTimeSpacer(int value)
+{
+    m_pModel->distanceTimeSpacerChanged(value);
+    m_pModel->updateScrollPosition(m_pTableView->horizontalScrollBar()->value());
+    m_pTableView->resizeColumnsToContents();
+}

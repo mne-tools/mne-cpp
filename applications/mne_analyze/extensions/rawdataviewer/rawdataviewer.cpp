@@ -146,8 +146,10 @@ void RawDataViewer::onNewModelAvalible(QSharedPointer<AbstractModel> pNewModel)
                 m_pFiffRawView.data(), &FiffRawView::setZoom);
         connect(viewWidget, &DISPLIB::FiffRawViewSettings::timeWindowChanged,
                 m_pFiffRawView.data(), &FiffRawView::setWindowSize);
+        connect(viewWidget, &DISPLIB::FiffRawViewSettings::distanceTimeSpacerChanged,
+                m_pFiffRawView.data(), &FiffRawView::setDistanceTimeSpacer);
 
-
+        m_pFiffRawView->setDistanceTimeSpacer(viewWidget->getDistanceTimeSpacer());
         m_pFiffRawView->setSignalColor(viewWidget->getSignalColor());
         m_pFiffRawView->setBackgroundColor(viewWidget->getBackgroundColor());
         m_pFiffRawView->setZoom(viewWidget->getZoom());
