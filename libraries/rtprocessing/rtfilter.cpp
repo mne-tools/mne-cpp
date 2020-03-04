@@ -60,11 +60,11 @@ using namespace FIFFLIB;
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-void doFilterPerChannelRTMSA(QPair<QList<FilterData>,QPair<int,RowVectorXd> > &channelDataTime)
+void doFilterPerChannelRTMSA(RtFilter::RtFilterData &channelDataTime)
 {
-    for(int i = 0; i < channelDataTime.first.size(); ++i) {
-        //channelDataTime.second.second = channelDataTime.first.at(i).applyConvFilter(channelDataTime.second.second, true, FilterData::ZeroPad);
-        channelDataTime.second.second = channelDataTime.first.at(i).applyFFTFilter(channelDataTime.second.second, true, FilterData::ZeroPad); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
+    for(int i = 0; i < channelDataTime.lFilterData.size(); ++i) {
+        //channelDataTime.vecData = channelDataTime.first.at(i).applyConvFilter(channelDataTime.vecData, true, FilterData::ZeroPad);
+        channelDataTime.vecData = channelDataTime.lFilterData.at(i).applyFFTFilter(channelDataTime.vecData, true, FilterData::ZeroPad); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
     }
 }
 
@@ -104,43 +104,48 @@ MatrixXd RtFilter::filterDataBlock(const MatrixXd& matDataIn,
     MatrixXd matDataOut = matDataIn;
 
     //Generate QList structure which can be handled by the QConcurrent framework
-    QList<QPair<QList<FilterData>,QPair<int,RowVectorXd> > > timeData;
+    //QList<QPair<QList<FilterData>,QPair<int,RowVectorXd> > > timeData;
+    QList<RtFilterData> timeData;
 
     //Only select channels specified in vecPicks
     for(qint32 i = 0; i < vecPicks.cols(); ++i) {
-        timeData.append(QPair<QList<FilterData>,QPair<int,RowVectorXd> >(lFilterData,QPair<int,RowVectorXd>(vecPicks[i],matDataIn.row(vecPicks[i]))));
+        RtFilterData data;
+        data.lFilterData = lFilterData;
+        data.iRow = vecPicks[i];
+        data.vecData = matDataIn.row(vecPicks[i]);
+        //timeData.append(QPair<QList<FilterData>,QPair<int,RowVectorXd> >(lFilterData,QPair<int,RowVectorXd>(vecPicks[i],matDataIn.row(vecPicks[i]))));
     }
 
     //Do the concurrent filtering
     if(!timeData.isEmpty()) {
         QFuture<void> future = QtConcurrent::map(timeData,
-                                             doFilterPerChannelRTMSA);
+                                                 doFilterPerChannelRTMSA);
 
         future.waitForFinished();
 
         //Do the overlap add method and store in matDataOut
-        int iFilteredNumberCols = timeData.at(0).second.second.cols();
+        int iFilteredNumberCols = timeData.at(0).vecData.cols();
 
         for(int r = 0; r < timeData.size(); r++) {
             //Get the currently filtered data. This data has a delay of filterLength/2 in front and back.
-            RowVectorXd tempData = timeData.at(r).second.second;
+            RowVectorXd tempData = timeData.at(r).vecData;
 
             //Perform the actual overlap add by adding the last filterlength data to the newly filtered one
-            tempData.head(iOrder) += m_matOverlap.row(timeData.at(r).second.first);
+            tempData.head(iOrder) += m_matOverlap.row(timeData.at(r).iRow);
 
             //Write the newly calulated filtered data to the filter data matrix. Keep in mind that the current block also effect last part of the last block (begin at dataIndex-iFilterDelay).
             int start = 0;
-            matDataOut.row(timeData.at(r).second.first).segment(start,iFilteredNumberCols-iOrder) = tempData.head(iFilteredNumberCols-iOrder);
+            matDataOut.row(timeData.at(r).iRow).segment(start,iFilteredNumberCols-iOrder) = tempData.head(iFilteredNumberCols-iOrder);
 
             //Refresh the m_matOverlap with the new calculated filtered data.
-            m_matOverlap.row(timeData.at(r).second.first) = timeData.at(r).second.second.tail(iOrder);
+            m_matOverlap.row(timeData.at(r).iRow) = timeData.at(r).vecData.tail(iOrder);
         }
     }
 
     if(matDataIn.cols() >= iOrder/2) {
         m_matDelay = matDataIn.block(0, matDataIn.cols()-iOrder/2, matDataIn.rows(), iOrder/2);
     } else {
-            qWarning() << "RtFilter::filterDataBlock - Half of filter length is larger than data size. Not filling m_matDelay for next step.";
+        qWarning() << "[RtFilter::filterDataBlock] Half of filter length is larger than data size. Not filling m_matDelay for next step.";
     }
 
     return matDataOut;
@@ -161,7 +166,7 @@ MatrixXd RtFilter::filterData(const MatrixXd& matDataIn,
 {
     // Check for size of data
     if (matDataIn.cols()<iOrder){
-        qDebug() << QString("RtFilter::filterData - Filter length bigger then data length.");
+        qDebug() << QString("[RtFilter::filterData] Filter length bigger then data length.");
     }
 
     // Normalize cut off frequencies to nyquist

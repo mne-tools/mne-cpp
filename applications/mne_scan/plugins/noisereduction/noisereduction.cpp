@@ -138,53 +138,6 @@ void NoiseReduction::init()
     m_pNoiseReductionOutput = PluginOutputData<RealTimeMultiSampleArray>::create(this, "NoiseReductionOut", "NoiseReduction output data");
     m_outputConnectors.append(m_pNoiseReductionOutput);
 
-    QStringList slFlags;
-    slFlags << "view" << "triggerdetection" << "scaling" << "colors";
-    m_pNoiseReductionOutput->data()->setDisplayFlags(slFlags);
-
-    // Quick control projectors
-    m_pProjectorsView = ProjectorsView::SPtr::create(QString("Plugin/%1/").arg(this->getName()));
-    m_pProjectorsView->setObjectName("group_tab_Noise_SSP");
-    m_pNoiseReductionOutput->data()->addControlWidget(m_pProjectorsView);
-
-    connect(m_pProjectorsView.data(), &ProjectorsView::projSelectionChanged,
-            this, &NoiseReduction::updateProjection);
-
-    // Quick control compensators
-    m_pCompensatorView = CompensatorView::SPtr::create(QString("Plugin/%1/").arg(this->getName()));
-    m_pCompensatorView->setObjectName("group_tab_Noise_Comp");
-    m_pNoiseReductionOutput->data()->addControlWidget(m_pCompensatorView);
-
-    connect(m_pCompensatorView.data(), &CompensatorView::compSelectionChanged,
-           this, &NoiseReduction::updateCompensator);
-
-    // Quick control filter
-    m_pFilterSettingsView = FilterSettingsView::SPtr::create(QString("Plugin/%1/").arg(this->getName()));
-    m_pFilterSettingsView->setObjectName("group_tab_Noise_Filter");
-    m_pNoiseReductionOutput->data()->addControlWidget(m_pFilterSettingsView);
-
-    connect(m_pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChannelTypeChanged,
-            this, &NoiseReduction::setFilterChannelType);
-
-    connect(m_pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChanged,
-            this, &NoiseReduction::setFilter);
-
-    connect(m_pFilterSettingsView.data(), &FilterSettingsView::filterActivationChanged,
-            this, &NoiseReduction::setFilterActive);
-
-    this->setFilterActive(m_pFilterSettingsView->getFilterActive());
-
-    // Quick control SPHARA settings
-    m_pSpharaSettingsView = SpharaSettingsView::SPtr::create();
-    m_pSpharaSettingsView->setObjectName("group_tab_Noise_SPHARA");
-    m_pNoiseReductionOutput->data()->addControlWidget(m_pSpharaSettingsView);
-
-    connect(m_pSpharaSettingsView.data(), &SpharaSettingsView::spharaActivationChanged,
-            this, &NoiseReduction::setSpharaActive);
-
-    connect(m_pSpharaSettingsView.data(), &SpharaSettingsView::spharaOptionsChanged,
-            this, &NoiseReduction::setSpharaOptions);
-
     if(!m_pNoiseReductionBuffer.isNull()) {
         m_pNoiseReductionBuffer = CircularMatrixBuffer<double>::SPtr();
     }
@@ -285,14 +238,7 @@ void NoiseReduction::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             //Init the filter
             m_iMaxFilterTapSize = m_pRTMSA->getMultiSampleArray().first().cols();
 
-            m_pFilterSettingsView->getFilterView()->init(m_pFiffInfo->sfreq);
-            m_pFilterSettingsView->getFilterView()->setWindowSize(m_iMaxFilterTapSize);
-            m_pFilterSettingsView->getFilterView()->setMaxFilterTaps(m_iMaxFilterTapSize);
-
-            this->setFilterChannelType(m_pFilterSettingsView->getFilterView()->getChannelType());
-
-            m_pProjectorsView->setProjectors(m_pFiffInfo->projs);
-            m_pCompensatorView->setCompensators(m_pFiffInfo->comps);
+            initPluginControlWidgets();
         }
 
         MatrixXd t_mat;
@@ -301,6 +247,68 @@ void NoiseReduction::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             t_mat = m_pRTMSA->getMultiSampleArray()[i];
             m_pNoiseReductionBuffer->push(&t_mat);
         }
+    }
+}
+//=============================================================================================================
+
+void NoiseReduction::initPluginControlWidgets()
+{
+    if(m_pFiffInfo) {
+        QList<QWidget*> plControlWidgets;
+
+        // Projectors
+        ProjectorsView* pProjectorsView = new ProjectorsView(QString("Plugin/%1/").arg(this->getName()));
+        pProjectorsView->setObjectName("group_tab_Noise_SSP");
+        plControlWidgets.append(pProjectorsView);
+
+        connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
+                this, &NoiseReduction::updateProjection);
+
+        // Compensators
+        CompensatorView* pCompensatorView = new CompensatorView(QString("Plugin/%1/").arg(this->getName()));
+        pCompensatorView->setObjectName("group_tab_Noise_Comp");
+        plControlWidgets.append(pCompensatorView);
+
+        connect(pCompensatorView, &CompensatorView::compSelectionChanged,
+               this, &NoiseReduction::updateCompensator);
+
+        // Filter
+        FilterSettingsView* pFilterSettingsView = new FilterSettingsView(QString("Plugin/%1/").arg(this->getName()));
+        pFilterSettingsView->setObjectName("group_tab_Noise_Filter");
+        plControlWidgets.append(pFilterSettingsView);
+
+        connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChannelTypeChanged,
+                this, &NoiseReduction::setFilterChannelType);
+
+        connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChanged,
+                this, &NoiseReduction::setFilter);
+
+        connect(pFilterSettingsView, &FilterSettingsView::filterActivationChanged,
+                this, &NoiseReduction::setFilterActive);
+
+        this->setFilterActive(pFilterSettingsView->getFilterActive());
+
+        // SPHARA settings
+        SpharaSettingsView* pSpharaSettingsView = new SpharaSettingsView();
+        pSpharaSettingsView->setObjectName("group_tab_Noise_SPHARA");
+        plControlWidgets.append(pSpharaSettingsView);
+
+        connect(pSpharaSettingsView, &SpharaSettingsView::spharaActivationChanged,
+                this, &NoiseReduction::setSpharaActive);
+
+        connect(pSpharaSettingsView, &SpharaSettingsView::spharaOptionsChanged,
+                this, &NoiseReduction::setSpharaOptions);
+
+        pFilterSettingsView->getFilterView()->init(m_pFiffInfo->sfreq);
+        pFilterSettingsView->getFilterView()->setWindowSize(m_iMaxFilterTapSize);
+        pFilterSettingsView->getFilterView()->setMaxFilterTaps(m_iMaxFilterTapSize);
+
+        this->setFilterChannelType(pFilterSettingsView->getFilterView()->getChannelType());
+
+        pProjectorsView->setProjectors(m_pFiffInfo->projs);
+        pCompensatorView->setCompensators(m_pFiffInfo->comps);
+
+        emit pluginControlWidgetsChanged(plControlWidgets, this->getName());
     }
 }
 

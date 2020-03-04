@@ -66,13 +66,6 @@ namespace UTILSLIB{
     class FilterData;
 }
 
-namespace DISPLIB{
-    class ProjectorsView;
-    class CompensatorView;
-    class FilterSettingsView;
-    class SpharaSettingsView;
-}
-
 namespace FIFFLIB{
     class FiffInfo;
 }
@@ -142,6 +135,12 @@ public:
      * @param[in] pMeasurement    The incoming data in form of a generalized Measurement.
      */
     void update(SCMEASLIB::Measurement::SPtr pMeasurement);
+
+    //=========================================================================================================
+    /**
+     * Inits widgets which are used to control this plugin, then emits them in form of a QList.
+     */
+    virtual void initPluginControlWidgets();
 
     //=========================================================================================================
     /**
@@ -266,11 +265,6 @@ private:
     QSharedPointer<RTPROCESSINGLIB::RtFilter>                       m_pRtFilter;                /**< Real time filter object. */
 
     QSharedPointer<SCMEASLIB::RealTimeMultiSampleArray>             m_pRTMSA;                   /**< the real time multi sample array object. */
-
-    QSharedPointer<DISPLIB::ProjectorsView>                         m_pProjectorsView;
-    QSharedPointer<DISPLIB::CompensatorView>                        m_pCompensatorView;
-    QSharedPointer<DISPLIB::FilterSettingsView>                     m_pFilterSettingsView;
-    QSharedPointer<DISPLIB::SpharaSettingsView>                     m_pSpharaSettingsView;
 
     SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr      m_pNoiseReductionInput;      /**< The RealTimeMultiSampleArray of the NoiseReduction input.*/
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pNoiseReductionOutput;     /**< The RealTimeMultiSampleArray of the NoiseReduction output.*/
