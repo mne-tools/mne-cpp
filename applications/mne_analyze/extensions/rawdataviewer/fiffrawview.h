@@ -151,6 +151,14 @@ public:
      */
     void setWindowSize(int T);
 
+    //=========================================================================================================
+    /**
+     * distanceTimeSpacerChanged changes the distance of the time spacers
+     *
+     * @param value the new distance for the time spacers
+     */
+    void setDistanceTimeSpacer(int value);
+
 private:
     //=========================================================================================================
     /**
