@@ -73,21 +73,27 @@ FiffSimulatorSetupWidget::FiffSimulatorSetupWidget(FiffSimulator* p_pFiffSimulat
     //rt server connection
     this->ui.m_qLineEdit_Ip->setText(m_pFiffSimulator->m_sFiffSimulatorIP);
 
-    connect(ui.m_qPushButton_Connect, &QPushButton::released, this, &FiffSimulatorSetupWidget::pressedConnect);
+    connect(ui.m_qPushButton_Connect, &QPushButton::released,
+            this, &FiffSimulatorSetupWidget::pressedConnect);
 
-    connect(m_pFiffSimulator, &FiffSimulator::cmdConnectionChanged, this, &FiffSimulatorSetupWidget::cmdConnectionChanged);
+    connect(m_pFiffSimulator, &FiffSimulator::cmdConnectionChanged,
+            this, &FiffSimulatorSetupWidget::cmdConnectionChanged);
 
     //rt server fiffInfo received
-    connect(m_pFiffSimulator, &FiffSimulator::fiffInfoAvailable, this, &FiffSimulatorSetupWidget::fiffInfoReceived);
+    connect(m_pFiffSimulator, &FiffSimulator::fiffInfoAvailable,
+            this, &FiffSimulatorSetupWidget::fiffInfoReceived);
 
     //Buffer
-    connect(ui.m_qLineEdit_BufferSize, &QLineEdit::textChanged, this, &FiffSimulatorSetupWidget::bufferSizeEdited);
+    connect(ui.m_qLineEdit_BufferSize, &QLineEdit::textChanged,
+            this, &FiffSimulatorSetupWidget::bufferSizeEdited);
 
     //CLI
-    connect(ui.m_qPushButton_SendCLI, &QPushButton::released, this, &FiffSimulatorSetupWidget::pressedSendCLI);
+    connect(ui.m_qPushButton_SendCLI, &QPushButton::released,
+            this, &FiffSimulatorSetupWidget::pressedSendCLI);
 
     //About
-    connect(ui.m_qPushButton_About, &QPushButton::released, this, &FiffSimulatorSetupWidget::showAboutDialog);
+    connect(ui.m_qPushButton_About, &QPushButton::released,
+            this, &FiffSimulatorSetupWidget::showAboutDialog);
 
     this->init();
 }

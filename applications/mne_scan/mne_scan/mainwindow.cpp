@@ -533,6 +533,9 @@ void MainWindow::updatePluginSetupWidget(SCSHAREDLIB::IPlugin::SPtr pPlugin)
                 setCentralWidget(pPlugin->setupWidget());
             }
         }
+    } else {
+        QWidget* pWidget = new QWidget;
+        setCentralWidget(pWidget);
     }
 }
 

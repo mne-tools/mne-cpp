@@ -85,13 +85,7 @@ FiffSimulator::FiffSimulator()
 , m_iBufferSize(-1)
 , m_iActiveConnectorId(0)
 , m_bDoContinousHPI(false)
-, m_bIsRunning(false)
 {
-    // We need to use a blocking queued signal here since the dataReceived signal is emmited
-    // in a different thread. The onDataReceived function will be called in the main thread.
-    connect(m_pFiffSimulatorProducer.data(), &FiffSimulatorProducer::dataReceived,
-            this, &FiffSimulator::onDataReceived, Qt::BlockingQueuedConnection);
-
     //init channels when fiff info is available
     connect(this, &FiffSimulator::fiffInfoAvailable,
             this, &FiffSimulator::initConnector);
@@ -137,9 +131,6 @@ void FiffSimulator::init()
     m_pRTMSA_FiffSimulator->data()->setName(this->getName());//Provide name to auto store widget settings
     m_outputConnectors.append(m_pRTMSA_FiffSimulator);
 
-    // Start FiffSimulatorProducer
-    m_pFiffSimulatorProducer->start();
-
     //Try to connect the cmd client on start up using localhost connection
     this->connectCmdClient();
 }
@@ -148,7 +139,7 @@ void FiffSimulator::init()
 
 void FiffSimulator::unload()
 {
-    qDebug() << "void FiffSimulator::unload()";
+    qDebug() << "FiffSimulator::unload()";
 }
 
 //=============================================================================================================
@@ -156,20 +147,23 @@ void FiffSimulator::unload()
 bool FiffSimulator::start()
 {
     if(m_bCmdClientIsConnected && m_pFiffInfo) {
-        m_bIsRunning = true;
-
         //Set buffer size
         (*m_pRtCmdClient)["bufsize"].pValues()[0].setValue(m_iBufferSize);
         (*m_pRtCmdClient)["bufsize"].send();
+
+        // Init circular buffer to transmit data from the producer to this thread
+        m_pRawMatrixBuffer_In = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(8,m_pFiffInfo->nchan,m_iBufferSize));
 
         m_pFiffSimulatorProducer->start();
 
         // Wait one sec so the producer can update the m_iDataClientId accordingly
         msleep(1000);
 
-        // Start Measurement at rt_Server
+        // Start Measurement at mne_rt_server
         (*m_pRtCmdClient)["start"].pValues()[0].setValue(m_pFiffSimulatorProducer->m_iDataClientId);
         (*m_pRtCmdClient)["start"].send();
+
+        QThread::start();
 
         return true;
     }
@@ -181,15 +175,15 @@ bool FiffSimulator::start()
 
 bool FiffSimulator::stop()
 {
-    m_bIsRunning = false;
+    // Stop this (consumer) thread first
+    requestInterruption();
+    wait();
 
-    if(m_pFiffSimulatorProducer->isRunning()) {
-        m_pFiffSimulatorProducer->stop();
-    }
+    // Stop producer thread second
+    m_pFiffSimulatorProducer->stop();
 
     // Tell the mne_rt_server to stop sending data
     if(m_bCmdClientIsConnected) {
-        // Stop Measurement at rt_Server
         (*m_pRtCmdClient)["stop-all"].send();
     }
 
@@ -225,27 +219,33 @@ QWidget* FiffSimulator::setupWidget()
 
 //=============================================================================================================
 
-void FiffSimulator::onDataReceived(const MatrixXf& matData)
-{
-    QMutexLocker locker (&m_qMutex);
-    MatrixXf matValue = matData;
-
-    //Update HPI data (for single and continous HPI fitting)
-    updateHPI(matValue);
-
-    //Do continous HPI fitting and write result to data block
-    if(m_bDoContinousHPI) {
-        doContinousHPI(matValue);
-    }
-
-    //emit values
-    m_pRTMSA_FiffSimulator->data()->setValue(matValue.cast<double>());
-}
-
-//=============================================================================================================
-
 void FiffSimulator::run()
 {
+    MatrixXf matValue;
+
+    while(!isInterruptionRequested()) {
+        //pop matrix
+        if(isInterruptionRequested()) {
+            m_pRawMatrixBuffer_In->releaseFromPop();
+            m_pRawMatrixBuffer_In->clear();
+            break;
+        } else {
+            matValue = m_pRawMatrixBuffer_In->pop();
+        }
+
+        //Update HPI data (for single and continous HPI fitting)
+        updateHPI(matValue);
+
+        //Do continous HPI fitting and write result to data block
+        if(m_bDoContinousHPI) {
+            doContinousHPI(matValue);
+        }
+
+        //emit values
+        if(!isInterruptionRequested()) {
+            m_pRTMSA_FiffSimulator->data()->setValue(matValue.cast<double>());
+        }
+    }
 }
 
 //=============================================================================================================
@@ -293,10 +293,15 @@ void FiffSimulator::changeConnector(qint32 p_iNewConnectorId)
 
 void FiffSimulator::connectCmdClient()
 {
-    if(m_pRtCmdClient.isNull())
+    if(m_pRtCmdClient.isNull()) {
         m_pRtCmdClient = QSharedPointer<RtCmdClient>(new RtCmdClient);
-    else if(m_bCmdClientIsConnected)
+    } else if(m_bCmdClientIsConnected) {
         this->disconnectCmdClient();
+    }
+
+    if(!m_pFiffSimulatorProducer->isRunning()) {
+        m_pFiffSimulatorProducer->start();
+    }
 
     m_pRtCmdClient->connectToHost(m_sFiffSimulatorIP);
     m_pRtCmdClient->waitForConnected(1000);
@@ -343,8 +348,9 @@ void FiffSimulator::disconnectCmdClient()
     if(m_bCmdClientIsConnected)
     {
         m_pRtCmdClient->disconnectFromHost();
-        if(m_pRtCmdClient->ConnectedState != QTcpSocket::UnconnectedState)
+        if(m_pRtCmdClient->ConnectedState != QTcpSocket::UnconnectedState) {
             m_pRtCmdClient->waitForDisconnected();
+        }
         m_bCmdClientIsConnected = false;
         emit cmdConnectionChanged(m_bCmdClientIsConnected);
     }
