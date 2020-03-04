@@ -160,7 +160,7 @@ bool compareResults(FiffCoordTrans& devHeadT, const FiffCoordTrans& devHeadTNew,
 
     // Compare translation
     float move = (trans-transNew).norm();
-    qInfo() << "Displacement Move [m]: " << move;
+    qInfo() << "Displacement Move [mm]: " << move*1000;
     return false;
 }
 
@@ -217,16 +217,16 @@ int main(int argc, char *argv[])
     float quantum_sec = 0.2f;       // read and write in 200 ms junks
     fiff_int_t quantum = ceil(quantum_sec*pFiffInfo->sfreq);
 
-    // create time vector that specifies when to fit
-    int N = ceil((last-first)/quantum);
-    RowVectorXf time = RowVectorXf::LinSpaced(N, 0, N-1) * dT_sec;
+//    // create time vector that specifies when to fit
+//    int N = ceil((last-first)/quantum);
+//    RowVectorXf time = RowVectorXf::LinSpaced(N, 0, N-1) * dT_sec;
 
     // To fit at specific times outcommend the following block
 //    // Read Quaternion File
-//    MatrixXd pos;
-//    qInfo() << "Specify the path to your position file (.txt)";
-//    UTILSLIB::IOUtils::read_eigen_matrix(pos, QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/ref_hpiFit_pos.txt");
-//    RowVectorXd time = pos.col(0);
+    MatrixXd pos;
+    qInfo() << "Specify the path to your position file (.txt)";
+    UTILSLIB::IOUtils::read_eigen_matrix(pos, QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/ref_hpiFit_pos.txt");
+    RowVectorXd time = pos.col(0);
 
     MatrixXd position;              // Position matrix to save quaternions etc.
     float threshRot = 10;           // in degree
