@@ -83,6 +83,11 @@ class RTPROCESINGSHARED_EXPORT RtFilter
 public:
     typedef QSharedPointer<RtFilter> SPtr;             /**< Shared pointer type for RtFilter. */
     typedef QSharedPointer<const RtFilter> ConstSPtr;  /**< Const shared pointer type for RtFilter. */
+    typedef struct {
+        QList<UTILSLIB::FilterData> lFilterData;
+        int iRow;
+        Eigen::RowVectorXd vecData;
+    } RtFilterData;
 
     //=========================================================================================================
     /**
@@ -108,9 +113,9 @@ public:
      * @return The filtered data in form of a matrix.
      */
     Eigen::MatrixXd filterDataBlock(const Eigen::MatrixXd& matDataIn,
-                                               int iOrder,
-                                               const Eigen::RowVectorXi& vecPicks,
-                                               const QList<UTILSLIB::FilterData> &lFilterData);
+                                    int iOrder,
+                                    const Eigen::RowVectorXi& vecPicks,
+                                    const QList<UTILSLIB::FilterData> &lFilterData);
 
     /**
      * Calculates the filtered version of the raw input data AND creates filter
