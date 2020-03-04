@@ -99,6 +99,7 @@ FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
 , m_pFiffInfo()
 , m_ChannelInfoList()
 , m_dDx(1.0)
+, m_iDistanceTimerSpacer(1000)
 {
     // connect data reloading: this will be run concurrently
     connect(&m_blockLoadFutureWatcher,
@@ -628,4 +629,22 @@ void FiffRawViewModel::setWindowSize(const int &iNumSeconds)
     m_iVisibleWindowSize = iNumSeconds;
     m_iTotalBlockCount = m_iVisibleWindowSize + 2 * m_iPreloadBufferSize;
     endResetModel();
+}
+
+//=============================================================================================================
+
+void FiffRawViewModel::distanceTimeSpacerChanged(int value)
+{
+    if(value <= 0) {
+        m_iDistanceTimerSpacer = 1000;
+    } else {
+        m_iDistanceTimerSpacer = value;
+    }
+}
+
+//=============================================================================================================
+
+int FiffRawViewModel::getNumberOfTimeSpacers() const
+{
+    return ((1000)/m_iDistanceTimerSpacer)-1;
 }
