@@ -121,18 +121,47 @@ void writePos(const float time, QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, Eig
 
 //=========================================================================================================
 /**
- * Compare new head position with current head position
+ * Compare new head position with current head position and update dev_head_t if big displacement occured
  *
  * @param[in] devHeadTrans      The device to head transformation matrix to compare to.
  * @param[in] devHeadTransNew   The device to head transformation matrix to be compared.
- * @param[in] treshRot          The Threshold for big head rotation
- * @param[in] treshTrans        The Threshold for big head movement
+ * @param[in] treshRot          The threshold for big head rotation in degree
+ * @param[in] treshTrans        The threshold for big head movement in m
  *
- * @return If big head displacement occured return true
+ * @param[out] state            The status that shows if devHead is updated or not
+ *
  */
-bool compareResults(const FIFFLIB::FiffCoordTrans& devHeadTrans, const FIFFLIB::FiffCoordTrans& devHeadTransNew, float treshRot, float treshTrans)
+bool compareResults(FIFFLIB::FiffCoordTrans& devHeadT, const FIFFLIB::FiffCoordTrans& devHeadTNew, float treshRot, float treshTrans)
 {
-    return true;
+    QMatrix3x3 rot;
+    QMatrix3x3 rotNew;
+
+    for(int ir = 0; ir < 3; ir++) {
+        for(int ic = 0; ic < 3; ic++) {
+            rot(ir,ic) = devHeadT.trans(ir,ic);
+            rotNew(ir,ic) = devHeadTNew.trans(ir,ic);
+        }
+    }
+
+    VectorXf trans = devHeadT.trans.col(3);
+    VectorXf transNew = devHeadTNew.trans.col(3);
+
+    QQuaternion quat = QQuaternion::fromRotationMatrix(rot);
+    QQuaternion quatNew = QQuaternion::fromRotationMatrix(rotNew);
+
+    // Compare Rotation
+    QQuaternion quatCompare;
+    float angle;
+    QVector3D axis;
+    // get rotation between both transformations by multiplying with the inverted quaternion
+    quatCompare = quat*quatNew.inverted();
+    quatCompare.getAxisAndAngle(&axis,&angle);
+    qInfo() << "Displacement angle [degree]: " << angle;
+
+    // Compare translation
+    float move = (trans-transNew).norm();
+    qInfo() << "Displacement Move [m]: " << move;
+    return false;
 }
 
 //=============================================================================================================
