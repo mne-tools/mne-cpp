@@ -619,3 +619,13 @@ void FiffRawViewModel::setBackgroundColor(const QColor& color)
 {
     m_colBackground = color;
 }
+
+//=============================================================================================================
+
+void FiffRawViewModel::setWindowSize(const int &iNumSeconds)
+{
+    beginResetModel();
+    m_iVisibleWindowSize = iNumSeconds;
+    m_iTotalBlockCount = m_iVisibleWindowSize + 2 * m_iPreloadBufferSize;
+    endResetModel();
+}

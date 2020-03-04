@@ -134,21 +134,23 @@ void RawDataViewer::onNewModelAvalible(QSharedPointer<AbstractModel> pNewModel)
 
         DISPLIB::ScalingView* scalingWidget = new DISPLIB::ScalingView("Test", m_pRawModel->getFiffInfo()->chs);
         connect(scalingWidget, &DISPLIB::ScalingView::scalingChanged,
-                m_pFiffRawView, &FiffRawView::setScalingMap);
+                m_pFiffRawView.data(), &FiffRawView::setScalingMap);
 
         DISPLIB::FiffRawViewSettings* viewWidget = new DISPLIB::FiffRawViewSettings("Test");
         viewWidget->setWidgetList();
         connect(viewWidget, &DISPLIB::FiffRawViewSettings::signalColorChanged,
-                m_pFiffRawView, &FiffRawView::setSignalColor);
+                m_pFiffRawView.data(), &FiffRawView::setSignalColor);
         connect(viewWidget, &DISPLIB::FiffRawViewSettings::backgroundColorChanged,
-                m_pFiffRawView, &FiffRawView::setBackgroundColor);
+                m_pFiffRawView.data(), &FiffRawView::setBackgroundColor);
         connect(viewWidget, &DISPLIB::FiffRawViewSettings::zoomChanged,
-                m_pFiffRawView, &FiffRawView::setZoom);
+                m_pFiffRawView.data(), &FiffRawView::setZoom);
+        connect(viewWidget, &DISPLIB::FiffRawViewSettings::timeWindowChanged,
+                m_pFiffRawView.data(), &FiffRawView::setWindowSize);
+
 
         m_pFiffRawView->setSignalColor(viewWidget->getSignalColor());
         m_pFiffRawView->setBackgroundColor(viewWidget->getBackgroundColor());
         m_pFiffRawView->setZoom(viewWidget->getZoom());
-
 
         m_pLayout->addWidget(scalingWidget);
         m_pLayout->addWidget(viewWidget);
