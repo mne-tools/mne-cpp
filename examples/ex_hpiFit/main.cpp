@@ -131,7 +131,7 @@ void writePos(const float time, QSharedPointer<FiffInfo> pFiffInfo, MatrixXd& po
  * @param[out] state            The status that shows if devHead is updated or not
  *
  */
-bool compareResults(FiffCoordTrans& devHeadT, const FiffCoordTrans& devHeadTNew, float treshRot, float treshTrans)
+bool compareResults(FiffCoordTrans& devHeadT, const FiffCoordTrans& devHeadTNew,const float& treshRot,const float& treshTrans, MatrixXd& result)
 {
     QMatrix3x3 rot;
     QMatrix3x3 rotNew;
@@ -161,6 +161,20 @@ bool compareResults(FiffCoordTrans& devHeadT, const FiffCoordTrans& devHeadTNew,
     // Compare translation
     float move = (trans-transNew).norm();
     qInfo() << "Displacement Move [mm]: " << move*1000;
+
+    // write results for debug purpose - quaternions are quatCompare
+    result.conservativeResize(result.rows()+1, 10);
+    result.conservativeResize(result.rows()+1, 10);
+    result(result.rows()-1,0) = 0;
+    result(result.rows()-1,1) = quatCompare.x();
+    result(result.rows()-1,2) = quatCompare.y();
+    result(result.rows()-1,3) = quatCompare.z();
+    result(result.rows()-1,4) = (trans-transNew).x();
+    result(result.rows()-1,5) = (trans-transNew).y();
+    result(result.rows()-1,6) = (trans-transNew).z();
+    result(result.rows()-1,7) = angle;
+    result(result.rows()-1,8) = move;
+    result(result.rows()-1,9) = 0;
     return false;
 }
 
@@ -229,6 +243,7 @@ int main(int argc, char *argv[])
     RowVectorXd time = pos.col(0);
 
     MatrixXd position;              // Position matrix to save quaternions etc.
+    MatrixXd result;
     float threshRot = 10;           // in degree
     float threshTrans = 5/1000;     // in m
 
@@ -290,10 +305,11 @@ int main(int argc, char *argv[])
         qInfo() << "[done]";
 
         writePos(time(i),pFiffInfo,position,vGof);
-        if(compareResults(devHeadTrans,pFiffInfo->dev_head_t,threshRot,threshTrans)){
+        if(compareResults(devHeadTrans,pFiffInfo->dev_head_t,threshRot,threshTrans,result)){
             qInfo() << "Big head displacement: dev_head_t has been updated";
         }
 
     }
     UTILSLIB::IOUtils::write_eigen_matrix(position, QCoreApplication::applicationDirPath() + "/MNE-sample-data/position.txt");
+    UTILSLIB::IOUtils::write_eigen_matrix(result, QCoreApplication::applicationDirPath() + "/MNE-sample-data/result.txt");
 }
