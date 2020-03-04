@@ -74,27 +74,29 @@ using namespace FIFFLIB;
 using namespace Eigen;
 
 //=============================================================================================================
-// MAIN
+// Member functions
 //=============================================================================================================
 
-//=============================================================================================================
+//=========================================================================================================
 /**
- * The function main marks the entry point of the program.
- * By default, main has the storage class extern.
+ * Store results from dev_Head_t as quaternions in position matrix. The postion matrix is consisten with the MaxFilter output
  *
- * @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
- * @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
- * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
+ * @param[in] time          The corresponding time in the measurement for the fit.
+ * @param[in] pFiffInfo     The FiffInfo file from the measurement.
+ * @param[in] position      The matrix to store the results
+ * @param[in] vGoF          The vector that stores the goodness of fit.
+ *
+ * ToDo: get correct GoF; vGof that is passed to fitHPI does not represent the actual GoF
+ *
  */
-
-void write_pos(const float time, QSharedPointer<FIFFLIB::FiffInfo> info, Eigen::MatrixXd& position, const QVector<double>& vGoF)
+void writePos(const float time, QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo, Eigen::MatrixXd& position, const QVector<double>& vGoF)
 {
     // Write quaternions and time in position matrix. Format is the same like MaxFilter's .pos files.
     QMatrix3x3 rot;
 
     for(int ir = 0; ir < 3; ir++) {
         for(int ic = 0; ic < 3; ic++) {
-            rot(ir,ic) = info->dev_head_t.trans(ir,ic);
+            rot(ir,ic) = pFiffInfo->dev_head_t.trans(ir,ic);
         }
     }    
 
@@ -109,13 +111,43 @@ void write_pos(const float time, QSharedPointer<FIFFLIB::FiffInfo> info, Eigen::
     position(position.rows()-1,1) = quatHPI.x();
     position(position.rows()-1,2) = quatHPI.y();
     position(position.rows()-1,3) = quatHPI.z();
-    position(position.rows()-1,4) = info->dev_head_t.trans(0,3);
-    position(position.rows()-1,5) = info->dev_head_t.trans(1,3);
-    position(position.rows()-1,6) = info->dev_head_t.trans(2,3);
+    position(position.rows()-1,4) = pFiffInfo->dev_head_t.trans(0,3);
+    position(position.rows()-1,5) = pFiffInfo->dev_head_t.trans(1,3);
+    position(position.rows()-1,6) = pFiffInfo->dev_head_t.trans(2,3);
     position(position.rows()-1,7) = 0;
     position(position.rows()-1,8) = 0;
     position(position.rows()-1,9) = 0;
 }
+
+//=========================================================================================================
+/**
+ * Compare new head position with current head position
+ *
+ * @param[in] devHeadTrans      The device to head transformation matrix to compare to.
+ * @param[in] devHeadTransNew   The device to head transformation matrix to be compared.
+ * @param[in] treshRot          The Threshold for big head rotation
+ * @param[in] treshTrans        The Threshold for big head movement
+ *
+ * @return If big head displacement occured return true
+ */
+bool compareResults(const FIFFLIB::FiffCoordTrans& devHeadTrans, const FIFFLIB::FiffCoordTrans& devHeadTransNew, float treshRot, float treshTrans)
+{
+    return true;
+}
+
+//=============================================================================================================
+// MAIN
+//=============================================================================================================
+
+//=============================================================================================================
+/**
+ * The function main marks the entry point of the program.
+ * By default, main has the storage class extern.
+ *
+ * @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
+ * @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
+ * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
+ */
 
 int main(int argc, char *argv[])
 {
@@ -139,6 +171,7 @@ int main(int argc, char *argv[])
 
     FiffRawData raw(t_fileIn);
     QSharedPointer<FiffInfo> pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FiffInfo(raw.info));
+    FIFFLIB::FiffCoordTrans& devHeadTrans = pFiffInfo->dev_head_t;
 
     // Set up the reading parameters
     RowVectorXi picks = pFiffInfo->pick_types(true, false, false);
@@ -166,7 +199,9 @@ int main(int argc, char *argv[])
 //    UTILSLIB::IOUtils::read_eigen_matrix(pos, QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/ref_hpiFit_pos.txt");
 //    RowVectorXd time = pos.col(0);
 
-    MatrixXd position;       // Position matrix to save quaternions etc.
+    MatrixXd position;              // Position matrix to save quaternions etc.
+    float threshRot = 10;           // in degree
+    float threshTrans = 5/1000;     // in m
 
     // setup informations for HPI fit (VectorView)
     QVector<int> vFreqs {166,154,161,158};
@@ -225,7 +260,11 @@ int main(int argc, char *argv[])
         qInfo() << "The HPI-Fit took" << timer.elapsed() << "milliseconds";
         qInfo() << "[done]";
 
-        write_pos(time(i),pFiffInfo,position,vGof);
+        writePos(time(i),pFiffInfo,position,vGof);
+        if(compareResults(devHeadTrans,pFiffInfo->dev_head_t,threshRot,threshTrans)){
+            qInfo() << "Big head displacement: dev_head_t has been updated";
+        }
+
     }
     UTILSLIB::IOUtils::write_eigen_matrix(position, QCoreApplication::applicationDirPath() + "/MNE-sample-data/position.txt");
 }
