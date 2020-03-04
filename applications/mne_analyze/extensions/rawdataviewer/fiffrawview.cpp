@@ -210,3 +210,12 @@ void FiffRawView::setZoom(double zoomFac)
 
     m_pTableView->verticalHeader()->setDefaultSectionSize(m_fZoomFactor*m_fDefaultSectionSize);//Row Height
 }
+
+//=============================================================================================================
+
+void FiffRawView::setWindowSize(int T)
+{
+    m_iT = T;
+    m_pModel->setWindowSize(T);
+    m_pModel->setDataColumnWidth(m_pTableView->width()-m_pTableView->columnWidth(0));
+}

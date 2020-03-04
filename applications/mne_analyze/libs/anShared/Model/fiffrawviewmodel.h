@@ -314,6 +314,8 @@ public:
      */
     void setBackgroundColor(const QColor& color);
 
+    void setWindowSize(const int& iNumSeconds);
+
 public slots:
 
     /**
@@ -367,7 +369,7 @@ private:
 signals:
      void newBlocksLoaded();
 
-private:
+public:
 
     std::list<QSharedPointer<QPair<MatrixXd, MatrixXd>>> m_lData;    /**< Data */
     std::list<QSharedPointer<QPair<MatrixXd, MatrixXd>>> m_lNewData; /**< Data that is to be appended or prepended */

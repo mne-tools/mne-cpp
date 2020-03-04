@@ -176,6 +176,8 @@ void FiffRawViewDelegate::createPlotPath(const QStyleOptionViewItem &option,
 
     const FiffRawViewModel* t_pModel = static_cast<const FiffRawViewModel*>(index.model());
 
+    qDebug() << "HERE ->" << t_pModel->m_iVisibleWindowSize;
+
     qint32 kind = t_pModel->getKind(index.row());
 
     double dMaxValue = 1.0e-10;
