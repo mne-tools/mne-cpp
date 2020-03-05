@@ -126,13 +126,14 @@ void writePos(const float time, QSharedPointer<FiffInfo> pFiffInfo, MatrixXd& po
  * @param[in] devHeadTrans      The device to head transformation matrix to compare to.
  * @param[in] devHeadTransNew   The device to head transformation matrix to be compared.
  * @param[in] treshRot          The threshold for big head rotation in degree
- * @param[in] treshTrans        The threshold for big head movement in m
+ * @param[in] threshTrans        The threshold for big head movement in m
  *
  * @param[out] state            The status that shows if devHead is updated or not
  *
  */
-bool compareResults(FiffCoordTrans& devHeadT, const FiffCoordTrans& devHeadTNew,const float& treshRot,const float& treshTrans, MatrixXd& result)
+bool compareResults(FiffCoordTrans& devHeadT, const FiffCoordTrans& devHeadTNew,const float& treshRot,const float& threshTrans, MatrixXd& result)
 {
+    bool state = false;
     QMatrix3x3 rot;
     QMatrix3x3 rotNew;
 
@@ -162,6 +163,21 @@ bool compareResults(FiffCoordTrans& devHeadT, const FiffCoordTrans& devHeadTNew,
     float move = (trans-transNew).norm();
     qInfo() << "Displacement Move [mm]: " << move*1000;
 
+    // compare to thresholds and update
+    if(move > threshTrans) {
+        qInfo() << "Large movement: " << move*1000 << "mm";
+        devHeadT = devHeadTNew;
+        qInfo() << "dev_head_t has been updatet";
+        state = true;
+    } else if (angle > treshRot) {
+        qInfo() << "Large rotation: " << angle << "°";
+        devHeadT = devHeadTNew;
+        qInfo() << "dev_head_t has been updatet";
+        state = true;
+    } else {
+        state = false;
+    }
+
     // write results for debug purpose - quaternions are quatCompare
     result.conservativeResize(result.rows()+1, 10);
     result.conservativeResize(result.rows()+1, 10);
@@ -175,7 +191,7 @@ bool compareResults(FiffCoordTrans& devHeadT, const FiffCoordTrans& devHeadTNew,
     result(result.rows()-1,7) = angle;
     result(result.rows()-1,8) = move;
     result(result.rows()-1,9) = 0;
-    return false;
+    return state;
 }
 
 //=============================================================================================================
@@ -244,8 +260,9 @@ int main(int argc, char *argv[])
 
     MatrixXd position;              // Position matrix to save quaternions etc.
     MatrixXd result;
-    float threshRot = 10;           // in degree
-    float threshTrans = 5/1000;     // in m
+
+    float threshRot = 5;           // in degree
+    float threshTrans = 0.005;    // in m
 
     // setup informations for HPI fit (VectorView)
     QVector<int> vFreqs {166,154,161,158};
