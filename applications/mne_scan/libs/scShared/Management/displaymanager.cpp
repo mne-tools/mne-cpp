@@ -106,7 +106,7 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
 
             qListActions.append(rtmsaWidget->getDisplayActions());
 
-            // We need to use wueued connection here because the FiffSimulator is dispatching its data from the main thread
+            // We need to use queued connection here because, e.g., theFiffSimulator is dispatching its data from the main thread
             // and a blocking one because the data is deleted immediatley after the signal was emmited
             connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
                     rtmsaWidget, &RealTimeMultiSampleArrayWidget::update, Qt::BlockingQueuedConnection);
@@ -142,35 +142,28 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
 //            vboxLayout->addWidget(rtseWidget);
 //            rtseWidget->init();
 //        }
-        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeEvokedSet> >())
-        {
+        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeEvokedSet> >()) {
             RealTimeEvokedSetWidget* rtesWidget = new RealTimeEvokedSetWidget(pT, newDisp);
 
             qListActions.append(rtesWidget->getDisplayActions());
 
-            // We need to use wueued connection here because the FiffSimulator is dispatching its data from the main thread
+            // We need to use queued connection here because, e.g., theFiffSimulator is dispatching its data from the main thread
             // and a blocking one because the data is deleted immediatley after the signal was emmited
             connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
-                    rtesWidget, &RealTimeEvokedSetWidget::update, Qt::AutoConnection);
+                    rtesWidget, &RealTimeEvokedSetWidget::update, Qt::BlockingQueuedConnection);
 
             vboxLayout->addWidget(rtesWidget);
             rtesWidget->init();
+        } else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeCov> >()) {
+            RealTimeCovWidget* rtcWidget = new RealTimeCovWidget(pT, newDisp);
+
+            qListActions.append(rtcWidget->getDisplayActions());
+            connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
+                    rtcWidget, &RealTimeCovWidget::update, Qt::BlockingQueuedConnection);
+
+            vboxLayout->addWidget(rtcWidget);
+            rtcWidget->init();
         }
-//        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeCov> >())
-//        {
-//            QSharedPointer<RealTimeCov>* pRealTimeCov = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeCov> >()->data();
-
-//            RealTimeCovWidget* rtcWidget = new RealTimeCovWidget(*pRealTimeCov, pT, newDisp);
-
-//            qListActions.append(rtcWidget->getDisplayActions());
-//            qListControlWidgets.append(rtcWidget->getPluginControlWidgets());
-
-//            connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
-//                    rtcWidget, &RealTimeCovWidget::update, Qt::BlockingQueuedConnection);
-
-//            vboxLayout->addWidget(rtcWidget);
-//            rtcWidget->init();
-//        }
 //        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSpectrum> >())
 //        {
 //            QSharedPointer<RealTimeSpectrum>* pRealTimeSpectrum = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSpectrum> >()->data();

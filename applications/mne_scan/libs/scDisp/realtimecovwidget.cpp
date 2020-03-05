@@ -77,21 +77,12 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeCovWidget::RealTimeCovWidget(QSharedPointer<RealTimeCov> pRTC,
-                                     QSharedPointer<QTime> &pTime,
+RealTimeCovWidget::RealTimeCovWidget(QSharedPointer<QTime> &pTime,
                                      QWidget* parent)
 : MeasurementWidget(parent)
-, m_pRTC(pRTC)
 , m_bInitialized(false)
 {
     Q_UNUSED(pTime)
-
-    m_pActionSelectModality = new QAction(QIcon(":/images/covarianceSelection.png"), tr("Shows the covariance modality selection widget (F12)"),this);
-    m_pActionSelectModality->setShortcut(tr("F12"));
-    m_pActionSelectModality->setStatusTip(tr("Shows the covariance modality selection widget (F12)"));
-    connect(m_pActionSelectModality.data(), &QAction::triggered,
-            this, &RealTimeCovWidget::showModalitySelectionWidget);
-    addDisplayAction(m_pActionSelectModality);
 
     //set vertical layout
     m_pRtcLayout = new QVBoxLayout(this);
@@ -112,8 +103,6 @@ RealTimeCovWidget::RealTimeCovWidget(QSharedPointer<RealTimeCov> pRTC,
     m_modalityMap.insert("EEG", true);
     m_modalityMap.insert("MAG", true);
     m_modalityMap.insert("GRAD", true);
-
-    getData();
 }
 
 //=============================================================================================================
@@ -124,31 +113,28 @@ RealTimeCovWidget::~RealTimeCovWidget()
 
 //=============================================================================================================
 
-void RealTimeCovWidget::update(SCMEASLIB::Measurement::SPtr)
+void RealTimeCovWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    getData();
-}
+    m_pRTC = qSharedPointerDynamicCast<RealTimeCov>(pMeasurement);
 
-//=============================================================================================================
-
-void RealTimeCovWidget::getData()
-{
     if(!m_bInitialized) {
         if(m_pRTC->isInitialized()) {
+            m_pFiffInfo = m_pRTC->getFiffInfo();
+
             init();
         }
-    } else {
-        if(m_pImageSc) {
-            MatrixXd data(m_qListSelChannel.size(), m_qListSelChannel.size());
+    }
 
-            for(int i = 0; i < m_qListSelChannel.size(); i++) {
-                for(int j = 0; j < m_qListSelChannel.size(); j++) {
-                    data(i,j) = m_pRTC->getValue()->data(m_qListSelChannel.at(i),m_qListSelChannel.at(j));
-                }
+    if(m_bInitialized) {
+        MatrixXd data(m_qListSelChannel.size(), m_qListSelChannel.size());
+
+        for(int i = 0; i < m_qListSelChannel.size(); i++) {
+            for(int j = 0; j < m_qListSelChannel.size(); j++) {
+                data(i,j) = m_pRTC->getValue()->data(m_qListSelChannel.at(i),m_qListSelChannel.at(j));
             }
-
-            m_pImageSc->updateData(data);
         }
+
+        m_pImageSc->updateData(data);
     }
 }
 
@@ -156,10 +142,7 @@ void RealTimeCovWidget::getData()
 
 void RealTimeCovWidget::init()
 {
-    if(m_pRTC->getValue()->names.size() > 0)
-    {
-        m_pFiffInfo = m_pRTC->getFiffInfo();
-
+    if(m_pFiffInfo) {
         m_pRtcLayout->removeWidget(m_pLabelInit);
         m_pLabelInit->hide();
 
@@ -167,28 +150,23 @@ void RealTimeCovWidget::init()
 
         onNewModalitySelection(m_modalityMap);
 
-        m_bInitialized = true;
-    }
-}
+        //Init control widgets
+        QList<QWidget*> lControlWidgets;
 
-//=============================================================================================================
+        DISPLIB::ModalitySelectionView* pModalitySelectionWidget = new ModalitySelectionView(m_pRTC->getFiffInfo()->chs,
+                                                                                              QString("MNESCAN/%1").arg(m_pRTC->getName()));
+        pModalitySelectionWidget->setObjectName("group_Modality");
+        lControlWidgets.append(pModalitySelectionWidget);
 
-void RealTimeCovWidget::showModalitySelectionWidget()
-{
-    if(!m_pModalitySelectionWidget)
-    {
-        m_pModalitySelectionWidget = ModalitySelectionView::SPtr::create(m_pRTC->getFiffInfo()->chs,
-                                                                         QString("MNESCAN/%1").arg(m_pRTC->getName()),
-                                                                         this,
-                                                                         Qt::Window);
-
-        connect(m_pModalitySelectionWidget.data(), &ModalitySelectionView::modalitiesChanged,
+        connect(pModalitySelectionWidget, &ModalitySelectionView::modalitiesChanged,
                 this, &RealTimeCovWidget::onNewModalitySelection);
 
-        m_pModalitySelectionWidget->setModalityMap(m_modalityMap);
-    }
+        pModalitySelectionWidget->setModalityMap(m_modalityMap);
 
-    m_pModalitySelectionWidget->show();
+        emit displayControlWidgetsChanged(lControlWidgets, m_pRTC->getName());
+
+        m_bInitialized = true;
+    }
 }
 
 //=============================================================================================================
