@@ -86,6 +86,7 @@ struct FittingResult {
     FIFFLIB::FiffDigPointSet fittedCoils;
     FIFFLIB::FiffCoordTrans devHeadTrans;
     QVector<double> errorDistances;
+    Eigen::VectorXd GoF;
 };
 
 //=============================================================================================================
