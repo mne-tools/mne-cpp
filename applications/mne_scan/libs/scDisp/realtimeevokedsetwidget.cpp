@@ -257,21 +257,6 @@ void RealTimeEvokedSetWidget::init()
         //Init control widgets
         QList<QWidget*> lControlWidgets;
 
-        // Quick control scaling        
-        ScalingView* pScalingView = new ScalingView(QString("RTESW/%1").arg(t_sRTESName),
-                                                    m_pFiffInfo->chs);
-        pScalingView->setObjectName("group_Scaling");
-        lControlWidgets.append(pScalingView);
-
-        connect(pScalingView, &ScalingView::scalingChanged,
-                m_pButterflyView.data(), &ButterflyView::setScaleMap);
-
-        connect(pScalingView, &ScalingView::scalingChanged,
-                m_pAverageLayoutView.data(), &AverageLayoutView::setScaleMap);
-
-        m_pButterflyView->setScaleMap(pScalingView->getScaleMap());
-        m_pAverageLayoutView->setScaleMap(pScalingView->getScaleMap());
-
         // Quick control projectors
         ProjectorsView* pProjectorsView = new ProjectorsView(QString("RTESW/%1").arg(t_sRTESName));
         pProjectorsView->setObjectName("group_tab_Noise_SSP");
@@ -392,6 +377,21 @@ void RealTimeEvokedSetWidget::init()
         m_pButterflyView->setAverageColor(pAverageSelectionView->getAverageColor());
         m_pAverageLayoutView->setAverageActivation(pAverageSelectionView->getAverageActivation());
         m_pAverageLayoutView->setAverageColor(pAverageSelectionView->getAverageColor());
+
+        // Scaling
+        ScalingView* pScalingView = new ScalingView(QString("RTESW/%1").arg(t_sRTESName),
+                                                    m_pFiffInfo->chs);
+        pScalingView->setObjectName("group_Scaling");
+        lControlWidgets.append(pScalingView);
+
+        connect(pScalingView, &ScalingView::scalingChanged,
+                m_pButterflyView.data(), &ButterflyView::setScaleMap);
+
+        connect(pScalingView, &ScalingView::scalingChanged,
+                m_pAverageLayoutView.data(), &AverageLayoutView::setScaleMap);
+
+        m_pButterflyView->setScaleMap(pScalingView->getScaleMap());
+        m_pAverageLayoutView->setScaleMap(pScalingView->getScaleMap());
 
         emit displayControlWidgetsChanged(lControlWidgets, t_sRTESName);
 

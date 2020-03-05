@@ -98,6 +98,11 @@ void Averaging::unload()
 
 bool Averaging::start()
 {
+    // Init circular buffer to transmit data from the producer to this thread
+    if(!m_pCircularBuffer) {
+        m_pCircularBuffer = CircularBuffer<FIFFLIB::FiffEvokedSet>::SPtr::create(10);
+    }
+
     QThread::start();
 
     return true;
@@ -108,6 +113,7 @@ bool Averaging::start()
 bool Averaging::stop()
 {    
     requestInterruption();
+    wait();
 
     return true;
 }
@@ -138,9 +144,7 @@ QWidget* Averaging::setupWidget()
 
 void Averaging::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
-
-    if(pRTMSA) {
+    if(QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>()) {
          //Fiff information
         if(!m_pFiffInfo) {
             m_pFiffInfo = pRTMSA->info();
@@ -383,11 +387,15 @@ void Averaging::onChangeBaselineActive(bool state)
 void Averaging::onNewEvokedSet(const FIFFLIB::FiffEvokedSet& evokedSet,
                                const QStringList& lResponsibleTriggerTypes)
 {
+
+    while(!m_pCircularBuffer->push(evokedSet)) {
+        //Do nothing until the circular buffer is ready to accept new data again
+    }
+
     emit evokedSetChanged(evokedSet);
 
-    m_pAveragingOutput->data()->setValue(evokedSet,
-                                         m_pFiffInfo,
-                                         m_lResponsibleTriggerTypes);
+    QMutexLocker locker(&m_qMutex);
+    m_lResponsibleTriggerTypes = lResponsibleTriggerTypes;
 }
 
 //=============================================================================================================
@@ -406,4 +414,18 @@ void Averaging::onResetAverage(bool state)
 
 void Averaging::run()
 {
+    FIFFLIB::FiffEvokedSet evokedSet;
+    QStringList lResponsibleTriggerTypes;
+
+    while(!isInterruptionRequested()){
+        if(m_pCircularBuffer->pop(evokedSet)) {
+            m_qMutex.lock();
+            lResponsibleTriggerTypes = m_lResponsibleTriggerTypes;
+            m_qMutex.unlock();
+
+            m_pAveragingOutput->data()->setValue(evokedSet,
+                                                 m_pFiffInfo,
+                                                 lResponsibleTriggerTypes);
+        }
+    }
 }

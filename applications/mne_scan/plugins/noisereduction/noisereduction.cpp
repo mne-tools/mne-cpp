@@ -191,14 +191,10 @@ QWidget* NoiseReduction::setupWidget()
 
 void NoiseReduction::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    if(!m_pRTMSA) {
-        m_pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
-    }
-
-    if(m_pRTMSA) {
+    if(QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>()) {
         //Check if the fiff info was inititalized
         if(!m_pFiffInfo) {
-            m_pFiffInfo = m_pRTMSA->info();
+            m_pFiffInfo = pRTMSA->info();
 
             //Init the multiplication matrices
             m_matSparseProjMult = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
@@ -220,7 +216,7 @@ void NoiseReduction::update(SCMEASLIB::Measurement::SPtr pMeasurement)
         }
 
         // Check if data is present
-        if(m_pRTMSA->getMultiSampleArray().size() > 0) {
+        if(pRTMSA->getMultiSampleArray().size() > 0) {
             //Init widgets
             if(m_iMaxFilterTapSize == -1) {
                 //Check if buffer was initialized
@@ -228,13 +224,13 @@ void NoiseReduction::update(SCMEASLIB::Measurement::SPtr pMeasurement)
                     m_pCircularBuffer = QSharedPointer<CircularBuffer_Matrix_double>(new CircularBuffer_Matrix_double(10));
                 }
 
-                m_iMaxFilterTapSize = m_pRTMSA->getMultiSampleArray().first().cols();
+                m_iMaxFilterTapSize = pRTMSA->getMultiSampleArray().first().cols();
                 initPluginControlWidgets();
                 QThread::start();
             }
 
-            for(unsigned char i = 0; i < m_pRTMSA->getMultiSampleArray().size(); ++i) {
-                while(!m_pCircularBuffer->push(m_pRTMSA->getMultiSampleArray()[i])) {
+            for(unsigned char i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
+                while(!m_pCircularBuffer->push(pRTMSA->getMultiSampleArray()[i])) {
                     //Do nothing until the circular buffer is ready to accept new data again
                 }
             }

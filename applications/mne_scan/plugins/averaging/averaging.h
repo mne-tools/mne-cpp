@@ -208,7 +208,7 @@ public:
      * @param[in] lResponsibleTriggerTypes   List of all trigger types which lead to the recent emit of a new evoked set.
      */
     void onNewEvokedSet(const FIFFLIB::FiffEvokedSet& evokedSet,
-                      const QStringList &lResponsibleTriggerTypes);
+                        const QStringList &lResponsibleTriggerTypes);
 
     //=========================================================================================================
     /**
@@ -223,6 +223,8 @@ private:
 
     SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pAveragingInput;      /**< The RealTimeSampleArray of the Averaging input.*/
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeEvokedSet>::SPtr           m_pAveragingOutput;     /**< The RealTimeEvoked of the Averaging output.*/
+
+    IOBUFFER::CircularBuffer<FIFFLIB::FiffEvokedSet>::SPtr                      m_pCircularBuffer;      /**< Holds incoming fiff evoked sets. */
 
     QMutex                                          m_qMutex;                           /**< Provides access serialization between threads. */
 
