@@ -153,10 +153,8 @@ bool FiffSimulator::start()
         (*m_pRtCmdClient)["bufsize"].send();
 
         // Init circular buffer to transmit data from the producer to this thread
-        if(!m_pRawMatrixBuffer_In) {
-            m_pRawMatrixBuffer_In = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(8,
-                                                                                        m_pFiffInfo->nchan,
-                                                                                        m_iBufferSize));
+        if(!m_pCircularBuffer) {
+            m_pCircularBuffer = QSharedPointer<CircularBuffer_Matrix_float>(new CircularBuffer_Matrix_float(8));
         }
 
         m_pFiffSimulatorProducer->start();
@@ -233,19 +231,19 @@ void FiffSimulator::run()
 
     while(!isInterruptionRequested()) {
         //pop matrix
-        matValue = m_pRawMatrixBuffer_In->pop();
+        if(m_pCircularBuffer->pop(matValue)) {
+            //Update HPI data (for single and continous HPI fitting)
+            updateHPI(matValue);
 
-        //Update HPI data (for single and continous HPI fitting)
-        updateHPI(matValue);
+            //Do continous HPI fitting and write result to data block
+            if(m_bDoContinousHPI) {
+                doContinousHPI(matValue);
+            }
 
-        //Do continous HPI fitting and write result to data block
-        if(m_bDoContinousHPI) {
-            doContinousHPI(matValue);
-        }
-
-        //emit values
-        if(!isInterruptionRequested()) {
-            m_pRTMSA_FiffSimulator->data()->setValue(matValue.cast<double>());
+            //emit values
+            if(!isInterruptionRequested()) {
+                m_pRTMSA_FiffSimulator->data()->setValue(matValue.cast<double>());
+            }
         }
     }
 }

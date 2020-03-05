@@ -51,6 +51,12 @@
 #include <QSharedPointer>
 
 //=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
+//=============================================================================================================
 // DEFINE NAMESPACE IOBUFFER
 //=============================================================================================================
 
@@ -95,7 +101,7 @@ public:
      * @param [in] pArray pointer to an Array which should be apend to the end.
      * @param [in] size number of elements containing the array.
      */
-    inline void push(const _Tp* pArray, unsigned int size);
+    inline bool push(const _Tp* pArray, unsigned int size);
 
     //=========================================================================================================
     /**
@@ -103,7 +109,7 @@ public:
      *
      * @param [in] newElement pointer to an Array which should be apend to the end.
      */
-    inline void push(const _Tp& newElement);
+    inline bool push(const _Tp& newElement);
 
     //=========================================================================================================
     /**
@@ -111,7 +117,7 @@ public:
      *
      * @return the first element
      */
-    inline _Tp pop();
+    inline bool pop(_Tp& element);
 
     //=========================================================================================================
     /**
@@ -124,20 +130,6 @@ public:
      * Pauses the buffer. Skpis any incoming matrices and only pops zero matrices.
      */
     inline void pause(bool);
-
-    //=========================================================================================================
-    /**
-     * Releases the circular buffer from the acquire statement in the pop() function.
-     * @param [out] bool returns true if resources were freed so that the aquire statement in the pop function can release, otherwise false.
-     */
-    inline bool releaseFromPop();
-
-    //=========================================================================================================
-    /**
-     * Releases the circular buffer from the acquire statement in the push() function.
-     * @param [out] bool returns true if resources were freed so that the aquire statement in the push function can release, otherwise false.
-     */
-    inline bool releaseFromPush();
 
 private:
     //=========================================================================================================
@@ -154,6 +146,7 @@ private:
     int             m_iCurrentWriteIndex;   /**< Holds the current write index.*/
     QSemaphore*     m_pFreeElements;        /**< Holds a semaphore which acquires free elements for thread safe writing. A semaphore is a generalization of a mutex.*/
     QSemaphore*     m_pUsedElements;        /**< Holds a semaphore which acquires written semaphore for thread safe reading.*/
+    int             m_iTimeout;             /**< Holds the timeout value after which the acquire statement will return false.*/
 
     bool            m_bPause;
 };
@@ -171,6 +164,7 @@ CircularBuffer<_Tp>::CircularBuffer(unsigned int uiMaxNumElements)
 , m_pFreeElements(new QSemaphore(m_uiMaxNumElements))
 , m_pUsedElements(new QSemaphore(0))
 , m_bPause(false)
+, m_iTimeout(1000)
 {
 }
 
@@ -187,43 +181,52 @@ CircularBuffer<_Tp>::~CircularBuffer()
 //=============================================================================================================
 
 template<typename _Tp>
-inline void CircularBuffer<_Tp>::push(const _Tp* pArray, unsigned int size)
+inline bool CircularBuffer<_Tp>::push(const _Tp* pArray, unsigned int size)
 {
-    if(!m_bPause)
-    {
-        m_pFreeElements->acquire(size);
-        for(unsigned int i = 0; i < size; ++i)
-            m_pBuffer[mapIndex(m_iCurrentWriteIndex)] = pArray[i];
-        m_pUsedElements->release(size);
+    if(!m_bPause) {
+        if(m_pFreeElements->tryAcquire(size, m_iTimeout)) {
+            for(unsigned int i = 0; i < size; ++i) {
+                m_pBuffer[mapIndex(m_iCurrentWriteIndex)] = pArray[i];
+            }
+            const QSemaphoreReleaser releaser(m_pUsedElements, size);
+        } else {
+            return false;
+        }
     }
+
+    return true;
 }
 
 //=============================================================================================================
 
 template<typename _Tp>
-inline void CircularBuffer<_Tp>::push(const _Tp& newElement)
+inline bool CircularBuffer<_Tp>::push(const _Tp& newElement)
 {
-    m_pFreeElements->acquire();
-    m_pBuffer[mapIndex(m_iCurrentWriteIndex)] = newElement;
-    m_pUsedElements->release();
+    if(m_pFreeElements->tryAcquire(1, m_iTimeout)) {
+        m_pBuffer[mapIndex(m_iCurrentWriteIndex)] = newElement;
+        const QSemaphoreReleaser releaser(m_pUsedElements, 1);
+    } else {
+       return false;
+    }
+
+    return true;
 }
 
 //=============================================================================================================
 
 template<typename _Tp>
-inline _Tp CircularBuffer<_Tp>::pop()
+inline bool CircularBuffer<_Tp>::pop(_Tp& element)
 {
-    _Tp element;
-    if(!m_bPause)
-    {
-        m_pUsedElements->acquire();
-        element = m_pBuffer[mapIndex(m_iCurrentReadIndex)];
-        m_pFreeElements->release();
+    if(!m_bPause) {
+        if(m_pUsedElements->tryAcquire(1, m_iTimeout)) {
+            element = m_pBuffer[mapIndex(m_iCurrentReadIndex)];
+            const QSemaphoreReleaser releaser(m_pFreeElements, 1);
+        } else {
+            return false;
+        }
     }
-//    else
-//        element = 0;
 
-    return element;
+    return true;
 }
 
 //=============================================================================================================
@@ -258,60 +261,24 @@ inline void CircularBuffer<_Tp>::pause(bool bPause)
 }
 
 //=============================================================================================================
-
-template<typename _Tp>
-inline bool CircularBuffer<_Tp>::releaseFromPop()
-{
-    if((uint)m_pUsedElements->available() < 1)
-    {
-        //The last value which is to be popped from the buffer is supposed to be a zero
-        m_pBuffer[mapIndex(m_iCurrentWriteIndex)] = 0;
-
-        //Release (create) values from m_pUsedElements so that the pop function can leave the acquire statement in the pop function
-        m_pUsedElements->release(1);
-
-        return true;
-    }
-
-    return false;
-}
-
-//=============================================================================================================
-
-template<typename _Tp>
-inline bool CircularBuffer<_Tp>::releaseFromPush()
-{
-    if((uint)m_pFreeElements->available() < 1)
-    {
-        //The last value which is to be pushed to the buffer is supposed to be a zero
-        m_pBuffer[mapIndex(m_iCurrentWriteIndex)] = 0;
-
-        //Release (create) value from m_pFreeElements so that the push function can leave the acquire statement in the push function
-        m_pFreeElements->release(1);
-
-        return true;
-    }
-
-    return false;
-}
-
-//=============================================================================================================
 // TYPEDEF
 //=============================================================================================================
 
 //ToDo Typedef -> warning visibility ignored -> dllexport/dllimport problem
 
-typedef UTILSSHARED_EXPORT CircularBuffer<int>                      _int_CircularBuffer;                 /**< Defines CircularBuffer of integer type.*/
-typedef UTILSSHARED_EXPORT CircularBuffer<short>                    _short_CircularBuffer;               /**< Defines CircularBuffer of short type.*/
-typedef UTILSSHARED_EXPORT CircularBuffer<char>                     _char_CircularBuffer;                /**< Defines CircularBuffer of char type.*/
-typedef UTILSSHARED_EXPORT CircularBuffer<double>                   _double_CircularBuffer;              /**< Defines CircularBuffer of double type.*/
-typedef UTILSSHARED_EXPORT CircularBuffer< QPair<int, int> >        _int_int_pair_CircularBuffer;        /**< Defines CircularBuffer of integer Pair type.*/
-typedef UTILSSHARED_EXPORT CircularBuffer< QPair<double, double> >  _double_double_pair_CircularBuffer;  /**< Defines CircularBuffer of double Pair type.*/
+typedef UTILSSHARED_EXPORT CircularBuffer<int>                      CircularBuffer_int;                 /**< Defines CircularBuffer of integer type.*/
+typedef UTILSSHARED_EXPORT CircularBuffer<short>                    CircularBuffer_short;               /**< Defines CircularBuffer of short type.*/
+typedef UTILSSHARED_EXPORT CircularBuffer<char>                     CircularBuffer_char;                /**< Defines CircularBuffer of char type.*/
+typedef UTILSSHARED_EXPORT CircularBuffer<double>                   CircularBuffer_double;              /**< Defines CircularBuffer of double type.*/
+typedef UTILSSHARED_EXPORT CircularBuffer< QPair<int, int> >        CircularBuffer_pair_int_int;        /**< Defines CircularBuffer of integer Pair type.*/
+typedef UTILSSHARED_EXPORT CircularBuffer< QPair<double, double> >  CircularBuffer_pair_double_double;  /**< Defines CircularBuffer of double Pair type.*/
+typedef UTILSSHARED_EXPORT CircularBuffer< Eigen::MatrixXd >        CircularBuffer_Matrix_double;       /**< Defines CircularBuffer of Eigen::MatrixXd type.*/
+typedef UTILSSHARED_EXPORT CircularBuffer< Eigen::MatrixXf >        CircularBuffer_Matrix_float;        /**< Defines CircularBuffer of Eigen::MatrixXf type.*/
 
-typedef UTILSSHARED_EXPORT _double_CircularBuffer                   dBuffer;             /**< Short for _double_CircularBuffer.*/
-typedef UTILSSHARED_EXPORT _int_CircularBuffer                      iBuffer;             /**< Short for _int_CircularBuffer.*/
-typedef UTILSSHARED_EXPORT _char_CircularBuffer                     cBuffer;             /**< Short for _char_CircularBuffer.*/
-typedef UTILSSHARED_EXPORT _double_CircularBuffer                   MEGBuffer;           /**< Defines MEGBuffer of type _double_CircularBuffer.*/
+//typedef UTILSSHARED_EXPORT CircularBuffer_double                   dBuffer;             /**< Short for CircularBuffer_double.*/
+//typedef UTILSSHARED_EXPORT CircularBuffer_int                      iBuffer;             /**< Short for CircularBuffer_int.*/
+//typedef UTILSSHARED_EXPORT CircularBuffer_char                     cBuffer;             /**< Short for CircularBuffer_char.*/
+//typedef UTILSSHARED_EXPORT CircularBuffer_double                   MEGBuffer;           /**< Defines MEGBuffer of type CircularBuffer_double.*/
 } // NAMESPACE
 
 #endif // CIRCULARBUFFER_H

@@ -133,7 +133,7 @@ void RtClient::run()
     //
     // Inits
     //
-    MatrixXf t_matRawBuffer;
+    MatrixXf matData;
 
     fiff_int_t kind;
 
@@ -169,15 +169,15 @@ void RtClient::run()
 
 //        while(m_bIsMeasuring)
 
-        t_dataClient.readRawBuffer(m_pFiffInfo->nchan, t_matRawBuffer, kind);
+        t_dataClient.readRawBuffer(m_pFiffInfo->nchan, matData, kind);
 
         if(kind == FIFF_DATA_BUFFER)
         {
-            to += t_matRawBuffer.cols();
+            to += matData.cols();
             printf("Reading %d ... %d  =  %9.3f ... %9.3f secs...", from, to, ((float)from)/m_pFiffInfo->sfreq, ((float)to)/m_pFiffInfo->sfreq);
-            from += t_matRawBuffer.cols();
+            from += matData.cols();
 
-            emit rawBufferReceived(t_matRawBuffer);
+            emit rawBufferReceived(matData);
         }
         else if(FIFF_DATA_BUFFER == FIFF_BLOCK_END)
             m_bIsRunning = false;
