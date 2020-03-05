@@ -498,6 +498,7 @@ inline void FiffRawViewModel::setDataColumnWidth(int iWidth) {
 //=============================================================================================================
 
 inline double FiffRawViewModel::pixelDifference() const {
+    qDebug() << "Pixel Difference (m_dDx):" << m_dDx;
     return m_dDx;
 }
 
