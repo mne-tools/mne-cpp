@@ -131,6 +131,13 @@ public:
      */
     virtual QSharedPointer<SCSHAREDLIB::IPlugin> clone() const;
     virtual void init();
+
+    //=========================================================================================================
+    /**
+     * Inits widgets which are used to control this plugin, then emits them in form of a QList.
+     */
+    virtual void initPluginControlWidgets();
+
     virtual void unload();
     virtual bool start();
     virtual bool stop();
@@ -161,6 +168,9 @@ public:
      * @param[in] pMeasurement   The evoked to be appended
      */
     void updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement);
+
+signals:
+    void responsibleTriggerTypesChaged(const QStringList& lResponsibleTriggerTypes);
 
 protected:
     //=========================================================================================================
@@ -226,7 +236,6 @@ protected:
     void onFrequencyBandChanged(float fFreqLow, float fFreqHigh);
 
 private:
-    bool                m_bIsRunning;           /**< Flag whether thread is running.*/
     qint32              m_iDownSample;          /**< Sampling rate. */
     qint32              m_iNumberAverages;      /**< The number of averages used to calculate the connectivity estimate. Use this only for resting state data when the averaging plugin is not connected.*/
     qint32              m_iNumberBadChannels;   /**< The current number of bad channels. USed to test if new bad channels were selected. */
@@ -243,7 +252,7 @@ private:
 
     CONNECTIVITYLIB::ConnectivitySettings                                           m_connectivitySettings;         /**< The connectivity settings.*/
 
-    QSharedPointer<IOBUFFER::CircularBuffer<CONNECTIVITYLIB::Network> >             m_pCircularNetworkBuffer;       /**< The circular buffer holding the connectivity estimates.*/
+    QSharedPointer<IOBUFFER::CircularBuffer<CONNECTIVITYLIB::Network> >             m_pCircularBuffer;              /**< The circular buffer holding the connectivity estimates.*/
     QSharedPointer<RTPROCESSINGLIB::RtConnectivity>                                 m_pRtConnectivity;              /**< The real-time connectivity estimation object.*/
     QSharedPointer<FIFFLIB::FiffInfo>                                               m_pFiffInfo;                    /**< Fiff measurement info.*/
     QSharedPointer<DISPLIB::ConnectivitySettingsView>                               m_pConnectivitySettingsView;    /**< The connectivity settings widget which will be added to the Quick Control view. The QuickControlView will not take ownership. Ownership will be managed by the QSharedPointer.*/

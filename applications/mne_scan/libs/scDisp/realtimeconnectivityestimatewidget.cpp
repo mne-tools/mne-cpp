@@ -42,8 +42,6 @@
 
 #include <connectivity/network/network.h>
 
-#include <disp/viewers/quickcontrolview.h>
-
 #include <disp3D/viewers/networkview.h>
 #include <disp3D/engine/model/items/network/networktreeitem.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
@@ -73,30 +71,13 @@ using namespace CONNECTIVITYLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeConnectivityEstimateWidget::RealTimeConnectivityEstimateWidget(QSharedPointer<SCMEASLIB::RealTimeConnectivityEstimate> &pRTCE, QWidget* parent)
+RealTimeConnectivityEstimateWidget::RealTimeConnectivityEstimateWidget(QWidget* parent)
 : MeasurementWidget(parent)
-, m_pRTCE(pRTCE)
 , m_bInitialized(false)
 , m_pRtItem(Q_NULLPTR)
 , m_pAbstractView(new AbstractView())
 , m_iNumberBadChannels(0)
 {
-    m_pActionQuickControl = new QAction(QIcon(":/images/quickControl.png"), tr("Show quick control widget (F9)"),this);
-    m_pActionQuickControl->setShortcut(tr("F9"));
-    m_pActionQuickControl->setStatusTip(tr("Show quick control widget (F9)"));
-    connect(m_pActionQuickControl.data(), &QAction::triggered,
-            this, &RealTimeConnectivityEstimateWidget::showQuickControlView);
-    addDisplayAction(m_pActionQuickControl);
-    m_pActionQuickControl->setVisible(true);
-
-    //QList<QSharedPointer<QWidget> > lControlWidgets = m_pRTCE->getPluginControlWidgets();
-    //m_pAbstractView->setQuickControlWidgets(lControlWidgets);
-
-    m_pQuickControlView = m_pAbstractView->getQuickControl();
-    m_pQuickControlView->setWindowFlags(Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint);
-    m_pQuickControlView->setDraggable(true);
-    m_pQuickControlView->setVisiblityHideOpacityClose(true);
-
     QGridLayout *mainLayoutView = new QGridLayout();
     mainLayoutView->addWidget(m_pAbstractView.data());
     mainLayoutView->setContentsMargins(0,0,0,0);
@@ -114,16 +95,9 @@ RealTimeConnectivityEstimateWidget::~RealTimeConnectivityEstimateWidget()
 
 //=============================================================================================================
 
-void RealTimeConnectivityEstimateWidget::update(SCMEASLIB::Measurement::SPtr)
+void RealTimeConnectivityEstimateWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    getData();
-}
-
-//=============================================================================================================
-
-void RealTimeConnectivityEstimateWidget::getData()
-{
-    if(m_pRTCE) {
+    if(m_pRTCE = qSharedPointerDynamicCast<RealTimeConnectivityEstimate>(pMeasurement)) {
         if(m_pRTCE->getValue().data()->isEmpty()) {
             return;
         }
@@ -182,14 +156,4 @@ void RealTimeConnectivityEstimateWidget::getData()
 void RealTimeConnectivityEstimateWidget::init()
 {
     m_bInitialized = true;
-}
-
-//=============================================================================================================
-
-void RealTimeConnectivityEstimateWidget::showQuickControlView()
-{
-    if(m_pQuickControlView) {
-        m_pQuickControlView->raise();
-        m_pQuickControlView->show();
-    }
 }

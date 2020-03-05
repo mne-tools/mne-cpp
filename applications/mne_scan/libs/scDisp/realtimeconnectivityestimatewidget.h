@@ -100,23 +100,15 @@ public:
     /**
      * Constructs a RealTimeConnectivityEstimateWidget which is a child of parent.
      *
-     * @param [in] pRTCE     pointer to real-time connectivity estimate.
      * @param [in] parent    pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
      */
-    RealTimeConnectivityEstimateWidget(QSharedPointer<SCMEASLIB::RealTimeConnectivityEstimate> &pRTCE,
-                                       QWidget* parent = 0);
+    RealTimeConnectivityEstimateWidget(QWidget* parent = 0);
 
     //=========================================================================================================
     /**
      * Destroys the RealTimeConnectivityEstimateWidget.
      */
     ~RealTimeConnectivityEstimateWidget();
-
-    //=========================================================================================================
-    /**
-     * Is called when new data are available.
-     */
-    virtual void getData();
 
     //=========================================================================================================
     /**
@@ -133,14 +125,7 @@ public:
     virtual void init();
 
 protected:
-    //=========================================================================================================
-    /**
-     * Shows quick control view
-     */
-    void showQuickControlView();
-
     QSharedPointer<SCMEASLIB::RealTimeConnectivityEstimate>     m_pRTCE;                /**< The real-time source estimate measurement. */
-    QPointer<DISPLIB::QuickControlView>                         m_pQuickControlView;    /**< Quick control widget. */
 
     bool                                                        m_bInitialized;         /**< Whether init was processed successfully. */
 
