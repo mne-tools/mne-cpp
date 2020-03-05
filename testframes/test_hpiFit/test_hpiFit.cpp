@@ -111,26 +111,28 @@ TestFitHPI::TestFitHPI()
 
 //=============================================================================================================
 
-void write_pos(const float time, const int index, QSharedPointer<FIFFLIB::FiffInfo> info, Eigen::MatrixXd& position)
+void storeHeadPosition(float time, const Eigen::Matrix<float, 4,4, Eigen::DontAlign>& devHeadT, MatrixXd& position, const VectorXd& vGoF, const QVector<double>& vError)
 {
-    // Write quaternions and time in position matrix. Format is the same as in maxfilter .pos files, but we only write quaternions and time. So column 7,8,9 are not used
-    QMatrix3x3 rot;
+    // Write quaternions and time in position matrix. Format is the same like MaxFilter's .pos files.
+    Matrix3f rot = devHeadT.block(0,0,3,3);
 
-    for(int ir = 0; ir < 3; ir++) {
-        for(int ic = 0; ic < 3; ic++) {
-            rot(ir,ic) = info->dev_head_t.trans(ir,ic);
-        }
-    }
+    double error = std::accumulate(vError.begin(), vError.end(), .0) / vError.size();     // HPI estimation Error
+    Eigen::Quaternionf quatHPI(rot);
 
-    QQuaternion quatHPI = QQuaternion::fromRotationMatrix(rot);
-    //std::cout << quatHPI.x() << quatHPI.y() << quatHPI.z() << info->dev_head_t.trans(0,3) << info->dev_head_t.trans(1,3) << info->dev_head_t.trans(2,3) << std::endl;
-    position(index,0) = time;
-    position(index,1) = quatHPI.x();
-    position(index,2) = quatHPI.y();
-    position(index,3) = quatHPI.z();
-    position(index,4) = info->dev_head_t.trans(0,3);
-    position(index,5) = info->dev_head_t.trans(1,3);
-    position(index,6) = info->dev_head_t.trans(2,3);
+    //qDebug() << "quatHPI.x() " << "quatHPI.y() " << "quatHPI.y() " << "trans x " << "trans y " << "trans z " << std::endl;
+    //qDebug() << quatHPI.x() << quatHPI.y() << quatHPI.z() << info->dev_head_t.trans(0,3) << info->dev_head_t.trans(1,3) << info->dev_head_t.trans(2,3) << std::endl;
+
+    position.conservativeResize(position.rows()+1, 10);
+    position(position.rows()-1,0) = time;
+    position(position.rows()-1,1) = quatHPI.x();
+    position(position.rows()-1,2) = quatHPI.y();
+    position(position.rows()-1,3) = quatHPI.z();
+    position(position.rows()-1,4) = devHeadT(0,3);
+    position(position.rows()-1,5) = devHeadT(1,3);
+    position(position.rows()-1,6) = devHeadT(2,3);
+    position(position.rows()-1,7) = vGoF.mean();
+    position(position.rows()-1,8) = error;
+    position(position.rows()-1,9) = 0;
 }
 
 void TestFitHPI::initTestCase()
@@ -201,7 +203,7 @@ void TestFitHPI::initTestCase()
                        bDoDebug = 0,
                        sHPIResourceDir);
         qInfo() << "[done]\n";
-        write_pos(ref_pos(i,0),i,pFiffInfo,hpi_pos);
+        storeHeadPosition(ref_pos(i,0),pFiffInfo->dev_head_t.trans,hpi_pos,vGoF,vError);
     }
     // For debug: position file for HPIFit
     // UTILSLIB::IOUtils::write_eigen_matrix(hpi_pos, QCoreApplication::applicationDirPath() + "/MNE-sample-data/hpi_pos.txt");
