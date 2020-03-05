@@ -65,7 +65,6 @@ contains(MNECPP_CONFIG, withLsl) {
 SUBDIRS += \
 #    dummytoolbox \
 #    rtcmne \
-#    rtcmusic \
     averaging \
 #    covariance \
     noisereduction \
