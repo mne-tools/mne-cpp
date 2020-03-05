@@ -106,14 +106,16 @@ void storeHeadPosition(float time, const Eigen::Matrix<float, 4,4, Eigen::DontAl
     double error = std::accumulate(vError.begin(), vError.end(), .0) / vError.size();     // HPI estimation Error
     Eigen::Quaternionf quatHPI(rot);
 
-    //qDebug() << "quatHPI.x() " << "quatHPI.y() " << "quatHPI.y() " << "trans x " << "trans y " << "trans z " << std::endl;
-    //qDebug() << quatHPI.x() << quatHPI.y() << quatHPI.z() << info->dev_head_t.trans(0,3) << info->dev_head_t.trans(1,3) << info->dev_head_t.trans(2,3) << std::endl;
-
+//    qDebug() << "quatHPI.x() " << "quatHPI.y() " << "quatHPI.y() " << "trans x " << "trans y " << "trans z ";
+//    qDebug() << quatHPI.x() << quatHPI.y() << quatHPI.z() << devHeadT(0,3) << devHeadT(1,3) << devHeadT(2,3);
+    float x = quatHPI.x();
+    float y = quatHPI.y();
+    float z = quatHPI.z();
     position.conservativeResize(position.rows()+1, 10);
     position(position.rows()-1,0) = time;
-    position(position.rows()-1,1) = quatHPI.x();
-    position(position.rows()-1,2) = quatHPI.y();
-    position(position.rows()-1,3) = quatHPI.z();
+    position(position.rows()-1,1) = x;
+    position(position.rows()-1,2) = y;
+    position(position.rows()-1,3) = z;
     position(position.rows()-1,4) = devHeadT(0,3);
     position(position.rows()-1,5) = devHeadT(1,3);
     position(position.rows()-1,6) = devHeadT(2,3);
@@ -306,12 +308,12 @@ int main(int argc, char *argv[])
         qInfo() << "The HPI-Fit took" << timer.elapsed() << "milliseconds";
         qInfo() << "[done]";
 
-        // writePos(time(i), pFiffInfo->dev_head_t.trans, position, vGoF, vError);
+        storeHeadPosition(time(i), pFiffInfo->dev_head_t.trans, position, vGoF, vError);
 
         if(compareTransformation(devHeadTrans.trans, pFiffInfo->dev_head_t.trans, threshRot, threshTrans)) {
             qInfo() << "Big head displacement: dev_head_t has been updated";
         }
 
     }
-    //UTILSLIB::IOUtils::write_eigen_matrix(position, QCoreApplication::applicationDirPath() + "/MNE-sample-data/position.txt");
+    UTILSLIB::IOUtils::write_eigen_matrix(position, QCoreApplication::applicationDirPath() + "/MNE-sample-data/position.txt");
 }
