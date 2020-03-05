@@ -177,9 +177,6 @@ void FiffSimulatorProducer::run()
                 from += t_matRawBuffer.cols();
                 if(!isInterruptionRequested()) {
                     m_pFiffSimulator->m_pRawMatrixBuffer_In->push(&t_matRawBuffer);
-                } else {
-                    m_pFiffSimulator->m_pRawMatrixBuffer_In->releaseFromPush();
-                    break;
                 }
             } else if(FIFF_DATA_BUFFER == FIFF_BLOCK_END) {
                 break;
