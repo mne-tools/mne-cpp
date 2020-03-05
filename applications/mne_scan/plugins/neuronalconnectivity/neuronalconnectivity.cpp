@@ -85,20 +85,23 @@ using namespace FIFFLIB;
 //=============================================================================================================
 
 NeuronalConnectivity::NeuronalConnectivity()
-: m_bIsRunning(false)
-, m_iDownSample(1)
+: m_iDownSample(1)
 , m_iNumberAverages(10)
 , m_sAvrType("1")
 , m_fFreqBandLow(7.0f)
 , m_fFreqBandHigh(13.0f)
 , m_iBlockSize(1)
-, m_pConnectivitySettingsView(ConnectivitySettingsView::SPtr::create(this->getName()))
 , m_pActionShowYourWidget(Q_NULLPTR)
 , m_iNumberBadChannels(0)
+, m_pRtConnectivity(RtConnectivity::SPtr::create())
 {
     AbstractMetric::m_bStorageModeIsActive = true;
     AbstractMetric::m_iNumberBinStart = 0;
     AbstractMetric::m_iNumberBinAmount = 100;
+
+    //Init rt connectivity worker
+    connect(m_pRtConnectivity.data(), &RtConnectivity::newConnectivityResultAvailable,
+            this, &NeuronalConnectivity::onNewConnectivityResultAvailable);
 }
 
 //=============================================================================================================
@@ -142,31 +145,38 @@ void NeuronalConnectivity::init()
     m_pRTCEOutput = PluginOutputData<RealTimeConnectivityEstimate>::create(this, "NeuronalConnectivityOut", "NeuronalConnectivity output data");
     m_outputConnectors.append(m_pRTCEOutput);
     m_pRTCEOutput->data()->setName(this->getName());
+}
+
+//=============================================================================================================
+
+void NeuronalConnectivity::initPluginControlWidgets()
+{
+    QList<QWidget*> plControlWidgets;
+
+    ConnectivitySettingsView* pConnectivitySettingsView = new ConnectivitySettingsView(this->getName());
+    pConnectivitySettingsView->setObjectName("group_tab_Settings_Connectivity");
 
     //Add control widgets to output data (will be used by QuickControlView by the measurements display)
-    connect(m_pConnectivitySettingsView.data(), &ConnectivitySettingsView::connectivityMetricChanged,
+    connect(pConnectivitySettingsView, &ConnectivitySettingsView::connectivityMetricChanged,
             this, &NeuronalConnectivity::onMetricChanged);
-    connect(m_pConnectivitySettingsView.data(), &ConnectivitySettingsView::numberTrialsChanged,
+    connect(pConnectivitySettingsView, &ConnectivitySettingsView::numberTrialsChanged,
             this, &NeuronalConnectivity::onNumberTrialsChanged);
-    connect(m_pConnectivitySettingsView.data(), &ConnectivitySettingsView::triggerTypeChanged,
+    connect(pConnectivitySettingsView, &ConnectivitySettingsView::triggerTypeChanged,
             this, &NeuronalConnectivity::onTriggerTypeChanged);
-    connect(m_pConnectivitySettingsView.data(), &ConnectivitySettingsView::freqBandChanged,
+    connect(pConnectivitySettingsView, &ConnectivitySettingsView::freqBandChanged,
             this, &NeuronalConnectivity::onFrequencyBandChanged);
+    connect(this, &NeuronalConnectivity::responsibleTriggerTypesChaged,
+            pConnectivitySettingsView, &ConnectivitySettingsView::setTriggerTypes);
 
-    onFrequencyBandChanged(m_pConnectivitySettingsView->getLowerFreq(), m_pConnectivitySettingsView->getUpperFreq());
-    onMetricChanged(m_pConnectivitySettingsView->getConnectivityMetric());
-    onWindowTypeChanged(m_pConnectivitySettingsView->getWindowType());
-    onNumberTrialsChanged(m_pConnectivitySettingsView->getNumberTrials());
-    onTriggerTypeChanged(m_pConnectivitySettingsView->getTriggerType());
+    plControlWidgets.append(pConnectivitySettingsView);
 
-    m_pRTCEOutput->data()->addControlWidget(m_pConnectivitySettingsView);
+    onFrequencyBandChanged(pConnectivitySettingsView->getLowerFreq(), pConnectivitySettingsView->getUpperFreq());
+    onMetricChanged(pConnectivitySettingsView->getConnectivityMetric());
+    onWindowTypeChanged(pConnectivitySettingsView->getWindowType());
+    onNumberTrialsChanged(pConnectivitySettingsView->getNumberTrials());
+    onTriggerTypeChanged(pConnectivitySettingsView->getTriggerType());
 
-    //Init rt connectivity worker
-    m_pRtConnectivity = RtConnectivity::SPtr::create();
-    connect(m_pRtConnectivity.data(), &RtConnectivity::newConnectivityResultAvailable,
-            this, &NeuronalConnectivity::onNewConnectivityResultAvailable);
-
-    m_pCircularNetworkBuffer = QSharedPointer<CircularBuffer<CONNECTIVITYLIB::Network> >(new CircularBuffer<CONNECTIVITYLIB::Network>(10));
+    emit pluginControlWidgetsChanged(plControlWidgets, this->getName());
 }
 
 //=============================================================================================================
@@ -178,13 +188,11 @@ void NeuronalConnectivity::unload()
 //=============================================================================================================
 
 bool NeuronalConnectivity::start()
-{
-//    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
-//    if(this->isRunning()) {
-//        QThread::wait();
-//    }
-
-    m_bIsRunning = true;
+{    
+    // Init circular buffer to transmit data from the producer to this thread
+    if(!m_pCircularBuffer) {
+        m_pCircularBuffer = CircularBuffer<CONNECTIVITYLIB::Network>::SPtr::create(10);
+    }
 
     //Start thread
     QThread::start();
@@ -196,7 +204,10 @@ bool NeuronalConnectivity::start()
 
 bool NeuronalConnectivity::stop()
 {
-    m_bIsRunning = false;
+    m_pRtConnectivity->restart();
+
+    requestInterruption();
+    wait();
 
     return true;
 }
@@ -227,9 +238,7 @@ QWidget* NeuronalConnectivity::setupWidget()
 
 void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    QSharedPointer<RealTimeSourceEstimate> pRTSE = pMeasurement.dynamicCast<RealTimeSourceEstimate>();
-
-    if(pRTSE) {
+    if(QSharedPointer<RealTimeSourceEstimate> pRTSE = pMeasurement.dynamicCast<RealTimeSourceEstimate>()) {
         //Fiff information
         if(!m_pFiffInfo) {
             m_pFiffInfo = pRTSE->getFiffInfo();
@@ -244,6 +253,8 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasuremen
 
             // Generate network nodes
             m_connectivitySettings.setNodePositions(*pRTSE->getFwdSolution(), *pRTSE->getSurfSet());
+
+            initPluginControlWidgets();
         }
 
         for(qint32 i = 0; i < pRTSE->getValue().size(); ++i) {
@@ -288,9 +299,7 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasuremen
 
 void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
-
-    if(pRTMSA) {
+    if(QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>()) {
         //Fiff information
         if(!m_pFiffInfo) {
             m_pFiffInfo = pRTMSA->info();
@@ -306,6 +315,8 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
             //Generate node vertices
             generateNodeVertices();
             m_iNumberBadChannels = m_pFiffInfo->bads.size();
+
+            initPluginControlWidgets();
         }
 
         if(m_pFiffInfo) {
@@ -356,15 +367,11 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
 
 void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    QSharedPointer<RealTimeEvokedSet> pRTEV = pMeasurement.dynamicCast<RealTimeEvokedSet>();
-
-    if(pRTEV) {
+    if(QSharedPointer<RealTimeEvokedSet> pRTEV = pMeasurement.dynamicCast<RealTimeEvokedSet>()) {
         FiffEvokedSet::SPtr pFiffEvokedSet = pRTEV->getValue();
         QStringList lResponsibleTriggerTypes = pRTEV->getResponsibleTriggerTypes();
 
-        if(m_pConnectivitySettingsView) {
-            m_pConnectivitySettingsView->setTriggerTypes(lResponsibleTriggerTypes);
-        }
+        emit responsibleTriggerTypesChaged(lResponsibleTriggerTypes);
 
         if(!pFiffEvokedSet || !lResponsibleTriggerTypes.contains(m_sAvrType)) {
             return;
@@ -393,6 +400,8 @@ void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
                     break;
                 }
             }
+
+            initPluginControlWidgets();
         }
 
         if(m_pFiffInfo) {
@@ -489,25 +498,25 @@ void NeuronalConnectivity::run()
     }    
 
     int skip_count = 0;
+    Network network;
 
-    while(m_bIsRunning) {
+    while(!isInterruptionRequested()) {
         //Do processing after skip count has reached limit
         if((skip_count % m_iDownSample) == 0) {
-            //QMutexLocker locker(&m_mutex);
-            //Do connectivity estimation here
-            m_currentConnectivityResult = m_pCircularNetworkBuffer->pop();
+            if(m_pCircularBuffer->pop(network)) {
+                //Send the data to the connected plugins and the online display
+                if(!network.isEmpty()) {
+                    //qDebug()<<"NeuronalConnectivity::run - Total time"<<m_timer.elapsed();
+                    m_mutex.lock();
+                    network.setFrequencyRange(m_fFreqBandLow, m_fFreqBandHigh);
+                    m_mutex.unlock();
+                    network.normalize();
 
-            //Send the data to the connected plugins and the online display
-            if(!m_currentConnectivityResult.isEmpty()) {
-                //qDebug()<<"NeuronalConnectivity::run - Total time"<<m_timer.elapsed();
-                m_currentConnectivityResult.setFrequencyRange(m_fFreqBandLow, m_fFreqBandHigh);
-                m_currentConnectivityResult.normalize();
-
-                m_pRTCEOutput->data()->setValue(m_currentConnectivityResult);
-            } else {
-                qDebug()<<"NeuronalConnectivity::run - Network is empty";
+                    m_pRTCEOutput->data()->setValue(network);
+                } else {
+                    qDebug()<<"NeuronalConnectivity::run - Network is empty";
+                }
             }
-
         }
 
         ++skip_count;
@@ -519,12 +528,11 @@ void NeuronalConnectivity::run()
 void NeuronalConnectivity::onNewConnectivityResultAvailable(const QList<Network>& connectivityResults,
                                                             const ConnectivitySettings& connectivitySettings)
 {
-    //QMutexLocker locker(&m_mutex);
     m_connectivitySettings = connectivitySettings;
     m_connectivitySettings.setConnectivityMethods(m_sConnectivityMethods);
 
     for(int i = 0; i < connectivityResults.size(); ++i) {
-        m_pCircularNetworkBuffer->push(connectivityResults.at(i));
+        m_pCircularBuffer->push(connectivityResults.at(i));
     }
 }
 
@@ -538,7 +546,7 @@ void NeuronalConnectivity::onMetricChanged(const QString& sMetric)
 
     m_sConnectivityMethods = QStringList() << sMetric;
     m_connectivitySettings.setConnectivityMethods(m_sConnectivityMethods);
-    if(m_pRtConnectivity && m_bIsRunning) {
+    if(m_pRtConnectivity && this->isRunning()) {
         m_pRtConnectivity->restart();
         m_pRtConnectivity->append(m_connectivitySettings);
     }
@@ -576,14 +584,16 @@ void NeuronalConnectivity::onTriggerTypeChanged(const QString& triggerType)
 void NeuronalConnectivity::onFrequencyBandChanged(float fFreqLow, float fFreqHigh)
 {
     // Convert to frequency bins
+    m_mutex.lock();
     m_fFreqBandLow = fFreqLow;
     m_fFreqBandHigh = fFreqHigh;
+    m_mutex.unlock();
 
-    //QMutexLocker locker(&m_mutex);
+    QMutexLocker locker(&m_mutex);
     if(!m_currentConnectivityResult.isEmpty()) {
         m_currentConnectivityResult.setFrequencyRange(m_fFreqBandLow, m_fFreqBandHigh);
         //m_currentConnectivityResult.normalize();
-        m_pCircularNetworkBuffer->push(m_currentConnectivityResult);
+        m_pCircularBuffer->push(m_currentConnectivityResult);
     }
 
     //qDebug() << "NeuronalConnectivity::onFrequencyBandChanged - m_fFreqBandLow" << m_fFreqBandLow;

@@ -68,4 +68,4 @@ SUBDIRS += \
     averaging \
     covariance \
     noisereduction \
-#    neuronalconnectivity \
+    neuronalconnectivity \
