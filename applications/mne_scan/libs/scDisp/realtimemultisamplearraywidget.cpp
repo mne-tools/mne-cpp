@@ -190,17 +190,6 @@ void RealTimeMultiSampleArrayWidget::init()
         //Init control widgets
         QList<QWidget*> lControlWidgets;
 
-        // Quick control scaling
-        ScalingView* pScalingView = new ScalingView(QString("RTMSAW/%1").arg(sRTMSAWName),
-                                                    m_pFiffInfo->chs);
-        pScalingView->setObjectName("group_Scaling");
-        lControlWidgets.append(pScalingView);
-
-        connect(pScalingView, &ScalingView::scalingChanged,
-                m_pChannelDataView.data(), &RtFiffRawView::setScalingMap);
-
-        m_pChannelDataView->setScalingMap(pScalingView->getScaleMap());
-
 //        // Quick control projectors
 //        ProjectorsView* pProjectorsView = new ProjectorsView(QString("RTMSAW/%1").arg(sRTMSAWName));
 //        pProjectorsView->setObjectName("group_tab_Noise_SSP");
@@ -297,6 +286,17 @@ void RealTimeMultiSampleArrayWidget::init()
                 pTriggerDetectionView, &TriggerDetectionView::setNumberDetectedTriggersAndTypes);
 
         pTriggerDetectionView->init(m_pFiffInfo);
+
+        // Quick control scaling
+        ScalingView* pScalingView = new ScalingView(QString("RTMSAW/%1").arg(sRTMSAWName),
+                                                    m_pFiffInfo->chs);
+        pScalingView->setObjectName("group_Scaling");
+        lControlWidgets.append(pScalingView);
+
+        connect(pScalingView, &ScalingView::scalingChanged,
+                m_pChannelDataView.data(), &RtFiffRawView::setScalingMap);
+
+        m_pChannelDataView->setScalingMap(pScalingView->getScaleMap());
 
         emit displayControlWidgetsChanged(lControlWidgets, sRTMSAWName);
 

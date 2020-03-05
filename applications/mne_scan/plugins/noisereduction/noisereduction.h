@@ -260,8 +260,6 @@ private:
 
     QSharedPointer<IOBUFFER::CircularBuffer_Matrix_double>          m_pCircularBuffer;      /**< Holds incoming raw data. */
 
-    QSharedPointer<SCMEASLIB::RealTimeMultiSampleArray>             m_pRTMSA;               /**< the incoming real time multi sample array object. */
-
     SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr      m_pNoiseReductionInput;      /**< The RealTimeMultiSampleArray of the NoiseReduction input.*/
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pNoiseReductionOutput;     /**< The RealTimeMultiSampleArray of the NoiseReduction output.*/
 
