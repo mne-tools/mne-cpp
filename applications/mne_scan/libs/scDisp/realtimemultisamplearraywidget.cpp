@@ -201,56 +201,56 @@ void RealTimeMultiSampleArrayWidget::init()
 
         m_pChannelDataView->setScalingMap(pScalingView->getScaleMap());
 
-        // Quick control projectors
-        ProjectorsView* pProjectorsView = new ProjectorsView(QString("RTMSAW/%1").arg(sRTMSAWName));
-        pProjectorsView->setObjectName("group_tab_Noise_SSP");
-        lControlWidgets.append(pProjectorsView);
+//        // Quick control projectors
+//        ProjectorsView* pProjectorsView = new ProjectorsView(QString("RTMSAW/%1").arg(sRTMSAWName));
+//        pProjectorsView->setObjectName("group_tab_Noise_SSP");
+//        lControlWidgets.append(pProjectorsView);
 
-        connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
-                m_pChannelDataView.data(), &RtFiffRawView::updateProjection);
+//        connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
+//                m_pChannelDataView.data(), &RtFiffRawView::updateProjection);
 
-        pProjectorsView->setProjectors(m_pFiffInfo->projs);
+//        pProjectorsView->setProjectors(m_pFiffInfo->projs);
 
-        // Quick control compensators
-        CompensatorView* pCompensatorView = new CompensatorView(QString("RTMSAW/%1").arg(sRTMSAWName));
-        pCompensatorView->setObjectName("group_tab_Noise_Comp");
-        lControlWidgets.append(pCompensatorView);
+//        // Quick control compensators
+//        CompensatorView* pCompensatorView = new CompensatorView(QString("RTMSAW/%1").arg(sRTMSAWName));
+//        pCompensatorView->setObjectName("group_tab_Noise_Comp");
+//        lControlWidgets.append(pCompensatorView);
 
-        connect(pCompensatorView, &CompensatorView::compSelectionChanged,
-                m_pChannelDataView.data(), &RtFiffRawView::updateCompensator);
+//        connect(pCompensatorView, &CompensatorView::compSelectionChanged,
+//                m_pChannelDataView.data(), &RtFiffRawView::updateCompensator);
 
-        pCompensatorView->setCompensators(m_pFiffInfo->comps);
+//        pCompensatorView->setCompensators(m_pFiffInfo->comps);
 
-        // Quick control filter
-        FilterSettingsView* pFilterSettingsView = new FilterSettingsView(QString("RTMSAW/%1").arg(sRTMSAWName));
-        pFilterSettingsView->setObjectName("group_tab_Noise_Filter");
-        lControlWidgets.append(pFilterSettingsView);
+//        // Quick control filter
+//        FilterSettingsView* pFilterSettingsView = new FilterSettingsView(QString("RTMSAW/%1").arg(sRTMSAWName));
+//        pFilterSettingsView->setObjectName("group_tab_Noise_Filter");
+//        lControlWidgets.append(pFilterSettingsView);
 
-        connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChannelTypeChanged,
-                m_pChannelDataView.data(), &RtFiffRawView::setFilterChannelType);
+//        connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChannelTypeChanged,
+//                m_pChannelDataView.data(), &RtFiffRawView::setFilterChannelType);
 
-        connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChanged,
-                m_pChannelDataView.data(), &RtFiffRawView::setFilter);
+//        connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChanged,
+//                m_pChannelDataView.data(), &RtFiffRawView::setFilter);
 
-        connect(pFilterSettingsView, &FilterSettingsView::filterActivationChanged,
-                m_pChannelDataView.data(), &RtFiffRawView::setFilterActive);
+//        connect(pFilterSettingsView, &FilterSettingsView::filterActivationChanged,
+//                m_pChannelDataView.data(), &RtFiffRawView::setFilterActive);
 
-        m_pChannelDataView->setFilterActive(pFilterSettingsView->getFilterActive());
-        m_pChannelDataView->setFilterChannelType(pFilterSettingsView->getFilterView()->getChannelType());
-        pFilterSettingsView->getFilterView()->setWindowSize(m_iMaxFilterTapSize);
-        pFilterSettingsView->getFilterView()->setMaxFilterTaps(m_iMaxFilterTapSize);
-        pFilterSettingsView->getFilterView()->init(m_pFiffInfo->sfreq);
+//        m_pChannelDataView->setFilterActive(pFilterSettingsView->getFilterActive());
+//        m_pChannelDataView->setFilterChannelType(pFilterSettingsView->getFilterView()->getChannelType());
+//        pFilterSettingsView->getFilterView()->setWindowSize(m_iMaxFilterTapSize);
+//        pFilterSettingsView->getFilterView()->setMaxFilterTaps(m_iMaxFilterTapSize);
+//        pFilterSettingsView->getFilterView()->init(m_pFiffInfo->sfreq);
 
-        // Quick control SPHARA settings
-        SpharaSettingsView* pSpharaSettingsView = new SpharaSettingsView();
-        pSpharaSettingsView->setObjectName("group_tab_Noise_SPHARA");
-        lControlWidgets.append(pSpharaSettingsView);
+//        // Quick control SPHARA settings
+//        SpharaSettingsView* pSpharaSettingsView = new SpharaSettingsView();
+//        pSpharaSettingsView->setObjectName("group_tab_Noise_SPHARA");
+//        lControlWidgets.append(pSpharaSettingsView);
 
-        connect(pSpharaSettingsView, &SpharaSettingsView::spharaActivationChanged,
-                m_pChannelDataView.data(), &RtFiffRawView::updateSpharaActivation);
+//        connect(pSpharaSettingsView, &SpharaSettingsView::spharaActivationChanged,
+//                m_pChannelDataView.data(), &RtFiffRawView::updateSpharaActivation);
 
-        connect(pSpharaSettingsView, &SpharaSettingsView::spharaOptionsChanged,
-                m_pChannelDataView.data(), &RtFiffRawView::updateSpharaOptions);
+//        connect(pSpharaSettingsView, &SpharaSettingsView::spharaOptionsChanged,
+//                m_pChannelDataView.data(), &RtFiffRawView::updateSpharaOptions);
 
         // Quick control channel data settings
         FiffRawViewSettings* pChannelDataSettingsView = new FiffRawViewSettings(QString("RTMSAW/%1").arg(sRTMSAWName));
@@ -298,7 +298,7 @@ void RealTimeMultiSampleArrayWidget::init()
 
         pTriggerDetectionView->init(m_pFiffInfo);
 
-        emit pluginControlWidgetsChanged(lControlWidgets, sRTMSAWName);
+        emit displayControlWidgetsChanged(lControlWidgets, sRTMSAWName);
 
         //Initialized
         m_bInitialized = true;

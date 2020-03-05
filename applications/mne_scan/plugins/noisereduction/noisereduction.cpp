@@ -133,6 +133,7 @@ void NoiseReduction::init()
 
     // Output
     m_pNoiseReductionOutput = PluginOutputData<RealTimeMultiSampleArray>::create(this, "NoiseReductionOut", "NoiseReduction output data");
+    m_pNoiseReductionOutput->data()->setName(this->getName());//Provide name to auto store widget settings
     m_outputConnectors.append(m_pNoiseReductionOutput);
 }
 
@@ -237,8 +238,7 @@ void NoiseReduction::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 
             MatrixXd matData;
             for(unsigned char i = 0; i < m_pRTMSA->getMultiSampleArray().size(); ++i) {
-                matData = m_pRTMSA->getMultiSampleArray()[i];
-                m_pNoiseReductionBuffer->push(&matData);
+                m_pNoiseReductionBuffer->push(&m_pRTMSA->getMultiSampleArray()[i]);
             }
         }
     }
@@ -252,24 +252,24 @@ void NoiseReduction::initPluginControlWidgets()
         QList<QWidget*> plControlWidgets;
 
         // Projectors
-        ProjectorsView* pProjectorsView = new ProjectorsView(QString("Plugin/%1/").arg(this->getName()));
-        pProjectorsView->setObjectName("group_tab_Noise_SSP");
+        ProjectorsView* pProjectorsView = new ProjectorsView(QString("MNESCAN/%1/").arg(this->getName()));
+        pProjectorsView->setObjectName("group_tab_Noise Reduction_SSP");
         plControlWidgets.append(pProjectorsView);
 
         connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
                 this, &NoiseReduction::updateProjection);
 
         // Compensators
-        CompensatorView* pCompensatorView = new CompensatorView(QString("Plugin/%1/").arg(this->getName()));
-        pCompensatorView->setObjectName("group_tab_Noise_Comp");
+        CompensatorView* pCompensatorView = new CompensatorView(QString("MNESCAN/%1/").arg(this->getName()));
+        pCompensatorView->setObjectName("group_tab_Noise Reduction_Comp");
         plControlWidgets.append(pCompensatorView);
 
         connect(pCompensatorView, &CompensatorView::compSelectionChanged,
                this, &NoiseReduction::updateCompensator);
 
         // Filter
-        FilterSettingsView* pFilterSettingsView = new FilterSettingsView(QString("Plugin/%1/").arg(this->getName()));
-        pFilterSettingsView->setObjectName("group_tab_Noise_Filter");
+        FilterSettingsView* pFilterSettingsView = new FilterSettingsView(QString("MNESCAN/%1/").arg(this->getName()));
+        pFilterSettingsView->setObjectName("group_tab_Noise Reduction_Filter");
         plControlWidgets.append(pFilterSettingsView);
 
         connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChannelTypeChanged,
@@ -285,7 +285,7 @@ void NoiseReduction::initPluginControlWidgets()
 
         // SPHARA settings
         SpharaSettingsView* pSpharaSettingsView = new SpharaSettingsView();
-        pSpharaSettingsView->setObjectName("group_tab_Noise_SPHARA");
+        pSpharaSettingsView->setObjectName("group_tab_Noise Reduction_SPHARA");
         plControlWidgets.append(pSpharaSettingsView);
 
         connect(pSpharaSettingsView, &SpharaSettingsView::spharaActivationChanged,

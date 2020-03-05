@@ -110,21 +110,21 @@ void QuickControlView::clear()
 
 //=============================================================================================================
 
-QGridLayout* QuickControlView::findTabWidgetLayout(const QString& sTabName)
+QVBoxLayout* QuickControlView::findTabWidgetLayout(const QString& sTabName)
 {
-    QGridLayout* pTabWidgetLayout = Q_NULLPTR;
+    QVBoxLayout* pTabWidgetLayout = Q_NULLPTR;
 
     if(QWidget* pTabWidget = ui->m_pTabWidget->findChild<QWidget *>(sTabName + "TabWidget")) {
         // Tab widget already exisits. Get the grid layout and return it.
-        pTabWidgetLayout = qobject_cast<QGridLayout *>(pTabWidget->layout());
+        pTabWidgetLayout = qobject_cast<QVBoxLayout *>(pTabWidget->layout());
     } else {
         // Tab widget does not exist yet. Create it and return grid lyout.
         pTabWidget = new QWidget();
         pTabWidget->setObjectName(sTabName + "TabWidget");
-        pTabWidgetLayout = new QGridLayout();
+        pTabWidgetLayout = new QVBoxLayout();
         pTabWidgetLayout->setContentsMargins(4,2,4,4);
         pTabWidget->setLayout(pTabWidgetLayout);
-        ui->m_pTabWidget->addTab(pTabWidget, sTabName);
+        ui->m_pTabWidget->insertTab(0,pTabWidget, sTabName);
     }
 
     return pTabWidgetLayout;
@@ -133,13 +133,14 @@ QGridLayout* QuickControlView::findTabWidgetLayout(const QString& sTabName)
 //=============================================================================================================
 
 void QuickControlView::addWidgets(const QList<QWidget*>& lWidgets,
-                                  const QString& sTabName)
+                                  const QString& sTabName,
+                                  bool bAddToEnd)
 {
     for(int i = 0; i < lWidgets.size(); ++i) {
         QString sObjectName = lWidgets.at(i)->objectName();
 
         if(sObjectName.contains("widget_", Qt::CaseInsensitive)) {
-            this->addWidget(lWidgets.at(i), sTabName);
+            this->addWidget(lWidgets.at(i), sTabName, bAddToEnd);
         }
 
         if(sObjectName.contains("group_", Qt::CaseInsensitive)) {
@@ -148,13 +149,13 @@ void QuickControlView::addWidgets(const QList<QWidget*>& lWidgets,
                 QStringList sList = sObjectName.split("_");
 
                 if(sList.size() >= 2) {
-                    this->addGroupBoxWithTabs(lWidgets.at(i), sList.at(0), sList.at(1), sTabName);
+                    this->addGroupBoxWithTabs(lWidgets.at(i), sList.at(0), sList.at(1), sTabName, bAddToEnd);
                 } else {
-                    this->addGroupBoxWithTabs(lWidgets.at(i), "", sObjectName, sTabName);
+                    this->addGroupBoxWithTabs(lWidgets.at(i), "", sObjectName, sTabName, bAddToEnd);
                 }
             } else {
                 sObjectName.remove("group_");
-                this->addGroupBox(lWidgets.at(i), sObjectName, sTabName);
+                this->addGroupBox(lWidgets.at(i), sObjectName, sTabName, bAddToEnd);
             }
         }
     }
@@ -163,12 +164,14 @@ void QuickControlView::addWidgets(const QList<QWidget*>& lWidgets,
 //=============================================================================================================
 
 void QuickControlView::addWidget(QWidget* pWidget,
-                                 const QString& sTabName)
+                                 const QString& sTabName,
+                                 bool bAddToEnd)
 {    
-    if(QGridLayout* pTabWidgetLayout = findTabWidgetLayout(sTabName)) {
-        pTabWidgetLayout->addWidget(pWidget,
-                                    pTabWidgetLayout->rowCount(),
-                                    0);
+    if(QVBoxLayout* pTabWidgetLayout = findTabWidgetLayout(sTabName)) {
+        int iPos = bAddToEnd ? -1 : 0;
+        pTabWidgetLayout->insertWidget(iPos,
+                                       pWidget,
+                                       0);
     }
 }
 
@@ -176,9 +179,11 @@ void QuickControlView::addWidget(QWidget* pWidget,
 
 void QuickControlView::addGroupBox(QWidget* pWidget,
                                    const QString& sGroupBoxName,
-                                   const QString& sTabName)
+                                   const QString& sTabName,
+                                   bool bAddToEnd)
 {    
-    if(QGridLayout* pTabWidgetLayout = findTabWidgetLayout(sTabName)) {
+    if(QVBoxLayout* pTabWidgetLayout = findTabWidgetLayout(sTabName)) {
+        int iPos = bAddToEnd ? -1 : 0;
         QGroupBox* pGroupBox = new QGroupBox(sGroupBoxName);
         pGroupBox->setObjectName(sGroupBoxName);
 
@@ -188,9 +193,9 @@ void QuickControlView::addGroupBox(QWidget* pWidget,
         pVBox->addWidget(pWidget);
         pGroupBox->setLayout(pVBox);
 
-        pTabWidgetLayout->addWidget(pGroupBox,
-                                    pTabWidgetLayout->rowCount(),
-                                    0);
+        pTabWidgetLayout->insertWidget(iPos,
+                                       pGroupBox,
+                                       0);
     }
 }
 
@@ -199,18 +204,20 @@ void QuickControlView::addGroupBox(QWidget* pWidget,
 void QuickControlView::addGroupBoxWithTabs(QWidget* pWidget,
                                            const QString& sGroupBoxName,
                                            const QString& sTabNameGroupBox,
-                                           const QString& sTabName)
+                                           const QString& sTabName,
+                                           bool bAddToEnd)
 {
-    if(QGridLayout* pTabWidgetLayout = findTabWidgetLayout(sTabName)) {
+    if(QVBoxLayout* pTabWidgetLayout = findTabWidgetLayout(sTabName)) {
         QGroupBox* pGroupBox = pTabWidgetLayout->parentWidget()->findChild<QGroupBox *>(sGroupBoxName);
 
         if(!pGroupBox) {
+            int iPos = bAddToEnd ? -1 : 0;
             pGroupBox = new QGroupBox(sGroupBoxName);
             pGroupBox->setObjectName(sGroupBoxName);
 
-            pTabWidgetLayout->addWidget(pGroupBox,
-                                        pTabWidgetLayout->rowCount(),
-                                        0);
+            pTabWidgetLayout->insertWidget(iPos,
+                                           pGroupBox,
+                                           0);
 
             QVBoxLayout *pVBox = new QVBoxLayout;
             QTabWidget* pTabWidget = new QTabWidget;
