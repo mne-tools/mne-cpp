@@ -50,6 +50,7 @@
 
 #include <utils/ioutils.h>
 #include <utils/generics/applicationlogger.h>
+#include <utils/mnemath.h>
 
 #include <disp3D/viewers/hpiview.h>
 
@@ -308,9 +309,9 @@ int main(int argc, char *argv[])
         qInfo() << "The HPI-Fit took" << timer.elapsed() << "milliseconds";
         qInfo() << "[done]";
 
-        storeHeadPosition(time(i), pFiffInfo->dev_head_t.trans, position, vGoF, vError);
+        HPIFit::storeHeadPosition(time(i), pFiffInfo->dev_head_t.trans, position, vGoF, vError);
 
-        if(compareTransformation(devHeadTrans.trans, pFiffInfo->dev_head_t.trans, threshRot, threshTrans)) {
+        if(UTILSLIB::MNEMath::compareTransformation(devHeadTrans.trans, pFiffInfo->dev_head_t.trans, threshRot, threshTrans)) {
             qInfo() << "Big head displacement: dev_head_t has been updated";
         }
 
