@@ -93,7 +93,7 @@ SOURCES += \
     realtimecovwidget.cpp \
     realtimespectrumwidget.cpp \
     realtimesourceestimatewidget.cpp \
-    realtimeconnectivityestimatewidget.cpp \
+    realtime3dwidget.cpp \
 
 HEADERS += \
     scdisp_global.h \
@@ -103,7 +103,7 @@ HEADERS += \
     realtimecovwidget.h \
     realtimespectrumwidget.h \
     realtimesourceestimatewidget.h \
-    realtimeconnectivityestimatewidget.h \
+    realtime3dwidget.h \
 
 FORMS += \
 

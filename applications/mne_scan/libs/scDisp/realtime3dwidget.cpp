@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     realtimeconnectivityestimatewidget.cpp
+ * @file     realtime3dwidget.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>
  * @version  dev
  * @date     October, 2016
@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the RealTimeConnectivityEstimateWidget Class.
+ * @brief    Definition of the RealTime3DWidget Class.
  *
  */
 
@@ -36,7 +36,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "realtimeconnectivityestimatewidget.h"
+#include "realtime3dwidget.h"
 
 #include <scMeas/realtimeconnectivityestimate.h>
 
@@ -71,7 +71,7 @@ using namespace CONNECTIVITYLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeConnectivityEstimateWidget::RealTimeConnectivityEstimateWidget(QWidget* parent)
+RealTime3DWidget::RealTime3DWidget(QWidget* parent)
 : MeasurementWidget(parent)
 , m_bInitialized(false)
 , m_pRtItem(Q_NULLPTR)
@@ -86,7 +86,7 @@ RealTimeConnectivityEstimateWidget::RealTimeConnectivityEstimateWidget(QWidget* 
 
 //=============================================================================================================
 
-RealTimeConnectivityEstimateWidget::~RealTimeConnectivityEstimateWidget()
+RealTime3DWidget::~RealTime3DWidget()
 {
     // Store Settings
     if(!m_pRTCE->getName().isEmpty()) {
@@ -95,7 +95,7 @@ RealTimeConnectivityEstimateWidget::~RealTimeConnectivityEstimateWidget()
 
 //=============================================================================================================
 
-void RealTimeConnectivityEstimateWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
+void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
     if(m_pRTCE = qSharedPointerDynamicCast<RealTimeConnectivityEstimate>(pMeasurement)) {
         if(m_pRTCE->getValue().data()->isEmpty()) {
@@ -104,7 +104,7 @@ void RealTimeConnectivityEstimateWidget::update(SCMEASLIB::Measurement::SPtr pMe
 
         // Add rt brain data
         if(!m_pRtItem) {
-            //qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Creating m_pRtItem";
+            //qDebug()<<"RealTime3DWidget::getData - Creating m_pRtItem";
             m_pRtItem = m_pAbstractView->getTreeModel()->addConnectivityData("sample",
                                                                              "Connectivity",
                                                                              *(m_pRTCE->getValue().data()));
@@ -131,7 +131,7 @@ void RealTimeConnectivityEstimateWidget::update(SCMEASLIB::Measurement::SPtr pMe
                 m_iNumberBadChannels = m_pRTCE->getFiffInfo()->bads.size();
             }
         } else {
-            //qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Working with m_pRtItem";
+            //qDebug()<<"RealTime3DWidget::getData - Working with m_pRtItem";
             QPair<float,float> freqs = m_pRTCE->getValue()->getFrequencyRange();
             QString sItemName = QString("%1_%2_%3").arg(m_pRTCE->getValue()->getConnectivityMethod()).arg(QString::number(freqs.first)).arg(QString::number(freqs.second));
             m_pRtItem->setText(sItemName);
@@ -153,7 +153,7 @@ void RealTimeConnectivityEstimateWidget::update(SCMEASLIB::Measurement::SPtr pMe
 
 //=============================================================================================================
 
-void RealTimeConnectivityEstimateWidget::init()
+void RealTime3DWidget::init()
 {
     m_bInitialized = true;
 }

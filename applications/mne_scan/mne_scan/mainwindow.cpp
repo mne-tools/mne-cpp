@@ -519,7 +519,6 @@ void MainWindow::updatePluginSetupWidget(SCSHAREDLIB::IPlugin::SPtr pPlugin)
 {
     m_qListDynamicPluginActions.clear();
     m_qListDynamicDisplayActions.clear();
-    m_qListDynamicControlWidgets.clear();
 
     if(!pPlugin.isNull()) {
         // Add Dynamic Plugin Actions
@@ -546,8 +545,6 @@ void MainWindow::initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::IPlugin> 
     for(int i = 0; i < lPlugins.size(); ++i) {
         m_qListDynamicPluginActions.clear();
         m_qListDynamicDisplayActions.clear();
-        m_qListDynamicControlWidgets.clear();
-
         if(!lPlugins.at(i).isNull()) {
             // Add Dynamic Plugin Actions
             m_qListDynamicPluginActions.append(lPlugins.at(i)->getPluginActions());
@@ -566,8 +563,7 @@ void MainWindow::initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::IPlugin> 
 
                     if(QWidget* pWidget = m_pDisplayManager->show(lPlugins.at(i)->getOutputConnectors(),
                                                                   m_pTime,
-                                                                  m_qListDynamicDisplayActions,
-                                                                  m_qListDynamicControlWidgets)) {
+                                                                  m_qListDynamicDisplayActions)) {
                         for (int i = 0; i < pWidget->layout()->count(); ++i) {
                             if(MeasurementWidget* pMeasWidget = qobject_cast<MeasurementWidget *>(pWidget->layout()->itemAt(i)->widget())) {
                                 connect(pMeasWidget, &MeasurementWidget::displayControlWidgetsChanged,
