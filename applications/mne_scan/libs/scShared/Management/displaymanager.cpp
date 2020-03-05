@@ -97,10 +97,8 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
 
     qListActions.clear();
 
-    foreach (QSharedPointer< PluginOutputConnector > pPluginOutputConnector, outputConnectorList)
-    {
-        if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeMultiSampleArray> >())
-        {
+    foreach (QSharedPointer< PluginOutputConnector > pPluginOutputConnector, outputConnectorList) {
+        if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeMultiSampleArray> >()) {
             RealTimeMultiSampleArrayWidget* rtmsaWidget = new RealTimeMultiSampleArrayWidget(pT, newDisp);
 
             qListActions.append(rtmsaWidget->getDisplayActions());
@@ -112,23 +110,18 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
 
             vboxLayout->addWidget(rtmsaWidget);
             rtmsaWidget->init();
-        }
-//        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSourceEstimate> >())
-//        {
-//            QSharedPointer<RealTimeSourceEstimate>* pRealTimeSourceEstimate = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSourceEstimate> >()->data();
-//            RealTimeSourceEstimateWidget* rtseWidget = new RealTimeSourceEstimateWidget(*pRealTimeSourceEstimate, newDisp);//new RealTimeSourceEstimateWidget(*pRealTimeSourceEstimate, pT, newDisp);
+        } else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSourceEstimate> >()) {
+            QSharedPointer<RealTimeSourceEstimate>* pRealTimeSourceEstimate = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSourceEstimate> >()->data();
+            RealTimeSourceEstimateWidget* rtseWidget = new RealTimeSourceEstimateWidget(*pRealTimeSourceEstimate, newDisp);//new RealTimeSourceEstimateWidget(*pRealTimeSourceEstimate, pT, newDisp);
 
-//            qListActions.append(rtseWidget->getDisplayActions());
-//            qListControlWidgets.append(rtseWidget->getPluginControlWidgets());
+            qListActions.append(rtseWidget->getDisplayActions());
 
-//            connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
-//                    rtseWidget, &RealTimeSourceEstimateWidget::update, Qt::BlockingQueuedConnection);
+            connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
+                    rtseWidget, &RealTimeSourceEstimateWidget::update, Qt::BlockingQueuedConnection);
 
-//            vboxLayout->addWidget(rtseWidget);
-//            rtseWidget->init();
-//        }
-        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeConnectivityEstimate> >())
-        {
+            vboxLayout->addWidget(rtseWidget);
+            rtseWidget->init();
+        } else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeConnectivityEstimate> >()) {
             if(!m_pRealTime3DWidget) {
                 m_pRealTime3DWidget = new RealTime3DWidget(newDisp);//new RealTime3DWidget(*pRealTimeConnectivityEstimate, pT, newDisp);
                 vboxLayout->addWidget(m_pRealTime3DWidget);

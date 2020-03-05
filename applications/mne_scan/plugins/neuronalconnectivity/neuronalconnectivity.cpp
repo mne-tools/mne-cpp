@@ -278,6 +278,8 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasuremen
                 }
             }
 
+            // No copy necessary since we do a deep copy in connectivity settings before the measurement
+            // overwrites the matrix
             m_connectivitySettings.append(pRTSE->getValue()[i]->data.block(0,
                                                                            iZeroIdx,
                                                                            pRTSE->getValue()[i]->data.rows(),
