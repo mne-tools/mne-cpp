@@ -44,7 +44,7 @@
 
 #include <scShared/Interfaces/IAlgorithm.h>
 
-#include <utils/generics/circularmatrixbuffer.h>
+#include <utils/generics/circularbuffer.h>
 
 #include <fiff/fiff_evoked.h>
 
@@ -141,6 +141,13 @@ public:
      */
     virtual QSharedPointer<SCSHAREDLIB::IPlugin> clone() const;
     virtual void init();
+
+    //=========================================================================================================
+    /**
+     * Inits widgets which are used to control this plugin, then emits them in form of a QList.
+     */
+    virtual void initPluginControlWidgets();
+
     virtual void unload();
     virtual bool start();
     virtual bool stop();
@@ -225,7 +232,8 @@ protected:
     QSharedPointer<SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeEvokedSet> >             m_pRTESInput;               /**< The RealTimeEvoked input.*/
     QSharedPointer<SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeCov> >                   m_pRTCInput;                /**< The RealTimeCov input.*/
     QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeSourceEstimate> >       m_pRTSEOutput;              /**< The RealTimeSourceEstimate output.*/
-    QSharedPointer<IOBUFFER::CircularMatrixBuffer<double> >                                 m_pMatrixDataBuffer;        /**< Holds incoming RealTimeMultiSampleArray data.*/
+    QSharedPointer<IOBUFFER::CircularBuffer_Matrix_double >                                 m_pCircularMatrixBuffer;    /**< Holds incoming RealTimeMultiSampleArray data.*/
+    QSharedPointer<IOBUFFER::CircularBuffer<FIFFLIB::FiffEvoked> >                          m_pCircularEvokedBuffer;    /**< Holds incoming RealTimeMultiSampleArray data.*/
     QSharedPointer<INVERSELIB::MinimumNorm>                                                 m_pMinimumNorm;             /**< Minimum Norm Estimation. */
     QSharedPointer<RTPROCESSINGLIB::RtInvOp>                                                m_pRtInvOp;                 /**< Real-time inverse operator. */
     QSharedPointer<MNELIB::MNEForwardSolution>                                              m_pFwd;                     /**< Forward solution. */
@@ -236,20 +244,15 @@ protected:
     QSharedPointer<FIFFLIB::FiffInfo>                                                       m_pFiffInfo;                /**< Fiff information. */
     QSharedPointer<FIFFLIB::FiffInfo>                                                       m_pFiffInfoInput;           /**< Fiff information of the evoked. */
 
-    QSharedPointer<DISPLIB::MinimumNormSettingsView>                                        m_pMinimumNormSettingsView; /**< The minimum norm settings widget which will be added to the Quick Control view. The QuickControlView will not take ownership. Ownership will be managed by the QSharedPointer.*/
-
     QMutex                          m_qMutex;                   /**< The mutex ensuring thread safety. */
     QFuture<void>                   m_future;                   /**< The future monitoring the clustering. */
 
-    QVector<FIFFLIB::FiffEvoked>    m_qVecFiffEvoked;           /**< The list of stored averages. */
     FIFFLIB::FiffEvoked             m_currentEvoked;
 
     qint32                          m_iNumAverages;             /**< The number of trials/averages to store. */
     qint32                          m_iDownSample;              /**< Down sample factor. */
     qint32                          m_iTimePointSps;            /**< The time point to pick from the data in samples. */
 
-    bool                            m_bIsRunning;               /**< If source lab is running. */
-    bool                            m_bReceiveData;             /**< If thread is ready to receive data. */
     bool                            m_bProcessData;             /**< If data should be received for processing. */
     bool                            m_bFinishedClustering;      /**< If clustered forward solution is available. */
 
@@ -266,6 +269,8 @@ protected:
     MNELIB::MNEInverseOperator      m_invOp;                    /**< The inverse operator. */
 
 signals:
+    void responsibleTriggerTypesChanged(const QStringList& lResponsibleTriggerTypes);
+
     //=========================================================================================================
     /**
      * Signal when clustering is started

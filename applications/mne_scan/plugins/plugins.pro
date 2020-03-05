@@ -64,7 +64,7 @@ contains(MNECPP_CONFIG, withLsl) {
 #Algorithms
 SUBDIRS += \
 #    dummytoolbox \
-#    rtcmne \
+    rtcmne \
     averaging \
     covariance \
     noisereduction \

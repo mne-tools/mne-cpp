@@ -76,7 +76,7 @@ QuickControlView::QuickControlView(const QString &sSettingsPath,
     ui->m_pTabWidget->setMovable(true);
     this->setWindowTitle("Quick Control");
 
-    if(windowFlags() & Qt::CustomizeWindowHint) {
+    if(windowFlags() | Qt::CustomizeWindowHint) {
         ui->m_pushButton_close->hide();
     }
 
