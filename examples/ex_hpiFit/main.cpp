@@ -89,18 +89,17 @@ using namespace Eigen;
  * ToDo: get correct GoF; vGof that is passed to fitHPI does not represent the actual GoF
  *
  */
-void writePos(const float time, QSharedPointer<FiffInfo> pFiffInfo, MatrixXd& position, const QVector<double>& vGoF)
+void writePos(const float time, FiffCoordTrans& dev_head_t, MatrixXd& position, const QVector<double>& vGoF)
 {
     // Write quaternions and time in position matrix. Format is the same like MaxFilter's .pos files.
     QMatrix3x3 rot;
 
     for(int ir = 0; ir < 3; ir++) {
         for(int ic = 0; ic < 3; ic++) {
-            rot(ir,ic) = pFiffInfo->dev_head_t.trans(ir,ic);
+            rot(ir,ic) = dev_head_t.trans(ir,ic);
         }
     }    
-
-    // double error = std::accumulate(vGoF.begin(), vGoF.end(), .0) / vGoF.size();
+    double error = std::accumulate(vGoF.begin(), vGoF.end(), .0) / vGoF.size();     // HPI estimation Error
     QQuaternion quatHPI = QQuaternion::fromRotationMatrix(rot);
 
     //qDebug() << "quatHPI.x() " << "quatHPI.y() " << "quatHPI.y() " << "trans x " << "trans y " << "trans z " << std::endl;
@@ -111,11 +110,11 @@ void writePos(const float time, QSharedPointer<FiffInfo> pFiffInfo, MatrixXd& po
     position(position.rows()-1,1) = quatHPI.x();
     position(position.rows()-1,2) = quatHPI.y();
     position(position.rows()-1,3) = quatHPI.z();
-    position(position.rows()-1,4) = pFiffInfo->dev_head_t.trans(0,3);
-    position(position.rows()-1,5) = pFiffInfo->dev_head_t.trans(1,3);
-    position(position.rows()-1,6) = pFiffInfo->dev_head_t.trans(2,3);
+    position(position.rows()-1,4) = dev_head_t.trans(0,3);
+    position(position.rows()-1,5) = dev_head_t.trans(1,3);
+    position(position.rows()-1,6) = dev_head_t.trans(2,3);
     position(position.rows()-1,7) = 0;
-    position(position.rows()-1,8) = 0;
+    position(position.rows()-1,8) = error;
     position(position.rows()-1,9) = 0;
 }
 
@@ -131,7 +130,7 @@ void writePos(const float time, QSharedPointer<FiffInfo> pFiffInfo, MatrixXd& po
  * @param[out] state            The status that shows if devHead is updated or not
  *
  */
-bool compareResults(FiffCoordTrans& devHeadT, const FiffCoordTrans& devHeadTNew,const float& treshRot,const float& threshTrans, MatrixXd& result)
+bool compareResults(FiffCoordTrans& devHeadT, const FiffCoordTrans& devHeadTNew,const float& treshRot,const float& threshTrans)
 {
     bool state = false;
     QMatrix3x3 rot;
@@ -154,6 +153,7 @@ bool compareResults(FiffCoordTrans& devHeadT, const FiffCoordTrans& devHeadTNew,
     QQuaternion quatCompare;
     float angle;
     QVector3D axis;
+
     // get rotation between both transformations by multiplying with the inverted quaternion
     quatCompare = quat*quatNew.inverted();
     quatCompare.getAxisAndAngle(&axis,&angle);
@@ -169,28 +169,17 @@ bool compareResults(FiffCoordTrans& devHeadT, const FiffCoordTrans& devHeadTNew,
         devHeadT = devHeadTNew;
         qInfo() << "dev_head_t has been updatet";
         state = true;
+
     } else if (angle > treshRot) {
         qInfo() << "Large rotation: " << angle << "°";
         devHeadT = devHeadTNew;
         qInfo() << "dev_head_t has been updatet";
         state = true;
+
     } else {
         state = false;
     }
 
-    // write results for debug purpose - quaternions are quatCompare
-    result.conservativeResize(result.rows()+1, 10);
-    result.conservativeResize(result.rows()+1, 10);
-    result(result.rows()-1,0) = 0;
-    result(result.rows()-1,1) = quatCompare.x();
-    result(result.rows()-1,2) = quatCompare.y();
-    result(result.rows()-1,3) = quatCompare.z();
-    result(result.rows()-1,4) = (trans-transNew).x();
-    result(result.rows()-1,5) = (trans-transNew).y();
-    result(result.rows()-1,6) = (trans-transNew).z();
-    result(result.rows()-1,7) = angle;
-    result(result.rows()-1,8) = move;
-    result(result.rows()-1,9) = 0;
     return state;
 }
 
@@ -230,7 +219,11 @@ int main(int argc, char *argv[])
 
     FiffRawData raw(t_fileIn);
     QSharedPointer<FiffInfo> pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(raw.info));
-    FiffCoordTrans devHeadTrans = pFiffInfo->dev_head_t;
+
+    // Setup comparison of transformation matrices
+    FiffCoordTrans devHeadTrans = pFiffInfo->dev_head_t;    // transformation that only updates after big head movements
+    float threshRot = 5;           // in degree
+    float threshTrans = 0.005;    // in m
 
     // Set up the reading parameters
     RowVectorXi picks = pFiffInfo->pick_types(true, false, false);
@@ -252,17 +245,13 @@ int main(int argc, char *argv[])
 //    RowVectorXf time = RowVectorXf::LinSpaced(N, 0, N-1) * dT_sec;
 
     // To fit at specific times outcommend the following block
-//    // Read Quaternion File
+    // Read Quaternion File
     MatrixXd pos;
     qInfo() << "Specify the path to your position file (.txt)";
-    UTILSLIB::IOUtils::read_eigen_matrix(pos, QCoreApplication::applicationDirPath() + "/MNE-sample-data/chpi/pos/sim_move_y_chpi_pos.txt");
+    UTILSLIB::IOUtils::read_eigen_matrix(pos, QCoreApplication::applicationDirPath() + "/MNE-sample-data/chpi/pos/posSim_move_y_chpi.txt");
     RowVectorXd time = pos.col(0);
 
     MatrixXd position;              // Position matrix to save quaternions etc.
-    MatrixXd result;
-
-    float threshRot = 5;           // in degree
-    float threshTrans = 0.005;    // in m
 
     // setup informations for HPI fit (VectorView)
     QVector<int> vFreqs {166,154,161,158};
@@ -321,12 +310,11 @@ int main(int argc, char *argv[])
         qInfo() << "The HPI-Fit took" << timer.elapsed() << "milliseconds";
         qInfo() << "[done]";
 
-        writePos(time(i),pFiffInfo,position,vGof);
-        if(compareResults(devHeadTrans,pFiffInfo->dev_head_t,threshRot,threshTrans,result)){
+        writePos(time(i),pFiffInfo->dev_head_t,position,vGof);
+        if(compareResults(devHeadTrans,pFiffInfo->dev_head_t,threshRot,threshTrans)) {
             qInfo() << "Big head displacement: dev_head_t has been updated";
         }
 
     }
     UTILSLIB::IOUtils::write_eigen_matrix(position, QCoreApplication::applicationDirPath() + "/MNE-sample-data/position.txt");
-    UTILSLIB::IOUtils::write_eigen_matrix(result, QCoreApplication::applicationDirPath() + "/MNE-sample-data/result.txt");
 }
