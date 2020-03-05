@@ -51,7 +51,14 @@
 #include <utils/ioutils.h>
 #include <utils/generics/applicationlogger.h>
 
+#include <disp3D/viewers/hpiview.h>
+
 #include <fwd/fwd_coil_set.h>
+
+#include <Eigen/Geometry>
+
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 //=============================================================================================================
 // Qt INCLUDES
@@ -78,30 +85,26 @@ using namespace Eigen;
 //=============================================================================================================
 
 //=========================================================================================================
-/**
- * Store results from dev_Head_t as quaternions in position matrix. The postion matrix is consisten with the MaxFilter output
- *
- * @param[in] time          The corresponding time in the measurement for the fit.
- * @param[in] pFiffInfo     The FiffInfo file from the measurement.
- * @param[in] position      The matrix to store the results
- * @param[in] vError        The Hpi estimation Error per coil
- *
- * ToDo: get correct GoF; vError that is passed to fitHPI does not represent the actual GoF
- *
- */
-void writePos(const float time, FiffCoordTrans& dev_head_t, MatrixXd& position, const VectorXd& vGoF, const QVector<double>& vError)
+    /**
+     * Store results from dev_Head_t as quaternions in position matrix. The format is the same as you
+     * get from Neuromag's MaxFilter.
+     *
+     *
+     * @param[in]   time          The corresponding time in the measurement for the fit.
+     * @param[in]   pFiffInfo     The FiffInfo file from the measurement.
+     * @param[out]  position      The matrix to store the results.
+     * @param[in]   vGoF          The goodness of fit for each coil.
+     * @param[in]   vError        The Hpi estimation Error per coil.
+     *
+     * ToDo: get estimated movement velocity and stroe it in channel
+     */
+void storeHeadPosition(float time, const Eigen::Matrix<float, 4,4, Eigen::DontAlign>& devHeadT, MatrixXd& position, const VectorXd& vGoF, const QVector<double>& vError)
 {
     // Write quaternions and time in position matrix. Format is the same like MaxFilter's .pos files.
-    QMatrix3x3 rot;
-
-    for(int ir = 0; ir < 3; ir++) {
-        for(int ic = 0; ic < 3; ic++) {
-            rot(ir,ic) = dev_head_t.trans(ir,ic);
-        }
-    }
+    Matrix3f rot = devHeadT.block(0,0,3,3);
 
     double error = std::accumulate(vError.begin(), vError.end(), .0) / vError.size();     // HPI estimation Error
-    QQuaternion quatHPI = QQuaternion::fromRotationMatrix(rot);
+    Eigen::Quaternionf quatHPI(rot);
 
     //qDebug() << "quatHPI.x() " << "quatHPI.y() " << "quatHPI.y() " << "trans x " << "trans y " << "trans z " << std::endl;
     //qDebug() << quatHPI.x() << quatHPI.y() << quatHPI.z() << info->dev_head_t.trans(0,3) << info->dev_head_t.trans(1,3) << info->dev_head_t.trans(2,3) << std::endl;
@@ -111,9 +114,9 @@ void writePos(const float time, FiffCoordTrans& dev_head_t, MatrixXd& position, 
     position(position.rows()-1,1) = quatHPI.x();
     position(position.rows()-1,2) = quatHPI.y();
     position(position.rows()-1,3) = quatHPI.z();
-    position(position.rows()-1,4) = dev_head_t.trans(0,3);
-    position(position.rows()-1,5) = dev_head_t.trans(1,3);
-    position(position.rows()-1,6) = dev_head_t.trans(2,3);
+    position(position.rows()-1,4) = devHeadT(0,3);
+    position(position.rows()-1,5) = devHeadT(1,3);
+    position(position.rows()-1,6) = devHeadT(2,3);
     position(position.rows()-1,7) = vGoF.mean();
     position(position.rows()-1,8) = error;
     position(position.rows()-1,9) = 0;
@@ -126,39 +129,34 @@ void writePos(const float time, FiffCoordTrans& dev_head_t, MatrixXd& position, 
  * @param[in] devHeadTrans      The device to head transformation matrix to compare to.
  * @param[in] devHeadTransNew   The device to head transformation matrix to be compared.
  * @param[in] treshRot          The threshold for big head rotation in degree
- * @param[in] threshTrans        The threshold for big head movement in m
+ * @param[in] threshTrans       The threshold for big head movement in m
  *
- * @param[out] state            The status that shows if devHead is updated or not
+ * @return state            The status that shows if devHead is updated or not
  *
  */
-bool compareTransformation(const FiffCoordTrans& devHeadT, const FiffCoordTrans& devHeadTNew, const float& fThreshRot, const float& fThreshTrans)
+bool compareTransformation(const Eigen::MatrixX4f& devHeadT, const Eigen::MatrixX4f& devHeadTNew, const float& fThreshRot, const float& fThreshTrans)
 {
     bool state = false;
-    QMatrix3x3 rot;
-    QMatrix3x3 rotNew;
 
-    for(int ir = 0; ir < 3; ir++) {
-        for(int ic = 0; ic < 3; ic++) {
-            rot(ir,ic) = devHeadT.trans(ir,ic);
-            rotNew(ir,ic) = devHeadTNew.trans(ir,ic);
-        }
-    }
+    Matrix3f rot = devHeadT.block(0,0,3,3);
+    Matrix3f rotNew = devHeadTNew.block(0,0,3,3);
 
-    VectorXf trans = devHeadT.trans.col(3);
-    VectorXf transNew = devHeadTNew.trans.col(3);
+    VectorXf trans = devHeadT.col(3);
+    VectorXf transNew = devHeadTNew.col(3);
 
-    QQuaternion quat = QQuaternion::fromRotationMatrix(rot);
-    QQuaternion quatNew = QQuaternion::fromRotationMatrix(rotNew);
+    Eigen::Quaternionf quat(rot);
+    Eigen::Quaternionf quatNew(rotNew);
 
     // Compare Rotation
-    QQuaternion quatCompare;
+    Eigen::Quaternionf quatCompare;
     float angle;
-    QVector3D axis;
 
     // get rotation between both transformations by multiplying with the inverted quaternion
-    quatCompare = quat*quatNew.inverted();
-    quatCompare.getAxisAndAngle(&axis,&angle);
-    qInfo() << "Displacement angle [degree]: " << angle;
+    quatCompare = quat*quatNew.inverse();
+    angle = quat.angularDistance(quatNew);
+    angle = angle * 180 / M_PI;
+
+    qInfo() << "Eigen angle [degree]: " << angle;
 
     // Compare translation
     float move = (trans-transNew).norm();
@@ -308,11 +306,12 @@ int main(int argc, char *argv[])
         qInfo() << "The HPI-Fit took" << timer.elapsed() << "milliseconds";
         qInfo() << "[done]";
 
-        writePos(time(i),pFiffInfo->dev_head_t,position,vGoF,vError);
-        if(compareTransformation(devHeadTrans,pFiffInfo->dev_head_t,threshRot,threshTrans)) {
+        // writePos(time(i), pFiffInfo->dev_head_t.trans, position, vGoF, vError);
+
+        if(compareTransformation(devHeadTrans.trans, pFiffInfo->dev_head_t.trans, threshRot, threshTrans)) {
             qInfo() << "Big head displacement: dev_head_t has been updated";
         }
 
     }
-    UTILSLIB::IOUtils::write_eigen_matrix(position, QCoreApplication::applicationDirPath() + "/MNE-sample-data/position.txt");
+    //UTILSLIB::IOUtils::write_eigen_matrix(position, QCoreApplication::applicationDirPath() + "/MNE-sample-data/position.txt");
 }
