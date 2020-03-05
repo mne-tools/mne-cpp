@@ -250,7 +250,7 @@ void NoiseReduction::initPluginControlWidgets()
 
         // Projectors
         ProjectorsView* pProjectorsView = new ProjectorsView(QString("MNESCAN/%1/").arg(this->getName()));
-        pProjectorsView->setObjectName("group_tab_Noise Reduction_SSP");
+        pProjectorsView->setObjectName("group_tab_Settings_SSP");
         plControlWidgets.append(pProjectorsView);
 
         connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
@@ -258,7 +258,7 @@ void NoiseReduction::initPluginControlWidgets()
 
         // Compensators
         CompensatorView* pCompensatorView = new CompensatorView(QString("MNESCAN/%1/").arg(this->getName()));
-        pCompensatorView->setObjectName("group_tab_Noise Reduction_Comp");
+        pCompensatorView->setObjectName("group_tab_Settings_Comp");
         plControlWidgets.append(pCompensatorView);
 
         connect(pCompensatorView, &CompensatorView::compSelectionChanged,
@@ -266,7 +266,7 @@ void NoiseReduction::initPluginControlWidgets()
 
         // Filter
         FilterSettingsView* pFilterSettingsView = new FilterSettingsView(QString("MNESCAN/%1/").arg(this->getName()));
-        pFilterSettingsView->setObjectName("group_tab_Noise Reduction_Filter");
+        pFilterSettingsView->setObjectName("group_tab_Settings_Filter");
         plControlWidgets.append(pFilterSettingsView);
 
         connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChannelTypeChanged,
@@ -282,7 +282,7 @@ void NoiseReduction::initPluginControlWidgets()
 
         // SPHARA settings
         SpharaSettingsView* pSpharaSettingsView = new SpharaSettingsView();
-        pSpharaSettingsView->setObjectName("group_tab_Noise Reduction_SPHARA");
+        pSpharaSettingsView->setObjectName("group_tab_Settings_SPHARA");
         plControlWidgets.append(pSpharaSettingsView);
 
         connect(pSpharaSettingsView, &SpharaSettingsView::spharaActivationChanged,

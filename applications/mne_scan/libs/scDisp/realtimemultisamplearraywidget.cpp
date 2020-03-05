@@ -241,10 +241,21 @@ void RealTimeMultiSampleArrayWidget::init()
 //        connect(pSpharaSettingsView, &SpharaSettingsView::spharaOptionsChanged,
 //                m_pChannelDataView.data(), &RtFiffRawView::updateSpharaOptions);
 
+        // Quick control scaling
+        ScalingView* pScalingView = new ScalingView(QString("RTMSAW/%1").arg(sRTMSAWName),
+                                                    m_pFiffInfo->chs);
+        pScalingView->setObjectName("group_tab_View_Scaling");
+        lControlWidgets.append(pScalingView);
+
+        connect(pScalingView, &ScalingView::scalingChanged,
+                m_pChannelDataView.data(), &RtFiffRawView::setScalingMap);
+
+        m_pChannelDataView->setScalingMap(pScalingView->getScaleMap());
+
         // Quick control channel data settings
         FiffRawViewSettings* pChannelDataSettingsView = new FiffRawViewSettings(QString("RTMSAW/%1").arg(sRTMSAWName));
         pChannelDataSettingsView->setWidgetList();
-        pChannelDataSettingsView->setObjectName("group_tab_Other_View");
+        pChannelDataSettingsView->setObjectName("group_tab_View_General");
         lControlWidgets.append(pChannelDataSettingsView);
 
         connect(pChannelDataSettingsView, &FiffRawViewSettings::signalColorChanged,
@@ -273,7 +284,7 @@ void RealTimeMultiSampleArrayWidget::init()
 
         // Quick control trigger detection settings
         TriggerDetectionView* pTriggerDetectionView = new TriggerDetectionView(QString("RTMSAW/%1").arg(sRTMSAWName));
-        pTriggerDetectionView->setObjectName("group_tab_Other_Triggers");
+        pTriggerDetectionView->setObjectName("group_tab_View_Triggers");
         lControlWidgets.append(pTriggerDetectionView);
 
         connect(pTriggerDetectionView, &TriggerDetectionView::triggerInfoChanged,
@@ -286,17 +297,6 @@ void RealTimeMultiSampleArrayWidget::init()
                 pTriggerDetectionView, &TriggerDetectionView::setNumberDetectedTriggersAndTypes);
 
         pTriggerDetectionView->init(m_pFiffInfo);
-
-        // Quick control scaling
-        ScalingView* pScalingView = new ScalingView(QString("RTMSAW/%1").arg(sRTMSAWName),
-                                                    m_pFiffInfo->chs);
-        pScalingView->setObjectName("group_Scaling");
-        lControlWidgets.append(pScalingView);
-
-        connect(pScalingView, &ScalingView::scalingChanged,
-                m_pChannelDataView.data(), &RtFiffRawView::setScalingMap);
-
-        m_pChannelDataView->setScalingMap(pScalingView->getScaleMap());
 
         emit displayControlWidgetsChanged(lControlWidgets, sRTMSAWName);
 
