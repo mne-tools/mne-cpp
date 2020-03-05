@@ -128,27 +128,26 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
 //            vboxLayout->addWidget(rtseWidget);
 //            rtseWidget->init();
 //        }
-//        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeConnectivityEstimate> >())
-//        {
-//            QSharedPointer<RealTimeConnectivityEstimate>* pRealTimeConnectivityEstimate = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeConnectivityEstimate> >()->data();
-//            RealTimeConnectivityEstimateWidget* rtseWidget = new RealTimeConnectivityEstimateWidget(*pRealTimeConnectivityEstimate, newDisp);//new RealTimeConnectivityEstimateWidget(*pRealTimeConnectivityEstimate, pT, newDisp);
+        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeConnectivityEstimate> >())
+        {
+            RealTimeConnectivityEstimateWidget* rtseWidget = new RealTimeConnectivityEstimateWidget(newDisp);//new RealTimeConnectivityEstimateWidget(*pRealTimeConnectivityEstimate, pT, newDisp);
 
-//            qListActions.append(rtseWidget->getDisplayActions());
-//            qListControlWidgets.append(rtseWidget->getPluginControlWidgets());
+            qListActions.append(rtseWidget->getDisplayActions());
 
-//            connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
-//                    rtseWidget, &RealTimeConnectivityEstimateWidget::update, Qt::BlockingQueuedConnection);
+            // We need to use queued connection here because the RealTimeConnectivityEstimate measurement
+            // only holds one measurment and overwrites it immediatley after it emmited notify
+            connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
+                    rtseWidget, &RealTimeConnectivityEstimateWidget::update, Qt::BlockingQueuedConnection);
 
-//            vboxLayout->addWidget(rtseWidget);
-//            rtseWidget->init();
-//        }
-        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeEvokedSet> >()) {
+            vboxLayout->addWidget(rtseWidget);
+            rtseWidget->init();
+        } else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeEvokedSet> >()) {
             RealTimeEvokedSetWidget* rtesWidget = new RealTimeEvokedSetWidget(pT, newDisp);
 
             qListActions.append(rtesWidget->getDisplayActions());
 
-            // We need to use queued connection here because, e.g., theFiffSimulator is dispatching its data from the main thread
-            // and a blocking one because the data is deleted immediatley after the signal was emmited
+            // We need to use queued connection here because the RealTimeEvokedSet measurement
+            // only holds one measurement (of multiple evoked responses) and overwrites it immediatley after it emmited notify
             connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
                     rtesWidget, &RealTimeEvokedSetWidget::update, Qt::BlockingQueuedConnection);
 
@@ -158,6 +157,8 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
             RealTimeCovWidget* rtcWidget = new RealTimeCovWidget(pT, newDisp);
 
             qListActions.append(rtcWidget->getDisplayActions());
+            // We need to use queued connection here because the RealTimeCovWidget measurement
+            // only holds one measurement and overwrites it immediatley after it emmited notify
             connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
                     rtcWidget, &RealTimeCovWidget::update, Qt::BlockingQueuedConnection);
 
