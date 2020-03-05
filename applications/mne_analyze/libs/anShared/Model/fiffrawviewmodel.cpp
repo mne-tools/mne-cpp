@@ -628,6 +628,39 @@ void FiffRawViewModel::setWindowSize(const int &iNumSeconds)
     beginResetModel();
     m_iVisibleWindowSize = iNumSeconds;
     m_iTotalBlockCount = m_iVisibleWindowSize + 2 * m_iPreloadBufferSize;
+
+    m_lData.clear();
+
+    MatrixXd data, times;
+    // append a matrix pair for each block
+    for(int i = 0; i < m_iTotalBlockCount; ++i)
+        m_lData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data, times)));
+
+    m_iFiffCursorBegin = m_pFiffIO->m_qlistRaw[0]->first_samp;
+
+    int start = m_iFiffCursorBegin;
+    m_iSamplesPerBlock = m_pFiffInfo->sfreq;
+
+    // for some reason the read_raw_segment function works with inclusive upper bound
+    int end = start + m_iSamplesPerBlock - 1;
+
+    // read in all blocks, use the already prepared list m_lData
+    for(auto &pairPointer : m_lData) {
+        if(m_pFiffIO->m_qlistRaw[0]->read_raw_segment(pairPointer->first,
+                                                      pairPointer->second,
+                                                      start,
+                                                      end)) {
+            // qDebug() << "[FiffRawmodel::loadFiffData] Successfully read a block ";
+        } else {
+            qDebug() << "[FiffRawViewModel::loadFiffData] Could not read samples " << start << " to " << end;
+            return;
+        }
+
+        start += m_iSamplesPerBlock;
+        end += m_iSamplesPerBlock;
+    }
+    //updateDisplayData();
+
     endResetModel();
 }
 
@@ -647,4 +680,40 @@ void FiffRawViewModel::distanceTimeSpacerChanged(int value)
 int FiffRawViewModel::getNumberOfTimeSpacers() const
 {
     return ((1000)/m_iDistanceTimerSpacer)-1;
+}
+
+//=============================================================================================================
+
+void FiffRawViewModel::updateDisplayData()
+{
+    m_lData.clear();
+
+    MatrixXd data, times;
+    // append a matrix pair for each block
+    for(int i = 0; i < m_iTotalBlockCount; ++i)
+        m_lData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data, times)));
+
+    m_iFiffCursorBegin = m_pFiffIO->m_qlistRaw[0]->first_samp;
+
+    int start = m_iFiffCursorBegin;
+    m_iSamplesPerBlock = m_pFiffInfo->sfreq;
+
+    // for some reason the read_raw_segment function works with inclusive upper bound
+    int end = start + m_iSamplesPerBlock - 1;
+
+    // read in all blocks, use the already prepared list m_lData
+    for(auto &pairPointer : m_lData) {
+        if(m_pFiffIO->m_qlistRaw[0]->read_raw_segment(pairPointer->first,
+                                                      pairPointer->second,
+                                                      start,
+                                                      end)) {
+            // qDebug() << "[FiffRawmodel::loadFiffData] Successfully read a block ";
+        } else {
+            qDebug() << "[FiffRawViewModel::loadFiffData] Could not read samples " << start << " to " << end;
+            return;
+        }
+
+        start += m_iSamplesPerBlock;
+        end += m_iSamplesPerBlock;
+    }
 }

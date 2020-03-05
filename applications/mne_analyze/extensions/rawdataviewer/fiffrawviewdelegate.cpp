@@ -168,7 +168,7 @@ QSize FiffRawViewDelegate::sizeHint(const QStyleOptionViewItem &option,
             const FiffRawViewModel* pFiffRawModel = static_cast<const FiffRawViewModel*>(index.model());
             qint32 nsamples = pFiffRawModel->absoluteLastSample() - pFiffRawModel->absoluteFirstSample();
 
-            size = QSize(nsamples * pFiffRawModel->pixelDifference(), option.rect.height());
+            size = QSize(nsamples, option.rect.height());
 
             qDebug() << "FiffRawViewDelegate::sizeHint - nsamples" << nsamples;
             qDebug() << "FiffRawViewDelegate::sizeHint - size" << size;
@@ -261,14 +261,14 @@ void FiffRawViewDelegate::createPlotPath(const QStyleOptionViewItem &option,
         iDataToJump = 1;
     }
 
-    for(int j = 0; j < data.size() - iDataToJump; j += iDataToJump) {
+    for(int j = 0; j < data.size(); j++) {
         dValue = data[j] * dScaleY;
 
         //Reverse direction -> plot the right way
         newY = y_base - dValue;
 
         qSamplePosition.setY(newY);
-        qSamplePosition.setX(path.currentPosition().x() + iPixelsToJump);
+        qSamplePosition.setX(path.currentPosition().x() + dDx);
         path.lineTo(qSamplePosition);
     }
 }
