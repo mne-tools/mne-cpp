@@ -91,6 +91,7 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
                     FiffCoordTrans& transDevHead,
                     const QVector<int>& vFreqs,
                     QVector<double>& vError,
+                    VectorXd& vGoF,
                     FiffDigPointSet& fittedPointSet,
                     FiffInfo::SPtr pFiffInfo,
                     bool bDoDebug,
@@ -323,6 +324,12 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
 
     for(int i = 0; i < diffPos.cols(); ++i) {
         vError.append(diffPos.col(i).norm());
+    }
+
+    // store Goodness of Fit
+    vGoF = coil.dpfiterror;
+    for(int i = 0; i < vGoF.size(); ++i) {
+        vGoF(i) = 1 - vGoF(i);
     }
 
     //Generate final fitted points and store in digitizer set
