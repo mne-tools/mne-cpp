@@ -203,7 +203,7 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("hpiFit Example");
     parser.addHelpOption();
     qInfo() << "Please download the mne-cpp-test-data folder from Github (mne-tools) into mne-cpp/bin.";
-    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif");
+    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/MNE-sample-data/chpi/raw/sim_move_y_chpi_raw.fif");
 
     parser.addOption(inputOption);
 
@@ -239,7 +239,7 @@ int main(int argc, char *argv[])
 //    // Read Quaternion File
     MatrixXd pos;
     qInfo() << "Specify the path to your position file (.txt)";
-    UTILSLIB::IOUtils::read_eigen_matrix(pos, QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/ref_hpiFit_pos.txt");
+    UTILSLIB::IOUtils::read_eigen_matrix(pos, QCoreApplication::applicationDirPath() + "/MNE-sample-data/chpi/pos/sim_move_y_chpi_pos.txt");
     RowVectorXd time = pos.col(0);
 
     MatrixXd position;              // Position matrix to save quaternions etc.
