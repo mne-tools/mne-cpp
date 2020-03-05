@@ -245,9 +245,9 @@ void HpiView::setData(const Eigen::MatrixXd& matData)
 
 //=============================================================================================================
 
-QVector<double> HpiView::getGOF()
+QVector<double> HpiView::getError()
 {
-    return m_vGof;
+    return m_vError;
 }
 
 //=============================================================================================================
@@ -450,7 +450,7 @@ void HpiView::alignFiducials(const QString& fileNameDigData)
 
 void HpiView::onNewFittingResultAvailable(const RTPROCESSINGLIB::FittingResult& fitResult)
 {
-    m_vGof = fitResult.errorDistances;
+    m_vError = fitResult.errorDistances;
 
     storeResults(fitResult.devHeadTrans, fitResult.fittedCoils);
 }
@@ -571,23 +571,23 @@ void HpiView::updateErrorLabels()
 {
     //Update gof labels and m_tAlignment from m to mm
     QString sGof("0mm");
-    if(m_vGof.size() > 0) {
-        sGof = QString::number(m_vGof[0]*1000,'f',2)+QString("mm");
+    if(m_vError.size() > 0) {
+        sGof = QString::number(m_vError[0]*1000,'f',2)+QString("mm");
         ui->m_label_gofCoil1->setText(sGof);
     }
 
-    if(m_vGof.size() > 1) {
-        sGof = QString::number(m_vGof[1]*1000,'f',2)+QString("mm");
+    if(m_vError.size() > 1) {
+        sGof = QString::number(m_vError[1]*1000,'f',2)+QString("mm");
         ui->m_label_gofCoil2->setText(sGof);
     }
 
-    if(m_vGof.size() > 2) {
-        sGof = QString::number(m_vGof[2]*1000,'f',2)+QString("mm");
+    if(m_vError.size() > 2) {
+        sGof = QString::number(m_vError[2]*1000,'f',2)+QString("mm");
         ui->m_label_gofCoil3->setText(sGof);
     }
 
-    if(m_vGof.size() > 3) {
-        sGof = QString::number(m_vGof[3]*1000,'f',2)+QString("mm");
+    if(m_vError.size() > 3) {
+        sGof = QString::number(m_vError[3]*1000,'f',2)+QString("mm");
         ui->m_label_gofCoil4->setText(sGof);
     }
 
@@ -636,12 +636,12 @@ void HpiView::updateTransLabels()
 void HpiView::storeResults(const FiffCoordTrans& devHeadTrans, const FiffDigPointSet& fittedCoils)
 {
     //Check if git meets distance requirement (GOF)
-    if(m_vGof.size() > 0) {
+    if(m_vError.size() > 0) {
         m_dMeanErrorDist = 0;
-        for(int i = 0; i < m_vGof.size(); ++i) {
-            m_dMeanErrorDist += m_vGof.at(i);
+        for(int i = 0; i < m_vError.size(); ++i) {
+            m_dMeanErrorDist += m_vError.at(i);
         }
-        m_dMeanErrorDist = m_dMeanErrorDist/m_vGof.size();
+        m_dMeanErrorDist = m_dMeanErrorDist/m_vError.size();
     }
 
     //Update error labels
