@@ -121,6 +121,7 @@ public:
      * @param[out]   transDevHead    The final dev head transformation matrix
      * @param[in]    vFreqs          The frequencies for each coil.
      * @param[out]   vError          The HPI estimation Error in mm for each fitted HPI coil.
+     * @param[out]   vGoF            The goodness of fit for each fitted HPI coil
      * @param[out]   fittedPointSet  The final fitted positions in form of a digitizer set.
      * @param[in]    p_pFiffInfo     Associated Fiff Information.
      * @param[in]    bDoDebug        Print debug info to cmd line and write debug info to file.
@@ -136,6 +137,27 @@ public:
                        QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
                        bool bDoDebug = false,
                        const QString& sHPIResourceDir = QString("./HPIFittingDebug"));
+
+    //=========================================================================================================
+    /**
+     * Store results from dev_Head_t as quaternions in position matrix. The format is the same as you
+     * get from Neuromag's MaxFilter.
+     *
+     *
+     * @param[in]   time          The corresponding time in the measurement for the fit.
+     * @param[in]   pFiffInfo     The FiffInfo file from the measurement.
+     * @param[out]  position      The matrix to store the results.
+     * @param[in]   vGoF          The goodness of fit for each coil.
+     * @param[in]   vError        The Hpi estimation Error per coil.
+     *
+     * ToDo: get estimated movement velocity and stroe it in channel 9
+     */
+//    static void storeHeadPosition(const float time,
+//                                  const Eigen::MatrixXf& devHeadT,
+//                                  Eigen::MatrixXf& position,
+//                                  const Eigen::VectorXd& vGoF,
+//                                  const QVector<double>& vError);
+
 
 protected:
     //=========================================================================================================

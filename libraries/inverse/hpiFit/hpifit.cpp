@@ -528,3 +528,37 @@ void HPIFit::createSensorSet(QList<struct Sensor>& sensors, FwdCoilSet* coils){
         sensors.append(s);
     }
 }
+
+//void HPIFit::storeHeadPosition(const float time,
+//                               const Eigen::MatrixXf &devHeadT,
+//                               Eigen::MatrixXf &position,
+//                               const Eigen::VectorXd &vGoF,
+//                               const QVector<double> &vError)
+//{
+//    // Write quaternions and time in position matrix. Format is the same like MaxFilter's .pos files.
+//    QMatrix3x3 rot;
+
+//    for(int ir = 0; ir < 3; ir++) {
+//        for(int ic = 0; ic < 3; ic++) {
+//            rot(ir,ic) = devHeadT(ir,ic);
+//        }
+//    }
+
+//    double error = std::accumulate(vError.begin(), vError.end(), .0) / vError.size();     // HPI estimation Error
+//    QQuaternion quatHPI = QQuaternion::fromRotationMatrix(rot);
+
+//    //qDebug() << "quatHPI.x() " << "quatHPI.y() " << "quatHPI.y() " << "trans x " << "trans y " << "trans z " << std::endl;
+//    //qDebug() << quatHPI.x() << quatHPI.y() << quatHPI.z() << info->dev_head_t.trans(0,3) << info->dev_head_t.trans(1,3) << info->dev_head_t.trans(2,3) << std::endl;
+
+//    position.conservativeResize(position.rows()+1, 10);
+//    position(position.rows()-1,0) = time;
+//    position(position.rows()-1,1) = quatHPI.x();
+//    position(position.rows()-1,2) = quatHPI.y();
+//    position(position.rows()-1,3) = quatHPI.z();
+//    position(position.rows()-1,4) = devHeadT(0,3);
+//    position(position.rows()-1,5) = devHeadT(1,3);
+//    position(position.rows()-1,6) = devHeadT(2,3);
+//    position(position.rows()-1,7) = vGoF.mean();
+//    position(position.rows()-1,8) = error;
+//    position(position.rows()-1,9) = 0;
+//}
