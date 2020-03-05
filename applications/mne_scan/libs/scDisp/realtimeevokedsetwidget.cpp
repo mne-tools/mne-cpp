@@ -393,7 +393,7 @@ void RealTimeEvokedSetWidget::init()
         m_pAverageLayoutView->setAverageActivation(pAverageSelectionView->getAverageActivation());
         m_pAverageLayoutView->setAverageColor(pAverageSelectionView->getAverageColor());
 
-        emit pluginControlWidgetsChanged(lControlWidgets, t_sRTESName);
+        emit displayControlWidgetsChanged(lControlWidgets, t_sRTESName);
 
         //Initialized
         m_bInitialized = true;

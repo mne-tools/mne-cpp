@@ -224,10 +224,17 @@ private:
 
     //=========================================================================================================
     /**
-     * Stops the main application timer.
+     * Adds plugin control widgets to the QuickControlView.
      */
-    void onControlWidgetsChanged(QList<QWidget*>& lControlWidgets,
-                                 const QString& sPluginName);
+    void onPluginControlWidgetsChanged(QList<QWidget*>& lControlWidgets,
+                                       const QString& sPluginName);
+
+    //=========================================================================================================
+    /**
+     * Adds display control widgets to the QuickControlView.
+     */
+    void onDisplayControlWidgetsChanged(QList<QWidget*>& lControlWidgets,
+                                        const QString& sPluginName);
 
     //=========================================================================================================
     /**

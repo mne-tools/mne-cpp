@@ -178,7 +178,7 @@ void RealTimeCovWidget::showModalitySelectionWidget()
     if(!m_pModalitySelectionWidget)
     {
         m_pModalitySelectionWidget = ModalitySelectionView::SPtr::create(m_pRTC->getFiffInfo()->chs,
-                                                                         QString("Plugin/%1").arg(m_pRTC->getName()),
+                                                                         QString("MNESCAN/%1").arg(m_pRTC->getName()),
                                                                          this,
                                                                          Qt::Window);
 

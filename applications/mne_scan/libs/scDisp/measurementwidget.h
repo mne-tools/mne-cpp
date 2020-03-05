@@ -141,8 +141,8 @@ signals:
      *                                  does not have ownership of these pointers.
      * @param [in] sDisplayName         The display emmiting the signal.
      */
-    void pluginControlWidgetsChanged(QList<QWidget*>& lControlWidgets,
-                                     const QString& sDisplayName);
+    void displayControlWidgetsChanged(QList<QWidget*>& lControlWidgets,
+                                      const QString& sDisplayName);
 
 protected:
     //=========================================================================================================
