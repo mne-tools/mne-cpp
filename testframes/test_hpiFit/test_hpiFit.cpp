@@ -54,7 +54,7 @@
 #include <fwd/fwd_coil_set.h>
 
 #include <Eigen/Dense>
-
+#include <Eigen/Geometry>
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -122,11 +122,14 @@ void storeHeadPosition(float time, const Eigen::Matrix<float, 4,4, Eigen::DontAl
     //qDebug() << "quatHPI.x() " << "quatHPI.y() " << "quatHPI.y() " << "trans x " << "trans y " << "trans z " << std::endl;
     //qDebug() << quatHPI.x() << quatHPI.y() << quatHPI.z() << info->dev_head_t.trans(0,3) << info->dev_head_t.trans(1,3) << info->dev_head_t.trans(2,3) << std::endl;
 
+    float x = quatHPI.x();
+    float y = quatHPI.y();
+    float z = quatHPI.z();
     position.conservativeResize(position.rows()+1, 10);
     position(position.rows()-1,0) = time;
-    position(position.rows()-1,1) = quatHPI.x();
-    position(position.rows()-1,2) = quatHPI.y();
-    position(position.rows()-1,3) = quatHPI.z();
+    position(position.rows()-1,1) = x;
+    position(position.rows()-1,2) = y;
+    position(position.rows()-1,3) = z;
     position(position.rows()-1,4) = devHeadT(0,3);
     position(position.rows()-1,5) = devHeadT(1,3);
     position(position.rows()-1,6) = devHeadT(2,3);
@@ -169,7 +172,6 @@ void TestFitHPI::initTestCase()
 
     // Read Quaternion File from maxfilter
     UTILSLIB::IOUtils::read_eigen_matrix(ref_pos, QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/ref_hpiFit_pos.txt");
-    hpi_pos = Eigen::MatrixXd::Zero(ref_pos.rows(),ref_pos.cols());
 
     // Setup informations for HPI fit
     QVector<int> vFreqs {166,154,161,158};
@@ -203,10 +205,10 @@ void TestFitHPI::initTestCase()
                        bDoDebug = 0,
                        sHPIResourceDir);
         qInfo() << "[done]\n";
-        storeHeadPosition(ref_pos(i,0),pFiffInfo->dev_head_t.trans,hpi_pos,vGoF,vError);
+        storeHeadPosition(ref_pos(i,0), pFiffInfo->dev_head_t.trans, hpi_pos, vGoF, vError);
     }
     // For debug: position file for HPIFit
-    // UTILSLIB::IOUtils::write_eigen_matrix(hpi_pos, QCoreApplication::applicationDirPath() + "/MNE-sample-data/hpi_pos.txt");
+    UTILSLIB::IOUtils::write_eigen_matrix(hpi_pos, QCoreApplication::applicationDirPath() + "/MNE-sample-data/hpi_pos.txt");
 }
 
 //=============================================================================================================
