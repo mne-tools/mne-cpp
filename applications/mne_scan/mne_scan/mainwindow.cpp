@@ -576,7 +576,7 @@ void MainWindow::initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::IPlugin> 
                         }
 
                         // Sensor plugins are always displayed as the most lowet vertical widget in the multiview
-                        if(lPlugins.at(i)->getType() == IPlugin::PluginType::_ISensor) {
+                        if(lPlugins.at(i)->getName() == "Filter" ||  lPlugins.at(i)->getName() == "Fiff Simulator") {
                             m_pRunWidget->addWidgetV(pWidget,
                                                      sCurPluginName);
                         } else {
