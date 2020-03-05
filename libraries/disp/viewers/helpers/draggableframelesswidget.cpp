@@ -62,12 +62,14 @@ using namespace DISPLIB;
 DraggableFramelessWidget::DraggableFramelessWidget(QWidget *parent,
                                                    Qt::WindowFlags flags,
                                                    bool bRoundEdges,
-                                                   bool bDraggable)
+                                                   bool bDraggable,
+                                                   bool bFrameless)
 : QWidget(parent, flags)
 , m_bRoundEdges(bRoundEdges)
 , m_bDraggable(bDraggable)
 , m_bMousePressed(false)
 {
+    this->setWindowFlag(Qt::CustomizeWindowHint, bFrameless);
     this->adjustSize();
 }
 
@@ -81,7 +83,7 @@ DraggableFramelessWidget::~DraggableFramelessWidget()
 
 void DraggableFramelessWidget::setDraggable(bool bFlag)
 {
-        m_bDraggable = bFlag;
+    m_bDraggable = bFlag;
 }
 
 //=============================================================================================================

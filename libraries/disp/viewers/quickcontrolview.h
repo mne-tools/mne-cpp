@@ -98,7 +98,7 @@ public:
      */
     QuickControlView(const QString& sSettingsPath = "",
                      const QString& name = "",
-                     Qt::WindowFlags flags = Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint,
+                     Qt::WindowFlags flags = Qt::Window | Qt::WindowStaysOnTopHint,
                      QWidget *parent = Q_NULLPTR,
                      bool bDraggable = true);
 
