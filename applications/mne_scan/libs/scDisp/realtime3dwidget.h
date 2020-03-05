@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     realtimeconnectivityestimatewidget.h
+ * @file     realtime3dwidget.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>
  * @version  dev
  * @date     October, 2016
@@ -28,12 +28,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Declaration of the RealTimeConnectivityEstimateWidget Class.
+ * @brief    Declaration of the RealTime3DWidget Class.
  *
  */
 
-#ifndef REALTIMECONNECTIVITYESTIMATEWIDGET_H
-#define REALTIMECONNECTIVITYESTIMATEWIDGET_H
+#ifndef REALTIME3DWIDGET_H
+#define REALTIME3DWIDGET_H
 
 //=============================================================================================================
 // INCLUDES
@@ -83,32 +83,32 @@ namespace SCDISPLIB
 
 //=============================================================================================================
 /**
- * DECLARE CLASS RealTimeConnectivityEstimateWidget
+ * DECLARE CLASS RealTime3DWidget
  *
- * @brief The RealTimeConnectivityEstimateWidget class provides a real-time network display.
+ * @brief The RealTime3DWidget class provides a real-time network display.
  */
 
-class SCDISPSHARED_EXPORT RealTimeConnectivityEstimateWidget : public MeasurementWidget
+class SCDISPSHARED_EXPORT RealTime3DWidget : public MeasurementWidget
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<RealTimeConnectivityEstimateWidget> SPtr;             /**< Shared pointer type for RealTimeConnectivityEstimateWidget class. */
-    typedef QSharedPointer<const RealTimeConnectivityEstimateWidget> ConstSPtr;  /**< Const shared pointer type for RealTimeConnectivityEstimateWidget class. */
+    typedef QSharedPointer<RealTime3DWidget> SPtr;             /**< Shared pointer type for RealTime3DWidget class. */
+    typedef QSharedPointer<const RealTime3DWidget> ConstSPtr;  /**< Const shared pointer type for RealTime3DWidget class. */
 
     //=========================================================================================================
     /**
-     * Constructs a RealTimeConnectivityEstimateWidget which is a child of parent.
+     * Constructs a RealTime3DWidget which is a child of parent.
      *
-     * @param [in] parent    pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
+     * @param [in] parent    pointer to parent widget; If parent is 0, the new NumericWidget becomes a window.
      */
-    RealTimeConnectivityEstimateWidget(QWidget* parent = 0);
+    RealTime3DWidget(QWidget* parent = 0);
 
     //=========================================================================================================
     /**
-     * Destroys the RealTimeConnectivityEstimateWidget.
+     * Destroys the RealTime3DWidget.
      */
-    ~RealTimeConnectivityEstimateWidget();
+    ~RealTime3DWidget();
 
     //=========================================================================================================
     /**
@@ -120,7 +120,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Initialise the RealTimeConnectivityEstimateWidget.
+     * Initialise the RealTime3DWidget.
      */
     virtual void init();
 
@@ -142,4 +142,4 @@ protected:
 };
 } // NAMESPACE
 
-#endif // REALTIMECONNECTIVITYESTIMATEWIDGET_H
+#endif // REALTIME3DWIDGET_H
