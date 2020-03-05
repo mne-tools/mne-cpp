@@ -159,6 +159,14 @@ public:
      */
     void setDistanceTimeSpacer(int value);
 
+    //=========================================================================================================
+    /**
+     * Call this slot whenever you want to make a screenshot current view.
+     *
+     * @param[in] imageType  The current iamge type: png, svg.
+     */
+    void onMakeScreenshot(const QString& imageType);
+
 private:
     //=========================================================================================================
     /**

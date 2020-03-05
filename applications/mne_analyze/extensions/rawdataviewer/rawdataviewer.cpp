@@ -132,34 +132,7 @@ void RawDataViewer::onNewModelAvalible(QSharedPointer<AbstractModel> pNewModel)
         m_pFiffRawView->initMVCSettings(m_pRawModel, m_pRawDelegate);
         qDebug() << "[RawDataViewer::onNewModelAvailable] New model added; " << pNewModel->getModelPath();
 
-        DISPLIB::ScalingView* scalingWidget = new DISPLIB::ScalingView("Test", m_pRawModel->getFiffInfo()->chs);
-        connect(scalingWidget, &DISPLIB::ScalingView::scalingChanged,
-                m_pFiffRawView.data(), &FiffRawView::setScalingMap);
-
-        DISPLIB::FiffRawViewSettings* viewWidget = new DISPLIB::FiffRawViewSettings("Test");
-        viewWidget->setWidgetList();
-        connect(viewWidget, &DISPLIB::FiffRawViewSettings::signalColorChanged,
-                m_pFiffRawView.data(), &FiffRawView::setSignalColor);
-        connect(viewWidget, &DISPLIB::FiffRawViewSettings::backgroundColorChanged,
-                m_pFiffRawView.data(), &FiffRawView::setBackgroundColor);
-        connect(viewWidget, &DISPLIB::FiffRawViewSettings::zoomChanged,
-                m_pFiffRawView.data(), &FiffRawView::setZoom);
-        connect(viewWidget, &DISPLIB::FiffRawViewSettings::timeWindowChanged,
-                m_pFiffRawView.data(), &FiffRawView::setWindowSize);
-        connect(viewWidget, &DISPLIB::FiffRawViewSettings::distanceTimeSpacerChanged,
-                m_pFiffRawView.data(), &FiffRawView::setDistanceTimeSpacer);
-
-        m_pFiffRawView->setDistanceTimeSpacer(viewWidget->getDistanceTimeSpacer());
-        m_pFiffRawView->setSignalColor(viewWidget->getSignalColor());
-        m_pFiffRawView->setBackgroundColor(viewWidget->getBackgroundColor());
-        m_pFiffRawView->setZoom(viewWidget->getZoom());
-
-        m_pLayout->addWidget(scalingWidget);
-        m_pLayout->addWidget(viewWidget);
-
-        m_pControlDock->setWidget(m_pContainer);
-        m_pContainer->setLayout(m_pLayout);
-        m_pContainer->show();
+        setUpControls();
     }
 }
 
@@ -232,3 +205,42 @@ QVector<EVENT_TYPE> RawDataViewer::getEventSubscriptions(void) const
 }
 
 //=============================================================================================================
+
+void RawDataViewer::setUpControls()
+{
+    //Scaling Widget
+    DISPLIB::ScalingView* scalingWidget = new DISPLIB::ScalingView("Test", m_pRawModel->getFiffInfo()->chs);
+    connect(scalingWidget, &DISPLIB::ScalingView::scalingChanged,
+            m_pFiffRawView.data(), &FiffRawView::setScalingMap);
+
+    //View Widget
+    DISPLIB::FiffRawViewSettings* viewWidget = new DISPLIB::FiffRawViewSettings("Test");
+    viewWidget->setWidgetList();
+    connect(viewWidget, &DISPLIB::FiffRawViewSettings::signalColorChanged,
+            m_pFiffRawView.data(), &FiffRawView::setSignalColor);
+    connect(viewWidget, &DISPLIB::FiffRawViewSettings::backgroundColorChanged,
+            m_pFiffRawView.data(), &FiffRawView::setBackgroundColor);
+    connect(viewWidget, &DISPLIB::FiffRawViewSettings::zoomChanged,
+            m_pFiffRawView.data(), &FiffRawView::setZoom);
+    connect(viewWidget, &DISPLIB::FiffRawViewSettings::timeWindowChanged,
+            m_pFiffRawView.data(), &FiffRawView::setWindowSize);
+    connect(viewWidget, &DISPLIB::FiffRawViewSettings::distanceTimeSpacerChanged,
+            m_pFiffRawView.data(), &FiffRawView::setDistanceTimeSpacer);
+    connect(viewWidget, &DISPLIB::FiffRawViewSettings::makeScreenshot,
+            m_pFiffRawView.data(), &FiffRawView::onMakeScreenshot);
+
+    m_pFiffRawView->setWindowSize(viewWidget->getWindowSize());
+    m_pFiffRawView->setDistanceTimeSpacer(viewWidget->getDistanceTimeSpacer());
+    m_pFiffRawView->setSignalColor(viewWidget->getSignalColor());
+    m_pFiffRawView->setBackgroundColor(viewWidget->getBackgroundColor());
+    m_pFiffRawView->setZoom(viewWidget->getZoom());
+
+    //Set up layout w/ control widgets
+    m_pLayout->addWidget(scalingWidget);
+    m_pLayout->addWidget(viewWidget);
+
+    //Make it all visible to the user
+    m_pControlDock->setWidget(m_pContainer);
+    m_pContainer->setLayout(m_pLayout);
+    m_pContainer->show();
+}
