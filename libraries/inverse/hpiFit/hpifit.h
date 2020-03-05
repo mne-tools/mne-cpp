@@ -152,11 +152,11 @@ public:
      *
      * ToDo: get estimated movement velocity and stroe it in channel 9
      */
-//    static void storeHeadPosition(const float time,
-//                                  const Eigen::MatrixXf& devHeadT,
-//                                  Eigen::MatrixXf& position,
-//                                  const Eigen::VectorXd& vGoF,
-//                                  const QVector<double>& vError);
+    static void storeHeadPosition(float time,
+                                  const Eigen::MatrixXf& devHeadT,
+                                  Eigen::MatrixXd& position,
+                                  const Eigen::VectorXd& vGoF,
+                                  const QVector<double>& vError);
 
 
 protected:
