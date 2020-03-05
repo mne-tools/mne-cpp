@@ -80,12 +80,13 @@ void RtHpiWorker::doWork(const Eigen::MatrixXd& matData,
     fitResult.devHeadTrans.to = 4;
 
     HPIFit::fitHPI(matData,
-                    matProjectors,
-                    fitResult.devHeadTrans,
-                    vFreqs,
-                    fitResult.errorDistances,
-                    fitResult.fittedCoils,
-                    pFiffInfo);
+                   matProjectors,
+                   fitResult.devHeadTrans,
+                   vFreqs,
+                   fitResult.errorDistances,
+                   fitResult.GoF,
+                   fitResult.fittedCoils,
+                   pFiffInfo);
 
     emit resultReady(fitResult);
 }

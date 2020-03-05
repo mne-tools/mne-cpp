@@ -131,6 +131,7 @@ public:
                        FIFFLIB::FiffCoordTrans &transDevHead,
                        const QVector<int>& vFreqs,
                        QVector<double> &vError,
+                       Eigen::VectorXd& vGoF,
                        FIFFLIB::FiffDigPointSet& fittedPointSet,
                        QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
                        bool bDoDebug = false,

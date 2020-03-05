@@ -172,6 +172,7 @@ void TestFitHPI::initTestCase()
     // Setup informations for HPI fit
     QVector<int> vFreqs {166,154,161,158};
     QVector<double> vError;
+    VectorXd vGoF;
     FiffDigPointSet fittedPointSet;
     Eigen::MatrixXd matProjectors = Eigen::MatrixXd::Identity(pFiffInfo->chs.size(), pFiffInfo->chs.size());
     QString sHPIResourceDir = QCoreApplication::applicationDirPath() + "/HPIFittingDebug";
@@ -194,6 +195,7 @@ void TestFitHPI::initTestCase()
                        pFiffInfo->dev_head_t,
                        vFreqs,
                        vError,
+                       vGoF,
                        fittedPointSet,
                        pFiffInfo,
                        bDoDebug = 0,

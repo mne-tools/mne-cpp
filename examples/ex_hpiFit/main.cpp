@@ -89,7 +89,7 @@ using namespace Eigen;
  * ToDo: get correct GoF; vError that is passed to fitHPI does not represent the actual GoF
  *
  */
-void writePos(const float time, FiffCoordTrans& dev_head_t, MatrixXd& position, const QVector<double>& vError)
+void writePos(const float time, FiffCoordTrans& dev_head_t, MatrixXd& position, const VectorXd& vGoF, const QVector<double>& vError)
 {
     // Write quaternions and time in position matrix. Format is the same like MaxFilter's .pos files.
     QMatrix3x3 rot;
@@ -98,7 +98,8 @@ void writePos(const float time, FiffCoordTrans& dev_head_t, MatrixXd& position, 
         for(int ic = 0; ic < 3; ic++) {
             rot(ir,ic) = dev_head_t.trans(ir,ic);
         }
-    }    
+    }
+
     double error = std::accumulate(vError.begin(), vError.end(), .0) / vError.size();     // HPI estimation Error
     QQuaternion quatHPI = QQuaternion::fromRotationMatrix(rot);
 
@@ -113,7 +114,7 @@ void writePos(const float time, FiffCoordTrans& dev_head_t, MatrixXd& position, 
     position(position.rows()-1,4) = dev_head_t.trans(0,3);
     position(position.rows()-1,5) = dev_head_t.trans(1,3);
     position(position.rows()-1,6) = dev_head_t.trans(2,3);
-    position(position.rows()-1,7) = 0;
+    position(position.rows()-1,7) = vGoF.mean();
     position(position.rows()-1,8) = error;
     position(position.rows()-1,9) = 0;
 }
@@ -130,7 +131,7 @@ void writePos(const float time, FiffCoordTrans& dev_head_t, MatrixXd& position, 
  * @param[out] state            The status that shows if devHead is updated or not
  *
  */
-bool compareResults(FiffCoordTrans& devHeadT, const FiffCoordTrans& devHeadTNew,const float& treshRot,const float& threshTrans)
+bool compareTransformation(const FiffCoordTrans& devHeadT, const FiffCoordTrans& devHeadTNew, const float& fThreshRot, const float& fThreshTrans)
 {
     bool state = false;
     QMatrix3x3 rot;
@@ -164,16 +165,12 @@ bool compareResults(FiffCoordTrans& devHeadT, const FiffCoordTrans& devHeadTNew,
     qInfo() << "Displacement Move [mm]: " << move*1000;
 
     // compare to thresholds and update
-    if(move > threshTrans) {
+    if(move > fThreshTrans) {
         qInfo() << "Large movement: " << move*1000 << "mm";
-        devHeadT = devHeadTNew;
-        qInfo() << "dev_head_t has been updatet";
         state = true;
 
-    } else if (angle > treshRot) {
+    } else if (angle > fThreshRot) {
         qInfo() << "Large rotation: " << angle << "°";
-        devHeadT = devHeadTNew;
-        qInfo() << "dev_head_t has been updatet";
         state = true;
 
     } else {
@@ -216,13 +213,12 @@ int main(int argc, char *argv[])
 
     // Init data loading and writing
     QFile t_fileIn(parser.value(inputOption));
-
     FiffRawData raw(t_fileIn);
     QSharedPointer<FiffInfo> pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(raw.info));
 
     // Setup comparison of transformation matrices
     FiffCoordTrans devHeadTrans = pFiffInfo->dev_head_t;    // transformation that only updates after big head movements
-    float threshRot = 5;           // in degree
+    float threshRot = 5;          // in degree
     float threshTrans = 0.005;    // in m
 
     // Set up the reading parameters
@@ -256,6 +252,7 @@ int main(int argc, char *argv[])
     // setup informations for HPI fit (VectorView)
     QVector<int> vFreqs {166,154,161,158};
     QVector<double> vError;
+    VectorXd vGoF;
     FiffDigPointSet fittedPointSet;
 
     // Use SSP + SGM + calibration
@@ -303,6 +300,7 @@ int main(int argc, char *argv[])
                        pFiffInfo->dev_head_t,
                        vFreqs,
                        vError,
+                       vGoF,
                        fittedPointSet,
                        pFiffInfo,
                        bDoDebug,
@@ -310,8 +308,8 @@ int main(int argc, char *argv[])
         qInfo() << "The HPI-Fit took" << timer.elapsed() << "milliseconds";
         qInfo() << "[done]";
 
-        writePos(time(i),pFiffInfo->dev_head_t,position,vError);
-        if(compareResults(devHeadTrans,pFiffInfo->dev_head_t,threshRot,threshTrans)) {
+        writePos(time(i),pFiffInfo->dev_head_t,position,vGoF,vError);
+        if(compareTransformation(devHeadTrans,pFiffInfo->dev_head_t,threshRot,threshTrans)) {
             qInfo() << "Big head displacement: dev_head_t has been updated";
         }
 
