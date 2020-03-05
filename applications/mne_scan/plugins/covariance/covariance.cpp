@@ -42,7 +42,6 @@
 #include "FormFiles/covariancesetupwidget.h"
 #include "FormFiles/covariancesettingswidget.h"
 
-#include <utils/generics/circularmatrixbuffer.h>
 #include <scMeas/realtimemultisamplearray.h>
 #include <scMeas/realtimecov.h>
 #include <rtprocessing/rtcov.h>
@@ -60,7 +59,6 @@
 
 #include <QtCore/QtPlugin>
 #include <QDebug>
-#include <QMutexLocker>
 #include <QtWidgets>
 
 //=============================================================================================================
@@ -80,18 +78,8 @@ using namespace Eigen;
 //=============================================================================================================
 
 Covariance::Covariance()
-: m_bIsRunning(false)
-, m_bProcessData(false)
-, m_pCovarianceInput(NULL)
-, m_pCovarianceOutput(NULL)
-, m_iEstimationSamples(5000)
+: m_iEstimationSamples(5000)
 {
-    m_pActionShowAdjustment = new QAction(QIcon(":/images/covadjustments.png"), tr("Covariance Adjustments"),this);
-//    m_pActionSetupProject->setShortcut(tr("F12"));
-    m_pActionShowAdjustment->setStatusTip(tr("Covariance Adjustments"));
-    connect(m_pActionShowAdjustment, &QAction::triggered, this, &Covariance::showCovarianceWidget);
-    addPluginAction(m_pActionShowAdjustment);
-//    m_pActionShowAdjustment->setVisible(false);
 }
 
 //=============================================================================================================
@@ -116,16 +104,37 @@ void Covariance::init()
 {
     // Load Settings
     QSettings settings;
-    m_iEstimationSamples = settings.value(QString("Plugin/%1/estimationSamples").arg(this->getName()), 5000).toInt();
+    m_iEstimationSamples = settings.value(QString("MNESCAN/%1/estimationSamples").arg(this->getName()), 5000).toInt();
 
     // Input
     m_pCovarianceInput = PluginInputData<RealTimeMultiSampleArray>::create(this, "CovarianceIn", "Covariance input data");
-    connect(m_pCovarianceInput.data(), &PluginInputConnector::notify, this, &Covariance::update, Qt::DirectConnection);
+    connect(m_pCovarianceInput.data(), &PluginInputConnector::notify,
+            this, &Covariance::update, Qt::DirectConnection);
     m_inputConnectors.append(m_pCovarianceInput);
 
     // Output
     m_pCovarianceOutput = PluginOutputData<RealTimeCov>::create(this, "CovarianceOut", "Covariance output data");
+    m_pCovarianceOutput->data()->setName(this->getName());//Provide name to auto store widget settings
     m_outputConnectors.append(m_pCovarianceOutput);
+}
+
+//=============================================================================================================
+
+void Covariance::initPluginControlWidgets()
+{
+    if(m_pFiffInfo) {
+        QList<QWidget*> plControlWidgets;
+
+        CovarianceSettingsWidget* pCovarianceWidget = new CovarianceSettingsWidget();
+        connect(pCovarianceWidget, &CovarianceSettingsWidget::samplesChanged,
+                this, &Covariance::changeSamples);
+        pCovarianceWidget->setMinSamples(m_pFiffInfo->sfreq);
+        pCovarianceWidget->setCurrentSamples(m_iEstimationSamples);
+        pCovarianceWidget->setObjectName("group_Settings");
+        plControlWidgets.append(pCovarianceWidget);
+
+        emit pluginControlWidgetsChanged(plControlWidgets, this->getName());
+    }
 }
 
 //=============================================================================================================
@@ -141,15 +150,7 @@ void Covariance::unload()
 
 bool Covariance::start()
 {
-//    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
-//    if(this->isRunning()) {
-//        QThread::wait();
-//    }
-
-    m_bIsRunning = true;
-
-    // Start threads
-    QThread::start();
+    //Start thread as soon as we have received the first data block. See update().
 
     return true;
 }
@@ -158,8 +159,8 @@ bool Covariance::start()
 
 bool Covariance::stop()
 {
-    //Wait until this thread is stopped
-    m_bIsRunning = false;
+    requestInterruption();
+    wait();
 
     return true;
 }
@@ -182,8 +183,6 @@ QString Covariance::getName() const
 
 void Covariance::showCovarianceWidget()
 {
-    m_pCovarianceWidget = CovarianceSettingsWidget::SPtr(new CovarianceSettingsWidget(this));
-    m_pCovarianceWidget->show();
 }
 
 //=============================================================================================================
@@ -205,32 +204,40 @@ void Covariance::update(SCMEASLIB::Measurement::SPtr pMeasurement)
         if(!m_pFiffInfo) {
             m_pFiffInfo = pRTMSA->info();
 
+            initPluginControlWidgets();
+
             m_pCovarianceOutput->data()->setFiffInfo(m_pFiffInfo);
 
-            //Set m_iEstimationSamples so that we alwyas wait for 5 secs
-            m_iEstimationSamples = m_pFiffInfo->sfreq * 5;
             m_pRtCov = RtCov::SPtr(new RtCov(m_iEstimationSamples, m_pFiffInfo));
             connect(m_pRtCov.data(), &RtCov::covCalculated,
                     this, &Covariance::appendCovariance);
+
+            if(!m_pCircularBuffer) {
+                m_pCircularBuffer = CircularBuffer<FIFFLIB::FiffCov>::SPtr::create(10);
+            }
+
+            // Start thread
+            QThread::start();
         }
 
-        if(m_bProcessData) {
-            MatrixXd t_mat;
-
-            for(qint32 i = 0; i < pRTMSA->getMultiArraySize(); ++i) {
-                t_mat = pRTMSA->getMultiSampleArray()[i];
-                m_pRtCov->append(t_mat);
-            }
+        MatrixXd matData;
+        for(qint32 i = 0; i < pRTMSA->getMultiArraySize(); ++i) {
+            // This extra copy is necessary since the referenced data is getting deleted as soon as
+            // m_pRtAve->append() returns. m_pRtAve->append() returns without a copy since it communicates
+            // via signals with the worker thread of RtCov.
+            matData = pRTMSA->getMultiSampleArray()[i];
+            m_pRtCov->append(matData);
         }
     }
 }
 
 //=============================================================================================================
 
-void Covariance::appendCovariance(const FiffCov& p_pCovariance)
+void Covariance::appendCovariance(const FiffCov& covariance)
 {
-    QMutexLocker locker(&mutex);
-    m_qVecCovData.push_back(p_pCovariance);
+    while(!m_pCircularBuffer->push(covariance)) {
+        //Do nothing until the circular buffer is ready to accept new data again
+    }
 }
 
 //=============================================================================================================
@@ -247,23 +254,13 @@ void Covariance::changeSamples(qint32 samples)
 
 void Covariance::run()
 {
-    // Read Fiff Info
-    while(!m_pFiffInfo) {
-        msleep(10);// Wait for fiff Info
-    }
-
-    m_pCovarianceOutput->data()->setFiffInfo(m_pFiffInfo);
+    FiffCov covariance;
 
     // Start processing data
-    m_bProcessData = true;
-
-    while (m_bIsRunning) {
-        if(m_bProcessData) {
-            //Add to covariance estimation
-            QMutexLocker locker(&mutex);
-            if(!m_qVecCovData.isEmpty()) {
-                m_pCovarianceOutput->data()->setValue(m_qVecCovData.takeFirst());
-            }
+    while(!isInterruptionRequested()) {
+        // Get the current data
+        if(m_pCircularBuffer->pop(covariance)) {
+            m_pCovarianceOutput->data()->setValue(covariance);
         }
     }
 }

@@ -43,6 +43,7 @@
 #include "covariance_global.h"
 
 #include <scShared/Interfaces/IAlgorithm.h>
+#include <utils/generics/circularbuffer.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -121,6 +122,12 @@ public:
 
     //=========================================================================================================
     /**
+     * Inits widgets which are used to control this plugin, then emits them in form of a QList.
+     */
+    virtual void initPluginControlWidgets();
+
+    //=========================================================================================================
+    /**
      * Is called when plugin is detached of the stage. Can be used to safe settings.
      */
     virtual void unload();
@@ -141,7 +148,7 @@ public:
 
     void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
-    void appendCovariance(const FIFFLIB::FiffCov &p_pCovariance);
+    void appendCovariance(const FIFFLIB::FiffCov &covariance);
 
     void showCovarianceWidget();
 
@@ -151,21 +158,12 @@ protected:
     virtual void run();
 
 private:
-    QMutex      mutex;
-
-    bool        m_bIsRunning;                       /**< If thread is running */
-    bool        m_bProcessData;                     /**< If data should be received for processing */
-
     qint32      m_iEstimationSamples;
 
-    QVector<FIFFLIB::FiffCov>                       m_qVecCovData;                  /**< Covariance data set */
+    IOBUFFER::CircularBuffer<FIFFLIB::FiffCov>::SPtr    m_pCircularBuffer;              /**< Covariance circular buffer */
 
-    QAction*                                        m_pActionShowAdjustment;
-
-    QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo;                    /**< Fiff measurement info.*/
-    QSharedPointer<RTPROCESSINGLIB::RtCov>          m_pRtCov;                       /**< Real-time covariance. */
-
-    QSharedPointer<CovarianceSettingsWidget>        m_pCovarianceWidget;
+    QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                    /**< Fiff measurement info.*/
+    QSharedPointer<RTPROCESSINGLIB::RtCov>              m_pRtCov;                       /**< Real-time covariance. */
 
     QSharedPointer<SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray> >  m_pCovarianceInput;     /**< The RealTimeMultiSampleArray of the Covariance input.*/
     QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeCov> >              m_pCovarianceOutput;    /**< The RealTimeCov of the Covariance output.*/

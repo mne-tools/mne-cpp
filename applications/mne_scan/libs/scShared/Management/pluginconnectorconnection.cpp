@@ -110,7 +110,7 @@ bool PluginConnectorConnection::createConnection()
                 m_qHashConnections.insert(QPair<QString,QString>(m_pSender->getOutputConnectors()[i]->getName(),
                                                                  m_pReceiver->getInputConnectors()[j]->getName()),
                                           connect(m_pSender->getOutputConnectors()[i].data(), &PluginOutputConnector::notify,
-                                                  m_pReceiver->getInputConnectors()[j].data(), &PluginInputConnector::update, Qt::AutoConnection));
+                                                  m_pReceiver->getInputConnectors()[j].data(), &PluginInputConnector::update, Qt::BlockingQueuedConnection));
                 bConnected = true;
                 break;
             }
@@ -124,7 +124,7 @@ bool PluginConnectorConnection::createConnection()
                 m_qHashConnections.insert(QPair<QString,QString>(m_pSender->getOutputConnectors()[i]->getName(),
                                                                  m_pReceiver->getInputConnectors()[j]->getName()),
                                           connect(m_pSender->getOutputConnectors()[i].data(), &PluginOutputConnector::notify,
-                                                  m_pReceiver->getInputConnectors()[j].data(), &PluginInputConnector::update, Qt::AutoConnection));
+                                                  m_pReceiver->getInputConnectors()[j].data(), &PluginInputConnector::update, Qt::BlockingQueuedConnection));
                 bConnected = true;
                 break;
             }

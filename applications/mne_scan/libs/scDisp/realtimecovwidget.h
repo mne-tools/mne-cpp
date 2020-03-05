@@ -103,12 +103,10 @@ public:
     /**
      * Constructs a RealTimeCovWidget which is a child of parent.
      *
-     * @param [in] pRTC          pointer to real-time evoked measurement.
      * @param [in] pTime         pointer to application time.
      * @param [in] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
      */
-    RealTimeCovWidget(QSharedPointer<SCMEASLIB::RealTimeCov> pRTC,
-                      QSharedPointer<QTime> &pTime,
+    RealTimeCovWidget(QSharedPointer<QTime> &pTime,
                       QWidget* parent = 0);
 
     //=========================================================================================================
@@ -121,15 +119,9 @@ public:
     /**
      * Is called when new data are available.
      *
-     * @param [in] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
+     * @param [in] pMeasurement  pointer to measurement
      */
     virtual void update(SCMEASLIB::Measurement::SPtr pMeasurement);
-
-    //=========================================================================================================
-    /**
-     * Is called when new data are available.
-     */
-    virtual void getData();
 
     //=========================================================================================================
     /**
@@ -142,19 +134,10 @@ protected:
     /**
      * Show modality view.
      */
-    void showModalitySelectionWidget();
-
-    //=========================================================================================================
-    /**
-     * Show modality view.
-     */
     void onNewModalitySelection(const QMap<QString, bool>& modalityMap);
-
-    QSharedPointer<DISPLIB::ModalitySelectionView>   m_pModalitySelectionWidget;    /**< Modality selection widget */
 
     QSharedPointer<SCMEASLIB::RealTimeCov>  m_pRTC;                                 /**< The real-time covariance measurement. */
 
-    QPointer<QAction>                       m_pActionSelectModality;                /**< Modality selection action */
     QPointer<QVBoxLayout>                   m_pRtcLayout;                           /**< Widget layout */
     QPointer<QLabel>                        m_pLabelInit;                           /**< Initialization label */
 

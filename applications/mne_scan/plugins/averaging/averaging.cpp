@@ -53,6 +53,12 @@
 //=============================================================================================================
 
 //=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -63,6 +69,7 @@ using namespace IOBUFFER;
 using namespace FIFFLIB;
 using namespace DISPLIB;
 using namespace RTPROCESSINGLIB;
+using namespace Eigen;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -163,10 +170,16 @@ void Averaging::update(SCMEASLIB::Measurement::SPtr pMeasurement)
         }
 
         // Append new data
+        MatrixXd matData;
+
         if(m_pFiffInfo) {
             for(qint32 i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
                 if(m_pRtAve) {
-                    m_pRtAve->append(pRTMSA->getMultiSampleArray()[i]);
+                    // This extra copy is necessary since the referenced data is getting deleted as soon as
+                    // m_pRtAve->append() returns. m_pRtAve->append() returns without a copy since it communicates
+                    // via signals with the worker thread of RtCov.
+                    matData = pRTMSA->getMultiSampleArray()[i];
+                    m_pRtAve->append(matData);
                 }
             }
         }

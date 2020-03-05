@@ -66,6 +66,6 @@ SUBDIRS += \
 #    dummytoolbox \
 #    rtcmne \
     averaging \
-#    covariance \
+    covariance \
     noisereduction \
 #    neuronalconnectivity \
