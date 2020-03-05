@@ -151,7 +151,7 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
             // We need to use wueued connection here because the FiffSimulator is dispatching its data from the main thread
             // and a blocking one because the data is deleted immediatley after the signal was emmited
             connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
-                    rtesWidget, &RealTimeEvokedSetWidget::update, Qt::BlockingQueuedConnection);
+                    rtesWidget, &RealTimeEvokedSetWidget::update, Qt::AutoConnection);
 
             vboxLayout->addWidget(rtesWidget);
             rtesWidget->init();
