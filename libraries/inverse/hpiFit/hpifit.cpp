@@ -90,7 +90,7 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
                     const MatrixXd& t_matProjectors,
                     FiffCoordTrans& transDevHead,
                     const QVector<int>& vFreqs,
-                    QVector<double>& vGof,
+                    QVector<double>& vError,
                     FiffDigPointSet& fittedPointSet,
                     FiffInfo::SPtr pFiffInfo,
                     bool bDoDebug,
@@ -273,7 +273,7 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
     }
 
     //Generate seed point by projection the found channel position 3cm inwards
-    double error = std::accumulate(vGof.begin(), vGof.end(), .0) / vGof.size();
+    double error = std::accumulate(vError.begin(), vError.end(), .0) / vError.size();
     MatrixXd coilPos = MatrixXd::Zero(numCoils,3);
 
     if(transDevHead.trans == MatrixXd::Identity(4,4).cast<float>() || error > 0.003){
@@ -322,7 +322,7 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
     MatrixXd diffPos = testPos.block(0,0,3,numCoils) - headHPI.transpose();
 
     for(int i = 0; i < diffPos.cols(); ++i) {
-        vGof.append(diffPos.col(i).norm());
+        vError.append(diffPos.col(i).norm());
     }
 
     //Generate final fitted points and store in digitizer set
