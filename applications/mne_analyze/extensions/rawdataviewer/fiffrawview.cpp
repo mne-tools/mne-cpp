@@ -221,6 +221,8 @@ void FiffRawView::setWindowSize(int T)
     m_iT = T;
     m_pModel->setWindowSize(T);
     m_pModel->setDataColumnWidth(m_pTableView->width()-m_pTableView->columnWidth(0));
+    m_pModel->updateScrollPosition(m_pTableView->horizontalScrollBar()->value());
+    m_pTableView->resizeColumnsToContents();
 }
 
 //=============================================================================================================
