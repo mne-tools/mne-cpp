@@ -42,8 +42,6 @@
 
 #include "IPlugin.h"
 
-#include <utils/generics/circularbuffer_old.h>
-
 #include <QMap>
 
 #include <QSharedPointer>

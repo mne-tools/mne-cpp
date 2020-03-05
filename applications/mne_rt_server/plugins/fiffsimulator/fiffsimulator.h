@@ -45,7 +45,7 @@
 #include "../../mne_rt_server/IConnector.h"
 
 #include <fiff/fiff_raw_data.h>
-#include <utils/generics/circularmatrixbuffer.h>
+#include <utils/generics/circularbuffer.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -178,14 +178,14 @@ private:
 
     QMutex mutex;
 
-    FiffProducer*               m_pFiffProducer;        /**< Holds the DataProducer.*/
-    IOBUFFER::RawMatrixBuffer*  m_pRawMatrixBuffer;     /**< The Circular Raw Matrix Buffer. */
-    FIFFLIB::FiffRawData        m_RawInfo;              /**< Holds the fiff raw measurement information. */
-    QString                     m_sResourceDataPath;    /**< Holds the path to the Fiff resource simulation file directory.*/
-    quint32                     m_uiBufferSampleSize;   /**< Sample size of the buffer */
-    float                       m_AccelerationFactor;   /**< Acceleration factor to simulate different sampling rates. */
-    float                       m_TrueSamplingRate;     /**< The true sampling rate of the fif file. */
-    bool                        m_bIsRunning;           /**< Flag whether the producer is running.*/
+    FiffProducer*                           m_pFiffProducer;        /**< Holds the DataProducer.*/
+    IOBUFFER::CircularBuffer_Matrix_float*  m_pRawMatrixBuffer;     /**< The Circular Raw Matrix Buffer. */
+    FIFFLIB::FiffRawData                    m_RawInfo;              /**< Holds the fiff raw measurement information. */
+    QString                                 m_sResourceDataPath;    /**< Holds the path to the Fiff resource simulation file directory.*/
+    quint32                                 m_uiBufferSampleSize;   /**< Sample size of the buffer */
+    float                                   m_AccelerationFactor;   /**< Acceleration factor to simulate different sampling rates. */
+    float                                   m_TrueSamplingRate;     /**< The true sampling rate of the fif file. */
+    bool                                    m_bIsRunning;           /**< Flag whether the producer is running.*/
 };
 } // NAMESPACE
 

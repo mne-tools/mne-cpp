@@ -41,7 +41,7 @@
 #include "fiffproducer.h"
 #include "fiffsimulator.h"
 
-#include <utils/generics/circularmatrixbuffer.h>
+#include <utils/generics/circularbuffer.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -49,6 +49,12 @@
 
 #include <QDebug>
 #include <QFile>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -187,7 +193,9 @@ void FiffProducer::run()
         }
 
         // call blocks until there is free space in the buffer
-        m_pFiffSimulator->m_pRawMatrixBuffer->push(&tmp);
+        while(!m_pFiffSimulator->m_pRawMatrixBuffer->push(tmp) && m_bIsRunning) {
+            //Do nothing until the circular buffer is ready to accept new data again
+        }
     }
 
     // close datastream in this thread

@@ -44,8 +44,7 @@
 
 #include <fiff/fiff_cov.h>
 #include <fiff/fiff_info.h>
-
-#include <utils/generics/circularmatrixbuffer.h>
+#include <utils/generics/circularbuffer.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -165,7 +164,7 @@ private:
 
     bool        m_bIsRunning;                       /**< Holds if real-time Covariance estimation is running.*/
 
-    IOBUFFER::CircularMatrixBuffer<double>::SPtr m_pRawMatrixBuffer;   /**< The Circular Raw Matrix Buffer. */
+    QSharedPointer<IOBUFFER::CircularBuffer_Matrix_double>       m_pCircularBuffer;      /**< Holds incoming raw data. */
 
     QVector <float> m_fWin;
 
