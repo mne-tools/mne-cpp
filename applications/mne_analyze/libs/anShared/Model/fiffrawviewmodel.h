@@ -390,6 +390,12 @@ private:
      */
     void postBlockLoad(int result);
 
+    //=========================================================================================================
+    /**
+     * Replicates the behavior of initFiffData to accomodate changes in number of samples shown
+     */
+    void updateDisplayData();
+
 signals:
      void newBlocksLoaded();
 
