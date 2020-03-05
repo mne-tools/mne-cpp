@@ -58,7 +58,6 @@
 using namespace RTPROCESSINGLIB;
 using namespace FIFFLIB;
 using namespace Eigen;
-using namespace IOBUFFER;
 using namespace INVERSELIB;
 
 //=============================================================================================================
@@ -66,9 +65,9 @@ using namespace INVERSELIB;
 //=============================================================================================================
 
 void RtHpiWorker::doWork(const Eigen::MatrixXd& matData,
-                          const Eigen::MatrixXd& matProjectors,
-                          const QVector<int>& vFreqs,
-                          QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo)
+                         const Eigen::MatrixXd& matProjectors,
+                         const QVector<int>& vFreqs,
+                         QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo)
 {
     if(this->thread()->isInterruptionRequested()) {
         return;

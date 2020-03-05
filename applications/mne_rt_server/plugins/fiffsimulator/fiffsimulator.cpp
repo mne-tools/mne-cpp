@@ -320,7 +320,7 @@ void FiffSimulator::init()
     m_pRawMatrixBuffer = NULL;
 
     if(!m_RawInfo.isEmpty())
-        m_pRawMatrixBuffer = new RawMatrixBuffer(RAW_BUFFFER_SIZE, m_RawInfo.info.nchan, this->m_uiBufferSampleSize);
+        m_pRawMatrixBuffer = new CircularBuffer_Matrix_float(RAW_BUFFFER_SIZE);
 }
 
 //=============================================================================================================
@@ -466,7 +466,7 @@ bool FiffSimulator::readRawInfo()
         //
         if(m_pRawMatrixBuffer)
             delete m_pRawMatrixBuffer;
-        m_pRawMatrixBuffer = new RawMatrixBuffer(10, m_RawInfo.info.nchan, m_uiBufferSampleSize);
+        m_pRawMatrixBuffer = new CircularBuffer_Matrix_float(10);
 
         mutex.unlock();
     }
@@ -486,14 +486,17 @@ void FiffSimulator::run()
     quint32 uiSamplePeriod = (unsigned int) ((t_fBuffSampleSize/t_fSamplingFrequency)*1000000.0f);
 
 //    quint32 count = 0;
+    Eigen::MatrixXf matData;
 
     while(m_bIsRunning)
     {
-        QSharedPointer<Eigen::MatrixXf> t_pRawBuffer(new Eigen::MatrixXf(m_pRawMatrixBuffer->pop()));
-//        ++count;
-//        printf("%d raw buffer (%d x %d) generated\r\n", count, t_pRawBuffer->rows(), t_pRawBuffer->cols());
+        if(m_pRawMatrixBuffer->pop(matData) ) {
+            QSharedPointer<Eigen::MatrixXf> t_pRawBuffer(new Eigen::MatrixXf(matData));
+            //        ++count;
+            //        printf("%d raw buffer (%d x %d) generated\r\n", count, t_pRawBuffer->rows(), t_pRawBuffer->cols());
 
-        emit remitRawBuffer(t_pRawBuffer);
-        usleep(uiSamplePeriod);
+            emit remitRawBuffer(t_pRawBuffer);
+            usleep(uiSamplePeriod);
+        }
     }
 }
