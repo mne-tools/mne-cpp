@@ -82,7 +82,6 @@ using namespace Eigen;
 NoiseReduction::NoiseReduction()
 : m_pNoiseReductionInput(NULL)
 , m_pNoiseReductionOutput(NULL)
-, m_pNoiseReductionBuffer(CircularMatrixBuffer<double>::SPtr())
 , m_iMaxFilterTapSize(-1)
 , m_bSpharaActive(false)
 , m_bFilterActivated(false)
@@ -224,21 +223,20 @@ void NoiseReduction::update(SCMEASLIB::Measurement::SPtr pMeasurement)
         if(m_pRTMSA->getMultiSampleArray().size() > 0) {
             //Init widgets
             if(m_iMaxFilterTapSize == -1) {
+                //Check if buffer was initialized
+                if(!m_pCircularBuffer) {
+                    m_pCircularBuffer = QSharedPointer<CircularBuffer_Matrix_double>(new CircularBuffer_Matrix_double(10));
+                }
+
                 m_iMaxFilterTapSize = m_pRTMSA->getMultiSampleArray().first().cols();
                 initPluginControlWidgets();
                 QThread::start();
             }
 
-            //Check if buffer was initialized
-            if(!m_pNoiseReductionBuffer) {
-                m_pNoiseReductionBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64,
-                                                                                                              m_pRTMSA->getNumChannels(),
-                                                                                                              m_pRTMSA->getMultiSampleArray().first().cols()));
-            }
-
-            MatrixXd matData;
             for(unsigned char i = 0; i < m_pRTMSA->getMultiSampleArray().size(); ++i) {
-                m_pNoiseReductionBuffer->push(&m_pRTMSA->getMultiSampleArray()[i]);
+                while(!m_pCircularBuffer->push(m_pRTMSA->getMultiSampleArray()[i])) {
+                    //Do nothing until the circular buffer is ready to accept new data again
+                }
             }
         }
     }
@@ -345,78 +343,78 @@ void NoiseReduction::run()
 
     while(!isInterruptionRequested()) {
         // Get the current data
-        matData = m_pNoiseReductionBuffer->pop();
-
-        m_mutex.lock();
-        //Do SSP's and compensators here
-        if(m_bCompActivated) {
-            if(m_bProjActivated) {
-                //Comp + Proj
-                matData = m_matSparseProjCompMult * matData;
+        if(m_pCircularBuffer->pop(matData)) {
+            m_mutex.lock();
+            //Do SSP's and compensators here
+            if(m_bCompActivated) {
+                if(m_bProjActivated) {
+                    //Comp + Proj
+                    matData = m_matSparseProjCompMult * matData;
+                } else {
+                    //Comp
+                    matData = m_matSparseCompMult * matData;
+                }
             } else {
-                //Comp
-                matData = m_matSparseCompMult * matData;
-            }
-        } else {
-            if(m_bProjActivated) {
-                //Proj
-                matData = m_matSparseProjMult * matData;
-            } else {
-                //None - Raw
-            }
-        }
-
-        //Do temporal filtering here
-        if(m_bFilterActivated) {
-            QList<FilterData> list;
-            list << m_filterData;
-            matData = pRtFilter->filterDataBlock(matData,
-                                               m_iMaxFilterLength,
-                                               m_lFilterChannelList,
-                                               list);
-        }
-
-//        qDebug()<<"matData dim:"<<matData.rows()<<"x"<<matData.cols();
-//        qDebug()<<"m_lFilterChannelList.size():"<<m_lFilterChannelList.size();
-//        qDebug()<<"m_filterData.size():"<<m_filterData.size();
-
-        //Do SPHARA here
-        if(m_bSpharaActive) {
-            //Set bad channels to zero so they do not get smeared into
-            for(int i = 0; i < m_pFiffInfo->bads.size(); ++i) {
-                matData.row(m_pFiffInfo->ch_names.indexOf(m_pFiffInfo->bads.at(i))).setZero();
+                if(m_bProjActivated) {
+                    //Proj
+                    matData = m_matSparseProjMult * matData;
+                } else {
+                    //None - Raw
+                }
             }
 
-            matData = m_matSparseSpharaMult * matData;
-        }
+            //Do temporal filtering here
+            if(m_bFilterActivated) {
+                QList<FilterData> list;
+                list << m_filterData;
+                matData = pRtFilter->filterDataBlock(matData,
+                                                   m_iMaxFilterLength,
+                                                   m_lFilterChannelList,
+                                                   list);
+            }
 
-//        //Common average
-//        MatrixXd commonAvr = MatrixXd(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
-//        commonAvr.setZero();
+    //        qDebug()<<"matData dim:"<<matData.rows()<<"x"<<matData.cols();
+    //        qDebug()<<"m_lFilterChannelList.size():"<<m_lFilterChannelList.size();
+    //        qDebug()<<"m_filterData.size():"<<m_filterData.size();
 
-//        int nEEGCh = 0;
+            //Do SPHARA here
+            if(m_bSpharaActive) {
+                //Set bad channels to zero so they do not get smeared into
+                for(int i = 0; i < m_pFiffInfo->bads.size(); ++i) {
+                    matData.row(m_pFiffInfo->ch_names.indexOf(m_pFiffInfo->bads.at(i))).setZero();
+                }
 
-//        for(int i = 0; i <m_pFiffInfo->chs.size(); ++i) {
-//            if(m_pFiffInfo->chs.at(i).ch_name.contains("EEG") && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)) {
-//                nEEGCh++;
-//            }
-//        }
+                matData = m_matSparseSpharaMult * matData;
+            }
 
-//        for(int i = 0; i <m_pFiffInfo->chs.size(); ++i) {
-//            for(int j = 0; j < m_pFiffInfo->chs.size(); ++j) {
-//                if(m_pFiffInfo->chs.at(j).ch_name.contains("EEG") && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(j).ch_name)) {
-//                    commonAvr(i,j) = 1/nEEGCh;
-//                }
-//            }
-//        }
+    //        //Common average
+    //        MatrixXd commonAvr = MatrixXd(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
+    //        commonAvr.setZero();
 
-//        UTILSLIB::IOUtils::write_eigen_matrix(commonAvr, "commonAvr.txt", "common vaergae matrix");
+    //        int nEEGCh = 0;
 
-        m_mutex.unlock();
+    //        for(int i = 0; i <m_pFiffInfo->chs.size(); ++i) {
+    //            if(m_pFiffInfo->chs.at(i).ch_name.contains("EEG") && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)) {
+    //                nEEGCh++;
+    //            }
+    //        }
 
-        //Send the data to the connected plugins and the display
-        if(!isInterruptionRequested()) {
-            m_pNoiseReductionOutput->data()->setValue(matData);
+    //        for(int i = 0; i <m_pFiffInfo->chs.size(); ++i) {
+    //            for(int j = 0; j < m_pFiffInfo->chs.size(); ++j) {
+    //                if(m_pFiffInfo->chs.at(j).ch_name.contains("EEG") && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(j).ch_name)) {
+    //                    commonAvr(i,j) = 1/nEEGCh;
+    //                }
+    //            }
+    //        }
+
+    //        UTILSLIB::IOUtils::write_eigen_matrix(commonAvr, "commonAvr.txt", "common vaergae matrix");
+
+            m_mutex.unlock();
+
+            //Send the data to the connected plugins and the display
+            if(!isInterruptionRequested()) {
+                m_pNoiseReductionOutput->data()->setValue(matData);
+            }
         }
     }
 }

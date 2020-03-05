@@ -43,8 +43,8 @@
 #include "fiffsimulator_global.h"
 
 #include <scShared/Interfaces/ISensor.h>
-#include <utils/generics/circularmatrixbuffer.h>
 #include <communication/rtClient/rtcmdclient.h>
+#include <utils/generics/circularbuffer.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -53,6 +53,12 @@
 #include <QtWidgets>
 #include <QVector>
 #include <QTimer>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -218,11 +224,11 @@ protected:
 
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pRTMSA_FiffSimulator;     /**< The RealTimeMultiSampleArray to provide the rt_server Channels.*/
 
-    QSharedPointer<FiffSimulatorProducer>           m_pFiffSimulatorProducer;   /**< Holds the FiffSimulatorProducer.*/
-    QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo;                /**< Fiff measurement info.*/
-    QSharedPointer<COMMUNICATIONLIB::RtCmdClient>   m_pRtCmdClient;             /**< The command client.*/
-    QSharedPointer<DISP3DLIB::HpiView>              m_pHPIWidget;               /**< HPI widget. */
-    QSharedPointer<IOBUFFER::RawMatrixBuffer>       m_pRawMatrixBuffer_In;      /**< Holds incoming raw data. */
+    QSharedPointer<FiffSimulatorProducer>                       m_pFiffSimulatorProducer;   /**< Holds the FiffSimulatorProducer.*/
+    QSharedPointer<FIFFLIB::FiffInfo>                           m_pFiffInfo;                /**< Fiff measurement info.*/
+    QSharedPointer<COMMUNICATIONLIB::RtCmdClient>               m_pRtCmdClient;             /**< The command client.*/
+    QSharedPointer<DISP3DLIB::HpiView>                          m_pHPIWidget;               /**< HPI widget. */
+    QSharedPointer<IOBUFFER::CircularBuffer_Matrix_float>       m_pCircularBuffer;      /**< Holds incoming raw data. */
 
     QAction*                m_pActionComputeHPI;            /**< Update HPI info into Fiff Info action */
 

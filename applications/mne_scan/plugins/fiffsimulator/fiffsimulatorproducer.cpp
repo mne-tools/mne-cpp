@@ -47,6 +47,12 @@
 #include <QMutexLocker>
 
 //=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -150,7 +156,7 @@ void FiffSimulatorProducer::run()
     }
 
     // Inits
-    MatrixXf t_matRawBuffer;
+    MatrixXf matData;
     fiff_int_t kind;
     qint32 from = 0;
     qint32 to = -1;
@@ -169,14 +175,14 @@ void FiffSimulatorProducer::run()
         // Only perform data reading if the measurement was started
         if(m_pFiffSimulator->isRunning()) {
             m_pRtDataClient->readRawBuffer(m_pFiffSimulator->m_pFiffInfo->nchan,
-                                           t_matRawBuffer,
+                                           matData,
                                            kind);
 
             if(kind == FIFF_DATA_BUFFER) {
-                to += t_matRawBuffer.cols();
-                from += t_matRawBuffer.cols();
-                if(!isInterruptionRequested()) {
-                    m_pFiffSimulator->m_pRawMatrixBuffer_In->push(&t_matRawBuffer);
+                to += matData.cols();
+                from += matData.cols();
+                while(!m_pFiffSimulator->m_pCircularBuffer->push(matData) && !isInterruptionRequested()) {
+                    //Do nothing until the circular buffer is ready to accept new data again
                 }
             } else if(FIFF_DATA_BUFFER == FIFF_BLOCK_END) {
                 break;
