@@ -137,6 +137,24 @@ public:
      */
     bool wasLastFitOk();
 
+    //=========================================================================================================
+    /**
+     * Compares two transformation matrices with each other and returns true if a threshold in movement or
+     * rotation is exceeded
+     *
+     * @param[in] mTrans            The device to head transformation matrix to compare to.
+     * @param[in] mTransNew         The device to head transformation matrix to be compared.
+     * @param[in] fThreshRot        The threshold for big head rotation in degree
+     * @param[in] fThreshTrans      The threshold for big head movement in m
+     *
+     * @return state            The status that shows if devHead is updated or not
+     *
+     */
+    static bool compareTransformation(const Eigen::MatrixX4f& mTrans,
+                                      const Eigen::MatrixX4f& mTransNew,
+                                      const float& fThreshRot,
+                                      const float& fThreshTrans);
+
 protected:
     virtual void closeEvent( QCloseEvent * event );
 
