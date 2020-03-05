@@ -42,10 +42,9 @@
 
 #include "noisereduction_global.h"
 
-#include <utils/generics/circularmatrixbuffer.h>
+#include <utils/generics/circularbuffer.h>
 #include <utils/filterTools/filterdata.h>
 #include <fiff/fiff_proj.h>
-
 #include <scShared/Interfaces/IAlgorithm.h>
 
 //=============================================================================================================
@@ -257,11 +256,11 @@ private:
 
     Eigen::RowVectorXi              m_lFilterChannelList;                       /**< The indices of the channels to be filtered.*/
 
-    QSharedPointer<FIFFLIB::FiffInfo>                               m_pFiffInfo;                /**< Fiff measurement info.*/
+    QSharedPointer<FIFFLIB::FiffInfo>                               m_pFiffInfo;            /**< Fiff measurement info.*/
 
-    IOBUFFER::CircularMatrixBuffer<double>::SPtr                    m_pNoiseReductionBuffer;    /**< Holds incoming data.*/
+    QSharedPointer<IOBUFFER::CircularBuffer_Matrix_double>          m_pCircularBuffer;      /**< Holds incoming raw data. */
 
-    QSharedPointer<SCMEASLIB::RealTimeMultiSampleArray>             m_pRTMSA;                   /**< the incoming real time multi sample array object. */
+    QSharedPointer<SCMEASLIB::RealTimeMultiSampleArray>             m_pRTMSA;               /**< the incoming real time multi sample array object. */
 
     SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr      m_pNoiseReductionInput;      /**< The RealTimeMultiSampleArray of the NoiseReduction input.*/
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pNoiseReductionOutput;     /**< The RealTimeMultiSampleArray of the NoiseReduction output.*/
