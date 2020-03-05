@@ -112,6 +112,9 @@ public:
     void onNewModelAvalible(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
 
 private:
+
+    void setUpControls();
+
     // Control
     QPointer<QDockWidget>                m_pControlDock;                 /**< Control Widget */
     QPointer<RawDataViewerControl>       m_pRawDataViewerControl;
