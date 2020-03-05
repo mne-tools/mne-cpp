@@ -59,12 +59,14 @@ MultiView::MultiView(QWidget *parent)
 {
     m_pSplitterHorizontal = new QSplitter(this);
     m_pSplitterHorizontal->setOrientation(Qt::Horizontal);
+    m_pSplitterHorizontal->setHandleWidth(5);
 
     m_pSplitterVertical = new QSplitter(this);
     m_pSplitterVertical->setOrientation(Qt::Vertical);
+    m_pSplitterVertical->setHandleWidth(5);
 
     m_pVerticalTabWidget = new QTabWidget();
-    m_pVerticalTabWidget->setTabBarAutoHide(false);
+    m_pVerticalTabWidget->setTabBarAutoHide(true);
     m_pVerticalTabWidget->setMovable(true);
 
     m_pSplitterVertical->addWidget(m_pSplitterHorizontal);

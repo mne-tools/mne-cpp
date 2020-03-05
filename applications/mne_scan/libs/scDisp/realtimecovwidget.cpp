@@ -87,12 +87,13 @@ RealTimeCovWidget::RealTimeCovWidget(QSharedPointer<QTime> &pTime,
     //set vertical layout
     m_pRtcLayout = new QVBoxLayout(this);
 
-    m_pLabelInit= new QLabel;
+    m_pLabelInit= new QLabel(this);
     m_pLabelInit->setText("Acquiring Data");
     m_pLabelInit->setAlignment(Qt::AlignCenter);
     QFont font;font.setBold(true);font.setPointSize(20);
     m_pLabelInit->setFont(font);
     m_pRtcLayout->addWidget(m_pLabelInit);
+    m_pRtcLayout->setContentsMargins(3,0,3,0);
 
     m_pImageSc = new ImageSc;
     m_pRtcLayout->addWidget(m_pImageSc);
@@ -154,8 +155,8 @@ void RealTimeCovWidget::init()
         QList<QWidget*> lControlWidgets;
 
         DISPLIB::ModalitySelectionView* pModalitySelectionWidget = new ModalitySelectionView(m_pRTC->getFiffInfo()->chs,
-                                                                                              QString("MNESCAN/%1").arg(m_pRTC->getName()));
-        pModalitySelectionWidget->setObjectName("group_Modality");
+                                                                                             QString("MNESCAN/%1").arg(m_pRTC->getName()));
+        pModalitySelectionWidget->setObjectName("group_tab_View_Modalities");
         lControlWidgets.append(pModalitySelectionWidget);
 
         connect(pModalitySelectionWidget, &ModalitySelectionView::modalitiesChanged,

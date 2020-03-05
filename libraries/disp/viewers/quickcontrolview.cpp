@@ -66,7 +66,7 @@ QuickControlView::QuickControlView(const QString &sSettingsPath,
                                    Qt::WindowFlags flags,
                                    QWidget *parent,
                                    bool bDraggable)
-: DraggableFramelessWidget(parent, flags, false, bDraggable)
+: DraggableFramelessWidget(parent, flags, false, bDraggable, false)
 , ui(new Ui::QuickControlViewWidget)
 , m_sName(name)
 , m_sSettingsPath(sSettingsPath)
@@ -74,6 +74,11 @@ QuickControlView::QuickControlView(const QString &sSettingsPath,
     ui->setupUi(this);
     ui->m_pTabWidget->setTabBarAutoHide(true);
     ui->m_pTabWidget->setMovable(true);
+    this->setWindowTitle("Quick Control");
+
+    if(windowFlags() & Qt::CustomizeWindowHint) {
+        ui->m_pushButton_close->hide();
+    }
 
     //Init opacity slider
     connect(ui->m_horizontalSlider_opacity, &QSlider::valueChanged,
@@ -221,6 +226,8 @@ void QuickControlView::addGroupBoxWithTabs(QWidget* pWidget,
 
             QVBoxLayout *pVBox = new QVBoxLayout;
             QTabWidget* pTabWidget = new QTabWidget;
+            pTabWidget->setTabBarAutoHide(false);
+            pTabWidget->setMovable(true);
             pTabWidget->setObjectName(sGroupBoxName + "TabWidget");
 
             pTabWidget->addTab(pWidget, sTabNameGroupBox);

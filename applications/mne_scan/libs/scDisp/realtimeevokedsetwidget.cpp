@@ -259,7 +259,7 @@ void RealTimeEvokedSetWidget::init()
 
         // Quick control projectors
         ProjectorsView* pProjectorsView = new ProjectorsView(QString("RTESW/%1").arg(t_sRTESName));
-        pProjectorsView->setObjectName("group_tab_Noise_SSP");
+        pProjectorsView->setObjectName("group_tab_Settings_SSP");
         lControlWidgets.append(pProjectorsView);
 
         connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
@@ -272,7 +272,7 @@ void RealTimeEvokedSetWidget::init()
 
         // Quick control compensators
         CompensatorView* pCompensatorView = new CompensatorView(QString("RTESW/%1").arg(t_sRTESName));
-        pCompensatorView->setObjectName("group_tab_Noise_Comp");
+        pCompensatorView->setObjectName("group_tab_Settings_Comp");
         lControlWidgets.append(pCompensatorView);
 
         connect(pCompensatorView, &CompensatorView::compSelectionChanged,
@@ -285,7 +285,7 @@ void RealTimeEvokedSetWidget::init()
 
         // Quick control filter settings
         FilterSettingsView* pFilterSettingsView = new FilterSettingsView(QString("RTESW/%1").arg(t_sRTESName));
-        pFilterSettingsView->setObjectName("group_tab_Noise_Filter");
+        pFilterSettingsView->setObjectName("group_tab_Settings_Filter");
         lControlWidgets.append(pFilterSettingsView);
 
         connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChannelTypeChanged,
@@ -314,10 +314,25 @@ void RealTimeEvokedSetWidget::init()
             pFilterSettingsView->getFilterView()->setMaxFilterTaps(m_iMaxFilterTapSize);
         }
 
+        // Scaling
+        ScalingView* pScalingView = new ScalingView(QString("RTESW/%1").arg(t_sRTESName),
+                                                    m_pFiffInfo->chs);
+        pScalingView->setObjectName("group_tab_View_Scaling");
+        lControlWidgets.append(pScalingView);
+
+        connect(pScalingView, &ScalingView::scalingChanged,
+                m_pButterflyView.data(), &ButterflyView::setScaleMap);
+
+        connect(pScalingView, &ScalingView::scalingChanged,
+                m_pAverageLayoutView.data(), &AverageLayoutView::setScaleMap);
+
+        m_pButterflyView->setScaleMap(pScalingView->getScaleMap());
+        m_pAverageLayoutView->setScaleMap(pScalingView->getScaleMap());
+
         // Quick control channel data settings
         FiffRawViewSettings* pChannelDataSettingsView = new FiffRawViewSettings(QString("RTESW/%1").arg(t_sRTESName));
         pChannelDataSettingsView->setWidgetList(QStringList() << "screenshot" << "backgroundColor");
-        pChannelDataSettingsView->setObjectName("group_tab_Other_View");
+        pChannelDataSettingsView->setObjectName("group_tab_View_General");
         lControlWidgets.append(pChannelDataSettingsView);
 
         connect(pChannelDataSettingsView, &FiffRawViewSettings::backgroundColorChanged,
@@ -335,7 +350,7 @@ void RealTimeEvokedSetWidget::init()
         // Quick control modality selection
         ModalitySelectionView* pModalitySelectionView = new ModalitySelectionView(m_pFiffInfo->chs,
                                                                                   QString("RTESW/%1").arg(t_sRTESName));
-        pModalitySelectionView->setObjectName("group_tab_Other_Modalities");
+        pModalitySelectionView->setObjectName("group_tab_View_Modalities");
         lControlWidgets.append(pModalitySelectionView);
 
         connect(pModalitySelectionView, &ModalitySelectionView::modalitiesChanged,
@@ -345,7 +360,7 @@ void RealTimeEvokedSetWidget::init()
 
         // Quick control average selection
         AverageSelectionView* pAverageSelectionView = new AverageSelectionView(QString("RTESW/%1").arg(t_sRTESName));
-        pAverageSelectionView->setObjectName("group_tab_Averaging_Selection");
+        pAverageSelectionView->setObjectName("group_tab_Settings_Selection");
         lControlWidgets.append(pAverageSelectionView);
 
         connect(m_pEvokedSetModel.data(), &EvokedSetModel::newAverageActivationMap,
@@ -377,21 +392,6 @@ void RealTimeEvokedSetWidget::init()
         m_pButterflyView->setAverageColor(pAverageSelectionView->getAverageColor());
         m_pAverageLayoutView->setAverageActivation(pAverageSelectionView->getAverageActivation());
         m_pAverageLayoutView->setAverageColor(pAverageSelectionView->getAverageColor());
-
-        // Scaling
-        ScalingView* pScalingView = new ScalingView(QString("RTESW/%1").arg(t_sRTESName),
-                                                    m_pFiffInfo->chs);
-        pScalingView->setObjectName("group_Scaling");
-        lControlWidgets.append(pScalingView);
-
-        connect(pScalingView, &ScalingView::scalingChanged,
-                m_pButterflyView.data(), &ButterflyView::setScaleMap);
-
-        connect(pScalingView, &ScalingView::scalingChanged,
-                m_pAverageLayoutView.data(), &AverageLayoutView::setScaleMap);
-
-        m_pButterflyView->setScaleMap(pScalingView->getScaleMap());
-        m_pAverageLayoutView->setScaleMap(pScalingView->getScaleMap());
 
         emit displayControlWidgetsChanged(lControlWidgets, t_sRTESName);
 

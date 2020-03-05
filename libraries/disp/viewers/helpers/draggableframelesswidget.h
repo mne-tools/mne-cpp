@@ -88,11 +88,13 @@ public:
      * @param [in] flags         The window flags.
      * @param [in] bRoundEdges   Flag specifying whether to round the edges.
      * @param [in] bDraggable    Flag specifying whether this widget is draggable.
+     * @param [in] bFrameless    Flag specifying whether this widget is frameless.
      */
     DraggableFramelessWidget(QWidget *parent = 0,
                              Qt::WindowFlags flags = 0,
                              bool bRoundEdges = false,
-                             bool bDraggable = true);
+                             bool bDraggable = true,
+                             bool bFrameless = true);
 
     //=========================================================================================================
     /**
