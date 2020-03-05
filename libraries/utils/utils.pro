@@ -75,9 +75,7 @@ SOURCES += \
     warp.cpp \
     filterTools/sphara.cpp \
     sphere.cpp \
-    generics/buffer.cpp \
     generics/circularbuffer.cpp \
-    generics/circularmatrixbuffer.cpp \
     generics/observerpattern.cpp \
     generics/applicationlogger.cpp \
     spectral.cpp
@@ -101,11 +99,7 @@ HEADERS += \
     filterTools/sphara.h \
     sphere.h \
     simplex_algorithm.h \
-    generics/buffer.h \
     generics/circularbuffer.h \
-    generics/circularbuffer_old.h \
-    generics/circularmatrixbuffer.h \
-    generics/circularmultichannelbuffer_old.h \
     generics/commandpattern.h \
     generics/observerpattern.h \
     generics/typename_old.h \

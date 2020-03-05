@@ -43,7 +43,7 @@
 #include "averaging_global.h"
 
 #include <scShared/Interfaces/IAlgorithm.h>
-#include <utils/generics/circularmatrixbuffer.h>
+#include <utils/generics/circularbuffer.h>
 
 #include <fiff/fiff_evoked_set.h>
 
