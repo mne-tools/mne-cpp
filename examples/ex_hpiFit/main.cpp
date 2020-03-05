@@ -84,12 +84,12 @@ using namespace Eigen;
  * @param[in] time          The corresponding time in the measurement for the fit.
  * @param[in] pFiffInfo     The FiffInfo file from the measurement.
  * @param[in] position      The matrix to store the results
- * @param[in] vGoF          The vector that stores the goodness of fit.
+ * @param[in] vError        The Hpi estimation Error per coil
  *
- * ToDo: get correct GoF; vGof that is passed to fitHPI does not represent the actual GoF
+ * ToDo: get correct GoF; vError that is passed to fitHPI does not represent the actual GoF
  *
  */
-void writePos(const float time, FiffCoordTrans& dev_head_t, MatrixXd& position, const QVector<double>& vGoF)
+void writePos(const float time, FiffCoordTrans& dev_head_t, MatrixXd& position, const QVector<double>& vError)
 {
     // Write quaternions and time in position matrix. Format is the same like MaxFilter's .pos files.
     QMatrix3x3 rot;
@@ -99,7 +99,7 @@ void writePos(const float time, FiffCoordTrans& dev_head_t, MatrixXd& position, 
             rot(ir,ic) = dev_head_t.trans(ir,ic);
         }
     }    
-    double error = std::accumulate(vGoF.begin(), vGoF.end(), .0) / vGoF.size();     // HPI estimation Error
+    double error = std::accumulate(vError.begin(), vError.end(), .0) / vError.size();     // HPI estimation Error
     QQuaternion quatHPI = QQuaternion::fromRotationMatrix(rot);
 
     //qDebug() << "quatHPI.x() " << "quatHPI.y() " << "quatHPI.y() " << "trans x " << "trans y " << "trans z " << std::endl;
@@ -255,7 +255,7 @@ int main(int argc, char *argv[])
 
     // setup informations for HPI fit (VectorView)
     QVector<int> vFreqs {166,154,161,158};
-    QVector<double> vGof;
+    QVector<double> vError;
     FiffDigPointSet fittedPointSet;
 
     // Use SSP + SGM + calibration
@@ -302,7 +302,7 @@ int main(int argc, char *argv[])
                        matProjectors,
                        pFiffInfo->dev_head_t,
                        vFreqs,
-                       vGof,
+                       vError,
                        fittedPointSet,
                        pFiffInfo,
                        bDoDebug,
@@ -310,7 +310,7 @@ int main(int argc, char *argv[])
         qInfo() << "The HPI-Fit took" << timer.elapsed() << "milliseconds";
         qInfo() << "[done]";
 
-        writePos(time(i),pFiffInfo->dev_head_t,position,vGof);
+        writePos(time(i),pFiffInfo->dev_head_t,position,vError);
         if(compareResults(devHeadTrans,pFiffInfo->dev_head_t,threshRot,threshTrans)) {
             qInfo() << "Big head displacement: dev_head_t has been updated";
         }

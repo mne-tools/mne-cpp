@@ -123,11 +123,11 @@ public:
 
     //=========================================================================================================
     /**
-     * Get GOF per coil in mm.
+     * Get HPI estimation Error per coil in mm.
      *
      * @return   The GOF vector
      */
-    QVector<double> getGOF();
+    QVector<double> getError();
 
     //=========================================================================================================
     /**
@@ -243,7 +243,7 @@ protected:
     Ui::HpiViewWidget*                          ui;                     /**< The HPI dialog. */
 
     QVector<int>                                m_vCoilFreqs;           /**< Vector contains the HPI coil frequencies. */
-    QVector<double>                             m_vGof;                 /**< The goodness of fit in mm for each fitted HPI coil. */
+    QVector<double>                             m_vError;               /**< The HPI estimation error mm for each fitted HPI coil. */
 
     double                                      m_dMeanErrorDist;       /**< The error distances, averaged over all coil errors. */
     qint16                                      m_iNubmerBadChannels;   /**< The number of bad channels.*/

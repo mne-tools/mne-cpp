@@ -473,7 +473,6 @@ void FiffSimulator::doContinousHPI(MatrixXf& matData)
             matData.row(406) = MatrixXf::Constant(1,matData.cols(), m_pFiffInfo->dev_head_t.trans(2,3));
 
             // Write GOF to HPI Ch #7
-            // Write goodness of fit (GOF)to HPI Ch #7
             float dpfitError = 0.0;
             float GOF = 1 - dpfitError;
             matData.row(407) = MatrixXf::Constant(1,matData.cols(), GOF);
