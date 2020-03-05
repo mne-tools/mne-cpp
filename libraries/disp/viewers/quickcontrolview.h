@@ -60,7 +60,7 @@ namespace Ui {
     class QuickControlViewWidget;
 }
 
-class QGridLayout;
+class QVBoxLayout;
 
 //=============================================================================================================
 // DEFINE NAMESPACE DISPLIB
@@ -115,7 +115,7 @@ public:
     void clear();
 
 
-    QGridLayout* findTabWidgetLayout(const QString& sTabName);
+    QVBoxLayout* findTabWidgetLayout(const QString& sTabName);
 
     //=========================================================================================================
     /**
@@ -125,9 +125,12 @@ public:
      * @param [in] lWidgets     The widget which are supposed to be added. The widgets will be categorized based on their
      *                          object names: "widget_", "group_", "group_tab_".
      * @param [in] sTabName     The tab to which the widgets are supposed to be added to.
+     * @param [in] bAddToEnd    Whether to add the new widgets to the end of the layout.
+     *                          If true, the widgets will inserted in the beginning of the layout.
      */
     void addWidgets(const QList<QWidget*>& lWidgets,
-                    const QString& sTabName);
+                    const QString& sTabName,
+                    bool bAddToEnd = false);
 
     //=========================================================================================================
     /**
@@ -135,9 +138,12 @@ public:
      *
      * @param [in] pWidget           The widget which is supposed to be added.
      * @param [in] sTabName          The tab to which the widget is supposed to be added to.
+     * @param [in] bAddToEnd         Whether to add the new widgets to the end of the layout.
+     *                               If true, the widgets will inserted in the beginning of the layout.
      */
     void addWidget(QWidget* pWidget,
-                   const QString& sTabName);
+                   const QString& sTabName,
+                   bool bAddToEnd = false);
 
     //=========================================================================================================
     /**
@@ -146,10 +152,13 @@ public:
      * @param [in] pWidget           The widgets which will be put into the new group box.
      * @param [in] sGroupBoxName     The name of the new group box.
      * @param [in] sTabName          The tab to which the group box is supposed to be added to.
+     * @param [in] bAddToEnd         Whether to add the new widgets to the end of the layout.
+     *                               If true, the widgets will inserted in the beginning of the layout.
      */
     void addGroupBox(QWidget* pWidget,
                      const QString& sGroupBoxName,
-                     const QString& sTabName);
+                     const QString& sTabName,
+                     bool bAddToEnd = false);
 
     //=========================================================================================================
     /**
@@ -160,11 +169,14 @@ public:
      * @param [in] sGroupBoxName     The name of the new group box.
      * @param [in] sTabNameGroupBox  The tab name inside the tab widget of the group box.
      * @param [in] sTabName          The tab to which the group box with the tab widget is supposed to be added to.
+     * @param [in] bAddToEnd         Whether to add the new widgets to the end of the layout.
+     *                               If true, the widgets will inserted in the beginning of the layout.
      */
     void addGroupBoxWithTabs(QWidget* pWidget,
                              const QString& sGroupBoxName,
                              const QString& sTabNameGroupBox,
-                             const QString& sTabName);
+                             const QString& sTabName,
+                             bool bAddToEnd = false);
 
     //=========================================================================================================
     /**

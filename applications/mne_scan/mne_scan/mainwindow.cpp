@@ -114,7 +114,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_pPluginManager->loadPlugins(qApp->applicationDirPath()+pluginDir);
 
     // Quick control selection
-    m_pQuickControlView = new QuickControlView(QString("MNESCAN/MainWindow"),
+    m_pQuickControlView = new QuickControlView(QString("MNESCAN/MainWindow/QuickControl"),
                                                        "MNE Scan",
                                                        Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint,
                                                        this);
@@ -562,7 +562,7 @@ void MainWindow::initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::IPlugin> 
                     setCentralWidget(lPlugins.at(i)->setupWidget());
                 } else {
                     connect(lPlugins.at(i).data(), &IPlugin::pluginControlWidgetsChanged,
-                            this, &MainWindow::onControlWidgetsChanged);
+                            this, &MainWindow::onPluginControlWidgetsChanged);
 
                     if(QWidget* pWidget = m_pDisplayManager->show(lPlugins.at(i)->getOutputConnectors(),
                                                                   m_pTime,
@@ -570,8 +570,8 @@ void MainWindow::initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::IPlugin> 
                                                                   m_qListDynamicControlWidgets)) {
                         for (int i = 0; i < pWidget->layout()->count(); ++i) {
                             if(MeasurementWidget* pMeasWidget = qobject_cast<MeasurementWidget *>(pWidget->layout()->itemAt(i)->widget())) {
-                                connect(pMeasWidget, &MeasurementWidget::pluginControlWidgetsChanged,
-                                        this, &MainWindow::onControlWidgetsChanged);
+                                connect(pMeasWidget, &MeasurementWidget::displayControlWidgetsChanged,
+                                        this, &MainWindow::onDisplayControlWidgetsChanged);
                             }
                         }
 
@@ -596,8 +596,18 @@ void MainWindow::initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::IPlugin> 
 
 //=============================================================================================================
 
-void MainWindow::onControlWidgetsChanged(QList<QWidget*>& lControlWidgets,
-                                         const QString& sPluginName)
+void MainWindow::onPluginControlWidgetsChanged(QList<QWidget*>& lControlWidgets,
+                                               const QString& sPluginName)
+{
+    if(m_pQuickControlView) {
+        m_pQuickControlView->addWidgets(lControlWidgets, sPluginName);
+    }
+}
+
+//=============================================================================================================
+
+void MainWindow::onDisplayControlWidgetsChanged(QList<QWidget*>& lControlWidgets,
+                                                const QString& sPluginName)
 {
     if(m_pQuickControlView) {
         m_pQuickControlView->addWidgets(lControlWidgets, sPluginName);
