@@ -80,18 +80,15 @@ using namespace Eigen;
 //=============================================================================================================
 
 NoiseReduction::NoiseReduction()
-: m_bIsRunning(false)
-, m_pNoiseReductionInput(NULL)
+: m_pNoiseReductionInput(NULL)
 , m_pNoiseReductionOutput(NULL)
 , m_pNoiseReductionBuffer(CircularMatrixBuffer<double>::SPtr())
-, m_iMaxFilterTapSize(0)
+, m_iMaxFilterTapSize(-1)
 , m_bSpharaActive(false)
 , m_bFilterActivated(false)
 , m_bProjActivated(false)
 , m_bCompActivated(false)
 , m_sCurrentSystem("VectorView")
-, m_pRTMSA(RealTimeMultiSampleArray::SPtr(new RealTimeMultiSampleArray()))
-, m_pRtFilter(RTPROCESSINGLIB::RtFilter::SPtr::create())
 , m_iMaxFilterLength(1)
 {
     if(m_sCurrentSystem == "BabyMEG") {
@@ -134,13 +131,9 @@ void NoiseReduction::init()
             this, &NoiseReduction::update, Qt::DirectConnection);
     m_inputConnectors.append(m_pNoiseReductionInput);
 
-    // Output - Uncomment this if you don't want to send processed data (in form of a matrix) to other plugins.
+    // Output
     m_pNoiseReductionOutput = PluginOutputData<RealTimeMultiSampleArray>::create(this, "NoiseReductionOut", "NoiseReduction output data");
     m_outputConnectors.append(m_pNoiseReductionOutput);
-
-    if(!m_pNoiseReductionBuffer.isNull()) {
-        m_pNoiseReductionBuffer = CircularMatrixBuffer<double>::SPtr();
-    }
 }
 
 //=============================================================================================================
@@ -153,14 +146,7 @@ void NoiseReduction::unload()
 
 bool NoiseReduction::start()
 {
-//    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
-//    if(this->isRunning())
-//        QThread::wait();
-
-    m_bIsRunning = true;
-
-    //Start thread
-    QThread::start();
+    //Start thread as soon as we have received the first data block. See update().
 
     return true;
 }
@@ -169,12 +155,12 @@ bool NoiseReduction::start()
 
 bool NoiseReduction::stop()
 {
-    m_bIsRunning = false;
+    requestInterruption();
+    wait();
 
-    m_pNoiseReductionBuffer->releaseFromPop();
-    m_pNoiseReductionBuffer->clear();
+    m_iMaxFilterTapSize = -1;
 
-    m_pNoiseReductionBuffer->clear();
+    m_pNoiseReductionOutput->data()->clear();
 
     return true;
 }
@@ -190,7 +176,7 @@ IPlugin::PluginType NoiseReduction::getType() const
 
 QString NoiseReduction::getName() const
 {
-    return "Noise Reduction";
+    return "Filter";
 }
 
 //=============================================================================================================
@@ -205,15 +191,12 @@ QWidget* NoiseReduction::setupWidget()
 
 void NoiseReduction::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    m_pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
+    if(!m_pRTMSA) {
+        m_pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
+    }
 
     if(m_pRTMSA) {
-        //Check if buffer initialized
-        if(!m_pNoiseReductionBuffer) {
-            m_pNoiseReductionBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, m_pRTMSA->getNumChannels(), m_pRTMSA->getMultiSampleArray()[0].cols()));
-        }
-
-        //Fiff information
+        //Check if the fiff info was inititalized
         if(!m_pFiffInfo) {
             m_pFiffInfo = m_pRTMSA->info();
 
@@ -230,25 +213,37 @@ void NoiseReduction::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             m_matSparseProjCompMult.setIdentity();
             m_matSparseFull.setIdentity();
 
-            //Init output - Unocmment this if you also uncommented the m_pNoiseReductionOutput in the constructor above
+            //Init output
             m_pNoiseReductionOutput->data()->initFromFiffInfo(m_pFiffInfo);
             m_pNoiseReductionOutput->data()->setMultiArraySize(1);
-            m_pNoiseReductionOutput->data()->setVisibility(true);            
-
-            //Init the filter
-            m_iMaxFilterTapSize = m_pRTMSA->getMultiSampleArray().first().cols();
-
-            initPluginControlWidgets();
+            m_pNoiseReductionOutput->data()->setVisibility(true);
         }
 
-        MatrixXd t_mat;
+        // Check if data is present
+        if(m_pRTMSA->getMultiSampleArray().size() > 0) {
+            //Init widgets
+            if(m_iMaxFilterTapSize == -1) {
+                m_iMaxFilterTapSize = m_pRTMSA->getMultiSampleArray().first().cols();
+                initPluginControlWidgets();
+                QThread::start();
+            }
 
-        for(unsigned char i = 0; i < m_pRTMSA->getMultiArraySize(); ++i) {
-            t_mat = m_pRTMSA->getMultiSampleArray()[i];
-            m_pNoiseReductionBuffer->push(&t_mat);
+            //Check if buffer was initialized
+            if(!m_pNoiseReductionBuffer) {
+                m_pNoiseReductionBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64,
+                                                                                                              m_pRTMSA->getNumChannels(),
+                                                                                                              m_pRTMSA->getMultiSampleArray().first().cols()));
+            }
+
+            MatrixXd matData;
+            for(unsigned char i = 0; i < m_pRTMSA->getMultiSampleArray().size(); ++i) {
+                matData = m_pRTMSA->getMultiSampleArray()[i];
+                m_pNoiseReductionBuffer->push(&matData);
+            }
         }
     }
 }
+
 //=============================================================================================================
 
 void NoiseReduction::initPluginControlWidgets()
@@ -334,6 +329,96 @@ void NoiseReduction::setSpharaOptions(const QString& sSytemType,
     m_mutex.unlock();
 
     createSpharaOperator();
+}
+
+//=============================================================================================================
+
+void NoiseReduction::run()
+{
+    // Read and create SPHARA operator for the first time
+    initSphara();
+    createSpharaOperator();
+
+    // Init
+    MatrixXd matData;
+    QScopedPointer<RTPROCESSINGLIB::RtFilter> pRtFilter(new RTPROCESSINGLIB::RtFilter());
+
+    while(!isInterruptionRequested()) {
+        // Get the current data
+        matData = m_pNoiseReductionBuffer->pop();
+
+        m_mutex.lock();
+        //Do SSP's and compensators here
+        if(m_bCompActivated) {
+            if(m_bProjActivated) {
+                //Comp + Proj
+                matData = m_matSparseProjCompMult * matData;
+            } else {
+                //Comp
+                matData = m_matSparseCompMult * matData;
+            }
+        } else {
+            if(m_bProjActivated) {
+                //Proj
+                matData = m_matSparseProjMult * matData;
+            } else {
+                //None - Raw
+            }
+        }
+
+        //Do temporal filtering here
+        if(m_bFilterActivated) {
+            QList<FilterData> list;
+            list << m_filterData;
+            matData = pRtFilter->filterDataBlock(matData,
+                                               m_iMaxFilterLength,
+                                               m_lFilterChannelList,
+                                               list);
+        }
+
+//        qDebug()<<"matData dim:"<<matData.rows()<<"x"<<matData.cols();
+//        qDebug()<<"m_lFilterChannelList.size():"<<m_lFilterChannelList.size();
+//        qDebug()<<"m_filterData.size():"<<m_filterData.size();
+
+        //Do SPHARA here
+        if(m_bSpharaActive) {
+            //Set bad channels to zero so they do not get smeared into
+            for(int i = 0; i < m_pFiffInfo->bads.size(); ++i) {
+                matData.row(m_pFiffInfo->ch_names.indexOf(m_pFiffInfo->bads.at(i))).setZero();
+            }
+
+            matData = m_matSparseSpharaMult * matData;
+        }
+
+//        //Common average
+//        MatrixXd commonAvr = MatrixXd(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
+//        commonAvr.setZero();
+
+//        int nEEGCh = 0;
+
+//        for(int i = 0; i <m_pFiffInfo->chs.size(); ++i) {
+//            if(m_pFiffInfo->chs.at(i).ch_name.contains("EEG") && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)) {
+//                nEEGCh++;
+//            }
+//        }
+
+//        for(int i = 0; i <m_pFiffInfo->chs.size(); ++i) {
+//            for(int j = 0; j < m_pFiffInfo->chs.size(); ++j) {
+//                if(m_pFiffInfo->chs.at(j).ch_name.contains("EEG") && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(j).ch_name)) {
+//                    commonAvr(i,j) = 1/nEEGCh;
+//                }
+//            }
+//        }
+
+//        UTILSLIB::IOUtils::write_eigen_matrix(commonAvr, "commonAvr.txt", "common vaergae matrix");
+
+        m_mutex.unlock();
+
+        //Send the data to the connected plugins and the display
+        if(!isInterruptionRequested()) {
+            m_pNoiseReductionOutput->data()->setValue(matData);
+        }
+    }
 }
 
 //=============================================================================================================
@@ -629,97 +714,4 @@ void NoiseReduction::createSpharaOperator()
     m_matSparseFull = m_matSparseProjMult * m_matSparseCompMult;
 
     m_mutex.unlock();
-}
-
-//=============================================================================================================
-
-void NoiseReduction::run()
-{
-    //
-    // Wait for Fiff Info
-    //
-    while(!m_pFiffInfo) {
-        msleep(10);// Wait for fiff Info
-    }
-
-    //Read and create SPHARA operator for the first time
-    initSphara();
-    createSpharaOperator();
-
-    while(m_bIsRunning)
-    {
-        //Dispatch the inputs
-        MatrixXd t_mat = m_pNoiseReductionBuffer->pop();
-
-        m_mutex.lock();
-
-        //Do SSP's and compensators here
-        if(m_bCompActivated) {
-            if(m_bProjActivated) {
-                //Comp + Proj
-                t_mat = m_matSparseProjCompMult * t_mat;
-            } else {
-                //Comp
-                t_mat = m_matSparseCompMult * t_mat;
-            }
-        } else {
-            if(m_bProjActivated) {
-                //Proj
-                t_mat = m_matSparseProjMult * t_mat;
-            } else {
-                //None - Raw
-            }
-        }
-
-        //Do temporal filtering here
-        if(m_bFilterActivated) {
-            QList<FilterData> list;
-            list << m_filterData;
-            t_mat = m_pRtFilter->filterDataBlock(t_mat,
-                                                 m_iMaxFilterLength,
-                                                 m_lFilterChannelList,
-                                                 list);
-        }
-
-//        qDebug()<<"t_mat dim:"<<t_mat.rows()<<"x"<<t_mat.cols();
-//        qDebug()<<"m_lFilterChannelList.size():"<<m_lFilterChannelList.size();
-//        qDebug()<<"m_filterData.size():"<<m_filterData.size();
-
-        //Do SPHARA here
-        if(m_bSpharaActive) {
-            //Set bad channels to zero so they do not get smeared into
-            for(int i = 0; i < m_pFiffInfo->bads.size(); ++i) {
-                t_mat.row(m_pFiffInfo->ch_names.indexOf(m_pFiffInfo->bads.at(i))).setZero();
-            }
-
-            t_mat = m_matSparseSpharaMult * t_mat;
-        }
-
-//        //Common average
-//        MatrixXd commonAvr = MatrixXd(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
-//        commonAvr.setZero();
-
-//        int nEEGCh = 0;
-
-//        for(int i = 0; i <m_pFiffInfo->chs.size(); ++i) {
-//            if(m_pFiffInfo->chs.at(i).ch_name.contains("EEG") && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)) {
-//                nEEGCh++;
-//            }
-//        }
-
-//        for(int i = 0; i <m_pFiffInfo->chs.size(); ++i) {
-//            for(int j = 0; j < m_pFiffInfo->chs.size(); ++j) {
-//                if(m_pFiffInfo->chs.at(j).ch_name.contains("EEG") && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(j).ch_name)) {
-//                    commonAvr(i,j) = 1/nEEGCh;
-//                }
-//            }
-//        }
-
-//        UTILSLIB::IOUtils::write_eigen_matrix(commonAvr, "commonAvr.txt", "common vaergae matrix");
-
-        m_mutex.unlock();
-
-        //Send the data to the connected plugins and the online display
-        m_pNoiseReductionOutput->data()->setValue(t_mat);
-    }
 }

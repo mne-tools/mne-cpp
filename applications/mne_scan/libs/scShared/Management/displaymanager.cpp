@@ -106,7 +106,8 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
 
             qListActions.append(rtmsaWidget->getDisplayActions());
 
-            // We need to use BlockingQueuedConnection here because the FiffSimulator is dispatching its data from the main thread
+            // We need to use wueued connection here because the FiffSimulator is dispatching its data from the main thread
+            // and a blocking one because the data is deleted immediatley after the signal was emmited
             connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
                     rtmsaWidget, &RealTimeMultiSampleArrayWidget::update, Qt::BlockingQueuedConnection);
 
@@ -147,9 +148,10 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
 
             qListActions.append(rtesWidget->getDisplayActions());
 
-            // We cannot use BlockingQueuedConnection here because Averaging is dispatching its data from the main thread via the onNewEvokedSet method
+            // We need to use wueued connection here because the FiffSimulator is dispatching its data from the main thread
+            // and a blocking one because the data is deleted immediatley after the signal was emmited
             connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
-                    rtesWidget, &RealTimeEvokedSetWidget::update, Qt::AutoConnection);
+                    rtesWidget, &RealTimeEvokedSetWidget::update, Qt::BlockingQueuedConnection);
 
             vboxLayout->addWidget(rtesWidget);
             rtesWidget->init();

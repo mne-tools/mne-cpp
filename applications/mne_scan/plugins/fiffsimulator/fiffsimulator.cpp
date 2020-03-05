@@ -102,8 +102,9 @@ FiffSimulator::FiffSimulator()
 
 FiffSimulator::~FiffSimulator()
 {
-    if(m_pFiffSimulatorProducer->isRunning() || this->isRunning())
+    if(m_pFiffSimulatorProducer->isRunning() || this->isRunning()) {
         stop();
+    }
 }
 
 //=============================================================================================================
@@ -152,7 +153,11 @@ bool FiffSimulator::start()
         (*m_pRtCmdClient)["bufsize"].send();
 
         // Init circular buffer to transmit data from the producer to this thread
-        m_pRawMatrixBuffer_In = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(8,m_pFiffInfo->nchan,m_iBufferSize));
+        if(!m_pRawMatrixBuffer_In) {
+            m_pRawMatrixBuffer_In = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(8,
+                                                                                        m_pFiffInfo->nchan,
+                                                                                        m_iBufferSize));
+        }
 
         m_pFiffSimulatorProducer->start();
 
@@ -191,6 +196,9 @@ bool FiffSimulator::stop()
         m_pHPIWidget->hide();
     }
 
+    // Clear all data in the buffer connected to displays and other plugins
+    m_pRTMSA_FiffSimulator->data()->clear();
+
     return true;
 }
 
@@ -225,13 +233,7 @@ void FiffSimulator::run()
 
     while(!isInterruptionRequested()) {
         //pop matrix
-        if(isInterruptionRequested()) {
-            m_pRawMatrixBuffer_In->releaseFromPop();
-            m_pRawMatrixBuffer_In->clear();
-            break;
-        } else {
-            matValue = m_pRawMatrixBuffer_In->pop();
-        }
+        matValue = m_pRawMatrixBuffer_In->pop();
 
         //Update HPI data (for single and continous HPI fitting)
         updateHPI(matValue);

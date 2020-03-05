@@ -162,7 +162,13 @@ public:
                           int nBaseFctsFirst,
                           int nBaseFctsSecond);
 
-protected:
+protected:    
+    //=========================================================================================================
+    /**
+     * IAlgorithm function
+     */
+    virtual void run();
+
     //=========================================================================================================
     /**
      * Update the SSP projection
@@ -213,17 +219,10 @@ protected:
      */
     void createSpharaOperator();
 
-    //=========================================================================================================
-    /**
-     * IAlgorithm function
-     */
-    virtual void run();
-
 private:
     QMutex                          m_mutex;                                    /**< The threads mutex.*/
 
     bool                            m_bCompActivated;                           /**< Compensator activated */
-    bool                            m_bIsRunning;                               /**< Flag whether thread is running.*/
     bool                            m_bSpharaActive;                            /**< Flag whether thread is running.*/
     bool                            m_bProjActivated;                           /**< Projections activated */
     bool                            m_bFilterActivated;                         /**< Projections activated */
@@ -262,9 +261,7 @@ private:
 
     IOBUFFER::CircularMatrixBuffer<double>::SPtr                    m_pNoiseReductionBuffer;    /**< Holds incoming data.*/
 
-    QSharedPointer<RTPROCESSINGLIB::RtFilter>                       m_pRtFilter;                /**< Real time filter object. */
-
-    QSharedPointer<SCMEASLIB::RealTimeMultiSampleArray>             m_pRTMSA;                   /**< the real time multi sample array object. */
+    QSharedPointer<SCMEASLIB::RealTimeMultiSampleArray>             m_pRTMSA;                   /**< the incoming real time multi sample array object. */
 
     SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr      m_pNoiseReductionInput;      /**< The RealTimeMultiSampleArray of the NoiseReduction input.*/
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pNoiseReductionOutput;     /**< The RealTimeMultiSampleArray of the NoiseReduction output.*/

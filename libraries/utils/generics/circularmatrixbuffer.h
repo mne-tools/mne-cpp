@@ -59,6 +59,7 @@
 #include <QSemaphore>
 #include <QSharedPointer>
 #include <stdio.h>
+#include <QDebug>
 
 //=============================================================================================================
 // DEFINE NAMESPACE IOBUFFER
@@ -147,15 +148,16 @@ public:
 
     //=========================================================================================================
     /**
-     * Releases the circular buffer from the acquire statement in the pop() function.
+     * Releases the circular buffer from the acquire statement in the pop() function. If the timeout is hit
+     * this function will return a matrix with all zeros.
      */
-    inline void releaseFromPop();
+    inline bool releaseFromPop();
 
     //=========================================================================================================
     /**
      * Releases the circular buffer from the acquire statement in the push() function.
      */
-    inline void releaseFromPush();
+    inline bool releaseFromPush();
 
 private:
     //=========================================================================================================
@@ -177,6 +179,7 @@ private:
     QSemaphore*     m_pFreeElements;            /**< Holds a semaphore which acquires free elements for thread safe writing. A semaphore is a generalization of a mutex.*/
     QSemaphore*     m_pUsedElements;            /**< Holds a semaphore which acquires written semaphore for thread safe reading.*/
     bool            m_bPause;
+    int             m_iTimeout;                 /**< Holds the timeout value after which the acquire statement will return false.*/
 };
 
 //=============================================================================================================
@@ -196,6 +199,7 @@ CircularMatrixBuffer<_Tp>::CircularMatrixBuffer(unsigned int uiMaxNumMatrices, u
 , m_pFreeElements(new QSemaphore(m_uiMaxNumElements))
 , m_pUsedElements(new QSemaphore(0))
 , m_bPause(false)
+, m_iTimeout(1000)
 {
 }
 
@@ -214,18 +218,15 @@ CircularMatrixBuffer<_Tp>::~CircularMatrixBuffer()
 template<typename _Tp>
 inline void CircularMatrixBuffer<_Tp>::push(const Eigen::Matrix<_Tp, Eigen::Dynamic, Eigen::Dynamic>* pMatrix)
 {
-    if(!m_bPause)
-    {
+    if(!m_bPause) {
         unsigned int t_size = pMatrix->size();
-        if(t_size == m_uiRows*m_uiCols)
-        {
-            m_pFreeElements->acquire(t_size);
-            for(unsigned int i = 0; i < t_size; ++i)
-                m_pBuffer[mapIndex(m_iCurrentWriteIndex)] = pMatrix->data()[i];
-            m_pUsedElements->release(t_size);
-        }
-
-        else {
+        if(t_size == m_uiRows*m_uiCols) {
+            if(m_pFreeElements->tryAcquire(t_size,m_iTimeout)) {
+                for(unsigned int i = 0; i < t_size; ++i)
+                    m_pBuffer[mapIndex(m_iCurrentWriteIndex)] = pMatrix->data()[i];
+                const QSemaphoreReleaser releaser(m_pUsedElements, t_size);
+            }
+        } else {
             printf("Error: Matrix not appended to CircularMatrixBuffer - wrong dimensions\n");
         }
     }
@@ -238,15 +239,15 @@ inline Eigen::Matrix<_Tp, Eigen::Dynamic, Eigen::Dynamic> CircularMatrixBuffer<_
 {
     Eigen::Matrix<_Tp, Eigen::Dynamic, Eigen::Dynamic> matrix(m_uiRows, m_uiCols);
 
-    if(!m_bPause)
-    {
-        m_pUsedElements->acquire(m_uiRows*m_uiCols);
-        for(quint32 i = 0; i < m_uiRows*m_uiCols; ++i)
-            matrix.data()[i] = m_pBuffer[mapIndex(m_iCurrentReadIndex)];
-        m_pFreeElements->release(m_uiRows*m_uiCols);
-    }
-    else
+    if(!m_bPause) {
+        if(m_pUsedElements->tryAcquire(m_uiRows*m_uiCols,m_iTimeout)) {
+            for(quint32 i = 0; i < m_uiRows*m_uiCols; ++i)
+                matrix.data()[i] = m_pBuffer[mapIndex(m_iCurrentReadIndex)];
+            const QSemaphoreReleaser releaser(m_pFreeElements, m_uiRows*m_uiCols);
+        }
+    } else {
         matrix.setZero();
+    }
 
     return matrix;
 }
@@ -310,45 +311,45 @@ inline void CircularMatrixBuffer<_Tp>::pause(bool bPause)
 //=============================================================================================================
 
 template<typename _Tp>
-inline void CircularMatrixBuffer<_Tp>::releaseFromPop()
+inline bool CircularMatrixBuffer<_Tp>::releaseFromPop()
 {
-    const QSemaphoreReleaser releaser(m_pUsedElements);
-//    if((uint)m_pUsedElements->available() < m_uiRows*m_uiCols)
-//    {
-//        //The last matrix which is to be popped from the buffer is supposed to be a zero matrix
-//        unsigned int t_size = m_uiRows*m_uiCols;
-//        for(unsigned int i = 0; i < t_size; ++i)
-//            m_pBuffer[mapIndex(m_iCurrentWriteIndex)] = 0;
+ //   const QSemaphoreReleaser releaser(m_pUsedElements);
+    if((uint)m_pUsedElements->available() < m_uiRows*m_uiCols)
+    {
+        //The last matrix which is to be popped from the buffer is supposed to be a zero matrix
+        unsigned int t_size = m_uiRows*m_uiCols;
+        for(unsigned int i = 0; i < t_size; ++i)
+            m_pBuffer[mapIndex(m_iCurrentWriteIndex)] = 0;
 
-//        //Release (create) values from m_pUsedElements so that the pop function can leave the acquire statement in the pop function
-//        m_pUsedElements->release(m_uiRows*m_uiCols);
+        //Release (create) values from m_pUsedElements so that the pop function can leave the acquire statement in the pop function
+        m_pUsedElements->release(m_uiRows*m_uiCols);
 
-//        return true;
-//    }
+        return true;
+    }
 
-//    return false;
+    return false;
 }
 
 //=============================================================================================================
 
 template<typename _Tp>
-inline void CircularMatrixBuffer<_Tp>::releaseFromPush()
+inline bool CircularMatrixBuffer<_Tp>::releaseFromPush()
 {
-    const QSemaphoreReleaser releaser(m_pFreeElements);
-//    if((uint)m_pFreeElements->available() < m_uiRows*m_uiCols)
-//    {
-//        //The last matrix which is to be pushed to the buffer is supposed to be a zero matrix
-//        unsigned int t_size = m_uiRows*m_uiCols;
-//        for(unsigned int i = 0; i < t_size; ++i)
-//            m_pBuffer[mapIndex(m_iCurrentWriteIndex)] = 0;
+//    const QSemaphoreReleaser releaser(m_pFreeElements);
+    if((uint)m_pFreeElements->available() < m_uiRows*m_uiCols)
+    {
+        //The last matrix which is to be pushed to the buffer is supposed to be a zero matrix
+        unsigned int t_size = m_uiRows*m_uiCols;
+        for(unsigned int i = 0; i < t_size; ++i)
+            m_pBuffer[mapIndex(m_iCurrentWriteIndex)] = 0;
 
-//        //Release (create) values from m_pFreeElements so that the push function can leave the acquire statement in the push function
-//        m_pFreeElements->release(m_uiRows*m_uiCols);
+        //Release (create) values from m_pFreeElements so that the push function can leave the acquire statement in the push function
+        m_pFreeElements->release(m_uiRows*m_uiCols);
 
-//        return true;
-//    }
+        return true;
+    }
 
-//    return false;
+    return false;
 }
 
 //=============================================================================================================
