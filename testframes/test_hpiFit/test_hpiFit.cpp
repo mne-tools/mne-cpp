@@ -111,33 +111,6 @@ TestFitHPI::TestFitHPI()
 
 //=============================================================================================================
 
-void storeHeadPosition(float time, const Eigen::Matrix<float, 4,4, Eigen::DontAlign>& devHeadT, MatrixXd& position, const VectorXd& vGoF, const QVector<double>& vError)
-{
-    // Write quaternions and time in position matrix. Format is the same like MaxFilter's .pos files.
-    Matrix3f rot = devHeadT.block(0,0,3,3);
-
-    double error = std::accumulate(vError.begin(), vError.end(), .0) / vError.size();     // HPI estimation Error
-    Eigen::Quaternionf quatHPI(rot);
-
-    //qDebug() << "quatHPI.x() " << "quatHPI.y() " << "quatHPI.y() " << "trans x " << "trans y " << "trans z " << std::endl;
-    //qDebug() << quatHPI.x() << quatHPI.y() << quatHPI.z() << info->dev_head_t.trans(0,3) << info->dev_head_t.trans(1,3) << info->dev_head_t.trans(2,3) << std::endl;
-
-    float x = quatHPI.x();
-    float y = quatHPI.y();
-    float z = quatHPI.z();
-    position.conservativeResize(position.rows()+1, 10);
-    position(position.rows()-1,0) = time;
-    position(position.rows()-1,1) = x;
-    position(position.rows()-1,2) = y;
-    position(position.rows()-1,3) = z;
-    position(position.rows()-1,4) = devHeadT(0,3);
-    position(position.rows()-1,5) = devHeadT(1,3);
-    position(position.rows()-1,6) = devHeadT(2,3);
-    position(position.rows()-1,7) = vGoF.mean();
-    position(position.rows()-1,8) = error;
-    position(position.rows()-1,9) = 0;
-}
-
 void TestFitHPI::initTestCase()
 {
     qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
@@ -149,7 +122,7 @@ void TestFitHPI::initTestCase()
     QFileInfo t_fileInInfo(t_fileIn);
     QDir().mkdir(t_fileInInfo.path());
 
-    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Read Raw and HPI fit  >>>>>>>>>>>>>>>>>>>>>>>>>\n");
+    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Read Raw and HPI fit >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
     // Setup for reading the raw data
     FiffRawData raw;
@@ -205,7 +178,7 @@ void TestFitHPI::initTestCase()
                        bDoDebug = 0,
                        sHPIResourceDir);
         qInfo() << "[done]\n";
-        storeHeadPosition(ref_pos(i,0), pFiffInfo->dev_head_t.trans, hpi_pos, vGoF, vError);
+        HPIFit::storeHeadPosition(ref_pos(i,0), pFiffInfo->dev_head_t.trans, hpi_pos, vGoF, vError);
     }
     // For debug: position file for HPIFit
     UTILSLIB::IOUtils::write_eigen_matrix(hpi_pos, QCoreApplication::applicationDirPath() + "/MNE-sample-data/hpi_pos.txt");
