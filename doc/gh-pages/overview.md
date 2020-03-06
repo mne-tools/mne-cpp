@@ -10,8 +10,8 @@ MNE-CPP can be used to build standalone software applications, which offer a var
 Besides the basic library (MNE Lib) we deliver a number of applications, e.g., an acquisition and real-time processing (MNE Scan), as well as an offline processing application (MNE Analzye). MNE-CPP is open source BSD licensed (clause 3) and can be freely accessed. MNE-CPP has two external dependencies, namely [Qt](https://www.qt.io/){:target="_blank" rel="noopener"} and [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page){:target="_blank" rel="noopener"}. 
 
 We are targeting two user groups:
-* Front-End users with little or no coding background. These users are interested in straight-forward setups and applications with an easy to use GUI, such as MNE Scan and MNE Analyze.
-* Back-End users who are experienced with programming in C++ and want to use MNE-CPP functionalities to build their own applications. 
+* Front-End users with little or no coding background. These users are interested in straight-forward setups and applications with an easy to use GUI, such as MNE Scan and MNE Analyze. For more information see our [Learn section](/learn/learn.md).
+* Back-End users who are experienced with programming in C++ and want to use MNE-CPP functionalities to build their own applications. For more information see our [Development section](/develop/develop.md). 
 
 MNE-CPP is a community project. Contributions by new developers are always welcomed and greatly appreciated. If you are planning to contribute to MNE-CPP our [contributor page](pages/contribute/contribute.md) is a good point to start.
 
