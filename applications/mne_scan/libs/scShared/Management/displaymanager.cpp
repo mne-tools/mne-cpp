@@ -40,7 +40,6 @@
 #include "displaymanager.h"
 
 #include <scDisp/realtimemultisamplearraywidget.h>
-#include <scDisp/realtimesourceestimatewidget.h>
 #include <scDisp/realtime3dwidget.h>
 #include <scDisp/realtimeevokedsetwidget.h>
 #include <scDisp/realtimecovwidget.h>
@@ -160,21 +159,20 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
             vboxLayout->addWidget(rtcWidget);
             rtcWidget->init();
         }
-//        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSpectrum> >())
-//        {
-//            QSharedPointer<RealTimeSpectrum>* pRealTimeSpectrum = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSpectrum> >()->data();
+        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSpectrum> >())
+        {
+            QSharedPointer<RealTimeSpectrum>* pRealTimeSpectrum = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSpectrum> >()->data();
 
-//            RealTimeSpectrumWidget* fsWidget = new RealTimeSpectrumWidget(*pRealTimeSpectrum, pT, newDisp);
+            RealTimeSpectrumWidget* fsWidget = new RealTimeSpectrumWidget(*pRealTimeSpectrum, pT, newDisp);
 
-//            qListActions.append(fsWidget->getDisplayActions());
-//            qListControlWidgets.append(fsWidget->getPluginControlWidgets());
+            qListActions.append(fsWidget->getDisplayActions());
 
-//            connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
-//                    fsWidget, &RealTimeSpectrumWidget::update, Qt::BlockingQueuedConnection);
+            connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
+                    fsWidget, &RealTimeSpectrumWidget::update, Qt::BlockingQueuedConnection);
 
-//            vboxLayout->addWidget(fsWidget);
-//            fsWidget->init();
-//        }
+            vboxLayout->addWidget(fsWidget);
+            fsWidget->init();
+        }
     }
 
 //    // Add all widgets but NumericWidgets to layout and display them

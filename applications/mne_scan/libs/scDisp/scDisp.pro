@@ -92,7 +92,6 @@ SOURCES += \
     realtimeevokedsetwidget.cpp \
     realtimecovwidget.cpp \
     realtimespectrumwidget.cpp \
-    realtimesourceestimatewidget.cpp \
     realtime3dwidget.cpp \
 
 HEADERS += \
@@ -102,7 +101,6 @@ HEADERS += \
     realtimeevokedsetwidget.h \
     realtimecovwidget.h \
     realtimespectrumwidget.h \
-    realtimesourceestimatewidget.h \
     realtime3dwidget.h \
 
 FORMS += \
