@@ -246,7 +246,6 @@ bool BrainFlowBoard::start()
         msgBox.exec();
         return false;
     }
-    m_bIsRunning = true;
     QThread::start();
     return true;
 }
@@ -257,7 +256,7 @@ bool BrainFlowBoard::stop()
 {
     try {
         m_pBoardShim->stop_stream();
-        m_bIsRunning = false;
+        requestInterruption();
         m_pOutput->data()->clear();
     } catch (const BrainFlowException &err) {
         BoardShim::log_message((int)LogLevels::LEVEL_ERROR, err.what());
@@ -391,7 +390,7 @@ void BrainFlowBoard::run()
     double **data = NULL;
     QList<Eigen::VectorXd> lSampleBlockBuffer;
 
-    while(m_bIsRunning) {
+    while(!isInterruptionRequested()) {
         usleep(lSamplingPeriod);
         iSampleIterator = 0;
 
@@ -452,7 +451,6 @@ void BrainFlowBoard::releaseSession(bool useQmessage)
     m_pBoardShim = nullptr;
     m_pChannels = nullptr;
     m_iBoardId = (int)BoardIds::SYNTHETIC_BOARD;
-    m_bIsRunning = false;
     m_pOutput->data()->clear();
     m_iSamplingFreq = 0;
     m_sStreamerParams = "";
