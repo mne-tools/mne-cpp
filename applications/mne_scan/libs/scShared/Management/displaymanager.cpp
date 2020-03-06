@@ -196,7 +196,6 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
     newDisp->setLayout(vboxLayout);
 
     // If no display was attached return NULL pointer
-    qDebug() << "vboxLayout->count()" << vboxLayout->count();
     if(vboxLayout->count() <= 1) {
         delete newDisp;
         newDisp = Q_NULLPTR;
