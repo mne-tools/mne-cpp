@@ -417,41 +417,41 @@ MatrixXd MNEMath::rescale(const MatrixXd &data, const RowVectorXf &times, QPair<
 
 //=============================================================================================================
 
-bool MNEMath::compareTransformation(const Eigen::MatrixX4f& mDevHeadT,
-                                    const Eigen::MatrixX4f& mDevHeadTNew,
+bool MNEMath::compareTransformation(const MatrixX4f& mDevHeadT,
+                                    const MatrixX4f& mDevHeadDest,
                                     const float& fThreshRot,
                                     const float& fThreshTrans)
 {
     bool bState = false;
 
-    Matrix3f rot = mDevHeadT.block(0,0,3,3);
-    Matrix3f rotNew = mDevHeadTNew.block(0,0,3,3);
+    Matrix3f mRot = mDevHeadT.block(0,0,3,3);
+    Matrix3f mRotDest = mDevHeadDest.block(0,0,3,3);
 
-    VectorXf trans = mDevHeadT.col(3);
-    VectorXf transNew = mDevHeadTNew.col(3);
+    VectorXf vTrans = mDevHeadT.block(0,3,3,1);
+    VectorXf vTransDest = mDevHeadDest.block(0,3,3,1);
 
-    Eigen::Quaternionf quat(rot);
-    Eigen::Quaternionf quatNew(rotNew);
+    Quaternionf quat(mRot);
+    Quaternionf quatNew(mRotDest);
 
     // Compare Rotation
-    Eigen::Quaternionf quatCompare;
-    float angle;
+    Quaternionf quatCompare;
+    float fAngle;
 
     // get rotation between both transformations by multiplying with the inverted quaternion
     quatCompare = quat*quatNew.inverse();
-    angle = quat.angularDistance(quatNew);
-    angle = angle * 180 / M_PI;
+    fAngle = quat.angularDistance(quatNew);
+    fAngle = fAngle * 180 / M_PI;
 
     // Compare translation
-    float move = (trans-transNew).norm();
+    float fMove = (vTrans-vTransDest).norm();
 
     // compare to thresholds and update
-    if(move > fThreshTrans) {
-        qInfo() << "Large movement: " << move*1000 << "mm";
+    if(fMove > fThreshTrans) {
+        qInfo() << "Large movement: " << fMove*1000 << "mm";
         bState = true;
 
-    } else if (angle > fThreshRot) {
-        qInfo() << "Large rotation: " << angle << "degree";
+    } else if (fAngle > fThreshRot) {
+        qInfo() << "Large rotation: " << fAngle << "degree";
         bState = true;
 
     } else {
