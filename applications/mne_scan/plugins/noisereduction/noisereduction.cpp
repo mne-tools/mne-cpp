@@ -256,13 +256,17 @@ void NoiseReduction::initPluginControlWidgets()
         connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
                 this, &NoiseReduction::updateProjection);
 
+        pProjectorsView->setProjectors(m_pFiffInfo->projs);
+
         // Compensators
         CompensatorView* pCompensatorView = new CompensatorView(QString("MNESCAN/%1/").arg(this->getName()));
         pCompensatorView->setObjectName("group_tab_Settings_Comp");
         plControlWidgets.append(pCompensatorView);
 
         connect(pCompensatorView, &CompensatorView::compSelectionChanged,
-               this, &NoiseReduction::updateCompensator);
+                this, &NoiseReduction::updateCompensator);
+
+        pCompensatorView->setCompensators(m_pFiffInfo->comps);
 
         // Filter
         FilterSettingsView* pFilterSettingsView = new FilterSettingsView(QString("MNESCAN/%1/").arg(this->getName()));
@@ -278,7 +282,13 @@ void NoiseReduction::initPluginControlWidgets()
         connect(pFilterSettingsView, &FilterSettingsView::filterActivationChanged,
                 this, &NoiseReduction::setFilterActive);
 
+
+        pFilterSettingsView->getFilterView()->init(m_pFiffInfo->sfreq);
+        pFilterSettingsView->getFilterView()->setWindowSize(m_iMaxFilterTapSize);
+        pFilterSettingsView->getFilterView()->setMaxFilterTaps(m_iMaxFilterTapSize);
+
         this->setFilterActive(pFilterSettingsView->getFilterActive());
+        this->setFilterChannelType(pFilterSettingsView->getFilterView()->getChannelType());
 
         // SPHARA settings
         SpharaSettingsView* pSpharaSettingsView = new SpharaSettingsView();
@@ -290,15 +300,6 @@ void NoiseReduction::initPluginControlWidgets()
 
         connect(pSpharaSettingsView, &SpharaSettingsView::spharaOptionsChanged,
                 this, &NoiseReduction::setSpharaOptions);
-
-        pFilterSettingsView->getFilterView()->init(m_pFiffInfo->sfreq);
-        pFilterSettingsView->getFilterView()->setWindowSize(m_iMaxFilterTapSize);
-        pFilterSettingsView->getFilterView()->setMaxFilterTaps(m_iMaxFilterTapSize);
-
-        this->setFilterChannelType(pFilterSettingsView->getFilterView()->getChannelType());
-
-        pProjectorsView->setProjectors(m_pFiffInfo->projs);
-        pCompensatorView->setCompensators(m_pFiffInfo->comps);
 
         emit pluginControlWidgetsChanged(plControlWidgets, this->getName());
     }
@@ -367,14 +368,10 @@ void NoiseReduction::run()
                 QList<FilterData> list;
                 list << m_filterData;
                 matData = pRtFilter->filterDataBlock(matData,
-                                                   m_iMaxFilterLength,
-                                                   m_lFilterChannelList,
-                                                   list);
+                                                     m_iMaxFilterLength,
+                                                     m_lFilterChannelList,
+                                                     list);
             }
-
-    //        qDebug()<<"matData dim:"<<matData.rows()<<"x"<<matData.cols();
-    //        qDebug()<<"m_lFilterChannelList.size():"<<m_lFilterChannelList.size();
-    //        qDebug()<<"m_filterData.size():"<<m_filterData.size();
 
             //Do SPHARA here
             if(m_bSpharaActive) {
@@ -536,6 +533,7 @@ void NoiseReduction::setFilterChannelType(QString sType)
 {
     m_sFilterChannelType = sType;
 
+    m_mutex.lock();
     //This version is for when all channels of a type are to be filtered (not only the visible ones).
     //Create channel filter list independent from channelNames
     m_lFilterChannelList.resize(0);
@@ -554,18 +552,21 @@ void NoiseReduction::setFilterChannelType(QString sType)
             }
         }
     }
+    m_mutex.unlock();
 }
 
 //=============================================================================================================
 
 void NoiseReduction::setFilter(const FilterData& filterData)
 {
+    m_mutex.lock();
     m_filterData = filterData;
 
     m_iMaxFilterLength = 1;
     if(m_iMaxFilterLength < m_filterData.m_iFilterOrder) {
         m_iMaxFilterLength = m_filterData.m_iFilterOrder;
     }
+    m_mutex.unlock();
 }
 
 //=============================================================================================================
