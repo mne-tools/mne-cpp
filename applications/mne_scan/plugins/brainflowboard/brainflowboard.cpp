@@ -65,7 +65,6 @@ BrainFlowBoard::BrainFlowBoard()
 : m_pBoardShim(NULL)
 , m_pChannels(NULL)
 , m_iBoardId((int)BoardIds::SYNTHETIC_BOARD)
-, m_bIsRunning(false)
 , m_pOutput(NULL)
 , m_iSamplingFreq(0)
 , m_sStreamerParams("")
@@ -77,9 +76,6 @@ BrainFlowBoard::BrainFlowBoard()
     m_pShowSettingsAction->setStatusTip(tr("Streaming Settings"));
     connect(m_pShowSettingsAction, &QAction::triggered, this, &BrainFlowBoard::showSettings);
     addPluginAction(m_pShowSettingsAction);
-
-    m_pOutput = PluginOutputData<RealTimeMultiSampleArray>::create(this, "BrainFlowBoard", "BrainFlow Board Output");
-    m_outputConnectors.append(m_pOutput);
 }
 
 //=============================================================================================================
@@ -108,7 +104,11 @@ QSharedPointer<IPlugin> BrainFlowBoard::clone() const
 //=============================================================================================================
 
 void BrainFlowBoard::init()
-{
+{    
+    m_pOutput = PluginOutputData<RealTimeMultiSampleArray>::create(this, "BrainFlowBoard", "BrainFlow Board Output");
+    m_pOutput->data()->setName(this->getName());//Provide name to auto store widget settings
+    m_outputConnectors.append(m_pOutput);
+
     BoardShim::set_log_file((char *)"brainflow_log.txt");
     BoardShim::enable_dev_board_logger();
 }
@@ -450,6 +450,7 @@ void BrainFlowBoard::releaseSession(bool useQmessage)
 
     m_pBoardShim = nullptr;
     m_pChannels = nullptr;
+    requestInterruption();
     m_iBoardId = (int)BoardIds::SYNTHETIC_BOARD;
     m_pOutput->data()->clear();
     m_iSamplingFreq = 0;

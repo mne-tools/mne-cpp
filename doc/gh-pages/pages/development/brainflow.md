@@ -6,41 +6,40 @@ nav_order: 6
 ---
 # BrainFlow
 
-This plugin adds BrainFlow data acquisition SDK to MNE Scan app.
-
-**Links:**
+The BrainFlow plugin adds data acquisition for several EEG amplifiers to MNE Scan. For more information on the BrainFlow project please see:
 
 * [BrainFlow Docs](https://brainflow.readthedocs.io/en/stable/){:target="_blank" rel="noopener"}
 * [BrainFlow Repo](https://github.com/Andrey1994/brainflow){:target="_blank" rel="noopener"}
 
-## Compilation of BrainFlow submodule
+## Compilation of the BrainFlow submodule
 
-* Make sure that you have the brainflow git submodule by typing
+Make sure that you have brainflow git submodule by typing:
 
 ```
     git submodule update --init applications/mne_scan/plugins/brainflowboard/brainflow
 ```
 
-* Build it as a regular Cmake project but for MSVC you need to ensure that you use exactly the same Cmake Generator as for MNE-CPP, also you need to specify MSVC_RUNTIME dynamic(default is static). And specify -DCMAKE_INSTALL_PREFIX=..\installed
+Build it as a regular Cmake project. For MSVC you need to ensure that you use exactly the same Cmake generator as for MNE-CPP. Also, you need to specify `MSVC_RUNTIME` as dynamic (default is static) and set the `-DCMAKE_INSTALL_PREFIX=..\installed` flag. For compilation with MSVC 2015 on a 64bit system do:
 
-Example of compilation:
 ```
 cd applications\mne_scan\plugins\brainflowboard\brainflow\
 mkdir build
 cd build
-cmake -G "Visual Studio 14 2015 Win64" -DMSVC_RUNTIME=dynamic -DCMAKE_SYSTEM_VERSION=8.1 -DCMAKE_INSTALL_PREFIX=..\\installed ..
+cmake -G "Visual Studio 14 2015 Win64" -DMSVC_RUNTIME=dynamic -DCMAKE_SYSTEM_VERSION=8.1 -DCMAKE_INSTALL_PREFIX="..\\installed" ..
 cmake --build . --target install --config Release
 ```
 
-## BrainFlowBoard plugin setup
+For a MSVC 2017 build you need to use `Visual Studio 15 2017 Win64` instead.
+
+## Compilation of the BrainFlowBoard plugin in MNE Scan
 
 * After steps above make sure that you have brainflowboard uncommented in plugins.pro
 * Build MNE Scan application
-* BrainFlow has several dynamic libraries and JSON file which must be in your search path before you run BrainFlow based app, so you need to copypaste all dynamic libraries and brainflow_boards.json to your executable folder from brainflow\installed\lib
+* BrainFlow has several dynamic libraries and a JSON file which must be in your search path before you run MNE Scan. You need to copypaste all dynamic libraries and the brainflow_boards.json file to your executable folder `mne-cpp\bin` from `mne-cpp\applications\mne_scan\plugins\brainflowboard\brainflow\installed\lib`.
 
-## BrainFlowBoard plugin UI
+## BrainFlowBoard plugin GUI
 
-* You need to provide all inputs required for selected board and click 'Submit Params and Prepare Session' button. For information about inputs in BraiFlowBoard plugin widget use this [table](https://brainflow.readthedocs.io/en/stable/SupportedBoards.html)
-* After that you can start data streaming using play button
-* If you need to change board or other parameters click 'Release Session' button and create a new one.
-* [Optional] if you need to send config to a board, open setting widget and enter a config.
+* You need to provide all inputs required for the selected board and click `Submit Params and Prepare Session` button. For information about inputs in BraiFlowBoard plugin widget use this [table](https://brainflow.readthedocs.io/en/stable/SupportedBoards.html).
+* You can now start data streaming using the play button.
+* If you need to change board or other parameters click `Release Session` button and create a new one.
+* [Optional] if you need to send a config command to a board, open setting widget and enter a config command.
