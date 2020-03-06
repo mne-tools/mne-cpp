@@ -499,7 +499,8 @@ Eigen::Matrix4d HPIFit::computeTransformation(Eigen::MatrixXd NH, MatrixXd BT)
 
 //=============================================================================================================
 
-void HPIFit::createSensorSet(QList<struct Sensor>& sensors, FwdCoilSet* coils) {
+void HPIFit::createSensorSet(QList<struct Sensor>& sensors, FwdCoilSet* coils)
+{
     int nchan = coils->ncoil;
     for(int i = 0; i < nchan; i++){
         Sensor s;

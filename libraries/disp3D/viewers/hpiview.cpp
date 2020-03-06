@@ -644,11 +644,8 @@ void HpiView::storeResults(const FiffCoordTrans& devHeadTrans, const FiffDigPoin
 {
     //Check if git meets distance requirement (GOF)
     if(m_vError.size() > 0) {
-        m_dMeanErrorDist = 0;
-        for(int i = 0; i < m_vError.size(); ++i) {
-            m_dMeanErrorDist += m_vError.at(i);
-        }
-        m_dMeanErrorDist = m_dMeanErrorDist/m_vError.size();
+        m_dMeanErrorDist = 0;        
+        m_dMeanErrorDist = std::accumulate(m_vError.begin(), m_vError.end(), .0) / m_vError.size();
     }
 
     //Update error labels
