@@ -11,7 +11,7 @@ jobs:
     
     steps:
     - name: Clone repository
-      uses: actions/checkout@v1  
+      uses: actions/checkout@v2  
     - name: Install hub
       uses: geertvdc/setup-hub@master
     - name: Setup Github credentials
@@ -43,7 +43,7 @@ jobs:
     
     steps:
     - name: Clone repository
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
     - name: Install Python 3.7 version
       uses: actions/setup-python@v1
       with:
@@ -106,7 +106,7 @@ jobs:
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
     - name: Install Python 3.7 version
       uses: actions/setup-python@v1
       with:
@@ -157,7 +157,7 @@ jobs:
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
     - name: Install Python 3.7 version
       uses: actions/setup-python@v1
       with:
@@ -216,7 +216,7 @@ jobs:
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
     - name: Install Python 3.7 version
       uses: actions/setup-python@v1
       with:
@@ -257,7 +257,7 @@ jobs:
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
     - name: Install Qt Dev Tools, Doxygen and Graphviz
       run: |
         sudo apt-get update -qq
@@ -302,7 +302,7 @@ jobs:
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
     - name: Setup Github credentials
       uses: fusion-engineering/setup-git-credentials@v2
       with:

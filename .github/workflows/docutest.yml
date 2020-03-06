@@ -12,7 +12,7 @@ jobs:
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
     - name: Setup Github credentials
       uses: fusion-engineering/setup-git-credentials@v2
       with:
