@@ -2,6 +2,7 @@
 /**
  * @file     hpiview.cpp
  * @author   Gabriel B Motta <gabrielbenmotta@gmail.com>;
+ *           Ruben Dörfel <ruben.doerfel@tu-ilmenau.de>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>
  * @version  dev
  * @date     March, 2017
