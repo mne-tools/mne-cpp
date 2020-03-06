@@ -63,11 +63,18 @@
 
 namespace DISP3DLIB {
     class NetworkTreeItem;
-    class AbstractView;
+    class View3D;
+    class Data3DTreeModel;
+    class MneDataTreeItem;
 }
 
 namespace SCMEASLIB {
     class RealTimeConnectivityEstimate;
+}
+
+namespace DISPLIB {
+    class QuickControlView;
+    class Control3DView;
 }
 
 //=============================================================================================================
@@ -125,7 +132,11 @@ public:
     virtual void init();
 
 protected:
-    QSharedPointer<SCMEASLIB::RealTimeConnectivityEstimate>     m_pRTCE;                /**< The real-time source estimate measurement. */
+    //=========================================================================================================
+    /**
+     * Creates the GUI.
+     */
+    void createGUI();
 
     bool                                                        m_bInitialized;         /**< Whether init was processed successfully. */
 
@@ -134,9 +145,11 @@ protected:
     FSLIB::AnnotationSet                                        m_annotationSet;        /**< The current annotation set. */
     FSLIB::SurfaceSet                                           m_surfSet;              /**< The current surface set. */
 
-    QPointer<DISP3DLIB::AbstractView>                           m_pAbstractView;         /**< The 3D view to visualize the network data. */
+    QPointer<DISP3DLIB::View3D>                                 m_p3DView;              /**< The Disp3D view. */
+    QSharedPointer<DISP3DLIB::Data3DTreeModel>                  m_pData3DModel;         /**< The Disp3D model. */
 
-    DISP3DLIB::NetworkTreeItem*                                 m_pRtItem;              /**< The Disp3D real time item. */
+    QPointer<DISP3DLIB::NetworkTreeItem>                        m_pRtConnectivityItem;  /**< The Disp3D real time item. */
+    QPointer<DISP3DLIB::MneDataTreeItem>                        m_pRtMNEItem;           /**< The Disp3D real time items. */
 
     QPointer<QAction>                                           m_pActionQuickControl;  /**< Show quick control widget. */
 };

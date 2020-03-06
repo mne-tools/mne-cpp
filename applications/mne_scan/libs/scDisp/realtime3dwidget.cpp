@@ -39,13 +39,20 @@
 #include "realtime3dwidget.h"
 
 #include <scMeas/realtimeconnectivityestimate.h>
+#include <scMeas/realtimesourceestimate.h>
 
 #include <connectivity/network/network.h>
 
 #include <disp3D/viewers/networkview.h>
 #include <disp3D/engine/model/items/network/networktreeitem.h>
+#include <disp3D/engine/model/items/sourcedata/mnedatatreeitem.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
 #include <disp3D/engine/model/items/freesurfer/fssurfacetreeitem.h>
+#include <disp3D/engine/view/view3D.h>
+#include <disp3D/engine/model/data3Dtreemodel.h>
+#include <disp3D/engine/delegate/data3Dtreedelegate.h>
+
+#include <disp/viewers/control3dview.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -66,6 +73,7 @@ using namespace DISP3DLIB;
 using namespace SCMEASLIB;
 using namespace DISPLIB;
 using namespace CONNECTIVITYLIB;
+using namespace MNELIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -74,77 +82,121 @@ using namespace CONNECTIVITYLIB;
 RealTime3DWidget::RealTime3DWidget(QWidget* parent)
 : MeasurementWidget(parent)
 , m_bInitialized(false)
-, m_pRtItem(Q_NULLPTR)
-, m_pAbstractView(new AbstractView())
+, m_p3DView(new View3D())
+, m_pData3DModel(Data3DTreeModel::SPtr::create())
 , m_iNumberBadChannels(0)
 {
-    QGridLayout *mainLayoutView = new QGridLayout();
-    mainLayoutView->addWidget(m_pAbstractView.data());
-    mainLayoutView->setContentsMargins(0,0,0,0);
-    this->setLayout(mainLayoutView);
+    //Init 3D View
+    m_p3DView->setModel(m_pData3DModel);
+
+    createGUI();
 }
 
 //=============================================================================================================
 
 RealTime3DWidget::~RealTime3DWidget()
 {
-    // Store Settings
-    if(!m_pRTCE->getName().isEmpty()) {
-    }
+}
+
+//=============================================================================================================
+
+void RealTime3DWidget::createGUI()
+{
+    QWidget *pWidgetContainer = QWidget::createWindowContainer(m_p3DView, this, Qt::Widget);
+    pWidgetContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    pWidgetContainer->setMinimumSize(400,400);
+
+    QGridLayout* pMainLayoutView = new QGridLayout();
+    pMainLayoutView->addWidget(pWidgetContainer,0,0);
+    pMainLayoutView->setContentsMargins(0,0,0,0);
+
+    this->setLayout(pMainLayoutView);
 }
 
 //=============================================================================================================
 
 void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    if(m_pRTCE = qSharedPointerDynamicCast<RealTimeConnectivityEstimate>(pMeasurement)) {
-        if(m_pRTCE->getValue().data()->isEmpty()) {
+    if(RealTimeConnectivityEstimate::SPtr pRTCE = qSharedPointerDynamicCast<RealTimeConnectivityEstimate>(pMeasurement)) {
+        if(pRTCE->getValue().data()->isEmpty()) {
             return;
         }
 
         // Add rt brain data
-        if(!m_pRtItem) {
-            //qDebug()<<"RealTime3DWidget::getData - Creating m_pRtItem";
-            m_pRtItem = m_pAbstractView->getTreeModel()->addConnectivityData("sample",
-                                                                             "Connectivity",
-                                                                             *(m_pRTCE->getValue().data()));
+        if(!m_pRtConnectivityItem) {
+            //qDebug()<<"RealTime3DWidget::getData - Creating m_pRtConnectivityItem";
+            m_pRtConnectivityItem = m_pData3DModel->addConnectivityData("sample",
+                                                            "Connectivity",
+                                                            *(pRTCE->getValue().data()));
 
-            m_pRtItem->setThresholds(QVector3D(0.9f,0.95f,1.0f));
+            m_pRtConnectivityItem->setThresholds(QVector3D(0.9f,0.95f,1.0f));
 
-            if(m_pRTCE->getSurfSet() && m_pRTCE->getAnnotSet()) {
-                QList<FsSurfaceTreeItem*> lSurfaces = m_pAbstractView->getTreeModel()->addSurfaceSet("sample",
-                                                                                                     "MRI",
-                                                                                                     *(m_pRTCE->getSurfSet().data()),
-                                                                                                     *(m_pRTCE->getAnnotSet().data()));
+            if(pRTCE->getSurfSet() && pRTCE->getAnnotSet()) {
+                QList<FsSurfaceTreeItem*> lSurfaces = m_pData3DModel->addSurfaceSet("sample",
+                                                                                    "MRI",
+                                                                                    *(pRTCE->getSurfSet().data()),
+                                                                                    *(pRTCE->getAnnotSet().data()));
 
                 for(int i = 0; i < lSurfaces.size(); i++) {
                     lSurfaces.at(i)->setAlpha(0.3f);
                 }
             }
 
-            if(m_pRTCE->getSensorSurface() && m_pRTCE->getFiffInfo()) {
-                m_pAbstractView->getTreeModel()->addMegSensorInfo("sample",
-                                                                  "Sensors",
-                                                                  m_pRTCE->getFiffInfo()->chs,
-                                                                  *(m_pRTCE->getSensorSurface()),
-                                                                  m_pRTCE->getFiffInfo()->bads);
-                m_iNumberBadChannels = m_pRTCE->getFiffInfo()->bads.size();
+            if(pRTCE->getSensorSurface() && pRTCE->getFiffInfo()) {
+                m_pData3DModel->addMegSensorInfo("sample",
+                                                 "Sensors",
+                                                 pRTCE->getFiffInfo()->chs,
+                                                 *(pRTCE->getSensorSurface()),
+                                                 pRTCE->getFiffInfo()->bads);
+                m_iNumberBadChannels = pRTCE->getFiffInfo()->bads.size();
+
+                init();
             }
         } else {
-            //qDebug()<<"RealTime3DWidget::getData - Working with m_pRtItem";
-            QPair<float,float> freqs = m_pRTCE->getValue()->getFrequencyRange();
-            QString sItemName = QString("%1_%2_%3").arg(m_pRTCE->getValue()->getConnectivityMethod()).arg(QString::number(freqs.first)).arg(QString::number(freqs.second));
-            m_pRtItem->setText(sItemName);
-            m_pRtItem->addData(*(m_pRTCE->getValue().data()));
+            //qDebug()<<"RealTime3DWidget::getData - Working with m_pRtConnectivityItem";
+            QPair<float,float> freqs = pRTCE->getValue()->getFrequencyRange();
+            QString sItemName = QString("%1_%2_%3").arg(pRTCE->getValue()->getConnectivityMethod()).arg(QString::number(freqs.first)).arg(QString::number(freqs.second));
+            m_pRtConnectivityItem->setText(sItemName);
+            m_pRtConnectivityItem->addData(*(pRTCE->getValue().data()));
 
-            if(m_pRTCE->getSensorSurface() && m_pRTCE->getFiffInfo()) {
-                if(m_iNumberBadChannels != m_pRTCE->getFiffInfo()->bads.size()) {
-                    m_pAbstractView->getTreeModel()->addMegSensorInfo("sample",
-                                                                      "Sensors",
-                                                                      m_pRTCE->getFiffInfo()->chs,
-                                                                      *(m_pRTCE->getSensorSurface()),
-                                                                      m_pRTCE->getFiffInfo()->bads);
-                    m_iNumberBadChannels = m_pRTCE->getFiffInfo()->bads.size();
+            if(pRTCE->getSensorSurface() && pRTCE->getFiffInfo()) {
+                if(m_iNumberBadChannels != pRTCE->getFiffInfo()->bads.size()) {
+                    m_pData3DModel->addMegSensorInfo("sample",
+                                                     "Sensors",
+                                                     pRTCE->getFiffInfo()->chs,
+                                                     *(pRTCE->getSensorSurface()),
+                                                     pRTCE->getFiffInfo()->bads);
+                    m_iNumberBadChannels = pRTCE->getFiffInfo()->bads.size();
+                }
+            }
+        }
+    } else if(RealTimeSourceEstimate::SPtr pRTSE = qSharedPointerDynamicCast<RealTimeSourceEstimate>(pMeasurement)) {
+        QList<MNESourceEstimate::SPtr> lMNEData = pRTSE->getValue();
+
+        // Add source estimate data
+        if(!lMNEData.isEmpty()) {
+            if(!m_pRtMNEItem && pRTSE->getAnnotSet() && pRTSE->getSurfSet() && pRTSE->getFwdSolution()) {
+                //qDebug()<<"RealTimeSourceEstimateWidget::getData - Creating m_lRtItem list";
+                m_pRtMNEItem = m_pData3DModel->addSourceData("Subject", "Data",
+                                                             *lMNEData.first(),
+                                                             *pRTSE->getFwdSolution(),
+                                                             *pRTSE->getSurfSet(),
+                                                             *pRTSE->getAnnotSet());
+
+                m_pRtMNEItem->setLoopState(false);
+                m_pRtMNEItem->setTimeInterval(17);
+                m_pRtMNEItem->setThresholds(QVector3D(0.0,5,10));
+                m_pRtMNEItem->setColormapType("Hot");
+                m_pRtMNEItem->setVisualizationType("Annotation based");
+                m_pRtMNEItem->setNumberAverages(17);
+                m_pRtMNEItem->setAlpha(1.0);
+                m_pRtMNEItem->setStreamingState(true);
+                m_pRtMNEItem->setSFreq(pRTSE->getFiffInfo()->sfreq);
+            } else {
+                //qDebug()<<"RealTimeSourceEstimateWidget::getData - Working with m_lRtItem list";
+
+                if(m_pRtMNEItem) {
+                    m_pRtMNEItem->addData(*lMNEData.first());
                 }
             }
         }
@@ -155,5 +207,42 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 void RealTime3DWidget::init()
 {
+    Data3DTreeDelegate* pData3DTreeDelegate = new Data3DTreeDelegate(this);
+
+    //Init control widgets
+    QList<QWidget*> lControlWidgets;
+
+    QStringList slControlFlags;
+    slControlFlags << "Data" << "View" << "Light";
+    Control3DView* pControl3DView = new Control3DView(Q_NULLPTR, slControlFlags);
+    pControl3DView->setObjectName("group_tab_View_General");
+    lControlWidgets.append(pControl3DView);
+
+    pControl3DView->setDelegate(pData3DTreeDelegate);
+    pControl3DView->setModel(m_pData3DModel.data());
+
+    connect(pControl3DView, &Control3DView::sceneColorChanged,
+            m_p3DView.data(), &View3D::setSceneColor);
+
+    connect(pControl3DView, &Control3DView::rotationChanged,
+            m_p3DView.data(), &View3D::startStopModelRotation);
+
+    connect(pControl3DView, &Control3DView::showCoordAxis,
+            m_p3DView.data(), &View3D::toggleCoordAxis);
+
+    connect(pControl3DView, &Control3DView::showFullScreen,
+            m_p3DView.data(), &View3D::showFullScreen);
+
+    connect(pControl3DView, &Control3DView::lightColorChanged,
+            m_p3DView.data(), &View3D::setLightColor);
+
+    connect(pControl3DView, &Control3DView::lightIntensityChanged,
+            m_p3DView.data(), &View3D::setLightIntensity);
+
+    connect(pControl3DView, &Control3DView::takeScreenshotChanged,
+            m_p3DView.data(), &View3D::takeScreenshot);
+
+    emit displayControlWidgetsChanged(lControlWidgets, "3D View");
+
     m_bInitialized = true;
 }

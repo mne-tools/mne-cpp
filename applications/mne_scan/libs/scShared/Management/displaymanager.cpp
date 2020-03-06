@@ -111,29 +111,31 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
             vboxLayout->addWidget(rtmsaWidget);
             rtmsaWidget->init();
         } else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSourceEstimate> >()) {
-            QSharedPointer<RealTimeSourceEstimate>* pRealTimeSourceEstimate = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSourceEstimate> >()->data();
-            RealTimeSourceEstimateWidget* rtseWidget = new RealTimeSourceEstimateWidget(*pRealTimeSourceEstimate, newDisp);//new RealTimeSourceEstimateWidget(*pRealTimeSourceEstimate, pT, newDisp);
+            if(!m_pRealTime3DWidget) {
+                m_pRealTime3DWidget = new RealTime3DWidget(newDisp);//new RealTime3DWidget(*pRealTimeConnectivityEstimate, pT, newDisp);
+                vboxLayout->addWidget(m_pRealTime3DWidget);
+                m_pRealTime3DWidget->init();
+            }
 
-            qListActions.append(rtseWidget->getDisplayActions());
+            qListActions.append(m_pRealTime3DWidget->getDisplayActions());
 
+            // We need to use queued connection here because the RealTimeSourceEstimate measurement
+            // only holds one measurment and overwrites it immediatley after it emmited notify
             connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
-                    rtseWidget, &RealTimeSourceEstimateWidget::update, Qt::BlockingQueuedConnection);
-
-            vboxLayout->addWidget(rtseWidget);
-            rtseWidget->init();
+                    m_pRealTime3DWidget.data(), &RealTime3DWidget::update, Qt::BlockingQueuedConnection);
         } else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeConnectivityEstimate> >()) {
             if(!m_pRealTime3DWidget) {
                 m_pRealTime3DWidget = new RealTime3DWidget(newDisp);//new RealTime3DWidget(*pRealTimeConnectivityEstimate, pT, newDisp);
                 vboxLayout->addWidget(m_pRealTime3DWidget);
                 m_pRealTime3DWidget->init();
-                qListActions.append(m_pRealTime3DWidget->getDisplayActions());
             }
+
+            qListActions.append(m_pRealTime3DWidget->getDisplayActions());
 
             // We need to use queued connection here because the RealTimeConnectivityEstimate measurement
             // only holds one measurment and overwrites it immediatley after it emmited notify
             connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
                     m_pRealTime3DWidget.data(), &RealTime3DWidget::update, Qt::BlockingQueuedConnection);
-
         } else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeEvokedSet> >()) {
             RealTimeEvokedSetWidget* rtesWidget = new RealTimeEvokedSetWidget(pT, newDisp);
 
@@ -194,7 +196,8 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
     newDisp->setLayout(vboxLayout);
 
     // If no display was attached return NULL pointer
-    if(vboxLayout->count() == 0) {
+    qDebug() << "vboxLayout->count()" << vboxLayout->count();
+    if(vboxLayout->count() <= 1) {
         delete newDisp;
         newDisp = Q_NULLPTR;
     }
