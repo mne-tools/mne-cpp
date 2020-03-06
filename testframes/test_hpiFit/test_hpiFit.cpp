@@ -50,6 +50,7 @@
 
 #include <utils/ioutils.h>
 #include <utils/generics/applicationlogger.h>
+#include <utils/mnemath.h>
 
 #include <fwd/fwd_coil_set.h>
 
@@ -92,6 +93,9 @@ private slots:
     void initTestCase();
     void compareTranslation();
     void compareRotation();
+    void compareAngle();
+    void compareMove();
+    void compareCompare();
     void compareTime();
     void cleanupTestCase();
 
@@ -99,8 +103,13 @@ private:
     double errorTrans = 0.0003;
     double errorQuat = 0.002;
     double errorTime = 0.00000001;
+    double errorAngle = 0.1; // in degree
+    double errorMove = 0.0003; // in m
+    double errorCompare = 0;
     MatrixXd ref_pos;
     MatrixXd hpi_pos;
+    MatrixXd ref_result;
+    MatrixXd hpi_result;
 };
 
 //=============================================================================================================
@@ -113,7 +122,7 @@ TestFitHPI::TestFitHPI()
 
 void TestFitHPI::initTestCase()
 {
-    qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     qInfo() << "Error Translation" << errorTrans;
     qInfo() << "Error Quaternion" << errorQuat;
     QFile t_fileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif");
@@ -133,6 +142,8 @@ void TestFitHPI::initTestCase()
     RowVectorXi picks = raw.info.pick_types(true, false, false);
     RowVectorXd cals;
 
+    FiffCoordTrans devHeadT = pFiffInfo->dev_head_t;
+
     // Set up the reading parameters
     fiff_int_t from;
     fiff_int_t to;
@@ -143,8 +154,15 @@ void TestFitHPI::initTestCase()
     float quantum_sec = 0.2f;   //read and write in 200 ms junks
     fiff_int_t quantum = ceil(quantum_sec*pFiffInfo->sfreq);
 
-    // Read Quaternion File from maxfilter
-    UTILSLIB::IOUtils::read_eigen_matrix(ref_pos, QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/ref_hpiFit_pos.txt");
+    // Read Quaternion File from maxfilter and calculated movements/rotations with python
+    IOUtils::read_eigen_matrix(ref_pos, QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/ref_hpiFit_pos.txt");
+    IOUtils::read_eigen_matrix(ref_result, QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/ref_angle_move.txt");
+
+    hpi_result = ref_result;
+
+    // define thresholds for big head movement detection
+    float threshRot = 2;
+    float threshTrans = 0.002;
 
     // Setup informations for HPI fit
     QVector<int> vFreqs {166,154,161,158};
@@ -178,10 +196,18 @@ void TestFitHPI::initTestCase()
                        bDoDebug = 0,
                        sHPIResourceDir);
         qInfo() << "[done]\n";
+
+        if(MNEMath::compareTransformation(devHeadT.trans, pFiffInfo->dev_head_t.trans, threshRot, threshTrans)) {
+            hpi_result(i,2) = 1;
+        }
+
         HPIFit::storeHeadPosition(ref_pos(i,0), pFiffInfo->dev_head_t.trans, hpi_pos, vGoF, vError);
+        hpi_result(i,0) = devHeadT.translationTo(pFiffInfo->dev_head_t.trans);
+        hpi_result(i,1) = devHeadT.angleTo(pFiffInfo->dev_head_t.trans);
+
     }
     // For debug: position file for HPIFit
-    UTILSLIB::IOUtils::write_eigen_matrix(hpi_pos, QCoreApplication::applicationDirPath() + "/MNE-sample-data/hpi_pos.txt");
+//    UTILSLIB::IOUtils::write_eigen_matrix(hpi_pos, QCoreApplication::applicationDirPath() + "/MNE-sample-data/hpi_pos.txt");
 }
 
 //=============================================================================================================
@@ -216,6 +242,42 @@ void TestFitHPI::compareRotation()
     QVERIFY(std::abs(diff_quat(0)) < errorQuat);
     QVERIFY(std::abs(diff_quat(1)) < errorQuat);
     QVERIFY(std::abs(diff_quat(2)) < errorQuat);
+}
+
+//=============================================================================================================
+
+void TestFitHPI::compareMove()
+{
+    MatrixXd diff = MatrixXd::Zero(ref_result.rows(),1);
+    float diffMove = (ref_result.col(0)-hpi_result.col(0)).mean();
+    diffMove = std::abs(diffMove);
+    qDebug() << "diffMove: [m]" << diffMove;
+
+    QVERIFY(std::abs(diffMove) < errorMove);
+}
+
+//=============================================================================================================
+
+void TestFitHPI::compareAngle()
+{
+    MatrixXd diff = MatrixXd::Zero(ref_result.rows(),1);
+    float diffAngle = (ref_result.col(1)-ref_result.col(1)).mean();
+    diffAngle = std::abs(diffAngle);
+    qDebug() << "diffAngle: [degree]" << diffAngle;
+
+    QVERIFY(std::abs(diffAngle) < errorAngle);
+}
+
+//=============================================================================================================
+
+void TestFitHPI::compareCompare()
+{
+    MatrixXd diff = MatrixXd::Zero(ref_result.rows(),1);
+    float diffCompare = (ref_result.col(2)-ref_result.col(2)).mean();
+    diffCompare = std::abs(diffCompare);
+
+    qDebug() << "diffCompare: " << diffCompare;
+    QVERIFY(std::abs(diffCompare) == errorCompare);
 }
 
 //=============================================================================================================
