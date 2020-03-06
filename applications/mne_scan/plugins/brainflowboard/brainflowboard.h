@@ -127,8 +127,6 @@ private:
     int*    m_pChannels;
     int     m_iSamplingFreq;
 
-    volatile bool m_bIsRunning;
-
     QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> > m_pOutput;
     QSharedPointer<FIFFLIB::FiffInfo>   m_pFiffInfo;        /**< Fiff measurement info.*/
 };
