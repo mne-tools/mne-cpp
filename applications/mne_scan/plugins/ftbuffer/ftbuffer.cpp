@@ -59,19 +59,18 @@ using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
 using namespace FIFFLIB;
 using namespace Eigen;
+using namespace IOBUFFER;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
 FtBuffer::FtBuffer()
-: m_bIsRunning(false)
-, m_bIsConfigured(false)
+: m_bIsConfigured(false)
 , m_pFtBuffProducer(QSharedPointer<FtBuffProducer>::create(this))
 , m_pFiffInfo(QSharedPointer<FiffInfo>::create())
 , m_pRTMSA_BufferOutput(PluginOutputData<RealTimeMultiSampleArray>::create(this, "FtBuffer", "Output data"))
 {
-    qInfo() << "[FtBuffer::FtBufer] Object created.";
 }
 
 //=============================================================================================================
@@ -113,10 +112,12 @@ bool FtBuffer::start()
         return false;
     }
 
+    // Init circular buffer to transmit data from the producer to this thread
+    if(!m_pCircularBuffer) {
+        m_pCircularBuffer = QSharedPointer<CircularBuffer_Matrix_double>(new CircularBuffer_Matrix_double(10));
+    }
+
     qInfo() << "[FtBuffer::start] Starting FtBuffer...";
-    m_mutex.lock();
-    m_bIsRunning = true;
-    m_mutex.unlock();
 
     //Move relevant objects to new thread
     m_pFtBuffProducer->m_pFtConnector->m_pSocket->moveToThread(&m_pProducerThread);
@@ -141,11 +142,7 @@ bool FtBuffer::start()
 
 bool FtBuffer::stop()
 {
-    qInfo() << "[FtBuffer::stop] Stopping...";
-
-    m_mutex.lock();
-    m_bIsRunning = false;
-    m_mutex.unlock();
+    qInfo() << "[FtBuffer::stop] Stopping.";
 
     m_pRTMSA_BufferOutput->data()->clear();
 
@@ -159,7 +156,7 @@ bool FtBuffer::stop()
     m_pFtBuffProducer.clear();
     m_pFtBuffProducer = QSharedPointer<FtBuffProducer>::create(this);
 
-    qInfo() << "[FtBuffer::stop] Stoped.";
+    qInfo() << "[FtBuffer::stop] Stopped.";
     return true;
 }
 
@@ -189,24 +186,25 @@ QWidget* FtBuffer::setupWidget()
 
 void FtBuffer::run()
 {
-}
+    MatrixXd matData;
 
-//=============================================================================================================
-
-bool FtBuffer::isRunning()
-{
-    QMutexLocker locker(&m_mutex);
-    return m_bIsRunning;
+    while(!isInterruptionRequested()) {
+        //pop matrix
+        if(m_pCircularBuffer->pop(matData)) {
+            //emit values
+            if(!isInterruptionRequested()) {
+                m_pRTMSA_BufferOutput->data()->setValue(matData);
+            }
+        }
+    }
 }
 
 //=============================================================================================================
 
 void FtBuffer::onNewDataAvailable(const Eigen::MatrixXd &matData)
 {
-    QMutexLocker locker(&m_mutex);
-
-    if(m_bIsRunning) {
-        m_pRTMSA_BufferOutput->data()->setValue(matData);
+    while(!m_pCircularBuffer->push(matData)) {
+        //Do nothing until the circular buffer is ready to accept new data again
     }
 }
 
@@ -237,6 +235,7 @@ bool FtBuffer::setupRTMSA()
         qInfo() << "[FtBuffer::setupRTMSA] Successfully acquired fif info from file.";
         return m_bIsConfigured = true;
     }
+
     return false;
 }
 

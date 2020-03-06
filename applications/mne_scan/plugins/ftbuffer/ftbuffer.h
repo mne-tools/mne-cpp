@@ -54,6 +54,8 @@
 
 #include <fiff/fiff_raw_data.h>
 
+#include <utils/generics/circularbuffer.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -172,14 +174,6 @@ public:
      */
     virtual QWidget* setupWidget();
 
-    //=========================================================================================================
-    /**
-     * Whether the plugin is currenlty running.
-     *
-     * @return True - running, False - not running
-     */
-    bool isRunning();
-
 signals:
     //=========================================================================================================
     /**
@@ -217,7 +211,6 @@ protected:
     bool setupRTMSA(FIFFLIB::FiffInfo FiffInfo);
 
 private:
-    bool                                                                                m_bIsRunning;                   /**< Whether ftbuffer is running. */
     bool                                                                                m_bIsConfigured;                /**< Whether the buffer output has been configured */
 
     QMutex                                                                              m_mutex;                        /**< Guards shared data from being accessed at the same time */
@@ -233,6 +226,7 @@ private:
     QSharedPointer<FIFFLIB::FiffRawData>                                                m_pNeuromagHeadChunkData;       /**< Fiff into parser for header data collected from Neuromag extended header */
 
     QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>>  m_pRTMSA_BufferOutput;          /**< The RealTimeSampleArray to provide the plugin output data.*/
+    QSharedPointer<IOBUFFER::CircularBuffer_Matrix_double>                              m_pCircularBuffer;      /**< Holds incoming raw data. */
 
 };
 }//namespace end brace
