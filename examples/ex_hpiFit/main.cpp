@@ -51,11 +51,6 @@
 
 #include <fwd/fwd_coil_set.h>
 
-#include <Eigen/Geometry>
-
-#define _USE_MATH_DEFINES
-#include <math.h>
-
 //=============================================================================================================
 // Qt INCLUDES
 //=============================================================================================================
@@ -65,7 +60,6 @@
 #include <QCommandLineParser>
 #include <QDebug>
 #include <QGenericMatrix>
-#include <QQuaternion>
 #include <QElapsedTimer>
 
 //=============================================================================================================
