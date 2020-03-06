@@ -546,14 +546,12 @@ void HPIFit::storeHeadPosition(float time,
 
 //    qDebug() << "quatHPI.x() " << "quatHPI.y() " << "quatHPI.y() " << "trans x " << "trans y " << "trans z ";
 //    qDebug() << quatHPI.x() << quatHPI.y() << quatHPI.z() << devHeadT(0,3) << devHeadT(1,3) << devHeadT(2,3);
-    float x = quatHPI.x();
-    float y = quatHPI.y();
-    float z = quatHPI.z();
+
     position.conservativeResize(position.rows()+1, 10);
     position(position.rows()-1,0) = time;
-    position(position.rows()-1,1) = x;
-    position(position.rows()-1,2) = y;
-    position(position.rows()-1,3) = z;
+    position(position.rows()-1,1) = quatHPI.x();
+    position(position.rows()-1,2) = quatHPI.y();
+    position(position.rows()-1,3) = quatHPI.z();
     position(position.rows()-1,4) = devHeadT(0,3);
     position(position.rows()-1,5) = devHeadT(1,3);
     position(position.rows()-1,6) = devHeadT(2,3);
