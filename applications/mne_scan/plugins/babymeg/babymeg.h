@@ -48,7 +48,7 @@
 #include <fiff/fiff_stream.h>
 
 #include <scShared/Interfaces/ISensor.h>
-#include <utils/generics/circularmatrixbuffer.h>
+#include <utils/generics/circularbuffer.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -380,7 +380,7 @@ protected:
 
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pRTMSABabyMEG;    /**< The RealTimeMultiSampleArray to provide the rt_server Channels.*/
 
-    QSharedPointer<IOBUFFER::RawMatrixBuffer>                                   m_pRawMatrixBuffer; /**< Holds incoming raw data. */
+    QSharedPointer<IOBUFFER::CircularBuffer_Matrix_float>                    m_pCircularBuffer;  /**< Holds incoming raw data. */
 
     QSharedPointer<BabyMEGClient>                   m_pMyClient;                    /**< TCP/IP communication between Qt and Labview. */
     QSharedPointer<BabyMEGClient>                   m_pMyClientComm;                /**< TCP/IP communication between Qt and Labview - communication. */
@@ -405,7 +405,6 @@ protected:
 
     bool                                    m_bWriteToFile;                 /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
     bool                                    m_bUseRecordTimer;              /**< Flag whether to use data recording timer.*/
-    bool                                    m_bIsRunning;                   /**< If thread is running flag.*/
     bool                                    m_bDoContinousHPI;              /**< Whether to do continous HPI.*/
     QString                                 m_sRecordFile;                  /**< Current record file. */
     QString                                 m_sFiffProjections;             /**< Fiff projection information */

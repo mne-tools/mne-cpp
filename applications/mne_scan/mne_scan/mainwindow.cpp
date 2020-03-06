@@ -442,23 +442,23 @@ void MainWindow::createToolBars()
         m_pLabelTime->setText(QTime(0, 0).toString());
     }
 
-    //Plugin
-    if(!m_pDynamicPluginToolBar) {
-        m_pDynamicPluginToolBar = addToolBar(tr("Plugin Control"));
-        m_pDynamicPluginToolBar->addAction(m_pActionQuickControl);
-    }
+//    //Plugin
+//    if(!m_pDynamicPluginToolBar) {
+//        m_pDynamicPluginToolBar = addToolBar(tr("Plugin Control"));
+//        m_pDynamicPluginToolBar->addAction(m_pActionQuickControl);
+//    }
 
-    if(m_qListDynamicPluginActions.size() > 0) {
-        for(qint32 i = 0; i < m_qListDynamicPluginActions.size(); ++i) {
-            m_pDynamicPluginToolBar->addAction(m_qListDynamicPluginActions[i]);
-        }
-    }
+//    if(m_qListDynamicPluginActions.size() > 0) {
+//        for(qint32 i = 0; i < m_qListDynamicPluginActions.size(); ++i) {
+//            m_pDynamicPluginToolBar->addAction(m_qListDynamicPluginActions[i]);
+//        }
+//    }
 
-    if(m_qListDynamicDisplayActions.size() > 0) {
-        for(qint32 i = 0; i < m_qListDynamicDisplayActions.size(); ++i) {
-            m_pDynamicPluginToolBar->addAction(m_qListDynamicDisplayActions[i]);
-        }
-    }
+//    if(m_qListDynamicDisplayActions.size() > 0) {
+//        for(qint32 i = 0; i < m_qListDynamicDisplayActions.size(); ++i) {
+//            m_pDynamicPluginToolBar->addAction(m_qListDynamicDisplayActions[i]);
+//        }
+//    }
 }
 
 //=============================================================================================================

@@ -87,9 +87,8 @@ BabyMEG::BabyMEG()
 : m_iBlinkStatus(0)
 , m_iBufferSize(-1)
 , m_bWriteToFile(false)
-, m_bIsRunning(false)
 , m_bUseRecordTimer(false)
-, m_pRawMatrixBuffer(0)
+, m_pCircularBuffer(0)
 , m_sFiffProjections(QCoreApplication::applicationDirPath() + "/resources/mne_scan/plugins/babymeg/header.fif")
 , m_sFiffCompensators(QCoreApplication::applicationDirPath() + "/resources/mne_scan/plugins/babymeg/compensator.fif")
 , m_sBadChannels(QCoreApplication::applicationDirPath() + "/resources/mne_scan/plugins/babymeg/both.bad")
@@ -256,18 +255,14 @@ void BabyMEG::clear()
 
 bool BabyMEG::start()
 {
-//    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
-//    if(this->isRunning())
-//        QThread::wait();
-
-    if(!m_pRTMSABabyMEG)
+    if(!m_pRTMSABabyMEG) {
         initConnector();
+    }
 
-    // Start threads
-    m_bIsRunning = true;
-
-    if(!m_pMyClient->isConnected())
+    if(!m_pMyClient->isConnected()) {
         m_pMyClient->ConnectToBabyMEG();
+    }
+
     // Start threads
     QThread::start();
 
@@ -278,16 +273,12 @@ bool BabyMEG::start()
 
 bool BabyMEG::stop()
 {
-    if(m_pMyClient->isConnected())
+    if(m_pMyClient->isConnected()) {
         m_pMyClient->DisConnectBabyMEG();
+    }
 
-    m_bIsRunning = false;
-
-    //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
-    m_pRawMatrixBuffer->releaseFromPop();
-
-    //Clear Buffers
-    m_pRawMatrixBuffer->clear();
+    requestInterruption();
+    wait(500);
 
     if(m_pHPIWidget) {
         m_pHPIWidget->hide();
@@ -329,40 +320,42 @@ void BabyMEG::run()
     MatrixXf matValue;
     qint32 size = 0;
 
-    while(m_bIsRunning) {
-        if(m_pRawMatrixBuffer) {
+    while(!isInterruptionRequested()) {
+        if(m_pCircularBuffer) {
             //pop matrix
-            matValue = m_pRawMatrixBuffer->pop();
+            if(m_pCircularBuffer->pop(matValue)) {
+                //Update HPI data (for single and continous HPI fitting)
+                updateHPI(matValue);
 
-            //Update HPI data (for single and continous HPI fitting)
-            updateHPI(matValue);
-
-            //Do continous HPI fitting and write result to data block
-            if(m_bDoContinousHPI) {
-                doContinousHPI(matValue);
-            }
-
-            //Create digital trigger information
-            createDigTrig(matValue);
-
-            //Write raw data to fif file
-            if(m_bWriteToFile) {
-                size += matValue.rows()*matValue.cols() * 4;
-
-                if(size > MAX_DATA_LEN) {
-                    size = 0;
-                    this->splitRecordingFile();
+                //Do continous HPI fitting and write result to data block
+                if(m_bDoContinousHPI) {
+                    doContinousHPI(matValue);
                 }
 
-                m_mutex.lock();
-                m_pOutfid->write_raw_buffer(matValue.cast<double>());
-                m_mutex.unlock();
-            } else {
-                size = 0;
-            }
+                //Create digital trigger information
+                createDigTrig(matValue);
 
-            if(m_pRTMSABabyMEG) {
-                m_pRTMSABabyMEG->data()->setValue(this->calibrate(matValue));
+                //Write raw data to fif file
+                if(m_bWriteToFile) {
+                    size += matValue.rows()*matValue.cols() * 4;
+
+                    if(size > MAX_DATA_LEN) {
+                        size = 0;
+                        this->splitRecordingFile();
+                    }
+
+                    m_mutex.lock();
+                    m_pOutfid->write_raw_buffer(matValue.cast<double>());
+                    m_mutex.unlock();
+                } else {
+                    size = 0;
+                }
+
+                if(!isInterruptionRequested()) {
+                    if(m_pRTMSABabyMEG) {
+                        m_pRTMSABabyMEG->data()->setValue(this->calibrate(matValue));
+                    }
+                }
             }
         }
     }
@@ -409,34 +402,27 @@ void BabyMEG::setFiffInfo(const FiffInfo& p_FiffInfo)
 {
     m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(p_FiffInfo));
 
-    if(!readProjectors())
-    {
+    if(!readProjectors()) {
         qDebug() << "Not able to read projectors";
     }
 
-    if(!readCompensators())
-    {
+    if(!readCompensators()) {
         qDebug() << "Not able to read compensators";
     }
 
-    if(!readBadChannels())
-    {
+    if(!readBadChannels()) {
         qDebug() << "Not able to read bad channels";
     }
 
     m_iBufferSize = m_pInfo->dataLength;
 
-    //
-    //   Add the calibration factors
-    //
+    // Add the calibration factors
     m_cals = RowVectorXd(m_pFiffInfo->nchan);
     m_cals.setZero();
     for (qint32 k = 0; k < m_pFiffInfo->nchan; ++k)
         m_cals[k] = m_pFiffInfo->chs[k].range*m_pFiffInfo->chs[k].cal;
 
-    //
-    //  Initialize the data and calibration vector
-    //
+    // Initialize the data and calibration vector
     typedef Eigen::Triplet<double> T;
     std::vector<T> tripletList;
     tripletList.reserve(m_pFiffInfo->nchan);
@@ -464,15 +450,18 @@ void BabyMEG::setFiffData(QByteArray data)
 
     MatrixXf rawData(Map<MatrixXf>( (float*)data.data(),rows, cols ));
 
-    for(qint32 i = 0; i < rows*cols; ++i)
+    for(qint32 i = 0; i < rows*cols; ++i) {
         IOUtils::swap_floatp(rawData.data()+i);
+    }
 
-    if(m_bIsRunning)
-    {
-        if(!m_pRawMatrixBuffer)
-            m_pRawMatrixBuffer = CircularMatrixBuffer<float>::SPtr(new CircularMatrixBuffer<float>(40, rows, cols));
+    if(this->isRunning()) {
+        if(!m_pCircularBuffer) {
+            m_pCircularBuffer = CircularBuffer_Matrix_float::SPtr(new CircularBuffer_Matrix_float(40));
+        }
 
-        m_pRawMatrixBuffer->push(&rawData);
+        while(!m_pCircularBuffer->push(rawData)) {
+            //Do nothing until the circular buffer is ready to accept new data again
+        }
     }
 
     emit dataToSquidCtrlGUI(rawData);
