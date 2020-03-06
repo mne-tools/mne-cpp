@@ -292,8 +292,8 @@ void FiffRawViewDelegate::createTimeSpacersPath(const QModelIndex &index,
     if(t_pModel->getNumberOfTimeSpacers() > 0)
     {
         //vertical lines
-        float distanceSec = float (option.rect.width())/(t_pModel->numVLines()+1);
-        float distanceSpacers = distanceSec/(t_pModel->getNumberOfTimeSpacers()+1);
+        float distanceSec = float (option.rect.width())/(t_pModel->numVLines());
+        float distanceSpacers = distanceSec/(t_pModel->getNumberOfTimeSpacers());
 
         float yStart = option.rect.topLeft().y();
 

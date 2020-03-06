@@ -521,7 +521,7 @@ inline const QMap< qint32,float >& FiffRawViewModel::getScaling() const
 
 inline qint32 FiffRawViewModel::numVLines() const
 {
-    return (m_iVisibleWindowSize - 1);
+    return (m_iVisibleWindowSize);
 }
 
 //=============================================================================================================
