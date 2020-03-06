@@ -18,7 +18,7 @@ jobs:
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
     - name: Install Python 3.7 version
       uses: actions/setup-python@v1
       with:
@@ -99,7 +99,7 @@ jobs:
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
     - name: Clone mne-cpp test data
       run: git clone https://github.com/mne-tools/mne-cpp-test-data.git ./bin/mne-cpp-test-data      
     - name: Install Python 3.7 version
@@ -188,7 +188,7 @@ jobs:
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v1      
+      uses: actions/checkout@v2      
     - name: Install Python 3.7 version
       uses: actions/setup-python@v1
       with:
@@ -208,7 +208,7 @@ jobs:
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
     - name: Install Qt Dev Tools, Doxygen and Graphviz
       run: |
         # sudo apt-get update -qq
