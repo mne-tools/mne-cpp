@@ -417,18 +417,18 @@ MatrixXd MNEMath::rescale(const MatrixXd &data, const RowVectorXf &times, QPair<
 
 //=============================================================================================================
 
-bool MNEMath::compareTransformation(const Eigen::MatrixX4f& devHeadT,
-                                    const Eigen::MatrixX4f& devHeadTNew,
+bool MNEMath::compareTransformation(const Eigen::MatrixX4f& mDevHeadT,
+                                    const Eigen::MatrixX4f& mDevHeadTNew,
                                     const float& fThreshRot,
                                     const float& fThreshTrans)
 {
-    bool state = false;
+    bool bState = false;
 
-    Matrix3f rot = devHeadT.block(0,0,3,3);
-    Matrix3f rotNew = devHeadTNew.block(0,0,3,3);
+    Matrix3f rot = mDevHeadT.block(0,0,3,3);
+    Matrix3f rotNew = mDevHeadTNew.block(0,0,3,3);
 
-    VectorXf trans = devHeadT.col(3);
-    VectorXf transNew = devHeadTNew.col(3);
+    VectorXf trans = mDevHeadT.col(3);
+    VectorXf transNew = mDevHeadTNew.col(3);
 
     Eigen::Quaternionf quat(rot);
     Eigen::Quaternionf quatNew(rotNew);
@@ -442,24 +442,21 @@ bool MNEMath::compareTransformation(const Eigen::MatrixX4f& devHeadT,
     angle = quat.angularDistance(quatNew);
     angle = angle * 180 / M_PI;
 
-    qInfo() << "Eigen angle [degree]: " << angle;
-
     // Compare translation
     float move = (trans-transNew).norm();
-    qInfo() << "Displacement Move [mm]: " << move*1000;
 
     // compare to thresholds and update
     if(move > fThreshTrans) {
         qInfo() << "Large movement: " << move*1000 << "mm";
-        state = true;
+        bState = true;
 
     } else if (angle > fThreshRot) {
-        qInfo() << "Large rotation: " << angle << "°";
-        state = true;
+        qInfo() << "Large rotation: " << angle << "degree";
+        bState = true;
 
     } else {
-        state = false;
+        bState = false;
     }
 
-    return state;
+    return bState;
 }

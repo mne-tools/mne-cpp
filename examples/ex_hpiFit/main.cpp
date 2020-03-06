@@ -38,21 +38,16 @@
 
 #include <iostream>
 #include <vector>
-#include <math.h>
 
 #include <fiff/fiff.h>
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_dig_point_set.h>
-#include <fiff/fiff_cov.h>
 
 #include <inverse/hpiFit/hpifit.h>
-#include <inverse/hpiFit/hpifitdata.h>
 
 #include <utils/ioutils.h>
 #include <utils/generics/applicationlogger.h>
 #include <utils/mnemath.h>
-
-#include <disp3D/viewers/hpiview.h>
 
 #include <fwd/fwd_coil_set.h>
 
@@ -212,10 +207,11 @@ int main(int argc, char *argv[])
 
         HPIFit::storeHeadPosition(time(i), pFiffInfo->dev_head_t.trans, position, vGoF, vError);
 
+        // if big head displacement occures, update debHeadTrans
         if(MNEMath::compareTransformation(devHeadTrans.trans, pFiffInfo->dev_head_t.trans, threshRot, threshTrans)) {
-            qInfo() << "Big head displacement: dev_head_t has been updated";
+            devHeadTrans = pFiffInfo->dev_head_t;
+            qInfo() << "dev_head_t has been updated.";
         }
-
     }
-    IOUtils::write_eigen_matrix(position, QCoreApplication::applicationDirPath() + "/MNE-sample-data/position.txt");
+//    IOUtils::write_eigen_matrix(position, QCoreApplication::applicationDirPath() + "/MNE-sample-data/position.txt");
 }

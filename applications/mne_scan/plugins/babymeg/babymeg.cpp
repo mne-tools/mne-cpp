@@ -614,7 +614,6 @@ void BabyMEG::doContinousHPI(MatrixXf& matData)
             QVector<double> vError = m_pHPIWidget->getError();
             float error = std::accumulate(vError.begin(), vError.end(), .0) / vError.size();     // HPI estimation Error
             matData.row(408) = MatrixXf::Constant(1,matData.cols(), error);
-
     }
 }
 
