@@ -389,16 +389,16 @@ public:
     /**
      * Compare new head position with current head position and update dev_head_t if big displacement occured
      *
-     * @param[in] devHeadTrans      The device to head transformation matrix to compare to.
-     * @param[in] devHeadTransNew   The device to head transformation matrix to be compared.
-     * @param[in] treshRot          The threshold for big head rotation in degree
-     * @param[in] threshTrans       The threshold for big head movement in m
+     * @param[in] mDevHeadTrans      The device to head transformation matrix to compare to.
+     * @param[in] mDevHeadTransNew   The device to head transformation matrix to be compared.
+     * @param[in] fTreshRot          The threshold for big head rotation in degree
+     * @param[in] fThreshTrans       The threshold for big head movement in m
      *
-     * @return state            The status that shows if devHead is updated or not
+     * @return bState                The status that shows if devHead is updated or not
      *
      */
-    static bool compareTransformation(const Eigen::MatrixX4f& devHeadT,
-                                      const Eigen::MatrixX4f& devHeadTNew,
+    static bool compareTransformation(const Eigen::MatrixX4f& mDevHeadT,
+                                      const Eigen::MatrixX4f& mDevHeadTNew,
                                       const float& fThreshRot,
                                       const float& fThreshTrans);
 
