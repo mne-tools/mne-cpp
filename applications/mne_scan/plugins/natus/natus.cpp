@@ -62,6 +62,7 @@ using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
 using namespace FIFFLIB;
 using namespace Eigen;
+using namespace IOBUFFER;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -71,8 +72,6 @@ Natus::Natus()
 : m_iSamplingFreq(2048)
 , m_iNumberChannels(46)
 , m_iSamplesPerBlock(256)
-, m_bIsRunning(false)
-, m_pListReceivedSamples(QSharedPointer<QList<Eigen::MatrixXd> >::create())
 , m_pFiffInfo(QSharedPointer<FiffInfo>::create())
 , m_pRMTSA_Natus(PluginOutputData<RealTimeMultiSampleArray>::create(this, "Natus", "EEG output data"))
 , m_qStringResourcePath(qApp->applicationDirPath()+"/resources/mne_scan/plugins/natus/")
@@ -84,14 +83,9 @@ Natus::Natus()
 Natus::~Natus()
 {
     //If the program is closed while the sampling is in process
-    if(this->isRunning())
+    if(this->isRunning()) {
         this->stop();
-
-    //Store settings for next use
-    QSettings settings;
-    settings.setValue(QString("NATUS/sFreq"), m_iSamplingFreq);
-    settings.setValue(QString("NATUS/samplesPerBlock"), m_iSamplesPerBlock);
-    settings.setValue(QString("NATUS/numberChannels"), m_iNumberChannels);
+    }
 }
 
 //=============================================================================================================
@@ -107,11 +101,6 @@ QSharedPointer<IPlugin> Natus::clone() const
 void Natus::init()
 {
     m_outputConnectors.append(m_pRMTSA_Natus);
-
-    QSettings settings;
-    m_iSamplingFreq = settings.value(QString("NATUS/sFreq"), 2048).toInt();
-    m_iSamplesPerBlock = settings.value(QString("NATUS/samplesPerBlock"), 256).toInt();
-    m_iNumberChannels = settings.value(QString("NATUS/numberChannels"), 150).toInt();
 }
 
 //=============================================================================================================
@@ -124,22 +113,16 @@ void Natus::unload()
 
 void Natus::setUpFiffInfo()
 {
-    //
     //Clear old fiff info data
-    //
     m_pFiffInfo->clear();
 
-    //
     //Set number of channels, sampling frequency and high/-lowpass
-    //
     m_pFiffInfo->nchan = m_iNumberChannels;
     m_pFiffInfo->sfreq = m_iSamplingFreq;
     m_pFiffInfo->highpass = 0.001f;
     m_pFiffInfo->lowpass = m_iSamplingFreq/2;
 
-    //
     //Set up the channel info
-    //
     QStringList QSLChNames;
     m_pFiffInfo->chs.clear();
 
@@ -222,9 +205,7 @@ void Natus::setUpFiffInfo()
     //Set channel names in fiff_info_base
     m_pFiffInfo->ch_names = QSLChNames;
 
-    //
     //Set head projection
-    //
     m_pFiffInfo->dev_head_t.from = FIFFV_COORD_DEVICE;
     m_pFiffInfo->dev_head_t.to = FIFFV_COORD_HEAD;
     m_pFiffInfo->ctf_head_t.from = FIFFV_COORD_DEVICE;
@@ -235,14 +216,10 @@ void Natus::setUpFiffInfo()
 
 bool Natus::start()
 {
-//    //Check if the thread is already or still running.
-//    //This can happen if the start button is pressed immediately after the stop button was pressed.
-//    //In this case the stopping process is not finished yet but the start process is initiated.
-//    if(this->isRunning()) {
-//        this->wait();
-//    }
-
-    m_bIsRunning = true;
+    // Init circular buffer to transmit data from the producer to this thread
+    if(!m_pCircularBuffer) {
+        m_pCircularBuffer = QSharedPointer<CircularBuffer_Matrix_double>(new CircularBuffer_Matrix_double(10));
+    }
 
     //Setup fiff info before setting up the RMTSA because we need it to init the RTMSA
     setUpFiffInfo();
@@ -257,8 +234,7 @@ bool Natus::start()
     m_pNatusProducer = QSharedPointer<NatusProducer>::create(m_iSamplesPerBlock, m_iNumberChannels);
     m_pNatusProducer->moveToThread(&m_pProducerThread);
     connect(m_pNatusProducer.data(), &NatusProducer::newDataAvailable,
-            this, &Natus::onNewDataAvailable,
-            Qt::DirectConnection);
+            this, &Natus::onNewDataAvailable, Qt::DirectConnection);
     m_pProducerThread.start();
 
     return true;
@@ -268,9 +244,8 @@ bool Natus::start()
 
 bool Natus::stop()
 {
-    //Wait until this thread (Natus) is stopped
-    m_bIsRunning = false;
-    //this->wait();
+    requestInterruption();
+    wait(500);
 
     m_pRMTSA_Natus->data()->clear();
 
@@ -310,29 +285,24 @@ QWidget* Natus::setupWidget()
 
 void Natus::onNewDataAvailable(const Eigen::MatrixXd &matData)
 {
-    m_mutex.lock();
-    if(m_bIsRunning) {
-        //qDebug()<<"Natus::onNewDataAvailable - appending data";
-        m_pListReceivedSamples->append(matData);
+    while(!m_pCircularBuffer->push(matData)) {
+        //Do nothing until the circular buffer is ready to accept new data again
     }
-    m_mutex.unlock();
 }
 
 //=============================================================================================================
 
 void Natus::run()
 {
-    while(m_bIsRunning)
-    {
-        m_mutex.lock();
-        if(!m_pListReceivedSamples->isEmpty())
-        {
-            MatrixXd matData = m_pListReceivedSamples->takeFirst();
-            //qDebug()<<"Natus::run - matData.rows(): "<< matData.rows();
-            //qDebug()<<"Natus::run - matData.cols(): "<< matData.cols();
-            m_pRMTSA_Natus->data()->setValue(matData);
+    MatrixXd matData;
+
+    while(!isInterruptionRequested()) {
+        if(m_pCircularBuffer->pop(matData)) {
+            //emit values
+            if(!isInterruptionRequested()) {
+                m_pRMTSA_Natus->data()->setValue(matData);
+            }
         }
-        m_mutex.unlock();
     }
 }
 
