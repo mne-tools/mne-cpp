@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("hpiFit Example");
     parser.addHelpOption();
     qInfo() << "Please download the mne-cpp-test-data folder from Github (mne-tools) into mne-cpp/bin.";
-    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/MNE-sample-data/chpi/raw/sim_move_y_chpi_raw.fif");
+    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif");
 
     parser.addOption(inputOption);
 
@@ -133,16 +133,16 @@ int main(int argc, char *argv[])
     float quantum_sec = 0.2f;       // read and write in 200 ms junks
     fiff_int_t quantum = ceil(quantum_sec*pFiffInfo->sfreq);
 
-//    // create time vector that specifies when to fit
-//    int N = ceil((last-first)/quantum);
-//    RowVectorXf time = RowVectorXf::LinSpaced(N, 0, N-1) * dT_sec;
+    // create time vector that specifies when to fit
+    int N = ceil((last-first)/quantum);
+    RowVectorXf time = RowVectorXf::LinSpaced(N, 0, N-1) * dT_sec;
 
     // To fit at specific times outcommend the following block
-    // Read Quaternion File
-    MatrixXd pos;
-    qInfo() << "Specify the path to your position file (.txt)";
-    IOUtils::read_eigen_matrix(pos, QCoreApplication::applicationDirPath() + "/MNE-sample-data/chpi/pos/posSim_move_y_chpi.txt");
-    RowVectorXd time = pos.col(0);
+//    // Read Quaternion File
+//    MatrixXd pos;
+//    qInfo() << "Specify the path to your position file (.txt)";
+//    IOUtils::read_eigen_matrix(pos, QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/ref_hpiFit_pos.txt");
+//    RowVectorXd time = pos.col(0);
 
     MatrixXd position;              // Position matrix to save quaternions etc.
 
