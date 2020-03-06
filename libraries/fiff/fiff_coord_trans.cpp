@@ -237,3 +237,37 @@ void FiffCoordTrans::print() const
         printf("\t% 8.6f % 8.6f % 8.6f\t% 7.2f mm\n", trans(p,0),trans(p,1),trans(p,2),1000*trans(p,3));
     printf("\t% 8.6f % 8.6f % 8.6f   % 7.2f\n",trans(3,0),trans(3,1),trans(3,2),trans(3,3));
 }
+
+//=============================================================================================================
+
+float FiffCoordTrans::angleTo(Eigen::MatrixX4f  mTransDest)
+{
+    MatrixX4f mDevHeadT = this->trans;
+    Matrix3f mRot = mDevHeadT.block(0,0,3,3);
+    Matrix3f mRotNew = mTransDest.block(0,0,3,3);
+
+    Quaternionf quat(mRot);
+    Quaternionf quatNew(mRotNew);
+
+    float fAngle;
+
+    // calculate rotation
+    Quaternionf quatCompare;
+
+    quatCompare = quat*quatNew.inverse();
+    fAngle = quat.angularDistance(quatNew);
+    fAngle = fAngle * 180 / M_PI;
+
+    return fAngle;
+}
+
+//=============================================================================================================
+
+float FiffCoordTrans::translationTo(Eigen::MatrixX4f  mTransDest)
+{
+    VectorXf vTrans = this->trans.col(3);
+    VectorXf vTransDest = mTransDest.col(3);
+
+    float fMove = (vTrans-vTransDest).norm();
+    return fMove;
+}

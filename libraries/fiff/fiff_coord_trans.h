@@ -224,6 +224,7 @@ public:
      */
     inline static qint32 storageSize();
 
+    //========================================================================================================
     /**
      * Overloaded == operator to compare an object to this instance.
      *
@@ -232,6 +233,24 @@ public:
      * @return true if equal, false otherwise
      */
     friend bool operator== (const FiffCoordTrans &a, const FiffCoordTrans &b);
+
+    //========================================================================================================
+    /**
+     * Calculate rotation as angle between two rotation matrices
+     *
+     * @param[in]   mTransDest  The destination transformation matrix.
+     * @return      fAgle       The of rotation between two rotation matrices in degree.
+     */
+    float angleTo(Eigen::MatrixX4f mTransDest);
+
+    //========================================================================================================
+    /**
+     * Calculate translation between two rotation matrices in meter
+     *
+     * @param[in]   mTransTarget  The destination transformation matrix.
+     * @return      fMove         The translation between two rotation matrices in m.
+     */
+    float translationTo(Eigen::MatrixX4f mTransDest);
 
 public:
     fiff_int_t  from;   /**< Source coordinate system. */
