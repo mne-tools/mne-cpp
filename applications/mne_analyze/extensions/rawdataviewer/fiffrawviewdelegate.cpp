@@ -288,12 +288,9 @@ void FiffRawViewDelegate::createTimeSpacersPath(const QModelIndex &index,
                                                 QPainterPath& path) const
 {
 
-    qDebug() << "1";
     const FiffRawViewModel* t_pModel = static_cast<const FiffRawViewModel*>(index.model());
-    qDebug() << "2";
     if(t_pModel->getNumberOfTimeSpacers() > 0)
     {
-        qDebug() << "3";
         //vertical lines
         float distanceSec = float (option.rect.width())/(t_pModel->numVLines()+1);
         float distanceSpacers = distanceSec/(t_pModel->getNumberOfTimeSpacers()+1);

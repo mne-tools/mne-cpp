@@ -623,42 +623,51 @@ void FiffRawViewModel::setBackgroundColor(const QColor& color)
 
 //=============================================================================================================
 
-void FiffRawViewModel::setWindowSize(const int &iNumSeconds)
+void FiffRawViewModel::setWindowSize(const int& iNumSeconds,
+                                     const int& iColWidth,
+                                     int& iScrollPos)
 {
     beginResetModel();
     m_iVisibleWindowSize = iNumSeconds;
     m_iTotalBlockCount = m_iVisibleWindowSize + 2 * m_iPreloadBufferSize;
 
-    m_lData.clear();
+    updateDisplayData();
 
-    MatrixXd data, times;
-    // append a matrix pair for each block
-    for(int i = 0; i < m_iTotalBlockCount; ++i)
-        m_lData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data, times)));
+    setDataColumnWidth(iColWidth);
+    updateScrollPosition(iScrollPos);
+    //iScrollPos = m_iFiffCursorBegin;
 
-    m_iFiffCursorBegin = m_pFiffIO->m_qlistRaw[0]->first_samp;
+//    m_lData.clear();
 
-    int start = m_iFiffCursorBegin;
-    m_iSamplesPerBlock = m_pFiffInfo->sfreq;
+//    MatrixXd data, times;
+//    // append a matrix pair for each block
+//    for(int i = 0; i < m_iTotalBlockCount; ++i)
+//        m_lData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data, times)));
 
-    // for some reason the read_raw_segment function works with inclusive upper bound
-    int end = start + m_iSamplesPerBlock - 1;
+//    m_iFiffCursorBegin = m_pFiffIO->m_qlistRaw[0]->first_samp;
 
-    // read in all blocks, use the already prepared list m_lData
-    for(auto &pairPointer : m_lData) {
-        if(m_pFiffIO->m_qlistRaw[0]->read_raw_segment(pairPointer->first,
-                                                      pairPointer->second,
-                                                      start,
-                                                      end)) {
-            // qDebug() << "[FiffRawmodel::loadFiffData] Successfully read a block ";
-        } else {
-            qDebug() << "[FiffRawViewModel::loadFiffData] Could not read samples " << start << " to " << end;
-            return;
-        }
+//    int start = m_iFiffCursorBegin;
+//    m_iSamplesPerBlock = m_pFiffInfo->sfreq;
 
-        start += m_iSamplesPerBlock;
-        end += m_iSamplesPerBlock;
-    }
+//    // for some reason the read_raw_segment function works with inclusive upper bound
+//    int end = start + m_iSamplesPerBlock - 1;
+
+//    // read in all blocks, use the already prepared list m_lData
+//    for(auto &pairPointer : m_lData) {
+//        if(m_pFiffIO->m_qlistRaw[0]->read_raw_segment(pairPointer->first,
+//                                                      pairPointer->second,
+//                                                      start,
+//                                                      end)) {
+//            // qDebug() << "[FiffRawmodel::loadFiffData] Successfully read a block ";
+//        } else {
+//            qDebug() << "[FiffRawViewModel::loadFiffData] Could not read samples " << start << " to " << end;
+//            return;
+//        }
+
+//        start += m_iSamplesPerBlock;
+//        end += m_iSamplesPerBlock;
+//    }
+
     //updateDisplayData();
 
     endResetModel();

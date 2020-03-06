@@ -164,6 +164,7 @@ void FiffRawView::initMVCSettings(const QSharedPointer<FiffRawViewModel>& pModel
 //    m_pTableView->resizeColumnsToContents();
 //    m_pTableView->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
 //    m_pTableView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+    m_iT = 10;
 
 }
 
@@ -218,11 +219,34 @@ void FiffRawView::setZoom(double zoomFac)
 
 void FiffRawView::setWindowSize(int T)
 {
+    qDebug() << "AAAAA" << m_pTableView->horizontalScrollBar()->value();
+    int iNewPos;
+
+    if( T > m_iT){
+        iNewPos = ((m_pTableView->horizontalScrollBar()->value() * T) / m_iT);
+    }
+    else {
+        iNewPos = ((m_pTableView->horizontalScrollBar()->value() * T) / m_iT);
+    }
+
+    if (iNewPos < 0) {
+        iNewPos = 0;
+    }
+
     m_iT = T;
-    m_pModel->setWindowSize(T);
-    m_pModel->setDataColumnWidth(m_pTableView->width()-m_pTableView->columnWidth(0));
-    m_pModel->updateScrollPosition(m_pTableView->horizontalScrollBar()->value());
-    m_pTableView->resizeColumnsToContents();
+
+//    m_pTableView->horizontalScrollBar()->setValue(m_pTableView->horizontalScrollBar()->value());
+
+    m_pModel->setWindowSize(T,
+                            m_pTableView->width() - m_pTableView->columnWidth(0),
+                            iNewPos);
+
+    m_pTableView->horizontalScrollBar()->setValue(iNewPos);
+    //m_pTableView->horizontalScrollBar()->setValue(m_pTableView->horizontalScrollBar()->value());
+    //m_pTableView->horizontalScrollBar()->setValue(m_pTableView->horizontalScrollBar()->value() + 1);
+
+    qDebug() << "BBBBB" << m_pTableView->horizontalScrollBar()->value();
+    //m_pTableView->resizeColumnsToContents();
 }
 
 //=============================================================================================================
@@ -233,6 +257,8 @@ void FiffRawView::setDistanceTimeSpacer(int value)
     m_pModel->updateScrollPosition(m_pTableView->horizontalScrollBar()->value());
     m_pTableView->resizeColumnsToContents();
 }
+
+//=============================================================================================================
 
 void FiffRawView::onMakeScreenshot(const QString& imageType)
 {

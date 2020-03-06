@@ -314,7 +314,9 @@ public:
      */
     void setBackgroundColor(const QColor& color);
 
-    void setWindowSize(const int& iNumSeconds);
+    void setWindowSize(const int& iNumSeconds,
+                       const int& iColWidth,
+                       int& iScrollPos);
 
     //=========================================================================================================
     /**
