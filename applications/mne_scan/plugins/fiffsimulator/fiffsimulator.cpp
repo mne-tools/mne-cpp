@@ -180,7 +180,7 @@ bool FiffSimulator::stop()
 {
     // Stop this (consumer) thread first
     requestInterruption();
-    wait();
+    wait(500);
 
     // Stop producer thread second
     m_pFiffSimulatorProducer->stop();

@@ -335,7 +335,7 @@ bool RtcMne::start()
 bool RtcMne::stop()
 {
     requestInterruption();
-    wait();
+    wait(500);
 
     m_qListCovChNames.clear();
 
