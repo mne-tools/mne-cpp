@@ -41,6 +41,16 @@
 #include "dummytoolbox.h"
 
 //=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -55,10 +65,6 @@ using namespace Eigen;
 //=============================================================================================================
 
 DummyToolbox::DummyToolbox()
-: m_bIsRunning(false)
-, m_pDummyInput(NULL)
-, m_pDummyOutput(NULL)
-, m_pDummyBuffer(CircularMatrixBuffer<double>::SPtr())
 {
     //Add action which will be visible in the plugin's toolbar
     m_pActionShowYourWidget = new QAction(QIcon(":/images/options.png"), tr("Your Toolbar Widget"),this);
@@ -98,10 +104,6 @@ void DummyToolbox::init()
     // Also, this output stream will generate an online display in your plugin
     m_pDummyOutput = PluginOutputData<RealTimeMultiSampleArray>::create(this, "DummyOut", "Dummy output data");
     m_outputConnectors.append(m_pDummyOutput);
-
-    //Delete Buffer - will be initailzed with first incoming data
-    if(!m_pDummyBuffer.isNull())
-        m_pDummyBuffer = CircularMatrixBuffer<double>::SPtr();
 }
 
 //=============================================================================================================
@@ -113,12 +115,11 @@ void DummyToolbox::unload()
 //=============================================================================================================
 
 bool DummyToolbox::start()
-{
-//    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
-//    if(this->isRunning())
-//        QThread::wait();
-
-    m_bIsRunning = true;
+{    
+    //Delete Buffer - will be initailzed with first incoming data
+    if(!m_pDummyBuffer) {
+        m_pDummyBuffer = CircularBuffer_Matrix_double::SPtr::create(64);
+    }
 
     //Start thread
     QThread::start();
@@ -130,12 +131,8 @@ bool DummyToolbox::start()
 
 bool DummyToolbox::stop()
 {
-    m_bIsRunning = false;
-
-    m_pDummyBuffer->releaseFromPop();
-    m_pDummyBuffer->releaseFromPush();
-
-    m_pDummyBuffer->clear();
+    requestInterruption();
+    wait(500);
 
     return true;
 }
@@ -169,11 +166,6 @@ void DummyToolbox::update(SCMEASLIB::Measurement::SPtr pMeasurement)
     QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
 
     if(pRTMSA) {
-        //Check if buffer initialized
-        if(!m_pDummyBuffer) {
-            m_pDummyBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiSampleArray()[0].cols()));
-        }
-
         //Fiff information
         if(!m_pFiffInfo) {
             m_pFiffInfo = pRTMSA->info();
@@ -184,11 +176,15 @@ void DummyToolbox::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             m_pDummyOutput->data()->setVisibility(true);
         }
 
-        MatrixXd t_mat;
+        MatrixXd matData;
 
         for(unsigned char i = 0; i < pRTMSA->getMultiArraySize(); ++i) {
-            t_mat = pRTMSA->getMultiSampleArray()[i];
-            m_pDummyBuffer->push(&t_mat);
+            // Please note that we do not need a copy here since this function will block until
+            // the buffer accepts new data again. Hence, the data is not deleted in the actual
+            // Mesaurement function after it emitted the notify signal.
+            while(!m_pDummyBuffer->push(pRTMSA->getMultiSampleArray()[i])) {
+                //Do nothing until the circular buffer is ready to accept new data again
+            }
         }
     }
 }
@@ -197,22 +193,23 @@ void DummyToolbox::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 void DummyToolbox::run()
 {
-    //
     // Wait for Fiff Info
-    //
+    MatrixXd matData;
+
     while(!m_pFiffInfo)
         msleep(10);// Wait for fiff Info
 
-    while(m_bIsRunning)
-    {
-        //Dispatch the inputs
-        MatrixXd t_mat = m_pDummyBuffer->pop();
+    while(!isInterruptionRequested()) {
+        // Get the current data
+        if(m_pDummyBuffer->pop(matData)) {
+            //ToDo: Implement your algorithm here
 
-        //ToDo: Implement your algorithm here
-
-        //Send the data to the connected plugins and the online display
-        //Unocmment this if you also uncommented the m_pDummyOutput in the constructor above
-        m_pDummyOutput->data()->setValue(t_mat);
+            //Send the data to the connected plugins and the online display
+            //Unocmment this if you also uncommented the m_pDummyOutput in the constructor above
+            if(!isInterruptionRequested()) {
+                m_pDummyOutput->data()->setValue(matData);
+            }
+        }
     }
 }
 

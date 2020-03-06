@@ -44,7 +44,7 @@
 #include "dummytoolbox_global.h"
 
 #include <scShared/Interfaces/IAlgorithm.h>
-#include <utils/generics/circularmatrixbuffer.h>
+#include <utils/generics/circularbuffer.h>
 #include <scMeas/realtimemultisamplearray.h>
 #include "FormFiles/dummysetupwidget.h"
 #include "FormFiles/dummyyourwidget.h"
@@ -58,6 +58,10 @@
 #include <QDebug>
 
 //=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+//=============================================================================================================
 // DEFINE NAMESPACE DUMMYTOOLBOXPLUGIN
 //=============================================================================================================
 
@@ -65,7 +69,7 @@ namespace DUMMYTOOLBOXPLUGIN
 {
 
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DUMMYTOOLBOXPLUGIN FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
@@ -125,13 +129,11 @@ protected:
     void showYourWidget();
 
 private:
-    bool                                            m_bIsRunning;           /**< Flag whether thread is running.*/
-
     FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;            /**< Fiff measurement info.*/
     QSharedPointer<DummyYourWidget>                 m_pYourWidget;          /**< flag whether thread is running.*/
     QAction*                                        m_pActionShowYourWidget;/**< flag whether thread is running.*/
 
-    IOBUFFER::CircularMatrixBuffer<double>::SPtr    m_pDummyBuffer;         /**< Holds incoming data.*/
+    IOBUFFER::CircularBuffer_Matrix_double::SPtr    m_pDummyBuffer;         /**< Holds incoming data.*/
 
     SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr      m_pDummyInput;      /**< The RealTimeMultiSampleArray of the DummyToolbox input.*/
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pDummyOutput;     /**< The RealTimeMultiSampleArray of the DummyToolbox output.*/
