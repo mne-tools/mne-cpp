@@ -58,6 +58,7 @@
 // EIGEN INCLUDES
 //=============================================================================================================
 
+#include <Eigen/Dense>
 #include <Eigen/SparseCore>
 
 //=============================================================================================================
@@ -125,9 +126,17 @@ public:
     /**
      * Get HPI estimation Error per coil in mm.
      *
-     * @return   The GOF vector
+     * @return   The error vector
      */
     QVector<double> getError();
+
+    //=========================================================================================================
+    /**
+     * Get the goodness of fit per coil.
+     *
+     * @return   The GOF vector
+     */
+    Eigen::VectorXd getGoF();
 
     //=========================================================================================================
     /**
@@ -244,7 +253,7 @@ protected:
 
     QVector<int>                                m_vCoilFreqs;           /**< Vector contains the HPI coil frequencies. */
     QVector<double>                             m_vError;               /**< The HPI estimation error mm for each fitted HPI coil. */
-
+    Eigen::VectorXd                             m_vGoF;
     double                                      m_dMeanErrorDist;       /**< The error distances, averaged over all coil errors. */
     qint16                                      m_iNubmerBadChannels;   /**< The number of bad channels.*/
 
