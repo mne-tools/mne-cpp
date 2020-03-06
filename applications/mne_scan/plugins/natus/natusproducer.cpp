@@ -68,8 +68,6 @@ NatusProducer::NatusProducer(int iBlockSize, int iChannelSize, QObject *parent)
 : QObject(parent)
 , m_iMatDataSampleIterator(1)
 {
-    //qRegisterMetaType<Eigen::MatrixXd>();
-
     //Init socket
     m_pUdpSocket = QSharedPointer<QUdpSocket>(new QUdpSocket(this));
     m_pUdpSocket->bind(QHostAddress::AnyIPv4, 50000);

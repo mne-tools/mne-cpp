@@ -144,6 +144,9 @@ bool FtBuffer::stop()
 {
     qInfo() << "[FtBuffer::stop] Stopping.";
 
+    requestInterruption();
+    wait(500);
+
     m_pRTMSA_BufferOutput->data()->clear();
 
     m_bIsConfigured = false;
