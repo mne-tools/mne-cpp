@@ -595,16 +595,6 @@ void BabyMEG::doContinousHPI(MatrixXf& matData)
 
             QQuaternion quatHPI = QQuaternion::fromRotationMatrix(rot);
 
-            // Write HPI estimation Error (error) to HPI Ch #8
-//            float dpfitError = 0.0;
-//            float GOF = 1 - dpfitError;
-            QVector<double> vError = m_pHPIWidget->getError();
-            float error = 0.0f;
-            for(int i = 0; i < vError.size(); ++i) {
-                error += vError.at(i);
-            }
-            error = error / vError.size();
-
             // Write rotation quaternion to HPI Ch #1~3
             matData.row(401) = MatrixXf::Constant(1,matData.cols(), quatHPI.x());
             matData.row(402) = MatrixXf::Constant(1,matData.cols(), quatHPI.y());
@@ -615,9 +605,16 @@ void BabyMEG::doContinousHPI(MatrixXf& matData)
             matData.row(405) = MatrixXf::Constant(1,matData.cols(), m_pFiffInfo->dev_head_t.trans(1,3));
             matData.row(406) = MatrixXf::Constant(1,matData.cols(), m_pFiffInfo->dev_head_t.trans(2,3));
 
-            // Write GOF to HPI Ch #8
+            // Write GOF to HPI Ch #7
+            VectorXd vGof = m_pHPIWidget->getGoF();
+            float gof = vGof.mean();
+            matData.row(407) = MatrixXf::Constant(1,matData.cols(), gof);
+
+            // Write HPI estimation Error (error) to HPI Ch #8
+            QVector<double> vError = m_pHPIWidget->getError();
+            float error = std::accumulate(vError.begin(), vError.end(), .0) / vError.size();     // HPI estimation Error
             matData.row(408) = MatrixXf::Constant(1,matData.cols(), error);
-        //}
+
     }
 }
 

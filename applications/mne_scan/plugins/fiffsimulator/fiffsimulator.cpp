@@ -473,9 +473,14 @@ void FiffSimulator::doContinousHPI(MatrixXf& matData)
             matData.row(406) = MatrixXf::Constant(1,matData.cols(), m_pFiffInfo->dev_head_t.trans(2,3));
 
             // Write GOF to HPI Ch #7
-            float dpfitError = 0.0;
-            float GOF = 1 - dpfitError;
-            matData.row(407) = MatrixXf::Constant(1,matData.cols(), GOF);
+            VectorXd vGof = m_pHPIWidget->getGoF();
+            float gof = vGof.mean();
+            matData.row(407) = MatrixXf::Constant(1,matData.cols(), gof);
+
+            // Write HPI estimation Error (error) to HPI Ch #8
+            QVector<double> vError = m_pHPIWidget->getError();
+            float error = std::accumulate(vError.begin(), vError.end(), .0) / vError.size();     // HPI estimation Error
+            matData.row(408) = MatrixXf::Constant(1,matData.cols(), error);
         }
     }
 }
