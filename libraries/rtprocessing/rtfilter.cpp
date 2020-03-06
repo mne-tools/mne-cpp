@@ -104,7 +104,6 @@ MatrixXd RtFilter::filterDataBlock(const MatrixXd& matDataIn,
     MatrixXd matDataOut = matDataIn;
 
     //Generate QList structure which can be handled by the QConcurrent framework
-    //QList<QPair<QList<FilterData>,QPair<int,RowVectorXd> > > timeData;
     QList<RtFilterData> timeData;
 
     //Only select channels specified in vecPicks
@@ -113,7 +112,7 @@ MatrixXd RtFilter::filterDataBlock(const MatrixXd& matDataIn,
         data.lFilterData = lFilterData;
         data.iRow = vecPicks[i];
         data.vecData = matDataIn.row(vecPicks[i]);
-        //timeData.append(QPair<QList<FilterData>,QPair<int,RowVectorXd> >(lFilterData,QPair<int,RowVectorXd>(vecPicks[i],matDataIn.row(vecPicks[i]))));
+        timeData.append(data);
     }
 
     //Do the concurrent filtering
