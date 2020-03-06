@@ -252,6 +252,13 @@ QVector<double> HpiView::getError()
 
 //=============================================================================================================
 
+Eigen::VectorXd HpiView::getGoF()
+{
+    return m_vGoF;
+}
+
+//=============================================================================================================
+
 bool HpiView::wasLastFitOk()
 {
     return m_bLastFitGood;
@@ -451,7 +458,7 @@ void HpiView::alignFiducials(const QString& fileNameDigData)
 void HpiView::onNewFittingResultAvailable(const RTPROCESSINGLIB::FittingResult& fitResult)
 {
     m_vError = fitResult.errorDistances;
-
+    m_vGoF = fitResult.GoF;
     storeResults(fitResult.devHeadTrans, fitResult.fittedCoils);
 }
 
