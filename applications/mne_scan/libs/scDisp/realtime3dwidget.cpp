@@ -125,14 +125,14 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
         // Add rt brain data
         if(!m_pRtConnectivityItem) {
             //qDebug()<<"RealTime3DWidget::getData - Creating m_pRtConnectivityItem";
-            m_pRtConnectivityItem = m_pData3DModel->addConnectivityData("sample",
+            m_pRtConnectivityItem = m_pData3DModel->addConnectivityData("Subject",
                                                             "Connectivity",
                                                             *(pRTCE->getValue().data()));
 
             m_pRtConnectivityItem->setThresholds(QVector3D(0.9f,0.95f,1.0f));
 
             if(pRTCE->getSurfSet() && pRTCE->getAnnotSet()) {
-                QList<FsSurfaceTreeItem*> lSurfaces = m_pData3DModel->addSurfaceSet("sample",
+                QList<FsSurfaceTreeItem*> lSurfaces = m_pData3DModel->addSurfaceSet("Subject",
                                                                                     "MRI",
                                                                                     *(pRTCE->getSurfSet().data()),
                                                                                     *(pRTCE->getAnnotSet().data()));
@@ -161,7 +161,7 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 
             if(pRTCE->getSensorSurface() && pRTCE->getFiffInfo()) {
                 if(m_iNumberBadChannels != pRTCE->getFiffInfo()->bads.size()) {
-                    m_pData3DModel->addMegSensorInfo("sample",
+                    m_pData3DModel->addMegSensorInfo("Subject",
                                                      "Sensors",
                                                      pRTCE->getFiffInfo()->chs,
                                                      *(pRTCE->getSensorSurface()),
@@ -192,6 +192,8 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
                 m_pRtMNEItem->setAlpha(1.0);
                 m_pRtMNEItem->setStreamingState(true);
                 m_pRtMNEItem->setSFreq(pRTSE->getFiffInfo()->sfreq);
+
+                init();
             } else {
                 //qDebug()<<"RealTimeSourceEstimateWidget::getData - Working with m_lRtItem list";
 
