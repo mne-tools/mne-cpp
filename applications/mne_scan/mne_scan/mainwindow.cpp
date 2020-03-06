@@ -561,6 +561,7 @@ void MainWindow::initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::IPlugin> 
                     connect(lPlugins.at(i).data(), &IPlugin::pluginControlWidgetsChanged,
                             this, &MainWindow::onPluginControlWidgetsChanged);
 
+                    qDebug() << "sCurPluginName" << sCurPluginName;
                     if(QWidget* pWidget = m_pDisplayManager->show(lPlugins.at(i)->getOutputConnectors(),
                                                                   m_pTime,
                                                                   m_qListDynamicDisplayActions)) {
