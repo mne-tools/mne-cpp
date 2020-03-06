@@ -111,7 +111,7 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
             rtmsaWidget->init();
         } else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSourceEstimate> >()) {
             if(!m_pRealTime3DWidget) {
-                m_pRealTime3DWidget = new RealTime3DWidget(newDisp);//new RealTime3DWidget(*pRealTimeConnectivityEstimate, pT, newDisp);
+                m_pRealTime3DWidget = new RealTime3DWidget(newDisp);
                 vboxLayout->addWidget(m_pRealTime3DWidget);
                 m_pRealTime3DWidget->init();
             }
@@ -124,7 +124,7 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
                     m_pRealTime3DWidget.data(), &RealTime3DWidget::update, Qt::BlockingQueuedConnection);
         } else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeConnectivityEstimate> >()) {
             if(!m_pRealTime3DWidget) {
-                m_pRealTime3DWidget = new RealTime3DWidget(newDisp);//new RealTime3DWidget(*pRealTimeConnectivityEstimate, pT, newDisp);
+                m_pRealTime3DWidget = new RealTime3DWidget(newDisp);
                 vboxLayout->addWidget(m_pRealTime3DWidget);
                 m_pRealTime3DWidget->init();
             }
@@ -151,6 +151,7 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
             RealTimeCovWidget* rtcWidget = new RealTimeCovWidget(pT, newDisp);
 
             qListActions.append(rtcWidget->getDisplayActions());
+
             // We need to use queued connection here because the RealTimeCovWidget measurement
             // only holds one measurement and overwrites it immediatley after it emmited notify
             connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
@@ -158,9 +159,7 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
 
             vboxLayout->addWidget(rtcWidget);
             rtcWidget->init();
-        }
-        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSpectrum> >())
-        {
+        } else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSpectrum> >()) {
             QSharedPointer<RealTimeSpectrum>* pRealTimeSpectrum = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSpectrum> >()->data();
 
             RealTimeSpectrumWidget* fsWidget = new RealTimeSpectrumWidget(*pRealTimeSpectrum, pT, newDisp);

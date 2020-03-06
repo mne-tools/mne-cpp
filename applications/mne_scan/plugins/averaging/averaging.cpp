@@ -120,7 +120,7 @@ bool Averaging::start()
 bool Averaging::stop()
 {    
     requestInterruption();
-    wait();
+    wait(500);
 
     return true;
 }

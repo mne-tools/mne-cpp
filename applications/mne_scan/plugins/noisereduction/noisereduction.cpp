@@ -156,7 +156,7 @@ bool NoiseReduction::start()
 bool NoiseReduction::stop()
 {
     requestInterruption();
-    wait();
+    wait(500);
 
     m_iMaxFilterTapSize = -1;
 
