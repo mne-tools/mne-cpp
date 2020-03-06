@@ -223,10 +223,10 @@ void FiffRawView::setWindowSize(int T)
     int iNewPos;
 
     if( T > m_iT){
-        iNewPos = ((m_pTableView->horizontalScrollBar()->value() * T) / m_iT);
+        iNewPos = ((m_pTableView->horizontalScrollBar()->value() * m_iT) / T);
     }
     else {
-        iNewPos = ((m_pTableView->horizontalScrollBar()->value() * T) / m_iT);
+        iNewPos = ((m_pTableView->horizontalScrollBar()->value() * m_iT) / T);
     }
 
     if (iNewPos < 0) {
