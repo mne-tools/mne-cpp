@@ -207,7 +207,7 @@ bool NeuronalConnectivity::stop()
     m_pRtConnectivity->restart();
 
     requestInterruption();
-    wait();
+    wait(500);
 
     return true;
 }

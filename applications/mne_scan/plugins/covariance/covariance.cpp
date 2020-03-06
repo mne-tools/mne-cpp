@@ -160,7 +160,7 @@ bool Covariance::start()
 bool Covariance::stop()
 {
     requestInterruption();
-    wait();
+    wait(500);
 
     return true;
 }
