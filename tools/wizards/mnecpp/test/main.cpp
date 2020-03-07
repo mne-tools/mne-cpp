@@ -66,7 +66,7 @@ public:
 
 private slots:
     void initTestCase();
-    void compareData();
+    void compareValue();
     // add other compareFunctions here
     void cleanupTestCase();
 
@@ -94,7 +94,7 @@ void %{TestClassName}::initTestCase()
 
 //=============================================================================================================
 
-void %{TestClassName}::compareData()
+void %{TestClassName}::compareValue()
 {
     // compare your data here, think about usefull metrics
     Eigen::MatrixXd mDataDiff = mFirstInData - mSecondInData;
