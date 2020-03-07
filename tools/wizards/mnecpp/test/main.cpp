@@ -72,7 +72,7 @@ private slots:
 
 private:
     // declare your thresholds, variables and error values here
-    double epsilon;
+    double dEpsilon;
     Eigen::MatrixXd mFirstInData; 
     Eigen::MatrixXd mSecondInData;
     
@@ -81,7 +81,7 @@ private:
 //=============================================================================================================
 
 %{TestClassName}::%{TestClassName}()
-: epsilon(0.000001)
+: dEpsilon(0.000001)
 {
 }
 
@@ -97,8 +97,8 @@ void %{TestClassName}::initTestCase()
 void %{TestClassName}::compareData()
 {
     // compare your data here, think about usefull metrics
-    Eigen::MatrixXd data_diff = mFirstInData - mSecondInData;
-    QVERIFY( data_diff.sum() < epsilon );
+    Eigen::MatrixXd mDataDiff = mFirstInData - mSecondInData;
+    QVERIFY( mDataDiff.sum() < dEpsilon );
 }
 
 //=============================================================================================================
