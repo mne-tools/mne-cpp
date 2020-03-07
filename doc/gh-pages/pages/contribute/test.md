@@ -35,23 +35,13 @@ public:
 private slots:
     void initTestCase();
     void compareData();
-    void compareTimes();
-    void compareInfo();
     void cleanupTestCase();
 
 private:
     // some variables and error thresholds
-    double epsilon;
-
-    FiffRawData first_in_raw;
-
-    MatrixXd first_in_data;
-    MatrixXd first_in_times;
-
-    FiffRawData second_in_raw;
-
-    MatrixXd second_in_data;
-    MatrixXd second_in_times;
+    double dEpsilon;
+    Eigen::MatrixXd mFirstInData; 
+    Eigen::MatrixXd mSecondInData;
 };
 ```
 
@@ -59,17 +49,21 @@ private:
 
 Here you execute and declare everything that is necessary for your test. You generate and load e.g. all values in a variable that can be compared later. If you want to load external calculated data in e.g. `.txt` files you can use: 
 
-- `UTILSLIB::IOUtils::read_eigen_matrix(ref_pos, QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/ref_hpiFit_pos.txt");`
+```cpp
+Eigen::MatrixXd mDataFromFile;
+UTILSLIB::IOUtils::read_eigen_matrix(mDataFromFile, QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/<yourFile>.txt");
+```
 
-All files you use, have to be added to [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data){:target="_blank" rel="noopener"}. Just open a PullRequest to this repository. The files you use should be as small as possible. If you need a .fif file, have a look at the already existing data and see if you can use one of the files. 
+All files you use, have to be added to [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data){:target="_blank" rel="noopener"}. Just open a Pull Request to this repository. The files you use should be as small as possible. If you need a .fif file, have a look at the already existing data and see if you can use one of the files. 
 
 ### comparValue()
 
 ```cpp
 void TestFiffRWR::compareData()
 {
-    MatrixXd data_diff = first_in_data - second_in_data;
-    QVERIFY( data_diff.sum() < epsilon );
+    // compare your data here, think about usefull metrics
+    Eigen::MatrixXd mDataDiff = mFirstInData - mSecondInData;
+    QVERIFY( mDataDiff.sum() < dEpsilon );
 }
 ```
 
