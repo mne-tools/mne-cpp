@@ -168,6 +168,8 @@ QSize FiffRawViewDelegate::sizeHint(const QStyleOptionViewItem &option,
             const FiffRawViewModel* pFiffRawModel = static_cast<const FiffRawViewModel*>(index.model());
             qint32 nsamples = pFiffRawModel->absoluteLastSample() - pFiffRawModel->absoluteFirstSample();
 
+            nsamples *= pFiffRawModel->m_dDx;
+
             size = QSize(nsamples, option.rect.height());
 
             qDebug() << "FiffRawViewDelegate::sizeHint - nsamples" << nsamples;

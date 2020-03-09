@@ -239,10 +239,13 @@ void FiffRawView::setWindowSize(int T)
                             iNewPos);
     //m_pModel.
 
+    qDebug() << "AAAAAAAAAAAAAA" << m_pTableView->width() - m_pTableView->columnWidth(0);
+    qDebug() << "AAAAAAAAAAAAAA" << m_pModel->m_lData.size();
     m_pTableView->horizontalScrollBar()->setValue(iNewPos);
     m_pTableView->horizontalScrollBar()->setRange(0, iNewSize);
-    m_pTableView->setColumnWidth(1, 50000);//hardcoded for testing, need to scale to data
-    m_pTableView->updateGeometry();
+    m_pTableView->resizeRowsToContents();
+    //m_pTableView->setColumnWidth(1, 50000);//hardcoded for testing, need to scale to data
+    //m_pTableView->updateGeometry();
 }
 
 //=============================================================================================================
