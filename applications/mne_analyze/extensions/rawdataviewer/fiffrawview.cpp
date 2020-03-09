@@ -55,6 +55,7 @@
 #include <QDate>
 #include <QDir>
 #include <QSvgGenerator>
+#include <QAbstractScrollArea>
 
 #if defined(USE_OPENGL)
     #include <QGLWidget>
@@ -93,6 +94,10 @@ FiffRawView::FiffRawView(QWidget *parent)
 
     //set layouts
     this->setLayout(neLayout);
+
+    m_pTableView->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+    //m_pTableView->horizontalScrollBar()->setRange(0, m_pTableView->horizontalScrollBar()->maximum() / 1000000);
+    //m_pTableView->setShowGrid(true);
 }
 
 //=============================================================================================================
@@ -219,8 +224,9 @@ void FiffRawView::setZoom(double zoomFac)
 
 void FiffRawView::setWindowSize(int T)
 {
-    int iNewPos;
+    int iNewPos, iNewSize;
     iNewPos = ((m_pTableView->horizontalScrollBar()->value() * m_iT) / T);
+    iNewSize = ((m_pTableView->horizontalScrollBar()->maximum() * m_iT) / T);
 
     if (iNewPos < 0) {
         iNewPos = 0;
@@ -231,9 +237,11 @@ void FiffRawView::setWindowSize(int T)
     m_pModel->setWindowSize(T,
                             m_pTableView->width() - m_pTableView->columnWidth(0),
                             iNewPos);
+    //m_pModel.
 
     m_pTableView->horizontalScrollBar()->setValue(iNewPos);
-
+    m_pTableView->horizontalScrollBar()->setRange(0, iNewSize);
+    m_pTableView->setColumnWidth(1, 50000);//hardcoded for testing, need to scale to data
     m_pTableView->updateGeometry();
 }
 
@@ -242,8 +250,9 @@ void FiffRawView::setWindowSize(int T)
 void FiffRawView::setDistanceTimeSpacer(int value)
 {
     m_pModel->distanceTimeSpacerChanged(value);
-    m_pModel->updateScrollPosition(m_pTableView->horizontalScrollBar()->value());
-    m_pTableView->resizeColumnsToContents();
+//    m_pModel->updateScrollPosition(m_pTableView->horizontalScrollBar()->value());
+//    m_pTableView->resizeColumnsToContents();
+    //setWindowSize(m_iT);
 }
 
 //=============================================================================================================

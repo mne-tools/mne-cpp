@@ -230,10 +230,10 @@ void RawDataViewer::setUpControls()
             m_pFiffRawView.data(), &FiffRawView::onMakeScreenshot);
 
     m_pFiffRawView->setWindowSize(viewWidget->getWindowSize());
-    m_pFiffRawView->setDistanceTimeSpacer(viewWidget->getDistanceTimeSpacer());
     m_pFiffRawView->setSignalColor(viewWidget->getSignalColor());
     m_pFiffRawView->setBackgroundColor(viewWidget->getBackgroundColor());
     m_pFiffRawView->setZoom(viewWidget->getZoom());
+    m_pFiffRawView->setDistanceTimeSpacer(viewWidget->getDistanceTimeSpacer());
 
     //Set up layout w/ control widgets
     m_pLayout->addWidget(scalingWidget);
