@@ -37,6 +37,7 @@ jobs:
         git push -f --tag
         # Create new dev_build release
         hub release create -m "Development Builds" dev_build --prerelease
+
   Linux:
     runs-on: ubuntu-16.04
     needs: UpdateDevTag
@@ -74,7 +75,7 @@ jobs:
         cd applications/mne_scan/plugins/brainflowboard
         qmake -makefile brainflowboard.pro
         make -j2
-        cp -a ./brainflow/installed/lib/. ../../../bin/
+        cp -a ./brainflow/installed/lib/. ../../../../bin/
     - name: Package binaries
       run: |
         # Install libxkbcommon so linuxdeployqt can find it
@@ -137,7 +138,7 @@ jobs:
         cd applications/mne_scan/plugins/brainflowboard
         qmake -makefile brainflowboard.pro
         make -j2
-        cp -a ./brainflow/installed/lib/. ../../../bin/
+        cp -a ./brainflow/installed/lib/. ../../../../bin/mne_scan.app/Contents/MacOS
     - name: Package binaries
       run: |
         # Creating archive of all macos deployed applications
@@ -197,7 +198,7 @@ jobs:
         cd applications\mne_scan\plugins\brainflowboard
         qmake -makefile brainflowboard.pro
         jom -j2
-        xcopy .\brainflow\installed\lib\* ..\..\..\bin\ /s /i
+        xcopy .\brainflow\installed\lib\* ..\..\..\..\bin\ /s /i
     - name: Package binaries
       run: |
         7z a mne-cpp-windows-x86_64.zip ./bin
