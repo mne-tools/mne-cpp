@@ -74,7 +74,10 @@
                     "trDisplayName": "Test Class Name:",
                     "mandatory": true,
                     "type": "LineEdit",
-                    "data": {}
+                    "data": 
+                    {
+                        "trText": "Test<YourTestName>"
+                    }
                 }	
                 
             ]
@@ -113,7 +116,7 @@
             "data": { "projectFilePath": "%{ProjectFile}" }
         },
         {
-            "trDisplayName": "Example Management",
+            "trDisplayName": "Test Management",
             "trShortTitle": "Summary",
             "typeId": "Summary"
         }
