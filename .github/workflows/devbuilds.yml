@@ -50,7 +50,7 @@ jobs:
       with:
         python-version: '3.7'
         architecture: 'x64'
-    - name: Install Git submodules
+    - name: Install BrainFlow submodule
       run: |
         git submodule update --init applications/mne_scan/plugins/brainflowboard/brainflow
     - name: Install Qt
@@ -58,10 +58,6 @@ jobs:
       with:
         version: 5.14.1
         modules: qtcharts
-    - name: Configure and compile MNE-CPP
-      run: |
-        qmake -r MNECPP_CONFIG+=noTests
-        make -j2 
     - name: Compile BrainFlow submodule
       run: |
         cd applications/mne_scan/plugins/brainflowboard/brainflow
@@ -70,14 +66,14 @@ jobs:
         cmake -DCMAKE_INSTALL_PREFIX=../installed ..
         make
         make install
-    - name: Compile and configure BrainFlow plugin
+    - name: Configure and compile MNE-CPP
       run: |
-        cd applications/mne_scan/plugins/brainflowboard
-        qmake -makefile brainflowboard.pro
+        qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow
         make -j2
-        cp -a ./brainflow/installed/lib/. ../../../../lib/
     - name: Package binaries
       run: |
+        # Copy additional brainflow libs
+        cp -a ./brainflow/installed/lib/. ../../../../lib/
         # Install libxkbcommon so linuxdeployqt can find it
         sudo apt-get install libxkbcommon-x11-0
         # Downloading linuxdeployqt from continious release
@@ -113,7 +109,7 @@ jobs:
       with:
         python-version: '3.7'
         architecture: 'x64'
-    - name: Install Git submodules
+    - name: Install BrainFlow submodule
       run: |
         git submodule update --init applications/mne_scan/plugins/brainflowboard/brainflow
     - name: Install Qt
@@ -121,25 +117,18 @@ jobs:
       with:
         version: 5.14.1
         modules: qtcharts
-    - name: Compile BrainFlow submodule
+    - name: Compile BrainFlow submodule 
       run: |
-        # This needs to be done before we build MNE Scan because plugins are 
-        # copied into the .app folder by mne_scan.pro immediatley after compilation
-        cd applications/mne_scan/plugins/brainflowboard/brainflow
-        mkdir build
-        cd build
+        mkdir applications/mne_scan/plugins/brainflowboard/brainflow/build
+        cd applications/mne_scan/plugins/brainflowboard/brainflow/build
         cmake -DCMAKE_INSTALL_PREFIX=../installed ..
         make
         make install
-    - name: Compile and configure BrainFlow plugin
-      run: |
-        cd applications/mne_scan/plugins/brainflowboard
-        qmake -makefile brainflowboard.pro
-        make -j2
     - name: Configure and compile MNE-CPP
       run: |
-        qmake -r MNECPP_CONFIG+=noTests
+        qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow
         make -j2
+        # Copy additional brainflow libs
         cp -a applications/mne_scan/plugins/brainflowboard/brainflow/installed/lib/. bin/mne_scan.app/Contents/Frameworks
     - name: Package binaries
       run: |
@@ -166,7 +155,7 @@ jobs:
       with:
         python-version: '3.7'
         architecture: 'x64'   
-    - name: Install Git submodules
+    - name: Install BrainFlow submodule
       run: |
         git submodule update --init applications/mne_scan/plugins/brainflowboard/brainflow
     - name: Install Qt
@@ -180,12 +169,6 @@ jobs:
         Invoke-WebRequest http://download.qt.io/official_releases/jom/jom.zip -OutFile .\jom.zip
         expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
         echo "::add-path::$HOME\jom"
-    - name: Configure and compile MNE-CPP
-      run: |
-        cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
-        Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
-        qmake -r MNECPP_CONFIG+=noTests
-        jom -j2
     - name: Compile BrainFlow submodule
       run: |
         cd applications\mne_scan\plugins\brainflowboard\brainflow
@@ -193,13 +176,13 @@ jobs:
         cd build
         cmake -G "Visual Studio 15 2017" -A x64 -DMSVC_RUNTIME=dynamic -DCMAKE_SYSTEM_VERSION=8.1 -DCMAKE_INSTALL_PREFIX="$env:GITHUB_WORKSPACE\applications\mne_scan\plugins\brainflowboard\brainflow\installed" ..
         cmake --build . --target install --config Release
-    - name: Compile and configure BrainFlow plugin
+    - name: Configure and compile MNE-CPP
       run: |
         cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
-        cd applications\mne_scan\plugins\brainflowboard
-        qmake -makefile brainflowboard.pro
+        qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow
         jom -j2
+        # Copy additional brainflow libs
         xcopy .\brainflow\installed\lib\* ..\..\..\..\bin\ /s /i
     - name: Package binaries
       run: |

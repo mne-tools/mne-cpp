@@ -24,9 +24,9 @@ jobs:
       with:
         python-version: '3.7'
         architecture: 'x64'
-    - name: Install Git submodules
+    - name: Install BrainFlow submodule
       run: |
-        git submodule update --init
+        git submodule update --init applications/mne_scan/plugins/brainflowboard/brainflow
     - name: Install Qt (Linux|MacOS)
       if: (matrix.os == 'ubuntu-16.04') || (matrix.os == 'macos-latest')
       uses: jurplel/install-qt-action@v2
@@ -45,13 +45,18 @@ jobs:
       run: |
         Invoke-WebRequest http://download.qt.io/official_releases/jom/jom.zip -OutFile .\jom.zip
         expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
-        echo "::add-path::$HOME\jom"
-    - name: Configure and compile MNE-CPP (Linux|MacOS)
-      if: (matrix.os == 'ubuntu-16.04') || (matrix.os == 'macos-latest')
+        echo "::add-path::$HOME\jom"        
+    - name: Compile BrainFlow submodule (Windows)
+      if: matrix.os == 'windows-2016'
       run: |
-        qmake -r MNECPP_CONFIG+=noTests
-        make -j2
-    - name: Configure and Compile BrainFlow package and submodule (Linux|MacOS)
+        cd applications\mne_scan\plugins\brainflowboard\brainflow
+        mkdir build
+        cd build
+        cmake -G "Visual Studio 15 2017" -A x64 -DMSVC_RUNTIME=dynamic -DCMAKE_SYSTEM_VERSION=8.1 -DCMAKE_INSTALL_PREFIX="$env:GITHUB_WORKSPACE\applications\mne_scan\plugins\brainflowboard\brainflow\installed" ..
+        cmake --build . --target install --config Release
+        cd ..\..
+        xcopy .\brainflow\installed\lib\* ..\..\..\..\bin\ /s /i
+    - name: Compile BrainFlow submodule (Linux|MacOS)
       if: (matrix.os == 'ubuntu-16.04') || (matrix.os == 'macos-latest')
       run: |
         cd applications/mne_scan/plugins/brainflowboard/brainflow
@@ -61,33 +66,21 @@ jobs:
         make
         make install
         cd ../..
-        qmake -makefile brainflowboard.pro
-        make -j2
         cp -a ./brainflow/installed/lib/. ../../../../bin/
+    - name: Configure and compile MNE-CPP (Linux|MacOS)
+      if: (matrix.os == 'ubuntu-16.04') || (matrix.os == 'macos-latest')
+      run: |
+        qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow
+        make -j2
     - name: Configure and compile MNE-CPP (Windows)
       if: matrix.os == 'windows-2016'
       run: |
         # Setup VS compiler   
         cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
-        qmake -r MNECPP_CONFIG+=noTests
+        qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow
         jom -j2
-    - name: Configure and Compile BrainFlow package and submodule (Windows)
-      if: matrix.os == 'windows-2016'
-      run: |
-        cd applications\mne_scan\plugins\brainflowboard\brainflow
-        mkdir build
-        cd build
-        cmake -G "Visual Studio 15 2017" -A x64 -DMSVC_RUNTIME=dynamic -DCMAKE_SYSTEM_VERSION=8.1 -DCMAKE_INSTALL_PREFIX="$env:GITHUB_WORKSPACE\applications\mne_scan\plugins\brainflowboard\brainflow\installed" ..
-        cmake --build . --target install --config Release
-        cd ..\..
-        # Setup VS compiler
-        cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
-        Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
-        qmake -makefile brainflowboard.pro
-        jom -j2
-        xcopy .\brainflow\installed\lib\* ..\..\..\..\bin\ /s /i
-                        
+        
   Tests:
     runs-on: ${{ matrix.os }}
 
