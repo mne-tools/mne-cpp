@@ -364,6 +364,7 @@ void FiffRawViewModel::updateScrollPosition(qint32 newScrollPosition)
             //startBackgroundOperation(&FiffRawViewModel::loadLaterBlocks, m_iTotalBlockCount);
             postBlockLoad(loadEarlierBlocks(m_iTotalBlockCount));
             qDebug() << "A";
+            updateScrollPosition(newScrollPosition);
         } else {
             // there are some blocks in the intersection of the old and the new window that can stay in the buffer:
             // simply load earlier blocks
@@ -385,6 +386,7 @@ void FiffRawViewModel::updateScrollPosition(qint32 newScrollPosition)
             //startBackgroundOperation(&FiffRawViewModel::loadLaterBlocks, m_iTotalBlockCount);
             postBlockLoad(loadLaterBlocks(m_iTotalBlockCount));
             qDebug() << "C";
+            updateScrollPosition(newScrollPosition);
         } else {
             // there are some blocks in the intersection of the old and the new window that can stay in the buffer:
             // simply load later blocks
