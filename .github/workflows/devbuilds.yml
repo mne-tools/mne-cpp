@@ -75,7 +75,7 @@ jobs:
         cd applications/mne_scan/plugins/brainflowboard
         qmake -makefile brainflowboard.pro
         make -j2
-        cp -a ./brainflow/installed/lib/. ../../../../bin/
+        cp -a ./brainflow/installed/lib/. ../../../../lib/
     - name: Package binaries
       run: |
         # Install libxkbcommon so linuxdeployqt can find it
@@ -123,8 +123,8 @@ jobs:
         modules: qtcharts
     - name: Compile BrainFlow submodule
       run: |
-        # This needs to be done before we build mne scan because 
-        # plugins are copied into the .app folder by mne_scan.pro
+        # This needs to be done before we build MNE Scan because plugins are 
+        # copied into the .app folder by mne_scan.pro immediatley after compilation
         cd applications/mne_scan/plugins/brainflowboard/brainflow
         mkdir build
         cd build
