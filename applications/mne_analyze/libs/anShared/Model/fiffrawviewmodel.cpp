@@ -634,7 +634,7 @@ void FiffRawViewModel::setWindowSize(const int& iNumSeconds,
     updateDisplayData();
 
     setDataColumnWidth(iColWidth);
-    updateScrollPosition(iScrollPos);
+    //updateScrollPosition(iScrollPos * m_dDx); //m_Dx here to account for the function dividing by m_dDx to convert sample to pixel
     //iScrollPos = m_iFiffCursorBegin;
     //updateDisplayData();
 

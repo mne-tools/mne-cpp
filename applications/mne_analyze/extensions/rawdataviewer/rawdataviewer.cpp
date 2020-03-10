@@ -54,6 +54,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QSpacerItem>
+
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -238,6 +240,7 @@ void RawDataViewer::setUpControls()
     //Set up layout w/ control widgets
     m_pLayout->addWidget(scalingWidget);
     m_pLayout->addWidget(viewWidget);
+    m_pLayout->addStretch();
 
     //Make it all visible to the user
     m_pControlDock->setWidget(m_pContainer);
