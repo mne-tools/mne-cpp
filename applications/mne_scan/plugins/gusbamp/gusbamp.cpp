@@ -292,7 +292,7 @@ IPlugin::PluginType GUSBAmp::getType() const
 
 QString GUSBAmp::getName() const
 {
-    return "GUSBAmp EEG";
+    return "GUSBAmp";
 }
 
 //=============================================================================================================
