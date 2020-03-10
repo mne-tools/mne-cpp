@@ -52,7 +52,7 @@ jobs:
         architecture: 'x64'
     - name: Install Git submodules
       run: |
-        git submodule update --init
+        git submodule update --init applications/mne_scan/plugins/brainflowboard/brainflow
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with:
@@ -115,18 +115,16 @@ jobs:
         architecture: 'x64'
     - name: Install Git submodules
       run: |
-        git submodule update --init
+        git submodule update --init applications/mne_scan/plugins/brainflowboard/brainflow
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with:
         version: 5.14.1
         modules: qtcharts
-    - name: Configure and compile MNE-CPP
-      run: |
-        qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples
-        make -j2
     - name: Compile BrainFlow submodule
       run: |
+        # This needs to be done before we build mne scan because 
+        # plugins are copied into the .app folder by mne_scan.pro
         cd applications/mne_scan/plugins/brainflowboard/brainflow
         mkdir build
         cd build
@@ -138,11 +136,15 @@ jobs:
         cd applications/mne_scan/plugins/brainflowboard
         qmake -makefile brainflowboard.pro
         make -j2
-        cp -a ./brainflow/installed/lib/. ../../../../bin/mne_scan.app/Contents/MacOS
+    - name: Configure and compile MNE-CPP
+      run: |
+        qmake -r MNECPP_CONFIG+=noTests
+        make -j2
+        cp -a applications/mne_scan/plugins/brainflowboard/brainflow/installed/lib/. bin/mne_scan.app/Contents/Frameworks
     - name: Package binaries
       run: |
         # Creating archive of all macos deployed applications
-        tar cfvz mne-cpp-macos-x86_64.tar.gz bin/mne_scan.dmg
+        tar cfvz mne-cpp-macos-x86_64.tar.gz bin/. lib/.
     - name: Deploy MNE Scan binaries with dev_build release on Github
       uses: svenstaro/upload-release-action@v1-release
       with:
@@ -166,7 +168,7 @@ jobs:
         architecture: 'x64'   
     - name: Install Git submodules
       run: |
-        git submodule update --init
+        git submodule update --init applications/mne_scan/plugins/brainflowboard/brainflow
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with:
