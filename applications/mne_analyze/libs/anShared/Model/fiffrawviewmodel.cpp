@@ -341,6 +341,7 @@ bool FiffRawViewModel::hasChildren(const QModelIndex &parent) const
 
 void FiffRawViewModel::updateScrollPosition(qint32 newScrollPosition)
 {
+    qDebug() << "We are here!";
     // check if we are currently loading something in the background. This is a rudimentary solution.
     if (m_bCurrentlyLoading) {
         qDebug() << "[FiffRawViewModel::updateScrollPosition] Background operation still pending, try again later...";
@@ -361,12 +362,14 @@ void FiffRawViewModel::updateScrollPosition(qint32 newScrollPosition)
 
             // ... and load the whole model anew
             //startBackgroundOperation(&FiffRawViewModel::loadLaterBlocks, m_iTotalBlockCount);
-            postBlockLoad(loadLaterBlocks(m_iTotalBlockCount));
+            postBlockLoad(loadEarlierBlocks(m_iTotalBlockCount));
+            qDebug() << "A";
         } else {
             // there are some blocks in the intersection of the old and the new window that can stay in the buffer:
             // simply load earlier blocks
             //startBackgroundOperation(&FiffRawViewModel::loadEarlierBlocks, blockDist);
             postBlockLoad(loadEarlierBlocks(blockDist));
+            qDebug() << "B";
         }
     } else if (targetCursor + (m_iVisibleWindowSize * m_iSamplesPerBlock) >= m_iFiffCursorBegin + ((m_iPreloadBufferSize + 1) + m_iVisibleWindowSize) * m_iSamplesPerBlock
                && m_bEndOfFileReached == false) {
@@ -381,11 +384,13 @@ void FiffRawViewModel::updateScrollPosition(qint32 newScrollPosition)
             // ... and load the whole model anew
             //startBackgroundOperation(&FiffRawViewModel::loadLaterBlocks, m_iTotalBlockCount);
             postBlockLoad(loadLaterBlocks(m_iTotalBlockCount));
+            qDebug() << "C";
         } else {
             // there are some blocks in the intersection of the old and the new window that can stay in the buffer:
             // simply load later blocks
             //startBackgroundOperation(&FiffRawViewModel::loadLaterBlocks, blockDist);
             postBlockLoad(loadLaterBlocks(blockDist));
+            qDebug() << "D";
         }
     }
 }
@@ -634,6 +639,7 @@ void FiffRawViewModel::setWindowSize(const int& iNumSeconds,
     updateDisplayData();
 
     setDataColumnWidth(iColWidth);
+
     //updateScrollPosition(iScrollPos * m_dDx); //m_Dx here to account for the function dividing by m_dDx to convert sample to pixel
     //iScrollPos = m_iFiffCursorBegin;
     //updateDisplayData();
