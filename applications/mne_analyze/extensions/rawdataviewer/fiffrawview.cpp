@@ -229,23 +229,18 @@ void FiffRawView::setWindowSize(int T)
     iNewSize = ((m_pTableView->horizontalScrollBar()->maximum() * m_iT) / T);
 
     if (iNewPos < 0) {
-        iNewPos = 0;
+        iNewPos = m_pTableView->horizontalScrollBar()->value();
     }
 
     m_iT = T;
 
-
     m_pModel->setWindowSize(T,
                             m_pTableView->width() - m_pTableView->columnWidth(0),
                             iNewPos);
-    //m_pModel.
 
-    qDebug() << "AAAAAAAAAAAAAA" << m_pTableView->width() - m_pTableView->columnWidth(0);
-    qDebug() << "AAAAAAAAAAAAAA" << m_pModel->m_lData.size();
-//    m_pTableView->horizontalScrollBar()->setValue(iNewPos);
-//    m_pTableView->horizontalScrollBar()->setRange(0, iNewSize);
     m_pTableView->resizeRowsToContents();
     m_pTableView->resizeColumnsToContents();
+
     m_pTableView->horizontalScrollBar()->setRange(0, iNewSize);
     m_pTableView->horizontalScrollBar()->setValue(iNewPos + 1);
     m_pTableView->horizontalScrollBar()->setValue(iNewPos);
