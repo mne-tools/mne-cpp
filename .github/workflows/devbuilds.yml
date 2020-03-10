@@ -128,10 +128,10 @@ jobs:
       run: |
         qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow
         make -j2
-        # Copy additional brainflow libs
-        cp -a applications/mne_scan/plugins/brainflowboard/brainflow/installed/lib/. bin/mne_scan.app/Contents/Frameworks
     - name: Package binaries
       run: |
+        # Copy additional brainflow libs
+        cp -a applications/mne_scan/plugins/brainflowboard/brainflow/installed/lib/. bin/mne_scan.app/Contents/Frameworks
         # Creating archive of all macos deployed applications
         tar cfvz mne-cpp-macos-x86_64.tar.gz bin/. lib/.
     - name: Deploy MNE Scan binaries with dev_build release on Github
@@ -182,10 +182,10 @@ jobs:
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow
         jom -j2
-        # Copy additional brainflow libs
-        xcopy .\brainflow\installed\lib\* ..\..\..\..\bin\ /s /i
     - name: Package binaries
       run: |
+        # Copy additional brainflow libs
+        xcopy .\applications\mne_scan\plugins\brainflowboard\brainflow\installed\lib\* .\bin\ /s /i
         7z a mne-cpp-windows-x86_64.zip ./bin
     - name: Deploy binaries with dev_build release on Github
       uses: svenstaro/upload-release-action@v1-release
