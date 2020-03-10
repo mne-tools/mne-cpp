@@ -38,9 +38,10 @@ include(../../../../mne-cpp.pri)
 TEMPLATE = lib
 
 CONFIG += c++11
+CONFIG += plugin
 
 DEFINES += QT_DEPRECATED_WARNINGS
-DEFINES += BRAINFLOWBOARD_LIBRARY
+DEFINES += BRAINFLOWBOARD_PLUGIN
 
 QT += core widgets
 
