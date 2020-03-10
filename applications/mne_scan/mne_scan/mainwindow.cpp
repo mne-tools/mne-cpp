@@ -573,7 +573,17 @@ void MainWindow::initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::IPlugin> 
                         }
 
                         // Sensor plugins are always displayed as the most lowet vertical widget in the multiview
-                        if(lPlugins.at(i)->getName() == "Filter" ||  lPlugins.at(i)->getName() == "Fiff Simulator") {
+                        if(lPlugins.at(i)->getName() == "Filter" ||
+                           lPlugins.at(i)->getName() == "Fiff Simulator" ||
+                           lPlugins.at(i)->getName() == "FtBuffer" ||
+                           lPlugins.at(i)->getName() == "Natus" ||
+                           lPlugins.at(i)->getName() == "BabyMEG"||
+                           lPlugins.at(i)->getName() == "BrainFlow"||
+                           lPlugins.at(i)->getName() == "EEGoSports"||
+                           lPlugins.at(i)->getName() == "GUSBAmp"||
+                           lPlugins.at(i)->getName() == "LSL Adapter"||
+                           lPlugins.at(i)->getName() == "TMSI"||
+                           lPlugins.at(i)->getName() == "BrainAMP") {
                             m_pRunWidget->addWidgetV(pWidget,
                                                      sCurPluginName);
                         } else {

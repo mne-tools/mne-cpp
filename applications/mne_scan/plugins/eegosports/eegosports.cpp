@@ -653,7 +653,7 @@ IPlugin::PluginType EEGoSports::getType() const
 
 QString EEGoSports::getName() const
 {
-    return "EEGoSports EEG";
+    return "EEGoSports";
 }
 
 //=============================================================================================================

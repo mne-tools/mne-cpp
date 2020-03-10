@@ -276,7 +276,7 @@ IPlugin::PluginType BrainFlowBoard::getType() const
 
 QString BrainFlowBoard::getName() const
 {
-    return "BrainFlow Board Plugin";
+    return "BrainFlow";
 }
 
 //=============================================================================================================

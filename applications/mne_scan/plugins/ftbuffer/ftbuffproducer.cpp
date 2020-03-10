@@ -89,7 +89,7 @@ void FtBuffProducer::runMainLoop()
 
     qInfo() << "[FtBuffProducer::runMainLoop] Connected to buffer and ready to receive data.";
 
-    while (true) {
+    while(!this->thread()->isInterruptionRequested()) {
         m_pFtConnector->getData();
 
         //Sends up new data when FtConnector flags new data
@@ -98,12 +98,10 @@ void FtBuffProducer::runMainLoop()
             m_pFtConnector->resetEmitData();
         }
 
-        QThread::usleep(50);
-
-        if (!m_pFtBuffer->isRunning()) {
-            break;
-        }
+        //QThread::usleep(50);
     }
+
+    this->thread()->quit();
 }
 
 //=============================================================================================================

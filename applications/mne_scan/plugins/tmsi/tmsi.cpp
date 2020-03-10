@@ -566,7 +566,7 @@ IPlugin::PluginType TMSI::getType() const
 
 QString TMSI::getName() const
 {
-    return "TMSI EEG";
+    return "TMSI";
 }
 
 //=============================================================================================================

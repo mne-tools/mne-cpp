@@ -69,7 +69,7 @@ FtBuffer::FtBuffer()
 : m_bIsConfigured(false)
 , m_pFtBuffProducer(QSharedPointer<FtBuffProducer>::create(this))
 , m_pFiffInfo(QSharedPointer<FiffInfo>::create())
-, m_pRTMSA_BufferOutput(PluginOutputData<RealTimeMultiSampleArray>::create(this, "FtBuffer", "Output data"))
+//, m_pRTMSA_BufferOutput(PluginOutputData<RealTimeMultiSampleArray>::create(this, "FtBuffer", "Output data"))
 {
 }
 
@@ -95,6 +95,8 @@ QSharedPointer<IPlugin> FtBuffer::clone() const
 void FtBuffer::init()
 {
     qInfo() << "[FtBuffer::init] Initializing FtBuffer plugin...";
+    m_pRTMSA_BufferOutput = PluginOutputData<RealTimeMultiSampleArray>::create(this, "FtBuffer", "FtBuffer Output");
+    m_pRTMSA_BufferOutput->data()->setName(this->getName());//Provide name to auto store widget settings
     m_outputConnectors.append(m_pRTMSA_BufferOutput);
 }
 
@@ -135,6 +137,8 @@ bool FtBuffer::start()
     qInfo() << "[FtBuffer::start] Producer thread created, sending work command...";
     emit workCommand();
 
+    QThread::start();
+
     return true;
 }
 
@@ -144,20 +148,22 @@ bool FtBuffer::stop()
 {
     qInfo() << "[FtBuffer::stop] Stopping.";
 
-    requestInterruption();
-    wait(500);
-
-    m_pRTMSA_BufferOutput->data()->clear();
-
     m_bIsConfigured = false;
 
-    //stops separate producer/client thread
-    m_pProducerThread.quit();
-    m_pProducerThread.wait();
+    //stops separate producer/client thread first
+    m_pProducerThread.requestInterruption();
+    while(m_pProducerThread.isRunning()) {
+        msleep(10);
+    }
+
+    requestInterruption();
+    wait(500);
 
     //Reset ftproducer and sample received list
     m_pFtBuffProducer.clear();
     m_pFtBuffProducer = QSharedPointer<FtBuffProducer>::create(this);
+
+    m_pRTMSA_BufferOutput->data()->clear();
 
     qInfo() << "[FtBuffer::stop] Stopped.";
     return true;
@@ -192,6 +198,7 @@ void FtBuffer::run()
     MatrixXd matData;
 
     while(!isInterruptionRequested()) {
+        qDebug() << "[FtBuffer::run] m_pFiffInfo->dig.size()" << m_pFiffInfo->dig.size();
         //pop matrix
         if(m_pCircularBuffer->pop(matData)) {
             //emit values

@@ -368,7 +368,7 @@ IPlugin::PluginType BrainAMP::getType() const
 
 QString BrainAMP::getName() const
 {
-    return "BrainAMP EEG";
+    return "BrainAMP";
 }
 
 //=============================================================================================================
