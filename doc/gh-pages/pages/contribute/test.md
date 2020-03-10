@@ -44,7 +44,7 @@ private:
 };
 ```
 
-## initTestCase()
+### initTestCase()
 
 Here you execute and declare everything that is necessary for setting up your test. You generate and load all values in a variable that can be compared to later. If you want to load external calculated data in e.g. `.txt` files you can use: 
 
@@ -76,10 +76,12 @@ It might be possible that the last line of the test shows an error in your edito
 #include "test_fiff_rwr.moc"
 ```
 
-### Naming Conventions
+### Naming conventions
 
 Please follow the following naming conventions when naming your test project and class:
 
-- Project name: `test_something_meaningful`
-- Class name: `TestSomethingMeaningful`
+|Object|Rule|
+| --------------- | ------------------- |
+| Project name 	  |`test_something_meaningful`|
+| Class name 	  |`TestSomethingMeaningful`  |
 

@@ -24,6 +24,7 @@ jobs:
         # Copy the changed docu files first
         cp -RT ../mne-cpp/doc/gh-pages ../newDoc
         # Checkout the gh-pages branch
+        git fetch origin gh-pages
         git checkout --track origin/gh-pages
         # Remove all files first
         git rm * -r
