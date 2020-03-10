@@ -261,6 +261,8 @@ public:
 
     inline double pixelDifference() const;
 
+    inline double getDx() const;
+
     //=========================================================================================================
     /**
      * Returns current scaling
@@ -401,7 +403,7 @@ private:
 signals:
      void newBlocksLoaded();
 
-public:
+private:
 
     std::list<QSharedPointer<QPair<MatrixXd, MatrixXd>>> m_lData;    /**< Data */
     std::list<QSharedPointer<QPair<MatrixXd, MatrixXd>>> m_lNewData; /**< Data that is to be appended or prepended */
@@ -522,6 +524,13 @@ inline const QMap< qint32,float >& FiffRawViewModel::getScaling() const
 inline qint32 FiffRawViewModel::numVLines() const
 {
     return (m_iVisibleWindowSize);
+}
+
+//=============================================================================================================
+
+inline double FiffRawViewModel::getDx() const
+{
+    return m_dDx;
 }
 
 //=============================================================================================================
