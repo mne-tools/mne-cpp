@@ -448,11 +448,11 @@ void MainWindow::createToolBars()
         m_pDynamicPluginToolBar->addAction(m_pActionQuickControl);
     }
 
-//    if(m_qListDynamicPluginActions.size() > 0) {
-//        for(qint32 i = 0; i < m_qListDynamicPluginActions.size(); ++i) {
-//            m_pDynamicPluginToolBar->addAction(m_qListDynamicPluginActions[i]);
-//        }
-//    }
+    if(m_qListDynamicPluginActions.size() > 0) {
+        for(qint32 i = 0; i < m_qListDynamicPluginActions.size(); ++i) {
+            m_pDynamicPluginToolBar->addAction(m_qListDynamicPluginActions[i]);
+        }
+    }
 
 //    if(m_qListDynamicDisplayActions.size() > 0) {
 //        for(qint32 i = 0; i < m_qListDynamicDisplayActions.size(); ++i) {
@@ -518,7 +518,6 @@ void MainWindow::createLogDockWindow()
 void MainWindow::updatePluginSetupWidget(SCSHAREDLIB::IPlugin::SPtr pPlugin)
 {
     m_qListDynamicPluginActions.clear();
-    m_qListDynamicDisplayActions.clear();
 
     if(!pPlugin.isNull()) {
         // Add Dynamic Plugin Actions
@@ -543,9 +542,10 @@ void MainWindow::updatePluginSetupWidget(SCSHAREDLIB::IPlugin::SPtr pPlugin)
 void MainWindow::initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::IPlugin> > lPlugins)
 {
     for(int i = 0; i < lPlugins.size(); ++i) {
-        m_qListDynamicPluginActions.clear();
-        m_qListDynamicDisplayActions.clear();
         if(!lPlugins.at(i).isNull()) {
+            m_qListDynamicPluginActions.clear();
+            m_qListDynamicDisplayActions.clear();
+
             // Add Dynamic Plugin Actions
             m_qListDynamicPluginActions.append(lPlugins.at(i)->getPluginActions());
 
@@ -595,9 +595,9 @@ void MainWindow::initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::IPlugin> 
                     m_pRunWidget->show();
                 }
             }
-        }
 
-        this->createToolBars();
+            this->createToolBars();
+        }
     }
 }
 
