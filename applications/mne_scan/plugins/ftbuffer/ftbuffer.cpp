@@ -71,6 +71,7 @@ FtBuffer::FtBuffer()
 , m_pFtBuffProducer(QSharedPointer<FtBuffProducer>::create(this))
 , m_pFiffInfo(QSharedPointer<FiffInfo>::create())
 , m_bDoContinousHPI(false)
+, m_pCircularBuffer(QSharedPointer<CircularBuffer_Matrix_double>(new CircularBuffer_Matrix_double(10)))
 {
     //Init HPI
     m_pActionComputeHPI = new QAction(QIcon(":/images/latestFiffInfoHPI.png"), tr("Compute HPI"),this);
@@ -119,11 +120,6 @@ bool FtBuffer::start()
 {
     if (!m_bIsConfigured) {
         return false;
-    }
-
-    // Init circular buffer to transmit data from the producer to this thread
-    if(!m_pCircularBuffer) {
-        m_pCircularBuffer = QSharedPointer<CircularBuffer_Matrix_double>(new CircularBuffer_Matrix_double(10));
     }
 
     qInfo() << "[FtBuffer::start] Starting FtBuffer...";

@@ -65,7 +65,6 @@ using namespace Eigen;
 EEGoSportsProducer::EEGoSportsProducer(EEGoSports* pEEGoSports)
 : m_pEEGoSports(pEEGoSports)
 , m_pEEGoSportsDriver(new EEGoSportsDriver(this))
-, m_bIsRunning(true)
 {
 }
 
@@ -107,23 +106,16 @@ void EEGoSportsProducer::start(int iSamplesPerBlock,
     if(m_bIsConnected && m_pEEGoSportsDriver->startRecording(iSamplesPerBlock,
                                 iSamplingFrequency,
                                 bMeasureImpedance)) {
-        m_bIsRunning = true;
         QThread::start();
-    } else {
-        m_bIsRunning = false;
     }
 }
 
 //=============================================================================================================
 
 void EEGoSportsProducer::stop()
-{
-    //Wait until this thread (EEGoSportsProducer) is stopped
-    m_bIsRunning = false;
-
-    while(this->isRunning()) {
-        m_bIsRunning = false;
-    }
+{    
+    requestInterruption();
+    wait();
 
     //Unitialise device only after the thread stopped
     m_pEEGoSportsDriver->uninitDevice();
@@ -144,7 +136,7 @@ void EEGoSportsProducer::run()
 {
     MatrixXd matRawBuffer;
 
-    while(m_bIsRunning) {
+    while(!isInterruptionRequested()) {
         //Get the EEG data out of the device buffer and send it to main thread
         if(m_pEEGoSportsDriver->getSampleMatrixValue(matRawBuffer)) {
             m_pEEGoSports->setSampleData(matRawBuffer);

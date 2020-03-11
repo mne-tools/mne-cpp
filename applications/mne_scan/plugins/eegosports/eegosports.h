@@ -50,7 +50,7 @@
 #include "FormFiles/eegosportssetupprojectwidget.h"
 
 #include <scShared/Interfaces/ISensor.h>
-#include <utils/generics/circularmatrixbuffer.h>
+#include <utils/generics/circularbuffer.h>
 #include <fstream>
 
 //=============================================================================================================
@@ -172,9 +172,9 @@ public:
 
     //=========================================================================================================
     /**
-     * Set/Add received samples to a QList.
+     * Set/Add received samples to the circular buffer.
      */
-    void setSampleData(Eigen::MatrixXd &matRawBuffer);
+    void setSampleData(Eigen::MatrixXd &matData);
 
     //=========================================================================================================
 
@@ -239,6 +239,7 @@ private:
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr    m_pRMTSA_EEGoSports;                    /**< The RealTimeSampleArray to provide the EEG data.*/
     QSharedPointer<EEGoSportsImpedanceWidget>                                   m_pEEGoSportsImpedanceWidget;           /**< Widget for checking the impedances*/
     QSharedPointer<EEGoSportsSetupProjectWidget>                                m_pEEGoSportsSetupProjectWidget;        /**< Widget for checking the impedances*/
+    QSharedPointer<IOBUFFER::CircularBuffer_Matrix_double>                      m_pCircularBuffer;              /**< Holds incoming raw data. */
 
     QString                             m_qStringResourcePath;              /**< The path to the EEG resource directory.*/
 
@@ -255,7 +256,6 @@ private:
 
     bool                                m_bWriteToFile;                     /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
     bool                                m_bWriteDriverDebugToFile;          /**< Flag for for writing driver debug informstions to a file. Defined by the user via the GUI.*/
-    bool                                m_bIsRunning;                       /**< Whether EEGoSports is running.*/
     bool                                m_bCheckImpedances;                 /**< Flag for checking the impedances of the EEG amplifier.*/
     bool                                m_bUseTrackedCardinalMode;          /**< Flag for using the tracked cardinal mode.*/
     bool                                m_bUseElectrodeShiftMode;           /**< Flag for using the electrode shift mode.*/
@@ -284,8 +284,6 @@ private:
 
     QSharedPointer<QTimer>              m_pTimerRecordingChange;            /**< Timer to control blinking of the recording icon */
     qint16                              m_iBlinkStatus;                     /**< Flag for recording icon blinking */
-
-    QList<Eigen::MatrixXd>              m_qListReceivedSamples;             /**< List with alle the received samples in form of differentley sized matrices. */
 };
 } // NAMESPACE
 
