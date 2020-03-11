@@ -40,23 +40,28 @@
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
+
+#include "tmsi_global.h"
+
+#include "FormFiles/tmsisetupwidget.h"
+#include "FormFiles/tmsimanualannotationwidget.h"
+#include "FormFiles/tmsiimpedancewidget.h"
+#include "FormFiles/tmsisetupprojectwidget.h"
+
 #include <iostream>
 #include <fstream>
 #include <direct.h>
 
-#include "tmsi_global.h"
-
 #include <scShared/Interfaces/ISensor.h>
-#include <utils/generics/circularmatrixbuffer.h>
+#include <utils/generics/circularbuffer.h>
 #include <scMeas/realtimemultisamplearray.h>
 
 #include <utils/layoutloader.h>
 
-#include <unsupported/Eigen/FFT>
-#include <Eigen/Geometry>
+#include <fiff/fiff.h>
 
 //=============================================================================================================
-// QT STL INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
 #include <QtWidgets>
@@ -64,16 +69,21 @@
 #include <QTime>
 #include <QtConcurrent/QtConcurrent>
 
-#include "FormFiles/tmsisetupwidget.h"
-#include "FormFiles/tmsimanualannotationwidget.h"
-#include "FormFiles/tmsiimpedancewidget.h"
-#include "FormFiles/tmsisetupprojectwidget.h"
-
 //=============================================================================================================
-// FIFF INCLUDES
+// EIGEN INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff.h>
+#include <unsupported/Eigen/FFT>
+#include <Eigen/Geometry>
+
+//=============================================================================================================
+// TMSIPLUGIN FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace FIFFLIB {
+    class FiffInfo;
+    class FiffStream;
+}
 
 //=============================================================================================================
 // DEFINE NAMESPACE TMSIPLUGIN
@@ -83,19 +93,7 @@ namespace TMSIPLUGIN
 {
 
 //=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace MNESCAN;
-using namespace SCMEASLIB;
-using namespace IOBUFFER;
-using namespace FIFFLIB;
-using namespace std;
-using namespace UTILSLIB;
-using namespace Eigen;
-
-//=============================================================================================================
-// FORWARD DECLARATIONS
+// TMSIPLUGIN FORWARD DECLARATIONS
 //=============================================================================================================
 
 class TMSIProducer;
@@ -106,12 +104,12 @@ class TMSIProducer;
  *
  * @brief The TMSI class provides a EEG connector. In order for this plugin to work properly the driver dll "RTINST.dll" must be installed in the system directory. This dll is automatically copied in the system directory during the driver installtion of the TMSi Refa device.
  */
-class TMSISHARED_EXPORT TMSI : public ISensor
+class TMSISHARED_EXPORT TMSI : public SCSHAREDLIB::ISensor
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "tmsi.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(MNESCAN::ISensor)
+    Q_INTERFACES(SCSHAREDLIB::ISensor)
 
     friend class TMSIProducer;
     friend class TMSISetupWidget;
@@ -216,10 +214,10 @@ protected:
     bool dirExists(const std::string& dirName_in);
 
 private:
-    PluginOutputData<RealTimeMultiSampleArray>::SPtr m_pRMTSA_TMSI;      /**< The RealTimeSampleArray to provide the EEG data.*/
-    QSharedPointer<TMSIManualAnnotationWidget> m_tmsiManualAnnotationWidget;/**< Widget for manually annotation the trigger during session.*/
-    QSharedPointer<TMSIImpedanceWidget> m_pTmsiImpedanceWidget;             /**< Widget for checking the impedances*/
-    QSharedPointer<TMSISetupProjectWidget> m_pTmsiSetupProjectWidget;       /**< Widget for checking the impedances*/
+    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> > m_pRMTSA_TMSI;                  /**< The RealTimeSampleArray to provide the EEG data.*/
+    QSharedPointer<TMSIManualAnnotationWidget>                                          m_pTmsiManualAnnotationWidget;  /**< Widget for manually annotation the trigger during session.*/
+    QSharedPointer<TMSIImpedanceWidget>                                                 m_pTmsiImpedanceWidget;         /**< Widget for checking the impedances*/
+    QSharedPointer<TMSISetupProjectWidget>                                              m_pTmsiSetupProjectWidget;      /**< Widget for checking the impedances*/
 
     QString                             m_qStringResourcePath;              /**< The path to the EEG resource directory.*/
 
@@ -236,9 +234,6 @@ private:
     bool                                m_bUseUnitOffset;                   /**< Flag for using the channels unit offset. Defined by the user via the GUI.*/
     bool                                m_bWriteToFile;                     /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
     bool                                m_bWriteDriverDebugToFile;          /**< Flag for for writing driver debug informstions to a file. Defined by the user via the GUI.*/
-    bool                                m_bUseFiltering;                    /**< Flag for writing the received samples to a file. Defined by the user via the GUI.*/
-    bool                                m_bIsRunning;                       /**< Whether TMSI is running.*/
-    bool                                m_bUseFFT;                          /**< Flag for using FFT. Defined by the user via the GUI.*/
     bool                                m_bBeepTrigger;                     /**< Flag for using a trigger input.*/
     bool                                m_bUseCommonAverage;                /**< Flag for using common average.*/
     bool                                m_bUseKeyboardTrigger;              /**< Flag for using the keyboard as a trigger input.*/
@@ -248,19 +243,19 @@ private:
     int                                 m_iSplitFileSizeMs;                 /**< Holds the size of the splitted files in ms.*/
     int                                 m_iTriggerType;                     /**< Holds the trigger type | 0 - no trigger activated, 254 - left, 253 - right, 252 - beep.*/
 
-    ofstream                            m_outputFileStream;                 /**< fstream for writing the samples values to txt file.*/
+    std::ofstream                       m_outputFileStream;                 /**< fstream for writing the samples values to txt file.*/
     QString                             m_sOutputFilePath;                  /**< Holds the path for the sample output file. Defined by the user via the GUI.*/
     QString                             m_sElcFilePath;                     /**< Holds the path for the .elc file (electrode positions). Defined by the user via the GUI.*/
     QFile                               m_fileOut;                          /**< QFile for writing to fif file.*/
-    FiffStream::SPtr                    m_pOutfid;                          /**< QFile for writing to fif file.*/
-    QSharedPointer<FiffInfo>            m_pFiffInfo;                        /**< Fiff measurement info.*/
-    RowVectorXd                         m_cals;
+    QSharedPointer<FIFFLIB::FiffStream> m_pOutfid;                          /**< QFile for writing to fif file.*/
+    QSharedPointer<FIFFLIB::FiffInfo>   m_pFiffInfo;                        /**< Fiff measurement info.*/
+    Eigen::RowVectorXd                  m_cals;
 
-    QSharedPointer<RawMatrixBuffer>     m_pRawMatrixBuffer_In;              /**< Holds incoming raw data.*/
+    QSharedPointer<IOBUFFER::CircularBuffer_Matrix_float>     m_pCircularBuffer;              /**< Holds incoming raw data.*/
 
     QSharedPointer<TMSIProducer>        m_pTMSIProducer;                    /**< the TMSIProducer.*/
 
-    MatrixXf                            m_matOldMatrix;                     /**< Last received sample matrix by the tmsiproducer/tmsidriver class. Used for simple HP filtering.*/
+    Eigen::MatrixXf                     m_matOldMatrix;                     /**< Last received sample matrix by the tmsiproducer/tmsidriver class. Used for simple HP filtering.*/
 
     QMutex                              m_qMutex;                           /**< Holds the threads mutex.*/
 

@@ -56,7 +56,6 @@ using namespace TMSIPLUGIN;
 TMSIProducer::TMSIProducer(TMSI* pTMSI)
 : m_pTMSI(pTMSI)
 , m_pTMSIDriver(new TMSIDriver(this))
-, m_bIsRunning(true)
 {
 }
 
@@ -64,21 +63,23 @@ TMSIProducer::TMSIProducer(TMSI* pTMSI)
 
 TMSIProducer::~TMSIProducer()
 {
-    //cout << "TMSIProducer::~TMSIProducer()" << endl;
+    if(this->isRunning()) {
+        stop();
+    }
 }
 
 //=============================================================================================================
 
 void TMSIProducer::start(int iNumberOfChannels,
-                     int iSamplingFrequency,
-                     int iSamplesPerBlock,
-                     bool bUseChExponent,
-                     bool bUseUnitGain,
-                     bool bUseUnitOffset,
-                     bool bWriteDriverDebugToFile,
-                     QString sOutputFilePath,
-                     bool bUseCommonAverage,
-                     bool bMeasureImpedance)
+                         int iSamplingFrequency,
+                         int iSamplesPerBlock,
+                         bool bUseChExponent,
+                         bool bUseUnitGain,
+                         bool bUseUnitOffset,
+                         bool bWriteDriverDebugToFile,
+                         QString sOutputFilePath,
+                         bool bUseCommonAverage,
+                         bool bMeasureImpedance)
 {
     //Initialise device
     if(m_pTMSIDriver->initDevice(iNumberOfChannels,
@@ -90,46 +91,33 @@ void TMSIProducer::start(int iNumberOfChannels,
                               bWriteDriverDebugToFile,
                               sOutputFilePath,
                               bUseCommonAverage,
-                              bMeasureImpedance))
-    {
-        m_bIsRunning = true;
+                              bMeasureImpedance)) {
         QThread::start();
     }
-    else
-        m_bIsRunning = false;
 }
 
 //=============================================================================================================
 
 void TMSIProducer::stop()
 {
-    //Wait until this thread (TMSIProducer) is stopped
-    m_bIsRunning = false;
-
-    //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the push function (acquire statement)
-    m_pTMSI->m_pRawMatrixBuffer_In->releaseFromPush();
-
-    while(this->isRunning())
-        m_bIsRunning = false;
-
-    //Unitialise device only after the thread stopped
-    m_pTMSIDriver->uninitDevice();
+    requestInterruption();
+    wait();
 }
 
 //=============================================================================================================
 
 void TMSIProducer::run()
 {
-    MatrixXf matRawBuffer(m_pTMSI->m_iNumberOfChannels, m_pTMSI->m_iSamplesPerBlock);
+    MatrixXf matData(m_pTMSI->m_iNumberOfChannels, m_pTMSI->m_iSamplesPerBlock);
 
-    while(m_bIsRunning)
-    {
-        //std::cout<<"TMSIProducer::run()"<<std::endl;
-        //Get the TMSi EEG data out of the device buffer and write received data to circular buffer
-        if(m_pTMSIDriver->getSampleMatrixValue(matRawBuffer))
-            m_pTMSI->m_pRawMatrixBuffer_In->push(&matRawBuffer);
+    while(!isInterruptionRequested()) {
+        if(m_pTMSIDriver->getSampleMatrixValue(matData)) {
+            while(!m_pTMSI->m_pCircularBuffer->push(matData) && !isInterruptionRequested()) {
+                //Do nothing until the circular buffer is ready to accept new data again
+            }
+        }
     }
 
-    //std::cout<<"EXITING - TMSIProducer::run()"<<std::endl;
+    //Unitialise device only after the thread stopped
+    m_pTMSIDriver->uninitDevice();
 }
-

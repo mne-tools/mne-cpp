@@ -134,8 +134,6 @@ protected:
 private:
     TMSI*                       m_pTMSI;            /**< A pointer to the corresponding TMSI class.*/
     QSharedPointer<TMSIDriver>  m_pTMSIDriver;      /**< A pointer to the corresponding TMSI driver class.*/
-
-    bool                        m_bIsRunning;       /**< Whether TMSIProducer is running.*/
 };
 } // NAMESPACE
 

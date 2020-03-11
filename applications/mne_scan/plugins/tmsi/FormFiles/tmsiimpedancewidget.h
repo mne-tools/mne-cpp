@@ -43,7 +43,7 @@
 #include <utils/layoutloader.h>
 #include "../tmsielectrodeitem.h"
 #include "../tmsiimpedancescene.h"
-#include "disp/helpers/colormap.h"
+#include "disp/plots/helpers/colormap.h"
 
 #include <scMeas/realtimemultisamplearray.h>
 
@@ -57,8 +57,12 @@
 #include <QtAlgorithms>
 #include <QtSvg/QSvgGenerator>
 
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
 namespace Ui {
-class TMSIImpedanceWidget;
+    class TMSIImpedanceWidget;
 }
 
 //=============================================================================================================
@@ -69,15 +73,7 @@ namespace TMSIPLUGIN
 {
 
 //=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
-using namespace UTILSLIB;
-using namespace DISPLIB;
-
-//=============================================================================================================
-// FORWARD DECLARATIONS
+// TMSIPLUGIN FORWARD DECLARATIONS
 //=============================================================================================================
 
 class TMSI;
@@ -100,7 +96,7 @@ public:
     /**
      * Updates the values of the electrodes placed in the QGraphicsScene.
      */
-    void updateGraphicScene(VectorXd matValue);
+    void updateGraphicScene(Eigen::VectorXd matValue);
 
     //=========================================================================================================
     /**
@@ -117,7 +113,7 @@ private:
 
     Ui::TMSIImpedanceWidget*                    ui;                         /**< The user interface for the TMSIImpedanceWidget.*/
 
-    QSharedPointer<ColorMap>                    m_cbColorMap;               /**< The pointer the colormap object.*/
+    QSharedPointer<DISPLIB::ColorMap>           m_cbColorMap;               /**< The pointer the colormap object.*/
 
     double                                      m_dMaxImpedance;            /**< Maximum impedance value. This is a fixed value to scale the color map.*/
 
