@@ -305,8 +305,9 @@ QString BabyMEG::getName() const
 
 QWidget* BabyMEG::setupWidget()
 {
-    if(!m_pMyClient->isConnected())
+    if(!m_pMyClient->isConnected()) {
         m_pMyClient->ConnectToBabyMEG();
+    }
 
     BabyMEGSetupWidget* widget = new BabyMEGSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
 

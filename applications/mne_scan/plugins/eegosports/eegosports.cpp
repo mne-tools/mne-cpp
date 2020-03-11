@@ -141,6 +141,7 @@ QSharedPointer<IPlugin> EEGoSports::clone() const
 void EEGoSports::init()
 {
     m_pRMTSA_EEGoSports = PluginOutputData<RealTimeMultiSampleArray>::create(this, "EEGoSports", "EEG output data");
+    m_pRMTSA_EEGoSports->data()->setName(this->getName());//Provide name to auto store widget settings
 
     m_outputConnectors.append(m_pRMTSA_EEGoSports);
 
