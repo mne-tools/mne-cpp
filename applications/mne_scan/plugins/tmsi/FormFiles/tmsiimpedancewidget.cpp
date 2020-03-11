@@ -54,6 +54,10 @@
 //=============================================================================================================
 
 using namespace TMSIPLUGIN;
+using namespace Eigen;
+using namespace UTILSLIB;
+using namespace DISPLIB;
+using namespace std;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -78,12 +82,18 @@ TMSIImpedanceWidget::TMSIImpedanceWidget(TMSI* pTMSI, QWidget *parent)
     ui->m_pushButton_stop->setEnabled(false);
 
     // Connects of this widget
-    connect(ui->m_pushButton_stop, &QPushButton::released, this, &TMSIImpedanceWidget::stopImpedanceMeasurement);
-    connect(ui->m_pushButton_start, &QPushButton::released, this, &TMSIImpedanceWidget::startImpedanceMeasurement);
-    connect(ui->m_pushButton_takeScreenshot, &QPushButton::released, this, &TMSIImpedanceWidget::takeScreenshot);
-    connect(ui->m_pushButton_loadLayout, &QPushButton::released, this, &TMSIImpedanceWidget::loadLayout);
-    connect(ui->m_pushButton_saveValues, &QPushButton::released, this, &TMSIImpedanceWidget::saveToFile);
-    connect(ui->m_pushButton_Help, &QPushButton::released, this, &TMSIImpedanceWidget::helpDialog);
+    connect(ui->m_pushButton_stop, &QPushButton::released,
+            this, &TMSIImpedanceWidget::stopImpedanceMeasurement);
+    connect(ui->m_pushButton_start, &QPushButton::released,
+            this, &TMSIImpedanceWidget::startImpedanceMeasurement);
+    connect(ui->m_pushButton_takeScreenshot, &QPushButton::released,
+            this, &TMSIImpedanceWidget::takeScreenshot);
+    connect(ui->m_pushButton_loadLayout, &QPushButton::released,
+            this, &TMSIImpedanceWidget::loadLayout);
+    connect(ui->m_pushButton_saveValues, &QPushButton::released,
+            this, &TMSIImpedanceWidget::saveToFile);
+    connect(ui->m_pushButton_Help, &QPushButton::released,
+            this, &TMSIImpedanceWidget::helpDialog);
     //connect(ui->m_verticalSlider_manualImpedanceValue, &QSlider::valueChanged, this, &TMSIImpedanceWidget::setIm);
 }
 
@@ -149,13 +159,16 @@ void TMSIImpedanceWidget::initGraphicScene()
 
     // Load standard layout file
     LayoutLoader *asaObject = new LayoutLoader();
-    QList<QVector<double> > elcLocation3D;
-    QList<QVector<double> > elcLocation2D;
+    QList<QVector<float> > elcLocation3D;
+    QList<QVector<float> > elcLocation2D;
     QString unit;
     QStringList elcChannelNames;
     QString sElcFilePath = QString("./resources/mne_scan/plugins/tmsi/loc_files/standard_waveguard128.elc");
 
-    if(!asaObject->readAsaElcFile(sElcFilePath, elcChannelNames, elcLocation3D, elcLocation2D, unit))
+    if(!asaObject->readAsaElcFile(sElcFilePath,
+                                  elcChannelNames,
+                                  elcLocation3D,
+                                  elcLocation2D, unit))
     {
         qDebug() << "Error: Reading elc file.";
         return;
@@ -265,12 +278,16 @@ void TMSIImpedanceWidget::loadLayout()
 
     // Load standard layout file
     LayoutLoader *asaObject = new LayoutLoader();
-    QList<QVector<double> > elcLocation3D;
-    QList<QVector<double> > elcLocation2D;
+    QList<QVector<float> > elcLocation3D;
+    QList<QVector<float> > elcLocation2D;
     QString unit;
     QStringList elcChannelNames;
 
-    if(!asaObject->readAsaElcFile(sElcFilePath, elcChannelNames, elcLocation3D, elcLocation2D, unit))
+    if(!asaObject->readAsaElcFile(sElcFilePath,
+                                  elcChannelNames,
+                                  elcLocation3D,
+                                  elcLocation2D,
+                                  unit))
         qDebug() << "Error: Reading elc file.";
     else
         m_qGScene->clear();
@@ -299,8 +316,9 @@ void TMSIImpedanceWidget::closeEvent(QCloseEvent *event)
     Q_UNUSED(event);
 
     // On window close event -> stop impedance measurement
-    if(m_pTMSI->m_bIsRunning)
+    if(m_pTMSI->isRunning()) {
         stopImpedanceMeasurement();
+    }
 }
 
 //=============================================================================================================

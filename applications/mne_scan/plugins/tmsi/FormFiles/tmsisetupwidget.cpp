@@ -81,14 +81,6 @@ TMSISetupWidget::TMSISetupWidget(TMSI* pTMSI, QWidget* parent)
     connect(ui.m_checkBox_UseUnitOffset, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &TMSISetupWidget::setDeviceSamplingProperties);
 
-    //Connect preprocessing
-    connect(ui.m_checkBox_UseFiltering, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            this, &TMSISetupWidget::setPreprocessing);
-
-    //Connect postprocessing
-    connect(ui.m_checkBox_UseFFT, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            this, &TMSISetupWidget::setPostprocessing);
-
     //Connect debug file
     connect(ui.m_checkBox_WriteDriverDebugToFile, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &TMSISetupWidget::setWriteToFile);
@@ -145,9 +137,6 @@ void TMSISetupWidget::initGui()
     ui.m_checkBox_UseUnitGain->setChecked(m_pTMSI->m_bUseUnitGain);
     ui.m_checkBox_UseUnitOffset->setChecked(m_pTMSI->m_bUseUnitOffset);
 
-    //Init preprocessing
-    ui.m_checkBox_UseFiltering->setChecked(m_pTMSI->m_bUseFiltering);
-
     //Init write to file
     ui.m_checkBox_WriteDriverDebugToFile->setChecked(m_pTMSI->m_bWriteDriverDebugToFile);
 
@@ -162,7 +151,6 @@ void TMSISetupWidget::initGui()
 
 void TMSISetupWidget::setDeviceSamplingProperties()
 {
-    cout<<"changing "<<endl;
     m_pTMSI->m_iSamplingFreq = ui.m_spinBox_SamplingFreq->value();
     m_pTMSI->m_iNumberOfChannels = ui.m_spinBox_NumberOfChannels->value();
     m_pTMSI->m_iSamplesPerBlock = ui.m_spinBox_SamplesPerBlock->value();
@@ -172,20 +160,6 @@ void TMSISetupWidget::setDeviceSamplingProperties()
     m_pTMSI->m_bUseUnitOffset = ui.m_checkBox_UseUnitOffset->isChecked();
 
     m_pTMSI->m_bUseCommonAverage = ui.m_checkBox_UseCommonAverage->isChecked();
-}
-
-//=============================================================================================================
-
-void TMSISetupWidget::setPreprocessing()
-{
-    m_pTMSI->m_bUseFiltering = ui.m_checkBox_UseFiltering->isChecked();
-}
-
-//=============================================================================================================
-
-void TMSISetupWidget::setPostprocessing()
-{
-    m_pTMSI->m_bUseFFT = ui.m_checkBox_UseFFT->isChecked();
 }
 
 //=============================================================================================================
