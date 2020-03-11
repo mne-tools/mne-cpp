@@ -54,28 +54,36 @@ using namespace FTBUFFERPLUGIN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FtBufferSetupWidget::FtBufferSetupWidget(FtBuffer* toolbox, QWidget *parent)
+FtBufferSetupWidget::FtBufferSetupWidget(FtBuffer* toolbox,
+                                         const QString& sSettingsPath,
+                                         QWidget *parent)
 : QWidget(parent)
 , m_pFtBuffer(toolbox)
+, m_sSettingsPath(sSettingsPath)
 {
     ui.setupUi(this);
 
     this->ui.m_lineEditIP->setText(toolbox->m_pFtBuffProducer->m_pFtConnector->getAddr());
 
+    loadSettings(m_sSettingsPath);
 
     //Always connect GUI elemts after ui.setpUi has been called
-    connect(ui.m_qPushButton_About, SIGNAL(released()), this, SLOT(showAboutDialog())); // About page
-    connect(ui.m_qPushButton_Connect, SIGNAL(released()), this, SLOT(pressedConnect())); // Connect/Disconnect button
+    connect(ui.m_qPushButton_About, SIGNAL(released()),
+            this, SLOT(showAboutDialog())); // About page
+    connect(ui.m_qPushButton_Connect, SIGNAL(released()),
+            this, SLOT(pressedConnect())); // Connect/Disconnect button
 
-    connect(this, &FtBufferSetupWidget::connectAtAddr, m_pFtBuffer->m_pFtBuffProducer.data(), &FtBuffProducer::connectToBuffer);
-    connect(m_pFtBuffer->m_pFtBuffProducer.data(), &FtBuffProducer::connecStatus, this, &FtBufferSetupWidget::isConnected);
+    connect(this, &FtBufferSetupWidget::connectAtAddr,
+            m_pFtBuffer->m_pFtBuffProducer.data(), &FtBuffProducer::connectToBuffer);
+    connect(m_pFtBuffer->m_pFtBuffProducer.data(), &FtBuffProducer::connecStatus,
+            this, &FtBufferSetupWidget::isConnected);
 }
 
 //=============================================================================================================
 
 FtBufferSetupWidget::~FtBufferSetupWidget()
 {
-
+    saveSettings(m_sSettingsPath);
 }
 
 //=============================================================================================================
@@ -107,4 +115,32 @@ void FtBufferSetupWidget::isConnected(bool stat)
         msgBox.setText("Unable to find relevant fiff info. Is there header data in the buffer or a fiff file in your bin folder?");
         msgBox.exec();
     }
+}
+
+//=============================================================================================================
+
+void FtBufferSetupWidget::saveSettings(const QString& settingsPath)
+{
+    if(settingsPath.isEmpty()) {
+        return;
+    }
+
+    // Store Settings
+    QSettings settings;
+
+    settings.setValue(settingsPath + QString("/IP"), ui.m_lineEditIP->text());
+}
+
+//=============================================================================================================
+
+void FtBufferSetupWidget::loadSettings(const QString& settingsPath)
+{
+    if(settingsPath.isEmpty()) {
+        return;
+    }
+
+    // Load Settings
+    QSettings settings;
+
+    ui.m_lineEditIP->setText(settings.value(settingsPath + QString("/IP"), "127.0.0.1").toString());
 }

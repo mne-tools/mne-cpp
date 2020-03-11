@@ -84,7 +84,9 @@ public:
      * @param [in] toolbox  a pointer to the corresponding FtBuffer.
      * @param [in] parent   pointer to parent widget; If parent is 0, the new FtBufferSetupWidget becomes a window. If parent is another widget, FtBufferSetupWidget becomes a child window inside parent. FtBufferSetupWidget is deleted when its parent is deleted.
      */
-    FtBufferSetupWidget(FtBuffer* toolbox, QWidget *parent = 0);
+    FtBufferSetupWidget(FtBuffer* toolbox,
+                        const QString& sSettingsPath = "",
+                        QWidget *parent = 0);
 
     //=========================================================================================================
     /**
@@ -113,6 +115,22 @@ private slots:
      */
     void isConnected(bool stat);
 
+    //=========================================================================================================
+    /**
+     * Saves all important settings of this view via QSettings.
+     *
+     * @param[in] settingsPath        the path to store the settings to.
+     */
+    void saveSettings(const QString& settingsPath);
+
+    //=========================================================================================================
+    /**
+     * Loads and inits all important settings of this view via QSettings.
+     *
+     * @param[in] settingsPath        the path to load the settings from.
+     */
+    void loadSettings(const QString& settingsPath);
+
 signals:
 
     /**
@@ -125,8 +143,9 @@ signals:
                        int port);
 
 private:
-
     FtBuffer*   m_pFtBuffer;            /**< Holds a pointer to corresponding FtBuffer.*/
+
+    QString     m_sSettingsPath;        /**< The settings path to store the GUI settings to. */
 
     Ui::FtBufferSetupWidgetClass ui;	/**< Holds the user interface for the FtBufferSetupWidget.*/
 };
