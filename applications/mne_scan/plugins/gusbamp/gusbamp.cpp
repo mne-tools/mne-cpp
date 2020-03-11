@@ -40,6 +40,7 @@
 
 #include "gusbamp.h"
 #include "gusbampproducer.h"   
+#include <fiff/fiff_ch_info.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -56,7 +57,8 @@ using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
 using namespace GUSBAMPPLUGIN;
 using namespace IOBUFFER;
-using namespace std;
+using namespace Eigen;
+using namespace FIFFLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -65,12 +67,12 @@ using namespace std;
 GUSBAmp::GUSBAmp()
 : m_pRTMSA_GUSBAmp(0)
 , m_qStringResourcePath(qApp->applicationDirPath()+"/resources/mne_scan/plugins/gusbamp/")
-, m_pCircularBuffer(0)
 , m_pGUSBAmpProducer(new GUSBAmpProducer(this))
 , m_iNumberOfChannels(0)
 , m_iSamplesPerBlock(0)
 , m_iSampleRate(128)
 , m_bWriteToFile(false)
+, m_pCircularBuffer(QSharedPointer<CircularBuffer_Matrix_float>(new CircularBuffer_Matrix_float(8)))
 {
     m_viChannelsToAcquire = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
 
@@ -107,14 +109,10 @@ GUSBAmp::~GUSBAmp()
 void GUSBAmp::setUpFiffInfo()
 {
     // Only works for ANT Neuro Waveguard Duke caps
-    //
     //Clear old fiff info data
-    //
     m_pFiffInfo->clear();
 
-    //
     //Set number of channels, sampling frequency and high/-lowpass
-    //
     m_pFiffInfo->nchan = m_iNumberOfChannels;
     m_pFiffInfo->sfreq = m_iSampleRate;
     m_pFiffInfo->highpass = (float)0.001;
@@ -122,9 +120,7 @@ void GUSBAmp::setUpFiffInfo()
 
     int numberEEGCh = m_iNumberOfChannels;
 
-    //
     //Set up the channel info
-    //
     QStringList QSLChNames;
     m_pFiffInfo->chs.clear();
 
@@ -174,9 +170,7 @@ void GUSBAmp::setUpFiffInfo()
     //Set channel names in fiff_info_base
     m_pFiffInfo->ch_names = QSLChNames;
 
-    //
     //Set head projection
-    //
     m_pFiffInfo->dev_head_t.from = FIFFV_COORD_DEVICE;
     m_pFiffInfo->dev_head_t.to = FIFFV_COORD_HEAD;
     m_pFiffInfo->ctf_head_t.from = FIFFV_COORD_DEVICE;
@@ -223,9 +217,6 @@ bool GUSBAmp::start()
 
     //after device was started: ask for size of SampleMatrix to set the buffer matrix (bevor setUpFiffInfo() is started)
     m_viSizeOfSampleMatrix = m_pGUSBAmpProducer->getSizeOfSampleMatrix();
-    if(m_pCircularBuffer) {
-        m_pCircularBuffer = QSharedPointer<CircularBuffer_Matrix_float>(new CircularBuffer_Matrix_float(8));
-    }
 
     //set the parameters for number of channels (rows of matrix) and samples (columns of matrix)
     m_iNumberOfChannels = m_viSizeOfSampleMatrix[0];
@@ -240,13 +231,10 @@ bool GUSBAmp::start()
     m_pRTMSA_GUSBAmp->data()->setSamplingRate(m_iSampleRate);
 
     //start the thread for ring buffer
-    if(m_pGUSBAmpProducer->isRunning())
-    {
+    if(m_pGUSBAmpProducer->isRunning())  {
         QThread::start();
         return true;
-    }
-    else
-    {
+    } else  {
         qWarning() << "Plugin GUSBAmp - ERROR - GUSBAmpProducer thread could not be started - Either the device is turned off (check your OS device manager) or the driver DLL (GUSBAmpSDK.dll / GUSBAmpSDK32bit.dll) is not installed in the system32 / SysWOW64 directory" << endl;
         return false;
     }
@@ -304,12 +292,11 @@ void GUSBAmp::run()
     MatrixXf matValue;
 
     while(!isInterruptionRequested()) {
-    {
         //pop matrix only if the producer thread is running
         if(m_pGUSBAmpProducer->isRunning()) {
             //pop matrix
             if(m_pCircularBuffer->pop(matValue)) {
-                for(int i = 0; i < matValue.cols(); i++){
+                for(int i = 0; i < matValue.cols(); i++) {
                     qDebug() << matValue(0,i);
                 }
 
@@ -370,11 +357,10 @@ void GUSBAmp::splitRecordingFile()
 void GUSBAmp::showSetupProjectDialog()
 {
     // Open setup project widget
-    if(m_pGUSBampSetupProjectWidget == NULL){
+    if(m_pGUSBampSetupProjectWidget == NULL) {
         m_pGUSBampSetupProjectWidget = QSharedPointer<GUSBAmpSetupProjectWidget>(new GUSBAmpSetupProjectWidget(this));
     }
-    if(!m_pGUSBampSetupProjectWidget->isVisible())
-    {
+    if(!m_pGUSBampSetupProjectWidget->isVisible()) {
         m_pGUSBampSetupProjectWidget->setWindowTitle("GUSBAmp EEG Connector - Setup project");
         m_pGUSBampSetupProjectWidget->initGui();
         m_pGUSBampSetupProjectWidget->show();
@@ -417,6 +403,7 @@ void GUSBAmp::showStartRecording()
             msgBox.setInformativeText("Do you want to overwrite this file?");
             msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
             int ret = msgBox.exec();
+
             if(ret == QMessageBox::No){
                 return;
             }

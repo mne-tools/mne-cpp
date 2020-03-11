@@ -40,7 +40,7 @@ TEMPLATE = lib
 
 CONFIG += plugin
 
-DEFINES += GUSBAMP_LIBRARY
+DEFINES += GUSBAMP_PLUGIN
 
 #contains(QMAKE_HOST.arch, x86_64) { #Compiling MNE-X FOR a 64bit system
 #    exists(C:/Windows/System32/GUSBAmpSDK.dll) {
@@ -63,7 +63,7 @@ DEFINES += GUSBAMP_LIBRARY
 
 QT += core widgets svg
 
-TARGET = gusbamp_temp
+TARGET = gusbamp
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -109,7 +109,6 @@ HEADERS += \
         gusbampdriver.h \
         FormFiles/gusbampsetupwidget.h \
         FormFiles/gusbampaboutwidget.h \
-        gtec_gUSBamp.h \
         FormFiles/gusbampsetupprojectwidget.h
 
 FORMS += \
@@ -118,7 +117,7 @@ FORMS += \
         FormFiles/gusbampsetupprojectwidget.ui
 
 RESOURCE_FILES +=\
-    $${MNE_DIR}/resources/mne_scan/plugins/gusbamp/readme.txt \
+    $${ROOT_DIR}/resources/mne_scan/plugins/gusbamp/readme.txt \
 
 # Copy resource files from repository to bin resource folder
 COPY_CMD = $$copyResources($${RESOURCE_FILES})
