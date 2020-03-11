@@ -45,7 +45,7 @@
 #include <fstream>
 
 #include <scShared/Interfaces/ISensor.h>
-#include <utils/generics/circularmatrixbuffer.h>
+#include <utils/generics/circularbuffer.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -159,7 +159,7 @@ public:
     /**
      * Set/Add received samples to a QList.
      */
-    void setSampleData(Eigen::MatrixXd &matRawBuffer);
+    void setSampleData(Eigen::MatrixXd &matData);
 
     virtual IPlugin::PluginType getType() const;
     virtual QString getName() const;
@@ -214,10 +214,10 @@ protected:
     bool dirExists(const std::string& dirName_in);
 
 private:
-    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> >  m_pRMTSA_BrainAMP;              /**< The RealTimeSampleArray to provide the EEG data.*/
+    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> >     m_pRMTSA_BrainAMP;              /**< The RealTimeSampleArray to provide the EEG data.*/
     QSharedPointer<BrainAMPSetupProjectWidget>                                              m_pBrainAMPSetupProjectWidget;  /**< Widget for checking the impedances*/
 
-    QSharedPointer<IOBUFFER::RawMatrixBuffer>     m_pRawMatrixBuffer_In;              /**< Holds incoming raw data.*/
+    QSharedPointer<IOBUFFER::CircularBuffer_Matrix_double>                                  m_pCircularBuffer;              /**< Holds incoming raw data.*/
 
     QString                             m_qStringResourcePath;              /**< The path to the EEG resource directory.*/
 
@@ -229,7 +229,6 @@ private:
     double                              m_dNasionShift;                     /**< The shift in m in to generate the Nasion.*/
 
     bool                                m_bWriteToFile;                     /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
-    bool                                m_bIsRunning;                       /**< Whether BrainAMP is running.*/
     bool                                m_bCheckImpedances;                 /**< Flag for checking the impedances of the EEG amplifier.*/
     bool                                m_bUseTrackedCardinalMode;          /**< Flag for using the tracked cardinal mode.*/
     bool                                m_bUseElectrodeShiftMode;           /**< Flag for using the electrode shift mode.*/
@@ -258,8 +257,6 @@ private:
 
     QSharedPointer<QTimer>              m_pTimerRecordingChange;            /**< timer to control blinking of the recording icon */
     qint16                              m_iBlinkStatus;                     /**< flag for recording icon blinking */
-
-    QList<Eigen::MatrixXd>              m_qListReceivedSamples;             /**< list with alle the received samples in form of differentley sized matrices. */
 
     QMutex                              m_mutex;
 };
