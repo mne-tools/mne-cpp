@@ -74,7 +74,6 @@ using namespace Eigen;
 BrainAMP::BrainAMP()
 : m_pRMTSA_BrainAMP(0)
 , m_qStringResourcePath(qApp->applicationDirPath()+"/resources/mne_scan/plugins/brainamp/")
-, m_pRawMatrixBuffer_In(0)
 , m_pBrainAMPProducer(new BrainAMPProducer(this))
 , m_dLPAShift(0.01)
 , m_dRPAShift(0.01)
@@ -84,6 +83,7 @@ BrainAMP::BrainAMP()
 , m_sLPA("2LD")
 , m_sRPA("2RD")
 , m_sNasion("0Z")
+, m_pCircularBuffer(QSharedPointer<CircularBuffer_Matrix_double>(new CircularBuffer_Matrix_double(8)))
 {
     // Create record file option action bar item/button
     m_pActionSetupProject = new QAction(QIcon(":/images/database.png"), tr("Setup project"), this);
@@ -105,24 +105,9 @@ BrainAMP::~BrainAMP()
     //std::cout << "BrainAMP::~BrainAMP() " << std::endl;
 
     //If the program is closed while the sampling is in process
-    if(this->isRunning())
+    if(this->isRunning()) {
         this->stop();    
-
-    //Store settings for next use
-    QSettings settings;
-    settings.setValue(QString("BRAINAMP/sFreq"), m_iSamplingFreq);
-    settings.setValue(QString("BRAINAMP/samplesPerBlock"), m_iSamplesPerBlock);
-    settings.setValue(QString("BRAINAMP/LPAShift"), m_dLPAShift);
-    settings.setValue(QString("BRAINAMP/RPAShift"), m_dRPAShift);
-    settings.setValue(QString("BRAINAMP/NasionShift"), m_dNasionShift);
-    settings.setValue(QString("BRAINAMP/LPAElectrode"), m_sLPA);
-    settings.setValue(QString("BRAINAMP/RPAElectrode"), m_sRPA);
-    settings.setValue(QString("BRAINAMP/NasionElectrode"), m_sNasion);
-    settings.setValue(QString("BRAINAMP/outputFilePath"), m_sOutputFilePath);
-    settings.setValue(QString("BRAINAMP/elcFilePath"), m_sElcFilePath);
-    settings.setValue(QString("BRAINAMP/cardinalFilePath"), m_sCardinalFilePath);
-    settings.setValue(QString("BRAINAMP/useTrackedCardinalsMode"), m_bUseTrackedCardinalMode);
-    settings.setValue(QString("BRAINAMP/useElectrodeshiftMode"), m_bUseElectrodeShiftMode);
+    }
 }
 
 //=============================================================================================================
@@ -138,6 +123,7 @@ QSharedPointer<IPlugin> BrainAMP::clone() const
 void BrainAMP::init()
 {
     m_pRMTSA_BrainAMP = PluginOutputData<RealTimeMultiSampleArray>::create(this, "BrainAMP", "EEG output data");
+    m_pRMTSA_BrainAMP->data()->setName(this->getName());//Provide name to auto store widget settings
 
     m_outputConnectors.append(m_pRMTSA_BrainAMP);
 
@@ -147,7 +133,6 @@ void BrainAMP::init()
     m_iSamplingFreq = settings.value(QString("BRAINAMP/sFreq"), 1000).toInt();
     m_iSamplesPerBlock = settings.value(QString("BRAINAMP/samplesPerBlock"), 1000).toInt();
     m_bWriteToFile = false;
-    m_bIsRunning = false;
     m_bCheckImpedances = false;
 
     QDate date;
@@ -291,11 +276,6 @@ void BrainAMP::setUpFiffInfo()
 
 bool BrainAMP::start()
 {
-    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
-    if(this->isRunning()) {
-        QThread::wait();
-    }
-
     //Setup fiff info
     setUpFiffInfo();
 
@@ -304,23 +284,15 @@ bool BrainAMP::start()
     m_pRMTSA_BrainAMP->data()->setMultiArraySize(1);
     m_pRMTSA_BrainAMP->data()->setSamplingRate(m_iSamplingFreq);
 
-    //Buffer
-    m_pRawMatrixBuffer_In = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(8, m_pFiffInfo->nchan, m_iSamplesPerBlock));
-    m_qListReceivedSamples.clear();
-
     m_pBrainAMPProducer->start(m_iSamplesPerBlock,
                        m_iSamplingFreq,
                        m_sOutputFilePath,
                        m_bCheckImpedances);
 
-    if(m_pBrainAMPProducer->isRunning())
-    {
-        m_bIsRunning = true;
+    if(m_pBrainAMPProducer->isRunning()) {
         QThread::start();
         return true;
-    }
-    else
-    {
+    } else {
         qWarning() << "BrainAMP::start() - BrainAMPProducer thread could not be started." << endl;
         return false;
     }
@@ -330,31 +302,42 @@ bool BrainAMP::start()
 
 bool BrainAMP::stop()
 {
+    requestInterruption();
+    wait(500);
+
     //Stop the producer thread first
     m_pBrainAMPProducer->stop();
 
-    //Wait until this thread (BrainAMP) is stopped
-    m_bIsRunning = false;
-
-    //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
-    m_pRawMatrixBuffer_In->releaseFromPop();
-
-    m_pRawMatrixBuffer_In->clear();
+    m_pCircularBuffer->clear();
 
     m_pRMTSA_BrainAMP->data()->clear();
 
-    m_qListReceivedSamples.clear();
+    //Store settings for next use
+    QSettings settings;
+    settings.setValue(QString("BRAINAMP/sFreq"), m_iSamplingFreq);
+    settings.setValue(QString("BRAINAMP/samplesPerBlock"), m_iSamplesPerBlock);
+    settings.setValue(QString("BRAINAMP/LPAShift"), m_dLPAShift);
+    settings.setValue(QString("BRAINAMP/RPAShift"), m_dRPAShift);
+    settings.setValue(QString("BRAINAMP/NasionShift"), m_dNasionShift);
+    settings.setValue(QString("BRAINAMP/LPAElectrode"), m_sLPA);
+    settings.setValue(QString("BRAINAMP/RPAElectrode"), m_sRPA);
+    settings.setValue(QString("BRAINAMP/NasionElectrode"), m_sNasion);
+    settings.setValue(QString("BRAINAMP/outputFilePath"), m_sOutputFilePath);
+    settings.setValue(QString("BRAINAMP/elcFilePath"), m_sElcFilePath);
+    settings.setValue(QString("BRAINAMP/cardinalFilePath"), m_sCardinalFilePath);
+    settings.setValue(QString("BRAINAMP/useTrackedCardinalsMode"), m_bUseTrackedCardinalMode);
+    settings.setValue(QString("BRAINAMP/useElectrodeshiftMode"), m_bUseElectrodeShiftMode);
 
     return true;
 }
 
 //=============================================================================================================
 
-void BrainAMP::setSampleData(MatrixXd &matRawBuffer)
+void BrainAMP::setSampleData(MatrixXd &matData)
 {
-    m_mutex.lock();
-    m_qListReceivedSamples.append(matRawBuffer);
-    m_mutex.unlock();
+    while(!m_pCircularBuffer->push(matData)) {
+        //Do nothing until the circular buffer is ready to accept new data again
+    }
 }
 
 //=============================================================================================================
@@ -400,36 +383,25 @@ void BrainAMP::onUpdateCardinalPoints(const QString& sLPA, double dLPA, const QS
 
 void BrainAMP::run()
 {
-    while(m_bIsRunning)
-    {
-        if(m_pBrainAMPProducer->isRunning())
-        {
-            m_mutex.lock();
+    MatrixXd matData;
 
-            if(m_qListReceivedSamples.isEmpty() == false)
-            {
-                MatrixXd matValue;
-                matValue = m_qListReceivedSamples.first();
-                m_qListReceivedSamples.removeFirst();
-
+    while(!isInterruptionRequested()) {
+        if(m_pBrainAMPProducer->isRunning()) {
+            //pop matrix
+            if(m_pCircularBuffer->pop(matData)) {
                 //Write raw data to fif file
                 if(m_bWriteToFile) {
-                    m_pOutfid->write_raw_buffer(matValue, m_cals);
+                    m_pOutfid->write_raw_buffer(matData, m_cals);
                 }
 
                 //emit values to real time multi sample array
-                //qDebug()<<"BrainAMP::run() - mat size"<<matValue.rows()<<"x"<<matValue.cols();
-                //std::cout << "BrainAMP::run() - matValue.block(10,10)" << matValue.block(0,0,10,10) << std::endl;
-                m_pRMTSA_BrainAMP->data()->setValue(matValue);
-            }
-
-            m_mutex.unlock();            
+                m_pRMTSA_BrainAMP->data()->setValue(matData);
+            }       
         }
     }
 
     //Close the fif output stream
-    if(m_bWriteToFile)
-    {
+    if(m_bWriteToFile) {
         m_pOutfid->finish_writing_raw();
         m_bWriteToFile = false;
         m_pTimerRecordingChange->stop();
@@ -451,8 +423,7 @@ void BrainAMP::showSetupProjectDialog()
                 this, &BrainAMP::onUpdateCardinalPoints);
     }
 
-    if(!m_pBrainAMPSetupProjectWidget->isVisible())
-    {
+    if(!m_pBrainAMPSetupProjectWidget->isVisible()) {
         m_pBrainAMPSetupProjectWidget->setWindowTitle("BrainAMP EEG Connector - Setup project");
         m_pBrainAMPSetupProjectWidget->show();
         m_pBrainAMPSetupProjectWidget->raise();
@@ -464,25 +435,20 @@ void BrainAMP::showSetupProjectDialog()
 void BrainAMP::showStartRecording()
 {
     //Setup writing to file
-    if(m_bWriteToFile)
-    {
+    if(m_bWriteToFile) {
         m_pOutfid->finish_writing_raw();
         m_bWriteToFile = false;
         m_pTimerRecordingChange->stop();
         m_pActionStartRecording->setIcon(QIcon(":/images/record.png"));
-    }
-    else
-    {
-        if(!m_bIsRunning)
-        {
+    } else {
+        if(!this->isRunning()) {
             QMessageBox msgBox;
             msgBox.setText("Start data acquisition first!");
             msgBox.exec();
             return;
         }
 
-        if(!m_pFiffInfo)
-        {
+        if(!m_pFiffInfo) {
             QMessageBox msgBox;
             msgBox.setText("FiffInfo missing!");
             msgBox.exec();
@@ -491,8 +457,7 @@ void BrainAMP::showStartRecording()
 
         //Initiate the stream for writing to the fif file
         m_fileOut.setFileName(m_sOutputFilePath);
-        if(m_fileOut.exists())
-        {
+        if(m_fileOut.exists()) {
             QMessageBox msgBox;
             msgBox.setText("The file you want to write already exists.");
             msgBox.setInformativeText("Do you want to overwrite this file?");
@@ -507,8 +472,7 @@ void BrainAMP::showStartRecording()
         list.removeLast(); // remove file name
         QString fileDir = list.join("/");
 
-        if(!dirExists(fileDir.toStdString()))
-        {
+        if(!dirExists(fileDir.toStdString())) {
             QDir dir;
             dir.mkpath(fileDir);
         }
@@ -520,7 +484,8 @@ void BrainAMP::showStartRecording()
         m_bWriteToFile = true;
 
         m_pTimerRecordingChange = QSharedPointer<QTimer>(new QTimer);
-        connect(m_pTimerRecordingChange.data(), &QTimer::timeout, this, &BrainAMP::changeRecordingButton);
+        connect(m_pTimerRecordingChange.data(), &QTimer::timeout,
+                this, &BrainAMP::changeRecordingButton);
         m_pTimerRecordingChange->start(500);
     }
 }
@@ -529,13 +494,10 @@ void BrainAMP::showStartRecording()
 
 void BrainAMP::changeRecordingButton()
 {
-    if(m_iBlinkStatus == 0)
-    {
+    if(m_iBlinkStatus == 0) {
         m_pActionStartRecording->setIcon(QIcon(":/images/record.png"));
         m_iBlinkStatus = 1;
-    }
-    else
-    {
+    } else {
         m_pActionStartRecording->setIcon(QIcon(":/images/record_active.png"));
         m_iBlinkStatus = 0;
     }
@@ -546,11 +508,13 @@ void BrainAMP::changeRecordingButton()
 bool BrainAMP::dirExists(const std::string& dirName_in)
 {
     DWORD ftyp = GetFileAttributesA(dirName_in.c_str());
-    if (ftyp == INVALID_FILE_ATTRIBUTES)
+    if (ftyp == INVALID_FILE_ATTRIBUTES) {
         return false;  //something is wrong with your path!
+    }
 
-    if (ftyp & FILE_ATTRIBUTE_DIRECTORY)
+    if (ftyp & FILE_ATTRIBUTE_DIRECTORY) {
         return true;   // this is a directory!
+    }
 
     return false;    // this is not a directory!
 }
