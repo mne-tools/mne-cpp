@@ -334,8 +334,9 @@ void EEGoSportsImpedanceWidget::closeEvent(QCloseEvent *event)
     Q_UNUSED(event);
 
     // On window close event -> stop impedance measurement
-    if(m_pEEGoSports->m_bIsRunning)
+    if(m_pEEGoSports->isRunning()) {
         stopImpedanceMeasurement();
+    }
 }
 
 //=============================================================================================================

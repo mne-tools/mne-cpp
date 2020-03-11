@@ -97,6 +97,7 @@ EEGoSports::EEGoSports()
 , m_sLPA("2LD")
 , m_sRPA("2RD")
 , m_sNasion("0Z")
+, m_pCircularBuffer(QSharedPointer<CircularBuffer_Matrix_double>(new CircularBuffer_Matrix_double(10)))
 {
     // Create record file option action bar item/button
     m_pActionSetupProject = new QAction(QIcon(":/images/database.png"), tr("Setup project"), this);
@@ -125,22 +126,6 @@ EEGoSports::~EEGoSports()
     if(this->isRunning()) {
         this->stop();    
     }
-
-    //Store settings for next use
-    QSettings settings;
-    settings.setValue(QString("EEGOSPORTS/sFreq"), m_iSamplingFreq);
-    settings.setValue(QString("EEGOSPORTS/samplesPerBlock"), m_iSamplesPerBlock);
-    settings.setValue(QString("EEGOSPORTS/LPAShift"), m_dLPAShift);
-    settings.setValue(QString("EEGOSPORTS/RPAShift"), m_dRPAShift);
-    settings.setValue(QString("EEGOSPORTS/NasionShift"), m_dNasionShift);
-    settings.setValue(QString("EEGOSPORTS/LPAElectrode"), m_sLPA);
-    settings.setValue(QString("EEGOSPORTS/RPAElectrode"), m_sRPA);
-    settings.setValue(QString("EEGOSPORTS/NasionElectrode"), m_sNasion);
-    settings.setValue(QString("EEGOSPORTS/outputFilePath"), m_sOutputFilePath);
-    settings.setValue(QString("EEGOSPORTS/elcFilePath"), m_sElcFilePath);
-    settings.setValue(QString("EEGOSPORTS/cardinalFilePath"), m_sCardinalFilePath);
-    settings.setValue(QString("EEGOSPORTS/useTrackedCardinalsMode"), m_bUseTrackedCardinalMode);
-    settings.setValue(QString("EEGOSPORTS/useElectrodeshiftMode"), m_bUseElectrodeShiftMode);
 }
 
 //=============================================================================================================
@@ -168,7 +153,6 @@ void EEGoSports::init()
     m_iSamplesPerBlock = settings.value(QString("EEGOSPORTS/samplesPerBlock"), 512).toInt();
     m_bWriteToFile = false;
     m_bWriteDriverDebugToFile = false;
-    m_bIsRunning = false;
     m_bCheckImpedances = false;
 
     QDate date;
@@ -200,28 +184,20 @@ void EEGoSports::unload()
 
 void EEGoSports::setUpFiffInfo()
 {
-    //
     //Clear old fiff info data
-    //
     m_pFiffInfo->clear();
 
-    //
     //Set number of channels, sampling frequency and high/-lowpass
-    //
     m_pFiffInfo->nchan = m_iNumberOfChannels;
     m_pFiffInfo->sfreq = m_iSamplingFreq;
 
-    //
     //Get amplifier data
-    //
     /*QList<uint> channellist = m_pEEGoSportsProducer->getChannellist();
 
     for(QList<uint>::iterator i=channellist.begin(); i!=channellist.end(); ++i)
         std::cout << *i << std::endl;*/
 
-    //
     //Read electrode positions from .elc file
-    //
     QList<QVector<float> > elcLocation3D;
     QList<QVector<float> > elcLocation2D;
     QString unit;
@@ -286,9 +262,7 @@ void EEGoSports::setUpFiffInfo()
         }
     }
 
-    //
     //Append cardinal points LPA RPA Nasion
-    //
     QList<QVector<float> > cardinals3D;
     QList<QVector<float> > cardinals2D;
     QStringList cardinalNames;
@@ -577,17 +551,12 @@ void EEGoSports::setNumberOfChannels(int iNumberOfChannels, int iNumberOfEEGChan
 
 bool EEGoSports::start()
 {
-    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
-    if(this->isRunning()) {
-        QThread::wait();
-    }
-
     //Initialize amplifier
     if(!m_pEEGoSportsProducer->init(m_bWriteDriverDebugToFile,
                                     m_sOutputFilePath,
                                     m_bCheckImpedances))
     {
-        qWarning() << "Plugin EEGoSports - ERROR - EEGoSportsProducer thread could not be started - Either the device is turned off (check your OS device manager) or the driver DLL (EEGO-SDK.dll) is not installed in one of the monitored dll path." << endl;
+        qWarning() << "[EEGoSports::start] EEGoSportsProducer thread could not be started - Either the device is turned off (check your OS device manager) or the driver DLL (EEGO-SDK.dll) is not installed in one of the monitored dll path." << endl;
         return false;
     }
 
@@ -599,19 +568,15 @@ bool EEGoSports::start()
     m_pRMTSA_EEGoSports->data()->setMultiArraySize(1);
     m_pRMTSA_EEGoSports->data()->setSamplingRate(m_iSamplingFreq);
 
-    //Buffer
-    m_qListReceivedSamples.clear();
-
     m_pEEGoSportsProducer->start(m_iSamplesPerBlock,
-                       m_iSamplingFreq,
-                       m_bCheckImpedances);
+                                 m_iSamplingFreq,
+                                 m_bCheckImpedances);
 
     if(m_pEEGoSportsProducer->isRunning()) {
-        m_bIsRunning = true;
         QThread::start();
         return true;
     } else {
-        qWarning() << "[EEGoSports::start] Producer thread could not be started - Either the device is turned off (check your OS device manager) or the driver DLL (EEGO-SDK.dll) is not installed in one of the monitored dll path." << endl;
+        qWarning() << "[EEGoSports::start] EEGoSports thread could not be started - Either the device is turned off (check your OS device manager) or the driver DLL (EEGO-SDK.dll) is not installed in one of the monitored dll path." << endl;
         return false;
     }
 }
@@ -620,26 +585,41 @@ bool EEGoSports::start()
 
 bool EEGoSports::stop()
 {
-    //Stop the producer thread first
-    m_pEEGoSportsProducer->stop();
+    // Stop this (consumer) thread first
+    requestInterruption();
+    wait(500);
 
-    //Wait until this thread (EEGoSports) is stopped
-    m_bIsRunning = false;
+    //Stop the producer thread
+    m_pEEGoSportsProducer->stop();
 
     m_pRMTSA_EEGoSports->data()->clear();
 
-    m_qListReceivedSamples.clear();
+    //Store settings for next use. Do this in stop() since it will crash if we do it in the destructor.
+    QSettings settings;
+    settings.setValue(QString("EEGOSPORTS/sFreq"), m_iSamplingFreq);
+    settings.setValue(QString("EEGOSPORTS/samplesPerBlock"), m_iSamplesPerBlock);
+    settings.setValue(QString("EEGOSPORTS/LPAShift"), m_dLPAShift);
+    settings.setValue(QString("EEGOSPORTS/RPAShift"), m_dRPAShift);
+    settings.setValue(QString("EEGOSPORTS/NasionShift"), m_dNasionShift);
+    settings.setValue(QString("EEGOSPORTS/LPAElectrode"), m_sLPA);
+    settings.setValue(QString("EEGOSPORTS/RPAElectrode"), m_sRPA);
+    settings.setValue(QString("EEGOSPORTS/NasionElectrode"), m_sNasion);
+    settings.setValue(QString("EEGOSPORTS/outputFilePath"), m_sOutputFilePath);
+    settings.setValue(QString("EEGOSPORTS/elcFilePath"), m_sElcFilePath);
+    settings.setValue(QString("EEGOSPORTS/cardinalFilePath"), m_sCardinalFilePath);
+    settings.setValue(QString("EEGOSPORTS/useTrackedCardinalsMode"), m_bUseTrackedCardinalMode);
+    settings.setValue(QString("EEGOSPORTS/useElectrodeshiftMode"), m_bUseElectrodeShiftMode);
 
     return true;
 }
 
 //=============================================================================================================
 
-void EEGoSports::setSampleData(MatrixXd &matRawBuffer)
+void EEGoSports::setSampleData(MatrixXd &matData)
 {
-    m_mutex.lock();
-    m_qListReceivedSamples.append(matRawBuffer);
-    m_mutex.unlock();
+    while(!m_pCircularBuffer->push(matData)) {
+        //Do nothing until the circular buffer is ready to accept new data again
+    }
 }
 
 //=============================================================================================================
@@ -686,13 +666,12 @@ void EEGoSports::onUpdateCardinalPoints(const QString& sLPA, double dLPA, const 
 void EEGoSports::showImpedanceDialog()
 {
     // Open Impedance dialog only if no sampling process is active
-    if(!m_bIsRunning)
-    {
-        if(m_pEEGoSportsImpedanceWidget == NULL)
+    if(!this->isRunning()) {
+        if(m_pEEGoSportsImpedanceWidget == NULL) {
             m_pEEGoSportsImpedanceWidget = QSharedPointer<EEGoSportsImpedanceWidget>(new EEGoSportsImpedanceWidget(this));
+        }
 
-        if(!m_pEEGoSportsImpedanceWidget->isVisible())
-        {
+        if(!m_pEEGoSportsImpedanceWidget->isVisible()) {
             m_pEEGoSportsImpedanceWidget->setWindowTitle("EEGoSports - Measure impedances");
             m_pEEGoSportsImpedanceWidget->show();
             m_pEEGoSportsImpedanceWidget->raise();
@@ -732,7 +711,7 @@ void EEGoSports::showStartRecording()
         m_pTimerRecordingChange->stop();
         m_pActionStartRecording->setIcon(QIcon(":/images/record.png"));
     } else {
-        if(!m_bIsRunning) {
+        if(!this->isRunning()) {
             QMessageBox msgBox;
             msgBox.setText("Start data acquisition first!");
             msgBox.exec();
@@ -765,9 +744,11 @@ void EEGoSports::showStartRecording()
         QString fileDir = list.join("/");
 
         QDir dir;
-        if(!dir.exists(fileDir))
-            if(!dir.mkpath(fileDir))
+        if(!dir.exists(fileDir)) {
+            if(!dir.mkpath(fileDir)) {
                 return;
+            }
+        }
 
         m_pOutfid = Fiff::start_writing_raw(m_fileOut, *m_pFiffInfo, m_cals);
         fiff_int_t first = 0;
@@ -798,48 +779,28 @@ void EEGoSports::changeRecordingButton()
 
 void EEGoSports::run()
 {
-    MatrixXd matValue;
+    MatrixXd matData;
 
-    while(m_bIsRunning) {
+    while(!isInterruptionRequested()) {
         if(m_pEEGoSportsProducer->isRunning()) {
-            m_mutex.lock();
-
             // Check impedances - send new impedance values to graphic scene
-            if(m_bCheckImpedances)
-            {
-                /*MatrixXf matValue = m_pRawMatrixBuffer_In->pop();
-
-                for(qint32 i = 0; i < matValue.cols(); ++i)
-                    m_pTmsiImpedanceWidget->updateGraphicScene(matValue.col(i).cast<double>());*/
-                if(m_qListReceivedSamples.isEmpty() == false) {
-                    matValue = m_qListReceivedSamples.takeFirst();
-                    //for(qint32 i = 0; i < matValue.cols(); ++i)
-                    m_pEEGoSportsImpedanceWidget->updateGraphicScene(matValue.col(0).cast<double>());
-
-                    m_qListReceivedSamples.clear();
+            if(m_bCheckImpedances) {
+                //pop matrix
+                if(m_pCircularBuffer->pop(matData)) {
+                    m_pEEGoSportsImpedanceWidget->updateGraphicScene(matData.col(0));
                 }
-            }
-
-            //pop matrix only if the producer thread is running
-            if(!m_bCheckImpedances)
-            {
-
-                if(m_qListReceivedSamples.isEmpty() == false) {
-
-                    matValue = m_qListReceivedSamples.takeFirst();
-
+            } else {
+                if(m_pCircularBuffer->pop(matData)) {
                     //Write raw data to fif file
                     if(m_bWriteToFile) {
-                        m_pOutfid->write_raw_buffer(matValue, m_cals);
+                        m_pOutfid->write_raw_buffer(matData, m_cals);
                     }
 
                     //emit values to real time multi sample array
                     //qDebug()<<"EEGoSports::run - mat size"<<matValue.rows()<<"x"<<matValue.cols();
-                    m_pRMTSA_EEGoSports->data()->setValue(matValue);
+                    m_pRMTSA_EEGoSports->data()->setValue(matData);
                 }
-            }
-
-            m_mutex.unlock();            
+            }      
         }
     }
 
@@ -850,7 +811,5 @@ void EEGoSports::run()
         m_pTimerRecordingChange->stop();
         m_pActionStartRecording->setIcon(QIcon(":/images/record.png"));
     }
-
-    //qDebug() << "[EEGoSports::run] Thread's run routine finished";
 }
 
