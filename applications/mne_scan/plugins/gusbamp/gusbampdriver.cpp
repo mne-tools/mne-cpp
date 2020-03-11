@@ -102,7 +102,6 @@ GUSBAmpDriver::GUSBAmpDriver(GUSBAmpProducer* pGUSBAmpProducer)
 
 GUSBAmpDriver::~GUSBAmpDriver()
 {
-    //qDebug() << "GUSBAmpDriver::~GUSBAmpDriver()" << endl;
 }
 
 //=============================================================================================================
