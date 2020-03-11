@@ -57,7 +57,6 @@ using namespace std;
 GUSBAmpProducer::GUSBAmpProducer(GUSBAmp* pGUSBAmp)
 : m_pGUSBAmp(pGUSBAmp)
 , m_pGUSBAmpDriver(new GUSBAmpDriver(this))
-, m_bIsRunning(true)
 , m_iSampRate(1200)
 , m_sFilePath("data")
 {
@@ -87,28 +86,17 @@ void GUSBAmpProducer::start(vector<QString> &serials, vector<int> channels, int 
     m_viSizeOfSampleMatrix = m_pGUSBAmpDriver->getSizeOfSampleMatrix();
 
     //Initialise and starting the device
-    if(m_pGUSBAmpDriver->initDevice())
-    {
-        m_bIsRunning = true;
+    if(m_pGUSBAmpDriver->initDevice()) {
         QThread::start();
     }
-    else
-        m_bIsRunning = false;
 }
 
 //=============================================================================================================
 
 void GUSBAmpProducer::stop()
 {
-    //Wait until this thread (GUSBAmpProducer) is stopped
-    m_bIsRunning = false;
-
-    //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the push function (acquire statement)
-    m_pGUSBAmp->m_pRawMatrixBuffer_In->releaseFromPush();
-
-    while(this->isRunning()){
-        m_bIsRunning = false;
-    }
+    requestInterruption();
+    wait();
 
     //Unitialise device only after the thread stopped
     m_pGUSBAmpDriver->uninitDevice();
@@ -120,12 +108,14 @@ void GUSBAmpProducer::run()
 {
     MatrixXf matRawBuffer(m_viSizeOfSampleMatrix[0],m_viSizeOfSampleMatrix[1]);
 
-    while(m_bIsRunning)
-    {
+    while(!isInterruptionRequested()) {
         //qDebug()<<"GUSBAmpProducer::run()"<<endl;
         //Get the GUSBAmp EEG data out of the device buffer and write received data to circular buffer
-        if(m_pGUSBAmpDriver->getSampleMatrixValue(matRawBuffer))
-            m_pGUSBAmp->m_pRawMatrixBuffer_In->push(&matRawBuffer);
+        if(m_pGUSBAmpDriver->getSampleMatrixValue(matRawBuffer)) {
+            while(!m_pGUSBAmp->m_pCircularBuffer->push(&matRawBuffer) && !isInterruptionRequested()) {
+                //Do nothing until the circular buffer is ready to accept new data again
+            }
+        }
     }
 }
 
