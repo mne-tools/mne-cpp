@@ -254,7 +254,7 @@ private:
     QSharedPointer<FIFFLIB::FiffInfo>                                                   m_pFiffInfo;                    /**< Fiff measurement info.*/
     QSharedPointer<FIFFLIB::FiffRawData>                                                m_pNeuromagHeadChunkData;       /**< Fiff into parser for header data collected from Neuromag extended header */
     QSharedPointer<DISP3DLIB::HpiView>                                                  m_pHPIWidget;                   /**< HPI widget. */
-    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>>  m_pRTMSA_BufferOutput;          /**< The RealTimeSampleArray to provide the plugin output data.*/
+    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> > m_pRTMSA_BufferOutput;          /**< The RealTimeSampleArray to provide the plugin output data.*/
     QSharedPointer<IOBUFFER::CircularBuffer_Matrix_double>                              m_pCircularBuffer;              /**< Holds incoming raw data. */
 
 };
