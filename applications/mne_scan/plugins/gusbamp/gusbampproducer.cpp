@@ -48,6 +48,7 @@
 
 using namespace GUSBAMPPLUGIN;
 using namespace IOBUFFER;
+using namespace Eigen;
 using namespace std;
 
 //=============================================================================================================
@@ -70,12 +71,13 @@ GUSBAmpProducer::GUSBAmpProducer(GUSBAmp* pGUSBAmp)
 
 GUSBAmpProducer::~GUSBAmpProducer()
 {
-    //qDebug() << "GUSBAmpProducer::~GUSBAmpProducer()" << endl;
 }
 
 //=============================================================================================================
 
-void GUSBAmpProducer::start(vector<QString> &serials, vector<int> channels, int sampleRate)
+void GUSBAmpProducer::start(vector<QString> &serials,
+                            vector<int> channels,
+                            int sampleRate)
 {
     //setting the new parameters of the gUSBamp device
     m_pGUSBAmpDriver->setSerials(serials);
@@ -97,26 +99,26 @@ void GUSBAmpProducer::stop()
 {
     requestInterruption();
     wait();
-
-    //Unitialise device only after the thread stopped
-    m_pGUSBAmpDriver->uninitDevice();
 }
 
 //=============================================================================================================
 
 void GUSBAmpProducer::run()
 {
-    MatrixXf matRawBuffer(m_viSizeOfSampleMatrix[0],m_viSizeOfSampleMatrix[1]);
+    MatrixXf matData(m_viSizeOfSampleMatrix[0],m_viSizeOfSampleMatrix[1]);
 
     while(!isInterruptionRequested()) {
         //qDebug()<<"GUSBAmpProducer::run()"<<endl;
         //Get the GUSBAmp EEG data out of the device buffer and write received data to circular buffer
-        if(m_pGUSBAmpDriver->getSampleMatrixValue(matRawBuffer)) {
-            while(!m_pGUSBAmp->m_pCircularBuffer->push(&matRawBuffer) && !isInterruptionRequested()) {
+        if(m_pGUSBAmpDriver->getSampleMatrixValue(matData)) {
+            while(!m_pGUSBAmp->m_pCircularBuffer->push(matData) && !isInterruptionRequested()) {
                 //Do nothing until the circular buffer is ready to accept new data again
             }
         }
     }
+
+    //Unitialise device only after the thread stopped
+    m_pGUSBAmpDriver->uninitDevice();
 }
 
 //=============================================================================================================

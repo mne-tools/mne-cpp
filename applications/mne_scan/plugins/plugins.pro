@@ -46,7 +46,7 @@ SUBDIRS += \
     ftbuffer \
     babymeg \
     natus \
-    gusbamp \              # Build guide -> https://mne-cpp.github.io/pages/development/gusbamp.html
+#    gusbamp \              # Build guide -> https://mne-cpp.github.io/pages/development/gusbamp.html
 #    eegosports \           # Build guide -> https://mne-cpp.github.io/pages/development/eegosports.html
 #    brainamp \             # Build guide -> https://mne-cpp.github.io/pages/development/brainamp.html
 #    tmsi \                 # Build guide -> NA
