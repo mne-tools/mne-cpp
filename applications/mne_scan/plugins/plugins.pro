@@ -70,3 +70,4 @@ SUBDIRS += \
     covariance \
     noisereduction \
     neuronalconnectivity \
+    writetofile \

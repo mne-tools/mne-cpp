@@ -131,6 +131,7 @@ signals:
     void newProject(const QString& sCurrentProject);
     void newSubject(const QString& sCurrentSubject);
     void newParadigm(const QString& sCurrentParadigm);
+    void fileNameChanged(const QString& sCurrentFileName);
 };
 } // NAMESPACE
 

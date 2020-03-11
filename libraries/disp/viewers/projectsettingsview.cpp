@@ -393,6 +393,8 @@ void ProjectSettingsView::updateFileName(bool currentTime)
     m_sFileName = sFilePath;
 
     ui->m_qLineEditFileName->setText(m_sFileName);
+
+    emit fileNameChanged(m_sFileName);
 }
 
 //=============================================================================================================

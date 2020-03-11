@@ -551,52 +551,49 @@ void MainWindow::initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::IPlugin> 
 
             QString sCurPluginName = lPlugins.at(i)->getName();
 
-            if(lPlugins.at(i).isNull()) {
-                QWidget* pWidget = new QWidget;
-                setCentralWidget(pWidget);
+            if(!m_bIsRunning) {
+                setCentralWidget(lPlugins.at(i)->setupWidget());
             } else {
-                if(!m_bIsRunning) {
-                    setCentralWidget(lPlugins.at(i)->setupWidget());
-                } else {
-                    connect(lPlugins.at(i).data(), &IPlugin::pluginControlWidgetsChanged,
-                            this, &MainWindow::onPluginControlWidgetsChanged);
+                connect(lPlugins.at(i).data(), &IPlugin::pluginControlWidgetsChanged,
+                        this, &MainWindow::onPluginControlWidgetsChanged);
 
-                    qDebug() << "sCurPluginName" << sCurPluginName;
-                    if(QWidget* pWidget = m_pDisplayManager->show(lPlugins.at(i)->getOutputConnectors(),
-                                                                  m_pTime,
-                                                                  m_qListDynamicDisplayActions)) {
-                        for (int i = 0; i < pWidget->layout()->count(); ++i) {
-                            if(MeasurementWidget* pMeasWidget = qobject_cast<MeasurementWidget *>(pWidget->layout()->itemAt(i)->widget())) {
-                                connect(pMeasWidget, &MeasurementWidget::displayControlWidgetsChanged,
-                                        this, &MainWindow::onDisplayControlWidgetsChanged);
-                            }
-                        }
-
-                        // Sensor plugins are always displayed as the most lowet vertical widget in the multiview
-                        if(lPlugins.at(i)->getName() == "Filter" ||
-                           lPlugins.at(i)->getName() == "Fiff Simulator" ||
-                           lPlugins.at(i)->getName() == "FtBuffer" ||
-                           lPlugins.at(i)->getName() == "Natus" ||
-                           lPlugins.at(i)->getName() == "BabyMEG"||
-                           lPlugins.at(i)->getName() == "BrainFlow"||
-                           lPlugins.at(i)->getName() == "EEGoSports"||
-                           lPlugins.at(i)->getName() == "GUSBAmp"||
-                           lPlugins.at(i)->getName() == "LSL Adapter"||
-                           lPlugins.at(i)->getName() == "TMSI"||
-                           lPlugins.at(i)->getName() == "BrainAMP") {
-                            m_pRunWidget->addWidgetV(pWidget,
-                                                     sCurPluginName);
-                        } else {
-                            m_pRunWidget->addWidgetH(pWidget,
-                                                     sCurPluginName);
+                if(QWidget* pWidget = m_pDisplayManager->show(lPlugins.at(i)->getOutputConnectors(),
+                                                              m_pTime,
+                                                              m_qListDynamicDisplayActions)) {
+                    for (int i = 0; i < pWidget->layout()->count(); ++i) {
+                        if(MeasurementWidget* pMeasWidget = qobject_cast<MeasurementWidget *>(pWidget->layout()->itemAt(i)->widget())) {
+                            connect(pMeasWidget, &MeasurementWidget::displayControlWidgetsChanged,
+                                    this, &MainWindow::onDisplayControlWidgetsChanged);
                         }
                     }
 
-                    m_pRunWidget->show();
+                    // Sensor plugins are always displayed as the most lowet vertical widget in the multiview
+                    if(lPlugins.at(i)->getName() == "Filter" ||
+                       lPlugins.at(i)->getName() == "Fiff Simulator" ||
+                       lPlugins.at(i)->getName() == "FtBuffer" ||
+                       lPlugins.at(i)->getName() == "Natus" ||
+                       lPlugins.at(i)->getName() == "BabyMEG"||
+                       lPlugins.at(i)->getName() == "BrainFlow"||
+                       lPlugins.at(i)->getName() == "EEGoSports"||
+                       lPlugins.at(i)->getName() == "GUSBAmp"||
+                       lPlugins.at(i)->getName() == "LSL Adapter"||
+                       lPlugins.at(i)->getName() == "TMSI"||
+                       lPlugins.at(i)->getName() == "BrainAMP") {
+                        m_pRunWidget->addWidgetV(pWidget,
+                                                 sCurPluginName);
+                    } else {
+                        m_pRunWidget->addWidgetH(pWidget,
+                                                 sCurPluginName);
+                    }
                 }
+
+                m_pRunWidget->show();
             }
 
             this->createToolBars();
+        } else {
+            QWidget* pWidget = new QWidget;
+            setCentralWidget(pWidget);
         }
     }
 }
@@ -606,6 +603,7 @@ void MainWindow::initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::IPlugin> 
 void MainWindow::onPluginControlWidgetsChanged(QList<QWidget*>& lControlWidgets,
                                                const QString& sPluginName)
 {
+    qDebug() << "MainWindow::onPluginControlWidgetsChanged" << sPluginName;
     if(m_pQuickControlView) {
         m_pQuickControlView->addWidgets(lControlWidgets, sPluginName);
     }
