@@ -126,7 +126,6 @@ protected:
 private:
     GUSBAmp*                        m_pGUSBAmp;            /**< A pointer to the corresponding GUSBAmp class.*/
     QSharedPointer<GUSBAmpDriver>   m_pGUSBAmpDriver;      /**< A pointer to the corresponding GUSBAmp driver class.*/
-    bool                            m_bIsRunning;          /**< Whether GUSBAmpProducer is running.*/
 
     int                 m_iSampRate;            /**< sample rate of the device */
     QString             m_sFilePath;            /**< path of the file of written data */

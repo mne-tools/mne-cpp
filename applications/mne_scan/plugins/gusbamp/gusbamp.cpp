@@ -65,7 +65,7 @@ using namespace std;
 GUSBAmp::GUSBAmp()
 : m_pRTMSA_GUSBAmp(0)
 , m_qStringResourcePath(qApp->applicationDirPath()+"/resources/mne_scan/plugins/gusbamp/")
-, m_pRawMatrixBuffer_In(0)
+, m_pCircularBuffer(0)
 , m_pGUSBAmpProducer(new GUSBAmpProducer(this))
 , m_iNumberOfChannels(0)
 , m_iSamplesPerBlock(0)
@@ -96,8 +96,6 @@ GUSBAmp::GUSBAmp()
 
 GUSBAmp::~GUSBAmp()
 {
-    //std::cout << "GUSBAmp::~GUSBAmp() " << std::endl;
-
     //If the program is closed while the sampling is in process
     if(this->isRunning()){
         this->stop();
@@ -205,12 +203,9 @@ void GUSBAmp::init()
     m_sOutputFilePath = QString ("%1Sequence_01/Subject_01/%2_%3_%4_EEG_001_raw.fif").arg(m_qStringResourcePath).arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day());
 
     m_pRTMSA_GUSBAmp = PluginOutputData<RealTimeMultiSampleArray>::create(this, "GUSBAmp", "EEG output data");
+    m_pRTMSA_GUSBAmp->data()->setName(this->getName());//Provide name to auto store widget settings
 
     m_outputConnectors.append(m_pRTMSA_GUSBAmp);
-
-    m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo());
-
-    m_bIsRunning = false;
 }
 
 //=============================================================================================================
@@ -223,17 +218,14 @@ void GUSBAmp::unload()
 
 bool GUSBAmp::start()
 {
-    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
-    if(this->isRunning()){
-        QThread::wait();
-    }
-
     //get the values from the GUI and start GUSBAmpProducer
     m_pGUSBAmpProducer->start(m_vSerials, m_viChannelsToAcquire, m_iSampleRate);
 
     //after device was started: ask for size of SampleMatrix to set the buffer matrix (bevor setUpFiffInfo() is started)
     m_viSizeOfSampleMatrix = m_pGUSBAmpProducer->getSizeOfSampleMatrix();
-    m_pRawMatrixBuffer_In = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(8, m_viSizeOfSampleMatrix[0], m_viSizeOfSampleMatrix[1]));
+    if(m_pCircularBuffer) {
+        m_pCircularBuffer = QSharedPointer<CircularBuffer_Matrix_float>(new CircularBuffer_Matrix_float(8));
+    }
 
     //set the parameters for number of channels (rows of matrix) and samples (columns of matrix)
     m_iNumberOfChannels = m_viSizeOfSampleMatrix[0];
@@ -250,7 +242,6 @@ bool GUSBAmp::start()
     //start the thread for ring buffer
     if(m_pGUSBAmpProducer->isRunning())
     {
-        m_bIsRunning = true;
         QThread::start();
         return true;
     }
@@ -265,16 +256,14 @@ bool GUSBAmp::start()
 
 bool GUSBAmp::stop()
 {
+    // Stop this (consumer) thread first
+    requestInterruption();
+    wait(500);
+
     //Stop the producer thread first
     m_pGUSBAmpProducer->stop();
 
-    //Wait until this thread (GUSBAmp) is stopped
-    m_bIsRunning = false;
-
-    //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
-    m_pRawMatrixBuffer_In->releaseFromPop();
-
-    m_pRawMatrixBuffer_In->clear();
+    m_pCircularBuffer->clear();
 
     m_pRTMSA_GUSBAmp->data()->clear();
 
@@ -312,41 +301,34 @@ QWidget* GUSBAmp::setupWidget()
 void GUSBAmp::run()
 {
     qint32 size = 0;
+    MatrixXf matValue;
 
-    //get Matrix from the producer
-    while(m_bIsRunning)
+    while(!isInterruptionRequested()) {
     {
         //pop matrix only if the producer thread is running
-        if(m_pGUSBAmpProducer->isRunning())
-        {
-            //qDebug()<<"GUSBAmp is running";
-            MatrixXf matValue = m_pRawMatrixBuffer_In->pop();
-            MatrixXf matValue_show = matValue/1000000; //matvalue for showing
+        if(m_pGUSBAmpProducer->isRunning()) {
+            //pop matrix
+            if(m_pCircularBuffer->pop(matValue)) {
+                for(int i = 0; i < matValue.cols(); i++){
+                    qDebug() << matValue(0,i);
+                }
 
-            for(int i = 0; i < matValue.cols(); i++){
-                qDebug() << matValue(0,i);
-            }
+                //emit values to real time multi sample array
+                m_pRTMSA_GUSBAmp->data()->setValue(matValue.cast<double>()/1000000);
 
-            //emit values to real time multi sample array
-            m_pRTMSA_GUSBAmp->data()->setValue(matValue_show.cast<double>());
-            qDebug() << "PUSH!";
+                //Write raw data to fif file
+                if(m_bWriteToFile) {
+                    m_pOutfid->write_raw_buffer(matValue.cast<double>(), m_cals);
+                    size += matValue.cols();
 
-            //Write raw data to fif file
-            if(m_bWriteToFile)
-            {
-                m_pOutfid->write_raw_buffer(matValue.cast<double>(), m_cals);
-                size += matValue.cols();
-
-                //                qDebug()<<"size"<<size;
-                //                qDebug()<<"(m_iSplitFileSizeMs/1000)*m_pFiffInfo->sfreq"<<(double(m_iSplitFileSizeMs)/1000.0)*m_pFiffInfo->sfreq;
-                if(size > (double(m_iSplitFileSizeMs)/1000.0)*m_pFiffInfo->sfreq && m_bSplitFile)
-                {
+                    if(size > (double(m_iSplitFileSizeMs)/1000.0)*m_pFiffInfo->sfreq && m_bSplitFile)  {
+                        size = 0;
+                        splitRecordingFile();
+                    }
+                } else {
                     size = 0;
-                    splitRecordingFile();
                 }
             }
-            else
-                size = 0;
         }
     }
 }
@@ -407,25 +389,20 @@ void GUSBAmp::showStartRecording()
     m_iSplitCount = 0;
 
     //Setup writing to file
-    if(m_bWriteToFile)
-    {
+    if(m_bWriteToFile) {
         m_pOutfid->finish_writing_raw();
         m_bWriteToFile = false;
         m_pTimerRecordingChange->stop();
         m_pActionStartRecording->setIcon(QIcon(":/images/record.png"));
-    }
-    else
-    {
-        if(!m_bIsRunning)
-        {
+    } else {
+        if(!this->isRunning()) {
             QMessageBox msgBox;
             msgBox.setText("Start data acquisition first!");
             msgBox.exec();
             return;
         }
 
-        if(!m_pFiffInfo)
-        {
+        if(!m_pFiffInfo) {
             QMessageBox msgBox;
             msgBox.setText("FiffInfo missing!");
             msgBox.exec();
@@ -434,8 +411,7 @@ void GUSBAmp::showStartRecording()
 
         //Initiate the stream for writing to the fif file
         m_fileOut.setFileName(m_sOutputFilePath);
-        if(m_fileOut.exists())
-        {
+        if(m_fileOut.exists()) {
             QMessageBox msgBox;
             msgBox.setText("The file you want to write already exists.");
             msgBox.setInformativeText("Do you want to overwrite this file?");
@@ -445,13 +421,13 @@ void GUSBAmp::showStartRecording()
                 return;
             }
         }
+
         // Check if path exists -> otherwise create it
         QStringList list = m_sOutputFilePath.split("/");
         list.removeLast(); // remove file name
         QString fileDir = list.join("/");
 
-        if(!dirExists(fileDir.toStdString()))
-        {
+        if(!dirExists(fileDir.toStdString())) {
             QDir dir;
             dir.mkpath(fileDir);
         }
@@ -472,13 +448,10 @@ void GUSBAmp::showStartRecording()
 
 void GUSBAmp::changeRecordingButton()
 {
-    if(m_iBlinkStatus == 0)
-    {
+    if(m_iBlinkStatus == 0) {
         m_pActionStartRecording->setIcon(QIcon(":/images/record.png"));
         m_iBlinkStatus = 1;
-    }
-    else
-    {
+    } else {
         m_pActionStartRecording->setIcon(QIcon(":/images/record_active.png"));
         m_iBlinkStatus = 0;
     }
@@ -489,10 +462,10 @@ void GUSBAmp::changeRecordingButton()
 bool GUSBAmp::dirExists(const std::string& dirName_in)
 {
     DWORD ftyp = GetFileAttributesA(dirName_in.c_str());
-    if (ftyp == INVALID_FILE_ATTRIBUTES){
+    if (ftyp == INVALID_FILE_ATTRIBUTES) {
         return false;  //something is wrong with your path!
     }
-    if (ftyp & FILE_ATTRIBUTE_DIRECTORY){
+    if (ftyp & FILE_ATTRIBUTE_DIRECTORY) {
         return true;   // this is a directory!
     }
     return false;    // this is not a directory!
