@@ -37,10 +37,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <iostream>
-
 #include "ftbuffer.h"
 #include "ftbuffproducer.h"
+
+#include <disp3D/viewers/hpiview.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -60,6 +60,7 @@ using namespace SCMEASLIB;
 using namespace FIFFLIB;
 using namespace Eigen;
 using namespace IOBUFFER;
+using namespace DISP3DLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -69,8 +70,14 @@ FtBuffer::FtBuffer()
 : m_bIsConfigured(false)
 , m_pFtBuffProducer(QSharedPointer<FtBuffProducer>::create(this))
 , m_pFiffInfo(QSharedPointer<FiffInfo>::create())
-//, m_pRTMSA_BufferOutput(PluginOutputData<RealTimeMultiSampleArray>::create(this, "FtBuffer", "Output data"))
+, m_bDoContinousHPI(false)
 {
+    //Init HPI
+    m_pActionComputeHPI = new QAction(QIcon(":/images/latestFiffInfoHPI.png"), tr("Compute HPI"),this);
+    m_pActionComputeHPI->setStatusTip(tr("Compute HPI"));
+    connect(m_pActionComputeHPI, &QAction::triggered,
+            this, &FtBuffer::showHPIDialog);
+    addPluginAction(m_pActionComputeHPI);
 }
 
 //=============================================================================================================
@@ -165,6 +172,10 @@ bool FtBuffer::stop()
 
     m_pRTMSA_BufferOutput->data()->clear();
 
+    if(m_pHPIWidget) {
+        m_pHPIWidget->hide();
+    }
+
     qInfo() << "[FtBuffer::stop] Stopped.";
     return true;
 }
@@ -187,7 +198,7 @@ QString FtBuffer::getName() const
 
 QWidget* FtBuffer::setupWidget()
 {
-    FtBufferSetupWidget* setupWidget = new FtBufferSetupWidget(this);
+    FtBufferSetupWidget* setupWidget = new FtBufferSetupWidget(this, QString("MNESCAN/%1").arg(this->getName()));
     return setupWidget;
 }
 
@@ -198,14 +209,32 @@ void FtBuffer::run()
     MatrixXd matData;
 
     while(!isInterruptionRequested()) {
-        qDebug() << "[FtBuffer::run] m_pFiffInfo->dig.size()" << m_pFiffInfo->dig.size();
+        //qDebug() << "[FtBuffer::run] m_pFiffInfo->dig.size()" << m_pFiffInfo->dig.size();
         //pop matrix
-        if(m_pCircularBuffer->pop(matData)) {
+        if(m_pCircularBuffer->pop(matData)) {            
+            //Update HPI data (for single and continous HPI fitting)
+            updateHPI(matData);
+
+            //Do continous HPI fitting and write result to data block
+//            if(m_bDoContinousHPI) {
+//                doContinousHPI(matValue);
+//            }
+
             //emit values
             if(!isInterruptionRequested()) {
                 m_pRTMSA_BufferOutput->data()->setValue(matData);
             }
         }
+    }
+}
+
+//=============================================================================================================
+
+void FtBuffer::updateHPI(const MatrixXd& matData)
+{
+    //Update HPI data
+    if(m_pFiffInfo && m_pHPIWidget) {
+        m_pHPIWidget->setData(matData);
     }
 }
 
@@ -268,3 +297,34 @@ bool FtBuffer::setupRTMSA(FIFFLIB::FiffInfo FiffInfo)
     qInfo() << "[FtBuffer::setupRTMSA] Successfully acquired fif info from buffer.";
     return m_bIsConfigured = true;
 }
+
+//=============================================================================================================
+
+void FtBuffer::showHPIDialog()
+{
+    if(!m_pFiffInfo) {
+        QMessageBox msgBox;
+        msgBox.setText("FiffInfo missing!");
+        msgBox.exec();
+        return;
+    } else {
+        if (!m_pHPIWidget) {
+            m_pHPIWidget = QSharedPointer<HpiView>(new HpiView(m_pFiffInfo));
+            connect(m_pHPIWidget.data(), &HpiView::continousHPIToggled,
+                    this, &FtBuffer::onContinousHPIToggled);
+        }
+
+        if (!m_pHPIWidget->isVisible()) {
+            m_pHPIWidget->show();
+            m_pHPIWidget->raise();
+        }
+    }
+}
+
+//=============================================================================================================
+
+void FtBuffer::onContinousHPIToggled(bool bDoContinousHPI)
+{
+    m_bDoContinousHPI = bDoContinousHPI;
+}
+
