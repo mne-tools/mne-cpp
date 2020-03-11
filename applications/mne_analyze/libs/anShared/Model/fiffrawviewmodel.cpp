@@ -664,7 +664,7 @@ void FiffRawViewModel::distanceTimeSpacerChanged(int value)
 
 int FiffRawViewModel::getNumberOfTimeSpacers() const
 {
-    return ((100)/m_iDistanceTimerSpacer);
+    return ((1000)/m_iDistanceTimerSpacer)-1;
 }
 
 //=============================================================================================================
