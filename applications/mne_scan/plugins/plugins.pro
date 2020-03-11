@@ -50,7 +50,7 @@ SUBDIRS += \
 #    eegosports \           # Build guide -> https://mne-cpp.github.io/pages/development/eegosports.html
 #    brainamp \             # Build guide -> https://mne-cpp.github.io/pages/development/brainamp.html
 #    tmsi \                 # Build guide -> NA
-    lsladapter \           # Build guide -> NA
+#    lsladapter \           # Build guide -> NA
 
 contains(MNECPP_CONFIG, withBrainFlow) {
     SUBDIRS += \

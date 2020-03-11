@@ -117,15 +117,10 @@ void LSLAdapter::init()
 {
     // move producer to thread and connect a few synchronization points
     m_pProducer->moveToThread(&m_producerThread);
-    connect(&m_producerThread,
-            &QThread::started,
-            m_pProducer,
-            &LSLAdapterProducer::readStream);
-    connect(m_pProducer,
-            &LSLAdapterProducer::finished,
-            &m_producerThread,
-            &QThread::quit,
-            Qt::DirectConnection);  // apparently a direct connection is needed in order to avoid a crash upon 'stop'
+    connect(&m_producerThread, &QThread::started,
+            m_pProducer, &LSLAdapterProducer::readStream);
+    connect(m_pProducer, &LSLAdapterProducer::finished,
+            &m_producerThread, &QThread::quit, Qt::DirectConnection);  // apparently a direct connection is needed in order to avoid a crash upon 'stop'
 
     // make RTMSA accessible
     m_pRTMSA->data()->setName(this->getName());
@@ -181,8 +176,7 @@ bool LSLAdapter::start()
         m_producerThread.start();
 
         return true;
-    }
-    else {
+    } else {
         qDebug() << "[LSLAdapter::start] No valid stream !";
         return false;
     }
