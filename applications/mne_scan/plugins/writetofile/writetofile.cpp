@@ -228,7 +228,7 @@ void WriteToFile::initPluginControlWidgets()
                                                                             sCurrentProject,
                                                                             sCurrentSubject,
                                                                             "");
-        pProjectSettingsView->setObjectName("group_tab_Settings_Write to file");
+        pProjectSettingsView->setObjectName("widget_");
         m_sRecordFileName = pProjectSettingsView->getCurrentFileName();
 
         connect(pProjectSettingsView, &ProjectSettingsView::timerChanged,

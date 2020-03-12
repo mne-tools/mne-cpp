@@ -194,26 +194,24 @@ private:
     qint32                                  m_iSplitCount;                  /**< File split count */
     int                                     m_iRecordingMSeconds;           /**< Recording length in mseconds.*/
 
-    QMutex                          m_mutex;                                    /**< The threads mutex.*/
+    QMutex                                  m_mutex;                        /**< The threads mutex.*/
 
-    QSharedPointer<FIFFLIB::FiffInfo>                               m_pFiffInfo;            /**< Fiff measurement info.*/
-    QSharedPointer<FIFFLIB::FiffStream>                             m_pOutfid;                      /**< FiffStream to write to.*/
+    QSharedPointer<FIFFLIB::FiffInfo>       m_pFiffInfo;                    /**< Fiff measurement info.*/
+    QSharedPointer<FIFFLIB::FiffStream>     m_pOutfid;                      /**< FiffStream to write to.*/
 
     QSharedPointer<QTimer>                  m_pUpdateTimeInfoTimer;         /**< timer to control remaining time. */
     QSharedPointer<QTimer>                  m_pBlinkingRecordButtonTimer;   /**< timer to control blinking recording button. */
     QSharedPointer<QTimer>                  m_pRecordTimer;                 /**< timer to control recording time. */
 
     QFile                                   m_qFileOut;                     /**< QFile for writing to fif file.*/
-    QString                                 m_sRecordFileName;                  /**< Current record file. */
+    QString                                 m_sRecordFileName;              /**< Current record file. */
     QTime                                   m_recordingStartedTime;         /**< The time when the recording started.*/
-
-    QSharedPointer<IOBUFFER::CircularBuffer_Matrix_double>          m_pCircularBuffer;      /**< Holds incoming raw data. */
 
     QPointer<QAction>                       m_pActionRecordFile;            /**< start recording action */
 
-    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr      m_pWriteToFileInput;      /**< The RealTimeMultiSampleArray of the WriteToFile input.*/
+    QSharedPointer<IOBUFFER::CircularBuffer_Matrix_double>                      m_pCircularBuffer;      /**< Holds incoming raw data. */
 
-signals:
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr      m_pWriteToFileInput;   /**< The RealTimeMultiSampleArray of the WriteToFile input.*/
 };
 } // NAMESPACE
 
