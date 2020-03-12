@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>373</width>
-    <height>736</height>
+    <height>759</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -31,24 +31,11 @@
      <property name="spacing">
       <number>6</number>
      </property>
-     <item row="2" column="0">
-      <spacer name="verticalSpacer">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>40</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
      <item row="0" column="0">
       <widget class="QGroupBox" name="m_groupBox_loadDigitizers">
        <property name="minimumSize">
         <size>
-         <width>258</width>
+         <width>228</width>
          <height>0</height>
         </size>
        </property>
@@ -59,13 +46,13 @@
         </size>
        </property>
        <property name="title">
-        <string>Load digitizers</string>
+        <string>Digitizers</string>
        </property>
        <layout class="QFormLayout" name="formLayout_2">
         <item row="2" column="0">
          <widget class="QLabel" name="label_7">
           <property name="text">
-           <string>Number of loaded HPI coils:</string>
+           <string>Loaded HPI coils:</string>
           </property>
          </widget>
         </item>
@@ -82,7 +69,7 @@
         <item row="3" column="0">
          <widget class="QLabel" name="label_8">
           <property name="text">
-           <string>Number of loaded additional digitizers:</string>
+           <string>Loaded additional digitizers:</string>
           </property>
          </widget>
         </item>
@@ -99,7 +86,7 @@
         <item row="4" column="0">
          <widget class="QLabel" name="label_9">
           <property name="text">
-           <string>Number of loaded fiducials:</string>
+           <string>Loaded fiducials:</string>
           </property>
          </widget>
         </item>
@@ -116,7 +103,7 @@
         <item row="5" column="0">
          <widget class="QLabel" name="label_10">
           <property name="text">
-           <string>Number of loaded EEG:</string>
+           <string>Loaded EEG positions:</string>
           </property>
          </widget>
         </item>
@@ -147,6 +134,19 @@
        </layout>
       </widget>
      </item>
+     <item row="2" column="0">
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
      <item row="0" column="1" rowspan="2">
       <spacer name="horizontalSpacer">
        <property name="orientation">
@@ -164,7 +164,7 @@
       <widget class="QGroupBox" name="m_groupBox_hpiFitting">
        <property name="minimumSize">
         <size>
-         <width>258</width>
+         <width>228</width>
          <height>0</height>
         </size>
        </property>
@@ -175,26 +175,9 @@
         </size>
        </property>
        <property name="title">
-        <string>HPI fitting</string>
+        <string>Fitting</string>
        </property>
        <layout class="QGridLayout" name="gridLayout">
-        <item row="5" column="3">
-         <widget class="QPushButton" name="m_pushButton_removeCoil">
-          <property name="text">
-           <string>-</string>
-          </property>
-         </widget>
-        </item>
-        <item row="19" column="3">
-         <widget class="QDoubleSpinBox" name="m_doubleSpinBox_maxHPIContinousDist">
-          <property name="maximum">
-           <double>9999.989999999999782</double>
-          </property>
-          <property name="value">
-           <double>10.000000000000000</double>
-          </property>
-         </widget>
-        </item>
         <item row="17" column="0" colspan="4">
          <widget class="QLabel" name="label_11">
           <property name="text">
@@ -328,48 +311,17 @@
           </item>
          </widget>
         </item>
-        <item row="20" column="0" colspan="4">
-         <widget class="QLabel" name="m_label_fitFeedback">
+        <item row="8" column="0" colspan="4">
+         <widget class="QCheckBox" name="m_checkBox_useComp">
           <property name="text">
-           <string>No fit yet</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
+           <string>Use compensators</string>
           </property>
          </widget>
         </item>
-        <item row="7" column="0">
-         <widget class="QCheckBox" name="m_checkBox_useSSP">
+        <item row="5" column="3">
+         <widget class="QPushButton" name="m_pushButton_removeCoil">
           <property name="text">
-           <string>Use SSP</string>
-          </property>
-         </widget>
-        </item>
-        <item row="12" column="0" colspan="4">
-         <widget class="QCheckBox" name="m_checkBox_continousHPI">
-          <property name="text">
-           <string>Do continous HPI fitting</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="3">
-         <widget class="QPushButton" name="m_pushButton_addCoil">
-          <property name="text">
-           <string>+</string>
-          </property>
-         </widget>
-        </item>
-        <item row="19" column="2">
-         <widget class="QLabel" name="label">
-          <property name="text">
-           <string>Allowed:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="0" colspan="4">
-         <widget class="Line" name="line_4">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
+           <string>-</string>
           </property>
          </widget>
         </item>
@@ -459,13 +411,10 @@
           </item>
          </widget>
         </item>
-        <item row="19" column="0">
-         <widget class="QLabel" name="label_2">
+        <item row="12" column="0" colspan="4">
+         <widget class="QCheckBox" name="m_checkBox_continousHPI">
           <property name="text">
-           <string>Average:</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
+           <string>Do continous HPI fitting</string>
           </property>
          </widget>
         </item>
@@ -479,17 +428,24 @@
           </property>
          </widget>
         </item>
-        <item row="8" column="0">
-         <widget class="QCheckBox" name="m_checkBox_useComp">
+        <item row="4" column="3">
+         <widget class="QPushButton" name="m_pushButton_addCoil">
           <property name="text">
-           <string>Use compensators</string>
+           <string>+</string>
           </property>
          </widget>
         </item>
-        <item row="19" column="1">
-         <widget class="QLabel" name="m_label_averagedFitError">
+        <item row="7" column="0" colspan="4">
+         <widget class="QCheckBox" name="m_checkBox_useSSP">
           <property name="text">
-           <string>0mm</string>
+           <string>Use SSP</string>
+          </property>
+         </widget>
+        </item>
+        <item row="21" column="0" colspan="4">
+         <widget class="QLabel" name="m_label_fitFeedback">
+          <property name="text">
+           <string>No fit yet</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -500,6 +456,50 @@
          <widget class="Line" name="line_2">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="0" colspan="4">
+         <widget class="Line" name="line_4">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="20" column="0" colspan="2">
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Error threshold:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="20" column="2">
+         <widget class="QDoubleSpinBox" name="m_doubleSpinBox_maxHPIContinousDist">
+          <property name="maximum">
+           <double>9999.989999999999782</double>
+          </property>
+          <property name="value">
+           <double>10.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="19" column="2">
+         <widget class="QLabel" name="m_label_averagedFitError">
+          <property name="text">
+           <string>0mm</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="19" column="0" colspan="2">
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>Average:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
           </property>
          </widget>
         </item>

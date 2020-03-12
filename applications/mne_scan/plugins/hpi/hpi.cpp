@@ -40,9 +40,8 @@
 
 #include "FormFiles/hpisetupwidget.h"
 
-#include <disp/viewers/projectsettingsview.h>
+#include <disp/viewers/hpisettingsview.h>
 #include <scMeas/realtimemultisamplearray.h>
-#include <fiff/fiff_stream.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -69,32 +68,8 @@ using namespace Eigen;
 //=============================================================================================================
 
 Hpi::Hpi()
-: m_iBlinkStatus(0)
-, m_bHpi(false)
-, m_bUseRecordTimer(false)
-, m_iRecordingMSeconds(5*60*1000)
-, m_iSplitCount(0)
-, m_pCircularBuffer(CircularBuffer_Matrix_double::SPtr(new CircularBuffer_Matrix_double(40)))
+: m_pCircularBuffer(CircularBuffer_Matrix_double::SPtr(new CircularBuffer_Matrix_double(40)))
 {
-    m_pActionRecordFile = new QAction(QIcon(":/images/record.png"), tr("Start Recording"),this);
-    m_pActionRecordFile->setStatusTip(tr("Start Recording"));
-    connect(m_pActionRecordFile.data(), &QAction::triggered,
-            this, &Hpi::toggleRecordingFile);
-    addPluginAction(m_pActionRecordFile);
-
-    //Init timers
-    if(!m_pRecordTimer) {
-        m_pRecordTimer = QSharedPointer<QTimer>(new QTimer(this));
-        m_pRecordTimer->setSingleShot(true);
-        connect(m_pRecordTimer.data(), &QTimer::timeout,
-                this, &Hpi::toggleRecordingFile);
-    }
-
-    if(!m_pBlinkingRecordButtonTimer) {
-        m_pBlinkingRecordButtonTimer = QSharedPointer<QTimer>(new QTimer(this));
-        connect(m_pBlinkingRecordButtonTimer.data(), &QTimer::timeout,
-                this, &Hpi::changeRecordingButton);
-    }
 }
 
 //=============================================================================================================
@@ -161,7 +136,7 @@ IPlugin::PluginType Hpi::getType() const
 
 QString Hpi::getName() const
 {
-    return "Write To File";
+    return "HPI Fitting";
 }
 
 //=============================================================================================================
@@ -204,56 +179,13 @@ void Hpi::initPluginControlWidgets()
     if(m_pFiffInfo) {
         QList<QWidget*> plControlWidgets;
 
-        //Mne Scan data Path
-        QString sMneScanDataPath = QDir::homePath() + "/mne_scan";
-        if(!QDir(sMneScanDataPath).exists()) {
-            QDir().mkdir(sMneScanDataPath);
-        }
-
-        //Test Project
-        QSettings settings;
-        QString sCurrentProject = settings.value(QString("MNESCAN/%1/currentProject").arg(getName()), "TestProject").toString();
-        if(!QDir(sMneScanDataPath+"/"+sCurrentProject).exists()) {
-            QDir().mkdir(sMneScanDataPath+"/"+sCurrentProject);
-        }
-
-        //Test Subject
-        QString sCurrentSubject = settings.value(QString("MNESCAN/%1/currentSubject").arg(getName()), "TestSubject").toString();
-        if(!QDir(sMneScanDataPath+"/"+sCurrentProject+"/"+sCurrentSubject).exists()) {
-            QDir().mkdir(sMneScanDataPath+"/"+sCurrentProject+"/"+sCurrentSubject);
-        }
-
         // Projects Settings
-        ProjectSettingsView* pProjectSettingsView = new ProjectSettingsView(sMneScanDataPath,
-                                                                            sCurrentProject,
-                                                                            sCurrentSubject,
-                                                                            "");
-        pProjectSettingsView->setObjectName("group_tab_Settings_Write to file");
-        m_sRecordFileName = pProjectSettingsView->getCurrentFileName();
+        HpiSettingsView* pHpiSettingsView = new HpiSettingsView();
+        pHpiSettingsView->setObjectName("widget_");
 
-        connect(pProjectSettingsView, &ProjectSettingsView::timerChanged,
-                this, &Hpi::setRecordingTimerChanged);
-
-        connect(pProjectSettingsView, &ProjectSettingsView::recordingTimerStateChanged,
-                this, &Hpi::setRecordingTimerStateChanged);
-
-        connect(pProjectSettingsView, &ProjectSettingsView::fileNameChanged,
-                this, &Hpi::onFileNameChanged);
-
-        connect(pProjectSettingsView, &ProjectSettingsView::fileNameChanged, [=]() {
-            pProjectSettingsView->setRecordingElapsedTime(m_recordingStartedTime.elapsed());
-        });
-
-        plControlWidgets.append(pProjectSettingsView);
+        plControlWidgets.append(pHpiSettingsView);
 
         emit pluginControlWidgetsChanged(plControlWidgets, this->getName());
-
-        if(!m_pUpdateTimeInfoTimer) {
-            m_pUpdateTimeInfoTimer = QSharedPointer<QTimer>(new QTimer(this));
-            connect(m_pUpdateTimeInfoTimer.data(), &QTimer::timeout, [=]() {
-                pProjectSettingsView->setRecordingElapsedTime(m_recordingStartedTime.elapsed());
-            });
-        }
     }
 }
 
@@ -268,185 +200,8 @@ void Hpi::run()
         if(m_pCircularBuffer) {
             //pop matrix
             if(m_pCircularBuffer->pop(matData)) {
-                //Write raw data to fif file
-                m_mutex.lock();
-                if(m_bHpi) {
-                    size += matData.rows()*matData.cols() * 4;
-
-                    if(size > MAX_DATA_LEN) {
-                        size = 0;
-                        this->splitRecordingFile();
-                    }
-
-                    m_pOutfid->write_raw_buffer(matData.cast<double>());
-                } else {
-                    size = 0;
-                }
-                m_mutex.unlock();
+                // Perform HPI fit
             }
         }
-    }
-
-    //Close the fif output stream
-    if(m_bHpi) {
-        this->toggleRecordingFile();
-    }
-}
-
-//=============================================================================================================
-
-void Hpi::setRecordingTimerChanged(int timeMSecs)
-{
-    //If the recording time is changed during the recording, change the timer
-    if(m_bHpi) {
-        m_pRecordTimer->setInterval(timeMSecs-m_recordingStartedTime.elapsed());
-    }
-
-    m_iRecordingMSeconds = timeMSecs;
-}
-
-//=============================================================================================================
-
-void Hpi::setRecordingTimerStateChanged(bool state)
-{
-    m_bUseRecordTimer = state;
-}
-
-//=============================================================================================================
-
-void Hpi::onFileNameChanged(const QString& sFileName)
-{
-    m_sRecordFileName = sFileName;
-}
-
-//=============================================================================================================
-
-void Hpi::toggleRecordingFile()
-{
-    //Setup writing to file
-    if(m_bHpi) {
-        m_mutex.lock();
-        m_pOutfid->finish_writing_raw();
-        m_mutex.unlock();
-
-        m_bHpi = false;
-        m_iSplitCount = 0;
-
-        //Stop record timer
-        m_pRecordTimer->stop();
-        m_pUpdateTimeInfoTimer->stop();
-        m_pBlinkingRecordButtonTimer->stop();
-
-        m_pActionRecordFile->setIcon(QIcon(":/images/record.png"));
-    } else {
-        m_iSplitCount = 0;
-
-        if(!m_pFiffInfo) {
-            QMessageBox msgBox;
-            msgBox.setText("FiffInfo missing!");
-            msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
-            msgBox.exec();
-            return;
-        }
-
-        if(m_pFiffInfo->dev_head_t.trans.isIdentity()) {
-            QMessageBox msgBox;
-            msgBox.setText("It seems that no HPI fitting was performed. This is your last chance!");
-            msgBox.setInformativeText("Do you want to continue without HPI fitting?");
-            msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-            msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
-            int ret = msgBox.exec();
-            if(ret == QMessageBox::No)
-                return;
-        }
-
-        //Initiate the stream for writing to the fif file
-        m_qFileOut.setFileName(m_sRecordFileName);
-        if(m_qFileOut.exists()) {
-            QMessageBox msgBox;
-            msgBox.setText("The file you want to write already exists.");
-            msgBox.setInformativeText("Do you want to overwrite this file?");
-            msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-            msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
-            int ret = msgBox.exec();
-            if(ret == QMessageBox::No) {
-                return;
-            }
-        }
-
-        //Set all projectors to zero before writing to file because we always write the raw data
-        for(int i = 0; i<m_pFiffInfo->projs.size(); i++) {
-            m_pFiffInfo->projs[i].active = false;
-        }
-
-        //Start/Prepare writing process. Actual writing is done in run() method.
-        m_mutex.lock();
-        RowVectorXd cals;
-        m_pOutfid = FiffStream::start_writing_raw(m_qFileOut,
-                                                  *m_pFiffInfo,
-                                                  cals);
-        fiff_int_t first = 0;
-        m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
-        m_mutex.unlock();
-
-        m_bHpi = true;
-
-        //Start timers for record button blinking, recording timer and updating the elapsed time in the proj widget
-        m_pBlinkingRecordButtonTimer->start(500);
-        m_recordingStartedTime.restart();
-        m_pUpdateTimeInfoTimer->start(1000);
-
-        if(m_bUseRecordTimer) {
-            m_pRecordTimer->start(m_iRecordingMSeconds);
-        }
-    }
-}
-
-//=============================================================================================================
-
-void Hpi::splitRecordingFile()
-{
-    //qDebug() << "Split recording file";
-    ++m_iSplitCount;
-    QString nextFileName = m_sRecordFileName.remove("_raw.fif");
-    nextFileName += QString("-%1_raw.fif").arg(m_iSplitCount);
-
-    //Write the link to the next file
-    qint32 data;
-    m_pOutfid->start_block(FIFFB_REF);
-    data = FIFFV_ROLE_NEXT_FILE;
-    m_pOutfid->write_int(FIFF_REF_ROLE,&data);
-    m_pOutfid->write_string(FIFF_REF_FILE_NAME, nextFileName);
-    m_pOutfid->write_id(FIFF_REF_FILE_ID);//ToDo meas_id
-    data = m_iSplitCount - 1;
-    m_pOutfid->write_int(FIFF_REF_FILE_NUM, &data);
-    m_pOutfid->end_block(FIFFB_REF);
-
-    //finish file
-    m_pOutfid->finish_writing_raw();
-
-    //start next file
-    m_qFileOut.setFileName(nextFileName);
-    RowVectorXd cals;
-    MatrixXi sel;
-    m_pOutfid = FiffStream::start_writing_raw(m_qFileOut,
-                                              *m_pFiffInfo,
-                                              cals,
-                                              sel,
-                                              false);
-    fiff_int_t first = 0;
-    m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
-}
-
-//=============================================================================================================
-
-void Hpi::changeRecordingButton()
-{
-    if(m_iBlinkStatus == 0) {
-        m_pActionRecordFile->setIcon(QIcon(":/images/record.png"));
-        m_iBlinkStatus = 1;
-    } else {
-        m_pActionRecordFile->setIcon(QIcon(":/images/record_active.png"));
-        m_iBlinkStatus = 0;
     }
 }

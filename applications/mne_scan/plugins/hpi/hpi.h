@@ -49,9 +49,6 @@
 //=============================================================================================================
 
 #include <QPointer>
-#include <QAction>
-#include <QFile>
-#include <QTime>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -65,7 +62,6 @@
 
 namespace FIFFLIB{
     class FiffInfo;
-    class FiffStream;
 }
 
 namespace SCMEASLIB{
@@ -145,75 +141,14 @@ private:
      */
     virtual void run();
 
-    //=========================================================================================================
-    /**
-     * Set the recording time in seconds.
-     *
-     * @param[in] time   the new recording time.
-     */
-    void setRecordingTimerChanged(int timeMSecs);
+    QMutex          m_mutex;                                    /**< The threads mutex.*/
 
-    //=========================================================================================================
-    /**
-     * Set the recording time active flag.
-     *
-     * @param[in] state   whether the recording should be used or not.
-     */
-    void setRecordingTimerStateChanged(bool state);
+    QSharedPointer<FIFFLIB::FiffInfo>                                           m_pFiffInfo;            /**< Fiff measurement info.*/
 
-    //=========================================================================================================
-    /**
-     * Set the recording file name.
-     *
-     * @param[in] sFileName   the new file name.
-     */
-    void onFileNameChanged(const QString& sFileName);
+    QSharedPointer<IOBUFFER::CircularBuffer_Matrix_double>                      m_pCircularBuffer;      /**< Holds incoming raw data. */
 
-    //=========================================================================================================
-    /**
-     * Starts or stops a file recording depending on the current recording state.
-     */
-    void toggleRecordingFile();
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pHpiInput;            /**< The RealTimeMultiSampleArray of the Hpi input.*/
 
-    //=========================================================================================================
-    /**
-     * Determines current file. And starts a new one.
-     */
-    void splitRecordingFile();
-
-    //=========================================================================================================
-    /**
-     * change recording button.
-     */
-    void changeRecordingButton();
-
-    bool                                    m_bHpi;                 /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
-    bool                                    m_bUseRecordTimer;              /**< Flag whether to use data recording timer.*/
-
-    qint16                                  m_iBlinkStatus;                 /**< The blink status of the recording button.*/
-    qint32                                  m_iSplitCount;                  /**< File split count */
-    int                                     m_iRecordingMSeconds;           /**< Recording length in mseconds.*/
-
-    QMutex                          m_mutex;                                    /**< The threads mutex.*/
-
-    QSharedPointer<FIFFLIB::FiffInfo>                               m_pFiffInfo;            /**< Fiff measurement info.*/
-    QSharedPointer<FIFFLIB::FiffStream>                             m_pOutfid;                      /**< FiffStream to write to.*/
-
-    QSharedPointer<QTimer>                  m_pUpdateTimeInfoTimer;         /**< timer to control remaining time. */
-    QSharedPointer<QTimer>                  m_pBlinkingRecordButtonTimer;   /**< timer to control blinking recording button. */
-    QSharedPointer<QTimer>                  m_pRecordTimer;                 /**< timer to control recording time. */
-
-    QFile                                   m_qFileOut;                     /**< QFile for writing to fif file.*/
-    QString                                 m_sRecordFileName;                  /**< Current record file. */
-    QTime                                   m_recordingStartedTime;         /**< The time when the recording started.*/
-
-    QSharedPointer<IOBUFFER::CircularBuffer_Matrix_double>          m_pCircularBuffer;      /**< Holds incoming raw data. */
-
-    QPointer<QAction>                       m_pActionRecordFile;            /**< start recording action */
-
-    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr      m_pHpiInput;      /**< The RealTimeMultiSampleArray of the Hpi input.*/
-
-signals:
 };
 } // NAMESPACE
 
