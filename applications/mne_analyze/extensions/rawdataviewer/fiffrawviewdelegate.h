@@ -155,7 +155,8 @@ private:
      */
     void createTimeSpacersPath(const QModelIndex &index,
                                const QStyleOptionViewItem &option,
-                               QPainterPath& path) const;
+                               QPainterPath& path,
+                               ANSHAREDLIB::ChannelData &data) const;
 
     QPen        m_penGrid;                  /**< Pen for drawing the data grid. */
     QPen        m_penNormal;                /**< Pen for drawing the data when data is plotted normally without freeze on.  */

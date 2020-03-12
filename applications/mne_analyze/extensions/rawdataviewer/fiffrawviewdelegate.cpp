@@ -111,18 +111,6 @@ void FiffRawViewDelegate::paint(QPainter *painter,
 
                 QPainterPath path = QPainterPath(QPointF(option.rect.x()+pos, option.rect.y()));
 
-                //Plot time spacers
-                createTimeSpacersPath(index,
-                                      option,
-                                      path);
-
-                painter->save();
-                painter->setPen(QPen(Qt::black, 1, Qt::DashLine));
-                painter->drawPath(path);
-                painter->restore();
-
-                path = QPainterPath(QPointF(option.rect.x()+pos, option.rect.y()));
-
                 //Plot data
                 createPlotPath(option,
                                path,
@@ -150,6 +138,19 @@ void FiffRawViewDelegate::paint(QPainter *painter,
                 painter->drawPath(path);
                 painter->restore();
 
+                path = QPainterPath(QPointF(option.rect.x()+pos, option.rect.y()));
+
+                //Plot time spacers
+                createTimeSpacersPath(index,
+                                      option,
+                                      path,
+                                      data);
+
+                painter->save();
+                painter->setPen(QPen(Qt::black, 1, Qt::DashLine));
+                painter->drawPath(path);
+                painter->restore();
+
             }
             break;
         }
@@ -172,8 +173,6 @@ QSize FiffRawViewDelegate::sizeHint(const QStyleOptionViewItem &option,
 
             size = QSize(nsamples, option.rect.height());
 
-            qDebug() << "FiffRawViewDelegate::sizeHint - nsamples" << nsamples;
-            qDebug() << "FiffRawViewDelegate::sizeHint - size" << size;
             break;
     }
 
@@ -263,6 +262,7 @@ void FiffRawViewDelegate::createPlotPath(const QStyleOptionViewItem &option,
         iDataToJump = 1;
     }
 
+    qDebug() << "HERE HERE HERE -- Data size:" << data.size();
     for(int j = 0; j < data.size(); j++) {
         dValue = data[j] * dScaleY;
 
@@ -272,6 +272,13 @@ void FiffRawViewDelegate::createPlotPath(const QStyleOptionViewItem &option,
         qSamplePosition.setY(newY);
         qSamplePosition.setX(path.currentPosition().x() + dDx);
         path.lineTo(qSamplePosition);
+//        if ((j % 100) == 0) {
+//            float yStart = option.rect.topLeft().y();
+//            float yEnd = option.rect.bottomRight().y();
+//            path.moveTo(j,yStart);
+//            path.lineTo(j,yEnd);
+//        }
+
     }
 }
 
@@ -287,29 +294,131 @@ void FiffRawViewDelegate::setSignalColor(const QColor& signalColor)
 
 void FiffRawViewDelegate::createTimeSpacersPath(const QModelIndex &index,
                                                 const QStyleOptionViewItem &option,
-                                                QPainterPath& path) const
+                                                QPainterPath& path,
+                                                ANSHAREDLIB::ChannelData &data) const
 {
-
     const FiffRawViewModel* t_pModel = static_cast<const FiffRawViewModel*>(index.model());
+    double dDx = t_pModel->pixelDifference();
 
-    if(t_pModel->getNumberOfTimeSpacers() > 0)
-    {
-        //vertical lines
-        float distanceSec = float (option.rect.width())/(t_pModel->numVLines()+1);
-        float distanceSpacers = distanceSec/(t_pModel->getNumberOfTimeSpacers()+1);
-        qDebug() << "distanceSec:" << distanceSec;
-        qDebug() << "distanceSpacers" << distanceSpacers;
+//    if(t_pModel->getNumberOfTimeSpacers() > 0)
+//    {
+//        //vertical lines
+//        float distanceSec = (float (option.rect.width()) * t_pModel->getDx()) / (/*t_pModel->getDx() **/ (t_pModel->numVLines() + 1));
+//        float distanceSpacers = distanceSec/(t_pModel->getNumberOfTimeSpacers() + 1);
+//        qDebug() << "distanceSec:" << distanceSec;
+//        qDebug() << "distanceSpacers" << distanceSpacers;
 
-        float yStart = option.rect.topLeft().y();
+//        float yStart = option.rect.topLeft().y();
 
-        float yEnd = option.rect.bottomRight().y();
+//        float yEnd = option.rect.bottomRight().y();
 
-        for(qint8 t = 0; t < t_pModel->numVLines()+1; ++t) {
-            for(qint8 i = 0; i < t_pModel->getNumberOfTimeSpacers(); ++i) {
-                float x = (distanceSec*t)+(distanceSpacers*(i+1));
-                path.moveTo(x,yStart);
-                path.lineTo(x,yEnd);
+//        float linedraw = 0;
+
+//        for(qint8 t = 0; t < t_pModel->numVLines()+1; ++t) {
+//            linedraw += distanceSec;
+//            path.moveTo(linedraw,yStart);
+//            path.lineTo(linedraw,yEnd);
+//        }
+
+////        for(qint8 t = 0; t < t_pModel->numVLines()+1; ++t) {
+////            for(qint8 i = 0; i < t_pModel->getNumberOfTimeSpacers(); ++i) {
+////                float x = (distanceSec*t)+(distanceSpacers*(i+1));
+////                path.moveTo(x,yStart);
+////                path.lineTo(x,yEnd);
+////            }
+////        }
+//    }
+
+    qint32 kind = t_pModel->getKind(index.row());
+
+    double dMaxValue = 1.0e-10;
+
+    switch(kind) {
+        case FIFFV_MEG_CH: {
+            qint32 unit = t_pModel->getUnit(index.row());
+            if(unit == FIFF_UNIT_T_M) { //gradiometers
+                dMaxValue = 1e-10f;
+                if(t_pModel->getScaling().contains(FIFF_UNIT_T_M))
+                    dMaxValue = t_pModel->getScaling()[FIFF_UNIT_T_M];
             }
+            else if(unit == FIFF_UNIT_T) {//magnetometers
+                dMaxValue = 1e-11f;
+                if(t_pModel->getScaling().contains(FIFF_UNIT_T))
+                    dMaxValue = t_pModel->getScaling()[FIFF_UNIT_T];
+            }
+            break;
+        }
+
+        case FIFFV_REF_MEG_CH: {  /*11/04/14 Added by Limin: MEG reference channel */
+            dMaxValue = 1e-11f;
+            if(t_pModel->getScaling().contains(FIFF_UNIT_T))
+                dMaxValue = t_pModel->getScaling()[FIFF_UNIT_T];
+            break;
+        }
+        case FIFFV_EEG_CH: {
+            dMaxValue = 1e-4f;
+            if(t_pModel->getScaling().contains(FIFFV_EEG_CH))
+                dMaxValue = t_pModel->getScaling()[FIFFV_EEG_CH];
+            break;
+        }
+        case FIFFV_EOG_CH: {
+            dMaxValue = 1e-3f;
+            if(t_pModel->getScaling().contains(FIFFV_EOG_CH))
+                dMaxValue = t_pModel->getScaling()[FIFFV_EOG_CH];
+            break;
+        }
+        case FIFFV_STIM_CH: {
+            dMaxValue = 5;
+            if(t_pModel->getScaling().contains(FIFFV_STIM_CH))
+                dMaxValue = t_pModel->getScaling()[FIFFV_STIM_CH];
+            break;
+        }
+        case FIFFV_MISC_CH: {
+            dMaxValue = 1e-3f;
+            if(t_pModel->getScaling().contains(FIFFV_MISC_CH))
+                dMaxValue = t_pModel->getScaling()[FIFFV_MISC_CH];
+            break;
         }
     }
+
+    double dScaleY = option.rect.height()/(2*dMaxValue);
+
+    double y_base = path.currentPosition().y();
+
+    QPointF qSamplePosition;
+    double dValue, newY;
+
+    int iPixelsToJump = 1;
+    if(dDx > 1.0) {
+        iPixelsToJump = dDx;
+    }
+
+    int iDataToJump = floor(1.0/dDx);
+    //qDebug() << "FiffRawViewDelegate::createPlotPath - iDataToJump" << iDataToJump;
+    if(iDataToJump < 1) {
+        iDataToJump = 1;
+    }
+
+    //qDebug() << "HERE HERE HERE -- Data size:" << data.size();
+    for(int j = 0; j < data.size(); j++) {
+//        dValue = data[j] * dScaleY;
+
+//        //Reverse direction -> plot the right way
+//        newY = y_base - dValue;
+
+//        qSamplePosition.setY(newY);
+//        qSamplePosition.setX(path.currentPosition().x() + dDx);
+//        path.lineTo(qSamplePosition);
+        float yStart = option.rect.topLeft().y();
+        float yEnd = option.rect.bottomRight().y();
+
+        if ((j % 100) == 0) {
+
+            path.moveTo(path.currentPosition().x() + dDx, yStart);
+            path.lineTo(path.currentPosition().x(), yEnd);
+        } else {
+            path.moveTo(path.currentPosition().x() + dDx, yStart);
+        }
+    }
+
 }
