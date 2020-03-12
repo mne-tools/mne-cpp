@@ -113,6 +113,7 @@ SOURCES += \
     viewers/rtfiffrawview.cpp \
     viewers/multiviewwindow.cpp \
     viewers/multiview.cpp \
+    viewers/hpisettingsview.cpp \
     viewers/helpers/rtfiffrawviewmodel.cpp \
     viewers/helpers/rtfiffrawviewdelegate.cpp \
     viewers/helpers/evokedsetmodel.cpp \
@@ -161,6 +162,7 @@ HEADERS += \
     viewers/rtfiffrawview.h \
     viewers/multiviewwindow.h \
     viewers/multiview.h \
+    viewers/hpisettingsview.h \
     viewers/helpers/rtfiffrawviewdelegate.h \
     viewers/helpers/rtfiffrawviewmodel.h \
     viewers/helpers/evokedsetmodel.h \
@@ -201,6 +203,7 @@ FORMS += \
     viewers/formfiles/averagingsettingsview.ui \
     viewers/formfiles/projectsettingsview.ui \
     viewers/formfiles/control3dview.ui \
+    viewers/formfiles/hpisettingsview.ui \
 
 RESOURCE_FILES +=\
     $${ROOT_DIR}/resources/general/default_filters/BP_1Hz_40Hz_Fs1kHz.txt \
