@@ -113,6 +113,10 @@ public:
 
 private:
 
+    //=========================================================================================================
+    /**
+     * Sets up control widgets, connects all relevant signals and slots, and diplays controls to user
+     */
     void setUpControls();
 
     // Control
