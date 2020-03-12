@@ -242,11 +242,10 @@ void FiffRawView::setWindowSize(int T)
     m_pTableView->resizeColumnsToContents();
 
     m_pTableView->horizontalScrollBar()->setRange(0, iNewSize);
+
+    //Wiggle view area to trigger update (there's probably a better way of doing this)
     m_pTableView->horizontalScrollBar()->setValue(iNewPos + 1);
     m_pTableView->horizontalScrollBar()->setValue(iNewPos);
-
-    //m_pTableView->setColumnWidth(1, 50000);//hardcoded for testing, need to scale to data
-    //m_pTableView->updateGeometry();
 }
 
 //=============================================================================================================
@@ -254,11 +253,10 @@ void FiffRawView::setWindowSize(int T)
 void FiffRawView::setDistanceTimeSpacer(int value)
 {
     m_pModel->distanceTimeSpacerChanged(value);
+
+    //Wiggle view area to trigger update (there's probably a better way of doing this)
     m_pTableView->horizontalScrollBar()->setValue(m_pTableView->horizontalScrollBar()->value()+1);
     m_pTableView->horizontalScrollBar()->setValue(m_pTableView->horizontalScrollBar()->value()-1);
-//    m_pModel->updateScrollPosition(m_pTableView->horizontalScrollBar()->value());
-//    m_pTableView->resizeColumnsToContents();
-    //setWindowSize(m_iT);
 }
 
 //=============================================================================================================
