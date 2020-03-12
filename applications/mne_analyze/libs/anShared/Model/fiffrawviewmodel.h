@@ -257,11 +257,19 @@ public:
      */
     inline qint32 sampleWindowSize() const;
 
+    //=========================================================================================================
+    /**
+     * Updates m_dDx based on new size parameters
+     * @param[in] iWidth    the width of the data column of the table view
+     */
     inline void setDataColumnWidth(int iWidth);
 
+    //=========================================================================================================
+    /**
+     * @brief pixelDifference
+     * @return
+     */
     inline double pixelDifference() const;
-
-    inline double getDx() const;
 
     //=========================================================================================================
     /**
@@ -316,9 +324,17 @@ public:
      */
     void setBackgroundColor(const QColor& color);
 
+    //=========================================================================================================
+    /**
+     * Adjusts size of viewable window and data withing it
+     *
+     * @param[in] iNumSeconds   How many seconds of data to be displayed
+     * @param[in] iColWidth         How wide the data column should be
+     * @param[in] iScrollPos        Where in the data scrollable area should go to after resizing
+     */
     void setWindowSize(const int& iNumSeconds,
                        const int& iColWidth,
-                       int& iScrollPos);
+                       const int& iScrollPos);
 
     //=========================================================================================================
     /**
@@ -326,15 +342,15 @@ public:
      *
      * @param value the new distance for the time spacers
      */
-    void distanceTimeSpacerChanged(int value);
+    void distanceTimeSpacerChanged(const int& iNewValue);
 
     //=========================================================================================================
     /**
-     * Returns the current number for the time spacers
+     * Returns the number of time spacers per second based on the current time spacer spacing
      *
-     * @return the current number for the time spacers
+     * @return the current number of time spacers per second
      */
-    int getNumberOfTimeSpacers() const;
+    float getNumberOfTimeSpacers() const;
 
     //=========================================================================================================
     /**
@@ -466,7 +482,7 @@ inline qint32 FiffRawViewModel::absoluteFirstSample() const {
         return m_pFiffIO->m_qlistRaw[0]->first_samp;
     else
     {
-        qDebug() << "[FiffRawViewModel::firstSample] Raw list is empty, returning -1";
+        qWarning() << "[FiffRawViewModel::firstSample] Raw list is empty, returning -1";
         return -1;
     }
 }
@@ -484,7 +500,7 @@ inline qint32 FiffRawViewModel::absoluteLastSample() const {
         return m_pFiffIO->m_qlistRaw[0]->last_samp;
     else
     {
-        qDebug() << "[FiffRawViewModel::lastSample] Raw list is empty, returning -1";
+        qWarning() << "[FiffRawViewModel::lastSample] Raw list is empty, returning -1";
         return -1;
     }
 }
@@ -498,17 +514,13 @@ inline qint32 FiffRawViewModel::sampleWindowSize() const {
 //=============================================================================================================
 
 inline void FiffRawViewModel::setDataColumnWidth(int iWidth) {
-    qDebug() << "FiffRawViewModel::setDataColumnWidth - m_iVisibleWindowSize" << m_iVisibleWindowSize;
-    qDebug() << "FiffRawViewModel::setDataColumnWidth - m_iSamplesPerBlock" << m_iSamplesPerBlock;
-    qDebug() << "FiffRawViewModel::setDataColumnWidth - iWidth" << iWidth;
     m_dDx = (double)iWidth / double(m_iVisibleWindowSize*m_iSamplesPerBlock);
-    qDebug() << "FiffRawViewModel::setDataColumnWidth - m_dDx" << m_dDx;
+    qInfo() << "[FiffRawViewModel::setDataColumnWidth] m_dDx:" << m_dDx;
 }
 
 //=============================================================================================================
 
 inline double FiffRawViewModel::pixelDifference() const {
-    qDebug() << "Pixel Difference (m_dDx):" << m_dDx;
     return m_dDx;
 }
 
@@ -526,12 +538,6 @@ inline qint32 FiffRawViewModel::numVLines() const
     return (m_iVisibleWindowSize - 1);
 }
 
-//=============================================================================================================
-
-inline double FiffRawViewModel::getDx() const
-{
-    return m_dDx;
-}
 
 //=============================================================================================================
 // CHANNELDATA / CHANNELITERATOR DEFINITION
@@ -666,7 +672,7 @@ public:
     , m_iRowNumber(-1)
     , m_iNumSamples(0)
     {
-        qDebug() << "[FiffRawViewModel::ChannelData::ChannelData] WARNING: default constructor called, this is probably wrong ...";
+        qWarning() << "[FiffRawViewModel::ChannelData::ChannelData] WARNING: default constructor called, this is probably wrong ...";
     }
 
     // we need a public destructor in order to register this as QMetaType

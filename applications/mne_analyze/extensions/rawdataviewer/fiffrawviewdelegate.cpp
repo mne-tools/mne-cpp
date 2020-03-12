@@ -169,7 +169,7 @@ QSize FiffRawViewDelegate::sizeHint(const QStyleOptionViewItem &option,
             const FiffRawViewModel* pFiffRawModel = static_cast<const FiffRawViewModel*>(index.model());
             qint32 nsamples = pFiffRawModel->absoluteLastSample() - pFiffRawModel->absoluteFirstSample();
 
-            nsamples *= pFiffRawModel->getDx();
+            nsamples *= pFiffRawModel->pixelDifference();
 
             size = QSize(nsamples, option.rect.height());
 
@@ -211,7 +211,6 @@ void FiffRawViewDelegate::createPlotPath(const QStyleOptionViewItem &option,
             }
             break;
         }
-
         case FIFFV_REF_MEG_CH: {  /*11/04/14 Added by Limin: MEG reference channel */
             dMaxValue = 1e-11f;
             if(t_pModel->getScaling().contains(FIFF_UNIT_T))
@@ -251,18 +250,6 @@ void FiffRawViewDelegate::createPlotPath(const QStyleOptionViewItem &option,
     QPointF qSamplePosition;
     double dValue, newY;
 
-    int iPixelsToJump = 1;
-    if(dDx > 1.0) {
-        iPixelsToJump = dDx;
-    }
-
-    int iDataToJump = floor(1.0/dDx);
-    qDebug() << "FiffRawViewDelegate::createPlotPath - iDataToJump" << iDataToJump;
-    if(iDataToJump < 1) {
-        iDataToJump = 1;
-    }
-
-    qDebug() << "HERE HERE HERE -- Data size:" << data.size();
     for(int j = 0; j < data.size(); j++) {
         dValue = data[j] * dScaleY;
 
@@ -272,13 +259,6 @@ void FiffRawViewDelegate::createPlotPath(const QStyleOptionViewItem &option,
         qSamplePosition.setY(newY);
         qSamplePosition.setX(path.currentPosition().x() + dDx);
         path.lineTo(qSamplePosition);
-//        if ((j % 100) == 0) {
-//            float yStart = option.rect.topLeft().y();
-//            float yEnd = option.rect.bottomRight().y();
-//            path.moveTo(j,yStart);
-//            path.lineTo(j,yEnd);
-//        }
-
     }
 }
 
@@ -298,147 +278,20 @@ void FiffRawViewDelegate::createTimeSpacersPath(const QModelIndex &index,
                                                 ANSHAREDLIB::ChannelData &data) const
 {
     const FiffRawViewModel* t_pModel = static_cast<const FiffRawViewModel*>(index.model());
+
     double dDx = t_pModel->pixelDifference();
 
-//    if(t_pModel->getNumberOfTimeSpacers() > 0)
-//    {
-//        //vertical lines
-//        float distanceSec = (float (option.rect.width()) * t_pModel->getDx()) / (/*t_pModel->getDx() **/ (t_pModel->numVLines() + 1));
-//        float distanceSpacers = distanceSec/(t_pModel->getNumberOfTimeSpacers() + 1);
-//        qDebug() << "distanceSec:" << distanceSec;
-//        qDebug() << "distanceSpacers" << distanceSpacers;
+    float iSpacersPerSecond = t_pModel->getNumberOfTimeSpacers();
+    float fSampFreq = t_pModel->getFiffInfo()->sfreq;
+    float fTop = option.rect.topLeft().y();
+    float fBottom = option.rect.bottomRight().y();
 
-//        float yStart = option.rect.topLeft().y();
-
-//        float yEnd = option.rect.bottomRight().y();
-
-//        float linedraw = 0;
-
-//        for(qint8 t = 0; t < t_pModel->numVLines()+1; ++t) {
-//            linedraw += distanceSec;
-//            path.moveTo(linedraw,yStart);
-//            path.lineTo(linedraw,yEnd);
-//        }
-
-////        for(qint8 t = 0; t < t_pModel->numVLines()+1; ++t) {
-////            for(qint8 i = 0; i < t_pModel->getNumberOfTimeSpacers(); ++i) {
-////                float x = (distanceSec*t)+(distanceSpacers*(i+1));
-////                path.moveTo(x,yStart);
-////                path.lineTo(x,yEnd);
-////            }
-////        }
-//    }
-
-    qint32 kind = t_pModel->getKind(index.row());
-
-    double dMaxValue = 1.0e-10;
-
-    switch(kind) {
-        case FIFFV_MEG_CH: {
-            qint32 unit = t_pModel->getUnit(index.row());
-            if(unit == FIFF_UNIT_T_M) { //gradiometers
-                dMaxValue = 1e-10f;
-                if(t_pModel->getScaling().contains(FIFF_UNIT_T_M))
-                    dMaxValue = t_pModel->getScaling()[FIFF_UNIT_T_M];
-            }
-            else if(unit == FIFF_UNIT_T) {//magnetometers
-                dMaxValue = 1e-11f;
-                if(t_pModel->getScaling().contains(FIFF_UNIT_T))
-                    dMaxValue = t_pModel->getScaling()[FIFF_UNIT_T];
-            }
-            break;
-        }
-
-        case FIFFV_REF_MEG_CH: {  /*11/04/14 Added by Limin: MEG reference channel */
-            dMaxValue = 1e-11f;
-            if(t_pModel->getScaling().contains(FIFF_UNIT_T))
-                dMaxValue = t_pModel->getScaling()[FIFF_UNIT_T];
-            break;
-        }
-        case FIFFV_EEG_CH: {
-            dMaxValue = 1e-4f;
-            if(t_pModel->getScaling().contains(FIFFV_EEG_CH))
-                dMaxValue = t_pModel->getScaling()[FIFFV_EEG_CH];
-            break;
-        }
-        case FIFFV_EOG_CH: {
-            dMaxValue = 1e-3f;
-            if(t_pModel->getScaling().contains(FIFFV_EOG_CH))
-                dMaxValue = t_pModel->getScaling()[FIFFV_EOG_CH];
-            break;
-        }
-        case FIFFV_STIM_CH: {
-            dMaxValue = 5;
-            if(t_pModel->getScaling().contains(FIFFV_STIM_CH))
-                dMaxValue = t_pModel->getScaling()[FIFFV_STIM_CH];
-            break;
-        }
-        case FIFFV_MISC_CH: {
-            dMaxValue = 1e-3f;
-            if(t_pModel->getScaling().contains(FIFFV_MISC_CH))
-                dMaxValue = t_pModel->getScaling()[FIFFV_MISC_CH];
-            break;
-        }
-    }
-
-    double dScaleY = option.rect.height()/(2*dMaxValue);
-
-    double y_base = path.currentPosition().y();
-
-    QPointF qSamplePosition;
-    double dValue, newY;
-
-    int iPixelsToJump = 1;
-    if(dDx > 1.0) {
-        iPixelsToJump = dDx;
-    }
-
-    int iDataToJump = floor(1.0/dDx);
-    //qDebug() << "FiffRawViewDelegate::createPlotPath - iDataToJump" << iDataToJump;
-    if(iDataToJump < 1) {
-        iDataToJump = 1;
-    }
-
-    int param = t_pModel->getNumberOfTimeSpacers();
-    int freqparam = t_pModel->getFiffInfo()->sfreq;
-    float yStart = option.rect.topLeft().y();
-    float yEnd = option.rect.bottomRight().y();
-    //qDebug() << "HERE HERE HERE -- Data size:" << data.size();
     for(int j = 0; j < data.size(); j++) {
-//        dValue = data[j] * dScaleY;
+        //draw vertical line
+        path.moveTo(path.currentPosition().x(), fTop);
+        path.lineTo(path.currentPosition().x(), fBottom);
 
-//        //Reverse direction -> plot the right way
-//        newY = y_base - dValue;
-
-//        qSamplePosition.setY(newY);
-//        qSamplePosition.setX(path.currentPosition().x() + dDx);
-//        path.lineTo(qSamplePosition);
-//        float yStart = option.rect.topLeft().y();
-//        float yEnd = option.rect.bottomRight().y();
-
-//        if ((j % param) == 0) {
-
-//            path.moveTo(path.currentPosition().x(), yStart);
-//            path.lineTo(path.currentPosition().x(), yEnd);
-//        }
-
-
-//        path.moveTo(path.currentPosition().x() + dDx, yStart);
-
-        path.moveTo(path.currentPosition().x(), yStart);
-        path.lineTo(path.currentPosition().x(), yEnd);
-
-        path.moveTo(path.currentPosition().x() + ((dDx * freqparam) / (1000 / param)), yStart);
-
-
+        //jump to next place to draw
+        path.moveTo(path.currentPosition().x() + ((dDx * fSampFreq) / iSpacersPerSecond), fTop);
     }
-//    int count = 0;
-
-
-//    while(count < data.size()) {
-
-
-//        count++;
-//    }
-
 }

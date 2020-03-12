@@ -132,7 +132,7 @@ void RawDataViewer::onNewModelAvalible(QSharedPointer<AbstractModel> pNewModel)
     if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
         m_pRawModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
         m_pFiffRawView->initMVCSettings(m_pRawModel, m_pRawDelegate);
-        qDebug() << "[RawDataViewer::onNewModelAvailable] New model added; " << pNewModel->getModelPath();
+        qInfo() << "[RawDataViewer::onNewModelAvailable] New model added; " << pNewModel->getModelPath();
 
         setUpControls();
     }
@@ -194,7 +194,7 @@ void RawDataViewer::handleEvent(QSharedPointer<Event> e)
         m_pSubWindow->resize(800, 600);
         break;
     default:
-        qDebug() << "[RawDataViewer::handleEvent] Received an Event that is not handled by switch cases.";
+        qWarning() << "[RawDataViewer::handleEvent] Received an Event that is not handled by switch cases.";
     }
 }
 
@@ -231,6 +231,7 @@ void RawDataViewer::setUpControls()
     connect(viewWidget, &DISPLIB::FiffRawViewSettings::makeScreenshot,
             m_pFiffRawView.data(), &FiffRawView::onMakeScreenshot);
 
+    //Init view widget (preserved between session)
     m_pFiffRawView->setWindowSize(viewWidget->getWindowSize());
     m_pFiffRawView->setSignalColor(viewWidget->getSignalColor());
     m_pFiffRawView->setBackgroundColor(viewWidget->getBackgroundColor());
