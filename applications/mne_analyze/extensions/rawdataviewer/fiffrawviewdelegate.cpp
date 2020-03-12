@@ -399,6 +399,10 @@ void FiffRawViewDelegate::createTimeSpacersPath(const QModelIndex &index,
         iDataToJump = 1;
     }
 
+    int param = t_pModel->getNumberOfTimeSpacers();
+    int freqparam = t_pModel->getFiffInfo()->sfreq;
+    float yStart = option.rect.topLeft().y();
+    float yEnd = option.rect.bottomRight().y();
     //qDebug() << "HERE HERE HERE -- Data size:" << data.size();
     for(int j = 0; j < data.size(); j++) {
 //        dValue = data[j] * dScaleY;
@@ -409,16 +413,32 @@ void FiffRawViewDelegate::createTimeSpacersPath(const QModelIndex &index,
 //        qSamplePosition.setY(newY);
 //        qSamplePosition.setX(path.currentPosition().x() + dDx);
 //        path.lineTo(qSamplePosition);
-        float yStart = option.rect.topLeft().y();
-        float yEnd = option.rect.bottomRight().y();
+//        float yStart = option.rect.topLeft().y();
+//        float yEnd = option.rect.bottomRight().y();
 
-        if ((j % 100) == 0) {
+//        if ((j % param) == 0) {
 
-            path.moveTo(path.currentPosition().x() + dDx, yStart);
-            path.lineTo(path.currentPosition().x(), yEnd);
-        } else {
-            path.moveTo(path.currentPosition().x() + dDx, yStart);
-        }
+//            path.moveTo(path.currentPosition().x(), yStart);
+//            path.lineTo(path.currentPosition().x(), yEnd);
+//        }
+
+
+//        path.moveTo(path.currentPosition().x() + dDx, yStart);
+
+        path.moveTo(path.currentPosition().x(), yStart);
+        path.lineTo(path.currentPosition().x(), yEnd);
+
+        path.moveTo(path.currentPosition().x() + ((dDx * freqparam) / (1000 / param)), yStart);
+
+
     }
+//    int count = 0;
+
+
+//    while(count < data.size()) {
+
+
+//        count++;
+//    }
 
 }
