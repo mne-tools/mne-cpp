@@ -287,7 +287,6 @@ public:
      * @param [in] bUseUnitGain Flag for using the channels unit gain. Defined by the user via the GUI.
      * @param [in] bUseUnitOffset Flag for using the channels unit offset. Defined by the user via the GUI.
      * @param [in] bWriteDriverDebugToFile Flag for writing driver debug information to a file. Defined by the user via the GUI.
-     * @param [in] sOutpuFilePath Holds the path for the output file. Defined by the user via the GUI.
      * @param [out] bool returns true if device was successfully initialised, false otherwise.
      * @param [in] bUseCommonAverage Flag for using common average when recording EEG data. Defined by the user via the GUI.
      * @param [in] bMeasureImpedance Flag for measuring impedances.
@@ -299,7 +298,6 @@ public:
                     bool bUseUnitGain,
                     bool bUseUnitOffset,
                     bool bWriteDriverDebugToFile,
-                    QString sOutpuFilePath,
                     bool bUseCommonAverage,
                     bool bMeasureImpedance);
 
@@ -326,7 +324,6 @@ private:
     bool                m_bUseUnitOffset;               /**< Flag for using the channels unit offset. Defined by the user via the GUI.*/
     bool                m_bWriteDriverDebugToFile;      /**< Flag for for writing driver debug informstions to a file. Defined by the user via the GUI.*/
     bool                m_bUsePreprocessing;            /**< Flag for using preprocessing actions for the EEG data. Defined by the user via the GUI.*/
-    QString             m_sOutputFilePath;              /**< Holds the path for the output file. Defined by the user via the GUI.*/
     bool                m_bUseCommonAverage;            /**< Flag for using common average.*/
     bool                m_bMeasureImpedances;           /**< Flag for impedance measuring mode.*/
 

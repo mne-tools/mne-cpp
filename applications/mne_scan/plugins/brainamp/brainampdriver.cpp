@@ -63,7 +63,6 @@ BrainAMPDriver::BrainAMPDriver(BrainAMPProducer* pBrainAmpProducer)
 , m_bInitDeviceSuccess(false)
 , m_uiSamplingFrequency(1000)
 , m_uiSamplesPerBlock(200)
-, m_sOutputFilePath("/resources/mne_scan/plugins/brainamp")
 , DeviceAmp(INVALID_HANDLE_VALUE)
 , UsbDevice(false)
 , DriverVersion(0)
@@ -79,13 +78,8 @@ BrainAMPDriver::~BrainAMPDriver()
 //=============================================================================================================
 
 bool BrainAMPDriver::initDevice(int iSamplesPerBlock,
-                            int iSamplingFrequency,
-                            QString sOutpuFilePath,
-                            bool bMeasureImpedance)
+                                int iSamplingFrequency)
 {
-    Q_UNUSED(sOutpuFilePath);
-    Q_UNUSED(bMeasureImpedance);
-
     m_uiSamplesPerBlock = iSamplesPerBlock;
     m_uiSamplingFrequency = iSamplingFrequency;
     m_uiDownsample = 1; //no downsample

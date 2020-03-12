@@ -77,7 +77,6 @@ void TMSIProducer::start(int iNumberOfChannels,
                          bool bUseUnitGain,
                          bool bUseUnitOffset,
                          bool bWriteDriverDebugToFile,
-                         QString sOutputFilePath,
                          bool bUseCommonAverage,
                          bool bMeasureImpedance)
 {
@@ -89,7 +88,6 @@ void TMSIProducer::start(int iNumberOfChannels,
                               bUseUnitGain,
                               bUseUnitOffset,
                               bWriteDriverDebugToFile,
-                              sOutputFilePath,
                               bUseCommonAverage,
                               bMeasureImpedance)) {
         QThread::start();

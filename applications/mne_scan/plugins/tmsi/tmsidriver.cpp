@@ -61,7 +61,6 @@ TMSIDriver::TMSIDriver(TMSIProducer* pTMSIProducer)
 , m_bUseUnitGain(false)
 , m_bUseUnitOffset(false)
 , m_bWriteDriverDebugToFile(false)
-, m_sOutputFilePath("/resources/mne_scan/plugins/tmsi")
 , m_bUseCommonAverage(false)
 , m_bMeasureImpedances(false)
 {
@@ -131,7 +130,6 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
                             bool bUseUnitGain,
                             bool bUseUnitOffset,
                             bool bWriteDriverDebugToFile,
-                            QString sOutpuFilePath,
                             bool bUseCommonAverage,
                             bool bMeasureImpedance)
 {
@@ -147,7 +145,6 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
     m_bUseUnitGain = bUseUnitGain;
     m_bUseUnitOffset = bUseUnitOffset;
     m_bWriteDriverDebugToFile = bWriteDriverDebugToFile;
-    m_sOutputFilePath = sOutpuFilePath;
     m_bUseCommonAverage = bUseCommonAverage;
     m_bMeasureImpedances = bMeasureImpedance;
 
