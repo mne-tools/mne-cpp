@@ -298,8 +298,9 @@ void Hpi::run()
 void Hpi::setRecordingTimerChanged(int timeMSecs)
 {
     //If the recording time is changed during the recording, change the timer
-    if(m_bHpi)
+    if(m_bHpi) {
         m_pRecordTimer->setInterval(timeMSecs-m_recordingStartedTime.elapsed());
+    }
 
     m_iRecordingMSeconds = timeMSecs;
 }
