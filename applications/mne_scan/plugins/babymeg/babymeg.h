@@ -280,51 +280,9 @@ protected:
 
     //=========================================================================================================
     /**
-     * Set the recording time in seconds.
-     *
-     * @param[in] time   the new recording time.
-     */
-    void setRecordingTimerChanged(int timeMSecs);
-
-    //=========================================================================================================
-    /**
-     * Set the recording time active flag.
-     *
-     * @param[in] state   whether the recording should be used or not.
-     */
-    void setRecordingTimerStateChanged(bool state);
-
-    //=========================================================================================================
-    /**
-     * Set the final file name including its full path.
-     *
-     * @param[in] sFileName   The new file name.
-     */
-    void setFileName(const QString& sFileName);
-
-    //=========================================================================================================
-    /**
-     * Shows the project dialog/window.
-     */
-    void showProjectDialog();
-
-    //=========================================================================================================
-    /**
      * Shows the project squid control dialog.
      */
     void showSqdCtrlDialog();
-
-    //=========================================================================================================
-    /**
-     * Determines current file. And starts a new one.
-     */
-    void splitRecordingFile();
-
-    //=========================================================================================================
-    /**
-     * Starts or stops a file recording depending on the current recording state.
-     */
-    void toggleRecordingFile();
 
     //=========================================================================================================
     /**
@@ -366,18 +324,6 @@ protected:
      */
     bool readBadChannels();
 
-    //=========================================================================================================
-    /**
-     * change recording button.
-     */
-    void changeRecordingButton();
-
-    //=========================================================================================================
-    /**
-     * This function sends the current remaining recording time to the project window.
-     */
-    void onRecordingRemainingTimeChange();
-
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pRTMSABabyMEG;    /**< The RealTimeMultiSampleArray to provide the rt_server Channels.*/
 
     QSharedPointer<IOBUFFER::CircularBuffer_Matrix_float>                    m_pCircularBuffer;  /**< Holds incoming raw data. */
@@ -385,41 +331,25 @@ protected:
     QSharedPointer<BabyMEGClient>                   m_pMyClient;                    /**< TCP/IP communication between Qt and Labview. */
     QSharedPointer<BabyMEGClient>                   m_pMyClientComm;                /**< TCP/IP communication between Qt and Labview - communication. */
     QSharedPointer<BabyMEGInfo>                     m_pInfo;                        /**< Set up the babyMEG info. */
-    QSharedPointer<DISPLIB::ProjectSettingsView>    m_pProjectSettingsView;         /**< Window to setup the recording tiem and fiel name. */
     QSharedPointer<BabyMEGSQUIDControlDgl>          m_pSQUIDCtrlDlg;                /**< Nonmodal dialog for squid control. */
     QSharedPointer<DISP3DLIB::HpiView>              m_pHPIWidget;                   /**< HPI widget. */
-
-    QSharedPointer<QTimer>                  m_pUpdateTimeInfoTimer;         /**< timer to control remaining time. */
-    QSharedPointer<QTimer>                  m_pBlinkingRecordButtonTimer;   /**< timer to control blinking recording button. */
-    QSharedPointer<QTimer>                  m_pRecordTimer;                 /**< timer to control recording time. */
 
     QList<int>                              m_lTriggerChannelIndices;       /**< List of all trigger channel indices. */
 
     FIFFLIB::FiffInfo::SPtr                 m_pFiffInfo;                    /**< Fiff measurement info.*/
-    FIFFLIB::FiffStream::SPtr               m_pOutfid;                      /**< FiffStream to write to.*/
 
-    qint16                                  m_iBlinkStatus;                 /**< The blink status of the recording button.*/
     qint32                                  m_iBufferSize;                  /**< The raw data buffer size.*/
-    qint32                                  m_iSplitCount;                  /**< File split count */
-    int                                     m_iRecordingMSeconds;           /**< Recording length in mseconds.*/
 
-    bool                                    m_bWriteToFile;                 /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
-    bool                                    m_bUseRecordTimer;              /**< Flag whether to use data recording timer.*/
     bool                                    m_bDoContinousHPI;              /**< Whether to do continous HPI.*/
-    QString                                 m_sRecordFile;                  /**< Current record file. */
     QString                                 m_sFiffProjections;             /**< Fiff projection information */
     QString                                 m_sFiffCompensators;            /**< Fiff compensator information */
     QString                                 m_sBadChannels;                 /**< Filename which contains a list of bad channels */
 
-    QFile                                   m_qFileOut;                     /**< QFile for writing to fif file.*/
     QMutex                                  m_mutex;                        /**< Mutex to guarantee thread safety.*/
-    QTime                                   m_recordingStartedTime;         /**< The time when the recording started.*/
 
     Eigen::RowVectorXd                      m_cals;                         /**< Calibration vector.*/
     Eigen::SparseMatrix<double>             m_sparseMatCals;                /**< Sparse calibration matrix.*/
 
-    QPointer<QAction>                       m_pActionSetupProject;          /**< shows setup project dialog */
-    QPointer<QAction>                       m_pActionRecordFile;            /**< start recording action */
     QPointer<QAction>                       m_pActionSqdCtrl;               /**< show squid control */
     QPointer<QAction>                       m_pActionUpdateFiffInfo;        /**< Update Fiff Info action */
     QPointer<QAction>                       m_pActionComputeHPI;            /**< The Action to show the HPI view */
