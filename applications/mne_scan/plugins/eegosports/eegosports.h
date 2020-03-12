@@ -217,18 +217,6 @@ protected:
 
     //=========================================================================================================
     /**
-     * Starts data recording
-     */
-    void showStartRecording();
-
-    //=========================================================================================================
-    /**
-     * Implements blinking recording button
-     */
-    void changeRecordingButton();
-
-    //=========================================================================================================
-    /**
     * The starting point for the thread. After calling start(), the newly created thread calls this function.
     * Returning from this method will end the execution of the thread.
     * Pure virtual method inherited by QThread.
@@ -254,25 +242,18 @@ private:
     double                              m_dRPAShift;                        /**< The shift in m in to generate the RPA.*/
     double                              m_dNasionShift;                     /**< The shift in m in to generate the Nasion.*/
 
-    bool                                m_bWriteToFile;                     /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
     bool                                m_bWriteDriverDebugToFile;          /**< Flag for for writing driver debug informstions to a file. Defined by the user via the GUI.*/
     bool                                m_bCheckImpedances;                 /**< Flag for checking the impedances of the EEG amplifier.*/
     bool                                m_bUseTrackedCardinalMode;          /**< Flag for using the tracked cardinal mode.*/
     bool                                m_bUseElectrodeShiftMode;           /**< Flag for using the electrode shift mode.*/
 
-    std::ofstream                       m_outputFileStream;                 /**< fstream for writing the samples values to txt file.*/
-
-    QString                             m_sOutputFilePath;                  /**< Holds the path for the sample output file. Defined by the user via the GUI.*/
     QString                             m_sElcFilePath;                     /**< Holds the path for the .elc file (electrode positions). Defined by the user via the GUI.*/
     QString                             m_sCardinalFilePath;                /**< Holds the path for the .elc file holding the cardinals/fiducials (electrode positions). Defined by the user via the GUI.*/
     QString                             m_sLPA;                             /**< The electrode to take to function as the LPA.*/
     QString                             m_sRPA;                             /**< The electrode to take to function as the RPA.*/
     QString                             m_sNasion;                          /**< The electrode to take to function as the Nasion.*/
 
-    QFile                               m_fileOut;                          /**< QFile for writing to fif file.*/
-    QSharedPointer<FIFFLIB::FiffStream> m_pOutfid;                          /**< QFile for writing to fif file.*/
     QSharedPointer<FIFFLIB::FiffInfo>   m_pFiffInfo;                        /**< Fiff measurement info.*/
-    Eigen::RowVectorXd                  m_cals;
 
     QSharedPointer<EEGoSportsProducer>  m_pEEGoSportsProducer;              /**< The EEGoSportsProducer.*/
 
@@ -280,10 +261,6 @@ private:
 
     QAction*                            m_pActionImpedance;                 /**< shows impedance widget */
     QAction*                            m_pActionSetupProject;              /**< Shows setup project dialog */
-    QAction*                            m_pActionStartRecording;            /**< Starts to record data */
-
-    QSharedPointer<QTimer>              m_pTimerRecordingChange;            /**< Timer to control blinking of the recording icon */
-    qint16                              m_iBlinkStatus;                     /**< Flag for recording icon blinking */
 };
 } // NAMESPACE
 

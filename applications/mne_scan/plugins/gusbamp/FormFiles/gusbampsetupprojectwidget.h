@@ -84,7 +84,8 @@ public:
      * @param [in] parent pointer to parent widget; If parent is 0, the new TMSISetupProjectWidget becomes a window. If parent is another widget, TMSISetupWidget becomes a child window inside parent. TMSISetupWidget is deleted when its parent is deleted.
      * @param [in] pTMSI a pointer to the corresponding ECGSimulator.
      */
-    explicit GUSBAmpSetupProjectWidget(GUSBAmp* pGUSBAmp, QWidget *parent = 0);
+    explicit GUSBAmpSetupProjectWidget(GUSBAmp* pGUSBAmp,
+                                       QWidget *parent = 0);
 
     //=========================================================================================================
     /**
@@ -103,38 +104,10 @@ public:
 private:
     //=========================================================================================================
     /**
-     * Sets the project dir
-     *
-     */
-    void addProject();
-
-    //=========================================================================================================
-    /**
-     * Sets the subject dir
-     *
-     */
-    void addSubject();
-
-    //=========================================================================================================
-    /**
-     * Sets the dir where the output file is saved
-     *
-     */
-    void changeOutputFile();
-
-    //=========================================================================================================
-    /**
      * Sets the dir where the eeg cap file is located
      *
      */
     void changeCap();
-
-    //=========================================================================================================
-    /**
-     * Generates new file path based onthe project and subject parameters
-     *
-     */
-    void generateFilePath(int index = 0);
 
     //=========================================================================================================
     /**

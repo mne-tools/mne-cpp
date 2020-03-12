@@ -85,7 +85,8 @@ public:
      * @param [in] parent pointer to parent widget; If parent is 0, the new BrainAMPSetupProjectWidget becomes a window. If parent is another widget, BrainAMPSetupWidget becomes a child window inside parent. BrainAMPSetupWidget is deleted when its parent is deleted.
      * @param [in] pBrainAMP a pointer to the corresponding ECGSimulator.
      */
-    explicit BrainAMPSetupProjectWidget(BrainAMP* pBrainAMP, QWidget *parent = 0);
+    explicit BrainAMPSetupProjectWidget(BrainAMP* pBrainAMP,
+                                        QWidget *parent = 0);
 
     //=========================================================================================================
     /**
@@ -127,24 +128,6 @@ private:
 
     //=========================================================================================================
     /**
-     * Sets the project dir
-     */
-    void addProject();
-
-    //=========================================================================================================
-    /**
-     * Sets the subject dir
-     */
-    void addSubject();
-
-    //=========================================================================================================
-    /**
-     * Sets the dir where the output file is saved
-     */
-    void changeOutputFile();
-
-    //=========================================================================================================
-    /**
      * Sets the dir where the eeg cap file is located
      */
     void changeCap();
@@ -154,12 +137,6 @@ private:
      * Sets the dir where the cardinal file is located
      */
     void changeCardinalFile();
-
-    //=========================================================================================================
-    /**
-     * Generates new file path based onthe project and subject parameters
-     */
-    void generateFilePath(int index = 0);
 
     //=========================================================================================================
     /**
@@ -179,7 +156,12 @@ signals:
      * @param[in] sNasion    The channel name to take as the Nasion.
      * @param[in] dNasion    The amount (in m) to translate the Nasion channel position on the z axis.
      */
-    void cardinalPointsChanged(const QString& sLPA, double dLPA, const QString& sRPA, double dRPA, const QString& sNasion, double dNasion);
+    void cardinalPointsChanged(const QString& sLPA,
+                               double dLPA,
+                               const QString& sRPA,
+                               double dRPA,
+                               const QString& sNasion,
+                               double dNasion);
 };
 } // NAMESPACE
 

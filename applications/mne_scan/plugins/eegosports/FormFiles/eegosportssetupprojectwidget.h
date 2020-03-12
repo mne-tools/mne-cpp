@@ -129,24 +129,6 @@ private:
 
     //=========================================================================================================
     /**
-     * Sets the project dir
-     */
-    void addProject();
-
-    //=========================================================================================================
-    /**
-     * Sets the subject dir
-     */
-    void addSubject();
-
-    //=========================================================================================================
-    /**
-     * Sets the dir where the output file is saved
-     */
-    void changeOutputFile();
-
-    //=========================================================================================================
-    /**
      * Sets the dir where the eeg cap file is located
      */
     void changeCap();
@@ -156,12 +138,6 @@ private:
      * Sets the dir where the cardinal file is located
      */
     void changeCardinalFile();
-
-    //=========================================================================================================
-    /**
-     * Generates new file path based onthe project and subject parameters
-     */
-    void generateFilePath(int index = 0);
 
     //=========================================================================================================
     /**

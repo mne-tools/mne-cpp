@@ -98,13 +98,9 @@ public:
      * Starts the BrainAMPProducer by starting the producer's thread and initialising the device.
      * @param [in] iSamplesPerBlock The samples per block defined by the user via the GUI.
      * @param [in] iSamplingFrequency The sampling frequency defined by the user via the GUI (in Hertz).
-     * @param [in] sOutpuFilePath Holds the path for the output file. Defined by the user via the GUI.
-     * @param [in] bMeasureImpedance Flag for measuring impedances.
      */
     virtual void start(int iSamplesPerBlock,
-                       int iSamplingFrequency,
-                       QString sOutputFilePath,
-                       bool bMeasureImpedance);
+                       int iSamplingFrequency);
 
     //=========================================================================================================
     /**

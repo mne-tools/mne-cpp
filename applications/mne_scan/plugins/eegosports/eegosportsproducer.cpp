@@ -77,12 +77,10 @@ EEGoSportsProducer::~EEGoSportsProducer()
 //=============================================================================================================
 
 bool EEGoSportsProducer::init(bool bWriteDriverDebugToFile,
-                              const QString& sOutputFilePath,
                               bool bMeasureImpedance)
 {
     //Initialise device
     if(m_pEEGoSportsDriver->initDevice(bWriteDriverDebugToFile,
-                                       sOutputFilePath,
                                        bMeasureImpedance)) {
         m_bIsConnected = true;
     } else {
@@ -91,7 +89,9 @@ bool EEGoSportsProducer::init(bool bWriteDriverDebugToFile,
     }
 
     //Return number of channels
-    m_pEEGoSports->setNumberOfChannels(m_pEEGoSportsDriver->getNumberOfChannels(),m_pEEGoSportsDriver->getNumberOfEEGChannels(),m_pEEGoSportsDriver->getNumberOfBipolarChannels());
+    m_pEEGoSports->setNumberOfChannels(m_pEEGoSportsDriver->getNumberOfChannels(),
+                                       m_pEEGoSportsDriver->getNumberOfEEGChannels(),
+                                       m_pEEGoSportsDriver->getNumberOfBipolarChannels());
 
     return true;
 }

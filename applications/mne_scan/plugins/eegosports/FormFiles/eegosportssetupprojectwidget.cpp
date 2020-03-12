@@ -69,37 +69,34 @@ EEGoSportsSetupProjectWidget::EEGoSportsSetupProjectWidget(EEGoSports* pEEGoSpor
 {
     m_pUi->setupUi(this);
 
-    // Connect write to file options
-    connect(m_pUi->m_qPushButton_NewProject, &QPushButton::released, this, &EEGoSportsSetupProjectWidget::addProject);
-    connect(m_pUi->m_qPushButton_NewSubject, &QPushButton::released, this, &EEGoSportsSetupProjectWidget::addSubject);
-    connect(m_pUi->m_qPushButton_FiffRecordFile, &QPushButton::released, this, &EEGoSportsSetupProjectWidget::changeOutputFile);
-
-    // Connect drop down menus
-    connect(m_pUi->m_qComboBox_SubjectSelection, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, &EEGoSportsSetupProjectWidget::generateFilePath);
-    connect(m_pUi->m_qComboBox_ProjectSelection, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, &EEGoSportsSetupProjectWidget::generateFilePath);
-
     // Connect EEG hat
-    connect(m_pUi->m_qPushButton_EEGCap, &QPushButton::released, this, &EEGoSportsSetupProjectWidget::changeCap);
-    connect(m_pUi->m_qLineEdit_EEGCap, &QLineEdit::textChanged, this, &EEGoSportsSetupProjectWidget::updateCardinalComboBoxes);
+    connect(m_pUi->m_qPushButton_EEGCap, &QPushButton::released,
+            this, &EEGoSportsSetupProjectWidget::changeCap);
+    connect(m_pUi->m_qLineEdit_EEGCap, &QLineEdit::textChanged,
+            this, &EEGoSportsSetupProjectWidget::updateCardinalComboBoxes);
 
     // Connect cardinal combo boxes and shift spin boxes
-    connect(m_pUi->m_comboBox_cardinalMode, &QComboBox::currentTextChanged, this, &EEGoSportsSetupProjectWidget::changeCardinalMode);
+    connect(m_pUi->m_comboBox_cardinalMode, &QComboBox::currentTextChanged,
+            this, &EEGoSportsSetupProjectWidget::changeCardinalMode);
 
-    connect(m_pUi->m_comboBox_LPA, &QComboBox::currentTextChanged, this, &EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged);
-    connect(m_pUi->m_comboBox_RPA, &QComboBox::currentTextChanged, this, &EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged);
-    connect(m_pUi->m_comboBox_Nasion, &QComboBox::currentTextChanged, this, &EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged);
-    connect(m_pUi->m_doubleSpinBox_LPA, &QDoubleSpinBox::editingFinished, this, &EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged);
-    connect(m_pUi->m_doubleSpinBox_RPA, &QDoubleSpinBox::editingFinished, this, &EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged);
-    connect(m_pUi->m_doubleSpinBox_Nasion, &QDoubleSpinBox::editingFinished, this, &EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged);
+    connect(m_pUi->m_comboBox_LPA, &QComboBox::currentTextChanged,
+            this, &EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged);
+    connect(m_pUi->m_comboBox_RPA, &QComboBox::currentTextChanged,
+            this, &EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged);
+    connect(m_pUi->m_comboBox_Nasion, &QComboBox::currentTextChanged,
+            this, &EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged);
+    connect(m_pUi->m_doubleSpinBox_LPA, &QDoubleSpinBox::editingFinished,
+            this, &EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged);
+    connect(m_pUi->m_doubleSpinBox_RPA, &QDoubleSpinBox::editingFinished,
+            this, &EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged);
+    connect(m_pUi->m_doubleSpinBox_Nasion, &QDoubleSpinBox::editingFinished,
+            this, &EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged);
 
-    connect(m_pUi->m_pushButton_cardinalFile, &QPushButton::released, this, &EEGoSportsSetupProjectWidget::changeCardinalFile);
+    connect(m_pUi->m_pushButton_cardinalFile, &QPushButton::released,
+            this, &EEGoSportsSetupProjectWidget::changeCardinalFile);
 
     // Connect QLineEdit's
     connect(m_pUi->m_qLineEdit_EEGCap, static_cast<void (QLineEdit::*)(const QString &)>(&QLineEdit::textEdited),
-            this, &EEGoSportsSetupProjectWidget::changeQLineEdits);
-    connect(m_pUi->m_qLineEdit_FiffRecordFile, static_cast<void (QLineEdit::*)(const QString &)>(&QLineEdit::textEdited),
             this, &EEGoSportsSetupProjectWidget::changeQLineEdits);
 
     initGui();
@@ -116,9 +113,6 @@ EEGoSportsSetupProjectWidget::~EEGoSportsSetupProjectWidget()
 
 void EEGoSportsSetupProjectWidget::initGui()
 {
-    // Init output file path
-    m_pUi->m_qLineEdit_FiffRecordFile->setText(m_pEEGoSports->m_sOutputFilePath);
-
     // Init location of layout file
     m_pUi->m_qLineEdit_EEGCap->setText(m_pEEGoSports->m_sElcFilePath);
 
@@ -133,15 +127,6 @@ void EEGoSportsSetupProjectWidget::initGui()
     m_pUi->m_comboBox_Nasion->setCurrentText(m_pEEGoSports->m_sNasion);
 
     m_pUi->m_lineEdit_cardinalFile->setText(m_pEEGoSports->m_sCardinalFilePath);
-
-    // Init project and subject menus
-    m_pUi->m_qComboBox_ProjectSelection->addItem("Sequence_01");
-    m_pUi->m_qComboBox_SubjectSelection->addItem("Subject_01");
-    m_pUi->m_qComboBox_ProjectSelection->addItem("Sequence_02");
-    m_pUi->m_qComboBox_SubjectSelection->addItem("Subject_02");
-
-    // Init file name
-    generateFilePath();
 
     //Init cardinal support
     if(m_pEEGoSports->m_bUseTrackedCardinalMode) {
@@ -233,57 +218,6 @@ void EEGoSportsSetupProjectWidget::updateCardinalComboBoxes(const QString& sPath
     m_pUi->m_comboBox_Nasion->addItems(elcChannelNames);
 }
 
-//=============================================================================================================
-
-void EEGoSportsSetupProjectWidget::addProject()
-{
-    QString path = QFileDialog::getExistingDirectory(this, tr("Open Project Directory"),
-                                                     m_pEEGoSports->m_qStringResourcePath,
-                                                     QFileDialog::ShowDirsOnly
-                                                     | QFileDialog::DontResolveSymlinks);
-
-    // Split string to get created or existing target dir with the name of the project
-    QStringList list = path.split("/");
-
-    // Add to combo box
-    m_pUi->m_qComboBox_ProjectSelection->addItem(list.at(list.size()-1));
-    m_pUi->m_qComboBox_ProjectSelection->setCurrentIndex(m_pUi->m_qComboBox_ProjectSelection->count()-1);
-}
-
-//=============================================================================================================
-
-void EEGoSportsSetupProjectWidget::addSubject()
-{
-    QString path = QFileDialog::getExistingDirectory(this, tr("Open Subject Directory"),
-                                                     m_pEEGoSports->m_qStringResourcePath,
-                                                     QFileDialog::ShowDirsOnly
-                                                     | QFileDialog::DontResolveSymlinks);
-
-    // Split string to get created or existing target dir with the name of the project
-    QStringList list = path.split("/");
-
-    // Add to combo box
-    m_pUi->m_qComboBox_SubjectSelection->addItem(list.at(list.size()-1));
-    m_pUi->m_qComboBox_SubjectSelection->setCurrentIndex(m_pUi->m_qComboBox_SubjectSelection->count()-1);
-}
-
-//=============================================================================================================
-
-void EEGoSportsSetupProjectWidget::changeOutputFile()
-{
-    QString path = QFileDialog::getSaveFileName(
-                this,
-                "Save to fif file",
-                "resources/mne_scan/plugins/eegosports/EEG_data_001_raw.fif",
-                 tr("Fif files (*.fif)"));
-
-    if(path==NULL){
-        path = m_pUi->m_qLineEdit_FiffRecordFile->text();
-    }
-
-    m_pUi->m_qLineEdit_FiffRecordFile->setText(path);
-    m_pEEGoSports->m_sOutputFilePath = m_pUi->m_qLineEdit_FiffRecordFile->text();
-}
 
 //=============================================================================================================
 
@@ -320,30 +254,7 @@ void EEGoSportsSetupProjectWidget::changeCardinalFile()
 
 //=============================================================================================================
 
-void EEGoSportsSetupProjectWidget::generateFilePath(int index)
-{
-    Q_UNUSED(index);
-
-    // Generate file name with timestamp
-    QDate date;
-    QString fileName = QString ("%1_%2_%3_EEG_001_raw.fif").arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day());
-
-    // Append new file name, subject and project
-    QString resourcePath = m_pEEGoSports->m_qStringResourcePath;
-    resourcePath.append(m_pUi->m_qComboBox_ProjectSelection->currentText());
-    resourcePath.append("/");
-    resourcePath.append(m_pUi->m_qComboBox_SubjectSelection->currentText());
-    resourcePath.append("/");
-    resourcePath.append(fileName);
-
-    m_pUi->m_qLineEdit_FiffRecordFile->setText(resourcePath);
-    m_pEEGoSports->m_sOutputFilePath = resourcePath;
-}
-
-//=============================================================================================================
-
 void EEGoSportsSetupProjectWidget::changeQLineEdits()
 {
     m_pEEGoSports->m_sElcFilePath = m_pUi->m_qLineEdit_EEGCap->text();
-    m_pEEGoSports->m_sOutputFilePath = m_pUi->m_qLineEdit_FiffRecordFile->text();
 }

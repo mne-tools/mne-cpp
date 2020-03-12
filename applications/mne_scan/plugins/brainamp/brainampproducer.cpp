@@ -80,21 +80,16 @@ BrainAMPProducer::~BrainAMPProducer()
 //=============================================================================================================
 
 void BrainAMPProducer::start(int iSamplesPerBlock,
-                        int iSamplingFrequency,
-                        QString sOutputFilePath,
-                        bool bMeasureImpedance)
+                             int iSamplingFrequency)
 {
     //Initialise device
     if(m_pBrainAmpDriver->initDevice(iSamplesPerBlock,
-                                iSamplingFrequency,
-                                sOutputFilePath,
-                                bMeasureImpedance))
-    {
+                                     iSamplingFrequency)) {
         m_bIsRunning = true;
         QThread::start();
-    }
-    else
+    } else {
         m_bIsRunning = false;
+    }
 }
 
 //=============================================================================================================

@@ -105,12 +105,6 @@ EEGoSports::EEGoSports()
     connect(m_pActionSetupProject, &QAction::triggered, this, &EEGoSports::showSetupProjectDialog);
     addPluginAction(m_pActionSetupProject);
 
-    // Create start recordin action bar item/button
-    m_pActionStartRecording = new QAction(QIcon(":/images/record.png"), tr("Start recording data to fif file"), this);
-    m_pActionStartRecording->setStatusTip(tr("Start recording data to fif file"));
-    connect(m_pActionStartRecording, &QAction::triggered, this, &EEGoSports::showStartRecording);
-    addPluginAction(m_pActionStartRecording);
-
     // Create impedance action bar item/button
     m_pActionImpedance = new QAction(QIcon(":/images/impedances.png"), tr("Check impedance values"), this);
     m_pActionImpedance->setStatusTip(tr("Check impedance values"));
@@ -146,18 +140,13 @@ void EEGoSports::init()
     m_outputConnectors.append(m_pRMTSA_EEGoSports);
 
     //default values used by the setupGUI class must be set here
-
     QSettings settings;
     m_iSamplingFreq = settings.value(QString("EEGOSPORTS/sFreq"), 512).toInt();
     m_iNumberOfChannels = 90;
     m_iNumberOfEEGChannels = 64;
     m_iSamplesPerBlock = settings.value(QString("EEGOSPORTS/samplesPerBlock"), 512).toInt();
-    m_bWriteToFile = false;
     m_bWriteDriverDebugToFile = false;
     m_bCheckImpedances = false;
-
-    QDate date;
-    m_sOutputFilePath = settings.value(QString("EEGOSPORTS/outputFilePath"), QString("%1Sequence_01/Subject_01/%2_%3_%4_EEG_001_raw.fif").arg(m_qStringResourcePath).arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day())).toString();
 
     m_sElcFilePath = settings.value(QString("EEGOSPORTS/elcFilePath"), QString(QCoreApplication::applicationDirPath() + "/resources/3DLayouts/standard_waveguard64_duke.elc")).toString();
 
@@ -554,9 +543,7 @@ bool EEGoSports::start()
 {
     //Initialize amplifier
     if(!m_pEEGoSportsProducer->init(m_bWriteDriverDebugToFile,
-                                    m_sOutputFilePath,
-                                    m_bCheckImpedances))
-    {
+                                    m_bCheckImpedances)) {
         qWarning() << "[EEGoSports::start] EEGoSportsProducer thread could not be started - Either the device is turned off (check your OS device manager) or the driver DLL (EEGO-SDK.dll) is not installed in one of the monitored dll path." << endl;
         return false;
     }
@@ -605,7 +592,6 @@ bool EEGoSports::stop()
     settings.setValue(QString("EEGOSPORTS/LPAElectrode"), m_sLPA);
     settings.setValue(QString("EEGOSPORTS/RPAElectrode"), m_sRPA);
     settings.setValue(QString("EEGOSPORTS/NasionElectrode"), m_sNasion);
-    settings.setValue(QString("EEGOSPORTS/outputFilePath"), m_sOutputFilePath);
     settings.setValue(QString("EEGOSPORTS/elcFilePath"), m_sElcFilePath);
     settings.setValue(QString("EEGOSPORTS/cardinalFilePath"), m_sCardinalFilePath);
     settings.setValue(QString("EEGOSPORTS/useTrackedCardinalsMode"), m_bUseTrackedCardinalMode);
@@ -703,81 +689,6 @@ void EEGoSports::showSetupProjectDialog()
 
 //=============================================================================================================
 
-void EEGoSports::showStartRecording()
-{
-    //Setup writing to file
-    if(m_bWriteToFile) {
-        m_pOutfid->finish_writing_raw();
-        m_bWriteToFile = false;
-        m_pTimerRecordingChange->stop();
-        m_pActionStartRecording->setIcon(QIcon(":/images/record.png"));
-    } else {
-        if(!this->isRunning()) {
-            QMessageBox msgBox;
-            msgBox.setText("Start data acquisition first!");
-            msgBox.exec();
-            return;
-        }
-
-        if(!m_pFiffInfo) {
-            QMessageBox msgBox;
-            msgBox.setText("FiffInfo missing!");
-            msgBox.exec();
-            return;
-        }
-
-        //Initiate the stream for writing to the fif file
-        m_fileOut.setFileName(m_sOutputFilePath);
-
-        if(m_fileOut.exists()) {
-            QMessageBox msgBox;
-            msgBox.setText("The file you want to write already exists.");
-            msgBox.setInformativeText("Do you want to overwrite this file?");
-            msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-            int ret = msgBox.exec();
-            if(ret == QMessageBox::No)
-                return;
-        }
-
-        // Check if path exists -> otherwise create it
-        QStringList list = m_sOutputFilePath.split("/");
-        list.removeLast(); // remove file name
-        QString fileDir = list.join("/");
-
-        QDir dir;
-        if(!dir.exists(fileDir)) {
-            if(!dir.mkpath(fileDir)) {
-                return;
-            }
-        }
-
-        m_pOutfid = Fiff::start_writing_raw(m_fileOut, *m_pFiffInfo, m_cals);
-        fiff_int_t first = 0;
-        m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
-
-        m_bWriteToFile = true;
-
-        m_pTimerRecordingChange = QSharedPointer<QTimer>(new QTimer);
-        connect(m_pTimerRecordingChange.data(), &QTimer::timeout, this, &EEGoSports::changeRecordingButton);
-        m_pTimerRecordingChange->start(500);
-    }
-}
-
-//=============================================================================================================
-
-void EEGoSports::changeRecordingButton()
-{
-    if(m_iBlinkStatus == 0) {
-        m_pActionStartRecording->setIcon(QIcon(":/images/record.png"));
-        m_iBlinkStatus = 1;
-    } else {
-        m_pActionStartRecording->setIcon(QIcon(":/images/record_active.png"));
-        m_iBlinkStatus = 0;
-    }
-}
-
-//=============================================================================================================
-
 void EEGoSports::run()
 {
     MatrixXd matData;
@@ -792,25 +703,12 @@ void EEGoSports::run()
                 }
             } else {
                 if(m_pCircularBuffer->pop(matData)) {
-                    //Write raw data to fif file
-                    if(m_bWriteToFile) {
-                        m_pOutfid->write_raw_buffer(matData, m_cals);
-                    }
-
                     //emit values to real time multi sample array
                     //qDebug()<<"EEGoSports::run - mat size"<<matValue.rows()<<"x"<<matValue.cols();
                     m_pRMTSA_EEGoSports->data()->setValue(matData);
                 }
             }      
         }
-    }
-
-    //Close the fif output stream
-    if(m_bWriteToFile) {
-        m_pOutfid->finish_writing_raw();
-        m_bWriteToFile = false;
-        m_pTimerRecordingChange->stop();
-        m_pActionStartRecording->setIcon(QIcon(":/images/record.png"));
     }
 }
 

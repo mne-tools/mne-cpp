@@ -90,12 +90,6 @@ BrainAMP::BrainAMP()
     m_pActionSetupProject->setStatusTip(tr("Setup project"));
     connect(m_pActionSetupProject, &QAction::triggered, this, &BrainAMP::showSetupProjectDialog);
     addPluginAction(m_pActionSetupProject);
-
-    // Create start recordin action bar item/button
-    m_pActionStartRecording = new QAction(QIcon(":/images/record.png"), tr("Start recording data to fif file"), this);
-    m_pActionStartRecording->setStatusTip(tr("Start recording data to fif file"));
-    connect(m_pActionStartRecording, &QAction::triggered, this, &BrainAMP::showStartRecording);
-    addPluginAction(m_pActionStartRecording);
 }
 
 //=============================================================================================================
@@ -132,11 +126,7 @@ void BrainAMP::init()
     QSettings settings;
     m_iSamplingFreq = settings.value(QString("BRAINAMP/sFreq"), 1000).toInt();
     m_iSamplesPerBlock = settings.value(QString("BRAINAMP/samplesPerBlock"), 1000).toInt();
-    m_bWriteToFile = false;
     m_bCheckImpedances = false;
-
-    QDate date;
-    m_sOutputFilePath = settings.value(QString("BRAINAMP/outputFilePath"), QString("%1Sequence_01/Subject_01/%2_%3_%4_EEG_001_raw.fif").arg(m_qStringResourcePath).arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day())).toString();
 
     m_sElcFilePath = settings.value(QString("BRAINAMP/elcFilePath"), QString("./Resources/3DLayouts/standard_waveguard64_duke.elc")).toString();
 
@@ -285,9 +275,7 @@ bool BrainAMP::start()
     m_pRMTSA_BrainAMP->data()->setSamplingRate(m_iSamplingFreq);
 
     m_pBrainAMPProducer->start(m_iSamplesPerBlock,
-                       m_iSamplingFreq,
-                       m_sOutputFilePath,
-                       m_bCheckImpedances);
+                               m_iSamplingFreq);
 
     if(m_pBrainAMPProducer->isRunning()) {
         QThread::start();
@@ -322,7 +310,6 @@ bool BrainAMP::stop()
     settings.setValue(QString("BRAINAMP/LPAElectrode"), m_sLPA);
     settings.setValue(QString("BRAINAMP/RPAElectrode"), m_sRPA);
     settings.setValue(QString("BRAINAMP/NasionElectrode"), m_sNasion);
-    settings.setValue(QString("BRAINAMP/outputFilePath"), m_sOutputFilePath);
     settings.setValue(QString("BRAINAMP/elcFilePath"), m_sElcFilePath);
     settings.setValue(QString("BRAINAMP/cardinalFilePath"), m_sCardinalFilePath);
     settings.setValue(QString("BRAINAMP/useTrackedCardinalsMode"), m_bUseTrackedCardinalMode);
@@ -389,26 +376,11 @@ void BrainAMP::run()
         if(m_pBrainAMPProducer->isRunning()) {
             //pop matrix
             if(m_pCircularBuffer->pop(matData)) {
-                //Write raw data to fif file
-                if(m_bWriteToFile) {
-                    m_pOutfid->write_raw_buffer(matData, m_cals);
-                }
-
                 //emit values to real time multi sample array
                 m_pRMTSA_BrainAMP->data()->setValue(matData);
             }       
         }
     }
-
-    //Close the fif output stream
-    if(m_bWriteToFile) {
-        m_pOutfid->finish_writing_raw();
-        m_bWriteToFile = false;
-        m_pTimerRecordingChange->stop();
-        m_pActionStartRecording->setIcon(QIcon(":/images/record.png"));
-    }
-
-    //std::cout<<"EXITING - BrainAMP::run()"<<std::endl;
 }
 
 //=============================================================================================================
@@ -429,93 +401,3 @@ void BrainAMP::showSetupProjectDialog()
         m_pBrainAMPSetupProjectWidget->raise();
     }
 }
-
-//=============================================================================================================
-
-void BrainAMP::showStartRecording()
-{
-    //Setup writing to file
-    if(m_bWriteToFile) {
-        m_pOutfid->finish_writing_raw();
-        m_bWriteToFile = false;
-        m_pTimerRecordingChange->stop();
-        m_pActionStartRecording->setIcon(QIcon(":/images/record.png"));
-    } else {
-        if(!this->isRunning()) {
-            QMessageBox msgBox;
-            msgBox.setText("Start data acquisition first!");
-            msgBox.exec();
-            return;
-        }
-
-        if(!m_pFiffInfo) {
-            QMessageBox msgBox;
-            msgBox.setText("FiffInfo missing!");
-            msgBox.exec();
-            return;
-        }
-
-        //Initiate the stream for writing to the fif file
-        m_fileOut.setFileName(m_sOutputFilePath);
-        if(m_fileOut.exists()) {
-            QMessageBox msgBox;
-            msgBox.setText("The file you want to write already exists.");
-            msgBox.setInformativeText("Do you want to overwrite this file?");
-            msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-            int ret = msgBox.exec();
-            if(ret == QMessageBox::No)
-                return;
-        }
-
-        // Check if path exists -> otherwise create it
-        QStringList list = m_sOutputFilePath.split("/");
-        list.removeLast(); // remove file name
-        QString fileDir = list.join("/");
-
-        if(!dirExists(fileDir.toStdString())) {
-            QDir dir;
-            dir.mkpath(fileDir);
-        }
-
-        m_pOutfid = Fiff::start_writing_raw(m_fileOut, *m_pFiffInfo, m_cals);
-        fiff_int_t first = 0;
-        m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
-
-        m_bWriteToFile = true;
-
-        m_pTimerRecordingChange = QSharedPointer<QTimer>(new QTimer);
-        connect(m_pTimerRecordingChange.data(), &QTimer::timeout,
-                this, &BrainAMP::changeRecordingButton);
-        m_pTimerRecordingChange->start(500);
-    }
-}
-
-//=============================================================================================================
-
-void BrainAMP::changeRecordingButton()
-{
-    if(m_iBlinkStatus == 0) {
-        m_pActionStartRecording->setIcon(QIcon(":/images/record.png"));
-        m_iBlinkStatus = 1;
-    } else {
-        m_pActionStartRecording->setIcon(QIcon(":/images/record_active.png"));
-        m_iBlinkStatus = 0;
-    }
-}
-
-//=============================================================================================================
-
-bool BrainAMP::dirExists(const std::string& dirName_in)
-{
-    DWORD ftyp = GetFileAttributesA(dirName_in.c_str());
-    if (ftyp == INVALID_FILE_ATTRIBUTES) {
-        return false;  //something is wrong with your path!
-    }
-
-    if (ftyp & FILE_ATTRIBUTE_DIRECTORY) {
-        return true;   // this is a directory!
-    }
-
-    return false;    // this is not a directory!
-}
-

@@ -75,17 +75,6 @@ BrainAMPSetupProjectWidget::BrainAMPSetupProjectWidget(BrainAMP* pBrainAMP, QWid
 {
     ui->setupUi(this);
 
-    // Connect write to file options
-    connect(ui->m_qPushButton_NewProject, &QPushButton::released, this, &BrainAMPSetupProjectWidget::addProject);
-    connect(ui->m_qPushButton_NewSubject, &QPushButton::released, this, &BrainAMPSetupProjectWidget::addSubject);
-    connect(ui->m_qPushButton_FiffRecordFile, &QPushButton::released, this, &BrainAMPSetupProjectWidget::changeOutputFile);
-
-    // Connect drop down menus
-    connect(ui->m_qComboBox_SubjectSelection, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, &BrainAMPSetupProjectWidget::generateFilePath);
-    connect(ui->m_qComboBox_ProjectSelection, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, &BrainAMPSetupProjectWidget::generateFilePath);
-
     // Connect EEG hat
     connect(ui->m_qPushButton_EEGCap, &QPushButton::released, this, &BrainAMPSetupProjectWidget::changeCap);
     connect(ui->m_qLineEdit_EEGCap, &QLineEdit::textChanged, this, &BrainAMPSetupProjectWidget::updateCardinalComboBoxes);
@@ -105,8 +94,6 @@ BrainAMPSetupProjectWidget::BrainAMPSetupProjectWidget(BrainAMP* pBrainAMP, QWid
     // Connect QLineEdit's
     connect(ui->m_qLineEdit_EEGCap, static_cast<void (QLineEdit::*)(const QString &)>(&QLineEdit::textEdited),
             this, &BrainAMPSetupProjectWidget::changeQLineEdits);
-    connect(ui->m_qLineEdit_FiffRecordFile, static_cast<void (QLineEdit::*)(const QString &)>(&QLineEdit::textEdited),
-            this, &BrainAMPSetupProjectWidget::changeQLineEdits);
 
     initGui();
 }
@@ -122,9 +109,6 @@ BrainAMPSetupProjectWidget::~BrainAMPSetupProjectWidget()
 
 void BrainAMPSetupProjectWidget::initGui()
 {
-    // Init output file path
-    ui->m_qLineEdit_FiffRecordFile->setText(m_pBrainAMP->m_sOutputFilePath);
-
     // Init location of layout file
     ui->m_qLineEdit_EEGCap->setText(m_pBrainAMP->m_sElcFilePath);
 
@@ -139,15 +123,6 @@ void BrainAMPSetupProjectWidget::initGui()
     ui->m_comboBox_Nasion->setCurrentText(m_pBrainAMP->m_sNasion);
 
     ui->m_lineEdit_cardinalFile->setText(m_pBrainAMP->m_sCardinalFilePath);
-
-    // Init project and subject menus
-    ui->m_qComboBox_ProjectSelection->addItem("Sequence_01");
-    ui->m_qComboBox_SubjectSelection->addItem("Subject_01");
-    ui->m_qComboBox_ProjectSelection->addItem("Sequence_02");
-    ui->m_qComboBox_SubjectSelection->addItem("Subject_02");
-
-    // Init file name
-    generateFilePath();
 
     //Init cardinal support
     if(m_pBrainAMP->m_bUseTrackedCardinalMode) {
@@ -238,59 +213,6 @@ void BrainAMPSetupProjectWidget::updateCardinalComboBoxes(const QString& sPath)
     ui->m_comboBox_RPA->addItems(elcChannelNames);
     ui->m_comboBox_Nasion->addItems(elcChannelNames);
 }
-
-//=============================================================================================================
-
-void BrainAMPSetupProjectWidget::addProject()
-{
-    QString path = QFileDialog::getExistingDirectory(this, tr("Open Project Directory"),
-                                                     m_pBrainAMP->m_qStringResourcePath,
-                                                     QFileDialog::ShowDirsOnly
-                                                     | QFileDialog::DontResolveSymlinks);
-
-    // Split string to get created or existing target dir with the name of the project
-    QStringList list = path.split("/");
-
-    // Add to combo box
-    ui->m_qComboBox_ProjectSelection->addItem(list.at(list.size()-1));
-    ui->m_qComboBox_ProjectSelection->setCurrentIndex(ui->m_qComboBox_ProjectSelection->count()-1);
-}
-
-//=============================================================================================================
-
-void BrainAMPSetupProjectWidget::addSubject()
-{
-    QString path = QFileDialog::getExistingDirectory(this, tr("Open Subject Directory"),
-                                                     m_pBrainAMP->m_qStringResourcePath,
-                                                     QFileDialog::ShowDirsOnly
-                                                     | QFileDialog::DontResolveSymlinks);
-
-    // Split string to get created or existing target dir with the name of the project
-    QStringList list = path.split("/");
-
-    // Add to combo box
-    ui->m_qComboBox_SubjectSelection->addItem(list.at(list.size()-1));
-    ui->m_qComboBox_SubjectSelection->setCurrentIndex(ui->m_qComboBox_SubjectSelection->count()-1);
-}
-
-//=============================================================================================================
-
-void BrainAMPSetupProjectWidget::changeOutputFile()
-{
-    QString path = QFileDialog::getSaveFileName(
-                this,
-                "Save to fif file",
-                "resources/mne_scan/plugins/brainamp/EEG_data_001_raw.fif",
-                 tr("Fif files (*.fif)"));
-
-    if(path==NULL){
-        path = ui->m_qLineEdit_FiffRecordFile->text();
-    }
-
-    ui->m_qLineEdit_FiffRecordFile->setText(path);
-    m_pBrainAMP->m_sOutputFilePath = ui->m_qLineEdit_FiffRecordFile->text();
-}
-
 //=============================================================================================================
 
 void BrainAMPSetupProjectWidget::changeCap()
@@ -326,30 +248,7 @@ void BrainAMPSetupProjectWidget::changeCardinalFile()
 
 //=============================================================================================================
 
-void BrainAMPSetupProjectWidget::generateFilePath(int index)
-{
-    Q_UNUSED(index);
-
-    // Generate file name with timestamp
-    QDate date;
-    QString fileName = QString ("%1_%2_%3_EEG_001_raw.fif").arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day());
-
-    // Append new file name, subject and project
-    QString resourcePath = m_pBrainAMP->m_qStringResourcePath;
-    resourcePath.append(ui->m_qComboBox_ProjectSelection->currentText());
-    resourcePath.append("/");
-    resourcePath.append(ui->m_qComboBox_SubjectSelection->currentText());
-    resourcePath.append("/");
-    resourcePath.append(fileName);
-
-    ui->m_qLineEdit_FiffRecordFile->setText(resourcePath);
-    m_pBrainAMP->m_sOutputFilePath = resourcePath;
-}
-
-//=============================================================================================================
-
 void BrainAMPSetupProjectWidget::changeQLineEdits()
 {
     m_pBrainAMP->m_sElcFilePath = ui->m_qLineEdit_EEGCap->text();
-    m_pBrainAMP->m_sOutputFilePath = ui->m_qLineEdit_FiffRecordFile->text();
 }

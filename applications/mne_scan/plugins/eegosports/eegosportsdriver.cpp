@@ -77,7 +77,6 @@ EEGoSportsDriver::EEGoSportsDriver(EEGoSportsProducer* pEEGoSportsProducer)
 , m_uiSamplingFrequency(512)
 , m_uiSamplesPerBlock(100)
 , m_bWriteDriverDebugToFile(false)
-, m_sOutputFilePath("/resources/mne_scan/plugins/eegosports")
 , m_bMeasureImpedances(false)
 {
     m_bDllLoaded = true;
@@ -92,7 +91,7 @@ EEGoSportsDriver::~EEGoSportsDriver()
 //=============================================================================================================
 
 bool EEGoSportsDriver::initDevice(bool bWriteDriverDebugToFile,
-                                  const QString& sOutpuFilePath, bool bMeasureImpedance)
+                                  bool bMeasureImpedance)
 {
     m_bMeasureImpedances = bMeasureImpedance;
 
@@ -103,7 +102,6 @@ bool EEGoSportsDriver::initDevice(bool bWriteDriverDebugToFile,
 
     //Set global variables
     m_bWriteDriverDebugToFile = bWriteDriverDebugToFile;
-    m_sOutputFilePath = sOutpuFilePath;
 
     //Open debug file to write to
     if(m_bWriteDriverDebugToFile) {

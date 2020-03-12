@@ -128,11 +128,9 @@ public:
      *  @param [in] iSamplesPerBlock samples per block specified by the user.
      *  @param [in] iSamplingFrequency sampling frequency specified by the user.
      *  @param [in] bWriteDriverDebugToFile Flag for writing driver debug information to a file. Defined by the user via the GUI.
-     *  @param [in] sOutpuFilePath Holds the path for the output file. Defined by the user via the GUI.
      *  @param [in] bMeasureImpedance Flag for measuring impedances.
      */
     bool initDevice(bool bWriteDriverDebugToFile,
-                    const QString& sOutpuFilePath,
                     bool bMeasureImpedance);
 
     //=========================================================================================================
@@ -182,7 +180,6 @@ private:
     uint                        m_uiSamplingFrequency;          /**< The sampling frequency defined by the user via the GUI (in Hertz).*/
     uint                        m_uiSamplesPerBlock;            /**< The samples per block defined by the user via the GUI.*/
     bool                        m_bWriteDriverDebugToFile;      /**< Flag for for writing driver debug informstions to a file. Defined by the user via the GUI.*/
-    QString                     m_sOutputFilePath;              /**< Holds the path for the output file. Defined by the user via the GUI.*/
     bool                        m_bMeasureImpedances;           /**< Flag for impedance measuring mode.*/
 
     QList<Eigen::VectorXd>      m_lSampleBlockBuffer;           /**< Buffer to store all the incoming smaples. This is the buffer which is getting read from.*/

@@ -94,11 +94,9 @@ public:
     * Initializes the EEGoSportsProducer by initialising the device.
     *
     * @param [in] bWriteDriverDebugToFile Flag for writing the received samples to a file. Defined by the user via the GUI.
-    * @param [in] sOutpuFilePath Holds the path for the output file. Defined by the user via the GUI.
     * @param [in] bMeasureImpedance Flag for measuring impedances.
     */
     bool init(bool bWriteDriverDebugToFile,
-              const QString& sOutputFilePath,
               bool bMeasureImpedance);
 
     //=========================================================================================================
