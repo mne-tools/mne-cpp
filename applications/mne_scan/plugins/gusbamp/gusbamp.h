@@ -208,18 +208,7 @@ private:
     UCHAR                       m_iNumberOfChannels;        /**< the channels that should be acquired from each device */
     std::vector<int>            m_viSizeOfSampleMatrix;     /**< vector including the size of the two dimensional sample Matrix */
     std::vector<int>            m_viChannelsToAcquire;      /**< vector of the calling numbers of the channels to be acquired */
-    bool                        m_bWriteToFile;             /**< Flag for File writing*/
-    FIFFLIB::FiffStream::SPtr   m_pOutfid;                  /**< QFile for writing to fif file.*/
     Eigen::RowVectorXd          m_cals;
-    bool                        m_bSplitFile;               /**< Flag for splitting the recorded file.*/
-    int                         m_iSplitFileSizeMs;         /**< Holds the size of the splitted files in ms.*/
-    int                         m_iSplitCount;              /**< File split count */
-    QString                     m_sOutputFilePath;          /**< Holds the path for the sample output file. Defined by the user via the GUI.*/
-    QFile                       m_fileOut;                  /**< QFile for writing to fiff file.*/
-    QSharedPointer<QTimer>      m_pTimerRecordingChange;    /**< timer to control blinking of the recording icon */
-    qint16                      m_iBlinkStatus;             /**< flag for recording icon blinking */
-    QAction*                    m_pActionStartRecording;    /**< starts to record data */
-    QAction*                    m_pActionSetupProject;      /**< shows setup project dialog */
 };
 } // NAMESPACE
 

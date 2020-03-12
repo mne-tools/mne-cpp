@@ -83,7 +83,7 @@ TMSISetupWidget::TMSISetupWidget(TMSI* pTMSI, QWidget* parent)
 
     //Connect debug file
     connect(ui.m_checkBox_WriteDriverDebugToFile, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            this, &TMSISetupWidget::setWriteToFile);
+            this, &TMSISetupWidget::setWriteToDebugFile);
 
     //Connect trigger properties
     connect(ui.m_spinBox_BeepLength, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
@@ -96,20 +96,14 @@ TMSISetupWidget::TMSISetupWidget(TMSI* pTMSI, QWidget* parent)
     //Connect about button
     connect(ui.m_qPushButton_About, &QPushButton::released, this, &TMSISetupWidget::showAboutDialog);
 
-    //Connect split file options
-    connect(ui.m_checkBox_splitFiles, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            this, &TMSISetupWidget::setSplitFile);
-    connect(ui.m_spinBox_splitFileSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            this, &TMSISetupWidget::setSplitFileSize);
-
     //Fill info box
     QFile file(m_pTMSI->m_qStringResourcePath+"readme.txt");
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         return;
+    }
 
     QTextStream in(&file);
-    while (!in.atEnd())
-    {
+    while (!in.atEnd()) {
         QString line = in.readLine();
         ui.m_qTextBrowser_Information->insertHtml(line);
         ui.m_qTextBrowser_Information->insertHtml("<br>");
@@ -164,23 +158,9 @@ void TMSISetupWidget::setDeviceSamplingProperties()
 
 //=============================================================================================================
 
-void TMSISetupWidget::setWriteToFile()
+void TMSISetupWidget::setWriteToDebugFile()
 {
     m_pTMSI->m_bWriteDriverDebugToFile = ui.m_checkBox_WriteDriverDebugToFile->isChecked();
-}
-
-//=============================================================================================================
-
-void TMSISetupWidget::setSplitFile(bool state)
-{
-    m_pTMSI->m_bSplitFile = state;
-}
-
-//=============================================================================================================
-
-void TMSISetupWidget::setSplitFileSize(qint32 value)
-{
-    m_pTMSI->m_iSplitFileSizeMs = value;
 }
 
 //=============================================================================================================

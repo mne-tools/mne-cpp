@@ -224,7 +224,6 @@ private:
     int                                 m_iSamplingFreq;                    /**< The sampling frequency defined by the user via the GUI (in Hertz).*/
     int                                 m_iNumberOfChannels;                /**< The number of channels defined by the user via the GUI.*/
     int                                 m_iSamplesPerBlock;                 /**< The samples per block defined by the user via the GUI.*/
-    qint32                              m_iSplitCount;                      /**< File split count */
 
     int                                 m_iTriggerInterval;                 /**< The gap between the trigger signals which request the subject to do something (in ms).*/
     QTime                               m_qTimerTrigger;                    /**< Time stemp of the last trigger event (in ms).*/
@@ -232,24 +231,16 @@ private:
     bool                                m_bUseChExponent;                   /**< Flag for using the channels exponent. Defined by the user via the GUI.*/
     bool                                m_bUseUnitGain;                     /**< Flag for using the channels unit gain. Defined by the user via the GUI.*/
     bool                                m_bUseUnitOffset;                   /**< Flag for using the channels unit offset. Defined by the user via the GUI.*/
-    bool                                m_bWriteToFile;                     /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
     bool                                m_bWriteDriverDebugToFile;          /**< Flag for for writing driver debug informstions to a file. Defined by the user via the GUI.*/
     bool                                m_bBeepTrigger;                     /**< Flag for using a trigger input.*/
     bool                                m_bUseCommonAverage;                /**< Flag for using common average.*/
     bool                                m_bUseKeyboardTrigger;              /**< Flag for using the keyboard as a trigger input.*/
     bool                                m_bCheckImpedances;                 /**< Flag for checking the impedances of the EEG amplifier.*/
-    bool                                m_bSplitFile;                       /**< Flag for splitting the recorded file.*/
 
-    int                                 m_iSplitFileSizeMs;                 /**< Holds the size of the splitted files in ms.*/
     int                                 m_iTriggerType;                     /**< Holds the trigger type | 0 - no trigger activated, 254 - left, 253 - right, 252 - beep.*/
 
-    std::ofstream                       m_outputFileStream;                 /**< fstream for writing the samples values to txt file.*/
-    QString                             m_sOutputFilePath;                  /**< Holds the path for the sample output file. Defined by the user via the GUI.*/
     QString                             m_sElcFilePath;                     /**< Holds the path for the .elc file (electrode positions). Defined by the user via the GUI.*/
-    QFile                               m_fileOut;                          /**< QFile for writing to fif file.*/
-    QSharedPointer<FIFFLIB::FiffStream> m_pOutfid;                          /**< QFile for writing to fif file.*/
     QSharedPointer<FIFFLIB::FiffInfo>   m_pFiffInfo;                        /**< Fiff measurement info.*/
-    Eigen::RowVectorXd                  m_cals;
 
     QSharedPointer<IOBUFFER::CircularBuffer_Matrix_float>     m_pCircularBuffer;              /**< Holds incoming raw data.*/
 
@@ -261,10 +252,6 @@ private:
 
     QAction*                            m_pActionImpedance;                 /**< shows impedance widget */
     QAction*                            m_pActionSetupProject;              /**< shows setup project dialog */
-    QAction*                            m_pActionStartRecording;            /**< starts to record data */
-
-    QSharedPointer<QTimer>              m_pTimerRecordingChange;            /**< timer to control blinking of the recording icon */
-    qint16                              m_iBlinkStatus;                     /**< flag for recording icon blinking */
 };
 } // NAMESPACE
 

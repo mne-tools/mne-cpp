@@ -118,7 +118,8 @@ public:
     /**
      * Get sample from the device in form of a mtrix.
      * @param [in] MatrixXf the block sample values in form of a matrix.
-     * @param [out] bool returns true if sample was successfully written to the input variable, false otherwise.
+     *
+     * @return Returns true if sample was successfully written to the input variable, false otherwise.
      */
     bool getSampleMatrixValue(Eigen::MatrixXd& sampleMatrix);
 
@@ -127,13 +128,9 @@ public:
      * Initialise device.
      * @param [in] iSamplesPerBlock samples per block specified by the user.
      * @param [in] iSamplingFrequency sampling frequency specified by the user.
-     * @param [in] sOutpuFilePath Holds the path for the output file. Defined by the user via the GUI.
-     * @param [in] bMeasureImpedance Flag for measuring impedances.
      */
     bool initDevice(int iSamplesPerBlock,
-                    int iSamplingFrequency,
-                    QString sOutpuFilePath,
-                    bool bMeasureImpedance);
+                    int iSamplingFrequency);
 
     //=========================================================================================================
     /**
@@ -168,7 +165,6 @@ private:
     uint                        m_uiDownsample;                     /**< The number of channels defined by the user via the GUI.*/
     uint                        m_uiSamplingFrequency;              /**< The sampling frequency defined by the user via the GUI (in Hertz).*/
     uint                        m_uiSamplesPerBlock;                /**< The samples per block defined by the user via the GUI.*/
-    QString                     m_sOutputFilePath;                  /**< Holds the path for the output file. Defined by the user via the GUI.*/
 
     HANDLE                      DeviceAmp;                          /**< Amplifier device.*/
 

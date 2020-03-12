@@ -77,12 +77,6 @@ TMSI::TMSI()
     connect(m_pActionSetupProject, &QAction::triggered, this, &TMSI::showSetupProjectDialog);
     addPluginAction(m_pActionSetupProject);
 
-    // Create start recordin action bar item/button
-    m_pActionStartRecording = new QAction(QIcon(":/images/record.png"), tr("Start recording data to fif file"), this);
-    m_pActionStartRecording->setStatusTip(tr("Start recording data to fif file"));
-    connect(m_pActionStartRecording, &QAction::triggered, this, &TMSI::showStartRecording);
-    addPluginAction(m_pActionStartRecording);
-
     // Create impedance action bar item/button
     m_pActionImpedance = new QAction(QIcon(":/images/impedances.png"), tr("Check impedance values"), this);
     m_pActionImpedance->setStatusTip(tr("Check impedance values"));
@@ -121,25 +115,17 @@ void TMSI::init()
     m_iSamplingFreq = 1024;
     m_iNumberOfChannels = 138;
     m_iSamplesPerBlock = 16;
-    m_iTriggerInterval = 5000;
-    m_iSplitFileSizeMs = 10;
-    m_iSplitCount = 0;
 
     m_bUseChExponent = true;
     m_bUseUnitGain = true;
     m_bUseUnitOffset = true;
-    m_bWriteToFile = false;
     m_bWriteDriverDebugToFile = false;
     m_bBeepTrigger = false;
     m_bUseCommonAverage = true;
     m_bUseKeyboardTrigger = false;
     m_bCheckImpedances = false;
-    m_bSplitFile = false;
 
     m_iTriggerType = 0;
-
-    QDate date;
-    m_sOutputFilePath = QString ("%1Sequence_01/Subject_01/%2_%3_%4_EEG_001_raw.fif").arg(m_qStringResourcePath).arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day());
 
     m_sElcFilePath = QString("./resources/general/3DLayouts/standard_waveguard128_duke.elc");
 
@@ -491,15 +477,14 @@ bool TMSI::start()
     m_pRMTSA_TMSI->data()->setSamplingRate(m_iSamplingFreq);
 
     m_pTMSIProducer->start(m_iNumberOfChannels,
-                       m_iSamplingFreq,
-                       m_iSamplesPerBlock,
-                       m_bUseChExponent,
-                       m_bUseUnitGain,
-                       m_bUseUnitOffset,
-                       m_bWriteDriverDebugToFile,
-                       m_sOutputFilePath,
-                       m_bUseCommonAverage,
-                       m_bCheckImpedances);
+                           m_iSamplingFreq,
+                           m_iSamplesPerBlock,
+                           m_bUseChExponent,
+                           m_bUseUnitGain,
+                           m_bUseUnitOffset,
+                           m_bWriteDriverDebugToFile,
+                           m_bUseCommonAverage,
+                           m_bCheckImpedances);
     wait(500);
 
     if(m_pTMSIProducer->isRunning()) {
@@ -576,36 +561,6 @@ void TMSI::setKeyboardTriggerType(int type)
 
 //=============================================================================================================
 
-void TMSI::splitRecordingFile()
-{
-    qDebug() << "[TMSI::splitRecordingFile] Split recording file";
-    ++m_iSplitCount;
-    QString nextFileName = m_sOutputFilePath.remove("_raw.fif");
-    nextFileName += QString("-%1_raw.fif").arg(m_iSplitCount);
-
-    //Write the link to the next file
-    qint32 data;
-    m_pOutfid->start_block(FIFFB_REF);
-    data = FIFFV_ROLE_NEXT_FILE;
-    m_pOutfid->write_int(FIFF_REF_ROLE,&data);
-    m_pOutfid->write_string(FIFF_REF_FILE_NAME, nextFileName);
-    m_pOutfid->write_id(FIFF_REF_FILE_ID);//ToDo meas_id
-    data = m_iSplitCount - 1;
-    m_pOutfid->write_int(FIFF_REF_FILE_NUM, &data);
-    m_pOutfid->end_block(FIFFB_REF);
-
-    //finish file
-    m_pOutfid->finish_writing_raw();
-
-    //start next file
-    m_fileOut.setFileName(nextFileName);
-    m_pOutfid = Fiff::start_writing_raw(m_fileOut, *m_pFiffInfo, m_cals);
-    fiff_int_t first = 0;
-    m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
-}
-
-//=============================================================================================================
-
 void TMSI::run()
 {
     qint32 size = 0;
@@ -637,21 +592,6 @@ void TMSI::run()
                     matData(136, m_iSamplesPerBlock-1) = m_iTriggerType;
                 }
 
-                //Write raw data to fif file
-                if(m_bWriteToFile) {
-                    m_pOutfid->write_raw_buffer(matData.cast<double>(), m_cals);
-                    size += matData.cols();
-
-    //                qDebug()<<"size"<<size;
-    //                qDebug()<<"(m_iSplitFileSizeMs/1000)*m_pFiffInfo->sfreq"<<(double(m_iSplitFileSizeMs)/1000.0)*m_pFiffInfo->sfreq;
-                    if(size > (double(m_iSplitFileSizeMs)/1000.0)*m_pFiffInfo->sfreq && m_bSplitFile) {
-                        size = 0;
-                        splitRecordingFile();
-                    }
-                } else {
-                    size = 0;
-                }
-
                 //Change values of the trigger channel for better plotting - this change is not saved in the produced fif file
                 if(m_iNumberOfChannels>137) {
                     for(int i = 0; i<matData.row(137).cols(); i++) {
@@ -679,14 +619,6 @@ void TMSI::run()
                 m_iTriggerType = 0;
             }
         }
-    }
-
-    //Close the fif output stream
-    if(m_bWriteToFile) {
-        m_pOutfid->finish_writing_raw();
-        m_bWriteToFile = false;
-        m_pTimerRecordingChange->stop();
-        m_pActionStartRecording->setIcon(QIcon(":/images/record.png"));
     }
 }
 
@@ -726,94 +658,3 @@ void TMSI::showSetupProjectDialog()
         m_pTmsiSetupProjectWidget->raise();
     }
 }
-
-//=============================================================================================================
-
-void TMSI::showStartRecording()
-{
-    m_iSplitCount = 0;
-
-    //Setup writing to file
-    if(m_bWriteToFile) {
-        m_pOutfid->finish_writing_raw();
-        m_bWriteToFile = false;
-        m_pTimerRecordingChange->stop();
-        m_pActionStartRecording->setIcon(QIcon(":/images/record.png"));
-    } else {
-        if(!this->isRunning()) {
-            QMessageBox msgBox;
-            msgBox.setText("Start data acquisition first!");
-            msgBox.exec();
-            return;
-        }
-
-        if(!m_pFiffInfo) {
-            QMessageBox msgBox;
-            msgBox.setText("FiffInfo missing!");
-            msgBox.exec();
-            return;
-        }
-
-        //Initiate the stream for writing to the fif file
-        m_fileOut.setFileName(m_sOutputFilePath);
-        if(m_fileOut.exists()) {
-            QMessageBox msgBox;
-            msgBox.setText("The file you want to write already exists.");
-            msgBox.setInformativeText("Do you want to overwrite this file?");
-            msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-            int ret = msgBox.exec();
-            if(ret == QMessageBox::No)
-                return;
-        }
-
-        // Check if path exists -> otherwise create it
-        QStringList list = m_sOutputFilePath.split("/");
-        list.removeLast(); // remove file name
-        QString fileDir = list.join("/");
-
-        if(!dirExists(fileDir.toStdString())) {
-            QDir dir;
-            dir.mkpath(fileDir);
-        }
-
-        m_pOutfid = Fiff::start_writing_raw(m_fileOut, *m_pFiffInfo, m_cals);
-        fiff_int_t first = 0;
-        m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
-
-        m_bWriteToFile = true;
-
-        m_pTimerRecordingChange = QSharedPointer<QTimer>(new QTimer);
-        connect(m_pTimerRecordingChange.data(), &QTimer::timeout, this, &TMSI::changeRecordingButton);
-        m_pTimerRecordingChange->start(500);
-    }
-}
-
-//=============================================================================================================
-
-void TMSI::changeRecordingButton()
-{
-    if(m_iBlinkStatus == 0) {
-        m_pActionStartRecording->setIcon(QIcon(":/images/record.png"));
-        m_iBlinkStatus = 1;
-    } else {
-        m_pActionStartRecording->setIcon(QIcon(":/images/record_active.png"));
-        m_iBlinkStatus = 0;
-    }
-}
-
-//=============================================================================================================
-
-bool TMSI::dirExists(const std::string& dirName_in)
-{
-    DWORD ftyp = GetFileAttributesA(dirName_in.c_str());
-    if (ftyp == INVALID_FILE_ATTRIBUTES) {
-        return false;  //something is wrong with your path!
-    }
-
-    if (ftyp & FILE_ATTRIBUTE_DIRECTORY) {
-        return true;   // this is a directory!
-    }
-
-    return false;    // this is not a directory!
-}
-
