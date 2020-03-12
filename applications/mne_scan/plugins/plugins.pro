@@ -71,3 +71,4 @@ SUBDIRS += \
     noisereduction \
     neuronalconnectivity \
     writetofile \
+    hpi \
