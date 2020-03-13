@@ -43,7 +43,7 @@
 
 #include "../fwd_global.h"
 #include <fiff/fiff_constants.h>
-
+#include <fiff/c/fiff_coord_trans_old.h>
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -137,6 +137,8 @@ public:
     bool scale_eeg_pos;     	/**< Scale the electrode locations to scalp in the sphere model */
     bool use_equiv_eeg;      	/**< Use the equivalent source approach for the EEG sphere model */
     bool use_threads;        	/**< Parallelize? */
+
+    FIFFLIB::FiffCoordTransOld* meg_head_t;  /**< Shared pointer to Fiff Info */
 
 private:
     void initMembers();
