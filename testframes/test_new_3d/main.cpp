@@ -36,6 +36,8 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <utils/generics/applicationlogger.h>
+
 #include <QGuiApplication>
 
 #include "common/window.h"

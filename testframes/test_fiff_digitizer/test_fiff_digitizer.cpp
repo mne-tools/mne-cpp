@@ -37,6 +37,8 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <utils/generics/applicationlogger.h>
+
 #include <fiff/fiff_dig_point.h>
 #include <fiff/c/fiff_digitizer_data.h>
 
@@ -94,6 +96,7 @@ TestFiffDigitizer::TestFiffDigitizer()
 
 void TestFiffDigitizer::initTestCase()
 {
+    qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
     //Read the results produced with MNE-CPP
     QFile t_fileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
     digDataLoaded = FiffDigitizerData(t_fileIn);
