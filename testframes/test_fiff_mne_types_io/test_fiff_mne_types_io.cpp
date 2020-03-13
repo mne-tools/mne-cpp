@@ -38,6 +38,8 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <utils/generics/applicationlogger.h>
+
 #include <fiff/fiff.h>
 #include "fiff_types_ref.h"
 #include <iostream>
@@ -93,6 +95,7 @@ TestFiffMneTypesIO::TestFiffMneTypesIO()
 
 void TestFiffMneTypesIO::initTestCase()
 {
+    qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
     qDebug() << "Epsilon" << epsilon;
     qDebug() << "Raw File Name" << rawName;
     qDebug() << "Evoked File Name" << evokedName;
