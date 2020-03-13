@@ -37,6 +37,8 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <utils/generics/applicationlogger.h>
+
 #include "../applications/mne_anonymize/fiffanonymizer.h"
 #include "../applications/mne_anonymize/settingscontroller.h"
 
@@ -101,6 +103,7 @@ TestMneAnonymize::TestMneAnonymize()
 
 void TestMneAnonymize::initTestCase()
 {
+    qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
 }
 
 //=============================================================================================================

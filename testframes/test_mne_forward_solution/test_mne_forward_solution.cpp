@@ -38,6 +38,8 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <utils/generics/applicationlogger.h>
+
 #include <fwd/computeFwd/compute_fwd_settings.h>
 #include <fwd/computeFwd/compute_fwd.h>
 #include <mne/mne.h>
@@ -93,6 +95,7 @@ TestMneForwardSolution::TestMneForwardSolution()
 
 void TestMneForwardSolution::initTestCase()
 {
+    qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
 }
 
 //=============================================================================================================

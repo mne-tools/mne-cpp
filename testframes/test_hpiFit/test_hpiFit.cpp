@@ -32,9 +32,13 @@
  *
  */
 
-///=============================================================================================================
+//=============================================================================================================
 // INCLUDES
 //=============================================================================================================
+
+#include <utils/generics/applicationlogger.h>
+
+#include <utils/generics/applicationlogger.h>
 
 #include <iostream>
 #include <vector>
@@ -48,7 +52,6 @@
 #include <inverse/hpiFit/hpifitdata.h>
 
 #include <utils/ioutils.h>
-#include <utils/generics/applicationlogger.h>
 #include <utils/mnemath.h>
 
 #include <fwd/fwd_coil_set.h>

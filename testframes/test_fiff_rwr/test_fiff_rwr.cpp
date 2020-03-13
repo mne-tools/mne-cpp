@@ -38,6 +38,8 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <utils/generics/applicationlogger.h>
+
 #include <fiff/fiff.h>
 
 #include <iostream>
@@ -101,6 +103,7 @@ TestFiffRWR::TestFiffRWR()
 
 void TestFiffRWR::initTestCase()
 {
+    qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
     qDebug() << "Epsilon" << epsilon;
 
     QFile t_fileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
