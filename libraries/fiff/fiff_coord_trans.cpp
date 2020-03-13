@@ -274,3 +274,18 @@ float FiffCoordTrans::translationTo(Eigen::MatrixX4f  mTransDest)
     float fMove = (vTrans-vTransDest).norm();
     return fMove;
 }
+
+//=============================================================================================================
+
+FiffCoordTransOld FiffCoordTrans::toOld()
+{
+    FiffCoordTransOld tOld;
+    tOld.from = this->from;
+    tOld.to = this->to;
+    tOld.rot = this->trans.block(0,0,3,3);
+    tOld.move = this->trans.block(0,3,3,1);
+    tOld.invrot = this->invtrans.block(0,0,3,3);
+    tOld.invmove = this->invtrans.block(0,3,3,1);
+
+    return tOld;
+}
