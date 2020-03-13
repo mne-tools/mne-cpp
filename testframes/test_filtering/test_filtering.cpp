@@ -64,20 +64,21 @@
 using namespace FIFFLIB;
 using namespace UTILSLIB;
 using namespace RTPROCESSINGLIB;
+using namespace Eigen;
 
 //=============================================================================================================
 /**
- * DECLARE CLASS TestFiffRFR
+ * DECLARE CLASS TestFiltering
  *
- * @brief The TestFiffRFR class provides read filter read fiff verification tests
+ * @brief The TestFiltering class provides read filter read fiff verification tests
  *
  */
-class TestFiffRFR: public QObject
+class TestFiltering: public QObject
 {
     Q_OBJECT
 
 public:
-    TestFiffRFR();
+    TestFiltering();
 
 private slots:
     void initTestCase();
@@ -86,40 +87,39 @@ private slots:
     void cleanupTestCase();
 
 private:
-    double epsilon;
-    int order;
+    double dEpsilon;
+    int iOrder;
 
-    MatrixXd first_in_data;
-    MatrixXd first_in_times;
-    MatrixXd first_filtered;
+    MatrixXd mFirstInData;
+    MatrixXd mFirstInTimes;
+    MatrixXd mFirstFiltered;
 
-    MatrixXd ref_in_data;
-    MatrixXd ref_in_times;
-    MatrixXd ref_filtered;
+    MatrixXd mRefInData;
+    MatrixXd mRefInTimes;
+    MatrixXd mRefFiltered;
 
-    MatrixXi picks;
 };
 
 //=============================================================================================================
 
-TestFiffRFR::TestFiffRFR()
-: epsilon(0.000001)
+TestFiltering::TestFiltering()
+: dEpsilon(0.000001)
 {
 }
 
 //=============================================================================================================
 
-void TestFiffRFR::initTestCase()
+void TestFiltering::initTestCase()
 {
     qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
-    qDebug() << "Epsilon" << epsilon;
+    qDebug() << "dEpsilon" << dEpsilon;
 
     QFile t_fileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
     QFile t_fileOut(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/rtfilter_filterdata_out_raw.fif");
 
-    // Filter in Python is created with following function: mne.filter.design_mne_c_filter(raw.info['sfreq'], 5, 10, 1, 1)
-    // This will create a filter with with 8193 elements/taps/order. In order to be concise with the MNE-CPP implementation
-    // the filter is cut to the order used in mne-cpp (1024, see below).//
+    // Filter in Python is created with following function: mne.filter.design_mne_c_filter(raw.info['dSFreq'], 5, 10, 1, 1)
+    // This will create a filter with with 8193 elements/taps/iOrder. In iOrder to be concise with the MNE-CPP implementation
+    // the filter is cut to the iOrder used in mne-cpp (1024, see below).//
     // The actual filtering was performed with the function: mne.filter._overlap_add_filter(dataIn, filter_python, phase = 'linear')
     QFile t_fileRef(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/ref_rtfilter_filterdata_raw.fif");
 
@@ -134,56 +134,56 @@ void TestFiffRFR::initTestCase()
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Read, Filter & Write >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
     // Setup for reading the raw data
-    FiffRawData first_in_raw;
-    first_in_raw = FiffRawData(t_fileIn);
+    FiffRawData rawFirstInRaw;
+    rawFirstInRaw = FiffRawData(t_fileIn);
 
     // Only filter MEG channels
-    RowVectorXi picks = first_in_raw.info.pick_types(true, true, false);
-    RowVectorXd cals;
-    FiffStream::SPtr outfid = FiffStream::start_writing_raw(t_fileOut, first_in_raw.info, cals);
+    RowVectorXi vPicks = rawFirstInRaw.info.pick_types(true, true, false);
+    RowVectorXd vCals;
+    FiffStream::SPtr outfid = FiffStream::start_writing_raw(t_fileOut, rawFirstInRaw.info, vCals);
 
     //   Set up the reading parameters
     //   To read the whole file at once set
 
-    fiff_int_t from = first_in_raw.first_samp;
-    fiff_int_t to = first_in_raw.last_samp;
+    fiff_int_t from = rawFirstInRaw.first_samp;
+    fiff_int_t to = rawFirstInRaw.last_samp;
 
     // initialize filter settings
-    QString filter_name = "example_cosine";
+    QString sFilterName = "example_cosine";
     FilterData::FilterType type = FilterData::BPF;
-    double sFreq = first_in_raw.info.sfreq;
+    double dSFreq = rawFirstInRaw.info.sfreq;
     double dCenterfreq = 10;
     double dBandwidth = 10;
     double dTransition = 1;
-    order = 1024;
+    iOrder = 1024;
 
     RtFilter rtFilter;
-    MatrixXd dataFiltered;
+    MatrixXd mDataFiltered;
 
     // Reading
-    if(!first_in_raw.read_raw_segment(first_in_data, first_in_times, from, to)) {
+    if(!rawFirstInRaw.read_raw_segment(mFirstInData, mFirstInTimes, from, to)) {
         printf("error during read_raw_segment\n");
     }
 
     // Filtering
     printf("Filtering...");
-    first_filtered = rtFilter.filterData(first_in_data, type, dCenterfreq, dBandwidth, dTransition, sFreq, picks);
+    mFirstFiltered = rtFilter.filterData(mFirstInData, type, dCenterfreq, dBandwidth, dTransition, dSFreq, vPicks);
     printf("[done]\n");
 
     // Writing
     printf("Writing...");
     outfid->write_int(FIFF_FIRST_SAMPLE, &from);
-    outfid->write_raw_buffer(first_filtered,cals);
+    outfid->write_raw_buffer(mFirstFiltered,vCals);
     printf("[done]\n");
 
     outfid->finish_writing_raw();
 
     // Read filtered data from the filtered output file to check if read and write is working correctly
-    FiffRawData second_in_Raw;
-    second_in_Raw = FiffRawData(t_fileOut);
+    FiffRawData rawSecondInRaw;
+    rawSecondInRaw = FiffRawData(t_fileOut);
 
     // Reading
-    if (!second_in_Raw.read_raw_segment(first_filtered,first_in_times,from,to,picks)) {
+    if (!rawSecondInRaw.read_raw_segment(mFirstFiltered,mFirstInTimes,from,to,vPicks)) {
         printf("error during read_raw_segment\n");
     }
 
@@ -199,7 +199,7 @@ void TestFiffRFR::initTestCase()
     ref_in_raw = FiffRawData(t_fileRef);
 
     // Reading
-    if (!ref_in_raw.read_raw_segment(ref_filtered,ref_in_times,from,to,picks)) {
+    if (!ref_in_raw.read_raw_segment(mRefFiltered,mRefInTimes,from,to,vPicks)) {
         printf("error during read_raw_segment\n");
     }
 
@@ -208,23 +208,23 @@ void TestFiffRFR::initTestCase()
 
 //=============================================================================================================
 
-void TestFiffRFR::compareData()
+void TestFiltering::compareData()
 {
-    //make sure to only read data after 1/2 filter length
-    int length = first_filtered.cols()-int(order/2);
-    MatrixXd data_diff = first_filtered.block(0,int(order/2),first_filtered.rows(),length) - ref_filtered.block(0,int(order/2),ref_filtered.rows(),length);
-    QVERIFY( data_diff.sum() < epsilon );
+    //make sure to only read data after 1/2 filter Length
+    int iLength = mFirstFiltered.cols()-int(iOrder/2);
+    MatrixXd mDataDiff = mFirstFiltered.block(0,int(iOrder/2),mFirstFiltered.rows(),iLength) - mRefFiltered.block(0,int(iOrder/2),mRefFiltered.rows(),iLength);
+    QVERIFY( mDataDiff.sum() < dEpsilon );
 }
 
 //=============================================================================================================
 
-void TestFiffRFR::compareTimes()
+void TestFiltering::compareTimes()
 {
-    MatrixXd times_diff = first_in_times - ref_in_times;
-    QVERIFY( times_diff.sum() < epsilon );
+    MatrixXd mTimesDiff = mFirstInTimes - mRefInTimes;
+    QVERIFY( mTimesDiff.sum() < dEpsilon );
 }
 
-void TestFiffRFR::cleanupTestCase()
+void TestFiltering::cleanupTestCase()
 {
 }
 
@@ -232,5 +232,5 @@ void TestFiffRFR::cleanupTestCase()
 // MAIN
 //=============================================================================================================
 
-QTEST_GUILESS_MAIN(TestFiffRFR)
+QTEST_GUILESS_MAIN(TestFiltering)
 #include "test_filtering.moc"
