@@ -100,6 +100,8 @@ void ComputeFwdSettings::initMembers()
     scale_eeg_pos = false;    
     use_equiv_eeg = true;     
     use_threads = true;
+
+    meg_head_t = NULL;
 }
 
 //=============================================================================================================
