@@ -43,6 +43,7 @@
 
 #include "fiff_global.h"
 #include "fiff_types.h"
+#include "c/fiff_coord_trans_old.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -251,6 +252,14 @@ public:
      * @return      fMove         The translation between two rotation matrices in m.
      */
     float translationTo(Eigen::MatrixX4f mTransDest);
+
+    //========================================================================================================
+    /**
+     * Transform FiffCoordTrans to FiffCoordTransOld
+     *
+     * @return  The old FiffCoordTrans structure
+     */
+    FiffCoordTransOld toOld();
 
 public:
     fiff_int_t  from;   /**< Source coordinate system. */
