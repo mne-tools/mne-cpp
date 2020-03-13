@@ -1936,6 +1936,12 @@ void ComputeFwd::calculateFwd() const
                                          &meg_head_t,
                                          &meas_id) != OK)
         goto out;
+
+    // get meg_head_t from settings file
+    if(settings->meg_head_t) {
+        meg_head_t = settings->meg_head_t;
+    }
+
     if (nmeg > 0)
         printf("Read %3d MEG channels from %s\n",nmeg,settings->measname.toUtf8().constData());
     if (ncomp > 0)
