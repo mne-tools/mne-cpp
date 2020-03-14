@@ -111,16 +111,16 @@ void TestFiffDigitizer::initTestCase()
 
 void TestFiffDigitizer::comparePoints()
 {
-    double sum = 0.0;
+    double dSum = 0.0;
     for(int i = 0; i < digDataLoaded.points.size(); ++i) {
-        sum += digDataLoaded.points[i].r[0];
-        sum += digDataLoaded.points[i].r[1];
-        sum += digDataLoaded.points[i].r[2];
+        dSum += digDataLoaded.points[i].r[0];
+        dSum += digDataLoaded.points[i].r[1];
+        dSum += digDataLoaded.points[i].r[2];
     }
 
-    double diff = sum - m_dSumPointsDigDataResult;
+    double dDiff = dSum - m_dSumPointsDigDataResult;
 
-    QVERIFY( diff < m_dEpsilon );
+    QVERIFY( dDiff < m_dEpsilon );
 }
 
 //=============================================================================================================

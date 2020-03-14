@@ -79,7 +79,7 @@ private slots:
     void cleanupTestCase();
 
 private:
-    double epsilon;
+    double dEpsilon;
 
     MneMshDisplaySurfaceSet::SPtr m_pSurfSetBemLoaded;
 };
@@ -87,7 +87,7 @@ private:
 //=============================================================================================================
 
 TestMneMshDisplaySurfaceSet::TestMneMshDisplaySurfaceSet()
-: epsilon(0.000001)
+: dEpsilon(0.000001)
 {
 }
 
@@ -96,7 +96,7 @@ TestMneMshDisplaySurfaceSet::TestMneMshDisplaySurfaceSet()
 void TestMneMshDisplaySurfaceSet::initTestCase()
 {
     qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
-    //qDebug() << "Epsilon" << epsilon;
+    //qDebug() << "dEpsilon" << dEpsilon;
 
     //Read the results produced with MNE-CPP
     //Calculate the alignment of the fiducials

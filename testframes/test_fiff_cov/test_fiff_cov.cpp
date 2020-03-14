@@ -83,7 +83,7 @@ private slots:
     void cleanupTestCase();
 
 private:
-    double epsilon;
+    double dEpsilon;
 
     FiffCov covLoaded;
     FiffCov covResult;
@@ -92,7 +92,7 @@ private:
 //=============================================================================================================
 
 TestFiffCov::TestFiffCov()
-: epsilon(0.000001)
+: dEpsilon(0.000001)
 {
 }
 
@@ -101,7 +101,7 @@ TestFiffCov::TestFiffCov()
 void TestFiffCov::initTestCase()
 {
     qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
-    qDebug() << "Epsilon" << epsilon;
+    qDebug() << "Epsilon" << dEpsilon;
     //Read the results produced with MNE-CPP
     QFile t_fileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis-cov.fif");
     covLoaded = FiffCov(t_fileIn);
@@ -122,14 +122,14 @@ void TestFiffCov::initTestCase()
 void TestFiffCov::compareData()
 {
     //Make the values a little bit bigger
-    MatrixXd data_diff = covResult.data*1000000 - covLoaded.data*1000000;
+    MatrixXd mDataDiff = covResult.data*1000000 - covLoaded.data*1000000;
 
 //    qDebug()<<"abs(covResult.data.sum()) "<<covResult.data.normalized().sum();
 //    qDebug()<<"abs(covLoaded.data.sum()) "<<covLoaded.data.normalized().sum();
-//    qDebug()<<"abs(data_diff.sum()) "<<abs(data_diff.sum());
+//    qDebug()<<"abs(mDataDiff.sum()) "<<abs(mDataDiff.sum());
 //    qDebug()<<"epsilon "<<epsilon;
 
-    QVERIFY( std::abs(data_diff.sum()) < epsilon );
+    QVERIFY( std::abs(mDataDiff.sum()) < dEpsilon );
 }
 
 //=============================================================================================================

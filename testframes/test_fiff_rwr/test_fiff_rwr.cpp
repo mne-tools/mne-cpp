@@ -79,23 +79,23 @@ private slots:
     void cleanupTestCase();
 
 private:
-    double epsilon;
+    double dEpsilon;
 
-    FiffRawData first_in_raw;
+    FiffRawData rawFirstInRaw;
 
-    MatrixXd first_in_data;
-    MatrixXd first_in_times;
+    MatrixXd mFirstInData;
+    MatrixXd mFirstInTimes;
 
-    FiffRawData second_in_raw;
+    FiffRawData rawSecondInRaw;
 
-    MatrixXd second_in_data;
-    MatrixXd second_in_times;
+    MatrixXd mSecondInData;
+    MatrixXd mSecondInTimes;
 };
 
 //=============================================================================================================
 
 TestFiffRWR::TestFiffRWR()
-: epsilon(0.000001)
+: dEpsilon(0.000001)
 {
 }
 
@@ -104,7 +104,7 @@ TestFiffRWR::TestFiffRWR()
 void TestFiffRWR::initTestCase()
 {
     qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
-    qDebug() << "Epsilon" << epsilon;
+    qDebug() << "dEpsilon" << dEpsilon;
 
     QFile t_fileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
     QFile t_fileOut(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw_test_rwr_out.fif");
@@ -124,42 +124,42 @@ void TestFiffRWR::initTestCase()
     //
     //   Setup for reading the raw data
     //
-    first_in_raw = FiffRawData(t_fileIn);
+    rawFirstInRaw = FiffRawData(t_fileIn);
 
     //
     //   Set up pick list: MEG + STI 014 - bad channels
     //
     //
-    bool want_meg   = true;
-    bool want_eeg   = false;
-    bool want_stim  = false;
+    bool bWantMeg   = true;
+    bool bWantEeg   = false;
+    bool bWantStim  = false;
     QStringList include;
     include << "STI 014";
 
-    MatrixXi picks = first_in_raw.info.pick_types(want_meg, want_eeg, want_stim, include, first_in_raw.info.bads); // prefer member function
-    if(picks.cols() == 0)
+    MatrixXi vPicks = rawFirstInRaw.info.pick_types(bWantMeg, bWantEeg, bWantStim, include, rawFirstInRaw.info.bads); // prefer member function
+    if(vPicks.cols() == 0)
     {
         include.clear();
         include << "STI101" << "STI201" << "STI301";
-        picks = first_in_raw.info.pick_types(want_meg, want_eeg, want_stim, include, first_in_raw.info.bads);// prefer member function
-        if(picks.cols() == 0)
+        vPicks = rawFirstInRaw.info.pick_types(bWantMeg, bWantEeg, bWantStim, include, rawFirstInRaw.info.bads);// prefer member function
+        if(vPicks.cols() == 0)
         {
             printf("channel list may need modification\n");
         }
     }
     //
-    RowVectorXd cals;
+    RowVectorXd vCals;
 
-    FiffStream::SPtr outfid = FiffStream::start_writing_raw(t_fileOut,first_in_raw.info, cals/*, picks*/);
+    FiffStream::SPtr outfid = FiffStream::start_writing_raw(t_fileOut,rawFirstInRaw.info, vCals/*, vPicks*/);
 
     //
     //   Set up the reading parameters
     //
-    qint32 num_of_junks = 5;
-    float quantum_sec = 1.0f;//read and write in 1 sec junks
-    fiff_int_t from = first_in_raw.first_samp;
-    fiff_int_t to = first_in_raw.first_samp + num_of_junks*quantum_sec*first_in_raw.info.sfreq;//raw.last_samp;
-    fiff_int_t quantum = ceil(quantum_sec*first_in_raw.info.sfreq);
+    qint32 iNumOfJunks = 5;
+    float fQuantumSec = 1.0f;//read and write in 1 sec junks
+    fiff_int_t from = rawFirstInRaw.first_samp;
+    fiff_int_t to = rawFirstInRaw.first_samp + iNumOfJunks*fQuantumSec*rawFirstInRaw.info.sfreq;//raw.last_samp;
+    fiff_int_t quantum = ceil(fQuantumSec*rawFirstInRaw.info.sfreq);
 
     //
     //   To read the whole file at once set
@@ -169,7 +169,7 @@ void TestFiffRWR::initTestCase()
     //
     //   Read and write all the data
     //
-    bool first_buffer = true;
+    bool bFirstBuffer = true;
 
     fiff_int_t first, last;
 
@@ -181,7 +181,7 @@ void TestFiffRWR::initTestCase()
             last = to;
         }
 
-        if (!first_in_raw.read_raw_segment(first_in_data,first_in_times,first,last/*,picks*/))
+        if (!rawFirstInRaw.read_raw_segment(mFirstInData,mFirstInTimes,first,last/*,vPicks*/))
         {
                 printf("error during read_raw_segment\n");
         }
@@ -189,13 +189,13 @@ void TestFiffRWR::initTestCase()
         //   You can add your own miracle here
         //
         printf("Writing...");
-        if (first_buffer)
+        if (bFirstBuffer)
         {
            if (first > 0)
                outfid->write_int(FIFF_FIRST_SAMPLE,&first);
-           first_buffer = false;
+           bFirstBuffer = false;
         }
-        outfid->write_raw_buffer(first_in_data,cals);
+        outfid->write_raw_buffer(mFirstInData,vCals);
         printf("[done]\n");
     }
 
@@ -212,20 +212,20 @@ void TestFiffRWR::initTestCase()
     //
     //   Setup for reading the raw data from out file
     //
-    second_in_raw = FiffRawData(t_fileOut);
+    rawSecondInRaw = FiffRawData(t_fileOut);
 
     //
     //   Set up pick list: MEG + STI 014 - bad channels
     //
     //
 
-    picks = second_in_raw.info.pick_types(want_meg, want_eeg, want_stim, include, second_in_raw.info.bads); // prefer member function
-    if(picks.cols() == 0)
+    vPicks = rawSecondInRaw.info.pick_types(bWantMeg, bWantEeg, bWantStim, include, rawSecondInRaw.info.bads); // prefer member function
+    if(vPicks.cols() == 0)
     {
         include.clear();
         include << "STI101" << "STI201" << "STI301";
-        picks = second_in_raw.info.pick_types(want_meg, want_eeg, want_stim, include, second_in_raw.info.bads);// prefer member function
-        if(picks.cols() == 0)
+        vPicks = rawSecondInRaw.info.pick_types(bWantMeg, bWantEeg, bWantStim, include, rawSecondInRaw.info.bads);// prefer member function
+        if(vPicks.cols() == 0)
         {
             printf("channel list may need modification\n");
         }
@@ -243,7 +243,7 @@ void TestFiffRWR::initTestCase()
             last = to;
         }
 
-        if (!second_in_raw.read_raw_segment(second_in_data,second_in_times,first,last/*,picks*/))
+        if (!rawSecondInRaw.read_raw_segment(mSecondInData,mSecondInTimes,first,last/*,vPicks*/))
         {
                 printf("error during read_raw_segment\n");
         }
@@ -256,24 +256,24 @@ void TestFiffRWR::initTestCase()
 
 void TestFiffRWR::compareData()
 {
-    MatrixXd data_diff = first_in_data - second_in_data;
+    MatrixXd mDataDiff = mFirstInData - mSecondInData;
 //    std::cout << "\tCompare data:\n";
-//    std::cout << "\tFirst data\n" << first_in_data.block(0,0,4,4) << "\n";
-//    std::cout << "\tSecond data\n" << second_in_data.block(0,0,4,4) << "\n";
+//    std::cout << "\tFirst data\n" << mFirstInData.block(0,0,4,4) << "\n";
+//    std::cout << "\tSecond data\n" << mSecondInData.block(0,0,4,4) << "\n";
 
-    QVERIFY( data_diff.sum() < epsilon );
+    QVERIFY( mDataDiff.sum() < dEpsilon );
 }
 
 //=============================================================================================================
 
 void TestFiffRWR::compareTimes()
 {
-    MatrixXd times_diff = first_in_times - second_in_times;
+    MatrixXd mTimesDiff = mFirstInTimes - mSecondInTimes;
 //    std::cout << "\tCompare Times:\n";
-//    std::cout << "\tFirst times\n" << first_in_times.block(0,0,1,4) << "\n";
-//    std::cout << "\tSecond times\n" << second_in_times.block(0,0,1,4) << "\n";
+//    std::cout << "\tFirst times\n" << mFirstInTimes.block(0,0,1,4) << "\n";
+//    std::cout << "\tSecond times\n" << mSecondInTimes.block(0,0,1,4) << "\n";
 
-    QVERIFY( times_diff.sum() < epsilon );
+    QVERIFY( mTimesDiff.sum() < dEpsilon );
 }
 
 //=============================================================================================================
@@ -282,28 +282,28 @@ void TestFiffRWR::compareInfo()
 {
     //Sampling frequency
     std::cout << "[1] Sampling Frequency Check\n";
-    QVERIFY( first_in_raw.info.sfreq == second_in_raw.info.sfreq );
+    QVERIFY( rawFirstInRaw.info.sfreq == rawSecondInRaw.info.sfreq );
 
     //Projection
     std::cout << "[2] Projection Check\n";
-    QVERIFY( first_in_raw.info.projs.size() == second_in_raw.info.projs.size() );
+    QVERIFY( rawFirstInRaw.info.projs.size() == rawSecondInRaw.info.projs.size() );
 
-    for( qint32 i = 0; i < first_in_raw.info.projs.size(); ++i )
+    for( qint32 i = 0; i < rawFirstInRaw.info.projs.size(); ++i )
     {
         std::cout << "Projector " << i << std::endl;
-        MatrixXd tmp = first_in_raw.info.projs[i].data->data - second_in_raw.info.projs[i].data->data;
-        QVERIFY( tmp.sum() < epsilon );
+        MatrixXd mTmp = rawFirstInRaw.info.projs[i].data->data - rawSecondInRaw.info.projs[i].data->data;
+        QVERIFY( mTmp.sum() < dEpsilon );
     }
 
     //Compensators
     std::cout << "[3] Compensator Check\n";
-    QVERIFY( first_in_raw.info.comps.size() == second_in_raw.info.comps.size() );
+    QVERIFY( rawFirstInRaw.info.comps.size() == rawSecondInRaw.info.comps.size() );
 
-    for( qint32 i = 0; i < first_in_raw.info.comps.size(); ++i )
+    for( qint32 i = 0; i < rawFirstInRaw.info.comps.size(); ++i )
     {
         std::cout << "Compensator " << i << std::endl;
-        MatrixXd tmp = first_in_raw.info.comps[i].data->data - second_in_raw.info.comps[i].data->data;
-        QVERIFY( tmp.sum() < epsilon );
+        MatrixXd mTmp = rawFirstInRaw.info.comps[i].data->data - rawSecondInRaw.info.comps[i].data->data;
+        QVERIFY( mTmp.sum() < dEpsilon );
     }
 }
 

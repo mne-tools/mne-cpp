@@ -78,7 +78,7 @@ private slots:
     void cleanupTestCase();
 
 private:
-    double epsilon;
+    double dEpsilon;
 
     QSharedPointer<MNEForwardSolution> m_pFwdMEGEEGRead;
     QSharedPointer<MNEForwardSolution> m_pFwdMEGEEGRef;
@@ -87,7 +87,7 @@ private:
 //=============================================================================================================
 
 TestMneForwardSolution::TestMneForwardSolution()
-: epsilon(0.0001)
+: dEpsilon(0.0001)
 {
 }
 

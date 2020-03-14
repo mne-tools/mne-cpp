@@ -90,11 +90,11 @@ private slots:
 private:
     // real data
     MNEBemSurface realSurface;
-    QVector<Vector3f> megSensors;
+    QVector<Vector3f> vMegSensors;
     FiffEvoked evoked;
     // random data (keep computation times short)
     MNEBemSurface smallSurface;
-    QVector<int> smallSubset;
+    QVector<int> vSmallSubset;
 };
 
 //=============================================================================================================
@@ -121,38 +121,38 @@ void TestInterpolation::initTestCase()
     }
     for( const FiffChInfo &info : evoked.info.chs) {
         if(info.kind == FIFFV_MEG_CH && info.unit == FIFF_UNIT_T) {
-            megSensors.push_back(info.chpos.r0);
+            vMegSensors.push_back(info.chpos.r0);
         }
     }
 
     // generate small test mesh with 100 vertices:
-    MatrixX3f vertPos(100, 3);
+    MatrixX3f vVertPos(100, 3);
     for(qint8 i = 0; i < 100; i++) {
         float x = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
         float y = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
         float z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 
-        vertPos(i, 0) = x;
-        vertPos(i, 1) = y;
-        vertPos(i, 2) = z;
+        vVertPos(i, 0) = x;
+        vVertPos(i, 1) = y;
+        vVertPos(i, 2) = z;
     }
-    smallSurface.rr = vertPos;
+    smallSurface.rr = vVertPos;
 
     // generate random adjacency, assume that every vertex has 4 neighbors
     for (int i = 0; i < 100; ++i) {
-        QVector<int> neighborList;
+        QVector<int> vNeighborList;
         for (int a = 0; a < 4; ++a) {
             // this allows duplicates, probably is not a problem
-            neighborList.push_back(rand() % 100);
+            vNeighborList.push_back(rand() % 100);
         }
-        smallSurface.neighbor_vert.push_back(neighborList);
+        smallSurface.neighbor_vert.push_back(vNeighborList);
     }
 
-    // generate random subset of test mesh of size subsetSize
-    int subsetSize = rand() % 100;
-    for (int b = 0; b <= subsetSize; b++) {
+    // generate random subset of test mesh of size iSubsetSize
+    int iSubsetSize = rand() % 100;
+    for (int b = 0; b <= iSubsetSize; b++) {
         // this allows duplicates, probably is not a problem
-        smallSubset.push_back(rand() % 100);
+        vSmallSubset.push_back(rand() % 100);
     }
 }
 
@@ -161,24 +161,24 @@ void TestInterpolation::initTestCase()
 void TestInterpolation::testDimensionsForInterpolation()
 {
     // create weight matrix from distance table
-    QSharedPointer<MatrixXd> distTable = GeometryInfo::scdc(smallSurface.rr, smallSurface.neighbor_vert, smallSubset);
-    QSharedPointer<SparseMatrix<float> > testWeightMatrix = Interpolation::createInterpolationMat(smallSubset,
-                                                                                 distTable,
+    QSharedPointer<MatrixXd> pDistTable = GeometryInfo::scdc(smallSurface.rr, smallSurface.neighbor_vert, vSmallSubset);
+    QSharedPointer<SparseMatrix<float> > pTestWeightMatrix = Interpolation::createInterpolationMat(vSmallSubset,
+                                                                                 pDistTable,
                                                                                  Interpolation::linear);
 
-    QVERIFY(testWeightMatrix->rows() == distTable->rows());
-    QVERIFY(testWeightMatrix->cols() == distTable->cols());
+    QVERIFY(pTestWeightMatrix->rows() == pDistTable->rows());
+    QVERIFY(pTestWeightMatrix->cols() == pDistTable->cols());
 
     // random data set
-    VectorXd testSignal = VectorXd::Random(smallSubset.size());
+    VectorXd testSignal = VectorXd::Random(vSmallSubset.size());
 
-    QVERIFY(testWeightMatrix->cols() == testSignal.rows());
+    QVERIFY(pTestWeightMatrix->cols() == testSignal.rows());
 
     // interpolate with random data set
-    VectorXf testInterpolatedSignal = Interpolation::interpolateSignal(*testWeightMatrix, testSignal.cast<float>());
+    VectorXf vTestInterpolatedSignal = Interpolation::interpolateSignal(*pTestWeightMatrix, testSignal.cast<float>());
 
-    QVERIFY(testInterpolatedSignal.rows() == smallSurface.rr.rows());
-    QVERIFY(testInterpolatedSignal.cols() == 1);
+    QVERIFY(vTestInterpolatedSignal.rows() == smallSurface.rr.rows());
+    QVERIFY(vTestInterpolatedSignal.cols() == 1);
 }
 
 //=============================================================================================================
@@ -186,39 +186,39 @@ void TestInterpolation::testDimensionsForInterpolation()
 void TestInterpolation::testSumOfRow()
 {
     // projecting with MEG:
-    QVector<int> mappedSubSet = GeometryInfo::projectSensors(realSurface.rr,
-                                                                megSensors);
+    QVector<int> vMappedSubSet = GeometryInfo::projectSensors(realSurface.rr,
+                                                                vMegSensors);
 
     // SCDC with cancel distance 0.20 m:
-    QSharedPointer<MatrixXd> distanceMatrix = GeometryInfo::scdc(realSurface.rr,
+    QSharedPointer<MatrixXd> pDistanceMatrix = GeometryInfo::scdc(realSurface.rr,
                                                  realSurface.neighbor_vert,
-                                                 mappedSubSet,
+                                                 vMappedSubSet,
                                                  0.20);
 
     // filtering of bad channel
-    GeometryInfo::filterBadChannels(distanceMatrix,
+    GeometryInfo::filterBadChannels(pDistanceMatrix,
                                     evoked.info,
                                     FIFFV_MEG_CH);
 
     // weight matrix creation
-    QSharedPointer<SparseMatrix<float> > w = Interpolation::createInterpolationMat(mappedSubSet,
-                                                                  distanceMatrix,
+    QSharedPointer<SparseMatrix<float>> pW = Interpolation::createInterpolationMat(vMappedSubSet,
+                                                                  pDistanceMatrix,
                                                                   Interpolation::linear,
                                                                   0.20);
 
-    qint32 n = w->rows();
-    qint32 m = w->cols();
+    qint32 n = pW->rows();
+    qint32 m = pW->cols();
 
     const float LOWER_TRESH = 0.99999f;
     const float UPPER_TRESH = 1.00001f;
 
     for (int r = 0; r < n; ++r) {
-        float rowSum = 0.0f;
+        float fRowSum = 0.0f;
         for (int c = 0; c < m; ++c) {
-            rowSum += w->coeff(r, c);
+            fRowSum += pW->coeff(r, c);
         }
         // either 1.0 (within range of some sensors) or 0.0 (out of range for all sensors)
-        QVERIFY((rowSum >= LOWER_TRESH && rowSum <= UPPER_TRESH) || rowSum == 0.0);
+        QVERIFY((fRowSum >= LOWER_TRESH && fRowSum <= UPPER_TRESH) || fRowSum == 0.0);
     }
 }
 
@@ -227,23 +227,23 @@ void TestInterpolation::testSumOfRow()
 void TestInterpolation::testEmptyInputsForWeightMatrix()
 {
     // SCDC with cancel distance 0.03:
-    QSharedPointer<MatrixXd> distTable = GeometryInfo::scdc(smallSurface.rr, smallSurface.neighbor_vert, smallSubset, 0.03);
+    QSharedPointer<MatrixXd> pDistTable = GeometryInfo::scdc(smallSurface.rr, smallSurface.neighbor_vert, vSmallSubset, 0.03);
 
     // ---------- empty sensor indices ----------
-    QVector<int> emptySensors;
-    QVERIFY(Interpolation::createInterpolationMat(emptySensors,
-                                                  distTable,
+    QVector<int> vEmptySensors;
+    QVERIFY(Interpolation::createInterpolationMat(vEmptySensors,
+                                                  pDistTable,
                                                   Interpolation::linear,
                                                   0.03)->size() == 0);
 
     // ---------- empty distance table ----------
-    QSharedPointer<MatrixXd> emptyDistTable = QSharedPointer<MatrixXd>::create();
-    QSharedPointer<SparseMatrix<float> > resultMat = Interpolation::createInterpolationMat(smallSubset,
-                                                                          emptyDistTable,
+    QSharedPointer<MatrixXd> pEmptypDistTable = QSharedPointer<MatrixXd>::create();
+    QSharedPointer<SparseMatrix<float> > pResultMat = Interpolation::createInterpolationMat(vSmallSubset,
+                                                                          pEmptypDistTable,
                                                                           Interpolation::linear,
                                                                           0.03);
 
-    QVERIFY((resultMat->rows() == 0) && (resultMat->cols() == 0));
+    QVERIFY((pResultMat->rows() == 0) && (pResultMat->cols() == 0));
 }
 
 //=============================================================================================================

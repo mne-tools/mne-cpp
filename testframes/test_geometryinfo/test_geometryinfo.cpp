@@ -93,7 +93,7 @@ private:
     MNEBemSurface realSurface;
     // random data (keep computation times short)
     MNEBemSurface smallSurface;
-    QVector<int> smallSubset;
+    QVector<int> vSmallSubset;
 };
 
 //=============================================================================================================
@@ -110,33 +110,33 @@ void TestGeometryInfo::initTestCase() {
     realSurface = t_sensorSurfaceVV[0];
 
     // generate small test mesh with 100 vertices:
-    MatrixX3f vertPos(100, 3);
+    MatrixX3f mVertPos(100, 3);
     for(qint8 i = 0; i < 100; i++) {
         float x = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
         float y = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
         float z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 
-        vertPos(i, 0) = x;
-        vertPos(i, 1) = y;
-        vertPos(i, 2) = z;
+        mVertPos(i, 0) = x;
+        mVertPos(i, 1) = y;
+        mVertPos(i, 2) = z;
     }
-    smallSurface.rr = vertPos;
+    smallSurface.rr = mVertPos;
 
     // generate random adjacency, assume that every vertex has 4 neighbors
     for (int i = 0; i < 100; ++i) {
-        QVector<int> neighborList;
+        QVector<int> vNeighborList;
         for (int a = 0; a < 4; ++a) {
             // this allows duplicates, probably is not a problem
-            neighborList.push_back(rand() % 100);
+            vNeighborList.push_back(rand() % 100);
         }
-        smallSurface.neighbor_vert.push_back(neighborList);
+        smallSurface.neighbor_vert.push_back(vNeighborList);
     }
 
-    //generate random subset of test mesh of size subsetSize
-    int subsetSize = rand() % 100;
-    for (int b = 0; b <= subsetSize; b++) {
+    //generate random subset of test mesh of size SubsetSize
+    int iSubsetSize = rand() % 100;
+    for (int b = 0; b <= iSubsetSize; b++) {
         // this allows duplicates, probably is not a problem
-        smallSubset.push_back(rand() % 100);
+        vSmallSubset.push_back(rand() % 100);
     }
 }
 
@@ -152,28 +152,28 @@ void TestGeometryInfo::testBadChannelFiltering() {
     {
         return;
     }
-    QVector<Vector3f> megSensors;
+    QVector<Vector3f> vMegSensors;
     for( const FiffChInfo &info : evoked.info.chs) {
         if(info.kind == FIFFV_MEG_CH) {
-            megSensors.push_back(info.chpos.r0);
+            vMegSensors.push_back(info.chpos.r0);
         }
     }
 
     // projecting with MEG:
-    QVector<int> mappedSubSet = GeometryInfo::projectSensors(realSurface.rr, megSensors);
+    QVector<int> mappedSubSet = GeometryInfo::projectSensors(realSurface.rr, vMegSensors);
     // SCDC with cancel distance 0.03:
-    QSharedPointer<MatrixXd> distanceMatrix = GeometryInfo::scdc(realSurface.rr, realSurface.neighbor_vert, mappedSubSet, 0.03);
+    QSharedPointer<MatrixXd> pDistanceMatrix = GeometryInfo::scdc(realSurface.rr, realSurface.neighbor_vert, mappedSubSet, 0.03);
     // filter for bad MEG channels:
-    QVector<int> erasedColums = GeometryInfo::filterBadChannels(distanceMatrix, evoked.info, FIFFV_MEG_CH);
+    QVector<int> vErasedColums = GeometryInfo::filterBadChannels(pDistanceMatrix, evoked.info, FIFFV_MEG_CH);
 
-    for (qint32 col : erasedColums) {
-        qint64 notInfCount = 0;
-        for (qint32 row = 0; row < distanceMatrix->rows(); ++row) {
-            if (distanceMatrix->coeff(row, col) != FLOAT_INFINITY) {
-                notInfCount++;
+    for (qint32 col : vErasedColums) {
+        qint64 iNotInfCount = 0;
+        for (qint32 row = 0; row < pDistanceMatrix->rows(); ++row) {
+            if (pDistanceMatrix->coeff(row, col) != FLOAT_INFINITY) {
+                iNotInfCount++;
             }
         }
-        QVERIFY(notInfCount == 0);
+        QVERIFY(iNotInfCount == 0);
     }
 }
 
@@ -181,25 +181,25 @@ void TestGeometryInfo::testBadChannelFiltering() {
 
 void TestGeometryInfo::testEmptyInputsForProjecting() {
     // sensor projecting:
-    QVector<Vector3f> emptySensors;
-    QVector<int> emptyMapping = GeometryInfo::projectSensors(realSurface.rr, emptySensors);
-    QVERIFY(emptyMapping.size() == 0);
+    QVector<Vector3f> vEmptySensors;
+    QVector<int> vEmptyMapping = GeometryInfo::projectSensors(realSurface.rr, vEmptySensors);
+    QVERIFY(vEmptyMapping.size() == 0);
 }
 
 //=============================================================================================================
 
 void TestGeometryInfo::testEmptyInputsForSCDC() {
-    QVector<int> vecVertSubset;
-    QSharedPointer<MatrixXd> distTable = GeometryInfo::scdc(smallSurface.rr, smallSurface.neighbor_vert, vecVertSubset);
-    QVERIFY(distTable->rows() == distTable->cols());
+    QVector<int> vVertSubset;
+    QSharedPointer<MatrixXd> pDistTable = GeometryInfo::scdc(smallSurface.rr, smallSurface.neighbor_vert, vVertSubset);
+    QVERIFY(pDistTable->rows() == pDistTable->cols());
 }
 
 //=============================================================================================================
 
 void TestGeometryInfo::testDimensionsForSCDC() {
-    QSharedPointer<MatrixXd> distTable = GeometryInfo::scdc(smallSurface.rr, smallSurface.neighbor_vert, smallSubset);
-    QVERIFY(distTable->rows() == smallSurface.rr.rows());
-    QVERIFY(distTable->cols() == smallSubset.size());
+    QSharedPointer<MatrixXd> pDistTable = GeometryInfo::scdc(smallSurface.rr, smallSurface.neighbor_vert, vSmallSubset);
+    QVERIFY(pDistTable->rows() == smallSurface.rr.rows());
+    QVERIFY(pDistTable->cols() == vSmallSubset.size());
 }
 
 //=============================================================================================================
