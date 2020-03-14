@@ -38,8 +38,6 @@
 
 #include <utils/generics/applicationlogger.h>
 
-#include <utils/generics/applicationlogger.h>
-
 #include <iostream>
 #include <vector>
 #include <math.h>
@@ -215,82 +213,77 @@ void TestHpiFit::initTestCase()
 
 void TestHpiFit::compareTranslation()
 {
-    MatrixXd diff = MatrixXd::Zero(mRefPos.rows(),3);
-    RowVector3d diff_trans;
-    diff_trans(0) = (mRefPos.col(4)-mHpiPos.col(4)).mean();
-    diff_trans(1) = (mRefPos.col(5)-mHpiPos.col(5)).mean();
-    diff_trans(2) = (mRefPos.col(6)-mHpiPos.col(6)).mean();
-    qDebug() << "dErrorTrans x: " << std::abs(diff_trans(0));
-    qDebug() << "dErrorTrans y: " << std::abs(diff_trans(1));
-    qDebug() << "dErrorTrans z: " << std::abs(diff_trans(2));
-    QVERIFY(std::abs(diff_trans(0)) < dErrorTrans);
-    QVERIFY(std::abs(diff_trans(1)) < dErrorTrans);
-    QVERIFY(std::abs(diff_trans(2)) < dErrorTrans);
+    RowVector3d vDiffTrans;
+    vDiffTrans(0) = (mRefPos.col(4)-mHpiPos.col(4)).mean();
+    vDiffTrans(1) = (mRefPos.col(5)-mHpiPos.col(5)).mean();
+    vDiffTrans(2) = (mRefPos.col(6)-mHpiPos.col(6)).mean();
+    qDebug() << "ErrorTrans x: " << std::abs(vDiffTrans(0));
+    qDebug() << "ErrorTrans y: " << std::abs(vDiffTrans(1));
+    qDebug() << "ErrorTrans z: " << std::abs(vDiffTrans(2));
+    QVERIFY(std::abs(vDiffTrans(0)) < dErrorTrans);
+    QVERIFY(std::abs(vDiffTrans(1)) < dErrorTrans);
+    QVERIFY(std::abs(vDiffTrans(2)) < dErrorTrans);
 }
 
 //=============================================================================================================
 
 void TestHpiFit::compareRotation()
 {
-    MatrixXd diff = MatrixXd::Zero(mRefPos.rows(),3);
-    RowVector3d diff_quat;
-    diff_quat(0) = (mRefPos.col(1)-mHpiPos.col(1)).mean();
-    diff_quat(1) = (mRefPos.col(2)-mHpiPos.col(2)).mean();
-    diff_quat(2) = (mRefPos.col(3)-mHpiPos.col(3)).mean();
-    qDebug() << "dErrorQuat q1: " <<std::abs(diff_quat(0));
-    qDebug() << "dErrorQuat q2: " <<std::abs(diff_quat(1));
-    qDebug() << "dErrorQuat q3: " <<std::abs(diff_quat(2));
-    QVERIFY(std::abs(diff_quat(0)) < dErrorQuat);
-    QVERIFY(std::abs(diff_quat(1)) < dErrorQuat);
-    QVERIFY(std::abs(diff_quat(2)) < dErrorQuat);
+    RowVector3d vDiffQuat;
+    vDiffQuat(0) = (mRefPos.col(1)-mHpiPos.col(1)).mean();
+    vDiffQuat(1) = (mRefPos.col(2)-mHpiPos.col(2)).mean();
+    vDiffQuat(2) = (mRefPos.col(3)-mHpiPos.col(3)).mean();
+    qDebug() << "ErrorQuat q1: " <<std::abs(vDiffQuat(0));
+    qDebug() << "ErrorQuat q2: " <<std::abs(vDiffQuat(1));
+    qDebug() << "ErrorQuat q3: " <<std::abs(vDiffQuat(2));
+    QVERIFY(std::abs(vDiffQuat(0)) < dErrorQuat);
+    QVERIFY(std::abs(vDiffQuat(1)) < dErrorQuat);
+    QVERIFY(std::abs(vDiffQuat(2)) < dErrorQuat);
 }
 
 //=============================================================================================================
 
 void TestHpiFit::compareMove()
 {
-    MatrixXd diff = MatrixXd::Zero(mRefResult.rows(),1);
-    float diffMove = (mRefResult.col(0)-mHpiResult.col(0)).mean();
-    diffMove = std::abs(diffMove);
-    qDebug() << "diffMove: [m]" << diffMove;
+    float fDiffMove = (mRefResult.col(0)-mHpiResult.col(0)).mean();
+    fDiffMove = std::abs(fDiffMove);
 
-    QVERIFY(std::abs(diffMove) < dErrorTrans);
+    qDebug() << "DiffMove: [m]" << fDiffMove;
+    QVERIFY(std::abs(fDiffMove) < dErrorTrans);
 }
 
 //=============================================================================================================
 
 void TestHpiFit::compareAngle()
 {
-    MatrixXd diff = MatrixXd::Zero(mRefResult.rows(),1);
-    float diffAngle = (mRefResult.col(1)-mRefResult.col(1)).mean();
-    diffAngle = std::abs(diffAngle);
+    float fDiffAngle = (mRefResult.col(1)-mRefResult.col(1)).mean();
+    fDiffAngle = std::abs(fDiffAngle);
 
-    qDebug() << "diffAngle: [degree]" << diffAngle;
-    QVERIFY(std::abs(diffAngle) < dErrorAngle);
+    qDebug() << "DiffAngle: [degree]" << fDiffAngle;
+    QVERIFY(std::abs(fDiffAngle) < dErrorAngle);
 }
 
 //=============================================================================================================
 
 void TestHpiFit::compareDetect()
 {
-    MatrixXd diff = MatrixXd::Zero(mRefResult.rows(),1);
-    float diffCompare = (mRefResult.col(2)-mRefResult.col(2)).mean();
-    diffCompare = std::abs(diffCompare);
+    float fDiffCompare = (mRefResult.col(2)-mRefResult.col(2)).mean();
+    fDiffCompare = std::abs(fDiffCompare);
 
-    qDebug() << "diffCompare: " << diffCompare;
-    QVERIFY(std::abs(diffCompare) == dErrorDetect);
+    qDebug() << "DiffCompare: " << fDiffCompare;
+    QVERIFY(std::abs(fDiffCompare) == dErrorDetect);
 }
 
 //=============================================================================================================
 
 void TestHpiFit::compareTime()
 {
-    MatrixXd diff = MatrixXd::Zero(mRefPos.rows(),1);
-    diff.col(0) = mRefPos.col(0)-mHpiPos.col(0);
-    float diff_t = diff.col(0).mean();
+    MatrixXd mDiff = MatrixXd::Zero(mRefPos.rows(),1);
+    mDiff.col(0) = mRefPos.col(0)-mHpiPos.col(0);
+    float fDiffTime = mDiff.col(0).mean();
 
-    qDebug() << "dErrorTime: " << diff_t;
-    QVERIFY(std::abs(diff_t) < dErrorTime);
+    qDebug() << "ErrorTime: " << fDiffTime;
+    QVERIFY(std::abs(fDiffTime) < dErrorTime);
 }
 
 //=============================================================================================================
