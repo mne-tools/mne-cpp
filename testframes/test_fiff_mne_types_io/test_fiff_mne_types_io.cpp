@@ -76,18 +76,18 @@ private slots:
     void cleanupTestCase();
 
 private:
-    double epsilon;
+    double dEpsilon;
 
-    QString rawName;
-    QString evokedName;
+    QString sRawName;
+    QString sEvokedName;
 };
 
 //=============================================================================================================
 
 TestFiffMneTypesIO::TestFiffMneTypesIO()
-: epsilon(0.000001)
-, rawName(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif")
-, evokedName(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif")
+: dEpsilon(0.000001)
+, sRawName(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif")
+, sEvokedName(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif")
 {
 }
 
@@ -96,66 +96,66 @@ TestFiffMneTypesIO::TestFiffMneTypesIO()
 void TestFiffMneTypesIO::initTestCase()
 {
     qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
-    qDebug() << "Epsilon" << epsilon;
-    qDebug() << "Raw File Name" << rawName;
-    qDebug() << "Evoked File Name" << evokedName;
+    qDebug() << "Epsilon" << dEpsilon;
+    qDebug() << "Raw File Name" << sRawName;
+    qDebug() << "Evoked File Name" << sEvokedName;
 }
 
 //=============================================================================================================
 
 void TestFiffMneTypesIO::checkFiffCoordTrans()
 {
-    QFile file(evokedName);
+    QFile file(sEvokedName);
     FiffStream::SPtr stream(new FiffStream(&file));
     if(!stream->open())
         QFAIL("Failed to open data file.");
 
     FiffTag::SPtr t_pTag;
-    fiffCoordTransRec_REF reference_trans;
-    FiffCoordTrans test_trans;
+    fiffCoordTransRec_REF refTransReference;
+    FiffCoordTrans transTest;
 
-    bool trans_found = false;
+    bool bTransFound = false;
 
     for (int k = 0; k < stream->dir().size(); k++) {
         if(stream->dir()[k]->kind == FIFF_COORD_TRANS) {
             if(!stream->read_tag(t_pTag, stream->dir()[k]->pos))
                 QFAIL("Failed to read FIFF_COORD_TRANS tag.");
-            reference_trans = *(fiffCoordTrans_REF)t_pTag->data();
-            test_trans = t_pTag->toCoordTrans();
+            refTransReference = *(fiffCoordTrans_REF)t_pTag->data();
+            transTest = t_pTag->toCoordTrans();
 
             //CHECKS
-            QVERIFY(reference_trans.from == test_trans.from);
-            QVERIFY(reference_trans.to == test_trans.to);
+            QVERIFY(refTransReference.from == transTest.from);
+            QVERIFY(refTransReference.to == transTest.to);
             //Check rot
             for (int i = 0; i < 3; ++i) {
                 for (int j = 0; j < 3; ++j) {
-//                    printf("rot %f == %f ", reference_trans.rot[i][j], test_trans.trans(i,j));
-                    QVERIFY(reference_trans.rot[i][j] == test_trans.trans(i,j));
+//                    printf("rot %f == %f ", refTransReference.rot[i][j], transTest.trans(i,j));
+                    QVERIFY(refTransReference.rot[i][j] == transTest.trans(i,j));
                 }
             }
             //Check move
             for (int i = 0; i < 3; ++i) {
-//                    printf("move %f == %f ", reference_trans.move[i], test_trans.trans(i,3));
-                    QVERIFY(reference_trans.move[i] == test_trans.trans(i,3));
+//                    printf("move %f == %f ", refTransReference.move[i], transTest.trans(i,3));
+                    QVERIFY(refTransReference.move[i] == transTest.trans(i,3));
             }
             //Check invrot
             for (int i = 0; i < 3; ++i) {
                 for (int j = 0; j < 3; ++j) {
-//                    printf("invrot %f == %f ", reference_trans.invrot[i][j], test_trans.invtrans(i,j));
-                    QVERIFY(reference_trans.invrot[i][j] == test_trans.invtrans(i,j));
+//                    printf("invrot %f == %f ", refTransReference.invrot[i][j], transTest.invtrans(i,j));
+                    QVERIFY(refTransReference.invrot[i][j] == transTest.invtrans(i,j));
                 }
             }
             //Check invmove
             for (int i = 0; i < 3; ++i) {
-//                    printf("invmove %f == %f ", reference_trans.invmove[i], test_trans.invtrans(i,3));
-                    QVERIFY(reference_trans.invmove[i] == test_trans.invtrans(i,3));
+//                    printf("invmove %f == %f ", refTransReference.invmove[i], transTest.invtrans(i,3));
+                    QVERIFY(refTransReference.invmove[i] == transTest.invtrans(i,3));
             }
 
-            trans_found = true;
+            bTransFound = true;
         }
     }
 
-    if(!trans_found)
+    if(!bTransFound)
         QFAIL("No FIFF_COORD_TRANS found.");
 
     stream->close();
