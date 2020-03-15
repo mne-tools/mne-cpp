@@ -231,7 +231,9 @@ HpiView::~HpiView()
 void HpiView::setData(const Eigen::MatrixXd& matData)
 {
     //If bad channels changed, recalcluate projectors
-    if(m_iNubmerBadChannels != m_pFiffInfo->bads.size() || m_matCompProjectors.rows() == 0 || m_matCompProjectors.cols() == 0) {
+    if(m_iNubmerBadChannels != m_pFiffInfo->bads.size()
+       || m_matCompProjectors.rows() == 0
+       || m_matCompProjectors.cols() == 0) {
         updateProjections();
         m_iNubmerBadChannels = m_pFiffInfo->bads.size();
     }

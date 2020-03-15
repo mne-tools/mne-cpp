@@ -43,11 +43,12 @@
 
 #include "dummytoolbox_global.h"
 
+#include "FormFiles/dummysetupwidget.h"
+#include "FormFiles/dummyyourwidget.h"
+
 #include <scShared/Interfaces/IAlgorithm.h>
 #include <utils/generics/circularbuffer.h>
 #include <scMeas/realtimemultisamplearray.h>
-#include "FormFiles/dummysetupwidget.h"
-#include "FormFiles/dummyyourwidget.h"
 
 //=============================================================================================================
 // QT INCLUDES

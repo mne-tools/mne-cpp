@@ -65,6 +65,7 @@ using namespace Eigen;
 //=============================================================================================================
 
 DummyToolbox::DummyToolbox()
+: m_pDummyBuffer(CircularBuffer_Matrix_double::SPtr::create(16))
 {
     //Add action which will be visible in the plugin's toolbar
     m_pActionShowYourWidget = new QAction(QIcon(":/images/options.png"), tr("Your Toolbar Widget"),this);
@@ -79,8 +80,9 @@ DummyToolbox::DummyToolbox()
 
 DummyToolbox::~DummyToolbox()
 {
-    if(this->isRunning())
+    if(this->isRunning()) {
         stop();
+    }
 }
 
 //=============================================================================================================
@@ -115,12 +117,7 @@ void DummyToolbox::unload()
 //=============================================================================================================
 
 bool DummyToolbox::start()
-{    
-    //Delete Buffer - will be initailzed with first incoming data
-    if(!m_pDummyBuffer) {
-        m_pDummyBuffer = CircularBuffer_Matrix_double::SPtr::create(64);
-    }
-
+{
     //Start thread
     QThread::start();
 
