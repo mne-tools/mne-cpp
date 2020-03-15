@@ -40,7 +40,7 @@
 
 #if defined(STATICLIB)
 #  define LSLADAPTERSHARED_EXPORT
-#elif defined(LSLADAPTER_LIBRARY)
+#elif defined(LSLADAPTER_PLUGIN)
 #  define LSLADAPTERSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
 #  define LSLADAPTERSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
