@@ -57,7 +57,7 @@ SUBDIRS += \
 
     qtHaveModule(charts) {
         SUBDIRS += \
-         #   disp3D
+            disp3D
     } else {
         message("libraries.pro - The Qt Charts module is missing. Please install to build the disp3D library.")
     }

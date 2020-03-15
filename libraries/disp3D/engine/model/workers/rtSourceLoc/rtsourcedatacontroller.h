@@ -253,6 +253,7 @@ protected:
     //=========================================================================================================
     /**
      * Call this function whenever new raw data is available to be dispatched.
+     * This function is usefull, e.g., when the interpolation is done on shader (GPU) level.
      *
      * @param[in] vecDataVectorLeftHemi          The new streamed raw data for the left hemispehre.
      * @param[in] vecDataVectorRightHemi         The new streamed raw data for the right hemispehre.
@@ -456,6 +457,7 @@ signals:
     //=========================================================================================================
     /**
      * Emit this signal whenever a new raw data is streamed.
+     * This function is usefull, e.g., when the interpolation is done on shader (GPU) level.
      *
      * @param[in] vecDataVectorLeftHemi          The new streamed raw data for the left hemispehre.
      * @param[in] vecDataVectorRightHemi         The new streamed raw data for the right hemispehre.

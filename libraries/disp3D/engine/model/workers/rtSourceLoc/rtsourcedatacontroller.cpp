@@ -77,10 +77,10 @@ RtSourceDataController::RtSourceDataController()
                m_pRtSourceDataWorker.data(), &QObject::deleteLater);
 
        connect(m_pRtSourceDataWorker.data(), &RtSourceDataWorker::newRtRawData,
-               this, &RtSourceDataController::onNewRtRawData);
+               this, &RtSourceDataController::onNewRtRawData, Qt::BlockingQueuedConnection);
 
        connect(m_pRtSourceDataWorker.data(), &RtSourceDataWorker::newRtSmoothedData,
-               this, &RtSourceDataController::onNewSmoothedRtRawData);
+               this, &RtSourceDataController::onNewSmoothedRtRawData, Qt::BlockingQueuedConnection);
 
        connect(&m_timer, &QTimer::timeout,
                m_pRtSourceDataWorker.data(), &RtSourceDataWorker::streamData);
