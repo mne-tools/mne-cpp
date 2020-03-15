@@ -143,7 +143,7 @@ void LSLAdapterSetup::updateTextFields()
 
 //=============================================================================================================
 
-void LSLADAPTERPLUGIN::LSLAdapterSetup::on_blockSizeEdit_editingFinished()
+void LSLAdapterSetup::on_blockSizeEdit_editingFinished()
 {
     QString sInput = ui.blockSizeEdit->text();
     int iBlockSize = sInput.toInt();
