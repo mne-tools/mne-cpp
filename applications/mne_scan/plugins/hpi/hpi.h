@@ -60,8 +60,12 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB{
+namespace FIFFLIB {
     class FiffInfo;
+}
+
+namespace RTPROCESSINGLIB {
+    class RtHpi;
 }
 
 namespace SCMEASLIB{
@@ -146,6 +150,7 @@ private:
     QSharedPointer<FIFFLIB::FiffInfo>                                           m_pFiffInfo;            /**< Fiff measurement info.*/
 
     QSharedPointer<IOBUFFER::CircularBuffer_Matrix_double>                      m_pCircularBuffer;      /**< Holds incoming raw data. */
+    QSharedPointer<RTPROCESSINGLIB::RtHpi>         m_pRtHPI;            /**< The real-time HPI object. */
 
     SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pHpiInput;            /**< The RealTimeMultiSampleArray of the Hpi input.*/
 

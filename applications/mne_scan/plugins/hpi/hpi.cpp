@@ -42,6 +42,7 @@
 
 #include <disp/viewers/hpisettingsview.h>
 #include <scMeas/realtimemultisamplearray.h>
+#include <rtprocessing/rthpis.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -62,6 +63,7 @@ using namespace DISPLIB;
 using namespace FIFFLIB;
 using namespace SCSHAREDLIB;
 using namespace Eigen;
+using namespace RTPROCESSINGLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -155,6 +157,12 @@ void Hpi::update(SCMEASLIB::Measurement::SPtr pMeasurement)
         //Check if the fiff info was inititalized
         if(!m_pFiffInfo) {
             m_pFiffInfo = pRTMSA->info();
+
+            m_pRtHPI = RtHpi::SPtr::create(new RtHpi(m_pFiffInfo));
+            m_pRtHPI->setCoilFrequencies(m_vCoilFreqs);
+            connect(m_pRtHPI.data(), &RtHpi::newFittingResultAvailable,
+                    this, &HpiView::onNewFittingResultAvailable);
+
             initPluginControlWidgets();
         }
 
