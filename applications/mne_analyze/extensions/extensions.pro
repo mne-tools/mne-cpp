@@ -41,3 +41,4 @@ SUBDIRS += \
     dataloader \
     datamanager \
     rawdataviewer \
+#    eventwindow \
