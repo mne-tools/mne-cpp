@@ -82,7 +82,7 @@ CONFIG(debug, debug|release) {
             -lscShared
 }
 
-LIBS += -L"$$PWD/liblsl/install/lib/" -llsl
+LIBS += -L"$$PWD/liblsl/build/install/lib/" -llsl
 
 SOURCES += \
         lsladapter.cpp \
@@ -101,7 +101,7 @@ FORMS += \
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
-INCLUDEPATH += $$PWD/liblsl/install/include
+INCLUDEPATH += $$PWD/liblsl/build/install/include
 
 OTHER_FILES += lsladapter.json
 
