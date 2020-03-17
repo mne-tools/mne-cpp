@@ -141,6 +141,29 @@ public:
 
     //=========================================================================================================
     /**
+     * Perform one single HPI fit.
+     *
+     * @param[in]    t_mat           Data to estimate the HPI positions from
+     * @param[in]    t_matProjectors The projectors to apply. Bad channels are still included.
+     * @param[out]   transDevHead    The final dev head transformation matrix
+     * @param[in]    vFreqs          The frequencies for each coil in unknown order.
+     * @param[out]   vFreqs          The frequencies for each coil in correct order.
+     * @param[out]   vError          The HPI estimation Error in mm for each fitted HPI coil.
+     * @param[out]   vGoF            The goodness of fit for each fitted HPI coil
+     * @param[out]   fittedPointSet  The final fitted positions in form of a digitizer set.
+     * @param[in]    p_pFiffInfo     Associated Fiff Information.
+     */
+    static void findOrder(const Eigen::MatrixXd& t_mat,
+                          const Eigen::MatrixXd& t_matProjectors,
+                          FIFFLIB::FiffCoordTrans &transDevHead,
+                          QVector<int>& vFreqs,
+                          QVector<double> &vError,
+                          Eigen::VectorXd& vGoF,
+                          FIFFLIB::FiffDigPointSet& fittedPointSet,
+                          QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
+
+    //=========================================================================================================
+    /**
      * Store results from dev_Head_t as quaternions in position matrix. The format is the same as you
      * get from Neuromag's MaxFilter.
      *
