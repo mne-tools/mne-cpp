@@ -84,7 +84,7 @@ jobs:
         # Copy additional brainflow libs
         cp -a applications/mne_scan/plugins/brainflowboard/brainflow/installed/lib/. lib/
         # Copy additional LSL libs
-        cp -a applications/mne_scan/plugins/lsladapter/liblsl/build/install/lib/ lib/
+        cp -a applications/mne_scan/plugins/lsladapter/liblsl/build/install/lib/. lib/
         # Install libxkbcommon so linuxdeployqt can find it
         sudo apt-get install libxkbcommon-x11-0
         # Downloading linuxdeployqt from continious release
