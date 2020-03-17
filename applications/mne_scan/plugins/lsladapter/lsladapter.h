@@ -235,7 +235,7 @@ inline SCSHAREDLIB::IPlugin::PluginType LSLAdapter::getType() const
 
 inline QString LSLAdapter::getName() const
 {
-    return "LSL Adapter";
+    return "LSL";
 }
 
 //************************************************************************************************************
