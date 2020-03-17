@@ -153,7 +153,7 @@ jobs:
         # Copy additional brainflow libs
         cp -a applications/mne_scan/plugins/brainflowboard/brainflow/installed/lib/. bin/mne_scan.app/Contents/Frameworks
         # Copy additional LSL libs
-        cp -a applications/mne_scan/plugins/lsladapter/liblsl/build/install/lib/ bin/mne_scan.app/Contents/Frameworks
+        cp -a applications/mne_scan/plugins/lsladapter/liblsl/build/install/lib/. bin/mne_scan.app/Contents/Frameworks
         # Creating archive of all macos deployed applications
         tar cfvz mne-cpp-macos-x86_64.tar.gz bin/. lib/.
     - name: Deploy MNE Scan binaries with dev_build release on Github
@@ -217,7 +217,7 @@ jobs:
         # Copy additional brainflow libs
         xcopy .\applications\mne_scan\plugins\brainflowboard\brainflow\installed\lib\* .\bin\ /s /i
         # Copy additional LSL libs
-        xcopy .\applications\mne_scan\plugins\lsladapter\liblsl\install\bin\lsl.dll .\bin\ /s /i
+        xcopy .\applications\mne_scan\plugins\lsladapter\liblsl\build\install\bin\lsl.dll .\bin\ /i
         7z a mne-cpp-windows-x86_64.zip ./bin
     - name: Deploy binaries with dev_build release on Github
       uses: svenstaro/upload-release-action@v1-release
