@@ -2,7 +2,7 @@
 title: Creating a new plugin
 parent: MNE Scan Development
 grand_parent: Develop
-nav_order: 9
+nav_order: 10
 ---
 # Creating a new plugin
 
@@ -12,4 +12,4 @@ A detailed tutorial on how you can create your own MNE Scan plugin directly usin
 
 <embed src="http://lorenzesch.de/mne-cpp/Creating_a_Plugin.pdf" width="800px" height="500px" type="application/pdf" />
 
-Also, a good starting point is the DummyToolbox plugin, which you can find under `\mne-cpp\applications\mne_scan\plugins\dummytoolbox` or [here](https://github.com/mne-tools/mne-cpp/tree/master/applications/mne_scan/plugins/dummytoolbox){:target="_blank" rel="noopener"}. For example, you could make a copy and rename it to your wishes in order to get things started.
+Another good starting point is the DummyToolbox plugin, which you can find under `\mne-cpp\applications\mne_scan\plugins\dummytoolbox` or [here](https://github.com/mne-tools/mne-cpp/tree/master/applications/mne_scan/plugins/dummytoolbox){:target="_blank" rel="noopener"}. Please note that the DummyToolbox plugin is commented out by default in the [plugins.pro](https://github.com/mne-tools/mne-cpp/blob/master/applications/mne_scan/plugins/plugins.pro){:target="_blank" rel="noopener"} file. For example, you could make a copy of the DummyToolbox, rename it and make changes.
