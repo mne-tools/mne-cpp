@@ -46,19 +46,20 @@ SUBDIRS += \
     ftbuffer \
     babymeg \
     natus \
-#    gusbamp \              # Build guide -> https://mne-cpp.github.io/pages/development/gusbamp.html
-#    eegosports \           # Build guide -> https://mne-cpp.github.io/pages/development/eegosports.html
-#    brainamp \             # Build guide -> https://mne-cpp.github.io/pages/development/brainamp.html
-#    tmsi \                 # Build guide -> NA
+#    gusbamp \                          # Build guide -> https://mne-cpp.github.io/pages/development/gusbamp.html
+#    eegosports \                       # Build guide -> https://mne-cpp.github.io/pages/development/eegosports.html
+#    brainamp \                         # Build guide -> https://mne-cpp.github.io/pages/development/brainamp.html
+
+win32 {
+    SUBDIRS += tmsi \                   # Build guide (Windows only) -> https://mne-cpp.github.io/pages/development/tmsi.html
+}
 
 contains(MNECPP_CONFIG, withBrainFlow) {
-    SUBDIRS += \
-        brainflowboard \    # Build guide -> https://mne-cpp.github.io/pages/development/brainflow.html
+    SUBDIRS += brainflowboard \         # Build guide -> https://mne-cpp.github.io/pages/development/brainflow.html
 }
 
 contains(MNECPP_CONFIG, withLsl) {
-    SUBDIRS += \
-        lsladapter \        # Build guide -> https://mne-cpp.github.io/pages/development/lsl.html
+    SUBDIRS += lsladapter \             # Build guide -> https://mne-cpp.github.io/pages/development/lsl.html
 }
 
 #Algorithms
