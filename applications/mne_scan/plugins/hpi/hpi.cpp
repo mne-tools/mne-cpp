@@ -71,6 +71,8 @@ using namespace RTPROCESSINGLIB;
 Hpi::Hpi()
 : m_pCircularBuffer(CircularBuffer<HpiFitResult>::SPtr(new CircularBuffer<HpiFitResult>(40)))
 , m_bDoContinousHpi(false)
+, m_bUseSSP(false)
+, m_bUseComp(false)
 {
 }
 
@@ -125,6 +127,8 @@ bool Hpi::stop()
     requestInterruption();
     wait(500);
 
+    m_pFiffInfo = Q_NULLPTR;
+
     return true;
 }
 
@@ -169,6 +173,14 @@ void Hpi::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 
         // Check if data is present
         if(pRTMSA->getMultiSampleArray().size() > 0) {
+            //If bad channels changed, recalcluate projectors
+            if(m_iNumberBadChannels != m_pFiffInfo->bads.size()
+               || m_matCompProjectors.rows() == 0
+               || m_matCompProjectors.cols() == 0) {
+                updateProjections();
+                m_iNumberBadChannels = m_pFiffInfo->bads.size();
+            }
+
             m_matData = pRTMSA->getMultiSampleArray()[0];
 
             if(m_bDoContinousHpi) {
@@ -197,11 +209,56 @@ void Hpi::initPluginControlWidgets()
                 this, &Hpi::onDoSingleHpiFit);
         connect(pHpiSettingsView, &HpiSettingsView::coilFrequenciesChanged,
                 this, &Hpi::onCoilFrequenciesChanged);
+        connect(pHpiSettingsView, &HpiSettingsView::sspStatusChanged,
+                this, &Hpi::onSspStatusChanged);
+        connect(pHpiSettingsView, &HpiSettingsView::compStatusChanged,
+                this, &Hpi::onCompStatusChanged);
+        connect(pHpiSettingsView, &HpiSettingsView::contHpiStatusChanged,
+                this, &Hpi::onContHpiStatusChanged);
 
         plControlWidgets.append(pHpiSettingsView);
 
         emit pluginControlWidgetsChanged(plControlWidgets, this->getName());
     }
+}
+
+//=============================================================================================================
+
+void Hpi::updateProjections()
+{
+    m_matProjectors = Eigen::MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+    Eigen::MatrixXd matComp = Eigen::MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+
+    if(m_bUseSSP) {
+        // Use SSP + SGM + calibration
+        //Do a copy here because we are going to change the activity flags of the SSP's
+        FiffInfo infoTemp = *(m_pFiffInfo.data());
+
+        //Turn on all SSP
+        for(int i = 0; i < infoTemp.projs.size(); ++i) {
+            infoTemp.projs[i].active = true;
+        }
+
+        //Create the projector for all SSP's on
+        infoTemp.make_projector(m_matProjectors);
+        //set columns of matrix to zero depending on bad channels indexes
+        for(qint32 j = 0; j < infoTemp.bads.size(); ++j) {
+            m_matProjectors.col(infoTemp.ch_names.indexOf(infoTemp.bads.at(j))).setZero();
+        }
+    }
+
+    if(m_bUseComp) {
+        // Setup Comps
+        FiffCtfComp newComp;
+        //Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
+        if(m_pFiffInfo->make_compensator(0, 101, newComp)) {
+            matComp = newComp.data->data;
+        }
+    }
+
+    m_matCompProjectors = m_matProjectors * matComp;
+
+    m_pRtHPI->setProjectionMatrix(m_matProjectors);
 }
 
 //=============================================================================================================
@@ -214,8 +271,6 @@ void Hpi::onNewHpiFitResultAvailable(const HpiFitResult& fitResult)
 
     m_vError = fitResult.errorDistances;
     m_vGoF = fitResult.GoF;
-
-    qDebug() << "Hpi::onNewHpiFitResultAvailable HPI fit complete";
 }
 
 //=============================================================================================================
@@ -245,7 +300,7 @@ void Hpi::onDoSingleHpiFit()
        return;
     }
 
-    if(m_pFiffInfo) {
+    if(m_pRtHPI) {
         m_pRtHPI->append(m_matData);
     }
 }
@@ -260,6 +315,27 @@ void Hpi::onCoilFrequenciesChanged(const QVector<int>& vCoilFreqs)
     }
 
     m_vCoilFreqs = vCoilFreqs;
+}
+
+//=============================================================================================================
+
+void Hpi::onSspStatusChanged(bool bChecked)
+{
+    m_bUseSSP = bChecked;
+}
+
+//=============================================================================================================
+
+void Hpi::onCompStatusChanged(bool bChecked)
+{
+    m_bUseComp = bChecked;
+}
+
+//=============================================================================================================
+
+void Hpi::onContHpiStatusChanged(bool bChecked)
+{
+    m_bDoContinousHpi = bChecked;
 }
 
 //=============================================================================================================

@@ -86,6 +86,12 @@ HpiSettingsView::HpiSettingsView(const QString& sSettingsPath,
             this, &HpiSettingsView::onAddCoil);
     connect(m_ui->m_pushButton_removeCoil, &QPushButton::clicked,
             this, &HpiSettingsView::onRemoveCoil);
+    connect(m_ui->m_checkBox_useSSP, &QCheckBox::clicked,
+            this, &HpiSettingsView::sspStatusChanged);
+    connect(m_ui->m_checkBox_useComp, &QCheckBox::clicked,
+            this, &HpiSettingsView::compStatusChanged);
+    connect(m_ui->m_checkBox_continousHPI, &QCheckBox::clicked,
+            this, &HpiSettingsView::contHpiStatusChanged);
 
     //Init coil freqs
     m_vCoilFreqs << 155 << 165 << 190 << 200;
@@ -99,7 +105,6 @@ HpiSettingsView::HpiSettingsView(const QString& sSettingsPath,
 HpiSettingsView::~HpiSettingsView()
 {
     saveSettings(m_sSettingsPath);
-    qDebug() << "[HpiSettingsView::HpiSettingsView] m_vCoilFreqs" << m_vCoilFreqs;
 
     delete m_ui;
 }
@@ -116,7 +121,6 @@ void HpiSettingsView::saveSettings(const QString& settingsPath)
     QVariant data;
 
     data.setValue(m_vCoilFreqs);
-    qDebug() << "[HpiSettingsView::saveSettings] m_vCoilFreqs" << m_vCoilFreqs;
     settings.setValue(settingsPath + QString("/coilFreqs"), data);
 }
 
@@ -134,8 +138,6 @@ void HpiSettingsView::loadSettings(const QString& settingsPath)
     defaultData.setValue(m_vCoilFreqs);
     m_vCoilFreqs = settings.value(settingsPath + QString("/coilFreqs"), defaultData).value<QVector<int> >();
     emit coilFrequenciesChanged(m_vCoilFreqs);
-
-    qDebug() << "[HpiSettingsView::loadSettings] m_vCoilFreqs" << m_vCoilFreqs;
 }
 
 //=============================================================================================================
@@ -196,6 +198,7 @@ void HpiSettingsView::onAddCoil()
         QMessageBox msgBox;
         msgBox.setText("Cannot add more HPI coils. Not enough digitzed HPI coils loaded.");
         msgBox.exec();
+        return;
     }
 
     // Add column 0 in freq table widget

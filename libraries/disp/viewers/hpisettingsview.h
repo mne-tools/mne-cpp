@@ -181,10 +181,32 @@ signals:
      * Emit this signal whenever a single HPI fit is supposed to be triggered.
      */
     void doSingleHpiFit();
+
+    //=========================================================================================================
+    /**
+     * Emit this signal whenever SSP checkbox changed.
+     *
+     * @param[in] bChecked    Whether the SSP check box is checked.
+     */
+    void sspStatusChanged(bool bChecked);
+
+    //=========================================================================================================
+    /**
+     * Emit this signal whenever compensator checkbox changed.
+     *
+     * @param[in] bChecked    Whether the compensator check box is checked.
+     */
+    void compStatusChanged(bool bChecked);
+
+    //=========================================================================================================
+    /**
+     * Emit this signal whenever continous HPI checkbox changed.
+     *
+     * @param[in] bChecked    Whether the continous HPI check box is checked.
+     */
+    void contHpiStatusChanged(bool bChecked);
 };
 
 } //NAMESPACE
-
-Q_DECLARE_METATYPE(QVector<int>)
 
 #endif // HPISETTINGSVIEW_H

@@ -162,6 +162,8 @@ bool NoiseReduction::stop()
 
     m_pNoiseReductionOutput->data()->clear();
 
+    m_pFiffInfo = Q_NULLPTR;
+
     return true;
 }
 

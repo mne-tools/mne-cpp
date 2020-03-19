@@ -342,6 +342,8 @@ bool RtcMne::stop()
     // Stop filling buffers with data from the inputs
     m_bProcessData = false;
 
+    m_pFiffInfo = Q_NULLPTR;
+
     return true;
 }
 
