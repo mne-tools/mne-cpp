@@ -50,9 +50,10 @@ jobs:
       with:
         python-version: '3.7'
         architecture: 'x64'
-    - name: Install BrainFlow submodule
+    - name: Install BrainFlow and LSL submodules
       run: |
         git submodule update --init applications/mne_scan/plugins/brainflowboard/brainflow
+        git submodule update --init applications/mne_scan/plugins/lsladapter/liblsl
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with:
@@ -66,14 +67,24 @@ jobs:
         cmake -DCMAKE_INSTALL_PREFIX=../installed ..
         make
         make install
+    - name: Compile LSL submodule
+      run: |
+        cd applications/mne_scan/plugins/lsladapter/liblsl
+        mkdir build
+        cd build
+        cmake ..
+        make
+        make install
     - name: Configure and compile MNE-CPP
       run: |
-        qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow
+        qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow MNECPP_CONFIG+=withLsl
         make -j2
     - name: Package binaries
       run: |
         # Copy additional brainflow libs
         cp -a applications/mne_scan/plugins/brainflowboard/brainflow/installed/lib/. lib/
+        # Copy additional LSL libs
+        cp -a applications/mne_scan/plugins/lsladapter/liblsl/build/install/lib/. lib/
         # Install libxkbcommon so linuxdeployqt can find it
         sudo apt-get install libxkbcommon-x11-0
         # Downloading linuxdeployqt from continious release
@@ -109,9 +120,10 @@ jobs:
       with:
         python-version: '3.7'
         architecture: 'x64'
-    - name: Install BrainFlow submodule
+    - name: Install BrainFlow and LSL submodules
       run: |
         git submodule update --init applications/mne_scan/plugins/brainflowboard/brainflow
+        git submodule update --init applications/mne_scan/plugins/lsladapter/liblsl
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with:
@@ -124,14 +136,24 @@ jobs:
         cmake -DCMAKE_INSTALL_PREFIX=../installed ..
         make
         make install
+    - name: Compile LSL submodule
+      run: |
+        cd applications/mne_scan/plugins/lsladapter/liblsl
+        mkdir build
+        cd build
+        cmake ..
+        make
+        make install
     - name: Configure and compile MNE-CPP
       run: |
-        qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow
+        qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow MNECPP_CONFIG+=withLsl
         make -j2
     - name: Package binaries
       run: |
         # Copy additional brainflow libs
         cp -a applications/mne_scan/plugins/brainflowboard/brainflow/installed/lib/. bin/mne_scan.app/Contents/Frameworks
+        # Copy additional LSL libs
+        cp -a applications/mne_scan/plugins/lsladapter/liblsl/build/install/lib/. bin/mne_scan.app/Contents/Frameworks
         # Creating archive of all macos deployed applications
         tar cfvz mne-cpp-macos-x86_64.tar.gz bin/. lib/.
     - name: Deploy MNE Scan binaries with dev_build release on Github
@@ -155,9 +177,10 @@ jobs:
       with:
         python-version: '3.7'
         architecture: 'x64'   
-    - name: Install BrainFlow submodule
+    - name: Install BrainFlow and LSL submodules
       run: |
         git submodule update --init applications/mne_scan/plugins/brainflowboard/brainflow
+        git submodule update --init applications/mne_scan/plugins/lsladapter/liblsl
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with:
@@ -176,16 +199,25 @@ jobs:
         cd build
         cmake -G "Visual Studio 15 2017" -A x64 -DMSVC_RUNTIME=dynamic -DCMAKE_SYSTEM_VERSION=8.1 -DCMAKE_INSTALL_PREFIX="$env:GITHUB_WORKSPACE\applications\mne_scan\plugins\brainflowboard\brainflow\installed" ..
         cmake --build . --target install --config Release
+    - name: Compile LSL submodule
+      run: |
+        cd applications\mne_scan\plugins\lsladapter\liblsl
+        mkdir build
+        cd build
+        cmake .. -G "Visual Studio 15 2017" -A x64
+        cmake --build . --config Release --target install
     - name: Configure and compile MNE-CPP
       run: |
         cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
-        qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow
+        qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow MNECPP_CONFIG+=withLsl
         jom -j2
     - name: Package binaries
       run: |
         # Copy additional brainflow libs
         xcopy .\applications\mne_scan\plugins\brainflowboard\brainflow\installed\lib\* .\bin\ /s /i
+        # Copy additional LSL libs
+        xcopy .\applications\mne_scan\plugins\lsladapter\liblsl\build\install\bin\lsl.dll .\bin\ /i
         7z a mne-cpp-windows-x86_64.zip ./bin
     - name: Deploy binaries with dev_build release on Github
       uses: svenstaro/upload-release-action@v1-release

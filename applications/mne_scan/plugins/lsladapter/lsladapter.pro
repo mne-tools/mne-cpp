@@ -39,7 +39,7 @@ TEMPLATE = lib
 
 CONFIG += plugin
 
-DEFINES += LSLADAPTER_LIBRARY
+DEFINES += LSLADAPTER_PLUGIN
 
 QT += core widgets network concurrent
 
@@ -58,14 +58,6 @@ contains(MNECPP_CONFIG, static) {
 }
 
 LIBS += -L$${MNE_LIBRARY_DIR}
-win32 {
-    LIBS += -LC:/LSL/lib/ \
-            -lliblsl64
-}
-unix:!macx {
-    LIBS += -L/usr/local/LSL/lib \
-            -llsl64
-}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
             -lMNE$${MNE_LIB_VERSION}Fsd \
@@ -90,6 +82,8 @@ CONFIG(debug, debug|release) {
             -lscShared
 }
 
+LIBS += -L"$$PWD/liblsl/build/install/lib/" -llsl
+
 SOURCES += \
         lsladapter.cpp \
         lsladapterproducer.cpp \
@@ -107,14 +101,7 @@ FORMS += \
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
-
-win32 {
-    INCLUDEPATH += C:/LSL/include/
-}
-
-unix:!macx {
-    INCLUDEPATH += /usr/local/LSL/include
-}
+INCLUDEPATH += $$PWD/liblsl/build/install/include
 
 OTHER_FILES += lsladapter.json
 

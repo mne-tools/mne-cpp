@@ -129,6 +129,7 @@ QMAKE_TARGET_COPYRIGHT = Copyright (C) 2019 Authors of mne-cpp. All rights reser
 ## To build MNE-CPP Disp library with OpenGL support (default is with OpenGL support): qmake MNECPP_CONFIG+=dispOpenGL
 ## To build MNE-CPP against wasm: qmake MNECPP_CONFIG+=wasm
 ## To build MNE Scan with BrainFlow support: qmake MNECPP_CONFIG+=withBrainFlow
+## To build MNE Scan with LSL support: qmake MNECPP_CONFIG+=withLsl
 
 # Default flags
 MNECPP_CONFIG += dispOpenGL
