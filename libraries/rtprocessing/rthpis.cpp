@@ -74,7 +74,7 @@ void RtHpiWorker::doWork(const Eigen::MatrixXd& matData,
     }
 
     //Perform actual fitting
-    FittingResult fitResult;
+    HpiFitResult fitResult;
     fitResult.devHeadTrans.from = 1;
     fitResult.devHeadTrans.to = 4;
 
@@ -98,7 +98,7 @@ RtHpi::RtHpi(FiffInfo::SPtr p_pFiffInfo, QObject *parent)
 : QObject(parent)
 , m_pFiffInfo(p_pFiffInfo)
 {
-    qRegisterMetaType<RTPROCESSINGLIB::FittingResult>("RTPROCESSINGLIB::FittingResult");
+    qRegisterMetaType<RTPROCESSINGLIB::HpiFitResult>("RTPROCESSINGLIB::HpiFitResult");
     qRegisterMetaType<QVector<int> >("QVector<int>");
     qRegisterMetaType<QSharedPointer<FIFFLIB::FiffInfo> >("QSharedPointer<FIFFLIB::FiffInfo>");
 
@@ -150,9 +150,9 @@ void RtHpi::setProjectionMatrix(const Eigen::MatrixXd& matProjectors)
 
 //=============================================================================================================
 
-void RtHpi::handleResults(const RTPROCESSINGLIB::FittingResult& fitResult)
+void RtHpi::handleResults(const RTPROCESSINGLIB::HpiFitResult& fitResult)
 {
-    emit newFittingResultAvailable(fitResult);
+    emit newHpiFitResultAvailable(fitResult);
 }
 
 //=============================================================================================================

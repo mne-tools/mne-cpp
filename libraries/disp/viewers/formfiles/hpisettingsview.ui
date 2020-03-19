@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>373</width>
-    <height>759</height>
+    <width>254</width>
+    <height>721</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -178,42 +178,21 @@
         <string>Fitting</string>
        </property>
        <layout class="QGridLayout" name="gridLayout">
-        <item row="17" column="0" colspan="4">
-         <widget class="QLabel" name="label_11">
+        <item row="6" column="0">
+         <widget class="QPushButton" name="m_pushButton_addCoil">
           <property name="text">
-           <string>Fitting errors:</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+           <string>+</string>
           </property>
          </widget>
         </item>
-        <item row="14" column="0" colspan="4">
-         <widget class="QToolButton" name="m_pushButton_doSingleFit">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>23</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
+        <item row="6" column="1">
+         <widget class="QPushButton" name="m_pushButton_removeCoil">
           <property name="text">
-           <string>Perform single HPI fit</string>
+           <string>-</string>
           </property>
          </widget>
         </item>
-        <item row="4" column="0" rowspan="2" colspan="3">
+        <item row="4" column="0" rowspan="2" colspan="2">
          <widget class="QTableWidget" name="tableWidget">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -226,6 +205,12 @@
             <width>0</width>
             <height>114</height>
            </size>
+          </property>
+          <property name="sizeAdjustPolicy">
+           <enum>QAbstractScrollArea::AdjustIgnored</enum>
+          </property>
+          <property name="showGrid">
+           <bool>true</bool>
           </property>
           <attribute name="horizontalHeaderMinimumSectionSize">
            <number>30</number>
@@ -311,21 +296,32 @@
           </item>
          </widget>
         </item>
-        <item row="8" column="0" colspan="4">
-         <widget class="QCheckBox" name="m_checkBox_useComp">
+        <item row="15" column="0" colspan="2">
+         <widget class="QToolButton" name="m_pushButton_doSingleFit">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>23</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>16777215</height>
+           </size>
+          </property>
           <property name="text">
-           <string>Use compensators</string>
+           <string>Perform single HPI fit</string>
           </property>
          </widget>
         </item>
-        <item row="5" column="3">
-         <widget class="QPushButton" name="m_pushButton_removeCoil">
-          <property name="text">
-           <string>-</string>
-          </property>
-         </widget>
-        </item>
-        <item row="18" column="0" colspan="4">
+        <item row="19" column="0" colspan="2">
          <widget class="QTableWidget" name="tableWidget_2">
           <property name="minimumSize">
            <size>
@@ -411,79 +407,24 @@
           </item>
          </widget>
         </item>
-        <item row="12" column="0" colspan="4">
-         <widget class="QCheckBox" name="m_checkBox_continousHPI">
+        <item row="20" column="0">
+         <widget class="QLabel" name="label_2">
           <property name="text">
-           <string>Do continous HPI fitting</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0" colspan="4">
-         <widget class="QLabel" name="label_5">
-          <property name="text">
-           <string>Coil frequencies:</string>
+           <string>Average:</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
           </property>
          </widget>
         </item>
-        <item row="4" column="3">
-         <widget class="QPushButton" name="m_pushButton_addCoil">
-          <property name="text">
-           <string>+</string>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="0" colspan="4">
-         <widget class="QCheckBox" name="m_checkBox_useSSP">
-          <property name="text">
-           <string>Use SSP</string>
-          </property>
-         </widget>
-        </item>
-        <item row="21" column="0" colspan="4">
-         <widget class="QLabel" name="m_label_fitFeedback">
-          <property name="text">
-           <string>No fit yet</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="15" column="0" colspan="4">
-         <widget class="Line" name="line_2">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="0" colspan="4">
-         <widget class="Line" name="line_4">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="20" column="0" colspan="2">
+        <item row="21" column="0">
          <widget class="QLabel" name="label">
           <property name="text">
            <string>Error threshold:</string>
           </property>
          </widget>
         </item>
-        <item row="20" column="2">
-         <widget class="QDoubleSpinBox" name="m_doubleSpinBox_maxHPIContinousDist">
-          <property name="maximum">
-           <double>9999.989999999999782</double>
-          </property>
-          <property name="value">
-           <double>10.000000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item row="19" column="2">
+        <item row="20" column="1">
          <widget class="QLabel" name="m_label_averagedFitError">
           <property name="text">
            <string>0mm</string>
@@ -493,10 +434,75 @@
           </property>
          </widget>
         </item>
-        <item row="19" column="0" colspan="2">
-         <widget class="QLabel" name="label_2">
+        <item row="21" column="1">
+         <widget class="QDoubleSpinBox" name="m_doubleSpinBox_maxHPIContinousDist">
+          <property name="maximum">
+           <double>9999.989999999999782</double>
+          </property>
+          <property name="value">
+           <double>10.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="16" column="0" colspan="2">
+         <widget class="Line" name="line_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="22" column="0" colspan="2">
+         <widget class="QLabel" name="m_label_fitFeedback">
           <property name="text">
-           <string>Average:</string>
+           <string>No fit yet</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="0">
+         <widget class="QCheckBox" name="m_checkBox_useSSP">
+          <property name="text">
+           <string>Use SSP</string>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="0">
+         <widget class="QCheckBox" name="m_checkBox_useComp">
+          <property name="text">
+           <string>Use compensators</string>
+          </property>
+         </widget>
+        </item>
+        <item row="13" column="0">
+         <widget class="QCheckBox" name="m_checkBox_continousHPI">
+          <property name="text">
+           <string>Do continous HPI fitting</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0" colspan="2">
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>Coil frequencies:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="0" colspan="2">
+         <widget class="Line" name="line_4">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="18" column="0" colspan="2">
+         <widget class="QLabel" name="label_11">
+          <property name="text">
+           <string>Fitting errors:</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>

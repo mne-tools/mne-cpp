@@ -42,7 +42,6 @@
 
 #include <disp/viewers/hpisettingsview.h>
 #include <scMeas/realtimemultisamplearray.h>
-#include <rtprocessing/rthpis.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -70,7 +69,7 @@ using namespace RTPROCESSINGLIB;
 //=============================================================================================================
 
 Hpi::Hpi()
-: m_pCircularBuffer(CircularBuffer_Matrix_double::SPtr(new CircularBuffer_Matrix_double(40)))
+: m_pCircularBuffer(CircularBuffer<HpiFitResult>::SPtr(new CircularBuffer<HpiFitResult>(40)))
 {
 }
 
@@ -122,7 +121,7 @@ bool Hpi::start()
 bool Hpi::stop()
 {
     requestInterruption();
-    wait();
+    wait(500);
 
     return true;
 }
@@ -158,10 +157,10 @@ void Hpi::update(SCMEASLIB::Measurement::SPtr pMeasurement)
         if(!m_pFiffInfo) {
             m_pFiffInfo = pRTMSA->info();
 
-            m_pRtHPI = RtHpi::SPtr::create(new RtHpi(m_pFiffInfo));
+            m_pRtHPI = RtHpi::SPtr::create(m_pFiffInfo);
             m_pRtHPI->setCoilFrequencies(m_vCoilFreqs);
-            connect(m_pRtHPI.data(), &RtHpi::newFittingResultAvailable,
-                    this, &HpiView::onNewFittingResultAvailable);
+            connect(m_pRtHPI.data(), &RtHpi::newHpiFitResultAvailable,
+                    this, &Hpi::onNewHpiFitResultAvailable);
 
             initPluginControlWidgets();
         }
@@ -169,12 +168,7 @@ void Hpi::update(SCMEASLIB::Measurement::SPtr pMeasurement)
         // Check if data is present
         if(pRTMSA->getMultiSampleArray().size() > 0) {
             for(unsigned char i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
-                // Please note that we do not need a copy here since this function will block until
-                // the buffer accepts new data again. Hence, the data is not deleted in the actual
-                // Mesaurement function after it emitted the notify signal.
-                while(!m_pCircularBuffer->push(pRTMSA->getMultiSampleArray()[i])) {
-                    //Do nothing until the circular buffer is ready to accept new data again
-                }
+                m_pRtHPI->append(pRTMSA->getMultiSampleArray()[i]);
             }
         }
     }
@@ -199,15 +193,27 @@ void Hpi::initPluginControlWidgets()
 
 //=============================================================================================================
 
+void Hpi::onNewHpiFitResultAvailable(const HpiFitResult& fitResult)
+{
+    while(!m_pCircularBuffer->push(fitResult)) {
+        //Do nothing until the circular buffer is ready to accept new data again
+    }
+
+    m_vError = fitResult.errorDistances;
+    m_vGoF = fitResult.GoF;
+}
+
+//=============================================================================================================
+
 void Hpi::run()
 {
-    MatrixXd matData;
+    HpiFitResult HpiFitResult;
     qint32 size = 0;
 
     while(!isInterruptionRequested()) {
         if(m_pCircularBuffer) {
             //pop matrix
-            if(m_pCircularBuffer->pop(matData)) {
+            if(m_pCircularBuffer->pop(HpiFitResult)) {
                 // Perform HPI fit
             }
         }

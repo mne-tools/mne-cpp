@@ -43,6 +43,7 @@
 
 #include <utils/generics/circularbuffer.h>
 #include <scShared/Interfaces/IAlgorithm.h>
+#include <rtprocessing/rthpis.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -141,15 +142,27 @@ public:
 private:
     //=========================================================================================================
     /**
+     * Load a Polhemus file name.
+     *
+     * @param[in] fitResult  The fit result coming from the rt HPI class.
+     */
+    void onNewHpiFitResultAvailable(const RTPROCESSINGLIB::HpiFitResult& fitResult);
+
+    //=========================================================================================================
+    /**
      * IAlgorithm function
      */
-    virtual void run();
+    virtual void run();    
 
-    QMutex          m_mutex;                                    /**< The threads mutex.*/
+    QMutex                      m_mutex;                /**< The threads mutex.*/
+
+    QVector<int>                m_vCoilFreqs;           /**< Vector contains the HPI coil frequencies. */
+    QVector<double>             m_vError;               /**< The HPI estimation error mm for each fitted HPI coil. */
+    Eigen::VectorXd             m_vGoF;                 /**< The goodness of fit per HPI coil. */
 
     QSharedPointer<FIFFLIB::FiffInfo>                                           m_pFiffInfo;            /**< Fiff measurement info.*/
 
-    QSharedPointer<IOBUFFER::CircularBuffer_Matrix_double>                      m_pCircularBuffer;      /**< Holds incoming raw data. */
+    QSharedPointer<IOBUFFER::CircularBuffer<RTPROCESSINGLIB::HpiFitResult> >   m_pCircularBuffer;      /**< Holds incoming raw data. */
     QSharedPointer<RTPROCESSINGLIB::RtHpi>         m_pRtHPI;            /**< The real-time HPI object. */
 
     SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pHpiInput;            /**< The RealTimeMultiSampleArray of the Hpi input.*/
