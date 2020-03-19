@@ -142,6 +142,12 @@ public:
 private:
     //=========================================================================================================
     /**
+     * Update the projectors for SSP and Comps.
+     */
+    void updateProjections();
+
+    //=========================================================================================================
+    /**
      * Load a Polhemus file name.
      *
      * @param[in] fitResult  The fit result coming from the rt HPI class.
@@ -172,6 +178,30 @@ private:
 
     //=========================================================================================================
     /**
+     * Call this function whenever SSP checkbox changed.
+     *
+     * @param[in] bChecked    Whether the SSP check box is checked.
+     */
+    void onSspStatusChanged(bool bChecked);
+
+    //=========================================================================================================
+    /**
+     * Call this function whenever compensator checkbox changed.
+     *
+     * @param[in] bChecked    Whether the compensator check box is checked.
+     */
+    void onCompStatusChanged(bool bChecked);
+
+    //=========================================================================================================
+    /**
+     * Call this function whenever continous HPI checkbox changed.
+     *
+     * @param[in] bChecked    Whether the continous HPI check box is checked.
+     */
+    void onContHpiStatusChanged(bool bChecked);
+
+    //=========================================================================================================
+    /**
      * IAlgorithm function
      */
     virtual void run();    
@@ -182,8 +212,13 @@ private:
     QVector<double>             m_vError;               /**< The HPI estimation error mm for each fitted HPI coil. */
     Eigen::VectorXd             m_vGoF;                 /**< The goodness of fit per HPI coil. */
     Eigen::MatrixXd             m_matData;              /**< The last data block.*/
+    qint16                                      m_iNumberBadChannels;   /**< The number of bad channels.*/
+    Eigen::MatrixXd                             m_matProjectors;        /**< Holds the matrix with the SSP and compensator projectors.*/
+    Eigen::MatrixXd                             m_matCompProjectors;    /**< Holds the matrix with the SSP and compensator projectors.*/
 
     bool                        m_bDoContinousHpi;
+    bool                                        m_bUseSSP;              /**< Use SSP's.*/
+    bool                                        m_bUseComp;             /**< Use Comps's.*/
 
     QSharedPointer<FIFFLIB::FiffInfo>                                           m_pFiffInfo;            /**< Fiff measurement info.*/
 
