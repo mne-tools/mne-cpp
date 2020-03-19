@@ -101,6 +101,7 @@ RtHpi::RtHpi(FiffInfo::SPtr p_pFiffInfo, QObject *parent)
     qRegisterMetaType<RTPROCESSINGLIB::HpiFitResult>("RTPROCESSINGLIB::HpiFitResult");
     qRegisterMetaType<QVector<int> >("QVector<int>");
     qRegisterMetaType<QSharedPointer<FIFFLIB::FiffInfo> >("QSharedPointer<FIFFLIB::FiffInfo>");
+    qRegisterMetaType<Eigen::MatrixXd>("Eigen::MatrixXd");
 
     RtHpiWorker *worker = new RtHpiWorker;
     worker->moveToThread(&m_workerThread);

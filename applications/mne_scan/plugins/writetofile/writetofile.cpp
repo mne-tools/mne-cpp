@@ -147,6 +147,8 @@ bool WriteToFile::stop()
     requestInterruption();
     wait();
 
+    m_pFiffInfo = Q_NULLPTR;
+
     return true;
 }
 

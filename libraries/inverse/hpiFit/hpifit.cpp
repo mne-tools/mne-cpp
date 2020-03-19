@@ -101,10 +101,12 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
     //Check if data was passed
     if(t_mat.rows() == 0 || t_mat.cols() == 0 ) {
         std::cout<<std::endl<< "HPIFit::fitHPI - No data passed. Returning.";
+        return;
     }
     //Check if projector was passed
     if(t_matProjectors.rows() == 0 || t_matProjectors.cols() == 0 ) {
         std::cout<<std::endl<< "HPIFit::fitHPI - No projector passed. Returning.";
+        return;
     }
 
     // Setup Constructors for Coil Set

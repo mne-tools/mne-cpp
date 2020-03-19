@@ -209,6 +209,8 @@ bool NeuronalConnectivity::stop()
     requestInterruption();
     wait(500);
 
+    m_pFiffInfo = Q_NULLPTR;
+
     return true;
 }
 
