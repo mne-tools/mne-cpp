@@ -37,8 +37,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <utils/generics/applicationlogger.h>
-
 #include <inverse/dipoleFit/dipole_fit_settings.h>
 #include <inverse/dipoleFit/dipole_fit.h>
 
@@ -94,7 +92,6 @@ TestDipoleFit::TestDipoleFit()
 
 void TestDipoleFit::initTestCase()
 {
-    qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
 }
 
 //=============================================================================================================
