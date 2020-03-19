@@ -215,8 +215,8 @@ HpiView::HpiView(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
 
     //Init RtHPIs
     m_pRtHPI->setCoilFrequencies(m_vCoilFreqs);
-    connect(m_pRtHPI.data(), &RtHpi::newFittingResultAvailable,
-            this, &HpiView::onNewFittingResultAvailable);
+    connect(m_pRtHPI.data(), &RtHpi::newHpiFitResultAvailable,
+            this, &HpiView::onNewHpiFitResultAvailable);
 }
 
 //=============================================================================================================
@@ -458,7 +458,7 @@ void HpiView::alignFiducials(const QString& fileNameDigData)
 
 //=============================================================================================================
 
-void HpiView::onNewFittingResultAvailable(const RTPROCESSINGLIB::FittingResult& fitResult)
+void HpiView::onNewHpiFitResultAvailable(const RTPROCESSINGLIB::HpiFitResult& fitResult)
 {
     m_vError = fitResult.errorDistances;
     m_vGoF = fitResult.GoF;

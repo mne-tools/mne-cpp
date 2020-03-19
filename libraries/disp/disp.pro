@@ -204,6 +204,7 @@ FORMS += \
     viewers/formfiles/projectsettingsview.ui \
     viewers/formfiles/control3dview.ui \
     viewers/formfiles/hpisettingsview.ui \
+    viewers/formfiles/scalingview.ui \
 
 RESOURCE_FILES +=\
     $${ROOT_DIR}/resources/general/default_filters/BP_1Hz_40Hz_Fs1kHz.txt \
