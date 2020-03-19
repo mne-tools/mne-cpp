@@ -92,12 +92,12 @@ FiffDigPointSet::FiffDigPointSet(QIODevice &p_IODevice)   //const FiffDigPointSe
     //
     FiffStream::SPtr t_pStream(new FiffStream(&p_IODevice));
 
-    if(!FiffDigPointSet::readFromStream(t_pStream, *this))
-    {
+    if(!FiffDigPointSet::readFromStream(t_pStream, *this)) {
         t_pStream->close();
-        qDebug() << "Could not read the FiffDigPointSet\n"; // ToDo throw error
+        qInfo() << "[FiffDigPointSet::FiffDigPointSet] Could not read the FiffDigPointSet"; // ToDo throw error
     }
-    qDebug("%i digitizer Points read in file.", this->size());
+
+    qInfo("[FiffDigPointSet::FiffDigPointSet] %i digitizer Points read from file.", this->size());
 }
 
 //=============================================================================================================

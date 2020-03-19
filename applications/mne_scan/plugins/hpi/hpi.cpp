@@ -205,6 +205,15 @@ void Hpi::onNewHpiFitResultAvailable(const HpiFitResult& fitResult)
 
 //=============================================================================================================
 
+void Hpi::onDigitizersChanged(const QList<FIFFLIB::FiffDigPoint>& lDigitzers)
+{
+    if(m_pFiffInfo) {
+        m_pFiffInfo->dig = lDigitzers;
+    }
+}
+
+//=============================================================================================================
+
 void Hpi::run()
 {
     HpiFitResult HpiFitResult;

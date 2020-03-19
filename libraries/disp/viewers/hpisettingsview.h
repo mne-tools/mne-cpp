@@ -59,6 +59,10 @@ namespace Ui {
     class HpiSettingsViewWidget;
 }
 
+namespace FIFFLIB {
+    class FiffDigPoint;
+}
+
 //=============================================================================================================
 // DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
@@ -90,6 +94,18 @@ public:
     ~HpiSettingsView();
 
 protected:
+    //=========================================================================================================
+    /**
+     * Load digitzers from a file.
+     */
+    void onLoadDigitizers();
+
+    //=========================================================================================================
+    /**
+     * Read Polhemus data from fif file.
+     */
+    QList<FIFFLIB::FiffDigPoint> readPolhemusDig(const QString& fileName);
+
     Ui::HpiSettingsViewWidget*                  m_ui;                    /**< The HPI dialog. */
 
 signals:
@@ -100,6 +116,14 @@ signals:
      * @param[in] state    Whether to do continous HPI.
      */
     void continousHPIToggled(bool state);
+
+    //=========================================================================================================
+    /**
+     * Emit this signal whenever new digitzers were loaded.
+     *
+     * @param[in] lDigitzers    The new digitzers.
+     */
+    void digitizersChanged(const QList<FIFFLIB::FiffDigPoint>& lDigitzers);
 };
 
 } //NAMESPACE
