@@ -40,9 +40,16 @@
 
 #include "ui_hpisettingsview.h"
 
+#include <fiff/fiff_dig_point_set.h>
+#include <fiff/fiff_dig_point.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
+
+#include <QFileInfo>
+#include <QFileDialog>
+#include <QMessageBox>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -54,6 +61,7 @@
 //=============================================================================================================
 
 using namespace DISPLIB;
+using namespace FIFFLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -66,6 +74,9 @@ HpiSettingsView::HpiSettingsView(QWidget *parent,
 , m_ui(new Ui::HpiSettingsViewWidget)
 {
     m_ui->setupUi(this);
+
+    connect(m_ui->m_pushButton_loadDigitizers, &QPushButton::released,
+            this, &HpiSettingsView::onLoadDigitizers);
 }
 
 //=============================================================================================================
@@ -73,4 +84,96 @@ HpiSettingsView::HpiSettingsView(QWidget *parent,
 HpiSettingsView::~HpiSettingsView()
 {
     delete m_ui;
+}
+
+//=============================================================================================================
+
+void HpiSettingsView::onLoadDigitizers()
+{
+    //Get file location
+    QString fileName_HPI = QFileDialog::getOpenFileName(this,
+            tr("Open digitizer file"),"", tr("Fiff file (*.fif)"));
+
+    if(!fileName_HPI.isEmpty()) {
+        m_ui->m_lineEdit_filePath->setText(fileName_HPI);
+    }
+
+    //Load Polhemus file
+    if (!fileName_HPI.isEmpty()) {
+        fileName_HPI = fileName_HPI.trimmed();
+        QFileInfo checkFile(fileName_HPI);
+
+        if (checkFile.exists() && checkFile.isFile()) {
+            emit digitizersChanged(readPolhemusDig(fileName_HPI));
+        } else {
+            QMessageBox msgBox;
+            msgBox.setText("File could not be loaded!");
+            msgBox.exec();
+            return;
+        }
+    }
+}
+
+//=============================================================================================================
+
+QList<FiffDigPoint> HpiSettingsView::readPolhemusDig(const QString& fileName)
+{
+    QFile t_fileDig(fileName);
+    FiffDigPointSet t_digSet(t_fileDig);
+
+    QList<FiffDigPoint> lDigPoints;
+
+    qint16 numHPI = 0;
+    qint16 numDig = 0;
+    qint16 numFiducials = 0;
+    qint16 numEEG = 0;
+
+    for(int i = 0; i < t_digSet.size(); ++i) {
+        lDigPoints.append(t_digSet[i]);
+
+        switch(t_digSet[i].kind) {
+            case FIFFV_POINT_HPI:
+                numHPI++;
+                break;
+
+            case FIFFV_POINT_EXTRA:
+                numDig++;
+                break;
+
+            case FIFFV_POINT_CARDINAL:
+                numFiducials++;
+                break;
+
+            case FIFFV_POINT_EEG:
+                numEEG++;
+                break;
+        }
+    }
+
+    //Set loaded number of digitizers
+    m_ui->m_label_numberLoadedCoils->setNum(numHPI);
+    m_ui->m_label_numberLoadedDigitizers->setNum(numDig);
+    m_ui->m_label_numberLoadedFiducials->setNum(numFiducials);
+    m_ui->m_label_numberLoadedEEG->setNum(numEEG);
+
+//    //Hide/show frequencies and errors based on the number of coils
+//    if(numHPI == 3) {
+//        m_ui->m_label_gofCoil4->hide();
+//        m_ui->m_label_gofCoil4Description->hide();
+//        m_ui->m_label_freqCoil4->hide();
+//        m_ui->m_spinBox_freqCoil4->hide();
+
+//        m_vCoilFreqs.clear();
+//        m_vCoilFreqs << 155 << 165 << 190;
+//    } else {
+//        m_ui->m_label_gofCoil4->show();
+//        m_ui->m_label_gofCoil4Description->show();
+//        m_ui->m_label_freqCoil4->show();
+//        m_ui->m_spinBox_freqCoil4->show();
+
+//        m_vCoilFreqs.clear();
+//        m_vCoilFreqs << 155 << 165 << 190 << 200;
+//    }
+
+    return lDigPoints;
 }

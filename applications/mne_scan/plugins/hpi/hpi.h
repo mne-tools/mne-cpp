@@ -150,6 +150,14 @@ private:
 
     //=========================================================================================================
     /**
+     * Call this funciton whenever new digitzers were loaded.
+     *
+     * @param[in] lDigitzers    The new digitzers.
+     */
+    void onDigitizersChanged(const QList<FIFFLIB::FiffDigPoint>& lDigitzers);
+
+    //=========================================================================================================
+    /**
      * IAlgorithm function
      */
     virtual void run();    
