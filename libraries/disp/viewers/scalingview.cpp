@@ -38,6 +38,8 @@
 
 #include "scalingview.h"
 
+#include "ui_scalingview.h"
+
 #include <fiff/fiff_constants.h>
 
 //=============================================================================================================
@@ -70,8 +72,11 @@ ScalingView::ScalingView(const QString& sSettingsPath,
                          QWidget *parent,
                          Qt::WindowFlags f)
 : QWidget(parent, f)
+, m_ui(new Ui::ScalingViewWidget)
 , m_sSettingsPath(sSettingsPath)
 {
+    m_ui->setupUi(this);
+
     this->setWindowTitle("Scaling");
     this->setMinimumWidth(330);
     this->setMaximumWidth(330);
@@ -129,17 +134,16 @@ void ScalingView::setScaleMap(const QMap<qint32,float>& qMapChScaling)
 
 void ScalingView::redrawGUI()
 {
-    QGridLayout* t_pGridLayout = new QGridLayout;
-
     qint32 i = 0;
 
     //MAG
     if(m_qMapChScaling.contains(FIFF_UNIT_T) && m_lChannelTypeList.contains("MAG"))
     {
         QLabel* t_pLabelModality = new QLabel("MAG (pT)");
-        t_pGridLayout->addWidget(t_pLabelModality,i,0,1,1);
+        m_ui->m_formLayout_Scaling->addWidget(t_pLabelModality,i,0,1,1);
 
         QDoubleSpinBox* t_pDoubleSpinBoxScale = new QDoubleSpinBox;
+        t_pDoubleSpinBoxScale->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
         t_pDoubleSpinBoxScale->setMinimum(0.001);
         t_pDoubleSpinBoxScale->setMaximum(50000);
         t_pDoubleSpinBoxScale->setMaximumWidth(100);
@@ -150,9 +154,10 @@ void ScalingView::redrawGUI()
         m_qMapScalingDoubleSpinBox.insert(FIFF_UNIT_T,t_pDoubleSpinBoxScale);
         connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
                 this,&ScalingView::onUpdateSpinBoxScaling);
-        t_pGridLayout->addWidget(t_pDoubleSpinBoxScale,i+1,0,1,1);
+        m_ui->m_formLayout_Scaling->addWidget(t_pDoubleSpinBoxScale,i+1,0,1,1);
 
         QSlider* t_pHorizontalSlider = new QSlider(Qt::Horizontal);
+        t_pHorizontalSlider->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
         t_pHorizontalSlider->setMinimum(1);
         t_pHorizontalSlider->setMaximum(500);
         t_pHorizontalSlider->setSingleStep(1);
@@ -161,7 +166,7 @@ void ScalingView::redrawGUI()
         m_qMapScalingSlider.insert(FIFF_UNIT_T,t_pHorizontalSlider);
         connect(t_pHorizontalSlider,static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
                 this,&ScalingView::onUpdateSliderScaling);
-        t_pGridLayout->addWidget(t_pHorizontalSlider,i+1,1,1,1);
+        m_ui->m_formLayout_Scaling->addWidget(t_pHorizontalSlider,i+1,1,1,1);
 
         i+=2;
     }
@@ -171,9 +176,10 @@ void ScalingView::redrawGUI()
     {
         QLabel* t_pLabelModality = new QLabel;
         t_pLabelModality->setText("GRAD (fT/cm)");
-        t_pGridLayout->addWidget(t_pLabelModality,i,0,1,1);
+        m_ui->m_formLayout_Scaling->addWidget(t_pLabelModality,i,0,1,1);
 
         QDoubleSpinBox* t_pDoubleSpinBoxScale = new QDoubleSpinBox;
+        t_pDoubleSpinBoxScale->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
         t_pDoubleSpinBoxScale->setMinimum(1);
         t_pDoubleSpinBoxScale->setMaximum(500000);
         t_pDoubleSpinBoxScale->setMaximumWidth(100);
@@ -184,9 +190,10 @@ void ScalingView::redrawGUI()
         m_qMapScalingDoubleSpinBox.insert(FIFF_UNIT_T_M,t_pDoubleSpinBoxScale);
         connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
                 this,&ScalingView::onUpdateSpinBoxScaling);
-        t_pGridLayout->addWidget(t_pDoubleSpinBoxScale,i+1,0,1,1);
+        m_ui->m_formLayout_Scaling->addWidget(t_pDoubleSpinBoxScale,i+1,0,1,1);
 
         QSlider* t_pHorizontalSlider = new QSlider(Qt::Horizontal);
+        t_pHorizontalSlider->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
         t_pHorizontalSlider->setMinimum(1);
         t_pHorizontalSlider->setMaximum(2000);
         t_pHorizontalSlider->setSingleStep(1);
@@ -195,7 +202,7 @@ void ScalingView::redrawGUI()
         m_qMapScalingSlider.insert(FIFF_UNIT_T_M,t_pHorizontalSlider);
         connect(t_pHorizontalSlider,static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
                 this,&ScalingView::onUpdateSliderScaling);
-        t_pGridLayout->addWidget(t_pHorizontalSlider,i+1,1,1,1);
+        m_ui->m_formLayout_Scaling->addWidget(t_pHorizontalSlider,i+1,1,1,1);
 
         i+=2;
     }
@@ -205,9 +212,10 @@ void ScalingView::redrawGUI()
     {
         QLabel* t_pLabelModality = new QLabel;
         t_pLabelModality->setText("EEG (uV)");
-        t_pGridLayout->addWidget(t_pLabelModality,i,0,1,1);
+        m_ui->m_formLayout_Scaling->addWidget(t_pLabelModality,i,0,1,1);
 
         QDoubleSpinBox* t_pDoubleSpinBoxScale = new QDoubleSpinBox;
+        t_pDoubleSpinBoxScale->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
         t_pDoubleSpinBoxScale->setMinimum(0.1);
         t_pDoubleSpinBoxScale->setMaximum(25000);
         t_pDoubleSpinBoxScale->setMaximumWidth(100);
@@ -218,9 +226,10 @@ void ScalingView::redrawGUI()
         m_qMapScalingDoubleSpinBox.insert(FIFFV_EEG_CH,t_pDoubleSpinBoxScale);
         connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
                 this,&ScalingView::onUpdateSpinBoxScaling);
-        t_pGridLayout->addWidget(t_pDoubleSpinBoxScale,i+1,0,1,1);
+        m_ui->m_formLayout_Scaling->addWidget(t_pDoubleSpinBoxScale,i+1,0,1,1);
 
         QSlider* t_pHorizontalSlider = new QSlider(Qt::Horizontal);
+        t_pHorizontalSlider->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
         t_pHorizontalSlider->setMinimum(1);
         t_pHorizontalSlider->setMaximum(1000);
         t_pHorizontalSlider->setSingleStep(1);
@@ -229,7 +238,7 @@ void ScalingView::redrawGUI()
         m_qMapScalingSlider.insert(FIFFV_EEG_CH,t_pHorizontalSlider);
         connect(t_pHorizontalSlider,static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
                 this,&ScalingView::onUpdateSliderScaling);
-        t_pGridLayout->addWidget(t_pHorizontalSlider,i+1,1,1,1);
+        m_ui->m_formLayout_Scaling->addWidget(t_pHorizontalSlider,i+1,1,1,1);
 
         i+=2;
     }
@@ -239,9 +248,10 @@ void ScalingView::redrawGUI()
     {
         QLabel* t_pLabelModality = new QLabel;
         t_pLabelModality->setText("EOG (uV)");
-        t_pGridLayout->addWidget(t_pLabelModality,i,0,1,1);
+        m_ui->m_formLayout_Scaling->addWidget(t_pLabelModality,i,0,1,1);
 
         QDoubleSpinBox* t_pDoubleSpinBoxScale = new QDoubleSpinBox;
+        t_pDoubleSpinBoxScale->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
         t_pDoubleSpinBoxScale->setMinimum(0.1);
         t_pDoubleSpinBoxScale->setMaximum(102500e14);
         t_pDoubleSpinBoxScale->setMaximumWidth(100);
@@ -252,9 +262,10 @@ void ScalingView::redrawGUI()
         m_qMapScalingDoubleSpinBox.insert(FIFFV_EOG_CH,t_pDoubleSpinBoxScale);
         connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
                 this,&ScalingView::onUpdateSpinBoxScaling);
-        t_pGridLayout->addWidget(t_pDoubleSpinBoxScale,i+1,0,1,1);
+        m_ui->m_formLayout_Scaling->addWidget(t_pDoubleSpinBoxScale,i+1,0,1,1);
 
         QSlider* t_pHorizontalSlider = new QSlider(Qt::Horizontal);
+        t_pHorizontalSlider->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
         t_pHorizontalSlider->setMinimum(1);
         t_pHorizontalSlider->setMaximum(1000);
         t_pHorizontalSlider->setSingleStep(1);
@@ -263,7 +274,7 @@ void ScalingView::redrawGUI()
         m_qMapScalingSlider.insert(FIFFV_EOG_CH,t_pHorizontalSlider);
         connect(t_pHorizontalSlider,static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
                 this,&ScalingView::onUpdateSliderScaling);
-        t_pGridLayout->addWidget(t_pHorizontalSlider,i+1,1,1,1);
+        m_ui->m_formLayout_Scaling->addWidget(t_pHorizontalSlider,i+1,1,1,1);
 
         i+=2;
     }
@@ -273,9 +284,10 @@ void ScalingView::redrawGUI()
     {
         QLabel* t_pLabelModality = new QLabel;
         t_pLabelModality->setText("STIM");
-        t_pGridLayout->addWidget(t_pLabelModality,i,0,1,1);
+        m_ui->m_formLayout_Scaling->addWidget(t_pLabelModality,i,0,1,1);
 
         QDoubleSpinBox* t_pDoubleSpinBoxScale = new QDoubleSpinBox;
+        t_pDoubleSpinBoxScale->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
         t_pDoubleSpinBoxScale->setMinimum(0.001);
         t_pDoubleSpinBoxScale->setMaximum(1000);
         t_pDoubleSpinBoxScale->setMaximumWidth(100);
@@ -286,9 +298,10 @@ void ScalingView::redrawGUI()
         m_qMapScalingDoubleSpinBox.insert(FIFFV_STIM_CH,t_pDoubleSpinBoxScale);
         connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
                 this,&ScalingView::onUpdateSpinBoxScaling);
-        t_pGridLayout->addWidget(t_pDoubleSpinBoxScale,i+1,0,1,1);
+        m_ui->m_formLayout_Scaling->addWidget(t_pDoubleSpinBoxScale,i+1,0,1,1);
 
         QSlider* t_pHorizontalSlider = new QSlider(Qt::Horizontal);
+        t_pHorizontalSlider->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
         t_pHorizontalSlider->setMinimum(1);
         t_pHorizontalSlider->setMaximum(1000);
         t_pHorizontalSlider->setSingleStep(1);
@@ -297,7 +310,7 @@ void ScalingView::redrawGUI()
         m_qMapScalingSlider.insert(FIFFV_STIM_CH,t_pHorizontalSlider);
         connect(t_pHorizontalSlider,static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
                 this,&ScalingView::onUpdateSliderScaling);
-        t_pGridLayout->addWidget(t_pHorizontalSlider,i+1,1,1,1);
+        m_ui->m_formLayout_Scaling->addWidget(t_pHorizontalSlider,i+1,1,1,1);
 
         i+=2;
     }
@@ -307,9 +320,10 @@ void ScalingView::redrawGUI()
     {
         QLabel* t_pLabelModality = new QLabel;
         t_pLabelModality->setText("MISC");
-        t_pGridLayout->addWidget(t_pLabelModality,i,0,1,1);
+        m_ui->m_formLayout_Scaling->addWidget(t_pLabelModality,i,0,1,1);
 
         QDoubleSpinBox* t_pDoubleSpinBoxScale = new QDoubleSpinBox;
+        t_pDoubleSpinBoxScale->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
         t_pDoubleSpinBoxScale->setMinimum(0.1);
         t_pDoubleSpinBoxScale->setMaximum(10000);
         t_pDoubleSpinBoxScale->setMaximumWidth(100);
@@ -320,9 +334,10 @@ void ScalingView::redrawGUI()
         m_qMapScalingDoubleSpinBox.insert(FIFFV_MISC_CH,t_pDoubleSpinBoxScale);
         connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
                 this,&ScalingView::onUpdateSpinBoxScaling);
-        t_pGridLayout->addWidget(t_pDoubleSpinBoxScale,i+1,0,1,1);
+        m_ui->m_formLayout_Scaling->addWidget(t_pDoubleSpinBoxScale,i+1,0,1,1);
 
         QSlider* t_pHorizontalSlider = new QSlider(Qt::Horizontal);
+        t_pHorizontalSlider->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
         t_pHorizontalSlider->setMinimum(1);
         t_pHorizontalSlider->setMaximum(10000);
         t_pHorizontalSlider->setSingleStep(1);
@@ -331,12 +346,10 @@ void ScalingView::redrawGUI()
         m_qMapScalingSlider.insert(FIFFV_MISC_CH,t_pHorizontalSlider);
         connect(t_pHorizontalSlider,static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
                 this,&ScalingView::onUpdateSliderScaling);
-        t_pGridLayout->addWidget(t_pHorizontalSlider,i+1,1,1,1);
+        m_ui->m_formLayout_Scaling->addWidget(t_pHorizontalSlider,i+1,1,1,1);
 
         i+=2;
     }
-
-    this->setLayout(t_pGridLayout);
 }
 
 //=============================================================================================================

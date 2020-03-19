@@ -61,6 +61,10 @@
 class QDoubleSpinBox;
 class QSlider;
 
+namespace Ui {
+    class ScalingViewWidget;
+}
+
 //=============================================================================================================
 // DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
@@ -159,6 +163,8 @@ protected:
     QStringList                         m_lChannelTypeList;             /**< Channel type list. */
 
     QString                             m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
+
+    Ui::ScalingViewWidget*              m_ui;
 
 signals:
     //=========================================================================================================
