@@ -142,7 +142,7 @@ protected:
 
     QString                                 m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
 
-    QSharedPointer<FilterDesignView>              m_pFilterView;                  /**< The filter view. */
+    QSharedPointer<FilterDesignView>        m_pFilterView;                  /**< The filter view. */
 
     QPointer<QCheckBox>                     m_pCheckBox;                    /**< The filter activation check box. */
 

@@ -193,7 +193,7 @@
          </widget>
         </item>
         <item row="4" column="0" rowspan="2" colspan="2">
-         <widget class="QTableWidget" name="tableWidget">
+         <widget class="QTableWidget" name="m_tableWidget_Frequencies">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
             <horstretch>0</horstretch>
@@ -212,6 +212,9 @@
           <property name="showGrid">
            <bool>true</bool>
           </property>
+          <attribute name="horizontalHeaderCascadingSectionResizes">
+           <bool>false</bool>
+          </attribute>
           <attribute name="horizontalHeaderMinimumSectionSize">
            <number>30</number>
           </attribute>
@@ -224,26 +227,6 @@
           <attribute name="verticalHeaderDefaultSectionSize">
            <number>22</number>
           </attribute>
-          <row>
-           <property name="text">
-            <string>0</string>
-           </property>
-          </row>
-          <row>
-           <property name="text">
-            <string>1</string>
-           </property>
-          </row>
-          <row>
-           <property name="text">
-            <string>2</string>
-           </property>
-          </row>
-          <row>
-           <property name="text">
-            <string>3</string>
-           </property>
-          </row>
           <column>
            <property name="text">
             <string>Coil #</string>
@@ -254,46 +237,6 @@
             <string>Frequency</string>
            </property>
           </column>
-          <item row="0" column="0">
-           <property name="text">
-            <string>1</string>
-           </property>
-          </item>
-          <item row="0" column="1">
-           <property name="text">
-            <string>155</string>
-           </property>
-          </item>
-          <item row="1" column="0">
-           <property name="text">
-            <string>2</string>
-           </property>
-          </item>
-          <item row="1" column="1">
-           <property name="text">
-            <string>165</string>
-           </property>
-          </item>
-          <item row="2" column="0">
-           <property name="text">
-            <string>3</string>
-           </property>
-          </item>
-          <item row="2" column="1">
-           <property name="text">
-            <string>190</string>
-           </property>
-          </item>
-          <item row="3" column="0">
-           <property name="text">
-            <string>4</string>
-           </property>
-          </item>
-          <item row="3" column="1">
-           <property name="text">
-            <string>200</string>
-           </property>
-          </item>
          </widget>
         </item>
         <item row="15" column="0" colspan="2">
@@ -322,7 +265,7 @@
          </widget>
         </item>
         <item row="19" column="0" colspan="2">
-         <widget class="QTableWidget" name="tableWidget_2">
+         <widget class="QTableWidget" name="m_tableWidget_errors">
           <property name="minimumSize">
            <size>
             <width>0</width>
@@ -335,26 +278,6 @@
           <attribute name="verticalHeaderDefaultSectionSize">
            <number>22</number>
           </attribute>
-          <row>
-           <property name="text">
-            <string>0</string>
-           </property>
-          </row>
-          <row>
-           <property name="text">
-            <string>1</string>
-           </property>
-          </row>
-          <row>
-           <property name="text">
-            <string>2</string>
-           </property>
-          </row>
-          <row>
-           <property name="text">
-            <string>3</string>
-           </property>
-          </row>
           <column>
            <property name="text">
             <string>Coil #</string>
@@ -365,46 +288,6 @@
             <string>Error in mm</string>
            </property>
           </column>
-          <item row="0" column="0">
-           <property name="text">
-            <string>1</string>
-           </property>
-          </item>
-          <item row="0" column="1">
-           <property name="text">
-            <string>0</string>
-           </property>
-          </item>
-          <item row="1" column="0">
-           <property name="text">
-            <string>2</string>
-           </property>
-          </item>
-          <item row="1" column="1">
-           <property name="text">
-            <string>0</string>
-           </property>
-          </item>
-          <item row="2" column="0">
-           <property name="text">
-            <string>3</string>
-           </property>
-          </item>
-          <item row="2" column="1">
-           <property name="text">
-            <string>0</string>
-           </property>
-          </item>
-          <item row="3" column="0">
-           <property name="text">
-            <string>4</string>
-           </property>
-          </item>
-          <item row="3" column="1">
-           <property name="text">
-            <string>0</string>
-           </property>
-          </item>
          </widget>
         </item>
         <item row="20" column="0">
@@ -461,27 +344,6 @@
           </property>
          </widget>
         </item>
-        <item row="8" column="0">
-         <widget class="QCheckBox" name="m_checkBox_useSSP">
-          <property name="text">
-           <string>Use SSP</string>
-          </property>
-         </widget>
-        </item>
-        <item row="9" column="0">
-         <widget class="QCheckBox" name="m_checkBox_useComp">
-          <property name="text">
-           <string>Use compensators</string>
-          </property>
-         </widget>
-        </item>
-        <item row="13" column="0">
-         <widget class="QCheckBox" name="m_checkBox_continousHPI">
-          <property name="text">
-           <string>Do continous HPI fitting</string>
-          </property>
-         </widget>
-        </item>
         <item row="3" column="0" colspan="2">
          <widget class="QLabel" name="label_5">
           <property name="text">
@@ -506,6 +368,27 @@
           </property>
           <property name="alignment">
            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="13" column="0" colspan="2">
+         <widget class="QCheckBox" name="m_checkBox_continousHPI">
+          <property name="text">
+           <string>Do continous HPI fitting</string>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="0" colspan="2">
+         <widget class="QCheckBox" name="m_checkBox_useComp">
+          <property name="text">
+           <string>Use compensators</string>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="0" colspan="2">
+         <widget class="QCheckBox" name="m_checkBox_useSSP">
+          <property name="text">
+           <string>Use SSP</string>
           </property>
          </widget>
         </item>
