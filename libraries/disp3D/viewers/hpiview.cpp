@@ -468,7 +468,7 @@ void HpiView::onNewHpiFitResultAvailable(const RTPROCESSINGLIB::HpiFitResult& fi
 //=============================================================================================================
 
 void HpiView::onBtnDoSingleFit()
-{    
+{
     if(!this->hpiLoaded()) {
        QMessageBox msgBox;
        msgBox.setText("Please load a digitizer set with at least 3 HPI coils first!");
