@@ -88,12 +88,29 @@ public:
      * @param[in] pFiffInfo      The FiffInfo.
      * @param[in] parent         The parent widget.
      */
-    HpiSettingsView(QWidget *parent = 0,
+    HpiSettingsView(const QString& sSettingsPath = "",
+                    QWidget *parent = 0,
                     Qt::WindowFlags f = Qt::Widget);
 
     ~HpiSettingsView();
 
-protected:
+protected:    
+    //=========================================================================================================
+    /**
+     * Saves all important settings of this view via QSettings.
+     *
+     * @param[in] settingsPath        the path to store the settings to.
+     */
+    void saveSettings(const QString& settingsPath);
+
+    //=========================================================================================================
+    /**
+     * Loads and inits all important settings of this view via QSettings.
+     *
+     * @param[in] settingsPath        the path to load the settings from.
+     */
+    void loadSettings(const QString& settingsPath);
+
     //=========================================================================================================
     /**
      * Load digitzers from a file.
@@ -102,13 +119,47 @@ protected:
 
     //=========================================================================================================
     /**
+     * Called whenever a cell in the frequenc table widget is changed.
+     *
+     * @param[in] row        the row of the changed cell.
+     * @param[in] col        the column of the changed cell.
+     */
+    void onFrequencyCellChanged(int row,
+                                int col);
+
+    //=========================================================================================================
+    /**
+     * Add coil to frequency table widget.
+     */
+    void onAddCoil();
+
+    //=========================================================================================================
+    /**
+     * Remove coil to frequency table widget.
+     */
+    void onRemoveCoil();
+
+    //=========================================================================================================
+    /**
      * Read Polhemus data from fif file.
      */
     QList<FIFFLIB::FiffDigPoint> readPolhemusDig(const QString& fileName);
 
-    Ui::HpiSettingsViewWidget*                  m_ui;                    /**< The HPI dialog. */
+    Ui::HpiSettingsViewWidget*                  m_ui;                   /**< The HPI dialog. */
+
+    QVector<int>                                m_vCoilFreqs;           /**< Vector contains the HPI coil frequencies. */
+
+    QString                                     m_sSettingsPath;        /**< The settings path to store the GUI settings to. */
 
 signals:
+    //=========================================================================================================
+    /**
+     * Emit this signal whenever the coil frequencies changed.
+     *
+     * @param[in] vCoilFreqs    The new coil frequencies.
+     */
+    void coilFrequenciesChanged(const QVector<int>& vCoilFreqs);
+
     //=========================================================================================================
     /**
      * Emit this signal whenever the user toggled the do HPI check box.
@@ -124,8 +175,16 @@ signals:
      * @param[in] lDigitzers    The new digitzers.
      */
     void digitizersChanged(const QList<FIFFLIB::FiffDigPoint>& lDigitzers);
+
+    //=========================================================================================================
+    /**
+     * Emit this signal whenever a single HPI fit is supposed to be triggered.
+     */
+    void doSingleHpiFit();
 };
 
 } //NAMESPACE
+
+Q_DECLARE_METATYPE(QVector<int>)
 
 #endif // HPISETTINGSVIEW_H

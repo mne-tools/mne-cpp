@@ -128,10 +128,12 @@ RtHpi::~RtHpi()
 
 void RtHpi::append(const MatrixXd &data)
 {
-    emit operate(data,
-                 m_matProjectors,
-                 m_vCoilFreqs,
-                 m_pFiffInfo);
+    if(m_vCoilFreqs.size() >= 3) {
+        emit operate(data,
+                     m_matProjectors,
+                     m_vCoilFreqs,
+                     m_pFiffInfo);
+    }
 }
 
 //=============================================================================================================

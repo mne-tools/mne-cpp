@@ -158,6 +158,20 @@ private:
 
     //=========================================================================================================
     /**
+     * Call this funciton whenever when a single HPI fit based on the last data block was requested.
+     */
+    void onDoSingleHpiFit();
+
+    //=========================================================================================================
+    /**
+     * Call this funciton whenever the coil frequencies changed.
+     *
+     * @param[in] vCoilFreqs    The new coil frequencies.
+     */
+    void onCoilFrequenciesChanged(const QVector<int>& vCoilFreqs);
+
+    //=========================================================================================================
+    /**
      * IAlgorithm function
      */
     virtual void run();    
@@ -167,6 +181,9 @@ private:
     QVector<int>                m_vCoilFreqs;           /**< Vector contains the HPI coil frequencies. */
     QVector<double>             m_vError;               /**< The HPI estimation error mm for each fitted HPI coil. */
     Eigen::VectorXd             m_vGoF;                 /**< The goodness of fit per HPI coil. */
+    Eigen::MatrixXd             m_matData;              /**< The last data block.*/
+
+    bool                        m_bDoContinousHpi;
 
     QSharedPointer<FIFFLIB::FiffInfo>                                           m_pFiffInfo;            /**< Fiff measurement info.*/
 
