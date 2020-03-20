@@ -74,10 +74,6 @@
 // FORWARD DECLARATION
 //=============================================================================================================
 
-namespace DISP3DLIB {
-    class HpiView;
-}
-
 //=============================================================================================================
 // DEFINE NAMESPACE FTBUFFERPLUGIN
 //=============================================================================================================
@@ -198,14 +194,6 @@ private:
 
     //=========================================================================================================
     /**
-     * Sends the current data block to the HPI dialog.
-     *
-     * @param [in] matData   The new data block.
-     */
-    void updateHPI(const Eigen::MatrixXd &matData);
-
-    //=========================================================================================================
-    /**
      * Receives new data from producer, publishes to plugin output rtmsa
      *
      * @param[in] matData   New data from FtBuffProducer
@@ -226,37 +214,17 @@ private:
      */
     bool setupRTMSA(FIFFLIB::FiffInfo FiffInfo);
 
-    //=========================================================================================================
-    /**
-     * Set HPI fiff information.
-     */
-    void showHPIDialog();
-
-    //=========================================================================================================
-    /**
-     * Toggles teh continous HPI flag.
-     *
-     * @param [in] bDoContinousHPI   Whether to do continous HPI.
-     */
-    void onContinousHPIToggled(bool bDoContinousHPI);
-
     bool                                                                                m_bIsConfigured;                /**< Whether the buffer output has been configured */
-    bool                                                                                m_bDoContinousHPI;              /**< Whether to do continous HPI.*/
 
     QMutex                                                                              m_mutex;                        /**< Guards shared data from being accessed at the same time */
 
     QThread                                                                             m_pProducerThread;              /**< Producer thread for the FtBuffProducer object */
 
-    QAction*                                                                            m_pActionShowYourWidget;        /**< Action used in the displaying of the widget */
-    QAction*                                                                            m_pActionComputeHPI;            /**< Update HPI info into Fiff Info action */
-
     QSharedPointer<FtBuffProducer>                                                      m_pFtBuffProducer;              /**< Pointer to producer object that handles data from FtConnector*/
     QSharedPointer<FIFFLIB::FiffInfo>                                                   m_pFiffInfo;                    /**< Fiff measurement info.*/
     QSharedPointer<FIFFLIB::FiffRawData>                                                m_pNeuromagHeadChunkData;       /**< Fiff into parser for header data collected from Neuromag extended header */
-    QSharedPointer<DISP3DLIB::HpiView>                                                  m_pHPIWidget;                   /**< HPI widget. */
     QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> > m_pRTMSA_BufferOutput;          /**< The RealTimeSampleArray to provide the plugin output data.*/
     QSharedPointer<IOBUFFER::CircularBuffer_Matrix_double>                              m_pCircularBuffer;              /**< Holds incoming raw data. */
-
 };
 }//namespace end brace
 
