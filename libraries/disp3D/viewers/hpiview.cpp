@@ -678,7 +678,6 @@ void HpiView::storeResults(const FiffCoordTrans& devHeadTrans,
 void HpiView::update3DView()
 {
     if(m_pTrackedDigitizer && m_pFiffInfo && m_pBemHeadAvr) {
-
         //Update fast scan / tracked digitizer
         QList<QStandardItem*> itemList = m_pTrackedDigitizer->findChildren(Data3DTreeModelItemTypes::DigitizerItem);
         for(int j = 0; j < itemList.size(); ++j) {

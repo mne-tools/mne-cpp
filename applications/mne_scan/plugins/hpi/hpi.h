@@ -64,6 +64,7 @@
 namespace FIFFLIB {
     class FiffInfo;
     class FiffDigPoint;
+    class FiffCoordTrans;
 }
 
 namespace RTPROCESSINGLIB {
@@ -161,8 +162,10 @@ private:
      * Call this funciton whenever new digitzers were loaded.
      *
      * @param[in] lDigitzers    The new digitzers.
+     * @param[in] sFilePath     The file path to the new digitzers.
      */
-    void onDigitizersChanged(const QList<FIFFLIB::FiffDigPoint>& lDigitzers);
+    void onDigitizersChanged(const QList<FIFFLIB::FiffDigPoint>& lDigitzers,
+                             const QString& sFilePath);
 
     //=========================================================================================================
     /**
@@ -204,6 +207,20 @@ private:
 
     //=========================================================================================================
     /**
+     * Call this function whenever the device to head transformation matrix changed.
+     *
+     * @param[in] devHeadTrans    The new device to head transformation matrix changed.
+     */
+    void onDevHeadTransAvailable(const FIFFLIB::FiffCoordTrans& devHeadTrans);
+
+    //=========================================================================================================
+    /**
+     * Read Polhemus data from fif file.
+     */
+    QList<FIFFLIB::FiffDigPoint> readPolhemusDig(const QString& fileName);
+
+    //=========================================================================================================
+    /**
      * IAlgorithm function
      */
     virtual void run();    
@@ -211,6 +228,8 @@ private:
     QMutex                      m_mutex;                    /**< The threads mutex.*/
 
     QVector<int>                m_vCoilFreqs;               /**< Vector contains the HPI coil frequencies. */
+
+    QString                     m_sFilePathDigitzers;       /**< The file path to the current digitzers. */
 
     qint16                      m_iNumberBadChannels;       /**< The number of bad channels.*/
 
@@ -222,7 +241,6 @@ private:
     bool                        m_bUseComp;                 /**< Use Comps's.*/
 
     Eigen::MatrixXd             m_matData;                  /**< The last data block.*/
-    Eigen::MatrixXd             m_matProjectors;            /**< Holds the matrix with the SSP and compensator projectors.*/
     Eigen::MatrixXd             m_matCompProjectors;        /**< Holds the matrix with the SSP and compensator projectors.*/
 
     QSharedPointer<FIFFLIB::FiffInfo>                                           m_pFiffInfo;            /**< Fiff measurement info.*/
@@ -234,6 +252,7 @@ private:
 signals:
     void errorsChanged(const QVector<double>& vErrors,
                        double dMeanErrorDist);
+    void devHeadTransAvailable(const FIFFLIB::FiffCoordTrans& devHeadTrans);
 };
 } // NAMESPACE
 

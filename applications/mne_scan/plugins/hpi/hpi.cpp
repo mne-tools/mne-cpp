@@ -78,6 +78,8 @@ Hpi::Hpi()
 , m_bUseComp(false)
 , m_bDoSingleHpi(false)
 {
+    connect(this, &Hpi::devHeadTransAvailable,
+            this, &Hpi::onDevHeadTransAvailable, Qt::BlockingQueuedConnection);
 }
 
 //=============================================================================================================
@@ -137,6 +139,8 @@ bool Hpi::stop()
 
     m_pFiffInfo = Q_NULLPTR;
 
+    m_pCircularBuffer->clear();
+
     return true;
 }
 
@@ -181,14 +185,7 @@ void Hpi::update(SCMEASLIB::Measurement::SPtr pMeasurement)
         // Check if data is present
         if(pRTMSA->getMultiSampleArray().size() > 0) {
             //If bad channels changed, recalcluate projectors
-            //m_mutex.lock();
-            if(m_iNumberBadChannels != m_pFiffInfo->bads.size()
-               || m_matCompProjectors.rows() == 0
-               || m_matCompProjectors.cols() == 0) {
-                updateProjections();
-                m_iNumberBadChannels = m_pFiffInfo->bads.size();
-            }
-            //m_mutex.unlock();
+            updateProjections();
 
             if(m_bDoSingleHpi) {
                 while(!m_pCircularBuffer->push(pRTMSA->getMultiSampleArray()[0])) {
@@ -255,7 +252,18 @@ void Hpi::initPluginControlWidgets()
 void Hpi::updateProjections()
 {
     if(m_pFiffInfo) {
-        m_matProjectors = Eigen::MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+        m_mutex.lock();
+        if(m_iNumberBadChannels != m_pFiffInfo->bads.size()
+           || m_matCompProjectors.rows() == 0
+           || m_matCompProjectors.cols() == 0) {
+            m_iNumberBadChannels = m_pFiffInfo->bads.size();
+        } else {
+            m_mutex.unlock();
+            return;
+        }
+        m_mutex.unlock();
+
+        Eigen::MatrixXd matProjectors = Eigen::MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
         Eigen::MatrixXd matComp = Eigen::MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
 
         if(m_bUseSSP) {
@@ -269,10 +277,10 @@ void Hpi::updateProjections()
             }
 
             //Create the projector for all SSP's on
-            infoTemp.make_projector(m_matProjectors);
+            infoTemp.make_projector(matProjectors);
             //set columns of matrix to zero depending on bad channels indexes
             for(qint32 j = 0; j < infoTemp.bads.size(); ++j) {
-                m_matProjectors.col(infoTemp.ch_names.indexOf(infoTemp.bads.at(j))).setZero();
+                matProjectors.col(infoTemp.ch_names.indexOf(infoTemp.bads.at(j))).setZero();
             }
         }
 
@@ -286,7 +294,7 @@ void Hpi::updateProjections()
         }
 
         m_mutex.lock();
-        m_matCompProjectors = m_matProjectors * matComp;
+        m_matCompProjectors = matProjectors * matComp;
         m_mutex.unlock();
     }
 }
@@ -300,12 +308,16 @@ void Hpi::onAllowedMeanErrorDistChanged(double dAllowedMeanErrorDist)
 
 //=============================================================================================================
 
-void Hpi::onDigitizersChanged(const QList<FIFFLIB::FiffDigPoint>& lDigitzers)
+void Hpi::onDigitizersChanged(const QList<FIFFLIB::FiffDigPoint>& lDigitzers,
+                              const QString& sFilePath)
 {    
     m_mutex.lock();
     if(m_pFiffInfo) {
         m_pFiffInfo->dig = lDigitzers;
     }
+
+    m_sFilePathDigitzers = sFilePath;
+
     m_mutex.unlock();
 }
 
@@ -358,6 +370,13 @@ void Hpi::onContHpiStatusChanged(bool bChecked)
 
 //=============================================================================================================
 
+void Hpi::onDevHeadTransAvailable(const FIFFLIB::FiffCoordTrans& devHeadTrans)
+{
+    m_pFiffInfo->dev_head_t = devHeadTrans;
+}
+
+//=============================================================================================================
+
 void Hpi::run()
 {
     HpiFitResult fitResult;
@@ -373,6 +392,7 @@ void Hpi::run()
             fitResult.devHeadTrans.to = 4;
 
             m_mutex.lock();
+            fitResult.sFilePathDigitzers = m_sFilePathDigitzers;
             HPIFit::fitHPI(matData,
                            m_matCompProjectors,
                            fitResult.devHeadTrans,
@@ -393,8 +413,11 @@ void Hpi::run()
                 m_mutex.lock();
                 dErrorMax = m_dAllowedMeanErrorDist;
                 m_mutex.unlock();
-                if(dMeanErrorDist < dErrorMax) {
+                if(1000*dMeanErrorDist < dErrorMax) {
                     m_pHpiOutput->data()->setValue(fitResult);
+
+                    //If fit was good, set newly calculated transformation matrix to fiff info
+                    emit devHeadTransAvailable(fitResult.devHeadTrans);
                 }
             }
         }

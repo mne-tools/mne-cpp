@@ -40,6 +40,7 @@
 
 #include <scMeas/realtimeconnectivityestimate.h>
 #include <scMeas/realtimesourceestimate.h>
+#include <scMeas/realtimehpiresult.h>
 
 #include <connectivity/network/network.h>
 
@@ -51,14 +52,25 @@
 #include <disp3D/engine/view/view3D.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
 #include <disp3D/engine/delegate/data3Dtreedelegate.h>
+#include <disp3D/engine/model/items/bem/bemtreeitem.h>
+#include <disp3D/engine/model/items/bem/bemsurfacetreeitem.h>
+#include <disp3D/engine/model/items/digitizer/digitizertreeitem.h>
+#include <disp3D/engine/model/items/digitizer/digitizersettreeitem.h>
 
 #include <disp/viewers/control3dview.h>
+
+#include <fiff/fiff_ch_info.h>
+#include <fiff/c/fiff_digitizer_data.h>
+
+#include <mne/c/mne_msh_display_surface_set.h>
+#include <mne/c/mne_surface_or_volume.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QGridLayout>
+#include <QCoreApplication>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -74,6 +86,8 @@ using namespace SCMEASLIB;
 using namespace DISPLIB;
 using namespace CONNECTIVITYLIB;
 using namespace MNELIB;
+using namespace INVERSELIB;
+using namespace FIFFLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -202,7 +216,125 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
                 }
             }
         }
+    } else if(RealTimeHpiResult::SPtr pRTHR = qSharedPointerDynamicCast<RealTimeHpiResult>(pMeasurement)) {
+        QSharedPointer<HpiFitResult> hpiFitResult = pRTHR->getValue();
+
+        if(!m_pBemHeadAvr) {
+            // Add sensor surface BabyMeg
+            QFile t_fileBabyMEGSensorSurfaceBEM(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/BabyMEG.fif");
+            MNEBem t_babyMEGsensorSurfaceBEM(t_fileBabyMEGSensorSurfaceBEM);
+            m_pData3DModel->addMegSensorInfo("Device", "BabyMEG", QList<FiffChInfo>(), t_babyMEGsensorSurfaceBEM);
+
+            // Add sensor surface VectorView
+            QFile t_fileVVSensorSurfaceBEM(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/306m.fif");
+            MNEBem t_sensorVVSurfaceBEM(t_fileVVSensorSurfaceBEM);
+            BemTreeItem* pVVItem = m_pData3DModel->addBemData("Device", "VectorView", t_sensorVVSurfaceBEM);
+            pVVItem->setCheckState(Qt::Unchecked);
+
+            // Add average head surface
+            QFile t_fileHeadAvr(QCoreApplication::applicationDirPath() + "/resources/general/hpiAlignment/fsaverage-head.fif");;
+            MNEBem t_BemHeadAvr(t_fileHeadAvr);
+            m_pBemHeadAvr = m_pData3DModel->addBemData("Head", "Average", t_BemHeadAvr);
+            m_pBemHeadAvr->setCheckState(Qt::Unchecked);
+
+            init();
+        }
+
+        if(m_sFilePathDigitizers != hpiFitResult->sFilePathDigitzers && m_pBemHeadAvr) {
+            //Add all digitizer but additional points to the 3D view
+            QFile fileDig(hpiFitResult->sFilePathDigitzers);
+            FiffDigPointSet digSet(fileDig);
+            FiffDigPointSet digSetWithoutAdditional = digSet.pickTypes(QList<int>()<<FIFFV_POINT_HPI<<FIFFV_POINT_CARDINAL<<FIFFV_POINT_EEG);
+            m_pTrackedDigitizer = m_pData3DModel->addDigitizerData("Head", "Tracked", digSetWithoutAdditional);
+
+            alignFiducials(hpiFitResult->sFilePathDigitzers);
+        }
+
+        //Add and update items to 3D view
+        m_pData3DModel->addDigitizerData("Head",
+                                         "Fitted",
+                                         hpiFitResult->fittedCoils.pickTypes(QList<int>()<<FIFFV_POINT_EEG));
+
+        if(m_pTrackedDigitizer && m_pBemHeadAvr) {
+            //Update fast scan / tracked digitizer
+            QList<QStandardItem*> itemList = m_pTrackedDigitizer->findChildren(Data3DTreeModelItemTypes::DigitizerItem);
+            for(int j = 0; j < itemList.size(); ++j) {
+                if(DigitizerTreeItem* pDigItem = dynamic_cast<DigitizerTreeItem*>(itemList.at(j))) {
+                    // apply inverse to get from head to device space
+                    pDigItem->setTransform(hpiFitResult->devHeadTrans, true);
+                }
+            }
+
+            // Update average head
+            itemList = m_pBemHeadAvr->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
+            for(int j = 0; j < itemList.size(); ++j) {
+                if(BemSurfaceTreeItem* pBemItem = dynamic_cast<BemSurfaceTreeItem*>(itemList.at(j))) {
+                    pBemItem->setTransform(m_tAlignment);
+                    // apply inverse to get from head to device space
+                    pBemItem->applyTransform(hpiFitResult->devHeadTrans, true);
+                }
+            }
+        }
     }
+}
+
+//=============================================================================================================
+
+void RealTime3DWidget::alignFiducials(const QString& sFilePath)
+{
+    m_sFilePathDigitizers = sFilePath;
+
+    //Calculate the alignment of the fiducials
+    MneMshDisplaySurfaceSet* pMneMshDisplaySurfaceSet = new MneMshDisplaySurfaceSet();
+    MneMshDisplaySurfaceSet::add_bem_surface(pMneMshDisplaySurfaceSet,
+                                             QCoreApplication::applicationDirPath() + "/resources/general/hpiAlignment/fsaverage-head.fif",
+                                             FIFFV_BEM_SURF_ID_HEAD,
+                                             "head",
+                                             1,
+                                             1);
+
+    MneMshDisplaySurface* surface = pMneMshDisplaySurfaceSet->surfs[0];
+
+    QFile t_fileDigData(sFilePath);
+    FiffDigitizerData* t_digData = new FiffDigitizerData(t_fileDigData);
+
+    QFile t_fileDigDataReference(QCoreApplication::applicationDirPath() + "/resources/general/hpiAlignment/fsaverage-fiducials.fif");
+
+    float scales[3];
+    QScopedPointer<FiffDigitizerData> t_digDataReference(new FiffDigitizerData(t_fileDigDataReference));
+    MneSurfaceOrVolume::align_fiducials(t_digData,
+                                        t_digDataReference.data(),
+                                        surface,
+                                        10,
+                                        1,
+                                        0,
+                                        scales);
+
+    QMatrix4x4 invMat;
+
+    // use inverse transform
+    for(int r = 0; r < 3; ++r) {
+        for(int c = 0; c < 3; ++c) {
+            // also apply scaling factor
+            invMat(r,c) = t_digData->head_mri_t_adj->invrot(r,c) * scales[0];
+        }
+    }
+    invMat(0,3) = t_digData->head_mri_t_adj->invmove(0);
+    invMat(1,3) = t_digData->head_mri_t_adj->invmove(1);
+    invMat(2,3) = t_digData->head_mri_t_adj->invmove(2);
+
+    Qt3DCore::QTransform identity;
+    m_tAlignment.setMatrix(invMat);
+
+    // align and scale average head (now in head space)
+    QList<QStandardItem*> itemList = m_pBemHeadAvr->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
+    for(int j = 0; j < itemList.size(); ++j) {
+        if(BemSurfaceTreeItem* pBemItem = dynamic_cast<BemSurfaceTreeItem*>(itemList.at(j))) {
+            pBemItem->setTransform(m_tAlignment);
+        }
+    }
+
+    delete pMneMshDisplaySurfaceSet;
 }
 
 //=============================================================================================================

@@ -131,6 +131,18 @@ public:
      */
     inline void pause(bool);
 
+    //=========================================================================================================
+    /**
+     * Returns the number of free elements for thread safe reading.
+     */
+    inline int getFreeElementsRead();
+
+    //=========================================================================================================
+    /**
+     * Returns the number of free elements for thread safe reading.
+     */
+    inline int getFreeElementsWrite();
+
 private:
     //=========================================================================================================
     /**
@@ -258,6 +270,22 @@ template<typename _Tp>
 inline void CircularBuffer<_Tp>::pause(bool bPause)
 {
     m_bPause = bPause;
+}
+
+//=============================================================================================================
+
+template<typename _Tp>
+inline int CircularBuffer<_Tp>::getFreeElementsRead()
+{
+    return m_pUsedElements->available();
+}
+
+//=============================================================================================================
+
+template<typename _Tp>
+inline int CircularBuffer<_Tp>::getFreeElementsWrite()
+{
+    return m_pFreeElements->available();
 }
 
 //=============================================================================================================

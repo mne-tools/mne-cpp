@@ -99,10 +99,11 @@ struct CoilParam {
  * The struct specifing all data needed to perform coil-wise fitting.
  */
 struct HpiFitResult {
-    FIFFLIB::FiffDigPointSet fittedCoils;
-    FIFFLIB::FiffCoordTrans devHeadTrans;
-    QVector<double> errorDistances;
-    Eigen::VectorXd GoF;
+    FIFFLIB::FiffDigPointSet    fittedCoils;
+    FIFFLIB::FiffCoordTrans     devHeadTrans;
+    QVector<double>             errorDistances;
+    Eigen::VectorXd             GoF;
+    QString                     sFilePathDigitzers;
 };
 
 //=============================================================================================================
@@ -139,7 +140,6 @@ public:
      * @param[out]   vError          The HPI estimation Error in mm for each fitted HPI coil.
      * @param[out]   vGoF            The goodness of fit for each fitted HPI coil
      * @param[out]   fittedPointSet  The final fitted positions in form of a digitizer set.
-     * @param[in]    p_pFiffInfo     Associated Fiff Information.
      * @param[in]    bDoDebug        Print debug info to cmd line and write debug info to file.
      * @param[in]    sHPIResourceDir The path to the debug file which is to be written.
      */
@@ -184,7 +184,6 @@ public:
      *
      *
      * @param[in]   time          The corresponding time in the measurement for the fit.
-     * @param[in]   pFiffInfo     The FiffInfo file from the measurement.
      * @param[out]  position      The matrix to store the results.
      * @param[in]   vGoF          The goodness of fit for each coil.
      * @param[in]   vError        The Hpi estimation Error per coil.
@@ -203,8 +202,8 @@ protected:
     /**
      * Fits dipoles for the given coils and a given data set.
      *
-     * @param[in] CoilParam       The coil parameters.
-     * @param[in] sensors         The sensor information.
+     * @param[in] coil            The coil parameters.
+     * @param[in] sensorSet       The sensor information.
      * @param[in] data            The data which used to fit the coils.
      * @param[in] numCoils        The number of coils.
      * @param[in] t_matProjectors The projectors to apply. Bad channels are still included.
@@ -226,7 +225,8 @@ protected:
      *
      * @return Returns the transformation matrix.
      */
-    static Eigen::Matrix4d computeTransformation(Eigen::MatrixXd NH, Eigen::MatrixXd BT);
+    static Eigen::Matrix4d computeTransformation(Eigen::MatrixXd NH,
+                                                 Eigen::MatrixXd BT);
 
     //=========================================================================================================
     /**
@@ -237,7 +237,8 @@ protected:
      * @param[in] coils     The coilset to read the sensor information from.
      *
      */
-    static void createSensorSet(QList<struct Sensor>& sensors, FWDLIB::FwdCoilSet* coils);
+    static void createSensorSet(QList<struct Sensor>& sensors,
+                                FWDLIB::FwdCoilSet* coils);
 
     //=========================================================================================================
 

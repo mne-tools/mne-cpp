@@ -207,8 +207,10 @@ signals:
      * Emit this signal whenever new digitzers were loaded.
      *
      * @param[in] lDigitzers    The new digitzers.
+     * @param[in] sFilePath     The file path to the new digitzers.
      */
-    void digitizersChanged(const QList<FIFFLIB::FiffDigPoint>& lDigitzers);
+    void digitizersChanged(const QList<FIFFLIB::FiffDigPoint>& lDigitzers,
+                           const QString& sFilePath);
 
     //=========================================================================================================
     /**
