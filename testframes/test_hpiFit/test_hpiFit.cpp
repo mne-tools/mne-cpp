@@ -91,6 +91,7 @@ public:
 
 private slots:
     void initTestCase();
+    void compareFrequencies();
     void compareTranslation();
     void compareRotation();
     void compareAngle();
@@ -109,6 +110,7 @@ private:
     MatrixXd mHpiPos;
     MatrixXd mRefResult;
     MatrixXd mHpiResult;
+    QVector<int> vFreqs;
 };
 
 //=============================================================================================================
@@ -164,13 +166,32 @@ void TestHpiFit::initTestCase()
     float threshTrans = 0.002;
 
     // Setup informations for HPI fit
-    QVector<int> vFreqs {166,154,161,158};
+    vFreqs = {154,158,161,166};
     QVector<double> vError;
     VectorXd vGoF;
     FiffDigPointSet fittedPointSet;
     Eigen::MatrixXd matProjectors = Eigen::MatrixXd::Identity(pFiffInfo->chs.size(), pFiffInfo->chs.size());
     QString sHPIResourceDir = QCoreApplication::applicationDirPath() + "/HPIFittingDebug";
     bool bDoDebug = true;
+
+    // initial fit and ordering of frequencies
+    from = first + mRefPos(0,0)*pFiffInfo->sfreq;
+    to = from + quantum;
+    if(!raw.read_raw_segment(matData, times, from, to)) {
+        qCritical("error during read_raw_segment");
+    }
+    qInfo() << "[done]";
+
+    qInfo() << "Order Frequecies: ...";
+    HPIFit::findOrder(matData,
+                      matProjectors,
+                      pFiffInfo->dev_head_t,
+                      vFreqs,
+                      vError,
+                      vGoF,
+                      fittedPointSet,
+                      pFiffInfo);
+    qInfo() << "[done]";
 
     for(int i = 0; i < mRefPos.rows(); i++) {
         from = first + mRefPos(i,0)*pFiffInfo->sfreq;
@@ -207,6 +228,14 @@ void TestHpiFit::initTestCase()
     }
     // For debug: position file for HPIFit
 //    UTILSLIB::IOUtils::write_eigen_matrix(mHpiPos, QCoreApplication::applicationDirPath() + "/MNE-sample-data/mHpiPos.txt");
+}
+
+//=============================================================================================================
+
+void TestHpiFit::compareFrequencies()
+{
+    QVector<int> vFreqRef {166, 154, 161, 158};
+    QVERIFY(vFreqRef == vFreqs);
 }
 
 //=============================================================================================================
