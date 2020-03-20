@@ -82,7 +82,7 @@ namespace SCMEASLIB
 
 //=========================================================================================================
 /**
- * DECLARE CLASS RealTimeEvokedSet -> ToDo check feasibilty of QAbstractTableModel
+ * DECLARE CLASS RealTimeEvokedSet
  *
  * @brief The RealTimeEvokedSet class provides a data stream which holds FiffEvokedSet data.
  */
@@ -96,13 +96,13 @@ public:
 
     //=========================================================================================================
     /**
-     * Constructs a RealTimeMultiSampleArrayNew.
+     * Constructs a RealTimeEvokedSet.
      */
     explicit RealTimeEvokedSet(QObject *parent = 0);
 
     //=========================================================================================================
     /**
-     * Destroys the RealTimeMultiSampleArrayNew.
+     * Destroys the RealTimeEvokedSet.
      */
     virtual ~RealTimeEvokedSet();
 

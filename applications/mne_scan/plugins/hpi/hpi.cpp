@@ -42,6 +42,7 @@
 
 #include <disp/viewers/hpisettingsview.h>
 #include <scMeas/realtimemultisamplearray.h>
+#include <scMeas/realtimehpiresult.h>
 #include <inverse/hpiFit/hpifit.h>
 
 //=============================================================================================================
@@ -104,8 +105,12 @@ void Hpi::init()
     m_pHpiInput = PluginInputData<RealTimeMultiSampleArray>::create(this, "HpiIn", "Hpi input data");
     connect(m_pHpiInput.data(), &PluginInputConnector::notify,
             this, &Hpi::update, Qt::DirectConnection);
-
     m_inputConnectors.append(m_pHpiInput);
+
+    // Output
+    m_pHpiOutput = PluginOutputData<RealTimeHpiResult>::create(this, "HpiOut", "Hpi output data");
+    m_pHpiOutput->data()->setName(this->getName());//Provide name to auto store widget settings
+    m_outputConnectors.append(m_pHpiOutput);
 }
 
 //=============================================================================================================
@@ -389,7 +394,7 @@ void Hpi::run()
                 dErrorMax = m_dAllowedMeanErrorDist;
                 m_mutex.unlock();
                 if(dMeanErrorDist < dErrorMax) {
-                    //Dispatch
+                    m_pHpiOutput->data()->setValue(fitResult);
                 }
             }
         }
