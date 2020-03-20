@@ -141,16 +141,16 @@ public:
 
     //=========================================================================================================
     /**
-     * Perform one single HPI fit.
+     * assign frequencies to correct position
      *
      * @param[in]    t_mat           Data to estimate the HPI positions from
      * @param[in]    t_matProjectors The projectors to apply. Bad channels are still included.
      * @param[out]   transDevHead    The final dev head transformation matrix
      * @param[in]    vFreqs          The frequencies for each coil in unknown order.
      * @param[out]   vFreqs          The frequencies for each coil in correct order.
-     * @param[out]   vError          The HPI estimation Error in mm for each fitted HPI coil.
-     * @param[out]   vGoF            The goodness of fit for each fitted HPI coil
-     * @param[out]   fittedPointSet  The final fitted positions in form of a digitizer set.
+     * @param[in]    vError          The HPI estimation Error in mm for each fitted HPI coil.
+     * @param[in]    vGoF            The goodness of fit for each fitted HPI coil
+     * @param[in]    fittedPointSet  The final fitted positions in form of a digitizer set.
      * @param[in]    p_pFiffInfo     Associated Fiff Information.
      */
     static void findOrder(const Eigen::MatrixXd& t_mat,
