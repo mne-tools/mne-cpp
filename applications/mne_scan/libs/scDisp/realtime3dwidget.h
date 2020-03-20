@@ -51,6 +51,7 @@
 //=============================================================================================================
 
 #include <QAction>
+#include <Qt3DCore/QTransform>
 #include <QPointer>
 
 //=============================================================================================================
@@ -66,6 +67,8 @@ namespace DISP3DLIB {
     class View3D;
     class Data3DTreeModel;
     class MneDataTreeItem;
+    class BemTreeItem;
+    class DigitizerSetTreeItem;
 }
 
 namespace SCMEASLIB {
@@ -127,6 +130,14 @@ public:
 
     //=========================================================================================================
     /**
+     * Call this function whenever the digitizer changed and you want to align fiducials.
+     *
+     * @param[in] sFilePath    The file path to the new digitzers.
+     */
+    void alignFiducials(const QString& sFilePath);
+
+    //=========================================================================================================
+    /**
      * Initialise the RealTime3DWidget.
      */
     virtual void init();
@@ -138,6 +149,8 @@ protected:
      */
     void createGUI();
 
+    QString                                                     m_sFilePathDigitizers;
+
     bool                                                        m_bInitialized;         /**< Whether init was processed successfully. */
 
     int                                                         m_iNumberBadChannels;   /**< The last received number of bad channels. */
@@ -145,12 +158,15 @@ protected:
     FSLIB::AnnotationSet                                        m_annotationSet;        /**< The current annotation set. */
     FSLIB::SurfaceSet                                           m_surfSet;              /**< The current surface set. */
 
-    QPointer<DISP3DLIB::View3D>                                 m_p3DView;              /**< The Disp3D view. */
+    Qt3DCore::QTransform                                        m_tAlignment;               /**< Transformation matrix alignment fiducials/tracked in head space */
+
     QSharedPointer<DISP3DLIB::Data3DTreeModel>                  m_pData3DModel;         /**< The Disp3D model. */
 
+    QPointer<DISP3DLIB::DigitizerSetTreeItem>                   m_pTrackedDigitizer;    /**< The 3D item pointing to the tracked digitizers. */
+    QPointer<DISP3DLIB::View3D>                                 m_p3DView;              /**< The Disp3D view. */
     QPointer<DISP3DLIB::NetworkTreeItem>                        m_pRtConnectivityItem;  /**< The Disp3D real time item. */
     QPointer<DISP3DLIB::MneDataTreeItem>                        m_pRtMNEItem;           /**< The Disp3D real time items. */
-
+    QPointer<DISP3DLIB::BemTreeItem>                            m_pBemHeadAvr;          /**< TThe fsaverage BEM head model. */
     QPointer<QAction>                                           m_pActionQuickControl;  /**< Show quick control widget. */
 };
 } // NAMESPACE

@@ -225,7 +225,7 @@ void HpiSettingsView::onLoadDigitizers()
         if (checkFile.exists() && checkFile.isFile()) {
             // Stop cont HPI first
             m_ui->m_checkBox_continousHPI->setChecked(false);
-            emit digitizersChanged(readPolhemusDig(fileName_HPI));
+            emit digitizersChanged(readPolhemusDig(fileName_HPI), fileName_HPI);
         } else {
             QMessageBox msgBox;
             msgBox.setText("File could not be loaded!");
