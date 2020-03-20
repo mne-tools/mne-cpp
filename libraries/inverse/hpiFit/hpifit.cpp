@@ -408,7 +408,7 @@ void HPIFit::findOrder(const MatrixXd& t_mat,
         vFreqTemp.fill(vFreqs[i]);
 
         // hpi Fit
-        fitHPI(t_mat, t_matProjectors, transDevHeadTemp, vFreqTemp, vErrorTemp, vGoFTemp, fittedPointSetTemp, pFiffInfo);
+        fitHPI(t_mat, t_matProjectors, transDevHeadTemp, vFreqTemp, vErrorTemp, vGoFTemp, fittedPointSetTemp, pFiffInfoTemp);
 
         // get location of maximum GoF -> correct assignment of coil - frequency
         VectorXd::Index indMax;
