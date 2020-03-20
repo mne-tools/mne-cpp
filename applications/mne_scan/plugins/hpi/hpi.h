@@ -72,6 +72,7 @@ namespace RTPROCESSINGLIB {
 
 namespace SCMEASLIB{
     class RealTimeMultiSampleArray;
+    class RealTimeHpiResult;
 }
 
 #define MAX_DATA_LEN    2000000000L
@@ -228,6 +229,7 @@ private:
     QSharedPointer<IOBUFFER::CircularBuffer_Matrix_double>                      m_pCircularBuffer;      /**< Holds incoming raw data. */
 
     SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pHpiInput;            /**< The RealTimeMultiSampleArray of the Hpi input.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeHpiResult>::SPtr           m_pHpiOutput;           /**< The RealTimeHpiResult of the Hpi output.*/
 
 signals:
     void errorsChanged(const QVector<double>& vErrors,
