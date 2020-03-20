@@ -94,6 +94,40 @@ public:
 
     ~HpiSettingsView();
 
+    //=========================================================================================================
+    /**
+     * Updates the error related labels.
+     *
+     * @param[in] vError            the new error values.
+     * @param[in] dMeanErrorDist    the mean error value.
+     */
+    void setErrorLabels(const QVector<double>& vError,
+                        double dMeanErrorDist);
+
+    //=========================================================================================================
+    /**
+     * Get the SSP checked status.
+     *
+     * @return  The current SSP checked status.
+     */
+    bool getSspStatusChanged();
+
+    //=========================================================================================================
+    /**
+     * Get the Comp checked status.
+     *
+     * @return  The current Comp checked status.
+     */
+    bool getCompStatusChanged();
+
+    //=========================================================================================================
+    /**
+     * Get the allowed mean error distance.
+     *
+     * @return  The current allowed mean error distance.
+     */
+    double getAllowedMeanErrorDistChanged();
+
 protected:    
     //=========================================================================================================
     /**
@@ -205,6 +239,14 @@ signals:
      * @param[in] bChecked    Whether the continous HPI check box is checked.
      */
     void contHpiStatusChanged(bool bChecked);
+
+    //=========================================================================================================
+    /**
+     * Emit this signal whenever the allowed error changed.
+     *
+     * @param[in] dAllowedMeanErrorDist    Allowed mean error in mm.
+     */
+    void allowedMeanErrorDistChanged(double dAllowedMeanErrorDist);
 };
 
 } //NAMESPACE

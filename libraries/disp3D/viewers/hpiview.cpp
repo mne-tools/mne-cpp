@@ -641,7 +641,8 @@ void HpiView::updateTransLabels()
 
 //=============================================================================================================
 
-void HpiView::storeResults(const FiffCoordTrans& devHeadTrans, const FiffDigPointSet& fittedCoils)
+void HpiView::storeResults(const FiffCoordTrans& devHeadTrans,
+                           const FiffDigPointSet& fittedCoils)
 {
     //Check if git meets distance requirement (GOF)
     if(m_vError.size() > 0) {
