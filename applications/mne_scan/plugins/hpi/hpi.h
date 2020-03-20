@@ -156,6 +156,14 @@ private:
 
     //=========================================================================================================
     /**
+     * Call this function whenever the allowed error changed.
+     *
+     * @param[in] dAllowedMeanErrorDist    Allowed mean error in mm.
+     */
+    void onAllowedMeanErrorDistChanged(double dAllowedMeanErrorDist);
+
+    //=========================================================================================================
+    /**
      * Call this funciton whenever new digitzers were loaded.
      *
      * @param[in] lDigitzers    The new digitzers.
@@ -209,8 +217,6 @@ private:
     QMutex                      m_mutex;                /**< The threads mutex.*/
 
     QVector<int>                m_vCoilFreqs;           /**< Vector contains the HPI coil frequencies. */
-    QVector<double>             m_vError;               /**< The HPI estimation error mm for each fitted HPI coil. */
-    Eigen::VectorXd             m_vGoF;                 /**< The goodness of fit per HPI coil. */
     Eigen::MatrixXd             m_matData;              /**< The last data block.*/
     qint16                                      m_iNumberBadChannels;   /**< The number of bad channels.*/
     Eigen::MatrixXd                             m_matProjectors;        /**< Holds the matrix with the SSP and compensator projectors.*/
@@ -219,7 +225,7 @@ private:
     bool                        m_bDoContinousHpi;
     bool                                        m_bUseSSP;              /**< Use SSP's.*/
     bool                                        m_bUseComp;             /**< Use Comps's.*/
-
+    double m_dAllowedMeanErrorDist;
     QSharedPointer<FIFFLIB::FiffInfo>                                           m_pFiffInfo;            /**< Fiff measurement info.*/
 
     QSharedPointer<IOBUFFER::CircularBuffer<RTPROCESSINGLIB::HpiFitResult> >   m_pCircularBuffer;      /**< Holds incoming raw data. */
@@ -227,6 +233,9 @@ private:
 
     SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pHpiInput;            /**< The RealTimeMultiSampleArray of the Hpi input.*/
 
+signals:
+    void errorsChanged(const QVector<double>& vErrors,
+                       double dMeanErrorDist);
 };
 } // NAMESPACE
 

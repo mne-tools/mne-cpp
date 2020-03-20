@@ -169,6 +169,7 @@ void Hpi::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             m_pRtHPI->setCoilFrequencies(m_vCoilFreqs);
             connect(m_pRtHPI.data(), &RtHpi::newHpiFitResultAvailable,
                     this, &Hpi::onNewHpiFitResultAvailable);
+            updateProjections();
         }
 
         // Check if data is present
@@ -215,6 +216,14 @@ void Hpi::initPluginControlWidgets()
                 this, &Hpi::onCompStatusChanged);
         connect(pHpiSettingsView, &HpiSettingsView::contHpiStatusChanged,
                 this, &Hpi::onContHpiStatusChanged);
+        connect(pHpiSettingsView, &HpiSettingsView::allowedMeanErrorDistChanged,
+                this, &Hpi::onAllowedMeanErrorDistChanged);
+        connect(this, &Hpi::errorsChanged,
+                pHpiSettingsView, &HpiSettingsView::setErrorLabels);
+
+        onSspStatusChanged(pHpiSettingsView->getSspStatusChanged());
+        onCompStatusChanged(pHpiSettingsView->getCompStatusChanged());
+        onAllowedMeanErrorDistChanged(pHpiSettingsView->getAllowedMeanErrorDistChanged());
 
         plControlWidgets.append(pHpiSettingsView);
 
@@ -226,57 +235,77 @@ void Hpi::initPluginControlWidgets()
 
 void Hpi::updateProjections()
 {
-    m_matProjectors = Eigen::MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
-    Eigen::MatrixXd matComp = Eigen::MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+    if(m_pFiffInfo && m_pRtHPI) {
+        m_matProjectors = Eigen::MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+        Eigen::MatrixXd matComp = Eigen::MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
 
-    if(m_bUseSSP) {
-        // Use SSP + SGM + calibration
-        //Do a copy here because we are going to change the activity flags of the SSP's
-        FiffInfo infoTemp = *(m_pFiffInfo.data());
+        if(m_bUseSSP) {
+            // Use SSP + SGM + calibration
+            //Do a copy here because we are going to change the activity flags of the SSP's
+            FiffInfo infoTemp = *(m_pFiffInfo.data());
 
-        //Turn on all SSP
-        for(int i = 0; i < infoTemp.projs.size(); ++i) {
-            infoTemp.projs[i].active = true;
+            //Turn on all SSP
+            for(int i = 0; i < infoTemp.projs.size(); ++i) {
+                infoTemp.projs[i].active = true;
+            }
+
+            //Create the projector for all SSP's on
+            infoTemp.make_projector(m_matProjectors);
+            //set columns of matrix to zero depending on bad channels indexes
+            for(qint32 j = 0; j < infoTemp.bads.size(); ++j) {
+                m_matProjectors.col(infoTemp.ch_names.indexOf(infoTemp.bads.at(j))).setZero();
+            }
         }
 
-        //Create the projector for all SSP's on
-        infoTemp.make_projector(m_matProjectors);
-        //set columns of matrix to zero depending on bad channels indexes
-        for(qint32 j = 0; j < infoTemp.bads.size(); ++j) {
-            m_matProjectors.col(infoTemp.ch_names.indexOf(infoTemp.bads.at(j))).setZero();
+        if(m_bUseComp) {
+            // Setup Comps
+            FiffCtfComp newComp;
+            //Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
+            if(m_pFiffInfo->make_compensator(0, 101, newComp)) {
+                matComp = newComp.data->data;
+            }
         }
+
+        m_matCompProjectors = m_matProjectors * matComp;
+
+        m_pRtHPI->setProjectionMatrix(m_matProjectors);
     }
-
-    if(m_bUseComp) {
-        // Setup Comps
-        FiffCtfComp newComp;
-        //Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
-        if(m_pFiffInfo->make_compensator(0, 101, newComp)) {
-            matComp = newComp.data->data;
-        }
-    }
-
-    m_matCompProjectors = m_matProjectors * matComp;
-
-    m_pRtHPI->setProjectionMatrix(m_matProjectors);
 }
 
 //=============================================================================================================
 
 void Hpi::onNewHpiFitResultAvailable(const HpiFitResult& fitResult)
 {
-    while(!m_pCircularBuffer->push(fitResult)) {
-        //Do nothing until the circular buffer is ready to accept new data again
-    }
+    //Check if git meets distance requirement (GOF)
+    if(fitResult.errorDistances.size() > 0) {
+        double dMeanErrorDist = 0;
+        dMeanErrorDist = std::accumulate(fitResult.errorDistances.begin(), fitResult.errorDistances.end(), .0) / fitResult.errorDistances.size();
 
-    m_vError = fitResult.errorDistances;
-    m_vGoF = fitResult.GoF;
+        emit errorsChanged(fitResult.errorDistances, dMeanErrorDist);
+
+        if(dMeanErrorDist < m_dAllowedMeanErrorDist) {
+            while(!m_pCircularBuffer->push(fitResult)) {
+                //Do nothing until the circular buffer is ready to accept new data again
+            }
+        }
+    }
+}
+
+//=============================================================================================================
+
+void Hpi::onAllowedMeanErrorDistChanged(double dAllowedMeanErrorDist)
+{
+    m_dAllowedMeanErrorDist = dAllowedMeanErrorDist;
 }
 
 //=============================================================================================================
 
 void Hpi::onDigitizersChanged(const QList<FIFFLIB::FiffDigPoint>& lDigitzers)
 {
+    if(m_pRtHPI) {
+        m_pRtHPI->restart();
+    }
+
     if(m_pFiffInfo) {
         m_pFiffInfo->dig = lDigitzers;
     }
@@ -286,6 +315,7 @@ void Hpi::onDigitizersChanged(const QList<FIFFLIB::FiffDigPoint>& lDigitzers)
 
 void Hpi::onDoSingleHpiFit()
 {
+    qDebug() << "Hpi::onDoSingleHpiFit " << m_vCoilFreqs;
     if(m_vCoilFreqs.size() < 3) {
        QMessageBox msgBox;
        msgBox.setText("Please load a digitizer set with at least 3 HPI coils first.");
@@ -309,7 +339,6 @@ void Hpi::onDoSingleHpiFit()
 
 void Hpi::onCoilFrequenciesChanged(const QVector<int>& vCoilFreqs)
 {
-    qDebug() << "[Hpi::onCoilFrequenciesChanged]" << vCoilFreqs;
     if(m_pRtHPI) {
         m_pRtHPI->setCoilFrequencies(vCoilFreqs);
     }
@@ -322,6 +351,8 @@ void Hpi::onCoilFrequenciesChanged(const QVector<int>& vCoilFreqs)
 void Hpi::onSspStatusChanged(bool bChecked)
 {
     m_bUseSSP = bChecked;
+
+    updateProjections();
 }
 
 //=============================================================================================================
@@ -329,6 +360,7 @@ void Hpi::onSspStatusChanged(bool bChecked)
 void Hpi::onCompStatusChanged(bool bChecked)
 {
     m_bUseComp = bChecked;
+    updateProjections();
 }
 
 //=============================================================================================================
