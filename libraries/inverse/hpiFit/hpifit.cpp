@@ -109,6 +109,9 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
         return;
     }
 
+    // Make sure the fitted digitzers are empty
+    fittedPointSet.clear();
+
     // Setup Constructors for Coil Set
     FwdCoilSet* templates = NULL;
     FwdCoilSet* megCoils = NULL;
@@ -339,7 +342,7 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
     //Generate final fitted points and store in digitizer set
     for(int i = 0; i < coil.pos.rows(); ++i) {
         FiffDigPoint digPoint;
-        digPoint.kind = FIFFV_POINT_EEG;
+        digPoint.kind = FIFFV_POINT_EEG; //Store as EEG so they have a different color
         digPoint.ident = i;
         digPoint.r[0] = coil.pos(i,0);
         digPoint.r[1] = coil.pos(i,1);

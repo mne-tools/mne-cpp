@@ -551,6 +551,13 @@ void MainWindow::initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::IPlugin> 
 
             QString sCurPluginName = lPlugins.at(i)->getName();
 
+            // Check for plugin's which share the 3D View
+            if(sCurPluginName == "HPI Fitting" ||
+               sCurPluginName == "Source Localization" ||
+               sCurPluginName == "Connectivity"){
+                sCurPluginName = "3D View";
+            }
+
             if(!m_bIsRunning) {
                 setCentralWidget(lPlugins.at(i)->setupWidget());
             } else {

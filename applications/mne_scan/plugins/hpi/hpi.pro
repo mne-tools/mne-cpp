@@ -42,7 +42,7 @@ CONFIG += c++11
 
 DEFINES += HPI_PLUGIN
 
-QT += core widgets svg
+QT += core widgets svg 3dcore
 
 TARGET = hpi
 CONFIG(debug, debug|release) {
