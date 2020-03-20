@@ -204,7 +204,7 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
                 m_pRtMNEItem->setVisualizationType("Annotation based");
                 m_pRtMNEItem->setNumberAverages(17);
                 m_pRtMNEItem->setAlpha(1.0);
-                m_pRtMNEItem->setStreamingState(true);
+                m_pRtMNEItem->setStreamingState(false);
                 m_pRtMNEItem->setSFreq(pRTSE->getFiffInfo()->sfreq);
 
                 init();
@@ -274,6 +274,14 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
                     pBemItem->applyTransform(hpiFitResult->devHeadTrans, true);
                 }
             }
+        }
+
+        if(m_pRtMNEItem) {
+            m_pRtMNEItem->setTransform(hpiFitResult->devHeadTrans, true);
+        }
+
+        if(m_pRtConnectivityItem) {
+            m_pRtConnectivityItem->setTransform(hpiFitResult->devHeadTrans, true);
         }
     }
 }
