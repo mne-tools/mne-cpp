@@ -68,7 +68,6 @@ using namespace SCSHAREDLIB;
 using namespace IOBUFFER;
 using namespace SCMEASLIB;
 using namespace COMMUNICATIONLIB;
-using namespace DISP3DLIB;
 using namespace Eigen;
 
 //=============================================================================================================
