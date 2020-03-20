@@ -412,7 +412,7 @@ void HPIFit::findOrder(const MatrixXd& t_mat,
 
         // get location of maximum GoF -> correct assignment of coil - frequency
         VectorXd::Index indMax;
-        double dMax = vGoFTemp.maxCoeff(&indMax);
+        vGoFTemp.maxCoeff(&indMax);
         vToOrder[indMax] = vFreqs[i];
 
         // reset values that are edidet by fitHpi
