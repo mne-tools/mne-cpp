@@ -108,37 +108,35 @@ int main(int argc, char *argv[])
     QSharedPointer<FiffInfo> pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(raw.info));
 
     // Setup comparison of transformation matrices
-    FiffCoordTrans devHeadTrans = pFiffInfo->dev_head_t;    // transformation that only updates after big head movements
-    float threshRot = 5;          // in degree
-    float threshTrans = 0.005;    // in m
+    FiffCoordTrans transDevHead = pFiffInfo->dev_head_t;    // transformation that only updates after big head movements
+    float fThreshRot = 5;          // in degree
+    float fThreshTrans = 0.005;    // in m
 
     // Set up the reading parameters
-    RowVectorXi picks = pFiffInfo->pick_types(true, false, false);
+    RowVectorXi vPicks = pFiffInfo->pick_types(true, false, false);
 
-    MatrixXd matData;
-    MatrixXd times;
+    MatrixXd mData, mTimes;
 
-    fiff_int_t from;
-    fiff_int_t to;
+    fiff_int_t from, to;
     fiff_int_t first = raw.first_samp;
     fiff_int_t last = raw.last_samp;
 
-    float dT_sec = 0.1;             // time between hpi fits
-    float quantum_sec = 0.2f;       // read and write in 200 ms junks
-    fiff_int_t quantum = ceil(quantum_sec*pFiffInfo->sfreq);
+    float dTSec = 0.1;             // time between hpi fits
+    float fQuantumSec = 0.2f;       // read and write in 200 ms junks
+    fiff_int_t iQuantum = ceil(fQuantumSec*pFiffInfo->sfreq);
 
     // create time vector that specifies when to fit
-    int N = ceil((last-first)/quantum);
-    RowVectorXf time = RowVectorXf::LinSpaced(N, 0, N-1) * dT_sec;
+    int iN = ceil((last-first)/iQuantum);
+    RowVectorXf vTime = RowVectorXf::LinSpaced(iN, 0, iN-1) * dTSec;
 
     // To fit at specific times outcommend the following block
 //    // Read Quaternion File
 //    MatrixXd pos;
-//    qInfo() << "Specify the path to your position file (.txt)";
+//    qInfo() << "Specify the path to your Position file (.txt)";
 //    IOUtils::read_eigen_matrix(pos, QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/ref_hpiFit_pos.txt");
 //    RowVectorXd time = pos.col(0);
 
-    MatrixXd position;              // Position matrix to save quaternions etc.
+    MatrixXd mPosition;              // mPosition matrix to save quaternions etc.
 
     // setup informations for HPI fit (VectorView)
     QVector<int> vFreqs {154,158,161,166};
@@ -147,7 +145,7 @@ int main(int argc, char *argv[])
     FiffDigPointSet fittedPointSet;
 
     // Use SSP + SGM + calibration
-    MatrixXd matProjectors = MatrixXd::Identity(pFiffInfo->chs.size(), pFiffInfo->chs.size());
+    MatrixXd mProjectors = MatrixXd::Identity(pFiffInfo->chs.size(), pFiffInfo->chs.size());
 
     //Do a copy here because we are going to change the activity flags of the SSP's
     FiffInfo infoTemp = *(pFiffInfo.data());
@@ -158,21 +156,21 @@ int main(int argc, char *argv[])
     }
 
     //Create the projector for all SSP's on
-    infoTemp.make_projector(matProjectors);
+    infoTemp.make_projector(mProjectors);
 
     //set columns of matrix to zero depending on bad channels indexes
     for(qint32 j = 0; j < infoTemp.bads.size(); ++j) {
-        matProjectors.col(infoTemp.ch_names.indexOf(infoTemp.bads.at(j))).setZero();
+        mProjectors.col(infoTemp.ch_names.indexOf(infoTemp.bads.at(j))).setZero();
     }
 
     // if debugging files are necessary set bDoDebug = true;
     QString sHPIResourceDir = QCoreApplication::applicationDirPath() + "/HPIFittingDebug";
     bool bDoDebug = false;
 
-    // initial fit and ordering of frequencies
-    from = first + time(0)*pFiffInfo->sfreq;
-    to = from + quantum;
-    if(!raw.read_raw_segment(matData, times, from, to)) {
+    // ordering of frequencies
+    from = first + vTime(0)*pFiffInfo->sfreq;
+    to = from + iQuantum;
+    if(!raw.read_raw_segment(mData, mTimes, from, to)) {
         qCritical("error during read_raw_segment");
         return -1;
     }
@@ -181,8 +179,8 @@ int main(int argc, char *argv[])
     // order frequencies
     qInfo() << "Find Order...";
     timer.start();
-    HPIFit::findOrder(matData,
-                   matProjectors,
+    HPIFit::findOrder(mData,
+                   mProjectors,
                    pFiffInfo->dev_head_t,
                    vFreqs,
                    vError,
@@ -194,15 +192,15 @@ int main(int argc, char *argv[])
     qInfo() << "[done]";
 
     // read and fit
-    for(int i = 0; i < time.size(); i++) {
-        from = first + time(i)*pFiffInfo->sfreq;
-        to = from + quantum;
+    for(int i = 0; i < vTime.size(); i++) {
+        from = first + vTime(i)*pFiffInfo->sfreq;
+        to = from + iQuantum;
         if (to > last) {
             to = last;
-            qWarning() << "Block size < quantum " << quantum;
+            qWarning() << "Block size < iQuantum " << iQuantum;
         }
         // Reading
-        if(!raw.read_raw_segment(matData, times, from, to)) {
+        if(!raw.read_raw_segment(mData, mTimes, from, to)) {
             qCritical("error during read_raw_segment");
             return -1;
         }
@@ -210,8 +208,8 @@ int main(int argc, char *argv[])
 
         qInfo() << "HPI-Fit...";
         timer.start();
-        HPIFit::fitHPI(matData,
-                       matProjectors,
+        HPIFit::fitHPI(mData,
+                       mProjectors,
                        pFiffInfo->dev_head_t,
                        vFreqs,
                        vError,
@@ -223,13 +221,13 @@ int main(int argc, char *argv[])
         qInfo() << "The HPI-Fit took" << timer.elapsed() << "milliseconds";
         qInfo() << "[done]";
 
-        HPIFit::storeHeadPosition(time(i), pFiffInfo->dev_head_t.trans, position, vGoF, vError);
+        HPIFit::storeHeadPosition(vTime(i), pFiffInfo->dev_head_t.trans, mPosition, vGoF, vError);
 
         // if big head displacement occures, update debHeadTrans
-        if(MNEMath::compareTransformation(devHeadTrans.trans, pFiffInfo->dev_head_t.trans, threshRot, threshTrans)) {
-            devHeadTrans = pFiffInfo->dev_head_t;
+        if(MNEMath::compareTransformation(transDevHead.trans, pFiffInfo->dev_head_t.trans, fThreshRot, fThreshTrans)) {
+            transDevHead = pFiffInfo->dev_head_t;
             qInfo() << "dev_head_t has been updated.";
         }
     }
-//    IOUtils::write_eigen_matrix(position, QCoreApplication::applicationDirPath() + "/MNE-sample-data/position.txt");
+//    IOUtils::write_eigen_matrix(mPosition, QCoreApplication::applicationDirPath() + "/MNE-sample-data/mPosition.txt");
 }

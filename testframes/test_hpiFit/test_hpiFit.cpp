@@ -150,7 +150,7 @@ void TestHpiFit::initTestCase()
     fiff_int_t to;
     fiff_int_t first = raw.first_samp;
     fiff_int_t last = raw.last_samp;
-    MatrixXd matData, times;
+    MatrixXd mData, mTimes;
 
     float quantum_sec = 0.2f;   //read and write in 200 ms junks
     fiff_int_t quantum = ceil(quantum_sec*pFiffInfo->sfreq);
@@ -170,21 +170,21 @@ void TestHpiFit::initTestCase()
     QVector<double> vError;
     VectorXd vGoF;
     FiffDigPointSet fittedPointSet;
-    Eigen::MatrixXd matProjectors = Eigen::MatrixXd::Identity(pFiffInfo->chs.size(), pFiffInfo->chs.size());
+    Eigen::MatrixXd mProjectors = Eigen::MatrixXd::Identity(pFiffInfo->chs.size(), pFiffInfo->chs.size());
     QString sHPIResourceDir = QCoreApplication::applicationDirPath() + "/HPIFittingDebug";
     bool bDoDebug = true;
 
-    // initial fit and ordering of frequencies
+    // bring frequencies into right order
     from = first + mRefPos(0,0)*pFiffInfo->sfreq;
     to = from + quantum;
-    if(!raw.read_raw_segment(matData, times, from, to)) {
+    if(!raw.read_raw_segment(mData, mTimes, from, to)) {
         qCritical("error during read_raw_segment");
     }
     qInfo() << "[done]";
 
     qInfo() << "Order Frequecies: ...";
-    HPIFit::findOrder(matData,
-                      matProjectors,
+    HPIFit::findOrder(mData,
+                      mProjectors,
                       pFiffInfo->dev_head_t,
                       vFreqs,
                       vError,
@@ -200,13 +200,13 @@ void TestHpiFit::initTestCase()
             to = last;
         }
         qInfo()  << "Reading...";
-        if(!raw.read_raw_segment(matData, times, from, to)) {
+        if(!raw.read_raw_segment(mData, mTimes, from, to)) {
             qWarning("error during read_raw_segment\n");
         }
 
         qInfo()  << "HPI-Fit...";
-        HPIFit::fitHPI(matData,
-                       matProjectors,
+        HPIFit::fitHPI(mData,
+                       mProjectors,
                        pFiffInfo->dev_head_t,
                        vFreqs,
                        vError,
