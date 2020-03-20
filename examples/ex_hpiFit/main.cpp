@@ -141,7 +141,6 @@ int main(int argc, char *argv[])
     MatrixXd position;              // Position matrix to save quaternions etc.
 
     // setup informations for HPI fit (VectorView)
-//    QVector<int> vFreqs {166,154,161,158};
     QVector<int> vFreqs {154,158,161,166};
     QVector<double> vError;
     VectorXd vGoF;
@@ -179,6 +178,7 @@ int main(int argc, char *argv[])
     }
     qInfo() << "[done]";
 
+    // order frequencies
     qInfo() << "Find Order...";
     timer.start();
     HPIFit::findOrder(matData,
@@ -190,47 +190,46 @@ int main(int argc, char *argv[])
                    fittedPointSet,
                    pFiffInfo);
     qInfo() << "Ordered Frequencies: ";
-    qInfo() << vFreqs;
-    qInfo() << "The HPI-Fit took" << timer.elapsed() << "milliseconds";
+    qInfo() << "findOrder() took" << timer.elapsed() << "milliseconds";
     qInfo() << "[done]";
 
-//    // read and fit
-//    for(int i = 1; i < time.size(); i++) {
-//        from = first + time(i)*pFiffInfo->sfreq;
-//        to = from + quantum;
-//        if (to > last) {
-//            to = last;
-//            qWarning() << "Block size < quantum " << quantum;
-//        }
-//        // Reading
-//        if(!raw.read_raw_segment(matData, times, from, to)) {
-//            qCritical("error during read_raw_segment");
-//            return -1;
-//        }
-//        qInfo() << "[done]";
+    // read and fit
+    for(int i = 0; i < time.size(); i++) {
+        from = first + time(i)*pFiffInfo->sfreq;
+        to = from + quantum;
+        if (to > last) {
+            to = last;
+            qWarning() << "Block size < quantum " << quantum;
+        }
+        // Reading
+        if(!raw.read_raw_segment(matData, times, from, to)) {
+            qCritical("error during read_raw_segment");
+            return -1;
+        }
+        qInfo() << "[done]";
 
-//        qInfo() << "HPI-Fit...";
-//        timer.start();
-//        HPIFit::fitHPI(matData,
-//                       matProjectors,
-//                       pFiffInfo->dev_head_t,
-//                       vFreqs,
-//                       vError,
-//                       vGoF,
-//                       fittedPointSet,
-//                       pFiffInfo,
-//                       bDoDebug,
-//                       sHPIResourceDir);
-//        qInfo() << "The HPI-Fit took" << timer.elapsed() << "milliseconds";
-//        qInfo() << "[done]";
+        qInfo() << "HPI-Fit...";
+        timer.start();
+        HPIFit::fitHPI(matData,
+                       matProjectors,
+                       pFiffInfo->dev_head_t,
+                       vFreqs,
+                       vError,
+                       vGoF,
+                       fittedPointSet,
+                       pFiffInfo,
+                       bDoDebug,
+                       sHPIResourceDir);
+        qInfo() << "The HPI-Fit took" << timer.elapsed() << "milliseconds";
+        qInfo() << "[done]";
 
-//        HPIFit::storeHeadPosition(time(i), pFiffInfo->dev_head_t.trans, position, vGoF, vError);
+        HPIFit::storeHeadPosition(time(i), pFiffInfo->dev_head_t.trans, position, vGoF, vError);
 
-//        // if big head displacement occures, update debHeadTrans
-//        if(MNEMath::compareTransformation(devHeadTrans.trans, pFiffInfo->dev_head_t.trans, threshRot, threshTrans)) {
-//            devHeadTrans = pFiffInfo->dev_head_t;
-//            qInfo() << "dev_head_t has been updated.";
-//        }
-//    }
+        // if big head displacement occures, update debHeadTrans
+        if(MNEMath::compareTransformation(devHeadTrans.trans, pFiffInfo->dev_head_t.trans, threshRot, threshTrans)) {
+            devHeadTrans = pFiffInfo->dev_head_t;
+            qInfo() << "dev_head_t has been updated.";
+        }
+    }
 //    IOUtils::write_eigen_matrix(position, QCoreApplication::applicationDirPath() + "/MNE-sample-data/position.txt");
 }
