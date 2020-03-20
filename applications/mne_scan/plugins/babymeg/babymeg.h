@@ -75,10 +75,6 @@ namespace SCMEASLIB {
     class RealTimeMultiSampleArray;
 }
 
-namespace DISP3DLIB {
-    class HpiView;
-}
-
 namespace DISPLIB {
     class ProjectSettingsView;
 }
@@ -250,36 +246,6 @@ protected:
 
     //=========================================================================================================
     /**
-     * Set HPI fiff information.
-     */
-    void showHPIDialog();
-
-    //=========================================================================================================
-    /**
-     * Sends the current data block to the HPI dialog.
-     *
-     * @param [in] matData   The new data block.
-     */
-    void updateHPI(const Eigen::MatrixXf &matData);
-
-    //=========================================================================================================
-    /**
-     * Sends the current data block to the HPI dialog and performs a fit.
-     *
-     * @param [in] matData   The data block to which the HPI information is to be written.
-     */
-    void doContinousHPI(Eigen::MatrixXf& matData);
-
-    //=========================================================================================================
-    /**
-     * Toggles teh continous HPI flag.
-     *
-     * @param [in] bDoContinousHPI   Whether to do continous HPI.
-     */
-    void onContinousHPIToggled(bool bDoContinousHPI);
-
-    //=========================================================================================================
-    /**
      * Shows the project squid control dialog.
      */
     void showSqdCtrlDialog();
@@ -332,7 +298,6 @@ protected:
     QSharedPointer<BabyMEGClient>                   m_pMyClientComm;                /**< TCP/IP communication between Qt and Labview - communication. */
     QSharedPointer<BabyMEGInfo>                     m_pInfo;                        /**< Set up the babyMEG info. */
     QSharedPointer<BabyMEGSQUIDControlDgl>          m_pSQUIDCtrlDlg;                /**< Nonmodal dialog for squid control. */
-    QSharedPointer<DISP3DLIB::HpiView>              m_pHPIWidget;                   /**< HPI widget. */
 
     QList<int>                              m_lTriggerChannelIndices;       /**< List of all trigger channel indices. */
 
@@ -340,7 +305,6 @@ protected:
 
     qint32                                  m_iBufferSize;                  /**< The raw data buffer size.*/
 
-    bool                                    m_bDoContinousHPI;              /**< Whether to do continous HPI.*/
     QString                                 m_sFiffProjections;             /**< Fiff projection information */
     QString                                 m_sFiffCompensators;            /**< Fiff compensator information */
     QString                                 m_sBadChannels;                 /**< Filename which contains a list of bad channels */
@@ -352,7 +316,6 @@ protected:
 
     QPointer<QAction>                       m_pActionSqdCtrl;               /**< show squid control */
     QPointer<QAction>                       m_pActionUpdateFiffInfo;        /**< Update Fiff Info action */
-    QPointer<QAction>                       m_pActionComputeHPI;            /**< The Action to show the HPI view */
 
 signals:
     //=========================================================================================================

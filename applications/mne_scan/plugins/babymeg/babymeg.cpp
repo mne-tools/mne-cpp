@@ -52,7 +52,6 @@
 #include <disp/viewers/projectsettingsview.h>
 #include <communication/rtClient/rtcmdclient.h>
 #include <scMeas/realtimemultisamplearray.h>
-#include <disp3D/viewers/hpiview.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -74,7 +73,6 @@ using namespace UTILSLIB;
 using namespace SCSHAREDLIB;
 using namespace IOBUFFER;
 using namespace SCMEASLIB;
-using namespace DISP3DLIB;
 using namespace DISPLIB;
 using namespace FIFFLIB;
 using namespace Eigen;
@@ -89,7 +87,6 @@ BabyMEG::BabyMEG()
 , m_sFiffProjections(QCoreApplication::applicationDirPath() + "/resources/mne_scan/plugins/babymeg/header.fif")
 , m_sFiffCompensators(QCoreApplication::applicationDirPath() + "/resources/mne_scan/plugins/babymeg/compensator.fif")
 , m_sBadChannels(QCoreApplication::applicationDirPath() + "/resources/mne_scan/plugins/babymeg/both.bad")
-, m_bDoContinousHPI(false)
 {
     m_pActionSqdCtrl = new QAction(QIcon(":/images/sqdctrl.png"), tr("Squid Control"),this);
 //    m_pActionSetupProject->setShortcut(tr("F12"));
@@ -103,13 +100,6 @@ BabyMEG::BabyMEG()
     connect(m_pActionUpdateFiffInfo.data(), &QAction::triggered,
             this, &BabyMEG::updateFiffInfo);
     addPluginAction(m_pActionUpdateFiffInfo);
-
-    //Init HPI
-    m_pActionComputeHPI = new QAction(QIcon(":/images/latestFiffInfoHPI.png"), tr("Compute HPI"),this);
-    m_pActionComputeHPI->setStatusTip(tr("Compute HPI"));
-    connect(m_pActionComputeHPI.data(), &QAction::triggered,
-            this, &BabyMEG::showHPIDialog);
-    addPluginAction(m_pActionComputeHPI);
 }
 
 //=============================================================================================================
@@ -227,10 +217,6 @@ bool BabyMEG::stop()
     requestInterruption();
     wait(500);
 
-    if(m_pHPIWidget) {
-        m_pHPIWidget->hide();
-    }
-
     return true;
 }
 
@@ -272,14 +258,6 @@ void BabyMEG::run()
         if(m_pCircularBuffer) {
             //pop matrix
             if(m_pCircularBuffer->pop(matValue)) {
-                //Update HPI data (for single and continous HPI fitting)
-                updateHPI(matValue);
-
-                //Do continous HPI fitting and write result to data block
-                if(m_bDoContinousHPI) {
-                    doContinousHPI(matValue);
-                }
-
                 //Create digital trigger information
                 createDigTrig(matValue);
 
@@ -459,85 +437,6 @@ void BabyMEG::updateFiffInfo()
     //sleep(0.5);
 
     //m_pActionRecordFile->setEnabled(true);
-}
-
-//=============================================================================================================
-
-void BabyMEG::showHPIDialog()
-{
-    if(!m_pFiffInfo) {
-        QMessageBox msgBox;
-        msgBox.setText("FiffInfo missing!");
-        msgBox.exec();
-        return;
-    } else {
-        if (!m_pHPIWidget) {
-            m_pHPIWidget = QSharedPointer<HpiView>(new HpiView(m_pFiffInfo));
-            connect(m_pHPIWidget.data(), &HpiView::continousHPIToggled,
-                    this, &BabyMEG::onContinousHPIToggled);
-        }
-
-        if (!m_pHPIWidget->isVisible()) {
-            m_pHPIWidget->show();
-            m_pHPIWidget->raise();
-        }
-    }
-}
-
-//=============================================================================================================
-
-void BabyMEG::updateHPI(const MatrixXf& matData)
-{
-    if(m_pFiffInfo && m_pHPIWidget) {
-        m_pHPIWidget->setData(this->calibrate(matData));
-    }
-}
-
-//=============================================================================================================
-
-void BabyMEG::doContinousHPI(MatrixXf& matData)
-{
-    //This only works with babyMEG HPI channels 400 ... 407
-    if(m_pFiffInfo && m_pHPIWidget && matData.rows() >= 407) {
-        //if(m_pHPIWidget->wasLastFitOk()) {
-            // Load device to head transformation matrix from Fiff info
-            QMatrix3x3 rot;
-
-            for(int ir = 0; ir < 3; ir++) {
-                for(int ic = 0; ic < 3; ic++) {
-                    rot(ir,ic) = m_pFiffInfo->dev_head_t.trans(ir,ic);
-                }
-            }
-
-            QQuaternion quatHPI = QQuaternion::fromRotationMatrix(rot);
-
-            // Write rotation quaternion to HPI Ch #1~3
-            matData.row(401) = MatrixXf::Constant(1,matData.cols(), quatHPI.x());
-            matData.row(402) = MatrixXf::Constant(1,matData.cols(), quatHPI.y());
-            matData.row(403) = MatrixXf::Constant(1,matData.cols(), quatHPI.z());
-
-            // Write translation vector to HPI Ch #4~6
-            matData.row(404) = MatrixXf::Constant(1,matData.cols(), m_pFiffInfo->dev_head_t.trans(0,3));
-            matData.row(405) = MatrixXf::Constant(1,matData.cols(), m_pFiffInfo->dev_head_t.trans(1,3));
-            matData.row(406) = MatrixXf::Constant(1,matData.cols(), m_pFiffInfo->dev_head_t.trans(2,3));
-
-            // Write GOF to HPI Ch #7
-            VectorXd vGof = m_pHPIWidget->getGoF();
-            float gof = vGof.mean();
-            matData.row(407) = MatrixXf::Constant(1,matData.cols(), gof);
-
-            // Write HPI estimation Error (error) to HPI Ch #8
-            QVector<double> vError = m_pHPIWidget->getError();
-            float error = std::accumulate(vError.begin(), vError.end(), .0) / vError.size();     // HPI estimation Error
-            matData.row(408) = MatrixXf::Constant(1,matData.cols(), error);
-    }
-}
-
-//=============================================================================================================
-
-void BabyMEG::onContinousHPIToggled(bool bDoContinousHPI)
-{
-    m_bDoContinousHPI = bDoContinousHPI;
 }
 
 //=============================================================================================================
