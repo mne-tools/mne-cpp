@@ -92,6 +92,8 @@ HpiSettingsView::HpiSettingsView(const QString& sSettingsPath,
             this, &HpiSettingsView::compStatusChanged);
     connect(m_ui->m_checkBox_continousHPI, &QCheckBox::clicked,
             this, &HpiSettingsView::contHpiStatusChanged);
+    connect(m_ui->m_doubleSpinBox_maxHPIContinousDist, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this, &HpiSettingsView::allowedMeanErrorDistChanged);
 
     //Init coil freqs
     m_vCoilFreqs << 155 << 165 << 190 << 200;
@@ -111,6 +113,58 @@ HpiSettingsView::~HpiSettingsView()
 
 //=============================================================================================================
 
+void HpiSettingsView::setErrorLabels(const QVector<double>& vError,
+                                     double dMeanErrorDist)
+{
+    qDebug() << "1";
+    //Update gof labels and m_tAlignment from m to mm
+    QString sGof("0mm");
+
+    for(int i = 0; i < vError.size(); ++i) {
+        if(i < m_ui->m_tableWidget_errors->rowCount()) {
+            sGof = QString::number(vError[i]*1000,'f',2)+QString("mm");
+            m_ui->m_tableWidget_errors->item(i, 1)->setText(sGof);
+        }
+    }
+    qDebug() << "2";
+
+    m_ui->m_label_averagedFitError->setText(QString::number(dMeanErrorDist*1000,'f',2)+QString("mm"));
+
+    qDebug() << "3";
+    //Update good/bad fit label
+    if(dMeanErrorDist*1000 > m_ui->m_doubleSpinBox_maxHPIContinousDist->value()) {
+        m_ui->m_label_fitFeedback->setText("Bad Fit");
+        m_ui->m_label_fitFeedback->setStyleSheet("QLabel { background-color : red;}");
+    } else {
+        m_ui->m_label_fitFeedback->setText("Good Fit");
+        m_ui->m_label_fitFeedback->setStyleSheet("QLabel { background-color : green;}");
+    }
+    qDebug() << "4";
+}
+
+//=============================================================================================================
+
+bool HpiSettingsView::getSspStatusChanged()
+{
+    return m_ui->m_checkBox_useSSP->isChecked();
+}
+
+//=============================================================================================================
+
+bool HpiSettingsView::getCompStatusChanged()
+{
+    return m_ui->m_checkBox_useComp->isChecked();
+}
+
+//=============================================================================================================
+
+double HpiSettingsView::getAllowedMeanErrorDistChanged()
+{
+    return m_ui->m_doubleSpinBox_maxHPIContinousDist->value();
+}
+
+//=============================================================================================================
+
 void HpiSettingsView::saveSettings(const QString& settingsPath)
 {
     if(settingsPath.isEmpty()) {
@@ -122,6 +176,15 @@ void HpiSettingsView::saveSettings(const QString& settingsPath)
 
     data.setValue(m_vCoilFreqs);
     settings.setValue(settingsPath + QString("/coilFreqs"), data);
+
+    data.setValue(m_ui->m_checkBox_useSSP->isChecked());
+    settings.setValue(settingsPath + QString("/useSSP"), data);
+
+    data.setValue(m_ui->m_checkBox_useComp->isChecked());
+    settings.setValue(settingsPath + QString("/useCOMP"), data);
+
+    data.setValue(m_ui->m_doubleSpinBox_maxHPIContinousDist->value());
+    settings.setValue(settingsPath + QString("/maxError"), data);
 }
 
 //=============================================================================================================
@@ -138,6 +201,10 @@ void HpiSettingsView::loadSettings(const QString& settingsPath)
     defaultData.setValue(m_vCoilFreqs);
     m_vCoilFreqs = settings.value(settingsPath + QString("/coilFreqs"), defaultData).value<QVector<int> >();
     emit coilFrequenciesChanged(m_vCoilFreqs);
+
+    m_ui->m_checkBox_useSSP->setChecked(settings.value(settingsPath + QString("/useSSP"), false).toBool());
+    m_ui->m_checkBox_useComp->setChecked(settings.value(settingsPath + QString("/useCOMP"), false).toBool());
+    m_ui->m_doubleSpinBox_maxHPIContinousDist->setValue(settings.value(settingsPath + QString("/maxError"), 10.0).toDouble());
 }
 
 //=============================================================================================================
@@ -160,6 +227,8 @@ void HpiSettingsView::onLoadDigitizers()
         QFileInfo checkFile(fileName_HPI);
 
         if (checkFile.exists() && checkFile.isFile()) {
+            // Stop cont HPI first
+            m_ui->m_checkBox_continousHPI->setChecked(false);
             emit digitizersChanged(readPolhemusDig(fileName_HPI));
         } else {
             QMessageBox msgBox;
@@ -230,7 +299,7 @@ void HpiSettingsView::onAddCoil()
                                         pTableItemB);
 
     // Add column 1 in error table widget
-    QTableWidgetItem* pTableItemC = new QTableWidgetItem("0");
+    QTableWidgetItem* pTableItemC = new QTableWidgetItem("0mm");
     pTableItemC->setFlags(Qt::ItemIsEnabled);
     m_ui->m_tableWidget_errors->setItem(m_ui->m_tableWidget_errors->rowCount()-1,
                                         1,
@@ -268,12 +337,14 @@ void HpiSettingsView::onRemoveCoil()
 QList<FiffDigPoint> HpiSettingsView::readPolhemusDig(const QString& fileName)
 {
     m_ui->m_tableWidget_Frequencies->clear();
+    m_ui->m_tableWidget_Frequencies->setRowCount(0);
     m_ui->m_tableWidget_Frequencies->setHorizontalHeaderItem(0, new QTableWidgetItem("#Coil"));
     m_ui->m_tableWidget_Frequencies->setHorizontalHeaderItem(1, new QTableWidgetItem("Frequency (Hz)"));
 
     m_ui->m_tableWidget_errors->clear();
+    m_ui->m_tableWidget_errors->setRowCount(0);
     m_ui->m_tableWidget_errors->setHorizontalHeaderItem(0, new QTableWidgetItem("#Coil"));
-    m_ui->m_tableWidget_errors->setHorizontalHeaderItem(1, new QTableWidgetItem("Error (mm)"));
+    m_ui->m_tableWidget_errors->setHorizontalHeaderItem(1, new QTableWidgetItem("Error"));
 
     QFile t_fileDig(fileName);
     FiffDigPointSet t_digSet(t_fileDig);
@@ -319,7 +390,7 @@ QList<FiffDigPoint> HpiSettingsView::readPolhemusDig(const QString& fileName)
                                                     pTableItemB);
 
                 // Add column 1 in error table widget
-                QTableWidgetItem* pTableItemC = new QTableWidgetItem("0");
+                QTableWidgetItem* pTableItemC = new QTableWidgetItem("0mm");
                 pTableItemC->setFlags(Qt::ItemIsEnabled);
                 m_ui->m_tableWidget_errors->setItem(m_ui->m_tableWidget_errors->rowCount()-1,
                                                     1,
@@ -349,6 +420,8 @@ QList<FiffDigPoint> HpiSettingsView::readPolhemusDig(const QString& fileName)
     m_ui->m_label_numberLoadedFiducials->setNum(numFiducials);
     m_ui->m_label_numberLoadedEEG->setNum(numEEG);
 
+    // Make sure that the stored coil freqs always match the number of loaded ones
+    m_vCoilFreqs.resize(numHPI);
     emit coilFrequenciesChanged(m_vCoilFreqs);
 
     return lDigPoints;
