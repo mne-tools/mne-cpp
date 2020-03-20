@@ -72,10 +72,6 @@ namespace FIFFLIB {
     class FiffInfo;
 }
 
-namespace DISP3DLIB {
-    class HpiView;
-}
-
 //=============================================================================================================
 // DEFINE NAMESPACE FIFFSIMULATORPLUGIN
 //=============================================================================================================
@@ -192,48 +188,14 @@ protected:
      */
     void requestInfo();
 
-    //=========================================================================================================
-    /**
-     * Set HPI fiff information.
-     */
-    void showHPIDialog();
-
-    //=========================================================================================================
-    /**
-     * Sends the current data block to the HPI dialog.
-     *
-     * @param [in] matData   The new data block.
-     */
-    void updateHPI(const Eigen::MatrixXf &matData);    
-
-    //=========================================================================================================
-    /**
-     * Sends the current data block to the HPI dialog and performs a fit.
-     *
-     * @param [in] matData   The data block to which the HPI information is to be written.
-     */
-    void doContinousHPI(Eigen::MatrixXf& matData);
-
-    //=========================================================================================================
-    /**
-     * Toggles teh continous HPI flag.
-     *
-     * @param [in] bDoContinousHPI   Whether to do continous HPI.
-     */
-    void onContinousHPIToggled(bool bDoContinousHPI);
-
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pRTMSA_FiffSimulator;     /**< The RealTimeMultiSampleArray to provide the rt_server Channels.*/
 
     QSharedPointer<FiffSimulatorProducer>                       m_pFiffSimulatorProducer;   /**< Holds the FiffSimulatorProducer.*/
     QSharedPointer<FIFFLIB::FiffInfo>                           m_pFiffInfo;                /**< Fiff measurement info.*/
     QSharedPointer<COMMUNICATIONLIB::RtCmdClient>               m_pRtCmdClient;             /**< The command client.*/
-    QSharedPointer<DISP3DLIB::HpiView>                          m_pHPIWidget;               /**< HPI widget. */
-    QSharedPointer<IOBUFFER::CircularBuffer_Matrix_float>       m_pCircularBuffer;      /**< Holds incoming raw data. */
-
-    QAction*                m_pActionComputeHPI;            /**< Update HPI info into Fiff Info action */
+    QSharedPointer<IOBUFFER::CircularBuffer_Matrix_float>       m_pCircularBuffer;          /**< Holds incoming raw data. */
 
     bool                    m_bCmdClientIsConnected;        /**< If the command client is connected.*/
-    bool                    m_bDoContinousHPI;              /**< Whether to do continous HPI.*/
     QString                 m_sFiffSimulatorIP;             /**< The IP Adress of mne_rt_server.*/
     QString                 m_sFiffSimulatorClientAlias;    /**< The rt server client alias.*/
 

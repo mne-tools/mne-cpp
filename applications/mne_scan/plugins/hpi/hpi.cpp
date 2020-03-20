@@ -303,7 +303,7 @@ void Hpi::updateProjections()
 
 void Hpi::onAllowedMeanErrorDistChanged(double dAllowedMeanErrorDist)
 {
-    m_dAllowedMeanErrorDist = dAllowedMeanErrorDist;
+    m_dAllowedMeanErrorDist = dAllowedMeanErrorDist * 0.001;
 }
 
 //=============================================================================================================
@@ -413,7 +413,7 @@ void Hpi::run()
                 m_mutex.lock();
                 dErrorMax = m_dAllowedMeanErrorDist;
                 m_mutex.unlock();
-                if(1000*dMeanErrorDist < dErrorMax) {
+                if(dMeanErrorDist < dErrorMax) {
                     m_pHpiOutput->data()->setValue(fitResult);
 
                     //If fit was good, set newly calculated transformation matrix to fiff info
