@@ -51,6 +51,7 @@
 #include <QWidget>
 #include <QPointer>
 #include <QMap>
+#include <QMenu>
 
 //=============================================================================================================
 // Eigen INCLUDES
@@ -167,6 +168,10 @@ public:
      */
     void onMakeScreenshot(const QString& imageType);
 
+    void customContextMenuRequested(const QPoint &pos);
+
+    void addTimeMark(bool con);
+
 private:
     //=========================================================================================================
     /**
@@ -189,6 +194,7 @@ private:
 
     qint32                                              m_iT;                           /**< Display window size in seconds */
 
+    QPoint                                              lastClickedPoint;
 signals:
     void tableViewDataWidthChanged(int iWidth);
 };
