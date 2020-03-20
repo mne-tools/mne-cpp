@@ -151,6 +151,17 @@ void FiffRawViewDelegate::paint(QPainter *painter,
                 painter->drawPath(path);
                 painter->restore();
 
+                path = QPainterPath(QPointF(option.rect.x()+pos, option.rect.y()));
+
+                createMarksPath(index,
+                                option,
+                                path,
+                                data);
+                painter->save();
+                painter->setPen(QPen(Qt::black, 2, Qt::SolidLine));
+                painter->drawPath(path);
+                painter->restore();
+
             }
             break;
         }
@@ -293,5 +304,32 @@ void FiffRawViewDelegate::createTimeSpacersPath(const QModelIndex &index,
 
         //jump to next place to draw
         path.moveTo(path.currentPosition().x() + ((dDx * fSampFreq) / iSpacersPerSecond), fTop);
+    }
+}
+
+//=============================================================================================================
+
+void FiffRawViewDelegate::createMarksPath(const QModelIndex &index,
+                                          const QStyleOptionViewItem &option,
+                                          QPainterPath &path,
+                                          ANSHAREDLIB::ChannelData &data) const
+{
+    qDebug() << "We're here: 1";
+    const FiffRawViewModel* t_pModel = static_cast<const FiffRawViewModel*>(index.model());
+
+    double dDx = t_pModel->pixelDifference();
+    QList<float> timeList = t_pModel->getTimeMarks();
+
+    float fSampFreq = t_pModel->getFiffInfo()->sfreq;
+    float fTop = option.rect.topLeft().y();
+    float fBottom = option.rect.bottomRight().y();
+    float fInitial = path.currentPosition().x();
+    qDebug() << "Initial:" << fInitial;
+
+    for (int i = 0; i < timeList.size(); i++) {
+        //path.moveTo(fInitial + ((dDx * fSampFreq) * timeList[i]), fTop);
+        path.moveTo(path.currentPosition().x() + 10, fTop);
+        path.lineTo(path.currentPosition().x(), fBottom);
+        qDebug() << "We're here: 2";
     }
 }

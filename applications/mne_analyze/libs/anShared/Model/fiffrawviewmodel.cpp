@@ -696,3 +696,18 @@ void FiffRawViewModel::updateDisplayData()
         end += m_iSamplesPerBlock;
     }
 }
+
+//=============================================================================================================
+
+void FiffRawViewModel::newTimeMark(const int& xpos)
+{
+    qDebug() << "First held:" << m_iFiffCursorBegin;
+    timeMarkList.append(3680.0);
+}
+
+//=============================================================================================================
+
+QList<float> FiffRawViewModel::getTimeMarks() const
+{
+    return timeMarkList;
+}

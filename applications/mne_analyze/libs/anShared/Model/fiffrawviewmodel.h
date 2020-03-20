@@ -59,6 +59,7 @@
 #include <QFile>
 #include <QColor>
 
+
 //=============================================================================================================
 // Eigen INCLUDES
 //=============================================================================================================
@@ -360,6 +361,10 @@ public:
      */
     inline qint32 numVLines() const;
 
+    void newTimeMark(const int& xpos);
+
+    QList<float> getTimeMarks() const;
+
 public slots:
 
     /**
@@ -458,6 +463,8 @@ private:
     QColor                              m_colBackground;                            /**< The background color.*/
 
     int                                 m_iDistanceTimerSpacer;                     /**< The distance for the horizontal time spacers in the view in ms */
+
+    QList<float>  timeMarkList;
 };
 
 //=============================================================================================================
