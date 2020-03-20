@@ -121,7 +121,6 @@ SOURCES += \
     viewers/ecdview.cpp \
     viewers/abstractview.cpp \
     viewers/networkview.cpp \
-    viewers/hpiview.cpp \
     viewers/sourceestimateview.cpp \
     engine/model/items/sensordata/sensordatatreeitem.cpp \
     helpers/interpolation/interpolation.cpp \
@@ -176,7 +175,6 @@ HEADERS += \
     viewers/ecdview.h \
     viewers/abstractview.h \
     viewers/networkview.h \
-    viewers/hpiview.h \
     viewers/sourceestimateview.h \
     disp3D_global.h \
     engine/model/items/sensordata/sensordatatreeitem.h \
@@ -190,7 +188,6 @@ HEADERS += \
     engine/view/orbitalcameracontroller.h
 
 FORMS += \
-    viewers/formfiles/hpiview.ui \
 
 RESOURCES += $$PWD/disp3d.qrc \
 
