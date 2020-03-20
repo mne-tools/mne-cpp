@@ -1,14 +1,13 @@
 //=============================================================================================================
 /**
- * @file     realtimecov.h
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
- *           Lorenz Esch <lesch@mgh.harvard.edu>
+ * @file     realtimehpiresult.h
+ * @author   Lorenz Esch <lesch@mgh.harvard.edu>
  * @version  dev
- * @date     February, 2013
+ * @date     March, 2020
  *
  * @section  LICENSE
  *
- * Copyright (C) 2013, Christoph Dinh, Lorenz Esch. All rights reserved.
+ * Copyright (C) 2020, Lorenz Esch. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -29,12 +28,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains the declaration of the RealTimeCov class.
+ * @brief    Contains the declaration of the RealTimeHpiResult class.
  *
  */
 
-#ifndef REALTIMECOV_H
-#define REALTIMECOV_H
+#ifndef REALTIMEHPIRESULT_H
+#define REALTIMEHPIRESULT_H
 
 //=============================================================================================================
 // INCLUDES
@@ -42,9 +41,8 @@
 
 #include "scmeas_global.h"
 #include "measurement.h"
-#include "realtimesamplearraychinfo.h"
 
-#include <fiff/fiff_cov.h>
+#include <inverse/hpiFit/hpifit.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -58,6 +56,14 @@
 #include <QMutexLocker>
 
 //=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace FIFFLIB{
+    class FiffInfo;
+}
+
+//=============================================================================================================
 // DEFINE NAMESPACE SCMEASLIB
 //=============================================================================================================
 
@@ -66,29 +72,29 @@ namespace SCMEASLIB
 
 //=========================================================================================================
 /**
- * DECLARE CLASS RealTimeCov
+ * DECLARE CLASS RealTimeHpiResult
  *
- * @brief The RealTimeCov class provides a container for real-time covariance estimations.
+ * @brief The RealTimeHpiResult class provides a container for real-time HPI fitting results.
  */
-class SCMEASSHARED_EXPORT RealTimeCov : public Measurement
+class SCMEASSHARED_EXPORT RealTimeHpiResult : public Measurement
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<RealTimeCov> SPtr;               /**< Shared pointer type for RealTimeCov. */
-    typedef QSharedPointer<const RealTimeCov> ConstSPtr;    /**< Const shared pointer type for RealTimeCov. */
+    typedef QSharedPointer<RealTimeHpiResult> SPtr;               /**< Shared pointer type for RealTimeHpiResult. */
+    typedef QSharedPointer<const RealTimeHpiResult> ConstSPtr;    /**< Const shared pointer type for RealTimeHpiResult. */
 
     //=========================================================================================================
     /**
-     * Constructs a RealTimeCov.
+     * Constructs a RealTimeHpiResult.
      */
-    explicit RealTimeCov(QObject *parent = 0);
+    explicit RealTimeHpiResult(QObject *parent = 0);
 
     //=========================================================================================================
     /**
-     * Destroys the RealTimeCov.
+     * Destroys the RealTimeHpiResult.
      */
-    virtual ~RealTimeCov();
+    virtual ~RealTimeHpiResult();
 
     //=========================================================================================================
     /**
@@ -112,7 +118,7 @@ public:
      *
      * @param [in] v     the covariance which should be distributed.
      */
-    virtual void setValue(const FIFFLIB::FiffCov& v);
+    virtual void setValue(const INVERSELIB::HpiFitResult& v);
 
     //=========================================================================================================
     /**
@@ -121,36 +127,36 @@ public:
      *
      * @return the last attached value.
      */
-    virtual FIFFLIB::FiffCov::SPtr& getValue();
+    virtual QSharedPointer<INVERSELIB::HpiFitResult>& getValue();
 
     //=========================================================================================================
     /**
-     * Returns whether RealTimeCov contains values
+     * Returns whether RealTimeHpiResult contains values
      *
-     * @return whether RealTimeCov contains values.
+     * @return whether RealTimeHpiResult contains values.
      */
     inline bool isInitialized() const;
 
 private:
-    mutable QMutex          m_qMutex;       /**< Mutex to ensure thread safety */
+    mutable QMutex          m_qMutex;                               /**< Mutex to ensure thread safety */
+    bool                    m_bInitialized;                         /**< If values are stored.*/
 
-    FIFFLIB::FiffCov::SPtr  m_pFiffCov;     /**< Covariance data set */
-    FIFFLIB::FiffInfo::SPtr m_pFiffInfo;    /**< The Fiff Info. */
-
-    bool                    m_bInitialized; /**< If values are stored.*/
+    QSharedPointer<INVERSELIB::HpiFitResult>    m_pHpiFitResult;    /**< The HPI fit result. */
+    QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;        /**< The Fiff Info. */
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool RealTimeCov::isInitialized() const
+inline bool RealTimeHpiResult::isInitialized() const
 {
     QMutexLocker locker(&m_qMutex);
     return m_bInitialized;
 }
+
 } // NAMESPACE
 
-Q_DECLARE_METATYPE(SCMEASLIB::RealTimeCov::SPtr)
+Q_DECLARE_METATYPE(SCMEASLIB::RealTimeHpiResult::SPtr)
 
-#endif // REALTIMECOV_H
+#endif // REALTIMEHPIRESULT_H

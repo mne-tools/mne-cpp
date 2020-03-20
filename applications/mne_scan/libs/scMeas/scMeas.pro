@@ -80,6 +80,7 @@ SOURCES += \
     measurementtypes.cpp \
     realtimeevokedset.cpp \
     realtimecov.cpp \
+    realtimehpiresult.cpp \
     realtimespectrum.cpp
 
 HEADERS += \
@@ -93,6 +94,7 @@ HEADERS += \
     measurementtypes.h \
     realtimeevokedset.h \
     realtimecov.h \
+    realtimehpiresult.h \
     realtimespectrum.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
