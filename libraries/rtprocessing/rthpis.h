@@ -41,9 +41,6 @@
 
 #include "rtprocessing_global.h"
 
-#include <fiff/fiff_dig_point_set.h>
-#include <fiff/fiff_dig_point.h>
-#include <fiff/fiff_coord_trans.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -64,8 +61,12 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB{
+namespace FIFFLIB {
     class FiffInfo;
+}
+
+namespace INVERSELIB {
+    struct HpiFitResult;
 }
 
 //=============================================================================================================
@@ -74,19 +75,6 @@ namespace FIFFLIB{
 
 namespace RTPROCESSINGLIB
 {
-
-//=============================================================================================================
-// Declare all structures to be used
-//=============================================================================================================
-/**
- * The struct specifing all data needed to perform coil-wise fitting.
- */
-struct HpiFitResult {
-    FIFFLIB::FiffDigPointSet fittedCoils;
-    FIFFLIB::FiffCoordTrans devHeadTrans;
-    QVector<double> errorDistances;
-    Eigen::VectorXd GoF;
-};
 
 //=============================================================================================================
 /**
@@ -114,7 +102,7 @@ public:
                 QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
 signals:
-    void resultReady(const RTPROCESSINGLIB::HpiFitResult &fitResult);
+    void resultReady(const INVERSELIB::HpiFitResult &fitResult);
 };
 
 //=============================================================================================================
@@ -188,7 +176,7 @@ protected:
     /**
      * Handles the results.
      */
-    void handleResults(const HpiFitResult &fitResult);
+    void handleResults(const INVERSELIB::HpiFitResult &fitResult);
 
     QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo;           /**< Holds the fiff measurement information. */
 
@@ -197,7 +185,7 @@ protected:
     Eigen::MatrixXd     m_matProjectors;        /**< Holds the matrix with the SSP and compensator projectors.*/
 
 signals:
-    void newHpiFitResultAvailable(const RTPROCESSINGLIB::HpiFitResult &fitResult);
+    void newHpiFitResultAvailable(const INVERSELIB::HpiFitResult &fitResult);
     void operate(const Eigen::MatrixXd& matData,
                  const Eigen::MatrixXd& matProjectors,
                  const QVector<int>& vFreqs,
@@ -208,10 +196,5 @@ signals:
 // INLINE DEFINITIONS
 //=============================================================================================================
 } // NAMESPACE
-
-#ifndef metatype_rthpisHpiFitResult
-#define metatype_rthpisHpiFitResult
-Q_DECLARE_METATYPE(RTPROCESSINGLIB::HpiFitResult)
-#endif
 
 #endif // RTHPIS_H

@@ -63,6 +63,7 @@
 
 namespace FIFFLIB {
     class FiffInfo;
+    class FiffDigPoint;
 }
 
 namespace RTPROCESSINGLIB {
@@ -148,14 +149,6 @@ private:
 
     //=========================================================================================================
     /**
-     * Load a Polhemus file name.
-     *
-     * @param[in] fitResult  The fit result coming from the rt HPI class.
-     */
-    void onNewHpiFitResultAvailable(const RTPROCESSINGLIB::HpiFitResult& fitResult);
-
-    //=========================================================================================================
-    /**
      * Call this function whenever the allowed error changed.
      *
      * @param[in] dAllowedMeanErrorDist    Allowed mean error in mm.
@@ -214,22 +207,25 @@ private:
      */
     virtual void run();    
 
-    QMutex                      m_mutex;                /**< The threads mutex.*/
+    QMutex                      m_mutex;                    /**< The threads mutex.*/
 
-    QVector<int>                m_vCoilFreqs;           /**< Vector contains the HPI coil frequencies. */
-    Eigen::MatrixXd             m_matData;              /**< The last data block.*/
-    qint16                                      m_iNumberBadChannels;   /**< The number of bad channels.*/
-    Eigen::MatrixXd                             m_matProjectors;        /**< Holds the matrix with the SSP and compensator projectors.*/
-    Eigen::MatrixXd                             m_matCompProjectors;    /**< Holds the matrix with the SSP and compensator projectors.*/
+    QVector<int>                m_vCoilFreqs;               /**< Vector contains the HPI coil frequencies. */
 
-    bool                        m_bDoContinousHpi;
-    bool                                        m_bUseSSP;              /**< Use SSP's.*/
-    bool                                        m_bUseComp;             /**< Use Comps's.*/
-    double m_dAllowedMeanErrorDist;
+    qint16                      m_iNumberBadChannels;       /**< The number of bad channels.*/
+
+    double                      m_dAllowedMeanErrorDist;    /**< The allowed error distance in order for the last fit to be counted as a good fit.*/
+
+    bool                        m_bDoSingleHpi;             /**< Do a single HPI fit.*/
+    bool                        m_bDoContinousHpi;          /**< Do continous HPI fitting.*/
+    bool                        m_bUseSSP;                  /**< Use SSP's.*/
+    bool                        m_bUseComp;                 /**< Use Comps's.*/
+
+    Eigen::MatrixXd             m_matData;                  /**< The last data block.*/
+    Eigen::MatrixXd             m_matProjectors;            /**< Holds the matrix with the SSP and compensator projectors.*/
+    Eigen::MatrixXd             m_matCompProjectors;        /**< Holds the matrix with the SSP and compensator projectors.*/
+
     QSharedPointer<FIFFLIB::FiffInfo>                                           m_pFiffInfo;            /**< Fiff measurement info.*/
-
-    QSharedPointer<IOBUFFER::CircularBuffer<RTPROCESSINGLIB::HpiFitResult> >   m_pCircularBuffer;      /**< Holds incoming raw data. */
-    QSharedPointer<RTPROCESSINGLIB::RtHpi>         m_pRtHPI;            /**< The real-time HPI object. */
+    QSharedPointer<IOBUFFER::CircularBuffer_Matrix_double>                      m_pCircularBuffer;      /**< Holds incoming raw data. */
 
     SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pHpiInput;            /**< The RealTimeMultiSampleArray of the Hpi input.*/
 
