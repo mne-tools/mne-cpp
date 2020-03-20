@@ -395,29 +395,32 @@ void HPIFit::findOrder(const MatrixXd& t_mat,
                        FiffInfo::SPtr pFiffInfo)
 {
     // create temporary copies that are necessary to reset values that are passed to fitHpi()
-    FiffDigPointSet fittedPointSetTemp;
-    FiffCoordTrans transDevHeadTemp;
-    FiffInfo::SPtr pFiffInfoTemp;
+    FiffDigPointSet fittedPointSetTemp = fittedPointSet;
+    FiffCoordTrans transDevHeadTemp = transDevHead;
+    FiffInfo::SPtr pFiffInfoTemp = pFiffInfo;
     QVector<int> vToOrder = vFreqs;
     QVector<int> vFreqTemp(vFreqs.size());
     QVector<double> vErrorTemp = vError;
-    VectorXd vGoFTemp;
+    VectorXd vGoFTemp = vGoF;
+
+    // perform vFreqs.size() hpi fits with same frequencies in each iteration
     for(int i = 0; i < vFreqs.size(); i++){
+        vFreqTemp.fill(vFreqs[i]);
+
+        // hpi Fit
+        fitHPI(t_mat, t_matProjectors, transDevHeadTemp, vFreqTemp, vErrorTemp, vGoFTemp, fittedPointSetTemp, pFiffInfo);
+
+        // get location of maximum GoF -> correct assignment of coil - frequency
+        VectorXd::Index indMax;
+        double dMax = vGoFTemp.maxCoeff(&indMax);
+        vToOrder[indMax] = vFreqs[i];
+
         // reset values that are edidet by fitHpi
         fittedPointSetTemp = fittedPointSet;
         pFiffInfoTemp = pFiffInfo;
         transDevHeadTemp = transDevHead;
         vErrorTemp = vError;
         vGoFTemp = vGoF;
-        vFreqTemp.fill(vFreqs[i]);
-
-        // hpi Fit
-        fitHPI(t_mat, t_matProjectors, transDevHeadTemp, vFreqTemp, vErrorTemp, vGoFTemp, fittedPointSetTemp, pFiffInfo);
-
-        // get location of maximum
-        MatrixXd::Index maxRow, maxCol;
-        double dMax = vGoFTemp.maxCoeff(&maxRow, &maxCol);
-        vToOrder[maxRow] = vFreqs[i];
     }
     vFreqs = vToOrder;
 }
