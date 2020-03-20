@@ -171,6 +171,9 @@ void FiffRawView::initMVCSettings(const QSharedPointer<FiffRawViewModel>& pModel
 //    m_pTableView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
     m_iT = 10;
 
+    m_pTableView->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(m_pTableView.data(), &QWidget::customContextMenuRequested,
+            this, &FiffRawView::customContextMenuRequested);
 }
 
 //=============================================================================================================
@@ -287,4 +290,27 @@ void FiffRawView::onMakeScreenshot(const QString& imageType)
         QPixmap pixMap = m_pTableView->grab();
         pixMap.save(fileName);
     }
+}
+
+//=============================================================================================================
+
+void FiffRawView::customContextMenuRequested(const QPoint &pos)
+{
+    QMenu* menu = new QMenu(this);
+
+    QAction* markTime = menu->addAction(tr("Mark time"));
+    connect(markTime, &QAction::triggered,
+            this, &FiffRawView::addTimeMark);
+
+    menu->popup(m_pTableView->viewport()->mapToGlobal(pos));
+
+    qDebug() << "POS:" << pos;
+    lastClickedPoint = pos;
+}
+
+//=============================================================================================================
+
+void FiffRawView::addTimeMark(bool con)
+{
+    m_pModel->newTimeMark(lastClickedPoint.x());
 }
