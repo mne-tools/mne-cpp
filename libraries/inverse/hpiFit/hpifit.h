@@ -43,6 +43,10 @@
 
 #include "../inverse_global.h"
 
+#include <fiff/fiff_dig_point_set.h>
+#include <fiff/fiff_dig_point.h>
+#include <fiff/fiff_coord_trans.h>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -80,6 +84,7 @@ namespace INVERSELIB
 //=============================================================================================================
 // Declare all structures to be used
 //=============================================================================================================
+
 /**
  * The strucut specifing the coil parameters.
  */
@@ -88,6 +93,16 @@ struct CoilParam {
     Eigen::MatrixXd mom;
     Eigen::VectorXd dpfiterror;
     Eigen::VectorXd dpfitnumitr;
+};
+
+/**
+ * The struct specifing all data needed to perform coil-wise fitting.
+ */
+struct HpiFitResult {
+    FIFFLIB::FiffDigPointSet fittedCoils;
+    FIFFLIB::FiffCoordTrans devHeadTrans;
+    QVector<double> errorDistances;
+    Eigen::VectorXd GoF;
 };
 
 //=============================================================================================================
@@ -233,5 +248,10 @@ protected:
 // INLINE DEFINITIONS
 //=============================================================================================================
 } //NAMESPACE
+
+#ifndef metatype_HpiFitResult
+#define metatype_HpiFitResult
+Q_DECLARE_METATYPE(INVERSELIB::HpiFitResult)
+#endif
 
 #endif // HPIFIT_H

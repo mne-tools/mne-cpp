@@ -98,7 +98,7 @@ RtHpi::RtHpi(FiffInfo::SPtr p_pFiffInfo, QObject *parent)
 : QObject(parent)
 , m_pFiffInfo(p_pFiffInfo)
 {
-    qRegisterMetaType<RTPROCESSINGLIB::HpiFitResult>("RTPROCESSINGLIB::HpiFitResult");
+    qRegisterMetaType<INVERSELIB::HpiFitResult>("INVERSELIB::HpiFitResult");
     qRegisterMetaType<QVector<int> >("QVector<int>");
     qRegisterMetaType<QSharedPointer<FIFFLIB::FiffInfo> >("QSharedPointer<FIFFLIB::FiffInfo>");
     qRegisterMetaType<Eigen::MatrixXd>("Eigen::MatrixXd");
@@ -134,6 +134,8 @@ void RtHpi::append(const MatrixXd &data)
                      m_matProjectors,
                      m_vCoilFreqs,
                      m_pFiffInfo);
+    } else {
+        qWarning() << "[RtHpi::append] Not enough coil frequencies set. At least three frequencies are needed.";
     }
 }
 
@@ -153,7 +155,7 @@ void RtHpi::setProjectionMatrix(const Eigen::MatrixXd& matProjectors)
 
 //=============================================================================================================
 
-void RtHpi::handleResults(const RTPROCESSINGLIB::HpiFitResult& fitResult)
+void RtHpi::handleResults(const INVERSELIB::HpiFitResult& fitResult)
 {
     emit newHpiFitResultAvailable(fitResult);
 }

@@ -293,7 +293,7 @@
         <item row="20" column="0">
          <widget class="QLabel" name="label_2">
           <property name="text">
-           <string>Average:</string>
+           <string>Average error:</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -319,6 +319,9 @@
         </item>
         <item row="21" column="1">
          <widget class="QDoubleSpinBox" name="m_doubleSpinBox_maxHPIContinousDist">
+          <property name="suffix">
+           <string>mm</string>
+          </property>
           <property name="maximum">
            <double>9999.989999999999782</double>
           </property>

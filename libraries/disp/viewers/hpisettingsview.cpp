@@ -116,8 +116,7 @@ HpiSettingsView::~HpiSettingsView()
 void HpiSettingsView::setErrorLabels(const QVector<double>& vError,
                                      double dMeanErrorDist)
 {
-    qDebug() << "1";
-    //Update gof labels and m_tAlignment from m to mm
+    //Update eror labels and change from m to mm
     QString sGof("0mm");
 
     for(int i = 0; i < vError.size(); ++i) {
@@ -126,20 +125,17 @@ void HpiSettingsView::setErrorLabels(const QVector<double>& vError,
             m_ui->m_tableWidget_errors->item(i, 1)->setText(sGof);
         }
     }
-    qDebug() << "2";
 
     m_ui->m_label_averagedFitError->setText(QString::number(dMeanErrorDist*1000,'f',2)+QString("mm"));
 
-    qDebug() << "3";
     //Update good/bad fit label
     if(dMeanErrorDist*1000 > m_ui->m_doubleSpinBox_maxHPIContinousDist->value()) {
-        m_ui->m_label_fitFeedback->setText("Bad Fit");
+        m_ui->m_label_fitFeedback->setText("Last fit: Bad");
         m_ui->m_label_fitFeedback->setStyleSheet("QLabel { background-color : red;}");
     } else {
-        m_ui->m_label_fitFeedback->setText("Good Fit");
+        m_ui->m_label_fitFeedback->setText("Last fit: Good");
         m_ui->m_label_fitFeedback->setStyleSheet("QLabel { background-color : green;}");
     }
-    qDebug() << "4";
 }
 
 //=============================================================================================================
