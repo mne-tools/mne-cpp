@@ -68,7 +68,7 @@ class MdiView;
 
 //=============================================================================================================
 /**
- * @brief The MultiViewWindow class provides sub windows as QDockWidgets which can be detached from the QSplitter.
+ * @brief The MultiViewWindow class provides sub windows as QDockWidgets.
  */
 class DISPSHARED_EXPORT MultiViewWindow : public QDockWidget
 {
@@ -83,7 +83,7 @@ public:
      * Constructs an MultiViewWindow.
      */
     explicit MultiViewWindow(QWidget *parent = Q_NULLPTR,
-                             Qt::WindowFlags flags = Qt::WindowFlags());
+                             Qt::WindowFlags flags = Qt::Window);
 
     //=========================================================================================================
     /**
@@ -92,12 +92,6 @@ public:
     ~MultiViewWindow();
 
 private:
-    //void onTopLevelChanged(bool bFlag);
-
-    //QPointer<QWidget>   m_pFloatingWindow;
-    //QPointer<QWidget>   m_pParent;
-
-    bool                m_bWindowMode;
 };
 
 }// NAMESPACE
