@@ -127,7 +127,7 @@ public:
     /**
      * Default constructor.
      */
-    explicit HPIFit();
+    explicit HPIFit(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
     //=========================================================================================================
     /**
