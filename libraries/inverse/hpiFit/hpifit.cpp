@@ -83,6 +83,10 @@ using namespace FWDLIB;
 
 HPIFit::HPIFit(FiffInfo::SPtr pFiffInfo)
 {
+    // init channel list and sensorSet
+    m_channels = QList<FIFFLIB::FiffChInfo>();
+    m_sensorSet = QList<Sensor>();
+
     // Get the indices of inner layer channels and exclude bad channels and create channellist
     int numCh = pFiffInfo->nchan;
     for (int i = 0; i < numCh; ++i) {
@@ -100,7 +104,7 @@ HPIFit::HPIFit(FiffInfo::SPtr pFiffInfo)
 
     // Setup Constructors for Coil Set
     FwdCoilSet* templates = NULL;
-    FwdCoilSet* m_megCoils = NULL;
+    FwdCoilSet* megCoils = NULL;
 
     // Create MEG-Coils and read doil_def.dat
     QString qPath = QString(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
@@ -111,8 +115,8 @@ HPIFit::HPIFit(FiffInfo::SPtr pFiffInfo)
 
     templates = FwdCoilSet::read_coil_defs(qPath);
 
-    m_megCoils = templates->create_meg_coils(m_channels,nch,acc,t);
-    createSensorSet(m_sensorSet,m_megCoils);
+    megCoils = templates->create_meg_coils(m_channels,nch,acc,t);
+    createSensorSet(m_sensorSet,megCoils);
 
 }
 
@@ -142,7 +146,7 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
 
     //struct SensorInfo sensors;
     struct CoilParam coil;
-    int numCh = pFiffInfo->nchan;
+
     int samF = pFiffInfo->sfreq;
     int samLoc = t_mat.cols(); // minimum samples required to localize numLoc times in a second
 
