@@ -77,6 +77,7 @@ Hpi::Hpi()
 , m_bUseSSP(false)
 , m_bUseComp(false)
 , m_bDoSingleHpi(false)
+, m_iNumberOfFitsPerSecond(3)
 {
     connect(this, &Hpi::devHeadTransAvailable,
             this, &Hpi::onDevHeadTransAvailable, Qt::BlockingQueuedConnection);
@@ -380,45 +381,68 @@ void Hpi::onDevHeadTransAvailable(const FIFFLIB::FiffCoordTrans& devHeadTrans)
 void Hpi::run()
 {
     HpiFitResult fitResult;
-    MatrixXd matData;
     double dErrorMax = 0.0;
+    int iDataIndexCounter = 0;
+    MatrixXd matData;
+
+    m_mutex.lock();
+    int iNumberOfFitsPerSecond = m_iNumberOfFitsPerSecond;
+    m_mutex.unlock();
+
+    MatrixXd matDataMerged(m_pFiffInfo->chs.size(), int(m_pFiffInfo->sfreq/iNumberOfFitsPerSecond));
 
     while(!isInterruptionRequested()) {
+        m_mutex.lock();
+        if(iNumberOfFitsPerSecond != m_iNumberOfFitsPerSecond) {
+            matDataMerged.resize(m_pFiffInfo->chs.size(), int(m_pFiffInfo->sfreq/iNumberOfFitsPerSecond));
+            iDataIndexCounter = 0;
+        }
+        m_mutex.unlock();
+
         //pop matrix
         if(m_pCircularBuffer->pop(matData)) {
-            // Perform HPI fit
-            //Perform actual fitting
-            fitResult.devHeadTrans.from = 1;
-            fitResult.devHeadTrans.to = 4;
+            if(iDataIndexCounter + matData.cols() < matDataMerged.cols()) {
+                matDataMerged.block(0, iDataIndexCounter, matData.rows(), matData.cols()) = matData;
+                iDataIndexCounter += matData.cols();
+            } else {
+                matDataMerged.block(0, iDataIndexCounter, matData.rows(), matDataMerged.cols()-iDataIndexCounter) = matData.block(0, 0, matData.rows(), matDataMerged.cols()-iDataIndexCounter);
 
-            m_mutex.lock();
-            fitResult.sFilePathDigitzers = m_sFilePathDigitzers;
-            HPIFit::fitHPI(matData,
-                           m_matCompProjectors,
-                           fitResult.devHeadTrans,
-                           m_vCoilFreqs,
-                           fitResult.errorDistances,
-                           fitResult.GoF,
-                           fitResult.fittedCoils,
-                           m_pFiffInfo);
-            m_mutex.unlock();
-
-            //Check if the error meets distance requirement
-            if(fitResult.errorDistances.size() > 0) {
-                double dMeanErrorDist = 0;
-                dMeanErrorDist = std::accumulate(fitResult.errorDistances.begin(), fitResult.errorDistances.end(), .0) / fitResult.errorDistances.size();
-
-                emit errorsChanged(fitResult.errorDistances, dMeanErrorDist);
+                // Perform HPI fit
+                //Perform actual fitting
+                fitResult.devHeadTrans.from = 1;
+                fitResult.devHeadTrans.to = 4;
 
                 m_mutex.lock();
-                dErrorMax = m_dAllowedMeanErrorDist;
+                fitResult.sFilePathDigitzers = m_sFilePathDigitzers;
+                HPIFit::fitHPI(matDataMerged,
+                               m_matCompProjectors,
+                               fitResult.devHeadTrans,
+                               m_vCoilFreqs,
+                               fitResult.errorDistances,
+                               fitResult.GoF,
+                               fitResult.fittedCoils,
+                               m_pFiffInfo);
                 m_mutex.unlock();
-                if(dMeanErrorDist < dErrorMax) {
-                    m_pHpiOutput->data()->setValue(fitResult);
 
-                    //If fit was good, set newly calculated transformation matrix to fiff info
-                    emit devHeadTransAvailable(fitResult.devHeadTrans);
+                //Check if the error meets distance requirement
+                if(fitResult.errorDistances.size() > 0) {
+                    double dMeanErrorDist = 0;
+                    dMeanErrorDist = std::accumulate(fitResult.errorDistances.begin(), fitResult.errorDistances.end(), .0) / fitResult.errorDistances.size();
+
+                    emit errorsChanged(fitResult.errorDistances, dMeanErrorDist);
+
+                    m_mutex.lock();
+                    dErrorMax = m_dAllowedMeanErrorDist;
+                    m_mutex.unlock();
+                    if(dMeanErrorDist < dErrorMax) {
+                        m_pHpiOutput->data()->setValue(fitResult);
+
+                        //If fit was good, set newly calculated transformation matrix to fiff info
+                        emit devHeadTransAvailable(fitResult.devHeadTrans);
+                    }
                 }
+
+                iDataIndexCounter = 0;
             }
         }
     }
