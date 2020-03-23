@@ -58,26 +58,7 @@ MultiView::MultiView(QWidget *parent,
                      Qt::WindowFlags flags)
 : QMainWindow(parent, flags)
 {
-//    m_pSplitterHorizontal = new QSplitter(this);
-//    m_pSplitterHorizontal->setOrientation(Qt::Horizontal);
-//    m_pSplitterHorizontal->setHandleWidth(5);
-
-//    m_pSplitterVertical = new QSplitter(this);
-//    m_pSplitterVertical->setOrientation(Qt::Vertical);
-//    m_pSplitterVertical->setHandleWidth(5);
-
-//    m_pVerticalTabWidget = new QTabWidget();
-//    m_pVerticalTabWidget->setTabBarAutoHide(true);
-//    m_pVerticalTabWidget->setMovable(true);
-
-//    m_pSplitterVertical->addWidget(m_pSplitterHorizontal);
-//    m_pSplitterVertical->addWidget(m_pVerticalTabWidget);
-
-//    QHBoxLayout *layout = new QHBoxLayout;
-//    layout->addWidget(m_pSplitterVertical);
-//    layout->setContentsMargins(0,0,3,0);
-//    this->setLayout(layout);
-
+    this->setDockNestingEnabled(true);
     if(QWidget* pCentralWidget = this->centralWidget()) {
         pCentralWidget->hide();
     }
@@ -91,26 +72,8 @@ MultiView::~MultiView()
 
 //=============================================================================================================
 
-MultiViewWindow* MultiView::addWidgetH(QWidget* pWidget,
-                                       const QString& sName)
-{
-    MultiViewWindow* pDockWidget = new MultiViewWindow();
-    pDockWidget->setWindowTitle(sName);
-    pDockWidget->setWidget(pWidget);
-    pWidget->layout()->setContentsMargins(0,0,0,0);
-    pDockWidget->layout()->setContentsMargins(0,0,0,0);
-
-    this->addDockWidget(Qt::DockWidgetArea::BottomDockWidgetArea, pDockWidget);
-
-//    m_pSplitterHorizontal->addWidget(pDockWidget);
-
-    return pDockWidget;
-}
-
-//=============================================================================================================
-
-MultiViewWindow* MultiView::addWidgetV(QWidget* pWidget,
-                                       const QString& sName)
+MultiViewWindow* MultiView::addWidgetTop(QWidget* pWidget,
+                                         const QString& sName)
 {
     MultiViewWindow* pDockWidget = new MultiViewWindow();
     pDockWidget->setWindowTitle(sName);
@@ -120,8 +83,29 @@ MultiViewWindow* MultiView::addWidgetV(QWidget* pWidget,
 
     this->addDockWidget(Qt::DockWidgetArea::TopDockWidgetArea, pDockWidget);
 
- //   m_pVerticalTabWidget->addTab(pDockWidget, sName);
-    //m_pSplitterVertical->addWidget(pDockWidget);
+    return pDockWidget;
+}
+
+//=============================================================================================================
+
+MultiViewWindow* MultiView::addWidgetBottom(QWidget* pWidget,
+                                            const QString& sName)
+{
+    MultiViewWindow* pDockWidget = new MultiViewWindow();
+    pDockWidget->setWindowTitle(sName);
+    pDockWidget->setWidget(pWidget);
+    pWidget->layout()->setContentsMargins(0,0,0,0);
+    pDockWidget->layout()->setContentsMargins(0,0,0,0);
+
+    if(m_lDockWidgets.isEmpty()) {
+        this->addDockWidget(Qt::DockWidgetArea::BottomDockWidgetArea, pDockWidget);
+    }
+
+    for(int i = 0; i < m_lDockWidgets.size(); ++i) {
+        this->tabifyDockWidget(m_lDockWidgets.at(i), pDockWidget);
+    }
+
+    m_lDockWidgets.append(pDockWidget);
 
     return pDockWidget;
 }

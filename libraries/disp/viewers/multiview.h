@@ -48,7 +48,6 @@
 #include <QMainWindow>
 #include <QSharedPointer>
 #include <QPointer>
-#include <QSplitter>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -69,8 +68,7 @@ class MultiViewWindow;
 
 //=============================================================================================================
 /**
- * @brief The MultiView class inherits from QWidget and provides a view with one vertical and one horizontal
- *        QSplitter. The horizontal splitter lives in the most upper element of the vertical QSplitter.
+ * @brief The MultiView class inherits from QMainWindow and provides a view which supports dock widgets.
  */
 class DISPSHARED_EXPORT MultiView : public QMainWindow
 {
@@ -95,32 +93,31 @@ public:
 
     //=========================================================================================================
     /**
-     * Adds a QWidget to the horizontal QSplitter.
+     * Adds a QWidget to the top docking area.
      *
      * @param[in] pWidget   The widget to be added.
      * @param[in] sName     The window title shown in the QSplitter.
      *
      * @return Returns a pointer to the added widget in form of a MultiViewWindow.
      */
-    MultiViewWindow* addWidgetH(QWidget* pWidget,
-                                const QString &sName);
+    MultiViewWindow* addWidgetTop(QWidget* pWidget,
+                                  const QString &sName);
 
     //=========================================================================================================
     /**
-     * Adds a QWidget to the vertical QSplitter.
+     * Adds a QWidget to the bottom docking area. Please note that all bottom dock widgets are tabbified by default.
      *
      * @param[in] pWidget   The widget to be added.
      * @param[in] sName     The window title shown in the QSplitter.
      *
      * @return Returns a pointer to the added widget in form of a MultiViewWindow.
      */
-    MultiViewWindow* addWidgetV(QWidget* pWidget,
-                                const QString& sName);
+    MultiViewWindow* addWidgetBottom(QWidget* pWidget,
+                                     const QString& sName);
 
 private:
-    QPointer<QSplitter>     m_pSplitterHorizontal;      /**< The horizontal QSplitter. */
-    QPointer<QSplitter>     m_pSplitterVertical;        /**< The vertical QSplitter. */
-    QPointer<QTabWidget>    m_pVerticalTabWidget;       /**< The vertically aligned tab widget. */
+    QList<MultiViewWindow *> m_lDockWidgets;
+
 };
 
 }// NAMESPACE

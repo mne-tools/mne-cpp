@@ -418,12 +418,9 @@ void MainWindow::createMenus()
         m_pMenuView = menuBar()->addMenu(tr("&View"));
     }
 
-    if(!m_pMenuLgLv) {
-        m_pMenuLgLv = m_pMenuView->addMenu(tr("&Log Level"));
-    }
-
     m_pMenuView->clear();
 
+    m_pMenuLgLv = m_pMenuView->addMenu(tr("&Log Level"));
     m_pMenuLgLv->addAction(m_pActionMinLgLv);
     m_pMenuLgLv->addAction(m_pActionNormLgLv);
     m_pMenuLgLv->addAction(m_pActionMaxLgLv);
@@ -613,10 +610,10 @@ void MainWindow::initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::IPlugin> 
                        lPlugins.at(i)->getName() == "LSL Adapter"||
                        lPlugins.at(i)->getName() == "TMSI"||
                        lPlugins.at(i)->getName() == "BrainAMP") {
-                        m_qListDynamicDisplayMenuActions.append(m_pRunWidget->addWidgetV(pWidget,
+                        m_qListDynamicDisplayMenuActions.append(m_pRunWidget->addWidgetBottom(pWidget,
                                                                                          sCurPluginName)->toggleViewAction());
                     } else {
-                        m_qListDynamicDisplayMenuActions.append(m_pRunWidget->addWidgetH(pWidget,
+                        m_qListDynamicDisplayMenuActions.append(m_pRunWidget->addWidgetTop(pWidget,
                                                                                          sCurPluginName)->toggleViewAction());
                     }
                 }
