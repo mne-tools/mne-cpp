@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("hpiFit Example");
     parser.addHelpOption();
     qInfo() << "Please download the mne-cpp-test-data folder from Github (mne-tools) into mne-cpp/bin.";
-    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif");
+    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/MNE-sample-data/chpi/raw/data_with_movement_chpi_raw.fif");
 
     parser.addOption(inputOption);
 
@@ -125,16 +125,16 @@ int main(int argc, char *argv[])
     float fQuantumSec = 0.2f;       // read and write in 200 ms junks
     fiff_int_t iQuantum = ceil(fQuantumSec*pFiffInfo->sfreq);
 
-    // create time vector that specifies when to fit
-    int iN = ceil((last-first)/iQuantum);
-    RowVectorXf vTime = RowVectorXf::LinSpaced(iN, 0, iN-1) * dTSec;
+//    // create time vector that specifies when to fit
+//    int iN = ceil((last-first)/iQuantum);
+//    RowVectorXf vTime = RowVectorXf::LinSpaced(iN, 0, iN-1) * dTSec;
 
     // To fit at specific times outcommend the following block
-//    // Read Quaternion File
-//    MatrixXd pos;
-//    qInfo() << "Specify the path to your Position file (.txt)";
-//    IOUtils::read_eigen_matrix(pos, QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/ref_hpiFit_pos.txt");
-//    RowVectorXd time = pos.col(0);
+    // Read Quaternion File
+    MatrixXd pos;
+    qInfo() << "Specify the path to your Position file (.txt)";
+    IOUtils::read_eigen_matrix(pos, QCoreApplication::applicationDirPath() + "/MNE-sample-data/chpi/pos/posMax_data_with_movement_chpi.txt");
+    RowVectorXd vTime = pos.col(0);
 
     MatrixXd mPosition;              // mPosition matrix to save quaternions etc.
 
@@ -191,6 +191,8 @@ int main(int argc, char *argv[])
     qInfo() << "findOrder() took" << timer.elapsed() << "milliseconds";
     qInfo() << "[done]";
 
+    float fTimer = 0.0;
+
     // read and fit
     for(int i = 0; i < vTime.size(); i++) {
         from = first + vTime(i)*pFiffInfo->sfreq;
@@ -218,16 +220,17 @@ int main(int argc, char *argv[])
                        pFiffInfo,
                        bDoDebug,
                        sHPIResourceDir);
-        qInfo() << "The HPI-Fit took" << timer.elapsed() << "milliseconds";
+        fTimer = timer.elapsed();
+        qInfo() << "The HPI-Fit took" << fTimer << "milliseconds";
         qInfo() << "[done]";
 
         HPIFit::storeHeadPosition(vTime(i), pFiffInfo->dev_head_t.trans, mPosition, vGoF, vError);
-
+        mPosition(i,9) = fTimer;
         // if big head displacement occures, update debHeadTrans
         if(MNEMath::compareTransformation(transDevHead.trans, pFiffInfo->dev_head_t.trans, fThreshRot, fThreshTrans)) {
             transDevHead = pFiffInfo->dev_head_t;
             qInfo() << "dev_head_t has been updated.";
         }
     }
-//    IOUtils::write_eigen_matrix(mPosition, QCoreApplication::applicationDirPath() + "/MNE-sample-data/mPosition.txt");
+    IOUtils::write_eigen_matrix(mPosition, QCoreApplication::applicationDirPath() + "/MNE-sample-data/chpi/pos/pos_01_Faster_Home.txt");
 }
