@@ -47,6 +47,7 @@
 #include <disp3D/viewers/networkview.h>
 #include <disp3D/engine/model/items/network/networktreeitem.h>
 #include <disp3D/engine/model/items/sourcedata/mnedatatreeitem.h>
+#include <disp3D/engine/model/items/sensorspace/sensorsettreeitem.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
 #include <disp3D/engine/model/items/freesurfer/fssurfacetreeitem.h>
 #include <disp3D/engine/view/view3D.h>
@@ -223,19 +224,17 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             // Add sensor surface BabyMeg
             QFile t_fileBabyMEGSensorSurfaceBEM(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/BabyMEG.fif");
             MNEBem t_babyMEGsensorSurfaceBEM(t_fileBabyMEGSensorSurfaceBEM);
-            m_pData3DModel->addMegSensorInfo("Device", "BabyMEG", QList<FiffChInfo>(), t_babyMEGsensorSurfaceBEM);
+            m_pData3DModel->addMegSensorInfo("Device", "BabyMEG", QList<FiffChInfo>(), t_babyMEGsensorSurfaceBEM)->setCheckState(Qt::Unchecked);
 
             // Add sensor surface VectorView
             QFile t_fileVVSensorSurfaceBEM(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/306m.fif");
             MNEBem t_sensorVVSurfaceBEM(t_fileVVSensorSurfaceBEM);
-            BemTreeItem* pVVItem = m_pData3DModel->addBemData("Device", "VectorView", t_sensorVVSurfaceBEM);
-            pVVItem->setCheckState(Qt::Unchecked);
+            m_pData3DModel->addMegSensorInfo("Device", "BabyMEG", QList<FiffChInfo>(), t_sensorVVSurfaceBEM);
 
             // Add average head surface
             QFile t_fileHeadAvr(QCoreApplication::applicationDirPath() + "/resources/general/hpiAlignment/fsaverage-head.fif");;
             MNEBem t_BemHeadAvr(t_fileHeadAvr);
             m_pBemHeadAvr = m_pData3DModel->addBemData("Head", "Average", t_BemHeadAvr);
-            m_pBemHeadAvr->setCheckState(Qt::Unchecked);
 
             init();
         }
