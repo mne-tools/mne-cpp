@@ -83,6 +83,21 @@ using namespace FWDLIB;
 
 HPIFit::HPIFit(FiffInfo::SPtr pFiffInfo)
 {
+    // Get the indices of inner layer channels and exclude bad channels and create channellist
+    int numCh = pFiffInfo->nchan;
+    for (int i = 0; i < numCh; ++i) {
+        if(pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_BABY_MAG ||
+                pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T1 ||
+                pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T2 ||
+                pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T3) {
+            // Check if the sensor is bad, if not append to innerind
+            if(!(pFiffInfo->bads.contains(pFiffInfo->ch_names.at(i)))) {
+                m_innerind.append(i);
+                m_channels.append(pFiffInfo->chs[i]);
+            }
+        }
+    }
+
     // Setup Constructors for Coil Set
     FwdCoilSet* templates = NULL;
     FwdCoilSet* m_megCoils = NULL;
@@ -194,44 +209,27 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
         }
     }
 
-    // Get the indices of inner layer channels and exclude bad channels and create channellist
-    QList<FiffChInfo> channels;
-    QVector<int> innerind(0);
-
-    for (int i = 0; i < numCh; ++i) {
-        if(pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_BABY_MAG ||
-                pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T1 ||
-                pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T2 ||
-                pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T3) {
-            // Check if the sensor is bad, if not append to innerind
-            if(!(pFiffInfo->bads.contains(pFiffInfo->ch_names.at(i)))) {
-                innerind.append(i);
-                channels.append(pFiffInfo->chs[i]);
-            }
-        }
-    }
-
     //Create new projector based on the excluded channels, first exclude the rows then the columns
-    MatrixXd matProjectorsRows(innerind.size(),t_matProjectors.cols());
-    MatrixXd matProjectorsInnerind(innerind.size(),innerind.size());
+    MatrixXd matProjectorsRows(m_innerind.size(),t_matProjectors.cols());
+    MatrixXd matProjectorsInnerind(m_innerind.size(),m_innerind.size());
 
     for (int i = 0; i < matProjectorsRows.rows(); ++i) {
-        matProjectorsRows.row(i) = t_matProjectors.row(innerind.at(i));
+        matProjectorsRows.row(i) = t_matProjectors.row(m_innerind.at(i));
     }
 
     for (int i = 0; i < matProjectorsInnerind.cols(); ++i) {
-        matProjectorsInnerind.col(i) = matProjectorsRows.col(innerind.at(i));
+        matProjectorsInnerind.col(i) = matProjectorsRows.col(m_innerind.at(i));
     }
 
-    MatrixXd topo(innerind.size(), numCoils*2);
-    MatrixXd amp(innerind.size(), numCoils);
-    MatrixXd ampC(innerind.size(), numCoils);
+    MatrixXd topo(m_innerind.size(), numCoils*2);
+    MatrixXd amp(m_innerind.size(), numCoils);
+    MatrixXd ampC(m_innerind.size(), numCoils);
 
     // Get the data from inner layer channels
-    MatrixXd innerdata(innerind.size(), t_mat.cols());
+    MatrixXd innerdata(m_innerind.size(), t_mat.cols());
 
-    for(int j = 0; j < innerind.size(); ++j) {
-        innerdata.row(j) << t_mat.row(innerind[j]);
+    for(int j = 0; j < m_innerind.size(); ++j) {
+        innerdata.row(j) << t_mat.row(m_innerind[j]);
     }
 
     // Calculate topo
@@ -244,13 +242,13 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
     for(int j = 0; j < numCoils; ++j) {
        float nS = 0.0;
        float nC = 0.0;
-       for(int i = 0; i < innerind.size(); ++i) {
+       for(int i = 0; i < m_innerind.size(); ++i) {
            nS += amp(i,j)*amp(i,j);
            nC += ampC(i,j)*ampC(i,j);
        }
 
        if(nC > nS) {
-         for(int i = 0; i < innerind.size(); ++i) {
+         for(int i = 0; i < m_innerind.size(); ++i) {
            amp(i,j) = ampC(i,j);
          }
        }
@@ -267,8 +265,8 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
         for (int i = 0; i < amp.rows(); ++i) {
             if(std::fabs(amp(i,j)) > maxVal) {
                 maxVal = std::fabs(amp(i,j));
-                if(chIdx < innerind.size()) {
-                    chIdx = innerind.at(i);
+                if(chIdx < m_innerind.size()) {
+                    chIdx = m_innerind.at(i);
                 }
             }
         }

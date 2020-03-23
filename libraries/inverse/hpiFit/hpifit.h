@@ -241,12 +241,10 @@ protected:
 
     //=========================================================================================================
 
-    //=========================================================================================================
-
-    QList<FIFFLIB::FiffChInfo> m_channels;          /**< Channellist */
-    QList<Sensor> m_sensorSet;                      /**< sensorSet */
-
-    static QString         m_sHPIResourceDir;      /**< Hold the resource folder to store the debug information in. */
+    static QList<FIFFLIB::FiffChInfo>   m_channels;             /**< Channellist */
+    static QList<Sensor>                m_sensorSet;            /**< sensorSet */
+    static QVector<int>                 m_innerind;             /**< innerind  */
+    static QString                      m_sHPIResourceDir;      /**< Hold the resource folder to store the debug information in. */
 };
 
 //=============================================================================================================
