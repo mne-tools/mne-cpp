@@ -83,6 +83,22 @@ using namespace FWDLIB;
 
 HPIFit::HPIFit(FiffInfo::SPtr pFiffInfo)
 {
+    // Setup Constructors for Coil Set
+    FwdCoilSet* templates = NULL;
+    FwdCoilSet* m_megCoils = NULL;
+
+    // Create MEG-Coils and read doil_def.dat
+    QString qPath = QString(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
+    // Create MEG-Coils and read data
+    int acc = 2;
+    int nch = m_channels.size();
+    FiffCoordTransOld* t = NULL;
+
+    templates = FwdCoilSet::read_coil_defs(qPath);
+
+    m_megCoils = templates->create_meg_coils(m_channels,nch,acc,t);
+    createSensorSet(m_sensorSet,m_megCoils);
+
 }
 
 //=============================================================================================================
@@ -108,13 +124,6 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
         std::cout<<std::endl<< "HPIFit::fitHPI - No projector passed. Returning.";
         return;
     }
-
-    // Make sure the fitted digitzers are empty
-    fittedPointSet.clear();
-
-    // Setup Constructors for Coil Set
-    FwdCoilSet* templates = NULL;
-    FwdCoilSet* megCoils = NULL;
 
     //struct SensorInfo sensors;
     struct CoilParam coil;
@@ -201,19 +210,6 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
             }
         }
     }
-
-    // Create MEG-Coils and read doil_def.dat
-    QString qPath = QString(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
-    // Create MEG-Coils and read data
-    int acc = 2;
-    int nch = channels.size();
-    FiffCoordTransOld* t = NULL;
-
-    templates = FwdCoilSet::read_coil_defs(qPath);
-
-    QList<Sensor> sensorSet;
-    megCoils = templates->create_meg_coils(channels,nch,acc,t);
-    createSensorSet(sensorSet,megCoils);
 
     //Create new projector based on the excluded channels, first exclude the rows then the columns
     MatrixXd matProjectorsRows(innerind.size(),t_matProjectors.cols());
@@ -305,7 +301,7 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
     coil.pos = coilPos;
 
     // Perform actual localization
-    coil = dipfit(coil, sensorSet, amp, numCoils, matProjectorsInnerind);
+    coil = dipfit(coil, m_sensorSet, amp, numCoils, matProjectorsInnerind);
 
     Matrix4d trans = computeTransformation(headHPI, coil.pos);
     //Eigen::Matrix4d trans = computeTransformation(coil.pos, headHPI);
