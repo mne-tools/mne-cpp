@@ -70,6 +70,7 @@ namespace FWDLIB{
 
 namespace FIFFLIB{
     class FiffInfo;
+    class FiffChInfo;
     class FiffCoordTrans;
     class FiffDigPointSet;
 }
@@ -194,9 +195,7 @@ public:
                                   const Eigen::MatrixXf& devHeadT,
                                   Eigen::MatrixXd& position,
                                   const Eigen::VectorXd& vGoF,
-                                  const QVector<double>& vError);
-
-
+                                  const QVector<double>& vError);    
 protected:
     //=========================================================================================================
     /**
@@ -241,6 +240,11 @@ protected:
                                 FWDLIB::FwdCoilSet* coils);
 
     //=========================================================================================================
+
+    //=========================================================================================================
+
+    QList<FIFFLIB::FiffChInfo> m_channels;          /**< Channellist */
+    QList<Sensor> m_sensorSet;                      /**< sensorSet */
 
     static QString         m_sHPIResourceDir;      /**< Hold the resource folder to store the debug information in. */
 };
