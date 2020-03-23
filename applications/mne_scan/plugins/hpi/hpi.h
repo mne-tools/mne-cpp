@@ -232,6 +232,7 @@ private:
     QString                     m_sFilePathDigitzers;       /**< The file path to the current digitzers. */
 
     qint16                      m_iNumberBadChannels;       /**< The number of bad channels.*/
+    qint16                      m_iNumberOfFitsPerSecond;   /**< The number of allowed HPI fits per second. Default is 3.*/
 
     double                      m_dAllowedMeanErrorDist;    /**< The allowed error distance in order for the last fit to be counted as a good fit.*/
 
