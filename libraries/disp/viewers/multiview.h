@@ -45,7 +45,7 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QMdiArea>
+#include <QMainWindow>
 #include <QSharedPointer>
 #include <QPointer>
 #include <QSplitter>
@@ -72,7 +72,7 @@ class MultiViewWindow;
  * @brief The MultiView class inherits from QWidget and provides a view with one vertical and one horizontal
  *        QSplitter. The horizontal splitter lives in the most upper element of the vertical QSplitter.
  */
-class DISPSHARED_EXPORT MultiView : public QWidget
+class DISPSHARED_EXPORT MultiView : public QMainWindow
 {
     Q_OBJECT
 
@@ -84,7 +84,8 @@ public:
     /**
      * Constructs an MultiView.
      */
-    explicit MultiView(QWidget *parent = Q_NULLPTR);
+    explicit MultiView(QWidget *parent = Q_NULLPTR,
+                       Qt::WindowFlags flags = Qt::Widget);
 
     //=========================================================================================================
     /**
