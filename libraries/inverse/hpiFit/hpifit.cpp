@@ -81,7 +81,7 @@ using namespace FWDLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-HPIFit::HPIFit()
+HPIFit::HPIFit(FiffInfo::SPtr pFiffInfo)
 {
 }
 
