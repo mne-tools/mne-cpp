@@ -82,7 +82,8 @@ public:
     /**
      * Constructs an MultiViewWindow.
      */
-    explicit MultiViewWindow(QWidget *parent = Q_NULLPTR);
+    explicit MultiViewWindow(QWidget *parent = Q_NULLPTR,
+                             Qt::WindowFlags flags = Qt::WindowFlags());
 
     //=========================================================================================================
     /**
@@ -91,10 +92,10 @@ public:
     ~MultiViewWindow();
 
 private:
-    void onTopLevelChanged(bool bFlag);
+    //void onTopLevelChanged(bool bFlag);
 
-    QPointer<QWidget>   m_pFloatingWindow;
-    QPointer<QWidget>   m_pParent;
+    //QPointer<QWidget>   m_pFloatingWindow;
+    //QPointer<QWidget>   m_pParent;
 
     bool                m_bWindowMode;
 };

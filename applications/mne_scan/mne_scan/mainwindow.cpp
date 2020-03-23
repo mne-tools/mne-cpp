@@ -47,6 +47,7 @@
 #include <scDisp/realtimemultisamplearraywidget.h>
 
 #include <disp/viewers/multiview.h>
+#include <disp/viewers/multiviewwindow.h>
 
 #include <disp/viewers/quickcontrolview.h>
 
@@ -402,26 +403,52 @@ void MainWindow::createActions()
 
 void MainWindow::createMenus()
 {
-    m_pMenuFile = menuBar()->addMenu(tr("&File"));
-    m_pMenuFile->addAction(m_pActionNewConfig);
-    m_pMenuFile->addAction(m_pActionOpenConfig);
-    m_pMenuFile->addAction(m_pActionSaveConfig);
-    m_pMenuFile->addSeparator();
-    m_pMenuFile->addAction(m_pActionExit);
+    // File menu
+    if(!m_pMenuFile) {
+        m_pMenuFile = menuBar()->addMenu(tr("&File"));
+        m_pMenuFile->addAction(m_pActionNewConfig);
+        m_pMenuFile->addAction(m_pActionOpenConfig);
+        m_pMenuFile->addAction(m_pActionSaveConfig);
+        m_pMenuFile->addSeparator();
+        m_pMenuFile->addAction(m_pActionExit);
+    }
 
-    m_pMenuView = menuBar()->addMenu(tr("&View"));
-    m_pMenuLgLv = m_pMenuView->addMenu(tr("&Log Level"));
+    // View menu
+    if(!m_pMenuView) {
+        m_pMenuView = menuBar()->addMenu(tr("&View"));
+    }
+
+    if(!m_pMenuLgLv) {
+        m_pMenuLgLv = m_pMenuView->addMenu(tr("&Log Level"));
+    }
+
+    m_pMenuView->clear();
+
     m_pMenuLgLv->addAction(m_pActionMinLgLv);
     m_pMenuLgLv->addAction(m_pActionNormLgLv);
     m_pMenuLgLv->addAction(m_pActionMaxLgLv);
     m_pMenuView->addSeparator();
 
+    if(m_pPluginGuiDockWidget) {
+        m_pMenuView->addAction(m_pPluginGuiDockWidget->toggleViewAction());
+    }
+
+    if(m_pDockWidget_Log) {
+        m_pMenuView->addAction(m_pDockWidget_Log->toggleViewAction());
+    }
+
+    for(int i = 0; i < m_qListDynamicDisplayMenuActions.size(); ++i) {
+        m_pMenuView->addAction(m_qListDynamicDisplayMenuActions.at(i));
+    }
+
     menuBar()->addSeparator();
 
-    m_pMenuHelp = menuBar()->addMenu(tr("&Help"));
-    m_pMenuHelp->addAction(m_pActionHelpContents);
-    m_pMenuHelp->addSeparator();
-    m_pMenuHelp->addAction(m_pActionAbout);
+    // Help menu
+    if(!m_pMenuHelp) {m_pMenuHelp = menuBar()->addMenu(tr("&Help"));
+        m_pMenuHelp->addAction(m_pActionHelpContents);
+        m_pMenuHelp->addSeparator();
+        m_pMenuHelp->addAction(m_pActionAbout);
+    }
 }
 
 //=============================================================================================================
@@ -586,11 +613,11 @@ void MainWindow::initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::IPlugin> 
                        lPlugins.at(i)->getName() == "LSL Adapter"||
                        lPlugins.at(i)->getName() == "TMSI"||
                        lPlugins.at(i)->getName() == "BrainAMP") {
-                        m_pRunWidget->addWidgetV(pWidget,
-                                                 sCurPluginName);
+                        m_qListDynamicDisplayMenuActions.append(m_pRunWidget->addWidgetV(pWidget,
+                                                                                         sCurPluginName)->toggleViewAction());
                     } else {
-                        m_pRunWidget->addWidgetH(pWidget,
-                                                 sCurPluginName);
+                        m_qListDynamicDisplayMenuActions.append(m_pRunWidget->addWidgetH(pWidget,
+                                                                                         sCurPluginName)->toggleViewAction());
                     }
                 }
 
@@ -603,6 +630,8 @@ void MainWindow::initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::IPlugin> 
             setCentralWidget(pWidget);
         }
     }
+
+    createMenus();
 }
 
 //=============================================================================================================
@@ -677,8 +706,10 @@ void MainWindow::startMeasurement()
     startTimer(m_iTimeoutMSec);
 
     delete m_pRunWidget;
-    m_pRunWidget = new MultiView(this);
+    m_pRunWidget = new MultiView();
     setCentralWidget(m_pRunWidget);
+
+    m_qListDynamicDisplayMenuActions.clear();
 
     initMultiViewWidget(m_pPluginSceneManager->getPlugins());
 }
