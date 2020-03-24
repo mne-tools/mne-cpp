@@ -357,3 +357,11 @@ void RealTimeMultiSampleArrayWidget::onHideBadChannels()
     }
 }
 
+//=============================================================================================================
+
+void RealTimeMultiSampleArrayWidget::updateOpenGLViewport()
+{
+    if(m_pChannelDataView) {
+        m_pChannelDataView->updateOpenGLViewport();
+    }
+}

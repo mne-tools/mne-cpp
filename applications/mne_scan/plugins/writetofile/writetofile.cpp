@@ -253,7 +253,7 @@ void WriteToFile::initPluginControlWidgets()
         if(!m_pUpdateTimeInfoTimer) {
             m_pUpdateTimeInfoTimer = QSharedPointer<QTimer>(new QTimer(this));
             connect(m_pUpdateTimeInfoTimer.data(), &QTimer::timeout, [=]() {
-                pProjectSettingsView->setRecordingElapsedTime(m_recordingStartedTime.elapsed());
+                    pProjectSettingsView->setRecordingElapsedTime(m_recordingStartedTime.elapsed());
             });
         }
     }
@@ -300,8 +300,9 @@ void WriteToFile::run()
 void WriteToFile::setRecordingTimerChanged(int timeMSecs)
 {
     //If the recording time is changed during the recording, change the timer
-    if(m_bWriteToFile)
+    if(m_bWriteToFile) {
         m_pRecordTimer->setInterval(timeMSecs-m_recordingStartedTime.elapsed());
+    }
 
     m_iRecordingMSeconds = timeMSecs;
 }
@@ -335,10 +336,9 @@ void WriteToFile::toggleRecordingFile()
 
         //Stop record timer
         m_pRecordTimer->stop();
-        m_pUpdateTimeInfoTimer->stop();
         m_pBlinkingRecordButtonTimer->stop();
-
         m_pActionRecordFile->setIcon(QIcon(":/images/record.png"));
+        m_pUpdateTimeInfoTimer->stop();
     } else {
         m_iSplitCount = 0;
 
@@ -395,7 +395,7 @@ void WriteToFile::toggleRecordingFile()
         //Start timers for record button blinking, recording timer and updating the elapsed time in the proj widget
         m_pBlinkingRecordButtonTimer->start(500);
         m_recordingStartedTime.restart();
-        m_pUpdateTimeInfoTimer->start(1000);
+        m_pUpdateTimeInfoTimer->start(200);
 
         if(m_bUseRecordTimer) {
             m_pRecordTimer->start(m_iRecordingMSeconds);

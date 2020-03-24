@@ -117,6 +117,13 @@ public:
 
     //=========================================================================================================
     /**
+     * Update the OpenGL viewport. This, e.g., necessary if this widget was set to a QDockWidget which changes
+     * its floating state.
+     */
+    void updateOpenGLViewport();
+
+    //=========================================================================================================
+    /**
      * Set the path where to store the settings of this widget via QSettings. Note that this will also trigger
      * a reload of the stored settings.
      *

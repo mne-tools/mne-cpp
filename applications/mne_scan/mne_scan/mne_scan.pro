@@ -39,10 +39,15 @@ include(../../../mne-cpp.pri)
 
 TEMPLATE = app
 
-QT += network core widgets xml svg charts opengl serialport concurrent
+QT += network core widgets xml svg charts serialport concurrent
 
 qtHaveModule(3dextras) {
     QT += 3dextras
+}
+
+contains(MNECPP_CONFIG, dispOpenGL) {
+    qtHaveModule(opengl): QT += opengl
+    DEFINES += USE_OPENGL
 }
 
 contains(MNECPP_CONFIG, static) {

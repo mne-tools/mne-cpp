@@ -115,6 +115,17 @@ RtFiffRawView::~RtFiffRawView()
 
 //=============================================================================================================
 
+void RtFiffRawView::updateOpenGLViewport()
+{
+#if defined(USE_OPENGL)
+    if(m_pTableView) {
+        m_pTableView->setViewport(new QOpenGLWidget);
+    }
+#endif
+}
+
+//=============================================================================================================
+
 void RtFiffRawView::setSettingsPath(const QString& sSettingsPath)
 {
     m_sSettingsPath = sSettingsPath;

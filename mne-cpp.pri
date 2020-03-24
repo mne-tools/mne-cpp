@@ -134,7 +134,7 @@ QMAKE_TARGET_COPYRIGHT = Copyright (C) 2019 Authors of mne-cpp. All rights reser
 # Default flags
 MNECPP_CONFIG += dispOpenGL
 
-# At least version 5.2.1
+# Minimal version needs at least qt version 5.2.1
 !minQtVersion(5, 2, 1) {
     message("Cannot build MNE-CPP with Qt version $${QT_VERSION}.")
     error("Use at least Qt 5.2.1. Please note that you may only be able to build the minimal MNE-CPP version.")

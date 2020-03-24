@@ -111,6 +111,7 @@ int main(int argc, char *argv[])
 
     qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QApplication app(argc, argv);
+    //app.setAttribute(Qt::AA_DontCreateNativeWidgetSiblings, true);
 
     //Store application info to use QSettings
     QApplication::setOrganizationName("MNE-CPP");

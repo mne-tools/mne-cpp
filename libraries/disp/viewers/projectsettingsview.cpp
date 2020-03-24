@@ -152,9 +152,16 @@ void ProjectSettingsView::setRecordingElapsedTime(int mSecsElapsed)
 
     QTime passedTime(0,0,0,0);
 
+    // If we are below 1 sec in difference and near to finish set to recording time specified by the user
+    // This overcomes the problem that the counter is not counted to the user specified recording time
+    // but showing the time right before finish.
+    if(m_iRecordingTime-mSecsElapsed < 500) {
+        mSecsElapsed = m_iRecordingTime;
+    }
+
     QTime passedTimeFinal = passedTime.addMSecs(mSecsElapsed);
 
-    ui->m_label_timePassed->setText(passedTimeFinal.toString());
+    ui->m_label_timePassed->setText(passedTimeFinal.toString("HH:mm:ss"));
 }
 
 //=============================================================================================================

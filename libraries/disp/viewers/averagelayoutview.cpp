@@ -102,6 +102,17 @@ AverageLayoutView::AverageLayoutView(QWidget *parent,
 
 //=============================================================================================================
 
+void AverageLayoutView::updateOpenGLViewport()
+{
+#if defined(USE_OPENGL)
+    if(m_pAverageLayoutView) {
+        m_pAverageLayoutView->setViewport(new QOpenGLWidget);
+    }
+#endif
+}
+
+//=============================================================================================================
+
 void AverageLayoutView::setChannelInfoModel(QSharedPointer<ChannelInfoModel> &pChannelInfoModel)
 {
     m_pChannelInfoModel = pChannelInfoModel;
