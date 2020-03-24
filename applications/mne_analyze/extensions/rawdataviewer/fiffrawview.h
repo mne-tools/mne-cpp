@@ -194,7 +194,7 @@ private:
 
     qint32                                              m_iT;                           /**< Display window size in seconds */
 
-    QPoint                                              lastClickedPoint;
+    int                                              lastClickedPoint;
 signals:
     void tableViewDataWidthChanged(int iWidth);
 };
