@@ -167,6 +167,8 @@ int main(int argc, char *argv[])
     QString sHPIResourceDir = QCoreApplication::applicationDirPath() + "/HPIFittingDebug";
     bool bDoDebug = false;
 
+    HPIFit HPI = HPIFit(pFiffInfo);
+
     // ordering of frequencies
     from = first + vTime(0)*pFiffInfo->sfreq;
     to = from + iQuantum;
@@ -179,14 +181,14 @@ int main(int argc, char *argv[])
     // order frequencies
     qInfo() << "Find Order...";
     timer.start();
-    HPIFit::findOrder(mData,
-                   mProjectors,
-                   pFiffInfo->dev_head_t,
-                   vFreqs,
-                   vError,
-                   vGoF,
-                   fittedPointSet,
-                   pFiffInfo);
+    HPI.findOrder(mData,
+                  mProjectors,
+                  pFiffInfo->dev_head_t,
+                  vFreqs,
+                  vError,
+                  vGoF,
+                  fittedPointSet,
+                  pFiffInfo);
     qInfo() << "Ordered Frequencies: ";
     qInfo() << "findOrder() took" << timer.elapsed() << "milliseconds";
     qInfo() << "[done]";
@@ -210,16 +212,16 @@ int main(int argc, char *argv[])
 
         qInfo() << "HPI-Fit...";
         timer.start();
-        HPIFit::fitHPI(mData,
-                       mProjectors,
-                       pFiffInfo->dev_head_t,
-                       vFreqs,
-                       vError,
-                       vGoF,
-                       fittedPointSet,
-                       pFiffInfo,
-                       bDoDebug,
-                       sHPIResourceDir);
+        HPI.fitHPI(mData,
+                   mProjectors,
+                   pFiffInfo->dev_head_t,
+                   vFreqs,
+                   vError,
+                   vGoF,
+                   fittedPointSet,
+                   pFiffInfo,
+                   bDoDebug,
+                   sHPIResourceDir);
         fTimer = timer.elapsed();
         qInfo() << "The HPI-Fit took" << fTimer << "milliseconds";
         qInfo() << "[done]";
@@ -232,5 +234,5 @@ int main(int argc, char *argv[])
             qInfo() << "dev_head_t has been updated.";
         }
     }
-    IOUtils::write_eigen_matrix(mPosition, QCoreApplication::applicationDirPath() + "/MNE-sample-data/chpi/pos/pos_01_Faster_Home.txt");
+    IOUtils::write_eigen_matrix(mPosition, QCoreApplication::applicationDirPath() + "/MNE-sample-data/chpi/pos/pos_01_Faster_MEG.txt");
 }
