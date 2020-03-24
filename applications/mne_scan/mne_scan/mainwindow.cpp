@@ -470,8 +470,9 @@ void MainWindow::createToolBars()
     //Plugin
     if(!m_pDynamicPluginToolBar) {
         m_pDynamicPluginToolBar = addToolBar(tr("Plugin Control"));
-        m_pDynamicPluginToolBar->addAction(m_pActionQuickControl);
     }
+
+    m_pDynamicPluginToolBar->addAction(m_pActionQuickControl);
 
     if(m_qListDynamicPluginActions.size() > 0) {
         for(qint32 i = 0; i < m_qListDynamicPluginActions.size(); ++i) {
@@ -479,11 +480,11 @@ void MainWindow::createToolBars()
         }
     }
 
-//    if(m_qListDynamicDisplayActions.size() > 0) {
-//        for(qint32 i = 0; i < m_qListDynamicDisplayActions.size(); ++i) {
-//            m_pDynamicPluginToolBar->addAction(m_qListDynamicDisplayActions[i]);
-//        }
-//    }
+    if(m_qListDynamicDisplayActions.size() > 0) {
+        for(qint32 i = 0; i < m_qListDynamicDisplayActions.size(); ++i) {
+            m_pDynamicPluginToolBar->addAction(m_qListDynamicDisplayActions[i]);
+        }
+    }
 }
 
 //=============================================================================================================
@@ -568,9 +569,6 @@ void MainWindow::initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::IPlugin> 
 {
     for(int i = 0; i < lPlugins.size(); ++i) {
         if(!lPlugins.at(i).isNull()) {
-            m_qListDynamicPluginActions.clear();
-            m_qListDynamicDisplayActions.clear();
-
             // Add Dynamic Plugin Actions
             m_qListDynamicPluginActions.append(lPlugins.at(i)->getPluginActions());
 
@@ -614,25 +612,25 @@ void MainWindow::initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::IPlugin> 
                        lPlugins.at(i)->getName() == "LSL Adapter"||
                        lPlugins.at(i)->getName() == "TMSI"||
                        lPlugins.at(i)->getName() == "BrainAMP") {
-                        pMultiViewWinow = m_pRunWidget->addWidgetBottom(pWidget, sCurPluginName);
+                        pMultiViewWinow = m_pMultiView->addWidgetBottom(pWidget, sCurPluginName);
                     } else {
-                        pMultiViewWinow = m_pRunWidget->addWidgetTop(pWidget, sCurPluginName);
+                        pMultiViewWinow = m_pMultiView->addWidgetTop(pWidget, sCurPluginName);
                     }
 
                     // Add Toggle Action to list so we can add to the View Menu
                     m_qListDynamicDisplayMenuActions.append(pMultiViewWinow->toggleViewAction());
                 }
 
-                m_pRunWidget->show();
+                m_pMultiView->show();
             }
 
-            this->createToolBars();
         } else {
             QWidget* pWidget = new QWidget;
             setCentralWidget(pWidget);
         }
     }
 
+    createToolBars();
     createMenus();
 }
 
@@ -722,18 +720,18 @@ void MainWindow::startMeasurement()
         return;
     }
 
-    m_pActionQuickControl->setVisible(true);
-
     m_pPluginGui->uiSetupRunningState(true);
     uiSetupRunningState(true);
     startTimer(m_iTimeoutMSec);
 
-    delete m_pRunWidget;
-    m_pRunWidget = new MultiView();
-    connect(m_pRunWidget.data(), &MultiView::dockLocationChanged,
+    delete m_pMultiView;
+    m_pMultiView = new MultiView();
+    connect(m_pMultiView.data(), &MultiView::dockLocationChanged,
             this, &MainWindow::onDockLocationChanged);
-    setCentralWidget(m_pRunWidget);
+    setCentralWidget(m_pMultiView);
 
+    m_pActionQuickControl->setVisible(true);
+    //m_pDynamicPluginToolBar->addAction(m_pActionQuickControl);
     initMultiViewWidget(m_pPluginSceneManager->getPlugins());
 }
 
@@ -743,15 +741,18 @@ void MainWindow::stopMeasurement()
 {
     writeToLog(tr("Stopping real-time measurement..."), _LogKndMessage, _LogLvMin);
 
+    //Stop all plugins
     m_pPluginSceneManager->stopPlugins();
     m_pDisplayManager->clean();
 
+    // Hide and clear QuickControlView
     m_pActionQuickControl->setVisible(false);
-    m_pQuickControlView->setVisible(false);
     m_pQuickControlView->clear();
 
+    // Clear dynamic toolbar holding plugin, dsiplay and the QuickControlView actions
     m_qListDynamicDisplayActions.clear();
-    m_qListDynamicDisplayMenuActions.clear();
+    m_qListDynamicDisplayMenuActions.clear();    
+    m_qListDynamicPluginActions.clear();
     m_pDynamicPluginToolBar->clear();
 
     m_pPluginGui->uiSetupRunningState(false);
