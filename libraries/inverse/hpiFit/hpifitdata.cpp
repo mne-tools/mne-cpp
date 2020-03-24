@@ -44,6 +44,9 @@
 
 #include <algorithm>
 
+#include <iostream>
+#include <fstream>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -53,7 +56,7 @@
 //=============================================================================================================
 
 #include <qmath.h>
-
+#include <QDebug>
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -232,7 +235,7 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& pos,
 
     //tolx = tolf = 1e-4;
     // Seok
-    tolx = tolf = 1e-9;
+    tolx = tolf = 1e-7;
 
     switch(display) {
         case 0:
@@ -342,9 +345,18 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& pos,
 
         temp2 = tempX2.maxCoeff();
 
+        std::ofstream f_temp1("/autofs/cluster/fusion/rd454/git/mne-cpp/bin/MNE-sample-data/chpi/pos/temp1.txt", std::ios_base::app | std::ios_base::out);
+        f_temp1 << temp1;
+        std::ofstream f_temp2("/autofs/cluster/fusion/rd454/git/mne-cpp/bin/MNE-sample-data/chpi/pos/temp2.txt", std::ios_base::app | std::ios_base::out);
+        f_temp2 << temp2 << ",";
+
         if((temp1 <= tolf) && (temp2 <= tolx)) {
+            f_temp1 << "\n";
+            f_temp2 << "\n";
             break;
         }
+        f_temp1 << ",";
+        f_temp2 << ",";
 
         xbar = v.block(0,0,n,n).rowwise().sum();
         xbar /= n;
@@ -352,7 +364,7 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& pos,
         xr = (1+rho) * xbar - rho * v.block(0,n,v.rows(),1);
 
         x = xr.transpose();
-        //std::cout << "Iteration Count: " << itercount << ":" << x << std::endl;
+        // std::cout << "Iteration Count: " << itercount << ":" << x << std::endl;
 
         fxr = dipfitError(x, data, sensorSet, matProjectors);
 
@@ -452,6 +464,9 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& pos,
 
     // Seok
     simplex_numitr = itercount;
+
+    std::ofstream result("/autofs/cluster/fusion/rd454/git/mne-cpp/bin/MNE-sample-data/chpi/pos/iter.txt", std::ios_base::app | std::ios_base::out);
+    result << itercount << "\n";
 
     return x;
 }
