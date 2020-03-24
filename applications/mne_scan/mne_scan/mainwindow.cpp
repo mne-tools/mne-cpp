@@ -45,6 +45,7 @@
 
 #include <scDisp/measurementwidget.h>
 #include <scDisp/realtimemultisamplearraywidget.h>
+#include <scDisp/realtimeevokedsetwidget.h>
 
 #include <disp/viewers/multiview.h>
 #include <disp/viewers/multiviewwindow.h>
@@ -575,7 +576,7 @@ void MainWindow::initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::IPlugin> 
 
             QString sCurPluginName = lPlugins.at(i)->getName();
 
-            // Check for plugin's which share the 3D View
+            // Check for plugins which share the 3D View
             if(sCurPluginName == "HPI Fitting" ||
                sCurPluginName == "Source Localization" ||
                sCurPluginName == "Connectivity"){
@@ -598,7 +599,10 @@ void MainWindow::initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::IPlugin> 
                         }
                     }
 
-                    // Sensor plugins are always displayed as the most lowet vertical widget in the multiview
+                    // Plugins which have a RealTimeMultiSampleArray output are always displayed as the most lowest and tabbified vertical widget in the MultiView by default
+                    // Please note that the MultiView will take ownership of the MultiViewWindow which inherits from QWidget
+                    MultiViewWindow* pMultiViewWinow = Q_NULLPTR;
+
                     if(lPlugins.at(i)->getName() == "Filter" ||
                        lPlugins.at(i)->getName() == "Fiff Simulator" ||
                        lPlugins.at(i)->getName() == "FtBuffer" ||
@@ -610,12 +614,13 @@ void MainWindow::initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::IPlugin> 
                        lPlugins.at(i)->getName() == "LSL Adapter"||
                        lPlugins.at(i)->getName() == "TMSI"||
                        lPlugins.at(i)->getName() == "BrainAMP") {
-                        m_qListDynamicDisplayMenuActions.append(m_pRunWidget->addWidgetBottom(pWidget,
-                                                                                         sCurPluginName)->toggleViewAction());
+                        pMultiViewWinow = m_pRunWidget->addWidgetBottom(pWidget, sCurPluginName);
                     } else {
-                        m_qListDynamicDisplayMenuActions.append(m_pRunWidget->addWidgetTop(pWidget,
-                                                                                         sCurPluginName)->toggleViewAction());
+                        pMultiViewWinow = m_pRunWidget->addWidgetTop(pWidget, sCurPluginName);
                     }
+
+                    // Add Toggle Action to list so we can add to the View Menu
+                    m_qListDynamicDisplayMenuActions.append(pMultiViewWinow->toggleViewAction());
                 }
 
                 m_pRunWidget->show();
@@ -633,10 +638,31 @@ void MainWindow::initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::IPlugin> 
 
 //=============================================================================================================
 
+void MainWindow::onDockLocationChanged(QWidget* pWidget)
+{
+    // Everytime a dock widget in the MultiView changes its floating state we need to update its OpenGL viewport
+    if(QVBoxLayout* vBoxLayout = qobject_cast<QVBoxLayout*>(pWidget->layout())) {
+        for(int i = 0; i < vBoxLayout->count(); ++i) {
+            if(QWidget *widget = pWidget->layout()->itemAt(i)->widget()) {
+                if(RealTimeMultiSampleArrayWidget* pView = qobject_cast<RealTimeMultiSampleArrayWidget*>(widget)) {
+                    pView->updateOpenGLViewport();
+                } else if(RealTimeEvokedSetWidget* pView = qobject_cast<RealTimeEvokedSetWidget*>(widget)) {
+                    pView->updateOpenGLViewport();
+                }
+            }
+        }
+    } else if(RealTimeMultiSampleArrayWidget* pView = qobject_cast<RealTimeMultiSampleArrayWidget*>(pWidget)) {
+        pView->updateOpenGLViewport();
+    } else if(RealTimeEvokedSetWidget* pView = qobject_cast<RealTimeEvokedSetWidget*>(pWidget)) {
+        pView->updateOpenGLViewport();
+    }
+}
+
+//=============================================================================================================
+
 void MainWindow::onPluginControlWidgetsChanged(QList<QWidget*>& lControlWidgets,
                                                const QString& sPluginName)
 {
-    qDebug() << "MainWindow::onPluginControlWidgetsChanged" << sPluginName;
     if(m_pQuickControlView) {
         m_pQuickControlView->addWidgets(lControlWidgets, sPluginName);
     }
@@ -669,7 +695,7 @@ void MainWindow::writeToLog(const QString& logMsg,
     if(lglvl<=m_eLogLevelCurrent) {
         if(lgknd == _LogKndError) {
             m_pTextBrowser_Log->insertHtml("<font color=red><b>Error:</b> "+logMsg+"</font>");
-        } else if(lgknd == _LogKndWarning)  {
+        } else if(lgknd == _LogKndWarning) {
             m_pTextBrowser_Log->insertHtml("<font color=blue><b>Warning:</b> "+logMsg+"</font>");
         } else {
             m_pTextBrowser_Log->insertHtml(logMsg);
@@ -704,9 +730,9 @@ void MainWindow::startMeasurement()
 
     delete m_pRunWidget;
     m_pRunWidget = new MultiView();
+    connect(m_pRunWidget.data(), &MultiView::dockLocationChanged,
+            this, &MainWindow::onDockLocationChanged);
     setCentralWidget(m_pRunWidget);
-
-    m_qListDynamicDisplayMenuActions.clear();
 
     initMultiViewWidget(m_pPluginSceneManager->getPlugins());
 }
@@ -724,19 +750,15 @@ void MainWindow::stopMeasurement()
     m_pQuickControlView->setVisible(false);
     m_pQuickControlView->clear();
 
+    m_qListDynamicDisplayActions.clear();
+    m_qListDynamicDisplayMenuActions.clear();
+    m_pDynamicPluginToolBar->clear();
+
     m_pPluginGui->uiSetupRunningState(false);
     uiSetupRunningState(false);
     stopTimer();
 
     updatePluginSetupWidget(m_pPluginGui->getCurrentPlugin());
-
-//    PluginManager::stopPlugins();
-
-//    Connector::disconnectMeasurementWidgets(m_pListCurrentDisplayPlugins);//was before stopPlugins();
-
-//    qDebug() << "set stopped UI";
-
-//    m_pPluginDockWidget->setTogglingEnabled(true);
 }
 
 //=============================================================================================================

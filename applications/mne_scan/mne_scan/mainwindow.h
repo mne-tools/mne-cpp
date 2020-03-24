@@ -222,6 +222,8 @@ private:
      */
     void initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::IPlugin> > lPlugins);
 
+    void onDockLocationChanged(QWidget* pWidget);
+
     //=========================================================================================================
     /**
      * Adds plugin control widgets to the QuickControlView.
@@ -349,7 +351,7 @@ private:
 
     QPointer<StartUpWidget>             m_pStartUpWidget;               /**< holds the StartUpWidget.*/
 
-    QPointer<DISPLIB::MultiView>        m_pRunWidget;                   /**< The run widget */
+    QPointer<DISPLIB::MultiView>        m_pMultiView;                   /**< The multi view widget, which is set as central widget as soon as the measurement starts. */
 
     LogLevel                            m_eLogLevelCurrent;             /**< Holds the current log level.*/
 

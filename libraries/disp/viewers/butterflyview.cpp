@@ -88,6 +88,16 @@ ButterflyView::ButterflyView(QWidget *parent, Qt::WindowFlags f)
 
 //=============================================================================================================
 
+void ButterflyView::updateOpenGLViewport()
+{
+#if defined(USE_OPENGL)
+    // Activate anti aliasing
+    initializeGL();
+#endif
+}
+
+//=============================================================================================================
+
 void ButterflyView::setEvokedSetModel(QSharedPointer<EvokedSetModel> model)
 {
     m_pEvokedSetModel = model;
