@@ -470,7 +470,7 @@ CoilParam HPIFit::dipfit(struct CoilParam coil,
             coil.dpfiterror(i) = lCoilData.at(i).errorInfo.error;
             coil.dpfitnumitr(i) = lCoilData.at(i).errorInfo.numIterations;
 
-            //std::cout<<std::endl<< "HPIFit::dipfit - Itr steps for coil " << i << " =" <<coil.dpfitnumitr(i);
+            // std::cout<<std::endl<< "HPIFit::dipfit - Itr steps for coil " << i << " =" <<coil.dpfitnumitr(i);
         }
     }
 

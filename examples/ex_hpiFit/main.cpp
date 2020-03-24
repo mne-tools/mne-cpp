@@ -234,5 +234,5 @@ int main(int argc, char *argv[])
             qInfo() << "dev_head_t has been updated.";
         }
     }
-    IOUtils::write_eigen_matrix(mPosition, QCoreApplication::applicationDirPath() + "/MNE-sample-data/chpi/pos/pos_01_Faster_MEG.txt");
+    // IOUtils::write_eigen_matrix(mPosition, QCoreApplication::applicationDirPath() + "/MNE-sample-data/chpi/pos/pos_03_Faster_MEG.txt");
 }
