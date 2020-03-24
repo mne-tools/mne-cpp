@@ -85,6 +85,7 @@ HPIFit::HPIFit(FiffInfo::SPtr pFiffInfo)
 {
     // init channel list and sensorSet
     m_channels = QList<FIFFLIB::FiffChInfo>();
+    m_innerind = QVector<int>();
     m_sensorSet = QList<Sensor>();
 
     // Get the indices of inner layer channels and exclude bad channels and create channellist
