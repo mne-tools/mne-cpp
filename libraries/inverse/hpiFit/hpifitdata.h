@@ -84,18 +84,7 @@ struct DipFitError {
     int numIterations;
 };
 
-//=========================================================================================================
-/**
- * The strucut specifing the sensor parameters.
- */
-struct Sensor {
-    Eigen::RowVector3d r0;
-    Eigen::MatrixXd rmag;
-    Eigen::MatrixXd cosmag;
-    Eigen::MatrixXd tra;
-    Eigen::RowVectorXd w;
-    int np;
-};
+
 
 //=========================================================================================================
 /**
@@ -128,6 +117,19 @@ public:
      * Default constructor.
      */
     explicit HPIFitData();
+
+    //=========================================================================================================
+    /**
+     * The strucut specifing the sensor parameters.
+     */
+    struct Sensor {
+        Eigen::RowVector3d r0;
+        Eigen::MatrixXd rmag;
+        Eigen::MatrixXd cosmag;
+        Eigen::MatrixXd tra;
+        Eigen::RowVectorXd w;
+        int np;
+    };
 
     //=========================================================================================================
     /**

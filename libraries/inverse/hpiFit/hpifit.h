@@ -42,6 +42,7 @@
 //=============================================================================================================
 
 #include "../inverse_global.h"
+#include "hpifitdata.h"
 
 #include <fiff/fiff_dig_point_set.h>
 #include <fiff/fiff_dig_point.h>
@@ -191,11 +192,11 @@ public:
      *
      * ToDo: get estimated movement velocity and stroe it in channel 9
      */
-    void storeHeadPosition(float time,
-                           const Eigen::MatrixXf& devHeadT,
-                           Eigen::MatrixXd& position,
-                           const Eigen::VectorXd& vGoF,
-                           const QVector<double>& vError);
+    static void storeHeadPosition(float time,
+                                  const Eigen::MatrixXf& devHeadT,
+                                  Eigen::MatrixXd& position,
+                                  const Eigen::VectorXd& vGoF,
+                                  const QVector<double>& vError);
 protected:
     //=========================================================================================================
     /**
@@ -210,7 +211,7 @@ protected:
      * @return Returns the coil parameters.
      */
     CoilParam dipfit(struct CoilParam coil,
-                     const QList<struct Sensor>& sensorSet,
+                     const QList<HPIFitData::Sensor>& sensorSet,
                      const Eigen::MatrixXd &data,
                      int numCoils,
                      const Eigen::MatrixXd &t_matProjectors);
@@ -236,13 +237,12 @@ protected:
      * @param[in] coils     The coilset to read the sensor information from.
      *
      */
-    static void createSensorSet(QList<struct Sensor>& sensors,
-                                FWDLIB::FwdCoilSet* coils);
+    void createSensorSet(QList<HPIFitData::Sensor>& sensors, FWDLIB::FwdCoilSet* coils);
 
     //=========================================================================================================
 
     QList<FIFFLIB::FiffChInfo>   m_channels;             /**< Channellist */
-    QList<struct Sensor>         m_sensorSet;            /**< sensorSet */
+    QList<HPIFitData::Sensor>    m_sensorSet;            /**< sensorSet */
     QVector<int>                 m_innerind;             /**< innerind  */
     QString                      m_sHPIResourceDir;      /**< Hold the resource folder to store the debug information in. */
 };
