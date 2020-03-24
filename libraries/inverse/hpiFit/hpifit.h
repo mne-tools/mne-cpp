@@ -144,16 +144,16 @@ public:
      * @param[in]    bDoDebug        Print debug info to cmd line and write debug info to file.
      * @param[in]    sHPIResourceDir The path to the debug file which is to be written.
      */
-    static void fitHPI(const Eigen::MatrixXd& t_mat,
-                       const Eigen::MatrixXd& t_matProjectors,
-                       FIFFLIB::FiffCoordTrans &transDevHead,
-                       const QVector<int>& vFreqs,
-                       QVector<double> &vError,
-                       Eigen::VectorXd& vGoF,
-                       FIFFLIB::FiffDigPointSet& fittedPointSet,
-                       QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
-                       bool bDoDebug = false,
-                       const QString& sHPIResourceDir = QString("./HPIFittingDebug"));
+    void fitHPI(const Eigen::MatrixXd& t_mat,
+                const Eigen::MatrixXd& t_matProjectors,
+                FIFFLIB::FiffCoordTrans &transDevHead,
+                const QVector<int>& vFreqs,
+                QVector<double> &vError,
+                Eigen::VectorXd& vGoF,
+                FIFFLIB::FiffDigPointSet& fittedPointSet,
+                QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
+                bool bDoDebug = false,
+                const QString& sHPIResourceDir = QString("./HPIFittingDebug"));
 
     //=========================================================================================================
     /**
@@ -169,14 +169,14 @@ public:
      * @param[in]    fittedPointSet  The final fitted positions in form of a digitizer set.
      * @param[in]    p_pFiffInfo     Associated Fiff Information.
      */
-    static void findOrder(const Eigen::MatrixXd& t_mat,
-                          const Eigen::MatrixXd& t_matProjectors,
-                          FIFFLIB::FiffCoordTrans &transDevHead,
-                          QVector<int>& vFreqs,
-                          QVector<double> &vError,
-                          Eigen::VectorXd& vGoF,
-                          FIFFLIB::FiffDigPointSet& fittedPointSet,
-                          QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
+    void findOrder(const Eigen::MatrixXd& t_mat,
+                   const Eigen::MatrixXd& t_matProjectors,
+                   FIFFLIB::FiffCoordTrans &transDevHead,
+                   QVector<int>& vFreqs,
+                   QVector<double> &vError,
+                   Eigen::VectorXd& vGoF,
+                   FIFFLIB::FiffDigPointSet& fittedPointSet,
+                   QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
     //=========================================================================================================
     /**
@@ -191,11 +191,11 @@ public:
      *
      * ToDo: get estimated movement velocity and stroe it in channel 9
      */
-    static void storeHeadPosition(float time,
-                                  const Eigen::MatrixXf& devHeadT,
-                                  Eigen::MatrixXd& position,
-                                  const Eigen::VectorXd& vGoF,
-                                  const QVector<double>& vError);    
+    void storeHeadPosition(float time,
+                           const Eigen::MatrixXf& devHeadT,
+                           Eigen::MatrixXd& position,
+                           const Eigen::VectorXd& vGoF,
+                           const QVector<double>& vError);
 protected:
     //=========================================================================================================
     /**
@@ -209,11 +209,11 @@ protected:
      *
      * @return Returns the coil parameters.
      */
-    static CoilParam dipfit(struct CoilParam coil,
-                            const QList<struct Sensor>& sensorSet,
-                            const Eigen::MatrixXd &data,
-                            int numCoils,
-                            const Eigen::MatrixXd &t_matProjectors);
+    CoilParam dipfit(struct CoilParam coil,
+                     const QList<struct Sensor>& sensorSet,
+                     const Eigen::MatrixXd &data,
+                     int numCoils,
+                     const Eigen::MatrixXd &t_matProjectors);
 
     //=========================================================================================================
     /**
@@ -241,10 +241,10 @@ protected:
 
     //=========================================================================================================
 
-    static QList<FIFFLIB::FiffChInfo>   m_channels;             /**< Channellist */
-    static QList<Sensor>                m_sensorSet;            /**< sensorSet */
-    static QVector<int>                 m_innerind;             /**< innerind  */
-    static QString                      m_sHPIResourceDir;      /**< Hold the resource folder to store the debug information in. */
+    QList<FIFFLIB::FiffChInfo>   m_channels;             /**< Channellist */
+    QList<struct Sensor>         m_sensorSet;            /**< sensorSet */
+    QVector<int>                 m_innerind;             /**< innerind  */
+    QString                      m_sHPIResourceDir;      /**< Hold the resource folder to store the debug information in. */
 };
 
 //=============================================================================================================
