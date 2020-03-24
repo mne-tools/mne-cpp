@@ -702,12 +702,20 @@ void FiffRawViewModel::updateDisplayData()
 void FiffRawViewModel::newTimeMark(const int& xpos)
 {
     qDebug() << "First held:" << m_iFiffCursorBegin;
-    timeMarkList.append(3680.0);
+    qDebug() << "DX" << m_dDx;
+    timeMarkList.append(35.0);
 }
 
 //=============================================================================================================
 
-QList<float> FiffRawViewModel::getTimeMarks() const
+float FiffRawViewModel::getTimeMarks(int index) const
 {
-    return timeMarkList;
+    return timeMarkList.at(index);
+}
+
+//=============================================================================================================
+
+int FiffRawViewModel::getTimeListSize() const
+{
+    return timeMarkList.size();
 }

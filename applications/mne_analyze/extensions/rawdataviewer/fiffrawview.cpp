@@ -304,13 +304,18 @@ void FiffRawView::customContextMenuRequested(const QPoint &pos)
 
     menu->popup(m_pTableView->viewport()->mapToGlobal(pos));
 
-    qDebug() << "POS:" << pos;
-    lastClickedPoint = pos;
+    qDebug() << "POS:" << pos.x();
+
+    lastClickedPoint = pos.x() + m_pTableView->horizontalScrollBar()->value();
 }
 
 //=============================================================================================================
 
 void FiffRawView::addTimeMark(bool con)
 {
-    m_pModel->newTimeMark(lastClickedPoint.x());
+    qDebug() << "Table Geometry x:" << m_pTableView->geometry().x();
+    qDebug() << "Table Geometry y:" << m_pTableView->geometry().y();
+    qDebug() << "Table Horizontal Bar:" << m_pTableView->horizontalScrollBar()->value();
+
+    m_pModel->newTimeMark(lastClickedPoint);
 }
