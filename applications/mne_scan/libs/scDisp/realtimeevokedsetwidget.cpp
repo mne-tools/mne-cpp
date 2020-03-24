@@ -100,13 +100,11 @@ RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<QTime> &pTime,
 {
     Q_UNUSED(pTime)
 
-    m_pActionSelectSensors = new QAction(QIcon(":/images/selectSensors.png"), tr("Show the region selection widget (F11)"),this);
-    m_pActionSelectSensors->setShortcut(tr("F11"));
-    m_pActionSelectSensors->setStatusTip(tr("Show the region selection widget (F11)"));
+    m_pActionSelectSensors = new QAction(QIcon(":/images/selectSensors.png"), tr("Show the channel selection window"),this);
+    m_pActionSelectSensors->setStatusTip(tr("Show the channel selection view"));
     connect(m_pActionSelectSensors.data(), &QAction::triggered,
             this, &RealTimeEvokedSetWidget::showSensorSelectionWidget);
     addDisplayAction(m_pActionSelectSensors);
-    m_pActionSelectSensors->setVisible(false);
 
     //Create GUI
     m_pRTESetLayout = new QVBoxLayout(this);
@@ -214,7 +212,6 @@ void RealTimeEvokedSetWidget::init()
         m_pRTESetLayout->removeWidget(m_pLabelInit);
         m_pLabelInit->hide();
         m_pToolBox->show();
-        m_pActionSelectSensors->setVisible(true);
 
         // Choose current view toolbox index - butterfly or 2D layout
         m_pToolBox->setCurrentIndex(settings.value(QString("RTESW/%1/selectedView").arg(t_sRTESName), 0).toInt());
@@ -234,6 +231,7 @@ void RealTimeEvokedSetWidget::init()
                                                                                this,
                                                                                m_pChannelInfoModel,
                                                                                Qt::Window);
+        m_pChannelSelectionView->setWindowTitle(tr(QString("%1: Channel Selection Window").arg(t_sRTESName).toUtf8()));
 
         connect(m_pChannelSelectionView.data(), &ChannelSelectionView::loadedLayoutMap,
                 m_pChannelInfoModel.data(), &ChannelInfoModel::layoutChanged);

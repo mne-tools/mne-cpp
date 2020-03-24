@@ -94,8 +94,6 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
     QWidget* newDisp = new QWidget;
     QVBoxLayout* vboxLayout = new QVBoxLayout;
 
-    qListActions.clear();
-
     foreach (QSharedPointer< PluginOutputConnector > pPluginOutputConnector, outputConnectorList) {
         if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeMultiSampleArray> >()) {
             RealTimeMultiSampleArrayWidget* rtmsaWidget = new RealTimeMultiSampleArrayWidget(pT, newDisp);
