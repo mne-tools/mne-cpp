@@ -402,6 +402,18 @@ void RealTimeEvokedSetWidget::init()
 
 //=============================================================================================================
 
+void RealTimeEvokedSetWidget::updateOpenGLViewport()
+{
+    if(m_pAverageLayoutView) {
+        m_pAverageLayoutView->updateOpenGLViewport();
+    }
+    if(m_pButterflyView) {
+        m_pButterflyView->updateOpenGLViewport();
+    }
+}
+
+//=============================================================================================================
+
 void RealTimeEvokedSetWidget::showSensorSelectionWidget()
 {
     if(!m_pChannelSelectionView) {

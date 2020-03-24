@@ -100,6 +100,13 @@ public:
 
     //=========================================================================================================
     /**
+     * Update the OpenGL viewport. This, e.g., necessary if this widget was set to a QDockWidget which changes
+     * its floating state.
+     */
+    void updateOpenGLViewport();
+
+    //=========================================================================================================
+    /**
      * Sets the channel info model.
      *
      * @param [in] pChannelInfoModel     The new channel info model.

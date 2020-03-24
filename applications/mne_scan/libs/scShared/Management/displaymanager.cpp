@@ -93,7 +93,6 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
 {
     QWidget* newDisp = new QWidget;
     QVBoxLayout* vboxLayout = new QVBoxLayout;
-    QHBoxLayout* hboxLayout = new QHBoxLayout;
 
     qListActions.clear();
 
@@ -188,26 +187,10 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
         }
     }
 
-//    // Add all widgets but NumericWidgets to layout and display them
-//    foreach(MeasurementWidget* pMSRW, s_hashMeasurementWidgets.values())
-//    {
-//        if(dynamic_cast<NumericWidget*>(pMSRW))
-//            continue;
-//        vboxLayout->addWidget(pMSRW);
-//        pMSRW->show();
-//    }
-
-//    foreach(NumericWidget* pNUMW, s_hashNumericWidgets.values())
-//    {
-//        hboxLayout->addWidget(pNUMW);
-//        pNUMW->show();
-//    }
-
-    vboxLayout->addLayout(hboxLayout);
     newDisp->setLayout(vboxLayout);
 
     // If no display was attached return NULL pointer
-    if(vboxLayout->count() <= 1) {
+    if(vboxLayout->count() == 0) {
         delete newDisp;
         newDisp = Q_NULLPTR;
     }

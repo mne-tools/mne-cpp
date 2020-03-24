@@ -37,12 +37,16 @@
 
 #include "multiview.h"
 #include "multiviewwindow.h"
+#include "rtfiffrawview.h"
+#include "averagelayoutview.h"
+#include "butterflyview.h"
 
 //=============================================================================================================
 // Qt INCLUDES
 //=============================================================================================================
 
 #include <QHBoxLayout>
+#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -83,6 +87,10 @@ MultiViewWindow* MultiView::addWidgetTop(QWidget* pWidget,
 
     this->addDockWidget(Qt::DockWidgetArea::TopDockWidgetArea, pDockWidget);
 
+    connect(pDockWidget, &MultiViewWindow::dockLocationChanged, [=]() {
+        emit dockLocationChanged(pWidget);
+    });
+
     return pDockWidget;
 }
 
@@ -106,6 +114,10 @@ MultiViewWindow* MultiView::addWidgetBottom(QWidget* pWidget,
     }
 
     m_lDockWidgets.append(pDockWidget);
+
+    connect(pDockWidget, &MultiViewWindow::dockLocationChanged, [=]() {
+        emit dockLocationChanged(pWidget);
+    });
 
     return pDockWidget;
 }

@@ -118,6 +118,8 @@ public:
 private:
     QList<MultiViewWindow *> m_lDockWidgets;
 
+signals:
+    void dockLocationChanged(QWidget* pWidget);
 };
 
 }// NAMESPACE
