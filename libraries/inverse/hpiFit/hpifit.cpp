@@ -86,7 +86,7 @@ HPIFit::HPIFit(FiffInfo::SPtr pFiffInfo)
     // init channel list and sensorSet
     m_channels = QList<FIFFLIB::FiffChInfo>();
     m_innerind = QVector<int>();
-    m_sensorSet = QList<Sensor>();
+    m_sensorSet = QList<HPIFitData::Sensor>();
 
     // Get the indices of inner layer channels and exclude bad channels and create channellist
     int numCh = pFiffInfo->nchan;
@@ -433,7 +433,7 @@ void HPIFit::findOrder(const MatrixXd& t_mat,
 //=============================================================================================================
 
 CoilParam HPIFit::dipfit(struct CoilParam coil,
-                         const QList<Sensor>& sensorSet,
+                         const QList<HPIFitData::Sensor>& sensorSet,
                          const MatrixXd& data,
                          int numCoils,
                          const MatrixXd& t_matProjectors)
@@ -547,11 +547,11 @@ Eigen::Matrix4d HPIFit::computeTransformation(Eigen::MatrixXd NH, MatrixXd BT)
 
 //=============================================================================================================
 
-void HPIFit::createSensorSet(QList<struct Sensor>& sensors, FwdCoilSet* coils)
+void HPIFit::createSensorSet(QList<HPIFitData::Sensor>& sensors, FwdCoilSet* coils)
 {
     int nchan = coils->ncoil;
     for(int i = 0; i < nchan; i++){
-        Sensor s;
+        HPIFitData::Sensor s;
         FwdCoil* coil = (coils->coils[i]);
         int np = coil->np;
         MatrixXd rmag = MatrixXd::Zero(np,3);
