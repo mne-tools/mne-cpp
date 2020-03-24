@@ -363,7 +363,9 @@ public:
 
     void newTimeMark(const int& xpos);
 
-    QList<float> getTimeMarks() const;
+    float getTimeMarks(int index) const;
+
+    int getTimeListSize() const;
 
 public slots:
 
