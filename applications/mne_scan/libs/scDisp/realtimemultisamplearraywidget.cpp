@@ -88,16 +88,15 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<QT
 {
     Q_UNUSED(pTime)
 
-    m_pActionSelectSensors = new QAction(QIcon(":/images/selectSensors.png"), tr("Shows the region selection widget (F9)"),this);
-    m_pActionSelectSensors->setShortcut(tr("F9"));
-    m_pActionSelectSensors->setToolTip(tr("Shows the region selection widget (F9)"));
+    m_pActionSelectSensors = new QAction(QIcon(":/images/selectSensors.png"), tr("Show the channel selection view"),this);
+    m_pActionSelectSensors->setToolTip(tr("Show the channel selection view"));
     connect(m_pActionSelectSensors.data(), &QAction::triggered,
             this, &RealTimeMultiSampleArrayWidget::showSensorSelectionWidget);
     addDisplayAction(m_pActionSelectSensors);
     m_pActionSelectSensors->setVisible(true);
 
-    m_pActionHideBad = new QAction(QIcon(":/images/hideBad.png"), tr("Toggle all bad channels"),this);
-    m_pActionHideBad->setStatusTip(tr("Toggle all bad channels"));
+    m_pActionHideBad = new QAction(QIcon(":/images/hideBad.png"), tr("Toggle bad channel visibility"),this);
+    m_pActionHideBad->setStatusTip(tr("Toggle bad channel visibility"));
     connect(m_pActionHideBad.data(), &QAction::triggered,
             this, &RealTimeMultiSampleArrayWidget::onHideBadChannels);
     addDisplayAction(m_pActionHideBad);
@@ -172,6 +171,7 @@ void RealTimeMultiSampleArrayWidget::init()
                                                                      this,
                                                                      m_pChannelInfoModel,
                                                                      Qt::Window);
+        m_pChannelSelectionView->setWindowTitle(tr(QString("%1: Channel Selection Window").arg(sRTMSAWName).toUtf8()));
 
         connect(m_pChannelSelectionView.data(), &ChannelSelectionView::loadedLayoutMap,
                 m_pChannelInfoModel.data(), &ChannelInfoModel::layoutChanged);

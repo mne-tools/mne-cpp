@@ -194,6 +194,24 @@ void RtFiffRawView::addData(const QList<Eigen::MatrixXd> &data)
 {
     if(!data.isEmpty()) {
         m_pModel->addData(data);
+
+        if(m_qListBadChannels.size() != m_pFiffInfo->bads.size()) {
+            m_qListBadChannels.clear();
+            for(int i = 0; i<m_pModel->rowCount(); i++) {
+                if(m_pModel->data(m_pModel->index(i,2)).toBool()) {
+                    m_qListBadChannels << i;
+                }
+            }
+
+            //Hide non selected channels/rows in the data views
+            for(int i = 0; i<m_qListBadChannels.size(); i++) {
+                if(m_bHideBadChannels) {
+                    m_pTableView->hideRow(m_qListBadChannels.at(i));
+                } else {
+                    m_pTableView->showRow(m_qListBadChannels.at(i));
+                }
+            }
+        }
     } else {
         qWarning() << "[RtFiffRawView::addData] Received data list is empty.";
     }
