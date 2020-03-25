@@ -300,7 +300,6 @@ int main(int argc, char *argv[])
     }
 
     //add sensor item for EEG data
-
     //Co-Register EEG points in order to correctly map them to the scalp
     for(int i = 0; i < evoked.info.chs.size(); ++i) {
         if(evoked.info.chs.at(i).kind == FIFFV_EEG_CH) {
