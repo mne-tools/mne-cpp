@@ -129,7 +129,7 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
         updateCoils();
     }
 
-    //struct SensorInfo sensors;
+    // init coil parameters
     struct CoilParam coil;
 
     int samF = pFiffInfo->sfreq;
@@ -167,17 +167,11 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
 
     // Generate simulated data
     MatrixXd simsig(samLoc,numCoils*2);
-    VectorXd time(samLoc);
-
-    for (int i = 0; i < samLoc; ++i) {
-        time[i] = i*1.0/samF;
-    }
+    VectorXd time = VectorXd::LinSpaced(samLoc, 0, samLoc-1) *1.0/samF;
 
     for(int i = 0; i < numCoils; ++i) {
-        for(int j = 0; j < samLoc; ++j) {
-            simsig(j,i) = sin(2*M_PI*coilfreq[i]*time[j]);
-            simsig(j,i+numCoils) = cos(2*M_PI*coilfreq[i]*time[j]);
-        }
+        simsig.col(i) = sin(2*M_PI*coilfreq[i]*time.array());
+        simsig.col(i+numCoils) = cos(2*M_PI*coilfreq[i]*time.array());
     }
 
     // Create digitized HPI coil position matrix
@@ -231,15 +225,11 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
     for(int j = 0; j < numCoils; ++j) {
        float nS = 0.0;
        float nC = 0.0;
-       for(int i = 0; i < m_innerind.size(); ++i) {
-           nS += amp(i,j)*amp(i,j);
-           nC += ampC(i,j)*ampC(i,j);
-       }
+       nS = amp.col(j).array().square().sum();
+       nC = ampC.col(j).array().square().sum();
 
        if(nC > nS) {
-         for(int i = 0; i < m_innerind.size(); ++i) {
-           amp(i,j) = ampC(i,j);
-         }
+           amp.col(j) = ampC.col(j);
        }
     }
 
@@ -269,15 +259,9 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
 
     if(transDevHead.trans == MatrixXd::Identity(4,4).cast<float>() || error > 0.003){
         for (int j = 0; j < chIdcs.rows(); ++j) {
-            int chIdx = chIdcs(j);
-            if(chIdx < pFiffInfo->chs.size()) {
-                double x = pFiffInfo->chs.at(chIdcs(j)).chpos.r0[0];
-                double y = pFiffInfo->chs.at(chIdcs(j)).chpos.r0[1];
-                double z = pFiffInfo->chs.at(chIdcs(j)).chpos.r0[2];
-
-                coilPos(j,0) = -1 * pFiffInfo->chs.at(chIdcs(j)).chpos.ez[0] * 0.03 + x;
-                coilPos(j,1) = -1 * pFiffInfo->chs.at(chIdcs(j)).chpos.ez[1] * 0.03 + y;
-                coilPos(j,2) = -1 * pFiffInfo->chs.at(chIdcs(j)).chpos.ez[2] * 0.03 + z;
+            if(chIdcs(j) < pFiffInfo->chs.size()) {
+                Vector3f r0 = pFiffInfo->chs.at(chIdcs(j)).chpos.r0;
+                coilPos.row(j) = (-1 * pFiffInfo->chs.at(chIdcs(j)).chpos.ez * 0.03 + r0).cast<double>();
             }
         }
         //std::cout << "HPIFit::fitHPI - Coil " << j << " max value index " << chIdx << std::endl;
