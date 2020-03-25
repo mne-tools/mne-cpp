@@ -193,19 +193,21 @@ void RtCov::setSamples(qint32 samples)
 
 void RtCov::append(const MatrixXd &matDataSegment)
 {
-    m_lData.append(matDataSegment);
-    m_iSamples += matDataSegment.cols();
+    if(m_pFiffInfo) {
+        m_lData.append(matDataSegment);
+        m_iSamples += matDataSegment.cols();
 
-    if(m_iSamples >= m_iMaxSamples) {
-        RtCovInput inputData;
-        inputData.lData = m_lData;
-        inputData.fiffInfo = FiffInfo(*m_pFiffInfo);
-        inputData.iSamples = m_iSamples;
+        if(m_iSamples >= m_iMaxSamples) {
+            RtCovInput inputData;
+            inputData.lData = m_lData;
+            inputData.fiffInfo = FiffInfo(*m_pFiffInfo);
+            inputData.iSamples = m_iSamples;
 
-        emit operate(inputData);
+            emit operate(inputData);
 
-        m_iSamples = 0;
-        m_lData.clear();
+            m_iSamples = 0;
+            m_lData.clear();
+        }
     }
 }
 

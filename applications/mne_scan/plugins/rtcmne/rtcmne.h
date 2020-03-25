@@ -237,7 +237,6 @@ protected:
     QSharedPointer<INVERSELIB::MinimumNorm>                                                 m_pMinimumNorm;             /**< Minimum Norm Estimation. */
     QSharedPointer<RTPROCESSINGLIB::RtInvOp>                                                m_pRtInvOp;                 /**< Real-time inverse operator. */
     QSharedPointer<MNELIB::MNEForwardSolution>                                              m_pFwd;                     /**< Forward solution. */
-    QSharedPointer<MNELIB::MNEForwardSolution>                                              m_pClusteredFwd;            /**< Clustered forward solution. */
     QSharedPointer<FSLIB::AnnotationSet>                                                    m_pAnnotationSet;           /**< Annotation set. */
     QSharedPointer<FSLIB::SurfaceSet>                                                       m_pSurfaceSet;              /**< Surface set. */
     QSharedPointer<FIFFLIB::FiffInfoBase>                                                   m_pFiffInfoForward;         /**< Fiff information of the forward solution. */
@@ -253,7 +252,6 @@ protected:
     qint32                          m_iDownSample;              /**< Down sample factor. */
     qint32                          m_iTimePointSps;            /**< The time point to pick from the data in samples. */
 
-    bool                            m_bProcessData;             /**< If data should be received for processing. */
     bool                            m_bFinishedClustering;      /**< If clustered forward solution is available. */
 
     QFile                           m_qFileFwdSolution;         /**< File to forward solution. */

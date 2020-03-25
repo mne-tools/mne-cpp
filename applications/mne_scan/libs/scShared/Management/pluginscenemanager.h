@@ -129,8 +129,10 @@ public:
     //=========================================================================================================
     /**
      * Starts IAlgorithm plugins.
+     *
+     * @return true if at least one ISensor plugin was started successfully, false otherwise.
      */
-    void startAlgorithmPlugins();
+    bool startAlgorithmPlugins();
 
     //=========================================================================================================
     /**
