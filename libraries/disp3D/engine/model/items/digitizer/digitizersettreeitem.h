@@ -129,7 +129,8 @@ public:
      * @param[in] transform     The new entity's transform.
      * @param[in] bApplyInverse Whether to apply the inverse. False by default.
      */
-    virtual void setTransform(const FIFFLIB::FiffCoordTrans& transform, bool bApplyInverse = false);
+    virtual void setTransform(const FIFFLIB::FiffCoordTrans& transform,
+                              bool bApplyInverse = false);
 
     //=========================================================================================================
     /**
@@ -146,7 +147,8 @@ public:
      * @param[in] transform     The new entity's transform.
      * @param[in] bApplyInverse Whether to apply the inverse. False by default.
      */
-    virtual void applyTransform(const FIFFLIB::FiffCoordTrans& transform, bool bApplyInverse = false);
+    virtual void applyTransform(const FIFFLIB::FiffCoordTrans& transform,
+                                bool bApplyInverse = false);
 
 protected:
     //=========================================================================================================

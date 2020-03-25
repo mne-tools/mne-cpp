@@ -335,7 +335,8 @@ void DigitizerSetTreeItem::setTransform(const Qt3DCore::QTransform& transform)
 
 //=============================================================================================================
 
-void DigitizerSetTreeItem::setTransform(const FiffCoordTrans& transform, bool bApplyInverse)
+void DigitizerSetTreeItem::setTransform(const FiffCoordTrans& transform,
+                                        bool bApplyInverse)
 {
     if(m_pRenderable3DEntity) {
         m_pRenderable3DEntity->setTransform(transform, bApplyInverse);
@@ -353,7 +354,8 @@ void DigitizerSetTreeItem::applyTransform(const Qt3DCore::QTransform& transform)
 
 //=============================================================================================================
 
-void DigitizerSetTreeItem::applyTransform(const FiffCoordTrans& transform, bool bApplyInverse)
+void DigitizerSetTreeItem::applyTransform(const FiffCoordTrans& transform,
+                                          bool bApplyInverse)
 {
     if(m_pRenderable3DEntity) {
         m_pRenderable3DEntity->applyTransform(transform, bApplyInverse);

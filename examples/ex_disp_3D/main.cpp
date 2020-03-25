@@ -46,6 +46,8 @@
 #include <disp3D/engine/model/items/sourcedata/mnedatatreeitem.h>
 #include <disp3D/engine/model/items/sensordata/sensordatatreeitem.h>
 #include <disp3D/engine/model/items/digitizer/digitizersettreeitem.h>
+#include <disp3D/engine/model/items/bem/bemtreeitem.h>
+#include <disp3D/engine/model/items/freesurfer/fssurfacetreeitem.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
 #include <disp3D/engine/view/view3D.h>
 #include <disp3D/helpers/geometryinfo/geometryinfo.h>
@@ -251,15 +253,19 @@ int main(int argc, char *argv[])
     Data3DTreeModel::SPtr p3DDataModel = p3DAbstractView->getTreeModel();
 
     //Add fressurfer surface set including both hemispheres
-    p3DDataModel->addSurfaceSet(parser.value(subjectOption),
-                                "MRI",
-                                tSurfSet,
-                                tAnnotSet);
+    QList<FsSurfaceTreeItem*> lFsSurfaces = p3DDataModel->addSurfaceSet(parser.value(subjectOption),
+                                                                        "MRI",
+                                                                        tSurfSet,
+                                                                        tAnnotSet);
+
+    for(int i = 0; i < lFsSurfaces.size(); ++i) {
+        lFsSurfaces.at(i)->setTransform(evoked.info.dev_head_t, true);
+    }
 
     //Read and show BEM
     QFile t_fileBem(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
     MNEBem t_Bem(t_fileBem);
-    p3DDataModel->addBemData(parser.value(subjectOption), "BEM", t_Bem);
+    p3DDataModel->addBemData(parser.value(subjectOption), "BEM", t_Bem)->setTransform(evoked.info.dev_head_t, true);
 
     //Read and show sensor helmets
     QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/306m_rt.fif");
@@ -274,7 +280,8 @@ int main(int argc, char *argv[])
     FiffCoordTrans coordTrans(coordTransfile);
 
     DigitizerSetTreeItem* pDigitizerSetTreeItem = p3DDataModel->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
-    pDigitizerSetTreeItem->applyTransform(coordTrans, true);
+    pDigitizerSetTreeItem->setTransform(coordTrans, true);
+    pDigitizerSetTreeItem->applyTransform(evoked.info.dev_head_t, true);
 
     //add sensor item for MEG data
     if (SensorDataTreeItem* pMegSensorTreeItem = p3DDataModel->addSensorData(parser.value(subjectOption),
@@ -322,6 +329,7 @@ int main(int argc, char *argv[])
         pEegSensorTreeItem->setThresholds(QVector3D(0.0f, 6.0e-6f*0.5f, 6.0e-6f));
         pEegSensorTreeItem->setColormapType("Jet");
         pEegSensorTreeItem->setSFreq(evoked.info.sfreq);
+        pEegSensorTreeItem->setTransform(evoked.info.dev_head_t, true);
     }
 
     if(bAddRtSourceLoc) {
@@ -332,7 +340,7 @@ int main(int argc, char *argv[])
                                                                       t_clusteredFwd,
                                                                       tSurfSet,
                                                                       tAnnotSet)) {
-        pRTDataItem->setLoopState(true);
+            pRTDataItem->setLoopState(true);
             pRTDataItem->setTimeInterval(17);
             pRTDataItem->setNumberAverages(1);
             pRTDataItem->setAlpha(1.0);
@@ -340,6 +348,7 @@ int main(int argc, char *argv[])
             pRTDataItem->setThresholds(QVector3D(0.0f,0.5f,10.0f));
             pRTDataItem->setVisualizationType("Annotation based");
             pRTDataItem->setColormapType("Jet");
+            pRTDataItem->setTransform(evoked.info.dev_head_t, true);
         }
     }
 
