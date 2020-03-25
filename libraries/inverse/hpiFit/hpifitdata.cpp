@@ -176,7 +176,7 @@ Eigen::MatrixXd HPIFitData::compute_leadfield(const Eigen::MatrixXd& pos, const 
 
 DipFitError HPIFitData::dipfitError(const Eigen::MatrixXd& pos,
                                     const Eigen::MatrixXd& data,
-                                    const QList<Sensor>& sensorSet,
+                                    const QList<struct Sensor>& sensorSet,
                                     const Eigen::MatrixXd& matProjectors)
 {
     // Variable Declaration
@@ -218,7 +218,7 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& pos,
                                        int display,
                                        const Eigen::MatrixXd& data,
                                        const Eigen::MatrixXd& matProjectors,
-                                       const QList<Sensor>& sensorSet,
+                                       const QList<struct Sensor>& sensorSet,
                                        int &simplex_numitr)
 {
     double tolx, tolf, rho, chi, psi, sigma, func_evals, usual_delta, zero_term_delta, temp1, temp2;
