@@ -39,7 +39,7 @@
 //=============================================================================================================
 
 #include "hpifitdata.h"
-
+#include "hpifit.h"
 #include <utils/mnemath.h>
 
 #include <algorithm>
@@ -159,7 +159,7 @@ Eigen::MatrixXd HPIFitData::magnetic_dipole(Eigen::MatrixXd pos,
 
 //=============================================================================================================
 
-Eigen::MatrixXd HPIFitData::compute_leadfield(const Eigen::MatrixXd& pos, const struct Sensor& sensor)
+Eigen::MatrixXd HPIFitData::compute_leadfield(const Eigen::MatrixXd& pos, const Sensor& sensor)
 {
 
     Eigen::MatrixXd pnt, ori, lf;

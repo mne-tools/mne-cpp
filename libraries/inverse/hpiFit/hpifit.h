@@ -108,6 +108,19 @@ struct HpiFitResult {
     QString                     sFilePathDigitzers;
 };
 
+//=========================================================================================================
+/**
+ * The strucut specifing the sensor parameters.
+ */
+struct Sensor {
+    Eigen::RowVector3d r0;
+    Eigen::MatrixXd rmag;
+    Eigen::MatrixXd cosmag;
+    Eigen::MatrixXd tra;
+    Eigen::RowVectorXd w;
+    int np;
+};
+
 //=============================================================================================================
 // INVERSELIB FORWARD DECLARATIONS
 //=============================================================================================================
@@ -142,6 +155,7 @@ public:
      * @param[out]   vError          The HPI estimation Error in mm for each fitted HPI coil.
      * @param[out]   vGoF            The goodness of fit for each fitted HPI coil
      * @param[out]   fittedPointSet  The final fitted positions in form of a digitizer set.
+     * @param[in]    pFiffInfo     Associated Fiff Information.
      * @param[in]    bDoDebug        Print debug info to cmd line and write debug info to file.
      * @param[in]    sHPIResourceDir The path to the debug file which is to be written.
      */
@@ -162,13 +176,13 @@ public:
      *
      * @param[in]    t_mat           Data to estimate the HPI positions from
      * @param[in]    t_matProjectors The projectors to apply. Bad channels are still included.
-     * @param[out]   transDevHead    The final dev head transformation matrix
+     * @param[in]    transDevHead    The final dev head transformation matrix
      * @param[in]    vFreqs          The frequencies for each coil in unknown order.
      * @param[out]   vFreqs          The frequencies for each coil in correct order.
      * @param[in]    vError          The HPI estimation Error in mm for each fitted HPI coil.
      * @param[in]    vGoF            The goodness of fit for each fitted HPI coil
      * @param[in]    fittedPointSet  The final fitted positions in form of a digitizer set.
-     * @param[in]    p_pFiffInfo     Associated Fiff Information.
+     * @param[in]    pFiffInfo     Associated Fiff Information.
      */
     void findOrder(const Eigen::MatrixXd& t_mat,
                    const Eigen::MatrixXd& t_matProjectors,
@@ -211,7 +225,7 @@ protected:
      * @return Returns the coil parameters.
      */
     CoilParam dipfit(struct CoilParam coil,
-                     const QList<HPIFitData::Sensor>& sensorSet,
+                     const QList<Sensor>& sensorSet,
                      const Eigen::MatrixXd &data,
                      int numCoils,
                      const Eigen::MatrixXd &t_matProjectors);
@@ -237,12 +251,12 @@ protected:
      * @param[in] coils     The coilset to read the sensor information from.
      *
      */
-    void createSensorSet(QList<HPIFitData::Sensor>& sensors, FWDLIB::FwdCoilSet* coils);
+    void createSensorSet(QList<Sensor>& sensors, FWDLIB::FwdCoilSet* coils);
 
     //=========================================================================================================
 
     QList<FIFFLIB::FiffChInfo>   m_channels;             /**< Channellist */
-    QList<HPIFitData::Sensor>    m_sensorSet;            /**< sensorSet */
+    QList<Sensor>                m_sensorSet;            /**< sensorSet */
     QVector<int>                 m_innerind;             /**< innerind  */
     QString                      m_sHPIResourceDir;      /**< Hold the resource folder to store the debug information in. */
 };
