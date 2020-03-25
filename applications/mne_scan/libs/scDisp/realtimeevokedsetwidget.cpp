@@ -257,7 +257,7 @@ void RealTimeEvokedSetWidget::init()
 
         // Quick control projectors
         ProjectorsView* pProjectorsView = new ProjectorsView(QString("RTESW/%1").arg(t_sRTESName));
-        pProjectorsView->setObjectName("group_tab_Settings_SSP");
+        pProjectorsView->setObjectName("group_tab_View_SSP");
         lControlWidgets.append(pProjectorsView);
 
         connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
@@ -270,7 +270,7 @@ void RealTimeEvokedSetWidget::init()
 
         // Quick control compensators
         CompensatorView* pCompensatorView = new CompensatorView(QString("RTESW/%1").arg(t_sRTESName));
-        pCompensatorView->setObjectName("group_tab_Settings_Comp");
+        pCompensatorView->setObjectName("group_tab_View_Comp");
         lControlWidgets.append(pCompensatorView);
 
         connect(pCompensatorView, &CompensatorView::compSelectionChanged,
@@ -283,7 +283,7 @@ void RealTimeEvokedSetWidget::init()
 
         // Quick control filter settings
         FilterSettingsView* pFilterSettingsView = new FilterSettingsView(QString("RTESW/%1").arg(t_sRTESName));
-        pFilterSettingsView->setObjectName("group_tab_Settings_Filter");
+        pFilterSettingsView->setObjectName("group_tab_View_Filter");
         lControlWidgets.append(pFilterSettingsView);
 
         connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChannelTypeChanged,
@@ -358,7 +358,7 @@ void RealTimeEvokedSetWidget::init()
 
         // Quick control average selection
         AverageSelectionView* pAverageSelectionView = new AverageSelectionView(QString("RTESW/%1").arg(t_sRTESName));
-        pAverageSelectionView->setObjectName("group_tab_Settings_Selection");
+        pAverageSelectionView->setObjectName("group_tab_View_Selection");
         lControlWidgets.append(pAverageSelectionView);
 
         connect(m_pEvokedSetModel.data(), &EvokedSetModel::newAverageActivationMap,

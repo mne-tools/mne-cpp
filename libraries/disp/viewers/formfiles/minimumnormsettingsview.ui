@@ -95,7 +95,7 @@
      <item row="2" column="0">
       <widget class="QLabel" name="label">
        <property name="text">
-        <string>Time point:</string>
+        <string>Time point (incl. pre stim):</string>
        </property>
       </widget>
      </item>

@@ -129,9 +129,8 @@ bool PluginSceneManager::startPlugins()
     // Start ISensor and IRTAlgorithm plugins first!
     bool bFlag = startSensorPlugins();
 
-    if(bFlag)
-    {
-        startAlgorithmPlugins();
+    if(bFlag) {
+        bFlag = startAlgorithmPlugins();
     }
 
     return bFlag;
@@ -160,13 +159,21 @@ bool PluginSceneManager::startSensorPlugins()
 
 //=============================================================================================================
 
-void PluginSceneManager::startAlgorithmPlugins()
+bool PluginSceneManager::startAlgorithmPlugins()
 {
+    bool bFlag = true;
+
     QList<IPlugin::SPtr>::iterator it = m_pluginList.begin();
-    for( ; it != m_pluginList.end(); ++it)
-        if((*it)->getType() == IPlugin::_IAlgorithm)
-            if(!(*it)->start())
+    for( ; it != m_pluginList.end(); ++it) {
+        if((*it)->getType() == IPlugin::_IAlgorithm) {
+            if(!(*it)->start()) {
+                bFlag = false;
                 qWarning() << "Could not start IAlgorithm: " << (*it)->getName();
+            }
+        }
+    }
+
+    return bFlag;
 }
 
 //=============================================================================================================

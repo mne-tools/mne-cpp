@@ -92,8 +92,7 @@ using namespace Eigen;
 //=============================================================================================================
 
 RtcMne::RtcMne()
-: m_bProcessData(false)
-, m_bFinishedClustering(false)
+: m_bFinishedClustering(false)
 , m_qFileFwdSolution(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif")
 , m_sAtlasDir(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/label")
 , m_sSurfaceDir(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/surf")
@@ -101,7 +100,7 @@ RtcMne::RtcMne()
 , m_iDownSample(1)
 , m_sAvrType("3")
 , m_sMethod("dSPM")
-, m_iTimePointSps(-1)
+, m_iTimePointSps(0)
 {
 }
 
@@ -131,7 +130,7 @@ void RtcMne::init()
     // Inits
     m_pFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_qFileFwdSolution, false, true));
     m_pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet(m_sAtlasDir+"/lh.aparc.a2009s.annot", m_sAtlasDir+"/rh.aparc.a2009s.annot"));
-    m_pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet(m_sSurfaceDir+"/lh.pial", m_sSurfaceDir+"/rh.pial"));
+    m_pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet(m_sSurfaceDir+"/lh.inflated", m_sSurfaceDir+"/rh.inflated"));
 
     // Input
     m_pRTMSAInput = PluginInputData<RealTimeMultiSampleArray>::create(this, "MNE RTMSA In", "MNE real-time multi sample array input data");
@@ -154,13 +153,10 @@ void RtcMne::init()
     m_outputConnectors.append(m_pRTSEOutput);
     m_pRTSEOutput->data()->setName(this->getName());//Provide name to auto store widget settings
 
-    // start clustering
-    QFuture<void> m_future = QtConcurrent::run(this, &RtcMne::doClustering);
-
     // Set the fwd, annotation and surface data
     m_pRTSEOutput->data()->setAnnotSet(m_pAnnotationSet);
     m_pRTSEOutput->data()->setSurfSet(m_pSurfaceSet);
-    m_pRTSEOutput->data()->setFwdSolution(m_pClusteredFwd);
+    m_pRTSEOutput->data()->setFwdSolution(m_pFwd);
 }
 
 //=============================================================================================================
@@ -172,7 +168,6 @@ void RtcMne::initPluginControlWidgets()
     MinimumNormSettingsView* pMinimumNormSettingsView = new MinimumNormSettingsView;
     pMinimumNormSettingsView->setObjectName("group_tab_Settings_Source Localization");
 
-    //Add control widgets to output data (will be used by QuickControlView in RealTimeSourceEstimateWidget)
     connect(pMinimumNormSettingsView, &MinimumNormSettingsView::methodChanged,
             this, &RtcMne::onMethodChanged);
     connect(pMinimumNormSettingsView, &MinimumNormSettingsView::triggerTypeChanged,
@@ -296,9 +291,8 @@ void RtcMne::doClustering()
 
     m_qMutex.lock();
     m_bFinishedClustering = false;
-    m_pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_pFwd->cluster_forward_solution(*m_pAnnotationSet.data(), 200)));
-    //m_pClusteredFwd = m_pFwd;
-    m_pRTSEOutput->data()->setFwdSolution(m_pClusteredFwd);
+    m_pFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_pFwd->cluster_forward_solution(*m_pAnnotationSet.data(), 200)));
+    m_pRTSEOutput->data()->setFwdSolution(m_pFwd);
 
     m_qMutex.unlock();
 
@@ -311,7 +305,7 @@ void RtcMne::finishedClustering()
 {
     m_qMutex.lock();
     m_bFinishedClustering = true;
-    m_pFiffInfoForward = QSharedPointer<FiffInfoBase>(new FiffInfoBase(m_pClusteredFwd->info));
+    m_pFiffInfoForward = QSharedPointer<FiffInfoBase>(new FiffInfoBase(m_pFwd->info));
     m_qMutex.unlock();
 
     emit clusteringFinished();
@@ -321,13 +315,17 @@ void RtcMne::finishedClustering()
 
 bool RtcMne::start()
 {
-    if(m_bFinishedClustering) {
-        QThread::start();
-
-        return true;
-    } else {
+    if(!m_pFwd->isClustered()) {
+        QMessageBox msgBox;
+        msgBox.setText("The forward solution has not been clustered yet. Please click the Start Clustering button in the Source Localization plugin.");
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
+        msgBox.exec();
         return false;
     }
+
+    QThread::start();
+    return true;
 }
 
 //=============================================================================================================
@@ -338,9 +336,6 @@ bool RtcMne::stop()
     wait(500);
 
     m_qListCovChNames.clear();
-
-    // Stop filling buffers with data from the inputs
-    m_bProcessData = false;
 
     m_pFiffInfo = Q_NULLPTR;
 
@@ -366,9 +361,6 @@ QString RtcMne::getName() const
 QWidget* RtcMne::setupWidget()
 {
     RtcMneSetupWidget* setupWidget = new RtcMneSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
-
-    if(!m_bFinishedClustering)
-        setupWidget->setClusteringState();
 
     connect(this, &RtcMne::clusteringStarted,
             setupWidget, &RtcMneSetupWidget::setClusteringState);
@@ -397,7 +389,7 @@ void RtcMne::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement)
             m_iNumAverages = 1;
         }
 
-        if(m_bProcessData) {
+        if(this->isRunning()) {
             for(qint32 i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
                 // Check for artifacts
                 QMap<QString,double> mapReject;
@@ -430,8 +422,8 @@ void RtcMne::updateRTC(SCMEASLIB::Measurement::SPtr pMeasurement)
 
     if(pRTC && this->isRunning()) {
         // Init Real-Time inverse estimator
-        if(!m_pRtInvOp && m_pFiffInfo && m_pClusteredFwd) {
-            m_pRtInvOp = RtInvOp::SPtr(new RtInvOp(m_pFiffInfo, m_pClusteredFwd));
+        if(!m_pRtInvOp && m_pFiffInfo && m_pFwd) {
+            m_pRtInvOp = RtInvOp::SPtr(new RtInvOp(m_pFiffInfo, m_pFwd));
             connect(m_pRtInvOp.data(), &RtInvOp::invOperatorCalculated,
                     this, &RtcMne::updateInvOp);
         }
@@ -441,7 +433,7 @@ void RtcMne::updateRTC(SCMEASLIB::Measurement::SPtr pMeasurement)
             m_qListCovChNames = pRTC->getValue()->names;
         }
 
-        if(m_bProcessData && m_pRtInvOp){
+        if(this->isRunning() && m_pRtInvOp){
             m_pRtInvOp->append(*pRTC->getValue());
         }
     }
@@ -459,12 +451,11 @@ void RtcMne::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
         QMutexLocker locker(&m_qMutex);
 
         QStringList lResponsibleTriggerTypes = pRTES->getResponsibleTriggerTypes();
+        emit responsibleTriggerTypesChanged(lResponsibleTriggerTypes);
 
         if(!this->isRunning() || !lResponsibleTriggerTypes.contains(m_sAvrType)) {
             return;
         }
-
-        emit responsibleTriggerTypesChanged(lResponsibleTriggerTypes);
 
         FiffEvokedSet::SPtr pFiffEvokedSet = pRTES->getValue();
 
@@ -479,9 +470,12 @@ void RtcMne::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
             }
         }
 
-        if(m_bProcessData) {
+        if(this->isRunning()) {
             for(int i = 0; i < pFiffEvokedSet->evoked.size(); ++i) {
                 if(pFiffEvokedSet->evoked.at(i).comment == m_sAvrType) {
+                    // Store current evoked as member so we can dispatch it if the time pick by the user changed
+                    m_currentEvoked = pFiffEvokedSet->evoked.at(i).pick_channels(m_qListPickChannels);
+
                     // Please note that we do not need a copy here since this function will block until
                     // the buffer accepts new data again. Hence, the data is not deleted in the actual
                     // Mesaurement function after it emitted the notify signal.
@@ -545,12 +539,12 @@ void RtcMne::onTriggerTypeChanged(const QString& triggerType)
 
 void RtcMne::onTimePointValueChanged(int iTimePointMs)
 {
-    QMutexLocker locker(&m_qMutex);
+    if(m_pFiffInfoInput && m_pCircularEvokedBuffer) {
+        m_qMutex.lock();
+        m_iTimePointSps = m_pFiffInfoInput->sfreq * (float)iTimePointMs * 0.001f;
+        m_qMutex.unlock();
 
-    if(m_pFiffInfoInput) {
-        m_iTimePointSps = m_pFiffInfoInput->sfreq * (float)iTimePointMs * 0.001;
-
-        if(m_bProcessData) {
+        if(this->isRunning()) {
             while(!m_pCircularEvokedBuffer->push(m_currentEvoked)) {
                 //Do nothing until the circular buffer is ready to accept new data again
             }
@@ -562,87 +556,38 @@ void RtcMne::onTimePointValueChanged(int iTimePointMs)
 
 void RtcMne::run()
 {
-    // Mode 1: Use covariance and inverse operator calcualted by incoming stream
+    // Wait for fiff info and minimum norm instance
     while(true) {
-        {
-            QMutexLocker locker(&m_qMutex);
-            if(m_pFiffInfo)
-                break;
+        m_qMutex.lock();
+        if(m_pFiffInfo && m_pMinimumNorm) {
+            m_qMutex.unlock();
+            break;
         }
+        m_qMutex.unlock();
 
-        calcFiffInfo();
-        msleep(10);// Wait for fiff Info
+        if(!m_pFiffInfo) {
+            calcFiffInfo();
+        }
+        msleep(100);
     }
 
-//    qDebug() << "RtcMne::run - m_pClusteredFwd->info.ch_names" << m_pClusteredFwd->info.ch_names;
-//    qDebug() << "RtcMne::run - m_pFiffInfo->ch_names" << m_pFiffInfo->ch_names;
-
-    // Mode 1: End
-
-//    // Mode 2: Use covariance and inverse operator loaded from pre calculated files
-//    QFile t_fileCov(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
-//    FiffCov noise_cov(t_fileCov);
-//    m_qListCovChNames = noise_cov.names;
-
-//    while(true) {
-//        {
-//            QMutexLocker locker(&m_qMutex);
-//            if(m_pFiffInfoInput)
-//                break;
-//        }
-
-//        msleep(10);// Wait for fiff Info
-//    }
-
-//    // regularize noise covariance
-//    noise_cov = noise_cov.regularize(*m_pFiffInfoInput,
-//                                     0.05,
-//                                     0.05,
-//                                     0.1,
-//                                     true);
-
-//    // make an inverse operator
-//    m_invOp = MNEInverseOperator(*m_pFiffInfoInput,
-//                                 *m_pClusteredFwd,
-//                                 noise_cov,
-//                                 0.2f,
-//                                 0.8f);
-
-//    double snr = 3.0;
-//    double lambda2 = 1.0 / pow(snr, 2); //ToDo estimate lambda using covariance
-//    QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
-//    m_pMinimumNorm = MinimumNorm::SPtr(new MinimumNorm(m_invOp,
-//                                                       lambda2,
-//                                                       method));
-//    m_pMinimumNorm->doInverseSetup(1,true);
-
-//    m_pRTSEOutput->data()->setFiffInfo(m_pFiffInfoInput);
-
-////    qDebug() << "RtcMne::run - m_pClusteredFwd->info.ch_names" << m_pClusteredFwd->info.ch_names;
-////    qDebug() << "RtcMne::run - m_pFiffInfoInput->ch_names" << m_pFiffInfoInput->ch_names;
-
-//    // Mode 2: End
-
     // Init parameters
-    m_bProcessData = true;
-
     qint32 skip_count = 0;
     FiffEvoked evoked;
     MatrixXd rawSegment;
     MatrixXd matData;
     qint32 j;
+    int iTimePointSps = 0;
     float tmin, tstep;
     MNESourceEstimate sourceEstimate;
 
     // Start processing data
     while(!isInterruptionRequested()) {
-        //qDebug()<<"RtcMne::run - Processing RTMSA data";
-
+        //Process data from raw data input
         if(m_pCircularMatrixBuffer) {
-            if(m_pMinimumNorm && ((skip_count % m_iDownSample) == 0)) {
-                // Get the current data
+            if(((skip_count % m_iDownSample) == 0)) {
+                // Get the current raw data
                 if(m_pCircularMatrixBuffer->pop(rawSegment)) {
-
                     //Pick the same channels as in the inverse operator
                     m_qMutex.lock();
                     matData.resize(m_invOp.noise_cov->names.size(), rawSegment.cols());
@@ -675,33 +620,30 @@ void RtcMne::run()
         //Process data from averaging input
         if(m_pCircularEvokedBuffer) {
             if(m_pCircularEvokedBuffer->pop(evoked)) {
-                if(m_pMinimumNorm && ((skip_count % m_iDownSample) == 0)) {
-                    QElapsedTimer time;
-                    time.start();
+                // Get the current evoked data
+                if(((skip_count % m_iDownSample) == 0)) {
+//                    QElapsedTimer time;
+//                    time.start();
 
+                    m_qMutex.lock();
                     sourceEstimate = m_pMinimumNorm->calculateInverse(evoked);
-
-    //                else {
-    //                    m_currentEvoked = m_currentEvoked.pick_channels(m_invOp.noise_cov->names);
-    //                    tmin = 0.0f;
-    //                    tstep = 1.0f / m_pFiffInfoInput->sfreq;
-    //                    m_pMinimumNorm->doInverseSetup(m_currentEvoked.nave);
-    //                    sourceEstimate = m_pMinimumNorm->calculateInverse(m_currentEvoked.data.block(0,m_iTimePointSps,m_currentEvoked.data.rows(),1),
-    //                                                                      tmin,
-    //                                                                      tstep);
-    //                }
+                    m_qMutex.unlock();
 
                     if(!sourceEstimate.isEmpty()) {
                         //qInfo() << time.elapsed() << m_iBlockNumberProcessed << "MNE Time";
                         //qInfo() << QDateTime::currentDateTime().toString("hh:mm:ss.z") << m_iBlockNumberProcessed++ << "MNE Processed";
 
-    //                    if(m_iTimePointSps < m_currentEvoked.data.cols()) {
-    //                        m_pRTSEOutput->data()->setValue(sourceEstimate.reduce(m_iTimePointSps,1));
-    //                    } else {
-                            m_pRTSEOutput->data()->setValue(sourceEstimate);
-    //                    }
-                    }
+                        m_qMutex.lock();
+                        iTimePointSps = m_iTimePointSps;
+                        m_qMutex.unlock();
 
+                        if(iTimePointSps < sourceEstimate.data.cols() && iTimePointSps >= 0) {
+                            sourceEstimate = sourceEstimate.reduce(iTimePointSps,1);
+                            m_pRTSEOutput->data()->setValue(sourceEstimate);
+                        } else {
+                            m_pRTSEOutput->data()->setValue(sourceEstimate);
+                        }
+                    }
                 } else {
                     m_pCircularEvokedBuffer->pop(evoked);
                 }

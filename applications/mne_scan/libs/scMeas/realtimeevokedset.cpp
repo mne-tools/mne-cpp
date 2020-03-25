@@ -137,8 +137,7 @@ void RealTimeEvokedSet::setValue(const FiffEvokedSet &v,
     m_lResponsibleTriggerTypes = lResponsibleTriggerTypes;
     m_qMutex.unlock();
 
-    if(!m_bInitialized)
-    {
+    if(!m_bInitialized) {
         init(p_fiffinfo);
 
         m_qMutex.lock();
@@ -147,12 +146,12 @@ void RealTimeEvokedSet::setValue(const FiffEvokedSet &v,
         //Take the first evoked iformation to calcualte the pre samples.
         //They all have the same pre sample size as of right now.
         if(!m_pFiffEvokedSet->evoked.isEmpty()) {
-            for(qint32 i = 0; i < m_pFiffEvokedSet->evoked.at(0).times.size(); ++i)
-            {
-                if(m_pFiffEvokedSet->evoked.at(0).times[i] >= 0)
+            for(qint32 i = 0; i < m_pFiffEvokedSet->evoked.at(0).times.size(); ++i) {
+                if(m_pFiffEvokedSet->evoked.at(0).times[i] >= 0) {
                     break;
-                else
+                } else {
                     ++m_iPreStimSamples;
+                }
             }
         }
 
