@@ -198,16 +198,26 @@ public:
      * get from Neuromag's MaxFilter.
      *
      *
+<<<<<<< HEAD
      * @param[in]   time          The corresponding time in the measurement for the fit.
      * @param[out]  position      The matrix to store the results.
+||||||| constructed merge base
+     * @param[in]   time          The corresponding time in the measurement for the fit.
+     * @param[in]   pFiffInfo     The FiffInfo file from the measurement.
+     * @param[out]  position      The matrix to store the results.
+=======
+     * @param[in]   fTime          The corresponding time in the measurement for the fit.
+     * @param[in]   pFiffInfo     The FiffInfo file from the measurement.
+     * @param[out]  mPosition      The matrix to store the results.
+>>>>>>> MAINT: naming conventions
      * @param[in]   vGoF          The goodness of fit for each coil.
      * @param[in]   vError        The Hpi estimation Error per coil.
      *
      * ToDo: get estimated movement velocity and stroe it in channel 9
      */
-    static void storeHeadPosition(float time,
-                                  const Eigen::MatrixXf& devHeadT,
-                                  Eigen::MatrixXd& position,
+    static void storeHeadPosition(float fTime,
+                                  const Eigen::MatrixXf& transDevHead,
+                                  Eigen::MatrixXd& mPosition,
                                   const Eigen::VectorXd& vGoF,
                                   const QVector<double>& vError);
 protected:
@@ -215,57 +225,75 @@ protected:
     /**
      * Fits dipoles for the given coils and a given data set.
      *
+<<<<<<< HEAD
      * @param[in] coil            The coil parameters.
      * @param[in] sensorSet       The sensor information.
      * @param[in] data            The data which used to fit the coils.
      * @param[in] numCoils        The number of coils.
+||||||| constructed merge base
+     * @param[in] CoilParam       The coil parameters.
+     * @param[in] sensors         The sensor information.
+     * @param[in] data            The data which used to fit the coils.
+     * @param[in] numCoils        The number of coils.
+=======
+     * @param[in] CoilParam       The coil parameters.
+     * @param[in] lSensorSet      The sensor information.
+     * @param[in] mData           The data which used to fit the coils.
+     * @param[in] iNumCoils       The number of coils.
+>>>>>>> MAINT: naming conventions
      * @param[in] t_matProjectors The projectors to apply. Bad channels are still included.
      *
      * @return Returns the coil parameters.
      */
     CoilParam dipfit(struct CoilParam coil,
-                     const QList<Sensor>& sensorSet,
-                     const Eigen::MatrixXd &data,
-                     int numCoils,
+                     const QList<Sensor>& lSensorSet,
+                     const Eigen::MatrixXd &mData,
+                     int iNumCoils,
                      const Eigen::MatrixXd &t_matProjectors);
 
     //=========================================================================================================
     /**
      * Computes the transformation matrix between two sets of 3D points.
      *
-     * @param[in] NH     The first set of input 3D points (row-wise order).
-     * @param[in] BT     The second set of input 3D points (row-wise order).
+     * @param[in] mNH    The first set of input 3D points (row-wise order).
+     * @param[in] mBT    The second set of input 3D points (row-wise order).
      *
      * @return Returns the transformation matrix.
      */
+<<<<<<< HEAD
     static Eigen::Matrix4d computeTransformation(Eigen::MatrixXd NH,
                                                  Eigen::MatrixXd BT);
+||||||| constructed merge base
+    Eigen::Matrix4d computeTransformation(Eigen::MatrixXd NH, Eigen::MatrixXd BT);
+=======
+    Eigen::Matrix4d computeTransformation(Eigen::MatrixXd mNH, Eigen::MatrixXd mBT);
+>>>>>>> MAINT: naming conventions
 
     //=========================================================================================================
     /**
-     * Read from FwdCoilSet and store into sensors struct.
+     * Read from FwdCoilSet and store into lSensorSet struct.
      * Can be deleted as soon as FwdCoilSet is refactored to QList and EigenMatrix.
      *
-     * @param[in] sensors     The struct to save sensor information.
-     * @param[in] coils     The coilset to read the sensor information from.
+     * @param[in] lSensorSet    The struct to save sensor information.
+     * @param[in] coils         The coilset to read the sensor information from.
      *
      */
-    void createSensorSet(QList<Sensor>& sensors, FWDLIB::FwdCoilSet* coils);
+    void createSensorSet(QList<Sensor>& lSensorSet, FWDLIB::FwdCoilSet* coils);
 
     //=========================================================================================================
 
-    QList<Sensor>                m_sensorSet;            /**< sensorSet */
+    QList<Sensor>                m_lSensorSet;            /**< lSensorSet */
 
 private:
     //=========================================================================================================
     /**
-     * Update FwdCoilSet and store into sensors struct.
+     * Update FwdCoilSet and store into lSensorSet struct.
      *
      */
     void updateCoils();
 
-    FWDLIB::FwdCoilSet* m_templates;
-    FWDLIB::FwdCoilSet* m_megCoils;
+    FWDLIB::FwdCoilSet* m_coilTemplate;
+    FWDLIB::FwdCoilSet* m_coilMeg;
 
     //=========================================================================================================
     /**
@@ -274,9 +302,9 @@ private:
      */
     void updateChannels(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
-    QList<FIFFLIB::FiffChInfo>   m_channels;             /**< Channellist with excluded bads */
-    QVector<int>                 m_innerind;             /**< index of inner channels  */
-    QList<QString>               m_bads;                 /**< contains bad channels  */
+    QList<FIFFLIB::FiffChInfo>   m_lChannels;             /**< Channellist with excluded bads */
+    QVector<int>                 m_vInnerind;             /**< index of inner channels  */
+    QList<QString>               m_lBads;                 /**< contains bad channels  */
 
 };
 

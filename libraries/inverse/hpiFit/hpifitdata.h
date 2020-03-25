@@ -125,11 +125,11 @@ public:
      */
     void doDipfitConcurrent();
 
-    Eigen::MatrixXd     coilPos;
-    Eigen::RowVectorXd  sensorData;
-    DipFitError         errorInfo;
-    QList<struct Sensor>       sensorSet;
-    Eigen::MatrixXd     matProjector;
+    Eigen::MatrixXd         coilPos;
+    Eigen::RowVectorXd      sensorData;
+    DipFitError             errorInfo;
+    QList<struct Sensor>    lSensorSet;
+    Eigen::MatrixXd         matProjector;
 
 protected:
     //=========================================================================================================
@@ -137,20 +137,20 @@ protected:
      * magnetic_dipole leadfield for a magnetic dipole in an infinite medium.
      * The function has been compared with matlab magnetic_dipole and it gives same output.
      */
-    Eigen::MatrixXd magnetic_dipole(Eigen::MatrixXd pos,
-                                    Eigen::MatrixXd pnt,
-                                    Eigen::MatrixXd ori);
+    Eigen::MatrixXd magnetic_dipole(Eigen::MatrixXd mPos,
+                                    Eigen::MatrixXd mPnt,
+                                    Eigen::MatrixXd mOri);
 
     //=========================================================================================================
     /**
      * compute_leadfield computes a forward solution for a dipole in a a volume
      * conductor model. The forward solution is expressed as the leadfield
      * matrix (Nchan*3), where each column corresponds with the potential or field
-     * distributions on all sensors for one of the x,y,z-orientations of the dipole.
+     * distributions on all lSensorSet for one of the x,y,z-orientations of the dipole.
      * The function has been compared with matlab ft_compute_leadfield and it gives
      * same output.
      */
-    Eigen::MatrixXd compute_leadfield(const Eigen::MatrixXd& pos,
+    Eigen::MatrixXd compute_leadfield(const Eigen::MatrixXd& mPos,
                                       const struct Sensor& sensor);
 
     //=========================================================================================================
@@ -160,9 +160,9 @@ protected:
      * The function has been compared with matlab dipfit_error and it gives
      * same output
      */
-    DipFitError dipfitError(const Eigen::MatrixXd& pos,
-                            const Eigen::MatrixXd& data,
-                            const QList<struct Sensor>& sensorSet,
+    DipFitError dipfitError(const Eigen::MatrixXd& mPos,
+                            const Eigen::MatrixXd& mData,
+                            const QList<struct Sensor>& lSensorSet,
                             const Eigen::MatrixXd& matProjectors);
 
     //=========================================================================================================
@@ -174,17 +174,17 @@ protected:
     //=========================================================================================================
     /**
      * fminsearch Multidimensional unconstrained nonlinear minimization (Nelder-Mead).
-     * X = fminsearch(X0, maxiter, maxfun, display, data, sensors) starts at X0 and
+     * X = fminsearch(X0, iNaxiter, iMaxfun, iDisplay, mData, lSensorSet) starts at X0 and
      * attempts to find a local minimizer
      */
-    Eigen::MatrixXd fminsearch(const Eigen::MatrixXd& pos,
-                               int maxiter,
-                               int maxfun,
-                               int display,
-                               const Eigen::MatrixXd& data,
+    Eigen::MatrixXd fminsearch(const Eigen::MatrixXd& mPos,
+                               int iNaxiter,
+                               int iMaxfun,
+                               int iDisplay,
+                               const Eigen::MatrixXd& mData,
                                const Eigen::MatrixXd& matProjectors,
-                               const QList<struct Sensor>& sensorSet,
-                               int &simplex_numitr);
+                               const QList<struct Sensor>& lSensorSet,
+                               int &iSimplexNumitr);
 };
 
 //=============================================================================================================
