@@ -138,7 +138,7 @@ bool Hpi::stop()
     requestInterruption();
     wait(500);
 
-    m_pFiffInfo = Q_NULLPTR;
+    m_bPluginControlWidgetsInit = false;
 
     m_pCircularBuffer->clear();
 
@@ -176,11 +176,13 @@ void Hpi::update(SCMEASLIB::Measurement::SPtr pMeasurement)
         if(!m_pFiffInfo) {
             m_pFiffInfo = pRTMSA->info();
 
-            initPluginControlWidgets();
-
             updateProjections();
 
             QThread::start();
+        }
+
+        if(!m_bPluginControlWidgetsInit) {
+            initPluginControlWidgets();
         }
 
         // Check if data is present
@@ -245,6 +247,8 @@ void Hpi::initPluginControlWidgets()
         plControlWidgets.append(pHpiSettingsView);
 
         emit pluginControlWidgetsChanged(plControlWidgets, this->getName());
+
+        m_bPluginControlWidgetsInit = true;
     }
 }
 

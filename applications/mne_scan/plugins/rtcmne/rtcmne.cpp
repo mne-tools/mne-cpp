@@ -101,6 +101,7 @@ RtcMne::RtcMne()
 , m_sAvrType("3")
 , m_sMethod("dSPM")
 , m_iTimePointSps(0)
+, m_pCircularMatrixBuffer(CircularBuffer_Matrix_double::SPtr(new CircularBuffer_Matrix_double(40)))
 {
 }
 
@@ -180,6 +181,8 @@ void RtcMne::initPluginControlWidgets()
     plControlWidgets.append(pMinimumNormSettingsView);
 
     emit pluginControlWidgetsChanged(plControlWidgets, this->getName());
+
+    m_bPluginControlWidgetsInit = true;
 }
 
 //=============================================================================================================
@@ -287,6 +290,11 @@ void RtcMne::calcFiffInfo()
 
 void RtcMne::doClustering()
 {
+    if(m_pFwd->isClustered()) {
+        qInfo() << "[RtcMne::doClustering] Forward solution is already clustered.";
+        return;
+    }
+
     emit clusteringStarted();
 
     m_qMutex.lock();
@@ -337,7 +345,7 @@ bool RtcMne::stop()
 
     m_qListCovChNames.clear();
 
-    m_pFiffInfo = Q_NULLPTR;
+    m_bPluginControlWidgetsInit = false;
 
     return true;
 }
@@ -377,16 +385,15 @@ void RtcMne::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement)
     QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
 
     if(pRTMSA && this->isRunning()) {
-        //Check if the buffers are initialized
-        if(!m_pCircularMatrixBuffer) {
-            m_pCircularMatrixBuffer = CircularBuffer_Matrix_double::SPtr(new CircularBuffer_Matrix_double(10));
-        }
-
         //Fiff Information of the RTMSA
         if(!m_pFiffInfoInput) {
             m_pFiffInfoInput = pRTMSA->info();
             initPluginControlWidgets();
             m_iNumAverages = 1;
+        }
+
+        if(!m_bPluginControlWidgetsInit) {
+            initPluginControlWidgets();
         }
 
         if(this->isRunning()) {
@@ -464,10 +471,13 @@ void RtcMne::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
             for(int i = 0; i < pFiffEvokedSet->evoked.size(); ++i) {
                 if(pFiffEvokedSet->evoked.at(i).comment == m_sAvrType) {
                     m_pFiffInfoInput = QSharedPointer<FiffInfo>(new FiffInfo(pFiffEvokedSet->evoked.at(i).info));
-                    initPluginControlWidgets();
                     break;
                 }
             }
+        }
+
+        if(!m_bPluginControlWidgetsInit) {
+            initPluginControlWidgets();
         }
 
         if(this->isRunning()) {

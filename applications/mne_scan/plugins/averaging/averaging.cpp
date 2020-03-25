@@ -76,7 +76,7 @@ using namespace Eigen;
 //=============================================================================================================
 
 Averaging::Averaging()
-: m_pCircularBuffer = CircularBuffer<FIFFLIB::FiffEvokedSet>::SPtr::create(10);
+: m_pCircularBuffer(CircularBuffer<FIFFLIB::FiffEvokedSet>::SPtr::create(40))
 {
 }
 
@@ -118,7 +118,7 @@ bool Averaging::stop()
     requestInterruption();
     wait(500);
 
-    m_pFiffInfo = Q_NULLPTR;
+    m_bPluginControlWidgetsInit = false;
 
     return true;
 }
@@ -160,11 +160,10 @@ void Averaging::update(SCMEASLIB::Measurement::SPtr pMeasurement)
                     m_mapStimChsIndexNames.insert(m_pFiffInfo->chs[i].ch_name,i);
                 }
             }
+        }
 
+        if(!m_bPluginControlWidgetsInit) {
             initPluginControlWidgets();
-
-            emit stimChannelsChanged(m_mapStimChsIndexNames);
-            emit fiffChInfoChanged(m_pFiffInfo->chs);
         }
 
         // Append new data
@@ -232,6 +231,8 @@ void Averaging::initPluginControlWidgets()
         connect(this, &Averaging::evokedSetChanged,
                 pAveragingSettingsView, &AveragingSettingsView::setDetectedEpochs);
 
+        emit stimChannelsChanged(m_mapStimChsIndexNames);
+
         plControlWidgets.append(pAveragingSettingsView);
 
         ArtifactSettingsView* pArtifactSettingsView = new ArtifactSettingsView(QString("MNESCAN/%1").arg(this->getName()));
@@ -241,6 +242,8 @@ void Averaging::initPluginControlWidgets()
                 this, &Averaging::onChangeArtifactThreshold);
         connect(this, &Averaging::fiffChInfoChanged,
                 pArtifactSettingsView, &ArtifactSettingsView::setChInfo);
+
+        emit fiffChInfoChanged(m_pFiffInfo->chs);
 
         plControlWidgets.append(pArtifactSettingsView);
 
@@ -275,6 +278,8 @@ void Averaging::initPluginControlWidgets()
         m_pRtAve->setBaselineTo(iBaselineToSamples, pAveragingSettingsView->getBaselineToSeconds());
         m_pRtAve->setBaselineActive(pAveragingSettingsView->getDoBaselineCorrection());
         m_pRtAve->setArtifactReduction(pArtifactSettingsView->getThresholdMap());
+
+        m_bPluginControlWidgetsInit = true;
     }
 }
 
@@ -397,6 +402,10 @@ void Averaging::onChangeBaselineActive(bool state)
 void Averaging::onNewEvokedSet(const FIFFLIB::FiffEvokedSet& evokedSet,
                                const QStringList& lResponsibleTriggerTypes)
 {
+    if(!this->isRunning()) {
+        return;
+    }
+
     while(!m_pCircularBuffer->push(evokedSet)) {
         //Do nothing until the circular buffer is ready to accept new data again
     }

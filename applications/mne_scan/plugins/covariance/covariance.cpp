@@ -79,6 +79,7 @@ using namespace Eigen;
 
 Covariance::Covariance()
 : m_iEstimationSamples(2000)
+, m_pCircularBuffer(CircularBuffer<FIFFLIB::FiffCov>::SPtr::create(10))
 {
 }
 
@@ -134,6 +135,8 @@ void Covariance::initPluginControlWidgets()
         plControlWidgets.append(pCovarianceWidget);
 
         emit pluginControlWidgetsChanged(plControlWidgets, this->getName());
+
+        m_bPluginControlWidgetsInit = true;
     }
 }
 
@@ -162,7 +165,7 @@ bool Covariance::stop()
     requestInterruption();
     wait(500);
 
-    m_pFiffInfo = Q_NULLPTR;
+    m_bPluginControlWidgetsInit = false;
 
     return true;
 }
@@ -204,20 +207,18 @@ void Covariance::update(SCMEASLIB::Measurement::SPtr pMeasurement)
         if(!m_pFiffInfo) {
             m_pFiffInfo = pRTMSA->info();
 
-            initPluginControlWidgets();
-
             m_pCovarianceOutput->data()->setFiffInfo(m_pFiffInfo);
 
             m_pRtCov = RtCov::SPtr(new RtCov(m_iEstimationSamples, m_pFiffInfo));
             connect(m_pRtCov.data(), &RtCov::covCalculated,
                     this, &Covariance::appendCovariance);
 
-            if(!m_pCircularBuffer) {
-                m_pCircularBuffer = CircularBuffer<FIFFLIB::FiffCov>::SPtr::create(10);
-            }
-
             // Start thread
             QThread::start();
+        }
+
+        if(!m_bPluginControlWidgetsInit) {
+            initPluginControlWidgets();
         }
 
         MatrixXd matData;
