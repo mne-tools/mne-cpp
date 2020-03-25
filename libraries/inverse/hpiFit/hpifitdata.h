@@ -42,6 +42,7 @@
 //=============================================================================================================
 
 #include "../inverse_global.h"
+#include "hpifit.h"
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -120,19 +121,6 @@ public:
 
     //=========================================================================================================
     /**
-     * The strucut specifing the sensor parameters.
-     */
-    struct Sensor {
-        Eigen::RowVector3d r0;
-        Eigen::MatrixXd rmag;
-        Eigen::MatrixXd cosmag;
-        Eigen::MatrixXd tra;
-        Eigen::RowVectorXd w;
-        int np;
-    };
-
-    //=========================================================================================================
-    /**
      * dipfit function is adapted from Fieldtrip Software.
      */
     void doDipfitConcurrent();
@@ -140,7 +128,7 @@ public:
     Eigen::MatrixXd     coilPos;
     Eigen::RowVectorXd  sensorData;
     DipFitError         errorInfo;
-    QList<Sensor>       sensorSet;
+    QList<struct Sensor>       sensorSet;
     Eigen::MatrixXd     matProjector;
 
 protected:
@@ -174,7 +162,7 @@ protected:
      */
     DipFitError dipfitError(const Eigen::MatrixXd& pos,
                             const Eigen::MatrixXd& data,
-                            const QList<Sensor>& sensorSet,
+                            const QList<struct Sensor>& sensorSet,
                             const Eigen::MatrixXd& matProjectors);
 
     //=========================================================================================================
@@ -195,7 +183,7 @@ protected:
                                int display,
                                const Eigen::MatrixXd& data,
                                const Eigen::MatrixXd& matProjectors,
-                               const QList<Sensor>& sensorSet,
+                               const QList<struct Sensor>& sensorSet,
                                int &simplex_numitr);
 };
 

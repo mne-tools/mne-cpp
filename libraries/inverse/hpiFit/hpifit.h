@@ -42,7 +42,7 @@
 //=============================================================================================================
 
 #include "../inverse_global.h"
-#include "hpifitdata.h"
+#include "fiff/fiff_ch_info.h"
 
 #include <fiff/fiff_dig_point_set.h>
 #include <fiff/fiff_dig_point.h>
@@ -71,7 +71,6 @@ namespace FWDLIB{
 
 namespace FIFFLIB{
     class FiffInfo;
-    class FiffChInfo;
     class FiffCoordTrans;
     class FiffDigPointSet;
 }
