@@ -259,7 +259,7 @@ protected:
 private:
     //=========================================================================================================
     /**
-     * update FwdCoilSet and store into sensors struct.
+     * Update FwdCoilSet and store into sensors struct.
      *
      */
     void updateCoils();
@@ -269,7 +269,7 @@ private:
 
     //=========================================================================================================
     /**
-     * update the channellist for init and if bads are changing
+     * Update the channellist for init and if bads changed
      *
      */
     void updateChannels(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
