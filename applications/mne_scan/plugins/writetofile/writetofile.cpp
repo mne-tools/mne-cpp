@@ -147,7 +147,7 @@ bool WriteToFile::stop()
     requestInterruption();
     wait();
 
-    m_pFiffInfo = Q_NULLPTR;
+    m_bPluginControlWidgetsInit = false;
 
     return true;
 }
@@ -182,6 +182,9 @@ void WriteToFile::update(SCMEASLIB::Measurement::SPtr pMeasurement)
         //Check if the fiff info was inititalized
         if(!m_pFiffInfo) {
             m_pFiffInfo = pRTMSA->info();
+        }
+
+        if(!m_bPluginControlWidgetsInit) {
             initPluginControlWidgets();
         }
 
@@ -256,6 +259,8 @@ void WriteToFile::initPluginControlWidgets()
                     pProjectSettingsView->setRecordingElapsedTime(m_recordingStartedTime.elapsed());
             });
         }
+
+        m_bPluginControlWidgetsInit = true;
     }
 }
 

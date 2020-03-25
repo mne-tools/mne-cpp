@@ -177,6 +177,8 @@ void NeuronalConnectivity::initPluginControlWidgets()
     onTriggerTypeChanged(pConnectivitySettingsView->getTriggerType());
 
     emit pluginControlWidgetsChanged(plControlWidgets, this->getName());
+
+    m_bPluginControlWidgetsInit = true;
 }
 
 //=============================================================================================================
@@ -209,7 +211,7 @@ bool NeuronalConnectivity::stop()
     requestInterruption();
     wait(500);
 
-    m_pFiffInfo = Q_NULLPTR;
+    m_bPluginControlWidgetsInit = false;
 
     return true;
 }
@@ -255,7 +257,9 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasuremen
 
             // Generate network nodes
             m_connectivitySettings.setNodePositions(*pRTSE->getFwdSolution(), *pRTSE->getSurfSet());
+        }
 
+        if(!m_bPluginControlWidgetsInit) {
             initPluginControlWidgets();
         }
 
@@ -319,7 +323,9 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
             //Generate node vertices
             generateNodeVertices();
             m_iNumberBadChannels = m_pFiffInfo->bads.size();
+        }
 
+        if(!m_bPluginControlWidgetsInit) {
             initPluginControlWidgets();
         }
 
@@ -404,7 +410,9 @@ void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
                     break;
                 }
             }
+        }
 
+        if(!m_bPluginControlWidgetsInit) {
             initPluginControlWidgets();
         }
 

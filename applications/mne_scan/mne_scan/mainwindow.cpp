@@ -395,7 +395,7 @@ void MainWindow::createActions()
     m_pActionQuickControl = new QAction(QIcon(":/images/quickControl.png"), tr("Show quick control widget"),this);
     m_pActionQuickControl->setStatusTip(tr("Show quick control widget"));
     connect(m_pActionQuickControl.data(), &QAction::triggered,
-            m_pQuickControlView.data(), &QuickControlView::setVisible);
+            m_pQuickControlView.data(), &QuickControlView::show);
     m_pActionQuickControl->setVisible(false);
 }
 
