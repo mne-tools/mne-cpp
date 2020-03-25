@@ -185,9 +185,8 @@ DipFitError HPIFitData::dipfitError(const Eigen::MatrixXd& pos,
     Eigen::MatrixXd lf(data.size(),3);
     // field vector to store calculated value from averaging np integration points on sensor
     for(int i = 0; i < sensorSet.size(); i++){
-        Sensor sensor = sensorSet[i];
-        lfSensor = compute_leadfield(pos, sensor);
-        lf.row(i) = sensor.w * lfSensor;
+        lfSensor = compute_leadfield(pos, sensorSet[i]);
+        lf.row(i) = sensorSet[i].w * lfSensor;
     }
     // Compute lead field for a magnetic dipole in infinite vacuum
 
@@ -230,7 +229,7 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& pos,
 
     DipFitError tempdip, fxr, fxe, fxc, fxcc;
 
-    tolx = tolf = 1e-4;
+    tolx = tolf = 1e-5;
     // Seok
     // tolx = tolf = 1e-9;
 
