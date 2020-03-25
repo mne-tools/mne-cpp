@@ -254,10 +254,30 @@ protected:
 
     //=========================================================================================================
 
-    QList<FIFFLIB::FiffChInfo>   m_channels;             /**< Channellist */
     QList<Sensor>                m_sensorSet;            /**< sensorSet */
-    QVector<int>                 m_innerind;             /**< innerind  */
-    QString                      m_sHPIResourceDir;      /**< Hold the resource folder to store the debug information in. */
+
+private:
+    //=========================================================================================================
+    /**
+     * update FwdCoilSet and store into sensors struct.
+     *
+     */
+    void updateCoils();
+
+    FWDLIB::FwdCoilSet* m_templates;
+    FWDLIB::FwdCoilSet* m_megCoils;
+
+    //=========================================================================================================
+    /**
+     * update the channellist for init and if bads are changing
+     *
+     */
+    void updateChannels(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
+
+    QList<FIFFLIB::FiffChInfo>   m_channels;             /**< Channellist with excluded bads */
+    QVector<int>                 m_innerind;             /**< index of inner channels  */
+    QList<QString>               m_bads;                 /**< contains bad channels  */
+
 };
 
 //=============================================================================================================
