@@ -699,11 +699,14 @@ void FiffRawViewModel::updateDisplayData()
 
 //=============================================================================================================
 
-void FiffRawViewModel::newTimeMark(const int& xpos)
+void FiffRawViewModel::newTimeMark(const float& xpos)
 {
     qDebug() << "First held:" << m_iFiffCursorBegin;
     qDebug() << "DX" << m_dDx;
-    timeMarkList.append(35.0);
+    //Get absolute sample number of where we clicked
+    float fSample = (float)absoluteFirstSample() + (xpos/m_dDx);
+    timeMarkList.append(fSample);
+    std::sort(timeMarkList.begin(),timeMarkList.end());
 }
 
 //=============================================================================================================

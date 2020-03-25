@@ -296,6 +296,8 @@ void FiffRawView::onMakeScreenshot(const QString& imageType)
 
 void FiffRawView::customContextMenuRequested(const QPoint &pos)
 {
+    lastClickedPoint = ((float)pos.x() + (float)m_pTableView->horizontalScrollBar()->value());
+
     QMenu* menu = new QMenu(this);
 
     QAction* markTime = menu->addAction(tr("Mark time"));
@@ -305,8 +307,6 @@ void FiffRawView::customContextMenuRequested(const QPoint &pos)
     menu->popup(m_pTableView->viewport()->mapToGlobal(pos));
 
     qDebug() << "POS:" << pos.x();
-
-    lastClickedPoint = pos.x() + m_pTableView->horizontalScrollBar()->value();
 }
 
 //=============================================================================================================

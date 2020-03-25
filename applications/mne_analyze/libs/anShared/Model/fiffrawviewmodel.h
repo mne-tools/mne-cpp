@@ -361,7 +361,7 @@ public:
      */
     inline qint32 numVLines() const;
 
-    void newTimeMark(const int& xpos);
+    void newTimeMark(const float& xpos);
 
     float getTimeMarks(int index) const;
 

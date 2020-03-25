@@ -153,6 +153,7 @@ void FiffRawViewDelegate::paint(QPainter *painter,
 
                 path = QPainterPath(QPointF(option.rect.x()+pos, option.rect.y()));
 
+                //Plot time marks
                 createMarksPath(index,
                                 option,
                                 path,
@@ -323,9 +324,27 @@ void FiffRawViewDelegate::createMarksPath(const QModelIndex &index,
     float fBottom = option.rect.bottomRight().y();
     float fInitial = path.currentPosition().x();
 
-    for (int i = 0; i < t_pModel->getTimeListSize(); i++) {
-        //path.moveTo(fInitial + ((dDx * fSampFreq) * timeList[i]), fTop);
-        path.moveTo(path.currentPosition().x() + t_pModel->getTimeMarks(i), fTop);
-        path.lineTo(path.currentPosition().x(), fBottom);
+//    for (int i = t_pModel->currentFirstSample(); i < t_pModel->getTimeListSize(); i++) {
+//        //path.moveTo(fInitial + ((dDx * fSampFreq) * timeList[i]), fTop);
+//        path.moveTo(path.currentPosition().x() + t_pModel->getTimeMarks(i), fTop);
+//        path.lineTo(path.currentPosition().x(), fBottom);
+//    }
+    path.moveTo(path.currentPosition().x(), fTop);
+
+    qDebug() << "We're here chief";
+
+    int count = 0;
+    for(int j = t_pModel->currentFirstSample(); j < (t_pModel->currentFirstSample() + data.size()); j++) {
+        if(!(count < t_pModel->getTimeListSize())) {
+            break;
+        }
+        else {
+            if(j == (int)t_pModel->getTimeMarks(count)) {
+                path.moveTo(path.currentPosition().x(), fTop);
+                path.lineTo(path.currentPosition().x(), fBottom);
+                count++;
+            }
+            path.moveTo(path.currentPosition().x() + dDx, fTop);
+        }
     }
 }
