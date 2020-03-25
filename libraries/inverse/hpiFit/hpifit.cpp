@@ -87,37 +87,14 @@ HPIFit::HPIFit(FiffInfo::SPtr pFiffInfo)
     m_channels = QList<FIFFLIB::FiffChInfo>();
     m_innerind = QVector<int>();
     m_sensorSet = QList<Sensor>();
+    m_bads = pFiffInfo->bads;
 
-    // Get the indices of inner layer channels and exclude bad channels and create channellist
-    int numCh = pFiffInfo->nchan;
-    for (int i = 0; i < numCh; ++i) {
-        if(pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_BABY_MAG ||
-                pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T1 ||
-                pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T2 ||
-                pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T3) {
-            // Check if the sensor is bad, if not append to innerind
-            if(!(pFiffInfo->bads.contains(pFiffInfo->ch_names.at(i)))) {
-                m_innerind.append(i);
-                m_channels.append(pFiffInfo->chs[i]);
-            }
-        }
-    }
+    // init coils
+    m_templates = NULL;
+    m_megCoils = NULL;
 
-    // Setup Constructors for Coil Set
-    FwdCoilSet* templates = NULL;
-    FwdCoilSet* megCoils = NULL;
-
-    // Create MEG-Coils and read doil_def.dat
-    QString qPath = QString(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
-    // Create MEG-Coils and read data
-    int acc = 2;
-    int nch = m_channels.size();
-    FiffCoordTransOld* t = NULL;
-
-    templates = FwdCoilSet::read_coil_defs(qPath);
-
-    megCoils = templates->create_meg_coils(m_channels,nch,acc,t);
-    createSensorSet(m_sensorSet,megCoils);
+    updateChannels(pFiffInfo);
+    updateCoils();
 
 }
 
@@ -143,6 +120,13 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
     if(t_matProjectors.rows() == 0 || t_matProjectors.cols() == 0 ) {
         std::cout<<std::endl<< "HPIFit::fitHPI - No projector passed. Returning.";
         return;
+    }
+
+    // check if bads have changed and update coils/channellist if so
+    if(!(m_bads == pFiffInfo->bads)) {
+        m_bads = pFiffInfo->bads;
+        updateChannels(pFiffInfo);
+        updateCoils();
     }
 
     //struct SensorInfo sensors;
@@ -607,4 +591,44 @@ void HPIFit::storeHeadPosition(float time,
     position(position.rows()-1,7) = vGoF.mean();
     position(position.rows()-1,8) = error;
     position(position.rows()-1,9) = 0;
+}
+
+//=============================================================================================================
+
+void HPIFit::updateCoils()
+{
+    // Create MEG-Coils and read data
+    int acc = 2;
+    int nch = m_channels.size();
+    FiffCoordTransOld* t = NULL;
+
+    if(!m_templates) {
+        // read coil_def.dat
+        QString qPath = QString(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
+        m_templates = FwdCoilSet::read_coil_defs(qPath);
+    }
+    // create sensor set
+    m_megCoils = m_templates->create_meg_coils(m_channels,nch,acc,t);
+    createSensorSet(m_sensorSet,m_megCoils);
+}
+
+//=============================================================================================================
+
+void HPIFit::updateChannels(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo)
+{
+    // Get the indices of inner layer channels and exclude bad channels and create channellist
+    int numCh = pFiffInfo->nchan;
+    for (int i = 0; i < numCh; ++i) {
+        if(pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_BABY_MAG ||
+                pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T1 ||
+                pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T2 ||
+                pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T3) {
+            // Check if the sensor is bad, if not append to innerind
+            if(!(pFiffInfo->bads.contains(pFiffInfo->ch_names.at(i)))) {
+                m_innerind.append(i);
+                m_channels.append(pFiffInfo->chs[i]);
+            }
+        }
+    }
+    m_bads = pFiffInfo->bads;
 }
