@@ -41,6 +41,8 @@
 
 #include <mne/mne_bem.h>
 
+#include <fiff/fiff_coord_trans.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -58,6 +60,7 @@
 using namespace FSLIB;
 using namespace MNELIB;
 using namespace DISP3DLIB;
+using namespace FIFFLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -67,6 +70,44 @@ BemTreeItem::BemTreeItem(int iType, const QString& text)
 : AbstractTreeItem(iType, text)
 {
     initItem();
+}
+
+//=============================================================================================================
+
+void BemTreeItem::setTransform(const Qt3DCore::QTransform& transform)
+{
+    if(m_pRenderable3DEntity) {
+        m_pRenderable3DEntity->setTransform(transform);
+    }
+}
+
+//=============================================================================================================
+
+void BemTreeItem::setTransform(const FiffCoordTrans& transform,
+                               bool bApplyInverse)
+{
+    if(m_pRenderable3DEntity) {
+        m_pRenderable3DEntity->setTransform(transform, bApplyInverse);
+    }
+}
+
+//=============================================================================================================
+
+void BemTreeItem::applyTransform(const Qt3DCore::QTransform& transform)
+{
+    if(m_pRenderable3DEntity) {
+        m_pRenderable3DEntity->applyTransform(transform);
+    }
+}
+
+//=============================================================================================================
+
+void BemTreeItem::applyTransform(const FiffCoordTrans& transform,
+                                 bool bApplyInverse)
+{
+    if(m_pRenderable3DEntity) {
+        m_pRenderable3DEntity->applyTransform(transform, bApplyInverse);
+    }
 }
 
 //=============================================================================================================
@@ -83,11 +124,15 @@ void BemTreeItem::initItem()
 
 void BemTreeItem::addData(const MNEBem &tBem, Qt3DCore::QEntity* p3DEntityParent)
 {
+    if(!m_pRenderable3DEntity) {
+        m_pRenderable3DEntity = new Renderable3DEntity(p3DEntityParent);
+    }
+
     //Generate child items based on BEM input parameters
     for(int i = 0; i < tBem.size(); ++i) {
         QString sBemSurfName;
         sBemSurfName = QString("%1").arg(tBem[i].id);
-        BemSurfaceTreeItem* pSurfItem = new BemSurfaceTreeItem(p3DEntityParent, Data3DTreeModelItemTypes::BemSurfaceItem, sBemSurfName);
+        BemSurfaceTreeItem* pSurfItem = new BemSurfaceTreeItem(m_pRenderable3DEntity, Data3DTreeModelItemTypes::BemSurfaceItem, sBemSurfName);
         pSurfItem->addData(tBem[i]);
 
         QList<QStandardItem*> list;

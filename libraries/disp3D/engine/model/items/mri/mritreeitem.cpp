@@ -63,7 +63,8 @@ using namespace DISP3DLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MriTreeItem::MriTreeItem(int iType, const QString& text)
+MriTreeItem::MriTreeItem(int iType,
+                         const QString& text)
 : AbstractTreeItem(iType, text)
 {
     initItem();
@@ -81,7 +82,9 @@ void MriTreeItem::initItem()
 
 //=============================================================================================================
 
-QList<FsSurfaceTreeItem*> MriTreeItem::addData(const SurfaceSet& tSurfaceSet, const AnnotationSet& tAnnotationSet, Qt3DCore::QEntity* p3DEntityParent)
+QList<FsSurfaceTreeItem*> MriTreeItem::addData(const SurfaceSet& tSurfaceSet,
+                                               const AnnotationSet& tAnnotationSet,
+                                               Qt3DCore::QEntity* p3DEntityParent)
 {
     //Generate child items based on surface set input parameters
     QList<FsSurfaceTreeItem*> returnItemList;
@@ -100,7 +103,9 @@ QList<FsSurfaceTreeItem*> MriTreeItem::addData(const SurfaceSet& tSurfaceSet, co
 
 //=============================================================================================================
 
-FsSurfaceTreeItem* MriTreeItem::addData(const Surface& tSurface, const Annotation& tAnnotation, Qt3DCore::QEntity* p3DEntityParent)
+FsSurfaceTreeItem* MriTreeItem::addData(const Surface& tSurface,
+                                        const Annotation& tAnnotation,
+                                        Qt3DCore::QEntity* p3DEntityParent)
 {
     //Generate child items based on surface set input parameters
     FsSurfaceTreeItem* pReturnItem = Q_NULLPTR;
