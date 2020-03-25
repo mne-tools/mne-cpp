@@ -127,10 +127,8 @@ protected:
     //=========================================================================================================
     /**
      * Slot called when the time point changes.
-     *
-     * @param [in] iTimePointMs        The new time point in ms.
      */
-    void onTimePointValueChanged(int iTimePointMs);
+    void onTimePointValueChanged();
 
     Ui::MinimumNormSettingsViewWidget* ui;
 

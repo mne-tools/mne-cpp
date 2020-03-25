@@ -203,9 +203,9 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
                 m_pRtMNEItem->setThresholds(QVector3D(0.0,5,10));
                 m_pRtMNEItem->setColormapType("Hot");
                 m_pRtMNEItem->setVisualizationType("Annotation based");
-                m_pRtMNEItem->setNumberAverages(17);
+                m_pRtMNEItem->setNumberAverages(1); // Set to 1 because we want to enable time point picking which only includes one sample
                 m_pRtMNEItem->setAlpha(1.0);
-                m_pRtMNEItem->setStreamingState(false);
+                m_pRtMNEItem->setStreamingState(true);
                 m_pRtMNEItem->setSFreq(pRTSE->getFiffInfo()->sfreq);
 
                 init();

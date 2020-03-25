@@ -394,8 +394,7 @@ void MainWindow::createActions()
     //Display Toolbar
     m_pActionQuickControl = new QAction(QIcon(":/images/quickControl.png"), tr("Show quick control widget"),this);
     m_pActionQuickControl->setStatusTip(tr("Show quick control widget"));
-    m_pActionQuickControl->setCheckable(true);
-    connect(m_pActionQuickControl.data(), &QAction::toggled,
+    connect(m_pActionQuickControl.data(), &QAction::triggered,
             m_pQuickControlView.data(), &QuickControlView::setVisible);
     m_pActionQuickControl->setVisible(false);
 }
@@ -421,6 +420,9 @@ void MainWindow::createMenus()
 
     m_pMenuView->clear();
 
+    if(m_pDockWidget_Log) {
+        m_pMenuView->addAction(m_pDockWidget_Log->toggleViewAction());
+    }
     m_pMenuLgLv = m_pMenuView->addMenu(tr("&Log Level"));
     m_pMenuLgLv->addAction(m_pActionMinLgLv);
     m_pMenuLgLv->addAction(m_pActionNormLgLv);
@@ -429,10 +431,6 @@ void MainWindow::createMenus()
 
     if(m_pPluginGuiDockWidget) {
         m_pMenuView->addAction(m_pPluginGuiDockWidget->toggleViewAction());
-    }
-
-    if(m_pDockWidget_Log) {
-        m_pMenuView->addAction(m_pDockWidget_Log->toggleViewAction());
     }
 
     for(int i = 0; i < m_qListDynamicDisplayMenuActions.size(); ++i) {
@@ -716,7 +714,8 @@ void MainWindow::startMeasurement()
     writeToLog(tr("Starting real-time measurement..."), _LogKndMessage, _LogLvMin);
 
     if(!m_pPluginSceneManager->startPlugins()) {
-        QMessageBox::information(0, tr("MNE Scan - Start"), QString(QObject::tr("Not able to start at least one sensor plugin!")), QMessageBox::Ok);
+        QMessageBox::information(0, tr("MNE Scan - Start"), QString(QObject::tr("Not able to start all plugins!")), QMessageBox::Ok);
+        m_pPluginSceneManager->stopPlugins();
         return;
     }
 
@@ -746,6 +745,7 @@ void MainWindow::stopMeasurement()
     m_pDisplayManager->clean();
 
     // Hide and clear QuickControlView
+    m_pQuickControlView->hide();
     m_pActionQuickControl->setVisible(false);
     m_pQuickControlView->clear();
 

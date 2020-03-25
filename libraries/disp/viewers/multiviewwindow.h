@@ -83,7 +83,7 @@ public:
      * Constructs an MultiViewWindow.
      */
     explicit MultiViewWindow(QWidget *parent = Q_NULLPTR,
-                             Qt::WindowFlags flags = Qt::Window);
+                             Qt::WindowFlags flags = Qt::WindowFlags());
 
     //=========================================================================================================
     /**

@@ -78,7 +78,7 @@ using namespace Eigen;
 //=============================================================================================================
 
 Covariance::Covariance()
-: m_iEstimationSamples(5000)
+: m_iEstimationSamples(2000)
 {
 }
 
@@ -199,9 +199,7 @@ QWidget* Covariance::setupWidget()
 
 void Covariance::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
-
-    if(pRTMSA) {
+    if(QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>()) {
         //Fiff information
         if(!m_pFiffInfo) {
             m_pFiffInfo = pRTMSA->info();

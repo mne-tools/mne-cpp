@@ -76,6 +76,7 @@ using namespace Eigen;
 //=============================================================================================================
 
 Averaging::Averaging()
+: m_pCircularBuffer = CircularBuffer<FIFFLIB::FiffEvokedSet>::SPtr::create(10);
 {
 }
 
@@ -105,11 +106,6 @@ void Averaging::unload()
 
 bool Averaging::start()
 {
-    // Init circular buffer to transmit data from the producer to this thread
-    if(!m_pCircularBuffer) {
-        m_pCircularBuffer = CircularBuffer<FIFFLIB::FiffEvokedSet>::SPtr::create(10);
-    }
-
     QThread::start();
 
     return true;
@@ -401,7 +397,6 @@ void Averaging::onChangeBaselineActive(bool state)
 void Averaging::onNewEvokedSet(const FIFFLIB::FiffEvokedSet& evokedSet,
                                const QStringList& lResponsibleTriggerTypes)
 {
-
     while(!m_pCircularBuffer->push(evokedSet)) {
         //Do nothing until the circular buffer is ready to accept new data again
     }
