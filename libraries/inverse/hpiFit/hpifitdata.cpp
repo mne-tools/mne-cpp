@@ -230,9 +230,9 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& pos,
 
     DipFitError tempdip, fxr, fxe, fxc, fxcc;
 
-    //tolx = tolf = 1e-4;
+    tolx = tolf = 1e-4;
     // Seok
-    tolx = tolf = 1e-9;
+    // tolx = tolf = 1e-9;
 
     switch(display) {
         case 0:
