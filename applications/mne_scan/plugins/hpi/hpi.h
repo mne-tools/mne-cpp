@@ -66,6 +66,10 @@ namespace FIFFLIB {
     class FiffCoordTrans;
 }
 
+namespace INVERSELIB {
+    class HPIFit;
+}
+
 namespace SCMEASLIB{
     class RealTimeMultiSampleArray;
     class RealTimeHpiResult;
