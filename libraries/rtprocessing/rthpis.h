@@ -66,6 +66,7 @@ namespace FIFFLIB {
 }
 
 namespace INVERSELIB {
+    class HPIFit;
     struct HpiFitResult;
 }
 
@@ -99,6 +100,7 @@ public:
     void doWork(const Eigen::MatrixXd& matData,
                 const Eigen::MatrixXd& matProjectors,
                 const QVector<int>& vFreqs,
+                QSharedPointer<INVERSELIB::HPIFit> pHpiFit,
                 QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
 signals:
@@ -179,7 +181,7 @@ protected:
     void handleResults(const INVERSELIB::HpiFitResult &fitResult);
 
     QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo;           /**< Holds the fiff measurement information. */
-
+    QSharedPointer<INVERSELIB::HPIFit>              m_pHpiFit;              /**< Holds the HpiFit object. */
     QThread             m_workerThread;         /**< The worker thread. */
     QVector<int>        m_vCoilFreqs;           /**< Vector contains the HPI coil frequencies. */
     Eigen::MatrixXd     m_matProjectors;        /**< Holds the matrix with the SSP and compensator projectors.*/
@@ -189,6 +191,7 @@ signals:
     void operate(const Eigen::MatrixXd& matData,
                  const Eigen::MatrixXd& matProjectors,
                  const QVector<int>& vFreqs,
+                 QSharedPointer<INVERSELIB::HPIFit> pHpiFit,
                  QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 };
 
