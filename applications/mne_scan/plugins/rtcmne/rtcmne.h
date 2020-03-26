@@ -252,8 +252,6 @@ protected:
     qint32                          m_iDownSample;              /**< Down sample factor. */
     qint32                          m_iTimePointSps;            /**< The time point to pick from the data in samples. */
 
-    bool                            m_bFinishedClustering;      /**< If clustered forward solution is available. */
-
     QFile                           m_qFileFwdSolution;         /**< File to forward solution. */
 
     QString                         m_sAtlasDir;                /**< File to Atlas. */

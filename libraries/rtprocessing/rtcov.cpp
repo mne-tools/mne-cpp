@@ -40,7 +40,6 @@
 
 #include "rtcov.h"
 
-#include <fiff/fiff_cov.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -58,16 +57,33 @@ using namespace FIFFLIB;
 using namespace Eigen;
 
 //=============================================================================================================
-// DEFINE MEMBER METHODS RtCovWorker
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-void RtCovWorker::doWork(const RtCovInput &inputData)
+RtCov::RtCov(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo)
+: m_fiffInfo(*pFiffInfo)
+, m_iSamples(0)
 {
-    if(this->thread()->isInterruptionRequested()) {
-        return;
+}
+
+//=============================================================================================================
+
+FiffCov RtCov::estimateCovariance(const Eigen::MatrixXd& matData,
+                                  int iNewMaxSamples)
+{
+    if(m_fiffInfo.chs.isEmpty()) {
+        qWarning() << "[RtCov::estimateCovariance] FiffInfo was not set. Returning empty covariance estimation.";
+        return FiffCov();
     }
 
-    QFuture<RtCovComputeResult> result = QtConcurrent::mappedReduced(inputData.lData,
+    m_lData.append(matData);
+    m_iSamples += matData.cols();
+
+    if(m_iSamples < iNewMaxSamples) {
+        return FiffCov();
+    }
+
+    QFuture<RtCovComputeResult> result = QtConcurrent::mappedReduced(m_lData,
                                                                      compute,
                                                                      reduce);
 
@@ -80,31 +96,31 @@ void RtCovWorker::doWork(const RtCovInput &inputData)
     computedCov.data = finalResult.matData;
 
     QStringList exclude;
-    for(int i = 0; i<inputData.fiffInfo.chs.size(); i++) {
-        if(inputData.fiffInfo.chs.at(i).kind != FIFFV_MEG_CH &&
-           inputData.fiffInfo.chs.at(i).kind != FIFFV_EEG_CH) {
-            exclude << inputData.fiffInfo.chs.at(i).ch_name;
+    for(int i = 0; i<m_fiffInfo.chs.size(); i++) {
+        if(m_fiffInfo.chs.at(i).kind != FIFFV_MEG_CH &&
+           m_fiffInfo.chs.at(i).kind != FIFFV_EEG_CH) {
+            exclude << m_fiffInfo.chs.at(i).ch_name;
         }
     }
     bool doProj = true;
 
-    if(inputData.iSamples > 0) {
-        finalResult.mu /= (float)inputData.iSamples;
-        computedCov.data.array() -= inputData.iSamples * (finalResult.mu * finalResult.mu.transpose()).array();
-        computedCov.data.array() /= (inputData.iSamples - 1);
+    if(m_iSamples > 0) {
+        finalResult.mu /= (float)m_iSamples;
+        computedCov.data.array() -= m_iSamples * (finalResult.mu * finalResult.mu.transpose()).array();
+        computedCov.data.array() /= (m_iSamples - 1);
 
         computedCov.kind = FIFFV_MNE_NOISE_COV;
         computedCov.diag = false;
         computedCov.dim = computedCov.data.rows();
 
         //ToDo do picks
-        computedCov.names = inputData.fiffInfo.ch_names;
-        computedCov.projs = inputData.fiffInfo.projs;
-        computedCov.bads = inputData.fiffInfo.bads;
-        computedCov.nfree = inputData.iSamples;
+        computedCov.names = m_fiffInfo.ch_names;
+        computedCov.projs = m_fiffInfo.projs;
+        computedCov.bads = m_fiffInfo.bads;
+        computedCov.nfree = m_iSamples;
 
         // regularize noise covariance
-        computedCov = computedCov.regularize(inputData.fiffInfo, 0.05, 0.05, 0.1, doProj, exclude);
+        computedCov = computedCov.regularize(m_fiffInfo, 0.05, 0.05, 0.1, doProj, exclude);
 
 //            qint32 samples = rawSegment.cols();
 //            VectorXf mu = rawSegment.rowwise().sum().array() / (float)samples;
@@ -116,15 +132,21 @@ void RtCovWorker::doWork(const RtCovInput &inputData)
 //            std::cout << "Noise Covariance:\n" << noise_covariance.block(0,0,10,10) << std::endl;
 
 //            printf("%d raw buffer (%d x %d) generated\r\n", count, tmp.rows(), tmp.cols());
-        emit resultReady(computedCov);
+
+        m_lData.clear();
+        m_iSamples = 0;
+
+        return computedCov;
     } else {
-        qDebug() << "RtCovWorker::doWork - Number of samples equals zero. Regularization not possible. Returning without result.";
+        qWarning() << "[RtCov::estimateCovariance] Number of samples equals zero. Regularization not possible. Returning empty covariance estimation.";
+        return FiffCov();
     }
+
 }
 
 //=============================================================================================================
 
-RtCovComputeResult RtCovWorker::compute(const MatrixXd &matData)
+RtCovComputeResult RtCov::compute(const MatrixXd &matData)
 {
     RtCovComputeResult result;
     result.mu = matData.rowwise().sum();
@@ -134,7 +156,7 @@ RtCovComputeResult RtCovWorker::compute(const MatrixXd &matData)
 
 //=============================================================================================================
 
-void RtCovWorker::reduce(RtCovComputeResult& finalResult, const RtCovComputeResult &tempResult)
+void RtCov::reduce(RtCovComputeResult& finalResult, const RtCovComputeResult &tempResult)
 {
     if(finalResult.matData.size() == 0 || finalResult.mu.size() == 0) {
         finalResult.mu = tempResult.mu;
@@ -143,107 +165,4 @@ void RtCovWorker::reduce(RtCovComputeResult& finalResult, const RtCovComputeResu
         finalResult.mu += tempResult.mu;
         finalResult.matData += tempResult.matData;
     }
-}
-
-//=============================================================================================================
-// DEFINE MEMBER METHODS RtCov
-//=============================================================================================================
-
-RtCov::RtCov(qint32 iMaxSamples,
-             FiffInfo::SPtr pFiffInfo,
-             QObject *parent)
-: QObject(parent)
-, m_iMaxSamples(iMaxSamples)
-, m_pFiffInfo(pFiffInfo)
-, m_iSamples(0)
-, m_iNewMaxSamples(iMaxSamples)
-{
-    RtCovWorker *worker = new RtCovWorker;
-    worker->moveToThread(&m_workerThread);
-
-    connect(&m_workerThread, &QThread::finished,
-            worker, &QObject::deleteLater);
-
-    connect(this, &RtCov::operate,
-            worker, &RtCovWorker::doWork);
-
-    connect(worker, &RtCovWorker::resultReady,
-            this, &RtCov::handleResults);
-
-    m_workerThread.start();
-
-    qRegisterMetaType<RtCovInput>("RtCovInput");
-}
-
-//=============================================================================================================
-
-RtCov::~RtCov()
-{
-    stop();
-}
-
-//=============================================================================================================
-
-void RtCov::setSamples(qint32 samples)
-{
-    m_iMaxSamples = samples;
-}
-
-//=============================================================================================================
-
-void RtCov::append(const MatrixXd &matDataSegment)
-{
-    if(m_pFiffInfo) {
-        m_lData.append(matDataSegment);
-        m_iSamples += matDataSegment.cols();
-
-        if(m_iSamples >= m_iMaxSamples) {
-            RtCovInput inputData;
-            inputData.lData = m_lData;
-            inputData.fiffInfo = FiffInfo(*m_pFiffInfo);
-            inputData.iSamples = m_iSamples;
-
-            emit operate(inputData);
-
-            m_iSamples = 0;
-            m_lData.clear();
-        }
-    }
-}
-
-//=============================================================================================================
-
-void RtCov::handleResults(const FIFFLIB::FiffCov& computedCov)
-{
-    emit covCalculated(computedCov);
-}
-
-//=============================================================================================================
-
-void RtCov::restart()
-{
-    stop();
-
-    RtCovWorker *worker = new RtCovWorker;
-    worker->moveToThread(&m_workerThread);
-
-    connect(&m_workerThread, &QThread::finished,
-            worker, &QObject::deleteLater);
-
-    connect(this, &RtCov::operate,
-            worker, &RtCovWorker::doWork);
-
-    connect(worker, &RtCovWorker::resultReady,
-            this, &RtCov::handleResults);
-
-    m_workerThread.start();
-}
-
-//=============================================================================================================
-
-void RtCov::stop()
-{
-    m_workerThread.requestInterruption();
-    m_workerThread.quit();
-    m_workerThread.wait();
 }

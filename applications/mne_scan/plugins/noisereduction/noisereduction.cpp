@@ -234,7 +234,7 @@ void NoiseReduction::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             for(unsigned char i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
                 // Please note that we do not need a copy here since this function will block until
                 // the buffer accepts new data again. Hence, the data is not deleted in the actual
-                // Mesaurement function after it emitted the notify signal.
+                // Measurement function after it emitted the notify signal.
                 while(!m_pCircularBuffer->push(pRTMSA->getMultiSampleArray()[i])) {
                     //Do nothing until the circular buffer is ready to accept new data again
                 }

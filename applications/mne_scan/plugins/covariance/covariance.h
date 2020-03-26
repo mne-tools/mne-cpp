@@ -148,8 +148,6 @@ public:
 
     void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
-    void appendCovariance(const FIFFLIB::FiffCov &covariance);
-
     void showCovarianceWidget();
 
     void changeSamples(qint32 samples);
@@ -158,12 +156,12 @@ protected:
     virtual void run();
 
 private:
+    QMutex      m_mutex;
     qint32      m_iEstimationSamples;
 
-    IOBUFFER::CircularBuffer<FIFFLIB::FiffCov>::SPtr    m_pCircularBuffer;              /**< Covariance circular buffer */
+    IOBUFFER::CircularBuffer_Matrix_double::SPtr        m_pCircularBuffer;              /**< Matrix data circular buffer */
 
     QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                    /**< Fiff measurement info.*/
-    QSharedPointer<RTPROCESSINGLIB::RtCov>              m_pRtCov;                       /**< Real-time covariance. */
 
     QSharedPointer<SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray> >  m_pCovarianceInput;     /**< The RealTimeMultiSampleArray of the Covariance input.*/
     QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeCov> >              m_pCovarianceOutput;    /**< The RealTimeCov of the Covariance output.*/
