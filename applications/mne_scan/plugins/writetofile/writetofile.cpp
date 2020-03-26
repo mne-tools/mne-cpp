@@ -285,7 +285,9 @@ void WriteToFile::run()
                         this->splitRecordingFile();
                     }
 
-                    m_pOutfid->write_raw_buffer(matData.cast<double>());
+                    if(m_pOutfid) {
+                        m_pOutfid->write_raw_buffer(matData);
+                    }
                 } else {
                     size = 0;
                 }
