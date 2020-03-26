@@ -43,7 +43,6 @@
 
 #include <utils/generics/circularbuffer.h>
 #include <scShared/Interfaces/IAlgorithm.h>
-#include <rtprocessing/rthpis.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -65,10 +64,6 @@ namespace FIFFLIB {
     class FiffInfo;
     class FiffDigPoint;
     class FiffCoordTrans;
-}
-
-namespace RTPROCESSINGLIB {
-    class RtHpi;
 }
 
 namespace SCMEASLIB{
