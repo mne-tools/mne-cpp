@@ -107,7 +107,6 @@ struct HpiFitResult {
     QString                     sFilePathDigitzers;
 };
 
-//=========================================================================================================
 /**
  * The strucut specifing the sensor parameters.
  */
@@ -198,22 +197,13 @@ public:
      * get from Neuromag's MaxFilter.
      *
      *
-<<<<<<< HEAD
-     * @param[in]   time          The corresponding time in the measurement for the fit.
-     * @param[out]  position      The matrix to store the results.
-||||||| constructed merge base
-     * @param[in]   time          The corresponding time in the measurement for the fit.
-     * @param[in]   pFiffInfo     The FiffInfo file from the measurement.
-     * @param[out]  position      The matrix to store the results.
-=======
      * @param[in]   fTime          The corresponding time in the measurement for the fit.
      * @param[in]   pFiffInfo     The FiffInfo file from the measurement.
      * @param[out]  mPosition      The matrix to store the results.
->>>>>>> MAINT: naming conventions
      * @param[in]   vGoF          The goodness of fit for each coil.
      * @param[in]   vError        The Hpi estimation Error per coil.
      *
-     * ToDo: get estimated movement velocity and stroe it in channel 9
+     * ToDo: get estimated movement velocity and store it in channel 9
      */
     static void storeHeadPosition(float fTime,
                                   const Eigen::MatrixXf& transDevHead,
@@ -225,22 +215,10 @@ protected:
     /**
      * Fits dipoles for the given coils and a given data set.
      *
-<<<<<<< HEAD
-     * @param[in] coil            The coil parameters.
-     * @param[in] sensorSet       The sensor information.
-     * @param[in] data            The data which used to fit the coils.
-     * @param[in] numCoils        The number of coils.
-||||||| constructed merge base
-     * @param[in] CoilParam       The coil parameters.
-     * @param[in] sensors         The sensor information.
-     * @param[in] data            The data which used to fit the coils.
-     * @param[in] numCoils        The number of coils.
-=======
      * @param[in] CoilParam       The coil parameters.
      * @param[in] lSensorSet      The sensor information.
      * @param[in] mData           The data which used to fit the coils.
      * @param[in] iNumCoils       The number of coils.
->>>>>>> MAINT: naming conventions
      * @param[in] t_matProjectors The projectors to apply. Bad channels are still included.
      *
      * @return Returns the coil parameters.
@@ -260,14 +238,9 @@ protected:
      *
      * @return Returns the transformation matrix.
      */
-<<<<<<< HEAD
-    static Eigen::Matrix4d computeTransformation(Eigen::MatrixXd NH,
-                                                 Eigen::MatrixXd BT);
-||||||| constructed merge base
-    Eigen::Matrix4d computeTransformation(Eigen::MatrixXd NH, Eigen::MatrixXd BT);
-=======
-    Eigen::Matrix4d computeTransformation(Eigen::MatrixXd mNH, Eigen::MatrixXd mBT);
->>>>>>> MAINT: naming conventions
+
+    Eigen::Matrix4d computeTransformation(Eigen::MatrixXd mNH,
+                                          Eigen::MatrixXd mBT);
 
     //=========================================================================================================
     /**
@@ -278,7 +251,8 @@ protected:
      * @param[in] coils         The coilset to read the sensor information from.
      *
      */
-    void createSensorSet(QList<Sensor>& lSensorSet, FWDLIB::FwdCoilSet* coils);
+    void createSensorSet(QList<Sensor>& lSensorSet,
+                         FWDLIB::FwdCoilSet* coils);
 
     //=========================================================================================================
 
