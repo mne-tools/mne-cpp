@@ -46,6 +46,8 @@
 #include <fs/surfaceset.h>
 #include <mne/mne_forwardsolution.h>
 
+#include <scMeas/realtimesourceestimate.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -148,6 +150,7 @@ void RtcMneSetupWidget::showFwdFileDialog()
         ui.m_qLineEdit_FwdFileName->setText(t_sFileName);
         m_pMNE->m_qFileFwdSolution.setFileName(t_sFileName);
         m_pMNE->m_pFwd = t_pFwd;
+        m_pMNE->m_pRTSEOutput->data()->setFwdSolution(t_pFwd);
     }
 }
 
@@ -171,6 +174,8 @@ void RtcMneSetupWidget::showAtlasDirDialog()
         m_pMNE->m_pAnnotationSet = t_pAnnotationSet;
 
         m_pMNE->m_sAtlasDir = t_sAtlasDir;
+
+        m_pMNE->m_pRTSEOutput->data()->setAnnotSet(t_pAnnotationSet);
 
         ui.m_qLabel_atlasStat->setText("loaded");
     }
@@ -199,6 +204,8 @@ void RtcMneSetupWidget::showSurfaceDirDialog()
         m_pMNE->m_pSurfaceSet = t_pSurfaceSet;
 
         m_pMNE->m_sSurfaceDir = t_sSurfaceDir;
+
+        m_pMNE->m_pRTSEOutput->data()->setSurfSet(t_pSurfaceSet);
 
         ui.m_qLabel_surfaceStat->setText("loaded");
     }
