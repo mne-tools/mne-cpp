@@ -170,6 +170,12 @@ private:
 
     //=========================================================================================================
     /**
+     * Call this funciton whenever the frequencie ordering was requested.
+     */
+    void onDoFreqOrder();
+
+    //=========================================================================================================
+    /**
      * Call this funciton whenever the coil frequencies changed.
      *
      * @param[in] vCoilFreqs    The new coil frequencies.
@@ -231,6 +237,7 @@ private:
 
     double                      m_dAllowedMeanErrorDist;    /**< The allowed error distance in order for the last fit to be counted as a good fit.*/
 
+    bool                        m_bDoFreqOrder;             /**< Order Frequencies.*/
     bool                        m_bDoSingleHpi;             /**< Do a single HPI fit.*/
     bool                        m_bDoContinousHpi;          /**< Do continous HPI fitting.*/
     bool                        m_bUseSSP;                  /**< Use SSP's.*/

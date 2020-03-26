@@ -214,6 +214,12 @@ signals:
 
     //=========================================================================================================
     /**
+     * Emit this signal whenever the freuence ordering is supposed to be triggered.
+     */
+    void doFreqOrder();
+
+    //=========================================================================================================
+    /**
      * Emit this signal whenever a single HPI fit is supposed to be triggered.
      */
     void doSingleHpiFit();
