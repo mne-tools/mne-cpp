@@ -64,7 +64,6 @@ using namespace DISPLIB;
 using namespace FIFFLIB;
 using namespace SCSHAREDLIB;
 using namespace Eigen;
-using namespace RTPROCESSINGLIB;
 using namespace INVERSELIB;
 
 //=============================================================================================================
