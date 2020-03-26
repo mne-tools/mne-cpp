@@ -255,8 +255,11 @@ bool BrainFlowBoard::start()
 bool BrainFlowBoard::stop()
 {
     try {
-        m_pBoardShim->stop_stream();
+        if(m_pBoardShim) {
+            m_pBoardShim->stop_stream();
+        }
         requestInterruption();
+        wait(500);
         m_pOutput->data()->clear();
     } catch (const BrainFlowException &err) {
         BoardShim::log_message((int)LogLevels::LEVEL_ERROR, err.what());
@@ -395,7 +398,7 @@ void BrainFlowBoard::run()
         iSampleIterator = 0;
 
         //get samples from device until the complete matrix is filled, i.e. the samples per block size is met
-        while(iSampleIterator < m_uiSamplesPerBlock) {
+        while(iSampleIterator < m_uiSamplesPerBlock && !isInterruptionRequested()) {
             //Get sample block from device
             data = m_pBoardShim->get_board_data (&iReceivedSamples);
             if (iReceivedSamples == 0) {
@@ -450,9 +453,7 @@ void BrainFlowBoard::releaseSession(bool useQmessage)
 
     m_pBoardShim = nullptr;
     m_pChannels = nullptr;
-    requestInterruption();
     m_iBoardId = (int)BoardIds::SYNTHETIC_BOARD;
-    m_pOutput->data()->clear();
     m_iSamplingFreq = 0;
     m_sStreamerParams = "";
     m_iNumberChannels = 0;
