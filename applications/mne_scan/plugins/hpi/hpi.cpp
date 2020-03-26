@@ -128,7 +128,7 @@ void Hpi::unload()
 
 bool Hpi::start()
 {
-    //Start thread as soon as we have received the first data block. See update().
+    QThread::start();
 
     return true;
 }
@@ -179,8 +179,6 @@ void Hpi::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             m_pFiffInfo = pRTMSA->info();
 
             updateProjections();
-
-            QThread::start();
         }
 
         if(!m_bPluginControlWidgetsInit) {
@@ -420,7 +418,10 @@ void Hpi::run()
         msleep(100);
     }
 
+<<<<<<< HEAD
     // init hpi fit
+=======
+>>>>>>> FIX: Fix restarting of plugins
     HpiFitResult fitResult;
     fitResult.devHeadTrans = m_pFiffInfo->dev_head_t;
 
