@@ -129,6 +129,9 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
         updateCoils();
     }
 
+    // Make sure the fitted digitzers are empty
+    fittedPointSet.clear();
+
     // init coil parameters
     struct CoilParam coil;
 
@@ -253,26 +256,6 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
     }
 
     //Generate seed point by projection the found channel position 3cm inwards
-<<<<<<< HEAD
-    vError.resize(numCoils);
-    double error = std::accumulate(vError.begin(), vError.end(), .0) / vError.size();
-    MatrixXd coilPos = MatrixXd::Zero(numCoils,3);
-
-    if(transDevHead.trans == MatrixXd::Identity(4,4).cast<float>() || error > 0.003){
-        for (int j = 0; j < chIdcs.rows(); ++j) {
-            if(chIdcs(j) < pFiffInfo->chs.size()) {
-                Vector3f r0 = pFiffInfo->chs.at(chIdcs(j)).chpos.r0;
-                coilPos.row(j) = (-1 * pFiffInfo->chs.at(chIdcs(j)).chpos.ez * 0.03 + r0).cast<double>();
-||||||| constructed merge base
-    double error = std::accumulate(vError.begin(), vError.end(), .0) / vError.size();
-    MatrixXd coilPos = MatrixXd::Zero(numCoils,3);
-
-    if(transDevHead.trans == MatrixXd::Identity(4,4).cast<float>() || error > 0.003){
-        for (int j = 0; j < chIdcs.rows(); ++j) {
-            if(chIdcs(j) < pFiffInfo->chs.size()) {
-                Vector3f r0 = pFiffInfo->chs.at(chIdcs(j)).chpos.r0;
-                coilPos.row(j) = (-1 * pFiffInfo->chs.at(chIdcs(j)).chpos.ez * 0.03 + r0).cast<double>();
-=======
     double dError = std::accumulate(vError.begin(), vError.end(), .0) / vError.size();
     MatrixXd mCoilPos = MatrixXd::Zero(iNumCoils,3);
 
@@ -281,7 +264,6 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
             if(vChIdcs(j) < pFiffInfo->chs.size()) {
                 Vector3f r0 = pFiffInfo->chs.at(vChIdcs(j)).chpos.r0;
                 mCoilPos.row(j) = (-1 * pFiffInfo->chs.at(vChIdcs(j)).chpos.ez * 0.03 + r0).cast<double>();
->>>>>>> MAINT: naming conventions
             }
         }
         //std::cout << "HPIFit::fitHPI - Coil " << j << " max value index " << iChIdx << std::endl;
@@ -316,16 +298,8 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
     MatrixXd mTestPos = mTrans * mTemp;
     MatrixXd mDiffPos = mTestPos.block(0,0,3,iNumCoils) - mHeadHPI.transpose();
 
-<<<<<<< HEAD
-    for(int i = 0; i < diffPos.cols(); ++i) {
-        vError[i] = diffPos.col(i).norm();
-||||||| constructed merge base
-    for(int i = 0; i < diffPos.cols(); ++i) {
-        vError.append(diffPos.col(i).norm());
-=======
     for(int i = 0; i < mDiffPos.cols(); ++i) {
         vError.append(mDiffPos.col(i).norm());
->>>>>>> MAINT: naming conventions
     }
 
     // store Goodness of Fit
