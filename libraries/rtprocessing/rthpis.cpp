@@ -67,6 +67,7 @@ using namespace INVERSELIB;
 void RtHpiWorker::doWork(const Eigen::MatrixXd& matData,
                          const Eigen::MatrixXd& matProjectors,
                          const QVector<int>& vFreqs,
+                         QSharedPointer<INVERSELIB::HPIFit> pHpiFit,
                          QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo)
 {
     if(this->thread()->isInterruptionRequested()) {
@@ -78,14 +79,14 @@ void RtHpiWorker::doWork(const Eigen::MatrixXd& matData,
     fitResult.devHeadTrans.from = 1;
     fitResult.devHeadTrans.to = 4;
 
-    HPIFit::fitHPI(matData,
-                   matProjectors,
-                   fitResult.devHeadTrans,
-                   vFreqs,
-                   fitResult.errorDistances,
-                   fitResult.GoF,
-                   fitResult.fittedCoils,
-                   pFiffInfo);
+    pHpiFit->fitHPI(matData,
+                    matProjectors,
+                    fitResult.devHeadTrans,
+                    vFreqs,
+                    fitResult.errorDistances,
+                    fitResult.GoF,
+                    fitResult.fittedCoils,
+                    pFiffInfo);
 
     emit resultReady(fitResult);
 }
@@ -101,7 +102,10 @@ RtHpi::RtHpi(FiffInfo::SPtr p_pFiffInfo, QObject *parent)
     qRegisterMetaType<INVERSELIB::HpiFitResult>("INVERSELIB::HpiFitResult");
     qRegisterMetaType<QVector<int> >("QVector<int>");
     qRegisterMetaType<QSharedPointer<FIFFLIB::FiffInfo> >("QSharedPointer<FIFFLIB::FiffInfo>");
+    qRegisterMetaType<QSharedPointer<INVERSELIB::HPIFit> >("QSharedPointer<INVERSELIB::HPIFit>");
     qRegisterMetaType<Eigen::MatrixXd>("Eigen::MatrixXd");
+
+    m_pHpiFit = QSharedPointer<INVERSELIB::HPIFit>(new HPIFit(p_pFiffInfo));
 
     RtHpiWorker *worker = new RtHpiWorker;
     worker->moveToThread(&m_workerThread);
@@ -133,6 +137,7 @@ void RtHpi::append(const MatrixXd &data)
         emit operate(data,
                      m_matProjectors,
                      m_vCoilFreqs,
+                     m_pHpiFit,
                      m_pFiffInfo);
     } else {
         qWarning() << "[RtHpi::append] Not enough coil frequencies set. At least three frequencies are needed.";
