@@ -78,6 +78,8 @@ HpiSettingsView::HpiSettingsView(const QString& sSettingsPath,
 
     connect(m_ui->m_pushButton_loadDigitizers, &QPushButton::released,
             this, &HpiSettingsView::onLoadDigitizers);
+    connect(m_ui->m_pushButton_doFreqOrder, &QPushButton::clicked,
+            this, &HpiSettingsView::doFreqOrder);
     connect(m_ui->m_pushButton_doSingleFit, &QPushButton::clicked,
             this, &HpiSettingsView::doSingleHpiFit);
     connect(m_ui->m_tableWidget_Frequencies, &QTableWidget::cellChanged,

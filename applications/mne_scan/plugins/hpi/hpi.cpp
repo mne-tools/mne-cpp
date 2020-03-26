@@ -75,6 +75,7 @@ Hpi::Hpi()
 , m_bDoContinousHpi(false)
 , m_bUseSSP(false)
 , m_bUseComp(false)
+, m_bDoFreqOrder(false)
 , m_bDoSingleHpi(false)
 , m_iNumberOfFitsPerSecond(3)
 {
@@ -224,6 +225,8 @@ void Hpi::initPluginControlWidgets()
 
         connect(pHpiSettingsView, &HpiSettingsView::digitizersChanged,
                 this, &Hpi::onDigitizersChanged);
+        connect(pHpiSettingsView, &HpiSettingsView::doFreqOrder,
+                this, &Hpi::onDoFreqOrder);
         connect(pHpiSettingsView, &HpiSettingsView::doSingleHpiFit,
                 this, &Hpi::onDoSingleHpiFit);
         connect(pHpiSettingsView, &HpiSettingsView::coilFrequenciesChanged,
@@ -341,6 +344,20 @@ void Hpi::onDoSingleHpiFit()
 
 //=============================================================================================================
 
+void Hpi::onDoFreqOrder()
+{
+    if(m_vCoilFreqs.size() < 3) {
+       QMessageBox msgBox;
+       msgBox.setText("Please load a digitizer set with at least 3 HPI coils first.");
+       msgBox.exec();
+       return;
+    }
+
+    m_bDoFreqOrder = true;
+}
+
+//=============================================================================================================
+
 void Hpi::onCoilFrequenciesChanged(const QVector<int>& vCoilFreqs)
 {
     m_mutex.lock();
@@ -418,6 +435,20 @@ void Hpi::run()
 
                 m_mutex.lock();
                 fitResult.sFilePathDigitzers = m_sFilePathDigitzers;
+
+                if(m_bDoFreqOrder) {
+                    // find correct frequencie order if requested
+                    HPI.findOrder(matDataMerged,
+                                  m_matCompProjectors,
+                                  fitResult.devHeadTrans,
+                                  m_vCoilFreqs,
+                                  fitResult.errorDistances,
+                                  fitResult.GoF,
+                                  fitResult.fittedCoils,
+                                  m_pFiffInfo);
+                    m_bDoFreqOrder = false;
+                }
+
                 HPI.fitHPI(matDataMerged,
                            m_matCompProjectors,
                            fitResult.devHeadTrans,
