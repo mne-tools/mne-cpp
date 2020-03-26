@@ -384,6 +384,7 @@ void Hpi::onDevHeadTransAvailable(const FIFFLIB::FiffCoordTrans& devHeadTrans)
 
 void Hpi::run()
 {
+    HPIFit HPI = HPIFit(m_pFiffInfo);
     HpiFitResult fitResult;
     double dErrorMax = 0.0;
     int iDataIndexCounter = 0;
@@ -418,14 +419,14 @@ void Hpi::run()
 
                 m_mutex.lock();
                 fitResult.sFilePathDigitzers = m_sFilePathDigitzers;
-                HPIFit::fitHPI(matDataMerged,
-                               m_matCompProjectors,
-                               fitResult.devHeadTrans,
-                               m_vCoilFreqs,
-                               fitResult.errorDistances,
-                               fitResult.GoF,
-                               fitResult.fittedCoils,
-                               m_pFiffInfo);
+                HPI.fitHPI(matDataMerged,
+                           m_matCompProjectors,
+                           fitResult.devHeadTrans,
+                           m_vCoilFreqs,
+                           fitResult.errorDistances,
+                           fitResult.GoF,
+                           fitResult.fittedCoils,
+                           m_pFiffInfo);
                 m_mutex.unlock();
 
                 //Check if the error meets distance requirement
