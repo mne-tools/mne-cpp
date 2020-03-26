@@ -36,6 +36,8 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <iostream>
+
 #include "hpi.h"
 
 #include "FormFiles/hpisetupwidget.h"
@@ -198,6 +200,12 @@ void Hpi::update(SCMEASLIB::Measurement::SPtr pMeasurement)
                 m_bDoSingleHpi = false;
             }
 
+            if(m_bDoFreqOrder) {
+                while(!m_pCircularBuffer->push(pRTMSA->getMultiSampleArray()[0])) {
+                    //Do nothing until the circular buffer is ready to accept new data again
+                }
+            }
+
             if(m_bDoContinousHpi) {
                 for(unsigned char i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
                     // Please note that we do not need a copy here since this function will block until
@@ -352,7 +360,7 @@ void Hpi::onDoFreqOrder()
        msgBox.exec();
        return;
     }
-
+    qDebug() << "Order Frequencies";
     m_bDoFreqOrder = true;
 }
 
@@ -362,6 +370,7 @@ void Hpi::onCoilFrequenciesChanged(const QVector<int>& vCoilFreqs)
 {
     m_mutex.lock();
     m_vCoilFreqs = vCoilFreqs;
+    qDebug() << m_vCoilFreqs;
     m_mutex.unlock();
 }
 
@@ -405,7 +414,7 @@ void Hpi::run()
     double dErrorMax = 0.0;
     int iDataIndexCounter = 0;
     MatrixXd matData;
-
+    qDebug() << m_vCoilFreqs;
     m_mutex.lock();
     int iNumberOfFitsPerSecond = m_iNumberOfFitsPerSecond;
     m_mutex.unlock();
@@ -429,14 +438,14 @@ void Hpi::run()
                 matDataMerged.block(0, iDataIndexCounter, matData.rows(), matDataMerged.cols()-iDataIndexCounter) = matData.block(0, 0, matData.rows(), matDataMerged.cols()-iDataIndexCounter);
 
                 // Perform HPI fit
-                //Perform actual fitting
+                // order frequenie order if requested
                 fitResult.devHeadTrans.from = 1;
                 fitResult.devHeadTrans.to = 4;
 
                 m_mutex.lock();
                 fitResult.sFilePathDigitzers = m_sFilePathDigitzers;
-
                 if(m_bDoFreqOrder) {
+                    qDebug() << "Before Order: "<< m_vCoilFreqs;
                     // find correct frequencie order if requested
                     HPI.findOrder(matDataMerged,
                                   m_matCompProjectors,
@@ -446,9 +455,16 @@ void Hpi::run()
                                   fitResult.GoF,
                                   fitResult.fittedCoils,
                                   m_pFiffInfo);
+                    qDebug() << "After Order: "<< m_vCoilFreqs;
                     m_bDoFreqOrder = false;
                 }
+                m_mutex.unlock();
 
+                // Perform HPI fit
+                // Perform actual fitting
+                m_mutex.lock();
+                fitResult.sFilePathDigitzers = m_sFilePathDigitzers;
+                qDebug() << m_vCoilFreqs;
                 HPI.fitHPI(matDataMerged,
                            m_matCompProjectors,
                            fitResult.devHeadTrans,
@@ -457,6 +473,8 @@ void Hpi::run()
                            fitResult.GoF,
                            fitResult.fittedCoils,
                            m_pFiffInfo);
+                std::cout << "GoF" << fitResult.GoF;
+                qDebug() << "error" << fitResult.errorDistances;
                 m_mutex.unlock();
 
                 //Check if the error meets distance requirement
