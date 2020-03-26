@@ -454,7 +454,7 @@ void Hpi::run()
 
                 // Perform HPI fit
                 fitResult.devHeadTrans.from = 1;
-                fitResult.devHeadTrans.to = 4;
+                fitResult.devHeadTrans.to = 4;             
 
                 m_mutex.lock();
                 fitResult.sFilePathDigitzers = m_sFilePathDigitzers;
