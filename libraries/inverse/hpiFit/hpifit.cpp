@@ -256,6 +256,9 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
     }
 
     //Generate seed point by projection the found channel position 3cm inwards
+    vError.resize(iNumCoils);
+    qDebug() << iNumCoils;
+    qDebug() << vError;
     double dError = std::accumulate(vError.begin(), vError.end(), .0) / vError.size();
     MatrixXd mCoilPos = MatrixXd::Zero(iNumCoils,3);
 
@@ -299,7 +302,7 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
     MatrixXd mDiffPos = mTestPos.block(0,0,3,iNumCoils) - mHeadHPI.transpose();
 
     for(int i = 0; i < mDiffPos.cols(); ++i) {
-        vError.append(mDiffPos.col(i).norm());
+        vError[i] = mDiffPos.col(i).norm();
     }
 
     // store Goodness of Fit
