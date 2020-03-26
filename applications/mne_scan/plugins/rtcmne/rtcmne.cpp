@@ -155,9 +155,17 @@ void RtcMne::init()
     m_pRTSEOutput->data()->setName(this->getName());//Provide name to auto store widget settings
 
     // Set the fwd, annotation and surface data
-    m_pRTSEOutput->data()->setAnnotSet(m_pAnnotationSet);
-    m_pRTSEOutput->data()->setSurfSet(m_pSurfaceSet);
-    m_pRTSEOutput->data()->setFwdSolution(m_pFwd);
+    if(m_pAnnotationSet->size() != 0) {
+        m_pRTSEOutput->data()->setAnnotSet(m_pAnnotationSet);
+    }
+
+    if(m_pSurfaceSet->size() != 0) {
+        m_pRTSEOutput->data()->setSurfSet(m_pSurfaceSet);
+    }
+
+    if(m_pFwd->nchan != -1) {
+        m_pRTSEOutput->data()->setFwdSolution(m_pFwd);
+    }
 }
 
 //=============================================================================================================
@@ -290,6 +298,16 @@ void RtcMne::calcFiffInfo()
 
 void RtcMne::doClustering()
 {
+    if(m_pFwd->nchan == -1) {
+        qInfo() << "[RtcMne::doClustering] The forward solution has not been loaded yet.";
+        return;
+    }
+
+    if(m_pAnnotationSet->size() == 0) {
+        qInfo() << "[RtcMne::doClustering] The annotation set has not been loaded yet.";
+        return;
+    }
+
     if(m_pFwd->isClustered()) {
         qInfo() << "[RtcMne::doClustering] Forward solution is already clustered.";
         return;
@@ -323,6 +341,15 @@ void RtcMne::finishedClustering()
 
 bool RtcMne::start()
 {
+    if(m_pFwd->nchan == -1) {
+        QMessageBox msgBox;
+        msgBox.setText("The forward solution has not been loaded yet.");
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
+        msgBox.exec();
+        return false;
+    }
+
     if(!m_pFwd->isClustered()) {
         QMessageBox msgBox;
         msgBox.setText("The forward solution has not been clustered yet. Please click the Start Clustering button in the Source Localization plugin.");
