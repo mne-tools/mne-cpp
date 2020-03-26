@@ -88,6 +88,16 @@ class RTPROCESINGSHARED_EXPORT RtHpiWorker : public QObject
     Q_OBJECT
 
 public:
+
+    //=========================================================================================================
+    /**
+     * Creates the real-time HPI worker object.
+     *
+     * @param[in] p_pFiffInfo        Associated Fiff Information
+     * @param[in] parent     Parent QObject (optional)
+     */
+    explicit RtHpiWorker(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
+
     //=========================================================================================================
     /**
      * Perform one single HPI fit.
@@ -100,8 +110,11 @@ public:
     void doWork(const Eigen::MatrixXd& matData,
                 const Eigen::MatrixXd& matProjectors,
                 const QVector<int>& vFreqs,
-                QSharedPointer<INVERSELIB::HPIFit> pHpiFit,
                 QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
+
+protected:
+    //=========================================================================================================
+    QSharedPointer<INVERSELIB::HPIFit>              m_pHpiFit;             /**< Holds the HpiFit object. */
 
 signals:
     void resultReady(const INVERSELIB::HpiFitResult &fitResult);
@@ -181,7 +194,6 @@ protected:
     void handleResults(const INVERSELIB::HpiFitResult &fitResult);
 
     QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo;           /**< Holds the fiff measurement information. */
-    QSharedPointer<INVERSELIB::HPIFit>              m_pHpiFit;              /**< Holds the HpiFit object. */
     QThread             m_workerThread;         /**< The worker thread. */
     QVector<int>        m_vCoilFreqs;           /**< Vector contains the HPI coil frequencies. */
     Eigen::MatrixXd     m_matProjectors;        /**< Holds the matrix with the SSP and compensator projectors.*/
@@ -191,7 +203,6 @@ signals:
     void operate(const Eigen::MatrixXd& matData,
                  const Eigen::MatrixXd& matProjectors,
                  const QVector<int>& vFreqs,
-                 QSharedPointer<INVERSELIB::HPIFit> pHpiFit,
                  QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 };
 
