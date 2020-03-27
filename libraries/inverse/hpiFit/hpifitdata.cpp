@@ -82,12 +82,12 @@ void HPIFitData::doDipfitConcurrent()
     QList<Sensor> lCurrentSensors = this->lSensorSet;
 
     int iDisplay = 0;
-    int iNaxiter = 500;
+    int iMaxiter = 200;
     int iSimplexNumitr = 0;
 
     this->coilPos = fminsearch(vCurrentCoil,
-                               iNaxiter,
-                               2 * iNaxiter * vCurrentCoil.cols(),
+                               iMaxiter,
+                               2 * iMaxiter * vCurrentCoil.cols(),
                                iDisplay,
                                vCurrentData,
                                this->matProjector,
@@ -212,7 +212,7 @@ bool HPIFitData::compare(HPISortStruct a, HPISortStruct b)
 //=============================================================================================================
 
 Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& mPos,
-                                       int iNaxiter,
+                                       int iMaxiter,
                                        int iMaxfun,
                                        int iDisplay,
                                        const Eigen::MatrixXd& mData,
@@ -323,7 +323,7 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& mPos,
 
     tempX1 = Eigen::MatrixXd::Zero(1,n);
 
-    while ((func_evals < iMaxfun) && (itercount < iNaxiter)) {
+    while ((func_evals < iMaxfun) && (itercount < iMaxiter)) {
 
         for (int i = 0;i < n;i++) {
             tempX1(i) = std::fabs(fv[0] - fv[i+1]);
