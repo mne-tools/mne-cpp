@@ -409,8 +409,23 @@ void Hpi::onDevHeadTransAvailable(const FIFFLIB::FiffCoordTrans& devHeadTrans)
 
 void Hpi::run()
 {
-    HPIFit HPI = HPIFit(m_pFiffInfo);
+    // Wait for fiff info
+    while(true) {
+        m_mutex.lock();
+        if(m_pFiffInfo) {
+            m_mutex.unlock();
+            break;
+        }
+        m_mutex.unlock();
+        msleep(100);
+    }
+
+    // init hpi fit
     HpiFitResult fitResult;
+    fitResult.devHeadTrans = m_pFiffInfo->dev_head_t;
+
+    HPIFit HPI = HPIFit(m_pFiffInfo);
+
     double dErrorMax = 0.0;
     int iDataIndexCounter = 0;
     MatrixXd matData;
