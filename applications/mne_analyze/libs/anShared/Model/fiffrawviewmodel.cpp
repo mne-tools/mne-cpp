@@ -100,6 +100,7 @@ FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
 , m_ChannelInfoList()
 , m_dDx(1.0)
 , m_iDistanceTimerSpacer(1000)
+, m_iScrollPos(0)
 {
     // connect data reloading: this will be run concurrently
     connect(&m_blockLoadFutureWatcher,
@@ -136,6 +137,7 @@ FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
 , m_pFiffInfo()
 , m_ChannelInfoList()
 , m_dDx(1.0)
+, m_iScrollPos(0)
 {
     // connect data reloading: this will be run concurrently
     connect(&m_blockLoadFutureWatcher,
@@ -346,7 +348,7 @@ void FiffRawViewModel::updateScrollPosition(qint32 newScrollPosition)
         qInfo() << "[FiffRawViewModel::updateScrollPosition] Background operation still pending, try again later...";
         return;
     }
-
+    m_iScrollPos = newScrollPosition;
     qint32 targetCursor = (newScrollPosition / m_dDx) + absoluteFirstSample() ;
 
     if (targetCursor < m_iFiffCursorBegin + (m_iPreloadBufferSize - 1) * m_iSamplesPerBlock
@@ -704,7 +706,7 @@ void FiffRawViewModel::newTimeMark(const float& xpos)
     qDebug() << "First held:" << m_iFiffCursorBegin;
     qDebug() << "DX" << m_dDx;
     //Get absolute sample number of where we clicked
-    float fSample = (float)absoluteFirstSample() + (xpos/m_dDx);
+    float fSample = absoluteFirstSample() + (float)getSampleScrollPos() + (xpos/m_dDx);
     timeMarkList.append(fSample);
     std::sort(timeMarkList.begin(),timeMarkList.end());
 }
@@ -721,4 +723,12 @@ float FiffRawViewModel::getTimeMarks(int index) const
 int FiffRawViewModel::getTimeListSize() const
 {
     return timeMarkList.size();
+}
+
+//=============================================================================================================
+
+int FiffRawViewModel::getSampleScrollPos() const
+{
+    float result = float(m_iScrollPos) / m_dDx;
+    return int(result);
 }
