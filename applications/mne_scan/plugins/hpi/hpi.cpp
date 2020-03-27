@@ -190,12 +190,13 @@ void Hpi::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             //If bad channels changed, recalcluate projectors
             updateProjections();
 
-            if(m_bDoSingleHpi) {
+            m_mutex.lock();
+            bool bDoSingleHpi = m_bDoSingleHpi;
+            m_mutex.unlock();
+            if(bDoSingleHpi) {
                 while(!m_pCircularBuffer->push(pRTMSA->getMultiSampleArray()[0])) {
                     //Do nothing until the circular buffer is ready to accept new data again
                 }
-
-                m_bDoSingleHpi = false;
             }
 
             if(m_bDoFreqOrder) {
@@ -345,7 +346,9 @@ void Hpi::onDoSingleHpiFit()
        return;
     }
 
+    m_mutex.lock();
     m_bDoSingleHpi = true;
+    m_mutex.unlock();
 }
 
 //=============================================================================================================
@@ -428,6 +431,7 @@ void Hpi::run()
     HPIFit HPI = HPIFit(m_pFiffInfo);
 
     double dErrorMax = 0.0;
+    double dMeanErrorDist = 0;
     int iDataIndexCounter = 0;
     MatrixXd matData;
 
@@ -451,6 +455,12 @@ void Hpi::run()
                 matDataMerged.block(0, iDataIndexCounter, matData.rows(), matData.cols()) = matData;
                 iDataIndexCounter += matData.cols();
             } else {
+                m_mutex.lock();
+                if(m_bDoSingleHpi) {
+                    m_bDoSingleHpi = false;
+                }
+                m_mutex.unlock();
+
                 matDataMerged.block(0, iDataIndexCounter, matData.rows(), matDataMerged.cols()-iDataIndexCounter) = matData.block(0, 0, matData.rows(), matDataMerged.cols()-iDataIndexCounter);
 
                 // Perform HPI fit
@@ -488,7 +498,6 @@ void Hpi::run()
 
                 //Check if the error meets distance requirement
                 if(fitResult.errorDistances.size() > 0) {
-                    double dMeanErrorDist = 0;
                     dMeanErrorDist = std::accumulate(fitResult.errorDistances.begin(), fitResult.errorDistances.end(), .0) / fitResult.errorDistances.size();
 
                     emit errorsChanged(fitResult.errorDistances, dMeanErrorDist);
