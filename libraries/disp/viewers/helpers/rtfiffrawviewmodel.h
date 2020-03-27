@@ -689,7 +689,7 @@ inline bool RtFiffRawViewModel::isFreezed() const
 
 //=============================================================================================================
 
-inline const QMap< qint32,float >& RtFiffRawViewModel::getScaling() const
+inline const QMap<qint32,float>& RtFiffRawViewModel::getScaling() const
 {
     return m_qMapChScaling;
 }
