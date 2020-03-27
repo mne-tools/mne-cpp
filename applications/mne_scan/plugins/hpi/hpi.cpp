@@ -360,7 +360,7 @@ void Hpi::onDoFreqOrder()
        msgBox.exec();
        return;
     }
-    qDebug() << "Order Frequencies";
+
     m_bDoFreqOrder = true;
 }
 
@@ -370,7 +370,7 @@ void Hpi::onCoilFrequenciesChanged(const QVector<int>& vCoilFreqs)
 {
     m_mutex.lock();
     m_vCoilFreqs = vCoilFreqs;
-    qDebug() << m_vCoilFreqs;
+
     m_mutex.unlock();
 }
 
@@ -414,7 +414,7 @@ void Hpi::run()
     double dErrorMax = 0.0;
     int iDataIndexCounter = 0;
     MatrixXd matData;
-    qDebug() << m_vCoilFreqs;
+
     m_mutex.lock();
     int iNumberOfFitsPerSecond = m_iNumberOfFitsPerSecond;
     m_mutex.unlock();
@@ -445,7 +445,6 @@ void Hpi::run()
                 m_mutex.lock();
                 fitResult.sFilePathDigitzers = m_sFilePathDigitzers;
                 if(m_bDoFreqOrder) {
-                    qDebug() << "Before Order: "<< m_vCoilFreqs;
                     // find correct frequencie order if requested
                     HPI.findOrder(matDataMerged,
                                   m_matCompProjectors,
@@ -455,7 +454,6 @@ void Hpi::run()
                                   fitResult.GoF,
                                   fitResult.fittedCoils,
                                   m_pFiffInfo);
-                    qDebug() << "After Order: "<< m_vCoilFreqs;
                     m_bDoFreqOrder = false;
                 }
                 m_mutex.unlock();
@@ -464,7 +462,6 @@ void Hpi::run()
                 // Perform actual fitting
                 m_mutex.lock();
                 fitResult.sFilePathDigitzers = m_sFilePathDigitzers;
-                qDebug() << m_vCoilFreqs;
                 HPI.fitHPI(matDataMerged,
                            m_matCompProjectors,
                            fitResult.devHeadTrans,
@@ -473,8 +470,6 @@ void Hpi::run()
                            fitResult.GoF,
                            fitResult.fittedCoils,
                            m_pFiffInfo);
-                std::cout << "GoF" << fitResult.GoF;
-                qDebug() << "error" << fitResult.errorDistances;
                 m_mutex.unlock();
 
                 //Check if the error meets distance requirement
