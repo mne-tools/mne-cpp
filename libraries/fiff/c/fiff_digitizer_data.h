@@ -102,7 +102,7 @@ public:
     /**
      * Destroys the digitization point description
      */
-    ~FiffDigitizerData();    
+    ~FiffDigitizerData();
 
 public:
     QString        filename;                 /* Where did these come from */
