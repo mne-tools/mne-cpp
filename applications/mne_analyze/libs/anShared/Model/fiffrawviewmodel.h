@@ -367,6 +367,8 @@ public:
 
     int getTimeListSize() const;
 
+    int getSampleScrollPos() const;
+
 public slots:
 
     /**
@@ -467,6 +469,8 @@ private:
     int                                 m_iDistanceTimerSpacer;                     /**< The distance for the horizontal time spacers in the view in ms */
 
     QList<float>  timeMarkList;
+
+    qint32 m_iScrollPos;
 };
 
 //=============================================================================================================
