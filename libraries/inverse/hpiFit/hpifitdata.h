@@ -174,11 +174,11 @@ protected:
     //=========================================================================================================
     /**
      * fminsearch Multidimensional unconstrained nonlinear minimization (Nelder-Mead).
-     * X = fminsearch(X0, iNaxiter, iMaxfun, iDisplay, mData, lSensorSet) starts at X0 and
+     * X = fminsearch(X0, iMaxiter, iMaxfun, iDisplay, mData, lSensorSet) starts at X0 and
      * attempts to find a local minimizer
      */
     Eigen::MatrixXd fminsearch(const Eigen::MatrixXd& mPos,
-                               int iNaxiter,
+                               int iMaxiter,
                                int iMaxfun,
                                int iDisplay,
                                const Eigen::MatrixXd& mData,
