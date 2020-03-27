@@ -188,11 +188,7 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
             mHeadHPI(i,2) = lHPIPoints.at(i).r[2];
         }
     } else {
-        for (int i = 0; i < iNumCoils; ++i) {
-            mHeadHPI(i,0) = 0;
-            mHeadHPI(i,1) = 0;
-            mHeadHPI(i,2) = 0;
-        }
+        mHeadHPI.fill(0);
     }
 
     //Create new projector based on the excluded channels, first exclude the rows then the columns
@@ -257,8 +253,6 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
 
     //Generate seed point by projection the found channel position 3cm inwards
     vError.resize(iNumCoils);
-    qDebug() << iNumCoils;
-    qDebug() << vError;
     double dError = std::accumulate(vError.begin(), vError.end(), .0) / vError.size();
     MatrixXd mCoilPos = MatrixXd::Zero(iNumCoils,3);
 
@@ -269,9 +263,8 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
                 mCoilPos.row(j) = (-1 * pFiffInfo->chs.at(vChIdcs(j)).chpos.ez * 0.03 + r0).cast<double>();
             }
         }
-        //std::cout << "HPIFit::fitHPI - Coil " << j << " max value index " << iChIdx << std::endl;
     } else {
-        mCoilPos = transDevHead.apply_inverse_trans(mHeadHPI.cast<float>()).cast<double>();
+            mCoilPos = transDevHead.apply_inverse_trans(mHeadHPI.cast<float>()).cast<double>();
     }
 
     coil.pos = mCoilPos;
@@ -373,6 +366,7 @@ void HPIFit::findOrder(const MatrixXd& t_mat,
                        FiffInfo::SPtr pFiffInfo)
 {
     // create temporary copies that are necessary to reset values that are passed to fitHpi()
+    fittedPointSet.clear();
     FiffDigPointSet fittedPointSetTemp = fittedPointSet;
     FiffCoordTrans transDevHeadTemp = transDevHead;
     FiffInfo::SPtr pFiffInfoTemp = pFiffInfo;
@@ -380,6 +374,16 @@ void HPIFit::findOrder(const MatrixXd& t_mat,
     QVector<int> vFreqTemp(vFreqs.size());
     QVector<double> vErrorTemp = vError;
     VectorXd vGoFTemp = vGoF;
+    bool bIdentity = false;
+    fittedPointSetTemp.clear();
+
+    MatrixXf trans = transDevHead.trans;
+    if(transDevHead.trans == MatrixXf::Identity(4,4).cast<float>()) {
+        // avoid identity since this leads to problems with this method in fitHpi.
+        // the hpi fit is robust enough to handle bad starting points
+        transDevHeadTemp.trans(3,0) = 0.000001;
+        bIdentity = true;
+    }
 
     // perform vFreqs.size() hpi fits with same frequencies in each iteration
     for(int i = 0; i < vFreqs.size(); i++){
@@ -393,14 +397,26 @@ void HPIFit::findOrder(const MatrixXd& t_mat,
         vGoFTemp.maxCoeff(&indMax);
         vToOrder[indMax] = vFreqs[i];
 
+        // std::cout << vGoFTemp[0] << " " << vGoFTemp[1] << " " << vGoFTemp[2] << " " << vGoFTemp[3] << " " << std::endl;
+
         // reset values that are edidet by fitHpi
         fittedPointSetTemp = fittedPointSet;
         pFiffInfoTemp = pFiffInfo;
         transDevHeadTemp = transDevHead;
+        if(bIdentity) {
+            transDevHeadTemp.trans(3,0) = 0.000001;
+        }
+
         vErrorTemp = vError;
         vGoFTemp = vGoF;
     }
-    vFreqs = vToOrder;
+    // check if still all frequencies are represented
+    if(std::accumulate(vFreqs.begin(), vFreqs.end(), .0) ==  std::accumulate(vToOrder.begin(), vToOrder.end(), .0)) {
+        vFreqs = vToOrder;
+    } else {
+        qWarning() << "HPIFit::findOrder: frequencie ordering went wrong";
+    }
+    qInfo() << "HPIFit::findOrder: vFreqs = " << vFreqs;
 }
 
 //=============================================================================================================
