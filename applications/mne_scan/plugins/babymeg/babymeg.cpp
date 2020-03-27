@@ -99,7 +99,7 @@ BabyMEG::BabyMEG()
     m_pActionUpdateFiffInfo->setStatusTip(tr("Update Fiff Info"));
     connect(m_pActionUpdateFiffInfo.data(), &QAction::triggered,
             this, &BabyMEG::updateFiffInfo);
-    //addPluginAction(m_pActionUpdateFiffInfo);
+    addPluginAction(m_pActionUpdateFiffInfo);
 }
 
 //=============================================================================================================
@@ -172,7 +172,11 @@ void BabyMEG::init()
 
     //init channels when fiff info is available
     connect(this, &BabyMEG::fiffInfoAvailable,
-            this, &BabyMEG::initConnector);
+            this, &BabyMEG::initConnector);    
+
+    m_pRTMSABabyMEG = PluginOutputData<RealTimeMultiSampleArray>::create(this, "BabyMEG Output", "BabyMEG");
+    m_pRTMSABabyMEG->data()->setName(this->getName());//Provide name to auto store widget settings
+    m_outputConnectors.append(m_pRTMSABabyMEG);
 }
 
 //=============================================================================================================
@@ -193,9 +197,14 @@ void BabyMEG::clear()
 
 bool BabyMEG::start()
 {
-    if(!m_pRTMSABabyMEG) {
-        initConnector();
+    if(!m_pFiffInfo) {
+        QMessageBox msgBox;
+        msgBox.setText("FiffInfo is missing!");
+        msgBox.exec();
+        return false;
     }
+
+    initConnector();
 
     if(!m_pMyClient->isConnected()) {
         m_pMyClient->ConnectToBabyMEG();
@@ -272,17 +281,8 @@ void BabyMEG::run()
 void BabyMEG::initConnector()
 {
     if(m_pFiffInfo) {
-        m_pRTMSABabyMEG = PluginOutputData<RealTimeMultiSampleArray>::create(this, "BabyMEG Output", "BabyMEG");
-        m_pRTMSABabyMEG->data()->setName(this->getName());//Provide name to auto store widget settings
-
         m_pRTMSABabyMEG->data()->initFromFiffInfo(m_pFiffInfo);
         m_pRTMSABabyMEG->data()->setMultiArraySize(1);
-
-        m_pRTMSABabyMEG->data()->setSamplingRate(m_pFiffInfo->sfreq);
-
-        m_pRTMSABabyMEG->data()->setVisibility(true);
-
-        m_outputConnectors.append(m_pRTMSABabyMEG);
 
         //Look for trigger channels and initialise detected trigger map
         m_lTriggerChannelIndices.append(m_pFiffInfo->ch_names.indexOf("TRG001"));
