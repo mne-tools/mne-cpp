@@ -263,6 +263,8 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
                 mCoilPos.row(j) = (-1 * pFiffInfo->chs.at(vChIdcs(j)).chpos.ez * 0.03 + r0).cast<double>();
             }
         }
+        qWarning() << "dError > 0.003";
+        std::cout << mCoilPos << std::endl;
     } else {
             mCoilPos = transDevHead.apply_inverse_trans(mHeadHPI.cast<float>()).cast<double>();
     }
@@ -315,6 +317,12 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
 
         fittedPointSet << digPoint;
     }
+    dError = std::accumulate(vError.begin(), vError.end(), .0) / vError.size();
+    qDebug() << "Error: " << dError;
+    if(dError > 0.03) {
+        qCritical() << dError;
+    }
+    qDebug() << "GoF: " << vGoF.mean();
 
     if(bDoDebug) {
         // DEBUG HPI fitting and write debug results
@@ -568,17 +576,6 @@ void HPIFit::createSensorSet(Sensor& sensors, FwdCoilSet* coils)
         sensors.cosmag.block(i*iNp,0,iNp,3) = mCosmag;
         sensors.rmag.block(i*iNp,0,iNp,3) = mRmag;
     }
-//    MatrixXd x = sensors.w.segment(0*iNp,iNp) * sensors.rmag.block(0*iNp,0,iNp,sensors.rmag.cols());
-//    std::cout << sensors.w.segment(0*iNp,iNp) << std::endl;
-//    std::cout << sensors.rmag.block(0*iNp,0,iNp,sensors.rmag.cols()) << std::endl;
-//    qDebug() << x.cols() << "x" << x.rows();
-//    std::cout << x << std::endl;
-//    qDebug() << "sensors.rmag " << sensors.rmag.rows() << "x" << sensors.rmag.cols();
-//    std::cout << sensors.rmag << std::endl;
-//    qDebug() << "sensors.cosmag " << sensors.cosmag.rows() << "x" << sensors.cosmag.cols();
-//    std::cout << sensors.cosmag << std::endl;
-//    qDebug() << "sensors.w" << sensors.w.rows() << "x" << sensors.w.cols();
-//    std::cout << sensors.w << std::endl;
 }
 
 //=============================================================================================================
