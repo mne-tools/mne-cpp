@@ -128,7 +128,7 @@ public:
     Eigen::MatrixXd         coilPos;
     Eigen::RowVectorXd      sensorData;
     DipFitError             errorInfo;
-    QList<struct Sensor>    lSensorSet;
+    struct Sensor           sensors;
     Eigen::MatrixXd         matProjector;
 
 protected:
@@ -162,7 +162,7 @@ protected:
      */
     DipFitError dipfitError(const Eigen::MatrixXd& mPos,
                             const Eigen::MatrixXd& mData,
-                            const QList<struct Sensor>& lSensorSet,
+                            const struct Sensor& sensors,
                             const Eigen::MatrixXd& matProjectors);
 
     //=========================================================================================================
@@ -183,7 +183,7 @@ protected:
                                int iDisplay,
                                const Eigen::MatrixXd& mData,
                                const Eigen::MatrixXd& matProjectors,
-                               const QList<struct Sensor>& lSensorSet,
+                               const struct Sensor& lSensorSet,
                                int &iSimplexNumitr);
 };
 
