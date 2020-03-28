@@ -111,11 +111,12 @@ struct HpiFitResult {
  * The strucut specifing the sensor parameters.
  */
 struct Sensor {
-    Eigen::RowVector3d r0;
+    Eigen::MatrixXd r0;
     Eigen::MatrixXd rmag;
     Eigen::MatrixXd cosmag;
     Eigen::MatrixXd tra;
     Eigen::RowVectorXd w;
+    int ncoils;
     int np;
 };
 
@@ -224,7 +225,7 @@ protected:
      * @return Returns the coil parameters.
      */
     CoilParam dipfit(struct CoilParam coil,
-                     const QList<Sensor>& lSensorSet,
+                     const Sensor& sensors,
                      const Eigen::MatrixXd &mData,
                      int iNumCoils,
                      const Eigen::MatrixXd &t_matProjectors);
@@ -251,12 +252,12 @@ protected:
      * @param[in] coils         The coilset to read the sensor information from.
      *
      */
-    void createSensorSet(QList<Sensor>& lSensorSet,
+    void createSensorSet(Sensor& sensor,
                          FWDLIB::FwdCoilSet* coils);
 
     //=========================================================================================================
 
-    QList<Sensor>                m_lSensorSet;            /**< lSensorSet */
+    Sensor                m_sensors;            /**< sensors */
 
 private:
     //=========================================================================================================

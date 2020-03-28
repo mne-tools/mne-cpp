@@ -86,7 +86,7 @@ HPIFit::HPIFit(FiffInfo::SPtr pFiffInfo)
     // init channel list and lSensorSet
     m_lChannels = QList<FIFFLIB::FiffChInfo>();
     m_vInnerind = QVector<int>();
-    m_lSensorSet = QList<Sensor>();
+    m_sensors = Sensor ();
     m_lBads = pFiffInfo->bads;
 
     // init coils
@@ -270,7 +270,7 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
     coil.pos = mCoilPos;
 
     // Perform actual localization
-    coil = dipfit(coil, m_lSensorSet, mAmp, iNumCoils, matProjectorsInnerind);
+    coil = dipfit(coil, m_sensors, mAmp, iNumCoils, matProjectorsInnerind);
 
     Matrix4d mTrans = computeTransformation(mHeadHPI, coil.pos);
     //Eigen::Matrix4d mTrans = computeTransformation(coil.pos, mHeadHPI);
@@ -422,7 +422,7 @@ void HPIFit::findOrder(const MatrixXd& t_mat,
 //=============================================================================================================
 
 CoilParam HPIFit::dipfit(struct CoilParam coil,
-                         const QList<Sensor>& lSensorSet,
+                         const Sensor& sensors,
                          const MatrixXd& mData,
                          int iNumCoils,
                          const MatrixXd& t_matProjectors)
@@ -435,7 +435,7 @@ CoilParam HPIFit::dipfit(struct CoilParam coil,
         HPIFitData coilData;
         coilData.coilPos = coil.pos.row(i);
         coilData.sensorData = mData.col(i);
-        coilData.lSensorSet = lSensorSet;
+        coilData.sensors = sensors;
         coilData.matProjector = t_matProjectors;
 
         lCoilData.append(coilData);
@@ -536,35 +536,49 @@ Eigen::Matrix4d HPIFit::computeTransformation(Eigen::MatrixXd mNH, MatrixXd mBT)
 
 //=============================================================================================================
 
-void HPIFit::createSensorSet(QList<Sensor>& lSensorSet, FwdCoilSet* coils)
+void HPIFit::createSensorSet(Sensor& sensors, FwdCoilSet* coils)
 {
     int iNchan = coils->ncoil;
+    // init sensor struct
+    int iNp = coils->coils[0]->np;
+    sensors.w = RowVectorXd(iNchan*iNp);
+    sensors.r0 = MatrixXd(iNchan,3);
+    sensors.cosmag = MatrixXd(iNchan*iNp,3);
+    sensors.rmag = MatrixXd(iNchan*iNp,3);
+    sensors.ncoils = iNchan;
+    sensors.tra = MatrixXd::Identity(iNp,iNp);
+    sensors.np = iNp;
     for(int i = 0; i < iNchan; i++){
-        Sensor s;
         FwdCoil* coil = (coils->coils[i]);
-        int iNp = coil->np;
         MatrixXd mRmag = MatrixXd::Zero(iNp,3);
         MatrixXd mCosmag = MatrixXd::Zero(iNp,3);
         RowVectorXd vW(iNp);
 
-        s.r0(0) = coil->r0[0];
-        s.r0(1) = coil->r0[1];
-        s.r0(2) = coil->r0[2];
+        sensors.r0(i,0) = coil->r0[0];
+        sensors.r0(i,1) = coil->r0[1];
+        sensors.r0(i,2) = coil->r0[2];
 
         for (int p = 0; p < iNp; p++){
-            vW(p) = coil->w[p];
+            sensors.w(i*iNp+p) = coil->w[p];
             for (int c = 0; c < 3; c++) {
                 mRmag(p,c)   = coil->rmag[p][c];
                 mCosmag(p,c) = coil->cosmag[p][c];
             }
         }
-        s.tra = MatrixXd::Identity(iNp,iNp);
-        s.w = vW;
-        s.rmag = mRmag;
-        s.cosmag = mCosmag;
-        s.np = iNp;
-        lSensorSet.append(s);
+        sensors.cosmag.block(i*iNp,0,iNp,3) = mCosmag;
+        sensors.rmag.block(i*iNp,0,iNp,3) = mRmag;
     }
+//    MatrixXd x = sensors.w.segment(0*iNp,iNp) * sensors.rmag.block(0*iNp,0,iNp,sensors.rmag.cols());
+//    std::cout << sensors.w.segment(0*iNp,iNp) << std::endl;
+//    std::cout << sensors.rmag.block(0*iNp,0,iNp,sensors.rmag.cols()) << std::endl;
+//    qDebug() << x.cols() << "x" << x.rows();
+//    std::cout << x << std::endl;
+//    qDebug() << "sensors.rmag " << sensors.rmag.rows() << "x" << sensors.rmag.cols();
+//    std::cout << sensors.rmag << std::endl;
+//    qDebug() << "sensors.cosmag " << sensors.cosmag.rows() << "x" << sensors.cosmag.cols();
+//    std::cout << sensors.cosmag << std::endl;
+//    qDebug() << "sensors.w" << sensors.w.rows() << "x" << sensors.w.cols();
+//    std::cout << sensors.w << std::endl;
 }
 
 //=============================================================================================================
@@ -614,7 +628,7 @@ void HPIFit::updateCoils()
     }
     // create sensor set
     m_coilMeg = m_coilTemplate->create_meg_coils(m_lChannels,iNch,iAcc,t);
-    createSensorSet(m_lSensorSet,m_coilMeg);
+    createSensorSet(m_sensors,m_coilMeg);
 }
 
 //=============================================================================================================
