@@ -42,6 +42,7 @@
 #include "hpifit.h"
 #include <utils/mnemath.h>
 
+#include <iostream>
 #include <algorithm>
 
 //=============================================================================================================
@@ -79,7 +80,7 @@ void HPIFitData::doDipfitConcurrent()
     // Initialize variables
     Eigen::RowVectorXd vCurrentCoil = this->coilPos;
     Eigen::VectorXd vCurrentData = this->sensorData;
-    QList<Sensor> lCurrentSensors = this->lSensorSet;
+    Sensor CurrentSensors = this->sensors;
 
     int iDisplay = 0;
     int iMaxiter = 200;
@@ -91,12 +92,12 @@ void HPIFitData::doDipfitConcurrent()
                                iDisplay,
                                vCurrentData,
                                this->matProjector,
-                               lCurrentSensors,
+                               CurrentSensors,
                                iSimplexNumitr);
 
     this->errorInfo = dipfitError(vCurrentCoil,
                                   vCurrentData,
-                                  lCurrentSensors,
+                                  CurrentSensors,
                                   this->matProjector);
 
     this->errorInfo.numIterations = iSimplexNumitr;
@@ -167,8 +168,7 @@ Eigen::MatrixXd HPIFitData::compute_leadfield(const Eigen::MatrixXd& mPos, const
     mOri = sensor.cosmag; // mOrientation of each coil
 
     lf = magnetic_dipole(mPos, mPnt, mOri);
-    lf = sensor.tra * lf;
-
+    //lf = sensor.tra * lf;
     return lf;
 }
 
@@ -176,17 +176,18 @@ Eigen::MatrixXd HPIFitData::compute_leadfield(const Eigen::MatrixXd& mPos, const
 
 DipFitError HPIFitData::dipfitError(const Eigen::MatrixXd& mPos,
                                     const Eigen::MatrixXd& mData,
-                                    const QList<struct Sensor>& lSensorSet,
+                                    const struct Sensor& sensors,
                                     const Eigen::MatrixXd& matProjectors)
 {
     // Variable Declaration
     struct DipFitError e;
     Eigen::MatrixXd lfSensor, dif;
     Eigen::MatrixXd lf(mData.size(),3);
+    int iNp = sensors.np;
     // field vector to store calculated value from averaging np integration points on sensor
-    for(int i = 0; i < lSensorSet.size(); i++){
-        lfSensor = compute_leadfield(mPos, lSensorSet[i]);
-        lf.row(i) = lSensorSet[i].w * lfSensor;
+    lfSensor = compute_leadfield(mPos, sensors);
+    for(int i = 0; i < sensors.ncoils; i++){
+        lf.row(i) = sensors.w.segment(i*iNp,iNp) * lfSensor.block(i*iNp,0,iNp,lfSensor.cols());
     }
     // Compute lead field for a magnetic dipole in infinite vacuum
 
@@ -217,7 +218,7 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& mPos,
                                        int iDisplay,
                                        const Eigen::MatrixXd& mData,
                                        const Eigen::MatrixXd& matProjectors,
-                                       const QList<struct Sensor>& lSensorSet,
+                                       const struct Sensor& sensors,
                                        int &iSimplexNumitr)
 {
     double tolx, tolf, rho, chi, psi, sigma, func_evals, usual_delta, zero_term_delta, temp1, temp2;
@@ -266,7 +267,7 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& mPos,
         v(i,0) = mPosCopy(i);
     }
 
-    tempdip = dipfitError(mPosCopy, mData, lSensorSet, matProjectors);
+    tempdip = dipfitError(mPosCopy, mData, sensors, matProjectors);
     fv[0] = tempdip.error;
 
     func_evals = 1;
@@ -290,7 +291,7 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& mPos,
 
         v.col(j+1).array() = y;
         mPosCopy = y.transpose();
-        tempdip = dipfitError(mPosCopy, mData, lSensorSet, matProjectors);
+        tempdip = dipfitError(mPosCopy, mData, sensors, matProjectors);
         fv[j+1] = tempdip.error;
     }
 
@@ -353,7 +354,7 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& mPos,
         x = xr.transpose();
         //std::cout << "Iteration Count: " << itercount << ":" << x << std::endl;
 
-        fxr = dipfitError(x, mData, lSensorSet, matProjectors);
+        fxr = dipfitError(x, mData, sensors, matProjectors);
 
         func_evals = func_evals+1;
 
@@ -361,7 +362,7 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& mPos,
             // Calculate the expansion point
             xe = (1 + rho * chi) * xbar - rho * chi * v.col(v.cols()-1);
             x = xe.transpose();
-            fxe = dipfitError(x, mData, lSensorSet, matProjectors);
+            fxe = dipfitError(x, mData, sensors, matProjectors);
             func_evals = func_evals+1;
 
             if(fxe.error < fxr.error) {
@@ -385,7 +386,7 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& mPos,
                     // Perform an outside contraction
                     xc = (1 + psi * rho) * xbar - psi * rho * v.col(v.cols()-1);
                     x = xc.transpose();
-                    fxc = dipfitError(x, mData, lSensorSet, matProjectors);
+                    fxc = dipfitError(x, mData, sensors, matProjectors);
                     func_evals = func_evals + 1;
 
                     if(fxc.error <= fxr.error) {
@@ -399,7 +400,7 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& mPos,
                 } else {
                     xcc = (1 - psi) * xbar + psi * v.col(v.cols()-1);
                     x = xcc.transpose();
-                    fxcc = dipfitError(x, mData, lSensorSet, matProjectors);
+                    fxcc = dipfitError(x, mData, sensors, matProjectors);
                     func_evals = func_evals+1;
                     if(fxcc.error < fv[n]) {
                         v.col(v.cols()-1) = xcc;
@@ -415,7 +416,7 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& mPos,
                     for(int j = 1;j < n+1;j++) {
                         v.col(j).array() = v.col(0).array() + sigma * (v.col(j).array() - v.col(0).array());
                         x = v.col(j).array().transpose();
-                        tempdip = dipfitError(x,mData, lSensorSet, matProjectors);
+                        tempdip = dipfitError(x,mData, sensors, matProjectors);
                         fv[j] = tempdip.error;
                     }
                 }
