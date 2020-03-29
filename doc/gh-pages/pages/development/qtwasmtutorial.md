@@ -69,18 +69,18 @@ nav_order: 3
       cd qt5_shadow
       ```
 
-    * Call configure from new working directory in order to perform a shadow build.
+    * Call configure from new working directory in order to perform a shadow build. This option is preferable in order to keep Qt source tree clean from this build, which will be stored in a separate directory (prefix), especially if you want to have multiple builds, in order to test for different versions or configurations.
 
       With thread support:
 
       ```
-      ../qt5/configure -opensource -confirm-license -xplatform wasm-emscripten -feature-thread -nomake examples -no-dbus -no-ssl -prefix /home/lorenz/Qt/5.14.0/wasm_em1393_64_withThread
+      ../qt5/configure -opensource -confirm-license -xplatform wasm-emscripten -feature-thread -nomake examples -no-dbus -no-ssl -prefix /installation/directory/wasm_em1393_64_withThread
       ```
 
       Without thread support:
 
       ```
-      ../qt5/configure -opensource -confirm-license -xplatform wasm-emscripten -nomake examples -no-dbus -no-ssl -prefix /home/lorenz/Qt/5.14.0/wasm_em1393_64_withThread
+      ../qt5/configure -opensource -confirm-license -xplatform wasm-emscripten -nomake examples -no-dbus -no-ssl -prefix /home/lorenz/Qt/5.14.0/wasm_em1393_64_withoutThread
       ```
 
     * Build Qt and install to target (prefix) location afterwards. For MNE-CPP we only need the qt charts, qtsvg and qtbase module (see [https://wiki.qt.io/Qt_for_WebAssembly](https://wiki.qt.io/Qt_for_WebAssembly){:target="_blank" rel="noopener"} for officially supported modules):
