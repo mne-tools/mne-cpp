@@ -237,16 +237,11 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
     VectorXi vChIdcs(iNumCoils);
 
     for (int j = 0; j < iNumCoils; j++) {
-        double dMaxVal = 0;
         int iChIdx = 0;
-
-        for (int i = 0; i < mAmp.rows(); ++i) {
-            if(std::fabs(mAmp(i,j)) > dMaxVal) {
-                dMaxVal = std::fabs(mAmp(i,j));
-                if(iChIdx < m_vInnerind.size()) {
-                    iChIdx = m_vInnerind.at(i);
-                }
-            }
+        VectorXd::Index indMax;
+        mAmp.col(j).maxCoeff(&indMax);
+        if(indMax < m_vInnerind.size()) {
+            iChIdx = m_vInnerind.at(indMax);
         }
         vChIdcs(j) = iChIdx;
     }
@@ -256,15 +251,13 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
     double dError = std::accumulate(vError.begin(), vError.end(), .0) / vError.size();
     MatrixXd mCoilPos = MatrixXd::Zero(iNumCoils,3);
 
-    if(transDevHead.trans == MatrixXd::Identity(4,4).cast<float>() || dError > 0.003){
+    if(transDevHead.trans == MatrixXd::Identity(4,4).cast<float>() /*|| dError > 0.003*/){
         for (int j = 0; j < vChIdcs.rows(); ++j) {
             if(vChIdcs(j) < pFiffInfo->chs.size()) {
                 Vector3f r0 = pFiffInfo->chs.at(vChIdcs(j)).chpos.r0;
                 mCoilPos.row(j) = (-1 * pFiffInfo->chs.at(vChIdcs(j)).chpos.ez * 0.03 + r0).cast<double>();
             }
         }
-        qWarning() << "dError > 0.003";
-        std::cout << mCoilPos << std::endl;
     } else {
             mCoilPos = transDevHead.apply_inverse_trans(mHeadHPI.cast<float>()).cast<double>();
     }
@@ -317,12 +310,6 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
 
         fittedPointSet << digPoint;
     }
-    dError = std::accumulate(vError.begin(), vError.end(), .0) / vError.size();
-    qDebug() << "Error: " << dError;
-    if(dError > 0.03) {
-        qCritical() << dError;
-    }
-    qDebug() << "GoF: " << vGoF.mean();
 
     if(bDoDebug) {
         // DEBUG HPI fitting and write debug results
