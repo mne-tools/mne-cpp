@@ -107,6 +107,8 @@ int main(int argc, char *argv[])
     FiffRawData raw(t_fileIn);
     QSharedPointer<FiffInfo> pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(raw.info));
 
+    qDebug() << pFiffInfo->linefreq;
+
     // Setup comparison of transformation matrices
     FiffCoordTrans transDevHead = pFiffInfo->dev_head_t;    // transformation that only updates after big head movements
     float fThreshRot = 5;          // in degree
@@ -234,5 +236,5 @@ int main(int argc, char *argv[])
             qInfo() << "dev_head_t has been updated.";
         }
     }
-    IOUtils::write_eigen_matrix(matPosition, QCoreApplication::applicationDirPath() + "/MNE-sample-data/chpi/pos/pos_03_Faster_Home.txt");
+    //IOUtils::write_eigen_matrix(matPosition, QCoreApplication::applicationDirPath() + "/MNE-sample-data/chpi/pos/pos_03_Faster_Home.txt");
 }

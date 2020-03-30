@@ -968,6 +968,7 @@ bool FiffStream::read_meas_info(const FiffDirNode::SPtr& p_Node, FiffInfo& info,
 
     fiff_int_t nchan = -1;
     float sfreq = -1.0f;
+    float linefreq = -1.0f;
     QList<FiffChInfo> chs;
     float lowpass = -1.0f;
     float highpass = -1.0f;
@@ -998,6 +999,10 @@ bool FiffStream::read_meas_info(const FiffDirNode::SPtr& p_Node, FiffInfo& info,
             case FIFF_SFREQ:
                 this->read_tag(t_pTag, pos);
                 sfreq = *t_pTag->toFloat();
+                break;
+            case FIFF_LINE_FREQ:
+                this->read_tag(t_pTag, pos);
+                linefreq = *t_pTag->toFloat();
                 break;
             case FIFF_CH_INFO:
                 this->read_tag(t_pTag, pos);
@@ -1038,6 +1043,11 @@ bool FiffStream::read_meas_info(const FiffDirNode::SPtr& p_Node, FiffInfo& info,
     if (sfreq < 0)
     {
         qWarning("Sampling frequency is not defined\n");
+        return false;
+    }
+    if (linefreq < 0)
+    {
+        qWarning("Line frequency is not defined\n");
         return false;
     }
     if (chs.size() == 0)
@@ -1198,6 +1208,7 @@ bool FiffStream::read_meas_info(const FiffDirNode::SPtr& p_Node, FiffInfo& info,
 
     info.nchan  = nchan;
     info.sfreq  = sfreq;
+    info.linefreq = linefreq;
     if (highpass != -1.0f)
         info.highpass = highpass;
     else
@@ -2103,6 +2114,7 @@ FiffStream::SPtr FiffStream::start_writing_raw(QIODevice &p_IODevice, const Fiff
     //    General
     //
     t_pStream->write_float(FIFF_SFREQ,&info.sfreq);
+    t_pStream->write_float(FIFF_LINE_FREQ,&info.linefreq);
     t_pStream->write_float(FIFF_HIGHPASS,&info.highpass);
     t_pStream->write_float(FIFF_LOWPASS,&info.lowpass);
     t_pStream->write_int(FIFF_NCHAN,&nchan);
