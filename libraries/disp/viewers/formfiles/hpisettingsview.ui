@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>254</width>
-    <height>836</height>
+    <width>333</width>
+    <height>939</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -31,8 +31,6 @@
      <property name="spacing">
       <number>6</number>
      </property>
-<<<<<<< HEAD
-=======
      <item row="0" column="0">
       <widget class="QGroupBox" name="m_groupBox_loadDigitizers">
        <property name="minimumSize">
@@ -145,7 +143,6 @@
        </property>
       </spacer>
      </item>
->>>>>>> [FIX] Fix some problems in the BabyMEG plugin introduced by the last MNE Scan PR
      <item row="1" column="0">
       <widget class="QGroupBox" name="m_groupBox_hpiFitting">
        <property name="minimumSize">
@@ -403,109 +400,6 @@
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QGroupBox" name="m_groupBox_loadDigitizers">
-       <property name="minimumSize">
-        <size>
-         <width>228</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>300</width>
-         <height>16777215</height>
-        </size>
-       </property>
-       <property name="title">
-        <string>Digitizers</string>
-       </property>
-       <layout class="QFormLayout" name="formLayout_2">
-        <item row="2" column="0">
-         <widget class="QLabel" name="label_7">
-          <property name="text">
-           <string>Loaded HPI coils:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QLabel" name="m_label_numberLoadedCoils">
-          <property name="text">
-           <string>0</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="label_8">
-          <property name="text">
-           <string>Loaded additional digitizers:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1">
-         <widget class="QLabel" name="m_label_numberLoadedDigitizers">
-          <property name="text">
-           <string>0</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0">
-         <widget class="QLabel" name="label_9">
-          <property name="text">
-           <string>Loaded fiducials:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="1">
-         <widget class="QLabel" name="m_label_numberLoadedFiducials">
-          <property name="text">
-           <string>0</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="0">
-         <widget class="QLabel" name="label_10">
-          <property name="text">
-           <string>Loaded EEG positions:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="1">
-         <widget class="QLabel" name="m_label_numberLoadedEEG">
-          <property name="text">
-           <string>0</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0" colspan="2">
-         <widget class="QLineEdit" name="m_lineEdit_filePath">
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0" colspan="2">
-         <widget class="QPushButton" name="m_pushButton_loadDigitizers">
-          <property name="text">
-           <string>Load Digitizers</string>
           </property>
          </widget>
         </item>

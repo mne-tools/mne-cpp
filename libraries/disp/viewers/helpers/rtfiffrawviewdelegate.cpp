@@ -474,11 +474,11 @@ void RtFiffRawViewDelegate::setUpperItemIndex(int iUpperItemIndex)
 //=============================================================================================================
 
 void RtFiffRawViewDelegate::createPlotPath(const QModelIndex &index,
-                                                      const QStyleOptionViewItem &option,
-                                                      QPainterPath& path,
-                                                      QPointF &ellipsePos,
-                                                      QString &amplitude,
-                                                      RowVectorPair &data) const
+                                           const QStyleOptionViewItem &option,
+                                           QPainterPath& path,
+                                           QPointF &ellipsePos,
+                                           QString &amplitude,
+                                           RowVectorPair &data) const
 {
     const RtFiffRawViewModel* t_pModel = static_cast<const RtFiffRawViewModel*>(index.model());
 
@@ -546,7 +546,12 @@ void RtFiffRawViewDelegate::createPlotPath(const QModelIndex &index,
     if(iSkip <= 0) {
         iSkip = 1;
     }
-    double dDx = ((float)option.rect.width()) / (t_pModel->getMaxSamples()/iSkip);
+    double dRatio = (double)t_pModel->getMaxSamples()/(double)iSkip;
+    double dDx = (double)option.rect.width() / dRatio;
+
+    qDebug() << "dRatio" << dRatio;
+    qDebug() << "iSkip" << iSkip;
+    qDebug() << "dDx" << dDx;
 
     // Init indices
     int currentSampleIndex = t_pModel->getCurrentSampleIndex();
