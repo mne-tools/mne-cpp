@@ -174,7 +174,7 @@ private:
 
     //=========================================================================================================
     /**
-     * Call this funciton whenever the frequencie ordering was requested.
+     * Call this funciton whenever frequency ordering was requested.
      */
     void onDoFreqOrder();
 
