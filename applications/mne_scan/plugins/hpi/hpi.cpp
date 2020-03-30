@@ -360,8 +360,9 @@ void Hpi::onDoFreqOrder()
        msgBox.exec();
        return;
     }
-
+    m_mutex.lock();
     m_bDoFreqOrder = true;
+    m_mutex.unlock();
 }
 
 //=============================================================================================================
@@ -370,7 +371,6 @@ void Hpi::onCoilFrequenciesChanged(const QVector<int>& vCoilFreqs)
 {
     m_mutex.lock();
     m_vCoilFreqs = vCoilFreqs;
-
     m_mutex.unlock();
 }
 
@@ -453,7 +453,6 @@ void Hpi::run()
                 matDataMerged.block(0, iDataIndexCounter, matData.rows(), matDataMerged.cols()-iDataIndexCounter) = matData.block(0, 0, matData.rows(), matDataMerged.cols()-iDataIndexCounter);
 
                 // Perform HPI fit
-                // order frequenie order if requested
                 fitResult.devHeadTrans.from = 1;
                 fitResult.devHeadTrans.to = 4;
 
@@ -473,7 +472,6 @@ void Hpi::run()
                 }
                 m_mutex.unlock();
 
-                // Perform HPI fit
                 // Perform actual fitting
                 m_mutex.lock();
                 fitResult.sFilePathDigitzers = m_sFilePathDigitzers;
