@@ -80,6 +80,7 @@ static _fiffExp _fiff_explanations[] = {
 
   { FIFF_NCHAN,           "nchan          " },
   { FIFF_SFREQ,           "sfreq          " },
+  { FIFF_LINE_FREQ,       "linefreq       " },
   { FIFF_DATA_PACK,       "packing        " },
   { FIFF_CH_INFO,         "channel        " },
   { FIFF_MEAS_DATE,       "date           " },

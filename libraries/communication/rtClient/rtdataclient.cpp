@@ -311,6 +311,9 @@ FiffInfo::SPtr RtDataClient::readInfo()
         case FIFF_SFREQ:
             p_pFiffInfo->sfreq = *(t_pTag->toFloat());
             break;
+        case FIFF_LINE_FREQ:
+            p_pFiffInfo->linefreq = *(t_pTag->toFloat());
+            break;
         case FIFF_HIGHPASS:
             p_pFiffInfo->highpass = *(t_pTag->toFloat());
             break;

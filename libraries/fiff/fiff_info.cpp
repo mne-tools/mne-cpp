@@ -59,6 +59,7 @@ using namespace Eigen;
 FiffInfo::FiffInfo()
 : FiffInfoBase()//nchan(-1)
 , sfreq(-1.0)
+, linefreq(-1.0)
 , highpass(-1.0)
 , lowpass(-1.0)
 , acq_pars("")
@@ -73,6 +74,7 @@ FiffInfo::FiffInfo(const FiffInfo& p_FiffInfo)
 : FiffInfoBase(p_FiffInfo)
 , file_id(p_FiffInfo.file_id)
 , sfreq(p_FiffInfo.sfreq)
+, linefreq(p_FiffInfo.linefreq)
 , highpass(p_FiffInfo.highpass)
 , lowpass(p_FiffInfo.lowpass)
 , dev_ctf_t(p_FiffInfo.dev_ctf_t)
@@ -108,6 +110,7 @@ void FiffInfo::clear()
     file_id = FiffId();
     meas_date[0] = -1;
     sfreq = -1.0;
+    linefreq = -1.0;
     highpass = -1.0;
     lowpass = -1.0;
     dev_ctf_t.clear();
@@ -433,6 +436,7 @@ void FiffInfo::writeToStream(FiffStream* p_pStream) const
     //    General
     //
     p_pStream->write_float(FIFF_SFREQ,&this->sfreq);
+    p_pStream->write_float(FIFF_LINE_FREQ,&this->linefreq);
     p_pStream->write_float(FIFF_HIGHPASS,&this->highpass);
     p_pStream->write_float(FIFF_LOWPASS,&this->lowpass);
     p_pStream->write_int(FIFF_NCHAN,&nchan);
