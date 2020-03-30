@@ -214,7 +214,7 @@ signals:
 
     //=========================================================================================================
     /**
-     * Emit this signal whenever the freuence ordering is supposed to be triggered.
+     * Emit this signal whenever the frequency ordering is supposed to be triggered.
      */
     void doFreqOrder();
 

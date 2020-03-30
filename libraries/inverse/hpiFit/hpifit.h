@@ -110,7 +110,7 @@ struct HpiFitResult {
 /**
  * The strucut specifing the sensor parameters.
  */
-struct Sensor {
+struct SensorSet {
     Eigen::MatrixXd r0;
     Eigen::MatrixXd rmag;
     Eigen::MatrixXd cosmag;
@@ -147,23 +147,23 @@ public:
     /**
      * Perform one single HPI fit.
      *
-     * @param[in]    t_mat           Data to estimate the HPI positions from
-     * @param[in]    t_matProjectors The projectors to apply. Bad channels are still included.
-     * @param[out]   transDevHead    The final dev head transformation matrix
-     * @param[in]    vFreqs          The frequencies for each coil.
-     * @param[out]   vError          The HPI estimation Error in mm for each fitted HPI coil.
-     * @param[out]   vGoF            The goodness of fit for each fitted HPI coil
-     * @param[out]   fittedPointSet  The final fitted positions in form of a digitizer set.
-     * @param[in]    pFiffInfo     Associated Fiff Information.
-     * @param[in]    bDoDebug        Print debug info to cmd line and write debug info to file.
-     * @param[in]    sHPIResourceDir The path to the debug file which is to be written.
+     * @param[in]    t_mat              Data to estimate the HPI positions from
+     * @param[in]    t_matProjectors    The projectors to apply. Bad channels are still included.
+     * @param[out]   transDevHead       The final dev head transformation matrix
+     * @param[in]    vecFreqs           The frequencies for each coil.
+     * @param[out]   vecError           The HPI estimation Error in mm for each fitted HPI coil.
+     * @param[out]   vecGoF             The goodness of fit for each fitted HPI coil
+     * @param[out]   fittedPointSet     The final fitted positions in form of a digitizer set.
+     * @param[in]    pFiffInfo          Associated Fiff Information.
+     * @param[in]    bDoDebug           Print debug info to cmd line and write debug info to file.
+     * @param[in]    sHPIResourceDir    The path to the debug file which is to be written.
      */
     void fitHPI(const Eigen::MatrixXd& t_mat,
                 const Eigen::MatrixXd& t_matProjectors,
                 FIFFLIB::FiffCoordTrans &transDevHead,
-                const QVector<int>& vFreqs,
-                QVector<double> &vError,
-                Eigen::VectorXd& vGoF,
+                const QVector<int>& vecFreqs,
+                QVector<double>& vecError,
+                Eigen::VectorXd& vecGoF,
                 FIFFLIB::FiffDigPointSet& fittedPointSet,
                 QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
                 bool bDoDebug = false,
@@ -173,22 +173,22 @@ public:
     /**
      * assign frequencies to correct position
      *
-     * @param[in]    t_mat           Data to estimate the HPI positions from
-     * @param[in]    t_matProjectors The projectors to apply. Bad channels are still included.
-     * @param[in]    transDevHead    The final dev head transformation matrix
-     * @param[in]    vFreqs          The frequencies for each coil in unknown order.
-     * @param[out]   vFreqs          The frequencies for each coil in correct order.
-     * @param[in]    vError          The HPI estimation Error in mm for each fitted HPI coil.
-     * @param[in]    vGoF            The goodness of fit for each fitted HPI coil
-     * @param[in]    fittedPointSet  The final fitted positions in form of a digitizer set.
-     * @param[in]    pFiffInfo     Associated Fiff Information.
+     * @param[in]    t_mat              Data to estimate the HPI positions from
+     * @param[in]    t_matProjectors    The projectors to apply. Bad channels are still included.
+     * @param[in]    transDevHead       The final dev head transformation matrix
+     * @param[in]    vecFreqs           The frequencies for each coil in unknown order.
+     * @param[out]   vecFreqs           The frequencies for each coil in correct order.
+     * @param[in]    vecError           The HPI estimation Error in mm for each fitted HPI coil.
+     * @param[in]    vecGoF             The goodness of fit for each fitted HPI coil
+     * @param[in]    fittedPointSet     The final fitted positions in form of a digitizer set.
+     * @param[in]    pFiffInfo          Associated Fiff Information.
      */
     void findOrder(const Eigen::MatrixXd& t_mat,
                    const Eigen::MatrixXd& t_matProjectors,
                    FIFFLIB::FiffCoordTrans &transDevHead,
-                   QVector<int>& vFreqs,
-                   QVector<double> &vError,
-                   Eigen::VectorXd& vGoF,
+                   QVector<int>& vecFreqs,
+                   QVector<double> &vecError,
+                   Eigen::VectorXd& vecGoF,
                    FIFFLIB::FiffDigPointSet& fittedPointSet,
                    QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
@@ -198,35 +198,35 @@ public:
      * get from Neuromag's MaxFilter.
      *
      *
-     * @param[in]   fTime          The corresponding time in the measurement for the fit.
-     * @param[in]   pFiffInfo     The FiffInfo file from the measurement.
-     * @param[out]  mPosition      The matrix to store the results.
-     * @param[in]   vGoF          The goodness of fit for each coil.
-     * @param[in]   vError        The Hpi estimation Error per coil.
+     * @param[in]   fTime           The corresponding time in the measurement for the fit.
+     * @param[in]   pFiffInfo       The FiffInfo file from the measurement.
+     * @param[out]  matPosition     The matrix to store the results.
+     * @param[in]   vecGoF          The goodness of fit for each coil.
+     * @param[in]   vecError        The Hpi estimation Error per coil.
      *
      * ToDo: get estimated movement velocity and store it in channel 9
      */
     static void storeHeadPosition(float fTime,
                                   const Eigen::MatrixXf& transDevHead,
-                                  Eigen::MatrixXd& mPosition,
-                                  const Eigen::VectorXd& vGoF,
-                                  const QVector<double>& vError);
+                                  Eigen::MatrixXd& matPosition,
+                                  const Eigen::VectorXd& vecGoF,
+                                  const QVector<double>& vecError);
 protected:
     //=========================================================================================================
     /**
      * Fits dipoles for the given coils and a given data set.
      *
-     * @param[in] CoilParam       The coil parameters.
-     * @param[in] lSensorSet      The sensor information.
-     * @param[in] mData           The data which used to fit the coils.
-     * @param[in] iNumCoils       The number of coils.
-     * @param[in] t_matProjectors The projectors to apply. Bad channels are still included.
+     * @param[in] CoilParam         The coil parameters.
+     * @param[in] sensors           The sensor information.
+     * @param[in] matData           The data which used to fit the coils.
+     * @param[in] iNumCoils         The number of coils.
+     * @param[in] t_matProjectors   The projectors to apply. Bad channels are still included.
      *
      * @return Returns the coil parameters.
      */
     CoilParam dipfit(struct CoilParam coil,
-                     const Sensor& sensors,
-                     const Eigen::MatrixXd &mData,
+                     const SensorSet& sensors,
+                     const Eigen::MatrixXd &matData,
                      int iNumCoils,
                      const Eigen::MatrixXd &t_matProjectors);
 
@@ -234,38 +234,38 @@ protected:
     /**
      * Computes the transformation matrix between two sets of 3D points.
      *
-     * @param[in] mNH    The first set of input 3D points (row-wise order).
-     * @param[in] mBT    The second set of input 3D points (row-wise order).
+     * @param[in] matNH    The first set of input 3D points (row-wise order).
+     * @param[in] matBT    The second set of input 3D points (row-wise order).
      *
      * @return Returns the transformation matrix.
      */
 
-    Eigen::Matrix4d computeTransformation(Eigen::MatrixXd mNH,
-                                          Eigen::MatrixXd mBT);
+    Eigen::Matrix4d computeTransformation(Eigen::MatrixXd matNH,
+                                          Eigen::MatrixXd matBT);
 
     //=========================================================================================================
     /**
-     * Read from FwdCoilSet and store into lSensorSet struct.
+     * Read from FwdCoilSet and store into sensors struct.
      * Can be deleted as soon as FwdCoilSet is refactored to QList and EigenMatrix.
      *
-     * @param[in] lSensorSet    The struct to save sensor information.
+     * @param[in] sensors       The struct to save sensor information.
      * @param[in] coils         The coilset to read the sensor information from.
      *
      */
-    void createSensorSet(Sensor& sensor,
+    void createSensorSet(SensorSet& sensors,
                          FWDLIB::FwdCoilSet* coils);
 
     //=========================================================================================================
 
-    Sensor                m_sensors;            /**< sensors */
+    SensorSet                m_sensors;            /**< sensor struct that contains information about all sensors */
 
 private:
     //=========================================================================================================
     /**
-     * Update FwdCoilSet and store into lSensorSet struct.
+     * Update FwdCoilSet and store into sensors struct.
      *
      */
-    void updateCoils();
+    void updateSensor();
 
     FWDLIB::FwdCoilSet* m_coilTemplate;
     FWDLIB::FwdCoilSet* m_coilMeg;
@@ -277,7 +277,7 @@ private:
      */
     void updateChannels(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
-    QList<FIFFLIB::FiffChInfo>   m_lChannels;             /**< Channellist with excluded bads */
+    QList<FIFFLIB::FiffChInfo>   m_lChannels;             /**< Channellist with bads excluded */
     QVector<int>                 m_vInnerind;             /**< index of inner channels  */
     QList<QString>               m_lBads;                 /**< contains bad channels  */
 

@@ -128,7 +128,7 @@ public:
     Eigen::MatrixXd         coilPos;
     Eigen::RowVectorXd      sensorData;
     DipFitError             errorInfo;
-    struct Sensor           sensors;
+    struct SensorSet        sensors;
     Eigen::MatrixXd         matProjector;
 
 protected:
@@ -137,21 +137,21 @@ protected:
      * magnetic_dipole leadfield for a magnetic dipole in an infinite medium.
      * The function has been compared with matlab magnetic_dipole and it gives same output.
      */
-    Eigen::MatrixXd magnetic_dipole(Eigen::MatrixXd mPos,
-                                    Eigen::MatrixXd mPnt,
-                                    Eigen::MatrixXd mOri);
+    Eigen::MatrixXd magnetic_dipole(Eigen::MatrixXd matPos,
+                                    Eigen::MatrixXd matPnt,
+                                    Eigen::MatrixXd matOri);
 
     //=========================================================================================================
     /**
      * compute_leadfield computes a forward solution for a dipole in a a volume
      * conductor model. The forward solution is expressed as the leadfield
      * matrix (Nchan*3), where each column corresponds with the potential or field
-     * distributions on all lSensorSet for one of the x,y,z-orientations of the dipole.
+     * distributions on all sensors for one of the x,y,z-orientations of the dipole.
      * The function has been compared with matlab ft_compute_leadfield and it gives
      * same output.
      */
-    Eigen::MatrixXd compute_leadfield(const Eigen::MatrixXd& mPos,
-                                      const struct Sensor& sensor);
+    Eigen::MatrixXd compute_leadfield(const Eigen::MatrixXd& matPos,
+                                      const struct SensorSet& sensors);
 
     //=========================================================================================================
     /**
@@ -160,9 +160,9 @@ protected:
      * The function has been compared with matlab dipfit_error and it gives
      * same output
      */
-    DipFitError dipfitError(const Eigen::MatrixXd& mPos,
-                            const Eigen::MatrixXd& mData,
-                            const struct Sensor& sensors,
+    DipFitError dipfitError(const Eigen::MatrixXd& matPos,
+                            const Eigen::MatrixXd& matData,
+                            const struct SensorSet& sensors,
                             const Eigen::MatrixXd& matProjectors);
 
     //=========================================================================================================
@@ -174,16 +174,16 @@ protected:
     //=========================================================================================================
     /**
      * fminsearch Multidimensional unconstrained nonlinear minimization (Nelder-Mead).
-     * X = fminsearch(X0, iMaxiter, iMaxfun, iDisplay, mData, lSensorSet) starts at X0 and
+     * X = fminsearch(X0, iMaxiter, iMaxfun, iDisplay, matData, sensors) starts at X0 and
      * attempts to find a local minimizer
      */
-    Eigen::MatrixXd fminsearch(const Eigen::MatrixXd& mPos,
+    Eigen::MatrixXd fminsearch(const Eigen::MatrixXd& matPos,
                                int iMaxiter,
                                int iMaxfun,
                                int iDisplay,
-                               const Eigen::MatrixXd& mData,
+                               const Eigen::MatrixXd& matData,
                                const Eigen::MatrixXd& matProjectors,
-                               const struct Sensor& lSensorSet,
+                               const struct SensorSet& sensors,
                                int &iSimplexNumitr);
 };
 

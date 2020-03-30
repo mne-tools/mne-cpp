@@ -93,8 +93,7 @@ public:
     /**
      * Creates the real-time HPI worker object.
      *
-     * @param[in] p_pFiffInfo        Associated Fiff Information
-     * @param[in] parent     Parent QObject (optional)
+     * @param[in] pFiffInfo        Associated Fiff Information
      */
     explicit RtHpiWorker(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
