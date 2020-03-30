@@ -83,13 +83,6 @@
        </property>
       </spacer>
      </item>
-     <item row="2" column="2">
-      <widget class="QPushButton" name="m_qPushButton_About">
-       <property name="text">
-        <string>About</string>
-       </property>
-      </widget>
-     </item>
     </layout>
    </item>
   </layout>
