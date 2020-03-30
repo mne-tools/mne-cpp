@@ -192,14 +192,10 @@ void Hpi::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 
             m_mutex.lock();
             bool bDoSingleHpi = m_bDoSingleHpi;
+            bool bDoFreqOrder = m_bDoFreqOrder;
             m_mutex.unlock();
-            if(bDoSingleHpi) {
-                while(!m_pCircularBuffer->push(pRTMSA->getMultiSampleArray()[0])) {
-                    //Do nothing until the circular buffer is ready to accept new data again
-                }
-            }
 
-            if(m_bDoFreqOrder) {
+            if(bDoFreqOrder || bDoSingleHpi) {
                 while(!m_pCircularBuffer->push(pRTMSA->getMultiSampleArray()[0])) {
                     //Do nothing until the circular buffer is ready to accept new data again
                 }
@@ -361,6 +357,7 @@ void Hpi::onDoFreqOrder()
        msgBox.exec();
        return;
     }
+
     m_mutex.lock();
     m_bDoFreqOrder = true;
     m_mutex.unlock();
@@ -421,12 +418,11 @@ void Hpi::run()
         msleep(100);
     }
 
-<<<<<<< HEAD
     // init hpi fit
-=======
->>>>>>> FIX: Fix restarting of plugins
     HpiFitResult fitResult;
     fitResult.devHeadTrans = m_pFiffInfo->dev_head_t;
+    fitResult.devHeadTrans.from = 1;
+    fitResult.devHeadTrans.to = 4;
 
     HPIFit HPI = HPIFit(m_pFiffInfo);
 
@@ -459,16 +455,14 @@ void Hpi::run()
                 if(m_bDoSingleHpi) {
                     m_bDoSingleHpi = false;
                 }
+                fitResult.sFilePathDigitzers = m_sFilePathDigitzers;
                 m_mutex.unlock();
 
                 matDataMerged.block(0, iDataIndexCounter, matData.rows(), matDataMerged.cols()-iDataIndexCounter) = matData.block(0, 0, matData.rows(), matDataMerged.cols()-iDataIndexCounter);
 
                 // Perform HPI fit
-                fitResult.devHeadTrans.from = 1;
-                fitResult.devHeadTrans.to = 4;             
 
                 m_mutex.lock();
-                fitResult.sFilePathDigitzers = m_sFilePathDigitzers;
                 if(m_bDoFreqOrder) {
                     // find correct frequencie order if requested
                     HPI.findOrder(matDataMerged,
@@ -485,7 +479,6 @@ void Hpi::run()
 
                 // Perform actual fitting
                 m_mutex.lock();
-                fitResult.sFilePathDigitzers = m_sFilePathDigitzers;
                 HPI.fitHPI(matDataMerged,
                            m_matCompProjectors,
                            fitResult.devHeadTrans,

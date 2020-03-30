@@ -360,6 +360,7 @@ void HPIFit::findOrder(const MatrixXd& t_mat,
                        FiffDigPointSet& fittedPointSet,
                        FiffInfo::SPtr pFiffInfo)
 {
+    qDebug() << "HPIFit::findOrder";
     // create temporary copies that are necessary to reset values that are passed to fitHpi()
     fittedPointSet.clear();
     FiffDigPointSet fittedPointSetTemp = fittedPointSet;
