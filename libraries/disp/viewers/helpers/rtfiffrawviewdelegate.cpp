@@ -542,16 +542,17 @@ void RtFiffRawViewDelegate::createPlotPath(const QModelIndex &index,
     double y_base = path.currentPosition().y();
 
     // Calculate the smallest possible width for one sample data point
-    int iSkip = t_pModel->getMaxSamples() / (float)option.rect.width();
+    int iSkip = t_pModel->getMaxSamples() / option.rect.width();
     if(iSkip <= 0) {
         iSkip = 1;
     }
-    double dRatio = (double)t_pModel->getMaxSamples()/(double)iSkip;
-    double dDx = (double)option.rect.width() / dRatio;
+    double dRatio = t_pModel->getMaxSamples() / iSkip;
+    double dDx = option.rect.width() / dRatio;
 
-    qDebug() << "dRatio" << dRatio;
-    qDebug() << "iSkip" << iSkip;
-    qDebug() << "dDx" << dDx;
+//    qDebug() << "t_pModel->getMaxSamples()" << t_pModel->getMaxSamples();
+//    qDebug() << "dRatio" << dRatio;
+//    qDebug() << "iSkip" << iSkip;
+//    qDebug() << "dDx" << dDx;
 
     // Init indices
     int currentSampleIndex = t_pModel->getCurrentSampleIndex();
@@ -570,8 +571,8 @@ void RtFiffRawViewDelegate::createPlotPath(const QModelIndex &index,
         path.moveTo(qSamplePosition);
     }
 
-    for(qint32 j=0; j < data.second; j += iSkip) {
-        if(j<currentSampleIndex) {
+    for(qint32 j = 0; j < data.second; j += iSkip) {
+        if(j < currentSampleIndex) {
             dValue = *(data.first+j) - *(data.first); //remove first sample data[0] as offset
         } else {
             dValue = *(data.first+j) - lastFirstValue; //do not remove first sample data[0] as offset because this is the last data part
@@ -586,7 +587,7 @@ void RtFiffRawViewDelegate::createPlotPath(const QModelIndex &index,
         path.lineTo(qSamplePosition);
 
         //Create ellipse position
-        if(j == (qint32)(m_markerPosition.x()/dDx)) {
+        if(j == (qint32)(m_markerPosition.x() / dDx)) {
             ellipsePos.setX(path.currentPosition().x()+dDx);
             ellipsePos.setY(dValueScaled/*+(option.rect.height()/2)*/);
 
