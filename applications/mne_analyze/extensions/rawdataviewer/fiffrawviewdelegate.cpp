@@ -153,15 +153,15 @@ void FiffRawViewDelegate::paint(QPainter *painter,
 
                 path = QPainterPath(QPointF(option.rect.x()+pos, option.rect.y()));
 
-                //Plot time marks
-                createMarksPath(index,
-                                option,
-                                path,
-                                data);
-                painter->save();
-                painter->setPen(QPen(Qt::black, 2, Qt::SolidLine));
-                painter->drawPath(path);
-                painter->restore();
+//                //Plot time marks
+//                createMarksPath(index,
+//                                option,
+//                                path,
+//                                data);
+//                painter->save();
+//                painter->setPen(QPen(Qt::black, 2, Qt::SolidLine));
+//                painter->drawPath(path);
+//                painter->restore();
 
             }
             break;
@@ -298,7 +298,7 @@ void FiffRawViewDelegate::createTimeSpacersPath(const QModelIndex &index,
     float fTop = option.rect.topLeft().y();
     float fBottom = option.rect.bottomRight().y();
 
-    for(int j = 0; j < data.size(); j++) {
+    for(int j = 0; j < (1.5 * iSpacersPerSecond * t_pModel->getWindowSizeBlocks()); j++) {
         //draw vertical line
         path.moveTo(path.currentPosition().x(), fTop);
         path.lineTo(path.currentPosition().x(), fBottom);
