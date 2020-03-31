@@ -2158,7 +2158,6 @@ FiffStream::SPtr FiffStream::start_writing_raw(QIODevice &p_IODevice, const Fiff
     //    General
     //
     t_pStream->write_float(FIFF_SFREQ,&info.sfreq);
-    t_pStream->write_float(FIFF_LINE_FREQ,&info.linefreq);
     t_pStream->write_float(FIFF_HIGHPASS,&info.highpass);
     t_pStream->write_float(FIFF_LOWPASS,&info.lowpass);
     t_pStream->write_int(FIFF_NCHAN,&nchan);
