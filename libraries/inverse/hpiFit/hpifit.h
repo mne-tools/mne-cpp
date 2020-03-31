@@ -42,6 +42,7 @@
 //=============================================================================================================
 
 #include "../inverse_global.h"
+#include "fiff/fiff_ch_info.h"
 
 #include <fiff/fiff_dig_point_set.h>
 #include <fiff/fiff_dig_point.h>
@@ -106,6 +107,19 @@ struct HpiFitResult {
     QString                     sFilePathDigitzers;
 };
 
+/**
+ * The strucut specifing the sensor parameters.
+ */
+struct SensorSet {
+    Eigen::MatrixXd r0;
+    Eigen::MatrixXd rmag;
+    Eigen::MatrixXd cosmag;
+    Eigen::MatrixXd tra;
+    Eigen::RowVectorXd w;
+    int ncoils;
+    int np;
+};
+
 //=============================================================================================================
 // INVERSELIB FORWARD DECLARATIONS
 //=============================================================================================================
@@ -127,55 +141,56 @@ public:
     /**
      * Default constructor.
      */
-    explicit HPIFit();
+    explicit HPIFit(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
     //=========================================================================================================
     /**
      * Perform one single HPI fit.
      *
-     * @param[in]    t_mat           Data to estimate the HPI positions from
-     * @param[in]    t_matProjectors The projectors to apply. Bad channels are still included.
-     * @param[out]   transDevHead    The final dev head transformation matrix
-     * @param[in]    vFreqs          The frequencies for each coil.
-     * @param[out]   vError          The HPI estimation Error in mm for each fitted HPI coil.
-     * @param[out]   vGoF            The goodness of fit for each fitted HPI coil
-     * @param[out]   fittedPointSet  The final fitted positions in form of a digitizer set.
-     * @param[in]    bDoDebug        Print debug info to cmd line and write debug info to file.
-     * @param[in]    sHPIResourceDir The path to the debug file which is to be written.
+     * @param[in]    t_mat              Data to estimate the HPI positions from
+     * @param[in]    t_matProjectors    The projectors to apply. Bad channels are still included.
+     * @param[out]   transDevHead       The final dev head transformation matrix
+     * @param[in]    vecFreqs           The frequencies for each coil.
+     * @param[out]   vecError           The HPI estimation Error in mm for each fitted HPI coil.
+     * @param[out]   vecGoF             The goodness of fit for each fitted HPI coil
+     * @param[out]   fittedPointSet     The final fitted positions in form of a digitizer set.
+     * @param[in]    pFiffInfo          Associated Fiff Information.
+     * @param[in]    bDoDebug           Print debug info to cmd line and write debug info to file.
+     * @param[in]    sHPIResourceDir    The path to the debug file which is to be written.
      */
-    static void fitHPI(const Eigen::MatrixXd& t_mat,
-                       const Eigen::MatrixXd& t_matProjectors,
-                       FIFFLIB::FiffCoordTrans &transDevHead,
-                       const QVector<int>& vFreqs,
-                       QVector<double> &vError,
-                       Eigen::VectorXd& vGoF,
-                       FIFFLIB::FiffDigPointSet& fittedPointSet,
-                       QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
-                       bool bDoDebug = false,
-                       const QString& sHPIResourceDir = QString("./HPIFittingDebug"));
+    void fitHPI(const Eigen::MatrixXd& t_mat,
+                const Eigen::MatrixXd& t_matProjectors,
+                FIFFLIB::FiffCoordTrans &transDevHead,
+                const QVector<int>& vecFreqs,
+                QVector<double>& vecError,
+                Eigen::VectorXd& vecGoF,
+                FIFFLIB::FiffDigPointSet& fittedPointSet,
+                QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
+                bool bDoDebug = false,
+                const QString& sHPIResourceDir = QString("./HPIFittingDebug"));
 
     //=========================================================================================================
     /**
      * assign frequencies to correct position
      *
-     * @param[in]    t_mat           Data to estimate the HPI positions from
-     * @param[in]    t_matProjectors The projectors to apply. Bad channels are still included.
-     * @param[out]   transDevHead    The final dev head transformation matrix
-     * @param[in]    vFreqs          The frequencies for each coil in unknown order.
-     * @param[out]   vFreqs          The frequencies for each coil in correct order.
-     * @param[in]    vError          The HPI estimation Error in mm for each fitted HPI coil.
-     * @param[in]    vGoF            The goodness of fit for each fitted HPI coil
-     * @param[in]    fittedPointSet  The final fitted positions in form of a digitizer set.
-     * @param[in]    p_pFiffInfo     Associated Fiff Information.
+     * @param[in]    t_mat              Data to estimate the HPI positions from
+     * @param[in]    t_matProjectors    The projectors to apply. Bad channels are still included.
+     * @param[in]    transDevHead       The final dev head transformation matrix
+     * @param[in]    vecFreqs           The frequencies for each coil in unknown order.
+     * @param[out]   vecFreqs           The frequencies for each coil in correct order.
+     * @param[in]    vecError           The HPI estimation Error in mm for each fitted HPI coil.
+     * @param[in]    vecGoF             The goodness of fit for each fitted HPI coil
+     * @param[in]    fittedPointSet     The final fitted positions in form of a digitizer set.
+     * @param[in]    pFiffInfo          Associated Fiff Information.
      */
-    static void findOrder(const Eigen::MatrixXd& t_mat,
-                          const Eigen::MatrixXd& t_matProjectors,
-                          FIFFLIB::FiffCoordTrans &transDevHead,
-                          QVector<int>& vFreqs,
-                          QVector<double> &vError,
-                          Eigen::VectorXd& vGoF,
-                          FIFFLIB::FiffDigPointSet& fittedPointSet,
-                          QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
+    void findOrder(const Eigen::MatrixXd& t_mat,
+                   const Eigen::MatrixXd& t_matProjectors,
+                   FIFFLIB::FiffCoordTrans &transDevHead,
+                   QVector<int>& vecFreqs,
+                   QVector<double> &vecError,
+                   Eigen::VectorXd& vecGoF,
+                   FIFFLIB::FiffDigPointSet& fittedPointSet,
+                   QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
     //=========================================================================================================
     /**
@@ -183,66 +198,89 @@ public:
      * get from Neuromag's MaxFilter.
      *
      *
-     * @param[in]   time          The corresponding time in the measurement for the fit.
-     * @param[out]  position      The matrix to store the results.
-     * @param[in]   vGoF          The goodness of fit for each coil.
-     * @param[in]   vError        The Hpi estimation Error per coil.
+     * @param[in]   fTime           The corresponding time in the measurement for the fit.
+     * @param[in]   pFiffInfo       The FiffInfo file from the measurement.
+     * @param[out]  matPosition     The matrix to store the results.
+     * @param[in]   vecGoF          The goodness of fit for each coil.
+     * @param[in]   vecError        The Hpi estimation Error per coil.
      *
-     * ToDo: get estimated movement velocity and stroe it in channel 9
+     * ToDo: get estimated movement velocity and store it in channel 9
      */
-    static void storeHeadPosition(float time,
-                                  const Eigen::MatrixXf& devHeadT,
-                                  Eigen::MatrixXd& position,
-                                  const Eigen::VectorXd& vGoF,
-                                  const QVector<double>& vError);
-
-
+    static void storeHeadPosition(float fTime,
+                                  const Eigen::MatrixXf& transDevHead,
+                                  Eigen::MatrixXd& matPosition,
+                                  const Eigen::VectorXd& vecGoF,
+                                  const QVector<double>& vecError);
 protected:
     //=========================================================================================================
     /**
      * Fits dipoles for the given coils and a given data set.
      *
-     * @param[in] coil            The coil parameters.
-     * @param[in] sensorSet       The sensor information.
-     * @param[in] data            The data which used to fit the coils.
-     * @param[in] numCoils        The number of coils.
-     * @param[in] t_matProjectors The projectors to apply. Bad channels are still included.
+     * @param[in] CoilParam         The coil parameters.
+     * @param[in] sensors           The sensor information.
+     * @param[in] matData           The data which used to fit the coils.
+     * @param[in] iNumCoils         The number of coils.
+     * @param[in] t_matProjectors   The projectors to apply. Bad channels are still included.
      *
      * @return Returns the coil parameters.
      */
-    static CoilParam dipfit(struct CoilParam coil,
-                            const QList<struct Sensor>& sensorSet,
-                            const Eigen::MatrixXd &data,
-                            int numCoils,
-                            const Eigen::MatrixXd &t_matProjectors);
+    CoilParam dipfit(struct CoilParam coil,
+                     const SensorSet& sensors,
+                     const Eigen::MatrixXd &matData,
+                     int iNumCoils,
+                     const Eigen::MatrixXd &t_matProjectors);
 
     //=========================================================================================================
     /**
      * Computes the transformation matrix between two sets of 3D points.
      *
-     * @param[in] NH     The first set of input 3D points (row-wise order).
-     * @param[in] BT     The second set of input 3D points (row-wise order).
+     * @param[in] matNH    The first set of input 3D points (row-wise order).
+     * @param[in] matBT    The second set of input 3D points (row-wise order).
      *
      * @return Returns the transformation matrix.
      */
-    static Eigen::Matrix4d computeTransformation(Eigen::MatrixXd NH,
-                                                 Eigen::MatrixXd BT);
+
+    Eigen::Matrix4d computeTransformation(Eigen::MatrixXd matNH,
+                                          Eigen::MatrixXd matBT);
 
     //=========================================================================================================
     /**
      * Read from FwdCoilSet and store into sensors struct.
      * Can be deleted as soon as FwdCoilSet is refactored to QList and EigenMatrix.
      *
-     * @param[in] sensors     The struct to save sensor information.
-     * @param[in] coils     The coilset to read the sensor information from.
+     * @param[in] sensors       The struct to save sensor information.
+     * @param[in] coils         The coilset to read the sensor information from.
      *
      */
-    static void createSensorSet(QList<struct Sensor>& sensors,
-                                FWDLIB::FwdCoilSet* coils);
+    void createSensorSet(SensorSet& sensors,
+                         FWDLIB::FwdCoilSet* coils);
 
     //=========================================================================================================
 
-    static QString         m_sHPIResourceDir;      /**< Hold the resource folder to store the debug information in. */
+    SensorSet                m_sensors;            /**< sensor struct that contains information about all sensors */
+
+private:
+    //=========================================================================================================
+    /**
+     * Update FwdCoilSet and store into sensors struct.
+     *
+     */
+    void updateSensor();
+
+    FWDLIB::FwdCoilSet* m_coilTemplate;
+    FWDLIB::FwdCoilSet* m_coilMeg;
+
+    //=========================================================================================================
+    /**
+     * Update the channellist for init and if bads changed
+     *
+     */
+    void updateChannels(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
+
+    QList<FIFFLIB::FiffChInfo>   m_lChannels;             /**< Channellist with bads excluded */
+    QVector<int>                 m_vInnerind;             /**< index of inner channels  */
+    QList<QString>               m_lBads;                 /**< contains bad channels  */
+
 };
 
 //=============================================================================================================

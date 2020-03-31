@@ -43,7 +43,6 @@
 
 #include <utils/generics/circularbuffer.h>
 #include <scShared/Interfaces/IAlgorithm.h>
-#include <rtprocessing/rthpis.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -67,8 +66,8 @@ namespace FIFFLIB {
     class FiffCoordTrans;
 }
 
-namespace RTPROCESSINGLIB {
-    class RtHpi;
+namespace INVERSELIB {
+    class HPIFit;
 }
 
 namespace SCMEASLIB{
@@ -175,6 +174,12 @@ private:
 
     //=========================================================================================================
     /**
+     * Call this funciton whenever frequency ordering was requested.
+     */
+    void onDoFreqOrder();
+
+    //=========================================================================================================
+    /**
      * Call this funciton whenever the coil frequencies changed.
      *
      * @param[in] vCoilFreqs    The new coil frequencies.
@@ -236,6 +241,7 @@ private:
 
     double                      m_dAllowedMeanErrorDist;    /**< The allowed error distance in order for the last fit to be counted as a good fit.*/
 
+    bool                        m_bDoFreqOrder;             /**< Order Frequencies.*/
     bool                        m_bDoSingleHpi;             /**< Do a single HPI fit.*/
     bool                        m_bDoContinousHpi;          /**< Do continous HPI fitting.*/
     bool                        m_bUseSSP;                  /**< Use SSP's.*/

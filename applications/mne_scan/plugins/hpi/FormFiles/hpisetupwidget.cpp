@@ -59,8 +59,6 @@ HpiSetupWidget::HpiSetupWidget(Hpi* toolbox, QWidget *parent)
 , m_pHpi(toolbox)
 {
     ui.setupUi(this);
-
-    connect(ui.m_qPushButton_About, SIGNAL(released()), this, SLOT(showAboutDialog()));
 }
 
 //=============================================================================================================

@@ -39,9 +39,10 @@
 //=============================================================================================================
 
 #include "hpifitdata.h"
-
+#include "hpifit.h"
 #include <utils/mnemath.h>
 
+#include <iostream>
 #include <algorithm>
 
 //=============================================================================================================
@@ -77,78 +78,78 @@ HPIFitData::HPIFitData()
 void HPIFitData::doDipfitConcurrent()
 {
     // Initialize variables
-    Eigen::RowVectorXd currentCoil = this->coilPos;
-    Eigen::VectorXd currentData = this->sensorData;
-    QList<Sensor> currentSensors = this->sensorSet;
+    Eigen::RowVectorXd vecCurrentCoil = this->coilPos;
+    Eigen::VectorXd vecCurrentData = this->sensorData;
+    SensorSet currentSensors = this->sensors;
 
-    int display = 0;
-    int maxiter = 500;
-    int simplex_numitr = 0;
+    int iDisplay = 0;
+    int iMaxiter = 200;
+    int iSimplexNumitr = 0;
 
-    this->coilPos = fminsearch(currentCoil,
-                               maxiter,
-                               2 * maxiter * currentCoil.cols(),
-                               display,
-                               currentData,
+    this->coilPos = fminsearch(vecCurrentCoil,
+                               iMaxiter,
+                               2 * iMaxiter * vecCurrentCoil.cols(),
+                               iDisplay,
+                               vecCurrentData,
                                this->matProjector,
                                currentSensors,
-                               simplex_numitr);
+                               iSimplexNumitr);
 
-    this->errorInfo = dipfitError(currentCoil,
-                                  currentData,
+    this->errorInfo = dipfitError(vecCurrentCoil,
+                                  vecCurrentData,
                                   currentSensors,
                                   this->matProjector);
 
-    this->errorInfo.numIterations = simplex_numitr;
+    this->errorInfo.numIterations = iSimplexNumitr;
 }
 
 //=============================================================================================================
 
-Eigen::MatrixXd HPIFitData::magnetic_dipole(Eigen::MatrixXd pos,
-                                            Eigen::MatrixXd pnt,
-                                            Eigen::MatrixXd ori)
+Eigen::MatrixXd HPIFitData::magnetic_dipole(Eigen::MatrixXd matPos,
+                                            Eigen::MatrixXd matPnt,
+                                            Eigen::MatrixXd matOri)
 {
     double u0 = 1e-7;
-    int nchan;
+    int iNchan;
     Eigen::MatrixXd r, r2, r5, x, y, z, mx, my, mz, Tx, Ty, Tz, lf;
 
-    nchan = pnt.rows();
+    iNchan = matPnt.rows();
 
     // Shift the magnetometers so that the dipole is in the origin
-    pnt.array().col(0) -= pos(0);
-    pnt.array().col(1) -= pos(1);
-    pnt.array().col(2) -= pos(2);
+    matPnt.array().col(0) -=matPos(0);
+    matPnt.array().col(1) -=matPos(1);
+    matPnt.array().col(2) -=matPos(2);
 
-    r = pnt.array().square().rowwise().sum().sqrt();
+    r = matPnt.array().square().rowwise().sum().sqrt();
 
-    r2 = r5 = x = y = z = mx = my = mz = Tx = Ty = Tz = lf = Eigen::MatrixXd::Zero(nchan,3);
+    r2 = r5 = x = y = z = mx = my = mz = Tx = Ty = Tz = lf = Eigen::MatrixXd::Zero(iNchan,3);
 
-    for(int i = 0;i < nchan;i++) {
+    for(int i = 0;i < iNchan;i++) {
         r2.row(i).array().fill(pow(r(i),2));
         r5.row(i).array().fill(pow(r(i),5));
     }
 
-    for(int i = 0;i < nchan;i++) {
-        x.row(i).array().fill(pnt(i,0));
-        y.row(i).array().fill(pnt(i,1));
-        z.row(i).array().fill(pnt(i,2));
+    for(int i = 0;i < iNchan;i++) {
+        x.row(i).array().fill(matPnt(i,0));
+        y.row(i).array().fill(matPnt(i,1));
+        z.row(i).array().fill(matPnt(i,2));
     }
 
     mx.col(0).array().fill(1);
     my.col(1).array().fill(1);
     mz.col(2).array().fill(1);
 
-    Tx = 3 * x.cwiseProduct(pnt) - mx.cwiseProduct(r2);
-    Ty = 3 * y.cwiseProduct(pnt) - my.cwiseProduct(r2);
-    Tz = 3 * z.cwiseProduct(pnt) - mz.cwiseProduct(r2);
+    Tx = 3 * x.cwiseProduct(matPnt) - mx.cwiseProduct(r2);
+    Ty = 3 * y.cwiseProduct(matPnt) - my.cwiseProduct(r2);
+    Tz = 3 * z.cwiseProduct(matPnt) - mz.cwiseProduct(r2);
 
-    for(int i = 0;i < nchan;i++) {
-        lf(i,0) = Tx.row(i).dot(ori.row(i));
-        lf(i,1) = Ty.row(i).dot(ori.row(i));
-        lf(i,2) = Tz.row(i).dot(ori.row(i));
+    for(int i = 0;i < iNchan;i++) {
+        lf(i,0) = Tx.row(i).dot(matOri.row(i));
+        lf(i,1) = Ty.row(i).dot(matOri.row(i));
+        lf(i,2) = Tz.row(i).dot(matOri.row(i));
     }
 
-    for(int i = 0;i < nchan;i++) {
+    for(int i = 0;i < iNchan;i++) {
         for(int j = 0;j < 3;j++) {
             lf(i,j) = u0 * lf(i,j)/(4 * M_PI * r5(i,j));
         }
@@ -159,44 +160,47 @@ Eigen::MatrixXd HPIFitData::magnetic_dipole(Eigen::MatrixXd pos,
 
 //=============================================================================================================
 
-Eigen::MatrixXd HPIFitData::compute_leadfield(const Eigen::MatrixXd& pos, const struct Sensor& sensor)
+Eigen::MatrixXd HPIFitData::compute_leadfield(const Eigen::MatrixXd& matPos, const SensorSet& sensors)
 {
 
-    Eigen::MatrixXd pnt, ori, lf;
-    pnt = sensor.rmag; // position of each integrationpoint
-    ori = sensor.cosmag; // orientation of each coil
+    Eigen::MatrixXd matPnt, matOri, matLf;
+    matPnt = sensors.rmag; // position of each integrationpoint
+    matOri = sensors.cosmag; // mOrientation of each coil
 
-    lf = magnetic_dipole(pos, pnt, ori);
-    lf = sensor.tra * lf;
+    matLf = magnetic_dipole(matPos, matPnt, matOri);
 
-    return lf;
+    return matLf;
 }
 
 //=============================================================================================================
 
-DipFitError HPIFitData::dipfitError(const Eigen::MatrixXd& pos,
-                                    const Eigen::MatrixXd& data,
-                                    const QList<Sensor>& sensorSet,
+DipFitError HPIFitData::dipfitError(const Eigen::MatrixXd& matPos,
+                                    const Eigen::MatrixXd& matData,
+                                    const struct SensorSet& sensors,
                                     const Eigen::MatrixXd& matProjectors)
 {
     // Variable Declaration
     struct DipFitError e;
-    Eigen::MatrixXd lfSensor, dif;
-    Eigen::MatrixXd lf(data.size(),3);
-    // field vector to store calculated value from averaging np integration points on sensor
-    for(int i = 0; i < sensorSet.size(); i++){
-        Sensor sensor = sensorSet[i];
-        lfSensor = compute_leadfield(pos, sensor);
-        lf.row(i) = sensor.w * lfSensor;
+    Eigen::MatrixXd matLfSensor, matDif;
+    Eigen::MatrixXd matLf(matData.size(),3);
+    int iNp = sensors.np;
+
+    // calculate lf for all sensorpoints
+    matLfSensor = compute_leadfield(matPos, sensors);
+
+    // apply averaging per coil
+    for(int i = 0; i < sensors.ncoils; i++){
+        matLf.row(i) = sensors.w.segment(i*iNp,iNp) * matLfSensor.block(i*iNp,0,iNp,matLfSensor.cols());
     }
+    //matLf = sensors.tra * matLf;
+
     // Compute lead field for a magnetic dipole in infinite vacuum
+    e.moment = UTILSLIB::MNEMath::pinv(matLf) * matData;
 
-    e.moment = UTILSLIB::MNEMath::pinv(lf) * data;
+    //matDif = matData - matLf * e.moment;
+    matDif = matData - matProjectors * matLf * e.moment;
 
-    //dif = data - lf * e.moment;
-    dif = data - matProjectors * lf * e.moment;
-
-    e.error = dif.array().square().sum()/data.array().square().sum();
+    e.error = matDif.array().square().sum()/matData.array().square().sum();
 
     e.numIterations = 0;
 
@@ -212,29 +216,29 @@ bool HPIFitData::compare(HPISortStruct a, HPISortStruct b)
 
 //=============================================================================================================
 
-Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& pos,
-                                       int maxiter,
-                                       int maxfun,
-                                       int display,
-                                       const Eigen::MatrixXd& data,
+Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& matPos,
+                                       int iMaxiter,
+                                       int iMaxfun,
+                                       int iDisplay,
+                                       const Eigen::MatrixXd& matData,
                                        const Eigen::MatrixXd& matProjectors,
-                                       const QList<Sensor>& sensorSet,
-                                       int &simplex_numitr)
+                                       const struct SensorSet& sensors,
+                                       int &iSimplexNumitr)
 {
     double tolx, tolf, rho, chi, psi, sigma, func_evals, usual_delta, zero_term_delta, temp1, temp2;
     std::string header, how;
     int n, itercount, prnt;
-    Eigen::MatrixXd onesn, two2np1, one2n, v, y, v1, tempX1, tempX2, xbar, xr, x, xe, xc, xcc, xin, posCopy;
+    Eigen::MatrixXd onesn, two2np1, one2n, v, y, v1, tempX1, tempX2, xbar, xr, x, xe, xc, xcc, xin,posCopy;
     std::vector <double> fv, fv1;
     std::vector <int> idx;
 
     DipFitError tempdip, fxr, fxe, fxc, fxcc;
 
-    //tolx = tolf = 1e-4;
+    tolx = tolf = 1e-5;
     // Seok
-    tolx = tolf = 1e-9;
+    // tolx = tolf = 1e-9;
 
-    switch(display) {
+    switch(iDisplay) {
         case 0:
             prnt = 0;
             break;
@@ -244,7 +248,7 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& pos,
 
     header = " Iteration   Func-count     min f(x) Procedure";
 
-    posCopy = pos;
+    posCopy =matPos;
 
     n = posCopy.cols();
 
@@ -267,7 +271,7 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& pos,
         v(i,0) = posCopy(i);
     }
 
-    tempdip = dipfitError(posCopy, data, sensorSet, matProjectors);
+    tempdip = dipfitError(posCopy, matData, sensors, matProjectors);
     fv[0] = tempdip.error;
 
     func_evals = 1;
@@ -291,7 +295,7 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& pos,
 
         v.col(j+1).array() = y;
         posCopy = y.transpose();
-        tempdip = dipfitError(posCopy, data, sensorSet, matProjectors);
+        tempdip = dipfitError(posCopy, matData, sensors, matProjectors);
         fv[j+1] = tempdip.error;
     }
 
@@ -324,7 +328,7 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& pos,
 
     tempX1 = Eigen::MatrixXd::Zero(1,n);
 
-    while ((func_evals < maxfun) && (itercount < maxiter)) {
+    while ((func_evals < iMaxfun) && (itercount < iMaxiter)) {
 
         for (int i = 0;i < n;i++) {
             tempX1(i) = std::fabs(fv[0] - fv[i+1]);
@@ -354,7 +358,7 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& pos,
         x = xr.transpose();
         //std::cout << "Iteration Count: " << itercount << ":" << x << std::endl;
 
-        fxr = dipfitError(x, data, sensorSet, matProjectors);
+        fxr = dipfitError(x, matData, sensors, matProjectors);
 
         func_evals = func_evals+1;
 
@@ -362,7 +366,7 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& pos,
             // Calculate the expansion point
             xe = (1 + rho * chi) * xbar - rho * chi * v.col(v.cols()-1);
             x = xe.transpose();
-            fxe = dipfitError(x, data, sensorSet, matProjectors);
+            fxe = dipfitError(x, matData, sensors, matProjectors);
             func_evals = func_evals+1;
 
             if(fxe.error < fxr.error) {
@@ -386,7 +390,7 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& pos,
                     // Perform an outside contraction
                     xc = (1 + psi * rho) * xbar - psi * rho * v.col(v.cols()-1);
                     x = xc.transpose();
-                    fxc = dipfitError(x, data, sensorSet, matProjectors);
+                    fxc = dipfitError(x, matData, sensors, matProjectors);
                     func_evals = func_evals + 1;
 
                     if(fxc.error <= fxr.error) {
@@ -400,7 +404,7 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& pos,
                 } else {
                     xcc = (1 - psi) * xbar + psi * v.col(v.cols()-1);
                     x = xcc.transpose();
-                    fxcc = dipfitError(x, data, sensorSet, matProjectors);
+                    fxcc = dipfitError(x, matData, sensors, matProjectors);
                     func_evals = func_evals+1;
                     if(fxcc.error < fv[n]) {
                         v.col(v.cols()-1) = xcc;
@@ -416,7 +420,7 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& pos,
                     for(int j = 1;j < n+1;j++) {
                         v.col(j).array() = v.col(0).array() + sigma * (v.col(j).array() - v.col(0).array());
                         x = v.col(j).array().transpose();
-                        tempdip = dipfitError(x,data, sensorSet, matProjectors);
+                        tempdip = dipfitError(x,matData, sensors, matProjectors);
                         fv[j] = tempdip.error;
                     }
                 }
@@ -451,7 +455,7 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& pos,
     x = v.col(0).transpose();
 
     // Seok
-    simplex_numitr = itercount;
+    iSimplexNumitr = itercount;
 
     return x;
 }

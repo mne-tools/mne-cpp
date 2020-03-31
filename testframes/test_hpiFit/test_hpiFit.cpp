@@ -174,6 +174,8 @@ void TestHpiFit::initTestCase()
     QString sHPIResourceDir = QCoreApplication::applicationDirPath() + "/HPIFittingDebug";
     bool bDoDebug = true;
 
+    HPIFit HPI = HPIFit(pFiffInfo);
+
     // bring frequencies into right order
     from = first + mRefPos(0,0)*pFiffInfo->sfreq;
     to = from + quantum;
@@ -183,14 +185,14 @@ void TestHpiFit::initTestCase()
     qInfo() << "[done]";
 
     qInfo() << "Order Frequecies: ...";
-    HPIFit::findOrder(mData,
-                      mProjectors,
-                      pFiffInfo->dev_head_t,
-                      vFreqs,
-                      vError,
-                      vGoF,
-                      fittedPointSet,
-                      pFiffInfo);
+    HPI.findOrder(mData,
+                  mProjectors,
+                  pFiffInfo->dev_head_t,
+                  vFreqs,
+                  vError,
+                  vGoF,
+                  fittedPointSet,
+                  pFiffInfo);
     qInfo() << "[done]";
 
     for(int i = 0; i < mRefPos.rows(); i++) {
@@ -205,16 +207,16 @@ void TestHpiFit::initTestCase()
         }
 
         qInfo()  << "HPI-Fit...";
-        HPIFit::fitHPI(mData,
-                       mProjectors,
-                       pFiffInfo->dev_head_t,
-                       vFreqs,
-                       vError,
-                       vGoF,
-                       fittedPointSet,
-                       pFiffInfo,
-                       bDoDebug = 0,
-                       sHPIResourceDir);
+        HPI.fitHPI(mData,
+                   mProjectors,
+                   pFiffInfo->dev_head_t,
+                   vFreqs,
+                   vError,
+                   vGoF,
+                   fittedPointSet,
+                   pFiffInfo,
+                   bDoDebug = 0,
+                   sHPIResourceDir);
         qInfo() << "[done]\n";
 
         if(MNEMath::compareTransformation(devHeadT.trans, pFiffInfo->dev_head_t.trans, threshRot, threshTrans)) {

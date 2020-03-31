@@ -36,6 +36,8 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <iostream>
+
 #include "hpi.h"
 
 #include "FormFiles/hpisetupwidget.h"
@@ -64,7 +66,6 @@ using namespace DISPLIB;
 using namespace FIFFLIB;
 using namespace SCSHAREDLIB;
 using namespace Eigen;
-using namespace RTPROCESSINGLIB;
 using namespace INVERSELIB;
 
 //=============================================================================================================
@@ -76,6 +77,7 @@ Hpi::Hpi()
 , m_bDoContinousHpi(false)
 , m_bUseSSP(false)
 , m_bUseComp(false)
+, m_bDoFreqOrder(false)
 , m_bDoSingleHpi(false)
 , m_iNumberOfFitsPerSecond(3)
 {
@@ -198,6 +200,12 @@ void Hpi::update(SCMEASLIB::Measurement::SPtr pMeasurement)
                 m_bDoSingleHpi = false;
             }
 
+            if(m_bDoFreqOrder) {
+                while(!m_pCircularBuffer->push(pRTMSA->getMultiSampleArray()[0])) {
+                    //Do nothing until the circular buffer is ready to accept new data again
+                }
+            }
+
             if(m_bDoContinousHpi) {
                 for(unsigned char i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
                     // Please note that we do not need a copy here since this function will block until
@@ -225,6 +233,8 @@ void Hpi::initPluginControlWidgets()
 
         connect(pHpiSettingsView, &HpiSettingsView::digitizersChanged,
                 this, &Hpi::onDigitizersChanged);
+        connect(pHpiSettingsView, &HpiSettingsView::doFreqOrder,
+                this, &Hpi::onDoFreqOrder);
         connect(pHpiSettingsView, &HpiSettingsView::doSingleHpiFit,
                 this, &Hpi::onDoSingleHpiFit);
         connect(pHpiSettingsView, &HpiSettingsView::coilFrequenciesChanged,
@@ -342,6 +352,21 @@ void Hpi::onDoSingleHpiFit()
 
 //=============================================================================================================
 
+void Hpi::onDoFreqOrder()
+{
+    if(m_vCoilFreqs.size() < 3) {
+       QMessageBox msgBox;
+       msgBox.setText("Please load a digitizer set with at least 3 HPI coils first.");
+       msgBox.exec();
+       return;
+    }
+    m_mutex.lock();
+    m_bDoFreqOrder = true;
+    m_mutex.unlock();
+}
+
+//=============================================================================================================
+
 void Hpi::onCoilFrequenciesChanged(const QVector<int>& vCoilFreqs)
 {
     m_mutex.lock();
@@ -384,7 +409,23 @@ void Hpi::onDevHeadTransAvailable(const FIFFLIB::FiffCoordTrans& devHeadTrans)
 
 void Hpi::run()
 {
+    // Wait for fiff info
+    while(true) {
+        m_mutex.lock();
+        if(m_pFiffInfo) {
+            m_mutex.unlock();
+            break;
+        }
+        m_mutex.unlock();
+        msleep(100);
+    }
+
+    // init hpi fit
     HpiFitResult fitResult;
+    fitResult.devHeadTrans = m_pFiffInfo->dev_head_t;
+
+    HPIFit HPI = HPIFit(m_pFiffInfo);
+
     double dErrorMax = 0.0;
     int iDataIndexCounter = 0;
     MatrixXd matData;
@@ -412,20 +453,36 @@ void Hpi::run()
                 matDataMerged.block(0, iDataIndexCounter, matData.rows(), matDataMerged.cols()-iDataIndexCounter) = matData.block(0, 0, matData.rows(), matDataMerged.cols()-iDataIndexCounter);
 
                 // Perform HPI fit
-                //Perform actual fitting
                 fitResult.devHeadTrans.from = 1;
                 fitResult.devHeadTrans.to = 4;
 
                 m_mutex.lock();
                 fitResult.sFilePathDigitzers = m_sFilePathDigitzers;
-                HPIFit::fitHPI(matDataMerged,
-                               m_matCompProjectors,
-                               fitResult.devHeadTrans,
-                               m_vCoilFreqs,
-                               fitResult.errorDistances,
-                               fitResult.GoF,
-                               fitResult.fittedCoils,
-                               m_pFiffInfo);
+                if(m_bDoFreqOrder) {
+                    // find correct frequencie order if requested
+                    HPI.findOrder(matDataMerged,
+                                  m_matCompProjectors,
+                                  fitResult.devHeadTrans,
+                                  m_vCoilFreqs,
+                                  fitResult.errorDistances,
+                                  fitResult.GoF,
+                                  fitResult.fittedCoils,
+                                  m_pFiffInfo);
+                    m_bDoFreqOrder = false;
+                }
+                m_mutex.unlock();
+
+                // Perform actual fitting
+                m_mutex.lock();
+                fitResult.sFilePathDigitzers = m_sFilePathDigitzers;
+                HPI.fitHPI(matDataMerged,
+                           m_matCompProjectors,
+                           fitResult.devHeadTrans,
+                           m_vCoilFreqs,
+                           fitResult.errorDistances,
+                           fitResult.GoF,
+                           fitResult.fittedCoils,
+                           m_pFiffInfo);
                 m_mutex.unlock();
 
                 //Check if the error meets distance requirement

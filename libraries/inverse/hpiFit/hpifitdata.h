@@ -42,6 +42,7 @@
 //=============================================================================================================
 
 #include "../inverse_global.h"
+#include "hpifit.h"
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -84,18 +85,7 @@ struct DipFitError {
     int numIterations;
 };
 
-//=========================================================================================================
-/**
- * The strucut specifing the sensor parameters.
- */
-struct Sensor {
-    Eigen::RowVector3d r0;
-    Eigen::MatrixXd rmag;
-    Eigen::MatrixXd cosmag;
-    Eigen::MatrixXd tra;
-    Eigen::RowVectorXd w;
-    int np;
-};
+
 
 //=========================================================================================================
 /**
@@ -135,11 +125,11 @@ public:
      */
     void doDipfitConcurrent();
 
-    Eigen::MatrixXd     coilPos;
-    Eigen::RowVectorXd  sensorData;
-    DipFitError         errorInfo;
-    QList<Sensor>       sensorSet;
-    Eigen::MatrixXd     matProjector;
+    Eigen::MatrixXd         coilPos;
+    Eigen::RowVectorXd      sensorData;
+    DipFitError             errorInfo;
+    struct SensorSet        sensors;
+    Eigen::MatrixXd         matProjector;
 
 protected:
     //=========================================================================================================
@@ -147,9 +137,9 @@ protected:
      * magnetic_dipole leadfield for a magnetic dipole in an infinite medium.
      * The function has been compared with matlab magnetic_dipole and it gives same output.
      */
-    Eigen::MatrixXd magnetic_dipole(Eigen::MatrixXd pos,
-                                    Eigen::MatrixXd pnt,
-                                    Eigen::MatrixXd ori);
+    Eigen::MatrixXd magnetic_dipole(Eigen::MatrixXd matPos,
+                                    Eigen::MatrixXd matPnt,
+                                    Eigen::MatrixXd matOri);
 
     //=========================================================================================================
     /**
@@ -160,8 +150,8 @@ protected:
      * The function has been compared with matlab ft_compute_leadfield and it gives
      * same output.
      */
-    Eigen::MatrixXd compute_leadfield(const Eigen::MatrixXd& pos,
-                                      const struct Sensor& sensor);
+    Eigen::MatrixXd compute_leadfield(const Eigen::MatrixXd& matPos,
+                                      const struct SensorSet& sensors);
 
     //=========================================================================================================
     /**
@@ -170,9 +160,9 @@ protected:
      * The function has been compared with matlab dipfit_error and it gives
      * same output
      */
-    DipFitError dipfitError(const Eigen::MatrixXd& pos,
-                            const Eigen::MatrixXd& data,
-                            const QList<Sensor>& sensorSet,
+    DipFitError dipfitError(const Eigen::MatrixXd& matPos,
+                            const Eigen::MatrixXd& matData,
+                            const struct SensorSet& sensors,
                             const Eigen::MatrixXd& matProjectors);
 
     //=========================================================================================================
@@ -184,17 +174,17 @@ protected:
     //=========================================================================================================
     /**
      * fminsearch Multidimensional unconstrained nonlinear minimization (Nelder-Mead).
-     * X = fminsearch(X0, maxiter, maxfun, display, data, sensors) starts at X0 and
+     * X = fminsearch(X0, iMaxiter, iMaxfun, iDisplay, matData, sensors) starts at X0 and
      * attempts to find a local minimizer
      */
-    Eigen::MatrixXd fminsearch(const Eigen::MatrixXd& pos,
-                               int maxiter,
-                               int maxfun,
-                               int display,
-                               const Eigen::MatrixXd& data,
+    Eigen::MatrixXd fminsearch(const Eigen::MatrixXd& matPos,
+                               int iMaxiter,
+                               int iMaxfun,
+                               int iDisplay,
+                               const Eigen::MatrixXd& matData,
                                const Eigen::MatrixXd& matProjectors,
-                               const QList<Sensor>& sensorSet,
-                               int &simplex_numitr);
+                               const struct SensorSet& sensors,
+                               int &iSimplexNumitr);
 };
 
 //=============================================================================================================

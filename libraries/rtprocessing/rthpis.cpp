@@ -64,6 +64,11 @@ using namespace INVERSELIB;
 // DEFINE MEMBER METHODS RtHpiWorker
 //=============================================================================================================
 
+RtHpiWorker::RtHpiWorker(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo)
+{
+    m_pHpiFit = QSharedPointer<INVERSELIB::HPIFit>(new HPIFit(pFiffInfo));
+}
+
 void RtHpiWorker::doWork(const Eigen::MatrixXd& matData,
                          const Eigen::MatrixXd& matProjectors,
                          const QVector<int>& vFreqs,
@@ -78,14 +83,14 @@ void RtHpiWorker::doWork(const Eigen::MatrixXd& matData,
     fitResult.devHeadTrans.from = 1;
     fitResult.devHeadTrans.to = 4;
 
-    HPIFit::fitHPI(matData,
-                   matProjectors,
-                   fitResult.devHeadTrans,
-                   vFreqs,
-                   fitResult.errorDistances,
-                   fitResult.GoF,
-                   fitResult.fittedCoils,
-                   pFiffInfo);
+    m_pHpiFit->fitHPI(matData,
+                      matProjectors,
+                      fitResult.devHeadTrans,
+                      vFreqs,
+                      fitResult.errorDistances,
+                      fitResult.GoF,
+                      fitResult.fittedCoils,
+                      pFiffInfo);
 
     emit resultReady(fitResult);
 }
@@ -103,7 +108,7 @@ RtHpi::RtHpi(FiffInfo::SPtr p_pFiffInfo, QObject *parent)
     qRegisterMetaType<QSharedPointer<FIFFLIB::FiffInfo> >("QSharedPointer<FIFFLIB::FiffInfo>");
     qRegisterMetaType<Eigen::MatrixXd>("Eigen::MatrixXd");
 
-    RtHpiWorker *worker = new RtHpiWorker;
+    RtHpiWorker *worker = new RtHpiWorker(m_pFiffInfo);
     worker->moveToThread(&m_workerThread);
 
     connect(&m_workerThread, &QThread::finished,
@@ -166,7 +171,7 @@ void RtHpi::restart()
 {
     stop();
 
-    RtHpiWorker *worker = new RtHpiWorker;
+    RtHpiWorker *worker = new RtHpiWorker(m_pFiffInfo);
     worker->moveToThread(&m_workerThread);
 
     connect(&m_workerThread, &QThread::finished,
