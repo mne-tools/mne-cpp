@@ -327,6 +327,27 @@ FiffInfo::SPtr RtDataClient::readInfo()
             p_pFiffInfo->meas_date[0] = t_pTag->toInt()[0];
             p_pFiffInfo->meas_date[1] = t_pTag->toInt()[1];
             break;
+        case FIFF_PROJ_ID:
+            p_pFiffInfo->proj_id = *t_pTag->toInt();
+            break;
+        case FIFF_PROJ_NAME:
+            p_pFiffInfo->proj_name = t_pTag->toString();
+            break;
+        case FIFF_XPLOTTER_LAYOUT:
+            p_pFiffInfo->xplotter_layout = t_pTag->toString();
+            break;
+        case FIFF_EXPERIMENTER:
+            p_pFiffInfo->experimenter = t_pTag->toString();
+            break;
+        case FIFF_DESCRIPTION:
+            p_pFiffInfo->description = t_pTag->toString();
+            break;
+        case FIFF_GANTRY_ANGLE:
+            p_pFiffInfo->gantry_angle = *t_pTag->toFloat();
+            break;
+        case FIFF_UTC_OFFSET:
+            p_pFiffInfo->utc_offset = t_pTag->toString();
+            break;
         }
 
         if (t_pTag->kind == FIFF_CH_INFO)
