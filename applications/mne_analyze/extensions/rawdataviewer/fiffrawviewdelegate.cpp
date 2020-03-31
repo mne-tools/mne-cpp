@@ -262,14 +262,19 @@ void FiffRawViewDelegate::createPlotPath(const QStyleOptionViewItem &option,
     QPointF qSamplePosition;
     double dValue, newY;
 
-    for(int j = 0; j < data.size(); j++) {
+    int iPaintStep = (int)(1.0/dDx) - 1;
+    if (iPaintStep < 2){
+        iPaintStep = 1;
+    }
+
+    for(int j = 0; j < data.size(); j = j + iPaintStep) {
         dValue = data[j] * dScaleY;
 
         //Reverse direction -> plot the right way
         newY = y_base - dValue;
 
         qSamplePosition.setY(newY);
-        qSamplePosition.setX(path.currentPosition().x() + dDx);
+        qSamplePosition.setX(path.currentPosition().x() + (dDx * (float)iPaintStep));
         path.lineTo(qSamplePosition);
     }
 }
