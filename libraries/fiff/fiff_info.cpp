@@ -77,6 +77,13 @@ FiffInfo::FiffInfo(const FiffInfo& p_FiffInfo)
 , linefreq(p_FiffInfo.linefreq)
 , highpass(p_FiffInfo.highpass)
 , lowpass(p_FiffInfo.lowpass)
+, proj_id(p_FiffInfo.proj_id)
+, proj_name(p_FiffInfo.proj_name)
+, xplotter_layout(p_FiffInfo.xplotter_layout)
+, experimenter(p_FiffInfo.experimenter)
+, description(p_FiffInfo.description)
+, utc_offset(p_FiffInfo.utc_offset)         /**< UTC offset of related meas_date (sHH:MM).*/
+, gantry_angle(p_FiffInfo.gantry_angle)
 , dev_ctf_t(p_FiffInfo.dev_ctf_t)
 , dig_trans(p_FiffInfo.dig_trans)
 , acq_pars(p_FiffInfo.acq_pars)
@@ -113,6 +120,13 @@ void FiffInfo::clear()
     linefreq = -1.0;
     highpass = -1.0;
     lowpass = -1.0;
+    proj_id = -1;
+    proj_name = "";
+    xplotter_layout = "";
+    experimenter = "";
+    description = "";
+    utc_offset = "";         /**< UTC offset of related meas_date (sHH:MM).*/
+    gantry_angle = -1.0;
     dev_ctf_t.clear();
     dig.clear();
     dig_trans.clear();
@@ -439,6 +453,12 @@ void FiffInfo::writeToStream(FiffStream* p_pStream) const
     p_pStream->write_float(FIFF_LINE_FREQ,&this->linefreq);
     p_pStream->write_float(FIFF_HIGHPASS,&this->highpass);
     p_pStream->write_float(FIFF_LOWPASS,&this->lowpass);
+    p_pStream->write_string(FIFF_EXPERIMENTER,this->experimenter);
+    p_pStream->write_string(FIFF_DESCRIPTION,this->description);
+    p_pStream->write_string(FIFF_UNIT_C,this->utc_offset);
+    p_pStream->write_string(FIFF_PROJ_NAME,this->proj_name);
+    p_pStream->write_int(FIFF_PROJ_ID,&this->proj_id);
+    p_pStream->write_float(FIFF_GANTRY_ANGLE,&this->gantry_angle);
     p_pStream->write_int(FIFF_NCHAN,&nchan);
     p_pStream->write_int(FIFF_DATA_PACK,&data_type);
     if (this->meas_date[0] != -1)
