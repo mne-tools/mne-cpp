@@ -369,6 +369,8 @@ public:
 
     int getSampleScrollPos() const;
 
+    int getWindowSizeBlocks() const;
+
 public slots:
 
     /**
