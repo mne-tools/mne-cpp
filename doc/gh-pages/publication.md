@@ -21,7 +21,7 @@ nav_order: 5
 
 | Dinh, C.; Strohmeier, D.; Luessi, M.; Güllmar, D.; Baumgarten, D.; Haueisen, J.; Hämäläinen, M.S.: Real-Time MEG Source Localization using Regional Clustering. Brain Topography (2015), [DOI: 10.1007/s10548-015-0431-9](http://link.springer.com/article/10.1007%2Fs10548-015-0431-9) |
 
-| Dinh, C.; Luessi, M.; Sun, L.; Haueisen, J.; Hämäläinen, M.S.: MNE-X: MEG/EEG Real-Time Acquisition, Real-Time Processing, and Real-Time Source Localization Framework. Biomedizinische Technik (Berl.) (2013), 58, [DOI: 10.1515/bmt-2013-4184](https://www.researchgate.net/publication/256665672_Mne-X_MEGEEG_Real-Time_Acquisition_Real-Time_Processing_and_Real-Time_Source_Localization_Framework) |
+| Dinh, C.; Luessi, M.; Sun, L.; Haueisen, J.; Hämäläinen, M.S.: MNE-X: MEG/EEG Real-Time Acquisition, Real-Time Processing, and Real-Time Source Localization Framework. Biomedizinische Technik (Berl.) (2013), 58, [DOI: 10.1515/bmt-2013-4184](https://www.degruyter.com/view/journals/bmte/aop/article-10.1515-bmt-2013-4184/article-10.1515-bmt-2013-4184.xml) |
 
 | Dinh, C.; Rühle, J.; Bollmann, S.; Haueisen, J.; Güllmar, D.: A GPU-accelerated Performance Optimized RAP-MUSIC Algorithm for Real-Time Source Localization. Biomedizinische Technik (Berl.) (2012), 57 |
 
