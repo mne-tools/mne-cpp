@@ -732,3 +732,10 @@ int FiffRawViewModel::getSampleScrollPos() const
     float result = float(m_iScrollPos) / m_dDx;
     return int(result);
 }
+
+//=============================================================================================================
+
+int FiffRawViewModel::getWindowSizeBlocks() const
+{
+    return m_iVisibleWindowSize + m_iPreloadBufferSize;
+}
