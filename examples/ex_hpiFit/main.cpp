@@ -107,134 +107,144 @@ int main(int argc, char *argv[])
     FiffRawData raw(t_fileIn);
     QSharedPointer<FiffInfo> pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(raw.info));
 
-    qDebug() << pFiffInfo->linefreq;
+    qDebug() << "linefreq" << pFiffInfo->linefreq;
+    qDebug() << "description" << pFiffInfo->description;
+    qDebug() << "experimenter" << pFiffInfo->experimenter;
+    qDebug() << "proj_id" << pFiffInfo->proj_id;
+    qDebug() << "proj_name" << pFiffInfo->proj_name;
+    qDebug() << "xplotter_layout" << pFiffInfo->xplotter_layout;
+    qDebug() << "gantry_angle" << pFiffInfo->gantry_angle;
+    qDebug() << "utc_offset" << pFiffInfo->utc_offset;
 
-    // Setup comparison of transformation matrices
-    FiffCoordTrans transDevHead = pFiffInfo->dev_head_t;    // transformation that only updates after big head movements
-    float fThreshRot = 5;          // in degree
-    float fThreshTrans = 0.005;    // in m
 
-    // Set up the reading parameters
-    RowVectorXi vecPicks = pFiffInfo->pick_types(true, false, false);
 
-    MatrixXd matData, matTimes;
 
-    fiff_int_t from, to;
-    fiff_int_t first = raw.first_samp;
-    fiff_int_t last = raw.last_samp;
+//    // Setup comparison of transformation matrices
+//    FiffCoordTrans transDevHead = pFiffInfo->dev_head_t;    // transformation that only updates after big head movements
+//    float fThreshRot = 5;          // in degree
+//    float fThreshTrans = 0.005;    // in m
 
-    float dTSec = 0.1;             // time between hpi fits
-    float fQuantumSec = 0.2f;       // read and write in 200 ms junks
-    fiff_int_t iQuantum = ceil(fQuantumSec*pFiffInfo->sfreq);
+//    // Set up the reading parameters
+//    RowVectorXi vecPicks = pFiffInfo->pick_types(true, false, false);
 
-//    // create time vector that specifies when to fit
-//    int iN = ceil((last-first)/iQuantum);
-//    RowVectorXf vecTime = RowVectorXf::LinSpaced(iN, 0, iN-1) * dTSec;
+//    MatrixXd matData, matTimes;
 
-    // To fit at specific times outcommend the following block
-    // Read Quaternion File
-    MatrixXd matPos;
-    qInfo() << "Specify the path to your Position file (.txt)";
-    IOUtils::read_eigen_matrix(matPos, QCoreApplication::applicationDirPath() + "/MNE-sample-data/chpi/pos/posMax_data_with_movement_chpi.txt");
-    RowVectorXd vecTime = matPos.col(0);
+//    fiff_int_t from, to;
+//    fiff_int_t first = raw.first_samp;
+//    fiff_int_t last = raw.last_samp;
 
-    MatrixXd matPosition;              // matPosition matrix to save quaternions etc.
+//    float dTSec = 0.1;             // time between hpi fits
+//    float fQuantumSec = 0.2f;       // read and write in 200 ms junks
+//    fiff_int_t iQuantum = ceil(fQuantumSec*pFiffInfo->sfreq);
 
-    // setup informations for HPI fit (VectorView)
-    QVector<int> vecFreqs {154,158,161,166};
-    QVector<double> vecError;
-    VectorXd vecGoF;
-    FiffDigPointSet fittedPointSet;
+////    // create time vector that specifies when to fit
+////    int iN = ceil((last-first)/iQuantum);
+////    RowVectorXf vecTime = RowVectorXf::LinSpaced(iN, 0, iN-1) * dTSec;
 
-    // Use SSP + SGM + calibration
-    MatrixXd matProjectors = MatrixXd::Identity(pFiffInfo->chs.size(), pFiffInfo->chs.size());
+//    // To fit at specific times outcommend the following block
+//    // Read Quaternion File
+//    MatrixXd matPos;
+//    qInfo() << "Specify the path to your Position file (.txt)";
+//    IOUtils::read_eigen_matrix(matPos, QCoreApplication::applicationDirPath() + "/MNE-sample-data/chpi/pos/posMax_data_with_movement_chpi.txt");
+//    RowVectorXd vecTime = matPos.col(0);
 
-    //Do a copy here because we are going to change the activity flags of the SSP's
-    FiffInfo infoTemp = *(pFiffInfo.data());
+//    MatrixXd matPosition;              // matPosition matrix to save quaternions etc.
 
-    //Turn on all SSP
-    for(int i = 0; i < infoTemp.projs.size(); ++i) {
-        infoTemp.projs[i].active = true;
-    }
+//    // setup informations for HPI fit (VectorView)
+//    QVector<int> vecFreqs {154,158,161,166};
+//    QVector<double> vecError;
+//    VectorXd vecGoF;
+//    FiffDigPointSet fittedPointSet;
 
-    //Create the projector for all SSP's on
-    infoTemp.make_projector(matProjectors);
+//    // Use SSP + SGM + calibration
+//    MatrixXd matProjectors = MatrixXd::Identity(pFiffInfo->chs.size(), pFiffInfo->chs.size());
 
-    //set columns of matrix to zero depending on bad channels indexes
-    for(qint32 j = 0; j < infoTemp.bads.size(); ++j) {
-        matProjectors.col(infoTemp.ch_names.indexOf(infoTemp.bads.at(j))).setZero();
-    }
+//    //Do a copy here because we are going to change the activity flags of the SSP's
+//    FiffInfo infoTemp = *(pFiffInfo.data());
 
-    // if debugging files are necessary set bDoDebug = true;
-    QString sHPIResourceDir = QCoreApplication::applicationDirPath() + "/HPIFittingDebug";
-    bool bDoDebug = false;
+//    //Turn on all SSP
+//    for(int i = 0; i < infoTemp.projs.size(); ++i) {
+//        infoTemp.projs[i].active = true;
+//    }
 
-    HPIFit HPI = HPIFit(pFiffInfo);
+//    //Create the projector for all SSP's on
+//    infoTemp.make_projector(matProjectors);
 
-    // ordering of frequencies
-    from = first + vecTime(0)*pFiffInfo->sfreq;
-    to = from + iQuantum;
-    if(!raw.read_raw_segment(matData, matTimes, from, to)) {
-        qCritical("error during read_raw_segment");
-        return -1;
-    }
-    qInfo() << "[done]";
+//    //set columns of matrix to zero depending on bad channels indexes
+//    for(qint32 j = 0; j < infoTemp.bads.size(); ++j) {
+//        matProjectors.col(infoTemp.ch_names.indexOf(infoTemp.bads.at(j))).setZero();
+//    }
 
-    // order frequencies
-    qInfo() << "Find Order...";
-    timer.start();
-    HPI.findOrder(matData,
-                  matProjectors,
-                  pFiffInfo->dev_head_t,
-                  vecFreqs,
-                  vecError,
-                  vecGoF,
-                  fittedPointSet,
-                  pFiffInfo);
-    qInfo() << "Ordered Frequencies: ";
-    qInfo() << "findOrder() took" << timer.elapsed() << "milliseconds";
-    qInfo() << "[done]";
+//    // if debugging files are necessary set bDoDebug = true;
+//    QString sHPIResourceDir = QCoreApplication::applicationDirPath() + "/HPIFittingDebug";
+//    bool bDoDebug = false;
 
-    float fTimer = 0.0;
+//    HPIFit HPI = HPIFit(pFiffInfo);
 
-    // read and fit
-    for(int i = 0; i < vecTime.size(); i++) {
-        from = first + vecTime(i)*pFiffInfo->sfreq;
-        to = from + iQuantum;
-        if (to > last) {
-            to = last;
-            qWarning() << "Block size < iQuantum " << iQuantum;
-        }
-        // Reading
-        if(!raw.read_raw_segment(matData, matTimes, from, to)) {
-            qCritical("error during read_raw_segment");
-            return -1;
-        }
-        qInfo() << "[done]";
+//    // ordering of frequencies
+//    from = first + vecTime(0)*pFiffInfo->sfreq;
+//    to = from + iQuantum;
+//    if(!raw.read_raw_segment(matData, matTimes, from, to)) {
+//        qCritical("error during read_raw_segment");
+//        return -1;
+//    }
+//    qInfo() << "[done]";
 
-        qInfo() << "HPI-Fit...";
-        timer.start();
-        HPI.fitHPI(matData,
-                   matProjectors,
-                   pFiffInfo->dev_head_t,
-                   vecFreqs,
-                   vecError,
-                   vecGoF,
-                   fittedPointSet,
-                   pFiffInfo,
-                   bDoDebug,
-                   sHPIResourceDir);
-        fTimer = timer.elapsed();
-        qInfo() << "The HPI-Fit took" << fTimer << "milliseconds";
-        qInfo() << "[done]";
+//    // order frequencies
+//    qInfo() << "Find Order...";
+//    timer.start();
+//    HPI.findOrder(matData,
+//                  matProjectors,
+//                  pFiffInfo->dev_head_t,
+//                  vecFreqs,
+//                  vecError,
+//                  vecGoF,
+//                  fittedPointSet,
+//                  pFiffInfo);
+//    qInfo() << "Ordered Frequencies: ";
+//    qInfo() << "findOrder() took" << timer.elapsed() << "milliseconds";
+//    qInfo() << "[done]";
 
-        HPIFit::storeHeadPosition(vecTime(i), pFiffInfo->dev_head_t.trans, matPosition, vecGoF, vecError);
-        matPosition(i,9) = fTimer;
-        // if big head displacement occures, update debHeadTrans
-        if(MNEMath::compareTransformation(transDevHead.trans, pFiffInfo->dev_head_t.trans, fThreshRot, fThreshTrans)) {
-            transDevHead = pFiffInfo->dev_head_t;
-            qInfo() << "dev_head_t has been updated.";
-        }
-    }
+//    float fTimer = 0.0;
+
+//    // read and fit
+//    for(int i = 0; i < vecTime.size(); i++) {
+//        from = first + vecTime(i)*pFiffInfo->sfreq;
+//        to = from + iQuantum;
+//        if (to > last) {
+//            to = last;
+//            qWarning() << "Block size < iQuantum " << iQuantum;
+//        }
+//        // Reading
+//        if(!raw.read_raw_segment(matData, matTimes, from, to)) {
+//            qCritical("error during read_raw_segment");
+//            return -1;
+//        }
+//        qInfo() << "[done]";
+
+//        qInfo() << "HPI-Fit...";
+//        timer.start();
+//        HPI.fitHPI(matData,
+//                   matProjectors,
+//                   pFiffInfo->dev_head_t,
+//                   vecFreqs,
+//                   vecError,
+//                   vecGoF,
+//                   fittedPointSet,
+//                   pFiffInfo,
+//                   bDoDebug,
+//                   sHPIResourceDir);
+//        fTimer = timer.elapsed();
+//        qInfo() << "The HPI-Fit took" << fTimer << "milliseconds";
+//        qInfo() << "[done]";
+
+//        HPIFit::storeHeadPosition(vecTime(i), pFiffInfo->dev_head_t.trans, matPosition, vecGoF, vecError);
+//        matPosition(i,9) = fTimer;
+//        // if big head displacement occures, update debHeadTrans
+//        if(MNEMath::compareTransformation(transDevHead.trans, pFiffInfo->dev_head_t.trans, fThreshRot, fThreshTrans)) {
+//            transDevHead = pFiffInfo->dev_head_t;
+//            qInfo() << "dev_head_t has been updated.";
+//        }
+//    }
     //IOUtils::write_eigen_matrix(matPosition, QCoreApplication::applicationDirPath() + "/MNE-sample-data/chpi/pos/pos_03_Faster_Home.txt");
 }

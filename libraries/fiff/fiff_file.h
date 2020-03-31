@@ -448,6 +448,8 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
  * Tags used in data files
  */
 
+#define FIFF_UTC_OFFSET      159        /**< UTC offset of related meas_date (sHH:MM) */
+
 #define FIFF_NCHAN           200        /**< Number of channels */
 #define FIFF_SFREQ           201        /**< Sampling frequency (Hz) */
 #define FIFF_DATA_PACK       202        /**< How the raw data is packed */
@@ -550,6 +552,7 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 #define FIFF_SSS_BASE_VIRT     275        /**< DOUBLE matrix for SSS virtual basis */
 #define FIFF_SSS_NORM          276        /**< Froebius norm of the inside basis */
 #define FIFF_SSS_ITERATE       277        /**< Nr of iterations in iterative SSS pseudo-inverse */
+#define FIFF_GANTRY_ANGLE      282          /**< Tilt angle of the dewar in degrees */
 #define FIFF_DATA_BUFFER       300        /**< Buffer containing measurement data */
 #define FIFF_DATA_SKIP         301        /**< Data skip in buffers */
 #define FIFF_EPOCH             302        /**< Buffer containing one epoch and channel */
