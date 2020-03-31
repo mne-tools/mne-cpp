@@ -252,6 +252,13 @@ public: //Public because it's a mne struct
     float linefreq;             /**< Power line frequency. */
     float highpass;             /**< Highpass frequency. */
     float lowpass;              /**< Lowpass frequency. */
+    int proj_id;                /**< Project ID */
+    QString proj_name;          /**< Project name */
+    QString xplotter_layout;    /**< xplotter layout tag */
+    QString experimenter;       /**< Experimenter name. */
+    QString description;        /**< (Textual) Description of an object.*/
+    QString utc_offset;         /**< UTC offset of related meas_date (sHH:MM).*/
+    float gantry_angle;           /**< Tilt angle of the dewar in degrees.*/
     FiffCoordTrans dev_ctf_t;   /**< Coordinate transformation ToDo... */
     QList<FiffDigPoint> dig;    /**< List of all digitization point descriptors. */
     FiffCoordTrans dig_trans;   /**< Coordinate transformation ToDo... */

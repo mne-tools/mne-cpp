@@ -973,6 +973,16 @@ bool FiffStream::read_meas_info(const FiffDirNode::SPtr& p_Node, FiffInfo& info,
     float lowpass = -1.0f;
     float highpass = -1.0f;
 
+    int proj_id = 0;
+    QString proj_name = "";
+    QString xplotter_layout = "";
+
+    QString utc_offset = "";         /**< UTC offset of related meas_date (sHH:MM).*/
+    float gantry_angle = -1.0;
+
+    QString experimenter = "";
+    QString description = "";
+
     FiffChInfo t_chInfo;
 
     FiffCoordTrans cand;// = NULL;
@@ -1030,6 +1040,34 @@ bool FiffStream::read_meas_info(const FiffDirNode::SPtr& p_Node, FiffInfo& info,
                 else if (cand.from == FIFFV_MNE_COORD_CTF_HEAD && cand.to == FIFFV_COORD_HEAD)
                     ctf_head_t = cand;
                 break;
+            case FIFF_PROJ_ID:
+                this->read_tag(t_pTag,pos);
+                proj_id = *t_pTag->toInt();
+                break;
+            case FIFF_PROJ_NAME:
+                this->read_tag(t_pTag,pos);
+                proj_name = t_pTag->toString();
+                break;
+            case FIFF_XPLOTTER_LAYOUT:
+                this->read_tag(t_pTag,pos);
+                xplotter_layout = t_pTag->toString();
+                break;
+            case FIFF_EXPERIMENTER:
+                this->read_tag(t_pTag,pos);
+                experimenter = t_pTag->toString();
+                break;
+            case FIFF_DESCRIPTION:
+                this->read_tag(t_pTag,pos);
+                description = t_pTag->toString();
+                break;
+            case FIFF_GANTRY_ANGLE:
+                this->read_tag(t_pTag,pos);
+                gantry_angle = *t_pTag->toFloat();
+                break;
+            case FIFF_UTC_OFFSET:
+                this->read_tag(t_pTag,pos);
+                utc_offset = t_pTag->toString();
+                break;
         }
     }
     //
@@ -1048,7 +1086,6 @@ bool FiffStream::read_meas_info(const FiffDirNode::SPtr& p_Node, FiffInfo& info,
     if (linefreq < 0)
     {
         qWarning("Line frequency is not defined\n");
-        return false;
     }
     if (chs.size() == 0)
     {
@@ -1209,6 +1246,7 @@ bool FiffStream::read_meas_info(const FiffDirNode::SPtr& p_Node, FiffInfo& info,
     info.nchan  = nchan;
     info.sfreq  = sfreq;
     info.linefreq = linefreq;
+
     if (highpass != -1.0f)
         info.highpass = highpass;
     else
@@ -1247,6 +1285,14 @@ bool FiffStream::read_meas_info(const FiffDirNode::SPtr& p_Node, FiffInfo& info,
     info.dig   = dig;
     if (!dig_trans.isEmpty())
         info.dig_trans = dig_trans;
+
+    info.experimenter = experimenter;
+    info.description = description;
+    info.proj_id = proj_id;
+    info.proj_name = proj_name;
+    info.xplotter_layout = xplotter_layout;
+    info.gantry_angle = gantry_angle;
+    info.utc_offset = utc_offset;
 
     info.bads  = bads;
     info.projs = projs;
@@ -2030,9 +2076,7 @@ FiffStream::SPtr FiffStream::start_writing_raw(QIODevice &p_IODevice, const Fiff
 
         t_pStream2 = FiffStream::SPtr();
     }
-    //
-    // Unused parameters from original file (could eventually put these in info struct)
-    //
+
     QList<fiff_int_t> values;
     values << FIFF_EXPERIMENTER << FIFF_DESCRIPTION << FIFF_PROJ_ID << FIFF_PROJ_NAME << FIFF_LINE_FREQ << FIFF_XPLOTTER_LAYOUT;
     if (values.size() > 0 && !info.filename.isEmpty())
