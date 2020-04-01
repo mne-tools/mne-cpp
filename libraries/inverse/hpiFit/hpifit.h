@@ -140,8 +140,12 @@ public:
     //=========================================================================================================
     /**
      * Default constructor.
+     *
+     * @param[in] pFiffInfo        Associated Fiff Information
+     * @param[in] bDoFastFit       Do the fast fit by fitting to the more basic Model
      */
-    explicit HPIFit(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
+    explicit HPIFit(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
+                    bool bDoFastFit = true);
 
     //=========================================================================================================
     /**
@@ -255,8 +259,6 @@ protected:
     void createSensorSet(SensorSet& sensors,
                          FWDLIB::FwdCoilSet* coils);
 
-    //=========================================================================================================
-
     SensorSet                m_sensors;            /**< sensor struct that contains information about all sensors */
 
 private:
@@ -280,6 +282,28 @@ private:
     QList<FIFFLIB::FiffChInfo>   m_lChannels;             /**< Channellist with bads excluded */
     QVector<int>                 m_vInnerind;             /**< index of inner channels  */
     QList<QString>               m_lBads;                 /**< contains bad channels  */
+
+    //=========================================================================================================
+    /**
+     * Read from FwdCoilSet and store into sensors struct.
+     * Can be deleted as soon as FwdCoilSet is refactored to QList and EigenMatrix.
+     *
+     * @param[in] iSamF             The sample frequency.
+     * @param[in] iSamLoc           The minimum samples required to localize numLoc times in a second
+     * @param[in] iLineF            The line frequency.
+     * @param[in] vecFreqs          The frequencies for each coil in unknown order.
+     *
+     * @return The updated model
+     */
+
+    void updateModel(const int iSamF,
+                     const int iSamLoc,
+                     const int iLineF,
+                     const QVector<int>& vecFreqs);
+
+    Eigen::MatrixXd     m_matModel;         /**< The model that contains the sines/cosines for the hpi fit*/
+    bool                m_bDoFastFit;       /**< Do fast fit */
+    bool                m_bUpdateModel;     /**< indicates if Model has to be updated */
 
 };
 
