@@ -231,9 +231,9 @@ bool GUSBAmp::stop()
     //Stop the producer thread first
     m_pGUSBAmpProducer->stop();
 
-    m_pCircularBuffer->clear();
-
+    // Clear all data in the buffer connected to displays and other plugins
     m_pRTMSA_GUSBAmp->data()->clear();
+    m_pCircularBuffer->clear();
 
     return true;
 }

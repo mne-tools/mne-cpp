@@ -248,7 +248,9 @@ bool Natus::stop()
     requestInterruption();
     wait(500);
 
+    // Clear all data in the buffer connected to displays and other plugins
     m_pRMTSA_Natus->data()->clear();
+    m_pCircularBuffer->clear();
 
     m_pProducerThread.quit();
     m_pProducerThread.wait();

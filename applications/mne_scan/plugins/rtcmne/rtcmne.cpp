@@ -101,6 +101,9 @@ RtcMne::RtcMne()
 , m_sMethod("dSPM")
 , m_iTimePointSps(0)
 , m_pCircularMatrixBuffer(CircularBuffer_Matrix_double::SPtr(new CircularBuffer_Matrix_double(40)))
+, m_pCircularEvokedBuffer(CircularBuffer<FIFFLIB::FiffEvoked>::SPtr::create(40))
+, m_bEvokedInput(false)
+, m_bRawInput(false)
 {
 }
 
@@ -368,7 +371,8 @@ bool RtcMne::stop()
     wait(500);
 
     m_qListCovChNames.clear();
-
+    m_bEvokedInput = false;
+    m_bRawInput = false;
     m_bPluginControlWidgetsInit = false;
 
     return true;
@@ -410,22 +414,24 @@ void RtcMne::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement)
 
     if(pRTMSA && this->isRunning()) {
         //Fiff Information of the RTMSA
+        m_qMutex.lock();
         if(!m_pFiffInfoInput) {
             m_pFiffInfoInput = pRTMSA->info();
-            initPluginControlWidgets();
             m_iNumAverages = 1;
+            m_bRawInput = true;
         }
+        m_qMutex.lock();
 
         if(!m_bPluginControlWidgetsInit) {
             initPluginControlWidgets();
         }
 
         if(this->isRunning()) {
-            for(qint32 i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
-                // Check for artifacts
-                QMap<QString,double> mapReject;
-                mapReject.insert("eog", 150e-06);
+            // Check for artifacts
+            QMap<QString,double> mapReject;
+            mapReject.insert("eog", 150e-06);
 
+            for(qint32 i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
                 bool bArtifactDetected = MNEEpochDataList::checkForArtifact(pRTMSA->getMultiSampleArray()[i],
                                                                             *m_pFiffInfoInput,
                                                                             mapReject);
@@ -475,12 +481,6 @@ void RtcMne::updateRTC(SCMEASLIB::Measurement::SPtr pMeasurement)
 void RtcMne::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
     if(QSharedPointer<RealTimeEvokedSet> pRTES = pMeasurement.dynamicCast<RealTimeEvokedSet>()) {
-        if(!m_pCircularEvokedBuffer) {
-            m_pCircularEvokedBuffer = IOBUFFER::CircularBuffer<FIFFLIB::FiffEvoked>::SPtr::create(10);
-        }
-
-        QMutexLocker locker(&m_qMutex);
-
         QStringList lResponsibleTriggerTypes = pRTES->getResponsibleTriggerTypes();
         emit responsibleTriggerTypesChanged(lResponsibleTriggerTypes);
 
@@ -492,12 +492,16 @@ void RtcMne::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
 
         //Fiff Information of the evoked
         if(!m_pFiffInfoInput && pFiffEvokedSet->evoked.size() > 0) {
+            QMutexLocker locker(&m_qMutex);
+
             for(int i = 0; i < pFiffEvokedSet->evoked.size(); ++i) {
                 if(pFiffEvokedSet->evoked.at(i).comment == m_sAvrType) {
                     m_pFiffInfoInput = QSharedPointer<FiffInfo>(new FiffInfo(pFiffEvokedSet->evoked.at(i).info));
                     break;
                 }
             }
+
+            m_bEvokedInput = true;
         }
 
         if(!m_bPluginControlWidgetsInit) {
@@ -614,78 +618,84 @@ void RtcMne::run()
     int iTimePointSps = 0;
     float tmin, tstep;
     MNESourceEstimate sourceEstimate;
+    bool bEvokedInput = false;
+    bool bRawInput = false;
 
     // Start processing data
     while(!isInterruptionRequested()) {
         m_qMutex.lock();
         iTimePointSps = m_iTimePointSps;
+        bEvokedInput = m_bEvokedInput;
+        bRawInput = m_bRawInput;
         m_qMutex.unlock();
 
         //Process data from raw data input
-        if(((skip_count % m_iDownSample) == 0)) {
-            // Get the current raw data
-            if(m_pCircularMatrixBuffer->pop(matData)) {
-                //Pick the same channels as in the inverse operator
-                m_qMutex.lock();
-                matDataResized.resize(m_invOp.noise_cov->names.size(), matData.cols());
+        if(bRawInput) {
+            if(((skip_count % m_iDownSample) == 0)) {
+                // Get the current raw data
+                if(m_pCircularMatrixBuffer->pop(matData)) {
+                    //Pick the same channels as in the inverse operator
+                    m_qMutex.lock();
+                    matDataResized.resize(m_invOp.noise_cov->names.size(), matData.cols());
 
-                for(j = 0; j < m_invOp.noise_cov->names.size(); ++j) {
-                    matDataResized.row(j) = matData.row(m_pFiffInfoInput->ch_names.indexOf(m_invOp.noise_cov->names.at(j)));
-                }
-
-                tmin = 0.0f;
-                tstep = 1.0f / m_pFiffInfoInput->sfreq;
-
-                //TODO: Add picking here. See evoked part as input.
-                sourceEstimate = m_pMinimumNorm->calculateInverse(matDataResized,
-                                                                  tmin,
-                                                                  tstep,
-                                                                  true);
-
-                m_qMutex.unlock();
-
-                if(!sourceEstimate.isEmpty()) {
-                    //qInfo() << QDateTime::currentDateTime().toString("hh:mm:ss.z") << m_iBlockNumberProcessed++ << "MNE Processed";
-                    if(iTimePointSps < sourceEstimate.data.cols() && iTimePointSps >= 0) {
-                        sourceEstimate = sourceEstimate.reduce(iTimePointSps,1);
-                        m_pRTSEOutput->data()->setValue(sourceEstimate);
-                    } else {
-                        m_pRTSEOutput->data()->setValue(sourceEstimate);
+                    for(j = 0; j < m_invOp.noise_cov->names.size(); ++j) {
+                        matDataResized.row(j) = matData.row(m_pFiffInfoInput->ch_names.indexOf(m_invOp.noise_cov->names.at(j)));
                     }
 
-                    m_pRTSEOutput->data()->setValue(sourceEstimate);
-                }
-            }
-        } else {
-            m_pCircularMatrixBuffer->pop(matDataResized);
-        }
-    }
+                    tmin = 0.0f;
+                    tstep = 1.0f / m_pFiffInfoInput->sfreq;
 
-    //Process data from averaging input
-    if(m_pCircularEvokedBuffer) {
-        if(m_pCircularEvokedBuffer->pop(evoked)) {
-            // Get the current evoked data
-            if(((skip_count % m_iDownSample) == 0)) {
-//                    QElapsedTimer time;
-//                    time.start();
+                    //TODO: Add picking here. See evoked part as input.
+                    sourceEstimate = m_pMinimumNorm->calculateInverse(matDataResized,
+                                                                      tmin,
+                                                                      tstep,
+                                                                      true);
 
-                m_qMutex.lock();
-                sourceEstimate = m_pMinimumNorm->calculateInverse(evoked);
-                m_qMutex.unlock();
+                    m_qMutex.unlock();
 
-                if(!sourceEstimate.isEmpty()) {
-                    //qInfo() << time.elapsed() << m_iBlockNumberProcessed << "MNE Time";
-                    //qInfo() << QDateTime::currentDateTime().toString("hh:mm:ss.z") << m_iBlockNumberProcessed++ << "MNE Processed";
+                    if(!sourceEstimate.isEmpty()) {
+                        //qInfo() << QDateTime::currentDateTime().toString("hh:mm:ss.z") << m_iBlockNumberProcessed++ << "MNE Processed";
+                        if(iTimePointSps < sourceEstimate.data.cols() && iTimePointSps >= 0) {
+                            sourceEstimate = sourceEstimate.reduce(iTimePointSps,1);
+                            m_pRTSEOutput->data()->setValue(sourceEstimate);
+                        } else {
+                            m_pRTSEOutput->data()->setValue(sourceEstimate);
+                        }
 
-                    if(iTimePointSps < sourceEstimate.data.cols() && iTimePointSps >= 0) {
-                        sourceEstimate = sourceEstimate.reduce(iTimePointSps,1);
-                        m_pRTSEOutput->data()->setValue(sourceEstimate);
-                    } else {
                         m_pRTSEOutput->data()->setValue(sourceEstimate);
                     }
                 }
             } else {
-                m_pCircularEvokedBuffer->pop(evoked);
+                m_pCircularMatrixBuffer->pop(matDataResized);
+            }
+        }
+
+        //Process data from averaging input
+        if(bEvokedInput) {
+            if(m_pCircularEvokedBuffer->pop(evoked)) {
+                // Get the current evoked data
+                if(((skip_count % m_iDownSample) == 0)) {
+    //                    QElapsedTimer time;
+    //                    time.start();
+
+                    m_qMutex.lock();
+                    sourceEstimate = m_pMinimumNorm->calculateInverse(evoked);
+                    m_qMutex.unlock();
+
+                    if(!sourceEstimate.isEmpty()) {
+                        //qInfo() << time.elapsed() << m_iBlockNumberProcessed << "MNE Time";
+                        //qInfo() << QDateTime::currentDateTime().toString("hh:mm:ss.z") << m_iBlockNumberProcessed++ << "MNE Processed";
+
+                        if(iTimePointSps < sourceEstimate.data.cols() && iTimePointSps >= 0) {
+                            sourceEstimate = sourceEstimate.reduce(iTimePointSps,1);
+                            m_pRTSEOutput->data()->setValue(sourceEstimate);
+                        } else {
+                            m_pRTSEOutput->data()->setValue(sourceEstimate);
+                        }
+                    }
+                } else {
+                    m_pCircularEvokedBuffer->pop(evoked);
+                }
             }
         }
     }
