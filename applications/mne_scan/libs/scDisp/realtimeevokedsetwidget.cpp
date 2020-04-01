@@ -255,62 +255,62 @@ void RealTimeEvokedSetWidget::init()
         //Init control widgets
         QList<QWidget*> lControlWidgets;
 
-        // Quick control projectors
-        ProjectorsView* pProjectorsView = new ProjectorsView(QString("RTESW/%1").arg(t_sRTESName));
-        pProjectorsView->setObjectName("group_tab_View_SSP");
-        lControlWidgets.append(pProjectorsView);
+//        // Quick control projectors
+//        ProjectorsView* pProjectorsView = new ProjectorsView(QString("RTESW/%1").arg(t_sRTESName));
+//        pProjectorsView->setObjectName("group_tab_View_SSP");
+//        lControlWidgets.append(pProjectorsView);
 
-        connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
-                m_pEvokedSetModel.data(), &EvokedSetModel::updateProjection);
+//        connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
+//                m_pEvokedSetModel.data(), &EvokedSetModel::updateProjection);
 
-        connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
-                m_pButterflyView.data(), &ButterflyView::updateView);
+//        connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
+//                m_pButterflyView.data(), &ButterflyView::updateView);
 
-        pProjectorsView->setProjectors(m_pFiffInfo->projs);
+//        pProjectorsView->setProjectors(m_pFiffInfo->projs);
 
-        // Quick control compensators
-        CompensatorView* pCompensatorView = new CompensatorView(QString("RTESW/%1").arg(t_sRTESName));
-        pCompensatorView->setObjectName("group_tab_View_Comp");
-        lControlWidgets.append(pCompensatorView);
+//        // Quick control compensators
+//        CompensatorView* pCompensatorView = new CompensatorView(QString("RTESW/%1").arg(t_sRTESName));
+//        pCompensatorView->setObjectName("group_tab_View_Comp");
+//        lControlWidgets.append(pCompensatorView);
 
-        connect(pCompensatorView, &CompensatorView::compSelectionChanged,
-                m_pEvokedSetModel.data(), &EvokedSetModel::updateCompensator);
+//        connect(pCompensatorView, &CompensatorView::compSelectionChanged,
+//                m_pEvokedSetModel.data(), &EvokedSetModel::updateCompensator);
 
-        connect(pCompensatorView, &CompensatorView::compSelectionChanged,
-                m_pButterflyView.data(), &ButterflyView::updateView);
+//        connect(pCompensatorView, &CompensatorView::compSelectionChanged,
+//                m_pButterflyView.data(), &ButterflyView::updateView);
 
-        pCompensatorView->setCompensators(m_pFiffInfo->comps);
+//        pCompensatorView->setCompensators(m_pFiffInfo->comps);
 
-        // Quick control filter settings
-        FilterSettingsView* pFilterSettingsView = new FilterSettingsView(QString("RTESW/%1").arg(t_sRTESName));
-        pFilterSettingsView->setObjectName("group_tab_View_Filter");
-        lControlWidgets.append(pFilterSettingsView);
+//        // Quick control filter settings
+//        FilterSettingsView* pFilterSettingsView = new FilterSettingsView(QString("RTESW/%1").arg(t_sRTESName));
+//        pFilterSettingsView->setObjectName("group_tab_View_Filter");
+//        lControlWidgets.append(pFilterSettingsView);
 
-        connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChannelTypeChanged,
-                m_pEvokedSetModel.data(), &EvokedSetModel::setFilterChannelType);
+//        connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChannelTypeChanged,
+//                m_pEvokedSetModel.data(), &EvokedSetModel::setFilterChannelType);
 
-        connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChanged,
-                m_pEvokedSetModel.data(), &EvokedSetModel::setFilter);
+//        connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChanged,
+//                m_pEvokedSetModel.data(), &EvokedSetModel::setFilter);
 
-        connect(this, &RealTimeEvokedSetWidget::windowSizeChanged,
-                pFilterSettingsView->getFilterView().data(), &FilterDesignView::setWindowSize);
+//        connect(this, &RealTimeEvokedSetWidget::windowSizeChanged,
+//                pFilterSettingsView->getFilterView().data(), &FilterDesignView::setWindowSize);
 
-        connect(this, &RealTimeEvokedSetWidget::windowSizeChanged,
-                pFilterSettingsView->getFilterView().data(), &FilterDesignView::setMaxFilterTaps);
+//        connect(this, &RealTimeEvokedSetWidget::windowSizeChanged,
+//                pFilterSettingsView->getFilterView().data(), &FilterDesignView::setMaxFilterTaps);
 
-        connect(pFilterSettingsView, &FilterSettingsView::filterActivationChanged,
-                m_pEvokedSetModel.data(), &EvokedSetModel::setFilterActive);
+//        connect(pFilterSettingsView, &FilterSettingsView::filterActivationChanged,
+//                m_pEvokedSetModel.data(), &EvokedSetModel::setFilterActive);
 
-        m_pEvokedSetModel->setFilterActive(pFilterSettingsView->getFilterActive());
+//        m_pEvokedSetModel->setFilterActive(pFilterSettingsView->getFilterActive());
 
-        pFilterSettingsView->getFilterView()->init(m_pFiffInfo->sfreq);
+//        pFilterSettingsView->getFilterView()->init(m_pFiffInfo->sfreq);
 
-        if(!m_pRTESet->getValue()->evoked.isEmpty()) {
-            m_iMaxFilterTapSize = m_pRTESet->getValue()->evoked.first().data.cols();
+//        if(!m_pRTESet->getValue()->evoked.isEmpty()) {
+//            m_iMaxFilterTapSize = m_pRTESet->getValue()->evoked.first().data.cols();
 
-            pFilterSettingsView->getFilterView()->setWindowSize(m_iMaxFilterTapSize);
-            pFilterSettingsView->getFilterView()->setMaxFilterTaps(m_iMaxFilterTapSize);
-        }
+//            pFilterSettingsView->getFilterView()->setWindowSize(m_iMaxFilterTapSize);
+//            pFilterSettingsView->getFilterView()->setMaxFilterTaps(m_iMaxFilterTapSize);
+//        }
 
         // Scaling
         ScalingView* pScalingView = new ScalingView(QString("RTESW/%1").arg(t_sRTESName),
