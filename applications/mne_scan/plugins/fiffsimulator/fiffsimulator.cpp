@@ -182,6 +182,7 @@ bool FiffSimulator::stop()
 
     // Clear all data in the buffer connected to displays and other plugins
     m_pRTMSA_FiffSimulator->data()->clear();
+    m_pCircularBuffer->clear();
 
     return true;
 }

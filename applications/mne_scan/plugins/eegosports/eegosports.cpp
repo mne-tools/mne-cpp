@@ -580,7 +580,9 @@ bool EEGoSports::stop()
     //Stop the producer thread
     m_pEEGoSportsProducer->stop();
 
+    // Clear all data in the buffer connected to displays and other plugins
     m_pRMTSA_EEGoSports->data()->clear();
+    m_pCircularBuffer->clear();
 
     //Store settings for next use. Do this in stop() since it will crash if we do it in the destructor.
     QSettings settings;

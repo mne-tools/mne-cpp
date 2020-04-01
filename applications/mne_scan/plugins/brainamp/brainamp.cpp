@@ -296,9 +296,9 @@ bool BrainAMP::stop()
     //Stop the producer thread first
     m_pBrainAMPProducer->stop();
 
-    m_pCircularBuffer->clear();
-
+    // Clear all data in the buffer connected to displays and other plugins
     m_pRMTSA_BrainAMP->data()->clear();
+    m_pCircularBuffer->clear();
 
     //Store settings for next use
     QSettings settings;

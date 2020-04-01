@@ -515,7 +515,9 @@ bool TMSI::stop()
     requestInterruption();
     wait(500);
 
+    // Clear all data in the buffer connected to displays and other plugins
     m_pRMTSA_TMSI->data()->clear();
+    m_pCircularBuffer->clear();
 
     if(m_pTmsiManualAnnotationWidget) {
         m_pTmsiManualAnnotationWidget->hide();

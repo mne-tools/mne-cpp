@@ -151,6 +151,7 @@ void RealTimeMultiSampleArrayWidget::init()
         rtmsaLayout->setContentsMargins(0,0,0,0);
         rtmsaLayout->addWidget(m_pChannelDataView);
         this->setLayout(rtmsaLayout);
+        this->setMinimumSize(200,20);
 
         // Init channel view
         QSettings settings;
