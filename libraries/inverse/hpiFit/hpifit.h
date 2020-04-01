@@ -285,8 +285,7 @@ private:
 
     //=========================================================================================================
     /**
-     * Read from FwdCoilSet and store into sensors struct.
-     * Can be deleted as soon as FwdCoilSet is refactored to QList and EigenMatrix.
+     * Update the model of sinoids for the hpi data
      *
      * @param[in] iSamF             The sample frequency.
      * @param[in] iSamLoc           The minimum samples required to localize numLoc times in a second
@@ -303,7 +302,8 @@ private:
 
     Eigen::MatrixXd     m_matModel;         /**< The model that contains the sines/cosines for the hpi fit*/
     bool                m_bDoFastFit;       /**< Do fast fit */
-    bool                m_bUpdateModel;     /**< indicates if Model has to be updated */
+
+    QVector<int>        m_vecFreqs;         /**< The frequencies for each coil in unknown order. */
 
 };
 
