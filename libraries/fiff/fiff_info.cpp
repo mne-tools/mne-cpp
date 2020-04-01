@@ -62,6 +62,7 @@ FiffInfo::FiffInfo()
 , linefreq(-1.0)
 , highpass(-1.0)
 , lowpass(-1.0)
+, gantry_angle(-1.0)
 , acq_pars("")
 , acq_stim("")
 {

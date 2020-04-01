@@ -2076,31 +2076,6 @@ FiffStream::SPtr FiffStream::start_writing_raw(QIODevice &p_IODevice, const Fiff
 
         t_pStream2 = FiffStream::SPtr();
     }
-
-    QList<fiff_int_t> values;
-    values << FIFF_EXPERIMENTER << FIFF_DESCRIPTION << FIFF_PROJ_ID << FIFF_PROJ_NAME << FIFF_LINE_FREQ << FIFF_XPLOTTER_LAYOUT;
-    if (values.size() > 0 && !info.filename.isEmpty())
-    {
-        QFile t_qFile(info.filename);//ToDo this has to be adapted for TCPSocket
-        FiffStream::SPtr t_pStream2(new FiffStream(&t_qFile));
-        FiffTag::SPtr t_pTag;
-
-        t_pStream2->open();
-        QList<FiffDirNode::SPtr> nodes = t_pStream2->dirtree()->dir_tree_find(FIFFB_MEAS_INFO);
-
-        for(qint32 k = 0; k < values.size(); ++k)
-        {
-            if(nodes.size() > 0 && nodes[0]->find_tag(t_pStream2, values[k], t_pTag)) {
-                if (values[k] == FIFF_EXPERIMENTER || values[k] == FIFF_DESCRIPTION || values[k] == FIFF_PROJ_NAME || values[k] == FIFF_XPLOTTER_LAYOUT)
-                    t_pStream->write_string(values[k], t_pTag->toString());
-                else if (values[k] == FIFF_PROJ_ID)
-                    t_pStream->write_int(values[k], t_pTag->toInt());
-                else if (values[k] == FIFF_LINE_FREQ)
-                    t_pStream->write_float(values[k], t_pTag->toFloat());
-            }
-        }
-        t_pStream2 = FiffStream::SPtr();
-    }
     //
     //    megacq parameters
     //
@@ -2160,8 +2135,15 @@ FiffStream::SPtr FiffStream::start_writing_raw(QIODevice &p_IODevice, const Fiff
     t_pStream->write_float(FIFF_SFREQ,&info.sfreq);
     t_pStream->write_float(FIFF_HIGHPASS,&info.highpass);
     t_pStream->write_float(FIFF_LOWPASS,&info.lowpass);
+    t_pStream->write_float(FIFF_LINE_FREQ,&info.linefreq);
+    t_pStream->write_float(FIFF_GANTRY_ANGLE,&info.gantry_angle);
     t_pStream->write_int(FIFF_NCHAN,&nchan);
     t_pStream->write_int(FIFF_DATA_PACK,&data_type);
+    t_pStream->write_int(FIFF_PROJ_ID,&info.proj_id);
+    t_pStream->write_string(FIFF_EXPERIMENTER,info.experimenter);
+    t_pStream->write_string(FIFF_DESCRIPTION,info.description);
+    t_pStream->write_string(FIFF_PROJ_NAME,info.proj_name);
+    t_pStream->write_string(FIFF_XPLOTTER_LAYOUT,info.xplotter_layout);
     if (info.meas_date[0] != -1)
         t_pStream->write_int(FIFF_MEAS_DATE,info.meas_date, 2);
     //
