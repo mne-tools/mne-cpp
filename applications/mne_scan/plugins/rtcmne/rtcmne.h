@@ -243,8 +243,8 @@ protected:
     QSharedPointer<FIFFLIB::FiffInfo>                                                       m_pFiffInfo;                /**< Fiff information. */
     QSharedPointer<FIFFLIB::FiffInfo>                                                       m_pFiffInfoInput;           /**< Fiff information of the evoked. */
 
-    bool                            m_bEvokedInput;
-    bool                            m_bRawInput;
+    bool                            m_bEvokedInput;             /**< Flag whether an evoked input was received. */
+    bool                            m_bRawInput;                /**< Flag whether a raw data input was received. */
 
     QMutex                          m_qMutex;                   /**< The mutex ensuring thread safety. */
     QFuture<void>                   m_future;                   /**< The future monitoring the clustering. */
