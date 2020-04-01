@@ -46,6 +46,7 @@
 //=============================================================================================================
 
 #include <QPainter>
+#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -307,7 +308,7 @@ void RtFiffRawViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
             if(data.second > 0) {
                 QPainterPath path(QPointF(option.rect.x(),option.rect.y()));
 
-                //Plot marker
+//                //Plot hovering marker
 //                createMarkerPath(option, path);
 
 //                painter->save();
@@ -357,12 +358,7 @@ void RtFiffRawViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
 
                 path = QPainterPath(QPointF(option.rect.x(),option.rect.y()));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor(),option.rect.y()));
 
-                //QTime timer;
-
-                //timer.start();
                 createPlotPath(index, option, path, ellipsePos, amplitude, data);
-                //int timeMS = timer.elapsed();
-                //std::cout<<"Time createPlotPath"<<timeMS<<std::endl;
 
                 painter->setRenderHint(QPainter::Antialiasing, true);
                 painter->save();
@@ -394,12 +390,10 @@ void RtFiffRawViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
                     }
                 }
 
-                //timer.start();
                 painter->drawPath(path);
-                //timeMS = timer.elapsed();
-                //std::cout<<"Time drawPath Current data"<<timeMS<<std::endl;
+                painter->restore();
 
-                //Plot ellipse and amplitude next to marker mouse position
+//                //Plot ellipse and amplitude next to marker mouse position
 //                if(m_iActiveRow == index.row()) {
 //                    painter->save();
 //                    painter->drawEllipse(ellipsePos,2,2);
@@ -410,8 +404,6 @@ void RtFiffRawViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
 //                    painter->drawEllipse(ellipsePos,2,2);
 //                    painter->restore();
 //                }
-
-                painter->restore();
 
                 //Plot current position marker
                 path = QPainterPath(QPointF(option.rect.x(),option.rect.y()));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor(),option.rect.y()));
@@ -431,7 +423,7 @@ void RtFiffRawViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
 
 QSize RtFiffRawViewDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    QSize size;
+    QSize size = option.rect.size();
 
     switch(index.column()) {
     case 0:
@@ -440,7 +432,6 @@ QSize RtFiffRawViewDelegate::sizeHint(const QStyleOptionViewItem &option, const 
     case 1:
         QList< QVector<float> > data = index.model()->data(index).value< QList<QVector<float> > >();
 //        qint32 nsamples = (static_cast<const RtFiffRawViewModel*>(index.model()))->lastSample()-(static_cast<const RtFiffRawViewModel*>(index.model()))->firstSample();
-
 //        size = QSize(nsamples*m_dDx,m_dPlotHeight);
         Q_UNUSED(option);
         break;
@@ -451,7 +442,8 @@ QSize RtFiffRawViewDelegate::sizeHint(const QStyleOptionViewItem &option, const 
 
 //=============================================================================================================
 
-void RtFiffRawViewDelegate::markerMoved(QPoint position, int activeRow)
+void RtFiffRawViewDelegate::markerMoved(QPoint position,
+                                        int activeRow)
 {
     m_markerPosition = position;
     m_iActiveRow = activeRow;
@@ -482,11 +474,11 @@ void RtFiffRawViewDelegate::setUpperItemIndex(int iUpperItemIndex)
 //=============================================================================================================
 
 void RtFiffRawViewDelegate::createPlotPath(const QModelIndex &index,
-                                                      const QStyleOptionViewItem &option,
-                                                      QPainterPath& path,
-                                                      QPointF &ellipsePos,
-                                                      QString &amplitude,
-                                                      RowVectorPair &data) const
+                                           const QStyleOptionViewItem &option,
+                                           QPainterPath& path,
+                                           QPointF &ellipsePos,
+                                           QString &amplitude,
+                                           RowVectorPair &data) const
 {
     const RtFiffRawViewModel* t_pModel = static_cast<const RtFiffRawViewModel*>(index.model());
 
@@ -505,20 +497,13 @@ void RtFiffRawViewDelegate::createPlotPath(const QModelIndex &index,
             else if(unit == FIFF_UNIT_T) //magnetometers
             {
                 dMaxValue = 1e-11f;
-
-                //TODO: Debug this
-//                if(t_pModel->getCoil(index.row()) == FIFFV_COIL_BABY_MAG)
-//                    dMaxValue = 1e-11f;
-//                else
-//                    dMaxValue = 1e-11f;
-
                 if(t_pModel->getScaling().contains(FIFF_UNIT_T))
                     dMaxValue = t_pModel->getScaling()[FIFF_UNIT_T];
             }
             break;
         }
 
-        case FIFFV_REF_MEG_CH: {  /*11/04/14 Added by Limin: MEG reference channel */
+        case FIFFV_REF_MEG_CH: {
             dMaxValue = 1e-11f;
             if(t_pModel->getScaling().contains(FIFF_UNIT_T))
                 dMaxValue = t_pModel->getScaling()[FIFF_UNIT_T];
@@ -550,53 +535,61 @@ void RtFiffRawViewDelegate::createPlotPath(const QModelIndex &index,
         }
     }
 
-    double dValue;
-    double dScaleY = option.rect.height()/(2*dMaxValue);
-
-    double y_base = path.currentPosition().y();
     QPointF qSamplePosition;
 
-    double dDx = ((float)option.rect.width()) / t_pModel->getMaxSamples();
+    double dValueScaled, dValue;
+    double dScaleY = option.rect.height()/(2*dMaxValue);
+    double y_base = path.currentPosition().y();
 
+    // Calculate the smallest possible width for one sample data point
+    int iSkip = t_pModel->getMaxSamples() / option.rect.width();
+    if(iSkip <= 0) {
+        iSkip = 1;
+    }
+    double dRatio = t_pModel->getMaxSamples() / iSkip;
+    double dDx = option.rect.width() / dRatio;
+
+//    qDebug() << "t_pModel->getMaxSamples()" << t_pModel->getMaxSamples();
+//    qDebug() << "dRatio" << dRatio;
+//    qDebug() << "iSkip" << iSkip;
+//    qDebug() << "dDx" << dDx;
+
+    // Init indices
     int currentSampleIndex = t_pModel->getCurrentSampleIndex();
     double lastFirstValue = t_pModel->getLastBlockFirstValue(index.row());
 
     //Move to initial starting point
-    if(data.second > 0)
-    {
+    if(data.second > 0) {
         dValue = 0;
 
         //Reverse direction -> plot the right way
-        float newY = y_base-dValue;
+        dValue = y_base-dValue;
 
-        qSamplePosition.setY(newY);
+        qSamplePosition.setY(dValue);
         qSamplePosition.setX(path.currentPosition().x());
 
         path.moveTo(qSamplePosition);
     }
 
-    double val;
+    for(qint32 j = 0; j < data.second; j += iSkip) {
+        if(j < currentSampleIndex) {
+            dValue = *(data.first+j) - *(data.first); //remove first sample data[0] as offset
+        } else {
+            dValue = *(data.first+j) - lastFirstValue; //do not remove first sample data[0] as offset because this is the last data part
+        }
 
-    for(qint32 j=0; j < data.second; ++j)
-    {
-        if(j<currentSampleIndex)
-            val = *(data.first+j) - *(data.first); //remove first sample data[0] as offset
-        else
-            val = *(data.first+j) - lastFirstValue; //do not remove first sample data[0] as offset because this is the last data part
+        dValueScaled = dValue * dScaleY;
 
-        dValue = val*dScaleY;
-        //qDebug()<<"val"<<val<<"dScaleY"<<dScaleY<<"dValue"<<dValue;
+        dValueScaled = y_base-dValueScaled;//Reverse direction -> plot the right way
 
-        double newY = y_base-dValue;//Reverse direction -> plot the right way
-
-        qSamplePosition.setY(newY);
+        qSamplePosition.setY(dValueScaled);
         qSamplePosition.setX(path.currentPosition().x()+dDx);
         path.lineTo(qSamplePosition);
 
         //Create ellipse position
-        if(j == (qint32)(m_markerPosition.x()/dDx)) {
+        if(j == (qint32)(m_markerPosition.x() / dDx)) {
             ellipsePos.setX(path.currentPosition().x()+dDx);
-            ellipsePos.setY(newY/*+(option.rect.height()/2)*/);
+            ellipsePos.setY(dValueScaled/*+(option.rect.height()/2)*/);
 
             amplitude = QString::number(*(data.first+j));
         }
@@ -676,10 +669,10 @@ void RtFiffRawViewDelegate::createTimeSpacersPath(const QModelIndex &index, cons
 //=============================================================================================================
 
 void RtFiffRawViewDelegate::createTriggerPath(QPainter *painter,
-                                             const QModelIndex &index,
-                                             const QStyleOptionViewItem &option,
-                                             QPainterPath& path,
-                                             RowVectorPair &data) const
+                                              const QModelIndex &index,
+                                              const QStyleOptionViewItem &option,
+                                              QPainterPath& path,
+                                              RowVectorPair &data) const
 {
     Q_UNUSED(data)
     Q_UNUSED(path)
@@ -740,7 +733,11 @@ void RtFiffRawViewDelegate::createTriggerPath(QPainter *painter,
 
 //=============================================================================================================
 
-void RtFiffRawViewDelegate::createTriggerThresholdPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorPair &data, QPointF &textPosition) const
+void RtFiffRawViewDelegate::createTriggerThresholdPath(const QModelIndex &index,
+                                                       const QStyleOptionViewItem &option,
+                                                       QPainterPath& path,
+                                                       RowVectorPair &data,
+                                                       QPointF &textPosition) const
 {
     Q_UNUSED(data)
 
@@ -770,7 +767,8 @@ void RtFiffRawViewDelegate::createTriggerThresholdPath(const QModelIndex &index,
 
 //=============================================================================================================
 
-void RtFiffRawViewDelegate::createMarkerPath(const QStyleOptionViewItem &option, QPainterPath& path) const
+void RtFiffRawViewDelegate::createMarkerPath(const QStyleOptionViewItem &option,
+                                             QPainterPath& path) const
 {
     //horizontal lines
     float distance = m_markerPosition.x();

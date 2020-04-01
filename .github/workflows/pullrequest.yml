@@ -44,7 +44,7 @@ jobs:
     - name: Install jom (Windows)
       if: matrix.os == 'windows-2016'
       run: |
-        Invoke-WebRequest http://download.qt.io/official_releases/jom/jom.zip -OutFile .\jom.zip
+        Invoke-WebRequest https://www.dropbox.com/s/dku543gtw7ik7hr/jom.zip?dl=1 -OutFile .\jom.zip
         expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
         echo "::add-path::$HOME\jom"        
     - name: Compile BrainFlow submodule (Windows)
@@ -134,7 +134,7 @@ jobs:
     - name: Install jom (Windows) 
       if: matrix.os == 'windows-2016'
       run: |
-        Invoke-WebRequest http://download.qt.io/official_releases/jom/jom.zip -OutFile .\jom.zip
+        Invoke-WebRequest https://www.dropbox.com/s/dku543gtw7ik7hr/jom.zip?dl=1 -OutFile .\jom.zip
         expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
         echo "::add-path::$HOME\jom"
     - name: Configure and compile MNE-CPP (Linux)

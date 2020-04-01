@@ -94,6 +94,7 @@ NeuronalConnectivity::NeuronalConnectivity()
 , m_pActionShowYourWidget(Q_NULLPTR)
 , m_iNumberBadChannels(0)
 , m_pRtConnectivity(RtConnectivity::SPtr::create())
+, m_pCircularBuffer(CircularBuffer<CONNECTIVITYLIB::Network>::SPtr::create(40))
 {
     AbstractMetric::m_bStorageModeIsActive = true;
     AbstractMetric::m_iNumberBinStart = 0;
@@ -190,12 +191,7 @@ void NeuronalConnectivity::unload()
 //=============================================================================================================
 
 bool NeuronalConnectivity::start()
-{    
-    // Init circular buffer to transmit data from the producer to this thread
-    if(!m_pCircularBuffer) {
-        m_pCircularBuffer = CircularBuffer<CONNECTIVITYLIB::Network>::SPtr::create(10);
-    }
-
+{
     //Start thread
     QThread::start();
 
@@ -504,10 +500,16 @@ void NeuronalConnectivity::generateNodeVertices()
 
 void NeuronalConnectivity::run()
 {
-    // Wait for Fiff Info
-    while(!m_pFiffInfo) {
-        msleep(10);
-    }    
+    // Wait for fiff info
+    while(true) {
+        m_mutex.lock();
+        if(m_pFiffInfo) {
+            m_mutex.unlock();
+            break;
+        }
+        m_mutex.unlock();
+        msleep(100);
+    }
 
     int skip_count = 0;
     Network network;

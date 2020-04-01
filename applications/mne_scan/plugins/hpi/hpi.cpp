@@ -128,7 +128,7 @@ void Hpi::unload()
 
 bool Hpi::start()
 {
-    //Start thread as soon as we have received the first data block. See update().
+    QThread::start();
 
     return true;
 }
@@ -179,8 +179,6 @@ void Hpi::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             m_pFiffInfo = pRTMSA->info();
 
             updateProjections();
-
-            QThread::start();
         }
 
         if(!m_bPluginControlWidgetsInit) {
@@ -192,15 +190,12 @@ void Hpi::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             //If bad channels changed, recalcluate projectors
             updateProjections();
 
-            if(m_bDoSingleHpi) {
-                while(!m_pCircularBuffer->push(pRTMSA->getMultiSampleArray()[0])) {
-                    //Do nothing until the circular buffer is ready to accept new data again
-                }
+            m_mutex.lock();
+            bool bDoSingleHpi = m_bDoSingleHpi;
+            bool bDoFreqOrder = m_bDoFreqOrder;
+            m_mutex.unlock();
 
-                m_bDoSingleHpi = false;
-            }
-
-            if(m_bDoFreqOrder) {
+            if(bDoFreqOrder || bDoSingleHpi) {
                 while(!m_pCircularBuffer->push(pRTMSA->getMultiSampleArray()[0])) {
                     //Do nothing until the circular buffer is ready to accept new data again
                 }
@@ -210,7 +205,7 @@ void Hpi::update(SCMEASLIB::Measurement::SPtr pMeasurement)
                 for(unsigned char i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
                     // Please note that we do not need a copy here since this function will block until
                     // the buffer accepts new data again. Hence, the data is not deleted in the actual
-                    // Mesaurement function after it emitted the notify signal.
+                    // Measurement function after it emitted the notify signal.
                     while(!m_pCircularBuffer->push(pRTMSA->getMultiSampleArray()[i])) {
                         //Do nothing until the circular buffer is ready to accept new data again
                     }
@@ -347,7 +342,9 @@ void Hpi::onDoSingleHpiFit()
        return;
     }
 
+    m_mutex.lock();
     m_bDoSingleHpi = true;
+    m_mutex.unlock();
 }
 
 //=============================================================================================================
@@ -360,6 +357,7 @@ void Hpi::onDoFreqOrder()
        msgBox.exec();
        return;
     }
+
     m_mutex.lock();
     m_bDoFreqOrder = true;
     m_mutex.unlock();
@@ -423,10 +421,13 @@ void Hpi::run()
     // init hpi fit
     HpiFitResult fitResult;
     fitResult.devHeadTrans = m_pFiffInfo->dev_head_t;
+    fitResult.devHeadTrans.from = 1;
+    fitResult.devHeadTrans.to = 4;
 
     HPIFit HPI = HPIFit(m_pFiffInfo);
 
     double dErrorMax = 0.0;
+    double dMeanErrorDist = 0;
     int iDataIndexCounter = 0;
     MatrixXd matData;
 
@@ -450,14 +451,18 @@ void Hpi::run()
                 matDataMerged.block(0, iDataIndexCounter, matData.rows(), matData.cols()) = matData;
                 iDataIndexCounter += matData.cols();
             } else {
+                m_mutex.lock();
+                if(m_bDoSingleHpi) {
+                    m_bDoSingleHpi = false;
+                }
+                fitResult.sFilePathDigitzers = m_sFilePathDigitzers;
+                m_mutex.unlock();
+
                 matDataMerged.block(0, iDataIndexCounter, matData.rows(), matDataMerged.cols()-iDataIndexCounter) = matData.block(0, 0, matData.rows(), matDataMerged.cols()-iDataIndexCounter);
 
                 // Perform HPI fit
-                fitResult.devHeadTrans.from = 1;
-                fitResult.devHeadTrans.to = 4;
 
                 m_mutex.lock();
-                fitResult.sFilePathDigitzers = m_sFilePathDigitzers;
                 if(m_bDoFreqOrder) {
                     // find correct frequencie order if requested
                     HPI.findOrder(matDataMerged,
@@ -474,7 +479,6 @@ void Hpi::run()
 
                 // Perform actual fitting
                 m_mutex.lock();
-                fitResult.sFilePathDigitzers = m_sFilePathDigitzers;
                 HPI.fitHPI(matDataMerged,
                            m_matCompProjectors,
                            fitResult.devHeadTrans,
@@ -487,7 +491,6 @@ void Hpi::run()
 
                 //Check if the error meets distance requirement
                 if(fitResult.errorDistances.size() > 0) {
-                    double dMeanErrorDist = 0;
                     dMeanErrorDist = std::accumulate(fitResult.errorDistances.begin(), fitResult.errorDistances.end(), .0) / fitResult.errorDistances.size();
 
                     emit errorsChanged(fitResult.errorDistances, dMeanErrorDist);

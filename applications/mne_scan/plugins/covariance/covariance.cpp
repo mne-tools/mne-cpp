@@ -79,7 +79,7 @@ using namespace Eigen;
 
 Covariance::Covariance()
 : m_iEstimationSamples(2000)
-, m_pCircularBuffer(CircularBuffer<FIFFLIB::FiffCov>::SPtr::create(10))
+, m_pCircularBuffer(CircularBuffer_Matrix_double::SPtr::create(40))
 {
 }
 
@@ -146,14 +146,15 @@ void Covariance::unload()
 {
     // Store Settings
     QSettings settings;
-    settings.setValue(QString("Plugin/%1/estimationSamples").arg(this->getName()), m_iEstimationSamples);
+    settings.setValue(QString("MNESCAN/%1/estimationSamples").arg(this->getName()), m_iEstimationSamples);
 }
 
 //=============================================================================================================
 
 bool Covariance::start()
 {
-    //Start thread as soon as we have received the first data block. See update().
+    // Start thread
+    QThread::start();
 
     return true;
 }
@@ -208,36 +209,20 @@ void Covariance::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             m_pFiffInfo = pRTMSA->info();
 
             m_pCovarianceOutput->data()->setFiffInfo(m_pFiffInfo);
-
-            m_pRtCov = RtCov::SPtr(new RtCov(m_iEstimationSamples, m_pFiffInfo));
-            connect(m_pRtCov.data(), &RtCov::covCalculated,
-                    this, &Covariance::appendCovariance);
-
-            // Start thread
-            QThread::start();
         }
 
         if(!m_bPluginControlWidgetsInit) {
             initPluginControlWidgets();
         }
 
-        MatrixXd matData;
         for(qint32 i = 0; i < pRTMSA->getMultiArraySize(); ++i) {
-            // This extra copy is necessary since the referenced data is getting deleted as soon as
-            // m_pRtAve->append() returns. m_pRtAve->append() returns without a copy since it communicates
-            // via signals with the worker thread of RtCov.
-            matData = pRTMSA->getMultiSampleArray()[i];
-            m_pRtCov->append(matData);
+            // Please note that we do not need a copy here since this function will block until
+            // the buffer accepts new data again. Hence, the data is not deleted in the actual
+            // Measurement function after it emitted the notify signal.
+            while(!m_pCircularBuffer->push(pRTMSA->getMultiSampleArray()[i])) {
+                //Do nothing until the circular buffer is ready to accept new data again
+            }
         }
-    }
-}
-
-//=============================================================================================================
-
-void Covariance::appendCovariance(const FiffCov& covariance)
-{
-    while(!m_pCircularBuffer->push(covariance)) {
-        //Do nothing until the circular buffer is ready to accept new data again
     }
 }
 
@@ -246,22 +231,42 @@ void Covariance::appendCovariance(const FiffCov& covariance)
 void Covariance::changeSamples(qint32 samples)
 {
     m_iEstimationSamples = samples;
-    if(m_pRtCov) {
-        m_pRtCov->setSamples(m_iEstimationSamples);
-    }
 }
 
 //=============================================================================================================
 
 void Covariance::run()
 {
-    FiffCov covariance;
+    // Wait for fiff info
+    while(true) {
+        m_mutex.lock();
+        if(m_pFiffInfo) {
+            m_mutex.unlock();
+            break;
+        }
+        m_mutex.unlock();
+        msleep(100);
+    }
+
+    MatrixXd matData;
+    FiffCov fiffCov;
+    m_mutex.lock();
+    int iEstimationSamples = m_iEstimationSamples;
+    m_mutex.unlock();
+    RTPROCESSINGLIB::RtCov rtCov(m_pFiffInfo);
 
     // Start processing data
     while(!isInterruptionRequested()) {
         // Get the current data
-        if(m_pCircularBuffer->pop(covariance)) {
-            m_pCovarianceOutput->data()->setValue(covariance);
+        if(m_pCircularBuffer->pop(matData)) {
+            m_mutex.lock();
+            iEstimationSamples = m_iEstimationSamples;
+            m_mutex.unlock();
+
+            fiffCov = rtCov.estimateCovariance(matData, iEstimationSamples);
+            if(!fiffCov.names.isEmpty()) {
+                m_pCovarianceOutput->data()->setValue(fiffCov);
+            }
         }
     }
 }

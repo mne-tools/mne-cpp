@@ -350,13 +350,10 @@ QList<FiffDigPoint> HpiSettingsView::readPolhemusDig(const QString& fileName)
     QList<FiffDigPoint> lDigPoints;
 
     qint16 numHPI = 0;
-    qint16 numDig = 0;
     qint16 numFiducials = 0;
     qint16 numEEG = 0;
 
     for(int i = 0; i < t_digSet.size(); ++i) {
-        lDigPoints.append(t_digSet[i]);
-
         switch(t_digSet[i].kind) {
             case FIFFV_POINT_HPI: {
                 // Add column 0 in freq table widget
@@ -394,19 +391,18 @@ QList<FiffDigPoint> HpiSettingsView::readPolhemusDig(const QString& fileName)
                                                     1,
                                                     pTableItemC);
 
+                lDigPoints.append(t_digSet[i]);
                 numHPI++;
                 break;
             }
 
-            case FIFFV_POINT_EXTRA:
-                numDig++;
-                break;
-
             case FIFFV_POINT_CARDINAL:
+                lDigPoints.append(t_digSet[i]);
                 numFiducials++;
                 break;
 
             case FIFFV_POINT_EEG:
+                lDigPoints.append(t_digSet[i]);
                 numEEG++;
                 break;
         }
@@ -414,7 +410,6 @@ QList<FiffDigPoint> HpiSettingsView::readPolhemusDig(const QString& fileName)
 
     //Set loaded number of digitizers
     m_ui->m_label_numberLoadedCoils->setNum(numHPI);
-    m_ui->m_label_numberLoadedDigitizers->setNum(numDig);
     m_ui->m_label_numberLoadedFiducials->setNum(numFiducials);
     m_ui->m_label_numberLoadedEEG->setNum(numEEG);
 
