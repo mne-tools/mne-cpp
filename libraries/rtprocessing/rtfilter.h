@@ -101,6 +101,8 @@ public:
      */
     ~RtFilter();
 
+    static void filterChannel(RtFilter::RtFilterData &channelDataTime);
+
     //=========================================================================================================
     /**
      * Calculates the filtered version of the raw input data

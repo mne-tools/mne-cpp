@@ -57,18 +57,6 @@ using namespace FIFFLIB;
 #include <QDebug>
 
 //=============================================================================================================
-// DEFINE GLOBAL METHODS
-//=============================================================================================================
-
-void doFilterPerChannelRTMSA(RtFilter::RtFilterData &channelDataTime)
-{
-    for(int i = 0; i < channelDataTime.lFilterData.size(); ++i) {
-        //channelDataTime.vecData = channelDataTime.first.at(i).applyConvFilter(channelDataTime.vecData, true, FilterData::ZeroPad);
-        channelDataTime.vecData = channelDataTime.lFilterData.at(i).applyFFTFilter(channelDataTime.vecData, true, FilterData::ZeroPad); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
-    }
-}
-
-//=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
@@ -80,6 +68,16 @@ RtFilter::RtFilter()
 
 RtFilter::~RtFilter()
 {
+}
+
+//=============================================================================================================
+
+void RtFilter::filterChannel(RtFilter::RtFilterData &channelDataTime)
+{
+    for(int i = 0; i < channelDataTime.lFilterData.size(); ++i) {
+        //channelDataTime.vecData = channelDataTime.first.at(i).applyConvFilter(channelDataTime.vecData, true, FilterData::ZeroPad);
+        channelDataTime.vecData = channelDataTime.lFilterData.at(i).applyFFTFilter(channelDataTime.vecData, true, FilterData::ZeroPad); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
+    }
 }
 
 //=============================================================================================================
@@ -100,51 +98,57 @@ MatrixXd RtFilter::filterDataBlock(const MatrixXd& matDataIn,
         m_matDelay.setZero();
     }
 
-    //Resize output matrix to match input matrix
+    //Copy input data
     MatrixXd matDataOut = matDataIn;
 
-    //Generate QList structure which can be handled by the QConcurrent framework
-    QList<RtFilterData> timeData;
-
-    //Only select channels specified in vecPicks
-    for(qint32 i = 0; i < vecPicks.cols(); ++i) {
-        RtFilterData data;
-        data.lFilterData = lFilterData;
-        data.iRow = vecPicks[i];
-        data.vecData = matDataIn.row(vecPicks[i]);
-        timeData.append(data);
-    }
-
     //Do the concurrent filtering
-    if(!timeData.isEmpty()) {
+    if(vecPicks.cols() > 0) {
+        //Generate QList structure which can be handled by the QConcurrent framework
+        QList<RtFilterData> timeData;
+
+        //Only select channels specified in vecPicks
+        RtFilterData data;
+        for(qint32 i = 0; i < vecPicks.cols(); ++i) {
+            data.lFilterData = lFilterData;
+            data.iRow = vecPicks[i];
+            data.vecData = matDataIn.row(vecPicks[i]);
+            timeData.append(data);
+        }
+
+        // Copy in data from last data block. This is necessary in order to also delay channels which are not filtered.
+        matDataOut.block(0, iOrder/2, matDataIn.rows(), matDataOut.cols()-iOrder/2) = matDataIn.block(0, 0, matDataIn.rows(), matDataOut.cols()-iOrder/2);
+        matDataOut.block(0, 0, matDataIn.rows(), iOrder/2) = m_matDelay;
+
         QFuture<void> future = QtConcurrent::map(timeData,
-                                                 doFilterPerChannelRTMSA);
+                                                 filterChannel);
 
         future.waitForFinished();
 
         //Do the overlap add method and store in matDataOut
         int iFilteredNumberCols = timeData.at(0).vecData.cols();
+        RowVectorXd tempData;
 
         for(int r = 0; r < timeData.size(); r++) {
             //Get the currently filtered data. This data has a delay of filterLength/2 in front and back.
-            RowVectorXd tempData = timeData.at(r).vecData;
+            tempData = timeData.at(r).vecData;
 
-            //Perform the actual overlap add by adding the last filterlength data to the newly filtered one
+            //Perform the actual overlap add by adding the last filter length data to the newly filtered one
             tempData.head(iOrder) += m_matOverlap.row(timeData.at(r).iRow);
 
-            //Write the newly calulated filtered data to the filter data matrix. Keep in mind that the current block also effect last part of the last block (begin at dataIndex-iFilterDelay).
+            //Write the newly calculated filtered data to the filter data matrix.
+            //Keep in mind that the current block also effect last part of the last block (begin at dataIndex-iFilterDelay).
             int start = 0;
             matDataOut.row(timeData.at(r).iRow).segment(start,iFilteredNumberCols-iOrder) = tempData.head(iFilteredNumberCols-iOrder);
 
             //Refresh the m_matOverlap with the new calculated filtered data.
             m_matOverlap.row(timeData.at(r).iRow) = timeData.at(r).vecData.tail(iOrder);
         }
-    }
 
-    if(matDataIn.cols() >= iOrder/2) {
-        m_matDelay = matDataIn.block(0, matDataIn.cols()-iOrder/2, matDataIn.rows(), iOrder/2);
-    } else {
-        qWarning() << "[RtFilter::filterDataBlock] Half of filter length is larger than data size. Not filling m_matDelay for next step.";
+        if(matDataIn.cols() >= iOrder/2) {
+            m_matDelay = matDataIn.block(0, matDataIn.cols()-iOrder/2, matDataIn.rows(), iOrder/2);
+        } else {
+            qWarning() << "[RtFilter::filterDataBlock] Half of filter length is larger than data size. Not filling m_matDelay for next step.";
+        }
     }
 
     return matDataOut;
@@ -176,6 +180,7 @@ MatrixXd RtFilter::filterData(const MatrixXd& matDataIn,
     // create output matrix with size of inputmatrix and temporal input matrix with size of pick
     MatrixXd matDataOut = matDataIn;
     MatrixXd sliceFiltered;
+
     // create filter
     FilterData filter = FilterData("rt_filter",
                                    type,
