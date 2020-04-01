@@ -707,6 +707,14 @@ void FiffRawViewModel::newTimeMark(const float& xpos)
     qDebug() << "DX" << m_dDx;
     //Get absolute sample number of where we clicked
     float fSample = absoluteFirstSample() + (float)getSampleScrollPos() + (xpos/m_dDx);
+
+    for (float samp : timeMarkList) {
+        if(fSample == samp) {
+            qWarning() << "User attempted to add overlaping markers. Discarding new marker.";
+            return;
+        }
+    }
+
     timeMarkList.append(fSample);
     std::sort(timeMarkList.begin(),timeMarkList.end());
 }
