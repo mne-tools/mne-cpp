@@ -137,9 +137,9 @@ int main(int argc, char *argv[])
 
     splashscreen->finish(&mainWin);
 
-    QSurfaceFormat fmt;
-    fmt.setSamples(10);
-    QSurfaceFormat::setDefaultFormat(fmt);
+//    QSurfaceFormat fmt;
+//    fmt.setSamples(10);
+//    QSurfaceFormat::setDefaultFormat(fmt);
 
     return app.exec();
 }

@@ -89,6 +89,7 @@ NoiseReduction::NoiseReduction()
 , m_bCompActivated(false)
 , m_sCurrentSystem("VectorView")
 , m_iMaxFilterLength(1)
+, m_pCircularBuffer(QSharedPointer<IOBUFFER::CircularBuffer_Matrix_double>::create(40))
 {
     if(m_sCurrentSystem == "BabyMEG") {
         m_iNBaseFctsFirst = 270;
@@ -99,7 +100,7 @@ NoiseReduction::NoiseReduction()
     } else {
         m_iNBaseFctsFirst = 0;
         m_iNBaseFctsSecond = 0;
-        qDebug() << "Current system type not recognized.";
+        qDebug() << "[NoiseReduction::NoiseReduction] Current system type not recognized.";
     }
 }
 
@@ -162,8 +163,6 @@ bool NoiseReduction::stop()
 
     m_pNoiseReductionOutput->data()->clear();
 
-    m_pFiffInfo = Q_NULLPTR;
-
     return true;
 }
 
@@ -214,18 +213,12 @@ void NoiseReduction::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             //Init output
             m_pNoiseReductionOutput->data()->initFromFiffInfo(m_pFiffInfo);
             m_pNoiseReductionOutput->data()->setMultiArraySize(1);
-            m_pNoiseReductionOutput->data()->setVisibility(true);
         }
 
         // Check if data is present
         if(pRTMSA->getMultiSampleArray().size() > 0) {
             //Init widgets
             if(m_iMaxFilterTapSize == -1) {
-                //Check if buffer was initialized
-                if(!m_pCircularBuffer) {
-                    m_pCircularBuffer = QSharedPointer<CircularBuffer_Matrix_double>(new CircularBuffer_Matrix_double(10));
-                }
-
                 m_iMaxFilterTapSize = pRTMSA->getMultiSampleArray().first().cols();
                 initPluginControlWidgets();
                 QThread::start();
@@ -283,7 +276,6 @@ void NoiseReduction::initPluginControlWidgets()
 
         connect(pFilterSettingsView, &FilterSettingsView::filterActivationChanged,
                 this, &NoiseReduction::setFilterActive);
-
 
         pFilterSettingsView->getFilterView()->init(m_pFiffInfo->sfreq);
         pFilterSettingsView->getFilterView()->setWindowSize(m_iMaxFilterTapSize);

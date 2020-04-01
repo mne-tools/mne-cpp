@@ -186,9 +186,7 @@ bool LSLAdapter::start()
 
 bool LSLAdapter::stop()
 {
-    // make sure that this thread is completely finished
-    //this->wait();
-    // clear data in RTMSA
+    // Clear all data in the buffer connected to displays and other plugins
     m_pRTMSA->data()->clear();
 
     // stop the producer and wait for it

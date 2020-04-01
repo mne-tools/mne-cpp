@@ -156,7 +156,9 @@ bool FtBuffer::stop()
     m_pFtBuffProducer.clear();
     m_pFtBuffProducer = QSharedPointer<FtBuffProducer>::create(this);
 
+    // Clear all data in the buffer connected to displays and other plugins
     m_pRTMSA_BufferOutput->data()->clear();
+    m_pCircularBuffer->clear();
 
     qInfo() << "[FtBuffer::stop] Stopped.";
     return true;
