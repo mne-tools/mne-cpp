@@ -81,8 +81,11 @@ using namespace FWDLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-HPIFit::HPIFit(FiffInfo::SPtr pFiffInfo)
+HPIFit::HPIFit(FiffInfo::SPtr pFiffInfo, bool bDoFastFit)
+    : m_bDoFastFit(bDoFastFit)
+    , m_bUpdateModel(true)
 {
+    qDebug() << "hier";
     // init channel list and SensorSet
     m_lChannels = QList<FIFFLIB::FiffChInfo>();
     m_vInnerind = QVector<int>();
@@ -96,6 +99,7 @@ HPIFit::HPIFit(FiffInfo::SPtr pFiffInfo)
     updateChannels(pFiffInfo);
     updateSensor();
 
+    m_bUpdateModel = true;
 }
 
 //=============================================================================================================
@@ -127,6 +131,12 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
         m_lBads = pFiffInfo->bads;
         updateChannels(pFiffInfo);
         updateSensor();
+        m_bUpdateModel = true;
+    }
+
+    // check if we have to update the model
+    if(m_bUpdateModel) {
+        updateModel(pFiffInfo->sfreq,t_mat.cols(),/*pFiffInfo->linefreq*/ 60 ,vecFreqs);
     }
 
     // Make sure the fitted digitzers are empty
@@ -135,8 +145,6 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
     // init coil parameters
     struct CoilParam coil;
 
-    int iSamF = pFiffInfo->sfreq;
-    int iSamLoc = t_mat.cols(); // minimum samples required to localize numLoc times in a second
 
     //Get HPI coils from digitizers and set number of coils
     int iNumCoils = 0;
@@ -202,65 +210,36 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
         matInnerdata.row(j) << t_mat.row(m_vInnerind[j]);
     }
 
-    // Generate simulated data
-    MatrixXd matSimsig(iSamLoc,iNumCoils*4);
-    MatrixXd matInvSimsig = matSimsig.transpose();      // inverse
-    MatrixXd matInvSimsigR = matInvSimsig;              // reordered
-    VectorXd vecTime = VectorXd::LinSpaced(iSamLoc, 0, iSamLoc-1) *1.0/iSamF;
-
-    // ToDo: get linefreq from fiffInfo
-    int iLineFreq  = 60; // in Hz
-
-    for(int i = 0; i < iNumCoils; ++i) {
-        matSimsig.col(i) = sin(2*M_PI*vecCoilfreq[i]*vecTime.array());
-        matSimsig.col(i+iNumCoils) = cos(2*M_PI*vecCoilfreq[i]*vecTime.array());
-        matSimsig.col(i+2*iNumCoils) = sin(2*M_PI*iLineFreq*i*vecTime.array());
-        matSimsig.col(i+3*iNumCoils) = cos(2*M_PI*iLineFreq*i*vecTime.array());
-    }
-    matSimsig.col(14) = RowVectorXd::LinSpaced(iSamLoc, -0.5, 0.5);
-    matSimsig.col(15).fill(1);
-
-    matInvSimsig = UTILSLIB::MNEMath::pinv(matSimsig);
-
-    // reorder for faster computation
-    RowVectorXi vecIndex(2*iNumCoils);
-    vecIndex << 0,4,1,5,2,6,3,7;
-    for(int i = 0; i < vecIndex.size(); ++i) {
-        matInvSimsigR.row(i) = matInvSimsig.row(vecIndex(i));
-    }
-
     // Calculate topo
     MatrixXd matTopo(m_vInnerind.size(), iNumCoils*2);
     MatrixXd matAmp(m_vInnerind.size(), iNumCoils);
     MatrixXd matAmpC(m_vInnerind.size(), iNumCoils);
 
-    matTopo = matInvSimsigR * matInnerdata.transpose(); // topo: # of good inner channel x 8
-    //qDebug() << "topo rxc :" << topo.rows() << " x " << topo.cols();
-    for(int i = 0; i < iNumCoils; ++i) {
-        int from = 2*i;
-        MatrixXd m = matTopo.block(from,0,2,matTopo.cols());
-        JacobiSVD<MatrixXd> svd(m, ComputeThinU | ComputeThinV);
-        matAmp.col(i) = svd.singularValues()(0) * svd.matrixV().col(0);
+    matTopo = m_matModel * matInnerdata.transpose(); // topo: # of good inner channel x 8
+
+    if(!m_bDoFastFit) {
+        for(int i = 0; i < iNumCoils; ++i) {
+            int from = 2*i;
+            MatrixXd m = matTopo.block(from,0,2,matTopo.cols());
+            JacobiSVD<MatrixXd> svd(m, ComputeThinU | ComputeThinV);
+            matAmp.col(i) = svd.singularValues()(0) * svd.matrixV().col(0);
+        }
+    } else {
+        // Select sine or cosine component depending on the relative size
+        matAmp  = matTopo.transpose().leftCols(iNumCoils); // amp: # of good inner channel x 4
+        matAmpC = matTopo.transpose().rightCols(iNumCoils);
+
+        for(int j = 0; j < iNumCoils; ++j) {
+           float fNS = 0.0;
+           float fNC = 0.0;
+           fNS = matAmp.col(j).array().square().sum();
+           fNC = matAmpC.col(j).array().square().sum();
+
+           if(fNC > fNS) {
+               matAmp.col(j) = matAmpC.col(j);
+           }
+        }
     }
-
-    // Select sine or cosine component depending on the relative size
-//    amp  = topo.leftCols(numCoils); // amp: # of good inner channel x 4
-//    ampC = topo.rightCols(numCoils);
-
-//    for(int j = 0; j < numCoils; ++j) {
-//       float nS = 0.0;
-//       float nC = 0.0;
-//       for(int i = 0; i < innerind.size(); ++i) {
-//           nS += amp(i,j)*amp(i,j);
-//           nC += ampC(i,j)*ampC(i,j);
-//       }
-
-//       if(nC > nS) {
-//         for(int i = 0; i < innerind.size(); ++i) {
-//           amp(i,j) = ampC(i,j);
-//         }
-//       }
-//    }
 
     //Find good seed point/starting point for the coil position in 3D space
     //Find biggest amplitude per pickup coil (sensor) and store corresponding sensor channel index
@@ -416,7 +395,8 @@ void HPIFit::findOrder(const MatrixXd& t_mat,
     for(int i = 0; i < vecFreqs.size(); i++){
         vecFreqTemp.fill(vecFreqs[i]);
 
-        // hpi Fit
+        // update model and hpi Fit
+        updateModel(pFiffInfo->sfreq,t_mat.cols(),/*pFiffInfo->linefreq*/ 60 ,vecFreqTemp);
         fitHPI(t_mat, t_matProjectors, transDevHeadTemp, vecFreqTemp, vecErrorTemp, vecGoFTemp, fittedPointSetTemp, pFiffInfoTemp);
 
         // get location of maximum GoF -> correct assignment of coil - frequency
@@ -437,9 +417,10 @@ void HPIFit::findOrder(const MatrixXd& t_mat,
         vecErrorTemp = vecError;
         vecGoFTemp = vecGoF;
     }
-    // check if still all frequencies are represented
+    // check if still all frequencies are represented and update model
     if(std::accumulate(vecFreqs.begin(), vecFreqs.end(), .0) ==  std::accumulate(vecToOrder.begin(), vecToOrder.end(), .0)) {
         vecFreqs = vecToOrder;
+        updateModel(pFiffInfo->sfreq,t_mat.cols(),/*pFiffInfo->linefreq*/ 60 ,vecFreqs);
     } else {
         qWarning() << "HPIFit::findOrder: frequencie ordering went wrong";
     }
@@ -575,6 +556,7 @@ void HPIFit::createSensorSet(SensorSet& sensors, FwdCoilSet* coils)
     sensors.ncoils = iNchan;
     sensors.tra = MatrixXd::Identity(iNchan,iNchan);
     sensors.np = iNp;
+
     for(int i = 0; i < iNchan; i++){
         FwdCoil* coil = (coils->coils[i]);
         MatrixXd matRmag = MatrixXd::Zero(iNp,3);
@@ -666,4 +648,47 @@ void HPIFit::updateChannels(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo)
         }
     }
     m_lBads = pFiffInfo->bads;
+}
+
+//=============================================================================================================
+
+void HPIFit::updateModel(const int iSamF,const int iSamLoc, int iLineF, const QVector<int>& vecFreqs)
+{
+    int iNumCoils = vecFreqs.size();
+    MatrixXd matSimsig;
+    MatrixXd matInvSimsig;
+    VectorXd vecTime = VectorXd::LinSpaced(iSamLoc, 0, iSamLoc-1) *1.0/iSamF;
+
+    if(m_bDoFastFit){
+        // Generate simulated data Matrix
+        matSimsig.resize(iSamLoc,iNumCoils*2);
+
+        for(int i = 0; i < iNumCoils; ++i) {
+            matSimsig.col(i) = sin(2*M_PI*vecFreqs[i]*vecTime.array());
+            matSimsig.col(i+iNumCoils) = cos(2*M_PI*vecFreqs[i]*vecTime.array());
+        }
+
+    } else {
+        // add linefreq + harmonics + DC part to model
+        matSimsig.conservativeResize(iSamLoc,iNumCoils*4);
+        for(int i = 0; i < iNumCoils; ++i) {
+            matSimsig.col(i+2*iNumCoils) = sin(2*M_PI*iLineF*i*vecTime.array());
+            matSimsig.col(i+3*iNumCoils) = cos(2*M_PI*iLineF*i*vecTime.array());
+        }
+        matSimsig.col(14) = RowVectorXd::LinSpaced(iSamLoc, -0.5, 0.5);
+        matSimsig.col(15).fill(1);
+    }
+    matInvSimsig = UTILSLIB::MNEMath::pinv(matSimsig);
+
+    // reorder for faster computation
+    MatrixXd matTemp = matInvSimsig;
+    RowVectorXi vecIndex(2*iNumCoils);
+    vecIndex << 0,4,1,5,2,6,3,7;
+    for(int i = 0; i < vecIndex.size(); ++i) {
+        matTemp.row(i) = matInvSimsig.row(vecIndex(i));
+    }
+    matInvSimsig = matTemp;
+
+    m_matModel = matInvSimsig;
+    m_bUpdateModel = false;
 }
