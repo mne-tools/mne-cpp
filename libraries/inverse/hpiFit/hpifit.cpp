@@ -136,7 +136,7 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
 
     // check if we have to update the model
     if(m_bUpdateModel) {
-        updateModel(pFiffInfo->sfreq,t_mat.cols(),/*pFiffInfo->linefreq*/ 60 ,vecFreqs);
+        updateModel(pFiffInfo->sfreq,t_mat.cols(),pFiffInfo->linefreq,vecFreqs);
     }
 
     // Make sure the fitted digitzers are empty
@@ -396,7 +396,7 @@ void HPIFit::findOrder(const MatrixXd& t_mat,
         vecFreqTemp.fill(vecFreqs[i]);
 
         // update model and hpi Fit
-        updateModel(pFiffInfo->sfreq,t_mat.cols(),/*pFiffInfo->linefreq*/ 60 ,vecFreqTemp);
+        updateModel(pFiffInfo->sfreq,t_mat.cols(),pFiffInfo->linefreq,vecFreqTemp);
         fitHPI(t_mat, t_matProjectors, transDevHeadTemp, vecFreqTemp, vecErrorTemp, vecGoFTemp, fittedPointSetTemp, pFiffInfoTemp);
 
         // get location of maximum GoF -> correct assignment of coil - frequency
@@ -410,17 +410,17 @@ void HPIFit::findOrder(const MatrixXd& t_mat,
         fittedPointSetTemp = fittedPointSet;
         pFiffInfoTemp = pFiffInfo;
         transDevHeadTemp = transDevHead;
+
         if(bIdentity) {
             transDevHeadTemp.trans(3,0) = 0.000001;
         }
-
         vecErrorTemp = vecError;
         vecGoFTemp = vecGoF;
     }
     // check if still all frequencies are represented and update model
     if(std::accumulate(vecFreqs.begin(), vecFreqs.end(), .0) ==  std::accumulate(vecToOrder.begin(), vecToOrder.end(), .0)) {
         vecFreqs = vecToOrder;
-        updateModel(pFiffInfo->sfreq,t_mat.cols(),/*pFiffInfo->linefreq*/ 60 ,vecFreqs);
+        updateModel(pFiffInfo->sfreq,t_mat.cols(),pFiffInfo->linefreq,vecFreqs);
     } else {
         qWarning() << "HPIFit::findOrder: frequencie ordering went wrong";
     }
