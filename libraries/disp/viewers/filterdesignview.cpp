@@ -478,7 +478,7 @@ void FilterDesignView::filterParametersChanged()
 
     int fftLength = m_iWindowSize + ui->m_spinBox_filterTaps->value() * 4; // *2 to take into account the overlap in front and back after the convolution. Another *2 to take into account the appended and prepended data.
     int exp = ceil(MNEMath::log2(fftLength));
-    fftLength = pow(2, exp) <512 ? 512 : pow(2, exp);
+    fftLength = pow(2, exp) < 512 ? 512 : pow(2, exp);
 
 //    qDebug() <<"fftLength: "<<fftLength;
 //    qDebug()<<"m_iWindowSize: "<<m_iWindowSize;
