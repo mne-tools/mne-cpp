@@ -39,6 +39,17 @@
 //=============================================================================================================
 
 #include "dummyyourwidget.h"
+#include "../ui_dummyyourwidget.h"
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QSettings>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -50,16 +61,48 @@ using namespace DUMMYTOOLBOXPLUGIN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DummyYourWidget::DummyYourWidget(QWidget *parent)
+DummyYourWidget::DummyYourWidget(const QString& sSettingsPath,
+                                 QWidget *parent)
 : QWidget(parent)
-, ui(new Ui::DummyYourToolbarWidget)
+, m_pUi(new Ui::DummyYourWidgetGui)
+, m_sSettingsPath(sSettingsPath)
 {
-    ui->setupUi(this);
+    m_pUi->setupUi(this);
+
+    loadSettings(m_sSettingsPath);
 }
 
 //=============================================================================================================
 
 DummyYourWidget::~DummyYourWidget()
 {
-    delete ui;
+    saveSettings(m_sSettingsPath);
+
+    delete m_pUi;
+}
+
+//=============================================================================================================
+
+void DummyYourWidget::saveSettings(const QString& settingsPath)
+{
+    if(settingsPath.isEmpty()) {
+        return;
+    }
+
+    QSettings settings;
+
+    settings.setValue(settingsPath + QString("/dummy"), m_pUi->m_pDoubleSpinBox_dummy->value());
+}
+
+//=============================================================================================================
+
+void DummyYourWidget::loadSettings(const QString& settingsPath)
+{
+    if(settingsPath.isEmpty()) {
+        return;
+    }
+
+    QSettings settings;
+
+    m_pUi->m_pDoubleSpinBox_dummy->setValue(settings.value(settingsPath + QString("/dummy"), 10).toInt());
 }
