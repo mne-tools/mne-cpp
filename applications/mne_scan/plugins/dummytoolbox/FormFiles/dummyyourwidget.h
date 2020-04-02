@@ -41,13 +41,23 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_dummyyourtoolbarwidget.h"
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QWidget>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace Ui{
+    class DummyYourWidgetGui;
+}
 
 //=============================================================================================================
 // DEFINE NAMESPACE DUMMYTOOLBOXPLUGIN
@@ -64,7 +74,7 @@ namespace DUMMYTOOLBOXPLUGIN
 /**
  * DECLARE CLASS DummyYourWidget
  *
- * @brief The DummyToolbox class provides a dummy toolbar widget structure.
+ * @brief The DummyToolbox class provides a dummy widget.
  */
 class DummyYourWidget : public QWidget
 {
@@ -78,7 +88,8 @@ public:
     /**
      * Constructs a DummyToolbox.
      */
-    explicit DummyYourWidget(QWidget *parent = 0);
+    explicit DummyYourWidget(const QString& sSettingsPath = "",
+                             QWidget *parent = 0);
 
     //=========================================================================================================
     /**
@@ -87,7 +98,25 @@ public:
     ~DummyYourWidget();
 
 private:
-    Ui::DummyYourToolbarWidget* ui;        /**< The UI class specified in the designer. */
+    //=========================================================================================================
+    /**
+     * Saves all important settings of this view via QSettings.
+     *
+     * @param[in] settingsPath        the path to store the settings to.
+     */
+    void saveSettings(const QString& settingsPath);
+
+    //=========================================================================================================
+    /**
+     * Loads and inits all important settings of this view via QSettings.
+     *
+     * @param[in] settingsPath        the path to load the settings from.
+     */
+    void loadSettings(const QString& settingsPath);
+
+    Ui::DummyYourWidgetGui*     m_pUi;              /**< The UI class specified in the designer. */
+    QString                     m_sSettingsPath;    /**< The settings path to store the GUI settings to. */
+
 };
 }   //namespace
 
