@@ -65,15 +65,8 @@ using namespace Eigen;
 //=============================================================================================================
 
 DummyToolbox::DummyToolbox()
-: m_pDummyBuffer(CircularBuffer_Matrix_double::SPtr::create(16))
+: m_pCircularBuffer(CircularBuffer_Matrix_double::SPtr::create(40))
 {
-    //Add action which will be visible in the plugin's toolbar
-    m_pActionShowYourWidget = new QAction(QIcon(":/images/options.png"), tr("Your Toolbar Widget"),this);
-    m_pActionShowYourWidget->setShortcut(tr("F12"));
-    m_pActionShowYourWidget->setStatusTip(tr("Your Toolbar Widget"));
-    connect(m_pActionShowYourWidget, &QAction::triggered,
-            this, &DummyToolbox::showYourWidget);
-    addPluginAction(m_pActionShowYourWidget);
 }
 
 //=============================================================================================================
@@ -89,8 +82,8 @@ DummyToolbox::~DummyToolbox()
 
 QSharedPointer<IPlugin> DummyToolbox::clone() const
 {
-    QSharedPointer<DummyToolbox> pDummyToolboxClone(new DummyToolbox);
-    return pDummyToolboxClone;
+    QSharedPointer<DummyToolbox> pClone(new DummyToolbox);
+    return pClone;
 }
 
 //=============================================================================================================
@@ -98,14 +91,16 @@ QSharedPointer<IPlugin> DummyToolbox::clone() const
 void DummyToolbox::init()
 {
     // Input
-    m_pDummyInput = PluginInputData<RealTimeMultiSampleArray>::create(this, "DummyIn", "Dummy input data");
-    connect(m_pDummyInput.data(), &PluginInputConnector::notify, this, &DummyToolbox::update, Qt::DirectConnection);
-    m_inputConnectors.append(m_pDummyInput);
+    m_pInput = PluginInputData<RealTimeMultiSampleArray>::create(this, "DummyIn", "Dummy input data");
+    connect(m_pInput.data(), &PluginInputConnector::notify,
+            this, &DummyToolbox::update, Qt::DirectConnection);
+    m_inputConnectors.append(m_pInput);
 
     // Output - Uncomment this if you don't want to send processed data (in form of a matrix) to other plugins.
     // Also, this output stream will generate an online display in your plugin
-    m_pDummyOutput = PluginOutputData<RealTimeMultiSampleArray>::create(this, "DummyOut", "Dummy output data");
-    m_outputConnectors.append(m_pDummyOutput);
+    m_pOutput = PluginOutputData<RealTimeMultiSampleArray>::create(this, "DummyOut", "Dummy output data");
+    m_pOutput->data()->setName(this->getName());
+    m_outputConnectors.append(m_pOutput);
 }
 
 //=============================================================================================================
@@ -131,6 +126,12 @@ bool DummyToolbox::stop()
     requestInterruption();
     wait(500);
 
+    // Clear all data in the buffer connected to displays and other plugins
+    m_pOutput->data()->clear();
+    m_pCircularBuffer->clear();
+
+    m_bPluginControlWidgetsInit = false;
+
     return true;
 }
 
@@ -152,7 +153,7 @@ QString DummyToolbox::getName() const
 
 QWidget* DummyToolbox::setupWidget()
 {
-    DummySetupWidget* setupWidget = new DummySetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
+    DummySetupWidget* setupWidget = new DummySetupWidget(this);
     return setupWidget;
 }
 
@@ -160,17 +161,17 @@ QWidget* DummyToolbox::setupWidget()
 
 void DummyToolbox::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
-
-    if(pRTMSA) {
+    if(QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>()) {
         //Fiff information
         if(!m_pFiffInfo) {
             m_pFiffInfo = pRTMSA->info();
 
-            //Init output - Unocmment this if you also uncommented the m_pDummyOutput in the constructor above
-            m_pDummyOutput->data()->initFromFiffInfo(m_pFiffInfo);
-            m_pDummyOutput->data()->setMultiArraySize(1);
-            m_pDummyOutput->data()->setVisibility(true);
+            m_pOutput->data()->initFromFiffInfo(m_pFiffInfo);
+            m_pOutput->data()->setMultiArraySize(1);
+        }
+
+        if(!m_bPluginControlWidgetsInit) {
+            initPluginControlWidgets();
         }
 
         MatrixXd matData;
@@ -179,7 +180,7 @@ void DummyToolbox::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             // Please note that we do not need a copy here since this function will block until
             // the buffer accepts new data again. Hence, the data is not deleted in the actual
             // Mesaurement function after it emitted the notify signal.
-            while(!m_pDummyBuffer->push(pRTMSA->getMultiSampleArray()[i])) {
+            while(!m_pCircularBuffer->push(pRTMSA->getMultiSampleArray()[i])) {
                 //Do nothing until the circular buffer is ready to accept new data again
             }
         }
@@ -188,32 +189,44 @@ void DummyToolbox::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 //=============================================================================================================
 
-void DummyToolbox::run()
+void DummyToolbox::initPluginControlWidgets()
 {
-    // Wait for Fiff Info
-    MatrixXd matData;
+    if(m_pFiffInfo) {
+        QList<QWidget*> plControlWidgets;
 
-    while(!m_pFiffInfo)
-        msleep(10);// Wait for fiff Info
+        // The plugin's control widget
+        DummyYourWidget* pYourWidget = new DummyYourWidget(QString("MNESCAN/%1/").arg(this->getName()));
+        pYourWidget->setObjectName("group_tab_Settings_Your Widget");
 
-    while(!isInterruptionRequested()) {
-        // Get the current data
-        if(m_pDummyBuffer->pop(matData)) {
-            //ToDo: Implement your algorithm here
+        plControlWidgets.append(pYourWidget);
 
-            //Send the data to the connected plugins and the online display
-            //Unocmment this if you also uncommented the m_pDummyOutput in the constructor above
-            if(!isInterruptionRequested()) {
-                m_pDummyOutput->data()->setValue(matData);
-            }
-        }
+        emit pluginControlWidgetsChanged(plControlWidgets, this->getName());
+
+        m_bPluginControlWidgetsInit = true;
     }
 }
 
 //=============================================================================================================
 
-void DummyToolbox::showYourWidget()
+void DummyToolbox::run()
 {
-    m_pYourWidget = DummyYourWidget::SPtr(new DummyYourWidget());
-    m_pYourWidget->show();
+    MatrixXd matData;
+
+    // Wait for Fiff Info
+    while(!m_pFiffInfo) {
+        msleep(10);
+    }
+
+    while(!isInterruptionRequested()) {
+        // Get the current data
+        if(m_pCircularBuffer->pop(matData)) {
+            //ToDo: Implement your algorithm here
+
+            //Send the data to the connected plugins and the online display
+            //Unocmment this if you also uncommented the m_pOutput in the constructor above
+            if(!isInterruptionRequested()) {
+                m_pOutput->data()->setValue(matData);
+            }
+        }
+    }
 }

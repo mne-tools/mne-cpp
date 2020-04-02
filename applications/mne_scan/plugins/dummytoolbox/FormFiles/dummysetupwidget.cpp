@@ -74,11 +74,3 @@ DummySetupWidget::DummySetupWidget(DummyToolbox* toolbox, QWidget *parent)
 DummySetupWidget::~DummySetupWidget()
 {
 }
-
-//=============================================================================================================
-
-void DummySetupWidget::showAboutDialog()
-{
-    DummyAboutWidget aboutDialog(this);
-    aboutDialog.exec();
-}

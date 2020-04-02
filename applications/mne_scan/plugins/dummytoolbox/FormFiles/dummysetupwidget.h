@@ -40,7 +40,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "dummyaboutwidget.h"
 #include "../dummytoolbox.h"
 
 //=============================================================================================================
@@ -98,19 +97,10 @@ public:
      */
     ~DummySetupWidget();
 
-private slots:
-    //=========================================================================================================
-    /**
-     * Shows the About Dialog
-     *
-     */
-    void showAboutDialog();
-
 private:
+    DummyToolbox*               m_pDummyToolbox;	/**< Holds a pointer to corresponding DummyToolbox.*/
 
-    DummyToolbox* m_pDummyToolbox;	/**< Holds a pointer to corresponding DummyToolbox.*/
-
-    Ui::DummySetupWidgetClass* m_pUi;	/**< Holds the user interface for the DummySetupWidget.*/
+    Ui::DummySetupWidgetClass*  m_pUi;              /**< Holds the user interface for the DummySetupWidget.*/
 };
 } // NAMESPACE
 
