@@ -68,8 +68,6 @@ FtBufferSetupWidget::FtBufferSetupWidget(FtBuffer* toolbox,
     loadSettings(m_sSettingsPath);
 
     //Always connect GUI elemts after ui.setpUi has been called
-    connect(ui.m_qPushButton_About, SIGNAL(released()),
-            this, SLOT(showAboutDialog())); // About page
     connect(ui.m_qPushButton_Connect, SIGNAL(released()),
             this, SLOT(pressedConnect())); // Connect/Disconnect button
 

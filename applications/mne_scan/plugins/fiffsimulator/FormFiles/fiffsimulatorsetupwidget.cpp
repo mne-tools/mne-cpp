@@ -38,7 +38,6 @@
 //=============================================================================================================
 
 #include "fiffsimulatorsetupwidget.h"
-#include "fiffsimulatoraboutwidget.h"
 
 #include "../fiffsimulator.h"
 
@@ -90,10 +89,6 @@ FiffSimulatorSetupWidget::FiffSimulatorSetupWidget(FiffSimulator* p_pFiffSimulat
     //CLI
     connect(ui.m_qPushButton_SendCLI, &QPushButton::released,
             this, &FiffSimulatorSetupWidget::pressedSendCLI);
-
-    //About
-    connect(ui.m_qPushButton_About, &QPushButton::released,
-            this, &FiffSimulatorSetupWidget::showAboutDialog);
 
     this->init();
 }
@@ -231,12 +226,4 @@ void FiffSimulatorSetupWidget::fiffInfoReceived()
 {
     if(m_pFiffSimulator->m_pFiffInfo)
         this->ui.m_qLabel_sps->setText(QString("%1").arg(m_pFiffSimulator->m_pFiffInfo->sfreq));
-}
-
-//=============================================================================================================
-
-void FiffSimulatorSetupWidget::showAboutDialog()
-{
-    FiffSimulatorAboutWidget aboutDialog(this);
-    aboutDialog.exec();
 }

@@ -97,7 +97,6 @@ SOURCES += \
         tmsi.cpp \
         tmsiproducer.cpp \
         FormFiles/tmsisetupwidget.cpp \
-        FormFiles/tmsiaboutwidget.cpp \
         tmsidriver.cpp \
         FormFiles/tmsimanualannotationwidget.cpp \
         FormFiles/tmsiimpedancewidget.cpp \
@@ -111,7 +110,6 @@ HEADERS += \
         tmsi_global.h \
         tmsiproducer.h \
         FormFiles/tmsisetupwidget.h \
-        FormFiles/tmsiaboutwidget.h \
         tmsidriver.h \
         FormFiles/tmsimanualannotationwidget.h \
         FormFiles/tmsiimpedancewidget.h \
@@ -122,7 +120,6 @@ HEADERS += \
 
 FORMS += \
         FormFiles/tmsisetup.ui \
-        FormFiles/tmsiabout.ui \
         FormFiles/tmsimanualannotation.ui \
         FormFiles/tmsiimpedancewidget.ui \
         FormFiles/tmsisetupprojectwidget.ui

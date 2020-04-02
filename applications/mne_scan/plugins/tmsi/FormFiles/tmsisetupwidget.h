@@ -119,13 +119,6 @@ private:
      */
     void setTriggerProperties();
 
-    //=========================================================================================================
-    /**
-     * Shows the About Dialog
-     *
-     */
-    void showAboutDialog();
-
     TMSI*               m_pTMSI;                 /**< a pointer to corresponding TMSI.*/
 
     Ui::TMSISetupClass  ui;                      /**< the user interface for the TMSISetupWidget.*/
