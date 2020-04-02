@@ -72,18 +72,15 @@ CONFIG(debug, debug|release) {
 SOURCES += \
     fiffsimulatorproducer.cpp \
     fiffsimulator.cpp \
-    FormFiles/fiffsimulatoraboutwidget.cpp \
     FormFiles/fiffsimulatorsetupwidget.cpp
 
 HEADERS += \
     fiffsimulator_global.h \
     fiffsimulatorproducer.h \
     fiffsimulator.h \
-    FormFiles/fiffsimulatoraboutwidget.h \
     FormFiles/fiffsimulatorsetupwidget.h
 
 FORMS += \
-    FormFiles/fiffsimulatorabout.ui \
     FormFiles/fiffsimulatorsetup.ui
 
 RESOURCE_FILES +=\

@@ -38,7 +38,6 @@
 //=============================================================================================================
 
 #include "tmsisetupwidget.h"
-#include "tmsiaboutwidget.h"
 #include "../tmsi.h"
 
 //=============================================================================================================
@@ -92,9 +91,6 @@ TMSISetupWidget::TMSISetupWidget(TMSI* pTMSI, QWidget* parent)
             this, &TMSISetupWidget::setTriggerProperties);
     connect(ui.m_checkBox_EnableKeyboardTrigger, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &TMSISetupWidget::setTriggerProperties);
-
-    //Connect about button
-    connect(ui.m_qPushButton_About, &QPushButton::released, this, &TMSISetupWidget::showAboutDialog);
 
     //Fill info box
     QFile file(m_pTMSI->m_qStringResourcePath+"readme.txt");
@@ -173,9 +169,3 @@ void TMSISetupWidget::setTriggerProperties()
 }
 
 //=============================================================================================================
-
-void TMSISetupWidget::showAboutDialog()
-{
-    TMSIAboutWidget aboutDialog(this);
-    aboutDialog.exec();
-}

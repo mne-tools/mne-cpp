@@ -119,12 +119,6 @@ private:
      */
     void cmdConnectionChanged(bool p_bConnectionStatus);
 
-    //=========================================================================================================
-    /**
-     * Shows the About Dialog
-     */
-    void showAboutDialog();
-
     FiffSimulator*   m_pFiffSimulator;      /**< a pointer to corresponding mne rt client.*/
 
     Ui::FiffSimulatorSetupWidgetClass ui;   /**< the user interface for the MneRtClientSetupWidget.*/

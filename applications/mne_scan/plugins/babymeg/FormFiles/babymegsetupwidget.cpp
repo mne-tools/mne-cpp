@@ -38,7 +38,6 @@
 //=============================================================================================================
 
 #include "babymegsetupwidget.h"
-#include "babymegaboutwidget.h"
 
 #include "babymegsquidcontroldgl.h"
 
@@ -80,10 +79,6 @@ BabyMEGSetupWidget::BabyMEGSetupWidget(BabyMEG* p_pBabyMEG, QWidget* parent)
     connect(m_pBabyMEG, &BabyMEG::fiffInfoAvailable, this,
             &BabyMEGSetupWidget::fiffInfoReceived);
 
-    //About
-    connect(ui.m_qPushButton_About, &QPushButton::released,
-            this, &BabyMEGSetupWidget::showAboutDialog);
-
     //SQUID Control
     connect(ui.m_qPushButtonSqdCtrl, &QPushButton::released,
             this, &BabyMEGSetupWidget::showSqdCtrlDialog);
@@ -118,14 +113,6 @@ void BabyMEGSetupWidget::fiffInfoReceived()
 {
     if(m_pBabyMEG->m_pFiffInfo)
         this->ui.m_qLabel_sps->setText(QString("%1").arg(m_pBabyMEG->m_pFiffInfo->sfreq));
-}
-
-//=============================================================================================================
-
-void BabyMEGSetupWidget::showAboutDialog()
-{
-    BabyMEGAboutWidget aboutDialog(this);
-    aboutDialog.exec();
 }
 
 //=============================================================================================================

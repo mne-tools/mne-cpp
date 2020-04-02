@@ -74,7 +74,6 @@ SOURCES += \
     babymegclient.cpp \
     babymeginfo.cpp \
     FormFiles/babymegsetupwidget.cpp \
-    FormFiles/babymegaboutwidget.cpp \
     FormFiles/babymegsquidcontroldgl.cpp \
     FormFiles/globalobj.cpp \
     FormFiles/plotter.cpp \
@@ -85,14 +84,12 @@ HEADERS += \
     babymeginfo.h \
     babymeg_global.h \
     FormFiles/babymegsetupwidget.h \
-    FormFiles/babymegaboutwidget.h \
     FormFiles/babymegsquidcontroldgl.h \
     FormFiles/globalobj.h \
     FormFiles/plotter.h \
 
 FORMS += \
     FormFiles/babymegsetup.ui \
-    FormFiles/babymegabout.ui \
     FormFiles/babymegsquidcontroldgl.ui \
 
 RESOURCE_FILES +=\
