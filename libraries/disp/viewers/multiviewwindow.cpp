@@ -58,20 +58,11 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MultiViewWindow::MultiViewWindow(QWidget *parent)
-: QDockWidget(parent)
-, m_bWindowMode(false)
+MultiViewWindow::MultiViewWindow(QWidget *parent,
+                                 Qt::WindowFlags flags)
+: QDockWidget(parent, flags)
 {
-    m_pFloatingWindow = new QWidget(this->parentWidget(), Qt::Window);
-    QHBoxLayout *layout = new QHBoxLayout;
-    m_pFloatingWindow->setLayout(layout);
-    m_pFloatingWindow->setWindowFlags(Qt::WindowMinMaxButtonsHint);
-    m_pFloatingWindow->hide();
-
-    this->setFeatures(QDockWidget::DockWidgetFloatable);
-
-    connect(this, &QDockWidget::topLevelChanged,
-            this, &MultiViewWindow::onTopLevelChanged);
+    this->setWidget(parent);
 }
 
 //=============================================================================================================
@@ -79,24 +70,4 @@ MultiViewWindow::MultiViewWindow(QWidget *parent)
 MultiViewWindow::~MultiViewWindow()
 {
 
-}
-
-//=============================================================================================================
-
-void MultiViewWindow::onTopLevelChanged(bool bFlag)
-{
-    Q_UNUSED(bFlag)
-
-    if(!m_bWindowMode) {
-        m_pParent = this->parentWidget();
-        m_pFloatingWindow->layout()->addWidget(this);
-        this->setParent(m_pFloatingWindow);
-        m_pFloatingWindow->show();
-        m_bWindowMode = true;
-    } else if(m_pParent) {
-        m_pFloatingWindow->layout()->removeWidget(this);
-        this->setParent(m_pParent);
-        m_pFloatingWindow->hide();
-        m_bWindowMode = false;
-    }
 }
