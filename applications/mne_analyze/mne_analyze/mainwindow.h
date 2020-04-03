@@ -128,13 +128,13 @@ private:
     void createActions();                                                                       /**< Creates all actions for user interface of MainWindow class. */
     void createMenus(QSharedPointer<ANSHAREDLIB::ExtensionManager> pExtensionManager);          /**< Creates all menus for user interface of MainWindow class. */
     void createDockWindows(QSharedPointer<ANSHAREDLIB::ExtensionManager> pExtensionManager);    /**< Creates all dock windows for user interface of MainWindow class. */
-    void createMdiView(QSharedPointer<ANSHAREDLIB::ExtensionManager> pExtensionManager);        /**< Creates all Windows within the MDI View for user interface of MainWindow class. */
+    void createMultiView(QSharedPointer<ANSHAREDLIB::ExtensionManager> pExtensionManager);      /**< Creates all Windows within the MultiView for user interface of MainWindow class. */
     void tabifyDockWindows();                                                                   /**< Tabify all dock windows */
     void about();                                                                               /**< Implements about action.*/
 
     QPointer<DISPLIB::MultiView>        m_pMultiView;       /**< The central View.*/
 
-    QPointer<QGridLayout>               m_pGridLayout;      /**< Grid Layout is used for MainWindow, so that the MdiArea can always fit the size of MainWindow */
+    QPointer<QGridLayout>               m_pGridLayout;      /**< Grid Layout is used for MainWindow, so that the MultiView can always fit the size of MainWindow */
 
     // MainWindow actions
     QPointer<QAction>                   m_pActionExit;      /**< exit application action */

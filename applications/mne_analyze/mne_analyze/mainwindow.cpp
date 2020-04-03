@@ -89,7 +89,7 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::ExtensionManager> pExtensionM
         createActions();
         createMenus(pExtensionManager);
         createDockWindows(pExtensionManager);
-        createMdiView(pExtensionManager);
+        createMultiView(pExtensionManager);
     }
     else {
         qDebug() << "[MainWindow::MainWindow] CRITICAL ! Extension manager is nullptr";
@@ -176,18 +176,28 @@ void MainWindow::createDockWindows(QSharedPointer<ANSHAREDLIB::ExtensionManager>
 
 //=============================================================================================================
 
-void MainWindow::createMdiView(QSharedPointer<ExtensionManager> pExtensionManager)
+void MainWindow::createMultiView(QSharedPointer<ExtensionManager> pExtensionManager)
 {
     m_pGridLayout = new QGridLayout(this);
-    m_pMultiView = new MultiView(this);
+    m_pMultiView = new MultiView();
     m_pGridLayout->addWidget(m_pMultiView);
+    m_pMultiView->show();
     setCentralWidget(m_pMultiView);
+
+    QString sCurExtensionName;
 
     //Add Extension views to mdi
     for(IExtension* pExtension : pExtensionManager->getExtensions()) {
         QWidget* pView = pExtension->getView();
         if(pView) {
-            MultiViewWindow* pWindow = m_pMultiView->addWidgetV(pView, pExtension->getName());
+            sCurExtensionName = pExtension->getName();
+            MultiViewWindow* pWindow = Q_NULLPTR;
+
+            if(sCurExtensionName == "RawDataViewer") {
+                pWindow = m_pMultiView->addWidgetBottom(pView, sCurExtensionName);
+            } else {
+                pWindow = m_pMultiView->addWidgetTop(pView, sCurExtensionName);
+            }
 
             QAction* action = new QAction(pExtension->getName(), this);
             action->setCheckable(true);
@@ -196,7 +206,7 @@ void MainWindow::createMdiView(QSharedPointer<ExtensionManager> pExtensionManage
             connect(action, &QAction::toggled,
                     pWindow, &MultiViewWindow::setVisible);
 
-            qDebug() << "[MainWindow::createMdiView] Found and added subwindow for " << pExtension->getName();
+            qDebug() << "[MainWindow::createMultiView] Found and added subwindow for " << pExtension->getName();
 
 //            QListView *listview = new QListView;
 //            QListView *listviewa = new QListView;
