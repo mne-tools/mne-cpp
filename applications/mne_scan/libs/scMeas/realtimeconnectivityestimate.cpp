@@ -66,10 +66,10 @@ using namespace FSLIB;
 
 RealTimeConnectivityEstimate::RealTimeConnectivityEstimate(QObject *parent)
 : Measurement(QMetaType::type("RealTimeConnectivityEstimate::SPtr"), parent)
-, m_pNetwork(Network::SPtr(new Network))
 , m_pAnnotSet(AnnotationSet::SPtr(new AnnotationSet))
 , m_pSurfSet(SurfaceSet::SPtr(new SurfaceSet))
 , m_pFwdSolution(MNEForwardSolution::SPtr(new MNEForwardSolution))
+, m_pNetwork(Network::SPtr(new Network))
 , m_bInitialized(false)
 {
 }

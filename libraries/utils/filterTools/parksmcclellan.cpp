@@ -93,7 +93,8 @@ using namespace Eigen;
 //=============================================================================================================
 
 ParksMcClellan::ParksMcClellan()
-: ExchangeIndex(SMALL)
+: HalfTapCount(0)
+, ExchangeIndex(SMALL)
 , LeGrangeD(SMALL)
 , Alpha(SMALL)
 , CosOfGrid(SMALL)
@@ -106,14 +107,14 @@ ParksMcClellan::ParksMcClellan()
 , Grid(BIG)
 , Weight(BIG)
 , InitDone2(false)
-, HalfTapCount(0)
 {
 }
 
 //=============================================================================================================
 
 ParksMcClellan::ParksMcClellan(int NumTaps, double OmegaC, double BW, double ParksWidth, TPassType PassType)
-: ExchangeIndex(SMALL)
+: HalfTapCount(0)
+, ExchangeIndex(SMALL)
 , LeGrangeD(SMALL)
 , Alpha(SMALL)
 , CosOfGrid(SMALL)
@@ -126,7 +127,6 @@ ParksMcClellan::ParksMcClellan(int NumTaps, double OmegaC, double BW, double Par
 , Grid(BIG)
 , Weight(BIG)
 , InitDone2(false)
-, HalfTapCount(0)
 {
     FirCoeff = RowVectorXd::Zero(NumTaps);
     init(NumTaps, OmegaC, BW, ParksWidth, PassType);

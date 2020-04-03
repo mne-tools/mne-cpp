@@ -86,7 +86,7 @@ public:
      *
      * @param[in] parent     Parent QObject (optional)
      */
-    explicit RtCmdClient(QObject *parent = 0);
+    explicit RtCmdClient(QObject *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
@@ -199,6 +199,7 @@ private:
     CommandManager  m_commandManager;   /**< The command manager. */
     QMutex          m_qMutex;           /**< Access serialization between threads */
     QString         m_sAvailableData;   /**< The last received response. */
+    using QTcpSocket::connectToHost;
 };
 
 //=============================================================================================================

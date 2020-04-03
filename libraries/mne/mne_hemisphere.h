@@ -227,7 +227,7 @@ inline bool operator== (const MNEHemisphere &a, const MNEHemisphere &b)
 {
     if(a.pinfo.size() == b.pinfo.size()) {
         for(int i = 0; i < a.pinfo.size(); ++i) {
-            if(!a.pinfo.at(i).isApprox(b.pinfo.at(i), 0.0001f)) {
+            if(!a.pinfo.at(i).isApprox(b.pinfo.at(i))) {
                 return false;
             }
         }

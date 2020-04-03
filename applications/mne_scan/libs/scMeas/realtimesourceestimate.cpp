@@ -60,8 +60,8 @@ RealTimeSourceEstimate::RealTimeSourceEstimate(QObject *parent)
 , m_pAnnotSet(AnnotationSet::SPtr(new AnnotationSet))
 , m_pSurfSet(SurfaceSet::SPtr(new SurfaceSet))
 , m_pFwdSolution(MNEForwardSolution::SPtr(new MNEForwardSolution))
-, m_bInitialized(false)
 , m_iSourceEstimateSize(1)
+, m_bInitialized(false)
 {
 }
 
