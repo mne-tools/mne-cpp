@@ -162,6 +162,7 @@ void PluginManager::loadPlugins(const QString& dir)
     {
         this->setFileName(PluginsDir.absoluteFilePath(file));
         QObject *pPlugin = this->instance();
+        QString pluginName;
 
         // IPlugin
         if(pPlugin)
@@ -172,6 +173,7 @@ void PluginManager::loadPlugins(const QString& dir)
             m_qVecPlugins.push_back(qobject_cast<IPlugin*>(pPlugin));
 
             IPlugin::PluginType pluginType = qobject_cast<IPlugin*>(pPlugin)->getType();
+            pluginName = qobject_cast<IPlugin*>(pPlugin)->getName();
 
             // ISensor
             if(pluginType == IPlugin::_ISensor)
@@ -194,6 +196,7 @@ void PluginManager::loadPlugins(const QString& dir)
                 }
             }
 
+            emit pluginLoaded(QString("Plugin " + pluginName + " loaded."));
         }
 //        else
 //            qDebug() << "Plugin " << file << " could not be instantiated!";
