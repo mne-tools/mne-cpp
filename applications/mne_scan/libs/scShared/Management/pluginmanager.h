@@ -154,6 +154,9 @@ public:
      */
     inline const QVector<IIO*>& getIOPlugins();
 
+signals:
+    void pluginLoaded(QString msg);
+
 private:
     QVector<IPlugin*>    m_qVecPlugins;             /**< Vector of all plugins. */
 
