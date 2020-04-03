@@ -243,7 +243,6 @@ protected:
      *
      * @return Returns the transformation matrix.
      */
-
     Eigen::Matrix4d computeTransformation(Eigen::MatrixXd matNH,
                                           Eigen::MatrixXd matBT);
 
@@ -280,7 +279,7 @@ private:
     void updateChannels(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
     QList<FIFFLIB::FiffChInfo>   m_lChannels;             /**< Channellist with bads excluded */
-    QVector<int>                 m_vInnerind;             /**< index of inner channels  */
+    QVector<int>                 m_vecInnerind;           /**< index of inner channels  */
     QList<QString>               m_lBads;                 /**< contains bad channels  */
 
     //=========================================================================================================
@@ -294,7 +293,6 @@ private:
      *
      * @return The updated model
      */
-
     void updateModel(const int iSamF,
                      const int iSamLoc,
                      const int iLineF,

@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("hpiFit Example");
     parser.addHelpOption();
     qInfo() << "Please download the mne-cpp-test-data folder from Github (mne-tools) into mne-cpp/bin.";
-    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/MNE-sample-data/chpi/raw/data_with_movement_chpi_raw.fif");
+    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif");
 
     parser.addOption(inputOption);
 
@@ -121,19 +121,20 @@ int main(int argc, char *argv[])
     fiff_int_t first = raw.first_samp;
     fiff_int_t last = raw.last_samp;
 
-    float dTSec = 0.1;             // time between hpi fits
     float fQuantumSec = 0.2f;       // read and write in 200 ms junks
     fiff_int_t iQuantum = ceil(fQuantumSec*pFiffInfo->sfreq);
 
     // create time vector that specifies when to fit
-    int iN = ceil((last-first)/iQuantum);
+    float dTSec = 0.1;                              // time between hpi fits
+    int iQuantumT = floor(dTSec*pFiffInfo->sfreq);   // samples between fits
+    int iN = floor((last-first)/iQuantumT);
     RowVectorXf vecTime = RowVectorXf::LinSpaced(iN, 0, iN-1) * dTSec;
 
     // To fit at specific times outcommend the following block
     // Read Quaternion File
 //    MatrixXd matPos;
 //    qInfo() << "Specify the path to your Position file (.txt)";
-//    IOUtils::read_eigen_matrix(matPos, QCoreApplication::applicationDirPath() + "/MNE-sample-data/chpi/pos/posMax_data_with_movement_chpi.txt");
+//    IOUtils::read_eigen_matrix(matPos, QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/ref_hpiFit_pos.txt");
 //    RowVectorXd vecTime = matPos.col(0);
 
     MatrixXd matPosition;              // matPosition matrix to save quaternions etc.
@@ -234,5 +235,5 @@ int main(int argc, char *argv[])
             qInfo() << "dev_head_t has been updated.";
         }
     }
-    //IOUtils::write_eigen_matrix(matPosition, QCoreApplication::applicationDirPath() + "/MNE-sample-data/chpi/pos/position.txt");
+    // IOUtils::write_eigen_matrix(matPosition, QCoreApplication::applicationDirPath() + "/MNE-sample-data/position.txt");
 }
