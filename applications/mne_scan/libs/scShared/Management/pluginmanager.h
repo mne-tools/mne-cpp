@@ -47,6 +47,7 @@
 
 #include <QVector>
 #include <QPluginLoader>
+#include <QColor>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -96,7 +97,7 @@ public:
      *
      * @param [in] parent    pointer to parent Object. (It's normally the default value.)
      */
-    PluginManager(QObject* parent = 0);
+    PluginManager(QObject* parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
@@ -154,8 +155,8 @@ public:
      */
     inline const QVector<IIO*>& getIOPlugins();
 
-signals:
-    void pluginLoaded(QString msg);
+Q_SIGNALS:
+    void pluginLoaded(const QString &msg, int alignment = Qt::AlignLeft, const QColor &color = Qt::black );
 
 private:
     QVector<IPlugin*>    m_qVecPlugins;             /**< Vector of all plugins. */

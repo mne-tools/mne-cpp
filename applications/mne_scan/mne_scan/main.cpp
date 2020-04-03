@@ -122,18 +122,23 @@ int main(int argc, char *argv[])
 
     QPixmap pixmap(":/images/splashscreen.png");
     MainSplashScreen::SPtr splashscreen(new MainSplashScreen(pixmap));
-    splashscreen->show();
-
-    //ToDo Debug Some waiting stuff to see splash screen -> remove this in final release
-    int time = 100;
-    for(int i=0; i < time;++i)
-    {
-        int p = (i*100)/time;
-        splashscreen->showMessage("Loading modules.."+ QString::number(p)+"%");
-    }
 
     MainWindow mainWin;
+    mainWin.setSplashScreen(*splashscreen);
+
+    splashscreen->show();
+
+//    //ToDo Debug Some waiting stuff to see splash screen -> remove this in final release
+//    int time = 100;
+//    for(int i=0; i < time;++i)
+//    {
+//        int p = (i*100)/time;
+//        splashscreen->showMessage("Loading modules.."+ QString::number(p)+"%");
+//    }
+
     mainWin.show();
+    mainWin.setupPlugins();
+    mainWin.setupUI();
 
     splashscreen->finish(&mainWin);
 

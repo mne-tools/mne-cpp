@@ -165,6 +165,10 @@ public:
      */
     void writeToLog(const QString& logMsg, LogKind lgknd = _LogKndMessage, LogLevel lglvl = _LogLvNormal);
 
+    void setSplashScreen(MainSplashScreen &splashScreen);
+    void setupPlugins();
+    void setupUI();
+
 private:
     //=========================================================================================================
     /**

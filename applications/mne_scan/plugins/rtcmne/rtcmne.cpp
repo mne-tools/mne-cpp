@@ -92,18 +92,18 @@ using namespace Eigen;
 //=============================================================================================================
 
 RtcMne::RtcMne()
-: m_qFileFwdSolution(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif")
-, m_sAtlasDir(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/label")
-, m_sSurfaceDir(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/surf")
-, m_iNumAverages(1)
-, m_iDownSample(1)
-, m_sAvrType("3")
-, m_sMethod("dSPM")
-, m_iTimePointSps(0)
-, m_pCircularMatrixBuffer(CircularBuffer_Matrix_double::SPtr(new CircularBuffer_Matrix_double(40)))
+: m_pCircularMatrixBuffer(CircularBuffer_Matrix_double::SPtr(new CircularBuffer_Matrix_double(40)))
 , m_pCircularEvokedBuffer(CircularBuffer<FIFFLIB::FiffEvoked>::SPtr::create(40))
 , m_bEvokedInput(false)
 , m_bRawInput(false)
+, m_iNumAverages(1)
+, m_iDownSample(1)
+, m_iTimePointSps(0)
+, m_qFileFwdSolution(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif")
+, m_sAtlasDir(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/label")
+, m_sSurfaceDir(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/surf")
+, m_sAvrType("3")
+, m_sMethod("dSPM")
 {
 }
 

@@ -84,7 +84,7 @@ using namespace DISPLIB;
 // CONST
 //=============================================================================================================
 
-const char* pluginDir = "/mne_scan_plugins";        /**< holds path to plugins.*/
+const QString pluginDir = "/mne_scan_plugins";        /**< holds path to plugins.*/
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -92,14 +92,14 @@ const char* pluginDir = "/mne_scan_plugins";        /**< holds path to plugins.*
 
 MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
-, m_pStartUpWidget(new StartUpWidget(this))
-, m_pDisplayManager(new SCSHAREDLIB::DisplayManager(this))
 , m_bIsRunning(false)
-, m_pTime(new QTime(0, 0))
 , m_iTimeoutMSec(1000)
+, m_pStartUpWidget(new StartUpWidget(this))
+, m_eLogLevelCurrent(_LogLvMax)
+, m_pTime(new QTime(0, 0))
 , m_pPluginManager(new SCSHAREDLIB::PluginManager(this))
 , m_pPluginSceneManager(new SCSHAREDLIB::PluginSceneManager(this))
-, m_eLogLevelCurrent(_LogLvMax)
+, m_pDisplayManager(new SCSHAREDLIB::DisplayManager(this))
 {
     fprintf(stderr, "%s - Version %s\n",
             CInfo::AppNameShort().toUtf8().constData(),
@@ -113,25 +113,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     setUnifiedTitleAndToolBarOnMac(false);
 
-    m_pPluginManager->loadPlugins(qApp->applicationDirPath()+pluginDir);
-
-    // Quick control selection
-    m_pQuickControlView = new QuickControlView(QString("MNESCAN/MainWindow/QuickControl"),
-                                                       "MNE Scan",
-                                                       Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint,
-                                                       this);
-    createActions();
-    createMenus();
-    createToolBars();
-    createPluginDockWindow();
-    createLogDockWindow();
-
-//    //ToDo Debug Startup
-//    writeToLog(tr("Test normal message, Max"), _LogKndMessage, _LogLvMax);
-//    writeToLog(tr("Test warning message, Normal"), _LogKndWarning, _LogLvNormal);
-//    writeToLog(tr("Test error message, Min"), _LogKndError, _LogLvMin);
-
-    initStatusBar();
 }
 
 //=============================================================================================================
@@ -152,6 +133,42 @@ MainWindow::~MainWindow()
     delete m_pDynamicPluginToolBar;
 }
 
+void MainWindow::setupPlugins()
+{
+    if(m_pSplashScreen.data())
+    {
+        QObject::connect(m_pPluginManager.data(),&PluginManager::pluginLoaded,
+                         m_pSplashScreen,&MainSplashScreen::showMessage);
+    }
+    m_pPluginManager->loadPlugins(qApp->applicationDirPath()+pluginDir);
+
+}
+
+void MainWindow::setupUI()
+{
+    // Quick control selection
+    m_pQuickControlView = new QuickControlView(QString("MNESCAN/MainWindow/QuickControl"),
+                                                       "MNE Scan",
+                                                       Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint,
+                                                       this);
+    createActions();
+    createMenus();
+    createToolBars();
+    createPluginDockWindow();
+    createLogDockWindow();
+
+//    //ToDo Debug Startup
+//    writeToLog(tr("Test normal message, Max"), _LogKndMessage, _LogLvMax);
+//    writeToLog(tr("Test warning message, Normal"), _LogKndWarning, _LogLvNormal);
+//    writeToLog(tr("Test error message, Min"), _LogKndError, _LogLvMin);
+
+    initStatusBar();
+}
+
+void MainWindow::setSplashScreen(MainSplashScreen &splashScreen)
+{
+    m_pSplashScreen = &splashScreen;
+}
 //=============================================================================================================
 
 void MainWindow::closeEvent(QCloseEvent *event)

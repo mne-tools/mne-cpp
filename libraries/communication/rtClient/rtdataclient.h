@@ -82,7 +82,7 @@ public:
      *
      * @param[in] parent     Parent QObject (optional)
      */
-    explicit RtDataClient(QObject *parent = 0);
+    explicit RtDataClient(QObject *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
@@ -90,6 +90,7 @@ public:
      *
      * @param[in] p_sRtServerHostName    The IP address of the mne_rt_server
      */
+
     void connectToHost(const QString& p_sRtServerHostName);
 
     //=========================================================================================================
@@ -136,7 +137,7 @@ public:
 
 private:
     qint32 m_clientID;  /**< Corresponding client id of the data client at mne_rt_server */
-
+    using QTcpSocket::connectToHost;
 signals:
     
 public slots:

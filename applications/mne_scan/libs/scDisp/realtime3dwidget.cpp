@@ -97,9 +97,9 @@ using namespace FIFFLIB;
 RealTime3DWidget::RealTime3DWidget(QWidget* parent)
 : MeasurementWidget(parent)
 , m_bInitialized(false)
-, m_p3DView(new View3D())
-, m_pData3DModel(Data3DTreeModel::SPtr::create())
 , m_iNumberBadChannels(0)
+, m_pData3DModel(Data3DTreeModel::SPtr::create())
+, m_p3DView(new View3D())
 {
     //Init 3D View
     m_p3DView->setModel(m_pData3DModel);

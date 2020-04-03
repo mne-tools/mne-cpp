@@ -175,8 +175,8 @@ CircularBuffer<_Tp>::CircularBuffer(unsigned int uiMaxNumElements)
 , m_iCurrentWriteIndex(-1)
 , m_pFreeElements(new QSemaphore(m_uiMaxNumElements))
 , m_pUsedElements(new QSemaphore(0))
-, m_bPause(false)
 , m_iTimeout(1000)
+, m_bPause(false)
 {
 }
 
