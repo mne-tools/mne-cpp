@@ -155,7 +155,7 @@ public:
      */
     inline const QVector<IIO*>& getIOPlugins();
 
-Q_SIGNALS:
+signals:
     void pluginLoaded(const QString &msg, int alignment = Qt::AlignLeft, const QColor &color = Qt::black );
 
 private:
