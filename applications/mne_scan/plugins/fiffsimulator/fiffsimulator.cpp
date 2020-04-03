@@ -75,12 +75,12 @@ using namespace Eigen;
 //=============================================================================================================
 
 FiffSimulator::FiffSimulator()
-: m_sFiffSimulatorIP("127.0.0.1")
+: m_pFiffSimulatorProducer(new FiffSimulatorProducer(this))
 , m_bCmdClientIsConnected(false)
-, m_pFiffSimulatorProducer(new FiffSimulatorProducer(this))
+, m_sFiffSimulatorIP("127.0.0.1")
 , m_sFiffSimulatorClientAlias("mne_scan")
-, m_iBufferSize(-1)
 , m_iActiveConnectorId(0)
+, m_iBufferSize(-1)
 , m_pCircularBuffer(QSharedPointer<CircularBuffer_Matrix_float>(new CircularBuffer_Matrix_float(40)))
 , m_pRtCmdClient(QSharedPointer<RtCmdClient>::create())
 {
@@ -112,7 +112,7 @@ void FiffSimulator::clear()
 QSharedPointer<IPlugin> FiffSimulator::clone() const
 {
     QSharedPointer<FiffSimulator> pFiffSimulatorClone(new FiffSimulator());
-    return pFiffSimulatorClone;
+    return std::move(pFiffSimulatorClone);
 }
 
 //=============================================================================================================

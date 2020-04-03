@@ -116,10 +116,10 @@ void RtCmdClient::sendCommandJSON(const Command &p_command)
         QDataStream out(&block, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_5_1);
 
-        out << (quint16)0;
+        out << static_cast<quint16>(0);
         out << t_sCommand;
         out.device()->seek(0);
-        out << (quint16)(block.size() - sizeof(quint16));
+        out << static_cast<quint16>(static_cast<unsigned long>(block.size()) - sizeof(quint16));
 
         this->write(block);
         this->waitForBytesWritten();

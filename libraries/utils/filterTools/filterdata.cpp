@@ -99,15 +99,15 @@ FilterData::FilterData(QString unique_name,
                        double sFreq,
                        qint32 fftlength,
                        DesignMethod designMethod)
-: m_Type(type)
+: m_designMethod(designMethod)
+, m_Type(type)
+, m_sFreq(sFreq)
+, m_dCenterFreq(centerfreq)
+, m_dBandwidth(bandwidth)
+, m_dParksWidth(parkswidth)
 , m_iFilterOrder(order)
 , m_iFFTlength(fftlength)
 , m_sName(unique_name)
-, m_dParksWidth(parkswidth)
-, m_designMethod(designMethod)
-, m_dCenterFreq(centerfreq)
-, m_dBandwidth(bandwidth)
-, m_sFreq(sFreq)
 {
     if(order < 9) {
        qWarning() << "[FilterData::FilterData] Less than 9 taps were provided. Setting number of taps to 9.";
@@ -126,7 +126,7 @@ void FilterData::designFilter()
                                   m_dCenterFreq,
                                   m_dBandwidth,
                                   m_dParksWidth,
-                                  (ParksMcClellan::TPassType)m_Type);
+                                  static_cast<ParksMcClellan::TPassType>(m_Type));
             m_dCoeffA = filter.FirCoeff;
 
             //fft-transform m_dCoeffA in order to be able to perform frequency-domain filtering
@@ -141,7 +141,7 @@ void FilterData::designFilter()
             switch(m_Type) {
                 case LPF:
                     filtercos = CosineFilter(m_iFFTlength,
-                                             (m_dCenterFreq)*(m_sFreq/2),
+                                             (m_dCenterFreq)*(m_sFreq/2.),
                                              m_dParksWidth*(m_sFreq/2),
                                              (m_dCenterFreq)*(m_sFreq/2),
                                              m_dParksWidth*(m_sFreq/2),

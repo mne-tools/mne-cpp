@@ -87,14 +87,14 @@ using namespace FIFFLIB;
 NeuronalConnectivity::NeuronalConnectivity()
 : m_iDownSample(1)
 , m_iNumberAverages(10)
-, m_sAvrType("1")
+, m_iNumberBadChannels(0)
 , m_fFreqBandLow(7.0f)
 , m_fFreqBandHigh(13.0f)
 , m_iBlockSize(1)
-, m_pActionShowYourWidget(Q_NULLPTR)
-, m_iNumberBadChannels(0)
-, m_pRtConnectivity(RtConnectivity::SPtr::create())
+, m_sAvrType("1")
 , m_pCircularBuffer(CircularBuffer<CONNECTIVITYLIB::Network>::SPtr::create(40))
+, m_pRtConnectivity(RtConnectivity::SPtr::create())
+, m_pActionShowYourWidget(Q_NULLPTR)
 {
     AbstractMetric::m_bStorageModeIsActive = true;
     AbstractMetric::m_iNumberBinStart = 0;
