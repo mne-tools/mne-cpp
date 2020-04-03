@@ -41,6 +41,7 @@
 //=============================================================================================================
 
 #include "info.h"
+#include "mainsplashscreen.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -358,6 +359,8 @@ private:
     QPointer<PluginGui>                 m_pPluginGui;                   /**< Holds the plugin GUI.*/
 
     QPointer<DISPLIB::QuickControlView> m_pQuickControlView;            /**< quick control widget. */
+
+    QPointer<MainSplashScreen>          m_pSplashScreen;                /**< Holds the splash scren. */
 
     QSharedPointer<QTimer>                              m_pTimer;               /**< timer of the main application*/
     QSharedPointer<QTime>                               m_pTime;                /**< Holds current time output, updated with timeout of timer.*/
