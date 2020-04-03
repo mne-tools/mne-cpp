@@ -196,7 +196,7 @@ void PluginManager::loadPlugins(const QString& dir)
                 }
             }
 
-            emit pluginLoaded(QString("Plugin " + pluginName + " loaded."));
+            emit pluginLoaded(QString("Plugin ") + pluginName + " loaded.");
         }
 //        else
 //            qDebug() << "Plugin " << file << " could not be instantiated!";
