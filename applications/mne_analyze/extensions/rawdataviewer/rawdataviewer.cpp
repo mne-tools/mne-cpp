@@ -210,6 +210,14 @@ QVector<EVENT_TYPE> RawDataViewer::getEventSubscriptions(void) const
 
 void RawDataViewer::setUpControls()
 {
+    QLabel* tempLabel = new QLabel("Loading file");
+    m_pControlDock->setWidget(tempLabel);
+
+    delete m_pLayout;
+    delete m_pContainer;
+    m_pLayout = new QVBoxLayout;
+    m_pContainer = new QWidget;
+
     //Scaling Widget
     DISPLIB::ScalingView* scalingWidget = new DISPLIB::ScalingView("Test", m_pRawModel->getFiffInfo()->chs);
     connect(scalingWidget, &DISPLIB::ScalingView::scalingChanged,
