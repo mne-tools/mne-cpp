@@ -135,7 +135,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
     bool projAvailable = true;
 
     if (this->proj.size() == 0) {
-        qDebug() << "FiffRawData::read_raw_segment - No projectors setup. Consider calling MNE::setup_compensators.";
+        //qDebug() << "FiffRawData::read_raw_segment - No projectors setup. Consider calling MNE::setup_compensators.";
         projAvailable = false;
     }
 
@@ -156,7 +156,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
         printf("No data in this range %d ... %d  =  %9.3f ... %9.3f secs...", from, to, ((float)from)/this->info.sfreq, ((float)to)/this->info.sfreq);
         return false;
     }
-    printf("Reading %d ... %d  =  %9.3f ... %9.3f secs...", from, to, ((float)from)/this->info.sfreq, ((float)to)/this->info.sfreq);
+    //printf("Reading %d ... %d  =  %9.3f ... %9.3f secs...", from, to, ((float)from)/this->info.sfreq, ((float)to)/this->info.sfreq);
     //
     //  Initialize the data and calibration vector
     //
@@ -470,7 +470,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
     bool projAvailable = true;
 
     if (this->proj.size() == 0) {
-        qInfo() << "FiffRawData::read_raw_segment - No projectors setup. Consider calling MNE::setup_compensators.";
+        //qInfo() << "FiffRawData::read_raw_segment - No projectors setup. Consider calling MNE::setup_compensators.";
         projAvailable = false;
     }
 
@@ -491,7 +491,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
         printf("No data in this range\n");
         return false;
     }
-    printf("Reading %d ... %d  =  %9.3f ... %9.3f secs...", from, to, ((float)from)/this->info.sfreq, ((float)to)/this->info.sfreq);
+    //printf("Reading %d ... %d  =  %9.3f ... %9.3f secs...", from, to, ((float)from)/this->info.sfreq, ((float)to)/this->info.sfreq);
     //
     //  Initialize the data and calibration vector
     //

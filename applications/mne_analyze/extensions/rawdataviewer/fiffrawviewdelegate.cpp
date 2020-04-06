@@ -337,10 +337,10 @@ void FiffRawViewDelegate::createMarksPath(const QModelIndex &index,
     path.moveTo(path.currentPosition().x(), fTop);
 
     //qDebug() << data.size();
-    qDebug() << "Abs first sample:" << t_pModel->absoluteFirstSample();
-    qDebug() << "Scroll pos:" << t_pModel->getSampleScrollPos();
-    qDebug() << "Beggining:" << t_pModel->absoluteFirstSample() + t_pModel->getSampleScrollPos();
-    qDebug() << "End:" << (t_pModel->absoluteFirstSample() + t_pModel->getSampleScrollPos() + data.size());
+//    qDebug() << "Abs first sample:" << t_pModel->absoluteFirstSample();
+//    qDebug() << "Scroll pos:" << t_pModel->getSampleScrollPos();
+//    qDebug() << "Beggining:" << t_pModel->absoluteFirstSample() + t_pModel->getSampleScrollPos();
+//    qDebug() << "End:" << (t_pModel->absoluteFirstSample() + t_pModel->getSampleScrollPos() + data.size());
 
     int count = 0;
     for(int j = t_pModel->absoluteFirstSample() + t_pModel->getSampleScrollPos(); j < (t_pModel->absoluteFirstSample() + t_pModel->getSampleScrollPos() + data.size()); j++) {
