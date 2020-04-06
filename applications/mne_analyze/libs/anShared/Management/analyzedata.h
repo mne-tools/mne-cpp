@@ -139,7 +139,7 @@ public:
      * provided path and inserts the model into the hash. NO ERROR CHECKING IS PERFORMED !
      */
     template<class T>
-    QSharedPointer<T> loadModel(const QString sPath)
+    QSharedPointer<T> loadModel(const QString& sPath)
     {
         // check if model was already loaded:
         if (m_data.contains(sPath)) {
@@ -155,6 +155,24 @@ public:
             emit this->newModelAvailable(temp);
             return sm;
         }
+    }
+
+    //=========================================================================================================
+    /**
+     * This is the main function for saving models. It simply calls the models save function with the
+     * provided path.
+     */
+    bool saveModel(const QString& sPath)
+    {
+        // check if model was already loaded:
+        if (m_data.contains(sPath)) {
+            QSharedPointer<AbstractModel> temp = getModel(sPath);
+            return temp->saveToFile(sPath);
+        }
+
+        qDebug() << "[AnalyzeData::saveModel] Model does not exist!";
+
+        return false;
     }
 
     //=========================================================================================================

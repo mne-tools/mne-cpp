@@ -162,8 +162,26 @@ void DataLoader::onLoadFiffFilePressed()
 
 //=============================================================================================================
 
+void DataLoader::onSaveFiffFilePressed()
+{
+    //Get the path
+    QString filePath = QFileDialog::getSaveFileName(m_pControl,
+                                                    tr("Save Fiff File"),
+                                                    QDir::currentPath()+"/MNE-sample-data",
+                                                    tr("Fiff file(*.fif *.fiff)"));
+
+    if(!filePath.isNull()) {
+        m_pAnalyzeData->saveModel(filePath);
+    }
+}
+
+//=============================================================================================================
+
 void DataLoader::initGuiConnections()
 {
     connect(m_pDataLoaderControl.data(), &DataLoaderControl::loadFiffFile,
             this, &DataLoader::onLoadFiffFilePressed);
+
+    connect(m_pDataLoaderControl.data(), &DataLoaderControl::saveFiffFile,
+            this, &DataLoader::onSaveFiffFilePressed);
 }

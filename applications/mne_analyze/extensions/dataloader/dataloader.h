@@ -110,9 +110,15 @@ public:
 private:
     //=========================================================================================================
     /**
-     * This functions is called when the "Load fit from file" button is pressed.
+     * This functions is called when the load from file button is pressed.
      */
     void onLoadFiffFilePressed();
+
+    //=========================================================================================================
+    /**
+     * This functions is called when the save to file button is pressed.
+     */
+    void onSaveFiffFilePressed();
 
     //=========================================================================================================
     /**

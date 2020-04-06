@@ -81,7 +81,7 @@ FiffRawView::FiffRawView(QWidget *parent)
 #if defined(USE_OPENGL)
     //Use GPU rendering
     QGLFormat currentFormat = QGLFormat(QGL::SampleBuffers);
-    currentFormat.setSamples(10);
+    currentFormat.setSamples(3);
     QGLWidget* pGLWidget = new QGLWidget(currentFormat);
     m_pTableView->setViewport(pGLWidget);
 #endif
