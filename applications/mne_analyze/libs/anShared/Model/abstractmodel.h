@@ -163,9 +163,11 @@ public:
     /**
      * Saves model to the current model path if possible.
      *
+     * @param[in] sPath   The path where the file should be saved to.
+     *
      * @returns      True if saving was successful
      */
-    virtual inline bool saveToFile();
+    virtual inline bool saveToFile(const QString& sPath);
 
     //=========================================================================================================
     // Inherited by QAbstractItemModel:
@@ -206,9 +208,9 @@ QString AbstractModel::getModelName() const
 
 //=============================================================================================================
 
-bool AbstractModel::saveToFile()
+bool AbstractModel::saveToFile(const QString& sPath)
 {
-    qDebug() << "[AbstractModel::saveToFile] Saving to file is not implemented for MODELTYPE = " << getType();
+    qDebug() << "[AbstractModel::saveToFile] Saving data to" << sPath << "is not implemented for MODELTYPE = " << getType();
     return false;
 }
 

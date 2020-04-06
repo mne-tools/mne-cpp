@@ -91,9 +91,15 @@ private:
 signals:
     //=========================================================================================================
     /**
-     * Signal is emitted when user wants to load a Dipole Fit from a file
+     * Signal is emitted when user wants to load a fiff file
      */
     void loadFiffFile();
+
+    //=========================================================================================================
+    /**
+     * Signal is emitted when user wants to save a fiff file
+     */
+    void saveFiffFile();
 };
 }
 

@@ -69,7 +69,6 @@ using namespace ANSHAREDLIB;
 
 RawDataViewer::RawDataViewer()
 : m_pControlDock(Q_NULLPTR)
-, m_pRawDataViewerControl(Q_NULLPTR)
 , m_pCommu(Q_NULLPTR)
 , m_iVisibleBlocks(10)
 , m_iBufferBlocks(10)
@@ -84,6 +83,7 @@ RawDataViewer::RawDataViewer()
 RawDataViewer::~RawDataViewer()
 {
     delete m_pRawDataViewerControl;
+    delete m_pCommu;
 }
 
 //=============================================================================================================
@@ -202,7 +202,11 @@ void RawDataViewer::handleEvent(QSharedPointer<Event> e)
 
 QVector<EVENT_TYPE> RawDataViewer::getEventSubscriptions(void) const
 {
-    QVector<EVENT_TYPE> temp = {EXTENSION_INIT_FINISHED};
+    QVector<EVENT_TYPE> temp = {EXTENSION_INIT_FINISHED, };
+
+    // tell everyone that INIT-phase is finished
+    Communicator con;
+    con.publishEvent(EVENT_TYPE::EXTENSION_INIT_FINISHED);
     return temp;
 }
 
