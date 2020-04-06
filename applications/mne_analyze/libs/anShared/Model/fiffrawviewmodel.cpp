@@ -413,10 +413,10 @@ int FiffRawViewModel::loadEarlierBlocks(qint32 numBlocks)
     // check if start of file was reached:
     int leftSamples = (m_iFiffCursorBegin - numBlocks * m_iSamplesPerBlock) - absoluteFirstSample();
     if (leftSamples <= 0) {
-        qInfo() << "[FiffRawViewModel::loadEarlierBlocks] Reached start of file !";
+        //qInfo() << "[FiffRawViewModel::loadEarlierBlocks] Reached start of file !";
         // see how many blocks we still can load
         int maxNumBlocks = (m_iFiffCursorBegin - absoluteFirstSample()) / m_iSamplesPerBlock;
-        qInfo() << "[FiffRawViewModel::loadEarlierBlocks] Loading " << maxNumBlocks << " earlier blocks instead of requested " << numBlocks;
+        //qInfo() << "[FiffRawViewModel::loadEarlierBlocks] Loading " << maxNumBlocks << " earlier blocks instead of requested " << numBlocks;
         if (maxNumBlocks != 0) {
             numBlocks = maxNumBlocks;
         }
@@ -458,7 +458,7 @@ int FiffRawViewModel::loadEarlierBlocks(qint32 numBlocks)
     // adjust fiff cursor
     m_iFiffCursorBegin = start;
 
-    qDebug() << "[FiffRawViewModel::loadEarlierBlocks] |TIME| " << ((float) timer.elapsed()) / ((float) numBlocks) << " (per block) [FiffRawViewModel::loadEarlierBlocks]";
+    //qDebug() << "[FiffRawViewModel::loadEarlierBlocks] |TIME| " << ((float) timer.elapsed()) / ((float) numBlocks) << " (per block) [FiffRawViewModel::loadEarlierBlocks]";
 
     // return 0, meaning that this was a loading of earlier blocks
     return 0;
@@ -477,7 +477,7 @@ int FiffRawViewModel::loadLaterBlocks(qint32 numBlocks)
         qInfo() << "[FiffRawViewModel::loadLaterBlocks] Reached end of file !";
         // see how many blocks we still can load
         int maxNumBlocks = (absoluteLastSample() - (m_iFiffCursorBegin + m_iTotalBlockCount * m_iSamplesPerBlock)) / m_iSamplesPerBlock;
-        qInfo() << "[FiffRawViewModel::loadLaterBlocks] Loading " << maxNumBlocks << " later blocks instead of requested " << numBlocks;
+        //qInfo() << "[FiffRawViewModel::loadLaterBlocks] Loading " << maxNumBlocks << " later blocks instead of requested " << numBlocks;
         if (maxNumBlocks != 0) {
             numBlocks = maxNumBlocks;
         } else {
@@ -519,7 +519,7 @@ int FiffRawViewModel::loadLaterBlocks(qint32 numBlocks)
     // adjust fiff cursor
     m_iFiffCursorBegin += numBlocks * m_iSamplesPerBlock;
 
-    qInfo() << "[FiffRawViewModel::loadLaterBlocks] |TIME| " << ((float) timer.elapsed()) / ((float) numBlocks) << " (per block) [FiffRawViewModel::loadLaterBlocks]";
+    //qInfo() << "[FiffRawViewModel::loadLaterBlocks] |TIME| " << ((float) timer.elapsed()) / ((float) numBlocks) << " (per block) [FiffRawViewModel::loadLaterBlocks]";
 
     // return 1, meaning that this was a loading of later blocks
     return 1;
