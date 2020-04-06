@@ -39,6 +39,13 @@
      </property>
     </widget>
    </item>
+   <item row="1" column="0">
+    <widget class="QPushButton" name="m_pPushButtonFiffSaver">
+     <property name="text">
+      <string>Save Fiff file</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <resources/>

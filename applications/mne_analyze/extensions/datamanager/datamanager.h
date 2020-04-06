@@ -59,6 +59,10 @@
 
 class DataManagerView;
 
+namespace ANSHAREDLIB {
+    class Communicator;
+}
+
 //=============================================================================================================
 // DEFINE NAMESPACE SURFEREXTENSION
 //=============================================================================================================
@@ -112,8 +116,9 @@ private:
     void updateListWidget();
 
     // Control
-    QDockWidget*        m_pControlDock;         /**< Control Widget */
-    DataManagerView*    m_pDataManagerView;
+    QDockWidget*                        m_pControlDock;         /**< Control Widget */
+    DataManagerView*                    m_pDataManagerView;
+    QPointer<ANSHAREDLIB::Communicator> m_pCommu;
 };
 
 //=============================================================================================================

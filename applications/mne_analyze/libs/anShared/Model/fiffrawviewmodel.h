@@ -147,6 +147,16 @@ public:
 
     //=========================================================================================================
     /**
+     * Saves model to the current model path if possible.
+     *
+     * @param[in] sPath   The path where the file should be saved to.
+     *
+     * @returns      True if saving was successful
+     */
+    bool saveToFile(const QString& sPath) override;
+
+    //=========================================================================================================
+    /**
      * Returns the data for the given role and section in the header with the specified orientation.
      *
      * @param[in] section        For horizontal headers, the section number corresponds to the column number. Similarly, for vertical headers, the section number corresponds to the row number.

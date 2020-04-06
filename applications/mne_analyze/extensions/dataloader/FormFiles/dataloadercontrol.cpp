@@ -63,6 +63,9 @@ DataLoaderControl::DataLoaderControl(QWidget *parent)
 
     connect(ui->m_pPushButtonFiffLoader, &QPushButton::clicked,
             this, &DataLoaderControl::loadFiffFile);
+
+    connect(ui->m_pPushButtonFiffSaver, &QPushButton::clicked,
+            this, &DataLoaderControl::saveFiffFile);
 }
 
 //=============================================================================================================

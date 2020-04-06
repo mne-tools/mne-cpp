@@ -274,6 +274,19 @@ QVariant FiffRawViewModel::data(const QModelIndex &index, int role) const
 
 //=============================================================================================================
 
+bool FiffRawViewModel::saveToFile(const QString& sPath)
+{
+    QFile fFileOut(sPath);
+
+    if(m_pFiffIO->m_qlistRaw.size() > 0) {
+        return m_pFiffIO->write_raw(fFileOut, 0);
+    }
+
+    return false;
+}
+
+//=============================================================================================================
+
 QVariant FiffRawViewModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if(role != Qt::DisplayRole && role != Qt::TextAlignmentRole)
