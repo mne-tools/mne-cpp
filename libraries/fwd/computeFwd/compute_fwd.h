@@ -86,6 +86,27 @@ namespace FWDLIB
 //=============================================================================================================
 
 //=============================================================================================================
+// Declare all structures to be used
+//=============================================================================================================
+
+/**
+ * The struct containing the forward solution.
+ */
+struct FwdResult {
+    MNELIB::MneSourceSpaceOld **spaces;             /* Source spaces */
+    int nspace;                                     /* How many? */
+    FwdCoilSet *megCoils;
+    FwdCoilSet *comp_coils;
+    MNELIB::MneCTFCompDataSet *comp_data;
+    bool fixed_ori;                                 /* Use fixed-orientation dipoles */
+    FwdBemModel *bem_model;                         /* BEM model definition */
+    Eigen::Vector3f *r0;                            /* Sphere model origin */
+    bool use_threads;                               /* Parallelize with threads? */
+    MNELIB::MneNamedMatrix **megForward;                  /* The results */
+    MNELIB::MneNamedMatrix **megForwardGrad;
+};
+
+//=============================================================================================================
 /**
  * Implements the compute forward solution
  *
@@ -110,12 +131,22 @@ public:
     virtual ~ComputeFwd();
 
     //ToDo split this function into init (with settings as parameter) and the actual fit function
-    void calculateFwd() const;
+    void calculateFwd();
 
     QString qPath;
     QFile file;
 
+    FwdResult result;           /**< struct that contains the Fwd result */
+
 private:
+    //=========================================================================================================
+    /**
+     * init the result
+     */
+    void initResult();
+
+    //=========================================================================================================
+
     ComputeFwdSettings* settings;
 };
 
