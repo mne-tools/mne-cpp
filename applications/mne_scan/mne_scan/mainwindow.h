@@ -165,7 +165,7 @@ public:
      */
     void writeToLog(const QString& logMsg, LogKind lgknd = _LogKndMessage, LogLevel lglvl = _LogLvNormal);
 
-    void setSplashScreen(MainSplashScreen &splashScreen);
+    void setSplashScreen(bool ShowSplashScreen=false);
     void setupPlugins();
     void setupUI();
 
@@ -364,7 +364,7 @@ private:
 
     QPointer<DISPLIB::QuickControlView> m_pQuickControlView;            /**< quick control widget. */
 
-    QPointer<MainSplashScreen>          m_pSplashScreen;                /**< Holds the splash scren. */
+    MainSplashScreen::SPtr              m_pSplashScreen;                /**< Holds the splash scren. */
 
     QSharedPointer<QTimer>                              m_pTimer;               /**< timer of the main application*/
     QSharedPointer<QTime>                               m_pTime;                /**< Holds current time output, updated with timeout of timer.*/
