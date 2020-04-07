@@ -64,8 +64,8 @@ using namespace Eigen;
 
 BabyMEGSQUIDControlDgl::BabyMEGSQUIDControlDgl(BabyMEG* p_pBabyMEG,QWidget *parent)
 : QDialog(parent)
-, ui(new Ui::BabyMEGSQUIDControlDgl)
 , m_pBabyMEG(p_pBabyMEG)
+, ui(new Ui::BabyMEGSQUIDControlDgl)
 {
     connect(this,&BabyMEGSQUIDControlDgl::SendCMDToMEGSource,p_pBabyMEG,&BabyMEG::comFLL);
     connect(m_pBabyMEG,&BabyMEG::dataToSquidCtrlGUI,this,&BabyMEGSQUIDControlDgl::TuneGraphDispProc);
