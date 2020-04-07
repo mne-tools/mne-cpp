@@ -366,10 +366,10 @@ FiffInfo::SPtr RtDataClient::readInfo()
 
 //=============================================================================================================
 
-void RtDataClient::readRawBuffer(qint32 p_nChannels, MatrixXf& data, fiff_int_t& kind)
+void RtDataClient::readRawBuffer(qint32 p_nChannels,
+                                 MatrixXf& data,
+                                 fiff_int_t& kind)
 {
-//        data = [];
-
     FiffStream t_fiffStream(this);
     //
     // Find the start
