@@ -48,6 +48,7 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     ex_cancel_noise \
+    ex_compute_forward \
     ex_evoked_grad_amp \
     ex_fiff_io \
     ex_find_evoked \
