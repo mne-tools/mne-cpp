@@ -92,7 +92,8 @@ void FiffSimulatorProducer::connectDataClient(QString p_sRtSeverIP)
         return;
     }
 
-    m_pRtDataClient->connectToHost(p_sRtSeverIP);
+
+    m_pRtDataClient->connectToHost(p_sRtSeverIP,0);
     m_pRtDataClient->waitForConnected(1000);
 
     if(m_pRtDataClient->state() == QTcpSocket::ConnectedState) {

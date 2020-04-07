@@ -70,11 +70,15 @@ RtCmdClient::RtCmdClient(QObject *parent) :
 
 //=============================================================================================================
 
-void RtCmdClient::connectToHost(QString &p_sRtServerHostName)
+void RtCmdClient::connectToHost(const QString &hostName,
+                                quint16 port,
+                                QIODevice::OpenMode openMode,
+                                QAbstractSocket::NetworkLayerProtocol protocol)
 {
-    QTcpSocket::connectToHost(p_sRtServerHostName, 4217);
+    const int PORT_NUM(4217);
+    Q_UNUSED(port)
+    QTcpSocket::connectToHost(hostName, PORT_NUM, openMode, protocol);
 }
-
 //=============================================================================================================
 
 QString RtCmdClient::sendCLICommand(const QString &p_sCommand)

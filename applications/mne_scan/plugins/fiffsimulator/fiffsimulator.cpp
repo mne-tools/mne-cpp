@@ -276,7 +276,7 @@ void FiffSimulator::connectCmdClient()
         m_pFiffSimulatorProducer->start();
     }
 
-    m_pRtCmdClient->connectToHost(m_sFiffSimulatorIP);
+    m_pRtCmdClient->connectToHost(m_sFiffSimulatorIP,0);
     m_pRtCmdClient->waitForConnected(1000);
 
     if(m_pRtCmdClient->state() == QTcpSocket::ConnectedState)

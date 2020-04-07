@@ -85,14 +85,26 @@ public:
     explicit RtDataClient(QObject *parent = Q_NULLPTR);
 
     //=========================================================================================================
+//    /**
+//     * Connect to a mne_rt_server using port 4218
+//     *
+//     * @param[in] p_sRtServerHostName    The IP address of the mne_rt_server
+//     */
+//
+//    void connectToHost(const QString& p_sRtServerHostName);
+    //=========================================================================================================
     /**
-     * Connect to a mne_rt_server using port 4218
+     * Connect to a mne_rt_server using port 4217
      *
-     * @param[in] p_sRtServerHostName    The IP address of the mne_rt_server
+     * @param[in] hostName      The hostName on the given port.
+     * @param[in] port          The port.
+     * @param[in] openMode      The open mode. Default is QIODevice::OpenMode::ReadWrite.
+     * @param[in] protocol      The protocol. Default is QAbstractSocket::NetworkLayerProtocol::AnyIPProtocol.
      */
-
-    void connectToHost(const QString& p_sRtServerHostName);
-
+    void connectToHost(const QString &hostName,
+                       quint16 port,
+                       QIODevice::OpenMode openMode = ReadWrite,
+                       QAbstractSocket::NetworkLayerProtocol protocol = AnyIPProtocol);
     //=========================================================================================================
     /**
      * Attempts to close the socket. If there is pending data waiting to be written, QAbstractSocket will enter
@@ -137,7 +149,7 @@ public:
 
 private:
     qint32 m_clientID;  /**< Corresponding client id of the data client at mne_rt_server */
-    using QTcpSocket::connectToHost;
+
 signals:
     
 public slots:
