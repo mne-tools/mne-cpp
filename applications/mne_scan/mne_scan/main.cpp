@@ -121,26 +121,18 @@ int main(int argc, char *argv[])
     SCMEASLIB::MeasurementTypes::registerTypes();
 
     QPixmap pixmap(":/images/splashscreen.png");
-    MainSplashScreen::SPtr splashscreen(new MainSplashScreen(pixmap));
+
 
     MainWindow mainWin;
-    mainWin.setSplashScreen(*splashscreen);
+//    mainWin.setSplashScreen(*splashscreen);
 
-    splashscreen->show();
+//    splashscreen->show();
 
-//    //ToDo Debug Some waiting stuff to see splash screen -> remove this in final release
-//    int time = 100;
-//    for(int i=0; i < time;++i)
-//    {
-//        int p = (i*100)/time;
-//        splashscreen->showMessage("Loading modules.."+ QString::number(p)+"%");
-//    }
+//    mainWin.show();
+//    mainWin.setupPlugins();
+//    mainWin.setupUI();
 
-    mainWin.show();
-    mainWin.setupPlugins();
-    mainWin.setupUI();
-
-    splashscreen->finish(&mainWin);
+//    splashscreen->finish(&mainWin);
 
     QSurfaceFormat fmt;
     fmt.setSamples(10);
