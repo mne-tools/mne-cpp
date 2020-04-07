@@ -61,6 +61,7 @@ RtClient::RtClient(QString p_sRtServerHostname, QString p_sClientAlias, QObject 
 , m_bIsRunning(false)
 , m_sClientAlias(p_sClientAlias)
 , m_sRtServerHostName(p_sRtServerHostname)
+, m_iDefaultPort(4217)
 {
 }
 
@@ -98,18 +99,18 @@ void RtClient::run()
     // Connect Clients
     //
     RtCmdClient t_cmdClient;
-    t_cmdClient.connectToHost(m_sRtServerHostName);
+    t_cmdClient.connectToHost(m_sRtServerHostName,m_iDefaultPort);
     t_cmdClient.waitForConnected(1000);
 
     while(t_cmdClient.state() != QTcpSocket::ConnectedState)
     {
         msleep(100);
-        t_cmdClient.connectToHost(m_sRtServerHostName);
+        t_cmdClient.connectToHost(m_sRtServerHostName,m_iDefaultPort);
         t_cmdClient.waitForConnected(1000);
     }
 
     RtDataClient t_dataClient;
-    t_dataClient.connectToHost(m_sRtServerHostName);
+    t_dataClient.connectToHost(m_sRtServerHostName,m_iDefaultPort);
     t_dataClient.waitForConnected();
 
     mutex.lock();

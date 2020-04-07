@@ -140,7 +140,7 @@ private:
     QString     m_sClientAlias;             /**< The clien alias of the data client */
     QString     m_sRtServerHostName;        /**< The IP Adress of mne_rt_server.*/
     FIFFLIB::FiffInfo::SPtr  m_pFiffInfo;   /**< Fiff measurement info.*/
-
+    quint16      m_iDefaultPort;
 signals:
     //=========================================================================================================
     /**
