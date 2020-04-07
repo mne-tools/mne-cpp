@@ -85,27 +85,6 @@ public:
     explicit RtDataClient(QObject *parent = Q_NULLPTR);
 
     //=========================================================================================================
-//    /**
-//     * Connect to a mne_rt_server using port 4218
-//     *
-//     * @param[in] p_sRtServerHostName    The IP address of the mne_rt_server
-//     */
-//
-//    void connectToHost(const QString& p_sRtServerHostName);
-//    //=========================================================================================================
-//    /**
-//     * Connect to a mne_rt_server using port 4217
-//     *
-//     * @param[in] hostName      The hostName on the given port.
-//     * @param[in] port          The port.
-//     * @param[in] openMode      The open mode. Default is QIODevice::OpenMode::ReadWrite.
-//     * @param[in] protocol      The protocol. Default is QAbstractSocket::NetworkLayerProtocol::AnyIPProtocol.
-//     */
-//    void connectToHost(const QString &hostName,
-//                       quint16 port,
-//                       QIODevice::OpenMode openMode = ReadWrite,
-//                       QAbstractSocket::NetworkLayerProtocol protocol = AnyIPProtocol);
-    //=========================================================================================================
     /**
      * Attempts to close the socket. If there is pending data waiting to be written, QAbstractSocket will enter
      * ClosingState and wait until all data has been written. Eventually, it will enter UnconnectedState and
@@ -137,7 +116,9 @@ public:
      * @param[out] data          The read data - ToDo change this to raw buffer data object
      * @param[out] kind          Data kind
      */
-    void readRawBuffer(qint32 p_nChannels, Eigen::MatrixXf& data, FIFFLIB::fiff_int_t& kind);
+    void readRawBuffer(qint32 p_nChannels,
+                       Eigen::MatrixXf& data,
+                       FIFFLIB::fiff_int_t& kind);
 
     //=========================================================================================================
     /**
@@ -149,10 +130,6 @@ public:
 
 private:
     qint32 m_clientID;  /**< Corresponding client id of the data client at mne_rt_server */
-
-signals:
-    
-public slots:
     
 };
 } // NAMESPACE
