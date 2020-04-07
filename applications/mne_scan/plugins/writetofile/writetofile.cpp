@@ -69,11 +69,11 @@ using namespace Eigen;
 //=============================================================================================================
 
 WriteToFile::WriteToFile()
-: m_iBlinkStatus(0)
-, m_bWriteToFile(false)
+: m_bWriteToFile(false)
 , m_bUseRecordTimer(false)
-, m_iRecordingMSeconds(5*60*1000)
+, m_iBlinkStatus(0)
 , m_iSplitCount(0)
+, m_iRecordingMSeconds(5*60*1000)
 , m_pCircularBuffer(CircularBuffer_Matrix_double::SPtr(new CircularBuffer_Matrix_double(40)))
 {
     m_pActionRecordFile = new QAction(QIcon(":/images/record.png"), tr("Start Recording"),this);
@@ -110,7 +110,7 @@ WriteToFile::~WriteToFile()
 
 QSharedPointer<IPlugin> WriteToFile::clone() const
 {
-    QSharedPointer<WriteToFile> pWriteToFileClone(new WriteToFile);
+    QSharedPointer<IPlugin> pWriteToFileClone(new WriteToFile);
     return pWriteToFileClone;
 }
 
