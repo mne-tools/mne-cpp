@@ -131,7 +131,7 @@ bool FtConnector::getHeader()
     sendRequest(messagedef);
 
     //Waiting for response.
-    while(m_pSocket->bytesAvailable() < sizeof (messagedef_t)) {
+    while(static_cast<quint64>(m_pSocket->bytesAvailable()) < sizeof (messagedef_t)) {
         m_pSocket->waitForReadyRead(10);
     }
 
@@ -420,7 +420,7 @@ int FtConnector::totalBuffSamples()
     m_pSocket->write(reinterpret_cast<char*>(&timeout), sizeof (qint32));
 
     //Waiting for response.
-    while(m_pSocket->bytesAvailable() < sizeof (messagedef_t)) {
+    while(static_cast<quint64>(m_pSocket->bytesAvailable()) < sizeof (messagedef_t)) {
         m_pSocket->waitForReadyRead(10);
     }
 
@@ -430,7 +430,7 @@ int FtConnector::totalBuffSamples()
     parseMessageDef(msgBuffer);
 
     //Waiting for response.
-    while(m_pSocket->bytesAvailable() < sizeof (samples_events_t)) {
+    while(static_cast<quint64>(m_pSocket->bytesAvailable()) < sizeof (samples_events_t)) {
         m_pSocket->waitForReadyRead(10);
     }
 
