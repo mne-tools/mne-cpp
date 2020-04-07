@@ -202,11 +202,8 @@ void RawDataViewer::handleEvent(QSharedPointer<Event> e)
 
 QVector<EVENT_TYPE> RawDataViewer::getEventSubscriptions(void) const
 {
-    QVector<EVENT_TYPE> temp = {EXTENSION_INIT_FINISHED, };
+    QVector<EVENT_TYPE> temp = {EXTENSION_INIT_FINISHED,};
 
-    // tell everyone that INIT-phase is finished
-    Communicator con;
-    con.publishEvent(EVENT_TYPE::EXTENSION_INIT_FINISHED);
     return temp;
 }
 
