@@ -40,8 +40,10 @@
 
 #include "datamanager.h"
 #include "FormFiles/datamanagerview.h"
+
 #include <anShared/Management/analyzedata.h>
-#include "anShared/Utils/metatypes.h"
+#include <anShared/Management/communicator.h>
+#include <anShared/Utils/metatypes.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -61,8 +63,6 @@ using namespace ANSHAREDLIB;
 //=============================================================================================================
 
 DataManager::DataManager()
-: m_pControlDock(Q_NULLPTR)
-, m_pDataManagerView(Q_NULLPTR)
 {
 
 }
@@ -71,7 +71,7 @@ DataManager::DataManager()
 
 DataManager::~DataManager()
 {
-    delete m_pDataManagerView;
+    delete m_pCommu;
 }
 
 //=============================================================================================================
@@ -86,7 +86,12 @@ QSharedPointer<IExtension> DataManager::clone() const
 
 void DataManager::init()
 {
+    m_pCommu = new Communicator(this);
+
     m_pDataManagerView = new DataManagerView;
+
+    connect(m_pDataManagerView.data(), &DataManagerView::currentlySelectedModelChanged,
+            this, &DataManager::onCurrentlySelectedModelChanged);
 
     updateListWidget();
 
@@ -165,7 +170,6 @@ void DataManager::updateListWidget()
 
     //add all model names to the listView
     for(QSharedPointer<AbstractModel> pModel: lModels) {
-
         if(pModel->getType() == MODEL_TYPE::ANSHAREDLIB_QENTITYLIST_MODEL) {
             continue;
         }
@@ -178,3 +182,11 @@ void DataManager::updateListWidget()
 }
 
 //=============================================================================================================
+
+void DataManager::onCurrentlySelectedModelChanged(const QString& sCurrentItemText)
+{
+    qDebug()<<"[DataManager::onCurrentlySelectedModelChanged]" << sCurrentItemText;
+
+    QVariant data(sCurrentItemText);
+    m_pCommu->publishEvent(EVENT_TYPE::CURRENTLY_SELECTED_MODEL, data);
+}

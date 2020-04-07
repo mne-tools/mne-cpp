@@ -55,6 +55,10 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+namespace ANSHAREDLIB {
+    class Communicator;
+}
+
 //=============================================================================================================
 // DEFINE NAMESPACE DATALOADEREXTENSION
 //=============================================================================================================
@@ -120,14 +124,11 @@ private:
      */
     void onSaveFiffFilePressed();
 
-    //=========================================================================================================
-    /**
-     * This functions creates all connection to the gui.
-     */
-    void initGuiConnections();
+    QPointer<QDockWidget>               m_pControl;             /**< Control Widget */
+    QPointer<DataLoaderControl>         m_pDataLoaderControl;   /**< The data loader control Widget */
+    QPointer<ANSHAREDLIB::Communicator> m_pCommu;
 
-    QPointer<QDockWidget>        m_pControl;             /**< Control Widget */
-    QPointer<DataLoaderControl>  m_pDataLoaderControl;   /**< The data loader control Widget */
+    QString                             m_sCurrentlySelectedModel;
 
 };
 

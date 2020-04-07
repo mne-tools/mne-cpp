@@ -56,6 +56,9 @@ DataManagerView::DataManagerView(QWidget *parent)
     , ui(new Ui::DataManagerView)
 {
     ui->setupUi(this);
+
+    connect(ui->m_qListWidget, &QListWidget::currentItemChanged,
+            this, &DataManagerView::onCurrentItemChanged);
 }
 
 //=============================================================================================================
@@ -70,6 +73,9 @@ DataManagerView::~DataManagerView()
 void DataManagerView::addListItem(QListWidgetItem *pNewItem)
 {
     ui->m_qListWidget->addItem(pNewItem);
+
+    // Always set the last added item as the current one. This will also trigger the currently selected model signal.
+    ui->m_qListWidget->setCurrentItem(ui->m_qListWidget->item(ui->m_qListWidget->count()-1));
 }
 
 //=============================================================================================================
@@ -77,6 +83,15 @@ void DataManagerView::addListItem(QListWidgetItem *pNewItem)
 void DataManagerView::clearList()
 {
     ui->m_qListWidget->clear();
+}
+
+//=============================================================================================================
+#include <QDebug>
+void DataManagerView::onCurrentItemChanged(QListWidgetItem *current,
+                                           QListWidgetItem *previous)
+{
+    qDebug() << "DataManagerView::onCurrentItemChanged";
+    emit currentlySelectedModelChanged(current->text());
 }
 
 //=============================================================================================================

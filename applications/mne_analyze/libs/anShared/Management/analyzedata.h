@@ -162,11 +162,12 @@ public:
      * This is the main function for saving models. It simply calls the models save function with the
      * provided path.
      */
-    bool saveModel(const QString& sPath)
+    bool saveModel(const QString& sModelPath,
+                   const QString& sPath)
     {
         // check if model was already loaded:
-        if (m_data.contains(sPath)) {
-            QSharedPointer<AbstractModel> temp = getModel(sPath);
+        if (m_data.contains(sModelPath)) {
+            QSharedPointer<AbstractModel> temp = getModel(sModelPath);
             return temp->saveToFile(sPath);
         }
 
