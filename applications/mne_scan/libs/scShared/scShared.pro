@@ -57,17 +57,17 @@ contains(MNECPP_CONFIG, static) {
 #    QTPLUGIN += gusbamp
 #    QTPLUGIN += eegosports
 #    QTPLUGIN += brainamp
-#    QTPLUGIN += tmsi
-#    QTPLUGIN += lsladapter
-    QTPLUGIN += dummytoolbox
+    QTPLUGIN += tmsi
+    QTPLUGIN += lsladapter
+#    QTPLUGIN += dummytoolbox
     QTPLUGIN += rtcmne
-    QTPLUGIN += rtcmusic
     QTPLUGIN += averaging
     QTPLUGIN += covariance
     QTPLUGIN += noisereduction
-    QTPLUGIN += ssvepbci
     QTPLUGIN += neuronalconnectivity
     QTPLUGIN += ftbuffer
+    QTPLUGIN += writetofile
+    QTPLUGIN += hpi
 } else {
     CONFIG += shared
 }

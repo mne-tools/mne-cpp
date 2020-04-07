@@ -52,16 +52,16 @@
 //#include <../plugins/gusbamp/gusbamp.h>
 //#include <../plugins/eegosports/eegosports.h>
 //#include <../plugins/brainamp/brainamp.h>
-//#include <../plugins/tmsi/tmsi.h>
-//#include <../plugins/lsladapter/lsladapter.h>
-#include <../plugins/dummytoolbox/dummytoolbox.h>
+#include <../plugins/tmsi/tmsi.h>
+#include <../plugins/lsladapter/lsladapter.h>
+//#include <../plugins/dummytoolbox/dummytoolbox.h>
 #include <../plugins/rtcmne/rtcmne.h>
-#include <../plugins/rtcmusic/rtcmusic.h>
 #include <../plugins/averaging/averaging.h>
 #include <../plugins/covariance/covariance.h>
 #include <../plugins/noisereduction/noisereduction.h>
-#include <../plugins/ssvepbci/ssvepbci.h>
 #include <../plugins/neuronalconnectivity/neuronalconnectivity.h>
+#include <../plugins/writetofile/writetofile.h>
+#include <../plugins/hpi/hpi.h>
 #endif
 
 //=============================================================================================================
@@ -194,6 +194,7 @@ void PluginManager::loadPlugins(const QString& dir)
                     qDebug() << "RTAlgorithm " << pAlgorithm->getName() << " loaded.";
                 }
             }
+
             emit pluginLoaded(msg);
         }
 //        else
