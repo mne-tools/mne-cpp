@@ -1773,6 +1773,7 @@ bool mne_attach_env(const QString& name, const QString& command)
 ComputeFwd::ComputeFwd(ComputeFwdSettings* p_settings)
     : settings(p_settings)
 {
+    initResult();
 }
 
 //=============================================================================================================
@@ -1784,7 +1785,7 @@ ComputeFwd::~ComputeFwd()
 
 //=============================================================================================================
 
-void ComputeFwd::calculateFwd() const
+void ComputeFwd::calculateFwd()
 {
     // TODO: This only temporary until we have the fwd dlibrary refactored. This is only done in order to provide easy testing in test_forward_solution.
     bool                res = false;
@@ -2135,6 +2136,21 @@ void ComputeFwd::calculateFwd() const
                                               &meg_forward,
                                               settings->compute_grad ? &meg_forward_grad : Q_NULLPTR)) == FAIL)
             goto out;
+
+    // store results in struct
+    // hacky way to get results for partial recomputation
+    result.spaces = spaces;
+    result.nspace = nspace;
+    result.megCoils = megcoils;
+    result.comp_coils = compcoils;
+    result.comp_data = comp_data;
+    result.fixed_ori = settings->fixed_ori;
+    result.bem_model = bem_model;
+    result.r0 = &settings->r0;
+    result.use_threads = settings->use_threads;
+    result.megForward = &meg_forward;
+    result.megForwardGrad = settings->compute_grad ? &meg_forward_grad : Q_NULLPTR;
+
     if (neeg > 0)
         if ((FwdBemModel::compute_forward_eeg(spaces,
                                               nspace,
@@ -2171,8 +2187,10 @@ void ComputeFwd::calculateFwd() const
                         meg_forward,
                         eeg_forward,
                         meg_forward_grad,
-                        eeg_forward_grad))
+                        eeg_forward_grad)) {
         goto out;
+    }
+
     if (!mne_attach_env(settings->solname,settings->command))
         goto out;
     printf("done\n");
@@ -2208,3 +2226,17 @@ out : {
     }
 }
 
+void ComputeFwd::initResult()
+{
+    result.spaces = Q_NULLPTR;
+    result.nspace = -1;
+    result.megCoils = Q_NULLPTR;
+    result.comp_coils = Q_NULLPTR;
+    result.comp_data = Q_NULLPTR;
+    result.fixed_ori = true;
+    result.bem_model = Q_NULLPTR;
+    result.r0 = Q_NULLPTR;
+    result.use_threads = true;
+    result.megForward = Q_NULLPTR;
+    result.megForwardGrad = Q_NULLPTR;
+}
