@@ -91,8 +91,8 @@ namespace ANSHAREDLIB
     {
         PING,                       // dummy event for testing and debuggin purposes
         EXTENSION_INIT_FINISHED,    // send when all extensions finished initializing
-        STATUS_BAR_MSG              // sending a message to the status bar (part of gui)
-
+        STATUS_BAR_MSG,             // sending a message to the status bar (part of gui)
+        CURRENTLY_SELECTED_MODEL
     };
 } //NAMESPACE
 

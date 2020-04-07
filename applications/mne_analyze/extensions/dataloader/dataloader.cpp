@@ -40,6 +40,7 @@
 #include "FormFiles/dataloadercontrol.h"
 
 #include <anShared/Model/fiffrawviewmodel.h>
+#include <anShared/Management/communicator.h>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -76,9 +77,15 @@ QSharedPointer<IExtension> DataLoader::clone() const
 
 void DataLoader::init()
 {
+    m_pCommu = new Communicator(this);
+
     m_pDataLoaderControl = new DataLoaderControl();
 
-    initGuiConnections();
+    connect(m_pDataLoaderControl.data(), &DataLoaderControl::loadFiffFile,
+            this, &DataLoader::onLoadFiffFilePressed);
+
+    connect(m_pDataLoaderControl.data(), &DataLoaderControl::saveFiffFile,
+            this, &DataLoader::onSaveFiffFilePressed);
 }
 
 //=============================================================================================================
@@ -126,14 +133,21 @@ QWidget *DataLoader::getView()
 
 void DataLoader::handleEvent(QSharedPointer<Event> e)
 {
-    Q_UNUSED(e);
+    switch (e->getType()) {
+    case EVENT_TYPE::CURRENTLY_SELECTED_MODEL:
+        m_sCurrentlySelectedModel = e->getData().toString();
+        qDebug() << m_sCurrentlySelectedModel;
+        break;
+    default:
+        qWarning() << "[DataLoader::handleEvent] Received an Event that is not handled by switch cases.";
+    }
 }
 
 //=============================================================================================================
 
 QVector<EVENT_TYPE> DataLoader::getEventSubscriptions(void) const
 {
-    return QVector<EVENT_TYPE>();
+    return QVector<EVENT_TYPE>(CURRENTLY_SELECTED_MODEL);
 }
 
 //=============================================================================================================
@@ -171,17 +185,6 @@ void DataLoader::onSaveFiffFilePressed()
                                                     tr("Fiff file(*.fif *.fiff)"));
 
     if(!filePath.isNull()) {
-        m_pAnalyzeData->saveModel(filePath);
+        m_pAnalyzeData->saveModel(m_sCurrentlySelectedModel, filePath);
     }
-}
-
-//=============================================================================================================
-
-void DataLoader::initGuiConnections()
-{
-    connect(m_pDataLoaderControl.data(), &DataLoaderControl::loadFiffFile,
-            this, &DataLoader::onLoadFiffFilePressed);
-
-    connect(m_pDataLoaderControl.data(), &DataLoaderControl::saveFiffFile,
-            this, &DataLoader::onSaveFiffFilePressed);
 }

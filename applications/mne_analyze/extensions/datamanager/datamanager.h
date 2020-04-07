@@ -43,7 +43,6 @@
 
 #include "datamanager_global.h"
 #include <anShared/Interfaces/IExtension.h>
-#include <anShared/Management/communicator.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -52,6 +51,7 @@
 #include <QtWidgets>
 #include <QtCore/QtPlugin>
 #include <QDebug>
+#include <QPointer>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -108,16 +108,17 @@ public:
     virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
 
 private:
-
     //=========================================================================================================
     /**
      * Updates the content of the list widget.
      */
     void updateListWidget();
 
+    void onCurrentlySelectedModelChanged(const QString& sCurrentItemText);
+
     // Control
-    QDockWidget*                        m_pControlDock;         /**< Control Widget */
-    DataManagerView*                    m_pDataManagerView;
+    QPointer<QDockWidget>               m_pControlDock;         /**< Control Widget */
+    QPointer<DataManagerView>           m_pDataManagerView;
     QPointer<ANSHAREDLIB::Communicator> m_pCommu;
 };
 

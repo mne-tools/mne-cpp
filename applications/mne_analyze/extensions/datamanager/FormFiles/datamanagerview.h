@@ -93,8 +93,13 @@ public:
     void clearList();
 
 private:
+    void onCurrentItemChanged(QListWidgetItem *current,
+                              QListWidgetItem *previous);
 
     Ui::DataManagerView *ui;   /**< The user interface */
+
+signals:
+    void currentlySelectedModelChanged(const QString& sCurrentModelText);
 };
 
 #endif // DATAMANAGERVIEW_H
