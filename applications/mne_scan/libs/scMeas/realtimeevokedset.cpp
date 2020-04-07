@@ -59,8 +59,8 @@ using namespace FIFFLIB;
 RealTimeEvokedSet::RealTimeEvokedSet(QObject *parent)
 : Measurement(QMetaType::type("RealTimeEvokedSet::SPtr"), parent)
 , m_pFiffEvokedSet(new FiffEvokedSet)
-, m_bInitialized(false)
 , m_iPreStimSamples(0)
+, m_bInitialized(false)
 {
 }
 
@@ -80,7 +80,7 @@ void RealTimeEvokedSet::init(FiffInfo::SPtr p_fiffInfo)
 
     m_pFiffInfo = p_fiffInfo;
 
-    qsrand(time(NULL));
+    qsrand(static_cast<uint>(time(Q_NULLPTR)));
     for(qint32 i = 0; i < p_fiffInfo->nchan; ++i)
     {
          m_qListChColors.append(QColor(qrand() % 256, qrand() % 256, qrand() % 256));

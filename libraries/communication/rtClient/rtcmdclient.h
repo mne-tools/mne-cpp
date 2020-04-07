@@ -88,14 +88,26 @@ public:
      */
     explicit RtCmdClient(QObject *parent = Q_NULLPTR);
 
+//    //=========================================================================================================
+//    /**
+//     * Connect to a mne_rt_server using port 4217
+//     *
+//     * @param[in] p_sRtServerHostName    The IP address of the mne_rt_server
+//     */
+//    void connectToHost(QString &p_sRtServerHostName);
     //=========================================================================================================
     /**
      * Connect to a mne_rt_server using port 4217
      *
-     * @param[in] p_sRtServerHostName    The IP address of the mne_rt_server
+     * @param[in] hostName      The hostName on the given port.
+     * @param[in] port          The port.
+     * @param[in] openMode      The open mode. Default is QIODevice::OpenMode::ReadWrite.
+     * @param[in] protocol      The protocol. Default is QAbstractSocket::NetworkLayerProtocol::AnyIPProtocol.
      */
-    void connectToHost(QString &p_sRtServerHostName);
-
+    void connectToHost(const QString &hostName,
+                       quint16 port,
+                       QIODevice::OpenMode openMode = ReadWrite,
+                       QAbstractSocket::NetworkLayerProtocol protocol = AnyIPProtocol);
     //=========================================================================================================
     /**
      * Checks if a command is managed;
@@ -199,7 +211,6 @@ private:
     CommandManager  m_commandManager;   /**< The command manager. */
     QMutex          m_qMutex;           /**< Access serialization between threads */
     QString         m_sAvailableData;   /**< The last received response. */
-    using QTcpSocket::connectToHost;
 };
 
 //=============================================================================================================
