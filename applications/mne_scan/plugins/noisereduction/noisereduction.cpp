@@ -80,16 +80,16 @@ using namespace Eigen;
 //=============================================================================================================
 
 NoiseReduction::NoiseReduction()
-: m_pNoiseReductionInput(NULL)
-, m_pNoiseReductionOutput(NULL)
-, m_iMaxFilterTapSize(-1)
+: m_bCompActivated(false)
 , m_bSpharaActive(false)
-, m_bFilterActivated(false)
 , m_bProjActivated(false)
-, m_bCompActivated(false)
-, m_sCurrentSystem("VectorView")
+, m_bFilterActivated(false)
 , m_iMaxFilterLength(1)
+, m_iMaxFilterTapSize(-1)
+, m_sCurrentSystem("VectorView")
 , m_pCircularBuffer(QSharedPointer<IOBUFFER::CircularBuffer_Matrix_double>::create(40))
+, m_pNoiseReductionInput(Q_NULLPTR)
+, m_pNoiseReductionOutput(Q_NULLPTR)
 {
     if(m_sCurrentSystem == "BabyMEG") {
         m_iNBaseFctsFirst = 270;
