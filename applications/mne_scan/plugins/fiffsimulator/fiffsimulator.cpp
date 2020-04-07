@@ -83,6 +83,7 @@ FiffSimulator::FiffSimulator()
 , m_iBufferSize(-1)
 , m_pCircularBuffer(QSharedPointer<CircularBuffer_Matrix_float>(new CircularBuffer_Matrix_float(40)))
 , m_pRtCmdClient(QSharedPointer<RtCmdClient>::create())
+, m_iDefaultPort(4217)
 {
     //init channels when fiff info is available
     connect(this, &FiffSimulator::fiffInfoAvailable,
@@ -276,7 +277,7 @@ void FiffSimulator::connectCmdClient()
         m_pFiffSimulatorProducer->start();
     }
 
-    m_pRtCmdClient->connectToHost(m_sFiffSimulatorIP,0);
+    m_pRtCmdClient->connectToHost(m_sFiffSimulatorIP,m_iDefaultPort);
     m_pRtCmdClient->waitForConnected(1000);
 
     if(m_pRtCmdClient->state() == QTcpSocket::ConnectedState)

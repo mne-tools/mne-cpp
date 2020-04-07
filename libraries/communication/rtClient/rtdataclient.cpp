@@ -62,19 +62,6 @@ RtDataClient::RtDataClient(QObject *parent)
 
 //=============================================================================================================
 
-//=============================================================================================================
-
-void RtDataClient::connectToHost(const QString &hostName,
-                                quint16 port,
-                                QIODevice::OpenMode openMode,
-                                QAbstractSocket::NetworkLayerProtocol protocol)
-{   const int PORT_NUM(4217);
-    Q_UNUSED(port)
-    QTcpSocket::connectToHost(hostName, PORT_NUM, openMode, protocol);
-}
-
-//=============================================================================================================
-
 void RtDataClient::disconnectFromHost()
 {
     QTcpSocket::disconnectFromHost();

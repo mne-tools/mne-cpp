@@ -92,19 +92,19 @@ public:
 //     */
 //
 //    void connectToHost(const QString& p_sRtServerHostName);
-    //=========================================================================================================
-    /**
-     * Connect to a mne_rt_server using port 4217
-     *
-     * @param[in] hostName      The hostName on the given port.
-     * @param[in] port          The port.
-     * @param[in] openMode      The open mode. Default is QIODevice::OpenMode::ReadWrite.
-     * @param[in] protocol      The protocol. Default is QAbstractSocket::NetworkLayerProtocol::AnyIPProtocol.
-     */
-    void connectToHost(const QString &hostName,
-                       quint16 port,
-                       QIODevice::OpenMode openMode = ReadWrite,
-                       QAbstractSocket::NetworkLayerProtocol protocol = AnyIPProtocol);
+//    //=========================================================================================================
+//    /**
+//     * Connect to a mne_rt_server using port 4217
+//     *
+//     * @param[in] hostName      The hostName on the given port.
+//     * @param[in] port          The port.
+//     * @param[in] openMode      The open mode. Default is QIODevice::OpenMode::ReadWrite.
+//     * @param[in] protocol      The protocol. Default is QAbstractSocket::NetworkLayerProtocol::AnyIPProtocol.
+//     */
+//    void connectToHost(const QString &hostName,
+//                       quint16 port,
+//                       QIODevice::OpenMode openMode = ReadWrite,
+//                       QAbstractSocket::NetworkLayerProtocol protocol = AnyIPProtocol);
     //=========================================================================================================
     /**
      * Attempts to close the socket. If there is pending data waiting to be written, QAbstractSocket will enter
