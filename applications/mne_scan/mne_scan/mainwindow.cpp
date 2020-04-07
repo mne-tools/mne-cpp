@@ -113,6 +113,12 @@ MainWindow::MainWindow(QWidget *parent)
 
     setUnifiedTitleAndToolBarOnMac(false);
 
+    bool showSplashScreen=true;
+    setSplashScreen(showSplashScreen);
+    show();
+    setupPlugins();
+    setupUI();
+    m_pSplashScreen->finish(this);
 }
 
 //=============================================================================================================
@@ -138,7 +144,7 @@ void MainWindow::setupPlugins()
     if(m_pSplashScreen.data())
     {
         QObject::connect(m_pPluginManager.data(),&PluginManager::pluginLoaded,
-                         m_pSplashScreen,&MainSplashScreen::showMessage);
+                         m_pSplashScreen.data(),&MainSplashScreen::showMessage);
     }
     m_pPluginManager->loadPlugins(qApp->applicationDirPath()+pluginDir);
 
@@ -165,9 +171,14 @@ void MainWindow::setupUI()
     initStatusBar();
 }
 
-void MainWindow::setSplashScreen(MainSplashScreen &splashScreen)
+void MainWindow::setSplashScreen(bool ShowSplashScreen)
 {
-    m_pSplashScreen = &splashScreen;
+    QPixmap splashPixMap(":/images/splashscreen.png");
+    m_pSplashScreen = MainSplashScreen::SPtr(new MainSplashScreen(splashPixMap));
+    if(ShowSplashScreen)
+    {
+        m_pSplashScreen->show();
+    }
 }
 //=============================================================================================================
 
