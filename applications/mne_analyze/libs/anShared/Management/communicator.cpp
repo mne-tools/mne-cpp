@@ -57,8 +57,8 @@ using namespace ANSHAREDLIB;
 //=============================================================================================================
 
 Communicator::Communicator(const QVector<EVENT_TYPE> &subs)
-    : m_ID(nextID()),
-      m_EventSubscriptions(subs)
+: m_ID(nextID())
+, m_EventSubscriptions(subs)
 {
     EventManager::getEventManager().addCommunicator(this);
 }
@@ -66,7 +66,7 @@ Communicator::Communicator(const QVector<EVENT_TYPE> &subs)
 //=============================================================================================================
 
 Communicator::Communicator(IExtension* extension)
-    : Communicator(extension->getEventSubscriptions())
+: Communicator(extension->getEventSubscriptions())
 {
     QObject::connect(this, &Communicator::receivedEvent,
                      extension, &IExtension::handleEvent);

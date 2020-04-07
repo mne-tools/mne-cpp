@@ -189,6 +189,7 @@ QWidget *RawDataViewer::getView()
 
 void RawDataViewer::handleEvent(QSharedPointer<Event> e)
 {
+    qWarning() << "[RawDataViewer::handleEvent] hellooo.";
     switch (e->getType()) {
     case EVENT_TYPE::EXTENSION_INIT_FINISHED:
         m_pSubWindow->resize(800, 600);
@@ -202,7 +203,7 @@ void RawDataViewer::handleEvent(QSharedPointer<Event> e)
 
 QVector<EVENT_TYPE> RawDataViewer::getEventSubscriptions(void) const
 {
-    QVector<EVENT_TYPE> temp = {EXTENSION_INIT_FINISHED,};
+    QVector<EVENT_TYPE> temp = {EXTENSION_INIT_FINISHED};
 
     return temp;
 }

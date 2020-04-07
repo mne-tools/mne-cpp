@@ -131,7 +131,8 @@ public:
     *
     * @return                       FiffRawViewModel that contains the loaded Fiff raw data.
     */
-    QSharedPointer<FiffRawViewModel> loadFiffRawViewModel(const QString &sPath, const QByteArray& byteLoadedData);
+    QSharedPointer<FiffRawViewModel> loadFiffRawViewModel(const QString &sPath,
+                                                          const QByteArray& byteLoadedData);
 
     //=========================================================================================================
     /**
@@ -166,8 +167,7 @@ public:
                    const QString& sPath)
     {
         // check if model was already loaded:
-        if (m_data.contains(sModelPath)) {
-            QSharedPointer<AbstractModel> temp = getModel(sModelPath);
+        if (QSharedPointer<AbstractModel> temp = getModel(sModelPath)) {
             return temp->saveToFile(sPath);
         }
 

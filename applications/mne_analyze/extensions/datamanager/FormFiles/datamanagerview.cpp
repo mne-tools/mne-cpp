@@ -86,12 +86,12 @@ void DataManagerView::clearList()
 }
 
 //=============================================================================================================
-#include <QDebug>
+
 void DataManagerView::onCurrentItemChanged(QListWidgetItem *current,
                                            QListWidgetItem *previous)
 {
-    qDebug() << "DataManagerView::onCurrentItemChanged";
-    emit currentlySelectedModelChanged(current->text());
+    // The full model path is stored in the tooltip instead of the text
+    emit currentlySelectedModelChanged(current->toolTip());
 }
 
 //=============================================================================================================
