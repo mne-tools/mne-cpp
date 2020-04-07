@@ -107,7 +107,8 @@ FiffStream::FiffStream(QIODevice *p_pIODevice)
 
 //=============================================================================================================
 
-FiffStream::FiffStream(QByteArray * a, QIODevice::OpenMode mode)
+FiffStream::FiffStream(QByteArray * a,
+                       QIODevice::OpenMode mode)
 : QDataStream(a, mode)
 {
     this->setFloatingPointPrecision(QDataStream::SinglePrecision);
@@ -1655,7 +1656,8 @@ bool FiffStream::read_rt_tag(FiffTag::SPtr &p_pTag)
 
 //=============================================================================================================
 
-bool FiffStream::read_tag(FiffTag::SPtr &p_pTag, fiff_long_t pos)
+bool FiffStream::read_tag(FiffTag::SPtr &p_pTag,
+                          fiff_long_t pos)
 {
     if (pos >= 0) {
         this->device()->seek(pos);
@@ -1702,7 +1704,10 @@ bool FiffStream::read_tag(FiffTag::SPtr &p_pTag, fiff_long_t pos)
 
 //=============================================================================================================
 
-bool FiffStream::setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool allow_maxshield, bool is_littleEndian)
+bool FiffStream::setup_read_raw(QIODevice &p_IODevice,
+                                FiffRawData& data,
+                                bool allow_maxshield,
+                                bool is_littleEndian)
 {
     //
     //   Open the file
@@ -2009,7 +2014,11 @@ FiffStream::SPtr FiffStream::open_update(QIODevice &p_IODevice)
 
 //=============================================================================================================
 
-FiffStream::SPtr FiffStream::start_writing_raw(QIODevice &p_IODevice, const FiffInfo& info, RowVectorXd& cals, MatrixXi sel, bool bResetRange)
+FiffStream::SPtr FiffStream::start_writing_raw(QIODevice &p_IODevice,
+                                               const FiffInfo& info,
+                                               RowVectorXd& cals,
+                                               MatrixXi sel,
+                                               bool bResetRange)
 {
     //
     //   We will always write floats

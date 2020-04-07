@@ -125,7 +125,8 @@ void ExtensionManager::loadExtensionsFromDirectory(const QString& dir)
 
 //=============================================================================================================
 
-void ExtensionManager::initExtensions(QSharedPointer<AnalyzeSettings> settings, QSharedPointer<AnalyzeData> data)
+void ExtensionManager::initExtensions(QSharedPointer<AnalyzeSettings> settings,
+                                      QSharedPointer<AnalyzeData> data)
 {
     for(IExtension* extension : m_qVecExtensions)
     {
@@ -133,6 +134,7 @@ void ExtensionManager::initExtensions(QSharedPointer<AnalyzeSettings> settings, 
         extension->setGlobalData(data);
         extension->init();
     }
+
     // tell everyone that INIT-phase is finished
     Communicator con;
     con.publishEvent(EVENT_TYPE::EXTENSION_INIT_FINISHED);

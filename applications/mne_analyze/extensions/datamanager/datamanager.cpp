@@ -183,10 +183,8 @@ void DataManager::updateListWidget()
 
 //=============================================================================================================
 
-void DataManager::onCurrentlySelectedModelChanged(const QString& sCurrentItemText)
+void DataManager::onCurrentlySelectedModelChanged(const QString& sCurrentModelPath)
 {
-    qDebug()<<"[DataManager::onCurrentlySelectedModelChanged]" << sCurrentItemText;
-
-    QVariant data(sCurrentItemText);
+    QVariant data(sCurrentModelPath);
     m_pCommu->publishEvent(EVENT_TYPE::CURRENTLY_SELECTED_MODEL, data);
 }

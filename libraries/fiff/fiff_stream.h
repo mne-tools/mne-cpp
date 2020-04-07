@@ -426,7 +426,8 @@ public:
      *
      * @return true if succeeded, false otherwise
      */
-    bool read_tag(QSharedPointer<FiffTag>& p_pTag, fiff_long_t pos = -1);
+    bool read_tag(QSharedPointer<FiffTag>& p_pTag,
+                  fiff_long_t pos = -1);
 
     //=========================================================================================================
     /**
@@ -442,7 +443,10 @@ public:
      *
      * @return true if succeeded, false otherwise
      */
-    static bool setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool allow_maxshield = true, bool is_littleEndian = false);
+    static bool setup_read_raw(QIODevice &p_IODevice,
+                               FiffRawData& data,
+                               bool allow_maxshield = true,
+                               bool is_littleEndian = false);
 
     //=========================================================================================================
     /**

@@ -114,7 +114,7 @@ private:
      */
     void updateListWidget();
 
-    void onCurrentlySelectedModelChanged(const QString& sCurrentItemText);
+    void onCurrentlySelectedModelChanged(const QString& sCurrentModelPath);
 
     // Control
     QPointer<QDockWidget>               m_pControlDock;         /**< Control Widget */

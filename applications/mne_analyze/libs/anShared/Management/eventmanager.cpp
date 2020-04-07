@@ -60,12 +60,12 @@ using namespace ANSHAREDLIB;
 //=============================================================================================================
 
 EventManager::EventManager()
-    : m_routingTable(),
-      m_eventQ(),
-      m_eventQMutex(),
-      m_routingTableMutex(),
-      m_sleepTime(40l),
-      m_running(false)
+: m_routingTable()
+, m_eventQ()
+, m_eventQMutex()
+, m_routingTableMutex()
+, m_sleepTime(40l)
+, m_running(false)
 {
 
 }
@@ -92,7 +92,8 @@ void EventManager::issueEvent(QSharedPointer<Event> e)
 
 //=============================================================================================================
 
-void EventManager::addSubscriptions(Communicator* commu, QVector<EVENT_TYPE> newsubs)
+void EventManager::addSubscriptions(Communicator* commu,
+                                    QVector<EVENT_TYPE> newsubs)
 {
     QMutexLocker temp(&m_routingTableMutex);
     for(const EVENT_TYPE& etype : newsubs)
@@ -103,7 +104,8 @@ void EventManager::addSubscriptions(Communicator* commu, QVector<EVENT_TYPE> new
 
 //=============================================================================================================
 
-void EventManager::updateSubscriptions(Communicator* commu,const QVector<EVENT_TYPE> &subs)
+void EventManager::updateSubscriptions(Communicator* commu,
+                                       const QVector<EVENT_TYPE> &subs)
 {
     // remove all old subscriptions from EventManager routing table
     removeCommunicator(commu);
