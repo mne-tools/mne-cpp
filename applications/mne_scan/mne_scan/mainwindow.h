@@ -165,8 +165,26 @@ public:
      */
     void writeToLog(const QString& logMsg, LogKind lgknd = _LogKndMessage, LogLevel lglvl = _LogLvNormal);
 
-    void setSplashScreen(bool ShowSplashScreen=false);
+    //=========================================================================================================
+    /**
+     * Set the splash screen.
+     *
+     * @param [in] pSplashScreen        The pointer to the splash screen.
+     * @param [in] bShowSplashScreen    Whether to show the splash screen until this widget is shown. Default is true.
+     */
+    void setSplashScreen(MainSplashScreen::SPtr& pSplashScreen,
+                         bool bShowSplashScreen = true);
+
+    //=========================================================================================================
+    /**
+     * Init an setup the plugins.
+     */
     void setupPlugins();
+
+    //=========================================================================================================
+    /**
+     * Setup the GUI of this widget.
+     */
     void setupUI();
 
 private:

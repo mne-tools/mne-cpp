@@ -113,12 +113,12 @@ MainWindow::MainWindow(QWidget *parent)
 
     setUnifiedTitleAndToolBarOnMac(false);
 
-    bool showSplashScreen=true;
-    setSplashScreen(showSplashScreen);
-    show();
+    QPixmap splashPixMap(":/images/splashscreen.png");
+    MainSplashScreen::SPtr pSplashScreen = MainSplashScreen::SPtr::create(splashPixMap);
+    setSplashScreen(pSplashScreen, true);
+
     setupPlugins();
     setupUI();
-    m_pSplashScreen->finish(this);
 }
 
 //=============================================================================================================
@@ -139,16 +139,14 @@ MainWindow::~MainWindow()
     delete m_pDynamicPluginToolBar;
 }
 
+//=============================================================================================================
+
 void MainWindow::setupPlugins()
 {
-    if(m_pSplashScreen.data())
-    {
-        QObject::connect(m_pPluginManager.data(),&PluginManager::pluginLoaded,
-                         m_pSplashScreen.data(),&MainSplashScreen::showMessage);
-    }
     m_pPluginManager->loadPlugins(qApp->applicationDirPath()+pluginDir);
-
 }
+
+//=============================================================================================================
 
 void MainWindow::setupUI()
 {
@@ -171,15 +169,24 @@ void MainWindow::setupUI()
     initStatusBar();
 }
 
-void MainWindow::setSplashScreen(bool ShowSplashScreen)
+//=============================================================================================================
+
+void MainWindow::setSplashScreen(MainSplashScreen::SPtr& pSplashScreen,
+                                 bool bShowSplashScreen)
 {
-    QPixmap splashPixMap(":/images/splashscreen.png");
-    m_pSplashScreen = MainSplashScreen::SPtr(new MainSplashScreen(splashPixMap));
-    if(ShowSplashScreen)
-    {
+    m_pSplashScreen = pSplashScreen;
+
+    if(m_pSplashScreen && m_pPluginManager) {
+        QObject::connect(m_pPluginManager.data(), &PluginManager::pluginLoaded,
+                         m_pSplashScreen.data(), &MainSplashScreen::showMessage);
+    }
+
+    if(m_pSplashScreen && bShowSplashScreen) {
+        m_pSplashScreen->finish(this);
         m_pSplashScreen->show();
     }
 }
+
 //=============================================================================================================
 
 void MainWindow::closeEvent(QCloseEvent *event)
