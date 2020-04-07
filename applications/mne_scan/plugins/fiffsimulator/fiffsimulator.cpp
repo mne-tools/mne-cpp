@@ -201,9 +201,9 @@ QString FiffSimulator::getName() const
 
 QWidget* FiffSimulator::setupWidget()
 {
-    FiffSimulatorSetupWidget* widget = new FiffSimulatorSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
-
-    return widget;
+    //widget is later distroyed by CentralWidget - so it has to be created everytime new
+    QWidget * pWidget(new FiffSimulatorSetupWidget(this));
+    return pWidget;
 }
 
 //=============================================================================================================
