@@ -138,11 +138,10 @@ private:
     FiffSimulator*  m_pFiffSimulator;                               /**< Holds a pointer to corresponding MneRtClient.*/
 
     QSharedPointer<COMMUNICATIONLIB::RtDataClient> m_pRtDataClient; /**< The data client.*/
-    bool m_bDataClientIsConnected;                                  /**< If the data client is connected.*/
-
-    qint32 m_iDataClientId;
-
-    bool m_bFlagInfoRequest;    /**< Read Fiff Info flag */
+    bool                    m_bDataClientIsConnected;                                  /**< If the data client is connected.*/
+    qint32                  m_iDataClientId;
+    bool                    m_bFlagInfoRequest;    /**< Read Fiff Info flag */
+    quint16                 m_iDefaultPort;
 };
 } // NAMESPACE
 

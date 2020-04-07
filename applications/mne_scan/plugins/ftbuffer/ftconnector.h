@@ -363,7 +363,7 @@ private:
     int                                     m_iNumChannels;                         /**< Number of channels in the buffer data */
     int                                     m_iDataType;                            /**< Type of data in the buffer */
     int                                     m_iNeuromagHeader;                      /**< Size of neuromag header chunk */
-    int                                     m_iPort;                                /**< Port where the ft bufferis found */
+    quint16                                 m_iPort;                                /**< Port where the ft bufferis found */
 
     bool                                    m_bNewData;                             /**< Indicate whether we've received new data */
 

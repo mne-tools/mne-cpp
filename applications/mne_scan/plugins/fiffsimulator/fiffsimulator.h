@@ -207,7 +207,7 @@ protected:
     QTimer                  m_cmdConnectionTimer;           /**< Timer for convinient command client connection. When timer times out a connection is tried to be established. */
 
     QMutex                  m_qMutex;
-
+    quint16                 m_iDefaultPort;
 signals:
     //=========================================================================================================
     /**

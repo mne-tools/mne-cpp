@@ -70,6 +70,7 @@ FiffSimulatorProducer::FiffSimulatorProducer(FiffSimulator* p_pFiffSimulator)
 , m_bDataClientIsConnected(false)
 , m_iDataClientId(-1)
 , m_bFlagInfoRequest(false)
+, m_iDefaultPort(4217)
 {
 }
 
@@ -93,7 +94,7 @@ void FiffSimulatorProducer::connectDataClient(QString p_sRtSeverIP)
     }
 
 
-    m_pRtDataClient->connectToHost(p_sRtSeverIP,0);
+    m_pRtDataClient->connectToHost(p_sRtSeverIP,m_iDefaultPort);
     m_pRtDataClient->waitForConnected(1000);
 
     if(m_pRtDataClient->state() == QTcpSocket::ConnectedState) {
