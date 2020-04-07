@@ -72,9 +72,9 @@ Natus::Natus()
 : m_iSamplingFreq(2048)
 , m_iNumberChannels(46)
 , m_iSamplesPerBlock(256)
-, m_pFiffInfo(QSharedPointer<FiffInfo>::create())
-, m_pRMTSA_Natus(PluginOutputData<RealTimeMultiSampleArray>::create(this, "Natus", "EEG output data"))
 , m_qStringResourcePath(qApp->applicationDirPath()+"/resources/mne_scan/plugins/natus/")
+, m_pRMTSA_Natus(PluginOutputData<RealTimeMultiSampleArray>::create(this, "Natus", "EEG output data"))
+, m_pFiffInfo(QSharedPointer<FiffInfo>::create())
 {
     m_pRMTSA_Natus->data()->setName(this->getName());//Provide name to auto store widget settings
 }
@@ -93,7 +93,7 @@ Natus::~Natus()
 
 QSharedPointer<IPlugin> Natus::clone() const
 {
-    QSharedPointer<Natus> pNatusClone(new Natus());
+    QSharedPointer<IPlugin> pNatusClone(new Natus());
     return pNatusClone;
 }
 
