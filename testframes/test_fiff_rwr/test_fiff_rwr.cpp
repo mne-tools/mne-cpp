@@ -155,10 +155,9 @@ void TestFiffRWR::initTestCase()
     //
     //   Set up the reading parameters
     //
-    qint32 iNumOfJunks = 5;
     float fQuantumSec = 1.0f;//read and write in 1 sec junks
     fiff_int_t from = rawFirstInRaw.first_samp;
-    fiff_int_t to = rawFirstInRaw.first_samp + iNumOfJunks*fQuantumSec*rawFirstInRaw.info.sfreq;//raw.last_samp;
+    fiff_int_t to = rawFirstInRaw.last_samp;
     fiff_int_t quantum = ceil(fQuantumSec*rawFirstInRaw.info.sfreq);
 
     //
@@ -181,7 +180,7 @@ void TestFiffRWR::initTestCase()
             last = to;
         }
 
-        if (!rawFirstInRaw.read_raw_segment(mFirstInData,mFirstInTimes,first,last/*,vPicks*/))
+        if (!rawFirstInRaw.read_raw_segment(mFirstInData, mFirstInTimes, first, last/*,vPicks*/))
         {
                 printf("error during read_raw_segment\n");
         }
@@ -195,7 +194,7 @@ void TestFiffRWR::initTestCase()
                outfid->write_int(FIFF_FIRST_SAMPLE,&first);
            bFirstBuffer = false;
         }
-        outfid->write_raw_buffer(mFirstInData,vCals);
+        outfid->write_raw_buffer(mFirstInData, vCals);
         printf("[done]\n");
     }
 

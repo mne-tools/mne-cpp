@@ -99,7 +99,7 @@ private:
     Ui::DataManagerView *ui;   /**< The user interface */
 
 signals:
-    void currentlySelectedModelChanged(const QString& sCurrentModelText);
+    void currentlySelectedModelChanged(const QString& sCurrentModelPath);
 };
 
 #endif // DATAMANAGERVIEW_H

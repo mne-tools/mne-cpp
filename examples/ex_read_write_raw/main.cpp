@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
     QStringList include;
     include << "STI 014";
 
-    MatrixXi picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);
+    RowVectorXi picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);
     if(picks.cols() == 0) {
         include.clear();
         include << "STI101" << "STI201" << "STI301";

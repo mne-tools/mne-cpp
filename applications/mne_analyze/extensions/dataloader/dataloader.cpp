@@ -133,6 +133,7 @@ QWidget *DataLoader::getView()
 
 void DataLoader::handleEvent(QSharedPointer<Event> e)
 {
+    qWarning() << "[DataLoader::handleEvent] hellooo.";
     switch (e->getType()) {
     case EVENT_TYPE::CURRENTLY_SELECTED_MODEL:
         m_sCurrentlySelectedModel = e->getData().toString();
@@ -147,7 +148,9 @@ void DataLoader::handleEvent(QSharedPointer<Event> e)
 
 QVector<EVENT_TYPE> DataLoader::getEventSubscriptions(void) const
 {
-    return QVector<EVENT_TYPE>(CURRENTLY_SELECTED_MODEL);
+    QVector<EVENT_TYPE> temp = {CURRENTLY_SELECTED_MODEL};
+
+    return temp;
 }
 
 //=============================================================================================================
