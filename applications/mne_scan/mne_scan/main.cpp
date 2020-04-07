@@ -103,7 +103,6 @@ int main(int argc, char *argv[])
     Q_INIT_RESOURCE(fiffsimulator);
     Q_INIT_RESOURCE(neuromag);
     Q_INIT_RESOURCE(noisereduction);
-    Q_INIT_RESOURCE(rtcmusic);
     Q_INIT_RESOURCE(reference);
     Q_INIT_RESOURCE(ssvepbci);
     Q_INIT_RESOURCE(scDisp);
@@ -121,6 +120,7 @@ int main(int argc, char *argv[])
     SCMEASLIB::MeasurementTypes::registerTypes();
 
     MainWindow mainWin;
+    mainWin.show();
 
     QSurfaceFormat fmt;
     fmt.setSamples(10);
