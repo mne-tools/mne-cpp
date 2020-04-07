@@ -189,7 +189,7 @@ void Plotter::refreshPixmap()
     //pixmap.fill(this, 0, 0);
 
     QPainter painter(&pixmap);
-    painter.initFrom(this);
+    painter.begin(this);
     drawGrid(&painter);
     drawCurve(&painter);
     update();
@@ -203,7 +203,7 @@ void Plotter::drawGrid(QPainter *painter)
     if(!rect.isValid()) return;
 
     PlotSettings settings = zoomStack[curZoom];
-    QPen quiteDark = palette().dark().color().light();
+    QPen quiteDark = palette().dark().color().lighter();
     QPen light = palette().light().color();
 
     for(int i=0; i<=settings.numXTicks;++i)
