@@ -120,19 +120,7 @@ int main(int argc, char *argv[])
 
     SCMEASLIB::MeasurementTypes::registerTypes();
 
-    QPixmap pixmap(":/images/splashscreen.png");
-
-
     MainWindow mainWin;
-//    mainWin.setSplashScreen(*splashscreen);
-
-//    splashscreen->show();
-
-//    mainWin.show();
-//    mainWin.setupPlugins();
-//    mainWin.setupUI();
-
-//    splashscreen->finish(&mainWin);
 
     QSurfaceFormat fmt;
     fmt.setSamples(10);
