@@ -146,7 +146,7 @@ void FiffSimulatorProducer::run()
     connectDataClient(m_pFiffSimulator->m_sFiffSimulatorIP);
 
     qint32 count = 0;
-    while(m_pRtDataClient->state() != QTcpSocket::ConnectedState) {
+    while(!isInterruptionRequested() && m_pRtDataClient->state() != QTcpSocket::ConnectedState) {
         msleep(100);
         this->connectDataClient(m_pFiffSimulator->m_sFiffSimulatorIP);
         ++count;
