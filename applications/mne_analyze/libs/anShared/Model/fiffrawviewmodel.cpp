@@ -356,6 +356,8 @@ bool FiffRawViewModel::hasChildren(const QModelIndex &parent) const
 
 void FiffRawViewModel::updateScrollPosition(qint32 newScrollPosition)
 {
+    QElapsedTimer timer;
+    timer.start();
     // check if we are currently loading something in the background. This is a rudimentary solution.
     if (m_bCurrentlyLoading) {
         qInfo() << "[FiffRawViewModel::updateScrollPosition] Background operation still pending, try again later...";
@@ -405,6 +407,7 @@ void FiffRawViewModel::updateScrollPosition(qint32 newScrollPosition)
             postBlockLoad(loadLaterBlocks(blockDist));
         }
     }
+    qDebug() << "[FiffRawViewModel::updateScrollPosition] timer.elapsed()" << timer.elapsed();
 }
 
 //=============================================================================================================
@@ -460,12 +463,15 @@ int FiffRawViewModel::loadEarlierBlocks(qint32 numBlocks)
     for(auto &pairPointer : m_lNewData) {
         start -= m_iSamplesPerBlock;
         end -= m_iSamplesPerBlock;
+        QElapsedTimer timer;
+        timer.start();
         if(m_pFiffIO->m_qlistRaw[0]->read_raw_segment(pairPointer->first, pairPointer->second, start, end)) {
             // qDebug() << "[FiffRawViewModel::loadFiffData] Successfully read a block ";
         } else {
             qWarning() << "[FiffRawViewModel::loadEarlierBlocks] Could not read block ";
             return -1;
         }
+        qDebug() << "[FiffRawViewModel::loadEarlierBlocks] read_raw_segment timer.elapsed()" << timer.elapsed();
     }
 
     // adjust fiff cursor
@@ -518,12 +524,15 @@ int FiffRawViewModel::loadLaterBlocks(qint32 numBlocks)
 
     // read data, use the already prepaired list m_lNewData
     for(auto &pairPointer : m_lNewData) {
+        QElapsedTimer timer;
+        timer.start();
         if(m_pFiffIO->m_qlistRaw[0]->read_raw_segment(pairPointer->first, pairPointer->second, start, end)) {
             // qDebug() << "[FiffRawViewModel::loadFiffData] Successfully read a block ";
         } else {
             qWarning() << "[FiffRawViewModel::loadLaterBlocks] Could not read block ";
             return -1;
         }
+        qDebug() << "[FiffRawViewModel::loadLaterBlocks] read_raw_segment timer.elapsed()" << timer.elapsed();
 
         start += m_iSamplesPerBlock;
         end += m_iSamplesPerBlock;
@@ -750,7 +759,7 @@ int FiffRawViewModel::getTimeListSize() const
 
 int FiffRawViewModel::getSampleScrollPos() const
 {
-    qDebug() << "Scroll Position:" << m_iScrollPos;
+    //qDebug() << "Scroll Position:" << m_iScrollPos;
     return m_iScrollPos;
 }
 

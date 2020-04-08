@@ -47,11 +47,7 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QtGui>
 #include <QApplication>
-#include <QDateTime>
-#include <QSplashScreen>
-#include <QThread>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -77,17 +73,9 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationName(CInfo::OrganizationName());
     QCoreApplication::setApplicationName(CInfo::AppNameShort());
 
-    //show splash screen for 1 second
-    QPixmap pixmap(":/resources/images/splashscreen_mne_analyze.png");
-    QSplashScreen splash(pixmap);
-    splash.show();
-    QThread::sleep(1);
-
     //New main window instance
     pAnalyzeCore = new AnalyzeCore();
     pAnalyzeCore->showMainWindow();
-
-    splash.finish(pAnalyzeCore->getMainWindow());
 
     return a.exec();
 }
