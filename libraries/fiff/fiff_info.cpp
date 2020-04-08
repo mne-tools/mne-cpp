@@ -329,25 +329,25 @@ FiffInfo FiffInfo::pick_info(const RowVectorXi &sel) const
 
 //=============================================================================================================
 
-QList<FiffChInfo> FiffInfo::set_current_comp(QList<FiffChInfo>& _chs, fiff_int_t value)
+QList<FiffChInfo> FiffInfo::set_current_comp(QList<FiffChInfo>& listFiffChInfo, fiff_int_t value)
 {
-    QList<FiffChInfo> new_chs;
+    QList<FiffChInfo> newList;
     qint32 k;
     fiff_int_t coil_type;
 
-    for(k = 0; k < _chs.size(); ++k)
-        new_chs.append(_chs[k]);
+    for(k = 0; k < listFiffChInfo.size(); ++k)
+        newList.append(listFiffChInfo[k]);
 
     qint32 lower_half = 65535;// hex2dec('FFFF');
-    for (k = 0; k < _chs.size(); ++k)
+    for (k = 0; k < listFiffChInfo.size(); ++k)
     {
-        if (_chs[k].kind == FIFFV_MEG_CH)
+        if (listFiffChInfo[k].kind == FIFFV_MEG_CH)
         {
-            coil_type = _chs[k].chpos.coil_type & lower_half;
-            new_chs[k].chpos.coil_type = (coil_type | (value << 16));
+            coil_type = listFiffChInfo[k].chpos.coil_type & lower_half;
+            newList[k].chpos.coil_type = (coil_type | (value << 16));
         }
     }
-    return new_chs;
+    return newList;
 }
 
 //=============================================================================================================
