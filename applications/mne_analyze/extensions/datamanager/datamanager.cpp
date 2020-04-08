@@ -64,7 +64,6 @@ using namespace ANSHAREDLIB;
 
 DataManager::DataManager()
 {
-
 }
 
 //=============================================================================================================
@@ -101,7 +100,6 @@ void DataManager::init()
             this, &DataManager::updateListWidget);
     connect(m_pAnalyzeData.data(), &AnalyzeData::modelRemoved,
             this, &DataManager::updateListWidget);
-
 }
 
 //=============================================================================================================
@@ -186,5 +184,6 @@ void DataManager::updateListWidget()
 void DataManager::onCurrentlySelectedModelChanged(const QString& sCurrentModelPath)
 {
     QVariant data(sCurrentModelPath);
+    m_pAnalyzeData->setCurrentlySelectedModel(sCurrentModelPath);
     m_pCommu->publishEvent(EVENT_TYPE::CURRENTLY_SELECTED_MODEL, data);
 }

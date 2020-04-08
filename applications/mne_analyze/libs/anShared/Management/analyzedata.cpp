@@ -101,6 +101,18 @@ QSharedPointer<AbstractModel> AnalyzeData::getModel(const QString &sName) const
 
 //=============================================================================================================
 
+void AnalyzeData::setCurrentlySelectedModel(const QString &sModelPath)
+{
+    // check if model was already loaded:
+    if (QSharedPointer<AbstractModel> temp = getModel(sModelPath)) {
+        emit selectedModelChanged(temp);
+    } else {
+        qDebug() << "[AnalyzeData::setCurrentlySelectedModel] Model does not exist!";
+    }
+}
+
+//=============================================================================================================
+
 QSharedPointer<FiffRawViewModel> AnalyzeData::loadFiffRawViewModel(const QString &sPath, const QByteArray& byteLoadedData)
 {
     if(byteLoadedData.isEmpty() || sPath.isEmpty()) {
