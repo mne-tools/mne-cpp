@@ -92,7 +92,7 @@ namespace ANSHAREDLIB
         PING,                       // dummy event for testing and debuggin purposes
         EXTENSION_INIT_FINISHED,    // send when all extensions finished initializing
         STATUS_BAR_MSG,             // sending a message to the status bar (part of gui)
-        CURRENTLY_SELECTED_MODEL
+        CURRENTLY_SELECTED_MODEL    // event send whenever the user changes the selection in the datamanager plugin
     };
 } //NAMESPACE
 
