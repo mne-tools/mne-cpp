@@ -90,8 +90,11 @@ void DataManagerView::clearList()
 void DataManagerView::onCurrentItemChanged(QListWidgetItem *current,
                                            QListWidgetItem *previous)
 {
+    Q_UNUSED(previous)
     // The full model path is stored in the tooltip instead of the text
-    emit currentlySelectedModelChanged(current->toolTip());
+    if(current) {
+        emit currentlySelectedModelChanged(current->toolTip());
+    }
 }
 
 //=============================================================================================================

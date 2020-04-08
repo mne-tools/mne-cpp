@@ -104,6 +104,8 @@ void RawDataViewer::init()
 
     connect(m_pAnalyzeData.data(), &AnalyzeData::newModelAvailable,
             this, &RawDataViewer::onNewModelAvalible);
+    connect(m_pAnalyzeData.data(), &AnalyzeData::selectedModelChanged,
+            this, &RawDataViewer::onNewModelAvalible);
 
     // Create viewer
     m_pFiffRawView = new FiffRawView();

@@ -123,6 +123,15 @@ public:
 
     //=========================================================================================================
     /**
+     * Sets the currently selected model. If the model path corresponds to a stored model the
+     * selectedModelChanged signal will be emitted.
+     *
+     * @param[in] sModelPath               The full model path
+     */
+    void setCurrentlySelectedModel(const QString &sModelPath);
+
+    //=========================================================================================================
+    /**
     * Creates a FiffRawViewModel based on the loaded QByteArray. This function can, e.g., be used when using a WASM build.
     * The function returns a nullptr when model loading fails.
     *
@@ -198,12 +207,19 @@ public:
     /**
      * Returns all models.
      */
-    QList<QSharedPointer<AbstractModel>> getModels() const;
+    QList<QSharedPointer<AbstractModel> > getModels() const;
 
 private:
-    QHash<QString, QSharedPointer<AbstractModel> >        m_data;
+    QHash<QString, QSharedPointer<AbstractModel> >        m_data;       /**< The loaded models. */
 
 signals:
+    //=========================================================================================================
+    /**
+     * This is emitted whenever a different model is selected.
+     *
+     * @param[in] pModel      The newly selected model
+     */
+    void selectedModelChanged(QSharedPointer<AbstractModel> pModel);
 
     //=========================================================================================================
     /**
