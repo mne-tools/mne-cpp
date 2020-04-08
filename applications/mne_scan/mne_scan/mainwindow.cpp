@@ -84,7 +84,7 @@ using namespace DISPLIB;
 // CONST
 //=============================================================================================================
 
-const char* pluginDir = "/mne_scan_plugins";        /**< holds path to plugins.*/
+const QString pluginDir = "/mne_scan_plugins";        /**< holds path to plugins.*/
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -92,14 +92,14 @@ const char* pluginDir = "/mne_scan_plugins";        /**< holds path to plugins.*
 
 MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
-, m_pStartUpWidget(new StartUpWidget(this))
-, m_pDisplayManager(new SCSHAREDLIB::DisplayManager(this))
 , m_bIsRunning(false)
-, m_pTime(new QTime(0, 0))
 , m_iTimeoutMSec(1000)
+, m_pStartUpWidget(new StartUpWidget(this))
+, m_eLogLevelCurrent(_LogLvMax)
+, m_pTime(new QTime(0, 0))
 , m_pPluginManager(new SCSHAREDLIB::PluginManager(this))
 , m_pPluginSceneManager(new SCSHAREDLIB::PluginSceneManager(this))
-, m_eLogLevelCurrent(_LogLvMax)
+, m_pDisplayManager(new SCSHAREDLIB::DisplayManager(this))
 {
     fprintf(stderr, "%s - Version %s\n",
             CInfo::AppNameShort().toUtf8().constData(),
@@ -113,8 +113,43 @@ MainWindow::MainWindow(QWidget *parent)
 
     setUnifiedTitleAndToolBarOnMac(false);
 
-    m_pPluginManager->loadPlugins(qApp->applicationDirPath()+pluginDir);
+    QPixmap splashPixMap(":/images/splashscreen.png");
+    MainSplashScreen::SPtr pSplashScreen = MainSplashScreen::SPtr::create(splashPixMap);
+    setSplashScreen(pSplashScreen, true);
 
+    setupPlugins();
+    setupUI();
+}
+
+//=============================================================================================================
+
+MainWindow::~MainWindow()
+{
+    if(m_bIsRunning) {
+        this->stopMeasurement();
+    }
+
+    if(m_pToolBar) {
+        if(m_pLabelTime) {
+            delete m_pLabelTime;
+        }
+        delete m_pToolBar;
+    }
+
+    delete m_pDynamicPluginToolBar;
+}
+
+//=============================================================================================================
+
+void MainWindow::setupPlugins()
+{
+    m_pPluginManager->loadPlugins(qApp->applicationDirPath()+pluginDir);
+}
+
+//=============================================================================================================
+
+void MainWindow::setupUI()
+{
     // Quick control selection
     m_pQuickControlView = new QuickControlView(QString("MNESCAN/MainWindow/QuickControl"),
                                                        "MNE Scan",
@@ -136,20 +171,20 @@ MainWindow::MainWindow(QWidget *parent)
 
 //=============================================================================================================
 
-MainWindow::~MainWindow()
+void MainWindow::setSplashScreen(MainSplashScreen::SPtr& pSplashScreen,
+                                 bool bShowSplashScreen)
 {
-    if(m_bIsRunning) {
-        this->stopMeasurement();
+    m_pSplashScreen = pSplashScreen;
+
+    if(m_pSplashScreen && m_pPluginManager) {
+        QObject::connect(m_pPluginManager.data(), &PluginManager::pluginLoaded,
+                         m_pSplashScreen.data(), &MainSplashScreen::showMessage);
     }
 
-    if(m_pToolBar) {
-        if(m_pLabelTime) {
-            delete m_pLabelTime;
-        }
-        delete m_pToolBar;
+    if(m_pSplashScreen && bShowSplashScreen) {
+        m_pSplashScreen->finish(this);
+        m_pSplashScreen->show();
     }
-
-    delete m_pDynamicPluginToolBar;
 }
 
 //=============================================================================================================

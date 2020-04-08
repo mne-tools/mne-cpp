@@ -82,8 +82,8 @@ using namespace Eigen;
 //=============================================================================================================
 
 BabyMEG::BabyMEG()
-: m_iBufferSize(-1)
-, m_pCircularBuffer(CircularBuffer_Matrix_float::SPtr(new CircularBuffer_Matrix_float(40)))
+: m_pCircularBuffer(CircularBuffer_Matrix_float::SPtr(new CircularBuffer_Matrix_float(40)))
+, m_iBufferSize(-1)
 , m_sFiffProjections(QCoreApplication::applicationDirPath() + "/resources/mne_scan/plugins/babymeg/header.fif")
 , m_sFiffCompensators(QCoreApplication::applicationDirPath() + "/resources/mne_scan/plugins/babymeg/compensator.fif")
 , m_sBadChannels(QCoreApplication::applicationDirPath() + "/resources/mne_scan/plugins/babymeg/both.bad")
@@ -122,7 +122,7 @@ BabyMEG::~BabyMEG()
 QSharedPointer<IPlugin> BabyMEG::clone() const
 {
     QSharedPointer<BabyMEG> pBabyMEGClone(new BabyMEG());
-    return pBabyMEGClone;
+    return std::move(pBabyMEGClone);
 }
 
 //=============================================================================================================
@@ -324,12 +324,13 @@ void BabyMEG::setFiffInfo(const FiffInfo& p_FiffInfo)
     m_cals = RowVectorXd(m_pFiffInfo->nchan);
     m_cals.setZero();
     for (qint32 k = 0; k < m_pFiffInfo->nchan; ++k)
-        m_cals[k] = m_pFiffInfo->chs[k].range*m_pFiffInfo->chs[k].cal;
+        m_cals[k] = static_cast<double>(m_pFiffInfo->chs[k].range) *
+                    static_cast<double>(m_pFiffInfo->chs[k].cal);
 
     // Initialize the data and calibration vector
     typedef Eigen::Triplet<double> T;
     std::vector<T> tripletList;
-    tripletList.reserve(m_pFiffInfo->nchan);
+    tripletList.reserve(static_cast<unsigned long>(m_pFiffInfo->nchan));
     for(qint32 i = 0; i < m_pFiffInfo->nchan; ++i)
         tripletList.push_back(T(i, i, this->m_cals[i]));
 
@@ -352,7 +353,7 @@ void BabyMEG::setFiffData(QByteArray data)
 
     qInfo() << "[BabyMEG::setFiffData] Matrix " << rows << "x" << cols << " [Data bytes:" << dformat << "]";
 
-    MatrixXf rawData(Map<MatrixXf>( (float*)data.data(),rows, cols ));
+    MatrixXf rawData(Map<MatrixXf>( reinterpret_cast<float*>(data.data()),rows, cols ));
 
     for(qint32 i = 0; i < rows*cols; ++i) {
         IOUtils::swap_floatp(rawData.data()+i);
@@ -390,14 +391,14 @@ void BabyMEG::setFiffGainInfo(QStringList GainInfo)
         qInfo()<<"Set Gain Info";
         for(qint32 i = 0; i < m_pFiffInfo->nchan; i++) {
             m_pFiffInfo->chs[i].range = 1.0f/GainInfo.at(i).toFloat();//1; // set gain
-            m_cals[i] = m_pFiffInfo->chs[i].range*m_pFiffInfo->chs[i].cal;
+            m_cals[i] = static_cast<double>(m_pFiffInfo->chs[i].range * m_pFiffInfo->chs[i].cal);
             //qInfo()<<[BabyMEG::setFiffGainInfo] i<<"="<<m_pFiffInfo->chs[i].ch_name<<","<<m_pFiffInfo->chs[i].range;
         }
 
         // Initialize the data and calibration vector
         typedef Eigen::Triplet<double> T;
         std::vector<T> tripletList;
-        tripletList.reserve(m_pFiffInfo->nchan);
+        tripletList.reserve(static_cast<unsigned long>(m_pFiffInfo->nchan));
         for(qint32 i = 0; i < m_pFiffInfo->nchan; ++i) {
             tripletList.push_back(T(i, i, this->m_cals[i]));
         }
@@ -475,7 +476,7 @@ void BabyMEG::createDigTrig(MatrixXf& data)
 
         for(int k = 0; k < lDetectedTriggers.size(); ++k) {
             if(lDetectedTriggers.at(k).first < data.cols() && lDetectedTriggers.at(k).first >= 0) {
-                data(idxDigTrig,lDetectedTriggers.at(k).first) = data(idxDigTrig,lDetectedTriggers.at(k).first) + pow(2,counter);
+                data(idxDigTrig,lDetectedTriggers.at(k).first) = data(idxDigTrig,lDetectedTriggers.at(k).first) + powf(2,counter);
             }
         }
 

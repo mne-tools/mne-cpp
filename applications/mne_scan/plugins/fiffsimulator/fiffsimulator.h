@@ -201,12 +201,13 @@ protected:
 
     qint32                  m_iActiveConnectorId;           /**< The active connector.*/
     qint32                  m_iBufferSize;                  /**< The raw data buffer size.*/
+    quint16                 m_iDefaultPortCmdClient;        /**< The default port for the rt command client. */
 
     QMap<qint32, QString>   m_qMapConnectors;               /**< Connector map.*/
 
     QTimer                  m_cmdConnectionTimer;           /**< Timer for convinient command client connection. When timer times out a connection is tried to be established. */
 
-    QMutex                  m_qMutex;
+    QMutex                  m_qMutex;                       /**< The mutex to ensure thread safety.*/
 
 signals:
     //=========================================================================================================

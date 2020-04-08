@@ -86,15 +86,7 @@ public:
      *
      * @param[in] parent     Parent QObject (optional)
      */
-    explicit RtCmdClient(QObject *parent = 0);
-
-    //=========================================================================================================
-    /**
-     * Connect to a mne_rt_server using port 4217
-     *
-     * @param[in] p_sRtServerHostName    The IP address of the mne_rt_server
-     */
-    void connectToHost(QString &p_sRtServerHostName);
+    explicit RtCmdClient(QObject *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**

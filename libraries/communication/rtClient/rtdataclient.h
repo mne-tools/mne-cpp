@@ -82,15 +82,7 @@ public:
      *
      * @param[in] parent     Parent QObject (optional)
      */
-    explicit RtDataClient(QObject *parent = 0);
-
-    //=========================================================================================================
-    /**
-     * Connect to a mne_rt_server using port 4218
-     *
-     * @param[in] p_sRtServerHostName    The IP address of the mne_rt_server
-     */
-    void connectToHost(const QString& p_sRtServerHostName);
+    explicit RtDataClient(QObject *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
@@ -124,7 +116,9 @@ public:
      * @param[out] data          The read data - ToDo change this to raw buffer data object
      * @param[out] kind          Data kind
      */
-    void readRawBuffer(qint32 p_nChannels, Eigen::MatrixXf& data, FIFFLIB::fiff_int_t& kind);
+    void readRawBuffer(qint32 p_nChannels,
+                       Eigen::MatrixXf& data,
+                       FIFFLIB::fiff_int_t& kind);
 
     //=========================================================================================================
     /**
@@ -136,10 +130,6 @@ public:
 
 private:
     qint32 m_clientID;  /**< Corresponding client id of the data client at mne_rt_server */
-
-signals:
-    
-public slots:
     
 };
 } // NAMESPACE

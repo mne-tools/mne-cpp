@@ -52,16 +52,16 @@
 //#include <../plugins/gusbamp/gusbamp.h>
 //#include <../plugins/eegosports/eegosports.h>
 //#include <../plugins/brainamp/brainamp.h>
-//#include <../plugins/tmsi/tmsi.h>
-//#include <../plugins/lsladapter/lsladapter.h>
-#include <../plugins/dummytoolbox/dummytoolbox.h>
+#include <../plugins/tmsi/tmsi.h>
+#include <../plugins/lsladapter/lsladapter.h>
+//#include <../plugins/dummytoolbox/dummytoolbox.h>
 #include <../plugins/rtcmne/rtcmne.h>
-#include <../plugins/rtcmusic/rtcmusic.h>
 #include <../plugins/averaging/averaging.h>
 #include <../plugins/covariance/covariance.h>
 #include <../plugins/noisereduction/noisereduction.h>
-#include <../plugins/ssvepbci/ssvepbci.h>
 #include <../plugins/neuronalconnectivity/neuronalconnectivity.h>
+#include <../plugins/writetofile/writetofile.h>
+#include <../plugins/hpi/hpi.h>
 #endif
 
 //=============================================================================================================
@@ -172,6 +172,7 @@ void PluginManager::loadPlugins(const QString& dir)
             m_qVecPlugins.push_back(qobject_cast<IPlugin*>(pPlugin));
 
             IPlugin::PluginType pluginType = qobject_cast<IPlugin*>(pPlugin)->getType();
+            QString msg = "Plugin " + qobject_cast<IPlugin*>(pPlugin)->getName() + " loaded.";
 
             // ISensor
             if(pluginType == IPlugin::_ISensor)
@@ -194,6 +195,7 @@ void PluginManager::loadPlugins(const QString& dir)
                 }
             }
 
+            emit pluginLoaded(msg);
         }
 //        else
 //            qDebug() << "Plugin " << file << " could not be instantiated!";

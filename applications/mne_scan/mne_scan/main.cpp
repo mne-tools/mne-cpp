@@ -103,7 +103,6 @@ int main(int argc, char *argv[])
     Q_INIT_RESOURCE(fiffsimulator);
     Q_INIT_RESOURCE(neuromag);
     Q_INIT_RESOURCE(noisereduction);
-    Q_INIT_RESOURCE(rtcmusic);
     Q_INIT_RESOURCE(reference);
     Q_INIT_RESOURCE(ssvepbci);
     Q_INIT_RESOURCE(scDisp);
@@ -120,22 +119,8 @@ int main(int argc, char *argv[])
 
     SCMEASLIB::MeasurementTypes::registerTypes();
 
-    QPixmap pixmap(":/images/splashscreen.png");
-    MainSplashScreen::SPtr splashscreen(new MainSplashScreen(pixmap));
-    splashscreen->show();
-
-    //ToDo Debug Some waiting stuff to see splash screen -> remove this in final release
-    int time = 100;
-    for(int i=0; i < time;++i)
-    {
-        int p = (i*100)/time;
-        splashscreen->showMessage("Loading modules.."+ QString::number(p)+"%");
-    }
-
     MainWindow mainWin;
     mainWin.show();
-
-    splashscreen->finish(&mainWin);
 
     QSurfaceFormat fmt;
     fmt.setSamples(10);

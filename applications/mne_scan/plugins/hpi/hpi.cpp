@@ -73,13 +73,13 @@ using namespace INVERSELIB;
 //=============================================================================================================
 
 Hpi::Hpi()
-: m_pCircularBuffer(CircularBuffer_Matrix_double::SPtr::create(40))
+: m_iNumberOfFitsPerSecond(3)
+, m_bDoFreqOrder(false)
+, m_bDoSingleHpi(false)
 , m_bDoContinousHpi(false)
 , m_bUseSSP(false)
 , m_bUseComp(false)
-, m_bDoFreqOrder(false)
-, m_bDoSingleHpi(false)
-, m_iNumberOfFitsPerSecond(3)
+, m_pCircularBuffer(CircularBuffer_Matrix_double::SPtr::create(40))
 {
     connect(this, &Hpi::devHeadTransAvailable,
             this, &Hpi::onDevHeadTransAvailable, Qt::BlockingQueuedConnection);

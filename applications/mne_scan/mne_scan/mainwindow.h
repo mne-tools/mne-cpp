@@ -41,6 +41,7 @@
 //=============================================================================================================
 
 #include "info.h"
+#include "mainsplashscreen.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -163,6 +164,28 @@ public:
      * @param [in] lglvl message level; Message is displayed depending on its level.
      */
     void writeToLog(const QString& logMsg, LogKind lgknd = _LogKndMessage, LogLevel lglvl = _LogLvNormal);
+
+    //=========================================================================================================
+    /**
+     * Set the splash screen.
+     *
+     * @param [in] pSplashScreen        The pointer to the splash screen.
+     * @param [in] bShowSplashScreen    Whether to show the splash screen until this widget is shown. Default is true.
+     */
+    void setSplashScreen(MainSplashScreen::SPtr& pSplashScreen,
+                         bool bShowSplashScreen = true);
+
+    //=========================================================================================================
+    /**
+     * Init an setup the plugins.
+     */
+    void setupPlugins();
+
+    //=========================================================================================================
+    /**
+     * Setup the GUI of this widget.
+     */
+    void setupUI();
 
 private:
     //=========================================================================================================
@@ -358,6 +381,8 @@ private:
     QPointer<PluginGui>                 m_pPluginGui;                   /**< Holds the plugin GUI.*/
 
     QPointer<DISPLIB::QuickControlView> m_pQuickControlView;            /**< quick control widget. */
+
+    MainSplashScreen::SPtr              m_pSplashScreen;                /**< Holds the splash scren. */
 
     QSharedPointer<QTimer>                              m_pTimer;               /**< timer of the main application*/
     QSharedPointer<QTime>                               m_pTime;                /**< Holds current time output, updated with timeout of timer.*/

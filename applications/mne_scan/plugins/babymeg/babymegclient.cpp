@@ -498,7 +498,7 @@ void BabyMEGClient::SendCommand(QString s)
     QByteArray array;
     array.append(s);
 
-    int WrtNum;
+    qint64 WrtNum;
 
     if (tcpSocket->state()==QAbstractSocket::ConnectedState)
     {

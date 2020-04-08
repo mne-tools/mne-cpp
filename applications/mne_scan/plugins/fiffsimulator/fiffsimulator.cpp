@@ -75,14 +75,15 @@ using namespace Eigen;
 //=============================================================================================================
 
 FiffSimulator::FiffSimulator()
-: m_sFiffSimulatorIP("127.0.0.1")
+: m_pFiffSimulatorProducer(new FiffSimulatorProducer(this))
 , m_bCmdClientIsConnected(false)
-, m_pFiffSimulatorProducer(new FiffSimulatorProducer(this))
+, m_sFiffSimulatorIP("127.0.0.1")
 , m_sFiffSimulatorClientAlias("mne_scan")
-, m_iBufferSize(-1)
 , m_iActiveConnectorId(0)
+, m_iBufferSize(-1)
 , m_pCircularBuffer(QSharedPointer<CircularBuffer_Matrix_float>(new CircularBuffer_Matrix_float(40)))
 , m_pRtCmdClient(QSharedPointer<RtCmdClient>::create())
+, m_iDefaultPortCmdClient(4217)
 {
     //init channels when fiff info is available
     connect(this, &FiffSimulator::fiffInfoAvailable,
@@ -112,7 +113,7 @@ void FiffSimulator::clear()
 QSharedPointer<IPlugin> FiffSimulator::clone() const
 {
     QSharedPointer<FiffSimulator> pFiffSimulatorClone(new FiffSimulator());
-    return pFiffSimulatorClone;
+    return std::move(pFiffSimulatorClone);
 }
 
 //=============================================================================================================
@@ -201,9 +202,9 @@ QString FiffSimulator::getName() const
 
 QWidget* FiffSimulator::setupWidget()
 {
-    FiffSimulatorSetupWidget* widget = new FiffSimulatorSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
-
-    return widget;
+    //widget is later distroyed by CentralWidget - so it has to be created everytime new
+    QWidget * pWidget(new FiffSimulatorSetupWidget(this));
+    return pWidget;
 }
 
 //=============================================================================================================
@@ -276,7 +277,7 @@ void FiffSimulator::connectCmdClient()
         m_pFiffSimulatorProducer->start();
     }
 
-    m_pRtCmdClient->connectToHost(m_sFiffSimulatorIP);
+    m_pRtCmdClient->connectToHost(m_sFiffSimulatorIP, m_iDefaultPortCmdClient);
     m_pRtCmdClient->waitForConnected(1000);
 
     if(m_pRtCmdClient->state() == QTcpSocket::ConnectedState)
@@ -342,9 +343,9 @@ void FiffSimulator::requestInfo()
         (*m_pRtCmdClient)["measinfo"].pValues()[0].setValue(m_pFiffSimulatorProducer->m_iDataClientId);
         (*m_pRtCmdClient)["measinfo"].send();
 
-        m_pFiffSimulatorProducer->producerMutex.lock();
+        m_pFiffSimulatorProducer->m_producerMutex.lock();
         m_pFiffSimulatorProducer->m_bFlagInfoRequest = true;
-        m_pFiffSimulatorProducer->producerMutex.unlock();
+        m_pFiffSimulatorProducer->m_producerMutex.unlock();
     } else {
         qWarning() << "FiffSimulatorProducer is not connected!";
     }

@@ -131,7 +131,7 @@ bool FtConnector::getHeader()
     sendRequest(messagedef);
 
     //Waiting for response.
-    while(m_pSocket->bytesAvailable() < sizeof (messagedef_t)) {
+    while(static_cast<quint64>(m_pSocket->bytesAvailable()) < sizeof (messagedef_t)) {
         m_pSocket->waitForReadyRead(10);
     }
 
@@ -277,7 +277,7 @@ bool FtConnector::getData()
     sendDataSel(datasel);
 
     //Waiting for response.
-    while(m_pSocket->bytesAvailable() < sizeof (messagedef_t)) {
+    while(static_cast<unsigned long>(m_pSocket->bytesAvailable()) < sizeof (messagedef_t)) {
         m_pSocket->waitForReadyRead(10);
     }
 
@@ -410,7 +410,7 @@ int FtConnector::totalBuffSamples()
     //Set threshold to return more than number samples read.
     samples_events_t threshold;
     threshold.nsamples = m_iNumSamples;
-    threshold.nevents = 0xFFFFFFFF;
+    threshold.nevents = static_cast<qint32>(0xFFFFFFFF);
 
     // timeout for waiting in milliseconds
     qint32 timeout = 20;
@@ -420,7 +420,7 @@ int FtConnector::totalBuffSamples()
     m_pSocket->write(reinterpret_cast<char*>(&timeout), sizeof (qint32));
 
     //Waiting for response.
-    while(m_pSocket->bytesAvailable() < sizeof (messagedef_t)) {
+    while(static_cast<quint64>(m_pSocket->bytesAvailable()) < sizeof (messagedef_t)) {
         m_pSocket->waitForReadyRead(10);
     }
 
@@ -430,7 +430,7 @@ int FtConnector::totalBuffSamples()
     parseMessageDef(msgBuffer);
 
     //Waiting for response.
-    while(m_pSocket->bytesAvailable() < sizeof (samples_events_t)) {
+    while(static_cast<quint64>(m_pSocket->bytesAvailable()) < sizeof (samples_events_t)) {
         m_pSocket->waitForReadyRead(10);
     }
 
@@ -459,9 +459,10 @@ void FtConnector::sendSampleEvents(samples_events_t &threshold)
 bool FtConnector::parseData(QBuffer &datasampBuffer,
                             int bufsize)
 {
+    Q_UNUSED(bufsize)
     //start interpreting data as float instead of char
     QByteArray dataArray = datasampBuffer.readAll();
-    float* fdata = (float*) dataArray.data();
+    float* fdata = reinterpret_cast<float*> (dataArray.data());
 
 //TODO: Implement receiving other types of data
 //    switch (m_iDataType) {

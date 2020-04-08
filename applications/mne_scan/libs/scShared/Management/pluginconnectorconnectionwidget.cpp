@@ -117,7 +117,10 @@ PluginConnectorConnectionWidget::PluginConnectorConnectionWidget(PluginConnector
 
     //Connect Signals
     foreach(QComboBox* m_pComboBox, m_qMapSenderToReceiverConnections)
-        connect(m_pComboBox, static_cast<void (QComboBox::*)(const QString &)>(&QComboBox::currentIndexChanged), this, &PluginConnectorConnectionWidget::updateReceiver);
+        connect(m_pComboBox,
+                static_cast<void (QComboBox::*)(const QString &)>(&QComboBox::currentTextChanged),
+                this,
+                &PluginConnectorConnectionWidget::updateReceiver);
 
     layout->addWidget(bottomFiller,curRow,0);
     ++curRow;

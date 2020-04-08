@@ -62,13 +62,6 @@ RtDataClient::RtDataClient(QObject *parent)
 
 //=============================================================================================================
 
-void RtDataClient::connectToHost(const QString& p_sRtServerHostName)
-{
-    QTcpSocket::connectToHost(p_sRtServerHostName, 4218);
-}
-
-//=============================================================================================================
-
 void RtDataClient::disconnectFromHost()
 {
     QTcpSocket::disconnectFromHost();
@@ -373,10 +366,10 @@ FiffInfo::SPtr RtDataClient::readInfo()
 
 //=============================================================================================================
 
-void RtDataClient::readRawBuffer(qint32 p_nChannels, MatrixXf& data, fiff_int_t& kind)
+void RtDataClient::readRawBuffer(qint32 p_nChannels,
+                                 MatrixXf& data,
+                                 fiff_int_t& kind)
 {
-//        data = [];
-
     FiffStream t_fiffStream(this);
     //
     // Find the start

@@ -216,7 +216,7 @@ public:
 
     QString                     name;
 
-    int                         port;
+    quint16                     port;
     int                         numBlock;
 
     bool                        SkipLoop;
