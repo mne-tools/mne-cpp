@@ -322,28 +322,28 @@ FiffInfo FiffInfo::pick_info(const RowVectorXi &sel) const
         res.chs.append(this->chs[idx]);
         res.ch_names.append(this->ch_names[idx]);
     }
-    res.nchan  = sel.size();
+    res.nchan  = static_cast<int>(sel.size());
 
     return res;
 }
 
 //=============================================================================================================
 
-QList<FiffChInfo> FiffInfo::set_current_comp(QList<FiffChInfo>& chs, fiff_int_t value)
+QList<FiffChInfo> FiffInfo::set_current_comp(QList<FiffChInfo>& _chs, fiff_int_t value)
 {
     QList<FiffChInfo> new_chs;
     qint32 k;
     fiff_int_t coil_type;
 
-    for(k = 0; k < chs.size(); ++k)
-        new_chs.append(chs[k]);
+    for(k = 0; k < _chs.size(); ++k)
+        new_chs.append(_chs[k]);
 
     qint32 lower_half = 65535;// hex2dec('FFFF');
-    for (k = 0; k < chs.size(); ++k)
+    for (k = 0; k < _chs.size(); ++k)
     {
-        if (chs[k].kind == FIFFV_MEG_CH)
+        if (_chs[k].kind == FIFFV_MEG_CH)
         {
-            coil_type = chs[k].chpos.coil_type & lower_half;
+            coil_type = _chs[k].chpos.coil_type & lower_half;
             new_chs[k].chpos.coil_type = (coil_type | (value << 16));
         }
     }
@@ -469,7 +469,7 @@ void FiffInfo::writeToStream(FiffStream* p_pStream) const
         //
         chs[k].scanNo = k+1;//+1 because
 //        chs[k].range  = 1.0f;//Why? -> cause its already calibrated through reading
-        cals(0,k) = chs[k].cal; //ToDo whats going on with cals?
+        cals(0,k) = static_cast<double>(chs[k].cal); //ToDo whats going on with cals?
         p_pStream->write_ch_info(chs[k]);
     }
     //
