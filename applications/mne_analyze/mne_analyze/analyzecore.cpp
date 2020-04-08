@@ -76,8 +76,13 @@ const char* extensionsDir = "/mne_analyze_extensions";        /**< holds path to
 //=============================================================================================================
 
 AnalyzeCore::AnalyzeCore(QObject* parent)
-    : QObject(parent)
-{
+: QObject(parent)
+{    
+    //show splash screen for 1 second
+    QPixmap pixmap(":/images/splashscreen_mne_analyze.png");
+    QSplashScreen splash(pixmap);
+    splash.show();
+
     registerMetaTypes();
 
     initGlobalSettings();
@@ -86,6 +91,8 @@ AnalyzeCore::AnalyzeCore(QObject* parent)
     initEventSystem();
     initExtensionManager();
     initMainWindow();
+
+    splash.hide();
 }
 
 //=============================================================================================================

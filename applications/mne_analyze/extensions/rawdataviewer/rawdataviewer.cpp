@@ -103,9 +103,9 @@ void RawDataViewer::init()
     m_pRawDataViewerControl = new RawDataViewerControl;
 
     connect(m_pAnalyzeData.data(), &AnalyzeData::newModelAvailable,
-            this, &RawDataViewer::onNewModelAvalible);
+            this, &RawDataViewer::onModelChanged);
     connect(m_pAnalyzeData.data(), &AnalyzeData::selectedModelChanged,
-            this, &RawDataViewer::onNewModelAvalible);
+            this, &RawDataViewer::onModelChanged);
 
     // Create viewer
     m_pFiffRawView = new FiffRawView();
@@ -129,12 +129,12 @@ void RawDataViewer::init()
 
 //=============================================================================================================
 
-void RawDataViewer::onNewModelAvalible(QSharedPointer<AbstractModel> pNewModel)
+void RawDataViewer::onModelChanged(QSharedPointer<AbstractModel> pNewModel)
 {
     if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
         m_pRawModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
         m_pFiffRawView->initMVCSettings(m_pRawModel, m_pRawDelegate);
-        qInfo() << "[RawDataViewer::onNewModelAvailable] New model added; " << pNewModel->getModelPath();
+        qInfo() << "[RawDataViewer::onModelChanged] Model changed: " << pNewModel->getModelPath();
 
         setUpControls();
     }
@@ -191,7 +191,6 @@ QWidget *RawDataViewer::getView()
 
 void RawDataViewer::handleEvent(QSharedPointer<Event> e)
 {
-    qWarning() << "[RawDataViewer::handleEvent] hellooo.";
     switch (e->getType()) {
     case EVENT_TYPE::EXTENSION_INIT_FINISHED:
         m_pSubWindow->resize(800, 600);
