@@ -212,7 +212,7 @@ public:
      *
      * @return the current compensation
      */
-    static QList<FiffChInfo> set_current_comp(QList<FiffChInfo>& chs, fiff_int_t value);
+    static QList<FiffChInfo> set_current_comp(QList<FiffChInfo>& listFiffChInfo, fiff_int_t value);
 
 // ToDo
 //    //=========================================================================================================
