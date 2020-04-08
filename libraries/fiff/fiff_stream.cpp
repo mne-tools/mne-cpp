@@ -2600,12 +2600,10 @@ fiff_long_t FiffStream::write_double(fiff_int_t kind, const double* data, fiff_i
 
     qint32 datasize = nel * 8;
 
-     *this << (qint32)kind;
-     *this << (qint32)FIFFT_DOUBLE;
-     *this << (qint32)datasize;
-     *this << (qint32)FIFFV_NEXT_SEQ;
-
-//    this->setFloatingPointPrecision(QDataStream::SinglePrecision);
+    *this << (qint32)kind;
+    *this << (qint32)FIFFT_DOUBLE;
+    *this << (qint32)datasize;
+    *this << (qint32)FIFFV_NEXT_SEQ;
 
     for(qint32 i = 0; i < nel; ++i)
         *this << data[i];
@@ -2621,12 +2619,10 @@ fiff_long_t FiffStream::write_float(fiff_int_t kind, const float* data, fiff_int
 
     qint32 datasize = nel * 4;
 
-     *this << (qint32)kind;
-     *this << (qint32)FIFFT_FLOAT;
-     *this << (qint32)datasize;
-     *this << (qint32)FIFFV_NEXT_SEQ;
-
-//    this->setFloatingPointPrecision(QDataStream::SinglePrecision);
+    *this << (qint32)kind;
+    *this << (qint32)FIFFT_FLOAT;
+    *this << (qint32)datasize;
+    *this << (qint32)FIFFV_NEXT_SEQ;
 
     for(qint32 i = 0; i < nel; ++i)
         *this << data[i];

@@ -264,7 +264,7 @@ bool FiffIO::write_raw(QIODevice &p_IODevice, const fiff_int_t idx) const
                outfid->write_int(FIFF_FIRST_SAMPLE,&first);
            first_buffer = false;
         }
-        outfid->write_raw_buffer(data, mult);
+        outfid->write_raw_buffer(data, cals);
         qDebug("[done]\n");
     }
 
