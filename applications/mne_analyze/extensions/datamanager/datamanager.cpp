@@ -166,7 +166,7 @@ void DataManager::updateListWidget()
 {
     m_pDataManagerView->clearList();
 
-    QList<QSharedPointer<AbstractModel>> lModels = m_pAnalyzeData->getModels();
+    QList<QSharedPointer<AbstractModel> > lModels = m_pAnalyzeData->getModels();
 
     //add all model names to the listView
     for(QSharedPointer<AbstractModel> pModel: lModels) {
