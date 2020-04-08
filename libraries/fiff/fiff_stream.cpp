@@ -3082,7 +3082,8 @@ fiff_long_t FiffStream::write_proj(const QList<FiffProj>& projs)
 
 //=============================================================================================================
 
-bool FiffStream::write_raw_buffer(const MatrixXd& buf, const RowVectorXd& cals)
+bool FiffStream::write_raw_buffer(const MatrixXd& buf,
+                                  const RowVectorXd& cals)
 {
     if (buf.rows() != cals.cols())
     {
@@ -3106,7 +3107,8 @@ bool FiffStream::write_raw_buffer(const MatrixXd& buf, const RowVectorXd& cals)
 
 //=============================================================================================================
 
-bool FiffStream::write_raw_buffer(const MatrixXd& buf, const SparseMatrix<double>& mult)
+bool FiffStream::write_raw_buffer(const MatrixXd& buf,
+                                  const SparseMatrix<double>& mult)
 {
     if (buf.rows() != mult.cols()) {
         qWarning("buffer and mult sizes do not match\n");
@@ -3134,7 +3136,8 @@ bool FiffStream::write_raw_buffer(const MatrixXd& buf)
 
 //=============================================================================================================
 
-fiff_long_t FiffStream::write_string(fiff_int_t kind, const QString& data)
+fiff_long_t FiffStream::write_string(fiff_int_t kind,
+                                     const QString& data)
 {
     fiff_long_t pos = this->device()->pos();
 
