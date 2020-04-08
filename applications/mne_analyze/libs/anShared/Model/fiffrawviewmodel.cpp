@@ -550,7 +550,7 @@ void FiffRawViewModel::postBlockLoad(int result)
         }
         m_dataMutex.unlock();
 
-        qInfo() << "[FiffRawViewModel::postBlockLoad] |TIME| " << timer.elapsed() << " [FiffRawViewModel::postBlockLoad]";
+        //qInfo() << "[FiffRawViewModel::postBlockLoad] |TIME| " << timer.elapsed() << " [FiffRawViewModel::postBlockLoad]";
         emit newBlocksLoaded();
 
         break;
@@ -706,16 +706,16 @@ void FiffRawViewModel::newTimeMark(const float& xpos)
     qDebug() << "First held:" << m_iFiffCursorBegin;
     qDebug() << "DX" << m_dDx;
     //Get absolute sample number of where we clicked
-    float fSample = absoluteFirstSample() + (float)getSampleScrollPos() + (xpos/m_dDx);
+    //float fSample = /*absoluteFirstSample()*/currentFirstSample() + (xpos/m_dDx);
 
     for (float samp : timeMarkList) {
-        if(fSample == samp) {
+        if(xpos == samp) {
             qWarning() << "User attempted to add overlaping markers. Discarding new marker.";
             return;
         }
     }
 
-    timeMarkList.append(fSample);
+    timeMarkList.append(xpos);
     std::sort(timeMarkList.begin(),timeMarkList.end());
 }
 
@@ -737,8 +737,8 @@ int FiffRawViewModel::getTimeListSize() const
 
 int FiffRawViewModel::getSampleScrollPos() const
 {
-    float result = float(m_iScrollPos) / m_dDx;
-    return int(result);
+    qDebug() << "Scroll Position:" << m_iScrollPos;
+    return m_iScrollPos;
 }
 
 //=============================================================================================================

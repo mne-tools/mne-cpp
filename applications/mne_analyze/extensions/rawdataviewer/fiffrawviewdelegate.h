@@ -161,7 +161,8 @@ private:
     void createMarksPath(const QModelIndex &index,
                                const QStyleOptionViewItem &option,
                                QPainterPath& path,
-                               ANSHAREDLIB::ChannelData &data) const;
+                               ANSHAREDLIB::ChannelData &data,
+                               QPainter* painter) const;
 
 
     QPen        m_penGrid;                  /**< Pen for drawing the data grid. */

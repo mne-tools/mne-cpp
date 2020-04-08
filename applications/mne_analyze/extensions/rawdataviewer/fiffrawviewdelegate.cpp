@@ -110,6 +110,7 @@ void FiffRawViewDelegate::paint(QPainter *painter,
                 int pos = pFiffRawModel->pixelDifference() * (pFiffRawModel->currentFirstSample() - pFiffRawModel->absoluteFirstSample());
 
                 QPainterPath path = QPainterPath(QPointF(option.rect.x()+pos, option.rect.y()));
+//                QPainterPath path  = QPainterPath(QPointF(option.rect.x(),option.rect.y()));
 
                 //Plot data
                 createPlotPath(option,
@@ -157,7 +158,8 @@ void FiffRawViewDelegate::paint(QPainter *painter,
                 createMarksPath(index,
                                 option,
                                 path,
-                                data);
+                                data,
+                                painter);
                 painter->save();
                 painter->setPen(QPen(Qt::black, 2, Qt::SolidLine));
                 painter->drawPath(path);
@@ -205,7 +207,6 @@ void FiffRawViewDelegate::createPlotPath(const QStyleOptionViewItem &option,
     const FiffRawViewModel* t_pModel = static_cast<const FiffRawViewModel*>(index.model());
 
     qint32 kind = t_pModel->getKind(index.row());
-
     double dMaxValue = 1.0e-10;
 
     switch(kind) {
@@ -256,11 +257,11 @@ void FiffRawViewDelegate::createPlotPath(const QStyleOptionViewItem &option,
     }
 
     double dScaleY = option.rect.height()/(2*dMaxValue);
-
     double y_base = path.currentPosition().y();
+    double dValue, newY;
+    double diff;
 
     QPointF qSamplePosition;
-    double dValue, newY;
 
     int iPaintStep = (int)(1.0/dDx) - 1;
     if (iPaintStep < 2){
@@ -277,6 +278,16 @@ void FiffRawViewDelegate::createPlotPath(const QStyleOptionViewItem &option,
         qSamplePosition.setX(path.currentPosition().x() + (dDx * (float)iPaintStep));
         path.lineTo(qSamplePosition);
     }
+//    for(int j = iPaintStep; j < data.size(); j = j + iPaintStep) {
+//        dValue = data[j] * dScaleY;
+//        diff = dValue - (data[j - iPaintStep] * dScaleY);
+
+//        //Reverse direction -> plot the right way
+
+//        qSamplePosition.setY((path.currentPosition().y() - diff));
+//        qSamplePosition.setX(path.currentPosition().x() + (dDx * (float)iPaintStep));
+//        path.lineTo(qSamplePosition);
+//    }
 }
 
 //=============================================================================================================
@@ -318,7 +329,8 @@ void FiffRawViewDelegate::createTimeSpacersPath(const QModelIndex &index,
 void FiffRawViewDelegate::createMarksPath(const QModelIndex &index,
                                           const QStyleOptionViewItem &option,
                                           QPainterPath &path,
-                                          ANSHAREDLIB::ChannelData &data) const
+                                          ANSHAREDLIB::ChannelData &data,
+                                          QPainter* painter) const
 {
     const FiffRawViewModel* t_pModel = static_cast<const FiffRawViewModel*>(index.model());
 
@@ -334,7 +346,7 @@ void FiffRawViewDelegate::createMarksPath(const QModelIndex &index,
 //        path.moveTo(path.currentPosition().x() + t_pModel->getTimeMarks(i), fTop);
 //        path.lineTo(path.currentPosition().x(), fBottom);
 //    }
-    path.moveTo(path.currentPosition().x(), fTop);
+    //path.moveTo(path.currentPosition().x(), fTop);
 
     //qDebug() << data.size();
 //    qDebug() << "Abs first sample:" << t_pModel->absoluteFirstSample();
@@ -342,8 +354,17 @@ void FiffRawViewDelegate::createMarksPath(const QModelIndex &index,
 //    qDebug() << "Beggining:" << t_pModel->absoluteFirstSample() + t_pModel->getSampleScrollPos();
 //    qDebug() << "End:" << (t_pModel->absoluteFirstSample() + t_pModel->getSampleScrollPos() + data.size());
 
+    //int iStart = t_pModel->currentFirstSample(); /*t_pModel->absoluteFirstSample() + t_pModel->getSampleScrollPos();*/
+
+    int iStart = t_pModel->absoluteFirstSample() + t_pModel->getSampleScrollPos()/dDx;
+    //qDebug() << "iStart:" << iStart;
+    //qDebug() << "Pos" << t_pModel;
+
+    //ChannelData::ChannelIterator iterator = new ChannelData::ChannelIterator(data);
+
+
     int count = 0;
-    for(int j = t_pModel->absoluteFirstSample() + t_pModel->getSampleScrollPos(); j < (t_pModel->absoluteFirstSample() + t_pModel->getSampleScrollPos() + data.size()); j++) {
+    for(int j = iStart ; j < (iStart + data.size()); j++) {
         if(!(count < t_pModel->getTimeListSize())) {
             break;
         }
@@ -356,4 +377,10 @@ void FiffRawViewDelegate::createMarksPath(const QModelIndex &index,
             path.moveTo(path.currentPosition().x() + dDx, fTop);
         }
     }
+//    int i = 0;
+//    while(1) {
+//        if (t_pModel->getTimeMarks(i) >= iStart && t_pModel->getTimeMarks(i) <= (iStart + data.size())) {
+//            path.moveTo()
+//        }
+//    }
 }

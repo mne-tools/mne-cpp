@@ -249,6 +249,7 @@ void FiffRawView::setWindowSize(int T)
     //Wiggle view area to trigger update (there's probably a better way of doing this)
     m_pTableView->horizontalScrollBar()->setValue(iNewPos + 1);
     m_pTableView->horizontalScrollBar()->setValue(iNewPos);
+    //qDebug() << "ScrollSize:" << m_pTableView->horizontalScrollBar()->maximum
 }
 
 //=============================================================================================================
@@ -296,7 +297,9 @@ void FiffRawView::onMakeScreenshot(const QString& imageType)
 
 void FiffRawView::customContextMenuRequested(const QPoint &pos)
 {
-    lastClickedPoint = ((float)pos.x() + (float)m_pTableView->horizontalScrollBar()->value());
+    lastClickedPoint = floor((float)m_pModel->absoluteFirstSample() + //accounting for first sample offset
+                             (m_pTableView->horizontalScrollBar()->value() / m_pModel->pixelDifference()) + //accounting for scroll offset
+                             ((float)pos.x() / m_pModel->pixelDifference())); //accounting for mouse position offset
 
     QMenu* menu = new QMenu(this);
 
@@ -305,8 +308,6 @@ void FiffRawView::customContextMenuRequested(const QPoint &pos)
             this, &FiffRawView::addTimeMark);
 
     menu->popup(m_pTableView->viewport()->mapToGlobal(pos));
-
-    qDebug() << "POS:" << pos.x();
 }
 
 //=============================================================================================================
