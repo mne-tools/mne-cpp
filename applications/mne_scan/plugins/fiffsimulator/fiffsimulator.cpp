@@ -75,13 +75,14 @@ using namespace Eigen;
 //=============================================================================================================
 
 FiffSimulator::FiffSimulator()
-: m_sFiffSimulatorClientAlias("mne_scan")
-, m_pRtCmdClient(NULL)
+: m_sFiffSimulatorIP("127.0.0.1")
 , m_bCmdClientIsConnected(false)
-, m_sFiffSimulatorIP("127.0.0.1")
 , m_pFiffSimulatorProducer(new FiffSimulatorProducer(this))
+, m_sFiffSimulatorClientAlias("mne_scan")
 , m_iBufferSize(-1)
 , m_iActiveConnectorId(0)
+, m_pCircularBuffer(QSharedPointer<CircularBuffer_Matrix_float>(new CircularBuffer_Matrix_float(40)))
+, m_pRtCmdClient(QSharedPointer<RtCmdClient>::create())
 {
     //init channels when fiff info is available
     connect(this, &FiffSimulator::fiffInfoAvailable,
@@ -123,7 +124,7 @@ void FiffSimulator::init()
     m_outputConnectors.append(m_pRTMSA_FiffSimulator);
 
     //Try to connect the cmd client on start up using localhost connection
-    this->connectCmdClient();
+ //   this->connectCmdClient();
 }
 
 //=============================================================================================================
@@ -141,11 +142,6 @@ bool FiffSimulator::start()
         //Set buffer size
         (*m_pRtCmdClient)["bufsize"].pValues()[0].setValue(m_iBufferSize);
         (*m_pRtCmdClient)["bufsize"].send();
-
-        // Init circular buffer to transmit data from the producer to this thread
-        if(!m_pCircularBuffer) {
-            m_pCircularBuffer = QSharedPointer<CircularBuffer_Matrix_float>(new CircularBuffer_Matrix_float(8));
-        }
 
         m_pFiffSimulatorProducer->start();
 
@@ -272,9 +268,7 @@ void FiffSimulator::changeConnector(qint32 p_iNewConnectorId)
 
 void FiffSimulator::connectCmdClient()
 {
-    if(m_pRtCmdClient.isNull()) {
-        m_pRtCmdClient = QSharedPointer<RtCmdClient>(new RtCmdClient);
-    } else if(m_bCmdClientIsConnected) {
+    if(m_bCmdClientIsConnected) {
         this->disconnectCmdClient();
     }
 
