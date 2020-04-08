@@ -61,8 +61,8 @@ using namespace COMMUNICATIONLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtCmdClient::RtCmdClient(QObject *parent) :
-        QTcpSocket(parent)
+RtCmdClient::RtCmdClient(QObject *parent)
+: QTcpSocket(parent)
 {
     QObject::connect(&m_commandManager, &CommandManager::triggered, this,
             &RtCmdClient::sendCommandJSON);
