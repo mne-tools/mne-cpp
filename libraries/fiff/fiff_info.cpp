@@ -95,16 +95,6 @@ FiffInfo::FiffInfo(const FiffInfo& p_FiffInfo)
 {
     meas_date[0] = p_FiffInfo.meas_date[0];
     meas_date[1] = p_FiffInfo.meas_date[1];
-
-//    qint32 i;
-//    for(i = 0; i < p_FiffInfo.dig.size(); ++i)
-//        dig.append(FiffDigPoint(p_FiffInfo.dig[i]));
-
-//    for(i = 0; i < p_FiffInfo.projs.size(); ++i)
-//        projs.append(p_FiffInfo.projs[i]);
-
-//    for(i = 0; i < p_FiffInfo.comps.size(); ++i)
-//        comps.append(p_FiffInfo.comps[i]);
 }
 
 //=============================================================================================================
@@ -243,7 +233,7 @@ bool FiffInfo::make_compensator(fiff_int_t kind, MatrixXd& this_comp) const//pri
 {
     FiffNamedMatrix::SDPtr this_data;
     MatrixXd presel, postsel;
-    qint32 k, col, c, ch, row, row_ch=0, channelAvailable;
+    qint32 k, col, c, ch=0, row, row_ch=0, channelAvailable;
 
     for (k = 0; k < this->comps.size(); ++k)
     {
