@@ -86,22 +86,25 @@ FiffInfo::FiffInfo(const FiffInfo& p_FiffInfo)
 , utc_offset(p_FiffInfo.utc_offset)         /**< UTC offset of related meas_date (sHH:MM).*/
 , gantry_angle(p_FiffInfo.gantry_angle)
 , dev_ctf_t(p_FiffInfo.dev_ctf_t)
+, dig(p_FiffInfo.dig)
 , dig_trans(p_FiffInfo.dig_trans)
+, projs(p_FiffInfo.projs)
+, comps(p_FiffInfo.comps)
 , acq_pars(p_FiffInfo.acq_pars)
 , acq_stim(p_FiffInfo.acq_stim)
 {
     meas_date[0] = p_FiffInfo.meas_date[0];
     meas_date[1] = p_FiffInfo.meas_date[1];
 
-    qint32 i;
-    for(i = 0; i < p_FiffInfo.dig.size(); ++i)
-        dig.append(FiffDigPoint(p_FiffInfo.dig[i]));
+//    qint32 i;
+//    for(i = 0; i < p_FiffInfo.dig.size(); ++i)
+//        dig.append(FiffDigPoint(p_FiffInfo.dig[i]));
 
-    for(i = 0; i < p_FiffInfo.projs.size(); ++i)
-        projs.append(p_FiffInfo.projs[i]);
+//    for(i = 0; i < p_FiffInfo.projs.size(); ++i)
+//        projs.append(p_FiffInfo.projs[i]);
 
-    for(i = 0; i < p_FiffInfo.comps.size(); ++i)
-        comps.append(p_FiffInfo.comps[i]);
+//    for(i = 0; i < p_FiffInfo.comps.size(); ++i)
+//        comps.append(p_FiffInfo.comps[i]);
 }
 
 //=============================================================================================================
