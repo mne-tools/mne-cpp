@@ -39,7 +39,6 @@
 //=============================================================================================================
 
 #include "rawdataviewer.h"
-#include "FormFiles/rawdataviewercontrol.h"
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Utils/metatypes.h>
 #include <anShared/Management/communicator.h>
@@ -82,7 +81,6 @@ RawDataViewer::RawDataViewer()
 
 RawDataViewer::~RawDataViewer()
 {
-    delete m_pRawDataViewerControl;
     delete m_pCommu;
 }
 
@@ -99,8 +97,6 @@ QSharedPointer<IExtension> RawDataViewer::clone() const
 void RawDataViewer::init()
 {
     m_pCommu = new Communicator(this);
-
-    m_pRawDataViewerControl = new RawDataViewerControl;
 
     connect(m_pAnalyzeData.data(), &AnalyzeData::newModelAvailable,
             this, &RawDataViewer::onModelChanged);

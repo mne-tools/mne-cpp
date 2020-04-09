@@ -122,7 +122,6 @@ private:
 
     // Control
     QPointer<QDockWidget>                m_pControlDock;                 /**< Control Widget */
-    QPointer<RawDataViewerControl>       m_pRawDataViewerControl;
     QPointer<ANSHAREDLIB::Communicator>  m_pCommu;
 
     // Model

@@ -84,7 +84,6 @@ DESTDIR = $${MNE_BINARY_DIR}/mne_analyze_extensions
 SOURCES += \
     fiffrawevent.cpp \
     rawdataviewer.cpp \
-    FormFiles/rawdataviewercontrol.cpp \
     fiffrawview.cpp \
     fiffrawviewdelegate.cpp
 
@@ -92,12 +91,10 @@ HEADERS += \
     fiffrawevent.h \
     rawdataviewer_global.h \
     rawdataviewer.h    \
-    FormFiles/rawdataviewercontrol.h \
     fiffrawview.h \
     fiffrawviewdelegate.h
 
 FORMS += \
-    FormFiles/rawdataviewercontrol.ui \
     fiffrawevent.ui \
 
 OTHER_FILES += rawdataviewer.json
