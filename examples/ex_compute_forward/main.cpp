@@ -37,6 +37,10 @@
 //=============================================================================================================
 #include <utils/generics/applicationlogger.h>
 
+#include <fiff/fiff.h>
+#include <fiff/c/fiff_coord_trans_old.h>
+#include <fiff/fiff_info.h>
+
 #include <fwd/computeFwd/compute_fwd_settings.h>
 #include <fwd/computeFwd/compute_fwd.h>
 
@@ -51,12 +55,18 @@
 
 #include <QApplication>
 #include <QCommandLineParser>
+#include <QElapsedTimer>
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace FWDLIB;
+using namespace FIFFLIB;
+using namespace UTILSLIB;
+using namespace MNELIB;
+using namespace Eigen;
+
 
 //=============================================================================================================
 // MAIN
@@ -76,6 +86,8 @@ int main(int argc, char *argv[])
     qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
     QCoreApplication a(argc, argv);
 
+    QElapsedTimer timer;
+
     // Command Line Parser
     QCommandLineParser parser;
     parser.setApplicationDescription("Example name");
@@ -83,12 +95,23 @@ int main(int argc, char *argv[])
 
     QCommandLineOption parameterOption("parameter", "The first parameter description.");
 
+    qInfo() << "Please download the mne-cpp-test-data folder from Github (mne-tools) into mne-cpp/bin.";
+    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif");
+
+    parser.addOption(inputOption);
     parser.addOption(parameterOption);
 
     parser.process(a);
 
-    // Ininit calculation
+    // read data
+    // Init data loading and writing
+    QFile t_fileIn(parser.value(inputOption));
+    FiffRawData raw(t_fileIn);
+    QSharedPointer<FiffInfo> pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(raw.info));
 
+    FiffCoordTransOld meg_head_t = pFiffInfo->dev_head_t.toOld();
+
+    // Ininit calculation
     ComputeFwdSettings settingsMEGEEG;
 
     settingsMEGEEG.include_meg = true;
@@ -102,13 +125,19 @@ int main(int argc, char *argv[])
     settingsMEGEEG.mindist = 5.0f/1000.0f;
     settingsMEGEEG.solname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/sample_audvis-meg-eeg-oct-6-fwd.fif";
 
+    // bring in dev_head transformation
+    settingsMEGEEG.meg_head_t = &meg_head_t;
+
     settingsMEGEEG.checkIntegrity();
 
-    QSharedPointer<ComputeFwd> pFwdMEGEEGComputed = QSharedPointer<ComputeFwd>(new ComputeFwd(&settingsMEGEEG));
+    QSharedPointer<FWDLIB::ComputeFwd> pFwdMEGEEGComputed = QSharedPointer<FWDLIB::ComputeFwd>(new FWDLIB::ComputeFwd(&settingsMEGEEG));
+
+    timer.start();
     pFwdMEGEEGComputed->calculateFwd();
+    qInfo() << "The computation took: " << timer.elapsed() << " ms.";
 
     // get results
     FwdResult result = pFwdMEGEEGComputed->result;
-
-    return a.exec();
+    qInfo() << "result.nspace" << result.nspace;
+    qInfo() << "result.megCoils->ncoil" << result.megCoils->ncoil;
 }
