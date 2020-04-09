@@ -107,7 +107,7 @@ public:
      * Constructs a FiffRawViewModel object.
      */
     FiffRawViewModel(const QString &sFilePath,
-                     qint32 iVisibleWindowSize = 10,
+                     qint32 iVisibleWindowSize = 1,
                      qint32 iPreloadBufferSize = 1,
                      QObject *pParent = nullptr);
 
@@ -118,7 +118,7 @@ public:
      */
     FiffRawViewModel(const QString &sFilePath,
                      const QByteArray& byteLoadedData,
-                     qint32 iVisibleWindowSize = 10,
+                     qint32 iVisibleWindowSize = 1,
                      qint32 iPreloadBufferSize = 1,
                      QObject *pParent = nullptr);
 
@@ -381,8 +381,6 @@ public:
 
     int getWindowSizeBlocks() const;
 
-public slots:
-
     /**
      * This tells the model where the view currently is.
      *
@@ -442,8 +440,8 @@ signals:
 
 private:
 
-    std::list<QSharedPointer<QPair<MatrixXd, MatrixXd>>> m_lData;    /**< Data */
-    std::list<QSharedPointer<QPair<MatrixXd, MatrixXd>>> m_lNewData; /**< Data that is to be appended or prepended */
+    std::list<QSharedPointer<QPair<MatrixXd, MatrixXd> > > m_lData;    /**< Data */
+    std::list<QSharedPointer<QPair<MatrixXd, MatrixXd> > > m_lNewData; /**< Data that is to be appended or prepended */
 
     // Display studd
     double      m_dDx;              /**< pixel difference to the next sample. */
@@ -589,7 +587,7 @@ public:
         qint32 currentIndex;
 
         // Remember which block we are currently in
-        std::list<QSharedPointer<QPair<MatrixXd, MatrixXd>>>::const_iterator currentBlockToAccess;
+        std::list<QSharedPointer<QPair<MatrixXd, MatrixXd> > >::const_iterator currentBlockToAccess;
         qint32 currentRelativeIndex; /**< Remember the relative sample in the current block */
 
     public:

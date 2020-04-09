@@ -132,6 +132,12 @@ void RawDataViewer::init()
 void RawDataViewer::onModelChanged(QSharedPointer<AbstractModel> pNewModel)
 {
     if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
+        if(m_pRawModel) {
+            if(m_pRawModel == pNewModel) {
+                return;
+            }
+        }
+
         m_pRawModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
         m_pFiffRawView->initMVCSettings(m_pRawModel, m_pRawDelegate);
         qInfo() << "[RawDataViewer::onModelChanged] Model changed: " << pNewModel->getModelPath();
