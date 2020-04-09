@@ -124,7 +124,8 @@ void FiffRawData::clear()
 }
 
 //=============================================================================================================
-
+#include <QElapsedTimer>
+#include <QDebug>
 bool FiffRawData::read_raw_segment(MatrixXd& data,
                                    MatrixXd& times,
                                    fiff_int_t from,
@@ -250,8 +251,6 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
         mult.setFromTriplets(tripletList.begin(), tripletList.end());
 //    mult.makeCompressed();
 
-    //
-
     FiffStream::SPtr fid;
     if (!this->file->device()->isOpen())
     {
@@ -266,11 +265,13 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
         fid = this->file;
     }
 
-    MatrixXd one;
+    MatrixXd one, newData, tmp_data;
+    FiffRawDir thisRawDir;
+    FiffTag::SPtr t_pTag;
     fiff_int_t first_pick, last_pick, picksamp;
     for(k = 0; k < this->rawdir.size(); ++k)
     {
-        FiffRawDir thisRawDir = this->rawdir[k];
+        thisRawDir = this->rawdir[k];
         //
         //  Do we need this buffer
         //
@@ -292,7 +293,6 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
             }
             else
             {
-                FiffTag::SPtr t_pTag;
                 fid->read_tag(t_pTag, thisRawDir.ent->pos);
                 //
                 //   Depending on the state of the projection and selection
@@ -311,45 +311,44 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                         else if(t_pTag->type == FIFFT_SHORT)
                             one = cal*(Map< MatrixShort >( t_pTag->toShort(),nchan, thisRawDir.nsamp)).cast<double>();
                         else
-                            printf("Data Storage Format not known jet [1]!! Type: %d\n", t_pTag->type);
+                            printf("Data Storage Format not known yet [1]!! Type: %d\n", t_pTag->type);
                     }
                     else
                     {
-
                         //ToDo find a faster solution for this!! --> make cal and mul sparse like in MATLAB
-                        MatrixXd newData(sel.cols(), thisRawDir.nsamp); //ToDo this can be done much faster, without newData
+                        newData.resize(sel.cols(), thisRawDir.nsamp); //ToDo this can be done much faster, without newData
 
                         if (t_pTag->type == FIFFT_DAU_PACK16)
                         {
-                            MatrixXd tmp_data = (Map< MatrixDau16 > ( t_pTag->toDauPack16(),nchan, thisRawDir.nsamp)).cast<double>();
+                            tmp_data = (Map< MatrixDau16 > ( t_pTag->toDauPack16(),nchan, thisRawDir.nsamp)).cast<double>();
 
                             for(r = 0; r < sel.size(); ++r)
                                 newData.block(r,0,1,thisRawDir.nsamp) = tmp_data.block(sel[r],0,1,thisRawDir.nsamp);
                         }
                         else if(t_pTag->type == FIFFT_INT)
                         {
-                            MatrixXd tmp_data = (Map< MatrixXi >( t_pTag->toInt(),nchan, thisRawDir.nsamp)).cast<double>();
+                            tmp_data = (Map< MatrixXi >( t_pTag->toInt(),nchan, thisRawDir.nsamp)).cast<double>();
 
                             for(r = 0; r < sel.size(); ++r)
                                 newData.block(r,0,1,thisRawDir.nsamp) = tmp_data.block(sel[r],0,1,thisRawDir.nsamp);
                         }
                         else if(t_pTag->type == FIFFT_FLOAT)
                         {
-                            MatrixXd tmp_data = (Map< MatrixXf > ( t_pTag->toFloat(),nchan, thisRawDir.nsamp)).cast<double>();
+                            tmp_data = (Map< MatrixXf > ( t_pTag->toFloat(),nchan, thisRawDir.nsamp)).cast<double>();
 
                             for(r = 0; r < sel.size(); ++r)
                                 newData.block(r,0,1,thisRawDir.nsamp) = tmp_data.block(sel[r],0,1,thisRawDir.nsamp);
                         }
                         else if(t_pTag->type == FIFFT_SHORT)
                         {
-                            MatrixXd tmp_data = (Map< MatrixShort > ( t_pTag->toShort(),nchan, thisRawDir.nsamp)).cast<double>();
+                            tmp_data = (Map< MatrixShort > ( t_pTag->toShort(),nchan, thisRawDir.nsamp)).cast<double>();
 
                             for(r = 0; r < sel.size(); ++r)
                                 newData.block(r,0,1,thisRawDir.nsamp) = tmp_data.block(sel[r],0,1,thisRawDir.nsamp);
                         }
                         else
                         {
-                            printf("Data Storage Format not known jet [2]!! Type: %d\n", t_pTag->type);
+                            printf("Data Storage Format not known yet [2]!! Type: %d\n", t_pTag->type);
                         }
 
                         one = cal*newData;
@@ -364,7 +363,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                     else if(t_pTag->type == FIFFT_FLOAT)
                         one = mult*(Map< MatrixXf >( t_pTag->toFloat(),nchan, thisRawDir.nsamp)).cast<double>();
                     else
-                        printf("Data Storage Format not known jet [3]!! Type: %d\n", t_pTag->type);
+                        printf("Data Storage Format not known yet [3]!! Type: %d\n", t_pTag->type);
                 }
             }
             //
@@ -646,7 +645,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                         else if(t_pTag->type == FIFFT_SHORT)
                             one = cal*(Map< MatrixShort >( t_pTag->toShort(),nchan, thisRawDir.nsamp)).cast<double>();
                         else
-                            printf("Data Storage Format not known jet [1]!! Type: %d\n", t_pTag->type);
+                            printf("Data Storage Format not known yet [1]!! Type: %d\n", t_pTag->type);
                     }
                     else
                     {
@@ -684,7 +683,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                         }
                         else
                         {
-                            printf("Data Storage Format not known jet [2]!! Type: %d\n", t_pTag->type);
+                            printf("Data Storage Format not known yet [2]!! Type: %d\n", t_pTag->type);
                         }
 
                         one = cal*newData;
@@ -699,7 +698,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                     else if(t_pTag->type == FIFFT_FLOAT)
                         one = mult*(Map< MatrixXf >( t_pTag->toFloat(),nchan, thisRawDir.nsamp)).cast<double>();
                     else
-                        printf("Data Storage Format not known jet [3]!! Type: %d\n", t_pTag->type);
+                        printf("Data Storage Format not known yet [3]!! Type: %d\n", t_pTag->type);
                 }
             }
             //

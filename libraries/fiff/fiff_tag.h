@@ -145,7 +145,9 @@ class FiffDirNode;
  *
  * @brief FIFF data tag
  */
-class FIFFSHARED_EXPORT FiffTag : public QByteArray {
+class FIFFSHARED_EXPORT FiffTag : public QByteArray
+{
+
 public:
     typedef QSharedPointer<FiffTag> SPtr;            /**< Shared pointer type for FiffTag. */
     typedef QSharedPointer<const FiffTag> ConstSPtr; /**< Const shared pointer type for FiffTag. */

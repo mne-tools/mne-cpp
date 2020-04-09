@@ -201,6 +201,8 @@ public:
     QList<FiffRawDir> rawdir;   /**< Special fiff diretory entry for raw data. */
     Eigen::MatrixXd proj;       /**< SSP operator to apply to the data. */
     FiffCtfComp comp;           /**< Compensator. */
+
+
 };
 } // NAMESPACE
 
