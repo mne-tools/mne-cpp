@@ -139,6 +139,7 @@ void TestMneForwardSolution::computeForward()
 
     QSharedPointer<ComputeFwd> pFwdMEGEEGComputed = QSharedPointer<ComputeFwd>(new ComputeFwd(&settingsMEGEEG));
     pFwdMEGEEGComputed->calculateFwd();
+    pFwdMEGEEGComputed->storeFwd();
 
     // Read newly created fwd
     QFile fileFwdMEGEEGRead(settingsMEGEEG.solname);
