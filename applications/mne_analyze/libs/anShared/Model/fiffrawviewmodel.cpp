@@ -94,10 +94,6 @@ FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
 , m_bEndOfFileReached(false)
 , m_blockLoadFutureWatcher()
 , m_bCurrentlyLoading(false)
-, m_dataMutex()
-, m_pFiffIO()
-, m_pFiffInfo()
-, m_ChannelInfoList()
 , m_dDx(1.0)
 , m_iDistanceTimerSpacer(1000)
 , m_iScrollPos(0)
@@ -132,16 +128,12 @@ FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
 , m_bEndOfFileReached(false)
 , m_blockLoadFutureWatcher()
 , m_bCurrentlyLoading(false)
-, m_dataMutex()
-, m_pFiffIO()
-, m_pFiffInfo()
-, m_ChannelInfoList()
 , m_dDx(1.0)
+, m_iDistanceTimerSpacer(1000)
 , m_iScrollPos(0)
 {
     // connect data reloading: this will be run concurrently
-    connect(&m_blockLoadFutureWatcher,
-            &QFutureWatcher<int>::finished,
+    connect(&m_blockLoadFutureWatcher, &QFutureWatcher<int>::finished,
             [this]() {
                 postBlockLoad(m_blockLoadFutureWatcher.future().result());
             });
@@ -190,10 +182,15 @@ void FiffRawViewModel::initFiffData(QIODevice& p_IODevice)
     m_iFiffCursorBegin = m_pFiffIO->m_qlistRaw[0]->first_samp;
 
     int start = m_iFiffCursorBegin;
-    m_iSamplesPerBlock = m_pFiffInfo->sfreq;
+    m_iSamplesPerBlock = m_pFiffInfo->sfreq*10;
 
     // for some reason the read_raw_segment function works with inclusive upper bound
     int end = start + m_iSamplesPerBlock - 1;
+
+    qDebug() << "m_iSamplesPerBlock" << m_iSamplesPerBlock;
+    qDebug() << "m_iTotalBlockCount" << m_iTotalBlockCount;
+    qDebug() << "end" << end;
+    qDebug() << "start" << start;
 
     // read in all blocks, use the already prepared list m_lData
     for(auto &pairPointer : m_lData) {
@@ -487,9 +484,6 @@ int FiffRawViewModel::loadEarlierBlocks(qint32 numBlocks)
 
 int FiffRawViewModel::loadLaterBlocks(qint32 numBlocks)
 {
-    QElapsedTimer timer;
-    timer.start();
-
     // check if end of file is reached:
     int leftSamples = absoluteLastSample() - (m_iFiffCursorBegin + (m_iTotalBlockCount + numBlocks) * m_iSamplesPerBlock);
     if (leftSamples < 0) {
