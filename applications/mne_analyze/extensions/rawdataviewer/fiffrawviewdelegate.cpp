@@ -273,7 +273,7 @@ void FiffRawViewDelegate::createPlotPath(const QStyleOptionViewItem &option,
 
         //Reverse direction -> plot the right way
         newY = y_base - dValue;
-
+        //qDebug() << "data:" << dValue;
         qSamplePosition.setY(newY);
         qSamplePosition.setX(path.currentPosition().x() + (dDx * (float)iPaintStep));
         path.lineTo(qSamplePosition);
@@ -335,6 +335,7 @@ void FiffRawViewDelegate::createMarksPath(const QModelIndex &index,
     const FiffRawViewModel* t_pModel = static_cast<const FiffRawViewModel*>(index.model());
 
     double dDx = t_pModel->pixelDifference();
+    double dScrollDx = t_pModel->getScrollDx();
 
     float fSampFreq = t_pModel->getFiffInfo()->sfreq;
     float fTop = option.rect.topLeft().y();
@@ -356,9 +357,14 @@ void FiffRawViewDelegate::createMarksPath(const QModelIndex &index,
 
     //int iStart = t_pModel->currentFirstSample(); /*t_pModel->absoluteFirstSample() + t_pModel->getSampleScrollPos();*/
 
-    int iStart = t_pModel->absoluteFirstSample() + t_pModel->getSampleScrollPos()/dDx;
+    int iStart = t_pModel->absoluteFirstSample() + t_pModel->getSampleScrollPos()/(dScrollDx);
     //qDebug() << "iStart:" << iStart;
     //qDebug() << "Pos" << t_pModel;
+    qDebug() << "Scroll Diff:" << dScrollDx;
+    qDebug() << "Pixel Diff:" << dDx;
+    qDebug() << "Data size:" << data.size();
+    qDebug() << "Current Index" << data.begin().currentIndex;
+    qDebug() << "Current relative index" << data.begin().currentRelativeIndex;
 
     //ChannelData::ChannelIterator iterator = new ChannelData::ChannelIterator(data);
 
