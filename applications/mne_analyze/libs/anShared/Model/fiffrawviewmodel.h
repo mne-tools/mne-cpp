@@ -388,6 +388,10 @@ public:
      */
     void updateScrollPosition(qint32 newScrollPosition);
 
+    void setScrollDx(double dNewScrollRatio);
+
+    double getScrollDx() const;
+
 private:
 
     //=========================================================================================================
@@ -435,6 +439,8 @@ private:
      */
     void updateDisplayData();
 
+
+
 signals:
      void newBlocksLoaded();
 
@@ -445,6 +451,7 @@ private:
 
     // Display studd
     double      m_dDx;              /**< pixel difference to the next sample. */
+    double      m_dScrollDx;
 
     // model config
     qint32 m_iSamplesPerBlock;      /**< Number of samples per block */
@@ -580,7 +587,7 @@ public:
     class ChannelIterator : public std::iterator<std::random_access_iterator_tag, const double>
     {
 
-    private:
+    public:
         const ChannelData* cd;  /**< Pointer to the associated ChannelData container */
         // Remember at which point we are currently (this is NOT the absolute sample number,
         // but the index relative to all stored samples in the associated ChannelData container):

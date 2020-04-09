@@ -174,6 +174,8 @@ void FiffRawView::initMVCSettings(const QSharedPointer<FiffRawViewModel>& pModel
     m_pTableView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(m_pTableView.data(), &QWidget::customContextMenuRequested,
             this, &FiffRawView::customContextMenuRequested);
+    m_pTableView->grabGesture(Qt::PinchGesture);
+     m_pTableView->grabGesture(Qt::TapAndHoldGesture);
 }
 
 //=============================================================================================================
@@ -244,7 +246,10 @@ void FiffRawView::setWindowSize(int T)
     m_pTableView->resizeRowsToContents();
     m_pTableView->resizeColumnsToContents();
 
-    m_pTableView->horizontalScrollBar()->setRange(0, iNewSize);
+    //m_pTableView->horizontalScrollBar()->setRange(0, iNewSize);
+    qDebug() << "MAX:" << m_pTableView->horizontalScrollBar()->maximum();
+    qDebug() << "Last samp" << m_pModel->absoluteLastSample();
+    //m_pModel->setScrollDx(static_cast<double>(m_pTableView->horizontalScrollBar()->maximum()) / static_cast<double>(m_pModel->absoluteLastSample()));
 
     //Wiggle view area to trigger update (there's probably a better way of doing this)
     m_pTableView->horizontalScrollBar()->setValue(iNewPos + 1);
@@ -297,11 +302,16 @@ void FiffRawView::onMakeScreenshot(const QString& imageType)
 
 void FiffRawView::customContextMenuRequested(const QPoint &pos)
 {
+    double dScrollDiff = static_cast<double>(m_pTableView->horizontalScrollBar()->maximum()) / static_cast<double>(m_pModel->absoluteLastSample() - m_pModel->absoluteFirstSample());
+    m_pModel->setScrollDx(dScrollDiff);
     lastClickedPoint = floor((float)m_pModel->absoluteFirstSample() + //accounting for first sample offset
-                             (m_pTableView->horizontalScrollBar()->value() / m_pModel->pixelDifference()) + //accounting for scroll offset
+                             (m_pTableView->horizontalScrollBar()->value() / (dScrollDiff)) + //accounting for scroll offset
                              ((float)pos.x() / m_pModel->pixelDifference())); //accounting for mouse position offset
 
     QMenu* menu = new QMenu(this);
+
+    qDebug() << "MAX:" << m_pTableView->horizontalScrollBar()->maximum();
+    m_pModel->setScrollDx(static_cast<double>(m_pTableView->horizontalScrollBar()->maximum()) / static_cast<double>(m_pModel->absoluteLastSample() - m_pModel->absoluteFirstSample()));
 
     QAction* markTime = menu->addAction(tr("Mark time"));
     connect(markTime, &QAction::triggered,

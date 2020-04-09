@@ -97,6 +97,7 @@ FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
 , m_dDx(1.0)
 , m_iDistanceTimerSpacer(1000)
 , m_iScrollPos(0)
+, m_dScrollDx(1.0)
 {
     // connect data reloading: this will be run concurrently
     connect(&m_blockLoadFutureWatcher,
@@ -762,4 +763,16 @@ int FiffRawViewModel::getSampleScrollPos() const
 int FiffRawViewModel::getWindowSizeBlocks() const
 {
     return m_iVisibleWindowSize + m_iPreloadBufferSize;
+}
+
+//=============================================================================================================
+
+void FiffRawViewModel::setScrollDx(double dNewScrollRatio)
+{
+    m_dScrollDx = dNewScrollRatio;
+}
+
+double FiffRawViewModel::getScrollDx() const
+{
+    return m_dScrollDx;
 }
