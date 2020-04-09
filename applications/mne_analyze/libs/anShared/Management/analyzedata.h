@@ -180,7 +180,7 @@ public:
             return temp->saveToFile(sPath);
         }
 
-        qDebug() << "[AnalyzeData::saveModel] Model does not exist!";
+        qWarning() << "[AnalyzeData::saveModel] Model does not exist!";
 
         return false;
     }
