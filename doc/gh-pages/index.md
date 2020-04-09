@@ -16,7 +16,7 @@ nav_order: 1
       <a href="https://hms.harvard.edu/"><img style="max-height:50px;height:auto;width:auto;" src="images/institution_logos/harvard.svg" title="Harvard Medical School" alt="Harvard Medical School"/></a>   
       <a href="https://www.uth.edu/"><img style="max-height:50px;height:auto;width:auto;" src="images/institution_logos/uthealth.svg" title="The University of Texas Health Science Center at Houston" alt="The University of Texas Health Science Center at Houston"/></a>      
       <a href="https://www.uni-magdeburg.de/"><img style="max-height:50px;height:auto;width:auto;" src="images/institution_logos/magdeburg.svg" title="Universität Magdeburg" alt="Universität Magdeburg"/></a>
-      <a href="https://www.forschungscampus-stimulate.de/"><img style="max-height:50px;height:auto;width:auto;" src="images/institution_logos/stimulate.svg" title="Forschungscampus Stmulate" alt="Forschungscampus Stmulate"/></a>
+      <a href="https://www.forschungscampus-stimulate.de/"><img style="max-height:50px;height:auto;width:auto;" src="images/institution_logos/stimulate_magdeburg.svg" title="Forschungscampus Stmulate" alt="Forschungscampus Stmulate"/></a>
       <a href="https://umit.at/"><img style="max-height:50px;height:auto;width:auto;" src="images/institution_logos/umit.svg" title="UMIT" alt="UMIT"/></a>
       <a href="https://www.uniklinikum-jena.de/"><img style="max-height:50px;height:auto;width:auto;" src="images/institution_logos/jena.svg" title="Universitätsklinikum Jena" alt="Universitätsklinikum Jena"/></a>
     </div>
