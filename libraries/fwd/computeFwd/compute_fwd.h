@@ -130,22 +130,57 @@ public:
      */
     virtual ~ComputeFwd();
 
+    //=========================================================================================================
+    /**
+     * init forward caclulation
+     */
+    void init(ComputeFwdSettings* p_settings);
+
+    //=========================================================================================================
+    /**
+     * calculate Forward solution
+     */
     //ToDo split this function into init (with settings as parameter) and the actual fit function
     void calculateFwd();
 
+    //=========================================================================================================
+    /**
+     * store Forward solution
+     */
+    void storeFwd();
+
     QString qPath;
     QFile file;
-
-    FwdResult result;           /**< struct that contains the Fwd result */
 
 private:
     //=========================================================================================================
     /**
      * init the result
      */
-    void initResult();
+    void initFwd();
 
-    //=========================================================================================================
+    MNELIB::MneSourceSpaceOld **spaces;             /* Source spaces */
+    int nspace;                                     /* How many? */
+    FwdCoilSet *megcoils;
+    FwdCoilSet *compcoils;
+    FwdCoilSet* eegels;
+    MNELIB::MneCTFCompDataSet *comp_data;
+    FwdEegSphereModelSet*   eeg_models;
+    FwdEegSphereModel* eeg_model;
+    FwdBemModel *bem_model;                         /* BEM model definition */
+    Eigen::Vector3f *r0;                            /* Sphere model origin */
+    MNELIB::MneNamedMatrix *meg_forward;            /* The results */
+    MNELIB::MneNamedMatrix *meg_forward_grad;
+    MNELIB::MneNamedMatrix *eeg_forward;            /* The results */
+    MNELIB::MneNamedMatrix *eeg_forward_grad;
+
+    QList<FIFFLIB::FiffChInfo>     megchs;      /* The MEG channel information */
+    QList<FIFFLIB::FiffChInfo>     eegchs;      /* The EEG channel information */
+
+    FIFFLIB::fiffId mri_id;
+    FIFFLIB::fiffId meas_id;
+    FIFFLIB::FiffCoordTransOld* mri_head_t;     /* MRI <-> head coordinate transformation */
+    FIFFLIB::FiffCoordTransOld* meg_head_t;     /* MEG <-> head coordinate transformation */
 
     ComputeFwdSettings* settings;
 };
