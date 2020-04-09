@@ -3,10 +3,10 @@
  * @file     main.cpp
  * @author   Juan Garcia-Prieto <juangpc@gmail.com>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Wayne Mead <wayne.mead@uth.tmc.edu>;
- *           John C. Mosher <John.C.Mosher@uth.tmc.edu>
- * @since    0.1.0
+ *           John C. Mosher <John.C.Mosher@uth.tmc.edu>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ * @version  dev
  * @date     September, 2019
  *
  * @section  LICENSE
