@@ -20,5 +20,3 @@ Currently, MNE-CPP's development efforts can be divided into the following proje
 | ![MNELib](images/icon_mne-lib_256x256.png) | **MNE Lib** describes the core libraries provided by the MNE-CPP project. MNE Scan and MNE Analyze are solely based on these libraries. |
 | ![MNEScan](images/icon_mne_scan_256x256.png) | **MNE Scan** (former MNE-X) is an open-source and cross platform application built with tools provided by the MNE-CPP framework. Currently, it is in active clinical use at the Boston Children’s Hospital. With its acquisition and algorithmic plugin architecture it is able to acquire and process data of several MEG/EEG systems (TMSI Refa, eegosports, gtec, brainamp, LSL, VectorView, BabyMEG) in real-time. |
 | ![MNEAnalyze](images/icon_mne-analyze_256x256.png) | **MNE Analyze** is currently in an early development state. When finished it will provide an easy to use GUI for sensor and source level analysis. |
-
-
