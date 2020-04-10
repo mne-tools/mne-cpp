@@ -37,12 +37,28 @@
 #include "annotationview.h"
 #include "ui_annotationview.h"
 
+#include <QDebug>
+
 AnnotationView::AnnotationView()
 : ui(new Ui::EventWindowDockWidget)
 {
     ui->setupUi(this);
+    initGUIFunctionality();
+
 }
 
+void AnnotationView::initGUIFunctionality()
+{
+    connect(ui->m_checkBox_activateEvents, &QCheckBox::stateChanged,
+            this, &AnnotationView::onActiveEventsChecked);
+}
+
+void AnnotationView::onActiveEventsChecked(int iCheckBoxState)
+{
+    qDebug() << "onActiveEventsChecked" << iCheckBoxState;
+    m_iCheckState = iCheckBoxState;
+    emit activeEventsChecked(m_iCheckState);
+}
 //void EventWindow::jumpToEvent(const QModelIndex & current, const QModelIndex & previous)
 //{
 //    Q_UNUSED(previous);
