@@ -15,7 +15,7 @@ nav_order: 3
 
    Qt 5.14: it's complicated (1.38.27)
 
-   Qt 5.15: it's complicated (1.39.8)
+   Qt 5.15: 1.39.8
 
  | **Please note:** With the versions above some functions are not able to be linked and produce errors. It is possible that some MNE-CPP functions are not compatible with these emscripten versions. However, emscripten version 1.39.3 seems to be working with MNE-CPP code. The following setups should work: **Qt5.13.2 compiled with em++ 1.39.3 with thread support**, **Qt5.14.0 compiled with em++ 1.39.3 with thread support** and  **Qt5.15.0 compiled with em++ 1.39.8 with thread support**. | 
 
