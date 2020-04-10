@@ -45,8 +45,11 @@ TARGET = anShared
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
-
 DESTDIR = $${MNE_LIBRARY_DIR}
+
+contains(MNECPP_CONFIG, wasm) {
+    DEFINES += WASMBUILD
+}
 
 contains(MNECPP_CONFIG, static) {
     CONFIG += staticlib

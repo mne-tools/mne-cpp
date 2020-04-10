@@ -50,6 +50,7 @@
 
 #include <QDebug>
 #include <QPainter>
+#include <QPainterPath>
 
 //=============================================================================================================
 // Eigen INCLUDES

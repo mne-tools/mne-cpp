@@ -48,6 +48,7 @@
 //=============================================================================================================
 
 #include <QPainter>
+#include <QPainterPath>
 #include <QDebug>
 #include <QSvgGenerator>
 #include <QSurfaceFormat>

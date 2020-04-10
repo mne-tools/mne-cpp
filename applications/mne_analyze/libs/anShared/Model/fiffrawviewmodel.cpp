@@ -53,6 +53,7 @@
 #include <QElapsedTimer>
 #include <QFile>
 #include <QBrush>
+#include <QFileDialog>
 
 //=============================================================================================================
 // Eigen INCLUDES
@@ -277,6 +278,21 @@ QVariant FiffRawViewModel::data(const QModelIndex &index, int role) const
 
 bool FiffRawViewModel::saveToFile(const QString& sPath)
 {
+#ifdef WASMBUILD
+    Q_UNUSED(sPath)
+    QBuffer bufferOut;
+
+    if(m_pFiffIO->m_qlistRaw.size() > 0) {
+        m_pFiffIO->write_raw(bufferOut, 0);
+
+        // Wee need to call the QFileDialog here instead of the data load extension since we need access to the QByteArray
+        QFileDialog::saveFileContent(bufferOut.data());
+
+        return true;
+    }
+
+    return false;
+#else
     QFile fFileOut(sPath);
 
     if(m_pFiffIO->m_qlistRaw.size() > 0) {
@@ -284,6 +300,7 @@ bool FiffRawViewModel::saveToFile(const QString& sPath)
     }
 
     return false;
+#endif
 }
 
 //=============================================================================================================

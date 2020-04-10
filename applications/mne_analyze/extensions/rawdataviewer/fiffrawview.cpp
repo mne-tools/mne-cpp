@@ -266,30 +266,30 @@ void FiffRawView::setDistanceTimeSpacer(int value)
 
 void FiffRawView::onMakeScreenshot(const QString& imageType)
 {
-    // Create file name
-    QString fileName;
-    QString sDate = QDate::currentDate().toString("yyyy_MM_dd");
-    QString sTime = QTime::currentTime().toString("hh_mm_ss");
+//    // Create file name
+//    QString fileName;
+//    QString sDate = QDate::currentDate().toString("yyyy_MM_dd");
+//    QString sTime = QTime::currentTime().toString("hh_mm_ss");
 
-    if(!QDir("./Screenshots").exists()) {
-        QDir().mkdir("./Screenshots");
-    }
+//    if(!QDir("./Screenshots").exists()) {
+//        QDir().mkdir("./Screenshots");
+//    }
 
-    if(imageType.contains("SVG")) {
-        fileName = QString("./Screenshots/%1-%2-AnalyzeDataView.svg").arg(sDate).arg(sTime);
+//    if(imageType.contains("SVG")) {
+//        fileName = QString("./Screenshots/%1-%2-AnalyzeDataView.svg").arg(sDate).arg(sTime);
 
-        QSvgGenerator svgGen;
-        svgGen.setFileName(fileName);
-        svgGen.setSize(m_pTableView->size());
-        svgGen.setViewBox(m_pTableView->rect());
+//        QSvgGenerator svgGen;
+//        svgGen.setFileName(fileName);
+//        svgGen.setSize(m_pTableView->size());
+//        svgGen.setViewBox(m_pTableView->rect());
 
-        m_pTableView->render(&svgGen);
-    } else if(imageType.contains("PNG")) {
-        fileName = QString("./Screenshots/%1-%2-AnalyzeDataView.png").arg(sDate).arg(sTime);
+//        m_pTableView->render(&svgGen);
+//    } else if(imageType.contains("PNG")) {
+//        fileName = QString("./Screenshots/%1-%2-AnalyzeDataView.png").arg(sDate).arg(sTime);
 
-        QPixmap pixMap = m_pTableView->grab();
-        pixMap.save(fileName);
-    }
+//        QPixmap pixMap = m_pTableView->grab();
+//        pixMap.save(fileName);
+//    }
 }
 
 //=============================================================================================================
