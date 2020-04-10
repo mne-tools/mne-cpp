@@ -47,6 +47,7 @@
 
 #include <QPainter>
 #include <QDebug>
+#include <QPainterPath>
 
 //=============================================================================================================
 // EIGEN INCLUDES
