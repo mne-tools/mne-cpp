@@ -99,6 +99,7 @@ FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
 , m_iDistanceTimerSpacer(1000)
 , m_iScrollPos(0)
 , m_dScrollDx(1.0)
+, m_bDispAnn(true)
 {
     // connect data reloading: this will be run concurrently
     connect(&m_blockLoadFutureWatcher,
@@ -133,6 +134,7 @@ FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
 , m_dDx(1.0)
 , m_iDistanceTimerSpacer(1000)
 , m_iScrollPos(0)
+, m_bDispAnn(true)
 {
     // connect data reloading: this will be run concurrently
     connect(&m_blockLoadFutureWatcher, &QFutureWatcher<int>::finished,
@@ -772,8 +774,25 @@ void FiffRawViewModel::setScrollDx(double dNewScrollRatio)
 {
     m_dScrollDx = dNewScrollRatio;
 }
+//=============================================================================================================
 
 double FiffRawViewModel::getScrollDx() const
 {
     return m_dScrollDx;
+}
+
+//=============================================================================================================
+
+void FiffRawViewModel::toggleDispAnn(const int& iToggleDisp)
+{
+    qDebug() << "toggleDispAnn" << iToggleDisp;
+    m_bDispAnn = (iToggleDisp ? true : false);
+    qDebug() << "member" << m_bDispAnn;
+}
+
+//=============================================================================================================
+
+bool FiffRawViewModel::shouldDisplayAnn() const
+{
+    return m_bDispAnn;
 }

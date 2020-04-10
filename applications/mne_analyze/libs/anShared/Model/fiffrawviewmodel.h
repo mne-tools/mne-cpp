@@ -393,6 +393,10 @@ public:
 
     double getScrollDx() const;
 
+    void toggleDispAnn(const int& iToggleDisp);
+
+    bool shouldDisplayAnn() const;
+
 private:
 
     //=========================================================================================================
@@ -489,6 +493,8 @@ private:
     QList<int>  timeMarkList;
 
     qint32 m_iScrollPos;
+
+    bool m_bDispAnn;
 };
 
 //=============================================================================================================

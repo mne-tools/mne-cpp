@@ -153,19 +153,21 @@ void FiffRawViewDelegate::paint(QPainter *painter,
                 painter->drawPath(path);
                 painter->restore();
 
-                path = QPainterPath(QPointF(option.rect.x()+pos, option.rect.y()));
+                qDebug() << "DISP:" << pFiffRawModel->shouldDisplayAnn();
+                if(pFiffRawModel->shouldDisplayAnn()) {
+                    path = QPainterPath(QPointF(option.rect.x()+pos, option.rect.y()));
 
-                //Plot time marks
-                createMarksPath(index,
-                                option,
-                                path,
-                                data,
-                                painter);
-                painter->save();
-                painter->setPen(QPen(m_penNormal.color().darker(250), 2, Qt::SolidLine));
-                painter->drawPath(path);
-                painter->restore();
-
+                    //Plot time marks
+                    createMarksPath(index,
+                                    option,
+                                    path,
+                                    data,
+                                    painter);
+                    painter->save();
+                    painter->setPen(QPen(m_penNormal.color().darker(250), 2, Qt::SolidLine));
+                    painter->drawPath(path);
+                    painter->restore();
+                }
             }
             break;
         }

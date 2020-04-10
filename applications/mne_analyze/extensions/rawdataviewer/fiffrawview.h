@@ -173,6 +173,8 @@ public:
 
     void addTimeMark(bool con);
 
+    void toggleDisplayEvent(const int& iToggle);
+
 private:
     //=========================================================================================================
     /**
@@ -196,6 +198,8 @@ private:
     qint32                                              m_iT;                           /**< Display window size in seconds */
 
     float                                              lastClickedPoint;
+
+    qint32 m_iToggle;
 signals:
     void tableViewDataWidthChanged(int iWidth);
 };
