@@ -369,36 +369,42 @@ void FiffRawViewDelegate::createMarksPath(const QModelIndex &index,
 
     //ChannelData::ChannelIterator iterator = new ChannelData::ChannelIterator(data);
 
-    int count = 0;
-    bool draw = false;
-    for (count = 0; count < t_pModel->getTimeListSize(); count ++)
-        if(t_pModel->getTimeMarks(count) >= iStart){
-            draw = true;
-            break;
-        }
+    float initx = path.currentPosition().x();
+    float inity = path.currentPosition().y();
 
-    if(draw){
-        for(int j = iStart ; j < (iStart + data.size()); j++) {
-            if(count >= t_pModel->getTimeListSize()) {
-                break;
-            }
-            else {
-                if(j == t_pModel->getTimeMarks(count)) {
-                    path.moveTo(path.currentPosition().x(), fTop);
-                    path.lineTo(path.currentPosition().x(), fBottom);
-                    count++;
-                }
-                path.moveTo(path.currentPosition().x() + dDx, fTop);
-            }
+
+//    int count = 0;
+//    bool draw = false;
+//    for (count = 0; count < t_pModel->getTimeListSize(); count ++)
+//        if(t_pModel->getTimeMarks(count) >= iStart){
+//            draw = true;
+//            break;
+//        }
+
+
+//    if(draw){
+//        for(int j = iStart ; j < (iStart + data.size()); j++) {
+//            if(count >= t_pModel->getTimeListSize()) {
+//                break;
+//            }
+//            else {
+//                if(j == t_pModel->getTimeMarks(count)) {
+//                    path.moveTo(path.currentPosition().x(), fTop);
+//                    path.lineTo(path.currentPosition().x(), fBottom);
+//                    count++;
+//                }
+//                path.moveTo(path.currentPosition().x() + dDx, fTop);
+//            }
+//        }
+//    }
+
+    for(int i = 0; i < t_pModel->getTimeListSize(); i++) {
+        if ((t_pModel->getTimeMarks(i) > iStart) && (t_pModel->getTimeMarks(i) < (iStart + data.size()))) {
+            path.moveTo(initx + static_cast<float>(t_pModel->getTimeMarks(i) - iStart) * dDx, fTop);
+            path.lineTo(path.currentPosition().x(), fBottom);
         }
     }
 
-//    for(int i = 0; i < t_pModel->getTimeListSize(); i++) {
-//        if ((t_pModel->getTimeMarks(i) > iStart) && (t_pModel->getTimeMarks(i) < (iStart + data.size()))) {
-//            path .moveTo(static_cast<float>(t_pModel->getTimeMarks(i) - iStart) * dDx, fTop);
-//            path.lineTo(path.currentPosition().x(), fBottom);
-//        }
-//    }
 //    int i = 0;
 //    while(1) {
 //        if (t_pModel->getTimeMarks(i) >= iStart && t_pModel->getTimeMarks(i) <= (iStart + data.size())) {
