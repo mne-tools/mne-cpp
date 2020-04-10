@@ -49,6 +49,7 @@
 
 #include <QPainter>
 #include <QTableView>
+#include <QPainterPath>
 
 //=============================================================================================================
 // USED NAMESPACES

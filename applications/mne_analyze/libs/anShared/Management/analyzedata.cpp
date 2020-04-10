@@ -113,18 +113,22 @@ void AnalyzeData::setCurrentlySelectedModel(const QString &sModelPath)
 
 //=============================================================================================================
 
-QSharedPointer<FiffRawViewModel> AnalyzeData::loadFiffRawViewModel(const QString &sPath, const QByteArray& byteLoadedData)
+QSharedPointer<FiffRawViewModel> AnalyzeData::loadFiffRawViewModel(const QString &sPath,
+                                                                   const QByteArray& byteLoadedData)
 {
     if(byteLoadedData.isEmpty() || sPath.isEmpty()) {
         qDebug() << "[AnalyzeData::loadFiffRawViewModel] Could not load model!";
         return QSharedPointer<FiffRawViewModel>();
     }
+
     if (m_data.contains(sPath)) {
         qDebug() << "[AnalyzeData::loadFiffRawViewModel] Path already exists " << sPath;
         return qSharedPointerDynamicCast<FiffRawViewModel>(m_data.value(sPath));
     }
 
     QSharedPointer<FiffRawViewModel> pModel = QSharedPointer<FiffRawViewModel>::create(sPath, byteLoadedData);
+    pModel->setModelPath(sPath);
+
     m_data.insert(sPath, pModel);
     emit newModelAvailable(pModel);
     return pModel;

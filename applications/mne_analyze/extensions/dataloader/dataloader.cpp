@@ -181,6 +181,9 @@ void DataLoader::onLoadFiffFilePressed()
 
 void DataLoader::onSaveFiffFilePressed()
 {
+#ifdef WASMBUILD
+    m_pAnalyzeData->saveModel(m_sCurrentlySelectedModel, "");
+#else
     //Get the path
     QString filePath = QFileDialog::getSaveFileName(m_pControl,
                                                     tr("Save Fiff File"),
@@ -190,4 +193,5 @@ void DataLoader::onSaveFiffFilePressed()
     if(!filePath.isNull()) {
         m_pAnalyzeData->saveModel(m_sCurrentlySelectedModel, filePath);
     }
+#endif
 }

@@ -48,6 +48,7 @@
 
 #include <QAbstractItemDelegate>
 #include <QPen>
+#include <QPainterPath>
 
 //=============================================================================================================
 // EIGEN INCLUDES
