@@ -1780,26 +1780,26 @@ ComputeFwd::ComputeFwd(ComputeFwdSettings* p_settings)
 
 ComputeFwd::~ComputeFwd()
 {
-    //ToDo Garbage collection
-    for (int k = 0; k < nspace; k++)
-        if(spaces[k])
-            delete spaces[k];
-    if(mri_head_t)
-        delete mri_head_t;
-    if(meg_head_t)
-        delete meg_head_t;
-    if(megcoils)
-        delete megcoils;
-    if(eegels)
-        delete eegels;
-    if(meg_forward)
-        delete meg_forward;
-    if(eeg_forward)
-        delete eeg_forward;
-    if(meg_forward_grad)
-        delete meg_forward_grad;
-    if(eeg_forward_grad)
-        delete eeg_forward_grad;
+//    //ToDo Garbage collection
+//    for (int k = 0; k < nspace; k++)
+//        if(spaces[k])
+//            delete spaces[k];
+//    if(mri_head_t)
+//        delete mri_head_t;
+//    if(meg_head_t)
+//        delete meg_head_t;
+//    if(megcoils)
+//        delete megcoils;
+//    if(eegels)
+//        delete eegels;
+//    if(meg_forward)
+//        delete meg_forward;
+//    if(eeg_forward)
+//        delete eeg_forward;
+//    if(meg_forward_grad)
+//        delete meg_forward_grad;
+//    if(eeg_forward_grad)
+//        delete eeg_forward_grad;
 }
 
 //=============================================================================================================
@@ -1807,42 +1807,40 @@ ComputeFwd::~ComputeFwd()
 void ComputeFwd::initFwd()
 {
     // TODO: This only temporary until we have the fwd dlibrary refactored. This is only done in order to provide easy testing in test_forward_solution.
-    bool                res = false;
-    MneSourceSpaceOld*  *spaces = Q_NULLPTR;  /* The source spaces */
-    int                 nspace  = 0;
-    int                 nsource = 0;     /* Number of source space points */
+    spaces = Q_NULLPTR;              /* The source spaces */
+    nspace           = 0;
+    int nsource      = 0;            /* Number of source space points */
 
-    FiffCoordTransOld* mri_head_t = Q_NULLPTR;   /* MRI <-> head coordinate transformation */
-    FiffCoordTransOld* meg_head_t = Q_NULLPTR;   /* MEG <-> head coordinate transformation */
+    mri_head_t       = Q_NULLPTR;    /* MRI <-> head coordinate transformation */
+    meg_head_t       = Q_NULLPTR;    /* MEG <-> head coordinate transformation */
 
-    QList<FiffChInfo>     megchs; /* The MEG channel information */
-    int            nmeg     = 0;
-    QList<FiffChInfo>     eegchs; /* The EEG channel information */
-    int            neeg     = 0;
-    QList<FiffChInfo>     compchs;
-    int            ncomp    = 0;
+    megchs = QList<FIFFLIB::FiffChInfo>();      /* The MEG channel information */
+    int nmeg         = 0;
+    eegchs = QList<FIFFLIB::FiffChInfo>();      /* The EEG channel information */
+    int neeg         = 0;
+    QList<FiffChInfo> compchs = QList<FiffChInfo>();
+    int ncomp        = 0;
 
-    FwdCoilSet*             megcoils = Q_NULLPTR;     /* The coil descriptions */
-    FwdCoilSet*             compcoils = Q_NULLPTR;    /* MEG compensation coils */
-    MneCTFCompDataSet*      comp_data  = Q_NULLPTR;
-    FwdCoilSet*             eegels = Q_NULLPTR;
-    FwdEegSphereModelSet*   eeg_models = Q_NULLPTR;
+    FwdCoilSet* templates = Q_NULLPTR;
+    megcoils         = Q_NULLPTR;    /* The coil descriptions */
+    compcoils        = Q_NULLPTR;    /* MEG compensation coils */
+    comp_data        = Q_NULLPTR;
+    eegels           = Q_NULLPTR;
+    eeg_models       = Q_NULLPTR;
 
-    MneNamedMatrix* meg_forward      = Q_NULLPTR;    /* Result of the MEG forward calculation */
-    MneNamedMatrix* eeg_forward      = Q_NULLPTR;    /* Result of the EEG forward calculation */
-    MneNamedMatrix* meg_forward_grad = Q_NULLPTR;    /* Result of the MEG forward gradient calculation */
-    MneNamedMatrix* eeg_forward_grad = Q_NULLPTR;    /* Result of the EEG forward gradient calculation */
-    int            k;
-    fiffId         mri_id  = Q_NULLPTR;
-    fiffId         meas_id = Q_NULLPTR;
-    FILE           *out = Q_NULLPTR;     /* Output filtered points here */
+    meg_forward      = Q_NULLPTR;    /* Result of the MEG forward calculation */
+    eeg_forward      = Q_NULLPTR;    /* Result of the EEG forward calculation */
+    meg_forward_grad = Q_NULLPTR;    /* Result of the MEG forward gradient calculation */
+    eeg_forward_grad = Q_NULLPTR;    /* Result of the EEG forward gradient calculation */
 
-    FwdCoilSet*       templates = Q_NULLPTR;
-    FwdEegSphereModel* eeg_model = Q_NULLPTR;
-    FwdBemModel*       bem_model = Q_NULLPTR;
+    int k;
+    mri_id           = Q_NULLPTR;
+    meas_id          = Q_NULLPTR;
 
-    QString qPath;
-    QFile file;
+    FILE* out        = Q_NULLPTR;     /* Output filtered points here */
+
+    eeg_model        = Q_NULLPTR;
+    bem_model        = Q_NULLPTR;
 
     // Report the setup
 
@@ -1952,10 +1950,10 @@ void ComputeFwd::initFwd()
         mri_head_t = FiffCoordTransOld::mne_identity_transform(FIFFV_COORD_MRI,FIFFV_COORD_HEAD);
     }
     FiffCoordTransOld::mne_print_coord_transform(stderr,mri_head_t);
-    /*
-     * Read the channel information
-     * and the MEG device -> head coordinate transformation
-     */
+
+    // Read the channel information
+    // and the MEG device -> head coordinate transformation
+
     printf("\n");
     if (mne_read_meg_comp_eeg_ch_info_41(settings->measname,
                                          megchs,
@@ -2001,9 +1999,9 @@ void ComputeFwd::initFwd()
             return;
         }
     }
-    /*
-     * Create coil descriptions with transformation to head or MRI frame
-     */
+
+    // Create coil descriptions with transformation to head or MRI frame
+
     if (settings->include_meg) {
         //#ifdef USE_SHARE_PATH
         //        char *coilfile = mne_compose_mne_name("share/mne","coil_def.dat");
@@ -2086,8 +2084,7 @@ void ComputeFwd::initFwd()
                                                     meg_head_t)) == Q_NULLPTR) {
             return;
         }
-        qDebug() << "megcoils test";
-        qDebug() << megcoils->ncoil;
+
         if (ncomp > 0) {
             if ((compcoils = templates->create_meg_coils(compchs,
                                                          ncomp,
@@ -2150,9 +2147,9 @@ void ComputeFwd::initFwd()
         printf("Using the sphere model.\n");
     }
     printf ("\n");
-    /*
-     * Try to circumvent numerical problems by excluding points too close our ouside the inner skull surface
-     */
+
+    // Try to circumvent numerical problems by excluding points too close our ouside the inner skull surface
+
     if (settings->filter_spaces) {
         if (!settings->mindistoutname.isEmpty()) {
             out = fopen(settings->mindistoutname.toUtf8().constData(),"w");
@@ -2176,17 +2173,21 @@ void ComputeFwd::initFwd()
 
 void ComputeFwd::calculateFwd()
 {
-    qDebug() << "wir sind hier";
-    int nmeg = megcoils->ncoil;
-    int neeg = eegels->ncoil;
-    qDebug() << "nmeg" << nmeg;
+    int nmeg = 0;
+    int neeg = 0;
+
+    if(megcoils) {
+        nmeg = megcoils->ncoil;
+    }
+    if(eegels) {
+        neeg = eegels->ncoil;
+    }
     if (!bem_model) {
         settings->use_threads = false;
     }
 
     // Do the actual computation
     if (nmeg > 0) {
-        qDebug() << "calculateFwd";
         if ((FwdBemModel::compute_forward_meg(spaces,
                                               nspace,
                                               megcoils,
@@ -2215,10 +2216,24 @@ void ComputeFwd::calculateFwd()
             return;
         }
     }
-    /*
-     * Transform the source spaces back into MRI coordinates
-     */
-    if (MneSourceSpaceOld::mne_transform_source_spaces_to(FIFFV_COORD_MRI,mri_head_t,spaces,nspace) != OK) {
+}
+
+//=========================================================================================================
+
+void ComputeFwd::updateHeadPos(FiffCoordTransOld* meg_head_t)
+{
+    FwdCoilSet* megcoilsNew = megcoils->dup_coil_set(meg_head_t);
+    if ((FwdBemModel::compute_forward_meg(spaces,
+                                          nspace,
+                                          megcoils,
+                                          compcoils,
+                                          comp_data,
+                                          settings->fixed_ori,
+                                          bem_model,
+                                          &settings->r0,
+                                          settings->use_threads,
+                                          &meg_forward,
+                                          settings->compute_grad ? &meg_forward_grad : Q_NULLPTR)) == FAIL) {
         return;
     }
 }
@@ -2227,10 +2242,14 @@ void ComputeFwd::calculateFwd()
 
 void ComputeFwd::storeFwd()
 {
-    /*
-     * We are ready to spill it out
-     */
-    bool res = false;
+    // We are ready to spill it out
+    // Transform the source spaces back into MRI coordinates
+
+    // Question: transformation here or in calculateFwd()?
+    if (MneSourceSpaceOld::mne_transform_source_spaces_to(FIFFV_COORD_MRI,mri_head_t,spaces,nspace) != OK) {
+        return;
+    }
+
     int nmeg = megcoils->ncoil;
     int neeg = eegels->ncoil;
 
