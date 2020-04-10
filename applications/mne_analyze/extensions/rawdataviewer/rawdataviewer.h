@@ -43,7 +43,7 @@
 
 #include "rawdataviewer_global.h"
 #include <anShared/Interfaces/IExtension.h>
-#include "fiffrawevent.h"
+#include "annotationview.h"
 
 //=============================================================================================================
 // QT INCLUDES

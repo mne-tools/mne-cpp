@@ -251,7 +251,7 @@ void RawDataViewer::setUpControls()
     m_pFiffRawView->setZoom(viewWidget->getZoom());
     m_pFiffRawView->setDistanceTimeSpacer(viewWidget->getDistanceTimeSpacer());
 
-    FiffRawEvent* eventWidget = new FiffRawEvent();
+    AnnotationView* eventWidget = new AnnotationView();
 
     //Set up layout w/ control widgets
     m_pLayout->addWidget(scalingWidget);

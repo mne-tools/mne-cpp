@@ -82,20 +82,20 @@ CONFIG(debug, debug|release) {
 DESTDIR = $${MNE_BINARY_DIR}/mne_analyze_extensions
 
 SOURCES += \
-    fiffrawevent.cpp \
+    annotationview.cpp \
     rawdataviewer.cpp \
     fiffrawview.cpp \
     fiffrawviewdelegate.cpp
 
 HEADERS += \
-    fiffrawevent.h \
+    annotationview.h \
     rawdataviewer_global.h \
     rawdataviewer.h    \
     fiffrawview.h \
     fiffrawviewdelegate.h
 
 FORMS += \
-    fiffrawevent.ui \
+    annotationview.ui \
 
 OTHER_FILES += rawdataviewer.json
 
