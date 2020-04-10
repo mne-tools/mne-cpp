@@ -253,8 +253,9 @@ void FiffRawView::setWindowSize(int T)
     //m_pModel->setScrollDx(static_cast<double>(m_pTableView->horizontalScrollBar()->maximum()) / static_cast<double>(m_pModel->absoluteLastSample()));
 
     //Wiggle view area to trigger update (there's probably a better way of doing this)
-    m_pTableView->horizontalScrollBar()->setValue(iNewPos + 1);
+//    m_pTableView->horizontalScrollBar()->setValue(iNewPos + 1);
     m_pTableView->horizontalScrollBar()->setValue(iNewPos);
+    m_pTableView->viewport()->repaint();
     //qDebug() << "ScrollSize:" << m_pTableView->horizontalScrollBar()->maximum
 }
 
@@ -330,4 +331,14 @@ void FiffRawView::addTimeMark(bool con)
     qDebug() << "Table Horizontal Bar:" << m_pTableView->horizontalScrollBar()->value();
 
     m_pModel->newTimeMark(static_cast<int>(lastClickedPoint));
+}
+
+//=============================================================================================================
+
+void FiffRawView::toggleDisplayEvent(const int& iToggle)
+{
+    int m_iToggle = iToggle;
+    qDebug() << "toggleDisplayEvent" << iToggle;
+    m_pModel->toggleDispAnn(m_iToggle);
+    m_pTableView->viewport()->repaint();
 }

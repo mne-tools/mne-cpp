@@ -56,40 +56,53 @@ namespace Ui {
 
 class AnnotationView : public QWidget
 {
+    Q_OBJECT
+
 public:
     AnnotationView();
 
-protected slots:
+public slots:
 
-    //=========================================================================================================
-    /**
-     * jumpToEvent jumps to a event specified in the event table view
-     *
-     * @param [in] current model item focused in the view
-     * @param [in] previous model item focused in the view
-     */
-    void jumpToEvent(const QModelIndex &current, const QModelIndex &previous);
+//    //=========================================================================================================
+//    /**
+//     * jumpToEvent jumps to a event specified in the event table view
+//     *
+//     * @param [in] current model item focused in the view
+//     * @param [in] previous model item focused in the view
+//     */
+//    void jumpToEvent(const QModelIndex &current, const QModelIndex &previous);
 
-    //=========================================================================================================
-    /**
-     * jumpToEvent jumps to a event specified in the event table view
-     */
-    void removeEventfromEventModel();
+//    //=========================================================================================================
+//    /**
+//     * jumpToEvent jumps to a event specified in the event table view
+//     */
+//    void removeEventfromEventModel();
 
-    //=========================================================================================================
-    /**
-     * Adds an event to the event model and its QTableView
-     */
-    void addEventToEventModel();
+//    //=========================================================================================================
+//    /**
+//     * Adds an event to the event model and its QTableView
+//     */
+//    void addEventToEventModel();
 
-    //=========================================================================================================
-    /**
-     * call this function whenever a new event type is to be added
-     */
-    void addNewEventType();
+//    //=========================================================================================================
+//    /**
+//     * call this function whenever a new event type is to be added
+//     */
+//    void addNewEventType();
 
+    void onActiveEventsChecked(int iCheckBoxState);
+
+signals:
+
+    void activeEventsChecked(const int& iCheckBoxState);
+
+private:
+
+    void initGUIFunctionality();
 
     Ui::EventWindowDockWidget* ui;
+
+    int m_iCheckState;
 };
 
 #endif // ANNOTATIONVIEW_H

@@ -251,12 +251,15 @@ void RawDataViewer::setUpControls()
     m_pFiffRawView->setZoom(viewWidget->getZoom());
     m_pFiffRawView->setDistanceTimeSpacer(viewWidget->getDistanceTimeSpacer());
 
-    AnnotationView* eventWidget = new AnnotationView();
+    //Annotation Widget
+    AnnotationView* annotationWidget = new AnnotationView();
+    connect(annotationWidget, &AnnotationView::activeEventsChecked,
+            m_pFiffRawView.data(), &FiffRawView::toggleDisplayEvent);
 
     //Set up layout w/ control widgets
     m_pLayout->addWidget(scalingWidget);
     m_pLayout->addWidget(viewWidget);
-    m_pLayout->addWidget(eventWidget);
+    m_pLayout->addWidget(annotationWidget);
     m_pLayout->addStretch();
 
     //Make it all visible to the user
