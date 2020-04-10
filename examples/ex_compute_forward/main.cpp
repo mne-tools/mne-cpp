@@ -136,8 +136,7 @@ int main(int argc, char *argv[])
     pFwdMEGEEGComputed->calculateFwd();
     qInfo() << "The computation took: " << timer.elapsed() << " ms.";
 
-    // get results
-    FwdResult result = pFwdMEGEEGComputed->result;
-    qInfo() << "result.nspace" << result.nspace;
-    qInfo() << "result.megCoils->ncoil" << result.megCoils->ncoil;
+    timer.start();
+    pFwdMEGEEGComputed->updateHeadPos(&meg_head_t);
+    qInfo() << "The re-computation took: " << timer.elapsed() << " ms.";
 }
