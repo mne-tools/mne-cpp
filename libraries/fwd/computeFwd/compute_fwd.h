@@ -121,6 +121,7 @@ public:
     //=========================================================================================================
     /**
      * Default Constructor
+     * @param [in]  p_settings        The pointer that contains the setting information
      */
     explicit ComputeFwd(ComputeFwdSettings* p_settings);
 
@@ -140,8 +141,14 @@ public:
     /**
      * calculate Forward solution
      */
-    //ToDo split this function into init (with settings as parameter) and the actual fit function
     void calculateFwd();
+
+    //=========================================================================================================
+    /**
+     * Update the heaposition with meg_head_tand recalculate the forward solution for meg
+     * @param [in] meg_head_t        The meg_head_t to use for updating head position
+     */
+    void updateHeadPos(FIFFLIB::FiffCoordTransOld* meg_head_t);
 
     //=========================================================================================================
     /**
@@ -161,28 +168,29 @@ private:
 
     MNELIB::MneSourceSpaceOld **spaces;             /* Source spaces */
     int nspace;                                     /* How many? */
-    FwdCoilSet *megcoils;
-    FwdCoilSet *compcoils;
-    FwdCoilSet* eegels;
-    MNELIB::MneCTFCompDataSet *comp_data;
-    FwdEegSphereModelSet*   eeg_models;
-    FwdEegSphereModel* eeg_model;
+    FwdCoilSet *megcoils;                           /* The MEG coil set */
+    FwdCoilSet *compcoils;                          /* The compensator coil set */
+    FwdCoilSet* eegels;                             /* The eeg wcwltrode set */
+    MNELIB::MneCTFCompDataSet *comp_data;           /* The compensator data */
+    FwdEegSphereModelSet* eeg_models;               /* The EEG model set */
+    FwdEegSphereModel* eeg_model;                   /* The EEG model */
     FwdBemModel *bem_model;                         /* BEM model definition */
     Eigen::Vector3f *r0;                            /* Sphere model origin */
-    MNELIB::MneNamedMatrix *meg_forward;            /* The results */
+
+    MNELIB::MneNamedMatrix *meg_forward;            /* The meg forward  */
     MNELIB::MneNamedMatrix *meg_forward_grad;
-    MNELIB::MneNamedMatrix *eeg_forward;            /* The results */
+    MNELIB::MneNamedMatrix *eeg_forward;
     MNELIB::MneNamedMatrix *eeg_forward_grad;
 
-    QList<FIFFLIB::FiffChInfo>     megchs;      /* The MEG channel information */
-    QList<FIFFLIB::FiffChInfo>     eegchs;      /* The EEG channel information */
+    QList<FIFFLIB::FiffChInfo> megchs;              /* The MEG channel information */
+    QList<FIFFLIB::FiffChInfo> eegchs;              /* The EEG channel information */
 
     FIFFLIB::fiffId mri_id;
     FIFFLIB::fiffId meas_id;
-    FIFFLIB::FiffCoordTransOld* mri_head_t;     /* MRI <-> head coordinate transformation */
-    FIFFLIB::FiffCoordTransOld* meg_head_t;     /* MEG <-> head coordinate transformation */
+    FIFFLIB::FiffCoordTransOld* mri_head_t;         /* MRI <-> head coordinate transformation */
+    FIFFLIB::FiffCoordTransOld* meg_head_t;         /* MEG <-> head coordinate transformation */
 
-    ComputeFwdSettings* settings;
+    ComputeFwdSettings* settings;                   /* The settings for the forward calculation */
 };
 
 //=============================================================================================================
