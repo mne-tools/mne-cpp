@@ -371,9 +371,9 @@ public:
      */
     inline qint32 numVLines() const;
 
-    void newTimeMark(const float& xpos);
+    void newTimeMark(const int& xpos);
 
-    float getTimeMarks(int index) const;
+    int getTimeMarks(int index) const;
 
     int getTimeListSize() const;
 
@@ -485,7 +485,7 @@ private:
 
     int                                 m_iDistanceTimerSpacer;                     /**< The distance for the horizontal time spacers in the view in ms */
 
-    QList<float>  timeMarkList;
+    QList<int>  timeMarkList;
 
     qint32 m_iScrollPos;
 };

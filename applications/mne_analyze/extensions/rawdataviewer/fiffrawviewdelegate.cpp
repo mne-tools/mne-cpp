@@ -148,7 +148,7 @@ void FiffRawViewDelegate::paint(QPainter *painter,
                                       data);
 
                 painter->save();
-                painter->setPen(QPen(Qt::black, 1, Qt::DashLine));
+                painter->setPen(QPen(m_penNormal.color().darker(350), 1, Qt::DashLine));
                 painter->drawPath(path);
                 painter->restore();
 
@@ -161,7 +161,7 @@ void FiffRawViewDelegate::paint(QPainter *painter,
                                 data,
                                 painter);
                 painter->save();
-                painter->setPen(QPen(Qt::black, 2, Qt::SolidLine));
+                painter->setPen(QPen(m_penNormal.color().darker(250), 2, Qt::SolidLine));
                 painter->drawPath(path);
                 painter->restore();
 
@@ -356,33 +356,48 @@ void FiffRawViewDelegate::createMarksPath(const QModelIndex &index,
 //    qDebug() << "End:" << (t_pModel->absoluteFirstSample() + t_pModel->getSampleScrollPos() + data.size());
 
     //int iStart = t_pModel->currentFirstSample(); /*t_pModel->absoluteFirstSample() + t_pModel->getSampleScrollPos();*/
-
-    int iStart = t_pModel->absoluteFirstSample() + t_pModel->getSampleScrollPos()/(dScrollDx);
-    //qDebug() << "iStart:" << iStart;
+    //int iStart = t_pModel->absoluteFirstSample() + t_pModel->getSampleScrollPos()/(dScrollDx);
+    int iStart = t_pModel->currentFirstSample();
+    qDebug() << "iStart:" << iStart;
     //qDebug() << "Pos" << t_pModel;
-    qDebug() << "Scroll Diff:" << dScrollDx;
-    qDebug() << "Pixel Diff:" << dDx;
+//    qDebug() << "Scroll Diff:" << dScrollDx;
+//    qDebug() << "Pixel Diff:" << dDx;
     qDebug() << "Data size:" << data.size();
-    qDebug() << "Current Index" << data.begin().currentIndex;
-    qDebug() << "Current relative index" << data.begin().currentRelativeIndex;
+//    qDebug() << "Current Index" << data.begin().currentIndex;
+//    qDebug() << "Current relative index" << data.begin().currentRelativeIndex;
 
     //ChannelData::ChannelIterator iterator = new ChannelData::ChannelIterator(data);
 
-
     int count = 0;
-    for(int j = iStart ; j < (iStart + data.size()); j++) {
-        if(!(count < t_pModel->getTimeListSize())) {
+    bool draw = false;
+    for (count = 0; count < t_pModel->getTimeListSize(); count ++)
+        if(t_pModel->getTimeMarks(count) >= iStart){
+            draw = true;
             break;
         }
-        else {
-            if(j == (int)t_pModel->getTimeMarks(count)) {
-                path.moveTo(path.currentPosition().x(), fTop);
-                path.lineTo(path.currentPosition().x(), fBottom);
-                count++;
+
+    if(draw){
+        for(int j = iStart ; j < (iStart + data.size()); j++) {
+            if(count >= t_pModel->getTimeListSize()) {
+                break;
             }
-            path.moveTo(path.currentPosition().x() + dDx, fTop);
+            else {
+                if(j == t_pModel->getTimeMarks(count)) {
+                    path.moveTo(path.currentPosition().x(), fTop);
+                    path.lineTo(path.currentPosition().x(), fBottom);
+                    count++;
+                }
+                path.moveTo(path.currentPosition().x() + dDx, fTop);
+            }
         }
     }
+
+//    for(int i = 0; i < t_pModel->getTimeListSize(); i++) {
+//        if ((t_pModel->getTimeMarks(i) > iStart) && (t_pModel->getTimeMarks(i) < (iStart + data.size()))) {
+//            path .moveTo(static_cast<float>(t_pModel->getTimeMarks(i) - iStart) * dDx, fTop);
+//            path.lineTo(path.currentPosition().x(), fBottom);
+//        }
+//    }
 //    int i = 0;
 //    while(1) {
 //        if (t_pModel->getTimeMarks(i) >= iStart && t_pModel->getTimeMarks(i) <= (iStart + data.size())) {

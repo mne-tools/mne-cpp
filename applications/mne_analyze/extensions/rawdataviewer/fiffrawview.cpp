@@ -305,7 +305,7 @@ void FiffRawView::customContextMenuRequested(const QPoint &pos)
     double dScrollDiff = static_cast<double>(m_pTableView->horizontalScrollBar()->maximum()) / static_cast<double>(m_pModel->absoluteLastSample() - m_pModel->absoluteFirstSample());
     m_pModel->setScrollDx(dScrollDiff);
     lastClickedPoint = floor((float)m_pModel->absoluteFirstSample() + //accounting for first sample offset
-                             (m_pTableView->horizontalScrollBar()->value() / (dScrollDiff)) + //accounting for scroll offset
+                             (m_pTableView->horizontalScrollBar()->value() / m_pModel->pixelDifference()) + //accounting for scroll offset
                              ((float)pos.x() / m_pModel->pixelDifference())); //accounting for mouse position offset
 
     QMenu* menu = new QMenu(this);
@@ -328,5 +328,5 @@ void FiffRawView::addTimeMark(bool con)
     qDebug() << "Table Geometry y:" << m_pTableView->geometry().y();
     qDebug() << "Table Horizontal Bar:" << m_pTableView->horizontalScrollBar()->value();
 
-    m_pModel->newTimeMark(lastClickedPoint);
+    m_pModel->newTimeMark(static_cast<int>(lastClickedPoint));
 }

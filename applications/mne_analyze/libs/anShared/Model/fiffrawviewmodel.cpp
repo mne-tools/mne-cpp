@@ -718,14 +718,14 @@ void FiffRawViewModel::updateDisplayData()
 
 //=============================================================================================================
 
-void FiffRawViewModel::newTimeMark(const float& xpos)
+void FiffRawViewModel::newTimeMark(const int& xpos)
 {
     qDebug() << "First held:" << m_iFiffCursorBegin;
     qDebug() << "DX" << m_dDx;
     //Get absolute sample number of where we clicked
     //float fSample = /*absoluteFirstSample()*/currentFirstSample() + (xpos/m_dDx);
 
-    for (float samp : timeMarkList) {
+    for (int samp : timeMarkList) {
         if(xpos == samp) {
             qWarning() << "User attempted to add overlaping markers. Discarding new marker.";
             return;
@@ -738,7 +738,7 @@ void FiffRawViewModel::newTimeMark(const float& xpos)
 
 //=============================================================================================================
 
-float FiffRawViewModel::getTimeMarks(int index) const
+int FiffRawViewModel::getTimeMarks(int index) const
 {
     return timeMarkList.at(index);
 }
