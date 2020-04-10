@@ -289,6 +289,7 @@ float **mne_mat_mat_mult_40 (float **m1,
     MatrixXf a(d1,d2);
     MatrixXf b(d2,d3);
 
+    // ToDo use Eigen::Map
     for (j = 0; j < d1; j++) {
         for (k = 0; k < d2; k++) {
             a(j,k) = m1[j][k];
