@@ -69,9 +69,6 @@ BrainAMPSetupWidget::BrainAMPSetupWidget(BrainAMP* pBrainAMP, QWidget* parent)
     connect(ui.m_spinBox_BlockSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             this, &BrainAMPSetupWidget::setSamplesPerBlock);
 
-    //Connect about button
-    connect(ui.m_qPushButton_About, &QPushButton::released, this, &BrainAMPSetupWidget::showAboutDialog);
-
     //Fill info box
     QFile file(m_pBrainAMP->m_qStringResourcePath+"readme.txt");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))

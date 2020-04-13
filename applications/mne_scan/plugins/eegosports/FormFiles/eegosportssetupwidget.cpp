@@ -72,9 +72,6 @@ EEGoSportsSetupWidget::EEGoSportsSetupWidget(EEGoSports* pEEGoSports, QWidget* p
     connect(ui.m_checkBox_WriteDriverDebugToFile, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &EEGoSportsSetupWidget::setWriteToFile);
 
-    //Connect about button
-    connect(ui.m_qPushButton_About, &QPushButton::released, this, &EEGoSportsSetupWidget::showAboutDialog);
-
     //Fill info box
     QFile file(m_pEEGoSports->m_qStringResourcePath+"readme.txt");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
