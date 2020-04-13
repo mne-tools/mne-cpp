@@ -169,10 +169,27 @@ public:
      */
     void onMakeScreenshot(const QString& imageType);
 
+    //=========================================================================================================
+    /**
+     * Brings up a menu for interacting with data annotations
+     * @param[in] pos   Position on screen where the menu will show up
+     */
     void customContextMenuRequested(const QPoint &pos);
 
+    //=========================================================================================================
+    /**
+     * Create a new annotation
+     *
+     * @param[in] con   Whether a new annotaton should be created;
+     */
     void addTimeMark(bool con);
 
+    //=========================================================================================================
+    /**
+     * Controls toggling of annotation data
+     *
+     * @param[in] iToggle   Sets toggle: 0 - don't show, 1+ - show
+     */
     void toggleDisplayEvent(const int& iToggle);
 
 private:

@@ -247,16 +247,8 @@ void FiffRawView::setWindowSize(int T)
     m_pTableView->resizeRowsToContents();
     m_pTableView->resizeColumnsToContents();
 
-    //m_pTableView->horizontalScrollBar()->setRange(0, iNewSize);
-    qDebug() << "MAX:" << m_pTableView->horizontalScrollBar()->maximum();
-    qDebug() << "Last samp" << m_pModel->absoluteLastSample();
-    //m_pModel->setScrollDx(static_cast<double>(m_pTableView->horizontalScrollBar()->maximum()) / static_cast<double>(m_pModel->absoluteLastSample()));
-
-    //Wiggle view area to trigger update (there's probably a better way of doing this)
-//    m_pTableView->horizontalScrollBar()->setValue(iNewPos + 1);
     m_pTableView->horizontalScrollBar()->setValue(iNewPos);
     m_pTableView->viewport()->repaint();
-    //qDebug() << "ScrollSize:" << m_pTableView->horizontalScrollBar()->maximum
 }
 
 //=============================================================================================================
@@ -305,7 +297,6 @@ void FiffRawView::onMakeScreenshot(const QString& imageType)
 void FiffRawView::customContextMenuRequested(const QPoint &pos)
 {
     double dScrollDiff = static_cast<double>(m_pTableView->horizontalScrollBar()->maximum()) / static_cast<double>(m_pModel->absoluteLastSample() - m_pModel->absoluteFirstSample());
-    m_pModel->setScrollDx(dScrollDiff);
     lastClickedPoint = floor((float)m_pModel->absoluteFirstSample() + //accounting for first sample offset
                              (m_pTableView->horizontalScrollBar()->value() / m_pModel->pixelDifference()) + //accounting for scroll offset
                              ((float)pos.x() / m_pModel->pixelDifference())); //accounting for mouse position offset
@@ -313,7 +304,6 @@ void FiffRawView::customContextMenuRequested(const QPoint &pos)
     QMenu* menu = new QMenu(this);
 
     qDebug() << "MAX:" << m_pTableView->horizontalScrollBar()->maximum();
-    m_pModel->setScrollDx(static_cast<double>(m_pTableView->horizontalScrollBar()->maximum()) / static_cast<double>(m_pModel->absoluteLastSample() - m_pModel->absoluteFirstSample()));
 
     QAction* markTime = menu->addAction(tr("Mark time"));
     connect(markTime, &QAction::triggered,
@@ -326,10 +316,6 @@ void FiffRawView::customContextMenuRequested(const QPoint &pos)
 
 void FiffRawView::addTimeMark(bool con)
 {
-    qDebug() << "Table Geometry x:" << m_pTableView->geometry().x();
-    qDebug() << "Table Geometry y:" << m_pTableView->geometry().y();
-    qDebug() << "Table Horizontal Bar:" << m_pTableView->horizontalScrollBar()->value();
-
     m_pModel->newTimeMark(static_cast<int>(lastClickedPoint));
 }
 
