@@ -51,6 +51,7 @@ void AnnotationView::initGUIFunctionality()
 {
     connect(ui->m_checkBox_activateEvents, &QCheckBox::stateChanged,
             this, &AnnotationView::onActiveEventsChecked);
+    //connect(ui->m_checkBox_showSelectedEventsOnly)
 }
 
 void AnnotationView::onActiveEventsChecked(int iCheckBoxState)
@@ -59,6 +60,7 @@ void AnnotationView::onActiveEventsChecked(int iCheckBoxState)
     m_iCheckState = iCheckBoxState;
     emit activeEventsChecked(m_iCheckState);
 }
+
 //void EventWindow::jumpToEvent(const QModelIndex & current, const QModelIndex & previous)
 //{
 //    Q_UNUSED(previous);
