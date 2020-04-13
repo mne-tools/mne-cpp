@@ -372,6 +372,10 @@ bool FiffRawViewModel::hasChildren(const QModelIndex &parent) const
 
 void FiffRawViewModel::updateScrollPosition(qint32 newScrollPosition)
 {
+
+    qDebug() << "m_iSamplesPerBlock" << m_iSamplesPerBlock;
+    qDebug() << "m_iTotalBlockCount" << m_iTotalBlockCount;
+
     QElapsedTimer timer;
     timer.start();
     // check if we are currently loading something in the background. This is a rudimentary solution.
