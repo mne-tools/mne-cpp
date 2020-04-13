@@ -133,7 +133,6 @@ QWidget *DataLoader::getView()
 
 void DataLoader::handleEvent(QSharedPointer<Event> e)
 {
-    qWarning() << "[DataLoader::handleEvent] hellooo.";
     switch (e->getType()) {
     case EVENT_TYPE::CURRENTLY_SELECTED_MODEL:
         m_sCurrentlySelectedModel = e->getData().toString();
@@ -160,7 +159,7 @@ void DataLoader::onLoadFiffFilePressed()
 #ifdef WASMBUILD
     auto fileContentReady = [&](const QString &filePath, const QByteArray &fileContent) {
         if(!filePath.isNull()) {
-            m_pAnalyzeData->loadFiffRawViewModel(filePath,fileContent);
+            m_pAnalyzeData->loadFiffRawViewModel(filePath, fileContent);
         }
     };
     QFileDialog::getOpenFileContent("Fiff File (*.fif *.fiff)",  fileContentReady);
