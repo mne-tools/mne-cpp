@@ -63,8 +63,6 @@ CovarianceSetupWidget::CovarianceSetupWidget(Covariance* toolbox, QWidget *paren
 , m_pCovariance(toolbox)
 {
     ui.setupUi(this);
-
-    connect(ui.m_qPushButton_About, SIGNAL(released()), this, SLOT(showAboutDialog()));
 }
 
 //=============================================================================================================
