@@ -60,8 +60,6 @@ NoiseReductionSetupWidget::NoiseReductionSetupWidget(NoiseReduction* toolbox, QW
 , m_pNoiseReduction(toolbox)
 {
     ui.setupUi(this);
-
-    connect(ui.m_qPushButton_About, SIGNAL(released()), this, SLOT(showAboutDialog()));
 }
 
 //=============================================================================================================

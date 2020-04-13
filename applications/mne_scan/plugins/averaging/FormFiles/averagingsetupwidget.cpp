@@ -63,8 +63,6 @@ AveragingSetupWidget::AveragingSetupWidget(Averaging* toolbox, QWidget *parent)
 , m_pAveraging(toolbox)
 {
     ui.setupUi(this);
-
-    connect(ui.m_qPushButton_About, SIGNAL(released()), this, SLOT(showAboutDialog()));
 }
 
 //=============================================================================================================

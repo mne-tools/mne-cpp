@@ -66,7 +66,6 @@ GUSBAmpSetupWidget::GUSBAmpSetupWidget(GUSBAmp* pGUSBAmp, QWidget* parent)
     ui.setupUi(this);
 
     // connect push buttones and group boxes
-    connect(ui.m_qPushButton_About, &QPushButton::released, this, &GUSBAmpSetupWidget::showAboutDialog);
     connect(ui.m_pushButton_setSerials, &QPushButton::clicked, this, &GUSBAmpSetupWidget::setSerialAdresses);
     connect(ui.ChannelSelect, &QGroupBox::clicked, this, &GUSBAmpSetupWidget::activateChannelSelect);
 
