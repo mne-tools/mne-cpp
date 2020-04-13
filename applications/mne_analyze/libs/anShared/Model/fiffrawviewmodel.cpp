@@ -187,7 +187,7 @@ void FiffRawViewModel::initFiffData(QIODevice& p_IODevice)
     m_iFiffCursorBegin = m_pFiffIO->m_qlistRaw[0]->first_samp;
 
     int start = m_iFiffCursorBegin;
-    m_iSamplesPerBlock = m_pFiffInfo->sfreq*10;
+    m_iSamplesPerBlock = m_pFiffInfo->sfreq;
 
     // for some reason the read_raw_segment function works with inclusive upper bound
     int end = start + m_iSamplesPerBlock - 1;
@@ -374,6 +374,10 @@ bool FiffRawViewModel::hasChildren(const QModelIndex &parent) const
 
 void FiffRawViewModel::updateScrollPosition(qint32 newScrollPosition)
 {
+
+    qDebug() << "m_iSamplesPerBlock" << m_iSamplesPerBlock;
+    qDebug() << "m_iTotalBlockCount" << m_iTotalBlockCount;
+
     QElapsedTimer timer;
     timer.start();
     // check if we are currently loading something in the background. This is a rudimentary solution.
