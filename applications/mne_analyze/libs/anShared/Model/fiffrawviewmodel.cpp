@@ -721,7 +721,7 @@ void FiffRawViewModel::updateDisplayData()
 
 //=============================================================================================================
 
-void FiffRawViewModel::newTimeMark(const int& xpos)
+void FiffRawViewModel::newTimeMark(const int& iSamp)
 {
     qDebug() << "First held:" << m_iFiffCursorBegin;
     qDebug() << "DX" << m_dDx;
@@ -729,21 +729,21 @@ void FiffRawViewModel::newTimeMark(const int& xpos)
     //float fSample = /*absoluteFirstSample()*/currentFirstSample() + (xpos/m_dDx);
 
     for (int samp : timeMarkList) {
-        if(xpos == samp) {
+        if(iSamp == samp) {
             qWarning() << "User attempted to add overlaping markers. Discarding new marker.";
             return;
         }
     }
 
-    timeMarkList.append(xpos);
+    timeMarkList.append(iSamp);
     std::sort(timeMarkList.begin(),timeMarkList.end());
 }
 
 //=============================================================================================================
 
-int FiffRawViewModel::getTimeMarks(int index) const
+int FiffRawViewModel::getTimeMarks(int iIndex) const
 {
-    return timeMarkList.at(index);
+    return timeMarkList.at(iIndex);
 }
 
 //=============================================================================================================
@@ -766,19 +766,6 @@ int FiffRawViewModel::getSampleScrollPos() const
 int FiffRawViewModel::getWindowSizeBlocks() const
 {
     return m_iVisibleWindowSize + m_iPreloadBufferSize;
-}
-
-//=============================================================================================================
-
-void FiffRawViewModel::setScrollDx(double dNewScrollRatio)
-{
-    m_dScrollDx = dNewScrollRatio;
-}
-//=============================================================================================================
-
-double FiffRawViewModel::getScrollDx() const
-{
-    return m_dScrollDx;
 }
 
 //=============================================================================================================

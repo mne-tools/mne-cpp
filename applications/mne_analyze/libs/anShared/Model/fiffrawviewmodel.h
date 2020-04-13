@@ -372,16 +372,49 @@ public:
      */
     inline qint32 numVLines() const;
 
-    void newTimeMark(const int& xpos);
+    //=========================================================================================================
+    /**
+     * Saves a new annotation at a sample
+     *
+     * @param[in] xpos  Sample number to be saved
+     */
+    void newTimeMark(const int& iSamp);
 
-    int getTimeMarks(int index) const;
+    //=========================================================================================================
+    /**
+     * Get sample annotation at iIndex
+     *
+     * @param[in] index     Index of sample data we want to retreive
+     *
+     * @return sample number at iIndex
+     */
+    int getTimeMarks(int iIndex) const;
 
+    //=========================================================================================================
+    /**
+     * Get how many annotations we have
+     *
+     * @return number of saved annotations
+     */
     int getTimeListSize() const;
 
+    //=========================================================================================================
+    /**
+     * Get where in the viewer we are scrolling
+     *
+     * @return position of scrolling inthe viewer
+     */
     int getSampleScrollPos() const;
 
+    //=========================================================================================================
+    /**
+     * Get how many blocks total we have (preloaded and visible)
+     *
+     * @return number of blocks
+     */
     int getWindowSizeBlocks() const;
 
+    //=========================================================================================================
     /**
      * This tells the model where the view currently is.
      *
@@ -389,12 +422,20 @@ public:
      */
     void updateScrollPosition(qint32 newScrollPosition);
 
-    void setScrollDx(double dNewScrollRatio);
-
-    double getScrollDx() const;
-
+    //=========================================================================================================
+    /**
+     * Toggle whether to dipslay annotations
+     *
+     * @param[in] iToggleDisp   0 for no, 1+ for yes
+     */
     void toggleDispAnn(const int& iToggleDisp);
 
+    //=========================================================================================================
+    /**
+     * Returns wheter annotations hould be displayed
+     *
+     * @return m_bDispAnn
+     */
     bool shouldDisplayAnn() const;
 
 private:
@@ -767,6 +808,21 @@ private:
     qint32 m_iRowNumber;
     qint64 m_iNumSamples;
 };
+
+class AnnotationData {
+
+public:
+    inline bool comparator(AnnotationData& A, AnnotationData& B) {
+        return (A.m_iSample > B.m_iSample);
+    }
+private:
+
+    int m_iSample;
+    int m_iEventType;
+
+
+};
+
 
 } // namespace ANSHAREDLIB
 
