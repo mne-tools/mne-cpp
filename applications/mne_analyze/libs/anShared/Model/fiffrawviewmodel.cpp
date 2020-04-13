@@ -139,6 +139,8 @@ FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
 , m_bDispAnn(true)
 , m_vAnnotationsToDisplay(Q_NULLPTR)
 {
+    Q_UNUSED(sFilePath)
+
     // connect data reloading: this will be run concurrently
     connect(&m_blockLoadFutureWatcher, &QFutureWatcher<int>::finished,
             [this]() {
@@ -181,10 +183,6 @@ void FiffRawViewModel::initFiffData(QIODevice& p_IODevice)
     // build datastructure that is to be filled with data from the file
     MatrixXd data, times;
 
-    // append a matrix pair for each block
-    for(int i = 0; i < m_iTotalBlockCount; ++i)
-        m_lData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data, times)));
-
     // Fiff file is not empty, set cursor somewhere into Fiff file
     m_iFiffCursorBegin = m_pFiffIO->m_qlistRaw[0]->first_samp;
 
@@ -192,27 +190,23 @@ void FiffRawViewModel::initFiffData(QIODevice& p_IODevice)
     m_iSamplesPerBlock = m_pFiffInfo->sfreq;
 
     // for some reason the read_raw_segment function works with inclusive upper bound
-    int end = start + m_iSamplesPerBlock - 1;
-
-    qDebug() << "m_iSamplesPerBlock" << m_iSamplesPerBlock;
-    qDebug() << "m_iTotalBlockCount" << m_iTotalBlockCount;
-    qDebug() << "end" << end;
-    qDebug() << "start" << start;
+    int end = start + (m_iSamplesPerBlock * m_iTotalBlockCount) - 1;
 
     // read in all blocks, use the already prepared list m_lData
-    for(auto &pairPointer : m_lData) {
-        if(m_pFiffIO->m_qlistRaw[0]->read_raw_segment(pairPointer->first,
-                                                      pairPointer->second,
-                                                      start,
-                                                      end)) {
-            // qDebug() << "[FiffRawmodel::loadFiffData] Successfully read a block ";
-        } else {
-            qWarning() << "[FiffRawViewModel::loadFiffData] Could not read samples " << start << " to " << end;
-            return;
-        }
+    if(m_pFiffIO->m_qlistRaw[0]->read_raw_segment(data,
+                                                  times,
+                                                  start,
+                                                  end)) {
+        // qDebug() << "[FiffRawmodel::loadFiffData] Successfully read a block ";
+    } else {
+        qWarning() << "[FiffRawViewModel::loadFiffData] Could not read samples " << start << " to " << end;
+        return;
+    }
 
-        start += m_iSamplesPerBlock;
-        end += m_iSamplesPerBlock;
+    // append a matrix pair for each block
+    for(int i = 0; i < m_iTotalBlockCount; ++i) {
+        m_lData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data.block(0, i*m_iSamplesPerBlock, data.rows(), m_iSamplesPerBlock),
+                                                                                       times.block(0, i*m_iSamplesPerBlock, times.rows(), m_iSamplesPerBlock))));
     }
 
     qInfo() << "[FiffRawViewModel::initFiffData] Loaded " << m_lData.size() << " blocks";
@@ -376,10 +370,6 @@ bool FiffRawViewModel::hasChildren(const QModelIndex &parent) const
 
 void FiffRawViewModel::updateScrollPosition(qint32 newScrollPosition)
 {
-
-    qDebug() << "m_iSamplesPerBlock" << m_iSamplesPerBlock;
-    qDebug() << "m_iTotalBlockCount" << m_iTotalBlockCount;
-
     QElapsedTimer timer;
     timer.start();
     // check if we are currently loading something in the background. This is a rudimentary solution.
@@ -447,9 +437,6 @@ void FiffRawViewModel::startBackgroundOperation(int (FiffRawViewModel::*loadFunc
 
 int FiffRawViewModel::loadEarlierBlocks(qint32 numBlocks)
 {
-    QElapsedTimer timer;
-    timer.start();
-
     // check if start of file was reached:
     int leftSamples = (m_iFiffCursorBegin - numBlocks * m_iSamplesPerBlock) - absoluteFirstSample();
     if (leftSamples <= 0) {
@@ -475,27 +462,25 @@ int FiffRawViewModel::loadEarlierBlocks(qint32 numBlocks)
 
     // build data structures to be filled from file
     MatrixXd data, times;
-    for(int i = 0; i < numBlocks; ++i) {
-        m_lNewData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data, times)));
-    }
 
     // initialize start and end indices
-    int start = m_iFiffCursorBegin;
-    int end = start + m_iSamplesPerBlock - 1;
+    int start = m_iFiffCursorBegin - (numBlocks * m_iSamplesPerBlock);
+    int end = m_iFiffCursorBegin - 1;
 
     // read data, use the already prepared list m_lNewData
-    for(auto &pairPointer : m_lNewData) {
-        start -= m_iSamplesPerBlock;
-        end -= m_iSamplesPerBlock;
-        QElapsedTimer timer;
-        timer.start();
-        if(m_pFiffIO->m_qlistRaw[0]->read_raw_segment(pairPointer->first, pairPointer->second, start, end)) {
-            // qDebug() << "[FiffRawViewModel::loadFiffData] Successfully read a block ";
-        } else {
-            qWarning() << "[FiffRawViewModel::loadEarlierBlocks] Could not read block ";
-            return -1;
-        }
-        qDebug() << "[FiffRawViewModel::loadEarlierBlocks] read_raw_segment timer.elapsed()" << timer.elapsed();
+    QElapsedTimer timer;
+    timer.start();
+    if(m_pFiffIO->m_qlistRaw[0]->read_raw_segment(data, times, start, end)) {
+        // qDebug() << "[FiffRawViewModel::loadFiffData] Successfully read a block ";
+    } else {
+        qWarning() << "[FiffRawViewModel::loadEarlierBlocks] Could not read block ";
+        return -1;
+    }
+    qDebug() << "[FiffRawViewModel::loadEarlierBlocks] read_raw_segment timer.elapsed()" << timer.elapsed();
+
+    for(int i = 0; i < numBlocks; ++i) {
+        m_lNewData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data.block(0, i*m_iSamplesPerBlock, data.rows(), m_iSamplesPerBlock),
+                                                                                          times.block(0, i*m_iSamplesPerBlock, times.rows(), m_iSamplesPerBlock))));
     }
 
     // adjust fiff cursor
@@ -535,28 +520,25 @@ int FiffRawViewModel::loadLaterBlocks(qint32 numBlocks)
 
     // build data structures to be filled from file
     MatrixXd data, times;
-    for(int i = 0; i < numBlocks; ++i) {
-        m_lNewData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data, times)));
-    }
 
     // initialize start and end indices
     int start = m_iFiffCursorBegin + m_iTotalBlockCount * m_iSamplesPerBlock;
-    int end = start + m_iSamplesPerBlock - 1;
+    int end = start + (m_iSamplesPerBlock * numBlocks) - 1;
 
     // read data, use the already prepaired list m_lNewData
-    for(auto &pairPointer : m_lNewData) {
-        QElapsedTimer timer;
-        timer.start();
-        if(m_pFiffIO->m_qlistRaw[0]->read_raw_segment(pairPointer->first, pairPointer->second, start, end)) {
-            // qDebug() << "[FiffRawViewModel::loadFiffData] Successfully read a block ";
-        } else {
-            qWarning() << "[FiffRawViewModel::loadLaterBlocks] Could not read block ";
-            return -1;
-        }
-        qDebug() << "[FiffRawViewModel::loadLaterBlocks] read_raw_segment timer.elapsed()" << timer.elapsed();
+    QElapsedTimer timer;
+    timer.start();
+    if(m_pFiffIO->m_qlistRaw[0]->read_raw_segment(data, times, start, end)) {
+        // qDebug() << "[FiffRawViewModel::loadFiffData] Successfully read a block ";
+    } else {
+        qWarning() << "[FiffRawViewModel::loadLaterBlocks] Could not read block ";
+        return -1;
+    }
+    qDebug() << "[FiffRawViewModel::loadLaterBlocks] read_raw_segment timer.elapsed()" << timer.elapsed();
 
-        start += m_iSamplesPerBlock;
-        end += m_iSamplesPerBlock;
+    for(int i = 0; i < numBlocks; ++i) {
+        m_lNewData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data.block(0, i*m_iSamplesPerBlock, data.rows(), m_iSamplesPerBlock),
+                                                                                          times.block(0, i*m_iSamplesPerBlock, times.rows(), m_iSamplesPerBlock))));
     }
 
     // adjust fiff cursor
@@ -621,6 +603,7 @@ void FiffRawViewModel::postBlockLoad(int result)
 
     updateEndStartFlags();
     m_bCurrentlyLoading = false;
+    emit dataChanged(createIndex(0,0), createIndex(rowCount(), columnCount()));
 }
 
 //=============================================================================================================
@@ -677,6 +660,7 @@ void FiffRawViewModel::setWindowSize(const int& iNumSeconds,
     beginResetModel();
 
     m_iVisibleWindowSize = iNumSeconds;
+    m_iPreloadBufferSize = m_iVisibleWindowSize;
     m_iTotalBlockCount = m_iVisibleWindowSize + 2 * m_iPreloadBufferSize;
 
     //reload data to accomodate new size
@@ -713,9 +697,6 @@ void FiffRawViewModel::updateDisplayData()
     m_lData.clear();
 
     MatrixXd data, times;
-    // append a matrix pair for each block
-    for(int i = 0; i < m_iTotalBlockCount; ++i)
-        m_lData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data, times)));
 
     m_iFiffCursorBegin = m_pFiffIO->m_qlistRaw[0]->first_samp;
 
@@ -723,22 +704,23 @@ void FiffRawViewModel::updateDisplayData()
     m_iSamplesPerBlock = m_pFiffInfo->sfreq;
 
     // for some reason the read_raw_segment function works with inclusive upper bound
-    int end = start + m_iSamplesPerBlock - 1;
+    int end = start + (m_iSamplesPerBlock * m_iTotalBlockCount) - 1;
 
     // read in all blocks, use the already prepared list m_lData
-    for(auto &pairPointer : m_lData) {
-        if(m_pFiffIO->m_qlistRaw[0]->read_raw_segment(pairPointer->first,
-                                                      pairPointer->second,
-                                                      start,
-                                                      end)) {
-            // qDebug() << "[FiffRawmodel::loadFiffData] Successfully read a block ";
-        } else {
-            qWarning() << "[FiffRawViewModel::loadFiffData] Could not read samples " << start << " to " << end;
-            return;
-        }
+    if(m_pFiffIO->m_qlistRaw[0]->read_raw_segment(data,
+                                                  times,
+                                                  start,
+                                                  end)) {
+        // qDebug() << "[FiffRawmodel::loadFiffData] Successfully read a block ";
+    } else {
+        qWarning() << "[FiffRawViewModel::loadFiffData] Could not read samples " << start << " to " << end;
+        return;
+    }
 
-        start += m_iSamplesPerBlock;
-        end += m_iSamplesPerBlock;
+    // append a matrix pair for each block
+    for(int i = 0; i < m_iTotalBlockCount; ++i) {
+        m_lData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data.block(0, i*m_iSamplesPerBlock, data.rows(), m_iSamplesPerBlock),
+                                                                                       times.block(0, i*m_iSamplesPerBlock, times.rows(), m_iSamplesPerBlock))));
     }
 }
 
@@ -746,8 +728,8 @@ void FiffRawViewModel::updateDisplayData()
 
 void FiffRawViewModel::newTimeMark(const int& iSamp)
 {
-    qDebug() << "First held:" << m_iFiffCursorBegin;
-    qDebug() << "DX" << m_dDx;
+//    qDebug() << "First held:" << m_iFiffCursorBegin;
+//    qDebug() << "DX" << m_dDx;
     //Get absolute sample number of where we clicked
     //float fSample = /*absoluteFirstSample()*/currentFirstSample() + (xpos/m_dDx);
 
@@ -787,7 +769,6 @@ int FiffRawViewModel::getTimeListSize() const
 
 int FiffRawViewModel::getSampleScrollPos() const
 {
-    //qDebug() << "Scroll Position:" << m_iScrollPos;
     return m_iScrollPos;
 }
 
@@ -802,9 +783,7 @@ int FiffRawViewModel::getWindowSizeBlocks() const
 
 void FiffRawViewModel::toggleDispAnn(const int& iToggleDisp)
 {
-    qDebug() << "toggleDispAnn" << iToggleDisp;
     m_bDispAnn = (iToggleDisp ? true : false);
-    qDebug() << "member" << m_bDispAnn;
 }
 
 //=============================================================================================================
