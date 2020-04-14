@@ -56,3 +56,35 @@ bool AnnotationModel::insertRows(int position, int span, const QModelIndex & par
 
     return true;
 }
+
+//=============================================================================================================
+
+void AnnotationModel::setSamplePos(int iSamplePos)
+{
+    m_iSamplePos = iSamplePos;
+}
+
+//=============================================================================================================
+
+int AnnotationModel::rowCount(const QModelIndex &parent) const
+{
+    if(m_dataSamples.size() != 0) {
+        return m_dataSamples.size();
+    }else{
+        return 0;
+    }
+}
+
+//=============================================================================================================
+
+int AnnotationModel::columnCount(const QModelIndex &parent) const
+{
+    return 3;
+}
+
+//=============================================================================================================
+
+QVariant AnnotationModel::data(const QModelIndex &index, int role) const
+{
+    return QVariant();
+}

@@ -175,8 +175,10 @@ void FiffRawView::initMVCSettings(const QSharedPointer<FiffRawViewModel>& pModel
     m_pTableView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(m_pTableView.data(), &QWidget::customContextMenuRequested,
             this, &FiffRawView::customContextMenuRequested);
-    m_pTableView->grabGesture(Qt::PinchGesture);
-     m_pTableView->grabGesture(Qt::TapAndHoldGesture);
+
+//    //Gestures
+//    m_pTableView->grabGesture(Qt::PinchGesture);
+//    m_pTableView->grabGesture(Qt::TapAndHoldGesture);
 }
 
 //=============================================================================================================
@@ -296,8 +298,8 @@ void FiffRawView::onMakeScreenshot(const QString& imageType)
 
 void FiffRawView::customContextMenuRequested(const QPoint &pos)
 {
-    double dScrollDiff = static_cast<double>(m_pTableView->horizontalScrollBar()->maximum()) / static_cast<double>(m_pModel->absoluteLastSample() - m_pModel->absoluteFirstSample());
-    lastClickedPoint = floor((float)m_pModel->absoluteFirstSample() + //accounting for first sample offset
+    //double dScrollDiff = static_cast<double>(m_pTableView->horizontalScrollBar()->maximum()) / static_cast<double>(m_pModel->absoluteLastSample() - m_pModel->absoluteFirstSample());
+    m_fLastClickedPoint = floor((float)m_pModel->absoluteFirstSample() + //accounting for first sample offset
                              (m_pTableView->horizontalScrollBar()->value() / m_pModel->pixelDifference()) + //accounting for scroll offset
                              ((float)pos.x() / m_pModel->pixelDifference())); //accounting for mouse position offset
 
@@ -316,7 +318,8 @@ void FiffRawView::customContextMenuRequested(const QPoint &pos)
 
 void FiffRawView::addTimeMark(bool con)
 {
-    m_pModel->newTimeMark(static_cast<int>(lastClickedPoint));
+    m_pModel->newTimeMark(static_cast<int>(m_fLastClickedPoint));
+    emit sendSamplePos(m_fLastClickedPoint);
 }
 
 //=============================================================================================================

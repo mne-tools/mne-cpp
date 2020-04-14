@@ -44,6 +44,7 @@
 #include "rawdataviewer_global.h"
 #include <anShared/Interfaces/IExtension.h>
 #include "annotationview.h"
+#include "annotationmodel.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -131,6 +132,8 @@ private:
 
     QSharedPointer<ANSHAREDLIB::FiffRawViewModel>   m_pRawModel;
     QSharedPointer<FiffRawViewDelegate>             m_pRawDelegate;
+
+    QSharedPointer<AnnotationModel>                 m_pAnnotationModel;
 
     QPointer<FiffRawView>                           m_pFiffRawView;     /**< View for Fiff data */
     //QPointer<QMdiSubWindow>                         m_pSubWindow;       /**< Window that wraps the display */
