@@ -93,14 +93,6 @@ public:
      */
     ~AveragingSetupWidget();
 
-private slots:
-    //=========================================================================================================
-    /**
-     * Shows the About Dialog
-     *
-     */
-    void showAboutDialog();
-
 private:
 
     Averaging* m_pAveraging;        /**< Holds a pointer to corresponding Averaging.*/

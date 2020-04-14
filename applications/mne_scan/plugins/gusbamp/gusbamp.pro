@@ -99,7 +99,6 @@ SOURCES += \
         gusbampproducer.cpp \
         gusbampdriver.cpp \
         FormFiles/gusbampsetupwidget.cpp \
-        FormFiles/gusbampaboutwidget.cpp \
         FormFiles/gusbampsetupprojectwidget.cpp
 
 HEADERS += \
@@ -108,12 +107,10 @@ HEADERS += \
         gusbampproducer.h \
         gusbampdriver.h \
         FormFiles/gusbampsetupwidget.h \
-        FormFiles/gusbampaboutwidget.h \
         FormFiles/gusbampsetupprojectwidget.h
 
 FORMS += \
         FormFiles/gusbampsetupwidget.ui \
-        FormFiles/gusbampabout.ui \
         FormFiles/gusbampsetupprojectwidget.ui
 
 RESOURCE_FILES +=\

@@ -79,7 +79,6 @@ CONFIG(debug, debug|release) {
 SOURCES += \
     ftbuffer.cpp \
     FormFiles/ftbuffersetupwidget.cpp \
-    FormFiles/ftbufferaboutwidget.cpp \
     ftbuffproducer.cpp \
     ftconnector.cpp \
 
@@ -87,13 +86,11 @@ HEADERS += \
     ftbuffer_global.h \
     ftbuffer.h \
     FormFiles/ftbuffersetupwidget.h \
-    FormFiles/ftbufferaboutwidget.h \
     ftbuffproducer.h \
     ftconnector.h \
 
 FORMS += \
     FormFiles/ftbuffersetup.ui \
-    FormFiles/ftbufferabout.ui \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

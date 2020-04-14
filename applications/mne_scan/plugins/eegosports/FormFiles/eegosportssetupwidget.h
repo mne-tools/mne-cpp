@@ -111,13 +111,6 @@ private:
      */
     void setWriteToFile();
 
-    //=========================================================================================================
-    /**
-     * Shows the About Dialog
-     *
-     */
-    void showAboutDialog();
-
     EEGoSports*               m_pEEGoSports;           /**< a pointer to corresponding EEGoSports.*/
 
     Ui::EEGoSportsSetupClass  ui;                      /**< the user interface for the EEGoSportsSetupWidget.*/

@@ -84,17 +84,14 @@ CONFIG(debug, debug|release) {
 SOURCES += \
         neuronalconnectivity.cpp \
         FormFiles/neuronalconnectivitysetupwidget.cpp \
-        FormFiles/neuronalconnectivityaboutwidget.cpp \
 
 HEADERS += \
         neuronalconnectivity.h\
         neuronalconnectivity_global.h \
         FormFiles/neuronalconnectivitysetupwidget.h \
-        FormFiles/neuronalconnectivityaboutwidget.h \
 
 FORMS += \
         FormFiles/neuronalconnectivitysetup.ui \
-        FormFiles/neuronalconnectivityabout.ui \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

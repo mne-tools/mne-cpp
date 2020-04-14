@@ -84,7 +84,6 @@ SOURCES += \
         eegosportsimpedanceview.cpp \
         eegosportsproducer.cpp \
         FormFiles/eegosportssetupwidget.cpp \
-        FormFiles/eegosportsaboutwidget.cpp \
         eegosportsdriver.cpp \
         FormFiles/eegosportssetupprojectwidget.cpp \
 
@@ -97,14 +96,12 @@ HEADERS += \
         eegosportsimpedanceview.h \
         eegosportsproducer.h \
         FormFiles/eegosportssetupwidget.h \
-        FormFiles/eegosportsaboutwidget.h \
         eegosportsdriver.h \
         FormFiles/eegosportssetupprojectwidget.h \
 
 FORMS += \
     FormFiles/eegosportsimpedancewidget.ui \
         FormFiles/eegosportssetup.ui \
-        FormFiles/eegosportsabout.ui \
         FormFiles/eegosportssetupprojectwidget.ui \
 
 RESOURCE_FILES +=\

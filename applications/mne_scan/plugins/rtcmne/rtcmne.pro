@@ -80,17 +80,14 @@ CONFIG(debug, debug|release) {
 
 SOURCES += \
     rtcmne.cpp \
-    FormFiles/rtcmneaboutwidget.cpp \
     FormFiles/rtcmnesetupwidget.cpp
 
 HEADERS += \
     rtcmne.h\
     rtcmne_global.h \
-    FormFiles/rtcmneaboutwidget.h \
     FormFiles/rtcmnesetupwidget.h
 
 FORMS += \
-    FormFiles/rtcmneabout.ui \
     FormFiles/rtcmnesetup.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}

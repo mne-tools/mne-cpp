@@ -38,7 +38,6 @@
 //=============================================================================================================
 
 #include "rtcmnesetupwidget.h"
-#include "rtcmneaboutwidget.h"
 
 #include "../rtcmne.h"
 
@@ -88,7 +87,6 @@ RtcMneSetupWidget::RtcMneSetupWidget(RtcMne* toolbox, QWidget *parent)
     else
         ui.m_qLabel_surfaceStat->setText("loaded");
 
-    connect(ui.m_qPushButton_About, &QPushButton::released, this, &RtcMneSetupWidget::showAboutDialog);
     connect(ui.m_qPushButton_FwdFileDialog, &QPushButton::released, this, &RtcMneSetupWidget::showFwdFileDialog);
     connect(ui.m_qPushButton_AtlasDirDialog, &QPushButton::released, this, &RtcMneSetupWidget::showAtlasDirDialog);
     connect(ui.m_qPushButton_SurfaceDirDialog, &QPushButton::released, this, &RtcMneSetupWidget::showSurfaceDirDialog);
@@ -123,14 +121,6 @@ void RtcMneSetupWidget::clusteringTriggered()
 {
     // start clustering
     QFuture<void> future = QtConcurrent::run(m_pMNE, &RtcMne::doClustering);
-}
-
-//=============================================================================================================
-
-void RtcMneSetupWidget::showAboutDialog()
-{
-    RtcMneAboutWidget aboutDialog(this);
-    aboutDialog.exec();
 }
 
 //=============================================================================================================

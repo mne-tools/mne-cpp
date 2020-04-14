@@ -93,14 +93,6 @@ public:
      */
     ~CovarianceSetupWidget();
 
-private slots:
-    //=========================================================================================================
-    /**
-     * Shows the About Dialog
-     *
-     */
-    void showAboutDialog();
-
 private:
 
     Covariance* m_pCovariance;        /**< Holds a pointer to corresponding Covariance.*/
