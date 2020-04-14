@@ -479,8 +479,8 @@ int FiffRawViewModel::loadEarlierBlocks(qint32 numBlocks)
     qDebug() << "[FiffRawViewModel::loadEarlierBlocks] read_raw_segment timer.elapsed()" << timer.elapsed();
 
     for(int i = 0; i < numBlocks; ++i) {
-        m_lNewData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data.block(0, i*m_iSamplesPerBlock, data.rows(), m_iSamplesPerBlock),
-                                                                                          times.block(0, i*m_iSamplesPerBlock, times.rows(), m_iSamplesPerBlock))));
+        m_lNewData.push_front(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data.block(0, i*m_iSamplesPerBlock, data.rows(), m_iSamplesPerBlock),
+                                                                                           times.block(0, i*m_iSamplesPerBlock, times.rows(), m_iSamplesPerBlock))));
     }
 
     // adjust fiff cursor
