@@ -32,7 +32,7 @@ jobs:
         make install -j2
     - name: Configure and compile MNE-CPP
       run: |
-        ../Qt5_binaries/qmake -r MNECPP_CONFIG+=static
+        ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG+=static
         make -j2
 
 # jobs:
