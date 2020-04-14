@@ -47,18 +47,50 @@ AnnotationView::AnnotationView()
 
 }
 
+//=============================================================================================================
+
 void AnnotationView::initGUIFunctionality()
 {
     connect(ui->m_checkBox_activateEvents, &QCheckBox::stateChanged,
             this, &AnnotationView::onActiveEventsChecked);
     //connect(ui->m_checkBox_showSelectedEventsOnly)
+
+    ui->m_comboBox_filterTypes->addItem("All");
+//    ui->m_comboBox_filterTypes->addItems(m_pEventModel->getEventTypeList());
+    ui->m_comboBox_filterTypes->addItem("test1");
+    ui->m_comboBox_filterTypes->addItem("test2");
+    ui->m_comboBox_filterTypes->setCurrentText("All");
+
+    connect(ui->m_comboBox_filterTypes, &QComboBox::currentTextChanged,
+            this, &AnnotationView::onFilterTypesChanged);
+
 }
+
+//=============================================================================================================
 
 void AnnotationView::onActiveEventsChecked(int iCheckBoxState)
 {
     qDebug() << "onActiveEventsChecked" << iCheckBoxState;
     m_iCheckState = iCheckBoxState;
     emit activeEventsChecked(m_iCheckState);
+}
+
+//=============================================================================================================
+
+void AnnotationView::onFilterTypesChanged(const QString& sFilType)
+{
+    qDebug() << "AnnotationView::onFilterTypesChanged - Nothing here yet";
+}
+
+//=============================================================================================================
+
+void AnnotationView::updateComboBox(const QString &currentAnnotationType)
+{
+    ui->m_comboBox_filterTypes->clear();
+    ui->m_comboBox_filterTypes->addItem("All");
+    ui->m_comboBox_filterTypes->addItems(m_pAnnModel->getEventTypeList());
+    if(m_pAnnModel->getEventTypeList().contains(currentAnnotationType))
+        ui->m_comboBox_filterTypes->setCurrentText(currentAnnotationType);
 }
 
 //void EventWindow::jumpToEvent(const QModelIndex & current, const QModelIndex & previous)
