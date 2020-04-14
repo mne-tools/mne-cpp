@@ -38,7 +38,7 @@
 //=============================================================================================================
 
 #include "covariancesetupwidget.h"
-#include "covarianceaboutwidget.h"
+
 
 #include "../covariance.h"
 
@@ -69,12 +69,4 @@ CovarianceSetupWidget::CovarianceSetupWidget(Covariance* toolbox, QWidget *paren
 
 CovarianceSetupWidget::~CovarianceSetupWidget()
 {
-}
-
-//=============================================================================================================
-
-void CovarianceSetupWidget::showAboutDialog()
-{
-    CovarianceAboutWidget aboutDialog(this);
-    aboutDialog.exec();
 }

@@ -40,7 +40,6 @@
 //=============================================================================================================
 
 #include "../ui_ftbuffersetup.h"
-#include "ftbufferaboutwidget.h"
 #include "../ftbuffer.h"
 #include "../ftbuffproducer.h"
 #include "../ftconnector.h"
@@ -96,11 +95,6 @@ public:
     ~FtBufferSetupWidget();
 
 private slots:
-    //=========================================================================================================
-    /**
-     * Shows the About Dialog
-     */
-    void showAboutDialog();
 
     //=========================================================================================================
     /**

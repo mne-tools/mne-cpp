@@ -41,7 +41,6 @@
 //=============================================================================================================
 
 #include "../ui_noisereductionsetup.h"
-#include "noisereductionaboutwidget.h"
 #include "../noisereduction.h"
 
 //=============================================================================================================
@@ -90,14 +89,6 @@ public:
      * All NoiseReductionSetupWidget's children are deleted first. The application exits if NoiseReductionSetupWidget is the main widget.
      */
     ~NoiseReductionSetupWidget();
-
-private slots:
-    //=========================================================================================================
-    /**
-     * Shows the About Dialog
-     *
-     */
-    void showAboutDialog();
 
 private:
 

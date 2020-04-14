@@ -40,7 +40,6 @@
 //=============================================================================================================
 
 #include "../ui_neuronalconnectivitysetup.h"
-#include "neuronalconnectivityaboutwidget.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -87,14 +86,6 @@ public:
      * All NeuronalConnectivitySetupWidget's children are deleted first. The application exits if NeuronalConnectivitySetupWidget is the main widget.
      */
     ~NeuronalConnectivitySetupWidget();
-
-private slots:
-    //=========================================================================================================
-    /**
-     * Shows the About Dialog
-     *
-     */
-    void showAboutDialog();
 
 private:
     NeuronalConnectivity*   m_pNeuronalConnectivity;	/**< Holds a pointer to corresponding NeuronalConnectivityToolbox.*/

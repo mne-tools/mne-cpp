@@ -39,7 +39,6 @@
 //=============================================================================================================
 
 #include "eegosportssetupwidget.h"
-#include "eegosportsaboutwidget.h"
 #include "../eegosports.h"
 
 //=============================================================================================================
@@ -119,10 +118,3 @@ void EEGoSportsSetupWidget::setWriteToFile()
     m_pEEGoSports->m_bWriteDriverDebugToFile = ui.m_checkBox_WriteDriverDebugToFile->isChecked();
 }
 
-//=============================================================================================================
-
-void EEGoSportsSetupWidget::showAboutDialog()
-{
-    EEGoSportsAboutWidget aboutDialog(this);
-    aboutDialog.exec();
-}
