@@ -39,7 +39,7 @@ include(../../../mne-cpp.pri)
 
 TEMPLATE = app
 
-QT += network core widgets xml svg charts serialport concurrent
+QT += network core widgets xml svg charts concurrent
 
 qtHaveModule(3dextras) {
     QT += 3dextras
