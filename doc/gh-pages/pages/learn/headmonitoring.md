@@ -24,7 +24,7 @@ Real-time head monitoring is a functionality that can be added to all Sensor Plu
     * Stream data from a MEG device connected via the [FieldTripBuffer-Plugin](../development/ftbufferplugin.md).
 
 2. Add the HPI-Plugin to the plugin scene and connect your Sensor-Plugin to the HPI Plugin.
-   ![](../../images/plugin.png)
+   ![](../../images/hpi/mne_scan_hpi_plugin.png)
 
 3. Start the measurement
 
@@ -37,23 +37,25 @@ Real-time head monitoring is a functionality that can be added to all Sensor Plu
 
 MNE Scan should now look like following picture. You have the Plugin-Scene on the left, the 3D View in the upper part and the data stream in the lower part. The 3D View shows an average head model that is aligned and scaled to tracked landmarks like LPA, RPA, Nasion and HPI coils. It shows up after the first succesfull hpi fit. 
 
-![](../../images/mne_scan_hpi_3Dview.png)
+![](../../images/hpi/mne_scan_hpi_3D.png)
 
 The control panel can be accessed via the `QUICK CTRL`  button. Here you can change the settings for the hpi fit and the 3D View. 
 
 ## The Quick Control Widget
 Once opened, you can choose between different control panels. There you get i.e. acces to the HPI-control panel `HPI Fitting` or the 3D-cotrol panel `3D View`. Follow the described steps to setup the hpi fitting and control the apperance in the 3D View.
 
-### HPI Fitting: Load Digitizers
+![](../../images/hpi/mne_scan_quick.png)
 
-![](../../images/mne_scan_hpi_load.png)
+### HPI Fitting: Digitizers
+
+![](../../images/hpi/mne_scan_hpi_load.png)
 
 * Click the button `Load Digitizers` and navigate to the subjects digitized data which is stored in `.fif` format.  
 * The display will show how many digitizers of each kind are loaded. 
 
 ### HPI Fitting: Fitting
 
-![](../../images/mne_scan_hpi_fit.png)
+![](../../images/hpi/mne_scan_hpi_fit.png)
 
 1. Enter the HPI coil frequencies. You can add and remove new Frequencies, but keep in mind to only add used ones. 
 
@@ -69,7 +71,7 @@ Once opened, you can choose between different control panels. There you get i.e.
 
 ### 3D View
 
-![](../../images/mne_scan_hpi_control.png)
+![](../../images/hpi/mne_scan_hpi_control.png)
 
 Here you can choose what elements you want to visualize in the monitoring section. These elements include:
 
