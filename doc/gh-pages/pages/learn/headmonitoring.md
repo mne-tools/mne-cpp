@@ -28,18 +28,15 @@ Real-time head monitoring is a functionality that can be added to all Sensor Plu
 
 3. Start the measurement
 
-4. Control The HPI Fit
-    You can open and control the settings for the hpi fitting via the Quick-Control widget. Open it and follow the steps described in the next section.
+4. Settings for the Hpi Fit and 3D visualization
 
-    ![](../../images/mne_scan_open_quick.png)
+    You can open and control the settings for the hpi fitting via the Quick-Control widget. Open it by pressing the `QUICK CTRL` button and follow the steps described in the next section.
 
-## The 3D View
+    ![](../../images/hpi/mne_scan_open_quick.png)
 
 MNE Scan should now look like following picture. You have the Plugin-Scene on the left, the 3D View in the upper part and the data stream in the lower part. The 3D View shows an average head model that is aligned and scaled to tracked landmarks like LPA, RPA, Nasion and HPI coils. It shows up after the first succesfull hpi fit. 
 
 ![](../../images/hpi/mne_scan_hpi_3D.png)
-
-The control panel can be accessed via the `QUICK CTRL`  button. Here you can change the settings for the hpi fit and the 3D View. 
 
 ## The Quick Control Widget
 Once opened, you can choose between different control panels. There you get i.e. acces to the HPI-control panel `HPI Fitting` or the 3D-cotrol panel `3D View`. Follow the described steps to setup the hpi fitting and control the apperance in the 3D View.
@@ -59,11 +56,11 @@ Once opened, you can choose between different control panels. There you get i.e.
 
 1. Enter the HPI coil frequencies. You can add and remove new Frequencies, but keep in mind to only add used ones. 
 
-2. Choose if you want to Signal Space Projection (`SSP`) or `Compensators`.
+2. Choose if you want to use Signal Space Projection (`SSP`) or `Compensators`.
 
 3. If you don't know how your coils and frequencies are ordered, do an initial frequency ordering by pressing `Order coil frequencies`.
 
-4. Do an initial HPI fit or enable continuous HPi fitting. Make sure you have started the measuring pipeline via the play button first. After the first succesfull fit the average head shoul appear in the 3D View.
+4. Do an initial HPI fit or enable continuous HPi fitting. Make sure you have started the measuring pipeline via the play button first. After the first succesfull fit the average head should appear in the 3D View.
 
 4. The `Fitting errors` in mm are shown for each coil and in form of an average over all coils. The error is calculated as the distance between the estimated HPI coil and the digitized HPI positions.
 
