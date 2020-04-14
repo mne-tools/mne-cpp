@@ -40,7 +40,7 @@
 //=============================================================================================================
 
 #include "fiffrawview.h"
-
+#include "annotationmodel.h"
 #include "fiffrawviewdelegate.h"
 #include <anShared/Model/fiffrawviewmodel.h>
 

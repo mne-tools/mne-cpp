@@ -82,12 +82,14 @@ CONFIG(debug, debug|release) {
 DESTDIR = $${MNE_BINARY_DIR}/mne_analyze_extensions
 
 SOURCES += \
+    annotationmodel.cpp \
     annotationview.cpp \
     rawdataviewer.cpp \
     fiffrawview.cpp \
     fiffrawviewdelegate.cpp
 
 HEADERS += \
+    annotationmodel.h \
     annotationview.h \
     rawdataviewer_global.h \
     rawdataviewer.h    \

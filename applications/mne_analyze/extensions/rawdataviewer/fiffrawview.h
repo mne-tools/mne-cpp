@@ -79,6 +79,7 @@ namespace RAWDATAVIEWEREXTENSION {
 //=============================================================================================================
 
 class FiffRawViewDelegate;
+class AnnotationModel;
 
 //=============================================================================================================
 /**
@@ -192,6 +193,8 @@ public:
      */
     void toggleDisplayEvent(const int& iToggle);
 
+    void linkAnnotationModel();
+
 private:
     //=========================================================================================================
     /**
@@ -204,6 +207,8 @@ private:
     QSharedPointer<ANSHAREDLIB::FiffRawViewModel>       m_pModel;
 
     QSharedPointer<FiffRawViewDelegate>                 m_pDelegate;
+
+    QSharedPointer<AnnotationModel>                     m_pAnnotationModel;
 
     QMap<qint32,float>                                  m_qMapChScaling;                /**< Channel scaling values. */
 

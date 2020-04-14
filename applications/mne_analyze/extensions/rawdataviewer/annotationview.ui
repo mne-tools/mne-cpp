@@ -35,6 +35,14 @@
    <string>Event List</string>
   </property>
   <widget class="QWidget" name="dockWidgetContents">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>183</width>
+     <height>255</height>
+    </rect>
+   </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <layout class="QGridLayout" name="m_gridLayout_Main">
@@ -53,7 +61,7 @@
          </sizepolicy>
         </property>
         <property name="title">
-         <string>Event types</string>
+         <string>Annotation types</string>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <item>
@@ -239,7 +247,7 @@
               </sizepolicy>
              </property>
              <property name="text">
-              <string>Show selected event only</string>
+              <string>Show selected only</string>
              </property>
             </widget>
            </item>
@@ -252,7 +260,7 @@
               </sizepolicy>
              </property>
              <property name="text">
-              <string>Activate events</string>
+              <string>Activate annotations</string>
              </property>
              <property name="checked">
               <bool>true</bool>
@@ -271,7 +279,7 @@
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>5</width>
+          <width>20</width>
           <height>20</height>
          </size>
         </property>

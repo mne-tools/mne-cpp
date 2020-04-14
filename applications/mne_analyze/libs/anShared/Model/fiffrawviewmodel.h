@@ -101,7 +101,7 @@ public:
     /**
      * Constructs a FiffRawViewModel object.
      */
-    FiffRawViewModel(QObject *pParent = Q_Q_NULLPTR);
+    FiffRawViewModel(QObject *pParent = Q_NULLPTR);
 
     //=========================================================================================================
     /**

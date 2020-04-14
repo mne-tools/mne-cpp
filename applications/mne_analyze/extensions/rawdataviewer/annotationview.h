@@ -42,6 +42,7 @@
 //=============================================================================================================
 
 #include <fiff/fiff_ch_info.h>
+#include "annotationmodel.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -60,6 +61,8 @@ class AnnotationView : public QWidget
 
 public:
     AnnotationView();
+
+    void updateComboBox(const QString &currentAnnotationType);
 
 public slots:
 
@@ -91,6 +94,7 @@ public slots:
 //    void addNewEventType();
 
     void onActiveEventsChecked(int iCheckBoxState);
+    void onFilterTypesChanged(const QString& sFilType);
 
 signals:
 
@@ -100,9 +104,12 @@ private:
 
     void initGUIFunctionality();
 
-    Ui::EventWindowDockWidget* ui;
+    Ui::EventWindowDockWidget*                      ui;
 
-    int m_iCheckState;
+    int                                             m_iCheckState;
+
+    QSharedPointer<AnnotationModel>                 m_pAnnModel;
+
 };
 
 #endif // ANNOTATIONVIEW_H
