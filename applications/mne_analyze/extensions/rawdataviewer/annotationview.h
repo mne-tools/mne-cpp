@@ -100,6 +100,10 @@ signals:
 
     void activeEventsChecked(const int& iCheckBoxState);
 
+public slots:
+
+    void addAnnotationToModel(const int iSample);
+
 private:
 
     void initGUIFunctionality();
