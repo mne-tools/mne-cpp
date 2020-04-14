@@ -51,6 +51,8 @@ AnnotationView::AnnotationView()
 
 void AnnotationView::initGUIFunctionality()
 {
+
+    //Check Boxes
     connect(ui->m_checkBox_activateEvents, &QCheckBox::stateChanged,
             this, &AnnotationView::onActiveEventsChecked);
     //connect(ui->m_checkBox_showSelectedEventsOnly)
@@ -64,6 +66,8 @@ void AnnotationView::initGUIFunctionality()
     connect(ui->m_comboBox_filterTypes, &QComboBox::currentTextChanged,
             this, &AnnotationView::onFilterTypesChanged);
 
+    //Table
+    ui->m_tableView_eventTableView->setModel(m_pAnnModel.data());
 }
 
 //=============================================================================================================
@@ -93,6 +97,13 @@ void AnnotationView::updateComboBox(const QString &currentAnnotationType)
         ui->m_comboBox_filterTypes->setCurrentText(currentAnnotationType);
 }
 
+//=============================================================================================================
+
+void AnnotationView::addAnnotationToModel(const int iSample)
+{
+    m_pAnnModel->setSamplePos(iSample);
+    m_pAnnModel->insertRow(0, QModelIndex());
+}
 //void EventWindow::jumpToEvent(const QModelIndex & current, const QModelIndex & previous)
 //{
 //    Q_UNUSED(previous);

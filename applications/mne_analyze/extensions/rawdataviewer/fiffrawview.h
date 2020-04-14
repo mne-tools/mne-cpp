@@ -195,6 +195,9 @@ public:
 
     void linkAnnotationModel();
 
+signals:
+    void sendSamplePos(int iSample);
+
 private:
     //=========================================================================================================
     /**
@@ -208,8 +211,6 @@ private:
 
     QSharedPointer<FiffRawViewDelegate>                 m_pDelegate;
 
-    QSharedPointer<AnnotationModel>                     m_pAnnotationModel;
-
     QMap<qint32,float>                                  m_qMapChScaling;                /**< Channel scaling values. */
 
     QColor                                              m_backgroundColor;              /**< Current background color. */
@@ -219,7 +220,7 @@ private:
 
     qint32                                              m_iT;                           /**< Display window size in seconds */
 
-    float                                              lastClickedPoint;
+    float                                               m_fLastClickedPoint;
 
     qint32 m_iToggle;
 signals:

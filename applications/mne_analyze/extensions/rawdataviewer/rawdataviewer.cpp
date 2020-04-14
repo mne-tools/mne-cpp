@@ -48,6 +48,8 @@
 #include <disp/viewers/scalingview.h>
 #include "../dataloader/dataloader.h"
 #include "../dataloader/FormFiles/dataloadercontrol.h"
+#include "annotationmodel.h"
+#include "annotationview.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -121,6 +123,9 @@ void RawDataViewer::init()
     m_bDisplayCreated = true;
 
     //m_pSubWindow->show();
+
+    //create AnnotationModel
+    //m_pAnnotationModel = new AnnotationModel();
 }
 
 //=============================================================================================================
@@ -255,6 +260,8 @@ void RawDataViewer::setUpControls()
     AnnotationView* annotationWidget = new AnnotationView();
     connect(annotationWidget, &AnnotationView::activeEventsChecked,
             m_pFiffRawView.data(), &FiffRawView::toggleDisplayEvent);
+//    connect(m_pFiffRawView.data(), &FiffRawView::sendSamplePos,
+//            annotationWidget, &AnnotationView::addAnnotationToModel);
 
     //Set up layout w/ control widgets
     m_pLayout->addWidget(scalingWidget);
