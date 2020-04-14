@@ -59,8 +59,6 @@ WriteToFileSetupWidget::WriteToFileSetupWidget(WriteToFile* toolbox, QWidget *pa
 , m_pWriteToFile(toolbox)
 {
     ui.setupUi(this);
-
-    connect(ui.m_qPushButton_About, SIGNAL(released()), this, SLOT(showAboutDialog()));
 }
 
 //=============================================================================================================

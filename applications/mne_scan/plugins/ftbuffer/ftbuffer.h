@@ -42,7 +42,6 @@
 
 #include "ftbuffer_global.h"
 
-#include "FormFiles/ftbufferaboutwidget.h"
 #include "FormFiles/ftbuffersetupwidget.h"
 
 #include "ftbuffproducer.h"

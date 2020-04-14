@@ -67,11 +67,3 @@ NoiseReductionSetupWidget::NoiseReductionSetupWidget(NoiseReduction* toolbox, QW
 NoiseReductionSetupWidget::~NoiseReductionSetupWidget()
 {
 }
-
-//=============================================================================================================
-
-void NoiseReductionSetupWidget::showAboutDialog()
-{
-    NoiseReductionAboutWidget aboutDialog(this);
-    aboutDialog.exec();
-}

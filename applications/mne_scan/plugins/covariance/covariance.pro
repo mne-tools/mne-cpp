@@ -78,19 +78,16 @@ CONFIG(debug, debug|release) {
 SOURCES += \
     covariance.cpp \
     FormFiles/covariancesetupwidget.cpp \
-    FormFiles/covarianceaboutwidget.cpp \
     FormFiles/covariancesettingswidget.cpp
 
 HEADERS += \
     covariance_global.h \
     covariance.h \
     FormFiles/covariancesetupwidget.h \
-    FormFiles/covarianceaboutwidget.h \
     FormFiles/covariancesettingswidget.h
 
 FORMS += \
     FormFiles/covariancesetup.ui \
-    FormFiles/covarianceabout.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

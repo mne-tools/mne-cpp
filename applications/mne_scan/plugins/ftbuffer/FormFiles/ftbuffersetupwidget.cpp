@@ -86,14 +86,6 @@ FtBufferSetupWidget::~FtBufferSetupWidget()
 
 //=============================================================================================================
 
-void FtBufferSetupWidget::showAboutDialog()
-{
-    FtBufferAboutWidget aboutDialog(this);
-    aboutDialog.exec();
-}
-
-//=============================================================================================================
-
 void FtBufferSetupWidget::pressedConnect()
 {
     emit connectAtAddr(ui.m_lineEditIP->text(),

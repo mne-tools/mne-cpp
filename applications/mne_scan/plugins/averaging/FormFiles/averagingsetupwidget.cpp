@@ -38,7 +38,6 @@
 //=============================================================================================================
 
 #include "averagingsetupwidget.h"
-#include "averagingaboutwidget.h"
 
 #include "../averaging.h"
 
@@ -69,12 +68,4 @@ AveragingSetupWidget::AveragingSetupWidget(Averaging* toolbox, QWidget *parent)
 
 AveragingSetupWidget::~AveragingSetupWidget()
 {
-}
-
-//=============================================================================================================
-
-void AveragingSetupWidget::showAboutDialog()
-{
-    AveragingAboutWidget aboutDialog(this);
-    aboutDialog.exec();
 }

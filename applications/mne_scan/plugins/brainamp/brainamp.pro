@@ -78,7 +78,6 @@ SOURCES += \
         brainamp.cpp \
         brainampproducer.cpp \
         FormFiles/brainampsetupwidget.cpp \
-        FormFiles/brainampaboutwidget.cpp \
         brainampdriver.cpp \
         FormFiles/brainampsetupprojectwidget.cpp \
 
@@ -87,13 +86,11 @@ HEADERS += \
         brainamp_global.h \
         brainampproducer.h \
         FormFiles/brainampsetupwidget.h \
-        FormFiles/brainampaboutwidget.h \
         brainampdriver.h \
         FormFiles/brainampsetupprojectwidget.h \
 
 FORMS += \
         FormFiles/brainampsetup.ui \
-        FormFiles/brainampabout.ui \
         FormFiles/brainampsetupprojectwidget.ui \
 
 RESOURCE_FILES +=\

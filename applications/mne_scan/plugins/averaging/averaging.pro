@@ -82,17 +82,14 @@ CONFIG(debug, debug|release) {
 SOURCES += \
     averaging.cpp \
     FormFiles/averagingsetupwidget.cpp \
-    FormFiles/averagingaboutwidget.cpp \
 
 HEADERS += \
     averaging_global.h \
     averaging.h \
     FormFiles/averagingsetupwidget.h \
-    FormFiles/averagingaboutwidget.h \
 
 FORMS += \
     FormFiles/averagingsetup.ui \
-    FormFiles/averagingabout.ui \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

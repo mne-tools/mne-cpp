@@ -59,21 +59,10 @@ NeuronalConnectivitySetupWidget::NeuronalConnectivitySetupWidget(NeuronalConnect
 , m_pNeuronalConnectivity(toolbox)
 {
     ui.setupUi(this);
-
-    //Always connect GUI elemts after ui.setpUi has been called
-    connect(ui.m_qPushButton_About, SIGNAL(released()), this, SLOT(showAboutDialog()));
 }
 
 //=============================================================================================================
 
 NeuronalConnectivitySetupWidget::~NeuronalConnectivitySetupWidget()
 {
-}
-
-//=============================================================================================================
-
-void NeuronalConnectivitySetupWidget::showAboutDialog()
-{
-    NeuronalConnectivityAboutWidget aboutDialog(this);
-    aboutDialog.exec();
 }
