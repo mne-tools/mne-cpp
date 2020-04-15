@@ -65,7 +65,7 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Inversed \
             -lMNE$${MNE_LIB_VERSION}Fwdd \
             -lMNE$${MNE_LIB_VERSION}Mned \
-            -lMNE$${sMNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Utilsd \
 } else {
