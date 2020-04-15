@@ -58,8 +58,6 @@ contains(MNECPP_CONFIG, static) {
 #    QTPLUGIN += eegosports
 #    QTPLUGIN += brainamp
     QTPLUGIN += tmsi
-    QTPLUGIN += lsladapter
-#    QTPLUGIN += dummytoolbox
     QTPLUGIN += rtcmne
     QTPLUGIN += averaging
     QTPLUGIN += covariance
@@ -68,6 +66,17 @@ contains(MNECPP_CONFIG, static) {
     QTPLUGIN += ftbuffer
     QTPLUGIN += writetofile
     QTPLUGIN += hpi
+#    QTPLUGIN += dummytoolbox
+
+    contains(MNECPP_CONFIG, withLsl) {
+        QTPLUGIN += lsladapter
+        DEFINES += WITHLSL
+    }
+
+    contains(MNECPP_CONFIG, withBrainFlow) {
+        QTPLUGIN += brainflowboard
+        DEFINES += WITHBRAINFLOW
+    }
 } else {
     CONFIG += shared
 }
