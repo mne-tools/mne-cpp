@@ -41,10 +41,24 @@
 
 AnnotationView::AnnotationView()
 : ui(new Ui::EventWindowDockWidget)
+, m_iCheckState(0)
+, m_iLastSampClicked(0)
+, m_pAnnModel(Q_NULLPTR)
 {
     ui->setupUi(this);
-    initGUIFunctionality();
 
+    initMSVCSettings();
+    initGUIFunctionality();
+}
+
+//=============================================================================================================
+
+void AnnotationView::initMSVCSettings()
+{
+    //Table
+    ui->m_tableView_eventTableView->setModel(m_pAnnModel.data());
+    connect(m_pAnnModel.data(),&AnnotationModel::dataChanged,
+            this, &AnnotationView::onDataChanged);
 }
 
 //=============================================================================================================
@@ -58,16 +72,11 @@ void AnnotationView::initGUIFunctionality()
     //connect(ui->m_checkBox_showSelectedEventsOnly)
 
     ui->m_comboBox_filterTypes->addItem("All");
-//    ui->m_comboBox_filterTypes->addItems(m_pEventModel->getEventTypeList());
-    ui->m_comboBox_filterTypes->addItem("test1");
-    ui->m_comboBox_filterTypes->addItem("test2");
+    //ui->m_comboBox_filterTypes->addItems(m_pAnnModel->getEventTypeList());
     ui->m_comboBox_filterTypes->setCurrentText("All");
 
     connect(ui->m_comboBox_filterTypes, &QComboBox::currentTextChanged,
-            this, &AnnotationView::onFilterTypesChanged);
-
-    //Table
-    ui->m_tableView_eventTableView->setModel(m_pAnnModel.data());
+            this, &AnnotationView::onFilterTypesChanged);   
 }
 
 //=============================================================================================================
@@ -101,8 +110,32 @@ void AnnotationView::updateComboBox(const QString &currentAnnotationType)
 
 void AnnotationView::addAnnotationToModel(const int iSample)
 {
-    m_pAnnModel->setSamplePos(iSample);
+    qDebug() << "AnnotationView::addAnnotationToModel -- Here";
+    m_iLastSampClicked = iSample;
+    m_pAnnModel->setSamplePos(m_iLastSampClicked);
     m_pAnnModel->insertRow(0, QModelIndex());
+}
+
+//=============================================================================================================
+
+void AnnotationView::setModel(QSharedPointer<AnnotationModel> pAnnModel)
+{
+    m_pAnnModel = pAnnModel;
+}
+
+//=============================================================================================================
+
+void AnnotationView::onDataChanged()
+{
+    ui->m_tableView_eventTableView->viewport()->update();
+}
+
+//=============================================================================================================
+
+void AnnotationView::passFiffParams(int iFirst,int iLast,float fFreq)
+{
+    m_pAnnModel->setFirstLastSample(iFirst, iLast);
+    m_pAnnModel->setSampleFreq(fFreq);
 }
 //void EventWindow::jumpToEvent(const QModelIndex & current, const QModelIndex & previous)
 //{
