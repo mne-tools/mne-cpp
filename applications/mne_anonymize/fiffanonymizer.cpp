@@ -765,11 +765,14 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,
     }
     case FIFF_COMMENT:
     {
-        if(m_pBlockTypeList->first()==FIFFB_MEAS_INFO) {
+        if(m_pBlockTypeList->top()==FIFFB_MEAS_INFO) {
             QString newStr(m_sDefaultString);
             outTag->resize(newStr.size());
             memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
             printIfVerbose("Description of the measurement block changed: " + QString(inTag->data()) + " -> " + newStr);
+        } else {
+            outTag->resize(inTag->size());
+            memcpy(outTag->data(),inTag->data(),static_cast<size_t>(inTag->size()));
         }
         break;
     }
