@@ -37,6 +37,7 @@
 //=============================================================================================================
 
 #include "ftbuffersetupwidget.h"
+#include "../ui_ftbuffersetup.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -60,15 +61,16 @@ FtBufferSetupWidget::FtBufferSetupWidget(FtBuffer* toolbox,
 : QWidget(parent)
 , m_pFtBuffer(toolbox)
 , m_sSettingsPath(sSettingsPath)
+, m_pUi(new Ui::FtBufferSetupWidgetClass)
 {
-    ui.setupUi(this);
+    m_pUi->setupUi(this);
 
-    this->ui.m_lineEditIP->setText(toolbox->m_pFtBuffProducer->m_pFtConnector->getAddr());
+    this->m_pUi->m_lineEditIP->setText(toolbox->m_pFtBuffProducer->m_pFtConnector->getAddr());
 
     loadSettings(m_sSettingsPath);
 
-    //Always connect GUI elemts after ui.setpUi has been called
-    connect(ui.m_qPushButton_Connect, SIGNAL(released()),
+    //Always connect GUI elemts after m_pUi->setpUi has been called
+    connect(m_pUi->m_qPushButton_Connect, SIGNAL(released()),
             this, SLOT(pressedConnect())); // Connect/Disconnect button
 
     connect(this, &FtBufferSetupWidget::connectAtAddr,
@@ -88,8 +90,8 @@ FtBufferSetupWidget::~FtBufferSetupWidget()
 
 void FtBufferSetupWidget::pressedConnect()
 {
-    emit connectAtAddr(ui.m_lineEditIP->text(),
-                       ui.m_spinBoxPort->value());
+    emit connectAtAddr(m_pUi->m_lineEditIP->text(),
+                       m_pUi->m_spinBoxPort->value());
 }
 
 //=============================================================================================================
@@ -97,7 +99,7 @@ void FtBufferSetupWidget::pressedConnect()
 void FtBufferSetupWidget::isConnected(bool stat)
 {
     if (stat) {
-        ui.m_qPushButton_Connect->setText("Set");
+        m_pUi->m_qPushButton_Connect->setText("Set");
     } else {
         qWarning() << "[FtBufferSetupWidget::isConnected] Unable to find relevant fiff info.";
 
@@ -118,7 +120,7 @@ void FtBufferSetupWidget::saveSettings(const QString& settingsPath)
     // Store Settings
     QSettings settings;
 
-    settings.setValue(settingsPath + QString("/IP"), ui.m_lineEditIP->text());
+    settings.setValue(settingsPath + QString("/IP"), m_pUi->m_lineEditIP->text());
 }
 
 //=============================================================================================================
@@ -132,5 +134,5 @@ void FtBufferSetupWidget::loadSettings(const QString& settingsPath)
     // Load Settings
     QSettings settings;
 
-    ui.m_lineEditIP->setText(settings.value(settingsPath + QString("/IP"), "127.0.0.1").toString());
+    m_pUi->m_lineEditIP->setText(settings.value(settingsPath + QString("/IP"), "127.0.0.1").toString());
 }

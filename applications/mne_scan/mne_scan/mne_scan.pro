@@ -51,7 +51,7 @@ contains(MNECPP_CONFIG, dispOpenGL) {
 }
 
 contains(MNECPP_CONFIG, static) {
-    CONFIG += static
+    CONFIG += staticlib
     DEFINES += STATICLIB
     LIBS += -L$${MNE_BINARY_DIR}/mne_scan_plugins
     QTPLUGIN += fiffsimulator
@@ -60,9 +60,6 @@ contains(MNECPP_CONFIG, static) {
 #    QTPLUGIN += gusbamp
 #    QTPLUGIN += eegosports
 #    QTPLUGIN += brainamp
-    QTPLUGIN += tmsi
-    QTPLUGIN += lsladapter
-#    QTPLUGIN += dummytoolbox
     QTPLUGIN += rtcmne
     QTPLUGIN += averaging
     QTPLUGIN += covariance
@@ -71,6 +68,20 @@ contains(MNECPP_CONFIG, static) {
     QTPLUGIN += ftbuffer
     QTPLUGIN += writetofile
     QTPLUGIN += hpi
+#    QTPLUGIN += dummytoolbox
+
+    contains(MNECPP_CONFIG, withLsl) {
+        QTPLUGIN += lsladapter
+        DEFINES += WITHLSL
+    }
+    win32: {
+        QTPLUGIN += tmsi
+        DEFINES += WITHTMSI
+    }
+    contains(MNECPP_CONFIG, withBrainFlow) {
+        QTPLUGIN += brainflowboard
+        DEFINES += WITHBRAINFLOW
+    }
 } else {
     CONFIG += shared
 }
@@ -85,35 +96,35 @@ CONFIG += console
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
-            -lMNE$${MNE_LIB_VERSION}Fsd \
-            -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Communicationd \
-            -lMNE$${MNE_LIB_VERSION}Mned \
-            -lMNE$${MNE_LIB_VERSION}Fwdd \
-            -lMNE$${MNE_LIB_VERSION}Inversed \
-            -lMNE$${MNE_LIB_VERSION}Connectivityd \
-            -lMNE$${MNE_LIB_VERSION}RtProcessingd \
-            -lMNE$${MNE_LIB_VERSION}Dispd \
-            -lMNE$${MNE_LIB_VERSION}Disp3Dd \
-            -lscMeasd \
+    LIBS += -lscSharedd\
             -lscDispd \
-            -lscSharedd
+            -lscMeasd \
+            -lMNE$${MNE_LIB_VERSION}Disp3Dd \
+            -lMNE$${MNE_LIB_VERSION}Dispd \
+            -lMNE$${MNE_LIB_VERSION}RtProcessingd \
+            -lMNE$${MNE_LIB_VERSION}Connectivityd \
+            -lMNE$${MNE_LIB_VERSION}Inversed \
+            -lMNE$${MNE_LIB_VERSION}Fwdd \
+            -lMNE$${MNE_LIB_VERSION}Mned \
+            -lMNE$${MNE_LIB_VERSION}Communicationd \
+            -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Fsd \
+            -lMNE$${MNE_LIB_VERSION}Utilsd \
 } else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
-            -lMNE$${MNE_LIB_VERSION}Fs \
-            -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Communication \
-            -lMNE$${MNE_LIB_VERSION}Mne \
-            -lMNE$${MNE_LIB_VERSION}Fwd \
-            -lMNE$${MNE_LIB_VERSION}Inverse \
-            -lMNE$${MNE_LIB_VERSION}Connectivity \
-            -lMNE$${MNE_LIB_VERSION}RtProcessing \
-            -lMNE$${MNE_LIB_VERSION}Disp \
-            -lMNE$${MNE_LIB_VERSION}Disp3D \
-            -lscMeas \
+    LIBS += -lscShared\
             -lscDisp \
-            -lscShared
+            -lscMeas \
+            -lMNE$${MNE_LIB_VERSION}Disp3D \
+            -lMNE$${MNE_LIB_VERSION}Disp \
+            -lMNE$${MNE_LIB_VERSION}RtProcessing \
+            -lMNE$${MNE_LIB_VERSION}Connectivity \
+            -lMNE$${MNE_LIB_VERSION}Inverse \
+            -lMNE$${MNE_LIB_VERSION}Fwd \
+            -lMNE$${MNE_LIB_VERSION}Mne \
+            -lMNE$${MNE_LIB_VERSION}Communication \
+            -lMNE$${MNE_LIB_VERSION}Fiff \
+            -lMNE$${MNE_LIB_VERSION}Fs \
+            -lMNE$${MNE_LIB_VERSION}Utils \
 }
 
 DESTDIR = $${MNE_BINARY_DIR}
