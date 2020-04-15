@@ -57,7 +57,6 @@ contains(MNECPP_CONFIG, static) {
 #    QTPLUGIN += gusbamp
 #    QTPLUGIN += eegosports
 #    QTPLUGIN += brainamp
-    QTPLUGIN += tmsi
     QTPLUGIN += rtcmne
     QTPLUGIN += averaging
     QTPLUGIN += covariance
@@ -72,7 +71,10 @@ contains(MNECPP_CONFIG, static) {
         QTPLUGIN += lsladapter
         DEFINES += WITHLSL
     }
-
+    win32: {
+        QTPLUGIN += tmsi
+        DEFINES += WITHTMSI
+    }
     contains(MNECPP_CONFIG, withBrainFlow) {
         QTPLUGIN += brainflowboard
         DEFINES += WITHBRAINFLOW
@@ -83,19 +85,33 @@ contains(MNECPP_CONFIG, static) {
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
-            -lMNE$${MNE_LIB_VERSION}Fsd \
-            -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Dispd \
+    LIBS += -lscDispd \
             -lscMeasd \
-            -lscDispd
+            -lMNE$${MNE_LIB_VERSION}Disp3Dd \
+            -lMNE$${MNE_LIB_VERSION}Dispd \
+            -lMNE$${MNE_LIB_VERSION}RtProcessingd \
+            -lMNE$${MNE_LIB_VERSION}Connectivityd \
+            -lMNE$${MNE_LIB_VERSION}Inversed \
+            -lMNE$${MNE_LIB_VERSION}Fwdd \
+            -lMNE$${MNE_LIB_VERSION}Mned \
+            -lMNE$${MNE_LIB_VERSION}Communicationd \
+            -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Fsd \
+            -lMNE$${MNE_LIB_VERSION}Utilsd \
 } else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
-            -lMNE$${MNE_LIB_VERSION}Fs \
-            -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Disp \
+    LIBS += -lscDisp \
             -lscMeas \
-            -lscDisp
+            -lMNE$${MNE_LIB_VERSION}Disp3D \
+            -lMNE$${MNE_LIB_VERSION}Disp \
+            -lMNE$${MNE_LIB_VERSION}RtProcessing \
+            -lMNE$${MNE_LIB_VERSION}Connectivity \
+            -lMNE$${MNE_LIB_VERSION}Inverse \
+            -lMNE$${MNE_LIB_VERSION}Fwd \
+            -lMNE$${MNE_LIB_VERSION}Mne \
+            -lMNE$${MNE_LIB_VERSION}Communication \
+            -lMNE$${MNE_LIB_VERSION}Fiff \
+            -lMNE$${MNE_LIB_VERSION}Fs \
+            -lMNE$${MNE_LIB_VERSION}Utils \
 }
 
 SOURCES += \

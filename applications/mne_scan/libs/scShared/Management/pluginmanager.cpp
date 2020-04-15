@@ -52,7 +52,6 @@
 //#include <../plugins/gusbamp/gusbamp.h>
 //#include <../plugins/eegosports/eegosports.h>
 //#include <../plugins/brainamp/brainamp.h>
-#include <../plugins/tmsi/tmsi.h>
 #include <../plugins/rtcmne/rtcmne.h>
 #include <../plugins/averaging/averaging.h>
 #include <../plugins/covariance/covariance.h>
@@ -66,6 +65,9 @@
 #endif
 #ifdef WITHBRAINFLOW
 #include <../plugins/brainflowboard/brainflowboard.h>
+#endif
+#ifdef WITHTMSI
+#include <../plugins/tmsi/tmsi.h>
 #endif
 #endif
 
@@ -107,23 +109,24 @@ void PluginManager::loadPlugins(const QString& dir)
     // In case of a static build we have to load plugins manually.
     QList<QObject*> lObjects;
     lObjects << new FIFFSIMULATORPLUGIN::FiffSimulator;
-    lObjects << new BABYMEGPLUGIN::BabyMEG;
-    lObjects << new NATUSPLUGIN::Natus;
-    lObjects << new FTBUFFERPLUGIN::FtBuffer;
-    //lObjects << new GUSBAMPPLUGIN::GUSBAmp;
-    //lObjects << new EEGOSPORTSPLUGIN::EEGoSports;
-    //lObjects << new BRAINAMPPLUGIN::BrainAMP;
-    lObjects << new TMSIPLUGIN::TMSI;
-    lObjects << new RTCMNEPLUGIN::RtcMne;
-    lObjects << new AVERAGINGPLUGIN::Averaging;
-    lObjects << new COVARIANCEPLUGIN::Covariance;
-    lObjects << new NOISEREDUCTIONPLUGIN::NoiseReduction;
-    lObjects << new NEURONALCONNECTIVITYPLUGIN::NeuronalConnectivity;
+//    lObjects << new BABYMEGPLUGIN::BabyMEG;
+//    lObjects << new NATUSPLUGIN::Natus;
+//    lObjects << new FTBUFFERPLUGIN::FtBuffer;
+//    //lObjects << new GUSBAMPPLUGIN::GUSBAmp;
+//    //lObjects << new EEGOSPORTSPLUGIN::EEGoSports;
+//    //lObjects << new BRAINAMPPLUGIN::BrainAMP;
+//    lObjects << new RTCMNEPLUGIN::RtcMne;
+//    lObjects << new AVERAGINGPLUGIN::Averaging;
+//    lObjects << new COVARIANCEPLUGIN::Covariance;
+//    lObjects << new NOISEREDUCTIONPLUGIN::NoiseReduction;
+//    lObjects << new NEURONALCONNECTIVITYPLUGIN::NeuronalConnectivity;
     //lObjects << new DUMMYTOOLBOXPLUGIN::DummyToolbox;
 #ifdef WITHLSL
     lObjects << new LSLADAPTERPLUGIN::LSLAdapter;
+#endif    
+#ifdef WITHTMSI
+    lObjects << new TMSIPLUGIN::TMSI;
 #endif
-
 #ifdef WITHBRAINFLOW
     lObjects << new BRAINFLOWBOARDPLUGIN::BrainFlowBoard;
 #endif
@@ -150,14 +153,6 @@ void PluginManager::loadPlugins(const QString& dir)
                 if(pAlgorithm) {
                     m_qVecAlgorithmPlugins.push_back(pAlgorithm);
                     qDebug() << "RTAlgorithm " << pAlgorithm->getName() << " loaded.";
-                }
-            }
-            // IIO
-            else if(pluginType == IPlugin::_IIO) {
-                IIO* pIO = qobject_cast<IIO*>(lObjects[i]);
-                if(pIO) {
-                    m_qVecIOPlugins.push_back(pIO);
-                    qDebug() << "RTVisualization " << pIO->getName() << " loaded.";
                 }
             }
         } else {
