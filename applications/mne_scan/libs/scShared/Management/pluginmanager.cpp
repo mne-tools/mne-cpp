@@ -53,8 +53,6 @@
 //#include <../plugins/eegosports/eegosports.h>
 //#include <../plugins/brainamp/brainamp.h>
 #include <../plugins/tmsi/tmsi.h>
-#include <../plugins/lsladapter/lsladapter.h>
-//#include <../plugins/dummytoolbox/dummytoolbox.h>
 #include <../plugins/rtcmne/rtcmne.h>
 #include <../plugins/averaging/averaging.h>
 #include <../plugins/covariance/covariance.h>
@@ -62,6 +60,13 @@
 #include <../plugins/neuronalconnectivity/neuronalconnectivity.h>
 #include <../plugins/writetofile/writetofile.h>
 #include <../plugins/hpi/hpi.h>
+//#include <../plugins/dummytoolbox/dummytoolbox.h>
+#ifdef WITHLSL
+#include <../plugins/lsladapter/lsladapter.h>
+#endif
+#ifdef WITHBRAINFLOW
+#include <../plugins/brainflowboard/brainflowboard.h>
+#endif
 #endif
 
 //=============================================================================================================
@@ -108,16 +113,20 @@ void PluginManager::loadPlugins(const QString& dir)
     //lObjects << new GUSBAMPPLUGIN::GUSBAmp;
     //lObjects << new EEGOSPORTSPLUGIN::EEGoSports;
     //lObjects << new BRAINAMPPLUGIN::BrainAMP;
-    //lObjects << new TMSIPLUGIN::TMSI;
-    //lObjects << new LSLADAPTERPLUGIN::LSLAdapter;
-    lObjects << new DUMMYTOOLBOXPLUGIN::DummyToolbox;
+    lObjects << new TMSIPLUGIN::TMSI;
     lObjects << new RTCMNEPLUGIN::RtcMne;
-    lObjects << new RTCMUSICPLUGIN::RtcMusic;
     lObjects << new AVERAGINGPLUGIN::Averaging;
     lObjects << new COVARIANCEPLUGIN::Covariance;
     lObjects << new NOISEREDUCTIONPLUGIN::NoiseReduction;
-    lObjects << new SSVEPBCIPLUGIN::SsvepBci;
     lObjects << new NEURONALCONNECTIVITYPLUGIN::NeuronalConnectivity;
+    //lObjects << new DUMMYTOOLBOXPLUGIN::DummyToolbox;
+#ifdef WITHLSL
+    lObjects << new LSLADAPTERPLUGIN::LSLAdapter;
+#endif
+
+#ifdef WITHBRAINFLOW
+    lObjects << new BRAINFLOWBOARDPLUGIN::BrainFlowBoard;
+#endif
 
     for(int i = 0; i < lObjects.size(); ++i) {
         // IPlugin
