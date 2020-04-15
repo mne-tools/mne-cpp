@@ -27,7 +27,6 @@ jobs:
         cd qt5_shadow
         # Configure Qt5
         ../qt5/configure -static -release -prefix "../Qt5_binaries" -skip webengine -nomake tools -nomake tests -nomake examples -no-dbus -no-ssl -no-pch -opensource -confirm-license
-        # Compile Qt5
         make module-qtbase module-qtsvg module-qtcharts module-qt3d -j2
         make install -j2
     - name: Configure and compile MNE-CPP
