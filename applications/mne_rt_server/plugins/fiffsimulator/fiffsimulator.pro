@@ -62,13 +62,13 @@ contains(MNECPP_CONFIG, static) {
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
+    LIBS += -lMNE$${MNE_LIB_VERSION}Communicationd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Communicationd
+            -lMNE$${MNE_LIB_VERSION}Utilsd \
 } else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
+    LIBS += -lMNE$${MNE_LIB_VERSION}Communication \
             -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Communication
+            -lMNE$${MNE_LIB_VERSION}Utils \
 }
 
 SOURCES += \
