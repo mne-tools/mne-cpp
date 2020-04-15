@@ -128,11 +128,11 @@ contains(MNECPP_CONFIG, withCodeCov) {
 }
 
 # OpenMP
-win32:!contains(MNECPP_CONFIG, wasm) {
+win32:!contains(MNECPP_CONFIG, wasm):!contains(MNECPP_CONFIG, static) {
     QMAKE_CXXFLAGS  +=  -openmp
     #QMAKE_LFLAGS    +=  -openmp
 }
-unix:!macx:!contains(MNECPP_CONFIG, wasm) {
+unix:!macx:!contains(MNECPP_CONFIG, wasm):!contains(MNECPP_CONFIG, static) {
     QMAKE_CXXFLAGS  +=  -fopenmp
     QMAKE_LFLAGS    +=  -fopenmp
 }

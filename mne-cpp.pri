@@ -132,7 +132,7 @@ QMAKE_TARGET_COPYRIGHT = Copyright (C) 2019 Authors of mne-cpp. All rights reser
 ## To build MNE Scan with LSL support: qmake MNECPP_CONFIG+=withLsl
 
 # Default flags
-MNECPP_CONFIG += dispOpenGL
+MNECPP_CONFIG += dispOpenGL static
 
 # Minimal version needs at least qt version 5.2.1
 !minQtVersion(5, 2, 1) {
@@ -150,6 +150,10 @@ MNECPP_CONFIG += dispOpenGL
 contains(MNECPP_CONFIG, wasm) {
     message("The wasm flag was detected. Building static version of MNE-CPP.")
     MNECPP_CONFIG += static
+}
+
+contains(MNECPP_CONFIG, static) {
+    message("The static flag was detected. Building static version of MNE-CPP.")
 }
 
 ########################################### DIRECTORY DEFINITIONS #############################################
