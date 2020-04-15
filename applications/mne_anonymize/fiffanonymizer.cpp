@@ -614,13 +614,13 @@ void FiffAnonymizer::dir2tag(FiffTag::SPtr pTag)
     if(m_pOutDir->size() > 0) {
         QByteArray pInt8(sizeof(fiff_int_t),0);
         for(int i=0;i<m_pOutDir->size();++i) {
-            memcpy(&pInt8,reinterpret_cast<char*>(m_pOutDir->at(i).kind),sizeof(fiff_int_t));
+            memcpy(&pInt8,reinterpret_cast<const char*>(&m_pOutDir->at(i).kind),sizeof(fiff_int_t));
             pTag->append(pInt8);
-            memcpy(&pInt8,reinterpret_cast<char*>(m_pOutDir->at(i).type),sizeof(fiff_int_t));
+            memcpy(&pInt8,reinterpret_cast<const char*>(&m_pOutDir->at(i).type),sizeof(fiff_int_t));
             pTag->append(pInt8);
-            memcpy(&pInt8,reinterpret_cast<char*>(m_pOutDir->at(i).size),sizeof(fiff_int_t));
+            memcpy(&pInt8,reinterpret_cast<const char*>(&m_pOutDir->at(i).size),sizeof(fiff_int_t));
             pTag->append(pInt8);
-            memcpy(&pInt8,reinterpret_cast<char*>(m_pOutDir->at(i).pos),sizeof(fiff_int_t));
+            memcpy(&pInt8,reinterpret_cast<const char*>(&m_pOutDir->at(i).pos),sizeof(fiff_int_t));
             pTag->append(pInt8);
         }
     }

@@ -111,6 +111,7 @@ public:
      */
     FiffAnonymizer& operator = (const FiffAnonymizer &t)
     {
+        Q_UNUSED(t)
         return *this;
     }
 
