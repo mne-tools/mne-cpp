@@ -60,12 +60,13 @@ contains(MNECPP_CONFIG, static) {
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
-            -lMNE$${MNE_LIB_VERSION}Fiffd
+    LIBS += -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Utilsd
 } else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
-            -lMNE$${MNE_LIB_VERSION}Fiff
+    LIBS += -lMNE$${MNE_LIB_VERSION}Fiff \
+            -lMNE$${MNE_LIB_VERSION}Utils
 }
+
 
 SOURCES += \
     test_fiff_digitizer.cpp
