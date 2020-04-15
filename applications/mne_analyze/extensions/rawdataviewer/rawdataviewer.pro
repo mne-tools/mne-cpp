@@ -82,6 +82,7 @@ CONFIG(debug, debug|release) {
 DESTDIR = $${MNE_BINARY_DIR}/mne_analyze_extensions
 
 SOURCES += \
+    annotationdelegate.cpp \
     annotationmodel.cpp \
     annotationview.cpp \
     rawdataviewer.cpp \
@@ -89,6 +90,7 @@ SOURCES += \
     fiffrawviewdelegate.cpp
 
 HEADERS += \
+    annotationdelegate.h \
     annotationmodel.h \
     annotationview.h \
     rawdataviewer_global.h \

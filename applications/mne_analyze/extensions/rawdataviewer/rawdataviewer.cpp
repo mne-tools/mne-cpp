@@ -125,7 +125,7 @@ void RawDataViewer::init()
     //m_pSubWindow->show();
 
     //create AnnotationModel
-    //m_pAnnotationModel = new AnnotationModel();
+    m_pAnnotationModel = QSharedPointer<AnnotationModel>(new AnnotationModel(this));
 }
 
 //=============================================================================================================
@@ -258,10 +258,15 @@ void RawDataViewer::setUpControls()
 
     //Annotation Widget
     AnnotationView* annotationWidget = new AnnotationView();
+    annotationWidget->setModel(m_pAnnotationModel);
+//    annotationWidget->passFiffParams(m_pRawModel->absoluteFirstSample(),
+//                                     m_pRawModel->absoluteLastSample(),
+//                                     m_pRawModel->getFiffInfo()->sfreq);
+
     connect(annotationWidget, &AnnotationView::activeEventsChecked,
             m_pFiffRawView.data(), &FiffRawView::toggleDisplayEvent);
-//    connect(m_pFiffRawView.data(), &FiffRawView::sendSamplePos,
-//            annotationWidget, &AnnotationView::addAnnotationToModel);
+    connect(m_pFiffRawView.data(), &FiffRawView::sendSamplePos,
+            annotationWidget, &AnnotationView::addAnnotationToModel);
 
     //Set up layout w/ control widgets
     m_pLayout->addWidget(scalingWidget);

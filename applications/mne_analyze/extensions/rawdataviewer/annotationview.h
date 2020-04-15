@@ -64,6 +64,10 @@ public:
 
     void updateComboBox(const QString &currentAnnotationType);
 
+    void setModel(QSharedPointer<AnnotationModel> pAnnModel);
+
+    void passFiffParams(int iFirst,int iLast,float fFreq);
+
 public slots:
 
 //    //=========================================================================================================
@@ -94,6 +98,7 @@ public slots:
 //    void addNewEventType();
 
     void onActiveEventsChecked(int iCheckBoxState);
+
     void onFilterTypesChanged(const QString& sFilType);
 
 signals:
@@ -104,13 +109,20 @@ public slots:
 
     void addAnnotationToModel(const int iSample);
 
+private slots:
+
+    void onDataChanged();
+
 private:
 
     void initGUIFunctionality();
+    void initMSVCSettings();
 
     Ui::EventWindowDockWidget*                      ui;
 
     int                                             m_iCheckState;
+
+    int                                             m_iLastSampClicked;
 
     QSharedPointer<AnnotationModel>                 m_pAnnModel;
 
