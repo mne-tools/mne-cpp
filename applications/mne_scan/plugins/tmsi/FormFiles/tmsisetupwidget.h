@@ -45,8 +45,15 @@
 //=============================================================================================================
 
 #include <QtWidgets>
-#include "../ui_tmsisetup.h"
 #include "tmsiimpedanceview.h"
+
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace ui {
+    class TMSISetupClass;
+}
 
 //=============================================================================================================
 // DEFINE NAMESPACE TMSIPLUGIN
@@ -56,7 +63,7 @@ namespace TMSIPLUGIN
 {
 
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// TMSIPLUGIN FORWARD DECLARATIONS
 //=============================================================================================================
 
 class TMSI;
@@ -119,9 +126,9 @@ private:
      */
     void setTriggerProperties();
 
-    TMSI*               m_pTMSI;                 /**< a pointer to corresponding TMSI.*/
+    TMSI*                   m_pTMSI;                 /**< a pointer to corresponding TMSI.*/
 
-    Ui::TMSISetupClass  ui;                      /**< the user interface for the TMSISetupWidget.*/
+    Ui::TMSISetupClass*     m_pUi;                   /**< the user interface for the TMSISetupWidget.*/
 };
 } // NAMESPACE
 

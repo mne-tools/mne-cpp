@@ -39,6 +39,7 @@
 
 #include "tmsisetupwidget.h"
 #include "../tmsi.h"
+#include "../ui_tmsisetup.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -59,37 +60,38 @@ using namespace TMSIPLUGIN;
 TMSISetupWidget::TMSISetupWidget(TMSI* pTMSI, QWidget* parent)
 : QWidget(parent)
 , m_pTMSI(pTMSI)
+, m_pUi(new Ui::TMSISetupClass)
 {
-    ui.setupUi(this);
+    m_pUi->setupUi(this);
 
     //Connect device sampling properties
-    connect(ui.m_spinBox_SamplingFreq, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+    connect(m_pUi->m_spinBox_SamplingFreq, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             this, &TMSISetupWidget::setDeviceSamplingProperties);
-    connect(ui.m_spinBox_NumberOfChannels, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+    connect(m_pUi->m_spinBox_NumberOfChannels, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             this, &TMSISetupWidget::setDeviceSamplingProperties);
-    connect(ui.m_spinBox_SamplesPerBlock, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+    connect(m_pUi->m_spinBox_SamplesPerBlock, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             this, &TMSISetupWidget::setDeviceSamplingProperties);
-    connect(ui.m_checkBox_UseCommonAverage, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+    connect(m_pUi->m_checkBox_UseCommonAverage, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &TMSISetupWidget::setDeviceSamplingProperties);
 
     //Connect channel corrections
-    connect(ui.m_checkBox_UseChExponent, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+    connect(m_pUi->m_checkBox_UseChExponent, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &TMSISetupWidget::setDeviceSamplingProperties);
-    connect(ui.m_checkBox_UseUnitGain, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+    connect(m_pUi->m_checkBox_UseUnitGain, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &TMSISetupWidget::setDeviceSamplingProperties);
-    connect(ui.m_checkBox_UseUnitOffset, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+    connect(m_pUi->m_checkBox_UseUnitOffset, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &TMSISetupWidget::setDeviceSamplingProperties);
 
     //Connect debug file
-    connect(ui.m_checkBox_WriteDriverDebugToFile, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+    connect(m_pUi->m_checkBox_WriteDriverDebugToFile, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &TMSISetupWidget::setWriteToDebugFile);
 
     //Connect trigger properties
-    connect(ui.m_spinBox_BeepLength, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+    connect(m_pUi->m_spinBox_BeepLength, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             this, &TMSISetupWidget::setTriggerProperties);
-    connect(ui.m_checkBox_EnableBeep, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+    connect(m_pUi->m_checkBox_EnableBeep, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &TMSISetupWidget::setTriggerProperties);
-    connect(ui.m_checkBox_EnableKeyboardTrigger, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+    connect(m_pUi->m_checkBox_EnableKeyboardTrigger, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &TMSISetupWidget::setTriggerProperties);
 
     //Fill info box
@@ -101,8 +103,8 @@ TMSISetupWidget::TMSISetupWidget(TMSI* pTMSI, QWidget* parent)
     QTextStream in(&file);
     while (!in.atEnd()) {
         QString line = in.readLine();
-        ui.m_qTextBrowser_Information->insertHtml(line);
-        ui.m_qTextBrowser_Information->insertHtml("<br>");
+        m_pUi->m_qTextBrowser_Information->insertHtml(line);
+        m_pUi->m_qTextBrowser_Information->insertHtml("<br>");
     }
 }
 
@@ -117,55 +119,55 @@ TMSISetupWidget::~TMSISetupWidget()
 void TMSISetupWidget::initGui()
 {
     //Init device sampling properties
-    ui.m_spinBox_SamplingFreq->setValue(m_pTMSI->m_iSamplingFreq);
-    ui.m_spinBox_NumberOfChannels->setValue(m_pTMSI->m_iNumberOfChannels);
-    ui.m_spinBox_SamplesPerBlock->setValue(m_pTMSI->m_iSamplesPerBlock);
-    ui.m_checkBox_UseCommonAverage->setChecked(m_pTMSI->m_bUseCommonAverage);
+    m_pUi->m_spinBox_SamplingFreq->setValue(m_pTMSI->m_iSamplingFreq);
+    m_pUi->m_spinBox_NumberOfChannels->setValue(m_pTMSI->m_iNumberOfChannels);
+    m_pUi->m_spinBox_SamplesPerBlock->setValue(m_pTMSI->m_iSamplesPerBlock);
+    m_pUi->m_checkBox_UseCommonAverage->setChecked(m_pTMSI->m_bUseCommonAverage);
 
     //Init channel corrections
-    ui.m_checkBox_UseChExponent->setChecked(m_pTMSI->m_bUseChExponent);
-    ui.m_checkBox_UseUnitGain->setChecked(m_pTMSI->m_bUseUnitGain);
-    ui.m_checkBox_UseUnitOffset->setChecked(m_pTMSI->m_bUseUnitOffset);
+    m_pUi->m_checkBox_UseChExponent->setChecked(m_pTMSI->m_bUseChExponent);
+    m_pUi->m_checkBox_UseUnitGain->setChecked(m_pTMSI->m_bUseUnitGain);
+    m_pUi->m_checkBox_UseUnitOffset->setChecked(m_pTMSI->m_bUseUnitOffset);
 
     //Init write to file
-    ui.m_checkBox_WriteDriverDebugToFile->setChecked(m_pTMSI->m_bWriteDriverDebugToFile);
+    m_pUi->m_checkBox_WriteDriverDebugToFile->setChecked(m_pTMSI->m_bWriteDriverDebugToFile);
 
     //Init trigger properties
-    ui.m_spinBox_BeepLength->setValue(m_pTMSI->m_iTriggerInterval);
-    ui.m_checkBox_EnableBeep->setChecked(m_pTMSI->m_bBeepTrigger);
+    m_pUi->m_spinBox_BeepLength->setValue(m_pTMSI->m_iTriggerInterval);
+    m_pUi->m_checkBox_EnableBeep->setChecked(m_pTMSI->m_bBeepTrigger);
 
-    ui.m_checkBox_EnableKeyboardTrigger->setChecked(m_pTMSI->m_bUseKeyboardTrigger);
+    m_pUi->m_checkBox_EnableKeyboardTrigger->setChecked(m_pTMSI->m_bUseKeyboardTrigger);
 }
 
 //=============================================================================================================
 
 void TMSISetupWidget::setDeviceSamplingProperties()
 {
-    m_pTMSI->m_iSamplingFreq = ui.m_spinBox_SamplingFreq->value();
-    m_pTMSI->m_iNumberOfChannels = ui.m_spinBox_NumberOfChannels->value();
-    m_pTMSI->m_iSamplesPerBlock = ui.m_spinBox_SamplesPerBlock->value();
+    m_pTMSI->m_iSamplingFreq = m_pUi->m_spinBox_SamplingFreq->value();
+    m_pTMSI->m_iNumberOfChannels = m_pUi->m_spinBox_NumberOfChannels->value();
+    m_pTMSI->m_iSamplesPerBlock = m_pUi->m_spinBox_SamplesPerBlock->value();
 
-    m_pTMSI->m_bUseChExponent = ui.m_checkBox_UseChExponent->isChecked();
-    m_pTMSI->m_bUseUnitGain = ui.m_checkBox_UseUnitGain->isChecked();
-    m_pTMSI->m_bUseUnitOffset = ui.m_checkBox_UseUnitOffset->isChecked();
+    m_pTMSI->m_bUseChExponent = m_pUi->m_checkBox_UseChExponent->isChecked();
+    m_pTMSI->m_bUseUnitGain = m_pUi->m_checkBox_UseUnitGain->isChecked();
+    m_pTMSI->m_bUseUnitOffset = m_pUi->m_checkBox_UseUnitOffset->isChecked();
 
-    m_pTMSI->m_bUseCommonAverage = ui.m_checkBox_UseCommonAverage->isChecked();
+    m_pTMSI->m_bUseCommonAverage = m_pUi->m_checkBox_UseCommonAverage->isChecked();
 }
 
 //=============================================================================================================
 
 void TMSISetupWidget::setWriteToDebugFile()
 {
-    m_pTMSI->m_bWriteDriverDebugToFile = ui.m_checkBox_WriteDriverDebugToFile->isChecked();
+    m_pTMSI->m_bWriteDriverDebugToFile = m_pUi->m_checkBox_WriteDriverDebugToFile->isChecked();
 }
 
 //=============================================================================================================
 
 void TMSISetupWidget::setTriggerProperties()
 {
-    m_pTMSI->m_iTriggerInterval = ui.m_spinBox_BeepLength->value();
-    m_pTMSI->m_bBeepTrigger = ui.m_checkBox_EnableBeep->isChecked();
-    m_pTMSI->m_bUseKeyboardTrigger = ui.m_checkBox_EnableKeyboardTrigger->isChecked();
+    m_pTMSI->m_iTriggerInterval = m_pUi->m_spinBox_BeepLength->value();
+    m_pTMSI->m_bBeepTrigger = m_pUi->m_checkBox_EnableBeep->isChecked();
+    m_pTMSI->m_bUseKeyboardTrigger = m_pUi->m_checkBox_EnableKeyboardTrigger->isChecked();
 }
 
 //=============================================================================================================

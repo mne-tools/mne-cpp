@@ -1,4 +1,4 @@
-//=============================================================================================================
+﻿//=============================================================================================================
 /**
  * @file     ftbuffersetupwidget.h
  * @author   Gabriel B Motta <gbmotta@mgh.harvard.edu>
@@ -39,7 +39,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_ftbuffersetup.h"
 #include "../ftbuffer.h"
 #include "../ftbuffproducer.h"
 #include "../ftconnector.h"
@@ -51,6 +50,14 @@
 #include <QtWidgets>
 
 //=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace Ui {
+    class FtBufferSetupWidgetClass;
+}
+
+//=============================================================================================================
 // DEFINE NAMESPACE FtBufferPlugin
 //=============================================================================================================
 
@@ -58,7 +65,7 @@ namespace FTBUFFERPLUGIN
 {
 
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// FTBUFFERPLUGIN FORWARD DECLARATIONS
 //=============================================================================================================
 
 class FtBuffer;
@@ -137,11 +144,11 @@ signals:
                        int port);
 
 private:
-    FtBuffer*   m_pFtBuffer;            /**< Holds a pointer to corresponding FtBuffer.*/
+    FtBuffer*   m_pFtBuffer;                /**< Holds a pointer to corresponding FtBuffer.*/
 
-    QString     m_sSettingsPath;        /**< The settings path to store the GUI settings to. */
+    QString     m_sSettingsPath;            /**< The settings path to store the GUI settings to. */
 
-    Ui::FtBufferSetupWidgetClass ui;	/**< Holds the user interface for the FtBufferSetupWidget.*/
+    Ui::FtBufferSetupWidgetClass* m_pUi;	/**< Holds the user interface for the FtBufferSetupWidget.*/
 };
 
 } // NAMESPACE

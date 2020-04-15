@@ -55,7 +55,7 @@ CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
             -lscMeasd \
             -lscDispd \
-            -lscSharedd
+            -lscShared
 } else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
             -lscMeas \
