@@ -60,7 +60,7 @@ CONFIG(debug, debug|release) {
             -lscDispd \
             -lscSharedd
 } else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Communicationd \
+    LIBS += -lMNE$${MNE_LIB_VERSION}Communication \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Utils \
