@@ -1780,26 +1780,26 @@ ComputeFwd::ComputeFwd(ComputeFwdSettings* p_settings)
 
 ComputeFwd::~ComputeFwd()
 {
-//    //ToDo Garbage collection
-//    for (int k = 0; k < nspace; k++)
-//        if(spaces[k])
-//            delete spaces[k];
-//    if(mri_head_t)
-//        delete mri_head_t;
-//    if(meg_head_t)
-//        delete meg_head_t;
-//    if(megcoils)
-//        delete megcoils;
-//    if(eegels)
-//        delete eegels;
-//    if(meg_forward)
-//        delete meg_forward;
-//    if(eeg_forward)
-//        delete eeg_forward;
-//    if(meg_forward_grad)
-//        delete meg_forward_grad;
-//    if(eeg_forward_grad)
-//        delete eeg_forward_grad;
+    //ToDo Garbage collection
+    for (int k = 0; k < nspace; k++)
+        if(spaces[k])
+            delete spaces[k];
+    if(mri_head_t)
+        delete mri_head_t;
+    if(meg_head_t)
+        delete meg_head_t;
+    if(megcoils)
+        delete megcoils;
+    if(eegels)
+        delete eegels;
+    if(meg_forward)
+        delete meg_forward;
+    if(eeg_forward)
+        delete eeg_forward;
+    if(meg_forward_grad)
+        delete meg_forward_grad;
+    if(eeg_forward_grad)
+        delete eeg_forward_grad;
 }
 
 //=============================================================================================================
@@ -2223,10 +2223,11 @@ void ComputeFwd::calculateFwd()
 void ComputeFwd::updateHeadPos(FiffCoordTransOld* meg_head_t)
 {
     FwdCoilSet* megcoilsNew = megcoils->dup_coil_set(meg_head_t);
+    FwdCoilSet* compcoilsNew = compcoils->dup_coil_set(meg_head_t);
     if ((FwdBemModel::compute_forward_meg(spaces,
                                           nspace,
-                                          megcoils,
-                                          compcoils,
+                                          megcoilsNew,
+                                          compcoilsNew,
                                           comp_data,
                                           settings->fixed_ori,
                                           bem_model,

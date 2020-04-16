@@ -102,7 +102,7 @@ struct FwdResult {
     FwdBemModel *bem_model;                         /* BEM model definition */
     Eigen::Vector3f *r0;                            /* Sphere model origin */
     bool use_threads;                               /* Parallelize with threads? */
-    MNELIB::MneNamedMatrix **megForward;                  /* The results */
+    MNELIB::MneNamedMatrix **megForward;            /* The results */
     MNELIB::MneNamedMatrix **megForwardGrad;
 };
 
@@ -130,12 +130,6 @@ public:
      * Destructs the Compute Forward solution class
      */
     virtual ~ComputeFwd();
-
-    //=========================================================================================================
-    /**
-     * init forward caclulation
-     */
-    void init(ComputeFwdSettings* p_settings);
 
     //=========================================================================================================
     /**
