@@ -43,12 +43,6 @@ Copyright (C) 2017, Christoph Dinh, Lars Debor, Simon Heinke and Matti Hamalaine
 #include "../Interfaces/IExtension.h"
 #include "communicator.h"
 
-#ifdef STATICLIB
-#include <../extensions/dataloader/dataloader.h>
-#include <../extensions/datamanager/datamanager.h>
-#include <../extensions/rawdataviewer/rawdataviewer.h>
-#endif
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -86,7 +80,7 @@ ExtensionManager::~ExtensionManager()
 
 void ExtensionManager::loadExtensionsFromDirectory(const QString& dir)
 {
-#ifdef STATICLIB
+#ifdef STATICBUILD
     Q_UNUSED(dir);
 
     const auto staticInstances = QPluginLoader::staticInstances();
