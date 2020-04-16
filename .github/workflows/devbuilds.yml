@@ -64,10 +64,14 @@ jobs:
         make install -j2
     - name: Configure and compile MNE-CPP
       run: |
-        ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=static
+        ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples MNECPP_CONFIG+=static
         make -j2
     - name: Package binaries
       run: |
+        # Delete folders which we do not want to ship
+        rm -r bin/mne_rt_server_plugins
+        rm -r bin/mne_scan_plugins
+        rm -r bin/mne_analyze_extensions
         # Creating archive of everything in the bin directory
         tar cfvz ../mne-cpp-linux-static-x86_64.tar.gz bin/.
     - name: Deploy binaries with dev_build release on Github
@@ -103,10 +107,14 @@ jobs:
         make install -j2
     - name: Configure and compile MNE-CPP
       run: |
-        ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=static
+        ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples MNECPP_CONFIG+=static
         make -j2
     - name: Package binaries
       run: |
+        # Delete folders which we do not want to ship
+        rm -r bin/mne_rt_server_plugins
+        rm -r bin/mne_scan_plugins
+        rm -r bin/mne_analyze_extensions
         # Creating archive of all macos deployed applications
         tar cfvz mne-cpp-macos-static-x86_64.tar.gz bin/.
     - name: Deploy MNE Scan binaries with dev_build release on Github
@@ -350,6 +358,7 @@ jobs:
           # Hide codecov output since it corrupts the log too much
           codecov > /dev/null
         done
+        
   Doxygen:
     runs-on: ubuntu-latest
     needs: UpdateDevTag
