@@ -226,9 +226,11 @@ macx {
     plugins.files = $${ROOT_DIR}/bin/mne_scan_plugins
     QMAKE_BUNDLE_DATA += plugins
 
-    # 3 entries returned in DEPLOY_CMD
-    DEPLOY_CMD = $$macDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
-    QMAKE_POST_LINK += $${DEPLOY_CMD}
+    !contains(MNECPP_CONFIG, static) {
+        # 3 entries returned in DEPLOY_CMD
+        DEPLOY_CMD = $$macDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
+        QMAKE_POST_LINK += $${DEPLOY_CMD}
+    }
 
     QMAKE_CLEAN += -r $$member(DEPLOY_CMD, 1)
 }
