@@ -82,6 +82,39 @@ using namespace UTILSLIB;
 // MAIN
 //=============================================================================================================
 
+#ifdef STATICBUILD
+Q_IMPORT_PLUGIN(BabyMEG)
+Q_IMPORT_PLUGIN(FiffSimulator)
+Q_IMPORT_PLUGIN(Natus)
+Q_IMPORT_PLUGIN(Covariance)
+Q_IMPORT_PLUGIN(NoiseReduction)
+Q_IMPORT_PLUGIN(RtcMne)
+Q_IMPORT_PLUGIN(Averaging)
+Q_IMPORT_PLUGIN(NeuronalConnectivity)
+Q_IMPORT_PLUGIN(FtBuffer)
+Q_IMPORT_PLUGIN(WriteToFile)
+Q_IMPORT_PLUGIN(Hpi)
+//Q_IMPORT_PLUGIN(DummyToolbox)
+#ifdef WITHGUSBAMP
+Q_IMPORT_PLUGIN(GUSBAmp)
+#endif
+#ifdef WITHBRAINAMP
+Q_IMPORT_PLUGIN(BrainAMP)
+#endif
+#ifdef WITHEEGOSPORTS
+Q_IMPORT_PLUGIN(EEGoSports)
+#endif
+#ifdef WITHLSL
+Q_IMPORT_PLUGIN(LSLAdapter)
+#endif
+#ifdef WITHTMSI
+Q_IMPORT_PLUGIN(TMSI)
+#endif
+#ifdef WITHBRAINFLOW
+Q_IMPORT_PLUGIN(BrainFlowBoard)
+#endif
+#endif
+
 //=============================================================================================================
 /**
  * The function main marks the entry point of the program.
@@ -93,24 +126,38 @@ using namespace UTILSLIB;
  */
 int main(int argc, char *argv[])
 {
-    #ifdef STATICLIB
-    Q_INIT_RESOURCE(disp3d);
-    Q_INIT_RESOURCE(mne);
-    Q_INIT_RESOURCE(averaging);
+    // When building a static version of MNE Scan we have to init all resource (.qrc) files here manually
+    #ifdef STATICBUILD
     Q_INIT_RESOURCE(babymeg);
-    Q_INIT_RESOURCE(covariance);
-    Q_INIT_RESOURCE(ecgsimulator);
     Q_INIT_RESOURCE(fiffsimulator);
-    Q_INIT_RESOURCE(neuromag);
+    Q_INIT_RESOURCE(covariance);
     Q_INIT_RESOURCE(noisereduction);
-    Q_INIT_RESOURCE(reference);
-    Q_INIT_RESOURCE(ssvepbci);
+    Q_INIT_RESOURCE(rtcmne);
+    Q_INIT_RESOURCE(averaging);
+    Q_INIT_RESOURCE(writetofile);
+    Q_INIT_RESOURCE(hpi);
+    Q_INIT_RESOURCE(disp3d);
     Q_INIT_RESOURCE(scDisp);
+    #ifdef WITHBRAINAMP
+    Q_INIT_RESOURCE(brainamp);
+    #endif
+    #ifdef WITHEEGOSPORTS
+    Q_INIT_RESOURCE(eegosports);
+    #endif
+    #ifdef WITHGUSBAMP
+    Q_INIT_RESOURCE(gusbamp);
+    #endif
+    #ifdef WITHTMSI
+    Q_INIT_RESOURCE(tmsi);
+    #endif
     #endif
 
     qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QApplication app(argc, argv);
     //app.setAttribute(Qt::AA_DontCreateNativeWidgetSiblings, true);
+
+    int id = QFontDatabase::addApplicationFont(":/fonts/Roboto-Light.ttf");
+    app.setFont(QFont(QFontDatabase::applicationFontFamilies(id).at(0)));
 
     //Store application info to use QSettings
     QApplication::setOrganizationName("MNE-CPP");

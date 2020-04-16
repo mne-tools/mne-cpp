@@ -37,7 +37,7 @@
 
 #include <QtCore/qglobal.h>
 
-#if defined(STATICLIB)
+#if defined(STATICBUILD)
 #  define FTBUFFER_EXPORT
 #elif defined(FTBUFFER_LIBRARY)
 #  define FTBUFFER_EXPORT Q_DECL_EXPORT

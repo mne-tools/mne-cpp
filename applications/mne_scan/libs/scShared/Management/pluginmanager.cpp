@@ -44,33 +44,6 @@
 #include "../Interfaces/IAlgorithm.h"
 #include "../Interfaces/IIO.h"
 
-#ifdef STATICLIB
-#include <../plugins/fiffsimulator/fiffsimulator.h>
-#include <../plugins/babymeg/babymeg.h>
-#include <../plugins/natus/natus.h>
-#include <../plugins/ftbuffer/ftbuffer.h>
-//#include <../plugins/gusbamp/gusbamp.h>
-//#include <../plugins/eegosports/eegosports.h>
-//#include <../plugins/brainamp/brainamp.h>
-#include <../plugins/rtcmne/rtcmne.h>
-#include <../plugins/averaging/averaging.h>
-#include <../plugins/covariance/covariance.h>
-#include <../plugins/noisereduction/noisereduction.h>
-#include <../plugins/neuronalconnectivity/neuronalconnectivity.h>
-#include <../plugins/writetofile/writetofile.h>
-#include <../plugins/hpi/hpi.h>
-//#include <../plugins/dummytoolbox/dummytoolbox.h>
-#ifdef WITHLSL
-#include <../plugins/lsladapter/lsladapter.h>
-#endif
-#ifdef WITHBRAINFLOW
-#include <../plugins/brainflowboard/brainflowboard.h>
-#endif
-#ifdef WITHTMSI
-#include <../plugins/tmsi/tmsi.h>
-#endif
-#endif
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -103,57 +76,37 @@ PluginManager::~PluginManager()
 
 void PluginManager::loadPlugins(const QString& dir)
 {
-#ifdef STATICLIB
+#ifdef STATICBUILD
     Q_UNUSED(dir);
 
-    // In case of a static build we have to load plugins manually.
-    QList<QObject*> lObjects;
-    lObjects << new FIFFSIMULATORPLUGIN::FiffSimulator;
-//    lObjects << new BABYMEGPLUGIN::BabyMEG;
-//    lObjects << new NATUSPLUGIN::Natus;
-//    lObjects << new FTBUFFERPLUGIN::FtBuffer;
-//    //lObjects << new GUSBAMPPLUGIN::GUSBAmp;
-//    //lObjects << new EEGOSPORTSPLUGIN::EEGoSports;
-//    //lObjects << new BRAINAMPPLUGIN::BrainAMP;
-//    lObjects << new RTCMNEPLUGIN::RtcMne;
-//    lObjects << new AVERAGINGPLUGIN::Averaging;
-//    lObjects << new COVARIANCEPLUGIN::Covariance;
-//    lObjects << new NOISEREDUCTIONPLUGIN::NoiseReduction;
-//    lObjects << new NEURONALCONNECTIVITYPLUGIN::NeuronalConnectivity;
-    //lObjects << new DUMMYTOOLBOXPLUGIN::DummyToolbox;
-#ifdef WITHLSL
-    lObjects << new LSLADAPTERPLUGIN::LSLAdapter;
-#endif    
-#ifdef WITHTMSI
-    lObjects << new TMSIPLUGIN::TMSI;
-#endif
-#ifdef WITHBRAINFLOW
-    lObjects << new BRAINFLOWBOARDPLUGIN::BrainFlowBoard;
-#endif
-
-    for(int i = 0; i < lObjects.size(); ++i) {
+    const auto staticInstances = QPluginLoader::staticInstances();
+    qDebug() << "staticInstances.size()" << staticInstances.size();
+    for(QObject *plugin : staticInstances) {
         // IPlugin
-        if(lObjects[i]) {
-            // plugins are always disabled when they are first loaded
-            m_qVecPlugins.push_back(qobject_cast<IPlugin*>(lObjects[i]));
+        if(plugin) {
+            if(IPlugin* pIPlugin = qobject_cast<IPlugin*>(plugin)) {
+                // plugins are always disabled when they are first loaded
+                m_qVecPlugins.push_back(pIPlugin);
 
-            IPlugin::PluginType pluginType = qobject_cast<IPlugin*>(lObjects[i])->getType();
+                IPlugin::PluginType pluginType = pIPlugin->getType();
+                QString msg = "Plugin " + pIPlugin->getName() + " loaded.";
 
-            // ISensor
-            if(pluginType == IPlugin::_ISensor) {
-                ISensor* pSensor = qobject_cast<ISensor*>(lObjects[i]);
-                if(pSensor) {
-                    m_qVecSensorPlugins.push_back(pSensor);
-                    qDebug() << "Sensor " << pSensor->getName() << " loaded.";
+                // ISensor
+                if(pluginType == IPlugin::_ISensor) {
+                    if(ISensor* pSensor = qobject_cast<ISensor*>(pIPlugin)) {
+                        m_qVecSensorPlugins.push_back(pSensor);
+                        qDebug() << "Sensor" << pSensor->getName() << "loaded.";
+                    }
                 }
-            }
-            // IAlgorithm
-            else if(pluginType == IPlugin::_IAlgorithm) {
-                IAlgorithm* pAlgorithm = qobject_cast<IAlgorithm*>(lObjects[i]);
-                if(pAlgorithm) {
-                    m_qVecAlgorithmPlugins.push_back(pAlgorithm);
-                    qDebug() << "RTAlgorithm " << pAlgorithm->getName() << " loaded.";
+                // IAlgorithm
+                else if(pluginType == IPlugin::_IAlgorithm) {
+                    if(IAlgorithm* pAlgorithm = qobject_cast<IAlgorithm*>(pIPlugin)) {
+                        m_qVecAlgorithmPlugins.push_back(pAlgorithm);
+                        qDebug() << "RTAlgorithm" << pAlgorithm->getName() << "loaded.";
+                    }
                 }
+
+                emit pluginLoaded(msg);
             }
         } else {
             qDebug() << "Plugin could not be instantiated!";
@@ -185,7 +138,7 @@ void PluginManager::loadPlugins(const QString& dir)
                 if(pSensor)
                 {
                     m_qVecSensorPlugins.push_back(pSensor);
-                    qDebug() << "Sensor " << pSensor->getName() << " loaded.";
+                    qDebug() << "Sensor" << pSensor->getName() << "loaded.";
                 }
             }
             // IAlgorithm
@@ -195,7 +148,7 @@ void PluginManager::loadPlugins(const QString& dir)
                 if(pAlgorithm)
                 {
                     m_qVecAlgorithmPlugins.push_back(pAlgorithm);
-                    qDebug() << "RTAlgorithm " << pAlgorithm->getName() << " loaded.";
+                    qDebug() << "RTAlgorithm" << pAlgorithm->getName() << "loaded.";
                 }
             }
 
