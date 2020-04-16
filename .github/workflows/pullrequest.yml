@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       max-parallel: 6
       matrix:
-        qt: [5.14.1, 5.10.1]
+        qt: [5.14.2, 5.10.1]
         os: [ubuntu-16.04, macos-latest, windows-2016]
 
     steps:
@@ -122,13 +122,13 @@ jobs:
       if: (matrix.os == 'ubuntu-16.04') || (matrix.os == 'macos-latest')
       uses: jurplel/install-qt-action@v2
       with:
-        version: 5.14.1
+        version: 5.14.2
         modules: qtcharts    
     - name: Install Qt (Windows)
       if: matrix.os == 'windows-2016'
       uses: jurplel/install-qt-action@v2
       with:
-        version: 5.14.1
+        version: 5.14.2
         arch: win64_msvc2017_64
         modules: qtcharts
     - name: Install jom (Windows) 
