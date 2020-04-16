@@ -635,7 +635,7 @@ void TMSI::showImpedanceDialog()
         }
 
         if(!m_pTmsiImpedanceWidget->isVisible()) {
-            m_pTmsiImpedanceWidget->setWindowTitle("MNE-X - Measure impedances");
+            m_pTmsiImpedanceWidget->setWindowTitle("MNE Scan - Measure impedances");
             m_pTmsiImpedanceWidget->show();
             m_pTmsiImpedanceWidget->raise();
         }

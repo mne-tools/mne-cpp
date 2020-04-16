@@ -42,7 +42,7 @@ CONFIG += plugin
 
 DEFINES += GUSBAMP_PLUGIN
 
-#contains(QMAKE_HOST.arch, x86_64) { #Compiling MNE-X FOR a 64bit system
+#contains(QMAKE_HOST.arch, x86_64) { #Compiling MNE Scan FOR a 64bit system
 #    exists(C:/Windows/System32/GUSBAmpSDK.dll) {
 #        DEFINES += TAKE_GUSBAmpSDK_DLL
 #    }

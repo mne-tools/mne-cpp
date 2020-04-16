@@ -48,26 +48,22 @@ SUBDIRS += \
     natus \
 
     contains(MNECPP_CONFIG, withBrainAmp) {
-        SUBDIRS += brainamp \         # Build guide -> https://mne-cpp.github.io/pages/development/brainamp.html
+        SUBDIRS += brainamp \           # Build guide -> https://mne-cpp.github.io/pages/development/brainamp.html
     }
-
     contains(MNECPP_CONFIG, withEego) {
         SUBDIRS += eegosports \         # Build guide -> https://mne-cpp.github.io/pages/development/eegosports.html
     }
-
     contains(MNECPP_CONFIG, withGUSBAmp) {
-        SUBDIRS += gusbamp \         # Build guide -> https://mne-cpp.github.io/pages/development/gusbamp.html
+        SUBDIRS += gusbamp \            # Build guide -> https://mne-cpp.github.io/pages/development/gusbamp.html
     }
     contains(MNECPP_CONFIG, withTmsi) {
-        SUBDIRS += tmsi \         # Build guide (Windows only) -> https://mne-cpp.github.io/pages/development/tmsi.html
+        SUBDIRS += tmsi \               # Build guide (Windows only) -> https://mne-cpp.github.io/pages/development/tmsi.html
     }
-
     contains(MNECPP_CONFIG, withBrainFlow) {
-        SUBDIRS += brainflowboard \         # Build guide -> https://mne-cpp.github.io/pages/development/brainflow.html
+        SUBDIRS += brainflowboard \     # Build guide -> https://mne-cpp.github.io/pages/development/brainflow.html
     }
-
     contains(MNECPP_CONFIG, withLsl) {
-        SUBDIRS += lsladapter \             # Build guide -> https://mne-cpp.github.io/pages/development/lsl.html
+        SUBDIRS += lsladapter \         # Build guide -> https://mne-cpp.github.io/pages/development/lsl.html
     }
 
 #Algorithms
