@@ -67,11 +67,15 @@ DESTDIR = $${MNE_BINARY_DIR}
 
 contains(MNECPP_CONFIG, static) {
     CONFIG += static
-    DEFINES += STATICLIB
+    DEFINES += STATICBUILD
+    # For static builds we need to link against the plugins
+    # because we cannot load them dynamically during runtime
     LIBS += -L$${MNE_BINARY_DIR}/mne_analyze_extensions
-    QTPLUGIN += dataloader
-    QTPLUGIN += datamanager
-    QTPLUGIN += rawdataviewer
+    LIBS += -ldataloader \
+            -ldatamanager \
+            -lrawdataviewer \
+} else {
+    CONFIG += shared
 }
 
 LIBS += -L$${MNE_LIBRARY_DIR}
