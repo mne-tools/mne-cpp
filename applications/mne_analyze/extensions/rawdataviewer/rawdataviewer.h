@@ -45,6 +45,7 @@
 #include <anShared/Interfaces/IExtension.h>
 #include "annotationview.h"
 #include "annotationmodel.h"
+#include "annotationdelegate.h"
 
 //=============================================================================================================
 // QT INCLUDES

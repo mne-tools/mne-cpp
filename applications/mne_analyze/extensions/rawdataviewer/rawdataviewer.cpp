@@ -259,9 +259,9 @@ void RawDataViewer::setUpControls()
     //Annotation Widget
     AnnotationView* annotationWidget = new AnnotationView();
     annotationWidget->setModel(m_pAnnotationModel);
-//    annotationWidget->passFiffParams(m_pRawModel->absoluteFirstSample(),
-//                                     m_pRawModel->absoluteLastSample(),
-//                                     m_pRawModel->getFiffInfo()->sfreq);
+    annotationWidget->passFiffParams(m_pRawModel->absoluteFirstSample(),
+                                     m_pRawModel->absoluteLastSample(),
+                                     m_pRawModel->getFiffInfo()->sfreq);
 
     connect(annotationWidget, &AnnotationView::activeEventsChecked,
             m_pFiffRawView.data(), &FiffRawView::toggleDisplayEvent);

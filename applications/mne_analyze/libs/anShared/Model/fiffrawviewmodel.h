@@ -438,6 +438,7 @@ public:
      */
     bool shouldDisplayAnn() const;
 
+    void updateAnnotations(QVector<int>* vAnnData);
 private:
 
     //=========================================================================================================
@@ -536,6 +537,8 @@ private:
     qint32 m_iScrollPos;
 
     bool m_bDispAnn;
+
+    QVector<int>*                       m_vAnnotationsToDisplay;
 };
 
 //=============================================================================================================

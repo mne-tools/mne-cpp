@@ -101,6 +101,7 @@ FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
 , m_iScrollPos(0)
 , m_dScrollDx(1.0)
 , m_bDispAnn(true)
+, m_vAnnotationsToDisplay(Q_NULLPTR)
 {
     // connect data reloading: this will be run concurrently
     connect(&m_blockLoadFutureWatcher,
@@ -136,6 +137,7 @@ FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
 , m_iDistanceTimerSpacer(1000)
 , m_iScrollPos(0)
 , m_bDispAnn(true)
+, m_vAnnotationsToDisplay(Q_NULLPTR)
 {
     // connect data reloading: this will be run concurrently
     connect(&m_blockLoadFutureWatcher, &QFutureWatcher<int>::finished,
@@ -765,6 +767,7 @@ void FiffRawViewModel::newTimeMark(const int& iSamp)
 int FiffRawViewModel::getTimeMarks(int iIndex) const
 {
     return timeMarkList.at(iIndex);
+//    return m_vAnnotationsToDisplay->at(iIndex);
 }
 
 //=============================================================================================================
@@ -772,6 +775,12 @@ int FiffRawViewModel::getTimeMarks(int iIndex) const
 int FiffRawViewModel::getTimeListSize() const
 {
     return timeMarkList.size();
+
+//    if(m_vAnnotationsToDisplay != Q_NULLPTR){
+//        return m_vAnnotationsToDisplay->size();
+//    } else {
+//        return 0;
+//    }
 }
 
 //=============================================================================================================
@@ -803,4 +812,11 @@ void FiffRawViewModel::toggleDispAnn(const int& iToggleDisp)
 bool FiffRawViewModel::shouldDisplayAnn() const
 {
     return m_bDispAnn;
+}
+
+//=============================================================================================================
+
+void FiffRawViewModel::updateAnnotations(QVector<int>* vAnnData)
+{
+    m_vAnnotationsToDisplay = vAnnData;
 }

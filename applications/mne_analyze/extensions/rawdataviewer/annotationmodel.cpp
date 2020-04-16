@@ -7,6 +7,7 @@ AnnotationModel::AnnotationModel(QObject* parent)
 , m_iSamplePos(0)
 , m_iFirstSample(0)
 , m_fFreq(600)
+, m_sFilterEventType("All")
 {
     qDebug() << "ANNOTATION MODEL CONSTRUCTOR";
 
@@ -32,6 +33,9 @@ QStringList AnnotationModel::getEventTypeList() const
 bool AnnotationModel::insertRows(int position, int span, const QModelIndex & parent)
 {
     Q_UNUSED(parent);
+
+    qDebug() << "AnnotationModel::insertRows here";
+    qDebug() << "iSamplePos:" << m_iSamplePos;
 
     if(m_dataSamples.isEmpty()) {
         m_dataSamples.insert(0, m_iSamplePos);
@@ -62,6 +66,7 @@ bool AnnotationModel::insertRows(int position, int span, const QModelIndex & par
                         m_dataTypes.append(m_sFilterEventType.toInt());
 
                     m_dataIsUserEvent.append(1);
+                    break;
                 }
             }
         }
@@ -88,11 +93,8 @@ void AnnotationModel::setSamplePos(int iSamplePos)
 
 int AnnotationModel::rowCount(const QModelIndex &parent) const
 {
-    if(m_dataSamples_Filtered.size() != 0) {
-        return m_dataSamples_Filtered.size();
-    }else{
-        return 0;
-    }
+
+    return m_dataSamples_Filtered.size();
 }
 
 //=============================================================================================================
@@ -106,6 +108,8 @@ int AnnotationModel::columnCount(const QModelIndex &parent) const
 
 QVariant AnnotationModel::data(const QModelIndex &index, int role) const
 {
+    qDebug() << "AnnotationModel::data";
+
     if(role == Qt::TextAlignmentRole)
         return QVariant(Qt::AlignCenter | Qt::AlignVCenter);
 
@@ -184,6 +188,7 @@ QVariant AnnotationModel::data(const QModelIndex &index, int role) const
 
 bool AnnotationModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
+    qDebug() << "AnnotationModel::setData";
     if(index.row() >= m_dataSamples.size() || index.column() >= columnCount())
         return false;
 
@@ -215,6 +220,7 @@ bool AnnotationModel::setData(const QModelIndex &index, const QVariant &value, i
 
 void AnnotationModel::setEventFilterType(const QString eventType)
 {
+    qDebug() << "AnnotationModel::setEventFilterType";
     m_sFilterEventType = eventType;
 
     //Clear filtered event data
@@ -240,6 +246,9 @@ void AnnotationModel::setEventFilterType(const QString eventType)
 
     emit dataChanged(createIndex(0,0), createIndex(m_dataSamples_Filtered.size(), 0));
     emit headerDataChanged(Qt::Vertical, 0, m_dataSamples_Filtered.size());
+
+    qDebug() << "Samp:" << m_dataSamples;
+    qDebug() << "Filt:" << m_dataSamples_Filtered;
 }
 
 //=============================================================================================================
