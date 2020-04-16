@@ -54,13 +54,13 @@ CONFIG(debug, debug|release) {
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
+    LIBS += -lanSharedd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lanSharedd
+            -lMNE$${MNE_LIB_VERSION}Utilsd \
 } else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
+    LIBS += -lanShared \
             -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lanShared
+            -lMNE$${MNE_LIB_VERSION}Utils \
 }
 
 DESTDIR = $${MNE_BINARY_DIR}/mne_analyze_extensions
