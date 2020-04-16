@@ -48,6 +48,7 @@
 //=============================================================================================================
 
 #include <QApplication>
+#include <QFontDatabase>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -75,9 +76,13 @@ AnalyzeCore *pAnalyzeCore;
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
+    QApplication app(argc, argv);
 
     qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
+
+    // Set default font
+    int id = QFontDatabase::addApplicationFont(":/fonts/Roboto-Light.ttf");
+    app.setFont(QFont(QFontDatabase::applicationFontFamilies(id).at(0)));
 
     //set application settings
     QCoreApplication::setOrganizationName(CInfo::OrganizationName());
@@ -87,5 +92,5 @@ int main(int argc, char *argv[])
     pAnalyzeCore = new AnalyzeCore();
     pAnalyzeCore->showMainWindow();
 
-    return a.exec();
+    return app.exec();
 }

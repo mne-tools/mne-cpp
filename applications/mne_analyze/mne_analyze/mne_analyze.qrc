@@ -2,4 +2,10 @@
     <qresource prefix="/images">
         <file alias="splashscreen_mne_analyze.png">resources/images/splashscreen/splashscreen_mne_analyze.png</file>
     </qresource>
+    <qresource prefix="/fonts">
+        <file alias="Lato-Black.ttf">fonts/Lato-Black.ttf</file>
+        <file alias="Lato-Light.ttf">fonts/Lato-Light.ttf</file>
+        <file alias="Roboto-Black.ttf">fonts/Roboto-Black.ttf</file>
+        <file alias="Roboto-Light.ttf">fonts/Roboto-Light.ttf</file>
+    </qresource>
 </RCC>
