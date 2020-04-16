@@ -5,6 +5,8 @@ nav_order: 2
 ---
 # Build from Source
 
+This guide shows you how to build the dynamically linked version of MNE-CPP from source. If you want to build a static version of MNE-CPP, please the [static build guide](../development/staticbuild.md). In most cases and for development purposes we recommend building the dynamically linked version, as described in the following.
+
 ## Get a compiler
 
 Make sure you have one of the following compilers installed:

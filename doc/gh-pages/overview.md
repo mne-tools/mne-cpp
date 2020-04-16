@@ -11,7 +11,7 @@ Besides the basic library (MNE Lib) we deliver a number of applications, e.g., a
 
 We are targeting two user groups:
 * Front-End users with little or no coding background. These users are interested in straight-forward setups and applications with an easy to use GUI, such as MNE Scan and MNE Analyze. For more information see our [Learn section](pages/learn/learn.md).
-* Back-End users who are experienced with programming in C++ and want to use MNE-CPP functionalities to build their own applications. For more information see our [Development section](pages/develop/develop.md). 
+* Back-End users who are experienced with programming in C++ and want to use MNE-CPP functionalities to build their own applications. For more information see our [Development section](pages/development/development.md). 
 
 MNE-CPP is a community project. Contributions by new developers are always welcomed and greatly appreciated. If you are planning to contribute to MNE-CPP our [contributor page](pages/contribute/contribute.md) is a good point to start.
 
