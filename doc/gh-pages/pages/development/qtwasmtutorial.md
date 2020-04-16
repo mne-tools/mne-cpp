@@ -5,6 +5,23 @@ nav_order: 3
 ---
 # MNE-CPP with QtWasm
 
+This tutorial will show you how to build a Wasm (WebAssembly) version of MNE-CPP. In order to build a Wasm version we need to do three things:
+
+ * Setup the emscripten compiler
+ * Build a static wasm version of Qt (with thread support)
+ * Compile MNE-CPP with the `wasm` flag
+
+This tutorial assumes the following folder structure:
+```
+Git/
+├── emsdk/
+├── qt5/
+├── qt5_shadow/
+├── qt5_wasm_binaries/
+├── mne-cpp/
+└── mne-cpp_shadow/
+```
+
 ## Setup Qt Wasm to work with MNE-CPP on Ubuntu 18.04.03 64bit
 
  * According to the official Qt Wasm (WebAssembly) guide, the preferred emscripten versions are:
@@ -17,7 +34,7 @@ nav_order: 3
 
    Qt 5.15: 1.39.8
 
- | **Please note:** With the versions above some functions are not able to be linked and produce errors. It is possible that some MNE-CPP functions are not compatible with these emscripten versions. However, emscripten version 1.39.3 and 1.39.8 seem to be working with MNE-CPP code. The following setups should work: **Qt5.13.2 compiled with em++ 1.39.3 with thread support**, **Qt5.14.0 compiled with em++ 1.39.3 with thread support** and  **Qt5.15.0 compiled with em++ 1.39.8 with thread support**. | 
+ | **Please note:** With the versions above some functions are not able to be linked and produce errors. It is possible that some MNE-CPP functions are not compatible with these emscripten versions. However, emscripten version 1.39.3 and 1.39.8 seem to be working with MNE-CPP code. The following setups should work: **Qt5.13.2 compiled with em++ 1.39.3 with thread support**, **Qt5.14.2 compiled with em++ 1.39.3 with thread support** and  **Qt5.15.0 compiled with em++ 1.39.8 with thread support**. | 
 
 * Get the [emscripten](https://emscripten.org/){:target="_blank" rel="noopener"} compiler:
 
@@ -54,10 +71,10 @@ nav_order: 3
       sudo apt-get install build-essential libgl1-mesa-dev python
       ```
 
-    * Clone current Qt version. For example Qt 5.14.0:
+    * Clone current Qt version. For example Qt 5.14.2:
 
       ```
-      git clone https://code.qt.io/qt/qt5.git -b 5.14.0      
+      git clone https://code.qt.io/qt/qt5.git -b 5.14.2      
       cd qt5
       ./init-repository -f --module-subset=qtbase,qtcharts,qtsvg
       ```
@@ -75,13 +92,13 @@ nav_order: 3
       With thread support:
 
       ```
-      ../qt5/configure -opensource -confirm-license -xplatform wasm-emscripten -feature-thread -nomake examples -no-dbus -no-ssl -prefix /home/lorenz/Qt/5.14.0/wasm_em1393_64_withThread
+      ../qt5/configure -opensource -confirm-license -xplatform wasm-emscripten -feature-thread -nomake examples -no-dbus -no-ssl -prefix ../qt5_wasm_binaries
       ```
 
       Without thread support:
 
       ```
-      ../qt5/configure -opensource -confirm-license -xplatform wasm-emscripten -nomake examples -no-dbus -no-ssl -prefix /home/lorenz/Qt/5.14.0/wasm_em1393_64_withThread
+      ../qt5/configure -opensource -confirm-license -xplatform wasm-emscripten -nomake examples -no-dbus -no-ssl -prefix ../qt5_wasm_binaries
       ```
 
     * Build Qt and install to target (prefix) location afterwards. For MNE-CPP we only need the qt charts, qtsvg and qtbase module (see [https://wiki.qt.io/Qt_for_WebAssembly](https://wiki.qt.io/Qt_for_WebAssembly){:target="_blank" rel="noopener"} for officially supported modules):
@@ -91,7 +108,7 @@ nav_order: 3
       make install -j8
       ```
 
-    * Qt Wasm should now be setup to work with the activated emscripten version
+  * A static Qt Wasm version should now be setup in the `qt5_wasm_binaries` folder.
 
 ## Building MNE-CPP against QtWasm
 
@@ -104,9 +121,9 @@ nav_order: 3
  * Create a shadow build folder, run qmake and build mne-cpp:
 
    ```
-   mkdir mne-cpp-shadow
-   cd mne-cpp-shadow
-   /home/lorenz/Qt/5.14.0/wasm_em1393_64_withThread/bin/qmake ../mne-cpp/mne-cpp.pro
+   mkdir mne-cpp_shadow
+   cd mne-cpp_shadow
+   ../qt5_wasm_binaries/bin/qmake ../mne-cpp/mne-cpp.pro
    make -j8
    ```
 
@@ -114,7 +131,7 @@ nav_order: 3
 
 ## Running an application
 
- * Navigate to mne-cpp/bin and start a server
+ * Navigate to `mne-cpp/bin` and start a server
 
    ```
    python3 -m http.server
