@@ -59,7 +59,9 @@ contains(MNECPP_CONFIG, static) {
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lscMeasd \
+    LIBS += -lscSharedd \
+            -lscDispd \
+            -lscMeasd \
             -lMNE$${MNE_LIB_VERSION}Dispd \
             -lMNE$${MNE_LIB_VERSION}Inversed \
             -lMNE$${MNE_LIB_VERSION}Fwdd \
@@ -68,7 +70,9 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Utilsd \
 } else {
-    LIBS += -lscMeas \
+    LIBS += -lscShared \
+            -lscDisp \
+            -lscMeas \
             -lMNE$${MNE_LIB_VERSION}Disp \
             -lMNE$${MNE_LIB_VERSION}Inverse \
             -lMNE$${MNE_LIB_VERSION}Fwd \
