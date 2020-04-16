@@ -83,11 +83,6 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Utils \
 }
 
-contains(MNECPP_CONFIG, static) {
-    CONFIG += static
-    DEFINES += STATICBUILD
-}
-
 SOURCES += \
         main.cpp \
 
