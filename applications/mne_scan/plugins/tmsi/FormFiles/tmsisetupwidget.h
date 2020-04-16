@@ -51,7 +51,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace ui {
+namespace Ui {
     class TMSISetupClass;
 }
 
