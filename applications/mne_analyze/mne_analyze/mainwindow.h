@@ -126,9 +126,9 @@ signals:
 
 private:
     void createActions();                                                                       /**< Creates all actions for user interface of MainWindow class. */
-    void createMenus(QSharedPointer<ANSHAREDLIB::ExtensionManager> pExtensionManager);          /**< Creates all menus for user interface of MainWindow class. */
-    void createDockWindows(QSharedPointer<ANSHAREDLIB::ExtensionManager> pExtensionManager);    /**< Creates all dock windows for user interface of MainWindow class. */
-    void createMultiView(QSharedPointer<ANSHAREDLIB::ExtensionManager> pExtensionManager);      /**< Creates all Windows within the MultiView for user interface of MainWindow class. */
+    void createExtensionMenus(QSharedPointer<ANSHAREDLIB::ExtensionManager> pExtensionManager);          /**< Creates all menus for user interface of MainWindow class. */
+    void createExtensionControls(QSharedPointer<ANSHAREDLIB::ExtensionManager> pExtensionManager);    /**< Creates all dock windows for user interface of MainWindow class. */
+    void createExtensionViews(QSharedPointer<ANSHAREDLIB::ExtensionManager> pExtensionManager);      /**< Creates all Windows within the MultiView for user interface of MainWindow class. */
     void tabifyDockWindows();                                                                   /**< Tabify all dock windows */
     void about();                                                                               /**< Implements about action.*/
 

@@ -111,18 +111,8 @@ void RawDataViewer::init()
     m_pFiffRawView->setFocusPolicy(Qt::TabFocus);
     m_pFiffRawView->setAttribute(Qt::WA_DeleteOnClose, false);
 
-    // we need this since the top-level main window runs "QMdiView::addSubWindow()", which requires a subwindow
-    // to be passed (if a non-window would be passed, QMdiView would silently create a new QMidSubWindow )
-    //m_pSubWindow = new QMdiSubWindow();
-    //m_pSubWindow->setWidget(m_pFiffRawView);
-    m_pSubWindow = new QWidget();
-    m_pSubWindow->setWindowTitle(QString("Raw Data Viewer"));
-    m_pSubWindow->setAttribute(Qt::WA_DeleteOnClose, false);
-
     // remember that the display was built
     m_bDisplayCreated = true;
-
-    //m_pSubWindow->show();
 
     //create AnnotationModel
     m_pAnnotationModel = QSharedPointer<AnnotationModel>(new AnnotationModel(this));
@@ -191,7 +181,6 @@ QDockWidget *RawDataViewer::getControl()
 QWidget *RawDataViewer::getView()
 {
     return m_pFiffRawView;
-    //return m_pSubWindow;
 }
 
 //=============================================================================================================
@@ -199,9 +188,6 @@ QWidget *RawDataViewer::getView()
 void RawDataViewer::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
-    case EVENT_TYPE::EXTENSION_INIT_FINISHED:
-        m_pSubWindow->resize(800, 600);
-        break;
     default:
         qWarning() << "[RawDataViewer::handleEvent] Received an Event that is not handled by switch cases.";
     }
@@ -211,7 +197,7 @@ void RawDataViewer::handleEvent(QSharedPointer<Event> e)
 
 QVector<EVENT_TYPE> RawDataViewer::getEventSubscriptions(void) const
 {
-    QVector<EVENT_TYPE> temp = {EXTENSION_INIT_FINISHED};
+    QVector<EVENT_TYPE> temp = {};
 
     return temp;
 }
