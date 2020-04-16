@@ -54,6 +54,15 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
+DESTDIR = $${MNE_BINARY_DIR}/mne_analyze_extensions
+
+contains(MNECPP_CONFIG, static) {
+    CONFIG += staticlib
+    DEFINES += STATICBUILD
+} else {
+    CONFIG += shared
+}
+
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lanSharedd \
@@ -78,8 +87,6 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Utils \
 }
-
-DESTDIR = $${MNE_BINARY_DIR}/mne_analyze_extensions
 
 SOURCES += \
     annotationdelegate.cpp \

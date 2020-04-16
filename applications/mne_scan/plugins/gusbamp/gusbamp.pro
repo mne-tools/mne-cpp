@@ -72,7 +72,7 @@ DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
 
 contains(MNECPP_CONFIG, static) {
     CONFIG += staticlib
-    DEFINES += STATICLIB
+    DEFINES += STATICBUILD
 } else {
     CONFIG += shared
 }
