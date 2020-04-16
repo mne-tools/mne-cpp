@@ -347,34 +347,37 @@ void ConnectorManager::loadConnectors(const QString& dir)
     Q_UNUSED(dir)
 
     // In case of a static build we have to load plugins manually.
-    QList<QObject*> lObjects;
-    lObjects << new FIFFSIMULATORRTSERVERPLUGIN::FiffSimulator;
+    const auto staticInstances = QPluginLoader::staticInstances();
+    QString sJSONFile;
 
-    QStringList lJSONFiles;
-    lJSONFiles << QCoreApplication::applicationDirPath() + "/resources/mne_rt_server_plugins/fiffsimulator.json";
+    for(QObject *plugin : staticInstances) {
+        // IPlugin
+        if(plugin) {
+            if(IConnector* t_pIConnector = qobject_cast<IConnector*>(plugin)) {
+                t_pIConnector->setStatus(false);
 
-    for(int i = 0; i < lObjects.size(); ++i) {
-        IConnector* t_pIConnector = qobject_cast<IConnector*>(lObjects[i]);
-        t_pIConnector->setStatus(false);
+                //Add the curent plugin meta data. When building staically we need to data directly from the json file.
+                if(t_pIConnector->getName() == "Fiff File Simulator") {
+                    sJSONFile = QCoreApplication::applicationDirPath() + "/resources/mne_rt_server_plugins/fiffsimulator.json";
+                }
 
-        //Add the curent plugin meta data. When building staically we need to data directly from the json file.
-        if(i < lJSONFiles.size()) {
-            QFile file (lJSONFiles.at(i));
-            if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-                QString sMetaData = file.readAll();
-                file.close();
-                QJsonObject t_qJsonObjectMetaData = QJsonDocument::fromJson(sMetaData.toUtf8()).object();
-                t_pIConnector->setMetaData(t_qJsonObjectMetaData);
-                QJsonDocument t_jsonDocumentOrigin(t_qJsonObjectMetaData);
-                t_pIConnector->getCommandManager().insert(t_jsonDocumentOrigin);
-                t_pIConnector->connectCommandManager();
+                QFile file (sJSONFile);
+                if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+                    QString sMetaData = file.readAll();
+                    file.close();
+                    QJsonObject t_qJsonObjectMetaData = QJsonDocument::fromJson(sMetaData.toUtf8()).object();
+                    t_pIConnector->setMetaData(t_qJsonObjectMetaData);
+                    QJsonDocument t_jsonDocumentOrigin(t_qJsonObjectMetaData);
+                    t_pIConnector->getCommandManager().insert(t_jsonDocumentOrigin);
+                    t_pIConnector->connectCommandManager();
 
-                s_vecConnectors.push_back(t_pIConnector);
+                    s_vecConnectors.push_back(t_pIConnector);
+                } else {
+                    qWarning() << "ConnectorManager::loadConnectors - Plugin not loaded. Could not open meta data json file for plugin.";
+                }
             } else {
-                qWarning() << "ConnectorManager::loadConnectors - Plugin not loaded. Could not open meta data json file for plugin.";
+                qWarning() << "ConnectorManager::loadConnectors - Plugin not loaded. Path to meta data json file was not specified.";
             }
-        } else {
-            qWarning() << "ConnectorManager::loadConnectors - Plugin not loaded. Path to meta data json file was not specified.";
         }
     }
 #else

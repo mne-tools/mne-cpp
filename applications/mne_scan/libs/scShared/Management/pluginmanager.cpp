@@ -80,7 +80,6 @@ void PluginManager::loadPlugins(const QString& dir)
     Q_UNUSED(dir);
 
     const auto staticInstances = QPluginLoader::staticInstances();
-    qDebug() << "staticInstances.size()" << staticInstances.size();
     for(QObject *plugin : staticInstances) {
         // IPlugin
         if(plugin) {
