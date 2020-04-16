@@ -49,6 +49,7 @@
 
 #include <QApplication>
 #include <QFontDatabase>
+#include <QtPlugin>
 
 //=============================================================================================================
 // USED NAMESPACES
