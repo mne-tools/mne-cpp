@@ -61,19 +61,19 @@ Git/
 
 * A static Qt version should now be setup in the `qt5_binaries` folder.
 
-## Compile MNE-CPP with the static flag
-
-* Create a shadow build folder, run qmake and build mne-cpp:
-
-```
-mkdir mne-cpp_shadow
-cd mne-cpp_shadow
-../qt5_binaries/bin/qmake ../mne-cpp/mne-cpp.pro MNECPP_CONFIG += static
-make -j8
-```
-
-* All MNE-CPP applications (MNE Scan, examples, tests, etc.) should now be in the `mne-cpp/bin` folder.
-
 ### Windows
 
-It's complicated. A guide on how to build Qt/MNE-CPP statically on Windows wil follow soon.
+It's complicated. A guide on how to build Qt statically on Windows wil follow soon.
+
+## Compile MNE-CPP with the static flag
+
+* Create a shadow build folder, run qmake and build MNE-CPP (on Windows use `nmake` or `jom` instead of `make`):
+
+    ```
+    mkdir mne-cpp_shadow
+    cd mne-cpp_shadow
+    ../qt5_binaries/bin/qmake ../mne-cpp/mne-cpp.pro MNECPP_CONFIG += static
+    make -j8
+    ```
+
+* All MNE-CPP applications (MNE Scan, examples, tests, etc.) should now be in the `mne-cpp/bin` folder.

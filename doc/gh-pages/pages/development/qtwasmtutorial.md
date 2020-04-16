@@ -38,23 +38,23 @@ Git/
 
 * Get the [emscripten](https://emscripten.org/){:target="_blank" rel="noopener"} compiler:
 
-   ```
-   # Get the emsdk repo
-   git clone https://github.com/emscripten-core/emsdk.git
+  ```
+  # Get the emsdk repo
+  git clone https://github.com/emscripten-core/emsdk.git
 
-   # Enter that directory and pull
-   cd emsdk
-   git pull
+  # Enter that directory and pull
+  cd emsdk
+  git pull
 
-   # Download and install the latest SDK tools.
-   ./emsdk install 1.39.3
+  # Download and install the latest SDK tools.
+  ./emsdk install 1.39.3
 
-   # Make the "latest" SDK "active" for the current user. (writes ~/.emscripten file)
-   ./emsdk activate 1.39.3
+  # Make the "latest" SDK "active" for the current user. (writes ~/.emscripten file)
+  ./emsdk activate 1.39.3
 
-   # Activate PATH and other environment variables in the current terminal
-   source ./emsdk_env.sh
-   ```
+  # Activate PATH and other environment variables in the current terminal
+  source ./emsdk_env.sh
+  ```
 
  * Build Qt from source. This is needed since we want to have threading support which is deactivated for the pre-built QtWasm build. Also, the pre-built QtWasm binaries are build with emscripten version 1.38.30 which does not work with MNE-CPP code.
 
@@ -114,18 +114,18 @@ Git/
 
  * MNE-CPP needs to be build statically. This is automatically done if the `wasm` flag is set. Navigate to mne-cpp/mne-cpp.pri and add the wasm flag. This will build MNE-CPP statically and configure only wasm supported MNE-CPP code.
 
-   ```
-   MNECPP_CONFIG += wasm
-   ```
+  ```
+  MNECPP_CONFIG += wasm
+  ```
 
- * Create a shadow build folder, run qmake and build mne-cpp:
+ * Create a shadow build folder, run qmake and build MNE-CPP:
 
-   ```
-   mkdir mne-cpp_shadow
-   cd mne-cpp_shadow
-   ../qt5_wasm_binaries/bin/qmake ../mne-cpp/mne-cpp.pro
-   make -j8
-   ```
+  ```
+  mkdir mne-cpp_shadow
+  cd mne-cpp_shadow
+  ../qt5_wasm_binaries/bin/qmake ../mne-cpp/mne-cpp.pro
+  make -j8
+  ```
 
  * This should create the applications featured under applications, e.g. MNE Browse, to be build to mne-cpp/bin
 
@@ -133,15 +133,15 @@ Git/
 
  * Navigate to `mne-cpp/bin` and start a server
 
-   ```
-   python3 -m http.server
-   ```
+  ```
+  python3 -m http.server
+  ```
 
  * Go to a suitable web browser (Chromium based and Mozilla browsers seem to work the best) and type:
 
-   ```
-   http://localhost:8000/mne_browse.html
-   ```
+  ```
+  http://localhost:8000/mne_browse.html
+  ```
 
 ## Example builds
 
