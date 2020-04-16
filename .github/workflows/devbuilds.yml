@@ -34,6 +34,32 @@ jobs:
         ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG+=static
         make -j2
 
+  MacOSStatic:
+    runs-on: macos-latest
+    
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v2
+    - name: Compile static Qt
+      run: |
+        # Clone Qt5 repo
+        cd ..
+        git clone https://code.qt.io/qt/qt5.git -b 5.14.2
+        cd qt5
+        ./init-repository -f --module-subset=qtbase,qtcharts,qtsvg,qt3d
+        # Create shadow build folder
+        cd ..
+        mkdir qt5_shadow
+        cd qt5_shadow
+        # Configure Qt5
+        ../qt5/configure -static -release -prefix "../Qt5_binaries" -skip webengine -nomake tools -nomake tests -nomake examples -no-dbus -no-ssl -no-pch -opensource -confirm-license
+        make module-qtbase module-qtsvg module-qtcharts module-qt3d -j2
+        make install -j2
+    - name: Configure and compile MNE-CPP
+      run: |
+        ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG+=static
+        make -j2
+
 # jobs:
 #   UpdateDevTag:
 #     runs-on: ubuntu-16.04
