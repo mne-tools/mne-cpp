@@ -87,12 +87,11 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::ExtensionManager> pExtensionM
 
     if(!pExtensionManager.isNull()) {
         createActions();
-        createMenus(pExtensionManager);
-        createDockWindows(pExtensionManager);
-        createMultiView(pExtensionManager);
-    }
-    else {
-        qDebug() << "[MainWindow::MainWindow] CRITICAL ! Extension manager is nullptr";
+        createExtensionMenus(pExtensionManager);
+        createExtensionControls(pExtensionManager);
+        createExtensionViews(pExtensionManager);
+    } else {
+        qWarning() << "[MainWindow::MainWindow] CRITICAL ! Extension manager is nullptr";
     }
 
     this->setStatusBar(new StatusBar());
@@ -110,6 +109,7 @@ MainWindow::~MainWindow()
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     emit mainWindowClosed();
+
     // default implementation does this, so its probably a good idea
     event->accept();
 }
@@ -131,7 +131,7 @@ void MainWindow::createActions()
 
 //=============================================================================================================
 
-void MainWindow::createMenus(QSharedPointer<ANSHAREDLIB::ExtensionManager> pExtensionManager)
+void MainWindow::createExtensionMenus(QSharedPointer<ANSHAREDLIB::ExtensionManager> pExtensionManager)
 {
     m_pMenuFile = menuBar()->addMenu(tr("File"));
     m_pMenuFile->addAction(m_pActionExit);
@@ -156,18 +156,18 @@ void MainWindow::createMenus(QSharedPointer<ANSHAREDLIB::ExtensionManager> pExte
 
 //=============================================================================================================
 
-void MainWindow::createDockWindows(QSharedPointer<ANSHAREDLIB::ExtensionManager> pExtensionManager)
+void MainWindow::createExtensionControls(QSharedPointer<ANSHAREDLIB::ExtensionManager> pExtensionManager)
 {
     setTabPosition(Qt::LeftDockWidgetArea,QTabWidget::West);
     setTabPosition(Qt::RightDockWidgetArea,QTabWidget::East);
     setDockOptions(QMainWindow::ForceTabbedDocks);
 
-    //Add Extension views to mdi
+    //Add Extension controls to the MainWindow
     for(IExtension* pExtension : pExtensionManager->getExtensions()) {
         QDockWidget* pControl = pExtension->getControl();
         if(pControl) {
             addDockWidget(Qt::LeftDockWidgetArea, pControl);
-            qDebug() << "[MainWindow::createDockWindows] Found and added dock widget for " << pExtension->getName();
+            qDebug() << "[MainWindow::createExtensionControls] Found and added dock widget for " << pExtension->getName();
         }
     }
 
@@ -176,7 +176,7 @@ void MainWindow::createDockWindows(QSharedPointer<ANSHAREDLIB::ExtensionManager>
 
 //=============================================================================================================
 
-void MainWindow::createMultiView(QSharedPointer<ExtensionManager> pExtensionManager)
+void MainWindow::createExtensionViews(QSharedPointer<ExtensionManager> pExtensionManager)
 {
     m_pGridLayout = new QGridLayout(this);
     m_pMultiView = new MultiView();
@@ -186,7 +186,7 @@ void MainWindow::createMultiView(QSharedPointer<ExtensionManager> pExtensionMana
 
     QString sCurExtensionName;
 
-    //Add Extension views to mdi
+    //Add Extension views to the MultiView, which is the central widget
     for(IExtension* pExtension : pExtensionManager->getExtensions()) {
         QWidget* pView = pExtension->getView();
         if(pView) {
@@ -206,49 +206,9 @@ void MainWindow::createMultiView(QSharedPointer<ExtensionManager> pExtensionMana
             connect(action, &QAction::toggled,
                     pWindow, &MultiViewWindow::setVisible);
 
-            qDebug() << "[MainWindow::createMultiView] Found and added subwindow for " << pExtension->getName();
-
-//            QListView *listview = new QListView;
-//            QListView *listviewa = new QListView;
-//            QListView *listviewv = new QListView;
-//            QListView *listviewvx = new QListView;
-
-//            MultiViewWindow* pWindowa = m_pMultiView->addWidgetH(listview, "a");
-//            MultiViewWindow* pWindowb = m_pMultiView->addWidgetH(listviewa, "b");
-//            MultiViewWindow* pWindowc = m_pMultiView->addWidgetH(listviewv, "c");
-//            MultiViewWindow* pWindowd = m_pMultiView->addWidgetH(listviewvx, "d");
-
-//            QAction* actiona = new QAction(pExtension->getName(), this);
-//            actiona->setCheckable(true);
-//            actiona->setChecked(true);
-//            m_pMenuView->addAction(actiona);
-//            connect(actiona, &QAction::toggled,
-//                    pWindowa, &MultiViewWindow::setVisible);
-
-//            QAction* actionb = new QAction(pExtension->getName(), this);
-//            actionb->setCheckable(true);
-//            actionb->setChecked(true);
-//            m_pMenuView->addAction(actionb);
-//            connect(actionb, &QAction::toggled,
-//                    pWindowb, &MultiViewWindow::setVisible);
-
-//            QAction* actionc = new QAction(pExtension->getName(), this);
-//            actionc->setCheckable(true);
-//            actionc->setChecked(true);
-//            m_pMenuView->addAction(actionc);
-//            connect(actionc, &QAction::toggled,
-//                    pWindowc, &MultiViewWindow::setVisible);
-
-//            QAction* actiond = new QAction(pExtension->getName(), this);
-//            actiond->setCheckable(true);
-//            actiond->setChecked(true);
-//            m_pMenuView->addAction(actiond);
-//            connect(actiond, &QAction::toggled,
-//                    pWindowd, &MultiViewWindow::setVisible);
+            qInfo() << "[MainWindow::createExtensionViews] Found and added subwindow for " << pExtension->getName();
         }
     }
-
-    //m_pMultiView->cascadeSubWindows();
 }
 
 //=============================================================================================================
@@ -310,7 +270,7 @@ void MainWindow::tabifyDockWindows()
 void MainWindow::about()
 {
     if(!m_pAboutWindow) {
-        m_pAboutWindow = QSharedPointer<QWidget>(new QWidget());
+        m_pAboutWindow = QSharedPointer<QWidget>(new QWidget(this, Qt::Window));
 
         QGridLayout *gridLayout;
         QLabel *m_label_splashcreen;
@@ -353,11 +313,8 @@ void MainWindow::about()
         m_label_splashcreen->setText(QString());
         m_textEdit_aboutText->setHtml( tr("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
                                           "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-                                          "p, li { white-space: pre-wrap; }\n"
-                                          "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:7.8pt; font-weight:400; font-style:normal;\">\n"
-                                          "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt; font-weight:600;\">Copyright (C) 2017 Christoph Dinh, Lorenz Esch, Lars Debor, Simon Heinke, Matti Hamalainen. All rights reserved.</span></p>\n"
-                                          "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;\"><br /></p>\n"
-                                          "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">For more information visit the MNE-CPP/MNE Analyze project on its homepage:</span></p>\n"
+                                          "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:7.8pt; font-weight:400; font-style:normal;\">"
+                                          "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">For more information please visit the MNE-CPP/MNE Analyze project on its homepage:</span></p>\n"
                                           "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;\"><br /></p>\n"
                                           "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><a href=\"http://www.mne-cpp.org\"><span style=\" font-size:8pt; text-decoration: underline; color:#0000ff;\">http://www.mne-cpp.org</span></a></p>\n"
                                           "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;\"><br /></p>\n"
