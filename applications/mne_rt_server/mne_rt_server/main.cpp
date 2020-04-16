@@ -62,6 +62,10 @@ using namespace RTSERVER;
 // MAIN
 //=============================================================================================================
 
+#ifdef STATICBUILD
+Q_IMPORT_PLUGIN(FiffSimulator)
+#endif
+
 //=============================================================================================================
 /**
  * The function main marks the entry point of the program.

@@ -45,7 +45,7 @@ include(../mne-cpp.pri)
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    #mne_rt_server \
+    mne_rt_server \
 
 !contains(MNECPP_CONFIG, minimalVersion) {
     SUBDIRS += \

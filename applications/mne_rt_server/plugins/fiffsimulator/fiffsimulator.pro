@@ -45,7 +45,7 @@ CONFIG += plugin
 
 DEFINES += MNERTSERVER_FIFFSIMULATOR_PLUGIN
 
-TARGET = FiffSimulator
+TARGET = fiffsimulator
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -55,7 +55,6 @@ DESTDIR = $${MNE_BINARY_DIR}/mne_rt_server_plugins
 contains(MNECPP_CONFIG, static) {
     CONFIG += staticlib
     DEFINES += STATICBUILD
-    RESOURCE_FILES += $${ROOT_DIR}/resources/mne_rt_server_plugins/fiffsimulator.json
 } else {
     CONFIG += shared
 }
