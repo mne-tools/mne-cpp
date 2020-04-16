@@ -46,19 +46,25 @@ AnnotationView::AnnotationView()
 , m_pAnnModel(Q_NULLPTR)
 {
     ui->setupUi(this);
-
-    initMSVCSettings();
-    initGUIFunctionality();
 }
 
 //=============================================================================================================
 
 void AnnotationView::initMSVCSettings()
 {
-    //Table
+    //Model
     ui->m_tableView_eventTableView->setModel(m_pAnnModel.data());
+    qDebug() << "Bound";
     connect(m_pAnnModel.data(),&AnnotationModel::dataChanged,
             this, &AnnotationView::onDataChanged);
+    qDebug() << "Bound";
+
+    //Delegate
+    m_pAnnDelegate = QSharedPointer<AnnotationDelegate>(new AnnotationDelegate(this));
+    ui->m_tableView_eventTableView->setItemDelegate(m_pAnnDelegate.data());
+
+    ui->m_tableView_eventTableView->resizeColumnsToContents();
+    ui->m_tableView_eventTableView->adjustSize();
 }
 
 //=============================================================================================================
@@ -121,13 +127,19 @@ void AnnotationView::addAnnotationToModel(const int iSample)
 void AnnotationView::setModel(QSharedPointer<AnnotationModel> pAnnModel)
 {
     m_pAnnModel = pAnnModel;
+
+    initMSVCSettings();
+    initGUIFunctionality();
+    onDataChanged();
 }
 
 //=============================================================================================================
 
 void AnnotationView::onDataChanged()
 {
+    qDebug() << "AnnotationView::onDataChanged";
     ui->m_tableView_eventTableView->viewport()->update();
+    ui->m_tableView_eventTableView->viewport()->repaint();
 }
 
 //=============================================================================================================

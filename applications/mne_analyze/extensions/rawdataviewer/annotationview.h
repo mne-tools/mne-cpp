@@ -43,6 +43,7 @@
 
 #include <fiff/fiff_ch_info.h>
 #include "annotationmodel.h"
+#include "annotationdelegate.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -124,7 +125,11 @@ private:
 
     int                                             m_iLastSampClicked;
 
+    QSharedPointer<AnnotationDelegate>              m_pAnnDelegate;
     QSharedPointer<AnnotationModel>                 m_pAnnModel;
+
+
+
 
 };
 
