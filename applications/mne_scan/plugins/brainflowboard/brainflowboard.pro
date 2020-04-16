@@ -54,17 +54,13 @@ DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Fiffd \
+    LIBS += -lscMeasd \
+            -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Utilsd \
-            -lscMeasd \
-            -lscDispd \
-            -lscSharedd
 } else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Fiff \
+    LIBS += -lscMeas \
+            -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Utils \
-            -lscMeas \
-            -lscDisp \
-            -lscShared
 }
 
 contains(QT_ARCH, i386) {

@@ -45,7 +45,7 @@
 // PREPROCESSOR DEFINES
 //=============================================================================================================
 
-#if defined(STATICLIB)
+#if defined(STATICBUILD)
 #  define SCSHAREDSHARED_EXPORT
 #elif defined(SCSHARED_LIBRARY)
 #  define SCSHAREDSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */

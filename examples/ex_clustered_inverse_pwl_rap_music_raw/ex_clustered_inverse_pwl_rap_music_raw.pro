@@ -55,7 +55,7 @@ DESTDIR =  $${MNE_BINARY_DIR}
 
 contains(MNECPP_CONFIG, static) {
     CONFIG += static
-    DEFINES += STATICLIB
+    DEFINES += STATICBUILD
 }
 
 LIBS += -L$${MNE_LIBRARY_DIR}
@@ -85,7 +85,7 @@ CONFIG(debug, debug|release) {
 
 contains(MNECPP_CONFIG, static) {
     CONFIG += static
-    DEFINES += STATICLIB
+    DEFINES += STATICBUILD
 }
 
 SOURCES += \

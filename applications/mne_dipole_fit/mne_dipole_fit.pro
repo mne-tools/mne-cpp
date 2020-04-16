@@ -47,7 +47,7 @@ CONFIG   += console
 
 contains(MNECPP_CONFIG, static) {
     CONFIG += static
-    DEFINES += STATICLIB
+    DEFINES += STATICBUILD
 }
 
 TARGET = mne_dipole_fit
