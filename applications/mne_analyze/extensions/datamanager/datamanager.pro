@@ -44,6 +44,15 @@ DEFINES += DATAMANAGER_EXTENSION
 
 QT += gui widgets
 
+DESTDIR = $${MNE_BINARY_DIR}/mne_analyze_extensions
+
+contains(MNECPP_CONFIG, static) {
+    CONFIG += staticlib
+    DEFINES += STATICBUILD
+} else {
+    CONFIG += shared
+}
+
 TARGET = datamanager
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
@@ -59,8 +68,6 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lanShared
 }
-
-DESTDIR = $${MNE_BINARY_DIR}/mne_analyze_extensions
 
 SOURCES += \
     datamanager.cpp \
