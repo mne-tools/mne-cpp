@@ -40,7 +40,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = app
 
-QT += widgets concurrent
+QT += widgets concurrent network
 
 VERSION = $${MNE_CPP_VERSION}
 

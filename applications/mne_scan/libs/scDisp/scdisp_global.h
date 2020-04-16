@@ -46,7 +46,7 @@
 // DEFINES
 //=============================================================================================================
 
-#if defined(STATICLIB)
+#if defined(STATICBUILD)
 #  define SCDISPSHARED_EXPORT
 #elif defined(SCDISP_LIBRARY)
 #  define SCDISPSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */

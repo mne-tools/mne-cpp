@@ -52,34 +52,45 @@ contains(MNECPP_CONFIG, dispOpenGL) {
 
 contains(MNECPP_CONFIG, static) {
     CONFIG += staticlib
-    DEFINES += STATICLIB
+    DEFINES += STATICBUILD
+    # For static builds we need to link against the plugins
+    # because we cannot load them dynamically during runtime
     LIBS += -L$${MNE_BINARY_DIR}/mne_scan_plugins
-    QTPLUGIN += fiffsimulator
-    QTPLUGIN += babymeg
-    QTPLUGIN += natus
-#    QTPLUGIN += gusbamp
-#    QTPLUGIN += eegosports
-#    QTPLUGIN += brainamp
-    QTPLUGIN += rtcmne
-    QTPLUGIN += averaging
-    QTPLUGIN += covariance
-    QTPLUGIN += noisereduction
-    QTPLUGIN += neuronalconnectivity
-    QTPLUGIN += ftbuffer
-    QTPLUGIN += writetofile
-    QTPLUGIN += hpi
-#    QTPLUGIN += dummytoolbox
+    LIBS += -lbabymeg \
+            -lfiffsimulator \
+            -lnatus \
+            -lcovariance \
+            -lnoisereduction \
+            -lrtcmne \
+            -laveraging \
+            -lneuronalconnectivity \
+            -lftbuffer \
+            -lwritetofile \
+            -lhpi
+            #-ldummytoolbox
 
+    contains(MNECPP_CONFIG, withGUSBAmp) {
+        LIBS += -lgusbamp
+        DEFINES += WITHGUSBAMP
+    }
+    contains(MNECPP_CONFIG, withBrainAmp) {
+        LIBS += -lbrainamp
+        DEFINES += WITHBRAINAMP
+    }
+    contains(MNECPP_CONFIG, withEego) {
+        LIBS += -leegosports
+        DEFINES += WITHEEGOSPORTS
+    }
     contains(MNECPP_CONFIG, withLsl) {
-        QTPLUGIN += lsladapter
+        LIBS += -llsladapter
         DEFINES += WITHLSL
     }
-    win32: {
-        QTPLUGIN += tmsi
+    contains(MNECPP_CONFIG, withTmsi) {
+        LIBS += -ltmsi
         DEFINES += WITHTMSI
     }
     contains(MNECPP_CONFIG, withBrainFlow) {
-        QTPLUGIN += brainflowboard
+        LIBS += -lbrainflowboard
         DEFINES += WITHBRAINFLOW
     }
 } else {
@@ -96,7 +107,7 @@ CONFIG += console
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lscSharedd\
+    LIBS += -lscSharedd \
             -lscDispd \
             -lscMeasd \
             -lMNE$${MNE_LIB_VERSION}Disp3Dd \
@@ -111,7 +122,7 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Utilsd \
 } else {
-    LIBS += -lscShared\
+    LIBS += -lscShared \
             -lscDisp \
             -lscMeas \
             -lMNE$${MNE_LIB_VERSION}Disp3D \

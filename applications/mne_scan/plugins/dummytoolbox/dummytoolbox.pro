@@ -52,15 +52,11 @@ DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
-            -lscMeasd \
-            -lscDispd \
-            -lscShared
+    LIBS += -lscMeasd \
+            -lMNE$${MNE_LIB_VERSION}Utilsd \
 } else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
-            -lscMeas \
-            -lscDisp \
-            -lscShared
+    LIBS += -lscMeas \
+            -lMNE$${MNE_LIB_VERSION}Utils \
 }
 
 SOURCES += \

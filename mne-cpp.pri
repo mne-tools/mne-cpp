@@ -130,6 +130,10 @@ QMAKE_TARGET_COPYRIGHT = Copyright (C) 2019 Authors of mne-cpp. All rights reser
 ## To build MNE-CPP against wasm: qmake MNECPP_CONFIG+=wasm
 ## To build MNE Scan with BrainFlow support: qmake MNECPP_CONFIG+=withBrainFlow
 ## To build MNE Scan with LSL support: qmake MNECPP_CONFIG+=withLsl
+## To build MNE Scan with BrainAMP support: qmake MNECPP_CONFIG+=withBrainAmp
+## To build MNE Scan with EegoSports support: qmake MNECPP_CONFIG+=withEego
+## To build MNE Scan with GUSBAmp support: qmake MNECPP_CONFIG+=withGUSBAmp
+## To build MNE Scan with TMSI support: qmake MNECPP_CONFIG+=withTmsi
 
 # Default flags
 MNECPP_CONFIG += dispOpenGL static

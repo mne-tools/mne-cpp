@@ -38,7 +38,7 @@
 
 #include <QtCore/qglobal.h>
 
-#if defined(STATICLIB)
+#if defined(STATICBUILD)
 #  define LSLADAPTERSHARED_EXPORT
 #elif defined(LSLADAPTER_PLUGIN)
 #  define LSLADAPTERSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */

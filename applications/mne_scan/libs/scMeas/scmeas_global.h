@@ -45,7 +45,7 @@
 // PREPROCESSOR DEFINES
 //=============================================================================================================
 
-#if defined(STATICLIB)
+#if defined(STATICBUILD)
 #  define SCMEASSHARED_EXPORT
 #elif defined(SCMEAS_LIBRARY)
 #  define SCMEASSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */

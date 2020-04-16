@@ -55,7 +55,7 @@ DESTDIR = $${MNE_LIBRARY_DIR}
 
 contains(MNECPP_CONFIG, static) {
     CONFIG += staticlib
-    DEFINES += STATICLIB
+    DEFINES += STATICBUILD
 } else {
     CONFIG += shared
 }

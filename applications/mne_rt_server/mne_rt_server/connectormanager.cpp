@@ -48,7 +48,7 @@
 
 #include <communication/rtCommand/commandmanager.h>
 
-#ifdef STATICLIB
+#ifdef STATICBUILD
 #include <../plugins/fiffsimulator/fiffsimulator.h>
 #endif
 
@@ -343,7 +343,7 @@ void ConnectorManager::loadConnectors(const QString& dir)
 {
     clearConnectorActivation();
 
-#ifdef STATICLIB
+#ifdef STATICBUILD
     Q_UNUSED(dir)
 
     // In case of a static build we have to load plugins manually.

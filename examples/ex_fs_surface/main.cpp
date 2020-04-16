@@ -73,7 +73,7 @@ using namespace DISP3DLIB;
  */
 int main(int argc, char *argv[])
 {
-    #ifdef STATICLIB
+    #ifdef STATICBUILD
     Q_INIT_RESOURCE(disp3d);
     #endif
     

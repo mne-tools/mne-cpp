@@ -71,26 +71,22 @@ DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
 
 contains(MNECPP_CONFIG, static) {
     CONFIG += staticlib
-    DEFINES += STATICLIB
+    DEFINES += STATICBUILD
 } else {
     CONFIG += shared
 }
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Dispd \
+    LIBS += -lscMeasd \
+            -lMNE$${MNE_LIB_VERSION}Dispd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Utilsd \
-            -lscMeasd \
-            -lscDispd \
-            -lscSharedd
 } else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Disp \
+    LIBS += -lscMeas \
+            -lMNE$${MNE_LIB_VERSION}Disp \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Utils \
-            -lscMeas \
-            -lscDisp \
-            -lscShared
 }
 
 SOURCES += \

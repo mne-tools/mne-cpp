@@ -49,36 +49,7 @@ DESTDIR = $${MNE_LIBRARY_DIR}
 
 contains(MNECPP_CONFIG, static) {
     CONFIG += staticlib
-    DEFINES += STATICLIB
-    LIBS += -L$${MNE_BINARY_DIR}/mne_scan_plugins
-    QTPLUGIN += fiffsimulator
-    QTPLUGIN += babymeg
-    QTPLUGIN += natus
-#    QTPLUGIN += gusbamp
-#    QTPLUGIN += eegosports
-#    QTPLUGIN += brainamp
-    QTPLUGIN += rtcmne
-    QTPLUGIN += averaging
-    QTPLUGIN += covariance
-    QTPLUGIN += noisereduction
-    QTPLUGIN += neuronalconnectivity
-    QTPLUGIN += ftbuffer
-    QTPLUGIN += writetofile
-    QTPLUGIN += hpi
-#    QTPLUGIN += dummytoolbox
-
-    contains(MNECPP_CONFIG, withLsl) {
-        QTPLUGIN += lsladapter
-        DEFINES += WITHLSL
-    }
-    win32: {
-        QTPLUGIN += tmsi
-        DEFINES += WITHTMSI
-    }
-    contains(MNECPP_CONFIG, withBrainFlow) {
-        QTPLUGIN += brainflowboard
-        DEFINES += WITHBRAINFLOW
-    }
+    DEFINES += STATICBUILD
 } else {
     CONFIG += shared
 }

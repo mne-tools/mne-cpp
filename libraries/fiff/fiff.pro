@@ -57,7 +57,7 @@ contains(MNECPP_CONFIG, wasm) {
 
 contains(MNECPP_CONFIG, static) {
     CONFIG += staticlib
-    DEFINES += STATICLIB
+    DEFINES += STATICBUILD
 } else {
     CONFIG += shared
 }

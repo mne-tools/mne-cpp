@@ -54,7 +54,7 @@ DESTDIR = $${MNE_BINARY_DIR}/mne_rt_server_plugins
 
 contains(MNECPP_CONFIG, static) {
     CONFIG += staticlib
-    DEFINES += STATICLIB
+    DEFINES += STATICBUILD
     RESOURCE_FILES += $${ROOT_DIR}/resources/mne_rt_server_plugins/fiffsimulator.json
 } else {
     CONFIG += shared
