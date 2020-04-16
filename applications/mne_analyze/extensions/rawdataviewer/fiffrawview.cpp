@@ -305,7 +305,7 @@ void FiffRawView::customContextMenuRequested(const QPoint &pos)
 
     QMenu* menu = new QMenu(this);
 
-    qDebug() << "MAX:" << m_pTableView->horizontalScrollBar()->maximum();
+    //qDebug() << "MAX:" << m_pTableView->horizontalScrollBar()->maximum();
 
     QAction* markTime = menu->addAction(tr("Mark time"));
     connect(markTime, &QAction::triggered,
