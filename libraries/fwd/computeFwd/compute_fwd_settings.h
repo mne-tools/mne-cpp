@@ -117,16 +117,16 @@ public:
     QString bemname;            /**< BEM model file */
     QString solname;            /**< Solution file */
     QString mindistoutname;     /**< Output file for omitted source space points */
-    bool filter_spaces;  	/**< Filter the source space points */
+    bool filter_spaces;         /**< Filter the source space points */
     Eigen::Vector3f r0;         /**< Sphere model origin  */
-    bool accurate;      	/**< Use accurate calculations */
-    bool fixed_ori;     	/**< Fixed-orientation dipoles? */
+    bool accurate;              /**< Use accurate calculations */
+    bool fixed_ori;             /**< Fixed-orientation dipoles? */
     bool include_meg;
     bool include_eeg;
     bool compute_grad;
     QString command;            /**< Saves the recognized command line for future use */
-    float mindist;       	/**< Minimum allowed distance of the sources from the inner skull surface */
-    int coord_frame; 		/**< Can be changed with the --mricoord option */
+    float mindist;              /**< Minimum allowed distance of the sources from the inner skull surface */
+    int coord_frame;            /**< Can be changed with the --mricoord option */
     bool do_all;
     QStringList labels;         /**< Compute the solution only for these labels */
     int nlabel;
@@ -138,7 +138,7 @@ public:
     bool use_equiv_eeg;      	/**< Use the equivalent source approach for the EEG sphere model */
     bool use_threads;        	/**< Parallelize? */
 
-    FIFFLIB::FiffCoordTransOld* meg_head_t;  /**< Shared pointer to Fiff Info */
+    FIFFLIB::FiffCoordTransOld* meg_head_t;  /**< Pointer to meg <-> head transformation*/
 
 private:
     void initMembers();
