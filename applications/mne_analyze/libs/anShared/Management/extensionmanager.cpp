@@ -89,16 +89,11 @@ void ExtensionManager::loadExtensionsFromDirectory(const QString& dir)
 #ifdef STATICLIB
     Q_UNUSED(dir);
 
-    // In case of a static build we have to load plugins manually.
-    QList<QObject*> lObjects;
-    lObjects << new DATALOADEREXTENSION::DataLoader;
-    lObjects << new DATAMANAGEREXTENSION::DataManager;
-    lObjects << new RAWDATAVIEWEREXTENSION::RawDataViewer;
-
-    for(int i = 0; i < lObjects.size(); ++i) {
+    const auto staticInstances = QPluginLoader::staticInstances();
+    for(QObject *plugin : staticInstances) {
         // IExtension
-        if(lObjects[i]) {
-            m_qVecExtensions.push_back(qobject_cast<IExtension*>(lObjects[i]));
+        if(IExtension* pExtension = qobject_cast<IExtension*>(plugin)) {
+            m_qVecExtensions.push_back(qobject_cast<IExtension*>(pExtension));
         }
     }
 #else
