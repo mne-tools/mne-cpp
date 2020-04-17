@@ -37,6 +37,13 @@ public:
 
     void setSampleFreq(float fFreq);
 
+    int getNumberOfAnnotations() const;
+
+    int getAnnotation(int iIndex) const;
+
+    void addNewAnnotationType(const QString &eventType, const QColor &typeColor);
+
+
 
 
 private:

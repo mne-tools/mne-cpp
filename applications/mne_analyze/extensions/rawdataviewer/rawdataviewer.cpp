@@ -48,7 +48,7 @@
 #include <disp/viewers/scalingview.h>
 #include "../dataloader/dataloader.h"
 #include "../dataloader/FormFiles/dataloadercontrol.h"
-#include "annotationmodel.h"
+#include <anShared/Model/annotationmodel.h>
 #include "annotationview.h"
 
 //=============================================================================================================
@@ -115,7 +115,7 @@ void RawDataViewer::init()
     m_bDisplayCreated = true;
 
     //create AnnotationModel
-    m_pAnnotationModel = QSharedPointer<AnnotationModel>(new AnnotationModel(this));
+    m_pAnnotationModel = QSharedPointer<ANSHAREDLIB::AnnotationModel>(new ANSHAREDLIB::AnnotationModel(this));
 }
 
 //=============================================================================================================
@@ -251,8 +251,10 @@ void RawDataViewer::setUpControls()
 
     connect(annotationWidget, &AnnotationView::activeEventsChecked,
             m_pFiffRawView.data(), &FiffRawView::toggleDisplayEvent);
+
     connect(m_pFiffRawView.data(), &FiffRawView::sendSamplePos,
             annotationWidget, &AnnotationView::addAnnotationToModel);
+
     connect(m_pFiffRawView.data(), &FiffRawView::sendSamplePos,
             this, &RawDataViewer::onSendSamplePos);
 

@@ -343,3 +343,24 @@ void AnnotationModel::setSampleFreq(float fFreq)
 {
     m_fFreq = fFreq;
 }
+
+//=============================================================================================================
+
+int AnnotationModel::getNumberOfAnnotations() const
+{
+    return m_dataSamples_Filtered.size();
+}
+
+//=============================================================================================================
+
+int AnnotationModel::getAnnotation(int iIndex) const
+{
+    return m_dataSamples_Filtered.at(iIndex);
+}
+
+//=============================================================================================================
+
+void AnnotationModel::addNewAnnotationType(const QString &eventType, const QColor &typeColor)
+{
+
+}
