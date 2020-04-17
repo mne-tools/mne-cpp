@@ -1,15 +1,13 @@
 //=============================================================================================================
 /**
- * @file     rawdataviewer.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
- *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
+ * @file     annotationmanager.h
+ * @author   Lorenz Esch <lesch@mgh.harvard.edu>
  * @version  dev
- * @date     October, 2018
+ * @date     November, 2019
  *
  * @section  LICENSE
  *
- * Copyright (C) 2018, Lorenz Esch, Lars Debor, Simon Heinke. All rights reserved.
+ * Copyright (C) 2019, Lorenz Esch. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -30,22 +28,22 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains the declaration of the RawDataViewer class.
+ * @brief    Contains the declaration of the annotationmanager class.
  *
  */
 
-#ifndef RAWDATAVIEWER_H
-#define RAWDATAVIEWER_H
+#ifndef ANNOTATIONMANAGER_H
+#define ANNOTATIONMANAGER_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "rawdataviewer_global.h"
-#include <anShared/Interfaces/IExtension.h>
-#include "annotationview.h"
-#include "annotationmodel.h"
+#include "annotationmanager_global.h"
 #include "annotationdelegate.h"
+#include "annotationview.h"
+
+#include <anShared/Interfaces/IExtension.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -59,96 +57,85 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class RawDataViewerControl;
-
 namespace ANSHAREDLIB {
     class Communicator;
-    class FiffRawViewModel;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE RAWDATAVIEWEREXTENSION
+// DEFINE NAMESPACE annotationmanagerEXTENSION
 //=============================================================================================================
 
-namespace RAWDATAVIEWEREXTENSION
+namespace ANNOTATIONMANAGEREXTENSION
 {
-    class FiffRawView;
-    class FiffRawViewDelegate;
+
+//=============================================================================================================
+// ANNOTATIONMANAGEREXTENSION FORWARD DECLARATIONS
+//=============================================================================================================
+
+class annotationmanagerControl;
 
 //=============================================================================================================
 /**
- * RawDataViewer Extension
+ * annotationmanager Extension
  *
- * @brief The RawDataViewer class provides a view to display raw fiff data.
+ * @brief The annotationmanager class provides input and output capabilities for the fiff file format.
  */
-class RAWDATAVIEWERSHARED_EXPORT RawDataViewer : public ANSHAREDLIB::IExtension
+class ANNOTATIONMANAGERSHARED_EXPORT AnnotationManager : public ANSHAREDLIB::IExtension
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "rawdataviewer.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "annotationmanager.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(ANSHAREDLIB::IExtension)
 
 public:
     //=========================================================================================================
     /**
-     * Constructs a RawDataViewer.
+     * Constructs an AnnotationManager.
      */
-    RawDataViewer();
+    AnnotationManager();
 
     //=========================================================================================================
     /**
-     * Destroys the RawDataViewer.
+     * Destroys the AnnotationManager.
      */
-    virtual ~RawDataViewer();
+    ~AnnotationManager() override;
 
     // IExtension functions
     virtual QSharedPointer<IExtension> clone() const override;
     virtual void init() override;
     virtual void unload() override;
     virtual QString getName() const override;
+
     virtual QMenu* getMenu() override;
     virtual QDockWidget* getControl() override;
     virtual QWidget* getView() override;
+
     virtual void handleEvent(QSharedPointer<ANSHAREDLIB::Event> e) override;
     virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
 
     void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
 
-private:
-
-    //=========================================================================================================
-    /**
-     * Sets up control widgets, connects all relevant signals and slots, and diplays controls to user
-     */
     void setUpControls();
 
-    void onSendSamplePos(int iSample);
+    void toggleDisplayEvent(const int& iToggle);
 
-    // Control
-    QPointer<QDockWidget>                m_pControlDock;                 /**< Control Widget */
-    QPointer<ANSHAREDLIB::Communicator>  m_pCommu;
+private:
 
-    // Model
-    int m_iSamplesPerBlock;
-    int m_iVisibleBlocks;
-    int m_iBufferBlocks;
+    QPointer<QDockWidget>               m_pControl;             /**< Control Widget */
 
-    QSharedPointer<ANSHAREDLIB::FiffRawViewModel>   m_pRawModel;
-    QSharedPointer<FiffRawViewDelegate>             m_pRawDelegate;
+    QPointer<ANSHAREDLIB::Communicator> m_pCommu;
 
-    QSharedPointer<ANSHAREDLIB::AnnotationModel>                 m_pAnnotationModel;
+    QSharedPointer<AnnotationView>                  m_pAnnotationView;
+    QSharedPointer<ANSHAREDLIB::AnnotationModel>    m_pAnnotationModel;
 
-    QPointer<FiffRawView>                           m_pFiffRawView;     /**< View for Fiff data */
-    bool                                            m_bDisplayCreated;  /**< Flag for remembering whether or not the display was already created */
+    QSharedPointer<ANSHAREDLIB::FiffRawViewModel>   m_pFiffRawModel;
 
-    QVBoxLayout*            m_pLayout;              /**< Layout for widgets in the controller view */
-    QWidget*                m_pContainer;           /**< Container for widgets in the controller view */
+    QString                             m_sCurrentlySelectedModel;
+
+    int m_iToggle;
+
 };
-
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
 
 } // NAMESPACE
 
-#endif // RAWDATAVIEWER_H
+#endif // ANNOTATIONMANAGER_H

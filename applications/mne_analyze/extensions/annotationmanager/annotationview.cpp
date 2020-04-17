@@ -46,6 +46,12 @@ AnnotationView::AnnotationView()
 , m_pAnnModel(Q_NULLPTR)
 {
     ui->setupUi(this);
+
+    m_pAnnModel = QSharedPointer<ANSHAREDLIB::AnnotationModel>(new ANSHAREDLIB::AnnotationModel(this));
+
+    initMSVCSettings();
+    initGUIFunctionality();
+    onDataChanged();
 }
 
 //=============================================================================================================
@@ -89,16 +95,16 @@ void AnnotationView::initGUIFunctionality()
     toolBar->setOrientation(Qt::Vertical);
     toolBar->setMovable(false);
 
-    QAction* removeEvent = new QAction(QIcon(":Images/removeEvent.png"),tr("Remove annotation"), this);
+    QAction* removeEvent = new QAction("Remove", this);
     removeEvent->setStatusTip(tr("Remove an annotation from the list"));
     toolBar->addAction(removeEvent);
     connect(removeEvent, &QAction::triggered,
             this, &AnnotationView::removeAnnotationfromModel);
 
-    ui->m_gridLayout_Main->addWidget(toolBar,0,1,1,1);
+    ui->m_gridLayout_Main->addWidget(toolBar,1,1,1,1);
 
-//    connect(ui->m_pushButton_Remove, &QPushButton::clicked,
-//            this, &AnnotationView::addNewAnnotationType);
+    connect(ui->m_pushButton_addEventType, &QPushButton::clicked,
+            this, &AnnotationView::addNewAnnotationType);
 
 }
 
