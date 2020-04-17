@@ -90,15 +90,27 @@ Build Qt from source. This is needed since we want to have threading support whi
 
   With thread support:
 
+<<<<<<< HEAD
   ```
   ../qt5/configure -opensource -confirm-license -xplatform wasm-emscripten -feature-thread -nomake examples -no-dbus -no-ssl -prefix ../qt5_wasm_binaries
   ```
+=======
+      ```
+      ../qt5/configure -opensource -confirm-license -xplatform wasm-emscripten -feature-thread -nomake examples -no-dbus -no-ssl -prefix "../qt5_wasm_binaries"
+      ```
+>>>>>>> MAINT: add wasm build to CI
 
   Without thread support:
 
+<<<<<<< HEAD
   ```
   ../qt5/configure -opensource -confirm-license -xplatform wasm-emscripten -nomake examples -no-dbus -no-ssl -prefix ../qt5_wasm_binaries
   ```
+=======
+      ```
+      ../qt5/configure -opensource -confirm-license -xplatform wasm-emscripten -nomake examples -no-dbus -no-ssl -prefix "../qt5_wasm_binaries"
+      ```
+>>>>>>> MAINT: add wasm build to CI
 
   * Build Qt and install to target (prefix) location afterwards. For MNE-CPP we only need the qt charts, qtsvg and qtbase module (see [https://wiki.qt.io/Qt_for_WebAssembly](https://wiki.qt.io/Qt_for_WebAssembly){:target="_blank" rel="noopener"} for officially supported modules):
 
@@ -126,7 +138,11 @@ cd mne-cpp_shadow
 make -j8
 ```
 
+<<<<<<< HEAD
 This should create the applications featured under applications, e.g. MNE Browse, to be build to mne-cpp/bin
+=======
+ * This should create the applications featured under applications, e.g. MNE Analyze, to be build to mne-cpp/bin
+>>>>>>> MAINT: add wasm build to CI
 
 ## Running an application
 
@@ -138,15 +154,19 @@ python3 -m http.server
 
 Start to a suitable web browser (Chromium based browsers and Mozilla seem to work the best) and type:
 
+<<<<<<< HEAD
 ```
 http://localhost:8000/mne_browse.html
 ```
+=======
+  ```
+  http://localhost:8000/mne_analyze.html
+  ```
+>>>>>>> MAINT: add wasm build to CI
 
 ## Example builds
 
 Example builds can be found here (Chromium based and Mozilla browsers seem to work the best):
-
-  [https://mne-cpp.github.io/wasm/mne_browse.html](https://mne-cpp.github.io/wasm/mne_browse.html){:target="_blank" rel="noopener"}
 
   [https://mne-cpp.github.io/wasm/mne_analyze.html](https://mne-cpp.github.io/wasm/mne_analyze.html){:target="_blank" rel="noopener"}
 

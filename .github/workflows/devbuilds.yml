@@ -3,44 +3,44 @@ name: Linux|Win|MacOS
 on:
   push:
     branches:
-    - master
+    - alternate
 
 jobs:
-  UpdateDevTag:
-    runs-on: ubuntu-16.04
+  # UpdateDevTag:
+  #   runs-on: ubuntu-16.04
     
-    steps:
-    - name: Clone repository
-      uses: actions/checkout@v2  
-    - name: Install hub
-      uses: geertvdc/setup-hub@master
-    - name: Setup Github credentials
-      uses: fusion-engineering/setup-git-credentials@v2
-      with:
-        credentials: ${{secrets.GIT_CREDENTIALS}}
-    - name: Update dev_build tag and release
-      env:
-        GITHUB_USER: LorenzE
-        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-      run: |
-        git config --global user.email lorenzesch@hotmail.com
-        git config --global user.name $GITHUB_USER
-        # Delete current dev_build release remotley. 
-        # Must be done before deleting the remote tag associated with the dev_build release. 
-        # This prevents a draft release to be left over after we delete the tag remotley. 
-        hub release delete dev_build
-        # Delete current tag remotley
-        git push origin :refs/tags/dev_build
-        # Change dev_build tag to point to newest commit
-        git tag dev_build -f -a -m "Development Builds"
-        # Send the new tag
-        git push -f --tag
-        # Create new dev_build release
-        hub release create -m "Development Builds" dev_build --prerelease
+  #   steps:
+  #   - name: Clone repository
+  #     uses: actions/checkout@v2  
+  #   - name: Install hub
+  #     uses: geertvdc/setup-hub@master
+  #   - name: Setup Github credentials
+  #     uses: fusion-engineering/setup-git-credentials@v2
+  #     with:
+  #       credentials: ${{secrets.GIT_CREDENTIALS}}
+  #   - name: Update dev_build tag and release
+  #     env:
+  #       GITHUB_USER: LorenzE
+  #       GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+  #     run: |
+  #       git config --global user.email lorenzesch@hotmail.com
+  #       git config --global user.name $GITHUB_USER
+  #       # Delete current dev_build release remotley. 
+  #       # Must be done before deleting the remote tag associated with the dev_build release. 
+  #       # This prevents a draft release to be left over after we delete the tag remotley. 
+  #       hub release delete dev_build
+  #       # Delete current tag remotley
+  #       git push origin :refs/tags/dev_build
+  #       # Change dev_build tag to point to newest commit
+  #       git tag dev_build -f -a -m "Development Builds"
+  #       # Send the new tag
+  #       git push -f --tag
+  #       # Create new dev_build release
+  #       hub release create -m "Development Builds" dev_build --prerelease
 
   LinuxStatic:
     runs-on: ubuntu-16.04
-    needs: UpdateDevTag
+ #   needs: UpdateDevTag
     
     steps:
     - name: Clone repository
@@ -72,14 +72,16 @@ jobs:
     #     make install -j4
     - name: Configure and compile MNE-CPP
       run: |
-        ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples MNECPP_CONFIG+=static
-        make -j4
+        ../qt5/qtbase/bin/qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples MNECPP_CONFIG+=static
+        make -j2
     - name: Package binaries
       run: |
         # Delete folders which we do not want to ship
         rm -r bin/mne_rt_server_plugins
         rm -r bin/mne-cpp-test-data
         rm -r bin/mne_scan_plugins
+        rm -r bin/mne_analyze_extensions
+        rm -r bin/mne-cpp-test-data
         # Creating archive of everything in the bin directory
         tar cfvz mne-cpp-linux-static-x86_64.tar.gz bin/.
     - name: Deploy binaries with dev_build release on Github
@@ -93,7 +95,7 @@ jobs:
 
   MacOSStatic:
     runs-on: macos-latest
-    needs: UpdateDevTag
+  #  needs: UpdateDevTag
     
     steps:
     - name: Clone repository
@@ -121,14 +123,16 @@ jobs:
     #     make install -j4
     - name: Configure and compile MNE-CPP
       run: |
-        ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples MNECPP_CONFIG+=static
-        make -j4
+        ../qt5/qtbase/bin/qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples MNECPP_CONFIG+=static
+        make -j2
     - name: Package binaries
       run: |
         # Delete folders which we do not want to ship
         rm -r bin/mne_rt_server_plugins
         rm -r bin/mne-cpp-test-data
         rm -r bin/mne_scan_plugins
+        rm -r bin/mne_analyze_extensions
+        rm -r bin/mne-cpp-test-data
         # Creating archive of all macos deployed applications
         tar cfvz mne-cpp-macos-static-x86_64.tar.gz bin/.
     - name: Deploy binaries with dev_build release on Github
@@ -507,4 +511,71 @@ jobs:
         cd mne-cpp.github.io
         git add .
         git commit --amend -a -m 'Update docu'
+        git push -f --all
+
+  Wasm:
+    runs-on: ubuntu-latest
+    needs: UpdateDevTag
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v2
+    - name: Setup Github credentials
+      uses: fusion-engineering/setup-git-credentials@v2
+      with:
+        credentials: ${{secrets.GIT_CREDENTIALS_DOCU_TEST}}
+    - name: Setup emscripten compiler 
+      run: |
+        cd ..
+        # Get the emsdk repo
+        git clone https://github.com/emscripten-core/emsdk.git
+        # Enter that directory and pull
+        cd emsdk
+        git pull
+        # Download and install the latest SDK tools.
+        ./emsdk install 1.39.3        
+    - name: Compile wasm Qt version
+      run: |
+        cd ..
+        # Make the "latest" emscripten SDK "active" for the current user.
+        ./emsdk/emsdk activate 1.39.3
+        # Activate PATH and other environment variables in the current terminal
+        source ./emsdk/emsdk_env.sh
+        # Clone Qt5 repo
+        git clone https://code.qt.io/qt/qt5.git -b 5.14.2
+        cd qt5
+        ./init-repository -f --module-subset=qtbase,qtcharts,qtsvg
+        # Configure Qt5
+        ./configure -xplatform wasm-emscripten -feature-thread -skip webengine -nomake tests -nomake examples -no-dbus -no-ssl -no-pch -opensource -confirm-license -prefix $PWD/qtbase
+        make module-qtbase module-qtsvg module-qtcharts -j2
+    - name: Configure and compile MNE-CPP
+      run: |
+        cd ..
+        # Make the "latest" emscripten SDK "active" for the current user.
+        ./emsdk/emsdk activate 1.39.3
+        # Activate PATH and other environment variables in the current terminal
+        source ./emsdk/emsdk_env.sh
+        § Compile MNE-CPP        
+        cd mne-cpp
+        ../qt5/qtbase/bin/qmake -r MNECPP_CONFIG=wasm
+        make -j2
+    - name: Clone and update mne-cpp/wasm:gh-pages
+      run: |
+        # Delete folders which we do not want to ship
+        rm -r bin/mne_analyze_extensions
+        rm -r bin/mne-cpp-test-data
+        rm -r bin/MNE-sample-data
+        # Clone repo and update with new wasm versions
+        git config --global user.email lorenzesch@hotmail.com
+        git config --global user.name LorenzE
+        git clone -b master --single-branch https://github.com/mne-cpp/wasm.git
+        cd wasm
+        # Remove all files first
+        git rm * -r
+        git commit --amend -a -m 'Update wasm builds' --allow-empty
+        cd ..
+        cp -RT bin wasm
+        cd wasm
+        git add .
+        git commit --amend -a -m 'Update wasm builds'
         git push -f --all
