@@ -122,6 +122,8 @@ private:
      */
     void setUpControls();
 
+    void onSendSamplePos(int iSample);
+
     // Control
     QPointer<QDockWidget>                m_pControlDock;                 /**< Control Widget */
     QPointer<ANSHAREDLIB::Communicator>  m_pCommu;

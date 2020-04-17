@@ -253,6 +253,8 @@ void RawDataViewer::setUpControls()
             m_pFiffRawView.data(), &FiffRawView::toggleDisplayEvent);
     connect(m_pFiffRawView.data(), &FiffRawView::sendSamplePos,
             annotationWidget, &AnnotationView::addAnnotationToModel);
+    connect(m_pFiffRawView.data(), &FiffRawView::sendSamplePos,
+            this, &RawDataViewer::onSendSamplePos);
 
     //Set up layout w/ control widgets
     m_pLayout->addWidget(scalingWidget);
@@ -264,4 +266,14 @@ void RawDataViewer::setUpControls()
     m_pControlDock->setWidget(m_pContainer);
     m_pContainer->setLayout(m_pLayout);
     m_pContainer->show();
+}
+
+//=============================================================================================================
+
+void RawDataViewer::onSendSamplePos(int iSample)
+{
+    QVariant data;
+    data.setValue(iSample);
+
+    m_pCommu->publishEvent(EVENT_TYPE::NEW_ANNOTATION_ADDED, data);
 }

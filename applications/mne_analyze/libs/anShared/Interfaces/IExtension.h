@@ -180,7 +180,6 @@ public slots:
 protected:
     QSharedPointer<AnalyzeData>     m_pAnalyzeData;         /**< Pointer to the global data base */
     QSharedPointer<AnalyzeSettings> m_pAnalyzeSettings;     /**< Pointer to the global analyze settings */
-
 };
 
 //=============================================================================================================
