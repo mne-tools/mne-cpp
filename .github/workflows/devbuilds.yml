@@ -21,7 +21,7 @@ jobs:
     - name: Update dev_build tag and release
       env:
         GITHUB_USER: LorenzE
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |
         git config --global user.email lorenzesch@hotmail.com
         git config --global user.name $GITHUB_USER
@@ -64,16 +64,20 @@ jobs:
         make install -j2
     - name: Configure and compile MNE-CPP
       run: |
-        ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=static
+        ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples MNECPP_CONFIG+=static
         make -j2
     - name: Package binaries
       run: |
+        # Delete folders which we do not want to ship
+        rm -r bin/mne_rt_server_plugins
+        rm -r bin/mne_scan_plugins
+        rm -r bin/mne_analyze_extensions
         # Creating archive of everything in the bin directory
         tar cfvz ../mne-cpp-linux-static-x86_64.tar.gz bin/.
     - name: Deploy binaries with dev_build release on Github
       uses: svenstaro/upload-release-action@v1-release
       with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        repo_token: ${{ secrets.GH_TOKEN }}
         file: mne-cpp-linux-static-x86_64.tar.gz
         asset_name: mne-cpp-linux-static-x86_64.tar.gz
         tag: dev_build
@@ -103,16 +107,20 @@ jobs:
         make install -j2
     - name: Configure and compile MNE-CPP
       run: |
-        ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=static
+        ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples MNECPP_CONFIG+=static
         make -j2
     - name: Package binaries
       run: |
+        # Delete folders which we do not want to ship
+        rm -r bin/mne_rt_server_plugins
+        rm -r bin/mne_scan_plugins
+        rm -r bin/mne_analyze_extensions
         # Creating archive of all macos deployed applications
         tar cfvz mne-cpp-macos-static-x86_64.tar.gz bin/.
     - name: Deploy MNE Scan binaries with dev_build release on Github
       uses: svenstaro/upload-release-action@v1-release
       with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        repo_token: ${{ secrets.GH_TOKEN }}
         file: mne-cpp-macos-static-x86_64.tar.gz
         asset_name: mne-cpp-macos-static-x86_64.tar.gz
         tag: dev_build
@@ -183,7 +191,7 @@ jobs:
     - name: Deploy binaries with dev_build release on Github
       uses: svenstaro/upload-release-action@v1-release
       with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        repo_token: ${{ secrets.GH_TOKEN }}
         file: mne-cpp-linux-dynamic-x86_64.tar.gz
         asset_name: mne-cpp-linux-dynamic-x86_64.tar.gz
         tag: dev_build
@@ -240,7 +248,7 @@ jobs:
     - name: Deploy MNE Scan binaries with dev_build release on Github
       uses: svenstaro/upload-release-action@v1-release
       with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        repo_token: ${{ secrets.GH_TOKEN }}
         file: mne-cpp-macos-dynamic-x86_64.tar.gz
         asset_name: mne-cpp-macos-dynamic-x86_64.tar.gz
         tag: dev_build
@@ -303,7 +311,7 @@ jobs:
     - name: Deploy binaries with dev_build release on Github
       uses: svenstaro/upload-release-action@v1-release
       with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        repo_token: ${{ secrets.GH_TOKEN }}
         file: mne-cpp-windows-dynamic-x86_64.zip
         asset_name: mne-cpp-windows-dynamic-x86_64.zip
         tag: dev_build
@@ -350,6 +358,7 @@ jobs:
           # Hide codecov output since it corrupts the log too much
           codecov > /dev/null
         done
+        
   Doxygen:
     runs-on: ubuntu-latest
     needs: UpdateDevTag
@@ -372,7 +381,7 @@ jobs:
     - name: Deploy qch docu data base with dev_build release on Github
       uses: svenstaro/upload-release-action@v1-release
       with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        repo_token: ${{ secrets.GH_TOKEN }}
         file: doc/doxygen/qt-creator_doc/mne-cpp.qch
         asset_name: mne-cpp-doc-qtcreator.qch
         tag: dev_build
