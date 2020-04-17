@@ -146,7 +146,13 @@ QWidget *DataManager::getView()
 
 void DataManager::handleEvent(QSharedPointer<Event> e)
 {
-    qDebug() << "[DataManager::handleEvent] received an Event that is not handled by switch-cases";
+    switch (e->getType()) {
+    case NEW_ANNOTATION_ADDED:
+        qDebug() << "DataManager::handleEvent received NEW_ANNOTATION_ADDED:" << e->getData().toInt();
+        break;
+    default:
+        qWarning() << "[DataManager::handleEvent] received an Event that is not handled by switch-cases";
+    }
 }
 
 //=============================================================================================================
@@ -154,7 +160,8 @@ void DataManager::handleEvent(QSharedPointer<Event> e)
 QVector<EVENT_TYPE> DataManager::getEventSubscriptions(void) const
 {
     QVector<EVENT_TYPE> temp;
-    temp.push_back(EXTENSION_INIT_FINISHED);
+    temp.push_back(NEW_ANNOTATION_ADDED);
+
     return temp;
 }
 
