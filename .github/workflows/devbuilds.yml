@@ -71,7 +71,6 @@ jobs:
         # Delete folders which we do not want to ship
         rm -r bin/mne_rt_server_plugins
         rm -r bin/mne_scan_plugins
-        rm -r bin/mne_analyze_extensions
         # Creating archive of everything in the bin directory
         tar cfvz ../mne-cpp-linux-static-x86_64.tar.gz bin/.
     - name: Deploy binaries with dev_build release on Github
@@ -114,7 +113,6 @@ jobs:
         # Delete folders which we do not want to ship
         rm -r bin/mne_rt_server_plugins
         rm -r bin/mne_scan_plugins
-        rm -r bin/mne_analyze_extensions
         # Creating archive of all macos deployed applications
         tar cfvz mne-cpp-macos-static-x86_64.tar.gz bin/.
     - name: Deploy MNE Scan binaries with dev_build release on Github
