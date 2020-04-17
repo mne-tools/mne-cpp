@@ -4,6 +4,7 @@
 
 #include <fiff/c/fiff_coord_trans_old.h>
 #include "../fwd_coil_set.h"
+#include "../fwd_comp_data.h"
 #include <mne/c/mne_ctf_comp_data_set.h>
 #include "../fwd_eeg_sphere_model_set.h"
 #include "../fwd_bem_model.h"
@@ -2222,20 +2223,41 @@ void ComputeFwd::calculateFwd()
 
 void ComputeFwd::updateHeadPos(FiffCoordTransOld* meg_head_t)
 {
+
+    qDebug() << "Coordframe Transformation from: " << meg_head_t->from;
+    qDebug() << "Coordframe Transformation to: " << meg_head_t->to;
+    qDebug() << "Coordframe Coilset: " << megcoils->coord_frame;
+
     FwdCoilSet* megcoilsNew = megcoils->dup_coil_set(meg_head_t);
-    FwdCoilSet* compcoilsNew = compcoils->dup_coil_set(meg_head_t);
-    if ((FwdBemModel::compute_forward_meg(spaces,
-                                          nspace,
-                                          megcoilsNew,
-                                          compcoilsNew,
-                                          comp_data,
-                                          settings->fixed_ori,
-                                          bem_model,
-                                          &settings->r0,
-                                          settings->use_threads,
-                                          &meg_forward,
-                                          settings->compute_grad ? &meg_forward_grad : Q_NULLPTR)) == FAIL) {
+
+    // Field computation matrices...
+    qDebug() << "!!!TODO Speed the following with Eigen up!";
+    printf("Composing the field computation matrix...");
+    if (FwdBemModel::fwd_bem_specify_coils(bem_model,megcoilsNew) == FAIL) {
         return;
+    }
+    fprintf(stderr,"[done]\n");
+
+    if(compcoils) {
+        FwdCoilSet* compcoilsNew = compcoils->dup_coil_set(meg_head_t);
+        FwdCompData* comp = NULL;
+
+        FwdCompData::fwd_make_comp_data(comp_data,
+                                        megcoilsNew,
+                                        compcoilsNew,
+                                        FwdBemModel::fwd_bem_field,
+                                        NULL,
+                                        FwdBemModel::fwd_bem_field_grad,
+                                        bem_model,
+                                        NULL);
+
+        if (comp->set && comp->set->current) { /* Test just to specify confusing output */
+            fprintf(stderr,"Composing the field computation matrix (compensation coils)...");
+            if (FwdBemModel::fwd_bem_specify_coils(bem_model,comp->comp_coils) == FAIL) {
+                return;
+            }
+            fprintf(stderr,"[done]\n");
+        }
     }
 }
 
