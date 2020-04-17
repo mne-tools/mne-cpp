@@ -43,7 +43,6 @@
 
 #include <fiff/fiff_ch_info.h>
 #include <anShared/Model/annotationmodel.h>
-
 #include "annotationdelegate.h"
 
 //=============================================================================================================
@@ -127,6 +126,7 @@ private:
 
     void initGUIFunctionality();
     void initMSVCSettings();
+    void initConnections();
 
     Ui::EventWindowDockWidget*                      ui;
 

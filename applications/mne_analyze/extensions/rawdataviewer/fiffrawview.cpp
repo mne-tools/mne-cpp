@@ -40,9 +40,9 @@
 //=============================================================================================================
 
 #include "fiffrawview.h"
-#include "annotationmodel.h"
 #include "fiffrawviewdelegate.h"
 #include <anShared/Model/fiffrawviewmodel.h>
+#include <anShared/Model/annotationmodel.h>
 
 //=============================================================================================================
 // Qt INCLUDES
