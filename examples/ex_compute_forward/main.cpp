@@ -138,5 +138,5 @@ int main(int argc, char *argv[])
 
     timer.start();
     pFwdMEGEEGComputed->updateHeadPos(&meg_head_t);
-    qInfo() << "The re-computation took: " << timer.elapsed() << " ms.";
+    qInfo() << "The recomputation took: " << timer.elapsed() << " ms.";
 }
