@@ -576,7 +576,7 @@ jobs:
         # Clone repo and update with new wasm versions
         git config --global user.email lorenzesch@hotmail.com
         git config --global user.name LorenzE
-        git clone -b master --single-branch https://github.com/mne-cpp/wasm.git
+        git clone -b gh-pages --single-branch https://github.com/mne-cpp/wasm.git
         cd wasm
         # Remove all files first
         git rm * -r
