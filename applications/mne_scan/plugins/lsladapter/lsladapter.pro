@@ -55,7 +55,7 @@ contains(MNECPP_CONFIG, static) {
     CONFIG += shared
 }
 
-DESTDIR = $${MNE_BINAR
+DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
