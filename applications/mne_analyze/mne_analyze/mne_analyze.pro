@@ -39,8 +39,13 @@ include(../../../mne-cpp.pri)
 
 TEMPLATE = app
 
-QT += gui widgets network
+QT += gui widgets network opengl
 qtHaveModule(printsupport): QT += printsupport
+
+contains(MNECPP_CONFIG, noOpenGL) {
+    DEFINES += NO_OPENGL
+    QT -= opengl
+}
 
 TARGET = mne_analyze
 
