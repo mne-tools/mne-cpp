@@ -96,7 +96,7 @@ Build Qt from source. This is needed since we want to have threading support whi
   ```
 =======
       ```
-      ../qt5/configure -opensource -confirm-license -xplatform wasm-emscripten -feature-thread -nomake examples -no-dbus -no-ssl -prefix "../qt5_wasm_binaries"
+      ../qt5/configure -opensource -confirm-license -xplatform wasm-emscripten -feature-thread -nomake examples -no-dbus -no-ssl -prefix $PWD/../qt5_wasm_binaries
       ```
 >>>>>>> MAINT: add wasm build to CI
 
@@ -108,7 +108,7 @@ Build Qt from source. This is needed since we want to have threading support whi
   ```
 =======
       ```
-      ../qt5/configure -opensource -confirm-license -xplatform wasm-emscripten -nomake examples -no-dbus -no-ssl -prefix "../qt5_wasm_binaries"
+      ../qt5/configure -opensource -confirm-license -xplatform wasm-emscripten -nomake examples -no-dbus -no-ssl -prefix $PWD/../qt5_wasm_binaries
       ```
 >>>>>>> MAINT: add wasm build to CI
 

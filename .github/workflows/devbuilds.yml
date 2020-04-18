@@ -564,7 +564,7 @@ jobs:
         source ./emsdk/emsdk_env.sh
         # Compile MNE-CPP        
         cd mne-cpp
-        ../qt5_wasm_binaries/bin/qmake -r MNECPP_CONFIG=wasm
+        ../qt5_wasm_binaries/bin/qmake -r MNECPP_CONFIG+=wasm
         make -j2
         make install -j2
     - name: Clone and update mne-cpp/wasm:gh-pages

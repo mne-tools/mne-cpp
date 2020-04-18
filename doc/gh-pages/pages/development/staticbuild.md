@@ -78,7 +78,13 @@ Setup the following dependencies:
 * Install the [Windows 10 SDK](https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk/){:target="_blank" rel="noopener"} (can also be installed via the MSVC community edition installer)
 * If you want to use multiple cores (MSVC's `nmake` does not support multicore usage), install the [jom compiler](http://download.qt.io/official_releases/jom/jom.zip){:target="_blank" rel="noopener"} and add it to `PATH`
 
+<<<<<<< HEAD
 Navigate to the `qt5` folder and init the repository:
+=======
+    ```
+    ../qt5/configure -static -release -skip webengine -nomake tools -nomake tests -nomake examples -no-dbus -no-ssl -no-pch -opensource -confirm-license -prefix $PWD/../qt5_static_binaries 
+    ```
+>>>>>>> MAINT: Change opengl flag for disp library and disable by default when using the wasm flag. Improve docu.
 
 ```
 perl init-repository -f --module-subset=qtbase,qtcharts,qtsvg,qt3d
