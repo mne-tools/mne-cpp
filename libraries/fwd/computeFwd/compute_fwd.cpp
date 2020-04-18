@@ -18,6 +18,8 @@
 
 #include <time.h>
 
+#include <Eigen/Dense>
+
 #include <QCoreApplication>
 #include <QFile>
 #include <QDir>
@@ -2221,14 +2223,42 @@ void ComputeFwd::calculateFwd()
 
 //=========================================================================================================
 
-void ComputeFwd::updateHeadPos(FiffCoordTransOld* meg_head_t)
+void ComputeFwd::updateHeadPos(FiffCoordTransOld* dev_head_t)
 {
+    // transformation fro one point in head space to another
+    FiffCoordTransOld* head_head_t = new FiffCoordTransOld;
+    // get transformation matrix in Headspace between two meg <-> head matrices
+    if(dev_head_t->from != megcoils->coord_frame) {
+        if(dev_head_t->to != megcoils->coord_frame) {
+            qWarning() << "ComputeFwd::updateHeadPos: Target Space not in Head Space - Space: " << dev_head_t->to;
+            return;
+        }
+        // calclulate rotation
+        Matrix3f matRot = meg_head_t->rot;
+        Matrix3f matRotDest = dev_head_t->rot;
+        Matrix3f matRotNew = Matrix3f::Zero(3,3);
 
-    qDebug() << "Coordframe Transformation from: " << meg_head_t->from;
-    qDebug() << "Coordframe Transformation to: " << meg_head_t->to;
-    qDebug() << "Coordframe Coilset: " << megcoils->coord_frame;
+        Quaternionf quat(matRot);
+        Quaternionf quatDest(matRotDest);
+        Quaternionf quatNew;
+        quatNew = quat*quatDest.inverse();
+        matRotNew = quatNew.toRotationMatrix();
+        std::cout << matRotNew << std::endl;
 
-    FwdCoilSet* megcoilsNew = megcoils->dup_coil_set(meg_head_t);
+        // calculate translation
+        VectorXf vecTrans = meg_head_t->move;
+        VectorXf vecTransDest = dev_head_t->move;
+        VectorXf vecTransNew = vecTrans - vecTransDest;
+
+        // update ne transformation matrix
+        head_head_t->from = megcoils->coord_frame;
+        head_head_t->to = megcoils->coord_frame;
+        head_head_t->rot = matRotNew;
+        head_head_t->move = vecTransNew;
+        head_head_t->add_inverse(head_head_t);
+    }
+
+    FwdCoilSet* megcoilsNew = megcoils->dup_coil_set(head_head_t);
 
     // Field computation matrices...
     qDebug() << "!!!TODO Speed the following with Eigen up!";
@@ -2239,7 +2269,8 @@ void ComputeFwd::updateHeadPos(FiffCoordTransOld* meg_head_t)
     fprintf(stderr,"[done]\n");
 
     if(compcoils) {
-        FwdCoilSet* compcoilsNew = compcoils->dup_coil_set(meg_head_t);
+        qDebug() << "calc compensator";
+        FwdCoilSet* compcoilsNew = compcoils->dup_coil_set(dev_head_t);
         FwdCompData* comp = NULL;
 
         FwdCompData::fwd_make_comp_data(comp_data,
@@ -2259,6 +2290,8 @@ void ComputeFwd::updateHeadPos(FiffCoordTransOld* meg_head_t)
             fprintf(stderr,"[done]\n");
         }
     }
+    // Update new Transformation Matrix
+    meg_head_t = dev_head_t;
 }
 
 //=========================================================================================================

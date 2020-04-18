@@ -164,7 +164,7 @@ private:
     int nspace;                                     /* How many? */
     FwdCoilSet *megcoils;                           /* The MEG coil set */
     FwdCoilSet *compcoils;                          /* The compensator coil set */
-    FwdCoilSet* eegels;                             /* The eeg wcwltrode set */
+    FwdCoilSet* eegels;                             /* The eeg eceltrode set */
     MNELIB::MneCTFCompDataSet *comp_data;           /* The compensator data */
     FwdEegSphereModelSet* eeg_models;               /* The EEG model set */
     FwdEegSphereModel* eeg_model;                   /* The EEG model */
