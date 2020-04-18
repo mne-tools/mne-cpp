@@ -170,13 +170,15 @@ macx {
     QMAKE_BUNDLE_DATA += extensions
     EXTRA_ARGS = -dmg
 
-    # 3 entries returned in DEPLOY_CMD
-    DEPLOY_CMD = $$macDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
-    QMAKE_POST_LINK += $${DEPLOY_CMD}
+    !contains(MNECPP_CONFIG, static) {
+        # 3 entries returned in DEPLOY_CMD
+        DEPLOY_CMD = $$macDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
+        QMAKE_POST_LINK += $${DEPLOY_CMD}
 
-    deploy_app = $$member(DEPLOY_CMD, 1)
-    dmg_file = $$replace(deploy_app, .app, .dmg)
-    QMAKE_CLEAN += -r $${deploy_app} $${dmg_file}
+        deploy_app = $$member(DEPLOY_CMD, 1)
+        dmg_file = $$replace(deploy_app, .app, .dmg)
+        QMAKE_CLEAN += -r $${deploy_app} $${dmg_file}
+    }
 }
 
 # Activate FFTW backend in Eigen for non-static builds only
