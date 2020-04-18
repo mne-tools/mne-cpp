@@ -37,7 +37,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT += core widgets svg concurrent
+QT += core widgets svg concurrent opengl
 
 qtHaveModule(printsupport): QT += printsupport
 qtHaveModule(charts): QT += charts
