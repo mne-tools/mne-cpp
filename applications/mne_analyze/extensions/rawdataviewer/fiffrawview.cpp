@@ -58,7 +58,7 @@
 #include <QSvgGenerator>
 #include <QAbstractScrollArea>
 
-#if defined(USE_OPENGL)
+#if !defined(NO_OPENGL)
     #include <QGLWidget>
 #endif
 
@@ -79,7 +79,7 @@ FiffRawView::FiffRawView(QWidget *parent)
 {
     m_pTableView = new QTableView;
 
-#if defined(USE_OPENGL)
+#if !defined(NO_OPENGL)
     //Use GPU rendering
     QGLFormat currentFormat = QGLFormat(QGL::SampleBuffers);
     currentFormat.setSamples(3);

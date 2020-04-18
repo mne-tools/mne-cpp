@@ -42,11 +42,11 @@ CONFIG += plugin
 
 DEFINES += RAWDATAVIEWER_EXTENSION
 
-QT += gui widgets charts svg
+QT += gui widgets charts svg opengl
 
-contains(MNECPP_CONFIG, dispOpenGL) {
-    DEFINES += USE_OPENGL
-    QT += opengl
+contains(MNECPP_CONFIG, noOpenGL) {
+    DEFINES += NO_OPENGL
+    QT -= opengl
 }
 
 TARGET = rawdataviewer

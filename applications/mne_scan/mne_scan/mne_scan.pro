@@ -54,9 +54,9 @@ CONFIG(debug, debug|release) {
 
 DESTDIR = $${MNE_BINARY_DIR}
 
-contains(MNECPP_CONFIG, dispOpenGL) {
-    qtHaveModule(opengl): QT += opengl
-    DEFINES += USE_OPENGL
+contains(MNECPP_CONFIG, noOpenGL) {
+    DEFINES += NO_OPENGL
+    QT -= opengl
 }
 
 contains(MNECPP_CONFIG, static) {
