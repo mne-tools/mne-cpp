@@ -56,7 +56,7 @@
 #include <QSvgGenerator>
 #include <QDebug>
 #include <QGraphicsItem>
-#if defined(USE_OPENGL)
+#if !defined(NO_OPENGL)
     #include <QOpenGLWidget>
 #endif
 
@@ -81,7 +81,7 @@ AverageLayoutView::AverageLayoutView(QWidget *parent,
 
     m_pAverageLayoutView = new QGraphicsView();
 
-#if defined(USE_OPENGL)
+#if !defined(NO_OPENGL)
     m_pAverageLayoutView->setViewport(new QOpenGLWidget);
 #endif
 
@@ -104,7 +104,7 @@ AverageLayoutView::AverageLayoutView(QWidget *parent,
 
 void AverageLayoutView::updateOpenGLViewport()
 {
-#if defined(USE_OPENGL)
+#if !defined(NO_OPENGL)
     if(m_pAverageLayoutView) {
         m_pAverageLayoutView->setViewport(new QOpenGLWidget);
     }

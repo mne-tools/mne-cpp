@@ -65,7 +65,7 @@ using namespace DISPLIB;
 
 ButterflyView::ButterflyView(QWidget *parent, Qt::WindowFlags f)
 :
-#if defined(USE_OPENGL)
+#if !defined(NO_OPENGL)
     QOpenGLWidget(parent)
 #else
     QWidget(parent)
@@ -91,7 +91,7 @@ ButterflyView::ButterflyView(QWidget *parent, Qt::WindowFlags f)
 
 void ButterflyView::updateOpenGLViewport()
 {
-#if defined(USE_OPENGL)
+#if !defined(NO_OPENGL)
     // Activate anti aliasing
     initializeGL();
 #endif
@@ -253,7 +253,7 @@ void ButterflyView::showSelectedChannelsOnly(const QStringList& selectedChannels
 
 //=============================================================================================================
 
-#if defined(USE_OPENGL)
+#if !defined(NO_OPENGL)
     void ButterflyView::paintGL()
 #else
     void ButterflyView::paintEvent(QPaintEvent *event)
@@ -425,7 +425,7 @@ void ButterflyView::showSelectedChannelsOnly(const QStringList& selectedChannels
         }
     }
 
-#if defined(USE_OPENGL)
+#if !defined(NO_OPENGL)
     return QOpenGLWidget::paintGL();
 #else
     return QWidget::paintEvent(event);

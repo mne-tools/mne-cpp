@@ -50,9 +50,9 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
-contains(MNECPP_CONFIG, dispOpenGL) {
-    qtHaveModule(opengl): QT += opengl
-    DEFINES += USE_OPENGL
+contains(MNECPP_CONFIG, noOpenGL) {
+    DEFINES += NO_OPENGL
+    QT -= opengl
 }
 
 DESTDIR = $${MNE_LIBRARY_DIR}

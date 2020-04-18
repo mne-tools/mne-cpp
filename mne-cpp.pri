@@ -126,7 +126,7 @@ QMAKE_TARGET_COPYRIGHT = Copyright (C) 2019 Authors of mne-cpp. All rights reser
 ## To disable applications run: qmake MNECPP_CONFIG+=noApplications
 ## To build MNE-CPP libraries as static libs: qmake MNECPP_CONFIG+=static
 ## To build MNE-CPP with FFTW support in Eigen (make sure to specify FFTW_DIRs below): qmake MNECPP_CONFIG+=useFFTW
-## To build MNE-CPP Disp library with OpenGL support (default is with OpenGL support): qmake MNECPP_CONFIG+=dispOpenGL
+## To build MNE-CPP Disp library without OpenGL support (default is with OpenGL support): qmake MNECPP_CONFIG+=noOpenGL
 ## To build MNE-CPP against wasm: qmake MNECPP_CONFIG+=wasm
 ## To build MNE Scan with BrainFlow support: qmake MNECPP_CONFIG+=withBrainFlow
 ## To build MNE Scan with LSL support: qmake MNECPP_CONFIG+=withLsl
@@ -136,7 +136,7 @@ QMAKE_TARGET_COPYRIGHT = Copyright (C) 2019 Authors of mne-cpp. All rights reser
 ## To build MNE Scan with TMSI support: qmake MNECPP_CONFIG+=withTmsi
 
 # Default flags
-MNECPP_CONFIG += dispOpenGL
+MNECPP_CONFIG +=
 
 # Minimal version needs at least qt version 5.2.1
 !minQtVersion(5, 2, 1) {
@@ -152,8 +152,8 @@ MNECPP_CONFIG += dispOpenGL
 
 # Build static version if wasm flag was defined
 contains(MNECPP_CONFIG, wasm) {
-    message("The wasm flag was detected. Building static version of MNE-CPP.")
-    MNECPP_CONFIG += static
+    message("The wasm flag was detected. Building static version of MNE-CPP. Disable OpenGL support for Disp library")
+    MNECPP_CONFIG += static noOpenGL
 }
 
 contains(MNECPP_CONFIG, static) {

@@ -41,9 +41,9 @@ QT += widgets concurrent xml svg 3dextras
 
 DEFINES += SCDISP_LIBRARY
 
-contains(MNECPP_CONFIG, dispOpenGL) {
-    qtHaveModule(opengl): QT += opengl
-    DEFINES += USE_OPENGL
+contains(MNECPP_CONFIG, noOpenGL) {
+    DEFINES += NO_OPENGL
+    QT -= opengl
 }
 
 TARGET = scDisp
