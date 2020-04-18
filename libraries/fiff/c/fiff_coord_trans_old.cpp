@@ -414,25 +414,16 @@ FiffCoordTransOld::~FiffCoordTransOld()
 
 int FiffCoordTransOld::add_inverse(FiffCoordTransOld *t)
 {
-    int   j,k;
     Matrix4f m;
 
-    for (j = 0; j < 3; j++) {
-        for (k = 0; k < 3; k++)
-            m(j,k) = t->rot(j,k);
-        m(j,3) = t->move[j];
-    }
-    for (k = 0; k < 3; k++)
-        m(3,k) = 0.0;
-    m(3,3) = 1.0;
+    m.block(0,0,3,3) = t->rot;
+    m.block(0,3,3,1) = t->move;
 
     m = m.inverse().eval();
 
-    for (j = 0; j < 3; j++) {
-        for (k = 0; k < 3; k++)
-            t->invrot(j,k) = m(j,k);
-        t->invmove[j] = m(j,3);
-    }
+    t->invrot = m.block(0,0,3,3);
+    t->invmove = m.block(0,3,3,1);
+
     return OK;
 }
 
@@ -441,16 +432,10 @@ int FiffCoordTransOld::add_inverse(FiffCoordTransOld *t)
 FiffCoordTransOld *FiffCoordTransOld::fiff_invert_transform() const
 {
     FiffCoordTransOld* ti = new FiffCoordTransOld;
-    int j,k;
-
-    for (j = 0; j < 3; j++) {
-        ti->move[j] = this->invmove[j];
-        ti->invmove[j] = this->move[j];
-        for (k = 0; k < 3; k++) {
-            ti->rot(j,k)    = this->invrot(j,k);
-            ti->invrot(j,k) = this->rot(j,k);
-        }
-    }
+    ti->move = this->invmove;
+    ti->invmove = this ->move;
+    ti->rot = this->invrot;
+    ti->invrot = this ->rot;
     ti->from = this->to;
     ti->to   = this->from;
     return (ti);
