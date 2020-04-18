@@ -15,7 +15,7 @@ This tutorial assumes the following folder structure:
 Git/
 ├── qt5/
 ├── qt5_shadow/
-├── qt5_binaries/
+├── qt5_static_binaries/
 ├── mne-cpp/
 └── mne-cpp_shadow/
 ```
