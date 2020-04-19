@@ -117,7 +117,7 @@ MNE-CPP needs to be build statically. This is automatically done if the `wasm` f
 MNECPP_CONFIG += wasm
 ```
 
-Create a shadow build folder, run qmake and build MNE-CPP:
+Create a shadow build folder, run `qmake` and build MNE-CPP:
 
 ```
 mkdir mne-cpp_shadow

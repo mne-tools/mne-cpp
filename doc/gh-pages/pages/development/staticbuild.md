@@ -69,7 +69,7 @@ Setup the following tools:
 * Install [Python](https://www.python.org/downloads/){:target="_blank" rel="noopener"} and add it to `PATH`
 * Isntall MSVC 2015 or higher (We recommend the [MSVC 2017 Community Version](https://visualstudio.microsoft.com/vs/older-downloads/){:target="_blank" rel="noopener"}
 * Install the Windows 10 SDK 
-* If you want to use multiple cores (nmake does not support multicore usage), install the [jom compiler](http://download.qt.io/official_releases/jom/jom.zip){:target="_blank" rel="noopener"} and add it to `PATH`
+* If you want to use multiple cores (`nmake` does not support multicore usage), install the [jom compiler](http://download.qt.io/official_releases/jom/jom.zip){:target="_blank" rel="noopener"} and add it to `PATH`
 
 Clone the current Qt version. Currently, MNE-CPP uses four Qt modules: QtBase, QtCharts, QtSvg and Qt3D. QtBase includes most of the Qt functionality (core, gui, widgets, etc). In order to setup the sources for Qt 5.14.2 you would type:
 
@@ -107,9 +107,9 @@ jom -j8
 nmake install
 ```
 
-## Compile MNE-CPP with the static flag
+## Compile MNE-CPP with the `static` flag
 
-Create a shadow build folder, run qmake and build MNE-CPP (on Windows use `nmake` or `jom` instead of `make`):
+Create a shadow build folder, run `qmake` and build MNE-CPP (on Windows use `nmake` or `jom` instead of `make`):
 
 ```
 mkdir mne-cpp_shadow
