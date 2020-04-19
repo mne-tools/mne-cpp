@@ -1,9 +1,9 @@
 ---
-title: MNE-CPP with QtWasm
+title: WebAssembly Build Guide
 parent: Develop
 nav_order: 3
 ---
-# MNE-CPP with QtWasm
+# WebAssembly Build Guide
 
 This tutorial will show you how to build a Wasm (WebAssembly) version of MNE-CPP. In order to build a Wasm version we need to do three things:
 

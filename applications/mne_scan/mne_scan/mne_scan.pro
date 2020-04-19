@@ -45,13 +45,22 @@ qtHaveModule(3dextras) {
     QT += 3dextras
 }
 
+CONFIG += console
+
+TARGET = mne_scan
+CONFIG(debug, debug|release) {
+    TARGET = $$join(TARGET,,,d)
+}
+
+DESTDIR = $${MNE_BINARY_DIR}
+
 contains(MNECPP_CONFIG, dispOpenGL) {
     qtHaveModule(opengl): QT += opengl
     DEFINES += USE_OPENGL
 }
 
 contains(MNECPP_CONFIG, static) {
-    CONFIG += staticlib
+    CONFIG += static
     DEFINES += STATICBUILD
     # For static builds we need to link against the plugins
     # because we cannot load them dynamically during runtime
@@ -97,14 +106,6 @@ contains(MNECPP_CONFIG, static) {
     CONFIG += shared
 }
 
-TARGET = mne_scan
-
-CONFIG(debug, debug|release) {
-    TARGET = $$join(TARGET,,,d)
-}
-
-CONFIG += console
-
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lscSharedd \
@@ -137,8 +138,6 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Utils \
 }
-
-DESTDIR = $${MNE_BINARY_DIR}
 
 SOURCES += \
     main.cpp \
