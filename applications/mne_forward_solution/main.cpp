@@ -76,6 +76,7 @@ int main(int argc, char *argv[])
     ComputeFwdSettings settings(&argc,argv);
     ComputeFwd cmpFwd(&settings);
     cmpFwd.calculateFwd();
+    cmpFwd.storeFwd();
 
     return app.exec();
 }
