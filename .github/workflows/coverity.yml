@@ -25,7 +25,7 @@ jobs:
           COVERITY_SCAN_NOTIFICATION_EMAIL="lorenzesch@hotmail.com,gbmotta@mgh.harvard.edu"
           COVERITY_SCAN_BRANCH_PATTERN="master"
           COVERITY_SCAN_BUILD_COMMAND_PREPEND="qmake -r MNECPP_CONFIG+=noTests"
-          COVERITY_SCAN_BUILD_COMMAND="make -j2"
+          COVERITY_SCAN_BUILD_COMMAND="make -j4"
           COVERITY_SCAN_TOKEN=$COVTOKEN
           PLATFORM=`uname`
           TOOL_ARCHIVE=/tmp/cov-analysis-${PLATFORM}.tgz
