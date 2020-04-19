@@ -43,7 +43,7 @@ TEMPLATE = app
 QT += network concurrent
 QT -= gui
 
-CONFIG   += console
+CONFIG += console
 
 TARGET = mne_rt_server
 CONFIG(debug, debug|release) {
@@ -82,7 +82,6 @@ SOURCES += \
     commandthread.cpp
 
 HEADERS += \
-# has to be moved to connectors
     IConnector.h \
     connectormanager.h \
     mne_rt_server.h \
