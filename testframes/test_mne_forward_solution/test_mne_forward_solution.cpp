@@ -44,6 +44,9 @@
 #include <fwd/computeFwd/compute_fwd.h>
 #include <mne/mne.h>
 
+#include <fiff/fiff.h>
+#include <fiff/fiff_info.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -135,10 +138,18 @@ void TestMneForwardSolution::computeForward()
     settingsMEGEEG.mindist = 5.0f/1000.0f;
     settingsMEGEEG.solname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/sample_audvis-meg-eeg-oct-6-fwd.fif";
 
+    QFile t_name(settingsMEGEEG.measname);
+    FIFFLIB::FiffRawData raw(t_name);
+    QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FIFFLIB::FiffInfo(raw.info));
+    settingsMEGEEG.pFiffInfo = pFiffInfo;
     settingsMEGEEG.checkIntegrity();
 
     QSharedPointer<ComputeFwd> pFwdMEGEEGComputed = QSharedPointer<ComputeFwd>(new ComputeFwd(&settingsMEGEEG));
     pFwdMEGEEGComputed->calculateFwd();
+
+    // recalculate with same meg_head_t to check that we don't crash it
+    FIFFLIB::FiffCoordTransOld meg_head_t = pFiffInfo->dev_head_t.toOld();
+    pFwdMEGEEGComputed->updateHeadPos(&meg_head_t);
     pFwdMEGEEGComputed->storeFwd();
 
     // Read newly created fwd
@@ -153,7 +164,6 @@ void TestMneForwardSolution::computeForward()
 void TestMneForwardSolution::compareForward()
 {
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compare MEG/EEG Forward Solution >>>>>>>>>>>>>>>>>>>>>>>>>\n");
-
     // The following is equal to QVERIFY(*m_pFwdMEGEEGRead == *m_pFwdMEGEEGRef);
     // This just gives more information on what might be wrong if failing
     QVERIFY(m_pFwdMEGEEGRead->info == m_pFwdMEGEEGRef->info);

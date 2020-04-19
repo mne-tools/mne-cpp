@@ -2062,8 +2062,8 @@ void ComputeFwd::initFwd()
             return;
         }
         // Compensation channel information may be needed
-        if (comp_data->iNComp > 0) {
-            printf("%d compensation data sets in %s\n",comp_data->iNComp,settings->measname.toUtf8().constData());
+        if (comp_data->ncomp > 0) {
+            printf("%d compensation data sets in %s\n",comp_data->ncomp,settings->measname.toUtf8().constData());
         } else {
             compchs.clear();
             iNComp = 0;
@@ -2245,19 +2245,19 @@ void ComputeFwd::calculateFwd()
 
 //=========================================================================================================
 
-void ComputeFwd::updateHeadPos(FiffCoordTransOld* dev_head_t)
+void ComputeFwd::updateHeadPos(FiffCoordTransOld* transDevHeadOld)
 {
     // transformation fro one point in head space to another
-    FiffCoordTransOld* head_head_t = new FiffCoordTransOld;
+    FiffCoordTransOld* transHeadHeadOld = new FiffCoordTransOld;
     // get transformation matrix in Headspace between two meg <-> head matrices
-    if(dev_head_t->from != megcoils->coord_frame) {
-        if(dev_head_t->to != megcoils->coord_frame) {
-            qWarning() << "ComputeFwd::updateHeadPos: Target Space not in Head Space - Space: " << dev_head_t->to;
+    if(transDevHeadOld->from != megcoils->coord_frame) {
+        if(transDevHeadOld->to != megcoils->coord_frame) {
+            qWarning() << "ComputeFwd::updateHeadPos: Target Space not in Head Space - Space: " << transDevHeadOld->to;
             return;
         }
         // calclulate rotation
         Matrix3f matRot = meg_head_t->rot;
-        Matrix3f matRotDest = dev_head_t->rot;
+        Matrix3f matRotDest = transDevHeadOld->rot;
         Matrix3f matRotNew = Matrix3f::Zero(3,3);
 
         Quaternionf quat(matRot);
@@ -2269,18 +2269,18 @@ void ComputeFwd::updateHeadPos(FiffCoordTransOld* dev_head_t)
 
         // calculate translation
         VectorXf vecTrans = meg_head_t->move;
-        VectorXf vecTransDest = dev_head_t->move;
+        VectorXf vecTransDest = transDevHeadOld->move;
         VectorXf vecTransNew = vecTrans - vecTransDest;
 
         // update ne transformation matrix
-        head_head_t->from = megcoils->coord_frame;
-        head_head_t->to = megcoils->coord_frame;
-        head_head_t->rot = matRotNew;
-        head_head_t->move = vecTransNew;
-        head_head_t->add_inverse(head_head_t);
+        transHeadHeadOld->from = megcoils->coord_frame;
+        transHeadHeadOld->to = megcoils->coord_frame;
+        transHeadHeadOld->rot = matRotNew;
+        transHeadHeadOld->move = vecTransNew;
+        transHeadHeadOld->add_inverse(transHeadHeadOld);
     }
 
-    FwdCoilSet* megcoilsNew = megcoils->dup_coil_set(head_head_t);
+    FwdCoilSet* megcoilsNew = megcoils->dup_coil_set(transHeadHeadOld);
 
     // Field computation matrices...
     qDebug() << "!!!TODO Speed the following with Eigen up!";
@@ -2291,18 +2291,17 @@ void ComputeFwd::updateHeadPos(FiffCoordTransOld* dev_head_t)
     fprintf(stderr,"[done]\n");
 
     if(compcoils) {
-        qDebug() << "calc compensator";
-        FwdCoilSet* compcoilsNew = compcoils->dup_coil_set(dev_head_t);
-        FwdCompData* comp = NULL;
+        FwdCoilSet* compcoilsNew = compcoils->dup_coil_set(transDevHeadOld);
+        FwdCompData* comp = Q_NULLPTR;
 
         FwdCompData::fwd_make_comp_data(comp_data,
                                         megcoilsNew,
                                         compcoilsNew,
                                         FwdBemModel::fwd_bem_field,
-                                        NULL,
+                                        Q_NULLPTR,
                                         FwdBemModel::fwd_bem_field_grad,
                                         bem_model,
-                                        NULL);
+                                        Q_NULLPTR);
 
         if (comp->set && comp->set->current) { /* Test just to specify confusing output */
             fprintf(stderr,"Composing the field computation matrix (compensation coils)...");
@@ -2313,7 +2312,7 @@ void ComputeFwd::updateHeadPos(FiffCoordTransOld* dev_head_t)
         }
     }
     // Update new Transformation Matrix
-    meg_head_t = dev_head_t;
+    *meg_head_t = *transDevHeadOld;
 }
 
 //=========================================================================================================
