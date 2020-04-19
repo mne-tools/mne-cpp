@@ -125,9 +125,9 @@ int main(int argc, char *argv[])
     settingsMEGEEG.mindist = 5.0f/1000.0f;
     settingsMEGEEG.solname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/sample_audvis-meg-eeg-oct-6-fwd.fif";
 
-    // bring in dev_head transformation
+    // bring in dev_head transformation and FiffInfo
     settingsMEGEEG.meg_head_t = &meg_head_t;
-
+    settingsMEGEEG.pFiffInfo = pFiffInfo;
     settingsMEGEEG.checkIntegrity();
 
     QSharedPointer<FWDLIB::ComputeFwd> pFwdMEGEEGComputed = QSharedPointer<FWDLIB::ComputeFwd>(new FWDLIB::ComputeFwd(&settingsMEGEEG));
