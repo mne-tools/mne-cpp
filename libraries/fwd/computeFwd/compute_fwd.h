@@ -180,11 +180,24 @@ private:
     QList<FIFFLIB::FiffChInfo> eegchs;              /* The EEG channel information */
 
     FIFFLIB::fiffId mri_id;
-    FIFFLIB::fiffId meas_id;
+    FIFFLIB::FiffId meas_id;
     FIFFLIB::FiffCoordTransOld* mri_head_t;         /* MRI <-> head coordinate transformation */
     FIFFLIB::FiffCoordTransOld* meg_head_t;         /* MEG <-> head coordinate transformation */
 
     ComputeFwdSettings* settings;                   /* The settings for the forward calculation */
+
+    //=========================================================================================================
+
+    int readChannels(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
+                     QList<FIFFLIB::FiffChInfo>& meg,	 /* MEG channels */
+                     int& nmeg,
+                     QList<FIFFLIB::FiffChInfo>& meg_comp,
+                     int& nmeg_comp,
+                     QList<FIFFLIB::FiffChInfo>& eeg,	 /* EEG channels */
+                     int& neeg,
+                     FIFFLIB::FiffCoordTransOld** meg_head_t,
+                     FIFFLIB::FiffId& id);	         /* The measurement ID */
+
 };
 
 //=============================================================================================================
