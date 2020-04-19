@@ -52,6 +52,13 @@ CONFIG(debug, debug|release) {
 
 DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
 
+contains(MNECPP_CONFIG, static) {
+    CONFIG += staticlib
+    DEFINES += STATICBUILD
+} else {
+    CONFIG += shared
+}
+
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lscSharedd \
