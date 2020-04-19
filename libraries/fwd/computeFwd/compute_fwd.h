@@ -176,8 +176,8 @@ private:
     MNELIB::MneNamedMatrix *eeg_forward;
     MNELIB::MneNamedMatrix *eeg_forward_grad;
 
-    QList<FIFFLIB::FiffChInfo> megchs;              /* The MEG channel information */
-    QList<FIFFLIB::FiffChInfo> eegchs;              /* The EEG channel information */
+    QList<FIFFLIB::FiffChInfo> m_listMegChs;              /* The MEG channel information */
+    QList<FIFFLIB::FiffChInfo> m_listEegChs;              /* The EEG channel information */
 
     FIFFLIB::fiffId mri_id;
     FIFFLIB::FiffId meas_id;
@@ -189,13 +189,13 @@ private:
     //=========================================================================================================
 
     int readChannels(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
-                     QList<FIFFLIB::FiffChInfo>& meg,	 /* MEG channels */
-                     int& nmeg,
-                     QList<FIFFLIB::FiffChInfo>& meg_comp,
-                     int& nmeg_comp,
-                     QList<FIFFLIB::FiffChInfo>& eeg,	 /* EEG channels */
-                     int& neeg,
-                     FIFFLIB::FiffCoordTransOld** meg_head_t,
+                     QList<FIFFLIB::FiffChInfo>& listMegCh,	 /* MEG channels */
+                     int& iNMeg,
+                     QList<FIFFLIB::FiffChInfo>& listMegComp,
+                     int& iNMegCmp,
+                     QList<FIFFLIB::FiffChInfo>& listEegCh,	 /* EEG channels */
+                     int& iNEeg,
+                     FIFFLIB::FiffCoordTransOld** transDevHeadOld,
                      FIFFLIB::FiffId& id);	         /* The measurement ID */
 
 };
