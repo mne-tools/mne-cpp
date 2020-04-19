@@ -2,6 +2,7 @@
 
 #include "compute_fwd.h"
 
+#include <fiff/fiff.h>
 #include <fiff/c/fiff_coord_trans_old.h>
 #include "../fwd_coil_set.h"
 #include "../fwd_comp_data.h"
@@ -1381,7 +1382,7 @@ bool write_solution(const QString& name,         /* Destination file */
                    fiffId mri_id,
                    FiffCoordTransOld* mri_head_t,
                    const QString& meas_file,    /* MEG file and data obtained from there */
-                   fiffId meas_id,
+                   FiffId meas_id,
                    FiffCoordTransOld* meg_head_t,
                    QList<FiffChInfo> meg_chs,
                    int nmeg,
@@ -1436,8 +1437,9 @@ bool write_solution(const QString& name,         /* Destination file */
         t_pStream->start_block(FIFFB_MNE_PARENT_MEAS_FILE);
 
         t_pStream->write_string(FIFF_MNE_FILE_NAME, meas_file);
-        if (meas_id != Q_NULLPTR)
-            write_id_old(t_pStream, FIFF_PARENT_BLOCK_ID, meas_id);//t_pStream->write_id(FIFF_PARENT_BLOCK_ID, meas_id);
+        if (!meas_id.isEmpty()) {
+            t_pStream->write_id(FIFF_PARENT_BLOCK_ID, meas_id);
+        }
         write_coord_trans_old(t_pStream, meg_head_t);//t_pStream->write_coord_trans(meg_head_t);
 
         int nchan = nmeg+neeg;
@@ -1817,6 +1819,7 @@ void ComputeFwd::initFwd()
     mri_head_t       = Q_NULLPTR;    /* MRI <-> head coordinate transformation */
     meg_head_t       = Q_NULLPTR;    /* MEG <-> head coordinate transformation */
 
+    QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo = Q_NULLPTR;
     megchs = QList<FIFFLIB::FiffChInfo>();      /* The MEG channel information */
     int nmeg         = 0;
     eegchs = QList<FIFFLIB::FiffChInfo>();      /* The EEG channel information */
@@ -1838,7 +1841,7 @@ void ComputeFwd::initFwd()
 
     int k;
     mri_id           = Q_NULLPTR;
-    meas_id          = Q_NULLPTR;
+    meas_id.clear();
 
     FILE* out        = Q_NULLPTR;     /* Output filtered points here */
 
@@ -1954,26 +1957,47 @@ void ComputeFwd::initFwd()
     }
     FiffCoordTransOld::mne_print_coord_transform(stderr,mri_head_t);
 
-    // Read the channel information
-    // and the MEG device -> head coordinate transformation
+    // Read the channel information and the MEG device -> head coordinate transformation
+    // replace mne_read_meg_comp_eeg_ch_info_41()
 
-    printf("\n");
-    if (mne_read_meg_comp_eeg_ch_info_41(settings->measname,
-                                         megchs,
-                                         &nmeg,
-                                         compchs,
-                                         &ncomp,
-                                         eegchs,
-                                         &neeg,
-                                         &meg_head_t,
-                                         &meas_id) != OK) {
+    if(!settings->pFiffInfo) {
+
+        QFile measname(settings->measname);
+        FIFFLIB::FiffDirNode::SPtr DirNode;
+        FiffStream::SPtr pStream(new FiffStream(&measname));
+        FIFFLIB::FiffInfo fiffInfo;
+        if(!pStream->open()) {
+            qCritical() << "Could not open Stream.";
+            return;
+        }
+
+        //Get Fiff info
+        if(!pStream->read_meas_info(pStream->dirtree(), fiffInfo, DirNode)){
+            qCritical() << "Could not find the channel information.";
+            return;
+        }
+        pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FiffInfo(fiffInfo));
+    } else {
+        pFiffInfo = settings->pFiffInfo;
+    }
+    if(!pFiffInfo) {
+        qCritical ("ComputeFwd::initFwd(): no FiffInfo");
+        return;
+    }
+    if (readChannels(pFiffInfo,
+                     megchs,
+                     nmeg,
+                     compchs,
+                     ncomp,
+                     eegchs,
+                     neeg,
+                     &meg_head_t,
+                     meas_id) != OK) {
         return;
     }
 
-    // get meg_head_t from settings file
-    if(settings->meg_head_t) {
-        meg_head_t = settings->meg_head_t;
-    }
+    printf("\n");
+    qDebug() << "megchs[0].kind" << megchs[0].kind;
 
     if (nmeg > 0) {
         printf("Read %3d MEG channels from %s\n",nmeg,settings->measname.toUtf8().constData());
@@ -2335,4 +2359,43 @@ void ComputeFwd::storeFwd()
     }
     printf("done\n");
     printf("\nFinished.\n");
+}
+
+//=========================================================================================================
+
+int ComputeFwd::readChannels(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
+                             QList<FiffChInfo>& meg,	 /* MEG channels */
+                             int &nmeg,
+                             QList<FiffChInfo>& meg_comp,
+                             int &nmeg_comp,
+                             QList<FiffChInfo>& eeg,	 /* EEG channels */
+                             int &neeg,
+                             FiffCoordTransOld** meg_head_t,
+                             FiffId& idp)	 /* The measurement ID */
+{
+    int iNumCh = pFiffInfo->nchan;
+    for (int k = 0; k < iNumCh; k++) {
+        if (pFiffInfo->chs[k].kind == FIFFV_MEG_CH) {
+            meg.append(pFiffInfo->chs[k]);
+            nmeg++;
+        } else if (pFiffInfo->chs[k].kind == FIFFV_REF_MEG_CH) {
+            meg_comp.append(pFiffInfo->chs[k]);
+            nmeg_comp++;
+        } else if (pFiffInfo->chs[k].kind == FIFFV_EEG_CH) {
+            eeg.append(pFiffInfo->chs[k]);
+            neeg++;
+        }
+    }
+
+    if(!settings->meg_head_t) {
+        *meg_head_t = new FiffCoordTransOld(pFiffInfo->dev_head_t.toOld());
+    } else {
+        *meg_head_t = settings->meg_head_t;
+    }
+    if(!meg_head_t) {
+        qCritical("MEG -> head coordinate transformation not found.");
+        return FIFF_FAIL;
+    }
+    idp = pFiffInfo->file_id;
+    return OK;
 }

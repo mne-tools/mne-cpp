@@ -43,6 +43,7 @@
 
 #include "../fwd_global.h"
 #include <fiff/fiff_constants.h>
+#include <fiff/fiff_info.h>
 #include <fiff/c/fiff_coord_trans_old.h>
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -138,7 +139,8 @@ public:
     bool use_equiv_eeg;      	/**< Use the equivalent source approach for the EEG sphere model */
     bool use_threads;        	/**< Parallelize? */
 
-    FIFFLIB::FiffCoordTransOld* meg_head_t;  /**< Pointer to meg <-> head transformation*/
+    QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo;    /**< The FiffInfo file from the measurement.*/
+    FIFFLIB::FiffCoordTransOld* meg_head_t;         /**< Pointer to meg <-> head transformation.*/
 
 private:
     void initMembers();

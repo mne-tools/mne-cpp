@@ -101,7 +101,8 @@ void ComputeFwdSettings::initMembers()
     use_equiv_eeg = true;     
     use_threads = true;
 
-    meg_head_t = NULL;
+    pFiffInfo = Q_NULLPTR;
+    meg_head_t = Q_NULLPTR;
 }
 
 //=============================================================================================================
