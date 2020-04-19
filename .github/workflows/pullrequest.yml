@@ -85,7 +85,7 @@ jobs:
       if: (matrix.os == 'ubuntu-16.04') || (matrix.os == 'macos-latest')
       run: |
         qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow MNECPP_CONFIG+=withLsl
-        make -j2
+        make -j4
     - name: Configure and compile MNE-CPP (Windows)
       if: matrix.os == 'windows-2016'
       run: |
@@ -93,7 +93,7 @@ jobs:
         cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow MNECPP_CONFIG+=withLsl
-        jom -j2
+        jom -j4
         
   Tests:
     runs-on: ${{ matrix.os }}
@@ -141,12 +141,12 @@ jobs:
       if: matrix.os == 'ubuntu-16.04'
       run: |
         qmake -r MNECPP_CONFIG+=withCodeCov MNECPP_CONFIG+=noApplications MNECPP_CONFIG+=noExamples
-        make -j2
+        make -j4
     - name: Configure and compile MNE-CPP (MacOS)
       if: matrix.os == 'macos-latest'
       run: |
         qmake -r MNECPP_CONFIG+=noApplications MNECPP_CONFIG+=noExamples
-        make -j2
+        make -j4
     - name: Configure and compile MNE-CPP (Windows)
       if: matrix.os == 'windows-2016'
       run: |
@@ -154,7 +154,7 @@ jobs:
         cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         qmake -r MNECPP_CONFIG+=noApplications MNECPP_CONFIG+=noExamples
-        jom -j2
+        jom -j4
     - name: Run tests (Linux)
       if: matrix.os == 'ubuntu-16.04'
       env:
@@ -210,7 +210,7 @@ jobs:
     - name: Configure and compile MNE-CPP
       run: |
         qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=minimalVersion
-        make -j2
+        make -j4
 
   Doxygen:
     runs-on: ubuntu-latest
