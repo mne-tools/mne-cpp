@@ -78,7 +78,7 @@ Build Qt from source. This is needed since we want to have threading support whi
   ./init-repository -f --module-subset=qtbase,qtcharts,qtsvg
   ```
 
-  * Navigate to parent directory, create new shadow build folder and cd into it:
+  * Navigate to the parent directory, create a new shadow build folder and cd into it:
 
   ```
   cd ..
@@ -86,7 +86,7 @@ Build Qt from source. This is needed since we want to have threading support whi
   cd qt5_shadow
   ```
 
-  * Call configure from new working directory in order to perform a shadow build.
+  * Call configure from the new working directory in order to setup a shadow build.
 
   With thread support:
 
