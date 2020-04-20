@@ -111,32 +111,38 @@ int main(int argc, char *argv[])
 
     FiffCoordTransOld meg_head_t = pFiffInfo->dev_head_t.toOld();
 
-    // Ininit calculation
-    ComputeFwdSettings settingsMEGEEG;
+    // specify necessary information for forward computation
+    ComputeFwdSettings settings;
 
-    settingsMEGEEG.include_meg = true;
-    settingsMEGEEG.include_eeg = true;
-    settingsMEGEEG.accurate = true;
-    settingsMEGEEG.srcname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/subjects/sample/bem/sample-oct-6-src.fif";
-    settingsMEGEEG.measname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";
-    settingsMEGEEG.mriname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/all-trans.fif";
-    settingsMEGEEG.transname.clear();
-    settingsMEGEEG.bemname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/subjects/sample/bem/sample-1280-1280-1280-bem.fif";
-    settingsMEGEEG.mindist = 5.0f/1000.0f;
-    settingsMEGEEG.solname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/sample_audvis-meg-eeg-oct-6-fwd.fif";
+    settings.include_meg = true;
+    settings.include_eeg = true;
+    settings.accurate = true;
+    settings.srcname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/subjects/sample/bem/sample-oct-6-src.fif";
+    settings.measname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";
+    settings.mriname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/all-trans.fif";
+    settings.transname.clear();
+    settings.bemname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/subjects/sample/bem/sample-1280-1280-1280-bem.fif";
+    settings.mindist = 5.0f/1000.0f;
+    settings.solname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/sample_audvis-meg-eeg-oct-6-fwd.fif";
 
     // bring in dev_head transformation and FiffInfo
-    settingsMEGEEG.meg_head_t = &meg_head_t;
-    settingsMEGEEG.pFiffInfo = pFiffInfo;
-    settingsMEGEEG.checkIntegrity();
+    settings.meg_head_t = &meg_head_t;
+    settings.pFiffInfo = pFiffInfo;
 
-    QSharedPointer<FWDLIB::ComputeFwd> pFwdMEGEEGComputed = QSharedPointer<FWDLIB::ComputeFwd>(new FWDLIB::ComputeFwd(&settingsMEGEEG));
+    settings.checkIntegrity();
 
+    QSharedPointer<FWDLIB::ComputeFwd> pFwdMEGEEG = QSharedPointer<FWDLIB::ComputeFwd>(new FWDLIB::ComputeFwd(&settings));
+
+    // perform the actual computation
     timer.start();
-    pFwdMEGEEGComputed->calculateFwd();
+    pFwdMEGEEG->calculateFwd();
     qInfo() << "The computation took: " << timer.elapsed() << " ms.";
 
+    // update head position to forward solution and only recompute necessary part
     timer.start();
-    pFwdMEGEEGComputed->updateHeadPos(&meg_head_t);
+    pFwdMEGEEG->updateHeadPos(&meg_head_t);
     qInfo() << "The recomputation took: " << timer.elapsed() << " ms.";
+
+    // store calculated forward solution in settings.solname specified file
+    pFwdMEGEEG->storeFwd();
 }
