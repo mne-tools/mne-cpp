@@ -11,7 +11,7 @@ This tutorial will show you how to build a Wasm (WebAssembly) version of MNE-CPP
  * Build a static wasm version of Qt (with thread support)
  * Compile MNE-CPP with the `wasm` flag
 
-This tutorial assumes the following folder structure:
+This tutorial runs on Ubuntu 18.04.03 64bit and assumes the following folder structure:
 ```
 Git/
 ├── emsdk/
@@ -22,7 +22,7 @@ Git/
 └── mne-cpp_shadow/
 ```
 
-## Setup Qt Wasm to work with MNE-CPP on Ubuntu 18.04.03 64bit
+## Inforamtion on Qt Wasm with MNE-CPP 
 
 According to the official Qt Wasm (WebAssembly) guide, the preferred emscripten versions are:
 
@@ -34,6 +34,8 @@ Qt 5.15: 1.39.8
 ```
 
  | **Please note:** With the versions above some functions are not able to be linked and produce errors. It is possible that some MNE-CPP functions are not compatible with these emscripten versions. However, emscripten version 1.39.3 and 1.39.8 seem to be working with MNE-CPP code. The following setups should work: **Qt5.13.2 compiled with em++ 1.39.3 with thread support**, **Qt5.14.2 compiled with em++ 1.39.3 with thread support** and  **Qt5.15.0 compiled with em++ 1.39.8 with thread support**. | 
+
+## Setup the emscripten compiler
 
 Get the [emscripten](https://emscripten.org/){:target="_blank" rel="noopener"} compiler:
 
@@ -55,71 +57,53 @@ Get the [emscripten](https://emscripten.org/){:target="_blank" rel="noopener"} c
   source ./emsdk_env.sh
   ```
 
-Build Qt from source. This is needed since we want to have threading support which is deactivated for the pre-built QtWasm build. Also, the pre-built QtWasm binaries are build with emscripten version 1.38.30 which does not work with MNE-CPP code.
+## Build Qt from source with Wasm support
 
-  * Make sure to activate and source the correct emscripten version since the compiler will be used when building qt against wasm. You could also add this to your .basrc file. For example:
+This is needed since we want to have threading support which is deactivated for the pre-built QtWasm build. Also, the pre-built QtWasm binaries are build with emscripten version 1.38.30 which does not work with MNE-CPP code.
 
-  ```
-  ./emsdk activate 1.39.3
-  source ./emsdk_env.sh
-  ```
+Make sure to activate and source the correct emscripten version since the compiler will be used when building qt against wasm. You could also add this to your .basrc file. For example:
 
-  * Install some dependencies (just to make sure)
+```
+./emsdk activate 1.39.3
+source ./emsdk_env.sh
+```
 
-  ```
-  sudo apt-get install build-essential libgl1-mesa-dev python
-  ```
+Install some dependencies (just to make sure)
 
-  * Clone the current Qt version. For example Qt 5.14.2:
+```
+sudo apt-get install build-essential libgl1-mesa-dev python
+```
 
-  ```
-  git clone https://code.qt.io/qt/qt5.git -b 5.14.2      
-  cd qt5
-  ./init-repository -f --module-subset=qtbase,qtcharts,qtsvg
-  ```
+Clone the current Qt version. For example Qt 5.14.2:
 
-  * Navigate to the parent directory, create a new shadow build folder and cd into it:
+```
+git clone https://code.qt.io/qt/qt5.git -b 5.14.2      
+cd qt5
+./init-repository -f --module-subset=qtbase,qtcharts,qtsvg
+```
 
-  ```
-  cd ..
-  mkdir qt5_shadow
-  cd qt5_shadow
-  ```
+Navigate to the parent directory, create a new shadow build folder and cd into it:
 
-  * Call configure from the new working directory in order to setup a shadow build.
+```
+cd ..
+mkdir qt5_shadow
+cd qt5_shadow
+```
 
-  With thread support:
+Call configure from the new working directory in order to setup a shadow build (remove the `-feature-thread` flag if you want to build without multithread support):
 
-<<<<<<< HEAD
-  ```
-  ../qt5/configure -opensource -confirm-license -xplatform wasm-emscripten -feature-thread -nomake examples -no-dbus -no-ssl -prefix ../qt5_wasm_binaries
-  ```
-=======
-      ```
-      ../qt5/configure -opensource -confirm-license -xplatform wasm-emscripten -feature-thread -nomake examples -no-dbus -no-ssl -prefix $PWD/../qt5_wasm_binaries
-      ```
->>>>>>> MAINT: add wasm build to CI
+```
+../qt5/configure -opensource -confirm-license -xplatform wasm-emscripten -feature-thread -nomake examples -no-dbus -no-ssl -prefix $PWD/../qt5_wasm_binaries
+```
 
-  Without thread support:
+Build Qt and install to target (prefix) location afterwards. For MNE-CPP we only need the qt charts, qtsvg and qtbase module (see [https://wiki.qt.io/Qt_for_WebAssembly](https://wiki.qt.io/Qt_for_WebAssembly){:target="_blank" rel="noopener"} for officially supported modules):
 
-<<<<<<< HEAD
-  ```
-  ../qt5/configure -opensource -confirm-license -xplatform wasm-emscripten -nomake examples -no-dbus -no-ssl -prefix ../qt5_wasm_binaries
-  ```
-=======
-      ```
-      ../qt5/configure -opensource -confirm-license -xplatform wasm-emscripten -nomake examples -no-dbus -no-ssl -prefix $PWD/../qt5_wasm_binaries
-      ```
->>>>>>> MAINT: add wasm build to CI
+```
+make module-qtbase module-qtsvg module-qtcharts -j8
+make install -j8
+```
 
-  * Build Qt and install to target (prefix) location afterwards. For MNE-CPP we only need the qt charts, qtsvg and qtbase module (see [https://wiki.qt.io/Qt_for_WebAssembly](https://wiki.qt.io/Qt_for_WebAssembly){:target="_blank" rel="noopener"} for officially supported modules):
-
-  ```
-  make module-qtbase module-qtsvg module-qtcharts -j8
-  make install -j8
-  ```
-
-  * A static Qt Wasm version should now be setup in the `qt5_wasm_binaries` folder.
+A static Qt Wasm version should now be setup in the `qt5_wasm_binaries` folder.
 
 ## Building MNE-CPP against QtWasm
 
@@ -138,15 +122,11 @@ cd mne-cpp_shadow
 make -j8
 ```
 
-<<<<<<< HEAD
-This should create the applications featured under applications, e.g. MNE Browse, to be build to mne-cpp/bin
-=======
- * This should create the applications featured under applications, e.g. MNE Analyze, to be build to mne-cpp/bin
->>>>>>> MAINT: add wasm build to CI
+This should create the applications featured under applications, e.g. MNE Analyze, to be build to mne-cpp/bin
 
-## Running an application
+## Run an application
 
-Navigate to `mne-cpp/bin` and start a server
+Navigate to `mne-cpp/bin` and start a server:
 
 ```
 python3 -m http.server
@@ -154,15 +134,9 @@ python3 -m http.server
 
 Start to a suitable web browser (Chromium based browsers and Mozilla seem to work the best) and type:
 
-<<<<<<< HEAD
 ```
-http://localhost:8000/mne_browse.html
+http://localhost:8000/mne_analyze.html
 ```
-=======
-  ```
-  http://localhost:8000/mne_analyze.html
-  ```
->>>>>>> MAINT: add wasm build to CI
 
 ## Example builds
 
