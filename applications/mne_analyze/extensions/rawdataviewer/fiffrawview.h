@@ -194,6 +194,8 @@ public:
 
     void linkAnnotationModel();
 
+    void updateView();
+
 signals:
     void sendSamplePos(int iSample);
 

@@ -44,6 +44,7 @@ AnnotationView::AnnotationView()
 , m_iCheckState(0)
 , m_iLastSampClicked(0)
 , m_pAnnModel(Q_NULLPTR)
+, m_pColordialog(new QColorDialog(this))
 {
     ui->setupUi(this);
 
@@ -78,31 +79,31 @@ void AnnotationView::initMSVCSettings()
 void AnnotationView::initGUIFunctionality()
 {
 
-    //Check Boxes
+    //Activate annotations check box
     connect(ui->m_checkBox_activateEvents, &QCheckBox::stateChanged,
             this, &AnnotationView::onActiveEventsChecked);
-    //connect(ui->m_checkBox_showSelectedEventsOnly)
 
+    //Annotation types combo box
     ui->m_comboBox_filterTypes->addItem("All");
     //ui->m_comboBox_filterTypes->addItems(m_pAnnModel->getEventTypeList());
     ui->m_comboBox_filterTypes->setCurrentText("All");
-
     connect(ui->m_comboBox_filterTypes, &QComboBox::currentTextChanged,
-            this, &AnnotationView::onFilterTypesChanged);   
+            m_pAnnModel.data(), &ANSHAREDLIB::AnnotationModel::setEventFilterType);
+    connect(m_pAnnModel.data(), &ANSHAREDLIB::AnnotationModel::updateEventTypes,
+            this, &AnnotationView::updateComboBox);
 
-    //Buttons
+    //Remove annotations button
     QToolBar *toolBar = new QToolBar(this);
     toolBar->setOrientation(Qt::Vertical);
     toolBar->setMovable(false);
-
     QAction* removeEvent = new QAction("Remove", this);
     removeEvent->setStatusTip(tr("Remove an annotation from the list"));
     toolBar->addAction(removeEvent);
     connect(removeEvent, &QAction::triggered,
             this, &AnnotationView::removeAnnotationfromModel);
-
     ui->m_gridLayout_Main->addWidget(toolBar,1,1,1,1);
 
+    //Add type button
     connect(ui->m_pushButton_addEventType, &QPushButton::clicked,
             this, &AnnotationView::addNewAnnotationType);
 
@@ -122,6 +123,7 @@ void AnnotationView::onActiveEventsChecked(int iCheckBoxState)
 void AnnotationView::onFilterTypesChanged(const QString& sFilType)
 {
     qDebug() << "AnnotationView::onFilterTypesChanged - Nothing here yet";
+
 }
 
 //=============================================================================================================
@@ -186,6 +188,8 @@ void AnnotationView::removeAnnotationfromModel()
 
 void AnnotationView::addNewAnnotationType()
 {
+    m_pAnnModel->addNewAnnotationType(QString().number(ui->m_spinBox_addEventType->value()), m_pColordialog->getColor(Qt::black, this));
+    m_pAnnModel->setEventFilterType(QString().number(ui->m_spinBox_addEventType->value()));
 
 }
 
