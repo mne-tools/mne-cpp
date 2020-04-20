@@ -3,7 +3,7 @@ name: Linux|Win|MacOS
 on:
   push:
     branches:
-    - alternate
+    - master
 
 jobs:
   UpdateDevTag:
@@ -40,7 +40,7 @@ jobs:
 
   LinuxStatic:
     runs-on: ubuntu-16.04
-    #needs: UpdateDevTag
+    needs: UpdateDevTag
     
     steps:
     - name: Clone repository
@@ -95,7 +95,7 @@ jobs:
 
   MacOSStatic:
     runs-on: macos-latest
-    #needs: UpdateDevTag
+    needs: UpdateDevTag
     
     steps:
     - name: Clone repository
@@ -146,7 +146,7 @@ jobs:
         
   WinStatic:
     runs-on: windows-2016
-    #needs: UpdateDevTag
+    needs: UpdateDevTag
 
     steps:
     - name: Clone repository
@@ -516,7 +516,7 @@ jobs:
 
   WebAssembly:
     runs-on: ubuntu-latest
-    #needs: UpdateDevTag
+    needs: UpdateDevTag
 
     steps:
     - name: Clone repository
