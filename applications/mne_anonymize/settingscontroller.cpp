@@ -74,8 +74,12 @@ SettingsController::SettingsController(const QStringList& arguments,
 , m_bMultipleInFiles(false)
 {
     initParser();
-    if(parseInputs(arguments)) {
+    bool exitCode = parseInputs(arguments);
+    if(exitCode) {
         execute();
+    } else
+    {
+        m_parser.showHelp(exitCode);
     }
 }
 
