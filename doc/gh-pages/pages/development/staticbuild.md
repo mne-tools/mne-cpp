@@ -15,7 +15,7 @@ This tutorial assumes the following folder structure:
 Git/
 ├── qt5/
 ├── qt5_shadow/
-├── qt5_static_binaries/
+├── qt5_wasm_binaries/
 ├── mne-cpp/
 └── mne-cpp_shadow/
 ```
@@ -56,7 +56,7 @@ cd qt5_shadow
 Call configure from the new working directory in order to setup a shadow build:
 
 ```
-../qt5/configure -static -release -skip webengine -nomake tools -nomake tests -nomake examples -no-dbus -no-ssl -no-pch -opensource -confirm-license -prefix "$PWD/../qt5_binaries"
+../qt5/configure -static -release -skip webengine -nomake tools -nomake tests -nomake examples -no-dbus -no-ssl -no-pch -opensource -confirm-license -prefix "../qt5_wasm_binaries"
 ```
 
 Build Qt and install to target (prefix) location afterwards. You can change the `-j8` flag to the number of cores you want to use during compilation:
@@ -66,7 +66,7 @@ make module-qtbase module-qtsvg module-qtcharts module-qt3d -j8
 make install -j8
 ```
 
-A static Qt version should now be setup in the `qt5_binaries` folder.
+A static Qt version should now be setup in the `qt5_wasm_binaries` folder.
 
 ### Windows 10
 
@@ -102,7 +102,7 @@ Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)
 Call configure from the new working directory in order to setup a shadow build.
 
 ```
-../qt5/configure.bat -release -static -no-pch -optimize-size -opengl desktop -platform win32-msvc -prefix "C:\qt5_static_binaries" -skip webengine -nomake tools -nomake tests -nomake examples -opensource -confirm-license
+../qt5/configure.bat -release -static -no-pch -optimize-size -opengl desktop -platform win32-msvc -skip webengine -nomake tools -nomake tests -nomake examples -opensource -confirm-license -prefix "..\qt5_wasm_binaries"
 ```
     
 Build Qt and install to target (prefix) location afterwards. You can change the `-j8` flag to the number of cores you want to use during compilation:
@@ -112,6 +112,8 @@ jom -j8
 nmake install
 ```
 
+A static Qt version should now be setup in the `qt5_wasm_binaries` folder.
+
 ## Compile MNE-CPP with the `static` flag
 
 Create a shadow build folder, run `qmake` and build MNE-CPP (on Windows use `nmake` or `jom` instead of `make`):
@@ -119,7 +121,7 @@ Create a shadow build folder, run `qmake` and build MNE-CPP (on Windows use `nma
 ```
 mkdir mne-cpp_shadow
 cd mne-cpp_shadow
-../qt5_binaries/bin/qmake ../mne-cpp/mne-cpp.pro MNECPP_CONFIG += static
+../qt5_wasm_binaries/bin/qmake ../mne-cpp/mne-cpp.pro MNECPP_CONFIG += static
 make -j8
 ```
 
