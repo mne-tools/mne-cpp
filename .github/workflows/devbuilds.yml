@@ -557,7 +557,7 @@ jobs:
         ./emsdk/emsdk activate 1.39.3
         # Activate PATH and other environment variables in the current terminal
         source ./emsdk/emsdk_env.sh
-        § Compile MNE-CPP        
+        # Compile MNE-CPP        
         cd mne-cpp
         ../qt5/qtbase/bin/qmake -r MNECPP_CONFIG=wasm
         make -j4
