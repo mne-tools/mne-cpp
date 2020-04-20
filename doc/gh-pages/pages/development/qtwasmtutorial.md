@@ -22,9 +22,9 @@ Git/
 └── mne-cpp_shadow/
 ```
 
-## Inforamtion on Qt Wasm with MNE-CPP 
+## Basic information on Qt Wasm with MNE-CPP 
 
-According to the official Qt Wasm (WebAssembly) guide, the preferred emscripten versions are:
+According to the official [Qt Wasm guide](https://wiki.qt.io/Qt_for_WebAssembly){:target="_blank" rel="noopener"}, the preferred emscripten versions are:
 
 ```
 Qt 5.12: 1.38.16
@@ -39,23 +39,23 @@ Qt 5.15: 1.39.8
 
 Get the [emscripten](https://emscripten.org/){:target="_blank" rel="noopener"} compiler:
 
-  ```
-  # Get the emsdk repo
-  git clone https://github.com/emscripten-core/emsdk.git
+```
+# Get the emsdk repo
+git clone https://github.com/emscripten-core/emsdk.git
 
-  # Enter that directory and pull
-  cd emsdk
-  git pull
+# Enter that directory and pull
+cd emsdk
+git pull
 
-  # Download and install the latest SDK tools.
-  ./emsdk install 1.39.3
+# Download and install the latest SDK tools.
+./emsdk install 1.39.3
 
-  # Make the "latest" SDK "active" for the current user. (writes ~/.emscripten file)
-  ./emsdk activate 1.39.3
+# Make the "latest" SDK "active" for the current user. (writes ~/.emscripten file)
+./emsdk activate 1.39.3
 
-  # Activate PATH and other environment variables in the current terminal
-  source ./emsdk_env.sh
-  ```
+# Activate PATH and other environment variables in the current terminal
+source ./emsdk_env.sh
+```
 
 ## Build Qt from source with Wasm support
 
@@ -107,22 +107,16 @@ A static Qt Wasm version should now be setup in the `qt5_wasm_binaries` folder.
 
 ## Building MNE-CPP against QtWasm
 
-MNE-CPP needs to be build statically. This is automatically done if the `wasm` flag is set. Navigate to mne-cpp/mne-cpp.pri and add the wasm flag. This will build MNE-CPP statically and configure only wasm supported MNE-CPP code.
-
-```
-MNECPP_CONFIG += wasm
-```
-
-Create a shadow build folder, run `qmake` and build MNE-CPP:
+MNE-CPP needs to be build statically. This is automatically done if the `wasm` flag is set. Create a shadow build folder, run `qmake` and build MNE-CPP:
 
 ```
 mkdir mne-cpp_shadow
 cd mne-cpp_shadow
-../qt5_wasm_binaries/bin/qmake ../mne-cpp/mne-cpp.pro
+../qt5_wasm_binaries/bin/qmake ../mne-cpp/mne-cpp.pro MNECPP_CONFIG=wasm
 make -j8
 ```
 
-This should create the applications featured under applications, e.g. MNE Analyze, to be build to mne-cpp/bin
+This should build all Wasm enabled applications, e.g. MNE Analyze, to `mne-cpp/bin`.
 
 ## Run an application
 
