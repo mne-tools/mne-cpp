@@ -516,7 +516,7 @@ jobs:
 
   WebAssembly:
     runs-on: ubuntu-latest
-    needs: UpdateDevTag
+    #needs: UpdateDevTag
 
     steps:
     - name: Clone repository
