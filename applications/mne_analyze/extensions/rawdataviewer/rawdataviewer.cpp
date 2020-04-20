@@ -49,7 +49,6 @@
 #include "../dataloader/dataloader.h"
 #include "../dataloader/FormFiles/dataloadercontrol.h"
 #include <anShared/Model/annotationmodel.h>
-#include "annotationview.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -114,8 +113,6 @@ void RawDataViewer::init()
     // remember that the display was built
     m_bDisplayCreated = true;
 
-    //create AnnotationModel
-    m_pAnnotationModel = QSharedPointer<ANSHAREDLIB::AnnotationModel>(new ANSHAREDLIB::AnnotationModel(this));
 }
 
 //=============================================================================================================
@@ -188,6 +185,9 @@ QWidget *RawDataViewer::getView()
 void RawDataViewer::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
+    case TRIGGER_REDRAW:
+        m_pFiffRawView->updateView();
+        break;
     default:
         qWarning() << "[RawDataViewer::handleEvent] Received an Event that is not handled by switch cases.";
     }
@@ -198,6 +198,7 @@ void RawDataViewer::handleEvent(QSharedPointer<Event> e)
 QVector<EVENT_TYPE> RawDataViewer::getEventSubscriptions(void) const
 {
     QVector<EVENT_TYPE> temp = {};
+    temp.push_back(TRIGGER_REDRAW);
 
     return temp;
 }
@@ -242,18 +243,18 @@ void RawDataViewer::setUpControls()
     m_pFiffRawView->setZoom(viewWidget->getZoom());
     m_pFiffRawView->setDistanceTimeSpacer(viewWidget->getDistanceTimeSpacer());
 
-    //Annotation Widget
-    AnnotationView* annotationWidget = new AnnotationView();
-    annotationWidget->setModel(m_pAnnotationModel);
-    annotationWidget->passFiffParams(m_pRawModel->absoluteFirstSample(),
-                                     m_pRawModel->absoluteLastSample(),
-                                     m_pRawModel->getFiffInfo()->sfreq);
+//    //Annotation Widget
+//    AnnotationView* annotationWidget = new AnnotationView();
+//    annotationWidget->setModel(m_pAnnotationModel);
+//    annotationWidget->passFiffParams(m_pRawModel->absoluteFirstSample(),
+//                                     m_pRawModel->absoluteLastSample(),
+//                                     m_pRawModel->getFiffInfo()->sfreq);
 
-    connect(annotationWidget, &AnnotationView::activeEventsChecked,
-            m_pFiffRawView.data(), &FiffRawView::toggleDisplayEvent);
+//    connect(annotationWidget, &AnnotationView::activeEventsChecked,
+//            m_pFiffRawView.data(), &FiffRawView::toggleDisplayEvent);
 
-    connect(m_pFiffRawView.data(), &FiffRawView::sendSamplePos,
-            annotationWidget, &AnnotationView::addAnnotationToModel);
+//    connect(m_pFiffRawView.data(), &FiffRawView::sendSamplePos,
+//            annotationWidget, &AnnotationView::addAnnotationToModel);
 
     connect(m_pFiffRawView.data(), &FiffRawView::sendSamplePos,
             this, &RawDataViewer::onSendSamplePos);
@@ -261,7 +262,7 @@ void RawDataViewer::setUpControls()
     //Set up layout w/ control widgets
     m_pLayout->addWidget(scalingWidget);
     m_pLayout->addWidget(viewWidget);
-    m_pLayout->addWidget(annotationWidget);
+//    m_pLayout->addWidget(annotationWidget);
     m_pLayout->addStretch();
 
     //Make it all visible to the user

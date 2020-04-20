@@ -52,6 +52,7 @@
 #include <QWidget>
 #include <QMap>
 #include <QToolBar>
+#include <QColorDialog>
 
 namespace Ui {
     class EventWindowDockWidget;
@@ -135,9 +136,9 @@ private:
     int                                             m_iLastSampClicked;
 
     QSharedPointer<AnnotationDelegate>              m_pAnnDelegate;
-    QSharedPointer<ANSHAREDLIB::AnnotationModel>                 m_pAnnModel;
+    QSharedPointer<ANSHAREDLIB::AnnotationModel>    m_pAnnModel;
 
-
+    QColorDialog*       m_pColordialog;
 
 
 };

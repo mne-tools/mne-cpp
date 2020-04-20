@@ -45,6 +45,7 @@
 #include "../anshared_global.h"
 #include "../Utils/types.h"
 #include "abstractmodel.h"
+#include "annotationmodel.h"
 
 #include <fiff/fiff_ch_info.h>
 #include <fiff/fiff_io.h>
@@ -439,6 +440,8 @@ public:
     bool shouldDisplayAnn() const;
 
     void updateAnnotations(QVector<int>* vAnnData);
+
+    void setAnnotationModel(QSharedPointer<AnnotationModel> pModel);
 private:
 
     //=========================================================================================================
@@ -539,6 +542,8 @@ private:
     bool m_bDispAnn;
 
     QVector<int>*                       m_vAnnotationsToDisplay;
+
+    QSharedPointer<AnnotationModel>     m_pAnnotationModel;
 };
 
 //=============================================================================================================
