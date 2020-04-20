@@ -3,7 +3,7 @@ name: Linux|Win|MacOS
 on:
   push:
     branches:
-    - master
+    - alternate
 
 jobs:
   UpdateDevTag:
@@ -40,7 +40,7 @@ jobs:
 
   LinuxStatic:
     runs-on: ubuntu-16.04
-    needs: UpdateDevTag
+    #needs: UpdateDevTag
     
     steps:
     - name: Clone repository
@@ -72,9 +72,9 @@ jobs:
     #     make install -j4
     - name: Configure and compile MNE-CPP
       run: |
-        ../qt5_static_binaries/bin/qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples MNECPP_CONFIG+=static
-        make -j2
-        make install -j2
+        ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples MNECPP_CONFIG+=static
+        make -j4
+        make install -j4
     - name: Package binaries
       run: |
         # Delete folders which we do not want to ship
@@ -96,7 +96,7 @@ jobs:
 
   MacOSStatic:
     runs-on: macos-latest
-    needs: UpdateDevTag
+    #needs: UpdateDevTag
     
     steps:
     - name: Clone repository
@@ -124,9 +124,9 @@ jobs:
     #     make install -j4
     - name: Configure and compile MNE-CPP
       run: |
-        ../qt5_static_binaries/bin/qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples MNECPP_CONFIG+=static
-        make -j2
-        make install -j2
+        ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples MNECPP_CONFIG+=static
+        make -j4
+        make install -j4
     - name: Package binaries
       run: |
         # Delete folders which we do not want to ship
@@ -148,7 +148,7 @@ jobs:
         
   WinStatic:
     runs-on: windows-2016
-    needs: UpdateDevTag
+    #needs: UpdateDevTag
 
     steps:
     - name: Clone repository
@@ -547,14 +547,10 @@ jobs:
         git clone https://code.qt.io/qt/qt5.git -b 5.14.2
         cd qt5
         ./init-repository -f --module-subset=qtbase,qtcharts,qtsvg
-        # Create shadow build folder
-        cd ..
-        mkdir qt5_shadow
-        cd qt5_shadow
         # Configure Qt5
-        ../qt5/configure -xplatform wasm-emscripten -feature-thread -skip webengine -nomake tests -nomake examples -no-dbus -no-ssl -no-pch -opensource -confirm-license -prefix $PWD/../qt5_wasm_binaries
-        make module-qtbase module-qtsvg module-qtcharts -j2
-        make install -j2
+        ./configure -xplatform wasm-emscripten -feature-thread -skip webengine -nomake tests -nomake examples -no-dbus -no-ssl -no-pch -opensource -confirm-license -prefix $PWD/qtbase
+        make module-qtbase module-qtsvg module-qtcharts -j4
+        make install -j4
     - name: Configure and compile MNE-CPP
       run: |
         cd ..
@@ -562,11 +558,10 @@ jobs:
         ./emsdk/emsdk activate 1.39.3
         # Activate PATH and other environment variables in the current terminal
         source ./emsdk/emsdk_env.sh
-        # Compile MNE-CPP        
+        § Compile MNE-CPP        
         cd mne-cpp
-        ../qt5_wasm_binaries/bin/qmake -r MNECPP_CONFIG+=wasm
-        make -j2
-        make install -j2
+        ../qt5/qtbase/bin/qmake -r MNECPP_CONFIG=wasm
+        make -j4
     - name: Clone and update mne-cpp/wasm:gh-pages
       run: |
         # Delete folders which we do not want to ship
@@ -576,7 +571,7 @@ jobs:
         # Clone repo and update with new wasm versions
         git config --global user.email lorenzesch@hotmail.com
         git config --global user.name LorenzE
-        git clone -b gh-pages --single-branch https://github.com/mne-cpp/wasm.git
+        git clone -b master --single-branch https://github.com/mne-cpp/wasm.git
         cd wasm
         # Remove all files first
         git rm * -r
