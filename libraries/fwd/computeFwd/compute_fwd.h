@@ -89,23 +89,6 @@ namespace FWDLIB
 // Declare all structures to be used
 //=============================================================================================================
 
-/**
- * The struct containing the forward solution.
- */
-struct FwdResult {
-    MNELIB::MneSourceSpaceOld **spaces;             /* Source spaces */
-    int nspace;                                     /* How many? */
-    FwdCoilSet *megCoils;
-    FwdCoilSet *comp_coils;
-    MNELIB::MneCTFCompDataSet *comp_data;
-    bool fixed_ori;                                 /* Use fixed-orientation dipoles */
-    FwdBemModel *bem_model;                         /* BEM model definition */
-    Eigen::Vector3f *r0;                            /* Sphere model origin */
-    bool use_threads;                               /* Parallelize with threads? */
-    MNELIB::MneNamedMatrix **megForward;            /* The results */
-    MNELIB::MneNamedMatrix **megForwardGrad;
-};
-
 //=============================================================================================================
 /**
  * Implements the compute forward solution
@@ -123,7 +106,7 @@ public:
      * Default Constructor
      * @param [in]  p_settings        The pointer that contains the setting information
      */
-    explicit ComputeFwd(ComputeFwdSettings* p_settings);
+    explicit ComputeFwd(ComputeFwdSettings* pSettings);
 
     //=========================================================================================================
     /**
@@ -139,10 +122,10 @@ public:
 
     //=========================================================================================================
     /**
-     * Update the heaposition with meg_head_tand recalculate the forward solution for meg
-     * @param [in] meg_head_t        The meg_head_t to use for updating head position
+     * Update the heaposition with meg_head_t and recalculate the forward solution for meg
+     * @param [in] transDevHeadOld        The meg <-> head transformation to use for updating head position
      */
-    void updateHeadPos(FIFFLIB::FiffCoordTransOld* meg_head_t);
+    void updateHeadPos(FIFFLIB::FiffCoordTransOld* transDevHeadOld);
 
     //=========================================================================================================
     /**
@@ -156,38 +139,50 @@ public:
 private:
     //=========================================================================================================
     /**
-     * init the result
+     * init the member variables
      */
     void initFwd();
 
-    MNELIB::MneSourceSpaceOld **spaces;             /* Source spaces */
-    int nspace;                                     /* How many? */
-    FwdCoilSet *megcoils;                           /* The MEG coil set */
-    FwdCoilSet *compcoils;                          /* The compensator coil set */
-    FwdCoilSet* eegels;                             /* The eeg eceltrode set */
-    MNELIB::MneCTFCompDataSet *comp_data;           /* The compensator data */
-    FwdEegSphereModelSet* eeg_models;               /* The EEG model set */
-    FwdEegSphereModel* eeg_model;                   /* The EEG model */
-    FwdBemModel *bem_model;                         /* BEM model definition */
-    Eigen::Vector3f *r0;                            /* Sphere model origin */
+    MNELIB::MneSourceSpaceOld **m_spaces;           /* Source spaces */
+    int m_iNSpace;                                  /* How many spaces */
+    FwdCoilSet *m_megcoils;                         /* The MEG coil set */
+    FwdCoilSet *m_compcoils;                        /* The compensator coil set */
+    FwdCoilSet* m_eegels;                           /* The eeg eceltrode set */
+    MNELIB::MneCTFCompDataSet *m_compData;          /* The compensator data */
+    FwdEegSphereModelSet* m_eegModels;              /* The EEG model set */
+    FwdEegSphereModel* m_eegModel;                  /* The EEG model */
+    FwdBemModel *m_bemModel;                        /* BEM model definition */
+    Eigen::Vector3f *m_r0;                          /* Sphere model origin */
 
     MNELIB::MneNamedMatrix *meg_forward;            /* The meg forward  */
     MNELIB::MneNamedMatrix *meg_forward_grad;
     MNELIB::MneNamedMatrix *eeg_forward;
     MNELIB::MneNamedMatrix *eeg_forward_grad;
 
-    QList<FIFFLIB::FiffChInfo> m_listMegChs;              /* The MEG channel information */
-    QList<FIFFLIB::FiffChInfo> m_listEegChs;              /* The EEG channel information */
+    QList<FIFFLIB::FiffChInfo> m_listMegChs;        /* The MEG channel information */
+    QList<FIFFLIB::FiffChInfo> m_listEegChs;        /* The EEG channel information */
 
-    FIFFLIB::fiffId mri_id;
-    FIFFLIB::FiffId meas_id;
-    FIFFLIB::FiffCoordTransOld* mri_head_t;         /* MRI <-> head coordinate transformation */
-    FIFFLIB::FiffCoordTransOld* meg_head_t;         /* MEG <-> head coordinate transformation */
+    FIFFLIB::fiffId m_mri_id;
+    FIFFLIB::FiffId m_meas_id;
+    FIFFLIB::FiffCoordTransOld* m_mri_head_t;       /* MRI <-> head coordinate transformation */
+    FIFFLIB::FiffCoordTransOld* m_meg_head_t;       /* MEG <-> head coordinate transformation */
 
-    ComputeFwdSettings* settings;                   /* The settings for the forward calculation */
+    ComputeFwdSettings* m_settings;                 /* The m_settings for the forward calculation */
 
     //=========================================================================================================
-
+    /**
+     * Read channelinformation and split into lists for meg/eeg/comp + read m_meg_head_t
+     * @param [in] pFiffInfo            The FiffInfo to read from
+     * @param [out] listMegCh           The MEG channel list
+     * @param [out] iNMeg               The number of MEG channels
+     * @param [out] listMegComp         The compensator channel list
+     * @param [out] iNMegCmp            The number of compensator channels
+     * @param [out] listEegCh           The EEG channel list
+     * @param [out] iNEeg               The number of EEG channels
+     * @param [out] transDevHeadOld     The meg <-> head transformation
+     * @param [out] id                  The FiffID
+     *
+     */
     int readChannels(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
                      QList<FIFFLIB::FiffChInfo>& listMegCh,	 /* MEG channels */
                      int& iNMeg,
