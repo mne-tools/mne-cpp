@@ -93,7 +93,8 @@ namespace ANSHAREDLIB
         EXTENSION_INIT_FINISHED,    // send when all extensions finished initializing
         STATUS_BAR_MSG,             // sending a message to the status bar (part of gui)
         CURRENTLY_SELECTED_MODEL,   // event send whenever the user changes the selection in the datamanager plugin
-        NEW_ANNOTATION_ADDED        // event send whenever the user adds a new annotation in the rawdataviewer plugin
+        NEW_ANNOTATION_ADDED,       // event send whenever the user adds a new annotation in the rawdataviewer plugin
+        TRIGGER_REDRAW              // send when viewer needs to be updated
     };
 } //NAMESPACE
 

@@ -89,24 +89,17 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES += \
-    annotationdelegate.cpp \
-#    annotationmodel.cpp \
-    annotationview.cpp \
     rawdataviewer.cpp \
     fiffrawview.cpp \
     fiffrawviewdelegate.cpp
 
 HEADERS += \
-    annotationdelegate.h \
-#    annotationmodel.h \
-    annotationview.h \
     rawdataviewer_global.h \
     rawdataviewer.h    \
     fiffrawview.h \
     fiffrawviewdelegate.h
 
 FORMS += \
-    annotationview.ui \
 
 OTHER_FILES += rawdataviewer.json
 

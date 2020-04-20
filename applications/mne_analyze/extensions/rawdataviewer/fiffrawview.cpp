@@ -331,3 +331,10 @@ void FiffRawView::toggleDisplayEvent(const int& iToggle)
     m_pModel->toggleDispAnn(m_iToggle);
     m_pTableView->viewport()->repaint();
 }
+
+//=============================================================================================================
+
+void FiffRawView::updateView()
+{
+    m_pTableView->viewport()->repaint();
+}
