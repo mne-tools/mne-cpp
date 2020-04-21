@@ -86,8 +86,10 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::ExtensionManager> pExtensionM
     setWindowTitle(CInfo::AppNameShort());
 
     if(!pExtensionManager.isNull()) {
+        // The order we call these functions is important!
         createActions();
         createExtensionMenus(pExtensionManager);
+        createLogDockWindow();
         createExtensionControls(pExtensionManager);
         createExtensionViews(pExtensionManager);
     } else {
@@ -131,6 +133,25 @@ void MainWindow::createActions()
 
 //=============================================================================================================
 
+void MainWindow::createLogDockWindow()
+{
+    //Log TextBrowser
+    QDockWidget* pDockWidget_Log = new QDockWidget(tr("Log"), this);
+
+    m_pTextBrowser_Log = new QTextBrowser(pDockWidget_Log);
+
+    pDockWidget_Log->setWidget(m_pTextBrowser_Log);
+
+    pDockWidget_Log->setAllowedAreas(Qt::BottomDockWidgetArea);
+    addDockWidget(Qt::BottomDockWidgetArea, pDockWidget_Log);
+
+    pDockWidget_Log->hide();
+
+    m_pMenuView->addAction(pDockWidget_Log->toggleViewAction());
+}
+
+//=============================================================================================================
+
 void MainWindow::createExtensionMenus(QSharedPointer<ANSHAREDLIB::ExtensionManager> pExtensionManager)
 {
     m_pMenuFile = menuBar()->addMenu(tr("File"));
@@ -142,6 +163,7 @@ void MainWindow::createExtensionMenus(QSharedPointer<ANSHAREDLIB::ExtensionManag
 
     m_pMenuHelp = menuBar()->addMenu(tr("Help"));
     m_pMenuHelp->addAction(m_pActionAbout);
+
 
     // add extensions menus
     for(IExtension* pExtension : pExtensionManager->getExtensions()) {
@@ -342,4 +364,29 @@ void MainWindow::about()
     }
 
     m_pAboutWindow->show();
+}
+
+//=============================================================================================================
+
+void MainWindow::writeToLog(const QString& logMsg,
+                            LogKind lgknd,
+                            LogLevel lglvl)
+{
+    if(lglvl<=m_eLogLevelCurrent) {
+        if(lgknd == _LogKndError) {
+            m_pTextBrowser_Log->insertHtml("<font color=red><b>Error:</b> "+logMsg+"</font>");
+        } else if(lgknd == _LogKndWarning) {
+            m_pTextBrowser_Log->insertHtml("<font color=blue><b>Warning:</b> "+logMsg+"</font>");
+        } else {
+            m_pTextBrowser_Log->insertHtml(logMsg);
+        }
+        m_pTextBrowser_Log->insertPlainText("\n"); // new line
+
+        //scroll down to the newest entry
+        QTextCursor c = m_pTextBrowser_Log->textCursor();
+        c.movePosition(QTextCursor::End);
+        m_pTextBrowser_Log->setTextCursor(c);
+
+        m_pTextBrowser_Log->verticalScrollBar()->setValue(m_pTextBrowser_Log->verticalScrollBar()->maximum());
+    }
 }
