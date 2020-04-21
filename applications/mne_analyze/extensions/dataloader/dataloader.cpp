@@ -37,7 +37,6 @@
 //=============================================================================================================
 
 #include "dataloader.h"
-#include "FormFiles/dataloadercontrol.h"
 
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <anShared/Management/communicator.h>
@@ -78,14 +77,6 @@ QSharedPointer<IExtension> DataLoader::clone() const
 void DataLoader::init()
 {
     m_pCommu = new Communicator(this);
-
-    m_pDataLoaderControl = new DataLoaderControl();
-
-    connect(m_pDataLoaderControl.data(), &DataLoaderControl::loadFiffFile,
-            this, &DataLoader::onLoadFiffFilePressed);
-
-    connect(m_pDataLoaderControl.data(), &DataLoaderControl::saveFiffFile,
-            this, &DataLoader::onSaveFiffFilePressed);
 }
 
 //=============================================================================================================
@@ -106,20 +97,29 @@ QString DataLoader::getName() const
 
 QMenu *DataLoader::getMenu()
 {
-    return Q_NULLPTR;
+    QMenu* pMenuFile = new QMenu(tr("File"));
+
+    QAction* pActionLoad = new QAction(tr("Open"));
+    pActionLoad->setStatusTip(tr("Load a data file"));
+    connect(pActionLoad, &QAction::triggered,
+            this, &DataLoader::onLoadFiffFilePressed);
+
+    QAction* pActionSave = new QAction(tr("Save"));
+    pActionLoad->setStatusTip(tr("Save the selected data file"));
+    connect(pActionSave, &QAction::triggered,
+            this, &DataLoader::onSaveFiffFilePressed);
+
+    pMenuFile->addAction(pActionLoad);
+    pMenuFile->addAction(pActionSave);
+
+    return pMenuFile;
 }
 
 //=============================================================================================================
 
 QDockWidget *DataLoader::getControl()
 {
-    if(!m_pControl) {
-        m_pControl = new QDockWidget(tr("Data Loader"));
-        m_pControl->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
-        m_pControl->setWidget(m_pDataLoaderControl);
-    }
-
-    return m_pControl;
+    return Q_NULLPTR;
 }
 
 //=============================================================================================================
@@ -165,7 +165,7 @@ void DataLoader::onLoadFiffFilePressed()
     QFileDialog::getOpenFileContent("Fiff File (*.fif *.fiff)",  fileContentReady);
 #else
     //Get the path
-    QString filePath = QFileDialog::getOpenFileName(m_pControl,
+    QString filePath = QFileDialog::getOpenFileName(Q_NULLPTR,
                                                     tr("Open Fiff File"),
                                                     QDir::currentPath()+"/MNE-sample-data",
                                                     tr("Fiff file(*.fif *.fiff)"));
@@ -184,7 +184,7 @@ void DataLoader::onSaveFiffFilePressed()
     m_pAnalyzeData->saveModel(m_sCurrentlySelectedModel, "");
 #else
     //Get the path
-    QString filePath = QFileDialog::getSaveFileName(m_pControl,
+    QString filePath = QFileDialog::getSaveFileName(Q_NULLPTR,
                                                     tr("Save Fiff File"),
                                                     QDir::currentPath()+"/MNE-sample-data",
                                                     tr("Fiff file(*.fif *.fiff)"));

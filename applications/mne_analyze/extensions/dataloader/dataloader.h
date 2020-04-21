@@ -124,8 +124,6 @@ private:
      */
     void onSaveFiffFilePressed();
 
-    QPointer<QDockWidget>               m_pControl;             /**< Control Widget */
-    QPointer<DataLoaderControl>         m_pDataLoaderControl;   /**< The data loader control Widget */
     QPointer<ANSHAREDLIB::Communicator> m_pCommu;
 
     QString                             m_sCurrentlySelectedModel;

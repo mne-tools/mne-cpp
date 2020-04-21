@@ -74,15 +74,12 @@ CONFIG(debug, debug|release) {
 
 SOURCES += \
     dataloader.cpp \
-    FormFiles/dataloadercontrol.cpp
 
 HEADERS += \
     dataloader_global.h \
     dataloader.h \
-    FormFiles/dataloadercontrol.h
 
 FORMS += \
-    FormFiles/dataloadercontrol.ui
 
 OTHER_FILES += dataloader.json
 
