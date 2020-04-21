@@ -144,12 +144,26 @@ void MainWindow::createExtensionMenus(QSharedPointer<ANSHAREDLIB::ExtensionManag
     m_pMenuHelp->addAction(m_pActionAbout);
 
     // add extensions menus
-    for(IExtension* ex : pExtensionManager->getExtensions())
-    {
-        QMenu* pMenu = ex->getMenu();
-        if(pMenu)
-        {
-            menuBar()->addMenu(pMenu);
+    for(IExtension* pExtension : pExtensionManager->getExtensions()) {
+        if(pExtension) {
+            if (QMenu* pMenu = pExtension->getMenu()) {
+                // Check if the menu already exists. If it does add the actions to the exisiting menu.
+                if(pMenu->title() == "File") {
+                    for(QAction* pAction : pMenu->actions()) {
+                        m_pMenuFile->insertAction(m_pActionExit, pAction);
+                    }
+                } else if(pMenu->title() == "View") {
+                    for(QAction* pAction : pMenu->actions()) {
+                        m_pMenuView->addAction(pAction);
+                    }
+                } else if(pMenu->title() == "Help") {
+                    for(QAction* pAction : pMenu->actions()) {
+                        m_pMenuHelp->insertAction(m_pActionAbout, pAction);
+                    }
+                } else {
+                    menuBar()->addMenu(pMenu);
+                }
+            }
         }
     }
 }

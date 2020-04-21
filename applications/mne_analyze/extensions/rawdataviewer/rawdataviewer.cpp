@@ -47,7 +47,6 @@
 #include <disp/viewers/fiffrawviewsettings.h>
 #include <disp/viewers/scalingview.h>
 #include "../dataloader/dataloader.h"
-#include "../dataloader/FormFiles/dataloadercontrol.h"
 #include <anShared/Model/annotationmodel.h>
 
 //=============================================================================================================
