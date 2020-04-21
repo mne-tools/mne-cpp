@@ -229,7 +229,6 @@ bool FiffIO::write_raw(QIODevice &p_IODevice, const fiff_int_t idx) const
     SparseMatrix<double> mult;
     RowVectorXi sel;
 
-//    std::cout << "Writing file " << QFile(&p_IODevice).fileName().toUtf8() << std::endl;
     FiffStream::SPtr outfid = FiffStream::start_writing_raw(p_IODevice, this->m_qlistRaw[idx]->info, cals);
 
     //Setup reading parameters
@@ -268,6 +267,7 @@ bool FiffIO::write_raw(QIODevice &p_IODevice, const fiff_int_t idx) const
         qDebug("[done]\n");
     }
 
+    qDebug() << "8";
     outfid->finish_writing_raw();
 
     return true;
