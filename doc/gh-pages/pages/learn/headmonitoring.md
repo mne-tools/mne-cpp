@@ -6,71 +6,68 @@ nav_order: 3
 ---
 # Real-time Head Monitoring
 
-This guide shows how to enable and use real-time head monitoring during your MEG measurement. Currently, this only works with Neuromag/Elekta/MEGIN devices.
+This guide shows how to enable and use real-time head monitoring during a MEG measurement. Currently, only Neuromag/Elekta/MEGIN devices are supported.
 
 ## Prerequisites
 
-Before you can visualize the head movement during your measurement, you have to ensure two things:
+Before you can monitor head movements during a measurement, ensur eyou have the following things setup:
 
 1. Enable continuous HPI (cHPi) during your measurement.
-2. Make sure you have digitized the subjects head accordingly and you have access to the data. 
+2. Make sure you have digitized the subjects head (fiducials, HPI coils and additional head points) and you have access to the data. 
 
 ## Setup
 
-Real-time head monitoring is a functionality that can be added to all Sensor Plugins like `FiffSimulator` or `FieldTripBuffer`. The following steps will show you the necessary steps to set up the real-time head monitoring in MNE Scan: 
+Real-time head monitoring works in combination with sensor plugins, such as the `FiffSimulator` or `FieldTripBuffer`. The following steps guide you through setting up the real-time head monitoring in MNE Scan: 
 
-1. Setup the data streaming
-    * Stream pre-recorded data via [FiffSimulator](/prerecordeddata.md).
-    * Stream data from a MEG device connected via the [FieldTripBuffer-Plugin](../development/ftbufferplugin.md).
+1. Setup the data stream. You can either:
+    * Stream pre-recorded data via the [FiffSimulator plugin](/prerecordeddata.md).
+    * Stream data from a MEG device connected via the [FieldTripBuffer plugin](../development/ftbufferplugin.md).
 
-2. Add the HPI-Plugin to the plugin scene and connect your Sensor-Plugin to the HPI Plugin.
+2. Add the HPI Fitting plugin to the plugin scene and connect your sensor plugin from step one to the HPI Plugin.
+
    ![](../../images/hpi/mne_scan_hpi_plugin.png)
 
-3. Start the measurement
+3. Start the measurement via the Play button in the top left corner
 
-4. Settings for the Hpi Fit and 3D visualization
-
-    You can open and control the settings for the hpi fitting via the Quick-Control widget. Open it by pressing the `QUICK CTRL` button and follow the steps described in the next section.
+4. You can open and control the settings for the HPI fitting via the Quick Control View. Open it by pressing the `QUICK CTRL` button and follow the steps described in the next section.
 
     ![](../../images/hpi/mne_scan_open_quick.png)
 
-MNE Scan should now look like following picture. You have the Plugin-Scene on the left, the 3D View in the upper part and the data stream in the lower part. The 3D View shows an average head model that is aligned and scaled to tracked landmarks like LPA, RPA, Nasion and HPI coils. It shows up after the first succesfull hpi fit. 
+MNE Scan should now look like following picture. You have the plugin scene on the left, the 3D View in the upper part and the data stream in the lower part. The 3D View shows an average head model that is aligned and scaled to digitized landmarks like LPA, RPA, Nasion and HPI coils. The head moddel shows up after the first succesfull HPI fit. 
 
 ![](../../images/hpi/mne_scan_hpi_3D.png)
 
-## The Quick Control Widget
-Once opened, you can choose between different control panels. There you get i.e. acces to the HPI-control panel `HPI Fitting` or the 3D-cotrol panel `3D View`. Follow the described steps to setup the hpi fitting and control the apperance in the 3D View.
+## The Quick Control View
 
-![](../../images/hpi/mne_scan_quick.png)
+The Quick Control View can be used to choose between different tabs, where every tab correspondds to one plugin. In case of a basic HPI Fitting pipeline, there should be three tabs: FiffSimulaotr or FieldTripBuffer, HpI Fitting andd 3D View.
 
-### HPI Fitting: Digitizers
+![](../../images/hpi/mne_scan_quick.png){:height="300px"}
 
-![](../../images/hpi/mne_scan_hpi_load.png)
+The HPI Fitting and 3D View tabs and their functionalities are described in the following:
 
-* Click the button `Load Digitizers` and navigate to the subjects digitized data which is stored in `.fif` format.  
-* The display will show how many digitizers of each kind are loaded. 
+### The HPI Fitting tab
 
-### HPI Fitting: Fitting
 
-![](../../images/hpi/mne_scan_hpi_fit.png)
+1. Click the button `Load Digitizers` and navigate to the subject's digitized data which is stored in `.fif` format.  
+2. The display will show how many digitizers of each kind were loaded. 
 
-1. Enter the HPI coil frequencies. You can add and remove new Frequencies, but keep in mind to only add used ones. 
+    <img src="../../images/hpi/mne_scan_hpi_load.png" width="300" height="auto">
 
-2. Choose if you want to use Signal Space Projection (`SSP`) or `Compensators`.
+3. Enter the HPI coil frequencies. You can add and remove frequencies. 
 
-3. If you don't know how your coils and frequencies are ordered, do an initial frequency ordering by pressing `Order coil frequencies`.
+    <img src="../../images/hpi/mne_scan_hpi_fit.png" width="300" height="auto">
 
-4. Do an initial HPI fit or enable continuous HPi fitting. Make sure you have started the measuring pipeline via the play button first. After the first succesfull fit the average head should appear in the 3D View.
+4. Choose if you want to use `Signal Space Projection` (`SSP`) or `Compensators` when performing the fit.
+5. If you don't know how your coils and frequencies are ordered, do an initial frequency ordering by pressing `Order coil frequencies`.
+6. Do an initial HPI fit or enable continuous HPI fitting. Make sure you have started the measuring pipeline via the play button first. After the first succesfull fit the average head should appear in the 3D View.
+7. The `Fitting errors` are shown in mm for each coil and as an average over all coils. The error is calculated as the distance between the estimated HPI coils and the digitized HPI positions.
+8. Choose a threshold that defines an acceptable error. 
 
-4. The `Fitting errors` in mm are shown for each coil and in form of an average over all coils. The error is calculated as the distance between the estimated HPI coil and the digitized HPI positions.
+### The 3D View tab
 
-5. Choose a threshold that defines an acceptable error. 
-
-### 3D View
-
-![](../../images/hpi/mne_scan_hpi_control.png)
+<img src="../../images/hpi/mne_scan_hpi_control.png" width="300" height="auto">
 
 Here you can choose what elements you want to visualize in the monitoring section. These elements include:
 
- * Device > `VectorView` or `BabyMEG` features the different helmet surfaces.
- * Head > `Average`, `Tracked` and `Fitted` features the averaged head surface, digitized and aligned landmarks as well as the estimated HPI coil locations, respectivley.
+* Device > `VectorView` or `BabyMEG` features the helmet surfaces for different MEG devices.
+* Head > `Average`, `Tracked` and `Fitted` features the averaged head surface, digitized and aligned landmarks as well as the estimated HPI coil locations, respectivley.
