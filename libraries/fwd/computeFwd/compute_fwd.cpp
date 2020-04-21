@@ -2283,35 +2283,49 @@ void ComputeFwd::updateHeadPos(FiffCoordTransOld* transDevHeadOld)
 
     FwdCoilSet* megcoilsNew = m_megcoils->dup_coil_set(transHeadHeadOld);
 
-    // Field computation matrices...
-    qDebug() << "!!!TODO Speed the following with Eigen up!";
-    printf("Composing the field computation matrix...");
-    if (FwdBemModel::fwd_bem_specify_coils(m_bemModel,megcoilsNew) == FAIL) {
+    if ((FwdBemModel::compute_forward_meg(m_spaces,
+                                          m_iNSpace,
+                                          megcoilsNew,
+                                          m_compcoils,
+                                          m_compData,
+                                          m_settings->fixed_ori,
+                                          m_bemModel,
+                                          &m_settings->r0,
+                                          m_settings->use_threads,
+                                          &meg_forward,
+                                          m_settings->compute_grad ? &meg_forward_grad : Q_NULLPTR)) == FAIL) {
         return;
     }
-    fprintf(stderr,"[done]\n");
 
-    if(m_compcoils) {
-        FwdCoilSet* compcoilsNew = m_compcoils->dup_coil_set(transDevHeadOld);
-        FwdCompData* comp = Q_NULLPTR;
+//    // Field computation matrices...
+//    qDebug() << "!!!TODO Speed the following with Eigen up!";
+//    printf("Composing the field computation matrix...");
+//    if (FwdBemModel::fwd_bem_specify_coils(m_bemModel,megcoilsNew) == FAIL) {
+//        return;
+//    }
+//    fprintf(stderr,"[done]\n");
 
-        FwdCompData::fwd_make_comp_data(m_compData,
-                                        megcoilsNew,
-                                        compcoilsNew,
-                                        FwdBemModel::fwd_bem_field,
-                                        Q_NULLPTR,
-                                        FwdBemModel::fwd_bem_field_grad,
-                                        m_bemModel,
-                                        Q_NULLPTR);
+//    if(m_compcoils) {
+//        FwdCoilSet* compcoilsNew = m_compcoils->dup_coil_set(transDevHeadOld);
+//        FwdCompData* comp = Q_NULLPTR;
 
-        if (comp->set && comp->set->current) { /* Test just to specify confusing output */
-            fprintf(stderr,"Composing the field computation matrix (compensation coils)...");
-            if (FwdBemModel::fwd_bem_specify_coils(m_bemModel,comp->comp_coils) == FAIL) {
-                return;
-            }
-            fprintf(stderr,"[done]\n");
-        }
-    }
+//        FwdCompData::fwd_make_comp_data(m_compData,
+//                                        megcoilsNew,
+//                                        compcoilsNew,
+//                                        FwdBemModel::fwd_bem_field,
+//                                        Q_NULLPTR,
+//                                        FwdBemModel::fwd_bem_field_grad,
+//                                        m_bemModel,
+//                                        Q_NULLPTR);
+
+//        if (comp->set && comp->set->current) { /* Test just to specify confusing output */
+//            fprintf(stderr,"Composing the field computation matrix (compensation coils)...");
+//            if (FwdBemModel::fwd_bem_specify_coils(m_bemModel,comp->comp_coils) == FAIL) {
+//                return;
+//            }
+//            fprintf(stderr,"[done]\n");
+//        }
+//    }
     // Update new Transformation Matrix
     *m_meg_head_t = *transDevHeadOld;
 }
