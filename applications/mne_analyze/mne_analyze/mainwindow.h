@@ -50,6 +50,7 @@
 #include <QCloseEvent>
 #include <QString>
 #include <QPointer>
+#include <QTextBrowser>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -76,6 +77,28 @@ namespace DISPLIB {
 
 namespace MNEANALYZE
 {
+
+//=============================================================================================================
+/**
+ * Log level
+ */
+enum LogLevel
+{
+    _LogLvMin,      /**< Minimal log information */
+    _LogLvNormal,   /**< Normal amount of log information */
+    _LogLvMax       /**< Accurate logging */
+};
+
+//=============================================================================================================
+/**
+ * Log kind
+ */
+enum LogKind
+{
+    _LogKndMessage,     /**< Normal log message */
+    _LogKndWarning,     /**< Warning log message */
+    _LogKndError        /**< Error log message */
+};
 
 //=============================================================================================================
 // MNEANALYZE FORWARD DECLARATIONS
@@ -125,12 +148,30 @@ signals:
     void mainWindowClosed();
 
 private:
-    void createActions();                                                                       /**< Creates all actions for user interface of MainWindow class. */
+    void createActions();
+
+    //=========================================================================================================
+    /**
+     * Creates log dock widget.
+     */
+    void createLogDockWindow();
+
+    /**< Creates all actions for user interface of MainWindow class. */
     void createExtensionMenus(QSharedPointer<ANSHAREDLIB::ExtensionManager> pExtensionManager);          /**< Creates all menus for user interface of MainWindow class. */
     void createExtensionControls(QSharedPointer<ANSHAREDLIB::ExtensionManager> pExtensionManager);    /**< Creates all dock windows for user interface of MainWindow class. */
     void createExtensionViews(QSharedPointer<ANSHAREDLIB::ExtensionManager> pExtensionManager);      /**< Creates all Windows within the MultiView for user interface of MainWindow class. */
     void tabifyDockWindows();                                                                   /**< Tabify all dock windows */
     void about();                                                                               /**< Implements about action.*/
+
+    //=========================================================================================================
+    /**
+     * Writes to MainWindow log.
+     *
+     * @param [in] logMsg message
+     * @param [in] lgknd message kind; Message is formated depending on its kind.
+     * @param [in] lglvl message level; Message is displayed depending on its level.
+     */
+    void writeToLog(const QString& logMsg, LogKind lgknd = _LogKndMessage, LogLevel lglvl = _LogLvNormal);
 
     QPointer<DISPLIB::MultiView>        m_pMultiView;       /**< The central View.*/
 
@@ -144,6 +185,10 @@ private:
     QPointer<QMenu>                     m_pMenuFile;        /**< Holds the file menu.*/
     QPointer<QMenu>                     m_pMenuView;        /**< Holds the view menu.*/
     QPointer<QMenu>                     m_pMenuHelp;        /**< Holds the help menu.*/
+
+    QPointer<QTextBrowser>              m_pTextBrowser_Log; /**< Holds the text browser for the log.*/
+
+    LogLevel                            m_eLogLevelCurrent; /**< Holds the current log level.*/
 
     QSharedPointer<QWidget>             m_pAboutWindow;     /**< Holds the widget containing the about information.*/
 };
