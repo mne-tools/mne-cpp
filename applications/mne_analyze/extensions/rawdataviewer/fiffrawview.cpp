@@ -318,7 +318,7 @@ void FiffRawView::customContextMenuRequested(const QPoint &pos)
 
 void FiffRawView::addTimeMark(bool con)
 {
-    m_pModel->newTimeMark(static_cast<int>(m_fLastClickedPoint));
+    //m_pModel->newTimeMark(static_cast<int>(m_fLastClickedPoint));
     emit sendSamplePos(m_fLastClickedPoint);
 }
 
