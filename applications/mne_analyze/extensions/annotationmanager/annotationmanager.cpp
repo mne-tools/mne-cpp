@@ -81,6 +81,9 @@ void AnnotationManager::init()
 
     m_pAnnotationView = QSharedPointer<AnnotationView>(new AnnotationView());
 
+    connect(m_pAnnotationView.data(), &AnnotationView::triggerRedraw,
+            this, &AnnotationManager::onTriggerRedraw);
+
     connect(m_pAnalyzeData.data(), &AnalyzeData::newModelAvailable,
             this, &AnnotationManager::onModelChanged);
     connect(m_pAnalyzeData.data(), &AnalyzeData::selectedModelChanged,
@@ -106,7 +109,7 @@ void AnnotationManager::unload()
 
 QString AnnotationManager::getName() const
 {
-    return "Data Loader";
+    return "Annotation Manager";
 }
 
 //=============================================================================================================
@@ -147,6 +150,8 @@ void AnnotationManager::handleEvent(QSharedPointer<Event> e)
 //        break;
     case EVENT_TYPE::NEW_ANNOTATION_ADDED:
         m_pAnnotationView->addAnnotationToModel(e->getData().toInt());
+        m_pCommu->publishEvent(TRIGGER_REDRAW);
+        break;
     default:
         qWarning() << "[AnnotationManager::handleEvent] Received an Event that is not handled by switch cases.";
     }
@@ -173,16 +178,18 @@ void AnnotationManager::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel
                 return;
             }
         }
-        m_pFiffRawModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
 
+//        m_pAnnotationView.reset();
+//        m_pAnnotationView = QSharedPointer<AnnotationView>(new AnnotationView());
+
+        m_pFiffRawModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
+        m_pAnnotationModel = m_pFiffRawModel->getAnnotationModel();
+        m_pAnnotationView->setModel(m_pAnnotationModel);
         m_pAnnotationView->passFiffParams(m_pFiffRawModel->absoluteFirstSample(),
                                            m_pFiffRawModel->absoluteLastSample(),
                                            m_pFiffRawModel->getFiffInfo()->sfreq);
-        setUpControls();
-        connect(m_pAnnotationModel.data(), &ANSHAREDLIB::AnnotationModel::annotationsToDraw,
-                m_pFiffRawModel.data(), &FiffRawViewModel::updateAnnotations);
 
-        m_pFiffRawModel->setAnnotationModel(m_pAnnotationModel);
+        setUpControls();
     }
 }
 
@@ -201,5 +208,12 @@ void AnnotationManager::toggleDisplayEvent(const int& iToggle)
     int m_iToggle = iToggle;
     qDebug() << "toggleDisplayEvent" << iToggle;
     m_pFiffRawModel->toggleDispAnn(m_iToggle);
+    m_pCommu->publishEvent(TRIGGER_REDRAW);
+}
+
+//=============================================================================================================
+
+void AnnotationManager::onTriggerRedraw()
+{
     m_pCommu->publishEvent(TRIGGER_REDRAW);
 }

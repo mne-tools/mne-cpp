@@ -24,7 +24,7 @@ class ANSHAREDSHARED_EXPORT AnnotationModel : public QAbstractTableModel
 public:
     AnnotationModel(QObject* parent);
 
-    //=============================================================================================================
+    //=========================================================================================================
     bool insertRows(int position, int span, const QModelIndex & parent);
     bool removeRows(int position, int span, const QModelIndex & parent = QModelIndex());
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
@@ -34,25 +34,37 @@ public:
     bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
     Qt::ItemFlags flags(const QModelIndex & index) const;
 
+    //=========================================================================================================
     QStringList getEventTypeList() const;
 
+    //=========================================================================================================
     void setSamplePos(int iSamplePos);
 
+    //=========================================================================================================
     void setEventFilterType(const QString eventType);
 
-    void setFirstLastSample(int firstSample, int lastSample);
+    //=========================================================================================================
+    void setFirstLastSample(int firstSample,
+                            int lastSample);
 
+    //=========================================================================================================
     QPair<int, int> getFirstLastSample() const;
 
+    //=========================================================================================================
     float getSampleFreq() const;
 
+    //=========================================================================================================
     void setSampleFreq(float fFreq);
 
+    //=========================================================================================================
     int getNumberOfAnnotations() const;
 
+    //=========================================================================================================
     int getAnnotation(int iIndex) const;
 
-    void addNewAnnotationType(const QString &eventType, const QColor &typeColor);
+    //=========================================================================================================
+    void addNewAnnotationType(const QString &eventType,
+                              const QColor &typeColor);
 
 signals:
 
