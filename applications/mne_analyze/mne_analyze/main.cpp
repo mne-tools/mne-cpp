@@ -69,6 +69,7 @@ using namespace MNEANALYZE;
 Q_IMPORT_PLUGIN(DataLoader)
 Q_IMPORT_PLUGIN(DataManager)
 Q_IMPORT_PLUGIN(RawDataViewer)
+Q_IMPORT_PLUGIN(AnnotationManager)
 #endif
 
 //=============================================================================================================
