@@ -136,7 +136,7 @@ QMAKE_TARGET_COPYRIGHT = Copyright (C) 2019 Authors of mne-cpp. All rights reser
 ## To build MNE Scan with TMSI support: qmake MNECPP_CONFIG+=withTmsi
 
 # Default flags
-MNECPP_CONFIG +=
+MNECPP_CONFIG += wasm
 
 # Minimal version needs at least qt version 5.2.1
 !minQtVersion(5, 2, 1) {

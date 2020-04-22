@@ -2055,6 +2055,8 @@ FiffStream::SPtr FiffStream::start_writing_raw(QIODevice &p_IODevice,
     //    Measurement info
     //
     t_pStream->start_block(FIFFB_MEAS_INFO);//7
+
+#ifndef WASMBUILD
     //
     //    Blocks from the original
     //
@@ -2085,6 +2087,8 @@ FiffStream::SPtr FiffStream::start_writing_raw(QIODevice &p_IODevice,
 
         t_pStream2 = FiffStream::SPtr();
     }
+#endif
+
     //
     //    megacq parameters
     //
@@ -2099,6 +2103,8 @@ FiffStream::SPtr FiffStream::start_writing_raw(QIODevice &p_IODevice,
 
         t_pStream->end_block(FIFFB_DACQ_PARS);
     }
+
+#ifndef WASMBUILD
     //
     //    Coordinate transformations if the HPI result block was not there
     //
@@ -2121,6 +2127,8 @@ FiffStream::SPtr FiffStream::start_writing_raw(QIODevice &p_IODevice,
 
         t_pStream->end_block(FIFFB_ISOTRAK);
     }
+#endif
+
     //
     //    Projectors
     //
