@@ -152,7 +152,7 @@ MNECPP_CONFIG += wasm
 
 # Build static version if wasm flag was defined
 contains(MNECPP_CONFIG, wasm) {
-    message("The wasm flag was detected. Building static version of MNE-CPP. Disable OpenGL support for Disp library")
+    message("The wasm flag was detected. Building static version of MNE-CPP. Disable OpenGL support for Disp library.")
     MNECPP_CONFIG += static noOpenGL
 }
 
