@@ -262,9 +262,7 @@ QVariant FiffRawViewModel::data(const QModelIndex &index, int role) const
         // whether channel is marked as bad
         else if(index.column() == 2) {
             return QVariant(m_pFiffInfo->bads.contains(m_pFiffInfo->ch_names[index.row()]));
-        }
-
-        else {
+        } else {
             qWarning() << "[FiffRawViewModel::data] Column " << index.column() << " not implemented !";
             return QVariant();
         }

@@ -228,7 +228,6 @@ bool FiffIO::write_raw(QIODevice &p_IODevice, const fiff_int_t idx) const
     RowVectorXd cals;
     SparseMatrix<double> mult;
     RowVectorXi sel;
-
     FiffStream::SPtr outfid = FiffStream::start_writing_raw(p_IODevice, this->m_qlistRaw[idx]->info, cals);
 
     //Setup reading parameters
@@ -237,7 +236,7 @@ bool FiffIO::write_raw(QIODevice &p_IODevice, const fiff_int_t idx) const
     float quantum_sec = 30.0f;//read and write in 30 sec junks
     fiff_int_t quantum = ceil(quantum_sec*m_qlistRaw[idx]->info.sfreq);
 
-    // Uncomment to read the whole file at once. Warning MAtrix may be none-initialisable because its huge
+    // Uncomment to read the whole file at once. Warning Matrix may be none-initialisable because its huge
     //quantum = to - from + 1;
 
     // Read and write all the data
@@ -267,7 +266,6 @@ bool FiffIO::write_raw(QIODevice &p_IODevice, const fiff_int_t idx) const
         qDebug("[done]\n");
     }
 
-    qDebug() << "8";
     outfid->finish_writing_raw();
 
     return true;

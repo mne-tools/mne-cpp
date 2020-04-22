@@ -177,7 +177,7 @@ public:
     {
         // check if model was already loaded:
         if (QSharedPointer<AbstractModel> temp = getModel(sModelPath)) {
-            return temp->saveToFile(sPath);
+            return temp->saveToFile(sModelPath);
         }
 
         qWarning() << "[AnalyzeData::saveModel] Model does not exist!";
