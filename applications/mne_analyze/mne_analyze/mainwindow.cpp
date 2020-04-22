@@ -118,6 +118,47 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 //=============================================================================================================
 
+void MainWindow::writeToLog(QtMsgType type,
+                            const QMessageLogContext &context,
+                            const QString &msg)
+{
+    Q_UNUSED(context);
+
+    switch (type)
+    {
+        case QtDebugMsg:
+            m_pTextBrowser_Log->insertHtml("<font color=green><b>[DEBUG]</b> "+msg+"</font>");
+            break;
+        case QtInfoMsg:
+            m_pTextBrowser_Log->insertHtml("<font color=green><b>[INFO]</b> "+msg+"</font>");
+            break;
+        case QtWarningMsg:
+            m_pTextBrowser_Log->insertHtml("<font color=purple><b>[WARNING]</b> "+msg+"</font>");
+            break;
+        case QtCriticalMsg:
+            m_pTextBrowser_Log->insertHtml("<font color=red><b>[CRITICAL]</b> "+msg+"</font>");
+            break;
+        case QtFatalMsg:
+            m_pTextBrowser_Log->insertHtml("<font color=purple><b>[FATAL]</b> "+msg+"</font>");
+            abort();
+            break;
+        default:
+            m_pTextBrowser_Log->insertHtml("<font color=black><b>[UNKOWN]</b> "+msg+"</font>");
+            break;
+    }
+
+    // Add new line and scroll down to the newest entry
+    m_pTextBrowser_Log->insertPlainText("\n");
+
+    QTextCursor c = m_pTextBrowser_Log->textCursor();
+    c.movePosition(QTextCursor::End);
+    m_pTextBrowser_Log->setTextCursor(c);
+
+    m_pTextBrowser_Log->verticalScrollBar()->setValue(m_pTextBrowser_Log->verticalScrollBar()->maximum());
+}
+
+//=============================================================================================================
+
 void MainWindow::createActions()
 {
     m_pActionExit = new QAction(tr("Exit"), this);
@@ -145,9 +186,9 @@ void MainWindow::createLogDockWindow()
     pDockWidget_Log->setAllowedAreas(Qt::BottomDockWidgetArea);
     addDockWidget(Qt::BottomDockWidgetArea, pDockWidget_Log);
 
-    pDockWidget_Log->hide();
-
     m_pMenuView->addAction(pDockWidget_Log->toggleViewAction());
+
+    pDockWidget_Log->hide();
 }
 
 //=============================================================================================================
@@ -364,29 +405,4 @@ void MainWindow::about()
     }
 
     m_pAboutWindow->show();
-}
-
-//=============================================================================================================
-
-void MainWindow::writeToLog(const QString& logMsg,
-                            LogKind lgknd,
-                            LogLevel lglvl)
-{
-    if(lglvl<=m_eLogLevelCurrent) {
-        if(lgknd == _LogKndError) {
-            m_pTextBrowser_Log->insertHtml("<font color=red><b>Error:</b> "+logMsg+"</font>");
-        } else if(lgknd == _LogKndWarning) {
-            m_pTextBrowser_Log->insertHtml("<font color=blue><b>Warning:</b> "+logMsg+"</font>");
-        } else {
-            m_pTextBrowser_Log->insertHtml(logMsg);
-        }
-        m_pTextBrowser_Log->insertPlainText("\n"); // new line
-
-        //scroll down to the newest entry
-        QTextCursor c = m_pTextBrowser_Log->textCursor();
-        c.movePosition(QTextCursor::End);
-        m_pTextBrowser_Log->setTextCursor(c);
-
-        m_pTextBrowser_Log->verticalScrollBar()->setValue(m_pTextBrowser_Log->verticalScrollBar()->maximum());
-    }
 }
