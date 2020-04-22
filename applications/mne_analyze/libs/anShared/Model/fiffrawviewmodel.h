@@ -375,14 +375,6 @@ public:
 
     //=========================================================================================================
     /**
-     * Saves a new annotation at a sample
-     *
-     * @param[in] xpos  Sample number to be saved
-     */
-    void newTimeMark(const int& iSamp);
-
-    //=========================================================================================================
-    /**
      * Get sample annotation at iIndex
      *
      * @param[in] index     Index of sample data we want to retreive
@@ -439,9 +431,10 @@ public:
      */
     bool shouldDisplayAnn() const;
 
-    void updateAnnotations(QVector<int>* vAnnData);
-
     void setAnnotationModel(QSharedPointer<AnnotationModel> pModel);
+
+    QSharedPointer<AnnotationModel> getAnnotationModel();
+
 private:
 
     //=========================================================================================================
@@ -535,13 +528,9 @@ private:
 
     int                                 m_iDistanceTimerSpacer;                     /**< The distance for the horizontal time spacers in the view in ms */
 
-    QList<int>  timeMarkList;
-
     qint32 m_iScrollPos;
 
     bool m_bDispAnn;
-
-    QVector<int>*                       m_vAnnotationsToDisplay;
 
     QSharedPointer<AnnotationModel>     m_pAnnotationModel;
 };

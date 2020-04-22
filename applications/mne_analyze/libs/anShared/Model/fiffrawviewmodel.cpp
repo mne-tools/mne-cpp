@@ -101,8 +101,7 @@ FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
 , m_iScrollPos(0)
 , m_dScrollDx(1.0)
 , m_bDispAnn(true)
-, m_vAnnotationsToDisplay(Q_NULLPTR)
-, m_pAnnotationModel(Q_NULLPTR)
+, m_pAnnotationModel(QSharedPointer<AnnotationModel>::create(this))
 {
     // connect data reloading: this will be run concurrently
     connect(&m_blockLoadFutureWatcher,
@@ -115,6 +114,8 @@ FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
     initFiffData(m_file);
 
     updateEndStartFlags();
+
+    //m_pAnnotationModel = QSharedPointer<AnnotationModel>(new AnnotationModel(this));
 }
 
 //=============================================================================================================
@@ -138,8 +139,7 @@ FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
 , m_iDistanceTimerSpacer(1000)
 , m_iScrollPos(0)
 , m_bDispAnn(true)
-, m_vAnnotationsToDisplay(Q_NULLPTR)
-, m_pAnnotationModel(Q_NULLPTR)
+, m_pAnnotationModel(QSharedPointer<AnnotationModel>::create(this))
 {
     Q_UNUSED(sFilePath)
 
@@ -154,6 +154,8 @@ FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
 
     initFiffData(m_buffer);
     updateEndStartFlags();
+
+    //m_pAnnotationModel = QSharedPointer<AnnotationModel>(new AnnotationModel(this));
 }
 
 //=============================================================================================================
@@ -732,48 +734,19 @@ void FiffRawViewModel::updateDisplayData()
 
 //=============================================================================================================
 
-void FiffRawViewModel::newTimeMark(const int& iSamp)
-{
-//    qDebug() << "First held:" << m_iFiffCursorBegin;
-//    qDebug() << "DX" << m_dDx;
-    //Get absolute sample number of where we clicked
-    //float fSample = /*absoluteFirstSample()*/currentFirstSample() + (xpos/m_dDx);
-
-    for (int samp : timeMarkList) {
-        if(iSamp == samp) {
-            qWarning() << "User attempted to add overlaping markers. Discarding new marker.";
-            return;
-        }
-    }
-
-    timeMarkList.append(iSamp);
-    std::sort(timeMarkList.begin(),timeMarkList.end());
-}
-
-//=============================================================================================================
-
 int FiffRawViewModel::getTimeMarks(int iIndex) const
 {
-//    return m_pAnnotationModel->getAnnotation(iIndex);
-    return timeMarkList.at(iIndex);
-//    return m_vAnnotationsToDisplay->at(iIndex);
+
+//    qDebug() << "getTimeMarks" << m_pAnnotationModel->getAnnotation(iIndex);
+    return m_pAnnotationModel->getAnnotation(iIndex);
 }
 
 //=============================================================================================================
 
 int FiffRawViewModel::getTimeListSize() const
 {
-    return timeMarkList.size();
-//    if (m_pAnnotationModel->getNumberOfAnnotations()){
-//        return m_pAnnotationModel->getNumberOfAnnotations();
-//    } else {
-//        return 0;
-//    }
-//    if(m_vAnnotationsToDisplay != Q_NULLPTR){
-//        return m_vAnnotationsToDisplay->size();
-//    } else {
-//        return 0;
-//    }
+//    qDebug() << "getTimeListSize" << m_pAnnotationModel->getNumberOfAnnotations();
+    return m_pAnnotationModel->getNumberOfAnnotations();
 }
 
 //=============================================================================================================
@@ -806,14 +779,14 @@ bool FiffRawViewModel::shouldDisplayAnn() const
 
 //=============================================================================================================
 
-void FiffRawViewModel::updateAnnotations(QVector<int>* vAnnData)
+void FiffRawViewModel::setAnnotationModel(QSharedPointer<AnnotationModel> pModel)
 {
-    m_vAnnotationsToDisplay = vAnnData;
+    m_pAnnotationModel = pModel;
 }
 
 //=============================================================================================================
 
-void FiffRawViewModel::setAnnotationModel(QSharedPointer<AnnotationModel> pModel)
+QSharedPointer<AnnotationModel> FiffRawViewModel::getAnnotationModel()
 {
-    m_pAnnotationModel = pModel;
+    return m_pAnnotationModel;
 }

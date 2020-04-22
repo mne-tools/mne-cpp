@@ -113,11 +113,17 @@ public:
     virtual void handleEvent(QSharedPointer<ANSHAREDLIB::Event> e) override;
     virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
 
+    //=========================================================================================================
     void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
 
+    //=========================================================================================================
     void setUpControls();
 
+    //=========================================================================================================
     void toggleDisplayEvent(const int& iToggle);
+
+    //=============================================================================================================
+    void onTriggerRedraw();
 
 private:
 
