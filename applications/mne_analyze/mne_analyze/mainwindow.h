@@ -79,28 +79,6 @@ namespace MNEANALYZE
 {
 
 //=============================================================================================================
-/**
- * Log level
- */
-enum LogLevel
-{
-    _LogLvMin,      /**< Minimal log information */
-    _LogLvNormal,   /**< Normal amount of log information */
-    _LogLvMax       /**< Accurate logging */
-};
-
-//=============================================================================================================
-/**
- * Log kind
- */
-enum LogKind
-{
-    _LogKndMessage,     /**< Normal log message */
-    _LogKndWarning,     /**< Warning log message */
-    _LogKndError        /**< Error log message */
-};
-
-//=============================================================================================================
 // MNEANALYZE FORWARD DECLARATIONS
 //=============================================================================================================
 
@@ -144,6 +122,18 @@ public:
      */
     void closeEvent(QCloseEvent *event) override;
 
+    //=============================================================================================================
+    /**
+     * Custom Qt message handler.
+     *
+     * @param [in] type      enum to identify the various message types
+     * @param [in] context   additional information about a log message
+     * @param [in] msg       the message to log
+     */
+    void writeToLog(QtMsgType type,
+                    const QMessageLogContext &context,
+                    const QString &msg);
+
 signals:
     void mainWindowClosed();
 
@@ -163,16 +153,6 @@ private:
     void tabifyDockWindows();                                                                   /**< Tabify all dock windows */
     void about();                                                                               /**< Implements about action.*/
 
-    //=========================================================================================================
-    /**
-     * Writes to MainWindow log.
-     *
-     * @param [in] logMsg message
-     * @param [in] lgknd message kind; Message is formated depending on its kind.
-     * @param [in] lglvl message level; Message is displayed depending on its level.
-     */
-    void writeToLog(const QString& logMsg, LogKind lgknd = _LogKndMessage, LogLevel lglvl = _LogLvNormal);
-
     QPointer<DISPLIB::MultiView>        m_pMultiView;       /**< The central View.*/
 
     QPointer<QGridLayout>               m_pGridLayout;      /**< Grid Layout is used for MainWindow, so that the MultiView can always fit the size of MainWindow */
@@ -187,8 +167,6 @@ private:
     QPointer<QMenu>                     m_pMenuHelp;        /**< Holds the help menu.*/
 
     QPointer<QTextBrowser>              m_pTextBrowser_Log; /**< Holds the text browser for the log.*/
-
-    LogLevel                            m_eLogLevelCurrent; /**< Holds the current log level.*/
 
     QSharedPointer<QWidget>             m_pAboutWindow;     /**< Holds the widget containing the about information.*/
 };

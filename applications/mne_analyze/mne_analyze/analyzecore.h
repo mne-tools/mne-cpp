@@ -106,13 +106,13 @@ public:
      */
     void showMainWindow();
 
-    //=========================================================================================================
-    /**
-     * Returns a pointer to the main window.
-     *
-     * @return A pointer to the main window.
-     */
-    inline QPointer<MainWindow> getMainWindow() const;
+//    //=========================================================================================================
+//    /**
+//     * Returns a pointer to the main window.
+//     *
+//     * @return A pointer to the main window.
+//     */
+//    inline QPointer<MainWindow> getMainWindow() const;
 
     //=========================================================================================================
     /**
@@ -163,19 +163,17 @@ private:
     void registerMetaTypes();
 
     QSharedPointer<ANSHAREDLIB::ExtensionManager>   m_pExtensionManager;    /**< Holds extension manager. */
-    QPointer<MainWindow>                            m_pMainWindow;          /**< The main window. */
     QSharedPointer<ANSHAREDLIB::AnalyzeSettings>    m_analyzeSettings;      /**< The global settings. */
     QSharedPointer<ANSHAREDLIB::AnalyzeData>        m_analyzeData;          /**< The global data base. */
-
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-QPointer<MainWindow> AnalyzeCore::getMainWindow() const {
-    return m_pMainWindow;
-}
+//QPointer<MainWindow> AnalyzeCore::getMainWindow() const {
+//    return m_pMainWindow;
+//}
 
 } // namespace MNEANALYZE
 
