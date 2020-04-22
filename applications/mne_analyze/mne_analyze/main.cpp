@@ -79,8 +79,6 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
-    qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
-
     // Set default font
     int id = QFontDatabase::addApplicationFont(":/fonts/Roboto-Light.ttf");
     app.setFont(QFont(QFontDatabase::applicationFontFamilies(id).at(0)));

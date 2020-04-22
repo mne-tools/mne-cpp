@@ -72,6 +72,27 @@ using namespace ANSHAREDLIB;
 const char* extensionsDir = "/mne_analyze_extensions";        /**< holds path to the extensions.*/
 
 //=============================================================================================================
+// GLOBAL DEFINES
+//=============================================================================================================
+
+QPointer<MainWindow> m_pMainWindow;          /**< The main window. */
+
+//=============================================================================================================
+/**
+ * Custom Qt message handler.
+ *
+ * @param [in] type      enum to identify the various message types
+ * @param [in] context   additional information about a log message
+ * @param [in] msg       the message to log
+ */
+void customMessageHandler(QtMsgType type, const
+                          QMessageLogContext &context,
+                          const QString &msg)
+{
+    m_pMainWindow->writeToLog(type, context, msg);
+}
+
+//=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
@@ -93,6 +114,9 @@ AnalyzeCore::AnalyzeCore(QObject* parent)
     initMainWindow();
 
     splash.hide();
+
+    // Setup log window
+    qInstallMessageHandler(customMessageHandler);
 }
 
 //=============================================================================================================
