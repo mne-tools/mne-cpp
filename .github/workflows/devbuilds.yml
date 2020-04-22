@@ -3,7 +3,7 @@ name: Linux|Win|MacOS
 on:
   push:
     branches:
-    - master
+    - alternate
 
 jobs:
   UpdateDevTag:
@@ -516,7 +516,7 @@ jobs:
 
   WebAssembly:
     runs-on: ubuntu-latest
-    needs: UpdateDevTag
+    #needs: UpdateDevTag
 
     steps:
     - name: Clone repository
