@@ -49,12 +49,9 @@
 #include <mne/c/mne_ctf_comp_data_set.h>
 #include "../fwd_eeg_sphere_model_set.h"
 #include "../fwd_bem_model.h"
-
 #include <mne/c/mne_named_matrix.h>
 #include <mne/c/mne_nearest.h>
 #include <mne/c/mne_source_space_old.h>
-#include <mne/mne_sourcespace.h>
-#include <mne/mne_forwardsolution.h>
 
 #include <fiff/c/fiff_sparse_matrix.h>
 
@@ -139,28 +136,10 @@ public:
     QString qPath;
     QFile file;
 
-public:
-    //=========================================================================================================
-    FIFFLIB::FiffInfoBase info;                 /**< light weighted measurement info */
-    FIFFLIB::fiff_int_t source_ori;             /**< Source orientation: fixed or free */
-    bool surf_ori;                              /**< If surface oriented */
-    FIFFLIB::fiff_int_t coord_frame;            /**< Coil coordinate system definition */
-    FIFFLIB::fiff_int_t nsource;                /**< Number of source dipoles */
-    FIFFLIB::fiff_int_t nchan;                  /**< Number of channels */
-    FIFFLIB::FiffNamedMatrix::SDPtr sol;        /**< Forward solution */
-    FIFFLIB::FiffNamedMatrix::SDPtr sol_grad;   /**< ToDo... */
-    FIFFLIB::FiffCoordTrans mri_head_t;         /**< MRI head coordinate transformation */
-    MNELIB::MNESourceSpace src;                 /**< Geometric description of the source spaces (hemispheres) */
-    Eigen::MatrixX3f source_rr;                 /**< Source locations */
-    Eigen::MatrixX3f source_nn;                 /**< Source normals (number depends on fixed or free orientation) */
-
-    MNELIB::MNEForwardSolution mneFwdSol;        /**< The class contatining all the solutions */
-
 private:
     //=========================================================================================================
     /**
      * init the member variables
-     * ToDo: refactor so that most of the old member variables can be deleted and we only need the protected ones (consistend with MneForwardSolution)
      */
     void initFwd();
 
@@ -204,7 +183,7 @@ private:
      * @param [out] id                  The FiffID
      *
      */
-    int readChannels(FIFFLIB::FiffInfoBase infoBase,
+    int readChannels(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
                      QList<FIFFLIB::FiffChInfo>& listMegCh,	 /* MEG channels */
                      int& iNMeg,
                      QList<FIFFLIB::FiffChInfo>& listMegComp,
@@ -213,6 +192,7 @@ private:
                      int& iNEeg,
                      FIFFLIB::FiffCoordTransOld** transDevHeadOld,
                      FIFFLIB::FiffId& id);	         /* The measurement ID */
+
 };
 
 //=============================================================================================================
