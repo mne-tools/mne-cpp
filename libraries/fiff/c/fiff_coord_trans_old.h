@@ -115,6 +115,12 @@ public:
      */
     ~FiffCoordTransOld();
 
+    //=========================================================================================================
+    /*
+     * Transform Old coord transformation to new class. Can be deleted if FiffCoordTransOld is not used anymore
+     */
+    FiffCoordTrans toNew();
+
     //============================= make_volume_source_space.c =============================
 
     /*
