@@ -35,6 +35,8 @@
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
+#include <iostream>
+
 #include <utils/generics/applicationlogger.h>
 
 #include <fiff/fiff.h>
@@ -143,6 +145,13 @@ int main(int argc, char *argv[])
     pFwdMEGEEG->updateHeadPos(&meg_head_t);
     qInfo() << "The recomputation took: " << timer.elapsed() << " ms.";
 
+    qInfo() << "pFwdMEGEEG->coord_frame: " << pFwdMEGEEG->coord_frame;
+    qInfo() << "pFwdMEGEEG->nchan: " << pFwdMEGEEG->nchan;
+    qInfo() << "pFwdMEGEEG->nsource: " << pFwdMEGEEG->nsource;
+
+    std::cout << pFwdMEGEEG->mri_head_t.trans <<std::endl;
+
     // store calculated forward solution in settings.solname specified file
     pFwdMEGEEG->storeFwd();
+    qInfo() << "pFwdMEGEEG->coord_frame: " << pFwdMEGEEG->coord_frame;
 }
