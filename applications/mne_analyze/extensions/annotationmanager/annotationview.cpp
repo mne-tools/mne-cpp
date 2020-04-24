@@ -80,6 +80,8 @@ void AnnotationView::initGUIFunctionality()
     //'Show selected annotation' checkbox
     connect(ui->m_checkBox_showSelectedEventsOnly,&QCheckBox::stateChanged,
             this, &AnnotationView::onSelectedEventsChecked);
+    connect(ui->m_tableView_eventTableView->selectionModel(), &QItemSelectionModel::selectionChanged,
+            this, &AnnotationView::onCurrentSelectedChanged);
 
     //Annotation types combo box
     ui->m_comboBox_filterTypes->addItem("All");
@@ -133,6 +135,7 @@ void AnnotationView::updateComboBox(const QString &currentAnnotationType)
     ui->m_comboBox_filterTypes->addItems(m_pAnnModel->getEventTypeList());
     if(m_pAnnModel->getEventTypeList().contains(currentAnnotationType))
         ui->m_comboBox_filterTypes->setCurrentText(currentAnnotationType);
+    emit triggerRedraw();
 }
 
 //=============================================================================================================
@@ -143,6 +146,7 @@ void AnnotationView::addAnnotationToModel(const int iSample)
     m_iLastSampClicked = iSample;
     m_pAnnModel->setSamplePos(m_iLastSampClicked);
     m_pAnnModel->insertRow(0, QModelIndex());
+    emit triggerRedraw();
 }
 
 //=============================================================================================================
@@ -163,6 +167,7 @@ void AnnotationView::onDataChanged()
     qDebug() << "AnnotationView::onDataChanged";
     ui->m_tableView_eventTableView->viewport()->update();
     ui->m_tableView_eventTableView->viewport()->repaint();
+    emit triggerRedraw();
 }
 
 //=============================================================================================================
@@ -179,7 +184,7 @@ void AnnotationView::removeAnnotationfromModel()
 {
     QModelIndexList indexList = ui->m_tableView_eventTableView->selectionModel()->selectedIndexes();
     for(int i = 0; i<indexList.size(); i++)
-        m_pAnnModel->removeRow(indexList.at(i).row() - i);
+        m_pAnnModel->removeRow(indexList.at(i).row() /*- i*/);
     emit triggerRedraw();
 }
 
@@ -196,5 +201,39 @@ void AnnotationView::addNewAnnotationType()
 
 void AnnotationView::onSelectedEventsChecked(int iCheckBoxState)
 {
+    m_iCheckSelectedState = iCheckBoxState;
+    m_pAnnModel->setShowSelected(m_iCheckSelectedState);
     qDebug() << "AnnotationView::onSelectedEventsChecked -- not implemented yet";
+    qDebug() << ui->m_tableView_eventTableView->selectionModel()->currentIndex().row();
+    //ui->m_tableView_eventTableView->selectionModel()->sle
+    //m_pAnnModel
+    emit triggerRedraw();
+}
+
+//=============================================================================================================
+
+void AnnotationView::disconnectFromModel()
+{
+    disconnect(m_pAnnModel.data(),&ANSHAREDLIB::AnnotationModel::dataChanged,
+            this, &AnnotationView::onDataChanged);
+    disconnect(ui->m_checkBox_activateEvents, &QCheckBox::stateChanged,
+            this, &AnnotationView::onActiveEventsChecked);
+    disconnect(ui->m_checkBox_showSelectedEventsOnly,&QCheckBox::stateChanged,
+            this, &AnnotationView::onSelectedEventsChecked);
+    disconnect(ui->m_comboBox_filterTypes, &QComboBox::currentTextChanged,
+            m_pAnnModel.data(), &ANSHAREDLIB::AnnotationModel::setEventFilterType);
+    disconnect(m_pAnnModel.data(), &ANSHAREDLIB::AnnotationModel::updateEventTypes,
+            this, &AnnotationView::updateComboBox);
+    disconnect(ui->m_pushButton_addEventType, &QPushButton::clicked,
+            this, &AnnotationView::addNewAnnotationType);
+
+}
+
+//=============================================================================================================
+
+void AnnotationView::onCurrentSelectedChanged()
+{
+    qDebug() << "AnnotationView::onCurrentSelectedChanged";
+    qDebug() << ui->m_tableView_eventTableView->selectionModel()->currentIndex().row();
+    m_pAnnModel->setSelectedAnn(ui->m_tableView_eventTableView->selectionModel()->currentIndex().row());
 }

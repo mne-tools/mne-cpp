@@ -121,6 +121,8 @@ private:
 
     void onSendSamplePos(int iSample);
 
+    void disconnectOld();
+
     // Control
     QPointer<QDockWidget>                m_pControlDock;                 /**< Control Widget */
     QPointer<ANSHAREDLIB::Communicator>  m_pCommu;

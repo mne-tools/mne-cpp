@@ -433,7 +433,9 @@ public:
 
     void setAnnotationModel(QSharedPointer<AnnotationModel> pModel);
 
-    QSharedPointer<AnnotationModel> getAnnotationModel();
+    QSharedPointer<AnnotationModel> getAnnotationModel() const;
+
+    void addTimeMark(int iLastClicked);
 
 private:
 

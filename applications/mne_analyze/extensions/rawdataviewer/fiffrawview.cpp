@@ -57,6 +57,7 @@
 #include <QDir>
 #include <QSvgGenerator>
 #include <QAbstractScrollArea>
+#include <QEvent>
 
 #if !defined(NO_OPENGL)
     #include <QGLWidget>
@@ -147,6 +148,10 @@ void FiffRawView::initMVCSettings(const QSharedPointer<FiffRawViewModel>& pModel
     //Enable gestures for the view
     m_pTableView->grabGesture(Qt::PinchGesture);
     m_pTableView->installEventFilter(this);
+
+    QScroller::grabGesture(m_pTableView, QScroller::LeftMouseButtonGesture);
+    m_pKineticScroller = QScroller::scroller(m_pTableView);
+    m_pKineticScroller->setSnapPositionsX(100,100);
 
     //Enable event fitlering for the viewport in order to intercept mouse events
     m_pTableView->viewport()->installEventFilter(this);
@@ -319,7 +324,8 @@ void FiffRawView::customContextMenuRequested(const QPoint &pos)
 void FiffRawView::addTimeMark(bool con)
 {
     //m_pModel->newTimeMark(static_cast<int>(m_fLastClickedPoint));
-    emit sendSamplePos(m_fLastClickedPoint);
+    m_pModel->addTimeMark(m_fLastClickedPoint);
+//    emit sendSamplePos(m_fLastClickedPoint);
 }
 
 //=============================================================================================================
@@ -337,4 +343,28 @@ void FiffRawView::toggleDisplayEvent(const int& iToggle)
 void FiffRawView::updateView()
 {
     m_pTableView->viewport()->repaint();
+}
+
+//=============================================================================================================
+
+bool FiffRawView::eventFilter(QObject *object, QEvent *event)
+{
+    if ((object == m_pTableView->horizontalScrollBar() ||
+         object == m_pTableView->verticalScrollBar() ||
+         object == m_pTableView->verticalHeader())
+        && event->type() == QEvent::Enter) {
+        QScroller::ungrabGesture(m_pTableView);
+        return true;
+    }
+
+    //Activate grabbing gesture when scrollbars or vertical header are deselected
+    if ((object == m_pTableView->horizontalScrollBar() ||
+         object == m_pTableView->verticalScrollBar() ||
+         object == m_pTableView->verticalHeader())
+        && event->type() == QEvent::Leave) {
+        QScroller::grabGesture(m_pTableView, QScroller::LeftMouseButtonGesture);
+        return true;
+    }
+
+    return false;
 }

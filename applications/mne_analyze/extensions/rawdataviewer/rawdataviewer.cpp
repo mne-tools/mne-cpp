@@ -209,6 +209,8 @@ void RawDataViewer::setUpControls()
     QLabel* tempLabel = new QLabel("Loading file");
     m_pControlDock->setWidget(tempLabel);
 
+    disconnectOld();
+
     delete m_pLayout;
     delete m_pContainer;
     m_pLayout = new QVBoxLayout;
@@ -278,4 +280,25 @@ void RawDataViewer::onSendSamplePos(int iSample)
     data.setValue(iSample);
 
     m_pCommu->publishEvent(EVENT_TYPE::NEW_ANNOTATION_ADDED, data);
+}
+
+//=============================================================================================================
+
+void RawDataViewer::disconnectOld()
+{
+    disconnect(m_pFiffRawView.data(), &FiffRawView::sendSamplePos,
+            this, &RawDataViewer::onSendSamplePos);
+
+//    connect(viewWidget, &DISPLIB::FiffRawViewSettings::signalColorChanged,
+//            m_pFiffRawView.data(), &FiffRawView::setSignalColor);
+//    connect(viewWidget, &DISPLIB::FiffRawViewSettings::backgroundColorChanged,
+//            m_pFiffRawView.data(), &FiffRawView::setBackgroundColor);
+//    connect(viewWidget, &DISPLIB::FiffRawViewSettings::zoomChanged,
+//            m_pFiffRawView.data(), &FiffRawView::setZoom);
+//    connect(viewWidget, &DISPLIB::FiffRawViewSettings::timeWindowChanged,
+//            m_pFiffRawView.data(), &FiffRawView::setWindowSize);
+//    connect(viewWidget, &DISPLIB::FiffRawViewSettings::distanceTimeSpacerChanged,
+//            m_pFiffRawView.data(), &FiffRawView::setDistanceTimeSpacer);
+//    connect(viewWidget, &DISPLIB::FiffRawViewSettings::makeScreenshot,
+//            m_pFiffRawView.data(), &FiffRawView::onMakeScreenshot);
 }
