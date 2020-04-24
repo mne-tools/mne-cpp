@@ -848,7 +848,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,
         qint32 inSubjHand(*inTag->toInt());
         qint32 newSubjHand(m_iDfltSubjectHand);
         memcpy(outTag->data(),&newSubjHand, sizeof(qint32));
-        printIfVerbose("Subject's hand changed: " + QString::number(inSubjHand) + " -> " + QString::number(newSubjHand));
+        printIfVerbose("Subject's handedness changed: " + QString::number(inSubjHand) + " -> " + QString::number(newSubjHand));
         break;
     }
     case FIFF_SUBJ_WEIGHT:
