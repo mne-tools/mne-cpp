@@ -63,53 +63,133 @@ class AnnotationView : public QWidget
     Q_OBJECT
 
 public:
+
+    //=========================================================================================================
+    /**
+     * Constructor
+     */
     AnnotationView();
 
+    //=========================================================================================================
+    /**
+     * Updates the GUI combo box with a new item type, given by the input parameter.
+     *
+     * @param [in] currentAnnotationType    New annotation type to be added to the combo box
+     */
     void updateComboBox(const QString &currentAnnotationType);
 
+    //=========================================================================================================
+    /**
+     * Passes a shared pointer to the annotation model triggers all the relevant init functions
+     *
+     * @param [in] pAnnModel    Pointer to the annotation model of the current loaded file
+     */
     void setModel(QSharedPointer<ANSHAREDLIB::AnnotationModel> pAnnModel);
 
+    //=========================================================================================================
+    /**
+     * Used to pass parameters of the currently loaded fif file to the annotation model.
+     *
+     * @param [in] iFirst   Sample number of the first sample in the file
+     * @param [in] iLast    Sample number of the last sample in the file
+     * @param [in] fFreq    Sample frequency for the data in the file
+     */
     void passFiffParams(int iFirst,
                         int iLast,
                         float fFreq);
 
+    //=========================================================================================================
+    /**
+     * Disconnects from current model for switching between files
+     */
+    void disconnectFromModel();
+
 public slots:
 
+    //=========================================================================================================
+    /**
+     * Transmits the checkbox state of the 'Activate annotations' checkbox
+     *
+     * @param [in] iCheckBoxState    0 for unchecked, 2 for checked
+     */
     void onActiveEventsChecked(int iCheckBoxState);
+
+    //=========================================================================================================
+    /**
+     * Transmits the checkbox state of the 'Show selected only' checkbox
+     *
+     * @param [in] iCheckBoxState    0 for unchecked, 2 for checked
+     */
     void onSelectedEventsChecked(int iCheckBoxState);
 
+    //=========================================================================================================
+    /**
+     * Sets the current selected annotation in the gui and passes it to the model
+     */
+    void onCurrentSelectedChanged();
+
+    //=========================================================================================================
     void onFilterTypesChanged(const QString& sFilType);
 
+    //=========================================================================================================
+    /**
+     * Adds input parameter to annotation model as a new annotation.
+     *
+     * @param [in] iSample   Sample number to be added to annotation model
+     */
+    void addAnnotationToModel(const int iSample);
 
 signals:
 
+    //=========================================================================================================
     void activeEventsChecked(const int& iCheckBoxState);
 
+    //=========================================================================================================
+    /**
+     * Used to force the fiffrawviewer to redraw the data plot.
+     */
     void triggerRedraw();
-
-public slots:
-
-    void addAnnotationToModel(const int iSample);
 
 protected slots:
 
+    //=========================================================================================================
+    /**
+     * Removes currently selected annotation from model.
+     */
     void removeAnnotationfromModel();
 
+    //=========================================================================================================
+    /**
+     * Creates new annotation of the type currently on the Spin Box widget.
+     */
     void addNewAnnotationType();
 
 private slots:
 
+    //=========================================================================================================
+    /**
+     * Forces the dock widget to be redrawn.
+     */
     void onDataChanged();
 
 private:
 
+    //=========================================================================================================
+    /**
+     * Creates and connects GUI items to work with view class.
+     */
     void initGUIFunctionality();
+
+    //=========================================================================================================
+    /**
+     * Links delegate, model and view.
+     */
     void initMSVCSettings();
-    void initConnections();
 
     Ui::EventWindowDockWidget*                      ui;
 
     int                                             m_iCheckState;
+    int                                             m_iCheckSelectedState;
 
     int                                             m_iLastSampClicked;
 
