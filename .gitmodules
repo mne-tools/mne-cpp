@@ -6,3 +6,7 @@
 	path = bin/mne-cpp-test-data
 	url = https://github.com/mne-tools/mne-cpp-test-data.git
 	branch = master
+[submodule "applications/mne_scan/plugins/brainflowboard/brainflow"]
+	path = applications/mne_scan/plugins/brainflowboard/brainflow
+	url = https://github.com/brainflow-dev/brainflow
+	branch = master
