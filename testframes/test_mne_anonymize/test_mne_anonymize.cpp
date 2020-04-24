@@ -40,7 +40,7 @@
 #include <utils/generics/applicationlogger.h>
 
 #include "../applications/mne_anonymize/fiffanonymizer.h"
-#include "../applications/mne_anonymize/settingscontroller.h"
+#include "../applications/mne_anonymize/settingscontrollerCL.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -127,7 +127,7 @@ void TestMneAnonymize::testDefaultOutput()
         QFile::remove(sFileOut);
     }
 
-    MNEANONYMIZE::SettingsController controller(arguments, "MNE Anonymize", "dev");
+    MNEANONYMIZE::SettingsControllerCL controller(arguments, "MNE Anonymize", "dev");
     QVERIFY(QFile::exists(sFileOut));
 
     QFile::remove(sFileOut);
@@ -160,7 +160,7 @@ void TestMneAnonymize::testMultipleInputs()
         QFile::remove(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw_anonymized.fif");
     }
 
-    MNEANONYMIZE::SettingsController controller(arguments, "MNE Anonymize", "dev");
+    MNEANONYMIZE::SettingsControllerCL controller(arguments, "MNE Anonymize", "dev");
 
     QVERIFY(QFile::exists(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw_anonymized.fif"));
     QVERIFY(QFile::exists(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_A_raw_anonymized.fif"));
@@ -195,7 +195,7 @@ void TestMneAnonymize::testDeleteInputFile()
 
     qInfo() << "arguments" << arguments;
 
-    MNEANONYMIZE::SettingsController controller(arguments, "MNE Anonymize - Testing", "dev");
+    MNEANONYMIZE::SettingsControllerCL controller(arguments, "MNE Anonymize - Testing", "dev");
 
     QVERIFY(!QFile::exists(sFileInTest));
     QVERIFY(QFile::exists(sFileOutTest));
@@ -226,7 +226,7 @@ void TestMneAnonymize::testInplace()
 
     qInfo() << "arguments" << arguments;
 
-    MNEANONYMIZE::SettingsController controller(arguments, "MNE Anonymize - Testing", "dev");
+    MNEANONYMIZE::SettingsControllerCL controller(arguments, "MNE Anonymize - Testing", "dev");
 
     QVERIFY(QFile::exists(sFileOutTest));
 
@@ -256,7 +256,7 @@ void TestMneAnonymize::testInplaceAndDeleteInFile()
 
     qInfo() << "arguments" << arguments;
 
-    MNEANONYMIZE::SettingsController controller(arguments, "MNE Anonymize", "dev");
+    MNEANONYMIZE::SettingsControllerCL controller(arguments, "MNE Anonymize", "dev");
 
     QVERIFY(QFile::exists(sFileOutTest));
 
@@ -279,7 +279,7 @@ void TestMneAnonymize::testDefaultAnonymizationOfTags()
 
     qInfo() << "arguments" << arguments;
 
-    MNEANONYMIZE::SettingsController controller(arguments, "MNE Anonymize", "dev");
+    MNEANONYMIZE::SettingsControllerCL controller(arguments, "MNE Anonymize", "dev");
 
     QFile fFileOut(sFileOut);
     FiffStream::SPtr outStream(new FiffStream(&fFileOut));
@@ -312,7 +312,7 @@ void TestMneAnonymize::compareBirthdayOffsetOption()
 
     qInfo() << "arguments" << arguments;
 
-    MNEANONYMIZE::SettingsController controller(arguments, "MNE Anonymize", "dev");
+    MNEANONYMIZE::SettingsControllerCL controller(arguments, "MNE Anonymize", "dev");
 
     QFile fFileOut(sFileOut);
     FiffStream::SPtr outStream(new FiffStream(&fFileOut));
@@ -345,7 +345,7 @@ void TestMneAnonymize::compareMeasureDateOffsetOption()
 
     qInfo() << "arguments" << arguments;
 
-    MNEANONYMIZE::SettingsController controller(arguments, "MNE Anonymize", "dev");
+    MNEANONYMIZE::SettingsControllerCL controller(arguments, "MNE Anonymize", "dev");
 
     QFile fFileOut(sFileOut);
 
