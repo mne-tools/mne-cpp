@@ -210,9 +210,8 @@ bool SettingsControllerCL::parseInputs(const QStringList& arguments)
     } else {
         QFileInfo inFInfo(m_parser.value("in"));
         inFInfo.makeAbsolute();
-        QString fileOut;
-        fileOut = QDir(inFInfo.absolutePath()).filePath(
-                    inFInfo.baseName() + "_anonymized." + inFInfo.completeSuffix());
+        QString fileOut(QDir(inFInfo.absolutePath()).filePath(
+                    inFInfo.baseName() + "_anonymized." + inFInfo.completeSuffix()));
         m_anonymizer.setFileOut(fileOut);
     }
 
@@ -313,14 +312,6 @@ bool SettingsControllerCL::parseInputs(const QStringList& arguments)
     }
 
     return true;
-}
-
-void SettingsControllerCL::printVersionInfo()
-{
-    qInfo() << endl;
-    qInfo() << m_sAppName;
-    qInfo() << "Version: " + m_sAppVer;
-    qInfo() << endl;
 }
 
 //=============================================================================================================
@@ -436,4 +427,14 @@ void SettingsControllerCL::printHeaderIfVerbose()
         qInfo() << m_sAppName;
         qInfo() << "Version: " + m_sAppVer;
     }
+}
+
+//=============================================================================================================
+
+void SettingsControllerCL::printVersionInfo()
+{
+    qInfo() << endl;
+    qInfo() << m_sAppName;
+    qInfo() << "Version: " + m_sAppVer;
+    qInfo() << endl;
 }
