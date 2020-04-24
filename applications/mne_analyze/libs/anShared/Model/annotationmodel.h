@@ -63,17 +63,23 @@ public:
     int getAnnotation(int iIndex) const;
 
     //=========================================================================================================
+    QMap<int, QColor>& getTypeColors();
+
+    //=========================================================================================================
     void addNewAnnotationType(const QString &eventType,
                               const QColor &typeColor);
+
+    void setSelectedAnn(int iSelected);
+
+    int getSelectedAnn();
+
+    void setShowSelected(int iSelectedState);
+
+    int getShowSelected();
 
 signals:
 
     void updateEventTypes(const QString& currentFilterType);
-
-    void annotationsToDraw(QVector<int>* vAnnData);
-
-
-
 
 private:
 
@@ -90,6 +96,10 @@ private:
     int                 m_iSamplePos;
     int                 m_iFirstSample;
     int                 m_iLastSample;
+
+    int                 m_iActiveCheckState;
+    int                 m_iSelectedCheckState;
+    int                 m_iSelectedAnn;
 
     float               m_fFreq;
 

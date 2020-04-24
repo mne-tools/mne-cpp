@@ -36,6 +36,9 @@ AnnotationModel::AnnotationModel(QObject* parent)
 : QAbstractTableModel(parent)
 , m_iSamplePos(0)
 , m_iFirstSample(0)
+, m_iActiveCheckState(2)
+, m_iSelectedCheckState(0)
+, m_iSelectedAnn(0)
 , m_fFreq(600)
 , m_sFilterEventType("All")
 {
@@ -278,8 +281,6 @@ void AnnotationModel::setEventFilterType(const QString eventType)
     emit dataChanged(createIndex(0,0), createIndex(m_dataSamples_Filtered.size(), 0));
     emit headerDataChanged(Qt::Vertical, 0, m_dataSamples_Filtered.size());
 
-    emit annotationsToDraw(&m_dataSamples_Filtered);
-
     qDebug() << "Samp:" << m_dataSamples;
     qDebug() << "Filt:" << m_dataSamples_Filtered;
 }
@@ -393,7 +394,8 @@ int AnnotationModel::getAnnotation(int iIndex) const
 
 //=============================================================================================================
 
-void AnnotationModel::addNewAnnotationType(const QString &eventType, const QColor &typeColor)
+void AnnotationModel::addNewAnnotationType(const QString &eventType,
+                                           const QColor &typeColor)
 {
     m_eventTypeColor[eventType.toInt()] = typeColor;
 
@@ -401,4 +403,40 @@ void AnnotationModel::addNewAnnotationType(const QString &eventType, const QColo
         m_eventTypeList<<eventType;
 
     emit updateEventTypes(eventType);
+}
+
+//=============================================================================================================
+
+
+QMap<int, QColor>& AnnotationModel::getTypeColors()
+{
+    return m_eventTypeColor;
+}
+
+//=============================================================================================================
+
+void AnnotationModel::setSelectedAnn(int iSelected)
+{
+    m_iSelectedAnn = iSelected;
+}
+
+//=============================================================================================================
+
+void AnnotationModel::setShowSelected(int iSelectedState)
+{
+    m_iSelectedCheckState = iSelectedState;
+}
+
+//=============================================================================================================
+
+int AnnotationModel::getShowSelected()
+{
+    return m_iSelectedCheckState;
+}
+
+//=============================================================================================================
+
+int AnnotationModel::getSelectedAnn()
+{
+    return m_iSelectedAnn;
 }

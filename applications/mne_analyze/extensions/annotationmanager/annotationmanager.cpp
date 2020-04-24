@@ -84,8 +84,11 @@ void AnnotationManager::init()
     connect(m_pAnnotationView.data(), &AnnotationView::triggerRedraw,
             this, &AnnotationManager::onTriggerRedraw);
 
-    connect(m_pAnalyzeData.data(), &AnalyzeData::newModelAvailable,
-            this, &AnnotationManager::onModelChanged);
+    connect(m_pAnnotationView.data(), &AnnotationView::activeEventsChecked,
+            this, &AnnotationManager::toggleDisplayEvent);
+
+    //connect(m_pAnalyzeData.data(), &AnalyzeData::newModelAvailable,
+    //        this, &AnnotationManager::onModelChanged);
     connect(m_pAnalyzeData.data(), &AnalyzeData::selectedModelChanged,
             this, &AnnotationManager::onModelChanged);
 
@@ -182,14 +185,13 @@ void AnnotationManager::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel
 //        m_pAnnotationView.reset();
 //        m_pAnnotationView = QSharedPointer<AnnotationView>(new AnnotationView());
 
+        m_pAnnotationView->disconnectFromModel();
         m_pFiffRawModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
         m_pAnnotationModel = m_pFiffRawModel->getAnnotationModel();
         m_pAnnotationView->setModel(m_pAnnotationModel);
         m_pAnnotationView->passFiffParams(m_pFiffRawModel->absoluteFirstSample(),
                                            m_pFiffRawModel->absoluteLastSample(),
                                            m_pFiffRawModel->getFiffInfo()->sfreq);
-
-        setUpControls();
     }
 }
 

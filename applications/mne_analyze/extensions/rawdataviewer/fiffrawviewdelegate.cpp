@@ -157,16 +157,18 @@ void FiffRawViewDelegate::paint(QPainter *painter,
                 if(pFiffRawModel->shouldDisplayAnn()) {
                     path = QPainterPath(QPointF(option.rect.x()+pos, option.rect.y()));
 
+                    painter->setPen(QPen(m_penNormal.color().darker(250), 2, Qt::SolidLine));
+
                     //Plot time marks
                     createMarksPath(index,
                                     option,
                                     path,
                                     data,
                                     painter);
-                    painter->save();
-                    painter->setPen(QPen(m_penNormal.color().darker(250), 2, Qt::SolidLine));
-                    painter->drawPath(path);
-                    painter->restore();
+//                    painter->save();
+//                    painter->setPen(QPen(m_penNormal.color().darker(250), 2, Qt::SolidLine));
+//                    painter->drawPath(path);
+//                    painter->restore();
                 }
             }
             break;
@@ -336,6 +338,7 @@ void FiffRawViewDelegate::createMarksPath(const QModelIndex &index,
                                           QPainter* painter) const
 {
     const FiffRawViewModel* t_pModel = static_cast<const FiffRawViewModel*>(index.model());
+    QSharedPointer<AnnotationModel> t_pAnnModel = t_pModel->getAnnotationModel();
 
     double dDx = t_pModel->pixelDifference();
 
@@ -345,10 +348,35 @@ void FiffRawViewDelegate::createMarksPath(const QModelIndex &index,
     float fBottom = option.rect.bottomRight().y();
     float fInitX = path.currentPosition().x();
 
-    for(int i = 0; i < t_pModel->getTimeListSize(); i++) {
-        if ((t_pModel->getTimeMarks(i) > iStart) && (t_pModel->getTimeMarks(i) < (iStart + data.size()))) {
-            path.moveTo(fInitX + static_cast<float>(t_pModel->getTimeMarks(i) - iStart) * dDx, fTop);
-            path.lineTo(path.currentPosition().x(), fBottom);
+    QMap<int, QColor> typeColor = t_pAnnModel->getTypeColors();
+
+    if(t_pAnnModel->getShowSelected()){
+        qDebug() << "FiffRawViewDelegate::createMarksPath -- show selected checked";
+        int iSelectedAnn = t_pAnnModel->getSelectedAnn();
+        if ((t_pModel->getTimeMarks(iSelectedAnn) > iStart) && (t_pModel->getTimeMarks(iSelectedAnn) < (iStart + data.size()))) {
+            int type = t_pAnnModel->data(t_pAnnModel->index(iSelectedAnn,2)).toInt();
+            painter->setPen(QPen(typeColor.value(type), Qt::black));
+            painter->drawLine(fInitX + static_cast<float>(t_pModel->getTimeMarks(iSelectedAnn) - iStart) * dDx,
+                              fTop,
+                              fInitX + static_cast<float>(t_pModel->getTimeMarks(iSelectedAnn) - iStart) * dDx,
+                              fBottom);
+        }
+
+    } else {
+        for(int i = 0; i < t_pModel->getTimeListSize(); i++) {
+            if ((t_pModel->getTimeMarks(i) > iStart) && (t_pModel->getTimeMarks(i) < (iStart + data.size()))) {
+    //            path.moveTo(fInitX + static_cast<float>(t_pModel->getTimeMarks(i) - iStart) * dDx, fTop);
+    //            path.lineTo(path.currentPosition().x(), fBottom);
+
+                int type = t_pAnnModel->data(t_pAnnModel->index(i,2)).toInt();
+                painter->setPen(QPen(typeColor.value(type), Qt::black));
+    //            qDebug() << "sample:" << t_pAnnModel->data(t_pAnnModel->index(i,0)).toInt();
+    //            qDebug() << "mark" << t_pModel->getTimeMarks(i) - iStart;
+                painter->drawLine(fInitX + static_cast<float>(t_pModel->getTimeMarks(i) - iStart) * dDx,
+                                  fTop,
+                                  fInitX + static_cast<float>(t_pModel->getTimeMarks(i) - iStart) * dDx,
+                                  fBottom);
+            }
         }
     }
 }

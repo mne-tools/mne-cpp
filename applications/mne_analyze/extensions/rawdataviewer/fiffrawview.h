@@ -53,6 +53,7 @@
 #include <QPointer>
 #include <QMap>
 #include <QMenu>
+#include <QScroller>
 
 //=============================================================================================================
 // Eigen INCLUDES
@@ -206,6 +207,8 @@ private:
      */
     void resizeEvent(QResizeEvent* event);
 
+    bool eventFilter(QObject *object, QEvent *event);
+
     QPointer<QTableView>                                m_pTableView;
 
     QSharedPointer<ANSHAREDLIB::FiffRawViewModel>       m_pModel;
@@ -224,6 +227,8 @@ private:
     float                                               m_fLastClickedPoint;
 
     qint32 m_iToggle;
+
+    QScroller*      m_pKineticScroller;
 signals:
     void tableViewDataWidthChanged(int iWidth);
 };
