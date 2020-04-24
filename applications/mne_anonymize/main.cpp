@@ -40,8 +40,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "settingscontroller.h"
-
+#include "settingscontrollerCL.h"
 #include <utils/generics/applicationlogger.h>
 
 //=============================================================================================================
@@ -54,6 +53,7 @@
 
 #include <QApplication>
 #include <QCoreApplication>
+#include <QMainWindow>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -83,12 +83,12 @@ using namespace UTILSLIB;
 QCoreApplication* createApplication(int &argc, char *argv[])
 {
     //when gui is ready remove this line
-    return new QCoreApplication(argc, argv);
+    //return new QCoreApplication(argc, argv);
 
-//    for (int i = 1; i < argc; ++i)
-//        if (!qstrcmp(argv[i], "--no-gui"))
-//            return new QCoreApplication(argc, argv);
-//    return new QApplication(argc, argv);
+    for (int i = 1; i < argc; ++i)
+        if (!qstrcmp(argv[i], "--no-gui"))
+            return new QCoreApplication(argc, argv);
+    return new QApplication(argc, argv);
 }
 
 /**
@@ -115,13 +115,14 @@ int main(int argc, char* argv[])
     if (qobject_cast<QApplication *>(qtApp.data())) {
         // to do -> develop GUI version...
         //create reader object and parse data
-        //MainWindow w;
-        //w.show();
+        MainWindow w;
+        w.show();
     } else {
         // start non-GUI version...
-        //MNEANONYMIZE::SettingsController controller(reinterpret_cast<QCoreApplication *>(&qtApp));
-        MNEANONYMIZE::SettingsController controller(qtApp->arguments(), nameStr, versionStr);
+        //MNEANONYMIZE::SettingsControllerCL controller(reinterpret_cast<QCoreApplication *>(&qtApp));
+        MNEANONYMIZE::SettingsControllerCL controller(qtApp->arguments(), nameStr, versionStr);
     }
 
-    return 0;
+    return qtApp->exec();
+
 }
