@@ -69,12 +69,14 @@ CONFIG(debug, debug|release) {
 DESTDIR = $${MNE_BINARY_DIR}
 
 SOURCES += main.cpp \
-    settingscontroller.cpp \
-    fiffanonymizer.cpp
+    fiffanonymizer.cpp \
+    mainwindow.cpp \
+    settingscontrollerCL.cpp
 
 HEADERS  += \
-    settingscontroller.h \
-    fiffanonymizer.h
+    fiffanonymizer.h \
+    mainwindow.h \
+    settingscontrollerCL.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
