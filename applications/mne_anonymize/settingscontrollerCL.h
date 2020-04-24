@@ -50,9 +50,8 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
-#include <QCommandLineParser>
-#include <QFileInfo>
-#include <QDir>
+//#include <QFileInfo>
+//#include <QDir>
 #include <QtConcurrent>
 
 //=============================================================================================================
@@ -179,39 +178,40 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-/**
- * Finds all files in a folder matching a filename pattern (compatible with wildcard [*,?]).
- * This is a helper function. Given a filename with some pattern. It lists all possible filenames matching the pattern.
- * It outputs a QStringList with all the possible files in the folder matching the search pattern.
- *
- * @param [in] fileName     Reference to a QString containing the input filename search pattern.
- *
- * @return QStringList with all possible filenames compatible with the search pattern.
- */
-inline static QStringList listFilesMatchingPatternName(const QString &fileName)
-{
-    QStringList listOfFilteredFiles;
-    QFileInfo fiFileIn(QDir::toNativeSeparators(fileName));
-    fiFileIn.makeAbsolute();
-    if(fiFileIn.isDir()) {
-        qCritical() << "Input file is infact a directory: " << fileName;
-    }
+// /**
+// * Finds all files in a folder matching a filename pattern (compatible with wildcard [*,?]).
+// * This is a helper function. Given a filename with some pattern. It lists all possible filenames matching the pattern.
+// * It outputs a QStringList with all the possible files in the folder matching the search pattern.
+// *
+// * @param [in] fileName     Reference to a QString containing the input filename search pattern.
+// *
+// * @return QStringList with all possible filenames compatible with the search pattern.
+// */
+//inline static QStringList listFilesMatchingPatternName(const QString &fileName)
+//{
+//    QStringList listOfFilteredFiles;
+//    QFileInfo fiFileIn(QDir::toNativeSeparators(fileName));
+//    fiFileIn.makeAbsolute();
+//    if(fiFileIn.isDir()) {
+//        qCritical() << "Input file is infact a directory: " << fileName;
+//    }
 
-    QStringList filter;
-    filter << fiFileIn.fileName();
-    QDirIterator iteratorFileIn(fiFileIn.absoluteDir().absolutePath(),
-                                filter,
-                                QDir::AllEntries | QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::CaseSensitive);
+//    QStringList filter;
+//    filter << fiFileIn.fileName();
+//    QDirIterator iteratorFileIn(fiFileIn.absoluteDir().absolutePath(),
+//                                filter,
+//                                QDir::AllEntries | QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::CaseSensitive);
 
-    while(iteratorFileIn.hasNext()) {
-        QFileInfo fi(iteratorFileIn.next());
-        if(fi.isFile()) {
-            listOfFilteredFiles.append(fi.absoluteFilePath());
-        }
-    }
+//    while(iteratorFileIn.hasNext()) {
+//        QFileInfo fi(iteratorFileIn.next());
+//        if(fi.isFile()) {
+//            listOfFilteredFiles.append(fi.absoluteFilePath());
+//        }
+//    }
 
-    return listOfFilteredFiles;
-}
+//    return listOfFilteredFiles;
+//}
+
 } // namespace MNEANONYMIZE
 
 #endif // MNEANONYMIZE_SettingsControllerCL_H
