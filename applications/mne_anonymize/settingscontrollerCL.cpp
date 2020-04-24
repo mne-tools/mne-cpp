@@ -1,6 +1,6 @@
-//=============================================================================================================
+﻿//=============================================================================================================
 /**
- * @file     settingscontroller.cpp
+ * @file     SettingsControllerCL.cpp
  * @author   Wayne Mead <wayne.mead@uth.tmc.edu>;
  *           Juan Garcia-Prieto <juangpc@gmail.com>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>;
@@ -32,7 +32,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    SettingsController class definition.
+ * @brief    SettingsControllerCL class definition.
  *
  */
 
@@ -40,7 +40,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "settingscontroller.h"
+#include "settingscontrollerCL.h"
 #include "fiffanonymizer.h"
 
 //=============================================================================================================
@@ -65,9 +65,9 @@ using namespace MNEANONYMIZE;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SettingsController::SettingsController(const QStringList& arguments,
-                                       const QString& name,
-                                       const QString& ver)
+SettingsControllerCL::SettingsControllerCL(const QStringList& arguments,
+                                           const QString& name,
+                                           const QString& ver)
 : m_sAppName(name)
 , m_sAppVer(ver)
 , m_bShowHeaderFlag(false)
@@ -85,14 +85,14 @@ SettingsController::SettingsController(const QStringList& arguments,
 
 //=============================================================================================================
 
-SettingsController::~SettingsController()
+SettingsControllerCL::~SettingsControllerCL()
 {
     m_lApps.clear();
 }
 
 //=============================================================================================================
 
-void SettingsController::initParser()
+void SettingsControllerCL::initParser()
 {
     m_parser.setApplicationDescription(QCoreApplication::translate("main", "Application that removes or modifies Personal "
                                                                            "Health Information or Personal Identifiable information from a FIFF file."));
@@ -161,7 +161,7 @@ void SettingsController::initParser()
 
 //=============================================================================================================
 
-bool SettingsController::parseInputs(const QStringList& arguments)
+bool SettingsControllerCL::parseInputs(const QStringList& arguments)
 {
     m_parser.process(arguments);
 
@@ -244,7 +244,7 @@ bool SettingsController::parseInputs(const QStringList& arguments)
 
 //=============================================================================================================
 
-bool SettingsController::parseInputAndOutputFiles()
+bool SettingsControllerCL::parseInputAndOutputFiles()
 {
     QStringList inFilesAux;
     if(m_parser.isSet("in")) {
@@ -311,7 +311,7 @@ bool SettingsController::parseInputAndOutputFiles()
 
 //=============================================================================================================
 
-void SettingsController::generateAnonymizerInstances()
+void SettingsControllerCL::generateAnonymizerInstances()
 {
     if(m_SLInFiles.isEmpty() || m_SLOutFiles.isEmpty()) {
         qCritical() << "No input and/or output file names specified.";
@@ -332,7 +332,7 @@ void SettingsController::generateAnonymizerInstances()
 
 //=============================================================================================================
 
-void SettingsController::execute()
+void SettingsControllerCL::execute()
 {
     generateAnonymizerInstances();
 
@@ -346,7 +346,7 @@ void SettingsController::execute()
 
 //=============================================================================================================
 
-void SettingsController::printHeaderIfVerbose()
+void SettingsControllerCL::printHeaderIfVerbose()
 {
     if(m_bShowHeaderFlag) {
         qInfo() << " ";
