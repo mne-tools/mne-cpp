@@ -74,12 +74,11 @@ SettingsControllerCL::SettingsControllerCL(const QStringList& arguments,
 , m_bMultipleInFiles(false)
 {
     initParser();
-    bool exitCode = parseInputs(arguments);
-    if(exitCode) {
-        execute();
-    } else
+    if(parseInputs(arguments))
     {
-        m_parser.showHelp(exitCode);
+        execute();
+    } else {
+        m_parser.showHelp();
     }
 }
 
@@ -97,7 +96,9 @@ void SettingsControllerCL::initParser()
     m_parser.setApplicationDescription(QCoreApplication::translate("main", "Application that removes or modifies Personal "
                                                                            "Health Information or Personal Identifiable information from a FIFF file."));
     m_parser.addHelpOption();
-    m_parser.addVersionOption();
+
+    QCommandLineOption versionOpt("version",QCoreApplication::translate("main","Prints out the version of this application."));
+    m_parser.addOption(versionOpt);
 
     QCommandLineOption inFileOpt(QStringList() << "i" << "in",
                                  QCoreApplication::translate("main","File to anonymize. Multiple --in <infile> statements can be present (files will be "
@@ -111,8 +112,9 @@ void SettingsControllerCL::initParser()
                                   QCoreApplication::translate("main","outfile"));
     m_parser.addOption(outFileOpt);
 
-    QCommandLineOption verboseOpt("verbose",QCoreApplication::translate("main","Prints out more information, about each specific anonymized field. Only "
-                                                                               "allowed when anonymizing one single file. Default: false"));
+    QCommandLineOption verboseOpt(QStringList() << "v" << "verbose",
+                                  QCoreApplication::translate("main","Prints out more information, about each specific anonymized field. Only allowed "
+                                                                     "when anonymizing one single file. Default: false"));
     m_parser.addOption(verboseOpt);
 
     QCommandLineOption deleteInFileOpt(QStringList() << "d" << "delete_input_file_after",
@@ -125,8 +127,8 @@ void SettingsControllerCL::initParser()
     m_parser.addOption(deleteInFileConfirmOpt);
 
     QCommandLineOption bruteOpt("brute",
-                                QCoreApplication::translate("main","Also anonymize subject’s weight and height, and project’s ID, name, aim and "
-                                                                   "comment. Default: false"));
+                                QCoreApplication::translate("main","Anonymize additional subject’s information like weight, height, sex and handedness, "
+                                                            "and project’s ID, name, aim and comment. Default: false"));
     m_parser.addOption(bruteOpt);
 
     QCommandLineOption measDateOpt(QStringList() << "md" << "measurement_date",
@@ -165,12 +167,20 @@ bool SettingsControllerCL::parseInputs(const QStringList& arguments)
 {
     m_parser.process(arguments);
 
+    if(m_parser.isSet("version"))
+    {
+        //print name and version
+        qInfo() << m_sAppName << " - Version: " << m_sAppVer << endl << endl;
+    }
+
     if(!parseInputAndOutputFiles()) {
 
         return false;
     }
 
-    if(m_parser.isSet("verbose")) {
+
+    if(m_parser.isSet("verbose"))
+    {
         if(m_bMultipleInFiles) {
             qCritical() << "Verbose does not work with multiple Input files.";
             return false;
