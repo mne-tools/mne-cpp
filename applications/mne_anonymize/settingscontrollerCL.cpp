@@ -70,14 +70,17 @@ SettingsControllerCL::SettingsControllerCL(const QStringList& arguments,
                                            const QString& ver)
 : m_sAppName(name)
 , m_sAppVer(ver)
-, m_bShowHeaderFlag(false)
+, m_bVerboseMode(false)
 //, m_bMultipleInFiles(false)
 {
     m_pAnonymizer = FiffAnonymizer::SPtr(new FiffAnonymizer);
     initParser();
-    if(parseInputs(arguments))
+    if(parseInputs(arguments) == 0)
     {
-        execute();
+        if(execute() != 0)
+        {
+            qCritical() << "Something went wrong during the anonymization.";
+        }
     }
 }
 
@@ -162,7 +165,7 @@ void SettingsControllerCL::initParser()
 
 //=============================================================================================================
 
-bool SettingsControllerCL::parseInputs(const QStringList& arguments)
+int SettingsControllerCL::parseInputs(const QStringList& arguments)
 {
     m_parser.process(arguments);
 
@@ -170,7 +173,7 @@ bool SettingsControllerCL::parseInputs(const QStringList& arguments)
     {
         //print name and version
         printVersionInfo();
-        return false;
+        return 1;
     }
 
 //    if(!parseInputAndOutputFiles()) {
@@ -184,10 +187,13 @@ bool SettingsControllerCL::parseInputs(const QStringList& arguments)
         fInfo.makeAbsolute();
         if(fInfo.isFile())
         {
-            m_pAnonymizer->setFileIn(fInfo.fileName());
+            if(m_pAnonymizer->setFileIn(fInfo.fileName()))
+            {
+                qCritical() << "Error while setting the input file.";
+            }
         } else {
             qCritical() << "Input file is not a file." << endl;
-            return false;
+            return 1;
         }
     } else {
         qCritical() << "No valid input file specified." << endl;
@@ -201,16 +207,22 @@ bool SettingsControllerCL::parseInputs(const QStringList& arguments)
         if(fInfo.isDir())
         {
             qCritical() << "Output file is infact a folder." << endl;
-            return false;
+            return 1;
         } else {
-            m_pAnonymizer->setFileOut(fInfo.fileName());
+            if(m_pAnonymizer->setFileOut(fInfo.fileName()))
+            {
+                qCritical() << "Error while setting the output file.";
+            }
         }
     } else {
         QFileInfo inFInfo(m_parser.value("in"));
         inFInfo.makeAbsolute();
         QString fileOut(QDir(inFInfo.absolutePath()).filePath(
                     inFInfo.baseName() + "_anonymized." + inFInfo.completeSuffix()));
-        m_pAnonymizer->setFileOut(fileOut);
+        if(m_pAnonymizer->setFileOut(fileOut))
+        {
+            qCritical() << "Error while setting the output file.";
+        }
     }
 
     if(m_parser.isSet("verbose"))
@@ -219,7 +231,7 @@ bool SettingsControllerCL::parseInputs(const QStringList& arguments)
 //            qCritical() << "Verbose does not work with multiple Input files.";
 //            return false;
 //        }
-        m_bShowHeaderFlag = true;
+        m_bVerboseMode = true;
         m_pAnonymizer->setVerboseMode(true);
     }
 
@@ -234,7 +246,7 @@ bool SettingsControllerCL::parseInputs(const QStringList& arguments)
 
     if(m_parser.isSet("avoid_delete_confirmation"))
     {
-        m_pAnonymizer->setDeleteInputFileAfterConfirmation(false);
+        m_pAnonymizer->setDeleteInputFileConfirmation(false);
     }
 
     if(m_parser.isSet("measurement_date"))
@@ -309,7 +321,7 @@ bool SettingsControllerCL::parseInputs(const QStringList& arguments)
 
     }
 
-    return true;
+    return 0;
 }
 
 //=============================================================================================================
@@ -402,7 +414,7 @@ bool SettingsControllerCL::parseInputs(const QStringList& arguments)
 
 //=============================================================================================================
 
-void SettingsControllerCL::execute()
+int SettingsControllerCL::execute()
 {
 //    generateAnonymizerInstances();
 
@@ -410,7 +422,7 @@ void SettingsControllerCL::execute()
 //        QtConcurrent::blockingMap(m_lApps, &FiffAnonymizer::anonymizeFile);
 //    } else {
         printHeaderIfVerbose();
-        m_pAnonymizer->anonymizeFile();
+        return m_pAnonymizer->anonymizeFile();
 //    }
 }
 
@@ -418,7 +430,7 @@ void SettingsControllerCL::execute()
 
 void SettingsControllerCL::printHeaderIfVerbose()
 {
-    if(m_bShowHeaderFlag) {
+    if(m_bVerboseMode) {
         qInfo() << " ";
         qInfo() << "-------------------------------------------------------------------------------------------";
         qInfo() << " ";
