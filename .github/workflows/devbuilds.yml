@@ -3,7 +3,7 @@ name: Linux|Win|MacOS
 on:
   push:
     branches:
-    - master
+    - prebuilt
 
 jobs:
   UpdateDevTag:
@@ -40,28 +40,36 @@ jobs:
 
   LinuxStatic:
     runs-on: ubuntu-16.04
-    needs: UpdateDevTag
+    #needs: UpdateDevTag
     
     steps:
     - name: Clone repository
       uses: actions/checkout@v2
-    - name: Compile static Qt version
+    - name: Install OpenGL
       run: |
-        # Install OpenGL
         sudo apt-get install build-essential libgl1-mesa-dev
-        # Clone Qt5 repo
-        cd ..
-        git clone https://code.qt.io/qt/qt5.git -b 5.14.2
-        cd qt5
-        ./init-repository -f --module-subset=qtbase,qtcharts,qtsvg,qt3d
-        # Create shadow build folder
-        cd ..
-        mkdir qt5_shadow
-        cd qt5_shadow
-        # Configure Qt5
-        ../qt5/configure -static -release -prefix "../Qt5_binaries" -skip webengine -nomake tools -nomake tests -nomake examples -no-dbus -no-ssl -no-pch -opensource -confirm-license
-        make module-qtbase module-qtsvg module-qtcharts module-qt3d -j4
-        make install -j4
+    - name: Install Qt
+      run: |
+        # Download the pre-built static version of Qt, which was created with the generateBinaries.yml workflow
+        wget -O qt5_5142_static_binaries_linux.tar.gz https://www.dropbox.com/s/k245dalpw02ok1q/qt5_5142_static_binaries_linux.tar.gz?dl=1
+        mkdir ../Qt5_binaries
+        tar xvzf qt5_5142_static_binaries_linux.tar.gz -C ../ -P
+    # Uncomment this if you want to build Qt statically in this workflow
+    # - name: Compile static Qt version
+    #   run: |
+    #     # Clone Qt5 repo
+    #     cd ..
+    #     git clone https://code.qt.io/qt/qt5.git -b 5.14.2
+    #     cd qt5
+    #     ./init-repository -f --module-subset=qtbase,qtcharts,qtsvg,qt3d
+    #     # Create shadow build folder
+    #     cd ..
+    #     mkdir qt5_shadow
+    #     cd qt5_shadow
+    #     # Configure Qt5
+    #     ../qt5/configure -static -release -prefix "../Qt5_binaries" -skip webengine -nomake tools -nomake tests -nomake examples -no-dbus -no-ssl -no-pch -opensource -confirm-license
+    #     make module-qtbase module-qtsvg module-qtcharts module-qt3d -j4
+    #     make install -j4
     - name: Configure and compile MNE-CPP
       run: |
         ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples MNECPP_CONFIG+=static
@@ -85,26 +93,32 @@ jobs:
 
   MacOSStatic:
     runs-on: macos-latest
-    needs: UpdateDevTag
+    #needs: UpdateDevTag
     
     steps:
     - name: Clone repository
       uses: actions/checkout@v2
-    - name: Compile static Qt version
+    - name: Install Qt
       run: |
-        # Clone Qt5 repo
-        cd ..
-        git clone https://code.qt.io/qt/qt5.git -b 5.14.2
-        cd qt5
-        ./init-repository -f --module-subset=qtbase,qtcharts,qtsvg,qt3d
-        # Create shadow build folder
-        cd ..
-        mkdir qt5_shadow
-        cd qt5_shadow
-        # Configure Qt5
-        ../qt5/configure -static -release -prefix "../Qt5_binaries" -skip webengine -nomake tools -nomake tests -nomake examples -no-dbus -no-ssl -no-pch -opensource -confirm-license
-        make module-qtbase module-qtsvg module-qtcharts module-qt3d -j4
-        make install -j4
+        # Download the pre-built static version of Qt, which was created with the generateBinaries.yml workflow
+        wget -O qt5_5142_static_binaries_macos.tar.gz https://www.dropbox.com/s/bnlec4qpl7c22rp/qt5_5142_static_binaries_macos.tar.gz?dl=1
+        tar xzf qt5_5142_static_binaries_macos.tar.gz -P
+    # Uncomment this if you want to build Qt statically in this workflow
+    # - name: Compile static Qt version
+    #   run: |
+    #     # Clone Qt5 repo
+    #     cd ..
+    #     git clone https://code.qt.io/qt/qt5.git -b 5.14.2
+    #     cd qt5
+    #     ./init-repository -f --module-subset=qtbase,qtcharts,qtsvg,qt3d
+    #     # Create shadow build folder
+    #     cd ..
+    #     mkdir qt5_shadow
+    #     cd qt5_shadow
+    #     # Configure Qt5
+    #     ../qt5/configure -static -release -prefix "../Qt5_binaries" -skip webengine -nomake tools -nomake tests -nomake examples -no-dbus -no-ssl -no-pch -opensource -confirm-license
+    #     make module-qtbase module-qtsvg module-qtcharts module-qt3d -j4
+    #     make install -j4
     - name: Configure and compile MNE-CPP
       run: |
         ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples MNECPP_CONFIG+=static
@@ -125,10 +139,10 @@ jobs:
         asset_name: mne-cpp-macos-static-x86_64.tar.gz
         tag: dev_build
         overwrite: true
-
+        
   WinStatic:
     runs-on: windows-2016
-    needs: UpdateDevTag
+    #needs: UpdateDevTag
 
     steps:
     - name: Clone repository
@@ -142,25 +156,31 @@ jobs:
       run: |
         Invoke-WebRequest https://www.dropbox.com/s/dku543gtw7ik7hr/jom.zip?dl=1 -OutFile .\jom.zip
         expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
-        echo "::add-path::$HOME\jom"
-    - name: Compile static Qt version
+        echo "::add-path::$HOME\jom"  
+    - name: Install Qt
       run: |
-        # Clone Qt5 repo
-        cd ..
-        git clone https://code.qt.io/qt/qt5.git -b 5.14.2
-        cd qt5
-        perl init-repository -f --module-subset=qtbase,qtcharts,qtsvg,qt3d
-        # Create shadow build folder
-        cd ..
-        mkdir qt5_shadow
-        cd qt5_shadow
-        # Setup the compiler 
-        cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
-        Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
-        # Configure Qt5
-        ..\qt5\configure.bat -release -static -no-pch -optimize-size -opengl desktop -platform win32-msvc -prefix "..\Qt5_binaries" -skip webengine -nomake tools -nomake tests -nomake examples -opensource -confirm-license
-        jom -j4
-        nmake install
+        # Download the pre-built static version of Qt, which was created with the generateBinaries.yml workflow
+        Invoke-WebRequest https://www.dropbox.com/s/r1z7jjit23si9rp/qt5_5142_static_binaries_win.zip?dl=1 -OutFile .\qt5_5142_static_binaries_win.zip
+        expand-archive -path "qt5_5142_static_binaries_win.zip" -destinationpath "..\"
+    # Uncomment this if you want to build Qt statically in this workflow
+    # - name: Compile static Qt version
+    #   run: |
+    #     # Clone Qt5 repo
+    #     cd ..
+    #     git clone https://code.qt.io/qt/qt5.git -b 5.14.2
+    #     cd qt5
+    #     perl init-repository -f --module-subset=qtbase,qtcharts,qtsvg,qt3d
+    #     # Create shadow build folder
+    #     cd ..
+    #     mkdir qt5_shadow
+    #     cd qt5_shadow
+    #     # Setup the compiler 
+    #     cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
+    #     Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
+    #     # Configure Qt5
+    #     ..\qt5\configure.bat -release -static -no-pch -optimize-size -opengl desktop -platform win32-msvc -prefix "..\Qt5_binaries" -skip webengine -nomake tools -nomake tests -nomake examples -opensource -confirm-license
+    #     jom -j4
+    #     nmake install
     - name: Configure and compile MNE-CPP
       run: |
         cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
@@ -183,308 +203,308 @@ jobs:
         tag: dev_build
         overwrite: true
 
-  LinuxDynamic:
-    runs-on: ubuntu-16.04
-    needs: UpdateDevTag
+  # LinuxDynamic:
+  #   runs-on: ubuntu-16.04
+  #   needs: UpdateDevTag
     
-    steps:
-    - name: Clone repository
-      uses: actions/checkout@v2
-    - name: Install Python 3.7 version
-      uses: actions/setup-python@v1
-      with:
-        python-version: '3.7'
-        architecture: 'x64'
-    - name: Install BrainFlow and LSL submodules
-      run: |
-        git submodule update --init applications/mne_scan/plugins/brainflowboard/brainflow
-        git submodule update --init applications/mne_scan/plugins/lsladapter/liblsl
-    - name: Install Qt
-      uses: jurplel/install-qt-action@v2
-      with:
-        version: 5.14.2
-        modules: qtcharts
-    - name: Compile BrainFlow submodule
-      run: |
-        cd applications/mne_scan/plugins/brainflowboard/brainflow
-        mkdir build
-        cd build
-        cmake -DCMAKE_INSTALL_PREFIX=../installed ..
-        make
-        make install
-    - name: Compile LSL submodule
-      run: |
-        cd applications/mne_scan/plugins/lsladapter/liblsl
-        mkdir build
-        cd build
-        cmake ..
-        make
-        make install
-    - name: Configure and compile MNE-CPP
-      run: |
-        qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow MNECPP_CONFIG+=withLsl
-        make -j4
-    - name: Package binaries
-      run: |
-        # Copy additional brainflow libs
-        cp -a applications/mne_scan/plugins/brainflowboard/brainflow/installed/lib/. lib/
-        # Copy additional LSL libs
-        cp -a applications/mne_scan/plugins/lsladapter/liblsl/build/install/lib/. lib/
-        # Install libxkbcommon and libbluetooth3 so linuxdeployqt can find it
-        sudo apt-get install libxkbcommon-x11-0
-        sudo apt-get install libbluetooth3
-        # Downloading linuxdeployqt from continious release
-        wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
-        sudo chmod a+x linuxdeployqt-continuous-x86_64.AppImage
-        # Creating a directory for linuxdeployqt to create results 
-        sudo mkdir -p -m777 mne-cpp
-        # Copying built data to folder for easy packaging   
-        cp -r ./bin ./lib mne-cpp/
-        # linuxdeployqt uses mne_scan binary to resolve dependencies in current directory. 
-        cd mne-cpp
-        ../linuxdeployqt-continuous-x86_64.AppImage bin/mne_scan -verbose2
-        # Creating archive of everything in current directory
-        tar cfvz ../mne-cpp-linux-dynamic-x86_64.tar.gz ./*
-    - name: Deploy binaries with dev_build release on Github
-      uses: svenstaro/upload-release-action@v1-release
-      with:
-        repo_token: ${{ secrets.GH_TOKEN }}
-        file: mne-cpp-linux-dynamic-x86_64.tar.gz
-        asset_name: mne-cpp-linux-dynamic-x86_64.tar.gz
-        tag: dev_build
-        overwrite: true
+  #   steps:
+  #   - name: Clone repository
+  #     uses: actions/checkout@v2
+  #   - name: Install Python 3.7 version
+  #     uses: actions/setup-python@v1
+  #     with:
+  #       python-version: '3.7'
+  #       architecture: 'x64'
+  #   - name: Install BrainFlow and LSL submodules
+  #     run: |
+  #       git submodule update --init applications/mne_scan/plugins/brainflowboard/brainflow
+  #       git submodule update --init applications/mne_scan/plugins/lsladapter/liblsl
+  #   - name: Install Qt
+  #     uses: jurplel/install-qt-action@v2
+  #     with:
+  #       version: 5.14.2
+  #       modules: qtcharts
+  #   - name: Compile BrainFlow submodule
+  #     run: |
+  #       cd applications/mne_scan/plugins/brainflowboard/brainflow
+  #       mkdir build
+  #       cd build
+  #       cmake -DCMAKE_INSTALL_PREFIX=../installed ..
+  #       make
+  #       make install
+  #   - name: Compile LSL submodule
+  #     run: |
+  #       cd applications/mne_scan/plugins/lsladapter/liblsl
+  #       mkdir build
+  #       cd build
+  #       cmake ..
+  #       make
+  #       make install
+  #   - name: Configure and compile MNE-CPP
+  #     run: |
+  #       qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow MNECPP_CONFIG+=withLsl
+  #       make -j4
+  #   - name: Package binaries
+  #     run: |
+  #       # Copy additional brainflow libs
+  #       cp -a applications/mne_scan/plugins/brainflowboard/brainflow/installed/lib/. lib/
+  #       # Copy additional LSL libs
+  #       cp -a applications/mne_scan/plugins/lsladapter/liblsl/build/install/lib/. lib/
+  #       # Install libxkbcommon and libbluetooth3 so linuxdeployqt can find it
+  #       sudo apt-get install libxkbcommon-x11-0
+  #       sudo apt-get install libbluetooth3
+  #       # Downloading linuxdeployqt from continious release
+  #       wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
+  #       sudo chmod a+x linuxdeployqt-continuous-x86_64.AppImage
+  #       # Creating a directory for linuxdeployqt to create results 
+  #       sudo mkdir -p -m777 mne-cpp
+  #       # Copying built data to folder for easy packaging   
+  #       cp -r ./bin ./lib mne-cpp/
+  #       # linuxdeployqt uses mne_scan binary to resolve dependencies in current directory. 
+  #       cd mne-cpp
+  #       ../linuxdeployqt-continuous-x86_64.AppImage bin/mne_scan -verbose2
+  #       # Creating archive of everything in current directory
+  #       tar cfvz ../mne-cpp-linux-dynamic-x86_64.tar.gz ./*
+  #   - name: Deploy binaries with dev_build release on Github
+  #     uses: svenstaro/upload-release-action@v1-release
+  #     with:
+  #       repo_token: ${{ secrets.GH_TOKEN }}
+  #       file: mne-cpp-linux-dynamic-x86_64.tar.gz
+  #       asset_name: mne-cpp-linux-dynamic-x86_64.tar.gz
+  #       tag: dev_build
+  #       overwrite: true
 
-  MacOSDynamic:
-    runs-on: macos-latest
-    needs: UpdateDevTag
+  # MacOSDynamic:
+  #   runs-on: macos-latest
+  #   needs: UpdateDevTag
 
-    steps:
-    - name: Clone repository
-      uses: actions/checkout@v2
-    - name: Install Python 3.7 version
-      uses: actions/setup-python@v1
-      with:
-        python-version: '3.7'
-        architecture: 'x64'
-    - name: Install BrainFlow and LSL submodules
-      run: |
-        git submodule update --init applications/mne_scan/plugins/brainflowboard/brainflow
-        git submodule update --init applications/mne_scan/plugins/lsladapter/liblsl
-    - name: Install Qt
-      uses: jurplel/install-qt-action@v2
-      with:
-        version: 5.14.2
-        modules: qtcharts
-    - name: Compile BrainFlow submodule 
-      run: |
-        mkdir applications/mne_scan/plugins/brainflowboard/brainflow/build
-        cd applications/mne_scan/plugins/brainflowboard/brainflow/build
-        cmake -DCMAKE_INSTALL_PREFIX=../installed ..
-        make
-        make install
-    - name: Compile LSL submodule
-      run: |
-        cd applications/mne_scan/plugins/lsladapter/liblsl
-        mkdir build
-        cd build
-        cmake ..
-        make
-        make install
-    - name: Configure and compile MNE-CPP
-      run: |
-        qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow MNECPP_CONFIG+=withLsl
-        make -j4
-    - name: Package binaries
-      run: |
-        # Copy additional brainflow libs
-        cp -a applications/mne_scan/plugins/brainflowboard/brainflow/installed/lib/. bin/mne_scan.app/Contents/Frameworks
-        # Copy additional LSL libs
-        cp -a applications/mne_scan/plugins/lsladapter/liblsl/build/install/lib/. bin/mne_scan.app/Contents/Frameworks
-        # Creating archive of all macos deployed applications
-        tar cfvz mne-cpp-macos-dynamic-x86_64.tar.gz bin/. lib/.
-    - name: Deploy binaries with dev_build release on Github
-      uses: svenstaro/upload-release-action@v1-release
-      with:
-        repo_token: ${{ secrets.GH_TOKEN }}
-        file: mne-cpp-macos-dynamic-x86_64.tar.gz
-        asset_name: mne-cpp-macos-dynamic-x86_64.tar.gz
-        tag: dev_build
-        overwrite: true
+  #   steps:
+  #   - name: Clone repository
+  #     uses: actions/checkout@v2
+  #   - name: Install Python 3.7 version
+  #     uses: actions/setup-python@v1
+  #     with:
+  #       python-version: '3.7'
+  #       architecture: 'x64'
+  #   - name: Install BrainFlow and LSL submodules
+  #     run: |
+  #       git submodule update --init applications/mne_scan/plugins/brainflowboard/brainflow
+  #       git submodule update --init applications/mne_scan/plugins/lsladapter/liblsl
+  #   - name: Install Qt
+  #     uses: jurplel/install-qt-action@v2
+  #     with:
+  #       version: 5.14.2
+  #       modules: qtcharts
+  #   - name: Compile BrainFlow submodule 
+  #     run: |
+  #       mkdir applications/mne_scan/plugins/brainflowboard/brainflow/build
+  #       cd applications/mne_scan/plugins/brainflowboard/brainflow/build
+  #       cmake -DCMAKE_INSTALL_PREFIX=../installed ..
+  #       make
+  #       make install
+  #   - name: Compile LSL submodule
+  #     run: |
+  #       cd applications/mne_scan/plugins/lsladapter/liblsl
+  #       mkdir build
+  #       cd build
+  #       cmake ..
+  #       make
+  #       make install
+  #   - name: Configure and compile MNE-CPP
+  #     run: |
+  #       qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow MNECPP_CONFIG+=withLsl
+  #       make -j4
+  #   - name: Package binaries
+  #     run: |
+  #       # Copy additional brainflow libs
+  #       cp -a applications/mne_scan/plugins/brainflowboard/brainflow/installed/lib/. bin/mne_scan.app/Contents/Frameworks
+  #       # Copy additional LSL libs
+  #       cp -a applications/mne_scan/plugins/lsladapter/liblsl/build/install/lib/. bin/mne_scan.app/Contents/Frameworks
+  #       # Creating archive of all macos deployed applications
+  #       tar cfvz mne-cpp-macos-dynamic-x86_64.tar.gz bin/. lib/.
+  #   - name: Deploy binaries with dev_build release on Github
+  #     uses: svenstaro/upload-release-action@v1-release
+  #     with:
+  #       repo_token: ${{ secrets.GH_TOKEN }}
+  #       file: mne-cpp-macos-dynamic-x86_64.tar.gz
+  #       asset_name: mne-cpp-macos-dynamic-x86_64.tar.gz
+  #       tag: dev_build
+  #       overwrite: true
 
-  WinDynamic:
-    runs-on: windows-2016
-    needs: UpdateDevTag
+  # WinDynamic:
+  #   runs-on: windows-2016
+  #   needs: UpdateDevTag
 
-    steps:
-    - name: Clone repository
-      uses: actions/checkout@v2
-    - name: Install Python 3.7 version
-      uses: actions/setup-python@v1
-      with:
-        python-version: '3.7'
-        architecture: 'x64'   
-    - name: Install BrainFlow and LSL submodules
-      run: |
-        git submodule update --init applications/mne_scan/plugins/brainflowboard/brainflow
-        git submodule update --init applications/mne_scan/plugins/lsladapter/liblsl
-    - name: Install Qt
-      uses: jurplel/install-qt-action@v2
-      with:
-        version: 5.14.2
-        arch: win64_msvc2017_64
-        modules: qtcharts
-    - name: Install jom
-      run: |
-        Invoke-WebRequest https://www.dropbox.com/s/dku543gtw7ik7hr/jom.zip?dl=1 -OutFile .\jom.zip
-        expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
-        echo "::add-path::$HOME\jom"
-    - name: Compile BrainFlow submodule
-      run: |
-        cd applications\mne_scan\plugins\brainflowboard\brainflow
-        mkdir build
-        cd build
-        cmake -G "Visual Studio 15 2017" -A x64 -DMSVC_RUNTIME=dynamic -DCMAKE_SYSTEM_VERSION=8.1 -DCMAKE_INSTALL_PREFIX="$env:GITHUB_WORKSPACE\applications\mne_scan\plugins\brainflowboard\brainflow\installed" ..
-        cmake --build . --target install --config Release
-    - name: Compile LSL submodule
-      run: |
-        cd applications\mne_scan\plugins\lsladapter\liblsl
-        mkdir build
-        cd build
-        cmake .. -G "Visual Studio 15 2017" -A x64
-        cmake --build . --config Release --target install
-    - name: Configure and compile MNE-CPP
-      run: |
-        cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
-        Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
-        qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow MNECPP_CONFIG+=withLsl
-        jom -j4
-    - name: Package binaries
-      run: |
-        # Copy additional brainflow libs
-        xcopy .\applications\mne_scan\plugins\brainflowboard\brainflow\installed\lib\* .\bin\ /s /i
-        # Copy additional LSL libs
-        xcopy .\applications\mne_scan\plugins\lsladapter\liblsl\build\install\bin\lsl.dll .\bin\ /i
-        7z a mne-cpp-windows-dynamic-x86_64.zip ./bin
-    - name: Deploy binaries with dev_build release on Github
-      uses: svenstaro/upload-release-action@v1-release
-      with:
-        repo_token: ${{ secrets.GH_TOKEN }}
-        file: mne-cpp-windows-dynamic-x86_64.zip
-        asset_name: mne-cpp-windows-dynamic-x86_64.zip
-        tag: dev_build
-        overwrite: true
+  #   steps:
+  #   - name: Clone repository
+  #     uses: actions/checkout@v2
+  #   - name: Install Python 3.7 version
+  #     uses: actions/setup-python@v1
+  #     with:
+  #       python-version: '3.7'
+  #       architecture: 'x64'   
+  #   - name: Install BrainFlow and LSL submodules
+  #     run: |
+  #       git submodule update --init applications/mne_scan/plugins/brainflowboard/brainflow
+  #       git submodule update --init applications/mne_scan/plugins/lsladapter/liblsl
+  #   - name: Install Qt
+  #     uses: jurplel/install-qt-action@v2
+  #     with:
+  #       version: 5.14.2
+  #       arch: win64_msvc2017_64
+  #       modules: qtcharts
+  #   - name: Install jom
+  #     run: |
+  #       Invoke-WebRequest https://www.dropbox.com/s/dku543gtw7ik7hr/jom.zip?dl=1 -OutFile .\jom.zip
+  #       expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
+  #       echo "::add-path::$HOME\jom"
+  #   - name: Compile BrainFlow submodule
+  #     run: |
+  #       cd applications\mne_scan\plugins\brainflowboard\brainflow
+  #       mkdir build
+  #       cd build
+  #       cmake -G "Visual Studio 15 2017" -A x64 -DMSVC_RUNTIME=dynamic -DCMAKE_SYSTEM_VERSION=8.1 -DCMAKE_INSTALL_PREFIX="$env:GITHUB_WORKSPACE\applications\mne_scan\plugins\brainflowboard\brainflow\installed" ..
+  #       cmake --build . --target install --config Release
+  #   - name: Compile LSL submodule
+  #     run: |
+  #       cd applications\mne_scan\plugins\lsladapter\liblsl
+  #       mkdir build
+  #       cd build
+  #       cmake .. -G "Visual Studio 15 2017" -A x64
+  #       cmake --build . --config Release --target install
+  #   - name: Configure and compile MNE-CPP
+  #     run: |
+  #       cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
+  #       Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
+  #       qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow MNECPP_CONFIG+=withLsl
+  #       jom -j4
+  #   - name: Package binaries
+  #     run: |
+  #       # Copy additional brainflow libs
+  #       xcopy .\applications\mne_scan\plugins\brainflowboard\brainflow\installed\lib\* .\bin\ /s /i
+  #       # Copy additional LSL libs
+  #       xcopy .\applications\mne_scan\plugins\lsladapter\liblsl\build\install\bin\lsl.dll .\bin\ /i
+  #       7z a mne-cpp-windows-dynamic-x86_64.zip ./bin
+  #   - name: Deploy binaries with dev_build release on Github
+  #     uses: svenstaro/upload-release-action@v1-release
+  #     with:
+  #       repo_token: ${{ secrets.GH_TOKEN }}
+  #       file: mne-cpp-windows-dynamic-x86_64.zip
+  #       asset_name: mne-cpp-windows-dynamic-x86_64.zip
+  #       tag: dev_build
+  #       overwrite: true
         
-  Tests:
-    runs-on: ubuntu-16.04
-    needs: UpdateDevTag
+  # Tests:
+  #   runs-on: ubuntu-16.04
+  #   needs: UpdateDevTag
 
-    steps:
-    - name: Clone repository
-      uses: actions/checkout@v2
-    - name: Install Python 3.7 version
-      uses: actions/setup-python@v1
-      with:
-        python-version: '3.7'
-        architecture: 'x64'
-    - name: Install Codecov
-      run: |
-        sudo pip install codecov 
-    - name: Install Qt
-      uses: jurplel/install-qt-action@v2
-      with:
-        version: 5.14.2
-        modules: qtcharts
-    - name: Configure and compile MNE-CPP
-      run: |
-        qmake -r MNECPP_CONFIG+=withCodeCov MNECPP_CONFIG+=noApplications MNECPP_CONFIG+=noExamples
-        make -j4
-    - name: Run tests and upload results to Codecov
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-        QTEST_FUNCTION_TIMEOUT: 900000
-      run: |
-        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)/lib
-        git clone https://github.com/mne-tools/mne-cpp-test-data.git ./bin/mne-cpp-test-data
-        for test in ./bin/test_*;
-        do
-          # Run all tests and call gcov on all cpp files after each test run. Then upload to codecov for every test run.
-          # Codecov is able to process multiple uploads and merge them as soon as the CI job is done.          
-          echo ">> Starting $test"
-          $test
-          find ./libraries -type f -name "*.cpp" -execdir gcov {} \; > /dev/null
-          # Hide codecov output since it corrupts the log too much
-          codecov > /dev/null
-        done
+  #   steps:
+  #   - name: Clone repository
+  #     uses: actions/checkout@v2
+  #   - name: Install Python 3.7 version
+  #     uses: actions/setup-python@v1
+  #     with:
+  #       python-version: '3.7'
+  #       architecture: 'x64'
+  #   - name: Install Codecov
+  #     run: |
+  #       sudo pip install codecov 
+  #   - name: Install Qt
+  #     uses: jurplel/install-qt-action@v2
+  #     with:
+  #       version: 5.14.2
+  #       modules: qtcharts
+  #   - name: Configure and compile MNE-CPP
+  #     run: |
+  #       qmake -r MNECPP_CONFIG+=withCodeCov MNECPP_CONFIG+=noApplications MNECPP_CONFIG+=noExamples
+  #       make -j4
+  #   - name: Run tests and upload results to Codecov
+  #     env:
+  #       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+  #       QTEST_FUNCTION_TIMEOUT: 900000
+  #     run: |
+  #       export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)/lib
+  #       git clone https://github.com/mne-tools/mne-cpp-test-data.git ./bin/mne-cpp-test-data
+  #       for test in ./bin/test_*;
+  #       do
+  #         # Run all tests and call gcov on all cpp files after each test run. Then upload to codecov for every test run.
+  #         # Codecov is able to process multiple uploads and merge them as soon as the CI job is done.          
+  #         echo ">> Starting $test"
+  #         $test
+  #         find ./libraries -type f -name "*.cpp" -execdir gcov {} \; > /dev/null
+  #         # Hide codecov output since it corrupts the log too much
+  #         codecov > /dev/null
+  #       done
         
-  Doxygen:
-    runs-on: ubuntu-latest
-    needs: UpdateDevTag
+  # Doxygen:
+  #   runs-on: ubuntu-latest
+  #   needs: UpdateDevTag
 
-    steps:
-    - name: Clone repository
-      uses: actions/checkout@v2
-    - name: Install Qt Dev Tools, Doxygen and Graphviz
-      run: |
-        sudo apt-get update -qq
-        sudo apt-get install -qq qttools5-dev-tools doxygen graphviz
-    - name: Run Doxygen and package result
-      run: |
-        cd doc/doxygen
-        doxygen mne-cpp_doxyfile
-    - name: Setup Github credentials
-      uses: fusion-engineering/setup-git-credentials@v2
-      with:
-        credentials: ${{secrets.GIT_CREDENTIALS}}    
-    - name: Deploy qch docu data base with dev_build release on Github
-      uses: svenstaro/upload-release-action@v1-release
-      with:
-        repo_token: ${{ secrets.GH_TOKEN }}
-        file: doc/doxygen/qt-creator_doc/mne-cpp.qch
-        asset_name: mne-cpp-doc-qtcreator.qch
-        tag: dev_build
-        overwrite: true
-    - name: Update documentation at Github pages
-      run: |
-        cd doc/doxygen
-        git config --global user.email lorenzesch@hotmail.com
-        git config --global user.name LorenzE
-        git clone -b gh-pages https://github.com/mne-cpp/doxygen-api gh-pages
-        cd gh-pages
-        # Remove all files first
-        git rm * -r
-        git commit --amend -a -m 'Update docu' --allow-empty
-        touch .nojekyll        
-        # Copy doxygen files
-        cp -r ../html/* .
-        # Add all new files, commit and push
-        git add *
-        git add .nojekyll
-        git commit --amend -a -m 'Update docu'
-        git push -f --all
+  #   steps:
+  #   - name: Clone repository
+  #     uses: actions/checkout@v2
+  #   - name: Install Qt Dev Tools, Doxygen and Graphviz
+  #     run: |
+  #       sudo apt-get update -qq
+  #       sudo apt-get install -qq qttools5-dev-tools doxygen graphviz
+  #   - name: Run Doxygen and package result
+  #     run: |
+  #       cd doc/doxygen
+  #       doxygen mne-cpp_doxyfile
+  #   - name: Setup Github credentials
+  #     uses: fusion-engineering/setup-git-credentials@v2
+  #     with:
+  #       credentials: ${{secrets.GIT_CREDENTIALS}}    
+  #   - name: Deploy qch docu data base with dev_build release on Github
+  #     uses: svenstaro/upload-release-action@v1-release
+  #     with:
+  #       repo_token: ${{ secrets.GH_TOKEN }}
+  #       file: doc/doxygen/qt-creator_doc/mne-cpp.qch
+  #       asset_name: mne-cpp-doc-qtcreator.qch
+  #       tag: dev_build
+  #       overwrite: true
+  #   - name: Update documentation at Github pages
+  #     run: |
+  #       cd doc/doxygen
+  #       git config --global user.email lorenzesch@hotmail.com
+  #       git config --global user.name LorenzE
+  #       git clone -b gh-pages https://github.com/mne-cpp/doxygen-api gh-pages
+  #       cd gh-pages
+  #       # Remove all files first
+  #       git rm * -r
+  #       git commit --amend -a -m 'Update docu' --allow-empty
+  #       touch .nojekyll        
+  #       # Copy doxygen files
+  #       cp -r ../html/* .
+  #       # Add all new files, commit and push
+  #       git add *
+  #       git add .nojekyll
+  #       git commit --amend -a -m 'Update docu'
+  #       git push -f --all
 
-  gh-pages:
-    runs-on: ubuntu-latest
-    needs: UpdateDevTag
+  # gh-pages:
+  #   runs-on: ubuntu-latest
+  #   needs: UpdateDevTag
 
-    steps:
-    - name: Clone repository
-      uses: actions/checkout@v2
-    - name: Setup Github credentials
-      uses: fusion-engineering/setup-git-credentials@v2
-      with:
-        credentials: ${{secrets.GIT_CREDENTIALS}}
-    - name: Clone doc/gh-pages into gh-pages branch
-      run: |
-        git config --global user.email lorenzesch@hotmail.com
-        git config --global user.name LorenzE
-        git clone -b master --single-branch https://github.com/mne-cpp/mne-cpp.github.io.git
-        cd mne-cpp.github.io
-        # Remove all files first
-        git rm * -r
-        git commit --amend -a -m 'Update docu' --allow-empty
-        cd ..
-        cp -RT doc/gh-pages mne-cpp.github.io
-        cd mne-cpp.github.io
-        git add .
-        git commit --amend -a -m 'Update docu'
-        git push -f --all
+  #   steps:
+  #   - name: Clone repository
+  #     uses: actions/checkout@v2
+  #   - name: Setup Github credentials
+  #     uses: fusion-engineering/setup-git-credentials@v2
+  #     with:
+  #       credentials: ${{secrets.GIT_CREDENTIALS}}
+  #   - name: Clone doc/gh-pages into gh-pages branch
+  #     run: |
+  #       git config --global user.email lorenzesch@hotmail.com
+  #       git config --global user.name LorenzE
+  #       git clone -b master --single-branch https://github.com/mne-cpp/mne-cpp.github.io.git
+  #       cd mne-cpp.github.io
+  #       # Remove all files first
+  #       git rm * -r
+  #       git commit --amend -a -m 'Update docu' --allow-empty
+  #       cd ..
+  #       cp -RT doc/gh-pages mne-cpp.github.io
+  #       cd mne-cpp.github.io
+  #       git add .
+  #       git commit --amend -a -m 'Update docu'
+  #       git push -f --all
