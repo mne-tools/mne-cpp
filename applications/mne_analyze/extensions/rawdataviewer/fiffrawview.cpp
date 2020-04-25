@@ -162,7 +162,7 @@ void FiffRawView::initMVCSettings(const QSharedPointer<FiffRawViewModel>& pModel
 
     // Connect and init resizing of the table view to the MVC
     connect(this, &FiffRawView::tableViewDataWidthChanged,
-            pModel.data(), &FiffRawViewModel::setDataColumnWidth);
+            pModel.data(), &FiffRawViewModel::setDataColumnWidth, Qt::UniqueConnection);
 
     pModel->setDataColumnWidth(m_pTableView->width()-m_pTableView->columnWidth(0));
     m_pTableView->resizeColumnsToContents();
