@@ -98,8 +98,8 @@ FiffAnonymizer::FiffAnonymizer()
 , m_iDfltSubjectSex(0)
 , m_iDfltSubjectId(0)
 , m_iDfltSubjectHand(0)
-, m_iSubjectWeight(0)
-, m_iSubjectHeight(0)
+, m_fSubjectWeight(0.)
+, m_fSubjectHeight(0.)
 , m_iProjectId(0)
 {
     //MAC addresses have 6 bytes. We use 2 more here to complete 2 int32 (2bytes) reads.
