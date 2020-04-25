@@ -110,7 +110,7 @@ private:
     /**
      * Signals the FiffAnonymizer method handling both the multi-parallel setup and the single-thread setup.
      */
-    void execute();
+    int execute();
 
     //=========================================================================================================
     /**
@@ -127,7 +127,7 @@ private:
      *
      * @return Returns true if parsing was successful, false otherwise.
      */
-    bool parseInputs(const QStringList& arguments);
+    int parseInputs(const QStringList& arguments);
 
     //=========================================================================================================
 //    /**
@@ -172,7 +172,7 @@ private:
 //    QStringList m_SLInFiles;            /**< List of input file names (absolute paths).*/
 //    QStringList m_SLOutFiles;           /**< List of output file names (absolute paths).*/
 
-    bool m_bShowHeaderFlag;             /**< Show header when executing.*/
+    bool m_bVerboseMode;             /**< Show header when executing.*/
 //    bool m_bMultipleInFiles;            /**< Multpiple files concurrent execution flag.*/
 
 //    QList<FiffAnonymizer> m_lApps;      /**< list of addresses to FiffAnonyizer objects. */
