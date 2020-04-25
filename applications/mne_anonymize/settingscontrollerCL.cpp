@@ -71,21 +71,21 @@ SettingsControllerCL::SettingsControllerCL(const QStringList& arguments,
 : m_sAppName(name)
 , m_sAppVer(ver)
 , m_bShowHeaderFlag(false)
-, m_bMultipleInFiles(false)
+//, m_bMultipleInFiles(false)
 {
+    m_pAnonymizer = FiffAnonymizer::SPtr(new FiffAnonymizer);
     initParser();
     if(parseInputs(arguments))
     {
         execute();
     }
-
 }
 
 //=============================================================================================================
 
 SettingsControllerCL::~SettingsControllerCL()
 {
-    m_lApps.clear();
+//    m_lApps.clear();
 }
 
 //=============================================================================================================
@@ -170,7 +170,6 @@ bool SettingsControllerCL::parseInputs(const QStringList& arguments)
     {
         //print name and version
         printVersionInfo();
-//        qInfo() << m_sAppName << " - Version: " << m_sAppVer << endl << endl;
         return false;
     }
 
@@ -185,7 +184,7 @@ bool SettingsControllerCL::parseInputs(const QStringList& arguments)
         fInfo.makeAbsolute();
         if(fInfo.isFile())
         {
-            m_anonymizer.setFileIn(fInfo.fileName());
+            m_pAnonymizer->setFileIn(fInfo.fileName());
         } else {
             qCritical() << "Input file is not a file." << endl;
             return false;
@@ -195,24 +194,23 @@ bool SettingsControllerCL::parseInputs(const QStringList& arguments)
         m_parser.showHelp();
     }
 
-
     if(m_parser.isSet("out"))
     {
         QFileInfo fInfo(m_parser.value("out"));
         fInfo.makeAbsolute();
         if(fInfo.isDir())
         {
-            qCritical() << "Output file is infact a folder.";
+            qCritical() << "Output file is infact a folder." << endl;
             return false;
         } else {
-            m_anonymizer.setFileOut(fInfo.fileName());
+            m_pAnonymizer->setFileOut(fInfo.fileName());
         }
     } else {
         QFileInfo inFInfo(m_parser.value("in"));
         inFInfo.makeAbsolute();
         QString fileOut(QDir(inFInfo.absolutePath()).filePath(
                     inFInfo.baseName() + "_anonymized." + inFInfo.completeSuffix()));
-        m_anonymizer.setFileOut(fileOut);
+        m_pAnonymizer->setFileOut(fileOut);
     }
 
     if(m_parser.isSet("verbose"))
@@ -222,21 +220,21 @@ bool SettingsControllerCL::parseInputs(const QStringList& arguments)
 //            return false;
 //        }
         m_bShowHeaderFlag = true;
-        m_anonymizer.setVerboseMode(true);
+        m_pAnonymizer->setVerboseMode(true);
     }
 
     if(m_parser.isSet("brute")) {
-        m_anonymizer.setBruteMode(true);
+        m_pAnonymizer->setBruteMode(true);
     }
 
     if(m_parser.isSet("delete_input_file_after"))
     {
-        m_anonymizer.setDeleteInputFileAfter(true);
+        m_pAnonymizer->setDeleteInputFileAfter(true);
     }
 
     if(m_parser.isSet("avoid_delete_confirmation"))
     {
-        m_anonymizer.setDeleteInputFileAfterConfirmation(false);
+        m_pAnonymizer->setDeleteInputFileAfterConfirmation(false);
     }
 
     if(m_parser.isSet("measurement_date"))
@@ -252,7 +250,7 @@ bool SettingsControllerCL::parseInputs(const QStringList& arguments)
             m_parser.showHelp();
         }
         QString strMeasDate(m_parser.value("measurement_date"));
-        m_anonymizer.setMeasurementDay(strMeasDate);
+        m_pAnonymizer->setMeasurementDay(strMeasDate);
     }
 
     if(m_parser.isSet("measurement_date_offset"))
@@ -265,7 +263,7 @@ bool SettingsControllerCL::parseInputs(const QStringList& arguments)
         }
 
         int intMeasDateOffset(m_parser.value("measurement_date_offset").toInt());
-        m_anonymizer.setMeasurementDayOffset(intMeasDateOffset);
+        m_pAnonymizer->setMeasurementDayOffset(intMeasDateOffset);
     }
 
     if(m_parser.isSet("subject_birthday"))
@@ -281,7 +279,7 @@ bool SettingsControllerCL::parseInputs(const QStringList& arguments)
         }
 
         QString strBirthday(m_parser.value("subject_birthday"));
-        m_anonymizer.setSubjectBirthday(strBirthday);
+        m_pAnonymizer->setSubjectBirthday(strBirthday);
     }
 
     if(m_parser.isSet("subject_birthday_offset"))
@@ -296,7 +294,7 @@ bool SettingsControllerCL::parseInputs(const QStringList& arguments)
                            "the same time.";
         }
         int strBirthdayOffset(m_parser.value("subject_birthday_offset").toInt());
-        m_anonymizer.setSubjectBirthdayOffset(strBirthdayOffset);
+        m_pAnonymizer->setSubjectBirthdayOffset(strBirthdayOffset);
     }
 
     if(m_parser.isSet("his"))
@@ -307,7 +305,7 @@ bool SettingsControllerCL::parseInputs(const QStringList& arguments)
 //            return false;
 //        }
         QString strHisId(m_parser.value("his"));
-        m_anonymizer.setSubjectHisId(strHisId);
+        m_pAnonymizer->setSubjectHisId(strHisId);
 
     }
 
@@ -397,8 +395,8 @@ bool SettingsControllerCL::parseInputs(const QStringList& arguments)
 //            m_lApps[i].setFileOut(m_SLOutFiles.at(i));
 //        }
 //    } else {
-//        m_anonymizer.setFileIn(m_SLInFiles.first());
-//        m_anonymizer.setFileOut(m_SLOutFiles.first());
+//        m_pAnonymizer->setFileIn(m_SLInFiles.first());
+//        m_pAnonymizer->setFileOut(m_SLOutFiles.first());
 //    }
 //}
 
@@ -412,7 +410,7 @@ void SettingsControllerCL::execute()
 //        QtConcurrent::blockingMap(m_lApps, &FiffAnonymizer::anonymizeFile);
 //    } else {
         printHeaderIfVerbose();
-        m_anonymizer.anonymizeFile();
+        m_pAnonymizer->anonymizeFile();
 //    }
 }
 
@@ -426,6 +424,7 @@ void SettingsControllerCL::printHeaderIfVerbose()
         qInfo() << " ";
         qInfo() << m_sAppName;
         qInfo() << "Version: " + m_sAppVer;
+        qInfo() << " ";
     }
 }
 
@@ -433,8 +432,8 @@ void SettingsControllerCL::printHeaderIfVerbose()
 
 void SettingsControllerCL::printVersionInfo()
 {
-    qInfo() << endl;
+    qInfo() << " ";
     qInfo() << m_sAppName;
     qInfo() << "Version: " + m_sAppVer;
-    qInfo() << endl;
+    qInfo() << " ";
 }

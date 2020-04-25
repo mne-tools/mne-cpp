@@ -105,14 +105,13 @@ public:
      * Destroys SettingsControllerCL Object. All space allocated for FiffAnonymizer objects will be deleted.
      */
     ~SettingsControllerCL();
-
+private:
     //=========================================================================================================
     /**
      * Signals the FiffAnonymizer method handling both the multi-parallel setup and the single-thread setup.
      */
     void execute();
 
-private:
     //=========================================================================================================
     /**
      * Configures the QCommandLineParser member object with all the necesarry options.
@@ -131,22 +130,22 @@ private:
     bool parseInputs(const QStringList& arguments);
 
     //=========================================================================================================
-    /**
-     * Processes the options related to input and output files, like file names or deletion options. It also
-     * hables wild cards used while defining input filenames and configures the member QStringList with
-     * filenames to anonymize.
-     *
-     * @return Returns true if parsing was successful, false otherwise.
-     */
-    bool parseInputAndOutputFiles();
+//    /**
+//     * Processes the options related to input and output files, like file names or deletion options. It also
+//     * hables wild cards used while defining input filenames and configures the member QStringList with
+//     * filenames to anonymize.
+//     *
+//     * @return Returns true if parsing was successful, false otherwise.
+//     */
+//    bool parseInputAndOutputFiles();
 
     //=========================================================================================================
-    /**
-     * Handles filenames and, if needed, generates all the necessary FiffAnonyzer objects for a concurrent
-     * execution. All new instances (located in the heap) will be created through the copy constructor, as
-     * exact copies from the member FiffAnonyizer object. And then modified only the necessary options.
-     */
-    void generateAnonymizerInstances();
+//    /**
+//     * Handles filenames and, if needed, generates all the necessary FiffAnonyzer objects for a concurrent
+//     * execution. All new instances (located in the heap) will be created through the copy constructor, as
+//     * exact copies from the member FiffAnonyizer object. And then modified only the necessary options.
+//     */
+//    void generateAnonymizerInstances();
 
     //=========================================================================================================
     /**
@@ -156,22 +155,30 @@ private:
     void printHeaderIfVerbose();
 
     //=========================================================================================================
+    /**
+     * Prints version information when the "--version" option has been used in the application call. It is the
+     * first option to be parsed and if it is set, the application stops and none of the other options will be
+     * executed.
+     */
+    void printVersionInfo();
 
-    FiffAnonymizer m_anonymizer;        /**< Local instance of Fiffanonyzer, in which perform configurations.*/
+    //=========================================================================================================
+
+    FiffAnonymizer::SPtr m_pAnonymizer;  /**< Local pointer to a Fiffanonyzer object to configure and use.*/
 
     QString m_sAppName;                 /**< Application name.*/
     QString m_sAppVer;                  /**< Application version number.*/
 
-    QStringList m_SLInFiles;            /**< List of input file names (absolute paths).*/
-    QStringList m_SLOutFiles;           /**< List of output file names (absolute paths).*/
+//    QStringList m_SLInFiles;            /**< List of input file names (absolute paths).*/
+//    QStringList m_SLOutFiles;           /**< List of output file names (absolute paths).*/
 
     bool m_bShowHeaderFlag;             /**< Show header when executing.*/
-    bool m_bMultipleInFiles;            /**< Multpiple files concurrent execution flag.*/
+//    bool m_bMultipleInFiles;            /**< Multpiple files concurrent execution flag.*/
 
-    QList<FiffAnonymizer> m_lApps;      /**< list of addresses to FiffAnonyizer objects. */
-    QList<QFuture<void> > promisesList; /**< List of synchronizing waits for each concurrent execution.*/
+//    QList<FiffAnonymizer> m_lApps;      /**< list of addresses to FiffAnonyizer objects. */
+//    QList<QFuture<void> > promisesList; /**< List of synchronizing waits for each concurrent execution.*/
 
-    QCommandLineParser m_parser;        /**< parser object to work with member pointer to QCoreApp and parse input command line options.*/
+    QCommandLineParser m_parser;        /**< Parser object to work with member ptr to QCoreApp and parse input command line options.*/
 };
 
 //=============================================================================================================
