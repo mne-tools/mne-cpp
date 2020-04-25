@@ -141,7 +141,7 @@ jobs:
     - name: Configure and compile MNE-CPP (Linux|MacOS)
       if: (matrix.os == 'ubuntu-16.04') || (matrix.os == 'macos-latest')
       run: |
-        ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG+=noTests 
+        ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=static 
         make -j4
     - name: Configure and compile MNE-CPP (Windows)
       if: matrix.os == 'windows-2016'
@@ -149,7 +149,7 @@ jobs:
         # Setup VS compiler   
         cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
-        ..\Qt5_binaries\bin\qmake -r MNECPP_CONFIG+=noTests
+        ..\Qt5_binaries\bin\qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=static
         jom -j4
         
   Tests:
