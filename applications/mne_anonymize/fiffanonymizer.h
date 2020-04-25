@@ -236,184 +236,184 @@ public:
     void setSubjectHisId(const QString& sSubjectId);
 
     //=========================================================================================================
-    /**
-     * Returns the default string value to be used as substitution of other strings in the fiff file.
-     */
-    QString getDefaultString();
+//    /**
+//     * Returns the default string value to be used as substitution of other strings in the fiff file.
+//     */
+//    QString getDefaultString();
 
-    //=========================================================================================================
-    /**
-     * Get value of Date to be used as substitution of dates found in a fiff file.
-     */
-    QDateTime getDefaultDate();
+//    //=========================================================================================================
+//    /**
+//     * Get value of Date to be used as substitution of dates found in a fiff file.
+//     */
+//    QDateTime getDefaultDate();
 
-    //=========================================================================================================
-    /**
-     * Get value of Date to substitute the measuremnt date appearing in the file.
-     */
-    QDateTime getMeasurementDate();
+//    //=========================================================================================================
+//    /**
+//     * Get value of Date to substitute the measuremnt date appearing in the file.
+//     */
+//    QDateTime getMeasurementDate();
 
-    //=========================================================================================================
-    /**
-     * Get value of Flags to use Measurement-date days offset.
-     */
-    bool getUseMeasurementDayOffset();
+//    //=========================================================================================================
+//    /**
+//     * Get value of Flags to use Measurement-date days offset.
+//     */
+//    bool getUseMeasurementDayOffset();
 
-    //=========================================================================================================
-    /**
-     * Get value of Number of days to subtract from the measurement date.
-     */
-    int getIntMeasurementDayOffset();
+//    //=========================================================================================================
+//    /**
+//     * Get value of Number of days to subtract from the measurement date.
+//     */
+//    int getIntMeasurementDayOffset();
 
-    //=========================================================================================================
-    /**
-     * Get value of Subject's birthday substitutor.
-     */
-    QDateTime getSubjectBirthday();
+//    //=========================================================================================================
+//    /**
+//     * Get value of Subject's birthday substitutor.
+//     */
+//    QDateTime getSubjectBirthday();
 
-    //=========================================================================================================
-    /**
-     * Get value of Flags use of Subject's birthday offset.
-     */
-    bool getUseSubjectBirthdayOffset();
+//    //=========================================================================================================
+//    /**
+//     * Get value of Flags use of Subject's birthday offset.
+//     */
+//    bool getUseSubjectBirthdayOffset();
 
-    //=========================================================================================================
-    /**
-     * Get value of Subjects's birthday offset.
-     */
-    int  getIntSubjectBirthdayOffset();
+//    //=========================================================================================================
+//    /**
+//     * Get value of Subjects's birthday offset.
+//     */
+//    int  getIntSubjectBirthdayOffset();
 
-    //=========================================================================================================
-    /**
-     * Get value of MAC addresss substitutor.
-     */
-    void getDefaultMAC(FIFFLIB::fiff_int_t (&mac)[2]);
+//    //=========================================================================================================
+//    /**
+//     * Get value of MAC addresss substitutor.
+//     */
+//    void getDefaultMAC(FIFFLIB::fiff_int_t (&mac)[2]);
 
-    //=========================================================================================================
-    /**
-     * Get value of Subject's id substitutor.
-     */
-    int getDefaultSubjectId();
+//    //=========================================================================================================
+//    /**
+//     * Get value of Subject's id substitutor.
+//     */
+//    int getDefaultSubjectId();
 
-    //=========================================================================================================
-    /**
-     * Get value of Subject's first name substitutor.
-     */
-    QString getDefaultSubjectFirstName();
+//    //=========================================================================================================
+//    /**
+//     * Get value of Subject's first name substitutor.
+//     */
+//    QString getDefaultSubjectFirstName();
 
-    //=========================================================================================================
-    /**
-     * Get value of Subject's middle name substitutor.
-     */
-    QString getDefaultSubjectMidName();
+//    //=========================================================================================================
+//    /**
+//     * Get value of Subject's middle name substitutor.
+//     */
+//    QString getDefaultSubjectMidName();
 
-    //=========================================================================================================
-    /**
-     * Get value of Subject's last name substitutor.
-     */
-    QString getDefaultSubjectLastName();
+//    //=========================================================================================================
+//    /**
+//     * Get value of Subject's last name substitutor.
+//     */
+//    QString getDefaultSubjectLastName();
 
-    //=========================================================================================================
-    /**
-     * Get value of Subject's weight substitutor.
-     */
-    int getDefaultSubjectWeight();
+//    //=========================================================================================================
+//    /**
+//     * Get value of Subject's weight substitutor.
+//     */
+//    int getDefaultSubjectWeight();
 
-    //=========================================================================================================
-    /**
-     * Get value of Subject's height substitutor.
-     */
-    int getDefaultSubjectHeight();
+//    //=========================================================================================================
+//    /**
+//     * Get value of Subject's height substitutor.
+//     */
+//    int getDefaultSubjectHeight();
 
-    //=========================================================================================================
-    /**
-     * Get value of Subject's comment substitutor.
-     */
-    QString getDefaultSubjectComment();
+//    //=========================================================================================================
+//    /**
+//     * Get value of Subject's comment substitutor.
+//     */
+//    QString getDefaultSubjectComment();
 
-    //=========================================================================================================
-    /**
-     * Get value of Subject's HIS ID substitutor.
-     */
-    QString getDefaultSubjectHisId();
+//    //=========================================================================================================
+//    /**
+//     * Get value of Subject's HIS ID substitutor.
+//     */
+//    QString getDefaultSubjectHisId();
 
-    //=========================================================================================================
-    /**
-     * Get value of Project's id# substitutor.
-     */
-    int getDefaultProjectId();
+//    //=========================================================================================================
+//    /**
+//     * Get value of Project's id# substitutor.
+//     */
+//    int getDefaultProjectId();
 
-    //=========================================================================================================
-    /**
-     * Get value of Project's name substitutor.
-     */
-    QString getDefaultProjectName();
+//    //=========================================================================================================
+//    /**
+//     * Get value of Project's name substitutor.
+//     */
+//    QString getDefaultProjectName();
 
-    //=========================================================================================================
-    /**
-     * Get value of Project's aim substitutor.
-     */
-    QString getDefaultProjectAim();
+//    //=========================================================================================================
+//    /**
+//     * Get value of Project's aim substitutor.
+//     */
+//    QString getDefaultProjectAim();
 
-    //=========================================================================================================
-    /**
-     * Get value of Project's Persons substitutor.
-     */
-    QString getDefaultProjectPersons();
+//    //=========================================================================================================
+//    /**
+//     * Get value of Project's Persons substitutor.
+//     */
+//    QString getDefaultProjectPersons();
 
-    //=========================================================================================================
-    /**
-     * Get value of Project's comment substitutor.
-     */
-    QString getDefaultProjectComment();
+//    //=========================================================================================================
+//    /**
+//     * Get value of Project's comment substitutor.
+//     */
+//    QString getDefaultProjectComment();
 
-    //=========================================================================================================
-    /**
-     * Get value of default Advanced anonymization. Anonymize also weight, height and some other fields.
-     */
-    bool getBruteMode();
+//    //=========================================================================================================
+//    /**
+//     * Get value of default Advanced anonymization. Anonymize also weight, height and some other fields.
+//     */
+//    bool getBruteMode();
 
-    //=========================================================================================================
-    /**
-     * value of User's request to delete the input file after anonymization.
-     */
-    bool getDeleteInputFileAfter();
+//    //=========================================================================================================
+//    /**
+//     * value of User's request to delete the input file after anonymization.
+//     */
+//    bool getDeleteInputFileAfter();
 
-    //=========================================================================================================
-    /**
-     * Value of User's request to avoid confirmation prompt for input file deletion.
-     */
-    bool getDeleteInputFileConfirmation();
+//    //=========================================================================================================
+//    /**
+//     * Value of User's request to avoid confirmation prompt for input file deletion.
+//     */
+//    bool getDeleteInputFileConfirmation();
 
-    //=========================================================================================================
-    /**
-     * value of Flags if the input file has been deleted.
-     */
-    bool getInputFileDeleted();
+//    //=========================================================================================================
+//    /**
+//     * value of Flags if the input file has been deleted.
+//     */
+//    bool getInputFileDeleted();
 
-    //=========================================================================================================
-    /**
-     * Value of user's request to have both input and output files with the same name.
-     */
-    bool getInOutFileNamesEqual();
+//    //=========================================================================================================
+//    /**
+//     * Value of user's request to have both input and output files with the same name.
+//     */
+//    bool getInOutFileNamesEqual();
 
-    //=========================================================================================================
-    /**
-     * Value ofFlags if the output file has been renamed to match the name the input file had.
-     */
-    bool getOutputFileRenamed();
+//    //=========================================================================================================
+//    /**
+//     * Value ofFlags if the output file has been renamed to match the name the input file had.
+//     */
+//    bool getOutputFileRenamed();
 
-    //=========================================================================================================
-    /**
-     * Get name of Input file.
-     */
-    QString getFileNameIn();
+//    //=========================================================================================================
+//    /**
+//     * Get name of Input file.
+//     */
+//    QString getFileNameIn();
 
-    //=========================================================================================================
-    /**
-     * Get name of Output file.
-     */
-    QString getsFileNameOut();
+//    //=========================================================================================================
+//    /**
+//     * Get name of Output file.
+//     */
+//    QString getsFileNameOut();
 
     const double maxValidFiffVerion;    /**< Maximum version of the Fiff file standard compatible with this application.*/
 
@@ -572,6 +572,7 @@ private:
      */
     void renameOutputFileAsInputFile();
 
+    //=========================================================================================================
     QString m_sDefaultString;           /**< String to be used as substitution of other strings in a fiff file */
     QString m_sSubjectFirstName;        /**< Subject's first name substitutor.*/
     QString m_sSubjectMidName;          /**< Subject's middle name substitutor.*/
@@ -607,8 +608,8 @@ private:
     int m_iDfltSubjectSex;              /**< Subject's sex substitutor.*/
     int m_iDfltSubjectId;               /**< Subject's id substitutor.*/
     int m_iDfltSubjectHand;             /**< Subject's hand substitutor.*/
-    int m_iSubjectWeight;               /**< Subject's weight substitutor.*/
-    int m_iSubjectHeight;               /**< Subject's height substitutor.*/
+    float m_fSubjectWeight;             /**< Subject's weight substitutor.*/
+    float m_fSubjectHeight;             /**< Subject's height substitutor.*/
     int m_iProjectId;                   /**< Project's id# substitutor.*/
 
     FIFFLIB::fiff_int_t m_BDfltMAC[2];  /**< MAC addresss substitutor.*/
