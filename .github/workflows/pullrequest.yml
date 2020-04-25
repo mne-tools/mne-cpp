@@ -113,6 +113,10 @@ jobs:
       with:
         python-version: '3.7'
         architecture: 'x64'
+    - name: Install OpenGL (Linux)
+      if: matrix.os == 'ubuntu-16.04'
+      run: |
+        sudo apt-get install build-essential libgl1-mesa-dev
     - name: Install Qt (Linux)
       if: matrix.os == 'ubuntu-16.04'
       run: |
