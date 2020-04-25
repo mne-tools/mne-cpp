@@ -46,6 +46,7 @@
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_tag.h>
 #include <fiff/fiff_types.h>
+//#include <fiff/fiff_dir_entry.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -124,6 +125,7 @@ public:
     FiffAnonymizer(FiffAnonymizer &&obj);
 
     //=========================================================================================================
+    // PUBLIC INTERFACE
     /**
      * Calls the anonymizer routine. This method is the main method in the class. It goes through the input file and tag by tag
      * analyses if there might be some relevant information to anonymize and eventually does so.
@@ -133,13 +135,12 @@ public:
     int anonymizeFile();
 
     //=========================================================================================================
-    // PUBLIC INTERFACE
     /**
      * Specifies the input file to anonymize. This file will help to set a input Fiffstream object.
      *
      * @param [in] sFilePathIn  String containing the input file name including its path.
      */
-    void setFileIn(const QString &sFilePathIn);
+    int setFileIn(const QString &sFilePathIn);
 
     //=========================================================================================================
     /**
@@ -147,7 +148,7 @@ public:
      *
      * @param [in] sFilePathOut String containing the output file name including its path.
      */
-    void setFileOut(const QString &sFilePathOut);
+    int setFileOut(const QString &sFilePathOut);
 
     //=========================================================================================================
     /**
@@ -224,7 +225,7 @@ public:
      *
      * @param [in] bFlag    Bool argument whether to ask for confirmation when deleting a file.
      */
-    void setDeleteInputFileAfterConfirmation(bool bFlag);
+    void setDeleteInputFileConfirmation(bool bFlag);
 
     //=========================================================================================================
     /**
@@ -572,6 +573,8 @@ private:
      */
     void renameOutputFileAsInputFile();
 
+    int setupInOutStreams();
+
     //=========================================================================================================
     QString m_sDefaultString;           /**< String to be used as substitution of other strings in a fiff file */
     QString m_sSubjectFirstName;        /**< Subject's first name substitutor.*/
@@ -583,11 +586,14 @@ private:
     QString m_sProjectAim;              /**< Project's aim substitutor.*/
     QString m_sProjectPersons;          /**< Project's Persons substitutor.*/
     QString m_sProjectComment;          /**< Project's comment substitutor.*/
-    QString m_sFileNameIn;              /**< Input file.*/
-    QString m_sFileNameOut;             /**< Output file.*/
-
+//    QString m_sFileNameIn;              /**< Input file.*/
+//    QString m_sFileNameOut;             /**< Output file.*/
+//    QFileInfo m_fiFileIn;               /**< QFileInfo of input file.*/
+//    QFileInfo m_fiFileOut;              /**< QfileInfo of output file.*/
     QFile m_fFileIn;                    /**< QFile input file.*/
     QFile m_fFileOut;                   /**< QFile output file.*/
+    bool m_bFileInSet;                  /**< Input file set.*/
+    bool m_bFileOutSet;                 /**< Output file set.*/
 
     QDateTime m_dateDefaultDate;        /**< Date to be used as substitution of dates found in a fiff file */
     QDateTime m_dateMeasurmentDate;     /**< Date to substitute the measuremnt date appearing in the file.*/
@@ -611,6 +617,11 @@ private:
     float m_fSubjectWeight;             /**< Subject's weight substitutor.*/
     float m_fSubjectHeight;             /**< Subject's height substitutor.*/
     int m_iProjectId;                   /**< Project's id# substitutor.*/
+
+    FIFFLIB::FiffStream::SPtr m_pFiffStreamIn;   /**< Pointer to FiffStream object for reading.*/
+    FIFFLIB::FiffStream::SPtr m_pFiffStreamOut;  /**< Pointer to FiffStream object for writing the result.*/
+    FIFFLIB::FiffTag::SPtr m_pFiffInTag;         /**< Pointer to FiffTag used for reading each tag.*/
+    FIFFLIB::FiffTag::SPtr m_pFiffOutTag;        /**< Pointer to FiffTag used for writing each anonymized tag.*/
 
     FIFFLIB::fiff_int_t m_BDfltMAC[2];  /**< MAC addresss substitutor.*/
 
