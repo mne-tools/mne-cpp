@@ -9,9 +9,11 @@
 #include <mne/c/mne_ctf_comp_data_set.h>
 #include "../fwd_eeg_sphere_model_set.h"
 #include "../fwd_bem_model.h"
+
 #include <mne/c/mne_named_matrix.h>
 #include <mne/c/mne_nearest.h>
 #include <mne/c/mne_source_space_old.h>
+#include <mne/mne_forwardsolution.h>
 
 #include <fiff/c/fiff_sparse_matrix.h>
 
@@ -1776,7 +1778,8 @@ bool mne_attach_env(const QString& name, const QString& command)
 //=============================================================================================================
 
 ComputeFwd::ComputeFwd(ComputeFwdSettings* pSettings)
-    : m_settings(pSettings)
+    : fwdSolution(MNEForwardSolution::SPtr(new MNEForwardSolution))
+    , m_pSettings(pSettings)
 {
     initFwd();
 }
@@ -1812,140 +1815,143 @@ ComputeFwd::~ComputeFwd()
 void ComputeFwd::initFwd()
 {
     // TODO: This only temporary until we have the fwd dlibrary refactored. This is only done in order to provide easy testing in test_forward_solution.
-    m_spaces = Q_NULLPTR;              /* The source spaces */
-    m_iNSpace           = 0;
-    int iNSource      = 0;            /* Number of source space points */
+    m_spaces                = Q_NULLPTR;    /* The source spaces */
+    m_iNSpace               = 0;
+    m_iNSource              = 0;            /* Number of source space points */
 
-    m_mri_head_t       = Q_NULLPTR;    /* MRI <-> head coordinate transformation */
-    m_meg_head_t       = Q_NULLPTR;    /* MEG <-> head coordinate transformation */
+    m_mri_head_t            = Q_NULLPTR;    /* MRI <-> head coordinate transformation */
+    m_meg_head_t            = Q_NULLPTR;    /* MEG <-> head coordinate transformation */
 
-    QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo = Q_NULLPTR;
     m_listMegChs = QList<FIFFLIB::FiffChInfo>();      /* The MEG channel information */
-    int iNMeg         = 0;
+    int iNMeg               = 0;
     m_listEegChs = QList<FIFFLIB::FiffChInfo>();      /* The EEG channel information */
-    int iNEeg         = 0;
+    int iNEeg               = 0;
     QList<FiffChInfo> compchs = QList<FiffChInfo>();
-    int iNComp        = 0;
+    int iNComp              = 0;
 
-    FwdCoilSet* templates = Q_NULLPTR;
-    m_megcoils         = Q_NULLPTR;    /* The coil descriptions */
-    m_compcoils        = Q_NULLPTR;    /* MEG compensation coils */
-    m_compData        = Q_NULLPTR;
-    m_eegels           = Q_NULLPTR;
-    m_eegModels       = Q_NULLPTR;
+    FwdCoilSet* templates   = Q_NULLPTR;
+    m_megcoils              = Q_NULLPTR;    /* The coil descriptions */
+    m_compcoils             = Q_NULLPTR;    /* MEG compensation coils */
+    m_compData              = Q_NULLPTR;
+    m_eegels                = Q_NULLPTR;
+    m_eegModels             = Q_NULLPTR;
+    m_iNChan                = 0;
 
-    meg_forward      = Q_NULLPTR;    /* Result of the MEG forward calculation */
-    eeg_forward      = Q_NULLPTR;    /* Result of the EEG forward calculation */
-    meg_forward_grad = Q_NULLPTR;    /* Result of the MEG forward gradient calculation */
-    eeg_forward_grad = Q_NULLPTR;    /* Result of the EEG forward gradient calculation */
+    meg_forward             = Q_NULLPTR;    /* Result of the MEG forward calculation */
+    eeg_forward             = Q_NULLPTR;    /* Result of the EEG forward calculation */
+    meg_forward_grad        = Q_NULLPTR;    /* Result of the MEG forward gradient calculation */
+    eeg_forward_grad        = Q_NULLPTR;    /* Result of the EEG forward gradient calculation */
+
+    sol.clear();                       /* Result of the forward calculation */
+    sol_grad.clear();                   /* Result of the forward gradient calculation */
 
     int k;
-    m_mri_id           = Q_NULLPTR;
+    m_mri_id                = Q_NULLPTR;
     m_meas_id.clear();
 
-    FILE* out        = Q_NULLPTR;     /* Output filtered points here */
+    FILE* out               = Q_NULLPTR;     /* Output filtered points here */
 
-    m_eegModel        = Q_NULLPTR;
-    m_bemModel        = Q_NULLPTR;
+    m_eegModel              = Q_NULLPTR;
+    m_bemModel              = Q_NULLPTR;
 
     // Report the setup
 
     //    printf("\n");
     //    mne_print_version_info(stderr,argv[0],PROGRAM_VERSION,__DATE__,__TIME__);
     printf("\n");
-    printf("Source space                 : %s\n",m_settings->srcname.toUtf8().constData());
-    if (!(m_settings->transname.isEmpty()) || !(m_settings->mriname.isEmpty())) {
-        printf("MRI -> head transform source : %s\n",!(m_settings->mriname.isEmpty()) ? m_settings->mriname.toUtf8().constData() : m_settings->transname.toUtf8().constData());
+    printf("Source space                 : %s\n",m_pSettings->srcname.toUtf8().constData());
+    if (!(m_pSettings->transname.isEmpty()) || !(m_pSettings->mriname.isEmpty())) {
+        printf("MRI -> head transform source : %s\n",!(m_pSettings->mriname.isEmpty()) ? m_pSettings->mriname.toUtf8().constData() : m_pSettings->transname.toUtf8().constData());
     } else {
         printf("MRI and head coordinates are assumed to be identical.\n");
     }
-    printf("Measurement data             : %s\n",m_settings->measname.toUtf8().constData());
-    if (!m_settings->bemname.isEmpty()) {
-        printf("BEM model                    : %s\n",m_settings->bemname.toUtf8().constData());
+    printf("Measurement data             : %s\n",m_pSettings->measname.toUtf8().constData());
+    if (!m_pSettings->bemname.isEmpty()) {
+        printf("BEM model                    : %s\n",m_pSettings->bemname.toUtf8().constData());
     } else {
         printf("Sphere model                 : origin at (% 7.2f % 7.2f % 7.2f) mm\n",
-               1000.0f*m_settings->r0[X_41],1000.0f*m_settings->r0[Y_41],1000.0f*m_settings->r0[Z_41]);
-        if (m_settings->include_eeg) {
+               1000.0f*m_pSettings->r0[X_41],1000.0f*m_pSettings->r0[Y_41],1000.0f*m_pSettings->r0[Z_41]);
+        if (m_pSettings->include_eeg) {
             printf("\n");
 
-            if (m_settings->eeg_model_file.isEmpty()) {
+            if (m_pSettings->eeg_model_file.isEmpty()) {
                 qCritical("!!!!!!!!!!TODO: default_eeg_model_file();");
-                //                m_settings->eeg_model_file = default_eeg_model_file();
+                //                m_pSettings->eeg_model_file = default_eeg_model_file();
             }
-            m_eegModels = FwdEegSphereModelSet::fwd_load_eeg_sphere_models(m_settings->eeg_model_file,m_eegModels);
+            m_eegModels = FwdEegSphereModelSet::fwd_load_eeg_sphere_models(m_pSettings->eeg_model_file,m_eegModels);
             m_eegModels->fwd_list_eeg_sphere_models(stderr);
 
-            if (m_settings->eeg_model_name.isEmpty()) {
-                m_settings->eeg_model_name = QString("Default");
+            if (m_pSettings->eeg_model_name.isEmpty()) {
+                m_pSettings->eeg_model_name = QString("Default");
             }
-            if ((m_eegModel = m_eegModels->fwd_select_eeg_sphere_model(m_settings->eeg_model_name)) == Q_NULLPTR) {
+            if ((m_eegModel = m_eegModels->fwd_select_eeg_sphere_model(m_pSettings->eeg_model_name)) == Q_NULLPTR) {
                 return;
             }
 
-            if (!m_eegModel->fwd_setup_eeg_sphere_model(m_settings->eeg_sphere_rad,m_settings->use_equiv_eeg,3)) {
+            if (!m_eegModel->fwd_setup_eeg_sphere_model(m_pSettings->eeg_sphere_rad,m_pSettings->use_equiv_eeg,3)) {
                 return;
             }
 
             printf("Using EEG sphere model \"%s\" with scalp radius %7.1f mm\n",
-                   m_settings->eeg_model_name.toUtf8().constData(),1000*m_settings->eeg_sphere_rad);
-            printf("%s the electrode locations to scalp\n",m_settings->scale_eeg_pos ? "Scale" : "Do not scale");
+                   m_pSettings->eeg_model_name.toUtf8().constData(),1000*m_pSettings->eeg_sphere_rad);
+            printf("%s the electrode locations to scalp\n",m_pSettings->scale_eeg_pos ? "Scale" : "Do not scale");
 
-            m_eegModel->scale_pos = m_settings->scale_eeg_pos;
-            VEC_COPY_41(m_eegModel->r0,m_settings->r0);
+            m_eegModel->scale_pos = m_pSettings->scale_eeg_pos;
+            VEC_COPY_41(m_eegModel->r0,m_pSettings->r0);
 
             printf("\n");
         }
     }
-    printf("%s field computations\n",m_settings->accurate ? "Accurate" : "Standard");
-    printf("Do computations in %s coordinates.\n",FiffCoordTransOld::mne_coord_frame_name(m_settings->coord_frame));
-    printf("%s source orientations\n",m_settings->fixed_ori ? "Fixed" : "Free");
-    if (m_settings->compute_grad) {
+    printf("%s field computations\n",m_pSettings->accurate ? "Accurate" : "Standard");
+    printf("Do computations in %s coordinates.\n",FiffCoordTransOld::mne_coord_frame_name(m_pSettings->coord_frame));
+    printf("%s source orientations\n",m_pSettings->fixed_ori ? "Fixed" : "Free");
+    if (m_pSettings->compute_grad) {
         printf("Compute derivatives with respect to source location coordinates\n");
     }
-    printf("Destination for the solution : %s\n",m_settings->solname.toUtf8().constData());
-    if (m_settings->do_all) {
+    printf("Destination for the solution : %s\n",m_pSettings->solname.toUtf8().constData());
+    if (m_pSettings->do_all) {
         printf("Calculate solution for all source locations.\n");
     }
-    if (m_settings->nlabel > 0) {
-        printf("Source space will be restricted to sources in %d labels\n",m_settings->nlabel);
+    if (m_pSettings->nlabel > 0) {
+        printf("Source space will be restricted to sources in %d labels\n",m_pSettings->nlabel);
     }
 
     // Read the source locations
 
     printf("\n");
-    printf("Reading %s...\n",m_settings->srcname.toUtf8().constData());
-    if (MneSurfaceOrVolume::mne_read_source_spaces(m_settings->srcname,&m_spaces,&m_iNSpace) != OK) {
+    printf("Reading %s...\n",m_pSettings->srcname.toUtf8().constData());
+    if (MneSurfaceOrVolume::mne_read_source_spaces(m_pSettings->srcname,&m_spaces,&m_iNSpace) != OK) {
         return;
     }
-    for (k = 0, iNSource = 0; k < m_iNSpace; k++) {
-        if (m_settings->do_all) {
+    for (k = 0, m_iNSource = 0; k < m_iNSpace; k++) {
+        if (m_pSettings->do_all) {
             MneSurfaceOrVolume::enable_all_sources(m_spaces[k]);
         }
-        iNSource += m_spaces[k]->nuse;
+        m_iNSource += m_spaces[k]->nuse;
     }
-    if (iNSource == 0) {
+    if (m_iNSource == 0) {
         qCritical("No sources are active in these source spaces. --all option should be used.");
         return;
     }
-    printf("Read %d source spaces a total of %d active source locations\n", m_iNSpace,iNSource);
-    if (MneSurfaceOrVolume::restrict_sources_to_labels(m_spaces,m_iNSpace,m_settings->labels,m_settings->nlabel) == FAIL) {
+    printf("Read %d source spaces a total of %d active source locations\n", m_iNSpace,m_iNSource);
+    if (MneSurfaceOrVolume::restrict_sources_to_labels(m_spaces,m_iNSpace,m_pSettings->labels,m_pSettings->nlabel) == FAIL) {
         return;
     }
 
     // Read the MRI -> head coordinate transformation
     printf("\n");
-    if (!m_settings->mriname.isEmpty()) {
-        if ((m_mri_head_t = FiffCoordTransOld::mne_read_mri_transform(m_settings->mriname)) == Q_NULLPTR) {
+    if (!m_pSettings->mriname.isEmpty()) {
+        if ((m_mri_head_t = FiffCoordTransOld::mne_read_mri_transform(m_pSettings->mriname)) == Q_NULLPTR) {
             return;
         }
-        if ((m_mri_id = get_file_id(m_settings->mriname)) == Q_NULLPTR) {
+        if ((m_mri_id = get_file_id(m_pSettings->mriname)) == Q_NULLPTR) {
             qCritical("Couln't read MRI file id (How come?)");
             return;
         }
     }
-    else if (!m_settings->transname.isEmpty()) {
+    else if (!m_pSettings->transname.isEmpty()) {
         FiffCoordTransOld* t;
-        if ((t = FiffCoordTransOld::mne_read_FShead2mri_transform(m_settings->transname.toUtf8().data())) == Q_NULLPTR) {
+        if ((t = FiffCoordTransOld::mne_read_FShead2mri_transform(m_pSettings->transname.toUtf8().data())) == Q_NULLPTR) {
             return;
         }
         m_mri_head_t = t->fiff_invert_transform();
@@ -1960,9 +1966,9 @@ void ComputeFwd::initFwd()
     // Read the channel information and the MEG device -> head coordinate transformation
     // replace mne_read_meg_comp_eeg_ch_info_41()
 
-    if(!m_settings->pFiffInfo) {
+    if(!m_pSettings->pFiffInfo) {
 
-        QFile measname(m_settings->measname);
+        QFile measname(m_pSettings->measname);
         FIFFLIB::FiffDirNode::SPtr DirNode;
         FiffStream::SPtr pStream(new FiffStream(&measname));
         FIFFLIB::FiffInfo fiffInfo;
@@ -1976,15 +1982,15 @@ void ComputeFwd::initFwd()
             qCritical() << "Could not find the channel information.";
             return;
         }
-        pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FiffInfo(fiffInfo));
+        m_pInfoBase = QSharedPointer<FIFFLIB::FiffInfo>(new FiffInfo(fiffInfo));
     } else {
-        pFiffInfo = m_settings->pFiffInfo;
+        m_pInfoBase = m_pSettings->pFiffInfo;
     }
-    if(!pFiffInfo) {
+    if(!m_pInfoBase) {
         qCritical ("ComputeFwd::initFwd(): no FiffInfo");
         return;
     }
-    if (readChannels(pFiffInfo,
+    if (readChannels(m_pInfoBase,
                      m_listMegChs,
                      iNMeg,
                      compchs,
@@ -1995,18 +2001,19 @@ void ComputeFwd::initFwd()
                      m_meas_id) != OK) {
         return;
     }
+    m_iNChan = iNMeg + iNEeg;
 
     printf("\n");
     if (iNMeg > 0) {
-        printf("Read %3d MEG channels from %s\n",iNMeg,m_settings->measname.toUtf8().constData());
+        printf("Read %3d MEG channels from %s\n",iNMeg,m_pSettings->measname.toUtf8().constData());
     }
     if (iNComp > 0) {
-        printf("Read %3d MEG compensation channels from %s\n",iNComp,m_settings->measname.toUtf8().constData());
+        printf("Read %3d MEG compensation channels from %s\n",iNComp,m_pSettings->measname.toUtf8().constData());
     }
     if (iNEeg > 0) {
-        printf("Read %3d EEG channels from %s\n",iNEeg,m_settings->measname.toUtf8().constData());
+        printf("Read %3d EEG channels from %s\n",iNEeg,m_pSettings->measname.toUtf8().constData());
     }
-    if (!m_settings->include_meg) {
+    if (!m_pSettings->include_meg) {
         printf("MEG not requested. MEG channels omitted.\n");
         m_listMegChs.clear();
         compchs.clear();
@@ -2015,7 +2022,7 @@ void ComputeFwd::initFwd()
     }
     else
         FiffCoordTransOld::mne_print_coord_transform(stderr,m_meg_head_t);
-    if (!m_settings->include_eeg) {
+    if (!m_pSettings->include_eeg) {
         printf("EEG not requested. EEG channels omitted.\n");
         m_listEegChs.clear();
         iNEeg = 0;
@@ -2027,7 +2034,7 @@ void ComputeFwd::initFwd()
 
     // Create coil descriptions with transformation to head or MRI frame
 
-    if (m_settings->include_meg) {
+    if (m_pSettings->include_meg) {
         //#ifdef USE_SHARE_PATH
         //        char *coilfile = mne_compose_mne_name("share/mne","coil_def.dat");
         //#else
@@ -2058,12 +2065,12 @@ void ComputeFwd::initFwd()
 
         // Compensation data
 
-        if ((m_compData = MneCTFCompDataSet::mne_read_ctf_comp_data(m_settings->measname)) == Q_NULLPTR) {
+        if ((m_compData = MneCTFCompDataSet::mne_read_ctf_comp_data(m_pSettings->measname)) == Q_NULLPTR) {
             return;
         }
         // Compensation channel information may be needed
         if (m_compData->ncomp > 0) {
-            printf("%d compensation data sets in %s\n",m_compData->ncomp,m_settings->measname.toUtf8().constData());
+            printf("%d compensation data sets in %s\n",m_compData->ncomp,m_pSettings->measname.toUtf8().constData());
         } else {
             compchs.clear();
             iNComp = 0;
@@ -2074,7 +2081,7 @@ void ComputeFwd::initFwd()
             m_compData = Q_NULLPTR;
         }
     }
-    if (m_settings->coord_frame == FIFFV_COORD_MRI) {
+    if (m_pSettings->coord_frame == FIFFV_COORD_MRI) {
         FiffCoordTransOld* head_mri_t = m_mri_head_t->fiff_invert_transform();
         FiffCoordTransOld* meg_mri_t = FiffCoordTransOld::fiff_combine_transforms(FIFFV_COORD_DEVICE,FIFFV_COORD_MRI,m_meg_head_t,head_mri_t);
         if (meg_mri_t == Q_NULLPTR) {
@@ -2082,7 +2089,7 @@ void ComputeFwd::initFwd()
         }
         if ((m_megcoils = templates->create_meg_coils(m_listMegChs,
                                                     iNMeg,
-                                                    m_settings->accurate ? FWD_COIL_ACCURACY_ACCURATE : FWD_COIL_ACCURACY_NORMAL,
+                                                    m_pSettings->accurate ? FWD_COIL_ACCURACY_ACCURATE : FWD_COIL_ACCURACY_NORMAL,
                                                     meg_mri_t)) == Q_NULLPTR) {
             return;
         }
@@ -2105,7 +2112,7 @@ void ComputeFwd::initFwd()
     } else {
         if ((m_megcoils = templates->create_meg_coils(m_listMegChs,
                                                     iNMeg,
-                                                    m_settings->accurate ? FWD_COIL_ACCURACY_ACCURATE : FWD_COIL_ACCURACY_NORMAL,
+                                                    m_pSettings->accurate ? FWD_COIL_ACCURACY_ACCURATE : FWD_COIL_ACCURACY_NORMAL,
                                                     m_meg_head_t)) == Q_NULLPTR) {
             return;
         }
@@ -2127,27 +2134,27 @@ void ComputeFwd::initFwd()
 
     // Transform the source spaces into the appropriate coordinates
 
-    if (MneSurfaceOrVolume::mne_transform_source_spaces_to(m_settings->coord_frame,m_mri_head_t,m_spaces,m_iNSpace) != OK) {
+    if (MneSurfaceOrVolume::mne_transform_source_spaces_to(m_pSettings->coord_frame,m_mri_head_t,m_spaces,m_iNSpace) != OK) {
         return;
     }
-    printf("Source spaces are now in %s coordinates.\n",FiffCoordTransOld::mne_coord_frame_name(m_settings->coord_frame));
+    printf("Source spaces are now in %s coordinates.\n",FiffCoordTransOld::mne_coord_frame_name(m_pSettings->coord_frame));
 
     // Prepare the BEM model if necessary
 
-    if (!m_settings->bemname.isEmpty()) {
-        QString bemsolname = FwdBemModel::fwd_bem_make_bem_sol_name(m_settings->bemname);
+    if (!m_pSettings->bemname.isEmpty()) {
+        QString bemsolname = FwdBemModel::fwd_bem_make_bem_sol_name(m_pSettings->bemname);
         //        FREE(bemname);
-        m_settings->bemname = bemsolname;
+        m_pSettings->bemname = bemsolname;
 
-        printf("\nSetting up the BEM model using %s...\n",m_settings->bemname.toUtf8().constData());
+        printf("\nSetting up the BEM model using %s...\n",m_pSettings->bemname.toUtf8().constData());
         printf("\nLoading surfaces...\n");
-        m_bemModel = FwdBemModel::fwd_bem_load_three_layer_surfaces(m_settings->bemname);
+        m_bemModel = FwdBemModel::fwd_bem_load_three_layer_surfaces(m_pSettings->bemname);
 
         if (m_bemModel) {
             printf("Three-layer model surfaces loaded.\n");
         }
         else {
-            m_bemModel = FwdBemModel::fwd_bem_load_homog_surface(m_settings->bemname);
+            m_bemModel = FwdBemModel::fwd_bem_load_homog_surface(m_pSettings->bemname);
             if (!m_bemModel) {
                 return;
             }
@@ -2158,10 +2165,10 @@ void ComputeFwd::initFwd()
             return;
         }
         printf("\nLoading the solution matrix...\n");
-        if (FwdBemModel::fwd_bem_load_recompute_solution(m_settings->bemname.toUtf8().data(),FWD_BEM_UNKNOWN,FALSE,m_bemModel) == FAIL) {
+        if (FwdBemModel::fwd_bem_load_recompute_solution(m_pSettings->bemname.toUtf8().data(),FWD_BEM_UNKNOWN,FALSE,m_bemModel) == FAIL) {
             return;
         }
-        if (m_settings->coord_frame == FIFFV_COORD_HEAD) {
+        if (m_pSettings->coord_frame == FIFFV_COORD_HEAD) {
             printf("Employing the head->MRI coordinate transform with the BEM model.\n");
             if (FwdBemModel::fwd_bem_set_head_mri_t(m_bemModel,m_mri_head_t) == FAIL) {
                 return;
@@ -2175,20 +2182,20 @@ void ComputeFwd::initFwd()
 
     // Try to circumvent numerical problems by excluding points too close our ouside the inner skull surface
 
-    if (m_settings->filter_spaces) {
-        if (!m_settings->mindistoutname.isEmpty()) {
-            out = fopen(m_settings->mindistoutname.toUtf8().constData(),"w");
+    if (m_pSettings->filter_spaces) {
+        if (!m_pSettings->mindistoutname.isEmpty()) {
+            out = fopen(m_pSettings->mindistoutname.toUtf8().constData(),"w");
             if (out == Q_NULLPTR) {
-                qCritical() << m_settings->mindistoutname;
+                qCritical() << m_pSettings->mindistoutname;
                 return;
             }
-            printf("Omitted source space points will be output to : %s\n",m_settings->mindistoutname.toUtf8().constData());
+            printf("Omitted source space points will be output to : %s\n",m_pSettings->mindistoutname.toUtf8().constData());
         }
-        if (MneSurfaceOrVolume::filter_source_spaces(m_settings->mindist,
-                                                     m_settings->bemname.toUtf8().data(),
+        if (MneSurfaceOrVolume::filter_source_spaces(m_pSettings->mindist,
+                                                     m_pSettings->bemname.toUtf8().data(),
                                                      m_mri_head_t,
                                                      m_spaces,
-                                                     m_iNSpace,out,m_settings->use_threads) == FAIL) {
+                                                     m_iNSpace,out,m_pSettings->use_threads) == FAIL) {
             return;
         }
     }
@@ -2208,7 +2215,7 @@ void ComputeFwd::calculateFwd()
         iNEeg = m_eegels->ncoil;
     }
     if (!m_bemModel) {
-        m_settings->use_threads = false;
+        m_pSettings->use_threads = false;
     }
 
     // Do the actual computation
@@ -2218,12 +2225,12 @@ void ComputeFwd::calculateFwd()
                                               m_megcoils,
                                               m_compcoils,
                                               m_compData,
-                                              m_settings->fixed_ori,
+                                              m_pSettings->fixed_ori,
                                               m_bemModel,
-                                              &m_settings->r0,
-                                              m_settings->use_threads,
+                                              &m_pSettings->r0,
+                                              m_pSettings->use_threads,
                                               &meg_forward,
-                                              m_settings->compute_grad ? &meg_forward_grad : Q_NULLPTR)) == FAIL) {
+                                              m_pSettings->compute_grad ? &meg_forward_grad : Q_NULLPTR)) == FAIL) {
             return;
         }
     }
@@ -2232,12 +2239,12 @@ void ComputeFwd::calculateFwd()
         if ((FwdBemModel::compute_forward_eeg(m_spaces,
                                               m_iNSpace,
                                               m_eegels,
-                                              m_settings->fixed_ori,
+                                              m_pSettings->fixed_ori,
                                               m_bemModel,
                                               m_eegModel,
-                                              m_settings->use_threads,
+                                              m_pSettings->use_threads,
                                               &eeg_forward,
-                                              m_settings->compute_grad ? &eeg_forward_grad : Q_NULLPTR)) == FAIL) {
+                                              m_pSettings->compute_grad ? &eeg_forward_grad : Q_NULLPTR)) == FAIL) {
             return;
         }
     }
@@ -2266,7 +2273,6 @@ void ComputeFwd::updateHeadPos(FiffCoordTransOld* transDevHeadOld)
         Quaternionf quatNew;
         quatNew = quat*quatDest.inverse();
         matRotNew = quatNew.toRotationMatrix();
-        std::cout << matRotNew << std::endl;
 
         // calculate translation
         VectorXf vecTrans = m_meg_head_t->move;
@@ -2288,12 +2294,12 @@ void ComputeFwd::updateHeadPos(FiffCoordTransOld* transDevHeadOld)
                                           megcoilsNew,
                                           m_compcoils,
                                           m_compData,
-                                          m_settings->fixed_ori,
+                                          m_pSettings->fixed_ori,
                                           m_bemModel,
-                                          &m_settings->r0,
-                                          m_settings->use_threads,
+                                          &m_pSettings->r0,
+                                          m_pSettings->use_threads,
                                           &meg_forward,
-                                          m_settings->compute_grad ? &meg_forward_grad : Q_NULLPTR)) == FAIL) {
+                                          m_pSettings->compute_grad ? &meg_forward_grad : Q_NULLPTR)) == FAIL) {
         return;
     }
 
@@ -2328,6 +2334,8 @@ void ComputeFwd::updateHeadPos(FiffCoordTransOld* transDevHeadOld)
 //    }
     // Update new Transformation Matrix
     *m_meg_head_t = *transDevHeadOld;
+    // convert MneNamed matrix to Fiff named
+    toFiffNamed();
 }
 
 //=========================================================================================================
@@ -2345,20 +2353,20 @@ void ComputeFwd::storeFwd()
     int iNMeg = m_megcoils->ncoil;
     int iNEeg = m_eegels->ncoil;
 
-    printf("\nwriting %s...",m_settings->solname.toUtf8().constData());
-    if (!write_solution(m_settings->solname,               /* Destination file */
-                        m_spaces,                          /* The source spaces */
+    printf("\nwriting %s...",m_pSettings->solname.toUtf8().constData());
+    if (!write_solution(m_pSettings->solname,                   /* Destination file */
+                        m_spaces,                               /* The source spaces */
                         m_iNSpace,
-                        m_settings->mriname,m_mri_id,        /* MRI file and data obtained from there */
+                        m_pSettings->mriname,m_mri_id,          /* MRI file and data obtained from there */
                         m_mri_head_t,
-                        m_settings->measname,m_meas_id,      /* MEG file and data obtained from there */
+                        m_pSettings->measname,m_meas_id,        /* MEG file and data obtained from there */
                         m_meg_head_t,
                         m_listMegChs,
                         iNMeg,
                         m_listEegChs,
                         iNEeg,
-                        m_settings->fixed_ori,             /* Fixed orientation dipoles? */
-                        m_settings->coord_frame,           /* Coordinate frame */
+                        m_pSettings->fixed_ori,                 /* Fixed orientation dipoles? */
+                        m_pSettings->coord_frame,               /* Coordinate frame */
                         meg_forward,
                         eeg_forward,
                         meg_forward_grad,
@@ -2366,7 +2374,7 @@ void ComputeFwd::storeFwd()
         return;
     }
 
-    if (!mne_attach_env(m_settings->solname,m_settings->command)) {
+    if (!mne_attach_env(m_pSettings->solname,m_pSettings->command)) {
         return;
     }
     printf("done\n");
@@ -2375,7 +2383,129 @@ void ComputeFwd::storeFwd()
 
 //=========================================================================================================
 
-int ComputeFwd::readChannels(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
+void ComputeFwd::toFiffNamed()
+{
+    // ToDo: the following could be much easier if computeFwd woulnd't use that much old stuff
+    int iNMeg, iNEeg, iNMegGrad, iNEegGrad;
+    iNMeg = iNEeg = iNMegGrad = iNEegGrad = 0;
+    MatrixXd matMeg;
+    MatrixXd matEeg;
+    MatrixXd matMegGrad;
+    MatrixXd matEegGrad;
+    if(meg_forward) {
+        iNMeg = meg_forward->ncol;
+        matMeg.conservativeResize(meg_forward->nrow,iNMeg);
+        for(int i = 0; i < meg_forward->nrow; ++i) {
+            for(int j = 0; j < iNMeg; ++j) {
+                matMeg(i,j) = meg_forward->data[i][j];
+            }
+        }    }
+    if(eeg_forward) {
+        iNEeg = eeg_forward->ncol;
+        matEeg.conservativeResize(eeg_forward->nrow,iNEeg);
+        for(int i = 0; i < eeg_forward->nrow; ++i) {
+            for(int j = 0; j < iNEeg; ++j) {
+                matEeg(i,j) = eeg_forward->data[i][j];
+            }
+        }    }
+    if(meg_forward_grad) {
+        iNMegGrad = meg_forward_grad->ncol;
+        matMegGrad.conservativeResize(meg_forward_grad->nrow,iNMegGrad);
+        for(int i = 0; i < meg_forward_grad->nrow; ++i) {
+            for(int j = 0; j < iNMegGrad; ++j) {
+                matMegGrad(i,j) = meg_forward_grad->data[i][j];
+            }
+        }
+    }
+    if(eeg_forward_grad) {
+        iNEegGrad = eeg_forward_grad->ncol;
+        matEegGrad.conservativeResize(eeg_forward_grad->nrow,iNEegGrad);
+        for(int i = 0; i < eeg_forward_grad->nrow; ++i) {
+            for(int j = 0; j < iNEegGrad; ++j) {
+                matEegGrad(i,j) = eeg_forward_grad->data[i][j];
+            }
+        }
+    }
+
+    // convert MneNamed to FiffNamed
+    if(iNMeg > 0 && iNEeg > 0) {
+        sol.clear();
+        if(matMeg.rows() != matEeg.rows()) {
+            qWarning() << "Forward Solutions do not match!";
+        }
+        sol.data.block(0,0,meg_forward->nrow,iNMeg) = matMeg;
+        sol.data.block(0,iNMeg,meg_forward->nrow,iNEeg) = matEeg;
+        sol.ncol = iNMeg + iNEeg;
+        sol.nrow = meg_forward->nrow;
+        sol.col_names = meg_forward->collist;
+        sol.col_names.append(eeg_forward->collist);
+        sol.row_names = meg_forward->rowlist;
+        sol.transpose_named_matrix();
+        fwdSolution->sol = &sol;
+    } else if(iNMeg > 0 && iNEeg == 0) {
+        sol.clear();
+        sol.data = matMeg;
+        sol.ncol = iNMeg;
+        sol.nrow = meg_forward->nrow;
+        sol.col_names = meg_forward->collist;
+        sol.row_names = meg_forward->rowlist;
+        sol.transpose_named_matrix();
+        fwdSolution->sol = &sol;
+    } else if(iNMeg == 0 && iNEeg > 0) {
+        sol.clear();
+        sol.data = matEeg;
+        sol.ncol = iNEeg;
+        sol.nrow = eeg_forward->nrow;
+        sol.col_names = eeg_forward->collist;
+        sol.row_names = eeg_forward->rowlist;
+        sol.transpose_named_matrix();
+        fwdSolution->sol = &sol;
+    } else {
+        qWarning() << "ComputeFwd::getSolution(): no Forward Solution available";
+    }
+
+    if(m_pSettings->compute_grad) {
+        if(iNMegGrad > 0 && iNEegGrad > 0) {
+            sol.clear();
+            if(matMegGrad.rows() != matEegGrad.rows()) {
+                qWarning() << "Forward Solutions does not match!";
+            }
+            sol_grad.data.block(0,0,meg_forward_grad->nrow,iNMeg) = matMegGrad;
+            sol_grad.data.block(0,iNMegGrad,meg_forward_grad->nrow,iNEegGrad) = matEegGrad;
+            sol_grad.ncol = iNMegGrad + iNEegGrad;
+            sol_grad.nrow = meg_forward_grad->nrow;
+            sol_grad.col_names = meg_forward_grad->collist;
+            sol_grad.col_names.append(eeg_forward_grad->collist);
+            sol_grad.row_names = meg_forward_grad->rowlist;
+            sol_grad.transpose_named_matrix();
+            fwdSolution->sol_grad = &sol_grad;
+        } else if(iNMegGrad > 0 && iNEegGrad == 0) {
+            sol_grad.clear();
+            sol_grad.data = matMegGrad;
+            sol_grad.ncol = iNMegGrad;
+            sol_grad.nrow = meg_forward_grad->nrow;
+            sol_grad.col_names = meg_forward_grad->collist;
+            sol_grad.row_names = meg_forward_grad->rowlist;
+            sol_grad.transpose_named_matrix();
+            fwdSolution->sol_grad = &sol_grad;
+        } else if(iNMegGrad == 0 && iNEegGrad > 0) {
+            sol_grad.clear();
+            sol_grad.data = matEegGrad;
+            sol_grad.ncol = iNEegGrad;
+            sol_grad.nrow = eeg_forward_grad->nrow;
+            sol_grad.col_names = eeg_forward_grad->collist;
+            sol_grad.row_names = eeg_forward_grad->rowlist;
+            sol_grad.transpose_named_matrix();
+            fwdSolution->sol_grad = &sol_grad;
+        } else {
+            qWarning() << "ComputeFwd::getSolution(): no Forward Solution Grad available";
+        }
+    }
+}
+
+//=========================================================================================================
+
+int ComputeFwd::readChannels(QSharedPointer<FIFFLIB::FiffInfoBase> pFiffInfoBase,
                              QList<FiffChInfo>& listMegCh,	 /* MEG channels */
                              int& iNMeg,
                              QList<FiffChInfo>& listMegComp,
@@ -2385,29 +2515,29 @@ int ComputeFwd::readChannels(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
                              FiffCoordTransOld** transDevHeadOld,
                              FiffId& id)	 /* The measurement ID */
 {
-    int iNumCh = pFiffInfo->nchan;
+    int iNumCh = pFiffInfoBase->nchan;
     for (int k = 0; k < iNumCh; k++) {
-        if (pFiffInfo->chs[k].kind == FIFFV_MEG_CH) {
-            listMegCh.append(pFiffInfo->chs[k]);
+        if (pFiffInfoBase->chs[k].kind == FIFFV_MEG_CH) {
+            listMegCh.append(pFiffInfoBase->chs[k]);
             iNMeg++;
-        } else if (pFiffInfo->chs[k].kind == FIFFV_REF_MEG_CH) {
-            listMegComp.append(pFiffInfo->chs[k]);
+        } else if (pFiffInfoBase->chs[k].kind == FIFFV_REF_MEG_CH) {
+            listMegComp.append(pFiffInfoBase->chs[k]);
             iNMegCmp++;
-        } else if (pFiffInfo->chs[k].kind == FIFFV_EEG_CH) {
-            listEegCh.append(pFiffInfo->chs[k]);
+        } else if (pFiffInfoBase->chs[k].kind == FIFFV_EEG_CH) {
+            listEegCh.append(pFiffInfoBase->chs[k]);
             iNEeg++;
         }
     }
 
-    if(!m_settings->meg_head_t) {
-        *transDevHeadOld = new FiffCoordTransOld(pFiffInfo->dev_head_t.toOld());
+    if(!m_pSettings->meg_head_t) {
+        *transDevHeadOld = new FiffCoordTransOld(pFiffInfoBase->dev_head_t.toOld());
     } else {
-        *transDevHeadOld = m_settings->meg_head_t;
+        *transDevHeadOld = m_pSettings->meg_head_t;
     }
     if(!m_meg_head_t) {
         qCritical("MEG -> head coordinate transformation not found.");
         return FIFF_FAIL;
     }
-    id = pFiffInfo->file_id;
+    id = pFiffInfoBase->meas_id;
     return OK;
 }
