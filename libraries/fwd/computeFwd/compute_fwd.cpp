@@ -1778,8 +1778,7 @@ bool mne_attach_env(const QString& name, const QString& command)
 //=============================================================================================================
 
 ComputeFwd::ComputeFwd(ComputeFwdSettings* pSettings)
-    : fwdSolution(MNEForwardSolution::SPtr(new MNEForwardSolution))
-    , m_pSettings(pSettings)
+    : m_pSettings(pSettings)
 {
     initFwd();
 }
@@ -2218,6 +2217,13 @@ void ComputeFwd::calculateFwd()
         m_pSettings->use_threads = false;
     }
 
+    // check if source spaces are still in head space
+    if(m_spaces[0]->coord_frame != FIFFV_COORD_HEAD) {
+        if (MneSurfaceOrVolume::mne_transform_source_spaces_to(m_pSettings->coord_frame,m_mri_head_t,m_spaces,m_iNSpace) != OK) {
+            return;
+        }
+    }
+
     // Do the actual computation
     if (iNMeg > 0) {
         if ((FwdBemModel::compute_forward_meg(m_spaces,
@@ -2287,7 +2293,15 @@ void ComputeFwd::updateHeadPos(FiffCoordTransOld* transDevHeadOld)
         transHeadHeadOld->add_inverse(transHeadHeadOld);
     }
 
+    // rotate coil set
     FwdCoilSet* megcoilsNew = m_megcoils->dup_coil_set(transHeadHeadOld);
+
+    // check if source spaces are still in head space
+    if(m_spaces[0]->coord_frame != FIFFV_COORD_HEAD) {
+        if (MneSurfaceOrVolume::mne_transform_source_spaces_to(m_pSettings->coord_frame,m_mri_head_t,m_spaces,m_iNSpace) != OK) {
+            return;
+        }
+    }
 
     if ((FwdBemModel::compute_forward_meg(m_spaces,
                                           m_iNSpace,
@@ -2441,7 +2455,7 @@ void ComputeFwd::toFiffNamed()
         sol.col_names.append(eeg_forward->collist);
         sol.row_names = meg_forward->rowlist;
         sol.transpose_named_matrix();
-        fwdSolution->sol = &sol;
+        //fwdSolution->sol = &sol;
     } else if(iNMeg > 0 && iNEeg == 0) {
         sol.clear();
         sol.data = matMeg;
@@ -2450,7 +2464,7 @@ void ComputeFwd::toFiffNamed()
         sol.col_names = meg_forward->collist;
         sol.row_names = meg_forward->rowlist;
         sol.transpose_named_matrix();
-        fwdSolution->sol = &sol;
+        //fwdSolution->sol = &sol;
     } else if(iNMeg == 0 && iNEeg > 0) {
         sol.clear();
         sol.data = matEeg;
@@ -2459,7 +2473,7 @@ void ComputeFwd::toFiffNamed()
         sol.col_names = eeg_forward->collist;
         sol.row_names = eeg_forward->rowlist;
         sol.transpose_named_matrix();
-        fwdSolution->sol = &sol;
+        //fwdSolution->sol = &sol;
     } else {
         qWarning() << "ComputeFwd::getSolution(): no Forward Solution available";
     }
@@ -2478,7 +2492,7 @@ void ComputeFwd::toFiffNamed()
             sol_grad.col_names.append(eeg_forward_grad->collist);
             sol_grad.row_names = meg_forward_grad->rowlist;
             sol_grad.transpose_named_matrix();
-            fwdSolution->sol_grad = &sol_grad;
+            //fwdSolution->sol_grad = &sol_grad;
         } else if(iNMegGrad > 0 && iNEegGrad == 0) {
             sol_grad.clear();
             sol_grad.data = matMegGrad;
@@ -2487,7 +2501,7 @@ void ComputeFwd::toFiffNamed()
             sol_grad.col_names = meg_forward_grad->collist;
             sol_grad.row_names = meg_forward_grad->rowlist;
             sol_grad.transpose_named_matrix();
-            fwdSolution->sol_grad = &sol_grad;
+            //fwdSolution->sol_grad = &sol_grad;
         } else if(iNMegGrad == 0 && iNEegGrad > 0) {
             sol_grad.clear();
             sol_grad.data = matEegGrad;
@@ -2496,7 +2510,7 @@ void ComputeFwd::toFiffNamed()
             sol_grad.col_names = eeg_forward_grad->collist;
             sol_grad.row_names = eeg_forward_grad->rowlist;
             sol_grad.transpose_named_matrix();
-            fwdSolution->sol_grad = &sol_grad;
+            //fwdSolution->sol_grad = &sol_grad;
         } else {
             qWarning() << "ComputeFwd::getSolution(): no Forward Solution Grad available";
         }
