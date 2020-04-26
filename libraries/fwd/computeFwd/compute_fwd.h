@@ -137,8 +137,8 @@ public:
     // ToDo: make MNEForwardSolution the main output for the solution
     // QSharedPointer<MNELIB::MNEForwardSolution> fwdSolution;  /**< MNE Forward solution that contains all results */
 
-    FIFFLIB::FiffNamedMatrix sol;              /**< Forward solution (will be part of fwdSolution once rafactored) */
-    FIFFLIB::FiffNamedMatrix sol_grad;          /**< Forward solution (Grad) (will be part of fwdSolution once rafactored) */
+    FIFFLIB::FiffNamedMatrix sol;           /**< Forward solution (will be part of fwdSolution once rafactored) */
+    FIFFLIB::FiffNamedMatrix sol_grad;      /**< Forward solution (Grad) (will be part of fwdSolution once rafactored) */
 
     QString qPath;
     QFile file;
@@ -179,12 +179,12 @@ private:
 
     QSharedPointer<FIFFLIB::FiffInfoBase> m_pInfoBase;
 
-    ComputeFwdSettings* m_pSettings;                 /* The settings for the forward calculation */
+    ComputeFwdSettings* m_pSettings;                /**< The settings for the forward calculation */
 
     //=========================================================================================================
     /**
      * Read channelinformation and split into lists for meg/eeg/comp + read m_meg_head_t
-     * @param [in] pFiffInfo            The FiffInfo to read from
+     * @param [in]  pFiffInfo            The FiffInfo to read from
      * @param [out] listMegCh           The MEG channel list
      * @param [out] iNMeg               The number of MEG channels
      * @param [out] listMegComp         The compensator channel list
@@ -196,18 +196,18 @@ private:
      *
      */
     int readChannels(QSharedPointer<FIFFLIB::FiffInfoBase> pFiffInfoBase,
-                     QList<FIFFLIB::FiffChInfo>& listMegCh,	 /* MEG channels */
+                     QList<FIFFLIB::FiffChInfo>& listMegCh,
                      int& iNMeg,
                      QList<FIFFLIB::FiffChInfo>& listMegComp,
                      int& iNMegCmp,
-                     QList<FIFFLIB::FiffChInfo>& listEegCh,	 /* EEG channels */
+                     QList<FIFFLIB::FiffChInfo>& listEegCh,
                      int& iNEeg,
                      FIFFLIB::FiffCoordTransOld** transDevHeadOld,
-                     FIFFLIB::FiffId& id);	         /* The measurement ID */
+                     FIFFLIB::FiffId& id);
 
     //=========================================================================================================
     /**
-     * concert MneNamedMatrix to FiffNamedMatrix
+     * concvert MneNamedMatrix to FiffNamedMatrix
      * ToDo: delete this function once everything is refactored and results are automaticly stored in fwdSolution
      */
     void toFiffNamed();

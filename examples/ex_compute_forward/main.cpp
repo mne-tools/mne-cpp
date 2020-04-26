@@ -90,8 +90,8 @@ int main(int argc, char *argv[])
     qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
     QCoreApplication a(argc, argv);
 
-    QElapsedTimer timer1, timer2, timer3, timer4;
-    float fTime1, fTime2, fTime3, fTime4;
+    QElapsedTimer timer0, timer1, timer2, timer3, timer4;
+    float fTime0, fTime1, fTime2, fTime3, fTime4;
 
     // Command Line Parser
     QCommandLineParser parser;
@@ -136,7 +136,9 @@ int main(int argc, char *argv[])
 
     settings.checkIntegrity();
 
+    timer0.start();
     QSharedPointer<FWDLIB::ComputeFwd> pFwdMEGEEG = QSharedPointer<FWDLIB::ComputeFwd>(new FWDLIB::ComputeFwd(&settings));
+    fTime0 = timer0.elapsed();
 
     // perform the actual computation
     timer1.start();
@@ -157,6 +159,8 @@ int main(int argc, char *argv[])
     MNEForwardSolution fwdSolution = MNEForwardSolution(t_solution);
     fTime3 = timer3.elapsed();
 
+    fwdSolution.src[0];
+
     // update head position to forward solution and only recompute necessary part
     timer4.start();
     pFwdMEGEEG->updateHeadPos(&meg_head_t);
@@ -167,6 +171,7 @@ int main(int argc, char *argv[])
     fwdSolution.sol_grad = &pFwdMEGEEG->sol_grad;
 
     // Print timer results
+    qInfo() << "The initialization took: " << fTime0  << " ms.";
     qInfo() << "The computation took: " << fTime1  << " ms.";
     qInfo() << "Storing the fwd solution took: " << fTime2 << " ms.";
     qInfo() << "Reading the fwd solution took: " << fTime3 << " ms.";
