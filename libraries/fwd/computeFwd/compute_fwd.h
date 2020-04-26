@@ -49,9 +49,11 @@
 #include <mne/c/mne_ctf_comp_data_set.h>
 #include "../fwd_eeg_sphere_model_set.h"
 #include "../fwd_bem_model.h"
+
 #include <mne/c/mne_named_matrix.h>
 #include <mne/c/mne_nearest.h>
 #include <mne/c/mne_source_space_old.h>
+#include <mne/mne_forwardsolution.h>
 
 #include <fiff/c/fiff_sparse_matrix.h>
 
@@ -75,19 +77,18 @@
 #include <QDir>
 
 //=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+namespace MNELIB {
+    class MNEForwardSolution;
+}
+
+//=============================================================================================================
 // DEFINE NAMESPACE FWDLIB
 //=============================================================================================================
 
 namespace FWDLIB
 {
-
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-//=============================================================================================================
-// Declare all structures to be used
-//=============================================================================================================
 
 //=============================================================================================================
 /**
@@ -133,6 +134,12 @@ public:
      */
     void storeFwd();
 
+    // ToDo: make MNEForwardSolution the main output for the solution
+    // QSharedPointer<MNELIB::MNEForwardSolution> fwdSolution;  /**< MNE Forward solution that contains all results */
+
+    FIFFLIB::FiffNamedMatrix sol;              /**< Forward solution (will be part of fwdSolution once rafactored) */
+    FIFFLIB::FiffNamedMatrix sol_grad;          /**< Forward solution (Grad) (will be part of fwdSolution once rafactored) */
+
     QString qPath;
     QFile file;
 
@@ -143,31 +150,36 @@ private:
      */
     void initFwd();
 
-    MNELIB::MneSourceSpaceOld **m_spaces;           /* Source spaces */
-    int m_iNSpace;                                  /* How many spaces */
-    FwdCoilSet *m_megcoils;                         /* The MEG coil set */
-    FwdCoilSet *m_compcoils;                        /* The compensator coil set */
-    FwdCoilSet* m_eegels;                           /* The eeg eceltrode set */
-    MNELIB::MneCTFCompDataSet *m_compData;          /* The compensator data */
-    FwdEegSphereModelSet* m_eegModels;              /* The EEG model set */
-    FwdEegSphereModel* m_eegModel;                  /* The EEG model */
-    FwdBemModel *m_bemModel;                        /* BEM model definition */
-    Eigen::Vector3f *m_r0;                          /* Sphere model origin */
+    MNELIB::MneSourceSpaceOld **m_spaces;           /**< Source spaces */
+    int m_iNSpace;                                  /**< How many spaces */
+    int m_iNSource;                                 /**< Number of source space points */
+    FwdCoilSet *m_megcoils;                         /**< The MEG coil set */
+    FwdCoilSet *m_compcoils;                        /**< The compensator coil set */
+    FwdCoilSet* m_eegels;                           /**< The eeg eceltrode set */
+    MNELIB::MneCTFCompDataSet *m_compData;          /**< The compensator data */
+    FwdEegSphereModelSet* m_eegModels;              /**< The EEG model set */
+    FwdEegSphereModel* m_eegModel;                  /**< The EEG model */
+    FwdBemModel *m_bemModel;                        /**< BEM model definition */
+    Eigen::Vector3f *m_r0;                          /**< Sphere model origin */
 
-    MNELIB::MneNamedMatrix *meg_forward;            /* The meg forward  */
+    // ToDo: replace with FiffMneNamedMatrix
+    MNELIB::MneNamedMatrix *meg_forward;            /**< The meg forward  */
     MNELIB::MneNamedMatrix *meg_forward_grad;
     MNELIB::MneNamedMatrix *eeg_forward;
     MNELIB::MneNamedMatrix *eeg_forward_grad;
 
-    QList<FIFFLIB::FiffChInfo> m_listMegChs;        /* The MEG channel information */
-    QList<FIFFLIB::FiffChInfo> m_listEegChs;        /* The EEG channel information */
+    QList<FIFFLIB::FiffChInfo> m_listMegChs;        /**< The MEG channel information */
+    QList<FIFFLIB::FiffChInfo> m_listEegChs;        /**< The EEG channel information */
+    int m_iNChan;
 
     FIFFLIB::fiffId m_mri_id;
     FIFFLIB::FiffId m_meas_id;
-    FIFFLIB::FiffCoordTransOld* m_mri_head_t;       /* MRI <-> head coordinate transformation */
-    FIFFLIB::FiffCoordTransOld* m_meg_head_t;       /* MEG <-> head coordinate transformation */
+    FIFFLIB::FiffCoordTransOld* m_mri_head_t;       /**< MRI <-> head coordinate transformation */
+    FIFFLIB::FiffCoordTransOld* m_meg_head_t;       /**< MEG <-> head coordinate transformation */
 
-    ComputeFwdSettings* m_settings;                 /* The m_settings for the forward calculation */
+    QSharedPointer<FIFFLIB::FiffInfoBase> m_pInfoBase;
+
+    ComputeFwdSettings* m_pSettings;                 /* The settings for the forward calculation */
 
     //=========================================================================================================
     /**
@@ -183,7 +195,7 @@ private:
      * @param [out] id                  The FiffID
      *
      */
-    int readChannels(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
+    int readChannels(QSharedPointer<FIFFLIB::FiffInfoBase> pFiffInfoBase,
                      QList<FIFFLIB::FiffChInfo>& listMegCh,	 /* MEG channels */
                      int& iNMeg,
                      QList<FIFFLIB::FiffChInfo>& listMegComp,
@@ -192,6 +204,13 @@ private:
                      int& iNEeg,
                      FIFFLIB::FiffCoordTransOld** transDevHeadOld,
                      FIFFLIB::FiffId& id);	         /* The measurement ID */
+
+    //=========================================================================================================
+    /**
+     * concert MneNamedMatrix to FiffNamedMatrix
+     * ToDo: delete this function once everything is refactored and results are automaticly stored in fwdSolution
+     */
+    void toFiffNamed();
 
 };
 
