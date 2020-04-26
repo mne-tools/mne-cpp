@@ -85,12 +85,12 @@ namespace MNELIB
  */
 struct RegionDataOut
 {
-    Eigen::VectorXi    roiIdx;     /**< Region cluster indices */
-    Eigen::MatrixXd    ctrs;       /**< Cluster centers */
-    Eigen::VectorXd    sumd;       /**< Sums of the distances to the centroid */
-    Eigen::MatrixXd    D;          /**< Distances to the centroid */
+    Eigen::VectorXi roiIdx;         /**< Region cluster indices */
+    Eigen::MatrixXd ctrs;           /**< Cluster centers */
+    Eigen::VectorXd sumd;           /**< Sums of the distances to the centroid */
+    Eigen::MatrixXd D;              /**< Distances to the centroid */
 
-    qint32      iLabelIdxOut;   /**< Label ID */
+    qint32 iLabelIdxOut;            /**< Label ID */
 };
 
 //=========================================================================================================
@@ -99,18 +99,18 @@ struct RegionDataOut
  */
 struct RegionData
 {
-    Eigen::MatrixXd    matRoiG;            /**< Reshaped region gain matrix sources x sensors(x,y,z)*/
-    Eigen::MatrixXd    matRoiGWhitened;    /**< Reshaped whitened region gain matrix sources x sensors(x,y,z)*/
-    bool        bUseWhitened;       /**< Wheather indeces of whitened gain matrix should be used to calculate centroids */
+    Eigen::MatrixXd matRoiG;            /**< Reshaped region gain matrix sources x sensors(x,y,z)*/
+    Eigen::MatrixXd matRoiGWhitened;    /**< Reshaped whitened region gain matrix sources x sensors(x,y,z)*/
+    bool bUseWhitened;                  /**< Wheather indeces of whitened gain matrix should be used to calculate centroids */
 
-    Eigen::MatrixXd    matRoiGOrig;            /**< Region gain matrix sensors x sources(x,y,z)*/
+    Eigen::MatrixXd matRoiGOrig;        /**< Region gain matrix sensors x sources(x,y,z)*/
 //    Eigen::MatrixXd    matRoiGOrigWhitened;    /**< Whitened region gain matrix sensors x sources(x,y,z)*/
 
-    qint32      nClusters;      /**< Number of clusters within this region */
+    qint32 nClusters;      /**< Number of clusters within this region */
 
-    Eigen::VectorXi    idcs;           /**< Get source space indeces */
-    qint32      iLabelIdxIn;    /**< Label ID */
-    QString     sDistMeasure;   /**< "cityblock" or "sqeuclidean" */
+    Eigen::VectorXi idcs;           /**< Get source space indeces */
+    qint32 iLabelIdxIn;    /**< Label ID */
+    QString sDistMeasure;   /**< "cityblock" or "sqeuclidean" */
 
     RegionDataOut cluster() const
     {
