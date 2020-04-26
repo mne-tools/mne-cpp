@@ -46,6 +46,8 @@
 #include <fwd/computeFwd/compute_fwd_settings.h>
 #include <fwd/computeFwd/compute_fwd.h>
 
+#include <mne/mne_forwardsolution.h>
+
 #include <mne/mne.h>
 //=============================================================================================================
 // Eigen
@@ -88,7 +90,8 @@ int main(int argc, char *argv[])
     qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
     QCoreApplication a(argc, argv);
 
-    QElapsedTimer timer;
+    QElapsedTimer timer1, timer2, timer3, timer4;
+    float fTime1, fTime2, fTime3, fTime4;
 
     // Command Line Parser
     QCommandLineParser parser;
@@ -136,22 +139,37 @@ int main(int argc, char *argv[])
     QSharedPointer<FWDLIB::ComputeFwd> pFwdMEGEEG = QSharedPointer<FWDLIB::ComputeFwd>(new FWDLIB::ComputeFwd(&settings));
 
     // perform the actual computation
-    timer.start();
+    timer1.start();
     pFwdMEGEEG->calculateFwd();
-    qInfo() << "The computation took: " << timer.elapsed() << " ms.";
+    fTime1 = timer1.elapsed();
 
-    // update head position to forward solution and only recompute necessary part
-    timer.start();
-    pFwdMEGEEG->updateHeadPos(&meg_head_t);
-    qInfo() << "The recomputation took: " << timer.elapsed() << " ms.";
-
-    qInfo() << "pFwdMEGEEG->coord_frame: " << pFwdMEGEEG->coord_frame;
-    qInfo() << "pFwdMEGEEG->nchan: " << pFwdMEGEEG->nchan;
-    qInfo() << "pFwdMEGEEG->nsource: " << pFwdMEGEEG->nsource;
-
-    std::cout << pFwdMEGEEG->mri_head_t.trans <<std::endl;
+    // ToDo: Refactor fwd-lib and make MNEForwardSolution a member of computeForward,
+    // so next two steps will not be necessary
 
     // store calculated forward solution in settings.solname specified file
+    timer2.start();
     pFwdMEGEEG->storeFwd();
-    qInfo() << "pFwdMEGEEG->coord_frame: " << pFwdMEGEEG->coord_frame;
+    fTime2 = timer2.elapsed();
+
+    // read as MNEForwardSolution
+    timer3.start();
+    QFile t_solution(settings.solname);
+    MNEForwardSolution fwdSolution = MNEForwardSolution(t_solution);
+    fTime3 = timer3.elapsed();
+
+    // update head position to forward solution and only recompute necessary part
+    timer4.start();
+    pFwdMEGEEG->updateHeadPos(&meg_head_t);
+    fTime4 = timer4.elapsed();
+
+    // get updated solution
+    fwdSolution.sol = &pFwdMEGEEG->sol;
+    fwdSolution.sol_grad = &pFwdMEGEEG->sol_grad;
+
+    // Print timer results
+    qInfo() << "The computation took: " << fTime1  << " ms.";
+    qInfo() << "Storing the fwd solution took: " << fTime2 << " ms.";
+    qInfo() << "Reading the fwd solution took: " << fTime3 << " ms.";
+    qInfo() << "The recomputation took: " << fTime4 << " ms.";
+
 }
