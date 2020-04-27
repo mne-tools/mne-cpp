@@ -485,8 +485,7 @@ private:
      * @param [out] stream  The output file stream
      * @param [in] pos      Position in the file where the data can be written. Default is -1.
      */
-    void writeDirectory(FIFFLIB::FiffStream* stream,
-                        FIFFLIB::fiff_long_t pos = -1);
+    void writeDirectory(FIFFLIB::fiff_long_t pos = -1);
 
     //=========================================================================================================
     /**
@@ -564,7 +563,7 @@ private:
     void renameOutputFileAsInputFile();
 
     int setupInOutStreams();
-    void readHeaderTags();
+    void processHeaderTags();
     void readTag();
     void writeTag();
 
@@ -590,6 +589,8 @@ private:
     QFile m_fFileOut;                   /**< QFile output file.*/
     bool m_bFileInSet;                  /**< Input file set.*/
     bool m_bFileOutSet;                 /**< Output file set.*/
+    bool m_bFileHasDirPtr;          /**< File has a pointer to a tag directory.*/
+    bool m_bFileHasFreeListPtr;         /**< File has a pointer to a free list tag list.*/
 
     QDateTime m_dateDefaultDate;        /**< Date to be used as substitution of dates found in a fiff file */
     QDateTime m_dateMeasurmentDate;     /**< Date to substitute the measuremnt date appearing in the file.*/
@@ -614,7 +615,7 @@ private:
     float m_fSubjectHeight;             /**< Subject's height substitutor.*/
     int m_iProjectId;                   /**< Project's id# substitutor.*/
 
-    FIFFLIB::FiffStream::SPtr m_pFiffStreamIn;   /**< Pointer to FiffStream object for reading.*/
+    FIFFLIB::FiffStream::SPtr m_pInStream;   /**< Pointer to FiffStream object for reading.*/
     FIFFLIB::FiffStream::SPtr m_pOutStream;  /**< Pointer to FiffStream object for writing the result.*/
     FIFFLIB::FiffTag::SPtr m_pInTag;         /**< Pointer to FiffTag used for reading each tag.*/
     FIFFLIB::FiffTag::SPtr m_pOutTag;        /**< Pointer to FiffTag used for writing each anonymized tag.*/
