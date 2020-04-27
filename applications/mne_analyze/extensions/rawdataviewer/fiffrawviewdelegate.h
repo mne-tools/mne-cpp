@@ -159,6 +159,16 @@ private:
                                QPainterPath& path,
                                ANSHAREDLIB::ChannelData &data) const;
 
+    //=========================================================================================================
+    /**
+     * Draws annotations from the FiffRawView model's member Annotation Model
+     *
+     * @param index [in]            Used to locate data in the model
+     * @param option [in]           Describes the parameters used to draw an item in a view widget
+     * @param path [in]             The QPointerPath to create the plot.
+     * @param data [in]             Data for the given row.
+     * @param painter [in, out]     Used for drawing the annotations
+     */
     void createMarksPath(const QModelIndex &index,
                                const QStyleOptionViewItem &option,
                                QPainterPath& path,
