@@ -2317,37 +2317,8 @@ void ComputeFwd::updateHeadPos(FiffCoordTransOld* transDevHeadOld)
         return;
     }
 
-//    // Field computation matrices...
-//    qDebug() << "!!!TODO Speed the following with Eigen up!";
-//    printf("Composing the field computation matrix...");
-//    if (FwdBemModel::fwd_bem_specify_coils(m_bemModel,megcoilsNew) == FAIL) {
-//        return;
-//    }
-//    fprintf(stderr,"[done]\n");
-
-//    if(m_compcoils) {
-//        FwdCoilSet* compcoilsNew = m_compcoils->dup_coil_set(transDevHeadOld);
-//        FwdCompData* comp = Q_NULLPTR;
-
-//        FwdCompData::fwd_make_comp_data(m_compData,
-//                                        megcoilsNew,
-//                                        compcoilsNew,
-//                                        FwdBemModel::fwd_bem_field,
-//                                        Q_NULLPTR,
-//                                        FwdBemModel::fwd_bem_field_grad,
-//                                        m_bemModel,
-//                                        Q_NULLPTR);
-
-//        if (comp->set && comp->set->current) { /* Test just to specify confusing output */
-//            fprintf(stderr,"Composing the field computation matrix (compensation coils)...");
-//            if (FwdBemModel::fwd_bem_specify_coils(m_bemModel,comp->comp_coils) == FAIL) {
-//                return;
-//            }
-//            fprintf(stderr,"[done]\n");
-//        }
-//    }
     // Update new Transformation Matrix
-    *m_meg_head_t = *transDevHeadOld;
+    m_meg_head_t = new FiffCoordTransOld(*transDevHeadOld);
     // convert MneNamed matrix to Fiff named
     toFiffNamed();
 }

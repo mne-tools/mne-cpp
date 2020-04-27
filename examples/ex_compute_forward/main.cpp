@@ -137,12 +137,12 @@ int main(int argc, char *argv[])
     settings.checkIntegrity();
 
     timer0.start();
-    QSharedPointer<FWDLIB::ComputeFwd> pFwdMEGEEG = QSharedPointer<FWDLIB::ComputeFwd>(new FWDLIB::ComputeFwd(&settings));
+    QSharedPointer<FWDLIB::ComputeFwd> pComputeFwd = QSharedPointer<FWDLIB::ComputeFwd>(new FWDLIB::ComputeFwd(&settings));
     fTime0 = timer0.elapsed();
 
     // perform the actual computation
     timer1.start();
-    pFwdMEGEEG->calculateFwd();
+    pComputeFwd->calculateFwd();
     fTime1 = timer1.elapsed();
 
     // ToDo: Refactor fwd-lib and make MNEForwardSolution a member of computeForward,
@@ -150,25 +150,23 @@ int main(int argc, char *argv[])
 
     // store calculated forward solution in settings.solname specified file
     timer2.start();
-    pFwdMEGEEG->storeFwd();
+    pComputeFwd->storeFwd();
     fTime2 = timer2.elapsed();
 
     // read as MNEForwardSolution
     timer3.start();
     QFile t_solution(settings.solname);
-    MNEForwardSolution fwdSolution = MNEForwardSolution(t_solution);
+    QSharedPointer<MNEForwardSolution> pFwdSolution = QSharedPointer<MNEForwardSolution>(new MNEForwardSolution(t_solution));
     fTime3 = timer3.elapsed();
-
-    fwdSolution.src[0];
 
     // update head position to forward solution and only recompute necessary part
     timer4.start();
-    pFwdMEGEEG->updateHeadPos(&meg_head_t);
+    pComputeFwd->updateHeadPos(&meg_head_t);
     fTime4 = timer4.elapsed();
 
     // get updated solution
-    fwdSolution.sol = &pFwdMEGEEG->sol;
-    fwdSolution.sol_grad = &pFwdMEGEEG->sol_grad;
+    pFwdSolution->sol = new FiffNamedMatrix(pComputeFwd->sol);
+    pFwdSolution->sol_grad = new FiffNamedMatrix(pComputeFwd->sol_grad);
 
     // Print timer results
     qInfo() << "The initialization took: " << fTime0  << " ms.";
