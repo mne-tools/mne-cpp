@@ -1,10 +1,10 @@
 ---
-title: MNE Anonymize
+title: MNE Anonymize CLI
 has_children: true
 parent: Learn
 nav_order: 2
 ---
-# MNE Anonymize
+# MNE Anonymize CLI
 
 ## Introduction 
 

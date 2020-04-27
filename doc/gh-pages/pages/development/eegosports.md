@@ -1,6 +1,6 @@
 ---
 title: EEGoSports
-parent: MNE Scan Development
+parent: MNE Scan
 grand_parent: Develop
 nav_order: 4
 ---

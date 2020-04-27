@@ -1,6 +1,6 @@
 ---
 title: Real-time Source Localization
-parent: MNE Scan
+parent: MNE Scan GUI
 grand_parent: Learn
 nav_order: 2
 ---
