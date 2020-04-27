@@ -117,7 +117,7 @@ public:
 
     //=========================================================================================================
     /*
-     * Transform Old coord transformation to new class. Can be deleted if FiffCoordTransOld is not used anymore
+     * Transform Old coord transformation to new class.
      */
     FiffCoordTrans toNew();
 
