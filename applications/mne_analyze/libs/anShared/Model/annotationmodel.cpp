@@ -43,6 +43,7 @@ AnnotationModel::AnnotationModel(QObject* parent)
 , m_iActiveCheckState(2)
 , m_iSelectedCheckState(0)
 , m_iSelectedAnn(0)
+, m_iLastTypeAdded(0)
 , m_fFreq(600)
 , m_sFilterEventType("All")
 {
@@ -76,7 +77,7 @@ bool AnnotationModel::insertRows(int position, int span, const QModelIndex & par
 
     if(m_dataSamples.isEmpty()) {
         m_dataSamples.insert(0, m_iSamplePos);
-        m_dataTypes.insert(0, 1);
+        m_dataTypes.insert(0, m_iLastTypeAdded);
         m_dataIsUserEvent.insert(0, 1);
     }
     else {
@@ -86,7 +87,7 @@ bool AnnotationModel::insertRows(int position, int span, const QModelIndex & par
                     m_dataSamples.insert(t, m_iSamplePos);
 
                     if(m_sFilterEventType == "All")
-                        m_dataTypes.insert(t, 1);
+                        m_dataTypes.insert(t, m_iLastTypeAdded);
                     else
                         m_dataTypes.insert(t, m_sFilterEventType.toInt());
 
@@ -98,7 +99,7 @@ bool AnnotationModel::insertRows(int position, int span, const QModelIndex & par
                     m_dataSamples.append(m_iSamplePos);
 
                     if(m_sFilterEventType == "All")
-                        m_dataTypes.append(1);
+                        m_dataTypes.append(m_iLastTypeAdded);
                     else
                         m_dataTypes.append(m_sFilterEventType.toInt());
 
@@ -280,6 +281,7 @@ void AnnotationModel::setEventFilterType(const QString eventType)
                 m_dataIsUserEvent_Filtered.append(m_dataIsUserEvent[i]);
             }
         }
+        m_iLastTypeAdded = eventType.toInt();
     }
 
     emit dataChanged(createIndex(0,0), createIndex(m_dataSamples_Filtered.size(), 0));
@@ -406,6 +408,8 @@ void AnnotationModel::addNewAnnotationType(const QString &eventType,
     if(!m_eventTypeList.contains(eventType))
         m_eventTypeList<<eventType;
 
+    m_iLastTypeAdded = eventType.toInt();
+
     emit updateEventTypes(eventType);
 }
 
@@ -491,3 +495,9 @@ bool AnnotationModel::saveToFile(const QString& sPath)
 #endif
 }
 
+//=============================================================================================================
+
+void AnnotationModel::setLastType(int iType)
+{
+    m_iLastTypeAdded = iType;
+}
