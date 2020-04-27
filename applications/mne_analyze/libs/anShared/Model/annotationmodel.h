@@ -8,8 +8,8 @@
 #include "../anshared_global.h"
 #include "../Utils/types.h"
 #include "abstractmodel.h"
-#include <QAbstractTableModel>
 #include <QColor>
+#include <QAbstractTableModel>
 
 //=============================================================================================================
 // DEFINE NAMESPACE ANSHAREDLIB
@@ -21,8 +21,9 @@ namespace ANSHAREDLIB {
 class ANSHAREDSHARED_EXPORT AnnotationModel : public QAbstractTableModel
 {
     Q_OBJECT
+
 public:
-    AnnotationModel(QObject* parent);
+    AnnotationModel(QObject* parent = Q_NULLPTR);
 
     //=========================================================================================================
     bool insertRows(int position, int span, const QModelIndex & parent);
@@ -78,6 +79,16 @@ public:
     int getShowSelected();
 
     float getFreq();
+
+    //=========================================================================================================
+    /**
+     * Saves model to the current model path if possible.
+     *
+     * @param[in] sPath   The path where the file should be saved to.
+     *
+     * @returns      True if saving was successful
+     */
+    bool saveToFile(const QString& sPath);
 
 signals:
 
