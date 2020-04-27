@@ -2370,7 +2370,7 @@ void ComputeFwd::storeFwd()
 
 void ComputeFwd::toFiffNamed()
 {
-    // ToDo: the following could be much easier if computeFwd woulnd't use that much old stuff
+    // ToDo: the following can beleted ones FiffNamedMatrix is used for the fwd calc
     int iNMeg, iNEeg, iNMegGrad, iNEegGrad;
     iNMeg = iNEeg = iNMegGrad = iNEegGrad = 0;
     MatrixXd matMeg;
