@@ -53,6 +53,7 @@
 #include <QMap>
 #include <QToolBar>
 #include <QColorDialog>
+#include <QFileDialog>
 
 namespace Ui {
     class EventWindowDockWidget;
@@ -171,6 +172,8 @@ private slots:
      * Forces the dock widget to be redrawn.
      */
     void onDataChanged();
+
+    void onSaveButton();
 
 private:
 

@@ -77,6 +77,8 @@ public:
 
     int getShowSelected();
 
+    float getFreq();
+
 signals:
 
     void updateEventTypes(const QString& currentFilterType);
