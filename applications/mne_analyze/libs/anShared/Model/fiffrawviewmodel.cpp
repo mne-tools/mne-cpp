@@ -87,19 +87,18 @@ FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
                                    qint32 iPreloadBufferSize,
                                    QObject *pParent)
 : AbstractModel(pParent)
+, m_dDx(1.0)
+, m_iSamplesPerBlock(1024)
 , m_iVisibleWindowSize(iVisibleWindowSize)
 , m_iPreloadBufferSize(std::max(2, iPreloadBufferSize))
-, m_iSamplesPerBlock(1024)
 , m_iTotalBlockCount(m_iVisibleWindowSize + 2 * m_iPreloadBufferSize)
 , m_iFiffCursorBegin(-1)
 , m_bStartOfFileReached(true)
 , m_bEndOfFileReached(false)
 , m_blockLoadFutureWatcher()
 , m_bCurrentlyLoading(false)
-, m_dDx(1.0)
 , m_iDistanceTimerSpacer(1000)
 , m_iScrollPos(0)
-, m_dScrollDx(1.0)
 , m_bDispAnn(true)
 , m_pAnnotationModel(QSharedPointer<AnnotationModel>::create(this))
 {
@@ -126,16 +125,16 @@ FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
                                    qint32 iPreloadBufferSize,
                                    QObject *pParent)
 : AbstractModel(pParent)
+, m_dDx(1.0)
+, m_iSamplesPerBlock(1024)
 , m_iVisibleWindowSize(iVisibleWindowSize)
 , m_iPreloadBufferSize(std::max(2, iPreloadBufferSize))
-, m_iSamplesPerBlock(1024)
 , m_iTotalBlockCount(m_iVisibleWindowSize + 2 * m_iPreloadBufferSize)
 , m_iFiffCursorBegin(-1)
 , m_bStartOfFileReached(true)
 , m_bEndOfFileReached(false)
 , m_blockLoadFutureWatcher()
 , m_bCurrentlyLoading(false)
-, m_dDx(1.0)
 , m_iDistanceTimerSpacer(1000)
 , m_iScrollPos(0)
 , m_bDispAnn(true)
@@ -333,6 +332,7 @@ Qt::ItemFlags FiffRawViewModel::flags(const QModelIndex &index) const
 
 QModelIndex FiffRawViewModel::index(int row, int column, const QModelIndex &parent) const
 {
+    Q_UNUSED(parent);
     return createIndex(row, column);
 }
 
@@ -340,6 +340,7 @@ QModelIndex FiffRawViewModel::index(int row, int column, const QModelIndex &pare
 
 QModelIndex FiffRawViewModel::parent(const QModelIndex &index) const
 {
+    Q_UNUSED(index);
     // TODO implement stuff
     return QModelIndex();
 }
@@ -348,6 +349,7 @@ QModelIndex FiffRawViewModel::parent(const QModelIndex &index) const
 
 int FiffRawViewModel::rowCount(const QModelIndex &parent) const
 {
+    Q_UNUSED(parent);
     if(m_ChannelInfoList.empty() == false)
         return m_ChannelInfoList.size();
 
@@ -358,6 +360,7 @@ int FiffRawViewModel::rowCount(const QModelIndex &parent) const
 
 int FiffRawViewModel::columnCount(const QModelIndex &parent) const
 {
+    Q_UNUSED(parent);
     // TODO implement stuff
     return 3;
 }
@@ -366,6 +369,7 @@ int FiffRawViewModel::columnCount(const QModelIndex &parent) const
 
 bool FiffRawViewModel::hasChildren(const QModelIndex &parent) const
 {
+    Q_UNUSED(parent);
     // TODO implement stuff
     return false;
 }

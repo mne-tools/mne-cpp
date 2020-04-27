@@ -2,12 +2,13 @@
 /**
  * @file     annotationmanager.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>
+ *           Gabriel Motta <gbmotta@mgh.harvard.edu
  * @version  dev
- * @date     November, 2019
+ * @date     April, 2020
  *
  * @section  LICENSE
  *
- * Copyright (C) 2019, Lorenz Esch. All rights reserved.
+ * Copyright (C) 2020, Lorenz Esch, Gabriel Motta. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -51,7 +52,6 @@
 
 #include <QtWidgets>
 #include <QtCore/QtPlugin>
-#include <QDebug>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -114,31 +114,44 @@ public:
     virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
 
     //=========================================================================================================
+    /**
+     * Loads new Fiff model whan current loaded model is changed
+     *
+     * @param [in,out] pNewModel    pointer to currently loaded FiffRawView Model
+     */
     void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
 
     //=========================================================================================================
+    /**
+     * Sets up GUI controls
+     */
     void setUpControls();
 
     //=========================================================================================================
+    /**
+     * Toggles whether to show annotations
+     *
+     * @param [in] iToggle  0 for not shown, 2 for shown
+     */
     void toggleDisplayEvent(const int& iToggle);
 
     //=============================================================================================================
+    /**
+     * Publishes event to force FiffRawView to redraw the data viewer
+     */
     void onTriggerRedraw();
 
 private:
 
-    QPointer<QDockWidget>               m_pControl;             /**< Control Widget */
+    QPointer<QDockWidget>                                   m_pControl;                 /**< Dock Control Widget */
 
-    QPointer<ANSHAREDLIB::Communicator> m_pCommu;
+    QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals */
 
-    QSharedPointer<AnnotationView>                  m_pAnnotationView;
-    QSharedPointer<ANSHAREDLIB::AnnotationModel>    m_pAnnotationModel;
+    QSharedPointer<AnnotationView>                          m_pAnnotationView;          /**< Pointer to associated View for this extension */
 
-    QSharedPointer<ANSHAREDLIB::FiffRawViewModel>   m_pFiffRawModel;
+    QSharedPointer<ANSHAREDLIB::AnnotationModel>            m_pAnnotationModel;         /**< Pointer to associated Model for this extension */
 
-    QString                             m_sCurrentlySelectedModel;
-
-    int m_iToggle;
+    QSharedPointer<ANSHAREDLIB::FiffRawViewModel>           m_pFiffRawModel;            /**< Pointer to currently loaded FiffRawView Model */
 
 };
 

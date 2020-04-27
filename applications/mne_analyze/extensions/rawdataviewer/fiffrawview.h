@@ -193,11 +193,20 @@ public:
      */
     void toggleDisplayEvent(const int& iToggle);
 
-    void linkAnnotationModel();
-
+    //=========================================================================================================
+    /**
+     * Triggers a redraw of the data viewer
+     */
     void updateView();
 
 signals:
+
+    //=========================================================================================================
+    /**
+     * Emits sample number to be added aan annotation
+     *
+     * @param [in] iSample      sample number to be added
+     */
     void sendSamplePos(int iSample);
 
 private:
@@ -209,11 +218,11 @@ private:
 
     bool eventFilter(QObject *object, QEvent *event);
 
-    QPointer<QTableView>                                m_pTableView;
+    QPointer<QTableView>                                m_pTableView;                   /**< Pointer to table view ui element */
 
-    QSharedPointer<ANSHAREDLIB::FiffRawViewModel>       m_pModel;
+    QSharedPointer<ANSHAREDLIB::FiffRawViewModel>       m_pModel;                       /**< Pointer to associated Model */
 
-    QSharedPointer<FiffRawViewDelegate>                 m_pDelegate;
+    QSharedPointer<FiffRawViewDelegate>                 m_pDelegate;                    /**< Pointer to associated Delegate */
 
     QMap<qint32,float>                                  m_qMapChScaling;                /**< Channel scaling values. */
 
@@ -221,14 +230,12 @@ private:
 
     float                                               m_fDefaultSectionSize;          /**< Default row height */
     float                                               m_fZoomFactor;                  /**< Zoom factor */
+    float                                               m_fLastClickedPoint;            /**< Stores last clicked point on screen */
 
     qint32                                              m_iT;                           /**< Display window size in seconds */
 
-    float                                               m_fLastClickedPoint;
+    QScroller*                                          m_pKineticScroller;             /**< Used for kinetic scrolling through data view */
 
-    qint32 m_iToggle;
-
-    QScroller*      m_pKineticScroller;
 signals:
     void tableViewDataWidthChanged(int iWidth);
 };
