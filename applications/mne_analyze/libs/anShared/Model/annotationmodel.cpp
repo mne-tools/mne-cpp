@@ -11,6 +11,9 @@
 
 #include <QBrush>
 #include <QDebug>
+#include <QFile>
+#include <QFileInfo>
+#include <QFileDialog>
 
 //=============================================================================================================
 // Eigen INCLUDES
@@ -447,3 +450,40 @@ float AnnotationModel::getFreq()
 {
     return m_fFreq;
 }
+
+//=============================================================================================================
+
+bool AnnotationModel::saveToFile(const QString& sPath)
+{
+#ifdef WASMBUILD
+    QFileInfo fileInfo (sPath);
+    QByteArray bufferOut;
+
+    QTextStream out(bufferOut, QIODevice::ReadWrite);
+    for(int i = 0; i < this->getNumberOfAnnotations(); i++) {
+        out << "  " << this->getAnnotation(i) << "   " << static_cast<float>(this->getAnnotation(i)) / this->getFreq() << "          0         1" << endl;
+        out << "  " << this->getAnnotation(i) << "   " << qSetRealNumberPrecision(4) << static_cast<float>(this->getAnnotation(i)) / this->getFreq() << "          1         0" << endl;
+    }
+
+    // Wee need to call the QFileDialog here instead of the data load extension since we need access to the QByteArray
+    QFileDialog::saveFileContent(bufferOut.data(), fileInfo.fileName());
+
+    return true;
+#else
+    qDebug() << "AnnotationView::saveToFile";
+    qDebug() << this->getNumberOfAnnotations();
+
+    QFile file(sPath);
+    if (!file.open(QIODevice::WriteOnly)) {
+        qWarning() << "[AnnotationModel::saveToFile] Unable to access file.";
+        return false;
+    }
+
+    QTextStream out(&file);
+    for(int i = 0; i < this->getNumberOfAnnotations(); i++) {
+        out << "  " << this->getAnnotation(i) << "   " << static_cast<float>(this->getAnnotation(i)) / this->getFreq() << "          0         1" << endl;
+        out << "  " << this->getAnnotation(i) << "   " << qSetRealNumberPrecision(4) << static_cast<float>(this->getAnnotation(i)) / this->getFreq() << "          1         0" << endl;
+    }
+#endif
+}
+

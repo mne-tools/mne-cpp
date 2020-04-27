@@ -50,10 +50,7 @@
 //=============================================================================================================
 
 #include <QWidget>
-#include <QMap>
-#include <QToolBar>
 #include <QColorDialog>
-#include <QFileDialog>
 
 namespace Ui {
     class EventWindowDockWidget;

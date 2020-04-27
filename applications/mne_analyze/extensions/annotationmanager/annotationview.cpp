@@ -38,6 +38,10 @@
 #include "ui_annotationview.h"
 
 #include <QDebug>
+#include <QMap>
+#include <QToolBar>
+#include <QColorDialog>
+#include <QFileDialog>
 
 AnnotationView::AnnotationView()
 : ui(new Ui::EventWindowDockWidget)
@@ -244,23 +248,18 @@ void AnnotationView::onCurrentSelectedChanged()
 
 void AnnotationView::onSaveButton()
 {
-    qDebug() << "AnnotationView::onSaveButton";
-    qDebug() << m_pAnnModel->getNumberOfAnnotations();
-    QString fileName = QFileDialog::getSaveFileName(this,
-            tr("Save Annotations"), "",
-            tr("Event file (*.eve);;All Files (*)"));
-    if (fileName.isEmpty())
+#ifdef WASMBUILD
+    m_pAnnModel->saveToFile("");
+#else
+    QString fileName = QFileDialog::getSaveFileName(Q_NULLPTR,
+                                                    tr("Save Annotations"), "",
+                                                    tr("Event file (*.eve);;All Files (*)"));
+
+    if (fileName.isEmpty()) {
         return;
-    else {
-        QFile file(fileName);
-        if (!file.open(QIODevice::WriteOnly)) {
-            qWarning() << "Unable to access file.";
-            return;
-        }
-        QTextStream out(&file);
-        for(int i = 0; i < m_pAnnModel->getNumberOfAnnotations(); i++) {
-            out << "  " << m_pAnnModel->getAnnotation(i) << "   " << static_cast<float>(m_pAnnModel->getAnnotation(i)) / m_pAnnModel->getFreq() << "          0         1" << endl;
-            out << "  " << m_pAnnModel->getAnnotation(i) << "   " << qSetRealNumberPrecision(4) << static_cast<float>(m_pAnnModel->getAnnotation(i)) / m_pAnnModel->getFreq() << "          1         0" << endl;
-        }
     }
+    qDebug() << "AnnotationView::onSaveButton";
+
+    m_pAnnModel->saveToFile(fileName);
+#endif
 }
