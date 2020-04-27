@@ -429,8 +429,7 @@ FiffCoordTrans FiffCoordTransOld::toNew()
 
 int FiffCoordTransOld::add_inverse(FiffCoordTransOld *t)
 {
-    Matrix4f m;
-    m.fill(0);
+    Matrix4f m = Matrix4f::Identity(4,4);
 
     m.block(0,0,3,3) = t->rot;
     m.block(0,3,3,1) = t->move;
