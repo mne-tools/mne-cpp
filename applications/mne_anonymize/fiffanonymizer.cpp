@@ -428,10 +428,7 @@ int FiffAnonymizer::anonymizeFile()
     printIfVerbose("Current date: " + QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz t"));
     printIfVerbose(" ");
 
-    if(setupInOutStreams())
-    {
-        return 1;
-    }
+    openInOutStreams();
 
     printIfVerbose("Reading info in the file.");
     processHeaderTags();
@@ -447,12 +444,10 @@ int FiffAnonymizer::anonymizeFile()
     if (m_bFileHasDirPtr)
     {
         addFinalEntryToDir();
-    }
+        writeDirectory();
+        updatePointer(m_pOutStream,FIFF_DIR_POINTER,m_iDirectoryPos);
 
-    writeDirectory();
-    updatePointer directory
-    if m_bFreeListTagPresent
-    updatePointer FIFF_FREE_LIST
+    }
 
     closeInOutStreams();
 
@@ -475,43 +470,6 @@ int FiffAnonymizer::anonymizeFile()
 //    return 0;
 
 
-
-
-
-//    while(pInTag->next != -1) {
-//        inStream.read_tag(pInTag);
-
-//        updateBlockTypeList(pInTag);
-//        censorTag(pOutTag,pInTag);
-
-//        // The order of the tags in the output file is sequential. No jumps in the output file.
-//        if(pOutTag->next > 0) {
-//            pOutTag->next = FIFFV_NEXT_SEQ;
-//        }
-//        addEntryToDir(pOutTag,outStream.device()->pos());
-//        FiffTag::convert_tag_data(pOutTag,FIFFV_NATIVE_ENDIAN,FIFFV_BIG_ENDIAN);
-//        outStream.write_tag(pOutTag);
-//    }
-
-//    if(inStream.close()) {
-//        printIfVerbose("Input file closed. All tags have been correctly anonymized.");
-//    } else {
-//        qCritical() << "Problem closing the input file: " << m_fFileIn.fileName();
-//    }
-
-//    addFinalEntryToDir();
-
-//    // We do not want to write the FiffDir at the end. This was only needed back in the old days.
-// //    fiff_long_t posOfDirectory(outStream.device()->pos());
-// //    writeDirectory(&outStream);
-// //    updatePointer(&outStream,FIFF_DIR_POINTER,posOfDirectory);
-// //    updatePointer(&outStream,FIFF_FREE_LIST,-1);
-
-//    if(outStream.close()) {
-//        printIfVerbose("Output file closed. All tags have been correctly anonymized.");
-//    } else {
-//        qCritical() << "Problem closing the output file: " << m_fFileOut.fileName();
-//    }
 
     if(checkDeleteInputFile())
     {
@@ -681,21 +639,18 @@ void FiffAnonymizer::dir2tag(FIFFLIB::FiffTag::SPtr pTag)
 
 //=============================================================================================================
 
-void FiffAnonymizer::writeDirectory(FIFFLIB::fiff_long_t pos)
+void FiffAnonymizer::writeDirectory()
 {
-    if(pos>=0)
-    {
-        m_pOutStream->device()->seek(pos);
-    } else {
-        QFile* file=qobject_cast<QFile*>(m_pOutStream->device());
-        if(file)
-            m_pOutStream->device()->seek(file->size());
-    }
+    m_iDirectoryPos = m_pOutStream->device()->pos();
+
+    QFile* file=qobject_cast<QFile*>(m_pOutStream->device());
+    if(file)
+        m_pOutStream->device()->seek(file->size());
 
     *m_pOutStream << static_cast<quint32>(FIFF_DIR);
     *m_pOutStream << static_cast<quint32>(FIFFT_DIR_ENTRY_STRUCT);
     *m_pOutStream << static_cast<quint32>
-               (static_cast<unsigned long long>(m_pOutDir->size())*sizeof(FIFFLIB::FiffDirEntry));
+                     (static_cast<unsigned long long>(m_pOutDir->size())*sizeof(FIFFLIB::FiffDirEntry));
     *m_pOutStream << static_cast<quint32>(-1);
     for(int i=0;i<m_pOutDir->size();++i) {
         *m_pOutStream << static_cast<quint32>(m_pOutDir->at(i).kind);
@@ -707,7 +662,7 @@ void FiffAnonymizer::writeDirectory(FIFFLIB::fiff_long_t pos)
 
 //=============================================================================================================
 
-void FiffAnonymizer::updatePointer(FIFFLIB::FiffStream* stream,
+void FiffAnonymizer::updatePointer(FIFFLIB::FiffStream::SPtr stream,
                                    FIFFLIB::fiff_int_t tagKind,
                                    FIFFLIB::fiff_long_t newPos)
 {
@@ -1187,7 +1142,7 @@ void FiffAnonymizer::renameOutputFileAsInputFile()
 
 //=============================================================================================================
 
-int FiffAnonymizer::setupInOutStreams()
+int FiffAnonymizer::openInOutStreams()
 {
     m_pInStream = FIFFLIB::FiffStream::SPtr (new FIFFLIB::FiffStream (&m_fFileIn));
     if(m_pInStream->open(QIODevice::ReadOnly)) {
@@ -1202,6 +1157,25 @@ int FiffAnonymizer::setupInOutStreams()
         printIfVerbose("Output file opened correctly: " + m_fFileOut.fileName());
     } else {
         qCritical() << "Problem opening the output file: " << m_fFileOut.fileName();
+        return 1;
+    }
+    return 0;
+}
+
+int FiffAnonymizer::closeInOutStreams()
+{
+    if(m_pInStream->close()) {
+        printIfVerbose("Input file closed. All tags have been correctly anonymized.");
+    } else {
+        qCritical() << "Problem closing the input file: " << m_fFileIn.fileName();
+        return 1;
+    }
+
+
+    if(m_pOutStream->close()) {
+        printIfVerbose("Output file closed. All tags have been correctly anonymized.");
+    } else {
+        qCritical() << "Problem closing the output file: " << m_fFileOut.fileName();
         return 1;
     }
     return 0;
