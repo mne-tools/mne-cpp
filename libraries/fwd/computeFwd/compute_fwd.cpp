@@ -2418,6 +2418,7 @@ void ComputeFwd::toFiffNamed()
         if(matMeg.rows() != matEeg.rows()) {
             qWarning() << "Forward Solutions do not match!";
         }
+        sol.data = MatrixXd(meg_forward->nrow, iNMeg + iNEeg);
         sol.data.block(0,0,meg_forward->nrow,iNMeg) = matMeg;
         sol.data.block(0,iNMeg,meg_forward->nrow,iNEeg) = matEeg;
         sol.ncol = iNMeg + iNEeg;
@@ -2448,13 +2449,13 @@ void ComputeFwd::toFiffNamed()
     } else {
         qWarning() << "ComputeFwd::getSolution(): no Forward Solution available";
     }
-
     if(m_pSettings->compute_grad) {
         if(iNMegGrad > 0 && iNEegGrad > 0) {
             sol.clear();
             if(matMegGrad.rows() != matEegGrad.rows()) {
                 qWarning() << "Forward Solutions does not match!";
             }
+            sol_grad.data = MatrixXd(meg_forward_grad->nrow, iNMegGrad + iNEegGrad);
             sol_grad.data.block(0,0,meg_forward_grad->nrow,iNMeg) = matMegGrad;
             sol_grad.data.block(0,iNMegGrad,meg_forward_grad->nrow,iNEegGrad) = matEegGrad;
             sol_grad.ncol = iNMegGrad + iNEegGrad;
