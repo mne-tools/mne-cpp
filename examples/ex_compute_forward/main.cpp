@@ -99,22 +99,9 @@ int main(int argc, char *argv[])
     parser.addHelpOption();
 
     QCommandLineOption parameterOption("parameter", "The first parameter description.");
-
-    qInfo() << "Please download the mne-cpp-test-data folder from Github (mne-tools) into mne-cpp/bin.";
-    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif");
-
-    parser.addOption(inputOption);
     parser.addOption(parameterOption);
 
     parser.process(a);
-
-    // read data
-    // Init data loading and writing
-    QFile t_fileIn(parser.value(inputOption));
-    FiffRawData raw(t_fileIn);
-    QSharedPointer<FiffInfo> pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(raw.info));
-
-    FiffCoordTransOld meg_head_t = pFiffInfo->dev_head_t.toOld();
 
     // specify necessary information for forward computation
     ComputeFwdSettings settings;
@@ -131,6 +118,13 @@ int main(int argc, char *argv[])
     settings.solname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/sample_audvis-meg-eeg-oct-6-fwd.fif";
 
     // bring in dev_head transformation and FiffInfo
+    // Init data loading and writing
+    QFile t_fileIn(settings.measname);
+    FiffRawData raw(t_fileIn);
+    QSharedPointer<FiffInfo> pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(raw.info));
+
+    FiffCoordTransOld meg_head_t = pFiffInfo->dev_head_t.toOld();
+
     settings.meg_head_t = &meg_head_t;
     settings.pFiffInfo = pFiffInfo;
 
