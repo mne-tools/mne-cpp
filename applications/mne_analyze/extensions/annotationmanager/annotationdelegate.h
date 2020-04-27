@@ -1,7 +1,7 @@
 //=============================================================================================================
 /**
  * @file     annotationdelegate.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>
+ * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Gabriel Motta <gbmotta@mgh.harvard.edu
  * @version  dev
  * @date     April, 2020
