@@ -630,7 +630,7 @@ void FiffAnonymizer::readHeaderTags()
 void FiffAnonymizer::updateBlockTypeList()
 {
     if(m_pInTag->kind == FIFF_BLOCK_START) {
-        m_pBlockTypeList->push(*pTag->toInt());
+        m_pBlockTypeList->push(*m_pInTag->toInt());
     }
 
     if(m_pInTag->kind == FIFF_BLOCK_END) {
