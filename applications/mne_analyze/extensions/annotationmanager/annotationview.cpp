@@ -52,6 +52,10 @@ AnnotationView::AnnotationView()
 {
     ui->setupUi(this);
 
+    ui->m_comboBox_filterTypes->addItem("All");
+    ui->m_comboBox_filterTypes->addItem("0");
+    ui->m_comboBox_filterTypes->setCurrentText("All");
+
     onDataChanged();
 }
 
@@ -88,9 +92,9 @@ void AnnotationView::initGUIFunctionality()
             this, &AnnotationView::onCurrentSelectedChanged, Qt::UniqueConnection);
 
     //Annotation types combo box
-    ui->m_comboBox_filterTypes->addItem("All");
+
     //ui->m_comboBox_filterTypes->addItems(m_pAnnModel->getEventTypeList());
-    ui->m_comboBox_filterTypes->setCurrentText("All");
+
     connect(ui->m_comboBox_filterTypes, &QComboBox::currentTextChanged,
             m_pAnnModel.data(), &ANSHAREDLIB::AnnotationModel::setEventFilterType, Qt::UniqueConnection);
     connect(m_pAnnModel.data(), &ANSHAREDLIB::AnnotationModel::updateEventTypes,
@@ -141,6 +145,8 @@ void AnnotationView::updateComboBox(const QString &currentAnnotationType)
     ui->m_comboBox_filterTypes->addItems(m_pAnnModel->getEventTypeList());
 //    if(m_pAnnModel->getEventTypeList().contains(currentAnnotationType))
 //        ui->m_comboBox_filterTypes->setCurrentText(currentAnnotationType);
+
+    m_pAnnModel->setLastType(currentAnnotationType.toInt());
     emit triggerRedraw();
 }
 
