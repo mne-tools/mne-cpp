@@ -289,6 +289,8 @@ bool FiffRawViewModel::saveToFile(const QString& sPath)
         return true;
     }
 
+    //bufferOut->deleteLater();
+
     return false;
 #else
     QFile fFileOut(sPath);
