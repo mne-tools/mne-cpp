@@ -45,23 +45,31 @@ jobs:
     steps:
     - name: Clone repository
       uses: actions/checkout@v2
-    - name: Compile static Qt version
+    - name: Install OpenGL
       run: |
-        # Install OpenGL
         sudo apt-get install build-essential libgl1-mesa-dev
-        # Clone Qt5 repo
-        cd ..
-        git clone https://code.qt.io/qt/qt5.git -b 5.14.2
-        cd qt5
-        ./init-repository -f --module-subset=qtbase,qtcharts,qtsvg,qt3d
-        # Create shadow build folder
-        cd ..
-        mkdir qt5_shadow
-        cd qt5_shadow
-        # Configure Qt5
-        ../qt5/configure -static -release -prefix "../Qt5_binaries" -skip webengine -nomake tools -nomake tests -nomake examples -no-dbus -no-ssl -no-pch -opensource -confirm-license
-        make module-qtbase module-qtsvg module-qtcharts module-qt3d -j4
-        make install -j4
+    - name: Install Qt
+      run: |
+        # Download the pre-built static version of Qt, which was created with the generateBinaries.yml workflow
+        wget -O qt5_5142_static_binaries_linux.tar.gz https://www.dropbox.com/s/k245dalpw02ok1q/qt5_5142_static_binaries_linux.tar.gz?dl=1
+        mkdir ../Qt5_binaries
+        tar xvzf qt5_5142_static_binaries_linux.tar.gz -C ../ -P
+    # Uncomment this if you want to build Qt statically in this workflow
+    # - name: Compile static Qt version
+    #   run: |
+    #     # Clone Qt5 repo
+    #     cd ..
+    #     git clone https://code.qt.io/qt/qt5.git -b 5.14.2
+    #     cd qt5
+    #     ./init-repository -f --module-subset=qtbase,qtcharts,qtsvg,qt3d
+    #     # Create shadow build folder
+    #     cd ..
+    #     mkdir qt5_shadow
+    #     cd qt5_shadow
+    #     # Configure Qt5
+    #     ../qt5/configure -static -release -prefix "../Qt5_binaries" -skip webengine -nomake tools -nomake tests -nomake examples -no-dbus -no-ssl -no-pch -opensource -confirm-license
+    #     make module-qtbase module-qtsvg module-qtcharts module-qt3d -j4
+    #     make install -j4
     - name: Configure and compile MNE-CPP
       run: |
         ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples MNECPP_CONFIG+=static
@@ -90,21 +98,27 @@ jobs:
     steps:
     - name: Clone repository
       uses: actions/checkout@v2
-    - name: Compile static Qt version
+    - name: Install Qt
       run: |
-        # Clone Qt5 repo
-        cd ..
-        git clone https://code.qt.io/qt/qt5.git -b 5.14.2
-        cd qt5
-        ./init-repository -f --module-subset=qtbase,qtcharts,qtsvg,qt3d
-        # Create shadow build folder
-        cd ..
-        mkdir qt5_shadow
-        cd qt5_shadow
-        # Configure Qt5
-        ../qt5/configure -static -release -prefix "../Qt5_binaries" -skip webengine -nomake tools -nomake tests -nomake examples -no-dbus -no-ssl -no-pch -opensource -confirm-license
-        make module-qtbase module-qtsvg module-qtcharts module-qt3d -j4
-        make install -j4
+        # Download the pre-built static version of Qt, which was created with the generateBinaries.yml workflow
+        wget -O qt5_5142_static_binaries_macos.tar.gz https://www.dropbox.com/s/bnlec4qpl7c22rp/qt5_5142_static_binaries_macos.tar.gz?dl=1
+        tar xzf qt5_5142_static_binaries_macos.tar.gz -P
+    # Uncomment this if you want to build Qt statically in this workflow
+    # - name: Compile static Qt version
+    #   run: |
+    #     # Clone Qt5 repo
+    #     cd ..
+    #     git clone https://code.qt.io/qt/qt5.git -b 5.14.2
+    #     cd qt5
+    #     ./init-repository -f --module-subset=qtbase,qtcharts,qtsvg,qt3d
+    #     # Create shadow build folder
+    #     cd ..
+    #     mkdir qt5_shadow
+    #     cd qt5_shadow
+    #     # Configure Qt5
+    #     ../qt5/configure -static -release -prefix "../Qt5_binaries" -skip webengine -nomake tools -nomake tests -nomake examples -no-dbus -no-ssl -no-pch -opensource -confirm-license
+    #     make module-qtbase module-qtsvg module-qtcharts module-qt3d -j4
+    #     make install -j4
     - name: Configure and compile MNE-CPP
       run: |
         ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples MNECPP_CONFIG+=static
@@ -125,7 +139,7 @@ jobs:
         asset_name: mne-cpp-macos-static-x86_64.tar.gz
         tag: dev_build
         overwrite: true
-
+        
   WinStatic:
     runs-on: windows-2016
     needs: UpdateDevTag
@@ -142,25 +156,31 @@ jobs:
       run: |
         Invoke-WebRequest https://www.dropbox.com/s/dku543gtw7ik7hr/jom.zip?dl=1 -OutFile .\jom.zip
         expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
-        echo "::add-path::$HOME\jom"
-    - name: Compile static Qt version
+        echo "::add-path::$HOME\jom"  
+    - name: Install Qt
       run: |
-        # Clone Qt5 repo
-        cd ..
-        git clone https://code.qt.io/qt/qt5.git -b 5.14.2
-        cd qt5
-        perl init-repository -f --module-subset=qtbase,qtcharts,qtsvg,qt3d
-        # Create shadow build folder
-        cd ..
-        mkdir qt5_shadow
-        cd qt5_shadow
-        # Setup the compiler 
-        cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
-        Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
-        # Configure Qt5
-        ..\qt5\configure.bat -release -static -no-pch -optimize-size -opengl desktop -platform win32-msvc -prefix "..\Qt5_binaries" -skip webengine -nomake tools -nomake tests -nomake examples -opensource -confirm-license
-        jom -j4
-        nmake install
+        # Download the pre-built static version of Qt, which was created with the generateBinaries.yml workflow
+        Invoke-WebRequest https://www.dropbox.com/s/r1z7jjit23si9rp/qt5_5142_static_binaries_win.zip?dl=1 -OutFile .\qt5_5142_static_binaries_win.zip
+        expand-archive -path "qt5_5142_static_binaries_win.zip" -destinationpath "..\"
+    # Uncomment this if you want to build Qt statically in this workflow
+    # - name: Compile static Qt version
+    #   run: |
+    #     # Clone Qt5 repo
+    #     cd ..
+    #     git clone https://code.qt.io/qt/qt5.git -b 5.14.2
+    #     cd qt5
+    #     perl init-repository -f --module-subset=qtbase,qtcharts,qtsvg,qt3d
+    #     # Create shadow build folder
+    #     cd ..
+    #     mkdir qt5_shadow
+    #     cd qt5_shadow
+    #     # Setup the compiler 
+    #     cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
+    #     Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
+    #     # Configure Qt5
+    #     ..\qt5\configure.bat -release -static -no-pch -optimize-size -opengl desktop -platform win32-msvc -prefix "..\Qt5_binaries" -skip webengine -nomake tools -nomake tests -nomake examples -opensource -confirm-license
+    #     jom -j4
+    #     nmake install
     - name: Configure and compile MNE-CPP
       run: |
         cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"

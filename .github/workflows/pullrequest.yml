@@ -6,7 +6,7 @@ on:
     - master
 
 jobs:
-  Qt:
+  QtDynamic:
     runs-on: ${{ matrix.os }}
 
     strategy: 
@@ -93,6 +93,67 @@ jobs:
         cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow MNECPP_CONFIG+=withLsl
+        jom -j4
+
+  QtStatic:
+    runs-on: ${{ matrix.os }}
+
+    strategy: 
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        qt: [5.14.2]
+        os: [ubuntu-16.04, macos-latest, windows-2016]
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v2
+    - name: Install Python 3.7 version
+      uses: actions/setup-python@v1
+      with:
+        python-version: '3.7'
+        architecture: 'x64'
+    - name: Install OpenGL (Linux)
+      if: matrix.os == 'ubuntu-16.04'
+      run: |
+        sudo apt-get install build-essential libgl1-mesa-dev
+    - name: Install Qt (Linux)
+      if: matrix.os == 'ubuntu-16.04'
+      run: |
+        # Download the pre-built static version of Qt, which was created with the generateBinaries.yml workflow
+        wget -O qt5_5142_static_binaries_linux.tar.gz https://www.dropbox.com/s/k245dalpw02ok1q/qt5_5142_static_binaries_linux.tar.gz?dl=1
+        mkdir ../Qt5_binaries
+        tar xvzf qt5_5142_static_binaries_linux.tar.gz -C ../ -P
+    - name: Install Qt (MacOS)
+      if: matrix.os == 'macos-latest'
+      run: |
+        # Download the pre-built static version of Qt, which was created with the generateBinaries.yml workflow
+        wget -O qt5_5142_static_binaries_macos.tar.gz https://www.dropbox.com/s/bnlec4qpl7c22rp/qt5_5142_static_binaries_macos.tar.gz?dl=1
+        tar xvzf qt5_5142_static_binaries_macos.tar.gz -P
+    - name: Install Qt (Windows)
+      if: matrix.os == 'windows-2016'
+      run: |
+        # Download the pre-built static version of Qt, which was created with the generateBinaries.yml workflow
+        Invoke-WebRequest https://www.dropbox.com/s/r1z7jjit23si9rp/qt5_5142_static_binaries_win.zip?dl=1 -OutFile .\qt5_5142_static_binaries_win.zip
+        expand-archive -path "qt5_5142_static_binaries_win.zip" -destinationpath "..\"
+    - name: Install jom (Windows)
+      if: matrix.os == 'windows-2016'
+      run: |
+        Invoke-WebRequest https://www.dropbox.com/s/dku543gtw7ik7hr/jom.zip?dl=1 -OutFile .\jom.zip
+        expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
+        echo "::add-path::$HOME\jom"
+    - name: Configure and compile MNE-CPP (Linux|MacOS)
+      if: (matrix.os == 'ubuntu-16.04') || (matrix.os == 'macos-latest')
+      run: |
+        ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=static 
+        make -j4
+    - name: Configure and compile MNE-CPP (Windows)
+      if: matrix.os == 'windows-2016'
+      run: |
+        # Setup VS compiler   
+        cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
+        Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
+        ..\Qt5_binaries\bin\qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=static
         jom -j4
         
   Tests:
