@@ -1,11 +1,12 @@
 ---
-title: Contributing to the Website
-parent: Contribute
+title: Testing via CI
+parent: WebAssembly
+grand_parent: Develop
 nav_order: 2
 ---
-# Contributing to the Website
+# Testing via CI
 
-This page shows you how to contribute to MNE-CPP's website. The easiest way to make changes to the documentation and check them before you do a pull request is to follow the steps below.
+This page shows you how to check your wasm build and deploy it to your `gh-pages` branch. 
 
 ## Set up gh-pages
 
@@ -29,8 +30,8 @@ Create a new access token and give it repo rights only. A guide on how to create
 
 If you do not have a `GIT_CREDENTIALS_DOCU_TEST` secret setup already, create a secret for your forked MNE-CPP repository. A guide on how to create a new token can be found [here](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets#creating-encrypted-secrets){:target="_blank" rel="noopener"}. The secret must be named `GIT_CREDENTIALS_DOCU_TEST` and have the following format `https://$username:$token@github.com/`, where `$token` is the access token created in the step above and `$username` is your GitHub user name.
 
-## Make your changes to the documentation
+## Trigger the Github Actions workflow
 
-Create a new branch named `docu`. If you decide to use a different name make sure to change the branch parameter in the `docutest.yml` workflow file accordingly. The website is maintained via .md files, which can be found in `mne-cpp/doc/gh-pages`. When ready, commit and push your changes to your remote.
+Create a new branch named `wasm`. If you decide to use a different name make sure to change the branch parameter in the `wasmtest.yml` workflow file accordingly. When ready, commit and push your changes to your remote. This will trigger a wasm build being build via Github actions and then be pushed to your fork's `gh-pages` branch. Please note that this will delete everyhting presenet in your `gh-pages` branch. Building Qt and MNE-CPP for Wasm takes quite some time because we only have two CPU cores at our disposal.
 
-If everything was setup correctly, the push should trigger a GitHub action to build your changes to the `gh-pages` branch. Once the GitHub action finishes you can take a look at your changes by visiting `http://$username.github.io/mne-cpp/`. Please note that it can take some time or multiple refreshes for the changes to show.
+If everything was setup correctly, the push should trigger a GitHub action to build your changes to the `gh-pages` branch. Once the GitHub action finishes you can take a look at your changes by visiting `https://$username.github.io/mne-cpp/mne_analyze.html`. Please note that it can take some time or multiple refreshes for the changes to show.
