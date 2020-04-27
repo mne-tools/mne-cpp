@@ -3,6 +3,7 @@
  * @file     compute_fwd.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Ruben Dörfel <ruben.deorfel@tu-ilmenau.de>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
  * @since    0.1.0
  * @date     February, 2017
