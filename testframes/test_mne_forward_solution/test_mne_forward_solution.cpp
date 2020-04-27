@@ -46,6 +46,7 @@
 
 #include <fiff/fiff.h>
 #include <fiff/fiff_info.h>
+#include <fiff/fiff_named_matrix.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -147,9 +148,10 @@ void TestMneForwardSolution::computeForward()
     QSharedPointer<ComputeFwd> pFwdMEGEEGComputed = QSharedPointer<ComputeFwd>(new ComputeFwd(&settingsMEGEEG));
     pFwdMEGEEGComputed->calculateFwd();
 
-    // recalculate with same meg_head_t to check that we don't crash it
+    // recalculate with same meg_head_t to check that we still get the same result
     FIFFLIB::FiffCoordTransOld meg_head_t = pFiffInfo->dev_head_t.toOld();
     pFwdMEGEEGComputed->updateHeadPos(&meg_head_t);
+
     pFwdMEGEEGComputed->storeFwd();
 
     // Read newly created fwd
