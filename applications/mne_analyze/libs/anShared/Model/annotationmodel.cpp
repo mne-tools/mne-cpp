@@ -440,3 +440,10 @@ int AnnotationModel::getSelectedAnn()
 {
     return m_iSelectedAnn;
 }
+
+//=============================================================================================================
+
+float AnnotationModel::getFreq()
+{
+    return m_fFreq;
+}

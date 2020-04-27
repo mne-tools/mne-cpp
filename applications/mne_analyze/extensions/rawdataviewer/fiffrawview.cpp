@@ -179,7 +179,7 @@ void FiffRawView::initMVCSettings(const QSharedPointer<FiffRawViewModel>& pModel
 
     m_pTableView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(m_pTableView.data(), &QWidget::customContextMenuRequested,
-            this, &FiffRawView::customContextMenuRequested);
+            this, &FiffRawView::customContextMenuRequested, Qt::UniqueConnection);
 
 //    //Gestures
 //    m_pTableView->grabGesture(Qt::PinchGesture);
