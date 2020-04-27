@@ -3,7 +3,7 @@
  * @file     fiffrawviewdelegate.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
- *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
+ *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>;
  *           Gabriel Motta <gbmotta@mgh.harvard.edu>
  * @version  dev
  * @date     January, 2019

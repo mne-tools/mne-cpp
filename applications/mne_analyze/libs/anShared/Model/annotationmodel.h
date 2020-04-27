@@ -1,8 +1,7 @@
 //=============================================================================================================
 /**
  * @file     annotationmodel.h
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
- *           Lorenz Esch <lesch@mgh.harvard.edu>
+ * @author   Lorenz Esch <lesch@mgh.harvard.edu>
  *           Gabriel Motta <gbmotta@mgh.harvard.edu>
  * @version  dev
  * @date     March, 2020

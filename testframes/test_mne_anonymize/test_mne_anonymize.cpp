@@ -3,7 +3,7 @@
 /**
  * @file     test_mne_anonymize.cpp
  * @author   Lorenz Esch <lorenzesch@hotmail.com>;
- * @version  1.0
+ * @version  dev
  * @date     September, 2019
  *
  * @section  LICENSE
