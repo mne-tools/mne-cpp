@@ -451,26 +451,6 @@ int FiffAnonymizer::anonymizeFile()
 
     closeInOutStreams();
 
-//    if(checkDeleteInputFile())
-//    {
-//        deleteInputFile();
-//    }
-
-//    if(checkRenameOutputFile())
-//    {
-//        renameOutputFileAsInputFile();
-//    }
-
-//    qInfo() << "MNE Anonymize finished correctly: " + QFileInfo(m_fFileIn).fileName() + " -> " + QFileInfo(m_fFileOut).fileName();
-
-//    printIfVerbose(" ");
-//    printIfVerbose("----------------------------------------------------------------------------");
-//    printIfVerbose(" ");
-
-//    return 0;
-
-
-
     if(checkDeleteInputFile())
     {
         deleteInputFile();
@@ -1159,7 +1139,9 @@ int FiffAnonymizer::openInOutStreams()
         qCritical() << "Problem opening the output file: " << m_fFileOut.fileName();
         return 1;
     }
+
     return 0;
+
 }
 
 int FiffAnonymizer::closeInOutStreams()
@@ -1178,5 +1160,7 @@ int FiffAnonymizer::closeInOutStreams()
         qCritical() << "Problem closing the output file: " << m_fFileOut.fileName();
         return 1;
     }
+
     return 0;
+
 }
