@@ -90,6 +90,8 @@ public:
      */
     bool saveToFile(const QString& sPath);
 
+    void setLastType(int iType);
+
 signals:
 
     void updateEventTypes(const QString& currentFilterType);
@@ -113,6 +115,8 @@ private:
     int                 m_iActiveCheckState;
     int                 m_iSelectedCheckState;
     int                 m_iSelectedAnn;
+
+    int                 m_iLastTypeAdded;
 
     float               m_fFreq;
 
