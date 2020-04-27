@@ -66,7 +66,7 @@ using namespace MNEANONYMIZE;
 //=============================================================================================================
 
 FiffAnonymizer::FiffAnonymizer()
-: maxValidFiffVerion(1.3)
+: m_dMaxValidFiffVerion(1.3)
 , m_sDefaultString("mne_anonymize")
 , m_sSubjectFirstName(m_sDefaultString)
 , m_sSubjectMidName("mne")
@@ -101,8 +101,8 @@ FiffAnonymizer::FiffAnonymizer()
 , m_fSubjectWeight(0.)
 , m_fSubjectHeight(0.)
 , m_iProjectId(0)
-, m_pFiffInTag(FIFFLIB::FiffTag::SPtr::create())
-, m_pFiffOutTag(FIFFLIB::FiffTag::SPtr::create())
+, m_pInTag(FIFFLIB::FiffTag::SPtr::create())
+, m_pOutTag(FIFFLIB::FiffTag::SPtr::create())
 {
     //MAC addresses have 6 bytes. We use 2 more here to complete 2 int32 (2bytes) reads.
     //check->sometimes MAC address is stored in the 0-5 bytes some other times it
@@ -111,6 +111,7 @@ FiffAnonymizer::FiffAnonymizer()
     m_BDfltMAC[1] = 0;
 
     m_pBlockTypeList = QSharedPointer<QStack<int32_t> >(new QStack<int32_t>);
+    m_pBlockTypeList->clear();
     m_pOutDir = QSharedPointer<QVector<FIFFLIB::FiffDirEntry> >(new QVector<FIFFLIB::FiffDirEntry>);
 }
 
@@ -421,7 +422,7 @@ FiffAnonymizer::FiffAnonymizer()
 
 int FiffAnonymizer::anonymizeFile()
 {
-    printIfVerbose("Max. Valid Fiff version: " + QString::number(maxValidFiffVerion));
+    printIfVerbose("Max. Valid Fiff version: " + QString::number(m_dMaxValidFiffVerion));
     printIfVerbose("Current date: " + QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz t"));
     printIfVerbose(" ");
 
@@ -430,20 +431,9 @@ int FiffAnonymizer::anonymizeFile()
         return 1;
     }
 
-//    readTag();
-//    checkValidTag(1);
-//    censorTag();
-//    writeTag();
+    printIfVerbose("Reading info in the file.");
+    readHeaderTags();
 
-//    readTag();
-//    checkValidTag(2);
-//    censorTag();
-//    writeTag();
-
-//    readTag();
-//    checkValidTag(3);
-//    censorTag();
-//    writeTag
 
 //    while(m_pFiffInTag->next != -1)
 //    {
@@ -456,9 +446,11 @@ int FiffAnonymizer::anonymizeFile()
 //        writeTag();
 //    }
 
+//      if m_bTagDirectoryPresent
 //    addFinalEntryToDir();
 //    writeDirectory();
 //    updatePointer directory
+//    if m_bFreeListTagPresent
 //    updatePointer FIFF_FREE_LIST
 
 //    closeInOutStreams();
@@ -483,64 +475,7 @@ int FiffAnonymizer::anonymizeFile()
 
 
 
-//    FiffTag::SPtr pInTag = FiffTag::SPtr::create();
-//    FiffTag::SPtr pOutTag = FiffTag::SPtr::create();
 
-//    inStream.read_tag(pInTag,0);
-
-//    //info in a tag FIFF_COMMENT (206) depends on the type of block it is in. Therefore, in order to
-//    //anonymize it we not only have to know the kind of the current tag, but also which type of block
-//    //we're currently in. BlockTypeList is a stack container used to keep track of this.
-//    m_pBlockTypeList->clear();
-//    updateBlockTypeList(pInTag);
-
-//    printIfVerbose("Reading info in the file.");
-//    if(checkValidFiffFormatVersion(pInTag)) {
-//        printIfVerbose("Input file compatible with this version of mne_anonymizer.");
-//    } else {
-//        qWarning() << "This file may not be compatible with this application.";
-//    }
-
-//    censorTag(pOutTag,pInTag);
-//    pOutTag->next = FIFFV_NEXT_SEQ;
-
-//    // Build the tag directory on the go
-//    addEntryToDir(pOutTag,outStream.device()->pos());
-//    FiffTag::convert_tag_data(pOutTag,FIFFV_NATIVE_ENDIAN,FIFFV_BIG_ENDIAN);
-//    outStream.write_tag(pOutTag, 0);
-
-//    // Set FIFF_DIR_POINTER tag to -1
-//    inStream.read_tag(pInTag);
-//    if (pInTag->kind != FIFF_DIR_POINTER) {
-//        qCritical() << "File does have a directory pointer: " << m_fFileOut.fileName();
-//        return 1;
-//    }
-
-//    pOutTag->kind = FIFF_DIR_POINTER;
-//    pOutTag->type = pInTag->type;
-//    pOutTag->next = FIFFV_NEXT_SEQ;
-//    qint32 iFiffDirPos = -1;
-//    pOutTag->resize(sizeof(iFiffDirPos));
-//    memcpy(pOutTag->data(),&iFiffDirPos,sizeof(iFiffDirPos));
-//    addEntryToDir(pOutTag,outStream.device()->pos());
-//    FiffTag::convert_tag_data(pOutTag,FIFFV_NATIVE_ENDIAN,FIFFV_BIG_ENDIAN);
-//    outStream.write_tag(pOutTag);
-
-//    // Set FIFF_FREE_LIST tag to -1
-//    inStream.read_tag(pInTag);
-//    if (pInTag->kind != FIFF_FREE_LIST) {
-//        qCritical() << "File does have a free list pointer: " << m_fFileOut.fileName();
-//        return 1;
-//    }
-
-//    pOutTag->kind = FIFF_FREE_LIST;
-//    pOutTag->type = pInTag->type;
-//    pOutTag->next = FIFFV_NEXT_SEQ;
-//    pOutTag->resize(sizeof(iFiffDirPos));
-//    memcpy(pOutTag->data(),&iFiffDirPos,sizeof(iFiffDirPos));
-//    addEntryToDir(pOutTag,outStream.device()->pos());
-//    FiffTag::convert_tag_data(pOutTag,FIFFV_NATIVE_ENDIAN,FIFFV_BIG_ENDIAN);
-//    outStream.write_tag(pOutTag);
 
 //    while(pInTag->next != -1) {
 //        inStream.read_tag(pInTag);
@@ -598,44 +533,139 @@ int FiffAnonymizer::anonymizeFile()
 
 //=============================================================================================================
 
-void FiffAnonymizer::updateBlockTypeList(FIFFLIB::FiffTag::SPtr pTag)
+void FiffAnonymizer::readTag()
 {
-    if(pTag->kind == FIFF_BLOCK_START) {
+    m_pFiffStreamIn->read_tag(m_pInTag,0);
+    updateBlockTypeList();
+}
+
+void FiffAnonymizer::writeTag()
+{
+    FIFFLIB::FiffTag::convert_tag_data(m_pOutTag,FIFFV_NATIVE_ENDIAN,FIFFV_BIG_ENDIAN);
+    m_pOutStream->write_tag(m_pOutTag, 0);
+}
+
+void FiffAnonymizer::readHeaderTags()
+{
+    readTag();
+
+    if(checkValidFiffFormatVersion(m_pInTag)) {
+        printIfVerbose("Input file compatible with this version of mne_anonymizer.");
+    } else {
+        qCritical() << "This file may not be compatible with this application.";
+    }
+
+    censorTag();
+    m_pOutTag->next = FIFFV_NEXT_SEQ;
+    addEntryToDir();
+
+    //read and process first two tags. this deserves a member fcn.
+    //the first 2-4 tags work as a type of header.
+//    this method will read 2 or the 4 depending on wether they are present.
+    //setting the appropiate member variables accordingly.
+//    -->readTag();
+//    -->checkValidTag(1);
+//    -->censorTag();
+//    -->writeTag();
+//      -->
+//    -->readTag();
+//    -->checkValidTag(2);
+//    -->censorTag();
+//    -->writeTag();
+//      check if there is a tag directory
+//      set member bool to note so.
+
+    //    FiffTag::SPtr pInTag = FiffTag::SPtr::create();
+    //    FiffTag::SPtr pOutTag = FiffTag::SPtr::create();
+
+    //    inStream.read_tag(pInTag,0);
+
+    //    //info in a tag FIFF_COMMENT (206) depends on the type of block it is in. Therefore, in order to
+    //    //anonymize it we not only have to know the kind of the current tag, but also which type of block
+    //    //we're currently in. BlockTypeList is a stack container used to keep track of this.
+    //
+    //    // Build the tag directory on the go
+
+    readTag();
+    if(m_pInTag->kind != FIFF_DIR_POINTER)
+    {
+        qCritical() << "File does have a directory pointer: " << m_fFileOut.fileName();
+        return 1;
+    }
+    //    // Set FIFF_DIR_POINTER tag to -1
+    //    inStream.read_tag(pInTag);
+    //    if (pInTag->kind != FIFF_DIR_POINTER) {
+
+    //    }
+
+    //    pOutTag->kind = FIFF_DIR_POINTER;
+    //    pOutTag->type = pInTag->type;
+    //    pOutTag->next = FIFFV_NEXT_SEQ;
+    //    qint32 iFiffDirPos = -1;
+    //    pOutTag->resize(sizeof(iFiffDirPos));
+    //    memcpy(pOutTag->data(),&iFiffDirPos,sizeof(iFiffDirPos));
+    //    addEntryToDir(pOutTag,outStream.device()->pos());
+    //    FiffTag::convert_tag_data(pOutTag,FIFFV_NATIVE_ENDIAN,FIFFV_BIG_ENDIAN);
+    //    outStream.write_tag(pOutTag);
+
+    //    // Set FIFF_FREE_LIST tag to -1
+    //    inStream.read_tag(pInTag);
+    //    if (pInTag->kind != FIFF_FREE_LIST) {
+    //        qCritical() << "File does have a free list pointer: " << m_fFileOut.fileName();
+    //        return 1;
+    //    }
+
+    //    pOutTag->kind = FIFF_FREE_LIST;
+    //    pOutTag->type = pInTag->type;
+    //    pOutTag->next = FIFFV_NEXT_SEQ;
+    //    pOutTag->resize(sizeof(iFiffDirPos));
+    //    memcpy(pOutTag->data(),&iFiffDirPos,sizeof(iFiffDirPos));
+    //    addEntryToDir(pOutTag,outStream.device()->pos());
+    //    FiffTag::convert_tag_data(pOutTag,FIFFV_NATIVE_ENDIAN,FIFFV_BIG_ENDIAN);
+    //    outStream.write_tag(pOutTag);
+}
+
+//=============================================================================================================
+
+void FiffAnonymizer::updateBlockTypeList()
+{
+    if(m_pInTag->kind == FIFF_BLOCK_START) {
         m_pBlockTypeList->push(*pTag->toInt());
     }
 
-    if(pTag->kind == FIFF_BLOCK_END) {
+    if(m_pInTag->kind == FIFF_BLOCK_END) {
         m_pBlockTypeList->pop();
     }
 }
 
 //=============================================================================================================
 
-bool FiffAnonymizer::checkValidFiffFormatVersion(FIFFLIB::FiffTag::SPtr pTag)
+bool FiffAnonymizer::checkValidFiffFormatVersion(const FIFFLIB::FiffTag::SPtr pTag) const
 {
-    if(pTag->kind == FIFF_FILE_ID) {
+    if(pTag->kind == FIFF_FILE_ID)
+    {
         FIFFLIB::FiffId fileId = pTag->toFiffID();
         int inMayorVersion = (static_cast<uint32_t>(fileId.version) & 0xFFFF0000) >> 16;
         int inMinorVersion = (static_cast<uint32_t>(fileId.version) & 0x0000FFFF);
         double inVersion = inMayorVersion + inMinorVersion/10.0;
 
-        if(inVersion > maxValidFiffVerion) {
+        if(inVersion > m_dMaxValidFiffVerion) {
             return false;
         }
+        return true;
     }
-    return true;
+    return false;
 }
 
 //=============================================================================================================
 
-void FiffAnonymizer::addEntryToDir(FIFFLIB::FiffTag::SPtr pTag,
-                                   qint64 filePos)
+void FiffAnonymizer::addEntryToDir()
 {
     FIFFLIB::FiffDirEntry t_dirEntry;
-    t_dirEntry.kind = pTag->kind;
-    t_dirEntry.type = pTag->type;
-    t_dirEntry.size = pTag->size();
-    t_dirEntry.pos  = static_cast<FIFFLIB::fiff_int_t>(filePos);
+    t_dirEntry.kind = m_pOutTag->kind;
+    t_dirEntry.type = m_pOutTag->type;
+    t_dirEntry.size = m_pOutTag->size();
+    t_dirEntry.pos  = static_cast<FIFFLIB::fiff_int_t>(m_pOutStream->device()->pos());
     m_pOutDir->append(t_dirEntry);
 }
 
@@ -741,20 +771,16 @@ bool FiffAnonymizer::checkDeleteInputFile()
             return true;
         }
     }
-
     return false;
 }
 
 //=============================================================================================================
 
-int FiffAnonymizer::censorTag(FIFFLIB::FiffTag::SPtr outTag,
-                              FIFFLIB::FiffTag::SPtr inTag)
+void FiffAnonymizer::censorTag() const
 {
-    int sizeDiff(0);
-
-    outTag->kind = inTag->kind;
-    outTag->type = inTag->type;
-    outTag->next = inTag->next;
+    m_pOutTag->kind = m_pInTag->kind;
+    m_pOutTag->type = m_pInTag->type;
+    m_pOutTag->next = m_pInTag->next;
 
 //    switch (inTag->kind) {
 //    //all these 'kinds' of tags contain a fileID struct, which contains info related to
@@ -1002,9 +1028,6 @@ int FiffAnonymizer::censorTag(FIFFLIB::FiffTag::SPtr outTag,
 //    }
 //    }
 
-    sizeDiff = outTag->size() - inTag->size();
-
-    return sizeDiff;
 }
 
 //=============================================================================================================
@@ -1201,8 +1224,8 @@ int FiffAnonymizer::setupInOutStreams()
         return 1;
     }
 
-    m_pFiffStreamOut = FIFFLIB::FiffStream::SPtr(new FIFFLIB::FiffStream(&m_fFileOut));
-    if(m_pFiffStreamOut->device()->open(QIODevice::WriteOnly)) {
+    m_pOutStream = FIFFLIB::FiffStream::SPtr(new FIFFLIB::FiffStream(&m_fFileOut));
+    if(m_pOutStream->device()->open(QIODevice::WriteOnly)) {
         printIfVerbose("Output file opened correctly: " + m_fFileOut.fileName());
     } else {
         qCritical() << "Problem opening the output file: " << m_fFileOut.fileName();

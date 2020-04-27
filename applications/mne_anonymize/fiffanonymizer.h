@@ -416,8 +416,6 @@ public:
 //     */
 //    QString getsFileNameOut();
 
-    const double maxValidFiffVerion;    /**< Maximum version of the Fiff file standard compatible with this application.*/
-
 private:
     //=========================================================================================================
     /**
@@ -431,7 +429,7 @@ private:
      *
      * @param [in] pTag Pointer to the tag being read. Normally the input Tag.
      */
-    void updateBlockTypeList(FIFFLIB::FiffTag::SPtr pTag);
+    void updateBlockTypeList();
 
     //=========================================================================================================
     /**
@@ -441,19 +439,15 @@ private:
      *
      * @param [in] pTag Pointer to the tag being read. Normally, the input Tag.
      */
-    bool checkValidFiffFormatVersion(FIFFLIB::FiffTag::SPtr pTag);
+    bool checkValidFiffFormatVersion(const FIFFLIB::FiffTag::SPtr pTag) const;
 
     //=========================================================================================================
     /**
      * For a specific input tag, check if that tag belongs to a set of tags where relevant information should be
      * censored/anonymized. If so, perform such anonymization while copying the new tag into an output Tag.
      * This is the core method of the class where the actual anonymization takes place.
-     *
-     * @param [in] pInTag   Pointer to the input tag being read from the input file.
-     * @param [in] pOutTag  Pointer to the output tag being written to the output file.
      */
-    int censorTag(FIFFLIB::FiffTag::SPtr pInTag,
-                  FIFFLIB::FiffTag::SPtr pOutTag);
+    void censorTag() const;
 
     //=========================================================================================================
     /**
@@ -463,12 +457,8 @@ private:
      * anonymized tags, it has to be reworked. The fiff standard does not mandate to have this directory but it
      * seems convinient to build it. We do this on-the-fly, while reading each tag. And store all the info for the
      * directory inside m_pOutDir vector.
-     *
-     * @param [in] pTag     Pointer to the tag being read. Normally the input tag.
-     * @param [in] filePos  Actual file position of the input file (relative to the begining of the file).
      */
-    void addEntryToDir(FIFFLIB::FiffTag::SPtr pTag,
-                       qint64 filePos);
+    void addEntryToDir();
 
     //=========================================================================================================
     /**
@@ -574,8 +564,14 @@ private:
     void renameOutputFileAsInputFile();
 
     int setupInOutStreams();
+    void readHeaderTags();
+    void readTag();
+    void writeTag();
 
     //=========================================================================================================
+
+    const double m_dMaxValidFiffVerion;    /**< Maximum version of the Fiff file standard compatible with this application.*/
+
     QString m_sDefaultString;           /**< String to be used as substitution of other strings in a fiff file */
     QString m_sSubjectFirstName;        /**< Subject's first name substitutor.*/
     QString m_sSubjectMidName;          /**< Subject's middle name substitutor.*/
@@ -619,9 +615,9 @@ private:
     int m_iProjectId;                   /**< Project's id# substitutor.*/
 
     FIFFLIB::FiffStream::SPtr m_pFiffStreamIn;   /**< Pointer to FiffStream object for reading.*/
-    FIFFLIB::FiffStream::SPtr m_pFiffStreamOut;  /**< Pointer to FiffStream object for writing the result.*/
-    FIFFLIB::FiffTag::SPtr m_pFiffInTag;         /**< Pointer to FiffTag used for reading each tag.*/
-    FIFFLIB::FiffTag::SPtr m_pFiffOutTag;        /**< Pointer to FiffTag used for writing each anonymized tag.*/
+    FIFFLIB::FiffStream::SPtr m_pOutStream;  /**< Pointer to FiffStream object for writing the result.*/
+    FIFFLIB::FiffTag::SPtr m_pInTag;         /**< Pointer to FiffTag used for reading each tag.*/
+    FIFFLIB::FiffTag::SPtr m_pOutTag;        /**< Pointer to FiffTag used for writing each anonymized tag.*/
 
     FIFFLIB::fiff_int_t m_BDfltMAC[2];  /**< MAC addresss substitutor.*/
 
