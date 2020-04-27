@@ -81,6 +81,8 @@ FiffAnonymizer::FiffAnonymizer()
 //, m_sFileNameOut("")
 , m_bFileInSet(false)
 , m_bFileOutSet(false)
+, m_bFileHasDirPtr(true)
+, m_bFileHasFreeListPtr(false)
 , m_dateDefaultDate(QDateTime(QDate(2000,1,1), QTime(1, 1, 0), Qt::UTC))
 , m_dateMeasurmentDate(m_dateDefaultDate)
 , m_dateSubjectBirthday(m_dateDefaultDate)
@@ -432,28 +434,27 @@ int FiffAnonymizer::anonymizeFile()
     }
 
     printIfVerbose("Reading info in the file.");
-    readHeaderTags();
+    processHeaderTags();
 
 
-//    while(m_pFiffInTag->next != -1)
-//    {
-//        readTag();
-//        censorTag();
-//        if(m_pFiffOutTag->next > 0)
-//        {
-//            m_pFiffOutTag->next = FIFFV_NEXT_SEQ;
-//        }
-//        writeTag();
-//    }
+    while(m_pInTag->next != -1)
+    {
+        readTag();
+        censorTag();
+        writeTag();
+    }
 
-//      if m_bTagDirectoryPresent
-//    addFinalEntryToDir();
-//    writeDirectory();
-//    updatePointer directory
-//    if m_bFreeListTagPresent
-//    updatePointer FIFF_FREE_LIST
+    if (m_bFileHasDirPtr)
+    {
+        addFinalEntryToDir();
+    }
 
-//    closeInOutStreams();
+    writeDirectory();
+    updatePointer directory
+    if m_bFreeListTagPresent
+    updatePointer FIFF_FREE_LIST
+
+    closeInOutStreams();
 
 //    if(checkDeleteInputFile())
 //    {
@@ -535,94 +536,66 @@ int FiffAnonymizer::anonymizeFile()
 
 void FiffAnonymizer::readTag()
 {
-    m_pFiffStreamIn->read_tag(m_pInTag,0);
+    m_pInStream->read_tag(m_pInTag,0);
     updateBlockTypeList();
 }
 
 void FiffAnonymizer::writeTag()
 {
+    //make output tag list linear
+    if(m_pOutTag->next > 0)
+    {
+        m_pOutTag->next = FIFFV_NEXT_SEQ;
+    }
+
+    if(m_bFileHasDirPtr)
+    {
+        addEntryToDir();
+    }
+
     FIFFLIB::FiffTag::convert_tag_data(m_pOutTag,FIFFV_NATIVE_ENDIAN,FIFFV_BIG_ENDIAN);
     m_pOutStream->write_tag(m_pOutTag, 0);
 }
 
-void FiffAnonymizer::readHeaderTags()
+void FiffAnonymizer::processHeaderTags()
 {
     readTag();
 
     if(checkValidFiffFormatVersion(m_pInTag)) {
         printIfVerbose("Input file compatible with this version of mne_anonymizer.");
     } else {
-        qCritical() << "This file may not be compatible with this application.";
+        qCritical() << "This file may not be compatible with this application. First tag is not a valid ID tag.";
     }
 
     censorTag();
-    m_pOutTag->next = FIFFV_NEXT_SEQ;
-    addEntryToDir();
+    writeTag();
 
-    //read and process first two tags. this deserves a member fcn.
-    //the first 2-4 tags work as a type of header.
-//    this method will read 2 or the 4 depending on wether they are present.
-    //setting the appropiate member variables accordingly.
-//    -->readTag();
-//    -->checkValidTag(1);
-//    -->censorTag();
-//    -->writeTag();
-//      -->
-//    -->readTag();
-//    -->checkValidTag(2);
-//    -->censorTag();
-//    -->writeTag();
-//      check if there is a tag directory
-//      set member bool to note so.
-
-    //    FiffTag::SPtr pInTag = FiffTag::SPtr::create();
-    //    FiffTag::SPtr pOutTag = FiffTag::SPtr::create();
-
-    //    inStream.read_tag(pInTag,0);
-
-    //    //info in a tag FIFF_COMMENT (206) depends on the type of block it is in. Therefore, in order to
-    //    //anonymize it we not only have to know the kind of the current tag, but also which type of block
-    //    //we're currently in. BlockTypeList is a stack container used to keep track of this.
-    //
-    //    // Build the tag directory on the go
-
+    // pointer to tag directory
     readTag();
+
     if(m_pInTag->kind != FIFF_DIR_POINTER)
     {
-        qCritical() << "File does have a directory pointer: " << m_fFileOut.fileName();
-        return 1;
+        qCritical() << "This file may not be compatible with this application. Second tag is not a valid Tag directory pointer tag.";
     }
-    //    // Set FIFF_DIR_POINTER tag to -1
-    //    inStream.read_tag(pInTag);
-    //    if (pInTag->kind != FIFF_DIR_POINTER) {
+    if(*m_pInTag->toInt() <= 0)
+    {
+        m_bFileHasDirPtr = false;
+    }
 
-    //    }
+    censorTag();
+    writeTag();
 
-    //    pOutTag->kind = FIFF_DIR_POINTER;
-    //    pOutTag->type = pInTag->type;
-    //    pOutTag->next = FIFFV_NEXT_SEQ;
-    //    qint32 iFiffDirPos = -1;
-    //    pOutTag->resize(sizeof(iFiffDirPos));
-    //    memcpy(pOutTag->data(),&iFiffDirPos,sizeof(iFiffDirPos));
-    //    addEntryToDir(pOutTag,outStream.device()->pos());
-    //    FiffTag::convert_tag_data(pOutTag,FIFFV_NATIVE_ENDIAN,FIFFV_BIG_ENDIAN);
-    //    outStream.write_tag(pOutTag);
+    //free list
+    readTag();
 
-    //    // Set FIFF_FREE_LIST tag to -1
-    //    inStream.read_tag(pInTag);
-    //    if (pInTag->kind != FIFF_FREE_LIST) {
-    //        qCritical() << "File does have a free list pointer: " << m_fFileOut.fileName();
-    //        return 1;
-    //    }
-
-    //    pOutTag->kind = FIFF_FREE_LIST;
-    //    pOutTag->type = pInTag->type;
-    //    pOutTag->next = FIFFV_NEXT_SEQ;
-    //    pOutTag->resize(sizeof(iFiffDirPos));
-    //    memcpy(pOutTag->data(),&iFiffDirPos,sizeof(iFiffDirPos));
-    //    addEntryToDir(pOutTag,outStream.device()->pos());
-    //    FiffTag::convert_tag_data(pOutTag,FIFFV_NATIVE_ENDIAN,FIFFV_BIG_ENDIAN);
-    //    outStream.write_tag(pOutTag);
+    if(m_pInTag->kind == FIFF_FREE_LIST)
+    {
+        qWarning() << "This file contains a Free List of tags. It will not be copied to the output file.";
+    } else {
+        // output this tag, whatever kind it is, to the oupput file.
+        censorTag();
+        writeTag();
+    }
 }
 
 //=============================================================================================================
@@ -708,27 +681,27 @@ void FiffAnonymizer::dir2tag(FIFFLIB::FiffTag::SPtr pTag)
 
 //=============================================================================================================
 
-void FiffAnonymizer::writeDirectory(FIFFLIB::FiffStream* stream,
-                                    FIFFLIB::fiff_long_t pos)
+void FiffAnonymizer::writeDirectory(FIFFLIB::fiff_long_t pos)
 {
     if(pos>=0)
-        stream->device()->seek(pos);
-    else {
-        QFile* file=qobject_cast<QFile*>(stream->device());
+    {
+        m_pOutStream->device()->seek(pos);
+    } else {
+        QFile* file=qobject_cast<QFile*>(m_pOutStream->device());
         if(file)
-            stream->device()->seek(file->size());
+            m_pOutStream->device()->seek(file->size());
     }
 
-    *stream << static_cast<quint32>(FIFF_DIR);
-    *stream << static_cast<quint32>(FIFFT_DIR_ENTRY_STRUCT);
-    *stream << static_cast<quint32>
+    *m_pOutStream << static_cast<quint32>(FIFF_DIR);
+    *m_pOutStream << static_cast<quint32>(FIFFT_DIR_ENTRY_STRUCT);
+    *m_pOutStream << static_cast<quint32>
                (static_cast<unsigned long long>(m_pOutDir->size())*sizeof(FIFFLIB::FiffDirEntry));
-    *stream << static_cast<quint32>(-1);
+    *m_pOutStream << static_cast<quint32>(-1);
     for(int i=0;i<m_pOutDir->size();++i) {
-        *stream << static_cast<quint32>(m_pOutDir->at(i).kind);
-        *stream << static_cast<quint32>(m_pOutDir->at(i).type);
-        *stream << static_cast<quint32>(m_pOutDir->at(i).size);
-        *stream << static_cast<quint32>(m_pOutDir->at(i).pos);
+        *m_pOutStream << static_cast<quint32>(m_pOutDir->at(i).kind);
+        *m_pOutStream << static_cast<quint32>(m_pOutDir->at(i).type);
+        *m_pOutStream << static_cast<quint32>(m_pOutDir->at(i).size);
+        *m_pOutStream << static_cast<quint32>(m_pOutDir->at(i).pos);
     }
 }
 
@@ -1216,8 +1189,8 @@ void FiffAnonymizer::renameOutputFileAsInputFile()
 
 int FiffAnonymizer::setupInOutStreams()
 {
-    m_pFiffStreamIn = FIFFLIB::FiffStream::SPtr (new FIFFLIB::FiffStream (&m_fFileIn));
-    if(m_pFiffStreamIn->open(QIODevice::ReadOnly)) {
+    m_pInStream = FIFFLIB::FiffStream::SPtr (new FIFFLIB::FiffStream (&m_fFileIn));
+    if(m_pInStream->open(QIODevice::ReadOnly)) {
         printIfVerbose("Input file opened correctly: " + m_fFileIn.fileName());
     } else {
         qCritical() << "Problem opening the input file: " << m_fFileIn.fileName();
