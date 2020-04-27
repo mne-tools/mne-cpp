@@ -14,6 +14,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QFileDialog>
+#include <QBuffer>
 
 //=============================================================================================================
 // Eigen INCLUDES
@@ -457,7 +458,8 @@ bool AnnotationModel::saveToFile(const QString& sPath)
 {
 #ifdef WASMBUILD
     QFileInfo fileInfo (sPath);
-    QByteArray bufferOut;
+     //QBuffer* bufferOut = new QBuffer;
+   QByteArray* bufferOut = new QByteArray;
 
     QTextStream out(bufferOut, QIODevice::ReadWrite);
     for(int i = 0; i < this->getNumberOfAnnotations(); i++) {
@@ -466,7 +468,9 @@ bool AnnotationModel::saveToFile(const QString& sPath)
     }
 
     // Wee need to call the QFileDialog here instead of the data load extension since we need access to the QByteArray
-    QFileDialog::saveFileContent(bufferOut.data(), fileInfo.fileName());
+    QFileDialog::saveFileContent(bufferOut->data(), "events.eve");
+
+   // bufferOut->deleteLater();
 
     return true;
 #else
