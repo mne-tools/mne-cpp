@@ -58,7 +58,7 @@ void AnnotationView::initMSVCSettings()
     //Model
     ui->m_tableView_eventTableView->setModel(m_pAnnModel.data());
     connect(m_pAnnModel.data(),&ANSHAREDLIB::AnnotationModel::dataChanged,
-            this, &AnnotationView::onDataChanged);
+            this, &AnnotationView::onDataChanged, Qt::UniqueConnection);
 
     //Delegate
     m_pAnnDelegate = QSharedPointer<AnnotationDelegate>(new AnnotationDelegate(this));
@@ -75,22 +75,22 @@ void AnnotationView::initGUIFunctionality()
 
     //'Activate annotations' checkbox
     connect(ui->m_checkBox_activateEvents, &QCheckBox::stateChanged,
-            this, &AnnotationView::onActiveEventsChecked);
+            this, &AnnotationView::onActiveEventsChecked, Qt::UniqueConnection);
 
     //'Show selected annotation' checkbox
     connect(ui->m_checkBox_showSelectedEventsOnly,&QCheckBox::stateChanged,
-            this, &AnnotationView::onSelectedEventsChecked);
+            this, &AnnotationView::onSelectedEventsChecked, Qt::UniqueConnection);
     connect(ui->m_tableView_eventTableView->selectionModel(), &QItemSelectionModel::selectionChanged,
-            this, &AnnotationView::onCurrentSelectedChanged);
+            this, &AnnotationView::onCurrentSelectedChanged, Qt::UniqueConnection);
 
     //Annotation types combo box
     ui->m_comboBox_filterTypes->addItem("All");
     //ui->m_comboBox_filterTypes->addItems(m_pAnnModel->getEventTypeList());
     ui->m_comboBox_filterTypes->setCurrentText("All");
     connect(ui->m_comboBox_filterTypes, &QComboBox::currentTextChanged,
-            m_pAnnModel.data(), &ANSHAREDLIB::AnnotationModel::setEventFilterType);
+            m_pAnnModel.data(), &ANSHAREDLIB::AnnotationModel::setEventFilterType, Qt::UniqueConnection);
     connect(m_pAnnModel.data(), &ANSHAREDLIB::AnnotationModel::updateEventTypes,
-            this, &AnnotationView::updateComboBox);
+            this, &AnnotationView::updateComboBox, Qt::UniqueConnection);
 
     //'Remove annotations' button
     QToolBar *toolBar = new QToolBar(this);
@@ -100,13 +100,15 @@ void AnnotationView::initGUIFunctionality()
     removeEvent->setStatusTip(tr("Remove an annotation from the list"));
     toolBar->addAction(removeEvent);
     connect(removeEvent, &QAction::triggered,
-            this, &AnnotationView::removeAnnotationfromModel);
+            this, &AnnotationView::removeAnnotationfromModel, Qt::UniqueConnection);
     ui->m_gridLayout_Main->addWidget(toolBar,1,1,1,1);
 
     //Add type button
     connect(ui->m_pushButton_addEventType, &QPushButton::clicked,
-            this, &AnnotationView::addNewAnnotationType);
+            this, &AnnotationView::addNewAnnotationType, Qt::UniqueConnection);
 
+    connect(ui->m_pushButtonSave, &QPushButton::clicked,
+            this, &AnnotationView::onSaveButton, Qt::UniqueConnection);
 }
 
 //=============================================================================================================
@@ -133,8 +135,8 @@ void AnnotationView::updateComboBox(const QString &currentAnnotationType)
     ui->m_comboBox_filterTypes->clear();
     ui->m_comboBox_filterTypes->addItem("All");
     ui->m_comboBox_filterTypes->addItems(m_pAnnModel->getEventTypeList());
-    if(m_pAnnModel->getEventTypeList().contains(currentAnnotationType))
-        ui->m_comboBox_filterTypes->setCurrentText(currentAnnotationType);
+//    if(m_pAnnModel->getEventTypeList().contains(currentAnnotationType))
+//        ui->m_comboBox_filterTypes->setCurrentText(currentAnnotationType);
     emit triggerRedraw();
 }
 
@@ -193,7 +195,7 @@ void AnnotationView::removeAnnotationfromModel()
 void AnnotationView::addNewAnnotationType()
 {
     m_pAnnModel->addNewAnnotationType(QString().number(ui->m_spinBox_addEventType->value()), m_pColordialog->getColor(Qt::black, this));
-    m_pAnnModel->setEventFilterType(QString().number(ui->m_spinBox_addEventType->value()));
+    //m_pAnnModel->setEventFilterType(QString().number(ui->m_spinBox_addEventType->value()));
     emit triggerRedraw();
 }
 
@@ -236,4 +238,29 @@ void AnnotationView::onCurrentSelectedChanged()
     qDebug() << "AnnotationView::onCurrentSelectedChanged";
     qDebug() << ui->m_tableView_eventTableView->selectionModel()->currentIndex().row();
     m_pAnnModel->setSelectedAnn(ui->m_tableView_eventTableView->selectionModel()->currentIndex().row());
+}
+
+//=============================================================================================================
+
+void AnnotationView::onSaveButton()
+{
+    qDebug() << "AnnotationView::onSaveButton";
+    qDebug() << m_pAnnModel->getNumberOfAnnotations();
+    QString fileName = QFileDialog::getSaveFileName(this,
+            tr("Save Annotations"), "",
+            tr("Event file (*.eve);;All Files (*)"));
+    if (fileName.isEmpty())
+        return;
+    else {
+        QFile file(fileName);
+        if (!file.open(QIODevice::WriteOnly)) {
+            qWarning() << "Unable to access file.";
+            return;
+        }
+        QTextStream out(&file);
+        for(int i = 0; i < m_pAnnModel->getNumberOfAnnotations(); i++) {
+            out << "  " << m_pAnnModel->getAnnotation(i) << "   " << static_cast<float>(m_pAnnModel->getAnnotation(i)) / m_pAnnModel->getFreq() << "          0         1" << endl;
+            out << "  " << m_pAnnModel->getAnnotation(i) << "   " << qSetRealNumberPrecision(4) << static_cast<float>(m_pAnnModel->getAnnotation(i)) / m_pAnnModel->getFreq() << "          1         0" << endl;
+        }
+    }
 }
