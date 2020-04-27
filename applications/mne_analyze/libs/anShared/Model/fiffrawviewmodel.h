@@ -10,7 +10,7 @@
  *
  * @section  LICENSE
  *
- * Copyright (C) 2018, Lorenz Esch, Lars Debor, Simon Heinke. All rights reserved.
+ * Copyright (C) 2018, Lorenz Esch, Lars Debor, Simon Heinke, Gabriel Motta. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -487,6 +487,11 @@ private:
 
 
 signals:
+
+    //=========================================================================================================
+    /**
+      * Emits that new block data is loaded
+      */
      void newBlocksLoaded();
 
 private:
@@ -496,7 +501,6 @@ private:
 
     // Display studd
     double      m_dDx;              /**< pixel difference to the next sample. */
-    double      m_dScrollDx;
 
     // model config
     qint32 m_iSamplesPerBlock;      /**< Number of samples per block */
@@ -530,11 +534,11 @@ private:
 
     int                                 m_iDistanceTimerSpacer;                     /**< The distance for the horizontal time spacers in the view in ms */
 
-    qint32 m_iScrollPos;
+    qint32 m_iScrollPos;                                                            /**< Position of the scrollbar */
 
-    bool m_bDispAnn;
+    bool m_bDispAnn;                                                                /**< Whether annotations wil be shown */
 
-    QSharedPointer<AnnotationModel>     m_pAnnotationModel;
+    QSharedPointer<AnnotationModel>     m_pAnnotationModel;                         /**< Model to stored annotations to be displayed */
 };
 
 //=============================================================================================================

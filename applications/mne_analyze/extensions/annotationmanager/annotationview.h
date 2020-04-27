@@ -52,6 +52,11 @@
 #include <QWidget>
 #include <QColorDialog>
 
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+
 namespace Ui {
     class EventWindowDockWidget;
 }
@@ -106,31 +111,6 @@ public slots:
 
     //=========================================================================================================
     /**
-     * Transmits the checkbox state of the 'Activate annotations' checkbox
-     *
-     * @param [in] iCheckBoxState    0 for unchecked, 2 for checked
-     */
-    void onActiveEventsChecked(int iCheckBoxState);
-
-    //=========================================================================================================
-    /**
-     * Transmits the checkbox state of the 'Show selected only' checkbox
-     *
-     * @param [in] iCheckBoxState    0 for unchecked, 2 for checked
-     */
-    void onSelectedEventsChecked(int iCheckBoxState);
-
-    //=========================================================================================================
-    /**
-     * Sets the current selected annotation in the gui and passes it to the model
-     */
-    void onCurrentSelectedChanged();
-
-    //=========================================================================================================
-    void onFilterTypesChanged(const QString& sFilType);
-
-    //=========================================================================================================
-    /**
      * Adds input parameter to annotation model as a new annotation.
      *
      * @param [in] iSample   Sample number to be added to annotation model
@@ -140,6 +120,11 @@ public slots:
 signals:
 
     //=========================================================================================================
+    /**
+     * Emits state of the Activate Annotations checkbox
+     *
+     * @param [in] iCheckBoxState   0 for unchecked, 1 for checked
+     */
     void activeEventsChecked(const int& iCheckBoxState);
 
     //=========================================================================================================
@@ -162,6 +147,28 @@ protected slots:
      */
     void addNewAnnotationType();
 
+    //=========================================================================================================
+    /**
+     * Transmits the checkbox state of the 'Activate annotations' checkbox
+     *
+     * @param [in] iCheckBoxState    0 for unchecked, 2 for checked
+     */
+    void onActiveEventsChecked(int iCheckBoxState);
+
+    //=========================================================================================================
+    /**
+     * Transmits the checkbox state of the 'Show selected only' checkbox
+     *
+     * @param [in] iCheckBoxState    0 for unchecked, 2 for checked
+     */
+    void onSelectedEventsChecked(int iCheckBoxState);
+
+    //=========================================================================================================
+    /**
+     * Sets the current selected annotation in the gui and passes it to the model
+     */
+    void onCurrentSelectedChanged();
+
 private slots:
 
     //=========================================================================================================
@@ -170,6 +177,10 @@ private slots:
      */
     void onDataChanged();
 
+    //=========================================================================================================
+    /**
+     * Triggers the save file dialog. Calls the save file function in the Annotation Model
+     */
     void onSaveButton();
 
 private:
@@ -186,17 +197,16 @@ private:
      */
     void initMSVCSettings();
 
-    Ui::EventWindowDockWidget*                      ui;
+    Ui::EventWindowDockWidget*                      ui;                             /** < Pointer to GUI elements */
 
-    int                                             m_iCheckState;
-    int                                             m_iCheckSelectedState;
+    int                                             m_iCheckState;                  /** < State of show annotations checkbox (0 unchecked, 2 checked) */
+    int                                             m_iCheckSelectedState;          /** < State of the show selected checkbox (0 unchecked, 2 checked) */
+    int                                             m_iLastSampClicked;             /** < Number of the last sample clicked */
 
-    int                                             m_iLastSampClicked;
+    QSharedPointer<AnnotationDelegate>              m_pAnnDelegate;                 /** < Pointer to associated delegate */
+    QSharedPointer<ANSHAREDLIB::AnnotationModel>    m_pAnnModel;                    /** < Pointer to associated model. Points to currently loaded. */
 
-    QSharedPointer<AnnotationDelegate>              m_pAnnDelegate;
-    QSharedPointer<ANSHAREDLIB::AnnotationModel>    m_pAnnModel;
-
-    QColorDialog*       m_pColordialog;
+    QColorDialog*                                   m_pColordialog;                 /** < USed for Prompting users for annotation type colors */
 
 
 };
