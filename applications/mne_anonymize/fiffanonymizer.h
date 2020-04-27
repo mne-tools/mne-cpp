@@ -485,7 +485,7 @@ private:
      * @param [out] stream  The output file stream
      * @param [in] pos      Position in the file where the data can be written. Default is -1.
      */
-    void writeDirectory(FIFFLIB::fiff_long_t pos = -1);
+    void writeDirectory();
 
     //=========================================================================================================
     /**
@@ -501,7 +501,7 @@ private:
      * @param [in] tagKind  Tag kind code to search for
      * @param [in] newPos   New position to store in the data field of the pointer tag.
      */
-    void updatePointer(FIFFLIB::FiffStream* stream,
+    void updatePointer(FIFFLIB::FiffStream::SPtr stream,
                        FIFFLIB::fiff_int_t tagKind,
                        FIFFLIB::fiff_long_t newPos);
 
@@ -562,7 +562,8 @@ private:
      */
     void renameOutputFileAsInputFile();
 
-    int setupInOutStreams();
+    int openInOutStreams();
+    int closeInOutStreams();
     void processHeaderTags();
     void readTag();
     void writeTag();
@@ -589,7 +590,8 @@ private:
     QFile m_fFileOut;                   /**< QFile output file.*/
     bool m_bFileInSet;                  /**< Input file set.*/
     bool m_bFileOutSet;                 /**< Output file set.*/
-    bool m_bFileHasDirPtr;          /**< File has a pointer to a tag directory.*/
+    qint64 m_iDirectoryPos;             /**< Position of the tag directory in the output file.*/
+    bool m_bFileHasDirPtr;              /**< File has a pointer to a tag directory.*/
     bool m_bFileHasFreeListPtr;         /**< File has a pointer to a free list tag list.*/
 
     QDateTime m_dateDefaultDate;        /**< Date to be used as substitution of dates found in a fiff file */
