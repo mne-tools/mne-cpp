@@ -415,7 +415,7 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream,
         }
         case FIFF_COMMENT:
         {
-            if(m_pBlockTypeList->first()==FIFFB_MEAS_INFO) {
+            if(m_pBlockTypeList->first() == FIFFB_MEAS_INFO) {
                 QString defaultComment("mne_anonymize");
                 QString anonFiffInfoComment(pTag->data());
                 QVERIFY(anonFiffInfoComment == defaultComment);
