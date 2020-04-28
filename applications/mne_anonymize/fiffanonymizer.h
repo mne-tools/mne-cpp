@@ -141,7 +141,7 @@ public:
      * @param [in] sFilePathIn  String containing the input file name including its path. Can be a relative or
      * an absolute path.
      */
-    int setFileIn(const QString &sFilePathIn);
+    bool setFileIn(const QString &sFilePathIn);
 
     //=========================================================================================================
     /**
@@ -158,7 +158,7 @@ public:
      * @param [in] sFilePathOut     String containing the output file name including its path. Can be a relative or
      * an absolute path.
      */
-    int setFileOut(const QString &sFilePathOut);
+    bool setFileOut(const QString &sFilePathOut);
 
     //=========================================================================================================
     /**
