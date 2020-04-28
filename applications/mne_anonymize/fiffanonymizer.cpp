@@ -77,8 +77,8 @@ FiffAnonymizer::FiffAnonymizer()
 , m_iDfltSubjectSex(0)
 , m_iDfltSubjectId(0)
 , m_iDfltSubjectHand(0)
-, m_fSubjectWeight(0.)
-, m_fSubjectHeight(0.)
+, m_fSubjectWeight(0.0)
+, m_fSubjectHeight(0.0)
 , m_iProjectId(0)
 , m_sProjectName(m_sDefaultString)
 , m_sProjectAim(m_sDefaultString)
@@ -89,8 +89,8 @@ FiffAnonymizer::FiffAnonymizer()
 , m_iDirectoryPos(-1)
 , m_bFileHasDirPtr(true)
 , m_dDefaultDate(QDateTime(QDate(2000,1,1), QTime(1, 1, 0), Qt::UTC))
-, m_dateMeasurmentDate(m_dDefaultDate)
-, m_dateSubjectBirthday(m_dDefaultDate)
+, m_dMeasurmentDate(m_dDefaultDate)
+, m_dSubjectBirthday(m_dDefaultDate)
 , m_iMeasurementDayOffset(0)
 , m_bUseMeasurementDayOffset(false)
 , m_bUseSubjectBirthdayOffset(false)
@@ -100,7 +100,7 @@ FiffAnonymizer::FiffAnonymizer()
 , m_bDeleteInputFileConfirmation(true)
 , m_bInputFileDeleted(false)
 , m_bInOutFileNamesEqual(false)
-, m_bOutputFileRenamed(false)
+, m_bOutFileRenamed(false)
 , m_pInTag(FIFFLIB::FiffTag::SPtr::create())
 , m_pOutTag(FIFFLIB::FiffTag::SPtr::create())
 {
@@ -117,306 +117,310 @@ FiffAnonymizer::FiffAnonymizer()
 
 //=============================================================================================================
 
-//FiffAnonymizer::FiffAnonymizer(const FiffAnonymizer& obj)
-//: maxValidFiffVerion(obj.maxValidFiffVerion)
-//, m_sDefaultString(obj.m_sDefaultString)
-//, m_sSubjectFirstName(obj.m_sSubjectFirstName)
-//, m_sSubjectMidName(obj.m_sSubjectMidName)
-//, m_sSubjectLastName(obj.m_sSubjectLastName)
-//, m_sSubjectComment(obj.m_sSubjectComment)
-//, m_sSubjectHisId(obj.m_sSubjectHisId)
-//, m_sProjectName(obj.m_sProjectName)
-//, m_sProjectAim(obj.m_sProjectAim)
-//, m_sProjectPersons(obj.m_sProjectPersons)
-//, m_sProjectComment(obj.m_sProjectComment)
-////, m_sFileNameIn(obj.m_sFileNameIn)
-////, m_sFileNameOut(obj.m_sFileNameOut)
-//, m_bFileInSet(obj.m_bFileInSet)
-//, m_bFileOutSet(obj.m_bFileOutSet)
-//, m_dateDefaultDate(obj.m_dateDefaultDate)
-//, m_dateMeasurmentDate(obj.m_dateMeasurmentDate)
-//, m_dateSubjectBirthday(obj.m_dateSubjectBirthday)
-//, m_bUseMeasurementDayOffset(obj.m_bUseMeasurementDayOffset)
-//, m_bUseSubjectBirthdayOffset(obj.m_bUseSubjectBirthdayOffset)
-//, m_bVerboseMode(obj.m_bVerboseMode)
-//, m_bBruteMode(obj.m_bBruteMode)
-//, m_bDeleteInputFileAfter(obj.m_bDeleteInputFileAfter)
-//, m_bDeleteInputFileConfirmation(obj.m_bDeleteInputFileConfirmation)
-//, m_bInputFileDeleted(obj.m_bInputFileDeleted)
-//, m_bInOutFileNamesEqual(obj.m_bInOutFileNamesEqual)
-//, m_bOutputFileRenamed(obj.m_bOutputFileRenamed)
-//, m_iMeasurementDayOffset(obj.m_iMeasurementDayOffset)
-//, m_iSubjectBirthdayOffset(obj.m_iSubjectBirthdayOffset)
-//, m_iDfltSubjectSex(obj.m_iDfltSubjectSex)
-//, m_iDfltSubjectId(obj.m_iDfltSubjectId)
-//, m_iDfltSubjectHand(obj.m_iDfltSubjectHand)
-//, m_fSubjectWeight(obj.m_fSubjectWeight)
-//, m_fSubjectHeight(obj.m_fSubjectHeight)
-//, m_iProjectId(obj.m_iProjectId)
-//{
-//    m_BDfltMAC[0] = obj.m_BDfltMAC[0];
-//    m_BDfltMAC[1] = obj.m_BDfltMAC[1];
+FiffAnonymizer::FiffAnonymizer(const FiffAnonymizer& obj)
+: m_dMaxValidFiffVerion(obj.m_dMaxValidFiffVerion)
+, m_sDefaultString(obj.m_sDefaultString)
+, m_sSubjectFirstName(obj.m_sSubjectFirstName)
+, m_sSubjectMidName(obj.m_sSubjectMidName)
+, m_sSubjectLastName(obj.m_sSubjectLastName)
+, m_sSubjectComment(obj.m_sSubjectComment)
+, m_sSubjectHisId(obj.m_sSubjectHisId)
+, m_iSubjectBirthdayOffset(obj.m_iSubjectBirthdayOffset)
+, m_iDfltSubjectSex(obj.m_iDfltSubjectSex)
+, m_iDfltSubjectId(obj.m_iDfltSubjectId)
+, m_iDfltSubjectHand(obj.m_iDfltSubjectHand)
+, m_fSubjectWeight(obj.m_fSubjectWeight)
+, m_fSubjectHeight(obj.m_fSubjectHeight)
+, m_iProjectId(obj.m_iProjectId)
+, m_sProjectName(obj.m_sProjectName)
+, m_sProjectAim(obj.m_sProjectAim)
+, m_sProjectPersons(obj.m_sProjectPersons)
+, m_sProjectComment(obj.m_sProjectComment)
+, m_bFileInSet(obj.m_bFileInSet)
+, m_bFileOutSet(obj.m_bFileOutSet)
+, m_iDirectoryPos(-1)
+, m_bFileHasDirPtr(obj.m_bFileHasDirPtr)
+, m_dDefaultDate(QDateTime(QDate(2000,1,1), QTime(1, 1, 0), Qt::UTC))
+, m_dMeasurmentDate(obj.m_dMeasurmentDate)
+, m_dSubjectBirthday(obj.m_dSubjectBirthday)
+, m_iMeasurementDayOffset(obj.m_iMeasurementDayOffset)
+, m_bUseMeasurementDayOffset(obj.m_bUseMeasurementDayOffset)
+, m_bUseSubjectBirthdayOffset(obj.m_bUseSubjectBirthdayOffset)
+, m_bVerboseMode(obj.m_bVerboseMode)
+, m_bBruteMode(obj.m_bBruteMode)
+, m_bDeleteInputFileAfter(obj.m_bDeleteInputFileAfter)
+, m_bDeleteInputFileConfirmation(obj.m_bDeleteInputFileConfirmation)
+, m_bInputFileDeleted(obj.m_bInputFileDeleted)
+, m_bInOutFileNamesEqual(obj.m_bInOutFileNamesEqual)
+, m_bOutFileRenamed(obj.m_bOutFileRenamed)
+, m_pInTag(FIFFLIB::FiffTag::SPtr::create())
+, m_pOutTag(FIFFLIB::FiffTag::SPtr::create())
+{
+    m_BDfltMAC[0] = obj.m_BDfltMAC[0];
+    m_BDfltMAC[1] = obj.m_BDfltMAC[1];
 
-//    m_pBlockTypeList = QSharedPointer<QStack<int32_t> >(new QStack<int32_t>(*obj.m_pBlockTypeList));
-//    m_pOutDir = QSharedPointer<QVector<FIFFLIB::FiffDirEntry> >(new QVector<FIFFLIB::FiffDirEntry>);
+    m_pBlockTypeList = QSharedPointer<QStack<int32_t> >(new QStack<int32_t>(*obj.m_pBlockTypeList));
+    m_pOutDir = QSharedPointer<QVector<FIFFLIB::FiffDirEntry> >(new QVector<FIFFLIB::FiffDirEntry>(*obj.m_pOutDir));
+}
+
+//=============================================================================================================
+
+FiffAnonymizer::FiffAnonymizer(FiffAnonymizer &&obj)
+: m_dMaxValidFiffVerion(obj.m_dMaxValidFiffVerion)
+, m_sDefaultString(obj.m_sDefaultString)
+, m_sSubjectFirstName(obj.m_sSubjectFirstName)
+, m_sSubjectMidName(obj.m_sSubjectMidName)
+, m_sSubjectLastName(obj.m_sSubjectLastName)
+, m_sSubjectComment(obj.m_sSubjectComment)
+, m_sSubjectHisId(obj.m_sSubjectHisId)
+, m_iSubjectBirthdayOffset(obj.m_iSubjectBirthdayOffset)
+, m_iDfltSubjectSex(obj.m_iDfltSubjectSex)
+, m_iDfltSubjectId(obj.m_iDfltSubjectId)
+, m_iDfltSubjectHand(obj.m_iDfltSubjectHand)
+, m_fSubjectWeight(obj.m_fSubjectWeight)
+, m_fSubjectHeight(obj.m_fSubjectHeight)
+, m_iProjectId(obj.m_iProjectId)
+, m_sProjectName(obj.m_sProjectName)
+, m_sProjectAim(obj.m_sProjectAim)
+, m_sProjectPersons(obj.m_sProjectPersons)
+, m_sProjectComment(obj.m_sProjectComment)
+, m_bFileInSet(obj.m_bFileInSet)
+, m_bFileOutSet(obj.m_bFileOutSet)
+, m_iDirectoryPos(-1)
+, m_bFileHasDirPtr(obj.m_bFileHasDirPtr)
+, m_dDefaultDate(QDateTime(QDate(2000,1,1), QTime(1, 1, 0), Qt::UTC))
+, m_dMeasurmentDate(obj.m_dMeasurmentDate)
+, m_dSubjectBirthday(obj.m_dSubjectBirthday)
+, m_iMeasurementDayOffset(obj.m_iMeasurementDayOffset)
+, m_bUseMeasurementDayOffset(obj.m_bUseMeasurementDayOffset)
+, m_bUseSubjectBirthdayOffset(obj.m_bUseSubjectBirthdayOffset)
+, m_bVerboseMode(obj.m_bVerboseMode)
+, m_bBruteMode(obj.m_bBruteMode)
+, m_bDeleteInputFileAfter(obj.m_bDeleteInputFileAfter)
+, m_bDeleteInputFileConfirmation(obj.m_bDeleteInputFileConfirmation)
+, m_bInputFileDeleted(obj.m_bInputFileDeleted)
+, m_bInOutFileNamesEqual(obj.m_bInOutFileNamesEqual)
+, m_bOutFileRenamed(obj.m_bOutFileRenamed)
+, m_pInTag(FIFFLIB::FiffTag::SPtr::create())
+, m_pOutTag(FIFFLIB::FiffTag::SPtr::create())
+{
+    m_BDfltMAC[0] = obj.m_BDfltMAC[0];
+    m_BDfltMAC[1] = obj.m_BDfltMAC[1];
+
+    m_pBlockTypeList.swap(obj.m_pBlockTypeList);
+    m_pOutDir.swap(obj.m_pOutDir);
+}
+
+//=============================================================================================================
+
+//QString FiffAnonymizer::getDefaultString()
+//{
+//    return m_sDefaultString;
 //}
 
-//=============================================================================================================
+////=============================================================================================================
 
-//FiffAnonymizer::FiffAnonymizer(FiffAnonymizer &&obj)
-//: maxValidFiffVerion(obj.maxValidFiffVerion)
-//, m_sDefaultString(obj.m_sDefaultString)
-//, m_sSubjectFirstName(obj.m_sSubjectFirstName)
-//, m_sSubjectMidName(obj.m_sSubjectMidName)
-//, m_sSubjectLastName(obj.m_sSubjectLastName)
-//, m_sSubjectComment(obj.m_sSubjectComment)
-//, m_sSubjectHisId(obj.m_sSubjectHisId)
-//, m_sProjectName(obj.m_sProjectName)
-//, m_sProjectAim(obj.m_sProjectAim)
-//, m_sProjectPersons(obj.m_sProjectPersons)
-//, m_sProjectComment(obj.m_sProjectComment)
-////, m_sFileNameIn(obj.m_sFileNameIn)
-////, m_sFileNameOut(obj.m_sFileNameOut)
-//, m_bFileInSet(obj.m_bFileInSet)
-//, m_bFileOutSet(obj.m_bFileOutSet)
-//, m_dateDefaultDate(obj.m_dateDefaultDate)
-//, m_dateMeasurmentDate(obj.m_dateMeasurmentDate)
-//, m_dateSubjectBirthday(obj.m_dateSubjectBirthday)
-//, m_bUseMeasurementDayOffset(obj.m_bUseMeasurementDayOffset)
-//, m_bUseSubjectBirthdayOffset(obj.m_bUseSubjectBirthdayOffset)
-//, m_bVerboseMode(obj.m_bVerboseMode)
-//, m_bBruteMode(obj.m_bBruteMode)
-//, m_bDeleteInputFileAfter(obj.m_bDeleteInputFileAfter)
-//, m_bDeleteInputFileConfirmation(obj.m_bDeleteInputFileConfirmation)
-//, m_bInputFileDeleted(obj.m_bInputFileDeleted)
-//, m_bInOutFileNamesEqual(obj.m_bInOutFileNamesEqual)
-//, m_bOutputFileRenamed(obj.m_bOutputFileRenamed)
-//, m_iMeasurementDayOffset(obj.m_iMeasurementDayOffset)
-//, m_iSubjectBirthdayOffset(obj.m_iSubjectBirthdayOffset)
-//, m_iDfltSubjectSex(obj.m_iDfltSubjectSex)
-//, m_iDfltSubjectId(obj.m_iDfltSubjectId)
-//, m_iDfltSubjectHand(obj.m_iDfltSubjectHand)
-//, m_fSubjectWeight(obj.m_fSubjectWeight)
-//, m_fSubjectHeight(obj.m_fSubjectHeight)
-//, m_iProjectId(obj.m_iProjectId)
+//QDateTime FiffAnonymizer::getDefaultDate()
 //{
-//    m_BDfltMAC[0] = obj.m_BDfltMAC[0];
-//    m_BDfltMAC[1] = obj.m_BDfltMAC[1];
-
-//    m_pBlockTypeList.swap(obj.m_pBlockTypeList);
-//    m_pOutDir.swap(obj.m_pOutDir);
+//    return m_dDefaultDate;
 //}
 
-//=============================================================================================================
+////=============================================================================================================
 
-QString FiffAnonymizer::getDefaultString()
-{
-    return m_sDefaultString;
-}
+//QDateTime FiffAnonymizer::getMeasurementDate()
+//{
+//    return m_dDefaultDate;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-QDateTime FiffAnonymizer::getDefaultDate()
-{
-    return m_dDefaultDate;
-}
+//bool FiffAnonymizer::getUseMeasurementDayOffset()
+//{
+//    return m_bUseMeasurementDayOffset;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-QDateTime FiffAnonymizer::getMeasurementDate()
-{
-    return m_dateMeasurmentDate;
-}
+//int  FiffAnonymizer::getIntMeasurementDayOffset()
+//{
+//    return m_iMeasurementDayOffset;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-bool FiffAnonymizer::getUseMeasurementDayOffset()
-{
-    return m_bUseMeasurementDayOffset;
-}
+//QDateTime FiffAnonymizer::getSubjectBirthday()
+//{
+//    return m_dateSubjectBirthday;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-int  FiffAnonymizer::getIntMeasurementDayOffset()
-{
-    return m_iMeasurementDayOffset;
-}
+//bool FiffAnonymizer::getUseSubjectBirthdayOffset()
+//{
+//    return m_bUseSubjectBirthdayOffset;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-QDateTime FiffAnonymizer::getSubjectBirthday()
-{
-    return m_dateSubjectBirthday;
-}
+//int  FiffAnonymizer::getIntSubjectBirthdayOffset()
+//{
+//    return m_iSubjectBirthdayOffset;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-bool FiffAnonymizer::getUseSubjectBirthdayOffset()
-{
-    return m_bUseSubjectBirthdayOffset;
-}
+//void FiffAnonymizer::getDefaultMAC(FIFFLIB::fiff_int_t (&mac)[2])
+//{
+//    mac[0] = m_BDfltMAC[0];
+//    mac[1] = m_BDfltMAC[1];
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-int  FiffAnonymizer::getIntSubjectBirthdayOffset()
-{
-    return m_iSubjectBirthdayOffset;
-}
+//int FiffAnonymizer::getDefaultSubjectId()
+//{
+//    return m_iDfltSubjectId;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-void FiffAnonymizer::getDefaultMAC(FIFFLIB::fiff_int_t (&mac)[2])
-{
-    mac[0] = m_BDfltMAC[0];
-    mac[1] = m_BDfltMAC[1];
-}
+//QString FiffAnonymizer::getDefaultSubjectFirstName()
+//{
+//    return m_sSubjectFirstName;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-int FiffAnonymizer::getDefaultSubjectId()
-{
-    return m_iDfltSubjectId;
-}
+//QString FiffAnonymizer::getDefaultSubjectMidName()
+//{
+//    return m_sSubjectMidName;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-QString FiffAnonymizer::getDefaultSubjectFirstName()
-{
-    return m_sSubjectFirstName;
-}
+//QString FiffAnonymizer::getDefaultSubjectLastName()
+//{
+//    return m_sSubjectLastName;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-QString FiffAnonymizer::getDefaultSubjectMidName()
-{
-    return m_sSubjectMidName;
-}
+//float FiffAnonymizer::getDefaultSubjectWeight()
+//{
+//    return m_fSubjectWeight;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-QString FiffAnonymizer::getDefaultSubjectLastName()
-{
-    return m_sSubjectLastName;
-}
+//float FiffAnonymizer::getDefaultSubjectHeight()
+//{
+//    return m_fSubjectHeight;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-int FiffAnonymizer::getDefaultSubjectWeight()
-{
-    return m_iSubjectWeight;
-}
+//QString FiffAnonymizer::getDefaultSubjectComment()
+//{
+//    return m_sSubjectComment;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-int FiffAnonymizer::getDefaultSubjectHeight()
-{
-    return m_iSubjectHeight;
-}
+//QString FiffAnonymizer::getDefaultSubjectHisId()
+//{
+//    return m_sSubjectHisId;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-QString FiffAnonymizer::getDefaultSubjectComment()
-{
-    return m_sSubjectComment;
-}
+//int FiffAnonymizer::getDefaultProjectId()
+//{
+//    return m_iProjectId;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-QString FiffAnonymizer::getDefaultSubjectHisId()
-{
-    return m_sSubjectHisId;
-}
+//QString FiffAnonymizer::getDefaultProjectName()
+//{
+//    return m_sProjectName;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-int FiffAnonymizer::getDefaultProjectId()
-{
-    return m_iProjectId;
-}
+//QString FiffAnonymizer::getDefaultProjectAim()
+//{
+//    return m_sProjectAim;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-QString FiffAnonymizer::getDefaultProjectName()
-{
-    return m_sProjectName;
-}
+//QString FiffAnonymizer::getDefaultProjectPersons()
+//{
+//    return m_sProjectPersons;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-QString FiffAnonymizer::getDefaultProjectAim()
-{
-    return m_sProjectAim;
-}
+//QString FiffAnonymizer::getDefaultProjectComment()
+//{
+//    return m_sProjectComment;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-QString FiffAnonymizer::getDefaultProjectPersons()
-{
-    return m_sProjectPersons;
-}
+//bool FiffAnonymizer::getBruteMode()
+//{
+//    return m_bBruteMode;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-QString FiffAnonymizer::getDefaultProjectComment()
-{
-    return m_sProjectComment;
-}
+//bool FiffAnonymizer::getDeleteInputFileAfter()
+//{
+//    return m_bDeleteInputFileAfter;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-bool FiffAnonymizer::getBruteMode()
-{
-    return m_bBruteMode;
-}
+//bool FiffAnonymizer::getDeleteInputFileConfirmation()
+//{
+//    return m_bDeleteInputFileConfirmation;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-bool FiffAnonymizer::getDeleteInputFileAfter()
-{
-    return m_bDeleteInputFileAfter;
-}
+//bool FiffAnonymizer::getInputFileDeleted()
+//{
+//    return m_bInputFileDeleted;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-bool FiffAnonymizer::getDeleteInputFileConfirmation()
-{
-    return m_bDeleteInputFileConfirmation;
-}
+//bool FiffAnonymizer::getInOutFileNamesEqual()
+//{
+//    return m_bInOutFileNamesEqual;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-bool FiffAnonymizer::getInputFileDeleted()
-{
-    return m_bInputFileDeleted;
-}
+//bool FiffAnonymizer::getOutputFileRenamed()
+//{
+//    return m_bOutputFileRenamed;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-bool FiffAnonymizer::getInOutFileNamesEqual()
-{
-    return m_bInOutFileNamesEqual;
-}
+//QString FiffAnonymizer::getFileNameIn()
+//{
+//    return m_sFileNameIn;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-bool FiffAnonymizer::getOutputFileRenamed()
-{
-    return m_bOutputFileRenamed;
-}
-
-//=============================================================================================================
-
-QString FiffAnonymizer::getFileNameIn()
-{
-    return m_sFileNameIn;
-}
-
-//=============================================================================================================
-
-QString FiffAnonymizer::getsFileNameOut()
-{
-    return m_sFileNameOut;
-}
+//QString FiffAnonymizer::getsFileNameOut()
+//{
+//    return m_sFileNameOut;
+//}
 
 //=============================================================================================================
 
@@ -705,7 +709,7 @@ void FiffAnonymizer::censorTag() const
 //        if(m_bUseMeasurementDayOffset) {
 //            outMeasDate = inMeasDate.addDays(-m_iMeasurementDayOffset);
 //        } else {
-//            outMeasDate = m_dateMeasurmentDate;
+//            outMeasDate = m_dDefaultDate;
 //        }
 
 //        FiffId outId(inId);
@@ -736,7 +740,7 @@ void FiffAnonymizer::censorTag() const
 //        if(m_bUseMeasurementDayOffset) {
 //            outMeasDate = inMeasDate.addDays(-m_iMeasurementDayOffset);
 //        } else {
-//            outMeasDate = m_dateMeasurmentDate;
+//            outMeasDate = m_dDefaultDate;
 //        }
 
 //        fiff_int_t outData[1];
@@ -969,6 +973,7 @@ int FiffAnonymizer::setFileOut(const QString &sFileOut)
             m_bInOutFileNamesEqual = false;
             m_fFileOut.setFileName(fiOut.fileName());
         }
+        m_bFileOutSet = true;
         return 0;
     } else {
         qCritical() << "You need to specify the input file first.";
@@ -979,14 +984,14 @@ int FiffAnonymizer::setFileOut(const QString &sFileOut)
 
 //=============================================================================================================
 
-void FiffAnonymizer::setVerboseMode(bool bFlag)
+void FiffAnonymizer::setVerboseMode(const bool bFlag)
 {
     m_bVerboseMode = bFlag;
 }
 
 //=============================================================================================================
 
-bool FiffAnonymizer::getVerboseMode()
+bool FiffAnonymizer::getVerboseMode() const
 {
     return m_bVerboseMode;
 }
@@ -1002,7 +1007,7 @@ void FiffAnonymizer::setBruteMode(bool bFlag)
 
 void FiffAnonymizer::setMeasurementDay(const QString& sMeasDay)
 {
-    m_dateMeasurmentDate = QDateTime(QDate::fromString(sMeasDay),QTime(1,1,0));
+    m_dDefaultDate = QDateTime(QDate::fromString(sMeasDay),QTime(1,1,0));
 }
 
 //=============================================================================================================
@@ -1017,7 +1022,7 @@ void FiffAnonymizer::setMeasurementDayOffset(int iMeasDayOffset)
 
 void FiffAnonymizer::setSubjectBirthday(const QString& sSubjBirthday)
 {
-    m_dateSubjectBirthday = QDateTime(QDate::fromString(sSubjBirthday),QTime(1, 1, 0));
+    m_dSubjectBirthday = QDateTime(QDate::fromString(sSubjBirthday),QTime(1, 1, 0));
 }
 
 //=============================================================================================================
