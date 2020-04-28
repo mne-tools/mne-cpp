@@ -567,6 +567,8 @@ jobs:
         rm -r bin/mne_analyze_extensions
         rm -r bin/mne-cpp-test-data
         rm -r bin/MNE-sample-data
+        # Replace logo
+        cp -RT tools/design/logos/qtlogo.svg qtlogo.svg
         # Clone repo and update with new wasm versions
         git config --global user.email lorenzesch@hotmail.com
         git config --global user.name LorenzE
@@ -575,6 +577,7 @@ jobs:
         # Remove all files first
         git rm * -r
         git commit --amend -a -m 'Update wasm builds' --allow-empty
+        # Copy wasm files
         cd ..
         cp -RT bin wasm
         cd wasm
