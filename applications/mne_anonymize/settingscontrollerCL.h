@@ -92,20 +92,15 @@ public:
     /**
      * Constructs a SettingsControllerCL object.
      *
-     * @param [in] arguments    The input arguments in form of a QStringList.
-     * @param [in] name         The name of the application.
-     * @param [in] ver          The version of the application.
+     * @param [in] arguments    String list containing the input arguments in form of a QStringList.
+     * @param [in] name         String containing the name of the application.
+     * @param [in] ver          String containing the version of the application.
      */
     SettingsControllerCL(const QStringList& arguments,
                        const QString& name,
                        const QString& ver);
 
-    //=========================================================================================================
-    /**
-     * Destroys SettingsControllerCL Object. All space allocated for FiffAnonymizer objects will be deleted.
-     */
-    ~SettingsControllerCL();
-private:
+    private:
     //=========================================================================================================
     /**
      * Signals the FiffAnonymizer method handling both the multi-parallel setup and the single-thread setup.
@@ -128,24 +123,6 @@ private:
      * @return Returns true if parsing was successful, false otherwise.
      */
     int parseInputs(const QStringList& arguments);
-
-    //=========================================================================================================
-//    /**
-//     * Processes the options related to input and output files, like file names or deletion options. It also
-//     * hables wild cards used while defining input filenames and configures the member QStringList with
-//     * filenames to anonymize.
-//     *
-//     * @return Returns true if parsing was successful, false otherwise.
-//     */
-//    bool parseInputAndOutputFiles();
-
-    //=========================================================================================================
-//    /**
-//     * Handles filenames and, if needed, generates all the necessary FiffAnonyzer objects for a concurrent
-//     * execution. All new instances (located in the heap) will be created through the copy constructor, as
-//     * exact copies from the member FiffAnonyizer object. And then modified only the necessary options.
-//     */
-//    void generateAnonymizerInstances();
 
     //=========================================================================================================
     /**
