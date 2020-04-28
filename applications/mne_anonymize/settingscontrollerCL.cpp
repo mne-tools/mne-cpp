@@ -172,17 +172,17 @@ int SettingsControllerCL::parseInputs(const QStringList& arguments)
 {
     m_parser.process(arguments);
 
+    if(!m_parser.isSet("no-gui"))
+    {
+        qCritical() << "Error while running the application. Something went wrong.";
+    }
+
     if(m_parser.isSet("version"))
     {
         //print name and version
         printVersionInfo();
         return 1;
     }
-
-//    if(!parseInputAndOutputFiles()) {
-
-//        return false;
-//    }
 
     if(m_parser.isSet("in"))
     {
@@ -228,7 +228,8 @@ int SettingsControllerCL::parseInputs(const QStringList& arguments)
 
     if(m_parser.isSet("verbose"))
     {
-//        if(m_bMultipleInFiles) {
+//        if(m_bMultipleInFiles)
+//        {
 //            qCritical() << "Verbose does not work with multiple Input files.";
 //            return false;
 //        }
