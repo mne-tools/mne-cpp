@@ -516,7 +516,7 @@ jobs:
 
   WebAssembly:
     runs-on: ubuntu-latest
-    #needs: UpdateDevTag
+    needs: UpdateDevTag
 
     steps:
     - name: Clone repository
@@ -524,7 +524,7 @@ jobs:
     - name: Setup Github credentials
       uses: fusion-engineering/setup-git-credentials@v2
       with:
-        credentials: ${{secrets.GIT_CREDENTIALS_DOCU_TEST}}
+        credentials: ${{secrets.GIT_CREDENTIALS}}
     - name: Setup emscripten compiler 
       run: |
         cd ..

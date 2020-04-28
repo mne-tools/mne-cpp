@@ -4,7 +4,7 @@ on:
   push:
     branches:
     # Change this to the branch name you make changes to the documentation on
-    - wasm
+    - alternate
 
 jobs:
   WasmTest:
@@ -55,8 +55,12 @@ jobs:
         # Compile MNE-CPP        
         cd mne-cpp
         ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG=wasm
-        make -j4
-    - name: Clone doc/gh-pages into gh-pages branch
+        make -j4        
+    - name: Setup Github credentials
+      uses: fusion-engineering/setup-git-credentials@v2
+      with:
+        credentials: ${{secrets.GIT_CREDENTIALS_DOCU_TEST}}
+    - name: Update gh-pages branch with new wasm version
       run: |
         # Setup git credentials
         git config --global user.email dev@dev.com
