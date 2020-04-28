@@ -214,7 +214,7 @@ void AnnotationManager::setUpControls()
 void AnnotationManager::toggleDisplayEvent(const int& iToggle)
 {
     int m_iToggle = iToggle;
-    qDebug() << "toggleDisplayEvent" << iToggle;
+    //qDebug() << "toggleDisplayEvent" << iToggle;
     m_pFiffRawModel->toggleDispAnn(m_iToggle);
     m_pCommu->publishEvent(TRIGGER_REDRAW);
 }

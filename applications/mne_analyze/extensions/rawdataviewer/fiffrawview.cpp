@@ -335,7 +335,7 @@ void FiffRawView::addTimeMark(bool con)
 void FiffRawView::toggleDisplayEvent(const int& iToggle)
 {
     int m_iToggle = iToggle;
-    qDebug() << "toggleDisplayEvent" << iToggle;
+    //qDebug() << "toggleDisplayEvent" << iToggle;
     m_pModel->toggleDispAnn(m_iToggle);
     m_pTableView->viewport()->repaint();
 }

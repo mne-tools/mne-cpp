@@ -136,7 +136,7 @@ void DataLoader::handleEvent(QSharedPointer<Event> e)
     switch (e->getType()) {
     case EVENT_TYPE::CURRENTLY_SELECTED_MODEL:
         m_sCurrentlySelectedModel = e->getData().toString();
-        qDebug() << m_sCurrentlySelectedModel;
+        //qDebug() << m_sCurrentlySelectedModel;
         break;
     default:
         qWarning() << "[DataLoader::handleEvent] Received an Event that is not handled by switch cases.";
