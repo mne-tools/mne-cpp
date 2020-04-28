@@ -191,11 +191,12 @@ public:
      * @param [in] bFlag    Bool argument whether to use the brute mode.
      */
     void setBruteMode(const bool bFlag);
+
     //=========================================================================================================
     /**
      * Get value of default Advanced anonymization. Anonymize also weight, height and some other fields.
      */
-    bool getBruteMode();
+    bool getBruteMode() const;
 
     //=========================================================================================================
     /**
@@ -206,10 +207,18 @@ public:
     void setMeasurementDay(const QString& sMeasDay);
 
     //=========================================================================================================
+
+    void setMeasurementDay(const QDateTime& d);
+
+    //=========================================================================================================
+
+    void setMeasurementDay(const QDate& d);
+
+    //=========================================================================================================
     /**
      * Get value of Date to substitute the measuremnt date appearing in the file.
      */
-    QDateTime getMeasurementDate();
+    QDateTime getMeasurementDate() const;
 
     //=========================================================================================================
     /**
@@ -240,8 +249,11 @@ public:
     void setSubjectBirthday(const QString& sSubjBirthday);
 
     //=========================================================================================================
+    void setSubjectBirthday(const QDateTime& sSubjBirthday);
+
+    //=========================================================================================================
     /**
-     * Get value of Subject's birthday substitutor.
+     * Get value of Subject's birthday.
      */
     QDateTime getSubjectBirthday();
 
@@ -251,7 +263,7 @@ public:
      *
      * @param [in] iSubjBirthdayOffset  Integer with the number of dates to subtract from the subject's birthday date.
      */
-    void setSubjectBirthdayOffset(int iSubjBirthdayOffset);
+    void setSubjectBirthdayOffset(const int iSubjBirthdayOffset);
 
     //=========================================================================================================
     /**
@@ -344,16 +356,6 @@ private:
      * is a set of four -1 integer values which will mark the end of the tag directory.
      */
     void addFinalEntryToDir();
-
-//    //=========================================================================================================
-//    /**
-//     * This method allows to transform between a vector and a regular tag structure. The vector will only contain
-//     * the data inside the Tag Directory tag (remember a tag directory is a tag itself). This allows to use all the
-//     * methods related to a tag (i.e. writeTag) while storing a newly updated tag directory into a fiff file.
-//     *
-//     * @param [in] pTag A pointer to a tag where the tag directory information can be stored.
-//     */
-//    void dir2tag(FIFFLIB::FiffTag::SPtr pTag);
 
     //=========================================================================================================
     /**
@@ -514,9 +516,9 @@ private:
     qint64 m_iDirectoryPos;             /**< Position of the tag directory in the output file.*/
     bool m_bFileHasDirPtr;              /**< This file has a tag directory.*/
 
-    QDateTime m_dDefaultDate;           /**< Date to be used as substitution of dates found in a fiff file */
-    QDateTime m_dMeasurmentDate;     /**< Date to substitute the measuremnt date appearing in the file.*/
-    QDateTime m_dSubjectBirthday;    /**< Subject's birthday substitutor.*/
+    QDateTime m_dDefaultDate;       /**< Date to be used as substitution of dates found in a fiff file */
+    QDateTime m_dMeasurementDate;       /**< Date to substitute the measuremnt date appearing in the file.*/
+    QDateTime m_dSubjectBirthday;       /**< Subject's birthday substitutor.*/
     int  m_iMeasurementDayOffset;       /**< Number of days to subtract from the measurement date.*/
 
     bool m_bUseMeasurementDayOffset;    /**< Flags to use Measurement-date days offset.*/

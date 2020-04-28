@@ -89,7 +89,7 @@ FiffAnonymizer::FiffAnonymizer()
 , m_iDirectoryPos(-1)
 , m_bFileHasDirPtr(true)
 , m_dDefaultDate(QDateTime(QDate(2000,1,1), QTime(1, 1, 0), Qt::UTC))
-, m_dMeasurmentDate(m_dDefaultDate)
+, m_dMeasurementDate(m_dDefaultDate)
 , m_dSubjectBirthday(m_dDefaultDate)
 , m_iMeasurementDayOffset(0)
 , m_bUseMeasurementDayOffset(false)
@@ -113,6 +113,7 @@ FiffAnonymizer::FiffAnonymizer()
     m_pBlockTypeList = QSharedPointer<QStack<int32_t> >(new QStack<int32_t>);
     m_pBlockTypeList->clear();
     m_pOutDir = QSharedPointer<QVector<FIFFLIB::FiffDirEntry> >(new QVector<FIFFLIB::FiffDirEntry>);
+
 }
 
 //=============================================================================================================
@@ -141,7 +142,7 @@ FiffAnonymizer::FiffAnonymizer(const FiffAnonymizer& obj)
 , m_iDirectoryPos(-1)
 , m_bFileHasDirPtr(obj.m_bFileHasDirPtr)
 , m_dDefaultDate(QDateTime(QDate(2000,1,1), QTime(1, 1, 0), Qt::UTC))
-, m_dMeasurmentDate(obj.m_dMeasurmentDate)
+, m_dMeasurementDate(obj.m_dMeasurementDate)
 , m_dSubjectBirthday(obj.m_dSubjectBirthday)
 , m_iMeasurementDayOffset(obj.m_iMeasurementDayOffset)
 , m_bUseMeasurementDayOffset(obj.m_bUseMeasurementDayOffset)
@@ -189,7 +190,7 @@ FiffAnonymizer::FiffAnonymizer(FiffAnonymizer &&obj)
 , m_iDirectoryPos(-1)
 , m_bFileHasDirPtr(obj.m_bFileHasDirPtr)
 , m_dDefaultDate(QDateTime(QDate(2000,1,1), QTime(1, 1, 0), Qt::UTC))
-, m_dMeasurmentDate(obj.m_dMeasurmentDate)
+, m_dMeasurementDate(obj.m_dMeasurementDate)
 , m_dSubjectBirthday(obj.m_dSubjectBirthday)
 , m_iMeasurementDayOffset(obj.m_iMeasurementDayOffset)
 , m_bUseMeasurementDayOffset(obj.m_bUseMeasurementDayOffset)
@@ -259,222 +260,6 @@ int FiffAnonymizer::anonymizeFile()
     printIfVerbose(" ");
 
     return 0;
-}
-
-//=============================================================================================================
-
-void FiffAnonymizer::readTag()
-{
-    m_pInStream->read_tag(m_pInTag,0);
-    updateBlockTypeList();
-}
-
-//=============================================================================================================
-
-void FiffAnonymizer::writeTag()
-{
-    //make output tag list linear
-    if(m_pOutTag->next > 0)
-    {
-        m_pOutTag->next = FIFFV_NEXT_SEQ;
-    }
-
-    if(m_bFileHasDirPtr)
-    {
-        addEntryToDir();
-    }
-
-    FIFFLIB::FiffTag::convert_tag_data(m_pOutTag,FIFFV_NATIVE_ENDIAN,FIFFV_BIG_ENDIAN);
-    m_pOutStream->write_tag(m_pOutTag, 0);
-}
-
-//=============================================================================================================
-
-void FiffAnonymizer::processHeaderTags()
-{
-    readTag();
-
-    if(checkValidFiffFormatVersion(m_pInTag)) {
-        printIfVerbose("Input file compatible with this version of mne_anonymizer.");
-    } else {
-        qCritical() << "This file may not be compatible with this application. First tag is not a valid ID tag.";
-    }
-
-    censorTag();
-    writeTag();
-
-    // pointer to tag directory
-    readTag();
-
-    if(m_pInTag->kind != FIFF_DIR_POINTER)
-    {
-        qCritical() << "This file may not be compatible with this application. Second tag is not a valid Tag directory pointer tag.";
-    }
-    if(*m_pInTag->toInt() <= 0)
-    {
-        m_bFileHasDirPtr = false;
-    }
-
-    censorTag();
-    writeTag();
-
-    //free list
-    readTag();
-
-    if(m_pInTag->kind == FIFF_FREE_LIST)
-    {
-        qWarning() << "This file contains a Free List of tags. It will not be copied to the output file.";
-    } else {
-        // output this tag, whatever kind it is, to the oupput file.
-        censorTag();
-        writeTag();
-    }
-}
-
-//=============================================================================================================
-
-void FiffAnonymizer::updateBlockTypeList()
-{
-    if(m_pInTag->kind == FIFF_BLOCK_START) {
-        m_pBlockTypeList->push(*m_pInTag->toInt());
-    }
-
-    if(m_pInTag->kind == FIFF_BLOCK_END) {
-        m_pBlockTypeList->pop();
-    }
-}
-
-//=============================================================================================================
-
-bool FiffAnonymizer::checkValidFiffFormatVersion(const FIFFLIB::FiffTag::SPtr pTag) const
-{
-    if(pTag->kind == FIFF_FILE_ID)
-    {
-        FIFFLIB::FiffId fileId = pTag->toFiffID();
-        int inMayorVersion = (static_cast<uint32_t>(fileId.version) & 0xFFFF0000) >> 16;
-        int inMinorVersion = (static_cast<uint32_t>(fileId.version) & 0x0000FFFF);
-        double inVersion = inMayorVersion + inMinorVersion/10.0;
-
-        if(inVersion > m_dMaxValidFiffVerion) {
-            return false;
-        }
-        return true;
-    }
-    return false;
-}
-
-//=============================================================================================================
-
-void FiffAnonymizer::addEntryToDir()
-{
-    FIFFLIB::FiffDirEntry t_dirEntry;
-    t_dirEntry.kind = m_pOutTag->kind;
-    t_dirEntry.type = m_pOutTag->type;
-    t_dirEntry.size = m_pOutTag->size();
-    t_dirEntry.pos  = static_cast<FIFFLIB::fiff_int_t>(m_pOutStream->device()->pos());
-    m_pOutDir->append(t_dirEntry);
-}
-
-//=============================================================================================================
-
-void FiffAnonymizer::addFinalEntryToDir()
-{
-    FIFFLIB::FiffDirEntry t_dirEntry;
-    t_dirEntry.kind = -1;
-    t_dirEntry.type = -1;
-    t_dirEntry.size = -1;
-    t_dirEntry.pos  = -1;
-    m_pOutDir->append(t_dirEntry);
-}
-
-//=============================================================================================================
-
-void FiffAnonymizer::dir2tag(FIFFLIB::FiffTag::SPtr pTag)
-{
-    pTag->kind = FIFF_DIR;
-    pTag->type = FIFFT_DIR_ENTRY_STRUCT;
-    pTag->next = -1;
-    pTag->resize(m_pOutDir->size() * 4  * 4);
-    pTag->clear();
-
-    if(m_pOutDir->size() > 0) {
-        QByteArray pInt8(sizeof(FIFFLIB::fiff_int_t),0);
-        for(int i=0;i<m_pOutDir->size();++i) {
-            memcpy(&pInt8,reinterpret_cast<const char*>(&m_pOutDir->at(i).kind),sizeof(FIFFLIB::fiff_int_t));
-            pTag->append(pInt8);
-            memcpy(&pInt8,reinterpret_cast<const char*>(&m_pOutDir->at(i).type),sizeof(FIFFLIB::fiff_int_t));
-            pTag->append(pInt8);
-            memcpy(&pInt8,reinterpret_cast<const char*>(&m_pOutDir->at(i).size),sizeof(FIFFLIB::fiff_int_t));
-            pTag->append(pInt8);
-            memcpy(&pInt8,reinterpret_cast<const char*>(&m_pOutDir->at(i).pos),sizeof(FIFFLIB::fiff_int_t));
-            pTag->append(pInt8);
-        }
-    }
-}
-
-//=============================================================================================================
-
-void FiffAnonymizer::writeDirectory()
-{
-    m_iDirectoryPos = m_pOutStream->device()->pos();
-
-    QFile* file=qobject_cast<QFile*>(m_pOutStream->device());
-    if(file)
-        m_pOutStream->device()->seek(file->size());
-
-    *m_pOutStream << static_cast<quint32>(FIFF_DIR);
-    *m_pOutStream << static_cast<quint32>(FIFFT_DIR_ENTRY_STRUCT);
-    *m_pOutStream << static_cast<quint32>
-                     (static_cast<unsigned long long>(m_pOutDir->size())*sizeof(FIFFLIB::FiffDirEntry));
-    *m_pOutStream << static_cast<quint32>(-1);
-    for(int i=0;i<m_pOutDir->size();++i) {
-        *m_pOutStream << static_cast<quint32>(m_pOutDir->at(i).kind);
-        *m_pOutStream << static_cast<quint32>(m_pOutDir->at(i).type);
-        *m_pOutStream << static_cast<quint32>(m_pOutDir->at(i).size);
-        *m_pOutStream << static_cast<quint32>(m_pOutDir->at(i).pos);
-    }
-}
-
-//=============================================================================================================
-
-void FiffAnonymizer::updatePointer(FIFFLIB::FiffStream::SPtr stream,
-                                   FIFFLIB::fiff_int_t tagKind,
-                                   FIFFLIB::fiff_long_t newPos)
-{
-    FIFFLIB::fiff_long_t tagInfoSize = 16;
-
-    for(int i=0; i < m_pOutDir->size(); ++i) {
-        if(m_pOutDir->at(i).kind != tagKind) {
-            stream->device()->seek(m_pOutDir->at(i).pos+tagInfoSize);
-            *stream << static_cast<quint32>(newPos);
-            break;
-        }
-    }
-}
-
-//=============================================================================================================
-
-bool FiffAnonymizer::checkDeleteInputFile()
-{
-    if(m_bDeleteInputFileAfter) { //false by default
-        qInfo() << "You have requested to delete the input file: " + m_fFileIn.fileName();
-
-        if(m_bDeleteInputFileConfirmation) { //true by default
-            QTextStream consoleOut(stdout);
-            QTextStream consoleIn(stdin);
-            QString confirmation;
-            qInfo() << "You can avoid this confirmation by using the delete_confirmation option.";
-            consoleOut << "Are you sure you want to delete this file? [Y/n] ";
-            consoleIn >> confirmation;
-
-            if(confirmation == "Y") {
-                return true;
-            }
-        } else {
-            return true;
-        }
-    }
-    return false;
 }
 
 //=============================================================================================================
@@ -735,6 +520,197 @@ void FiffAnonymizer::censorTag() const
 
 //=============================================================================================================
 
+void FiffAnonymizer::readTag()
+{
+    m_pInStream->read_tag(m_pInTag,0);
+    updateBlockTypeList();
+}
+
+//=============================================================================================================
+
+void FiffAnonymizer::writeTag()
+{
+    //make output tag list linear
+    if(m_pOutTag->next > 0)
+    {
+        m_pOutTag->next = FIFFV_NEXT_SEQ;
+    }
+
+    if(m_bFileHasDirPtr)
+    {
+        addEntryToDir();
+    }
+
+    FIFFLIB::FiffTag::convert_tag_data(m_pOutTag,FIFFV_NATIVE_ENDIAN,FIFFV_BIG_ENDIAN);
+    m_pOutStream->write_tag(m_pOutTag, 0);
+}
+
+//=============================================================================================================
+
+void FiffAnonymizer::processHeaderTags()
+{
+    readTag();
+
+    if(checkValidFiffFormatVersion(m_pInTag)) {
+        printIfVerbose("Input file compatible with this version of mne_anonymizer.");
+    } else {
+        qCritical() << "This file may not be compatible with this application. First tag is not a valid ID tag.";
+    }
+
+    censorTag();
+    writeTag();
+
+    // pointer to tag directory
+    readTag();
+
+    if(m_pInTag->kind != FIFF_DIR_POINTER)
+    {
+        qCritical() << "This file may not be compatible with this application. Second tag is not a valid Tag directory pointer tag.";
+    }
+    if(*m_pInTag->toInt() <= 0)
+    {
+        m_bFileHasDirPtr = false;
+    }
+
+    censorTag();
+    writeTag();
+
+    //free list
+    readTag();
+
+    if(m_pInTag->kind == FIFF_FREE_LIST)
+    {
+        qWarning() << "This file contains a Free List of tags. It will not be copied to the output file.";
+    } else {
+        // output this tag, whatever kind it is, to the oupput file.
+        censorTag();
+        writeTag();
+    }
+}
+
+//=============================================================================================================
+
+void FiffAnonymizer::updateBlockTypeList()
+{
+    if(m_pInTag->kind == FIFF_BLOCK_START) {
+        m_pBlockTypeList->push(*m_pInTag->toInt());
+    }
+
+    if(m_pInTag->kind == FIFF_BLOCK_END) {
+        m_pBlockTypeList->pop();
+    }
+}
+
+//=============================================================================================================
+
+bool FiffAnonymizer::checkValidFiffFormatVersion(const FIFFLIB::FiffTag::SPtr pTag) const
+{
+    if(pTag->kind == FIFF_FILE_ID)
+    {
+        FIFFLIB::FiffId fileId = pTag->toFiffID();
+        int inMayorVersion = (static_cast<uint32_t>(fileId.version) & 0xFFFF0000) >> 16;
+        int inMinorVersion = (static_cast<uint32_t>(fileId.version) & 0x0000FFFF);
+        double inVersion = inMayorVersion + inMinorVersion/10.0;
+
+        if(inVersion > m_dMaxValidFiffVerion) {
+            return false;
+        }
+        return true;
+    }
+    return false;
+}
+
+//=============================================================================================================
+
+void FiffAnonymizer::addEntryToDir()
+{
+    FIFFLIB::FiffDirEntry t_dirEntry;
+    t_dirEntry.kind = m_pOutTag->kind;
+    t_dirEntry.type = m_pOutTag->type;
+    t_dirEntry.size = m_pOutTag->size();
+    t_dirEntry.pos  = static_cast<FIFFLIB::fiff_int_t>(m_pOutStream->device()->pos());
+    m_pOutDir->append(t_dirEntry);
+}
+
+//=============================================================================================================
+
+void FiffAnonymizer::addFinalEntryToDir()
+{
+    FIFFLIB::FiffDirEntry t_dirEntry;
+    t_dirEntry.kind = -1;
+    t_dirEntry.type = -1;
+    t_dirEntry.size = -1;
+    t_dirEntry.pos  = -1;
+    m_pOutDir->append(t_dirEntry);
+}
+
+//=============================================================================================================
+
+void FiffAnonymizer::writeDirectory()
+{
+    m_iDirectoryPos = m_pOutStream->device()->pos();
+
+    QFile* file=qobject_cast<QFile*>(m_pOutStream->device());
+    if(file)
+        m_pOutStream->device()->seek(file->size());
+
+    *m_pOutStream << static_cast<quint32>(FIFF_DIR);
+    *m_pOutStream << static_cast<quint32>(FIFFT_DIR_ENTRY_STRUCT);
+    *m_pOutStream << static_cast<quint32>
+                     (static_cast<unsigned long long>(m_pOutDir->size())*sizeof(FIFFLIB::FiffDirEntry));
+    *m_pOutStream << static_cast<quint32>(-1);
+    for(int i=0;i<m_pOutDir->size();++i) {
+        *m_pOutStream << static_cast<quint32>(m_pOutDir->at(i).kind);
+        *m_pOutStream << static_cast<quint32>(m_pOutDir->at(i).type);
+        *m_pOutStream << static_cast<quint32>(m_pOutDir->at(i).size);
+        *m_pOutStream << static_cast<quint32>(m_pOutDir->at(i).pos);
+    }
+}
+
+//=============================================================================================================
+
+void FiffAnonymizer::updatePointer(FIFFLIB::FiffStream::SPtr stream,
+                                   FIFFLIB::fiff_int_t tagKind,
+                                   FIFFLIB::fiff_long_t newPos)
+{
+    FIFFLIB::fiff_long_t tagInfoSize = 16;
+
+    for(int i=0; i < m_pOutDir->size(); ++i) {
+        if(m_pOutDir->at(i).kind != tagKind) {
+            stream->device()->seek(m_pOutDir->at(i).pos+tagInfoSize);
+            *stream << static_cast<quint32>(newPos);
+            break;
+        }
+    }
+}
+
+//=============================================================================================================
+
+bool FiffAnonymizer::checkDeleteInputFile()
+{
+    if(m_bDeleteInputFileAfter) { //false by default
+        qInfo() << "You have requested to delete the input file: " + m_fFileIn.fileName();
+
+        if(m_bDeleteInputFileConfirmation) { //true by default
+            QTextStream consoleOut(stdout);
+            QTextStream consoleIn(stdin);
+            QString confirmation;
+            qInfo() << "You can avoid this confirmation by using the delete_confirmation option.";
+            consoleOut << "Are you sure you want to delete this file? [Y/n] ";
+            consoleIn >> confirmation;
+
+            if(confirmation == "Y") {
+                return true;
+            }
+        } else {
+            return true;
+        }
+    }
+    return false;
+}
+
+//=============================================================================================================
+
 int FiffAnonymizer::setFileIn(const QString &sFileIn)
 {
 //    m_sFileNameIn = sFileIn;
@@ -748,6 +724,13 @@ int FiffAnonymizer::setFileIn(const QString &sFileIn)
     } else {
         return 1;
     }
+}
+
+//=============================================================================================================
+
+QString FiffAnonymizer::getFileNameIn() const
+{
+    return m_fFileIn.fileName();
 }
 
 //=============================================================================================================
@@ -777,6 +760,13 @@ int FiffAnonymizer::setFileOut(const QString &sFileOut)
 
 //=============================================================================================================
 
+QString FiffAnonymizer::getFileNameOut() const
+{
+    return m_fFileOut.fileName();
+}
+
+//=============================================================================================================
+
 void FiffAnonymizer::setVerboseMode(const bool bFlag)
 {
     m_bVerboseMode = bFlag;
@@ -798,14 +788,42 @@ void FiffAnonymizer::setBruteMode(bool bFlag)
 
 //=============================================================================================================
 
-void FiffAnonymizer::setMeasurementDay(const QString& sMeasDay)
+bool FiffAnonymizer::getBruteMode() const
 {
-    m_dDefaultDate = QDateTime(QDate::fromString(sMeasDay),QTime(1,1,0));
+    return m_bBruteMode;
 }
 
 //=============================================================================================================
 
-void FiffAnonymizer::setMeasurementDayOffset(int iMeasDayOffset)
+void FiffAnonymizer::setMeasurementDay(const QDateTime& d)
+{
+    m_dMeasurementDate = QDateTime(d.date(),QTime(1,1,0));
+}
+
+//=============================================================================================================
+
+void FiffAnonymizer::setMeasurementDay(const QDate& d)
+{
+    m_dMeasurementDate = QDateTime(d,QTime(1,1,0));
+}
+
+//=============================================================================================================
+
+void FiffAnonymizer::setMeasurementDay(const QString& sMeasDay)
+{
+    m_dMeasurementDate = QDateTime(QDate::fromString(sMeasDay),QTime(1,1,0));
+}
+
+//=============================================================================================================
+
+QDateTime FiffAnonymizer::getMeasurementDate() const
+{
+    return m_dMeasurementDate;
+}
+
+//=============================================================================================================
+
+void FiffAnonymizer::setMeasurementDayOffset(const int iMeasDayOffset)
 {
     m_bUseMeasurementDayOffset = true;
     m_iMeasurementDayOffset = iMeasDayOffset;
@@ -820,7 +838,14 @@ void FiffAnonymizer::setSubjectBirthday(const QString& sSubjBirthday)
 
 //=============================================================================================================
 
-void FiffAnonymizer::setSubjectBirthdayOffset(int iSubjBirthdayOffset)
+void FiffAnonymizer::setSubjectBirthday(const QDateTime& sSubjBirthday)
+{
+    m_dSubjectBirthday = QDateTime(sSubjBirthday);
+}
+
+//=============================================================================================================
+
+void FiffAnonymizer::setSubjectBirthdayOffset(const int iSubjBirthdayOffset)
 {
     m_bUseSubjectBirthdayOffset = true;
     m_iSubjectBirthdayOffset = iSubjBirthdayOffset;
@@ -828,14 +853,28 @@ void FiffAnonymizer::setSubjectBirthdayOffset(int iSubjBirthdayOffset)
 
 //=============================================================================================================
 
-void FiffAnonymizer::setDeleteInputFileAfter(bool bFlag)
+int  FiffAnonymizer::getSubjectBirthdayOffset()
+{
+    return m_iSubjectBirthdayOffset;
+}
+
+//=============================================================================================================
+
+QDateTime  FiffAnonymizer::getSubjectBirthday()
+{
+    return m_dSubjectBirthday;
+}
+
+//=============================================================================================================
+
+void FiffAnonymizer::setDeleteInputFileAfter(const bool bFlag)
 {
     m_bDeleteInputFileAfter = bFlag;
 }
 
 //=============================================================================================================
 
-void FiffAnonymizer::setDeleteInputFileConfirmation(bool bFlag)
+void FiffAnonymizer::setDeleteInputFileConfirmation(const bool bFlag)
 {
     m_bDeleteInputFileConfirmation = bFlag;
 }
@@ -920,7 +959,7 @@ void FiffAnonymizer::renameOutputFileAsInputFile()
 
 int FiffAnonymizer::openInOutStreams()
 {
-    m_pInStream = FIFFLIB::FiffStream::SPtr (new FIFFLIB::FiffStream (&m_fFileIn));
+    m_pInStream = FIFFLIB::FiffStream::SPtr (new FIFFLIB::FiffStream(&m_fFileIn));
     if(m_pInStream->open(QIODevice::ReadOnly)) {
         printIfVerbose("Input file opened correctly: " + m_fFileIn.fileName());
     } else {
