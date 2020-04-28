@@ -71,7 +71,6 @@ SettingsControllerCL::SettingsControllerCL(const QStringList& arguments,
 : m_sAppName(name)
 , m_sAppVer(ver)
 , m_bVerboseMode(false)
-//, m_bMultipleInFiles(false)
 {
     m_pAnonymizer = FiffAnonymizer::SPtr(new FiffAnonymizer);
     initParser();

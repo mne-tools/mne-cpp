@@ -50,8 +50,6 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
-//#include <QFileInfo>
-//#include <QDir>
 #include <QtConcurrent>
 
 //=============================================================================================================
@@ -141,60 +139,16 @@ public:
 
     //=========================================================================================================
 
-    FiffAnonymizer::SPtr m_pAnonymizer;  /**< Local pointer to a Fiffanonyzer object to configure and use.*/
-
+    FiffAnonymizer::SPtr m_pAnonymizer; /**< Local pointer to a Fiffanonyzer object to configure and use.*/
     QString m_sAppName;                 /**< Application name.*/
     QString m_sAppVer;                  /**< Application version number.*/
-
-//    QStringList m_SLInFiles;            /**< List of input file names (absolute paths).*/
-//    QStringList m_SLOutFiles;           /**< List of output file names (absolute paths).*/
-
-    bool m_bVerboseMode;             /**< Show header when executing.*/
-//    bool m_bMultipleInFiles;            /**< Multpiple files concurrent execution flag.*/
-
-//    QList<FiffAnonymizer> m_lApps;      /**< list of addresses to FiffAnonyizer objects. */
-//    QList<QFuture<void> > promisesList; /**< List of synchronizing waits for each concurrent execution.*/
-
+    bool m_bVerboseMode;                /**< Show header when executing.*/
     QCommandLineParser m_parser;        /**< Parser object to work with member ptr to QCoreApp and parse input command line options.*/
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
-// /**
-// * Finds all files in a folder matching a filename pattern (compatible with wildcard [*,?]).
-// * This is a helper function. Given a filename with some pattern. It lists all possible filenames matching the pattern.
-// * It outputs a QStringList with all the possible files in the folder matching the search pattern.
-// *
-// * @param [in] fileName     Reference to a QString containing the input filename search pattern.
-// *
-// * @return QStringList with all possible filenames compatible with the search pattern.
-// */
-//inline static QStringList listFilesMatchingPatternName(const QString &fileName)
-//{
-//    QStringList listOfFilteredFiles;
-//    QFileInfo fiFileIn(QDir::toNativeSeparators(fileName));
-//    fiFileIn.makeAbsolute();
-//    if(fiFileIn.isDir()) {
-//        qCritical() << "Input file is infact a directory: " << fileName;
-//    }
-
-//    QStringList filter;
-//    filter << fiFileIn.fileName();
-//    QDirIterator iteratorFileIn(fiFileIn.absoluteDir().absolutePath(),
-//                                filter,
-//                                QDir::AllEntries | QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::CaseSensitive);
-
-//    while(iteratorFileIn.hasNext()) {
-//        QFileInfo fi(iteratorFileIn.next());
-//        if(fi.isFile()) {
-//            listOfFilteredFiles.append(fi.absoluteFilePath());
-//        }
-//    }
-
-//    return listOfFilteredFiles;
-//}
 
 } // namespace MNEANONYMIZE
 
