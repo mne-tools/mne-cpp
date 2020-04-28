@@ -4,7 +4,7 @@ on:
   push:
     branches:
     # Change this to the branch name you make changes to the documentation on
-    - alternate
+    - wasm
 
 jobs:
   WasmTest:
@@ -65,10 +65,10 @@ jobs:
         # Setup git credentials
         git config --global user.email dev@dev.com
         git config --global user.name dev
-        # Replace logo
-        cp -RT tools/design/logos/qtlogo.svg qtlogo.svg
         # Save the wasm files first
         cp -RT bin/ ../bin
+        # Replace logo
+        cp -RT tools/design/logos/qtlogo.svg ../bin/qtlogo.svg
         # Checkout the gh-pages branch
         git fetch origin gh-pages
         git checkout --track origin/gh-pages
