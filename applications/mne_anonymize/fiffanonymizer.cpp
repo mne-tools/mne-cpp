@@ -522,7 +522,7 @@ void FiffAnonymizer::censorTag() const
 
 void FiffAnonymizer::readTag()
 {
-    m_pInStream->read_tag(m_pInTag,0);
+    m_pInStream->read_tag(m_pInTag,-1);
     updateBlockTypeList();
 }
 
@@ -551,7 +551,7 @@ void FiffAnonymizer::processHeaderTags()
 {
     readTag();
 
-    if(checkValidFiffFormatVersion(m_pInTag)) {
+    if(checkValidFiffFormatVersion()) {
         printIfVerbose("Input file compatible with this version of mne_anonymizer.");
     } else {
         qCritical() << "This file may not be compatible with this application. First tag is not a valid ID tag.";
@@ -603,11 +603,11 @@ void FiffAnonymizer::updateBlockTypeList()
 
 //=============================================================================================================
 
-bool FiffAnonymizer::checkValidFiffFormatVersion(const FIFFLIB::FiffTag::SPtr pTag) const
+bool FiffAnonymizer::checkValidFiffFormatVersion() const
 {
-    if(pTag->kind == FIFF_FILE_ID)
+    if(m_pInTag->kind == FIFF_FILE_ID)
     {
-        FIFFLIB::FiffId fileId = pTag->toFiffID();
+        FIFFLIB::FiffId fileId = m_pInTag->toFiffID();
         int inMayorVersion = (static_cast<uint32_t>(fileId.version) & 0xFFFF0000) >> 16;
         int inMinorVersion = (static_cast<uint32_t>(fileId.version) & 0x0000FFFF);
         double inVersion = inMayorVersion + inMinorVersion/10.0;
@@ -958,7 +958,7 @@ void FiffAnonymizer::renameOutputFileAsInputFile()
 int FiffAnonymizer::openInOutStreams()
 {
     m_pInStream = FIFFLIB::FiffStream::SPtr (new FIFFLIB::FiffStream(&m_fFileIn));
-    if(m_pInStream->open(QIODevice::ReadOnly)) {
+    if(m_pInStream->device()->open(QIODevice::ReadOnly)) {
         printIfVerbose("Input file opened correctly: " + m_fFileIn.fileName());
     } else {
         qCritical() << "Problem opening the input file: " << m_fFileIn.fileName();

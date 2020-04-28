@@ -353,7 +353,7 @@ private:
      *
      * @param [in] pTag Pointer to the tag being read. Normally, the input Tag.
      */
-    bool checkValidFiffFormatVersion(const FIFFLIB::FiffTag::SPtr pTag) const;
+    bool checkValidFiffFormatVersion() const;
 
     //=========================================================================================================
     /**

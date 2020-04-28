@@ -187,7 +187,6 @@ int SettingsControllerCL::parseInputs(const QStringList& arguments)
     if(m_parser.isSet("in"))
     {
         QFileInfo fInfo(m_parser.value("in"));
-        fInfo.makeAbsolute();
         if(fInfo.isFile())
         {
             if(m_pAnonymizer->setFileIn(fInfo.absoluteFilePath()))
@@ -219,7 +218,6 @@ int SettingsControllerCL::parseInputs(const QStringList& arguments)
         }
     } else {
         QFileInfo inFInfo(m_parser.value("in"));
-        inFInfo.makeAbsolute();
         QString fileOut(QDir(inFInfo.absolutePath()).filePath(
                     inFInfo.baseName() + "_anonymized." + inFInfo.completeSuffix()));
         if(m_pAnonymizer->setFileOut(fileOut))
