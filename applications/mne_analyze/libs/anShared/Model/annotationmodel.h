@@ -81,64 +81,165 @@ public:
     Qt::ItemFlags flags(const QModelIndex & index) const;
 
     //=========================================================================================================
+    /**
+     * Gets a list of event types currently held by the model
+     *
+     * @return Returns a list of event types
+     */
     QStringList getEventTypeList() const;
 
     //=========================================================================================================
+    /**
+     * Sets saved sample, used to prepare sample to be added to model.
+     *
+     * @param [in] iSamplePos   sample number to be set
+     */
     void setSamplePos(int iSamplePos);
 
     //=========================================================================================================
+    /**
+     * Sets current filter setting sto only display selected annotation type
+     *
+     * @param [in] eventType    Type of annotation that is to be displayed when filterd
+     */
     void setEventFilterType(const QString eventType);
 
     //=========================================================================================================
+    /**
+     * Used to pass first and last sample parameters to the model
+     *
+     * @param [in] firstSample  sample number of the first sample in the currently loaded fiff file
+     * @param [in] lastSample   sample number of the last sample in the currently loaded fiff file
+     */
     void setFirstLastSample(int firstSample,
                             int lastSample);
 
     //=========================================================================================================
+    /**
+     * returns the first and last sample parameters currently stored in the model
+     *
+     * @return Returns first and last sample parameters
+     */
     QPair<int, int> getFirstLastSample() const;
 
     //=========================================================================================================
+    /**
+     * Returns frequency parameter stored in the model
+     *
+     * @return frequency of the samples
+     */
     float getSampleFreq() const;
 
     //=========================================================================================================
+    /**
+     * Sets the stored frequerncy parameter to the function input
+     *
+     * @param [in] fFreq    frequency of the currently loaded fiff file
+     */
     void setSampleFreq(float fFreq);
 
     //=========================================================================================================
+    /**
+     * Return number of annotations to be displayed, based on current filter parameters
+     *
+     * @return number on annotations to display
+     */
     int getNumberOfAnnotations() const;
 
     //=========================================================================================================
+    /**
+     * Return annotation stored at index given by input parameter
+     *
+     * @param [in] iIndex   Index of the annotation to be retreived
+     *
+     * @return Returns annotation at index given by input parameter
+     */
     int getAnnotation(int iIndex) const;
 
     //=========================================================================================================
+    /**
+     * Returns map of the colors assigned to each of the annotation types
+     *
+     * @return Map of annotation colors
+     */
     QMap<int, QColor>& getTypeColors();
 
     //=========================================================================================================
+    /**
+     * Adds a new annotation type with the input parameters as configuration parameters
+     *
+     * @param [in] eventType    type number (0-99)
+     * @param [in] typeColor    color to be used for drawing
+     */
     void addNewAnnotationType(const QString &eventType,
                               const QColor &typeColor);
 
+    //=========================================================================================================
+    /**
+     * Pass which annotations are currenlty selected in the view GUI
+     *
+     * @param [in] iSelected    currently selected annotation
+     */
     void setSelectedAnn(int iSelected);
 
+    //=========================================================================================================
+    /**
+     * Returns currently selected annotation stored locally in the model
+     *
+     * @return Returns stored selected annotation
+     */
     int getSelectedAnn();
 
+    //=========================================================================================================
+    /**
+     * Sets whether only to show selected annotations
+     *
+     * @param [in] iSelectedState   whether to show only selected. 0 - no, 2 - yes
+     */
     void setShowSelected(int iSelectedState);
 
+    //=========================================================================================================
+    /**
+     * Returns whther to only show selected annotations
+     *
+     * @return whther to show selected annotations
+     */
     int getShowSelected();
 
+    //=========================================================================================================
+    /**
+     * Returns sample freqency
+     *
+     * @return sample frequency
+     */
     float getFreq();
 
     //=========================================================================================================
     /**
      * Saves model to the current model path if possible.
      *
-     * @param[in] sPath   The path where the file should be saved to.
+     * @param [in] sPath   The path where the file should be saved to.
      *
      * @returns      True if saving was successful
      */
     bool saveToFile(const QString& sPath);
 
+    //=========================================================================================================
+    /**
+     * Saves last added type or last type to be filterd to
+     *
+     * @param [in] iType    type to be saved
+     */
     void setLastType(int iType);
 
 signals:
 
+    //=========================================================================================================
+    /**
+     * Emits updated new type to be added to GUI
+     *
+     * @param [in] currentFilterType    Type to be updated in GUI
+     */
     void updateEventTypes(const QString& currentFilterType);
 
 private:

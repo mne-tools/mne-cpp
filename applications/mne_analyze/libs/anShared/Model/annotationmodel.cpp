@@ -82,8 +82,11 @@ AnnotationModel::AnnotationModel(QObject* parent)
 , m_fFreq(600)
 , m_sFilterEventType("All")
 {
-    qDebug() << "ANNOTATION MODEL CONSTRUCTOR";
+    qInfo() << "[AnnotationModel::AnnotationModel] CONSTRUCTOR";
 
+    m_eventTypeList<<"0";
+
+    m_eventTypeColor[0] = QColor(Qt::black);
     m_eventTypeColor[1] = QColor(Qt::black);
     m_eventTypeColor[2] = QColor(Qt::magenta);
     m_eventTypeColor[3] = QColor(Qt::green);
@@ -167,7 +170,7 @@ void AnnotationModel::setSamplePos(int iSamplePos)
 
 int AnnotationModel::rowCount(const QModelIndex &parent) const
 {
-
+    Q_UNUSED(parent);
     return m_dataSamples_Filtered.size();
 }
 
@@ -175,6 +178,7 @@ int AnnotationModel::rowCount(const QModelIndex &parent) const
 
 int AnnotationModel::columnCount(const QModelIndex &parent) const
 {
+    Q_UNUSED(parent);
     return 3;
 }
 
@@ -526,6 +530,7 @@ bool AnnotationModel::saveToFile(const QString& sPath)
         out << "  " << this->getAnnotation(i) << "   " << QString::number(static_cast<float>(this->getAnnotation(i)) / this->getFreq(), 'f', 4) << "          0         1" << endl;
         out << "  " << this->getAnnotation(i) << "   " << QString::number(static_cast<float>(this->getAnnotation(i)) / this->getFreq(), 'f', 4) << "          1         0" << endl;
     }
+    return true;
 #endif
 }
 
