@@ -196,15 +196,15 @@ private:
      * @param [out] id                  The FiffID
      *
      */
-    int readChannels(QSharedPointer<FIFFLIB::FiffInfoBase> pFiffInfoBase,
-                     QList<FIFFLIB::FiffChInfo>& listMegCh,
-                     int& iNMeg,
-                     QList<FIFFLIB::FiffChInfo>& listMegComp,
-                     int& iNMegCmp,
-                     QList<FIFFLIB::FiffChInfo>& listEegCh,
-                     int& iNEeg,
-                     FIFFLIB::FiffCoordTransOld** transDevHeadOld,
-                     FIFFLIB::FiffId& id);
+    int mne_read_meg_comp_eeg_ch_info_41(FIFFLIB::FiffInfoBase::SPtr pFiffInfoBase,
+                                         QList<FIFFLIB::FiffChInfo>& listMegCh,
+                                         int& iNMeg,
+                                         QList<FIFFLIB::FiffChInfo>& listMegComp,
+                                         int& iNMegCmp,
+                                         QList<FIFFLIB::FiffChInfo>& listEegCh,
+                                         int& iNEeg,
+                                         FIFFLIB::FiffCoordTransOld** transDevHeadOld,
+                                         FIFFLIB::FiffId& id);
 
     //=========================================================================================================
     /**
