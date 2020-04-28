@@ -529,7 +529,7 @@ private:
     bool m_bFileInSet;                  /**< Input file set.*/
     bool m_bFileOutSet;                 /**< Output file set.*/
     qint64 m_iDirectoryPos;             /**< Position of the tag directory in the output file.*/
-    bool m_bFileHasDirPtr;              /**< This file has a tag directory.*/
+    bool m_bFileInHasDirPtr;              /**< This file has a tag directory.*/
 
     QDateTime m_dDefaultDate;           /**< Date to be used as substitution of dates found in a fiff file */
     QDateTime m_dMeasurementDate;       /**< Date to substitute the measuremnt date appearing in the file.*/
