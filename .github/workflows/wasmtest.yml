@@ -65,7 +65,9 @@ jobs:
         # Setup git credentials
         git config --global user.email dev@dev.com
         git config --global user.name dev
-        # Copy the wasm files first
+        # Replace logo
+        cp -RT tools/design/logos/qtlogo.svg qtlogo.svg
+        # Save the wasm files first
         cp -RT bin/ ../bin
         # Checkout the gh-pages branch
         git fetch origin gh-pages
@@ -74,8 +76,8 @@ jobs:
         git clean -f -d
         git rm * -r
         git commit --amend -a -m 'Update wasm' --allow-empty
-        # Add the changed doc files
+        # Add the saved wasm files
         cp -RT ../bin .
         git add --all
         git commit --amend -a -m 'Update wasm'
-        git push origin/gh-pages -f
+        git push origin gh-pages -f
