@@ -717,7 +717,6 @@ int FiffAnonymizer::setFileIn(const QString &sFileIn)
     QFileInfo fiIn(sFileIn);
     if(fiIn.exists())
     {
-        fiIn.makeAbsolute();
         m_fFileIn.setFileName(fiIn.absoluteFilePath());
         m_bFileInSet = true;
         return 0;
@@ -740,7 +739,6 @@ int FiffAnonymizer::setFileOut(const QString &sFileOut)
     if(m_bFileInSet)
     {
         QFileInfo fiOut(sFileOut);
-        fiOut.makeAbsolute();
         if(fiOut.fileName() == m_fFileIn.fileName())
         {
             m_bInOutFileNamesEqual = true;
