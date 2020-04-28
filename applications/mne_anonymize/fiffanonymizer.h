@@ -175,6 +175,11 @@ public:
      * @param [in] bFlag    Bool argument whether to use the brute mode.
      */
     void setBruteMode(const bool bFlag);
+    //=========================================================================================================
+    /**
+     * Get value of default Advanced anonymization. Anonymize also weight, height and some other fields.
+     */
+    bool getBruteMode();
 
     //=========================================================================================================
     /**
@@ -186,11 +191,29 @@ public:
 
     //=========================================================================================================
     /**
+     * Get value of Date to substitute the measuremnt date appearing in the file.
+     */
+    QDateTime getMeasurementDate();
+
+    //=========================================================================================================
+    /**
      * If found in the fiff file, the specified number of days will be subtracted from the measurement date information contained in each fif file.
      *
      * @param [in] iMeasDayOffset   Integer with the number of dates to subtract from the measurement date.
      */
     void setMeasurementDayOffset(int iMeasDayOffset);
+
+    //=========================================================================================================
+    /**
+     * Get value of Number of days to subtract from the measurement date.
+     */
+    int getMeasurementDayOffset();
+
+    //=========================================================================================================
+    /**
+     * Get value of Flags to use Measurement-date days offset.
+     */
+    bool getUseMeasurementDayOffset();
 
     //=========================================================================================================
     /**
@@ -202,11 +225,29 @@ public:
 
     //=========================================================================================================
     /**
+     * Get value of Subject's birthday substitutor.
+     */
+    QDateTime getSubjectBirthday();
+
+    //=========================================================================================================
+    /**
      * If found in the fiff file, the specified number of days will be subtracted from the subject's birthday date information contained in each fif file.
      *
      * @param [in] iSubjBirthdayOffset  Integer with the number of dates to subtract from the subject's birthday date.
      */
     void setSubjectBirthdayOffset(int iSubjBirthdayOffset);
+
+    //=========================================================================================================
+    /**
+     * Get value of Flags use of Subject's birthday offset.
+     */
+    bool getUseSubjectBirthdayOffset();
+
+    //=========================================================================================================
+    /**
+     * Get value of Subjects's birthday offset.
+     */
+    int  getSubjectBirthdayOffset();
 
     //=========================================================================================================
     /**
@@ -249,41 +290,12 @@ public:
 //     */
 //    QDateTime getDefaultDate();
 
-//    //=========================================================================================================
-//    /**
-//     * Get value of Date to substitute the measuremnt date appearing in the file.
-//     */
-//    QDateTime getMeasurementDate();
 
-//    //=========================================================================================================
-//    /**
-//     * Get value of Flags to use Measurement-date days offset.
-//     */
-//    bool getUseMeasurementDayOffset();
 
-//    //=========================================================================================================
-//    /**
-//     * Get value of Number of days to subtract from the measurement date.
-//     */
-//    int getIntMeasurementDayOffset();
 
-//    //=========================================================================================================
-//    /**
-//     * Get value of Subject's birthday substitutor.
-//     */
-//    QDateTime getSubjectBirthday();
 
-//    //=========================================================================================================
-//    /**
-//     * Get value of Flags use of Subject's birthday offset.
-//     */
-//    bool getUseSubjectBirthdayOffset();
 
-//    //=========================================================================================================
-//    /**
-//     * Get value of Subjects's birthday offset.
-//     */
-//    int  getIntSubjectBirthdayOffset();
+
 
 //    //=========================================================================================================
 //    /**
@@ -368,12 +380,6 @@ public:
 //     * Get value of Project's comment substitutor.
 //     */
 //    QString getDefaultProjectComment();
-
-//    //=========================================================================================================
-//    /**
-//     * Get value of default Advanced anonymization. Anonymize also weight, height and some other fields.
-//     */
-//    bool getBruteMode();
 
 //    //=========================================================================================================
 //    /**
@@ -611,7 +617,7 @@ private:
     bool m_bDeleteInputFileConfirmation;/**< User's request to avoid confirmation prompt for input file deletion.*/
     bool m_bInputFileDeleted;           /**< Flags if the input file has been deleted. */
     bool m_bInOutFileNamesEqual;        /**< Flags user's request to have both input and output files with the same name.*/
-    bool m_bOutputFileRenamed;          /**< Flags if the output file has been renamed to match the name the input file had. */
+    bool m_bOutFileRenamed;          /**< Flags if the output file has been renamed to match the name the input file had. */
 
     FIFFLIB::FiffStream::SPtr m_pInStream;   /**< Pointer to FiffStream object for reading.*/
     FIFFLIB::FiffStream::SPtr m_pOutStream;  /**< Pointer to FiffStream object for writing the result.*/
