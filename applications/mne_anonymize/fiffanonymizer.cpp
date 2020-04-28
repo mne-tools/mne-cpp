@@ -330,7 +330,7 @@ void FiffAnonymizer::censorTag() const
     }
     case FIFF_COMMENT:
     {
-        if(m_pBlockTypeList->top()==FIFFB_MEAS_INFO)
+        if(m_pBlockTypeList->top() == FIFFB_MEAS_INFO)
         {
             QString newStr(m_sDefaultString);
             m_pOutTag->resize(newStr.size());
