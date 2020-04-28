@@ -148,7 +148,23 @@ public:
      *
      * @param [in] sFilePathOut String containing the output file name including its path.
      */
+    QString getFileNameIn() const;
+
+    //=========================================================================================================
+    /**
+     * Specifies the output file to anonymize. This file will help to set a output Fiffstream object.
+     *
+     * @param [in] sFilePathOut String containing the output file name including its path.
+     */
     int setFileOut(const QString &sFilePathOut);
+
+    //=========================================================================================================
+    /**
+     * Specifies the output file to anonymize. This file will help to set a output Fiffstream object.
+     *
+     * @param [in] sFilePathOut String containing the output file name including its path.
+     */
+    QString getFileNameOut() const;
 
     //=========================================================================================================
     /**
@@ -278,151 +294,6 @@ public:
      */
     void setSubjectHisId(const QString& sSubjectId);
 
-//    //=========================================================================================================
-//    /**
-//     * Returns the default string value to be used as substitution of other strings in the fiff file.
-//     */
-//    QString getDefaultString();
-
-//    //=========================================================================================================
-//    /**
-//     * Get value of Date to be used as substitution of dates found in a fiff file.
-//     */
-//    QDateTime getDefaultDate();
-
-
-
-
-
-
-
-
-//    //=========================================================================================================
-//    /**
-//     * Get value of MAC addresss substitutor.
-//     */
-//    void getDefaultMAC(FIFFLIB::fiff_int_t (&mac)[2]);
-
-//    //=========================================================================================================
-//    /**
-//     * Get value of Subject's id substitutor.
-//     */
-//    int getDefaultSubjectId();
-
-//    //=========================================================================================================
-//    /**
-//     * Get value of Subject's first name substitutor.
-//     */
-//    QString getDefaultSubjectFirstName();
-
-//    //=========================================================================================================
-//    /**
-//     * Get value of Subject's middle name substitutor.
-//     */
-//    QString getDefaultSubjectMidName();
-
-//    //=========================================================================================================
-//    /**
-//     * Get value of Subject's last name substitutor.
-//     */
-//    QString getDefaultSubjectLastName();
-
-//    //=========================================================================================================
-//    /**
-//     * Get value of Subject's weight substitutor.
-//     */
-//    int getDefaultSubjectWeight();
-
-//    //=========================================================================================================
-//    /**
-//     * Get value of Subject's height substitutor.
-//     */
-//    int getDefaultSubjectHeight();
-
-//    //=========================================================================================================
-//    /**
-//     * Get value of Subject's comment substitutor.
-//     */
-//    QString getDefaultSubjectComment();
-
-//    //=========================================================================================================
-//    /**
-//     * Get value of Subject's HIS ID substitutor.
-//     */
-//    QString getDefaultSubjectHisId();
-
-//    //=========================================================================================================
-//    /**
-//     * Get value of Project's id# substitutor.
-//     */
-//    int getDefaultProjectId();
-
-//    //=========================================================================================================
-//    /**
-//     * Get value of Project's name substitutor.
-//     */
-//    QString getDefaultProjectName();
-
-//    //=========================================================================================================
-//    /**
-//     * Get value of Project's aim substitutor.
-//     */
-//    QString getDefaultProjectAim();
-
-//    //=========================================================================================================
-//    /**
-//     * Get value of Project's Persons substitutor.
-//     */
-//    QString getDefaultProjectPersons();
-
-//    //=========================================================================================================
-//    /**
-//     * Get value of Project's comment substitutor.
-//     */
-//    QString getDefaultProjectComment();
-
-//    //=========================================================================================================
-//    /**
-//     * value of User's request to delete the input file after anonymization.
-//     */
-//    bool getDeleteInputFileAfter();
-
-//    //=========================================================================================================
-//    /**
-//     * Value of User's request to avoid confirmation prompt for input file deletion.
-//     */
-//    bool getDeleteInputFileConfirmation();
-
-//    //=========================================================================================================
-//    /**
-//     * value of Flags if the input file has been deleted.
-//     */
-//    bool getInputFileDeleted();
-
-//    //=========================================================================================================
-//    /**
-//     * Value of user's request to have both input and output files with the same name.
-//     */
-//    bool getInOutFileNamesEqual();
-
-//    //=========================================================================================================
-//    /**
-//     * Value ofFlags if the output file has been renamed to match the name the input file had.
-//     */
-//    bool getOutputFileRenamed();
-
-//    //=========================================================================================================
-//    /**
-//     * Get name of Input file.
-//     */
-//    QString getFileNameIn();
-
-//    //=========================================================================================================
-//    /**
-//     * Get name of Output file.
-//     */
-//    QString getsFileNameOut();
-
 private:
     //=========================================================================================================
     /**
@@ -474,15 +345,15 @@ private:
      */
     void addFinalEntryToDir();
 
-    //=========================================================================================================
-    /**
-     * This method allows to transform between a vector and a regular tag structure. The vector will only contain
-     * the data inside the Tag Directory tag (remember a tag directory is a tag itself). This allows to use all the
-     * methods related to a tag (i.e. writeTag) while storing a newly updated tag directory into a fiff file.
-     *
-     * @param [in] pTag A pointer to a tag where the tag directory information can be stored.
-     */
-    void dir2tag(FIFFLIB::FiffTag::SPtr pTag);
+//    //=========================================================================================================
+//    /**
+//     * This method allows to transform between a vector and a regular tag structure. The vector will only contain
+//     * the data inside the Tag Directory tag (remember a tag directory is a tag itself). This allows to use all the
+//     * methods related to a tag (i.e. writeTag) while storing a newly updated tag directory into a fiff file.
+//     *
+//     * @param [in] pTag A pointer to a tag where the tag directory information can be stored.
+//     */
+//    void dir2tag(FIFFLIB::FiffTag::SPtr pTag);
 
     //=========================================================================================================
     /**
@@ -522,7 +393,7 @@ private:
      *
      * @param [in] str  String to print.
      */
-    void printIfVerbose(const QString &str);
+    void printIfVerbose(const QString &str) const;
 
     //=========================================================================================================
     /**
@@ -569,10 +440,49 @@ private:
      */
     void renameOutputFileAsInputFile();
 
+    //=========================================================================================================
+    /**
+     * This method will rename the output file as the input file. It will be called only after all the necessary
+     * verification steps have been tested through the checkRenameOutputFile method.
+     * It sets the control member bool flag m_bOutputFileRenamed to true and if verbose mode is on, prints a
+     * description message.
+     */
     int openInOutStreams();
+
+    //=========================================================================================================
+    /**
+     * This method will rename the output file as the input file. It will be called only after all the necessary
+     * verification steps have been tested through the checkRenameOutputFile method.
+     * It sets the control member bool flag m_bOutputFileRenamed to true and if verbose mode is on, prints a
+     * description message.
+     */
     int closeInOutStreams();
+
+    //=========================================================================================================
+    /**
+     * This method will rename the output file as the input file. It will be called only after all the necessary
+     * verification steps have been tested through the checkRenameOutputFile method.
+     * It sets the control member bool flag m_bOutputFileRenamed to true and if verbose mode is on, prints a
+     * description message.
+     */
     void processHeaderTags();
+
+    //=========================================================================================================
+    /**
+     * This method will rename the output file as the input file. It will be called only after all the necessary
+     * verification steps have been tested through the checkRenameOutputFile method.
+     * It sets the control member bool flag m_bOutputFileRenamed to true and if verbose mode is on, prints a
+     * description message.
+     */
     void readTag();
+
+    //=========================================================================================================
+    /**
+     * This method will rename the output file as the input file. It will be called only after all the necessary
+     * verification steps have been tested through the checkRenameOutputFile method.
+     * It sets the control member bool flag m_bOutputFileRenamed to true and if verbose mode is on, prints a
+     * description message.
+     */
     void writeTag();
 
     //=========================================================================================================
@@ -634,7 +544,7 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline void FiffAnonymizer::printIfVerbose(const QString& str)
+inline void FiffAnonymizer::printIfVerbose(const QString& str) const
 {
     if(m_bVerboseMode) {
         qInfo() << str;
