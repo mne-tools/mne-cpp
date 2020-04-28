@@ -99,6 +99,9 @@ void SettingsControllerCL::initParser()
                                                                            "Health Information or Personal Identifiable information from a FIFF file."));
     m_parser.addHelpOption();
 
+    QCommandLineOption noGUIOpt("no-gui",QCoreApplication::translate("main","Command Line version of the application."));
+    m_parser.addOption(noGUIOpt);
+
     QCommandLineOption versionOpt("version",QCoreApplication::translate("main","Prints out the version of this application."));
     m_parser.addOption(versionOpt);
 
@@ -187,7 +190,7 @@ int SettingsControllerCL::parseInputs(const QStringList& arguments)
         fInfo.makeAbsolute();
         if(fInfo.isFile())
         {
-            if(m_pAnonymizer->setFileIn(fInfo.fileName()))
+            if(m_pAnonymizer->setFileIn(fInfo.absoluteFilePath()))
             {
                 qCritical() << "Error while setting the input file.";
             }
