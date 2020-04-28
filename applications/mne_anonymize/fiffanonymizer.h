@@ -524,8 +524,8 @@ private:
     QString m_sProjectPersons;          /**< Project's Persons substitutor.*/
     QString m_sProjectComment;          /**< Project's comment substitutor.*/
 
-    QFile m_fFileIn;                    /**< QFile input file.*/
-    QFile m_fFileOut;                   /**< QFile output file.*/
+    QFile m_fFileIn;                    /**< Input file.*/
+    QFile m_fFileOut;                   /**< Output file.*/
     bool m_bFileInSet;                  /**< Input file set.*/
     bool m_bFileOutSet;                 /**< Output file set.*/
     qint64 m_iDirectoryPos;             /**< Position of the tag directory in the output file.*/
