@@ -162,169 +162,206 @@ fiffId get_file_id(const QString& name)
 
 //============================= mne_read_forward_solution.c =============================
 
-int mne_read_meg_comp_eeg_ch_info_41(const QString& name,
-                                     QList<FiffChInfo>& megp,	 /* MEG channels */
-                                     int* nmegp,
-                                     QList<FiffChInfo>& meg_compp,
-                                     int* nmeg_compp,
-                                     QList<FiffChInfo>& eegp,	 /* EEG channels */
-                                     int* neegp,
-                                     FiffCoordTransOld** meg_head_t,
-                                     fiffId* idp)	 /* The measurement ID */
-/*
-      * Read the channel information and split it into three arrays,
-      * one for MEG, one for MEG compensation channels, and one for EEG
-      */
+//int mne_read_meg_comp_eeg_ch_info_41(const QString& name,
+//                                     QList<FiffChInfo>& megp,	 /* MEG channels */
+//                                     int* nmegp,
+//                                     QList<FiffChInfo>& meg_compp,
+//                                     int* nmeg_compp,
+//                                     QList<FiffChInfo>& eegp,	 /* EEG channels */
+//                                     int* neegp,
+//                                     FiffCoordTransOld** meg_head_t,
+//                                     fiffId* idp)	 /* The measurement ID */
+///*
+//      * Read the channel information and split it into three arrays,
+//      * one for MEG, one for MEG compensation channels, and one for EEG
+//      */
+//{
+//    QFile file(name);
+//    FiffStream::SPtr stream(new FiffStream(&file));
+
+//    QList<FiffChInfo> chs;
+//    int nchan = 0;
+//    QList<FiffChInfo> meg;
+//    int nmeg = 0;
+//    QList<FiffChInfo> meg_comp;
+//    int nmeg_comp = 0;
+//    QList<FiffChInfo> eeg;
+//    int neeg = 0;
+//    fiffId id = Q_NULLPTR;
+//    QList<FiffDirNode::SPtr> nodes;
+//    FiffDirNode::SPtr info;
+//    FiffTag::SPtr t_pTag;
+//    FiffChInfo this_ch;
+//    FiffCoordTransOld* t = Q_NULLPTR;
+//    fiff_int_t kind, pos;
+//    int j,k,to_find;
+
+//    if(!stream->open())
+//        goto bad;
+
+//    nodes = stream->dirtree()->dir_tree_find(FIFFB_MNE_PARENT_MEAS_FILE);
+
+//    if (nodes.size() == 0) {
+//        nodes = stream->dirtree()->dir_tree_find(FIFFB_MEAS_INFO);
+//        if (nodes.size() == 0) {
+//            qCritical ("Could not find the channel information.");
+//            goto bad;
+//        }
+//    }
+//    info = nodes[0];
+//    to_find = 0;
+//    for (k = 0; k < info->nent(); k++) {
+//        kind = info->dir[k]->kind;
+//        pos  = info->dir[k]->pos;
+//        switch (kind) {
+//        case FIFF_NCHAN :
+//            if (!stream->read_tag(t_pTag,pos))
+//                goto bad;
+//            nchan = *t_pTag->toInt();
+
+//            for (j = 0; j < nchan; j++) {
+//                chs.append(FiffChInfo());
+//                chs[j].scanNo = -1;
+//            }
+//            to_find = nchan;
+//            break;
+
+//        case FIFF_PARENT_BLOCK_ID :
+//            if(!stream->read_tag(t_pTag, pos))
+//                goto bad;
+//            //            id = t_pTag->toFiffID();
+//            *id = *(fiffId)t_pTag->data();
+//            break;
+
+//        case FIFF_COORD_TRANS :
+//            if(!stream->read_tag(t_pTag, pos))
+//                goto bad;
+//            //            t = t_pTag->toCoordTrans();
+//            t = FiffCoordTransOld::read_helper( t_pTag );
+//            if (t->from != FIFFV_COORD_DEVICE || t->to   != FIFFV_COORD_HEAD)
+//                t = Q_NULLPTR;
+//            break;
+
+//        case FIFF_CH_INFO : /* Information about one channel */
+//            if(!stream->read_tag(t_pTag, pos))
+//                goto bad;
+//            this_ch = t_pTag->toChInfo();
+//            if (this_ch.scanNo <= 0 || this_ch.scanNo > nchan) {
+//                printf ("FIFF_CH_INFO : scan # out of range %d (%d)!",this_ch.scanNo,nchan);
+//                goto bad;
+//            }
+//            else
+//                chs[this_ch.scanNo-1] = this_ch;
+//            to_find--;
+//            break;
+//        }
+//    }
+//    if (to_find != 0) {
+//        qCritical("Some of the channel information was missing.");
+//        goto bad;
+//    }
+//    if (t == Q_NULLPTR && meg_head_t != Q_NULLPTR) {
+//    /*
+//     * Try again in a more general fashion
+//     */
+//        if ((t = FiffCoordTransOld::mne_read_meas_transform(name)) == Q_NULLPTR) {
+//            qCritical("MEG -> head coordinate transformation not found.");
+//            goto bad;
+//        }
+//    }
+//   /*
+//    * Sort out the channels
+//    */
+//    for (k = 0; k < nchan; k++) {
+//        if (chs[k].kind == FIFFV_MEG_CH) {
+//            meg.append(chs[k]);
+//            nmeg++;
+//        } else if (chs[k].kind == FIFFV_REF_MEG_CH) {
+//            meg_comp.append(chs[k]);
+//            nmeg_comp++;
+//        } else if (chs[k].kind == FIFFV_EEG_CH) {
+//            eeg.append(chs[k]);
+//            neeg++;
+//        }
+//    }
+//    //    fiff_close(in);
+
+//    stream->close();
+
+//    megp  = meg;
+//    if(nmegp) {
+//        *nmegp = nmeg;
+//    }
+
+//    meg_compp = meg_comp;
+//    if(nmeg_compp) {
+//        *nmeg_compp = nmeg_comp;
+//    }
+
+//    eegp = eeg;
+//    if(neegp) {
+//        *neegp = neeg;
+//    }
+
+//    if (idp == Q_NULLPTR) {
+//        FREE_41(id);
+//    } else {
+//        *idp   = id;
+//    }
+
+//    if (meg_head_t == Q_NULLPTR) {
+//        FREE_41(t);
+//    } else {
+//        *meg_head_t = t;
+//    }
+
+//    return FIFF_OK;
+
+//bad : {
+//        //        fiff_close(in);
+//        stream->close();
+//        FREE_41(id);
+//        //        FREE_41(tag.data);
+//        FREE_41(t);
+//        return FIFF_FAIL;
+//    }
+//}
+
+int ComputeFwd::mne_read_meg_comp_eeg_ch_info_41(FIFFLIB::FiffInfoBase::SPtr pFiffInfoBase,
+                                                 QList<FiffChInfo>& listMegCh,
+                                                 int& iNMeg,
+                                                 QList<FiffChInfo>& listMegComp,
+                                                 int& iNMegCmp,
+                                                 QList<FiffChInfo>& listEegCh,
+                                                 int &iNEeg,
+                                                 FiffCoordTransOld** transDevHeadOld,
+                                                 FiffId& id)
 {
-    QFile file(name);
-    FiffStream::SPtr stream(new FiffStream(&file));
-
-    QList<FiffChInfo> chs;
-    int nchan = 0;
-    QList<FiffChInfo> meg;
-    int nmeg = 0;
-    QList<FiffChInfo> meg_comp;
-    int nmeg_comp = 0;
-    QList<FiffChInfo> eeg;
-    int neeg = 0;
-    fiffId id = Q_NULLPTR;
-    QList<FiffDirNode::SPtr> nodes;
-    FiffDirNode::SPtr info;
-    FiffTag::SPtr t_pTag;
-    FiffChInfo this_ch;
-    FiffCoordTransOld* t = Q_NULLPTR;
-    fiff_int_t kind, pos;
-    int j,k,to_find;
-
-    if(!stream->open())
-        goto bad;
-
-    nodes = stream->dirtree()->dir_tree_find(FIFFB_MNE_PARENT_MEAS_FILE);
-
-    if (nodes.size() == 0) {
-        nodes = stream->dirtree()->dir_tree_find(FIFFB_MEAS_INFO);
-        if (nodes.size() == 0) {
-            qCritical ("Could not find the channel information.");
-            goto bad;
+    int iNumCh = pFiffInfoBase->nchan;
+    for (int k = 0; k < iNumCh; k++) {
+        if (pFiffInfoBase->chs[k].kind == FIFFV_MEG_CH) {
+            listMegCh.append(pFiffInfoBase->chs[k]);
+            iNMeg++;
+        } else if (pFiffInfoBase->chs[k].kind == FIFFV_REF_MEG_CH) {
+            listMegComp.append(pFiffInfoBase->chs[k]);
+            iNMegCmp++;
+        } else if (pFiffInfoBase->chs[k].kind == FIFFV_EEG_CH) {
+            listEegCh.append(pFiffInfoBase->chs[k]);
+            iNEeg++;
         }
     }
-    info = nodes[0];
-    to_find = 0;
-    for (k = 0; k < info->nent(); k++) {
-        kind = info->dir[k]->kind;
-        pos  = info->dir[k]->pos;
-        switch (kind) {
-        case FIFF_NCHAN :
-            if (!stream->read_tag(t_pTag,pos))
-                goto bad;
-            nchan = *t_pTag->toInt();
 
-            for (j = 0; j < nchan; j++) {
-                chs.append(FiffChInfo());
-                chs[j].scanNo = -1;
-            }
-            to_find = nchan;
-            break;
-
-        case FIFF_PARENT_BLOCK_ID :
-            if(!stream->read_tag(t_pTag, pos))
-                goto bad;
-            //            id = t_pTag->toFiffID();
-            *id = *(fiffId)t_pTag->data();
-            break;
-
-        case FIFF_COORD_TRANS :
-            if(!stream->read_tag(t_pTag, pos))
-                goto bad;
-            //            t = t_pTag->toCoordTrans();
-            t = FiffCoordTransOld::read_helper( t_pTag );
-            if (t->from != FIFFV_COORD_DEVICE || t->to   != FIFFV_COORD_HEAD)
-                t = Q_NULLPTR;
-            break;
-
-        case FIFF_CH_INFO : /* Information about one channel */
-            if(!stream->read_tag(t_pTag, pos))
-                goto bad;
-            this_ch = t_pTag->toChInfo();
-            if (this_ch.scanNo <= 0 || this_ch.scanNo > nchan) {
-                printf ("FIFF_CH_INFO : scan # out of range %d (%d)!",this_ch.scanNo,nchan);
-                goto bad;
-            }
-            else
-                chs[this_ch.scanNo-1] = this_ch;
-            to_find--;
-            break;
-        }
-    }
-    if (to_find != 0) {
-        qCritical("Some of the channel information was missing.");
-        goto bad;
-    }
-    if (t == Q_NULLPTR && meg_head_t != Q_NULLPTR) {
-    /*
-     * Try again in a more general fashion
-     */
-        if ((t = FiffCoordTransOld::mne_read_meas_transform(name)) == Q_NULLPTR) {
-            qCritical("MEG -> head coordinate transformation not found.");
-            goto bad;
-        }
-    }
-   /*
-    * Sort out the channels
-    */
-    for (k = 0; k < nchan; k++) {
-        if (chs[k].kind == FIFFV_MEG_CH) {
-            meg.append(chs[k]);
-            nmeg++;
-        } else if (chs[k].kind == FIFFV_REF_MEG_CH) {
-            meg_comp.append(chs[k]);
-            nmeg_comp++;
-        } else if (chs[k].kind == FIFFV_EEG_CH) {
-            eeg.append(chs[k]);
-            neeg++;
-        }
-    }
-    //    fiff_close(in);
-
-    stream->close();
-
-    megp  = meg;
-    if(nmegp) {
-        *nmegp = nmeg;
-    }
-
-    meg_compp = meg_comp;
-    if(nmeg_compp) {
-        *nmeg_compp = nmeg_comp;
-    }
-
-    eegp = eeg;
-    if(neegp) {
-        *neegp = neeg;
-    }
-
-    if (idp == Q_NULLPTR) {
-        FREE_41(id);
+    if(!m_pSettings->meg_head_t) {
+        *transDevHeadOld = new FiffCoordTransOld(pFiffInfoBase->dev_head_t.toOld());
     } else {
-        *idp   = id;
+        *transDevHeadOld = m_pSettings->meg_head_t;
     }
-
-    if (meg_head_t == Q_NULLPTR) {
-        FREE_41(t);
-    } else {
-        *meg_head_t = t;
-    }
-
-    return FIFF_OK;
-
-bad : {
-        //        fiff_close(in);
-        stream->close();
-        FREE_41(id);
-        //        FREE_41(tag.data);
-        FREE_41(t);
+    if(!m_meg_head_t) {
+        qCritical("MEG -> head coordinate transformation not found.");
         return FIFF_FAIL;
     }
+    id = pFiffInfoBase->meas_id;
+    return OK;
 }
 
 int mne_check_chinfo(const QList<FiffChInfo>& chs,
@@ -335,7 +372,7 @@ int mne_check_chinfo(const QList<FiffChInfo>& chs,
 {
     int k;
     FiffChInfo ch;
-    float close = 0.02;
+    float close = 0.02f;
 
     for (k = 0; k < nch; k++) {
         if (chs.at(k).kind == FIFFV_EEG_CH) {
@@ -1982,6 +2019,7 @@ void ComputeFwd::initFwd()
             qCritical() << "Could not find the channel information.";
             return;
         }
+        pStream->close();
         m_pInfoBase = QSharedPointer<FIFFLIB::FiffInfo>(new FiffInfo(fiffInfo));
     } else {
         m_pInfoBase = m_pSettings->pFiffInfo;
@@ -1990,17 +2028,18 @@ void ComputeFwd::initFwd()
         qCritical ("ComputeFwd::initFwd(): no FiffInfo");
         return;
     }
-    if (readChannels(m_pInfoBase,
-                     m_listMegChs,
-                     iNMeg,
-                     listCompChs,
-                     iNComp,
-                     m_listEegChs,
-                     iNEeg,
-                     &m_meg_head_t,
-                     m_meas_id) != OK) {
+    if (mne_read_meg_comp_eeg_ch_info_41(m_pInfoBase,
+                                         m_listMegChs,
+                                         iNMeg,
+                                         listCompChs,
+                                         iNComp,
+                                         m_listEegChs,
+                                         iNEeg,
+                                         &m_meg_head_t,
+                                         m_meas_id) != OK) {
         return;
     }
+
     m_iNChan = iNMeg + iNEeg;
 
     printf("\n");
@@ -2088,22 +2127,22 @@ void ComputeFwd::initFwd()
             return;
         }
         if ((m_megcoils = templates->create_meg_coils(m_listMegChs,
-                                                    iNMeg,
-                                                    m_pSettings->accurate ? FWD_COIL_ACCURACY_ACCURATE : FWD_COIL_ACCURACY_NORMAL,
-                                                    meg_mri_t)) == Q_NULLPTR) {
+                                                      iNMeg,
+                                                      m_pSettings->accurate ? FWD_COIL_ACCURACY_ACCURATE : FWD_COIL_ACCURACY_NORMAL,
+                                                      meg_mri_t)) == Q_NULLPTR) {
             return;
         }
         if (iNComp > 0) {
             if ((m_compcoils = templates->create_meg_coils(listCompChs,
-                                                         iNComp,
-                                                         FWD_COIL_ACCURACY_NORMAL,
-                                                         meg_mri_t)) == Q_NULLPTR) {
+                                                           iNComp,
+                                                           FWD_COIL_ACCURACY_NORMAL,
+                                                           meg_mri_t)) == Q_NULLPTR) {
                 return;
             }
         }
         if ((m_eegels = FwdCoilSet::create_eeg_els(m_listEegChs,
-                                                 iNEeg,
-                                                 head_mri_t)) == Q_NULLPTR) {
+                                                   iNEeg,
+                                                   head_mri_t)) == Q_NULLPTR) {
             return;
         }
 
@@ -2111,9 +2150,9 @@ void ComputeFwd::initFwd()
         printf("MRI coordinate coil definitions created.\n");
     } else {
         if ((m_megcoils = templates->create_meg_coils(m_listMegChs,
-                                                    iNMeg,
-                                                    m_pSettings->accurate ? FWD_COIL_ACCURACY_ACCURATE : FWD_COIL_ACCURACY_NORMAL,
-                                                    m_meg_head_t)) == Q_NULLPTR) {
+                                                      iNMeg,
+                                                      m_pSettings->accurate ? FWD_COIL_ACCURACY_ACCURATE : FWD_COIL_ACCURACY_NORMAL,
+                                                      m_meg_head_t)) == Q_NULLPTR) {
             return;
         }
 
@@ -2331,7 +2370,6 @@ void ComputeFwd::storeFwd()
 {
     // We are ready to spill it out
     // Transform the source spaces back into MRI coordinates
-
     if (MneSourceSpaceOld::mne_transform_source_spaces_to(FIFFV_COORD_MRI,m_mri_head_t,m_spaces,m_iNSpace) != OK) {
         return;
     }
@@ -2489,43 +2527,4 @@ void ComputeFwd::toFiffNamed()
             qWarning() << "ComputeFwd::getSolution(): no Forward Solution Grad available";
         }
     }
-}
-
-//=========================================================================================================
-
-int ComputeFwd::readChannels(QSharedPointer<FIFFLIB::FiffInfoBase> pFiffInfoBase,
-                             QList<FiffChInfo>& listMegCh,	 /* MEG channels */
-                             int& iNMeg,
-                             QList<FiffChInfo>& listMegComp,
-                             int& iNMegCmp,
-                             QList<FiffChInfo>& listEegCh,	 /* EEG channels */
-                             int &iNEeg,
-                             FiffCoordTransOld** transDevHeadOld,
-                             FiffId& id)	 /* The measurement ID */
-{
-    int iNumCh = pFiffInfoBase->nchan;
-    for (int k = 0; k < iNumCh; k++) {
-        if (pFiffInfoBase->chs[k].kind == FIFFV_MEG_CH) {
-            listMegCh.append(pFiffInfoBase->chs[k]);
-            iNMeg++;
-        } else if (pFiffInfoBase->chs[k].kind == FIFFV_REF_MEG_CH) {
-            listMegComp.append(pFiffInfoBase->chs[k]);
-            iNMegCmp++;
-        } else if (pFiffInfoBase->chs[k].kind == FIFFV_EEG_CH) {
-            listEegCh.append(pFiffInfoBase->chs[k]);
-            iNEeg++;
-        }
-    }
-
-    if(!m_pSettings->meg_head_t) {
-        *transDevHeadOld = new FiffCoordTransOld(pFiffInfoBase->dev_head_t.toOld());
-    } else {
-        *transDevHeadOld = m_pSettings->meg_head_t;
-    }
-    if(!m_meg_head_t) {
-        qCritical("MEG -> head coordinate transformation not found.");
-        return FIFF_FAIL;
-    }
-    id = pFiffInfoBase->meas_id;
-    return OK;
 }
