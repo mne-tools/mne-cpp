@@ -127,42 +127,44 @@ public:
     //=========================================================================================================
     // PUBLIC INTERFACE
     /**
-     * Calls the anonymizer routine. This method is the main method in the class. It goes through the input file and tag by tag
-     * analyses if there might be some relevant information to anonymize and eventually does so.
-     * Finally the method would test if the input file should be deleted or renamed according to the
-     * flags set up during the object setup.
+     * This method is the main method in the class. It goes through the input file and tag by tag
+     * analyses if there might be some relevant information to anonymize and eventually does so. Initially it
+     * checks for valid file formating. Finally the method would test if the input file should be deleted or
+     * renamed according to the flags configured in the class.
      */
     int anonymizeFile();
 
     //=========================================================================================================
     /**
-     * Specifies the input file to anonymize. This file will help to set a input Fiffstream object.
+     * Configure the input file to anonymize.
      *
-     * @param [in] sFilePathIn  String containing the input file name including its path.
+     * @param [in] sFilePathIn  String containing the input file name including its path. Can be a relative or
+     * an absolute path.
      */
     int setFileIn(const QString &sFilePathIn);
 
     //=========================================================================================================
     /**
-     * Specifies the output file to anonymize. This file will help to set a output Fiffstream object.
+     * Returns the input file which will be anonymized. .
      *
-     * @param [in] sFilePathOut String containing the output file name including its path.
+     * @param [out] sFilePathIn String containing the input file name including its path.
      */
     QString getFileNameIn() const;
 
     //=========================================================================================================
     /**
-     * Specifies the output file to anonymize. This file will help to set a output Fiffstream object.
+     * Specifies the output file to anonymize.
      *
-     * @param [in] sFilePathOut String containing the output file name including its path.
+     * @param [in] sFilePathOut     String containing the output file name including its path. Can be a relative or
+     * an absolute path.
      */
     int setFileOut(const QString &sFilePathOut);
 
     //=========================================================================================================
     /**
-     * Specifies the output file to anonymize. This file will help to set a output Fiffstream object.
+     * Returns the output file where anonymized data will be saved.
      *
-     * @param [in] sFilePathOut String containing the output file name including its path.
+     * @param [out] String containing the output file name including its path.
      */
     QString getFileNameOut() const;
 
@@ -179,44 +181,61 @@ public:
     //=========================================================================================================
     /**
      * Retrieves the state of the FiffAnonyzer object's desired verbose mode.
+     *
+     * @param [out] Bool value of the actual verbose mode.
+     *
      */
     bool getVerboseMode() const;
 
     //=========================================================================================================
     /**
-     * Sets the state of the FiffAnonymizer object's desired anonymization mode. If set to TRUE, apart from the default information
-     * additional information will also be anonymized, like Subject's weight, height, or different project information.
-     * printed on screen during the anonymizing process.
+     * Sets the state of the FiffAnonymizer object's desired anonymization mode. If set to TRUE, apart from the
+     * default information additional information will also be anonymized, like Subject's weight, height, sex or
+     * handedness.
      *
      * @param [in] bFlag    Bool argument whether to use the brute mode.
+     *
      */
     void setBruteMode(const bool bFlag);
 
     //=========================================================================================================
     /**
-     * Get value of default Advanced anonymization. Anonymize also weight, height and some other fields.
+     * Retrieve the value of the anonymization level brute mode. If set to true, the anonymization will delete
+     * normal data but additionally it will also delete info related to the subject's weight, height, sex and
+     * handedness.
      */
     bool getBruteMode() const;
 
     //=========================================================================================================
     /**
-     * If found in the fiff file, the measurement date information will be overwritten in the file in order to match the date specified with this function.
+     * If found in the fiff file, the measurement date information will be overwritten with the date specified
+     * with this function. Format: YYYMMDD. Default: 20000101
      *
-     * @param [in] sMeasDay String containing the desired measurement date.
+     * @param [in] sMeasDay     String containing the desired measurement day.
      */
     void setMeasurementDay(const QString& sMeasDay);
 
     //=========================================================================================================
-
+    /**
+     * If found in the fiff file, the measurement date information will be overwritten with the date specified
+     * with this function.
+     *
+     * @param [in] d     QDateTime object containing the desired measurement day.
+     */
     void setMeasurementDay(const QDateTime& d);
 
     //=========================================================================================================
-
+    /**
+     * If found in the fiff file, the measurement date information will be overwritten with the date specified
+     * with this function.
+     *
+     * @param [in] d     QDate object containing the desired measurement day.
+     */
     void setMeasurementDay(const QDate& d);
 
     //=========================================================================================================
     /**
-     * Get value of Date to substitute the measuremnt date appearing in the file.
+     * Retrieve the value of Date to substitute the measuremnt date appearing in the file.
      */
     QDateTime getMeasurementDate() const;
 
@@ -230,7 +249,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Get value of Number of days to subtract from the measurement date.
+     * Get the value of Number of days to subtract from the measurement date.
      */
     int getMeasurementDayOffset();
 
@@ -249,6 +268,11 @@ public:
     void setSubjectBirthday(const QString& sSubjBirthday);
 
     //=========================================================================================================
+    /**
+     * If found in the fiff file, subject's birthday information will be overwritten in the file in order to match the date specified with this function.
+     *
+     * @param [in] sSubjBirtday String containing the desired subject birthday date.
+     */
     void setSubjectBirthday(const QDateTime& sSubjBirthday);
 
     //=========================================================================================================
@@ -444,52 +468,43 @@ private:
 
     //=========================================================================================================
     /**
-     * This method will rename the output file as the input file. It will be called only after all the necessary
-     * verification steps have been tested through the checkRenameOutputFile method.
-     * It sets the control member bool flag m_bOutputFileRenamed to true and if verbose mode is on, prints a
-     * description message.
+     * This method will configure and setup the in and out Fiffstreams to read from and write to, the fif tag
+     * data.
      */
     int openInOutStreams();
 
     //=========================================================================================================
     /**
-     * This method will rename the output file as the input file. It will be called only after all the necessary
-     * verification steps have been tested through the checkRenameOutputFile method.
-     * It sets the control member bool flag m_bOutputFileRenamed to true and if verbose mode is on, prints a
-     * description message.
+     * This method closes the Fiffstreams for the input and output files.
      */
     int closeInOutStreams();
 
     //=========================================================================================================
     /**
-     * This method will rename the output file as the input file. It will be called only after all the necessary
-     * verification steps have been tested through the checkRenameOutputFile method.
-     * It sets the control member bool flag m_bOutputFileRenamed to true and if verbose mode is on, prints a
-     * description message.
+     * The first 2-4 tags have to be a specific set, although not all are mandatory. First tag must be a FiffID tag,
+     * second must be a Tag Directory pointer tag. 3 and 4 are optional and must be a Free List pointer and a
+     * parent file FiffID tag. This method goes through tags #1 and #2 and verifies that they follow the fiff
+     * format.
+     *
      */
     void processHeaderTags();
 
     //=========================================================================================================
     /**
-     * This method will rename the output file as the input file. It will be called only after all the necessary
-     * verification steps have been tested through the checkRenameOutputFile method.
-     * It sets the control member bool flag m_bOutputFileRenamed to true and if verbose mode is on, prints a
-     * description message.
+     * Will read a tag and update the block type list and stores it in m_pInTag
      */
     void readTag();
 
     //=========================================================================================================
     /**
-     * This method will rename the output file as the input file. It will be called only after all the necessary
-     * verification steps have been tested through the checkRenameOutputFile method.
-     * It sets the control member bool flag m_bOutputFileRenamed to true and if verbose mode is on, prints a
-     * description message.
+     * Will overwrite the 'next' field in the tag stored in m_pInTag. It will store the output tag in the tag
+     * directory and will finally write the tag stored in m_pOutTag into the output file.
      */
     void writeTag();
 
     //=========================================================================================================
 
-    const double m_dMaxValidFiffVerion;    /**< Maximum version of the Fiff file standard compatible with this application.*/
+    const double m_dMaxValidFiffVerion; /**< Maximum version of the Fiff file standard compatible with this application.*/
 
     QString m_sDefaultString;           /**< String to be used as substitution of other strings in a fiff file */
     QString m_sSubjectFirstName;        /**< Subject's first name substitutor.*/
@@ -516,7 +531,7 @@ private:
     qint64 m_iDirectoryPos;             /**< Position of the tag directory in the output file.*/
     bool m_bFileHasDirPtr;              /**< This file has a tag directory.*/
 
-    QDateTime m_dDefaultDate;       /**< Date to be used as substitution of dates found in a fiff file */
+    QDateTime m_dDefaultDate;           /**< Date to be used as substitution of dates found in a fiff file */
     QDateTime m_dMeasurementDate;       /**< Date to substitute the measuremnt date appearing in the file.*/
     QDateTime m_dSubjectBirthday;       /**< Subject's birthday substitutor.*/
     int  m_iMeasurementDayOffset;       /**< Number of days to subtract from the measurement date.*/
@@ -529,7 +544,7 @@ private:
     bool m_bDeleteInputFileConfirmation;/**< User's request to avoid confirmation prompt for input file deletion.*/
     bool m_bInputFileDeleted;           /**< Flags if the input file has been deleted. */
     bool m_bInOutFileNamesEqual;        /**< Flags user's request to have both input and output files with the same name.*/
-    bool m_bOutFileRenamed;          /**< Flags if the output file has been renamed to match the name the input file had. */
+    bool m_bOutFileRenamed;             /**< Flags if the output file has been renamed to match the name the input file had. */
 
     FIFFLIB::FiffStream::SPtr m_pInStream;   /**< Pointer to FiffStream object for reading.*/
     FIFFLIB::FiffStream::SPtr m_pOutStream;  /**< Pointer to FiffStream object for writing the result.*/

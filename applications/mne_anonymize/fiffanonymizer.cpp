@@ -845,6 +845,13 @@ void FiffAnonymizer::setSubjectBirthday(const QDateTime& sSubjBirthday)
 
 //=============================================================================================================
 
+QDateTime  FiffAnonymizer::getSubjectBirthday()
+{
+    return m_dSubjectBirthday;
+}
+
+//=============================================================================================================
+
 void FiffAnonymizer::setSubjectBirthdayOffset(const int iSubjBirthdayOffset)
 {
     m_bUseSubjectBirthdayOffset = true;
@@ -858,12 +865,6 @@ int  FiffAnonymizer::getSubjectBirthdayOffset()
     return m_iSubjectBirthdayOffset;
 }
 
-//=============================================================================================================
-
-QDateTime  FiffAnonymizer::getSubjectBirthday()
-{
-    return m_dSubjectBirthday;
-}
 
 //=============================================================================================================
 
@@ -948,11 +949,10 @@ bool FiffAnonymizer::checkRenameOutputFile()
 
 void FiffAnonymizer::renameOutputFileAsInputFile()
 {
-//    QString oldName(m_fiFileOut.fileName());
-//    m_fFileOut.rename(m_fiFileIn.fileName());
-//    m_fiFileOut.
-//    m_bOutputFileRenamed = true;
-//    printIfVerbose("Output file named: " + oldName + " --> renamed as: " + m_fFileOut.fileName());
+    QString oldName(m_fFileOut.fileName());
+    m_fFileOut.rename(m_fFileIn.fileName());
+    m_bOutFileRenamed = true;
+    printIfVerbose("Output file named: " + oldName + " --> renamed as: " + m_fFileOut.fileName());
 }
 
 //=============================================================================================================
