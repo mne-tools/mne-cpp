@@ -168,6 +168,14 @@ protected slots:
      */
     void onCurrentSelectedChanged();
 
+    //=========================================================================================================
+    /**
+     * Used to handle delete key to remove annotations.
+     *
+     * @param [in] event    a key press event
+     */
+    void keyPressEvent(QKeyEvent* event);
+
 private slots:
 
     //=========================================================================================================

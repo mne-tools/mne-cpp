@@ -351,7 +351,7 @@ void FiffRawViewDelegate::createMarksPath(const QModelIndex &index,
     QMap<int, QColor> typeColor = t_pAnnModel->getTypeColors();
 
     if(t_pAnnModel->getShowSelected()){
-        qDebug() << "FiffRawViewDelegate::createMarksPath -- show selected checked";
+        //qDebug() << "FiffRawViewDelegate::createMarksPath -- show selected checked";
         int iSelectedAnn = t_pAnnModel->getSelectedAnn();
         if ((t_pModel->getTimeMarks(iSelectedAnn) > iStart) && (t_pModel->getTimeMarks(iSelectedAnn) < (iStart + data.size()))) {
             int type = t_pAnnModel->data(t_pAnnModel->index(iSelectedAnn,2)).toInt();

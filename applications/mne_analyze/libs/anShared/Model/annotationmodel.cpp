@@ -38,6 +38,7 @@
 //=============================================================================================================
 
 #include "annotationmodel.h"
+#include <iomanip>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -501,8 +502,8 @@ bool AnnotationModel::saveToFile(const QString& sPath)
 
     QTextStream out(bufferOut, QIODevice::ReadWrite);
     for(int i = 0; i < this->getNumberOfAnnotations(); i++) {
-        out << "  " << this->getAnnotation(i) << "   " << static_cast<float>(this->getAnnotation(i)) / this->getFreq() << "          0         1" << endl;
-        out << "  " << this->getAnnotation(i) << "   " << qSetRealNumberPrecision(4) << static_cast<float>(this->getAnnotation(i)) / this->getFreq() << "          1         0" << endl;
+        out << "  " << this->getAnnotation(i) << "   " << QString::number(static_cast<float>(this->getAnnotation(i)) / this->getFreq(), 'f', 4) << "          0         1" << endl;
+        out << "  " << this->getAnnotation(i) << "   " << QString::number(static_cast<float>(this->getAnnotation(i)) / this->getFreq(), 'f', 4) << "          1         0" << endl;
     }
 
     // Wee need to call the QFileDialog here instead of the data load extension since we need access to the QByteArray
@@ -512,8 +513,7 @@ bool AnnotationModel::saveToFile(const QString& sPath)
 
     return true;
 #else
-    qDebug() << "AnnotationView::saveToFile";
-    qDebug() << this->getNumberOfAnnotations();
+    qInfo() << "AnnotationView::saveToFile";
 
     QFile file(sPath);
     if (!file.open(QIODevice::WriteOnly)) {
@@ -523,8 +523,8 @@ bool AnnotationModel::saveToFile(const QString& sPath)
 
     QTextStream out(&file);
     for(int i = 0; i < this->getNumberOfAnnotations(); i++) {
-        out << "  " << this->getAnnotation(i) << "   " << static_cast<float>(this->getAnnotation(i)) / this->getFreq() << "          0         1" << endl;
-        out << "  " << this->getAnnotation(i) << "   " << qSetRealNumberPrecision(4) << static_cast<float>(this->getAnnotation(i)) / this->getFreq() << "          1         0" << endl;
+        out << "  " << this->getAnnotation(i) << "   " << QString::number(static_cast<float>(this->getAnnotation(i)) / this->getFreq(), 'f', 4) << "          0         1" << endl;
+        out << "  " << this->getAnnotation(i) << "   " << QString::number(static_cast<float>(this->getAnnotation(i)) / this->getFreq(), 'f', 4) << "          1         0" << endl;
     }
 #endif
 }

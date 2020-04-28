@@ -49,6 +49,7 @@
 #include <QToolBar>
 #include <QColorDialog>
 #include <QFileDialog>
+#include <QKeyEvent>
 
 //=============================================================================================================
 // Eigen INCLUDES
@@ -139,7 +140,7 @@ void AnnotationView::initGUIFunctionality()
 
 void AnnotationView::onActiveEventsChecked(int iCheckBoxState)
 {
-    qDebug() << "onActiveEventsChecked" << iCheckBoxState;
+    //qDebug() << "onActiveEventsChecked" << iCheckBoxState;
     m_iCheckState = iCheckBoxState;
     emit activeEventsChecked(m_iCheckState);
 }
@@ -162,7 +163,7 @@ void AnnotationView::updateComboBox(const QString &currentAnnotationType)
 
 void AnnotationView::addAnnotationToModel(const int iSample)
 {
-    qDebug() << "AnnotationView::addAnnotationToModel -- Here";
+    //qDebug() << "AnnotationView::addAnnotationToModel -- Here";
     m_iLastSampClicked = iSample;
     m_pAnnModel->setSamplePos(m_iLastSampClicked);
     m_pAnnModel->insertRow(0, QModelIndex());
@@ -184,7 +185,7 @@ void AnnotationView::setModel(QSharedPointer<ANSHAREDLIB::AnnotationModel> pAnnM
 
 void AnnotationView::onDataChanged()
 {
-    qDebug() << "AnnotationView::onDataChanged";
+    //qDebug() << "AnnotationView::onDataChanged";
     ui->m_tableView_eventTableView->viewport()->update();
     ui->m_tableView_eventTableView->viewport()->repaint();
     emit triggerRedraw();
@@ -223,8 +224,7 @@ void AnnotationView::onSelectedEventsChecked(int iCheckBoxState)
 {
     m_iCheckSelectedState = iCheckBoxState;
     m_pAnnModel->setShowSelected(m_iCheckSelectedState);
-    qDebug() << "AnnotationView::onSelectedEventsChecked -- not implemented yet";
-    qDebug() << ui->m_tableView_eventTableView->selectionModel()->currentIndex().row();
+    //qDebug() << ui->m_tableView_eventTableView->selectionModel()->currentIndex().row();
     //ui->m_tableView_eventTableView->selectionModel()->sle
     //m_pAnnModel
     emit triggerRedraw();
@@ -253,8 +253,8 @@ void AnnotationView::disconnectFromModel()
 
 void AnnotationView::onCurrentSelectedChanged()
 {
-    qDebug() << "AnnotationView::onCurrentSelectedChanged";
-    qDebug() << ui->m_tableView_eventTableView->selectionModel()->currentIndex().row();
+    //qDebug() << "AnnotationView::onCurrentSelectedChanged";
+    //qDebug() << ui->m_tableView_eventTableView->selectionModel()->currentIndex().row();
     m_pAnnModel->setSelectedAnn(ui->m_tableView_eventTableView->selectionModel()->currentIndex().row());
 }
 
@@ -272,8 +272,18 @@ void AnnotationView::onSaveButton()
     if (fileName.isEmpty()) {
         return;
     }
-    qDebug() << "AnnotationView::onSaveButton";
+    qInfo() << "AnnotationView::onSaveButton";
 
     m_pAnnModel->saveToFile(fileName);
 #endif
+}
+
+//=============================================================================================================
+
+void AnnotationView::keyPressEvent(QKeyEvent* event)
+{
+    if(event->key() == Qt::Key_Delete) {
+        //qDebug() << "[AnnotationView::keyPressEvent] -- Qt::Key_Delete";
+        this->removeAnnotationfromModel();
+    }
 }
