@@ -542,7 +542,7 @@ void FiffAnonymizer::writeTag()
     }
 
     FIFFLIB::FiffTag::convert_tag_data(m_pOutTag,FIFFV_NATIVE_ENDIAN,FIFFV_BIG_ENDIAN);
-    m_pOutStream->write_tag(m_pOutTag, 0);
+    m_pOutStream->write_tag(m_pOutTag, -1);
 }
 
 //=============================================================================================================
