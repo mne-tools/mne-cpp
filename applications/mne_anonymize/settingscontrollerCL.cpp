@@ -74,18 +74,22 @@ SettingsControllerCL::SettingsControllerCL(const QStringList& arguments,
 {
     m_pAnonymizer = FiffAnonymizer::SPtr(new FiffAnonymizer);
     initParser();
-    if(parseInputs(arguments) == 0)
+    if(parseInputs(arguments))
     {
-        if(execute() != 0)
-        {
-            qCritical() << "Something went wrong during the anonymization.";
-        }
+        qCritical() << "Something went wrong during the parsing of input options.";
+        return;
+    }
+
+    if(execute())
+    {
+        qCritical() << "Error during the anonymization of the input file";
+        return;
     }
 }
 
 //=============================================================================================================
 
-void SettingsControllerCL::initParser()
+int SettingsControllerCL::initParser()
 {
     m_parser.setApplicationDescription(QCoreApplication::translate("main", "Application that removes or modifies Personal "
                                                                            "Health Information or Personal Identifiable information from a FIFF file."));
@@ -167,6 +171,7 @@ int SettingsControllerCL::parseInputs(const QStringList& arguments)
     if(!m_parser.isSet("no-gui"))
     {
         qCritical() << "Error while running the application. Something went wrong.";
+        return 1;
     }
 
     if(m_parser.isSet("version"))
@@ -183,6 +188,7 @@ int SettingsControllerCL::parseInputs(const QStringList& arguments)
             if(m_pAnonymizer->setFileIn(fInfo.absoluteFilePath()))
             {
                 qCritical() << "Error while setting the input file.";
+                return 1;
             }
         } else {
             qCritical() << "Input file is not a file." << endl;
@@ -196,16 +202,16 @@ int SettingsControllerCL::parseInputs(const QStringList& arguments)
     if(m_parser.isSet("out"))
     {
         QFileInfo fInfo(m_parser.value("out"));
-        fInfo.makeAbsolute();
-        if(fInfo.isDir())
+        if(fInfo.isFile())
         {
-            qCritical() << "Output file is infact a folder." << endl;
-            return 1;
-        } else {
-            if(m_pAnonymizer->setFileOut(fInfo.fileName()))
+            if(m_pAnonymizer->setFileOut(fInfo.absoluteFilePath()))
             {
                 qCritical() << "Error while setting the output file.";
+                return 1;
             }
+        } else {
+            qCritical() << "Error. Output file is infact a folder.";
+            return 1;
         }
     } else {
         QFileInfo inFInfo(m_parser.value("in"));
@@ -214,6 +220,7 @@ int SettingsControllerCL::parseInputs(const QStringList& arguments)
         if(m_pAnonymizer->setFileOut(fileOut))
         {
             qCritical() << "Error while setting the output file.";
+            return 1;
         }
     }
 
@@ -268,6 +275,7 @@ int SettingsControllerCL::parseInputs(const QStringList& arguments)
         {
             qCritical() << "You cannot specify the subject's birthday and subject's birthday offset"
                            "the same time.";
+            m_parser.showHelp();
         }
 
         QString strBirthday(m_parser.value("subject_birthday"));
@@ -280,6 +288,7 @@ int SettingsControllerCL::parseInputs(const QStringList& arguments)
         {
             qCritical() << "You cannot specify the subject's birthday and subject's birthday offset"
                            "the same time.";
+            m_parser.showHelp();
         }
         int strBirthdayOffset(m_parser.value("subject_birthday_offset").toInt());
         m_pAnonymizer->setSubjectBirthdayOffset(strBirthdayOffset);
@@ -289,7 +298,6 @@ int SettingsControllerCL::parseInputs(const QStringList& arguments)
     {
         QString strHisId(m_parser.value("his"));
         m_pAnonymizer->setSubjectHisId(strHisId);
-
     }
 
     return 0;
@@ -299,8 +307,8 @@ int SettingsControllerCL::parseInputs(const QStringList& arguments)
 
 int SettingsControllerCL::execute()
 {
-        printHeaderIfVerbose();
-        return m_pAnonymizer->anonymizeFile();
+    printHeaderIfVerbose();
+    return m_pAnonymizer->anonymizeFile();
 }
 
 //=============================================================================================================

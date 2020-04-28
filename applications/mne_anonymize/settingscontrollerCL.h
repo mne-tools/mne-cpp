@@ -109,7 +109,7 @@ public:
     /**
      * Configures the QCommandLineParser member object with all the necesarry options.
      */
-    void initParser();
+    int initParser();
 
     //=========================================================================================================
     /**
