@@ -253,7 +253,7 @@ int FiffAnonymizer::anonymizeFile()
         renameOutputFileAsInputFile();
     }
 
-    qInfo() << "MNE Anonymize finished correctly: " + QFileInfo(*m_fFileIn).fileName() + " -> " + QFileInfo(*m_fFileOut).fileName();
+    qInfo() << "MNE Anonymize finished correctly: " + QFileInfo(m_fFileIn).fileName() + " -> " + QFileInfo(m_fFileOut).fileName();
 
     printIfVerbose(" ");
     printIfVerbose("----------------------------------------------------------------------------");
@@ -989,7 +989,6 @@ int FiffAnonymizer::closeInOutStreams()
         qCritical() << "Problem closing the input file: " << m_fFileIn.fileName();
         return 1;
     }
-
 
     if(m_pOutStream->close()) {
         printIfVerbose("Output file closed. All tags have been correctly anonymized.");
