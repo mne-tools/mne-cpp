@@ -253,7 +253,7 @@ int FiffAnonymizer::anonymizeFile()
         renameOutputFileAsInputFile();
     }
 
-    qInfo() << "MNE Anonymize finished correctly: " + QFileInfo(m_fFileIn).fileName() + " -> " + QFileInfo(m_fFileOut).fileName();
+    qInfo() << "MNE Anonymize finished correctly: " + QFileInfo(*m_fFileIn).fileName() + " -> " + QFileInfo(*m_fFileOut).fileName();
 
     printIfVerbose(" ");
     printIfVerbose("----------------------------------------------------------------------------");
@@ -747,7 +747,7 @@ int FiffAnonymizer::setFileOut(const QString &sFileOut)
             m_fFileOut.setFileName(fiOut.absolutePath() + "/" + generateRandomFileName()); // "/" is system dependant. Qt rocks!
         } else {
             m_bInOutFileNamesEqual = false;
-            m_fFileOut.setFileName(fiOut.fileName());
+            m_fFileOut.setFileName(fiOut.absoluteFilePath());
         }
         m_bFileOutSet = true;
         return 0;
