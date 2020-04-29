@@ -96,6 +96,8 @@ FiffAnonymizer::FiffAnonymizer()
 , m_bUseSubjectBirthdayOffset(false)
 , m_bVerboseMode(false)
 , m_bBruteMode(false)
+, m_pInTag(FIFFLIB::FiffTag::SPtr::create())
+, m_pOutTag(FIFFLIB::FiffTag::SPtr::create())
 {
     //MAC addresses have 6 bytes. We use 2 more here to complete 2 int32 (2bytes) reads.
     //check->sometimes MAC address is stored in the 0-5 bytes some other times it
