@@ -65,11 +65,9 @@ using namespace MNEANONYMIZE;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SettingsControllerCL::SettingsControllerCL(const QStringList& arguments,
-                                           const QString& name,
-                                           const QString& ver)
-: m_sAppName(name)
-, m_sAppVer(ver)
+SettingsControllerCL::SettingsControllerCL(const QStringList& arguments)
+: m_sAppName(qApp->applicationName())
+, m_sAppVer(qApp->applicationVersion())
 , m_bVerboseMode(false)
 , m_bInOutFileNamesEqual(false)
 , m_bDeleteInputFileAfter(false)
@@ -182,8 +180,7 @@ int SettingsControllerCL::parseInputs(const QStringList& arguments)
 
     if(m_parser.isSet("version"))
     {
-        printVersionInfo();
-        QCoreApplication::quit();
+        m_parser.showVersion();
     }
 
     if(parseInOutFiles())
@@ -460,16 +457,6 @@ void SettingsControllerCL::printFooterIfVerbose()
         qInfo() << "----------------------------------------------------------------------------";
         qInfo() << " ";
     }
-}
-
-//=============================================================================================================
-
-void SettingsControllerCL::printVersionInfo()
-{
-    qInfo() << " ";
-    qInfo() << m_sAppName;
-    qInfo() << "Version: " + m_sAppVer;
-    qInfo() << " ";
 }
 
 //=============================================================================================================
