@@ -659,7 +659,8 @@ void FiffAnonymizer::writeDirectory()
     *m_pOutStream << static_cast<quint32>
                      (static_cast<unsigned long long>(m_pOutDir->size())*sizeof(FIFFLIB::FiffDirEntry));
     *m_pOutStream << static_cast<quint32>(-1);
-    for(int i=0;i<m_pOutDir->size();++i) {
+    for(int i=0;i<m_pOutDir->size();++i)
+    {
         *m_pOutStream << static_cast<quint32>(m_pOutDir->at(i).kind);
         *m_pOutStream << static_cast<quint32>(m_pOutDir->at(i).type);
         *m_pOutStream << static_cast<quint32>(m_pOutDir->at(i).size);
