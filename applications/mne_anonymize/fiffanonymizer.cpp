@@ -96,8 +96,6 @@ FiffAnonymizer::FiffAnonymizer()
 , m_bUseSubjectBirthdayOffset(false)
 , m_bVerboseMode(false)
 , m_bBruteMode(false)
-, m_pInTag(FIFFLIB::FiffTag::SPtr::create())
-, m_pOutTag(FIFFLIB::FiffTag::SPtr::create())
 {
     //MAC addresses have 6 bytes. We use 2 more here to complete 2 int32 (2bytes) reads.
     //check->sometimes MAC address is stored in the 0-5 bytes some other times it
@@ -143,15 +141,14 @@ FiffAnonymizer::FiffAnonymizer(const FiffAnonymizer& obj)
 , m_bUseMeasurementDayOffset(obj.m_bUseMeasurementDayOffset)
 , m_bUseSubjectBirthdayOffset(obj.m_bUseSubjectBirthdayOffset)
 , m_bVerboseMode(obj.m_bVerboseMode)
-, m_bBruteMode(obj.m_bBruteMode
-, m_pInTag(FIFFLIB::FiffTag::SPtr::create())
-, m_pOutTag(FIFFLIB::FiffTag::SPtr::create())
+, m_bBruteMode(obj.m_bBruteMode)
 {
     m_BDfltMAC[0] = obj.m_BDfltMAC[0];
     m_BDfltMAC[1] = obj.m_BDfltMAC[1];
 
     m_pBlockTypeList = QSharedPointer<QStack<int32_t> >(new QStack<int32_t>(*obj.m_pBlockTypeList));
     m_pOutDir = QSharedPointer<QVector<FIFFLIB::FiffDirEntry> >(new QVector<FIFFLIB::FiffDirEntry>(*obj.m_pOutDir));
+
 }
 
 //=============================================================================================================
@@ -187,8 +184,6 @@ FiffAnonymizer::FiffAnonymizer(FiffAnonymizer &&obj)
 , m_bUseSubjectBirthdayOffset(obj.m_bUseSubjectBirthdayOffset)
 , m_bVerboseMode(obj.m_bVerboseMode)
 , m_bBruteMode(obj.m_bBruteMode)
-, m_pInTag(FIFFLIB::FiffTag::SPtr::create())
-, m_pOutTag(FIFFLIB::FiffTag::SPtr::create())
 {
     m_BDfltMAC[0] = obj.m_BDfltMAC[0];
     m_BDfltMAC[1] = obj.m_BDfltMAC[1];
