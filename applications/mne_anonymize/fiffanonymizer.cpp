@@ -151,6 +151,12 @@ FiffAnonymizer::FiffAnonymizer(const FiffAnonymizer& obj)
     m_pBlockTypeList = QSharedPointer<QStack<int32_t> >(new QStack<int32_t>(*obj.m_pBlockTypeList));
     m_pOutDir = QSharedPointer<QVector<FIFFLIB::FiffDirEntry> >(new QVector<FIFFLIB::FiffDirEntry>(*obj.m_pOutDir));
 
+    m_pOutTag->kind = m_pInTag->kind;
+    m_pOutTag->type = m_pInTag->type;
+    m_pOutTag->next = m_pInTag->next;
+    m_pOutTag->resize(m_pInTag->size());
+    memcpy(m_pOutTag->data(),m_pInTag->data(),static_cast<size_t>(m_pInTag->size()));
+
 }
 
 //=============================================================================================================
@@ -192,6 +198,12 @@ FiffAnonymizer::FiffAnonymizer(FiffAnonymizer &&obj)
 
     m_pBlockTypeList.swap(obj.m_pBlockTypeList);
     m_pOutDir.swap(obj.m_pOutDir);
+
+    m_pOutTag->kind = m_pInTag->kind;
+    m_pOutTag->type = m_pInTag->type;
+    m_pOutTag->next = m_pInTag->next;
+    m_pOutTag->resize(m_pInTag->size());
+    memcpy(m_pOutTag->data(),m_pInTag->data(),static_cast<size_t>(m_pInTag->size()));
 }
 
 //=============================================================================================================
