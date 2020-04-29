@@ -376,18 +376,24 @@ void FiffAnonymizer::censorTag() const
     }
     case FIFF_SUBJ_SEX:
     {
-        qint32 inSubjSex(*m_pInTag->toInt());
-        qint32 newSubjSex(m_iDfltSubjectSex);
-        memcpy(m_pOutTag->data(),&newSubjSex, sizeof(qint32));
-        printIfVerbose("Subject's sex changed: " + QString::number(inSubjSex) + " -> " + QString::number(newSubjSex));
+        if(m_bBruteMode)
+        {
+            qint32 inSubjSex(*m_pInTag->toInt());
+            qint32 newSubjSex(m_iDfltSubjectSex);
+            memcpy(m_pOutTag->data(),&newSubjSex, sizeof(qint32));
+            printIfVerbose("Subject's sex changed: " + QString::number(inSubjSex) + " -> " + QString::number(newSubjSex));
+        }
         break;
     }
     case FIFF_SUBJ_HAND:
     {
-        qint32 inSubjHand(*m_pInTag->toInt());
-        qint32 newSubjHand(m_iDfltSubjectHand);
-        memcpy(m_pOutTag->data(),&newSubjHand, sizeof(qint32));
-        printIfVerbose("Subject's handedness changed: " + QString::number(inSubjHand) + " -> " + QString::number(newSubjHand));
+        if(m_bBruteMode)
+        {
+            qint32 inSubjHand(*m_pInTag->toInt());
+            qint32 newSubjHand(m_iDfltSubjectHand);
+            memcpy(m_pOutTag->data(),&newSubjHand, sizeof(qint32));
+            printIfVerbose("Subject's handedness changed: " + QString::number(inSubjHand) + " -> " + QString::number(newSubjHand));
+        }
         break;
     }
     case FIFF_SUBJ_WEIGHT:
@@ -825,9 +831,9 @@ int  FiffAnonymizer::getSubjectBirthdayOffset()
 
 //=============================================================================================================
 
-void FiffAnonymizer::setSubjectHisId(const QString& sSubjectId)
+void FiffAnonymizer::setSubjectHisId(const QString& sSubjectHisId)
 {
-    m_sSubjectHisId = sSubjectId;
+    m_sSubjectHisId = sSubjectHisId;
 }
 
 //=============================================================================================================
