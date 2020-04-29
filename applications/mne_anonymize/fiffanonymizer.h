@@ -323,8 +323,8 @@ public:
 
     //=========================================================================================================
     /**
-     * Specifies a flag so that the user can specifiy the value of the subject's id tag. If found in the fiff file, the value
-     * will be changed to match the one specified with this method.
+     * Specifies the subject's id text information you want the output file to have. If a hisID tag is found in the fiff file,
+     * then, the subject's hisID information will be changed to match the one specified with this method.
      *
      * @param [in] sSubjectId   String with the subject's id.
      */
