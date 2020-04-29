@@ -234,12 +234,6 @@ int FiffAnonymizer::anonymizeFile()
 
     closeInOutStreams();
 
-    qInfo() << "MNE Anonymize finished correctly: " + QFileInfo(m_fFileIn).fileName() + " -> " + QFileInfo(m_fFileOut).fileName();
-
-    printIfVerbose(" ");
-    printIfVerbose("----------------------------------------------------------------------------");
-    printIfVerbose(" ");
-
     return 0;
 }
 
@@ -563,7 +557,7 @@ void FiffAnonymizer::processHeaderTags()
 
     if(m_pInTag->kind != FIFF_DIR_POINTER)
     {
-        qInfo() << "This file may not be compatible with this application. Second tag is not a valid Tag directory pointer tag.";
+        qCritical() << "This file may not be compatible with this application. Second tag is not a valid Tag directory pointer tag.";
     }
     if(*m_pInTag->toInt() <= 0)
     {
@@ -578,7 +572,7 @@ void FiffAnonymizer::processHeaderTags()
 
     if(m_pInTag->kind == FIFF_FREE_LIST)
     {
-        qInfo() << "This file contains a Free List of tags. It will not be copied to the output file.";
+        qWarning() << "This file contains a Free List of tags. It will not be copied to the output file.";
     } else {
         // output this tag, whatever kind it is, to the oupput file.
         censorTag();
@@ -877,7 +871,7 @@ int FiffAnonymizer::closeInOutStreams()
 {
     if(m_pInStream->close())
     {
-        printIfVerbose("Input file closed. All tags have been correctly anonymized.");
+        printIfVerbose("Input file closed.");
     } else {
         qCritical() << "Problem closing the input file: " << m_fFileIn.fileName();
         return 1;
@@ -885,7 +879,7 @@ int FiffAnonymizer::closeInOutStreams()
 
     if(m_pOutStream->close())
     {
-        printIfVerbose("Output file closed. All tags have been correctly anonymized.");
+        printIfVerbose("Output file closed.");
     } else {
         qCritical() << "Problem closing the output file: " << m_fFileOut.fileName();
         return 1;
