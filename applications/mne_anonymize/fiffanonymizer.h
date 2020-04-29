@@ -61,7 +61,7 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QPointer>
-
+#include <QString>
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -141,7 +141,7 @@ public:
      * @param [in] sFilePathIn  String containing the input file name including its path. Can be a relative or
      * an absolute path.
      */
-    bool setFileIn(const QString &sFilePathIn);
+    int setFileIn(const QString &sFilePathIn);
 
     //=========================================================================================================
     /**
@@ -158,7 +158,7 @@ public:
      * @param [in] sFilePathOut     String containing the output file name including its path. Can be a relative or
      * an absolute path.
      */
-    bool setFileOut(const QString &sFilePathOut);
+    int setFileOut(const QString &sFilePathOut);
 
     //=========================================================================================================
     /**
@@ -423,51 +423,6 @@ private:
 
     //=========================================================================================================
     /**
-     * If the user wants the name of the input file and the output file to be the same, well... it is not possible
-     * in this universe other than masking this behaviour with an auxiliary output filename to be used during the
-     * anonymizing process. Eventually, once the reading has finished correctly, the input file can be deleted and
-     * the output file can then be called as the original input file. This function helps with this process.
-     */
-    QString generateRandomFileName();
-
-    //=========================================================================================================
-    /**
-     * The user might request throught the flag "--delete_input_file_after" to have the input file deleted. If the
-     * necessary control measures allow for it, then this function will delete the input file and set the control
-     * member bool variable m_bInputFileDeleted to true.
-     */
-    void deleteInputFile();
-
-    //=========================================================================================================
-    /**
-     * This function checks if the user has requested to have the input file deleted and if the deletion has been
-     * confirmed by the user througha  command line prompt. This command line promt can be bypassed through the
-     * m_bDeleteInputFileConfirmation flag, which is accessed through the setDeleteInputFileAfterConfirmation public
-     * method.
-     */
-    bool checkDeleteInputFile();
-
-    //=========================================================================================================
-    /**
-     * This method is responsible to perform a complete check to see if the output filename should be changed.
-     * If the outpuf file has a random name, because the user requested this name to be equal to the input filename.
-     * And if the output filename has already been deleted, then it should return a true value. If the input file
-     * has not been deleted, this method will prompt the user to delete it. The user might still answer no to this
-     * confirmation.
-     */
-    bool checkRenameOutputFile();
-
-    //=========================================================================================================
-    /**
-     * This method will rename the output file as the input file. It will be called only after all the necessary
-     * verification steps have been tested through the checkRenameOutputFile method.
-     * It sets the control member bool flag m_bOutputFileRenamed to true and if verbose mode is on, prints a
-     * description message.
-     */
-    void renameOutputFileAsInputFile();
-
-    //=========================================================================================================
-    /**
      * This method will configure and setup the in and out Fiffstreams to read from and write to, the fif tag
      * data.
      */
@@ -540,11 +495,6 @@ private:
     bool m_bUseSubjectBirthdayOffset;   /**< Flags use of Subject's birthday offset.*/
     bool m_bVerboseMode;                /**< Verbosity mode enabler.*/
     bool m_bBruteMode;                  /**< Advanced anonymization. Anonymize also weight, height and some other fields.*/
-    bool m_bDeleteInputFileAfter;       /**< User's request to delete the input file after anonymization.*/
-    bool m_bDeleteInputFileConfirmation;/**< User's request to avoid confirmation prompt for input file deletion.*/
-    bool m_bInputFileDeleted;           /**< Flags if the input file has been deleted. */
-    bool m_bInOutFileNamesEqual;        /**< Flags user's request to have both input and output files with the same name.*/
-    bool m_bOutFileRenamed;             /**< Flags if the output file has been renamed to match the name the input file had. */
 
     FIFFLIB::FiffStream::SPtr m_pInStream;   /**< Pointer to FiffStream object for reading.*/
     FIFFLIB::FiffStream::SPtr m_pOutStream;  /**< Pointer to FiffStream object for writing the result.*/
