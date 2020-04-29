@@ -405,9 +405,7 @@ private:
      * @param [in] tagKind  Tag kind code to search for
      * @param [in] newPos   New position to store in the data field of the pointer tag.
      */
-    void updatePointer(FIFFLIB::FiffStream::SPtr stream,
-                       FIFFLIB::fiff_int_t tagKind,
-                       FIFFLIB::fiff_long_t newPos);
+    int updatePointer(int tagKind, long int newPos);
 
     //=========================================================================================================
     /**
