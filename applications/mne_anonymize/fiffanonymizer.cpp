@@ -229,7 +229,7 @@ int FiffAnonymizer::anonymizeFile()
     {
         addFinalEntryToDir();
         writeDirectory();
-        updatePointer(m_pOutStream,FIFF_DIR_POINTER,m_iDirectoryPos);
+        updatePointer(FIFF_DIR_POINTER,m_iDirectoryPos);
     }
 
     closeInOutStreams();
@@ -643,42 +643,70 @@ void FiffAnonymizer::addFinalEntryToDir()
 void FiffAnonymizer::writeDirectory()
 {
     m_iDirectoryPos = m_pOutStream->device()->pos();
+    m_pOutTag->clear();
+    m_pOutTag->kind = static_cast<qint32>(FIFF_DIR);
+    m_pOutTag->type = static_cast<qint32>(FIFFT_DIR_ENTRY_STRUCT);
+    m_pOutTag->next = static_cast<qint32>(-1);
 
-    QFile* file=qobject_cast<QFile*>(m_pOutStream->device());
-    if(file)
-        m_pOutStream->device()->seek(file->size());
+    int dirSize = m_pOutDir->size() * static_cast<int>(sizeof(FIFFLIB::FiffDirEntry));
+    m_pOutTag->resize(dirSize);
 
-    *m_pOutStream << static_cast<quint32>(FIFF_DIR);
-    *m_pOutStream << static_cast<quint32>(FIFFT_DIR_ENTRY_STRUCT);
-    *m_pOutStream << static_cast<quint32>
-                     (static_cast<unsigned long long>(m_pOutDir->size())*sizeof(FIFFLIB::FiffDirEntry));
-    *m_pOutStream << static_cast<quint32>(-1);
-    for(int i=0;i<m_pOutDir->size();++i)
-    {
-        *m_pOutStream << static_cast<quint32>(m_pOutDir->at(i).kind);
-        *m_pOutStream << static_cast<quint32>(m_pOutDir->at(i).type);
-        *m_pOutStream << static_cast<quint32>(m_pOutDir->at(i).size);
-        *m_pOutStream << static_cast<quint32>(m_pOutDir->at(i).pos);
-    }
+    memcpy(m_pOutTag->data(),m_pOutDir->data(),static_cast<size_t>(dirSize));
+
+    FIFFLIB::FiffTag::convert_tag_data(m_pOutTag,FIFFV_NATIVE_ENDIAN,FIFFV_BIG_ENDIAN);
+    m_pOutStream->write_tag(m_pOutTag, -1);
+
+    //    *m_pOutStream << static_cast<qint32>(FIFF_DIR);
+//    *m_pOutStream << static_cast<qint32>(FIFFT_DIR_ENTRY_STRUCT);
+//    *m_pOutStream << static_cast<qint32>
+//                     (static_cast<unsigned long long>(m_pOutDir->size())*sizeof(FIFFLIB::FiffDirEntry));
+//    *m_pOutStream << static_cast<qint32>(-1);
+
+//    for(int i=0;i<m_pOutDir->size();++i)
+//    {
+//        *m_pOutStream << static_cast<qint32>(m_pOutDir->at(i).kind);
+//        *m_pOutStream << static_cast<qint32>(m_pOutDir->at(i).type);
+//        *m_pOutStream << static_cast<qint32>(m_pOutDir->at(i).size);
+//        *m_pOutStream << static_cast<qint32>(m_pOutDir->at(i).pos);
+//    }
 }
 
 //=============================================================================================================
 
-void FiffAnonymizer::updatePointer(FIFFLIB::FiffStream::SPtr stream,
-                                   FIFFLIB::fiff_int_t tagKind,
-                                   FIFFLIB::fiff_long_t newPos)
+int FiffAnonymizer::updatePointer(int tagKind, long int newPos)
 {
-    FIFFLIB::fiff_long_t tagInfoSize = 16;
+    qint64 actualPos(m_pOutStream->device()->pos());
 
     for(int i=0; i < m_pOutDir->size(); ++i)
     {
-        if(m_pOutDir->at(i).kind != tagKind)
+        if(m_pOutDir->at(i).kind == tagKind)
         {
-            stream->device()->seek(m_pOutDir->at(i).pos+tagInfoSize);
-            *stream << static_cast<quint32>(newPos);
-            break;
+            m_pOutStream->device()->seek(m_pOutDir->at(i).pos);
+            m_pInStream->read_tag(m_pInTag,-1);
+
+            m_pOutTag->clear();
+            m_pOutTag->kind = m_pInTag->kind;
+            m_pOutTag->type = m_pInTag->type;
+            m_pOutTag->next = m_pInTag->next;
+
+            if(m_pInTag->kind != tagKind)
+            {
+                qCritical() << "Something went wrong while updating a pointier information";
+                return 1;
+            }
+            memcpy(m_pOutTag->data(),&newPos, sizeof(qint32));
+
+            FIFFLIB::FiffTag::convert_tag_data(m_pOutTag,FIFFV_NATIVE_ENDIAN,FIFFV_BIG_ENDIAN);
+            m_pOutStream->write_tag(m_pOutTag, -1);
+
+            //return to original position
+            m_pOutStream->device()->seek(actualPos);
+
+            return 0;
         }
+
     }
+    return 1;
 }
 
 //=============================================================================================================
