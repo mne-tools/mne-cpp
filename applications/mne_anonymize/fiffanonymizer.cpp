@@ -107,7 +107,7 @@ FiffAnonymizer::FiffAnonymizer()
 
     m_pBlockTypeList = QSharedPointer<QStack<int32_t> >(new QStack<int32_t>);
     m_pBlockTypeList->clear();
-    m_pOutDir = QSharedPointer<QVector<FIFFLIB::FiffDirEntry> >(new QVector<FIFFLIB::FiffDirEntry>)
+    m_pOutDir = QSharedPointer<QVector<FIFFLIB::FiffDirEntry> >(new QVector<FIFFLIB::FiffDirEntry>);
 }
 
 //=============================================================================================================
