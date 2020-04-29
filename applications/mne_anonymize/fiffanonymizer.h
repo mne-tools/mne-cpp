@@ -512,10 +512,13 @@ private:
 
 inline void FiffAnonymizer::printIfVerbose(const QString& str) const
 {
-    if(m_bVerboseMode) {
+    if(m_bVerboseMode)
+    {
         qInfo() << str;
     }
 }
+
+
 }
 
 #endif // MNEANONYMIZE
