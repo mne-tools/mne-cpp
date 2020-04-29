@@ -1860,13 +1860,13 @@ void ComputeFwd::initFwd()
 
     m_listMegChs = QList<FiffChInfo>();
     m_listEegChs = QList<FiffChInfo>();
-    QList<FiffChInfo> listCompChs = QList<FiffChInfo>(); /**< Compensator Channel List */
+    m_listCompChs = QList<FiffChInfo>();
 
     int iNMeg               = 0;
     int iNEeg               = 0;
     int iNComp              = 0;
 
-    FwdCoilSet* templates   = Q_NULLPTR;
+    m_templates             = Q_NULLPTR;
     m_megcoils              = Q_NULLPTR;
     m_compcoils             = Q_NULLPTR;
     m_compData              = Q_NULLPTR;
@@ -2031,7 +2031,7 @@ void ComputeFwd::initFwd()
     if (mne_read_meg_comp_eeg_ch_info_41(m_pInfoBase,
                                          m_listMegChs,
                                          iNMeg,
-                                         listCompChs,
+                                         m_listCompChs,
                                          iNComp,
                                          m_listEegChs,
                                          iNEeg,
@@ -2055,7 +2055,7 @@ void ComputeFwd::initFwd()
     if (!m_pSettings->include_meg) {
         printf("MEG not requested. MEG channels omitted.\n");
         m_listMegChs.clear();
-        listCompChs.clear();
+        m_listCompChs.clear();
         iNMeg = 0;
         iNComp = 0;
     }
@@ -2096,8 +2096,8 @@ void ComputeFwd::initFwd()
             return;
         }
 
-        templates = FwdCoilSet::read_coil_defs(coilfile);
-        if (!templates) {
+        m_templates = FwdCoilSet::read_coil_defs(coilfile);
+        if (!m_templates) {
             return;
         }
         FREE_41(coilfile);
@@ -2111,7 +2111,7 @@ void ComputeFwd::initFwd()
         if (m_compData->ncomp > 0) {
             printf("%d compensation data sets in %s\n",m_compData->ncomp,m_pSettings->measname.toUtf8().constData());
         } else {
-            listCompChs.clear();
+            m_listCompChs.clear();
             iNComp = 0;
 
             if(m_compData) {
@@ -2126,17 +2126,17 @@ void ComputeFwd::initFwd()
         if (meg_mri_t == Q_NULLPTR) {
             return;
         }
-        if ((m_megcoils = templates->create_meg_coils(m_listMegChs,
+        if ((m_megcoils = m_templates->create_meg_coils(m_listMegChs,
                                                       iNMeg,
                                                       m_pSettings->accurate ? FWD_COIL_ACCURACY_ACCURATE : FWD_COIL_ACCURACY_NORMAL,
                                                       meg_mri_t)) == Q_NULLPTR) {
             return;
         }
         if (iNComp > 0) {
-            if ((m_compcoils = templates->create_meg_coils(listCompChs,
-                                                           iNComp,
-                                                           FWD_COIL_ACCURACY_NORMAL,
-                                                           meg_mri_t)) == Q_NULLPTR) {
+            if ((m_compcoils = m_templates->create_meg_coils(m_listCompChs,
+                                                             iNComp,
+                                                             FWD_COIL_ACCURACY_NORMAL,
+                                                             meg_mri_t)) == Q_NULLPTR) {
                 return;
             }
         }
@@ -2149,23 +2149,23 @@ void ComputeFwd::initFwd()
         FREE_41(head_mri_t);
         printf("MRI coordinate coil definitions created.\n");
     } else {
-        if ((m_megcoils = templates->create_meg_coils(m_listMegChs,
-                                                      iNMeg,
-                                                      m_pSettings->accurate ? FWD_COIL_ACCURACY_ACCURATE : FWD_COIL_ACCURACY_NORMAL,
-                                                      m_meg_head_t)) == Q_NULLPTR) {
+        if ((m_megcoils = m_templates->create_meg_coils(m_listMegChs,
+                                                        iNMeg,
+                                                        m_pSettings->accurate ? FWD_COIL_ACCURACY_ACCURATE : FWD_COIL_ACCURACY_NORMAL,
+                                                        m_meg_head_t)) == Q_NULLPTR) {
             return;
         }
 
         if (iNComp > 0) {
-            if ((m_compcoils = templates->create_meg_coils(listCompChs,
-                                                         iNComp,
-                                                         FWD_COIL_ACCURACY_NORMAL,m_meg_head_t)) == Q_NULLPTR) {
+            if ((m_compcoils = m_templates->create_meg_coils(m_listCompChs,
+                                                             iNComp,
+                                                             FWD_COIL_ACCURACY_NORMAL,m_meg_head_t)) == Q_NULLPTR) {
                 return;
             }
         }
         if ((m_eegels = FwdCoilSet::create_eeg_els(m_listEegChs,
-                                                 iNEeg,
-                                                 Q_NULLPTR)) == Q_NULLPTR) {
+                                                   iNEeg,
+                                                   Q_NULLPTR)) == Q_NULLPTR) {
             return;
         }
         printf("Head coordinate coil definitions created.\n");
@@ -2300,42 +2300,93 @@ void ComputeFwd::calculateFwd()
 
 void ComputeFwd::updateHeadPos(FiffCoordTransOld* transDevHeadOld)
 {
-    // transformation in head space
-    FiffCoordTransOld* transHeadHeadOld = new FiffCoordTransOld;
 
-    // get transformation matrix in Headspace between two meg -> head transformations
-    // ToDo: the following part has to be tested
-    if(transDevHeadOld->from != m_megcoils->coord_frame) {
-        if(transDevHeadOld->to != m_megcoils->coord_frame) {
-            qWarning() << "ComputeFwd::updateHeadPos: Target Space not in Head Space - Space: " << transDevHeadOld->to;
-            return;
-        }
-        // calclulate rotation
-        Matrix3f matRot = m_meg_head_t->rot;
-        Matrix3f matRotDest = transDevHeadOld->rot;
-        Matrix3f matRotNew = Matrix3f::Zero(3,3);
-
-        Quaternionf quat(matRot);
-        Quaternionf quatDest(matRotDest);
-        Quaternionf quatNew;
-        quatNew = quat*quatDest.inverse();
-        matRotNew = quatNew.toRotationMatrix();
-
-        // calculate translation
-        VectorXf vecTrans = m_meg_head_t->move;
-        VectorXf vecTransDest = transDevHeadOld->move;
-        VectorXf vecTransNew = vecTrans - vecTransDest;
-
-        // update new transformation matrix
-        transHeadHeadOld->from = m_megcoils->coord_frame;
-        transHeadHeadOld->to = m_megcoils->coord_frame;
-        transHeadHeadOld->rot = matRotNew;
-        transHeadHeadOld->move = vecTransNew;
-        transHeadHeadOld->add_inverse(transHeadHeadOld);
+    int iNMeg = 0;
+    if(m_megcoils) {
+        iNMeg = m_megcoils->ncoil;
     }
 
-    // rotate coil set
-    FwdCoilSet* megcoilsNew = m_megcoils->dup_coil_set(transHeadHeadOld);
+    int iNComp = 0;
+    if(m_compcoils) {
+        iNMeg = m_megcoils->ncoil;
+    }
+//    // transformation in head space
+//    FiffCoordTransOld* transHeadHeadOld = new FiffCoordTransOld;
+//
+//    // get transformation matrix in Headspace between two meg -> head transformation
+//    // ToDo: the following part has to be tested
+//    if(transDevHeadOld->from != m_megcoils->coord_frame) {
+//        if(transDevHeadOld->to != m_megcoils->coord_frame) {
+//            qWarning() << "ComputeFwd::updateHeadPos: Target Space not in Head Space - Space: " << transDevHeadOld->to;
+//            return;
+//        }
+//        // calclulate rotation
+//        Matrix3f matRot = m_meg_head_t->rot;              // meg->head to origin
+//        Matrix3f matRotDest = transDevHeadOld->rot;       // meg->head after movement
+//        Matrix3f matRotNew = Matrix3f::Zero(3,3);         // rotation between origin and updated point
+//
+//        // get Quaternions
+//        Quaternionf quat(matRot);
+//        Quaternionf quatDest(matRotDest);
+//        Quaternionf quatNew;
+//        // Rotation between two rotation matrices is calculated by multiplying with the inverse
+//        // this is computitional easier with quaternions because for inverse we just have to flip signs
+//        quatNew = quat*quatDest.inverse();
+//        matRotNew = quatNew.toRotationMatrix();           // rotation between origin and updated point
+//
+//        // calculate translation
+//        // translation between to points = vector rsulting from substraction
+//        VectorXf vecTrans = m_meg_head_t->move;
+//        VectorXf vecTransDest = transDevHeadOld->move;
+//        VectorXf vecTransNew = vecTrans - vecTransDest;
+//
+//        // update new transformation matrix
+//        transHeadHeadOld->from = m_megcoils->coord_frame;
+//        transHeadHeadOld->to = m_megcoils->coord_frame;
+//        transHeadHeadOld->rot = matRotNew;
+//        transHeadHeadOld->move = vecTransNew;
+//        transHeadHeadOld->add_inverse(transHeadHeadOld);
+//    }
+//
+//    FwdCoilSet* megcoilsNew = m_megcoils->dup_coil_set(transHeadHeadOld);
+
+    // create new coilset with updated head position
+    if (m_pSettings->coord_frame == FIFFV_COORD_MRI) {
+        FiffCoordTransOld* head_mri_t = m_mri_head_t->fiff_invert_transform();
+        FiffCoordTransOld* meg_mri_t = FiffCoordTransOld::fiff_combine_transforms(FIFFV_COORD_DEVICE,FIFFV_COORD_MRI,transDevHeadOld,head_mri_t);
+        if (meg_mri_t == Q_NULLPTR) {
+            return;
+        }
+        if ((m_megcoils = m_templates->create_meg_coils(m_listMegChs,
+                                                        iNMeg,
+                                                        m_pSettings->accurate ? FWD_COIL_ACCURACY_ACCURATE : FWD_COIL_ACCURACY_NORMAL,
+                                                        meg_mri_t)) == Q_NULLPTR) {
+            return;
+        }
+        if (iNComp > 0) {
+            if ((m_compcoils = m_templates->create_meg_coils(m_listCompChs,
+                                                             iNComp,
+                                                             FWD_COIL_ACCURACY_NORMAL,
+                                                             meg_mri_t)) == Q_NULLPTR) {
+                return;
+            }
+        }
+    } else {
+        if ((m_megcoils = m_templates->create_meg_coils(m_listMegChs,
+                                                        iNMeg,
+                                                        m_pSettings->accurate ? FWD_COIL_ACCURACY_ACCURATE : FWD_COIL_ACCURACY_NORMAL,
+                                                        transDevHeadOld)) == Q_NULLPTR) {
+            return;
+        }
+
+        if (iNComp > 0) {
+            if ((m_compcoils = m_templates->create_meg_coils(m_listCompChs,
+                                                             iNComp,
+                                                             FWD_COIL_ACCURACY_NORMAL,transDevHeadOld)) == Q_NULLPTR) {
+                return;
+            }
+        }
+    }
 
     // check if source spaces are still in head space
     if(m_spaces[0]->coord_frame != FIFFV_COORD_HEAD) {
@@ -2347,9 +2398,9 @@ void ComputeFwd::updateHeadPos(FiffCoordTransOld* transDevHeadOld)
     // recompute meg forward
     if ((FwdBemModel::compute_forward_meg(m_spaces,
                                           m_iNSpace,
-                                          megcoilsNew,
+                                          m_megcoils,
                                           m_compcoils,
-                                          m_compData,
+                                          m_compData,                   // we might have to update this too
                                           m_pSettings->fixed_ori,
                                           m_bemModel,
                                           &m_pSettings->r0,

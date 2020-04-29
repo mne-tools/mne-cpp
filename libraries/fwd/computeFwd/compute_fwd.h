@@ -154,8 +154,9 @@ private:
     MNELIB::MneSourceSpaceOld **m_spaces;           /**< Source spaces */
     int m_iNSpace;                                  /**< The number of source spaces */
     int m_iNSource;                                 /**< Number of source space points */
-    FwdCoilSet *m_megcoils;                         /**< The MEG coil set */
-    FwdCoilSet *m_compcoils;                        /**< The compensator coil set */
+    FwdCoilSet* m_templates;                        /**< The template coil set */
+    FwdCoilSet* m_megcoils;                         /**< The MEG coil set */
+    FwdCoilSet* m_compcoils;                        /**< The compensator coil set */
     FwdCoilSet* m_eegels;                           /**< The EEG eceltrode set */
     MNELIB::MneCTFCompDataSet *m_compData;          /**< The compensator data */
     FwdEegSphereModelSet* m_eegModels;              /**< The EEG model set */
@@ -171,6 +172,7 @@ private:
 
     QList<FIFFLIB::FiffChInfo> m_listMegChs;        /**< The MEG channel information */
     QList<FIFFLIB::FiffChInfo> m_listEegChs;        /**< The EEG channel information */
+    QList<FIFFLIB::FiffChInfo> m_listCompChs;       /**< The Compensator Channel List */
     int m_iNChan;                                   /**< The number of channels */
 
     FIFFLIB::fiffId m_mri_id;                       /**< The MRI ID */
