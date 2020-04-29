@@ -119,7 +119,7 @@ int main(int argc, char* argv[])
 //        w.show();
     } else {
         // start non-GUI version...
-        MNEANONYMIZE::SettingsControllerCL controllerCL(qtApp->arguments(), nameStr, versionStr);
+        MNEANONYMIZE::SettingsControllerCL controllerCL(qtApp->arguments());
     }
 
     return qtApp->exec();

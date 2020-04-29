@@ -94,9 +94,7 @@ public:
      * @param [in] name         String containing the name of the application.
      * @param [in] ver          String containing the version of the application.
      */
-    SettingsControllerCL(const QStringList& arguments,
-                       const QString& name,
-                       const QString& ver);
+    SettingsControllerCL(const QStringList& arguments);
 
 private:
     //=========================================================================================================
@@ -185,31 +183,30 @@ private:
      */
     void printHeaderIfVerbose();
 
+    //=========================================================================================================
+    /**
+     * Prints a header message if the Verbose option has been set, a header will be printed during execution, right before the
+     * file anonymizationFile signal is sent.
+     */
     void printFooterIfVerbose();
 
     //=========================================================================================================
-    /**
-     * Prints version information when the "--version" option has been used in the application call. It is the
-     * first option to be parsed and if it is set, the application stops and none of the other options will be
-     * executed.
-     */
-    void printVersionInfo();
 
-    //=========================================================================================================
+    FiffAnonymizer::SPtr m_pAnonymizer;     /**< Local pointer to a Fiffanonyzer object to configure and use.*/
+    QString m_sAppName;                     /**< Application name.*/
+    QString m_sAppVer;                      /**< Application version number.*/
 
-    FiffAnonymizer::SPtr m_pAnonymizer; /**< Local pointer to a Fiffanonyzer object to configure and use.*/
-    QString m_sAppName;                 /**< Application name.*/
-    QString m_sAppVer;                  /**< Application version number.*/
-    QFileInfo m_fiInFileInfo;
-    QFileInfo m_fiOutFileInfo;
-    bool m_bVerboseMode;                /**< Show header when executing.*/
-    bool m_bInOutFileNamesEqual;        /**< Flags user's request to have both input and output files with the same name.*/
-    bool m_bDeleteInputFileAfter;       /**< User's request to delete the input file after anonymization.*/
-    bool m_bDeleteInputFileConfirmation;/**< User's request to avoid confirmation prompt for input file deletion.*/
-    bool m_bInputFileDeleted;           /**< Flags if the input file has been deleted. */
-    bool m_bOutFileRenamed;             /**< Flags if the output file has been renamed to match the name the input file had. */
+    QFileInfo m_fiInFileInfo;               /**< Input File info obj.*/
+    QFileInfo m_fiOutFileInfo;              /**< Output File info obj.*/
 
-    QCommandLineParser m_parser;        /**< Parser object to work with member ptr to QCoreApp and parse input command line options.*/
+    bool m_bVerboseMode;                    /**< Show header when executing.*/
+    bool m_bInOutFileNamesEqual;            /**< Flags user's request to have both input and output files with the same name.*/
+    bool m_bDeleteInputFileAfter;           /**< User's request to delete the input file after anonymization.*/
+    bool m_bDeleteInputFileConfirmation;    /**< User's request to avoid confirmation prompt for input file deletion.*/
+    bool m_bInputFileDeleted;               /**< Flags if the input file has been deleted. */
+    bool m_bOutFileRenamed;                 /**< Flags if the output file has been renamed to match the name the input file had. */
+
+    QCommandLineParser m_parser;            /**< Parser object to work with member ptr to QCoreApp and parse input command line options.*/
 
 };
 
