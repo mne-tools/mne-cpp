@@ -190,6 +190,10 @@ private slots:
      */
     void onSaveButton();
 
+    void realTimeDataSample(int iValue);
+
+    void realTimeDataTime(double dValue);
+
 private:
 
     //=========================================================================================================

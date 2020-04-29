@@ -232,6 +232,9 @@ public:
      */
     void setLastType(int iType);
 
+    void updateFilteredSample(int iIndex, int iSample);
+
+    void updateFilteredSample(int iSample);
 signals:
 
     //=========================================================================================================
