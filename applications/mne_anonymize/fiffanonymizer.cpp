@@ -107,8 +107,7 @@ FiffAnonymizer::FiffAnonymizer()
 
     m_pBlockTypeList = QSharedPointer<QStack<int32_t> >(new QStack<int32_t>);
     m_pBlockTypeList->clear();
-    m_pOutDir = QSharedPointer<QVector<FIFFLIB::FiffDirEntry> >(new QVector<FIFFLIB::FiffDirEntry>);
-
+    m_pOutDir = QSharedPointer<QVector<FIFFLIB::FiffDirEntry> >(new QVector<FIFFLIB::FiffDirEntry>)
 }
 
 //=============================================================================================================
@@ -156,7 +155,6 @@ FiffAnonymizer::FiffAnonymizer(const FiffAnonymizer& obj)
     m_pOutTag->next = m_pInTag->next;
     m_pOutTag->resize(m_pInTag->size());
     memcpy(m_pOutTag->data(),m_pInTag->data(),static_cast<size_t>(m_pInTag->size()));
-
 }
 
 //=============================================================================================================
@@ -253,7 +251,8 @@ void FiffAnonymizer::censorTag() const
     m_pOutTag->type = m_pInTag->type;
     m_pOutTag->next = m_pInTag->next;
 
-    switch (m_pInTag->kind) {
+    switch (m_pInTag->kind)
+    {
     //all these 'kinds' of tags contain a fileID struct, which contains info related to
     //measurement date
     case FIFF_FILE_ID:
@@ -514,7 +513,6 @@ void FiffAnonymizer::censorTag() const
         memcpy(m_pOutTag->data(),m_pInTag->data(),static_cast<size_t>(m_pInTag->size()));
     }
     }
-
 }
 
 //=============================================================================================================
@@ -869,9 +867,7 @@ int FiffAnonymizer::openInOutStreams()
         qCritical() << "Problem opening the output file: " << m_fFileOut.fileName();
         return 1;
     }
-
     return 0;
-
 }
 
 //=============================================================================================================
@@ -893,7 +889,5 @@ int FiffAnonymizer::closeInOutStreams()
         qCritical() << "Problem closing the output file: " << m_fFileOut.fileName();
         return 1;
     }
-
     return 0;
-
 }
