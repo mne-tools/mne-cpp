@@ -48,6 +48,7 @@
 #include <QComboBox>
 #include <QDebug>
 #include <QSettings>
+#include <QEvent>
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -72,6 +73,8 @@ QWidget* AnnotationDelegate::createEditor(QWidget *parent,
             QSpinBox *editor = new QSpinBox(parent);
             editor->setMinimum(0);
             editor->setMaximum(pAnnotationModel->getFirstLastSample().second);
+            connect(editor, QOverload<int>::of(&QSpinBox::valueChanged),
+                    this, &AnnotationDelegate::onSampleValueChanged);
             return editor;
         }
 
@@ -80,6 +83,8 @@ QWidget* AnnotationDelegate::createEditor(QWidget *parent,
             editor->setMinimum(0.0);
             editor->setMaximum(pAnnotationModel->getFirstLastSample().second / pAnnotationModel->getSampleFreq());
             editor->setSingleStep(0.01);
+            connect(editor, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+                    this, &AnnotationDelegate::onTimeValueChanged);
             return editor;
         }
 
@@ -98,6 +103,7 @@ QWidget* AnnotationDelegate::createEditor(QWidget *parent,
 
 void AnnotationDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
+    qDebug() << "AnnotationDelegate::setEditorData";
     switch(index.column()) {
         case 0: {
             int value = index.model()->data(index, Qt::DisplayRole).toInt();
@@ -127,6 +133,7 @@ void AnnotationDelegate::setEditorData(QWidget *editor, const QModelIndex &index
 void AnnotationDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
                                     const QModelIndex &index) const
 {
+    qDebug() << "setModelData";
     switch(index.column()) {
         case 0: {
             QSpinBox *spinBox = static_cast<QSpinBox*>(editor);
@@ -163,3 +170,27 @@ void AnnotationDelegate::updateEditorGeometry(QWidget *editor,
 {
     editor->setGeometry(option.rect);
 }
+
+//=============================================================================================================
+
+void AnnotationDelegate::onSampleValueChanged(int iValue)
+{
+    qDebug() << "[AnnotationDelegate::onSampleValueChanged] -- " << iValue ;
+    emit sampleValueChanged(iValue);
+}
+
+//=============================================================================================================
+
+void AnnotationDelegate::onTimeValueChanged(double dValue)
+{
+    qDebug() << "[AnnotationDelegate::onTimeValueChanged] -- " << dValue ;
+    emit timeValueChanged(dValue);
+}
+
+//=============================================================================================================
+
+//bool AnnotationDelegate::eventFilter(QObject *object, QEvent *event)
+//{
+//    qDebug() << event->type();
+//    return true;
+//}

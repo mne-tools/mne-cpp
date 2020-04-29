@@ -540,3 +540,17 @@ void AnnotationModel::setLastType(int iType)
 {
     m_iLastTypeAdded = iType;
 }
+
+//=============================================================================================================
+
+void AnnotationModel::updateFilteredSample(int iIndex, int iSample)
+{
+    m_dataSamples_Filtered[iIndex] = iSample + m_iFirstSample;
+}
+
+//=============================================================================================================
+
+void AnnotationModel::updateFilteredSample(int iSample)
+{
+    m_dataSamples_Filtered[m_iSelectedAnn] = iSample + m_iFirstSample;
+}

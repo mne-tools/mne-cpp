@@ -89,6 +89,12 @@ void AnnotationView::initMSVCSettings()
     m_pAnnDelegate = QSharedPointer<AnnotationDelegate>(new AnnotationDelegate(this));
     ui->m_tableView_eventTableView->setItemDelegate(m_pAnnDelegate.data());
 
+    connect(m_pAnnDelegate.data(), &AnnotationDelegate::sampleValueChanged,
+            this, &AnnotationView::realTimeDataSample, Qt::UniqueConnection);
+
+    connect(m_pAnnDelegate.data(), &AnnotationDelegate::timeValueChanged,
+            this, &AnnotationView::realTimeDataTime, Qt::UniqueConnection);
+
     ui->m_tableView_eventTableView->resizeColumnsToContents();
     ui->m_tableView_eventTableView->adjustSize();
 }
@@ -134,6 +140,8 @@ void AnnotationView::initGUIFunctionality()
 
     connect(ui->m_pushButtonSave, &QPushButton::clicked,
             this, &AnnotationView::onSaveButton, Qt::UniqueConnection);
+
+    //connect(ui->m_tableView_eventTableView.)
 }
 
 //=============================================================================================================
@@ -286,4 +294,27 @@ void AnnotationView::keyPressEvent(QKeyEvent* event)
         //qDebug() << "[AnnotationView::keyPressEvent] -- Qt::Key_Delete";
         this->removeAnnotationfromModel();
     }
+}
+
+//=============================================================================================================
+
+void AnnotationView::realTimeDataSample(int iValue)
+{
+    m_pAnnModel->setSelectedAnn(ui->m_tableView_eventTableView->selectionModel()->currentIndex().row());
+    qDebug() << "AnnotationView::realTimeData --" << iValue;
+    m_pAnnModel->updateFilteredSample(iValue);
+    this->onDataChanged();
+}
+
+//=============================================================================================================
+
+void AnnotationView::realTimeDataTime(double dValue)
+{
+    m_pAnnModel->setSelectedAnn(ui->m_tableView_eventTableView->selectionModel()->currentIndex().row());
+    qDebug() << "AnnotationView::realTimeDataTime" << dValue;
+    dValue *= m_pAnnModel->getFreq();
+    qDebug() << "AnnotationView::realTimeDataTime" << dValue;
+    int t_iSample = static_cast<int>(dValue);
+    m_pAnnModel->updateFilteredSample(t_iSample);
+    this->onDataChanged();
 }
