@@ -147,15 +147,15 @@ public:
     /**
      * Returns the input file which will be anonymized. .
      *
-     * @param [out] sFilePathIn String containing the input file name including its path.
+     * @param [out] Returns String containing the input file name including its path.
      */
     QString getFileNameIn() const;
 
     //=========================================================================================================
     /**
-     * Specifies the output file to anonymize.
+     * Configure the output file to anonymize.
      *
-     * @param [in] sFilePathOut     String containing the output file name including its path. Can be a relative or
+     * @param [in] sFilePathOut String containing the output file name. Can be a relative or
      * an absolute path.
      */
     int setFileOut(const QString &sFilePathOut);
@@ -182,16 +182,16 @@ public:
     /**
      * Retrieves the state of the FiffAnonyzer object's desired verbose mode.
      *
-     * @param [out] Bool value of the actual verbose mode.
+     * @param [out] Bool value with the actual verbose mode.
      *
      */
     bool getVerboseMode() const;
 
     //=========================================================================================================
     /**
-     * Sets the state of the FiffAnonymizer object's desired anonymization mode. If set to TRUE, apart from the
+     * Configure the state of the FiffAnonymizer object's desired anonymization mode. If set to TRUE, apart from the
      * default information additional information will also be anonymized, like Subject's weight, height, sex or
-     * handedness.
+     * handedness and the project's information too.
      *
      * @param [in] bFlag    Bool argument whether to use the brute mode.
      *
@@ -328,7 +328,7 @@ public:
      *
      * @param [in] sSubjectId   String with the subject's id.
      */
-    void setSubjectHisId(const QString& sSubjectId);
+    void setSubjectHisId(const QString& sSubjectHisId);
 
 private:
     //=========================================================================================================
@@ -393,7 +393,7 @@ private:
 
     //=========================================================================================================
     /**
-     * This function allows go through a the directory vector (m_pOutDir) and locate the position of any tag
+     * This function allows to go through a the directory vector (m_pOutDir) and locate the position of any tag
      * containing a pointer. Since the position of the pointer will have probably been updated, we can no go back
      * and mend it.
      * Fiff file format defines a set of pointers to addresses in the fiff file. These are defined as integer
@@ -423,14 +423,13 @@ private:
 
     //=========================================================================================================
     /**
-     * This method will configure and setup the in and out Fiffstreams to read from and write to, the fif tag
-     * data.
+     * Configure and setup the in and out stream (Fiffstreams) to read from and write to.
      */
     int openInOutStreams();
 
     //=========================================================================================================
     /**
-     * This method closes the Fiffstreams for the input and output files.
+     * Closes the streams (Fiffstream) for the input and output files.
      */
     int closeInOutStreams();
 
@@ -446,14 +445,14 @@ private:
 
     //=========================================================================================================
     /**
-     * Will read a tag and update the block type list and stores it in m_pInTag
+     * Will read a tag and update the block type list and stores it in m_pInTag.
      */
     void readTag();
 
     //=========================================================================================================
     /**
      * Will overwrite the 'next' field in the tag stored in m_pInTag. It will store the output tag in the tag
-     * directory and will finally write the tag stored in m_pOutTag into the output file.
+     * directory and will finally write the tag stored in m_pOutTag into the output file stream.
      */
     void writeTag();
 
@@ -484,7 +483,7 @@ private:
     bool m_bFileInSet;                  /**< Input file set.*/
     bool m_bFileOutSet;                 /**< Output file set.*/
     qint64 m_iDirectoryPos;             /**< Position of the tag directory in the output file.*/
-    bool m_bFileInHasDirPtr;              /**< This file has a tag directory.*/
+    bool m_bFileInHasDirPtr;             /**< This file has a tag directory.*/
 
     QDateTime m_dDefaultDate;           /**< Date to be used as substitution of dates found in a fiff file */
     QDateTime m_dMeasurementDate;       /**< Date to substitute the measuremnt date appearing in the file.*/
