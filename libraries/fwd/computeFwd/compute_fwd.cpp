@@ -2304,6 +2304,7 @@ void ComputeFwd::updateHeadPos(FiffCoordTransOld* transDevHeadOld)
     FiffCoordTransOld* transHeadHeadOld = new FiffCoordTransOld;
 
     // get transformation matrix in Headspace between two meg -> head transformations
+    // ToDo: the following part has to be tested
     if(transDevHeadOld->from != m_megcoils->coord_frame) {
         if(transDevHeadOld->to != m_megcoils->coord_frame) {
             qWarning() << "ComputeFwd::updateHeadPos: Target Space not in Head Space - Space: " << transDevHeadOld->to;
