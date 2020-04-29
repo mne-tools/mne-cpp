@@ -94,8 +94,31 @@ SettingsControllerCL::SettingsControllerCL(const QStringList& arguments)
 
 void SettingsControllerCL::initParser()
 {
-    m_parser.setApplicationDescription(QCoreApplication::translate("main", "Application that removes or modifies Personal "
-                                                                           "Health Information or Personal Identifiable information from a FIFF file."));
+    m_parser.setApplicationDescription(QCoreApplication::translate("main",
+           "\nApplication that removes or modifies Personal Health Information or Personal Identifiable information from a FIFF file."
+           "\n\nIf they exist, the following fields will be anonymized from the fif file:"
+           "\n - Measurement Date"
+           "\n - MAC address of the acquisition computer"
+           "\n - Text description of the acquisition system"
+           "\n - Experimenter acquiring the data"
+           "\n - Subject Id"
+           "\n - Subject First Name"
+           "\n - Subject's Middle Name"
+           "\n - Subject's Last Name"
+           "\n - Subject's Birthday date (can be altered by some number of days)"
+           "\n - Subject's Sex (only with brute option)"
+           "\n - Subject's Handedness (only with brute option)"
+           "\n - Subject's Weight (only with brute option)"
+           "\n - Subject's Height (only with brute option)"
+           "\n - Subject's Text Comment"
+           "\n - Subject's Hospital Id"
+           "\n - Project's Id (only with brute option)"
+           "\n - Project's Name (only with brute option)"
+           "\n - Project's Aim (only with brute option)"
+           "\n - Project's Persons"
+           "\n - Project's Comment (only with brute option)"
+           "\n "
+           "\n - *** Additionally if there is MRI data present in the file a warning message will appear.\n"));
     m_parser.addHelpOption();
 
     QCommandLineOption noGUIOpt("no-gui",QCoreApplication::translate("main","Command Line version of the application."));
@@ -291,7 +314,7 @@ int SettingsControllerCL::parseInOutFiles()
         m_parser.showHelp();
     }
 
-    QString fileOut;
+
     if(m_parser.isSet("out"))
     {
         m_fiOutFileInfo.setFile(m_parser.value("out"));
@@ -303,14 +326,16 @@ int SettingsControllerCL::parseInOutFiles()
             if(m_fiInFileInfo.absoluteFilePath() == m_fiOutFileInfo.absoluteFilePath())
             {
                 m_bInOutFileNamesEqual = true;
-                fileOut = QDir(m_fiInFileInfo.absolutePath()).filePath(generateRandomFileName());
+                QString fileOut(QDir(m_fiInFileInfo.absolutePath()).filePath(generateRandomFileName()));
+                m_fiOutFileInfo.setFile(fileOut);
             }
         }
     } else {
-        fileOut = QDir(m_fiInFileInfo.absolutePath()).filePath(
-                    m_fiInFileInfo.baseName() + "_anonymized." + m_fiInFileInfo.completeSuffix());
+        QString fileOut(QDir(m_fiInFileInfo.absolutePath()).filePath(
+                    m_fiInFileInfo.baseName() + "_anonymized." + m_fiInFileInfo.completeSuffix()));
+        m_fiOutFileInfo.setFile(fileOut);
     }
-    if(m_pAnonymizer->setFileOut(fileOut))
+    if(m_pAnonymizer->setFileOut(m_fiOutFileInfo.absoluteFilePath()))
     {
         qCritical() << "Error while setting the output file.";
         return 1;
@@ -411,7 +436,6 @@ bool SettingsControllerCL::checkRenameOutputFile()
                 qWarning() << " ";
                 qWarning() << "You have requested to save the output file with the same name as the input file.";
                 qWarning() << "This cannot be done without deleting or modifying the input file.";
-//                qWarning() << "The output file is: " << m_sFileNameOut;
                 qWarning() << " ";
             }
         }
@@ -439,7 +463,7 @@ void SettingsControllerCL::printHeaderIfVerbose()
 {
     if(m_bVerboseMode) {
         qInfo() << " ";
-        qInfo() << "-------------------------------------------------------------------------------------------";
+        qInfo() << "=============================================================================================";
         qInfo() << " ";
         qInfo() << m_sAppName;
         qInfo() << "Version: " + m_sAppVer;
@@ -451,12 +475,14 @@ void SettingsControllerCL::printHeaderIfVerbose()
 
 void SettingsControllerCL::printFooterIfVerbose()
 {
+    qInfo() << "MNE Anonymize finished correctly: " + m_fiInFileInfo.fileName() + " -> " + m_fiOutFileInfo.fileName();
+
     if(m_bVerboseMode)
     {
         qInfo() << " ";
-        qInfo() << "----------------------------------------------------------------------------";
+        qInfo() << "=============================================================================================";
         qInfo() << " ";
-    }
+    }    
 }
 
 //=============================================================================================================
