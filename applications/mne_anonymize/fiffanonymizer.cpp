@@ -563,7 +563,7 @@ void FiffAnonymizer::processHeaderTags()
 
     if(m_pInTag->kind != FIFF_DIR_POINTER)
     {
-        qCritical() << "This file may not be compatible with this application. Second tag is not a valid Tag directory pointer tag.";
+        qInfo() << "This file may not be compatible with this application. Second tag is not a valid Tag directory pointer tag.";
     }
     if(*m_pInTag->toInt() <= 0)
     {
@@ -578,7 +578,7 @@ void FiffAnonymizer::processHeaderTags()
 
     if(m_pInTag->kind == FIFF_FREE_LIST)
     {
-        qWarning() << "This file contains a Free List of tags. It will not be copied to the output file.";
+        qInfo() << "This file contains a Free List of tags. It will not be copied to the output file.";
     } else {
         // output this tag, whatever kind it is, to the oupput file.
         censorTag();
