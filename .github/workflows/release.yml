@@ -1,27 +1,56 @@
-name: Linux|Win|MacOS
+name: Linux|MacOS|Win|WASM
 
 on:
   push:
+    tags:        
+      - v0.*
     branches:
-    - master
+      - master
 
 jobs:
-  UpdateDevTag:
+  CreateRelease:
     runs-on: ubuntu-16.04
     
     steps:
     - name: Clone repository
-      uses: actions/checkout@v2  
-    - name: Install hub
+      uses: actions/checkout@v2
+    - name: Increment release version (stable release only)
+      if: endsWith(github.ref, 'master') == false
+      run: |
+        # Setup Git
+        git config --global user.email lorenzesch@hotmail.com
+        git config --global user.name LorenzE
+        # Increment MNE-CPP version in mne-cpp.pri file
+        sed -i "s/MNE_CPP_VERSION = 0.0.0/MNE_CPP_VERSION = ${GITHUB_REF#refs/tags/v}/" mne-cpp.pri
+        sed -i "s/MNE_LIB_VERSION = 0.0.0/MNE_LIB_VERSION = ${GITHUB_REF#refs/tags/v}/" mne-cpp.pri
+        # Increment Doxygen version
+        sed -i "s/PROJECT_NUMBER         = 0.0.0/PROJECT_NUMBER         = ${GITHUB_REF#refs/tags/v}/" ./doc/doxygen/mne-cpp_doxyfile
+        # Commit changes and push
+        git add -u
+        git commit -m "MAINT: Increment version information to ${GITHUB_REF#refs/tags/}"
+        git push origin HEAD:master
+    - name: Create new branch with the tag's name (stable release only)
+      if: endsWith(github.ref, 'master') == false
+      run: |
+        # Setup Git
+        git config --global user.email lorenzesch@hotmail.com
+        git config --global user.name LorenzE
+        # Create new branch named after the new version tag
+        git checkout -b ${GITHUB_REF#refs/tags/}
+        git push origin refs/heads/${GITHUB_REF#refs/tags/}
+    - name: Install hub (dev release only)
+      if: endsWith(github.ref, 'master') == true
       uses: geertvdc/setup-hub@master
-    - name: Setup Github credentials
+    - name: Setup Github credentials (dev release only)
+      if: endsWith(github.ref, 'master') == true
       uses: fusion-engineering/setup-git-credentials@v2
       with:
-        credentials: ${{secrets.GIT_CREDENTIALS}}
-    - name: Update dev_build tag and release
+        credentials: ${{secrets.GITHUB_TOKEN}}
+    - name: Update dev_build tag and release (dev release only)
+      if: endsWith(github.ref, 'master') == true
       env:
         GITHUB_USER: LorenzE
-        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         git config --global user.email lorenzesch@hotmail.com
         git config --global user.name $GITHUB_USER
@@ -37,10 +66,10 @@ jobs:
         git push -f --tag
         # Create new dev_build release
         hub release create -m "Development Builds" dev_build --prerelease
-
+        
   LinuxStatic:
     runs-on: ubuntu-16.04
-    needs: UpdateDevTag
+    needs: CreateRelease
     
     steps:
     - name: Clone repository
@@ -84,10 +113,20 @@ jobs:
         rm -r bin/mne_analyze_extensions
         # Creating archive of everything in the bin directory
         tar cfvz mne-cpp-linux-static-x86_64.tar.gz bin/.
-    - name: Deploy binaries with dev_build release on Github
+    - name: Deploy binaries with stable release on Github
+      if: endsWith(github.ref, 'master') == false
       uses: svenstaro/upload-release-action@v1-release
       with:
-        repo_token: ${{ secrets.GH_TOKEN }}
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: mne-cpp-linux-static-x86_64.tar.gz
+        asset_name: mne-cpp-linux-static-x86_64.tar.gz
+        tag: ${{ github.ref }}
+        overwrite: true
+    - name: Deploy binaries with dev release on Github
+      if: endsWith(github.ref, 'master') == true
+      uses: svenstaro/upload-release-action@v1-release
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: mne-cpp-linux-static-x86_64.tar.gz
         asset_name: mne-cpp-linux-static-x86_64.tar.gz
         tag: dev_build
@@ -95,7 +134,7 @@ jobs:
 
   MacOSStatic:
     runs-on: macos-latest
-    needs: UpdateDevTag
+    needs: CreateRelease
     
     steps:
     - name: Clone repository
@@ -135,10 +174,20 @@ jobs:
         rm -r bin/mne_analyze_extensions
         # Creating archive of all macos deployed applications
         tar cfvz mne-cpp-macos-static-x86_64.tar.gz bin/.
-    - name: Deploy binaries with dev_build release on Github
+    - name: Deploy binaries with stable release on Github
+      if: endsWith(github.ref, 'master') == false
       uses: svenstaro/upload-release-action@v1-release
       with:
-        repo_token: ${{ secrets.GH_TOKEN }}
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: mne-cpp-macos-static-x86_64.tar.gz
+        asset_name: mne-cpp-macos-static-x86_64.tar.gz
+        tag: ${{ github.ref }}
+        overwrite: true
+    - name: Deploy binaries with dev release on Github
+      if: endsWith(github.ref, 'master') == true
+      uses: svenstaro/upload-release-action@v1-release
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: mne-cpp-macos-static-x86_64.tar.gz
         asset_name: mne-cpp-macos-static-x86_64.tar.gz
         tag: dev_build
@@ -146,7 +195,7 @@ jobs:
         
   WinStatic:
     runs-on: windows-2016
-    needs: UpdateDevTag
+    needs: CreateRelease
 
     steps:
     - name: Clone repository
@@ -199,10 +248,20 @@ jobs:
         Remove-Item 'bin/mne_scan_plugins' -Recurse
         Remove-Item 'bin/mne_analyze_extensions' -Recurse
         7z a mne-cpp-windows-static-x86_64.zip ./bin
-    - name: Deploy binaries with dev_build release on Github
+    - name: Deploy binaries with stable release on Github
+      if: endsWith(github.ref, 'master') == false
       uses: svenstaro/upload-release-action@v1-release
       with:
-        repo_token: ${{ secrets.GH_TOKEN }}
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: mne-cpp-windows-static-x86_64.zip
+        asset_name: mne-cpp-windows-static-x86_64.zip
+        tag: ${{ github.ref }}
+        overwrite: true
+    - name: Deploy binaries with dev release on Github
+      if: endsWith(github.ref, 'master') == true
+      uses: svenstaro/upload-release-action@v1-release
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: mne-cpp-windows-static-x86_64.zip
         asset_name: mne-cpp-windows-static-x86_64.zip
         tag: dev_build
@@ -210,7 +269,7 @@ jobs:
 
   LinuxDynamic:
     runs-on: ubuntu-16.04
-    needs: UpdateDevTag
+    needs: CreateRelease
     
     steps:
     - name: Clone repository
@@ -270,10 +329,20 @@ jobs:
         ../linuxdeployqt-continuous-x86_64.AppImage bin/mne_scan -verbose2
         # Creating archive of everything in current directory
         tar cfvz ../mne-cpp-linux-dynamic-x86_64.tar.gz ./*
-    - name: Deploy binaries with dev_build release on Github
+    - name: Deploy binaries with stable release on Github
+      if: endsWith(github.ref, 'master') == false
       uses: svenstaro/upload-release-action@v1-release
       with:
-        repo_token: ${{ secrets.GH_TOKEN }}
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: mne-cpp-linux-dynamic-x86_64.tar.gz
+        asset_name: mne-cpp-linux-dynamic-x86_64.tar.gz
+        tag: ${{ github.ref }}
+        overwrite: true
+    - name: Deploy binaries with dev release on Github
+      if: endsWith(github.ref, 'master') == true
+      uses: svenstaro/upload-release-action@v1-release
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: mne-cpp-linux-dynamic-x86_64.tar.gz
         asset_name: mne-cpp-linux-dynamic-x86_64.tar.gz
         tag: dev_build
@@ -281,7 +350,7 @@ jobs:
 
   MacOSDynamic:
     runs-on: macos-latest
-    needs: UpdateDevTag
+    needs: CreateRelease
 
     steps:
     - name: Clone repository
@@ -327,10 +396,20 @@ jobs:
         cp -a applications/mne_scan/plugins/lsladapter/liblsl/build/install/lib/. bin/mne_scan.app/Contents/Frameworks
         # Creating archive of all macos deployed applications
         tar cfvz mne-cpp-macos-dynamic-x86_64.tar.gz bin/. lib/.
-    - name: Deploy binaries with dev_build release on Github
+    - name: Deploy binaries with stable release on Github
+      if: endsWith(github.ref, 'master') == false
       uses: svenstaro/upload-release-action@v1-release
       with:
-        repo_token: ${{ secrets.GH_TOKEN }}
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: mne-cpp-macos-dynamic-x86_64.tar.gz
+        asset_name: mne-cpp-macos-dynamic-x86_64.tar.gz
+        tag: ${{ github.ref }}
+        overwrite: true
+    - name: Deploy binaries with dev release on Github
+      if: endsWith(github.ref, 'master') == true
+      uses: svenstaro/upload-release-action@v1-release
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: mne-cpp-macos-dynamic-x86_64.tar.gz
         asset_name: mne-cpp-macos-dynamic-x86_64.tar.gz
         tag: dev_build
@@ -338,7 +417,7 @@ jobs:
 
   WinDynamic:
     runs-on: windows-2016
-    needs: UpdateDevTag
+    needs: CreateRelease
 
     steps:
     - name: Clone repository
@@ -390,18 +469,30 @@ jobs:
         # Copy additional LSL libs
         xcopy .\applications\mne_scan\plugins\lsladapter\liblsl\build\install\bin\lsl.dll .\bin\ /i
         7z a mne-cpp-windows-dynamic-x86_64.zip ./bin
-    - name: Deploy binaries with dev_build release on Github
+    - name: Deploy binaries with stable release on Github
+      if: endsWith(github.ref, 'master') == false
       uses: svenstaro/upload-release-action@v1-release
       with:
-        repo_token: ${{ secrets.GH_TOKEN }}
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: mne-cpp-windows-dynamic-x86_64.zip
+        asset_name: mne-cpp-windows-dynamic-x86_64.zip
+        tag: ${{ github.ref }}
+        overwrite: true
+    - name: Deploy binaries with dev release on Github
+      if: endsWith(github.ref, 'master') == true
+      uses: svenstaro/upload-release-action@v1-release
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: mne-cpp-windows-dynamic-x86_64.zip
         asset_name: mne-cpp-windows-dynamic-x86_64.zip
         tag: dev_build
         overwrite: true
         
   Tests:
+    # Only run for dev releases
+    if: endsWith(github.ref, 'master') == true
     runs-on: ubuntu-16.04
-    needs: UpdateDevTag
+    needs: CreateRelease
 
     steps:
     - name: Clone repository
@@ -442,8 +533,10 @@ jobs:
         done
         
   Doxygen:
+    # Only run for dev releases
+    if: endsWith(github.ref, 'master') == true
     runs-on: ubuntu-latest
-    needs: UpdateDevTag
+    needs: CreateRelease
 
     steps:
     - name: Clone repository
@@ -454,16 +547,27 @@ jobs:
         sudo apt-get install -qq qttools5-dev-tools doxygen graphviz
     - name: Run Doxygen and package result
       run: |
+        git fetch --all
+        git checkout origin/workflow
         cd doc/doxygen
         doxygen mne-cpp_doxyfile
     - name: Setup Github credentials
       uses: fusion-engineering/setup-git-credentials@v2
       with:
-        credentials: ${{secrets.GIT_CREDENTIALS}}    
-    - name: Deploy qch docu data base with dev_build release on Github
+        credentials: ${{secrets.GITHUB_TOKEN}}    
+    - name: Deploy qch docu data base with stable release on Github
+      if: endsWith(github.ref, 'master') == false
       uses: svenstaro/upload-release-action@v1-release
       with:
-        repo_token: ${{ secrets.GH_TOKEN }}
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: doc/doxygen/qt-creator_doc/mne-cpp.qch
+        asset_name: mne-cpp-doc-qtcreator.qch
+        tag: ${{ github.ref }}
+        overwrite: true
+    - name: Deploy qch docu data base with dev release on Github
+      uses: svenstaro/upload-release-action@v1-release
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: doc/doxygen/qt-creator_doc/mne-cpp.qch
         asset_name: mne-cpp-doc-qtcreator.qch
         tag: dev_build
@@ -488,8 +592,10 @@ jobs:
         git push -f --all
 
   gh-pages:
+    # Only run for dev releases
+    if: endsWith(github.ref, 'master') == true
     runs-on: ubuntu-latest
-    needs: UpdateDevTag
+    needs: CreateRelease
 
     steps:
     - name: Clone repository
@@ -497,7 +603,7 @@ jobs:
     - name: Setup Github credentials
       uses: fusion-engineering/setup-git-credentials@v2
       with:
-        credentials: ${{secrets.GIT_CREDENTIALS}}
+        credentials: ${{secrets.GITHUB_TOKEN}}
     - name: Clone doc/gh-pages into gh-pages branch
       run: |
         git config --global user.email lorenzesch@hotmail.com
@@ -515,8 +621,10 @@ jobs:
         git push -f --all
 
   WebAssembly:
+    # Only run for dev releases
+    if: endsWith(github.ref, 'master') == true
     runs-on: ubuntu-latest
-    needs: UpdateDevTag
+    needs: CreateRelease
 
     steps:
     - name: Clone repository
@@ -560,7 +668,11 @@ jobs:
     - name: Setup Github credentials
       uses: fusion-engineering/setup-git-credentials@v2
       with:
+<<<<<<< HEAD:.github/workflows/devbuilds.yml
         credentials: ${{secrets.GIT_CREDENTIALS}}
+=======
+        credentials: ${{secrets.GH_TOKEN}}
+>>>>>>> MAINT: Split up CI workflow files:.github/workflows/release.yml
     - name: Clone and update mne-cpp/wasm:gh-pages
       run: |
         # Delete folders which we do not want to ship
