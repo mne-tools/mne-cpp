@@ -5,7 +5,7 @@
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Johannes Vorwerk <johannes.vorwerk@umit.at>
- * @version  dev
+ * @since    0.1.0
  * @date     February, 2020
  *
  * @section  LICENSE

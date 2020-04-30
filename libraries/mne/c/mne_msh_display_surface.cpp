@@ -3,7 +3,7 @@
  * @file     mne_msh_display_surface.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
- * @version  dev
+ * @since    0.1.0
  * @date     April, 2017
  *
  * @section  LICENSE

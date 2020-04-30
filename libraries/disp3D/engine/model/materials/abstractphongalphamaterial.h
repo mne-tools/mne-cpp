@@ -2,7 +2,7 @@
 /**
  * @file     abstractphongalphamaterial.h
  * @author   Lars Debor <Lars.Debor@tu-ilmenau.de>
- * @version  dev
+ * @since    0.1.0
  * @date     January, 2018
  *
  * @section  LICENSE

@@ -3,7 +3,7 @@
  * @file     dummysetupwidget.h
  * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
  *           Viktor Klueber <Viktor.Klueber@tu-ilmenau.de>
- * @version  dev
+ * @since    0.1.0
  * @date     February, 2013
  *
  * @section  LICENSE

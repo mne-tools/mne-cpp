@@ -3,7 +3,7 @@
  * @file     neuronalconnectivity.cpp
  * @author   Gabriel B Motta <gabrielbenmotta@gmail.com>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  dev
+ * @since    0.1.0
  * @date     October, 2016
  *
  * @section  LICENSE

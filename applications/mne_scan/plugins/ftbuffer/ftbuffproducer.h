@@ -3,7 +3,7 @@
  * @file     ftbuffproducer.h
  * @author   Gabriel B Motta <gbmotta@mgh.harvard.edu>;
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @version  dev
+ * @since    0.1.0
  * @date     January, 2020
  *
  * @section  LICENSE

@@ -2,7 +2,7 @@
 /**
  * @file     geometrymultipliermaterial.h
  * @author   Lars Debor <Lars.Debor@tu-ilmenau.de>
- * @version  dev
+ * @since    0.1.0
  * @date     October, 2017
  *
  * @section  LICENSE

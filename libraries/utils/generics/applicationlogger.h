@@ -3,7 +3,7 @@
  * @file     applicationlogger.h
  * @author   Mainak Jas <mjas@mgh.harvard.edu>;
  *           Ruben Dörfel <rdorfel@mgh.harvard.edu>
- * @version  dev
+ * @since    0.1.0
  * @date     July, 2019
  *
  * @section  LICENSE

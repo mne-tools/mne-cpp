@@ -3,7 +3,7 @@
 # @file     annotationmanager.pro
 # @author   Lorenz Esch <lesch@mgh.harvard.edu>;
 #           Gabriel Motta <gbmotta@mgh.harvard.edu>
-# @version  dev
+# @since    0.1.0
 # @date     Februrary, 2020
 #
 # @section  LICENSE

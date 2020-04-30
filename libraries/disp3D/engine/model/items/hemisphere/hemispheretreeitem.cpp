@@ -3,7 +3,7 @@
  * @file     hemispheretreeitem.cpp
  * @author   Juan Garcia-Prieto <juangpc@gmail.com>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  dev
+ * @since    0.1.0
  * @date     November, 2015
  *
  * @section  LICENSE

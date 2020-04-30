@@ -3,7 +3,7 @@
  * @file     main.cpp
  * @author   Gabriel B Motta <gabrielbenmotta@gmail.com>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  dev
+ * @since    0.1.0
  * @date     April, 2019
  *
  * @section  LICENSE

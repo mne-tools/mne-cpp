@@ -5,7 +5,7 @@
  *           Felix Arndt <Felix.Arndt@tu-ilmenau.de>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
- * @version  dev
+ * @since    0.1.0
  * @date     July, 2012
  *
  * @section  LICENSE

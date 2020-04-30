@@ -3,7 +3,7 @@
  * @file     IIO.h
  * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
  *           Gabriel B Motta <gabrielbenmotta@gmail.com>
- * @version  dev
+ * @since    0.1.0
  * @date     February, 2013
  *
  * @section  LICENSE

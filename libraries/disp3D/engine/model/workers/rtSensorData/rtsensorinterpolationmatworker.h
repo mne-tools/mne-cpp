@@ -2,7 +2,7 @@
 /**
  * @file     rtsensorinterpolationmatworker.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  dev
+ * @since    0.1.0
  * @date     June, 2017
  *
  * @section  LICENSE
