@@ -114,7 +114,7 @@ MNE_LIB_VERSION = 1
 
 QMAKE_TARGET_PRODUCT = mne-cpp
 QMAKE_TARGET_DESCRIPTION = MNE Qt 5 based C++ library.
-QMAKE_TARGET_COPYRIGHT = Copyright (C) 2019 Authors of mne-cpp. All rights reserved.
+QMAKE_TARGET_COPYRIGHT = Copyright (C) 2020 Authors of mne-cpp. All rights reserved.
 
 
 ########################################### PROJECT CONFIGURATION #############################################
