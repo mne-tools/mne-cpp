@@ -2,7 +2,7 @@
 //
 // @file     installscript.qs
 // @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
-// @version  1.0
+// @version  dev
 // @date     January, 2016
 //
 // @section  LICENSE
