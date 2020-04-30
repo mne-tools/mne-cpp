@@ -202,6 +202,7 @@ private:
     QFileInfo m_fiOutFileInfo;              /**< Output File info obj.*/
 
     bool m_bVerboseMode;                    /**< Show header when executing.*/
+    bool m_bSilentMode;                     /**< Avoid any message to the user.*/
     bool m_bInOutFileNamesEqual;            /**< Flags user's request to have both input and output files with the same name.*/
     bool m_bDeleteInputFileAfter;           /**< User's request to delete the input file after anonymization.*/
     bool m_bDeleteInputFileConfirmation;    /**< User's request to avoid confirmation prompt for input file deletion.*/
