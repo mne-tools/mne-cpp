@@ -3,9 +3,9 @@ name: Linux|MacOS|Win|WASM
 on:
   push:
     tags:        
-      - v0.*
+    - v0.*
     branches:
-      - master
+    - master
 
 jobs:
   CreateRelease:
