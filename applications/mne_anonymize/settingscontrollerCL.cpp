@@ -455,6 +455,7 @@ void SettingsControllerCL::renameOutputFileAsInputFile()
     {
         printf("\n%s",QString("Output file named: " + m_fiOutFileInfo.fileName() + " --> renamed as: " + m_fiInFileInfo.fileName()).toUtf8().data());
     }
+    m_fiOutFileInfo.setFile(m_fiInFileInfo.fileName());
 }
 
 //=============================================================================================================
