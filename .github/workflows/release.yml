@@ -5,7 +5,7 @@ on:
     tags:        
     - v0.*
     branches:
-    - master
+    - workflow
 
 jobs:
   CreateRelease:
@@ -15,22 +15,22 @@ jobs:
     - name: Clone repository
       uses: actions/checkout@v2
     - name: Increment release version (stable release only)
-      if: endsWith(github.ref, 'master') == false
+      if: endsWith(github.ref, 'workflow') == false
       run: |
         # Setup Git
         git config --global user.email lorenzesch@hotmail.com
         git config --global user.name LorenzE
         # Increment MNE-CPP version in mne-cpp.pri file
-        sed -i "s/MNE_CPP_VERSION = 0.0.0/MNE_CPP_VERSION = ${GITHUB_REF#refs/tags/v}/" mne-cpp.pri
-        sed -i "s/MNE_LIB_VERSION = 0.0.0/MNE_LIB_VERSION = ${GITHUB_REF#refs/tags/v}/" mne-cpp.pri
+        sed -i "s/MNE_CPP_VERSION =/c\MNE_CPP_VERSION = ${GITHUB_REF#refs/tags/v}/" mne-cpp.pri
+        sed -i "s/MNE_LIB_VERSION =/c\MNE_LIB_VERSION = ${GITHUB_REF#refs/tags/v}/" mne-cpp.pri
         # Increment Doxygen version
-        sed -i "s/PROJECT_NUMBER         = 0.0.0/PROJECT_NUMBER         = ${GITHUB_REF#refs/tags/v}/" ./doc/doxygen/mne-cpp_doxyfile
+        sed -i "s/PROJECT_NUMBER         =/c\PROJECT_NUMBER         = ${GITHUB_REF#refs/tags/v}/" ./doc/doxygen/mne-cpp_doxyfile
         # Commit changes and push
         git add -u
         git commit -m "MAINT: Increment version information to ${GITHUB_REF#refs/tags/}"
-        git push origin HEAD:master
+        git push origin HEAD:workflow
     - name: Create new branch with the tag's name (stable release only)
-      if: endsWith(github.ref, 'master') == false
+      if: endsWith(github.ref, 'workflow') == false
       run: |
         # Setup Git
         git config --global user.email lorenzesch@hotmail.com
@@ -39,15 +39,15 @@ jobs:
         git checkout -b ${GITHUB_REF#refs/tags/}
         git push origin refs/heads/${GITHUB_REF#refs/tags/}
     - name: Install hub (dev release only)
-      if: endsWith(github.ref, 'master') == true
+      if: endsWith(github.ref, 'workflow') == true
       uses: geertvdc/setup-hub@master
     - name: Setup Github credentials (dev release only)
-      if: endsWith(github.ref, 'master') == true
+      if: endsWith(github.ref, 'workflow') == true
       uses: fusion-engineering/setup-git-credentials@v2
       with:
         credentials: ${{secrets.GIT_CREDENTIALS}}
     - name: Update dev_build tag and release (dev release only)
-      if: endsWith(github.ref, 'master') == true
+      if: endsWith(github.ref, 'workflow') == true
       env:
         GITHUB_USER: LorenzE
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -74,6 +74,11 @@ jobs:
     steps:
     - name: Clone repository
       uses: actions/checkout@v2
+    - name: Get version increment changes (for stable release only)
+      if: endsWith(github.ref, 'workflow') == false
+      run: |
+        git fetch origin
+        git checkout origin/workflow
     - name: Install OpenGL
       run: |
         sudo apt-get install build-essential libgl1-mesa-dev
@@ -114,7 +119,7 @@ jobs:
         # Creating archive of everything in the bin directory
         tar cfvz mne-cpp-linux-static-x86_64.tar.gz bin/.
     - name: Deploy binaries with stable release on Github
-      if: endsWith(github.ref, 'master') == false
+      if: endsWith(github.ref, 'workflow') == false
       uses: svenstaro/upload-release-action@v1-release
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -123,7 +128,7 @@ jobs:
         tag: ${{ github.ref }}
         overwrite: true
     - name: Deploy binaries with dev release on Github
-      if: endsWith(github.ref, 'master') == true
+      if: endsWith(github.ref, 'workflow') == true
       uses: svenstaro/upload-release-action@v1-release
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -139,6 +144,11 @@ jobs:
     steps:
     - name: Clone repository
       uses: actions/checkout@v2
+    - name: Get version increment changes (for stable release only)
+      if: endsWith(github.ref, 'workflow') == false
+      run: |
+        git fetch origin
+        git checkout origin/workflow
     - name: Install Qt
       run: |
         # Download the pre-built static version of Qt, which was created with the buildqtbinaries.yml workflow
@@ -175,7 +185,7 @@ jobs:
         # Creating archive of all macos deployed applications
         tar cfvz mne-cpp-macos-static-x86_64.tar.gz bin/.
     - name: Deploy binaries with stable release on Github
-      if: endsWith(github.ref, 'master') == false
+      if: endsWith(github.ref, 'workflow') == false
       uses: svenstaro/upload-release-action@v1-release
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -184,7 +194,7 @@ jobs:
         tag: ${{ github.ref }}
         overwrite: true
     - name: Deploy binaries with dev release on Github
-      if: endsWith(github.ref, 'master') == true
+      if: endsWith(github.ref, 'workflow') == true
       uses: svenstaro/upload-release-action@v1-release
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -200,6 +210,11 @@ jobs:
     steps:
     - name: Clone repository
       uses: actions/checkout@v2
+    - name: Get version increment changes (for stable release only)
+      if: endsWith(github.ref, 'workflow') == false
+      run: |
+        git fetch origin
+        git checkout origin/workflow
     - name: Install Python 3.7 version
       uses: actions/setup-python@v1
       with:
@@ -249,7 +264,7 @@ jobs:
         Remove-Item 'bin/mne_analyze_extensions' -Recurse
         7z a mne-cpp-windows-static-x86_64.zip ./bin
     - name: Deploy binaries with stable release on Github
-      if: endsWith(github.ref, 'master') == false
+      if: endsWith(github.ref, 'workflow') == false
       uses: svenstaro/upload-release-action@v1-release
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -258,7 +273,7 @@ jobs:
         tag: ${{ github.ref }}
         overwrite: true
     - name: Deploy binaries with dev release on Github
-      if: endsWith(github.ref, 'master') == true
+      if: endsWith(github.ref, 'workflow') == true
       uses: svenstaro/upload-release-action@v1-release
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -274,6 +289,11 @@ jobs:
     steps:
     - name: Clone repository
       uses: actions/checkout@v2
+    - name: Get version increment changes (for stable release only)
+      if: endsWith(github.ref, 'workflow') == false
+      run: |
+        git fetch origin
+        git checkout origin/workflow
     - name: Install Python 3.7 version
       uses: actions/setup-python@v1
       with:
@@ -330,7 +350,7 @@ jobs:
         # Creating archive of everything in current directory
         tar cfvz ../mne-cpp-linux-dynamic-x86_64.tar.gz ./*
     - name: Deploy binaries with stable release on Github
-      if: endsWith(github.ref, 'master') == false
+      if: endsWith(github.ref, 'workflow') == false
       uses: svenstaro/upload-release-action@v1-release
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -339,7 +359,7 @@ jobs:
         tag: ${{ github.ref }}
         overwrite: true
     - name: Deploy binaries with dev release on Github
-      if: endsWith(github.ref, 'master') == true
+      if: endsWith(github.ref, 'workflow') == true
       uses: svenstaro/upload-release-action@v1-release
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -355,6 +375,11 @@ jobs:
     steps:
     - name: Clone repository
       uses: actions/checkout@v2
+    - name: Get version increment changes (for stable release only)
+      if: endsWith(github.ref, 'workflow') == false
+      run: |
+        git fetch origin
+        git checkout origin/workflow
     - name: Install Python 3.7 version
       uses: actions/setup-python@v1
       with:
@@ -397,7 +422,7 @@ jobs:
         # Creating archive of all macos deployed applications
         tar cfvz mne-cpp-macos-dynamic-x86_64.tar.gz bin/. lib/.
     - name: Deploy binaries with stable release on Github
-      if: endsWith(github.ref, 'master') == false
+      if: endsWith(github.ref, 'workflow') == false
       uses: svenstaro/upload-release-action@v1-release
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -406,7 +431,7 @@ jobs:
         tag: ${{ github.ref }}
         overwrite: true
     - name: Deploy binaries with dev release on Github
-      if: endsWith(github.ref, 'master') == true
+      if: endsWith(github.ref, 'workflow') == true
       uses: svenstaro/upload-release-action@v1-release
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -422,6 +447,11 @@ jobs:
     steps:
     - name: Clone repository
       uses: actions/checkout@v2
+    - name: Get version increment changes (for stable release only)
+      if: endsWith(github.ref, 'workflow') == false
+      run: |
+        git fetch origin
+        git checkout origin/workflow
     - name: Install Python 3.7 version
       uses: actions/setup-python@v1
       with:
@@ -470,7 +500,7 @@ jobs:
         xcopy .\applications\mne_scan\plugins\lsladapter\liblsl\build\install\bin\lsl.dll .\bin\ /i
         7z a mne-cpp-windows-dynamic-x86_64.zip ./bin
     - name: Deploy binaries with stable release on Github
-      if: endsWith(github.ref, 'master') == false
+      if: endsWith(github.ref, 'workflow') == false
       uses: svenstaro/upload-release-action@v1-release
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -479,7 +509,7 @@ jobs:
         tag: ${{ github.ref }}
         overwrite: true
     - name: Deploy binaries with dev release on Github
-      if: endsWith(github.ref, 'master') == true
+      if: endsWith(github.ref, 'workflow') == true
       uses: svenstaro/upload-release-action@v1-release
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -490,7 +520,7 @@ jobs:
         
   Tests:
     # Only run for dev releases
-    if: endsWith(github.ref, 'master') == true
+    if: endsWith(github.ref, 'workflow') == true
     runs-on: ubuntu-16.04
     needs: CreateRelease
 
@@ -534,7 +564,7 @@ jobs:
         
   Doxygen:
     # Only run for dev releases
-    if: endsWith(github.ref, 'master') == true
+    if: endsWith(github.ref, 'workflow') == true
     runs-on: ubuntu-latest
     needs: CreateRelease
 
@@ -548,7 +578,7 @@ jobs:
     - name: Run Doxygen and package result
       run: |
         git fetch --all
-        git checkout origin/master
+        git checkout origin/workflow
         cd doc/doxygen
         doxygen mne-cpp_doxyfile
     - name: Setup Github credentials
@@ -556,7 +586,7 @@ jobs:
       with:
         credentials: ${{secrets.GIT_CREDENTIALS}}    
     - name: Deploy qch docu data base with stable release on Github
-      if: endsWith(github.ref, 'master') == false
+      if: endsWith(github.ref, 'workflow') == false
       uses: svenstaro/upload-release-action@v1-release
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -593,7 +623,7 @@ jobs:
 
   gh-pages:
     # Only run for dev releases
-    if: endsWith(github.ref, 'master') == true
+    if: endsWith(github.ref, 'workflow') == true
     runs-on: ubuntu-latest
     needs: CreateRelease
 
@@ -622,7 +652,7 @@ jobs:
 
   WebAssembly:
     # Only run for dev releases
-    if: endsWith(github.ref, 'master') == true
+    if: endsWith(github.ref, 'workflow') == true
     runs-on: ubuntu-latest
     needs: CreateRelease
 
