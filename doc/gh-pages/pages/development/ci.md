@@ -7,25 +7,25 @@ nav_order: 2
 
 ## Github Actions
 
-MNE-CPP faciliatets Github Actions to do continous integration (CI). Github Actions operates on Github events which trigger so called workflows. You can read more on the terminology [here](https://help.github.com/en/actions/reference){:target="_blank" rel="noopener"}. Currently, the following Github events trigger MNE-CPP's CI pipeline:
+MNE-CPP facilitates Github Actions to do continous integration (CI). Github Actions operates on Github events which trigger so called workflows. You can read more on the terminology [here](https://help.github.com/en/actions/reference){:target="_blank" rel="noopener"}. Currently, the following Github events trigger MNE-CPP's CI pipeline:
 
 | Event type | Workflow Name | Workflow Script | Effect |
 | ---------- | ------------- | --------------- | ------ |
 | Pull Requests | `PullRequest` | [pullrequest.yml](https://github.com/mne-tools/mne-cpp/blob/master/.github/workflows/pullrequest.yml){:target="_blank" rel="noopener"} | Triggers checks to run on the PR code.| 
-| Pushes/Merges to `master` | `Linux|MacOS|Win|WASM` | [release.yml](https://github.com/mne-tools/mne-cpp/blob/master/.github/workflows/release.yml){:target="_blank" rel="noopener"} | Triggers the Development Release binaries to be updated with the most recently pushed changes. |
-| Publishing a new release with tag syntax `v0.x.y` | `Linux|MacOS|Win|WASM` | [release.yml](https://github.com/mne-tools/mne-cpp/blob/master/.github/workflows/release.yml){:target="_blank" rel="noopener"} | Triggers stable release processing described below and adds the corresponding binaries to the new release on Github. |
+| Pushes/Merges to `master` | `Linux|MacOS|Win|WASM` | [release.yml](https://github.com/mne-tools/mne-cpp/blob/master/.github/workflows/release.yml){:target="_blank" rel="noopener"} | Triggers the Development Release binaries to be updated with the most recently pushed changes. This workflow basically follows the idea of nightly builds. |
+| Publishing a new release with tag syntax `v0.x.y` | `Linux|MacOS|Win|WASM` | [release.yml](https://github.com/mne-tools/mne-cpp/blob/master/.github/workflows/release.yml){:target="_blank" rel="noopener"} | Triggers stable release processing described in more detail below. |
 | Pushes to the `docu` branch | `DocuTest` | [docutest.yml](https://github.com/mne-tools/mne-cpp/blob/master/.github/workflows/docutest.yml){:target="_blank" rel="noopener"} | Creates a new version of the documentation website and makes them accessible via the repository's `gh-pages` branch. |
 | Pushes to the `wasm` branch | `WasmTest` | [wasmtest.yml](https://github.com/mne-tools/mne-cpp/blob/master/.github/workflows/wasmtest.yml){:target="_blank" rel="noopener"} | Creates new versions of the WebAssembly capable MNE-CPP applications and makes them accessible via the repository's `gh-pages` branch. |
 | Timer runs out | `Coverity` | [coverity.yml](https://github.com/mne-tools/mne-cpp/blob/master/.github/workflows/coverity.yml){:target="_blank" rel="noopener"} | Triggers every two days to run [Coverity](https://scan.coverity.com/projects/mne-tools-mne-cpp){:target="_blank" rel="noopener"} static code analysis tools. |
 | Pushes to the `generateqt` branch | `BuildQtBinaries` | [buildqtbinaries.yml](https://github.com/mne-tools/mne-cpp/blob/master/.github/workflows/buildqtbinaries.yml){:target="_blank" rel="noopener"} | Triggers builds of all needed Qt versions and makes them accesible as [artifacts via the Github Actions interface](https://help.github.com/en/actions/configuring-and-managing-workflows/persisting-workflow-data-using-artifacts){:target="_blank" rel="noopener"}. |  
 
-## Release Cycle
+## Releases
 
-New development takes place on the `master`. Once the dedvelopers have rough consensus we create a new stable release on GitHub. This will trigger the following steps, which will are fully automated by the [release.yml](https://github.com/mne-tools/mne-cpp/blob/master/.github/workflows/release.yml){:target="_blank" rel="noopener"} workflow script:
+New development takes place on the `master` branch. Once the developers have rough consensus we create a new stable release on GitHub, following the `v0.x.y` tag syntax. This will trigger the following steps, which are fully automated by the [release.yml](https://github.com/mne-tools/mne-cpp/blob/master/.github/workflows/release.yml){:target="_blank" rel="noopener"} workflow script:
 
-1. Increment version numbers in [mne-cpp.pri](https://github.com/mne-tools/mne-cpp/blob/master/mne-cpp.pri){:target="_blank" rel="noopener"} and [mne-cpp_doxyfile](https://github.com/mne-tools/mne-cpp/blob/master/doc/doxygen/mne-cpp_doxyfile){:target="_blank" rel="noopener"}.
+1. Increment version numbers in [mne-cpp.pri](https://github.com/mne-tools/mne-cpp/blob/master/mne-cpp.pri){:target="_blank" rel="noopener"} and [mne-cpp_doxyfile](https://github.com/mne-tools/mne-cpp/blob/master/doc/doxygen/mne-cpp_doxyfile){:target="_blank" rel="noopener"} by `0.x.y`.
 2. Create new branch named `v0.x.y` based on current `master` branch.
-3. Build binaries and add them to the corresponding release on Github.
+3. Build dynamically as well as statically linked binaries and upload them to the corresponding release on Github.
 
 ## Solving for dependencies
 
