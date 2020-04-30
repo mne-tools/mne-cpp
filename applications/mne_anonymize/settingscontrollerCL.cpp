@@ -70,6 +70,7 @@ SettingsControllerCL::SettingsControllerCL(const QStringList& arguments)
 : m_sAppName(qApp->applicationName())
 , m_sAppVer(qApp->applicationVersion())
 , m_bVerboseMode(false)
+, m_bSilentMode(false)
 , m_bInOutFileNamesEqual(false)
 , m_bDeleteInputFileAfter(false)
 , m_bDeleteInputFileConfirmation(true)
@@ -146,6 +147,10 @@ void SettingsControllerCL::initParser()
                                                                      "when anonymizing one single file. Default: false"));
     m_parser.addOption(verboseOpt);
 
+    QCommandLineOption silentOpt(QStringList() << "s" << "silent",
+                                  QCoreApplication::translate("main","Prints no output to the terminal, other than execution or configuration errors. Default: false"));
+    m_parser.addOption(silentOpt);
+
     QCommandLineOption deleteInFileOpt(QStringList() << "d" << "delete_input_file_after",
                                        QCoreApplication::translate("main","Delete input fiff file after anonymization. A confirmation message will be "
                                                                           "prompted to the user. Default: false"));
@@ -197,7 +202,7 @@ int SettingsControllerCL::parseInputs(const QStringList& arguments)
 {
     m_parser.process(arguments);
 
-    if(!m_parser.isSet("no-gui"))
+    if(!m_parser.isSet("gui"))
     {
         qCritical() << "Error while running the application. Something went wrong.";
         return 1;
@@ -217,6 +222,13 @@ int SettingsControllerCL::parseInputs(const QStringList& arguments)
     {
         m_bVerboseMode = true;
         m_pAnonymizer->setVerboseMode(true);
+    }
+
+    if(m_parser.isSet("silent"))
+    {
+        m_bSilentMode = true;
+        m_bVerboseMode = false;
+        m_pAnonymizer->setVerboseMode(false);
     }
 
     if(m_parser.isSet("brute")) {
@@ -366,7 +378,10 @@ int SettingsControllerCL::execute()
         renameOutputFileAsInputFile();
     }
 
-    printf("\n%s", QString("MNE Anonymize finished correctly: " + m_fiInFileInfo.fileName() + " -> " + m_fiOutFileInfo.fileName()).toUtf8().data());
+    if(!m_bSilentMode)
+    {
+        printf("\n%s", QString("MNE Anonymize finished correctly: " + m_fiInFileInfo.fileName() + " -> " + m_fiOutFileInfo.fileName()).toUtf8().data());
+    }
 
     printFooterIfVerbose();
 
@@ -379,14 +394,17 @@ bool SettingsControllerCL::checkDeleteInputFile()
 {
     if(m_bDeleteInputFileAfter) //false by default
     {
-        printf("%s", QString("You have requested to delete the input file: " + m_fiInFileInfo.fileName()).toUtf8().data());
+        if(!m_bSilentMode)
+        {
+            printf("%s", QString("You have requested to delete the input file: " + m_fiInFileInfo.fileName()).toUtf8().data());
+        }
 
         if(m_bDeleteInputFileConfirmation) //true by default
         {
             QTextStream consoleIn(stdin);
             QString confirmation;
             printf("\n%s",QString("You can avoid this confirmation by using the delete_confirmation option.").toUtf8().data());
-            printf("\n%s",QString("Are you sure you want to delete this file? [Y/n] ").toUtf8().data());
+            printf("\n%s",QString("Are you sure you want to delete the input file? [Y/n] ").toUtf8().data());
             consoleIn >> confirmation;
 
             if(confirmation == "Y")
@@ -434,9 +452,12 @@ bool SettingsControllerCL::checkRenameOutputFile()
                 deleteInputFile();
                 return true;
             } else {
-                printf("\n%s", QString("You have requested to save the output file with the same name as the input file.").toUtf8().data());
-                printf("\n%s", QString("This cannot be done without deleting or modifying the input file.").toUtf8().data());
-                printf("\n%s", QString(" ").toUtf8().data());
+                if(!m_bSilentMode)
+                {
+                    printf("\n%s", QString("You have requested to save the output file with the same name as the input file.").toUtf8().data());
+                    printf("\n%s", QString("This cannot be done without deleting or modifying the input file.").toUtf8().data());
+                    printf("\n%s", QString(" ").toUtf8().data());
+                }
             }
         }
     }
