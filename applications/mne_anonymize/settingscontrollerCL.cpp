@@ -42,6 +42,7 @@
 
 #include "settingscontrollerCL.h"
 #include "fiffanonymizer.h"
+#include <iostream>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -364,6 +365,8 @@ int SettingsControllerCL::execute()
         renameOutputFileAsInputFile();
     }
 
+    printf("\n%s", QString("MNE Anonymize finished correctly: " + m_fiInFileInfo.fileName() + " -> " + m_fiOutFileInfo.fileName()).toUtf8().data());
+
     printFooterIfVerbose();
 
     return 0;
@@ -373,16 +376,16 @@ int SettingsControllerCL::execute()
 
 bool SettingsControllerCL::checkDeleteInputFile()
 {
-    if(m_bDeleteInputFileAfter) { //false by default
-        qInfo() << "You have requested to delete the input file: " + m_fiInFileInfo.fileName();
+    if(m_bDeleteInputFileAfter) //false by default
+    {
+        printf("%s", QString("You have requested to delete the input file: " + m_fiInFileInfo.fileName()).toUtf8().data());
 
-        if(m_bDeleteInputFileConfirmation)
-        { //true by default
-            QTextStream consoleOut(stdout);
+        if(m_bDeleteInputFileConfirmation) //true by default
+        {
             QTextStream consoleIn(stdin);
             QString confirmation;
-            qInfo() << "You can avoid this confirmation by using the delete_confirmation option.";
-            consoleOut << "Are you sure you want to delete this file? [Y/n] ";
+            printf("\n%s",QString("You can avoid this confirmation by using the delete_confirmation option.").toUtf8().data());
+            printf("\n%s",QString("Are you sure you want to delete this file? [Y/n] ").toUtf8().data());
             consoleIn >> confirmation;
 
             if(confirmation == "Y")
@@ -402,10 +405,7 @@ void SettingsControllerCL::deleteInputFile()
 {
     QFile inFile(m_fiInFileInfo.absoluteFilePath());
     m_bInputFileDeleted = inFile.remove();
-    if(m_bVerboseMode)
-    {
-        qInfo() <<"Input file deleted.";
-    }
+    printIfVerbose("Input file deleted.");
 }
 
 //=============================================================================================================
@@ -433,10 +433,10 @@ bool SettingsControllerCL::checkRenameOutputFile()
                 deleteInputFile();
                 return true;
             } else {
-                qWarning() << " ";
-                qWarning() << "You have requested to save the output file with the same name as the input file.";
-                qWarning() << "This cannot be done without deleting or modifying the input file.";
-                qWarning() << " ";
+                printf("\n%s", QString(" ").toUtf8().data());
+                printf("\n%s", QString("You have requested to save the output file with the same name as the input file.").toUtf8().data());
+                printf("\n%s", QString("This cannot be done without deleting or modifying the input file.").toUtf8().data());
+                printf("\n%s", QString(" ").toUtf8().data());
             }
         }
     }
@@ -453,7 +453,7 @@ void SettingsControllerCL::renameOutputFileAsInputFile()
     m_bOutFileRenamed = true;
     if(m_bVerboseMode)
     {
-        qInfo() <<"Output file named: " + m_fiOutFileInfo.fileName() + " --> renamed as: " + m_fiInFileInfo.fileName();
+        printf("\n%s",QString("Output file named: " + m_fiOutFileInfo.fileName() + " --> renamed as: " + m_fiInFileInfo.fileName()).toUtf8().data());
     }
 }
 
@@ -461,28 +461,22 @@ void SettingsControllerCL::renameOutputFileAsInputFile()
 
 void SettingsControllerCL::printHeaderIfVerbose()
 {
-    if(m_bVerboseMode) {
-        qInfo() << " ";
-        qInfo() << "=============================================================================================";
-        qInfo() << " ";
-        qInfo() << m_sAppName;
-        qInfo() << "Version: " + m_sAppVer;
-        qInfo() << " ";
-    }
+
+    printIfVerbose(" ");
+    printIfVerbose("=============================================================================================");
+    printIfVerbose(" ");
+    printIfVerbose(m_sAppName);
+    printIfVerbose("Version: " + m_sAppVer);
+    printIfVerbose(" ");
 }
 
 //=============================================================================================================
 
 void SettingsControllerCL::printFooterIfVerbose()
 {
-    qInfo() << "MNE Anonymize finished correctly: " + m_fiInFileInfo.fileName() + " -> " + m_fiOutFileInfo.fileName();
-
-    if(m_bVerboseMode)
-    {
-        qInfo() << " ";
-        qInfo() << "=============================================================================================";
-        qInfo() << " ";
-    }    
+    printIfVerbose(" ");
+    printIfVerbose("=============================================================================================");
+    printIfVerbose(" ");
 }
 
 //=============================================================================================================

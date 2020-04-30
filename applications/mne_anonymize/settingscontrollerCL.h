@@ -190,6 +190,8 @@ private:
      */
     void printFooterIfVerbose();
 
+    void printIfVerbose(const QString& str) const;
+
     //=========================================================================================================
 
     FiffAnonymizer::SPtr m_pAnonymizer;     /**< Local pointer to a Fiffanonyzer object to configure and use.*/
@@ -213,6 +215,15 @@ private:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+
+inline void SettingsControllerCL::printIfVerbose(const QString& str) const
+{
+    if(m_bVerboseMode)
+    {
+        std::printf("\n%s", str.toUtf8().data());
+    }
+}
+
 
 } // namespace MNEANONYMIZE
 
