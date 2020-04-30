@@ -148,7 +148,8 @@ void SettingsControllerCL::initParser()
     m_parser.addOption(verboseOpt);
 
     QCommandLineOption silentOpt(QStringList() << "s" << "silent",
-                                  QCoreApplication::translate("main","Prints no output to the terminal, other than execution or configuration errors. Default: false"));
+                                  QCoreApplication::translate("main","Prints no output to the terminal, other than execution or configuration errors."
+                                                                     "Default: false"));
     m_parser.addOption(silentOpt);
 
     QCommandLineOption deleteInFileOpt(QStringList() << "d" << "delete_input_file_after",
