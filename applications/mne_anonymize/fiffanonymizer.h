@@ -43,6 +43,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <iostream>
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_tag.h>
 #include <fiff/fiff_types.h>
@@ -365,34 +366,6 @@ private:
 
     //=========================================================================================================
     /**
-     * Fiff standard defines a Tag Directory where a reference to all the tags in a file is stored. This directory
-     * itself a tag which is stored (usually) at the end of the file. The tag directory stores the memory address
-     * of every tag in the file (as an offset from the beging of the file). Thus, when altering the size of
-     * anonymized tags, it has to be reworked. The fiff standard does not mandate to have this directory but it
-     * seems convinient to build it. We do this on-the-fly, while reading each tag. And store all the info for the
-     * directory inside m_pOutDir vector.
-     */
-    void addEntryToDir();
-
-    //=========================================================================================================
-    /**
-     * After finishing reading all the tags in the input file, we can add the final entry to the tag directory. This
-     * is a set of four -1 integer values which will mark the end of the tag directory.
-     */
-    void addFinalEntryToDir();
-
-    //=========================================================================================================
-    /**
-     * This stores the vector containing the tag directory. This vector was populated on-line while going through
-     * the anonymizeFile method. Once the reading is finished the data needs to be saved in the output file.
-     *
-     * @param [out] stream  The output file stream
-     * @param [in] pos      Position in the file where the data can be written. Default is -1.
-     */
-    void writeDirectory();
-
-    //=========================================================================================================
-    /**
      * Helper function that prints messages to the command line only if the object has been set to a verbose mode.
      * This wraps QDebug functionality inline. Specified here in header file. If the obj is not set to be in a
      * verbose mode, it does nothing. Messages can be printed to a single line (followed by an eol character) or
@@ -464,8 +437,6 @@ private:
     QFile m_fFileOut;                   /**< Output file.*/
     bool m_bFileInSet;                  /**< Input file set.*/
     bool m_bFileOutSet;                 /**< Output file set.*/
-    qint64 m_iDirectoryPos;             /**< Position of the tag directory in the output file.*/
-    bool m_bFileInHasDirPtr;             /**< This file has a tag directory.*/
 
     QDateTime m_dDefaultDate;           /**< Date to be used as substitution of dates found in a fiff file */
     QDateTime m_dMeasurementDate;       /**< Date to substitute the measuremnt date appearing in the file.*/
@@ -485,7 +456,6 @@ private:
     FIFFLIB::fiff_int_t m_BDfltMAC[2];  /**< MAC addresss substitutor.*/
 
     QSharedPointer<QStack<int32_t> > m_pBlockTypeList;          /**< Pointer to Stack storing info related to the blocks of tags in the file.*/
-    QSharedPointer<QVector<FIFFLIB::FiffDirEntry> > m_pOutDir;  /**< Pointer to the Tag directory in the output file.*/
 };
 
 //=============================================================================================================
@@ -496,7 +466,7 @@ inline void FiffAnonymizer::printIfVerbose(const QString& str) const
 {
     if(m_bVerboseMode)
     {
-        qInfo() << str;
+        std::printf("%s", str.toUtf8().data());
     }
 }
 
