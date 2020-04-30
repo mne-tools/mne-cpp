@@ -478,11 +478,11 @@ void FiffAnonymizer::censorTag() const
     }
     case FIFF_MRI_PIXEL_DATA:
     {
-        qWarning() << " ";
-        qWarning() << "The input fif file contains MRI data.";
-        qWarning() << "Beware that a subject''s face can be reconstructed from it";
-        qWarning() << "This software can not anonymize MRI data, at the moment.";
-        qWarning() << " ";
+        printIfVerbose("  ");
+        printIfVerbose("Warning: The input fif file contains MRI data.");
+        printIfVerbose("Warning: Beware that a subject''s face can be reconstructed from it");
+        printIfVerbose("Warning: This software can not anonymize MRI data, at the moment.");
+        printIfVerbose("  ");
         break;
     }
     default:
@@ -547,7 +547,7 @@ void FiffAnonymizer::processHeaderTags()
     //free list
     readTag();
 
-    if(m_pInTag->kind == FIFF_FREE_LIST)
+    if( (m_pInTag->kind == FIFF_FREE_LIST) && (*m_pInTag->toInt() > 0) )
     {
         qWarning() << "This file contains a Free List of tags. It will not be copied to the output file.";
     } else {
