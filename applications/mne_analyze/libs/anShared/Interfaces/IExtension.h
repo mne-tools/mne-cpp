@@ -5,7 +5,7 @@
  *           Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
  *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
- * @version  1.0
+ * @version  dev
  * @date     February, 2017
  *
  * @section  LICENSE
