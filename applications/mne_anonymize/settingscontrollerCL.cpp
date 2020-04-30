@@ -47,6 +47,7 @@
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
+#include <QCommandLineOption>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -77,19 +78,24 @@ SettingsControllerCL::SettingsControllerCL(const QStringList& arguments)
 , m_bInputFileDeleted(false)
 , m_bOutFileRenamed(false)
 {
+    QObject::connect(this,&MNEANONYMIZE::SettingsControllerCL::finished,qApp,&QCoreApplication::exit,Qt::QueuedConnection);
+
     m_pAnonymizer = FiffAnonymizer::SPtr(new FiffAnonymizer);
     initParser();
     if(parseInputs(arguments))
     {
         qCritical() << "Something went wrong during the parsing of input options.";
-        return;
+        emit finished(1);
     }
 
     if(execute())
     {
         qCritical() << "Error during the anonymization of the input file";
-        return;
+        emit finished(1);
     }
+
+    emit finished(0);
+
 }
 
 //=============================================================================================================
@@ -131,30 +137,28 @@ void SettingsControllerCL::initParser()
     m_parser.addOption(versionOpt);
 
     QCommandLineOption inFileOpt(QStringList() << "i" << "in",
-                                 QCoreApplication::translate("main","File to anonymize. Multiple --in <infile> statements can be present (files will be "
-                                                                    "processed in parallel)."),
+                                 QCoreApplication::translate("main","File to anonymize. Multiple --in <infile> statements can be present (files will be processed in parallel)."),
                                  QCoreApplication::translate("main","infile"));
     m_parser.addOption(inFileOpt);
 
     QCommandLineOption outFileOpt(QStringList() << "o" << "out",
-                                  QCoreApplication::translate("main","Output file <outfile>. Only allowed when anonymizing one single file. As default "
-                                                                     "‘_anonymized.fif’ is attached to the file name."),
+                                  QCoreApplication::translate("main","Output file <outfile>. Only allowed when anonymizing one single file. As default ‘_anonymized.fif’ is "
+                                                              "attached to the file name."),
                                   QCoreApplication::translate("main","outfile"));
     m_parser.addOption(outFileOpt);
 
     QCommandLineOption verboseOpt(QStringList() << "v" << "verbose",
-                                  QCoreApplication::translate("main","Prints out more information, about each specific anonymized field. Only allowed "
-                                                                     "when anonymizing one single file. Default: false"));
+                                  QCoreApplication::translate("main","Prints out more information, about each specific anonymized field. Only allowed when anonymizing one single"
+                                                                     "file. Default: false"));
     m_parser.addOption(verboseOpt);
 
     QCommandLineOption silentOpt(QStringList() << "s" << "silent",
-                                  QCoreApplication::translate("main","Prints no output to the terminal, other than execution or configuration errors."
-                                                                     "Default: false"));
+                                  QCoreApplication::translate("main","Prints no output to the terminal, other than execution or configuration errors. Default: false"));
     m_parser.addOption(silentOpt);
 
     QCommandLineOption deleteInFileOpt(QStringList() << "d" << "delete_input_file_after",
-                                       QCoreApplication::translate("main","Delete input fiff file after anonymization. A confirmation message will be "
-                                                                          "prompted to the user. Default: false"));
+                                       QCoreApplication::translate("main","Delete input fiff file after anonymization. A confirmation message will be prompted to the user."
+                                                                          "Default: false"));
     m_parser.addOption(deleteInFileOpt);
 
     QCommandLineOption deleteInFileConfirmOpt(QStringList() << "ad" << "avoid_delete_confirmation",
@@ -162,36 +166,35 @@ void SettingsControllerCL::initParser()
     m_parser.addOption(deleteInFileConfirmOpt);
 
     QCommandLineOption bruteOpt("brute",
-                                QCoreApplication::translate("main","Anonymize additional subject’s information like weight, height, sex and handedness, "
-                                                            "and project’s ID, name, aim and comment. Default: false"));
+                                QCoreApplication::translate("main","Anonymize additional subject’s information like weight, height, sex and handedness, and project’s data,"
+                                                            " subject's data. See help above. Default: false"));
     m_parser.addOption(bruteOpt);
 
     QCommandLineOption measDateOpt(QStringList() << "md" << "measurement_date",
-                                   QCoreApplication::translate("main","Specify the measurement date. Only when anonymizing a single file. Format: YYYMMDD. "
-                                                                      "Default: 20000101"),
+                                   QCoreApplication::translate("main","Specify the measurement date. Only when anonymizing a single file. Format: YYYMMDD. Default: 20000101"),
                                    QCoreApplication::translate("main","days"));
     m_parser.addOption(measDateOpt);
 
     QCommandLineOption measDateOffsetOpt(QStringList() << "mdo" << "measurement_date_offset",
-                                         QCoreApplication::translate("main","Specify number of days to subtract to the measurement . Only allowed when "
-                                                                            "anonymizing a single file. Default: 0"),
+                                         QCoreApplication::translate("main","Specify number of days to subtract to the measurement . Only allowed when anonymizing a single"
+                                                                            "file. Default: 0"),
                                          QCoreApplication::translate("main","date"));
     m_parser.addOption(measDateOffsetOpt);
 
     QCommandLineOption birthdayOpt(QStringList() << "sb" << "subject_birthday",
-                                   QCoreApplication::translate("main","Specify the subject’s birthday . Only allowed when anonymizing a single file. "
-                                                                      "Format: YYYMMDD. Default: 20000101"),
+                                   QCoreApplication::translate("main","Specify the subject’s birthday . Only allowed when anonymizing a single file. Format: YYYMMDD. "
+                                                               "Default: 20000101"),
                                    QCoreApplication::translate("main","date"));
     m_parser.addOption(birthdayOpt);
 
     QCommandLineOption birthdayOffsetOpt(QStringList() << "sbo" << "subject_birthday_offset",
-                                         QCoreApplication::translate("main","Specify number of to subtract to the subject's birthday. Only allowed when "
-                                                                            "anonymizing a single file. Default: 0"),
+                                         QCoreApplication::translate("main","Specify number of to subtract to the subject's birthday. Only allowed when anonymizing a single"
+                                                                            "file. Default: 0"),
                                          QCoreApplication::translate("main","days"));
     m_parser.addOption(birthdayOffsetOpt);
 
-    QCommandLineOption SubjectIdOpt("his",QCoreApplication::translate("main","Specify the subject’s ID within the Hospital system. Only allowed when "
-                                                                             "anonymizing a single file. Default: ‘mne_anonymize’"),
+    QCommandLineOption SubjectIdOpt("his",QCoreApplication::translate("main","Specify the subject’s ID within the Hospital system. Only allowed when anonymizing a single"
+                                                                             "file. Default: ‘mne_anonymize’"),
                                           QCoreApplication::translate("main","id#"));
     m_parser.addOption(SubjectIdOpt);
 
@@ -203,7 +206,7 @@ int SettingsControllerCL::parseInputs(const QStringList& arguments)
 {
     m_parser.process(arguments);
 
-    if(!m_parser.isSet("gui"))
+    if(m_parser.isSet("gui"))
     {
         qCritical() << "Error while running the application. Something went wrong.";
         return 1;
@@ -381,7 +384,7 @@ int SettingsControllerCL::execute()
 
     if(!m_bSilentMode)
     {
-        printf("\n%s", QString("MNE Anonymize finished correctly: " + m_fiInFileInfo.fileName() + " -> " + m_fiOutFileInfo.fileName()).toUtf8().data());
+        std::printf("%s\n", QString("MNE Anonymize finished correctly: " + m_fiInFileInfo.fileName() + " -> " + m_fiOutFileInfo.fileName()).toUtf8().data());
     }
 
     printFooterIfVerbose();
