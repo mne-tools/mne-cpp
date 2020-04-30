@@ -241,14 +241,14 @@ void FiffAnonymizer::censorTag() const
     case FIFF_REF_BLOCK_ID:
     {
         FIFFLIB::FiffId inId = m_pInTag->toFiffID();
-        QDateTime inMeasDate = QDateTime::fromSecsSinceEpoch(inId.time.secs, Qt::UTC);
+        QDateTime inMeasDate = QDateTime::fromSecsSinceEpoch(inId.time.secs, Qt::LocalTime);
         QDateTime outMeasDate;
 
         if(m_bUseMeasurementDayOffset)
         {
             outMeasDate = inMeasDate.addDays(-m_iMeasurementDayOffset);
         } else {
-            outMeasDate = m_dDefaultDate;
+            outMeasDate = m_dMeasurementDate;
         }
 
         FIFFLIB::FiffId outId(inId);
@@ -273,14 +273,14 @@ void FiffAnonymizer::censorTag() const
     }
     case FIFF_MEAS_DATE:
     {
-        QDateTime inMeasDate(QDateTime::fromSecsSinceEpoch(*m_pInTag->toInt(), Qt::UTC));
+        QDateTime inMeasDate(QDateTime::fromSecsSinceEpoch(*m_pInTag->toInt(), Qt::LocalTime));
         QDateTime outMeasDate;
 
         if(m_bUseMeasurementDayOffset)
         {
             outMeasDate = inMeasDate.addDays(-m_iMeasurementDayOffset);
         } else {
-            outMeasDate = m_dDefaultDate;
+            outMeasDate = m_dMeasurementDate;
         }
 
         FIFFLIB::fiff_int_t outData[1];
@@ -690,7 +690,8 @@ void FiffAnonymizer::setMeasurementDay(const QDate& d)
 
 void FiffAnonymizer::setMeasurementDay(const QString& sMeasDay)
 {
-    m_dMeasurementDate = QDateTime(QDate::fromString(sMeasDay),QTime(1,1,0));
+
+    m_dMeasurementDate = QDateTime(QDate::fromString(sMeasDay,"ddMMyyyy"),QTime(1,1,0));
 }
 
 //=============================================================================================================
@@ -712,7 +713,7 @@ void FiffAnonymizer::setMeasurementDayOffset(const int iMeasDayOffset)
 
 void FiffAnonymizer::setSubjectBirthday(const QString& sSubjBirthday)
 {
-    m_dSubjectBirthday = QDateTime(QDate::fromString(sSubjBirthday),QTime(1, 1, 0));
+    m_dSubjectBirthday = QDateTime(QDate::fromString(sSubjBirthday,"ddMMyyyy"),QTime(1, 1, 0));
 }
 
 //=============================================================================================================

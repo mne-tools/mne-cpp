@@ -42,7 +42,6 @@
 
 #include "settingscontrollerCL.h"
 #include "fiffanonymizer.h"
-#include <iostream>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -86,16 +85,20 @@ SettingsControllerCL::SettingsControllerCL(const QStringList& arguments)
     {
         qCritical() << "Something went wrong during the parsing of input options.";
         emit finished(1);
+        return;
     }
+
+    printHeaderIfVerbose();
+    printIfVerbose(QString("Executing command: ") + arguments.join(" "));
 
     if(execute())
     {
         qCritical() << "Error during the anonymization of the input file";
         emit finished(1);
+        return;
     }
 
     emit finished(0);
-
 }
 
 //=============================================================================================================
@@ -104,11 +107,11 @@ void SettingsControllerCL::initParser()
 {
     m_parser.setApplicationDescription(QCoreApplication::translate("main",
            "\nApplication that removes or modifies Personal Health Information or Personal Identifiable information from a FIFF file."
-           "\n\nIf they exist, the following fields will be anonymized from the fif file:"
-           "\n - Measurement Date"
+           "\n\nIf they exist, the following fields will be anonymized in the output file:"
+           "\n - Measurement Date (can be altered by some number of days)"
            "\n - MAC address of the acquisition computer"
            "\n - Text description of the acquisition system"
-           "\n - Experimenter acquiring the data"
+           "\n - Experimenter"
            "\n - Subject Id"
            "\n - Subject First Name"
            "\n - Subject's Middle Name"
@@ -161,17 +164,17 @@ void SettingsControllerCL::initParser()
                                                                           "Default: false"));
     m_parser.addOption(deleteInFileOpt);
 
-    QCommandLineOption deleteInFileConfirmOpt(QStringList() << "ad" << "avoid_delete_confirmation",
+    QCommandLineOption deleteInFileConfirmOpt(QStringList() << "f" << "avoid_delete_confirmation",
                                               QCoreApplication::translate("main","Avoid confirming the deletion of the input fiff file. Default: false"));
     m_parser.addOption(deleteInFileConfirmOpt);
 
-    QCommandLineOption bruteOpt("brute",
+    QCommandLineOption bruteOpt(QStringList() << "b" << "brute",
                                 QCoreApplication::translate("main","Anonymize additional subject’s information like weight, height, sex and handedness, and project’s data,"
                                                             " subject's data. See help above. Default: false"));
     m_parser.addOption(bruteOpt);
 
     QCommandLineOption measDateOpt(QStringList() << "md" << "measurement_date",
-                                   QCoreApplication::translate("main","Specify the measurement date. Only when anonymizing a single file. Format: YYYMMDD. Default: 20000101"),
+                                   QCoreApplication::translate("main","Specify the measurement date. Only when anonymizing a single file. Format: DDMMYYYY. Default: 01012000"),
                                    QCoreApplication::translate("main","days"));
     m_parser.addOption(measDateOpt);
 
@@ -182,8 +185,8 @@ void SettingsControllerCL::initParser()
     m_parser.addOption(measDateOffsetOpt);
 
     QCommandLineOption birthdayOpt(QStringList() << "sb" << "subject_birthday",
-                                   QCoreApplication::translate("main","Specify the subject’s birthday . Only allowed when anonymizing a single file. Format: YYYMMDD. "
-                                                               "Default: 20000101"),
+                                   QCoreApplication::translate("main","Specify the subject’s birthday . Only allowed when anonymizing a single file. Format: DDMMYYYY. "
+                                                               "Default: 01012000"),
                                    QCoreApplication::translate("main","date"));
     m_parser.addOption(birthdayOpt);
 
@@ -365,7 +368,6 @@ int SettingsControllerCL::parseInOutFiles()
 
 int SettingsControllerCL::execute()
 {
-    printHeaderIfVerbose();
     if(m_pAnonymizer->anonymizeFile())
     {
         qCritical() << "Error. Program ends now.";
@@ -384,7 +386,7 @@ int SettingsControllerCL::execute()
 
     if(!m_bSilentMode)
     {
-        std::printf("%s\n", QString("MNE Anonymize finished correctly: " + m_fiInFileInfo.fileName() + " -> " + m_fiOutFileInfo.fileName()).toUtf8().data());
+        std::printf("\n%s\n", QString("MNE Anonymize finished correctly: " + m_fiInFileInfo.fileName() + " -> " + m_fiOutFileInfo.fileName()).toUtf8().data());
     }
 
     printFooterIfVerbose();
@@ -400,15 +402,15 @@ bool SettingsControllerCL::checkDeleteInputFile()
     {
         if(!m_bSilentMode)
         {
-            printf("%s", QString("You have requested to delete the input file: " + m_fiInFileInfo.fileName()).toUtf8().data());
+            std::printf("\n%s", QString("You have requested to delete the input file: " + m_fiInFileInfo.fileName()).toUtf8().data());
         }
 
         if(m_bDeleteInputFileConfirmation) //true by default
         {
             QTextStream consoleIn(stdin);
             QString confirmation;
-            printf("\n%s",QString("You can avoid this confirmation by using the delete_confirmation option.").toUtf8().data());
-            printf("\n%s",QString("Are you sure you want to delete the input file? [Y/n] ").toUtf8().data());
+            std::printf("\n%s",QString("You can avoid this confirmation by using the delete_confirmation option.").toUtf8().data());
+            std::printf("\n%s",QString("Are you sure you want to delete the input file? [Y/n] ").toUtf8().data());
             consoleIn >> confirmation;
 
             if(confirmation == "Y")
@@ -458,9 +460,9 @@ bool SettingsControllerCL::checkRenameOutputFile()
             } else {
                 if(!m_bSilentMode)
                 {
-                    printf("\n%s", QString("You have requested to save the output file with the same name as the input file.").toUtf8().data());
-                    printf("\n%s", QString("This cannot be done without deleting or modifying the input file.").toUtf8().data());
-                    printf("\n%s", QString(" ").toUtf8().data());
+                    std::printf("\n%s", QString("You have requested to save the output file with the same name as the input file.").toUtf8().data());
+                    std::printf("\n%s", QString("This cannot be done without deleting or modifying the input file.").toUtf8().data());
+                    std::printf("\n%s", QString(" ").toUtf8().data());
                 }
             }
         }
@@ -478,7 +480,7 @@ void SettingsControllerCL::renameOutputFileAsInputFile()
     m_bOutFileRenamed = true;
     if(m_bVerboseMode)
     {
-        printf("\n%s",QString("Output file named: " + m_fiOutFileInfo.fileName() + " --> renamed as: " + m_fiInFileInfo.fileName()).toUtf8().data());
+        std::printf("\n%s",QString("Output file named: " + m_fiOutFileInfo.fileName() + " --> renamed as: " + m_fiInFileInfo.fileName()).toUtf8().data());
     }
     m_fiOutFileInfo.setFile(m_fiInFileInfo.fileName());
 }
@@ -500,7 +502,7 @@ void SettingsControllerCL::printHeaderIfVerbose()
 
 void SettingsControllerCL::printFooterIfVerbose()
 {
-    printIfVerbose(" ");
+//    printIfVerbose(" ");
     printIfVerbose("=============================================================================================");
     printIfVerbose(" ");
 }
