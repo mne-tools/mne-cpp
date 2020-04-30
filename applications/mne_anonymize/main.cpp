@@ -108,11 +108,8 @@ int main(int argc, char* argv[])
 
     QScopedPointer<QCoreApplication> qtApp(createApplication(argc, argv));
 
-    QString nameStr("MNE Anonymize");
-    QString versionStr("dev");
-
-    qtApp->setApplicationName(nameStr);
-    qtApp->setApplicationVersion(versionStr);
+    qtApp->setApplicationName("MNE Anonymize");
+    qtApp->setApplicationVersion("dev");
 
     if (qobject_cast<QApplication *>(qtApp.data())) {
         // to do -> develop GUI version...
