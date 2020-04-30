@@ -85,7 +85,7 @@ QCoreApplication* createApplication(int &argc, char *argv[])
 {
     for (int i = 1; i < argc; ++i)
     {
-        if (qstrcmp(argv[i], "--gui"))
+        if (!qstrcmp(argv[i], "--gui"))
         {
             return new QApplication(argc, argv);
         }
