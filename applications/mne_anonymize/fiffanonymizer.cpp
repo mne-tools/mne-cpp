@@ -229,7 +229,7 @@ int FiffAnonymizer::anonymizeFile()
     {
         addFinalEntryToDir();
         writeDirectory();
-        updatePointer(FIFF_DIR_POINTER,m_iDirectoryPos);
+        updateTagDirPointer(m_iDirectoryPos);
     }
 
     closeInOutStreams();
@@ -673,40 +673,28 @@ void FiffAnonymizer::writeDirectory()
 
 //=============================================================================================================
 
-int FiffAnonymizer::updatePointer(int tagKind, long int newPos)
+int FiffAnonymizer::updateTagDirPointer(long int newPos)
 {
     qint64 actualPos(m_pOutStream->device()->pos());
+    //this number is always the same. first tag (id tag) is 36 bytes long.
+    qint64 tagDirPtrPos(36);
 
-    for(int i=0; i < m_pOutDir->size(); ++i)
+    m_pOutStream->read_tag(m_pOutTag,tagDirPtrPos);
+
+    if(m_pOutTag->kind != FIFF_DIR_POINTER)
     {
-        if(m_pOutDir->at(i).kind == tagKind)
-        {
-            m_pOutStream->device()->seek(m_pOutDir->at(i).pos);
-            m_pInStream->read_tag(m_pInTag,-1);
-
-            m_pOutTag->clear();
-            m_pOutTag->kind = m_pInTag->kind;
-            m_pOutTag->type = m_pInTag->type;
-            m_pOutTag->next = m_pInTag->next;
-
-            if(m_pInTag->kind != tagKind)
-            {
-                qCritical() << "Something went wrong while updating a pointier information";
-                return 1;
-            }
-            memcpy(m_pOutTag->data(),&newPos, sizeof(qint32));
-
-            FIFFLIB::FiffTag::convert_tag_data(m_pOutTag,FIFFV_NATIVE_ENDIAN,FIFFV_BIG_ENDIAN);
-            m_pOutStream->write_tag(m_pOutTag, -1);
-
-            //return to original position
-            m_pOutStream->device()->seek(actualPos);
-
-            return 0;
-        }
-
+        qCritical() << "Something went wrong while updating a pointier information";
+        return 1;
     }
-    return 1;
+
+    memcpy(m_pOutTag->data(),&newPos, sizeof(qint32));
+
+    FIFFLIB::FiffTag::convert_tag_data(m_pOutTag,FIFFV_NATIVE_ENDIAN,FIFFV_BIG_ENDIAN);
+    m_pOutStream->write_tag(m_pOutTag, -1);
+
+    //return to original position
+    m_pOutStream->device()->seek(actualPos);
+    return 0;
 }
 
 //=============================================================================================================
