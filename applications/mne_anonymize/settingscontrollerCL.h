@@ -50,7 +50,7 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
-#include <QtConcurrent>
+#include <QCommandLineParser>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -79,9 +79,9 @@ namespace MNEANONYMIZE
  * @details Handles command line input parameters, parses them and sets up anynymizer member objects, properly,
  *          depending on the different options.
  */
-class SettingsControllerCL
+class SettingsControllerCL : public QObject
 {
-
+    Q_OBJECT
 public:
     typedef QSharedPointer<SettingsControllerCL> SPtr;            /**< Shared pointer type for SettingsControllerCL. */
     typedef QSharedPointer<const SettingsControllerCL> ConstSPtr; /**< Const shared pointer type for SettingsControllerCL. */
@@ -185,15 +185,26 @@ private:
 
     //=========================================================================================================
     /**
-     * Prints a header message if the Verbose option has been set, a header will be printed during execution, right before the
+     * Prints a footer line or message if the Verbose option has been set, a header will be printed during execution, right before the
      * file anonymizationFile signal is sent.
      */
     void printFooterIfVerbose();
 
+    //=========================================================================================================
+    /**
+     * Prints a message if the Verbose option has been set.
+     */
     void printIfVerbose(const QString& str) const;
 
+signals:
     //=========================================================================================================
+    /**
+     * Signal the main qt core application to stop running and exit.
+     */
+    void finished(const int) const;
 
+    //=========================================================================================================
+private:
     FiffAnonymizer::SPtr m_pAnonymizer;     /**< Local pointer to a Fiffanonyzer object to configure and use.*/
     QString m_sAppName;                     /**< Application name.*/
     QString m_sAppVer;                      /**< Application version number.*/
