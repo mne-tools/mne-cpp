@@ -86,8 +86,6 @@ FiffAnonymizer::FiffAnonymizer()
 , m_sProjectComment(m_sDefaultString)
 , m_bFileInSet(false)
 , m_bFileOutSet(false)
-, m_iDirectoryPos(-1)
-, m_bFileInHasDirPtr(true)
 , m_dDefaultDate(QDateTime(QDate(2000,1,1), QTime(1, 1, 0), Qt::UTC))
 , m_dMeasurementDate(m_dDefaultDate)
 , m_dSubjectBirthday(m_dDefaultDate)
@@ -107,7 +105,6 @@ FiffAnonymizer::FiffAnonymizer()
 
     m_pBlockTypeList = QSharedPointer<QStack<int32_t> >(new QStack<int32_t>);
     m_pBlockTypeList->clear();
-    m_pOutDir = QSharedPointer<QVector<FIFFLIB::FiffDirEntry> >(new QVector<FIFFLIB::FiffDirEntry>);
 }
 
 //=============================================================================================================
@@ -133,8 +130,6 @@ FiffAnonymizer::FiffAnonymizer(const FiffAnonymizer& obj)
 , m_sProjectComment(obj.m_sProjectComment)
 , m_bFileInSet(obj.m_bFileInSet)
 , m_bFileOutSet(obj.m_bFileOutSet)
-, m_iDirectoryPos(-1)
-, m_bFileInHasDirPtr(obj.m_bFileInHasDirPtr)
 , m_dDefaultDate(QDateTime(QDate(2000,1,1), QTime(1, 1, 0), Qt::UTC))
 , m_dMeasurementDate(obj.m_dMeasurementDate)
 , m_dSubjectBirthday(obj.m_dSubjectBirthday)
@@ -148,7 +143,6 @@ FiffAnonymizer::FiffAnonymizer(const FiffAnonymizer& obj)
     m_BDfltMAC[1] = obj.m_BDfltMAC[1];
 
     m_pBlockTypeList = QSharedPointer<QStack<int32_t> >(new QStack<int32_t>(*obj.m_pBlockTypeList));
-    m_pOutDir = QSharedPointer<QVector<FIFFLIB::FiffDirEntry> >(new QVector<FIFFLIB::FiffDirEntry>(*obj.m_pOutDir));
 
     m_pOutTag->kind = m_pInTag->kind;
     m_pOutTag->type = m_pInTag->type;
@@ -180,8 +174,6 @@ FiffAnonymizer::FiffAnonymizer(FiffAnonymizer &&obj)
 , m_sProjectComment(obj.m_sProjectComment)
 , m_bFileInSet(obj.m_bFileInSet)
 , m_bFileOutSet(obj.m_bFileOutSet)
-, m_iDirectoryPos(-1)
-, m_bFileInHasDirPtr(obj.m_bFileInHasDirPtr)
 , m_dDefaultDate(QDateTime(QDate(2000,1,1), QTime(1, 1, 0), Qt::UTC))
 , m_dMeasurementDate(obj.m_dMeasurementDate)
 , m_dSubjectBirthday(obj.m_dSubjectBirthday)
@@ -195,7 +187,6 @@ FiffAnonymizer::FiffAnonymizer(FiffAnonymizer &&obj)
     m_BDfltMAC[1] = obj.m_BDfltMAC[1];
 
     m_pBlockTypeList.swap(obj.m_pBlockTypeList);
-    m_pOutDir.swap(obj.m_pOutDir);
 
     m_pOutTag->kind = m_pInTag->kind;
     m_pOutTag->type = m_pInTag->type;
@@ -223,13 +214,6 @@ int FiffAnonymizer::anonymizeFile()
         readTag();
         censorTag();
         writeTag();
-    }
-
-    if (m_bFileInHasDirPtr)
-    {
-        addFinalEntryToDir();
-        writeDirectory();
-        updateTagDirPointer(m_iDirectoryPos);
     }
 
     closeInOutStreams();
@@ -527,11 +511,6 @@ void FiffAnonymizer::writeTag()
         m_pOutTag->next = FIFFV_NEXT_SEQ;
     }
 
-    if(m_bFileInHasDirPtr)
-    {
-        addEntryToDir();
-    }
-
     FIFFLIB::FiffTag::convert_tag_data(m_pOutTag,FIFFV_NATIVE_ENDIAN,FIFFV_BIG_ENDIAN);
     m_pOutStream->write_tag(m_pOutTag, -1);
 }
@@ -559,10 +538,8 @@ void FiffAnonymizer::processHeaderTags()
     {
         qCritical() << "This file may not be compatible with this application. Second tag is not a valid Tag directory pointer tag.";
     }
-    if(*m_pInTag->toInt() <= 0)
-    {
-        m_bFileInHasDirPtr = false;
-    }
+    int newTagDirLoc(-1);
+    memcpy(m_pInTag->data(),&newTagDirLoc,sizeof(int));
 
     censorTag();
     writeTag();
@@ -612,89 +589,6 @@ bool FiffAnonymizer::checkValidFiffFormatVersion() const
         return true;
     }
     return false;
-}
-
-//=============================================================================================================
-
-void FiffAnonymizer::addEntryToDir()
-{
-    FIFFLIB::FiffDirEntry t_dirEntry;
-    t_dirEntry.kind = m_pOutTag->kind;
-    t_dirEntry.type = m_pOutTag->type;
-    t_dirEntry.size = m_pOutTag->size();
-    t_dirEntry.pos  = static_cast<FIFFLIB::fiff_int_t>(m_pOutStream->device()->pos());
-    m_pOutDir->append(t_dirEntry);
-}
-
-//=============================================================================================================
-
-void FiffAnonymizer::addFinalEntryToDir()
-{
-    FIFFLIB::FiffDirEntry t_dirEntry;
-    t_dirEntry.kind = -1;
-    t_dirEntry.type = -1;
-    t_dirEntry.size = -1;
-    t_dirEntry.pos  = -1;
-    m_pOutDir->append(t_dirEntry);
-}
-
-//=============================================================================================================
-
-void FiffAnonymizer::writeDirectory()
-{
-    m_iDirectoryPos = m_pOutStream->device()->pos();
-    m_pOutTag->clear();
-    m_pOutTag->kind = static_cast<qint32>(FIFF_DIR);
-    m_pOutTag->type = static_cast<qint32>(FIFFT_DIR_ENTRY_STRUCT);
-    m_pOutTag->next = static_cast<qint32>(-1);
-
-    int dirSize = m_pOutDir->size() * static_cast<int>(sizeof(FIFFLIB::FiffDirEntry));
-    m_pOutTag->resize(dirSize);
-
-    memcpy(m_pOutTag->data(),m_pOutDir->data(),static_cast<size_t>(dirSize));
-
-    FIFFLIB::FiffTag::convert_tag_data(m_pOutTag,FIFFV_NATIVE_ENDIAN,FIFFV_BIG_ENDIAN);
-    m_pOutStream->write_tag(m_pOutTag, -1);
-
-    //    *m_pOutStream << static_cast<qint32>(FIFF_DIR);
-//    *m_pOutStream << static_cast<qint32>(FIFFT_DIR_ENTRY_STRUCT);
-//    *m_pOutStream << static_cast<qint32>
-//                     (static_cast<unsigned long long>(m_pOutDir->size())*sizeof(FIFFLIB::FiffDirEntry));
-//    *m_pOutStream << static_cast<qint32>(-1);
-
-//    for(int i=0;i<m_pOutDir->size();++i)
-//    {
-//        *m_pOutStream << static_cast<qint32>(m_pOutDir->at(i).kind);
-//        *m_pOutStream << static_cast<qint32>(m_pOutDir->at(i).type);
-//        *m_pOutStream << static_cast<qint32>(m_pOutDir->at(i).size);
-//        *m_pOutStream << static_cast<qint32>(m_pOutDir->at(i).pos);
-//    }
-}
-
-//=============================================================================================================
-
-int FiffAnonymizer::updateTagDirPointer(long int newPos)
-{
-    qint64 actualPos(m_pOutStream->device()->pos());
-    //this number is always the same. first tag (id tag) is 36 bytes long.
-    qint64 tagDirPtrPos(36);
-
-    m_pOutStream->read_tag(m_pOutTag,tagDirPtrPos);
-
-    if(m_pOutTag->kind != FIFF_DIR_POINTER)
-    {
-        qCritical() << "Something went wrong while updating a pointier information";
-        return 1;
-    }
-
-    memcpy(m_pOutTag->data(),&newPos, sizeof(qint32));
-
-    FIFFLIB::FiffTag::convert_tag_data(m_pOutTag,FIFFV_NATIVE_ENDIAN,FIFFV_BIG_ENDIAN);
-    m_pOutStream->write_tag(m_pOutTag, -1);
-
-    //return to original position
-    m_pOutStream->device()->seek(actualPos);
-    return 0;
 }
 
 //=============================================================================================================

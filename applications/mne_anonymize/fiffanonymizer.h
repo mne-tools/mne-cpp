@@ -393,22 +393,6 @@ private:
 
     //=========================================================================================================
     /**
-     * This function allows to go through a the directory vector (m_pOutDir) and locate the position of any tag
-     * containing a pointer. Since the position of the pointer will have probably been updated, we can no go back
-     * and mend it.
-     * Fiff file format defines a set of pointers to addresses in the fiff file. These are defined as integer
-     * offset bytes since the begining of the file. As off fiff version 1.3 these pointers can be i. pointer to
-     * the tag directory, ii. pointer to free space in the file (free block list). iii. nil pointer at the end of
-     * the file (this one really contains no address info).
-     *
-     * @param [out] stream  Output stream
-     * @param [in] tagKind  Tag kind code to search for
-     * @param [in] newPos   New position to store in the data field of the pointer tag.
-     */
-    int updateTagDirPointer(long int newPos);
-
-    //=========================================================================================================
-    /**
      * Helper function that prints messages to the command line only if the object has been set to a verbose mode.
      * This wraps QDebug functionality inline. Specified here in header file. If the obj is not set to be in a
      * verbose mode, it does nothing. Messages can be printed to a single line (followed by an eol character) or
