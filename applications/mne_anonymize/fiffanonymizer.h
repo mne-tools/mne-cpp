@@ -466,7 +466,7 @@ inline void FiffAnonymizer::printIfVerbose(const QString& str) const
 {
     if(m_bVerboseMode)
     {
-        std::printf("%s", str.toUtf8().data());
+        std::printf("\n%s", str.toUtf8().data());
     }
 }
 
