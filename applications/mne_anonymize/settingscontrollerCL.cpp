@@ -106,8 +106,15 @@ SettingsControllerCL::SettingsControllerCL(const QStringList& arguments)
 void SettingsControllerCL::initParser()
 {
     m_parser.setApplicationDescription(QCoreApplication::translate("main",
-           "\nApplication that removes or modifies Personal Health Information or Personal Identifiable information from a FIFF file."
-           "\n\nIf they exist, the following fields will be anonymized in the output file:"
+           "\nMNE-CPP Project. UT-Health (McGovern Medical School) Houston, Tx."
+           "\nMNE_ANONYMIZE"
+           "\nMain authors: Juan Garcia-Prieto <juangpc@gmail.com>"
+           "\n              Wayne Mead <wayne.mead@uth.tmc.edu>"
+           "\n              Lorenz Esch <lesch@mgh.harvard.edu>"
+           "\n"
+           "\nMNE_ANONYMIZE removes or modifies Personal Health Information and Personal Identifiable information from a FIFF file."
+           "\n\nIf the information exists in the input file, the following fields will be anonymized in the output file:"
+           "\n"
            "\n - Measurement Date (can be altered by some number of days)"
            "\n - MAC address of the acquisition computer"
            "\n - Text description of the acquisition system"
