@@ -6,4 +6,6 @@ nav_order: 1
 ---
 # MNE Scan GUI
 
-Below are some guides to get you started with MNE Scan. 
+![](../../images/sourceloc.gif)
+
+Below are some guides to get you started with MNE Scan.
