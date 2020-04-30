@@ -1,4 +1,4 @@
-name: WamTest
+name: WasmTest
 
 on:
   push:

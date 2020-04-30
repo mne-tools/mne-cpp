@@ -3,7 +3,7 @@
 </p>
 <p align="center">
 <a href="https://github.com/mne-tools/mne-cpp/actions" target="_blank">
-    <img src="https://github.com/mne-tools/mne-cpp/workflows/Linux%7CWin%7CMacOS/badge.svg" alt="Github Actions">
+    <img src="https://github.com/mne-tools/mne-cpp/workflows/Linux%7CMacOS%7CWin%7CWASM/badge.svg" alt="Github Actions">
 </a>
 <a href="https://codecov.io/gh/mne-tools/mne-cpp" target="_blank">
     <img src="https://codecov.io/gh/mne-tools/mne-cpp/branch/master/graph/badge.svg" alt="CodeCov">

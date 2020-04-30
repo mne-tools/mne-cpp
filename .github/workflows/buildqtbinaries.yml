@@ -1,10 +1,10 @@
-name: GenerateBinaries
+name: BuildQtBinaries
 
 on:
   push:
     branches:
     # Change this to the branch name which you are developing on to trigger the workflow
-    - staticqt
+    - generateqt
 
 jobs:
   GenerateLinuxStaticBinaries:
