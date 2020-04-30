@@ -17,7 +17,7 @@ MNE-CPP is an open-source project and is made better by contributions from our u
    * Select the appropriate base and compare branch . The base branch is the branch of the repository you want to merge your changes to (by default the base branch is a branch of the repository you forked from). The compare branch is the branch where you implemented the new feature(s), bugfix(es), etc.
    * Name the pull reqest, describe your changes and hit Create pull request button.
    * For a more detailed overview of how to make a pull request, we recommend checking out the [guide on the official GitHub website](https://git-scm.com/book/en/v2/GitHub-Contributing-to-a-Project){:target="_blank" rel="noopener"}.
-6. After you created the pull request, wait for the [CI pipeline](../development/ci.md) runs and subsequent review process to be finished:
+6. After you created the pull request, wait for the [Continuous Integration](../development/ci.md) checks and subsequent review process to finish:
    * MNE-CPP developers will review your code.
    * Please change your code on your local machine based on the comments made by the reviewers. Note: There is no need to create a new pull request for every new change you make to your code. Just commit the changes and push your code to your remote (forked Git Hub) repository. The changes will automatically be added to your already created pull request.
    * As soon as your code suits all of the MNE-CPP coding conventions and possible inconsistencies were dealt with, your code will be merged into the main MNE-CPP repository.
