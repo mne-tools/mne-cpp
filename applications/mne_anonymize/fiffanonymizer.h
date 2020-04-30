@@ -405,7 +405,7 @@ private:
      * @param [in] tagKind  Tag kind code to search for
      * @param [in] newPos   New position to store in the data field of the pointer tag.
      */
-    int updatePointer(int tagKind, long int newPos);
+    int updateTagDirPointer(long int newPos);
 
     //=========================================================================================================
     /**
