@@ -10,7 +10,7 @@
  *           Petros Simidyan <petros.simidyan@tu-ilmenau.de>;
  *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>;
  *           Sugandha Sachdeva <sugandha.sachdeva@tu-ilmenau.de>
- * @version  dev
+ * @since    0.1.0
  * @date     June, 2017
  *
  * @section  LICENSE

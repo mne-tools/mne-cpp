@@ -3,7 +3,7 @@
  * @file     test_dipole_fit.cpp
  * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
  *           Gabriel B Motta <gabrielbenmotta@gmail.com>
- * @version  dev
+ * @since    0.1.0
  * @date     December, 2016
  *
  * @section  LICENSE

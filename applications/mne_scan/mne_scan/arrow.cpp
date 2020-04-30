@@ -2,7 +2,7 @@
 /**
  * @file     arrow.cpp
  * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @version  dev
+ * @since    0.1.0
  * @date     August, 2013
  *
  * @section  LICENSE

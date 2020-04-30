@@ -3,7 +3,7 @@
 # @file     test_dipole_fit.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Lorenz Esch <lesch@mgh.harvard.edu>
-# @version  dev
+# @since    0.1.0
 # @date     December, 2016
 #
 # @section  LICENSE

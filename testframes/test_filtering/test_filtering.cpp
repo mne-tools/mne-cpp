@@ -2,7 +2,7 @@
 /**
  * @file     test_filtering.cpp
  * @author   Ruben Doerfel <Ruben.Doerfel@tu-ilmenau.de>
- * @version  dev
+ * @since    0.1.0
  * @date     12, 2019
  *
  * @section  LICENSE

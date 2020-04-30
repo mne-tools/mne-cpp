@@ -5,7 +5,7 @@
 #           Lorenz Esch <lesch@mgh.harvard.edu>;
 #           Viktor Klueber <Viktor.Klueber@tu-ilmenau.de>;
 #           Johannes Vorwerk <johannes.vorwerk@umit.at>
-# @version  dev
+# @since    0.1.0
 # @date     February, 2020
 #
 # @section  LICENSE

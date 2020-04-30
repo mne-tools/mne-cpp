@@ -3,7 +3,7 @@
  * @file     rtfilter.cpp
  * @author   Ruben Doerfel <Ruben.Doerfel@tu-ilmenau.de>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  dev
+ * @since    0.1.0
  * @date     April, 2016
  *
  * @section  LICENSE

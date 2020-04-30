@@ -3,7 +3,7 @@
  * @file     scmeas_global.h
  * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  dev
+ * @since    0.1.0
  * @date     February, 2013
  *
  * @section  LICENSE

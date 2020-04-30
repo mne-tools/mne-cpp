@@ -7,7 +7,7 @@
  *           Juan Garcia-Prieto <juangpc@gmail.com>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
- * @version  dev
+ * @since    0.1.0
  * @date     July, 2016
  *
  * @section  LICENSE

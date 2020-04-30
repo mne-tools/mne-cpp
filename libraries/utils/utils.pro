@@ -5,7 +5,7 @@
 #           Daniel Strohmeier <Daniel.Strohmeier@tu-ilmenau.de>;
 #           Lorenz Esch <lesch@mgh.harvard.edu>;
 #           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
-# @version  dev
+# @since    0.1.0
 # @date     July, 2012
 #
 # @section  LICENSE

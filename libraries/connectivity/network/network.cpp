@@ -3,7 +3,7 @@
  * @file     network.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Faris Yahya <mfarisyahya@gmail.com>
- * @version  dev
+ * @since    0.1.0
  * @date     July, 2016
  *
  * @section  LICENSE

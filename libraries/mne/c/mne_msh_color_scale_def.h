@@ -3,7 +3,7 @@
  * @file     mne_msh_color_scale_def.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
- * @version  dev
+ * @since    0.1.0
  * @date     April, 2017
  *
  * @section  LICENSE

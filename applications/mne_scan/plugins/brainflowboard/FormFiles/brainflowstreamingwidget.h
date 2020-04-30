@@ -2,7 +2,7 @@
 /**
  * @file     brainflowstreamingwidget.h
  * @author   Andrey Parfenov <a1994ndrey@gmail.com>
- * @version  dev
+ * @since    0.1.0
  * @date     February, 2020
  *
  * @section  LICENSE

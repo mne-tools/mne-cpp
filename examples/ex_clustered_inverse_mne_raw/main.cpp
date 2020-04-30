@@ -5,7 +5,7 @@
  *           Gabriel B Motta <gabrielbenmotta@gmail.com>;
  *           Juan Garcia-Prieto <juangpc@gmail.com>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  dev
+ * @since    0.1.0
  * @date     July, 2013
  *
  * @section  LICENSE

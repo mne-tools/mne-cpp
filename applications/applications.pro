@@ -9,7 +9,7 @@
 #           Louis Eichhorst <Louis.Eichhorst@tu-ilmenau.de>;
 #           Seok Lew <Seok.Lew@childrens.harvard.edu>;
 #           Tim Kunze <Tim.Kunze@tu-ilmenau.de>
-# @version  dev
+# @since    0.1.0
 # @date     May, 2013
 #
 # @section  LICENSE

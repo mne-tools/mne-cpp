@@ -3,7 +3,7 @@
  * @file     debiasedsquaredweightedphaselagindex.h
  * @author   Daniel Strohmeier <Daniel.Strohmeier@tu-ilmenau.de>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  dev
+ * @since    0.1.0
  * @date     April, 2018
  *
  * @section  LICENSE

@@ -3,7 +3,7 @@
  * @file     main.cpp
  * @author   Daniel Strohmeier <Daniel.Strohmeier@tu-ilmenau.de>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  dev
+ * @since    0.1.0
  * @date     March, 2018
  *
  * @section  LICENSE

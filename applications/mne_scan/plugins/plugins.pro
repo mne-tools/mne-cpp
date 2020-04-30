@@ -6,7 +6,7 @@
 #           Louis Eichhorst <Louis.Eichhorst@tu-ilmenau.de>;
 #           Simon Heinke <Simon.Heinke@tu-ilmenau.de>;
 #           Viktor Klueber <Viktor.Klueber@tu-ilmenau.de>
-# @version  dev
+# @since    0.1.0
 # @date     February, 2013
 #
 # @section  LICENSE

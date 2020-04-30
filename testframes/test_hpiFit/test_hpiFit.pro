@@ -2,7 +2,7 @@
 #
 # @file     test_hpiFit.pro
 # @author   Ruben Dörfel <ruben.doerfel@tu-ilmenau.de>;
-# @version  dev
+# @since    0.1.0
 # @date     February, 2020
 #
 # @section  LICENSE

@@ -3,7 +3,7 @@
  * @file     gusbampsetupprojectwidget.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Viktor Klueber <Viktor.Klueber@tu-ilmenau.de>
- * @version  dev
+ * @since    0.1.0
  * @date     March 2016
  *
  * @section  LICENSE

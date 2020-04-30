@@ -2,7 +2,7 @@
 /**
  * @file     ftbuffersetupwidget.cpp
  * @author   Gabriel B Motta <gbmotta@mgh.harvard.edu>
- * @version  dev
+ * @since    0.1.0
  * @date     January, 2020
  *
  * @section  LICENSE

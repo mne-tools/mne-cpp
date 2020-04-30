@@ -3,7 +3,7 @@
 # @file     test_mne_forward_solution.pro
 # @author   Lorenz Esch <lesch@mgh.harvard.edu>;
 #           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
-# @version  dev
+# @since    0.1.0
 # @date     December, 2016
 #
 # @section  LICENSE

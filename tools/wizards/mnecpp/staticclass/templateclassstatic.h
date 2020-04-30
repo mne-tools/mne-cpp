@@ -2,7 +2,7 @@
 /**
  * @file     %{HdrFileName}
  * @author   %{author} <%{eMail}>
- * @version  dev
+ * @since    0.1.0
  * @date     %{Month}, %{Year}
  *
  * @section  LICENSE
