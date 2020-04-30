@@ -122,7 +122,8 @@ void SettingsControllerCL::initParser()
            "\n - *** Additionally if there is MRI data present in the file a warning message will appear.\n"));
     m_parser.addHelpOption();
 
-    QCommandLineOption noGUIOpt("no-gui",QCoreApplication::translate("main","Command Line version of the application."));
+    //just for completeness.
+    QCommandLineOption noGUIOpt("gui",QCoreApplication::translate("main","GUI version of the application."));
     m_parser.addOption(noGUIOpt);
 
     QCommandLineOption versionOpt("version",QCoreApplication::translate("main","Prints out the version of this application."));
@@ -433,7 +434,6 @@ bool SettingsControllerCL::checkRenameOutputFile()
                 deleteInputFile();
                 return true;
             } else {
-                printf("\n%s", QString(" ").toUtf8().data());
                 printf("\n%s", QString("You have requested to save the output file with the same name as the input file.").toUtf8().data());
                 printf("\n%s", QString("This cannot be done without deleting or modifying the input file.").toUtf8().data());
                 printf("\n%s", QString(" ").toUtf8().data());
