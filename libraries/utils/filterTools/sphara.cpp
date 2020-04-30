@@ -3,7 +3,7 @@
  * @file     sphara.cpp
  * @author   Robert Dicamillo <rd521@nmr.mgh.harvard.edu>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  dev
+ * @since    0.1.0
  * @date     February, 2016
  *
  * @section  LICENSE

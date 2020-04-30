@@ -2,7 +2,7 @@
 /**
  * @file     artifactsettingsview.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  dev
+ * @since    0.1.0
  * @date     January, 2018
  *
  * @section  LICENSE

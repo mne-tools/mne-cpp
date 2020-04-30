@@ -3,7 +3,7 @@
  * @file     view3D.h
  * @author   Lars Debor <Lars.Debor@tu-ilmenau.de>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  dev
+ * @since    0.1.0
  * @date     November, 2015
  *
  * @section  LICENSE

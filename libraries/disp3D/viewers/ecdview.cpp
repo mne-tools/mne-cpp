@@ -2,7 +2,7 @@
 /**
  * @file     ecdview.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  dev
+ * @since    0.1.0
  * @date     March, 2017
  *
  * @section  LICENSE

@@ -5,7 +5,7 @@
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @version  dev
+ * @since    0.1.0
  * @date     February, 2013
  *
  * @section  LICENSE

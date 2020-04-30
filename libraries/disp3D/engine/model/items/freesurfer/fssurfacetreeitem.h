@@ -2,7 +2,7 @@
 /**
  * @file     fssurfacetreeitem.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  dev
+ * @since    0.1.0
  * @date     November, 2015
  *
  * @section  LICENSE

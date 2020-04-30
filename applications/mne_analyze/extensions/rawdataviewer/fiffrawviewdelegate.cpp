@@ -5,7 +5,7 @@
  *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
  *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>;
  *           Gabriel Motta <gbmotta@mgh.harvard.edu>
- * @version  dev
+ * @since    0.1.0
  * @date     January, 2019
  *
  * @section  LICENSE

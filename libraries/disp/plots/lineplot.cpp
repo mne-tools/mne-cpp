@@ -3,7 +3,7 @@
  * @file     lineplot.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @version  dev
+ * @since    0.1.0
  * @date     January, 2017
  *
  * @section  LICENSE

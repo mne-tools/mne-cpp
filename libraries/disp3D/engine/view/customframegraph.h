@@ -3,7 +3,7 @@
  * @file     customframegraph.h
  * @author   Lars Debor <Lars.Debor@tu-ilmenau.de>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  dev
+ * @since    0.1.0
  * @date     August, 2017
  *
  * @section  LICENSE
