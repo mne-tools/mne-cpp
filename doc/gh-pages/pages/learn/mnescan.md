@@ -6,6 +6,6 @@ nav_order: 1
 ---
 # MNE Scan GUI
 
-![](../../images/sourceloc.gif)
+![](https://github.com/mne-cpp/media/blob/master/images/sourceloc.gif?raw=true)
 
 Below are some guides to get you started with MNE Scan.
