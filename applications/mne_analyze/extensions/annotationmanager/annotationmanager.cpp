@@ -85,26 +85,18 @@ void AnnotationManager::init()
 {
     m_pCommu = new Communicator(this);
 
-    m_pAnnotationView = QSharedPointer<AnnotationView>(new AnnotationView());
+    m_pAnnotationView = new AnnotationView();
 
-    connect(m_pAnnotationView.data(), &AnnotationView::triggerRedraw,
+    connect(m_pAnnotationView, &AnnotationView::triggerRedraw,
             this, &AnnotationManager::onTriggerRedraw);
 
-    connect(m_pAnnotationView.data(), &AnnotationView::activeEventsChecked,
+    connect(m_pAnnotationView, &AnnotationView::activeEventsChecked,
             this, &AnnotationManager::toggleDisplayEvent);
 
     //connect(m_pAnalyzeData.data(), &AnalyzeData::newModelAvailable,
     //        this, &AnnotationManager::onModelChanged);
     connect(m_pAnalyzeData.data(), &AnalyzeData::selectedModelChanged,
             this, &AnnotationManager::onModelChanged);
-
-//    m_pAnnotationManagerControl = new AnnotationManagerControl();
-
-//    connect(m_pAnnotationManagerControl.data(), &AnnotationManagerControl::loadFiffFile,
-//            this, &AnnotationManager::onLoadFiffFilePressed);
-
-//    connect(m_pAnnotationManagerControl.data(), &AnnotationManagerControl::saveFiffFile,
-//            this, &AnnotationManager::onSaveFiffFilePressed);
 }
 
 //=============================================================================================================
@@ -132,13 +124,11 @@ QMenu *AnnotationManager::getMenu()
 
 QDockWidget *AnnotationManager::getControl()
 {
-    if(!m_pControl) {
-        m_pControl = new QDockWidget(tr("Annotation Manager"));
-        m_pControl->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
-        m_pControl->setWidget(m_pAnnotationView.data());
-    }
+    QDockWidget* pControl = new QDockWidget(tr("Annotation Manager"));
+    pControl->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
+    pControl->setWidget(m_pAnnotationView);
 
-    return m_pControl;
+    return pControl;
 }
 
 //=============================================================================================================
@@ -188,9 +178,6 @@ void AnnotationManager::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel
             }
         }
 
-//        m_pAnnotationView.reset();
-//        m_pAnnotationView = QSharedPointer<AnnotationView>(new AnnotationView());
-
         m_pAnnotationView->disconnectFromModel();
         m_pFiffRawModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
         m_pAnnotationModel = m_pFiffRawModel->getAnnotationModel();
@@ -205,7 +192,7 @@ void AnnotationManager::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel
 
 void AnnotationManager::setUpControls()
 {
-    connect(m_pAnnotationView.data(), &AnnotationView::activeEventsChecked,
+    connect(m_pAnnotationView, &AnnotationView::activeEventsChecked,
             this, &AnnotationManager::toggleDisplayEvent);
 }
 
@@ -214,7 +201,6 @@ void AnnotationManager::setUpControls()
 void AnnotationManager::toggleDisplayEvent(const int& iToggle)
 {
     int m_iToggle = iToggle;
-    //qDebug() << "toggleDisplayEvent" << iToggle;
     m_pFiffRawModel->toggleDispAnn(m_iToggle);
     m_pCommu->publishEvent(TRIGGER_REDRAW);
 }
