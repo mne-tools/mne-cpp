@@ -51,6 +51,7 @@
 #include "fwd_thread_arg.h"
 
 #include <fiff/fiff_stream.h>
+#include <fiff/fiff_named_matrix.h>
 
 #include <QFile>
 #include <QList>
@@ -3095,8 +3096,9 @@ int FwdBemModel::compute_forward_meg(MneSourceSpaceOld **spaces,
                                      FwdBemModel *bem_model,
                                      Vector3f *r0,
                                      bool use_threads,
-                                     MneNamedMatrix **resp,
-                                     MneNamedMatrix **resp_grad)
+                                     FiffNamedMatrix& resp,
+                                     FiffNamedMatrix& resp_grad,
+                                     bool bDoGrad)
 /*
  * Compute the MEG forward solution
  * Use either the sphere model or BEM in the calculations
@@ -3104,6 +3106,9 @@ int FwdBemModel::compute_forward_meg(MneSourceSpaceOld **spaces,
 {
     float               **res = NULL;       /* The forward solution matrix */
     float               **res_grad = NULL;  /* The gradient with respect to the dipole position */
+    MatrixXd            matRes;
+    MatrixXd            matResGrad;
+    int                 nrow = 0;
     FwdCompData         *comp = NULL;
     fwdFieldFunc        field;              /* Computes the field for one dipole orientation */
     fwdVecFieldFunc     vec_field;          /* Computes the field for all dipole orientations */
@@ -3202,7 +3207,7 @@ int FwdBemModel::compute_forward_meg(MneSourceSpaceOld **spaces,
         res = ALLOC_CMATRIX_40(nsource,nmeg);
     else
         res = ALLOC_CMATRIX_40(3*nsource,nmeg);
-    if (resp_grad) {
+    if (bDoGrad) {
         if (fixed_ori)
             res_grad = ALLOC_CMATRIX_40(3*nsource,nmeg);
         else
@@ -3301,17 +3306,36 @@ int FwdBemModel::compute_forward_meg(MneSourceSpaceOld **spaces,
     if(comp)
         delete comp;
 
-     *resp = MneNamedMatrix::build_named_matrix(fixed_ori ? nsource : 3*nsource,
-                                               nmeg,
-                                               emptyList,
-                                               names,
-                                               res);
-    if (resp_grad && res_grad)
-        *resp_grad = MneNamedMatrix::build_named_matrix(fixed_ori ? 3*nsource : 3*3*nsource,
-                                                        nmeg,
-                                                        emptyList,
-                                                        names,
-                                                        res_grad);
+    // Store solution in fiff named matrix
+    nrow = fixed_ori ? nsource : 3*nsource;
+    matRes.conservativeResize(nrow,nmeg);
+    for(int i = 0; i < nrow; i++) {
+        for(int j = 0; j < nmeg; j++) {
+            matRes(i,j) = res[i][j];
+        }
+    }
+    resp.nrow = nrow;
+    resp.ncol = nmeg;
+    resp.row_names = emptyList;
+    resp.col_names = names;
+    resp.data = matRes;
+    resp.transpose_named_matrix();
+
+    if (bDoGrad && res_grad) {
+        nrow = fixed_ori ? 3*nsource : 3*3*nsource;
+        matResGrad = MatrixXd::Zero(nrow,nmeg);
+        for(int i = 0; i < nrow; i++) {
+            for(int j = 0; j < nmeg; j++) {
+                matResGrad(i,j) = res_grad[i][j];
+            }
+        }
+        resp_grad.nrow = nrow;
+        resp_grad.ncol = nmeg;
+        resp_grad.row_names = emptyList;
+        resp_grad.col_names = names;
+        resp_grad.data = matResGrad;
+        resp_grad.transpose_named_matrix();
+    }
     return OK;
 
 bad : {
@@ -3327,7 +3351,16 @@ bad : {
 
 //=============================================================================================================
 
-int FwdBemModel::compute_forward_eeg(MneSourceSpaceOld **spaces, int nspace, FwdCoilSet *els, bool fixed_ori, FwdBemModel *bem_model, FwdEegSphereModel *m, bool use_threads, MneNamedMatrix **resp, MneNamedMatrix **resp_grad)
+int FwdBemModel::compute_forward_eeg(MneSourceSpaceOld **spaces,
+                                     int nspace,
+                                     FwdCoilSet *els,
+                                     bool fixed_ori,
+                                     FwdBemModel *bem_model,
+                                     FwdEegSphereModel *m,
+                                     bool use_threads,
+                                     FiffNamedMatrix& resp,
+                                     FiffNamedMatrix& resp_grad,
+                                     bool bDoGrad)
 /*
      * Compute the EEG forward solution
      * Use either the sphere model or BEM in the calculations
@@ -3335,6 +3368,9 @@ int FwdBemModel::compute_forward_eeg(MneSourceSpaceOld **spaces, int nspace, Fwd
 {
     float            **res = NULL;          /* The forward solution matrix */
     float            **res_grad = NULL;     /* The gradient with respect to the dipole position */
+    MatrixXd matRes;
+    MatrixXd matResGrad;
+    int nrow = 0;
     fwdFieldFunc     pot;                   /* Computes the potentials for one dipole orientation */
     fwdVecFieldFunc  vec_pot;               /* Computes the potentials for all dipole orientations */
     fwdFieldGradFunc pot_grad;              /* Computes the potential and gradient with respect to dipole position
@@ -3388,7 +3424,7 @@ int FwdBemModel::compute_forward_eeg(MneSourceSpaceOld **spaces, int nspace, Fwd
         res = ALLOC_CMATRIX_40(nsource,neeg);
     else
         res = ALLOC_CMATRIX_40(3*nsource,neeg);
-    if (resp_grad) {
+    if (bDoGrad) {
         if (!pot_grad) {
             qCritical("EEG gradient calculation function not available");
             goto bad;
@@ -3486,10 +3522,36 @@ int FwdBemModel::compute_forward_eeg(MneSourceSpaceOld **spaces, int nspace, Fwd
     }
     if(one_arg)
         delete one_arg;
-     *resp = MneNamedMatrix::build_named_matrix(fixed_ori ? nsource : 3*nsource,neeg,emptyList,names,res);
-    if (resp_grad && res_grad)
-        *resp_grad = MneNamedMatrix::build_named_matrix(fixed_ori ? 3*nsource : 3*3*nsource,neeg,emptyList,
-                                            names,res_grad);
+
+    // Store solution in fiff named matrix
+    nrow = fixed_ori ? nsource : 3*nsource;
+    matRes.conservativeResize(nrow,neeg);
+    for(int i = 0; i < nrow; i++) {
+        for(int j = 0; j < neeg; j++) {
+            matRes(i,j) = res[i][j];
+        }
+    }
+    resp.nrow = nrow;
+    resp.ncol = neeg;
+    resp.row_names = emptyList;
+    resp.col_names = names;
+    resp.data = matRes;
+    resp.transpose_named_matrix();
+
+    if (bDoGrad && res_grad) {
+       matResGrad = MatrixXd::Zero(fixed_ori ? 3*nsource : 3*3*nsource,neeg);
+       for(int i = 0; i < nrow; i++) {
+           for(int j = 0; j < neeg; j++) {
+               matResGrad(i,j) = res_grad[i][j];
+           }
+        }
+        resp_grad.nrow = nrow;
+        resp_grad.ncol = neeg;
+        resp_grad.row_names = emptyList;
+        resp_grad.col_names = names;
+        resp_grad.data = matResGrad;
+        resp_grad.transpose_named_matrix();
+    }
     return OK;
 
 bad : {

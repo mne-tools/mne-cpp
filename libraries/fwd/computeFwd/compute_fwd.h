@@ -138,8 +138,13 @@ public:
     // ToDo: make MNEForwardSolution the main output for the solution
     // QSharedPointer<MNELIB::MNEForwardSolution> fwdSolution;  /**< MNE Forward solution that contains all results */
 
-    FIFFLIB::FiffNamedMatrix sol;           /**< Forward solution (will be part of fwdSolution once rafactored) */
-    FIFFLIB::FiffNamedMatrix sol_grad;      /**< Forward solution (Grad) (will be part of fwdSolution once rafactored) */
+    QSharedDataPointer<FIFFLIB::FiffNamedMatrix> sol;           /**< Forward solution (will be part of fwdSolution once rafactored) */
+    QSharedDataPointer<FIFFLIB::FiffNamedMatrix> sol_grad;      /**< Forward solution (Grad) (will be part of fwdSolution once rafactored) */
+
+    QSharedDataPointer<FIFFLIB::FiffNamedMatrix> m_meg_forward;            /**< The MEG forward calculation */
+    QSharedDataPointer<FIFFLIB::FiffNamedMatrix> m_meg_forward_grad;       /**< The MEG gradient forward calculation*/
+    QSharedDataPointer<FIFFLIB::FiffNamedMatrix> m_eeg_forward;            /**< The EEG forward calculation */
+    QSharedDataPointer<FIFFLIB::FiffNamedMatrix> m_eeg_forward_grad;       /**< The EEG gradient forward calculation*/
 
     QString qPath;
     QFile file;
@@ -163,12 +168,6 @@ private:
     FwdEegSphereModel* m_eegModel;                  /**< The EEG model */
     FwdBemModel *m_bemModel;                        /**< BEM model definition */
     Eigen::Vector3f *m_r0;                          /**< The Sphere model origin */
-
-    // ToDo: replace with FiffMneNamedMatrix
-    MNELIB::MneNamedMatrix *m_meg_forward;            /**< The MEG forward calculation */
-    MNELIB::MneNamedMatrix *m_meg_forward_grad;       /**< The MEG gradient forward calculation*/
-    MNELIB::MneNamedMatrix *m_eeg_forward;            /**< The EEG forward calculation */
-    MNELIB::MneNamedMatrix *m_eeg_forward_grad;       /**< The EEG gradient forward calculation*/
 
     QList<FIFFLIB::FiffChInfo> m_listMegChs;        /**< The MEG channel information */
     QList<FIFFLIB::FiffChInfo> m_listEegChs;        /**< The EEG channel information */
@@ -207,13 +206,6 @@ private:
                                          int& iNEeg,
                                          FIFFLIB::FiffCoordTransOld** transDevHeadOld,
                                          FIFFLIB::FiffId& id);
-
-    //=========================================================================================================
-    /**
-     * concvert MneNamedMatrix to FiffNamedMatrix
-     * ToDo: delete this function once everything is refactored and results are automaticly stored in fwdSolution
-     */
-    void toFiffNamed();
 
 };
 
