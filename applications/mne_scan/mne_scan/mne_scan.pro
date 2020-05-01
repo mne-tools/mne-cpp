@@ -75,7 +75,8 @@ contains(MNECPP_CONFIG, static) {
             -lneuronalconnectivity \
             -lftbuffer \
             -lwritetofile \
-            -lhpi
+	    -lhpi \
+	    -lrtfwd
             #-ldummytoolbox
 
     contains(MNECPP_CONFIG, withGUSBAmp) {

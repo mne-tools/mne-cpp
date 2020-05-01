@@ -37,6 +37,7 @@ include(../../../../mne-cpp.pri)
 TEMPLATE = lib
 
 CONFIG += plugin
+CONFIG += c++11
 
 DEFINES += RTFWD_PLUGIN
 
@@ -49,16 +50,33 @@ CONFIG(debug, debug|release) {
 
 DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
 
+contains(MNECPP_CONFIG, static) {
+    CONFIG += staticlib
+    DEFINES += STATICBUILD
+} else {
+    CONFIG += shared
+}
+
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lscSharedd \
             -lscDispd \
             -lscMeasd \
+	    -lMNE$${MNE_LIB_VERSION}Dispd \
+	    -lMNE$${MNE_LIB_VERSION}Fwdd \
+	    -lMNE$${MNE_LIB_VERSION}Mned \
+	    -lMNE$${MNE_LIB_VERSION}Fiffd \
+	    -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Utilsd \
 } else {
     LIBS += -lscShared \
             -lscDisp \
             -lscMeas \
+	    -lMNE$${MNE_LIB_VERSION}Disp \
+	    -lMNE$${MNE_LIB_VERSION}Fwd \
+	    -lMNE$${MNE_LIB_VERSION}Mne \
+	    -lMNE$${MNE_LIB_VERSION}Fiff \
+	    -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Utils \
 }
 
@@ -75,7 +93,7 @@ HEADERS += \
 
 FORMS += \
         FormFiles/rtfwdsetup.ui \
-	FormFiles/rtfwdwidget.ui
+	#FormFiles/rtfwdwidget.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
