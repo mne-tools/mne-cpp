@@ -47,6 +47,7 @@
 #include <fiff/c/fiff_coord_trans_old.h>
 #include <fiff/fiff_dir_node.h>
 #include <fiff/fiff_tag.h>
+#include <fiff/fiff_named_matrix.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -84,6 +85,9 @@ namespace MNELIB
     class MneNamedMatrix;
 }
 
+namespace FIFFLIB {
+    class FiffNamedMatrix;
+}
 //=============================================================================================================
 // DEFINE NAMESPACE FWDLIB
 //=============================================================================================================
@@ -431,27 +435,29 @@ public:
     static void *meg_eeg_fwd_one_source_space(void *arg);
 
     // TODO check if this is the correct class or move
-    static int compute_forward_meg( MNELIB::MneSourceSpaceOld*    *spaces,     /* Source spaces */
-                                    int                 nspace,      /* How many? */
-                                    FwdCoilSet*         coils,
-                                    FwdCoilSet*         comp_coils,
-                                    MNELIB::MneCTFCompDataSet*  comp_data,
-                                    bool                fixed_ori,   /* Use fixed-orientation dipoles */
-                                    FwdBemModel*        bem_model,   /* BEM model definition */
-                                    Eigen::Vector3f*    r0,         /* Sphere model origin */
-                                    bool                use_threads, /* Parallelize with threads? */
-                                    MNELIB::MneNamedMatrix*     *resp,       /* The results */
-                                    MNELIB::MneNamedMatrix*     *resp_grad);
+    static int compute_forward_meg( MNELIB::MneSourceSpaceOld*  *spaces,        /**< Source spaces */
+                                    int                         nspace,         /**< How many? */
+                                    FwdCoilSet*                 coils,          /**< MEG Coilset */
+                                    FwdCoilSet*                 comp_coils,     /**< Compensator Coilset */
+                                    MNELIB::MneCTFCompDataSet*  comp_data,      /**< Compensator Data */
+                                    bool                        fixed_ori,      /**< Use fixed-orientation dipoles */
+                                    FwdBemModel*                bem_model,      /**< BEM model definition */
+                                    Eigen::Vector3f*            r0,             /**< Sphere model origin */
+                                    bool                        use_threads,    /**< Parallelize with threads? */
+                                    FIFFLIB::FiffNamedMatrix&   resp,           /**< The results */
+                                    FIFFLIB::FiffNamedMatrix&   resp_grad,
+                                    bool bDoGRad);                              /**< calculate gradient solution */
 
-    static int compute_forward_eeg( MNELIB::MneSourceSpaceOld*  *spaces,     /* Source spaces */
-                                    int                 nspace,      /* How many? */
-                                    FwdCoilSet*         els,         /* Electrode locations */
-                                    bool                fixed_ori,   /* Use fixed-orientation dipoles */
-                                    FwdBemModel*        bem_model,   /* BEM model definition */
-                                    FwdEegSphereModel*  m,           /* Sphere model definition */
-                                    bool                use_threads, /* Parallelize with threads? */
-                                    MNELIB::MneNamedMatrix*     *resp,       /* The results */
-                                    MNELIB::MneNamedMatrix*     *resp_grad);
+    static int compute_forward_eeg( MNELIB::MneSourceSpaceOld*  *spaces,        /**< Source spaces */
+                                    int                         nspace,         /**< How many? */
+                                    FwdCoilSet*                 els,            /**< Electrode locations */
+                                    bool                        fixed_ori,      /**< Use fixed-orientation dipoles */
+                                    FwdBemModel*                bem_model,      /**< BEM model definition */
+                                    FwdEegSphereModel*          m,              /**< Sphere model definition */
+                                    bool                        use_threads,    /**< Parallelize with threads? */
+                                    FIFFLIB::FiffNamedMatrix&   resp,           /**< The results */
+                                    FIFFLIB::FiffNamedMatrix&   resp_grad,
+                                    bool                        bDoGrad);       /**< calculate gradient solution */
 
     //============================= fwd_spherefield.c =============================
     // TODO location of these functions need to be checked -> evtl moving to more suitable space
