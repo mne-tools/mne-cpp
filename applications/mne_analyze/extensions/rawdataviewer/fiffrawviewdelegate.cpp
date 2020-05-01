@@ -350,33 +350,14 @@ void FiffRawViewDelegate::createMarksPath(const QModelIndex &index,
 
     QMap<int, QColor> typeColor = t_pAnnModel->getTypeColors();
 
-    if(t_pAnnModel->getShowSelected()){
-        //qDebug() << "FiffRawViewDelegate::createMarksPath -- show selected checked";
-        int iSelectedAnn = t_pAnnModel->getSelectedAnn();
-        if ((t_pModel->getTimeMarks(iSelectedAnn) > iStart) && (t_pModel->getTimeMarks(iSelectedAnn) < (iStart + data.size()))) {
-            int type = t_pAnnModel->data(t_pAnnModel->index(iSelectedAnn,2)).toInt();
+    for(int i = 0; i < t_pModel->getTimeListSize(); i++) {
+        if ((t_pModel->getTimeMarks(i) > iStart) && (t_pModel->getTimeMarks(i) < (iStart + data.size()))) {
+            int type = t_pAnnModel->data(t_pAnnModel->index(i,2)).toInt();
             painter->setPen(QPen(typeColor.value(type), Qt::black));
-            painter->drawLine(fInitX + static_cast<float>(t_pModel->getTimeMarks(iSelectedAnn) - iStart) * dDx,
+            painter->drawLine(fInitX + static_cast<float>(t_pModel->getTimeMarks(i) - iStart) * dDx,
                               fTop,
-                              fInitX + static_cast<float>(t_pModel->getTimeMarks(iSelectedAnn) - iStart) * dDx,
+                              fInitX + static_cast<float>(t_pModel->getTimeMarks(i) - iStart) * dDx,
                               fBottom);
-        }
-
-    } else {
-        for(int i = 0; i < t_pModel->getTimeListSize(); i++) {
-            if ((t_pModel->getTimeMarks(i) > iStart) && (t_pModel->getTimeMarks(i) < (iStart + data.size()))) {
-    //            path.moveTo(fInitX + static_cast<float>(t_pModel->getTimeMarks(i) - iStart) * dDx, fTop);
-    //            path.lineTo(path.currentPosition().x(), fBottom);
-
-                int type = t_pAnnModel->data(t_pAnnModel->index(i,2)).toInt();
-                painter->setPen(QPen(typeColor.value(type), Qt::black));
-    //            qDebug() << "sample:" << t_pAnnModel->data(t_pAnnModel->index(i,0)).toInt();
-    //            qDebug() << "mark" << t_pModel->getTimeMarks(i) - iStart;
-                painter->drawLine(fInitX + static_cast<float>(t_pModel->getTimeMarks(i) - iStart) * dDx,
-                                  fTop,
-                                  fInitX + static_cast<float>(t_pModel->getTimeMarks(i) - iStart) * dDx,
-                                  fBottom);
-            }
         }
     }
 }
