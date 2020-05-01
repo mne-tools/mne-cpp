@@ -114,47 +114,45 @@ void PluginManager::loadPlugins(const QString& dir)
 #else
     QDir PluginsDir(dir);
 
-    foreach(QString file, PluginsDir.entryList(QDir::Files))
-    {
-        this->setFileName(PluginsDir.absoluteFilePath(file));
-        QObject *pPlugin = this->instance();
+    foreach(QString file, PluginsDir.entryList(QDir::Files)) {
+        // Exclude .exp and .lib files (only relevant for windows builds)
+        if(!file.contains(".exp") && !file.contains(".lib")) {
+            this->setFileName(PluginsDir.absoluteFilePath(file));
+            QObject *pPlugin = this->instance();
 
-        // IPlugin
-        if(pPlugin)
-        {
-            qDebug() << "Try to load Plugin " << file;
+            // IPlugin
+            if(pPlugin)  {
+                // plugins are always disabled when they are first loaded
+                m_qVecPlugins.push_back(qobject_cast<IPlugin*>(pPlugin));
 
-            // plugins are always disabled when they are first loaded
-            m_qVecPlugins.push_back(qobject_cast<IPlugin*>(pPlugin));
+                IPlugin::PluginType pluginType = qobject_cast<IPlugin*>(pPlugin)->getType();
+                QString msg = "Plugin " + qobject_cast<IPlugin*>(pPlugin)->getName() + " loaded.";
 
-            IPlugin::PluginType pluginType = qobject_cast<IPlugin*>(pPlugin)->getType();
-            QString msg = "Plugin " + qobject_cast<IPlugin*>(pPlugin)->getName() + " loaded.";
+                if(pluginType == IPlugin::_ISensor) {
+                    // ISensor
+                    ISensor* pSensor = qobject_cast<ISensor*>(pPlugin);
 
-            // ISensor
-            if(pluginType == IPlugin::_ISensor)
-            {
-                ISensor* pSensor = qobject_cast<ISensor*>(pPlugin);
-                if(pSensor)
-                {
-                    m_qVecSensorPlugins.push_back(pSensor);
-                    qDebug() << "Sensor" << pSensor->getName() << "loaded.";
+                    if(pSensor) {
+                        m_qVecSensorPlugins.push_back(pSensor);
+                        qDebug() << "[PluginManager::loadExtension] Loading sensor plugin" << pSensor->getName() << "succeeded.";
+                    } else {
+                        qDebug() << "[PluginManager::loadExtension] Loading sensor plugin" << pSensor->getName() << "failed.";
+                    }
+                } else if(pluginType == IPlugin::_IAlgorithm) {
+                    // IAlgorithm
+                    IAlgorithm* pAlgorithm = qobject_cast<IAlgorithm*>(pPlugin);
+
+                    if(pAlgorithm) {
+                        m_qVecAlgorithmPlugins.push_back(pAlgorithm);
+                        qDebug() << "[PluginManager::loadExtension] Loading algorithm plugin" << pAlgorithm->getName() << "succeeded.";
+                    } else {
+                        qDebug() << "[PluginManager::loadExtension] Loading algorithm plugin" << pAlgorithm->getName() << "failed.";
+                    }
                 }
-            }
-            // IAlgorithm
-            else if(pluginType == IPlugin::_IAlgorithm)
-            {
-                IAlgorithm* pAlgorithm = qobject_cast<IAlgorithm*>(pPlugin);
-                if(pAlgorithm)
-                {
-                    m_qVecAlgorithmPlugins.push_back(pAlgorithm);
-                    qDebug() << "RTAlgorithm" << pAlgorithm->getName() << "loaded.";
-                }
-            }
 
-            emit pluginLoaded(msg);
+                emit pluginLoaded(msg);
+            }
         }
-//        else
-//            qDebug() << "Plugin " << file << " could not be instantiated!";
     }
 #endif
 }
