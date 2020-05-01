@@ -93,20 +93,19 @@ void ExtensionManager::loadExtensionsFromDirectory(const QString& dir)
 #else
     QDir extensionsDir(dir);
 
-    foreach(const QString &file, extensionsDir.entryList(QDir::Files))
-    {
-        qDebug() << "[ExtensionManager::loadExtension] Loading Extension " << file.toUtf8().constData() << "... ";
+    foreach(const QString &file, extensionsDir.entryList(QDir::Files)) {
+        // Exclude .exp and .lib files (only relevant for windows builds)
+        if(!file.contains(".exp") && !file.contains(".lib")) {
+            this->setFileName(extensionsDir.absoluteFilePath(file));
+            QObject *pExtension = this->instance();
 
-        this->setFileName(extensionsDir.absoluteFilePath(file));
-        QObject *pExtension = this->instance();
-
-        // IExtension
-        if(pExtension) {
-            qDebug() << "[ExtensionManager::loadExtension] Extension " << file.toUtf8().constData() << " loaded.";
-            m_qVecExtensions.push_back(qobject_cast<IExtension*>(pExtension));
-        }
-        else {
-            qDebug() << "[ExtensionManager::loadExtension] Extension " << file.toUtf8().constData() << " could not be instantiated!";
+            // IExtension
+            if(pExtension) {
+                qDebug() << "[ExtensionManager::loadExtension] Loading Extension" << file.toUtf8().constData() << "succeeded.";
+                m_qVecExtensions.push_back(qobject_cast<IExtension*>(pExtension));
+            } else {
+                qDebug() << "[ExtensionManager::loadExtension] Loading Extension" << file.toUtf8().constData() << "failed.";
+            }
         }
     }
 #endif
