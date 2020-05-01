@@ -110,8 +110,8 @@ bool AnnotationModel::insertRows(int position, int span, const QModelIndex & par
 {
     Q_UNUSED(parent);
 
-    qDebug() << "AnnotationModel::insertRows here";
-    qDebug() << "iSamplePos:" << m_iSamplePos;
+    //qDebug() << "AnnotationModel::insertRows here";
+    //qDebug() << "iSamplePos:" << m_iSamplePos;
 
     if(m_dataSamples.isEmpty()) {
         m_dataSamples.insert(0, m_iSamplePos);
@@ -162,7 +162,7 @@ bool AnnotationModel::insertRows(int position, int span, const QModelIndex & par
 
 void AnnotationModel::setSamplePos(int iSamplePos)
 {
-    qDebug() << "iSamplePos:" << iSamplePos;
+    //qDebug() << "iSamplePos:" << iSamplePos;
     m_iSamplePos = iSamplePos;
 }
 
@@ -266,7 +266,7 @@ QVariant AnnotationModel::data(const QModelIndex &index, int role) const
 
 bool AnnotationModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    qDebug() << "AnnotationModel::setData";
+    //qDebug() << "AnnotationModel::setData";
     if(index.row() >= m_dataSamples.size() || index.column() >= columnCount())
         return false;
 
@@ -298,7 +298,7 @@ bool AnnotationModel::setData(const QModelIndex &index, const QVariant &value, i
 
 void AnnotationModel::setEventFilterType(const QString eventType)
 {
-    qDebug() << "AnnotationModel::setEventFilterType";
+    //qDebug() << "AnnotationModel::setEventFilterType";
     m_sFilterEventType = eventType;
 
     //Clear filtered event data
@@ -326,8 +326,8 @@ void AnnotationModel::setEventFilterType(const QString eventType)
     emit dataChanged(createIndex(0,0), createIndex(m_dataSamples_Filtered.size(), 0));
     emit headerDataChanged(Qt::Vertical, 0, m_dataSamples_Filtered.size());
 
-    qDebug() << "Samp:" << m_dataSamples;
-    qDebug() << "Filt:" << m_dataSamples_Filtered;
+    //qDebug() << "Samp:" << m_dataSamples;
+    //qDebug() << "Filt:" << m_dataSamples_Filtered;
 }
 
 //=============================================================================================================
@@ -427,14 +427,24 @@ void AnnotationModel::setSampleFreq(float fFreq)
 
 int AnnotationModel::getNumberOfAnnotations() const
 {
-    return m_dataSamples_Filtered.size();
+    if (m_iSelectedCheckState){
+        //qDebug() << m_dataSelectedRows.size();
+        return m_dataSelectedRows.size();
+    } else {
+        return m_dataSamples_Filtered.size();
+    }
 }
 
 //=============================================================================================================
 
 int AnnotationModel::getAnnotation(int iIndex) const
 {
-    return m_dataSamples_Filtered.at(iIndex);
+    if (m_iSelectedCheckState){
+        //qDebug() << m_dataSamples_Filtered.at(m_dataSelectedRows.at(iIndex));
+        return m_dataSamples_Filtered.at(m_dataSelectedRows.at(iIndex));
+    } else {
+        return m_dataSamples_Filtered.at(iIndex);
+    }
 }
 
 //=============================================================================================================
@@ -553,4 +563,19 @@ void AnnotationModel::updateFilteredSample(int iIndex, int iSample)
 void AnnotationModel::updateFilteredSample(int iSample)
 {
     m_dataSamples_Filtered[m_iSelectedAnn] = iSample + m_iFirstSample;
+}
+
+//=============================================================================================================
+
+void AnnotationModel::clearSelected()
+{
+    m_dataSelectedRows.clear();
+}
+
+//=============================================================================================================
+
+void AnnotationModel::appendSelected(int iSelectedIndex)
+{
+    m_dataSelectedRows.append(iSelectedIndex);
+//    qDebug() << m_dataSelectedRows;
 }
