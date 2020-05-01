@@ -80,9 +80,9 @@ QWidget* AnnotationDelegate::createEditor(QWidget *parent,
 
         case 1: {
             QDoubleSpinBox *editor = new QDoubleSpinBox(parent);
-            editor->setMinimum(0.0);
+            editor->setMinimum(0.00);
             editor->setMaximum(pAnnotationModel->getFirstLastSample().second / pAnnotationModel->getSampleFreq());
-            editor->setSingleStep(0.01);
+            editor->setSingleStep(0.020);
             connect(editor, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
                     this, &AnnotationDelegate::onTimeValueChanged);
             return editor;
