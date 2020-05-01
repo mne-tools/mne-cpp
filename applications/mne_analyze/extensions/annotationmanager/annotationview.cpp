@@ -97,6 +97,7 @@ void AnnotationView::initMSVCSettings()
 
     ui->m_tableView_eventTableView->resizeColumnsToContents();
     ui->m_tableView_eventTableView->adjustSize();
+    ui->m_tableView_eventTableView->setSelectionMode(QAbstractItemView::ExtendedSelection);
 }
 
 //=============================================================================================================
@@ -264,6 +265,8 @@ void AnnotationView::onCurrentSelectedChanged()
     //qDebug() << "AnnotationView::onCurrentSelectedChanged";
     //qDebug() << ui->m_tableView_eventTableView->selectionModel()->currentIndex().row();
     m_pAnnModel->setSelectedAnn(ui->m_tableView_eventTableView->selectionModel()->currentIndex().row());
+//    m_pAnnModel->setSelectedAnn(ui->m_tableView_eventTableView
+    qDebug() << ui->m_tableView_eventTableView->selectionModel()->selectedIndexes();
 }
 
 //=============================================================================================================

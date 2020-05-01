@@ -221,9 +221,9 @@ QVariant AnnotationModel::data(const QModelIndex &index, int role) const
         if(index.column()==1){
             switch(role) {
                 case Qt::DisplayRole: {
-                    int time = ((m_dataSamples_Filtered.at(index.row()) - m_iFirstSample) / m_fFreq) * 100;
+                    int time = ((m_dataSamples_Filtered.at(index.row()) - m_iFirstSample) / m_fFreq) * 1000;
 
-                    return QVariant((double)time / 100);
+                    return QVariant((double)time / 1000);
                 }
 
             case Qt::BackgroundRole:
