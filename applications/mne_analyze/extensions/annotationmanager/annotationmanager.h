@@ -142,12 +142,9 @@ public:
     void onTriggerRedraw();
 
 private:
-
-    QPointer<QDockWidget>                                   m_pControl;                 /**< Dock Control Widget */
-
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals */
 
-    QSharedPointer<AnnotationView>                          m_pAnnotationView;          /**< Pointer to associated View for this extension */
+    AnnotationView*                                         m_pAnnotationView;          /**< Pointer to associated View for this extension */
 
     QSharedPointer<ANSHAREDLIB::AnnotationModel>            m_pAnnotationModel;         /**< Pointer to associated Model for this extension */
 
