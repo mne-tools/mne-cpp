@@ -232,9 +232,38 @@ public:
      */
     void setLastType(int iType);
 
-    void updateFilteredSample(int iIndex, int iSample);
+    //=========================================================================================================
+    /**
+     * Updates the value of a sample for real time annotation scrolling
+     *
+     * @param [in] iIndex   Index of sample to be changed
+     * @param [in] iSample  Sample value to be changed to
+     */
+    void updateFilteredSample(int iIndex,
+                              int iSample);
 
+    //=========================================================================================================
+    /**
+     * Updates the value of the currently selected sample for real time annotation scrolling
+     *
+     * @param [in] iSample  Sample value to be changed to
+     */
     void updateFilteredSample(int iSample);
+
+    //=========================================================================================================
+    /**
+     * Clears list of currently sleected rows
+     */
+    void clearSelected();
+
+    //=========================================================================================================
+    /**
+     * Adds new row to list of selected rows
+     *
+     * @param [in] iSelectedIndex   row index to be added
+     */
+    void appendSelected(int iSelectedIndex);
+
 signals:
 
     //=========================================================================================================
@@ -264,6 +293,8 @@ private:
     int                 m_iActiveCheckState;
     int                 m_iSelectedCheckState;
     int                 m_iSelectedAnn;
+
+    QList<int>          m_dataSelectedRows;
 
     int                 m_iLastTypeAdded;
 

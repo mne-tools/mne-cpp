@@ -262,11 +262,17 @@ void AnnotationView::disconnectFromModel()
 
 void AnnotationView::onCurrentSelectedChanged()
 {
+    m_pAnnModel->clearSelected();
     //qDebug() << "AnnotationView::onCurrentSelectedChanged";
     //qDebug() << ui->m_tableView_eventTableView->selectionModel()->currentIndex().row();
     m_pAnnModel->setSelectedAnn(ui->m_tableView_eventTableView->selectionModel()->currentIndex().row());
 //    m_pAnnModel->setSelectedAnn(ui->m_tableView_eventTableView
-    qDebug() << ui->m_tableView_eventTableView->selectionModel()->selectedIndexes();
+//    qDebug() << ui->m_tableView_eventTableView->selectionModel()->selectedIndexes();
+
+    for (int i = 0;  i < ui->m_tableView_eventTableView->selectionModel()->selectedRows().size(); i++) {
+//        qDebug() << ui->m_tableView_eventTableView->selectionModel()->selectedRows().at(i).row();
+        m_pAnnModel->appendSelected(ui->m_tableView_eventTableView->selectionModel()->selectedRows().at(i).row());
+    }
 }
 
 //=============================================================================================================
@@ -304,7 +310,7 @@ void AnnotationView::keyPressEvent(QKeyEvent* event)
 void AnnotationView::realTimeDataSample(int iValue)
 {
     m_pAnnModel->setSelectedAnn(ui->m_tableView_eventTableView->selectionModel()->currentIndex().row());
-    qDebug() << "AnnotationView::realTimeData --" << iValue;
+    //qDebug() << "AnnotationView::realTimeData --" << iValue;
     m_pAnnModel->updateFilteredSample(iValue);
     this->onDataChanged();
 }
@@ -314,9 +320,9 @@ void AnnotationView::realTimeDataSample(int iValue)
 void AnnotationView::realTimeDataTime(double dValue)
 {
     m_pAnnModel->setSelectedAnn(ui->m_tableView_eventTableView->selectionModel()->currentIndex().row());
-    qDebug() << "AnnotationView::realTimeDataTime" << dValue;
+    //qDebug() << "AnnotationView::realTimeDataTime" << dValue;
     dValue *= m_pAnnModel->getFreq();
-    qDebug() << "AnnotationView::realTimeDataTime" << dValue;
+    //qDebug() << "AnnotationView::realTimeDataTime" << dValue;
     int t_iSample = static_cast<int>(dValue);
     m_pAnnModel->updateFilteredSample(t_iSample);
     this->onDataChanged();

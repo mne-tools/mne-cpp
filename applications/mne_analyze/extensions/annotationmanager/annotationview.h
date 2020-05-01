@@ -218,8 +218,6 @@ private:
     QSharedPointer<ANSHAREDLIB::AnnotationModel>    m_pAnnModel;                    /** < Pointer to associated model. Points to currently loaded. */
 
     QColorDialog*                                   m_pColordialog;                 /** < USed for Prompting users for annotation type colors */
-
-
 };
 
 #endif // ANNOTATIONVIEW_H
