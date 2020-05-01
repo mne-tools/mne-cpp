@@ -1415,24 +1415,25 @@ bool fiff_put_dir (FiffStream::SPtr& t_pStream, const QList<FiffDirEntry::SPtr>&
 //============================= write_solution.c =============================
 
 bool write_solution(const QString& name,         /* Destination file */
-                   MneSourceSpaceOld* *spaces,  /* The source spaces */
-                   int nspace,
-                   const QString& mri_file,     /* MRI file and data obtained from there */
-                   fiffId mri_id,
-                   FiffCoordTransOld* mri_head_t,
-                   const QString& meas_file,    /* MEG file and data obtained from there */
-                   FiffId meas_id,
-                   FiffCoordTransOld* meg_head_t,
-                   QList<FiffChInfo> meg_chs,
-                   int nmeg,
-                   QList<FiffChInfo> eeg_chs,
-                   int neeg,
-                   int fixed_ori,    /* Fixed orientation dipoles? */
-                   int coord_frame,  /* Coordinate frame employed in the forward calculations */
-                   MneNamedMatrix* meg_solution,
-                   MneNamedMatrix* eeg_solution,
-                   MneNamedMatrix* meg_solution_grad,
-                   MneNamedMatrix* eeg_solution_grad)
+                    MneSourceSpaceOld* *spaces,  /* The source spaces */
+                    int nspace,
+                    const QString& mri_file,     /* MRI file and data obtained from there */
+                    fiffId mri_id,
+                    FiffCoordTransOld* mri_head_t,
+                    const QString& meas_file,    /* MEG file and data obtained from there */
+                    FiffId meas_id,
+                    FiffCoordTransOld* meg_head_t,
+                    QList<FiffChInfo> meg_chs,
+                    int nmeg,
+                    QList<FiffChInfo> eeg_chs,
+                    int neeg,
+                    int fixed_ori,    /* Fixed orientation dipoles? */
+                    int coord_frame,  /* Coordinate frame employed in the forward calculations */
+                    FiffNamedMatrix& meg_solution,
+                    FiffNamedMatrix& eeg_solution,
+                    FiffNamedMatrix& meg_solution_grad,
+                    FiffNamedMatrix& eeg_solution_grad,
+                    bool bDoGrad)
 {
     // New Stuff
     QFile file(name);
@@ -1582,12 +1583,18 @@ bool write_solution(const QString& name,         /* Destination file */
         t_pStream->write_int(FIFF_MNE_SOURCE_ORIENTATION,&val);
         t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_NPOINTS,&nvert);
         t_pStream->write_int(FIFF_NCHAN,&nmeg);
-        if (mne_write_named_matrix(t_pStream,FIFF_MNE_FORWARD_SOLUTION,meg_solution) == FIFF_FAIL)
-            goto bad;
-        if (meg_solution_grad)
-            if (mne_write_named_matrix(t_pStream,FIFF_MNE_FORWARD_SOLUTION_GRAD,meg_solution_grad) == FIFF_FAIL)
-                goto bad;
 
+        meg_solution.transpose_named_matrix();
+        t_pStream->write_named_matrix(FIFF_MNE_FORWARD_SOLUTION,meg_solution);
+//        if (mne_write_named_matrix(t_pStream,FIFF_MNE_FORWARD_SOLUTION,meg_solution) == FIFF_FAIL)
+//            goto bad;
+        if (bDoGrad) {
+            meg_solution_grad.transpose_named_matrix();
+            t_pStream->write_named_matrix(FIFF_MNE_FORWARD_SOLUTION_GRAD,meg_solution_grad);
+        }
+
+//            if (mne_write_named_matrix(t_pStream,FIFF_MNE_FORWARD_SOLUTION_GRAD,meg_solution_grad) == FIFF_FAIL)
+//                goto bad;
         t_pStream->end_block(FIFFB_MNE_FORWARD_SOLUTION);
     }
     /*
@@ -1603,11 +1610,16 @@ bool write_solution(const QString& name,         /* Destination file */
         t_pStream->write_int(FIFF_MNE_SOURCE_ORIENTATION,&val);
         t_pStream->write_int(FIFF_NCHAN,&neeg);
         t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_NPOINTS,&nvert);
-        if (mne_write_named_matrix(t_pStream,FIFF_MNE_FORWARD_SOLUTION,eeg_solution) == FIFF_FAIL)
-            goto bad;
-        if (eeg_solution_grad)
-            if (mne_write_named_matrix(t_pStream,FIFF_MNE_FORWARD_SOLUTION_GRAD,eeg_solution_grad) == FIFF_FAIL)
-                goto bad;
+
+        eeg_solution.transpose_named_matrix();
+        t_pStream->write_named_matrix(FIFF_MNE_FORWARD_SOLUTION,eeg_solution);
+//        if (mne_write_named_matrix(t_pStream,FIFF_MNE_FORWARD_SOLUTION,eeg_solution) == FIFF_FAIL)
+//            goto bad;
+        if (bDoGrad) {
+            t_pStream->write_named_matrix(FIFF_MNE_FORWARD_SOLUTION_GRAD,eeg_solution_grad);
+        }
+//            if (mne_write_named_matrix(t_pStream,FIFF_MNE_FORWARD_SOLUTION_GRAD,eeg_solution_grad) == FIFF_FAIL)
+//                goto bad;
 
         t_pStream->end_block(FIFFB_MNE_FORWARD_SOLUTION);
     }
@@ -1815,7 +1827,13 @@ bool mne_attach_env(const QString& name, const QString& command)
 //=============================================================================================================
 
 ComputeFwd::ComputeFwd(ComputeFwdSettings* pSettings)
-    : m_pSettings(pSettings)
+    : sol(new FiffNamedMatrix)
+    , sol_grad(new FiffNamedMatrix)
+    , m_meg_forward(new FiffNamedMatrix)
+    , m_meg_forward_grad(new FiffNamedMatrix)
+    , m_eeg_forward(new FiffNamedMatrix)
+    , m_eeg_forward_grad(new FiffNamedMatrix)
+    , m_pSettings(pSettings)
 {
     initFwd();
 }
@@ -1836,14 +1854,6 @@ ComputeFwd::~ComputeFwd()
         delete m_megcoils;
     if(m_eegels)
         delete m_eegels;
-    if(m_meg_forward)
-        delete m_meg_forward;
-    if(m_eeg_forward)
-        delete m_eeg_forward;
-    if(m_meg_forward_grad)
-        delete m_meg_forward_grad;
-    if(m_eeg_forward_grad)
-        delete m_eeg_forward_grad;
 }
 
 //=============================================================================================================
@@ -1862,6 +1872,11 @@ void ComputeFwd::initFwd()
     m_listEegChs = QList<FiffChInfo>();
     m_listCompChs = QList<FiffChInfo>();
 
+    if(!m_pSettings->compute_grad) {
+        m_meg_forward_grad = Q_NULLPTR;
+        m_eeg_forward_grad = Q_NULLPTR;
+    }
+
     int iNMeg               = 0;
     int iNEeg               = 0;
     int iNComp              = 0;
@@ -1873,14 +1888,6 @@ void ComputeFwd::initFwd()
     m_eegels                = Q_NULLPTR;
     m_eegModels             = Q_NULLPTR;
     m_iNChan                = 0;
-
-    m_meg_forward             = Q_NULLPTR;
-    m_eeg_forward             = Q_NULLPTR;
-    m_meg_forward_grad        = Q_NULLPTR;
-    m_eeg_forward_grad        = Q_NULLPTR;
-
-    sol.clear();
-    sol_grad.clear();
 
     int k;
     m_mri_id                = Q_NULLPTR;
@@ -2275,12 +2282,12 @@ void ComputeFwd::calculateFwd()
                                               m_bemModel,
                                               &m_pSettings->r0,
                                               m_pSettings->use_threads,
-                                              &m_meg_forward,
-                                              m_pSettings->compute_grad ? &m_meg_forward_grad : Q_NULLPTR)) == FAIL) {
+                                              *m_meg_forward.data(),
+                                              *m_meg_forward_grad.data(),
+                                              m_pSettings->compute_grad)) == FAIL) {
             return;
         }
     }
-
     if (iNEeg > 0) {
         if ((FwdBemModel::compute_forward_eeg(m_spaces,
                                               m_iNSpace,
@@ -2289,9 +2296,45 @@ void ComputeFwd::calculateFwd()
                                               m_bemModel,
                                               m_eegModel,
                                               m_pSettings->use_threads,
-                                              &m_eeg_forward,
-                                              m_pSettings->compute_grad ? &m_eeg_forward_grad : Q_NULLPTR)) == FAIL) {
+                                              *m_eeg_forward.data(),
+                                              *m_eeg_forward_grad.data(),
+                                              m_pSettings->compute_grad))== FAIL) {
             return;
+        }
+    }
+    if(iNMeg > 0 && iNEeg > 0) {
+        if(m_meg_forward->data.cols() != m_eeg_forward->data.cols()) {
+            qWarning() << "The MEG and EEG forward solutions do not match";
+            return;
+        }
+        sol->clear();
+        sol->data = MatrixXd(m_meg_forward->nrow + m_eeg_forward->nrow, m_meg_forward->ncol);
+        sol->data.block(0,0,m_meg_forward->nrow,m_meg_forward->ncol) = m_meg_forward->data;
+        sol->data.block(m_meg_forward->nrow,0,m_eeg_forward->nrow,m_eeg_forward->ncol) = m_eeg_forward->data;
+        sol->nrow = m_meg_forward->nrow + m_eeg_forward->nrow;
+        sol->row_names.append(m_meg_forward->row_names);
+    } else if (iNMeg > 0) {
+        sol = m_meg_forward;
+    } else {
+        sol = m_eeg_forward;
+    }
+
+    if(m_pSettings->compute_grad) {
+        if(iNMeg > 0 && iNEeg > 0) {
+            if(m_meg_forward_grad->data.cols() != m_eeg_forward_grad->data.cols()) {
+                qWarning() << "The MEG and EEG forward solutions do not match";
+                return;
+            }
+            sol_grad->clear();
+            sol_grad->data = MatrixXd(m_meg_forward_grad->nrow + m_eeg_forward_grad->nrow, m_meg_forward_grad->ncol);
+            sol_grad->data.block(0,0,m_meg_forward_grad->nrow,m_meg_forward_grad->ncol) = m_meg_forward_grad->data;
+            sol_grad->data.block(m_meg_forward_grad->nrow,0,m_eeg_forward_grad->nrow,m_eeg_forward_grad->ncol) = m_eeg_forward_grad->data;
+            sol_grad->nrow = m_meg_forward_grad->nrow + m_eeg_forward_grad->nrow;
+            sol_grad->row_names.append(m_meg_forward_grad->row_names);
+        } else if (iNMeg > 0) {
+            sol_grad = m_meg_forward_grad;
+        } else {
+            sol_grad = m_eeg_forward_grad;
         }
     }
 }
@@ -2405,15 +2448,19 @@ void ComputeFwd::updateHeadPos(FiffCoordTransOld* transDevHeadOld)
                                           m_bemModel,
                                           &m_pSettings->r0,
                                           m_pSettings->use_threads,
-                                          &m_meg_forward,
-                                          m_pSettings->compute_grad ? &m_meg_forward_grad : Q_NULLPTR)) == FAIL) {
+                                          *m_meg_forward.data(),
+                                          *m_meg_forward_grad.data(),
+                                          m_pSettings->compute_grad)) == FAIL) {
         return;
     }
 
     // Update new Transformation Matrix
     m_meg_head_t = new FiffCoordTransOld(*transDevHeadOld);
-    // convert MneNamed matrix to FiffNamed
-    toFiffNamed();
+    // update solution
+    sol->data.block(0,0,m_meg_forward->nrow,m_meg_forward->ncol) = m_meg_forward->data;
+    if(m_pSettings->compute_grad) {
+        sol_grad->data.block(0,0,m_meg_forward_grad->nrow,m_meg_forward_grad->ncol) = m_meg_forward_grad->data;
+    }
 }
 
 //=========================================================================================================
@@ -2443,10 +2490,11 @@ void ComputeFwd::storeFwd()
                         iNEeg,
                         m_pSettings->fixed_ori,                 /* Fixed orientation dipoles? */
                         m_pSettings->coord_frame,               /* Coordinate frame */
-                        m_meg_forward,
-                        m_eeg_forward,
-                        m_meg_forward_grad,
-                        m_eeg_forward_grad)) {
+                        *m_meg_forward.data(),
+                        *m_eeg_forward.data(),
+                        *m_meg_forward_grad.data(),
+                        *m_eeg_forward_grad.data(),
+                        m_pSettings->compute_grad)) {
         return;
     }
 
@@ -2455,128 +2503,4 @@ void ComputeFwd::storeFwd()
     }
     printf("done\n");
     printf("\nFinished.\n");
-}
-
-//=========================================================================================================
-
-void ComputeFwd::toFiffNamed()
-{
-    // ToDo: the following can beleted ones FiffNamedMatrix is used for the fwd calc and MNEForwardSolution
-    // is implemented to store results
-    int iNMeg, iNEeg, iNMegGrad, iNEegGrad;
-    iNMeg = iNEeg = iNMegGrad = iNEegGrad = 0;
-    MatrixXd matMeg;
-    MatrixXd matEeg;
-    MatrixXd matMegGrad;
-    MatrixXd matEegGrad;
-    if(m_meg_forward) {
-        iNMeg = m_meg_forward->ncol;
-        matMeg.conservativeResize(m_meg_forward->nrow,iNMeg);
-        for(int i = 0; i < m_meg_forward->nrow; ++i) {
-            for(int j = 0; j < iNMeg; ++j) {
-                matMeg(i,j) = m_meg_forward->data[i][j];
-            }
-        }    }
-    if(m_eeg_forward) {
-        iNEeg = m_eeg_forward->ncol;
-        matEeg.conservativeResize(m_eeg_forward->nrow,iNEeg);
-        for(int i = 0; i < m_eeg_forward->nrow; ++i) {
-            for(int j = 0; j < iNEeg; ++j) {
-                matEeg(i,j) = m_eeg_forward->data[i][j];
-            }
-        }    }
-    if(m_meg_forward_grad) {
-        iNMegGrad = m_meg_forward_grad->ncol;
-        matMegGrad.conservativeResize(m_meg_forward_grad->nrow,iNMegGrad);
-        for(int i = 0; i < m_meg_forward_grad->nrow; ++i) {
-            for(int j = 0; j < iNMegGrad; ++j) {
-                matMegGrad(i,j) = m_meg_forward_grad->data[i][j];
-            }
-        }
-    }
-    if(m_eeg_forward_grad) {
-        iNEegGrad = m_eeg_forward_grad->ncol;
-        matEegGrad.conservativeResize(m_eeg_forward_grad->nrow,iNEegGrad);
-        for(int i = 0; i < m_eeg_forward_grad->nrow; ++i) {
-            for(int j = 0; j < iNEegGrad; ++j) {
-                matEegGrad(i,j) = m_eeg_forward_grad->data[i][j];
-            }
-        }
-    }
-
-    // convert MneNamed to FiffNamed
-    if(iNMeg > 0 && iNEeg > 0) {
-        sol.clear();
-        if(matMeg.rows() != matEeg.rows()) {
-            qWarning() << "Forward Solutions do not match!";
-        }
-        sol.data = MatrixXd(m_meg_forward->nrow, iNMeg + iNEeg);
-        sol.data.block(0,0,m_meg_forward->nrow,iNMeg) = matMeg;
-        sol.data.block(0,iNMeg,m_meg_forward->nrow,iNEeg) = matEeg;
-        sol.ncol = iNMeg + iNEeg;
-        sol.nrow = m_meg_forward->nrow;
-        sol.col_names = m_meg_forward->collist;
-        sol.col_names.append(m_eeg_forward->collist);
-        sol.row_names = m_meg_forward->rowlist;
-        sol.transpose_named_matrix();
-        //fwdSolution->sol = &sol;
-    } else if(iNMeg > 0 && iNEeg == 0) {
-        sol.clear();
-        sol.data = matMeg;
-        sol.ncol = iNMeg;
-        sol.nrow = m_meg_forward->nrow;
-        sol.col_names = m_meg_forward->collist;
-        sol.row_names = m_meg_forward->rowlist;
-        sol.transpose_named_matrix();
-        //fwdSolution->sol = &sol;
-    } else if(iNMeg == 0 && iNEeg > 0) {
-        sol.clear();
-        sol.data = matEeg;
-        sol.ncol = iNEeg;
-        sol.nrow = m_eeg_forward->nrow;
-        sol.col_names = m_eeg_forward->collist;
-        sol.row_names = m_eeg_forward->rowlist;
-        sol.transpose_named_matrix();
-        //fwdSolution->sol = &sol;
-    } else {
-        qWarning() << "ComputeFwd::getSolution(): no Forward Solution available";
-    }
-    if(m_pSettings->compute_grad) {
-        if(iNMegGrad > 0 && iNEegGrad > 0) {
-            sol.clear();
-            if(matMegGrad.rows() != matEegGrad.rows()) {
-                qWarning() << "Forward Solutions does not match!";
-            }
-            sol_grad.data = MatrixXd(m_meg_forward_grad->nrow, iNMegGrad + iNEegGrad);
-            sol_grad.data.block(0,0,m_meg_forward_grad->nrow,iNMeg) = matMegGrad;
-            sol_grad.data.block(0,iNMegGrad,m_meg_forward_grad->nrow,iNEegGrad) = matEegGrad;
-            sol_grad.ncol = iNMegGrad + iNEegGrad;
-            sol_grad.nrow = m_meg_forward_grad->nrow;
-            sol_grad.col_names = m_meg_forward_grad->collist;
-            sol_grad.col_names.append(m_eeg_forward_grad->collist);
-            sol_grad.row_names = m_meg_forward_grad->rowlist;
-            sol_grad.transpose_named_matrix();
-            //fwdSolution->sol_grad = &sol_grad;
-        } else if(iNMegGrad > 0 && iNEegGrad == 0) {
-            sol_grad.clear();
-            sol_grad.data = matMegGrad;
-            sol_grad.ncol = iNMegGrad;
-            sol_grad.nrow = m_meg_forward_grad->nrow;
-            sol_grad.col_names = m_meg_forward_grad->collist;
-            sol_grad.row_names = m_meg_forward_grad->rowlist;
-            sol_grad.transpose_named_matrix();
-            //fwdSolution->sol_grad = &sol_grad;
-        } else if(iNMegGrad == 0 && iNEegGrad > 0) {
-            sol_grad.clear();
-            sol_grad.data = matEegGrad;
-            sol_grad.ncol = iNEegGrad;
-            sol_grad.nrow = m_eeg_forward_grad->nrow;
-            sol_grad.col_names = m_eeg_forward_grad->collist;
-            sol_grad.row_names = m_eeg_forward_grad->rowlist;
-            sol_grad.transpose_named_matrix();
-            //fwdSolution->sol_grad = &sol_grad;
-        } else {
-            qWarning() << "ComputeFwd::getSolution(): no Forward Solution Grad available";
-        }
-    }
 }

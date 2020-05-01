@@ -158,8 +158,8 @@ int main(int argc, char *argv[])
     fTime4 = timer4.elapsed();
 
     // get updated solution
-    pFwdSolution->sol = new FiffNamedMatrix(pComputeFwd->sol);
-    pFwdSolution->sol_grad = new FiffNamedMatrix(pComputeFwd->sol_grad);
+    pFwdSolution->sol = pComputeFwd->sol;
+    pFwdSolution->sol_grad = pComputeFwd->sol_grad;
 
     // Print timer results
     qInfo() << "The initialization took: " << fTime0  << " ms.";
