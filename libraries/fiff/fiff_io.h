@@ -1,7 +1,8 @@
 //=============================================================================================================
 /**
  * @file     fiff_io.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
+ * @author   Florian Schlembach <Florian.Schlembach@tu-ilmenau.de>;
+ *           Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
  * @since    0.1.0
@@ -9,7 +10,7 @@
  *
  * @section  LICENSE
  *
- * Copyright (C) 2012, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ * Copyright (C) 2012, Florian Schlembach, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -117,7 +118,6 @@ public:
     FiffIO(const FiffIO& p_FiffIO);
 
     //=========================================================================================================
-
     /**
      * Setup a FiffStream
      *
@@ -127,7 +127,6 @@ public:
      *
      * @return true if succeeded, false otherwise
      */
-
     static bool setup_read(QIODevice& p_IODevice, FiffInfo& info, FiffDirNode::SPtr& dirTree);
 
     //=========================================================================================================
@@ -161,9 +160,9 @@ public:
     /**
      * Write whole data of a type to a fiff file.
      *
-     * @param[in] filename    filename including the path but not the type, e.g. ./sample_date/sample_audvis.fif -> will be extended to ./sample_date/sample_audvis-type-1.fif
-     * @param[in] type of data to write  fiff constants types, e.g. FIFFB_RAW_DATA
-     * @param[in] idx                    index of type, -1 for all entities of this type
+     * @param[in] p_QFile                   filename including the path but not the type, e.g. ./sample_date/sample_audvis.fif -> will be extended to ./sample_date/sample_audvis-type-1.fif
+     * @param[in] type of data to write     fiff constants types, e.g. FIFFB_RAW_DATA
+     * @param[in] idx                       index of type, -1 for all entities of this type
      */
     bool write(QFile& p_QFile, const fiff_int_t type, const fiff_int_t idx) const;
 
@@ -195,8 +194,8 @@ public:
     }
 
 public:
-    QList<QSharedPointer<FiffRawData> > m_qlistRaw;
-    QList<QSharedPointer<FiffEvoked> > m_qlistEvoked;
+    QList<QSharedPointer<FiffRawData> >     m_qlistRaw;
+    QList<QSharedPointer<FiffEvoked> >      m_qlistEvoked;
 //    QList<QSharedPointer<MNEForwardSolution> > m_qlistFwd;
     //FiffCov, MNEInverseOperator, AnnotationSet,
 };

@@ -170,6 +170,14 @@ public:
     virtual inline bool saveToFile(const QString& sPath);
 
     //=========================================================================================================
+    /**
+     * Whether the model has been initialized.
+     *
+     * @returns Tru or false flag whether the model has been initialized or not.
+     */
+    virtual inline bool isInit();
+
+    //=========================================================================================================
     // Inherited by QAbstractItemModel:
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override = 0;
     virtual Qt::ItemFlags flags(const QModelIndex &index) const override = 0;
@@ -179,8 +187,9 @@ public:
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override = 0;
 
 protected:
+    ModelPath   m_modelPath;
 
-    ModelPath m_modelPath;
+    bool        m_bIsInit = false;          /**< Whether the model has been initialized. */
 };
 
 //=============================================================================================================
@@ -212,6 +221,13 @@ bool AbstractModel::saveToFile(const QString& sPath)
 {
     qDebug() << "[AbstractModel::saveToFile] Saving data to" << sPath << "is not implemented for MODELTYPE = " << getType();
     return false;
+}
+
+//=============================================================================================================
+
+bool AbstractModel::isInit()
+{
+    return m_bIsInit;
 }
 
 } // namespace ANSHAREDLIB
