@@ -111,19 +111,29 @@ bool FiffIO::read(QIODevice& p_IODevice)
     //Read dirTree from fiff data (raw,evoked,fwds,cov)
     FiffInfo t_fiffInfo;
     FiffDirNode::SPtr t_dirTree;
-    bool hasRaw=false,hasEvoked=false; // hasFwds=false;
+    bool hasRaw = false;
+    bool hasEvoked = false; // hasFwds=false;
 
-    FiffIO::setup_read(p_IODevice,t_fiffInfo,t_dirTree);
+    FiffIO::setup_read(p_IODevice, t_fiffInfo, t_dirTree);
     p_IODevice.close(); //file can be closed, since IODevice is already read
 
+    if(!t_dirTree) {
+        qWarning() << "[FiffIO::read] Dir tree could not be read";
+        return false;
+    }
+
     //Search dirTree for specific data types
-    if(t_dirTree->has_kind(FIFFB_EVOKED))
+    if(t_dirTree->has_kind(FIFFB_EVOKED)) {
         hasEvoked = true;
+    }
+
     if(t_dirTree->has_kind(FIFFB_RAW_DATA) ||
        t_dirTree->has_kind(FIFFB_PROCESSED_DATA) ||
        t_dirTree->has_kind(FIFFB_CONTINUOUS_DATA) ||
-       t_dirTree->has_kind(FIFFB_SMSH_RAW_DATA))
+       t_dirTree->has_kind(FIFFB_SMSH_RAW_DATA)) {
         hasRaw = true;
+    }
+
    // if(t_Tree.has_kind(FIFFB_MNE_FORWARD_SOLUTION))
    //     hasFwds = true;
 

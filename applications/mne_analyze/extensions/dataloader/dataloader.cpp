@@ -170,7 +170,9 @@ void DataLoader::onLoadFiffFilePressed()
                                                     QDir::currentPath()+"/MNE-sample-data",
                                                     tr("Fiff file(*.fif *.fiff)"));
 
-    if(!filePath.isNull()) {
+    QFileInfo fileInfo(filePath);
+
+    if(fileInfo.exists() && (fileInfo.completeSuffix() == "fif")) {
         m_pAnalyzeData->loadModel<FiffRawViewModel>(filePath);
     }
 #endif
@@ -189,7 +191,9 @@ void DataLoader::onSaveFiffFilePressed()
                                                     QDir::currentPath()+"/MNE-sample-data",
                                                     tr("Fiff file(*.fif *.fiff)"));
 
-    if(!filePath.isNull()) {
+    QFileInfo fileInfo(filePath);
+
+    if(fileInfo.exists() && (fileInfo.completeSuffix() == "fif")) {
         m_pAnalyzeData->saveModel(m_sCurrentlySelectedModel, filePath);
     }
 #endif

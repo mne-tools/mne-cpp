@@ -438,7 +438,6 @@ public:
     void addTimeMark(int iLastClicked);
 
 private:
-
     //=========================================================================================================
     /**
      * This is a helper method thats is meant to correctly set the endOfFile / startOfFile flags whenever needed
@@ -484,15 +483,12 @@ private:
      */
     void updateDisplayData();
 
-
-
 signals:
-
     //=========================================================================================================
     /**
       * Emits that new block data is loaded
       */
-     void newBlocksLoaded();
+    void newBlocksLoaded();
 
 private:
 

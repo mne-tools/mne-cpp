@@ -160,10 +160,14 @@ public:
             QSharedPointer<AbstractModel> temp = qSharedPointerCast<AbstractModel>(sm);
             temp->setModelPath(sPath);
 
-            // add to record, and tell others about the new model
-            m_data.insert(sPath, temp);
-            emit this->newModelAvailable(temp);
-            return sm;
+            if(temp->isInit()) {
+                // add to record, and tell others about the new model
+                m_data.insert(sPath, temp);
+                emit this->newModelAvailable(temp);
+                return sm;
+            } else {
+                return Q_NULLPTR;
+            }
         }
     }
 
