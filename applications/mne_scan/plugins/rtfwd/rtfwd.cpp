@@ -37,6 +37,8 @@
 //=============================================================================================================
 
 #include "rtfwd.h"
+#include <fwd/computeFwd/compute_fwd.h>
+#include <fwd/computeFwd/compute_fwd_settings.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -57,6 +59,7 @@ using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
 using namespace IOBUFFER;
 using namespace Eigen;
+using namespace FWDLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -88,15 +91,18 @@ QSharedPointer<IPlugin> RtFwd::clone() const
 
 void RtFwd::init()
 {
+    // Inits
+    m_pFwdSettings = ComputeFwdSettings::SPtr(new ComputeFwdSettings);
+
     // Input
-    m_pInput = PluginInputData<RealTimeMultiSampleArray>::create(this, "DummyIn", "Dummy input data");
+    m_pInput = PluginInputData<RealTimeMultiSampleArray>::create(this, "rtFwdIn", "rtFwd input data");
     connect(m_pInput.data(), &PluginInputConnector::notify,
             this, &RtFwd::update, Qt::DirectConnection);
     m_inputConnectors.append(m_pInput);
 
     // Output - Uncomment this if you don't want to send processed data (in form of a matrix) to other plugins.
     // Also, this output stream will generate an online display in your plugin
-    m_pOutput = PluginOutputData<RealTimeMultiSampleArray>::create(this, "DummyOut", "Dummy output data");
+    m_pOutput = PluginOutputData<RealTimeMultiSampleArray>::create(this, "rtFwdOut", "rtFwd output data");
     m_pOutput->data()->setName(this->getName());
     m_outputConnectors.append(m_pOutput);
 }
@@ -144,7 +150,7 @@ IPlugin::PluginType RtFwd::getType() const
 
 QString RtFwd::getName() const
 {
-    return "rtFwd";
+    return "Real-Time Forward Solution";
 }
 
 //=============================================================================================================
