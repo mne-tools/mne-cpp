@@ -193,10 +193,10 @@ void RtFwd::initPluginControlWidgets()
         QList<QWidget*> plControlWidgets;
 
         // The plugin's control widget
-        RtFwdWidget* pYourWidget = new RtFwdWidget(QString("MNESCAN/%1/").arg(this->getName()));
-        pYourWidget->setObjectName("group_tab_Settings_Your Widget");
+//        RtFwdWidget* pYourWidget = new RtFwdWidget(QString("MNESCAN/%1/").arg(this->getName()));
+//        pYourWidget->setObjectName("group_tab_Settings_Your Widget");
 
-        plControlWidgets.append(pYourWidget);
+//        plControlWidgets.append(pYourWidget);
 
         emit pluginControlWidgetsChanged(plControlWidgets, this->getName());
 

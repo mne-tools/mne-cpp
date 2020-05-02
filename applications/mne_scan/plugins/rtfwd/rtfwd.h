@@ -42,7 +42,7 @@
 #include "rtfwd_global.h"
 
 #include "FormFiles/rtfwdsetupwidget.h"
-#include "FormFiles/rtfwdwidget.h"
+//#include "FormFiles/rtfwdwidget.h"
 
 #include <scShared/Interfaces/IAlgorithm.h>
 #include <utils/generics/circularbuffer.h>
@@ -138,7 +138,7 @@ protected:
 private:
     FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;                /**< Fiff measurement info.*/
 
-    QSharedPointer<RtFwdWidget>                 m_pYourWidget;              /**< The widget used to control this plugin by the user.*/
+//    QSharedPointer<RtFwdWidget>                 m_pYourWidget;              /**< The widget used to control this plugin by the user.*/
 
     IOBUFFER::CircularBuffer_Matrix_double::SPtr    m_pCircularBuffer;          /**< Holds incoming data.*/
 
