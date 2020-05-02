@@ -44,9 +44,13 @@
 #include "FormFiles/rtfwdsetupwidget.h"
 //#include "FormFiles/rtfwdwidget.h"
 
+#include <fwd/computeFwd/compute_fwd.h>
+#include <fwd/computeFwd/compute_fwd_settings.h>
+
 #include <scShared/Interfaces/IAlgorithm.h>
-#include <utils/generics/circularbuffer.h>
 #include <scMeas/realtimemultisamplearray.h>
+
+#include <utils/generics/circularbuffer.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -63,6 +67,16 @@
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+
+namespace FIFFLIB {
+    class FiffInfo;
+    class FiffCoordTrans;
+}
+
+namespace FWDLIB {
+class ComputeFwdSettings;
+class ComputeFwd;
+}
 
 //=============================================================================================================
 // DEFINE NAMESPACE RTFWDPLUGIN
@@ -116,7 +130,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Udates the pugin with new (incoming) data.
+     * Udates the plugin with new (incoming) data.
      *
      * @param[in] pMeasurement    The incoming data in form of a generalized Measurement.
      */
@@ -136,11 +150,42 @@ protected:
     virtual void run();
 
 private:
-    FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;                /**< Fiff measurement info.*/
+    QMutex m_mutex; /**< The threads mutex.*/
 
-//    QSharedPointer<RtFwdWidget>                 m_pYourWidget;              /**< The widget used to control this plugin by the user.*/
+    FIFFLIB::FiffInfo::SPtr             m_pFiffInfo;            /**< Fiff measurement info.*/
 
-    IOBUFFER::CircularBuffer_Matrix_double::SPtr    m_pCircularBuffer;          /**< Holds incoming data.*/
+    FWDLIB::ComputeFwdSettings::SPtr    m_pFwdSettings;         /**< Forward Solution Settings.*/
+
+    QString                             m_sSourceName;          /**< Source space file.*/
+    QString                             m_sMriName;             /**< MRI file for head <-> MRI transformation. */
+    QString                             m_sBemName;             /**< BEM model file */
+    QString                             m_sSolName;             /**< Forward Solution file.*/
+    QString                             m_sTransName;           /**< head2mri transformation file. */
+    QString                             m_sMinDistOutName;      /**< Output file for omitted source space points. */
+    QString                             m_sCommand;             /**< Saves the recognized command line for future use. */
+    QString                             m_sEegModelFile;        /**< File of EEG sphere model specifications. */
+    QString                             m_sEegModelName;        /**< Name of the EEG model to use. */
+    QStringList                         m_listLabels;           /**< Compute the solution only for these labels. */
+    bool                                m_bIncludeEEG;          /**< Compute EEG forward. */
+    bool                                m_bIncludeMEG;          /**< Compute MEG forward. */
+    bool                                m_bAccurate;            /**< Use accurate coil geometry.*/
+    bool                                m_bComputeGrad;         /**< Compute gradient solution. */
+    bool                                m_bFixedOri;            /**< Fixed-orientation dipoles? */
+    bool                                m_bScaleEegPos;     	/**< Scale the electrode locations to scalp in the sphere model. */
+    bool                                m_bUseEquivEeg;      	/**< Use the equivalent source approach for the EEG sphere model. */
+    bool                                m_bUseThreads;        	/**< Parallelize? */
+    bool                                m_bMriHeadIdent;        /**< Are the head and MRI coordinates the same? */
+    bool                                m_bFilterSpaces;        /**< Filter the source space points. */
+    bool                                m_bDoAll;               /**< Compute everthing. */
+    int                                 m_iNLabel;              /**< Number of labels.*/
+    int                                 m_iCoordFrame;          /**< Where to compute the solution. */
+    float                               m_fMinDist;             /**< Minimum allowed distance of the sources from the inner skull surface. */
+    float                               m_fEegSphereRad;        /**< Scalp radius to use in EEG sphere model. */
+    Eigen::Vector3f                     m_vecR0;                /**< Sphere model origin.  */
+
+    FIFFLIB::FiffCoordTrans             m_transDefHead;         /**< Updated meg->head transformation. */
+
+    IOBUFFER::CircularBuffer_Matrix_double::SPtr    m_pCircularBuffer;      /**< Holds incoming data.*/
 
     SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr      m_pInput;      /**< The incoming data.*/
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pOutput;     /**< The outgoing data.*/
@@ -148,9 +193,9 @@ private:
 signals:
     //=========================================================================================================
     /**
-     * Emitted when fiffInfo is available
+     * Emitted when forward solution is available
      */
-    void fiffInfoAvailable();
+    void fwdSolutionAvailable(const MNELIB::MNEForwardSolution& mneFwdSol);
 };
 } // NAMESPACE
 

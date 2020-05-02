@@ -129,7 +129,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Udates the pugin with new (incoming) data.
+     * Udates the plugin with new (incoming) data.
      *
      * @param[in] pMeasurement    The incoming data in form of a generalized Measurement.
      */
