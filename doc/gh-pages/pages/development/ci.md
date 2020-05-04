@@ -25,8 +25,8 @@ New development takes place on the `master` branch. Once the developers have rou
 
 1. (Manually) Increment version numbers in [mne-cpp.pri](https://github.com/mne-tools/mne-cpp/blob/master/mne-cpp.pri){:target="_blank" rel="noopener"} and [mne-cpp_doxyfile](https://github.com/mne-tools/mne-cpp/blob/master/doc/doxygen/mne-cpp_doxyfile){:target="_blank" rel="noopener"} by `0.x.y`. Commit and merge changes into `mne-tools/mne-cpp:master`.
 2. (Manually) Create release with tag `v0.x.y` on Github. 
-2. (Automatically by [release.yml](https://github.com/mne-tools/mne-cpp/blob/master/.github/workflows/release.yml){:target="_blank" rel="noopener"}) Create new branch named `v0.x.y` based on current `master` branch.
-3. (Automatically by [release.yml](https://github.com/mne-tools/mne-cpp/blob/master/.github/workflows/release.yml){:target="_blank" rel="noopener"}) Build dynamically as well as statically linked binaries and upload them to the `v0.x.y` release on Github.
+2. (Automated by [release.yml](https://github.com/mne-tools/mne-cpp/blob/master/.github/workflows/release.yml){:target="_blank" rel="noopener"}) Create new branch named `v0.x.y` based on current `master` branch.
+3. (Automated by [release.yml](https://github.com/mne-tools/mne-cpp/blob/master/.github/workflows/release.yml){:target="_blank" rel="noopener"}) Build dynamically as well as statically linked binaries and upload them to the `v0.x.y` release on Github.
 
 ## Solving for dependencies
 
