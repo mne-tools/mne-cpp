@@ -61,33 +61,32 @@ RtFwdSetupWidget::RtFwdSetupWidget(RtFwd* toolbox, QWidget *parent)
     m_ui.setupUi(this);
 
     // init line edits
-    m_ui.m_qLineEdit_SolName->setText(m_pRtFwd->m_sSolName);
-    m_ui.m_qLineEdit_BemName->setText(m_pRtFwd->m_sBemName);
-    m_ui.m_qLineEdit_SourceName->setText(m_pRtFwd->m_sSourceName);
-    m_ui.m_qLineEdit_MriName->setText(m_pRtFwd->m_sMriName);
-    m_ui.m_qLineEdit_MinDistName->setText(m_pRtFwd->m_sMinDistOutName);
-    m_ui.m_qLineEdit_EEGModelFile->setText(m_pRtFwd->m_sEegModelFile);
-    m_ui.m_qLineEdit_EEGModelName->setText(m_pRtFwd->m_sEegModelName);
+    m_ui.m_qLineEdit_SolName->setText(m_pRtFwd->m_pFwdSettings->solname);
+    m_ui.m_qLineEdit_BemName->setText(m_pRtFwd->m_pFwdSettings->bemname);
+    m_ui.m_qLineEdit_SourceName->setText(m_pRtFwd->m_pFwdSettings->srcname);
+    m_ui.m_qLineEdit_MriName->setText(m_pRtFwd->m_pFwdSettings->mriname);
+    m_ui.m_qLineEdit_MinDistName->setText(m_pRtFwd->m_pFwdSettings->mindistoutname);
+    m_ui.m_qLineEdit_EEGModelFile->setText(m_pRtFwd->m_pFwdSettings->eeg_model_file);
+    m_ui.m_qLineEdit_EEGModelName->setText(m_pRtFwd->m_pFwdSettings->eeg_model_name);
 
     // init checkboxes
-    m_ui.m_check_bDoAll->setChecked(m_pRtFwd->m_bDoAll);
-    m_ui.m_check_bIncludeEEG->setChecked(m_pRtFwd->m_bIncludeEEG);
-    m_ui.m_check_bIncludeMeg->setChecked(m_pRtFwd->m_bIncludeMEG);
-    m_ui.m_check_bComputeGrad->setChecked(m_pRtFwd->m_bComputeGrad);
-    m_ui.m_check_bAccurate->setChecked(m_pRtFwd->m_bAccurate);
-    m_ui.m_check_bDoAll->setChecked(m_pRtFwd->m_bDoAll);
-    m_ui.m_check_bFixedOri->setChecked(m_pRtFwd->m_bFixedOri);
-    m_ui.m_check_bFilterSpaces->setChecked(m_pRtFwd->m_bFilterSpaces);
-    m_ui.m_check_bMriHeadIdent->setChecked(m_pRtFwd->m_bMriHeadIdent);
-    m_ui.m_check_bUseThreads->setChecked(m_pRtFwd->m_bUseThreads);
-    m_ui.m_check_bUseEquivEeg->setChecked(m_pRtFwd->m_bUseEquivEeg);
+    m_ui.m_check_bDoAll->setChecked(m_pRtFwd->m_pFwdSettings->do_all);
+    m_ui.m_check_bIncludeEEG->setChecked(m_pRtFwd->m_pFwdSettings->include_eeg);
+    m_ui.m_check_bIncludeMeg->setChecked(m_pRtFwd->m_pFwdSettings->include_meg);
+    m_ui.m_check_bComputeGrad->setChecked(m_pRtFwd->m_pFwdSettings->compute_grad);
+    m_ui.m_check_bAccurate->setChecked(m_pRtFwd->m_pFwdSettings->accurate);
+    m_ui.m_check_bFixedOri->setChecked(m_pRtFwd->m_pFwdSettings->fixed_ori);
+    m_ui.m_check_bFilterSpaces->setChecked(m_pRtFwd->m_pFwdSettings->filter_spaces);
+    m_ui.m_check_bMriHeadIdent->setChecked(m_pRtFwd->m_pFwdSettings->mri_head_ident);
+    m_ui.m_check_bUseThreads->setChecked(m_pRtFwd->m_pFwdSettings->use_threads);
+    m_ui.m_check_bUseEquivEeg->setChecked(m_pRtFwd->m_pFwdSettings->use_equiv_eeg);
 
     // init Spin Boxes
-    m_ui.m_doubleSpinBox_dMinDist->setValue(m_pRtFwd->m_fMinDist);
-    m_ui.m_doubleSpinBox_dEegSphereRad->setValue(m_pRtFwd->m_fEegSphereRad);
-    m_ui.m_doubleSpinBox_dVecR0x->setValue(m_pRtFwd->m_vecR0.x());
-    m_ui.m_doubleSpinBox_dVecR0y->setValue(m_pRtFwd->m_vecR0.y());
-    m_ui.m_doubleSpinBox_dVecR0z->setValue(m_pRtFwd->m_vecR0.z());
+    m_ui.m_doubleSpinBox_dMinDist->setValue(m_pRtFwd->m_pFwdSettings->mindist);
+    m_ui.m_doubleSpinBox_dEegSphereRad->setValue(m_pRtFwd->m_pFwdSettings->eeg_sphere_rad);
+    m_ui.m_doubleSpinBox_dVecR0x->setValue(m_pRtFwd->m_pFwdSettings->r0.x());
+    m_ui.m_doubleSpinBox_dVecR0y->setValue(m_pRtFwd->m_pFwdSettings->r0.y());
+    m_ui.m_doubleSpinBox_dVecR0z->setValue(m_pRtFwd->m_pFwdSettings->r0.z());
 
     // connec line edits
     connect(m_ui.m_qLineEdit_SolName, &QLineEdit::textChanged, this, &RtFwdSetupWidget::changeSolName);
@@ -121,8 +120,7 @@ void RtFwdSetupWidget::showFwdDirDialog()
                                                   | QFileDialog::DontResolveSymlinks);
 
     QString t_sFileName = m_ui.m_qLineEdit_SolName->text();
-    m_pRtFwd->m_sSolName = m_sSolDir + "/" + t_sFileName;
-    qDebug() << m_pRtFwd->m_sSolName;
+    m_pRtFwd->m_pFwdSettings->solname = m_sSolDir + "/" + t_sFileName;
 }
 
 //=============================================================================================================
@@ -130,7 +128,7 @@ void RtFwdSetupWidget::showFwdDirDialog()
 void RtFwdSetupWidget::changeSolName()
 {
     QString t_sFileName = m_ui.m_qLineEdit_SolName->text();
-    m_pRtFwd->m_sSolName = m_sSolDir + "/" + t_sFileName;
+    m_pRtFwd->m_pFwdSettings->solname = m_sSolDir + "/" + t_sFileName;
 }
 
 //=============================================================================================================
@@ -142,7 +140,7 @@ void RtFwdSetupWidget::showSourceFileDialog()
                                                        QString(),
                                                        tr("Fif Files (*.fif)"));
 
-    m_pRtFwd->m_sSourceName = t_sFileName;
+    m_pRtFwd->m_pFwdSettings->srcname = t_sFileName;
     m_ui.m_qLineEdit_SourceName->setText(t_sFileName);
 }
 
@@ -155,7 +153,7 @@ void RtFwdSetupWidget::showBemFileDialog()
                                                        QString(),
                                                        tr("Fif Files (*.fif)"));
 
-    m_pRtFwd->m_sBemName = t_sFileName;
+    m_pRtFwd->m_pFwdSettings->bemname = t_sFileName;
     m_ui.m_qLineEdit_BemName->setText(t_sFileName);
 }
 
@@ -168,7 +166,7 @@ void RtFwdSetupWidget::showMriFileDialog()
                                                        QString(),
                                                        tr("Fif Files (*.fif)"));
 
-    m_pRtFwd->m_sMriName = t_sFileName;
+    m_pRtFwd->m_pFwdSettings->mriname = t_sFileName;
     m_ui.m_qLineEdit_MriName->setText(t_sFileName);
 }
 
@@ -181,7 +179,7 @@ void RtFwdSetupWidget::showEEGModelFileDialog()
                                                        QString(),
                                                        tr("Fif Files (*.fif)"));
 
-    m_pRtFwd->m_sEegModelFile = t_sFileName;
+    m_pRtFwd->m_pFwdSettings->eeg_model_file = t_sFileName;
     m_ui.m_qLineEdit_EEGModelFile->setText(t_sFileName);
 }
 
@@ -194,7 +192,7 @@ void RtFwdSetupWidget::showEEGModelNameDialog()
                                                        QString(),
                                                        tr("Fif Files (*.fif)"));
 
-    m_pRtFwd->m_sEegModelName = t_sFileName;
+    m_pRtFwd->m_pFwdSettings->eeg_model_name = t_sFileName;
     m_ui.m_qLineEdit_EEGModelName->setText(t_sFileName);
 }
 
@@ -209,7 +207,7 @@ void RtFwdSetupWidget::showMinDistDirDialog()
                                                       | QFileDialog::DontResolveSymlinks);
 
     QString t_sFileName = m_ui.m_qLineEdit_MinDistName->text();
-    m_pRtFwd->m_sMinDistOutName = m_sMinDistDir + "/" + t_sFileName;
+    m_pRtFwd->m_pFwdSettings->mindistoutname = m_sMinDistDir + "/" + t_sFileName;
 }
 
 //=============================================================================================================
@@ -217,29 +215,29 @@ void RtFwdSetupWidget::showMinDistDirDialog()
 void RtFwdSetupWidget::changeMinDistName()
 {
     QString t_sFileName = m_ui.m_qLineEdit_MinDistName->text();
-    m_pRtFwd->m_sMinDistOutName = m_sMinDistDir + "/" + t_sFileName;
+    m_pRtFwd->m_pFwdSettings->mindistoutname = m_sMinDistDir + "/" + t_sFileName;
 }
 
 //=============================================================================================================
 
 void RtFwdSetupWidget::changeMinDist()
 {
-    m_pRtFwd->m_fMinDist = m_ui.m_doubleSpinBox_dMinDist->value();
+    m_pRtFwd->m_pFwdSettings->mindist = m_ui.m_doubleSpinBox_dMinDist->value();
 }
 //=============================================================================================================
 
 void RtFwdSetupWidget::changeEEGSphereRad()
 {
-    m_pRtFwd->m_fEegSphereRad = m_ui.m_doubleSpinBox_dEegSphereRad->value();
+    m_pRtFwd->m_pFwdSettings->eeg_sphere_rad = m_ui.m_doubleSpinBox_dEegSphereRad->value();
 }
 
 //=============================================================================================================
 
 void RtFwdSetupWidget::changeEEGSphereOrigin()
 {
-    m_pRtFwd->m_vecR0.x() = m_ui.m_doubleSpinBox_dVecR0x->value();
-    m_pRtFwd->m_vecR0.y() = m_ui.m_doubleSpinBox_dVecR0y->value();
-    m_pRtFwd->m_vecR0.z() = m_ui.m_doubleSpinBox_dVecR0z->value();
+    m_pRtFwd->m_pFwdSettings->r0.x() = m_ui.m_doubleSpinBox_dVecR0x->value();
+    m_pRtFwd->m_pFwdSettings->r0.y() = m_ui.m_doubleSpinBox_dVecR0y->value();
+    m_pRtFwd->m_pFwdSettings->r0.z() = m_ui.m_doubleSpinBox_dVecR0z->value();
     std::cout << m_pRtFwd->m_vecR0 << std::endl;
 }
 //=============================================================================================================
