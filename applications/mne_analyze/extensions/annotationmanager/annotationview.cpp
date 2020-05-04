@@ -124,25 +124,23 @@ void AnnotationView::initGUIFunctionality()
     connect(m_pAnnModel.data(), &ANSHAREDLIB::AnnotationModel::updateEventTypes,
             this, &AnnotationView::updateComboBox, Qt::UniqueConnection);
 
-    //'Remove annotations' button
+    //For some reason the GUI breakes without this
     QToolBar *toolBar = new QToolBar(this);
     toolBar->setOrientation(Qt::Vertical);
     toolBar->setMovable(false);
-    QAction* removeEvent = new QAction("Remove", this);
-    removeEvent->setStatusTip(tr("Remove an annotation from the list"));
-    toolBar->addAction(removeEvent);
-    connect(removeEvent, &QAction::triggered,
-            this, &AnnotationView::removeAnnotationfromModel, Qt::UniqueConnection);
-    ui->m_gridLayout_Main->addWidget(toolBar,1,1,1,1);
+    ui->m_gridLayout_Main->addWidget(toolBar,0,0,1,1);
 
     //Add type button
     connect(ui->m_pushButton_addEventType, &QPushButton::clicked,
             this, &AnnotationView::addNewAnnotationType, Qt::UniqueConnection);
 
+    //Save button
     connect(ui->m_pushButtonSave, &QPushButton::clicked,
             this, &AnnotationView::onSaveButton, Qt::UniqueConnection);
 
-    //connect(ui->m_tableView_eventTableView.)
+    //Delete button
+    connect(ui->m_pushButtonDelete, &QPushButton::clicked,
+            this, &AnnotationView::removeAnnotationfromModel, Qt::UniqueConnection);
 }
 
 //=============================================================================================================
