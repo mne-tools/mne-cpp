@@ -7,17 +7,19 @@ nav_order: 2
 
 This is the quickest way to get MNE-CPP up and running on your machine:
 
-| **Please note:** Currently only a development version is available. |
+**Download MNE-CPP**
 
-* Download MNE-CPP:
+  [Download](../install/binaries.md) the latest stable release for the best stability, or the dev_build release for the latest features.
 
-&nbsp; &nbsp; &nbsp; &nbsp; [Windows](https://github.com/mne-tools/mne-cpp/releases/download/dev_build/mne-cpp-windows-static-x86_64.zip){: .btn .btn-green } [Linux](https://github.com/mne-tools/mne-cpp/releases/download/dev_build/mne-cpp-linux-static-x86_64.tar.gz){: .btn .btn-green } [MacOS](https://github.com/mne-tools/mne-cpp/releases/download/dev_build/mne-cpp-macos-static-x86_64.tar.gz){: .btn .btn-green }
+**Unzip the downloaded file**
 
-* Unzip the downloaded file.
+  Extract the downloaded build into a folder on your machine
 
-* Select the tool you wish to use from the `bin` folder.
+**Select the tool you wish to use from the `bin` folder**
 
-* Follow the [guides](../learn/learn.md) on how to use MNE-CPP tools.
+  Currently we offer a real-time application: [MNE-Scan](../learn/mnescan.md); a visualization/analysis application: [MNE Analyze](../learn/mneanalyze.md); and a data anonymization tool: [MNE Anonymize](../learn/mneanonymize).
+
+**Follow the [guides](../learn/learn.md) on how to use MNE-CPP tools**
 
 ---
 
