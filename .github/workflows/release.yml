@@ -518,8 +518,6 @@ jobs:
         done
         
   Doxygen:
-    # Only run for dev releases
-    if: endsWith(github.ref, 'master') == true
     runs-on: ubuntu-latest
     needs: CreateRelease
 
