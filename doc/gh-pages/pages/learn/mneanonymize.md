@@ -2,7 +2,7 @@
 title: MNE Anonymize CLI
 has_children: true
 parent: Learn
-nav_order: 2
+nav_order: 3
 ---
 # MNE Anonymize CLI
 
