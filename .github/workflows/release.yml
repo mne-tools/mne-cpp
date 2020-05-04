@@ -14,21 +14,6 @@ jobs:
     steps:
     - name: Clone repository
       uses: actions/checkout@v2
-    - name: Increment release version (stable release only)
-      if: endsWith(github.ref, 'master') == false
-      run: |
-        # Setup Git
-        git config --global user.email lorenzesch@hotmail.com
-        git config --global user.name LorenzE
-        # Increment MNE-CPP version in mne-cpp.pri file
-        sed -i "s/.*MNE_CPP_VERSION =.*/MNE_CPP_VERSION = ${GITHUB_REF#refs/tags/v}/" mne-cpp.pri
-        sed -i "s/.*MNE_LIB_VERSION =.*/MNE_LIB_VERSION = ${GITHUB_REF#refs/tags/v}/" mne-cpp.pri
-        # Increment Doxygen version
-        sed -i "s/.*PROJECT_NUMBER         =.*/PROJECT_NUMBER         = ${GITHUB_REF#refs/tags/v}/" ./doc/doxygen/mne-cpp_doxyfile
-        # Commit changes and push
-        git add -u
-        git commit -m "MAINT: Increment version information to ${GITHUB_REF#refs/tags/}"
-        git push origin HEAD:master
     - name: Create new branch with the tag's name (stable release only)
       if: endsWith(github.ref, 'master') == false
       run: |
@@ -74,11 +59,6 @@ jobs:
     steps:
     - name: Clone repository
       uses: actions/checkout@v2
-    - name: Get version increment changes (for stable release only)
-      if: endsWith(github.ref, 'master') == false
-      run: |
-        git fetch origin
-        git checkout origin/master
     - name: Install OpenGL
       run: |
         sudo apt-get install build-essential libgl1-mesa-dev
@@ -144,11 +124,6 @@ jobs:
     steps:
     - name: Clone repository
       uses: actions/checkout@v2
-    - name: Get version increment changes (for stable release only)
-      if: endsWith(github.ref, 'master') == false
-      run: |
-        git fetch origin
-        git checkout origin/master
     - name: Install Qt
       run: |
         # Download the pre-built static version of Qt, which was created with the buildqtbinaries.yml workflow
@@ -210,11 +185,6 @@ jobs:
     steps:
     - name: Clone repository
       uses: actions/checkout@v2
-    - name: Get version increment changes (for stable release only)
-      if: endsWith(github.ref, 'master') == false
-      run: |
-        git fetch origin
-        git checkout origin/master
     - name: Install Python 3.7 version
       uses: actions/setup-python@v1
       with:
@@ -289,11 +259,6 @@ jobs:
     steps:
     - name: Clone repository
       uses: actions/checkout@v2
-    - name: Get version increment changes (for stable release only)
-      if: endsWith(github.ref, 'master') == false
-      run: |
-        git fetch origin
-        git checkout origin/master
     - name: Install Python 3.7 version
       uses: actions/setup-python@v1
       with:
@@ -375,11 +340,6 @@ jobs:
     steps:
     - name: Clone repository
       uses: actions/checkout@v2
-    - name: Get version increment changes (for stable release only)
-      if: endsWith(github.ref, 'master') == false
-      run: |
-        git fetch origin
-        git checkout origin/master
     - name: Install Python 3.7 version
       uses: actions/setup-python@v1
       with:
@@ -447,11 +407,6 @@ jobs:
     steps:
     - name: Clone repository
       uses: actions/checkout@v2
-    - name: Get version increment changes (for stable release only)
-      if: endsWith(github.ref, 'master') == false
-      run: |
-        git fetch origin
-        git checkout origin/master
     - name: Install Python 3.7 version
       uses: actions/setup-python@v1
       with:
