@@ -1,4 +1,4 @@
----
+--- 
 title: MNE Analyze GUI
 has_children: true
 parent: Learn
