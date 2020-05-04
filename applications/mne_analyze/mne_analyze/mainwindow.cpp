@@ -384,7 +384,12 @@ void MainWindow::about()
         m_textEdit_aboutText->setOverwriteMode(true);
         m_textEdit_aboutText->setTextInteractionFlags(Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse);
 
-        gridLayout->addWidget(m_textEdit_aboutText, 1, 0, 1, 1);
+        QLabel* pLabel = new QLabel();
+        pLabel->setText(QString("Version: ") + CInfo::AppVersion());
+
+        gridLayout->addWidget(pLabel, 1, 0, 1, 1);
+
+        gridLayout->addWidget(m_textEdit_aboutText, 2, 0, 1, 1);
 
         m_pAboutWindow->setWindowTitle(tr("About"));
         m_label_splashcreen->setText(QString());
