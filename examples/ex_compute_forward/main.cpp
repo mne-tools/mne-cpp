@@ -167,5 +167,4 @@ int main(int argc, char *argv[])
     qInfo() << "Storing the fwd solution took: " << fTime2 << " ms.";
     qInfo() << "Reading the fwd solution took: " << fTime3 << " ms.";
     qInfo() << "The recomputation took: " << fTime4 << " ms.";
-
 }
