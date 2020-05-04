@@ -12,25 +12,25 @@ nav_order: 1
 
 New applications:
 
-* MNE Scan including new plugins: fiffsimulator, ftbuffer, babymeg, natus, brainamp, eegosports, gusbamp, tmsi, brainflowboard, lsladapter, dummytoolbox, rtcmne, averaging, covariance, noisereduction, neuronalconnectivity, writetofile, hpi
-* MNE Analyze including new plugins: dataloader, datamanager, rawdataviewer, annotationmanager
-* MNE Rt Server
-* MNE Forward Solution
-* MNE Dipole Fit
+* **MNE Scan** including new plugins: fiffsimulator, ftbuffer, babymeg, natus, brainamp, eegosports, gusbamp, tmsi, brainflowboard, lsladapter, dummytoolbox, rtcmne, averaging, covariance, noisereduction, neuronalconnectivity, writetofile, hpi
+* **MNE Analyze** including new plugins: dataloader, datamanager, rawdataviewer, annotationmanager
+* **MNE Rt Server**
+* **MNE Forward Solution**
+* **MNE Dipole Fit**
 
 New API libraries:
 
-* utils - Design patterns, generlaized classes, mathematical routines, I/O helpers
-* fs - FreeSurfer I/O routines
-* fiff - Fiff I/O routines
-* mne - I/O routines for MNE objects 
-* fwd - Forward modeling
-* inverse - Inverse modeling
-* communication - Tools for real-time communication
-* rtprocessing - Tools for real-time data processing
-* connectivity - Functional connectivity metrics
-* disp - 2D visualization routines
-* disp3D - 3D visualization routines
+* **utils** - Design patterns, generlaized classes, mathematical routines, I/O helpers
+* **fs** - FreeSurfer I/O routines
+* **fiff** - Fiff I/O routines
+* **mne** - I/O routines for MNE objects 
+* **fwd** - Forward modeling
+* **inverse** - Inverse modeling
+* **communication** - Tools for real-time communication
+* **rtprocessing** - Tools for real-time data processing
+* **connectivity** - Functional connectivity metrics
+* **disp** - 2D visualization routines
+* **disp3D** - 3D visualization routines
 
 ### Authors
 

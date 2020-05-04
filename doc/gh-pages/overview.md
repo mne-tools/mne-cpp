@@ -16,11 +16,11 @@ Other projects include:
 
 ## What is MNE-CPP?
 
-MNE-CPP is both an open source collection of cross-platform software tools and a framework for development. We provide two main GUI applications, MNE Scan and MNE Analyze, as well as several command line tools. MNE Scan is used for acquisition and real-time processing, while MNE Analyze is used for visualization and analysis of pre-recorded data.
+MNE-CPP is both an open-source collection of cross-platform software tools and a framework for development. We provide two main GUI applications, MNE Scan and MNE Analyze, as well as several command line tools. MNE Scan is used for acquisition and real-time processing, while MNE Analyze is used for visualization and analysis of pre-recorded data.
 
 MNE-CPP provides a cross-platform library which allows the processing of MEG/EEG data. It can be used to develop new applications, or to add functionality to existing ones.
 
-MNE-CPP is open source licensed under BSD (clause 3). MNE-CPP has two external dependencies, namely [Qt](https://www.qt.io/){:target="_blank" rel="noopener"} and [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page){:target="_blank" rel="noopener"}.
+MNE-CPP is open-source licensed under BSD (clause 3). MNE-CPP has two external dependencies, namely [Qt](https://www.qt.io/){:target="_blank" rel="noopener"} and [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page){:target="_blank" rel="noopener"}.
 
 ## Why use MNE-CPP?
 
