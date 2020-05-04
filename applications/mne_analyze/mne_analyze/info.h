@@ -119,7 +119,7 @@ public:
      */
     static int MajorVersion()
     {
-        return 1;
+        return 0;
     }
 
     //=========================================================================================================
@@ -130,7 +130,7 @@ public:
      */
     static int MinorVersion()
     {
-        return 0;
+        return 1;
     }
 
     //=========================================================================================================
@@ -163,7 +163,8 @@ public:
      */
     const static QString AppVersion()
     {
-        return QString("%1.%2.%3-%4").arg(MajorVersion()).arg(MinorVersion()).arg(RevisionVersion()).arg(BuildVersion());
+        //return QString("%1.%2.%3-%4").arg(MajorVersion()).arg(MinorVersion()).arg(RevisionVersion()).arg(BuildVersion());
+        return QString("%1.%2.%3").arg(MajorVersion()).arg(MinorVersion()).arg(RevisionVersion());
     }
 };
 
