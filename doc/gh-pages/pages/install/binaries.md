@@ -1,7 +1,6 @@
 ---
 title: Releases
 parent: Install
-has_children: true
 nav_order: 1
 ---
 # Releases
@@ -14,7 +13,7 @@ Stable Releases
 
 | Version | Release | Dynamic Build | Static Build |
 |-------|-------|-------|-------|
-| 0.1.0 | May 2019 | <span class="fs-2"> [~~Windows~~](){: .btn .btn-blue } [~~Linux~~](){: .btn .btn-blue } [~~MacOS~~](){: .btn .btn-blue } </span> | <span class="fs-2"> [~~Windows~~](){: .btn .btn-blue } [~~Linux~~](){: .btn .btn-blue } [~~MacOS~~](){: .btn .btn-blue } </span> |
+| [0.1.0](http://mne-cpp.github.io/mne-cpp/pages/install/changelog.html#version-010){:target="_blank" rel="noopener"} | May 2019 | <span class="fs-2"> [~~Windows~~](){: .btn .btn-blue } [~~Linux~~](){: .btn .btn-blue } [~~MacOS~~](){: .btn .btn-blue } </span> | <span class="fs-2"> [~~Windows~~](){: .btn .btn-blue } [~~Linux~~](){: .btn .btn-blue } [~~MacOS~~](){: .btn .btn-blue } </span> |
 
 Development Release
 {: .label .label-green }

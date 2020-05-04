@@ -1,7 +1,5 @@
 ---
 title: Changelog
-parent: Releases
-grand_parent: Install
 nav_order: 1
 ---
 # Changelog
