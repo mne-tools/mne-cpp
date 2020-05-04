@@ -98,6 +98,76 @@ public:
     ~RtFwdSetupWidget();
 
 private:
+    //=========================================================================================================
+    /**
+     * Shows forward solution directory selection dialog
+     */
+    void showFwdDirDialog();
+
+    QString     m_sSolDir;
+
+    //=========================================================================================================
+    /**
+     * change name of solution file
+     */
+    void changeSolName();
+
+    //=========================================================================================================
+    /**
+     * Shows source space selection dialog
+     */
+    void showSourceFileDialog();
+    //=========================================================================================================
+    /**
+     * Shows Bem model selection dialog
+     */
+    void showBemFileDialog();
+    //=========================================================================================================
+    /**
+     * Shows Mrie->Head transformation selection dialog
+     */
+    void showMriFileDialog();
+    //=========================================================================================================
+    /**
+     * Shows output file selection dialog
+     */
+    void showMinDistDirDialog();
+
+    QString     m_sMinDistDir;
+
+    //=========================================================================================================
+    /**
+     * change name of MinDistDir output
+     */
+    void changeMinDistName();
+
+    //=========================================================================================================
+    /**
+     * Shows EEG model selection dialog
+     */
+    void showEEGModelFileDialog();
+    //=========================================================================================================
+    /**
+     * Shows EEG model name selection selection dialog
+     */
+    void showEEGModelNameDialog();
+
+    //=========================================================================================================
+    /**
+     * change name of min distance skull - source
+     */
+    void changeMinDist();
+    //=========================================================================================================
+    /**
+     * change name of EEG sphere radius
+     */
+    void changeEEGSphereRad();
+    //=========================================================================================================
+    /**
+     * change name of EEG sphere origin
+     */
+    void changeEEGSphereOrigin();
+
     RtFwd*                     m_pRtFwd;        /**< Holds a pointer to corresponding RtFwd.*/
 
     Ui::RtFwdSetupWidgetClass  m_ui;            /**< Holds the user interface for the RtFwdSetupWidget.*/

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>603</width>
-    <height>450</height>
+    <height>607</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -201,7 +201,7 @@ p, li { white-space: pre-wrap; }
          </property>
          <layout class="QGridLayout" name="m_qGridLayout_Fwd_5">
           <item row="0" column="0" colspan="2">
-           <widget class="QLineEdit" name="m_qLineEdit_MinDistOut">
+           <widget class="QLineEdit" name="m_qLineEdit_MinDistName">
             <property name="minimumSize">
              <size>
               <width>140</width>
@@ -417,7 +417,7 @@ p, li { white-space: pre-wrap; }
          </property>
          <layout class="QGridLayout" name="gridLayout">
           <item row="0" column="0">
-           <widget class="QDoubleSpinBox" name="m_doubleSpinBox_dvecR0x">
+           <widget class="QDoubleSpinBox" name="m_doubleSpinBox_dVecR0x">
             <property name="decimals">
              <number>3</number>
             </property>
@@ -427,7 +427,7 @@ p, li { white-space: pre-wrap; }
            </widget>
           </item>
           <item row="0" column="2">
-           <widget class="QDoubleSpinBox" name="m_doubleSpinBox_dvecR0z">
+           <widget class="QDoubleSpinBox" name="m_doubleSpinBox_dVecR0z">
             <property name="decimals">
              <number>3</number>
             </property>
@@ -437,7 +437,7 @@ p, li { white-space: pre-wrap; }
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QDoubleSpinBox" name="m_doubleSpinBox_dvecR0y">
+           <widget class="QDoubleSpinBox" name="m_doubleSpinBox_dVecR0y">
             <property name="decimals">
              <number>3</number>
             </property>
