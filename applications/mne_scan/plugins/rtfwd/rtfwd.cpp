@@ -37,12 +37,20 @@
 //=============================================================================================================
 
 #include "rtfwd.h"
+
 #include <fwd/computeFwd/compute_fwd.h>
 #include <fwd/computeFwd/compute_fwd_settings.h>
+
+#include <mne/mne_forwardsolution.h>
+
+#include <scMeas/realtimehpiresult.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
+
+#include <QtCore/QtPlugin>
+#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -58,16 +66,30 @@ using namespace RTFWDPLUGIN;
 using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
 using namespace IOBUFFER;
-using namespace Eigen;
 using namespace FWDLIB;
+using namespace FIFFLIB;
+using namespace INVERSELIB;
+using namespace Eigen;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
 RtFwd::RtFwd()
-: m_pCircularBuffer(CircularBuffer_Matrix_double::SPtr::create(40))
+    : m_pFiffInfo(new FiffInfo)
+    , m_pFwdSettings(new ComputeFwdSettings)
+    , m_pCircularBuffer(CircularBuffer_Matrix_double::SPtr::create(40))
+
 {
+    // set init values
+    m_pFwdSettings->solname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/sample_audvis-meg-eeg-oct-6-fwd.fif";
+    m_pFwdSettings->mriname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/all-trans.fif";
+    m_pFwdSettings->bemname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/subjects/sample/bem/sample-1280-1280-1280-bem.fif";
+    m_pFwdSettings->srcname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/subjects/sample/bem/sample-oct-6-src.fif";
+    m_pFwdSettings->include_meg = true;
+    m_pFwdSettings->include_eeg = true;
+    m_pFwdSettings->accurate = true;
+    m_pFwdSettings->mindist = 5.0f/1000.0f;
 }
 
 //=============================================================================================================
@@ -92,13 +114,13 @@ QSharedPointer<IPlugin> RtFwd::clone() const
 void RtFwd::init()
 {
     // Inits
-    m_pFwdSettings = ComputeFwdSettings::SPtr(new ComputeFwdSettings);
+
 
     // Input
-    m_pInput = PluginInputData<RealTimeMultiSampleArray>::create(this, "rtFwdIn", "rtFwd input data");
-    connect(m_pInput.data(), &PluginInputConnector::notify,
+    m_pHpiInput = PluginInputData<RealTimeHpiResult>::create(this, "rtFwdIn", "rtFwd input data");
+    connect(m_pHpiInput.data(), &PluginInputConnector::notify,
             this, &RtFwd::update, Qt::DirectConnection);
-    m_inputConnectors.append(m_pInput);
+    m_inputConnectors.append(m_pHpiInput);
 
     // Output - Uncomment this if you don't want to send processed data (in form of a matrix) to other plugins.
     // Also, this output stream will generate an online display in your plugin
@@ -165,29 +187,26 @@ QWidget* RtFwd::setupWidget()
 
 void RtFwd::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    if(QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>()) {
+    if(QSharedPointer<RealTimeHpiResult> pRTHPI = pMeasurement.dynamicCast<RealTimeHpiResult>()) {
         //Fiff information
         if(!m_pFiffInfo) {
-            m_pFiffInfo = pRTMSA->info();
-
-            m_pOutput->data()->initFromFiffInfo(m_pFiffInfo);
-            m_pOutput->data()->setMultiArraySize(1);
+            m_pFiffInfo = pRTHPI->getFiffInfo();
         }
+
+        QSharedPointer<HpiFitResult> hpiFitResult = pRTHPI->getValue();
 
         if(!m_bPluginControlWidgetsInit) {
             initPluginControlWidgets();
         }
 
-        MatrixXd matData;
-
-        for(unsigned char i = 0; i < pRTMSA->getMultiArraySize(); ++i) {
-            // Please note that we do not need a copy here since this function will block until
-            // the buffer accepts new data again. Hence, the data is not deleted in the actual
-            // Mesaurement function after it emitted the notify signal.
-            while(!m_pCircularBuffer->push(pRTMSA->getMultiSampleArray()[i])) {
-                //Do nothing until the circular buffer is ready to accept new data again
-            }
-        }
+//        for(unsigned char i = 0; i < pRTHPI->getMultiArraySize(); ++i) {
+//            // Please note that we do not need a copy here since this function will block until
+//            // the buffer accepts new data again. Hence, the data is not deleted in the actual
+//            // Mesaurement function after it emitted the notify signal.
+//            while(!m_pCircularBuffer->push(pRTHPI->getMultiSampleArray()[i])) {
+//                //Do nothing until the circular buffer is ready to accept new data again
+//            }
+//        }
     }
 }
 
@@ -225,6 +244,7 @@ void RtFwd::run()
         // Get the current data
         if(m_pCircularBuffer->pop(matData)) {
             //ToDo: Implement your algorithm here
+
 
             //Send the data to the connected plugins and the online display
             //Unocmment this if you also uncommented the m_pOutput in the constructor above
