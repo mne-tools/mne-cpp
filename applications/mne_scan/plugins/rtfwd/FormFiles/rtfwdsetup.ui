@@ -6,15 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
+    <width>603</width>
     <height>450</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>DummySetupWidget</string>
   </property>
-  <layout class="QFormLayout" name="formLayout_3">
-   <item row="0" column="0">
+  <layout class="QVBoxLayout" name="verticalLayout_4">
+   <item>
     <widget class="QLabel" name="m_qLabel_Headline">
      <property name="font">
       <font>
@@ -27,7 +27,7 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="0">
+   <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="toolTip">
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;s&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -39,7 +39,7 @@
       <attribute name="title">
        <string>Information</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
+      <layout class="QVBoxLayout" name="verticalLayout">
        <item>
         <widget class="QTextBrowser" name="m_qTextBrowser_Information">
          <property name="html">
@@ -65,28 +65,15 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item>
-        <spacer name="horizontalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="Files">
       <attribute name="title">
        <string>Files</string>
       </attribute>
-      <layout class="QFormLayout" name="formLayout">
-       <item row="0" column="0">
-        <widget class="QGroupBox" name="m_qGroupBox_ForwardSolution">
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QGroupBox" name="m_qGroupBox_Sol">
          <property name="title">
           <string>Forward Solution</string>
          </property>
@@ -95,17 +82,20 @@ p, li { white-space: pre-wrap; }
          </property>
          <layout class="QGridLayout" name="m_qGridLayout_Fwd">
           <item row="0" column="0" colspan="2">
-           <widget class="QLineEdit" name="m_qLineEdit_FwdFileName">
+           <widget class="QLineEdit" name="m_qLineEdit_SolName">
             <property name="minimumSize">
              <size>
               <width>140</width>
               <height>0</height>
              </size>
             </property>
+            <property name="text">
+             <string/>
+            </property>
            </widget>
           </item>
           <item row="0" column="2">
-           <widget class="QPushButton" name="m_qPushButton_FwdFileDialog">
+           <widget class="QPushButton" name="m_qPushButton_SolNameDialog">
             <property name="text">
              <string>...</string>
             </property>
@@ -114,8 +104,8 @@ p, li { white-space: pre-wrap; }
          </layout>
         </widget>
        </item>
-       <item row="1" column="0">
-        <widget class="QGroupBox" name="m_qGroupBox_ForwardSolution_2">
+       <item>
+        <widget class="QGroupBox" name="m_qGroupBox_Source">
          <property name="title">
           <string>Source Space</string>
          </property>
@@ -124,7 +114,7 @@ p, li { white-space: pre-wrap; }
          </property>
          <layout class="QGridLayout" name="m_qGridLayout_Fwd_2">
           <item row="0" column="0" colspan="2">
-           <widget class="QLineEdit" name="m_qLineEdit_FwdFileName_2">
+           <widget class="QLineEdit" name="m_qLineEdit_SourceName">
             <property name="minimumSize">
              <size>
               <width>140</width>
@@ -134,7 +124,7 @@ p, li { white-space: pre-wrap; }
            </widget>
           </item>
           <item row="0" column="2">
-           <widget class="QPushButton" name="m_qPushButton_FwdFileDialog_2">
+           <widget class="QPushButton" name="m_qPushButton_SourceNameDialog">
             <property name="text">
              <string>...</string>
             </property>
@@ -143,8 +133,8 @@ p, li { white-space: pre-wrap; }
          </layout>
         </widget>
        </item>
-       <item row="2" column="0">
-        <widget class="QGroupBox" name="m_qGroupBox_ForwardSolution_3">
+       <item>
+        <widget class="QGroupBox" name="m_qGroupBox_Bem">
          <property name="title">
           <string>BEM Model</string>
          </property>
@@ -152,8 +142,15 @@ p, li { white-space: pre-wrap; }
           <bool>false</bool>
          </property>
          <layout class="QGridLayout" name="m_qGridLayout_Fwd_3">
+          <item row="0" column="2">
+           <widget class="QPushButton" name="m_qPushButton_BemNameDialog">
+            <property name="text">
+             <string>...</string>
+            </property>
+           </widget>
+          </item>
           <item row="0" column="0" colspan="2">
-           <widget class="QLineEdit" name="m_qLineEdit_FwdFileName_3">
+           <widget class="QLineEdit" name="m_qLineEdit_BemName">
             <property name="minimumSize">
              <size>
               <width>140</width>
@@ -162,18 +159,11 @@ p, li { white-space: pre-wrap; }
             </property>
            </widget>
           </item>
-          <item row="0" column="2">
-           <widget class="QPushButton" name="m_qPushButton_FwdFileDialog_3">
-            <property name="text">
-             <string>...</string>
-            </property>
-           </widget>
-          </item>
          </layout>
         </widget>
        </item>
-       <item row="3" column="0">
-        <widget class="QGroupBox" name="m_qGroupBox_ForwardSolution_4">
+       <item>
+        <widget class="QGroupBox" name="m_qGroupBox_Mri">
          <property name="title">
           <string>MRI - Head Transformation</string>
          </property>
@@ -182,7 +172,7 @@ p, li { white-space: pre-wrap; }
          </property>
          <layout class="QGridLayout" name="m_qGridLayout_Fwd_4">
           <item row="0" column="0" colspan="2">
-           <widget class="QLineEdit" name="m_qLineEdit_FwdFileName_4">
+           <widget class="QLineEdit" name="m_qLineEdit_MriName">
             <property name="minimumSize">
              <size>
               <width>140</width>
@@ -192,7 +182,7 @@ p, li { white-space: pre-wrap; }
            </widget>
           </item>
           <item row="0" column="2">
-           <widget class="QPushButton" name="m_qPushButton_FwdFileDialog_4">
+           <widget class="QPushButton" name="m_qPushButton_MriNameDialog">
             <property name="text">
              <string>...</string>
             </property>
@@ -201,17 +191,17 @@ p, li { white-space: pre-wrap; }
          </layout>
         </widget>
        </item>
-       <item row="4" column="0">
-        <widget class="QGroupBox" name="m_qGroupBox_ForwardSolution_5">
+       <item>
+        <widget class="QGroupBox" name="m_qGroupBox_MinDistOut">
          <property name="title">
-          <string>Forward Solution</string>
+          <string>Output for omitted source space points</string>
          </property>
          <property name="flat">
           <bool>false</bool>
          </property>
          <layout class="QGridLayout" name="m_qGridLayout_Fwd_5">
           <item row="0" column="0" colspan="2">
-           <widget class="QLineEdit" name="m_qLineEdit_FwdFileName_5">
+           <widget class="QLineEdit" name="m_qLineEdit_MinDistOut">
             <property name="minimumSize">
              <size>
               <width>140</width>
@@ -221,7 +211,7 @@ p, li { white-space: pre-wrap; }
            </widget>
           </item>
           <item row="0" column="2">
-           <widget class="QPushButton" name="m_qPushButton_FwdFileDialog_5">
+           <widget class="QPushButton" name="m_qPushButton_MinDistOutDialog">
             <property name="text">
              <string>...</string>
             </property>
@@ -230,7 +220,65 @@ p, li { white-space: pre-wrap; }
          </layout>
         </widget>
        </item>
-       <item row="5" column="0" colspan="2">
+       <item>
+        <widget class="QGroupBox" name="m_qGroupBox_EEGModel">
+         <property name="title">
+          <string>EEG model</string>
+         </property>
+         <property name="flat">
+          <bool>false</bool>
+         </property>
+         <layout class="QGridLayout" name="m_qGridLayout_Fwd_7">
+          <item row="0" column="0" colspan="2">
+           <widget class="QLineEdit" name="m_qLineEdit_EEGModelFile">
+            <property name="minimumSize">
+             <size>
+              <width>140</width>
+              <height>0</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QPushButton" name="m_qPushButton_EEGModelFileDialog">
+            <property name="text">
+             <string>...</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="m_qGroupBox_EEGModelName">
+         <property name="title">
+          <string>EEG model Name</string>
+         </property>
+         <property name="flat">
+          <bool>false</bool>
+         </property>
+         <layout class="QGridLayout" name="m_qGridLayout_Fwd_6">
+          <item row="0" column="0" colspan="2">
+           <widget class="QLineEdit" name="m_qLineEdit_EEGModelName">
+            <property name="minimumSize">
+             <size>
+              <width>140</width>
+              <height>0</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QPushButton" name="m_qPushButton_EEGModelNameDialog">
+            <property name="text">
+             <string>...</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -249,8 +297,159 @@ p, li { white-space: pre-wrap; }
       <attribute name="title">
        <string>Settings</string>
       </attribute>
-      <layout class="QFormLayout" name="formLayout_2">
-       <item row="13" column="0">
+      <layout class="QVBoxLayout" name="verticalLayout_6">
+       <item>
+        <widget class="QCheckBox" name="m_check_bIncludeMeg">
+         <property name="text">
+          <string>Compute MEG Solution</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="m_check_bIncludeEEG">
+         <property name="text">
+          <string>Compute EEG Solution</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="m_check_bComputeGrad">
+         <property name="text">
+          <string>Compute Gradient Solution</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="m_check_bFixedOri">
+         <property name="text">
+          <string>Fixed Orientation</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="m_check_bAccurate">
+         <property name="text">
+          <string>Acurate</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="m_check_bUseThreads">
+         <property name="text">
+          <string>Use threads</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="m_check_bDoAll">
+         <property name="text">
+          <string>Compute Everything</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="m_check_bMriHeadIdent">
+         <property name="text">
+          <string>Idential head- and MRI- space</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="m_check_bFilterSpaces">
+         <property name="text">
+          <string>Filter Source Spaces</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="m_check_bScaleEegPos">
+         <property name="text">
+          <string>Scale Electrode Positions</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="m_check_bUseEquivEeg">
+         <property name="text">
+          <string>Use equivalent source approach for EEG</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="distance">
+         <property name="title">
+          <string>Minimum distance skull &lt;-&gt; source [mm]</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <item>
+           <widget class="QDoubleSpinBox" name="m_doubleSpinBox_dMinDist">
+            <property name="decimals">
+             <number>1</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="EegScalpRadius">
+         <property name="title">
+          <string>EEG scalp radius of sphere model [m]</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_5">
+          <item>
+           <widget class="QDoubleSpinBox" name="m_doubleSpinBox_dEegSphereRad">
+            <property name="decimals">
+             <number>3</number>
+            </property>
+            <property name="singleStep">
+             <double>0.010000000000000</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="EEGModelOrigin">
+         <property name="title">
+          <string>Sphere Model Origin (x,y,z) [m]</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="0" column="0">
+           <widget class="QDoubleSpinBox" name="m_doubleSpinBox_dvecR0x">
+            <property name="decimals">
+             <number>3</number>
+            </property>
+            <property name="singleStep">
+             <double>0.010000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QDoubleSpinBox" name="m_doubleSpinBox_dvecR0z">
+            <property name="decimals">
+             <number>3</number>
+            </property>
+            <property name="singleStep">
+             <double>0.010000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QDoubleSpinBox" name="m_doubleSpinBox_dvecR0y">
+            <property name="decimals">
+             <number>3</number>
+            </property>
+            <property name="singleStep">
+             <double>0.010000000000000</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
         <spacer name="verticalSpacer_2">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -263,102 +462,22 @@ p, li { white-space: pre-wrap; }
          </property>
         </spacer>
        </item>
-       <item row="0" column="0">
-        <widget class="QCheckBox" name="checkBox_2">
-         <property name="text">
-          <string>Compute MEG Solution</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QCheckBox" name="checkBox_6">
-         <property name="text">
-          <string>Compute EEG Solution</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="QCheckBox" name="checkBox_3">
-         <property name="text">
-          <string>Compute Gradient Solution</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="0">
-        <widget class="QCheckBox" name="checkBox_5">
-         <property name="text">
-          <string>Acurate</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0">
-        <widget class="QCheckBox" name="checkBox_7">
-         <property name="text">
-          <string>Fixed Orientation</string>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="0">
-        <widget class="QCheckBox" name="checkBox_4">
-         <property name="text">
-          <string>Use threads</string>
-         </property>
-        </widget>
-       </item>
-       <item row="8" column="0">
-        <widget class="QCheckBox" name="checkBox_8">
-         <property name="text">
-          <string>Compute Everything</string>
-         </property>
-        </widget>
-       </item>
-       <item row="9" column="0">
-        <widget class="QCheckBox" name="checkBox_10">
-         <property name="text">
-          <string>Idential head- and MRI- space</string>
-         </property>
-        </widget>
-       </item>
-       <item row="10" column="0">
-        <widget class="QCheckBox" name="checkBox_11">
-         <property name="text">
-          <string>Filter Source Spaces</string>
-         </property>
-        </widget>
-       </item>
-       <item row="11" column="0">
-        <widget class="QGroupBox" name="groupBox">
-         <property name="title">
-          <string>Minimum distance skull &lt;-&gt; source [m]</string>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout_3">
-          <item>
-           <widget class="QDoubleSpinBox" name="doubleSpinBox">
-            <property name="decimals">
-             <number>3</number>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QCheckBox" name="checkBox_9">
-         <property name="text">
-          <string>Use equivalent source approach for EEG</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QCheckBox" name="checkBox">
-         <property name="text">
-          <string>Scale Electrode Positions</string>
-         </property>
-        </widget>
-       </item>
       </layout>
      </widget>
     </widget>
+   </item>
+   <item>
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>
