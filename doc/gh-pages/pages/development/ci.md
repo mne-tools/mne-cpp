@@ -23,10 +23,13 @@ MNE-CPP facilitates Github Actions to do continous integration (CI). Github Acti
 
 New development takes place on the `master` branch. Once the developers have rough consensus we create a new stable release on GitHub, following the `v0.x.y` tag syntax. The MNE-CPP stable release steps are:
 
-1. (Manually) Increment version numbers in [mne-cpp.pri](https://github.com/mne-tools/mne-cpp/blob/master/mne-cpp.pri){:target="_blank" rel="noopener"} and [mne-cpp_doxyfile](https://github.com/mne-tools/mne-cpp/blob/master/doc/doxygen/mne-cpp_doxyfile){:target="_blank" rel="noopener"} by `0.x.y`. Also, change version numbers of applications, e.g., [MNE Scan](https://github.com/mne-tools/mne-cpp/blob/master/applications/mne_scan/mne_scan/info.h){:target="_blank" rel="noopener"} and [MNE Analyze](https://github.com/mne-tools/mne-cpp/blob/master/applications/mne_analyze/mne_analyze/info.h){:target="_blank" rel="noopener"}. Commit and merge changes into `mne-tools/mne-cpp:master`.
-2. (Manually) Create release with tag `v0.x.y` on Github. 
-2. (Automated by [release.yml](https://github.com/mne-tools/mne-cpp/blob/master/.github/workflows/release.yml){:target="_blank" rel="noopener"}) Create new branch named `v0.x.y` based on current `master` branch.
-3. (Automated by [release.yml](https://github.com/mne-tools/mne-cpp/blob/master/.github/workflows/release.yml){:target="_blank" rel="noopener"}) Build dynamically as well as statically linked binaries and upload them to the `v0.x.y` release on Github.
+1. (Manually) Increment version numbers in [mne-cpp.pri](https://github.com/mne-tools/mne-cpp/blob/master/mne-cpp.pri){:target="_blank" rel="noopener"} and [mne-cpp_doxyfile](https://github.com/mne-tools/mne-cpp/blob/master/doc/doxygen/mne-cpp_doxyfile){:target="_blank" rel="noopener"} by `0.x.y`. 
+2. Change version numbers of applications, e.g., [MNE Scan](https://github.com/mne-tools/mne-cpp/blob/master/applications/mne_scan/mne_scan/info.h){:target="_blank" rel="noopener"} and [MNE Analyze](https://github.com/mne-tools/mne-cpp/blob/master/applications/mne_analyze/mne_analyze/info.h){:target="_blank" rel="noopener"}.
+3. (Manually) Prepare and update the [release table](https://mne-cpp.github.io/pages/install/binaries.html){:target="_blank" rel="noopener"}.
+4. (Manually) Prepare and update the [changelog](https://mne-cpp.github.io/pages/install/changelog.html){:target="_blank" rel="noopener"}.
+5. (Manually) Create release with tag `v0.x.y` via Github. 
+6. (Automated by [release.yml](https://github.com/mne-tools/mne-cpp/blob/master/.github/workflows/release.yml){:target="_blank" rel="noopener"}) Create new branch named `v0.x.y` based on current `master` branch.
+7. (Automated by [release.yml](https://github.com/mne-tools/mne-cpp/blob/master/.github/workflows/release.yml){:target="_blank" rel="noopener"}) Build dynamically as well as statically linked binaries and upload them to the `v0.x.y` release on Github.
 
 ## Solving for dependencies
 

@@ -106,7 +106,6 @@ defineReplace(copyResources) {
     return($${final_copy_command})
 }
 
-
 ############################################### GLOBAL DEFINES ################################################
 
 MNE_CPP_VERSION = 0.0.0
@@ -115,7 +114,6 @@ MNE_LIB_VERSION = 0.0.0
 QMAKE_TARGET_PRODUCT = mne-cpp
 QMAKE_TARGET_DESCRIPTION = MNE Qt 5 based C++ library.
 QMAKE_TARGET_COPYRIGHT = Copyright (C) 2020 Authors of mne-cpp. All rights reserved.
-
 
 ########################################### PROJECT CONFIGURATION #############################################
 
