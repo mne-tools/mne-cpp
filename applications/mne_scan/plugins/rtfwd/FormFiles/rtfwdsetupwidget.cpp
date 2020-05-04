@@ -59,6 +59,36 @@ RtFwdSetupWidget::RtFwdSetupWidget(RtFwd* toolbox, QWidget *parent)
 , m_pRtFwd(toolbox)
 {
     m_ui.setupUi(this);
+
+    // init file Loading
+    m_ui.m_qLineEdit_SolName->setText(m_pRtFwd->m_sSolName);
+    m_ui.m_qLineEdit_BemName->setText(m_pRtFwd->m_sBemName);
+    m_ui.m_qLineEdit_SourceName->setText(m_pRtFwd->m_sSourceName);
+    m_ui.m_qLineEdit_MriName->setText(m_pRtFwd->m_sMriName);
+    m_ui.m_qLineEdit_MinDistOut->setText(m_pRtFwd->m_sMinDistOutName);
+    m_ui.m_qLineEdit_EEGModelFile->setText(m_pRtFwd->m_sEegModelFile);
+    m_ui.m_qLineEdit_EEGModelName->setText(m_pRtFwd->m_sEegModelName);
+
+    // init checkboxes
+    m_ui.m_check_bDoAll->setChecked(m_pRtFwd->m_bDoAll);
+    m_ui.m_check_bIncludeEEG->setChecked(m_pRtFwd->m_bIncludeEEG);
+    m_ui.m_check_bIncludeMeg->setChecked(m_pRtFwd->m_bIncludeMEG);
+    m_ui.m_check_bComputeGrad->setChecked(m_pRtFwd->m_bComputeGrad);
+    m_ui.m_check_bAccurate->setChecked(m_pRtFwd->m_bAccurate);
+    m_ui.m_check_bDoAll->setChecked(m_pRtFwd->m_bDoAll);
+    m_ui.m_check_bFixedOri->setChecked(m_pRtFwd->m_bFixedOri);
+    m_ui.m_check_bFilterSpaces->setChecked(m_pRtFwd->m_bFilterSpaces);
+    m_ui.m_check_bMriHeadIdent->setChecked(m_pRtFwd->m_bMriHeadIdent);
+    m_ui.m_check_bUseThreads->setChecked(m_pRtFwd->m_bUseThreads);
+    m_ui.m_check_bUseEquivEeg->setChecked(m_pRtFwd->m_bUseEquivEeg);
+
+    // init Spin Boxes
+    m_ui.m_doubleSpinBox_dMinDist->setValue(m_pRtFwd->m_fMinDist);
+    m_ui.m_doubleSpinBox_dEegSphereRad->setValue(m_pRtFwd->m_fEegSphereRad);
+    m_ui.m_doubleSpinBox_dvecR0x->setValue(m_pRtFwd->m_vecR0.x());
+    m_ui.m_doubleSpinBox_dvecR0y->setValue(m_pRtFwd->m_vecR0.y());
+    m_ui.m_doubleSpinBox_dvecR0z->setValue(m_pRtFwd->m_vecR0.z());
+
 }
 
 //=============================================================================================================
