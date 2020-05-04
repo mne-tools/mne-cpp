@@ -156,6 +156,12 @@ private:
 
     FWDLIB::ComputeFwdSettings::SPtr    m_pFwdSettings;         /**< Forward Solution Settings.*/
 
+    IOBUFFER::CircularBuffer_Matrix_double::SPtr    m_pCircularBuffer;      /**< Holds incoming data.*/
+
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr      m_pInput;      /**< The incoming data.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pOutput;     /**< The outgoing data.*/
+
+public:
     QString                             m_sSourceName;          /**< Source space file.*/
     QString                             m_sMriName;             /**< MRI file for head <-> MRI transformation. */
     QString                             m_sBemName;             /**< BEM model file */
@@ -184,12 +190,6 @@ private:
     Eigen::Vector3f                     m_vecR0;                /**< Sphere model origin.  */
 
     FIFFLIB::FiffCoordTrans             m_transDefHead;         /**< Updated meg->head transformation. */
-
-    IOBUFFER::CircularBuffer_Matrix_double::SPtr    m_pCircularBuffer;      /**< Holds incoming data.*/
-
-    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr      m_pInput;      /**< The incoming data.*/
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pOutput;     /**< The outgoing data.*/
-
 signals:
     //=========================================================================================================
     /**
