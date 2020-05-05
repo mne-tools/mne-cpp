@@ -64,13 +64,13 @@ namespace ANSHAREDLIB {
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE RAWDATAVIEWEREXTENSION
+// DEFINE NAMESPACE RAWDATAVIEWERPLUGIN
 //=============================================================================================================
 
-namespace RAWDATAVIEWEREXTENSION {
+namespace RAWDATAVIEWERPLUGIN {
 
 //=============================================================================================================
-// RAWDATAVIEWEREXTENSION FORWARD DECLARATIONS
+// RAWDATAVIEWERPLUGIN FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
@@ -184,6 +184,6 @@ private:
 
 };
 
-} // NAMESPACE RAWDATAVIEWEREXTENSION
+} // NAMESPACE RAWDATAVIEWERPLUGIN
 
 #endif // FIFFRAWDELEGATE_H

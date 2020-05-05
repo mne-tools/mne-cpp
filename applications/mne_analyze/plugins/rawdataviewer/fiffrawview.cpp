@@ -67,7 +67,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace RAWDATAVIEWEREXTENSION;
+using namespace RAWDATAVIEWERPLUGIN;
 using namespace ANSHAREDLIB;
 
 //=============================================================================================================

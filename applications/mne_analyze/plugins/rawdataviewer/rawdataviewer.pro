@@ -1,14 +1,15 @@
 #==============================================================================================================
 #
-# @file     dataloader.pro
+# @file     rawdataviewer.pro
 # @author   Lorenz Esch <lesch@mgh.harvard.edu>;
-#           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
+#           Lars Debor <Lars.Debor@tu-ilmenau.de>;
+#           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
 # @since    0.1.0
-# @date     July, 2017
+# @date     October, 2018
 #
 # @section  LICENSE
 #
-# Copyright (C) 2017, Lorenz Esch, Christoph Dinh. All rights reserved.
+# Copyright (C) 2018, Lorenz Esch, Lars Debor, Simon Heinke. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -29,7 +30,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile for the dataloader plugin.
+# @brief    This project file generates the makefile for the rawdataviewer plugin.
 #
 #==============================================================================================================
 
@@ -39,20 +40,21 @@ TEMPLATE = lib
 
 CONFIG += plugin
 
-DEFINES += DATALOADER_EXTENSION
+DEFINES += RAWDATAVIEWER_PLUGIN
 
-QT += gui widgets
+QT += gui widgets charts svg opengl
 
-contains(MNECPP_CONFIG, wasm) {
-    DEFINES += WASMBUILD
+contains(MNECPP_CONFIG, noOpenGL) {
+    DEFINES += NO_OPENGL
+    QT -= opengl
 }
 
-TARGET = dataloader
+TARGET = rawdataviewer
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
-DESTDIR = $${MNE_BINARY_DIR}/mne_analyze_extensions
+DESTDIR = $${MNE_BINARY_DIR}/mne_analyze_plugins
 
 contains(MNECPP_CONFIG, static) {
     CONFIG += staticlib
@@ -64,24 +66,42 @@ contains(MNECPP_CONFIG, static) {
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lanSharedd \
+            -lMNE$${MNE_LIB_VERSION}Dispd \
+            -lMNE$${MNE_LIB_VERSION}Connectivityd \
+            -lMNE$${MNE_LIB_VERSION}RtProcessingd \
+            -lMNE$${MNE_LIB_VERSION}Inversed \
+            -lMNE$${MNE_LIB_VERSION}Fwdd \
+            -lMNE$${MNE_LIB_VERSION}Mned \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Utilsd \
 } else {
     LIBS += -lanShared \
+            -lMNE$${MNE_LIB_VERSION}Disp \
+            -lMNE$${MNE_LIB_VERSION}Connectivity \
+            -lMNE$${MNE_LIB_VERSION}RtProcessing \
+            -lMNE$${MNE_LIB_VERSION}Inverse \
+            -lMNE$${MNE_LIB_VERSION}Fwd \
+            -lMNE$${MNE_LIB_VERSION}Mne \
             -lMNE$${MNE_LIB_VERSION}Fiff \
+            -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Utils \
 }
 
 SOURCES += \
-    dataloader.cpp \
+    rawdataviewer.cpp \
+    fiffrawview.cpp \
+    fiffrawviewdelegate.cpp
 
 HEADERS += \
-    dataloader_global.h \
-    dataloader.h \
+    rawdataviewer_global.h \
+    rawdataviewer.h    \
+    fiffrawview.h \
+    fiffrawviewdelegate.h
 
 FORMS += \
 
-OTHER_FILES += dataloader.json
+OTHER_FILES += rawdataviewer.json
 
 RESOURCES += \
 
@@ -92,7 +112,7 @@ COPY_CMD = $$copyResources($${RESOURCE_FILES})
 QMAKE_POST_LINK += $${COPY_CMD}
 
 # Put generated form headers into the origin --> cause other src is pointing at them
-UI_DIR = $${PWD}
+UI_DIR = $$PWD
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
@@ -100,7 +120,7 @@ INCLUDEPATH += $${MNE_ANALYZE_INCLUDE_DIR}
 
 # Install headers to include directory
 header_files.files = $${HEADERS}
-header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/mne_analyze_extensions
+header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/mne_analyze_plugins
 
 unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
 
@@ -112,8 +132,8 @@ unix:!macx {
     QMAKE_RPATHDIR += $ORIGIN/../../lib
 }
 
-# Activate FFTW backend in Eigen for non-static builds only
-contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
+# Activate FFTW backend in Eigen
+contains(MNECPP_CONFIG, useFFTW) {
     DEFINES += EIGEN_FFTW_DEFAULT
     INCLUDEPATH += $$shell_path($${FFTW_DIR_INCLUDE})
     LIBS += -L$$shell_path($${FFTW_DIR_LIBS})

@@ -59,7 +59,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace RAWDATAVIEWEREXTENSION;
+using namespace RAWDATAVIEWERPLUGIN;
 using namespace ANSHAREDLIB;
 
 //=============================================================================================================
@@ -86,7 +86,7 @@ RawDataViewer::~RawDataViewer()
 
 //=============================================================================================================
 
-QSharedPointer<IExtension> RawDataViewer::clone() const
+QSharedPointer<IPlugin> RawDataViewer::clone() const
 {
     QSharedPointer<RawDataViewer> pRawDataViewerClone = QSharedPointer<RawDataViewer>::create();
     return pRawDataViewerClone;

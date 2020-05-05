@@ -41,8 +41,8 @@
 #include "info.h"
 #include "mainwindow.h"
 
-#include <anShared/Interfaces/IExtension.h>
-#include <anShared/Management/extensionmanager.h>
+#include <anShared/Interfaces/IPlugin.h>
+#include <anShared/Management/pluginmanager.h>
 #include <anShared/Management/statusbar.h>
 
 #include <disp/viewers/multiview.h>
@@ -76,7 +76,7 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::ExtensionManager> pExtensionManager, QWidget *parent)
+MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager, QWidget *parent)
 : QMainWindow(parent)
 , m_pMultiView(Q_NULLPTR)
 , m_pGridLayout(Q_NULLPTR)
@@ -85,15 +85,15 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::ExtensionManager> pExtensionM
     setMinimumSize(400, 400);
     setWindowTitle(CInfo::AppNameShort());
 
-    if(!pExtensionManager.isNull()) {
+    if(!pPluginManager.isNull()) {
         // The order we call these functions is important!
         createActions();
-        createExtensionMenus(pExtensionManager);
+        createPluginMenus(pPluginManager);
         createLogDockWindow();
-        createExtensionControls(pExtensionManager);
-        createExtensionViews(pExtensionManager);
+        createPluginControls(pPluginManager);
+        createPluginViews(pPluginManager);
     } else {
-        qWarning() << "[MainWindow::MainWindow] CRITICAL ! Extension manager is nullptr";
+        qWarning() << "[MainWindow::MainWindow] CRITICAL ! Plugin manager is nullptr";
     }
 
     this->setStatusBar(new StatusBar());
@@ -193,7 +193,7 @@ void MainWindow::createLogDockWindow()
 
 //=============================================================================================================
 
-void MainWindow::createExtensionMenus(QSharedPointer<ANSHAREDLIB::ExtensionManager> pExtensionManager)
+void MainWindow::createPluginMenus(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager)
 {
     m_pMenuFile = menuBar()->addMenu(tr("File"));
     m_pMenuFile->addAction(m_pActionExit);
@@ -206,10 +206,10 @@ void MainWindow::createExtensionMenus(QSharedPointer<ANSHAREDLIB::ExtensionManag
     m_pMenuHelp->addAction(m_pActionAbout);
 
 
-    // add extensions menus
-    for(IExtension* pExtension : pExtensionManager->getExtensions()) {
-        if(pExtension) {
-            if (QMenu* pMenu = pExtension->getMenu()) {
+    // add plugins menus
+    for(IPlugin* pPlugin : pPluginManager->getPlugins()) {
+        if(pPlugin) {
+            if (QMenu* pMenu = pPlugin->getMenu()) {
                 // Check if the menu already exists. If it does add the actions to the exisiting menu.
                 if(pMenu->title() == "File") {
                     for(QAction* pAction : pMenu->actions()) {
@@ -233,18 +233,18 @@ void MainWindow::createExtensionMenus(QSharedPointer<ANSHAREDLIB::ExtensionManag
 
 //=============================================================================================================
 
-void MainWindow::createExtensionControls(QSharedPointer<ANSHAREDLIB::ExtensionManager> pExtensionManager)
+void MainWindow::createPluginControls(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager)
 {
     setTabPosition(Qt::LeftDockWidgetArea,QTabWidget::West);
     setTabPosition(Qt::RightDockWidgetArea,QTabWidget::East);
     setDockOptions(QMainWindow::ForceTabbedDocks);
 
-    //Add Extension controls to the MainWindow
-    for(IExtension* pExtension : pExtensionManager->getExtensions()) {
-        QDockWidget* pControl = pExtension->getControl();
+    //Add Plugin controls to the MainWindow
+    for(IPlugin* pPlugin : pPluginManager->getPlugins()) {
+        QDockWidget* pControl = pPlugin->getControl();
         if(pControl) {
             addDockWidget(Qt::LeftDockWidgetArea, pControl);
-            qDebug() << "[MainWindow::createExtensionControls] Found and added dock widget for " << pExtension->getName();
+            qDebug() << "[MainWindow::createPluginControls] Found and added dock widget for " << pPlugin->getName();
         }
     }
 
@@ -253,7 +253,7 @@ void MainWindow::createExtensionControls(QSharedPointer<ANSHAREDLIB::ExtensionMa
 
 //=============================================================================================================
 
-void MainWindow::createExtensionViews(QSharedPointer<ExtensionManager> pExtensionManager)
+void MainWindow::createPluginViews(QSharedPointer<PluginManager> pPluginManager)
 {
     m_pGridLayout = new QGridLayout(this);
     m_pMultiView = new MultiView();
@@ -261,29 +261,29 @@ void MainWindow::createExtensionViews(QSharedPointer<ExtensionManager> pExtensio
     m_pMultiView->show();
     setCentralWidget(m_pMultiView);
 
-    QString sCurExtensionName;
+    QString sCurPluginName;
 
-    //Add Extension views to the MultiView, which is the central widget
-    for(IExtension* pExtension : pExtensionManager->getExtensions()) {
-        QWidget* pView = pExtension->getView();
+    //Add Plugin views to the MultiView, which is the central widget
+    for(IPlugin* pPlugin : pPluginManager->getPlugins()) {
+        QWidget* pView = pPlugin->getView();
         if(pView) {
-            sCurExtensionName = pExtension->getName();
+            sCurPluginName = pPlugin->getName();
             MultiViewWindow* pWindow = Q_NULLPTR;
 
-            if(sCurExtensionName == "RawDataViewer") {
-                pWindow = m_pMultiView->addWidgetBottom(pView, sCurExtensionName);
+            if(sCurPluginName == "RawDataViewer") {
+                pWindow = m_pMultiView->addWidgetBottom(pView, sCurPluginName);
             } else {
-                pWindow = m_pMultiView->addWidgetTop(pView, sCurExtensionName);
+                pWindow = m_pMultiView->addWidgetTop(pView, sCurPluginName);
             }
 
-            QAction* action = new QAction(pExtension->getName(), this);
+            QAction* action = new QAction(pPlugin->getName(), this);
             action->setCheckable(true);
             action->setChecked(true);
             m_pMenuView->addAction(action);
             connect(action, &QAction::toggled,
                     pWindow, &MultiViewWindow::setVisible);
 
-            qInfo() << "[MainWindow::createExtensionViews] Found and added subwindow for " << pExtension->getName();
+            qInfo() << "[MainWindow::createPluginViews] Found and added subwindow for " << pPlugin->getName();
         }
     }
 }

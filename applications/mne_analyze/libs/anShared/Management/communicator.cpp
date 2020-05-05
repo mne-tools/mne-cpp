@@ -40,7 +40,7 @@
 
 #include "communicator.h"
 #include "eventmanager.h"
-#include "../Interfaces/IExtension.h"
+#include "../Interfaces/IPlugin.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -65,11 +65,11 @@ Communicator::Communicator(const QVector<EVENT_TYPE> &subs)
 
 //=============================================================================================================
 
-Communicator::Communicator(IExtension* extension)
-: Communicator(extension->getEventSubscriptions())
+Communicator::Communicator(IPlugin* plugin)
+: Communicator(plugin->getEventSubscriptions())
 {
     QObject::connect(this, &Communicator::receivedEvent,
-                     extension, &IExtension::handleEvent);
+                     plugin, &IPlugin::handleEvent);
 }
 
 //=============================================================================================================

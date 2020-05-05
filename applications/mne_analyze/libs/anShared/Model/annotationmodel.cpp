@@ -520,7 +520,7 @@ bool AnnotationModel::saveToFile(const QString& sPath)
         out << "  " << this->getAnnotation(i) << "   " << QString::number(static_cast<float>(this->getAnnotation(i)) / this->getFreq(), 'f', 4) << "          1         0" << endl;
     }
 
-    // Wee need to call the QFileDialog here instead of the data load extension since we need access to the QByteArray
+    // Wee need to call the QFileDialog here instead of the data load plugin since we need access to the QByteArray
     QFileDialog::saveFileContent(bufferOut->data(), "events.eve");
 
    // bufferOut->deleteLater();

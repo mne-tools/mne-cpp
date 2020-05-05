@@ -75,7 +75,7 @@ contains(MNECPP_CONFIG, static) {
     DEFINES += STATICBUILD
     # For static builds we need to link against the plugins
     # because we cannot load them dynamically during runtime
-    LIBS += -L$${MNE_BINARY_DIR}/mne_analyze_extensions
+    LIBS += -L$${MNE_BINARY_DIR}/mne_analyze_plugins
     LIBS += -ldataloader \
             -ldatamanager \
             -lrawdataviewer \
@@ -167,8 +167,8 @@ macx {
     QMAKE_RPATHDIR += @executable_path/../Frameworks
 
     extensions.path = Contents/MacOS/
-    extensions.files = $${ROOT_DIR}/bin/mne_analyze_extensions
-    QMAKE_BUNDLE_DATA += extensions
+    extensions.files = $${ROOT_DIR}/bin/mne_analyze_plugins
+    QMAKE_BUNDLE_DATA += plugins
     EXTRA_ARGS = -dmg
 
     !contains(MNECPP_CONFIG, static) {

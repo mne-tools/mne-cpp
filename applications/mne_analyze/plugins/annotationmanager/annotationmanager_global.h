@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
- * @file     datamanagerview.h
+ * @file     annotationmanager_global.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
- *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
+ *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
  * @since    0.1.0
- * @date     August, 2018
+ * @date     February, 2017
  *
  * @section  LICENSE
  *
- * Copyright (C) 2018, Lorenz Esch, Lars Debor, Simon Heinke. All rights reserved.
+ * Copyright (C) 2017, Lorenz Esch, Christoph Dinh. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -30,76 +29,27 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains the declaration of the DataManagerView class.
+ * @brief    Contains the FiffIO library export/import macros.
  *
  */
 
-#ifndef DATAMANAGERVIEW_H
-#define DATAMANAGERVIEW_H
+#ifndef ANNOTATIONMANAGER_GLOBAL_H
+#define ANNOTATIONMANAGER_GLOBAL_H
 
 //=============================================================================================================
-// INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
+#include <QtCore/qglobal.h>
 
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// PREPROCESSOR DEFINES
 //=============================================================================================================
 
-namespace Ui {
-    class DataManagerView;
-}
+#if defined(ANNOTATIONMANAGER_PLUGIN)
+#  define ANNOTATIONMANAGERSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#else
+#  define ANNOTATIONMANAGERSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#endif
 
-class QListWidgetItem;
-
-//=============================================================================================================
-/**
- * DataManagerView Extension Control
- *
- * @brief The DataManagerView class provides the extension control.
- */
-class DataManagerView : public QWidget
-{
-    Q_OBJECT
-
-public:
-    //=========================================================================================================
-    /**
-     * Constructs the DataManagerView
-     *
-     * @param[in] parent     If parent is not NULL the QWidget becomes a child of QWidget inside parent.
-     */
-    explicit DataManagerView(QWidget *parent = 0);
-
-    //=========================================================================================================
-    /**
-     * Destroys the DataManagerView.
-     */
-    virtual ~DataManagerView();
-
-    //=========================================================================================================
-    /**
-     * Removes all entries from the QListWidget.
-     *
-     * @param[in] pNewItem       The new item.
-     */
-    void addListItem(QListWidgetItem* pNewItem);
-
-    //=========================================================================================================
-    /**
-     * Removes all entries from the QListWidget.
-     */
-    void clearList();
-
-private:
-    void onCurrentItemChanged(QListWidgetItem *current,
-                              QListWidgetItem *previous);
-
-    Ui::DataManagerView *ui;   /**< The user interface */
-
-signals:
-    void currentlySelectedModelChanged(const QString& sCurrentModelPath);
-};
-
-#endif // DATAMANAGERVIEW_H
+#endif // ANNOTATIONMANAGER_GLOBAL_H
