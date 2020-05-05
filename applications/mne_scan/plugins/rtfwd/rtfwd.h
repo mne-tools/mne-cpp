@@ -156,48 +156,48 @@ protected:
     virtual void run();
 
 private:
-    QMutex m_mutex; /**< The threads mutex.*/
+    //=========================================================================================================
+    /**
+     * Check if incoming headmovement should trigger a recalculation
+     */
+    void checkHeadDisplacement();
+
+    //=========================================================================================================
+    /**
+     * Call this function whenever the allowed head rotation changed.
+     *
+     * @param[in] dThreshRot    Allowed rotation in degree.
+     */
+    void onThresholdRotationChanged(double dThreshRot);
+
+    //=========================================================================================================
+    /**
+     * Call this function whenever the allowed head movement changed.
+     *
+     * @param[in] dThreshMove   Allowed movement in mm.
+     */
+    void onThresholdMovementChanged(double dThreshMove);
+
+    QMutex                              m_mutex;                /**< The threads mutex.*/
+
+    float                               m_fThreshRot;           /**< The allowed rotation in degree.**/
+    float                               m_fThreshMove;          /**< The Allowed movement in mm.**/
+    bool                                m_bUpdateHeadPos;       /**< Indicates if we have to update headposition.**/
+
+    QSharedPointer<HpiFitResult>        m_pHpiFitResult;        /**< The Hpi fitting result.**/
 
     FIFFLIB::FiffInfo::SPtr             m_pFiffInfo;            /**< Fiff measurement info.*/
+    FIFFLIB::FiffCoordTrans             m_transDevHead;         /**< Updated meg->head transformation. */
+
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeHpiResult>::SPtr            m_pHpiInput;    /**< The incoming Hpi Data.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr    m_pOutput;      /**< The outgoing data.*/
 
     IOBUFFER::CircularBuffer_Matrix_double::SPtr    m_pCircularBuffer;      /**< Holds incoming data.*/
 
-    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeHpiResult>::SPtr           m_pHpiInput;     /**< The incoming Hpi Data.*/
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pOutput;     /**< The outgoing data.*/
-
 public:
-//    QString                             m_sSourceName;          /**< Source space file.*/
-//    QString                             m_sMriName;             /**< MRI file for head <-> MRI transformation. */
-//    QString                             m_sBemName;             /**< BEM model file */
-//    QString                             m_sSolName;             /**< Forward Solution file.*/
-//    QString                             m_sTransName;           /**< head2mri transformation file. */
-//    QString                             m_sMinDistOutName;      /**< Output file for omitted source space points. */
-//    QString                             m_sCommand;             /**< Saves the recognized command line for future use. */
-//    QString                             m_sEegModelFile;        /**< File of EEG sphere model specifications. */
-//    QString                             m_sEegModelName;        /**< Name of the EEG model to use. */
-//    QStringList                         m_listLabels;           /**< Compute the solution only for these labels. */
-//    bool                                m_bIncludeEEG;          /**< Compute EEG forward. */
-//    bool                                m_bIncludeMEG;          /**< Compute MEG forward. */
-//    bool                                m_bAccurate;            /**< Use accurate coil geometry.*/
-//    bool                                m_bComputeGrad;         /**< Compute gradient solution. */
-//    bool                                m_bFixedOri;            /**< Fixed-orientation dipoles? */
-//    bool                                m_bScaleEegPos;         /**< Scale the electrode locations to scalp in the sphere model. */
-//    bool                                m_bUseEquivEeg;         /**< Use the equivalent source approach for the EEG sphere model. */
-//    bool                                m_bUseThreads;          /**< Parallelize? */
-//    bool                                m_bMriHeadIdent;        /**< Are the head and MRI coordinates the same? */
-//    bool                                m_bFilterSpaces;        /**< Filter the source space points. */
-//    bool                                m_bDoAll;               /**< Compute everthing. */
-//    int                                 m_iNLabel;              /**< Number of labels.*/
-//    int                                 m_iCoordFrame;          /**< Where to compute the solution. */
-//    float                               m_fMinDist;             /**< Minimum allowed distance of the sources from the inner skull surface. */
-//    float                               m_fEegSphereRad;        /**< Scalp radius to use in EEG sphere model. */
-//    Eigen::Vector3f                     m_vecR0;                /**< Sphere model origin.  */
-
     FWDLIB::ComputeFwdSettings::SPtr    m_pFwdSettings;         /**< Forward Solution Settings. */
 
     MNELIB::MNEForwardSolution::SPtr    m_pFwdSolution;         /**< Forward Solution. */
-
-    FIFFLIB::FiffCoordTrans             m_transDefHead;         /**< Updated meg->head transformation. */
 
 signals:
     //=========================================================================================================

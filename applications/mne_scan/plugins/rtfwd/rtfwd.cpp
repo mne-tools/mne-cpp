@@ -69,6 +69,7 @@ using namespace IOBUFFER;
 using namespace FWDLIB;
 using namespace FIFFLIB;
 using namespace INVERSELIB;
+using namespace MNELIB;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -76,10 +77,10 @@ using namespace Eigen;
 //=============================================================================================================
 
 RtFwd::RtFwd()
-    : m_pFiffInfo(new FiffInfo)
-    , m_pFwdSettings(new ComputeFwdSettings)
+    : m_bUpdateHeadPos(false)
+    , m_pFiffInfo(new FiffInfo)
     , m_pCircularBuffer(CircularBuffer_Matrix_double::SPtr::create(40))
-
+    , m_pFwdSettings(new ComputeFwdSettings)
 {
     // set init values
     m_pFwdSettings->solname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/sample_audvis-meg-eeg-oct-6-fwd.fif";
@@ -105,8 +106,8 @@ RtFwd::~RtFwd()
 
 QSharedPointer<IPlugin> RtFwd::clone() const
 {
-    QSharedPointer<RtFwd> pClone(new RtFwd);
-    return pClone;
+    QSharedPointer<RtFwd> pRtFwdClone(new RtFwd);
+    return pRtFwdClone;
 }
 
 //=============================================================================================================
@@ -191,9 +192,18 @@ void RtFwd::update(SCMEASLIB::Measurement::SPtr pMeasurement)
         //Fiff information
         if(!m_pFiffInfo) {
             m_pFiffInfo = pRTHPI->getFiffInfo();
+            m_transDevHead = pRTHPI->getValue()->devHeadTrans;
+
+//            m_mutex.lock();
+//            m_bUpdateHeadPos = true;
+//            m_mutex.unlock();
         }
 
-        QSharedPointer<HpiFitResult> hpiFitResult = pRTHPI->getValue();
+        m_mutex.lock();
+        m_pHpiFitResult = pRTHPI->getValue();
+        m_mutex.unlock();
+
+        checkHeadDisplacement();
 
         if(!m_bPluginControlWidgetsInit) {
             initPluginControlWidgets();
@@ -212,16 +222,49 @@ void RtFwd::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 //=============================================================================================================
 
+void RtFwd::checkHeadDisplacement()
+{
+    m_mutex.lock();
+    float fThreshMove = m_fThreshMove;      // threshold for movement
+    float fThreshRot = m_fThreshRot;        // threshold for rotation
+    float fAngle = m_transDevHead.angleTo(m_pHpiFitResult->devHeadTrans.trans);
+    float fMove = m_transDevHead.translationTo(m_pHpiFitResult->devHeadTrans.trans);
+    m_mutex.unlock();
+
+    if(fAngle > fThreshRot || fMove > fThreshMove) {
+        m_mutex.lock();
+        m_bUpdateHeadPos = true;
+        m_transDevHead = m_pHpiFitResult->devHeadTrans;
+        m_mutex.unlock();
+    }
+}
+
+//=============================================================================================================
+
+void RtFwd::onThresholdRotationChanged(double dThreshRot)
+{
+    m_mutex.lock();
+    m_fThreshRot = dThreshRot;
+    m_mutex.unlock();
+}
+
+//=============================================================================================================
+
+void RtFwd::onThresholdMovementChanged(double dThreshMove)
+{
+    m_mutex.lock();
+    m_fThreshMove = dThreshMove;
+    m_mutex.unlock();
+}
+
+//=============================================================================================================
+
 void RtFwd::initPluginControlWidgets()
 {
     if(m_pFiffInfo) {
         QList<QWidget*> plControlWidgets;
 
-        // The plugin's control widget
-//        RtFwdWidget* pYourWidget = new RtFwdWidget(QString("MNESCAN/%1/").arg(this->getName()));
-//        pYourWidget->setObjectName("group_tab_Settings_Your Widget");
-
-//        plControlWidgets.append(pYourWidget);
+        // Quick control widget here ?
 
         emit pluginControlWidgetsChanged(plControlWidgets, this->getName());
 
@@ -235,22 +278,51 @@ void RtFwd::run()
 {
     MatrixXd matData;
 
-    // Wait for Fiff Info
-    while(!m_pFiffInfo) {
-        msleep(10);
+    // Wait for fiff info
+    while(true) {
+        m_mutex.lock();
+        if(m_pFiffInfo) {
+            m_mutex.unlock();
+            break;
+        }
+        m_mutex.unlock();
+        msleep(100);
     }
+
+    m_pFwdSettings->pFiffInfo = m_pFiffInfo;
+
+    m_mutex.lock();
+    FiffCoordTransOld transMegHeadOld = m_transDevHead.toOld();
+    m_mutex.unlock();
+
+    // Compute initial Forward solution
+    ComputeFwd::SPtr pComputeFwd = ComputeFwd::SPtr(new ComputeFwd(m_pFwdSettings));
+    pComputeFwd->calculateFwd();
+    pComputeFwd->storeFwd();
+
+    // get Mne Forward Solution (in future this is not necessary, ComputeForward will have this as member)
+    QFile t_fSolution(m_pFwdSettings->solname);
+    m_pFwdSolution = MNEForwardSolution::SPtr(new MNEForwardSolution(t_fSolution));
 
     while(!isInterruptionRequested()) {
         // Get the current data
-        if(m_pCircularBuffer->pop(matData)) {
-            //ToDo: Implement your algorithm here
-
-
-            //Send the data to the connected plugins and the online display
-            //Unocmment this if you also uncommented the m_pOutput in the constructor above
-            if(!isInterruptionRequested()) {
-                m_pOutput->data()->setValue(matData);
-            }
+        m_mutex.lock();
+        if(m_bUpdateHeadPos) {
+            transMegHeadOld = m_transDevHead.toOld();
+            m_mutex.unlock();
+            pComputeFwd->updateHeadPos(&transMegHeadOld);
+            m_pFwdSolution->sol = pComputeFwd->sol;
+            m_pFwdSolution->sol_grad = pComputeFwd->sol_grad;
         }
+        m_mutex.lock();
+        m_bUpdateHeadPos = false;
+        m_mutex.unlock();
+
+        //Send the data to the connected plugins and the online display
+        //Unocmment this if you also uncommented the m_pOutput in the constructor above
+        if(!isInterruptionRequested()) {
+            m_pOutput->data()->setValue(matData);
+        }
+
     }
 }
