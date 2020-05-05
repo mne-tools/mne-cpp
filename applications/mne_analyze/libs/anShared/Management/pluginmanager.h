@@ -1,15 +1,16 @@
 //=============================================================================================================
 /**
- * @file     rawdataviewer.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
+ * @file     pluginmanager.h
+ * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+ *           Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
  *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
  * @since    0.1.0
- * @date     October, 2018
+ * @date     February, 2017
  *
  * @section  LICENSE
  *
- * Copyright (C) 2018, Lorenz Esch, Lars Debor, Simon Heinke. All rights reserved.
+ * Copyright (C) 2017, Christoph Dinh, Lorenz Esch, Lars Debor, Simon Heinke. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -30,122 +31,124 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains the declaration of the RawDataViewer class.
+ * @brief    Contains the declaration of the PluginManager class.
  *
  */
 
-#ifndef RAWDATAVIEWER_H
-#define RAWDATAVIEWER_H
+#ifndef PLUGINMANAGER_H
+#define PLUGINMANAGER_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "rawdataviewer_global.h"
-#include <anShared/Interfaces/IExtension.h>
+#include "../anshared_global.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
-#include <QtCore/QtPlugin>
-#include <QDebug>
+#include <QVector>
+#include <QPluginLoader>
+
+//=============================================================================================================
+// DEFINE NAMESPACE ANSHAREDLIB
+//=============================================================================================================
+
+namespace ANSHAREDLIB
+{
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class RawDataViewerControl;
-
-namespace ANSHAREDLIB {
-    class Communicator;
-    class FiffRawViewModel;
-}
-
-//=============================================================================================================
-// DEFINE NAMESPACE RAWDATAVIEWEREXTENSION
-//=============================================================================================================
-
-namespace RAWDATAVIEWEREXTENSION
-{
-    class FiffRawView;
-    class FiffRawViewDelegate;
+class IPlugin;
+class AnalyzeSettings;
+class AnalyzeData;
 
 //=============================================================================================================
 /**
- * RawDataViewer Extension
+ * DECLARE CLASS PluginManager
  *
- * @brief The RawDataViewer class provides a view to display raw fiff data.
+ * @brief The PluginManager class provides a dynamic plugin loader. As well as the handling of the loaded plugins.
  */
-class RAWDATAVIEWERSHARED_EXPORT RawDataViewer : public ANSHAREDLIB::IExtension
+class ANSHAREDSHARED_EXPORT PluginManager : public QPluginLoader
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "rawdataviewer.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
-    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(ANSHAREDLIB::IExtension)
 
 public:
-    //=========================================================================================================
-    /**
-     * Constructs a RawDataViewer.
-     */
-    RawDataViewer();
+    typedef QSharedPointer<PluginManager> SPtr;               /**< Shared pointer type for PluginManager. */
+    typedef QSharedPointer<const PluginManager> ConstSPtr;    /**< Const shared pointer type for PluginManager. */
 
     //=========================================================================================================
     /**
-     * Destroys the RawDataViewer.
+     * Constructs a PluginManager with the given parent.
+     *
+     * @param[in] parent pointer to parent Object. (It's normally the default value.)
      */
-    virtual ~RawDataViewer();
+    PluginManager(QObject* parent = nullptr);
 
-    // IExtension functions
-    virtual QSharedPointer<IExtension> clone() const override;
-    virtual void init() override;
-    virtual void unload() override;
-    virtual QString getName() const override;
-    virtual QMenu* getMenu() override;
-    virtual QDockWidget* getControl() override;
-    virtual QWidget* getView() override;
-    virtual void handleEvent(QSharedPointer<ANSHAREDLIB::Event> e) override;
-    virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
+    //=========================================================================================================
+    /**
+     * Destroys the PluginManager.
+     */
+    virtual ~PluginManager();
 
-    void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
+    //=========================================================================================================
+    /**
+     * Loads plugins from given directory.
+     *
+     * @param [in] dir    the plugin directory.
+     */
+    void loadPluginsFromDirectory(const QString& dir);
+
+    //=========================================================================================================
+    /**
+     * Initializes the plugins.
+     *
+     * @param [in] settings      the global mne analyze settings
+     * @param [in] data          the global mne analyze data
+     */
+    void initPlugins(QSharedPointer<AnalyzeSettings> settings, QSharedPointer<AnalyzeData> data);
+
+    //=========================================================================================================
+    /**
+     * Finds index of plugin by name.
+     *
+     * @param [in] name  the plugin name.
+     *
+     * @return index of plugin.
+     */
+    int findByName(const QString& name);
+
+    //=========================================================================================================
+    /**
+     * Returns vector containing all plugins.
+     *
+     * @return reference to vector containing all plugins.
+     */
+    inline const QVector<IPlugin*>& getPlugins();
+
+    //=========================================================================================================
+    /**
+     * This is called during main-program shutdown.
+     * It simply calls the unload-method for every plugin.
+     */
+    void shutdown();
 
 private:
-
-    //=========================================================================================================
-    /**
-     * Sets up control widgets, connects all relevant signals and slots, and diplays controls to user
-     */
-    void setUpControls();
-
-    void onSendSamplePos(int iSample);
-
-    void disconnectOld();
-
-    // Control
-    QPointer<QDockWidget>                m_pControlDock;                 /**< Control Widget */
-    QPointer<ANSHAREDLIB::Communicator>  m_pCommu;
-
-    // Model
-    int m_iSamplesPerBlock;
-    int m_iVisibleBlocks;
-    int m_iBufferBlocks;
-
-    QSharedPointer<ANSHAREDLIB::FiffRawViewModel>   m_pRawModel;
-    QSharedPointer<FiffRawViewDelegate>             m_pRawDelegate;
-
-    QPointer<FiffRawView>                           m_pFiffRawView;     /**< View for Fiff data */
-    bool                                            m_bDisplayCreated;  /**< Flag for remembering whether or not the display was already created */
-
-    QVBoxLayout*            m_pLayout;              /**< Layout for widgets in the controller view */
-    QWidget*                m_pContainer;           /**< Container for widgets in the controller view */
+    QVector<IPlugin*>    m_qVecPlugins;       /**< Vector containing all plugins. */
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
+inline const QVector<IPlugin*>& PluginManager::getPlugins()
+{
+    return m_qVecPlugins;
+}
+
 } // NAMESPACE
 
-#endif // RAWDATAVIEWER_H
+#endif // PLUGINMANAGER_H

@@ -1,6 +1,6 @@
 #==============================================================================================================
 #
-# @file     extensions.pro
+# @file     plugins.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Lorenz Esch <lesch@mgh.harvard.edu>
 # @since    0.1.0
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds the extensions for MNE Analyze project.
+# @brief    This project file builds the plugins for MNE Analyze project.
 #
 #==============================================================================================================
 

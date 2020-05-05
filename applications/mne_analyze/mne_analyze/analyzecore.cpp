@@ -40,10 +40,10 @@
 
 #include "analyzecore.h"
 #include "mainwindow.h"
-#include "../libs/anShared/Interfaces/IExtension.h"
+#include "../libs/anShared/Interfaces/IPlugin.h"
 #include "../libs/anShared/Management/analyzesettings.h"
 #include "../libs/anShared/Management/analyzedata.h"
-#include "../libs/anShared/Management/extensionmanager.h"
+#include "../libs/anShared/Management/pluginmanager.h"
 #include "../libs/anShared/Management/eventmanager.h"
 
 #include<iostream>
@@ -69,7 +69,7 @@ using namespace ANSHAREDLIB;
 // CONST
 //=============================================================================================================
 
-const char* extensionsDir = "/mne_analyze_extensions";        /**< holds path to the extensions.*/
+const char* pluginsDir = "/mne_analyze_plugins";        /**< holds path to the plugins.*/
 
 //=============================================================================================================
 // GLOBAL DEFINES
@@ -110,7 +110,7 @@ AnalyzeCore::AnalyzeCore(QObject* parent)
     initGlobalData();
 
     initEventSystem();
-    initExtensionManager();
+    initPluginManager();
     initMainWindow();
 
     splash.hide();
@@ -156,18 +156,18 @@ void AnalyzeCore::initEventSystem()
 
 //=============================================================================================================
 
-void AnalyzeCore::initExtensionManager()
+void AnalyzeCore::initPluginManager()
 {
-    m_pExtensionManager = QSharedPointer<ExtensionManager>::create();
-    m_pExtensionManager->loadExtensionsFromDirectory(qApp->applicationDirPath() +  extensionsDir);
-    m_pExtensionManager->initExtensions(m_analyzeSettings, m_analyzeData);
+    m_pPluginManager = QSharedPointer<PluginManager>::create();
+    m_pPluginManager->loadPluginsFromDirectory(qApp->applicationDirPath() +  pluginsDir);
+    m_pPluginManager->initPlugins(m_analyzeSettings, m_analyzeData);
 }
 
 //=============================================================================================================
 
 void AnalyzeCore::initMainWindow()
 {
-    m_pMainWindow = new MainWindow(m_pExtensionManager);
+    m_pMainWindow = new MainWindow(m_pPluginManager);
     QObject::connect(m_pMainWindow.data(), &MainWindow::mainWindowClosed,
                      this, &AnalyzeCore::onMainWindowClosed);
 }
@@ -185,6 +185,6 @@ void AnalyzeCore::registerMetaTypes()
 void AnalyzeCore::onMainWindowClosed()
 {
     EventManager::getEventManager().shutdown();
-    // shutdown every extension, empty analzye data etc.
-    m_pExtensionManager->shutdown();
+    // shutdown every plugin, empty analzye data etc.
+    m_pPluginManager->shutdown();
 }

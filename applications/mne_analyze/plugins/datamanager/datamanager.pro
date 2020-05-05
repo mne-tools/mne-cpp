@@ -1,14 +1,15 @@
 #==============================================================================================================
 #
-# @file     annotationmanager.pro
+# @file     datamanager.pro
 # @author   Lorenz Esch <lesch@mgh.harvard.edu>;
-#           Gabriel Motta <gbmotta@mgh.harvard.edu>
+#           Lars Debor <Lars.Debor@tu-ilmenau.de>;
+#           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
 # @since    0.1.0
-# @date     Februrary, 2020
+# @date     March, 2017
 #
 # @section  LICENSE
 #
-# Copyright (C) 2020, Lorenz Esch, Gabriel Motta. All rights reserved.
+# Copyright (C) 2017, Lorenz Esch, Lars Debor, Simon Heinke. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -29,7 +30,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile for the annotationmanager plugin.
+# @brief    This project file generates the makefile for the datamanager plugin.
 #
 #==============================================================================================================
 
@@ -39,20 +40,11 @@ TEMPLATE = lib
 
 CONFIG += plugin
 
-DEFINES += ANNOTATIONMANAGER_EXTENSION
+DEFINES += DATAMANAGER_PLUGIN
 
 QT += gui widgets
 
-contains(MNECPP_CONFIG, wasm) {
-    DEFINES += WASMBUILD
-}
-
-TARGET = annotationmanager
-CONFIG(debug, debug|release) {
-    TARGET = $$join(TARGET,,,d)
-}
-
-DESTDIR = $${MNE_BINARY_DIR}/mne_analyze_extensions
+DESTDIR = $${MNE_BINARY_DIR}/mne_analyze_plugins
 
 contains(MNECPP_CONFIG, static) {
     CONFIG += staticlib
@@ -61,51 +53,35 @@ contains(MNECPP_CONFIG, static) {
     CONFIG += shared
 }
 
+TARGET = datamanager
+CONFIG(debug, debug|release) {
+    TARGET = $$join(TARGET,,,d)
+}
+
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lanSharedd \
-            -lMNE$${MNE_LIB_VERSION}Dispd \
-            -lMNE$${MNE_LIB_VERSION}Connectivityd \
-            -lMNE$${MNE_LIB_VERSION}RtProcessingd \
-            -lMNE$${MNE_LIB_VERSION}Inversed \
-            -lMNE$${MNE_LIB_VERSION}Fwdd \
-            -lMNE$${MNE_LIB_VERSION}Mned \
+    LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Fsd \
-            -lMNE$${MNE_LIB_VERSION}Utilsd \
+            -lanSharedd
 } else {
-    LIBS += -lanShared \
-            -lMNE$${MNE_LIB_VERSION}Disp \
-            -lMNE$${MNE_LIB_VERSION}Connectivity \
-            -lMNE$${MNE_LIB_VERSION}RtProcessing \
-            -lMNE$${MNE_LIB_VERSION}Inverse \
-            -lMNE$${MNE_LIB_VERSION}Fwd \
-            -lMNE$${MNE_LIB_VERSION}Mne \
+    LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Fs \
-            -lMNE$${MNE_LIB_VERSION}Utils \
+            -lanShared
 }
 
 SOURCES += \
-    annotationmanager.cpp \
-    annotationdelegate.cpp \
-#    annotationmodel.cpp \
-    annotationview.cpp \
-#    FormFiles/annotationmanagercontrol.cpp
+    datamanager.cpp \
+    FormFiles/datamanagerview.cpp
 
 HEADERS += \
-    annotationmanager_global.h \
-    annotationmanager.h \
-    annotationdelegate.h \
-#    annotationmodel.h \
-    annotationview.h \
-#    FormFiles/annotationmanagercontrol.h
+    datamanager_global.h \
+    datamanager.h    \
+    FormFiles/datamanagerview.h
 
 FORMS += \
-    annotationview.ui \
-#    FormFiles/annotationmanagercontrol.ui
+    FormFiles/datamanagerview.ui
 
-OTHER_FILES += annotationmanager.json
+OTHER_FILES += datamanager.json
 
 RESOURCES += \
 
@@ -116,7 +92,7 @@ COPY_CMD = $$copyResources($${RESOURCE_FILES})
 QMAKE_POST_LINK += $${COPY_CMD}
 
 # Put generated form headers into the origin --> cause other src is pointing at them
-UI_DIR = $${PWD}
+UI_DIR = $$PWD
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
@@ -124,7 +100,7 @@ INCLUDEPATH += $${MNE_ANALYZE_INCLUDE_DIR}
 
 # Install headers to include directory
 header_files.files = $${HEADERS}
-header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/mne_analyze_extensions
+header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/mne_analyze_plugins
 
 unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
 
@@ -136,8 +112,8 @@ unix:!macx {
     QMAKE_RPATHDIR += $ORIGIN/../../lib
 }
 
-# Activate FFTW backend in Eigen for non-static builds only
-contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
+# Activate FFTW backend in Eigen
+contains(MNECPP_CONFIG, useFFTW) {
     DEFINES += EIGEN_FFTW_DEFAULT
     INCLUDEPATH += $$shell_path($${FFTW_DIR_INCLUDE})
     LIBS += -L$$shell_path($${FFTW_DIR_LIBS})

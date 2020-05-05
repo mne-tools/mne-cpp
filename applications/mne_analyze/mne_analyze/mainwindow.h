@@ -64,7 +64,7 @@ class QGridLayout;
 QT_END_NAMESPACE
 
 namespace ANSHAREDLIB {
-    class ExtensionManager;
+    class PluginManager;
 }
 
 namespace DISPLIB {
@@ -100,12 +100,12 @@ public:
     /**
      * Constructs a MainWindow which is a child of parent.
      *
-     * @param [in] pExtensionManager Pointer to the extension manager. It is needed to display subwindows froms extensions.
+     * @param [in] pPluginManager Pointer to the plugin manager. It is needed to display subwindows froms plugins.
      * @param [in] parent Pointer to parent widget; If parent is Q_NULLPTR, the new MainWindow becomes a window.
      *                    If parent is another widget, MainWindow becomes a child window inside parent.
      *                    MainWindow is deleted when its parent is deleted.
      */
-    MainWindow(QSharedPointer<ANSHAREDLIB::ExtensionManager> pExtensionManager, QWidget *parent = Q_NULLPTR);
+    MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager, QWidget *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
@@ -147,9 +147,9 @@ private:
     void createLogDockWindow();
 
     /**< Creates all actions for user interface of MainWindow class. */
-    void createExtensionMenus(QSharedPointer<ANSHAREDLIB::ExtensionManager> pExtensionManager);          /**< Creates all menus for user interface of MainWindow class. */
-    void createExtensionControls(QSharedPointer<ANSHAREDLIB::ExtensionManager> pExtensionManager);    /**< Creates all dock windows for user interface of MainWindow class. */
-    void createExtensionViews(QSharedPointer<ANSHAREDLIB::ExtensionManager> pExtensionManager);      /**< Creates all Windows within the MultiView for user interface of MainWindow class. */
+    void createPluginMenus(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager);          /**< Creates all menus for user interface of MainWindow class. */
+    void createPluginControls(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager);    /**< Creates all dock windows for user interface of MainWindow class. */
+    void createPluginViews(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager);      /**< Creates all Windows within the MultiView for user interface of MainWindow class. */
     void tabifyDockWindows();                                                                   /**< Tabify all dock windows */
     void about();                                                                               /**< Implements about action.*/
 

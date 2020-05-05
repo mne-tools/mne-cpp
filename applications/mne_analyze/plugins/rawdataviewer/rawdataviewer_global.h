@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
- * @file     datamanager_global.h
+ * @file     rawdataviewer_global.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
  *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
  * @since    0.1.0
- * @date     August, 2018
+ * @date     October, 2018
  *
  * @section  LICENSE
  *
@@ -30,12 +30,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains the DataViewer library export/import macros.
+ * @brief    Contains the RawDataViewer library export/import macros.
  *
  */
 
-#ifndef DATAVIEWER_GLOBAL_H
-#define DATAVIEWER_GLOBAL_H
+#ifndef RAWDATAVIEWER_GLOBAL_H
+#define RAWDATAVIEWER_GLOBAL_H
 
 //=============================================================================================================
 // QT INCLUDES
@@ -47,10 +47,10 @@
 // PREPROCESSOR DEFINES
 //=============================================================================================================
 
-#if defined(DATAMANAGER_EXTENSION)
-#  define DATAVIEWERSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#if defined(RAWDATAVIEWER_PLUGIN)
+#  define RAWDATAVIEWERSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define DATAVIEWERSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#  define RAWDATAVIEWERSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
-#endif // DATAVIEWER_GLOBAL_H
+#endif // RAWDATAVIEWER_GLOBAL_H

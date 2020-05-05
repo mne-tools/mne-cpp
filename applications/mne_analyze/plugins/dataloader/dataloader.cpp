@@ -45,7 +45,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DATALOADEREXTENSION;
+using namespace DATALOADERPLUGIN;
 using namespace ANSHAREDLIB;
 
 //=============================================================================================================
@@ -66,7 +66,7 @@ DataLoader::~DataLoader()
 
 //=============================================================================================================
 
-QSharedPointer<IExtension> DataLoader::clone() const
+QSharedPointer<IPlugin> DataLoader::clone() const
 {
     QSharedPointer<DataLoader> pDataLoaderClone(new DataLoader);
     return pDataLoaderClone;
