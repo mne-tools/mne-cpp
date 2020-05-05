@@ -74,6 +74,13 @@ RtFwdSetupWidget::RtFwdSetupWidget(RtFwd* toolbox, QWidget *parent)
     m_ui.m_check_bIncludeEEG->setChecked(m_pRtFwd->m_pFwdSettings->include_eeg);
     m_ui.m_check_bIncludeMeg->setChecked(m_pRtFwd->m_pFwdSettings->include_meg);
     m_ui.m_check_bComputeGrad->setChecked(m_pRtFwd->m_pFwdSettings->compute_grad);
+
+    if(m_pRtFwd->m_pFwdSettings->coord_frame == 5) {
+        m_ui.m_check_bCoordframe->setChecked(true);
+    } else {
+        m_ui.m_check_bCoordframe->setChecked(false);
+    }
+
     m_ui.m_check_bAccurate->setChecked(m_pRtFwd->m_pFwdSettings->accurate);
     m_ui.m_check_bFixedOri->setChecked(m_pRtFwd->m_pFwdSettings->fixed_ori);
     m_ui.m_check_bFilterSpaces->setChecked(m_pRtFwd->m_pFwdSettings->filter_spaces);
@@ -82,22 +89,36 @@ RtFwdSetupWidget::RtFwdSetupWidget(RtFwd* toolbox, QWidget *parent)
     m_ui.m_check_bUseEquivEeg->setChecked(m_pRtFwd->m_pFwdSettings->use_equiv_eeg);
 
     // init Spin Boxes
-    m_ui.m_doubleSpinBox_dMinDist->setValue(m_pRtFwd->m_pFwdSettings->mindist);
-    m_ui.m_doubleSpinBox_dEegSphereRad->setValue(m_pRtFwd->m_pFwdSettings->eeg_sphere_rad);
-    m_ui.m_doubleSpinBox_dVecR0x->setValue(m_pRtFwd->m_pFwdSettings->r0.x());
-    m_ui.m_doubleSpinBox_dVecR0y->setValue(m_pRtFwd->m_pFwdSettings->r0.y());
-    m_ui.m_doubleSpinBox_dVecR0z->setValue(m_pRtFwd->m_pFwdSettings->r0.z());
+    m_ui.m_doubleSpinBox_dMinDist->setValue(m_pRtFwd->m_pFwdSettings->mindist*1000);
+    m_ui.m_doubleSpinBox_dEegSphereRad->setValue(m_pRtFwd->m_pFwdSettings->eeg_sphere_rad*1000);
+    m_ui.m_doubleSpinBox_dVecR0x->setValue(m_pRtFwd->m_pFwdSettings->r0.x()*1000);
+    m_ui.m_doubleSpinBox_dVecR0y->setValue(m_pRtFwd->m_pFwdSettings->r0.y()*1000);
+    m_ui.m_doubleSpinBox_dVecR0z->setValue(m_pRtFwd->m_pFwdSettings->r0.z()*1000);
 
-    // connec line edits
-    connect(m_ui.m_qLineEdit_SolName, &QLineEdit::textChanged, this, &RtFwdSetupWidget::changeSolName);
-    connect(m_ui.m_qLineEdit_MinDistName, &QLineEdit::textChanged, this, &RtFwdSetupWidget::changeMinDistName);
+    // connect line edits
+    connect(m_ui.m_qLineEdit_SolName, &QLineEdit::textChanged, this, &RtFwdSetupWidget::onSolNameChanged);
+    connect(m_ui.m_qLineEdit_MinDistName, &QLineEdit::textChanged, this, &RtFwdSetupWidget::onMinDistNameChanged);
 
-    // connec spin boxes
-    connect(m_ui.m_doubleSpinBox_dMinDist,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &RtFwdSetupWidget::changeMinDist);
-    connect(m_ui.m_doubleSpinBox_dEegSphereRad, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &RtFwdSetupWidget::changeEEGSphereRad);
-    connect(m_ui.m_doubleSpinBox_dVecR0x, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &RtFwdSetupWidget::changeEEGSphereOrigin);
-    connect(m_ui.m_doubleSpinBox_dVecR0y, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &RtFwdSetupWidget::changeEEGSphereOrigin);
-    connect(m_ui.m_doubleSpinBox_dVecR0z, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &RtFwdSetupWidget::changeEEGSphereOrigin);
+    // connect checkboxes
+    connect(m_ui.m_check_bDoAll, &QCheckBox::stateChanged, this, &RtFwdSetupWidget::onCheckStateChanged);
+    connect(m_ui.m_check_bAccurate, &QCheckBox::stateChanged, this, &RtFwdSetupWidget::onCheckStateChanged);
+    connect(m_ui.m_check_bFixedOri, &QCheckBox::stateChanged, this, &RtFwdSetupWidget::onCheckStateChanged);
+    connect(m_ui.m_check_bCoordframe, &QCheckBox::stateChanged, this, &RtFwdSetupWidget::onCheckStateChanged);
+    connect(m_ui.m_check_bIncludeEEG, &QCheckBox::stateChanged, this, &RtFwdSetupWidget::onCheckStateChanged);
+    connect(m_ui.m_check_bIncludeMeg, &QCheckBox::stateChanged, this, &RtFwdSetupWidget::onCheckStateChanged);
+    connect(m_ui.m_check_bUseThreads, &QCheckBox::stateChanged, this, &RtFwdSetupWidget::onCheckStateChanged);
+    connect(m_ui.m_check_bComputeGrad, &QCheckBox::stateChanged, this, &RtFwdSetupWidget::onCheckStateChanged);
+    connect(m_ui.m_check_bScaleEegPos, &QCheckBox::stateChanged, this, &RtFwdSetupWidget::onCheckStateChanged);
+    connect(m_ui.m_check_bUseEquivEeg, &QCheckBox::stateChanged, this, &RtFwdSetupWidget::onCheckStateChanged);
+    connect(m_ui.m_check_bFilterSpaces, &QCheckBox::stateChanged, this, &RtFwdSetupWidget::onCheckStateChanged);
+    connect(m_ui.m_check_bMriHeadIdent, &QCheckBox::stateChanged, this, &RtFwdSetupWidget::onCheckStateChanged);
+
+    // connect spin boxes
+    connect(m_ui.m_doubleSpinBox_dMinDist,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &RtFwdSetupWidget::onMinDistChanged);
+    connect(m_ui.m_doubleSpinBox_dEegSphereRad, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &RtFwdSetupWidget::onEEGSphereRadChanged);
+    connect(m_ui.m_doubleSpinBox_dVecR0x, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &RtFwdSetupWidget::onEEGSphereOriginChanged);
+    connect(m_ui.m_doubleSpinBox_dVecR0y, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &RtFwdSetupWidget::onEEGSphereOriginChanged);
+    connect(m_ui.m_doubleSpinBox_dVecR0z, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &RtFwdSetupWidget::onEEGSphereOriginChanged);
 
     // connet Bushbuttons
     connect(m_ui.m_qPushButton_SolNameDialog, &QPushButton::released, this, &RtFwdSetupWidget::showFwdDirDialog);
@@ -106,7 +127,6 @@ RtFwdSetupWidget::RtFwdSetupWidget(RtFwd* toolbox, QWidget *parent)
     connect(m_ui.m_qPushButton_MriNameDialog, &QPushButton::released, this, &RtFwdSetupWidget::showMriFileDialog);
     connect(m_ui.m_qPushButton_MinDistOutDialog, &QPushButton::released, this, &RtFwdSetupWidget::showMinDistDirDialog);
     connect(m_ui.m_qPushButton_EEGModelFileDialog, &QPushButton::released, this, &RtFwdSetupWidget::showEEGModelFileDialog);
-    connect(m_ui.m_qPushButton_EEGModelNameDialog, &QPushButton::released, this, &RtFwdSetupWidget::showEEGModelNameDialog);
 }
 
 //=============================================================================================================
@@ -125,7 +145,7 @@ void RtFwdSetupWidget::showFwdDirDialog()
 
 //=============================================================================================================
 
-void RtFwdSetupWidget::changeSolName()
+void RtFwdSetupWidget::onSolNameChanged()
 {
     QString t_sFileName = m_ui.m_qLineEdit_SolName->text();
     m_pRtFwd->m_pFwdSettings->solname = m_sSolDir + "/" + t_sFileName;
@@ -185,15 +205,9 @@ void RtFwdSetupWidget::showEEGModelFileDialog()
 
 //=============================================================================================================
 
-void RtFwdSetupWidget::showEEGModelNameDialog()
+void RtFwdSetupWidget::onEEGModelNameChanged()
 {
-    QString t_sFileName = QFileDialog::getOpenFileName(this,
-                                                       tr("Select EEG model name"),
-                                                       QString(),
-                                                       tr("Fif Files (*.fif)"));
-
-    m_pRtFwd->m_pFwdSettings->eeg_model_name = t_sFileName;
-    m_ui.m_qLineEdit_EEGModelName->setText(t_sFileName);
+    m_pRtFwd->m_pFwdSettings->eeg_model_name = m_ui.m_qLineEdit_EEGModelName->text();
 }
 
 //=============================================================================================================
@@ -212,7 +226,7 @@ void RtFwdSetupWidget::showMinDistDirDialog()
 
 //=============================================================================================================
 
-void RtFwdSetupWidget::changeMinDistName()
+void RtFwdSetupWidget::onMinDistNameChanged()
 {
     QString t_sFileName = m_ui.m_qLineEdit_MinDistName->text();
     m_pRtFwd->m_pFwdSettings->mindistoutname = m_sMinDistDir + "/" + t_sFileName;
@@ -220,26 +234,51 @@ void RtFwdSetupWidget::changeMinDistName()
 
 //=============================================================================================================
 
-void RtFwdSetupWidget::changeMinDist()
+void RtFwdSetupWidget::onMinDistChanged()
 {
-    m_pRtFwd->m_pFwdSettings->mindist = m_ui.m_doubleSpinBox_dMinDist->value();
+    m_pRtFwd->m_pFwdSettings->mindist = m_ui.m_doubleSpinBox_dMinDist->value()/1000;
 }
 //=============================================================================================================
 
-void RtFwdSetupWidget::changeEEGSphereRad()
+void RtFwdSetupWidget::onEEGSphereRadChanged()
 {
-    m_pRtFwd->m_pFwdSettings->eeg_sphere_rad = m_ui.m_doubleSpinBox_dEegSphereRad->value();
+    m_pRtFwd->m_pFwdSettings->eeg_sphere_rad = m_ui.m_doubleSpinBox_dEegSphereRad->value()/1000;
 }
 
 //=============================================================================================================
 
-void RtFwdSetupWidget::changeEEGSphereOrigin()
+void RtFwdSetupWidget::onEEGSphereOriginChanged()
 {
-    m_pRtFwd->m_pFwdSettings->r0.x() = m_ui.m_doubleSpinBox_dVecR0x->value();
-    m_pRtFwd->m_pFwdSettings->r0.y() = m_ui.m_doubleSpinBox_dVecR0y->value();
-    m_pRtFwd->m_pFwdSettings->r0.z() = m_ui.m_doubleSpinBox_dVecR0z->value();
-    std::cout << m_pRtFwd->m_vecR0 << std::endl;
+    m_pRtFwd->m_pFwdSettings->r0.x() = m_ui.m_doubleSpinBox_dVecR0x->value()/1000;
+    m_pRtFwd->m_pFwdSettings->r0.y() = m_ui.m_doubleSpinBox_dVecR0y->value()/1000;
+    m_pRtFwd->m_pFwdSettings->r0.z() = m_ui.m_doubleSpinBox_dVecR0z->value()/1000;
+    std::cout << m_pRtFwd->m_pFwdSettings->r0 << std::endl;
 }
+
+//=============================================================================================================
+
+void RtFwdSetupWidget::onCheckStateChanged()
+{
+    m_pRtFwd->m_pFwdSettings->do_all = m_ui.m_check_bDoAll->isChecked();
+    m_pRtFwd->m_pFwdSettings->include_eeg = m_ui.m_check_bIncludeEEG->isChecked();
+    m_pRtFwd->m_pFwdSettings->include_meg = m_ui.m_check_bIncludeMeg->isChecked();
+    m_pRtFwd->m_pFwdSettings->compute_grad = m_ui.m_check_bComputeGrad->isChecked();
+
+    if( m_ui.m_check_bCoordframe->isChecked()) {
+        m_pRtFwd->m_pFwdSettings->coord_frame = FIFFV_COORD_MRI;
+    } else {
+        m_pRtFwd->m_pFwdSettings->coord_frame = FIFFV_COORD_HEAD;
+    }
+
+    m_pRtFwd->m_pFwdSettings->accurate = m_ui.m_check_bAccurate->isChecked();
+    m_pRtFwd->m_pFwdSettings->fixed_ori = m_ui.m_check_bFixedOri->isChecked();
+    m_pRtFwd->m_pFwdSettings->filter_spaces = m_ui.m_check_bFilterSpaces->isChecked();
+    m_pRtFwd->m_pFwdSettings->mri_head_ident = m_ui.m_check_bMriHeadIdent->isChecked();
+    m_pRtFwd->m_pFwdSettings->use_threads = m_ui.m_check_bUseThreads->isChecked();
+    m_pRtFwd->m_pFwdSettings->use_equiv_eeg = m_ui.m_check_bUseEquivEeg->isChecked();
+    m_pRtFwd->m_pFwdSettings->scale_eeg_pos = m_ui.m_check_bScaleEegPos->isChecked();
+}
+
 //=============================================================================================================
 
 RtFwdSetupWidget::~RtFwdSetupWidget()
