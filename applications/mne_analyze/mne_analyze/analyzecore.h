@@ -57,8 +57,8 @@
 
 namespace ANSHAREDLIB
 {
-    class IExtension;
-    class ExtensionManager;
+    class IPlugin;
+    class PluginManager;
     class AnalyzeData;
     class AnalyzeSettings;
 }
@@ -146,9 +146,9 @@ private:
 
     //=========================================================================================================
     /**
-     * This initializes the ExtensionManager.
+     * This initializes the PluginManager.
      */
-    void initExtensionManager();
+    void initPluginManager();
 
     //=========================================================================================================
     /**
@@ -162,7 +162,7 @@ private:
      */
     void registerMetaTypes();
 
-    QSharedPointer<ANSHAREDLIB::ExtensionManager>   m_pExtensionManager;    /**< Holds extension manager. */
+    QSharedPointer<ANSHAREDLIB::PluginManager>   m_pPluginManager;    /**< Holds plugin manager. */
     QSharedPointer<ANSHAREDLIB::AnalyzeSettings>    m_analyzeSettings;      /**< The global settings. */
     QSharedPointer<ANSHAREDLIB::AnalyzeData>        m_analyzeData;          /**< The global data base. */
 };

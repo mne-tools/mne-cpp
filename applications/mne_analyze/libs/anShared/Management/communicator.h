@@ -65,7 +65,7 @@ namespace ANSHAREDLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class IExtension;
+class IPlugin;
 
 //=========================================================================================================
 /**
@@ -94,11 +94,11 @@ public:
 
     //=========================================================================================================
     /**
-     * Constructs a Communicator object that is connected to the Extensions' handleEvent method.
+     * Constructs a Communicator object that is connected to the Plugins' handleEvent method.
      *
-     * @param[in] extension      The Extensions to connect to.
+     * @param[in] plugin      The Plugins to connect to.
      */
-    Communicator(IExtension* extension);
+    Communicator(IPlugin* plugin);
 
     //=========================================================================================================
     /**

@@ -1,16 +1,15 @@
 //=============================================================================================================
 /**
- * @file     extensionmanager.h
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
- *           Lorenz Esch <lesch@mgh.harvard.edu>;
+ * @file     rawdataviewer.h
+ * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
  *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
  * @since    0.1.0
- * @date     February, 2017
+ * @date     October, 2018
  *
  * @section  LICENSE
  *
- * Copyright (C) 2017, Christoph Dinh, Lorenz Esch, Lars Debor, Simon Heinke. All rights reserved.
+ * Copyright (C) 2018, Lorenz Esch, Lars Debor, Simon Heinke. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -31,124 +30,122 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains the declaration of the ExtensionManager class.
+ * @brief    Contains the declaration of the RawDataViewer class.
  *
  */
 
-#ifndef EXTENSIONMANAGER_H
-#define EXTENSIONMANAGER_H
+#ifndef RAWDATAVIEWER_H
+#define RAWDATAVIEWER_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../anshared_global.h"
+#include "rawdataviewer_global.h"
+#include <anShared/Interfaces/IPlugin.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QVector>
-#include <QPluginLoader>
-
-//=============================================================================================================
-// DEFINE NAMESPACE ANSHAREDLIB
-//=============================================================================================================
-
-namespace ANSHAREDLIB
-{
+#include <QtWidgets>
+#include <QtCore/QtPlugin>
+#include <QDebug>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class IExtension;
-class AnalyzeSettings;
-class AnalyzeData;
+class RawDataViewerControl;
+
+namespace ANSHAREDLIB {
+    class Communicator;
+    class FiffRawViewModel;
+}
+
+//=============================================================================================================
+// DEFINE NAMESPACE RAWDATAVIEWERPLUGIN
+//=============================================================================================================
+
+namespace RAWDATAVIEWERPLUGIN
+{
+    class FiffRawView;
+    class FiffRawViewDelegate;
 
 //=============================================================================================================
 /**
- * DECLARE CLASS ExtensionManager
+ * RawDataViewer Plugin
  *
- * @brief The ExtensionManager class provides a dynamic plugin loader. As well as the handling of the loaded extensions.
+ * @brief The RawDataViewer class provides a view to display raw fiff data.
  */
-class ANSHAREDSHARED_EXPORT ExtensionManager : public QPluginLoader
+class RAWDATAVIEWERSHARED_EXPORT RawDataViewer : public ANSHAREDLIB::IPlugin
 {
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "rawdataviewer.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
+    Q_INTERFACES(ANSHAREDLIB::IPlugin)
 
 public:
-    typedef QSharedPointer<ExtensionManager> SPtr;               /**< Shared pointer type for ExtensionManager. */
-    typedef QSharedPointer<const ExtensionManager> ConstSPtr;    /**< Const shared pointer type for ExtensionManager. */
+    //=========================================================================================================
+    /**
+     * Constructs a RawDataViewer.
+     */
+    RawDataViewer();
 
     //=========================================================================================================
     /**
-     * Constructs a ExtensionManager with the given parent.
-     *
-     * @param[in] parent pointer to parent Object. (It's normally the default value.)
+     * Destroys the RawDataViewer.
      */
-    ExtensionManager(QObject* parent = nullptr);
+    virtual ~RawDataViewer();
 
-    //=========================================================================================================
-    /**
-     * Destroys the ExtensionManager.
-     */
-    virtual ~ExtensionManager();
+    // IPlugin functions
+    virtual QSharedPointer<IPlugin> clone() const override;
+    virtual void init() override;
+    virtual void unload() override;
+    virtual QString getName() const override;
+    virtual QMenu* getMenu() override;
+    virtual QDockWidget* getControl() override;
+    virtual QWidget* getView() override;
+    virtual void handleEvent(QSharedPointer<ANSHAREDLIB::Event> e) override;
+    virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
 
-    //=========================================================================================================
-    /**
-     * Loads extensions from given directory.
-     *
-     * @param [in] dir    the plugin directory.
-     */
-    void loadExtensionsFromDirectory(const QString& dir);
-
-    //=========================================================================================================
-    /**
-     * Initializes the extensions.
-     *
-     * @param [in] settings      the global mne analyze settings
-     * @param [in] data          the global mne analyze data
-     */
-    void initExtensions(QSharedPointer<AnalyzeSettings> settings, QSharedPointer<AnalyzeData> data);
-
-    //=========================================================================================================
-    /**
-     * Finds index of extension by name.
-     *
-     * @param [in] name  the extension name.
-     *
-     * @return index of extension.
-     */
-    int findByName(const QString& name);
-
-    //=========================================================================================================
-    /**
-     * Returns vector containing all extensions.
-     *
-     * @return reference to vector containing all extensions.
-     */
-    inline const QVector<IExtension*>& getExtensions();
-
-    //=========================================================================================================
-    /**
-     * This is called during main-program shutdown.
-     * It simply calls the unload-method for every extension.
-     */
-    void shutdown();
+    void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
 
 private:
-    QVector<IExtension*>    m_qVecExtensions;       /**< Vector containing all extensions. */
+
+    //=========================================================================================================
+    /**
+     * Sets up control widgets, connects all relevant signals and slots, and diplays controls to user
+     */
+    void setUpControls();
+
+    void onSendSamplePos(int iSample);
+
+    void disconnectOld();
+
+    // Control
+    QPointer<QDockWidget>                m_pControlDock;                 /**< Control Widget */
+    QPointer<ANSHAREDLIB::Communicator>  m_pCommu;
+
+    // Model
+    int m_iSamplesPerBlock;
+    int m_iVisibleBlocks;
+    int m_iBufferBlocks;
+
+    QSharedPointer<ANSHAREDLIB::FiffRawViewModel>   m_pRawModel;
+    QSharedPointer<FiffRawViewDelegate>             m_pRawDelegate;
+
+    QPointer<FiffRawView>                           m_pFiffRawView;     /**< View for Fiff data */
+    bool                                            m_bDisplayCreated;  /**< Flag for remembering whether or not the display was already created */
+
+    QVBoxLayout*            m_pLayout;              /**< Layout for widgets in the controller view */
+    QWidget*                m_pContainer;           /**< Container for widgets in the controller view */
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline const QVector<IExtension*>& ExtensionManager::getExtensions()
-{
-    return m_qVecExtensions;
-}
-
 } // NAMESPACE
 
-#endif // EXTENSIONMANAGER_H
+#endif // RAWDATAVIEWER_H

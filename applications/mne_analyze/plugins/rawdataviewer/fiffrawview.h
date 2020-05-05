@@ -70,13 +70,13 @@ namespace ANSHAREDLIB {
 class QTableView;
 
 //=============================================================================================================
-// DEFINE NAMESPACE RAWDATAVIEWEREXTENSION
+// DEFINE NAMESPACE RAWDATAVIEWERPLUGIN
 //=============================================================================================================
 
-namespace RAWDATAVIEWEREXTENSION {
+namespace RAWDATAVIEWERPLUGIN {
 
 //=============================================================================================================
-// RAWDATAVIEWEREXTENSION FORWARD DECLARATIONS
+// RAWDATAVIEWERPLUGIN FORWARD DECLARATIONS
 //=============================================================================================================
 
 class FiffRawViewDelegate;
@@ -244,6 +244,6 @@ signals:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-} // NAMESPACE RAWDATAVIEWEREXTENSION
+} // NAMESPACE RAWDATAVIEWERPLUGIN
 
 #endif // FIFFRAWVIEW_H

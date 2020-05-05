@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
- * @file     datamanager.cpp
+ * @file     annotationmanager.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
- *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
+ *           Gabriel Motta <gbmotta@mgh.harvard.edu>
  * @since    0.1.0
- * @date     August, 2018
+ * @date     April, 2020
  *
  * @section  LICENSE
  *
- * Copyright (C) 2018, Lorenz Esch, Lars Debor, Simon Heinke. All rights reserved.
+ * Copyright (C) 2020, Lorenz Esch, Gabriel Motta. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -30,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the DataManager class.
+ * @brief    Definition of the AnnotationManager class.
  *
  */
 
@@ -38,155 +37,177 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "datamanager.h"
-#include "FormFiles/datamanagerview.h"
+#include "annotationmanager.h"
 
-#include <anShared/Management/analyzedata.h>
+#include <anShared/Model/fiffrawviewmodel.h>
 #include <anShared/Management/communicator.h>
-#include <anShared/Utils/metatypes.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QListWidgetItem>
+#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DATAMANAGEREXTENSION;
+using namespace ANNOTATIONMANAGERPLUGIN;
 using namespace ANSHAREDLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DataManager::DataManager()
+AnnotationManager::AnnotationManager()
 {
+
 }
 
 //=============================================================================================================
 
-DataManager::~DataManager()
+AnnotationManager::~AnnotationManager()
 {
-    delete m_pCommu;
+
 }
 
 //=============================================================================================================
 
-QSharedPointer<IExtension> DataManager::clone() const
+QSharedPointer<IPlugin> AnnotationManager::clone() const
 {
-    QSharedPointer<DataManager> pDataViewerClone = QSharedPointer<DataManager>::create();
-    return pDataViewerClone;
+    QSharedPointer<AnnotationManager> pAnnotationManagerClone(new AnnotationManager);
+    return pAnnotationManagerClone;
 }
 
 //=============================================================================================================
 
-void DataManager::init()
+void AnnotationManager::init()
 {
     m_pCommu = new Communicator(this);
 
-    m_pDataManagerView = new DataManagerView;
+    m_pAnnotationView = new AnnotationView();
 
-    connect(m_pDataManagerView.data(), &DataManagerView::currentlySelectedModelChanged,
-            this, &DataManager::onCurrentlySelectedModelChanged);
+    connect(m_pAnnotationView, &AnnotationView::triggerRedraw,
+            this, &AnnotationManager::onTriggerRedraw);
 
-    updateListWidget();
+    connect(m_pAnnotationView, &AnnotationView::activeEventsChecked,
+            this, &AnnotationManager::toggleDisplayEvent);
 
-    connect(m_pAnalyzeData.data(), &AnalyzeData::newModelAvailable,
-            this, &DataManager::updateListWidget);
-    connect(m_pAnalyzeData.data(), &AnalyzeData::modelPathChanged,
-            this, &DataManager::updateListWidget);
-    connect(m_pAnalyzeData.data(), &AnalyzeData::modelRemoved,
-            this, &DataManager::updateListWidget);
+    //connect(m_pAnalyzeData.data(), &AnalyzeData::newModelAvailable,
+    //        this, &AnnotationManager::onModelChanged);
+    connect(m_pAnalyzeData.data(), &AnalyzeData::selectedModelChanged,
+            this, &AnnotationManager::onModelChanged);
 }
 
 //=============================================================================================================
 
-void DataManager::unload()
+void AnnotationManager::unload()
 {
+
 }
 
 //=============================================================================================================
 
-QString DataManager::getName() const
+QString AnnotationManager::getName() const
 {
-    return "DataManager";
+    return "Annotation Manager";
 }
 
 //=============================================================================================================
 
-QMenu *DataManager::getMenu()
-{
-    return Q_NULLPTR;
-}
-
-//=============================================================================================================
-
-QDockWidget *DataManager::getControl()
-{
-    if(!m_pControlDock) {
-        m_pControlDock = new QDockWidget(tr("Data Manager"));
-        m_pControlDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-        m_pControlDock->setWidget(m_pDataManagerView);
-    }
-
-    return m_pControlDock;
-}
-
-//=============================================================================================================
-
-QWidget *DataManager::getView()
+QMenu *AnnotationManager::getMenu()
 {
     return Q_NULLPTR;
 }
 
 //=============================================================================================================
 
-void DataManager::handleEvent(QSharedPointer<Event> e)
+QDockWidget *AnnotationManager::getControl()
+{
+    QDockWidget* pControl = new QDockWidget(tr("Annotation Manager"));
+    pControl->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
+    pControl->setWidget(m_pAnnotationView);
+
+    return pControl;
+}
+
+//=============================================================================================================
+
+QWidget *AnnotationManager::getView()
+{
+    return Q_NULLPTR;
+}
+
+//=============================================================================================================
+
+void AnnotationManager::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
+//    case EVENT_TYPE::CURRENTLY_SELECTED_MODEL:
+//        m_sCurrentlySelectedModel = e->getData().toString();
+//        qDebug() << m_sCurrentlySelectedModel;
+//        break;
+    case EVENT_TYPE::NEW_ANNOTATION_ADDED:
+        m_pAnnotationView->addAnnotationToModel(e->getData().toInt());
+        m_pCommu->publishEvent(TRIGGER_REDRAW);
+        break;
     default:
-        qWarning() << "[DataManager::handleEvent] received an Event that is not handled by switch-cases";
+        qWarning() << "[AnnotationManager::handleEvent] Received an Event that is not handled by switch cases.";
     }
 }
 
 //=============================================================================================================
 
-QVector<EVENT_TYPE> DataManager::getEventSubscriptions(void) const
+QVector<EVENT_TYPE> AnnotationManager::getEventSubscriptions(void) const
 {
+    //QVector<EVENT_TYPE> temp = {CURRENTLY_SELECTED_MODEL};
     QVector<EVENT_TYPE> temp;
+    temp.push_back(NEW_ANNOTATION_ADDED);
 
     return temp;
 }
 
 //=============================================================================================================
 
-void DataManager::updateListWidget()
+void AnnotationManager::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel)
 {
-    m_pDataManagerView->clearList();
-
-    QList<QSharedPointer<AbstractModel> > lModels = m_pAnalyzeData->getModels();
-
-    //add all model names to the listView
-    for(QSharedPointer<AbstractModel> pModel: lModels) {
-        if(pModel->getType() == MODEL_TYPE::ANSHAREDLIB_QENTITYLIST_MODEL) {
-            continue;
+    if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
+        if(m_pFiffRawModel) {
+            if(m_pFiffRawModel == pNewModel) {
+                return;
+            }
         }
 
-        QListWidgetItem* tempListItem = new QListWidgetItem;
-        tempListItem->setText(pModel->getModelName());
-        tempListItem->setToolTip(pModel->getModelPath());
-        m_pDataManagerView->addListItem(tempListItem);
+        m_pAnnotationView->disconnectFromModel();
+        m_pFiffRawModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
+        m_pAnnotationModel = m_pFiffRawModel->getAnnotationModel();
+        m_pAnnotationView->setModel(m_pAnnotationModel);
+        m_pAnnotationView->passFiffParams(m_pFiffRawModel->absoluteFirstSample(),
+                                           m_pFiffRawModel->absoluteLastSample(),
+                                           m_pFiffRawModel->getFiffInfo()->sfreq);
     }
 }
 
 //=============================================================================================================
 
-void DataManager::onCurrentlySelectedModelChanged(const QString& sCurrentModelPath)
+void AnnotationManager::setUpControls()
 {
-    QVariant data(sCurrentModelPath);
-    m_pAnalyzeData->setCurrentlySelectedModel(sCurrentModelPath);
-    m_pCommu->publishEvent(EVENT_TYPE::CURRENTLY_SELECTED_MODEL, data);
+    connect(m_pAnnotationView, &AnnotationView::activeEventsChecked,
+            this, &AnnotationManager::toggleDisplayEvent);
+}
+
+//=============================================================================================================
+
+void AnnotationManager::toggleDisplayEvent(const int& iToggle)
+{
+    int m_iToggle = iToggle;
+    m_pFiffRawModel->toggleDispAnn(m_iToggle);
+    m_pCommu->publishEvent(TRIGGER_REDRAW);
+}
+
+//=============================================================================================================
+
+void AnnotationManager::onTriggerRedraw()
+{
+    m_pCommu->publishEvent(TRIGGER_REDRAW);
 }

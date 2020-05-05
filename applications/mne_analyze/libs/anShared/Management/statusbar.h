@@ -116,7 +116,7 @@ private:
      */
     void onNewMessageReceived(const QSharedPointer<ANSHAREDLIB::Event> pEvent);
 
-    ANSHAREDLIB::Communicator *m_pCommunicator;         /**< Vector containing all extensions. */
+    ANSHAREDLIB::Communicator *m_pCommunicator;         /**< Vector containing all plugins. */
 
     int m_iMsgTimeout;                                  /**< Timeout of one message in milliseconds. */
 };

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     extensionmanager.cpp
+ * @file     pluginmanager.cpp
  * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
@@ -31,7 +31,7 @@ Copyright (C) 2017, Christoph Dinh, Lars Debor, Simon Heinke and Matti Hamalaine
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the ExtensionManager class.
+ * @brief    Definition of the PluginManager class.
  *
  */
 
@@ -39,8 +39,8 @@ Copyright (C) 2017, Christoph Dinh, Lars Debor, Simon Heinke and Matti Hamalaine
 // INCLUDES
 //=============================================================================================================
 
-#include "extensionmanager.h"
-#include "../Interfaces/IExtension.h"
+#include "pluginmanager.h"
+#include "../Interfaces/IPlugin.h"
 #include "communicator.h"
 
 //=============================================================================================================
@@ -60,7 +60,7 @@ using namespace ANSHAREDLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ExtensionManager::ExtensionManager(QObject *parent)
+PluginManager::PluginManager(QObject *parent)
 : QPluginLoader(parent)
 {
 
@@ -68,43 +68,43 @@ ExtensionManager::ExtensionManager(QObject *parent)
 
 //=============================================================================================================
 
-ExtensionManager::~ExtensionManager()
+PluginManager::~PluginManager()
 {
-    for(IExtension* extension : m_qVecExtensions)
+    for(IPlugin* plugin : m_qVecPlugins)
     {
-        delete extension;
+        delete plugin;
     }
 }
 
 //=============================================================================================================
 
-void ExtensionManager::loadExtensionsFromDirectory(const QString& dir)
+void PluginManager::loadPluginsFromDirectory(const QString& dir)
 {
 #ifdef STATICBUILD
     Q_UNUSED(dir);
 
     const auto staticInstances = QPluginLoader::staticInstances();
     for(QObject *plugin : staticInstances) {
-        // IExtension
-        if(IExtension* pExtension = qobject_cast<IExtension*>(plugin)) {
-            m_qVecExtensions.push_back(qobject_cast<IExtension*>(pExtension));
+        // IPlugin
+        if(IPlugin* pPlugin = qobject_cast<IPlugin*>(plugin)) {
+            m_qVecPlugins.push_back(qobject_cast<IPlugin*>(pPlugin));
         }
     }
 #else
-    QDir extensionsDir(dir);
+    QDir pluginsDir(dir);
 
-    foreach(const QString &file, extensionsDir.entryList(QDir::Files)) {
+    foreach(const QString &file, pluginsDir.entryList(QDir::Files)) {
         // Exclude .exp and .lib files (only relevant for windows builds)
         if(!file.contains(".exp") && !file.contains(".lib")) {
-            this->setFileName(extensionsDir.absoluteFilePath(file));
-            QObject *pExtension = this->instance();
+            this->setFileName(pluginsDir.absoluteFilePath(file));
+            QObject *pPlugin = this->instance();
 
-            // IExtension
-            if(pExtension) {
-                qDebug() << "[ExtensionManager::loadExtension] Loading Extension" << file.toUtf8().constData() << "succeeded.";
-                m_qVecExtensions.push_back(qobject_cast<IExtension*>(pExtension));
+            // IPlugin
+            if(pPlugin) {
+                qDebug() << "[PluginManager::loadPlugin] Loading Plugin" << file.toUtf8().constData() << "succeeded.";
+                m_qVecPlugins.push_back(qobject_cast<IPlugin*>(pPlugin));
             } else {
-                qDebug() << "[ExtensionManager::loadExtension] Loading Extension" << file.toUtf8().constData() << "failed.";
+                qDebug() << "[PluginManager::loadPlugin] Loading Plugin" << file.toUtf8().constData() << "failed.";
             }
         }
     }
@@ -113,27 +113,27 @@ void ExtensionManager::loadExtensionsFromDirectory(const QString& dir)
 
 //=============================================================================================================
 
-void ExtensionManager::initExtensions(QSharedPointer<AnalyzeSettings> settings,
+void PluginManager::initPlugins(QSharedPointer<AnalyzeSettings> settings,
                                       QSharedPointer<AnalyzeData> data)
 {
-    for(IExtension* extension : m_qVecExtensions)
+    for(IPlugin* plugin : m_qVecPlugins)
     {
-        extension->setGlobalSettings(settings);
-        extension->setGlobalData(data);
-        extension->init();
+        plugin->setGlobalSettings(settings);
+        plugin->setGlobalData(data);
+        plugin->init();
     }
 
     // tell everyone that INIT-phase is finished
     Communicator con;
-    con.publishEvent(EVENT_TYPE::EXTENSION_INIT_FINISHED);
+    con.publishEvent(EVENT_TYPE::PLUGIN_INIT_FINISHED);
 }
 
 //=============================================================================================================
 
-int ExtensionManager::findByName(const QString& name)
+int PluginManager::findByName(const QString& name)
 {
-    QVector<IExtension*>::const_iterator it = m_qVecExtensions.begin();
-    for(int i = 0; it != m_qVecExtensions.end(); ++i, ++it)
+    QVector<IPlugin*>::const_iterator it = m_qVecPlugins.begin();
+    for(int i = 0; it != m_qVecPlugins.end(); ++i, ++it)
         if((*it)->getName() == name)
             return i;
 
@@ -142,10 +142,10 @@ int ExtensionManager::findByName(const QString& name)
 
 //=============================================================================================================
 
-void ExtensionManager::shutdown()
+void PluginManager::shutdown()
 {
-    for(IExtension* extension : m_qVecExtensions)
+    for(IPlugin* plugin : m_qVecPlugins)
     {
-        extension->unload();
+        plugin->unload();
     }
 }

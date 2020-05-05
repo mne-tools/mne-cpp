@@ -44,7 +44,7 @@
 #include "annotationdelegate.h"
 #include "annotationview.h"
 
-#include <anShared/Interfaces/IExtension.h>
+#include <anShared/Interfaces/IPlugin.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -62,30 +62,30 @@ namespace ANSHAREDLIB {
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE annotationmanagerEXTENSION
+// DEFINE NAMESPACE annotationmanagerPLUGIN
 //=============================================================================================================
 
-namespace ANNOTATIONMANAGEREXTENSION
+namespace ANNOTATIONMANAGERPLUGIN
 {
 
 //=============================================================================================================
-// ANNOTATIONMANAGEREXTENSION FORWARD DECLARATIONS
+// ANNOTATIONMANAGERPLUGIN FORWARD DECLARATIONS
 //=============================================================================================================
 
 class annotationmanagerControl;
 
 //=============================================================================================================
 /**
- * annotationmanager Extension
+ * annotationmanager Plugin
  *
  * @brief The annotationmanager class provides input and output capabilities for the fiff file format.
  */
-class ANNOTATIONMANAGERSHARED_EXPORT AnnotationManager : public ANSHAREDLIB::IExtension
+class ANNOTATIONMANAGERSHARED_EXPORT AnnotationManager : public ANSHAREDLIB::IPlugin
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "annotationmanager.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(ANSHAREDLIB::IExtension)
+    Q_INTERFACES(ANSHAREDLIB::IPlugin)
 
 public:
     //=========================================================================================================
@@ -100,8 +100,8 @@ public:
      */
     ~AnnotationManager() override;
 
-    // IExtension functions
-    virtual QSharedPointer<IExtension> clone() const override;
+    // IPlugin functions
+    virtual QSharedPointer<IPlugin> clone() const override;
     virtual void init() override;
     virtual void unload() override;
     virtual QString getName() const override;
@@ -144,9 +144,9 @@ public:
 private:
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals */
 
-    AnnotationView*                                         m_pAnnotationView;          /**< Pointer to associated View for this extension */
+    AnnotationView*                                         m_pAnnotationView;          /**< Pointer to associated View for this plugin */
 
-    QSharedPointer<ANSHAREDLIB::AnnotationModel>            m_pAnnotationModel;         /**< Pointer to associated Model for this extension */
+    QSharedPointer<ANSHAREDLIB::AnnotationModel>            m_pAnnotationModel;         /**< Pointer to associated Model for this plugin */
 
     QSharedPointer<ANSHAREDLIB::FiffRawViewModel>           m_pFiffRawModel;            /**< Pointer to currently loaded FiffRawView Model */
 

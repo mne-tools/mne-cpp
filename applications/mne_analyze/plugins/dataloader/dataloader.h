@@ -1,15 +1,13 @@
 //=============================================================================================================
 /**
- * @file     datamanager.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
- *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
+ * @file     dataloader.h
+ * @author   Lorenz Esch <lesch@mgh.harvard.edu>
  * @since    0.1.0
- * @date     August, 2018
+ * @date     November, 2019
  *
  * @section  LICENSE
  *
- * Copyright (C) 2018, Lorenz Esch, Lars Debor, Simon Heinke. All rights reserved.
+ * Copyright (C) 2019, Lorenz Esch. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -30,19 +28,20 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains the declaration of the DataManager class.
+ * @brief    Contains the declaration of the DataLoader class.
  *
  */
 
-#ifndef LOADEDDATA_H
-#define LOADEDDATA_H
+#ifndef DATALOADER_H
+#define DATALOADER_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "datamanager_global.h"
-#include <anShared/Interfaces/IExtension.h>
+#include "dataloader_global.h"
+
+#include <anShared/Interfaces/IPlugin.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -51,81 +50,86 @@
 #include <QtWidgets>
 #include <QtCore/QtPlugin>
 #include <QDebug>
-#include <QPointer>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
-class DataManagerView;
 
 namespace ANSHAREDLIB {
     class Communicator;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE SURFEREXTENSION
+// DEFINE NAMESPACE DATALOADERPLUGIN
 //=============================================================================================================
 
-namespace DATAMANAGEREXTENSION
+namespace DATALOADERPLUGIN
 {
+
+//=============================================================================================================
+// DATALOADERPLUGIN FORWARD DECLARATIONS
+//=============================================================================================================
+
+class DataLoaderControl;
 
 //=============================================================================================================
 /**
- * DataManager Extension
+ * DataLoader Plugin
  *
- * @brief The DataManager class provides a view with all currently loaded models.
+ * @brief The DataLoader class provides input and output capabilities for the fiff file format.
  */
-class DATAVIEWERSHARED_EXPORT DataManager : public ANSHAREDLIB::IExtension
+class DATALOADERSHARED_EXPORT DataLoader : public ANSHAREDLIB::IPlugin
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "datamanager.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "dataloader.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(ANSHAREDLIB::IExtension)
+    Q_INTERFACES(ANSHAREDLIB::IPlugin)
 
 public:
     //=========================================================================================================
     /**
-     * Constructs a DataManager.
+     * Constructs a DataLoader.
      */
-    DataManager();
+    DataLoader();
 
     //=========================================================================================================
     /**
-     * Destroys the DataManager.
+     * Destroys the DataLoader.
      */
-    virtual ~DataManager() override;
+    ~DataLoader() override;
 
-    // IExtension functions
-    virtual QSharedPointer<IExtension> clone() const override;
+    // IPlugin functions
+    virtual QSharedPointer<IPlugin> clone() const override;
     virtual void init() override;
     virtual void unload() override;
     virtual QString getName() const override;
+
     virtual QMenu* getMenu() override;
     virtual QDockWidget* getControl() override;
     virtual QWidget* getView() override;
+
     virtual void handleEvent(QSharedPointer<ANSHAREDLIB::Event> e) override;
     virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
 
 private:
     //=========================================================================================================
     /**
-     * Updates the content of the list widget.
+     * This functions is called when the load from file button is pressed.
      */
-    void updateListWidget();
+    void onLoadFiffFilePressed();
 
-    void onCurrentlySelectedModelChanged(const QString& sCurrentModelPath);
+    //=========================================================================================================
+    /**
+     * This functions is called when the save to file button is pressed.
+     */
+    void onSaveFiffFilePressed();
 
-    // Control
-    QPointer<QDockWidget>               m_pControlDock;         /**< Control Widget */
-    QPointer<DataManagerView>           m_pDataManagerView;
     QPointer<ANSHAREDLIB::Communicator> m_pCommu;
-};
 
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
+    QString                             m_sCurrentlySelectedModel;
+
+};
 
 } // NAMESPACE
 
-#endif // LOADEDDATA_H
+#endif // DATALOADER_H

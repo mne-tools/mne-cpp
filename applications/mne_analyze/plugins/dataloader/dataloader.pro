@@ -1,15 +1,14 @@
 #==============================================================================================================
 #
-# @file     datamanager.pro
+# @file     dataloader.pro
 # @author   Lorenz Esch <lesch@mgh.harvard.edu>;
-#           Lars Debor <Lars.Debor@tu-ilmenau.de>;
-#           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
+#           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
 # @since    0.1.0
-# @date     March, 2017
+# @date     July, 2017
 #
 # @section  LICENSE
 #
-# Copyright (C) 2017, Lorenz Esch, Lars Debor, Simon Heinke. All rights reserved.
+# Copyright (C) 2017, Lorenz Esch, Christoph Dinh. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -30,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile for the datamanager plugin.
+# @brief    This project file generates the makefile for the dataloader plugin.
 #
 #==============================================================================================================
 
@@ -40,11 +39,20 @@ TEMPLATE = lib
 
 CONFIG += plugin
 
-DEFINES += DATAMANAGER_EXTENSION
+DEFINES += DATALOADER_PLUGIN
 
 QT += gui widgets
 
-DESTDIR = $${MNE_BINARY_DIR}/mne_analyze_extensions
+contains(MNECPP_CONFIG, wasm) {
+    DEFINES += WASMBUILD
+}
+
+TARGET = dataloader
+CONFIG(debug, debug|release) {
+    TARGET = $$join(TARGET,,,d)
+}
+
+DESTDIR = $${MNE_BINARY_DIR}/mne_analyze_plugins
 
 contains(MNECPP_CONFIG, static) {
     CONFIG += staticlib
@@ -53,35 +61,27 @@ contains(MNECPP_CONFIG, static) {
     CONFIG += shared
 }
 
-TARGET = datamanager
-CONFIG(debug, debug|release) {
-    TARGET = $$join(TARGET,,,d)
-}
-
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
+    LIBS += -lanSharedd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lanSharedd
+            -lMNE$${MNE_LIB_VERSION}Utilsd \
 } else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
+    LIBS += -lanShared \
             -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lanShared
+            -lMNE$${MNE_LIB_VERSION}Utils \
 }
 
 SOURCES += \
-    datamanager.cpp \
-    FormFiles/datamanagerview.cpp
+    dataloader.cpp \
 
 HEADERS += \
-    datamanager_global.h \
-    datamanager.h    \
-    FormFiles/datamanagerview.h
+    dataloader_global.h \
+    dataloader.h \
 
 FORMS += \
-    FormFiles/datamanagerview.ui
 
-OTHER_FILES += datamanager.json
+OTHER_FILES += dataloader.json
 
 RESOURCES += \
 
@@ -92,7 +92,7 @@ COPY_CMD = $$copyResources($${RESOURCE_FILES})
 QMAKE_POST_LINK += $${COPY_CMD}
 
 # Put generated form headers into the origin --> cause other src is pointing at them
-UI_DIR = $$PWD
+UI_DIR = $${PWD}
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
@@ -100,7 +100,7 @@ INCLUDEPATH += $${MNE_ANALYZE_INCLUDE_DIR}
 
 # Install headers to include directory
 header_files.files = $${HEADERS}
-header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/mne_analyze_extensions
+header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/mne_analyze_plugins
 
 unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
 
@@ -112,8 +112,8 @@ unix:!macx {
     QMAKE_RPATHDIR += $ORIGIN/../../lib
 }
 
-# Activate FFTW backend in Eigen
-contains(MNECPP_CONFIG, useFFTW) {
+# Activate FFTW backend in Eigen for non-static builds only
+contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
     DEFINES += EIGEN_FFTW_DEFAULT
     INCLUDEPATH += $$shell_path($${FFTW_DIR_INCLUDE})
     LIBS += -L$$shell_path($${FFTW_DIR_LIBS})

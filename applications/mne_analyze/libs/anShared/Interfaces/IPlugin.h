@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     IExtension.h
+ * @file     IPlugin.h
  * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
@@ -31,12 +31,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains declaration of IExtension interface class.
+ * @brief    Contains declaration of IPlugin interface class.
  *
  */
 
-#ifndef IEXTENSION_H
-#define IEXTENSION_H
+#ifndef IPLUGIN_H
+#define IPLUGIN_H
 
 //=============================================================================================================
 // INCLUDES
@@ -73,39 +73,39 @@ class AnalyzeSettings;
 
 //=========================================================================================================
 /**
- * DECLARE CLASS IExtension
+ * DECLARE CLASS IPlugin
  *
- * @brief The IExtension class is the base interface class for all extensions.
+ * @brief The IPlugin class is the base interface class for all plugins.
  */
-class ANSHAREDSHARED_EXPORT IExtension : public QObject
+class ANSHAREDSHARED_EXPORT IPlugin : public QObject
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<IExtension> SPtr;               /**< Shared pointer type for IExtension. */
-    typedef QSharedPointer<const IExtension> ConstSPtr;    /**< Const shared pointer type for IExtension. */
+    typedef QSharedPointer<IPlugin> SPtr;               /**< Shared pointer type for IPlugin. */
+    typedef QSharedPointer<const IPlugin> ConstSPtr;    /**< Const shared pointer type for IPlugin. */
 
     //=========================================================================================================
     /**
-     * Destroys the extension.
+     * Destroys the plugin.
      */
-    virtual ~IExtension() {}
+    virtual ~IPlugin() {}
 
     //=========================================================================================================
     /**
-     * Clone the extension
+     * Clone the plugin
      */
-    virtual QSharedPointer<IExtension> clone() const = 0;
+    virtual QSharedPointer<IPlugin> clone() const = 0;
 
     //=========================================================================================================
     /**
-     * Initializes the extension.
+     * Initializes the plugin.
      */
     virtual void init() = 0;
 
     //=========================================================================================================
     /**
-     * Is called when extension unloaded.
+     * Is called when plugin unloaded.
      */
     virtual void unload() = 0;
 
@@ -144,8 +144,8 @@ public:
 
     //=========================================================================================================
     /**
-     * Informs the EventManager about all Events that the Extension wants to know about. Can return an empty
-     * vector in case no Events need to be seen by the Extension.
+     * Informs the EventManager about all Events that the Plugin wants to know about. Can return an empty
+     * vector in case no Events need to be seen by the Plugin.
      *
      * @return The vector of relevant Events
      */
@@ -186,20 +186,20 @@ protected:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-void IExtension::setGlobalData(QSharedPointer<AnalyzeData> globalData)
+void IPlugin::setGlobalData(QSharedPointer<AnalyzeData> globalData)
 {
     m_pAnalyzeData = globalData;
 }
 
 //=============================================================================================================
 
-void IExtension::setGlobalSettings(QSharedPointer<AnalyzeSettings> globalSettings)
+void IPlugin::setGlobalSettings(QSharedPointer<AnalyzeSettings> globalSettings)
 {
     m_pAnalyzeSettings = globalSettings;
 }
 
 } //Namespace
 
-Q_DECLARE_INTERFACE(ANSHAREDLIB::IExtension, "ansharedlib/1.0")
+Q_DECLARE_INTERFACE(ANSHAREDLIB::IPlugin, "ansharedlib/1.0")
 
-#endif //IEXTENSION_H
+#endif //IPLUGIN_H

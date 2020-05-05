@@ -70,7 +70,7 @@ class Communicator;
 /**
  * DECLARE CLASS Event
  *
- * @brief Event class for inter-Extension communication. Basically holds type information, sender and data.
+ * @brief Event class for inter-Plugin communication. Basically holds type information, sender and data.
  */
 class ANSHAREDSHARED_EXPORT Event : public QObject
 {

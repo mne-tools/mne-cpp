@@ -284,7 +284,7 @@ bool FiffRawViewModel::saveToFile(const QString& sPath)
     if(m_pFiffIO->m_qlistRaw.size() > 0) {
         m_pFiffIO->write_raw(*bufferOut, 0);
 
-        // Wee need to call the QFileDialog here instead of the data load extension since we need access to the QByteArray
+        // Wee need to call the QFileDialog here instead of the data load plugin since we need access to the QByteArray
         QFileDialog::saveFileContent(bufferOut->data(), fileInfo.fileName());
 
         return true;

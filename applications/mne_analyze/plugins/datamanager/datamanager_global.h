@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
- * @file     annotationmanager_global.h
+ * @file     datamanager_global.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
+ *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
+ *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
  * @since    0.1.0
- * @date     February, 2017
+ * @date     August, 2018
  *
  * @section  LICENSE
  *
- * Copyright (C) 2017, Lorenz Esch, Christoph Dinh. All rights reserved.
+ * Copyright (C) 2018, Lorenz Esch, Lars Debor, Simon Heinke. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -29,12 +30,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains the FiffIO library export/import macros.
+ * @brief    Contains the DataViewer library export/import macros.
  *
  */
 
-#ifndef ANNOTATIONMANAGER_GLOBAL_H
-#define ANNOTATIONMANAGER_GLOBAL_H
+#ifndef DATAVIEWER_GLOBAL_H
+#define DATAVIEWER_GLOBAL_H
 
 //=============================================================================================================
 // QT INCLUDES
@@ -46,10 +47,10 @@
 // PREPROCESSOR DEFINES
 //=============================================================================================================
 
-#if defined(ANNOTATIONMANAGER_EXTENSION)
-#  define ANNOTATIONMANAGERSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#if defined(DATAMANAGER_PLUGIN)
+#  define DATAVIEWERSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define ANNOTATIONMANAGERSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#  define DATAVIEWERSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
-#endif // ANNOTATIONMANAGER_GLOBAL_H
+#endif // DATAVIEWER_GLOBAL_H

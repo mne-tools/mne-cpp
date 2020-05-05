@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
- * @file     rawdataviewer_global.h
+ * @file     datamanagerview.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
  *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
  * @since    0.1.0
- * @date     October, 2018
+ * @date     August, 2018
  *
  * @section  LICENSE
  *
@@ -30,27 +30,76 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains the RawDataViewer library export/import macros.
+ * @brief    Contains the declaration of the DataManagerView class.
  *
  */
 
-#ifndef RAWDATAVIEWER_GLOBAL_H
-#define RAWDATAVIEWER_GLOBAL_H
+#ifndef DATAMANAGERVIEW_H
+#define DATAMANAGERVIEW_H
 
 //=============================================================================================================
-// QT INCLUDES
+// INCLUDES
 //=============================================================================================================
 
-#include <QtCore/qglobal.h>
+#include <QWidget>
 
 //=============================================================================================================
-// PREPROCESSOR DEFINES
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-#if defined(RAWDATAVIEWER_EXTENSION)
-#  define RAWDATAVIEWERSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
-#else
-#  define RAWDATAVIEWERSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
-#endif
+namespace Ui {
+    class DataManagerView;
+}
 
-#endif // RAWDATAVIEWER_GLOBAL_H
+class QListWidgetItem;
+
+//=============================================================================================================
+/**
+ * DataManagerView Plugin Control
+ *
+ * @brief The DataManagerView class provides the plugin control.
+ */
+class DataManagerView : public QWidget
+{
+    Q_OBJECT
+
+public:
+    //=========================================================================================================
+    /**
+     * Constructs the DataManagerView
+     *
+     * @param[in] parent     If parent is not NULL the QWidget becomes a child of QWidget inside parent.
+     */
+    explicit DataManagerView(QWidget *parent = 0);
+
+    //=========================================================================================================
+    /**
+     * Destroys the DataManagerView.
+     */
+    virtual ~DataManagerView();
+
+    //=========================================================================================================
+    /**
+     * Removes all entries from the QListWidget.
+     *
+     * @param[in] pNewItem       The new item.
+     */
+    void addListItem(QListWidgetItem* pNewItem);
+
+    //=========================================================================================================
+    /**
+     * Removes all entries from the QListWidget.
+     */
+    void clearList();
+
+private:
+    void onCurrentItemChanged(QListWidgetItem *current,
+                              QListWidgetItem *previous);
+
+    Ui::DataManagerView *ui;   /**< The user interface */
+
+signals:
+    void currentlySelectedModelChanged(const QString& sCurrentModelPath);
+};
+
+#endif // DATAMANAGERVIEW_H
