@@ -76,8 +76,8 @@ RtFwdSettingsView::RtFwdSettingsView(const QString& sSettingsPath,
     m_ui->setupUi(this);
 
     // init
-    m_ui->m_spinBox_Movement->setValue(3);      // movement threshols = 3 mm
-    m_ui->m_spinBox_Rotation->setValue(5);      // rotation threshols = 5°
+    m_ui->m_spinBox_Movement->setValue(0);      // movement threshols = 3 mm
+    m_ui->m_spinBox_Rotation->setValue(0);      // rotation threshols = 5°
 
     // connect
     connect(m_ui->m_spinBox_Movement, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
@@ -142,14 +142,15 @@ void RtFwdSettingsView::saveSettings(const QString& settingsPath)
 
 //=============================================================================================================
 
-void RtFwdSettingsView::allowedMoveThresholdChanged(double dThreshMove)
+double RtFwdSettingsView::getAllowedMoveThresholdChanged()
 {
-
+    return m_ui->m_spinBox_Movement->value();
 }
 
 //=============================================================================================================
 
-void RtFwdSettingsView::allowedRotThresholdChanged(double dThreshRot)
+double RtFwdSettingsView::getAllowedRotThresholdChanged()
 {
-
+    return m_ui->m_spinBox_Rotation->value();
 }
+
