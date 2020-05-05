@@ -80,7 +80,6 @@ using namespace Eigen;
 
 RtFwd::RtFwd()
     : m_bUpdateHeadPos(false)
-    , m_pFiffInfo(new FiffInfo)
     , m_pCircularBuffer(CircularBuffer_Matrix_double::SPtr::create(40))
     , m_pFwdSettings(new ComputeFwdSettings)
 {

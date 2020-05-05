@@ -47,6 +47,8 @@
 #include <fwd/computeFwd/compute_fwd.h>
 #include <fwd/computeFwd/compute_fwd_settings.h>
 
+#include <inverse/hpiFit/hpifit.h>
+
 #include <scShared/Interfaces/IAlgorithm.h>
 #include <scMeas/realtimemultisamplearray.h>
 #include <scMeas/realtimehpiresult.h>
@@ -83,6 +85,7 @@ namespace SCMEASLIB{
     class RealTimeMultiSampleArray;
     class RealTimeHpiResult;
 }
+
 
 //=============================================================================================================
 // DEFINE NAMESPACE RTFWDPLUGIN
@@ -168,7 +171,7 @@ private:
      *
      * @param[in] dThreshRot    Allowed rotation in degree.
      */
-    void onThresholdRotationChanged(double dThreshRot);
+    void onAllowedRotThresholdChanged(double dThreshRot);
 
     //=========================================================================================================
     /**
@@ -176,7 +179,7 @@ private:
      *
      * @param[in] dThreshMove   Allowed movement in mm.
      */
-    void onThresholdMovementChanged(double dThreshMove);
+    void onAllowedMoveThresholdChanged(double dThreshMove);
 
     QMutex                              m_mutex;                /**< The threads mutex.*/
 
@@ -184,7 +187,7 @@ private:
     float                               m_fThreshMove;          /**< The Allowed movement in mm.**/
     bool                                m_bUpdateHeadPos;       /**< Indicates if we have to update headposition.**/
 
-    QSharedPointer<HpiFitResult>        m_pHpiFitResult;        /**< The Hpi fitting result.**/
+    QSharedPointer<INVERSELIB::HpiFitResult>        m_pHpiFitResult;        /**< The Hpi fitting result.**/
 
     FIFFLIB::FiffInfo::SPtr             m_pFiffInfo;            /**< Fiff measurement info.*/
     FIFFLIB::FiffCoordTrans             m_transDevHead;         /**< Updated meg->head transformation. */
