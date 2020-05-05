@@ -1826,7 +1826,7 @@ bool mne_attach_env(const QString& name, const QString& command)
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ComputeFwd::ComputeFwd(ComputeFwdSettings* pSettings)
+ComputeFwd::ComputeFwd(ComputeFwdSettings::SPtr pSettings)
     : sol(new FiffNamedMatrix)
     , sol_grad(new FiffNamedMatrix)
     , m_meg_forward(new FiffNamedMatrix)
