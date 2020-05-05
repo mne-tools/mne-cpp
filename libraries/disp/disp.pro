@@ -201,6 +201,7 @@ qtHaveModule(charts) {
 FORMS += \
     viewers/formfiles/filterdesignview.ui \
     viewers/formfiles/channelselectionview.ui \
+    viewers/formfiles/rtfwdsettingsview.ui \
     viewers/formfiles/spharasettingsview.ui \
     viewers/formfiles/fiffrawviewsettings.ui \
     viewers/formfiles/triggerdetectionview.ui \
