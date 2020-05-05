@@ -37,10 +37,16 @@
 //=============================================================================================================
 
 #include "rtfwdsettingsview.h"
+#include "ui_rtfwdsettingsview.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
+
+#include <QFileInfo>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QSettings>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -50,7 +56,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace NAMESPACE;
+using namespace DISPLIB;
 
 //=============================================================================================================
 // DEFINE GLOBAL METHODS
@@ -60,9 +66,67 @@ using namespace NAMESPACE;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtFwdSettingsView::RtFwdSettingsView(QWidget *parent)
-: QWidget(parent)
+RtFwdSettingsView::RtFwdSettingsView(const QString& sSettingsPath,
+                                     QWidget *parent,
+                                     Qt::WindowFlags f)
+    : QWidget(parent, f)
+    , m_ui(new Ui::RtFwdSettingsViewWidget)
+    , m_sSettingsPath(sSettingsPath)
 {
+    m_ui->setupUi(this);
+
+    loadSettings(m_sSettingsPath);
 }
 
 //=============================================================================================================
+
+RtFwdSettingsView::~RtFwdSettingsView()
+{
+    saveSettings(m_sSettingsPath);
+
+    delete m_ui;
+}
+
+//=============================================================================================================
+
+void RtFwdSettingsView::loadSettings(const QString& settingsPath)
+{
+    if(settingsPath.isEmpty()) {
+        return;
+    }
+
+    QSettings settings;
+    QVariant defaultData;
+
+//    defaultData.setValue(m_vCoilFreqs);
+//    m_vCoilFreqs = settings.value(settingsPath + QString("/coilFreqs"), defaultData).value<QVector<int> >();
+//    emit coilFrequenciesChanged(m_vCoilFreqs);
+
+//    m_ui->m_checkBox_useSSP->setChecked(settings.value(settingsPath + QString("/useSSP"), false).toBool());
+//    m_ui->m_checkBox_useComp->setChecked(settings.value(settingsPath + QString("/useCOMP"), false).toBool());
+//    m_ui->m_doubleSpinBox_maxHPIContinousDist->setValue(settings.value(settingsPath + QString("/maxError"), 10.0).toDouble());
+}
+
+//=============================================================================================================
+
+void RtFwdSettingsView::saveSettings(const QString& settingsPath)
+{
+    if(settingsPath.isEmpty()) {
+        return;
+    }
+
+    QSettings settings;
+    QVariant data;
+
+//    data.setValue(m_vCoilFreqs);
+//    settings.setValue(settingsPath + QString("/coilFreqs"), data);
+
+//    data.setValue(m_ui->m_checkBox_useSSP->isChecked());
+//    settings.setValue(settingsPath + QString("/useSSP"), data);
+
+//    data.setValue(m_ui->m_checkBox_useComp->isChecked());
+//    settings.setValue(settingsPath + QString("/useCOMP"), data);
+
+//    data.setValue(m_ui->m_doubleSpinBox_maxHPIContinousDist->value());
+//    settings.setValue(settingsPath + QString("/maxError"), data);
+}

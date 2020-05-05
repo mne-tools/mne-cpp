@@ -32,12 +32,14 @@
  *
  */
 
-#ifndef NAMESPACE_RTFWDSETTINGSVIEW_H
-#define NAMESPACE_RTFWDSETTINGSVIEW_H
+#ifndef RTFWDSETTINGSVIEW_H
+#define RTFWDSETTINGSVIEW_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
+
+#include "../disp_global.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -54,40 +56,43 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+namespace Ui {
+    class RtFwdSettingsViewWidget;
+}
 //=============================================================================================================
-// DEFINE NAMESPACE NAMESPACE
+// DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
-namespace NAMESPACE {
-
-
-//=============================================================================================================
-// NAMESPACE FORWARD DECLARATIONS
-//=============================================================================================================
+namespace DISPLIB
+{
 
 //=============================================================================================================
 /**
- * Description of what this class is intended to do (in detail).
+ * The RtFwdSettingsView class provides a QWidget for the real-time Forward Solution controls.
  *
- * @brief Brief description of this class.
+ * @brief The RtFwdSettingsView class provides a QWidget for the real-time Forward Solution controls.
  */
-class RtFwdSettingsView : public QWidget
+class DISPSHARED_EXPORT RtFwdSettingsView : public QWidget
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<RtFwdSettingsView> SPtr;            /**< Shared pointer type for RtFwdSettingsView. */
-    typedef QSharedPointer<const RtFwdSettingsView> ConstSPtr; /**< Const shared pointer type for RtFwdSettingsView. */
 
     //=========================================================================================================
     /**
     * Constructs a RtFwdSettingsView object.
     */
-    explicit RtFwdSettingsView(QWidget *parent = 0);
+    explicit RtFwdSettingsView(const QString& sSettingsPath = "",
+                               QWidget *parent = 0,
+                               Qt::WindowFlags f = Qt::Widget);
+
+    ~RtFwdSettingsView();
 
 protected:
 
-private:
+    Ui::RtFwdSettingsViewWidget*                m_ui;                   /**< The rtFwd dialog. */
+
+    QString                                     m_sSettingsPath;        /**< The settings path to store the GUI settings to. */
 
 signals:
 };
@@ -97,8 +102,7 @@ signals:
 //=============================================================================================================
 
 
-} // namespace NAMESPACE
+} // NAMESPACE
 
-#endif // NAMESPACE_RTFWDSETTINGSVIEW_H
-ass}')}
-#endif // NAMESPACE_RTFWDSETTINGSVIEW_H
+#endif // RTFWDSETTINGSVIEW_H
+
