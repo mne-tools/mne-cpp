@@ -88,13 +88,62 @@ public:
 
     ~RtFwdSettingsView();
 
+    //=========================================================================================================
+    /**
+     * Get the allowed head movement.
+     *
+     * @return  The current allowed head movement.
+     */
+    double getAllowedMoveThresholdChanged();
+
+    //=========================================================================================================
+    /**
+     * Get the allowed head rotation.
+     *
+     * @return  The current allowed head rotation.
+     */
+    double getAllowedRotThresholdChanged();
+
 protected:
+
+    //=========================================================================================================
+    /**
+     * Saves all important settings of this view via QSettings.
+     *
+     * @param[in] settingsPath        the path to store the settings to.
+     */
+    void saveSettings(const QString& settingsPath);
+
+    //=========================================================================================================
+    /**
+     * Loads and inits all important settings of this view via QSettings.
+     *
+     * @param[in] settingsPath        the path to load the settings from.
+     */
+    void loadSettings(const QString& settingsPath);
+
 
     Ui::RtFwdSettingsViewWidget*                m_ui;                   /**< The rtFwd dialog. */
 
     QString                                     m_sSettingsPath;        /**< The settings path to store the GUI settings to. */
 
 signals:
+    //=========================================================================================================
+    /**
+     * Emit this signal whenever the allowed movement changed.
+     *
+     * @param[in] dThreshRot    Allowed movement threhold in mm.
+     */
+    void allowedMoveThresholdChanged(double dThreshMove);
+
+    //=========================================================================================================
+    /**
+     * Emit this signal whenever the allowed rotation changed.
+     *
+     * @param[in] dThreshRot    Allowed rotation threhold in degree.
+     */
+    void allowedRotThresholdChanged(double dThreshRot);
+
 };
 
 //=============================================================================================================
