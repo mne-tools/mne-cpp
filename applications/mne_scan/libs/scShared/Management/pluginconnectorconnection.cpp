@@ -45,6 +45,7 @@
 #include <scMeas/realtimeevokedset.h>
 #include <scMeas/realtimecov.h>
 #include <scMeas/realtimesourceestimate.h>
+#include <scMeas/realtimehpiresult.h>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -154,6 +155,20 @@ bool PluginConnectorConnection::createConnection()
                 bConnected = true;
                 break;
             }
+
+            //Cast to RealTimeHpiResult
+            QSharedPointer< PluginOutputData<RealTimeHpiResult> > senderRTHR = m_pSender->getOutputConnectors()[i].dynamicCast< PluginOutputData<RealTimeHpiResult> >();
+            QSharedPointer< PluginInputData<RealTimeHpiResult> > receiverRTHR = m_pReceiver->getInputConnectors()[j].dynamicCast< PluginInputData<RealTimeHpiResult> >();
+            if(senderRTHR && receiverRTHR)
+            {
+                m_qHashConnections.insert(QPair<QString,QString>(m_pSender->getOutputConnectors()[i]->getName(),
+                                                                  m_pReceiver->getInputConnectors()[j]->getName()),
+                                          connect(m_pSender->getOutputConnectors()[i].data(), &PluginOutputConnector::notify,
+                                                  m_pReceiver->getInputConnectors()[j].data(), &PluginInputConnector::update, Qt::BlockingQueuedConnection));
+                bConnected = true;
+                break;
+            }
+
         }
 
         if(bConnected)
@@ -192,6 +207,11 @@ ConnectorDataType PluginConnectorConnection::getDataType(QSharedPointer<PluginCo
     QSharedPointer< PluginInputData<SCMEASLIB::RealTimeSourceEstimate> > RTSE_In = pPluginConnector.dynamicCast< PluginInputData<SCMEASLIB::RealTimeSourceEstimate> >();
     if(RTSE_Out || RTSE_In)
         return ConnectorDataType::_RTSE;
+
+    QSharedPointer< PluginOutputData<SCMEASLIB::RealTimeHpiResult> > RTHR_Out = pPluginConnector.dynamicCast< PluginOutputData<SCMEASLIB::RealTimeHpiResult> >();
+    QSharedPointer< PluginInputData<SCMEASLIB::RealTimeHpiResult> > RTHR_In = pPluginConnector.dynamicCast< PluginInputData<SCMEASLIB::RealTimeHpiResult> >();
+    if(RTHR_Out || RTHR_In)
+        return ConnectorDataType::_RTHR;
 
     QSharedPointer< PluginOutputData<SCMEASLIB::Numeric> > Num_Out = pPluginConnector.dynamicCast< PluginOutputData<SCMEASLIB::Numeric> >();
     QSharedPointer< PluginInputData<SCMEASLIB::Numeric> > Num_In = pPluginConnector.dynamicCast< PluginInputData<SCMEASLIB::Numeric> >();
