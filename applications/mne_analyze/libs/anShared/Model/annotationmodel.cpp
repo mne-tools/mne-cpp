@@ -72,7 +72,7 @@ using namespace ANSHAREDLIB;
 //=============================================================================================================
 
 AnnotationModel::AnnotationModel(QObject* parent)
-: QAbstractTableModel(parent)
+: AbstractModel(parent)
 , m_iSamplePos(0)
 , m_iFirstSample(0)
 , m_iActiveCheckState(2)

@@ -49,7 +49,7 @@
 //=============================================================================================================
 
 #include <QColor>
-#include <QAbstractTableModel>
+//#include <QAbstractTableModel>
 
 //=============================================================================================================
 // Eigen INCLUDES
@@ -63,7 +63,7 @@
 namespace ANSHAREDLIB {
 
 
-class ANSHAREDSHARED_EXPORT AnnotationModel : public QAbstractTableModel
+class ANSHAREDSHARED_EXPORT AnnotationModel : public AbstractModel
 {
     Q_OBJECT
 
@@ -71,14 +71,14 @@ public:
     AnnotationModel(QObject* parent = Q_NULLPTR);
 
     //=========================================================================================================
-    bool insertRows(int position, int span, const QModelIndex & parent);
-    bool removeRows(int position, int span, const QModelIndex & parent = QModelIndex());
-    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
-    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
-    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-    QVariant headerData(int section, Qt::Orientation orientation, int role) const;
-    bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
-    Qt::ItemFlags flags(const QModelIndex & index) const;
+    bool insertRows(int position, int span, const QModelIndex & parent) override;
+    bool removeRows(int position, int span, const QModelIndex & parent = QModelIndex()) override;
+    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+    bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole) override;
+    Qt::ItemFlags flags(const QModelIndex & index) const override;
 
     //=========================================================================================================
     /**
@@ -222,7 +222,7 @@ public:
      *
      * @returns      True if saving was successful
      */
-    bool saveToFile(const QString& sPath);
+    bool saveToFile(const QString& sPath) override;
 
     //=========================================================================================================
     /**
@@ -264,6 +264,35 @@ public:
      */
     void appendSelected(int iSelectedIndex);
 
+    //=========================================================================================================
+    /**
+     * The type of this model (AnnotationModel)
+     *
+     * @return The type of this model (AnnotationModel)
+     */
+    inline MODEL_TYPE getType() const override;
+
+    //=========================================================================================================
+    /**
+     * Returns the parent index of the given index.
+     * In this Model the parent index in always QModelIndex().
+     *
+     * @param[in] index   The index that referres to the child.
+     */
+    inline QModelIndex parent(const QModelIndex &index) const override;
+
+    //=========================================================================================================
+    /**
+     * Returns the index for the item in the model specified by the given row, column and parent index.
+     * Currently only Qt::DisplayRole is supported.
+     * Index rows reflect channels, first column is channel names, second is raw data.
+     *
+     * @param[in] row      The specified row.
+     * @param[in] column   The specified column.
+     * @param[in] parent   The parent index.
+     */
+    inline QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
+
 signals:
 
     //=========================================================================================================
@@ -304,5 +333,31 @@ private:
     QMap<int, QColor>   m_eventTypeColor;
 
 };
+
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline MODEL_TYPE AnnotationModel::getType() const
+{
+    return MODEL_TYPE::ANSHAREDLIB_ANNOTATION_MODEL;
+}
+
+//=============================================================================================================
+
+QModelIndex AnnotationModel::parent(const QModelIndex &index) const
+{
+    Q_UNUSED(index);
+    return QModelIndex();
+}
+
+//=============================================================================================================
+
+QModelIndex AnnotationModel::index(int row, int column, const QModelIndex &parent) const
+{
+    Q_UNUSED(parent);
+    return createIndex(row, column);
+}
+
 }
 #endif // ANSHAREDLIB_ANNOTATIONMODEL_H
