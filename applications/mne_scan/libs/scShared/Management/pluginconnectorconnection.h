@@ -71,6 +71,7 @@ enum ConnectorDataType
     _RTES,      /**< Real-Time Evoked Set */
     _RTC,       /**< Real-Time Covariance */
     _RTSE,      /**< Real-Time Source Estimate */
+    _RTHR,      /**< Real-Time Hpi Result */
     _None,      /**< None */
 };
 
