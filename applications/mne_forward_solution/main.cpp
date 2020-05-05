@@ -73,8 +73,8 @@ int main(int argc, char *argv[])
     qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
     QApplication app(argc, argv);
 
-    ComputeFwdSettings settings(&argc,argv);
-    ComputeFwd cmpFwd(&settings);
+    ComputeFwdSettings::SPtr settings = ComputeFwdSettings::SPtr(new ComputeFwdSettings(&argc,argv));
+    ComputeFwd cmpFwd(settings);
     cmpFwd.calculateFwd();
     cmpFwd.storeFwd();
 
