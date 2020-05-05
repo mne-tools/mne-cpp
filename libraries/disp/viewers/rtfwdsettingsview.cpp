@@ -75,6 +75,15 @@ RtFwdSettingsView::RtFwdSettingsView(const QString& sSettingsPath,
 {
     m_ui->setupUi(this);
 
+    // init
+    m_ui->m_spinBox_Movement->setValue(3);      // movement threshols = 3 mm
+    m_ui->m_spinBox_Rotation->setValue(5);      // rotation threshols = 5°
+
+    // connect
+    connect(m_ui->m_spinBox_Movement, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+            this, &RtFwdSettingsView::allowedMoveThresholdChanged);
+
+    // load settings
     loadSettings(m_sSettingsPath);
 }
 
@@ -129,4 +138,18 @@ void RtFwdSettingsView::saveSettings(const QString& settingsPath)
 
 //    data.setValue(m_ui->m_doubleSpinBox_maxHPIContinousDist->value());
 //    settings.setValue(settingsPath + QString("/maxError"), data);
+}
+
+//=============================================================================================================
+
+void RtFwdSettingsView::allowedMoveThresholdChanged(double dThreshMove)
+{
+
+}
+
+//=============================================================================================================
+
+void RtFwdSettingsView::allowedRotThresholdChanged(double dThreshRot)
+{
+
 }

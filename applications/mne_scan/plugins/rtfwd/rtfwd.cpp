@@ -37,6 +37,7 @@
 //=============================================================================================================
 
 #include "rtfwd.h"
+#include <disp/viewers/rtfwdsettingsview.h>
 
 #include <fwd/computeFwd/compute_fwd.h>
 #include <fwd/computeFwd/compute_fwd_settings.h>
@@ -70,6 +71,7 @@ using namespace FWDLIB;
 using namespace FIFFLIB;
 using namespace INVERSELIB;
 using namespace MNELIB;
+using namespace DISPLIB;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -241,7 +243,7 @@ void RtFwd::checkHeadDisplacement()
 
 //=============================================================================================================
 
-void RtFwd::onThresholdRotationChanged(double dThreshRot)
+void RtFwd::onAllowedRotThresholdChanged(double dThreshRot)
 {
     m_mutex.lock();
     m_fThreshRot = dThreshRot;
@@ -250,10 +252,10 @@ void RtFwd::onThresholdRotationChanged(double dThreshRot)
 
 //=============================================================================================================
 
-void RtFwd::onThresholdMovementChanged(double dThreshMove)
+void RtFwd::onAllowedMoveThresholdChanged(double dThreshMove)
 {
     m_mutex.lock();
-    m_fThreshMove = dThreshMove;
+    m_fThreshMove = dThreshMove/1000;   // to meter
     m_mutex.unlock();
 }
 
@@ -265,6 +267,18 @@ void RtFwd::initPluginControlWidgets()
         QList<QWidget*> plControlWidgets;
 
         // Quick control widget here ?
+        RtFwdSettingsView* pRtFwdSettingsView = new RtFwdSettingsView(QString("MNESCAN/%1/").arg(this->getName()));
+
+        connect(pRtFwdSettingsView, &RtFwdSettingsView::allowedRotThresholdChanged,
+                this, &RtFwd::onAllowedRotThresholdChanged);
+
+        connect(pRtFwdSettingsView, &RtFwdSettingsView::allowedMoveThresholdChanged,
+                this, &RtFwd::onAllowedMoveThresholdChanged);
+
+        onAllowedRotThresholdChanged(pRtFwdSettingsView->getAllowedRotThresholdChanged());
+        onAllowedMoveThresholdChanged(pRtFwdSettingsView->getAllowedMoveThresholdChanged());
+
+        plControlWidgets.append(pRtFwdSettingsView);
 
         emit pluginControlWidgetsChanged(plControlWidgets, this->getName());
 
