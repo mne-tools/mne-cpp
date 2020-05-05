@@ -159,15 +159,15 @@ win32:!contains(MNECPP_CONFIG, static) {
     QMAKE_POST_LINK += $${DEPLOY_CMD}
 }
 unix:!macx {
-    # === Unix ===
+    # Unix
     QMAKE_RPATHDIR += $ORIGIN/../lib
 }
 macx {
-    # === Mac ===
+    # Mac
     QMAKE_RPATHDIR += @executable_path/../Frameworks
 
     extensions.path = Contents/MacOS/
-    extensions.files = $${ROOT_DIR}/applications/mne_analyze/extensions
+    extensions.files = $${ROOT_DIR}/bin/mne_analyze_extensions
     QMAKE_BUNDLE_DATA += extensions
     EXTRA_ARGS = -dmg
 
