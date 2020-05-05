@@ -126,26 +126,26 @@ void TestMneForwardSolution::computeForward()
     // --mindist 5
     // --fwd ./mne-cpp-test-data/Result/sample_audvis-meg-eeg-oct-6-fwd.fif
 
-    ComputeFwdSettings settingsMEGEEG;
+    ComputeFwdSettings::SPtr pSettingsMEGEEG = ComputeFwdSettings::SPtr(new ComputeFwdSettings);
 
-    settingsMEGEEG.include_meg = true;
-    settingsMEGEEG.include_eeg = true;
-    settingsMEGEEG.accurate = true;
-    settingsMEGEEG.srcname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/subjects/sample/bem/sample-oct-6-src.fif";
-    settingsMEGEEG.measname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";
-    settingsMEGEEG.mriname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/all-trans.fif";
-    settingsMEGEEG.transname.clear();
-    settingsMEGEEG.bemname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/subjects/sample/bem/sample-1280-1280-1280-bem.fif";
-    settingsMEGEEG.mindist = 5.0f/1000.0f;
-    settingsMEGEEG.solname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/sample_audvis-meg-eeg-oct-6-fwd.fif";
+    pSettingsMEGEEG->include_meg = true;
+    pSettingsMEGEEG->include_eeg = true;
+    pSettingsMEGEEG->accurate = true;
+    pSettingsMEGEEG->srcname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/subjects/sample/bem/sample-oct-6-src.fif";
+    pSettingsMEGEEG->measname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";
+    pSettingsMEGEEG->mriname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/all-trans.fif";
+    pSettingsMEGEEG->transname.clear();
+    pSettingsMEGEEG->bemname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/subjects/sample/bem/sample-1280-1280-1280-bem.fif";
+    pSettingsMEGEEG->mindist = 5.0f/1000.0f;
+    pSettingsMEGEEG->solname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/sample_audvis-meg-eeg-oct-6-fwd.fif";
 
-    QFile t_name(settingsMEGEEG.measname);
+    QFile t_name(pSettingsMEGEEG->measname);
     FIFFLIB::FiffRawData raw(t_name);
     QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FIFFLIB::FiffInfo(raw.info));
-    settingsMEGEEG.pFiffInfo = pFiffInfo;
-    settingsMEGEEG.checkIntegrity();
+    pSettingsMEGEEG->pFiffInfo = pFiffInfo;
+    pSettingsMEGEEG->checkIntegrity();
 
-    QSharedPointer<ComputeFwd> pFwdMEGEEGComputed = QSharedPointer<ComputeFwd>(new ComputeFwd(&settingsMEGEEG));
+    QSharedPointer<ComputeFwd> pFwdMEGEEGComputed = QSharedPointer<ComputeFwd>(new ComputeFwd(pSettingsMEGEEG));
     pFwdMEGEEGComputed->calculateFwd();
 
     // recalculate with same meg_head_t to check that we still get the same result
@@ -155,7 +155,7 @@ void TestMneForwardSolution::computeForward()
     pFwdMEGEEGComputed->storeFwd();
 
     // Read newly created fwd
-    QFile fileFwdMEGEEGRead(settingsMEGEEG.solname);
+    QFile fileFwdMEGEEGRead(pSettingsMEGEEG->solname);
     m_pFwdMEGEEGRead = QSharedPointer<MNEForwardSolution>(new MNEForwardSolution(fileFwdMEGEEGRead));
 
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compute/Write/Read MEG/EEG Forward Solution Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");

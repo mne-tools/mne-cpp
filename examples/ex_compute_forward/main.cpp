@@ -103,34 +103,34 @@ int main(int argc, char *argv[])
     parser.process(a);
 
     // specify necessary information for forward computation
-    ComputeFwdSettings settings;
+    ComputeFwdSettings::SPtr pSettings = ComputeFwdSettings::SPtr(new ComputeFwdSettings);
 
-    settings.include_meg = true;
-    settings.include_eeg = true;
-    settings.accurate = true;
-    settings.srcname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/subjects/sample/bem/sample-oct-6-src.fif";
-    settings.measname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";
-    settings.mriname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/all-trans.fif";
-    settings.transname.clear();
-    settings.bemname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/subjects/sample/bem/sample-1280-1280-1280-bem.fif";
-    settings.mindist = 5.0f/1000.0f;
-    settings.solname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/sample_audvis-meg-eeg-oct-6-fwd.fif";
+    pSettings->include_meg = true;
+    pSettings->include_eeg = true;
+    pSettings->accurate = true;
+    pSettings->srcname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/subjects/sample/bem/sample-oct-6-src.fif";
+    pSettings->measname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";
+    pSettings->mriname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/all-trans.fif";
+    pSettings->transname.clear();
+    pSettings->bemname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/subjects/sample/bem/sample-1280-1280-1280-bem.fif";
+    pSettings->mindist = 5.0f/1000.0f;
+    pSettings->solname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/sample_audvis-meg-eeg-oct-6-fwd.fif";
 
     // bring in dev_head transformation and FiffInfo
     // Init data loading and writing
-    QFile t_fileIn(settings.measname);
+    QFile t_fileIn(pSettings->measname);
     FiffRawData raw(t_fileIn);
     QSharedPointer<FiffInfo> pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(raw.info));
 
     FiffCoordTransOld meg_head_t = pFiffInfo->dev_head_t.toOld();
 
-    settings.meg_head_t = &meg_head_t;
-    settings.pFiffInfo = pFiffInfo;
+    pSettings->meg_head_t = &meg_head_t;
+    pSettings->pFiffInfo = pFiffInfo;
 
-    settings.checkIntegrity();
+    pSettings->checkIntegrity();
 
     timer0.start();
-    QSharedPointer<FWDLIB::ComputeFwd> pComputeFwd = QSharedPointer<FWDLIB::ComputeFwd>(new FWDLIB::ComputeFwd(&settings));
+    QSharedPointer<FWDLIB::ComputeFwd> pComputeFwd = QSharedPointer<FWDLIB::ComputeFwd>(new FWDLIB::ComputeFwd(pSettings));
     fTime0 = timer0.elapsed();
 
     // perform the actual computation
@@ -141,14 +141,14 @@ int main(int argc, char *argv[])
     // ToDo: Refactor fwd-lib and make MNEForwardSolution a member of computeForward,
     // so next two steps will not be necessary
 
-    // store calculated forward solution in settings.solname specified file
+    // store calculated forward solution in pSettings->solname specified file
     timer2.start();
     pComputeFwd->storeFwd();
     fTime2 = timer2.elapsed();
 
     // read as MNEForwardSolution
     timer3.start();
-    QFile t_solution(settings.solname);
+    QFile t_solution(pSettings->solname);
     QSharedPointer<MNEForwardSolution> pFwdSolution = QSharedPointer<MNEForwardSolution>(new MNEForwardSolution(t_solution));
     fTime3 = timer3.elapsed();
 

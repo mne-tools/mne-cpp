@@ -108,7 +108,7 @@ public:
      * Default Constructor
      * @param [in]  p_settings        The pointer that contains the setting information
      */
-    explicit ComputeFwd(ComputeFwdSettings* pSettings);
+    explicit ComputeFwd(ComputeFwdSettings::SPtr pSettings);
 
     //=========================================================================================================
     /**
@@ -181,7 +181,7 @@ private:
 
     QSharedPointer<FIFFLIB::FiffInfoBase> m_pInfoBase;
 
-    ComputeFwdSettings* m_pSettings;                /**< The settings for the forward calculation */
+    ComputeFwdSettings::SPtr m_pSettings;                /**< The settings for the forward calculation */
 
     //=========================================================================================================
     /**
