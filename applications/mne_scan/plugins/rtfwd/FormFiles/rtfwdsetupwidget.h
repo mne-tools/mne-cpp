@@ -110,23 +110,26 @@ private:
     /**
      * change name of solution file
      */
-    void changeSolName();
+    void onSolNameChanged();
 
     //=========================================================================================================
     /**
      * Shows source space selection dialog
      */
     void showSourceFileDialog();
+
     //=========================================================================================================
     /**
      * Shows Bem model selection dialog
      */
     void showBemFileDialog();
+
     //=========================================================================================================
     /**
      * Shows Mrie->Head transformation selection dialog
      */
     void showMriFileDialog();
+
     //=========================================================================================================
     /**
      * Shows output file selection dialog
@@ -139,34 +142,46 @@ private:
     /**
      * change name of MinDistDir output
      */
-    void changeMinDistName();
+    void onMinDistNameChanged();
 
     //=========================================================================================================
     /**
      * Shows EEG model selection dialog
      */
     void showEEGModelFileDialog();
+
     //=========================================================================================================
     /**
      * Shows EEG model name selection selection dialog
      */
-    void showEEGModelNameDialog();
+    void onEEGModelNameChanged();
 
     //=========================================================================================================
     /**
      * change name of min distance skull - source
      */
-    void changeMinDist();
+    void onMinDistChanged();
+
     //=========================================================================================================
     /**
      * change name of EEG sphere radius
      */
-    void changeEEGSphereRad();
+    void onEEGSphereRadChanged();
+
     //=========================================================================================================
     /**
      * change name of EEG sphere origin
      */
-    void changeEEGSphereOrigin();
+    void onEEGSphereOriginChanged();
+
+    //=========================================================================================================
+    /**
+     * change settings from checkboxes
+     */
+    void onCheckStateChanged();
+
+    //=========================================================================================================
+
 
     RtFwd*                     m_pRtFwd;        /**< Holds a pointer to corresponding RtFwd.*/
 

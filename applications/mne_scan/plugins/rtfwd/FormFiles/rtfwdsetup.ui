@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>603</width>
-    <height>607</height>
+    <height>633</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -252,7 +252,7 @@ p, li { white-space: pre-wrap; }
        <item>
         <widget class="QGroupBox" name="m_qGroupBox_EEGModelName">
          <property name="title">
-          <string>EEG model Name</string>
+          <string>EEG model name</string>
          </property>
          <property name="flat">
           <bool>false</bool>
@@ -265,13 +265,6 @@ p, li { white-space: pre-wrap; }
               <width>140</width>
               <height>0</height>
              </size>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="2">
-           <widget class="QPushButton" name="m_qPushButton_EEGModelNameDialog">
-            <property name="text">
-             <string>...</string>
             </property>
            </widget>
           </item>
@@ -334,6 +327,13 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item>
+        <widget class="QCheckBox" name="m_check_bCoordframe">
+         <property name="text">
+          <string>Compute in MRI space (else Head space)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QCheckBox" name="m_check_bUseThreads">
          <property name="text">
           <string>Use threads</string>
@@ -343,7 +343,7 @@ p, li { white-space: pre-wrap; }
        <item>
         <widget class="QCheckBox" name="m_check_bDoAll">
          <property name="text">
-          <string>Compute Everything</string>
+          <string>Calculate forward solution in all nodes</string>
          </property>
         </widget>
        </item>
@@ -394,16 +394,19 @@ p, li { white-space: pre-wrap; }
        <item>
         <widget class="QGroupBox" name="EegScalpRadius">
          <property name="title">
-          <string>EEG scalp radius of sphere model [m]</string>
+          <string>EEG scalp radius of sphere model [mm]</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_5">
           <item>
            <widget class="QDoubleSpinBox" name="m_doubleSpinBox_dEegSphereRad">
             <property name="decimals">
-             <number>3</number>
+             <number>1</number>
+            </property>
+            <property name="maximum">
+             <double>500.000000000000000</double>
             </property>
             <property name="singleStep">
-             <double>0.010000000000000</double>
+             <double>1.000000000000000</double>
             </property>
            </widget>
           </item>
@@ -413,36 +416,54 @@ p, li { white-space: pre-wrap; }
        <item>
         <widget class="QGroupBox" name="EEGModelOrigin">
          <property name="title">
-          <string>Sphere Model Origin (x,y,z) [m]</string>
+          <string>Sphere Model Origin (x,y,z) [mm]</string>
          </property>
          <layout class="QGridLayout" name="gridLayout">
           <item row="0" column="0">
            <widget class="QDoubleSpinBox" name="m_doubleSpinBox_dVecR0x">
             <property name="decimals">
-             <number>3</number>
+             <number>1</number>
+            </property>
+            <property name="minimum">
+             <double>-500.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>500.000000000000000</double>
             </property>
             <property name="singleStep">
-             <double>0.010000000000000</double>
+             <double>1.000000000000000</double>
             </property>
            </widget>
           </item>
           <item row="0" column="2">
            <widget class="QDoubleSpinBox" name="m_doubleSpinBox_dVecR0z">
             <property name="decimals">
-             <number>3</number>
+             <number>1</number>
+            </property>
+            <property name="minimum">
+             <double>-500.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>500.000000000000000</double>
             </property>
             <property name="singleStep">
-             <double>0.010000000000000</double>
+             <double>1.000000000000000</double>
             </property>
            </widget>
           </item>
           <item row="0" column="1">
            <widget class="QDoubleSpinBox" name="m_doubleSpinBox_dVecR0y">
             <property name="decimals">
-             <number>3</number>
+             <number>1</number>
+            </property>
+            <property name="minimum">
+             <double>-500.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>500.000000000000000</double>
             </property>
             <property name="singleStep">
-             <double>0.010000000000000</double>
+             <double>1.000000000000000</double>
             </property>
            </widget>
           </item>
