@@ -125,11 +125,11 @@ void RtFwd::init()
             this, &RtFwd::update, Qt::DirectConnection);
     m_inputConnectors.append(m_pHpiInput);
 
-    // Output - Uncomment this if you don't want to send processed data (in form of a matrix) to other plugins.
-    // Also, this output stream will generate an online display in your plugin
-    m_pOutput = PluginOutputData<RealTimeMultiSampleArray>::create(this, "rtFwdOut", "rtFwd output data");
-    m_pOutput->data()->setName(this->getName());
-    m_outputConnectors.append(m_pOutput);
+//    // Output - Uncomment this if you don't want to send processed data (in form of a matrix) to other plugins.
+//    // Also, this output stream will generate an online display in your plugin
+//    m_pOutput = PluginOutputData<RealTimeMultiSampleArray>::create(this, "rtFwdOut", "rtFwd output data");
+//    m_pOutput->data()->setName(this->getName());
+//    m_outputConnectors.append(m_pOutput);
 }
 
 //=============================================================================================================
@@ -192,8 +192,8 @@ bool RtFwd::stop()
     wait(500);
 
     // Clear all data in the buffer connected to displays and other plugins
-    m_pOutput->data()->clear();
-    m_pCircularBuffer->clear();
+    // m_pOutput->data()->clear();
+    // m_pCircularBuffer->clear();
 
     m_bPluginControlWidgetsInit = false;
 
@@ -228,6 +228,7 @@ void RtFwd::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
     if(QSharedPointer<RealTimeHpiResult> pRTHPI = pMeasurement.dynamicCast<RealTimeHpiResult>()) {
         //Fiff information
+        m_mutex.lock();
         if(!m_pFiffInfo) {
             m_pFiffInfo = pRTHPI->getFiffInfo();
             m_transDevHead = pRTHPI->getValue()->devHeadTrans;
@@ -235,12 +236,13 @@ void RtFwd::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 //            m_bUpdateHeadPos = true;
 //            m_mutex.unlock();
         }
+        m_mutex.unlock();
 
         m_mutex.lock();
         m_pHpiFitResult = pRTHPI->getValue();
         m_mutex.unlock();
 
-        checkHeadDisplacement();
+        // checkHeadDisplacement();
 
         if(!m_bPluginControlWidgetsInit) {
             initPluginControlWidgets();
@@ -338,22 +340,13 @@ void RtFwd::run()
         msleep(100);
     }
 
+    m_mutex.lock();
     m_pFwdSettings->pFiffInfo = m_pFiffInfo;
+    m_mutex.unlock();
 
     m_mutex.lock();
     FiffCoordTransOld transMegHeadOld = m_transDevHead.toOld();
     m_mutex.unlock();
-
-//    // wait until necessary files are readable again
-//    QFile fBemName(m_pFwdSettings->bemname);
-//    QFile fSrcName(m_pFwdSettings->srcname);
-//    QFile fMriName(m_pFwdSettings->mriname);
-//    QFile fCoilDefDat(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
-
-//    while(!(fBemName.isReadable() && fSrcName.isReadable() && fMriName.isReadable() && fMriName.isReadable() && fCoilDefDat.isReadable())) {
-//        msleep(100);
-//        qDebug() << "Wait for files to be readable";
-//    }
 
     // Compute initial Forward solution
     ComputeFwd::SPtr pComputeFwd = ComputeFwd::SPtr(new ComputeFwd(m_pFwdSettings));
@@ -363,26 +356,28 @@ void RtFwd::run()
     // get Mne Forward Solution (in future this is not necessary, ComputeForward will have this as member)
     QFile t_fSolution(m_pFwdSettings->solname);
     m_pFwdSolution = MNEForwardSolution::SPtr(new MNEForwardSolution(t_fSolution));
+    qDebug() << "m_pFwdSolution is ready";
 
     while(!isInterruptionRequested()) {
         // Get the current data
         m_mutex.lock();
-        if(m_bUpdateHeadPos) {
-            transMegHeadOld = m_transDevHead.toOld();
-            m_mutex.unlock();
+        bool bDoUpdate = m_pHpiFitResult->bIsLargeHeadMovement;
+        m_mutex.unlock();
+
+        if(bDoUpdate) {
+            transMegHeadOld = m_pHpiFitResult->devHeadTrans.toOld();
+
             pComputeFwd->updateHeadPos(&transMegHeadOld);
             m_pFwdSolution->sol = pComputeFwd->sol;
             m_pFwdSolution->sol_grad = pComputeFwd->sol_grad;
+            m_mutex.lock();
         }
-        m_mutex.lock();
-        m_bUpdateHeadPos = false;
-        m_mutex.unlock();
-
-        //Send the data to the connected plugins and the online display
-        //Unocmment this if you also uncommented the m_pOutput in the constructor above
-        if(!isInterruptionRequested()) {
-            m_pOutput->data()->setValue(matData);
-        }
+            m_mutex.unlock();
+//        //Send the data to the connected plugins and the online display
+//        //Unocmment this if you also uncommented the m_pOutput in the constructor above
+//        if(!isInterruptionRequested()) {
+//            m_pOutput->data()->setValue(matData);
+//        }
 
     }
 }
