@@ -104,8 +104,6 @@ private:
      */
     void showFwdDirDialog();
 
-    QString     m_sSolDir;
-
     //=========================================================================================================
     /**
      * change name of solution file

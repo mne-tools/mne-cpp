@@ -88,6 +88,8 @@ RtFwd::RtFwd()
     m_pFwdSettings->mriname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/all-trans.fif";
     m_pFwdSettings->bemname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/subjects/sample/bem/sample-1280-1280-1280-bem.fif";
     m_pFwdSettings->srcname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/subjects/sample/bem/sample-oct-6-src.fif";
+    m_pFwdSettings->measname =QCoreApplication::applicationDirPath() + "/MNE-sample-data/chpi/raw/data_with_movement_chpi_raw.fif";
+    m_pFwdSettings->transname.clear();
     m_pFwdSettings->include_meg = true;
     m_pFwdSettings->include_eeg = true;
     m_pFwdSettings->accurate = true;
@@ -117,7 +119,6 @@ void RtFwd::init()
 {
     // Inits
 
-
     // Input
     m_pHpiInput = PluginInputData<RealTimeHpiResult>::create(this, "rtFwdIn", "rtFwd input data");
     connect(m_pHpiInput.data(), &PluginInputConnector::notify,
@@ -141,9 +142,45 @@ void RtFwd::unload()
 
 bool RtFwd::start()
 {
+    QFile t_fBem(m_pFwdSettings->bemname);
+    FiffStream::SPtr stream(new FiffStream(&t_fBem));
+    if(!stream->open()) {
+        QMessageBox msgBox;
+        msgBox.setText("The bem model cannot be opend. Chosse another file.");
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
+        msgBox.exec();
+        stream->close();
+        return false;
+    }
+    stream->close();
+    QFile t_fSource(m_pFwdSettings->srcname);
+    stream = FiffStream::SPtr(new FiffStream(&t_fSource));
+    if(!stream->open()) {
+        QMessageBox msgBox;
+        msgBox.setText("The source space cannot be opend. Chosse another file.");
+        msgBox.setText(m_pFwdSettings->srcname);
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
+        msgBox.exec();
+        stream->close();
+        return false;
+    }
+    stream->close();
+    QFile t_fMri(m_pFwdSettings->mriname);
+    stream = FiffStream::SPtr(new FiffStream(&t_fMri));
+    if(!stream->open()) {
+        QMessageBox msgBox;
+        msgBox.setText("The mri - head transformation cannot be opend. Chosse another file.");
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
+        msgBox.exec();
+        stream->close();
+        return false;
+    }
+    stream->close();
     //Start thread
     QThread::start();
-
     return true;
 }
 
@@ -194,7 +231,6 @@ void RtFwd::update(SCMEASLIB::Measurement::SPtr pMeasurement)
         if(!m_pFiffInfo) {
             m_pFiffInfo = pRTHPI->getFiffInfo();
             m_transDevHead = pRTHPI->getValue()->devHeadTrans;
-
 //            m_mutex.lock();
 //            m_bUpdateHeadPos = true;
 //            m_mutex.unlock();
@@ -307,6 +343,17 @@ void RtFwd::run()
     m_mutex.lock();
     FiffCoordTransOld transMegHeadOld = m_transDevHead.toOld();
     m_mutex.unlock();
+
+//    // wait until necessary files are readable again
+//    QFile fBemName(m_pFwdSettings->bemname);
+//    QFile fSrcName(m_pFwdSettings->srcname);
+//    QFile fMriName(m_pFwdSettings->mriname);
+//    QFile fCoilDefDat(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
+
+//    while(!(fBemName.isReadable() && fSrcName.isReadable() && fMriName.isReadable() && fMriName.isReadable() && fCoilDefDat.isReadable())) {
+//        msleep(100);
+//        qDebug() << "Wait for files to be readable";
+//    }
 
     // Compute initial Forward solution
     ComputeFwd::SPtr pComputeFwd = ComputeFwd::SPtr(new ComputeFwd(m_pFwdSettings));
