@@ -75,7 +75,6 @@ private slots:
     //test app behaviour
     void initTestCase();
     void testDefaultOutput();
-    void testMultipleInputs();
     void testDeleteInputFile();
     void testInplace();
     void testInplaceAndDeleteInFile();
@@ -131,45 +130,9 @@ void TestMneAnonymize::testDefaultOutput()
     QVERIFY(QFile::exists(sFileOut));
 
     QFile::remove(sFileOut);
+
 }
 
-//=============================================================================================================
-
-void TestMneAnonymize::testMultipleInputs()
-{
-    // Init testing arguments
-    QString sFileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
-    QString sFileInA(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_A_raw.fif");
-    QString sFileInB(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_B_raw.fif");
-
-    qInfo() << "\n\n-------------------------testMultipleInputs-------------------------------------";
-
-    QFile::copy(sFileIn,sFileInA);
-    QFile::copy(sFileIn,sFileInB);
-
-    QStringList arguments;
-    arguments << QCoreApplication::applicationDirPath() + "/mne_anonymize";
-    arguments << "--in" << sFileIn;
-    arguments << "--in" << sFileInA;
-    arguments << "--in" << sFileInB;
-
-    qInfo() << "arguments" << arguments;
-
-    // Delete anoymized file from other test runs
-    if(QFile::exists(QCoreApplication::applicationDirPath() + QString("/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw_anonymized.fif"))) {
-        QFile::remove(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw_anonymized.fif");
-    }
-
-    MNEANONYMIZE::SettingsControllerCL controller(arguments);
-
-    QVERIFY(QFile::exists(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw_anonymized.fif"));
-    QVERIFY(QFile::exists(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_A_raw_anonymized.fif"));
-    QVERIFY(QFile::exists(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_B_raw_anonymized.fif"));
-
-    QFile::remove(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw_anonymized.fif");
-    QFile::remove(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_A_raw_anonymized.fif");
-    QFile::remove(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_B_raw_anonymized.fif");
-}
 
 //=============================================================================================================
 
