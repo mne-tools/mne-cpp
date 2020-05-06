@@ -535,7 +535,7 @@ void FiffAnonymizer::processHeaderTags()
 
     if(checkValidFiffFormatVersion())
     {
-        printIfVerbose("Input file compatible with this version of mne_anonymizer.");
+        printIfVerbose("Input file compatible with this version.");
     } else {
         qCritical() << "This file may not be compatible with this application. First tag is not a valid ID tag.";
     }
