@@ -166,8 +166,8 @@ macx {
     # Mac
     QMAKE_RPATHDIR += @executable_path/../Frameworks
 
-    extensions.path = Contents/MacOS/
-    extensions.files = $${ROOT_DIR}/bin/mne_analyze_plugins
+    plugins.path = Contents/MacOS/
+    plugins.files = $${ROOT_DIR}/bin/mne_analyze_plugins
     QMAKE_BUNDLE_DATA += plugins
     EXTRA_ARGS = -dmg
 
