@@ -112,6 +112,13 @@ private:
 
     //=========================================================================================================
     /**
+     * Shows measurement selection dialog
+     */
+    void showMeasFileDialog();
+
+
+    //=========================================================================================================
+    /**
      * Shows source space selection dialog
      */
     void showSourceFileDialog();

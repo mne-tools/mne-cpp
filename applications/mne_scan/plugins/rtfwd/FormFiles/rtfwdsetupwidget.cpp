@@ -64,6 +64,7 @@ RtFwdSetupWidget::RtFwdSetupWidget(RtFwd* toolbox, QWidget *parent)
 
     // init line edits
     m_ui.m_qLineEdit_SolName->setText(m_pRtFwd->m_pFwdSettings->solname);
+    m_ui.m_qLineEdit_MeasName->setText(m_pRtFwd->m_pFwdSettings->measname);
     m_ui.m_qLineEdit_BemName->setText(m_pRtFwd->m_pFwdSettings->bemname);
     m_ui.m_qLineEdit_SourceName->setText(m_pRtFwd->m_pFwdSettings->srcname);
     m_ui.m_qLineEdit_MriName->setText(m_pRtFwd->m_pFwdSettings->mriname);
@@ -122,9 +123,10 @@ RtFwdSetupWidget::RtFwdSetupWidget(RtFwd* toolbox, QWidget *parent)
     connect(m_ui.m_doubleSpinBox_dVecR0y, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &RtFwdSetupWidget::onEEGSphereOriginChanged);
     connect(m_ui.m_doubleSpinBox_dVecR0z, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &RtFwdSetupWidget::onEEGSphereOriginChanged);
 
-    // connet Bushbuttons
+    // connet push buttons
     connect(m_ui.m_qPushButton_SolNameDialog, &QPushButton::released, this, &RtFwdSetupWidget::showFwdDirDialog);
     connect(m_ui.m_qPushButton_BemNameDialog, &QPushButton::released, this, &RtFwdSetupWidget::showBemFileDialog);
+    connect(m_ui.m_qPushButton_MeasNameDialog, &QPushButton::released, this, &RtFwdSetupWidget::showMeasFileDialog);
     connect(m_ui.m_qPushButton_SourceNameDialog, &QPushButton::released, this, &RtFwdSetupWidget::showSourceFileDialog);
     connect(m_ui.m_qPushButton_MriNameDialog, &QPushButton::released, this, &RtFwdSetupWidget::showMriFileDialog);
     connect(m_ui.m_qPushButton_MinDistOutDialog, &QPushButton::released, this, &RtFwdSetupWidget::showMinDistDirDialog);
@@ -156,6 +158,28 @@ void RtFwdSetupWidget::onSolNameChanged()
     } else {
         qWarning() << "rtFwdSetup: make sure to name dolution file correctly: -fwd.fif";
     }
+}
+
+//=============================================================================================================
+
+void RtFwdSetupWidget::showMeasFileDialog()
+{
+    QString t_sFileName = QFileDialog::getOpenFileName(this,
+                                                       tr("Select Source Space"),
+                                                       QString(),
+                                                       tr("Fif Files (*.fif)"));
+
+    m_ui.m_qLineEdit_MeasName->setText(t_sFileName);
+
+    QFile t_fSource(t_sFileName);
+    if(t_fSource.open(QIODevice::ReadOnly)) {
+        m_pRtFwd->m_pFwdSettings->measname = t_sFileName;
+        m_ui.m_qLineEdit_MeasName->setText(t_sFileName);
+    } else {
+        qWarning() << "rtFwdSetup: Measurement file cannot be opened";
+    }
+    t_fSource.close();
+
 }
 
 //=============================================================================================================
