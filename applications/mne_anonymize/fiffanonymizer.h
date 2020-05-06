@@ -431,6 +431,8 @@ private:
     const double m_dMaxValidFiffVerion; /**< Maximum version of the Fiff file standard compatible with this application.*/
 
     QString m_sDefaultString;           /**< String to be used as substitution of other strings in a fiff file */
+    QString m_sFiffComment;             /**< Fiff comment string substitutor.*/
+    QString m_sFiffExperimenter;        /**< Fiff experimenter string substitutor.*/
     QString m_sSubjectFirstName;        /**< Subject's first name substitutor.*/
     QString m_sSubjectMidName;          /**< Subject's middle name substitutor.*/
     QString m_sSubjectLastName;         /**< Subject's last name substitutor.*/
