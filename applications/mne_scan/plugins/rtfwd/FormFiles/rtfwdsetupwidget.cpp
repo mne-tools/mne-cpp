@@ -37,6 +37,7 @@
 //=============================================================================================================
 
 #include "rtfwdsetupwidget.h"
+#include <fiff/fiff_stream.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -49,6 +50,7 @@
 //=============================================================================================================
 
 using namespace RTFWDPLUGIN;
+using namespace FIFFLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -133,14 +135,13 @@ RtFwdSetupWidget::RtFwdSetupWidget(RtFwd* toolbox, QWidget *parent)
 
 void RtFwdSetupWidget::showFwdDirDialog()
 {
-    m_sSolDir = QFileDialog::getExistingDirectory(this,
-                                                  tr("Select Directory to store the forward solution"),
-                                                  QString(),
-                                                  QFileDialog::ShowDirsOnly
-                                                  | QFileDialog::DontResolveSymlinks);
+    QString t_sSolDir = QFileDialog::getExistingDirectory(this,
+                                                         tr("Select Directory to store the forward solution"),
+                                                         QString(),
+                                                         QFileDialog::ShowDirsOnly
+                                                         | QFileDialog::DontResolveSymlinks);
 
-    QString t_sFileName = m_ui.m_qLineEdit_SolName->text();
-    m_pRtFwd->m_pFwdSettings->solname = m_sSolDir + "/" + t_sFileName;
+    m_ui.m_qLineEdit_SolName->setText(t_sSolDir);
 }
 
 //=============================================================================================================
@@ -148,7 +149,13 @@ void RtFwdSetupWidget::showFwdDirDialog()
 void RtFwdSetupWidget::onSolNameChanged()
 {
     QString t_sFileName = m_ui.m_qLineEdit_SolName->text();
-    m_pRtFwd->m_pFwdSettings->solname = m_sSolDir + "/" + t_sFileName;
+
+    // check for file endings
+    if(t_sFileName.contains("-fwd.fif")) {
+        m_pRtFwd->m_pFwdSettings->solname = t_sFileName;
+    } else {
+        qWarning() << "rtFwdSetup: make sure to name dolution file correctly: -fwd.fif";
+    }
 }
 
 //=============================================================================================================
@@ -160,8 +167,14 @@ void RtFwdSetupWidget::showSourceFileDialog()
                                                        QString(),
                                                        tr("Fif Files (*.fif)"));
 
-    m_pRtFwd->m_pFwdSettings->srcname = t_sFileName;
-    m_ui.m_qLineEdit_SourceName->setText(t_sFileName);
+    QFile t_fSource(t_sFileName);
+    if(t_fSource.open(QIODevice::ReadOnly)) {
+        m_pRtFwd->m_pFwdSettings->srcname = t_sFileName;
+        m_ui.m_qLineEdit_SourceName->setText(t_sFileName);
+    } else {
+        qWarning() << "rtFwdSetup: Source file cannot be opened";
+    }
+    t_fSource.close();
 }
 
 //=============================================================================================================
@@ -173,8 +186,14 @@ void RtFwdSetupWidget::showBemFileDialog()
                                                        QString(),
                                                        tr("Fif Files (*.fif)"));
 
-    m_pRtFwd->m_pFwdSettings->bemname = t_sFileName;
-    m_ui.m_qLineEdit_BemName->setText(t_sFileName);
+    QFile t_fBem(t_sFileName);
+    if(t_fBem.open(QIODevice::ReadOnly)) {
+        m_pRtFwd->m_pFwdSettings->bemname = t_sFileName;
+        m_ui.m_qLineEdit_BemName->setText(t_sFileName);
+    } else {
+        qWarning() << "rtFwdSetup: Bem file cannot be opened";
+    }
+    t_fBem.close();
 }
 
 //=============================================================================================================
@@ -186,8 +205,14 @@ void RtFwdSetupWidget::showMriFileDialog()
                                                        QString(),
                                                        tr("Fif Files (*.fif)"));
 
-    m_pRtFwd->m_pFwdSettings->mriname = t_sFileName;
-    m_ui.m_qLineEdit_MriName->setText(t_sFileName);
+    QFile t_fMri(t_sFileName);
+    if(t_fMri.open(QIODevice::ReadOnly)) {
+        m_pRtFwd->m_pFwdSettings->mriname = t_sFileName;
+        m_ui.m_qLineEdit_MriName->setText(t_sFileName);
+    } else {
+        qWarning() << "rtFwdSetup: Mri file cannot be opened";
+    }
+    t_fMri.close();
 }
 
 //=============================================================================================================
@@ -199,8 +224,14 @@ void RtFwdSetupWidget::showEEGModelFileDialog()
                                                        QString(),
                                                        tr("Fif Files (*.fif)"));
 
-    m_pRtFwd->m_pFwdSettings->eeg_model_file = t_sFileName;
-    m_ui.m_qLineEdit_EEGModelFile->setText(t_sFileName);
+    QFile t_fEegModel(t_sFileName);
+    if(t_fEegModel.open(QIODevice::ReadOnly)) {
+        m_pRtFwd->m_pFwdSettings->eeg_model_file = t_sFileName;
+        m_ui.m_qLineEdit_EEGModelFile->setText(t_sFileName);
+    } else {
+        qWarning() << "rtFwdSetup: Eeg model file cannot be opened";
+    }
+    t_fEegModel.close();
 }
 
 //=============================================================================================================
@@ -214,14 +245,13 @@ void RtFwdSetupWidget::onEEGModelNameChanged()
 
 void RtFwdSetupWidget::showMinDistDirDialog()
 {
-    m_sMinDistDir = QFileDialog::getExistingDirectory(this,
-                                                      tr("Select output for omitted source space"),
-                                                      QString(),
-                                                      QFileDialog::ShowDirsOnly
-                                                      | QFileDialog::DontResolveSymlinks);
+    QString t_sMinDistDir = QFileDialog::getExistingDirectory(this,
+                                                             tr("Select output for omitted source space"),
+                                                             QString(),
+                                                             QFileDialog::ShowDirsOnly
+                                                             | QFileDialog::DontResolveSymlinks);
 
-    QString t_sFileName = m_ui.m_qLineEdit_MinDistName->text();
-    m_pRtFwd->m_pFwdSettings->mindistoutname = m_sMinDistDir + "/" + t_sFileName;
+    m_ui.m_qLineEdit_MinDistName->setText(t_sMinDistDir);
 }
 
 //=============================================================================================================
@@ -229,7 +259,7 @@ void RtFwdSetupWidget::showMinDistDirDialog()
 void RtFwdSetupWidget::onMinDistNameChanged()
 {
     QString t_sFileName = m_ui.m_qLineEdit_MinDistName->text();
-    m_pRtFwd->m_pFwdSettings->mindistoutname = m_sMinDistDir + "/" + t_sFileName;
+    m_pRtFwd->m_pFwdSettings->mindistoutname = t_sFileName;
 }
 
 //=============================================================================================================
