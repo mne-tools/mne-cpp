@@ -424,6 +424,10 @@ void Hpi::run()
     fitResult.devHeadTrans.from = 1;
     fitResult.devHeadTrans.to = 4;
 
+    FiffCoordTrans transDevHeadRef = m_pFiffInfo->dev_head_t;
+    float fMove = 0;
+    float fRot = 0;
+
     m_pHpiOutput->data()->setFiffInfo(m_pFiffInfo);
 
     HPIFit HPI = HPIFit(m_pFiffInfo);
@@ -490,6 +494,16 @@ void Hpi::run()
                            fitResult.fittedCoils,
                            m_pFiffInfo);
                 m_mutex.unlock();
+
+                // check for large head movement
+                fitResult.dHeadMovementDistance = transDevHeadRef.translationTo(fitResult.devHeadTrans.trans);
+                fitResult.dHeadMovementAngle = transDevHeadRef.angleTo(fitResult.devHeadTrans.trans);
+
+                fitResult.bIsLargeHeadMovement = false;
+                if(fitResult.dHeadMovementDistance > fMove || fitResult.dHeadMovementDistance > fRot) {
+                    fitResult.bIsLargeHeadMovement = true;
+                    transDevHeadRef = fitResult.devHeadTrans;
+                }
 
                 //Check if the error meets distance requirement
                 if(fitResult.errorDistances.size() > 0) {
