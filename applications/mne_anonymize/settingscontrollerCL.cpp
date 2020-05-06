@@ -416,7 +416,7 @@ bool SettingsControllerCL::checkDeleteInputFile()
         {
             QTextStream consoleIn(stdin);
             QString confirmation;
-            std::printf("\n%s",QString("You can avoid this confirmation by using the delete_confirmation option.").toUtf8().data());
+            std::printf("\n%s",QString("You can avoid this confirmation by using the delete_confirmation [-f] option.").toUtf8().data());
             std::printf("\n%s",QString("Are you sure you want to delete the input file? [Y/n] ").toUtf8().data());
             consoleIn >> confirmation;
 
@@ -444,13 +444,13 @@ void SettingsControllerCL::deleteInputFile()
 
 bool SettingsControllerCL::checkRenameOutputFile()
 {
-    //if both files in and out have the same name, Anonymizer class would already know and a temporary
+    //if both files in and out have the same name, this controller class would already know and a temporary
     //random filename will be in use, during the anonymizing process, for the output file.
-    //When this function is called Anonymizer will check if this needs to be reverted:
+    //When this function is called we will check if this needs to be reverted:
     // -if the infile has been deleted already there is no conflict->outfile name = infile name.
     // -if the infile has not been deleted but the user has never been asked. They is asked.
     // -if the infile has not been deleted but the user was already asked, it means they answered NO.
-    //  Thus, a warning is shown.
+    //      Thus, a warning is shown.
     if(m_bInOutFileNamesEqual) {
         if(m_bDeleteInputFileAfter)
         {
