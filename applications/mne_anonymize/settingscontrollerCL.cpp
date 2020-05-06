@@ -143,23 +143,21 @@ void SettingsControllerCL::initParser()
     QCommandLineOption noGUIOpt("gui",QCoreApplication::translate("main","GUI version of the application."));
     m_parser.addOption(noGUIOpt);
 
-    QCommandLineOption versionOpt("version",QCoreApplication::translate("main","Prints out the version of this application."));
+    QCommandLineOption versionOpt("version",QCoreApplication::translate("main","Show the version of this application."));
     m_parser.addOption(versionOpt);
 
     QCommandLineOption inFileOpt(QStringList() << "i" << "in",
-                                 QCoreApplication::translate("main","File to anonymize. Multiple --in <infile> statements can be present (files will be processed in parallel)."),
+                                 QCoreApplication::translate("main","File to anonymize."),
                                  QCoreApplication::translate("main","infile"));
     m_parser.addOption(inFileOpt);
 
     QCommandLineOption outFileOpt(QStringList() << "o" << "out",
-                                  QCoreApplication::translate("main","Output file <outfile>. Only allowed when anonymizing one single file. As default ‘_anonymized.fif’ is "
-                                                              "attached to the file name."),
+                                  QCoreApplication::translate("main","Output file <outfile>. Default ‘_anonymized.fif’ will be attached to the input file name."),
                                   QCoreApplication::translate("main","outfile"));
     m_parser.addOption(outFileOpt);
 
     QCommandLineOption verboseOpt(QStringList() << "v" << "verbose",
-                                  QCoreApplication::translate("main","Prints out more information, about each specific anonymized field. Only allowed when anonymizing one single"
-                                                                     "file. Default: false"));
+                                  QCoreApplication::translate("main","Prints out more information, about each specific anonymized field. Default: false"));
     m_parser.addOption(verboseOpt);
 
     QCommandLineOption silentOpt(QStringList() << "s" << "silent",
@@ -186,25 +184,21 @@ void SettingsControllerCL::initParser()
     m_parser.addOption(measDateOpt);
 
     QCommandLineOption measDateOffsetOpt(QStringList() << "mdo" << "measurement_date_offset",
-                                         QCoreApplication::translate("main","Specify number of days to subtract to the measurement . Only allowed when anonymizing a single"
-                                                                            "file. Default: 0"),
+                                         QCoreApplication::translate("main","Specify number of days to subtract to the measurement. Default: 0"),
                                          QCoreApplication::translate("main","date"));
     m_parser.addOption(measDateOffsetOpt);
 
     QCommandLineOption birthdayOpt(QStringList() << "sb" << "subject_birthday",
-                                   QCoreApplication::translate("main","Specify the subject’s birthday . Only allowed when anonymizing a single file. Format: DDMMYYYY. "
-                                                               "Default: 01012000"),
+                                   QCoreApplication::translate("main","Specify the subject’s birthday. Default: 01012000"),
                                    QCoreApplication::translate("main","date"));
     m_parser.addOption(birthdayOpt);
 
     QCommandLineOption birthdayOffsetOpt(QStringList() << "sbo" << "subject_birthday_offset",
-                                         QCoreApplication::translate("main","Specify number of to subtract to the subject's birthday. Only allowed when anonymizing a single"
-                                                                            "file. Default: 0"),
+                                         QCoreApplication::translate("main","Specify number of to subtract to the subject's birthday. Default: 0"),
                                          QCoreApplication::translate("main","days"));
     m_parser.addOption(birthdayOffsetOpt);
 
-    QCommandLineOption SubjectIdOpt("his",QCoreApplication::translate("main","Specify the subject’s ID within the Hospital system. Only allowed when anonymizing a single"
-                                                                             "file. Default: ‘mne_anonymize’"),
+    QCommandLineOption SubjectIdOpt("his",QCoreApplication::translate("main","Specify the subject’s ID within the Hospital information system. Default: ‘mne_anonymize’"),
                                           QCoreApplication::translate("main","id#"));
     m_parser.addOption(SubjectIdOpt);
 
