@@ -366,6 +366,21 @@ private:
 
     //=========================================================================================================
     /**
+     * This transforms the data inside a subject sex tag (male, female or unknown) into a string object
+     * containing that information.
+     */
+    inline QString subjectSexToString(const int sexCode) const;
+
+
+    //=========================================================================================================
+    /**
+     * This transforms the data inside a subject handedness tag (right, left or unknown) into a string object
+     * containing that information.
+     */
+    inline QString subjectHandToString(const int handCode) const;
+
+    //=========================================================================================================
+    /**
      * Helper function that prints messages to the command line only if the object has been set to a verbose mode.
      * This wraps QDebug functionality inline. Specified here in header file. If the obj is not set to be in a
      * verbose mode, it does nothing. Messages can be printed to a single line (followed by an eol character) or
