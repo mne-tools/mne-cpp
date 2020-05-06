@@ -246,26 +246,26 @@ private:
     bool make_compensator(fiff_int_t kind, Eigen::MatrixXd& this_comp) const;
 
 public: //Public because it's a mne struct
-    FiffId file_id;             /**< File ID. */
-    fiff_int_t  meas_date[2];   /**< Measurement date. TODO: use fiffTime instead to be MNE-C consistent*/
-    float sfreq;                /**< Sample frequency. */
-    float linefreq;             /**< Power line frequency. */
-    float highpass;             /**< Highpass frequency. */
-    float lowpass;              /**< Lowpass frequency. */
-    int proj_id;                /**< Project ID */
-    QString proj_name;          /**< Project name */
-    QString xplotter_layout;    /**< xplotter layout tag */
-    QString experimenter;       /**< Experimenter name. */
-    QString description;        /**< (Textual) Description of an object.*/
-    QString utc_offset;         /**< UTC offset of related meas_date (sHH:MM).*/
-    float gantry_angle;         /**< Tilt angle of the dewar in degrees.*/
-    FiffCoordTrans dev_ctf_t;   /**< Coordinate transformation ToDo... */
-    QList<FiffDigPoint> dig;    /**< List of all digitization point descriptors. */
-    FiffCoordTrans dig_trans;   /**< Coordinate transformation ToDo... */
-    QList<FiffProj> projs;      /**< List of available SSP projectors. */
-    QList<FiffCtfComp> comps;   /**< List of available CTF software compensators. */
-    QString acq_pars;           /**< Acquisition information ToDo... */
-    QString acq_stim;           /**< Acquisition information ToDo... */
+    FiffId file_id;                 /**< File ID. */
+    fiff_int_t  meas_date[2];       /**< Measurement date. TODO: use fiffTime instead to be MNE-C consistent*/
+    float sfreq;                    /**< Sample frequency. */
+    float linefreq;                 /**< Power line frequency. */
+    float highpass;                 /**< Highpass frequency. */
+    float lowpass;                  /**< Lowpass frequency. */
+    int proj_id;                    /**< Project ID */
+    QString proj_name;              /**< Project name */
+    QString xplotter_layout;        /**< xplotter layout tag */
+    QString experimenter;           /**< Experimenter name. */
+    QString description;            /**< (Textual) Description of an object.*/
+    QString utc_offset;             /**< UTC offset of related meas_date (sHH:MM).*/
+    fiff_int_t gantry_angle;        /**< Tilt angle of the dewar in degrees.*/
+    FiffCoordTrans dev_ctf_t;       /**< Coordinate transformation ToDo... */
+    QList<FiffDigPoint> dig;        /**< List of all digitization point descriptors. */
+    FiffCoordTrans dig_trans;       /**< Coordinate transformation ToDo... */
+    QList<FiffProj> projs;          /**< List of available SSP projectors. */
+    QList<FiffCtfComp> comps;       /**< List of available CTF software compensators. */
+    QString acq_pars;               /**< Acquisition information ToDo... */
+    QString acq_stim;               /**< Acquisition information ToDo... */
 };
 
 //=============================================================================================================

@@ -336,7 +336,7 @@ FiffInfo::SPtr RtDataClient::readInfo()
             p_pFiffInfo->description = t_pTag->toString();
             break;
         case FIFF_GANTRY_ANGLE:
-            p_pFiffInfo->gantry_angle = *t_pTag->toFloat();
+            p_pFiffInfo->gantry_angle = *t_pTag->toInt();
             break;
         case FIFF_UTC_OFFSET:
             p_pFiffInfo->utc_offset = t_pTag->toString();

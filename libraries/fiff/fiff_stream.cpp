@@ -978,8 +978,8 @@ bool FiffStream::read_meas_info(const FiffDirNode::SPtr& p_Node, FiffInfo& info,
     QString proj_name = "";
     QString xplotter_layout = "";
 
-    QString utc_offset = "";         /**< UTC offset of related meas_date (sHH:MM).*/
-    float gantry_angle = -1.0;
+    QString utc_offset = "";
+    fiff_int_t gantry_angle = -1;
 
     QString experimenter = "";
     QString description = "";
@@ -1063,7 +1063,7 @@ bool FiffStream::read_meas_info(const FiffDirNode::SPtr& p_Node, FiffInfo& info,
                 break;
             case FIFF_GANTRY_ANGLE:
                 this->read_tag(t_pTag,pos);
-                gantry_angle = *t_pTag->toFloat();
+                gantry_angle = *t_pTag->toInt();
                 break;
             case FIFF_UTC_OFFSET:
                 this->read_tag(t_pTag,pos);
@@ -2153,7 +2153,7 @@ FiffStream::SPtr FiffStream::start_writing_raw(QIODevice &p_IODevice,
     t_pStream->write_float(FIFF_HIGHPASS,&info.highpass);
     t_pStream->write_float(FIFF_LOWPASS,&info.lowpass);
     t_pStream->write_float(FIFF_LINE_FREQ,&info.linefreq);
-    t_pStream->write_float(FIFF_GANTRY_ANGLE,&info.gantry_angle);
+    t_pStream->write_int(FIFF_GANTRY_ANGLE,&info.gantry_angle);
     t_pStream->write_int(FIFF_NCHAN,&nchan);
     t_pStream->write_int(FIFF_DATA_PACK,&data_type);
     t_pStream->write_int(FIFF_PROJ_ID,&info.proj_id);
