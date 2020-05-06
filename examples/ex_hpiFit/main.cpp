@@ -125,10 +125,10 @@ int main(int argc, char *argv[])
     fiff_int_t iQuantum = ceil(fQuantumSec*pFiffInfo->sfreq);
 
     // create time vector that specifies when to fit
-    float dTSec = 0.1;                              // time between hpi fits
-    int iQuantumT = floor(dTSec*pFiffInfo->sfreq);   // samples between fits
+    float fTSec = 0.1;                              // time between hpi fits
+    int iQuantumT = floor(fTSec*pFiffInfo->sfreq);   // samples between fits
     int iN = floor((last-first)/iQuantumT);
-    RowVectorXf vecTime = RowVectorXf::LinSpaced(iN, 0, iN-1) * dTSec;
+    RowVectorXf vecTime = RowVectorXf::LinSpaced(iN, 0, iN-1) * fTSec;
 
     // To fit at specific times outcommend the following block
     // Read Quaternion File
