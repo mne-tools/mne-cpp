@@ -105,6 +105,9 @@ struct HpiFitResult {
     QVector<double>             errorDistances;
     Eigen::VectorXd             GoF;
     QString                     sFilePathDigitzers;
+    bool                        bIsLargeHeadMovement;
+    double                      dHeadMovementDistance;
+    double                      dHeadMovementAngle;
 };
 
 /**
