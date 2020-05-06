@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>603</width>
-    <height>633</height>
+    <height>663</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -81,6 +81,13 @@ p, li { white-space: pre-wrap; }
           <bool>false</bool>
          </property>
          <layout class="QGridLayout" name="m_qGridLayout_Fwd">
+          <item row="0" column="2">
+           <widget class="QPushButton" name="m_qPushButton_SolNameDialog">
+            <property name="text">
+             <string>...</string>
+            </property>
+           </widget>
+          </item>
           <item row="0" column="0" colspan="2">
            <widget class="QLineEdit" name="m_qLineEdit_SolName">
             <property name="minimumSize">
@@ -94,8 +101,33 @@ p, li { white-space: pre-wrap; }
             </property>
            </widget>
           </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="m_qGroupBox_Meas">
+         <property name="title">
+          <string>Measurement File (with compensator inforamtion)</string>
+         </property>
+         <property name="flat">
+          <bool>false</bool>
+         </property>
+         <layout class="QGridLayout" name="m_qGridLayout_Fwd_8">
+          <item row="0" column="0" colspan="2">
+           <widget class="QLineEdit" name="m_qLineEdit_MeasName">
+            <property name="minimumSize">
+             <size>
+              <width>140</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
           <item row="0" column="2">
-           <widget class="QPushButton" name="m_qPushButton_SolNameDialog">
+           <widget class="QPushButton" name="m_qPushButton_MeasNameDialog">
             <property name="text">
              <string>...</string>
             </property>
@@ -350,7 +382,7 @@ p, li { white-space: pre-wrap; }
        <item>
         <widget class="QCheckBox" name="m_check_bMriHeadIdent">
          <property name="text">
-          <string>Idential head- and MRI- space</string>
+          <string>Identixal head- and MRI- space</string>
          </property>
         </widget>
        </item>
