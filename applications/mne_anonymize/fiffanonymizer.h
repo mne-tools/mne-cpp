@@ -450,8 +450,8 @@ private:
 
     FIFFLIB::FiffStream::SPtr m_pInStream;   /**< Pointer to FiffStream object for reading.*/
     FIFFLIB::FiffStream::SPtr m_pOutStream;  /**< Pointer to FiffStream object for writing the result.*/
-    FIFFLIB::FiffTag::SPtr m_pInTag;         /**< Pointer to FiffTag used for reading each tag.*/
-    FIFFLIB::FiffTag::SPtr m_pOutTag;        /**< Pointer to FiffTag used for writing each anonymized tag.*/
+    FIFFLIB::FiffTag::SPtr m_pTag;         /**< Pointer to FiffTag used for reading and writing each tag.*/
+    //FIFFLIB::FiffTag::SPtr m_pOutTag;        /**< Pointer to FiffTag used for writing each anonymized tag.*/
 
     FIFFLIB::fiff_int_t m_BDfltMAC[2];  /**< MAC addresss substitutor.*/
 
