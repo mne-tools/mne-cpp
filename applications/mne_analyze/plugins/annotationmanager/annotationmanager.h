@@ -113,6 +113,7 @@ public:
     virtual void handleEvent(QSharedPointer<ANSHAREDLIB::Event> e) override;
     virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
 
+private:
     //=========================================================================================================
     /**
      * Loads new Fiff model whan current loaded model is changed
@@ -140,6 +141,8 @@ public:
      * Publishes event to force FiffRawView to redraw the data viewer
      */
     void onTriggerRedraw();
+
+    void onJumpToSelected();
 
 private:
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals */

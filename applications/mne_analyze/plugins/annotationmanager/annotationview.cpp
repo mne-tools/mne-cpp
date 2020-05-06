@@ -310,6 +310,9 @@ void AnnotationView::keyPressEvent(QKeyEvent* event)
         //qDebug() << "[AnnotationView::keyPressEvent] -- Qt::Key_Delete";
         this->removeAnnotationfromModel();
     }
+    if(event->key() == Qt::Key_J) {
+        emit jumpToSelected();
+    }
 }
 
 //=============================================================================================================
