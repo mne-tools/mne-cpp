@@ -424,6 +424,8 @@ void Hpi::run()
     fitResult.devHeadTrans.from = 1;
     fitResult.devHeadTrans.to = 4;
 
+    m_pHpiOutput->data()->setFiffInfo(m_pFiffInfo);
+
     HPIFit HPI = HPIFit(m_pFiffInfo);
 
     double dErrorMax = 0.0;
