@@ -58,6 +58,7 @@
 #include <QSvgGenerator>
 #include <QAbstractScrollArea>
 #include <QEvent>
+#include <QKeyEvent>
 
 #if !defined(NO_OPENGL)
     #include <QGLWidget>
@@ -248,8 +249,9 @@ void FiffRawView::setWindowSize(int T)
     m_iT = T;
 
     m_pModel->setWindowSize(T,
-                            m_pTableView->width() - m_pTableView->columnWidth(0),
+                            m_pTableView->width() /*- m_pTableView->columnWidth(0)*/,
                             iNewPos);
+    qDebug() << "FiffRawView::setWindowSize -- width:" << m_pTableView->width() << "," << m_pTableView->columnWidth(0) << "," << m_pTableView->columnWidth(1);
 
     m_pTableView->resizeRowsToContents();
     m_pTableView->resizeColumnsToContents();
@@ -369,4 +371,21 @@ bool FiffRawView::eventFilter(QObject *object, QEvent *event)
     }
 
     return false;
+}
+
+//=============================================================================================================
+
+void FiffRawView::updateScrollPosition()
+{
+    int iSample = m_pModel->getAnnotationModel()->getAnnotation(m_pModel->getAnnotationModel()->getSelectedAnn()) - m_pModel->absoluteFirstSample();
+    double dDx = m_pModel->pixelDifference();
+
+    //qDebug() << "Div:" << iSample * dDx;
+    int iPos = static_cast<int>(iSample * dDx) - static_cast<int>(m_pTableView->width() / 2);
+    if(iPos < 0){
+        iPos = 0;
+    }
+    //qDebug() << "Current scroll:" << m_pTableView->horizontalScrollBar()->value();
+
+    m_pTableView->horizontalScrollBar()->setValue(iPos);
 }

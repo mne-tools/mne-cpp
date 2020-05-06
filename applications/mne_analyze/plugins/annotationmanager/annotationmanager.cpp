@@ -88,10 +88,13 @@ void AnnotationManager::init()
     m_pAnnotationView = new AnnotationView();
 
     connect(m_pAnnotationView, &AnnotationView::triggerRedraw,
-            this, &AnnotationManager::onTriggerRedraw);
+            this, &AnnotationManager::onTriggerRedraw, Qt::UniqueConnection);
 
     connect(m_pAnnotationView, &AnnotationView::activeEventsChecked,
-            this, &AnnotationManager::toggleDisplayEvent);
+            this, &AnnotationManager::toggleDisplayEvent, Qt::UniqueConnection);
+
+    connect(m_pAnnotationView, &AnnotationView::jumpToSelected,
+            this, &AnnotationManager::onJumpToSelected, Qt::UniqueConnection);
 
     //connect(m_pAnalyzeData.data(), &AnalyzeData::newModelAvailable,
     //        this, &AnnotationManager::onModelChanged);
@@ -210,4 +213,11 @@ void AnnotationManager::toggleDisplayEvent(const int& iToggle)
 void AnnotationManager::onTriggerRedraw()
 {
     m_pCommu->publishEvent(TRIGGER_REDRAW);
+}
+
+//=============================================================================================================
+
+void AnnotationManager::onJumpToSelected()
+{
+    m_pCommu->publishEvent(TRIGGER_VIEWER_MOVE);
 }

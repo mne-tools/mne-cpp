@@ -187,6 +187,9 @@ void RawDataViewer::handleEvent(QSharedPointer<Event> e)
     case TRIGGER_REDRAW:
         m_pFiffRawView->updateView();
         break;
+    case TRIGGER_VIEWER_MOVE:
+        m_pFiffRawView->updateScrollPosition();
+        break;
     default:
         qWarning() << "[RawDataViewer::handleEvent] Received an Event that is not handled by switch cases.";
     }
@@ -198,6 +201,7 @@ QVector<EVENT_TYPE> RawDataViewer::getEventSubscriptions(void) const
 {
     QVector<EVENT_TYPE> temp = {};
     temp.push_back(TRIGGER_REDRAW);
+    temp.push_back(TRIGGER_VIEWER_MOVE);
 
     return temp;
 }
@@ -270,6 +274,8 @@ void RawDataViewer::setUpControls()
     m_pControlDock->setWidget(m_pContainer);
     m_pContainer->setLayout(m_pLayout);
     m_pContainer->show();
+
+    delete tempLabel;
 }
 
 //=============================================================================================================
