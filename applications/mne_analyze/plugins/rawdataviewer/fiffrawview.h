@@ -245,7 +245,7 @@ private:
 
     float                                               m_fDefaultSectionSize;          /**< Default row height */
     float                                               m_fZoomFactor;                  /**< Zoom factor */
-    float                                               m_fLastClickedPoint;            /**< Stores last clicked point on screen */
+    float                                               m_fLastClickedSample;            /**< Stores last clicked sample on screen */
 
     qint32                                              m_iT;                           /**< Display window size in seconds */
 

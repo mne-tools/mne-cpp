@@ -431,10 +431,20 @@ public:
      */
     bool shouldDisplayAnn() const;
 
-    void setAnnotationModel(QSharedPointer<AnnotationModel> pModel);
-
+    //=========================================================================================================
+    /**
+     * Returns shared pointer to associated Annotation model for the FiffRawView model
+     *
+     * @return shared pointer to the annotation model
+     */
     QSharedPointer<AnnotationModel> getAnnotationModel() const;
 
+    //=========================================================================================================
+    /**
+     * Adds a new annotation at the sample location the user clicked
+     *
+     * @param [in] iLastClicked     position of the last clicked sample
+     */
     void addTimeMark(int iLastClicked);
 
 private:
@@ -592,7 +602,7 @@ inline qint32 FiffRawViewModel::sampleWindowSize() const {
 
 inline void FiffRawViewModel::setDataColumnWidth(int iWidth) {
     m_dDx = (double)iWidth / double(m_iVisibleWindowSize*m_iSamplesPerBlock);
-    qInfo() << "[FiffRawViewModel::setDataColumnWidth] m_dDx:" << m_dDx;
+    //qInfo() << "[FiffRawViewModel::setDataColumnWidth] m_dDx:" << m_dDx;
 }
 
 //=============================================================================================================
