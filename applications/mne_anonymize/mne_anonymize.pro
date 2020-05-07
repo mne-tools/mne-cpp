@@ -45,6 +45,7 @@ QT += widgets concurrent network
 VERSION = $${MNE_CPP_VERSION}
 
 CONFIG   += consol
+CONFIG -= app_bundle
 
 contains(MNECPP_CONFIG, static) {
     CONFIG += static
