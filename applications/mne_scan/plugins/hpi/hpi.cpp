@@ -176,8 +176,10 @@ void Hpi::update(SCMEASLIB::Measurement::SPtr pMeasurement)
     if(QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>()) {
         //Check if the fiff info was inititalized
         if(!m_pFiffInfo) {
+            m_mutex.lock();
             m_pFiffInfo = pRTMSA->info();
-
+            m_pHpiOutput->data()->setFiffInfo(m_pFiffInfo);
+            m_mutex.unlock();
             updateProjections();
         }
 
@@ -377,7 +379,6 @@ void Hpi::onCoilFrequenciesChanged(const QVector<int>& vCoilFreqs)
 void Hpi::onSspStatusChanged(bool bChecked)
 {
     m_bUseSSP = bChecked;
-
     updateProjections();
 }
 
@@ -408,13 +409,17 @@ void Hpi::onDevHeadTransAvailable(const FIFFLIB::FiffCoordTrans& devHeadTrans)
 void Hpi::run()
 {
     // Wait for fiff info
+    bool bFiffInfo = false;
+
     while(true) {
         m_mutex.lock();
         if(m_pFiffInfo) {
-            m_mutex.unlock();
-            break;
+            bFiffInfo = true;
         }
         m_mutex.unlock();
+        if(bFiffInfo) {
+            break;
+        }
         msleep(100);
     }
 
@@ -425,10 +430,10 @@ void Hpi::run()
     fitResult.devHeadTrans.to = 4;
 
     FiffCoordTrans transDevHeadRef = m_pFiffInfo->dev_head_t;
-    float fMove = 0;
-    float fRot = 0;
-
-    m_pHpiOutput->data()->setFiffInfo(m_pFiffInfo);
+    float fMove = 0.003;
+    float fRot = 5;
+    float fDistance = 0;
+    float fAngle = 0;
 
     HPIFit HPI = HPIFit(m_pFiffInfo);
 
@@ -496,11 +501,13 @@ void Hpi::run()
                 m_mutex.unlock();
 
                 // check for large head movement
-                fitResult.dHeadMovementDistance = transDevHeadRef.translationTo(fitResult.devHeadTrans.trans);
-                fitResult.dHeadMovementAngle = transDevHeadRef.angleTo(fitResult.devHeadTrans.trans);
+                fDistance = transDevHeadRef.translationTo(fitResult.devHeadTrans.trans);
+                fAngle = transDevHeadRef.angleTo(fitResult.devHeadTrans.trans);
+                fitResult.fHeadMovementDistance = fDistance;
+                fitResult.fHeadMovementAngle = fAngle;
 
                 fitResult.bIsLargeHeadMovement = false;
-                if(fitResult.dHeadMovementDistance > fMove || fitResult.dHeadMovementDistance > fRot) {
+                if(fDistance > fMove || fAngle > fRot) {
                     fitResult.bIsLargeHeadMovement = true;
                     transDevHeadRef = fitResult.devHeadTrans;
                 }
