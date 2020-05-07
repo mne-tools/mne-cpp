@@ -79,8 +79,8 @@ using namespace Eigen;
 //=============================================================================================================
 
 RtFwd::RtFwd()
-    : m_bUpdateHeadPos(false)
-    , m_pCircularBuffer(CircularBuffer_Matrix_double::SPtr::create(40))
+    : m_bBusy(false)
+    , m_pCircularBuffer(CircularBuffer<RealTimeHpiResult>::SPtr::create(40))
     , m_pFwdSettings(new ComputeFwdSettings)
 {
     // set init values
@@ -231,18 +231,14 @@ void RtFwd::update(SCMEASLIB::Measurement::SPtr pMeasurement)
         m_mutex.lock();
         if(!m_pFiffInfo) {
             m_pFiffInfo = pRTHPI->getFiffInfo();
-            m_transDevHead = pRTHPI->getValue()->devHeadTrans;
-//            m_mutex.lock();
-//            m_bUpdateHeadPos = true;
-//            m_mutex.unlock();
         }
         m_mutex.unlock();
 
         m_mutex.lock();
-        m_pHpiFitResult = pRTHPI->getValue();
+        if(!m_bBusy) {
+            m_pHpiFitResult = pRTHPI->getValue();
+        }
         m_mutex.unlock();
-
-        // checkHeadDisplacement();
 
         if(!m_bPluginControlWidgetsInit) {
             initPluginControlWidgets();
@@ -252,29 +248,10 @@ void RtFwd::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 //            // Please note that we do not need a copy here since this function will block until
 //            // the buffer accepts new data again. Hence, the data is not deleted in the actual
 //            // Mesaurement function after it emitted the notify signal.
-//            while(!m_pCircularBuffer->push(pRTHPI->getMultiSampleArray()[i])) {
+//            while(!m_pCircularBuffer->push(pRTHPI->getValue()[i])) {
 //                //Do nothing until the circular buffer is ready to accept new data again
 //            }
 //        }
-    }
-}
-
-//=============================================================================================================
-
-void RtFwd::checkHeadDisplacement()
-{
-    m_mutex.lock();
-    float fThreshMove = m_fThreshMove;      // threshold for movement
-    float fThreshRot = m_fThreshRot;        // threshold for rotation
-    float fAngle = m_transDevHead.angleTo(m_pHpiFitResult->devHeadTrans.trans);
-    float fMove = m_transDevHead.translationTo(m_pHpiFitResult->devHeadTrans.trans);
-    m_mutex.unlock();
-
-    if(fAngle > fThreshRot || fMove > fThreshMove) {
-        m_mutex.lock();
-        m_bUpdateHeadPos = true;
-        m_transDevHead = m_pHpiFitResult->devHeadTrans;
-        m_mutex.unlock();
     }
 }
 
@@ -327,16 +304,18 @@ void RtFwd::initPluginControlWidgets()
 
 void RtFwd::run()
 {
-    MatrixXd matData;
+    bool bFiffInfo = false;
 
     // Wait for fiff info
     while(true) {
         m_mutex.lock();
         if(m_pFiffInfo) {
-            m_mutex.unlock();
-            break;
+            bFiffInfo = true;
         }
         m_mutex.unlock();
+        if(bFiffInfo) {
+            break;
+        }
         msleep(100);
     }
 
@@ -356,23 +335,28 @@ void RtFwd::run()
     // get Mne Forward Solution (in future this is not necessary, ComputeForward will have this as member)
     QFile t_fSolution(m_pFwdSettings->solname);
     m_pFwdSolution = MNEForwardSolution::SPtr(new MNEForwardSolution(t_fSolution));
-    qDebug() << "m_pFwdSolution is ready";
 
+    bool bIsLargeHeadMovement = false;
+    bool bIsDifferent = false;
     while(!isInterruptionRequested()) {
         // Get the current data
         m_mutex.lock();
-        bool bDoUpdate = m_pHpiFitResult->bIsLargeHeadMovement;
+        bIsLargeHeadMovement = m_pHpiFitResult->bIsLargeHeadMovement;
+        bIsDifferent = !(transMegHeadOld == m_pHpiFitResult->devHeadTrans.toOld());
         m_mutex.unlock();
 
-        if(bDoUpdate) {
+        if(bIsLargeHeadMovement && bIsDifferent) {
+            m_mutex.lock();
+            m_bBusy = true;
             transMegHeadOld = m_pHpiFitResult->devHeadTrans.toOld();
-
+            m_mutex.unlock();
             pComputeFwd->updateHeadPos(&transMegHeadOld);
             m_pFwdSolution->sol = pComputeFwd->sol;
             m_pFwdSolution->sol_grad = pComputeFwd->sol_grad;
             m_mutex.lock();
-        }
+            m_bBusy = false;
             m_mutex.unlock();
+        }
 //        //Send the data to the connected plugins and the online display
 //        //Unocmment this if you also uncommented the m_pOutput in the constructor above
 //        if(!isInterruptionRequested()) {
