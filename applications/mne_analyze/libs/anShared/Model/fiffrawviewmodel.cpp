@@ -230,7 +230,7 @@ QVariant FiffRawViewModel::data(const QModelIndex &index, int role) const
     }
 
     if (role != Qt::DisplayRole) {
-        qWarning() << "[FiffRawViewModel::data] Role " << role << " not implemented yet !";
+        qInfo() << "[FiffRawViewModel::data] Role " << role << " not implemented yet.";
         return QVariant();
     }
 
@@ -380,12 +380,8 @@ bool FiffRawViewModel::hasChildren(const QModelIndex &parent) const
 
 void FiffRawViewModel::updateScrollPosition(qint32 newScrollPosition)
 {
-
-    qDebug() << "m_iSamplesPerBlock" << m_iSamplesPerBlock;
-    qDebug() << "m_iTotalBlockCount" << m_iTotalBlockCount;
-
-    QElapsedTimer timer;
-    timer.start();
+//    QElapsedTimer timer;
+//    timer.start();
     // check if we are currently loading something in the background. This is a rudimentary solution.
     if (m_bCurrentlyLoading) {
         qInfo() << "[FiffRawViewModel::updateScrollPosition] Background operation still pending, try again later...";
@@ -435,7 +431,7 @@ void FiffRawViewModel::updateScrollPosition(qint32 newScrollPosition)
             postBlockLoad(loadLaterBlocks(blockDist));
         }
     }
-    qDebug() << "[FiffRawViewModel::updateScrollPosition] timer.elapsed()" << timer.elapsed();
+    //qDebug() << "[FiffRawViewModel::updateScrollPosition] timer.elapsed()" << timer.elapsed();
 }
 
 //=============================================================================================================
@@ -482,15 +478,15 @@ int FiffRawViewModel::loadEarlierBlocks(qint32 numBlocks)
     int end = m_iFiffCursorBegin - 1;
 
     // read data, use the already prepared list m_lNewData
-    QElapsedTimer timer;
-    timer.start();
+//    QElapsedTimer timer;
+//    timer.start();
     if(m_pFiffIO->m_qlistRaw[0]->read_raw_segment(data, times, start, end)) {
         // qDebug() << "[FiffRawViewModel::loadFiffData] Successfully read a block ";
     } else {
         qWarning() << "[FiffRawViewModel::loadEarlierBlocks] Could not read block ";
         return -1;
     }
-    qDebug() << "[FiffRawViewModel::loadEarlierBlocks] read_raw_segment timer.elapsed()" << timer.elapsed();
+//    qDebug() << "[FiffRawViewModel::loadEarlierBlocks] read_raw_segment timer.elapsed()" << timer.elapsed();
 
     for(int i = 0; i < numBlocks; ++i) {
         m_lNewData.push_front(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data.block(0, i*m_iSamplesPerBlock, data.rows(), m_iSamplesPerBlock),
@@ -540,15 +536,15 @@ int FiffRawViewModel::loadLaterBlocks(qint32 numBlocks)
     int end = start + (m_iSamplesPerBlock * numBlocks) - 1;
 
     // read data, use the already prepaired list m_lNewData
-    QElapsedTimer timer;
-    timer.start();
+//    QElapsedTimer timer;
+//    timer.start();
     if(m_pFiffIO->m_qlistRaw[0]->read_raw_segment(data, times, start, end)) {
         // qDebug() << "[FiffRawViewModel::loadFiffData] Successfully read a block ";
     } else {
         qWarning() << "[FiffRawViewModel::loadLaterBlocks] Could not read block ";
         return -1;
     }
-    qDebug() << "[FiffRawViewModel::loadLaterBlocks] read_raw_segment timer.elapsed()" << timer.elapsed();
+//    qDebug() << "[FiffRawViewModel::loadLaterBlocks] read_raw_segment timer.elapsed()" << timer.elapsed();
 
     for(int i = 0; i < numBlocks; ++i) {
         m_lNewData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data.block(0, i*m_iSamplesPerBlock, data.rows(), m_iSamplesPerBlock),
@@ -568,8 +564,8 @@ int FiffRawViewModel::loadLaterBlocks(qint32 numBlocks)
 
 void FiffRawViewModel::postBlockLoad(int result)
 {
-    QElapsedTimer timer;
-    timer.start();
+//    QElapsedTimer timer;
+//    timer.start();
 
     switch(result){
     case -1:
@@ -781,13 +777,6 @@ void FiffRawViewModel::toggleDispAnn(const int& iToggleDisp)
 bool FiffRawViewModel::shouldDisplayAnn() const
 {
     return (m_bDispAnn && getTimeListSize());
-}
-
-//=============================================================================================================
-
-void FiffRawViewModel::setAnnotationModel(QSharedPointer<AnnotationModel> pModel)
-{
-    m_pAnnotationModel = pModel;
 }
 
 //=============================================================================================================
