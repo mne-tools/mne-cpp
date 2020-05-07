@@ -185,7 +185,7 @@ private:
 
     float                               m_fThreshRot;           /**< The allowed rotation in degree.**/
     float                               m_fThreshMove;          /**< The Allowed movement in mm.**/
-    bool                                m_bUpdateHeadPos;       /**< Indicates if we have to update headposition.**/
+    bool                                m_bBusy;       /**< Indicates if we have to update headposition.**/
 
     QSharedPointer<INVERSELIB::HpiFitResult>        m_pHpiFitResult;        /**< The Hpi fitting result.**/
 
@@ -195,7 +195,7 @@ private:
     SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeHpiResult>::SPtr            m_pHpiInput;    /**< The incoming Hpi Data.*/
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr    m_pOutput;      /**< The outgoing data.*/
 
-    IOBUFFER::CircularBuffer_Matrix_double::SPtr    m_pCircularBuffer;      /**< Holds incoming data.*/
+    IOBUFFER::CircularBuffer<SCMEASLIB::RealTimeHpiResult>::SPtr    m_pCircularBuffer;      /**< Holds incoming data.*/
 
 public:
     FWDLIB::ComputeFwdSettings::SPtr    m_pFwdSettings;         /**< Forward Solution Settings. */
