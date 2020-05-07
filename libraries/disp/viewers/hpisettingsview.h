@@ -106,6 +106,16 @@ public:
 
     //=========================================================================================================
     /**
+     * Updates the movement refered to last head position.
+     *
+     * @param[in] dMovement         the movement refered to last fit.
+     * @param[in] dRotation         the rotation refered to last fit.
+     */
+    void setMovementResults(double dMovement,
+                            double dRotation);
+
+    //=========================================================================================================
+    /**
      * Get the SSP checked status.
      *
      * @return  The current SSP checked status.
@@ -127,6 +137,22 @@ public:
      * @return  The current allowed mean error distance.
      */
     double getAllowedMeanErrorDistChanged();
+
+    //=========================================================================================================
+    /**
+     * Get the allowed head movement.
+     *
+     * @return  The current allowed head movement.
+     */
+    double getAllowedMovementChanged();
+
+    //=========================================================================================================
+    /**
+     * Get the allowed head rotation.
+     *
+     * @return  The current allowed head rotation.
+     */
+    double getAllowedRotationChanged();
 
 protected:    
     //=========================================================================================================
@@ -255,6 +281,22 @@ signals:
      * @param[in] dAllowedMeanErrorDist    Allowed mean error in mm.
      */
     void allowedMeanErrorDistChanged(double dAllowedMeanErrorDist);
+
+    //=========================================================================================================
+    /**
+     * Emit this signal whenever the allowed head movement threshold changed.
+     *
+     * @param[in] dAllowedMeanErrorDist    Allowed movement threshold in mm.
+     */
+    void allowedMovementChanged(double dAllowedMovement);
+
+    //=========================================================================================================
+    /**
+     * Emit this signal whenever the allowed head rotation threshold changed.
+     *
+     * @param[in] dAllowedMeanErrorDist    Allowed rotation in degree.
+     */
+    void allowedRotationChanged(double dAllowedRotation);
 };
 
 } //NAMESPACE
