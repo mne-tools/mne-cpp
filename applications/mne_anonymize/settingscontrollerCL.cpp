@@ -431,8 +431,12 @@ bool SettingsControllerCL::checkDeleteInputFile()
 void SettingsControllerCL::deleteInputFile()
 {
     QFile inFile(m_fiInFileInfo.absoluteFilePath());
-    m_bInputFileDeleted = inFile.remove();
-    printIfVerbose("Input file deleted.");
+    if((m_bInputFileDeleted = inFile.remove()))
+    {
+        printIfVerbose("Input file deleted.");
+    } else {
+        qCritical() << "Unable to delete the input file: " << inFile.fileName();
+    }
 }
 
 //=============================================================================================================
@@ -477,14 +481,17 @@ bool SettingsControllerCL::checkRenameOutputFile()
 
 void SettingsControllerCL::renameOutputFileAsInputFile()
 {
-    QFile auxFile(m_fiOutFileInfo.fileName());
-    auxFile.rename(m_fiInFileInfo.fileName());
-    m_bOutFileRenamed = true;
-    if(m_bVerboseMode)
+    QFile auxFile(m_fiOutFileInfo.absoluteFilePath());
+    if((m_bOutFileRenamed = auxFile.rename(m_fiInFileInfo.absoluteFilePath())))
     {
-        std::printf("\n%s",QString("Output file named: " + m_fiOutFileInfo.fileName() + " --> renamed as: " + m_fiInFileInfo.fileName()).toUtf8().data());
+        if(m_bVerboseMode)
+        {
+            std::printf("\n%s",QString("Output file named: " + m_fiOutFileInfo.fileName() + " --> renamed as: " + m_fiInFileInfo.fileName()).toUtf8().data());
+        }
+        m_fiOutFileInfo.setFile(m_fiInFileInfo.absoluteFilePath());
+    } else {
+        qCritical() << "Error while renaming the output file: " << auxFile.fileName() << " as " << m_fiInFileInfo.fileName();
     }
-    m_fiOutFileInfo.setFile(m_fiInFileInfo.fileName());
 }
 
 //=============================================================================================================

@@ -77,7 +77,6 @@ private slots:
     void testDefaultOutput();
     void testDeleteInputFile();
     void testInPlace();
-    void testInplaceAndDeleteInFile();
 
     //test anonymization
     void testDefaultAnonymizationOfTags();
@@ -176,36 +175,6 @@ void TestMneAnonymize::testInPlace()
     QString sFileOutTest(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/testing1.fif");
 
     qInfo() << "\n\n-------------------------testInPlace-------------------------------------";
-    qInfo() << "sFileIn" << sFileIn;
-
-    QFile::copy(sFileIn,sFileInTest);
-    QVERIFY(QFile::exists(sFileInTest));
-
-    QStringList arguments;
-    arguments << QCoreApplication::applicationDirPath() + "/mne_anonymize";
-    arguments << "--in" << sFileInTest;
-    arguments << "--out" << sFileOutTest;
-    arguments << "--avoid_delete_confirmation";
-
-    qInfo() << "arguments" << arguments;
-
-    MNEANONYMIZE::SettingsControllerCL controller(arguments);
-
-    QVERIFY(QFile::exists(sFileOutTest));
-
-    QFile::remove(sFileOutTest);
-}
-
-//=============================================================================================================
-
-void TestMneAnonymize::testInplaceAndDeleteInFile()
-{
-    // Init testing arguments
-    QString sFileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
-    QString sFileInTest(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/testing2.fif");
-    QString sFileOutTest(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/testing2.fif");
-
-    qInfo() << "\n\n-------------------------testInOutSameNameAndDeleteInFile-------------------------------------";
     qInfo() << "sFileIn" << sFileIn;
 
     QFile::copy(sFileIn,sFileInTest);
