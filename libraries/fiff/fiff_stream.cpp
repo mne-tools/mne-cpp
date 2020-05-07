@@ -2209,10 +2209,10 @@ fiff_long_t FiffStream::write_tag(const QSharedPointer<FiffTag> &p_pTag, fiff_lo
 
     fiff_int_t datasize = p_pTag->size();
 
-     *this << reinterpret_cast<qint32>(p_pTag->kind);
-     *this << reinterpret_cast<qint32>(p_pTag->type);
-     *this << reinterpret_cast<qint32>(datasize);
-     *this << reinterpret_cast<qint32>(p_pTag->next);
+     *this << static_cast<qint32>(p_pTag->kind);
+     *this << static_cast<qint32>(p_pTag->type);
+     *this << static_cast<qint32>(datasize);
+     *this << static_cast<qint32>(p_pTag->next);
 
     /*
      * Do we have data?
