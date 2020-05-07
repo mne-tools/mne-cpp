@@ -116,17 +116,17 @@ public:
 
     //=========================================================================================================
     /**
+     * Initialise the MeasurementWidget.
+     */
+    virtual void init(){}
+
+    //=========================================================================================================
+    /**
      * Is called when new data are available.
      *
      * @param [in] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
      */
     virtual void update(SCMEASLIB::Measurement::SPtr pMeasurement);
-
-    //=========================================================================================================
-    /**
-     * Initialise the RealTimeMultiSampleArrayWidget.
-     */
-    virtual void init();
 
     //=========================================================================================================
     /**
@@ -136,6 +136,12 @@ public:
     void updateOpenGLViewport();
 
 private:
+    //=========================================================================================================
+    /**
+     * Initialise the display control widgets to be shown in the QuickControlView.
+     */
+    void initDisplayControllWidgets();
+
     //=========================================================================================================
     /**
      * Shows sensor selection widget
@@ -169,7 +175,6 @@ private:
     QPointer<QAction>                                       m_pActionSelectSensors;         /**< show roi select widget */
     QPointer<QAction>                                       m_pActionHideBad;               /**< Hide bad channels. */
 
-    bool                                                    m_bInitialized;                 /**< Is Initialized */
     qint32                                                  m_iMaxFilterTapSize;            /**< Maximum number of allowed filter taps. This number depends on the size of the receiving blocks. */
  };
 } // NAMESPACE SCDISPLIB

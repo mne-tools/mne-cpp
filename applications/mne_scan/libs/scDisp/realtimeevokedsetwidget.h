@@ -120,17 +120,17 @@ public:
 
     //=========================================================================================================
     /**
+     * Initialise the MeasurementWidget.
+     */
+    virtual void init(){}
+
+    //=========================================================================================================
+    /**
      * Is called when new data are available.
      *
      * @param [in] pMeasurement  pointer to measurement.
      */
     virtual void update(SCMEASLIB::Measurement::SPtr pMeasurement);
-
-    //=========================================================================================================
-    /**
-     * Initialise the RealTimeEvokedSetWidget.
-     */
-    virtual void init();
 
     //=========================================================================================================
     /**
@@ -157,6 +157,12 @@ private slots:
 private:
     //=========================================================================================================
     /**
+     * Initialise the display control widgets to be shown in the QuickControlView.
+     */
+    void initDisplayControllWidgets();
+
+    //=========================================================================================================
+    /**
      * Reimplemented eventFilter
      */
     bool virtual eventFilter(QObject *object, QEvent *event);
@@ -171,7 +177,6 @@ private:
 
     QList<qint32>                       m_qListCurrentSelection;    /**< Current selection list -> hack around C++11 lambda  */
 
-    bool                                m_bInitialized;             /**< Is Initialized */
     bool                                m_bHideBadChannels;         /**< hide bad channels flag. */
     qint32                              m_iMaxFilterTapSize;        /**< maximum number of allowed filter taps. This number depends on the size of the receiving blocks. */
 

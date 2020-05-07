@@ -153,6 +153,8 @@ protected:
      */
     inline void addDisplayAction(QAction* pAction);
 
+    bool                m_bDisplayWidgetsInitialized;   /**< Whether the control widgets were sucesfully initialized. */
+
 private:
     QList< QAction* >   m_qListDisplayActions;          /**< List of display actions */
 

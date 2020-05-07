@@ -117,19 +117,25 @@ public:
 
     //=========================================================================================================
     /**
+     * Initialise the MeasurementWidget.
+     */
+    virtual void init(){}
+
+    //=========================================================================================================
+    /**
      * Is called when new data are available.
      *
      * @param [in] pMeasurement  pointer to measurement
      */
     virtual void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
+protected:
     //=========================================================================================================
     /**
-     * Initialise the RealTimeCovWidget.
+     * Initialise the display control widgets to be shown in the QuickControlView.
      */
-    virtual void init();
+    void initDisplayControllWidgets();
 
-protected:
     //=========================================================================================================
     /**
      * Show modality view.
@@ -140,8 +146,6 @@ protected:
 
     QPointer<QVBoxLayout>                   m_pRtcLayout;                           /**< Widget layout */
     QPointer<QLabel>                        m_pLabelInit;                           /**< Initialization label */
-
-    bool                                    m_bInitialized;                         /**< Is Initialized */
 
     QSharedPointer<FIFFLIB::FiffInfo>       m_pFiffInfo;                            /**< The Fiff Info. */
 

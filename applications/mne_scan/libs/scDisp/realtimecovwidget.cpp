@@ -80,7 +80,6 @@ using namespace Eigen;
 RealTimeCovWidget::RealTimeCovWidget(QSharedPointer<QTime> &pTime,
                                      QWidget* parent)
 : MeasurementWidget(parent)
-, m_bInitialized(false)
 {
     Q_UNUSED(pTime)
 
@@ -118,15 +117,13 @@ void RealTimeCovWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
     m_pRTC = qSharedPointerDynamicCast<RealTimeCov>(pMeasurement);
 
-    if(!m_bInitialized) {
-        if(m_pRTC->isInitialized()) {
-            m_pFiffInfo = m_pRTC->getFiffInfo();
+    if(m_pRTC->isInitialized()) {
+        m_pFiffInfo = m_pRTC->getFiffInfo();
 
-            init();
+        if(!m_bDisplayWidgetsInitialized) {
+            initDisplayControllWidgets();
         }
-    }
 
-    if(m_bInitialized) {
         MatrixXd data(m_qListSelChannel.size(), m_qListSelChannel.size());
 
         for(int i = 0; i < m_qListSelChannel.size(); i++) {
@@ -141,7 +138,7 @@ void RealTimeCovWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 //=============================================================================================================
 
-void RealTimeCovWidget::init()
+void RealTimeCovWidget::initDisplayControllWidgets()
 {
     if(m_pFiffInfo) {
         m_pRtcLayout->removeWidget(m_pLabelInit);
@@ -166,7 +163,7 @@ void RealTimeCovWidget::init()
 
         emit displayControlWidgetsChanged(lControlWidgets, m_pRTC->getName());
 
-        m_bInitialized = true;
+        m_bDisplayWidgetsInitialized = true;
     }
 }
 

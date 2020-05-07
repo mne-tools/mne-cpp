@@ -78,7 +78,6 @@ RealTimeSpectrumWidget::RealTimeSpectrumWidget(QSharedPointer<RealTimeSpectrum> 
 , m_pFS(pFS)
 , m_fLowerFrqBound(0)
 , m_fUpperFrqBound(300)
-, m_bInitialized(false)
 {
     Q_UNUSED(pTime)
 
@@ -129,16 +128,14 @@ void RealTimeSpectrumWidget::update(SCMEASLIB::Measurement::SPtr)
 
 void RealTimeSpectrumWidget::getData()
 {
-    if(!m_bInitialized)
-    {
-        if(m_pFS->isInit())
-        {
-            init();
-
-            m_pSpectrumView->addData(m_pFS->getValue());
-
-            initSettingsWidget();
+    if(m_pFS->isInit()) {
+        if(!m_bDisplayWidgetsInitialized) {
+            initDisplayControllWidgets();
         }
+
+        m_pSpectrumView->addData(m_pFS->getValue());
+
+        initSettingsWidget();
     } else {
         m_pSpectrumView->addData(m_pFS->getValue());
     }
@@ -146,7 +143,7 @@ void RealTimeSpectrumWidget::getData()
 
 //=============================================================================================================
 
-void RealTimeSpectrumWidget::init()
+void RealTimeSpectrumWidget::initDisplayControllWidgets()
 {
     if(m_pFS->getFiffInfo()) {
         QSettings settings;
@@ -160,7 +157,7 @@ void RealTimeSpectrumWidget::init()
 
         m_pSpectrumView->init(m_pFS->getFiffInfo(), m_pFS->getScaleType());
 
-        m_bInitialized = true;
+        m_bDisplayWidgetsInitialized = true;
     }
 }
 

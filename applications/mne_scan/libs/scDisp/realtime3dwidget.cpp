@@ -96,7 +96,6 @@ using namespace FIFFLIB;
 
 RealTime3DWidget::RealTime3DWidget(QWidget* parent)
 : MeasurementWidget(parent)
-, m_bInitialized(false)
 , m_iNumberBadChannels(0)
 , m_pData3DModel(Data3DTreeModel::SPtr::create())
 , m_p3DView(new View3D())
@@ -132,6 +131,10 @@ void RealTime3DWidget::createGUI()
 
 void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
+    if(!m_bDisplayWidgetsInitialized) {
+        initDisplayControllWidgets();
+    }
+
     if(RealTimeConnectivityEstimate::SPtr pRTCE = qSharedPointerDynamicCast<RealTimeConnectivityEstimate>(pMeasurement)) {
         if(pRTCE->getValue().data()->isEmpty()) {
             return;
@@ -141,8 +144,8 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
         if(!m_pRtConnectivityItem) {
             //qDebug()<<"RealTime3DWidget::getData - Creating m_pRtConnectivityItem";
             m_pRtConnectivityItem = m_pData3DModel->addConnectivityData("Subject",
-                                                            "Connectivity",
-                                                            *(pRTCE->getValue().data()));
+                                                                        "Functional Data",
+                                                                        *(pRTCE->getValue().data()));
 
             m_pRtConnectivityItem->setThresholds(QVector3D(0.9f,0.95f,1.0f));
 
@@ -158,14 +161,12 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             }
 
             if(pRTCE->getSensorSurface() && pRTCE->getFiffInfo()) {
-                m_pData3DModel->addMegSensorInfo("sample",
+                m_pData3DModel->addMegSensorInfo("Subject",
                                                  "Sensors",
                                                  pRTCE->getFiffInfo()->chs,
                                                  *(pRTCE->getSensorSurface()),
                                                  pRTCE->getFiffInfo()->bads);
                 m_iNumberBadChannels = pRTCE->getFiffInfo()->bads.size();
-
-                init();
             }
         } else {
             //qDebug()<<"RealTime3DWidget::getData - Working with m_pRtConnectivityItem";
@@ -192,7 +193,7 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
         if(!lMNEData.isEmpty()) {
             if(!m_pRtMNEItem && pRTSE->getAnnotSet() && pRTSE->getSurfSet() && pRTSE->getFwdSolution()) {
                 //qDebug()<<"RealTimeSourceEstimateWidget::getData - Creating m_lRtItem list";
-                m_pRtMNEItem = m_pData3DModel->addSourceData("Subject", "Data",
+                m_pRtMNEItem = m_pData3DModel->addSourceData("Subject", "Functional Data",
                                                              *lMNEData.first(),
                                                              *pRTSE->getFwdSolution(),
                                                              *pRTSE->getSurfSet(),
@@ -207,8 +208,6 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
                 m_pRtMNEItem->setAlpha(1.0);
                 m_pRtMNEItem->setStreamingState(true);
                 m_pRtMNEItem->setSFreq(pRTSE->getFiffInfo()->sfreq);
-
-                init();
             } else {
                 //qDebug()<<"RealTimeSourceEstimateWidget::getData - Working with m_lRtItem list";
 
@@ -234,9 +233,7 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             // Add average head surface
             QFile t_fileHeadAvr(QCoreApplication::applicationDirPath() + "/resources/general/hpiAlignment/fsaverage-head.fif");;
             MNEBem t_BemHeadAvr(t_fileHeadAvr);
-            m_pBemHeadAvr = m_pData3DModel->addBemData("Head", "Average", t_BemHeadAvr);
-
-            init();
+            m_pBemHeadAvr = m_pData3DModel->addBemData("Subject", "Average head", t_BemHeadAvr);
         }
 
         if(m_sFilePathDigitizers != hpiFitResult->sFilePathDigitzers && m_pBemHeadAvr) {
@@ -244,14 +241,16 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             QFile fileDig(hpiFitResult->sFilePathDigitzers);
             FiffDigPointSet digSet(fileDig);
             FiffDigPointSet digSetWithoutAdditional = digSet.pickTypes(QList<int>()<<FIFFV_POINT_HPI<<FIFFV_POINT_CARDINAL<<FIFFV_POINT_EEG);
-            m_pTrackedDigitizer = m_pData3DModel->addDigitizerData("Head", "Tracked", digSetWithoutAdditional);
+            m_pTrackedDigitizer = m_pData3DModel->addDigitizerData("Subject",
+                                                                   "Tracked Digitizers",
+                                                                   digSetWithoutAdditional);
 
             alignFiducials(hpiFitResult->sFilePathDigitzers);
         }
 
         //Add and update items to 3D view
         m_pData3DModel->addDigitizerData("Head",
-                                         "Fitted",
+                                         "Fitted Digitizers",
                                          hpiFitResult->fittedCoils.pickTypes(QList<int>()<<FIFFV_POINT_EEG));
 
         if(m_pTrackedDigitizer && m_pBemHeadAvr) {
@@ -346,7 +345,7 @@ void RealTime3DWidget::alignFiducials(const QString& sFilePath)
 
 //=============================================================================================================
 
-void RealTime3DWidget::init()
+void RealTime3DWidget::initDisplayControllWidgets()
 {
     Data3DTreeDelegate* pData3DTreeDelegate = new Data3DTreeDelegate(this);
 
@@ -385,5 +384,5 @@ void RealTime3DWidget::init()
 
     emit displayControlWidgetsChanged(lControlWidgets, "3D View");
 
-    m_bInitialized = true;
+    m_bDisplayWidgetsInitialized = true;
 }
