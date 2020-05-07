@@ -96,7 +96,10 @@ HpiSettingsView::HpiSettingsView(const QString& sSettingsPath,
             this, &HpiSettingsView::contHpiStatusChanged);
     connect(m_ui->m_doubleSpinBox_maxHPIContinousDist, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
             this, &HpiSettingsView::allowedMeanErrorDistChanged);
-
+    connect(m_ui->m_doubleSpinBox_moveThreshold, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this, &HpiSettingsView::allowedMovementChanged);
+    connect(m_ui->m_doubleSpinBox_rotThreshold, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this, &HpiSettingsView::allowedRotationChanged);
     //Init coil freqs
     m_vCoilFreqs << 155 << 165 << 190 << 200;
     qRegisterMetaTypeStreamOperators<QVector<int> >("QVector<int>");
@@ -123,12 +126,12 @@ void HpiSettingsView::setErrorLabels(const QVector<double>& vError,
 
     for(int i = 0; i < vError.size(); ++i) {
         if(i < m_ui->m_tableWidget_errors->rowCount()) {
-            sGof = QString::number(vError[i]*1000,'f',2)+QString("mm");
+            sGof = QString::number(vError[i]*1000,'f',2)+QString(" mm");
             m_ui->m_tableWidget_errors->item(i, 1)->setText(sGof);
         }
     }
 
-    m_ui->m_label_averagedFitError->setText(QString::number(dMeanErrorDist*1000,'f',2)+QString("mm"));
+    m_ui->m_label_averagedFitError->setText(QString::number(dMeanErrorDist*1000,'f',2)+QString(" mm"));
 
     //Update good/bad fit label
     if(dMeanErrorDist*1000 > m_ui->m_doubleSpinBox_maxHPIContinousDist->value()) {
@@ -137,6 +140,23 @@ void HpiSettingsView::setErrorLabels(const QVector<double>& vError,
     } else {
         m_ui->m_label_fitFeedback->setText("Last fit: Good");
         m_ui->m_label_fitFeedback->setStyleSheet("QLabel { background-color : green;}");
+    }
+}
+
+//=========================================================================================================
+
+void HpiSettingsView::setMovementResults(double dMovement,
+                                         double dRotation)
+{
+    m_ui->m_qLineEdit_moveResult->setText(QString::number(dMovement*1000,'f',2) + QString(" mm"));
+    m_ui->m_qLineEdit_rotResult->setText(QString::number(dRotation,'f',2) + QString(" °"));
+
+    if(dMovement*1000 > m_ui->m_doubleSpinBox_moveThreshold->value() || dRotation > m_ui->m_doubleSpinBox_rotThreshold->value()) {
+        m_ui->m_label_movementFeedback->setText("Big");
+        m_ui->m_label_movementFeedback->setStyleSheet("QLabel { background-color : red;}");
+    } else {
+        m_ui->m_label_movementFeedback->setText("Small");
+        m_ui->m_label_movementFeedback->setStyleSheet("QLabel { background-color : green;}");
     }
 }
 
@@ -159,6 +179,20 @@ bool HpiSettingsView::getCompStatusChanged()
 double HpiSettingsView::getAllowedMeanErrorDistChanged()
 {
     return m_ui->m_doubleSpinBox_maxHPIContinousDist->value();
+}
+
+//=============================================================================================================
+
+double HpiSettingsView::getAllowedMovementChanged()
+{
+    return m_ui->m_doubleSpinBox_moveThreshold->value();
+}
+
+//=============================================================================================================
+
+double HpiSettingsView::getAllowedRotationChanged()
+{
+    return m_ui->m_doubleSpinBox_rotThreshold->value();
 }
 
 //=============================================================================================================

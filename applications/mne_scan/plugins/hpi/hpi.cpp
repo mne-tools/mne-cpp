@@ -244,12 +244,20 @@ void Hpi::initPluginControlWidgets()
                 this, &Hpi::onContHpiStatusChanged);
         connect(pHpiSettingsView, &HpiSettingsView::allowedMeanErrorDistChanged,
                 this, &Hpi::onAllowedMeanErrorDistChanged);
+        connect(pHpiSettingsView, &HpiSettingsView::allowedMovementChanged,
+                this, &Hpi::onAllowedMovementChanged);
+        connect(pHpiSettingsView, &HpiSettingsView::allowedRotationChanged,
+                this, &Hpi::onAllowedRotationChanged);
         connect(this, &Hpi::errorsChanged,
                 pHpiSettingsView, &HpiSettingsView::setErrorLabels, Qt::BlockingQueuedConnection);
+        connect(this, &Hpi::movementResultsChanged,
+                pHpiSettingsView, &HpiSettingsView::setMovementResults, Qt::BlockingQueuedConnection);
 
         onSspStatusChanged(pHpiSettingsView->getSspStatusChanged());
         onCompStatusChanged(pHpiSettingsView->getCompStatusChanged());
         onAllowedMeanErrorDistChanged(pHpiSettingsView->getAllowedMeanErrorDistChanged());
+        onAllowedMovementChanged(pHpiSettingsView->getAllowedMovementChanged());
+        onAllowedRotationChanged(pHpiSettingsView->getAllowedRotationChanged());
 
         plControlWidgets.append(pHpiSettingsView);
 
@@ -315,7 +323,27 @@ void Hpi::updateProjections()
 
 void Hpi::onAllowedMeanErrorDistChanged(double dAllowedMeanErrorDist)
 {
+    m_mutex.lock();
     m_dAllowedMeanErrorDist = dAllowedMeanErrorDist * 0.001;
+    m_mutex.unlock();
+}
+
+//=============================================================================================================
+
+void Hpi::onAllowedMovementChanged(double dAllowedMovement)
+{
+    m_mutex.lock();
+    m_dAllowedMovement = dAllowedMovement;
+    m_mutex.unlock();
+}
+
+//=============================================================================================================
+
+void Hpi::onAllowedRotationChanged(double dAllowedRotation)
+{
+    m_mutex.lock();
+    m_dAllowedRotation = dAllowedRotation;
+    m_mutex.unlock();
 }
 
 //=============================================================================================================
@@ -430,15 +458,16 @@ void Hpi::run()
     fitResult.devHeadTrans.to = 4;
 
     FiffCoordTrans transDevHeadRef = m_pFiffInfo->dev_head_t;
-    float fMove = 0.003;
-    float fRot = 5;
-    float fDistance = 0;
-    float fAngle = 0;
 
     HPIFit HPI = HPIFit(m_pFiffInfo);
 
     double dErrorMax = 0.0;
-    double dMeanErrorDist = 0;
+    double dMeanErrorDist = 0.0;
+    double dAllowedMovement = 0.0;
+    double dAllowedRotation = 0.0;
+    double dMovement = 0.0;
+    double dRotation = 0.0;
+
     int iDataIndexCounter = 0;
     MatrixXd matData;
 
@@ -500,18 +529,6 @@ void Hpi::run()
                            m_pFiffInfo);
                 m_mutex.unlock();
 
-                // check for large head movement
-                fDistance = transDevHeadRef.translationTo(fitResult.devHeadTrans.trans);
-                fAngle = transDevHeadRef.angleTo(fitResult.devHeadTrans.trans);
-                fitResult.fHeadMovementDistance = fDistance;
-                fitResult.fHeadMovementAngle = fAngle;
-
-                fitResult.bIsLargeHeadMovement = false;
-                if(fDistance > fMove || fAngle > fRot) {
-                    fitResult.bIsLargeHeadMovement = true;
-                    transDevHeadRef = fitResult.devHeadTrans;
-                }
-
                 //Check if the error meets distance requirement
                 if(fitResult.errorDistances.size() > 0) {
                     dMeanErrorDist = std::accumulate(fitResult.errorDistances.begin(), fitResult.errorDistances.end(), .0) / fitResult.errorDistances.size();
@@ -526,6 +543,26 @@ void Hpi::run()
 
                         //If fit was good, set newly calculated transformation matrix to fiff info
                         emit devHeadTransAvailable(fitResult.devHeadTrans);
+
+                        // check for large head movement
+                        dMovement = transDevHeadRef.translationTo(fitResult.devHeadTrans.trans);
+                        dRotation = transDevHeadRef.angleTo(fitResult.devHeadTrans.trans);
+
+                        emit movementResultsChanged(dMovement,dRotation);
+
+                        fitResult.fHeadMovementDistance = dMovement;
+                        fitResult.fHeadMovementAngle = dRotation;
+                        fitResult.bIsLargeHeadMovement = false;
+
+                        m_mutex.lock();
+                        dAllowedMovement = m_dAllowedMovement;
+                        dAllowedRotation = m_dAllowedRotation;
+                        m_mutex.unlock();
+                        if(dMovement > dAllowedMovement || dRotation > dAllowedRotation) {
+                            fitResult.bIsLargeHeadMovement = true;
+                            transDevHeadRef = fitResult.devHeadTrans;
+                        }
+
                     }
                 }
 
