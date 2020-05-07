@@ -96,7 +96,6 @@ using namespace FIFFLIB;
 RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<QTime> &pTime,
                                                  QWidget* parent)
 : MeasurementWidget(parent)
-, m_bInitialized(false)
 {
     Q_UNUSED(pTime)
 
@@ -148,15 +147,13 @@ RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<QTime> &pTime,
 RealTimeEvokedSetWidget::~RealTimeEvokedSetWidget()
 {
     // Store Settings
-    if(m_bInitialized) {
-        if(!m_pRTESet->getName().isEmpty())
-        {
-            QSettings settings;
+    if(!m_pRTESet->getName().isEmpty())
+    {
+        QSettings settings;
 
-            //Store current view toolbox index - butterfly or 2D layout
-            if(m_pToolBox) {
-                settings.setValue(QString("RTESW/%1/selectedView").arg(m_pRTESet->getName()), m_pToolBox->currentIndex());
-            }
+        //Store current view toolbox index - butterfly or 2D layout
+        if(m_pToolBox) {
+            settings.setValue(QString("RTESW/%1/selectedView").arg(m_pRTESet->getName()), m_pToolBox->currentIndex());
         }
     }
 
@@ -170,11 +167,11 @@ void RealTimeEvokedSetWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
     m_pRTESet = qSharedPointerDynamicCast<RealTimeEvokedSet>(pMeasurement);
 
     if(m_pRTESet) {
-        if(!m_bInitialized) {
-            if(m_pRTESet->isInitialized()) {
-                m_pFiffInfo = m_pRTESet->info();
+        if(m_pRTESet->isInitialized()) {
+            m_pFiffInfo = m_pRTESet->info();
 
-                init();
+            if(!m_bDisplayWidgetsInitialized) {
+                initDisplayControllWidgets();
             }
         } else {
             //Check if block size has changed, if yes update the filter
@@ -195,7 +192,7 @@ void RealTimeEvokedSetWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 //=============================================================================================================
 
-void RealTimeEvokedSetWidget::init()
+void RealTimeEvokedSetWidget::initDisplayControllWidgets()
 {
     if(m_pFiffInfo) {
         QSettings settings;
@@ -394,7 +391,7 @@ void RealTimeEvokedSetWidget::init()
         emit displayControlWidgetsChanged(lControlWidgets, t_sRTESName);
 
         //Initialized
-        m_bInitialized = true;
+        m_bDisplayWidgetsInitialized = true;
     }
 }
 

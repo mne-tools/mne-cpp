@@ -83,7 +83,6 @@ using namespace UTILSLIB;
 RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<QTime> &pTime,
                                                                QWidget* parent)
 : MeasurementWidget(parent)
-, m_bInitialized(false)
 , m_iMaxFilterTapSize(-1)
 {
     Q_UNUSED(pTime)
@@ -120,17 +119,19 @@ RealTimeMultiSampleArrayWidget::~RealTimeMultiSampleArrayWidget()
 
 void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    m_pRTMSA = qSharedPointerDynamicCast<RealTimeMultiSampleArray>(pMeasurement);
+    if(!m_pRTMSA) {
+        m_pRTMSA = qSharedPointerDynamicCast<RealTimeMultiSampleArray>(pMeasurement);
+    }
 
     if(m_pRTMSA) {
-        if(!m_bInitialized) {
-            if(m_pRTMSA->isChInit() && !m_pRTMSA->getMultiSampleArray().isEmpty()) {
-                m_pFiffInfo = m_pRTMSA->info();
-                m_iMaxFilterTapSize = m_pRTMSA->getMultiSampleArray().first().cols();
+        if(m_pRTMSA->isChInit() && !m_pFiffInfo) {
+            m_pFiffInfo = m_pRTMSA->info();
+            m_iMaxFilterTapSize = m_pRTMSA->getMultiSampleArray().first().cols();
 
-                init();
+            if(!m_bDisplayWidgetsInitialized) {
+                initDisplayControllWidgets();
             }
-        } else {
+        } else if (!m_pRTMSA->getMultiSampleArray().isEmpty()) {
             //Add data to table view
             m_pChannelDataView->addData(m_pRTMSA->getMultiSampleArray());
         }
@@ -139,7 +140,7 @@ void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::Measurement::SPtr pMeasur
 
 //=============================================================================================================
 
-void RealTimeMultiSampleArrayWidget::init()
+void RealTimeMultiSampleArrayWidget::initDisplayControllWidgets()
 {
     if(m_pFiffInfo) {        
         //Create table view and set layout
@@ -302,7 +303,7 @@ void RealTimeMultiSampleArrayWidget::init()
         emit displayControlWidgetsChanged(lControlWidgets, sRTMSAWName);
 
         //Initialized
-        m_bInitialized = true;
+        m_bDisplayWidgetsInitialized = true;
     }
 }
 

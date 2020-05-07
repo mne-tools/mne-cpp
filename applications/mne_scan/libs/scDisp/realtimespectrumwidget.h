@@ -96,14 +96,20 @@ public:
      * @param [in] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
      */
     RealTimeSpectrumWidget(QSharedPointer<SCMEASLIB::RealTimeSpectrum> pNE,
-                            QSharedPointer<QTime> &pTime,
-                            QWidget* parent = 0);
+                           QSharedPointer<QTime> &pTime,
+                           QWidget* parent = 0);
 
     //=========================================================================================================
     /**
      * Destroys the RealTimeSpectrumWidget.
      */
     ~RealTimeSpectrumWidget();
+
+    //=========================================================================================================
+    /**
+     * Initialise the MeasurementWidget.
+     */
+    virtual void init(){}
 
     //=========================================================================================================
     /**
@@ -121,12 +127,6 @@ public:
 
     //=========================================================================================================
     /**
-     * Initialise the RealTimeSpectrumWidget.
-     */
-    virtual void init();
-
-    //=========================================================================================================
-    /**
      * Initialise the SettingsWidget.
      */
     void initSettingsWidget();
@@ -134,6 +134,12 @@ public:
     bool eventFilter(QObject *object, QEvent *event);
 
 private:
+    //=========================================================================================================
+    /**
+     * Initialise the display control widgets to be shown in the QuickControlView.
+     */
+    void initDisplayControllWidgets();
+
     //=========================================================================================================
     /**
      * Broadcast settings of frequency spectrum settings widget
@@ -154,8 +160,6 @@ private:
 
     float m_fLowerFrqBound;         /**< Lower frequency bound */
     float m_fUpperFrqBound;         /**< Upper frequency bound */
-
-    bool m_bInitialized;            /**< Is Initialized */
 };
 } // NAMESPACE
 

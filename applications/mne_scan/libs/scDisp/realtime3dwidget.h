@@ -122,6 +122,12 @@ public:
 
     //=========================================================================================================
     /**
+     * Initialise the MeasurementWidget.
+     */
+    virtual void init(){}
+
+    //=========================================================================================================
+    /**
      * Is called when new data are available.
      *
      * @param [in] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
@@ -136,13 +142,13 @@ public:
      */
     void alignFiducials(const QString& sFilePath);
 
+protected:
     //=========================================================================================================
     /**
-     * Initialise the RealTime3DWidget.
+     * Initialise the display control widgets to be shown in the QuickControlView.
      */
-    virtual void init();
+    void initDisplayControllWidgets();
 
-protected:
     //=========================================================================================================
     /**
      * Creates the GUI.
@@ -150,8 +156,6 @@ protected:
     void createGUI();
 
     QString                                                     m_sFilePathDigitizers;
-
-    bool                                                        m_bInitialized;         /**< Whether init was processed successfully. */
 
     int                                                         m_iNumberBadChannels;   /**< The last received number of bad channels. */
 
