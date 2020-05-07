@@ -249,9 +249,9 @@ void FiffRawView::setWindowSize(int T)
     m_iT = T;
 
     m_pModel->setWindowSize(T,
-                            m_pTableView->width() /*- m_pTableView->columnWidth(0)*/,
+                            m_pTableView->width() - m_pTableView->verticalHeader()->width()/*- m_pTableView->columnWidth(0)*/,
                             iNewPos);
-    qDebug() << "FiffRawView::setWindowSize -- width:" << m_pTableView->width() << "," << m_pTableView->columnWidth(0) << "," << m_pTableView->columnWidth(1);
+    qDebug() << "FiffRawView::setWindowSize -- width:" << m_pTableView->width() << "," << m_pTableView->horizontalHeader()->width() << "," << m_pTableView->verticalHeader()->width();
 
     m_pTableView->resizeRowsToContents();
     m_pTableView->resizeColumnsToContents();

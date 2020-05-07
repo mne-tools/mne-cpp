@@ -199,6 +199,10 @@ public:
      */
     void updateView();
 
+    //=========================================================================================================
+    /**
+     * Moves data viewer to a position where the selected annotation is in the middle of the viewer.
+     */
     void updateScrollPosition();
 
 signals:
@@ -218,6 +222,15 @@ private:
      */
     void resizeEvent(QResizeEvent* event);
 
+    //=========================================================================================================
+    /**
+     * Catches events to performa specific action handling
+     *
+     * @param [in, out] object      pointer to object the event pertains to
+     * @param [in] event            type of object with associated data
+     *
+     * @return                      true if handled by custom event handling, false if not
+     */
     bool eventFilter(QObject *object, QEvent *event);
 
     QPointer<QTableView>                                m_pTableView;                   /**< Pointer to table view ui element */
