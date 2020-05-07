@@ -42,6 +42,7 @@ QT += testlib concurrent network
 QT -= gui
 
 CONFIG   += console
+CONFIG -= app_bundle
 
 TARGET = test_mne_anonymize
 
