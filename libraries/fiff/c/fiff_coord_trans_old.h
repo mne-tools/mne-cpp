@@ -181,6 +181,16 @@ public:
     //TODO: remove later on
     static FiffCoordTransOld* read_helper( QSharedPointer<FIFFLIB::FiffTag>& tag );
 
+    //========================================================================================================
+    /**
+     * Overloaded == operator to compare an object to this instance.
+     *
+     * @param[in] object    The object which should be compared to.
+     *
+     * @return true if equal, false otherwise
+     */
+    friend bool operator== (const FiffCoordTransOld &a, const FiffCoordTransOld &b);
+
 public:
     FIFFLIB::fiff_int_t from;       /**< Source coordinate system. */
     FIFFLIB::fiff_int_t to;         /**< Destination coordinate system. */
@@ -203,6 +213,16 @@ public:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+
+inline bool operator== (const FiffCoordTransOld &a, const FiffCoordTransOld &b)
+{
+    return (a.from == b.from &&
+            a.to == b.to &&
+            a.rot.isApprox(b.rot, 0.0001f) &&
+            a.move.isApprox(b.move, 0.0001f) &&
+            a.invrot.isApprox(b.invrot, 0.0001f) &&
+            a.invmove.isApprox(b.invmove, 0.0001f));
+}
 } // NAMESPACE FIFFLIB
 
 #endif // FIFFCOORDTRANSOLD_H
