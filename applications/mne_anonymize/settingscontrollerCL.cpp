@@ -77,7 +77,8 @@ SettingsControllerCL::SettingsControllerCL(const QStringList& arguments)
 , m_bInputFileDeleted(false)
 , m_bOutFileRenamed(false)
 {
-    QObject::connect(this,&MNEANONYMIZE::SettingsControllerCL::finished,qApp,&QCoreApplication::exit,Qt::QueuedConnection);
+    QObject::connect(this, &MNEANONYMIZE::SettingsControllerCL::finished,
+                     qApp, &QCoreApplication::exit, Qt::QueuedConnection);
 
     m_pAnonymizer = FiffAnonymizer::SPtr(new FiffAnonymizer);
     initParser();
