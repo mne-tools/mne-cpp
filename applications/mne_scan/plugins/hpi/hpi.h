@@ -158,6 +158,22 @@ private:
 
     //=========================================================================================================
     /**
+     * Call this function whenever the allowed head movement threshold changed.
+     *
+     * @param[in] dAllowedMeanErrorDist    Allowed movement threshold in mm.
+     */
+    void onAllowedMovementChanged(double dAllowedMovement);
+
+    //=========================================================================================================
+    /**
+     * Call this function whenever the allowed head rotation threshold changed.
+     *
+     * @param[in] dAllowedMeanErrorDist    Allowed rotation in degree.
+     */
+    void onAllowedRotationChanged(double dAllowedRotation);
+
+    //=========================================================================================================
+    /**
      * Call this funciton whenever new digitzers were loaded.
      *
      * @param[in] lDigitzers    The new digitzers.
@@ -240,6 +256,8 @@ private:
     qint16                      m_iNumberOfFitsPerSecond;   /**< The number of allowed HPI fits per second. Default is 3.*/
 
     double                      m_dAllowedMeanErrorDist;    /**< The allowed error distance in order for the last fit to be counted as a good fit.*/
+    double                      m_dAllowedMovement;         /**< The allowed head movement regarding last head position in mm.*/
+    double                      m_dAllowedRotation;         /**< The allowed head rotation regarding last head position in degree.*/
 
     bool                        m_bDoFreqOrder;             /**< Order Frequencies.*/
     bool                        m_bDoSingleHpi;             /**< Do a single HPI fit.*/
@@ -259,6 +277,8 @@ private:
 signals:
     void errorsChanged(const QVector<double>& vErrors,
                        double dMeanErrorDist);
+    void movementResultsChanged(double dMovement,
+                                double dRotation);
     void devHeadTransAvailable(const FIFFLIB::FiffCoordTrans& devHeadTrans);
 };
 } // NAMESPACE
