@@ -76,7 +76,7 @@ private slots:
     void initTestCase();
     void testDefaultOutput();
     void testDeleteInputFile();
-    void testInplace();
+    void testInPlace();
     void testInplaceAndDeleteInFile();
 
     //test anonymization
@@ -168,14 +168,14 @@ void TestMneAnonymize::testDeleteInputFile()
 
 //=============================================================================================================
 
-void TestMneAnonymize::testInplace()
+void TestMneAnonymize::testInPlace()
 {
     // Init testing arguments
     QString sFileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
     QString sFileInTest(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/testing1.fif");
     QString sFileOutTest(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/testing1.fif");
 
-    qInfo() << "\n\n-------------------------testInOutSameName-------------------------------------";
+    qInfo() << "\n\n-------------------------testInPlace-------------------------------------";
     qInfo() << "sFileIn" << sFileIn;
 
     QFile::copy(sFileIn,sFileInTest);
