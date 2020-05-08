@@ -221,7 +221,14 @@ void Hpi::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 void Hpi::initPluginControlWidgets()
 {
+    bool bFiffInfo = false;
+    m_mutex.lock();
     if(m_pFiffInfo) {
+        bFiffInfo = true;
+    }
+    m_mutex.unlock();
+
+    if(bFiffInfo) {
         QList<QWidget*> plControlWidgets;
 
         // Projects Settings
