@@ -76,12 +76,16 @@ RtFwdSettingsView::RtFwdSettingsView(const QString& sSettingsPath,
     m_ui->setupUi(this);
 
     // init
-    m_ui->m_spinBox_Movement->setValue(0);      // movement threshols = 3 mm
-    m_ui->m_spinBox_Rotation->setValue(0);      // rotation threshols = 5°
+    m_ui->m_checkBox_bDoRecomputation->setChecked(false);
+    m_ui->m_lineEdit_iNChan->setText(QString::number(0));
+    m_ui->m_lineEdit_iNSourceSpace->setText(QString::number(0));
+    m_ui->m_lineEdit_iNDipole->setText(QString::number(0));
+    m_ui->m_lineEdit_sSourceOri->setText("fixed");
+    m_ui->m_lineEdit_sCoordFrame->setText("Head Space");
 
     // connect
-    connect(m_ui->m_spinBox_Movement, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            this, &RtFwdSettingsView::allowedMoveThresholdChanged);
+    connect(m_ui->m_checkBox_bDoRecomputation, &QCheckBox::clicked,
+            this, &RtFwdSettingsView::recompStatusChanged);
 
     // load settings
     loadSettings(m_sSettingsPath);
@@ -107,13 +111,7 @@ void RtFwdSettingsView::loadSettings(const QString& settingsPath)
     QSettings settings;
     QVariant defaultData;
 
-//    defaultData.setValue(m_vCoilFreqs);
-//    m_vCoilFreqs = settings.value(settingsPath + QString("/coilFreqs"), defaultData).value<QVector<int> >();
-//    emit coilFrequenciesChanged(m_vCoilFreqs);
-
-//    m_ui->m_checkBox_useSSP->setChecked(settings.value(settingsPath + QString("/useSSP"), false).toBool());
-//    m_ui->m_checkBox_useComp->setChecked(settings.value(settingsPath + QString("/useCOMP"), false).toBool());
-//    m_ui->m_doubleSpinBox_maxHPIContinousDist->setValue(settings.value(settingsPath + QString("/maxError"), 10.0).toDouble());
+    m_ui->m_checkBox_bDoRecomputation->setChecked(settings.value(settingsPath + QString("/doRecomp"), false).toBool());
 }
 
 //=============================================================================================================
@@ -127,30 +125,61 @@ void RtFwdSettingsView::saveSettings(const QString& settingsPath)
     QSettings settings;
     QVariant data;
 
-//    data.setValue(m_vCoilFreqs);
-//    settings.setValue(settingsPath + QString("/coilFreqs"), data);
-
-//    data.setValue(m_ui->m_checkBox_useSSP->isChecked());
-//    settings.setValue(settingsPath + QString("/useSSP"), data);
-
-//    data.setValue(m_ui->m_checkBox_useComp->isChecked());
-//    settings.setValue(settingsPath + QString("/useCOMP"), data);
-
-//    data.setValue(m_ui->m_doubleSpinBox_maxHPIContinousDist->value());
-//    settings.setValue(settingsPath + QString("/maxError"), data);
+    data.setValue(m_ui->m_checkBox_bDoRecomputation->isChecked());
+    settings.setValue(settingsPath + QString("/doRecomp"), data);
 }
 
 //=============================================================================================================
 
-double RtFwdSettingsView::getAllowedMoveThresholdChanged()
+bool RtFwdSettingsView::getRecomputationStatusChanged()
 {
-    return m_ui->m_spinBox_Movement->value();
+    return m_ui->m_checkBox_bDoRecomputation->isChecked();
 }
 
 //=============================================================================================================
 
-double RtFwdSettingsView::getAllowedRotThresholdChanged()
+void RtFwdSettingsView::setRecomputationStatus(bool bRecomputationTriggered)
 {
-    return m_ui->m_spinBox_Rotation->value();
+    if(bRecomputationTriggered) {
+        m_ui->m_label_recomputationFeedback->setText("Triggered");
+        m_ui->m_label_recomputationFeedback->setStyleSheet("QLabel { background-color : red;}");
+    } else {
+        m_ui->m_label_recomputationFeedback->setText("Finished");
+        m_ui->m_label_recomputationFeedback->setStyleSheet("QLabel { background-color : green;}");
+    }
+}
+
+//=============================================================================================================
+
+void RtFwdSettingsView::setSolutionInformation(FIFFLIB::fiff_int_t iSourceOri,
+                                               FIFFLIB::fiff_int_t iCoordFrame,
+                                               int iNSource,
+                                               int iNChan,
+                                               int iNSpaces)
+{
+    // set source orientation
+    if(iSourceOri == 0) {
+        m_ui->m_lineEdit_sSourceOri->setText("fixed");
+    } else {
+        m_ui->m_lineEdit_sSourceOri->setText("free");
+    }
+
+    // set coordinate frame
+    if(iCoordFrame == FIFFV_COORD_HEAD) {
+        m_ui->m_lineEdit_sCoordFrame->setText("Head Space");
+    } else if (iCoordFrame == FIFFV_COORD_MRI){
+        m_ui->m_lineEdit_sCoordFrame->setText("MRI Space");
+    } else {
+        m_ui->m_lineEdit_sCoordFrame->setText("Unknown");
+    }
+
+    // set number of sources
+    m_ui->m_lineEdit_iNDipole->setText(QString::number(iNSource));
+
+    // set number of channels
+    m_ui->m_lineEdit_iNChan->setText(QString::number(iNChan));
+
+    // set number of source spaces
+    m_ui->m_lineEdit_iNSourceSpace->setText(QString::number(iNSpaces));
 }
 

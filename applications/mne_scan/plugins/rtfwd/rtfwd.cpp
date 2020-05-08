@@ -81,6 +81,7 @@ using namespace Eigen;
 
 RtFwd::RtFwd()
     : m_bBusy(false)
+    , m_bDoRecomputation(false)
     , m_pCircularBuffer(CircularBuffer<RealTimeHpiResult>::SPtr::create(40))
     , m_pFwdSettings(new ComputeFwdSettings)
 {
@@ -269,46 +270,46 @@ void RtFwd::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 //=============================================================================================================
 
-void RtFwd::onAllowedRotThresholdChanged(double dThreshRot)
-{
-    m_mutex.lock();
-    m_fThreshRot = dThreshRot;
-    m_mutex.unlock();
-}
-
-//=============================================================================================================
-
-void RtFwd::onAllowedMoveThresholdChanged(double dThreshMove)
-{
-    m_mutex.lock();
-    m_fThreshMove = dThreshMove/1000;   // to meter
-    m_mutex.unlock();
-}
-
-//=============================================================================================================
-
 void RtFwd::initPluginControlWidgets()
 {
+    bool bFiffInfo = false;
+    m_mutex.lock();
     if(m_pFiffInfo) {
+        bFiffInfo = true;
+    }
+    m_mutex.unlock();
+    if(bFiffInfo) {
         QList<QWidget*> plControlWidgets;
 
-//        RtFwdSettingsView* pRtFwdSettingsView = new RtFwdSettingsView(QString("MNESCAN/%1/").arg(this->getName()));
+        RtFwdSettingsView* pRtFwdSettingsView = new RtFwdSettingsView(QString("MNESCAN/%1/").arg(this->getName()));
 
-//        connect(pRtFwdSettingsView, &RtFwdSettingsView::allowedRotThresholdChanged,
-//                this, &RtFwd::onAllowedRotThresholdChanged);
+        // connect incoming signals
+        connect(pRtFwdSettingsView, &RtFwdSettingsView::recompStatusChanged,
+                this, &RtFwd::onRecompStatusChanged);
 
-//        connect(pRtFwdSettingsView, &RtFwdSettingsView::allowedMoveThresholdChanged,
-//                this, &RtFwd::onAllowedMoveThresholdChanged);
+        // connect outgoing signals
+        connect(this, &RtFwd::recompStatusChanged,
+                pRtFwdSettingsView, &RtFwdSettingsView::setRecomputationStatus, Qt::BlockingQueuedConnection);
+        connect(this, &RtFwd::fwdSolutionAvailable,
+                pRtFwdSettingsView, &RtFwdSettingsView::setSolutionInformation, Qt::BlockingQueuedConnection);
 
-//        onAllowedRotThresholdChanged(pRtFwdSettingsView->getAllowedRotThresholdChanged());
-//        onAllowedMoveThresholdChanged(pRtFwdSettingsView->getAllowedMoveThresholdChanged());
+        onRecompStatusChanged(pRtFwdSettingsView->getRecomputationStatusChanged());
 
-//        plControlWidgets.append(pRtFwdSettingsView);
+        plControlWidgets.append(pRtFwdSettingsView);
 
         emit pluginControlWidgetsChanged(plControlWidgets, this->getName());
 
         m_bPluginControlWidgetsInit = true;
     }
+}
+
+//=============================================================================================================
+
+void RtFwd::onRecompStatusChanged(bool bDoRecomputation)
+{
+    m_mutex.lock();
+    m_bDoRecomputation = bDoRecomputation;
+    m_mutex.unlock();
 }
 
 //=============================================================================================================
@@ -350,16 +351,27 @@ void RtFwd::run()
 
     m_pFwdOutput->data()->setMneFwd(m_pFwdSolution);
 
+    // emit results to control widget
+    emit fwdSolutionAvailable(m_pFwdSolution->source_ori,
+                              m_pFwdSolution->coord_frame,
+                              m_pFwdSolution->nsource,
+                              m_pFwdSolution->nchan,
+                              m_pFwdSolution->src.size());
+
+    // do recomputation if requested, not busy and transformation is different
     bool bIsLargeHeadMovement = false;
     bool bIsDifferent = false;
+    bool bDoRecomputation = false;
     while(!isInterruptionRequested()) {
         // Get the current data
         m_mutex.lock();
         bIsLargeHeadMovement = m_pHpiFitResult->bIsLargeHeadMovement;
         bIsDifferent = !(transMegHeadOld == m_pHpiFitResult->devHeadTrans.toOld());
+        bDoRecomputation = m_bDoRecomputation;
         m_mutex.unlock();
 
-        if(bIsLargeHeadMovement && bIsDifferent) {
+        if(bIsLargeHeadMovement && bIsDifferent && bDoRecomputation) {
+            emit recompStatusChanged(true);
             m_mutex.lock();
             m_bBusy = true;
             transMegHeadOld = m_pHpiFitResult->devHeadTrans.toOld();
@@ -370,7 +382,7 @@ void RtFwd::run()
             m_mutex.lock();
             m_bBusy = false;
             m_mutex.unlock();
-
+            emit recompStatusChanged(false);
             // send data
             m_pFwdOutput->data()->setSol(pComputeFwd->sol);
             m_pFwdOutput->data()->setSolGrad(pComputeFwd->sol_grad);
