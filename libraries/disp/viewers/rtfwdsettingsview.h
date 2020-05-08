@@ -40,6 +40,7 @@
 //=============================================================================================================
 
 #include "../disp_global.h"
+#include <fiff/fiff_types.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -90,20 +91,36 @@ public:
 
     //=========================================================================================================
     /**
-     * Get the allowed head movement.
+     * Get status of recomputation.
      *
-     * @return  The current allowed head movement.
+     * @return  The icurrent recomputation status checked.
      */
-    double getAllowedMoveThresholdChanged();
+    bool getRecomputationStatusChanged();
 
     //=========================================================================================================
     /**
-     * Get the allowed head rotation.
+     * Updates the recomputation status
      *
-     * @return  The current allowed head rotation.
+     * @param[in] bRecomputationStatus            if recomputation finished.
      */
-    double getAllowedRotThresholdChanged();
+    void setRecomputationStatus(bool bRecomputationStatus);
 
+    //=========================================================================================================
+    /**
+     * Updates forward solution information
+     *
+     * @param[in] iSourceOri    Source orientation: fixed or free.
+     * @param[in] iCoordFrame   Coil coordinate system definition.
+     * @param[in] iNSource      Number of source dipoles.
+     * @param[in] iNChan        Number of channels.
+     * @param[in] iNSpaces      Number of source spaces.
+     */
+
+    void setSolutionInformation(FIFFLIB::fiff_int_t iSourceOri,
+                                FIFFLIB::fiff_int_t iCoordFrame,
+                                int iNSource,
+                                int iNChan,
+                                int iNSpaces);
 protected:
 
     //=========================================================================================================
@@ -130,20 +147,11 @@ protected:
 signals:
     //=========================================================================================================
     /**
-     * Emit this signal whenever the allowed movement changed.
+     * Emit this signal whenever recomputation checkbox changed.
      *
-     * @param[in] dThreshRot    Allowed movement threhold in mm.
+     * @param[in] bChecked    Whether the recomputation check box is checked.
      */
-    void allowedMoveThresholdChanged(double dThreshMove);
-
-    //=========================================================================================================
-    /**
-     * Emit this signal whenever the allowed rotation changed.
-     *
-     * @param[in] dThreshRot    Allowed rotation threhold in degree.
-     */
-    void allowedRotThresholdChanged(double dThreshRot);
-
+    void recompStatusChanged(bool bChecked);
 };
 
 //=============================================================================================================
