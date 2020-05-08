@@ -299,6 +299,10 @@ void FiffSimulator::init()
                 idx += key.size();
 
                 QString sFileName = line.mid(idx, line.size()-idx);
+                if(sFileName.contains("<pathTo>"))
+                {
+                    sFileName.replace("<pathTo>",QCoreApplication::applicationDirPath());
+                }
 
                 QFile t_qFileMeas(sFileName);
 
@@ -317,7 +321,7 @@ void FiffSimulator::init()
 
     if(m_pRawMatrixBuffer)
         delete m_pRawMatrixBuffer;
-    m_pRawMatrixBuffer = NULL;
+    m_pRawMatrixBuffer = nullptr;
 
     if(!m_RawInfo.isEmpty())
         m_pRawMatrixBuffer = new CircularBuffer_Matrix_float(RAW_BUFFFER_SIZE);

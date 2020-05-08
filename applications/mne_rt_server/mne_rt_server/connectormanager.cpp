@@ -269,7 +269,7 @@ IConnector* ConnectorManager::getActiveConnector()
             return *it;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 //=============================================================================================================
@@ -383,7 +383,7 @@ void ConnectorManager::loadConnectors(const QString& dir)
         this->setFileName(ConnectorsDir.absoluteFilePath(fileName));
         QObject *pConnector = this->instance();
 
-        printf("\tLoading %s... ", fileName.toUtf8().constData() );
+        printf("Loading %s... \n", fileName.toUtf8().constData() );
 
         // IModule
         if(pConnector)
