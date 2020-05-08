@@ -83,7 +83,8 @@ SOURCES += \
     realtimeevokedset.cpp \
     realtimecov.cpp \
     realtimehpiresult.cpp \
-    realtimespectrum.cpp
+    realtimespectrum.cpp \
+    realtimefwdresult.cpp
 
 HEADERS += \
     scmeas_global.h \
@@ -97,7 +98,8 @@ HEADERS += \
     realtimeevokedset.h \
     realtimecov.h \
     realtimehpiresult.h \
-    realtimespectrum.h
+    realtimespectrum.h \
+    realtimefwdresult.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
