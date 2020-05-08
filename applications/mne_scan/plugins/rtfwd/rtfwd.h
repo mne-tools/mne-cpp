@@ -172,25 +172,18 @@ private:
 
     //=========================================================================================================
     /**
-     * Call this function whenever the allowed head rotation changed.
+     * Call this function whenever the arecompution status changed.
      *
-     * @param[in] dThreshRot    Allowed rotation in degree.
+     * @param[in] bDoRecomputation    If recomputation is activated.
      */
-    void onAllowedRotThresholdChanged(double dThreshRot);
-
-    //=========================================================================================================
-    /**
-     * Call this function whenever the allowed head movement changed.
-     *
-     * @param[in] dThreshMove   Allowed movement in mm.
-     */
-    void onAllowedMoveThresholdChanged(double dThreshMove);
+    void onRecompStatusChanged(bool bDoRecomputation);
 
     QMutex                              m_mutex;                /**< The threads mutex.*/
 
     float                               m_fThreshRot;           /**< The allowed rotation in degree.**/
     float                               m_fThreshMove;          /**< The Allowed movement in mm.**/
-    bool                                m_bBusy;       /**< Indicates if we have to update headposition.**/
+    bool                                m_bBusy;                /**< Indicates if we have to update headposition.**/
+    bool                                m_bDoRecomputation;     /**< If recomputation is activated.**/
 
     QSharedPointer<INVERSELIB::HpiFitResult>        m_pHpiFitResult;        /**< The Hpi fitting result.**/
 
@@ -212,7 +205,19 @@ signals:
     /**
      * Emitted when forward solution is available
      */
-    void fwdSolutionAvailable(const MNELIB::MNEForwardSolution& mneFwdSol);
+    void fwdSolutionAvailable(FIFFLIB::fiff_int_t iSourceOri,
+                              FIFFLIB::fiff_int_t iCoordFrame,
+                              int iNSource,
+                              int iNChan,
+                              int iNSpaces);
+
+    //=========================================================================================================
+    /**
+     * Emit this signal whenever recomputation status changed.
+     *
+     * @param[in] bTriggered   Whether the recomputation is triggered.
+     */
+    void recompStatusChanged(bool bTriggered);
 };
 } // NAMESPACE
 
