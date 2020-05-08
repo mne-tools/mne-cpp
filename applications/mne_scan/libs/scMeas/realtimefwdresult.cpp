@@ -71,14 +71,6 @@ RealTimeFwdResult::~RealTimeFwdResult()
 
 //=============================================================================================================
 
-QSharedPointer<MNEForwardSolution>& RealTimeFwdResult::getValue()
-{
-    QMutexLocker locker(&m_qMutex);
-    return m_pMneFwdSol;
-}
-
-//=============================================================================================================
-
 void RealTimeFwdResult::setFiffInfo(QSharedPointer<FiffInfo> pFiffInfo)
 {
     m_pFiffInfo = pFiffInfo;
@@ -93,14 +85,65 @@ QSharedPointer<FiffInfo> RealTimeFwdResult::getFiffInfo()
 
 //=============================================================================================================
 
-void RealTimeFwdResult::setValue(const MNEForwardSolution& v)
+QSharedPointer<MNEForwardSolution>& RealTimeFwdResult::getMneFwd()
+{
+    QMutexLocker locker(&m_qMutex);
+    return m_pMneFwdSol;
+}
+
+//=============================================================================================================
+
+
+void RealTimeFwdResult::setMneFwd(const MNELIB::MNEForwardSolution::SPtr& pV)
 {
     m_qMutex.lock();
     //Store
-    *m_pMneFwdSol = v;
+    m_pMneFwdSol = pV;
     m_bInitialized = true;
     m_qMutex.unlock();
 
     emit notify();
 }
 
+//=============================================================================================================
+
+QSharedDataPointer<FIFFLIB::FiffNamedMatrix>& RealTimeFwdResult::getSol()
+{
+    QMutexLocker locker(&m_qMutex);
+    return m_pSol;
+}
+
+//=============================================================================================================
+
+
+void RealTimeFwdResult::setSol(const FiffNamedMatrix::SDPtr& pV)
+{
+    m_qMutex.lock();
+    //Store
+    m_pSol = pV;
+    m_bInitialized = true;
+    m_qMutex.unlock();
+
+    emit notify();
+}
+//=============================================================================================================
+
+QSharedDataPointer<FIFFLIB::FiffNamedMatrix>& RealTimeFwdResult::getSolGrad()
+{
+    QMutexLocker locker(&m_qMutex);
+    return m_pSolGrad;
+}
+
+//=============================================================================================================
+
+
+void RealTimeFwdResult::setSolGrad(const FiffNamedMatrix::SDPtr& pV)
+{
+    m_qMutex.lock();
+    //Store
+    m_pSol = pV;
+    m_bInitialized = true;
+    m_qMutex.unlock();
+
+    emit notify();
+}

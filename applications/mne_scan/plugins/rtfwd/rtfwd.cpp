@@ -45,6 +45,7 @@
 #include <mne/mne_forwardsolution.h>
 
 #include <scMeas/realtimehpiresult.h>
+#include <scMeas/realtimefwdresult.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -125,11 +126,10 @@ void RtFwd::init()
             this, &RtFwd::update, Qt::DirectConnection);
     m_inputConnectors.append(m_pHpiInput);
 
-//    // Output - Uncomment this if you don't want to send processed data (in form of a matrix) to other plugins.
-//    // Also, this output stream will generate an online display in your plugin
-//    m_pOutput = PluginOutputData<RealTimeMultiSampleArray>::create(this, "rtFwdOut", "rtFwd output data");
-//    m_pOutput->data()->setName(this->getName());
-//    m_outputConnectors.append(m_pOutput);
+    // Output
+    m_pFwdOutput = PluginOutputData<RealTimeFwdResult>::create(this, "rtFwdOut", "rtFwd output data");
+    m_pFwdOutput->data()->setName(this->getName());//Provide name to auto store widget settings
+    m_outputConnectors.append(m_pFwdOutput);
 }
 
 //=============================================================================================================
@@ -172,6 +172,18 @@ bool RtFwd::start()
     if(!stream->open()) {
         QMessageBox msgBox;
         msgBox.setText("The mri - head transformation cannot be opend. Chosse another file.");
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
+        msgBox.exec();
+        stream->close();
+        return false;
+    }
+    stream->close();
+    QFile t_fMeas(m_pFwdSettings->measname);
+    stream = FiffStream::SPtr(new FiffStream(&t_fMri));
+    if(!stream->open()) {
+        QMessageBox msgBox;
+        msgBox.setText("The meaurement file cannot be opend. Chosse another file.");
         msgBox.setStandardButtons(QMessageBox::Ok);
         msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
         msgBox.exec();
@@ -280,19 +292,18 @@ void RtFwd::initPluginControlWidgets()
     if(m_pFiffInfo) {
         QList<QWidget*> plControlWidgets;
 
-        // Quick control widget here ?
-        RtFwdSettingsView* pRtFwdSettingsView = new RtFwdSettingsView(QString("MNESCAN/%1/").arg(this->getName()));
+//        RtFwdSettingsView* pRtFwdSettingsView = new RtFwdSettingsView(QString("MNESCAN/%1/").arg(this->getName()));
 
-        connect(pRtFwdSettingsView, &RtFwdSettingsView::allowedRotThresholdChanged,
-                this, &RtFwd::onAllowedRotThresholdChanged);
+//        connect(pRtFwdSettingsView, &RtFwdSettingsView::allowedRotThresholdChanged,
+//                this, &RtFwd::onAllowedRotThresholdChanged);
 
-        connect(pRtFwdSettingsView, &RtFwdSettingsView::allowedMoveThresholdChanged,
-                this, &RtFwd::onAllowedMoveThresholdChanged);
+//        connect(pRtFwdSettingsView, &RtFwdSettingsView::allowedMoveThresholdChanged,
+//                this, &RtFwd::onAllowedMoveThresholdChanged);
 
-        onAllowedRotThresholdChanged(pRtFwdSettingsView->getAllowedRotThresholdChanged());
-        onAllowedMoveThresholdChanged(pRtFwdSettingsView->getAllowedMoveThresholdChanged());
+//        onAllowedRotThresholdChanged(pRtFwdSettingsView->getAllowedRotThresholdChanged());
+//        onAllowedMoveThresholdChanged(pRtFwdSettingsView->getAllowedMoveThresholdChanged());
 
-        plControlWidgets.append(pRtFwdSettingsView);
+//        plControlWidgets.append(pRtFwdSettingsView);
 
         emit pluginControlWidgetsChanged(plControlWidgets, this->getName());
 
@@ -321,6 +332,7 @@ void RtFwd::run()
 
     m_mutex.lock();
     m_pFwdSettings->pFiffInfo = m_pFiffInfo;
+    m_pFwdOutput->data()->setFiffInfo(m_pFiffInfo);
     m_mutex.unlock();
 
     m_mutex.lock();
@@ -335,6 +347,8 @@ void RtFwd::run()
     // get Mne Forward Solution (in future this is not necessary, ComputeForward will have this as member)
     QFile t_fSolution(m_pFwdSettings->solname);
     m_pFwdSolution = MNEForwardSolution::SPtr(new MNEForwardSolution(t_fSolution));
+
+    m_pFwdOutput->data()->setMneFwd(m_pFwdSolution);
 
     bool bIsLargeHeadMovement = false;
     bool bIsDifferent = false;
@@ -356,12 +370,10 @@ void RtFwd::run()
             m_mutex.lock();
             m_bBusy = false;
             m_mutex.unlock();
-        }
-//        //Send the data to the connected plugins and the online display
-//        //Unocmment this if you also uncommented the m_pOutput in the constructor above
-//        if(!isInterruptionRequested()) {
-//            m_pOutput->data()->setValue(matData);
-//        }
 
+            // send data
+            m_pFwdOutput->data()->setSol(pComputeFwd->sol);
+            m_pFwdOutput->data()->setSolGrad(pComputeFwd->sol_grad);
+        }
     }
 }

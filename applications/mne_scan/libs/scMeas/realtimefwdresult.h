@@ -63,6 +63,11 @@ namespace FIFFLIB{
     class FiffInfo;
 }
 
+namespace MNELIB{
+    class MNEForwardSolution;
+}
+
+
 //=============================================================================================================
 // DEFINE NAMESPACE SCMEASLIB
 //=============================================================================================================
@@ -114,11 +119,11 @@ public:
 
     //=========================================================================================================
     /**
-     * New covariance to distribute
+     * New mne forward solution to distribute
      *
-     * @param [in] v     the covariance which should be distributed.
+     * @param [in] v     the forward solution which should be distributed.
      */
-    virtual void setValue(const MNELIB::MNEForwardSolution& v);
+    virtual void setMneFwd(const MNELIB::MNEForwardSolution::SPtr& pV);
 
     //=========================================================================================================
     /**
@@ -127,7 +132,42 @@ public:
      *
      * @return the last attached value.
      */
-    virtual QSharedPointer<MNELIB::MNEForwardSolution>& getValue();
+    virtual QSharedPointer<MNELIB::MNEForwardSolution>& getMneFwd();
+
+    //=========================================================================================================
+    /**
+     * New mne forward solution to distribute
+     *
+     * @param [in] v     the solution matrix (Lead Field) which should be distributed.
+     */
+    virtual void setSol(const FIFFLIB::FiffNamedMatrix::SDPtr& pV);
+
+    //=========================================================================================================
+    /**
+     * Returns the current value set.
+     * This method is inherited by Measurement.
+     *
+     * @return the last attached value.
+     */
+    virtual QSharedDataPointer<FIFFLIB::FiffNamedMatrix>& getSol();
+
+    //=========================================================================================================
+    /**
+     * New mne forward solution to distribute
+     *
+     * @param [in] v     the gradient solution matrix (Lead Field) which should be distributed.
+     */
+    virtual void setSolGrad(const FIFFLIB::FiffNamedMatrix::SDPtr& pV);
+
+    //=========================================================================================================
+    /**
+     * Returns the current value set.
+     * This method is inherited by Measurement.
+     *
+     * @return the last attached value.
+     */
+    virtual QSharedDataPointer<FIFFLIB::FiffNamedMatrix>& getSolGrad();
+
 
     //=========================================================================================================
     /**
@@ -141,8 +181,11 @@ private:
     mutable QMutex          m_qMutex;                                       /**< Mutex to ensure thread safety */
     bool                    m_bInitialized;                                 /**< If values are stored.*/
 
-    QSharedPointer<MNELIB::MNEForwardSolution>      m_pMneFwdSol;        /**< The HPI fit result. */
+    QSharedPointer<MNELIB::MNEForwardSolution>      m_pMneFwdSol;           /**< The Mne Forward Solution. */
     QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo;            /**< The Fiff Info. */
+
+    QSharedDataPointer<FIFFLIB::FiffNamedMatrix>    m_pSol;                 /**< The solution matrix (LF). */
+    QSharedDataPointer<FIFFLIB::FiffNamedMatrix>    m_pSolGrad;             /**< The gradient solution matrix (LF). */
 };
 
 //=============================================================================================================

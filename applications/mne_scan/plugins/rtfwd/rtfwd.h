@@ -50,7 +50,8 @@
 #include <inverse/hpiFit/hpifit.h>
 
 #include <scShared/Interfaces/IAlgorithm.h>
-#include <scMeas/realtimemultisamplearray.h>
+
+#include <scMeas/realtimefwdresult.h>
 #include <scMeas/realtimehpiresult.h>
 
 #include <utils/generics/circularbuffer.h>
@@ -81,8 +82,12 @@ namespace FWDLIB {
     class ComputeFwd;
 }
 
+namespace MNELIB{
+    class MNEForwardSolution;
+}
+
 namespace SCMEASLIB{
-    class RealTimeMultiSampleArray;
+    class RealTimeFwdResult;
     class RealTimeHpiResult;
 }
 
@@ -192,8 +197,8 @@ private:
     FIFFLIB::FiffInfo::SPtr             m_pFiffInfo;            /**< Fiff measurement info.*/
     FIFFLIB::FiffCoordTrans             m_transDevHead;         /**< Updated meg->head transformation. */
 
-    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeHpiResult>::SPtr            m_pHpiInput;    /**< The incoming Hpi Data.*/
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr    m_pOutput;      /**< The outgoing data.*/
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeHpiResult>::SPtr            m_pHpiInput;        /**< The incoming Hpi data.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeFwdResult>::SPtr       	m_pFwdOutput;       /**< The fwd solution.*/
 
     IOBUFFER::CircularBuffer<SCMEASLIB::RealTimeHpiResult>::SPtr    m_pCircularBuffer;      /**< Holds incoming data.*/
 
