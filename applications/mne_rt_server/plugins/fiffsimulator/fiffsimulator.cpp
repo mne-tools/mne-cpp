@@ -81,11 +81,11 @@ const QString FiffSimulator::Commands::SIMFILE      = "simfile";
 
 FiffSimulator::FiffSimulator()
 : m_pFiffProducer(new FiffProducer(this))
+, m_pRawMatrixBuffer(nullptr)
 , m_sResourceDataPath(QString("%1/MNE-sample-data/MEG/sample/sample_audvis_raw.fif").arg(QCoreApplication::applicationDirPath()))
 , m_uiBufferSampleSize(200)//(4)
 , m_AccelerationFactor(1.0)
 , m_TrueSamplingRate(0.0)
-, m_pRawMatrixBuffer(NULL)
 , m_bIsRunning(false)
 {
     this->init();
@@ -146,7 +146,7 @@ void FiffSimulator::comGetBufsize(Command p_command)
         //create JSON help object
         //
         QJsonObject t_qJsonObjectRoot;
-        t_qJsonObjectRoot.insert(Commands::BUFSIZE, QJsonValue((double)m_uiBufferSampleSize));
+        t_qJsonObjectRoot.insert(Commands::BUFSIZE, QJsonValue(static_cast<double>(m_uiBufferSampleSize)));
         QJsonDocument p_qJsonDocument(t_qJsonObjectRoot);
 
         m_commandManager[Commands::GETBUFSIZE].reply(p_qJsonDocument.toJson());
@@ -183,7 +183,7 @@ void FiffSimulator::comAccel(Command p_command)
             if(t_bWasRunning)
                 this->start();
 
-        QString str = QString("\tSet acceleration factor to %0.3f\r\n\n").arg(t_uiAccel);
+        QString str = QString("\tSet acceleration factor to %0.3f\r\n\n").arg(static_cast<double>(t_uiAccel));
 
         m_commandManager[Commands::ACCEL].reply(str);
     }
@@ -202,14 +202,14 @@ void FiffSimulator::comGetAccel(Command p_command)
         //create JSON help object
         //
         QJsonObject t_qJsonObjectRoot;
-        t_qJsonObjectRoot.insert(Commands::ACCEL, QJsonValue((double)m_AccelerationFactor));
+        t_qJsonObjectRoot.insert(Commands::ACCEL, QJsonValue(static_cast<double>(m_AccelerationFactor)));
         QJsonDocument p_qJsonDocument(t_qJsonObjectRoot);
 
         m_commandManager[Commands::GETACCEL].reply(p_qJsonDocument.toJson());
     }
     else
     {
-        QString str = QString("\t%0.3f\r\n\n").arg(m_AccelerationFactor);
+        QString str = QString("\t%0.3f\r\n\n").arg(static_cast<double>(m_AccelerationFactor));
         m_commandManager[Commands::GETACCEL].reply(str);
     }
 }
@@ -485,9 +485,9 @@ void FiffSimulator::run()
     m_bIsRunning = true;
 
     float t_fSamplingFrequency = m_RawInfo.info.sfreq;
-    float t_fBuffSampleSize = (float)m_uiBufferSampleSize;
+    float t_fBuffSampleSize = static_cast<float>(m_uiBufferSampleSize);
 
-    quint32 uiSamplePeriod = (unsigned int) ((t_fBuffSampleSize/t_fSamplingFrequency)*1000000.0f);
+    quint32 uiSamplePeriod = static_cast<unsigned int>(((t_fBuffSampleSize/t_fSamplingFrequency)*1000000.0f));
 
 //    quint32 count = 0;
     Eigen::MatrixXf matData;
