@@ -65,3 +65,29 @@ AppHandler::AppHandler()
 }
 
 //=============================================================================================================
+
+QCoreApplication* AppHandler::createApplication(int& argc, char* argv[])
+{
+    for (int i = 1; i < argc; ++i)
+    {
+        if (!qstrcmp(argv[i], "--gui"))
+        {
+            return new QApplication(argc, argv);
+        }
+    }
+    return new QCoreApplication(argc, argv);
+}
+
+//=============================================================================================================
+
+//SettingsControllerGUI* AppHandler::dispatch(QApplication& a)
+//{
+//     return new SettingsControllerGUI(a.arguments());
+//}
+
+//=============================================================================================================
+
+SettingsControllerCL* AppHandler::dispatch(QCoreApplication &a)
+{
+    return new SettingsControllerCL(a.arguments());
+}
