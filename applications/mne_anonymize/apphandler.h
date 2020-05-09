@@ -39,11 +39,16 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "settingscontrollerCL.h"
+//#include "settingscontrollerGUI.h"
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QCoreApplication>
+#include <QApplication>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -83,6 +88,67 @@ public:
     */
     AppHandler();
 
+    //=========================================================================================================
+    /**
+     * @brief Creates a QApplication or a QCoreApplication according tu user's preference for a command line or a
+     *  GUI application.
+     *
+     * @details Handles input arguments and searches for a "--no-gui" option. If found, this will create a
+     *  QCoreApplication so that main can execute the appplication as a command line one. If not found, it creates a
+     *  QApplication so that main can execute a GUI.
+     *
+     * @see QT Documentation
+     * @see https://doc.qt.io/qt-5/qapplication.html#details
+     *
+     * @param [in] argc (argument count) number of arguments on the command line.
+     * @param [in] argv (argument vector) an array of pointers to arrays of characters.
+     *
+     * @return Pointer to a QApplication or a QCoreApplication.
+     */
+    static QCoreApplication* createApplication(int& argc, char * argv[]);
+
+    //=========================================================================================================
+    /**
+     * @brief Creates a QApplication or a QCoreApplication according tu user's preference for a command line or a
+     *  GUI application.
+     *
+     * @details Handles input arguments and searches for a "--no-gui" option. If found, this will create a
+     *  QCoreApplication so that main can execute the appplication as a command line one. If not found, it creates a
+     *  QApplication so that main can execute a GUI.
+     *
+     * @see QT Documentation
+     * @see https://doc.qt.io/qt-5/qapplication.html#details
+     *
+     * @param [in] argc (argument count) number of arguments on the command line.
+     * @param [in] argv (argument vector) an array of pointers to arrays of characters.
+     *
+     * @return Pointer to a QApplication or a QCoreApplication.
+     */
+    /**
+    * Constructs an appropiate controller QApplication (GUI application).
+    */
+    //    . when inputing a QCoreApplication (command-line application).
+    static SettingsControllerCL* dispatch(QCoreApplication&);
+
+    //=========================================================================================================
+    /**
+     * @brief Creates a QApplication or a QCoreApplication according tu user's preference for a command line or a
+     *  GUI application.
+     *
+     * @details Handles input arguments and searches for a "--no-gui" option. If found, this will create a
+     *  QCoreApplication so that main can execute the appplication as a command line one. If not found, it creates a
+     *  QApplication so that main can execute a GUI.
+     *
+     * @see QT Documentation
+     * @see https://doc.qt.io/qt-5/qapplication.html#details
+     *
+     * @param [in] argc (argument count) number of arguments on the command line.
+     * @param [in] argv (argument vector) an array of pointers to arrays of characters.
+     *
+     * @return Pointer to a QApplication or a QCoreApplication.
+     */
+//    static SettingsControllerGUI dispatch(QApplication& a);
+
 protected:
 
 private:
@@ -96,6 +162,4 @@ private:
 
 } // namespace MNEANONYMIZE
 
-#endif // MNEANONYMIZE_APPHANDLER_H
-ass}')}
 #endif // MNEANONYMIZE_APPHANDLER_H
