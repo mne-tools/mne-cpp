@@ -90,11 +90,15 @@ public:
 
     //=========================================================================================================
     /**
+     * Default constructor for SettingsControllerCL object.
+     */
+    SettingsControllerCL();
+
+    //=========================================================================================================
+    /**
      * Constructs a SettingsControllerCL object.
      *
      * @param [in] arguments    String list containing the input arguments in form of a QStringList.
-     * @param [in] name         String containing the name of the application.
-     * @param [in] ver          String containing the version of the application.
      */
     SettingsControllerCL(const QStringList& arguments);
 
