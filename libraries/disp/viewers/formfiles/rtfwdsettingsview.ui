@@ -28,7 +28,11 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QLineEdit" name="m_lineEdit_iNSourceSpace"/>
+       <widget class="QLineEdit" name="m_lineEdit_iNSourceSpace">
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
       <item row="1" column="0">
        <widget class="QLabel" name="label_3">
@@ -38,7 +42,11 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QLineEdit" name="m_lineEdit_iNDipole"/>
+       <widget class="QLineEdit" name="m_lineEdit_iNDipole">
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
       <item row="4" column="0">
        <widget class="QLabel" name="label_6">
@@ -51,6 +59,9 @@
        <widget class="QLineEdit" name="m_lineEdit_sSourceOri">
         <property name="text">
          <string/>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -66,6 +77,9 @@
         <property name="text">
          <string/>
         </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
       <item row="6" column="0">
@@ -80,6 +94,9 @@
         <property name="text">
          <string/>
         </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
       <item row="3" column="0">
@@ -90,7 +107,11 @@
        </widget>
       </item>
       <item row="3" column="1">
-       <widget class="QLineEdit" name="m_lineEdit_iNDipoleClustered"/>
+       <widget class="QLineEdit" name="m_lineEdit_iNDipoleClustered">
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -101,14 +122,21 @@
       <string>Clustering</string>
      </property>
      <layout class="QFormLayout" name="formLayout_3">
-      <item row="0" column="0">
+      <item row="0" column="0" colspan="2">
        <widget class="QLabel" name="label_2">
         <property name="text">
          <string>Brain Atlas Directory</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
+      <item row="2" column="1">
+       <widget class="QPushButton" name="m_qPushButton_AtlasDirDialog">
+        <property name="text">
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
        <widget class="QLineEdit" name="m_qLineEdit_AtlasDirName">
         <property name="minimumSize">
          <size>
@@ -118,21 +146,20 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="QPushButton" name="m_qPushButton_AtlasDirDialog">
-        <property name="text">
-         <string>...</string>
+      <item row="7" column="0">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="m_qLabel_atlas">
-        <property name="text">
-         <string>(lh+rh).aparc.a2009s.annot</string>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>142</width>
+          <height>0</height>
+         </size>
         </property>
-       </widget>
+       </spacer>
       </item>
-      <item row="2" column="1">
+      <item row="3" column="1">
        <widget class="QLabel" name="m_qLabel_atlasStat">
         <property name="frameShape">
          <enum>QFrame::Panel</enum>
@@ -145,7 +172,14 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="0" colspan="2">
+      <item row="3" column="0">
+       <widget class="QLabel" name="m_qLabel_atlas">
+        <property name="text">
+         <string>(lh+rh).aparc.a2009s.annot</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
        <widget class="QCheckBox" name="m_checkBox_bDoClustering">
         <property name="text">
          <string>Do Clustering</string>
@@ -164,14 +198,14 @@
       <item row="0" column="0" colspan="2">
        <widget class="QCheckBox" name="m_checkBox_bDoRecomputation">
         <property name="text">
-         <string>Recompute forward solution after big headmovement</string>
+         <string>Recompute forward solution after head movement</string>
         </property>
        </widget>
       </item>
       <item row="1" column="0">
        <widget class="QLabel" name="label">
         <property name="text">
-         <string>Recomputation: </string>
+         <string>Status recomputation: </string>
         </property>
        </widget>
       </item>
