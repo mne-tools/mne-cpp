@@ -297,15 +297,13 @@ void RtFwd::initPluginControlWidgets()
                 this, &RtFwd::onAtlasDirChanged);
 
         // connect outgoing signals
-        connect(this, &RtFwd::recompStatusChanged,
+        connect(this, &RtFwd::statusInformationChanged,
                 pRtFwdSettingsView, &RtFwdSettingsView::setRecomputationStatus, Qt::BlockingQueuedConnection);
         connect(this, &RtFwd::fwdSolutionAvailable,
                 pRtFwdSettingsView, &RtFwdSettingsView::setSolutionInformation, Qt::BlockingQueuedConnection);
         connect(this, &RtFwd::clusteringAvailable,
                 pRtFwdSettingsView, &RtFwdSettingsView::setClusteredInformation, Qt::BlockingQueuedConnection);
 
-        onRecompStatusChanged(pRtFwdSettingsView->getRecomputationStatusChanged());
-        onClusteringStatusChanged(pRtFwdSettingsView->getClusteringStatusChanged());
         plControlWidgets.append(pRtFwdSettingsView);
 
         emit pluginControlWidgetsChanged(plControlWidgets, this->getName());
@@ -377,6 +375,7 @@ void RtFwd::run()
     m_mutex.unlock();
 
     // Compute initial Forward solution
+    emit statusInformationChanged(1);
     ComputeFwd::SPtr pComputeFwd = ComputeFwd::SPtr(new ComputeFwd(m_pFwdSettings));
     pComputeFwd->calculateFwd();
     pComputeFwd->storeFwd();
@@ -401,6 +400,7 @@ void RtFwd::run()
     bool bIsDifferent = false;
     bool bDoRecomputation = false;
     bool bDoClustering = false;
+    bool bFwdReady = true;
 
     while(!isInterruptionRequested()) {
         // Get the current data
@@ -412,7 +412,7 @@ void RtFwd::run()
 
         // do recomputation if requested
         if(bIsLargeHeadMovement && bIsDifferent && bDoRecomputation) {
-            emit recompStatusChanged(true);
+            emit statusInformationChanged(1);
             m_mutex.lock();
             m_bBusy = true;
             transMegHeadOld = m_pHpiFitResult->devHeadTrans.toOld();
@@ -423,21 +423,23 @@ void RtFwd::run()
             m_mutex.lock();
             m_bBusy = false;
             m_mutex.unlock();
-            emit recompStatusChanged(false);
             // send data
             m_pFwdOutput->data()->setSol(pComputeFwd->sol);
             m_pFwdOutput->data()->setSolGrad(pComputeFwd->sol_grad);
+            bFwdReady = true;
         }
 
         // do clustering if requested
         m_mutex.lock();
         bDoClustering = m_bDoClustering;
         m_mutex.unlock();
-        if(bDoClustering && bIsDifferent) {
+        if(bDoClustering && bFwdReady) {
+            emit statusInformationChanged(2);
+            bFwdReady = false;
             pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(pFwdSolution->cluster_forward_solution(*m_pAnnotationSet.data(), 200)));
             emit clusteringAvailable(pClusteredFwd->nsource);
             m_pFwdOutput->data()->setMneFwd(pClusteredFwd);
         }
-
+        emit statusInformationChanged(3);
     }
 }
