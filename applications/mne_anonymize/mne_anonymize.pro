@@ -71,13 +71,11 @@ DESTDIR = $${MNE_BINARY_DIR}
 SOURCES += main.cpp \
     apphandler.cpp \
     fiffanonymizer.cpp \
-    mainwindow.cpp \
     settingscontrollerCL.cpp
 
 HEADERS  += \
     apphandler.h \
     fiffanonymizer.h \
-    mainwindow.h \
     settingscontrollerCL.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
