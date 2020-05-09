@@ -104,11 +104,11 @@ public:
 
     //=========================================================================================================
     /**
-     * Updates the recomputation status
+     * Updates the clustering status (1 Recomp. Triggered, 2 Clustering, 3 Finished)
      *
-     * @param[in] bRecomputationStatus            if recomputation finished.
+     * @param[in] iStatus            status of recomputation.
      */
-    void setRecomputationStatus(bool bRecomputationStatus);
+    void setRecomputationStatus(int iStatus);
 
     //=========================================================================================================
     /**
@@ -117,14 +117,6 @@ public:
      * @return  Wheter clustering is checked or not.
      */
     bool getClusteringStatusChanged();
-
-    //=========================================================================================================
-    /**
-     * Updates the clustering status
-     *
-     * @param[in] bRecomputationStatus            if recomputation finished.
-     */
-    void setClusteringStatus(bool bRecomputationStatus);
 
     //=========================================================================================================
     /**
@@ -158,6 +150,15 @@ public:
 
     void setClusteredInformation(int iNSource);
 
+    //=========================================================================================================
+    /**
+     * Updates clustered forward solution information
+     *
+     * @param[in] bChecked      Whether the clustering check box is checked..
+     */
+
+    void onClusteringStatusChanged(bool bChecked);
+
 protected:
 
     //=========================================================================================================
@@ -175,6 +176,8 @@ protected:
      * @param[in] settingsPath        the path to load the settings from.
      */
     void loadSettings(const QString& settingsPath);
+
+    bool                                        m_bAnnotaionsLoaded;    /**< If the annotationset is loaded. */
 
     Ui::RtFwdSettingsViewWidget*                m_ui;                   /**< The rtFwd dialog. */
 
