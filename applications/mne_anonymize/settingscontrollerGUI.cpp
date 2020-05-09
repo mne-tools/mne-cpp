@@ -60,8 +60,7 @@ using namespace MNEANONYMIZE;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SettingsControllerGUI::SettingsControllerGUI(QObject *parent)
-    : QObject(parent)
+SettingsControllerGUI::SettingsControllerGUI()
 {
 }
 
