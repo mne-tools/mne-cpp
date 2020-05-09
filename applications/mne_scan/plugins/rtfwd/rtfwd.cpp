@@ -438,8 +438,14 @@ void RtFwd::run()
             bFwdReady = false;
             pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(pFwdSolution->cluster_forward_solution(*m_pAnnotationSet.data(), 200)));
             emit clusteringAvailable(pClusteredFwd->nsource);
-            m_pFwdOutput->data()->setMneFwd(pClusteredFwd);
         }
         emit statusInformationChanged(3);
+
+        // spill orward solution out
+        if(bDoRecomputation && !bDoClustering) {
+            m_pFwdOutput->data()->setMneFwd(pFwdSolution);
+        } else if (bDoClustering) {
+            m_pFwdOutput->data()->setMneFwd(pClusteredFwd);
+        }
     }
 }
