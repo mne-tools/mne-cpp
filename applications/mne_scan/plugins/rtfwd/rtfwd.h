@@ -172,33 +172,55 @@ private:
 
     //=========================================================================================================
     /**
-     * Call this function whenever the arecompution status changed.
+     * Call this function whenever the recompution status changed.
      *
      * @param[in] bDoRecomputation    If recomputation is activated.
      */
     void onRecompStatusChanged(bool bDoRecomputation);
 
-    QMutex                              m_mutex;                /**< The threads mutex.*/
+    //=========================================================================================================
+    /**
+     * Call this function whenever the clustering status changed.
+     *
+     * @param[in] bDoClustering   If clustering is activated.
+     */
+    void onClusteringStatusChanged(bool bDoRecomputation);
 
-    float                               m_fThreshRot;           /**< The allowed rotation in degree.**/
-    float                               m_fThreshMove;          /**< The Allowed movement in mm.**/
-    bool                                m_bBusy;                /**< Indicates if we have to update headposition.**/
-    bool                                m_bDoRecomputation;     /**< If recomputation is activated.**/
+    //=========================================================================================================
+    /**
+     * Call this function whenever the atlas directory is set.
+     *
+     * @param[in] sDirPath              The path to the atlas.
+     * @param[in] pAnnotationSet        The Annotation set.
+     */
+    void onAtlasDirChanged(const QString& sDirPath,
+                           const FSLIB::AnnotationSet::SPtr pAnnotationSet);
 
-    QSharedPointer<INVERSELIB::HpiFitResult>        m_pHpiFitResult;        /**< The Hpi fitting result.**/
 
-    FIFFLIB::FiffInfo::SPtr             m_pFiffInfo;            /**< Fiff measurement info.*/
-    FIFFLIB::FiffCoordTrans             m_transDevHead;         /**< Updated meg->head transformation. */
 
-    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeHpiResult>::SPtr            m_pHpiInput;        /**< The incoming Hpi data.*/
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeFwdResult>::SPtr       	m_pFwdOutput;       /**< The fwd solution.*/
+    QMutex                                      m_mutex;                /**< The threads mutex.*/
 
-    IOBUFFER::CircularBuffer<SCMEASLIB::RealTimeHpiResult>::SPtr    m_pCircularBuffer;      /**< Holds incoming data.*/
+    float                                       m_fThreshRot;           /**< The allowed rotation in degree.**/
+    float                                       m_fThreshMove;          /**< The Allowed movement in mm.**/
+    bool                                        m_bBusy;                /**< Indicates if we have to update headposition.**/
+    bool                                        m_bDoRecomputation;     /**< If recomputation is activated.**/
+    bool                                        m_bDoClustering;        /**< If clustering is activated.**/
+
+    QString                                     m_sAtlasDir;            /**< File to Atlas. */
+
+    QSharedPointer<INVERSELIB::HpiFitResult>    m_pHpiFitResult;        /**< The Hpi fitting result.**/
+
+    FIFFLIB::FiffInfo::SPtr                     m_pFiffInfo;            /**< Fiff measurement info.*/
+    FIFFLIB::FiffCoordTrans                     m_transDevHead;         /**< Updated meg->head transformation. */
+
+    QSharedPointer<FSLIB::AnnotationSet>                                m_pAnnotationSet;       /**< Annotation set. */
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeHpiResult>::SPtr    m_pHpiInput;            /**< The incoming Hpi data.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeFwdResult>::SPtr   m_pFwdOutput;           /**< The fwd solution.*/
+
+    IOBUFFER::CircularBuffer<SCMEASLIB::RealTimeHpiResult>::SPtr        m_pCircularBuffer;      /**< Holds incoming data.*/
 
 public:
     FWDLIB::ComputeFwdSettings::SPtr    m_pFwdSettings;         /**< Forward Solution Settings. */
-
-    MNELIB::MNEForwardSolution::SPtr    m_pFwdSolution;         /**< Forward Solution. */
 
 signals:
     //=========================================================================================================
@@ -213,11 +235,18 @@ signals:
 
     //=========================================================================================================
     /**
+     * Emitted when  clustered forward solution is available
+     */
+    void clusteringAvailable(int iNSource);
+
+    //=========================================================================================================
+    /**
      * Emit this signal whenever recomputation status changed.
      *
      * @param[in] bTriggered   Whether the recomputation is triggered.
      */
     void recompStatusChanged(bool bTriggered);
+
 };
 } // NAMESPACE
 
