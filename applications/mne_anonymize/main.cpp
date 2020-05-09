@@ -41,7 +41,7 @@
 //=============================================================================================================
 
 #include "settingscontrollerCL.h"
-#include "mainwindow.h"
+#include "apphandler.h"
 #include <utils/generics/applicationlogger.h>
 
 //=============================================================================================================
@@ -52,8 +52,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QApplication>
-#include <QCoreApplication>
+//#include <QApplication>
+//#include <QCoreApplication>
 //#include <QMainWindow>
 
 //=============================================================================================================
@@ -65,33 +65,6 @@ using namespace UTILSLIB;
 //=============================================================================================================
 // MAIN
 //=============================================================================================================
-/**
- * @brief Creates a QApplication or a QCoreApplication according tu user's preference for a command line or a
- *  GUI application.
- *
- * @details Handles input arguments and searches for a "--no-gui" option. If found, this will create a
- *  QCoreApplication so that main can execute the appplication as a command line one. If not found, it creates a
- *  QApplication so that main can execute a GUI.
- *
- * @see QT Documentation
- * @see https://doc.qt.io/qt-5/qapplication.html#details
- *
- * @param [in] argc (argument count) number of arguments on the command line.
- * @param [in] argv (argument vector) an array of pointers to arrays of characters.
- *
- * @return Pointer to a QApplication or a QCoreApplication.
- */
-QCoreApplication* createApplication(int &argc, char *argv[])
-{
-    for (int i = 1; i < argc; ++i)
-    {
-        if (!qstrcmp(argv[i], "--gui"))
-        {
-            return new QApplication(argc, argv);
-        }
-    }
-    return new QCoreApplication(argc, argv);
-}
 
 /**
  * The function main marks the entry point of the program.
@@ -106,21 +79,26 @@ int main(int argc, char* argv[])
 {
     qInstallMessageHandler(ApplicationLogger::customLogWriter);
 
-    QScopedPointer<QCoreApplication> qtApp(createApplication(argc, argv));
+    QScopedPointer<QCoreApplication>
+            qtApp(MNEANONYMIZE::AppHandler::createApplication(argc, argv));
 
     qtApp->setOrganizationName("MNE-CPP Project");
     qtApp->setApplicationName("MNE Anonymize");
     qtApp->setApplicationVersion("dev");
 
-    if (qobject_cast<QApplication *>(qtApp.data())) {
-        // to do -> develop GUI version...
-        //create reader object and parse data
+    QScopedPointer<MNEANONYMIZE::SettingsControllerCL>
+            controller(MNEANONYMIZE::AppHandler::dispatch(*qtApp));
+
+
+//    if (qobject_cast<QApplication *>(qtApp.data())) {
+//        // to do -> develop GUI version...
+//        //create reader object and parse data
 //        MainWindow w;
 //        w.show();
-    } else {
-        // start non-GUI version...
-        MNEANONYMIZE::SettingsControllerCL controllerCL(qtApp->arguments());
-    }
+//    } else {
+//        // start non-GUI version...
+//        MNEANONYMIZE::SettingsControllerCL controllerCL(qtApp->arguments());
+//    }
 
     return qtApp->exec();
 
