@@ -40,7 +40,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "settingscontrollerCL.h"
 #include "apphandler.h"
 #include <utils/generics/applicationlogger.h>
 
@@ -51,10 +50,6 @@
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-
-//#include <QApplication>
-//#include <QCoreApplication>
-//#include <QMainWindow>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -86,7 +81,7 @@ int main(int argc, char* argv[])
     qtApp->setApplicationName("MNE Anonymize");
     qtApp->setApplicationVersion("dev");
 
-    QScopedPointer<MNEANONYMIZE::SettingsControllerCL>
+    QScopedPointer<QObject>
             controller(MNEANONYMIZE::AppHandler::dispatch(*qtApp));
 
 
