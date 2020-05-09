@@ -83,6 +83,7 @@ namespace MNEANONYMIZE
 class SettingsControllerCL : public QObject
 {
     Q_OBJECT
+
 public:
     typedef QSharedPointer<SettingsControllerCL> SPtr;            /**< Shared pointer type for SettingsControllerCL. */
     typedef QSharedPointer<const SettingsControllerCL> ConstSPtr; /**< Const shared pointer type for SettingsControllerCL. */
