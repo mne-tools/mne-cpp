@@ -235,17 +235,17 @@ signals:
 
     //=========================================================================================================
     /**
-     * Emitted when  clustered forward solution is available
+     * Emitted whenever clustered forward solution is available
      */
     void clusteringAvailable(int iNSource);
 
     //=========================================================================================================
     /**
-     * Emit this signal whenever recomputation status changed.
+     * Emit this signal whenever the clustering status changed (1 Recomp. Triggered, 2 Clustering, 3 Finished).
      *
-     * @param[in] bTriggered   Whether the recomputation is triggered.
+     * @param[in] iStatus            status of recomputation.
      */
-    void recompStatusChanged(bool bTriggered);
+    void statusInformationChanged(int iStatus);
 
 };
 } // NAMESPACE
