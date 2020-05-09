@@ -546,8 +546,6 @@ void Hpi::run()
                     dErrorMax = m_dAllowedMeanErrorDist;
                     m_mutex.unlock();
                     if(dMeanErrorDist < dErrorMax) {
-                        m_pHpiOutput->data()->setValue(fitResult);
-
                         //If fit was good, set newly calculated transformation matrix to fiff info
                         emit devHeadTransAvailable(fitResult.devHeadTrans);
 
@@ -569,7 +567,7 @@ void Hpi::run()
                             fitResult.bIsLargeHeadMovement = true;
                             transDevHeadRef = fitResult.devHeadTrans;
                         }
-
+                        m_pHpiOutput->data()->setValue(fitResult);
                     }
                 }
 
