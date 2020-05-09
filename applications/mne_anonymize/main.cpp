@@ -108,6 +108,7 @@ int main(int argc, char* argv[])
 
     QScopedPointer<QCoreApplication> qtApp(createApplication(argc, argv));
 
+    qtApp->setOrganizationName("MNE-CPP Project");
     qtApp->setApplicationName("MNE Anonymize");
     qtApp->setApplicationVersion("dev");
 
