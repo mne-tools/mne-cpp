@@ -492,7 +492,11 @@
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QLineEdit" name="m_qLineEdit_moveResult"/>
+           <widget class="QLineEdit" name="m_qLineEdit_moveResult">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="label_rotResult">
@@ -502,7 +506,11 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QLineEdit" name="m_qLineEdit_rotResult"/>
+           <widget class="QLineEdit" name="m_qLineEdit_rotResult">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
           </item>
           <item row="2" column="0">
            <widget class="QLabel" name="label_largeResult">
