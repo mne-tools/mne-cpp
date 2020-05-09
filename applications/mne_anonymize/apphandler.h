@@ -39,9 +39,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "settingscontrollerCL.h"
-//#include "settingscontrollerGUI.h"
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -147,7 +144,7 @@ public:
      *
      * @return Pointer to a QApplication or a QCoreApplication.
      */
-//    static QObject* dispatch(QApplication& a);
+    static QObject* dispatch(QApplication&);
 
 protected:
 

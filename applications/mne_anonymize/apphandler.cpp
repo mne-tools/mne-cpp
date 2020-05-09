@@ -37,6 +37,8 @@
 //=============================================================================================================
 
 #include "apphandler.h"
+#include "settingscontrollerCL.h"
+#include "settingscontrollerGUI.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -80,10 +82,10 @@ QCoreApplication* AppHandler::createApplication(int& argc, char* argv[])
 
 //=============================================================================================================
 
-//QObject* AppHandler::dispatch(QApplication& a)
-//{
-//     return new SettingsControllerGUI(a.arguments());
-//}
+QObject* AppHandler::dispatch(QApplication& a)
+{
+     return new SettingsControllerGUI(a.arguments());
+}
 
 //=============================================================================================================
 
