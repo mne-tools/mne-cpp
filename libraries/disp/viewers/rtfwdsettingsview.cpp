@@ -72,6 +72,7 @@ RtFwdSettingsView::RtFwdSettingsView(const QString& sSettingsPath,
                                      QWidget *parent,
                                      Qt::WindowFlags f)
     : QWidget(parent, f)
+    , m_bAnnotaionsLoaded(false)
     , m_ui(new Ui::RtFwdSettingsViewWidget)
     , m_sSettingsPath(sSettingsPath)
 {
@@ -94,7 +95,7 @@ RtFwdSettingsView::RtFwdSettingsView(const QString& sSettingsPath,
     connect(m_ui->m_qPushButton_AtlasDirDialog, &QPushButton::released,
             this, &RtFwdSettingsView::showAtlasDirDialog);
     connect(m_ui->m_checkBox_bDoClustering, &QCheckBox::clicked,
-            this, &RtFwdSettingsView::clusteringStatusChanged);
+            this, &RtFwdSettingsView::onClusteringStatusChanged);
 
     // load settings
     loadSettings(m_sSettingsPath);
@@ -120,8 +121,8 @@ void RtFwdSettingsView::loadSettings(const QString& settingsPath)
     QSettings settings;
     QVariant defaultData;
 
-    m_ui->m_checkBox_bDoRecomputation->setChecked(settings.value(settingsPath + QString("/doRecomp"), false).toBool());
-    m_ui->m_checkBox_bDoClustering->setChecked(settings.value(settingsPath + QString("/doCluster"), false).toBool());
+    // m_ui->m_checkBox_bDoRecomputation->setChecked(settings.value(settingsPath + QString("/doRecomp"), false).toBool());
+    // m_ui->m_checkBox_bDoClustering->setChecked(settings.value(settingsPath + QString("/doCluster"), false).toBool());
 }
 
 //=============================================================================================================
@@ -135,10 +136,10 @@ void RtFwdSettingsView::saveSettings(const QString& settingsPath)
     QSettings settings;
     QVariant data;
 
-    data.setValue(m_ui->m_checkBox_bDoRecomputation->isChecked());
-    settings.setValue(settingsPath + QString("/doRecomp"), data);
-    data.setValue(m_ui->m_checkBox_bDoClustering->isChecked());
-    settings.setValue(settingsPath + QString("/doCluster"), data);
+//    data.setValue(m_ui->m_checkBox_bDoRecomputation->isChecked());
+//    settings.setValue(settingsPath + QString("/doRecomp"), data);
+//    data.setValue(m_ui->m_checkBox_bDoClustering->isChecked());
+//    settings.setValue(settingsPath + QString("/doCluster"), data);
 }
 
 //=============================================================================================================
@@ -150,10 +151,13 @@ bool RtFwdSettingsView::getRecomputationStatusChanged()
 
 //=============================================================================================================
 
-void RtFwdSettingsView::setRecomputationStatus(bool bRecomputationTriggered)
+void RtFwdSettingsView::setRecomputationStatus(int iStatus)
 {
-    if(bRecomputationTriggered) {
-        m_ui->m_label_recomputationFeedback->setText("Triggered");
+    if(iStatus == 1) {
+        m_ui->m_label_recomputationFeedback->setText("Recomputing");
+        m_ui->m_label_recomputationFeedback->setStyleSheet("QLabel { background-color : red;}");
+    } else if (iStatus == 2) {
+        m_ui->m_label_recomputationFeedback->setText("Clustering");
         m_ui->m_label_recomputationFeedback->setStyleSheet("QLabel { background-color : red;}");
     } else {
         m_ui->m_label_recomputationFeedback->setText("Finished");
@@ -207,6 +211,21 @@ bool RtFwdSettingsView::getClusteringStatusChanged()
 
 //=============================================================================================================
 
+void RtFwdSettingsView::onClusteringStatusChanged(bool bChecked)
+{
+    if(!m_bAnnotaionsLoaded) {
+        QMessageBox msgBox;
+        msgBox.setText("Please load an annotation set before clustering.");
+        msgBox.exec();
+        m_ui->m_checkBox_bDoClustering->setChecked(false);
+        return;
+    } else {
+        emit clusteringStatusChanged(bChecked);
+    }
+}
+
+//=============================================================================================================
+
 void RtFwdSettingsView::setClusteredInformation(int iNSources)
 {
     // set number of clustered sources
@@ -218,7 +237,7 @@ void RtFwdSettingsView::setClusteredInformation(int iNSources)
 void RtFwdSettingsView::showAtlasDirDialog()
 {
     QString t_sAtlasDir = QFileDialog::getExistingDirectory(this, tr("Open Atlas Directory"),
-                                                            QString(),
+                                                            QCoreApplication::applicationDirPath(),
                                                             QFileDialog::ShowDirsOnly
                                                             | QFileDialog::DontResolveSymlinks);
 
@@ -233,6 +252,7 @@ void RtFwdSettingsView::showAtlasDirDialog()
         //m_pMNE->m_pRTSEOutput->data()->setAnnotSet(t_pAnnotationSet);
 
         m_ui->m_qLabel_atlasStat->setText("loaded");
+        m_bAnnotaionsLoaded = true;
     }
     else
     {
