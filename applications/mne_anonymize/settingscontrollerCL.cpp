@@ -80,8 +80,9 @@ SettingsControllerCL::SettingsControllerCL()
 //    QObject::connect(this, &MNEANONYMIZE::SettingsControllerCL::finished,
 //                     qApp, &QCoreApplication::exit, Qt::QueuedConnection);
 
-    m_pAnonymizer = FiffAnonymizer::SPtr(new FiffAnonymizer);
-    initParser();
+//    m_pAnonymizer = FiffAnonymizer::SPtr(new FiffAnonymizer);
+//    initParser();
+
 //    if(parseInputs(arguments))
 //    {
 //        qCritical() << "Something went wrong during the parsing of input options.";
