@@ -128,7 +128,7 @@ public:
     * Constructs an appropiate controller QApplication (GUI application).
     */
     //    . when inputing a QCoreApplication (command-line application).
-    static SettingsControllerCL* dispatch(QCoreApplication&);
+    static QObject* dispatch(QCoreApplication&);
 
     //=========================================================================================================
     /**
@@ -147,7 +147,7 @@ public:
      *
      * @return Pointer to a QApplication or a QCoreApplication.
      */
-//    static SettingsControllerGUI dispatch(QApplication& a);
+//    static QObject* dispatch(QApplication& a);
 
 protected:
 
