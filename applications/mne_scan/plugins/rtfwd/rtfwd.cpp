@@ -41,6 +41,7 @@
 
 #include <fwd/computeFwd/compute_fwd.h>
 #include <fwd/computeFwd/compute_fwd_settings.h>
+#include <fs/annotationset.h>
 
 #include <mne/mne_forwardsolution.h>
 
@@ -69,6 +70,7 @@ using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
 using namespace IOBUFFER;
 using namespace FWDLIB;
+using namespace FSLIB;
 using namespace FIFFLIB;
 using namespace INVERSELIB;
 using namespace MNELIB;
@@ -82,6 +84,7 @@ using namespace Eigen;
 RtFwd::RtFwd()
     : m_bBusy(false)
     , m_bDoRecomputation(false)
+    , m_bDoClustering(false)
     , m_pCircularBuffer(CircularBuffer<RealTimeHpiResult>::SPtr::create(40))
     , m_pFwdSettings(new ComputeFwdSettings)
 {
@@ -120,6 +123,7 @@ QSharedPointer<IPlugin> RtFwd::clone() const
 void RtFwd::init()
 {
     // Inits
+    m_pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet);
 
     // Input
     m_pHpiInput = PluginInputData<RealTimeHpiResult>::create(this, "rtFwdIn", "rtFwd input data");
@@ -224,7 +228,7 @@ IPlugin::PluginType RtFwd::getType() const
 
 QString RtFwd::getName() const
 {
-    return "Real-Time Forward Solution";
+    return "Forward Solution";
 }
 
 //=============================================================================================================
@@ -282,19 +286,26 @@ void RtFwd::initPluginControlWidgets()
         QList<QWidget*> plControlWidgets;
 
         RtFwdSettingsView* pRtFwdSettingsView = new RtFwdSettingsView(QString("MNESCAN/%1/").arg(this->getName()));
+        pRtFwdSettingsView->setObjectName("widget_");
 
         // connect incoming signals
         connect(pRtFwdSettingsView, &RtFwdSettingsView::recompStatusChanged,
                 this, &RtFwd::onRecompStatusChanged);
+        connect(pRtFwdSettingsView, &RtFwdSettingsView::clusteringStatusChanged,
+                this, &RtFwd::onClusteringStatusChanged);
+        connect(pRtFwdSettingsView, &RtFwdSettingsView::atlasDirChanged,
+                this, &RtFwd::onAtlasDirChanged);
 
         // connect outgoing signals
         connect(this, &RtFwd::recompStatusChanged,
                 pRtFwdSettingsView, &RtFwdSettingsView::setRecomputationStatus, Qt::BlockingQueuedConnection);
         connect(this, &RtFwd::fwdSolutionAvailable,
                 pRtFwdSettingsView, &RtFwdSettingsView::setSolutionInformation, Qt::BlockingQueuedConnection);
+        connect(this, &RtFwd::clusteringAvailable,
+                pRtFwdSettingsView, &RtFwdSettingsView::setClusteredInformation, Qt::BlockingQueuedConnection);
 
         onRecompStatusChanged(pRtFwdSettingsView->getRecomputationStatusChanged());
-
+        onClusteringStatusChanged(pRtFwdSettingsView->getClusteringStatusChanged());
         plControlWidgets.append(pRtFwdSettingsView);
 
         emit pluginControlWidgetsChanged(plControlWidgets, this->getName());
@@ -309,6 +320,31 @@ void RtFwd::onRecompStatusChanged(bool bDoRecomputation)
 {
     m_mutex.lock();
     m_bDoRecomputation = bDoRecomputation;
+    m_mutex.unlock();
+}
+
+//=============================================================================================================
+
+void RtFwd::onClusteringStatusChanged(bool bDoClustering)
+{
+    if(m_pAnnotationSet->isEmpty()) {
+        QMessageBox msgBox;
+        msgBox.setText("Please load an annotation set befor clustering.");
+        msgBox.exec();
+        return;
+    }
+    m_mutex.lock();
+    m_bDoClustering = bDoClustering;
+    m_mutex.unlock();
+}
+
+//=============================================================================================================
+
+void RtFwd::onAtlasDirChanged(const QString& sDirPath, const AnnotationSet::SPtr pAnnotationSet)
+{
+    m_mutex.lock();
+    m_sAtlasDir = sDirPath;
+    m_pAnnotationSet = pAnnotationSet;
     m_mutex.unlock();
 }
 
@@ -347,21 +383,25 @@ void RtFwd::run()
 
     // get Mne Forward Solution (in future this is not necessary, ComputeForward will have this as member)
     QFile t_fSolution(m_pFwdSettings->solname);
-    m_pFwdSolution = MNEForwardSolution::SPtr(new MNEForwardSolution(t_fSolution));
-
-    m_pFwdOutput->data()->setMneFwd(m_pFwdSolution);
+    MNEForwardSolution::SPtr pFwdSolution = MNEForwardSolution::SPtr(new MNEForwardSolution(t_fSolution));
 
     // emit results to control widget
-    emit fwdSolutionAvailable(m_pFwdSolution->source_ori,
-                              m_pFwdSolution->coord_frame,
-                              m_pFwdSolution->nsource,
-                              m_pFwdSolution->nchan,
-                              m_pFwdSolution->src.size());
+    emit fwdSolutionAvailable(pFwdSolution->source_ori,
+                              pFwdSolution->coord_frame,
+                              pFwdSolution->nsource,
+                              pFwdSolution->nchan,
+                              pFwdSolution->src.size());
+
+    MNEForwardSolution::SPtr pClusteredFwd;
+
+    m_pFwdOutput->data()->setMneFwd(pFwdSolution);
 
     // do recomputation if requested, not busy and transformation is different
     bool bIsLargeHeadMovement = false;
     bool bIsDifferent = false;
     bool bDoRecomputation = false;
+    bool bDoClustering = false;
+
     while(!isInterruptionRequested()) {
         // Get the current data
         m_mutex.lock();
@@ -370,6 +410,7 @@ void RtFwd::run()
         bDoRecomputation = m_bDoRecomputation;
         m_mutex.unlock();
 
+        // do recomputation if requested
         if(bIsLargeHeadMovement && bIsDifferent && bDoRecomputation) {
             emit recompStatusChanged(true);
             m_mutex.lock();
@@ -377,8 +418,8 @@ void RtFwd::run()
             transMegHeadOld = m_pHpiFitResult->devHeadTrans.toOld();
             m_mutex.unlock();
             pComputeFwd->updateHeadPos(&transMegHeadOld);
-            m_pFwdSolution->sol = pComputeFwd->sol;
-            m_pFwdSolution->sol_grad = pComputeFwd->sol_grad;
+            pFwdSolution->sol = pComputeFwd->sol;
+            pFwdSolution->sol_grad = pComputeFwd->sol_grad;
             m_mutex.lock();
             m_bBusy = false;
             m_mutex.unlock();
@@ -387,5 +428,16 @@ void RtFwd::run()
             m_pFwdOutput->data()->setSol(pComputeFwd->sol);
             m_pFwdOutput->data()->setSolGrad(pComputeFwd->sol_grad);
         }
+
+        // do clustering if requested
+        m_mutex.lock();
+        bDoClustering = m_bDoClustering;
+        m_mutex.unlock();
+        if(bDoClustering && bIsDifferent) {
+            pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(pFwdSolution->cluster_forward_solution(*m_pAnnotationSet.data(), 200)));
+            emit clusteringAvailable(pClusteredFwd->nsource);
+            m_pFwdOutput->data()->setMneFwd(pClusteredFwd);
+        }
+
     }
 }
