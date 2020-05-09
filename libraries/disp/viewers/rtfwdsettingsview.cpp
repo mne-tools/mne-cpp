@@ -38,6 +38,7 @@
 
 #include "rtfwdsettingsview.h"
 #include "ui_rtfwdsettingsview.h"
+#include <fs/annotationset.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -57,6 +58,7 @@
 //=============================================================================================================
 
 using namespace DISPLIB;
+using namespace FSLIB;
 
 //=============================================================================================================
 // DEFINE GLOBAL METHODS
@@ -77,15 +79,22 @@ RtFwdSettingsView::RtFwdSettingsView(const QString& sSettingsPath,
 
     // init
     m_ui->m_checkBox_bDoRecomputation->setChecked(false);
+    m_ui->m_checkBox_bDoClustering->setChecked(false);
     m_ui->m_lineEdit_iNChan->setText(QString::number(0));
     m_ui->m_lineEdit_iNSourceSpace->setText(QString::number(0));
     m_ui->m_lineEdit_iNDipole->setText(QString::number(0));
     m_ui->m_lineEdit_sSourceOri->setText("fixed");
     m_ui->m_lineEdit_sCoordFrame->setText("Head Space");
+    m_ui->m_lineEdit_iNDipoleClustered->setText("Not Clustered");
+    m_ui->m_qLineEdit_AtlasDirName->setText(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/label");
 
     // connect
     connect(m_ui->m_checkBox_bDoRecomputation, &QCheckBox::clicked,
             this, &RtFwdSettingsView::recompStatusChanged);
+    connect(m_ui->m_qPushButton_AtlasDirDialog, &QPushButton::released,
+            this, &RtFwdSettingsView::showAtlasDirDialog);
+    connect(m_ui->m_checkBox_bDoClustering, &QCheckBox::clicked,
+            this, &RtFwdSettingsView::clusteringStatusChanged);
 
     // load settings
     loadSettings(m_sSettingsPath);
@@ -112,6 +121,7 @@ void RtFwdSettingsView::loadSettings(const QString& settingsPath)
     QVariant defaultData;
 
     m_ui->m_checkBox_bDoRecomputation->setChecked(settings.value(settingsPath + QString("/doRecomp"), false).toBool());
+    m_ui->m_checkBox_bDoClustering->setChecked(settings.value(settingsPath + QString("/doCluster"), false).toBool());
 }
 
 //=============================================================================================================
@@ -127,6 +137,8 @@ void RtFwdSettingsView::saveSettings(const QString& settingsPath)
 
     data.setValue(m_ui->m_checkBox_bDoRecomputation->isChecked());
     settings.setValue(settingsPath + QString("/doRecomp"), data);
+    data.setValue(m_ui->m_checkBox_bDoClustering->isChecked());
+    settings.setValue(settingsPath + QString("/doCluster"), data);
 }
 
 //=============================================================================================================
@@ -176,6 +188,9 @@ void RtFwdSettingsView::setSolutionInformation(FIFFLIB::fiff_int_t iSourceOri,
     // set number of sources
     m_ui->m_lineEdit_iNDipole->setText(QString::number(iNSource));
 
+    // set number of clustered sources
+    m_ui->m_lineEdit_iNDipoleClustered->setText("Not clustered");
+
     // set number of channels
     m_ui->m_lineEdit_iNChan->setText(QString::number(iNChan));
 
@@ -183,3 +198,45 @@ void RtFwdSettingsView::setSolutionInformation(FIFFLIB::fiff_int_t iSourceOri,
     m_ui->m_lineEdit_iNSourceSpace->setText(QString::number(iNSpaces));
 }
 
+//=============================================================================================================
+
+bool RtFwdSettingsView::getClusteringStatusChanged()
+{
+    return m_ui->m_checkBox_bDoClustering->isChecked();
+}
+
+//=============================================================================================================
+
+void RtFwdSettingsView::setClusteredInformation(int iNSources)
+{
+    // set number of clustered sources
+    m_ui->m_lineEdit_iNDipoleClustered->setText(QString::number(iNSources));
+}
+
+//=============================================================================================================
+
+void RtFwdSettingsView::showAtlasDirDialog()
+{
+    QString t_sAtlasDir = QFileDialog::getExistingDirectory(this, tr("Open Atlas Directory"),
+                                                            QString(),
+                                                            QFileDialog::ShowDirsOnly
+                                                            | QFileDialog::DontResolveSymlinks);
+
+    m_ui->m_qLineEdit_AtlasDirName->setText(t_sAtlasDir);
+
+    AnnotationSet::SPtr t_pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet(t_sAtlasDir+"/lh.aparc.a2009s.annot", t_sAtlasDir+"/rh.aparc.a2009s.annot"));
+
+    if(!t_pAnnotationSet->isEmpty() && t_pAnnotationSet->size() == 2)
+    {
+        emit atlasDirChanged(t_sAtlasDir,t_pAnnotationSet);
+
+        //m_pMNE->m_pRTSEOutput->data()->setAnnotSet(t_pAnnotationSet);
+
+        m_ui->m_qLabel_atlasStat->setText("loaded");
+    }
+    else
+    {
+//        m_pMNE->m_pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet());
+        m_ui->m_qLabel_atlasStat->setText("not loaded");
+    }
+}

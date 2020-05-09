@@ -41,6 +41,7 @@
 
 #include "../disp_global.h"
 #include <fiff/fiff_types.h>
+#include <fs/annotationset.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -56,6 +57,10 @@
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+
+namespace FSLIB {
+    class AnnotationSet;
+}
 
 namespace Ui {
     class RtFwdSettingsViewWidget;
@@ -107,6 +112,28 @@ public:
 
     //=========================================================================================================
     /**
+     * Get status of clustering.
+     *
+     * @return  Wheter clustering is checked or not.
+     */
+    bool getClusteringStatusChanged();
+
+    //=========================================================================================================
+    /**
+     * Updates the clustering status
+     *
+     * @param[in] bRecomputationStatus            if recomputation finished.
+     */
+    void setClusteringStatus(bool bRecomputationStatus);
+
+    //=========================================================================================================
+    /**
+     * Shows atlas selection dialog
+     */
+    void showAtlasDirDialog();
+
+    //=========================================================================================================
+    /**
      * Updates forward solution information
      *
      * @param[in] iSourceOri    Source orientation: fixed or free.
@@ -121,6 +148,16 @@ public:
                                 int iNSource,
                                 int iNChan,
                                 int iNSpaces);
+
+    //=========================================================================================================
+    /**
+     * Updates clustered forward solution information
+     *
+     * @param[in] iNSource      Number of source dipoles.
+     */
+
+    void setClusteredInformation(int iNSource);
+
 protected:
 
     //=========================================================================================================
@@ -139,7 +176,6 @@ protected:
      */
     void loadSettings(const QString& settingsPath);
 
-
     Ui::RtFwdSettingsViewWidget*                m_ui;                   /**< The rtFwd dialog. */
 
     QString                                     m_sSettingsPath;        /**< The settings path to store the GUI settings to. */
@@ -152,6 +188,25 @@ signals:
      * @param[in] bChecked    Whether the recomputation check box is checked.
      */
     void recompStatusChanged(bool bChecked);
+
+    //=========================================================================================================
+    /**
+     * Emit this signal whenever clustering checkbox changed.
+     *
+     * @param[in] bChecked    Whether the clustering check box is checked.
+     */
+    void clusteringStatusChanged(bool bChecked);
+
+    //=========================================================================================================
+    /**
+     * Emit this signal whenever the atlas directory is set.
+     *
+     * @param[in] sDirPath              The path to the atlas.
+     * @param[in] pAnnotationSet        The Annotation set.
+     */
+    void atlasDirChanged(const QString& sDirPath,
+                         const FSLIB::AnnotationSet::SPtr pAnnotationSet);
+
 };
 
 //=============================================================================================================
