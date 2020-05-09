@@ -39,14 +39,13 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "settingscontrollerCL.h"
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QMainWindow>
-#include <QObject>
 #include <QSharedPointer>
-#include <QWidget>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -73,7 +72,7 @@ namespace MNEANONYMIZE {
  *
  * @brief Brief description of this class.
  */
-class SettingsControllerGUI : public QObject
+class SettingsControllerGUI : public SettingsControllerCL
 {
     Q_OBJECT
 
@@ -85,7 +84,7 @@ public:
     /**
     * Constructs a SettingsControllerGUI object.
     */
-    explicit SettingsControllerGUI(QObject *parent = 0);
+    explicit SettingsControllerGUI(QObject *parent = nullptr);
 
 protected:
 
