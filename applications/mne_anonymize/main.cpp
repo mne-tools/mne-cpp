@@ -84,17 +84,6 @@ int main(int argc, char* argv[])
     QScopedPointer<QObject>
             controller(MNEANONYMIZE::AppHandler::dispatch(*qtApp));
 
-
-//    if (qobject_cast<QApplication *>(qtApp.data())) {
-//        // to do -> develop GUI version...
-//        //create reader object and parse data
-//        MainWindow w;
-//        w.show();
-//    } else {
-//        // start non-GUI version...
-//        MNEANONYMIZE::SettingsControllerCL controllerCL(qtApp->arguments());
-//    }
-
     return qtApp->exec();
 
 }
