@@ -84,8 +84,7 @@ public:
     /**
     * Constructs a SettingsControllerGUI object.
     */
-//    const QStringList& arguments
-    explicit SettingsControllerGUI();
+    explicit SettingsControllerGUI(const QStringList& arguments);
 
 protected:
 
