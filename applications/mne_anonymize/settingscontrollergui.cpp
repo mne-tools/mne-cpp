@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     settingscontrollerGUI.h
+ * @file     settingscontrollergui.cpp
  * @author   Juan GPC <juangpc@gmail.com>
  * @since    0.1.0
  * @date     May, 2020
@@ -28,77 +28,41 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     SettingsControllerGUI class declaration.
+ * @brief    SettingsControllerGUI class definition.
  *
  */
-
-#ifndef MNEANONYMIZE_SETTINGSCONTROLLERGUI_H
-#define MNEANONYMIZE_SETTINGSCONTROLLERGUI_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "settingscontrollerCL.h"
+#include "settingscontrollergui.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-
-#include <QSharedPointer>
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace MNEANONYMIZE;
+
+//=============================================================================================================
+// DEFINE GLOBAL METHODS
 //=============================================================================================================
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNEANONYMIZE
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-namespace MNEANONYMIZE {
-
-
-//=============================================================================================================
-// MNEANONYMIZE FORWARD DECLARATIONS
-//=============================================================================================================
-
-//=============================================================================================================
-/**
- * Description of what this class is intended to do (in detail).
- *
- * @brief Brief description of this class.
- */
-class SettingsControllerGUI : public SettingsControllerCL
+SettingsControllerGUI::SettingsControllerGUI(const QStringList& arguments)
 {
-    Q_OBJECT
 
-public:
-    typedef QSharedPointer<SettingsControllerGUI> SPtr;            /**< Shared pointer type for SettingsControllerGUI. */
-    typedef QSharedPointer<const SettingsControllerGUI> ConstSPtr; /**< Const shared pointer type for SettingsControllerGUI. */
-
-    //=========================================================================================================
-    /**
-    * Constructs a SettingsControllerGUI object.
-    */
-    explicit SettingsControllerGUI(const QStringList& arguments);
-
-protected:
-
-private:
-
-signals:
-};
+}
 
 //=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
-
-
-} // namespace MNEANONYMIZE
-
-#endif // MNEANONYMIZE_SETTINGSCONTROLLERGUI_H
-
