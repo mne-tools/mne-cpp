@@ -421,12 +421,12 @@ void RtFwd::run()
     m_pRTFSOutput->data()->setMneFwd(pFwdSolution);
 
     // do recomputation if requested, not busy and transformation is different
-    bool bIsLargeHeadMovement = false;
-    bool bIsDifferent = false;
-    bool bDoRecomputation = false;
-    bool bDoClustering = false;
-    bool bFwdReady = true;
-    bool bHpiConnectected = false;
+    bool bIsLargeHeadMovement = false;          // indicate if movement was large
+    bool bIsDifferent = false;                  // indicate if incoming transformation matrix is different
+    bool bDoRecomputation = false;              // indicate if we want to recompute
+    bool bDoClustering = false;                 // indicate if we want to cluster
+    bool bFwdReady = true;                      // only cluster if fwd is ready
+    bool bHpiConnectected = false;              // only update/recompute if hpi is connected
 
     while(!isInterruptionRequested()) {
         // Get the current data
@@ -444,9 +444,9 @@ void RtFwd::run()
             bDoRecomputation = m_bDoRecomputation;
             m_mutex.unlock();
 
-            // do recomputation if requested
+            // do recomputation if requested, a large head movement occured and devHeadTrans is different
             if(bIsLargeHeadMovement && bIsDifferent && bDoRecomputation) {
-                emit statusInformationChanged(1);
+                emit statusInformationChanged(1);       // Recomputing
                 m_mutex.lock();
                 m_bBusy = true;
                 transMegHeadOld = m_pHpiFitResult->devHeadTrans.toOld();
@@ -467,19 +467,19 @@ void RtFwd::run()
                 }
             }
         }
-        // do clustering if requested
+        // do clustering if requested and fwd is ready
         m_mutex.lock();
         bDoClustering = m_bDoClustering;
         m_mutex.unlock();
         if(bDoClustering && bFwdReady) {
-            emit statusInformationChanged(2);
+            emit statusInformationChanged(2);           // Clustering
             pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(pFwdSolution->cluster_forward_solution(*m_pAnnotationSet.data(), 200)));
             emit clusteringAvailable(pClusteredFwd->nsource);
 
             m_pRTFSOutput->data()->setMneFwd(pClusteredFwd);
             bFwdReady = false;
         }
-        emit statusInformationChanged(3);
+        emit statusInformationChanged(3);               //finished
 
     }
 }
