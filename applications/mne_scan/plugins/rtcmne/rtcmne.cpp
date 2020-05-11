@@ -132,7 +132,7 @@ QSharedPointer<IPlugin> RtcMne::clone() const
 void RtcMne::init()
 {
     // Inits
-    m_pFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_qFileFwdSolution, false, true));
+    //m_pFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_qFileFwdSolution, false, true));
     m_pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet(m_sAtlasDir+"/lh.aparc.a2009s.annot", m_sAtlasDir+"/rh.aparc.a2009s.annot"));
     m_pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet(m_sSurfaceDir+"/lh.inflated", m_sSurfaceDir+"/rh.inflated"));
 
@@ -171,9 +171,9 @@ void RtcMne::init()
         m_pRTSEOutput->data()->setSurfSet(m_pSurfaceSet);
     }
 
-    if(m_pFwd->nchan != -1) {
-        m_pRTSEOutput->data()->setFwdSolution(m_pFwd);
-    }
+//    if(m_pFwd->nchan != -1) {
+//        m_pRTSEOutput->data()->setFwdSolution(m_pFwd);
+//    }
 }
 
 //=============================================================================================================
@@ -347,23 +347,23 @@ void RtcMne::finishedClustering()
 
 bool RtcMne::start()
 {
-    if(m_pFwd->nchan == -1) {
-        QMessageBox msgBox;
-        msgBox.setText("The forward solution has not been loaded yet.");
-        msgBox.setStandardButtons(QMessageBox::Ok);
-        msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
-        msgBox.exec();
-        return false;
-    }
+//    if(m_pFwd->nchan == -1) {
+//        QMessageBox msgBox;
+//        msgBox.setText("The forward solution has not been loaded yet.");
+//        msgBox.setStandardButtons(QMessageBox::Ok);
+//        msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
+//        msgBox.exec();
+//        return false;
+//    }
 
-    if(!m_pFwd->isClustered()) {
-        QMessageBox msgBox;
-        msgBox.setText("The forward solution has not been clustered yet. Please click the Start Clustering button in the Source Localization plugin.");
-        msgBox.setStandardButtons(QMessageBox::Ok);
-        msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
-        msgBox.exec();
-        return false;
-    }
+//    if(!m_pFwd->isClustered()) {
+//        QMessageBox msgBox;
+//        msgBox.setText("The forward solution has not been clustered yet. Please click the Start Clustering button in the Source Localization plugin.");
+//        msgBox.setStandardButtons(QMessageBox::Ok);
+//        msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
+//        msgBox.exec();
+//        return false;
+//    }
 
     QThread::start();
     return true;
@@ -416,41 +416,43 @@ QWidget* RtcMne::setupWidget()
 
 void RtcMne::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
+    if(m_pFwd) {
+        QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
 
-    if(pRTMSA && this->isRunning()) {
-        //Fiff Information of the RTMSA
-        m_qMutex.lock();
-        if(!m_pFiffInfoInput) {
-            m_pFiffInfoInput = pRTMSA->info();
-            m_iNumAverages = 1;
-            m_bRawInput = true;
-        }
-        m_qMutex.unlock();
+        if(pRTMSA && this->isRunning()) {
+            //Fiff Information of the RTMSA
+            m_qMutex.lock();
+            if(!m_pFiffInfoInput) {
+                m_pFiffInfoInput = pRTMSA->info();
+                m_iNumAverages = 1;
+                m_bRawInput = true;
+            }
+            m_qMutex.unlock();
 
-        if(!m_bPluginControlWidgetsInit) {
-            initPluginControlWidgets();
-        }
+            if(!m_bPluginControlWidgetsInit) {
+                initPluginControlWidgets();
+            }
 
-        if(this->isRunning() && m_pMinimumNorm) {
-            // Check for artifacts
-            QMap<QString,double> mapReject;
-            mapReject.insert("eog", 150e-06);
+            if(this->isRunning() && m_pMinimumNorm) {
+                // Check for artifacts
+                QMap<QString,double> mapReject;
+                mapReject.insert("eog", 150e-06);
 
-            for(qint32 i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
-                bool bArtifactDetected = MNEEpochDataList::checkForArtifact(pRTMSA->getMultiSampleArray()[i],
-                                                                            *m_pFiffInfoInput,
-                                                                            mapReject);
+                for(qint32 i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
+                    bool bArtifactDetected = MNEEpochDataList::checkForArtifact(pRTMSA->getMultiSampleArray()[i],
+                                                                                *m_pFiffInfoInput,
+                                                                                mapReject);
 
-                if(!bArtifactDetected) {
-                    // Please note that we do not need a copy here since this function will block until
-                    // the buffer accepts new data again. Hence, the data is not deleted in the actual
-                    // Measurement function after it emitted the notify signal.
-                    while(!m_pCircularMatrixBuffer->push(pRTMSA->getMultiSampleArray()[i])) {
-                        //Do nothing until the circular buffer is ready to accept new data again
+                    if(!bArtifactDetected) {
+                        // Please note that we do not need a copy here since this function will block until
+                        // the buffer accepts new data again. Hence, the data is not deleted in the actual
+                        // Measurement function after it emitted the notify signal.
+                        while(!m_pCircularMatrixBuffer->push(pRTMSA->getMultiSampleArray()[i])) {
+                            //Do nothing until the circular buffer is ready to accept new data again
+                        }
+                    } else {
+                        qDebug() << "RtcMne::updateRTMSA - Reject data block";
                     }
-                } else {
-                    qDebug() << "RtcMne::updateRTMSA - Reject data block";
                 }
             }
         }
@@ -461,23 +463,25 @@ void RtcMne::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 void RtcMne::updateRTC(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    QSharedPointer<RealTimeCov> pRTC = pMeasurement.dynamicCast<RealTimeCov>();
+    if(m_pFwd) {
+        QSharedPointer<RealTimeCov> pRTC = pMeasurement.dynamicCast<RealTimeCov>();
 
-    if(pRTC && this->isRunning()) {
-        // Init Real-Time inverse estimator
-        if(!m_pRtInvOp && m_pFiffInfo && m_pFwd) {
-            m_pRtInvOp = RtInvOp::SPtr(new RtInvOp(m_pFiffInfo, m_pFwd));
-            connect(m_pRtInvOp.data(), &RtInvOp::invOperatorCalculated,
-                    this, &RtcMne::updateInvOp);
-        }
+        if(pRTC && this->isRunning()) {
+            // Init Real-Time inverse estimator
+            if(!m_pRtInvOp && m_pFiffInfo && m_pFwd) {
+                m_pRtInvOp = RtInvOp::SPtr(new RtInvOp(m_pFiffInfo, m_pFwd));
+                connect(m_pRtInvOp.data(), &RtInvOp::invOperatorCalculated,
+                        this, &RtcMne::updateInvOp);
+            }
 
-        //Fiff Information of the covariance
-        if(m_qListCovChNames.size() != pRTC->getValue()->names.size()) {
-            m_qListCovChNames = pRTC->getValue()->names;
-        }
+            //Fiff Information of the covariance
+            if(m_qListCovChNames.size() != pRTC->getValue()->names.size()) {
+                m_qListCovChNames = pRTC->getValue()->names;
+            }
 
-        if(this->isRunning() && m_pRtInvOp){
-            m_pRtInvOp->append(*pRTC->getValue());
+            if(this->isRunning() && m_pRtInvOp){
+                m_pRtInvOp->append(*pRTC->getValue());
+            }
         }
     }
 }
@@ -542,7 +546,6 @@ void RtcMne::updateInvOp(const MNEInverseOperator& invOp)
     QMutexLocker locker(&m_qMutex);
 
     m_invOp = invOp;
-    qDebug() << "Update InvOp";
     double snr = 1.0;
     double lambda2 = 1.0 / pow(snr, 2); //ToDo estimate lambda using covariance
 
@@ -557,12 +560,19 @@ void RtcMne::updateInvOp(const MNEInverseOperator& invOp)
 
 void RtcMne::updateRTFS(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    QSharedPointer<RealTimeFwdSolution> pRTFS = pMeasurement.dynamicCast<RealTimeFwdSolution>();
+    if(QSharedPointer<RealTimeFwdSolution> pRTFS = pMeasurement.dynamicCast<RealTimeFwdSolution>()) {
 
-    if(pRTFS->isClustered()) {
-        m_qMutex.lock();
-        m_pFwd = pRTFS->getValue();
-        m_qMutex.unlock();
+        if(pRTFS->isClustered()) {
+            m_qMutex.lock();
+            m_pFwd = pRTFS->getValue();
+            m_qMutex.unlock();
+        } else if(!pRTFS->isClustered()) {
+            QMessageBox msgBox;
+            msgBox.setText("The forward solution has not been clustered yet.");
+            msgBox.setStandardButtons(QMessageBox::Ok);
+            msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
+            msgBox.exec();
+        }
     }
 }
 
