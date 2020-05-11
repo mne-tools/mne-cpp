@@ -6,7 +6,7 @@
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Wayne Mead <wayne.mead@uth.tmc.edu>;
  *           John C. Mosher <John.C.Mosher@uth.tmc.edu>
- * @version  dev
+ * @since    0.1.0
  * @date     September, 2019
  *
  * @section  LICENSE
@@ -36,8 +36,8 @@
  *
  */
 
-#ifndef MNEANONYMIZE_SettingsControllerCL_H
-#define MNEANONYMIZE_SettingsControllerCL_H
+#ifndef MNEANONYMIZE_SETTINGSCONTROLLERCL_H
+#define MNEANONYMIZE_SETTINGSCONTROLLERCL_H
 
 //=============================================================================================================
 // INCLUDES
@@ -203,7 +203,6 @@ private:
     void printIfVerbose(const QString& str) const;
 
 signals:
-    //=========================================================================================================
     /**
      * Signal the main qt core application to stop running and exit.
      */
@@ -245,4 +244,4 @@ inline void SettingsControllerCL::printIfVerbose(const QString& str) const
 
 } // namespace MNEANONYMIZE
 
-#endif // MNEANONYMIZE_SettingsControllerCL_H
+#endif // MNEANONYMIZE_SETTINGSCONTROLLERCL_H
