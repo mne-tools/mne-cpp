@@ -1,6 +1,6 @@
 ﻿//=============================================================================================================
 /**
- * @file     SettingsControllerCL.cpp
+ * @file     settingscontrollercl.cpp
  * @author   Wayne Mead <wayne.mead@uth.tmc.edu>;
  *           Juan Garcia-Prieto <juangpc@gmail.com>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>;
@@ -40,7 +40,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "settingscontrollerCL.h"
+#include "settingscontrollercl.h"
 #include "fiffanonymizer.h"
 
 //=============================================================================================================
