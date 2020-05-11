@@ -46,7 +46,7 @@
 #include <mne/mne_forwardsolution.h>
 
 #include <scMeas/realtimehpiresult.h>
-#include <scMeas/realtimefwdresult.h>
+#include <scMeas/realtimefwdsolution.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -132,9 +132,9 @@ void RtFwd::init()
     m_inputConnectors.append(m_pHpiInput);
 
     // Output
-    m_pFwdOutput = PluginOutputData<RealTimeFwdResult>::create(this, "rtFwdOut", "rtFwd output data");
-    m_pFwdOutput->data()->setName(this->getName());//Provide name to auto store widget settings
-    m_outputConnectors.append(m_pFwdOutput);
+    m_pRTFSOutput = PluginOutputData<RealTimeFwdSolution>::create(this, "rtFwdOut", "rtFwd output data");
+    m_pRTFSOutput->data()->setName(this->getName());//Provide name to auto store widget settings
+    m_outputConnectors.append(m_pRTFSOutput);
 }
 
 //=============================================================================================================
@@ -367,7 +367,7 @@ void RtFwd::run()
 
     m_mutex.lock();
     m_pFwdSettings->pFiffInfo = m_pFiffInfo;
-    m_pFwdOutput->data()->setFiffInfo(m_pFiffInfo);
+    m_pRTFSOutput->data()->setFiffInfo(m_pFiffInfo);
     m_mutex.unlock();
 
     m_mutex.lock();
@@ -393,7 +393,7 @@ void RtFwd::run()
 
     MNEForwardSolution::SPtr pClusteredFwd;
 
-    m_pFwdOutput->data()->setMneFwd(pFwdSolution);
+    m_pRTFSOutput->data()->setMneFwd(pFwdSolution);
 
     // do recomputation if requested, not busy and transformation is different
     bool bIsLargeHeadMovement = false;
@@ -424,8 +424,8 @@ void RtFwd::run()
             m_bBusy = false;
             m_mutex.unlock();
             // send data
-            m_pFwdOutput->data()->setSol(pComputeFwd->sol);
-            m_pFwdOutput->data()->setSolGrad(pComputeFwd->sol_grad);
+            m_pRTFSOutput->data()->setSol(pComputeFwd->sol);
+            m_pRTFSOutput->data()->setSolGrad(pComputeFwd->sol_grad);
             bFwdReady = true;
         }
 
@@ -443,9 +443,9 @@ void RtFwd::run()
 
         // spill orward solution out
         if(bDoRecomputation && !bDoClustering) {
-            m_pFwdOutput->data()->setMneFwd(pFwdSolution);
+            m_pRTFSOutput->data()->setMneFwd(pFwdSolution);
         } else if (bDoClustering) {
-            m_pFwdOutput->data()->setMneFwd(pClusteredFwd);
+            m_pRTFSOutput->data()->setMneFwd(pClusteredFwd);
         }
     }
 }

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     realtimefwdresult.h
+ * @file     realtimefwdsolution.h
  * @author   Ruben Dörfel <ruben.doerfel@tu-ilmenau.de>
  * @since    0.1.0
  * @date     May, 2020
@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains the declaration of the RealTimeFwdResult class.
+ * @brief    Contains the declaration of the RealTimeFwdSolution class.
  *
  */
 
@@ -77,29 +77,29 @@ namespace SCMEASLIB
 
 //=========================================================================================================
 /**
- * DECLARE CLASS RealTimeFwdResult
+ * DECLARE CLASS RealTimeFwdSolution
  *
- * @brief The RealTimeFwdResult class provides a container for real-time HPI fitting results.
+ * @brief The RealTimeFwdSolution class provides a container for real-time HPI fitting results.
  */
-class SCMEASSHARED_EXPORT RealTimeFwdResult : public Measurement
+class SCMEASSHARED_EXPORT RealTimeFwdSolution : public Measurement
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<RealTimeFwdResult> SPtr;               /**< Shared pointer type for RealTimeFwdResult. */
-    typedef QSharedPointer<const RealTimeFwdResult> ConstSPtr;    /**< Const shared pointer type for RealTimeFwdResult. */
+    typedef QSharedPointer<RealTimeFwdSolution> SPtr;               /**< Shared pointer type for RealTimeFwdSolution. */
+    typedef QSharedPointer<const RealTimeFwdSolution> ConstSPtr;    /**< Const shared pointer type for RealTimeFwdSolution. */
 
     //=========================================================================================================
     /**
-     * Constructs a RealTimeFwdResult.
+     * Constructs a RealTimeFwdSolution.
      */
-    explicit RealTimeFwdResult(QObject *parent = 0);
+    explicit RealTimeFwdSolution(QObject *parent = 0);
 
     //=========================================================================================================
     /**
-     * Destroys the RealTimeFwdResult.
+     * Destroys the RealTimeFwdSolution.
      */
-    virtual ~RealTimeFwdResult();
+    virtual ~RealTimeFwdSolution();
 
     //=========================================================================================================
     /**
@@ -171,9 +171,9 @@ public:
 
     //=========================================================================================================
     /**
-     * Returns whether RealTimeFwdResult contains values
+     * Returns whether RealTimeFwdSolution contains values
      *
-     * @return whether RealTimeFwdResult contains values.
+     * @return whether RealTimeFwdSolution contains values.
      */
     inline bool isInitialized() const;
 
@@ -192,7 +192,7 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool RealTimeFwdResult::isInitialized() const
+inline bool RealTimeFwdSolution::isInitialized() const
 {
     QMutexLocker locker(&m_qMutex);
     return m_bInitialized;
@@ -200,6 +200,6 @@ inline bool RealTimeFwdResult::isInitialized() const
 
 } // NAMESPACE
 
-Q_DECLARE_METATYPE(SCMEASLIB::RealTimeFwdResult::SPtr)
+Q_DECLARE_METATYPE(SCMEASLIB::RealTimeFwdSolution::SPtr)
 
 #endif // REALTIMEFWDRESULT_H
