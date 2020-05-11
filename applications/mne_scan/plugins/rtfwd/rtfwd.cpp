@@ -126,10 +126,15 @@ void RtFwd::init()
     m_pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet);
 
     // Input
-    m_pHpiInput = PluginInputData<RealTimeHpiResult>::create(this, "rtFwdIn", "rtFwd input data");
+    m_pHpiInput = PluginInputData<RealTimeHpiResult>::create(this, "rtFwdIn", "rtFwd HPI input");
     connect(m_pHpiInput.data(), &PluginInputConnector::notify,
             this, &RtFwd::update, Qt::DirectConnection);
     m_inputConnectors.append(m_pHpiInput);
+
+    m_pRTMSAInput = PluginInputData<RealTimeMultiSampleArray>::create(this, "rtFwdIn", "rtFwd input data");
+    connect(m_pRTMSAInput.data(), &PluginInputConnector::notify,
+            this, &RtFwd::update, Qt::DirectConnection);
+    m_inputConnectors.append(m_pRTMSAInput);
 
     // Output
     m_pRTFSOutput = PluginOutputData<RealTimeFwdSolution>::create(this, "rtFwdOut", "rtFwd output data");
@@ -243,6 +248,20 @@ QWidget* RtFwd::setupWidget()
 
 void RtFwd::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
+
+    if(QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>()) {
+        //Fiff information
+        m_mutex.lock();
+        if(!m_pFiffInfo) {
+            m_pFiffInfo = pRTMSA->info();
+        }
+        m_mutex.unlock();
+
+        if(!m_bPluginControlWidgetsInit) {
+            initPluginControlWidgets();
+        }
+    }
+
     if(QSharedPointer<RealTimeHpiResult> pRTHPI = pMeasurement.dynamicCast<RealTimeHpiResult>()) {
         //Fiff information
         m_mutex.lock();
@@ -317,6 +336,12 @@ void RtFwd::initPluginControlWidgets()
 void RtFwd::onRecompStatusChanged(bool bDoRecomputation)
 {
     m_mutex.lock();
+    if(!m_pHpiInput) {
+        QMessageBox msgBox;
+        msgBox.setText("Please connect the Hpi plugin.");
+        msgBox.exec();
+        return;
+    }
     m_bDoRecomputation = bDoRecomputation;
     m_mutex.unlock();
 }
@@ -401,38 +426,47 @@ void RtFwd::run()
     bool bDoRecomputation = false;
     bool bDoClustering = false;
     bool bFwdReady = true;
+    bool bHpiConnectected = false;
 
     while(!isInterruptionRequested()) {
         // Get the current data
         m_mutex.lock();
-        bIsLargeHeadMovement = m_pHpiFitResult->bIsLargeHeadMovement;
-        bIsDifferent = !(transMegHeadOld == m_pHpiFitResult->devHeadTrans.toOld());
-        bDoRecomputation = m_bDoRecomputation;
+        if(m_pHpiFitResult) {
+            bHpiConnectected = true;
+        }
         m_mutex.unlock();
 
-        // do recomputation if requested
-        if(bIsLargeHeadMovement && bIsDifferent && bDoRecomputation) {
-            emit statusInformationChanged(1);
+        if(bHpiConnectected) {
+            // only recompute if hpi is connected
             m_mutex.lock();
-            m_bBusy = true;
-            transMegHeadOld = m_pHpiFitResult->devHeadTrans.toOld();
+            bIsLargeHeadMovement = m_pHpiFitResult->bIsLargeHeadMovement;
+            bIsDifferent = !(transMegHeadOld == m_pHpiFitResult->devHeadTrans.toOld());
+            bDoRecomputation = m_bDoRecomputation;
             m_mutex.unlock();
 
-            pComputeFwd->updateHeadPos(&transMegHeadOld);
-            pFwdSolution->sol = pComputeFwd->sol;
-            pFwdSolution->sol_grad = pComputeFwd->sol_grad;
+            // do recomputation if requested
+            if(bIsLargeHeadMovement && bIsDifferent && bDoRecomputation) {
+                emit statusInformationChanged(1);
+                m_mutex.lock();
+                m_bBusy = true;
+                transMegHeadOld = m_pHpiFitResult->devHeadTrans.toOld();
+                m_mutex.unlock();
 
-            m_mutex.lock();
-            m_bBusy = false;
-            m_mutex.unlock();
-            bFwdReady = true;
+                pComputeFwd->updateHeadPos(&transMegHeadOld);
+                pFwdSolution->sol = pComputeFwd->sol;
+                pFwdSolution->sol_grad = pComputeFwd->sol_grad;
 
-            if(!bDoClustering) {
-                m_pRTFSOutput->data()->setMneFwd(pFwdSolution);
-                bFwdReady = false;
+                m_mutex.lock();
+                m_bBusy = false;
+                m_mutex.unlock();
+                bFwdReady = true;
+
+                if(!bDoClustering) {
+                    m_pRTFSOutput->data()->setMneFwd(pFwdSolution);
+                    bFwdReady = false;
+                }
             }
         }
-
         // do clustering if requested
         m_mutex.lock();
         bDoClustering = m_bDoClustering;
