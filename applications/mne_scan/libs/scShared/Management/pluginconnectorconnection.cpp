@@ -46,7 +46,7 @@
 #include <scMeas/realtimecov.h>
 #include <scMeas/realtimesourceestimate.h>
 #include <scMeas/realtimehpiresult.h>
-#include <scMeas/realtimefwdresult.h>
+#include <scMeas/realtimefwdsolution.h>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -170,9 +170,9 @@ bool PluginConnectorConnection::createConnection()
                 break;
             }
 
-            //Cast to RealTimeFwdResult
-            QSharedPointer< PluginOutputData<RealTimeFwdResult> > senderRTFSR = m_pSender->getOutputConnectors()[i].dynamicCast< PluginOutputData<RealTimeFwdResult> >();
-            QSharedPointer< PluginInputData<RealTimeFwdResult> > receiverRTFSR = m_pReceiver->getInputConnectors()[j].dynamicCast< PluginInputData<RealTimeFwdResult> >();
+            //Cast to RealTimeFwdSolution
+            QSharedPointer< PluginOutputData<RealTimeFwdSolution> > senderRTFS = m_pSender->getOutputConnectors()[i].dynamicCast< PluginOutputData<RealTimeFwdSolution> >();
+            QSharedPointer< PluginInputData<RealTimeFwdSolution> > receiverRTFS = m_pReceiver->getInputConnectors()[j].dynamicCast< PluginInputData<RealTimeFwdSolution> >();
             if(senderRTHR && receiverRTHR)
             {
                 m_qHashConnections.insert(QPair<QString,QString>(m_pSender->getOutputConnectors()[i]->getName(),
@@ -227,10 +227,10 @@ ConnectorDataType PluginConnectorConnection::getDataType(QSharedPointer<PluginCo
     if(RTHR_Out || RTHR_In)
         return ConnectorDataType::_RTHR;
 
-    QSharedPointer< PluginOutputData<SCMEASLIB::RealTimeFwdResult> > RTFSR_Out = pPluginConnector.dynamicCast< PluginOutputData<SCMEASLIB::RealTimeFwdResult> >();
-    QSharedPointer< PluginInputData<SCMEASLIB::RealTimeFwdResult> > RTFSR_In = pPluginConnector.dynamicCast< PluginInputData<SCMEASLIB::RealTimeFwdResult> >();
+    QSharedPointer< PluginOutputData<SCMEASLIB::RealTimeFwdSolution> > RTFS_Out = pPluginConnector.dynamicCast< PluginOutputData<SCMEASLIB::RealTimeFwdSolution> >();
+    QSharedPointer< PluginInputData<SCMEASLIB::RealTimeFwdSolution> > RTFS_In = pPluginConnector.dynamicCast< PluginInputData<SCMEASLIB::RealTimeFwdSolution> >();
     if(RTHR_Out || RTHR_In)
-        return ConnectorDataType::_RTHR;
+        return ConnectorDataType::_RTFS;
 
     QSharedPointer< PluginOutputData<SCMEASLIB::Numeric> > Num_Out = pPluginConnector.dynamicCast< PluginOutputData<SCMEASLIB::Numeric> >();
     QSharedPointer< PluginInputData<SCMEASLIB::Numeric> > Num_In = pPluginConnector.dynamicCast< PluginInputData<SCMEASLIB::Numeric> >();
