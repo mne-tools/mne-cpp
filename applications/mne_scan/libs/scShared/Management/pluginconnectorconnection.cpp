@@ -173,7 +173,7 @@ bool PluginConnectorConnection::createConnection()
             //Cast to RealTimeFwdSolution
             QSharedPointer< PluginOutputData<RealTimeFwdSolution> > senderRTFS = m_pSender->getOutputConnectors()[i].dynamicCast< PluginOutputData<RealTimeFwdSolution> >();
             QSharedPointer< PluginInputData<RealTimeFwdSolution> > receiverRTFS = m_pReceiver->getInputConnectors()[j].dynamicCast< PluginInputData<RealTimeFwdSolution> >();
-            if(senderRTHR && receiverRTHR)
+            if(senderRTFS && receiverRTFS)
             {
                 m_qHashConnections.insert(QPair<QString,QString>(m_pSender->getOutputConnectors()[i]->getName(),
                                                                   m_pReceiver->getInputConnectors()[j]->getName()),

@@ -60,6 +60,7 @@
 #include <scMeas/realtimemultisamplearray.h>
 #include <scMeas/realtimecov.h>
 #include <scMeas/realtimeevokedset.h>
+#include <scMeas/realtimefwdsolution.h>
 
 #include <utils/ioutils.h>
 
@@ -150,6 +151,11 @@ void RtcMne::init()
     connect(m_pRTCInput.data(), &PluginInputConnector::notify,
             this, &RtcMne::updateRTC, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTCInput);
+
+    m_pRTFSInput = PluginInputData<RealTimeFwdSolution>::create(this, "MNE RFS In", "MNE real-time forward solution input data");
+    connect(m_pRTFSInput.data(), &PluginInputConnector::notify,
+            this, &RtcMne::updateRTFS, Qt::DirectConnection);
+    m_inputConnectors.append(m_pRTFSInput);
 
     // Output
     m_pRTSEOutput = PluginOutputData<RealTimeSourceEstimate>::create(this, "MNE Out", "MNE output data");
@@ -536,7 +542,7 @@ void RtcMne::updateInvOp(const MNEInverseOperator& invOp)
     QMutexLocker locker(&m_qMutex);
 
     m_invOp = invOp;
-
+    qDebug() << "Update InvOp";
     double snr = 1.0;
     double lambda2 = 1.0 / pow(snr, 2); //ToDo estimate lambda using covariance
 
@@ -545,6 +551,37 @@ void RtcMne::updateInvOp(const MNEInverseOperator& invOp)
     //Set up the inverse according to the parameters
     // Use 1 nave here because in case of evoked data as input the minimum norm will always be updated when the source estimate is calculated (see run method).
     m_pMinimumNorm->doInverseSetup(1,true);
+}
+
+//=============================================================================================================
+
+void RtcMne::updateRTFS(SCMEASLIB::Measurement::SPtr pMeasurement)
+{
+    QSharedPointer<RealTimeFwdSolution> pRTFS = pMeasurement.dynamicCast<RealTimeFwdSolution>();
+
+    if(pRTFS->isClustered()) {
+        qDebug() << "Start Updating";
+        m_qMutex.lock();
+        m_pFwd = pRTFS->getMneFwd();
+        //m_pRtInvOp = RtInvOp::SPtr(new RtInvOp(m_pFiffInfo, m_pFwd));
+        m_qMutex.lock();
+        qDebug() << "Update Fwd";
+//        // Init Real-Time inverse estimator
+//        if(!m_pRtInvOp && m_pFiffInfo && m_pFwd) {
+//            m_pRtInvOp = RtInvOp::SPtr(new RtInvOp(m_pFiffInfo, m_pFwd));
+//            connect(m_pRtInvOp.data(), &RtInvOp::invOperatorCalculated,
+//                    this, &RtcMne::updateInvOp);
+//        }
+
+//        //Fiff Information of the covariance
+//        if(m_qListCovChNames.size() != pRTFS->getValue()->names.size()) {
+//            m_qListCovChNames = pRTFS->getValue()->names;
+//        }
+
+//        if(this->isRunning() && m_pRtInvOp){
+//            m_pRtInvOp->append(*pRTFS->getValue());
+//        }
+    }
 }
 
 //=============================================================================================================
