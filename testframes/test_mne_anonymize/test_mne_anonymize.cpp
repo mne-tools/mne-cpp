@@ -125,7 +125,7 @@ void TestMneAnonymize::testDefaultOutput()
         QFile::remove(sFileOut);
     }
 
-    MNEANONYMIZE::SettingsControllerCL controller(arguments);
+    MNEANONYMIZE::SettingsControllerCl controller(arguments);
     QVERIFY(QFile::exists(sFileOut));
 
     QFile::remove(sFileOut);
@@ -157,7 +157,7 @@ void TestMneAnonymize::testDeleteInputFile()
 
     qInfo() << "arguments" << arguments;
 
-    MNEANONYMIZE::SettingsControllerCL controller(arguments);
+    MNEANONYMIZE::SettingsControllerCl controller(arguments);
 
     QVERIFY(!QFile::exists(sFileInTest));
     QVERIFY(QFile::exists(sFileOutTest));
@@ -188,7 +188,7 @@ void TestMneAnonymize::testInPlace()
 
     qInfo() << "arguments" << arguments;
 
-    MNEANONYMIZE::SettingsControllerCL controller(arguments);
+    MNEANONYMIZE::SettingsControllerCl controller(arguments);
 
     QVERIFY(QFile::exists(sFileOutTest));
 
@@ -211,7 +211,7 @@ void TestMneAnonymize::testDefaultAnonymizationOfTags()
 
     qInfo() << "arguments" << arguments;
 
-    MNEANONYMIZE::SettingsControllerCL controller(arguments);
+    MNEANONYMIZE::SettingsControllerCl controller(arguments);
 
     QFile fFileOut(sFileOut);
     FiffStream::SPtr outStream(new FiffStream(&fFileOut));
@@ -244,7 +244,7 @@ void TestMneAnonymize::compareBirthdayOffsetOption()
 
     qInfo() << "arguments" << arguments;
 
-    MNEANONYMIZE::SettingsControllerCL controller(arguments);
+    MNEANONYMIZE::SettingsControllerCl controller(arguments);
 
     QFile fFileOut(sFileOut);
     FiffStream::SPtr outStream(new FiffStream(&fFileOut));
@@ -277,7 +277,7 @@ void TestMneAnonymize::compareMeasureDateOffsetOption()
 
     qInfo() << "arguments" << arguments;
 
-    MNEANONYMIZE::SettingsControllerCL controller(arguments);
+    MNEANONYMIZE::SettingsControllerCl controller(arguments);
 
     QFile fFileOut(sFileOut);
 
