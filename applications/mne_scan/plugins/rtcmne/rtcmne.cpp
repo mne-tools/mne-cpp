@@ -420,13 +420,13 @@ void RtcMne::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement)
             m_iNumAverages = 1;
             m_bRawInput = true;
         }
-        m_qMutex.lock();
+        m_qMutex.unlock();
 
         if(!m_bPluginControlWidgetsInit) {
             initPluginControlWidgets();
         }
 
-        if(this->isRunning()) {
+        if(this->isRunning() && m_pMinimumNorm) {
             // Check for artifacts
             QMap<QString,double> mapReject;
             mapReject.insert("eog", 150e-06);
@@ -661,12 +661,10 @@ void RtcMne::run()
                         } else {
                             m_pRTSEOutput->data()->setValue(sourceEstimate);
                         }
-
-                        m_pRTSEOutput->data()->setValue(sourceEstimate);
                     }
                 }
             } else {
-                m_pCircularMatrixBuffer->pop(matDataResized);
+                m_pCircularMatrixBuffer->pop(matData);
             }
         }
 
