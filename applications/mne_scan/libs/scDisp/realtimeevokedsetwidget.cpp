@@ -164,16 +164,20 @@ RealTimeEvokedSetWidget::~RealTimeEvokedSetWidget()
 
 void RealTimeEvokedSetWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    m_pRTESet = qSharedPointerDynamicCast<RealTimeEvokedSet>(pMeasurement);
+    if(!m_pRTESet) {
+        m_pRTESet = qSharedPointerDynamicCast<RealTimeEvokedSet>(pMeasurement);
+    }
 
     if(m_pRTESet) {
-        if(m_pRTESet->isInitialized()) {
+        if(!m_pFiffInfo) {
             m_pFiffInfo = m_pRTESet->info();
 
             if(!m_bDisplayWidgetsInitialized) {
                 initDisplayControllWidgets();
             }
-        } else {
+        }
+
+        if(m_pRTESet->isInitialized()) {
             //Check if block size has changed, if yes update the filter
             if(!m_pRTESet->getValue()->evoked.isEmpty()) {
                 if(m_iMaxFilterTapSize != m_pRTESet->getValue()->evoked.first().data.cols()) {

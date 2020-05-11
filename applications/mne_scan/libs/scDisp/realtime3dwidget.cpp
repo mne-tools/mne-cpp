@@ -249,7 +249,7 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
         }
 
         //Add and update items to 3D view
-        m_pData3DModel->addDigitizerData("Head",
+        m_pData3DModel->addDigitizerData("Subject",
                                          "Fitted Digitizers",
                                          hpiFitResult->fittedCoils.pickTypes(QList<int>()<<FIFFV_POINT_EEG));
 
