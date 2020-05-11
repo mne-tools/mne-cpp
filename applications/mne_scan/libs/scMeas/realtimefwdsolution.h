@@ -119,11 +119,11 @@ public:
 
     //=========================================================================================================
     /**
-     * New mne forward solution to distribute
+     * New forward solution to distribute
      *
-     * @param [in] v     the forward solution which should be distributed.
+     * @param [in] fwdSolution     the forward solution which should be distributed.
      */
-    virtual void setMneFwd(const MNELIB::MNEForwardSolution::SPtr& pV);
+    virtual void setValue(const MNELIB::MNEForwardSolution::SPtr pFwdSolution);
 
     //=========================================================================================================
     /**
@@ -132,7 +132,7 @@ public:
      *
      * @return the last attached value.
      */
-    virtual QSharedPointer<MNELIB::MNEForwardSolution>& getMneFwd();
+    virtual QSharedPointer<MNELIB::MNEForwardSolution> getValue();
 
     //=========================================================================================================
     /**
@@ -188,7 +188,8 @@ private:
     mutable QMutex          m_qMutex;                                       /**< Mutex to ensure thread safety */
     bool                    m_bInitialized;                                 /**< If values are stored.*/
     bool                    m_bClustered;                                   /**< If fwd is clustered.*/
-    QSharedPointer<MNELIB::MNEForwardSolution>      m_pMneFwdSol;           /**< The Mne Forward Solution. */
+
+    QSharedPointer<MNELIB::MNEForwardSolution>      m_pFwdSolution;         /**< The Mne Forward Solution. */
     QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo;            /**< The Fiff Info. */
 
     QSharedDataPointer<FIFFLIB::FiffNamedMatrix>    m_pSol;                 /**< The solution matrix (LF). */
