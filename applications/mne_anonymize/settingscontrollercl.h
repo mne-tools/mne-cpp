@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     SettingsControllerCL.h
+ * @file     settingscontrollercl.h
  * @author   Juan Garcia-Prieto <juangpc@gmail.com>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
@@ -32,7 +32,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     SettingsControllerCL class declaration.
+ * @brief     SettingsControllerCl class declaration.
  *
  */
 
@@ -80,27 +80,27 @@ namespace MNEANONYMIZE
  * @details Handles command line input parameters, parses them and sets up anynymizer member objects, properly,
  *          depending on the different options.
  */
-class SettingsControllerCL : public QObject
+class SettingsControllerCl : public QObject
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<SettingsControllerCL> SPtr;            /**< Shared pointer type for SettingsControllerCL. */
-    typedef QSharedPointer<const SettingsControllerCL> ConstSPtr; /**< Const shared pointer type for SettingsControllerCL. */
+    typedef QSharedPointer<SettingsControllerCl> SPtr;            /**< Shared pointer type for SettingsControllerCl. */
+    typedef QSharedPointer<const SettingsControllerCl> ConstSPtr; /**< Const shared pointer type for SettingsControllerCl. */
 
     //=========================================================================================================
     /**
-     * Default constructor for SettingsControllerCL object.
+     * Default constructor for SettingsControllerCl object.
      */
-    SettingsControllerCL();
+    SettingsControllerCl();
 
     //=========================================================================================================
     /**
-     * Constructs a SettingsControllerCL object.
+     * Constructs a SettingsControllerCl object.
      *
      * @param [in] arguments    String list containing the input arguments in form of a QStringList.
      */
-    SettingsControllerCL(const QStringList& arguments);
+    SettingsControllerCl(const QStringList& arguments);
 
 private:
     //=========================================================================================================
@@ -233,7 +233,7 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline void SettingsControllerCL::printIfVerbose(const QString& str) const
+inline void SettingsControllerCl::printIfVerbose(const QString& str) const
 {
     if(m_bVerboseMode)
     {

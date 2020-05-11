@@ -32,7 +32,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    SettingsControllerCL class definition.
+ * @brief    SettingsControllerCl class definition.
  *
  */
 
@@ -67,7 +67,7 @@ using namespace MNEANONYMIZE;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SettingsControllerCL::SettingsControllerCL()
+SettingsControllerCl::SettingsControllerCl()
 : m_sAppName(qApp->applicationName())
 , m_sAppVer(qApp->applicationVersion())
 , m_bVerboseMode(false)
@@ -78,7 +78,7 @@ SettingsControllerCL::SettingsControllerCL()
 , m_bInputFileDeleted(false)
 , m_bOutFileRenamed(false)
 {
-//    QObject::connect(this, &MNEANONYMIZE::SettingsControllerCL::finished,
+//    QObject::connect(this, &MNEANONYMIZE::SettingsControllerCl::finished,
 //                     qApp, &QCoreApplication::exit, Qt::QueuedConnection);
 
     m_pAnonymizer = FiffAnonymizer::SPtr(new FiffAnonymizer);
@@ -105,7 +105,7 @@ SettingsControllerCL::SettingsControllerCL()
 }
 
 
-SettingsControllerCL::SettingsControllerCL(const QStringList& arguments)
+SettingsControllerCl::SettingsControllerCl(const QStringList& arguments)
 : m_sAppName(qApp->applicationName())
 , m_sAppVer(qApp->applicationVersion())
 , m_bVerboseMode(false)
@@ -116,7 +116,7 @@ SettingsControllerCL::SettingsControllerCL(const QStringList& arguments)
 , m_bInputFileDeleted(false)
 , m_bOutFileRenamed(false)
 {
-    QObject::connect(this, &MNEANONYMIZE::SettingsControllerCL::finished,
+    QObject::connect(this, &MNEANONYMIZE::SettingsControllerCl::finished,
                      qApp, &QCoreApplication::exit, Qt::QueuedConnection);
 
     m_pAnonymizer = FiffAnonymizer::SPtr(new FiffAnonymizer);
@@ -143,7 +143,7 @@ SettingsControllerCL::SettingsControllerCL(const QStringList& arguments)
 
 //=============================================================================================================
 
-void SettingsControllerCL::initParser()
+void SettingsControllerCl::initParser()
 {
     m_parser.setApplicationDescription(QCoreApplication::translate("main",
            "\nMNE-CPP Project. UT-Health (McGovern Medical School) Houston, Tx."
@@ -246,7 +246,7 @@ void SettingsControllerCL::initParser()
 
 //=============================================================================================================
 
-int SettingsControllerCL::parseInputs(const QStringList& arguments)
+int SettingsControllerCl::parseInputs(const QStringList& arguments)
 {
     m_parser.process(arguments);
 
@@ -354,7 +354,7 @@ int SettingsControllerCL::parseInputs(const QStringList& arguments)
 
 //=============================================================================================================
 
-int SettingsControllerCL::parseInOutFiles()
+int SettingsControllerCl::parseInOutFiles()
 {
 
     if(m_parser.isSet("in"))
@@ -407,7 +407,7 @@ int SettingsControllerCL::parseInOutFiles()
 
 //=============================================================================================================
 
-int SettingsControllerCL::execute()
+int SettingsControllerCl::execute()
 {
     if(m_pAnonymizer->anonymizeFile())
     {
@@ -437,7 +437,7 @@ int SettingsControllerCL::execute()
 
 //=============================================================================================================
 
-bool SettingsControllerCL::checkDeleteInputFile()
+bool SettingsControllerCl::checkDeleteInputFile()
 {
     if(m_bDeleteInputFileAfter) //false by default
     {
@@ -467,7 +467,7 @@ bool SettingsControllerCL::checkDeleteInputFile()
 
 //=============================================================================================================
 
-void SettingsControllerCL::deleteInputFile()
+void SettingsControllerCl::deleteInputFile()
 {
     QFile inFile(m_fiInFileInfo.absoluteFilePath());
     if((m_bInputFileDeleted = inFile.remove()))
@@ -480,7 +480,7 @@ void SettingsControllerCL::deleteInputFile()
 
 //=============================================================================================================
 
-bool SettingsControllerCL::checkRenameOutputFile()
+bool SettingsControllerCl::checkRenameOutputFile()
 {
     //if both files in and out have the same name, this controller class would already know and a temporary
     //random filename will be in use, during the anonymizing process, for the output file.
@@ -518,7 +518,7 @@ bool SettingsControllerCL::checkRenameOutputFile()
 
 //=============================================================================================================
 
-void SettingsControllerCL::renameOutputFileAsInputFile()
+void SettingsControllerCl::renameOutputFileAsInputFile()
 {
     QFile auxFile(m_fiOutFileInfo.absoluteFilePath());
     if((m_bOutFileRenamed = auxFile.rename(m_fiInFileInfo.absoluteFilePath())))
@@ -535,7 +535,7 @@ void SettingsControllerCL::renameOutputFileAsInputFile()
 
 //=============================================================================================================
 
-void SettingsControllerCL::printHeaderIfVerbose()
+void SettingsControllerCl::printHeaderIfVerbose()
 {
 
     printIfVerbose(" ");
@@ -548,7 +548,7 @@ void SettingsControllerCL::printHeaderIfVerbose()
 
 //=============================================================================================================
 
-void SettingsControllerCL::printFooterIfVerbose()
+void SettingsControllerCl::printFooterIfVerbose()
 {
 //    printIfVerbose(" ");
     printIfVerbose("=============================================================================================");
@@ -557,7 +557,7 @@ void SettingsControllerCL::printFooterIfVerbose()
 
 //=============================================================================================================
 
-QString SettingsControllerCL::generateRandomFileName()
+QString SettingsControllerCl::generateRandomFileName()
 {
     QString randomFileName("mne_anonymize_");
     const QString charPool("abcdefghijklmnopqrstuvwxyz1234567890");

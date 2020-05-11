@@ -68,11 +68,11 @@ CONFIG(debug, debug|release) {
 
 SOURCES += \
     test_mne_anonymize.cpp \
-    ../../applications/mne_anonymize/SettingsControllerCL.cpp \
+    ../../applications/mne_anonymize/settingscontrollercl.cpp \
     ../../applications/mne_anonymize/fiffanonymizer.cpp \
 
 HEADERS  += \
-    ../../applications/mne_anonymize/SettingsControllerCL.h \
+    ../../applications/mne_anonymize/settingscontrollercl.h \
     ../../applications/mne_anonymize/fiffanonymizer.h \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
