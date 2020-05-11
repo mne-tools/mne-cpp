@@ -51,7 +51,7 @@
 
 #include <scShared/Interfaces/IAlgorithm.h>
 
-#include <scMeas/realtimefwdresult.h>
+#include <scMeas/realtimefwdsolution.h>
 #include <scMeas/realtimehpiresult.h>
 
 #include <utils/generics/circularbuffer.h>
@@ -87,7 +87,7 @@ namespace MNELIB{
 }
 
 namespace SCMEASLIB{
-    class RealTimeFwdResult;
+    class RealTimeFwdSolution;
     class RealTimeHpiResult;
 }
 
@@ -213,9 +213,9 @@ private:
     FIFFLIB::FiffInfo::SPtr                     m_pFiffInfo;            /**< Fiff measurement info.*/
     FIFFLIB::FiffCoordTrans                     m_transDevHead;         /**< Updated meg->head transformation. */
 
-    QSharedPointer<FSLIB::AnnotationSet>                                m_pAnnotationSet;       /**< Annotation set. */
-    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeHpiResult>::SPtr    m_pHpiInput;            /**< The incoming Hpi data.*/
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeFwdResult>::SPtr   m_pFwdOutput;           /**< The fwd solution.*/
+    QSharedPointer<FSLIB::AnnotationSet>                                    m_pAnnotationSet;       /**< Annotation set. */
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeHpiResult>::SPtr        m_pHpiInput;            /**< The incoming Hpi data.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeFwdSolution>::SPtr     m_pRTFSOutput;           /**< The fwd solution.*/
 
     IOBUFFER::CircularBuffer<SCMEASLIB::RealTimeHpiResult>::SPtr        m_pCircularBuffer;      /**< Holds incoming data.*/
 

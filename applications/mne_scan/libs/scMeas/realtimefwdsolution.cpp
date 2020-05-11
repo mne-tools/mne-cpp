@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     realtimefwdresult.cpp
+ * @file     realtimefwdsolution.cpp
  * @author   Ruben Dörfel <ruben.doerfel@tu-ilmenau.de>
  * @since    0.1.0
  * @date     May, 2020
@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the RealTimeFwdResult class.
+ * @brief    Definition of the RealTimeFwdSolution class.
  *
  */
 
@@ -36,7 +36,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "realtimefwdresult.h"
+#include "realtimefwdsolution.h"
 #include <mne/mne_forwardsolution.h>
 #include <time.h>
 
@@ -56,8 +56,8 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeFwdResult::RealTimeFwdResult(QObject *parent)
-: Measurement(QMetaType::type("RealTimeFwdResult::SPtr"), parent)
+RealTimeFwdSolution::RealTimeFwdSolution(QObject *parent)
+: Measurement(QMetaType::type("RealTimeFwdSolution::SPtr"), parent)
 , m_bInitialized(false)
 , m_pMneFwdSol(QSharedPointer<MNEForwardSolution>(new MNEForwardSolution))
 {
@@ -65,27 +65,27 @@ RealTimeFwdResult::RealTimeFwdResult(QObject *parent)
 
 //=============================================================================================================
 
-RealTimeFwdResult::~RealTimeFwdResult()
+RealTimeFwdSolution::~RealTimeFwdSolution()
 {
 }
 
 //=============================================================================================================
 
-void RealTimeFwdResult::setFiffInfo(QSharedPointer<FiffInfo> pFiffInfo)
+void RealTimeFwdSolution::setFiffInfo(QSharedPointer<FiffInfo> pFiffInfo)
 {
     m_pFiffInfo = pFiffInfo;
 }
 
 //=============================================================================================================
 
-QSharedPointer<FiffInfo> RealTimeFwdResult::getFiffInfo()
+QSharedPointer<FiffInfo> RealTimeFwdSolution::getFiffInfo()
 {
     return m_pFiffInfo;
 }
 
 //=============================================================================================================
 
-QSharedPointer<MNEForwardSolution>& RealTimeFwdResult::getMneFwd()
+QSharedPointer<MNEForwardSolution>& RealTimeFwdSolution::getMneFwd()
 {
     QMutexLocker locker(&m_qMutex);
     return m_pMneFwdSol;
@@ -94,7 +94,7 @@ QSharedPointer<MNEForwardSolution>& RealTimeFwdResult::getMneFwd()
 //=============================================================================================================
 
 
-void RealTimeFwdResult::setMneFwd(const MNELIB::MNEForwardSolution::SPtr& pV)
+void RealTimeFwdSolution::setMneFwd(const MNELIB::MNEForwardSolution::SPtr& pV)
 {
     m_qMutex.lock();
     //Store
@@ -107,7 +107,7 @@ void RealTimeFwdResult::setMneFwd(const MNELIB::MNEForwardSolution::SPtr& pV)
 
 //=============================================================================================================
 
-QSharedDataPointer<FIFFLIB::FiffNamedMatrix>& RealTimeFwdResult::getSol()
+QSharedDataPointer<FIFFLIB::FiffNamedMatrix>& RealTimeFwdSolution::getSol()
 {
     QMutexLocker locker(&m_qMutex);
     return m_pSol;
@@ -116,7 +116,7 @@ QSharedDataPointer<FIFFLIB::FiffNamedMatrix>& RealTimeFwdResult::getSol()
 //=============================================================================================================
 
 
-void RealTimeFwdResult::setSol(const FiffNamedMatrix::SDPtr& pV)
+void RealTimeFwdSolution::setSol(const FiffNamedMatrix::SDPtr& pV)
 {
     m_qMutex.lock();
     //Store
@@ -128,7 +128,7 @@ void RealTimeFwdResult::setSol(const FiffNamedMatrix::SDPtr& pV)
 }
 //=============================================================================================================
 
-QSharedDataPointer<FIFFLIB::FiffNamedMatrix>& RealTimeFwdResult::getSolGrad()
+QSharedDataPointer<FIFFLIB::FiffNamedMatrix>& RealTimeFwdSolution::getSolGrad()
 {
     QMutexLocker locker(&m_qMutex);
     return m_pSolGrad;
@@ -137,7 +137,7 @@ QSharedDataPointer<FIFFLIB::FiffNamedMatrix>& RealTimeFwdResult::getSolGrad()
 //=============================================================================================================
 
 
-void RealTimeFwdResult::setSolGrad(const FiffNamedMatrix::SDPtr& pV)
+void RealTimeFwdSolution::setSolGrad(const FiffNamedMatrix::SDPtr& pV)
 {
     m_qMutex.lock();
     //Store
