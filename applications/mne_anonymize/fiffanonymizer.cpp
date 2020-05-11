@@ -478,13 +478,20 @@ void FiffAnonymizer::censorTag() const
         break;
     }
     default:
-    {   }
-    }
+    {
+    }//default
+    }//switch
 }
 
 inline QString FiffAnonymizer::subjectSexToString(const int sexCode) const
 {
-    static QStringList subjectSexRefList = { "unknown" , "male" , "female" };
+    static QStringList subjectSexRefList =
+    {
+        "unknown" ,
+        "male" ,
+        "female"
+    };
+
     if (sexCode > -1 && sexCode < subjectSexRefList.size())
     {
         return subjectSexRefList.at(sexCode);
@@ -496,7 +503,14 @@ inline QString FiffAnonymizer::subjectSexToString(const int sexCode) const
 
 inline QString FiffAnonymizer::subjectHandToString(const int handCode) const
 {
-    static QStringList subjectHandRefList = { "unknown", "right", "left", "ambidextrous" };
+    static QStringList subjectHandRefList =
+    {
+        "unknown",
+        "right",
+        "left",
+        "ambidextrous"
+    };
+
     if ((handCode > -1) && (handCode < subjectHandRefList.size()))
     {
         return subjectHandRefList.at(handCode);
