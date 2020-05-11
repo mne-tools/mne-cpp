@@ -57,9 +57,10 @@ using namespace MNELIB;
 //=============================================================================================================
 
 RealTimeFwdSolution::RealTimeFwdSolution(QObject *parent)
-: Measurement(QMetaType::type("RealTimeFwdSolution::SPtr"), parent)
-, m_bInitialized(false)
-, m_pMneFwdSol(QSharedPointer<MNEForwardSolution>(new MNEForwardSolution))
+    : Measurement(QMetaType::type("RealTimeFwdSolution::SPtr"), parent)
+    , m_bInitialized(false)
+    , m_bClustered(false)
+    , m_pFwdSolution(QSharedPointer<MNEForwardSolution>(new MNEForwardSolution))
 {
 }
 
@@ -85,21 +86,21 @@ QSharedPointer<FiffInfo> RealTimeFwdSolution::getFiffInfo()
 
 //=============================================================================================================
 
-QSharedPointer<MNEForwardSolution>& RealTimeFwdSolution::getMneFwd()
+QSharedPointer<MNEForwardSolution> RealTimeFwdSolution::getValue()
 {
     QMutexLocker locker(&m_qMutex);
-    return m_pMneFwdSol;
+    return m_pFwdSolution;
 }
 
 //=============================================================================================================
 
 
-void RealTimeFwdSolution::setMneFwd(const MNELIB::MNEForwardSolution::SPtr& pV)
+void RealTimeFwdSolution::setValue(const MNELIB::MNEForwardSolution::SPtr pFwdSolution)
 {
     m_qMutex.lock();
-    m_pMneFwdSol = pV;
+    m_pFwdSolution = MNELIB::MNEForwardSolution::SPtr(pFwdSolution);
     m_bInitialized = true;
-    m_bClustered = m_pMneFwdSol->isClustered();
+    m_bClustered = m_pFwdSolution->isClustered();
     m_qMutex.unlock();
 
     emit notify();

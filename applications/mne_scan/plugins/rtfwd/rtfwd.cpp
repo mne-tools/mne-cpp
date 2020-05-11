@@ -418,7 +418,7 @@ void RtFwd::run()
 
     MNEForwardSolution::SPtr pClusteredFwd;
 
-    m_pRTFSOutput->data()->setMneFwd(pFwdSolution);
+    m_pRTFSOutput->data()->setValue(pFwdSolution);
 
     // do recomputation if requested, not busy and transformation is different
     bool bIsLargeHeadMovement = false;          // indicate if movement was large
@@ -462,7 +462,7 @@ void RtFwd::run()
                 bFwdReady = true;
 
                 if(!bDoClustering) {
-                    m_pRTFSOutput->data()->setMneFwd(pFwdSolution);
+                    m_pRTFSOutput->data()->setValue(pFwdSolution);
                     bFwdReady = false;
                 }
             }
@@ -476,7 +476,8 @@ void RtFwd::run()
             pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(pFwdSolution->cluster_forward_solution(*m_pAnnotationSet.data(), 200)));
             emit clusteringAvailable(pClusteredFwd->nsource);
 
-            m_pRTFSOutput->data()->setMneFwd(pClusteredFwd);
+            m_pRTFSOutput->data()->setValue(pClusteredFwd);
+
             bFwdReady = false;
         }
         emit statusInformationChanged(3);               //finished
