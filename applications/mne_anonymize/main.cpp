@@ -7,7 +7,7 @@
  *           John C. Mosher <John.C.Mosher@uth.tmc.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  * @version  dev
- * @date     September, 2019
+ * @since    0.1.0
  *
  * @section  LICENSE
  *
