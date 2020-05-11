@@ -97,7 +97,6 @@ QSharedPointer<MNEForwardSolution>& RealTimeFwdSolution::getMneFwd()
 void RealTimeFwdSolution::setMneFwd(const MNELIB::MNEForwardSolution::SPtr& pV)
 {
     m_qMutex.lock();
-    //Store
     m_pMneFwdSol = pV;
     m_bInitialized = true;
     m_bClustered = m_pMneFwdSol->isClustered();
