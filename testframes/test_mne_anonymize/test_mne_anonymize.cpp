@@ -40,7 +40,7 @@
 #include <utils/generics/applicationlogger.h>
 
 #include "../applications/mne_anonymize/fiffanonymizer.h"
-#include "../applications/mne_anonymize/settingscontrollerCL.h"
+#include "../applications/mne_anonymize/settingscontrollercl.h"
 
 //=============================================================================================================
 // QT INCLUDES

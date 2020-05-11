@@ -37,8 +37,8 @@
 //=============================================================================================================
 
 #include "apphandler.h"
-#include "settingscontrollerCL.h"
-#include "settingscontrollerGUI.h"
+#include "settingscontrollercl.h"
+#include "settingscontrollergui.h"
 
 //=============================================================================================================
 // QT INCLUDES
