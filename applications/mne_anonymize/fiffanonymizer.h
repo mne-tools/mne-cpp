@@ -177,7 +177,7 @@ public:
      *
      * @param [in] bFlag    Bool argument whether to use the verbose mode.
      */
-    void setVerboseMode(const bool bFlag);
+    void setVerboseMode(bool bFlag);
 
     //=========================================================================================================
     /**
@@ -197,7 +197,7 @@ public:
      * @param [in] bFlag    Bool argument whether to use the brute mode.
      *
      */
-    void setBruteMode(const bool bFlag);
+    void setBruteMode(bool bFlag);
 
     //=========================================================================================================
     /**
@@ -288,7 +288,7 @@ public:
      *
      * @param [in] iSubjBirthdayOffset  Integer with the number of dates to subtract from the subject's birthday date.
      */
-    void setSubjectBirthdayOffset(const int iSubjBirthdayOffset);
+    void setSubjectBirthdayOffset(int iSubjBirthdayOffset);
 
     //=========================================================================================================
     /**
@@ -369,7 +369,7 @@ private:
      * This transforms the data inside a subject sex tag (male, female or unknown) into a string object
      * containing that information.
      */
-    inline QString subjectSexToString(const int sexCode) const;
+    inline QString subjectSexToString(int sexCode) const;
 
 
     //=========================================================================================================
@@ -377,7 +377,7 @@ private:
      * This transforms the data inside a subject handedness tag (right, left or unknown) into a string object
      * containing that information.
      */
-    inline QString subjectHandToString(const int handCode) const;
+    inline QString subjectHandToString(int handCode) const;
 
     //=========================================================================================================
     /**
