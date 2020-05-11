@@ -417,16 +417,20 @@ void RtFwd::run()
             m_bBusy = true;
             transMegHeadOld = m_pHpiFitResult->devHeadTrans.toOld();
             m_mutex.unlock();
+
             pComputeFwd->updateHeadPos(&transMegHeadOld);
             pFwdSolution->sol = pComputeFwd->sol;
             pFwdSolution->sol_grad = pComputeFwd->sol_grad;
+
             m_mutex.lock();
             m_bBusy = false;
             m_mutex.unlock();
-            // send data
-            m_pRTFSOutput->data()->setSol(pComputeFwd->sol);
-            m_pRTFSOutput->data()->setSolGrad(pComputeFwd->sol_grad);
             bFwdReady = true;
+
+            if(!bDoClustering) {
+                m_pRTFSOutput->data()->setMneFwd(pFwdSolution);
+                bFwdReady = false;
+            }
         }
 
         // do clustering if requested
@@ -435,17 +439,13 @@ void RtFwd::run()
         m_mutex.unlock();
         if(bDoClustering && bFwdReady) {
             emit statusInformationChanged(2);
-            bFwdReady = false;
             pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(pFwdSolution->cluster_forward_solution(*m_pAnnotationSet.data(), 200)));
             emit clusteringAvailable(pClusteredFwd->nsource);
+
+            m_pRTFSOutput->data()->setMneFwd(pClusteredFwd);
+            bFwdReady = false;
         }
         emit statusInformationChanged(3);
 
-        // spill orward solution out
-        if(bDoRecomputation && !bDoClustering) {
-            m_pRTFSOutput->data()->setMneFwd(pFwdSolution);
-        } else if (bDoClustering) {
-            m_pRTFSOutput->data()->setMneFwd(pClusteredFwd);
-        }
     }
 }

@@ -168,6 +168,13 @@ public:
      */
     virtual QSharedDataPointer<FIFFLIB::FiffNamedMatrix>& getSolGrad();
 
+    //=========================================================================================================
+    /**
+     * Returns if the fwd solution is clustered.
+     *
+     * @return if Forward is Clustered.
+     */
+    inline bool  isClustered();
 
     //=========================================================================================================
     /**
@@ -180,7 +187,7 @@ public:
 private:
     mutable QMutex          m_qMutex;                                       /**< Mutex to ensure thread safety */
     bool                    m_bInitialized;                                 /**< If values are stored.*/
-
+    bool                    m_bClustered;                                   /**< If fwd is clustered.*/
     QSharedPointer<MNELIB::MNEForwardSolution>      m_pMneFwdSol;           /**< The Mne Forward Solution. */
     QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo;            /**< The Fiff Info. */
 
@@ -196,6 +203,12 @@ inline bool RealTimeFwdSolution::isInitialized() const
 {
     QMutexLocker locker(&m_qMutex);
     return m_bInitialized;
+}
+
+inline bool RealTimeFwdSolution::isClustered()
+{
+    QMutexLocker locker(&m_qMutex);
+    return m_bClustered;
 }
 
 } // NAMESPACE

@@ -52,6 +52,7 @@
 #include <scMeas/realtimecov.h>
 #include <scMeas/realtimespectrum.h>
 #include <scMeas/realtimehpiresult.h>
+#include <scMeas/realtimefwdsolution.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -100,7 +101,7 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
 
             qListActions.append(rtmsaWidget->getDisplayActions());
 
-            // We need to use queued connection here because, e.g., theFiffSimulator is dispatching its data from the main thread
+            // We need to use queued connection here because, e.g., the FiffSimulator is dispatching its data from the main thread
             // and a blocking one because the data is deleted immediatley after the signal was emmited
             connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
                     rtmsaWidget, &RealTimeMultiSampleArrayWidget::update, Qt::BlockingQueuedConnection);

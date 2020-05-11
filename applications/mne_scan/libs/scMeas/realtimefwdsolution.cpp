@@ -100,6 +100,7 @@ void RealTimeFwdSolution::setMneFwd(const MNELIB::MNEForwardSolution::SPtr& pV)
     //Store
     m_pMneFwdSol = pV;
     m_bInitialized = true;
+    m_bClustered = m_pMneFwdSol->isClustered();
     m_qMutex.unlock();
 
     emit notify();
