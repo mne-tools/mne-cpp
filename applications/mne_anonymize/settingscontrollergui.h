@@ -72,19 +72,19 @@ namespace MNEANONYMIZE {
  *
  * @brief Brief description of this class.
  */
-class SettingsControllerGUI : public SettingsControllerCL
+class SettingsControllerGui : public SettingsControllerCl
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<SettingsControllerGUI> SPtr;            /**< Shared pointer type for SettingsControllerGUI. */
-    typedef QSharedPointer<const SettingsControllerGUI> ConstSPtr; /**< Const shared pointer type for SettingsControllerGUI. */
+    typedef QSharedPointer<SettingsControllerGui> SPtr;            /**< Shared pointer type for SettingsControllerGUI. */
+    typedef QSharedPointer<const SettingsControllerGui> ConstSPtr; /**< Const shared pointer type for SettingsControllerGUI. */
 
     //=========================================================================================================
     /**
     * Constructs a SettingsControllerGUI object.
     */
-    explicit SettingsControllerGUI(const QStringList& arguments);
+    explicit SettingsControllerGui(const QStringList& arguments);
 
 protected:
 

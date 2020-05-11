@@ -60,7 +60,7 @@ using namespace MNEANONYMIZE;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SettingsControllerGUI::SettingsControllerGUI(const QStringList& arguments)
+SettingsControllerGui::SettingsControllerGui(const QStringList& arguments)
 {
 
 }

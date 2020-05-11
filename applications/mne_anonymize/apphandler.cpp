@@ -84,12 +84,12 @@ QCoreApplication* AppHandler::createApplication(int& argc, char* argv[])
 
 QObject* AppHandler::dispatch(QApplication& a)
 {
-     return new SettingsControllerGUI(a.arguments());
+     return new SettingsControllerGui(a.arguments());
 }
 
 //=============================================================================================================
 
 QObject* AppHandler::dispatch(QCoreApplication &a)
 {
-    return new SettingsControllerCL(a.arguments());
+    return new SettingsControllerCl(a.arguments());
 }
