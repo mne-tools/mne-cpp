@@ -47,6 +47,7 @@
 // QT INCLUDES
 //=============================================================================================================
 #include <QCommandLineOption>
+#include <QRandomGenerator>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -564,7 +565,8 @@ QString SettingsControllerCL::generateRandomFileName()
 
     for(int i=0;i<randomLength;++i)
     {
-        int p=qrand() % charPool.length();
+//        int p=qrand() % charPool.length();
+        int p(QRandomGenerator::global()->bounded(randomLength));
         randomFileName.append(charPool.at(p));
     }
 
