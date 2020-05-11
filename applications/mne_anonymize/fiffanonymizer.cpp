@@ -483,7 +483,7 @@ void FiffAnonymizer::censorTag() const
     }//switch
 }
 
-inline QString FiffAnonymizer::subjectSexToString(const int sexCode) const
+inline QString FiffAnonymizer::subjectSexToString(int sexCode) const
 {
     static QStringList subjectSexRefList =
     {
@@ -501,7 +501,7 @@ inline QString FiffAnonymizer::subjectSexToString(const int sexCode) const
     }
 }
 
-inline QString FiffAnonymizer::subjectHandToString(const int handCode) const
+inline QString FiffAnonymizer::subjectHandToString(int handCode) const
 {
     static QStringList subjectHandRefList =
     {
@@ -672,7 +672,7 @@ QString FiffAnonymizer::getFileNameOut() const
 
 //=============================================================================================================
 
-void FiffAnonymizer::setVerboseMode(const bool bFlag)
+void FiffAnonymizer::setVerboseMode(bool bFlag)
 {
     m_bVerboseMode = bFlag;
 }
@@ -758,7 +758,7 @@ QDateTime  FiffAnonymizer::getSubjectBirthday()
 
 //=============================================================================================================
 
-void FiffAnonymizer::setSubjectBirthdayOffset(const int iSubjBirthdayOffset)
+void FiffAnonymizer::setSubjectBirthdayOffset(int iSubjBirthdayOffset)
 {
     m_bUseSubjectBirthdayOffset = true;
     m_iSubjectBirthdayOffset = iSubjBirthdayOffset;
