@@ -73,16 +73,16 @@ int main(int argc, char* argv[])
 {
     qInstallMessageHandler(ApplicationLogger::customLogWriter);
 
+    MNEANONYMIZE::AppHandler h;
     QScopedPointer<QCoreApplication>
-            qtApp(MNEANONYMIZE::AppHandler::createApplication(argc, argv));
+            qtApp(h.createApplication(argc, argv));
 
     qtApp->setOrganizationName("MNE-CPP Project");
     qtApp->setApplicationName("MNE Anonymize");
     qtApp->setApplicationVersion("dev");
 
     QScopedPointer<QObject>
-            controller(MNEANONYMIZE::AppHandler::dispatch(*qtApp));
+            controller(h.createController(qtApp->arguments()));
 
     return qtApp->exec();
-
 }
