@@ -73,7 +73,7 @@ RtcMneSetupWidget::RtcMneSetupWidget(RtcMne* toolbox, QWidget *parent)
 {
     ui.setupUi(this);
 
-    ui.m_qLineEdit_FwdFileName->setText(m_pMNE->m_qFileFwdSolution.fileName());
+    // ui.m_qLineEdit_FwdFileName->setText(m_pMNE->m_qFileFwdSolution.fileName());
 
     ui.m_qLineEdit_AtlasDirName->setText(m_pMNE->m_sAtlasDir);
     if(m_pMNE->m_pAnnotationSet->isEmpty())
@@ -87,61 +87,16 @@ RtcMneSetupWidget::RtcMneSetupWidget(RtcMne* toolbox, QWidget *parent)
     else
         ui.m_qLabel_surfaceStat->setText("loaded");
 
-    connect(ui.m_qPushButton_FwdFileDialog, &QPushButton::released, this, &RtcMneSetupWidget::showFwdFileDialog);
+    //connect(ui.m_qPushButton_FwdFileDialog, &QPushButton::released, this, &RtcMneSetupWidget::showFwdFileDialog);
     connect(ui.m_qPushButton_AtlasDirDialog, &QPushButton::released, this, &RtcMneSetupWidget::showAtlasDirDialog);
     connect(ui.m_qPushButton_SurfaceDirDialog, &QPushButton::released, this, &RtcMneSetupWidget::showSurfaceDirDialog);
-    connect(ui.m_qPushButonStartClustering, &QPushButton::released, this, &RtcMneSetupWidget::clusteringTriggered);
+    //connect(ui.m_qPushButonStartClustering, &QPushButton::released, this, &RtcMneSetupWidget::clusteringTriggered);
 }
 
 //=============================================================================================================
 
 RtcMneSetupWidget::~RtcMneSetupWidget()
 {
-}
-
-//=============================================================================================================
-
-void RtcMneSetupWidget::setClusteringState()
-{
-    ui.m_qPushButonStartClustering->setEnabled(false);
-    ui.m_qPushButonStartClustering->setText("Clustering...");
-}
-
-//=============================================================================================================
-
-void RtcMneSetupWidget::setSetupState()
-{
-    ui.m_qPushButonStartClustering->setEnabled(true);
-    ui.m_qPushButonStartClustering->setText("Start Clustering");
-}
-
-//=============================================================================================================
-
-void RtcMneSetupWidget::clusteringTriggered()
-{
-    // start clustering
-    QFuture<void> future = QtConcurrent::run(m_pMNE, &RtcMne::doClustering);
-}
-
-//=============================================================================================================
-
-void RtcMneSetupWidget::showFwdFileDialog()
-{
-    QString t_sFileName = QFileDialog::getOpenFileName(this,
-                                                    tr("Open Forward Solution"),
-                                                    QString(),
-                                                    tr("Fif Files (*.fif)"));
-
-    QFile file(t_sFileName);
-    MNEForwardSolution::SPtr t_pFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(file));
-
-    if(!t_pFwd->isEmpty())
-    {
-        ui.m_qLineEdit_FwdFileName->setText(t_sFileName);
-        m_pMNE->m_qFileFwdSolution.setFileName(t_sFileName);
-        m_pMNE->m_pFwd = t_pFwd;
-        m_pMNE->m_pRTSEOutput->data()->setFwdSolution(t_pFwd);
-    }
 }
 
 //=============================================================================================================

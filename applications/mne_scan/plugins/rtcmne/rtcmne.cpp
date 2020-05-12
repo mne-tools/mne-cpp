@@ -100,7 +100,6 @@ RtcMne::RtcMne()
 , m_iNumAverages(1)
 , m_iDownSample(1)
 , m_iTimePointSps(0)
-, m_qFileFwdSolution(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif")
 , m_sAtlasDir(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/label")
 , m_sSurfaceDir(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/surf")
 , m_sAvrType("3")
@@ -132,7 +131,6 @@ QSharedPointer<IPlugin> RtcMne::clone() const
 void RtcMne::init()
 {
     // Inits
-    m_pFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_qFileFwdSolution, false, true));
     m_pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet(m_sAtlasDir+"/lh.aparc.a2009s.annot", m_sAtlasDir+"/rh.aparc.a2009s.annot"));
     m_pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet(m_sSurfaceDir+"/lh.inflated", m_sSurfaceDir+"/rh.inflated"));
 
@@ -300,67 +298,8 @@ void RtcMne::calcFiffInfo()
 
 //=============================================================================================================
 
-void RtcMne::doClustering()
-{
-    if(m_pFwd->nchan == -1) {
-        qInfo() << "[RtcMne::doClustering] The forward solution has not been loaded yet.";
-        return;
-    }
-
-    if(m_pAnnotationSet->size() == 0) {
-        qInfo() << "[RtcMne::doClustering] The annotation set has not been loaded yet.";
-        return;
-    }
-
-    if(m_pFwd->isClustered()) {
-        qInfo() << "[RtcMne::doClustering] Forward solution is already clustered.";
-        return;
-    }
-
-    emit clusteringStarted();
-
-    m_qMutex.lock();
-    m_pFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_pFwd->cluster_forward_solution(*m_pAnnotationSet.data(), 200)));
-    m_pRTSEOutput->data()->setFwdSolution(m_pFwd);
-
-    m_qMutex.unlock();
-
-    finishedClustering();
-}
-
-//=============================================================================================================
-
-void RtcMne::finishedClustering()
-{
-    m_qMutex.lock();
-    m_pFiffInfoForward = QSharedPointer<FiffInfoBase>(new FiffInfoBase(m_pFwd->info));
-    m_qMutex.unlock();
-
-    emit clusteringFinished();
-}
-
-//=============================================================================================================
-
 bool RtcMne::start()
 {
-//    if(m_pFwd->nchan == -1) {
-//        QMessageBox msgBox;
-//        msgBox.setText("The forward solution has not been loaded yet.");
-//        msgBox.setStandardButtons(QMessageBox::Ok);
-//        msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
-//        msgBox.exec();
-//        return false;
-//    }
-
-//    if(!m_pFwd->isClustered()) {
-//        QMessageBox msgBox;
-//        msgBox.setText("The forward solution has not been clustered yet. Please click the Start Clustering button in the Source Localization plugin.");
-//        msgBox.setStandardButtons(QMessageBox::Ok);
-//        msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
-//        msgBox.exec();
-//        return false;
-//    }
-
     QThread::start();
     return true;
 }
@@ -399,11 +338,6 @@ QString RtcMne::getName() const
 QWidget* RtcMne::setupWidget()
 {
     RtcMneSetupWidget* setupWidget = new RtcMneSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
-
-    connect(this, &RtcMne::clusteringStarted,
-            setupWidget, &RtcMneSetupWidget::setClusteringState);
-    connect(this, &RtcMne::clusteringFinished,
-            setupWidget, &RtcMneSetupWidget::setSetupState);
 
     return setupWidget;
 }
