@@ -60,7 +60,6 @@ using namespace UTILSLIB;
 //=============================================================================================================
 // MAIN
 //=============================================================================================================
-
 /**
  * The function main marks the entry point of the program.
  * By default, main has the storage class extern.

@@ -4,7 +4,7 @@ on:
   push:
     branches:
     # Change this to the branch name you make changes to the documentation on
-    - mne_anonymize_fixes
+    - docu
 
 jobs:
   gh-pages:
