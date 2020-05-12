@@ -439,7 +439,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
         //
         if (thisRawDir.last >= to)
         {
-            printf(" [done]\n");
+            //printf(" [done]\n");
             break;
         }
     }
@@ -774,7 +774,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
         //
         if (thisRawDir.last >= to)
         {
-            printf(" [done]\n");
+            //printf(" [done]\n");
             break;
         }
     }
