@@ -36,8 +36,8 @@
  *
  */
 
-#ifndef MNEANONYMIZE_H
-#define MNEANONYMIZE_H
+#ifndef MNEANONYMIZE_FIFFANONYMIZER_H
+#define MNEANONYMIZE_FIFFANONYMIZER_H
 
 //=============================================================================================================
 // INCLUDES
@@ -47,7 +47,6 @@
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_tag.h>
 #include <fiff/fiff_types.h>
-//#include <fiff/fiff_dir_entry.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -63,6 +62,7 @@
 #include <QDebug>
 #include <QPointer>
 #include <QString>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -79,12 +79,15 @@ namespace MNEANONYMIZE
 {
 
 //=============================================================================================================
+// MNEANONYMIZE FORWARD DECLARATIONS
+//=============================================================================================================
+
+//=============================================================================================================
 /**
  * Description of what this class is intended to do (in detail).
  *
  * @brief FiffAnonymizer class declaration.
  */
-
 class FiffAnonymizer
 {
 public:
@@ -126,7 +129,6 @@ public:
     FiffAnonymizer(FiffAnonymizer &&obj);
 
     //=========================================================================================================
-    // PUBLIC INTERFACE
     /**
      * This method is the main method in the class. It goes through the input file and tag by tag
      * analyses if there might be some relevant information to anonymize and eventually does so. Initially it
@@ -148,7 +150,7 @@ public:
     /**
      * Returns the input file which will be anonymized. .
      *
-     * @param [out] Returns String containing the input file name including its path.
+     * @param [out] Returns a string containing the input file name including its path.
      */
     QString getFileNameIn() const;
 
@@ -165,7 +167,7 @@ public:
     /**
      * Returns the output file where anonymized data will be saved.
      *
-     * @param [out] String containing the output file name including its path.
+     * @param [out] Returns a string containing the output file name including its path.
      */
     QString getFileNameOut() const;
 
@@ -264,7 +266,7 @@ public:
     /**
      * If found in the fiff file, subject's birthday information will be overwritten in the file in order to match the date specified with this function.
      *
-     * @param [in] sSubjBirtday String containing the desired subject birthday date.
+     * @param [in] sSubjBirthday String containing the desired subject birthday date.
      */
     void setSubjectBirthday(const QString& sSubjBirthday);
 
@@ -327,7 +329,7 @@ public:
      * Specifies the subject's id text information you want the output file to have. If a hisID tag is found in the fiff file,
      * then, the subject's hisID information will be changed to match the one specified with this method.
      *
-     * @param [in] sSubjectId   String with the subject's id.
+     * @param [in] sSubjectHisId   String with the subject's id.
      */
     void setSubjectHisId(const QString& sSubjectHisId);
 
@@ -371,7 +373,6 @@ private:
      */
     inline QString subjectSexToString(int sexCode) const;
 
-
     //=========================================================================================================
     /**
      * This transforms the data inside a subject handedness tag (right, left or unknown) into a string object
@@ -389,7 +390,7 @@ private:
      *
      * @param [in] str  String to print.
      */
-    void printIfVerbose(const QString &str) const;
+    inline void printIfVerbose(const QString &str) const;
 
     //=========================================================================================================
     /**
@@ -479,6 +480,47 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
+inline QString FiffAnonymizer::subjectSexToString(int sexCode) const
+{
+    static QStringList subjectSexRefList =
+    {
+        "unknown" ,
+        "male" ,
+        "female"
+    };
+
+    if (sexCode > -1 && sexCode < subjectSexRefList.size())
+    {
+        return subjectSexRefList.at(sexCode);
+    } else {
+        qCritical() << "Invalid subject sex code. [0 = unknown, 1 = male, 2 = female]. The code of the subject is: " << QString::number(sexCode);
+        return QString("invalid-code");
+    }
+}
+
+//=============================================================================================================
+
+inline QString FiffAnonymizer::subjectHandToString(int handCode) const
+{
+    static QStringList subjectHandRefList =
+    {
+        "unknown",
+        "right",
+        "left",
+        "ambidextrous"
+    };
+
+    if ((handCode > -1) && (handCode < subjectHandRefList.size()))
+    {
+        return subjectHandRefList.at(handCode);
+    } else {
+        qCritical() << "Invalid subject handedness code. [0 = unknown, 1 = right, 2 = left, 3 = ambidextrous]. The code of the subject is: " << QString::number(handCode);
+        return QString("invalid-code");
+    }
+}
+
+//=============================================================================================================
+
 inline void FiffAnonymizer::printIfVerbose(const QString& str) const
 {
     if(m_bVerboseMode)
@@ -487,7 +529,6 @@ inline void FiffAnonymizer::printIfVerbose(const QString& str) const
     }
 }
 
+} // namespace MNEANONYMIZE
 
-}
-
-#endif // MNEANONYMIZE
+#endif // MNEANONYMIZE_FIFFANONYMIZER_H
