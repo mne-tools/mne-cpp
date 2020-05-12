@@ -46,6 +46,7 @@
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
+
 #include <QCommandLineOption>
 #include <QRandomGenerator>
 
@@ -104,6 +105,7 @@ SettingsControllerCl::SettingsControllerCl()
 //    emit finished(0);
 }
 
+//=============================================================================================================
 
 SettingsControllerCl::SettingsControllerCl(const QStringList& arguments)
 : m_sAppName(qApp->applicationName())
@@ -537,7 +539,6 @@ void SettingsControllerCl::renameOutputFileAsInputFile()
 
 void SettingsControllerCl::printHeaderIfVerbose()
 {
-
     printIfVerbose(" ");
     printIfVerbose("=============================================================================================");
     printIfVerbose(" ");

@@ -64,5 +64,3 @@ SettingsControllerGui::SettingsControllerGui(const QStringList& arguments)
 {
 
 }
-
-//=============================================================================================================

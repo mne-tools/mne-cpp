@@ -208,7 +208,6 @@ signals:
      */
     void finished(const int) const;
 
-    //=========================================================================================================
 private:
     FiffAnonymizer::SPtr m_pAnonymizer;     /**< Local pointer to a Fiffanonyzer object to configure and use.*/
     QString m_sAppName;                     /**< Application name.*/
@@ -226,7 +225,6 @@ private:
     bool m_bOutFileRenamed;                 /**< Flags if the output file has been renamed to match the name the input file had. */
 
     QCommandLineParser m_parser;            /**< Parser object to work with member ptr to QCoreApp and parse input command line options.*/
-
 };
 
 //=============================================================================================================
@@ -240,7 +238,6 @@ inline void SettingsControllerCl::printIfVerbose(const QString& str) const
         std::printf("\n%s", str.toUtf8().data());
     }
 }
-
 
 } // namespace MNEANONYMIZE
 

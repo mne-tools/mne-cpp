@@ -483,42 +483,6 @@ void FiffAnonymizer::censorTag() const
     }//switch
 }
 
-inline QString FiffAnonymizer::subjectSexToString(int sexCode) const
-{
-    static QStringList subjectSexRefList =
-    {
-        "unknown" ,
-        "male" ,
-        "female"
-    };
-
-    if (sexCode > -1 && sexCode < subjectSexRefList.size())
-    {
-        return subjectSexRefList.at(sexCode);
-    } else {
-        qCritical() << "Invalid subject sex code. [0 = unknown, 1 = male, 2 = female]. The code of the subject is: " << QString::number(sexCode);
-        return QString("invalid-code");
-    }
-}
-
-inline QString FiffAnonymizer::subjectHandToString(int handCode) const
-{
-    static QStringList subjectHandRefList =
-    {
-        "unknown",
-        "right",
-        "left",
-        "ambidextrous"
-    };
-
-    if ((handCode > -1) && (handCode < subjectHandRefList.size()))
-    {
-        return subjectHandRefList.at(handCode);
-    } else {
-        qCritical() << "Invalid subject handedness code. [0 = unknown, 1 = right, 2 = left, 3 = ambidextrous]. The code of the subject is: " << QString::number(handCode);
-        return QString("invalid-code");
-    }
-}
 //=============================================================================================================
 
 void FiffAnonymizer::readTag()
@@ -751,7 +715,7 @@ void FiffAnonymizer::setSubjectBirthday(const QDateTime& sSubjBirthday)
 
 //=============================================================================================================
 
-QDateTime  FiffAnonymizer::getSubjectBirthday()
+QDateTime FiffAnonymizer::getSubjectBirthday()
 {
     return m_dSubjectBirthday;
 }
