@@ -132,7 +132,7 @@ QSharedPointer<IPlugin> RtcMne::clone() const
 void RtcMne::init()
 {
     // Inits
-    //m_pFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_qFileFwdSolution, false, true));
+    m_pFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_qFileFwdSolution, false, true));
     m_pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet(m_sAtlasDir+"/lh.aparc.a2009s.annot", m_sAtlasDir+"/rh.aparc.a2009s.annot"));
     m_pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet(m_sSurfaceDir+"/lh.inflated", m_sSurfaceDir+"/rh.inflated"));
 
@@ -162,7 +162,7 @@ void RtcMne::init()
     m_outputConnectors.append(m_pRTSEOutput);
     m_pRTSEOutput->data()->setName(this->getName());//Provide name to auto store widget settings
 
-    // Set the fwd, annotation and surface data
+    // Set the annotation and surface data
     if(m_pAnnotationSet->size() != 0) {
         m_pRTSEOutput->data()->setAnnotSet(m_pAnnotationSet);
     }
@@ -170,10 +170,6 @@ void RtcMne::init()
     if(m_pSurfaceSet->size() != 0) {
         m_pRTSEOutput->data()->setSurfSet(m_pSurfaceSet);
     }
-
-//    if(m_pFwd->nchan != -1) {
-//        m_pRTSEOutput->data()->setFwdSolution(m_pFwd);
-//    }
 }
 
 //=============================================================================================================
@@ -214,7 +210,7 @@ void RtcMne::calcFiffInfo()
 {
     QMutexLocker locker(&m_qMutex);
 
-    if(m_qListCovChNames.size() > 0 && m_pFiffInfoInput && m_pFiffInfoForward)  {
+    if(m_qListCovChNames.size() > 0 && m_pFiffInfoInput && m_pFiffInfoForward) {
         qDebug() << "RtcMne::calcFiffInfoFiff - Infos available";
 
 //        qDebug() << "RtcMne::calcFiffInfo - m_qListCovChNames" << m_qListCovChNames;
@@ -414,6 +410,28 @@ QWidget* RtcMne::setupWidget()
 
 //=============================================================================================================
 
+void RtcMne::updateRTFS(SCMEASLIB::Measurement::SPtr pMeasurement)
+{
+    if(QSharedPointer<RealTimeFwdSolution> pRTFS = pMeasurement.dynamicCast<RealTimeFwdSolution>()) {
+
+        if(pRTFS->isClustered()) {
+            m_qMutex.lock();
+            m_pFwd = pRTFS->getValue();
+            m_pRTSEOutput->data()->setFwdSolution(m_pFwd);
+            m_pFiffInfoForward = QSharedPointer<FiffInfoBase>(new FiffInfoBase(m_pFwd->info));
+            m_qMutex.unlock();
+        } else if(!pRTFS->isClustered()) {
+            QMessageBox msgBox;
+            msgBox.setText("The forward solution has not been clustered yet.");
+            msgBox.setStandardButtons(QMessageBox::Ok);
+            msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
+            msgBox.exec();
+        }
+    }
+}
+
+//=============================================================================================================
+
 void RtcMne::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
     if(m_pFwd) {
@@ -490,52 +508,58 @@ void RtcMne::updateRTC(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 void RtcMne::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    if(QSharedPointer<RealTimeEvokedSet> pRTES = pMeasurement.dynamicCast<RealTimeEvokedSet>()) {
-        QStringList lResponsibleTriggerTypes = pRTES->getResponsibleTriggerTypes();
-        emit responsibleTriggerTypesChanged(lResponsibleTriggerTypes);
+    if(m_pFwd) {
+        if(QSharedPointer<RealTimeEvokedSet> pRTES = pMeasurement.dynamicCast<RealTimeEvokedSet>()) {
+            QStringList lResponsibleTriggerTypes = pRTES->getResponsibleTriggerTypes();
+            emit responsibleTriggerTypesChanged(lResponsibleTriggerTypes);
 
-        if(!m_bPluginControlWidgetsInit) {
-            initPluginControlWidgets();
-        }
-
-        if(!this->isRunning() || !lResponsibleTriggerTypes.contains(m_sAvrType)) {
-            return;
-        }
-
-        FiffEvokedSet::SPtr pFiffEvokedSet = pRTES->getValue();
-
-        //Fiff Information of the evoked
-        if(!m_pFiffInfoInput && pFiffEvokedSet->evoked.size() > 0) {
-            QMutexLocker locker(&m_qMutex);
-
-            for(int i = 0; i < pFiffEvokedSet->evoked.size(); ++i) {
-                if(pFiffEvokedSet->evoked.at(i).comment == m_sAvrType) {
-                    m_pFiffInfoInput = QSharedPointer<FiffInfo>(new FiffInfo(pFiffEvokedSet->evoked.at(i).info));
-                    break;
-                }
+            if(!m_bPluginControlWidgetsInit) {
+                initPluginControlWidgets();
             }
 
-            m_bEvokedInput = true;
-        }
+            if(!this->isRunning() || !lResponsibleTriggerTypes.contains(m_sAvrType)) {
+                return;
+            }
 
-        if(this->isRunning()) {
-            for(int i = 0; i < pFiffEvokedSet->evoked.size(); ++i) {
-                if(pFiffEvokedSet->evoked.at(i).comment == m_sAvrType) {
-                    // Store current evoked as member so we can dispatch it if the time pick by the user changed
-                    m_currentEvoked = pFiffEvokedSet->evoked.at(i).pick_channels(m_qListPickChannels);
+            FiffEvokedSet::SPtr pFiffEvokedSet = pRTES->getValue();
 
-                    // Please note that we do not need a copy here since this function will block until
-                    // the buffer accepts new data again. Hence, the data is not deleted in the actual
-                    // Measurement function after it emitted the notify signal.
-                    while(!m_pCircularEvokedBuffer->push(pFiffEvokedSet->evoked.at(i).pick_channels(m_qListPickChannels))) {
-                        //Do nothing until the circular buffer is ready to accept new data again
+            //Fiff Information of the evoked
+            if(!m_pFiffInfoInput && pFiffEvokedSet->evoked.size() > 0) {
+                QMutexLocker locker(&m_qMutex);
+
+                for(int i = 0; i < pFiffEvokedSet->evoked.size(); ++i) {
+                    if(pFiffEvokedSet->evoked.at(i).comment == m_sAvrType) {
+                        m_pFiffInfoInput = QSharedPointer<FiffInfo>(new FiffInfo(pFiffEvokedSet->evoked.at(i).info));
+                        break;
                     }
+                }
 
-                    //qDebug()<<"RtcMne::updateRTE - average found type" << m_sAvrType;
-                    break;
+                m_bEvokedInput = true;
+            }
+
+            if(!m_bPluginControlWidgetsInit) {
+                initPluginControlWidgets();
+            }
+
+            if(this->isRunning()) {
+                for(int i = 0; i < pFiffEvokedSet->evoked.size(); ++i) {
+                    if(pFiffEvokedSet->evoked.at(i).comment == m_sAvrType) {
+                        // Store current evoked as member so we can dispatch it if the time pick by the user changed
+                        m_currentEvoked = pFiffEvokedSet->evoked.at(i).pick_channels(m_qListPickChannels);
+
+                        // Please note that we do not need a copy here since this function will block until
+                        // the buffer accepts new data again. Hence, the data is not deleted in the actual
+                        // Measurement function after it emitted the notify signal.
+                        while(!m_pCircularEvokedBuffer->push(pFiffEvokedSet->evoked.at(i).pick_channels(m_qListPickChannels))) {
+                            //Do nothing until the circular buffer is ready to accept new data again
+                        }
+
+                            //qDebug()<<"RtcMne::updateRTE - average found type" << m_sAvrType;
+                            break;
+                        }
+                    }
                 }
             }
-        }
     }
 }
 
@@ -554,26 +578,6 @@ void RtcMne::updateInvOp(const MNEInverseOperator& invOp)
     //Set up the inverse according to the parameters
     // Use 1 nave here because in case of evoked data as input the minimum norm will always be updated when the source estimate is calculated (see run method).
     m_pMinimumNorm->doInverseSetup(1,true);
-}
-
-//=============================================================================================================
-
-void RtcMne::updateRTFS(SCMEASLIB::Measurement::SPtr pMeasurement)
-{
-    if(QSharedPointer<RealTimeFwdSolution> pRTFS = pMeasurement.dynamicCast<RealTimeFwdSolution>()) {
-
-        if(pRTFS->isClustered()) {
-            m_qMutex.lock();
-            m_pFwd = pRTFS->getValue();
-            m_qMutex.unlock();
-        } else if(!pRTFS->isClustered()) {
-            QMessageBox msgBox;
-            msgBox.setText("The forward solution has not been clustered yet.");
-            msgBox.setStandardButtons(QMessageBox::Ok);
-            msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
-            msgBox.exec();
-        }
-    }
 }
 
 //=============================================================================================================

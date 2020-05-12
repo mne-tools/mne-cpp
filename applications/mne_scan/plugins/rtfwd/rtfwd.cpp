@@ -400,14 +400,14 @@ void RtFwd::run()
     m_mutex.unlock();
 
     // Compute initial Forward solution
-    emit statusInformationChanged(1);
+    emit statusInformationChanged(0);
     ComputeFwd::SPtr pComputeFwd = ComputeFwd::SPtr(new ComputeFwd(m_pFwdSettings));
     pComputeFwd->calculateFwd();
     pComputeFwd->storeFwd();
 
     // get Mne Forward Solution (in future this is not necessary, ComputeForward will have this as member)
     QFile t_fSolution(m_pFwdSettings->solname);
-    MNEForwardSolution::SPtr pFwdSolution = MNEForwardSolution::SPtr(new MNEForwardSolution(t_fSolution));
+    MNEForwardSolution::SPtr pFwdSolution = MNEForwardSolution::SPtr(new MNEForwardSolution(t_fSolution, false, true));
 
     // emit results to control widget
     emit fwdSolutionAvailable(pFwdSolution->source_ori,
