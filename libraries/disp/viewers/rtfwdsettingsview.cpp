@@ -153,7 +153,10 @@ bool RtFwdSettingsView::getRecomputationStatusChanged()
 
 void RtFwdSettingsView::setRecomputationStatus(int iStatus)
 {
-    if(iStatus == 1) {
+    if(iStatus == 0) {
+        m_ui->m_label_recomputationFeedback->setText("Computing");
+        m_ui->m_label_recomputationFeedback->setStyleSheet("QLabel { background-color : red;}");
+    } else if(iStatus == 1) {
         m_ui->m_label_recomputationFeedback->setText("Recomputing");
         m_ui->m_label_recomputationFeedback->setStyleSheet("QLabel { background-color : red;}");
     } else if (iStatus == 2) {
