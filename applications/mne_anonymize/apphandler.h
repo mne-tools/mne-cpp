@@ -101,7 +101,7 @@ public:
      *
      * @return Pointer to a QApplication or a QCoreApplication.
      */
-    static QCoreApplication* createApplication(int& argc, char * argv[]);
+    QCoreApplication* createApplication(int& argc, char * argv[]);
 
     //=========================================================================================================
     /**
@@ -124,30 +124,12 @@ public:
     * Constructs an appropiate controller QApplication (GUI application).
     */
     //    . when inputing a QCoreApplication (command-line application).
-    static QObject* dispatch(QCoreApplication&);
-
-    //=========================================================================================================
-    /**
-     * @brief Creates a QApplication or a QCoreApplication according tu user's preference for a command line or a
-     *  GUI application.
-     *
-     * @details Handles input arguments and searches for a "--no-gui" option. If found, this will create a
-     *  QCoreApplication so that main can execute the appplication as a command line one. If not found, it creates a
-     *  QApplication so that main can execute a GUI.
-     *
-     * @see QT Documentation
-     * @see https://doc.qt.io/qt-5/qapplication.html#details
-     *
-     * @param [in] argc (argument count) number of arguments on the command line.
-     * @param [in] argv (argument vector) an array of pointers to arrays of characters.
-     *
-     * @return Pointer to a QApplication or a QCoreApplication.
-     */
-    static QObject* dispatch(QApplication&);
+    QObject* createController(QStringList args);
 
 protected:
 
 private:
+bool m_AppHasGui;  /**< Show if the app is a GUI based app, or a Command-line one.*/
 
 };
 
