@@ -1,41 +1,55 @@
 ---
 title: MNE Anonymize CLI
-has_children: true
+has_children: false
 parent: Learn
 nav_order: 3
+has_toc: false
 ---
 # MNE Anonymize CLI
 
-This application substitutes Personal Health Information and Personal Identifiable information from a FIFF file with some default information.
+This application substitutes **Personal Health Information** (PHI) and **Personal Identifiable Information** (PII) from a [FIFF (Functional Imaging File Format)](https://bids-specification.readthedocs.io/en/stable/99-appendices/06-meg-file-formats.html) file (*.fif*). 
 
-## Introduction 
+##### De-identifying vs Anonymizing
+PHI or PII can be substituted with default or user-specified values. This way, it is up to the user to have the output file be either, completely anonymized or de-identified. For instance, a field included as PHI could be the **measurment date and time** (see the following paragraph for more information). With this application, the measurement date and time can be either substituted with a default date or it can be modified by a number of days as a constant offset. This way, you could de-identify this field in each file within a database of FIFF files and you could then distribute the files for research purposes. Lastly, given a de-identified file, and knowing the number of days to offset the measurement date, a file can be **re-identified**. (Note. This is just an example, typically *.fif* files carry a lot more protected information apart from the measurement date.)
 
-Fiff files may include Personal Health Information and Personal Identifyable information. The consequences of openly distributing this kind of protected information can be dire. Typically, the regulatory bodies in charge of these issues in each state or country will describe methods for deidentify and anonymize data. In the United States of America the law related to this problem is the well-known HIPAA, issued by the US Department of Health and Human Services (HHS). This law mentions two main ways (see this [link](https://www.hhs.gov/hipaa/for-professionals/privacy/special-topics/de-identification/index.html) for more information) to know when it is ok to distribute a file related to a patient. This kind of easy(-er) method is called the "safe harbor", by which if the data is stripped from the following info, it is then considered "safe". 
+## Introduction on HIPAA law 
 
-(A) Names
-(B) All geographic subdivisions smaller than a state, including street address, city, county, precinct, ZIP code, and their equivalent geocodes, except for the initial three digits of the ZIP code if, according to the current publicly available data from the Bureau of the Census:
-(C) All elements of dates (except year) for dates that are directly related to an individual, including birth date, admission date, discharge date, death date, and all ages over 89 and all elements of dates (including year) indicative of such age, except that such ages and elements may be aggregated into a single category of age 90 or older
-(D) Telephone numbers
-(L) Vehicle identifiers and serial numbers, including license plate numbers
-(E) Fax numbers
-(M) Device identifiers and serial numbers
-(F) Email addresses
-(N) Web Universal Resource Locators (URLs)
-(G) Social security numbers
-(O) Internet Protocol (IP) addresses
-(H) Medical record numbers
-(P) Biometric identifiers, including finger and voice prints
-(I) Health plan beneficiary numbers
-(Q) Full-face photographs and any comparable images
-(J) Account numbers
-(R) Any other unique identifying number, characteristic, or code, except as permitted by paragraph (c) of this section [Paragraph (c) is presented below in the section “Re-identification”]; and
-(K) Certificate/license numbers
+Fiff files may include Personal Health Information and Personal Identifyable information. The consequences of openly distributing this kind of protected information can be dire. Typically, the regulatory bodies in charge of these issues in each state or country will describe methods for deidentify and anonymize data. In the United States of America, the law related to this problem is the well-known HIPAA, issued by the US Department of Health and Human Services (HHS). This law mentions two main ways ([more information](https://svdecomposer.github.io/mne-cpp/pages/learn/mneanonymize.html#introduction-on-HIPAA-law) to know when it is OK to distribute a file with patient information in it. This kind of easy(-er) method is called the "safe harbor", by which if the data is stripped from the following info, it is then considered "safe". 
 
-Depending on the settings during acquisition the data files may contain few or many of the previous fields, stored in plain text, in unencrypted form. The application `mne_anonymize` was written to solve this problem. 
+* Names
+* All geographic subdivisions smaller than a state, including street address, city, county, precinct, ZIP code, and their equivalent geocodes, except for the initial three digits of the ZIP code if, according to the current publicly available data from the Bureau of the Census:
+* All elements of dates (except year) for dates that are directly related to an individual, including birth date, admission date, discharge date, death date, and all ages over 89 and all elements of dates (including year) indicative of such age, except that such ages and elements may be aggregated into a single category of age 90 or older
+* Telephone numbers
+* Vehicle identifiers and serial numbers, including license plate numbers
+* Fax numbers
+* Device identifiers and serial numbers
+* Email addresses
+* Web Universal Resource Locators (URLs)
+* Social security numbers
+* Internet Protocol (IP) addresses
+* Medical record numbers
+* Biometric identifiers, including finger and voice prints
+* Health plan beneficiary numbers
+* Full-face photographs and any comparable images
+* Account numbers
+* Any other unique identifying number, characteristic, or code, except for specific  codes/names assigned to a certain file which could allow to *re-identify* the file. For instance, a new research-oriented id# asigned to a specific subject. There are two requirements for this exception: (1) this new code/number must not be derived from the actual data, and (2) the actual relational table between each code and the protected information cannot be disclosed.
+* Certificate/license numbers
 
-It is not a good idea to directly erase the problematic information contained in a fiff file, because some of these fields like Subject Name or Measuremenet date, are needed and expected by other software. Therefore `mne_anonymize` reads data from the input file, modifyies the information by inserting a set of default values instead. These new values may slighlty modify the resulting size of the output file. `mne_anonymize` does not modify the input file. It can read from write-protected folders without problem. All the new information will be stored in a separated output file.
+Depending on the settings during acquisition the data files may contain few or many of the previous fields, stored in plain text, in unencrypted form. The application `mne_anonymize` was created to solve this problem.
 
-As the fiff file consists of a linked list of tags, `mne_anonymize` will follow the list and modify the protected information. Hidden or 'unlinked' tags in the file will not be copied to the output. The so-called "free list" of tags, will not be copied to the output anonymized file either. The tag directory will not be copied to the output file either. Therefore, after `mne_anonymize` has processed a data file there is no way to recover the removed information. Use this utility with caution. |
+## How is the file modified
+
+An initial approach to strip protected information from the file would be to just delete it or maybe alter it in place. However, this is not a good idea. 
+
+Firstly, some of these fields like `Subject Name` or `Measuremenet date`, are needed and expected by other software packages, to simply delete it might cause some trouble down the road. Moreover, it doesn't seem to be a neat job to alter the actual information by *masking* it with a default character set, like, for instance, substituing the name `Peter` `C` `Smith` with `xxxxx` `x` `xxxxx`. Some of the fields of data in a fiff file are quite long, or, for instance, an individual subject might have a particularly long name. Therefore a subject might not be properly de-identified if we were to follow this route. But most importantly, we consider that the best way to modify the information in a FIFF file is to recompute completely the actual information and the structure it is stored in, whenever needed.
+
+Since the FIFF format implies a linked list of `tags` with information in them, `mne_anonymize` will follow this list of tags from the begining to the end, while creating a new `tag` with *anonymized* or *de-identified* information wherever needed. This way, hidden or *unlinked* tags in the input file will not be copied to the output. The so-called `free list` of tags, will not be copied to the output anonymized file either. The tag directory will not be copied to the output file either.
+
+This implies that the actual final size of the output file will slightly differ from the input file.
+
+`mne_anonymize` does not modify the input file. This application can even read from write-protected folders. The new/altered output information will be stored in a separated output file.
+
+After `mne_anonymize` has processed a data file there is no way to recover the removed information. Use this utility with caution. 
 
 ## Command-line options 
 
@@ -61,7 +75,9 @@ As the fiff file consists of a linked list of tags, `mne_anonymize` will follow 
 |`--his <value>` *optional*| Specify the Subject's ID within the Hospital system. Only allowed when anonymizing a single file. Default: 'mne_anonymize' |
 
 
-Specifically, this utility modifies the following tags from the fiff file:
+## Modified FIFF *tags*
+
+Specifically, this utility modifies the following `tags` from the fiff file:
 
 | Tag | Description | Default Anonymization Value |
 |-----|-------------|-----------------------------|
@@ -107,4 +123,5 @@ In order to substract 35 days from all measurement dates, both in the ID and `FI
     $ mne_anonymize --in ./MNE-sample-data/MEG/sample/sample_audvis_raw.fif --measurement_date_offset 35
 
 Typical use with abbreviated options. This line will call `mne_anonymize`, specify the input file, set verbose mode and brute mode on. Set `delete_input_file` on, avoiding the deletion confirmation, and finally set the measurement date to be 35 days before the date registered in the file.
+
     $ mne_anonymize -i ./MNE-sample-data/MEG/sample/sample_audvis_raw.fif -vbdf --mdo 35
