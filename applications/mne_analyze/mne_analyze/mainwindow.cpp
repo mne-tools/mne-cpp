@@ -244,7 +244,9 @@ void MainWindow::createPluginControls(QSharedPointer<ANSHAREDLIB::PluginManager>
         QDockWidget* pControl = pPlugin->getControl();
         if(pControl) {
             addDockWidget(Qt::LeftDockWidgetArea, pControl);
-            qDebug() << "[MainWindow::createPluginControls] Found and added dock widget for " << pPlugin->getName();
+            qInfo() << "[MainWindow::createPluginControls] Found and added dock widget for " << pPlugin->getName();
+            m_pMenuView->addAction(pControl->toggleViewAction());
+            qInfo() << "[MainWindow::createPluginControls] Added" << pPlugin->getName() << "controls to View menu";
         }
     }
 
