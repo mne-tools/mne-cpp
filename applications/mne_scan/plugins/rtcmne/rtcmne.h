@@ -164,18 +164,6 @@ public:
 
     //=========================================================================================================
     /**
-     * Slot called to do the clustering.
-     */
-    void doClustering();
-
-    //=========================================================================================================
-    /**
-     * Slot called when the clustering is finished.
-     */
-    void finishedClustering();
-
-    //=========================================================================================================
-    /**
      * Slot to update the real time multi sample array data
      */
     void updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement);
@@ -264,8 +252,6 @@ protected:
     qint32                          m_iDownSample;              /**< Down sample factor. */
     qint32                          m_iTimePointSps;            /**< The time point to pick from the data in samples. */
 
-    QFile                           m_qFileFwdSolution;         /**< File to forward solution. */
-
     QString                         m_sAtlasDir;                /**< File to Atlas. */
     QString                         m_sSurfaceDir;              /**< File to Surface. */
     QString                         m_sAvrType;                 /**< The average type */
@@ -279,17 +265,6 @@ protected:
 signals:
     void responsibleTriggerTypesChanged(const QStringList& lResponsibleTriggerTypes);
 
-    //=========================================================================================================
-    /**
-     * Signal when clustering is started
-     */
-    void clusteringStarted();
-
-    //=========================================================================================================
-    /**
-     * Signal when clustering has finished
-     */
-    void clusteringFinished();
 };
 } // NAMESPACE
 
