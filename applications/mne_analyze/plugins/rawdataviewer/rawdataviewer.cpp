@@ -158,7 +158,7 @@ QMenu *RawDataViewer::getMenu()
 QDockWidget *RawDataViewer::getControl()
 {
     if(!m_pControlDock) {
-        m_pControlDock = new QDockWidget(tr("Raw Data Viewer"));
+        m_pControlDock = new QDockWidget(tr("Data View Controls"));
         m_pControlDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 
         m_pLayout = new QVBoxLayout;
