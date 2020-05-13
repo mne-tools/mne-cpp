@@ -59,6 +59,7 @@
 #include <QAbstractScrollArea>
 #include <QEvent>
 #include <QKeyEvent>
+#include <QLabel>
 
 #if !defined(NO_OPENGL)
     #include <QGLWidget>
@@ -92,15 +93,20 @@ FiffRawView::FiffRawView(QWidget *parent)
     //set vertical layout
     QVBoxLayout *neLayout = new QVBoxLayout(this);
     neLayout->setContentsMargins(0, 0, 0, 0);
-
     neLayout->addWidget(m_pTableView);
 
     //set layouts
     this->setLayout(neLayout);
 
+    //Create position labels
+    createLabels();
+
     m_pTableView->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
     //m_pTableView->horizontalScrollBar()->setRange(0, m_pTableView->horizontalScrollBar()->maximum() / 1000000);
     //m_pTableView->setShowGrid(true);
+
+    connect(m_pTableView->horizontalScrollBar(), &QScrollBar::valueChanged,
+            this, &FiffRawView::updateLabels);
 }
 
 //=============================================================================================================
@@ -185,6 +191,7 @@ void FiffRawView::initMVCSettings(const QSharedPointer<FiffRawViewModel>& pModel
 //    //Gestures
 //    m_pTableView->grabGesture(Qt::PinchGesture);
 //    m_pTableView->grabGesture(Qt::TapAndHoldGesture);
+    updateLabels(0);
 }
 
 //=============================================================================================================
@@ -257,6 +264,7 @@ void FiffRawView::setWindowSize(int T)
 
     m_pTableView->horizontalScrollBar()->setValue(iNewPos);
     m_pTableView->viewport()->repaint();
+    updateLabels(m_pTableView->horizontalScrollBar()->value());
 }
 
 //=============================================================================================================
@@ -386,4 +394,50 @@ void FiffRawView::updateScrollPosition()
     //qDebug() << "Current scroll:" << m_pTableView->horizontalScrollBar()->value();
 
     m_pTableView->horizontalScrollBar()->setValue(iPos);
+}
+
+//=============================================================================================================
+
+void FiffRawView::createLabels()
+{
+    QHBoxLayout *LabelLayout = new QHBoxLayout(this);
+    QWidget* labelBar = new QWidget(this);
+
+    m_pLeftLabel = new QLabel(this);
+    m_pRightLabel = new QLabel(this);
+
+    m_pLeftLabel->setText(" ");
+    m_pLeftLabel->setAlignment(Qt::AlignLeft);
+
+    m_pRightLabel->setText(" ");
+    m_pRightLabel->setAlignment(Qt::AlignRight);
+
+    LabelLayout->addWidget(m_pLeftLabel);
+    LabelLayout->addWidget(m_pRightLabel);
+    labelBar->setLayout(LabelLayout);
+
+    this->layout()->addWidget(labelBar);
+
+    m_pLeftLabel->show();
+    m_pRightLabel->show();
+    labelBar->show();
+}
+
+//=============================================================================================================
+
+void FiffRawView::updateLabels(int iValue)
+{
+    Q_UNUSED(iValue);
+
+    QString strLeft, strRight;
+
+    //Left Label
+    int iSample = static_cast<int>(m_pTableView->horizontalScrollBar()->value() / m_pModel->pixelDifference());
+    strLeft = QString("%1 | %2 sec").arg(QString().number(iSample)).arg(QString().number(iSample / m_pModel->getFiffInfo()->sfreq, 'f', 2));
+    m_pLeftLabel->setText(strLeft);
+
+    //Right Label
+    iSample += m_iT * m_pModel->getFiffInfo()->sfreq;
+    strRight = QString("%1 | %2 sec").arg(QString().number(iSample)).arg(QString().number(iSample / m_pModel->getFiffInfo()->sfreq, 'f', 2));
+    m_pRightLabel->setText(strRight);
 }

@@ -68,6 +68,7 @@ namespace ANSHAREDLIB {
 }
 
 class QTableView;
+class QLabel;
 
 //=============================================================================================================
 // DEFINE NAMESPACE RAWDATAVIEWERPLUGIN
@@ -233,6 +234,20 @@ private:
      */
     bool eventFilter(QObject *object, QEvent *event);
 
+    //=========================================================================================================
+    /**
+     * Creates the lables for sample/time values displayed beneath the data view
+     */
+    void createLabels();
+
+    //=========================================================================================================
+    /**
+     * Triggers the update of the update label based on the data viewer horizontal positon (not on iValue)
+     *
+     * @param [in] iValue   Horizontal scroll bar position (unused)
+     */
+    void updateLabels(int iValue);
+
     QPointer<QTableView>                                m_pTableView;                   /**< Pointer to table view ui element */
 
     QSharedPointer<ANSHAREDLIB::FiffRawViewModel>       m_pModel;                       /**< Pointer to associated Model */
@@ -250,6 +265,9 @@ private:
     qint32                                              m_iT;                           /**< Display window size in seconds */
 
     QScroller*                                          m_pKineticScroller;             /**< Used for kinetic scrolling through data view */
+
+    QLabel*                                             m_pLeftLabel;                   /**< Left 'Sample | Seconds' display label */
+    QLabel*                                             m_pRightLabel;                  /**< Right 'Sample | Seconds' display label */
 
 signals:
     void tableViewDataWidthChanged(int iWidth);
