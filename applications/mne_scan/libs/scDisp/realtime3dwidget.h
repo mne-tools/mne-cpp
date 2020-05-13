@@ -43,6 +43,8 @@
 
 #include "measurementwidget.h"
 
+#include <fiff/fiff_coord_trans.h>
+
 #include <fs/surfaceset.h>
 #include <fs/annotationset.h>
 
@@ -162,7 +164,8 @@ protected:
     FSLIB::AnnotationSet                                        m_annotationSet;        /**< The current annotation set. */
     FSLIB::SurfaceSet                                           m_surfSet;              /**< The current surface set. */
 
-    Qt3DCore::QTransform                                        m_tAlignment;               /**< Transformation matrix alignment fiducials/tracked in head space */
+    Qt3DCore::QTransform                                        m_tAlignment;           /**< Transformation matrix alignment fiducials/tracked in head space */
+    FIFFLIB::FiffCoordTrans                                     m_mriHeadTrans;         /**< The mri to head transformation. */
 
     QSharedPointer<DISP3DLIB::Data3DTreeModel>                  m_pData3DModel;         /**< The Disp3D model. */
 
