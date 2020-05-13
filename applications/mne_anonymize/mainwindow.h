@@ -1,7 +1,8 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef MNEANONYMIZE_MAINWINDOW_H
+#define MNEANONYMIZE_MAINWINDOW_H
 
 #include <QMainWindow>
+#include <settingscontrollergui.h>
 
 namespace Ui {
 class MainWindow;
@@ -13,10 +14,30 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+    void setController(MNEANONYMIZE::SettingsControllerGui*);
+
+//    void loadFile(const QString& fileName);
+    MNEANONYMIZE::SettingsControllerGui* getController() const;
+
+protected:
+    void closeEvent(QCloseEvent *event) override;
+
+private slots:
+//    void open();
+//    void save();
+//    void about();
 
 private:
-    Ui::MainWindow *ui;
+//    void createStatusBar();
+//    void createAcctions();
+//    void saveFile(const QString& fileNme);
+    bool confirmClose();
+
+//    QString strippedName(const QString & fullFileName);
+
+   bool m_bDataModified;
+   QSharedPointer<Ui::MainWindow> m_pUi;
+   MNEANONYMIZE::SettingsControllerGui* m_pController;
 };
 
-#endif // MAINWINDOW_H
+#endif // MNEANONYMIZE_MAINWINDOW_H
