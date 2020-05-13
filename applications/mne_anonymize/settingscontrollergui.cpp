@@ -62,5 +62,5 @@ using namespace MNEANONYMIZE;
 
 SettingsControllerGui::SettingsControllerGui(const QStringList& arguments)
 {
-
+    Q_UNUSED(arguments)
 }
