@@ -34,6 +34,7 @@ defineReplace(macDeployArgs) {
         target_ext = .app
     }
 
+    # Deploy qt dependencies
     deploy_cmd = macdeployqt
 
     deploy_target = $$shell_quote($$shell_path($${mne_binary_dir}/$${target}$${target_ext}))
@@ -53,7 +54,7 @@ defineReplace(winDeployArgs) {
 
     # Deploy/Copy mne-cpp dependencies manually (windeployqt only takes care of qt and system libraries)
     file = $$shell_quote($$shell_path($${mne_library_dir}/*.dll))
-    final_deploy_command += $${QMAKE_COPY} $${file} $$shell_quote($${mne_binary_dir}) $$escape_expand(\\n\\t)
+    final_deploy_command += copy /-Y $${file} $$shell_quote($${mne_binary_dir}) $$escape_expand(\\n\\t)
 
     # Deploy qt dependencies
     deploy_target = $$shell_quote($$shell_path($${mne_binary_dir}/$${target}.exe))
@@ -84,24 +85,23 @@ defineReplace(copyResources) {
 
 ############################################### GLOBAL DEFINES ################################################
 
-MNE_CPP_VERSION = 0.1.0
-MNE_LIB_VERSION = 0.1.0
+VERSION = 0.1.0
 
-QMAKE_TARGET_PRODUCT = mne-cpp
+QMAKE_TARGET_PRODUCT = MNE-CPP
 QMAKE_TARGET_DESCRIPTION = MNE-CPP Qt and Eigen based C++ library.
 QMAKE_TARGET_COPYRIGHT = Copyright (C) 2020 Authors of MNE-CPP. All rights reserved.
 
 ########################################### PROJECT CONFIGURATION #############################################
 
 ## To build the minimal version of MNE-CPP run: qmake MNECPP_CONFIG+=minimalVersion
-## To set CodeCov coverage compiler flag run: qmake MNECPP_CONFIG+=withCodeCov
+## To compile with code coverage support run: qmake MNECPP_CONFIG+=withCodeCov
 ## To disable tests run: qmake MNECPP_CONFIG+=noTests
 ## To disable examples run: qmake MNECPP_CONFIG+=noExamples
 ## To disable applications run: qmake MNECPP_CONFIG+=noApplications
-## To build MNE-CPP libraries as static libs: qmake MNECPP_CONFIG+=static
+## To build MNE-CPP libraries and executables statically run: qmake MNECPP_CONFIG+=static
 ## To build MNE-CPP with FFTW support in Eigen (make sure to specify FFTW_DIRs below): qmake MNECPP_CONFIG+=useFFTW
 ## To build MNE-CPP Disp library without OpenGL support (default is with OpenGL support): qmake MNECPP_CONFIG+=noOpenGL
-## To build MNE-CPP against wasm: qmake MNECPP_CONFIG+=wasm
+## To build MNE-CPP against WebAssembly (Wasm): qmake MNECPP_CONFIG+=wasm
 ## To build MNE Scan with BrainFlow support: qmake MNECPP_CONFIG+=withBrainFlow
 ## To build MNE Scan with LSL support: qmake MNECPP_CONFIG+=withLsl
 ## To build MNE Scan with BrainAMP support: qmake MNECPP_CONFIG+=withBrainAmp

@@ -39,13 +39,15 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
+CONFIG += skip_target_version_ext
+
 QT -= gui
 QT += xml core concurrent
 
 DEFINES += UTILS_LIBRARY
 
 TARGET = Utils
-TARGET = $$join(TARGET,,MNE$$MNE_LIB_VERSION,)
+TARGET = $$join(TARGET,,"mnecpp",)
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }

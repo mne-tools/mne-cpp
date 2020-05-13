@@ -38,13 +38,15 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
+CONFIG += skip_target_version_ext
+
 QT += network concurrent
 QT -= gui
 
 DEFINES += MNE_LIBRARY
 
 TARGET = Mne
-TARGET = $$join(TARGET,,MNE$${MNE_LIB_VERSION},)
+TARGET = $$join(TARGET,,mnecpp,)
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -60,13 +62,13 @@ contains(MNECPP_CONFIG, static) {
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Fsd \
-            -lMNE$${MNE_LIB_VERSION}Utilsd \
+    LIBS += -lmnecppFiffd \
+            -lmnecppFsd \
+            -lmnecppUtilsd \
 } else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Fs \
-            -lMNE$${MNE_LIB_VERSION}Utils \
+    LIBS += -lmnecppFiff \
+            -lmnecppFs \
+            -lmnecppUtils \
 }
 
 SOURCES += \

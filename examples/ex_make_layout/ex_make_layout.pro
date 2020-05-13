@@ -38,8 +38,6 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = app
 
-VERSION = $${MNE_CPP_VERSION}
-
 QT += network
 QT -= gui
 
@@ -61,12 +59,12 @@ contains(MNECPP_CONFIG, static) {
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Utilsd \
+    LIBS += -lmnecppFiffd \
+            -lmnecppUtilsd \
 
 } else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Utils \
+    LIBS += -lmnecppFiff \
+            -lmnecppUtils \
 }
 
 SOURCES += main.cpp

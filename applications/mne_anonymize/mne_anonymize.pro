@@ -42,8 +42,6 @@ TEMPLATE = app
 
 QT += widgets concurrent network
 
-VERSION = $${MNE_CPP_VERSION}
-
 CONFIG   += console
 
 contains(MNECPP_CONFIG, static) {
@@ -59,11 +57,11 @@ CONFIG(debug, debug|release) {
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Utilsd \
+    LIBS += -lmnecppFiffd \
+            -lmnecppUtilsd \
 } else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Utils \
+    LIBS += -lmnecppFiff \
+            -lmnecppUtils \
 }
 
 DESTDIR = $${MNE_BINARY_DIR}

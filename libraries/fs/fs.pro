@@ -38,12 +38,17 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
+VER_MAJ = 0
+VER_MIN = 1
+VER_PAT = 0
+CONFIG += skip_target_version_ext
+
 QT -= gui
 
 DEFINES += FS_LIBRARY
 
 TARGET = Fs
-TARGET = $$join(TARGET,,MNE$${MNE_LIB_VERSION},)
+TARGET = $$join(TARGET,,mnecpp,)
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -59,9 +64,9 @@ contains(MNECPP_CONFIG, static) {
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd
+    LIBS += -lmnecppUtilsd
 } else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Utils
+    LIBS += -lmnecppUtils
 }
 
 SOURCES += \

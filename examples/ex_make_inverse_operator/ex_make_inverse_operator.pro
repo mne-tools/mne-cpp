@@ -37,8 +37,6 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = app
 
-VERSION = $${MNE_CPP_VERSION}
-
 QT += core concurrent network
 QT -= gui
 
@@ -60,19 +58,19 @@ contains(MNECPP_CONFIG, static) {
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Inversed \
-            -lMNE$${MNE_LIB_VERSION}Fwdd \
-            -lMNE$${MNE_LIB_VERSION}Mned \
-            -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Fsd \
-            -lMNE$${MNE_LIB_VERSION}Utilsd \
+    LIBS += -lmnecppInversed \
+            -lmnecppFwdd \
+            -lmnecppMned \
+            -lmnecppFiffd \
+            -lmnecppFsd \
+            -lmnecppUtilsd \
 } else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Inverse \
-            -lMNE$${MNE_LIB_VERSION}Fwd \
-            -lMNE$${MNE_LIB_VERSION}Mne \
-            -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Fs \
-            -lMNE$${MNE_LIB_VERSION}Utils \
+    LIBS += -lmnecppInverse \
+            -lmnecppFwd \
+            -lmnecppMne \
+            -lmnecppFiff \
+            -lmnecppFs \
+            -lmnecppUtils \
 }
 
 SOURCES += main.cpp
