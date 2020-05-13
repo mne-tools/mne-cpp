@@ -355,11 +355,11 @@ void RtcMne::updateRTFS(SCMEASLIB::Measurement::SPtr pMeasurement)
             m_pFiffInfoForward = QSharedPointer<FiffInfoBase>(new FiffInfoBase(m_pFwd->info));
             m_qMutex.unlock();
         } else if(!pRTFS->isClustered()) {
-            QMessageBox msgBox;
-            msgBox.setText("The forward solution has not been clustered yet.");
-            msgBox.setStandardButtons(QMessageBox::Ok);
-            msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
-            msgBox.exec();
+//            QMessageBox msgBox;
+//            msgBox.setText("The forward solution has not been clustered yet.");
+//            msgBox.exec();
+//            return;
+            qWarning() << "[RtcMne::updateRTFS: The forward solution has not been clustered yet. ]";
         }
     }
 }

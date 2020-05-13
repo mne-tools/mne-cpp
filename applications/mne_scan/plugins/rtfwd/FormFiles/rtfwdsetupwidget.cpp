@@ -165,7 +165,7 @@ void RtFwdSetupWidget::onSolNameChanged()
 void RtFwdSetupWidget::showMeasFileDialog()
 {
     QString t_sFileName = QFileDialog::getOpenFileName(this,
-                                                       tr("Select Source Space"),
+                                                       tr("Select Measurement File"),
                                                        QString(),
                                                        tr("Fif Files (*.fif)"));
 

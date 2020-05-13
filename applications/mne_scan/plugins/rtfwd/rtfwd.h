@@ -174,6 +174,12 @@ private:
 
     //=========================================================================================================
     /**
+     * Call this funciton whenever when a forward computation was requested.
+     */
+    void onDoForwardComputation();
+
+    //=========================================================================================================
+    /**
      * Call this function whenever the recompution status changed.
      *
      * @param[in] bDoRecomputation    If recomputation is activated.
@@ -200,20 +206,21 @@ private:
 
 
 
-    QMutex                                      m_mutex;                /**< The threads mutex.*/
+    QMutex                                      m_mutex;                    /**< The threads mutex.*/
 
-    float                                       m_fThreshRot;           /**< The allowed rotation in degree.**/
-    float                                       m_fThreshMove;          /**< The Allowed movement in mm.**/
-    bool                                        m_bBusy;                /**< Indicates if we have to update headposition.**/
-    bool                                        m_bDoRecomputation;     /**< If recomputation is activated.**/
-    bool                                        m_bDoClustering;        /**< If clustering is activated.**/
+    float                                       m_fThreshRot;               /**< The allowed rotation in degree.**/
+    float                                       m_fThreshMove;              /**< The Allowed movement in mm.**/
+    bool                                        m_bBusy;                    /**< Indicates if we have to update headposition.**/
+    bool                                        m_bDoRecomputation;         /**< If recomputation is activated.**/
+    bool                                        m_bDoClustering;            /**< If clustering is activated.**/
+    bool                                        m_bDoFwdComputation;        /**< Do a forward computation. **/
 
-    QString                                     m_sAtlasDir;            /**< File to Atlas. */
+    QString                                     m_sAtlasDir;                /**< File to Atlas. */
 
-    QSharedPointer<INVERSELIB::HpiFitResult>    m_pHpiFitResult;        /**< The Hpi fitting result.**/
+    QSharedPointer<INVERSELIB::HpiFitResult>    m_pHpiFitResult;            /**< The Hpi fitting result.**/
 
-    FIFFLIB::FiffInfo::SPtr                     m_pFiffInfo;            /**< Fiff measurement info.*/
-    FIFFLIB::FiffCoordTrans                     m_transDevHead;         /**< Updated meg->head transformation. */
+    FIFFLIB::FiffInfo::SPtr                     m_pFiffInfo;                /**< Fiff measurement info.*/
+    FIFFLIB::FiffCoordTrans                     m_transDevHead;             /**< Updated meg->head transformation. */
 
     QSharedPointer<FSLIB::AnnotationSet>                                        m_pAnnotationSet;       /**< Annotation set. */
 
