@@ -37,6 +37,8 @@ include(../../../../mne-cpp.pri)
 
 TEMPLATE = lib
 
+CONFIG += skip_target_version_ext
+
 CONFIG += plugin
 CONFIG += c++11
 
@@ -70,28 +72,28 @@ CONFIG(debug, debug|release) {
     LIBS += -lscSharedd \
             -lscDispd \
             -lscMeasd \
-            -lMNE$${MNE_LIB_VERSION}Dispd \
-            -lMNE$${MNE_LIB_VERSION}RtProcessingd \
-            -lMNE$${MNE_LIB_VERSION}Connectivityd \
-            -lMNE$${MNE_LIB_VERSION}Inversed \
-            -lMNE$${MNE_LIB_VERSION}Fwdd \
-            -lMNE$${MNE_LIB_VERSION}Mned \
-            -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Fsd \
-            -lMNE$${MNE_LIB_VERSION}Utilsd \
+            -lmnecppDispd \
+            -lmnecppRtProcessingd \
+            -lmnecppConnectivityd \
+            -lmnecppInversed \
+            -lmnecppFwdd \
+            -lmnecppMned \
+            -lmnecppFiffd \
+            -lmnecppFsd \
+            -lmnecppUtilsd \
 } else {
     LIBS += -lscShared \
             -lscDisp \
             -lscMeas \
-            -lMNE$${MNE_LIB_VERSION}Disp \
-            -lMNE$${MNE_LIB_VERSION}RtProcessing \
-            -lMNE$${MNE_LIB_VERSION}Connectivity \
-            -lMNE$${MNE_LIB_VERSION}Inverse \
-            -lMNE$${MNE_LIB_VERSION}Fwd \
-            -lMNE$${MNE_LIB_VERSION}Mne \
-            -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Fs \
-            -lMNE$${MNE_LIB_VERSION}Utils \
+            -lmnecppDisp \
+            -lmnecppRtProcessing \
+            -lmnecppConnectivity \
+            -lmnecppInverse \
+            -lmnecppFwd \
+            -lmnecppMne \
+            -lmnecppFiff \
+            -lmnecppFs \
+            -lmnecppUtils \
 }
 
 SOURCES += \

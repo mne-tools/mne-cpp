@@ -37,6 +37,8 @@ include(../../../../mne-cpp.pri)
 
 TEMPLATE = lib
 
+CONFIG += skip_target_version_ext
+
 CONFIG += c++11
 CONFIG += plugin
 
@@ -71,14 +73,14 @@ CONFIG(debug, debug|release) {
     LIBS += -lscSharedd \
             -lscDispd \
             -lscMeasd \
-            -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Utilsd \
+            -lmnecppFiffd \
+            -lmnecppUtilsd \
 } else {
     LIBS += -lscShared \
             -lscDisp \
             -lscMeas \
-            -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Utils \
+            -lmnecppFiff \
+            -lmnecppUtils \
 }
 
 contains(QT_ARCH, i386) {

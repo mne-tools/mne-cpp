@@ -37,6 +37,8 @@ include(../../../../mne-cpp.pri)
 
 TEMPLATE = lib
 
+CONFIG += skip_target_version_ext
+
 CONFIG += plugin
 
 DEFINES += BABYMEG_PLUGIN
@@ -69,18 +71,18 @@ CONFIG(debug, debug|release) {
     LIBS += -lscSharedd \
             -lscDispd \
             -lscMeasd \
-            -lMNE$${MNE_LIB_VERSION}Communicationd \
-            -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Fsd \
-            -lMNE$${MNE_LIB_VERSION}Utilsd \
+            -lmnecppCommunicationd \
+            -lmnecppFiffd \
+            -lmnecppFsd \
+            -lmnecppUtilsd \
 } else {
     LIBS += -lscShared \
             -lscDisp \
             -lscMeas \
-            -lMNE$${MNE_LIB_VERSION}Communication \
-            -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Fs \
-            -lMNE$${MNE_LIB_VERSION}Utils \
+            -lmnecppCommunication \
+            -lmnecppFiff \
+            -lmnecppFs \
+            -lmnecppUtils \
 }
 
 SOURCES += \

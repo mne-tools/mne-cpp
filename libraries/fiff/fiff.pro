@@ -38,13 +38,15 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
+CONFIG += skip_target_version_ext
+
 QT += network
 QT -= gui
 
 DEFINES += FIFF_LIBRARY
 
 TARGET = Fiff
-TARGET = $$join(TARGET,,MNE$${MNE_LIB_VERSION},)
+TARGET = $$join(TARGET,,mnecpp,)
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -64,9 +66,9 @@ contains(MNECPP_CONFIG, static) {
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd
+    LIBS += -lmnecppUtilsd
 } else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Utils
+    LIBS += -lmnecppUtils
 }
 
 SOURCES += fiff.cpp \

@@ -38,6 +38,8 @@ include(../../../../mne-cpp.pri)
 
 TEMPLATE = lib
 
+CONFIG += skip_target_version_ext
+
 CONFIG += plugin
 
 DEFINES += GUSBAMP_PLUGIN
@@ -82,16 +84,16 @@ CONFIG(debug, debug|release) {
     LIBS += -lscSharedd \
             -lscDispd \
             -lscMeasd \
-            -lMNE$${MNE_LIB_VERSION}Dispd \
-            -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Utilsd \
+            -lmnecppDispd \
+            -lmnecppFiffd \
+            -lmnecppUtilsd \
 } else {
     LIBS += -lscShared \
             -lscDisp \
             -lscMeas \
-            -lMNE$${MNE_LIB_VERSION}Disp \
-            -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Utils \
+            -lmnecppDisp \
+            -lmnecppFiff \
+            -lmnecppUtils \
 }
 
 SOURCES += \

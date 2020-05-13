@@ -42,8 +42,6 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = app
 
-VERSION = $${MNE_CPP_VERSION}
-
 QT += testlib 3dextras
 
 CONFIG   += console
@@ -64,27 +62,27 @@ contains(MNECPP_CONFIG, static) {
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Disp3Dd \
-            -lMNE$${MNE_LIB_VERSION}Dispd \
-            -lMNE$${MNE_LIB_VERSION}RtProcessingd \
-            -lMNE$${MNE_LIB_VERSION}Connectivityd \
-            -lMNE$${MNE_LIB_VERSION}Inversed \
-            -lMNE$${MNE_LIB_VERSION}Fwdd \
-            -lMNE$${MNE_LIB_VERSION}Mned \
-            -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Fsd \
-            -lMNE$${MNE_LIB_VERSION}Utilsd \
+    LIBS += -lmnecppDisp3Dd \
+            -lmnecppDispd \
+            -lmnecppRtProcessingd \
+            -lmnecppConnectivityd \
+            -lmnecppInversed \
+            -lmnecppFwdd \
+            -lmnecppMned \
+            -lmnecppFiffd \
+            -lmnecppFsd \
+            -lmnecppUtilsd \
 } else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Disp3D \
-            -lMNE$${MNE_LIB_VERSION}Disp \
-            -lMNE$${MNE_LIB_VERSION}RtProcessing \
-            -lMNE$${MNE_LIB_VERSION}Connectivity \
-            -lMNE$${MNE_LIB_VERSION}Inverse \
-            -lMNE$${MNE_LIB_VERSION}Fwd \
-            -lMNE$${MNE_LIB_VERSION}Mne \
-            -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Fs \
-            -lMNE$${MNE_LIB_VERSION}Utils \
+    LIBS += -lmnecppDisp3D \
+            -lmnecppDisp \
+            -lmnecppRtProcessing \
+            -lmnecppConnectivity \
+            -lmnecppInverse \
+            -lmnecppFwd \
+            -lmnecppMne \
+            -lmnecppFiff \
+            -lmnecppFs \
+            -lmnecppUtils \
 }
 
 
