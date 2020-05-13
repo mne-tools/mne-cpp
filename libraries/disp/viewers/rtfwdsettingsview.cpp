@@ -96,6 +96,8 @@ RtFwdSettingsView::RtFwdSettingsView(const QString& sSettingsPath,
             this, &RtFwdSettingsView::showAtlasDirDialog);
     connect(m_ui->m_checkBox_bDoClustering, &QCheckBox::clicked,
             this, &RtFwdSettingsView::onClusteringStatusChanged);
+    connect(m_ui->m_qPushButton_ComputeForward, &QPushButton::clicked,
+            this, &RtFwdSettingsView::doForwardComputation);
 
     // load settings
     loadSettings(m_sSettingsPath);
@@ -120,9 +122,6 @@ void RtFwdSettingsView::loadSettings(const QString& settingsPath)
 
     QSettings settings;
     QVariant defaultData;
-
-    // m_ui->m_checkBox_bDoRecomputation->setChecked(settings.value(settingsPath + QString("/doRecomp"), false).toBool());
-    // m_ui->m_checkBox_bDoClustering->setChecked(settings.value(settingsPath + QString("/doCluster"), false).toBool());
 }
 
 //=============================================================================================================
@@ -135,11 +134,6 @@ void RtFwdSettingsView::saveSettings(const QString& settingsPath)
 
     QSettings settings;
     QVariant data;
-
-//    data.setValue(m_ui->m_checkBox_bDoRecomputation->isChecked());
-//    settings.setValue(settingsPath + QString("/doRecomp"), data);
-//    data.setValue(m_ui->m_checkBox_bDoClustering->isChecked());
-//    settings.setValue(settingsPath + QString("/doCluster"), data);
 }
 
 //=============================================================================================================
@@ -154,12 +148,15 @@ bool RtFwdSettingsView::getRecomputationStatusChanged()
 void RtFwdSettingsView::setRecomputationStatus(int iStatus)
 {
     if(iStatus == 0) {
-        m_ui->m_label_recomputationFeedback->setText("Computing");
+        m_ui->m_label_recomputationFeedback->setText("Initializing");
         m_ui->m_label_recomputationFeedback->setStyleSheet("QLabel { background-color : red;}");
     } else if(iStatus == 1) {
-        m_ui->m_label_recomputationFeedback->setText("Recomputing");
+        m_ui->m_label_recomputationFeedback->setText("Computing");
         m_ui->m_label_recomputationFeedback->setStyleSheet("QLabel { background-color : red;}");
     } else if (iStatus == 2) {
+        m_ui->m_label_recomputationFeedback->setText("Recomputing");
+        m_ui->m_label_recomputationFeedback->setStyleSheet("QLabel { background-color : red;}");
+    } else if (iStatus == 3) {
         m_ui->m_label_recomputationFeedback->setText("Clustering");
         m_ui->m_label_recomputationFeedback->setStyleSheet("QLabel { background-color : red;}");
     } else {
@@ -251,15 +248,11 @@ void RtFwdSettingsView::showAtlasDirDialog()
     if(!t_pAnnotationSet->isEmpty() && t_pAnnotationSet->size() == 2)
     {
         emit atlasDirChanged(t_sAtlasDir,t_pAnnotationSet);
-
-        //m_pMNE->m_pRTSEOutput->data()->setAnnotSet(t_pAnnotationSet);
-
         m_ui->m_qLabel_atlasStat->setText("loaded");
         m_bAnnotaionsLoaded = true;
     }
     else
     {
-//        m_pMNE->m_pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet());
         m_ui->m_qLabel_atlasStat->setText("not loaded");
     }
 }

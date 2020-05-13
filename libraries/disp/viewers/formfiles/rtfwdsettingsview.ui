@@ -48,49 +48,15 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="label_6">
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_4">
         <property name="text">
-         <string>Source Orientation</string>
+         <string>Number of clustered Sources:</string>
         </property>
        </widget>
       </item>
-      <item row="4" column="1">
-       <widget class="QLineEdit" name="m_lineEdit_sSourceOri">
-        <property name="text">
-         <string/>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="0">
-       <widget class="QLabel" name="label_7">
-        <property name="text">
-         <string>Number of Channels</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="1">
-       <widget class="QLineEdit" name="m_lineEdit_iNChan">
-        <property name="text">
-         <string/>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="0">
-       <widget class="QLabel" name="label_8">
-        <property name="text">
-         <string>Coordinate Frame</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="1">
-       <widget class="QLineEdit" name="m_lineEdit_sCoordFrame">
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="m_lineEdit_iNDipoleClustered">
         <property name="text">
          <string/>
         </property>
@@ -100,16 +66,136 @@
        </widget>
       </item>
       <item row="3" column="0">
-       <widget class="QLabel" name="label_4">
+       <widget class="QLabel" name="label_6">
         <property name="text">
-         <string>Number of Sources Clustered:</string>
+         <string>Source Orientation</string>
         </property>
        </widget>
       </item>
       <item row="3" column="1">
-       <widget class="QLineEdit" name="m_lineEdit_iNDipoleClustered">
+       <widget class="QLineEdit" name="m_lineEdit_sSourceOri">
+        <property name="text">
+         <string/>
+        </property>
         <property name="readOnly">
          <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_7">
+        <property name="text">
+         <string>Number of Channels</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLineEdit" name="m_lineEdit_iNChan">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_8">
+        <property name="text">
+         <string>Coordinate Frame</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QLineEdit" name="m_lineEdit_sCoordFrame">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1">
+       <widget class="QLabel" name="label_9">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="palette">
+         <palette>
+          <active>
+           <colorrole role="Text">
+            <brush brushstyle="SolidPattern">
+             <color alpha="0">
+              <red>231</red>
+              <green>231</green>
+              <blue>231</blue>
+             </color>
+            </brush>
+           </colorrole>
+           <colorrole role="PlaceholderText">
+            <brush brushstyle="SolidPattern">
+             <color alpha="128">
+              <red>231</red>
+              <green>231</green>
+              <blue>231</blue>
+             </color>
+            </brush>
+           </colorrole>
+          </active>
+          <inactive>
+           <colorrole role="Text">
+            <brush brushstyle="SolidPattern">
+             <color alpha="0">
+              <red>231</red>
+              <green>231</green>
+              <blue>231</blue>
+             </color>
+            </brush>
+           </colorrole>
+           <colorrole role="PlaceholderText">
+            <brush brushstyle="SolidPattern">
+             <color alpha="128">
+              <red>231</red>
+              <green>231</green>
+              <blue>231</blue>
+             </color>
+            </brush>
+           </colorrole>
+          </inactive>
+          <disabled>
+           <colorrole role="Text">
+            <brush brushstyle="SolidPattern">
+             <color alpha="127">
+              <red>255</red>
+              <green>255</green>
+              <blue>255</blue>
+             </color>
+            </brush>
+           </colorrole>
+           <colorrole role="PlaceholderText">
+            <brush brushstyle="SolidPattern">
+             <color alpha="128">
+              <red>231</red>
+              <green>231</green>
+              <blue>231</blue>
+             </color>
+            </brush>
+           </colorrole>
+          </disabled>
+         </palette>
+        </property>
+        <property name="text">
+         <string>                                           </string>
         </property>
        </widget>
       </item>
@@ -121,22 +207,15 @@
      <property name="title">
       <string>Clustering</string>
      </property>
-     <layout class="QFormLayout" name="formLayout_3">
-      <item row="0" column="0" colspan="2">
+     <layout class="QFormLayout" name="formLayout">
+      <item row="0" column="0">
        <widget class="QLabel" name="label_2">
         <property name="text">
          <string>Brain Atlas Directory</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
-       <widget class="QPushButton" name="m_qPushButton_AtlasDirDialog">
-        <property name="text">
-         <string>...</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
+      <item row="1" column="0">
        <widget class="QLineEdit" name="m_qLineEdit_AtlasDirName">
         <property name="minimumSize">
          <size>
@@ -146,20 +225,21 @@
         </property>
        </widget>
       </item>
-      <item row="7" column="0">
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+      <item row="1" column="1">
+       <widget class="QPushButton" name="m_qPushButton_AtlasDirDialog">
+        <property name="text">
+         <string>...</string>
         </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>142</width>
-          <height>0</height>
-         </size>
-        </property>
-       </spacer>
+       </widget>
       </item>
-      <item row="3" column="1">
+      <item row="2" column="0">
+       <widget class="QLabel" name="m_qLabel_atlas">
+        <property name="text">
+         <string>(lh+rh).aparc.a2009s.annot</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
        <widget class="QLabel" name="m_qLabel_atlasStat">
         <property name="frameShape">
          <enum>QFrame::Panel</enum>
@@ -172,19 +252,18 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="m_qLabel_atlas">
-        <property name="text">
-         <string>(lh+rh).aparc.a2009s.annot</string>
+      <item row="3" column="0" colspan="2">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
-       </widget>
-      </item>
-      <item row="4" column="0">
-       <widget class="QCheckBox" name="m_checkBox_bDoClustering">
-        <property name="text">
-         <string>Do Clustering</string>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>142</width>
+          <height>0</height>
+         </size>
         </property>
-       </widget>
+       </spacer>
       </item>
      </layout>
     </widget>
@@ -192,32 +271,50 @@
    <item>
     <widget class="QGroupBox" name="groupBox_recomp">
      <property name="title">
-      <string>Forward Solution Recomputation</string>
+      <string>Forward Solution Computation</string>
      </property>
-     <layout class="QFormLayout" name="formLayout">
-      <item row="0" column="0" colspan="2">
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QPushButton" name="m_qPushButton_ComputeForward">
+        <property name="text">
+         <string>Compute Forward Solution</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QCheckBox" name="m_checkBox_bDoRecomputation">
         <property name="text">
-         <string>Recompute forward solution after head movement</string>
+         <string>Enable head position update</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label">
+      <item>
+       <widget class="QCheckBox" name="m_checkBox_bDoClustering">
         <property name="text">
-         <string>Status recomputation: </string>
+         <string>Cluster forward solution</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="QLabel" name="m_label_recomputationFeedback">
-        <property name="text">
-         <string>No fit yet</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Status computation: </string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="m_label_recomputationFeedback">
+          <property name="text">
+           <string>No fit yet</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>
