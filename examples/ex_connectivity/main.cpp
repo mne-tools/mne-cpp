@@ -125,6 +125,7 @@ int main(int argc, char *argv[])
     #endif
     qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QApplication a(argc, argv);
+    QApplication::addLibraryPath(QApplication::applicationDirPath()+"/../lib");
 
     AbstractMetric::m_bStorageModeIsActive = false;
     AbstractMetric::m_iNumberBinStart = 0;

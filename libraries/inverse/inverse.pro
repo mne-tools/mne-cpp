@@ -146,13 +146,6 @@ unix:!macx:!contains(MNECPP_CONFIG, wasm):!contains(MNECPP_CONFIG, static) {
     QMAKE_LFLAGS    +=  -fopenmp
 }
 
-# Deploy library in non-static builds only
-win32:!contains(MNECPP_CONFIG, static) {
-    EXTRA_ARGS =
-    DEPLOY_CMD = $$winDeployLibArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
-    QMAKE_POST_LINK += $${DEPLOY_CMD}
-}
-
 # Activate FFTW backend in Eigen for non-static builds only
 contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
     DEFINES += EIGEN_FFTW_DEFAULT
