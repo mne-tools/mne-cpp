@@ -42,6 +42,7 @@
 
 #include "apphandler.h"
 #include <utils/generics/applicationlogger.h>
+#include "mainwindow.h"
 
 //=============================================================================================================
 // Eigen
@@ -81,8 +82,12 @@ int main(int argc, char* argv[])
     qtApp->setApplicationName("MNE Anonymize");
     qtApp->setApplicationVersion("dev");
 
+    QScopedPointer<MainWindow> win(new MainWindow);
+    win->show();
+
     QScopedPointer<QObject>
             controller(h.createController(qtApp->arguments()));
+
 
     return qtApp->exec();
 }
