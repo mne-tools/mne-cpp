@@ -210,6 +210,12 @@ signals:
     void atlasDirChanged(const QString& sDirPath,
                          const FSLIB::AnnotationSet::SPtr pAnnotationSet);
 
+    //=========================================================================================================
+    /**
+     * Emit this signal whenever a forward computation is supposed to be triggered.
+     */
+    void doForwardComputation();
+
 };
 
 //=============================================================================================================

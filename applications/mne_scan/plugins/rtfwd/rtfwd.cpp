@@ -85,20 +85,24 @@ RtFwd::RtFwd()
     : m_bBusy(false)
     , m_bDoRecomputation(false)
     , m_bDoClustering(false)
+    , m_bDoFwdComputation(false)
     , m_pCircularBuffer(CircularBuffer<RealTimeHpiResult>::SPtr::create(40))
     , m_pFwdSettings(new ComputeFwdSettings)
 {
     // set init values
-    m_pFwdSettings->solname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/sample_audvis-meg-eeg-oct-6-fwd.fif";
-    m_pFwdSettings->mriname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/all-trans.fif";
+    m_pFwdSettings->solname = QCoreApplication::applicationDirPath() + "/MNE-sample-data/your-solution-fwd.fif";
+    m_pFwdSettings->mriname = QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/all-trans.fif";
     m_pFwdSettings->bemname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/subjects/sample/bem/sample-1280-1280-1280-bem.fif";
-    m_pFwdSettings->srcname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/subjects/sample/bem/sample-oct-6-src.fif";
-    m_pFwdSettings->measname =QCoreApplication::applicationDirPath() + "/MNE-sample-data/chpi/raw/data_with_movement_chpi_raw.fif";
+    m_pFwdSettings->srcname = QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-oct-6-src.fif";
+    m_pFwdSettings->measname = QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif";
     m_pFwdSettings->transname.clear();
+    m_pFwdSettings->eeg_model_name = "Default";
     m_pFwdSettings->include_meg = true;
     m_pFwdSettings->include_eeg = true;
     m_pFwdSettings->accurate = true;
     m_pFwdSettings->mindist = 5.0f/1000.0f;
+
+    m_sAtlasDir = QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/label";
 }
 
 //=============================================================================================================
@@ -123,7 +127,7 @@ QSharedPointer<IPlugin> RtFwd::clone() const
 void RtFwd::init()
 {
     // Inits
-    m_pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet);
+    m_pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet(m_sAtlasDir+"/lh.aparc.a2009s.annot", m_sAtlasDir+"/rh.aparc.a2009s.annot"));
 
     // Input
     m_pHpiInput = PluginInputData<RealTimeHpiResult>::create(this, "rtFwdIn", "rtFwd HPI input");
@@ -314,6 +318,8 @@ void RtFwd::initPluginControlWidgets()
                 this, &RtFwd::onClusteringStatusChanged);
         connect(pRtFwdSettingsView, &RtFwdSettingsView::atlasDirChanged,
                 this, &RtFwd::onAtlasDirChanged);
+        connect(pRtFwdSettingsView, &RtFwdSettingsView::doForwardComputation,
+                this, &RtFwd::onDoForwardComputation);
 
         // connect outgoing signals
         connect(this, &RtFwd::statusInformationChanged,
@@ -329,6 +335,15 @@ void RtFwd::initPluginControlWidgets()
 
         m_bPluginControlWidgetsInit = true;
     }
+}
+
+//=============================================================================================================
+
+void RtFwd::onDoForwardComputation()
+{
+    m_mutex.lock();
+    m_bDoFwdComputation = true;
+    m_mutex.unlock();
 }
 
 //=============================================================================================================
@@ -399,44 +414,69 @@ void RtFwd::run()
     FiffCoordTransOld transMegHeadOld = m_transDevHead.toOld();
     m_mutex.unlock();
 
-    // Compute initial Forward solution
+    // initialize fwd solution
     emit statusInformationChanged(0);
     ComputeFwd::SPtr pComputeFwd = ComputeFwd::SPtr(new ComputeFwd(m_pFwdSettings));
-    pComputeFwd->calculateFwd();
-    pComputeFwd->storeFwd();
 
-    // get Mne Forward Solution (in future this is not necessary, ComputeForward will have this as member)
     QFile t_fSolution(m_pFwdSettings->solname);
-    MNEForwardSolution::SPtr pFwdSolution = MNEForwardSolution::SPtr(new MNEForwardSolution(t_fSolution, false, true));
-
-    // emit results to control widget
-    emit fwdSolutionAvailable(pFwdSolution->source_ori,
-                              pFwdSolution->coord_frame,
-                              pFwdSolution->nsource,
-                              pFwdSolution->nchan,
-                              pFwdSolution->src.size());
-
+    MNEForwardSolution::SPtr pFwdSolution;
     MNEForwardSolution::SPtr pClusteredFwd;
 
-    m_pRTFSOutput->data()->setValue(pFwdSolution);
+    emit statusInformationChanged(4);
 
     // do recomputation if requested, not busy and transformation is different
     bool bIsLargeHeadMovement = false;          // indicate if movement was large
     bool bIsDifferent = false;                  // indicate if incoming transformation matrix is different
     bool bDoRecomputation = false;              // indicate if we want to recompute
     bool bDoClustering = false;                 // indicate if we want to cluster
-    bool bFwdReady = true;                      // only cluster if fwd is ready
+    bool bFwdReady = false;                      // only cluster if fwd is ready
     bool bHpiConnectected = false;              // only update/recompute if hpi is connected
-
+    bool bDoFwdComputation = false;
+    bool bIsInit = false;
     while(!isInterruptionRequested()) {
-        // Get the current data
+
+        m_mutex.lock();
+        bDoFwdComputation = m_bDoFwdComputation;
+        m_mutex.unlock();
+
+        if(bDoFwdComputation) {
+            emit statusInformationChanged(1);   // computing
+            m_mutex.lock();
+            m_bBusy = true;
+            m_mutex.unlock();
+
+            // compute and store
+            pComputeFwd->calculateFwd();
+            pComputeFwd->storeFwd();
+
+            // get Mne Forward Solution (in future this is not necessary, ComputeForward will have this as member)
+            pFwdSolution = MNEForwardSolution::SPtr(new MNEForwardSolution(t_fSolution, false, true));
+            // emit results to control widget
+            emit fwdSolutionAvailable(pFwdSolution->source_ori,
+                                      pFwdSolution->coord_frame,
+                                      pFwdSolution->nsource,
+                                      pFwdSolution->nchan,
+                                      pFwdSolution->src.size());
+
+            m_mutex.lock();
+            if(!m_bDoClustering) {
+                m_pRTFSOutput->data()->setValue(pFwdSolution);
+                bFwdReady = false;
+            }
+            bFwdReady = true;
+            m_bDoFwdComputation = false;
+            bIsInit = true;
+            m_mutex.unlock();
+        }
+
+        // check if hpi is connected
         m_mutex.lock();
         if(m_pHpiFitResult) {
             bHpiConnectected = true;
         }
         m_mutex.unlock();
 
-        if(bHpiConnectected) {
+        if(bHpiConnectected && bIsInit) {
             // only recompute if hpi is connected
             m_mutex.lock();
             bIsLargeHeadMovement = m_pHpiFitResult->bIsLargeHeadMovement;
@@ -446,7 +486,7 @@ void RtFwd::run()
 
             // do recomputation if requested, a large head movement occured and devHeadTrans is different
             if(bIsLargeHeadMovement && bIsDifferent && bDoRecomputation) {
-                emit statusInformationChanged(1);       // Recomputing
+                emit statusInformationChanged(2);       // recomputing
                 m_mutex.lock();
                 m_bBusy = true;
                 transMegHeadOld = m_pHpiFitResult->devHeadTrans.toOld();
@@ -472,7 +512,7 @@ void RtFwd::run()
         bDoClustering = m_bDoClustering;
         m_mutex.unlock();
         if(bDoClustering && bFwdReady) {
-            emit statusInformationChanged(2);           // Clustering
+            emit statusInformationChanged(3);           // clustering
             pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(pFwdSolution->cluster_forward_solution(*m_pAnnotationSet.data(), 200)));
             emit clusteringAvailable(pClusteredFwd->nsource);
 
@@ -480,7 +520,7 @@ void RtFwd::run()
 
             bFwdReady = false;
         }
-        emit statusInformationChanged(3);               //finished
+        emit statusInformationChanged(4);               //finished
 
     }
 }
