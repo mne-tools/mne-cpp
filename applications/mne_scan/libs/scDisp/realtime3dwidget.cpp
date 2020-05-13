@@ -100,6 +100,7 @@ RealTime3DWidget::RealTime3DWidget(QWidget* parent)
 , m_pData3DModel(Data3DTreeModel::SPtr::create())
 , m_p3DView(new View3D())
 {
+    m_mriHeadTrans = FiffCoordTrans();
     //Init 3D View
     m_p3DView->setModel(m_pData3DModel);
 
@@ -208,6 +209,7 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
                 m_pRtMNEItem->setAlpha(1.0);
                 m_pRtMNEItem->setStreamingState(true);
                 m_pRtMNEItem->setSFreq(pRTSE->getFiffInfo()->sfreq);
+                m_mriHeadTrans = pRTSE->getMriHeadTrans();
             } else {
                 //qDebug()<<"RealTimeSourceEstimateWidget::getData - Working with m_lRtItem list";
 
@@ -275,7 +277,13 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
         }
 
         if(m_pRtMNEItem) {
-            m_pRtMNEItem->setTransform(hpiFitResult->devHeadTrans, true);
+            if(!m_mriHeadTrans.isEmpty()) {
+                m_pRtMNEItem->setTransform(m_mriHeadTrans,false);
+                m_pRtMNEItem->applyTransform(hpiFitResult->devHeadTrans, true);
+            } else {
+                m_pRtMNEItem->setTransform(hpiFitResult->devHeadTrans, true);
+            }
+
         }
 
         if(m_pRtConnectivityItem) {

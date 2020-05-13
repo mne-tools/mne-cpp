@@ -247,6 +247,7 @@ protected:
     QFuture<void>                   m_future;                   /**< The future monitoring the clustering. */
 
     FIFFLIB::FiffEvoked             m_currentEvoked;
+    FIFFLIB::FiffCoordTrans         m_mriHeadTrans;            /**< the Mri Head transformation. */
 
     qint32                          m_iNumAverages;             /**< The number of trials/averages to store. */
     qint32                          m_iDownSample;              /**< Down sample factor. */
@@ -256,6 +257,7 @@ protected:
     QString                         m_sSurfaceDir;              /**< File to Surface. */
     QString                         m_sAvrType;                 /**< The average type */
     QString                         m_sMethod;                  /**< The method: "MNE" | "dSPM" | "sLORETA". */
+    QFile                           m_fMriHeadTrans;            /**< The Head - Mri transformation. */
 
     QStringList                     m_qListCovChNames;          /**< Covariance channel names. */
     QStringList                     m_qListPickChannels;        /**< Channels to pick. */

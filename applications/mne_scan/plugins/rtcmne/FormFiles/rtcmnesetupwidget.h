@@ -103,9 +103,15 @@ private:
 
     //=========================================================================================================
     /**
-     * Shows atlas selection dialog
+     * Shows surface selection dialog
      */
     void showSurfaceDirDialog();
+
+    //=========================================================================================================
+    /**
+     * Shows transformation selection dialog
+     */
+    void showMriHeadFileDialog();
 
     RtcMne* m_pMNE;
 

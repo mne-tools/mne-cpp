@@ -104,6 +104,7 @@ RtcMne::RtcMne()
 , m_sSurfaceDir(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/surf")
 , m_sAvrType("3")
 , m_sMethod("dSPM")
+, m_fMriHeadTrans(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/all-trans.fif")
 {
 }
 
@@ -132,7 +133,8 @@ void RtcMne::init()
 {
     // Inits
     m_pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet(m_sAtlasDir+"/lh.aparc.a2009s.annot", m_sAtlasDir+"/rh.aparc.a2009s.annot"));
-    m_pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet(m_sSurfaceDir+"/lh.inflated", m_sSurfaceDir+"/rh.inflated"));
+    m_pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet(m_sSurfaceDir+"/lh.orig", m_sSurfaceDir+"/rh.orig"));
+    m_mriHeadTrans = FIFFLIB::FiffCoordTrans(m_fMriHeadTrans);
 
     // Input
     m_pRTMSAInput = PluginInputData<RealTimeMultiSampleArray>::create(this, "MNE RTMSA In", "MNE real-time multi sample array input data");
@@ -167,6 +169,10 @@ void RtcMne::init()
 
     if(m_pSurfaceSet->size() != 0) {
         m_pRTSEOutput->data()->setSurfSet(m_pSurfaceSet);
+    }
+
+    if(!m_mriHeadTrans.isEmpty()) {
+        m_pRTSEOutput->data()->setMriHeadTrans(m_mriHeadTrans);
     }
 }
 
@@ -355,10 +361,6 @@ void RtcMne::updateRTFS(SCMEASLIB::Measurement::SPtr pMeasurement)
             m_pFiffInfoForward = QSharedPointer<FiffInfoBase>(new FiffInfoBase(m_pFwd->info));
             m_qMutex.unlock();
         } else if(!pRTFS->isClustered()) {
-//            QMessageBox msgBox;
-//            msgBox.setText("The forward solution has not been clustered yet.");
-//            msgBox.exec();
-//            return;
             qWarning() << "[RtcMne::updateRTFS: The forward solution has not been clustered yet. ]";
         }
     }

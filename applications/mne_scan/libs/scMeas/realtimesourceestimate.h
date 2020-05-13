@@ -47,6 +47,8 @@
 #include <fs/surfaceset.h>
 #include <fs/annotationset.h>
 #include <fiff/fiff_info.h>
+#include <fiff/fiff_coord_trans.h>
+
 #include <mne/mne_sourcespace.h>
 #include <mne/mne_sourceestimate.h>
 #include <mne/mne_forwardsolution.h>
@@ -128,6 +130,22 @@ public:
 
     //=========================================================================================================
     /**
+     * Sets the mri head transformation.
+     *
+     * @param[in] mriHeadTrans   the transformation to set
+     */
+    inline void setMriHeadTrans(FIFFLIB::FiffCoordTrans& mriHeadTrans);
+
+    //=========================================================================================================
+    /**
+     * Returns the mri head transformation.
+     *
+     * @return the mri head transformation
+     */
+    inline FIFFLIB::FiffCoordTrans& getMriHeadTrans();
+
+    //=========================================================================================================
+    /**
      * Sets the forward solution.
      *
      * @param[in] fwdSolution   the forward solution to set
@@ -201,18 +219,19 @@ public:
     inline qint32 getSourceEstimateSize() const;
 
 private:
-    mutable QMutex                          m_qMutex;       /**< Mutex to ensure thread safety */
+    mutable QMutex                          m_qMutex;               /**< Mutex to ensure thread safety */
 
-    FIFFLIB::FiffInfo::SPtr                 m_pFiffInfo;    /**< The Fiff info. */
+    FIFFLIB::FiffInfo::SPtr                 m_pFiffInfo;            /**< The Fiff info. */
+    FIFFLIB::FiffCoordTrans                 m_mriHeadTrans;         /**< Mri to head transformation. */
 
-    FSLIB::AnnotationSet::SPtr              m_pAnnotSet;    /**< Annotation set. */
-    FSLIB::SurfaceSet::SPtr                 m_pSurfSet;     /**< Surface set. */
-    MNELIB::MNEForwardSolution::SPtr        m_pFwdSolution; /**< Forward solution. */
+    FSLIB::AnnotationSet::SPtr              m_pAnnotSet;            /**< Annotation set. */
+    FSLIB::SurfaceSet::SPtr                 m_pSurfSet;             /**< Surface set. */
+    MNELIB::MNEForwardSolution::SPtr        m_pFwdSolution;         /**< Forward solution. */
 
     qint32                                  m_iSourceEstimateSize;  /**< Sample size of the multi sample array.*/
 
-    QList<MNELIB::MNESourceEstimate::SPtr>  m_pMNEStc;      /**< The source estimates. */
-    bool                                    m_bInitialized; /**< Is initialized */
+    QList<MNELIB::MNESourceEstimate::SPtr>  m_pMNEStc;              /**< The source estimates. */
+    bool                                    m_bInitialized;         /**< Is initialized */
 };
 
 //=============================================================================================================
@@ -249,6 +268,21 @@ inline FSLIB::SurfaceSet::SPtr& RealTimeSourceEstimate::getSurfSet()
     return m_pSurfSet;
 }
 
+//=============================================================================================================
+
+inline void RealTimeSourceEstimate::setMriHeadTrans(FIFFLIB::FiffCoordTrans& mriHeadTrans)
+{
+    QMutexLocker locker(&m_qMutex);
+    m_mriHeadTrans = mriHeadTrans;
+}
+
+//=============================================================================================================
+
+inline FIFFLIB::FiffCoordTrans& RealTimeSourceEstimate::getMriHeadTrans()
+{
+    QMutexLocker locker(&m_qMutex);
+    return m_mriHeadTrans;
+}
 //=============================================================================================================
 
 inline void RealTimeSourceEstimate::setFwdSolution(MNELIB::MNEForwardSolution::SPtr& fwdSolution)
