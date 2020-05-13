@@ -1,14 +1,99 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow)
+#include <QMessageBox>
+#include <QCloseEvent>
+
+MainWindow::MainWindow(QWidget *parent)
+: QMainWindow(parent)
+, m_bDataModified(true)
+, m_pUi(new Ui::MainWindow)
 {
-    ui->setupUi(this);
+    m_pUi->setupUi(this);
 }
 
-MainWindow::~MainWindow()
+void MainWindow::closeEvent(QCloseEvent *event)
 {
-    delete ui;
+    if(confirmClose())
+    {
+        event->accept();
+    } else {
+        event->ignore();
+    }
 }
+
+bool MainWindow::confirmClose()
+{
+    if (!m_bDataModified)
+    {
+        return true;
+    }
+    const QMessageBox::StandardButton ret
+            = QMessageBox::warning(this, tr("Application"),
+                                   tr("The document has been modified.\n"
+                                      "Do you want to save your changes?"),
+                                   QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+    switch (ret) {
+    case QMessageBox::Save:
+        return true; //save();
+    case QMessageBox::Cancel:
+        return false;
+    default:
+        break;
+    }
+    return true;
+}
+
+void MainWindow::setController(MNEANONYMIZE::SettingsControllerGui *c)
+{
+    m_pController = c;
+}
+
+MNEANONYMIZE::SettingsControllerGui* MainWindow::getController() const
+{
+    return m_pController;
+}
+
+//void MainWindow::open()
+//{
+//    if(confirmOpen())
+//    {
+//        QString fileName = QFileDialog::getOpenFileName(this);
+//        if(!fileName.isEmpty())
+//        {
+//            loadFile(filename);
+//        }
+//    }
+//}
+
+//void MainWindow::save()
+//{
+//    return saveFile(curFile);
+//}
+
+//void MainWindow::about()
+//{
+//    QMessageBox::about(this,"About Application",
+//            "MNE Anonymize");
+//}
+
+//void MainWindow::doucmentWasModified()
+//{
+//    senWindowModified()
+//}
+
+//void MainWindow::createActions()
+//{
+//    QMenu *fileMenu = menuBar()->addMenu("&File");
+//    QAction *openAct = new QAction("&Open",this);
+//    openAct->setShortcut(QKeySequence::Open);
+//    openAct->setStatusTip("Open a FIFF file");
+
+//    //conect
+//    fileMenu->addAction(openAct);
+
+//    QAction * aboutAct = helpMenu->addAction("About MNE Anonymize"),qApp)
+//    aboutAct->setStatusTip("Show information about MNE Anonymize");
+
+
+//}
