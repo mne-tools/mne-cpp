@@ -40,7 +40,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = app
 
-QT += widgets concurrent network
+QT += core gui widgets
 
 CONFIG   += console
 
