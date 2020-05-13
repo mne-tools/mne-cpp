@@ -25,10 +25,10 @@ Qt is the only dependency you will need to install. Go to the Qt download sectio
 
 Please note that Qt 5.10.0 or higher is needed in order to have full Qt3D support. Install the Qt version with the minimum of the following features (uncheck all other boxes) to a path without white spaces:
 
-- Qt/5.12.6/MSVC 2017 64-bit (Make sure to select the correct version based on your compiler)
-- Qt/5.12.6/QtCharts
+- Qt/5.14.2/MSVC 2017 64-bit (Make sure to select the correct version based on your compiler)
+- Qt/5.14.2/QtCharts
 
-After the installation is finished make sure to add the Qt bin folder (e.g. `<QtFolder>\5.12.6\msvc2017_64\bin`) to your path variable. On Linux and MacOS you might also need to add the Qt lib folder (e.g. `<QtFolder>\5.12.6\msvc2017_64\lib`) to the `LD_LIBRARY_PATH` and `DYLD_LIBRARY_PATH`, respectivley.
+After the installation is finished make sure to add the Qt bin folder (e.g. `<QtFolder>\5.14.2\msvc2017_64\bin`) to your `PATH` variable. On Linux and MacOS you might also need to add the Qt lib folder (e.g. `<QtFolder>\5.14.2\msvc2017_64\lib`) to the `LD_LIBRARY_PATH` and `DYLD_LIBRARY_PATH`, respectivley.
 
 ## Get the source code
 
@@ -52,7 +52,7 @@ Every time you want to update to the newest changes use:
 | **Please note:** If you are working on an operating system on a "non-western" system, i.e. Japan, you might encounter problems with unicode interpretation. Please do the  following: Go to Control Panel > Language and Region > Management tab > Language Settings for non-Unicode Programs > Set to English (U.S.) > Reboot your system. |
 
 1. Go to your cloned repository folder and run the `mne-cpp.pro` file with QtCreator.
-2. The first time you open the mne-cpp.pro file you will be prompted to configure the project with a pre-defined kit. Select the appropriate kit, e.g., `Desktop Qt 5.12.6 MSVC2017 64bit` and configure the project.
+2. The first time you open the mne-cpp.pro file you will be prompted to configure the project with a pre-defined kit. Select the appropriate kit, e.g., `Desktop Qt 5.14.2 MSVC2017 64bit` and configure the project.
 3. In QtCreator select the Release mode in the lower left corner.
 4. In the Qt Creator's Projects window, right mouse click on the top level MNE-CPP tree item and select Run qmake. Wait until progress bar in lower right corner turns green (this step may take some time).
 5. Right mouse click again and then hit Build (this step may take some time). Wait until progress bar in lower right corner turns green.
