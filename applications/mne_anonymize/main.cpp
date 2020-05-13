@@ -83,11 +83,10 @@ int main(int argc, char* argv[])
     qtApp->setApplicationVersion("dev");
 
     QScopedPointer<MainWindow> win(new MainWindow);
-    win->show();
-
     QScopedPointer<QObject>
             controller(h.createController(qtApp->arguments()));
 
 
+    win->show();
     return qtApp->exec();
 }
