@@ -69,12 +69,14 @@ DESTDIR = $${MNE_BINARY_DIR}
 SOURCES += main.cpp \
     apphandler.cpp \
     fiffanonymizer.cpp \
+    mainwindow.cpp \
     settingscontrollercl.cpp \
     settingscontrollergui.cpp
 
 HEADERS  += \
     apphandler.h \
     fiffanonymizer.h \
+    mainwindow.h \
     settingscontrollercl.h \
     settingscontrollergui.h
 
@@ -121,3 +123,6 @@ contains(MNECPP_CONFIG, useFFTW) {
                 -lfftw3_threads \
     }
 }
+
+FORMS += \
+    mainwindow.ui
