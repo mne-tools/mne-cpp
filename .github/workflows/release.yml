@@ -17,17 +17,10 @@ jobs:
     - name: Create new branch with the tag's name (stable release only)
       if: endsWith(github.ref, 'master') == false
       run: |
-        currentVersion=$(git describe --tags $(git rev-list --tags --max-count=1))
-        currentVersionMinor=`echo $currentVersion | cut -d. -f2`
-        echo $currentVersion
-        echo $currentVersionMinor
-        newVersion=${GITHUB_REF#refs/tags/}
-        newVersionMinor=`echo $newVersion | cut -d. -f2`
-        echo $newVersionMinor
-
-        # Only branch off if we have a new minor version bump
-        if [[ "$currentVersionMinor" < "$newVersionMinor" ]]; then
-          echo Branching off
+        currentVersionPatch=`echo ${GITHUB_REF#refs/tags/} | cut -d. -f3`
+        # Only branch off if we have a new minor version bump, which will always result in the patch version to be 0
+        if [[ "$currentVersionPatch" == 0 ]]; then
+          echo Branching off $currentVersionPatch
           # Setup Git
           git config --global user.email lorenzesch@hotmail.com
           git config --global user.name LorenzE
