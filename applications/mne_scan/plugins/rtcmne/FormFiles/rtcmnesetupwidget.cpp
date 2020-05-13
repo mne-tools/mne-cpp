@@ -44,6 +44,7 @@
 #include <fs/annotationset.h>
 #include <fs/surfaceset.h>
 #include <mne/mne_forwardsolution.h>
+#include <fiff/fiff_coord_trans.h>
 
 #include <scMeas/realtimesourceestimate.h>
 
@@ -87,10 +88,11 @@ RtcMneSetupWidget::RtcMneSetupWidget(RtcMne* toolbox, QWidget *parent)
     else
         ui.m_qLabel_surfaceStat->setText("loaded");
 
-    //connect(ui.m_qPushButton_FwdFileDialog, &QPushButton::released, this, &RtcMneSetupWidget::showFwdFileDialog);
+    ui.m_qLineEdit_MriHeadTrans->setText(m_pMNE->m_fMriHeadTrans.fileName());
+
     connect(ui.m_qPushButton_AtlasDirDialog, &QPushButton::released, this, &RtcMneSetupWidget::showAtlasDirDialog);
     connect(ui.m_qPushButton_SurfaceDirDialog, &QPushButton::released, this, &RtcMneSetupWidget::showSurfaceDirDialog);
-    //connect(ui.m_qPushButonStartClustering, &QPushButton::released, this, &RtcMneSetupWidget::clusteringTriggered);
+    connect(ui.m_qPushButton_MriHeadTrans, &QPushButton::released, this, &RtcMneSetupWidget::showMriHeadFileDialog);
 }
 
 //=============================================================================================================
@@ -158,5 +160,24 @@ void RtcMneSetupWidget::showSurfaceDirDialog()
     {
         m_pMNE->m_pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet());
         ui.m_qLabel_surfaceStat->setText("not loaded");
+    }
+}
+
+//=============================================================================================================
+
+void RtcMneSetupWidget::showMriHeadFileDialog()
+{
+    QString t_sMriHeadFile = QFileDialog::getOpenFileName(this,
+                                                          tr("Select Mri - Head transformation"),
+                                                          QString(),
+                                                          tr("Fif Files (*.fif)"));
+
+    QFile file(t_sMriHeadFile);
+
+    FIFFLIB::FiffCoordTrans mriHeadTrans = FIFFLIB::FiffCoordTrans(file);
+
+    if(!mriHeadTrans.isEmpty()) {
+        m_pMNE->m_mriHeadTrans = mriHeadTrans;
+        ui.m_qLineEdit_MriHeadTrans->setText(t_sMriHeadFile);
     }
 }
