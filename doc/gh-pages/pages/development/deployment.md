@@ -15,7 +15,7 @@ This page explains how MNE-CPP handles builds, exernal as well as internal depen
 
 ## Dependency solving
 
-Realized in three scripts in mne-cpp.pri and CI workflow 
+Realized in three scripts in mne-cpp.pri and CI workflow. linuxdeployqt is not part of Qt
 
 ### Internal dependencies (MNE-CPP libraries) 
 

@@ -37,8 +37,6 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = app
 
-VERSION = $${MNE_CPP_VERSION}
-
 QT += testlib network concurrent
 QT -= gui
 
@@ -60,17 +58,17 @@ contains(MNECPP_CONFIG, static) {
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Connectivityd \
-            -lMNE$${MNE_LIB_VERSION}Mned \
-            -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Fsd \
-            -lMNE$${MNE_LIB_VERSION}Utilsd \
+    LIBS += -lmnecppConnectivityd \
+            -lmnecppMned \
+            -lmnecppFiffd \
+            -lmnecppFsd \
+            -lmnecppUtilsd \
 } else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Connectivity \
-            -lMNE$${MNE_LIB_VERSION}Mne \
-            -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Fs \
-            -lMNE$${MNE_LIB_VERSION}Utils \
+    LIBS += -lmnecppConnectivity \
+            -lmnecppMne \
+            -lmnecppFiff \
+            -lmnecppFs \
+            -lmnecppUtils \
 }
 
 SOURCES += \

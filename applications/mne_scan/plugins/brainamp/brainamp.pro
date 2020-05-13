@@ -37,6 +37,8 @@ include(../../../../mne-cpp.pri)
 
 TEMPLATE = lib
 
+CONFIG += skip_target_version_ext
+
 CONFIG += plugin
 
 DEFINES += BRAINAMP_LIBRARY
@@ -59,16 +61,16 @@ DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Dispd \
-            -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Utilsd \
+    LIBS += -lmnecppDispd \
+            -lmnecppFiffd \
+            -lmnecppUtilsd \
             -lscMeasd \
             -lscDispd \
             -lscShared
 } else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Disp \
-            -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Utils \
+    LIBS += -lmnecppDisp \
+            -lmnecppFiff \
+            -lmnecppUtils \
             -lscMeas \
             -lscDisp \
             -lscShared

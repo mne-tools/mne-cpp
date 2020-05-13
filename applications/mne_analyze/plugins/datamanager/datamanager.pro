@@ -38,6 +38,8 @@ include(../../../../mne-cpp.pri)
 
 TEMPLATE = lib
 
+CONFIG += skip_target_version_ext
+
 CONFIG += plugin
 
 DEFINES += DATAMANAGER_PLUGIN
@@ -60,12 +62,12 @@ CONFIG(debug, debug|release) {
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
-            -lMNE$${MNE_LIB_VERSION}Fiffd \
+    LIBS += -lmnecppUtilsd \
+            -lmnecppFiffd \
             -lanSharedd
 } else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
-            -lMNE$${MNE_LIB_VERSION}Fiff \
+    LIBS += -lmnecppUtils \
+            -lmnecppFiff \
             -lanShared
 }
 
