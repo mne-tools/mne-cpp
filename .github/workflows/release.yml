@@ -5,7 +5,7 @@ on:
     tags:        
     - v0.*
     branches:
-    - docu
+    - master
 
 jobs:
   CreateRelease:
