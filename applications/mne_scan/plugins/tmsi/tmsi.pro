@@ -54,9 +54,6 @@ else {
         exists(C:/Windows/System32/TMSiSDK.dll) { #Compiling MNE Scan FOR a 32bit system ON a 32bit system
             DEFINES += TAKE_TMSISDK_DLL
         }
-        else {
-            message(TMSI.pro warning: TMSi Driver DLL not found!)
-        }
     }
 }
 

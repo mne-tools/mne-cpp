@@ -115,12 +115,6 @@ header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/anShared
 
 INSTALLS += header_files
 
-# Deploy library in non-static builds only
-win32:!contains(MNECPP_CONFIG, static) {
-    EXTRA_ARGS =
-    DEPLOY_CMD = $$winDeployLibArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
-    QMAKE_POST_LINK += $${DEPLOY_CMD}
-}
 unix:!macx {
     QMAKE_CXXFLAGS += -std=c++0x
     QMAKE_CXXFLAGS += -Wno-attributes

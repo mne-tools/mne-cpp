@@ -87,14 +87,14 @@ unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
 
 win32:!contains(MNECPP_CONFIG, static) {
     EXTRA_ARGS =
-    DEPLOY_CMD = $$winDeployAppArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${LIBS},$${EXTRA_ARGS})
+    DEPLOY_CMD = $$winDeployArgs($${TARGET},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
     QMAKE_POST_LINK += $${DEPLOY_CMD}
 }
 unix:!macx {
     # Unix
     QMAKE_RPATHDIR += $ORIGIN/../lib
 }
-macx:!contains(MNECPP_CONFIG, static) {
+macx {
     # Mac
     QMAKE_RPATHDIR += @executable_path/../Frameworks
     EXTRA_ARGS =
