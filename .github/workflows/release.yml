@@ -5,7 +5,7 @@ on:
     tags:        
     - v0.*
     branches:
-    - master
+    - docu
 
 jobs:
   CreateRelease:
@@ -17,12 +17,24 @@ jobs:
     - name: Create new branch with the tag's name (stable release only)
       if: endsWith(github.ref, 'master') == false
       run: |
-        # Setup Git
-        git config --global user.email lorenzesch@hotmail.com
-        git config --global user.name LorenzE
-        # Create new branch named after the new version tag
-        git checkout -b ${GITHUB_REF#refs/tags/}
-        git push origin refs/heads/${GITHUB_REF#refs/tags/}
+        currentVersion=$(git describe --tags $(git rev-list --tags --max-count=1))
+        currentVersionMinor=`echo $currentVersion | cut -d. -f2`
+        echo $currentVersion
+        echo $currentVersionMinor
+        newVersion=${GITHUB_REF#refs/tags/}
+        newVersionMinor=`echo $newVersion | cut -d. -f2`
+        echo $newVersionMinor
+
+        # Only branch off if we have a new minor version bump
+        if [[ "$currentVersionMinor" < "$newVersionMinor" ]]; then
+          echo Branching off
+          # Setup Git
+          git config --global user.email lorenzesch@hotmail.com
+          git config --global user.name LorenzE
+          # Create new branch named after the new version tag
+          git checkout -b ${GITHUB_REF#refs/tags/}
+          git push origin refs/heads/${GITHUB_REF#refs/tags/}
+        fi
     - name: Install hub (dev release only)
       if: endsWith(github.ref, 'master') == true
       uses: geertvdc/setup-hub@master
