@@ -13,15 +13,13 @@ class SettingsControllerGui;
 
 namespace MNEANONYMIZE {
 
-//using MNEANONYMIZE::SettingsControllerGui;
-
-
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = nullptr);
+    explicit MainWindow(SettingsControllerGui* controller = nullptr);
+
     void setController(SettingsControllerGui*);
 
 //    void loadFile(const QString& fileName);
