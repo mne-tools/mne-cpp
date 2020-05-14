@@ -46,23 +46,30 @@ defineReplace(macDeployArgs) {
     return($$deploy_cmd $$deploy_target $$deploy_libs_to_copy)
 }
 
-defineReplace(winDeployArgs) {
+defineReplace(winDeployLibArgs) {
+    # Copy library to bin folder
     target = $$1
     mne_binary_dir = $$2
     mne_library_dir = $$3
     extra_args = $$4
-    final_deploy_command
 
-    # Deploy/Copy mne-cpp dependencies manually if not present already (windeployqt only takes care of qt and system libraries)
-    libraryFiles = $$files($${mne_library_dir}/*.dll, true)
-    for(FILE, libraryFiles) {
-        FILE = $$shell_path($${FILE})
-        TRGTDIR = $$FILE
-        TRGTDIR ~= s,\lib,bin,g
-        !exists($$TRGTDIR) {
-            final_deploy_command += copy /-Y $$shell_quote($${FILE}) $$shell_quote($${TRGTDIR}) $$escape_expand(\\n\\t)
-        }
-    }
+    file = $$shell_quote($$shell_path($${mne_library_dir}/$${target}.dll))
+    final_deploy_command += $${QMAKE_COPY} $${file} $$shell_quote($${mne_binary_dir}) $$escape_expand(\\n\\t)
+
+    # Deploy qt dependecies for the library
+    deploy_target = $$shell_quote($$shell_path($${mne_binary_dir}/$${target}.dll))
+    deploy_cmd = windeployqt
+
+    final_deploy_command += $$deploy_cmd $$deploy_target $$extra_args $$escape_expand(\\n\\t)
+
+    return($${final_deploy_command})
+}
+
+defineReplace(winDeployAppArgs) {
+    target = $$1
+    mne_binary_dir = $$2
+    mne_library_dir = $$3
+    extra_args = $$4
 
     # Deploy qt dependencies
     deploy_target = $$shell_quote($$shell_path($${mne_binary_dir}/$${target}.exe))
