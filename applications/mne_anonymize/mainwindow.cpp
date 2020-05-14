@@ -59,6 +59,14 @@ MNEANONYMIZE::SettingsControllerGui* MainWindow::getController() const
     return m_pController;
 }
 
+
+void MainWindow::setLineEditInFile(const QString &f)
+{
+    m_pUi->lineEditInFile->setText(f);
+}
+
+
+
 //void MainWindow::open()
 //{
 //    if(confirmOpen())
