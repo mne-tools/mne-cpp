@@ -112,24 +112,24 @@ Specifically, this utility modifies the following `tags` from the fiff file:
 
 The easiest way to anonymize one single file is (will result in the output file `sample_audvis_raw_anonymized.fif`):
 
-```shell
+```bash
 mne_anonymize --in ./MNE-sample-data/MEG/sample/sample_audvis_raw.fif
 ```
 
 Inplace anonymization can be performed via (`--avoid_delete_confirmation` will result in an automatic overwriting/deletion of the input file):
 
-```shell
+```bash
 mne_anonymize --in ./MNE-sample-data/MEG/sample/sample_audvis_raw.fif --out ./MNE-sample-data/MEG/sample/sample_audvis_raw.fif --delete_input_file --avoid_delete_confirmation
 ```
 
 In order to substract 35 days from all measurement dates, both in the ID and `FIFF_MEAS_DATE` tags, use:
 
-```shell
+```bash
 mne_anonymize --in ./MNE-sample-data/MEG/sample/sample_audvis_raw.fif --measurement_date_offset 35
 ```
 
 Typical use with abbreviated options. This line will call `mne_anonymize`, specify the input file, set verbose mode and brute mode on. Set `delete_input_file` on, avoiding the deletion confirmation, and finally set the measurement date to be 35 days before the date registered in the file.
 
-```shell
+```bash
 mne_anonymize -i ./MNE-sample-data/MEG/sample/sample_audvis_raw.fif -vbdf --mdo 35
 ```

@@ -15,13 +15,13 @@ The BrainFlow plugin adds data acquisition for several EEG amplifiers to MNE Sca
 
 Make sure that you have brainflow git submodule by typing:
 
-```shell
+```bash
 git submodule update --init applications/mne_scan/plugins/brainflowboard/brainflow
 ```
 
 Build it as a regular Cmake project. For MSVC you need to ensure that you use exactly the same Cmake generator as for MNE-CPP. Also, you need to specify `MSVC_RUNTIME` as dynamic (default is static) and set the `-DCMAKE_INSTALL_PREFIX=..\installed` flag. For compilation with MSVC 2015 on a 64bit system do:
 
-```shell
+```bash
 cd mne-cpp\applications\mne_scan\plugins\brainflowboard\brainflow\
 mkdir build
 cd build

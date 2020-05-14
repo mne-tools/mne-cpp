@@ -8,7 +8,7 @@ nav_order: 4
 This part is focused on giving a short overview of git commands that should cover the general git workflow in MNE-CPP. For further information you can check out this [Git tutorial video](https://www.youtube.com/watch?v=DtLrWCFaG0A&feature=youtu.be){:target="_blank" rel="noopener"}.
 
 The first steps to get started, as described in the [build guide](../install/buildguide.md), are:
-```shell
+```bash
 git clone https://github.com/<YourGitUserName>/mne-cpp.git
 git remote add upstream https://github.com/mne-tools/mne-cpp.git
 git fetch --all 
@@ -19,13 +19,13 @@ The general workflow is covered by the following steps:
 
 - Create a new branch from `master`: 
 
-```shell
+```bash
 git checkout -b <branchName> master
 ```
 
 - Get the latest changes and [rebase](https://www.atlassian.com/git/tutorials/rewriting-history/git-rebase){:target="_blank" rel="noopener"}: 
 
-```shell
+```bash
 git fetch upstream
 git rebase upstream/master
 ```
@@ -34,13 +34,13 @@ git rebase upstream/master
 
 - Make your changes and check the status: 
 
-```shell
+```bash
 git status
 ```
 
 - Add unstaged changes (colored in red) to prepare next commit: 
 
-```shell
+```bash
 git add <changedFileName>
    or
 git add --all
@@ -48,7 +48,7 @@ git add --all
 
 - Commit the added files (colored in green in status report) and add a meaningful message about what changed and why (have a look at our [commit policy](conv_style.md)): 
 
-```shell
+```bash
 git commit -m "Fix: meaningful commit message" 
    or 
 git commit --all
@@ -56,13 +56,13 @@ git commit --all
 
 - If you make small changes that are related to the previous commit, you can amend your changes to the previous commit with: 
 
-```shell
+```bash
 git commit -m "Fix: meaningful commit message" --amend
 ```
 
 - Push your changes to origin (your MNE-CPP fork on GitHub). Pleaes note that a force push via `-f` might be necessary if you rebased: 
 
-```shell
+```bash
 git push origin <branchName>
    or
 git push origin <branchName> -f
