@@ -7,6 +7,59 @@ nav_order: 1
 
 # Changelog
 
+## Version 0.1.1
+
+### Applications
+
+MNE Analyze:
+* Fix bug during deployment of dynamically linked MNE Analyze version on macOS
+* Renamed MNE Analyze extensions to plugins 
+* Fix issue with display width, now displays only full seconds as selected 
+* Jump viewer to selected annotation with 'J' key 
+* Removed seemingly unused timer debug outputs 
+* Documentations and variable name changes for readability 
+* Add plugin control views to menu bar 
+* Clean up command line output 
+* Add time information on the y-axis
+
+MNE Scan:
+* Fix problems with Source Localization and Connectivity plugins
+* Fix problems where the QuickControlView was not populated with plugin control GUI widgets correctly
+
+MNE Anonymize:
+* Overall improvements and bug fixes to MNE Anonymize
+
+### API libraries
+
+All:
+* Rename libraries and fix versioning
+* Don't let libraries deploy themselves for windows builds. Instead include library copying to the mne-cpp.pri windeployqt function
+
+Fiff:
+* Fix bug when reading gantry_angle from Fiff file
+
+### Tools
+* Fix template class in Qt Creator wizard for MNE-CPP classes
+* Update test and example Qt Creator wizards
+	
+### Continuous Integration
+* Only branch off when a minor or major version bump occurred
+* Remove folders which we do not want to ship from dynamic builds
+
+### Documentation
+* Updated information on continuous integration
+* Improved build from source guide
+* Updated guide on streaming pre-recorded data in MNE Scan
+
+### Authors
+
+People who contributed to this release (preceded by number of commits):
+
+(115) Juan Garcia-Prieto
+(43) Lorenz Esch
+(2) Ruben Dörfel
+(7) Gabriel Motta
+
 ## Version 0.1.0
 
 ### Changes
