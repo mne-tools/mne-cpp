@@ -47,6 +47,13 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
+DESTDIR =  $${MNE_BINARY_DIR}
+
+contains(MNECPP_CONFIG, static) {
+    CONFIG += static
+    DEFINES += STATICBUILD
+}
+
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \\
@@ -60,8 +67,6 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Mne \\
 }
 
-DESTDIR = $${MNE_BINARY_DIR}
-
 SOURCES += %{CppFileName}
 
 HEADERS  +=
@@ -71,7 +76,32 @@ FORMS    +=
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
-# Put generated form headers into the origin --> cause other src is pointing at them
-UI_DIR = $$PWD
-origin --> cause other src is pointing at them
-UI_DIR = $$PWD
+win32:!contains(MNECPP_CONFIG, static) {
+    EXTRA_ARGS =
+    DEPLOY_CMD = $$winDeployArgs($${TARGET},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
+    QMAKE_POST_LINK += $${DEPLOY_CMD}
+}
+unix:!macx {
+    # Unix
+    QMAKE_RPATHDIR += $ORIGIN/../lib
+}
+
+# Activate FFTW backend in Eigen for non-static builds only
+contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
+    DEFINES += EIGEN_FFTW_DEFAULT
+    INCLUDEPATH += $$shell_path($${FFTW_DIR_INCLUDE})
+    LIBS += -L$$shell_path($${FFTW_DIR_LIBS})
+
+    win32 {
+        # On Windows
+        LIBS += -llibfftw3-3 \
+                -llibfftw3f-3 \
+                -llibfftw3l-3 \
+    }
+
+    unix:!macx {
+        # On Linux
+        LIBS += -lfftw3 \
+                -lfftw3_threads \
+    }
+}
