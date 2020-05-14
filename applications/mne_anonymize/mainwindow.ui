@@ -67,7 +67,7 @@
        </property>
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="0" column="0" colspan="3">
-         <widget class="QFrame" name="frame_2">
+         <widget class="QFrame" name="frameInOutFiles">
           <property name="maximumSize">
            <size>
             <width>16777215</width>
@@ -82,24 +82,24 @@
           </property>
           <layout class="QFormLayout" name="formLayout">
            <item row="0" column="0">
-            <widget class="QLabel" name="label">
+            <widget class="QLabel" name="labelInFile">
              <property name="text">
               <string>Input File</string>
              </property>
             </widget>
            </item>
            <item row="0" column="1">
-            <widget class="QLineEdit" name="lineEdit"/>
+            <widget class="QLineEdit" name="lineEditInFile"/>
            </item>
            <item row="1" column="0">
-            <widget class="QLabel" name="label_2">
+            <widget class="QLabel" name="labelOutFile">
              <property name="text">
               <string>Output File</string>
              </property>
             </widget>
            </item>
            <item row="1" column="1">
-            <widget class="QLineEdit" name="lineEdit_2"/>
+            <widget class="QLineEdit" name="lineEditOutFile"/>
            </item>
           </layout>
          </widget>
@@ -230,7 +230,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>455</width>
+             <width>414</width>
              <height>454</height>
             </rect>
            </property>
@@ -532,9 +532,9 @@
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <tabstops>
-  <tabstop>lineEdit_2</tabstop>
+  <tabstop>lineEditOutFile</tabstop>
   <tabstop>checkBox</tabstop>
-  <tabstop>lineEdit</tabstop>
+  <tabstop>lineEditInFile</tabstop>
   <tabstop>checkBox_2</tabstop>
   <tabstop>checkBox_3</tabstop>
   <tabstop>checkBox_4</tabstop>
@@ -553,43 +553,6 @@
   <tabstop>lineEdit_23</tabstop>
   <tabstop>dateTimeEdit_9</tabstop>
   <tabstop>dateTimeEdit_10</tabstop>
-  <tabstop>doubleSpinBox_3</tabstop>
-  <tabstop>lineEdit_14</tabstop>
-  <tabstop>lineEdit_15</tabstop>
-  <tabstop>spinBox_5</tabstop>
-  <tabstop>scrollArea_4</tabstop>
-  <tabstop>dateTimeEdit_11</tabstop>
-  <tabstop>lineEdit_24</tabstop>
-  <tabstop>lineEdit_17</tabstop>
-  <tabstop>dateTimeEdit_12</tabstop>
-  <tabstop>plainTextEdit_5</tabstop>
-  <tabstop>dateTimeEdit_6</tabstop>
-  <tabstop>lineEdit_18</tabstop>
-  <tabstop>lineEdit_19</tabstop>
-  <tabstop>plainTextEdit_6</tabstop>
-  <tabstop>comboBox_3</tabstop>
-  <tabstop>spinBox_6</tabstop>
-  <tabstop>doubleSpinBox_4</tabstop>
-  <tabstop>comboBox_4</tabstop>
-  <tabstop>lineEdit_20</tabstop>
-  <tabstop>lineEdit_4</tabstop>
-  <tabstop>lineEdit_5</tabstop>
-  <tabstop>lineEdit_21</tabstop>
-  <tabstop>lineEdit_22</tabstop>
-  <tabstop>checkBox_9</tabstop>
-  <tabstop>checkBox_10</tabstop>
-  <tabstop>dateTimeEdit_3</tabstop>
-  <tabstop>checkBox_11</tabstop>
-  <tabstop>checkBox_12</tabstop>
-  <tabstop>dateTimeEdit_4</tabstop>
-  <tabstop>spinBox_7</tabstop>
-  <tabstop>checkBox_13</tabstop>
-  <tabstop>checkBox_14</tabstop>
-  <tabstop>checkBox_15</tabstop>
-  <tabstop>checkBox_16</tabstop>
-  <tabstop>spinBox_8</tabstop>
-  <tabstop>lineEdit_6</tabstop>
-  <tabstop>plainTextEdit_7</tabstop>
   <tabstop>scrollArea</tabstop>
  </tabstops>
  <resources/>
