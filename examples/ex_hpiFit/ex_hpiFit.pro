@@ -88,6 +88,7 @@ FORMS    +=
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
+# Deploy dependencies
 win32:!contains(MNECPP_CONFIG, static) {
     EXTRA_ARGS =
     DEPLOY_CMD = $$winDeployArgs($${TARGET},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
