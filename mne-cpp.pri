@@ -51,10 +51,18 @@ defineReplace(winDeployArgs) {
     mne_binary_dir = $$2
     mne_library_dir = $$3
     extra_args = $$4
+    final_deploy_command
 
-    # Deploy/Copy mne-cpp dependencies manually (windeployqt only takes care of qt and system libraries)
-    file = $$shell_quote($$shell_path($${mne_library_dir}/*.dll))
-    final_deploy_command += copy /-Y $${file} $$shell_quote($${mne_binary_dir}) $$escape_expand(\\n\\t)
+    # Deploy/Copy mne-cpp dependencies manually if not present already (windeployqt only takes care of qt and system libraries)
+    libraryFiles = $$files($${mne_library_dir}/*.dll, true)
+    for(FILE, libraryFiles) {
+        FILE = $$shell_path($${FILE})
+        TRGTDIR = $$FILE
+        TRGTDIR ~= s,\lib,bin,g
+        !exists($$TRGTDIR) {
+            final_deploy_command += copy /-Y $$shell_quote($${FILE}) $$shell_quote($${TRGTDIR}) $$escape_expand(\\n\\t)
+        }
+    }
 
     # Deploy qt dependencies
     deploy_target = $$shell_quote($$shell_path($${mne_binary_dir}/$${target}.exe))
