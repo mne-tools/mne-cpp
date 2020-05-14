@@ -28,7 +28,7 @@ Applications, tests, and examples link against MNE-CPP libraries (internal depen
 | --------------------------- | -------------------------------------- |
 | Windows | All MNE-CPP libraries are copied from `mne-cpp/lib` to `mne-cpp/bin` via the `defineReplace(winDeployArgs)` function in [mne-cpp.pri](https://github.com/mne-tools/mne-cpp/blob/master/mne-cpp.pri){:target="_blank" rel="noopener"}, since `windeployqt` only takes care of Qt related dependencies.| 
 | Linux | MNE-CPP libraries reside in `mne-cpp/lib`. `QMAKE_RPATHDIR` is specified in the executable's .pro file in order to link to the libraries in `mne-cpp/lib`. | 
-| MacOS | MNE-CPP libraries are copied to the .app `Frameworks` folder by `macdeployqt`. |
+| MacOS | MNE-CPP libraries are copied to the .app `Frameworks` folder by `macdeployqt`. Tests and examples are created as normal executables and therefore need `DYLD_LIBRARY_PATH` to include the `mne-cpp/lib` folder. |
 
 ### External dependencies (Qt, Eigen, and system libraries)
 
@@ -42,7 +42,9 @@ As of right now MNE-CPP depends on [Qt](https://www.qt.io/){:target="_blank" rel
 
 ## Resource handling
 
-Needed resources are copied from `mne-cpp/resources` to `mne-cpp/bin/resources`. In case of .app images on MacOS, e.g., MNE Scan, the needed resources are copied from `mne-cpp/resources` to `mne-cpp/bin/mne_scan.app/MacOs/resources`. If you need to add new resources, please add them to `mne-cpp/resources` and **NOT** to `mne-cpp/bin/resources`.
+Files which are needed by the applications, e.g., layout files, selection groups and so on, are considrered resources and reside in `mne-cpp/resources`. Needed resources are copied from `mne-cpp/resources` to `mne-cpp/bin/resources`. In case of .app images on MacOS, e.g., MNE Scan, the needed resources are copied from `mne-cpp/resources` to `mne-cpp/bin/mne_scan.app/MacOs/resources`. 
+
+| **Please note:** If you need to add new resources, please add them to the `mne-cpp/resources` and **NOT** to the `mne-cpp/bin/resources` folder. Also, make sure that you included them in your .pro file. | 
 
 ## Packaging and uploading
 
