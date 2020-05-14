@@ -6,7 +6,7 @@ nav_order: 1
 ---
 # Releases
 
-Please select the version and platform you'd like to download. We recommend the dynamic builds of our releases. For older releases please visit our [Github release page](https://github.com/mne-tools/mne-cpp/releases){:target="_blank" rel="noopener"}.
+Please select the version and platform you'd like to download. We recommend the dynamic builds of our releases. Due to size limitations the static builds do not include tests and example binaries. For older releases please visit our [Github release page](https://github.com/mne-tools/mne-cpp/releases){:target="_blank" rel="noopener"}.
 
 Stable Releases
 {: .label .label-blue }
