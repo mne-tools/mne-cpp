@@ -17,7 +17,8 @@ Follow these steps to playback recorded data through the MNE Rt Server to MNE Sc
 
 ![](../../images/mne_scan_fiffsimulator.png)
 
-* Click on the `FiffSimulator` plug-in and set the wanted buffer size. We recommend to use the same block size as the sampling frequency. This way the data will be refreshed every second. 
+* Click on the `FiffSimulator` plug-in and select the `Connection` tab. If you have started the `mne_rt_server` on your local machine, use IP `127.0.0.1` and press `Connect`. The status should change to `Connected`.
+* Click on the `FiffSimulator` plug-in and select the `Preferences` tab. We recommend to use the same block size as the sampling frequency. This way the data will be refreshed every second. 
 
 ![](../../images/mne_scan_fiffsimulator_size.png)
 
