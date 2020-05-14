@@ -2,12 +2,13 @@
 /**
  * @file     realtime3dwidget.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>
+ *           Ruben Dörfel <ruben.doerfel@tu-ilmenau.de>
  * @since    0.1.0
  * @date     October, 2016
  *
  * @section  LICENSE
  *
- * Copyright (C) 2016, Lorenz Esch. All rights reserved.
+ * Copyright (C) 2016, Lorenz Esch and Ruben Dörfel. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:

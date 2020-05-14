@@ -2,6 +2,7 @@
 /**
  * @file     hpisettingsview.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>
+ *           Ruben Dörfel <ruben.doerfel@tu-ilmenau.de>
  * @since    0.1.0
  * @date     March, 2020
  *
@@ -106,7 +107,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Updates the movement refered to last head position.
+     * Updates the movement refered to last reference head position.
      *
      * @param[in] dMovement         the movement refered to last fit.
      * @param[in] dRotation         the rotation refered to last fit.
@@ -286,7 +287,7 @@ signals:
     /**
      * Emit this signal whenever the allowed head movement threshold changed.
      *
-     * @param[in] dAllowedMeanErrorDist    Allowed movement threshold in mm.
+     * @param[in] dAllowedMeanErrorDist    Allowed movement threshold.
      */
     void allowedMovementChanged(double dAllowedMovement);
 

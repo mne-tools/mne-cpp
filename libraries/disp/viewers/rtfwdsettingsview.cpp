@@ -38,6 +38,7 @@
 
 #include "rtfwdsettingsview.h"
 #include "ui_rtfwdsettingsview.h"
+
 #include <fs/annotationset.h>
 
 //=============================================================================================================
@@ -87,7 +88,23 @@ RtFwdSettingsView::RtFwdSettingsView(const QString& sSettingsPath,
     m_ui->m_lineEdit_sSourceOri->setText("fixed");
     m_ui->m_lineEdit_sCoordFrame->setText("Head Space");
     m_ui->m_lineEdit_iNDipoleClustered->setText("Not Clustered");
-    m_ui->m_qLineEdit_AtlasDirName->setText(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/label");
+
+    // load init annotation set
+    QString t_sAtlasDir = QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/label";
+    m_ui->m_qLineEdit_AtlasDirName->setText(t_sAtlasDir);
+
+    AnnotationSet::SPtr t_pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet(t_sAtlasDir+"/lh.aparc.a2009s.annot", t_sAtlasDir+"/rh.aparc.a2009s.annot"));
+
+    if(!t_pAnnotationSet->isEmpty() && t_pAnnotationSet->size() == 2)
+    {
+        emit atlasDirChanged(t_sAtlasDir,t_pAnnotationSet);
+        m_ui->m_qLabel_atlasStat->setText("loaded");
+        m_bAnnotaionsLoaded = true;
+    }
+    else
+    {
+        m_ui->m_qLabel_atlasStat->setText("not loaded");
+    }
 
     // connect
     connect(m_ui->m_checkBox_bDoRecomputation, &QCheckBox::clicked,

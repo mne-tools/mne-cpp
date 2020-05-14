@@ -72,7 +72,7 @@ enum ConnectorDataType
     _RTC,       /**< Real-Time Covariance */
     _RTSE,      /**< Real-Time Source Estimate */
     _RTHR,      /**< Real-Time Hpi Result */
-    _RTFS,     /**< Real-Time forward solution result */
+    _RTFS,      /**< Real-Time Forward Solution */
     _None,      /**< None */
 };
 

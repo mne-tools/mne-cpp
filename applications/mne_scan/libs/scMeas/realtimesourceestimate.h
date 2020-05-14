@@ -46,6 +46,7 @@
 #include <fs/label.h>
 #include <fs/surfaceset.h>
 #include <fs/annotationset.h>
+
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_coord_trans.h>
 
@@ -132,7 +133,7 @@ public:
     /**
      * Sets the mri head transformation.
      *
-     * @param[in] mriHeadTrans   the transformation to set
+     * @param[in] mriHeadTrans   The transformation to set
      */
     inline void setMriHeadTrans(FIFFLIB::FiffCoordTrans& mriHeadTrans);
 
