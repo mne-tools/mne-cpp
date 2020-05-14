@@ -40,7 +40,7 @@ Qt 5.15: 1.39.8
 
 Get the [emscripten](https://emscripten.org/){:target="_blank" rel="noopener"} compiler:
 
-```sh
+```
 # Get the emsdk repo
 git clone https://github.com/emscripten-core/emsdk.git
 
@@ -64,20 +64,20 @@ This is needed since we want to have threading support which is deactivated for 
 
 Make sure to activate and source the correct emscripten version since the compiler will be used when building qt against wasm. You could also add this to your .basrc file. For example:
 
-```sh
+```
 ./emsdk activate 1.39.3
 source ./emsdk_env.sh
 ```
 
 Install some dependencies (just to make sure)
 
-```sh
+```
 sudo apt-get install build-essential libgl1-mesa-dev python
 ```
 
 Clone the current Qt version. For example Qt 5.14.2:
 
-```sh
+```
 git clone https://code.qt.io/qt/qt5.git -b 5.14.2      
 cd qt5
 ./init-repository -f --module-subset=qtbase,qtcharts,qtsvg
@@ -85,7 +85,7 @@ cd qt5
 
 Navigate to the parent directory, create a new shadow build folder and cd into it:
 
-```sh
+```
 cd ..
 mkdir qt5_shadow
 cd qt5_shadow
@@ -93,13 +93,13 @@ cd qt5_shadow
 
 Call configure from the new working directory in order to setup a shadow build (remove the `-feature-thread` flag if you want to build without multithread support):
 
-```sh
+```
 ../qt5/configure -opensource -confirm-license -xplatform wasm-emscripten -feature-thread -nomake examples -no-dbus -no-ssl -prefix $PWD/../qt5_wasm_binaries
 ```
 
 Build Qt and install to target (prefix) location afterwards. For MNE-CPP we only need the qt charts, qtsvg and qtbase module (see [https://wiki.qt.io/Qt_for_WebAssembly](https://wiki.qt.io/Qt_for_WebAssembly){:target="_blank" rel="noopener"} for officially supported modules):
 
-```sh
+```
 make module-qtbase module-qtsvg module-qtcharts -j8
 make install -j8
 ```
@@ -110,7 +110,7 @@ A static Qt Wasm version should now be setup in the `qt5_wasm_binaries` folder.
 
 MNE-CPP needs to be build statically. This is automatically done if the `wasm` flag is set. Create a shadow build folder, run `qmake` and build MNE-CPP:
 
-```sh
+```
 mkdir mne-cpp_shadow
 cd mne-cpp_shadow
 ../qt5_wasm_binaries/bin/qmake ../mne-cpp/mne-cpp.pro MNECPP_CONFIG=wasm
@@ -123,7 +123,7 @@ This should build all Wasm enabled applications, e.g. MNE Analyze, to `mne-cpp/b
 
 Navigate to `mne-cpp/bin` and start a server:
 
-```sh
+```
 python3 -m http.server
 ```
 
