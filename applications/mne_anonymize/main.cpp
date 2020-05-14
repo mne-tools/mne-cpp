@@ -58,6 +58,7 @@
 
 using namespace UTILSLIB;
 
+
 //=============================================================================================================
 // MAIN
 //=============================================================================================================
@@ -82,7 +83,7 @@ int main(int argc, char* argv[])
     qtApp->setApplicationName("MNE Anonymize");
     qtApp->setApplicationVersion("dev");
 
-    QScopedPointer<MainWindow> win(new MainWindow);
+    QScopedPointer<MNEANONYMIZE::MainWindow> win(new MNEANONYMIZE::MainWindow);
     QScopedPointer<QObject>
             controller(h.createController(qtApp->arguments()));
 
