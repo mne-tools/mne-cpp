@@ -49,6 +49,10 @@ Every time you want to update to the newest changes use:
 
 ## Compile the source code
 
+### Via command line
+
+### Via QtCreator
+
 | **Please note:** If you are working on an operating system on a "non-western" system, i.e. Japan, you might encounter problems with unicode interpretation. Please do the  following: Go to Control Panel > Language and Region > Management tab > Language Settings for non-Unicode Programs > Set to English (U.S.) > Reboot your system. |
 
 1. Go to your cloned repository folder and run the `mne-cpp.pro` file with QtCreator.

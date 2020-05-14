@@ -108,7 +108,6 @@ win32:!contains(MNECPP_CONFIG, static) {
     QMAKE_POST_LINK += $${DEPLOY_CMD}
 }
 unix:!macx {
-    # Unix
     QMAKE_RPATHDIR += $ORIGIN/../lib
 }
 macx {
@@ -120,16 +119,12 @@ macx {
     plugins.files = $${ROOT_DIR}/bin/mne_rt_server_plugins
     QMAKE_BUNDLE_DATA += plugins
 
-    QMAKE_RPATHDIR += @executable_path/../Frameworks
-    EXTRA_ARGS =
-
     !contains(MNECPP_CONFIG, static) {
         # 3 entries returned in DEPLOY_CMD
+        EXTRA_ARGS =
         DEPLOY_CMD = $$macDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
         QMAKE_POST_LINK += $${DEPLOY_CMD}
     }
-
-    QMAKE_CLEAN += -r $$member(DEPLOY_CMD, 1)
 }
 
 # Activate FFTW backend in Eigen for non-static builds only

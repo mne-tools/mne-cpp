@@ -7,7 +7,7 @@ nav_order: 2
 
 # Deployment
 
-This page explains how MNE-CPP handles builds, exernal as well as internal dependencies, resources, and packaging.
+This page explains how MNE-CPP handles build setups, solves for exernal as well as internal dependencies, prepares resources, and does packaging.
 
 ## Build rules
 
@@ -15,21 +15,33 @@ This page explains how MNE-CPP handles builds, exernal as well as internal depen
 
 ## Dependency solving
 
+<<<<<<< HEAD
 Realized in three scripts in mne-cpp.pri and CI workflow. linuxdeployqt is not part of Qt
+=======
+On Windows and MacOS dependency solving for libraries and executables is done in the executable's corresponding .pro file. Here the `windeployqt` and `macdeployqt` tools are used, which are officially developed and maintained by Qt. Two functions `defineReplace(macDeployArgs)` and `defineReplace(winDeployArgs)` are provided in the [mne-cpp.pri](https://github.com/mne-tools/mne-cpp/blob/master/mne-cpp.pri){:target="_blank" rel="noopener"} file, which are used to deploy executables on Windows and MacOS. For Linux we use the unoffical [linuxdeployqt](https://github.com/probonopd/linuxdeployqt){:target="_blank" rel="noopener"} tool which is executed in the [release.yml](https://github.com/mne-tools/mne-cpp/blob/master/.github/workflows/release.yml){:target="_blank" rel="noopener"} workflow file.
+>>>>>>> 9fd028e... MAINT: Some documetnation in .pro files
 
 ### Internal dependencies (MNE-CPP libraries) 
 
 Applications, tests, and examples link against MNE-CPP libraries (internal dependencies). Dependencies between MNE-CPP libraries exist as well and can be seen in the [libraries.pro file](https://github.com/mne-tools/mne-cpp/blob/master/libraries/libraries.pro){:target="_blank" rel="noopener"}. The following table describes how we solve for internal dependencies:
 
+<<<<<<< HEAD
 | Platform                    | MNE-CPP Libraries                      | MNE-CPP Applications                  | MNE-CPP Examples                 |
 | --------------------------- | -------------------------------------- | ------------------------------------- | -------------------------------- |
 | Windows | Build into `mne-cpp/lib` and copied afterwards to `mne-cpp/bin`. | Build to `mne-cpp/bin`. | Build to `mne-cpp/bin`. |
 | Linux |Build into `mne-cpp/lib`. | Build to `mne-cpp/bin/resources`. Qt's and MNE-CPP's lib folder need to be added to `LD_LIBRARY_PATH` to start applications from navigator. | Build to `mne-cpp/bin`. Qt's and MNE-CPP's lib folder need to be added to `LD_LIBRARY_PATH` to start examples from navigator. |
 | MacOS |Build into `mne-cpp/lib`. | Build to `mne-cpp/bin`. Build as .app or .dmg (MNE Scan, MNE Analyze). | Build to `mne-cpp/bin`. Qt's and MNE-CPP's lib folder need to be added to `DYLD_LIBRARY_PATH`. |
+=======
+| Platform                    | Dependency solving                     |
+| --------------------------- | -------------------------------------- |
+| Windows | All MNE-CPP libraries are copied from `mne-cpp/lib` to `mne-cpp/bin` via the `defineReplace(winDeployArgs)` function in [mne-cpp.pri](https://github.com/mne-tools/mne-cpp/blob/master/mne-cpp.pri){:target="_blank" rel="noopener"}, since `windeployqt` only takes care of Qt related dependencies.| 
+| Linux | MNE-CPP libraries reside in `mne-cpp/lib`. `QMAKE_RPATHDIR` is specified in the executable's .pro file in order to link to the libraries in `mne-cpp/lib`. | 
+| MacOS | MNE-CPP libraries are copied to the .app `Frameworks` folder by `macdeployqt`. |
+>>>>>>> 9fd028e... MAINT: Some documetnation in .pro files
 
 ### External dependencies (Qt, Eigen, and system)
 
-As of right now MNE-CPP depends on [Qt](https://www.qt.io/){:target="_blank" rel="noopener"} and [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page){:target="_blank" rel="noopener"}. Eigen, as a lightweight tempalte library, [is included in the MNE-CPP repository by default](https://github.com/mne-tools/mne-cpp/tree/master/include/3rdParty/eigen3){:target="_blank" rel="noopener"}. Here, no dependency solving is needed, since we build Eigen from source on the corresponding built setup.
+As of right now MNE-CPP depends on [Qt](https://www.qt.io/){:target="_blank" rel="noopener"} and [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page){:target="_blank" rel="noopener"}. Eigen, as a lightweight template library, [is included in the MNE-CPP repository by default](https://github.com/mne-tools/mne-cpp/tree/master/include/3rdParty/eigen3){:target="_blank" rel="noopener"}. Here, no dependency solving is needed, since we build Eigen from source on the corresponding built setup. For Qt dependencies we do the following:
 
 | Platform                    | MNE-CPP Libraries                      | MNE-CPP Applications                  | MNE-CPP Examples                 |
 | --------------------------- | -------------------------------------- | ------------------------------------- | -------------------------------- |
@@ -39,7 +51,7 @@ As of right now MNE-CPP depends on [Qt](https://www.qt.io/){:target="_blank" rel
 
 ## Resource handling
 
-Needed resources are copied from `mne-cpp/resources` to `mne-cpp/bin/resources`. In case of .app images on MacOS, e.g., MNE Scan, the needed resources are copied from `mne-cpp/resources` to `mne-cpp/bin/mne_scan.app/MacOs/resources`. If you need to add new resources, please add them to `mne-cpp/resources` and NOT `mne-cpp/bin/resources`.
+Needed resources are copied from `mne-cpp/resources` to `mne-cpp/bin/resources`. In case of .app images on MacOS, e.g., MNE Scan, the needed resources are copied from `mne-cpp/resources` to `mne-cpp/bin/mne_scan.app/MacOs/resources`. If you need to add new resources, please add them to `mne-cpp/resources` and **NOT** to `mne-cpp/bin/resources`.
 
 ## Packaging
 
