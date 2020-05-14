@@ -52,6 +52,7 @@
 
 #include <QSharedPointer>
 #include <QCommandLineParser>
+#include <QFileInfo>
 
 //=============================================================================================================
 // EIGEN INCLUDES

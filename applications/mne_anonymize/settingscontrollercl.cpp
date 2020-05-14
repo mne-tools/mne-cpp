@@ -49,6 +49,7 @@
 
 #include <QCommandLineOption>
 #include <QRandomGenerator>
+#include <QDir>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -69,7 +70,8 @@ using namespace MNEANONYMIZE;
 //=============================================================================================================
 
 SettingsControllerCl::SettingsControllerCl()
-: m_sAppName(qApp->applicationName())
+: m_pAnonymizer(FiffAnonymizer::SPtr(new FiffAnonymizer))
+, m_sAppName(qApp->applicationName())
 , m_sAppVer(qApp->applicationVersion())
 , m_bVerboseMode(false)
 , m_bSilentMode(false)
