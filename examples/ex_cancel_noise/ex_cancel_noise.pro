@@ -42,6 +42,7 @@ QT += network
 QT -= gui
 
 CONFIG   += console
+CONFIG   -= app_bundle
 
 TARGET = ex_cancel_noise
 
