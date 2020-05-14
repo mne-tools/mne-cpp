@@ -7,10 +7,10 @@
 
 using namespace MNEANONYMIZE;
 
-MainWindow::MainWindow(QWidget *parent)
-: QMainWindow(parent)
-, m_bDataModified(true)
+MainWindow::MainWindow(MNEANONYMIZE::SettingsControllerGui *c)
+: m_bDataModified(true)
 , m_pUi(new Ui::MainWindow)
+, m_pController(c)
 {
     m_pUi->setupUi(this);
 }
