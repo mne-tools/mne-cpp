@@ -25,6 +25,8 @@ public:
 //    void loadFile(const QString& fileName);
     SettingsControllerGui* getController() const;
 
+    void setLineEditInFile(const QString&);
+
 protected:
     void closeEvent(QCloseEvent *event) override;
 
