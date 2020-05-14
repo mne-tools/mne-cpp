@@ -52,16 +52,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
-#include <QCoreApplication>
 #include <QFile>
-#include <QDir>
-#include <QFileInfo>
-#include <QStack>
 #include <QDateTime>
-#include <QDebug>
-#include <QPointer>
-#include <QString>
 
 //=============================================================================================================
 // EIGEN INCLUDES
