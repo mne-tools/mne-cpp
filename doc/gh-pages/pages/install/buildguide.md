@@ -36,16 +36,22 @@ Fork [MNE-CPP's main repository](https://github.com/mne-tools/mne-cpp){:target="
 
 Clone the fork to your local machine:
 
-    $ git clone https://github.com/<YourGitUserName>/mne-cpp.git
+```shell
+git clone https://github.com/<YourGitUserName>/mne-cpp.git
+```
 
 Setup a new remote pointing to MNE-CPP's main repository:
 
-    $ git remote add upstream https://github.com/mne-tools/mne-cpp.git
+```shell
+git remote add upstream https://github.com/mne-tools/mne-cpp.git
+```
 
 Every time you want to update to the newest changes use:
 
-    $ git fetch --all
-    $ git rebase upstream/master
+```shell
+git fetch --all
+git rebase upstream/master
+```
 
 ## Compile the source code
 
@@ -62,24 +68,14 @@ Every time you want to update to the newest changes use:
 
 ### Via command line
 
-Create a shadow build folder and run `qmake` on `mne-cpp.pro`:
+Create a shadow build folder, run `qmake` on `mne-cpp.pro` and build:
 
 ```shell
 mkdir mne-cpp_shadow
 cd mne-cpp_shadow
 <QtFolder>/5.14.2/msvc2017_64/bin/qmake ../mne-cpp/mne-cpp.pro
-```
-
-Now build MNE-CPP via nmake or jom (Windows):
-
-```shell
-<QtFolder>/5.14.2/msvc2017_64/bin/jom -j8
-```
-
-Or make (MacOS or Linux):
-
-```shell
-make -j8 #On Linux and MacOS
+<QtFolder>/5.14.2/msvc2017_64/bin/jom -j8 # On Windows
+make -j8 # On Linux and MacOS
 ```
 
 ## Test the build
