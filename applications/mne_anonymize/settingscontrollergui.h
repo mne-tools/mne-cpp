@@ -87,16 +87,17 @@ public:
     /**
     * Constructs a SettingsControllerGUI object.
     */
-    explicit SettingsControllerGui(const QStringList& arguments, MainWindow* w = nullptr);
+    explicit SettingsControllerGui(const QStringList& arguments);
 
 protected:
+    void parseInputs(const QStringList& arguments);
 
 private:
 
 signals:
 
 private:
-    MainWindow* m_pWindow;
+    QSharedPointer<MainWindow> m_pWindow;
 };
 
 //=============================================================================================================
