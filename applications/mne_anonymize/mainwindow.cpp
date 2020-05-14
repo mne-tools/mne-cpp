@@ -41,6 +41,8 @@ bool MainWindow::confirmClose()
         return true; //save();
     case QMessageBox::Cancel:
         return false;
+    case QMessageBox::Discard:
+        return true;
     default:
         break;
     }
