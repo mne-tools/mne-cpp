@@ -49,9 +49,7 @@ Every time you want to update to the newest changes use:
 
 ## Compile the source code
 
-### Via command line
-
-### Via QtCreator
+### Via QtCreator (recommended)
 
 | **Please note:** If you are working on an operating system on a "non-western" system, i.e. Japan, you might encounter problems with unicode interpretation. Please do the  following: Go to Control Panel > Language and Region > Management tab > Language Settings for non-Unicode Programs > Set to English (U.S.) > Reboot your system. |
 
@@ -61,6 +59,28 @@ Every time you want to update to the newest changes use:
 4. In the Qt Creator's Projects window, right mouse click on the top level MNE-CPP tree item and select Run qmake. Wait until progress bar in lower right corner turns green (this step may take some time).
 5. Right mouse click again and then hit Build (this step may take some time). Wait until progress bar in lower right corner turns green.
 6. After the build process is finished, go to the `mne-cpp/bin` folder. All applications and libraries should have been created throughout the build process.
+
+### Via command line
+
+Create a shadow build folder and run `qmake` on `mne-cpp.pro`:
+
+```shell
+mkdir mne-cpp_shadow
+cd mne-cpp_shadow
+<QtFolder>/5.14.2/msvc2017_64/bin/qmake ../mne-cpp/mne-cpp.pro
+```
+
+Now build MNE-CPP via nmake or jom (Windows):
+
+```shell
+<QtFolder>/5.14.2/msvc2017_64/bin/jom -j8
+```
+
+Or make (MacOS or Linux):
+
+```shell
+make -j8 #On Linux and MacOS
+```
 
 ## Test the build
 
