@@ -15,6 +15,7 @@ Stable Releases
 | Version | Release | Dynamic Build | Static Build |
 |-------|-------|-------|-------|
 | [0.1.0](changelog.md#version-010) | May 2019 | <span class="fs-2"> [Windows](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.0/mne-cpp-windows-dynamic-x86_64.zip){: .btn .btn-blue } [Linux](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.0/mne-cpp-linux-dynamic-x86_64.tar.gz){: .btn .btn-blue } [MacOS](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.0/mne-cpp-macos-dynamic-x86_64.tar.gz){: .btn .btn-blue } </span> | <span class="fs-2"> [Windows](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.0/mne-cpp-windows-static-x86_64.zip){: .btn .btn-blue } [Linux](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.0/mne-cpp-linux-static-x86_64.tar.gz){: .btn .btn-blue } [MacOS](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.0/mne-cpp-macos-static-x86_64.tar.gz){: .btn .btn-blue } </span> |
+
 For older releases please [here](https://github.com/mne-tools/mne-cpp/releases){:target="_blank" rel="noopener"}.
 
 Development Release
