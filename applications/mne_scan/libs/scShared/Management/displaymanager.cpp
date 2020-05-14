@@ -52,7 +52,6 @@
 #include <scMeas/realtimecov.h>
 #include <scMeas/realtimespectrum.h>
 #include <scMeas/realtimehpiresult.h>
-#include <scMeas/realtimefwdsolution.h>
 
 //=============================================================================================================
 // QT INCLUDES

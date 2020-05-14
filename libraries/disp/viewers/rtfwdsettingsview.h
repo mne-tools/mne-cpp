@@ -40,6 +40,7 @@
 //=============================================================================================================
 
 #include "../disp_global.h"
+
 #include <fiff/fiff_types.h>
 #include <fs/annotationset.h>
 
@@ -96,15 +97,16 @@ public:
 
     //=========================================================================================================
     /**
-     * Get status of recomputation.
+     * Get status of recomputation check box.
      *
-     * @return  The icurrent recomputation status checked.
+     * @return  If recomputation status is checked.
      */
     bool getRecomputationStatusChanged();
 
     //=========================================================================================================
     /**
-     * Updates the clustering status (1 Recomp. Triggered, 2 Clustering, 3 Finished)
+     * Updates the clustering status
+     * (0 Initializing, 1 Computing, 2 Recomputing, 3 Clustering, 4 Finished).
      *
      * @param[in] iStatus            status of recomputation.
      */
@@ -112,7 +114,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Get status of clustering.
+     * Get status of clustering check box.
      *
      * @return  Wheter clustering is checked or not.
      */
@@ -145,7 +147,7 @@ public:
     /**
      * Updates clustered forward solution information
      *
-     * @param[in] iNSource      Number of source dipoles.
+     * @param[in] iNSource      Number of clustered source dipoles.
      */
 
     void setClusteredInformation(int iNSource);

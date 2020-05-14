@@ -42,7 +42,6 @@
 #include "rtfwd_global.h"
 
 #include "FormFiles/rtfwdsetupwidget.h"
-//#include "FormFiles/rtfwdwidget.h"
 
 #include <fwd/computeFwd/compute_fwd.h>
 #include <fwd/computeFwd/compute_fwd_settings.h>
@@ -168,13 +167,7 @@ protected:
 private:
     //=========================================================================================================
     /**
-     * Check if incoming headmovement should trigger a recalculation
-     */
-    void checkHeadDisplacement();
-
-    //=========================================================================================================
-    /**
-     * Call this funciton whenever when a forward computation was requested.
+     * Call this funciton whenever a forward computation was requested.
      */
     void onDoForwardComputation();
 
@@ -198,7 +191,7 @@ private:
     /**
      * Call this function whenever the atlas directory is set.
      *
-     * @param[in] sDirPath              The path to the atlas.
+     * @param[in] sDirPath              The path to the atlas directory.
      * @param[in] pAnnotationSet        The Annotation set.
      */
     void onAtlasDirChanged(const QString& sDirPath,
@@ -229,7 +222,7 @@ private:
 
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeFwdSolution>::SPtr         m_pRTFSOutput;          /**< The fwd solution.*/
 
-    IOBUFFER::CircularBuffer<SCMEASLIB::RealTimeHpiResult>::SPtr        m_pCircularBuffer;      /**< Holds incoming data.*/
+    IOBUFFER::CircularBuffer<SCMEASLIB::RealTimeHpiResult>::SPtr                m_pCircularBuffer;      /**< Holds incoming data.*/
 
 public:
     FWDLIB::ComputeFwdSettings::SPtr    m_pFwdSettings;         /**< Forward Solution Settings. */
@@ -253,7 +246,8 @@ signals:
 
     //=========================================================================================================
     /**
-     * Emit this signal whenever the clustering status changed (1 Recomp. Triggered, 2 Clustering, 3 Finished).
+     * Emit this signal whenever the clustering status changed
+     * (0 Initializing, 1 Computing, 2 Recomputing, 3 Clustering, 4 Finished).
      *
      * @param[in] iStatus            status of recomputation.
      */

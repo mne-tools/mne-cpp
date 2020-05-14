@@ -78,7 +78,7 @@ RtFwdSetupWidget::RtFwdSetupWidget(RtFwd* toolbox, QWidget *parent)
     m_ui.m_check_bIncludeMeg->setChecked(m_pRtFwd->m_pFwdSettings->include_meg);
     m_ui.m_check_bComputeGrad->setChecked(m_pRtFwd->m_pFwdSettings->compute_grad);
 
-    if(m_pRtFwd->m_pFwdSettings->coord_frame == 5) {
+    if(m_pRtFwd->m_pFwdSettings->coord_frame == FIFFV_COORD_MRI) {
         m_ui.m_check_bCoordframe->setChecked(true);
     } else {
         m_ui.m_check_bCoordframe->setChecked(false);
@@ -156,7 +156,7 @@ void RtFwdSetupWidget::onSolNameChanged()
     if(t_sFileName.contains("-fwd.fif")) {
         m_pRtFwd->m_pFwdSettings->solname = t_sFileName;
     } else {
-        qWarning() << "rtFwdSetup: make sure to name dolution file correctly: -fwd.fif";
+        qWarning() << "rtFwdSetup: make sure to name solution file correctly: -fwd.fif";
     }
 }
 
@@ -234,7 +234,7 @@ void RtFwdSetupWidget::showMriFileDialog()
         m_pRtFwd->m_pFwdSettings->mriname = t_sFileName;
         m_ui.m_qLineEdit_MriName->setText(t_sFileName);
     } else {
-        qWarning() << "rtFwdSetup: Mri file cannot be opened";
+        qWarning() << "rtFwdSetup: Mri-Head transformation cannot be opened";
     }
     t_fMri.close();
 }
