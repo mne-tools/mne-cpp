@@ -152,7 +152,7 @@ void RtcMne::init()
             this, &RtcMne::updateRTC, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTCInput);
 
-    m_pRTFSInput = PluginInputData<RealTimeFwdSolution>::create(this, "MNE RFS In", "MNE real-time forward solution input data");
+    m_pRTFSInput = PluginInputData<RealTimeFwdSolution>::create(this, "MNE RTFS In", "MNE real-time forward solution input data");
     connect(m_pRTFSInput.data(), &PluginInputConnector::notify,
             this, &RtcMne::updateRTFS, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTFSInput);
@@ -162,7 +162,7 @@ void RtcMne::init()
     m_outputConnectors.append(m_pRTSEOutput);
     m_pRTSEOutput->data()->setName(this->getName());//Provide name to auto store widget settings
 
-    // Set the annotation and surface data
+    // Set the annotation and surface data and mri-head transformation
     if(m_pAnnotationSet->size() != 0) {
         m_pRTSEOutput->data()->setAnnotSet(m_pAnnotationSet);
     }
@@ -298,7 +298,7 @@ void RtcMne::calcFiffInfo()
 
         m_pRTSEOutput->data()->setFiffInfo(m_pFiffInfo);
 
-        qDebug() << "RtcMne::calcFiffInfo - m_pFiffInfo" << m_pFiffInfo->ch_names;
+        // qDebug() << "RtcMne::calcFiffInfo - m_pFiffInfo" << m_pFiffInfo->ch_names;
     }
 }
 
@@ -361,7 +361,7 @@ void RtcMne::updateRTFS(SCMEASLIB::Measurement::SPtr pMeasurement)
             m_pFiffInfoForward = QSharedPointer<FiffInfoBase>(new FiffInfoBase(m_pFwd->info));
             m_qMutex.unlock();
         } else if(!pRTFS->isClustered()) {
-            qWarning() << "[RtcMne::updateRTFS: The forward solution has not been clustered yet. ]";
+            qWarning() << "[RtcMne::updateRTFS] The forward solution has not been clustered yet.";
         }
     }
 }

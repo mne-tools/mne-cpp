@@ -37,10 +37,12 @@
 //=============================================================================================================
 
 #include "rtfwd.h"
+
 #include <disp/viewers/rtfwdsettingsview.h>
 
 #include <fwd/computeFwd/compute_fwd.h>
 #include <fwd/computeFwd/compute_fwd_settings.h>
+
 #include <fs/annotationset.h>
 
 #include <mne/mne_forwardsolution.h>
@@ -130,18 +132,18 @@ void RtFwd::init()
     m_pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet(m_sAtlasDir+"/lh.aparc.a2009s.annot", m_sAtlasDir+"/rh.aparc.a2009s.annot"));
 
     // Input
-    m_pHpiInput = PluginInputData<RealTimeHpiResult>::create(this, "rtFwdIn", "rtFwd HPI input");
+    m_pHpiInput = PluginInputData<RealTimeHpiResult>::create(this, "rtFwd RTHR In", "rtFwd real time HPI result input data");
     connect(m_pHpiInput.data(), &PluginInputConnector::notify,
             this, &RtFwd::update, Qt::DirectConnection);
     m_inputConnectors.append(m_pHpiInput);
 
-    m_pRTMSAInput = PluginInputData<RealTimeMultiSampleArray>::create(this, "rtFwdIn", "rtFwd input data");
+    m_pRTMSAInput = PluginInputData<RealTimeMultiSampleArray>::create(this, "rtFwd RTMSA In", "rtFwd real-time multi sample array input data");
     connect(m_pRTMSAInput.data(), &PluginInputConnector::notify,
             this, &RtFwd::update, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTMSAInput);
 
     // Output
-    m_pRTFSOutput = PluginOutputData<RealTimeFwdSolution>::create(this, "rtFwdOut", "rtFwd output data");
+    m_pRTFSOutput = PluginOutputData<RealTimeFwdSolution>::create(this, "rtFwdOut", "rtFwd real-time forward solution output data");
     m_pRTFSOutput->data()->setName(this->getName());//Provide name to auto store widget settings
     m_outputConnectors.append(m_pRTFSOutput);
 }
@@ -415,24 +417,24 @@ void RtFwd::run()
     m_mutex.unlock();
 
     // initialize fwd solution
-    emit statusInformationChanged(0);
+    emit statusInformationChanged(0);           // initializing
     ComputeFwd::SPtr pComputeFwd = ComputeFwd::SPtr(new ComputeFwd(m_pFwdSettings));
 
     QFile t_fSolution(m_pFwdSettings->solname);
     MNEForwardSolution::SPtr pFwdSolution;
     MNEForwardSolution::SPtr pClusteredFwd;
 
-    emit statusInformationChanged(4);
+    emit statusInformationChanged(4);           // finished
 
     // do recomputation if requested, not busy and transformation is different
     bool bIsLargeHeadMovement = false;          // indicate if movement was large
     bool bIsDifferent = false;                  // indicate if incoming transformation matrix is different
     bool bDoRecomputation = false;              // indicate if we want to recompute
     bool bDoClustering = false;                 // indicate if we want to cluster
-    bool bFwdReady = false;                      // only cluster if fwd is ready
+    bool bFwdReady = false;                     // only cluster if fwd is ready
     bool bHpiConnectected = false;              // only update/recompute if hpi is connected
-    bool bDoFwdComputation = false;
-    bool bIsInit = false;
+    bool bDoFwdComputation = false;             // compute forward if requested
+    bool bIsInit = false;                       // only recompute if initial fwd solulion is calculated
     while(!isInterruptionRequested()) {
 
         m_mutex.lock();
@@ -451,6 +453,7 @@ void RtFwd::run()
 
             // get Mne Forward Solution (in future this is not necessary, ComputeForward will have this as member)
             pFwdSolution = MNEForwardSolution::SPtr(new MNEForwardSolution(t_fSolution, false, true));
+
             // emit results to control widget
             emit fwdSolutionAvailable(pFwdSolution->source_ori,
                                       pFwdSolution->coord_frame,
@@ -461,11 +464,11 @@ void RtFwd::run()
             m_mutex.lock();
             if(!m_bDoClustering) {
                 m_pRTFSOutput->data()->setValue(pFwdSolution);
-                bFwdReady = false;
+                bFwdReady = false;          // make sure to not cluster
             }
-            bFwdReady = true;
-            m_bDoFwdComputation = false;
-            bIsInit = true;
+            bFwdReady = true;               // enable cluster
+            m_bDoFwdComputation = false;    // don't call this again if not requested
+            bIsInit = true;                 // init computation finished -> recomputation possible
             m_mutex.unlock();
         }
 
@@ -521,6 +524,5 @@ void RtFwd::run()
             bFwdReady = false;
         }
         emit statusInformationChanged(4);               //finished
-
     }
 }

@@ -94,8 +94,7 @@ QSharedPointer<MNEForwardSolution> RealTimeFwdSolution::getValue()
 
 //=============================================================================================================
 
-
-void RealTimeFwdSolution::setValue(const MNELIB::MNEForwardSolution::SPtr pFwdSolution)
+void RealTimeFwdSolution::setValue(const MNEForwardSolution::SPtr pFwdSolution)
 {
     m_qMutex.lock();
     m_pFwdSolution = pFwdSolution;
@@ -108,20 +107,19 @@ void RealTimeFwdSolution::setValue(const MNELIB::MNEForwardSolution::SPtr pFwdSo
 
 //=============================================================================================================
 
-QSharedDataPointer<FIFFLIB::FiffNamedMatrix>& RealTimeFwdSolution::getSol()
+QSharedDataPointer<FiffNamedMatrix>& RealTimeFwdSolution::getSol()
 {
     QMutexLocker locker(&m_qMutex);
-    return m_pSol;
+    return m_pNamedMatSol;
 }
 
 //=============================================================================================================
 
-
-void RealTimeFwdSolution::setSol(const FiffNamedMatrix::SDPtr& pV)
+void RealTimeFwdSolution::setSol(const FiffNamedMatrix::SDPtr& pNamedMatSol)
 {
     m_qMutex.lock();
     //Store
-    m_pSol = pV;
+    m_pNamedMatSol = pNamedMatSol;
     m_bInitialized = true;
     m_qMutex.unlock();
 
@@ -129,20 +127,19 @@ void RealTimeFwdSolution::setSol(const FiffNamedMatrix::SDPtr& pV)
 }
 //=============================================================================================================
 
-QSharedDataPointer<FIFFLIB::FiffNamedMatrix>& RealTimeFwdSolution::getSolGrad()
+QSharedDataPointer<FiffNamedMatrix>& RealTimeFwdSolution::getSolGrad()
 {
     QMutexLocker locker(&m_qMutex);
-    return m_pSolGrad;
+    return m_pNamedMatSolGrad;
 }
 
 //=============================================================================================================
 
-
-void RealTimeFwdSolution::setSolGrad(const FiffNamedMatrix::SDPtr& pV)
+void RealTimeFwdSolution::setSolGrad(const FiffNamedMatrix::SDPtr& pNamedMatSolGrad)
 {
     m_qMutex.lock();
     //Store
-    m_pSol = pV;
+    m_pNamedMatSol = pNamedMatSolGrad;
     m_bInitialized = true;
     m_qMutex.unlock();
 

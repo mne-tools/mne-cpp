@@ -43,8 +43,9 @@
 
 #include <fs/annotationset.h>
 #include <fs/surfaceset.h>
-#include <mne/mne_forwardsolution.h>
 #include <fiff/fiff_coord_trans.h>
+
+#include <mne/mne_forwardsolution.h>
 
 #include <scMeas/realtimesourceestimate.h>
 
@@ -73,8 +74,6 @@ RtcMneSetupWidget::RtcMneSetupWidget(RtcMne* toolbox, QWidget *parent)
 , m_pMNE(toolbox)
 {
     ui.setupUi(this);
-
-    // ui.m_qLineEdit_FwdFileName->setText(m_pMNE->m_qFileFwdSolution.fileName());
 
     ui.m_qLineEdit_AtlasDirName->setText(m_pMNE->m_sAtlasDir);
     if(m_pMNE->m_pAnnotationSet->isEmpty())
@@ -168,7 +167,7 @@ void RtcMneSetupWidget::showSurfaceDirDialog()
 void RtcMneSetupWidget::showMriHeadFileDialog()
 {
     QString t_sMriHeadFile = QFileDialog::getOpenFileName(this,
-                                                          tr("Select Mri - Head transformation"),
+                                                          tr("Select Mri-Head transformation"),
                                                           QString(),
                                                           tr("Fif Files (*.fif)"));
 

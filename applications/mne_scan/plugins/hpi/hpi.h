@@ -2,12 +2,13 @@
 /**
  * @file     hpi.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>
+ *           Ruben Dörfel <ruben.doerfel@tu-ilmenau.de>
  * @since    0.1.0
  * @date     February, 2020
  *
  * @section  LICENSE
  *
- * Copyright (C) 2020, Lorenz Esch. All rights reserved.
+ * Copyright (C) 2020, Lorenz Esch, Ruben Dörfel. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -160,7 +161,7 @@ private:
     /**
      * Call this function whenever the allowed head movement threshold changed.
      *
-     * @param[in] dAllowedMeanErrorDist    Allowed movement threshold in mm.
+     * @param[in] dAllowedMeanErrorDist    Allowed movement threshold.
      */
     void onAllowedMovementChanged(double dAllowedMovement);
 
@@ -256,8 +257,8 @@ private:
     qint16                      m_iNumberOfFitsPerSecond;   /**< The number of allowed HPI fits per second. Default is 3.*/
 
     double                      m_dAllowedMeanErrorDist;    /**< The allowed error distance in order for the last fit to be counted as a good fit.*/
-    double                      m_dAllowedMovement;         /**< The allowed head movement regarding last head position in mm.*/
-    double                      m_dAllowedRotation;         /**< The allowed head rotation regarding last head position in degree.*/
+    double                      m_dAllowedMovement;         /**< The allowed head movement regarding reference head position.*/
+    double                      m_dAllowedRotation;         /**< The allowed head rotation regarding reference head position in degree.*/
 
     bool                        m_bDoFreqOrder;             /**< Order Frequencies.*/
     bool                        m_bDoSingleHpi;             /**< Do a single HPI fit.*/

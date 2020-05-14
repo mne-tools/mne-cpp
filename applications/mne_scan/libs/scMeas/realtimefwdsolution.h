@@ -67,7 +67,6 @@ namespace MNELIB{
     class MNEForwardSolution;
 }
 
-
 //=============================================================================================================
 // DEFINE NAMESPACE SCMEASLIB
 //=============================================================================================================
@@ -105,7 +104,7 @@ public:
     /**
      * Set the fiff info
      *
-     * @param [in] pFiffInfo     the new fiff info.
+     * @param [in] pFiffInfo     The new fiff info.
      */
     void setFiffInfo(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
@@ -113,7 +112,7 @@ public:
     /**
      * Get the fiff info
      *
-     * @return     the current fiff info.
+     * @return     The current fiff info.
      */
     QSharedPointer<FIFFLIB::FiffInfo> getFiffInfo();
 
@@ -121,7 +120,7 @@ public:
     /**
      * New forward solution to distribute
      *
-     * @param [in] fwdSolution     the forward solution which should be distributed.
+     * @param [in] fwdSolution     The forward solution which should be distributed.
      */
     virtual void setValue(const MNELIB::MNEForwardSolution::SPtr pFwdSolution);
 
@@ -130,41 +129,39 @@ public:
      * Returns the current value set.
      * This method is inherited by Measurement.
      *
-     * @return the last attached value.
+     * @return The last attached value.
      */
     virtual QSharedPointer<MNELIB::MNEForwardSolution> getValue();
 
     //=========================================================================================================
     /**
-     * New mne forward solution to distribute
+     * New Lead Field to distribute
      *
-     * @param [in] v     the solution matrix (Lead Field) which should be distributed.
+     * @param [in] pNamedMatSol     The solution matrix (Lead Field) which should be distributed.
      */
-    virtual void setSol(const FIFFLIB::FiffNamedMatrix::SDPtr& pV);
+    virtual void setSol(const FIFFLIB::FiffNamedMatrix::SDPtr& pNamedMatSol);
 
     //=========================================================================================================
     /**
-     * Returns the current value set.
-     * This method is inherited by Measurement.
+     * Get the Lied Field matrix
      *
-     * @return the last attached value.
+     * @return The Lead Field matrix.
      */
     virtual QSharedDataPointer<FIFFLIB::FiffNamedMatrix>& getSol();
 
     //=========================================================================================================
     /**
-     * New mne forward solution to distribute
+     * New gradient lead field to ditstribute
      *
-     * @param [in] v     the gradient solution matrix (Lead Field) which should be distributed.
+     * @param [in] pNamedMatSolGrad     The gradient solution matrix (Lead Field) which should be distributed.
      */
-    virtual void setSolGrad(const FIFFLIB::FiffNamedMatrix::SDPtr& pV);
+    virtual void setSolGrad(const FIFFLIB::FiffNamedMatrix::SDPtr& pNamedMatSolGrad);
 
     //=========================================================================================================
     /**
-     * Returns the current value set.
-     * This method is inherited by Measurement.
+     * Get the gradient Lied Field matrix
      *
-     * @return the last attached value.
+     * @return The gradient lead field.
      */
     virtual QSharedDataPointer<FIFFLIB::FiffNamedMatrix>& getSolGrad();
 
@@ -192,8 +189,8 @@ private:
     QSharedPointer<MNELIB::MNEForwardSolution>      m_pFwdSolution;         /**< The Mne Forward Solution. */
     QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo;            /**< The Fiff Info. */
 
-    QSharedDataPointer<FIFFLIB::FiffNamedMatrix>    m_pSol;                 /**< The solution matrix (LF). */
-    QSharedDataPointer<FIFFLIB::FiffNamedMatrix>    m_pSolGrad;             /**< The gradient solution matrix (LF). */
+    QSharedDataPointer<FIFFLIB::FiffNamedMatrix>    m_pNamedMatSol;         /**< The solution matrix (LF). */
+    QSharedDataPointer<FIFFLIB::FiffNamedMatrix>    m_pNamedMatSolGrad;     /**< The gradient solution matrix (LF). */
 };
 
 //=============================================================================================================

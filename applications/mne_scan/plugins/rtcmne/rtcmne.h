@@ -192,7 +192,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Slot to update the forward solution
+     * Slot to update the real time forward solution
      */
     void updateRTFS(SCMEASLIB::Measurement::SPtr pMeasurement);
 
@@ -247,7 +247,7 @@ protected:
     QFuture<void>                   m_future;                   /**< The future monitoring the clustering. */
 
     FIFFLIB::FiffEvoked             m_currentEvoked;
-    FIFFLIB::FiffCoordTrans         m_mriHeadTrans;            /**< the Mri Head transformation. */
+    FIFFLIB::FiffCoordTrans         m_mriHeadTrans;             /**< the Mri Head transformation. */
 
     qint32                          m_iNumAverages;             /**< The number of trials/averages to store. */
     qint32                          m_iDownSample;              /**< Down sample factor. */

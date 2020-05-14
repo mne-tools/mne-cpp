@@ -83,17 +83,14 @@ CONFIG(debug, debug|release) {
 SOURCES += \
         rtfwd.cpp \
 	FormFiles/rtfwdsetupwidget.cpp \
-	#FormFiles/rtfwdwidget.cpp
 
 HEADERS += \
         rtfwd.h\
 	rtfwd_global.h \
 	FormFiles/rtfwdsetupwidget.h \
-	#FormFiles/rtfwdwidget.h
 
 FORMS += \
-        FormFiles/rtfwdsetup.ui \
-	#FormFiles/rtfwdwidget.ui
+        FormFiles/rtfwdsetupwidget.ui \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

@@ -40,7 +40,7 @@
 //=============================================================================================================
 
 #include "../rtfwd.h"
-#include "../ui_rtfwdsetup.h"
+#include "../ui_rtfwdsetupwidget.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -131,7 +131,7 @@ private:
 
     //=========================================================================================================
     /**
-     * Shows Mrie->Head transformation selection dialog
+     * Shows Mri->Head transformation selection dialog
      */
     void showMriFileDialog();
 
@@ -145,7 +145,7 @@ private:
 
     //=========================================================================================================
     /**
-     * change name of MinDistDir output
+     * Change name of MinDistDir output
      */
     void onMinDistNameChanged();
 
@@ -163,25 +163,25 @@ private:
 
     //=========================================================================================================
     /**
-     * change name of min distance skull - source
+     * Change value of minimum distance skull - source
      */
     void onMinDistChanged();
 
     //=========================================================================================================
     /**
-     * change name of EEG sphere radius
+     * Change EEG sphere radius
      */
     void onEEGSphereRadChanged();
 
     //=========================================================================================================
     /**
-     * change name of EEG sphere origin
+     * Change EEG sphere origin
      */
     void onEEGSphereOriginChanged();
 
     //=========================================================================================================
     /**
-     * change settings from checkboxes
+     * Change settings from checkboxes
      */
     void onCheckStateChanged();
 
