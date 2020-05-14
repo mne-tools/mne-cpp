@@ -61,9 +61,36 @@ using namespace MNEANONYMIZE;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SettingsControllerGui::SettingsControllerGui(const QStringList& arguments, MainWindow* w)
-: SettingsControllerCl(arguments)
-, m_pWindow(w)
+SettingsControllerGui::SettingsControllerGui(const QStringList& arguments)
+: m_pWindow(QSharedPointer<MainWindow> (new MainWindow(this)))
 {
     Q_UNUSED(arguments)
+
+    initParser();
+
+    parseInputs(arguments);
+
+    m_pWindow->show();
+}
+
+void SettingsControllerGui::parseInputs(const QStringList& arguments)
+{
+    m_parser.process(arguments);
+
+    //parse in and out files
+    if(m_parser.isSet("in"))
+    {
+        m_fiInFileInfo.setFile(m_parser.value("in"));
+        if(m_fiInFileInfo.isFile())
+        {
+            if(m_pAnonymizer->setFileIn(m_fiInFileInfo.absoluteFilePath()))
+            {
+                qCritical() << "Error while setting the input file.";
+            }
+            m_pWindow->setLineEditInFile(m_fiInFileInfo.fileName());
+        } else {
+            qWarning() << "Input file is not a file.";
+        }
+    }
+
 }

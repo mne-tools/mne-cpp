@@ -81,36 +81,14 @@ SettingsControllerCl::SettingsControllerCl()
 , m_bInputFileDeleted(false)
 , m_bOutFileRenamed(false)
 {
-//    QObject::connect(this, &MNEANONYMIZE::SettingsControllerCl::finished,
-//                     qApp, &QCoreApplication::exit, Qt::QueuedConnection);
 
-    m_pAnonymizer = FiffAnonymizer::SPtr(new FiffAnonymizer);
-    initParser();
-
-//    if(parseInputs(arguments))
-//    {
-//        qCritical() << "Something went wrong during the parsing of input options.";
-//        emit finished(1);
-//        return;
-//    }
-
-//    printHeaderIfVerbose();
-//    printIfVerbose(QString("Executing command: ") + arguments.join(" "));
-
-//    if(execute())
-//    {
-//        qCritical() << "Error during the anonymization of the input file";
-//        emit finished(1);
-//        return;
-//    }
-
-//    emit finished(0);
 }
 
 //=============================================================================================================
 
 SettingsControllerCl::SettingsControllerCl(const QStringList& arguments)
-: m_sAppName(qApp->applicationName())
+: m_pAnonymizer(FiffAnonymizer::SPtr(new FiffAnonymizer))
+, m_sAppName(qApp->applicationName())
 , m_sAppVer(qApp->applicationVersion())
 , m_bVerboseMode(false)
 , m_bSilentMode(false)
@@ -123,7 +101,6 @@ SettingsControllerCl::SettingsControllerCl(const QStringList& arguments)
     QObject::connect(this, &MNEANONYMIZE::SettingsControllerCl::finished,
                      qApp, &QCoreApplication::exit, Qt::QueuedConnection);
 
-    m_pAnonymizer = FiffAnonymizer::SPtr(new FiffAnonymizer);
     initParser();
     if(parseInputs(arguments))
     {
