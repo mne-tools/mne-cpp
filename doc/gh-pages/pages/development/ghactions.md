@@ -4,6 +4,7 @@ parent: Continuous Integration
 grand_parent: Develop
 nav_order: 1
 ---
+
 # Github Actions
 
 MNE-CPP facilitates Github Actions to do continous integration (CI). Github Actions operates on Github events which trigger so called workflows. You can read more on the terminology [here](https://help.github.com/en/actions/reference){:target="_blank" rel="noopener"}. Currently, the following Github events trigger MNE-CPP's CI pipeline:

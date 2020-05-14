@@ -14,6 +14,6 @@ New development takes place on the `master` branch. Once the developers have rou
 3. (Manually) Prepare and update the [release table](https://mne-cpp.github.io/pages/install/binaries.html){:target="_blank" rel="noopener"}.
 4. (Manually) Prepare and update the [changelog](https://mne-cpp.github.io/pages/install/changelog.html){:target="_blank" rel="noopener"}.
 5. (Manually) Create release with tag `v0.x.y` via Github. 
-6. (Automated by [release.yml](https://github.com/mne-tools/mne-cpp/blob/master/.github/workflows/release.yml){:target="_blank" rel="noopener"}) Create a new branch named `v0.x.y` based on current `master` branch. A new branch is only created for a minor version releases, e.g., going from `v0.1.0` to `v0.2.0`.
+6. (Automated by [release.yml](https://github.com/mne-tools/mne-cpp/blob/master/.github/workflows/release.yml){:target="_blank" rel="noopener"}) Create a new branch named `v0.x.y` based on current `master` branch. A new branch is only created for minor version releases, e.g., going from `v0.1.0` to `v0.2.0`.
 7. (Automated by [release.yml](https://github.com/mne-tools/mne-cpp/blob/master/.github/workflows/release.yml){:target="_blank" rel="noopener"}) Build dynamically as well as statically linked binaries and upload them to the `v0.x.y` release on Github.
 8. (Manually) In case of a minor or major version bump, create branch protection rules for the newly created branch via the Github web interface.
