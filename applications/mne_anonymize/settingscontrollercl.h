@@ -103,18 +103,19 @@ public:
      */
     SettingsControllerCl(const QStringList& arguments);
 
+protected:
+    //=========================================================================================================
+    /**
+     * Configures the QCommandLineParser member object with all the necesarry options.
+     */
+    void initParser();
+
 private:
     //=========================================================================================================
     /**
      * Signals the FiffAnonymizer method handling both the multi-parallel setup and the single-thread setup.
      */
     int execute();
-
-    //=========================================================================================================
-    /**
-     * Configures the QCommandLineParser member object with all the necesarry options.
-     */
-    void initParser();
 
     //=========================================================================================================
     /**
@@ -203,20 +204,24 @@ private:
      */
     void printIfVerbose(const QString& str) const;
 
+protected:
 signals:
     /**
      * Signal the main qt core application to stop running and exit.
      */
     void finished(const int) const;
 
-private:
+protected:
     FiffAnonymizer::SPtr m_pAnonymizer;     /**< Local pointer to a Fiffanonyzer object to configure and use.*/
     QString m_sAppName;                     /**< Application name.*/
     QString m_sAppVer;                      /**< Application version number.*/
 
+    QCommandLineParser m_parser;            /**< Parser object to work with member ptr to QCoreApp and parse input command line options.*/
+
     QFileInfo m_fiInFileInfo;               /**< Input File info obj.*/
     QFileInfo m_fiOutFileInfo;              /**< Output File info obj.*/
 
+private:
     bool m_bVerboseMode;                    /**< Show header when executing.*/
     bool m_bSilentMode;                     /**< Avoid any message to the user.*/
     bool m_bInOutFileNamesEqual;            /**< Flags user's request to have both input and output files with the same name.*/
@@ -225,7 +230,6 @@ private:
     bool m_bInputFileDeleted;               /**< Flags if the input file has been deleted. */
     bool m_bOutFileRenamed;                 /**< Flags if the output file has been renamed to match the name the input file had. */
 
-    QCommandLineParser m_parser;            /**< Parser object to work with member ptr to QCoreApp and parse input command line options.*/
 };
 
 //=============================================================================================================
