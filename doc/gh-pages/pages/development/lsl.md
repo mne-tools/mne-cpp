@@ -15,13 +15,13 @@ This plugin adds support for LSL data streams to MNE Scan. For more information 
 
 Make sure that you have the LSL git submodule by typing:
 
-```sh
+```
 git submodule update --init applications\mne_scan\plugins\lsladapter\liblsl
 ```
 
 Build it as a regular Cmake project. For MSVC you need to ensure that you use exactly the same Cmake generator as for MNE-CPP. For compilation with MSVC 2015 on a 64bit system do:
 
-```sh
+```
 cd mne-cpp\applications\mne_scan\plugins\lsladapter\liblsl\
 mkdir build
 cd build
