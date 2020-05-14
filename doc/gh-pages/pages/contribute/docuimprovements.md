@@ -10,7 +10,7 @@ This page shows you how to contribute to MNE-CPP's website. The easiest way to m
 ## Set up gh-pages
 
 If not present already, create a new branch called `gh-pages`. Please note that the `git rm -rf .` command will delete all files in your repository folder, which are not tracked by git:
-```bash
+```console
 git checkout --orphan gh-pages
 git rm -rf .
 touch README.md

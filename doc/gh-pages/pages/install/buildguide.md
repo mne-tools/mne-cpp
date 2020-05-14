@@ -36,19 +36,19 @@ Fork [MNE-CPP's main repository](https://github.com/mne-tools/mne-cpp){:target="
 
 Clone the fork to your local machine:
 
-```bash
+```console
 git clone https://github.com/<YourGitUserName>/mne-cpp.git
 ```
 
 Setup a new remote pointing to MNE-CPP's main repository:
 
-```bash
+```console
 git remote add upstream https://github.com/mne-tools/mne-cpp.git
 ```
 
 Every time you want to update to the newest changes use:
 
-```bash
+```console
 git fetch --all
 git rebase upstream/master
 ```
@@ -70,7 +70,7 @@ git rebase upstream/master
 
 Create a shadow build folder, run `qmake` on `mne-cpp.pro` and build:
 
-```bash
+```console
 mkdir mne-cpp_shadow
 cd mne-cpp_shadow
 <QtFolder>/5.14.2/msvc2017_64/bin/qmake ../mne-cpp/mne-cpp.pro
