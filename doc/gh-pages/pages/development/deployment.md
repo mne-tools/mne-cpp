@@ -48,7 +48,7 @@ Files which are needed by the applications, e.g., layout files, selection groups
 
 ## Packaging and uploading
 
-| Platform                    | Packaged folder                      |
+| Platform                    | Packaged folders                      |
 | --------------------------- | ------------------------------------ |
 | Windows | Folder `mne-cpp/bin` is compressed to a zip file and uploaded as release asset to the corresponding GitHub release. |
 | Linux | Folders `mne-cpp/bin`, `mne-cpp/lib`, `mne-cpp/plugins`, `mne-cpp/translations` are compressed to a tar.gz file and uploaded as release assets to the corresponding GitHub release. |
