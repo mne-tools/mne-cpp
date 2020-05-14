@@ -11,7 +11,7 @@ This page shows you how to check your wasm build and deploy it to your `gh-pages
 ## Set up gh-pages
 
 If not present already, create a new branch called `gh-pages`. Please note that the `git rm -rf .` command will delete all files in your repository folder, which are not tracked by git:
-```console
+```sh
 git checkout --orphan gh-pages
 git rm -rf .
 touch README.md
