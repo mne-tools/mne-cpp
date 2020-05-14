@@ -159,26 +159,20 @@ win32:!contains(MNECPP_CONFIG, static) {
     QMAKE_POST_LINK += $${DEPLOY_CMD}
 }
 unix:!macx {
-    # Unix
     QMAKE_RPATHDIR += $ORIGIN/../lib
 }
 macx {
-    # Mac
-    QMAKE_RPATHDIR += @executable_path/../Frameworks
-
+    # Copy Resource and plugins folder to app bundle
     plugins.path = Contents/MacOS/
     plugins.files = $${ROOT_DIR}/bin/mne_analyze_plugins
     QMAKE_BUNDLE_DATA += plugins
-    EXTRA_ARGS = -dmg
 
     !contains(MNECPP_CONFIG, static) {
         # 3 entries returned in DEPLOY_CMD
+        EXTRA_ARGS =
         DEPLOY_CMD = $$macDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
         QMAKE_POST_LINK += $${DEPLOY_CMD}
-
-        deploy_app = $$member(DEPLOY_CMD, 1)
-        dmg_file = $$replace(deploy_app, .app, .dmg)
-        QMAKE_CLEAN += -r $${deploy_app} $${dmg_file}
+        QMAKE_CLEAN += -r $$member(DEPLOY_CMD, 1)
     }
 }
 

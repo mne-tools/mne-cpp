@@ -185,14 +185,10 @@ win32:!contains(MNECPP_CONFIG, static) {
     QMAKE_POST_LINK += $${DEPLOY_CMD}
 }
 unix:!macx {
-    # Unix
     QMAKE_RPATHDIR += $ORIGIN/../lib
 }
 macx {
-    # Mac
-    QMAKE_RPATHDIR += @executable_path/../Frameworks
-
-    # Copy Resource folder to app bundle
+    # Copy Resource and plugins folder to app bundle
     filtrc.path = Contents/MacOS/resources/general/
     filtrc.files = $${ROOT_DIR}/resources/general/default_filters
     QMAKE_BUNDLE_DATA += filtrc
@@ -227,6 +223,7 @@ macx {
 
     !contains(MNECPP_CONFIG, static) {
         # 3 entries returned in DEPLOY_CMD
+        EXTRA_ARGS =
         DEPLOY_CMD = $$macDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
         QMAKE_POST_LINK += $${DEPLOY_CMD}
     }
