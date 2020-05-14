@@ -1,8 +1,11 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <settingscontrollergui.h>
 
 #include <QMessageBox>
 #include <QCloseEvent>
+
+using namespace MNEANONYMIZE;
 
 MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
