@@ -10,9 +10,10 @@ nav_order: 3
 New development takes place on the `master` branch. Once the developers have rough consensus we create a new stable release on GitHub, following the `v0.x.y` tag syntax. The MNE-CPP stable release steps are:
 
 1. (Manually) Increment version number in [mne-cpp.pri](https://github.com/mne-tools/mne-cpp/blob/master/mne-cpp.pri){:target="_blank" rel="noopener"} and [mne-cpp_doxyfile](https://github.com/mne-tools/mne-cpp/blob/master/doc/doxygen/mne-cpp_doxyfile){:target="_blank" rel="noopener"} by `0.x.y`. 
-2. Change version numbers of applications, e.g., [MNE Scan](https://github.com/mne-tools/mne-cpp/blob/master/applications/mne_scan/mne_scan/info.h){:target="_blank" rel="noopener"} and [MNE Analyze](https://github.com/mne-tools/mne-cpp/blob/master/applications/mne_analyze/mne_analyze/info.h){:target="_blank" rel="noopener"}.
+2. (Manually) Change version numbers of applications, e.g., [MNE Scan](https://github.com/mne-tools/mne-cpp/blob/master/applications/mne_scan/mne_scan/info.h){:target="_blank" rel="noopener"} and [MNE Analyze](https://github.com/mne-tools/mne-cpp/blob/master/applications/mne_analyze/mne_analyze/info.h){:target="_blank" rel="noopener"}.
 3. (Manually) Prepare and update the [release table](https://mne-cpp.github.io/pages/install/binaries.html){:target="_blank" rel="noopener"}.
 4. (Manually) Prepare and update the [changelog](https://mne-cpp.github.io/pages/install/changelog.html){:target="_blank" rel="noopener"}.
 5. (Manually) Create release with tag `v0.x.y` via Github. 
 6. (Automated by [release.yml](https://github.com/mne-tools/mne-cpp/blob/master/.github/workflows/release.yml){:target="_blank" rel="noopener"}) Create a new branch named `v0.x.y` based on current `master` branch. A new branch is only created for a minor version releases, e.g., going from `v0.1.0` to `v0.2.0`.
 7. (Automated by [release.yml](https://github.com/mne-tools/mne-cpp/blob/master/.github/workflows/release.yml){:target="_blank" rel="noopener"}) Build dynamically as well as statically linked binaries and upload them to the `v0.x.y` release on Github.
+8. (Manually) In case of a minor or major version bump, create branch protection rules for the newly created branch via the Github web interface.
