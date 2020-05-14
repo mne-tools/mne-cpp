@@ -11,14 +11,11 @@ This page explains how MNE-CPP handles build setups, solves for exernal as well 
 
 ## Build rules
 
-
+All MNE-CPP libraries are build to the `mne-cpp/lib` folder. All applications, test, and examples are build to the `mne-cpp/bin` folder.
 
 ## Dependency solving
 
-On Windows and MacOS dependency solving for libraries and executables is done in the executable's corresponding .pro file. Here the `windeployqt` and `macdeployqt` tools are used, which are officially developed and maintained by Qt. Two functions `defineReplace(macDeployArgs)` and `defineReplace(winDeployArgs)` are provided in the [mne-cpp.pri](https://github.com/mne-tools/mne-cpp/blob/master/mne-cpp.pri){:target="_blank" rel="noopener"} file, which are used to deploy executables on Windows and MacOS. For Linux we use the unoffical [linuxdeployqt](https://github.com/probonopd/linuxdeployqt){:target="_blank" rel="noopener"} tool which is executed in the [release.yml](https://github.com/mne-tools/mne-cpp/blob/master/.github/workflows/release.yml){:target="_blank" rel="noopener"} workflow file.
-=======
 On Windows and MacOS dependency solving for libraries and executables is done in the executable's corresponding .pro file. Here, the `windeployqt` and `macdeployqt` tools are used, which are officially developed and maintained by Qt. Two functions `defineReplace(macDeployArgs)` and `defineReplace(winDeployArgs)` are provided in the [mne-cpp.pri](https://github.com/mne-tools/mne-cpp/blob/master/mne-cpp.pri){:target="_blank" rel="noopener"} file, which are used to deploy executables on Windows and MacOS. For Linux we use the unoffical [linuxdeployqt](https://github.com/probonopd/linuxdeployqt){:target="_blank" rel="noopener"} tool which is executed in the [release.yml](https://github.com/mne-tools/mne-cpp/blob/master/.github/workflows/release.yml){:target="_blank" rel="noopener"} workflow file.
->>>>>>> 2cb500e... DOCU: Work on deployment docu
 
 ### Internal dependencies (MNE-CPP libraries) 
 
