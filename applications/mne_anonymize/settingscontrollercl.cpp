@@ -260,7 +260,8 @@ int SettingsControllerCl::parseInputs(const QStringList& arguments)
         m_pAnonymizer->setVerboseMode(false);
     }
 
-    if(m_parser.isSet("brute")) {
+    if(m_parser.isSet("brute"))
+    {
         m_pAnonymizer->setBruteMode(true);
     }
 
