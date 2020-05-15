@@ -20,6 +20,8 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(SettingsControllerGui* controller = nullptr);
 
+    ~MainWindow() override;
+
     void setController(SettingsControllerGui*);
 
 //    void loadFile(const QString& fileName);
@@ -35,6 +37,8 @@ private slots:
 //    void save();
 //    void about();
 
+    void on_lineEditInFile_textChanged(const QString &arg1);
+
 private:
 //    void createStatusBar();
 //    void createAcctions();
@@ -44,7 +48,7 @@ private:
 //    QString strippedName(const QString & fullFileName);
 
    bool m_bDataModified;
-   QSharedPointer<Ui::MainWindow> m_pUi;
+   Ui::MainWindow* m_pUi;
    SettingsControllerGui* m_pController;
 };
 
