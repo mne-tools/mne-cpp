@@ -80,6 +80,9 @@ HEADERS  += \
     settingscontrollercl.h \
     settingscontrollergui.h
 
+FORMS += \
+    mainwindow.ui
+
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_FIFF_ANONYMIZER_DIR}
@@ -124,5 +127,3 @@ contains(MNECPP_CONFIG, useFFTW) {
     }
 }
 
-FORMS += \
-    mainwindow.ui
