@@ -99,9 +99,8 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager
     this->setStatusBar(new StatusBar());
 
 #ifdef __linux__
-    qDebug() << "Loading icon (Linux):";
-    QMainWindow::setWindowIcon(QIcon("../applications/mne_analyze/mne_analyze/resources/images/appIcons/icon_mne-analyze_128x128.png"));
-    //QWindow::setIcon(QIcon("../applications/mne_analyze/mne_analyze/resources/images/appIcons/icon_mne-analyze_128x128.png"));
+    qInfo() << "Loading icon...";
+    QMainWindow::setWindowIcon(QIcon("../applications/mne_analyze/mne_analyze/resources/images/appIcons/icon_mne-analyze_256x256.png"));
 #endif
 }
 
