@@ -87,7 +87,7 @@ void SettingsControllerGui::parseInputs(const QStringList& arguments)
         {
             if(m_pAnonymizer->setFileIn(m_fiInFileInfo.absoluteFilePath()))
             {
-                qCritical() << "Error while setting the input file.";
+                qWarning() << "Error while setting the input file.";
             }
             m_pWindow->setLineEditInFile(m_fiInFileInfo.absoluteFilePath());
         } else {
@@ -117,9 +117,64 @@ void SettingsControllerGui::parseInputs(const QStringList& arguments)
     if(m_parser.isSet("brute"))
     {
         m_pAnonymizer->setBruteMode(true);
-        m_pWindow->setBruteMode(true);
+        m_pWindow->setCheckBoxBruteMode(true);
     }
 
+    if(m_parser.isSet("measurement_date"))
+    {
+        if(m_parser.isSet("measurement_date_offset"))
+        {
+            qCritical() << "You cannot specify the measurement date and the measurement date offset at "
+                           "the same time.";
+            m_parser.showHelp();
+        }
+        QString strMeasDate(m_parser.value("measurement_date"));
+        m_pAnonymizer->setMeasurementDate(strMeasDate);
+    }
+
+    if(m_parser.isSet("measurement_date_offset"))
+    {
+        if(m_parser.isSet("measurement_date"))
+        {
+            qCritical() << "You cannot specify the measurement date and the measurement date offset at "
+                           "the same time.";
+            m_parser.showHelp();
+        }
+
+        int intMeasDateOffset(m_parser.value("measurement_date_offset").toInt());
+        m_pAnonymizer->setMeasurementDateOffset(intMeasDateOffset);
+    }
+
+    if(m_parser.isSet("subject_birthday"))
+    {
+        if(m_parser.isSet("subject_birthday_offset"))
+        {
+            qCritical() << "You cannot specify the subject's birthday and subject's birthday offset"
+                           "the same time.";
+            m_parser.showHelp();
+        }
+
+        QString strBirthday(m_parser.value("subject_birthday"));
+        m_pAnonymizer->setSubjectBirthday(strBirthday);
+    }
+
+    if(m_parser.isSet("subject_birthday_offset"))
+    {
+        if(m_parser.isSet("subject_birthday"))
+        {
+            qCritical() << "You cannot specify the subject's birthday and subject's birthday offset"
+                           "the same time.";
+            m_parser.showHelp();
+        }
+        int strBirthdayOffset(m_parser.value("subject_birthday_offset").toInt());
+        m_pAnonymizer->setSubjectBirthdayOffset(strBirthdayOffset);
+    }
+
+    if(m_parser.isSet("his"))
+    {
+        QString strHisId(m_parser.value("his"));
+        m_pAnonymizer->setSubjectHisId(strHisId);
+    }
 
 
 
