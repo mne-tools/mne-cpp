@@ -4,7 +4,7 @@ on:
   push:
     branches:
     # Change this to the branch name you make changes to the documentation on
-    - docu
+    - docs_minor_edits
 
 jobs:
   gh-pages:
