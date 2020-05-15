@@ -108,7 +108,7 @@ namespace RTFWDPLUGIN
 /**
  * DECLARE CLASS RtFwd
  *
- * @brief The RtFwd class provides a dummy algorithm structure.
+ * @brief The RtFwd class provides a plugin for calculating and updating the forward solution.
  */
 class RTFWDSHARED_EXPORT RtFwd : public SCSHAREDLIB::IAlgorithm
 {
@@ -200,6 +200,7 @@ private:
 
 
     QMutex                                      m_mutex;                    /**< The threads mutex.*/
+    QFuture<void>                               m_future;                   /**< The future monitoring the clustering and forward calculation. */
 
     float                                       m_fThreshRot;               /**< The allowed rotation in degree.**/
     float                                       m_fThreshMove;              /**< The Allowed movement in mm.**/
