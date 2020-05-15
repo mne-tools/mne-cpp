@@ -69,7 +69,6 @@ FtConnector::FtConnector()
 ,m_sAddress("127.0.0.1")
 ,m_pSocket(Q_NULLPTR)
 {
-    qInfo() << "[FtConnector::FtConnector] Object created.";
 }
 
 //=============================================================================================================
