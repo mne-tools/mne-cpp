@@ -130,6 +130,7 @@ public:
     int anonymizeFile();
 
     //=========================================================================================================
+public slots:
     /**
      * Configure the input file to anonymize.
      *
@@ -140,20 +141,120 @@ public:
 
     //=========================================================================================================
     /**
-     * Returns the input file which will be anonymized. .
-     *
-     * @param [out] Returns a string containing the input file name including its path.
-     */
-    QString getFileNameIn() const;
-
-    //=========================================================================================================
-    /**
      * Configure the output file to anonymize.
      *
      * @param [in] sFilePathOut String containing the output file name. Can be a relative or
      * an absolute path.
      */
     int setFileOut(const QString &sFilePathOut);
+
+    //=========================================================================================================
+    /**
+     * Configure the state of the FiffAnonymizer object's desired anonymization mode. If set to TRUE, apart from the
+     * default information additional information will also be anonymized, like Subject's weight, height, sex or
+     * handedness and the project's information too.
+     *
+     * @param [in] bFlag    Bool argument whether to use the brute mode.
+     *
+     */
+    void setBruteMode(bool bFlag);
+
+    //=========================================================================================================
+    /**
+     * If found in the fiff file, the measurement date information will be overwritten with the date specified
+     * with this function. Format: YYYMMDD. Default: 20000101
+     *
+     * @param [in] sMeasDay     String containing the desired measurement day.
+     */
+    void setMeasurementDate(const QString& sMeasDay);
+
+    //=========================================================================================================
+    /**
+     * If found in the fiff file, the measurement date information will be overwritten with the date specified
+     * with this function.
+     *
+     * @param [in] d     QDateTime object containing the desired measurement day.
+     */
+    void setMeasurementDate(const QDateTime& d);
+
+    //=========================================================================================================
+    /**
+     * If found in the fiff file, the measurement date information will be overwritten with the date specified
+     * with this function.
+     *
+     * @param [in] d     QDate object containing the desired measurement day.
+     */
+    void setMeasurementDate(const QDate& d);
+
+    //=========================================================================================================
+    /**
+     * If found in the fiff file, the specified number of days will be subtracted from the measurement date information contained in each fif file.
+     *
+     * @param [in] iMeasDayOffset   Integer with the number of dates to subtract from the measurement date.
+     */
+    void setMeasurementDateOffset(int iMeasDayOffset);
+
+    //=========================================================================================================
+    /**
+     * If found in the fiff file, subject's birthday information will be overwritten in the file in order to match the date specified with this function.
+     *
+     * @param [in] sSubjBirthday String containing the desired subject birthday date.
+     */
+    void setSubjectBirthday(const QString& sSubjBirthday);
+
+    //=========================================================================================================
+    /**
+     * If found in the fiff file, subject's birthday information will be overwritten in the file in order to match the date specified with this function.
+     *
+     * @param [in] sSubjBirtday String containing the desired subject birthday date.
+     */
+    void setSubjectBirthday(const QDateTime& sSubjBirthday);
+
+    //=========================================================================================================
+    /**
+     * If found in the fiff file, the specified number of days will be subtracted from the subject's birthday date information contained in each fif file.
+     *
+     * @param [in] iSubjBirthdayOffset  Integer with the number of dates to subtract from the subject's birthday date.
+     */
+    void setSubjectBirthdayOffset(int iSubjBirthdayOffset);
+
+    //=========================================================================================================
+    /**
+     * Specifies the subject's id text information you want the output file to have. If a hisID tag is found in the fiff file,
+     * then, the subject's hisID information will be changed to match the one specified with this method.
+     *
+     * @param [in] sSubjectHisId   String with the subject's id.
+     */
+    void setSubjectHisId(const QString& sSubjectHisId);
+
+    //=========================================================================================================
+    /**
+     * Sets fiffanonymizer to delete the input file after anonymization finishes. This is intended to avoid duplication of disk space usage.
+     * If set to true, by its own, a confirmation message will be prompted to the user. Used with the --delete_input_file_after option.
+     * It can be used with the option "avoid_delete_confirmation" so that no confirmation is prompt to the user.
+     *
+     * @param [in] bFlag    Bool argument whether to delete the input file afterwards.
+     */
+    void setDeleteInputFileAfter(bool bFlag);
+
+    //=========================================================================================================
+    /**
+     * Method to avoid the need to prompt the user for confirmation of deletion of the input file after anonymization has finished.
+     * As the deletion flag has to manually be set to true and this confirmation flag has to manually be set to false, the chances of
+     * a user disadvertently deleted a relevant input file are (hopefully) minimized.
+     *
+     * @param [in] bFlag    Bool argument whether to ask for confirmation when deleting a file.
+     */
+    void setDeleteInputFileConfirmation(bool bFlag);
+
+public:
+    //=========================================================================================================
+    /**
+     * Returns the input file which will be anonymized. .
+     *
+     * @param [out] Returns a string containing the input file name including its path.
+     */
+    QString getFileNameIn() const;
 
     //=========================================================================================================
     /**
@@ -184,17 +285,6 @@ public:
 
     //=========================================================================================================
     /**
-     * Configure the state of the FiffAnonymizer object's desired anonymization mode. If set to TRUE, apart from the
-     * default information additional information will also be anonymized, like Subject's weight, height, sex or
-     * handedness and the project's information too.
-     *
-     * @param [in] bFlag    Bool argument whether to use the brute mode.
-     *
-     */
-    void setBruteMode(bool bFlag);
-
-    //=========================================================================================================
-    /**
      * Retrieve the value of the anonymization level brute mode. If set to true, the anonymization will delete
      * normal data but additionally it will also delete info related to the subject's weight, height, sex and
      * handedness.
@@ -203,44 +293,9 @@ public:
 
     //=========================================================================================================
     /**
-     * If found in the fiff file, the measurement date information will be overwritten with the date specified
-     * with this function. Format: YYYMMDD. Default: 20000101
-     *
-     * @param [in] sMeasDay     String containing the desired measurement day.
-     */
-    void setMeasurementDay(const QString& sMeasDay);
-
-    //=========================================================================================================
-    /**
-     * If found in the fiff file, the measurement date information will be overwritten with the date specified
-     * with this function.
-     *
-     * @param [in] d     QDateTime object containing the desired measurement day.
-     */
-    void setMeasurementDay(const QDateTime& d);
-
-    //=========================================================================================================
-    /**
-     * If found in the fiff file, the measurement date information will be overwritten with the date specified
-     * with this function.
-     *
-     * @param [in] d     QDate object containing the desired measurement day.
-     */
-    void setMeasurementDay(const QDate& d);
-
-    //=========================================================================================================
-    /**
      * Retrieve the value of Date to substitute the measuremnt date appearing in the file.
      */
     QDateTime getMeasurementDate() const;
-
-    //=========================================================================================================
-    /**
-     * If found in the fiff file, the specified number of days will be subtracted from the measurement date information contained in each fif file.
-     *
-     * @param [in] iMeasDayOffset   Integer with the number of dates to subtract from the measurement date.
-     */
-    void setMeasurementDayOffset(int iMeasDayOffset);
 
     //=========================================================================================================
     /**
@@ -256,33 +311,9 @@ public:
 
     //=========================================================================================================
     /**
-     * If found in the fiff file, subject's birthday information will be overwritten in the file in order to match the date specified with this function.
-     *
-     * @param [in] sSubjBirthday String containing the desired subject birthday date.
-     */
-    void setSubjectBirthday(const QString& sSubjBirthday);
-
-    //=========================================================================================================
-    /**
-     * If found in the fiff file, subject's birthday information will be overwritten in the file in order to match the date specified with this function.
-     *
-     * @param [in] sSubjBirtday String containing the desired subject birthday date.
-     */
-    void setSubjectBirthday(const QDateTime& sSubjBirthday);
-
-    //=========================================================================================================
-    /**
      * Get value of Subject's birthday.
      */
     QDateTime getSubjectBirthday();
-
-    //=========================================================================================================
-    /**
-     * If found in the fiff file, the specified number of days will be subtracted from the subject's birthday date information contained in each fif file.
-     *
-     * @param [in] iSubjBirthdayOffset  Integer with the number of dates to subtract from the subject's birthday date.
-     */
-    void setSubjectBirthdayOffset(int iSubjBirthdayOffset);
 
     //=========================================================================================================
     /**
@@ -295,35 +326,6 @@ public:
      * Get value of Subjects's birthday offset.
      */
     int  getSubjectBirthdayOffset();
-
-    //=========================================================================================================
-    /**
-     * Sets fiffanonymizer to delete the input file after anonymization finishes. This is intended to avoid duplication of disk space usage.
-     * If set to true, by its own, a confirmation message will be prompted to the user. Used with the --delete_input_file_after option.
-     * It can be used with the option "avoid_delete_confirmation" so that no confirmation is prompt to the user.
-     *
-     * @param [in] bFlag    Bool argument whether to delete the input file afterwards.
-     */
-    void setDeleteInputFileAfter(bool bFlag);
-
-    //=========================================================================================================
-    /**
-     * Method to avoid the need to prompt the user for confirmation of deletion of the input file after anonymization has finished.
-     * As the deletion flag has to manually be set to true and this confirmation flag has to manually be set to false, the chances of
-     * a user disadvertently deleted a relevant input file are (hopefully) minimized.
-     *
-     * @param [in] bFlag    Bool argument whether to ask for confirmation when deleting a file.
-     */
-    void setDeleteInputFileConfirmation(bool bFlag);
-
-    //=========================================================================================================
-    /**
-     * Specifies the subject's id text information you want the output file to have. If a hisID tag is found in the fiff file,
-     * then, the subject's hisID information will be changed to match the one specified with this method.
-     *
-     * @param [in] sSubjectHisId   String with the subject's id.
-     */
-    void setSubjectHisId(const QString& sSubjectHisId);
 
 private:
     //=========================================================================================================
