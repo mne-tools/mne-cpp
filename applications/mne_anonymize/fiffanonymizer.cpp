@@ -667,21 +667,21 @@ bool FiffAnonymizer::getBruteMode() const
 
 //=============================================================================================================
 
-void FiffAnonymizer::setMeasurementDay(const QDateTime& d)
+void FiffAnonymizer::setMeasurementDate(const QDateTime& d)
 {
     m_dMeasurementDate = QDateTime(d.date(),QTime(1,1,0));
 }
 
 //=============================================================================================================
 
-void FiffAnonymizer::setMeasurementDay(const QDate& d)
+void FiffAnonymizer::setMeasurementDate(const QDate& d)
 {
     m_dMeasurementDate = QDateTime(d,QTime(1,1,0));
 }
 
 //=============================================================================================================
 
-void FiffAnonymizer::setMeasurementDay(const QString& sMeasDay)
+void FiffAnonymizer::setMeasurementDate(const QString& sMeasDay)
 {
 
     m_dMeasurementDate = QDateTime(QDate::fromString(sMeasDay,"ddMMyyyy"),QTime(1,1,0));
@@ -696,7 +696,7 @@ QDateTime FiffAnonymizer::getMeasurementDate() const
 
 //=============================================================================================================
 
-void FiffAnonymizer::setMeasurementDayOffset(const int iMeasDayOffset)
+void FiffAnonymizer::setMeasurementDateOffset(const int iMeasDayOffset)
 {
     m_bUseMeasurementDayOffset = true;
     m_iMeasurementDayOffset = iMeasDayOffset;
