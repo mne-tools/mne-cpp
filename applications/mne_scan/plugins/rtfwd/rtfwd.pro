@@ -62,22 +62,22 @@ CONFIG(debug, debug|release) {
     LIBS += -lscSharedd \
             -lscDispd \
             -lscMeasd \
-	    -lMNE$${MNE_LIB_VERSION}Dispd \
-	    -lMNE$${MNE_LIB_VERSION}Fwdd \
-	    -lMNE$${MNE_LIB_VERSION}Mned \
-	    -lMNE$${MNE_LIB_VERSION}Fiffd \
-	    -lMNE$${MNE_LIB_VERSION}Fsd \
-            -lMNE$${MNE_LIB_VERSION}Utilsd \
+	    -lmnecppDispd \
+	    -lmnecppFwdd \
+	    -lmnecppMned \
+	    -lmnecppFiffd \
+	    -lmnecppFsd \
+	    -lmnecppUtilsd \
 } else {
     LIBS += -lscShared \
             -lscDisp \
             -lscMeas \
-	    -lMNE$${MNE_LIB_VERSION}Disp \
-	    -lMNE$${MNE_LIB_VERSION}Fwd \
-	    -lMNE$${MNE_LIB_VERSION}Mne \
-	    -lMNE$${MNE_LIB_VERSION}Fiff \
-	    -lMNE$${MNE_LIB_VERSION}Fs \
-            -lMNE$${MNE_LIB_VERSION}Utils \
+	    -lmnecppDisp \
+	    -lmnecppFwd \
+	    -lmnecppMne \
+	    -lmnecppFiff \
+	    -lmnecppFs \
+	    -lmnecppUtils \
 }
 
 SOURCES += \
