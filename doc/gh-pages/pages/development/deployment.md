@@ -41,7 +41,7 @@ As of right now MNE-CPP depends on [Qt](https://www.qt.io/){:target="_blank" rel
 
 Files which are needed by the applications, e.g., layout files, selection groups and so on, are considrered resources and reside in `mne-cpp/resources`. Needed resources are copied from `mne-cpp/resources` to `mne-cpp/bin/resources`. In case of .app images on MacOS, e.g., MNE Scan, the needed resources are copied from `mne-cpp/resources` to `mne-cpp/bin/mne_scan.app/MacOs/resources`. 
 
-| **Please note:** If you need to add new resources, please add them to the `mne-cpp/resources` and **NOT** to the `mne-cpp/bin/resources` folder. Also, make sure that you included them in your .pro file. | 
+| **Please note:** If you need to add new resources, please add them to the `mne-cpp/resources` and **NOT** to the `mne-cpp/bin/resources` folder. Also, make sure to include them in your .pro file as well. | 
 
 ## Packaging and uploading
 

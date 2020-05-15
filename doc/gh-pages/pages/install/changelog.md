@@ -33,7 +33,6 @@ MNE Anonymize:
 
 All:
 * Rename libraries and fix versioning
-* Don't let libraries deploy themselves for windows builds. Instead include library copying to the mne-cpp.pri windeployqt function
 
 Fiff:
 * Fix bug when reading gantry_angle from Fiff file
@@ -55,10 +54,10 @@ Fiff:
 
 People who contributed to this release (preceded by number of commits):
 
-(115) Juan Garcia-Prieto
-(43) Lorenz Esch
-(2) Ruben Dörfel
-(7) Gabriel Motta
+(115) Juan Garcia-Prieto,
+(43) Lorenz Esch,
+(7) Gabriel Motta,
+(2) Ruben Dörfel,
 
 ## Version 0.1.0
 
