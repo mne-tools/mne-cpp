@@ -43,6 +43,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QDir>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -87,10 +89,45 @@ void SettingsControllerGui::parseInputs(const QStringList& arguments)
             {
                 qCritical() << "Error while setting the input file.";
             }
-            m_pWindow->setLineEditInFile(m_fiInFileInfo.fileName());
+            m_pWindow->setLineEditInFile(m_fiInFileInfo.absoluteFilePath());
         } else {
             qWarning() << "Input file is not a file.";
         }
     }
+
+    if(m_parser.isSet("out"))
+    {
+        m_fiOutFileInfo.setFile(m_parser.value("out"));
+        if(m_fiOutFileInfo.isDir())
+        {
+            qWarning() << "Error. Output file is infact a folder.";
+        }
+    } else {
+        QString fileOut(QDir(m_fiInFileInfo.absolutePath()).filePath(
+                    m_fiInFileInfo.baseName() + "_anonymized." + m_fiInFileInfo.completeSuffix()));
+        m_fiOutFileInfo.setFile(fileOut);
+    }
+    if(m_pAnonymizer->setFileOut(m_fiOutFileInfo.absoluteFilePath()))
+    {
+        qWarning() << "Error while setting the output file.";
+    }
+    m_pWindow->setLineEditOutFile(m_fiOutFileInfo.absoluteFilePath());
+
+
+    if(m_parser.isSet("brute"))
+    {
+        m_pAnonymizer->setBruteMode(true);
+        m_pWindow->setBruteMode(true);
+    }
+
+
+
+
+
+
+
+
+
+
 
 }
