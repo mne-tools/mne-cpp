@@ -51,14 +51,12 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QCoreApplication>
+//#include <QObject>
+//#include <QCoreApplication>
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
-
-using namespace UTILSLIB;
-
 
 //=============================================================================================================
 // MAIN
@@ -74,9 +72,10 @@ using namespace UTILSLIB;
  */
 int main(int argc, char* argv[])
 {
-    qInstallMessageHandler(ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
 
-    QScopedPointer<MNEANONYMIZE::AppHandler> h;
+    QScopedPointer<MNEANONYMIZE::AppHandler>
+            h(new MNEANONYMIZE::AppHandler);
     QScopedPointer<QCoreApplication>
             qtApp(h->createApplication(argc, argv));
 
