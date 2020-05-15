@@ -14,6 +14,13 @@ MainWindow::MainWindow(MNEANONYMIZE::SettingsControllerGui *c)
 , m_pController(c)
 {
     m_pUi->setupUi(this);
+
+    //set confirm deletion to true TODO!!!
+    m_pUi->dateTimeMeasurementDate->setEnabled(false);
+    m_pUi->dateTimeBirthdayDate->setEnabled(false);
+    m_pUi->spinBoxBirthdayDateOffset->setEnabled(false);
+    m_pUi->spinBoxMeasurementDateOffset->setEnabled(false);
+    m_pUi->lineEditHisValue->setEnabled(false);
 }
 
 MainWindow::~MainWindow()
@@ -65,6 +72,23 @@ MNEANONYMIZE::SettingsControllerGui* MainWindow::getController() const
     return m_pController;
 }
 
+//todo
+// set the delete input file
+// set the avoid delete input file confirmation.
+
+//generate signals for each of these setters
+//emit whenever there is a change.
+//have the controller not configuring the actual anonymizer state directly.
+//but configure the signals=>slots and then just actively configure the setteers
+//
+//generate a section which is hidden initially named> See and edit all the information
+// then create a reader in the controller gui which will populate the info.
+// then create another column with the actual output to be writtern to the output file
+// syncrhonize the initial controls with these ones.
+//
+// generate a link between Anonymize file and the actual anonymize member in anonymizer
+// solve the issues with input output file the same etc...
+// i think that would be a first approach.
 
 void MainWindow::setLineEditInFile(const QString &f)
 {
@@ -78,65 +102,105 @@ void MainWindow::setLineEditOutFile(const QString &f)
 //    std::printf("\n%s\n",f.toUtf8().data());
 }
 
-void MainWindow::setBruteMode(const bool b)
+void MainWindow::setCheckBoxBruteMode(bool b)
 {
     m_pUi->checkBoxBruteMode->setCheckState(Qt::CheckState(b));
 }
 
-
-
-
-
-
-
-
-void MNEANONYMIZE::MainWindow::on_lineEditInFile_editingFinished()
+void MainWindow::setMeasurementDate(const QString& d)
 {
-    std::printf("\n%s\n",m_pUi->lineEditInFile->text().toUtf8().data());
+    m_pUi->checkBoxMeasurementDate->setCheckState(Qt::CheckState(true));
+    m_pUi->dateTimeMeasurementDate->setDateTime(
+            QDateTime(QDate::fromString(d,"ddMMyyyy"),QTime(1,1,0)));
 }
 
 
-//void MainWindow::open()
-//{
-//    if(confirmOpen())
-//    {
-//        QString fileName = QFileDialog::getOpenFileName(this);
-//        if(!fileName.isEmpty())
-//        {
-//            loadFile(filename);
-//        }
-//    }
-//}
+void MainWindow::setMeasurementDateOffset(int d)
+{
+    m_pUi->checkBoxMeasurementDateOffset->setCheckState(Qt::CheckState(true));
+    m_pUi->spinBoxMeasurementDateOffset->setValue(d);
+}
 
-//void MainWindow::save()
-//{
-//    return saveFile(curFile);
-//}
+void MainWindow::setSubjectBirthday(const QString& d)
+{
+    m_pUi->checkBoxBirthdayDate->setCheckState(Qt::CheckState(true));
+    m_pUi->dateTimeBirthdayDate->setDateTime(
+                QDateTime(QDate::fromString(d,"ddMMyyyy"),QTime(1,1,0)));
+}
 
-//void MainWindow::about()
-//{
-//    QMessageBox::about(this,"About Application",
-//            "MNE Anonymize");
-//}
+void MainWindow::setSubjectBirthdayOffset(int d)
+{
+    m_pUi->checkBoxBirthdayDateOffset->setCheckState(Qt::CheckState(true));
+    m_pUi->spinBoxBirthdayDateOffset->setValue(d);
+}
 
-//void MainWindow::doucmentWasModified()
-//{
-//    senWindowModified()
-//}
+void MainWindow::setSubjectHis(const QString& h)
+{
+    m_pUi->checkBoxHisValue->setCheckState(Qt::CheckState(true));
+    m_pUi->lineEditHisValue->setText(h);
+}
 
-//void MainWindow::createActions()
-//{
-//    QMenu *fileMenu = menuBar()->addMenu("&File");
-//    QAction *openAct = new QAction("&Open",this);
-//    openAct->setShortcut(QKeySequence::Open);
-//    openAct->setStatusTip("Open a FIFF file");
+// /////////////////////////////// slots
 
-//    //conect
-//    fileMenu->addAction(openAct);
+void MNEANONYMIZE::MainWindow::on_lineEditInFile_editingFinished()
+{
+    //std::printf("\n%s\n",m_pUi->lineEditInFile->text().toUtf8().data());
+    emit fileInChanged(m_pUi->lineEditInFile->text());
+}
 
-//    QAction * aboutAct = helpMenu->addAction("About MNE Anonymize"),qApp)
-//    aboutAct->setStatusTip("Show information about MNE Anonymize");
+void MNEANONYMIZE::MainWindow::on_lineEditOutFile_editingFinished()
+{
+    emit fileOutChanged(m_pUi->lineEditOutFile->text());
+}
 
 
-//}
+void MNEANONYMIZE::MainWindow::on_checkBoxMeasurementDate_stateChanged(int arg1)
+{
+    std::printf("\n%i\n",arg1);
+    if(arg1)
+    {
+        m_pUi->dateTimeMeasurementDate->setEnabled(true);
+        m_pUi->checkBoxMeasurementDateOffset->setCheckState(Qt::CheckState(false));
+    } else {
+        m_pUi->dateTimeMeasurementDate->setEnabled(false);
+    }
+}
+
+void MNEANONYMIZE::MainWindow::on_checkBoxMeasurementDateOffset_stateChanged(int arg1)
+{
+    if(arg1)
+    {
+        m_pUi->spinBoxMeasurementDateOffset->setEnabled(true);
+        m_pUi->checkBoxMeasurementDate->setCheckState(Qt::CheckState(false));
+    } else {
+        m_pUi->spinBoxMeasurementDateOffset->setEnabled(false);
+    }
+}
+
+void MNEANONYMIZE::MainWindow::on_checkBoxBirthdayDate_stateChanged(int arg1)
+{
+    if(arg1)
+    {
+        m_pUi->dateTimeBirthdayDate->setEnabled(true);
+        m_pUi->checkBoxBirthdayDateOffset->setCheckState(Qt::CheckState(false));
+    } else {
+        m_pUi->dateTimeBirthdayDate->setEnabled(false);
+    }
+}
+
+void MNEANONYMIZE::MainWindow::on_checkBoxBirthdayDateOffset_stateChanged(int arg1)
+{
+    if(arg1)
+    {
+        m_pUi->spinBoxBirthdayDateOffset->setEnabled(true);
+        m_pUi->checkBoxBirthdayDate->setCheckState(Qt::CheckState(false));
+    } else {
+        m_pUi->spinBoxBirthdayDateOffset->setEnabled(false);
+    }
+}
+
+void MNEANONYMIZE::MainWindow::on_checkBoxHisValue_clicked(bool checked)
+{
+    m_pUi->lineEditHisValue->setEnabled(checked);
+}
 

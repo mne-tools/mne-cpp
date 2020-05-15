@@ -119,49 +119,18 @@
            <enum>QFrame::Raised</enum>
           </property>
           <layout class="QGridLayout" name="gridLayout_3">
-           <item row="11" column="0">
-            <widget class="QCheckBox" name="checkBox_8">
-             <property name="text">
-              <string>Set His Value</string>
-             </property>
-            </widget>
+           <item row="8" column="0">
+            <widget class="QDateTimeEdit" name="dateTimeBirthdayDate"/>
            </item>
-           <item row="5" column="0">
-            <widget class="QCheckBox" name="checkBox_5">
+           <item row="1" column="0">
+            <widget class="QCheckBox" name="checkBoxBruteMode_2">
              <property name="text">
-              <string>Measurement Date Offset</string>
+              <string>Confirm before Delete Input file</string>
              </property>
             </widget>
            </item>
            <item row="4" column="0">
-            <widget class="QDateTimeEdit" name="dateTimeEdit"/>
-           </item>
-           <item row="7" column="0">
-            <widget class="QCheckBox" name="checkBox_7">
-             <property name="text">
-              <string>Set Birthday Date</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <widget class="QCheckBox" name="checkBox">
-             <property name="text">
-              <string>Delete Input File After Anonymizing</string>
-             </property>
-            </widget>
-           </item>
-           <item row="8" column="0">
-            <widget class="QDateTimeEdit" name="dateTimeEdit_2"/>
-           </item>
-           <item row="10" column="0">
-            <widget class="QSpinBox" name="spinBox_2"/>
-           </item>
-           <item row="1" column="0">
-            <widget class="QCheckBox" name="checkBox_2">
-             <property name="text">
-              <string>Avoid Delete confirmation</string>
-             </property>
-            </widget>
+            <widget class="QDateTimeEdit" name="dateTimeMeasurementDate"/>
            </item>
            <item row="2" column="0">
             <widget class="QCheckBox" name="checkBoxBruteMode">
@@ -170,25 +139,56 @@
              </property>
             </widget>
            </item>
-           <item row="3" column="0">
-            <widget class="QCheckBox" name="checkBox_4">
+           <item row="6" column="0">
+            <widget class="QSpinBox" name="spinBoxMeasurementDateOffset"/>
+           </item>
+           <item row="10" column="0">
+            <widget class="QSpinBox" name="spinBoxBirthdayDateOffset"/>
+           </item>
+           <item row="5" column="0">
+            <widget class="QCheckBox" name="checkBoxMeasurementDateOffset">
              <property name="text">
-              <string>Set Measurement Date</string>
+              <string>Measurement Date Offset</string>
              </property>
             </widget>
            </item>
            <item row="9" column="0">
-            <widget class="QCheckBox" name="checkBox_6">
+            <widget class="QCheckBox" name="checkBoxBirthdayDateOffset">
              <property name="text">
               <string>Birthday Date Offset</string>
              </property>
             </widget>
            </item>
-           <item row="6" column="0">
-            <widget class="QSpinBox" name="spinBox"/>
+           <item row="3" column="0">
+            <widget class="QCheckBox" name="checkBoxMeasurementDate">
+             <property name="text">
+              <string>Set Measurement Date</string>
+             </property>
+            </widget>
+           </item>
+           <item row="11" column="0">
+            <widget class="QCheckBox" name="checkBoxHisValue">
+             <property name="text">
+              <string>Set His Value</string>
+             </property>
+            </widget>
+           </item>
+           <item row="7" column="0">
+            <widget class="QCheckBox" name="checkBoxBirthdayDate">
+             <property name="text">
+              <string>Set Birthday Date</string>
+             </property>
+            </widget>
            </item>
            <item row="12" column="0">
-            <widget class="QLineEdit" name="lineEdit_3"/>
+            <widget class="QLineEdit" name="lineEditHisValue"/>
+           </item>
+           <item row="0" column="0">
+            <widget class="QCheckBox" name="checkBoxBruteMode_3">
+             <property name="text">
+              <string>Delete Input File</string>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>
@@ -533,20 +533,18 @@
  </widget>
  <tabstops>
   <tabstop>lineEditOutFile</tabstop>
-  <tabstop>checkBox</tabstop>
   <tabstop>lineEditInFile</tabstop>
-  <tabstop>checkBox_2</tabstop>
   <tabstop>checkBoxBruteMode</tabstop>
-  <tabstop>checkBox_4</tabstop>
-  <tabstop>dateTimeEdit</tabstop>
-  <tabstop>checkBox_5</tabstop>
-  <tabstop>spinBox</tabstop>
-  <tabstop>spinBox_2</tabstop>
-  <tabstop>checkBox_6</tabstop>
-  <tabstop>dateTimeEdit_2</tabstop>
-  <tabstop>checkBox_7</tabstop>
-  <tabstop>checkBox_8</tabstop>
-  <tabstop>lineEdit_3</tabstop>
+  <tabstop>checkBoxMeasurementDate</tabstop>
+  <tabstop>dateTimeMeasurementDate</tabstop>
+  <tabstop>checkBoxMeasurementDateOffset</tabstop>
+  <tabstop>spinBoxMeasurementDateOffset</tabstop>
+  <tabstop>spinBoxBirthdayDateOffset</tabstop>
+  <tabstop>checkBoxBirthdayDateOffset</tabstop>
+  <tabstop>dateTimeBirthdayDate</tabstop>
+  <tabstop>checkBoxBirthdayDate</tabstop>
+  <tabstop>checkBoxHisValue</tabstop>
+  <tabstop>lineEditHisValue</tabstop>
   <tabstop>scrollArea_2</tabstop>
   <tabstop>lineEdit_16</tabstop>
   <tabstop>plainTextEdit_4</tabstop>
