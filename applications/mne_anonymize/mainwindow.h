@@ -29,16 +29,37 @@ public:
 
     void setLineEditInFile(const QString&);
     void setLineEditOutFile(const QString &f);
-    void setBruteMode(const bool b);
+    void setBruteMode(bool b);
+    void setMeasurementDate(const QString& d);
+    void setMeasurementDateOffset(int d);
+    void setSubjectBirthday(const QString& d);
+    void setSubjectBirthdayOffset(int d);
+    void setSubjectHis(const QString& h);
 
 protected:
     void closeEvent(QCloseEvent *event) override;
+signals:
+    void fileInChanged(const QString& s) const;
+    void fileOutChanged(const QString& s) const;
 
 private slots:
 //    void open();
 //    void save();
 //    void about();
     void on_lineEditInFile_editingFinished();
+    void on_lineEditOutFile_editingFinished();
+
+    void on_checkBoxMeasurementDate_stateChanged(int arg1);
+    void on_checkBoxMeasurementDateOffset_stateChanged(int arg1);
+
+    void on_checkBoxBirthdayDate_stateChanged(int arg1);
+    void on_checkBoxBirthdayDateOffset_stateChanged(int arg1);
+
+    void on_checkBoxHisValue_clicked(bool checked);
+
+
+
+
 
 private:
 //    void createStatusBar();
