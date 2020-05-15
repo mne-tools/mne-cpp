@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <settingscontrollergui.h>
+#include <iostream>
 
 #include <QMessageBox>
 #include <QCloseEvent>
@@ -13,6 +14,11 @@ MainWindow::MainWindow(MNEANONYMIZE::SettingsControllerGui *c)
 , m_pController(c)
 {
     m_pUi->setupUi(this);
+}
+
+MainWindow::~MainWindow()
+{
+    delete m_pUi;
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -63,6 +69,7 @@ MNEANONYMIZE::SettingsControllerGui* MainWindow::getController() const
 void MainWindow::setLineEditInFile(const QString &f)
 {
     m_pUi->lineEditInFile->setText(f);
+//    std::printf("\n%s\n",f.toUtf8().data());
 }
 
 
@@ -110,3 +117,8 @@ void MainWindow::setLineEditInFile(const QString &f)
 
 
 //}
+
+void MNEANONYMIZE::MainWindow::on_lineEditInFile_textChanged(const QString &arg1)
+{
+    std::printf("\n%s\n",arg1.toUtf8().data());
+}
