@@ -28,6 +28,8 @@ public:
     SettingsControllerGui* getController() const;
 
     void setLineEditInFile(const QString&);
+    void setLineEditOutFile(const QString &f);
+    void setBruteMode(const bool b);
 
 protected:
     void closeEvent(QCloseEvent *event) override;
@@ -36,8 +38,7 @@ private slots:
 //    void open();
 //    void save();
 //    void about();
-
-    void on_lineEditInFile_textChanged(const QString &arg1);
+    void on_lineEditInFile_editingFinished();
 
 private:
 //    void createStatusBar();

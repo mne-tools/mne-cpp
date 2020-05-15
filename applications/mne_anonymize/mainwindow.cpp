@@ -72,6 +72,28 @@ void MainWindow::setLineEditInFile(const QString &f)
 //    std::printf("\n%s\n",f.toUtf8().data());
 }
 
+void MainWindow::setLineEditOutFile(const QString &f)
+{
+    m_pUi->lineEditOutFile->setText(f);
+//    std::printf("\n%s\n",f.toUtf8().data());
+}
+
+void MainWindow::setBruteMode(const bool b)
+{
+    m_pUi->checkBoxBruteMode->setCheckState(Qt::CheckState(b));
+}
+
+
+
+
+
+
+
+
+void MNEANONYMIZE::MainWindow::on_lineEditInFile_editingFinished()
+{
+    std::printf("\n%s\n",m_pUi->lineEditInFile->text().toUtf8().data());
+}
 
 
 //void MainWindow::open()
@@ -118,7 +140,3 @@ void MainWindow::setLineEditInFile(const QString &f)
 
 //}
 
-void MNEANONYMIZE::MainWindow::on_lineEditInFile_textChanged(const QString &arg1)
-{
-    std::printf("\n%s\n",arg1.toUtf8().data());
-}
