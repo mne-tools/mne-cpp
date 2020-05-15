@@ -43,6 +43,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QObject>
+#include <QCoreApplication>
 #include <QSharedPointer>
 
 //=============================================================================================================
@@ -52,9 +54,6 @@
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
-class QObject;
-class QCoreApplication;
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNEANONYMIZE
@@ -125,12 +124,13 @@ public:
     * Constructs an appropiate controller QApplication (GUI application).
     */
     //    . when inputing a QCoreApplication (command-line application).
-    QObject* createController(QStringList args);
+    QObject* createController(const QStringList& args);
 
 protected:
 
 private:
-bool m_AppHasGui;  /**< Show if the app is a GUI based app, or a Command-line one.*/
+
+bool m_bAppHasGui;  /**< Show if the app is a GUI based app, or a Command-line one.*/
 
 };
 
