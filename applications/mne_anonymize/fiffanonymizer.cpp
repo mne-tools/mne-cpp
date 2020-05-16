@@ -778,3 +778,32 @@ int FiffAnonymizer::closeInOutStreams()
     }
     return 0;
 }
+
+//=============================================================================================================
+
+QString FiffAnonymizer::getSubjectHisID()
+{
+    return m_sSubjectHisId;
+}
+
+//=============================================================================================================
+
+int FiffAnonymizer::getMeasurementDayOffset()
+{
+    return m_iMeasurementDayOffset;
+}
+
+//=============================================================================================================
+
+bool FiffAnonymizer::getUseMeasurementDayOffset()
+{
+    return m_bUseMeasurementDayOffset;
+}
+
+//=============================================================================================================
+
+bool FiffAnonymizer::getUseSubjectBirthdayOffset()
+{
+    return m_bUseSubjectBirthdayOffset;
+}
+

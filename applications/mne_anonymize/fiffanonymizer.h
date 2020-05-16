@@ -247,6 +247,16 @@ public slots:
      */
     void setDeleteInputFileConfirmation(bool bFlag);
 
+    //=========================================================================================================
+    /**
+     * Sets the state of the FiffAnonymizer object's desired verbose mode. If set to TRUE, different messages will be
+     * printed on screen during the anonymizing process. If set to false only a single line confirmation message will be
+     * printed on each execution.
+     *
+     * @param [in] bFlag    Bool argument whether to use the verbose mode.
+     */
+    void setVerboseMode(bool bFlag);
+
 public:
     //=========================================================================================================
     /**
@@ -263,16 +273,6 @@ public:
      * @param [out] Returns a string containing the output file name including its path.
      */
     QString getFileNameOut() const;
-
-    //=========================================================================================================
-    /**
-     * Sets the state of the FiffAnonymizer object's desired verbose mode. If set to TRUE, different messages will be
-     * printed on screen during the anonymizing process. If set to false only a single line confirmation message will be
-     * printed on each execution.
-     *
-     * @param [in] bFlag    Bool argument whether to use the verbose mode.
-     */
-    void setVerboseMode(bool bFlag);
 
     //=========================================================================================================
     /**
@@ -326,6 +326,13 @@ public:
      * Get value of Subjects's birthday offset.
      */
     int  getSubjectBirthdayOffset();
+
+    //=========================================================================================================
+    /**
+     * Get value of Subjects's His Id text.
+     */
+    QString getSubjectHisID();
+
 
 private:
     //=========================================================================================================
