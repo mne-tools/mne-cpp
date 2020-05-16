@@ -72,117 +72,38 @@ SettingsControllerGui::SettingsControllerGui(const QStringList& arguments)
 
     parseInputs(arguments);
 
+    //initialize options in window
+    QFileInfo fileInfoIn(m_pAnonymizer->getFileNameIn());
+    if (fileInfoIn.isFile())
+    {
+        m_pWindow->setLineEditInFile(fileInfoIn.absoluteFilePath());
+    }
+
+    QFileInfo fileInfoOut(m_pAnonymizer->getFileNameOut());
+    if (fileInfoOut.isFile())
+    {
+        m_pWindow->setLineEditOutFile(fileInfoOut.absoluteFilePath());
+    }
+
+    m_pWindow->setCheckBoxBruteMode(m_pAnonymizer->getBruteMode());
+    m_pWindow->setCheckBoxDeleteInputFileAfter(m_bDeleteInputFileAfter);
+    m_pWindow->setCheckBoxAvoidDeleteConfirmation(m_bDeleteInputFileConfirmation);
+    m_pWindow->setMeasurementDate(m_pAnonymizer->getMeasurementDate());
+    m_pWindow->setCheckBoxMeasurementDateOffset(m_pAnonymizer->getUseMeasurementDayOffset());
+    m_pWindow->setMeasurementDateOffset(m_pAnonymizer->getMeasurementDayOffset());
+    m_pWindow->setCheckBoxSubjectBirthdayOffset(m_pAnonymizer->getUseSubjectBirthdayOffset());
+    m_pWindow->setSubjectBirthdayOffset(m_pAnonymizer->getSubjectBirthdayOffset());
+    m_pWindow->setSubjectHis(m_pAnonymizer->getSubjectHisID());
+
+    //setup communication
+
+
+
+
+
+//    read data method
+//    anonymize method
+
     m_pWindow->show();
 }
 
-void SettingsControllerGui::parseInputs(const QStringList& arguments)
-{
-    m_parser.process(arguments);
-
-    //parse in and out files
-    if(m_parser.isSet("in"))
-    {
-        m_fiInFileInfo.setFile(m_parser.value("in"));
-        if(m_fiInFileInfo.isFile())
-        {
-            if(m_pAnonymizer->setFileIn(m_fiInFileInfo.absoluteFilePath()))
-            {
-                qWarning() << "Error while setting the input file.";
-            }
-            m_pWindow->setLineEditInFile(m_fiInFileInfo.absoluteFilePath());
-        } else {
-            qWarning() << "Input file is not a file.";
-        }
-    }
-
-    if(m_parser.isSet("out"))
-    {
-        m_fiOutFileInfo.setFile(m_parser.value("out"));
-        if(m_fiOutFileInfo.isDir())
-        {
-            qWarning() << "Error. Output file is infact a folder.";
-        }
-    } else {
-        QString fileOut(QDir(m_fiInFileInfo.absolutePath()).filePath(
-                    m_fiInFileInfo.baseName() + "_anonymized." + m_fiInFileInfo.completeSuffix()));
-        m_fiOutFileInfo.setFile(fileOut);
-    }
-    if(m_pAnonymizer->setFileOut(m_fiOutFileInfo.absoluteFilePath()))
-    {
-        qWarning() << "Error while setting the output file.";
-    }
-    m_pWindow->setLineEditOutFile(m_fiOutFileInfo.absoluteFilePath());
-
-
-    if(m_parser.isSet("brute"))
-    {
-        m_pAnonymizer->setBruteMode(true);
-        m_pWindow->setCheckBoxBruteMode(true);
-    }
-
-    if(m_parser.isSet("measurement_date"))
-    {
-        if(m_parser.isSet("measurement_date_offset"))
-        {
-            qCritical() << "You cannot specify the measurement date and the measurement date offset at "
-                           "the same time.";
-            m_parser.showHelp();
-        }
-        QString strMeasDate(m_parser.value("measurement_date"));
-        m_pAnonymizer->setMeasurementDate(strMeasDate);
-    }
-
-    if(m_parser.isSet("measurement_date_offset"))
-    {
-        if(m_parser.isSet("measurement_date"))
-        {
-            qCritical() << "You cannot specify the measurement date and the measurement date offset at "
-                           "the same time.";
-            m_parser.showHelp();
-        }
-
-        int intMeasDateOffset(m_parser.value("measurement_date_offset").toInt());
-        m_pAnonymizer->setMeasurementDateOffset(intMeasDateOffset);
-    }
-
-    if(m_parser.isSet("subject_birthday"))
-    {
-        if(m_parser.isSet("subject_birthday_offset"))
-        {
-            qCritical() << "You cannot specify the subject's birthday and subject's birthday offset"
-                           "the same time.";
-            m_parser.showHelp();
-        }
-
-        QString strBirthday(m_parser.value("subject_birthday"));
-        m_pAnonymizer->setSubjectBirthday(strBirthday);
-    }
-
-    if(m_parser.isSet("subject_birthday_offset"))
-    {
-        if(m_parser.isSet("subject_birthday"))
-        {
-            qCritical() << "You cannot specify the subject's birthday and subject's birthday offset"
-                           "the same time.";
-            m_parser.showHelp();
-        }
-        int strBirthdayOffset(m_parser.value("subject_birthday_offset").toInt());
-        m_pAnonymizer->setSubjectBirthdayOffset(strBirthdayOffset);
-    }
-
-    if(m_parser.isSet("his"))
-    {
-        QString strHisId(m_parser.value("his"));
-        m_pAnonymizer->setSubjectHisId(strHisId);
-    }
-
-
-
-
-
-
-
-
-
-
-}
