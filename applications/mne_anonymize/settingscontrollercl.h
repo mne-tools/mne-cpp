@@ -110,13 +110,6 @@ protected:
      */
     void initParser();
 
-private:
-    //=========================================================================================================
-    /**
-     * Signals the FiffAnonymizer method handling both the multi-parallel setup and the single-thread setup.
-     */
-    int execute();
-
     //=========================================================================================================
     /**
      * Processes the input parser and configures the state of the FiffAnonymizer instance according to
@@ -127,6 +120,13 @@ private:
      * @return Returns true if parsing was successful, false otherwise.
      */
     int parseInputs(const QStringList& arguments);
+
+private:
+    //=========================================================================================================
+    /**
+     * Signals the FiffAnonymizer method handling both the multi-parallel setup and the single-thread setup.
+     */
+    int execute();
 
     //=========================================================================================================
     /**
@@ -221,12 +221,15 @@ protected:
     QFileInfo m_fiInFileInfo;               /**< Input File info obj.*/
     QFileInfo m_fiOutFileInfo;              /**< Output File info obj.*/
 
+protected:
+    bool m_bGuiMode;                        /**< Object running in GUI mode.*/
+    bool m_bDeleteInputFileAfter;           /**< User's request to delete the input file after anonymization.*/
+    bool m_bDeleteInputFileConfirmation;    /**< User's request to avoid confirmation prompt for input file deletion.*/
+
 private:
     bool m_bVerboseMode;                    /**< Show header when executing.*/
     bool m_bSilentMode;                     /**< Avoid any message to the user.*/
     bool m_bInOutFileNamesEqual;            /**< Flags user's request to have both input and output files with the same name.*/
-    bool m_bDeleteInputFileAfter;           /**< User's request to delete the input file after anonymization.*/
-    bool m_bDeleteInputFileConfirmation;    /**< User's request to avoid confirmation prompt for input file deletion.*/
     bool m_bInputFileDeleted;               /**< Flags if the input file has been deleted. */
     bool m_bOutFileRenamed;                 /**< Flags if the output file has been renamed to match the name the input file had. */
 
