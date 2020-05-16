@@ -90,7 +90,7 @@ public:
     explicit SettingsControllerGui(const QStringList& arguments);
 
 protected:
-    void parseInputs(const QStringList& arguments);
+//    void parseInputs(const QStringList& arguments);
 
 private:
 
