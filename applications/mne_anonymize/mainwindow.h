@@ -24,52 +24,67 @@ public:
 
     void setController(SettingsControllerGui*);
 
-//    void loadFile(const QString& fileName);
     SettingsControllerGui* getController() const;
 
     void setLineEditInFile(const QString&);
     void setLineEditOutFile(const QString &f);
-    void setBruteMode(bool b);
+
+    void setCheckBoxBruteMode(bool b);
+    void setCheckBoxDeleteInputFileAfter(bool b);
+    void setCheckBoxAvoidDeleteConfirmation(bool b);
+
     void setMeasurementDate(const QString& d);
+    void setMeasurementDate(const QDateTime& dt);
+    void setCheckBoxMeasurementDateOffset(bool o);
     void setMeasurementDateOffset(int d);
+
     void setSubjectBirthday(const QString& d);
+    void setCheckBoxSubjectBirthdayOffset(bool b);
     void setSubjectBirthdayOffset(int d);
+
     void setSubjectHis(const QString& h);
 
 protected:
     void closeEvent(QCloseEvent *event) override;
+
 signals:
     void fileInChanged(const QString& s) const;
     void fileOutChanged(const QString& s) const;
+    void useMeasurementOffset(bool f) const;
+    void measurementDateChanged(const QDateTime& t) const;
+    void measurementDateOffsetChanged(int o) const;
+    void birthdayDateChanged(const QDateTime& d) const;
+    void useBirthdayOffset(bool f) const;
+    void birthdayOffsetChanged(int o) const;
+    void subjectHisIdChanged(const QString& text) const;
 
 private slots:
-//    void open();
-//    void save();
-//    void about();
+
     void on_lineEditInFile_editingFinished();
     void on_lineEditOutFile_editingFinished();
 
-    void on_checkBoxMeasurementDate_stateChanged(int arg1);
     void on_checkBoxMeasurementDateOffset_stateChanged(int arg1);
 
-    void on_checkBoxBirthdayDate_stateChanged(int arg1);
     void on_checkBoxBirthdayDateOffset_stateChanged(int arg1);
 
-    void on_checkBoxHisValue_clicked(bool checked);
+    void on_dateTimeMeasurementDate_dateTimeChanged(const QDateTime &dateTime);
 
+    void on_spinBoxMeasurementDateOffset_valueChanged(int arg1);
 
+    void on_dateTimeBirthdayDate_dateTimeChanged(const QDateTime &dateTime);
 
+    void on_spinBoxBirthdayDateOffset_valueChanged(int arg1);
 
+    void on_lineEditSubjectHisId_editingFinished();
+
+    void on_toolButton_clicked();
 
 private:
-//    void createStatusBar();
-//    void createAcctions();
-//    void saveFile(const QString& fileNme);
-    bool confirmClose();
 
-//    QString strippedName(const QString & fullFileName);
+   bool confirmClose();
 
    bool m_bDataModified;
+   bool m_bShowEachField;
    Ui::MainWindow* m_pUi;
    SettingsControllerGui* m_pController;
 };
