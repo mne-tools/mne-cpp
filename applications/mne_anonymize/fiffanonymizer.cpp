@@ -589,15 +589,9 @@ bool FiffAnonymizer::checkValidFiffFormatVersion() const
 int FiffAnonymizer::setFileIn(const QString &sFileIn)
 {
     QFileInfo fiIn(sFileIn);
-    if(fiIn.exists())
-    {
-        m_fFileIn.setFileName(fiIn.absoluteFilePath());
-        m_bFileInSet = true;
-        return 0;
-    } else {
-        qCritical() << "File doesn't exist.";
-        return 1;
-    }
+    m_fFileIn.setFileName(fiIn.absoluteFilePath());
+    m_bFileInSet = true;
+    return 0;
 }
 
 //=============================================================================================================
@@ -611,23 +605,17 @@ QString FiffAnonymizer::getFileNameIn() const
 
 int FiffAnonymizer::setFileOut(const QString &sFileOut)
 {
-    if(m_bFileInSet)
+    QFileInfo fiIn(m_fFileIn);
+    QFileInfo fiOut(sFileOut);
+    if(fiOut.absoluteFilePath() == fiIn.absoluteFilePath())
     {
-        QFileInfo fiIn(m_fFileIn);
-        QFileInfo fiOut(sFileOut);
-        if(fiOut.absoluteFilePath() == fiIn.absoluteFilePath())
-        {
-            qCritical() << "Both input and output file names are the same.";
-            return 1;
-        } else {
-            m_fFileOut.setFileName(fiOut.absoluteFilePath());
-        }
-        m_bFileOutSet = true;
-        return 0;
-    } else {
-        qCritical() << "You need to specify the input file first.";
+        qWarning() << "Both input and output file names are the same.";
         return 1;
+    } else {
+        m_fFileOut.setFileName(fiOut.absoluteFilePath());
     }
+    m_bFileOutSet = true;
+    return 0;
 }
 
 //=============================================================================================================
