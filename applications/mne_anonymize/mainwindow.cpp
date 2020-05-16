@@ -5,22 +5,35 @@
 
 #include <QMessageBox>
 #include <QCloseEvent>
+#include <QUrl>
+#include <QDesktopServices>
 
 using namespace MNEANONYMIZE;
 
 MainWindow::MainWindow(MNEANONYMIZE::SettingsControllerGui *c)
 : m_bDataModified(true)
+, m_bHideEachField(false)
 , m_pUi(new Ui::MainWindow)
 , m_pController(c)
 {
     m_pUi->setupUi(this);
 
-    //set confirm deletion to true TODO!!!
-    m_pUi->dateTimeMeasurementDate->setEnabled(false);
-    m_pUi->dateTimeBirthdayDate->setEnabled(false);
-    m_pUi->spinBoxBirthdayDateOffset->setEnabled(false);
+////    //maybe use getters from fiff_anonymizer obj.?
+//    m_pUi->checkBoxDeleteInputFile->setEnabled(false);
+//    m_pUi->checkBoxAvoidDeleteConfirmation->setEnabled(true);
+
+//    m_pUi->dateTimeMeasurementDate->setEnabled(true);
+//    m_pUi->checkBoxMeasurementDateOffset->setEnabled(false);
     m_pUi->spinBoxMeasurementDateOffset->setEnabled(false);
-    m_pUi->lineEditHisValue->setEnabled(false);
+
+//    m_pUi->dateTimeBirthdayDate->setEnabled(true);
+//    m_pUi->checkBoxBirthdayDateOffset->setEnabled(false);
+    m_pUi->spinBoxBirthdayDateOffset->setEnabled(false);
+
+//    m_pUi->lineEditSubjectHisId->setEnabled(true);
+    m_pUi->frameFile->setHidden(m_bHideEachField);
+    m_pUi->frameSubject->setHidden(m_bHideEachField);
+    m_pUi->frameProject->setHidden(m_bHideEachField);
 }
 
 MainWindow::~MainWindow()
@@ -99,45 +112,64 @@ void MainWindow::setLineEditInFile(const QString &f)
 void MainWindow::setLineEditOutFile(const QString &f)
 {
     m_pUi->lineEditOutFile->setText(f);
-//    std::printf("\n%s\n",f.toUtf8().data());
+    // std::printf("\n%s\n",f.toUtf8().data());
 }
 
 void MainWindow::setCheckBoxBruteMode(bool b)
 {
-    m_pUi->checkBoxBruteMode->setCheckState(Qt::CheckState(b));
+    m_pUi->checkBoxBruteMode->setChecked(b);
+}
+
+void MainWindow::setCheckBoxDeleteInputFileAfter(bool b)
+{
+    m_pUi->checkBoxDeleteInputFile->setChecked(b);
+}
+
+void MainWindow::setCheckBoxAvoidDeleteConfirmation(bool b)
+{
+    m_pUi->checkBoxAvoidDeleteConfirmation->setChecked(b);
 }
 
 void MainWindow::setMeasurementDate(const QString& d)
 {
-    m_pUi->checkBoxMeasurementDate->setCheckState(Qt::CheckState(true));
     m_pUi->dateTimeMeasurementDate->setDateTime(
             QDateTime(QDate::fromString(d,"ddMMyyyy"),QTime(1,1,0)));
 }
 
+void MainWindow::setMeasurementDate(const QDateTime& dt)
+{
+    m_pUi->dateTimeMeasurementDate->setDateTime(dt);
+}
+
+void MainWindow::setCheckBoxMeasurementDateOffset(bool o)
+{
+    m_pUi->checkBoxMeasurementDateOffset->setCheckState(Qt::CheckState(o));
+}
 
 void MainWindow::setMeasurementDateOffset(int d)
 {
-    m_pUi->checkBoxMeasurementDateOffset->setCheckState(Qt::CheckState(true));
     m_pUi->spinBoxMeasurementDateOffset->setValue(d);
 }
 
 void MainWindow::setSubjectBirthday(const QString& d)
 {
-    m_pUi->checkBoxBirthdayDate->setCheckState(Qt::CheckState(true));
     m_pUi->dateTimeBirthdayDate->setDateTime(
                 QDateTime(QDate::fromString(d,"ddMMyyyy"),QTime(1,1,0)));
 }
 
+void MainWindow::setCheckBoxSubjectBirthdayOffset(bool b)
+{
+    m_pUi->checkBoxBirthdayDateOffset->setChecked(b);
+}
+
 void MainWindow::setSubjectBirthdayOffset(int d)
 {
-    m_pUi->checkBoxBirthdayDateOffset->setCheckState(Qt::CheckState(true));
     m_pUi->spinBoxBirthdayDateOffset->setValue(d);
 }
 
 void MainWindow::setSubjectHis(const QString& h)
 {
-    m_pUi->checkBoxHisValue->setCheckState(Qt::CheckState(true));
-    m_pUi->lineEditHisValue->setText(h);
+    m_pUi->lineEditSubjectHisId->setText(h);
 }
 
 // /////////////////////////////// slots
@@ -153,54 +185,55 @@ void MNEANONYMIZE::MainWindow::on_lineEditOutFile_editingFinished()
     emit fileOutChanged(m_pUi->lineEditOutFile->text());
 }
 
-
-void MNEANONYMIZE::MainWindow::on_checkBoxMeasurementDate_stateChanged(int arg1)
+void MNEANONYMIZE::MainWindow::on_checkBoxMeasurementDateOffset_stateChanged(int state)
 {
-    std::printf("\n%i\n",arg1);
-    if(arg1)
-    {
-        m_pUi->dateTimeMeasurementDate->setEnabled(true);
-        m_pUi->checkBoxMeasurementDateOffset->setCheckState(Qt::CheckState(false));
-    } else {
-        m_pUi->dateTimeMeasurementDate->setEnabled(false);
-    }
+     m_pUi->spinBoxMeasurementDateOffset->setEnabled(state);
+     emit useMeasurementOffset(!!state);
+     m_pUi->dateTimeMeasurementDate->setEnabled(!state);
 }
 
-void MNEANONYMIZE::MainWindow::on_checkBoxMeasurementDateOffset_stateChanged(int arg1)
+void MNEANONYMIZE::MainWindow::on_checkBoxBirthdayDateOffset_stateChanged(int state)
 {
-    if(arg1)
-    {
-        m_pUi->spinBoxMeasurementDateOffset->setEnabled(true);
-        m_pUi->checkBoxMeasurementDate->setCheckState(Qt::CheckState(false));
-    } else {
-        m_pUi->spinBoxMeasurementDateOffset->setEnabled(false);
-    }
+    m_pUi->spinBoxBirthdayDateOffset->setEnabled(state);
+    emit useBirthdayOffset(!!state);
+    m_pUi->dateTimeBirthdayDate->setEnabled(!state);
 }
 
-void MNEANONYMIZE::MainWindow::on_checkBoxBirthdayDate_stateChanged(int arg1)
+void MNEANONYMIZE::MainWindow::on_dateTimeMeasurementDate_dateTimeChanged(const QDateTime &dateTime)
 {
-    if(arg1)
-    {
-        m_pUi->dateTimeBirthdayDate->setEnabled(true);
-        m_pUi->checkBoxBirthdayDateOffset->setCheckState(Qt::CheckState(false));
-    } else {
-        m_pUi->dateTimeBirthdayDate->setEnabled(false);
-    }
+    emit measurementDateChanged(dateTime);
 }
 
-void MNEANONYMIZE::MainWindow::on_checkBoxBirthdayDateOffset_stateChanged(int arg1)
+void MNEANONYMIZE::MainWindow::on_spinBoxMeasurementDateOffset_valueChanged(int offset)
 {
-    if(arg1)
-    {
-        m_pUi->spinBoxBirthdayDateOffset->setEnabled(true);
-        m_pUi->checkBoxBirthdayDate->setCheckState(Qt::CheckState(false));
-    } else {
-        m_pUi->spinBoxBirthdayDateOffset->setEnabled(false);
-    }
+    emit measurementDateOffsetChanged(offset);
 }
 
-void MNEANONYMIZE::MainWindow::on_checkBoxHisValue_clicked(bool checked)
+void MNEANONYMIZE::MainWindow::on_dateTimeBirthdayDate_dateTimeChanged(const QDateTime &dateTime)
 {
-    m_pUi->lineEditHisValue->setEnabled(checked);
+    emit birthdayDateChanged(dateTime);
 }
 
+void MNEANONYMIZE::MainWindow::on_spinBoxBirthdayDateOffset_valueChanged(int offset)
+{
+    emit birthdayOffsetChanged(offset);
+}
+
+void MNEANONYMIZE::MainWindow::on_lineEditSubjectHisId_editingFinished()
+{
+    emit subjectHisIdChanged(m_pUi->lineEditSubjectHisId->text());
+}
+
+void MNEANONYMIZE::MainWindow::on_toolButton_clicked()
+{
+    m_bHideEachField = !m_bHideEachField;
+    m_pUi->frameFile->setHidden(m_bHideEachField);
+    m_pUi->frameSubject->setHidden(m_bHideEachField);
+    m_pUi->frameProject->setHidden(m_bHideEachField);
+}
+
+void MNEANONYMIZE::MainWindow::on_buttonSaveFile_helpRequested()
+{
+    QDesktopServices::openUrl( QUrl("https://mne-cpp.github.io/pages/learn/mneanonymize.html",
+                               QUrl::TolerantMode) );
+}
