@@ -73,11 +73,12 @@ SettingsControllerCl::SettingsControllerCl()
 : m_pAnonymizer(FiffAnonymizer::SPtr(new FiffAnonymizer))
 , m_sAppName(qApp->applicationName())
 , m_sAppVer(qApp->applicationVersion())
+, m_bGuiMode(false)
+, m_bDeleteInputFileAfter(false)
+, m_bDeleteInputFileConfirmation(true)
 , m_bVerboseMode(false)
 , m_bSilentMode(false)
 , m_bInOutFileNamesEqual(false)
-, m_bDeleteInputFileAfter(false)
-, m_bDeleteInputFileConfirmation(true)
 , m_bInputFileDeleted(false)
 , m_bOutFileRenamed(false)
 {
@@ -90,11 +91,12 @@ SettingsControllerCl::SettingsControllerCl(const QStringList& arguments)
 : m_pAnonymizer(FiffAnonymizer::SPtr(new FiffAnonymizer))
 , m_sAppName(qApp->applicationName())
 , m_sAppVer(qApp->applicationVersion())
+, m_bGuiMode(false)
+, m_bDeleteInputFileAfter(false)
+, m_bDeleteInputFileConfirmation(true)
 , m_bVerboseMode(false)
 , m_bSilentMode(false)
 , m_bInOutFileNamesEqual(false)
-, m_bDeleteInputFileAfter(false)
-, m_bDeleteInputFileConfirmation(true)
 , m_bInputFileDeleted(false)
 , m_bOutFileRenamed(false)
 {
@@ -233,8 +235,7 @@ int SettingsControllerCl::parseInputs(const QStringList& arguments)
 
     if(m_parser.isSet("gui"))
     {
-        qCritical() << "Error while running the application. Something went wrong.";
-        return 1;
+        m_bGuiMode = true;
     }
 
     if(m_parser.isSet("version"))
@@ -354,10 +355,12 @@ int SettingsControllerCl::parseInOutFiles()
             return 1;
         }
     } else {
-        qCritical() << "No valid input file specified.";
-        m_parser.showHelp();
+        if(!m_bGuiMode)
+        {
+            qCritical() << "No valid input file specified.";
+            m_parser.showHelp();
+        }
     }
-
 
     if(m_parser.isSet("out"))
     {
@@ -367,7 +370,8 @@ int SettingsControllerCl::parseInOutFiles()
             qCritical() << "Error. Output file is infact a folder.";
             return 1;
         } else {
-            if(m_fiInFileInfo.absoluteFilePath() == m_fiOutFileInfo.absoluteFilePath())
+            if((m_fiInFileInfo.absoluteFilePath() == m_fiOutFileInfo.absoluteFilePath()) &&
+                    !m_bGuiMode)
             {
                 m_bInOutFileNamesEqual = true;
                 QString fileOut(QDir(m_fiInFileInfo.absolutePath()).filePath(generateRandomFileName()));
@@ -546,7 +550,6 @@ QString SettingsControllerCl::generateRandomFileName()
 
     for(int i=0;i<randomLength;++i)
     {
-//        int p=qrand() % charPool.length();
         int p(QRandomGenerator::global()->bounded(randomLength));
         randomFileName.append(charPool.at(p));
     }
