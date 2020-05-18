@@ -103,6 +103,9 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager
     qInfo() << "Loading icon...";
     QMainWindow::setWindowIcon(QIcon("../applications/mne_analyze/mne_analyze/resources/images/appIcons/icon_mne-analyze_256x256.png"));
 #endif
+
+    //Load saved GUI geometry and state
+    restoreSettings();
 }
 
 //=============================================================================================================
@@ -116,6 +119,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+    //Save GUI gemoetry and state;
+    saveSettings();
+
     emit mainWindowClosed();
 
     // default implementation does this, so its probably a good idea
@@ -219,6 +225,7 @@ void MainWindow::createPluginMenus(QSharedPointer<ANSHAREDLIB::PluginManager> pP
 
     // add plugins menus
     for(IPlugin* pPlugin : pPluginManager->getPlugins()) {
+        pPlugin->setObjectName(pPlugin->getName());
         if(pPlugin) {
             if (QMenu* pMenu = pPlugin->getMenu()) {
                 // Check if the menu already exists. If it does add the actions to the exisiting menu.
@@ -433,4 +440,28 @@ void MainWindow::about()
     }
 
     m_pAboutWindow->show();
+}
+
+//=============================================================================================================
+
+void MainWindow::saveSettings()
+{
+    QSettings settings("MNECPP", "ANALYZEWINDOW");
+
+    settings.beginGroup("layout");
+    settings.setValue("geometry", saveGeometry());
+    settings.setValue("state", saveState());
+    settings.endGroup();
+}
+
+//=============================================================================================================
+
+void MainWindow::restoreSettings()
+{
+    QSettings settings("MNECPP", "ANALYZEWINDOW");
+
+    settings.beginGroup("layout");
+    restoreGeometry(settings.value("geometry").toByteArray());
+    restoreState(settings.value("state").toByteArray());
+    settings.endGroup();
 }
