@@ -51,6 +51,7 @@
 #include <QString>
 #include <QPointer>
 #include <QTextBrowser>
+#include <QSettings>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -152,6 +153,9 @@ private:
     void createPluginViews(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager);      /**< Creates all Windows within the MultiView for user interface of MainWindow class. */
     void tabifyDockWindows();                                                                   /**< Tabify all dock windows */
     void about();                                                                               /**< Implements about action.*/
+
+    void saveSettings();
+    void restoreSettings();
 
     QPointer<DISPLIB::MultiView>        m_pMultiView;       /**< The central View.*/
 
