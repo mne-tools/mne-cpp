@@ -85,19 +85,6 @@ void AnnotationManager::init()
 {
     m_pCommu = new Communicator(this);
 
-    m_pAnnotationView = new AnnotationView();
-
-    connect(m_pAnnotationView, &AnnotationView::triggerRedraw,
-            this, &AnnotationManager::onTriggerRedraw, Qt::UniqueConnection);
-
-    connect(m_pAnnotationView, &AnnotationView::activeEventsChecked,
-            this, &AnnotationManager::toggleDisplayEvent, Qt::UniqueConnection);
-
-    connect(m_pAnnotationView, &AnnotationView::jumpToSelected,
-            this, &AnnotationManager::onJumpToSelected, Qt::UniqueConnection);
-
-    //connect(m_pAnalyzeData.data(), &AnalyzeData::newModelAvailable,
-    //        this, &AnnotationManager::onModelChanged);
     connect(m_pAnalyzeData.data(), &AnalyzeData::selectedModelChanged,
             this, &AnnotationManager::onModelChanged);
 }
@@ -113,7 +100,7 @@ void AnnotationManager::unload()
 
 QString AnnotationManager::getName() const
 {
-    return "Annotation Manager";
+    return "Annotations";
 }
 
 //=============================================================================================================
@@ -127,9 +114,35 @@ QMenu *AnnotationManager::getMenu()
 
 QDockWidget *AnnotationManager::getControl()
 {
-    QDockWidget* pControl = new QDockWidget(tr("Annotation Manager"));
+    AnnotationSettingsView* pAnnotationSettingsView = new AnnotationSettingsView();
+
+    connect(pAnnotationSettingsView, &AnnotationSettingsView::triggerRedraw,
+            this, &AnnotationManager::onTriggerRedraw, Qt::UniqueConnection);
+
+    connect(pAnnotationSettingsView, &AnnotationSettingsView::activeEventsChecked,
+            this, &AnnotationManager::toggleDisplayEvent, Qt::UniqueConnection);
+
+    connect(pAnnotationSettingsView, &AnnotationSettingsView::jumpToSelected,
+            this, &AnnotationManager::onJumpToSelected, Qt::UniqueConnection);
+
+    connect(this, &AnnotationManager::newAnnotationAvailable,
+            pAnnotationSettingsView, &AnnotationSettingsView::addAnnotationToModel, Qt::UniqueConnection);
+
+    connect(this, &AnnotationManager::disconnectFromModel,
+            pAnnotationSettingsView, &AnnotationSettingsView::disconnectFromModel, Qt::UniqueConnection);
+
+    connect(this, &AnnotationManager::newAnnotationModelAvailable,
+            pAnnotationSettingsView, &AnnotationSettingsView::setModel, Qt::UniqueConnection);
+
+    connect(this, &AnnotationManager::newFiffParamsAvailable,
+            pAnnotationSettingsView, &AnnotationSettingsView::passFiffParams, Qt::UniqueConnection);
+
+    connect(pAnnotationSettingsView, &AnnotationSettingsView::activeEventsChecked,
+            this, &AnnotationManager::toggleDisplayEvent);
+
+    QDockWidget* pControl = new QDockWidget(tr("Annotations"));
     pControl->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
-    pControl->setWidget(m_pAnnotationView);
+    pControl->setWidget(pAnnotationSettingsView);
 
     return pControl;
 }
@@ -146,13 +159,9 @@ QWidget *AnnotationManager::getView()
 void AnnotationManager::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
-//    case EVENT_TYPE::CURRENTLY_SELECTED_MODEL:
-//        m_sCurrentlySelectedModel = e->getData().toString();
-//        qDebug() << m_sCurrentlySelectedModel;
-//        break;
     case EVENT_TYPE::NEW_ANNOTATION_ADDED:
-        m_pAnnotationView->addAnnotationToModel(e->getData().toInt());
-        m_pCommu->publishEvent(TRIGGER_REDRAW);
+        emit newAnnotationAvailable(e->getData().toInt());
+        onTriggerRedraw();
         break;
     default:
         qWarning() << "[AnnotationManager::handleEvent] Received an Event that is not handled by switch cases.";
@@ -163,7 +172,6 @@ void AnnotationManager::handleEvent(QSharedPointer<Event> e)
 
 QVector<EVENT_TYPE> AnnotationManager::getEventSubscriptions(void) const
 {
-    //QVector<EVENT_TYPE> temp = {CURRENTLY_SELECTED_MODEL};
     QVector<EVENT_TYPE> temp;
     temp.push_back(NEW_ANNOTATION_ADDED);
 
@@ -181,22 +189,14 @@ void AnnotationManager::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel
             }
         }
 
-        m_pAnnotationView->disconnectFromModel();
+        emit disconnectFromModel();
         m_pFiffRawModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
         m_pAnnotationModel = m_pFiffRawModel->getAnnotationModel();
-        m_pAnnotationView->setModel(m_pAnnotationModel);
-        m_pAnnotationView->passFiffParams(m_pFiffRawModel->absoluteFirstSample(),
-                                           m_pFiffRawModel->absoluteLastSample(),
-                                           m_pFiffRawModel->getFiffInfo()->sfreq);
+        emit newAnnotationModelAvailable(m_pAnnotationModel);
+        emit newFiffParamsAvailable(m_pFiffRawModel->absoluteFirstSample(),
+                                    m_pFiffRawModel->absoluteLastSample(),
+                                    m_pFiffRawModel->getFiffInfo()->sfreq);
     }
-}
-
-//=============================================================================================================
-
-void AnnotationManager::setUpControls()
-{
-    connect(m_pAnnotationView, &AnnotationView::activeEventsChecked,
-            this, &AnnotationManager::toggleDisplayEvent);
 }
 
 //=============================================================================================================

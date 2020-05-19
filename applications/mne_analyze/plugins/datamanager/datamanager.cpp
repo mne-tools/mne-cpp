@@ -70,7 +70,6 @@ DataManager::DataManager()
 
 DataManager::~DataManager()
 {
-    delete m_pCommu;
 }
 
 //=============================================================================================================
@@ -112,7 +111,7 @@ void DataManager::unload()
 
 QString DataManager::getName() const
 {
-    return "DataManager";
+    return "Data";
 }
 
 //=============================================================================================================
