@@ -222,7 +222,7 @@ public:
      *
      * @returns      True if saving was successful
      */
-    bool saveToFile(const QString& sPath) override;
+    virtual bool saveToFile(const QString& sPath) override;
 
     //=========================================================================================================
     /**

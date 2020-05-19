@@ -527,7 +527,7 @@ bool AnnotationModel::saveToFile(const QString& sPath)
 
     return true;
 #else
-    qInfo() << "AnnotationView::saveToFile";
+    qInfo() << "AnnotationSettingsView::saveToFile";
 
     QFile file(sPath);
     if (!file.open(QIODevice::WriteOnly)) {

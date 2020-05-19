@@ -91,21 +91,16 @@ CONFIG(debug, debug|release) {
 SOURCES += \
     annotationmanager.cpp \
     annotationdelegate.cpp \
-#    annotationmodel.cpp \
-    annotationview.cpp \
-#    FormFiles/annotationmanagercontrol.cpp
+    annotationsettingsview.cpp \
 
 HEADERS += \
     annotationmanager_global.h \
     annotationmanager.h \
     annotationdelegate.h \
-#    annotationmodel.h \
-    annotationview.h \
-#    FormFiles/annotationmanagercontrol.h
+    annotationsettingsview.h \
 
 FORMS += \
-    annotationview.ui \
-#    FormFiles/annotationmanagercontrol.ui
+    annotationsettingsview.ui \
 
 OTHER_FILES += annotationmanager.json
 
