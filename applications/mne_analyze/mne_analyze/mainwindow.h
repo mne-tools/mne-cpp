@@ -154,7 +154,16 @@ private:
     void tabifyDockWindows();                                                                   /**< Tabify all dock windows */
     void about();                                                                               /**< Implements about action.*/
 
+    //=========================================================================================================
+    /**
+     * Saves geometry and state of GUI dock widgets that have given a name with setObjectName()
+     */
     void saveSettings();
+
+    //=========================================================================================================
+    /**
+     * Restores geometry and state as saved by saveSettings()
+     */
     void restoreSettings();
 
     QPointer<DISPLIB::MultiView>        m_pMultiView;       /**< The central View.*/
