@@ -282,7 +282,7 @@ void FiffRawView::setDistanceTimeSpacer(int value)
 
 void FiffRawView::onMakeScreenshot(const QString& imageType)
 {
-    qInfo() << "[FiffRawView::onMakeScreenshot] -- Saving Screenshot";
+    qInfo() << "[FiffRawView::onMakeScreenshot] Saving Screenshot";
     // Create file name
     QString fileName;
     QString sDate = QDate::currentDate().toString("yyyy_MM_dd");
