@@ -90,14 +90,15 @@ void StatusBar::onNewMessageReceived(const QSharedPointer<Event> pEvent)
 {
     switch(pEvent->getType()) {
         case EVENT_TYPE::STATUS_BAR_MSG: {
-        if(pEvent->getData().canConvert<QString>()) {
-            showMessage(pEvent->getData().toString(), m_iMsgTimeout);
+            if(pEvent->getData().canConvert<QString>()) {
+                showMessage(pEvent->getData().toString(), m_iMsgTimeout);
+                break;
+            }
+            qWarning() << "[StatusBar::onNewMessageReceived] Received a message/event that cannot be parsed";
             break;
         }
-
-        }
         default:
-            qDebug() << "[StatusBar::onNewMessageReceived] Received a message/event that is not handled by switch-cases";
+            qWarning() << "[StatusBar::onNewMessageReceived] Received a message/event that is not handled by switch-cases";
             break;
     }
 }
