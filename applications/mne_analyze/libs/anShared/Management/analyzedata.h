@@ -163,7 +163,7 @@ public:
             if(temp->isInit()) {
                 // add to record, and tell others about the new model
                 m_data.insert(sPath, temp);
-                emit this->newModelAvailable(temp);
+                emit newModelAvailable(temp);
                 return sm;
             } else {
                 return Q_NULLPTR;

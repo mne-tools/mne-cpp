@@ -102,12 +102,12 @@ QMenu *DataLoader::getMenu()
     QAction* pActionLoad = new QAction(tr("Open"));
     pActionLoad->setStatusTip(tr("Load a data file"));
     connect(pActionLoad, &QAction::triggered,
-            this, &DataLoader::onLoadFiffFilePressed);
+            this, &DataLoader::onLoadFilePressed);
 
     QAction* pActionSave = new QAction(tr("Save"));
     pActionLoad->setStatusTip(tr("Save the selected data file"));
     connect(pActionSave, &QAction::triggered,
-            this, &DataLoader::onSaveFiffFilePressed);
+            this, &DataLoader::onSaveFilePressed);
 
     pMenuFile->addAction(pActionLoad);
     pMenuFile->addAction(pActionSave);
@@ -154,7 +154,7 @@ QVector<EVENT_TYPE> DataLoader::getEventSubscriptions(void) const
 
 //=============================================================================================================
 
-void DataLoader::onLoadFiffFilePressed()
+void DataLoader::onLoadFilePressed()
 {
 #ifdef WASMBUILD
     auto fileContentReady = [&](const QString &filePath, const QByteArray &fileContent) {
@@ -180,7 +180,7 @@ void DataLoader::onLoadFiffFilePressed()
 
 //=============================================================================================================
 
-void DataLoader::onSaveFiffFilePressed()
+void DataLoader::onSaveFilePressed()
 {
 #ifdef WASMBUILD
     m_pAnalyzeData->saveModel(m_sCurrentlySelectedModel, "");

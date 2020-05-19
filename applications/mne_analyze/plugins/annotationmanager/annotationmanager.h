@@ -42,7 +42,7 @@
 
 #include "annotationmanager_global.h"
 #include "annotationdelegate.h"
-#include "annotationview.h"
+#include "annotationsettingsview.h"
 
 #include <anShared/Interfaces/IPlugin.h>
 
@@ -124,12 +124,6 @@ private:
 
     //=========================================================================================================
     /**
-     * Sets up GUI controls
-     */
-    void setUpControls();
-
-    //=========================================================================================================
-    /**
      * Toggles whether to show annotations
      *
      * @param [in] iToggle  0 for not shown, 2 for shown
@@ -144,15 +138,19 @@ private:
 
     void onJumpToSelected();
 
-private:
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals */
-
-    AnnotationView*                                         m_pAnnotationView;          /**< Pointer to associated View for this plugin */
 
     QSharedPointer<ANSHAREDLIB::AnnotationModel>            m_pAnnotationModel;         /**< Pointer to associated Model for this plugin */
 
     QSharedPointer<ANSHAREDLIB::FiffRawViewModel>           m_pFiffRawModel;            /**< Pointer to currently loaded FiffRawView Model */
 
+signals:
+    void newAnnotationAvailable(int iAnnotation);
+    void disconnectFromModel();
+    void newAnnotationModelAvailable(QSharedPointer<ANSHAREDLIB::AnnotationModel> pAnnotModel);
+    void newFiffParamsAvailable(qint32 iFirstSample,
+                                qint32 iLastSample,
+                                float fSFreq);
 };
 
 } // NAMESPACE

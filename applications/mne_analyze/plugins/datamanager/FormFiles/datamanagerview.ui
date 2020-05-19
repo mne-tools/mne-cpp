@@ -39,7 +39,7 @@
      </property>
      <layout class="QVBoxLayout" name="m_qVerticalLayoutBrowser">
       <item>
-       <widget class="QListWidget" name="m_qListWidget"/>
+       <widget class="QTreeView" name="m_pTreeView"/>
       </item>
      </layout>
     </widget>

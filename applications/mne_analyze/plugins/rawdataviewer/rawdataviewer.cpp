@@ -249,17 +249,17 @@ void RawDataViewer::setUpControls()
     m_pFiffRawView->setDistanceTimeSpacer(viewWidget->getDistanceTimeSpacer());
 
 //    //Annotation Widget
-//    AnnotationView* annotationWidget = new AnnotationView();
+//    AnnotationSettingsView* annotationWidget = new AnnotationSettingsView();
 //    annotationWidget->setModel(m_pAnnotationModel);
 //    annotationWidget->passFiffParams(m_pRawModel->absoluteFirstSample(),
 //                                     m_pRawModel->absoluteLastSample(),
 //                                     m_pRawModel->getFiffInfo()->sfreq);
 
-//    connect(annotationWidget, &AnnotationView::activeEventsChecked,
+//    connect(annotationWidget, &AnnotationSettingsView::activeEventsChecked,
 //            m_pFiffRawView.data(), &FiffRawView::toggleDisplayEvent);
 
 //    connect(m_pFiffRawView.data(), &FiffRawView::sendSamplePos,
-//            annotationWidget, &AnnotationView::addAnnotationToModel);
+//            annotationWidget, &AnnotationSettingsView::addAnnotationToModel);
 
     connect(m_pFiffRawView.data(), &FiffRawView::sendSamplePos,
             this, &RawDataViewer::onSendSamplePos);

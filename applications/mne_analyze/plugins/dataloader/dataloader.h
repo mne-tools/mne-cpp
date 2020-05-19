@@ -116,13 +116,13 @@ private:
     /**
      * This functions is called when the load from file button is pressed.
      */
-    void onLoadFiffFilePressed();
+    void onLoadFilePressed();
 
     //=========================================================================================================
     /**
      * This functions is called when the save to file button is pressed.
      */
-    void onSaveFiffFilePressed();
+    void onSaveFilePressed();
 
     QPointer<ANSHAREDLIB::Communicator> m_pCommu;
 
