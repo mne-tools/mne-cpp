@@ -94,7 +94,7 @@ RtFwd::RtFwd()
     // set init values
     m_pFwdSettings->solname = QCoreApplication::applicationDirPath() + "/MNE-sample-data/your-solution-fwd.fif";
     m_pFwdSettings->mriname = QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/all-trans.fif";
-    m_pFwdSettings->bemname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/subjects/sample/bem/sample-1280-1280-1280-bem.fif";
+    m_pFwdSettings->bemname = QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif";
     m_pFwdSettings->srcname = QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-oct-6-src.fif";
     m_pFwdSettings->measname = QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif";
     m_pFwdSettings->transname.clear();
