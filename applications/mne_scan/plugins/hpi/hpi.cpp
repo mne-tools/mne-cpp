@@ -430,6 +430,13 @@ void Hpi::onCompStatusChanged(bool bChecked)
 
 void Hpi::onContHpiStatusChanged(bool bChecked)
 {
+    if(m_vCoilFreqs.size() < 3) {
+       QMessageBox msgBox;
+       msgBox.setText("Please load a digitizer set with at least 3 HPI coils first.");
+       msgBox.exec();
+       return;
+    }
+
     m_bDoContinousHpi = bChecked;
 }
 
