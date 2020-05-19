@@ -37,7 +37,10 @@
 //=============================================================================================================
 
 #include "rtfwdsetupwidget.h"
+
 #include <fiff/fiff_stream.h>
+
+#include <fwd/computeFwd/compute_fwd_settings.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -306,7 +309,6 @@ void RtFwdSetupWidget::onEEGSphereOriginChanged()
     m_pRtFwd->m_pFwdSettings->r0.x() = m_ui.m_doubleSpinBox_dVecR0x->value()/1000;
     m_pRtFwd->m_pFwdSettings->r0.y() = m_ui.m_doubleSpinBox_dVecR0y->value()/1000;
     m_pRtFwd->m_pFwdSettings->r0.z() = m_ui.m_doubleSpinBox_dVecR0z->value()/1000;
-    std::cout << m_pRtFwd->m_pFwdSettings->r0 << std::endl;
 }
 
 //=============================================================================================================

@@ -43,18 +43,11 @@
 
 #include "FormFiles/rtfwdsetupwidget.h"
 
-#include <fwd/computeFwd/compute_fwd.h>
-#include <fwd/computeFwd/compute_fwd_settings.h>
-
-#include <inverse/hpiFit/hpifit.h>
-
 #include <scShared/Interfaces/IAlgorithm.h>
 
-#include <scMeas/realtimefwdsolution.h>
-#include <scMeas/realtimehpiresult.h>
-#include <scMeas/realtimemultisamplearray.h>
-
 #include <utils/generics/circularbuffer.h>
+
+#include <fiff/fiff_coord_trans.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -84,6 +77,14 @@ namespace FWDLIB {
 
 namespace MNELIB{
     class MNEForwardSolution;
+}
+
+namespace FSLIB{
+    class AnnotationSet;
+}
+
+namespace INVERSELIB{
+    struct HpiFitResult;
 }
 
 namespace SCMEASLIB{
@@ -151,6 +152,8 @@ public:
      */
     void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
+    QSharedPointer<FWDLIB::ComputeFwdSettings>                  m_pFwdSettings;         /**< Forward Solution Settings. */
+
 protected:
     //=========================================================================================================
     /**
@@ -195,9 +198,7 @@ private:
      * @param[in] pAnnotationSet        The Annotation set.
      */
     void onAtlasDirChanged(const QString& sDirPath,
-                           const FSLIB::AnnotationSet::SPtr pAnnotationSet);
-
-
+                           const QSharedPointer<FSLIB::AnnotationSet> pAnnotationSet);
 
     QMutex                                      m_mutex;                    /**< The threads mutex.*/
     QFuture<void>                               m_future;                   /**< The future monitoring the clustering and forward calculation. */
@@ -213,7 +214,7 @@ private:
 
     QSharedPointer<INVERSELIB::HpiFitResult>    m_pHpiFitResult;            /**< The Hpi fitting result.**/
 
-    FIFFLIB::FiffInfo::SPtr                     m_pFiffInfo;                /**< Fiff measurement info.*/
+    QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;                /**< Fiff measurement info.*/
     FIFFLIB::FiffCoordTrans                     m_transDevHead;             /**< Updated meg->head transformation. */
 
     QSharedPointer<FSLIB::AnnotationSet>                                        m_pAnnotationSet;       /**< Annotation set. */
@@ -222,11 +223,6 @@ private:
     SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pRTMSAInput;          /**< The incoming data.*/
 
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeFwdSolution>::SPtr         m_pRTFSOutput;          /**< The fwd solution.*/
-
-    IOBUFFER::CircularBuffer<SCMEASLIB::RealTimeHpiResult>::SPtr                m_pCircularBuffer;      /**< Holds incoming data.*/
-
-public:
-    FWDLIB::ComputeFwdSettings::SPtr    m_pFwdSettings;         /**< Forward Solution Settings. */
 
 signals:
     //=========================================================================================================
