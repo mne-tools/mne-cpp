@@ -484,6 +484,10 @@ void RtcMne::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
         QStringList lResponsibleTriggerTypes = pRTES->getResponsibleTriggerTypes();
         emit responsibleTriggerTypesChanged(lResponsibleTriggerTypes);
 
+        if(!m_bPluginControlWidgetsInit) {
+            initPluginControlWidgets();
+        }
+
         if(!this->isRunning() || !lResponsibleTriggerTypes.contains(m_sAvrType)) {
             return;
         }
@@ -502,10 +506,6 @@ void RtcMne::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
             }
 
             m_bEvokedInput = true;
-        }
-
-        if(!m_bPluginControlWidgetsInit) {
-            initPluginControlWidgets();
         }
 
         if(this->isRunning()) {
