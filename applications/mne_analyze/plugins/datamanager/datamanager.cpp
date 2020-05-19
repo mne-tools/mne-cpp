@@ -125,6 +125,7 @@ QDockWidget *DataManager::getControl()
         m_pControlDock = new QDockWidget(getName());
         m_pControlDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
         m_pControlDock->setWidget(m_pDataManagerView);
+        m_pControlDock->setObjectName("Data Manager");
     }
 
     return m_pControlDock;
