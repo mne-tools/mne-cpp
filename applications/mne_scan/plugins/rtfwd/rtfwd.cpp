@@ -43,12 +43,15 @@
 #include <fwd/computeFwd/compute_fwd.h>
 #include <fwd/computeFwd/compute_fwd_settings.h>
 
+#include <inverse/hpiFit/hpifit.h>
+
 #include <fs/annotationset.h>
 
 #include <mne/mne_forwardsolution.h>
 
 #include <scMeas/realtimehpiresult.h>
 #include <scMeas/realtimefwdsolution.h>
+#include <scMeas/realtimemultisamplearray.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -84,12 +87,11 @@ using namespace Eigen;
 //=============================================================================================================
 
 RtFwd::RtFwd()
-    : m_bBusy(false)
-    , m_bDoRecomputation(false)
-    , m_bDoClustering(false)
-    , m_bDoFwdComputation(false)
-    , m_pCircularBuffer(CircularBuffer<RealTimeHpiResult>::SPtr::create(40))
-    , m_pFwdSettings(new ComputeFwdSettings)
+: m_bBusy(false)
+, m_bDoRecomputation(false)
+, m_bDoClustering(false)
+, m_bDoFwdComputation(false)
+, m_pFwdSettings(new ComputeFwdSettings)
 {
     // set init values
     m_pFwdSettings->solname = QCoreApplication::applicationDirPath() + "/MNE-sample-data/your-solution-fwd.fif";
@@ -224,7 +226,6 @@ bool RtFwd::stop()
 
     // Clear all data in the buffer connected to displays and other plugins
     // m_pOutput->data()->clear();
-    // m_pCircularBuffer->clear();
 
     m_bPluginControlWidgetsInit = false;
 
@@ -257,7 +258,6 @@ QWidget* RtFwd::setupWidget()
 
 void RtFwd::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-
     if(QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>()) {
         //Fiff information
         m_mutex.lock();
@@ -288,15 +288,6 @@ void RtFwd::update(SCMEASLIB::Measurement::SPtr pMeasurement)
         if(!m_bPluginControlWidgetsInit) {
             initPluginControlWidgets();
         }
-
-//        for(unsigned char i = 0; i < pRTHPI->getMultiArraySize(); ++i) {
-//            // Please note that we do not need a copy here since this function will block until
-//            // the buffer accepts new data again. Hence, the data is not deleted in the actual
-//            // Mesaurement function after it emitted the notify signal.
-//            while(!m_pCircularBuffer->push(pRTHPI->getValue()[i])) {
-//                //Do nothing until the circular buffer is ready to accept new data again
-//            }
-//        }
     }
 }
 
@@ -310,6 +301,7 @@ void RtFwd::initPluginControlWidgets()
         bFiffInfo = true;
     }
     m_mutex.unlock();
+
     if(bFiffInfo) {
         QList<QWidget*> plControlWidgets;
 
@@ -438,8 +430,8 @@ void RtFwd::run()
     bool bHpiConnectected = false;              // only update/recompute if hpi is connected
     bool bDoFwdComputation = false;             // compute forward if requested
     bool bIsInit = false;                       // only recompute if initial fwd solulion is calculated
-    while(!isInterruptionRequested()) {
 
+    while(!isInterruptionRequested()) {
         m_mutex.lock();
         bDoFwdComputation = m_bDoFwdComputation;
         m_mutex.unlock();
