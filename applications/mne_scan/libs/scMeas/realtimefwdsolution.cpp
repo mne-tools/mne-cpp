@@ -2,7 +2,7 @@
 /**
  * @file     realtimefwdsolution.cpp
  * @author   Ruben Dörfel <ruben.doerfel@tu-ilmenau.de>
- * @since    0.1.0
+ * @since    0.1.1
  * @date     May, 2020
  *
  * @section  LICENSE
@@ -57,10 +57,10 @@ using namespace MNELIB;
 //=============================================================================================================
 
 RealTimeFwdSolution::RealTimeFwdSolution(QObject *parent)
-    : Measurement(QMetaType::type("RealTimeFwdSolution::SPtr"), parent)
-    , m_bInitialized(false)
-    , m_bClustered(false)
-    , m_pFwdSolution(QSharedPointer<MNEForwardSolution>(new MNEForwardSolution))
+: Measurement(QMetaType::type("RealTimeFwdSolution::SPtr"), parent)
+, m_bInitialized(false)
+, m_bClustered(false)
+, m_pFwdSolution(QSharedPointer<MNEForwardSolution>(new MNEForwardSolution))
 {
 }
 
