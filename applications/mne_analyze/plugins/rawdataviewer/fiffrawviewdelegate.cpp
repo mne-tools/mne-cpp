@@ -265,7 +265,6 @@ void FiffRawViewDelegate::createPlotPath(const QStyleOptionViewItem &option,
     double dScaleY = option.rect.height()/(2*dMaxValue);
     double y_base = path.currentPosition().y();
     double dValue, newY;
-    double diff;
 
     QPointF qSamplePosition;
 
@@ -274,7 +273,7 @@ void FiffRawViewDelegate::createPlotPath(const QStyleOptionViewItem &option,
         iPaintStep = 1;
     }
 
-    for(int j = 0; j < data.size(); j = j + iPaintStep) {
+    for(unsigned int j = 0; j < data.size(); j = j + iPaintStep) {
         dValue = data[j] * dScaleY;
 
         //Reverse direction -> plot the right way
@@ -311,6 +310,8 @@ void FiffRawViewDelegate::createTimeSpacersPath(const QModelIndex &index,
                                                 QPainterPath& path,
                                                 ANSHAREDLIB::ChannelData &data) const
 {
+    Q_UNUSED(data);
+
     const FiffRawViewModel* t_pModel = static_cast<const FiffRawViewModel*>(index.model());
 
     double dDx = t_pModel->pixelDifference();
@@ -352,7 +353,8 @@ void FiffRawViewDelegate::createMarksPath(const QModelIndex &index,
     QMap<int, QColor> typeColor = t_pAnnModel->getTypeColors();
 
     for(int i = 0; i < t_pModel->getTimeListSize(); i++) {
-        if ((t_pModel->getTimeMarks(i) > iStart) && (t_pModel->getTimeMarks(i) < (iStart + data.size()))) {
+        unsigned int uiTime = t_pModel->getTimeMarks(i);
+        if ((t_pModel->getTimeMarks(i) > iStart) && (uiTime < (iStart + data.size()))) {
             int type = t_pAnnModel->data(t_pAnnModel->index(i,2)).toInt();
             painter->setPen(QPen(typeColor.value(type), Qt::black));
             painter->drawLine(fInitX + static_cast<float>(t_pModel->getTimeMarks(i) - iStart) * dDx,
