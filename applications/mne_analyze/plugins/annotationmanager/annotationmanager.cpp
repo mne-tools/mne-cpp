@@ -140,6 +140,7 @@ QDockWidget *AnnotationManager::getControl()
     QDockWidget* pControl = new QDockWidget(getName());
     pControl->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
     pControl->setWidget(pAnnotationSettingsView);
+    pControl->setObjectName("Annotation Manager");
 
     return pControl;
 }
