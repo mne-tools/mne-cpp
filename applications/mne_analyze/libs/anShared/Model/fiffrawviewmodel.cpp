@@ -664,6 +664,8 @@ void FiffRawViewModel::setWindowSize(const int& iNumSeconds,
                                      const int& iColWidth,
                                      const int& iScrollPos)
 {
+    Q_UNUSED(iScrollPos);
+
     beginResetModel();
 
     m_iVisibleWindowSize = iNumSeconds;

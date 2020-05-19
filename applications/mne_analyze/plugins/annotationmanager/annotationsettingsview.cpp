@@ -213,8 +213,7 @@ void AnnotationSettingsView::removeAnnotationfromModel()
     m_pUi->m_tableView_eventTableView->setSelectionMode(QAbstractItemView::SingleSelection);
     //QModelIndexList indexList = m_pUi->m_tableView_eventTableView->selectionModel()->selectedIndexes();
     QModelIndexList indexList = m_pUi->m_tableView_eventTableView->selectionModel()->selectedRows();
-    qDebug() << indexList;
-    int iLastDeleted();
+
     for(int i = 0; i<indexList.size(); i++) {
         //qDebug() << "Index List" << indexList.at(i).row();
         //qDebug() << "With Modifier" << indexList.at(i).row() - i;

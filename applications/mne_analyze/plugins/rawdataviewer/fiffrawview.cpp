@@ -265,9 +265,8 @@ void FiffRawView::setZoom(double zoomFac)
 
 void FiffRawView::setWindowSize(int T)
 {
-    int iNewPos, iNewSize;
+    int iNewPos;
     iNewPos = ((m_pTableView->horizontalScrollBar()->value() * m_iT) / T);
-    iNewSize = ((m_pTableView->horizontalScrollBar()->maximum() * m_iT) / T);
 
     if (iNewPos < 0) {
         iNewPos = m_pTableView->horizontalScrollBar()->value();
