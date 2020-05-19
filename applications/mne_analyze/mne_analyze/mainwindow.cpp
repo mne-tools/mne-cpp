@@ -300,6 +300,7 @@ void MainWindow::createPluginViews(QSharedPointer<PluginManager> pPluginManager)
 
             if(sCurPluginName == "RawDataViewer") {
                 pWindow = m_pMultiView->addWidgetBottom(pView, sCurPluginName);
+                pView->setObjectName("RawDataViewer");
             } else {
                 pWindow = m_pMultiView->addWidgetTop(pView, sCurPluginName);
             }
