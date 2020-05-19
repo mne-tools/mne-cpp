@@ -74,6 +74,7 @@ QuickControlView::QuickControlView(const QString &sSettingsPath,
     ui->setupUi(this);
     ui->m_pTabWidget->setTabBarAutoHide(true);
     ui->m_pTabWidget->setMovable(true);
+    ui->m_pTabWidget->setTabPosition(QTabWidget::West);
     this->setWindowTitle("Quick Control");
 
     if(!(windowFlags() & Qt::CustomizeWindowHint)) {
