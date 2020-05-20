@@ -47,6 +47,7 @@
 
 #include <QHBoxLayout>
 #include <QDebug>
+#include <QSettings>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -80,6 +81,7 @@ MultiViewWindow* MultiView::addWidgetTop(QWidget* pWidget,
                                          const QString& sName)
 {
     MultiViewWindow* pDockWidget = new MultiViewWindow();
+    pDockWidget->setObjectName(sName);
     pDockWidget->setWindowTitle(sName);
     pDockWidget->setWidget(pWidget);
 
@@ -106,6 +108,7 @@ MultiViewWindow* MultiView::addWidgetBottom(QWidget* pWidget,
                                             const QString& sName)
 {
     MultiViewWindow* pDockWidget = new MultiViewWindow();
+    pDockWidget->setObjectName(sName);
     pDockWidget->setWindowTitle(sName);
     pDockWidget->setWidget(pWidget);
 
@@ -132,4 +135,28 @@ MultiViewWindow* MultiView::addWidgetBottom(QWidget* pWidget,
     });
 
     return pDockWidget;
+}
+
+//=============================================================================================================
+
+void MultiView::saveSettings()
+{
+    QSettings settings("MNECPP", "ANALYZEWINDOW");
+
+    settings.beginGroup("layout");
+    settings.setValue("geometry", saveGeometry());
+    settings.setValue("state", saveState());
+    settings.endGroup();
+}
+
+//=============================================================================================================
+
+void MultiView::restoreSettings()
+{
+    QSettings settings("MNECPP", "ANALYZEWINDOW");
+
+    settings.beginGroup("layout");
+    restoreGeometry(settings.value("geometry").toByteArray());
+    restoreState(settings.value("state").toByteArray());
+    settings.endGroup();
 }

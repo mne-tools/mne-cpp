@@ -194,8 +194,20 @@ private slots:
      */
     void onSaveButton();
 
+    //=========================================================================================================
+    /**
+     * Update selected annotation with new sample value iValue
+     *
+     * @param [in] iValue   new sample value for selected annotation
+     */
     void realTimeDataSample(int iValue);
 
+    //=========================================================================================================
+    /**
+     * Update selected annotation with new time value dValue
+     *
+     * @param [in] dValue   new time value for selected annotation
+     */
     void realTimeDataTime(double dValue);
 
 private:

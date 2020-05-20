@@ -210,18 +210,14 @@ void AnnotationSettingsView::passFiffParams(int iFirst,int iLast,float fFreq)
 
 void AnnotationSettingsView::removeAnnotationfromModel()
 {
-    m_pUi->m_tableView_eventTableView->setSelectionMode(QAbstractItemView::SingleSelection);
     //QModelIndexList indexList = m_pUi->m_tableView_eventTableView->selectionModel()->selectedIndexes();
     QModelIndexList indexList = m_pUi->m_tableView_eventTableView->selectionModel()->selectedRows();
 
     for(int i = 0; i<indexList.size(); i++) {
-        //qDebug() << "Index List" << indexList.at(i).row();
-        //qDebug() << "With Modifier" << indexList.at(i).row() - i;
         m_pAnnModel->removeRow(indexList.at(i).row() - i);
     }
-    emit triggerRedraw();
-    m_pUi->m_tableView_eventTableView->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
+    emit triggerRedraw();
 }
 
 //=============================================================================================================
