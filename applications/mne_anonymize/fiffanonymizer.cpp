@@ -217,6 +217,29 @@ int FiffAnonymizer::anonymizeFile()
 
 //=============================================================================================================
 
+fiffData FiffAnonyzer::readInfoFile()
+{
+    //todo create only show method.
+    printIfVerbose("Max. Valid Fiff version: " + QString::number(m_dMaxValidFiffVerion));
+    printIfVerbose("Current date: " + QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz t"));
+    printIfVerbose(" ");
+
+    openInOutStreams();
+
+    printIfVerbose("Reading info in the file.");
+    processHeaderTags();
+
+    while( (m_pTag->next != -1) && (!m_pInStream->device()->atEnd()))
+    {
+        readTag();
+        censorTag(false);
+    }
+
+    closeInOutStreams();
+
+    return 0;
+}
+
 void FiffAnonymizer::censorTag() const
 {
     switch (m_pTag->kind)
