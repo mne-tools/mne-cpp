@@ -85,15 +85,15 @@ void DataManagerView::setModel(QAbstractItemModel *pModel)
 
 void DataManagerView::customMenuRequested(QPoint pos)
 {
-    QMenu *menu = new QMenu(this);
+//    QMenu *menu = new QMenu(this);
 
-    QAction* pAction = new QAction("Remove", this);
-    connect(pAction, &QAction::triggered, [=]() {
-        emit removeItem(m_pUi->m_pTreeView->indexAt(pos));
-    });
+//    QAction* pAction = new QAction("Remove", this);
+//    connect(pAction, &QAction::triggered, [=]() {
+//        emit removeItem(m_pUi->m_pTreeView->indexAt(pos));
+//    });
 
-    menu->addAction(pAction);
-    menu->popup(m_pUi->m_pTreeView->viewport()->mapToGlobal(pos));
+//    menu->addAction(pAction);
+//    menu->popup(m_pUi->m_pTreeView->viewport()->mapToGlobal(pos));
 }
 
 //=============================================================================================================
