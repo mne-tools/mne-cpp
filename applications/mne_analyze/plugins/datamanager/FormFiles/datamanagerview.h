@@ -48,6 +48,7 @@
 #include <QWidget>
 #include <QAbstractItemModel>
 #include <QItemSelectionModel>
+#include <QStandardItem>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -99,12 +100,15 @@ public:
     void setModel(QAbstractItemModel *pModel);
 
 private:
+    void customMenuRequested(QPoint pos);
+
     void onCurrentItemChanged(const QItemSelection &selected,
                               const QItemSelection &deselected);
 
     Ui::DataManagerView *m_pUi;   /**< The user interface */
 
 signals:
+    void removeItem(const QModelIndex& pIndex);
     void selectedModelChanged(const QVariant& data);
 };
 

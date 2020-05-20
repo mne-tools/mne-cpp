@@ -137,7 +137,7 @@ QDockWidget *AnnotationManager::getControl()
     connect(pAnnotationSettingsView, &AnnotationSettingsView::activeEventsChecked,
             this, &AnnotationManager::toggleDisplayEvent);
 
-    QDockWidget* pControl = new QDockWidget(tr("Annotations"));
+    QDockWidget* pControl = new QDockWidget(getName());
     pControl->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
     pControl->setWidget(pAnnotationSettingsView);
 

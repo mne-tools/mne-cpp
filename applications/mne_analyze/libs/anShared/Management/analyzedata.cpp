@@ -52,6 +52,7 @@
 #include <QSharedPointer>
 #include <QString>
 #include <QtConcurrent/QtConcurrent>
+#include <QMessageBox>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -155,7 +156,7 @@ QSharedPointer<AbstractModel> AnalyzeData::getModelByPath(const QString& sPath,
 
 //=============================================================================================================
 
-QAbstractItemModel* AnalyzeData::getDataModel()
+QStandardItemModel* AnalyzeData::getDataModel()
 {
     return m_pData;
 }
@@ -190,12 +191,24 @@ QSharedPointer<FiffRawViewModel> AnalyzeData::loadFiffRawViewModel(const QString
     return pModel;
 }
 
-////=============================================================================================================
+//=============================================================================================================
 
-//void AnalyzeData::removeModel(const QString &sModelPath)
-//{
-//    int numRemovedModels = m_pData.remove(sModelPath);
-//    if(numRemovedModels > 0) {
-//        emit modelRemoved(sModelPath);
-//    }
-//}
+void AnalyzeData::removeModel(const QModelIndex& index)
+{
+    if(m_pData->checkIndex(index)) {
+        QString sModelPath = m_pData->itemFromIndex(index)->toolTip();
+        QFileInfo info (sModelPath);
+
+        QMessageBox msgBox;
+        msgBox.setText("Are you sure you want to remove the model "+info.fileName()+"?");
+        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+        msgBox.setDefaultButton(QMessageBox::No);
+        int ret = msgBox.exec();
+
+        if(ret == QMessageBox::Yes) {
+            if(m_pData->removeRows(index.row(), 1, index)) {
+                emit modelRemoved(sModelPath);
+            }
+        }
+    }
+}

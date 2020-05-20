@@ -250,7 +250,9 @@ void MainWindow::createPluginControls(QSharedPointer<ANSHAREDLIB::PluginManager>
         if(pControl) {
             addDockWidget(Qt::LeftDockWidgetArea, pControl);
             qInfo() << "[MainWindow::createPluginControls] Found and added dock widget for " << pPlugin->getName();
-            m_pMenuView->addAction(pControl->toggleViewAction());
+            QAction* pAction = pControl->toggleViewAction();
+            pAction->setText(pPlugin->getName()+" Controls");
+            m_pMenuView->addAction(pAction);
             qInfo() << "[MainWindow::createPluginControls] Added" << pPlugin->getName() << "controls to View menu";
         }
     }
@@ -283,12 +285,9 @@ void MainWindow::createPluginViews(QSharedPointer<PluginManager> pPluginManager)
                 pWindow = m_pMultiView->addWidgetTop(pView, sCurPluginName);
             }
 
-            QAction* action = new QAction(pPlugin->getName(), this);
-            action->setCheckable(true);
-            action->setChecked(true);
-            m_pMenuView->addAction(action);
-            connect(action, &QAction::toggled,
-                    pWindow, &MultiViewWindow::setVisible);
+            QAction* pAction = pWindow->toggleViewAction();
+            pAction->setText(pPlugin->getName());
+            m_pMenuView->addAction(pAction);
 
             qInfo() << "[MainWindow::createPluginViews] Found and added subwindow for " << pPlugin->getName();
         }
