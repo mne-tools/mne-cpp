@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     rtfwdsettingsview.h
+ * @file     fwdsettingsview.h
  * @author   Ruben Dörfel <ruben.doerfel@tu-ilmenau.de>
  * @since    0.1.1
  * @date     May, 2020
@@ -28,12 +28,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     RtFwdSettingsView class declaration.
+ * @brief     FwdSettingsView class declaration.
  *
  */
 
-#ifndef RTFWDSETTINGSVIEW_H
-#define RTFWDSETTINGSVIEW_H
+#ifndef FWDSETTINGSVIEW_H
+#define FWDSETTINGSVIEW_H
 
 //=============================================================================================================
 // INCLUDES
@@ -64,7 +64,7 @@ namespace FSLIB {
 }
 
 namespace Ui {
-    class RtFwdSettingsViewWidget;
+    class FwdSettingsViewWidget;
 }
 //=============================================================================================================
 // DEFINE NAMESPACE DISPLIB
@@ -75,11 +75,11 @@ namespace DISPLIB
 
 //=============================================================================================================
 /**
- * The RtFwdSettingsView class provides a QWidget for the real-time Forward Solution controls.
+ * The FwdSettingsView class provides a QWidget for the real-time Forward Solution controls.
  *
- * @brief The RtFwdSettingsView class provides a QWidget for the real-time Forward Solution controls.
+ * @brief The FwdSettingsView class provides a QWidget for the real-time Forward Solution controls.
  */
-class DISPSHARED_EXPORT RtFwdSettingsView : public QWidget
+class DISPSHARED_EXPORT FwdSettingsView : public QWidget
 {
     Q_OBJECT
 
@@ -87,13 +87,13 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a RtFwdSettingsView object.
+    * Constructs a FwdSettingsView object.
     */
-    explicit RtFwdSettingsView(const QString& sSettingsPath = "",
+    explicit FwdSettingsView(const QString& sSettingsPath = "",
                                QWidget *parent = 0,
                                Qt::WindowFlags f = Qt::Widget);
 
-    ~RtFwdSettingsView();
+    ~FwdSettingsView();
 
     //=========================================================================================================
     /**
@@ -181,7 +181,7 @@ protected:
 
     bool                                        m_bAnnotaionsLoaded;    /**< If the annotationset is loaded. */
 
-    Ui::RtFwdSettingsViewWidget*                m_ui;                   /**< The rtFwd dialog. */
+    Ui::FwdSettingsViewWidget*                m_ui;                   /**< The rtFwd dialog. */
 
     QString                                     m_sSettingsPath;        /**< The settings path to store the GUI settings to. */
 
@@ -227,5 +227,5 @@ signals:
 
 } // NAMESPACE
 
-#endif // RTFWDSETTINGSVIEW_H
+#endif // FWDSETTINGSVIEW_H
 
