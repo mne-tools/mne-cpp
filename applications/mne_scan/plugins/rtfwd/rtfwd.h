@@ -244,7 +244,7 @@ signals:
     //=========================================================================================================
     /**
      * Emit this signal whenever the clustering status changed
-     * (0 Initializing, 1 Computing, 2 Recomputing, 3 Clustering, 4 Finished).
+     * (0 Initializing, 1 Computing, 2 Recomputing, 3 Clustering, 4 Not Computed, 5 Finished).
      *
      * @param[in] iStatus            status of recomputation.
      */
