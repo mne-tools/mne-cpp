@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     rtfwdsettingsview.cpp
+ * @file     fwdsettingsview.cpp
  * @author   Ruben Dörfel <ruben.doerfel@tu-ilmenau.de>
  * @since    0.1.1
  * @date     May, 2020
@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    RtFwdSettingsView class definition.
+ * @brief    FwdSettingsView class definition.
  *
  */
 
@@ -36,8 +36,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "rtfwdsettingsview.h"
-#include "ui_rtfwdsettingsview.h"
+#include "fwdsettingsview.h"
+#include "ui_fwdsettingsview.h"
 
 #include <fs/annotationset.h>
 
@@ -69,12 +69,12 @@ using namespace FSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtFwdSettingsView::RtFwdSettingsView(const QString& sSettingsPath,
+FwdSettingsView::FwdSettingsView(const QString& sSettingsPath,
                                      QWidget *parent,
                                      Qt::WindowFlags f)
     : QWidget(parent, f)
     , m_bAnnotaionsLoaded(false)
-    , m_ui(new Ui::RtFwdSettingsViewWidget)
+    , m_ui(new Ui::FwdSettingsViewWidget)
     , m_sSettingsPath(sSettingsPath)
 {
     m_ui->setupUi(this);
@@ -108,13 +108,13 @@ RtFwdSettingsView::RtFwdSettingsView(const QString& sSettingsPath,
 
     // connect
     connect(m_ui->m_checkBox_bDoRecomputation, &QCheckBox::clicked,
-            this, &RtFwdSettingsView::recompStatusChanged);
+            this, &FwdSettingsView::recompStatusChanged);
     connect(m_ui->m_qPushButton_AtlasDirDialog, &QPushButton::released,
-            this, &RtFwdSettingsView::showAtlasDirDialog);
+            this, &FwdSettingsView::showAtlasDirDialog);
     connect(m_ui->m_checkBox_bDoClustering, &QCheckBox::clicked,
-            this, &RtFwdSettingsView::onClusteringStatusChanged);
+            this, &FwdSettingsView::onClusteringStatusChanged);
     connect(m_ui->m_qPushButton_ComputeForward, &QPushButton::clicked,
-            this, &RtFwdSettingsView::doForwardComputation);
+            this, &FwdSettingsView::doForwardComputation);
 
     // load settings
     loadSettings(m_sSettingsPath);
@@ -122,7 +122,7 @@ RtFwdSettingsView::RtFwdSettingsView(const QString& sSettingsPath,
 
 //=============================================================================================================
 
-RtFwdSettingsView::~RtFwdSettingsView()
+FwdSettingsView::~FwdSettingsView()
 {
     saveSettings(m_sSettingsPath);
 
@@ -131,7 +131,7 @@ RtFwdSettingsView::~RtFwdSettingsView()
 
 //=============================================================================================================
 
-void RtFwdSettingsView::loadSettings(const QString& settingsPath)
+void FwdSettingsView::loadSettings(const QString& settingsPath)
 {
     if(settingsPath.isEmpty()) {
         return;
@@ -143,7 +143,7 @@ void RtFwdSettingsView::loadSettings(const QString& settingsPath)
 
 //=============================================================================================================
 
-void RtFwdSettingsView::saveSettings(const QString& settingsPath)
+void FwdSettingsView::saveSettings(const QString& settingsPath)
 {
     if(settingsPath.isEmpty()) {
         return;
@@ -155,14 +155,14 @@ void RtFwdSettingsView::saveSettings(const QString& settingsPath)
 
 //=============================================================================================================
 
-bool RtFwdSettingsView::getRecomputationStatusChanged()
+bool FwdSettingsView::getRecomputationStatusChanged()
 {
     return m_ui->m_checkBox_bDoRecomputation->isChecked();
 }
 
 //=============================================================================================================
 
-void RtFwdSettingsView::setRecomputationStatus(int iStatus)
+void FwdSettingsView::setRecomputationStatus(int iStatus)
 {
     if(iStatus == 0) {
         m_ui->m_label_recomputationFeedback->setText("Initializing");
@@ -184,7 +184,7 @@ void RtFwdSettingsView::setRecomputationStatus(int iStatus)
 
 //=============================================================================================================
 
-void RtFwdSettingsView::setSolutionInformation(FIFFLIB::fiff_int_t iSourceOri,
+void FwdSettingsView::setSolutionInformation(FIFFLIB::fiff_int_t iSourceOri,
                                                FIFFLIB::fiff_int_t iCoordFrame,
                                                int iNSource,
                                                int iNChan,
@@ -221,14 +221,14 @@ void RtFwdSettingsView::setSolutionInformation(FIFFLIB::fiff_int_t iSourceOri,
 
 //=============================================================================================================
 
-bool RtFwdSettingsView::getClusteringStatusChanged()
+bool FwdSettingsView::getClusteringStatusChanged()
 {
     return m_ui->m_checkBox_bDoClustering->isChecked();
 }
 
 //=============================================================================================================
 
-void RtFwdSettingsView::onClusteringStatusChanged(bool bChecked)
+void FwdSettingsView::onClusteringStatusChanged(bool bChecked)
 {
     if(!m_bAnnotaionsLoaded) {
         QMessageBox msgBox;
@@ -243,7 +243,7 @@ void RtFwdSettingsView::onClusteringStatusChanged(bool bChecked)
 
 //=============================================================================================================
 
-void RtFwdSettingsView::setClusteredInformation(int iNSources)
+void FwdSettingsView::setClusteredInformation(int iNSources)
 {
     // set number of clustered sources
     m_ui->m_lineEdit_iNDipoleClustered->setText(QString::number(iNSources));
@@ -251,7 +251,7 @@ void RtFwdSettingsView::setClusteredInformation(int iNSources)
 
 //=============================================================================================================
 
-void RtFwdSettingsView::showAtlasDirDialog()
+void FwdSettingsView::showAtlasDirDialog()
 {
     QString t_sAtlasDir = QFileDialog::getExistingDirectory(this, tr("Open Atlas Directory"),
                                                             QCoreApplication::applicationDirPath(),
