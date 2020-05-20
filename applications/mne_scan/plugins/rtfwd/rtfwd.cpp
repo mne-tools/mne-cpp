@@ -518,6 +518,6 @@ void RtFwd::run()
 
             bFwdReady = false;
         }
-        emit statusInformationChanged(4);               //finished
+        emit statusInformationChanged(5);               //finished
     }
 }

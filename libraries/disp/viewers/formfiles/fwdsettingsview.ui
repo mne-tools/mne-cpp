@@ -230,7 +230,7 @@
         <item>
          <widget class="QLabel" name="m_label_recomputationFeedback">
           <property name="text">
-           <string>No fit yet</string>
+           <string>Not Computed</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>

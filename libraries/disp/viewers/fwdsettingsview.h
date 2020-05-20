@@ -90,8 +90,8 @@ public:
     * Constructs a FwdSettingsView object.
     */
     explicit FwdSettingsView(const QString& sSettingsPath = "",
-                               QWidget *parent = 0,
-                               Qt::WindowFlags f = Qt::Widget);
+                             QWidget *parent = 0,
+                             Qt::WindowFlags f = Qt::Widget);
 
     ~FwdSettingsView();
 
@@ -106,7 +106,7 @@ public:
     //=========================================================================================================
     /**
      * Updates the clustering status
-     * (0 Initializing, 1 Computing, 2 Recomputing, 3 Clustering, 4 Finished).
+     * (0 Initializing, 1 Computing, 2 Recomputing, 3 Clustering, 4 Not Computed, 5 Finished).
      *
      * @param[in] iStatus            status of recomputation.
      */
@@ -181,7 +181,7 @@ protected:
 
     bool                                        m_bAnnotaionsLoaded;    /**< If the annotationset is loaded. */
 
-    Ui::FwdSettingsViewWidget*                m_ui;                   /**< The rtFwd dialog. */
+    Ui::FwdSettingsViewWidget*                  m_ui;                   /**< The rtFwd dialog. */
 
     QString                                     m_sSettingsPath;        /**< The settings path to store the GUI settings to. */
 
