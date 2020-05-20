@@ -38,7 +38,6 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-VERSION = $${MNE_LIB_VERSION}
 CONFIG += skip_target_version_ext
 
 QT -= gui

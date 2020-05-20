@@ -510,8 +510,6 @@ float AnnotationModel::getFreq()
 bool AnnotationModel::saveToFile(const QString& sPath)
 {
 #ifdef WASMBUILD
-    // In case of WASM the sPath strin is empty
-    sPath = getModelName();
     //QBuffer* bufferOut = new QBuffer;
     QByteArray* bufferOut = new QByteArray;
 

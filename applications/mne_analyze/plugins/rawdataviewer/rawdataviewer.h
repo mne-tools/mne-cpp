@@ -136,7 +136,6 @@ private:
     QSharedPointer<FiffRawViewDelegate>             m_pRawDelegate;
 
     QPointer<FiffRawView>                           m_pFiffRawView;     /**< View for Fiff data */
-    bool                                            m_bDisplayCreated;  /**< Flag for remembering whether or not the display was already created */
 
     QVBoxLayout*            m_pLayout;              /**< Layout for widgets in the controller view */
     QWidget*                m_pContainer;           /**< Container for widgets in the controller view */
