@@ -43,6 +43,7 @@ TEMPLATE = app
 QT += core gui widgets
 
 CONFIG   += console
+#CONFIG -= app_bundle
 
 contains(MNECPP_CONFIG, static) {
     CONFIG += static
