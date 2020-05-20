@@ -79,12 +79,14 @@ private slots:
 
     void on_toolButton_clicked();
 
+    void on_buttonSaveFile_helpRequested();
+
 private:
 
    bool confirmClose();
 
    bool m_bDataModified;
-   bool m_bShowEachField;
+   bool m_bHideEachField;
    Ui::MainWindow* m_pUi;
    SettingsControllerGui* m_pController;
 };

@@ -102,6 +102,7 @@ SettingsControllerGui::SettingsControllerGui(const QStringList& arguments)
 
 
 //    read data method
+//    recieve a struct.
 //    anonymize method
 
     m_pWindow->show();

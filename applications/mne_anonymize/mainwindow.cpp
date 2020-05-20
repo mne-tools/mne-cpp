@@ -34,6 +34,8 @@ MainWindow::MainWindow(MNEANONYMIZE::SettingsControllerGui *c)
     m_pUi->frameFile->setHidden(m_bHideEachField);
     m_pUi->frameSubject->setHidden(m_bHideEachField);
     m_pUi->frameProject->setHidden(m_bHideEachField);
+    m_pUi->lineEditFileVersionExtra->setEnabled(false);
+    m_pUi->lineEditMACAddressExtra->setEnabled(false);
 }
 
 MainWindow::~MainWindow()
