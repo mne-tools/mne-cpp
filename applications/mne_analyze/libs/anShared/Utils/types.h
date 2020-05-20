@@ -93,7 +93,7 @@ namespace ANSHAREDLIB
         PING,                       // dummy event for testing and debuggin purposes
         PLUGIN_INIT_FINISHED,       // send when all plugins finished initializing
         STATUS_BAR_MSG,             // sending a message to the status bar (part of gui)
-        CURRENTLY_SELECTED_MODEL,   // event send whenever the user changes the selection in the datamanager plugin
+        SELECTED_MODEL_CHANGED,     // event send whenever the user changes the selection in the datamanager plugin
         NEW_ANNOTATION_ADDED,       // event send whenever the user adds a new annotation in the rawdataviewer plugin
         TRIGGER_REDRAW,             // send when viewer needs to be updated
         TRIGGER_VIEWER_MOVE         // send when scroll position of viewer needs to be moved

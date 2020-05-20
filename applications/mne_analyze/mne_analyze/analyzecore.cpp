@@ -116,7 +116,7 @@ AnalyzeCore::AnalyzeCore(QObject* parent)
     splash.hide();
 
     // Setup log window
-    qInstallMessageHandler(customMessageHandler);
+    //qInstallMessageHandler(customMessageHandler);
 }
 
 //=============================================================================================================

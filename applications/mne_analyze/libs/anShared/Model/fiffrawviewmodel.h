@@ -45,9 +45,7 @@
 #include "../anshared_global.h"
 #include "../Utils/types.h"
 #include "abstractmodel.h"
-#include "annotationmodel.h"
 
-#include <fiff/fiff_ch_info.h>
 #include <fiff/fiff_io.h>
 
 //=============================================================================================================
@@ -61,7 +59,6 @@
 #include <QFile>
 #include <QColor>
 
-
 //=============================================================================================================
 // Eigen INCLUDES
 //=============================================================================================================
@@ -70,9 +67,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB
-{
+namespace FIFFLIB {
     class FiffInfo;
+    class FiffChInfo;
 }
 
 //=============================================================================================================
@@ -84,6 +81,8 @@ namespace ANSHAREDLIB {
 //=============================================================================================================
 // ANSHAREDLIB FORWARD DECLARATIONS
 //=============================================================================================================
+
+class AnnotationModel;
 
 //=============================================================================================================
 /**
@@ -128,7 +127,7 @@ public:
     /**
      * Destructs a FiffRawViewModel.
      */
-    ~FiffRawViewModel();
+    ~FiffRawViewModel() override;
 
     //=========================================================================================================
     /**
@@ -505,7 +504,7 @@ private:
     std::list<QSharedPointer<QPair<MatrixXd, MatrixXd> > > m_lData;    /**< Data */
     std::list<QSharedPointer<QPair<MatrixXd, MatrixXd> > > m_lNewData; /**< Data that is to be appended or prepended */
 
-    // Display studd
+    // Display stuff
     double      m_dDx;              /**< pixel difference to the next sample. */
 
     // model config
@@ -540,9 +539,9 @@ private:
 
     int                                 m_iDistanceTimerSpacer;                     /**< The distance for the horizontal time spacers in the view in ms */
 
-    qint32 m_iScrollPos;                                                            /**< Position of the scrollbar */
+    qint32                              m_iScrollPos;                               /**< Position of the scrollbar */
 
-    bool m_bDispAnn;                                                                /**< Whether annotations wil be shown */
+    bool                                m_bDispAnn;                                 /**< Whether annotations wil be shown */
 
     QSharedPointer<AnnotationModel>     m_pAnnotationModel;                         /**< Model to stored annotations to be displayed */
 };

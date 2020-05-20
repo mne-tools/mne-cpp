@@ -40,6 +40,7 @@
 
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <anShared/Management/communicator.h>
+#include <anShared/Management/analyzedata.h>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -134,9 +135,10 @@ QWidget *DataLoader::getView()
 void DataLoader::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
-    case EVENT_TYPE::CURRENTLY_SELECTED_MODEL:
-        m_sCurrentlySelectedModel = e->getData().toString();
-        //qDebug() << m_sCurrentlySelectedModel;
+    case EVENT_TYPE::SELECTED_MODEL_CHANGED:
+        if(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >()) {
+            m_pSelectedModel = e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >();
+        }
         break;
     default:
         qWarning() << "[DataLoader::handleEvent] Received an Event that is not handled by switch cases.";
@@ -147,7 +149,7 @@ void DataLoader::handleEvent(QSharedPointer<Event> e)
 
 QVector<EVENT_TYPE> DataLoader::getEventSubscriptions(void) const
 {
-    QVector<EVENT_TYPE> temp = {CURRENTLY_SELECTED_MODEL};
+    QVector<EVENT_TYPE> temp = {SELECTED_MODEL_CHANGED};
 
     return temp;
 }
@@ -182,8 +184,13 @@ void DataLoader::onLoadFilePressed()
 
 void DataLoader::onSaveFilePressed()
 {
+    if(!m_pSelectedModel) {
+        qWarning() << "[DataLoader::onSaveFilePressed] No model selected.";
+        return;
+    }
+
 #ifdef WASMBUILD
-    m_pAnalyzeData->saveModel(m_sCurrentlySelectedModel, "");
+    m_pSelectedModel->saveToFile("");
 #else
     //Get the path
     QString filePath = QFileDialog::getSaveFileName(Q_NULLPTR,
@@ -192,9 +199,6 @@ void DataLoader::onSaveFilePressed()
                                                     tr("Fiff file(*.fif *.fiff)"));
 
     QFileInfo fileInfo(filePath);
-
-    if(fileInfo.exists() && (fileInfo.completeSuffix() == "fif")) {
-        m_pAnalyzeData->saveModel(m_sCurrentlySelectedModel, filePath);
-    }
+    m_pSelectedModel->saveToFile(filePath);
 #endif
 }

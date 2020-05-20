@@ -88,17 +88,10 @@ void DataManager::init()
 
     m_pDataManagerView = new DataManagerView;
 
-    connect(m_pDataManagerView.data(), &DataManagerView::currentlySelectedModelChanged,
+    m_pDataManagerView->setModel(m_pAnalyzeData->getDataModel());
+
+    connect(m_pDataManagerView.data(), &DataManagerView::selectedModelChanged,
             this, &DataManager::onCurrentlySelectedModelChanged);
-
-    updateListWidget();
-
-    connect(m_pAnalyzeData.data(), &AnalyzeData::newModelAvailable,
-            this, &DataManager::updateListWidget);
-    connect(m_pAnalyzeData.data(), &AnalyzeData::modelPathChanged,
-            this, &DataManager::updateListWidget);
-    connect(m_pAnalyzeData.data(), &AnalyzeData::modelRemoved,
-            this, &DataManager::updateListWidget);
 }
 
 //=============================================================================================================
@@ -126,7 +119,7 @@ QMenu *DataManager::getMenu()
 QDockWidget *DataManager::getControl()
 {
     if(!m_pControlDock) {
-        m_pControlDock = new QDockWidget(tr("Data Manager"));
+        m_pControlDock = new QDockWidget(tr("Data"));
         m_pControlDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
         m_pControlDock->setWidget(m_pDataManagerView);
     }
@@ -162,30 +155,7 @@ QVector<EVENT_TYPE> DataManager::getEventSubscriptions(void) const
 
 //=============================================================================================================
 
-void DataManager::updateListWidget()
+void DataManager::onCurrentlySelectedModelChanged(const QVariant& data)
 {
-    m_pDataManagerView->clearList();
-
-    QList<QSharedPointer<AbstractModel> > lModels = m_pAnalyzeData->getModels();
-
-    //add all model names to the listView
-    for(QSharedPointer<AbstractModel> pModel: lModels) {
-        if(pModel->getType() == MODEL_TYPE::ANSHAREDLIB_QENTITYLIST_MODEL) {
-            continue;
-        }
-
-        QListWidgetItem* tempListItem = new QListWidgetItem;
-        tempListItem->setText(pModel->getModelName());
-        tempListItem->setToolTip(pModel->getModelPath());
-        m_pDataManagerView->addListItem(tempListItem);
-    }
-}
-
-//=============================================================================================================
-
-void DataManager::onCurrentlySelectedModelChanged(const QString& sCurrentModelPath)
-{
-    QVariant data(sCurrentModelPath);
-    m_pAnalyzeData->setCurrentlySelectedModel(sCurrentModelPath);
-    m_pCommu->publishEvent(EVENT_TYPE::CURRENTLY_SELECTED_MODEL, data);
+    m_pCommu->publishEvent(EVENT_TYPE::SELECTED_MODEL_CHANGED, data);
 }

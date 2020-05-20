@@ -57,6 +57,7 @@
 
 namespace ANSHAREDLIB {
     class Communicator;
+    class AbstractModel;
 }
 
 //=============================================================================================================
@@ -124,10 +125,9 @@ private:
      */
     void onSaveFilePressed();
 
-    QPointer<ANSHAREDLIB::Communicator> m_pCommu;
+    QPointer<ANSHAREDLIB::Communicator>         m_pCommu;
 
-    QString                             m_sCurrentlySelectedModel;
-
+    QSharedPointer<ANSHAREDLIB::AbstractModel>  m_pSelectedModel;
 };
 
 } // NAMESPACE

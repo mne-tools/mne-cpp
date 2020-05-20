@@ -52,6 +52,9 @@
 
 #include <QSharedPointer>
 #include <QString>
+#include <QPointer>
+#include <QStandardItemModel>
+#include <QFileInfo>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -102,33 +105,55 @@ public:
 
     //=========================================================================================================
     /**
+     * Returns all models.
+     *
+     * @param[in] parent             The entry point/model index to tart looking
+     *
+     * @return                       Vector of all models
+     */
+    QVector<QSharedPointer<AbstractModel> > getAllModels(QModelIndex parent = QModelIndex()) const;
+
+    //=========================================================================================================
+    /**
      * Returns a vector of all loaded models that have the specified type
      *
      * @param[in] mtype              The type to search for
+     * @param[in] parent             The entry point/model index to tart looking
      *
      * @return                       Vector of models that have the specified type
      */
-    QVector<QSharedPointer<AbstractModel> > getObjectsOfType(MODEL_TYPE mtype) const;
+    QVector<QSharedPointer<AbstractModel> > getModelsByType(MODEL_TYPE mtype,
+                                                            QModelIndex parent = QModelIndex()) const;
 
     //=========================================================================================================
     /**
-     * Returns the requested model.
+     * Returns the requested model. If multiple matches are found the first one is returned.
      * If the path name is not used a nullptr is returned.
      *
-     * @param[in] sName               Model name
+     * @param[in] sName              Model name (not the model path)
      *
      * @return                       Pointer to the model
      */
-    QSharedPointer<AbstractModel> getModel(const QString &sName) const;
+    QSharedPointer<AbstractModel> getModelByName(const QString &sNamet) const;
 
     //=========================================================================================================
     /**
-     * Sets the currently selected model. If the model path corresponds to a stored model the
-     * selectedModelChanged signal will be emitted.
+     * Returns the requested model. If multiple matches are found the first one is returned.
+     * If the path name is not used a nullptr is returned.
      *
-     * @param[in] sModelPath               The full model path
+     * @param[in] sPath              Model path (not the model name)
+     * @param[in] parent             The entry point/model index to tart looking
+     *
+     * @return                       Pointer to the model
      */
-    void setCurrentlySelectedModel(const QString &sModelPath);
+    QSharedPointer<AbstractModel> getModelByPath(const QString& sPath,
+                                                 QModelIndex parent = QModelIndex()) const;
+
+    //=========================================================================================================
+    /**
+     * Returns the QStandardItemModel holding all the data
+     */
+    QAbstractItemModel* getDataModel();
 
     //=========================================================================================================
     /**
@@ -151,9 +176,10 @@ public:
     template<class T>
     QSharedPointer<T> loadModel(const QString& sPath)
     {
-        // check if model was already loaded:
-        if (m_data.contains(sPath)) {
-            return qSharedPointerDynamicCast<T>(m_data.value(sPath));
+        // check if model was already loaded
+        if(QSharedPointer<AbstractModel> pModel = getModelByPath(sPath)) {
+            qInfo() << "[AnalyzeData::loadModel] Data has been loaded already.";
+            return qSharedPointerDynamicCast<T>(pModel);
         } else {
             // call model constructor with provided path
             QSharedPointer<T> sm = QSharedPointer<T>::create(sPath);
@@ -162,7 +188,14 @@ public:
 
             if(temp->isInit()) {
                 // add to record, and tell others about the new model
-                m_data.insert(sPath, temp);
+                QStandardItem* pItem = new QStandardItem(temp->getModelName());
+                pItem->setToolTip(temp->getModelPath());
+
+                QVariant data;
+                data.setValue(temp);
+                pItem->setData(data);
+                m_pData->appendRow(pItem);
+
                 emit newModelAvailable(temp);
                 return sm;
             } else {
@@ -171,60 +204,18 @@ public:
         }
     }
 
-    //=========================================================================================================
-    /**
-     * This is the main function for saving models. It simply calls the models save function with the
-     * provided path.
-     */
-    bool saveModel(const QString& sModelPath,
-                   const QString& sPath)
-    {
-        // check if model was already loaded:
-        if (QSharedPointer<AbstractModel> temp = getModel(sModelPath)) {
-            return temp->saveToFile(sModelPath);
-        }
-
-        qWarning() << "[AnalyzeData::saveModel] Model does not exist!";
-
-        return false;
-    }
-
-    //=========================================================================================================
-    /**
-     * Removes model stored under the given path.
-     *
-     * @param[in] sModelPath     The model path.
-     */
-    void removeModel(const QString &sModelPath);
-
-    //=========================================================================================================
-    /**
-     * Changes the path where the model is stored.
-     *
-     * @param[in] sOldModelPath     The old model path.
-     * @param[in] sNewModelPath     The new model path.
-     */
-    void changeModelPath(const QString &sOldModelPath,
-                         const QString &sNewModelPath);
-
-    //=========================================================================================================
-    /**
-     * Returns all models.
-     */
-    QList<QSharedPointer<AbstractModel> > getModels() const;
+//    //=========================================================================================================
+//    /**
+//     * Removes model stored under the given path.
+//     *
+//     * @param[in] sModelPath     The model path.
+//     */
+//    void removeModel(const QString &sModelPath);
 
 private:
-    QHash<QString, QSharedPointer<AbstractModel> >        m_data;       /**< The loaded models. */
+    QPointer<QStandardItemModel>            m_pData;         /**< The loaded models in form of a QStandardItemModel. */
 
 signals:
-    //=========================================================================================================
-    /**
-     * This is emitted whenever a different model is selected.
-     *
-     * @param[in] pModel      The newly selected model
-     */
-    void selectedModelChanged(QSharedPointer<AbstractModel> pModel);
-
     //=========================================================================================================
     /**
      * This is emitted whenever a new model is loaded.

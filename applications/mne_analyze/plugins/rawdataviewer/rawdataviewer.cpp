@@ -67,9 +67,7 @@ using namespace ANSHAREDLIB;
 //=============================================================================================================
 
 RawDataViewer::RawDataViewer()
-: m_pControlDock(Q_NULLPTR)
-, m_pCommu(Q_NULLPTR)
-, m_iVisibleBlocks(10)
+: m_iVisibleBlocks(10)
 , m_iBufferBlocks(10)
 , m_pFiffRawView(Q_NULLPTR)
 , m_pRawDelegate(QSharedPointer<FiffRawViewDelegate>::create())
@@ -81,7 +79,6 @@ RawDataViewer::RawDataViewer()
 
 RawDataViewer::~RawDataViewer()
 {
-    delete m_pCommu;
 }
 
 //=============================================================================================================
@@ -97,11 +94,6 @@ QSharedPointer<IPlugin> RawDataViewer::clone() const
 void RawDataViewer::init()
 {
     m_pCommu = new Communicator(this);
-
-    connect(m_pAnalyzeData.data(), &AnalyzeData::newModelAvailable,
-            this, &RawDataViewer::onModelChanged);
-    connect(m_pAnalyzeData.data(), &AnalyzeData::selectedModelChanged,
-            this, &RawDataViewer::onModelChanged);
 
     // Create viewer
     m_pFiffRawView = new FiffRawView();
@@ -127,7 +119,6 @@ void RawDataViewer::onModelChanged(QSharedPointer<AbstractModel> pNewModel)
 
         m_pRawModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
         m_pFiffRawView->initMVCSettings(m_pRawModel, m_pRawDelegate);
-        qInfo() << "[RawDataViewer::onModelChanged] Model changed: " << pNewModel->getModelPath();
 
         setUpControls();
     }
@@ -143,7 +134,7 @@ void RawDataViewer::unload()
 
 QString RawDataViewer::getName() const
 {
-    return "RawDataViewer";
+    return "Signal Viewer";
 }
 
 //=============================================================================================================
@@ -169,7 +160,6 @@ QDockWidget *RawDataViewer::getControl()
     }
 
     return m_pControlDock;
-    //return Q_NULLPTR;
 }
 
 //=============================================================================================================
@@ -190,6 +180,9 @@ void RawDataViewer::handleEvent(QSharedPointer<Event> e)
     case TRIGGER_VIEWER_MOVE:
         m_pFiffRawView->updateScrollPosition();
         break;
+    case SELECTED_MODEL_CHANGED:
+        onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
+        break;
     default:
         qWarning() << "[RawDataViewer::handleEvent] Received an Event that is not handled by switch cases.";
     }
@@ -202,6 +195,7 @@ QVector<EVENT_TYPE> RawDataViewer::getEventSubscriptions(void) const
     QVector<EVENT_TYPE> temp = {};
     temp.push_back(TRIGGER_REDRAW);
     temp.push_back(TRIGGER_VIEWER_MOVE);
+    temp.push_back(SELECTED_MODEL_CHANGED);
 
     return temp;
 }
@@ -248,26 +242,12 @@ void RawDataViewer::setUpControls()
     m_pFiffRawView->setZoom(viewWidget->getZoom());
     m_pFiffRawView->setDistanceTimeSpacer(viewWidget->getDistanceTimeSpacer());
 
-//    //Annotation Widget
-//    AnnotationSettingsView* annotationWidget = new AnnotationSettingsView();
-//    annotationWidget->setModel(m_pAnnotationModel);
-//    annotationWidget->passFiffParams(m_pRawModel->absoluteFirstSample(),
-//                                     m_pRawModel->absoluteLastSample(),
-//                                     m_pRawModel->getFiffInfo()->sfreq);
-
-//    connect(annotationWidget, &AnnotationSettingsView::activeEventsChecked,
-//            m_pFiffRawView.data(), &FiffRawView::toggleDisplayEvent);
-
-//    connect(m_pFiffRawView.data(), &FiffRawView::sendSamplePos,
-//            annotationWidget, &AnnotationSettingsView::addAnnotationToModel);
-
     connect(m_pFiffRawView.data(), &FiffRawView::sendSamplePos,
             this, &RawDataViewer::onSendSamplePos);
 
     //Set up layout w/ control widgets
     m_pLayout->addWidget(scalingWidget);
     m_pLayout->addWidget(viewWidget);
-//    m_pLayout->addWidget(annotationWidget);
     m_pLayout->addStretch();
 
     //Make it all visible to the user
