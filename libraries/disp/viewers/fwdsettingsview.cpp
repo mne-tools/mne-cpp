@@ -70,12 +70,12 @@ using namespace FSLIB;
 //=============================================================================================================
 
 FwdSettingsView::FwdSettingsView(const QString& sSettingsPath,
-                                     QWidget *parent,
-                                     Qt::WindowFlags f)
-    : QWidget(parent, f)
-    , m_bAnnotaionsLoaded(false)
-    , m_ui(new Ui::FwdSettingsViewWidget)
-    , m_sSettingsPath(sSettingsPath)
+                                 QWidget *parent,
+                                 Qt::WindowFlags f)
+: QWidget(parent, f)
+, m_bAnnotaionsLoaded(false)
+, m_ui(new Ui::FwdSettingsViewWidget)
+, m_sSettingsPath(sSettingsPath)
 {
     m_ui->setupUi(this);
 
@@ -176,6 +176,9 @@ void FwdSettingsView::setRecomputationStatus(int iStatus)
     } else if (iStatus == 3) {
         m_ui->m_label_recomputationFeedback->setText("Clustering");
         m_ui->m_label_recomputationFeedback->setStyleSheet("QLabel { background-color : red;}");
+    } else if (iStatus == 4) {
+        m_ui->m_label_recomputationFeedback->setText("Not Computed");
+        m_ui->m_label_recomputationFeedback->setStyleSheet("QLabel { background-color : red;}");
     } else {
         m_ui->m_label_recomputationFeedback->setText("Finished");
         m_ui->m_label_recomputationFeedback->setStyleSheet("QLabel { background-color : green;}");
@@ -185,10 +188,10 @@ void FwdSettingsView::setRecomputationStatus(int iStatus)
 //=============================================================================================================
 
 void FwdSettingsView::setSolutionInformation(FIFFLIB::fiff_int_t iSourceOri,
-                                               FIFFLIB::fiff_int_t iCoordFrame,
-                                               int iNSource,
-                                               int iNChan,
-                                               int iNSpaces)
+                                             FIFFLIB::fiff_int_t iCoordFrame,
+                                             int iNSource,
+                                             int iNChan,
+                                             int iNSpaces)
 {
     // set source orientation
     if(iSourceOri == 0) {
