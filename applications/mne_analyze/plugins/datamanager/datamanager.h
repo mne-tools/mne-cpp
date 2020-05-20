@@ -110,13 +110,12 @@ public:
 private:
     //=========================================================================================================
     /**
-     * Updates the content of the list widget.
+     * Handles the event when the currently selected model was changed.
+     *
+     * @param[in] data  The data from the currently selected QStandardItem
      */
-    void updateListWidget();
+    void onCurrentlySelectedModelChanged(const QVariant& data);
 
-    void onCurrentlySelectedModelChanged(const QString& sCurrentModelPath);
-
-    // Control
     QPointer<QDockWidget>               m_pControlDock;         /**< Control Widget */
     QPointer<DataManagerView>           m_pDataManagerView;
     QPointer<ANSHAREDLIB::Communicator> m_pCommu;

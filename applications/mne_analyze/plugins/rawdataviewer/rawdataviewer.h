@@ -61,6 +61,7 @@ class RawDataViewerControl;
 namespace ANSHAREDLIB {
     class Communicator;
     class FiffRawViewModel;
+    class AbstractModel;
 }
 
 //=============================================================================================================
@@ -109,9 +110,8 @@ public:
     virtual void handleEvent(QSharedPointer<ANSHAREDLIB::Event> e) override;
     virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
 
-    void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
-
 private:
+    void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
 
     //=========================================================================================================
     /**

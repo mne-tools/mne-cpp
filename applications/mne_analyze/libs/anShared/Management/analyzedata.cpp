@@ -65,6 +65,7 @@ using namespace ANSHAREDLIB;
 
 AnalyzeData::AnalyzeData(QObject *pParent)
 : QObject(pParent)
+, m_pData(new QStandardItemModel(this))
 {
 
 }
@@ -73,42 +74,90 @@ AnalyzeData::AnalyzeData(QObject *pParent)
 
 AnalyzeData::~AnalyzeData()
 {
-    // @TODO make sure all objects are safely deleted
 }
 
 //=============================================================================================================
 
-QVector<QSharedPointer<AbstractModel> > AnalyzeData::getObjectsOfType(MODEL_TYPE mtype) const
+QVector<QSharedPointer<AbstractModel> > AnalyzeData::getAllModels(QModelIndex parent) const
 {
-    // simply iterate over map, number of objects in memory should be small enough to ensure acceptable execution time
-    QVector<QSharedPointer<AbstractModel> > result;
-    QHash<QString, QSharedPointer<AbstractModel> >::const_iterator iter = m_data.cbegin();
-    for (; iter != m_data.cend(); iter++) {
-        if (iter.value()->getType() == mtype)
-        {
-            result.push_back(iter.value());
+    QVector<QSharedPointer<AbstractModel> > lItems;
+
+    for(int r = 0; r < m_pData->rowCount(parent); ++r) {
+        QModelIndex index = m_pData->index(r, 0, parent);
+        if(QSharedPointer<AbstractModel> pModel = m_pData->data(index).value<QSharedPointer<AbstractModel> >()) {
+            lItems.append(pModel);
+        }
+
+        if( m_pData->hasChildren(index) ) {
+            lItems.append(getAllModels(index));
+            return lItems;
         }
     }
-    return result;
 }
 
 //=============================================================================================================
 
-QSharedPointer<AbstractModel> AnalyzeData::getModel(const QString &sName) const
+QVector<QSharedPointer<AbstractModel> > AnalyzeData::getModelsByType(MODEL_TYPE mtype,
+                                                                     QModelIndex parent) const
 {
-    return m_data.value(sName);
-}
+    QVector<QSharedPointer<AbstractModel> > lItems;
 
-//=============================================================================================================
+    for(int r = 0; r < m_pData->rowCount(parent); ++r) {
+        QModelIndex index = m_pData->index(r, 0, parent);
+        if(QSharedPointer<AbstractModel> pModel = m_pData->data(index).value<QSharedPointer<AbstractModel> >()) {
+            if (pModel->getType() == mtype) {
+                lItems.append(pModel);
+            }
+        }
 
-void AnalyzeData::setCurrentlySelectedModel(const QString &sModelPath)
-{
-    // check if model was already loaded:
-    if (QSharedPointer<AbstractModel> temp = getModel(sModelPath)) {
-        emit selectedModelChanged(temp);
-    } else {
-        qDebug() << "[AnalyzeData::setCurrentlySelectedModel] Model does not exist!";
+        if( m_pData->hasChildren(index) ) {
+            lItems.append(getModelsByType(mtype, index));
+            return lItems;
+        }
     }
+}
+
+//=============================================================================================================
+
+QSharedPointer<AbstractModel> AnalyzeData::getModelByName(const QString &sName) const
+{
+    QList<QStandardItem*> lItems = m_pData->findItems(sName, Qt::MatchRecursive);
+
+    if(!lItems.isEmpty()) {
+        return lItems.first()->data().value<QSharedPointer<AbstractModel> >();
+    } else {
+        return Q_NULLPTR;
+    }
+}
+
+//=============================================================================================================
+
+QSharedPointer<AbstractModel> AnalyzeData::getModelByPath(const QString& sPath,
+                                                          QModelIndex parent) const
+{
+    for(int r = 0; r < m_pData->rowCount(parent); ++r) {
+        QModelIndex index = m_pData->index(r, 0, parent);
+        if(QStandardItem* pItem = m_pData->itemFromIndex(index)) {
+            if (pItem->toolTip() == sPath) {
+                if(QSharedPointer<AbstractModel> pModel = pItem->data().value<QSharedPointer<AbstractModel> >()) {
+                    return pModel;
+                }
+            }
+        }
+
+        if(m_pData->hasChildren(index) ) {
+            return getModelByPath(sPath, index);
+        }
+    }
+
+    return Q_NULLPTR;
+}
+
+//=============================================================================================================
+
+QAbstractItemModel* AnalyzeData::getDataModel()
+{
+    return m_pData;
 }
 
 //=============================================================================================================
@@ -121,51 +170,32 @@ QSharedPointer<FiffRawViewModel> AnalyzeData::loadFiffRawViewModel(const QString
         return QSharedPointer<FiffRawViewModel>();
     }
 
-    if (m_data.contains(sPath)) {
+    if(QSharedPointer<AbstractModel> pModel = getModelByPath(sPath)) {
         qDebug() << "[AnalyzeData::loadFiffRawViewModel] Path already exists " << sPath;
-        return qSharedPointerDynamicCast<FiffRawViewModel>(m_data.value(sPath));
+        return qSharedPointerDynamicCast<FiffRawViewModel>(pModel);
     }
 
     QSharedPointer<FiffRawViewModel> pModel = QSharedPointer<FiffRawViewModel>::create(sPath, byteLoadedData);
     pModel->setModelPath(sPath);
 
-    m_data.insert(sPath, pModel);
+    QStandardItem* pItem = new QStandardItem(pModel->getModelName());
+    pItem->setToolTip(pModel->getModelPath());
+
+    QVariant data;
+    data.setValue(pModel);
+    pItem->setData(data);
+    m_pData->appendRow(pItem);
+
     emit newModelAvailable(pModel);
     return pModel;
 }
 
-//=============================================================================================================
+////=============================================================================================================
 
-void AnalyzeData::removeModel(const QString &sModelPath)
-{
-    int numRemovedModels = m_data.remove(sModelPath);
-    if(numRemovedModels > 0) {
-        emit modelRemoved(sModelPath);
-    }
-}
-
-//=============================================================================================================
-
-void AnalyzeData::changeModelPath(const QString &sOldModelPath, const QString &sNewModelPath)
-{
-    QSharedPointer<AbstractModel> pModel = m_data.value(sOldModelPath);
-    if(!pModel.isNull() && !m_data.contains(sNewModelPath)) {
-        m_data.remove(sOldModelPath);
-        m_data.insert(sNewModelPath, pModel);
-        pModel->setModelPath(sNewModelPath);
-        emit modelPathChanged(pModel, sOldModelPath, sNewModelPath);
-    }
-    else {
-        qDebug() << "[AnalyzeData::changeModelPath] Changing model name from " << sOldModelPath <<
-                    " to " << sNewModelPath << " unsuccessful!";
-    }
-}
-
-//=============================================================================================================
-
-QList<QSharedPointer<AbstractModel> > AnalyzeData::getModels() const
-{
-    return m_data.values();
-}
-
-//=============================================================================================================
+//void AnalyzeData::removeModel(const QString &sModelPath)
+//{
+//    int numRemovedModels = m_pData.remove(sModelPath);
+//    if(numRemovedModels > 0) {
+//        emit modelRemoved(sModelPath);
+//    }
+//}

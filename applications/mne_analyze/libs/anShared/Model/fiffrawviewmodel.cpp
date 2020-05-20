@@ -43,6 +43,8 @@
 
 #include "../Utils/metatypes.h"
 
+#include "annotationmodel.h"
+
 #include <fiff/fiff.h>
 
 //=============================================================================================================
@@ -278,14 +280,15 @@ QVariant FiffRawViewModel::data(const QModelIndex &index, int role) const
 bool FiffRawViewModel::saveToFile(const QString& sPath)
 {
 #ifdef WASMBUILD
-    QFileInfo fileInfo (sPath);
+    // In case of WASM the sPath string is empty
+    sPath = getModelName();
     QBuffer* bufferOut = new QBuffer;
 
     if(m_pFiffIO->m_qlistRaw.size() > 0) {
         m_pFiffIO->write_raw(*bufferOut, 0);
 
         // Wee need to call the QFileDialog here instead of the data load plugin since we need access to the QByteArray
-        QFileDialog::saveFileContent(bufferOut->data(), fileInfo.fileName());
+        QFileDialog::saveFileContent(bufferOut->data(), sPath);
 
         return true;
     }
