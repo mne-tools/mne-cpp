@@ -146,7 +146,7 @@ QSharedPointer<AbstractModel> AnalyzeData::getModelByPath(const QString& sPath,
             }
         }
 
-        if(m_pData->hasChildren(index) ) {
+        if(m_pData->hasChildren(index)) {
             return getModelByPath(sPath, index);
         }
     }
@@ -179,16 +179,22 @@ QSharedPointer<FiffRawViewModel> AnalyzeData::loadFiffRawViewModel(const QString
     QSharedPointer<FiffRawViewModel> pModel = QSharedPointer<FiffRawViewModel>::create(sPath, byteLoadedData);
     pModel->setModelPath(sPath);
 
-    QStandardItem* pItem = new QStandardItem(pModel->getModelName());
-    pItem->setToolTip(pModel->getModelPath());
+    if(pModel->isInit()) {
+        QStandardItem* pItem = new QStandardItem(pModel->getModelName());
+        pItem->setEditable(false);
+        pItem->setDragEnabled(true);
+        pItem->setToolTip(pModel->getModelPath());
 
-    QVariant data;
-    data.setValue(pModel);
-    pItem->setData(data);
-    m_pData->appendRow(pItem);
+        QVariant data;
+        data.setValue(pModel);
+        pItem->setData(data);
+        m_pData->appendRow(pItem);
 
-    emit newModelAvailable(pModel);
-    return pModel;
+        emit newModelAvailable(pModel);
+        return pModel;
+    } else {
+        return Q_NULLPTR;
+    }
 }
 
 //=============================================================================================================

@@ -69,9 +69,7 @@ using namespace ANSHAREDLIB;
 RawDataViewer::RawDataViewer()
 : m_iVisibleBlocks(10)
 , m_iBufferBlocks(10)
-, m_pFiffRawView(Q_NULLPTR)
 , m_pRawDelegate(QSharedPointer<FiffRawViewDelegate>::create())
-, m_bDisplayCreated(false)
 {
 }
 
@@ -100,10 +98,6 @@ void RawDataViewer::init()
     m_pFiffRawView->setMinimumSize(256, 256);
     m_pFiffRawView->setFocusPolicy(Qt::TabFocus);
     m_pFiffRawView->setAttribute(Qt::WA_DeleteOnClose, false);
-
-    // remember that the display was built
-    m_bDisplayCreated = true;
-
 }
 
 //=============================================================================================================
@@ -116,6 +110,7 @@ void RawDataViewer::onModelChanged(QSharedPointer<AbstractModel> pNewModel)
                 return;
             }
         }
+        qDebug() << "RawDataViewer::onModelChanged";
 
         m_pRawModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
         m_pFiffRawView->initMVCSettings(m_pRawModel, m_pRawDelegate);

@@ -103,7 +103,6 @@ win32:!contains(MNECPP_CONFIG, static) {
     QMAKE_POST_LINK += $${DEPLOY_CMD}
 }
 unix:!macx {
-    # Unix
     QMAKE_RPATHDIR += $ORIGIN/../lib
 }
 

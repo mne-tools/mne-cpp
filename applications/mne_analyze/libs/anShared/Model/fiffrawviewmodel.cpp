@@ -115,8 +115,6 @@ FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
     initFiffData(m_file);
 
     updateEndStartFlags();
-
-    //m_pAnnotationModel = QSharedPointer<AnnotationModel>(new AnnotationModel(this));
 }
 
 //=============================================================================================================
@@ -155,8 +153,6 @@ FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
 
     initFiffData(m_buffer);
     updateEndStartFlags();
-
-    //m_pAnnotationModel = QSharedPointer<AnnotationModel>(new AnnotationModel(this));
 }
 
 //=============================================================================================================
@@ -280,15 +276,13 @@ QVariant FiffRawViewModel::data(const QModelIndex &index, int role) const
 bool FiffRawViewModel::saveToFile(const QString& sPath)
 {
 #ifdef WASMBUILD
-    // In case of WASM the sPath string is empty
-    sPath = getModelName();
     QBuffer* bufferOut = new QBuffer;
 
     if(m_pFiffIO->m_qlistRaw.size() > 0) {
         m_pFiffIO->write_raw(*bufferOut, 0);
 
         // Wee need to call the QFileDialog here instead of the data load plugin since we need access to the QByteArray
-        QFileDialog::saveFileContent(bufferOut->data(), sPath);
+        QFileDialog::saveFileContent(bufferOut->data(), getModelName());
 
         return true;
     }

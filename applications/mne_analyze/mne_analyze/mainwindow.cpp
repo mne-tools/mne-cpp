@@ -184,6 +184,11 @@ void MainWindow::createLogDockWindow()
     //Log TextBrowser
     QDockWidget* pDockWidget_Log = new QDockWidget(tr("Log"), this);
 
+    // Disable floating and editable dock widgets, since the wasm QDockWidget version is buggy
+    #ifdef WASMBUILD
+    pDockWidget_Log->setFeatures(QDockWidget::DockWidgetClosable);
+    #endif
+
     m_pTextBrowser_Log = new QTextBrowser(pDockWidget_Log);
 
     pDockWidget_Log->setWidget(m_pTextBrowser_Log);
@@ -247,6 +252,7 @@ void MainWindow::createPluginControls(QSharedPointer<ANSHAREDLIB::PluginManager>
     //Add Plugin controls to the MainWindow
     for(IPlugin* pPlugin : pPluginManager->getPlugins()) {
         QDockWidget* pControl = pPlugin->getControl();
+
         if(pControl) {
             addDockWidget(Qt::LeftDockWidgetArea, pControl);
             qInfo() << "[MainWindow::createPluginControls] Found and added dock widget for " << pPlugin->getName();
@@ -254,6 +260,11 @@ void MainWindow::createPluginControls(QSharedPointer<ANSHAREDLIB::PluginManager>
             pAction->setText(pPlugin->getName()+" Controls");
             m_pMenuView->addAction(pAction);
             qInfo() << "[MainWindow::createPluginControls] Added" << pPlugin->getName() << "controls to View menu";
+
+            // Disable floating and editable dock widgets, since the wasm QDockWidget version is buggy
+            #ifdef WASMBUILD
+            pControl->setFeatures(QDockWidget::DockWidgetClosable);
+            #endif
         }
     }
 
@@ -308,7 +319,12 @@ void MainWindow::tabifyDockWindows()
     QVector<QDockWidget*> topArea, leftArea, rightArea, bottomArea;
     QVector<QVector<QDockWidget*>*> dockAreas{&topArea, &leftArea, &rightArea, &bottomArea};
 
-    for (QDockWidget* pDockWidget : docks) {
+    for (QDockWidget* pDockWidget : docks) {        
+        // Disable floating and editable dock widgets, since the wasm QDockWidget version is buggy
+        #ifdef WASMBUILD
+        pDockWidget->setFeatures(QDockWidget::DockWidgetClosable);
+        #endif
+
         // default with left area
         Qt::DockWidgetArea area = Qt::LeftDockWidgetArea;
         switch (dockWidgetArea(pDockWidget))
