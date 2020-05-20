@@ -92,6 +92,9 @@ void DataManager::init()
 
     connect(m_pDataManagerView.data(), &DataManagerView::selectedModelChanged,
             this, &DataManager::onCurrentlySelectedModelChanged);
+
+    connect(m_pDataManagerView.data(), &DataManagerView::removeItem,
+            this, &DataManager::onRemoveItem);
 }
 
 //=============================================================================================================
@@ -119,7 +122,7 @@ QMenu *DataManager::getMenu()
 QDockWidget *DataManager::getControl()
 {
     if(!m_pControlDock) {
-        m_pControlDock = new QDockWidget(tr("Data"));
+        m_pControlDock = new QDockWidget(getName());
         m_pControlDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
         m_pControlDock->setWidget(m_pDataManagerView);
     }
@@ -158,4 +161,11 @@ QVector<EVENT_TYPE> DataManager::getEventSubscriptions(void) const
 void DataManager::onCurrentlySelectedModelChanged(const QVariant& data)
 {
     m_pCommu->publishEvent(EVENT_TYPE::SELECTED_MODEL_CHANGED, data);
+}
+
+//=============================================================================================================
+
+void DataManager::onRemoveItem(const QModelIndex& index)
+{
+    m_pAnalyzeData->removeModel(index);
 }

@@ -134,7 +134,7 @@ public:
      *
      * @return                       Pointer to the model
      */
-    QSharedPointer<AbstractModel> getModelByName(const QString &sNamet) const;
+    QSharedPointer<AbstractModel> getModelByName(const QString &sName) const;
 
     //=========================================================================================================
     /**
@@ -153,7 +153,7 @@ public:
     /**
      * Returns the QStandardItemModel holding all the data
      */
-    QAbstractItemModel* getDataModel();
+    QStandardItemModel* getDataModel();
 
     //=========================================================================================================
     /**
@@ -189,6 +189,8 @@ public:
             if(temp->isInit()) {
                 // add to record, and tell others about the new model
                 QStandardItem* pItem = new QStandardItem(temp->getModelName());
+                pItem->setEditable(false);
+                pItem->setDragEnabled(true);
                 pItem->setToolTip(temp->getModelPath());
 
                 QVariant data;
@@ -204,13 +206,13 @@ public:
         }
     }
 
-//    //=========================================================================================================
-//    /**
-//     * Removes model stored under the given path.
-//     *
-//     * @param[in] sModelPath     The model path.
-//     */
-//    void removeModel(const QString &sModelPath);
+    //=========================================================================================================
+    /**
+     * Removes model stored under the given index.
+     *
+     * @param[in] index     The index to the item to be deleted.
+     */
+    void removeModel(const QModelIndex &index);
 
 private:
     QPointer<QStandardItemModel>            m_pData;         /**< The loaded models in form of a QStandardItemModel. */
