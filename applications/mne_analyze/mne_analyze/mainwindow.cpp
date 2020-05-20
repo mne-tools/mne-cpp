@@ -120,7 +120,8 @@ MainWindow::~MainWindow()
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     //Save GUI gemoetry and state;
-    saveSettings();
+    m_pMultiView->saveSettings();
+    this->saveSettings();
 
     emit mainWindowClosed();
 
@@ -300,7 +301,6 @@ void MainWindow::createPluginViews(QSharedPointer<PluginManager> pPluginManager)
 
             if(sCurPluginName == "RawDataViewer") {
                 pWindow = m_pMultiView->addWidgetBottom(pView, sCurPluginName);
-                pView->setObjectName("RawDataViewer");
             } else {
                 pWindow = m_pMultiView->addWidgetTop(pView, sCurPluginName);
             }
@@ -312,6 +312,7 @@ void MainWindow::createPluginViews(QSharedPointer<PluginManager> pPluginManager)
             qInfo() << "[MainWindow::createPluginViews] Found and added subwindow for " << pPlugin->getName();
         }
     }
+    m_pMultiView->restoreSettings();
 }
 
 //=============================================================================================================

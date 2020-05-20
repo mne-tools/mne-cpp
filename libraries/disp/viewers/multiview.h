@@ -115,6 +115,18 @@ public:
     MultiViewWindow* addWidgetBottom(QWidget* pWidget,
                                      const QString& sName);
 
+    //=========================================================================================================
+    /**
+     * Saves geometry and state of GUI dock widgets that have given a name with setObjectName()
+     */
+    void saveSettings();
+
+    //=========================================================================================================
+    /**
+     * Restores geometry and state as saved by saveSettings()
+     */
+    void restoreSettings();
+
 private:
     QList<MultiViewWindow *> m_lDockWidgets;
 
