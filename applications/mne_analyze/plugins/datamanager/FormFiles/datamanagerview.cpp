@@ -102,9 +102,9 @@ void DataManagerView::onCurrentItemChanged(const QItemSelection &selected,
                                            const QItemSelection &deselected)
 {
     Q_UNUSED(deselected)
-    if(QStandardItemModel *pModel = qobject_cast<QStandardItemModel *>(m_pUi->m_pTreeView->model())) {
-        if(pModel->checkIndex(selected.indexes().first())) {
-            emit selectedModelChanged(pModel->itemFromIndex(selected.indexes().front())->data());
+    if(QStandardItemModel *pModel = qobject_cast<QStandardItemModel *>(m_pUi->m_pTreeView->model())) {        
+        if(QStandardItem* pItem = pModel->itemFromIndex(selected.indexes().first())) {
+            emit selectedModelChanged(pItem->data());
         }
     }
 }

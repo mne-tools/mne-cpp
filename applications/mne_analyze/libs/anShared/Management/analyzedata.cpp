@@ -195,8 +195,8 @@ QSharedPointer<FiffRawViewModel> AnalyzeData::loadFiffRawViewModel(const QString
 
 void AnalyzeData::removeModel(const QModelIndex& index)
 {
-    if(m_pData->checkIndex(index)) {
-        QString sModelPath = m_pData->itemFromIndex(index)->toolTip();
+    if(QStandardItem* pItem = m_pData->itemFromIndex(index)) {
+        QString sModelPath = pItem->toolTip();
         QFileInfo info (sModelPath);
 
         QMessageBox msgBox;
