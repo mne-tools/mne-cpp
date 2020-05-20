@@ -95,7 +95,7 @@ SOURCES += \
     plots/helpers/colormap.cpp \
     viewers/filterdesignview.cpp \
     viewers/averagelayoutview.cpp \
-    viewers/rtfwdsettingsview.cpp \
+    viewers/fwdsettingsview.cpp \
     viewers/spectrumview.cpp \
     viewers/modalityselectionview.cpp \
     viewers/butterflyview.cpp \
@@ -145,7 +145,7 @@ HEADERS += \
     plots/helpers/colormap.h \
     viewers/filterdesignview.h \
     viewers/averagelayoutview.h \
-    viewers/rtfwdsettingsview.h \
+    viewers/fwdsettingsview.h \
     viewers/spectrumview.h \
     viewers/modalityselectionview.h \
     viewers/butterflyview.h \
@@ -201,7 +201,7 @@ qtHaveModule(charts) {
 FORMS += \
     viewers/formfiles/filterdesignview.ui \
     viewers/formfiles/channelselectionview.ui \
-    viewers/formfiles/rtfwdsettingsview.ui \
+    viewers/formfiles/fwdsettingsview.ui \
     viewers/formfiles/spharasettingsview.ui \
     viewers/formfiles/fiffrawviewsettings.ui \
     viewers/formfiles/triggerdetectionview.ui \

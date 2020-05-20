@@ -38,7 +38,7 @@
 
 #include "rtfwd.h"
 
-#include <disp/viewers/rtfwdsettingsview.h>
+#include <disp/viewers/fwdsettingsview.h>
 
 #include <fwd/computeFwd/compute_fwd.h>
 #include <fwd/computeFwd/compute_fwd_settings.h>
@@ -305,28 +305,28 @@ void RtFwd::initPluginControlWidgets()
     if(bFiffInfo) {
         QList<QWidget*> plControlWidgets;
 
-        RtFwdSettingsView* pRtFwdSettingsView = new RtFwdSettingsView(QString("MNESCAN/%1/").arg(this->getName()));
-        pRtFwdSettingsView->setObjectName("widget_");
+        FwdSettingsView* pFwdSettingsView = new FwdSettingsView(QString("MNESCAN/%1/").arg(this->getName()));
+        pFwdSettingsView->setObjectName("widget_");
 
         // connect incoming signals
-        connect(pRtFwdSettingsView, &RtFwdSettingsView::recompStatusChanged,
+        connect(pFwdSettingsView, &FwdSettingsView::recompStatusChanged,
                 this, &RtFwd::onRecompStatusChanged);
-        connect(pRtFwdSettingsView, &RtFwdSettingsView::clusteringStatusChanged,
+        connect(pFwdSettingsView, &FwdSettingsView::clusteringStatusChanged,
                 this, &RtFwd::onClusteringStatusChanged);
-        connect(pRtFwdSettingsView, &RtFwdSettingsView::atlasDirChanged,
+        connect(pFwdSettingsView, &FwdSettingsView::atlasDirChanged,
                 this, &RtFwd::onAtlasDirChanged);
-        connect(pRtFwdSettingsView, &RtFwdSettingsView::doForwardComputation,
+        connect(pFwdSettingsView, &FwdSettingsView::doForwardComputation,
                 this, &RtFwd::onDoForwardComputation);
 
         // connect outgoing signals
         connect(this, &RtFwd::statusInformationChanged,
-                pRtFwdSettingsView, &RtFwdSettingsView::setRecomputationStatus, Qt::BlockingQueuedConnection);
+                pFwdSettingsView, &FwdSettingsView::setRecomputationStatus, Qt::BlockingQueuedConnection);
         connect(this, &RtFwd::fwdSolutionAvailable,
-                pRtFwdSettingsView, &RtFwdSettingsView::setSolutionInformation, Qt::BlockingQueuedConnection);
+                pFwdSettingsView, &FwdSettingsView::setSolutionInformation, Qt::BlockingQueuedConnection);
         connect(this, &RtFwd::clusteringAvailable,
-                pRtFwdSettingsView, &RtFwdSettingsView::setClusteredInformation, Qt::BlockingQueuedConnection);
+                pFwdSettingsView, &FwdSettingsView::setClusteredInformation, Qt::BlockingQueuedConnection);
 
-        plControlWidgets.append(pRtFwdSettingsView);
+        plControlWidgets.append(pFwdSettingsView);
 
         emit pluginControlWidgetsChanged(plControlWidgets, this->getName());
 
