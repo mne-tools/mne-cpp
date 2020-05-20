@@ -80,8 +80,6 @@ contains(MNECPP_CONFIG, static) {
             -ldatamanager \
             -lrawdataviewer \
             -lannotationmanager \
-} else {
-    CONFIG += shared
 }
 
 LIBS += -L$${MNE_LIBRARY_DIR}
@@ -123,7 +121,6 @@ FORMS += \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
-INCLUDEPATH += $${CNTK_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_ANALYZE_INCLUDE_DIR}
 
 unix:!macx {

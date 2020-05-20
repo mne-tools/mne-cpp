@@ -82,6 +82,12 @@ MultiViewWindow* MultiView::addWidgetTop(QWidget* pWidget,
     MultiViewWindow* pDockWidget = new MultiViewWindow();
     pDockWidget->setWindowTitle(sName);
     pDockWidget->setWidget(pWidget);
+
+    // Disable floating and editable dock widgets, since the wasm QDockWidget version is buggy
+    #ifdef WASMBUILD
+    pDockWidget->setFeatures(QDockWidget::DockWidgetClosable);
+    #endif
+
     pWidget->layout()->setContentsMargins(0,0,0,0);
     pDockWidget->layout()->setContentsMargins(0,0,0,0);
 
@@ -102,6 +108,12 @@ MultiViewWindow* MultiView::addWidgetBottom(QWidget* pWidget,
     MultiViewWindow* pDockWidget = new MultiViewWindow();
     pDockWidget->setWindowTitle(sName);
     pDockWidget->setWidget(pWidget);
+
+    // Disable floating and editable dock widgets, since the wasm QDockWidget version is buggy
+    #ifdef WASMBUILD
+    pDockWidget->setFeatures(QDockWidget::DockWidgetClosable);
+    #endif
+
     pWidget->layout()->setContentsMargins(0,0,0,0);
     pDockWidget->layout()->setContentsMargins(0,0,0,0);
 

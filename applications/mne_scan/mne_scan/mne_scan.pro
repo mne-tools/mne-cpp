@@ -102,8 +102,6 @@ contains(MNECPP_CONFIG, static) {
         LIBS += -lbrainflowboard
         DEFINES += WITHBRAINFLOW
     }
-} else {
-    CONFIG += shared
 }
 
 LIBS += -L$${MNE_LIBRARY_DIR}

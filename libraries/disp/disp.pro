@@ -52,6 +52,10 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
+contains(MNECPP_CONFIG, wasm) {
+    DEFINES += WASMBUILD
+}
+
 contains(MNECPP_CONFIG, noOpenGL) {
     DEFINES += NO_OPENGL
     QT -= opengl
