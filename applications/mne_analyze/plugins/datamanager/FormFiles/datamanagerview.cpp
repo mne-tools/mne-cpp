@@ -45,7 +45,9 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QListWidgetItem>
+#include <QTreeView>
+#include <QStandardItemModel>
+#include <QDebug>
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -53,48 +55,37 @@
 
 DataManagerView::DataManagerView(QWidget *parent)
 : QWidget(parent)
-, ui(new Ui::DataManagerView)
+, m_pUi(new Ui::DataManagerView)
 {
-    ui->setupUi(this);
-
-//    connect(ui->m_pTreeView, &QTreeView::currentItemChanged,
-//            this, &DataManagerView::onCurrentItemChanged);
+    m_pUi->setupUi(this);
 }
 
 //=============================================================================================================
 
 DataManagerView::~DataManagerView()
 {
-    delete ui;
+    delete m_pUi;
 }
 
 //=============================================================================================================
 
-void DataManagerView::addListItem(QListWidgetItem *pNewItem)
+void DataManagerView::setModel(QAbstractItemModel *pModel)
 {
-//    ui->m_qListWidget->addItem(pNewItem);
+    m_pUi->m_pTreeView->setModel(pModel);
 
-    // Always set the last added item as the current one. This will also trigger the currently selected model signal.
-//    ui->m_qListWidget->setCurrentItem(ui->m_qListWidget->item(ui->m_qListWidget->count()-1));
+    connect(m_pUi->m_pTreeView->selectionModel(), &QItemSelectionModel::selectionChanged,
+            this, &DataManagerView::onCurrentItemChanged);
 }
 
 //=============================================================================================================
 
-void DataManagerView::clearList()
+void DataManagerView::onCurrentItemChanged(const QItemSelection &selected,
+                                           const QItemSelection &deselected)
 {
-//    ui->m_qListWidget->clear();
-}
-
-//=============================================================================================================
-
-void DataManagerView::onCurrentItemChanged(QListWidgetItem *current,
-                                           QListWidgetItem *previous)
-{
-    Q_UNUSED(previous)
-    // The full model path is stored in the tooltip instead of the text
-    if(current) {
-        emit currentlySelectedModelChanged(current->toolTip());
+    Q_UNUSED(deselected)
+    if(QStandardItemModel *pModel = qobject_cast<QStandardItemModel *>(m_pUi->m_pTreeView->model())) {
+        if(pModel->checkIndex(selected.indexes().first())) {
+            emit selectedModelChanged(pModel->itemFromIndex(selected.indexes().front())->data());
+        }
     }
 }
-
-//=============================================================================================================

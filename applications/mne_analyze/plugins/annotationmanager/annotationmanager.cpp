@@ -84,9 +84,6 @@ QSharedPointer<IPlugin> AnnotationManager::clone() const
 void AnnotationManager::init()
 {
     m_pCommu = new Communicator(this);
-
-    connect(m_pAnalyzeData.data(), &AnalyzeData::selectedModelChanged,
-            this, &AnnotationManager::onModelChanged);
 }
 
 //=============================================================================================================
@@ -159,12 +156,15 @@ QWidget *AnnotationManager::getView()
 void AnnotationManager::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
-    case EVENT_TYPE::NEW_ANNOTATION_ADDED:
-        emit newAnnotationAvailable(e->getData().toInt());
-        onTriggerRedraw();
-        break;
-    default:
-        qWarning() << "[AnnotationManager::handleEvent] Received an Event that is not handled by switch cases.";
+        case EVENT_TYPE::NEW_ANNOTATION_ADDED:
+            emit newAnnotationAvailable(e->getData().toInt());
+            onTriggerRedraw();
+            break;
+        case EVENT_TYPE::SELECTED_MODEL_CHANGED:
+            onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
+            break;
+        default:
+            qWarning() << "[AnnotationManager::handleEvent] Received an Event that is not handled by switch cases.";
     }
 }
 
@@ -174,6 +174,7 @@ QVector<EVENT_TYPE> AnnotationManager::getEventSubscriptions(void) const
 {
     QVector<EVENT_TYPE> temp;
     temp.push_back(NEW_ANNOTATION_ADDED);
+    temp.push_back(SELECTED_MODEL_CHANGED);
 
     return temp;
 }
@@ -192,6 +193,7 @@ void AnnotationManager::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel
         emit disconnectFromModel();
         m_pFiffRawModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
         m_pAnnotationModel = m_pFiffRawModel->getAnnotationModel();
+
         emit newAnnotationModelAvailable(m_pAnnotationModel);
         emit newFiffParamsAvailable(m_pFiffRawModel->absoluteFirstSample(),
                                     m_pFiffRawModel->absoluteLastSample(),

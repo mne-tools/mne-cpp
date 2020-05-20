@@ -59,6 +59,7 @@
 
 namespace ANSHAREDLIB {
     class Communicator;
+    class FiffRawViewModel;
 }
 
 //=============================================================================================================
@@ -71,8 +72,6 @@ namespace ANNOTATIONMANAGERPLUGIN
 //=============================================================================================================
 // ANNOTATIONMANAGERPLUGIN FORWARD DECLARATIONS
 //=============================================================================================================
-
-class annotationmanagerControl;
 
 //=============================================================================================================
 /**
@@ -136,6 +135,10 @@ private:
      */
     void onTriggerRedraw();
 
+    //=============================================================================================================
+    /**
+     * Publishes event to force FiffRawView to jump to selected annoation
+     */
     void onJumpToSelected();
 
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals */

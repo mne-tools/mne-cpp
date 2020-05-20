@@ -41,7 +41,17 @@
 // INCLUDES
 //=============================================================================================================
 
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
 #include <QWidget>
+#include <QAbstractItemModel>
+#include <QItemSelectionModel>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -51,7 +61,9 @@ namespace Ui {
     class DataManagerView;
 }
 
-class QListWidgetItem;
+namespace ANSHARED {
+    class AbstractModel;
+}
 
 //=============================================================================================================
 /**
@@ -80,26 +92,20 @@ public:
 
     //=========================================================================================================
     /**
-     * Removes all entries from the QListWidget.
+     * Sets the model to the tree view.
      *
-     * @param[in] pNewItem       The new item.
+     * @param[in] pModel       The new model.
      */
-    void addListItem(QListWidgetItem* pNewItem);
-
-    //=========================================================================================================
-    /**
-     * Removes all entries from the QListWidget.
-     */
-    void clearList();
+    void setModel(QAbstractItemModel *pModel);
 
 private:
-    void onCurrentItemChanged(QListWidgetItem *current,
-                              QListWidgetItem *previous);
+    void onCurrentItemChanged(const QItemSelection &selected,
+                              const QItemSelection &deselected);
 
-    Ui::DataManagerView *ui;   /**< The user interface */
+    Ui::DataManagerView *m_pUi;   /**< The user interface */
 
 signals:
-    void currentlySelectedModelChanged(const QString& sCurrentModelPath);
+    void selectedModelChanged(const QVariant& data);
 };
 
 #endif // DATAMANAGERVIEW_H
