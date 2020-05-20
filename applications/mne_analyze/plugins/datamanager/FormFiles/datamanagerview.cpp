@@ -48,6 +48,7 @@
 #include <QTreeView>
 #include <QStandardItemModel>
 #include <QDebug>
+#include <QMenu>
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -58,6 +59,9 @@ DataManagerView::DataManagerView(QWidget *parent)
 , m_pUi(new Ui::DataManagerView)
 {
     m_pUi->setupUi(this);
+    m_pUi->m_pTreeView->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(m_pUi->m_pTreeView, &QTreeView::customContextMenuRequested,
+            this, &DataManagerView::customMenuRequested);
 }
 
 //=============================================================================================================
@@ -75,6 +79,21 @@ void DataManagerView::setModel(QAbstractItemModel *pModel)
 
     connect(m_pUi->m_pTreeView->selectionModel(), &QItemSelectionModel::selectionChanged,
             this, &DataManagerView::onCurrentItemChanged);
+}
+
+//=============================================================================================================
+
+void DataManagerView::customMenuRequested(QPoint pos)
+{
+    QMenu *menu = new QMenu(this);
+
+    QAction* pAction = new QAction("Remove", this);
+    connect(pAction, &QAction::triggered, [=]() {
+        emit removeItem(m_pUi->m_pTreeView->indexAt(pos));
+    });
+
+    menu->addAction(pAction);
+    menu->popup(m_pUi->m_pTreeView->viewport()->mapToGlobal(pos));
 }
 
 //=============================================================================================================

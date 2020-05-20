@@ -116,6 +116,8 @@ private:
      */
     void onCurrentlySelectedModelChanged(const QVariant& data);
 
+    void onRemoveItem(const QModelIndex &index);
+
     QPointer<QDockWidget>               m_pControlDock;         /**< Control Widget */
     QPointer<DataManagerView>           m_pDataManagerView;
     QPointer<ANSHAREDLIB::Communicator> m_pCommu;
