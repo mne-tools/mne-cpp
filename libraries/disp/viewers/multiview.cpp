@@ -80,7 +80,7 @@ MultiView::~MultiView()
 MultiViewWindow* MultiView::addWidgetTop(QWidget* pWidget,
                                          const QString& sName)
 {
-    MultiViewWindow* pDockWidget = new MultiViewWindow();
+    MultiViewWindow* pDockWidget = new MultiViewWindow(this);
     pDockWidget->setObjectName(sName);
     pDockWidget->setWindowTitle(sName);
     pDockWidget->setWidget(pWidget);
@@ -107,7 +107,7 @@ MultiViewWindow* MultiView::addWidgetTop(QWidget* pWidget,
 MultiViewWindow* MultiView::addWidgetBottom(QWidget* pWidget,
                                             const QString& sName)
 {
-    MultiViewWindow* pDockWidget = new MultiViewWindow();
+    MultiViewWindow* pDockWidget = new MultiViewWindow(this);
     pDockWidget->setObjectName(sName);
     pDockWidget->setWindowTitle(sName);
     pDockWidget->setWidget(pWidget);

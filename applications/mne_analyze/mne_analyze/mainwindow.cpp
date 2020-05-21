@@ -99,9 +99,10 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager
 
     this->setStatusBar(new StatusBar());
 
+    //Load application icon for linux builds only, mac and win executables have built in icons from .pro file
 #ifdef __linux__
     qInfo() << "Loading icon...";
-    QMainWindow::setWindowIcon(QIcon("../applications/mne_analyze/mne_analyze/resources/images/appIcons/icon_mne-analyze_256x256.png"));
+    QMainWindow::setWindowIcon(QIcon(":/images/appIcons/icon_mne-analyze_256x256.png"));
 #endif
 
     //Load saved GUI geometry and state
