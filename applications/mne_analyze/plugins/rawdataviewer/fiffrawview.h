@@ -110,10 +110,31 @@ public:
 
     //=========================================================================================================
     /**
-     * Setup the model view controller.
+     * Returns the currently set delegate
      */
-    void initMVCSettings(const QSharedPointer<ANSHAREDLIB::FiffRawViewModel> &pModel,
-                         const QSharedPointer<FiffRawViewDelegate>& pDelegate);
+    QSharedPointer<FiffRawViewDelegate> getDelegate();
+
+    //=========================================================================================================
+    /**
+     * Setups the delegate of this view.
+     *
+     * @param [in] pDelegate    The new delegate.
+     */
+    void setDelegate(const QSharedPointer<FiffRawViewDelegate>& pDelegate);
+
+    //=========================================================================================================
+    /**
+     * Returns the currently set model
+     */
+    QSharedPointer<ANSHAREDLIB::FiffRawViewModel> getModel();
+
+    //=========================================================================================================
+    /**
+     * Setups the model of this view.
+     *
+     * @param [in] pModel    The new model.
+     */
+    void setModel(const QSharedPointer<ANSHAREDLIB::FiffRawViewModel>& pModel);
 
     //=========================================================================================================
     /**
