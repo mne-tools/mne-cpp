@@ -7,7 +7,45 @@ nav_order: 1
 
 # Changelog
 
-## Version 0.1.1
+## Version 0.1.2 - 2020/05/21
+
+### Applications
+
+MNE Analyze:
+* Fix application icon on Linux
+* Add timing labels below the signal viewer
+* Fix deployment of internal MNE Analyze libraries on Windows
+* Change list data model to child/parent item data model in AnalyzeData
+* Rename AnnotationView to AnnotationSettingsView
+* Update splashcreen to show full application name
+* Refactor RawDataViewer plugin. The controls are no longer destroyed when a different file is selected. This led to some visible glitches when switching between files.
+* Do not allow  floating or movable dock widgets in the WASM version. The QDockWidget behavior is a bit buggy in the current Qt WASM versions. 
+* Use QOpenGlWidget instead of QOGLWidget. The latter is marked as deprecated.
+
+MNE Scan:
+* Fix application icon on Linux 
+* Fix deployment of internal MNE Scan libraries on Windows 
+* Fix bug when receiving evoked data in source localization plugin 
+* Update splashcreen to show full application name 
+		
+### API libraries
+
+Inverse:
+* Fix bug in versioning 
+	
+### Documentation
+* Minor improvements and typo fixes
+
+### Authors
+
+People who contributed to this release (preceded by number of commits):
+
+(42) Lorenz Esch,
+(5) Juan Garcia-Prieto,
+(2) Gabriel Motta,
+(1) Ruben Dörfel
+
+## Version 0.1.1 - 2020/05/14
 
 ### Applications
 
@@ -59,7 +97,7 @@ People who contributed to this release (preceded by number of commits):
 (7) Gabriel Motta,
 (2) Ruben Dörfel,
 
-## Version 0.1.0
+## Version 0.1.0 - 2020/05/04
 
 ### Changes
 
