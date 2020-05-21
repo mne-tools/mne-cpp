@@ -68,7 +68,6 @@ using namespace FIFFLIB;
 //=============================================================================================================
 
 ScalingView::ScalingView(const QString& sSettingsPath,
-                         const QList<FIFFLIB::FiffChInfo>& lChannelList,
                          QWidget *parent,
                          Qt::WindowFlags f)
 : QWidget(parent, f)
@@ -80,28 +79,6 @@ ScalingView::ScalingView(const QString& sSettingsPath,
     this->setWindowTitle("Scaling");
     this->setMinimumWidth(330);
     this->setMaximumWidth(330);
-
-    // Specify which channel types are needed
-    for(int i = 0; i < lChannelList.size(); ++i) {
-        if(lChannelList.at(i).unit == FIFF_UNIT_T && !m_lChannelTypeList.contains("MAG")) {
-            m_lChannelTypeList << "MAG";
-        }
-        if(lChannelList.at(i).unit == FIFF_UNIT_T_M && !m_lChannelTypeList.contains("GRAD")) {
-            m_lChannelTypeList << "GRAD";
-        }
-        if(lChannelList.at(i).kind == FIFFV_EEG_CH && !m_lChannelTypeList.contains("EEG")) {
-            m_lChannelTypeList << "EEG";
-        }
-        if(lChannelList.at(i).kind == FIFFV_EOG_CH && !m_lChannelTypeList.contains("EOG")) {
-            m_lChannelTypeList << "EOG";
-        }
-        if(lChannelList.at(i).kind == FIFFV_STIM_CH && !m_lChannelTypeList.contains("STIM")) {
-            m_lChannelTypeList << "STIM";
-        }
-        if(lChannelList.at(i).kind == FIFFV_MISC_CH && !m_lChannelTypeList.contains("MISC")) {
-            m_lChannelTypeList << "MISC";
-        }
-    }
 
     loadSettings(m_sSettingsPath);
     redrawGUI();

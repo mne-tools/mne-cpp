@@ -41,8 +41,6 @@
 
 #include "../disp_global.h"
 
-#include <fiff/fiff_ch_info.h>
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -97,7 +95,6 @@ public:
      * @param [in] parent        parent of widget
      */
     ScalingView(const QString& sSettingsPath = "",
-                const QList<FIFFLIB::FiffChInfo> &lChannelList = QList<FIFFLIB::FiffChInfo>(),
                 QWidget *parent = 0,
                 Qt::WindowFlags f = Qt::Widget);
 
@@ -159,8 +156,6 @@ protected:
     QMap<qint32, float>                 m_qMapChScaling;                /**< Channel scaling values. */
     QMap<qint32, QDoubleSpinBox*>       m_qMapScalingDoubleSpinBox;     /**< Map of types and channel scaling line edits. */
     QMap<qint32, QSlider*>              m_qMapScalingSlider;            /**< Map of types and channel scaling line edits. */
-
-    QStringList                         m_lChannelTypeList;             /**< Channel type list. */
 
     QString                             m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
 
