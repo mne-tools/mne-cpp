@@ -131,9 +131,10 @@ public:
 
     //=========================================================================================================
 signals:
-    void readingMeasurementDateInId(QDateTime d);
-    void readingMeasurementDateInFile(QDateTime d);
+    void readingIdMeasurementDate(QDateTime d);
+    void readingFileMeasurementDate(QDateTime d);
     void readingFileComment(QString s);
+    void readingFileExperimenter(QString e);
     void readingSubjectId(int i);
     void readingSubjectFirstName(QString fn);
     void readingSubjectMiddleName(QString mn);
@@ -222,6 +223,14 @@ public slots:
 
     //=========================================================================================================
     /**
+     * If found in the fiff file, the specified number of days will be subtracted from the measurement date information contained in each fif file.
+     *
+     * @param [in] iMeasDayOffset   Integer with the number of dates to subtract from the measurement date.
+     */
+    void setUseMeasurementDateOffset(bool);
+
+    //=========================================================================================================
+    /**
      * If found in the fiff file, subject's birthday information will be overwritten in the file in order to match the date specified with this function.
      *
      * @param [in] sSubjBirthday String containing the desired subject birthday date.
@@ -243,6 +252,14 @@ public slots:
      * @param [in] iSubjBirthdayOffset  Integer with the number of dates to subtract from the subject's birthday date.
      */
     void setSubjectBirthdayOffset(int iSubjBirthdayOffset);
+
+    //=========================================================================================================
+    /**
+     * If found in the fiff file, the specified number of days will be subtracted from the subject's birthday date information contained in each fif file.
+     *
+     * @param [in] iSubjBirthdayOffset  Integer with the number of dates to subtract from the subject's birthday date.
+     */
+    void setUseSubjectBirthdayOffset(bool);
 
     //=========================================================================================================
     /**
