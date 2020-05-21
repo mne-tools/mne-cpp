@@ -102,11 +102,12 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager
     //Load application icon for linux builds only, mac and win executables have built in icons from .pro file
 #ifdef __linux__
     qInfo() << "Loading icon...";
-    QMainWindow::setWindowIcon(QIcon(":/images/appIcons/icon_mne-analyze_256x256.png"));
+    QMainWindow::setWindowIcon(QIcon(":/images/resources/images/appIcons/icon_mne-analyze_256x256.png"));
 #endif
 
     //Load saved GUI geometry and state
     restoreSettings();
+    m_pMultiView->restoreSettings();
 }
 
 //=============================================================================================================
@@ -313,7 +314,7 @@ void MainWindow::createPluginViews(QSharedPointer<PluginManager> pPluginManager)
             qInfo() << "[MainWindow::createPluginViews] Found and added subwindow for " << pPlugin->getName();
         }
     }
-    m_pMultiView->restoreSettings();
+    //m_pMultiView->restoreSettings();
 }
 
 //=============================================================================================================
