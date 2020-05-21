@@ -62,7 +62,7 @@
 #include <QLabel>
 
 #if !defined(NO_OPENGL)
-    #include <QGLWidget>
+    #include <QOpenGLWidget>
 #endif
 
 //=============================================================================================================
@@ -81,14 +81,6 @@ FiffRawView::FiffRawView(QWidget *parent)
 , m_fDefaultSectionSize(80.0f)
 {
     m_pTableView = new QTableView;
-
-#if !defined(NO_OPENGL)
-    //Use GPU rendering
-    QGLFormat currentFormat = QGLFormat(QGL::SampleBuffers);
-    currentFormat.setSamples(3);
-    QGLWidget* pGLWidget = new QGLWidget(currentFormat);
-    m_pTableView->setViewport(pGLWidget);
-#endif
 
     //set vertical layout
     QVBoxLayout *neLayout = new QVBoxLayout(this);
@@ -120,6 +112,10 @@ FiffRawView::~FiffRawView()
 
 void FiffRawView::setDelegate(const QSharedPointer<FiffRawViewDelegate>& pDelegate)
 {
+    if(!pDelegate) {
+        qWarning() << "[FiffRawView::setDelegate] Passed delegate is NULL.";
+        return;
+    }
     m_pDelegate = pDelegate;
 
     m_pTableView->setItemDelegate(m_pDelegate.data());
@@ -142,10 +138,19 @@ QSharedPointer<FiffRawViewModel> FiffRawView::getModel()
 //=============================================================================================================
 
 void FiffRawView::setModel(const QSharedPointer<FiffRawViewModel>& pModel)
-{
+{   
+    if(!pModel) {
+        qWarning() << "[FiffRawView::setModel] Passed model is NULL.";
+        return;
+    }
+
     m_pModel = pModel;
 
     m_pTableView->setModel(m_pModel.data());
+
+#if !defined(NO_OPENGL)
+    m_pTableView->setViewport(new QOpenGLWidget);
+#endif
 
     m_pTableView->setObjectName(QString::fromUtf8("m_pTableView"));
     QSizePolicy sizePolicy3(QSizePolicy::Expanding, QSizePolicy::Expanding);
