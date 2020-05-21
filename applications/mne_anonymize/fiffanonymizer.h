@@ -430,51 +430,56 @@ private:
 
     //=========================================================================================================
 
-    const double m_dMaxValidFiffVerion; /**< Maximum version of the Fiff file standard compatible with this application.*/
+    FIFFLIB::FiffStream::SPtr m_pInStream;  /**< Pointer to FiffStream object for reading.*/
+    FIFFLIB::FiffStream::SPtr m_pOutStream; /**< Pointer to FiffStream object for writing the result.*/
+    FIFFLIB::FiffTag::SPtr m_pTag;          /**< Pointer to FiffTag used for reading and writing each tag.*/
 
-    QString m_sDefaultString;           /**< String to be used as substitution of other strings in a fiff file */
-    QString m_sFiffComment;             /**< Fiff comment string substitutor.*/
-    QString m_sFiffExperimenter;        /**< Fiff experimenter string substitutor.*/
-    QString m_sSubjectFirstName;        /**< Subject's first name substitutor.*/
-    QString m_sSubjectMidName;          /**< Subject's middle name substitutor.*/
-    QString m_sSubjectLastName;         /**< Subject's last name substitutor.*/
-    QString m_sSubjectComment;          /**< Subject's comment substitutor.*/
-    QString m_sSubjectHisId;            /**< Subject's HIS ID substitutor.*/
-    int m_iSubjectBirthdayOffset;       /**< Subjects's birthday offset.*/
-    int m_iSubjectSex;              /**< Subject's sex substitutor.*/
-    int m_iSubjectId;               /**< Subject's id substitutor.*/
-    int m_iSubjectHand;             /**< Subject's hand substitutor.*/
-    float m_fSubjectWeight;             /**< Subject's weight substitutor.*/
-    float m_fSubjectHeight;             /**< Subject's height substitutor.*/
-    int m_iProjectId;                   /**< Project's id# substitutor.*/
-    QString m_sProjectName;             /**< Project's name substitutor.*/
-    QString m_sProjectAim;              /**< Project's aim substitutor.*/
-    QString m_sProjectPersons;          /**< Project's Persons substitutor.*/
-    QString m_sProjectComment;          /**< Project's comment substitutor.*/
+    FIFFLIB::fiff_int_t m_BDfltMAC[2];  /**< MAC addresss substitutor.*/
+
+    QSharedPointer<QStack<int32_t> > m_pBlockTypeList;          /**< Pointer to Stack storing info related to the blocks of tags in the file.*/
 
     QFile m_fFileIn;                    /**< Input file.*/
     QFile m_fFileOut;                   /**< Output file.*/
     bool m_bFileInSet;                  /**< Input file set.*/
     bool m_bFileOutSet;                 /**< Output file set.*/
 
-    QDateTime m_dDefaultDate;           /**< Date to be used as substitution of dates found in a fiff file */
-    QDateTime m_dMeasurementDate;       /**< Date to substitute the measuremnt date appearing in the file.*/
-    QDateTime m_dSubjectBirthday;       /**< Subject's birthday substitutor.*/
-    int  m_iMeasurementDayOffset;       /**< Number of days to subtract from the measurement date.*/
-
-    bool m_bUseMeasurementDayOffset;    /**< Flags to use Measurement-date days offset.*/
-    bool m_bUseSubjectBirthdayOffset;   /**< Flags use of Subject's birthday offset.*/
-
     bool m_bVerboseMode;                /**< Verbosity mode enabler.*/
     bool m_bBruteMode;                  /**< Advanced anonymization. Anonymize also weight, height and some other fields.*/
 
-    FIFFLIB::FiffStream::SPtr m_pInStream;   /**< Pointer to FiffStream object for reading.*/
-    FIFFLIB::FiffStream::SPtr m_pOutStream;  /**< Pointer to FiffStream object for writing the result.*/
-    FIFFLIB::FiffTag::SPtr m_pTag;         /**< Pointer to FiffTag used for reading and writing each tag.*/
+    //fiff version of standard
+    const double m_dMaxValidFiffVerion; /**< Maximum version of the Fiff file standard compatible with this application.*/
 
-    FIFFLIB::fiff_int_t m_BDfltMAC[2];  /**< MAC addresss substitutor.*/
+    //actual fields in fiff file to anonymize
+    QString m_sDefaultString;           /**< String to be used as substitution of other strings in a fiff file */
+    QString m_sDefaultShortString;      /**< Short string to be used as substitution of protected short strings in a fiff file */
+    QDateTime m_dDefaultDate;           /**< Date to be used as substitution of dates found in a fiff file */
 
-    QSharedPointer<QStack<int32_t> > m_pBlockTypeList;          /**< Pointer to Stack storing info related to the blocks of tags in the file.*/
+    QDateTime m_dMeasurementDate;       /**< Date to substitute the measuremnt date appearing in the file.*/
+    int  m_iMeasurementDateOffset;       /**< Number of days to subtract from the measurement date.*/
+    bool m_bUseMeasurementDateOffset;    /**< Flags use Measurement-date days offset.*/
+
+    QString m_sFiffComment;             /**< Fiff comment string substitutor.*/
+    QString m_sFiffExperimenter;        /**< Fiff experimenter string substitutor.*/
+
+    int m_iSubjectId;                   /**< Subject's id substitutor.*/
+    QString m_sSubjectFirstName;        /**< Subject's first name substitutor.*/
+    QString m_sSubjectMidName;          /**< Subject's middle name substitutor.*/
+    QString m_sSubjectLastName;         /**< Subject's last name substitutor.*/
+    QDateTime m_dSubjectBirthday;       /**< Subject's birthday substitutor.*/
+    int m_iSubjectBirthdayOffset;       /**< Subjects's birthday offset.*/
+    bool m_bUseSubjectBirthdayOffset;   /**< Flags use of Subject's birthday offset.*/
+    QString m_sSubjectComment;          /**< Subject's comment substitutor.*/
+    int m_iSubjectSex;                  /**< Subject's sex substitutor.*/
+    int m_iSubjectHand;                 /**< Subject's hand substitutor.*/
+    float m_fSubjectWeight;             /**< Subject's weight substitutor.*/
+    float m_fSubjectHeight;             /**< Subject's height substitutor.*/
+    QString m_sSubjectHisId;            /**< Subject's HIS ID substitutor.*/
+
+    int m_iProjectId;                   /**< Project's id# substitutor.*/
+    QString m_sProjectName;             /**< Project's name substitutor.*/
+    QString m_sProjectAim;              /**< Project's aim substitutor.*/
+    QString m_sProjectPersons;          /**< Project's Persons substitutor.*/
+    QString m_sProjectComment;          /**< Project's comment substitutor.*/
 };
 
 //=============================================================================================================

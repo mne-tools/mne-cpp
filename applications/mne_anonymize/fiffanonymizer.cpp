@@ -69,37 +69,38 @@ using namespace MNEANONYMIZE;
 //=============================================================================================================
 
 FiffAnonymizer::FiffAnonymizer()
-: m_dMaxValidFiffVerion(1.3)
+: m_pTag(FIFFLIB::FiffTag::SPtr::create())
+, m_bFileInSet(false)
+, m_bFileOutSet(false)
+, m_bVerboseMode(false)
+, m_bBruteMode(false)
+, m_dMaxValidFiffVerion(1.3)
 , m_sDefaultString("mne_anonymize")
+, m_sDefaultShortString("mne-cpp")
+, m_dDefaultDate(QDateTime(QDate(2000,1,1), QTime(1, 1, 0), Qt::LocalTime))
+, m_dMeasurementDate(m_dDefaultDate)
+, m_iMeasurementDateOffset(0)
+, m_bUseMeasurementDateOffset(false)
 , m_sFiffComment(m_sDefaultString)
 , m_sFiffExperimenter(m_sDefaultString)
+, m_iSubjectId(0)
 , m_sSubjectFirstName(m_sDefaultString)
 , m_sSubjectMidName("mne")
 , m_sSubjectLastName(m_sDefaultString)
-, m_sSubjectComment(m_sDefaultString)
-, m_sSubjectHisId(m_sDefaultString)
+, m_dSubjectBirthday(m_dDefaultDate)
 , m_iSubjectBirthdayOffset(0)
+, m_bUseSubjectBirthdayOffset(false)
+, m_sSubjectComment(m_sDefaultString)
 , m_iSubjectSex(0)
-, m_iSubjectId(0)
 , m_iSubjectHand(0)
 , m_fSubjectWeight(0.0)
 , m_fSubjectHeight(0.0)
+, m_sSubjectHisId(m_sDefaultString)
 , m_iProjectId(0)
 , m_sProjectName(m_sDefaultString)
 , m_sProjectAim(m_sDefaultString)
 , m_sProjectPersons(m_sDefaultString)
 , m_sProjectComment(m_sDefaultString)
-, m_bFileInSet(false)
-, m_bFileOutSet(false)
-, m_dDefaultDate(QDateTime(QDate(2000,1,1), QTime(1, 1, 0), Qt::UTC))
-, m_dMeasurementDate(m_dDefaultDate)
-, m_dSubjectBirthday(m_dDefaultDate)
-, m_iMeasurementDayOffset(0)
-, m_bUseMeasurementDayOffset(false)
-, m_bUseSubjectBirthdayOffset(false)
-, m_bVerboseMode(false)
-, m_bBruteMode(false)
-, m_pTag(FIFFLIB::FiffTag::SPtr::create())
 {
     //MAC addresses have 6 bytes. We use 2 more here to complete 2 int32 (2bytes) reads.
     //check->sometimes MAC address is stored in the 0-5 bytes some other times it
@@ -114,36 +115,41 @@ FiffAnonymizer::FiffAnonymizer()
 //=============================================================================================================
 
 FiffAnonymizer::FiffAnonymizer(const FiffAnonymizer& obj)
-: m_dMaxValidFiffVerion(obj.m_dMaxValidFiffVerion)
+: m_pTag(FIFFLIB::FiffTag::SPtr::create())
+, m_bFileInSet(obj.m_bFileInSet)
+, m_bFileOutSet(obj.m_bFileOutSet)
+, m_bVerboseMode(obj.m_bVerboseMode)
+, m_bBruteMode(obj.m_bBruteMode)
+, m_dMaxValidFiffVerion(obj.m_dMaxValidFiffVerion)
 , m_sDefaultString(obj.m_sDefaultString)
-, m_sFiffComment(m_sDefaultString)
+, m_sDefaultShortString(obj.m_sDefaultShortString)
+, m_dDefaultDate(obj.m_dDefaultDate)
+, m_dMeasurementDate(obj.m_dMeasurementDate)
+, m_iMeasurementDateOffset(obj.m_iMeasurementDateOffset)
+, m_bUseMeasurementDateOffset(obj.m_bUseMeasurementDateOffset)
+, m_sFiffComment(obj.m_sFiffComment)
+, m_sFiffExperimenter(obj.m_sFiffExperimenter)
+, m_iSubjectId(obj.m_iSubjectId)
 , m_sSubjectFirstName(obj.m_sSubjectFirstName)
 , m_sSubjectMidName(obj.m_sSubjectMidName)
 , m_sSubjectLastName(obj.m_sSubjectLastName)
-, m_sSubjectComment(obj.m_sSubjectComment)
-, m_sSubjectHisId(obj.m_sSubjectHisId)
+, m_dSubjectBirthday(obj.m_dSubjectBirthday)
 , m_iSubjectBirthdayOffset(obj.m_iSubjectBirthdayOffset)
+, m_bUseSubjectBirthdayOffset(obj.m_bUseSubjectBirthdayOffset)
+, m_sSubjectComment(obj.m_sSubjectComment)
 , m_iSubjectSex(obj.m_iSubjectSex)
-, m_iSubjectId(obj.m_iSubjectId)
 , m_iSubjectHand(obj.m_iSubjectHand)
 , m_fSubjectWeight(obj.m_fSubjectWeight)
 , m_fSubjectHeight(obj.m_fSubjectHeight)
+, m_sSubjectHisId(obj.m_sSubjectHisId)
 , m_iProjectId(obj.m_iProjectId)
 , m_sProjectName(obj.m_sProjectName)
 , m_sProjectAim(obj.m_sProjectAim)
 , m_sProjectPersons(obj.m_sProjectPersons)
 , m_sProjectComment(obj.m_sProjectComment)
-, m_bFileInSet(obj.m_bFileInSet)
-, m_bFileOutSet(obj.m_bFileOutSet)
-, m_dDefaultDate(QDateTime(QDate(2000,1,1), QTime(1, 1, 0), Qt::UTC))
-, m_dMeasurementDate(obj.m_dMeasurementDate)
-, m_dSubjectBirthday(obj.m_dSubjectBirthday)
-, m_iMeasurementDayOffset(obj.m_iMeasurementDayOffset)
-, m_bUseMeasurementDayOffset(obj.m_bUseMeasurementDayOffset)
-, m_bUseSubjectBirthdayOffset(obj.m_bUseSubjectBirthdayOffset)
-, m_bVerboseMode(obj.m_bVerboseMode)
-, m_bBruteMode(obj.m_bBruteMode)
 {
+    memcpy(m_pTag->data(),obj.m_pTag->data(),static_cast<size_t>(obj.m_pTag->size()));
+
     m_BDfltMAC[0] = obj.m_BDfltMAC[0];
     m_BDfltMAC[1] = obj.m_BDfltMAC[1];
 
@@ -153,36 +159,41 @@ FiffAnonymizer::FiffAnonymizer(const FiffAnonymizer& obj)
 //=============================================================================================================
 
 FiffAnonymizer::FiffAnonymizer(FiffAnonymizer &&obj)
-: m_dMaxValidFiffVerion(obj.m_dMaxValidFiffVerion)
+: m_pTag(FIFFLIB::FiffTag::SPtr::create())
+, m_bFileInSet(obj.m_bFileInSet)
+, m_bFileOutSet(obj.m_bFileOutSet)
+, m_bVerboseMode(obj.m_bVerboseMode)
+, m_bBruteMode(obj.m_bBruteMode)
+, m_dMaxValidFiffVerion(obj.m_dMaxValidFiffVerion)
 , m_sDefaultString(obj.m_sDefaultString)
-, m_sFiffComment(m_sDefaultString)
+, m_sDefaultShortString(obj.m_sDefaultShortString)
+, m_dDefaultDate(obj.m_dDefaultDate)
+, m_dMeasurementDate(obj.m_dMeasurementDate)
+, m_iMeasurementDateOffset(obj.m_iMeasurementDateOffset)
+, m_bUseMeasurementDateOffset(obj.m_bUseMeasurementDateOffset)
+, m_sFiffComment(obj.m_sFiffComment)
+, m_sFiffExperimenter(obj.m_sFiffExperimenter)
+, m_iSubjectId(obj.m_iSubjectId)
 , m_sSubjectFirstName(obj.m_sSubjectFirstName)
 , m_sSubjectMidName(obj.m_sSubjectMidName)
 , m_sSubjectLastName(obj.m_sSubjectLastName)
-, m_sSubjectComment(obj.m_sSubjectComment)
-, m_sSubjectHisId(obj.m_sSubjectHisId)
+, m_dSubjectBirthday(obj.m_dSubjectBirthday)
 , m_iSubjectBirthdayOffset(obj.m_iSubjectBirthdayOffset)
+, m_bUseSubjectBirthdayOffset(obj.m_bUseSubjectBirthdayOffset)
+, m_sSubjectComment(obj.m_sSubjectComment)
 , m_iSubjectSex(obj.m_iSubjectSex)
-, m_iSubjectId(obj.m_iSubjectId)
 , m_iSubjectHand(obj.m_iSubjectHand)
 , m_fSubjectWeight(obj.m_fSubjectWeight)
 , m_fSubjectHeight(obj.m_fSubjectHeight)
+, m_sSubjectHisId(obj.m_sSubjectHisId)
 , m_iProjectId(obj.m_iProjectId)
 , m_sProjectName(obj.m_sProjectName)
 , m_sProjectAim(obj.m_sProjectAim)
 , m_sProjectPersons(obj.m_sProjectPersons)
 , m_sProjectComment(obj.m_sProjectComment)
-, m_bFileInSet(obj.m_bFileInSet)
-, m_bFileOutSet(obj.m_bFileOutSet)
-, m_dDefaultDate(QDateTime(QDate(2000,1,1), QTime(1, 1, 0), Qt::UTC))
-, m_dMeasurementDate(obj.m_dMeasurementDate)
-, m_dSubjectBirthday(obj.m_dSubjectBirthday)
-, m_iMeasurementDayOffset(obj.m_iMeasurementDayOffset)
-, m_bUseMeasurementDayOffset(obj.m_bUseMeasurementDayOffset)
-, m_bUseSubjectBirthdayOffset(obj.m_bUseSubjectBirthdayOffset)
-, m_bVerboseMode(obj.m_bVerboseMode)
-, m_bBruteMode(obj.m_bBruteMode)
 {
+    memcpy(m_pTag->data(),obj.m_pTag->data(),static_cast<size_t>(obj.m_pTag->size()));
+
     m_BDfltMAC[0] = obj.m_BDfltMAC[0];
     m_BDfltMAC[1] = obj.m_BDfltMAC[1];
 
@@ -234,9 +245,9 @@ void FiffAnonymizer::censorTag() const
         QDateTime inMeasDate = QDateTime::fromSecsSinceEpoch(inId.time.secs, Qt::LocalTime);
         QDateTime outMeasDate;
 
-        if(m_bUseMeasurementDayOffset)
+        if(m_bUseMeasurementDateOffset)
         {
-            outMeasDate = inMeasDate.addDays(-m_iMeasurementDayOffset);
+            outMeasDate = inMeasDate.addDays(-m_iMeasurementDateOffset);
         } else {
             outMeasDate = m_dMeasurementDate;
         }
@@ -266,9 +277,9 @@ void FiffAnonymizer::censorTag() const
         QDateTime inMeasDate(QDateTime::fromSecsSinceEpoch(*m_pTag->toInt(), Qt::LocalTime));
         QDateTime outMeasDate;
 
-        if(m_bUseMeasurementDayOffset)
+        if(m_bUseMeasurementDateOffset)
         {
-            outMeasDate = inMeasDate.addDays(-m_iMeasurementDayOffset);
+            outMeasDate = inMeasDate.addDays(-m_iMeasurementDateOffset);
         } else {
             outMeasDate = m_dMeasurementDate;
         }
@@ -686,8 +697,8 @@ QDateTime FiffAnonymizer::getMeasurementDate() const
 
 void FiffAnonymizer::setMeasurementDateOffset(const int iMeasDayOffset)
 {
-    m_bUseMeasurementDayOffset = true;
-    m_iMeasurementDayOffset = iMeasDayOffset;
+    m_bUseMeasurementDateOffset = true;
+    m_iMeasurementDateOffset = iMeasDayOffset;
 }
 
 //=============================================================================================================
@@ -790,14 +801,14 @@ QString FiffAnonymizer::getSubjectHisID()
 
 int FiffAnonymizer::getMeasurementDayOffset()
 {
-    return m_iMeasurementDayOffset;
+    return m_iMeasurementDateOffset;
 }
 
 //=============================================================================================================
 
 bool FiffAnonymizer::getUseMeasurementDayOffset()
 {
-    return m_bUseMeasurementDayOffset;
+    return m_bUseMeasurementDateOffset;
 }
 
 //=============================================================================================================
