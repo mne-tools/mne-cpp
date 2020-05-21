@@ -243,7 +243,7 @@ void FiffAnonymizer::censorTag()
     {
         FIFFLIB::FiffId inId = m_pTag->toFiffID();
         QDateTime inMeasDate = QDateTime::fromSecsSinceEpoch(inId.time.secs, Qt::LocalTime);
-        emit readingMeasurementDateInId(inMeasDate);
+        emit readingIdMeasurementDate(inMeasDate);
 
         QDateTime outMeasDate;
 
@@ -277,6 +277,7 @@ void FiffAnonymizer::censorTag()
     case FIFF_MEAS_DATE:
     {
         QDateTime inMeasDate(QDateTime::fromSecsSinceEpoch(*m_pTag->toInt(), Qt::LocalTime));
+        emit readingFileMeasurementDate(inMeasDate);
         QDateTime outMeasDate;
 
         if(m_bUseMeasurementDateOffset)
@@ -294,9 +295,11 @@ void FiffAnonymizer::censorTag()
     }
     case FIFF_COMMENT:
     {
+        QString inStr(m_pTag->data());
+        emit readingFileComment(inStr);
+
         if(m_pBlockTypeList->top() == FIFFB_MEAS_INFO)
         {
-            QString inStr(m_pTag->data());
             QString outStr(m_sDefaultString);
             m_pTag->resize(outStr.size());
             memcpy(m_pTag->data(),outStr.toUtf8(),static_cast<size_t>(outStr.size()));
@@ -307,6 +310,8 @@ void FiffAnonymizer::censorTag()
     case FIFF_EXPERIMENTER:
     {
         QString inStr(m_pTag->data());
+        emit readingFileExperimenter(inStr);
+
         QString outStr(m_sDefaultString);
         m_pTag->resize(outStr.size());
         memcpy(m_pTag->data(),outStr.toUtf8(),static_cast<size_t>(outStr.size()));
@@ -315,24 +320,28 @@ void FiffAnonymizer::censorTag()
     }
     case FIFF_SUBJ_ID:
     {
-        qint32 oldSubjID(*m_pTag->toInt());
-        qint32 newSubjID(m_iSubjectId);
-        memcpy(m_pTag->data(),&newSubjID, sizeof(qint32));
-        printIfVerbose("Subject ID changed: " + QString::number(oldSubjID) + " -> " + QString::number(newSubjID));
+        qint32 inSubjID(*m_pTag->toInt());
+        emit readingSubjectId(inSubjID);
+        qint32 outSubjID(m_iSubjectId);
+        memcpy(m_pTag->data(),&outSubjID, sizeof(qint32));
+        printIfVerbose("Subject ID changed: " + QString::number(inSubjID) + " -> " + QString::number(outSubjID));
         break;
     }
     case FIFF_SUBJ_FIRST_NAME:
     {
-        QString inStr(m_pTag->data());
-        QString outStr(m_sSubjectFirstName);
-        m_pTag->resize(outStr.size());
-        memcpy(m_pTag->data(),outStr.toUtf8(),static_cast<size_t>(outStr.size()));
-        printIfVerbose("Subject first name changed: " + inStr + " -> " + outStr);
+        QString inFirstName
+                (m_pTag->data());
+        emit readingSubjectFirstName(inFirstName);
+        QString outFirstName(m_sSubjectFirstName);
+        m_pTag->resize(outFirstName.size());
+        memcpy(m_pTag->data(),outFirstName.toUtf8(),static_cast<size_t>(outFirstName.size()));
+        printIfVerbose("Subject first name changed: " + inFirstName + " -> " + outFirstName);
         break;
     }
     case FIFF_SUBJ_MIDDLE_NAME:
     {
         QString inStr(m_pTag->data());
+        emit readingSubjectMiddleName(inStr);
         QString outStr(m_sSubjectMidName);
         m_pTag->resize(outStr.size());
         memcpy(m_pTag->data(),outStr.toUtf8(),static_cast<size_t>(outStr.size()));
@@ -342,6 +351,7 @@ void FiffAnonymizer::censorTag()
     case FIFF_SUBJ_LAST_NAME:
     {
         QString inStr(m_pTag->data());
+        readingSubjectLastName(inStr);
         QString outStr(m_sSubjectLastName);
         m_pTag->resize(outStr.size());
         memcpy(m_pTag->data(),outStr.toUtf8(),static_cast<size_t>(outStr.size()));
@@ -351,6 +361,7 @@ void FiffAnonymizer::censorTag()
     case FIFF_SUBJ_BIRTH_DAY:
     {
         QDateTime inBirthday(QDate::fromJulianDay(*m_pTag->toJulian()));
+        readingSubjectBirthday(inBirthday);
         QDateTime outBirthday;
 
         if(m_bUseSubjectBirthdayOffset)
@@ -368,31 +379,34 @@ void FiffAnonymizer::censorTag()
     }
     case FIFF_SUBJ_SEX:
     {
+        qint32 inSubjectSex(*m_pTag->toInt());
+        emit readingSubjectSex(inSubjectSex);
         if(m_bBruteMode)
         {
-            qint32 inSubjSex(*m_pTag->toInt());
             qint32 outSubjSex(m_iSubjectSex);
             memcpy(m_pTag->data(),&outSubjSex, sizeof(qint32));
-            printIfVerbose("Subject sex changed: " + subjectSexToString(inSubjSex) + " -> " + subjectSexToString(outSubjSex));
+            printIfVerbose("Subject sex changed: " + subjectSexToString(inSubjectSex) + " -> " + subjectSexToString(outSubjSex));
         }
         break;
     }
     case FIFF_SUBJ_HAND:
     {
+        qint32 inSubjectHand(*m_pTag->toInt());
+        emit readingSubjectHand(inSubjectHand);
         if(m_bBruteMode)
         {
-            qint32 inSubjHand(*m_pTag->toInt());
             qint32 newSubjHand(m_iSubjectHand);
             memcpy(m_pTag->data(),&newSubjHand, sizeof(qint32));
-            printIfVerbose("Subject handedness changed: " + subjectHandToString(inSubjHand) + " -> " + subjectHandToString(newSubjHand));
+            printIfVerbose("Subject handedness changed: " + subjectHandToString(inSubjectHand) + " -> " + subjectHandToString(newSubjHand));
         }
         break;
     }
     case FIFF_SUBJ_WEIGHT:
     {
+        float inWeight(*m_pTag->toFloat());
+        emit readingSubjectWeight(inWeight);
         if(m_bBruteMode)
         {
-            float inWeight(*m_pTag->toFloat());
             float outWeight(m_fSubjectWeight);
             memcpy(m_pTag->data(),&outWeight,sizeof(float));
             printIfVerbose("Subject weight changed: " + QString::number(static_cast<double>(inWeight)) + " -> " + QString::number(static_cast<double>(outWeight)));
@@ -401,9 +415,10 @@ void FiffAnonymizer::censorTag()
     }
     case FIFF_SUBJ_HEIGHT:
     {
+        float inHeight(*m_pTag->toFloat());
+        emit readingSubjectHeight(inHeight);
         if(m_bBruteMode)
         {
-            float inHeight(*m_pTag->toFloat());
             float outHeight(m_fSubjectHeight);
             memcpy(m_pTag->data(),&outHeight,sizeof(float));
             printIfVerbose("Subject height changed: " + QString::number(static_cast<double>(inHeight)) + " -> " + QString::number(static_cast<double>(outHeight)));
@@ -413,6 +428,7 @@ void FiffAnonymizer::censorTag()
     case FIFF_SUBJ_COMMENT:
     {
         QString inStr(m_pTag->data());
+        emit readingSubjectComment(inStr);
         QString outStr(m_sSubjectComment);
         m_pTag->resize(outStr.size());
         memcpy(m_pTag->data(),outStr.toUtf8(),static_cast<size_t>(outStr.size()));
@@ -422,6 +438,7 @@ void FiffAnonymizer::censorTag()
     case FIFF_SUBJ_HIS_ID:
     {
         QString inSubjectHisId(m_pTag->data());
+        emit readingSubjectHisId(inSubjectHisId);
         QString outSubjectHisId(m_sSubjectHisId);
         m_pTag->resize(outSubjectHisId.size());
         memcpy(m_pTag->data(),outSubjectHisId.toUtf8(),static_cast<size_t>(outSubjectHisId.size()));
@@ -430,9 +447,10 @@ void FiffAnonymizer::censorTag()
     }
     case FIFF_PROJ_ID:
     {
+        qint32 inProjID(*m_pTag->toInt());
+        emit readingProjectId(inProjID);
         if(m_bBruteMode)
         {
-            qint32 inProjID(*m_pTag->toInt());
             qint32 newProjID(m_iProjectId);
             memcpy(m_pTag->data(),&newProjID,sizeof(qint32));
             printIfVerbose("ProjectID changed: " + QString::number(inProjID) + " -> " + QString::number(newProjID));
@@ -441,9 +459,10 @@ void FiffAnonymizer::censorTag()
     }
     case FIFF_PROJ_NAME:
     {
+        QString inStr(m_pTag->data());
+        emit readingProjectName(inStr);
         if(m_bBruteMode)
         {
-            QString inStr(m_pTag->data());
             QString outStr(m_sProjectName);
             m_pTag->resize(outStr.size());
             memcpy(m_pTag->data(),outStr.toUtf8(),static_cast<size_t>(outStr.size()));
@@ -453,9 +472,10 @@ void FiffAnonymizer::censorTag()
     }
     case FIFF_PROJ_AIM:
     {
+        QString inStr(m_pTag->data());
+        emit readingProjectAim(inStr);
         if(m_bBruteMode)
         {
-            QString inStr(m_pTag->data());
             QString outStr(m_sProjectAim);
             m_pTag->resize(outStr.size());
             memcpy(m_pTag->data(),outStr.toUtf8(),static_cast<size_t>(outStr.size()));
@@ -466,6 +486,7 @@ void FiffAnonymizer::censorTag()
     case FIFF_PROJ_PERSONS:
     {
         QString inStr(m_pTag->data());
+        emit readingProjectPersons(inStr);
         QString outStr(m_sProjectPersons);
         m_pTag->resize(outStr.size());
         memcpy(m_pTag->data(),outStr.toUtf8(),static_cast<size_t>(outStr.size()));
@@ -474,9 +495,10 @@ void FiffAnonymizer::censorTag()
     }
     case FIFF_PROJ_COMMENT:
     {
+        QString inStr(m_pTag->data());
+        emit readingProjectComment(inStr);
         if(m_bBruteMode)
         {
-            QString inStr(m_pTag->data());
             QString outStr(m_sProjectComment);
             m_pTag->resize(outStr.size());
             memcpy(m_pTag->data(),outStr.toUtf8(),static_cast<size_t>(outStr.size()));
@@ -699,8 +721,15 @@ QDateTime FiffAnonymizer::getMeasurementDate() const
 
 void FiffAnonymizer::setMeasurementDateOffset(const int iMeasDayOffset)
 {
-    m_bUseMeasurementDateOffset = true;
+
     m_iMeasurementDateOffset = iMeasDayOffset;
+}
+
+//=============================================================================================================
+
+void FiffAnonymizer::setUseMeasurementDateOffset(bool b)
+{
+        m_bUseMeasurementDateOffset = b;
 }
 
 //=============================================================================================================
@@ -728,10 +757,15 @@ QDateTime FiffAnonymizer::getSubjectBirthday()
 
 void FiffAnonymizer::setSubjectBirthdayOffset(int iSubjBirthdayOffset)
 {
-    m_bUseSubjectBirthdayOffset = true;
     m_iSubjectBirthdayOffset = iSubjBirthdayOffset;
 }
 
+//=============================================================================================================
+
+void FiffAnonymizer::setUseSubjectBirthdayOffset(bool b)
+{
+    m_bUseSubjectBirthdayOffset = b;
+}
 //=============================================================================================================
 
 int  FiffAnonymizer::getSubjectBirthdayOffset()
