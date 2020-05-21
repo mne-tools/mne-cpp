@@ -314,8 +314,7 @@ void RealTimeEvokedSetWidget::initDisplayControllWidgets()
 //        }
 
         // Scaling
-        ScalingView* pScalingView = new ScalingView(QString("RTESW/%1").arg(t_sRTESName),
-                                                    m_pFiffInfo->chs);
+        ScalingView* pScalingView = new ScalingView(QString("RTESW/%1").arg(t_sRTESName));
         pScalingView->setObjectName("group_tab_View_Scaling");
         lControlWidgets.append(pScalingView);
 

@@ -244,8 +244,7 @@ void RealTimeMultiSampleArrayWidget::initDisplayControllWidgets()
 //                m_pChannelDataView.data(), &RtFiffRawView::updateSpharaOptions);
 
         // Quick control scaling
-        ScalingView* pScalingView = new ScalingView(QString("RTMSAW/%1").arg(sRTMSAWName),
-                                                    m_pFiffInfo->chs);
+        ScalingView* pScalingView = new ScalingView(QString("RTMSAW/%1").arg(sRTMSAWName));
         pScalingView->setObjectName("group_tab_View_Scaling");
         lControlWidgets.append(pScalingView);
 
