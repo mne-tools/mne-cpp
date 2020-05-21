@@ -58,6 +58,11 @@
 
 class RawDataViewerControl;
 
+namespace DISPLIB {
+    class ScalingView;
+    class FiffRawViewSettings;
+}
+
 namespace ANSHAREDLIB {
     class Communicator;
     class FiffRawViewModel;
@@ -111,34 +116,40 @@ public:
     virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
 
 private:
+    //=========================================================================================================
+    /**
+     * Handles if a new model is present. Only works on FiffRawViewModels
+     *
+     * @param [in] pNewModel    The new model.
+     */
     void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
 
     //=========================================================================================================
     /**
      * Sets up control widgets, connects all relevant signals and slots, and diplays controls to user
      */
-    void setUpControls();
+    void updateControls();
 
+    //=========================================================================================================
+    /**
+     * Handles if a new sample position should be dispatched
+     *
+     * @param [in] iSample    The sample to be send.
+     */
     void onSendSamplePos(int iSample);
 
-    void disconnectOld();
-
     // Control
-    QPointer<QDockWidget>                m_pControlDock;                 /**< Control Widget */
-    QPointer<ANSHAREDLIB::Communicator>  m_pCommu;
+    QPointer<ANSHAREDLIB::Communicator>             m_pCommu;                   /**< The communicator object to communicate with other plugins. */
 
     // Model
-    int m_iSamplesPerBlock;
-    int m_iVisibleBlocks;
-    int m_iBufferBlocks;
+    int                                             m_iSamplesPerBlock;         /**< The samples per data block. Default is set to sampling frequency. */
+    int                                             m_iVisibleBlocks;           /**< The amount of visible data blocks. Default is set to 10. */
+    int                                             m_iBufferBlocks;            /**< The amount of buffered data blocks. Default is set to 10. */
 
-    QSharedPointer<ANSHAREDLIB::FiffRawViewModel>   m_pRawModel;
-    QSharedPointer<FiffRawViewDelegate>             m_pRawDelegate;
+    QPointer<DISPLIB::ScalingView>                  m_pScalingWidget;           /**< The scaling view, which needs to be updated between file sessions. */
+    QPointer<DISPLIB::FiffRawViewSettings>          m_pSettingsViewWidget;      /**< The fiff raw view settings, which needs to be updated between file sessions. */
 
-    QPointer<FiffRawView>                           m_pFiffRawView;     /**< View for Fiff data */
-
-    QVBoxLayout*            m_pLayout;              /**< Layout for widgets in the controller view */
-    QWidget*                m_pContainer;           /**< Container for widgets in the controller view */
+    QPointer<FiffRawView>                           m_pFiffRawView;             /**< View for Fiff data. */
 };
 
 //=============================================================================================================

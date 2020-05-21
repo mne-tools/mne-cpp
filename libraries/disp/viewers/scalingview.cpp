@@ -137,7 +137,7 @@ void ScalingView::redrawGUI()
     qint32 i = 0;
 
     //MAG
-    if(m_qMapChScaling.contains(FIFF_UNIT_T) && m_lChannelTypeList.contains("MAG"))
+    if(m_qMapChScaling.contains(FIFF_UNIT_T))
     {
         QLabel* t_pLabelModality = new QLabel("MAG (pT)");
         m_ui->m_formLayout_Scaling->addWidget(t_pLabelModality,i,0,1,1);
@@ -172,7 +172,7 @@ void ScalingView::redrawGUI()
     }
 
     //GRAD
-    if(m_qMapChScaling.contains(FIFF_UNIT_T_M) && m_lChannelTypeList.contains("GRAD"))
+    if(m_qMapChScaling.contains(FIFF_UNIT_T_M))
     {
         QLabel* t_pLabelModality = new QLabel;
         t_pLabelModality->setText("GRAD (fT/cm)");
@@ -208,7 +208,7 @@ void ScalingView::redrawGUI()
     }
 
     //EEG
-    if(m_qMapChScaling.contains(FIFFV_EEG_CH) && m_lChannelTypeList.contains("EEG"))
+    if(m_qMapChScaling.contains(FIFFV_EEG_CH))
     {
         QLabel* t_pLabelModality = new QLabel;
         t_pLabelModality->setText("EEG (uV)");
@@ -244,7 +244,7 @@ void ScalingView::redrawGUI()
     }
 
     //EOG
-    if(m_qMapChScaling.contains(FIFFV_EOG_CH) && m_lChannelTypeList.contains("EOG"))
+    if(m_qMapChScaling.contains(FIFFV_EOG_CH))
     {
         QLabel* t_pLabelModality = new QLabel;
         t_pLabelModality->setText("EOG (uV)");
@@ -280,7 +280,7 @@ void ScalingView::redrawGUI()
     }
 
     //STIM
-    if(m_qMapChScaling.contains(FIFFV_STIM_CH) && m_lChannelTypeList.contains("STIM"))
+    if(m_qMapChScaling.contains(FIFFV_STIM_CH))
     {
         QLabel* t_pLabelModality = new QLabel;
         t_pLabelModality->setText("STIM");
@@ -316,7 +316,7 @@ void ScalingView::redrawGUI()
     }
 
     //MISC
-    if(m_qMapChScaling.contains(FIFFV_MISC_CH) && m_lChannelTypeList.contains("MISC"))
+    if(m_qMapChScaling.contains(FIFFV_MISC_CH))
     {
         QLabel* t_pLabelModality = new QLabel;
         t_pLabelModality->setText("MISC");
