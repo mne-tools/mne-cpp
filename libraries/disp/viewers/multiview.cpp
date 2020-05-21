@@ -143,7 +143,7 @@ void MultiView::saveSettings()
 {
     QSettings settings("MNECPP", "ANALYZEWINDOW");
 
-    settings.beginGroup("layout");
+    settings.beginGroup("multiview");
     settings.setValue("geometry", saveGeometry());
     settings.setValue("state", saveState());
     settings.endGroup();
@@ -155,7 +155,7 @@ void MultiView::restoreSettings()
 {
     QSettings settings("MNECPP", "ANALYZEWINDOW");
 
-    settings.beginGroup("layout");
+    settings.beginGroup("multiview");
     restoreGeometry(settings.value("geometry").toByteArray());
     restoreState(settings.value("state").toByteArray());
     settings.endGroup();

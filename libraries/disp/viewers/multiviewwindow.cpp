@@ -62,7 +62,7 @@ MultiViewWindow::MultiViewWindow(QWidget *parent,
                                  Qt::WindowFlags flags)
 : QDockWidget(parent, flags)
 {
-    this->setWidget(parent);
+    //this->setWidget(parent);
 }
 
 //=============================================================================================================
