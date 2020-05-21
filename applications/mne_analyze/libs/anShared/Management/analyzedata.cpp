@@ -177,20 +177,21 @@ QSharedPointer<FiffRawViewModel> AnalyzeData::loadFiffRawViewModel(const QString
     }
 
     QSharedPointer<FiffRawViewModel> pModel = QSharedPointer<FiffRawViewModel>::create(sPath, byteLoadedData);
-    pModel->setModelPath(sPath);
+    QSharedPointer<AbstractModel> temp = qSharedPointerCast<AbstractModel>(pModel);
+    temp->setModelPath(sPath);
 
-    if(pModel->isInit()) {
-        QStandardItem* pItem = new QStandardItem(pModel->getModelName());
+    if(temp->isInit()) {
+        QStandardItem* pItem = new QStandardItem(temp->getModelName());
         pItem->setEditable(false);
         pItem->setDragEnabled(true);
-        pItem->setToolTip(pModel->getModelPath());
+        pItem->setToolTip(temp->getModelPath());
 
         QVariant data;
-        data.setValue(pModel);
+        data.setValue(temp);
         pItem->setData(data);
         m_pData->appendRow(pItem);
 
-        emit newModelAvailable(pModel);
+        emit newModelAvailable(temp);
         return pModel;
     } else {
         return Q_NULLPTR;

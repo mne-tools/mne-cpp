@@ -180,29 +180,29 @@ public:
         if(QSharedPointer<AbstractModel> pModel = getModelByPath(sPath)) {
             qInfo() << "[AnalyzeData::loadModel] Data has been loaded already.";
             return qSharedPointerDynamicCast<T>(pModel);
+        }
+
+        // call model constructor with provided path
+        QSharedPointer<T> sm = QSharedPointer<T>::create(sPath);
+        QSharedPointer<AbstractModel> temp = qSharedPointerCast<AbstractModel>(sm);
+        temp->setModelPath(sPath);
+
+        if(temp->isInit()) {
+            // add to record, and tell others about the new model
+            QStandardItem* pItem = new QStandardItem(temp->getModelName());
+            pItem->setEditable(false);
+            pItem->setDragEnabled(true);
+            pItem->setToolTip(temp->getModelPath());
+
+            QVariant data;
+            data.setValue(temp);
+            pItem->setData(data);
+            m_pData->appendRow(pItem);
+
+            emit newModelAvailable(temp);
+            return sm;
         } else {
-            // call model constructor with provided path
-            QSharedPointer<T> sm = QSharedPointer<T>::create(sPath);
-            QSharedPointer<AbstractModel> temp = qSharedPointerCast<AbstractModel>(sm);
-            temp->setModelPath(sPath);
-
-            if(temp->isInit()) {
-                // add to record, and tell others about the new model
-                QStandardItem* pItem = new QStandardItem(temp->getModelName());
-                pItem->setEditable(false);
-                pItem->setDragEnabled(true);
-                pItem->setToolTip(temp->getModelPath());
-
-                QVariant data;
-                data.setValue(temp);
-                pItem->setData(data);
-                m_pData->appendRow(pItem);
-
-                emit newModelAvailable(temp);
-                return sm;
-            } else {
-                return Q_NULLPTR;
-            }
+            return Q_NULLPTR;
         }
     }
 

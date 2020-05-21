@@ -76,7 +76,8 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager, QWidget *parent)
+MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager,
+                       QWidget *parent)
 : QMainWindow(parent)
 , m_pMultiView(Q_NULLPTR)
 , m_pGridLayout(Q_NULLPTR)
