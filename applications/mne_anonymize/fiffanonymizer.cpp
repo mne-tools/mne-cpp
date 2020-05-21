@@ -79,9 +79,9 @@ FiffAnonymizer::FiffAnonymizer()
 , m_sSubjectComment(m_sDefaultString)
 , m_sSubjectHisId(m_sDefaultString)
 , m_iSubjectBirthdayOffset(0)
-, m_iDfltSubjectSex(0)
-, m_iDfltSubjectId(0)
-, m_iDfltSubjectHand(0)
+, m_iSubjectSex(0)
+, m_iSubjectId(0)
+, m_iSubjectHand(0)
 , m_fSubjectWeight(0.0)
 , m_fSubjectHeight(0.0)
 , m_iProjectId(0)
@@ -123,9 +123,9 @@ FiffAnonymizer::FiffAnonymizer(const FiffAnonymizer& obj)
 , m_sSubjectComment(obj.m_sSubjectComment)
 , m_sSubjectHisId(obj.m_sSubjectHisId)
 , m_iSubjectBirthdayOffset(obj.m_iSubjectBirthdayOffset)
-, m_iDfltSubjectSex(obj.m_iDfltSubjectSex)
-, m_iDfltSubjectId(obj.m_iDfltSubjectId)
-, m_iDfltSubjectHand(obj.m_iDfltSubjectHand)
+, m_iSubjectSex(obj.m_iSubjectSex)
+, m_iSubjectId(obj.m_iSubjectId)
+, m_iSubjectHand(obj.m_iSubjectHand)
 , m_fSubjectWeight(obj.m_fSubjectWeight)
 , m_fSubjectHeight(obj.m_fSubjectHeight)
 , m_iProjectId(obj.m_iProjectId)
@@ -162,9 +162,9 @@ FiffAnonymizer::FiffAnonymizer(FiffAnonymizer &&obj)
 , m_sSubjectComment(obj.m_sSubjectComment)
 , m_sSubjectHisId(obj.m_sSubjectHisId)
 , m_iSubjectBirthdayOffset(obj.m_iSubjectBirthdayOffset)
-, m_iDfltSubjectSex(obj.m_iDfltSubjectSex)
-, m_iDfltSubjectId(obj.m_iDfltSubjectId)
-, m_iDfltSubjectHand(obj.m_iDfltSubjectHand)
+, m_iSubjectSex(obj.m_iSubjectSex)
+, m_iSubjectId(obj.m_iSubjectId)
+, m_iSubjectHand(obj.m_iSubjectHand)
 , m_fSubjectWeight(obj.m_fSubjectWeight)
 , m_fSubjectHeight(obj.m_fSubjectHeight)
 , m_iProjectId(obj.m_iProjectId)
@@ -303,7 +303,7 @@ void FiffAnonymizer::censorTag() const
     case FIFF_SUBJ_ID:
     {
         qint32 oldSubjID(*m_pTag->toInt());
-        qint32 newSubjID(m_iDfltSubjectId);
+        qint32 newSubjID(m_iSubjectId);
         memcpy(m_pTag->data(),&newSubjID, sizeof(qint32));
         printIfVerbose("Subject ID changed: " + QString::number(oldSubjID) + " -> " + QString::number(newSubjID));
         break;
@@ -358,7 +358,7 @@ void FiffAnonymizer::censorTag() const
         if(m_bBruteMode)
         {
             qint32 inSubjSex(*m_pTag->toInt());
-            qint32 outSubjSex(m_iDfltSubjectSex);
+            qint32 outSubjSex(m_iSubjectSex);
             memcpy(m_pTag->data(),&outSubjSex, sizeof(qint32));
             printIfVerbose("Subject sex changed: " + subjectSexToString(inSubjSex) + " -> " + subjectSexToString(outSubjSex));
         }
@@ -369,7 +369,7 @@ void FiffAnonymizer::censorTag() const
         if(m_bBruteMode)
         {
             qint32 inSubjHand(*m_pTag->toInt());
-            qint32 newSubjHand(m_iDfltSubjectHand);
+            qint32 newSubjHand(m_iSubjectHand);
             memcpy(m_pTag->data(),&newSubjHand, sizeof(qint32));
             printIfVerbose("Subject handedness changed: " + subjectHandToString(inSubjHand) + " -> " + subjectHandToString(newSubjHand));
         }
