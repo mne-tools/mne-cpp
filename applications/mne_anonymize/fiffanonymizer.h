@@ -129,8 +129,6 @@ public:
      */
     int anonymizeFile();
 
-    fiffData readInfoInFile();
-
     //=========================================================================================================
 public slots:
     /**
@@ -466,13 +464,13 @@ private:
 
     bool m_bUseMeasurementDayOffset;    /**< Flags to use Measurement-date days offset.*/
     bool m_bUseSubjectBirthdayOffset;   /**< Flags use of Subject's birthday offset.*/
+
     bool m_bVerboseMode;                /**< Verbosity mode enabler.*/
     bool m_bBruteMode;                  /**< Advanced anonymization. Anonymize also weight, height and some other fields.*/
 
     FIFFLIB::FiffStream::SPtr m_pInStream;   /**< Pointer to FiffStream object for reading.*/
     FIFFLIB::FiffStream::SPtr m_pOutStream;  /**< Pointer to FiffStream object for writing the result.*/
     FIFFLIB::FiffTag::SPtr m_pTag;         /**< Pointer to FiffTag used for reading and writing each tag.*/
-    //FIFFLIB::FiffTag::SPtr m_pOutTag;        /**< Pointer to FiffTag used for writing each anonymized tag.*/
 
     FIFFLIB::fiff_int_t m_BDfltMAC[2];  /**< MAC addresss substitutor.*/
 
