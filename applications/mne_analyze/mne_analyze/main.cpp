@@ -50,6 +50,7 @@
 #include <QApplication>
 #include <QFontDatabase>
 #include <QtPlugin>
+#include <QSurfaceFormat>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -87,6 +88,10 @@ int main(int argc, char *argv[])
     //set application settings
     QCoreApplication::setOrganizationName(CInfo::OrganizationName());
     QCoreApplication::setApplicationName(CInfo::AppNameShort());
+
+    QSurfaceFormat fmt;
+    fmt.setSamples(4);
+    QSurfaceFormat::setDefaultFormat(fmt);
 
     //New main window instance
     pAnalyzeCore = new AnalyzeCore();
