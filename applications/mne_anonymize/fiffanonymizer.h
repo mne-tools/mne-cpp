@@ -441,9 +441,9 @@ private:
     QString m_sSubjectComment;          /**< Subject's comment substitutor.*/
     QString m_sSubjectHisId;            /**< Subject's HIS ID substitutor.*/
     int m_iSubjectBirthdayOffset;       /**< Subjects's birthday offset.*/
-    int m_iDfltSubjectSex;              /**< Subject's sex substitutor.*/
-    int m_iDfltSubjectId;               /**< Subject's id substitutor.*/
-    int m_iDfltSubjectHand;             /**< Subject's hand substitutor.*/
+    int m_iSubjectSex;              /**< Subject's sex substitutor.*/
+    int m_iSubjectId;               /**< Subject's id substitutor.*/
+    int m_iSubjectHand;             /**< Subject's hand substitutor.*/
     float m_fSubjectWeight;             /**< Subject's weight substitutor.*/
     float m_fSubjectHeight;             /**< Subject's height substitutor.*/
     int m_iProjectId;                   /**< Project's id# substitutor.*/
