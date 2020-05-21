@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/images">
         <file alias="splashscreen_mne_analyze.png">resources/images/splashscreen/splashscreen_mne_analyze.png</file>
+        <file>resources/images/appIcons/icon_mne-analyze_256x256.png</file>
     </qresource>
     <qresource prefix="/fonts">
         <file alias="Lato-Black.ttf">fonts/Lato-Black.ttf</file>

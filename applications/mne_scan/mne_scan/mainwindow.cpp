@@ -121,9 +121,10 @@ MainWindow::MainWindow(QWidget *parent)
     setupPlugins();
     setupUI();
 
+    //Load application icon for linux builds only, mac and win executables have built in icons from .pro file
 #ifdef __linux__
     qInfo() << "Loading icon...";
-    QMainWindow::setWindowIcon(QIcon("../applications/mne_scan/mne_scan/images/appIcons/icon_mne_scan_256x256.png"));
+    QMainWindow::setWindowIcon(QIcon(":/images/appIcons/icon_mne_scan_256x256.png"));
 #endif
 }
 
