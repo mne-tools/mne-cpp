@@ -110,7 +110,6 @@ void RawDataViewer::onModelChanged(QSharedPointer<AbstractModel> pNewModel)
                 return;
             }
         }
-        qDebug() << "RawDataViewer::onModelChanged";
 
         m_pRawModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
         m_pFiffRawView->initMVCSettings(m_pRawModel, m_pRawDelegate);
