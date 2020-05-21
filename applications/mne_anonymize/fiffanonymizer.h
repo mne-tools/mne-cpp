@@ -130,6 +130,32 @@ public:
     int anonymizeFile();
 
     //=========================================================================================================
+signals:
+    void readingMeasurementDateInId(QDateTime d);
+    void readingMeasurementDateInFile(QDateTime d);
+    void readingFileComment(QString s);
+    void readingSubjectId(int i);
+    void readingSubjectFirstName(QString fn);
+    void readingSubjectMiddleName(QString mn);
+    void readingSubjectLastName(QString ln);
+    void readingSubjectBirthday(QDateTime b);
+    void readingSubjectSex(int s);
+    void readingSubjectHand(int h);
+    void readingSubjectWeight(float w);
+    void readingSubjectHeight(float h);
+    void readingSubjectComment(QString c);
+    void readingSubjectHisId(QString);
+
+    void readingProjectId(int);
+    void readingProjectName(QString);
+    void readingProjectAim(QString);
+    void readingProjectPersons(QString);
+    void readingProjectComment(QString);
+
+    void mriDataFoundInFile(bool);
+
+    //=========================================================================================================
+
 public slots:
     /**
      * Configure the input file to anonymize.
@@ -333,7 +359,6 @@ public:
      */
     QString getSubjectHisID();
 
-
 private:
     //=========================================================================================================
     /**
@@ -365,7 +390,7 @@ private:
      * censored/anonymized. If so, perform such anonymization while copying the new tag into an output Tag.
      * This is the core method of the class where the actual anonymization takes place.
      */
-    void censorTag() const;
+    void censorTag();
 
     //=========================================================================================================
     /**

@@ -228,7 +228,7 @@ int FiffAnonymizer::anonymizeFile()
 
 //=============================================================================================================
 
-void FiffAnonymizer::censorTag() const
+void FiffAnonymizer::censorTag()
 {
     switch (m_pTag->kind)
     {
@@ -243,6 +243,8 @@ void FiffAnonymizer::censorTag() const
     {
         FIFFLIB::FiffId inId = m_pTag->toFiffID();
         QDateTime inMeasDate = QDateTime::fromSecsSinceEpoch(inId.time.secs, Qt::LocalTime);
+        emit readingMeasurementDateInId(inMeasDate);
+
         QDateTime outMeasDate;
 
         if(m_bUseMeasurementDateOffset)
