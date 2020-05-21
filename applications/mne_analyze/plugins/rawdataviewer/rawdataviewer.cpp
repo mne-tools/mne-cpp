@@ -39,15 +39,17 @@
 //=============================================================================================================
 
 #include "rawdataviewer.h"
+#include "fiffrawview.h"
+#include "fiffrawviewdelegate.h"
+#include "../dataloader/dataloader.h"
+
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Utils/metatypes.h>
 #include <anShared/Management/communicator.h>
-#include "fiffrawview.h"
-#include "fiffrawviewdelegate.h"
+#include <anShared/Model/annotationmodel.h>
+
 #include <disp/viewers/fiffrawviewsettings.h>
 #include <disp/viewers/scalingview.h>
-#include "../dataloader/dataloader.h"
-#include <anShared/Model/annotationmodel.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -61,6 +63,7 @@
 
 using namespace RAWDATAVIEWERPLUGIN;
 using namespace ANSHAREDLIB;
+using namespace DISPLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -69,7 +72,6 @@ using namespace ANSHAREDLIB;
 RawDataViewer::RawDataViewer()
 : m_iVisibleBlocks(10)
 , m_iBufferBlocks(10)
-, m_pRawDelegate(QSharedPointer<FiffRawViewDelegate>::create())
 {
 }
 
@@ -102,24 +104,6 @@ void RawDataViewer::init()
 
 //=============================================================================================================
 
-void RawDataViewer::onModelChanged(QSharedPointer<AbstractModel> pNewModel)
-{
-    if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
-        if(m_pRawModel) {
-            if(m_pRawModel == pNewModel) {
-                return;
-            }
-        }
-
-        m_pRawModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
-        m_pFiffRawView->initMVCSettings(m_pRawModel, m_pRawDelegate);
-
-        setUpControls();
-    }
-}
-
-//=============================================================================================================
-
 void RawDataViewer::unload()
 {
 }
@@ -142,18 +126,25 @@ QMenu *RawDataViewer::getMenu()
 
 QDockWidget *RawDataViewer::getControl()
 {
-    if(!m_pControlDock) {
-        m_pControlDock = new QDockWidget(getName());
-        m_pControlDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    QDockWidget* pControlDock = new QDockWidget(getName());
+    pControlDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 
-        m_pLayout = new QVBoxLayout;
-        m_pContainer = new QWidget;
+    QVBoxLayout* pLayout = new QVBoxLayout;
 
-        QLabel* tempLabel = new QLabel("No file loaded.");
-        m_pControlDock->setWidget(tempLabel);
-    }
+    //Scaling Widget
+    m_pScalingWidget = new ScalingView("mne_analyze/SignalViewer/Scaling");
+    pLayout->addWidget(m_pScalingWidget);
 
-    return m_pControlDock;
+    //View Widget
+    m_pSettingsViewWidget = new FiffRawViewSettings("mne_analyze/SignalViewer/ViewSettings");
+    m_pSettingsViewWidget->setWidgetList();
+    pLayout->addWidget(m_pSettingsViewWidget);
+
+    QWidget* pWidget = new QWidget();
+    pWidget->setLayout(pLayout);
+    pControlDock->setWidget(pWidget);
+
+    return pControlDock;
 }
 
 //=============================================================================================================
@@ -196,60 +187,56 @@ QVector<EVENT_TYPE> RawDataViewer::getEventSubscriptions(void) const
 
 //=============================================================================================================
 
-void RawDataViewer::setUpControls()
+void RawDataViewer::onModelChanged(QSharedPointer<AbstractModel> pNewModel)
 {
-    QLabel* tempLabel = new QLabel("Loading file");
-    m_pControlDock->setWidget(tempLabel);
+    if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
+        if(m_pFiffRawView->getModel() == pNewModel) {
+            return;
+        }
 
-    disconnectOld();
+        if(!m_pFiffRawView->getDelegate()) {
+            m_pFiffRawView->setDelegate(QSharedPointer<FiffRawViewDelegate>::create());
+        }
 
-    delete m_pLayout;
-    delete m_pContainer;
-    m_pLayout = new QVBoxLayout;
-    m_pContainer = new QWidget;
+        m_pFiffRawView->setModel(qSharedPointerCast<FiffRawViewModel>(pNewModel));
 
-    //Scaling Widget
-    DISPLIB::ScalingView* scalingWidget = new DISPLIB::ScalingView("Test", m_pRawModel->getFiffInfo()->chs);
-    connect(scalingWidget, &DISPLIB::ScalingView::scalingChanged,
-            m_pFiffRawView.data(), &FiffRawView::setScalingMap);
+        updateControls();
+    }
+}
 
-    //View Widget
-    DISPLIB::FiffRawViewSettings* viewWidget = new DISPLIB::FiffRawViewSettings("Test");
-    viewWidget->setWidgetList();
-    connect(viewWidget, &DISPLIB::FiffRawViewSettings::signalColorChanged,
-            m_pFiffRawView.data(), &FiffRawView::setSignalColor);
-    connect(viewWidget, &DISPLIB::FiffRawViewSettings::backgroundColorChanged,
-            m_pFiffRawView.data(), &FiffRawView::setBackgroundColor);
-    connect(viewWidget, &DISPLIB::FiffRawViewSettings::zoomChanged,
-            m_pFiffRawView.data(), &FiffRawView::setZoom);
-    connect(viewWidget, &DISPLIB::FiffRawViewSettings::timeWindowChanged,
-            m_pFiffRawView.data(), &FiffRawView::setWindowSize);
-    connect(viewWidget, &DISPLIB::FiffRawViewSettings::distanceTimeSpacerChanged,
-            m_pFiffRawView.data(), &FiffRawView::setDistanceTimeSpacer);
-    connect(viewWidget, &DISPLIB::FiffRawViewSettings::makeScreenshot,
-            m_pFiffRawView.data(), &FiffRawView::onMakeScreenshot);
+//=============================================================================================================
 
-    //Init view widget (preserved between session)
-    m_pFiffRawView->setWindowSize(viewWidget->getWindowSize());
-    m_pFiffRawView->setSignalColor(viewWidget->getSignalColor());
-    m_pFiffRawView->setBackgroundColor(viewWidget->getBackgroundColor());
-    m_pFiffRawView->setZoom(viewWidget->getZoom());
-    m_pFiffRawView->setDistanceTimeSpacer(viewWidget->getDistanceTimeSpacer());
+void RawDataViewer::updateControls()
+{
+    if(m_pScalingWidget && m_pSettingsViewWidget) {
+        // Setup scaling widget
+        connect(m_pScalingWidget.data(), &DISPLIB::ScalingView::scalingChanged,
+                m_pFiffRawView.data(), &FiffRawView::setScalingMap);
 
-    connect(m_pFiffRawView.data(), &FiffRawView::sendSamplePos,
-            this, &RawDataViewer::onSendSamplePos);
+        // Setup view settings widget
+        connect(m_pSettingsViewWidget.data(), &DISPLIB::FiffRawViewSettings::signalColorChanged,
+                m_pFiffRawView.data(), &FiffRawView::setSignalColor);
+        connect(m_pSettingsViewWidget.data(), &DISPLIB::FiffRawViewSettings::backgroundColorChanged,
+                m_pFiffRawView.data(), &FiffRawView::setBackgroundColor);
+        connect(m_pSettingsViewWidget.data(), &DISPLIB::FiffRawViewSettings::zoomChanged,
+                m_pFiffRawView.data(), &FiffRawView::setZoom);
+        connect(m_pSettingsViewWidget.data(), &DISPLIB::FiffRawViewSettings::timeWindowChanged,
+                m_pFiffRawView.data(), &FiffRawView::setWindowSize);
+        connect(m_pSettingsViewWidget.data(), &DISPLIB::FiffRawViewSettings::distanceTimeSpacerChanged,
+                m_pFiffRawView.data(), &FiffRawView::setDistanceTimeSpacer);
+        connect(m_pSettingsViewWidget.data(), &DISPLIB::FiffRawViewSettings::makeScreenshot,
+                m_pFiffRawView.data(), &FiffRawView::onMakeScreenshot);
 
-    //Set up layout w/ control widgets
-    m_pLayout->addWidget(scalingWidget);
-    m_pLayout->addWidget(viewWidget);
-    m_pLayout->addStretch();
+        // Preserve settings between different file sessions
+        m_pFiffRawView->setWindowSize(m_pSettingsViewWidget->getWindowSize());
+        m_pFiffRawView->setSignalColor(m_pSettingsViewWidget->getSignalColor());
+        m_pFiffRawView->setBackgroundColor(m_pSettingsViewWidget->getBackgroundColor());
+        m_pFiffRawView->setZoom(m_pSettingsViewWidget->getZoom());
+        m_pFiffRawView->setDistanceTimeSpacer(m_pSettingsViewWidget->getDistanceTimeSpacer());
 
-    //Make it all visible to the user
-    m_pControlDock->setWidget(m_pContainer);
-    m_pContainer->setLayout(m_pLayout);
-    m_pContainer->show();
-
-    delete tempLabel;
+        connect(m_pFiffRawView.data(), &FiffRawView::sendSamplePos,
+                this, &RawDataViewer::onSendSamplePos);
+    }
 }
 
 //=============================================================================================================
@@ -260,25 +247,4 @@ void RawDataViewer::onSendSamplePos(int iSample)
     data.setValue(iSample);
 
     m_pCommu->publishEvent(EVENT_TYPE::NEW_ANNOTATION_ADDED, data);
-}
-
-//=============================================================================================================
-
-void RawDataViewer::disconnectOld()
-{
-    disconnect(m_pFiffRawView.data(), &FiffRawView::sendSamplePos,
-            this, &RawDataViewer::onSendSamplePos);
-
-//    connect(viewWidget, &DISPLIB::FiffRawViewSettings::signalColorChanged,
-//            m_pFiffRawView.data(), &FiffRawView::setSignalColor);
-//    connect(viewWidget, &DISPLIB::FiffRawViewSettings::backgroundColorChanged,
-//            m_pFiffRawView.data(), &FiffRawView::setBackgroundColor);
-//    connect(viewWidget, &DISPLIB::FiffRawViewSettings::zoomChanged,
-//            m_pFiffRawView.data(), &FiffRawView::setZoom);
-//    connect(viewWidget, &DISPLIB::FiffRawViewSettings::timeWindowChanged,
-//            m_pFiffRawView.data(), &FiffRawView::setWindowSize);
-//    connect(viewWidget, &DISPLIB::FiffRawViewSettings::distanceTimeSpacerChanged,
-//            m_pFiffRawView.data(), &FiffRawView::setDistanceTimeSpacer);
-//    connect(viewWidget, &DISPLIB::FiffRawViewSettings::makeScreenshot,
-//            m_pFiffRawView.data(), &FiffRawView::onMakeScreenshot);
 }

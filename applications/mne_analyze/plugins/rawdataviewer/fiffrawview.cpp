@@ -118,14 +118,34 @@ FiffRawView::~FiffRawView()
 
 //=============================================================================================================
 
-void FiffRawView::initMVCSettings(const QSharedPointer<FiffRawViewModel>& pModel,
-                                  const QSharedPointer<FiffRawViewDelegate>& pDelegate)
+void FiffRawView::setDelegate(const QSharedPointer<FiffRawViewDelegate>& pDelegate)
 {
-    m_pModel = pModel;
     m_pDelegate = pDelegate;
 
-    m_pTableView->setModel(pModel.data());
-    m_pTableView->setItemDelegate(pDelegate.data());
+    m_pTableView->setItemDelegate(m_pDelegate.data());
+}
+
+//=============================================================================================================
+
+QSharedPointer<FiffRawViewDelegate> FiffRawView::getDelegate()
+{
+    return m_pDelegate;
+}
+
+//=============================================================================================================
+
+QSharedPointer<FiffRawViewModel> FiffRawView::getModel()
+{
+    return m_pModel;
+}
+
+//=============================================================================================================
+
+void FiffRawView::setModel(const QSharedPointer<FiffRawViewModel>& pModel)
+{
+    m_pModel = pModel;
+
+    m_pTableView->setModel(m_pModel.data());
 
     m_pTableView->setObjectName(QString::fromUtf8("m_pTableView"));
     QSizePolicy sizePolicy3(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -165,11 +185,11 @@ void FiffRawView::initMVCSettings(const QSharedPointer<FiffRawViewModel>& pModel
 
     // Connect QScrollBar with model in order to reload data samples
     connect(m_pTableView->horizontalScrollBar(), &QScrollBar::valueChanged,
-            pModel.data(), &FiffRawViewModel::updateScrollPosition);
+            m_pModel.data(), &FiffRawViewModel::updateScrollPosition);
 
     // Connect and init resizing of the table view to the MVC
     connect(this, &FiffRawView::tableViewDataWidthChanged,
-            pModel.data(), &FiffRawViewModel::setDataColumnWidth, Qt::UniqueConnection);
+            m_pModel.data(), &FiffRawViewModel::setDataColumnWidth, Qt::UniqueConnection);
 
     pModel->setDataColumnWidth(m_pTableView->width()-m_pTableView->columnWidth(0));
     m_pTableView->resizeColumnsToContents();
