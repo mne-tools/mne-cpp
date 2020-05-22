@@ -216,7 +216,7 @@ bool RtcMne::calcFiffInfo()
     QMutexLocker locker(&m_qMutex);
 
     if(m_qListCovChNames.size() > 0 && m_pFiffInfoInput && m_pFiffInfoForward) {
-        qDebug() << "RtcMne::calcFiffInfoFiff - Infos available";
+        qDebug() << "[RtcMne::calcFiffInfoFiff] Infos available";
 
 //        qDebug() << "RtcMne::calcFiffInfo - m_qListCovChNames" << m_qListCovChNames;
 //        qDebug() << "RtcMne::calcFiffInfo - m_pFiffInfoForward->ch_names" << m_pFiffInfoForward->ch_names;
@@ -593,7 +593,7 @@ void RtcMne::run()
         m_qMutex.unlock();
 
         if(bUpdateMinimumNorm) {
-            qDebug() << "Run - rtcmne - update minimumnorm";
+            qDebug() << "Run - rtcmne - update minimumnorm ----------------";
             m_qMutex.lock();
             pMinimumNorm = MinimumNorm::SPtr(new MinimumNorm(m_invOp, lambda2, m_sMethod));
             m_bUpdateMinimumNorm = false;
