@@ -163,6 +163,8 @@ void RtFwd::unload()
 
 bool RtFwd::start()
 {
+    // Maybe we can move all of this to the run() method?
+    // Read BEM
     QFile t_fBem(m_pFwdSettings->bemname);
     FiffStream::SPtr stream(new FiffStream(&t_fBem));
     if(!stream->open()) {
@@ -175,6 +177,8 @@ bool RtFwd::start()
         return false;
     }
     stream->close();
+
+    // Read source space
     QFile t_fSource(m_pFwdSettings->srcname);
     stream = FiffStream::SPtr(new FiffStream(&t_fSource));
     if(!stream->open()) {
@@ -188,6 +192,8 @@ bool RtFwd::start()
         return false;
     }
     stream->close();
+
+    // Read MRI transformation
     QFile t_fMri(m_pFwdSettings->mriname);
     stream = FiffStream::SPtr(new FiffStream(&t_fMri));
     if(!stream->open()) {
@@ -200,6 +206,8 @@ bool RtFwd::start()
         return false;
     }
     stream->close();
+
+    // Read measurement
     QFile t_fMeas(m_pFwdSettings->measname);
     stream = FiffStream::SPtr(new FiffStream(&t_fMri));
     if(!stream->open()) {
@@ -212,8 +220,10 @@ bool RtFwd::start()
         return false;
     }
     stream->close();
+
     //Start thread
     QThread::start();
+
     return true;
 }
 
@@ -223,9 +233,6 @@ bool RtFwd::stop()
 {
     requestInterruption();
     wait(500);
-
-    // Clear all data in the buffer connected to displays and other plugins
-    // m_pOutput->data()->clear();
 
     m_bPluginControlWidgetsInit = false;
 
@@ -269,17 +276,13 @@ void RtFwd::update(SCMEASLIB::Measurement::SPtr pMeasurement)
         if(!m_bPluginControlWidgetsInit) {
             initPluginControlWidgets();
         }
-    }
-
-    if(QSharedPointer<RealTimeHpiResult> pRTHPI = pMeasurement.dynamicCast<RealTimeHpiResult>()) {
+    } else if(QSharedPointer<RealTimeHpiResult> pRTHPI = pMeasurement.dynamicCast<RealTimeHpiResult>()) {
         //Fiff information
         m_mutex.lock();
         if(!m_pFiffInfo) {
             m_pFiffInfo = pRTHPI->getFiffInfo();
         }
-        m_mutex.unlock();
 
-        m_mutex.lock();
         if(!m_bBusy) {
             m_pHpiFitResult = pRTHPI->getValue();
         }
@@ -387,27 +390,20 @@ void RtFwd::onAtlasDirChanged(const QString& sDirPath, const AnnotationSet::SPtr
 
 void RtFwd::run()
 {
-    bool bFiffInfo = false;
-
-    // Wait for fiff info
+    // Wait for fiff the info to arrive
     while(true) {
         m_mutex.lock();
         if(m_pFiffInfo) {
-            bFiffInfo = true;
-        }
-        m_mutex.unlock();
-        if(bFiffInfo) {
+            m_mutex.unlock();
             break;
         }
-        msleep(100);
+        m_mutex.unlock();
+        msleep(200);
     }
 
     m_mutex.lock();
     m_pFwdSettings->pFiffInfo = m_pFiffInfo;
     m_pRTFSOutput->data()->setFiffInfo(m_pFiffInfo);
-    m_mutex.unlock();
-
-    m_mutex.lock();
     FiffCoordTransOld transMegHeadOld = m_transDevHead.toOld();
     m_mutex.unlock();
 
@@ -507,10 +503,12 @@ void RtFwd::run()
                 }
             }
         }
+
         // do clustering if requested and fwd is ready
         m_mutex.lock();
         bDoClustering = m_bDoClustering;
         m_mutex.unlock();
+
         if(bDoClustering && bFwdReady) {
             emit statusInformationChanged(3);               // clustering
             pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(pFwdSolution->cluster_forward_solution(*m_pAnnotationSet.data(), 200)));
