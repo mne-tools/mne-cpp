@@ -105,6 +105,7 @@ RtcMne::RtcMne()
 , m_sAvrType("3")
 , m_sMethod("dSPM")
 , m_fMriHeadTrans(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/all-trans.fif")
+, m_bUpdateMinimumNorm(false)
 {
 }
 
@@ -210,7 +211,7 @@ void RtcMne::unload()
 
 //=============================================================================================================
 
-void RtcMne::calcFiffInfo()
+bool RtcMne::calcFiffInfo()
 {
     QMutexLocker locker(&m_qMutex);
 
@@ -299,7 +300,11 @@ void RtcMne::calcFiffInfo()
         m_pRTSEOutput->data()->setFiffInfo(m_pFiffInfo);
 
         // qDebug() << "RtcMne::calcFiffInfo - m_pFiffInfo" << m_pFiffInfo->ch_names;
+
+        return true;
     }
+
+    return false;
 }
 
 //=============================================================================================================
@@ -353,11 +358,11 @@ QWidget* RtcMne::setupWidget()
 void RtcMne::updateRTFS(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
     if(QSharedPointer<RealTimeFwdSolution> pRTFS = pMeasurement.dynamicCast<RealTimeFwdSolution>()) {
-
         if(pRTFS->isClustered()) {
-            m_qMutex.lock();
             m_pFwd = pRTFS->getValue();
             m_pRTSEOutput->data()->setFwdSolution(m_pFwd);
+
+            m_qMutex.lock();
             m_pFiffInfoForward = QSharedPointer<FiffInfoBase>(new FiffInfoBase(m_pFwd->info));
             m_qMutex.unlock();
         } else if(!pRTFS->isClustered()) {
@@ -387,7 +392,7 @@ void RtcMne::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement)
                 initPluginControlWidgets();
             }
 
-            if(this->isRunning() && m_pMinimumNorm) {
+            if(this->isRunning()) {
                 // Check for artifacts
                 QMap<QString,double> mapReject;
                 mapReject.insert("eog", 150e-06);
@@ -506,33 +511,19 @@ void RtcMne::updateInvOp(const MNEInverseOperator& invOp)
     QMutexLocker locker(&m_qMutex);
 
     m_invOp = invOp;
-    double snr = 1.0;
-    double lambda2 = 1.0 / pow(snr, 2); //ToDo estimate lambda using covariance
 
-    m_pMinimumNorm = MinimumNorm::SPtr(new MinimumNorm(m_invOp, lambda2, m_sMethod));
-
-    //Set up the inverse according to the parameters
-    // Use 1 nave here because in case of evoked data as input the minimum norm will always be updated when the source estimate is calculated (see run method).
-    m_pMinimumNorm->doInverseSetup(1,true);
+    m_bUpdateMinimumNorm = true;
 }
 
 //=============================================================================================================
 
 void RtcMne::onMethodChanged(const QString& method)
 {
-    m_sMethod = method;
-
     QMutexLocker locker(&m_qMutex);
 
-    if(m_pMinimumNorm) {
-        double snr = 1.0;
-        double lambda2 = 1.0 / pow(snr, 2); //ToDo estimate lambda using covariance
-        m_pMinimumNorm = MinimumNorm::SPtr(new MinimumNorm(m_invOp, lambda2, m_sMethod));
+    m_sMethod = method;
 
-        // Set up the inverse according to the parameters.
-        // Use 1 nave here because in case of evoked data as input the minimum norm will always be updated when the source estimate is calculated (see run method).
-        m_pMinimumNorm->doInverseSetup(1,true);
-    }
+    m_bUpdateMinimumNorm = true;
 }
 
 //=============================================================================================================
@@ -563,19 +554,9 @@ void RtcMne::onTimePointValueChanged(int iTimePointMs)
 
 void RtcMne::run()
 {
-    // Wait for fiff info and minimum norm instance
-    while(true) {
-        m_qMutex.lock();
-        if(m_pFiffInfo && m_pMinimumNorm) {
-            m_qMutex.unlock();
-            break;
-        }
-        m_qMutex.unlock();
-
-        if(!m_pFiffInfo) {
-            calcFiffInfo();
-        }
-        msleep(100);
+    // Wait for fiff info to arrive
+    while(!calcFiffInfo()) {
+        msleep(200);
     }
 
     // Init parameters
@@ -585,10 +566,17 @@ void RtcMne::run()
     MatrixXd matDataResized;
     qint32 j;
     int iTimePointSps = 0;
-    float tmin, tstep;
+    int iNumberChannels = 0;
+    int iDownSample = 1;
+    float tstep;
+    float lambda2 = 1.0f / pow(1.0f, 2); //ToDo estimate lambda using covariance
     MNESourceEstimate sourceEstimate;
     bool bEvokedInput = false;
     bool bRawInput = false;
+    bool bUpdateMinimumNorm = false;
+    QSharedPointer<INVERSELIB::MinimumNorm> pMinimumNorm;
+    QStringList lChNamesFiffInfo;
+    QStringList lChNamesInvOp;
 
     // Start processing data
     while(!isInterruptionRequested()) {
@@ -596,34 +584,45 @@ void RtcMne::run()
         iTimePointSps = m_iTimePointSps;
         bEvokedInput = m_bEvokedInput;
         bRawInput = m_bRawInput;
+        iDownSample = m_iDownSample;
+        iNumberChannels = m_invOp.noise_cov->names.size();
+        tstep = 1.0f / m_pFiffInfoInput->sfreq;
+        lChNamesFiffInfo = m_pFiffInfoInput->ch_names;
+        lChNamesInvOp = m_invOp.noise_cov->names;
+        bUpdateMinimumNorm = m_bUpdateMinimumNorm;
         m_qMutex.unlock();
 
+        if(bUpdateMinimumNorm) {
+            qDebug() << "Run - rtcmne - update minimumnorm";
+            m_qMutex.lock();
+            pMinimumNorm = MinimumNorm::SPtr(new MinimumNorm(m_invOp, lambda2, m_sMethod));
+            m_bUpdateMinimumNorm = false;
+            m_qMutex.unlock();
+
+            // Set up the inverse according to the parameters.
+            // Use 1 nave here because in case of evoked data as input the minimum norm will always be updated when the source estimate is calculated (see run method).
+            pMinimumNorm->doInverseSetup(1,true);
+        }
+
         //Process data from raw data input
-        if(bRawInput) {
-            if(((skip_count % m_iDownSample) == 0)) {
+        if(bRawInput && pMinimumNorm) {
+            if(((skip_count % iDownSample) == 0)) {
                 // Get the current raw data
                 if(m_pCircularMatrixBuffer->pop(matData)) {
                     //Pick the same channels as in the inverse operator
-                    m_qMutex.lock();
-                    matDataResized.resize(m_invOp.noise_cov->names.size(), matData.cols());
+                    matDataResized.resize(iNumberChannels, matData.cols());
 
-                    for(j = 0; j < m_invOp.noise_cov->names.size(); ++j) {
-                        matDataResized.row(j) = matData.row(m_pFiffInfoInput->ch_names.indexOf(m_invOp.noise_cov->names.at(j)));
+                    for(j = 0; j < iNumberChannels; ++j) {
+                        matDataResized.row(j) = matData.row(lChNamesFiffInfo.indexOf(lChNamesInvOp.at(j)));
                     }
 
-                    tmin = 0.0f;
-                    tstep = 1.0f / m_pFiffInfoInput->sfreq;
-
                     //TODO: Add picking here. See evoked part as input.
-                    sourceEstimate = m_pMinimumNorm->calculateInverse(matDataResized,
-                                                                      tmin,
-                                                                      tstep,
-                                                                      true);
-
-                    m_qMutex.unlock();
+                    sourceEstimate = pMinimumNorm->calculateInverse(matDataResized,
+                                                                    0.0f,
+                                                                    tstep,
+                                                                    true);
 
                     if(!sourceEstimate.isEmpty()) {
-                        //qInfo() << QDateTime::currentDateTime().toString("hh:mm:ss.z") << m_iBlockNumberProcessed++ << "MNE Processed";
                         if(iTimePointSps < sourceEstimate.data.cols() && iTimePointSps >= 0) {
                             sourceEstimate = sourceEstimate.reduce(iTimePointSps,1);
                             m_pRTSEOutput->data()->setValue(sourceEstimate);
@@ -638,21 +637,13 @@ void RtcMne::run()
         }
 
         //Process data from averaging input
-        if(bEvokedInput) {
+        if(bEvokedInput && pMinimumNorm) {
             if(m_pCircularEvokedBuffer->pop(evoked)) {
                 // Get the current evoked data
-                if(((skip_count % m_iDownSample) == 0)) {
-    //                    QElapsedTimer time;
-    //                    time.start();
-
-                    m_qMutex.lock();
-                    sourceEstimate = m_pMinimumNorm->calculateInverse(evoked);
-                    m_qMutex.unlock();
+                if(((skip_count % iDownSample) == 0)) {
+                    sourceEstimate = pMinimumNorm->calculateInverse(evoked);
 
                     if(!sourceEstimate.isEmpty()) {
-                        //qInfo() << time.elapsed() << m_iBlockNumberProcessed << "MNE Time";
-                        //qInfo() << QDateTime::currentDateTime().toString("hh:mm:ss.z") << m_iBlockNumberProcessed++ << "MNE Processed";
-
                         if(iTimePointSps < sourceEstimate.data.cols() && iTimePointSps >= 0) {
                             sourceEstimate = sourceEstimate.reduce(iTimePointSps,1);
                             m_pRTSEOutput->data()->setValue(sourceEstimate);
@@ -665,7 +656,7 @@ void RtcMne::run()
                 }
             }
         }
-    }
 
-    ++skip_count;
+        ++skip_count;
+    }
 }
