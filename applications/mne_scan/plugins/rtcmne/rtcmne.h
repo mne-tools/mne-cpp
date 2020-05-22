@@ -160,7 +160,7 @@ public:
     /**
      * Slot called when the fiff info is to be calculated.
      */
-    void calcFiffInfo();
+    bool calcFiffInfo();
 
     //=========================================================================================================
     /**
@@ -196,7 +196,6 @@ public:
      */
     void updateRTFS(SCMEASLIB::Measurement::SPtr pMeasurement);
 
-
 protected:
     //=========================================================================================================
     /**
@@ -231,7 +230,6 @@ protected:
     QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeSourceEstimate> >       m_pRTSEOutput;              /**< The RealTimeSourceEstimate output.*/
     QSharedPointer<IOBUFFER::CircularBuffer_Matrix_double >                                 m_pCircularMatrixBuffer;    /**< Holds incoming RealTimeMultiSampleArray data.*/
     QSharedPointer<IOBUFFER::CircularBuffer<FIFFLIB::FiffEvoked> >                          m_pCircularEvokedBuffer;    /**< Holds incoming RealTimeMultiSampleArray data.*/
-    QSharedPointer<INVERSELIB::MinimumNorm>                                                 m_pMinimumNorm;             /**< Minimum Norm Estimation. */
     QSharedPointer<RTPROCESSINGLIB::RtInvOp>                                                m_pRtInvOp;                 /**< Real-time inverse operator. */
     QSharedPointer<MNELIB::MNEForwardSolution>                                              m_pFwd;                     /**< Forward solution. */
     QSharedPointer<FSLIB::AnnotationSet>                                                    m_pAnnotationSet;           /**< Annotation set. */
@@ -242,6 +240,7 @@ protected:
 
     bool                            m_bEvokedInput;             /**< Flag whether an evoked input was received. */
     bool                            m_bRawInput;                /**< Flag whether a raw data input was received. */
+    bool                            m_bUpdateMinimumNorm;       /**< Flag whether to update the miniumum norm object. */
 
     QMutex                          m_qMutex;                   /**< The mutex ensuring thread safety. */
     QFuture<void>                   m_future;                   /**< The future monitoring the clustering. */
