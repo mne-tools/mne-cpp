@@ -193,6 +193,7 @@ void MainWindow::createLogDockWindow()
 {
     //Log TextBrowser
     QDockWidget* pDockWidget_Log = new QDockWidget(tr("Log"), this);
+    pDockWidget_Log->setObjectName("Log");
 
     // Disable floating and editable dock widgets, since the wasm QDockWidget version is buggy
     #ifdef WASMBUILD
