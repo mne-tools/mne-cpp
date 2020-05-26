@@ -77,6 +77,9 @@ BrainFlowSetupWidget::BrainFlowSetupWidget(BrainFlowBoard *board, QWidget *paren
     ui->boardId->addItem("Cyton Daisy Wifi");
     ui->boardId->addItem("BrainBit");
     ui->boardId->addItem("Unicorn");
+    ui->boardId->addItem("Callibri EEG");
+    ui->boardId->addItem("Callibri EMG");
+    ui->boardId->addItem("Callibri ECG");
     ui->boardId->setCurrentIndex(1); // Synthetic board is default
 
     connect(ui->prepareSession, &QPushButton::clicked, this, &BrainFlowSetupWidget::prepareSession);
@@ -107,6 +110,7 @@ void BrainFlowSetupWidget::prepareSession()
     params.mac_address = ui->macAddress->text().toStdString();
     params.other_info = ui->otherInfo->text().toStdString();
     params.serial_port = ui->serialPort->text().toStdString();
+    params.serial_number = ui->serialNumber->text().toStdString();
 
     std::string streamerParams = ui->streamerParams->text().toStdString();
 
@@ -145,6 +149,15 @@ void BrainFlowSetupWidget::prepareSession()
             break;
         case 9:
             boardId = (int)BoardIds::UNICORN_BOARD;
+            break;
+        case 10:
+            boardId = (int)BoardIds::CALLIBRI_EEG_BOARD;
+            break;
+        case 11:
+            boardId = (int)BoardIds::CALLIBRI_EMG_BOARD;
+            break;
+        case 12:
+            boardId = (int)BoardIds::CALLIBRI_ECG_BOARD;
             break;
     }
 
