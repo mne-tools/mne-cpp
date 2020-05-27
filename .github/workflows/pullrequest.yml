@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       max-parallel: 6
       matrix:
-        qt: [5.14.2, 5.10.1]
+        qt: [5.15.0, 5.10.1]
         os: [ubuntu-16.04, macos-latest, windows-2016]
 
     steps:
@@ -102,7 +102,7 @@ jobs:
       fail-fast: false
       max-parallel: 3
       matrix:
-        qt: [5.14.2]
+        qt: [5.15.0]
         os: [ubuntu-16.04, macos-latest, windows-2016]
 
     steps:
@@ -121,21 +121,21 @@ jobs:
       if: matrix.os == 'ubuntu-16.04'
       run: |
         # Download the pre-built static version of Qt, which was created with the generateBinaries.yml workflow
-        wget -O qt5_5142_static_binaries_linux.tar.gz https://www.dropbox.com/s/k245dalpw02ok1q/qt5_5142_static_binaries_linux.tar.gz?dl=1
+        wget -O qt5_5150_static_binaries_linux.tar.gz https://www.dropbox.com/s/k245dalpw02ok1q/qt5_5150_static_binaries_linux.tar.gz?dl=1
         mkdir ../Qt5_binaries
-        tar xvzf qt5_5142_static_binaries_linux.tar.gz -C ../ -P
+        tar xvzf qt5_5150_static_binaries_linux.tar.gz -C ../ -P
     - name: Install Qt (MacOS)
       if: matrix.os == 'macos-latest'
       run: |
         # Download the pre-built static version of Qt, which was created with the generateBinaries.yml workflow
-        wget -O qt5_5142_static_binaries_macos.tar.gz https://www.dropbox.com/s/bnlec4qpl7c22rp/qt5_5142_static_binaries_macos.tar.gz?dl=1
-        tar xvzf qt5_5142_static_binaries_macos.tar.gz -P
+        wget -O qt5_5150_static_binaries_macos.tar.gz https://www.dropbox.com/s/bnlec4qpl7c22rp/qt5_5150_static_binaries_macos.tar.gz?dl=1
+        tar xvzf qt5_5150_static_binaries_macos.tar.gz -P
     - name: Install Qt (Windows)
       if: matrix.os == 'windows-2016'
       run: |
         # Download the pre-built static version of Qt, which was created with the generateBinaries.yml workflow
-        Invoke-WebRequest https://www.dropbox.com/s/r1z7jjit23si9rp/qt5_5142_static_binaries_win.zip?dl=1 -OutFile .\qt5_5142_static_binaries_win.zip
-        expand-archive -path "qt5_5142_static_binaries_win.zip" -destinationpath "..\"
+        Invoke-WebRequest https://www.dropbox.com/s/r1z7jjit23si9rp/qt5_5150_static_binaries_win.zip?dl=1 -OutFile .\qt5_5150_static_binaries_win.zip
+        expand-archive -path "qt5_5150_static_binaries_win.zip" -destinationpath "..\"
     - name: Install jom (Windows)
       if: matrix.os == 'windows-2016'
       run: |
@@ -183,13 +183,13 @@ jobs:
       if: (matrix.os == 'ubuntu-16.04') || (matrix.os == 'macos-latest')
       uses: jurplel/install-qt-action@v2
       with:
-        version: 5.14.2
+        version: 5.15.0
         modules: qtcharts    
     - name: Install Qt (Windows)
       if: matrix.os == 'windows-2016'
       uses: jurplel/install-qt-action@v2
       with:
-        version: 5.14.2
+        version: 5.15.0
         arch: win64_msvc2017_64
         modules: qtcharts
     - name: Install jom (Windows) 

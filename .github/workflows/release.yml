@@ -70,15 +70,15 @@ jobs:
     - name: Install Qt
       run: |
         # Download the pre-built static version of Qt, which was created with the buildqtbinaries.yml workflow
-        wget -O qt5_5142_static_binaries_linux.tar.gz https://www.dropbox.com/s/k245dalpw02ok1q/qt5_5142_static_binaries_linux.tar.gz?dl=1
+        wget -O qt5_5150_static_binaries_linux.tar.gz https://www.dropbox.com/s/k245dalpw02ok1q/qt5_5150_static_binaries_linux.tar.gz?dl=1
         mkdir ../Qt5_binaries
-        tar xvzf qt5_5142_static_binaries_linux.tar.gz -C ../ -P
+        tar xvzf qt5_5150_static_binaries_linux.tar.gz -C ../ -P
     # Uncomment this if you want to build Qt statically in this workflow
     # - name: Compile static Qt version
     #   run: |
     #     # Clone Qt5 repo
     #     cd ..
-    #     git clone https://code.qt.io/qt/qt5.git -b 5.14.2
+    #     git clone https://code.qt.io/qt/qt5.git -b 5.15.0
     #     cd qt5
     #     ./init-repository -f --module-subset=qtbase,qtcharts,qtsvg,qt3d
     #     # Create shadow build folder
@@ -132,14 +132,14 @@ jobs:
     - name: Install Qt
       run: |
         # Download the pre-built static version of Qt, which was created with the buildqtbinaries.yml workflow
-        wget -O qt5_5142_static_binaries_macos.tar.gz https://www.dropbox.com/s/bnlec4qpl7c22rp/qt5_5142_static_binaries_macos.tar.gz?dl=1
-        tar xzf qt5_5142_static_binaries_macos.tar.gz -P
+        wget -O qt5_5150_static_binaries_macos.tar.gz https://www.dropbox.com/s/bnlec4qpl7c22rp/qt5_5150_static_binaries_macos.tar.gz?dl=1
+        tar xzf qt5_5150_static_binaries_macos.tar.gz -P
     # Uncomment this if you want to build Qt statically in this workflow
     # - name: Compile static Qt version
     #   run: |
     #     # Clone Qt5 repo
     #     cd ..
-    #     git clone https://code.qt.io/qt/qt5.git -b 5.14.2
+    #     git clone https://code.qt.io/qt/qt5.git -b 5.15.0
     #     cd qt5
     #     ./init-repository -f --module-subset=qtbase,qtcharts,qtsvg,qt3d
     #     # Create shadow build folder
@@ -203,14 +203,14 @@ jobs:
     - name: Install Qt
       run: |
         # Download the pre-built static version of Qt, which was created with the buildqtbinaries.yml workflow
-        Invoke-WebRequest https://www.dropbox.com/s/r1z7jjit23si9rp/qt5_5142_static_binaries_win.zip?dl=1 -OutFile .\qt5_5142_static_binaries_win.zip
-        expand-archive -path "qt5_5142_static_binaries_win.zip" -destinationpath "..\"
+        Invoke-WebRequest https://www.dropbox.com/s/r1z7jjit23si9rp/qt5_5150_static_binaries_win.zip?dl=1 -OutFile .\qt5_5150_static_binaries_win.zip
+        expand-archive -path "qt5_5150_static_binaries_win.zip" -destinationpath "..\"
     # Uncomment this if you want to build Qt statically in this workflow
     # - name: Compile static Qt version
     #   run: |
     #     # Clone Qt5 repo
     #     cd ..
-    #     git clone https://code.qt.io/qt/qt5.git -b 5.14.2
+    #     git clone https://code.qt.io/qt/qt5.git -b 5.15.0
     #     cd qt5
     #     perl init-repository -f --module-subset=qtbase,qtcharts,qtsvg,qt3d
     #     # Create shadow build folder
@@ -276,7 +276,7 @@ jobs:
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with:
-        version: 5.14.2
+        version: 5.15.0
         modules: qtcharts
     - name: Compile BrainFlow submodule
       run: |
@@ -359,7 +359,7 @@ jobs:
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with:
-        version: 5.14.2
+        version: 5.15.0
         modules: qtcharts
     - name: Compile BrainFlow submodule 
       run: |
@@ -431,7 +431,7 @@ jobs:
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with:
-        version: 5.14.2
+        version: 5.15.0
         arch: win64_msvc2017_64
         modules: qtcharts
     - name: Install jom
@@ -507,7 +507,7 @@ jobs:
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with:
-        version: 5.14.2
+        version: 5.15.0
         modules: qtcharts
     - name: Configure and compile MNE-CPP
       run: |
@@ -644,7 +644,7 @@ jobs:
         # Activate PATH and other environment variables in the current terminal
         source ./emsdk/emsdk_env.sh
         # Clone Qt5 repo
-        git clone https://code.qt.io/qt/qt5.git -b 5.14.2
+        git clone https://code.qt.io/qt/qt5.git -b 5.15.0
         cd qt5
         ./init-repository -f --module-subset=qtbase,qtcharts,qtsvg
         # Configure Qt5
