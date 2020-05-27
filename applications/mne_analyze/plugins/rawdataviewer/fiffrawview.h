@@ -269,6 +269,12 @@ private:
      */
     void updateLabels(int iValue);
 
+    //=========================================================================================================
+    /**
+     * @brief disconnectModel
+     */
+    void disconnectModel();
+
     QPointer<QTableView>                                m_pTableView;                   /**< Pointer to table view ui element */
 
     QSharedPointer<ANSHAREDLIB::FiffRawViewModel>       m_pModel;                       /**< Pointer to associated Model */

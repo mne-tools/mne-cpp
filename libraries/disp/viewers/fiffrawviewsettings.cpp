@@ -73,7 +73,7 @@ FiffRawViewSettings::FiffRawViewSettings(const QString &sSettingsPath,
 
     this->setWindowTitle("Channel Data View Settings");
     this->setMinimumWidth(330);
-    this->setMaximumWidth(330);
+    //this->setMaximumWidth(330);
 
     loadSettings(m_sSettingsPath);
 }
@@ -295,7 +295,7 @@ void FiffRawViewSettings::onViewColorButtonClicked()
     QObject* obj = sender();
     if(obj == ui->m_pushButton_signalColor) {
         pDialog->setCurrentColor(m_colCurrentSignalColor);
-        pDialog->setWindowTitle("Select Signal Color");
+        pDialog->setWindowTitle("Signal Color");
 
         pDialog->exec();
         m_colCurrentSignalColor = pDialog->currentColor();
@@ -308,7 +308,7 @@ void FiffRawViewSettings::onViewColorButtonClicked()
 
     if( obj == ui->m_pushButton_backgroundColor ) {
         pDialog->setCurrentColor(m_colCurrentBackgroundColor);
-        pDialog->setWindowTitle("Select Background Color");
+        pDialog->setWindowTitle("Background Color");
 
         pDialog->exec();
         m_colCurrentBackgroundColor = pDialog->currentColor();

@@ -143,6 +143,7 @@ void FiffRawView::setModel(const QSharedPointer<FiffRawViewModel>& pModel)
         qWarning() << "[FiffRawView::setModel] Passed model is NULL.";
         return;
     }
+    disconnectModel();
 
     m_pModel = pModel;
 
@@ -190,7 +191,7 @@ void FiffRawView::setModel(const QSharedPointer<FiffRawViewModel>& pModel)
 
     // Connect QScrollBar with model in order to reload data samples
     connect(m_pTableView->horizontalScrollBar(), &QScrollBar::valueChanged,
-            m_pModel.data(), &FiffRawViewModel::updateScrollPosition);
+            m_pModel.data(), &FiffRawViewModel::updateScrollPosition, Qt::UniqueConnection);
 
     // Connect and init resizing of the table view to the MVC
     connect(this, &FiffRawView::tableViewDataWidthChanged,
@@ -464,4 +465,17 @@ void FiffRawView::updateLabels(int iValue)
     iSample += m_iT * m_pModel->getFiffInfo()->sfreq;
     strRight = QString("%1 | %2 sec").arg(QString().number(iSample)).arg(QString().number(iSample / m_pModel->getFiffInfo()->sfreq, 'f', 2));
     m_pRightLabel->setText(strRight);
+}
+
+//=============================================================================================================
+
+void FiffRawView::disconnectModel()
+{
+    // Connect QScrollBar with model in order to reload data samples
+    disconnect(m_pTableView->horizontalScrollBar(), &QScrollBar::valueChanged,
+            m_pModel.data(), &FiffRawViewModel::updateScrollPosition);
+
+    // Connect and init resizing of the table view to the MVC
+    disconnect(this, &FiffRawView::tableViewDataWidthChanged,
+            m_pModel.data(), &FiffRawViewModel::setDataColumnWidth);
 }
