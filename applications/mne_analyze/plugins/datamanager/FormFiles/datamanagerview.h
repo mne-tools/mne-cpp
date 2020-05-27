@@ -100,10 +100,31 @@ public:
     void setModel(QAbstractItemModel *pModel);
 
 private:
+
+    //=========================================================================================================
     void customMenuRequested(QPoint pos);
 
+    //=========================================================================================================
+    /**
+     * @brief onCurrentItemChanged
+     *
+     * @param [in] selected
+     * @param [in] deselected
+     */
     void onCurrentItemChanged(const QItemSelection &selected,
                               const QItemSelection &deselected);
+
+    //=========================================================================================================
+    /**
+     * Selects most recently loaded file in data manager
+     *
+     * @param [in] parent   UNUSED - QModelIndex to parent of where the new row was inserted in the model
+     * @param [in] first    index of first row that was added
+     * @param [in] last     UNUSED - index of the last row that was added
+     */
+    void onNewFileLoaded(const QModelIndex &parent,
+                         int first,
+                         int last);
 
     Ui::DataManagerView *m_pUi;   /**< The user interface */
 
