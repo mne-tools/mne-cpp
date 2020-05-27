@@ -49,10 +49,10 @@ cd emsdk
 git pull
 
 # Download and install the latest SDK tools.
-./emsdk install 1.39.3
+./emsdk install 1.39.8
 
 # Make the "latest" SDK "active" for the current user. (writes ~/.emscripten file)
-./emsdk activate 1.39.3
+./emsdk activate 1.39.8
 
 # Activate PATH and other environment variables in the current terminal
 source ./emsdk_env.sh
@@ -65,7 +65,7 @@ This is needed since we want to have threading support which is deactivated for 
 Make sure to activate and source the correct emscripten version since the compiler will be used when building qt against wasm. You could also add this to your .basrc file. For example:
 
 ```
-./emsdk activate 1.39.3
+./emsdk activate 1.39.8
 source ./emsdk_env.sh
 ```
 
@@ -75,10 +75,10 @@ Install some dependencies (just to make sure)
 sudo apt-get install build-essential libgl1-mesa-dev python
 ```
 
-Clone the current Qt version. For example Qt 5.14.2:
+Clone the current Qt version. For example Qt 5.15.0:
 
 ```
-git clone https://code.qt.io/qt/qt5.git -b 5.14.2      
+git clone https://code.qt.io/qt/qt5.git -b 5.15   
 cd qt5
 ./init-repository -f --module-subset=qtbase,qtcharts,qtsvg
 ```

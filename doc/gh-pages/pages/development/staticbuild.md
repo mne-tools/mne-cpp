@@ -24,10 +24,10 @@ Git/
 
 ### Get the Qt source code
 
-Clone the current Qt version. Currently, MNE-CPP uses four Qt modules: QtBase, QtCharts, QtSvg and Qt3D. QtBase subdivides in other modules reflecting most of the Qt functionality (core, gui, widgets, etc). In order to setup the sources for Qt 5.14.2 type:
+Clone the current Qt version. Currently, MNE-CPP uses four Qt modules: QtBase, QtCharts, QtSvg and Qt3D. QtBase subdivides in other modules reflecting most of the Qt functionality (core, gui, widgets, etc). In order to setup the sources for Qt 5.15.0 type:
 
 ```
-git clone https://code.qt.io/qt/qt5.git -b 5.14.2  
+git clone https://code.qt.io/qt/qt5.git -b 5.15
 cd qt5
 ```
 
