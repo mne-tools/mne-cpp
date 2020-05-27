@@ -133,19 +133,37 @@ QDockWidget *RawDataViewer::getControl()
     QVBoxLayout* pLayout = new QVBoxLayout;
 
     //Scaling Widget
+    QLabel* title_scaling = new QLabel();
+    title_scaling->setTextFormat(Qt::RichText);
+    title_scaling->setText("<b>Channel Scaling</b>");
+
     m_pScalingWidget = new ScalingView("mne_analyze/SignalViewer/Scaling");
+    pLayout->addWidget(title_scaling);
     pLayout->addWidget(m_pScalingWidget);
 
     //View Widget
+    QLabel* title_viewsettings = new QLabel();
+    title_viewsettings->setTextFormat(Qt::RichText);
+    title_viewsettings->setText("<b>View Settings</b>");
+
     m_pSettingsViewWidget = new FiffRawViewSettings("mne_analyze/SignalViewer/ViewSettings");
     m_pSettingsViewWidget->setWidgetList();
+    pLayout->addWidget(title_viewsettings);
     pLayout->addWidget(m_pSettingsViewWidget);
 
+    QSpacerItem* endSpacer = new QSpacerItem(1,
+                                             1,
+                                             QSizePolicy::Preferred,
+                                             QSizePolicy::Expanding);
+    pLayout->addSpacerItem(endSpacer);
+
     QWidget* pWidget = new QWidget();
-    pWidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
+    pWidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,
+                                       QSizePolicy::Preferred));
     pWidget->setLayout(pLayout);
     pControlDock->setWidget(pWidget);
-    pControlDock->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
+    pControlDock->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,
+                                            QSizePolicy::Preferred));
 
     return pControlDock;
 }
