@@ -71,7 +71,7 @@ jobs:
         path: qt5_5150_static_binaries_macos.tar.gz
 
   GenerateWinStaticBinaries:
-    runs-on: windows-2016
+    runs-on: windows-2019
 
     steps:
     - name: Clone repository
@@ -98,7 +98,7 @@ jobs:
         mkdir qt5_shadow
         cd qt5_shadow
         # Setup the compiler 
-        cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
+        cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         # Configure Qt5
         ..\qt5\configure.bat -release -static -no-pch -optimize-size -opengl desktop -platform win32-msvc -prefix "..\Qt5_binaries" -skip webengine -nomake tools -nomake tests -nomake examples -opensource -confirm-license
