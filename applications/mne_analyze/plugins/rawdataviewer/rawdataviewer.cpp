@@ -142,8 +142,10 @@ QDockWidget *RawDataViewer::getControl()
     pLayout->addWidget(m_pSettingsViewWidget);
 
     QWidget* pWidget = new QWidget();
+    pWidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
     pWidget->setLayout(pLayout);
     pControlDock->setWidget(pWidget);
+    pControlDock->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
 
     return pControlDock;
 }

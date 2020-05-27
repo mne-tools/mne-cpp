@@ -68,6 +68,7 @@ AnnotationSettingsView::AnnotationSettingsView()
 , m_pColordialog(new QColorDialog(this))
 {
     m_pUi->setupUi(this);
+    this->setMinimumWidth(300);
 
     m_pUi->m_comboBox_filterTypes->addItem("All");
     m_pUi->m_comboBox_filterTypes->addItem("0");

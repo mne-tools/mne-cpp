@@ -71,14 +71,14 @@ ScalingView::ScalingView(const QString& sSettingsPath,
                          QWidget *parent,
                          Qt::WindowFlags f)
 : QWidget(parent, f)
-, m_ui(new Ui::ScalingViewWidget)
 , m_sSettingsPath(sSettingsPath)
+, m_ui(new Ui::ScalingViewWidget)
 {
     m_ui->setupUi(this);
 
     this->setWindowTitle("Scaling");
     this->setMinimumWidth(330);
-    this->setMaximumWidth(330);
+    //this->setMaximumWidth(330);
 
     loadSettings(m_sSettingsPath);
     redrawGUI();
