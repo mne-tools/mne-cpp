@@ -61,7 +61,7 @@ DataManagerView::DataManagerView(QWidget *parent)
     m_pUi->setupUi(this);
     m_pUi->m_pTreeView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(m_pUi->m_pTreeView, &QTreeView::customContextMenuRequested,
-            this, &DataManagerView::customMenuRequested);
+            this, &DataManagerView::customMenuRequested, Qt::UniqueConnection);
 }
 
 //=============================================================================================================
@@ -78,7 +78,9 @@ void DataManagerView::setModel(QAbstractItemModel *pModel)
     m_pUi->m_pTreeView->setModel(pModel);
 
     connect(m_pUi->m_pTreeView->selectionModel(), &QItemSelectionModel::selectionChanged,
-            this, &DataManagerView::onCurrentItemChanged);
+            this, &DataManagerView::onCurrentItemChanged, Qt::UniqueConnection);
+    connect(pModel, &QAbstractItemModel::rowsInserted,
+            this, &DataManagerView::onNewFileLoaded, Qt::UniqueConnection);
 }
 
 //=============================================================================================================
@@ -110,4 +112,21 @@ void DataManagerView::onCurrentItemChanged(const QItemSelection &selected,
             }
         }
     }
+}
+
+//=============================================================================================================
+
+void DataManagerView::onNewFileLoaded(const QModelIndex &parent,
+                                      int first,
+                                      int last)
+{
+    Q_UNUSED(parent);
+    Q_UNUSED(last);
+    qInfo() << "[DataManagerView::onNewFileLoaded] Selecting and displaying newly loaded file.";
+//    qDebug() << "First:" << first;
+//    qDebug() << "Last:" << last;
+
+    m_pUi->m_pTreeView->selectionModel()->select(m_pUi->m_pTreeView->model()->index(first, 0),
+                                                 QItemSelectionModel::ClearAndSelect);
+    //m_pUi->m_pTreeView->model()->index(first,0);
 }
