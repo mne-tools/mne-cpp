@@ -1,15 +1,13 @@
 //=============================================================================================================
 /**
- * @file     datamanagerview.cpp
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
- *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
- * @since    0.1.0
- * @date     August, 2018
+ * @file     analyzedatamodel.h
+ * @author   Lorenz Esch <lesch@mgh.harvard.edu>
+ * @since    0.1.2
+ * @date     May, 2019
  *
  * @section  LICENSE
  *
- * Copyright (C) 2018, Lorenz Esch, Lars Debor, Simon Heinke. All rights reserved.
+ * Copyright (C) 2019, Lorenz Esch. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -30,84 +28,81 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains the declaration of the DataManagerView class.
+ * @brief    Contains declaration of AnalyzeDataModel Container class.
  *
  */
+
+#ifndef ANALYZEDATAMODEL_H
+#define ANALYZEDATAMODEL_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "datamanagerview.h"
-#include "ui_datamanagerview.h"
+#include "../anshared_global.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QTreeView>
 #include <QStandardItemModel>
-#include <QDebug>
-#include <QMenu>
 
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-DataManagerView::DataManagerView(QWidget *parent)
-: QWidget(parent)
-, m_pUi(new Ui::DataManagerView)
+//=============================================================================================================
+// DEFINE NAMESPACE ANSHAREDLIB
+//=============================================================================================================
+
+namespace ANSHAREDLIB
 {
-    m_pUi->setupUi(this);
-    m_pUi->m_pTreeView->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(m_pUi->m_pTreeView, &QTreeView::customContextMenuRequested,
-            this, &DataManagerView::customMenuRequested);
-}
 
 //=============================================================================================================
-
-DataManagerView::~DataManagerView()
-{
-    delete m_pUi;
-}
-
+// ANSHAREDLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-void DataManagerView::setModel(QAbstractItemModel *pModel)
-{
-    m_pUi->m_pTreeView->setModel(pModel);
-
-    connect(m_pUi->m_pTreeView->selectionModel(), &QItemSelectionModel::selectionChanged,
-            this, &DataManagerView::onCurrentItemChanged);
-}
-
+//=============================================================================================================
+// ENUMERATIONS
 //=============================================================================================================
 
-void DataManagerView::customMenuRequested(QPoint pos)
+//=========================================================================================================
+/**
+ * DECLARE CLASS AnalyzeDataModel
+ *
+ * @brief The AnalyzeDataModel class is the base data container.
+ */
+class ANSHAREDSHARED_EXPORT AnalyzeDataModel : public QStandardItemModel
 {
-//    QMenu *menu = new QMenu(this);
+    Q_OBJECT
 
-//    QAction* pAction = new QAction("Remove", this);
-//    connect(pAction, &QAction::triggered, [=]() {
-//        emit removeItem(m_pUi->m_pTreeView->indexAt(pos));
-//    });
+public:
+    typedef QSharedPointer<AnalyzeDataModel> SPtr;               /**< Shared pointer type for AnalyzeDataModel. */
+    typedef QSharedPointer<const AnalyzeDataModel> ConstSPtr;    /**< Const shared pointer type for AnalyzeDataModel. */
 
-//    menu->addAction(pAction);
-//    menu->popup(m_pUi->m_pTreeView->viewport()->mapToGlobal(pos));
-}
+    //=========================================================================================================
+    /**
+     * Constructs the Analyze Data Model.
+     */
+    AnalyzeDataModel(QObject* pParent = Q_NULLPTR);
 
-//=============================================================================================================
+    //=========================================================================================================
+    /**
+     * Destroys the Analyze Data Model.
+     */
+    ~AnalyzeDataModel();
 
-void DataManagerView::onCurrentItemChanged(const QItemSelection &selected,
-                                           const QItemSelection &deselected)
-{
-    Q_UNUSED(deselected)
+    //=========================================================================================================
+    /**
+     * Adds data to the item model.
+     *
+     * @param[in] sSubjectName          The subject name to store the data under.
+     * @param[in] pItem                 The item to be added.
+     */
+    void addData(const QString &sSubjectName,
+                 QStandardItem *pNewItem);
+};
 
-    if(QStandardItemModel *pModel = qobject_cast<QStandardItemModel *>(m_pUi->m_pTreeView->model())) {        
-        if(QStandardItem* pItem = pModel->itemFromIndex(selected.indexes().first())) {
-            if(!pItem->data().isNull()) {
-                emit selectedModelChanged(pItem->data());
-            }
-        }
-    }
-}
+} //Namespace
+
+#endif //ANALYZEDATAMODEL_H

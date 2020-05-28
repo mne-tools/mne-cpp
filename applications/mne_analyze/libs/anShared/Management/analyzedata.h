@@ -45,6 +45,7 @@
 #include "../anshared_global.h"
 #include "../Model/abstractmodel.h"
 #include "../Utils/types.h"
+#include "analyzedatamodel.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -53,8 +54,8 @@
 #include <QSharedPointer>
 #include <QString>
 #include <QPointer>
-#include <QStandardItemModel>
 #include <QFileInfo>
+#include <QStandardItemModel>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -70,8 +71,6 @@ namespace ANSHAREDLIB
 //=============================================================================================================
 // ANSHAREDLIB FORWARD DECLARATIONS
 //=============================================================================================================
-
-class FiffRawViewModel;
 
 //=============================================================================================================
 // ENUMERATIONS
@@ -158,7 +157,7 @@ public:
     //=========================================================================================================
     /**
      * This is the main function for instanciating models. It simply calls the models constructor with the
-     * provided path and inserts the model into the hash. NO ERROR CHECKING IS PERFORMED !
+     * provided path and inserts the model to the central item model. NO ERROR CHECKING IS PERFORMED !
      */
     template<class T>
     QSharedPointer<T> loadModel(const QString& sPath,
@@ -185,7 +184,7 @@ public:
             QVariant data;
             data.setValue(temp);
             pItem->setData(data);
-            m_pData->appendRow(pItem);
+            m_pData->addData("Sample Subject", pItem);
 
             emit newModelAvailable(temp);
             return sm;
@@ -203,7 +202,7 @@ public:
     void removeModel(const QModelIndex &index);
 
 private:
-    QPointer<QStandardItemModel>            m_pData;         /**< The loaded models in form of a QStandardItemModel. */
+    QPointer<AnalyzeDataModel>            m_pData;         /**< The loaded models in form of a QStandardItemModel. */
 
 signals:
     //=========================================================================================================

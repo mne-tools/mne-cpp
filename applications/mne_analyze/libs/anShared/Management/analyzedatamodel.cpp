@@ -1,15 +1,13 @@
 //=============================================================================================================
 /**
- * @file     datamanagerview.cpp
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
- *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
- * @since    0.1.0
- * @date     August, 2018
+ * @file     analyzedatamodel.cpp
+ * @author   Lorenz Esch <lesch@mgh.harvard.edu>
+ * @since    0.1.2
+ * @date     May, 2019
  *
  * @section  LICENSE
  *
- * Copyright (C) 2018, Lorenz Esch, Lars Debor, Simon Heinke. All rights reserved.
+ * Copyright (C) 2019, Lorenz Esch. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -30,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains the declaration of the DataManagerView class.
+ * @brief    Definition of the Analyze Data Model Class.
  *
  */
 
@@ -38,76 +36,49 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "datamanagerview.h"
-#include "ui_datamanagerview.h"
+#include "analyzedatamodel.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QTreeView>
-#include <QStandardItemModel>
-#include <QDebug>
-#include <QMenu>
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace ANSHAREDLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DataManagerView::DataManagerView(QWidget *parent)
-: QWidget(parent)
-, m_pUi(new Ui::DataManagerView)
+AnalyzeDataModel::AnalyzeDataModel(QObject *pParent)
+: QStandardItemModel(pParent)
 {
-    m_pUi->setupUi(this);
-    m_pUi->m_pTreeView->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(m_pUi->m_pTreeView, &QTreeView::customContextMenuRequested,
-            this, &DataManagerView::customMenuRequested);
+
 }
 
 //=============================================================================================================
 
-DataManagerView::~DataManagerView()
+AnalyzeDataModel::~AnalyzeDataModel()
 {
-    delete m_pUi;
 }
 
 //=============================================================================================================
 
-void DataManagerView::setModel(QAbstractItemModel *pModel)
-{
-    m_pUi->m_pTreeView->setModel(pModel);
+void AnalyzeDataModel::addData(const QString &sSubjectName,
+                               QStandardItem* pNewItem)
+{    
+    QList<QStandardItem*> pItemList = this->findItems(sSubjectName);
 
-    connect(m_pUi->m_pTreeView->selectionModel(), &QItemSelectionModel::selectionChanged,
-            this, &DataManagerView::onCurrentItemChanged);
-}
-
-//=============================================================================================================
-
-void DataManagerView::customMenuRequested(QPoint pos)
-{
-//    QMenu *menu = new QMenu(this);
-
-//    QAction* pAction = new QAction("Remove", this);
-//    connect(pAction, &QAction::triggered, [=]() {
-//        emit removeItem(m_pUi->m_pTreeView->indexAt(pos));
-//    });
-
-//    menu->addAction(pAction);
-//    menu->popup(m_pUi->m_pTreeView->viewport()->mapToGlobal(pos));
-}
-
-//=============================================================================================================
-
-void DataManagerView::onCurrentItemChanged(const QItemSelection &selected,
-                                           const QItemSelection &deselected)
-{
-    Q_UNUSED(deselected)
-
-    if(QStandardItemModel *pModel = qobject_cast<QStandardItemModel *>(m_pUi->m_pTreeView->model())) {        
-        if(QStandardItem* pItem = pModel->itemFromIndex(selected.indexes().first())) {
-            if(!pItem->data().isNull()) {
-                emit selectedModelChanged(pItem->data());
-            }
+    if(pItemList.isEmpty()) {
+        QStandardItem* pSubjectItem = new QStandardItem(sSubjectName);
+        pSubjectItem->setToolTip("The subject");
+        pSubjectItem->setChild(pSubjectItem->rowCount(), pNewItem);
+        this->appendRow(pSubjectItem);
+    } else {
+        for(QStandardItem* pItem: pItemList) {
+            pItem->setChild(pItem->rowCount(), pNewItem);
         }
     }
 }

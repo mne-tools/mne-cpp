@@ -41,8 +41,6 @@
 
 #include "analyzedata.h"
 
-#include "../Model/fiffrawviewmodel.h"
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -66,7 +64,7 @@ using namespace ANSHAREDLIB;
 
 AnalyzeData::AnalyzeData(QObject *pParent)
 : QObject(pParent)
-, m_pData(new QStandardItemModel(this))
+, m_pData(new AnalyzeDataModel(this))
 {
 
 }
