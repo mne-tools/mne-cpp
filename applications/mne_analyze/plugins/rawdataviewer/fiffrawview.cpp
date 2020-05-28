@@ -98,7 +98,7 @@ FiffRawView::FiffRawView(QWidget *parent)
     //m_pTableView->setShowGrid(true);
 
     connect(m_pTableView->horizontalScrollBar(), &QScrollBar::valueChanged,
-            this, &FiffRawView::updateLabels);
+            this, &FiffRawView::updateLabels, Qt::UniqueConnection);
 }
 
 //=============================================================================================================
@@ -349,7 +349,7 @@ void FiffRawView::customContextMenuRequested(const QPoint &pos)
 
     QAction* markTime = menu->addAction(tr("Mark time"));
     connect(markTime, &QAction::triggered,
-            this, &FiffRawView::addTimeMark);
+            this, &FiffRawView::addTimeMark, Qt::UniqueConnection);
 
     menu->popup(m_pTableView->viewport()->mapToGlobal(pos));
 }

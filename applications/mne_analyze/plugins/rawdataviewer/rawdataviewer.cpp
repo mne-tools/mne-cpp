@@ -232,21 +232,21 @@ void RawDataViewer::updateControls()
     if(m_pScalingWidget && m_pSettingsViewWidget) {
         // Setup scaling widget
         connect(m_pScalingWidget.data(), &DISPLIB::ScalingView::scalingChanged,
-                m_pFiffRawView.data(), &FiffRawView::setScalingMap);
+                m_pFiffRawView.data(), &FiffRawView::setScalingMap, Qt::UniqueConnection);
 
         // Setup view settings widget
         connect(m_pSettingsViewWidget.data(), &DISPLIB::FiffRawViewSettings::signalColorChanged,
-                m_pFiffRawView.data(), &FiffRawView::setSignalColor);
+                m_pFiffRawView.data(), &FiffRawView::setSignalColor, Qt::UniqueConnection);
         connect(m_pSettingsViewWidget.data(), &DISPLIB::FiffRawViewSettings::backgroundColorChanged,
-                m_pFiffRawView.data(), &FiffRawView::setBackgroundColor);
+                m_pFiffRawView.data(), &FiffRawView::setBackgroundColor, Qt::UniqueConnection);
         connect(m_pSettingsViewWidget.data(), &DISPLIB::FiffRawViewSettings::zoomChanged,
-                m_pFiffRawView.data(), &FiffRawView::setZoom);
+                m_pFiffRawView.data(), &FiffRawView::setZoom, Qt::UniqueConnection);
         connect(m_pSettingsViewWidget.data(), &DISPLIB::FiffRawViewSettings::timeWindowChanged,
-                m_pFiffRawView.data(), &FiffRawView::setWindowSize);
+                m_pFiffRawView.data(), &FiffRawView::setWindowSize, Qt::UniqueConnection);
         connect(m_pSettingsViewWidget.data(), &DISPLIB::FiffRawViewSettings::distanceTimeSpacerChanged,
-                m_pFiffRawView.data(), &FiffRawView::setDistanceTimeSpacer);
+                m_pFiffRawView.data(), &FiffRawView::setDistanceTimeSpacer, Qt::UniqueConnection);
         connect(m_pSettingsViewWidget.data(), &DISPLIB::FiffRawViewSettings::makeScreenshot,
-                m_pFiffRawView.data(), &FiffRawView::onMakeScreenshot);
+                m_pFiffRawView.data(), &FiffRawView::onMakeScreenshot, Qt::UniqueConnection);
 
         // Preserve settings between different file sessions
         m_pFiffRawView->setWindowSize(m_pSettingsViewWidget->getWindowSize());
@@ -256,7 +256,7 @@ void RawDataViewer::updateControls()
         m_pFiffRawView->setDistanceTimeSpacer(m_pSettingsViewWidget->getDistanceTimeSpacer());
 
         connect(m_pFiffRawView.data(), &FiffRawView::sendSamplePos,
-                this, &RawDataViewer::onSendSamplePos);
+                this, &RawDataViewer::onSendSamplePos, Qt::UniqueConnection);
     }
 }
 
