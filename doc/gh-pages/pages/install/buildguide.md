@@ -13,7 +13,7 @@ Make sure you have one of the following compilers installed:
 
 | Windows | Linux | MacOS |
 |---------|-------|-------|
-| min. MSVC 2015 (We recommend the [MSVC 2019 Build Tools](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=BuildTools&rel=16#){:target="_blank" rel="noopener"} compiler. During install exclude all optional items except for the MSVC C++-X86/x64-Buildtools and Windows 10 SDK) | min. [GCC 5.3.1](https://gcc.gnu.org/releases.html){:target="_blank" rel="noopener"} | min. [Clang 3.5](https://developer.apple.com/xcode/){:target="_blank" rel="noopener"}|
+| min. MSVC 2015 (We recommend the [MSVC 2019 Build Tools](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=BuildTools&rel=16#){:target="_blank" rel="noopener"} compiler. During install exclude all optional items except for the MSVC C++-X86/x64-Buildtools, Windows 10 SDK and C++-ATL support) | min. [GCC 5.3.1](https://gcc.gnu.org/releases.html){:target="_blank" rel="noopener"} | min. [Clang 3.5](https://developer.apple.com/xcode/){:target="_blank" rel="noopener"}|
 
 ## Get Qt
 
