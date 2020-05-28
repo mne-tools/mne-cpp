@@ -163,43 +163,6 @@ QStandardItemModel* AnalyzeData::getDataModel()
 
 //=============================================================================================================
 
-QSharedPointer<FiffRawViewModel> AnalyzeData::loadFiffRawViewModel(const QString &sPath,
-                                                                   const QByteArray& byteLoadedData)
-{
-    if(byteLoadedData.isEmpty() || sPath.isEmpty()) {
-        qDebug() << "[AnalyzeData::loadFiffRawViewModel] Could not load model!";
-        return QSharedPointer<FiffRawViewModel>();
-    }
-
-    if(QSharedPointer<AbstractModel> pModel = getModelByPath(sPath)) {
-        qDebug() << "[AnalyzeData::loadFiffRawViewModel] Path already exists " << sPath;
-        return qSharedPointerDynamicCast<FiffRawViewModel>(pModel);
-    }
-
-    QSharedPointer<FiffRawViewModel> pModel = QSharedPointer<FiffRawViewModel>::create(sPath, byteLoadedData);
-    QSharedPointer<AbstractModel> temp = qSharedPointerCast<AbstractModel>(pModel);
-    temp->setModelPath(sPath);
-
-    if(temp->isInit()) {
-        QStandardItem* pItem = new QStandardItem(temp->getModelName());
-        pItem->setEditable(false);
-        pItem->setDragEnabled(true);
-        pItem->setToolTip(temp->getModelPath());
-
-        QVariant data;
-        data.setValue(temp);
-        pItem->setData(data);
-        m_pData->appendRow(pItem);
-
-        emit newModelAvailable(temp);
-        return pModel;
-    } else {
-        return Q_NULLPTR;
-    }
-}
-
-//=============================================================================================================
-
 void AnalyzeData::removeModel(const QModelIndex& index)
 {
     if(QStandardItem* pItem = m_pData->itemFromIndex(index)) {
