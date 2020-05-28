@@ -81,6 +81,7 @@ CONFIG(debug, debug|release) {
 
 SOURCES += \
     Management/analyzedata.cpp \
+    Management/analyzedatamodel.cpp \
     Management/analyzesettings.cpp \
     Management/pluginmanager.cpp \
     Management/event.cpp \
@@ -94,6 +95,7 @@ HEADERS += \
     anshared_global.h \
     Model/abstractmodel.h \
     Management/analyzedata.h \
+    Management/analyzedatamodel.h \
     Management/analyzesettings.h \
     Management/pluginmanager.h \
     Management/event.h \
