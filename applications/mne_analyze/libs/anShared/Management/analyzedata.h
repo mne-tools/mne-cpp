@@ -157,24 +157,12 @@ public:
 
     //=========================================================================================================
     /**
-    * Creates a FiffRawViewModel based on the loaded QByteArray. This function can, e.g., be used when using a WASM build.
-    * The function returns a nullptr when model loading fails.
-    *
-    * @param[in] sPath              The path where the Model is saved.
-    * @param[in] byteLoadedData     The loaded data in form of a QByteArray.
-    *
-    * @return                       FiffRawViewModel that contains the loaded Fiff raw data.
-    */
-    QSharedPointer<FiffRawViewModel> loadFiffRawViewModel(const QString &sPath,
-                                                          const QByteArray& byteLoadedData);
-
-    //=========================================================================================================
-    /**
      * This is the main function for instanciating models. It simply calls the models constructor with the
      * provided path and inserts the model into the hash. NO ERROR CHECKING IS PERFORMED !
      */
     template<class T>
-    QSharedPointer<T> loadModel(const QString& sPath)
+    QSharedPointer<T> loadModel(const QString& sPath,
+                                const QByteArray& byteLoadedData = QByteArray())
     {
         // check if model was already loaded
         if(QSharedPointer<AbstractModel> pModel = getModelByPath(sPath)) {
@@ -183,7 +171,7 @@ public:
         }
 
         // call model constructor with provided path
-        QSharedPointer<T> sm = QSharedPointer<T>::create(sPath);
+        QSharedPointer<T> sm = QSharedPointer<T>::create(sPath, byteLoadedData);
         QSharedPointer<AbstractModel> temp = qSharedPointerCast<AbstractModel>(sm);
         temp->setModelPath(sPath);
 

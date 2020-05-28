@@ -106,19 +106,16 @@ public:
     //=========================================================================================================
     /**
      * Constructs a FiffRawViewModel object.
+     *
+     * @param[in] sFilePath             The file path of the model. This is usually also the file path.
+     * @param[in] byteLoadedData        The loaded data as a QByteArray. It can, e.g., be used when using a WASM build.
+     *                                  Default is set to an empty byte array.
+     * @param[in] iVisibleWindowSize    The visible window size in the fiff raw view. Default is set to 10.
+     * @param[in] iPreloadBufferSize    The number of preloaded buffer windows. Default is set to 10.
+     * @param[in] pParent               The parent model. Default is set to NULL.
      */
     FiffRawViewModel(const QString &sFilePath,
-                     qint32 iVisibleWindowSize = 10,
-                     qint32 iPreloadBufferSize = 10,
-                     QObject *pParent = Q_NULLPTR);
-
-    //=========================================================================================================
-    /**
-     * Constructs a FiffRawViewModel object. This function takes the whole Fiff raw data as a QByteArray.
-     * It can, e.g., be used when using a WASM build.
-     */
-    FiffRawViewModel(const QString &sFilePath,
-                     const QByteArray& byteLoadedData,
+                     const QByteArray& byteLoadedData = QByteArray(),
                      qint32 iVisibleWindowSize = 10,
                      qint32 iPreloadBufferSize = 10,
                      QObject *pParent = Q_NULLPTR);

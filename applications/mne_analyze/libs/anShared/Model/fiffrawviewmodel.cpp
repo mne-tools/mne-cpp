@@ -85,41 +85,6 @@ FiffRawViewModel::FiffRawViewModel(QObject *pParent)
 //=============================================================================================================
 
 FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
-                                   qint32 iVisibleWindowSize,
-                                   qint32 iPreloadBufferSize,
-                                   QObject *pParent)
-: AbstractModel(pParent)
-, m_dDx(1.0)
-, m_iSamplesPerBlock(1024)
-, m_iVisibleWindowSize(iVisibleWindowSize)
-, m_iPreloadBufferSize(std::max(2, iPreloadBufferSize))
-, m_iTotalBlockCount(m_iVisibleWindowSize + 2 * m_iPreloadBufferSize)
-, m_iFiffCursorBegin(-1)
-, m_bStartOfFileReached(true)
-, m_bEndOfFileReached(false)
-, m_blockLoadFutureWatcher()
-, m_bCurrentlyLoading(false)
-, m_iDistanceTimerSpacer(1000)
-, m_iScrollPos(0)
-, m_bDispAnn(true)
-, m_pAnnotationModel(QSharedPointer<AnnotationModel>::create(this))
-{
-    // connect data reloading: this will be run concurrently
-    connect(&m_blockLoadFutureWatcher,
-            &QFutureWatcher<int>::finished,
-            [this]() {
-                postBlockLoad(m_blockLoadFutureWatcher.future().result());
-            });
-
-    m_file.setFileName(sFilePath);
-    initFiffData(m_file);
-
-    updateEndStartFlags();
-}
-
-//=============================================================================================================
-
-FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
                                    const QByteArray& byteLoadedData,
                                    qint32 iVisibleWindowSize,
                                    qint32 iPreloadBufferSize,
@@ -148,10 +113,15 @@ FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
                 postBlockLoad(m_blockLoadFutureWatcher.future().result());
             });
 
-    m_byteLoadedData = byteLoadedData;
-    m_buffer.setData(m_byteLoadedData);
+    if(byteLoadedData.isEmpty()) {
+        m_file.setFileName(sFilePath);
+        initFiffData(m_file);
+    } else {
+        m_byteLoadedData = byteLoadedData;
+        m_buffer.setData(m_byteLoadedData);
+        initFiffData(m_buffer);
+    }
 
-    initFiffData(m_buffer);
     updateEndStartFlags();
 }
 
