@@ -118,19 +118,10 @@ void AnnotationSettingsView::initGUIFunctionality()
             this, &AnnotationSettingsView::onCurrentSelectedChanged, Qt::UniqueConnection);
 
     //Annotation types combo box
-
-    //m_pUi->m_comboBox_filterTypes->addItems(m_pAnnModel->getEventTypeList());
-
     connect(m_pUi->m_comboBox_filterTypes, &QComboBox::currentTextChanged,
             m_pAnnModel.data(), &ANSHAREDLIB::AnnotationModel::setEventFilterType, Qt::UniqueConnection);
     connect(m_pAnnModel.data(), &ANSHAREDLIB::AnnotationModel::updateEventTypes,
             this, &AnnotationSettingsView::updateComboBox, Qt::UniqueConnection);
-
-    //For some reason the GUI breakes without this
-//    QToolBar *toolBar = new QToolBar(this);
-//    toolBar->setOrientation(Qt::Vertical);
-//    toolBar->setMovable(false);
-//    m_pUi->m_gridLayout_Main->addWidget(toolBar,0,0,1,1);
 
     //Add type button
     connect(m_pUi->m_pushButton_addEventType, &QPushButton::clicked,

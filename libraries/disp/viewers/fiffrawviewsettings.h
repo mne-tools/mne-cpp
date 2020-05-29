@@ -239,12 +239,6 @@ protected:
      */
     void onMakeScreenshot();
 
-    //=========================================================================================================
-    /**
-     * @brief disconnectModel
-     */
-    void disconnectModel();
-
     Ui::FiffRawViewSettingsWidget* ui;
 
     QColor      m_colCurrentSignalColor;        /**< Current color of the signal. */

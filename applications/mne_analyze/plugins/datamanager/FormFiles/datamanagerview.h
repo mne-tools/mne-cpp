@@ -106,10 +106,10 @@ private:
 
     //=========================================================================================================
     /**
-     * @brief onCurrentItemChanged
+     * Sends signal to trigger model change when a new model is selcted
      *
-     * @param [in] selected
-     * @param [in] deselected
+     * @param [in] selected     New item being selected
+     * @param [in] deselected   UNUSED - previously selected item
      */
     void onCurrentItemChanged(const QItemSelection &selected,
                               const QItemSelection &deselected);

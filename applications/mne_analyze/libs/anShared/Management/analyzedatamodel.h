@@ -104,7 +104,15 @@ public:
 
 signals:
 
+    //=========================================================================================================
+    /**
+     * Send index of newly added file model and index of subject it was added to
+     *
+     * @param [in] iSubjectIndex        index of subject that the new model was added to
+     * @param [in] iChildModelIndex     index of new model
+     */
     void newFileAdded(int iSubjectIndex, int iChildModelIndex);
+
 };
 
 } //Namespace

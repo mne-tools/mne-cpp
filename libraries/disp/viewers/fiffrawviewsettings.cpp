@@ -73,7 +73,6 @@ FiffRawViewSettings::FiffRawViewSettings(const QString &sSettingsPath,
 
     this->setWindowTitle("Channel Data View Settings");
     this->setMinimumWidth(330);
-    //this->setMaximumWidth(330);
 
     loadSettings(m_sSettingsPath);
 }
