@@ -112,6 +112,8 @@ QMenu *AnnotationManager::getMenu()
 QDockWidget *AnnotationManager::getControl()
 {
     AnnotationSettingsView* pAnnotationSettingsView = new AnnotationSettingsView();
+    pAnnotationSettingsView->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,
+                                                       QSizePolicy::Preferred));
 
     connect(pAnnotationSettingsView, &AnnotationSettingsView::triggerRedraw,
             this, &AnnotationManager::onTriggerRedraw, Qt::UniqueConnection);
@@ -141,6 +143,8 @@ QDockWidget *AnnotationManager::getControl()
     pControl->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
     pControl->setWidget(pAnnotationSettingsView);
     pControl->setObjectName("Annotation Manager");
+    pControl->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,
+                                        QSizePolicy::Preferred));
 
     return pControl;
 }
