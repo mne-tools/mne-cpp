@@ -471,11 +471,11 @@ void FiffRawView::updateLabels(int iValue)
 
 void FiffRawView::disconnectModel()
 {
-    // Connect QScrollBar with model in order to reload data samples
+    // Disconnect QScrollBar with model
     disconnect(m_pTableView->horizontalScrollBar(), &QScrollBar::valueChanged,
             m_pModel.data(), &FiffRawViewModel::updateScrollPosition);
 
-    // Connect and init resizing of the table view to the MVC
+    // Disconnect resizing of the table view to the MVC
     disconnect(this, &FiffRawView::tableViewDataWidthChanged,
             m_pModel.data(), &FiffRawViewModel::setDataColumnWidth);
 }

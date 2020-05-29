@@ -271,7 +271,7 @@ private:
 
     //=========================================================================================================
     /**
-     * @brief disconnectModel
+     * Disconnects the model from the view's scrollbar and resizing
      */
     void disconnectModel();
 
