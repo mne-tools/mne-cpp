@@ -40,7 +40,7 @@
 
 #include "datamanagerview.h"
 #include "ui_datamanagerview.h"
-#include "anShared/Management/analyzedatamodel.h"
+#include <anShared/Management/analyzedatamodel.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -110,7 +110,6 @@ void DataManagerView::onCurrentItemChanged(const QItemSelection &selected,
     if(QStandardItemModel *pModel = qobject_cast<QStandardItemModel *>(m_pUi->m_pTreeView->model())) {        
         if(QStandardItem* pItem = pModel->itemFromIndex(selected.indexes().first())) {
             if(!pItem->data().isNull()) {
-                qDebug() << selected;
                 emit selectedModelChanged(pItem->data());
             }
         }
@@ -122,13 +121,6 @@ void DataManagerView::onCurrentItemChanged(const QItemSelection &selected,
 void DataManagerView::onNewFileLoaded(int iSubject,
                                       int iModel)
 {
-    qDebug() << "iSubject:" << iSubject;
-    qDebug() << "iModel" << iModel;
-
-//    qInfo() << "[DataManagerView::onNewFileLoaded] Selecting and displaying newly loaded file.";
-//    qDebug() << "First:" << first;
-//    qDebug() << "Last:" << last;
     m_pUi->m_pTreeView->selectionModel()->select(m_pUi->m_pTreeView->model()->index(iModel, 0, m_pUi->m_pTreeView->model()->index(iSubject, 0)),
                                                  QItemSelectionModel::ClearAndSelect);
-    //m_pUi->m_pTreeView->model()->index(first,0).model()->index(first,0);
 }
