@@ -70,15 +70,22 @@ void AnalyzeDataModel::addData(const QString &sSubjectName,
                                QStandardItem* pNewItem)
 {    
     QList<QStandardItem*> pItemList = this->findItems(sSubjectName);
+    int iSubjectIndex = 0;
+    int iChildModelIndex = 0;
 
     if(pItemList.isEmpty()) {
         QStandardItem* pSubjectItem = new QStandardItem(sSubjectName);
         pSubjectItem->setToolTip("The subject");
         pSubjectItem->setChild(pSubjectItem->rowCount(), pNewItem);
+        iSubjectIndex = this->rowCount();
         this->appendRow(pSubjectItem);
     } else {
         for(QStandardItem* pItem: pItemList) {
+            iChildModelIndex = pItem->rowCount();
+            iSubjectIndex = pItem->row();
             pItem->setChild(pItem->rowCount(), pNewItem);
+
         }
     }
+    emit newFileAdded(iSubjectIndex, iChildModelIndex);
 }

@@ -101,6 +101,10 @@ public:
      */
     void addData(const QString &sSubjectName,
                  QStandardItem *pNewItem);
+
+signals:
+
+    void newFileAdded(int iSubjectIndex, int iChildModelIndex);
 };
 
 } //Namespace
