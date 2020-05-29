@@ -1,15 +1,13 @@
 //=============================================================================================================
 /**
- * @file     datamanager.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
- *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
- * @since    0.1.0
- * @date     August, 2018
+ * @file     filtering.cpp
+ * @author   Lorenz Esch <lesch@mgh.harvard.edu>
+ * @since    0.1.2
+ * @date     May, 2020
  *
  * @section  LICENSE
  *
- * Copyright (C) 2018, Lorenz Esch, Lars Debor, Simon Heinke. All rights reserved.
+ * Copyright (C) 2020, Lorenz Esch. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -30,99 +28,120 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains the declaration of the DataManager class.
+ * @brief    Definition of the Filtering class.
  *
  */
-
-#ifndef DATAMANAGER_H
-#define DATAMANAGER_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "datamanager_global.h"
-#include <anShared/Interfaces/IPlugin.h>
+#include "filtering.h"
+#include "FormFiles/filteringview.h"
+
+#include <anShared/Management/analyzedata.h>
+#include <anShared/Management/communicator.h>
+#include <anShared/Utils/metatypes.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
-#include <QtCore/QtPlugin>
-#include <QDebug>
-#include <QPointer>
-
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// USED NAMESPACES
 //=============================================================================================================
 
-namespace ANSHAREDLIB {
-    class Communicator;
+using namespace FILTERINGPLUGIN;
+using namespace ANSHAREDLIB;
+
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+Filtering::Filtering()
+{
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE SURFERPLUGIN
-//=============================================================================================================
 
-namespace DATAMANAGERPLUGIN
+Filtering::~Filtering()
 {
+}
 
 //=============================================================================================================
-/**
- * DataManager Plugin
- *
- * @brief The DataManager class provides a view with all currently loaded models.
- */
-class DATAMANAGERSHARED_EXPORT DataManager : public ANSHAREDLIB::IPlugin
+
+QSharedPointer<IPlugin> Filtering::clone() const
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "datamanager.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
-    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(ANSHAREDLIB::IPlugin)
-
-public:
-    //=========================================================================================================
-    /**
-     * Constructs a DataManager.
-     */
-    DataManager();
-
-    //=========================================================================================================
-    /**
-     * Destroys the DataManager.
-     */
-    virtual ~DataManager() override;
-
-    // IPlugin functions
-    virtual QSharedPointer<IPlugin> clone() const override;
-    virtual void init() override;
-    virtual void unload() override;
-    virtual QString getName() const override;
-    virtual QMenu* getMenu() override;
-    virtual QDockWidget* getControl() override;
-    virtual QWidget* getView() override;
-    virtual void handleEvent(QSharedPointer<ANSHAREDLIB::Event> e) override;
-    virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
-
-private:
-    //=========================================================================================================
-    /**
-     * Handles the event when the currently selected model was changed.
-     *
-     * @param[in] data  The data from the currently selected QStandardItem
-     */
-    void onCurrentlySelectedModelChanged(const QVariant& data);
-
-    void onRemoveItem(const QModelIndex &index);
-
-    QPointer<ANSHAREDLIB::Communicator> m_pCommu;
-};
+    QSharedPointer<Filtering> pFilteringClone = QSharedPointer<Filtering>::create();
+    return pFilteringClone;
+}
 
 //=============================================================================================================
-// INLINE DEFINITIONS
+
+void Filtering::init()
+{
+    m_pCommu = new Communicator(this);
+}
+
 //=============================================================================================================
 
-} // NAMESPACE
+void Filtering::unload()
+{
+}
 
-#endif // DATAMANAGER_H
+//=============================================================================================================
+
+QString Filtering::getName() const
+{
+    return "Filtering";
+}
+
+//=============================================================================================================
+
+QMenu *Filtering::getMenu()
+{
+    return Q_NULLPTR;
+}
+
+//=============================================================================================================
+
+QDockWidget *Filtering::getControl()
+{
+    FilteringView* pFilteringView = new FilteringView;
+
+    pFilteringView->setModel(m_pAnalyzeData->getDataModel());
+
+    QDockWidget* pControlDock = new QDockWidget(getName());
+    pControlDock->setAllowedAreas(Qt::TopDockWidgetArea | Qt::BottomDockWidgetArea);
+    pControlDock->setWidget(pFilteringView);
+    pControlDock->setObjectName(getName());
+
+    return pControlDock;
+}
+
+//=============================================================================================================
+
+QWidget *Filtering::getView()
+{
+    return Q_NULLPTR;
+}
+
+//=============================================================================================================
+
+void Filtering::handleEvent(QSharedPointer<Event> e)
+{
+    switch (e->getType()) {
+    default:
+        qWarning() << "[Filtering::handleEvent] received an Event that is not handled by switch-cases";
+    }
+}
+
+//=============================================================================================================
+
+QVector<EVENT_TYPE> Filtering::getEventSubscriptions(void) const
+{
+    QVector<EVENT_TYPE> temp;
+
+    return temp;
+}
+
