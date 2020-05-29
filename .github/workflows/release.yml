@@ -5,7 +5,7 @@ on:
     tags:        
     - v0.*
     branches:
-    - master
+    - qt515
 
 jobs:
   CreateRelease:
@@ -307,7 +307,10 @@ jobs:
         # Copy additional LSL libs
         cp -a applications/mne_scan/plugins/lsladapter/liblsl/build/install/lib/. lib/
         # Install libxkbcommon and libbluetooth3 so linuxdeployqt can find it
+        sudo apt-get update
         sudo apt-get install libxkbcommon-x11-0
+        sudo apt-get install libxcb-icccm4
+        sudo apt-get install libxcb-image0
         sudo apt-get install libbluetooth3
         # Downloading linuxdeployqt from continious release
         wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
