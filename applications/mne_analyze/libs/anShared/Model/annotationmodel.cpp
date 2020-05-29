@@ -361,7 +361,7 @@ QVariant AnnotationModel::headerData(int section, Qt::Orientation orientation, i
             }
     }
     else if(orientation == Qt::Vertical) {
-        return QString("Event %1").arg(section);
+        return QString(" %1 ").arg(section);
     }
 
     return QVariant();
