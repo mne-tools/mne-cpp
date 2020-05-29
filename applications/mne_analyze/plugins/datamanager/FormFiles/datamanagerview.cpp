@@ -108,6 +108,7 @@ void DataManagerView::onCurrentItemChanged(const QItemSelection &selected,
     if(QStandardItemModel *pModel = qobject_cast<QStandardItemModel *>(m_pUi->m_pTreeView->model())) {        
         if(QStandardItem* pItem = pModel->itemFromIndex(selected.indexes().first())) {
             if(!pItem->data().isNull()) {
+                qDebug() << selected;
                 emit selectedModelChanged(pItem->data());
             }
         }
@@ -122,11 +123,11 @@ void DataManagerView::onNewFileLoaded(const QModelIndex &parent,
 {
     Q_UNUSED(parent);
     Q_UNUSED(last);
-    qInfo() << "[DataManagerView::onNewFileLoaded] Selecting and displaying newly loaded file.";
+//    qInfo() << "[DataManagerView::onNewFileLoaded] Selecting and displaying newly loaded file.";
 //    qDebug() << "First:" << first;
 //    qDebug() << "Last:" << last;
 
-    m_pUi->m_pTreeView->selectionModel()->select(m_pUi->m_pTreeView->model()->index(first, 0),
-                                                 QItemSelectionModel::ClearAndSelect);
+//    m_pUi->m_pTreeView->selectionModel()->select(m_pUi->m_pTreeView->model()->index(first, 0),
+//                                                 QItemSelectionModel::ClearAndSelect);
     //m_pUi->m_pTreeView->model()->index(first,0);
 }
