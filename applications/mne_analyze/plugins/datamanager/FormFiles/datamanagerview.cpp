@@ -40,6 +40,7 @@
 
 #include "datamanagerview.h"
 #include "ui_datamanagerview.h"
+#include "anShared/Management/analyzedatamodel.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -79,8 +80,9 @@ void DataManagerView::setModel(QAbstractItemModel *pModel)
 
     connect(m_pUi->m_pTreeView->selectionModel(), &QItemSelectionModel::selectionChanged,
             this, &DataManagerView::onCurrentItemChanged, Qt::UniqueConnection);
-    connect(pModel, &QAbstractItemModel::rowsInserted,
-            this, &DataManagerView::onNewFileLoaded, Qt::UniqueConnection);
+    //static_cast<ANSHAREDLIB::AnalyzeDataModel*>(pModel);
+    connect(static_cast<ANSHAREDLIB::AnalyzeDataModel*>(pModel), &ANSHAREDLIB::AnalyzeDataModel::newFileAdded,
+            this, &DataManagerView::onNewFileLoaded);
 }
 
 //=============================================================================================================
@@ -117,17 +119,16 @@ void DataManagerView::onCurrentItemChanged(const QItemSelection &selected,
 
 //=============================================================================================================
 
-void DataManagerView::onNewFileLoaded(const QModelIndex &parent,
-                                      int first,
-                                      int last)
+void DataManagerView::onNewFileLoaded(int iSubject,
+                                      int iModel)
 {
-    Q_UNUSED(parent);
-    Q_UNUSED(last);
+    qDebug() << "iSubject:" << iSubject;
+    qDebug() << "iModel" << iModel;
+
 //    qInfo() << "[DataManagerView::onNewFileLoaded] Selecting and displaying newly loaded file.";
 //    qDebug() << "First:" << first;
 //    qDebug() << "Last:" << last;
-
-//    m_pUi->m_pTreeView->selectionModel()->select(m_pUi->m_pTreeView->model()->index(first, 0),
-//                                                 QItemSelectionModel::ClearAndSelect);
-    //m_pUi->m_pTreeView->model()->index(first,0);
+    m_pUi->m_pTreeView->selectionModel()->select(m_pUi->m_pTreeView->model()->index(iModel, 0, m_pUi->m_pTreeView->model()->index(iSubject, 0)),
+                                                 QItemSelectionModel::ClearAndSelect);
+    //m_pUi->m_pTreeView->model()->index(first,0).model()->index(first,0);
 }

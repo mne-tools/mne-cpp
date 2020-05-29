@@ -116,15 +116,13 @@ private:
 
     //=========================================================================================================
     /**
-     * Selects most recently loaded file in data manager
+     * Uses the indeces of newly added subject and file to select it in the GUI view
      *
-     * @param [in] parent   UNUSED - QModelIndex to parent of where the new row was inserted in the model
-     * @param [in] first    index of first row that was added
-     * @param [in] last     UNUSED - index of the last row that was added
+     * @param [in] iSubject     index of the subject the new file was added to
+     * @param [in] iModel       index of the new model file relative to the subject
      */
-    void onNewFileLoaded(const QModelIndex &parent,
-                         int first,
-                         int last);
+    void onNewFileLoaded(int iSubject,
+                         int iModel);
 
     Ui::DataManagerView *m_pUi;   /**< The user interface */
 
