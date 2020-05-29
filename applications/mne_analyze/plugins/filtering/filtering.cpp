@@ -1,15 +1,13 @@
 //=============================================================================================================
 /**
- * @file     datamanager.cpp
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
- *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
- * @since    0.1.0
- * @date     August, 2018
+ * @file     filtering.cpp
+ * @author   Lorenz Esch <lesch@mgh.harvard.edu>
+ * @since    0.1.2
+ * @date     May, 2020
  *
  * @section  LICENSE
  *
- * Copyright (C) 2018, Lorenz Esch, Lars Debor, Simon Heinke. All rights reserved.
+ * Copyright (C) 2020, Lorenz Esch. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -30,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the DataManager class.
+ * @brief    Definition of the Filtering class.
  *
  */
 
@@ -38,8 +36,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "datamanager.h"
-#include "FormFiles/datamanagerview.h"
+#include "filtering.h"
+#include "FormFiles/filteringview.h"
 
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Management/communicator.h>
@@ -49,81 +47,73 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QListWidgetItem>
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DATAMANAGERPLUGIN;
+using namespace FILTERINGPLUGIN;
 using namespace ANSHAREDLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DataManager::DataManager()
+Filtering::Filtering()
 {
 }
 
 //=============================================================================================================
 
-DataManager::~DataManager()
+Filtering::~Filtering()
 {
 }
 
 //=============================================================================================================
 
-QSharedPointer<IPlugin> DataManager::clone() const
+QSharedPointer<IPlugin> Filtering::clone() const
 {
-    QSharedPointer<DataManager> pDataManagerClone = QSharedPointer<DataManager>::create();
-    return pDataManagerClone;
+    QSharedPointer<Filtering> pFilteringClone = QSharedPointer<Filtering>::create();
+    return pFilteringClone;
 }
 
 //=============================================================================================================
 
-void DataManager::init()
+void Filtering::init()
 {
     m_pCommu = new Communicator(this);
 }
 
 //=============================================================================================================
 
-void DataManager::unload()
+void Filtering::unload()
 {
 }
 
 //=============================================================================================================
 
-QString DataManager::getName() const
+QString Filtering::getName() const
 {
-    return "Data";
+    return "Filtering";
 }
 
 //=============================================================================================================
 
-QMenu *DataManager::getMenu()
+QMenu *Filtering::getMenu()
 {
     return Q_NULLPTR;
 }
 
 //=============================================================================================================
 
-QDockWidget *DataManager::getControl()
+QDockWidget *Filtering::getControl()
 {
-    DataManagerView* pDataManagerView = new DataManagerView;
+    FilteringView* pFilteringView = new FilteringView;
 
-    pDataManagerView->setModel(m_pAnalyzeData->getDataModel());
-
-    connect(pDataManagerView, &DataManagerView::selectedModelChanged,
-            this, &DataManager::onCurrentlySelectedModelChanged);
-
-    connect(pDataManagerView, &DataManagerView::removeItem,
-            this, &DataManager::onRemoveItem);
+    pFilteringView->setModel(m_pAnalyzeData->getDataModel());
 
     QDockWidget* pControlDock = new QDockWidget(getName());
-    pControlDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    pControlDock->setWidget(pDataManagerView);
+    pControlDock->setAllowedAreas(Qt::TopDockWidgetArea | Qt::BottomDockWidgetArea);
+    pControlDock->setWidget(pFilteringView);
     pControlDock->setObjectName(getName());
 
     return pControlDock;
@@ -131,40 +121,27 @@ QDockWidget *DataManager::getControl()
 
 //=============================================================================================================
 
-QWidget *DataManager::getView()
+QWidget *Filtering::getView()
 {
     return Q_NULLPTR;
 }
 
 //=============================================================================================================
 
-void DataManager::handleEvent(QSharedPointer<Event> e)
+void Filtering::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
     default:
-        qWarning() << "[DataManager::handleEvent] received an Event that is not handled by switch-cases";
+        qWarning() << "[Filtering::handleEvent] received an Event that is not handled by switch-cases";
     }
 }
 
 //=============================================================================================================
 
-QVector<EVENT_TYPE> DataManager::getEventSubscriptions(void) const
+QVector<EVENT_TYPE> Filtering::getEventSubscriptions(void) const
 {
     QVector<EVENT_TYPE> temp;
 
     return temp;
 }
 
-//=============================================================================================================
-
-void DataManager::onCurrentlySelectedModelChanged(const QVariant& data)
-{
-    m_pCommu->publishEvent(EVENT_TYPE::SELECTED_MODEL_CHANGED, data);
-}
-
-//=============================================================================================================
-
-void DataManager::onRemoveItem(const QModelIndex& index)
-{
-    m_pAnalyzeData->removeModel(index);
-}

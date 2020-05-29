@@ -1,15 +1,13 @@
 //=============================================================================================================
 /**
- * @file     datamanager.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
- *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
- * @since    0.1.0
- * @date     August, 2018
+ * @file     filtering.h
+ * @author   Lorenz Esch <lesch@mgh.harvard.edu>
+ * @since    0.1.2
+ * @date     May, 2020
  *
  * @section  LICENSE
  *
- * Copyright (C) 2018, Lorenz Esch, Lars Debor, Simon Heinke. All rights reserved.
+ * Copyright (C) 2020, Lorenz Esch. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -30,18 +28,19 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains the declaration of the DataManager class.
+ * @brief    Contains the declaration of the Filtering class.
  *
  */
 
-#ifndef DATAMANAGER_H
-#define DATAMANAGER_H
+#ifndef FILTERING_H
+#define FILTERING_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "datamanager_global.h"
+#include "filtering_global.h"
+
 #include <anShared/Interfaces/IPlugin.h>
 
 //=============================================================================================================
@@ -65,34 +64,34 @@ namespace ANSHAREDLIB {
 // DEFINE NAMESPACE SURFERPLUGIN
 //=============================================================================================================
 
-namespace DATAMANAGERPLUGIN
+namespace FILTERINGPLUGIN
 {
 
 //=============================================================================================================
 /**
- * DataManager Plugin
+ * Filtering Plugin
  *
- * @brief The DataManager class provides a view with all currently loaded models.
+ * @brief The Filtering class provides a view with all currently loaded models.
  */
-class DATAMANAGERSHARED_EXPORT DataManager : public ANSHAREDLIB::IPlugin
+class FILTERINGSHARED_EXPORT Filtering : public ANSHAREDLIB::IPlugin
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "datamanager.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "filtering.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(ANSHAREDLIB::IPlugin)
 
 public:
     //=========================================================================================================
     /**
-     * Constructs a DataManager.
+     * Constructs a Filtering.
      */
-    DataManager();
+    Filtering();
 
     //=========================================================================================================
     /**
-     * Destroys the DataManager.
+     * Destroys the Filtering.
      */
-    virtual ~DataManager() override;
+    virtual ~Filtering() override;
 
     // IPlugin functions
     virtual QSharedPointer<IPlugin> clone() const override;
@@ -106,16 +105,6 @@ public:
     virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
 
 private:
-    //=========================================================================================================
-    /**
-     * Handles the event when the currently selected model was changed.
-     *
-     * @param[in] data  The data from the currently selected QStandardItem
-     */
-    void onCurrentlySelectedModelChanged(const QVariant& data);
-
-    void onRemoveItem(const QModelIndex &index);
-
     QPointer<ANSHAREDLIB::Communicator> m_pCommu;
 };
 
@@ -125,4 +114,4 @@ private:
 
 } // NAMESPACE
 
-#endif // DATAMANAGER_H
+#endif // FILTERING_H

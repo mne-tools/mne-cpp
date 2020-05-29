@@ -128,7 +128,7 @@ QDockWidget *RawDataViewer::getControl()
 {
     QDockWidget* pControlDock = new QDockWidget(getName());
     pControlDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    pControlDock->setObjectName("Data View Controls");
+    pControlDock->setObjectName(getName());
 
     QVBoxLayout* pLayout = new QVBoxLayout;
 
