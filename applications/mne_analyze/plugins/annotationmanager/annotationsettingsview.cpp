@@ -68,7 +68,9 @@ AnnotationSettingsView::AnnotationSettingsView()
 , m_pColordialog(new QColorDialog(this))
 {
     m_pUi->setupUi(this);
-    this->setMinimumWidth(300);
+    this->setMinimumWidth(330);
+    this->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,
+                                    QSizePolicy::Preferred));
 
     m_pUi->m_comboBox_filterTypes->addItem("All");
     m_pUi->m_comboBox_filterTypes->addItem("0");
@@ -96,8 +98,7 @@ void AnnotationSettingsView::initMSVCSettings()
     connect(m_pAnnDelegate.data(), &AnnotationDelegate::timeValueChanged,
             this, &AnnotationSettingsView::realTimeDataTime, Qt::UniqueConnection);
 
-    m_pUi->m_tableView_eventTableView->resizeColumnsToContents();
-    m_pUi->m_tableView_eventTableView->adjustSize();
+    m_pUi->m_tableView_eventTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     m_pUi->m_tableView_eventTableView->setSelectionMode(QAbstractItemView::ExtendedSelection);
 }
 
@@ -126,10 +127,10 @@ void AnnotationSettingsView::initGUIFunctionality()
             this, &AnnotationSettingsView::updateComboBox, Qt::UniqueConnection);
 
     //For some reason the GUI breakes without this
-    QToolBar *toolBar = new QToolBar(this);
-    toolBar->setOrientation(Qt::Vertical);
-    toolBar->setMovable(false);
-    m_pUi->m_gridLayout_Main->addWidget(toolBar,0,0,1,1);
+//    QToolBar *toolBar = new QToolBar(this);
+//    toolBar->setOrientation(Qt::Vertical);
+//    toolBar->setMovable(false);
+//    m_pUi->m_gridLayout_Main->addWidget(toolBar,0,0,1,1);
 
     //Add type button
     connect(m_pUi->m_pushButton_addEventType, &QPushButton::clicked,
