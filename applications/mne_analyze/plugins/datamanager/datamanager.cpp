@@ -76,8 +76,8 @@ DataManager::~DataManager()
 
 QSharedPointer<IPlugin> DataManager::clone() const
 {
-    QSharedPointer<DataManager> pDataViewerClone = QSharedPointer<DataManager>::create();
-    return pDataViewerClone;
+    QSharedPointer<DataManager> pDataManagerClone = QSharedPointer<DataManager>::create();
+    return pDataManagerClone;
 }
 
 //=============================================================================================================
@@ -85,16 +85,6 @@ QSharedPointer<IPlugin> DataManager::clone() const
 void DataManager::init()
 {
     m_pCommu = new Communicator(this);
-
-    m_pDataManagerView = new DataManagerView;
-
-    m_pDataManagerView->setModel(m_pAnalyzeData->getDataModel());
-
-    connect(m_pDataManagerView.data(), &DataManagerView::selectedModelChanged,
-            this, &DataManager::onCurrentlySelectedModelChanged);
-
-    connect(m_pDataManagerView.data(), &DataManagerView::removeItem,
-            this, &DataManager::onRemoveItem);
 }
 
 //=============================================================================================================
@@ -121,14 +111,22 @@ QMenu *DataManager::getMenu()
 
 QDockWidget *DataManager::getControl()
 {
-    if(!m_pControlDock) {
-        m_pControlDock = new QDockWidget(getName());
-        m_pControlDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-        m_pControlDock->setWidget(m_pDataManagerView);
-        m_pControlDock->setObjectName("Data Manager");
-    }
+    DataManagerView* pDataManagerView = new DataManagerView;
 
-    return m_pControlDock;
+    pDataManagerView->setModel(m_pAnalyzeData->getDataModel());
+
+    connect(pDataManagerView, &DataManagerView::selectedModelChanged,
+            this, &DataManager::onCurrentlySelectedModelChanged);
+
+    connect(pDataManagerView, &DataManagerView::removeItem,
+            this, &DataManager::onRemoveItem);
+
+    QDockWidget* pControlDock = new QDockWidget(getName());
+    pControlDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    pControlDock->setWidget(pDataManagerView);
+    pControlDock->setObjectName(getName());
+
+    return pControlDock;
 }
 
 //=============================================================================================================

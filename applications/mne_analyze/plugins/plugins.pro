@@ -42,3 +42,4 @@ SUBDIRS += \
     datamanager \
     rawdataviewer \
     annotationmanager \
+    filtering\

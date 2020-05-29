@@ -1,15 +1,13 @@
 //=============================================================================================================
 /**
- * @file     datamanager.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
- *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
- * @since    0.1.0
- * @date     August, 2018
+ * @file     filteringview.h
+ * @author   Lorenz Esch <lesch@mgh.harvard.edu>
+ * @since    0.1.2
+ * @date     May, 2020
  *
  * @section  LICENSE
  *
- * Copyright (C) 2018, Lorenz Esch, Lars Debor, Simon Heinke. All rights reserved.
+ * Copyright (C) 2020, Lorenz Esch. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -30,99 +28,104 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains the declaration of the DataManager class.
+ * @brief    Contains the declaration of the FilteringView class.
  *
  */
 
-#ifndef DATAMANAGER_H
-#define DATAMANAGER_H
+#ifndef FILTERINGVIEW_H
+#define FILTERINGVIEW_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "datamanager_global.h"
-#include <anShared/Interfaces/IPlugin.h>
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
-#include <QtCore/QtPlugin>
-#include <QDebug>
-#include <QPointer>
+#include <QWidget>
+#include <QAbstractItemModel>
+#include <QItemSelectionModel>
+#include <QStandardItem>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace ANSHAREDLIB {
-    class Communicator;
+namespace Ui {
+    class FilteringView;
+}
+
+namespace ANSHARED {
+    class AbstractModel;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE SURFERPLUGIN
-//=============================================================================================================
-
-namespace DATAMANAGERPLUGIN
-{
-
-//=============================================================================================================
 /**
- * DataManager Plugin
+ * FilteringView Plugin Control
  *
- * @brief The DataManager class provides a view with all currently loaded models.
+ * @brief The FilteringView class provides the plugin control.
  */
-class DATAMANAGERSHARED_EXPORT DataManager : public ANSHAREDLIB::IPlugin
+class FilteringView : public QWidget
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "datamanager.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
-    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(ANSHAREDLIB::IPlugin)
 
 public:
     //=========================================================================================================
     /**
-     * Constructs a DataManager.
+     * Constructs the FilteringView
+     *
+     * @param[in] parent     If parent is not NULL the QWidget becomes a child of QWidget inside parent.
      */
-    DataManager();
+    explicit FilteringView(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-     * Destroys the DataManager.
+     * Destroys the FilteringView.
      */
-    virtual ~DataManager() override;
+    virtual ~FilteringView();
 
-    // IPlugin functions
-    virtual QSharedPointer<IPlugin> clone() const override;
-    virtual void init() override;
-    virtual void unload() override;
-    virtual QString getName() const override;
-    virtual QMenu* getMenu() override;
-    virtual QDockWidget* getControl() override;
-    virtual QWidget* getView() override;
-    virtual void handleEvent(QSharedPointer<ANSHAREDLIB::Event> e) override;
-    virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
+    //=========================================================================================================
+    /**
+     * Sets the model to the tree view.
+     *
+     * @param[in] pModel       The new model.
+     */
+    void setModel(QAbstractItemModel *pModel);
 
 private:
     //=========================================================================================================
+    void customMenuRequested(QPoint pos);
+
+    //=========================================================================================================
     /**
-     * Handles the event when the currently selected model was changed.
+     * Sends signal to trigger model change when a new model is selcted
      *
-     * @param[in] data  The data from the currently selected QStandardItem
+     * @param [in] selected     New item being selected
+     * @param [in] deselected   UNUSED - previously selected item
      */
-    void onCurrentlySelectedModelChanged(const QVariant& data);
+    void onCurrentItemChanged(const QItemSelection &selected,
+                              const QItemSelection &deselected);
 
-    void onRemoveItem(const QModelIndex &index);
+    //=========================================================================================================
+    /**
+     * Uses the indeces of newly added subject and file to select it in the GUI view
+     *
+     * @param [in] iSubject     index of the subject the new file was added to
+     * @param [in] iModel       index of the new model file relative to the subject
+     */
+    void onNewFileLoaded(int iSubject,
+                         int iModel);
 
-    QPointer<ANSHAREDLIB::Communicator> m_pCommu;
+    Ui::FilteringView *m_pUi;   /**< The user interface */
+
+signals:
+    void removeItem(const QModelIndex& pIndex);
+    void selectedModelChanged(const QVariant& data);
 };
 
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
-
-} // NAMESPACE
-
-#endif // DATAMANAGER_H
+#endif // FILTERINGVIEW_H
