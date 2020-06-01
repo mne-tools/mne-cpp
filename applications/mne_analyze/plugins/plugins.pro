@@ -42,4 +42,5 @@ SUBDIRS += \
     datamanager \
     rawdataviewer \
     annotationmanager \
-    filtering\
+    filtering \
+    averaging \
