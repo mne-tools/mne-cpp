@@ -38,6 +38,7 @@
 
 #include "averaging.h"
 #include <anShared/Management/communicator.h>
+#include <disp/viewers/averagingsettingsview.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -115,9 +116,10 @@ QWidget *Averaging::getView()
 
 QDockWidget* Averaging::getControl()
 {
-    QLabel* label = new QLabel("Plugin Under Construction");
+    DISPLIB::AveragingSettingsView* pAveragingSettingsView = new DISPLIB::AveragingSettingsView(QString("MNEANALYZE/%1").arg(this->getName()));
+//    QLabel* label = new QLabel("Plugin Under Construction");
     QDockWidget* pControl = new QDockWidget(getName());
-    pControl->setWidget(label);
+    pControl->setWidget(pAveragingSettingsView);
     pControl->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
     pControl->setObjectName("Averaging");
     pControl->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,
