@@ -418,6 +418,8 @@ void PluginGui::itemInserted(PluginItem *item)
 
     m_pButtonGroupPointers->button(int(PluginScene::MovePluginItem))->setChecked(true);
     m_pPluginScene->setMode(PluginScene::Mode(m_pButtonGroupPointers->checkedId()));
+
+    saveConfig(QStandardPaths::writableLocation(QStandardPaths::DataLocation),"default.xml");
 }
 
 //=============================================================================================================
