@@ -220,8 +220,6 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             }
         }
     } else if(RealTimeHpiResult::SPtr pRTHR = qSharedPointerDynamicCast<RealTimeHpiResult>(pMeasurement)) {
-        QSharedPointer<HpiFitResult> hpiFitResult = pRTHR->getValue();
-
         if(!m_pBemHeadAvr) {
             // Add sensor surface BabyMeg
             QFile t_fileBabyMEGSensorSurfaceBEM(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/BabyMEG.fif");
@@ -239,56 +237,58 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             m_pBemHeadAvr = m_pData3DModel->addBemData("Subject", "Average head", t_BemHeadAvr);
         }
 
-        if(m_sFilePathDigitizers != hpiFitResult->sFilePathDigitzers && m_pBemHeadAvr) {
-            //Add all digitizer but additional points to the 3D view
-            QFile fileDig(hpiFitResult->sFilePathDigitzers);
-            FiffDigPointSet digSet(fileDig);
-            FiffDigPointSet digSetWithoutAdditional = digSet.pickTypes(QList<int>()<<FIFFV_POINT_HPI<<FIFFV_POINT_CARDINAL<<FIFFV_POINT_EEG);
-            m_pTrackedDigitizer = m_pData3DModel->addDigitizerData("Subject",
-                                                                   "Tracked Digitizers",
-                                                                   digSetWithoutAdditional);
+        if(QSharedPointer<HpiFitResult> pHpiFitResult = pRTHR->getValue()) {
+            if(m_sFilePathDigitizers != pHpiFitResult->sFilePathDigitzers && m_pBemHeadAvr) {
+                //Add all digitizer but additional points to the 3D view
+                QFile fileDig(pHpiFitResult->sFilePathDigitzers);
+                FiffDigPointSet digSet(fileDig);
+                FiffDigPointSet digSetWithoutAdditional = digSet.pickTypes(QList<int>()<<FIFFV_POINT_HPI<<FIFFV_POINT_CARDINAL<<FIFFV_POINT_EEG);
+                m_pTrackedDigitizer = m_pData3DModel->addDigitizerData("Subject",
+                                                                       "Tracked Digitizers",
+                                                                       digSetWithoutAdditional);
 
-            alignFiducials(hpiFitResult->sFilePathDigitzers);
-        }
+                alignFiducials(pHpiFitResult->sFilePathDigitzers);
+            }
 
-        //Add and update items to 3D view
-        m_pData3DModel->addDigitizerData("Subject",
-                                         "Fitted Digitizers",
-                                         hpiFitResult->fittedCoils.pickTypes(QList<int>()<<FIFFV_POINT_EEG));
+            //Add and update items to 3D view
+            m_pData3DModel->addDigitizerData("Subject",
+                                             "Fitted Digitizers",
+                                             pHpiFitResult->fittedCoils.pickTypes(QList<int>()<<FIFFV_POINT_EEG));
 
-        if(m_pTrackedDigitizer && m_pBemHeadAvr) {
-            //Update fast scan / tracked digitizer
-            QList<QStandardItem*> itemList = m_pTrackedDigitizer->findChildren(Data3DTreeModelItemTypes::DigitizerItem);
-            for(int j = 0; j < itemList.size(); ++j) {
-                if(DigitizerTreeItem* pDigItem = dynamic_cast<DigitizerTreeItem*>(itemList.at(j))) {
-                    // apply inverse to get from head to device space
-                    pDigItem->setTransform(hpiFitResult->devHeadTrans, true);
+            if(m_pTrackedDigitizer && m_pBemHeadAvr) {
+                //Update fast scan / tracked digitizer
+                QList<QStandardItem*> itemList = m_pTrackedDigitizer->findChildren(Data3DTreeModelItemTypes::DigitizerItem);
+                for(int j = 0; j < itemList.size(); ++j) {
+                    if(DigitizerTreeItem* pDigItem = dynamic_cast<DigitizerTreeItem*>(itemList.at(j))) {
+                        // apply inverse to get from head to device space
+                        pDigItem->setTransform(pHpiFitResult->devHeadTrans, true);
+                    }
+                }
+
+                // Update average head
+                itemList = m_pBemHeadAvr->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
+                for(int j = 0; j < itemList.size(); ++j) {
+                    if(BemSurfaceTreeItem* pBemItem = dynamic_cast<BemSurfaceTreeItem*>(itemList.at(j))) {
+                        pBemItem->setTransform(m_tAlignment);
+                        // apply inverse to get from head to device space
+                        pBemItem->applyTransform(pHpiFitResult->devHeadTrans, true);
+                    }
                 }
             }
 
-            // Update average head
-            itemList = m_pBemHeadAvr->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
-            for(int j = 0; j < itemList.size(); ++j) {
-                if(BemSurfaceTreeItem* pBemItem = dynamic_cast<BemSurfaceTreeItem*>(itemList.at(j))) {
-                    pBemItem->setTransform(m_tAlignment);
-                    // apply inverse to get from head to device space
-                    pBemItem->applyTransform(hpiFitResult->devHeadTrans, true);
+            if(m_pRtMNEItem) {
+                if(!m_mriHeadTrans.isEmpty()) {
+                    m_pRtMNEItem->setTransform(m_mriHeadTrans,false);
+                    m_pRtMNEItem->applyTransform(pHpiFitResult->devHeadTrans, true);
+                } else {
+                    m_pRtMNEItem->setTransform(pHpiFitResult->devHeadTrans, true);
                 }
-            }
-        }
 
-        if(m_pRtMNEItem) {
-            if(!m_mriHeadTrans.isEmpty()) {
-                m_pRtMNEItem->setTransform(m_mriHeadTrans,false);
-                m_pRtMNEItem->applyTransform(hpiFitResult->devHeadTrans, true);
-            } else {
-                m_pRtMNEItem->setTransform(hpiFitResult->devHeadTrans, true);
             }
 
-        }
-
-        if(m_pRtConnectivityItem) {
-            m_pRtConnectivityItem->setTransform(hpiFitResult->devHeadTrans, true);
+            if(m_pRtConnectivityItem) {
+                m_pRtConnectivityItem->setTransform(pHpiFitResult->devHeadTrans, true);
+            }
         }
     }
 }
