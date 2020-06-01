@@ -216,16 +216,45 @@ void MainWindow::createLogDockWindow()
 
 void MainWindow::createPluginMenus(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager)
 {
+    // File menu
     m_pMenuFile = menuBar()->addMenu(tr("File"));
     m_pMenuFile->addAction(m_pActionExit);
 
+    // View menu
     m_pMenuView = menuBar()->addMenu(tr("View"));
 
-    menuBar()->addSeparator();
+    // Appearance menu
+    m_pMenuAppearance = menuBar()->addMenu(tr("Appearance"));
 
+    QAction* pActionDarkMode = new QAction("Dark Mode");
+    pActionDarkMode->setStatusTip(tr("Activate dark mode"));
+    pActionDarkMode->setCheckable(true);
+    connect(pActionDarkMode, &QAction::toggled,
+        [=](bool checked) {
+        // Styles are from https://github.com/Alexhuszagh/BreezeStyleSheets
+        if(QApplication *pApp = qobject_cast<QApplication *>(QApplication::instance())) {
+            if(checked) {
+                QFile file;
+                file.setFileName(":/dark.qss");
+                file.open(QFile::ReadOnly | QFile::Text);
+                QTextStream stream(&file);
+                pApp->setStyleSheet(stream.readAll());
+            } else {
+                pApp->setStyleSheet("");
+            }
+
+            // Set default font
+            int id = QFontDatabase::addApplicationFont(":/fonts/Roboto-Light.ttf");
+            pApp->setFont(QFont(QFontDatabase::applicationFontFamilies(id).at(0)));
+        }
+    });
+    pActionDarkMode->setChecked(false);
+
+    m_pMenuAppearance->addAction(pActionDarkMode);
+
+    // Help menu
     m_pMenuHelp = menuBar()->addMenu(tr("Help"));
     m_pMenuHelp->addAction(m_pActionAbout);
-
 
     // add plugins menus
     for(IPlugin* pPlugin : pPluginManager->getPlugins()) {

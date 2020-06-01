@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>180</width>
-    <height>283</height>
+    <height>366</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -19,29 +19,12 @@
   <property name="windowTitle">
    <string>Music Control</string>
   </property>
-  <layout class="QVBoxLayout" name="m_qVerticalLayoutRoot">
-   <property name="leftMargin">
-    <number>0</number>
-   </property>
-   <property name="topMargin">
-    <number>0</number>
-   </property>
-   <property name="rightMargin">
-    <number>0</number>
-   </property>
-   <property name="bottomMargin">
-    <number>0</number>
-   </property>
-   <item>
-    <widget class="QGroupBox" name="m_qGroupBoxBrowser">
-     <property name="title">
-      <string>Browser</string>
-     </property>
-     <layout class="QVBoxLayout" name="m_qVerticalLayoutBrowser">
-      <item>
-       <widget class="QTreeView" name="m_pTreeView"/>
-      </item>
-     </layout>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QTreeView" name="m_pTreeView">
+     <attribute name="headerVisible">
+      <bool>false</bool>
+     </attribute>
     </widget>
    </item>
   </layout>
