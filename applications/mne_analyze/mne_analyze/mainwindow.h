@@ -177,6 +177,7 @@ private:
     // MainWindow menus
     QPointer<QMenu>                     m_pMenuFile;        /**< Holds the file menu.*/
     QPointer<QMenu>                     m_pMenuView;        /**< Holds the view menu.*/
+    QPointer<QMenu>                     m_pMenuAppearance;  /**< Holds the appearance menu.*/
     QPointer<QMenu>                     m_pMenuHelp;        /**< Holds the help menu.*/
 
     QPointer<QTextBrowser>              m_pTextBrowser_Log; /**< Holds the text browser for the log.*/

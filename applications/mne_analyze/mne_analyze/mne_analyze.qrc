@@ -4,9 +4,9 @@
         <file>resources/images/appIcons/icon_mne-analyze_256x256.png</file>
     </qresource>
     <qresource prefix="/fonts">
-        <file alias="Lato-Black.ttf">fonts/Lato-Black.ttf</file>
-        <file alias="Lato-Light.ttf">fonts/Lato-Light.ttf</file>
-        <file alias="Roboto-Black.ttf">fonts/Roboto-Black.ttf</file>
-        <file alias="Roboto-Light.ttf">fonts/Roboto-Light.ttf</file>
+        <file alias="Lato-Black.ttf">resources/fonts/Lato-Black.ttf</file>
+        <file alias="Lato-Light.ttf">resources/fonts/Lato-Light.ttf</file>
+        <file alias="Roboto-Black.ttf">resources/fonts/Roboto-Black.ttf</file>
+        <file alias="Roboto-Light.ttf">resources/fonts/Roboto-Light.ttf</file>
     </qresource>
 </RCC>
