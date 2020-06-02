@@ -72,6 +72,9 @@ namespace ANSHAREDLIB {
 
 namespace DISPLIB {
     class MultiView;
+    class ButterflyView;
+    class AverageLayoutView;
+
 }
 
 //=============================================================================================================
@@ -191,6 +194,8 @@ private:
      */
     void createLogDockWindow();
 
+    void createAveragingWindows();
+
     /**< Creates all actions for user interface of MainWindow class. */
     void createPluginMenus(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager);          /**< Creates all menus for user interface of MainWindow class. */
     void createPluginControls(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager);    /**< Creates all dock windows for user interface of MainWindow class. */
@@ -221,6 +226,10 @@ private:
 
     QString                             m_sSettingsPath;            /**< The settings path to store the GUI settings to. */
     QString                             m_sCurrentStyle;            /**< The currently selected style (dark mode, default mode). */
+
+    QPointer<DISPLIB::ButterflyView>        m_pButterflyView;       /**< The butterfly plot view. */
+
+    QPointer<DISPLIB::AverageLayoutView>    m_pAverageLayoutView;   /**< The average layout plot view */
 };
 
 }// NAMESPACE
