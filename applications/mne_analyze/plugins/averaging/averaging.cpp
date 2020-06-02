@@ -39,6 +39,7 @@
 #include "averaging.h"
 #include <anShared/Management/communicator.h>
 #include <disp/viewers/averagingsettingsview.h>
+#include <anShared/Model/fiffrawviewmodel.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -116,10 +117,18 @@ QWidget *Averaging::getView()
 
 QDockWidget* Averaging::getControl()
 {
+    QVBoxLayout* pLayout = new QVBoxLayout;
+    QWidget* pWidget = new QWidget();
     DISPLIB::AveragingSettingsView* pAveragingSettingsView = new DISPLIB::AveragingSettingsView(QString("MNEANALYZE/%1").arg(this->getName()));
-//    QLabel* label = new QLabel("Plugin Under Construction");
     QDockWidget* pControl = new QDockWidget(getName());
-    pControl->setWidget(pAveragingSettingsView);
+    QPushButton* pButton = new QPushButton();
+    pButton->setText("COMPUTE");
+
+    pLayout->addWidget(pAveragingSettingsView);
+    pLayout->addWidget(pButton);
+    pWidget->setLayout(pLayout);
+
+    pControl->setWidget(pWidget);
     pControl->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
     pControl->setObjectName("Averaging");
     pControl->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,
@@ -133,6 +142,10 @@ QDockWidget* Averaging::getControl()
 void Averaging::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
+        case EVENT_TYPE::SELECTED_MODEL_CHANGED:
+            qDebug() << "[Averaging::handleEvent] SELECTED_MODEL_CHANGED";
+            onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
+            break;
         default:
             qWarning() << "[Averaging::handleEvent] Received an Event that is not handled by switch cases.";
     }
@@ -143,9 +156,23 @@ void Averaging::handleEvent(QSharedPointer<Event> e)
 QVector<EVENT_TYPE> Averaging::getEventSubscriptions(void) const
 {
     QVector<EVENT_TYPE> temp;
-    temp.push_back(NEW_ANNOTATION_ADDED);
     temp.push_back(SELECTED_MODEL_CHANGED);
 
     return temp;
 }
 
+//=============================================================================================================
+
+void Averaging::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel)
+{
+    if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
+        if(m_pFiffRawModel) {
+            if(m_pFiffRawModel == pNewModel) {
+                qDebug() << "[Averaging::onModelChanged] Model is the same";
+                return;
+            }
+        }
+        m_pFiffRawModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
+        qDebug() << "[Averaging::onModelChanged] New model loaded";
+    }
+}

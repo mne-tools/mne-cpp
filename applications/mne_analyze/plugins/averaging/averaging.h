@@ -56,6 +56,7 @@
 namespace ANSHAREDLIB {
     class Communicator;
     class FiffRawViewModel;
+    class AbstractModel;
 }
 
 //=============================================================================================================
@@ -108,8 +109,18 @@ public:
     virtual void handleEvent(QSharedPointer<ANSHAREDLIB::Event> e) override;
     virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
 
+private:
+    //=========================================================================================================
+    /**
+     * Loads new Fiff model whan current loaded model is changed
+     *
+     * @param [in,out] pNewModel    pointer to currently loaded FiffRawView Model
+     */
+    void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
 
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals */
+
+    QSharedPointer<ANSHAREDLIB::FiffRawViewModel>           m_pFiffRawModel;            /**< Pointer to currently loaded FiffRawView Model */
 
 };
 
