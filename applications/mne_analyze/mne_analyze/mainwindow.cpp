@@ -49,6 +49,9 @@
 #include <disp/viewers/multiviewwindow.h>
 #include <disp/viewers/abstractview.h>
 
+#include <disp/viewers/butterflyview.h>
+#include <disp/viewers/averagelayoutview.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -96,6 +99,7 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager
         createLogDockWindow();
         createPluginControls(pPluginManager);
         createPluginViews(pPluginManager);
+        createAveragingWindows();
     } else {
         qWarning() << "[MainWindow::MainWindow] CRITICAL ! Plugin manager is nullptr";
     }
@@ -575,4 +579,29 @@ void MainWindow::about()
     }
 
     m_pAboutWindow->show();
+}
+
+//=============================================================================================================
+
+void MainWindow::createAveragingWindows()
+{
+    m_pButterflyView = new ButterflyView();
+    m_pAverageLayoutView = new AverageLayoutView();
+
+    QDockWidget* pDockWidgetBF = new QDockWidget(tr("Butterfly Plot"), this);
+    QDockWidget* pDockWidgetAL = new QDockWidget(tr("2D Layout"), this);
+    pDockWidgetBF->setObjectName("Butterfly Plot");
+    pDockWidgetAL->setObjectName("2D Layout");
+
+    pDockWidgetBF->setWidget(m_pButterflyView);
+    pDockWidgetAL->setWidget(m_pAverageLayoutView);
+    pDockWidgetBF->setAllowedAreas(Qt::BottomDockWidgetArea);
+    pDockWidgetAL->setAllowedAreas(Qt::BottomDockWidgetArea);
+    addDockWidget(Qt::BottomDockWidgetArea, pDockWidgetBF);
+    addDockWidget(Qt::BottomDockWidgetArea, pDockWidgetAL);
+
+    m_pMenuView->addAction(pDockWidgetBF->toggleViewAction());
+    m_pMenuView->addAction(pDockWidgetAL->toggleViewAction());
+
+    tabifyDockWindows();
 }
