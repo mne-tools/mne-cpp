@@ -64,6 +64,11 @@ namespace UTILSLIB {
     class FilterData;
 }
 
+namespace Ui {
+    class FilterSettingsViewWidget;
+}
+
+
 //=============================================================================================================
 // DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
@@ -144,7 +149,7 @@ protected:
 
     QSharedPointer<FilterDesignView>        m_pFilterView;                  /**< The filter view. */
 
-    QPointer<QCheckBox>                     m_pCheckBox;                    /**< The filter activation check box. */
+    Ui::FilterSettingsViewWidget*           m_pUi;                          /**< The filter settings GUI view. */
 
 signals:
     void filterActivationChanged(bool activated);
