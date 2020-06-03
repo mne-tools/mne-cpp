@@ -83,6 +83,7 @@ QSharedPointer<IPlugin> Averaging::clone() const
 void Averaging::init()
 {
     m_pCommu = new Communicator(this);
+
 }
 
 //=============================================================================================================
@@ -123,6 +124,21 @@ QDockWidget* Averaging::getControl()
     QDockWidget* pControl = new QDockWidget(getName());
     QPushButton* pButton = new QPushButton();
     pButton->setText("COMPUTE");
+
+    connect(pAveragingSettingsView, &DISPLIB::AveragingSettingsView::changeNumAverages,
+            this, &Averaging::onChangeNumAverages, Qt::UniqueConnection);
+    connect(pAveragingSettingsView, &DISPLIB::AveragingSettingsView::changeBaselineFrom,
+            this, &Averaging::onChangeBaselineFrom, Qt::UniqueConnection);
+    connect(pAveragingSettingsView, &DISPLIB::AveragingSettingsView::changeBaselineTo,
+            this, &Averaging::onChangeBaselineTo, Qt::UniqueConnection);
+    connect(pAveragingSettingsView, &DISPLIB::AveragingSettingsView::changePostStim,
+            this, &Averaging::onChangePostStim, Qt::UniqueConnection);
+    connect(pAveragingSettingsView, &DISPLIB::AveragingSettingsView::changePreStim,
+            this, &Averaging::onChangePreStim, Qt::UniqueConnection);
+    connect(pAveragingSettingsView, &DISPLIB::AveragingSettingsView::changeBaselineActive,
+            this, &Averaging::onChangeBaselineActive, Qt::UniqueConnection);
+    connect(pAveragingSettingsView, &DISPLIB::AveragingSettingsView::resetAverage,
+            this, &Averaging::onResetAverage, Qt::UniqueConnection);
 
     pLayout->addWidget(pAveragingSettingsView);
     pLayout->addWidget(pButton);
@@ -174,5 +190,108 @@ void Averaging::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewMo
         }
         m_pFiffRawModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
         qDebug() << "[Averaging::onModelChanged] New model loaded";
+    }
+}
+
+//=============================================================================================================
+
+void Averaging::onChangeNumAverages(qint32 numAve)
+{
+    qDebug() << "[Averaging::onChangeNumAverages]";
+    if(m_pAve) {
+        m_pAve->setAverageNumber(numAve);
+    }
+}
+
+//=============================================================================================================
+
+void Averaging::onChangeBaselineFrom(qint32 fromMSeconds)
+{
+
+    qDebug() << "[Averaging::onChangeBaselineFrom]";
+//    if(!m_pFiffInfo) {
+//        return;
+//    }
+
+//    int iBaselineFromSamples = ((float)(fromMSeconds)/1000)*m_pFiffInfo->sfreq;
+
+//    if(m_pAve) {
+//        m_pAve->setBaselineFrom(iBaselineFromSamples, fromMSeconds);
+//    }
+}
+
+
+//=============================================================================================================
+
+void Averaging::onChangeBaselineTo(qint32 toMSeconds)
+{
+    qDebug() << "[Averaging::onChangeBaselineTo]";
+//    if(!m_pFiffInfo) {
+//        return;
+//    }
+
+//    int iBaselineToSamples = ((float)(toMSeconds)/1000)*m_pFiffInfo->sfreq;
+
+//    if(m_tAve) {
+//        m_tAve->setBaselineTo(iBaselineToSamples, toMSeconds);
+//    }
+}
+
+//=============================================================================================================
+
+void Averaging::onChangePreStim(qint32 mseconds)
+{
+    qDebug() << "[Averaging::onChangePreStim]";
+//    if(!m_pFiffInfo) {
+//        return;
+//    }
+
+//    int iPreStimSamples = ((float)(mseconds)/1000)*m_pFiffInfo->sfreq;
+
+//    if(m_pAveragingOutput) {
+//        m_pAveragingOutput->data()->setNumPreStimSamples(iPreStimSamples);
+//    }
+
+//    if(m_pAve) {
+//        m_pAve->setPreStim(iPreStimSamples, mseconds);
+//    }
+}
+
+//=============================================================================================================
+
+void Averaging::onChangePostStim(qint32 mseconds)
+{
+
+    qDebug() << "[Averaging::onChangePostStim]";
+//    if(!m_pFiffInfo) {
+//        return;
+//    }
+
+//    int iPostStimSamples = ((float)(mseconds)/1000)*m_pFiffInfo->sfreq;
+
+//    if(m_pAve) {
+//        m_pAve->setPostStim(iPostStimSamples, mseconds);
+//    }
+}
+
+//=============================================================================================================
+
+void Averaging::onChangeBaselineActive(bool state)
+{
+    qDebug() << "[Averaging::onChangeBaselineActive]";
+    if(m_pAve) {
+        m_pAve->setBaselineActive(state);
+    }
+}
+
+//=============================================================================================================
+
+void Averaging::onResetAverage(bool state)
+{
+    Q_UNUSED(state)
+
+    qDebug() << "[Averaging::onResetAverage]";
+    if(m_pAve) {
+        m_pAve->reset();
     }
 }

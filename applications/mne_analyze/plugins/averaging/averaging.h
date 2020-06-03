@@ -119,6 +119,62 @@ private:
      */
     void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
 
+    //=========================================================================================================
+    /**
+     * Change the number of averages
+     *
+     * @param[in] numAve     new number of averages
+     */
+    void onChangeNumAverages(qint32 numAve);
+
+    //=========================================================================================================
+    /**
+     * Change the baseline from value
+     *
+     * @param[in] fromMSeconds     the new baseline from value in seconds
+     */
+    void onChangeBaselineFrom(qint32 fromMSeconds);
+
+    //=========================================================================================================
+    /**
+     * Change the baseline to value
+     *
+     * @param[in] fromMSeconds     the new baseline to value in seconds
+     */
+    void onChangeBaselineTo(qint32 toMSeconds);
+
+    //=========================================================================================================
+    /**
+     * Change the pre stim stim
+     *
+     * @param[in] mseconds     the new pres stim in seconds
+     */
+    void onChangePreStim(qint32 mseconds);
+
+    //=========================================================================================================
+    /**
+     * Change the post stim stim
+     *
+     * @param[in] mseconds     the new post stim in seconds
+     */
+    void onChangePostStim(qint32 mseconds);
+
+    //=========================================================================================================
+    /**
+     * Change the baseline active state
+     *
+     * @param[in] state     the new state
+     */
+    void onChangeBaselineActive(bool state);
+
+    //=========================================================================================================
+    /**
+     * Reset the averaging plugin and delete all currently stored data
+     *
+     * @param[in] state     the new state
+     */
+    void onResetAverage(bool state);
+
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals */
 
     QSharedPointer<ANSHAREDLIB::FiffRawViewModel>           m_pFiffRawModel;            /**< Pointer to currently loaded FiffRawView Model */
