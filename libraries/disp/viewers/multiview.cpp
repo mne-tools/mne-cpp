@@ -63,8 +63,8 @@ MultiView::MultiView(const QString& sSettingsPath,
                      QWidget *parent,
                      Qt::WindowFlags flags)
 : QMainWindow(parent, flags)
-, m_sSettingsPath(sSettingsPath)
 {
+    m_sSettingsPath = sSettingsPath;
     this->setDockNestingEnabled(true);
     if(QWidget* pCentralWidget = this->centralWidget()) {
         pCentralWidget->hide();

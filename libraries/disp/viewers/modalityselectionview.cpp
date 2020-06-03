@@ -67,8 +67,9 @@ ModalitySelectionView::ModalitySelectionView(const QList<FIFFLIB::FiffChInfo>& l
                                              const QString &sSettingsPath,
                                              QWidget *parent,
                                              Qt::WindowFlags f)
-: AbstractView(sSettingsPath, parent, f)
+: AbstractView(parent, f)
 {
+    m_sSettingsPath = sSettingsPath;
     this->setWindowTitle("Modality Selection");
     this->setMinimumWidth(330);
     this->setMaximumWidth(330);
@@ -124,22 +125,22 @@ void ModalitySelectionView::saveSettings()
     QSettings settings("MNECPP");
 
     if(m_modalityMap.contains("MAG")) {
-        settings.setValue(m_sSettingsPath + QString("/modalityMAG"), m_modalityMap["MAG"]);
+        settings.setValue(m_sSettingsPath + QString("/ModalitySelectionView/modalityMAG"), m_modalityMap["MAG"]);
     }
     if(m_modalityMap.contains("GRAD")) {
-        settings.setValue(m_sSettingsPath + QString("/modalityGRAD"), m_modalityMap["GRAD"]);
+        settings.setValue(m_sSettingsPath + QString("/ModalitySelectionView/modalityGRAD"), m_modalityMap["GRAD"]);
     }
     if(m_modalityMap.contains("EEG")) {
-        settings.setValue(m_sSettingsPath + QString("/modalityEEG"), m_modalityMap["EEG"]);
+        settings.setValue(m_sSettingsPath + QString("/ModalitySelectionView/modalityEEG"), m_modalityMap["EEG"]);
     }
     if(m_modalityMap.contains("EOG")) {
-        settings.setValue(m_sSettingsPath + QString("/modalityEOG"), m_modalityMap["EOG"]);
+        settings.setValue(m_sSettingsPath + QString("/ModalitySelectionView/modalityEOG"), m_modalityMap["EOG"]);
     }
     if(m_modalityMap.contains("STIM")) {
-        settings.setValue(m_sSettingsPath + QString("/modalitySTIM"), m_modalityMap["STIM"]);
+        settings.setValue(m_sSettingsPath + QString("/ModalitySelectionView/modalitySTIM"), m_modalityMap["STIM"]);
     }
     if(m_modalityMap.contains("MISC")) {
-        settings.setValue(m_sSettingsPath + QString("/modalityMISC"), m_modalityMap["MISC"]);
+        settings.setValue(m_sSettingsPath + QString("/ModalitySelectionView/modalityMISC"), m_modalityMap["MISC"]);
     }
 }
 
@@ -153,22 +154,22 @@ void ModalitySelectionView::loadSettings()
 
     QSettings settings("MNECPP");
 
-    bool flag = settings.value(m_sSettingsPath + QString("/modalityMAG"), true).toBool();
+    bool flag = settings.value(m_sSettingsPath + QString("/ModalitySelectionView/modalityMAG"), true).toBool();
     m_modalityMap.insert("MAG", flag);
 
-    flag = settings.value(m_sSettingsPath + QString("/modalityGRAD"), true).toBool();
+    flag = settings.value(m_sSettingsPath + QString("/ModalitySelectionView/modalityGRAD"), true).toBool();
     m_modalityMap.insert("GRAD", flag);
 
-    flag = settings.value(m_sSettingsPath + QString("/modalityEEG"), true).toBool();
+    flag = settings.value(m_sSettingsPath + QString("/ModalitySelectionView/modalityEEG"), true).toBool();
     m_modalityMap.insert("EEG", flag);
 
-    flag = settings.value(m_sSettingsPath + QString("/modalityEOG"), true).toBool();
+    flag = settings.value(m_sSettingsPath + QString("/ModalitySelectionView/modalityEOG"), true).toBool();
     m_modalityMap.insert("EOG", flag);
 
-    flag = settings.value(m_sSettingsPath + QString("/modalitySTIM"), true).toBool();
+    flag = settings.value(m_sSettingsPath + QString("/ModalitySelectionView/modalitySTIM"), true).toBool();
     m_modalityMap.insert("STIM", flag);
 
-    flag = settings.value(m_sSettingsPath + QString("/modalityMISC"), true).toBool();
+    flag = settings.value(m_sSettingsPath + QString("/ModalitySelectionView/modalityMISC"), true).toBool();
     m_modalityMap.insert("MISC", flag);
 }
 

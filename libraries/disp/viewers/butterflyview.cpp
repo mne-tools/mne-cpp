@@ -85,6 +85,7 @@ ButterflyView::ButterflyView(const QString& sSettingsPath,
 , m_qMapAverageActivation(QSharedPointer<QMap<QString, bool> >::create())
 , m_qMapAverageColor(QSharedPointer<QMap<QString, QColor> >::create())
 {
+    m_sSettingsPath = sSettingsPath;
 //    // Activate anti aliasing
 //    QSurfaceFormat fmt;
 //    fmt.setSamples(4);

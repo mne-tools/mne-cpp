@@ -67,9 +67,10 @@ using namespace FIFFLIB;
 ProjectorsView::ProjectorsView(const QString& sSettingsPath,
                                QWidget *parent,
                                Qt::WindowFlags f)
-: AbstractView(sSettingsPath, parent, f)
+: AbstractView(parent, f)
 , m_pEnableDisableProjectors(Q_NULLPTR)
 {
+    m_sSettingsPath = sSettingsPath;
     this->setWindowTitle("Projectors");
     this->setMinimumWidth(330);
     this->setMaximumWidth(330);
@@ -170,7 +171,7 @@ void ProjectorsView::saveSettings()
 
     QSettings settings("MNECPP");
 
-    settings.beginGroup(m_sSettingsPath + QString("/projectorsActive"));
+    settings.beginGroup(m_sSettingsPath + QString("/ProjectorsView/projectorsActive"));
 
     QMap<QString,bool>::const_iterator iProj = m_mapProjActive.constBegin();
     while (iProj != m_mapProjActive.constEnd()) {
@@ -191,7 +192,7 @@ void ProjectorsView::loadSettings()
 
     QSettings settings("MNECPP");
 
-    settings.beginGroup(m_sSettingsPath + QString("/projectorsActive"));
+    settings.beginGroup(m_sSettingsPath + QString("/ProjectorsView/projectorsActive"));
 
     QStringList keys = settings.childKeys();
     foreach (QString key, keys) {

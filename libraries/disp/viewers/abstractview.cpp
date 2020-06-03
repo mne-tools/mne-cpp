@@ -42,6 +42,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QDebug>
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -56,11 +57,9 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-AbstractView::AbstractView(const QString& sSettingsPath,
-                           QWidget *parent,
+AbstractView::AbstractView(QWidget *parent,
                            Qt::WindowFlags f)
 : QWidget(parent, f)
-, m_sSettingsPath(sSettingsPath)
 {
 }
 

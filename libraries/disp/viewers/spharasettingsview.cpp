@@ -63,9 +63,10 @@ using namespace DISPLIB;
 SpharaSettingsView::SpharaSettingsView(const QString& sSettingsPath,
                                        QWidget *parent,
                                        Qt::WindowFlags f)
-: AbstractView(sSettingsPath, parent, f)
+: AbstractView(parent, f)
 , ui(new Ui::SpharaSettingsViewWidget)
 {
+    m_sSettingsPath = sSettingsPath;
     ui->setupUi(this);
 
     //Sphara activation changed

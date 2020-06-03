@@ -155,7 +155,7 @@ protected:
 
     QString                             m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
 
-    Ui::ScalingViewWidget*              m_ui;
+    Ui::ScalingViewWidget*              m_pUi;
 
 signals:
     //=========================================================================================================
