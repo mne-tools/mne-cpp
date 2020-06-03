@@ -190,6 +190,14 @@ public:
 private:
     //=========================================================================================================
     /**
+     * Changes the current layout style of the application.
+     *
+     * @param [in] sStyle   The new qss style.
+     */
+    void onStyleChanged(const QString& sStyle);
+
+    //=========================================================================================================
+    /**
      * Setup the user interface for running mode.
      *
      * @param [in] state whether program is running.
@@ -339,6 +347,7 @@ private:
     int                                 m_iTimeoutMSec;                 /**< Holds milliseconds after which timer timeouts.*/
 
     QPointer<QActionGroup>              m_pActionGroupLgLv;             /**< group log level */
+    QPointer<QActionGroup>              m_pActionStyleGroup;
 
     QPointer<QAction>                   m_pActionNewConfig;             /**< new configuration */
     QPointer<QAction>                   m_pActionOpenConfig;            /**< open configuration */
@@ -353,6 +362,8 @@ private:
     QPointer<QAction>                   m_pActionQuickControl;          /**< Show quick control widget. */
     QPointer<QAction>                   m_pActionRun;                   /**< run application */
     QPointer<QAction>                   m_pActionStop;                  /**< stop application */
+    QPointer<QAction>                   m_pActionDefaultMode;                  /**< stop application */
+    QPointer<QAction>                   m_pActionLightMode;                  /**< stop application */
 
     QList<QAction*>                     m_qListDynamicPluginActions;    /**< dynamic plugin actions */
     QList<QAction*>                     m_qListDynamicDisplayActions;   /**< dynamic display actions */
