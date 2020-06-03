@@ -68,8 +68,7 @@ using namespace DISPLIB;
 FilterSettingsView::FilterSettingsView(const QString& sSettingsPath,
                                        QWidget *parent,
                                        Qt::WindowFlags f)
-: QWidget(parent, f)
-, m_sSettingsPath(sSettingsPath)
+: AbstractView(sSettingsPath, parent, f)
 , m_pUi(new Ui::FilterSettingsViewWidget)
 {
     this->setWindowTitle("Filter Settings");
@@ -87,9 +86,9 @@ FilterSettingsView::FilterSettingsView(const QString& sSettingsPath,
             this, &FilterSettingsView::onFilterActivationChanged);
     connect(m_pUi->m_pPushButtonShowFilterOptions, &QPushButton::clicked,
             this, &FilterSettingsView::onShowFilterView);
-    connect(m_pUi->m_pDoubleSpinBoxFrom, qOverload<double>(&QDoubleSpinBox::valueChanged),
+    connect(m_pUi->m_pDoubleSpinBoxFrom, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
             this, &FilterSettingsView::onFilterParametersChanged);
-    connect(m_pUi->m_pDoubleSpinBoxTo, qOverload<double>(&QDoubleSpinBox::valueChanged),
+    connect(m_pUi->m_pDoubleSpinBoxTo, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
             this, &FilterSettingsView::onFilterParametersChanged);
 }
 

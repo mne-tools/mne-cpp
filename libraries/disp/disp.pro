@@ -93,6 +93,7 @@ SOURCES += \
     plots/graph.cpp \
     plots/tfplot.cpp \
     plots/helpers/colormap.cpp \
+    viewers/abstractview.cpp \
     viewers/filterdesignview.cpp \
     viewers/averagelayoutview.cpp \
     viewers/fwdsettingsview.cpp \
@@ -143,6 +144,7 @@ HEADERS += \
     plots/graph.h \
     plots/tfplot.h \
     plots/helpers/colormap.h \
+    viewers/abstractview.h \
     viewers/filterdesignview.h \
     viewers/averagelayoutview.h \
     viewers/fwdsettingsview.h \
