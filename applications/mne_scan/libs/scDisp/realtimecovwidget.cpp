@@ -152,7 +152,7 @@ void RealTimeCovWidget::initDisplayControllWidgets()
         QList<QWidget*> lControlWidgets;
 
         DISPLIB::ModalitySelectionView* pModalitySelectionWidget = new ModalitySelectionView(m_pRTC->getFiffInfo()->chs,
-                                                                                             QString("MNESCAN/%1").arg(m_pRTC->getName()));
+                                                                                             QString("MNESCAN/RTCW"));
         pModalitySelectionWidget->setObjectName("group_tab_View_Modalities");
         lControlWidgets.append(pModalitySelectionWidget);
 

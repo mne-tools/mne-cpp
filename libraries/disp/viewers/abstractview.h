@@ -86,7 +86,7 @@ public:
      *
      * @param [in] parent        parent of widget
      */
-    AbstractView(const QString& sSettingsPath = "",
+    AbstractView(const QString& sSettingsPath,
                  QWidget *parent = 0,
                  Qt::WindowFlags f = Qt::Widget);
 

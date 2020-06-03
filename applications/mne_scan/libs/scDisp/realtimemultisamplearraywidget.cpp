@@ -111,7 +111,7 @@ RealTimeMultiSampleArrayWidget::~RealTimeMultiSampleArrayWidget()
     QSettings settings("MNECPP");
 
     if(m_pChannelDataView && m_pRTMSA) {
-        settings.setValue(QString("RTMSAW/%1/showHideBad").arg(m_pRTMSA->getName()), m_pChannelDataView->getBadChannelHideStatus());
+        settings.setValue(QString("RTMSAW/showHideBad"), m_pChannelDataView->getBadChannelHideStatus());
     }
 }
 
@@ -144,7 +144,7 @@ void RealTimeMultiSampleArrayWidget::initDisplayControllWidgets()
 {
     if(m_pFiffInfo) {        
         //Create table view and set layout
-        m_pChannelDataView = new RtFiffRawView(QString("RTMSAW/%1").arg(m_pRTMSA->getName()),
+        m_pChannelDataView = new RtFiffRawView(QString("MNESCAN/RTMSAW"),
                                                this);
         m_pChannelDataView->hide();
 
@@ -161,7 +161,7 @@ void RealTimeMultiSampleArrayWidget::initDisplayControllWidgets()
         m_pChannelDataView->show();
         m_pChannelDataView->init(m_pFiffInfo);
 
-        if(settings.value(QString("RTMSAW/%1/showHideBad").arg(sRTMSAWName), false).toBool()) {
+        if(settings.value(QString("RTMSAW/showHideBad"), false).toBool()) {
             this->onHideBadChannels();
         }
 
@@ -169,7 +169,7 @@ void RealTimeMultiSampleArrayWidget::initDisplayControllWidgets()
         m_pChannelInfoModel = ChannelInfoModel::SPtr::create(m_pFiffInfo,
                                                              this);
 
-        m_pChannelSelectionView = ChannelSelectionView::SPtr::create(QString("RTMSAW/%1").arg(sRTMSAWName),
+        m_pChannelSelectionView = ChannelSelectionView::SPtr::create(QString("MNESCAN/RTMSAW"),
                                                                      this,
                                                                      m_pChannelInfoModel,
                                                                      Qt::Window);
@@ -193,7 +193,7 @@ void RealTimeMultiSampleArrayWidget::initDisplayControllWidgets()
         QList<QWidget*> lControlWidgets;
 
 //        // Quick control projectors
-//        ProjectorsView* pProjectorsView = new ProjectorsView(QString("RTMSAW/%1").arg(sRTMSAWName));
+//        ProjectorsView* pProjectorsView = new ProjectorsView(QString("MNESCAN/RTMSAW"));
 //        pProjectorsView->setObjectName("group_tab_Noise_SSP");
 //        lControlWidgets.append(pProjectorsView);
 
@@ -203,7 +203,7 @@ void RealTimeMultiSampleArrayWidget::initDisplayControllWidgets()
 //        pProjectorsView->setProjectors(m_pFiffInfo->projs);
 
 //        // Quick control compensators
-//        CompensatorView* pCompensatorView = new CompensatorView(QString("RTMSAW/%1").arg(sRTMSAWName));
+//        CompensatorView* pCompensatorView = new CompensatorView(QString("MNESCAN/RTMSAW"));
 //        pCompensatorView->setObjectName("group_tab_Noise_Comp");
 //        lControlWidgets.append(pCompensatorView);
 
@@ -213,7 +213,7 @@ void RealTimeMultiSampleArrayWidget::initDisplayControllWidgets()
 //        pCompensatorView->setCompensators(m_pFiffInfo->comps);
 
 //        // Quick control filter
-//        FilterSettingsView* pFilterSettingsView = new FilterSettingsView(QString("RTMSAW/%1").arg(sRTMSAWName));
+//        FilterSettingsView* pFilterSettingsView = new FilterSettingsView(QString("MNESCAN/RTMSAW"));
 //        pFilterSettingsView->setObjectName("group_tab_Noise_Filter");
 //        lControlWidgets.append(pFilterSettingsView);
 
@@ -244,7 +244,7 @@ void RealTimeMultiSampleArrayWidget::initDisplayControllWidgets()
 //                m_pChannelDataView.data(), &RtFiffRawView::updateSpharaOptions);
 
         // Quick control scaling
-        ScalingView* pScalingView = new ScalingView(QString("RTMSAW/%1").arg(sRTMSAWName));
+        ScalingView* pScalingView = new ScalingView(QString("MNESCAN/RTMSAW"));
         pScalingView->setObjectName("group_tab_View_Scaling");
         lControlWidgets.append(pScalingView);
 
@@ -254,7 +254,7 @@ void RealTimeMultiSampleArrayWidget::initDisplayControllWidgets()
         m_pChannelDataView->setScalingMap(pScalingView->getScaleMap());
 
         // Quick control channel data settings
-        FiffRawViewSettings* pChannelDataSettingsView = new FiffRawViewSettings(QString("RTMSAW/%1").arg(sRTMSAWName));
+        FiffRawViewSettings* pChannelDataSettingsView = new FiffRawViewSettings(QString("MNESCAN/RTMSAW"));
         pChannelDataSettingsView->setWidgetList();
         pChannelDataSettingsView->setObjectName("group_tab_View_General");
         lControlWidgets.append(pChannelDataSettingsView);
@@ -284,7 +284,7 @@ void RealTimeMultiSampleArrayWidget::initDisplayControllWidgets()
         m_pChannelDataView->setSignalColor(pChannelDataSettingsView->getSignalColor());
 
         // Quick control trigger detection settings
-        TriggerDetectionView* pTriggerDetectionView = new TriggerDetectionView(QString("RTMSAW/%1").arg(sRTMSAWName));
+        TriggerDetectionView* pTriggerDetectionView = new TriggerDetectionView(QString("MNESCAN/RTMSAW"));
         pTriggerDetectionView->setObjectName("group_tab_View_Triggers");
         lControlWidgets.append(pTriggerDetectionView);
 

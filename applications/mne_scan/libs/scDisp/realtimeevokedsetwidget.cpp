@@ -124,11 +124,11 @@ RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<QTime> &pTime,
     m_pToolBox->hide();
 
     //Butterfly
-    m_pButterflyView = new ButterflyView("MNESCAN", this);
+    m_pButterflyView = new ButterflyView("MNESCAN/RTESW", this);
     m_pButterflyView->installEventFilter(this);
 
     //2D layout plot
-    m_pAverageLayoutView = new AverageLayoutView("MNESCAN", this);
+    m_pAverageLayoutView = new AverageLayoutView("MNESCAN/RTESW", this);
     //m_pAverageLayoutView->installEventFilter(this);
 
     m_pToolBox->insertItem(0, m_pButterflyView, QIcon(), "Butterfly plot");
@@ -153,7 +153,7 @@ RealTimeEvokedSetWidget::~RealTimeEvokedSetWidget()
 
         //Store current view toolbox index - butterfly or 2D layout
         if(m_pToolBox) {
-            settings.setValue(QString("RTESW/%1/selectedView").arg(m_pRTESet->getName()), m_pToolBox->currentIndex());
+            settings.setValue(QString("MNESCAN/RTESW/selectedView"), m_pToolBox->currentIndex());
         }
     }
 
@@ -215,7 +215,7 @@ void RealTimeEvokedSetWidget::initDisplayControllWidgets()
         m_pToolBox->show();
 
         // Choose current view toolbox index - butterfly or 2D layout
-        m_pToolBox->setCurrentIndex(settings.value(QString("RTESW/%1/selectedView").arg(t_sRTESName), 0).toInt());
+        m_pToolBox->setCurrentIndex(settings.value(QString("MNESCAN/RTESW/selectedView"), 0).toInt());
 
         // Init data model and set first data
         m_pEvokedSetModel = EvokedSetModel::SPtr::create(this);
@@ -228,7 +228,7 @@ void RealTimeEvokedSetWidget::initDisplayControllWidgets()
         m_pChannelInfoModel = ChannelInfoModel::SPtr::create(m_pFiffInfo,
                                                              this);
 
-        m_pChannelSelectionView = QSharedPointer<ChannelSelectionView>::create(QString("RTESW/%1").arg(t_sRTESName),
+        m_pChannelSelectionView = QSharedPointer<ChannelSelectionView>::create(QString("MNESCAN/RTESW"),
                                                                                this,
                                                                                m_pChannelInfoModel,
                                                                                Qt::Window);
@@ -257,7 +257,7 @@ void RealTimeEvokedSetWidget::initDisplayControllWidgets()
         QList<QWidget*> lControlWidgets;
 
 //        // Quick control projectors
-//        ProjectorsView* pProjectorsView = new ProjectorsView(QString("RTESW/%1").arg(t_sRTESName));
+//        ProjectorsView* pProjectorsView = new ProjectorsView(QString("MNESCAN/RTESW"));
 //        pProjectorsView->setObjectName("group_tab_View_SSP");
 //        lControlWidgets.append(pProjectorsView);
 
@@ -270,7 +270,7 @@ void RealTimeEvokedSetWidget::initDisplayControllWidgets()
 //        pProjectorsView->setProjectors(m_pFiffInfo->projs);
 
 //        // Quick control compensators
-//        CompensatorView* pCompensatorView = new CompensatorView(QString("RTESW/%1").arg(t_sRTESName));
+//        CompensatorView* pCompensatorView = new CompensatorView(QString("MNESCAN/RTESW"));
 //        pCompensatorView->setObjectName("group_tab_View_Comp");
 //        lControlWidgets.append(pCompensatorView);
 
@@ -283,7 +283,7 @@ void RealTimeEvokedSetWidget::initDisplayControllWidgets()
 //        pCompensatorView->setCompensators(m_pFiffInfo->comps);
 
 //        // Quick control filter settings
-//        FilterSettingsView* pFilterSettingsView = new FilterSettingsView(QString("RTESW/%1").arg(t_sRTESName));
+//        FilterSettingsView* pFilterSettingsView = new FilterSettingsView(QString("MNESCAN/RTESW"));
 //        pFilterSettingsView->setObjectName("group_tab_View_Filter");
 //        lControlWidgets.append(pFilterSettingsView);
 
@@ -314,7 +314,7 @@ void RealTimeEvokedSetWidget::initDisplayControllWidgets()
 //        }
 
         // Scaling
-        ScalingView* pScalingView = new ScalingView(QString("RTESW/%1").arg(t_sRTESName));
+        ScalingView* pScalingView = new ScalingView(QString("MNESCAN/RTESW"));
         pScalingView->setObjectName("group_tab_View_Scaling");
         lControlWidgets.append(pScalingView);
 
@@ -328,7 +328,7 @@ void RealTimeEvokedSetWidget::initDisplayControllWidgets()
         m_pAverageLayoutView->setScaleMap(pScalingView->getScaleMap());
 
         // Quick control channel data settings
-        FiffRawViewSettings* pChannelDataSettingsView = new FiffRawViewSettings(QString("RTESW/%1").arg(t_sRTESName));
+        FiffRawViewSettings* pChannelDataSettingsView = new FiffRawViewSettings(QString("MNESCAN/RTESW"));
         pChannelDataSettingsView->setWidgetList(QStringList() << "screenshot" << "backgroundColor");
         pChannelDataSettingsView->setObjectName("group_tab_View_General");
         lControlWidgets.append(pChannelDataSettingsView);
@@ -347,7 +347,7 @@ void RealTimeEvokedSetWidget::initDisplayControllWidgets()
 
         // Quick control modality selection
         ModalitySelectionView* pModalitySelectionView = new ModalitySelectionView(m_pFiffInfo->chs,
-                                                                                  QString("RTESW/%1").arg(t_sRTESName));
+                                                                                  QString("MNESCAN/RTESW"));
         pModalitySelectionView->setObjectName("group_tab_View_Modalities");
         lControlWidgets.append(pModalitySelectionView);
 
@@ -357,7 +357,7 @@ void RealTimeEvokedSetWidget::initDisplayControllWidgets()
         m_pButterflyView->setModalityMap(pModalitySelectionView->getModalityMap());
 
         // Quick control average selection
-        AverageSelectionView* pAverageSelectionView = new AverageSelectionView(QString("RTESW/%1").arg(t_sRTESName));
+        AverageSelectionView* pAverageSelectionView = new AverageSelectionView(QString("MNESCAN/RTESW"));
         pAverageSelectionView->setObjectName("group_tab_View_Selection");
         lControlWidgets.append(pAverageSelectionView);
 
