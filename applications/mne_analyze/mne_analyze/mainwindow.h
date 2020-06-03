@@ -139,7 +139,19 @@ signals:
     void mainWindowClosed();
 
 private:
+    //=========================================================================================================
+    /**
+     * Creates the menu actions.
+     */
     void createActions();
+
+    //=========================================================================================================
+    /**
+     * Changes the current layout style of the application.
+     *
+     * @param [in] sStyle   The new qss style.
+     */
+    void onStyleChanged(const QString& sStyle);
 
     //=========================================================================================================
     /**

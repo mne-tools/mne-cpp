@@ -173,6 +173,28 @@ void MainWindow::setupUI()
 
 //=============================================================================================================
 
+void MainWindow::onStyleChanged(const QString& sStyle)
+{
+    // Styles are from https://github.com/Alexhuszagh/BreezeStyleSheets
+    if(QApplication *pApp = qobject_cast<QApplication *>(QApplication::instance())) {
+        if(sStyle == "default") {
+            pApp->setStyleSheet("");
+        } else {
+            QFile file;
+            file.setFileName(":/"+sStyle+".qss");
+            file.open(QFile::ReadOnly | QFile::Text);
+            QTextStream stream(&file);
+            pApp->setStyleSheet(stream.readAll());
+        }
+
+        // Set default font
+        int id = QFontDatabase::addApplicationFont(":/fonts/Roboto-Light.ttf");
+        pApp->setFont(QFont(QFontDatabase::applicationFontFamilies(id).at(0)));
+    }
+}
+
+//=============================================================================================================
+
 void MainWindow::setSplashScreen(MainSplashScreen::SPtr& pSplashScreen,
                                  bool bShowSplashScreen)
 {
@@ -408,29 +430,37 @@ void MainWindow::createActions()
     }
 
     //Appearance QMenu
-    m_pActionDarkMode = new QAction("Dark Mode");
-    m_pActionDarkMode->setStatusTip(tr("Activate dark mode"));
-    m_pActionDarkMode->setCheckable(true);
-    connect(m_pActionDarkMode, &QAction::toggled,
-        [=](bool checked) {
-        // Styles are from https://github.com/Alexhuszagh/BreezeStyleSheets
-        if(QApplication *pApp = qobject_cast<QApplication *>(QApplication::instance())) {
-            if(checked) {
-                QFile file;
-                file.setFileName(":/dark.qss");
-                file.open(QFile::ReadOnly | QFile::Text);
-                QTextStream stream(&file);
-                pApp->setStyleSheet(stream.readAll());
-            } else {
-                pApp->setStyleSheet("");
-            }
+    m_pActionStyleGroup = new QActionGroup(this);
 
-            // Set default font
-            int id = QFontDatabase::addApplicationFont(":/fonts/Roboto-Light.ttf");
-            pApp->setFont(QFont(QFontDatabase::applicationFontFamilies(id).at(0)));
-        }
+    m_pActionDefaultMode = new QAction("Default");
+    m_pActionDefaultMode->setStatusTip(tr("Activate default style"));
+    m_pActionDefaultMode->setCheckable(true);
+    m_pActionDefaultMode->setChecked(true);
+    m_pActionStyleGroup->addAction(m_pActionDefaultMode);
+    connect(m_pActionDefaultMode, &QAction::triggered,
+        [=]() {
+        onStyleChanged("default");
     });
+
+    m_pActionDarkMode = new QAction("Dark");
+    m_pActionDarkMode->setStatusTip(tr("Activate dark style"));
+    m_pActionDarkMode->setCheckable(true);
     m_pActionDarkMode->setChecked(false);
+    m_pActionStyleGroup->addAction(m_pActionDarkMode);
+    connect(m_pActionDarkMode, &QAction::triggered,
+        [=]() {
+        onStyleChanged("dark");
+    });
+
+    m_pActionLightMode = new QAction("Light");
+    m_pActionLightMode->setStatusTip(tr("Activate light style"));
+    m_pActionLightMode->setCheckable(true);
+    m_pActionLightMode->setChecked(false);
+    m_pActionStyleGroup->addAction(m_pActionLightMode);
+    connect(m_pActionLightMode, &QAction::triggered,
+        [=]() {
+        onStyleChanged("light");
+    });
 
     //Help QMenu
     m_pActionHelpContents = new QAction(tr("Help &Contents"), this);
@@ -508,7 +538,7 @@ void MainWindow::createMenus()
     // Help Appearance
     if(!m_pMenuAppearance) {
         m_pMenuAppearance = menuBar()->addMenu(tr("&Appearance"));
-        m_pMenuAppearance->addAction(m_pActionDarkMode);
+        m_pMenuAppearance->addMenu("Styles")->addActions(m_pActionStyleGroup->actions());
     }
 
     // Help menu
