@@ -110,7 +110,7 @@ QMenu *Filtering::getMenu()
 
 QDockWidget *Filtering::getControl()
 {
-    FilterSettingsView* pFilterSettingsView = new FilterSettingsView("mne_analyze/Filtering/FilterSettingsView");
+    FilterSettingsView* pFilterSettingsView = new FilterSettingsView("MNEANALYZE");
 
     QDockWidget* pControlDock = new QDockWidget(getName());
     pControlDock->setAllowedAreas(Qt::RightDockWidgetArea | Qt::LeftDockWidgetArea);

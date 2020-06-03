@@ -52,6 +52,7 @@
 #include <QDebug>
 #include <QSvgGenerator>
 #include <QSurfaceFormat>
+#include <QSettings>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -252,6 +253,30 @@ void ButterflyView::showSelectedChannelsOnly(const QStringList& selectedChannels
         selectedChannelsIndexes<<m_pChannelInfoModel->getIndexFromOrigChName(selectedChannels.at(i));
 
     setSelectedChannels(selectedChannelsIndexes);
+}
+
+//=============================================================================================================
+
+void ButterflyView::saveSettings()
+{
+    if(m_sSettingsPath.isEmpty()) {
+        return;
+    }
+
+    // Save Settings
+    QSettings settings("MNECPP");
+}
+
+//=============================================================================================================
+
+void ButterflyView::loadSettings()
+{
+    if(m_sSettingsPath.isEmpty()) {
+        return;
+    }
+
+    // Load Settings
+    QSettings settings("MNECPP");
 }
 
 //=============================================================================================================

@@ -132,16 +132,12 @@ public:
     //=========================================================================================================
     /**
      * Saves all important settings of this view via QSettings.
-     *
-     * @param[in] settingsPath        the path to store the settings to.
      */
     void saveSettings();
 
     //=========================================================================================================
     /**
      * Loads and inits all important settings of this view via QSettings.
-     *
-     * @param[in] settingsPath        the path to load the settings from.
      */
     void loadSettings();
 

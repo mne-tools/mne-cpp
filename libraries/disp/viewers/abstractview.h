@@ -101,16 +101,12 @@ public:
     //=========================================================================================================
     /**
      * Saves all important settings of this view via QSettings.
-     *
-     * @param[in] settingsPath        the path to store the settings to.
      */
     virtual void saveSettings() = 0;
 
     //=========================================================================================================
     /**
      * Loads and inits all important settings of this view via QSettings.
-     *
-     * @param[in] settingsPath        the path to load the settings from.
      */
     virtual void loadSettings() = 0;
 

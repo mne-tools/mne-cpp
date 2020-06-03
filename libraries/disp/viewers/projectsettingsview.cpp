@@ -50,6 +50,7 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QTime>
+#include <QSettings>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -139,6 +140,30 @@ ProjectSettingsView::ProjectSettingsView(const QString& sSettingsPath,
 ProjectSettingsView::~ProjectSettingsView()
 {
     delete ui;
+}
+
+//=============================================================================================================
+
+void ProjectSettingsView::saveSettings()
+{
+    if(m_sSettingsPath.isEmpty()) {
+        return;
+    }
+
+    // Save Settings
+    QSettings settings("MNECPP");
+}
+
+//=============================================================================================================
+
+void ProjectSettingsView::loadSettings()
+{
+    if(m_sSettingsPath.isEmpty()) {
+        return;
+    }
+
+    // Load Settings
+    QSettings settings("MNECPP");
 }
 
 //=============================================================================================================

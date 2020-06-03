@@ -285,7 +285,7 @@ void NoiseReduction::initPluginControlWidgets()
         this->setFilterChannelType(pFilterSettingsView->getFilterView()->getChannelType());
 
         // SPHARA settings
-        SpharaSettingsView* pSpharaSettingsView = new SpharaSettingsView();
+        SpharaSettingsView* pSpharaSettingsView = new SpharaSettingsView(QString("MNESCAN/%1").arg(this->getName()));
         pSpharaSettingsView->setObjectName("group_tab_Settings_SPHARA");
         plControlWidgets.append(pSpharaSettingsView);
 
