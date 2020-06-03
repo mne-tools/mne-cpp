@@ -136,8 +136,8 @@ macx {
 }
 
 RESOURCES += \
-    mne_analyze.qrc \
-    $${ROOT_DIR}/resources/general/styles/styles.qrc
+        $${ROOT_DIR}/resources/general/styles/styles.qrc \
+        $${ROOT_DIR}/resources/general/fonts/fonts.qrc
 
 # Icon
 win32 {
