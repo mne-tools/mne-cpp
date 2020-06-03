@@ -347,6 +347,7 @@ private:
     QPointer<QAction>                   m_pActionMinLgLv;               /**< set minimal log level */
     QPointer<QAction>                   m_pActionNormLgLv;              /**< set normal log level */
     QPointer<QAction>                   m_pActionMaxLgLv;               /**< set maximal log level */
+    QPointer<QAction>                   m_pActionDarkMode;              /**< toggle dark mode */
     QPointer<QAction>                   m_pActionHelpContents;          /**< open help contents */
     QPointer<QAction>                   m_pActionAbout;                 /**< show about dialog */
     QPointer<QAction>                   m_pActionQuickControl;          /**< Show quick control widget. */
@@ -361,6 +362,7 @@ private:
     QPointer<QMenu>                     m_pMenuView;                    /**< Holds the view menu.*/
     QPointer<QMenu>                     m_pMenuLgLv;                    /**< Holds the log level sub menu.*/
     QPointer<QMenu>                     m_pMenuHelp;                    /**< Holds the help menu.*/
+    QPointer<QMenu>                     m_pMenuAppearance;              /**< Holds the help menu.*/
 
     QPointer<QDockWidget>               m_pPluginGuiDockWidget;         /**< Dock widget which holds the plugin gui. */
     QPointer<QDockWidget>               m_pDockWidget_Log;              /**< Holds the dock widget containing the log.*/

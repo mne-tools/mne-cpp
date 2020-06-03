@@ -20,9 +20,6 @@
         <file alias="pointer.png">images/icons/pointer.png</file>
         <file>images/appIcons/icon_mne_scan_256x256.png</file>
     </qresource>
-    <qresource prefix="/qss">
-        <file>QtStyleSheets/plastique.qss</file>
-    </qresource>
     <qresource prefix="/fonts">
         <file alias="Lato-Black.ttf">fonts/Lato-Black.ttf</file>
         <file alias="Lato-Light.ttf">fonts/Lato-Light.ttf</file>
