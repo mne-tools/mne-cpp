@@ -166,7 +166,8 @@ INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
 
 RESOURCES += \
     mne_scan.qrc \
-    $${ROOT_DIR}/resources/general/styles/styles.qrc
+    $${ROOT_DIR}/resources/general/styles/styles.qrc \
+    $${ROOT_DIR}/resources/general/fonts/fonts.qrc
 
 unix: QMAKE_CXXFLAGS += -Wno-attributes
 
