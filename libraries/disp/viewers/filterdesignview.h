@@ -146,18 +146,16 @@ public:
     /**
      * Sets the new filter parameters.
      *
-     * @param[in] hp                 Highpass frequency.
-     * @param[in] lp                 Lowpass frequency.
+     * @param[in] from               The lower bound of the filter in Hz.
+     * @param[in] to                 The upper bound of the filter in Hz.
      * @param[in] order              The order of the.
-     * @param[in] type               The filter type.
      * @param[in] designMethod       The filter design method.
      * @param[in] transition         The transition frequency.
      * @param[in] channelType        the channel Type.
      */
-    void setFilterParameters(double hp,
-                             double lp,
+    void setFilterParameters(double from,
+                             double to,
                              int order,
-                             int type,
                              int designMethod,
                              double transition,
                              const QString &sChannelType);
@@ -285,7 +283,7 @@ protected:
      */
     void onBtnLoadFilter();
 
-    Ui::FilterDesignViewWidget*         ui;                   /**< Pointer to the qt designer generated ui class.*/
+    Ui::FilterDesignViewWidget*         m_pUi;                      /**< Pointer to the qt designer generated ui class.*/
 
     QPointer<FilterPlotScene>           m_pFilterPlotScene;         /**< Pointer to the QGraphicsScene which holds the filter plotting.*/
 

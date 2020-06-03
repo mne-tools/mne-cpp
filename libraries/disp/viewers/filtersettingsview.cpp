@@ -76,6 +76,8 @@ FilterSettingsView::FilterSettingsView(const QString& sSettingsPath,
 
     m_pUi->setupUi(this);
 
+    loadSettings(m_sSettingsPath);
+
     m_pFilterView = FilterDesignView::SPtr::create(m_sSettingsPath,
                                                    this,
                                                    Qt::Window);
@@ -85,8 +87,10 @@ FilterSettingsView::FilterSettingsView(const QString& sSettingsPath,
             this, &FilterSettingsView::onFilterActivationChanged);
     connect(m_pUi->m_pPushButtonShowFilterOptions, &QPushButton::clicked,
             this, &FilterSettingsView::onShowFilterView);
-
-    loadSettings(m_sSettingsPath);
+    connect(m_pUi->m_pDoubleSpinBoxFrom, qOverload<double>(&QDoubleSpinBox::valueChanged),
+            this, &FilterSettingsView::onFilterParametersChanged);
+    connect(m_pUi->m_pDoubleSpinBoxTo, qOverload<double>(&QDoubleSpinBox::valueChanged),
+            this, &FilterSettingsView::onFilterParametersChanged);
 }
 
 //=============================================================================================================
@@ -94,6 +98,7 @@ FilterSettingsView::FilterSettingsView(const QString& sSettingsPath,
 FilterSettingsView::~FilterSettingsView()
 {
     saveSettings(m_sSettingsPath);
+    delete m_pUi;
 }
 
 //=============================================================================================================
@@ -112,6 +117,27 @@ bool FilterSettingsView::getFilterActive()
 
 //=============================================================================================================
 
+void FilterSettingsView::init(double dSFreq)
+{
+    //Update min max of spin boxes to nyquist
+    double nyquistFrequency = dSFreq/2;
+
+    m_pUi->m_pDoubleSpinBoxFrom->setMaximum(nyquistFrequency);
+    m_pUi->m_pDoubleSpinBoxTo->setMaximum(nyquistFrequency);
+
+    if(m_pUi->m_pDoubleSpinBoxFrom->value() > dSFreq/2) {
+        m_pUi->m_pDoubleSpinBoxFrom->setValue(dSFreq/2);
+    }
+
+    if(m_pUi->m_pDoubleSpinBoxTo->value() > dSFreq/2) {
+        m_pUi->m_pDoubleSpinBoxTo->setValue(dSFreq/2);
+    }
+
+    m_pFilterView->init(dSFreq);
+}
+
+//=============================================================================================================
+
 void FilterSettingsView::saveSettings(const QString& settingsPath)
 {
     if(settingsPath.isEmpty()) {
@@ -120,7 +146,9 @@ void FilterSettingsView::saveSettings(const QString& settingsPath)
 
     QSettings settings;
 
-    settings.setValue(settingsPath + QString("/filterActivated"), m_pUi->m_pCheckBoxActivateFilter->isChecked());
+    settings.setValue(settingsPath + QString("/FilterSettingsView/filterActivated"), m_pUi->m_pCheckBoxActivateFilter->isChecked());
+    settings.setValue(settingsPath + QString("/FilterSettingsView/filterFrom"), m_pUi->m_pDoubleSpinBoxFrom->value());
+    settings.setValue(settingsPath + QString("/FilterSettingsView/filterTo"), m_pUi->m_pDoubleSpinBoxTo->value());
 }
 
 //=============================================================================================================
@@ -133,7 +161,9 @@ void FilterSettingsView::loadSettings(const QString& settingsPath)
 
     QSettings settings;
 
-    m_pUi->m_pCheckBoxActivateFilter->setChecked(settings.value(settingsPath + QString("/filterActivated"), false).toBool());
+    m_pUi->m_pCheckBoxActivateFilter->setChecked(settings.value(settingsPath + QString("/FilterSettingsView/filterActivated"), false).toBool());
+    m_pUi->m_pDoubleSpinBoxTo->setValue(settings.value(settingsPath + QString("/FilterSettingsView/filterTo"), 0).toDouble());
+    m_pUi->m_pDoubleSpinBoxFrom->setValue(settings.value(settingsPath + QString("/FilterSettingsView/filterFrom"), 0).toDouble());
 }
 
 //=============================================================================================================
@@ -153,6 +183,23 @@ void FilterSettingsView::onShowFilterView()
 void FilterSettingsView::onFilterActivationChanged()
 {
     emit filterActivationChanged(m_pUi->m_pCheckBoxActivateFilter->isChecked());
+
+    saveSettings(m_sSettingsPath);
+}
+
+//=============================================================================================================
+
+void FilterSettingsView::onFilterParametersChanged(double dValue)
+{
+    Q_UNUSED(dValue)
+    m_pUi->m_pDoubleSpinBoxFrom->setMaximum(m_pUi->m_pDoubleSpinBoxTo->value());
+
+    m_pFilterView->setFilterParameters(m_pUi->m_pDoubleSpinBoxFrom->value(),
+                                       m_pUi->m_pDoubleSpinBoxTo->value(),
+                                       2048,
+                                       1, //Cosine
+                                       0.1,
+                                       "All");
 
     saveSettings(m_sSettingsPath);
 }
