@@ -40,12 +40,12 @@
 //=============================================================================================================
 
 #include "../disp_global.h"
+#include "abstractview.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
 #include <QPointer>
 
 //=============================================================================================================
@@ -84,7 +84,7 @@ class FrequencySpectrumModel;
  *
  * @brief The SpectrumView class provides a spectrum view
  */
-class DISPSHARED_EXPORT SpectrumView : public QWidget
+class DISPSHARED_EXPORT SpectrumView : public AbstractView
 {    
     Q_OBJECT
 
@@ -98,7 +98,8 @@ public:
      *
      * @param [in] parent    parent of widget
      */
-    SpectrumView(QWidget* parent = 0,
+    SpectrumView(const QString& sSettingsPath = "",
+                 QWidget* parent = 0,
                  Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================

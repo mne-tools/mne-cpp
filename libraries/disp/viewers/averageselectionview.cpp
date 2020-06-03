@@ -74,17 +74,16 @@ using namespace Eigen;
 AverageSelectionView::AverageSelectionView(const QString& sSettingsPath,
                                            QWidget *parent,
                                            Qt::WindowFlags f)
-: QWidget(parent, f)
+: AbstractView(sSettingsPath, parent, f)
 , m_iMaxNumAverages(10)
 , m_qMapAverageColor(QSharedPointer<QMap<QString, QColor> >::create())
 , m_qMapAverageActivation(QSharedPointer<QMap<QString, bool> >::create())
-, m_sSettingsPath(sSettingsPath)
 {
     this->setWindowTitle("Average Selection");
     this->setMinimumWidth(330);
     this->setMaximumWidth(330);
 
-    loadSettings(m_sSettingsPath);
+    loadSettings();
     redrawGUI();
 }
 
@@ -92,7 +91,7 @@ AverageSelectionView::AverageSelectionView(const QString& sSettingsPath,
 
 AverageSelectionView::~AverageSelectionView()
 {
-    saveSettings(m_sSettingsPath);
+    saveSettings();
 }
 
 //=============================================================================================================
@@ -127,15 +126,15 @@ void AverageSelectionView::setAverageActivation(const QSharedPointer<QMap<QStrin
 
 //=============================================================================================================
 
-void AverageSelectionView::saveSettings(const QString& settingsPath)
+void AverageSelectionView::saveSettings()
 {
-    if(settingsPath.isEmpty()) {
+    if(m_sSettingsPath.isEmpty()) {
         return;
     }
 
-    QSettings settings;
+    QSettings settings("MNECPP");
 
-    settings.beginGroup(settingsPath + QString("/averageColorMap"));
+    settings.beginGroup(m_sSettingsPath + QString("/averageColorMap"));
     QMap<QString, QColor>::const_iterator iColor = m_qMapAverageColor->constBegin();
     while (iColor != m_qMapAverageColor->constEnd()) {
          settings.setValue(iColor.key(), iColor.value());
@@ -143,7 +142,7 @@ void AverageSelectionView::saveSettings(const QString& settingsPath)
     }
     settings.endGroup();
 
-    settings.beginGroup(settingsPath + QString("/averageActivationMap"));
+    settings.beginGroup(m_sSettingsPath + QString("/averageActivationMap"));
     QMap<QString, bool>::const_iterator iActivation = m_qMapAverageActivation->constBegin();
     while (iActivation != m_qMapAverageActivation->constEnd()) {
          settings.setValue(iActivation.key(), iActivation.value());
@@ -154,22 +153,22 @@ void AverageSelectionView::saveSettings(const QString& settingsPath)
 
 //=============================================================================================================
 
-void AverageSelectionView::loadSettings(const QString& settingsPath)
+void AverageSelectionView::loadSettings()
 {
-    if(settingsPath.isEmpty()) {
+    if(m_sSettingsPath.isEmpty()) {
         return;
     }
 
-    QSettings settings;
+    QSettings settings("MNECPP");
 
-    settings.beginGroup(settingsPath + QString("/averageColorMap"));
+    settings.beginGroup(m_sSettingsPath + QString("/averageColorMap"));
     QStringList keys = settings.childKeys();
     foreach (QString key, keys) {
          m_qMapAverageColor->insert(key, settings.value(key).value<QColor>());
     }
     settings.endGroup();
 
-    settings.beginGroup(settingsPath + QString("/averageActivationMap"));
+    settings.beginGroup(m_sSettingsPath + QString("/averageActivationMap"));
     keys = settings.childKeys();
     foreach (QString key, keys) {
          m_qMapAverageActivation->insert(key, settings.value(key).toBool());
@@ -264,5 +263,5 @@ void AverageSelectionView::onAverageSelectionColorChanged()
         emit newAverageActivationMap(m_qMapAverageActivation);
     }
 
-    saveSettings(m_sSettingsPath);
+    saveSettings();
 }

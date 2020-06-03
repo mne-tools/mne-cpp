@@ -40,12 +40,11 @@
 //=============================================================================================================
 
 #include "../disp_global.h"
+#include "abstractview.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-
-#include <QWidget>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -76,7 +75,7 @@ namespace DISPLIB
  *
  * @brief The SpharaSettingsView class provides a view to select the SPHARA settings
  */
-class DISPSHARED_EXPORT SpharaSettingsView : public QWidget
+class DISPSHARED_EXPORT SpharaSettingsView : public AbstractView
 {
     Q_OBJECT
 
@@ -90,8 +89,9 @@ public:
      *
      * @param [in] parent        parent of widget
      */
-    SpharaSettingsView(QWidget *parent = 0,
-                Qt::WindowFlags f = Qt::Widget);
+    SpharaSettingsView(const QString& sSettingsPath = "",
+                       QWidget *parent = 0,
+                       Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**

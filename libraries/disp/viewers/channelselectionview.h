@@ -41,12 +41,12 @@
 //=============================================================================================================
 
 #include "../disp_global.h"
+#include "abstractview.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
 #include <QWidget>
 #include <QListWidget>
 
@@ -88,7 +88,7 @@ class SelectionScene;
  *
  * @brief The ChannelSelectionView class provides a channel selection window.
  */
-class DISPSHARED_EXPORT ChannelSelectionView : public QWidget
+class DISPSHARED_EXPORT ChannelSelectionView : public AbstractView
 {
     Q_OBJECT
 
@@ -199,14 +199,13 @@ public:
      */
     void updateDataView();
 
-private:
     //=========================================================================================================
     /**
      * Saves all important settings of this view via QSettings.
      *
      * @param[in] settingsPath        the path to store the settings to.
      */
-    void saveSettings(const QString& settingsPath);
+    void saveSettings();
 
     //=========================================================================================================
     /**
@@ -214,8 +213,9 @@ private:
      *
      * @param[in] settingsPath        the path to load the settings from.
      */
-    void loadSettings(const QString& settingsPath);
+    void loadSettings();
 
+private:
     //=========================================================================================================
     /**
      * Initialises all tabel widgets in the selection window.

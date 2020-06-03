@@ -63,13 +63,16 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ButterflyView::ButterflyView(QWidget *parent, Qt::WindowFlags f)
+ButterflyView::ButterflyView(const QString& sSettingsPath,
+                             QWidget *parent,
+                             Qt::WindowFlags f)
 :
 #if !defined(NO_OPENGL)
-    QOpenGLWidget(parent)
+  QOpenGLWidget(parent, f)
 #else
-    QWidget(parent)
+  QWidget(parent, f)
 #endif
+, m_sSettingsPath(sSettingsPath)
 , m_pEvokedSetModel(NULL)
 , m_bIsInit(false)
 , m_bShowMAG(true)

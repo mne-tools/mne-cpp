@@ -101,8 +101,23 @@ public:
      */
     ~FtBufferSetupWidget();
 
-private slots:
+    //=========================================================================================================
+    /**
+     * Saves all important settings of this view via QSettings.
+     *
+     * @param[in] settingsPath        the path to store the settings to.
+     */
+    void saveSettings();
 
+    //=========================================================================================================
+    /**
+     * Loads and inits all important settings of this view via QSettings.
+     *
+     * @param[in] settingsPath        the path to load the settings from.
+     */
+    void loadSettings();
+
+private:
     //=========================================================================================================
     /**
      * Attempts to connect to and receive fiff data from buffer. As a backup tried to read from local file.
@@ -116,24 +131,7 @@ private slots:
      */
     void isConnected(bool stat);
 
-    //=========================================================================================================
-    /**
-     * Saves all important settings of this view via QSettings.
-     *
-     * @param[in] settingsPath        the path to store the settings to.
-     */
-    void saveSettings(const QString& settingsPath);
-
-    //=========================================================================================================
-    /**
-     * Loads and inits all important settings of this view via QSettings.
-     *
-     * @param[in] settingsPath        the path to load the settings from.
-     */
-    void loadSettings(const QString& settingsPath);
-
 signals:
-
     /**
      * Sends a singal with the cooresponding port and address information
      *

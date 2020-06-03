@@ -41,6 +41,7 @@
 //=============================================================================================================
 
 #include "../disp_global.h"
+#include "abstractview.h"
 
 #include <fiff/fiff_ch_info.h>
 
@@ -49,7 +50,6 @@
 //=============================================================================================================
 
 #include <QPointer>
-#include <QWidget>
 #include <QMap>
 
 //=============================================================================================================
@@ -81,7 +81,7 @@ namespace DISPLIB
  *
  * @brief The AveragingSettingsView class provides a averaging settings view.
  */
-class DISPSHARED_EXPORT AveragingSettingsView : public QWidget
+class DISPSHARED_EXPORT AveragingSettingsView : public AbstractView
 {
     Q_OBJECT
 
@@ -119,20 +119,13 @@ public:
 
     void setDetectedEpochs(const FIFFLIB::FiffEvokedSet& evokedSet);
 
-protected:
-    //=========================================================================================================
-    /**
-     * Redraw the GUI.
-     */
-    void redrawGUI();
-
     //=========================================================================================================
     /**
      * Saves all important settings of this view via QSettings.
      *
      * @param[in] settingsPath        the path to store the settings to.
      */
-    void saveSettings(const QString& settingsPath);
+    void saveSettings();
 
     //=========================================================================================================
     /**
@@ -140,7 +133,14 @@ protected:
      *
      * @param[in] settingsPath        the path to load the settings from.
      */
-    void loadSettings(const QString& settingsPath);
+    void loadSettings();
+
+protected:
+    //=========================================================================================================
+    /**
+     * Redraw the GUI.
+     */
+    void redrawGUI();
 
     void onChangePreStim();
     void onChangePostStim();
@@ -151,7 +151,6 @@ protected:
 
     Ui::AverageSettingsViewWidget* ui;              /**< Holds the user interface for the AverageSettingsViewWidget.*/
 
-    QString             m_sSettingsPath;            /**< The settings path to store the GUI settings to. */
     QString             m_sCurrentStimChan;
 
     QMap<QString,int>   m_mapStimChsIndexNames;

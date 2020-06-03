@@ -64,8 +64,6 @@ namespace DISPLIB
 // DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-class MdiView;
-
 //=============================================================================================================
 /**
  * @brief The MultiViewWindow class provides sub windows as QDockWidgets.

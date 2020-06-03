@@ -75,7 +75,7 @@ FilterSettingsView::FilterSettingsView(const QString& sSettingsPath,
 
     m_pUi->setupUi(this);
 
-    loadSettings(m_sSettingsPath);
+    loadSettings();
 
     m_pFilterView = FilterDesignView::SPtr::create(m_sSettingsPath,
                                                    this,
@@ -96,7 +96,7 @@ FilterSettingsView::FilterSettingsView(const QString& sSettingsPath,
 
 FilterSettingsView::~FilterSettingsView()
 {
-    saveSettings(m_sSettingsPath);
+    saveSettings();
     delete m_pUi;
 }
 
@@ -137,32 +137,32 @@ void FilterSettingsView::init(double dSFreq)
 
 //=============================================================================================================
 
-void FilterSettingsView::saveSettings(const QString& settingsPath)
+void FilterSettingsView::saveSettings()
 {
-    if(settingsPath.isEmpty()) {
+    if(m_sSettingsPath.isEmpty()) {
         return;
     }
 
-    QSettings settings;
+    QSettings settings("MNECPP");
 
-    settings.setValue(settingsPath + QString("/FilterSettingsView/filterActivated"), m_pUi->m_pCheckBoxActivateFilter->isChecked());
-    settings.setValue(settingsPath + QString("/FilterSettingsView/filterFrom"), m_pUi->m_pDoubleSpinBoxFrom->value());
-    settings.setValue(settingsPath + QString("/FilterSettingsView/filterTo"), m_pUi->m_pDoubleSpinBoxTo->value());
+    settings.setValue(m_sSettingsPath + QString("/FilterSettingsView/filterActivated"), m_pUi->m_pCheckBoxActivateFilter->isChecked());
+    settings.setValue(m_sSettingsPath + QString("/FilterSettingsView/filterFrom"), m_pUi->m_pDoubleSpinBoxFrom->value());
+    settings.setValue(m_sSettingsPath + QString("/FilterSettingsView/filterTo"), m_pUi->m_pDoubleSpinBoxTo->value());
 }
 
 //=============================================================================================================
 
-void FilterSettingsView::loadSettings(const QString& settingsPath)
+void FilterSettingsView::loadSettings()
 {
-    if(settingsPath.isEmpty()) {
+    if(m_sSettingsPath.isEmpty()) {
         return;
     }
 
-    QSettings settings;
+    QSettings settings("MNECPP");
 
-    m_pUi->m_pCheckBoxActivateFilter->setChecked(settings.value(settingsPath + QString("/FilterSettingsView/filterActivated"), false).toBool());
-    m_pUi->m_pDoubleSpinBoxTo->setValue(settings.value(settingsPath + QString("/FilterSettingsView/filterTo"), 0).toDouble());
-    m_pUi->m_pDoubleSpinBoxFrom->setValue(settings.value(settingsPath + QString("/FilterSettingsView/filterFrom"), 0).toDouble());
+    m_pUi->m_pCheckBoxActivateFilter->setChecked(settings.value(m_sSettingsPath + QString("/FilterSettingsView/filterActivated"), false).toBool());
+    m_pUi->m_pDoubleSpinBoxTo->setValue(settings.value(m_sSettingsPath + QString("/FilterSettingsView/filterTo"), 0).toDouble());
+    m_pUi->m_pDoubleSpinBoxFrom->setValue(settings.value(m_sSettingsPath + QString("/FilterSettingsView/filterFrom"), 0).toDouble());
 }
 
 //=============================================================================================================
@@ -183,7 +183,7 @@ void FilterSettingsView::onFilterActivationChanged()
 {
     emit filterActivationChanged(m_pUi->m_pCheckBoxActivateFilter->isChecked());
 
-    saveSettings(m_sSettingsPath);
+    saveSettings();
 }
 
 //=============================================================================================================
@@ -200,5 +200,5 @@ void FilterSettingsView::onFilterParametersChanged(double dValue)
                                        0.1,
                                        "All");
 
-    saveSettings(m_sSettingsPath);
+    saveSettings();
 }
