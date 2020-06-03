@@ -43,6 +43,8 @@
 #include <anShared/Management/communicator.h>
 #include <anShared/Utils/metatypes.h>
 
+#include <disp/viewers/filtersettingsview.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -53,6 +55,7 @@
 
 using namespace FILTERINGPLUGIN;
 using namespace ANSHAREDLIB;
+using namespace DISPLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -107,13 +110,11 @@ QMenu *Filtering::getMenu()
 
 QDockWidget *Filtering::getControl()
 {
-    FilteringView* pFilteringView = new FilteringView;
-
-    pFilteringView->setModel(m_pAnalyzeData->getDataModel());
+    FilterSettingsView* pFilterSettingsView = new FilterSettingsView("mne_analyze/Filtering/FilterSettingsView");
 
     QDockWidget* pControlDock = new QDockWidget(getName());
-    pControlDock->setAllowedAreas(Qt::TopDockWidgetArea | Qt::BottomDockWidgetArea);
-    pControlDock->setWidget(pFilteringView);
+    pControlDock->setAllowedAreas(Qt::RightDockWidgetArea | Qt::LeftDockWidgetArea);
+    pControlDock->setWidget(pFilterSettingsView);
     pControlDock->setObjectName(getName());
 
     return pControlDock;

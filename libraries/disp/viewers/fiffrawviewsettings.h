@@ -239,7 +239,7 @@ protected:
      */
     void onMakeScreenshot();
 
-    Ui::FiffRawViewSettingsWidget* ui;
+    Ui::FiffRawViewSettingsWidget* m_pUi;
 
     QColor      m_colCurrentSignalColor;        /**< Current color of the signal. */
     QColor      m_colCurrentBackgroundColor;    /**< Current color of the background. */
