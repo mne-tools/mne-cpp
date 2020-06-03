@@ -363,7 +363,7 @@ void RealTime3DWidget::initDisplayControllWidgets()
 
     QStringList slControlFlags;
     slControlFlags << "Data" << "View" << "Light";
-    Control3DView* pControl3DView = new Control3DView("MNESCAN", Q_NULLPTR, slControlFlags);
+    Control3DView* pControl3DView = new Control3DView("MNESCAN/RT3DW", Q_NULLPTR, slControlFlags);
     pControl3DView->setObjectName("group_tab_View_General");
     lControlWidgets.append(pControl3DView);
 

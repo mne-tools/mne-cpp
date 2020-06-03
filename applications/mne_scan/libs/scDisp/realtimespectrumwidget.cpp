@@ -112,8 +112,8 @@ RealTimeSpectrumWidget::~RealTimeSpectrumWidget()
 
         QSettings settings("MNECPP");
 
-        settings.setValue(QString("FSW/%1/lowerFrqBound").arg(t_sFSName), m_fLowerFrqBound);
-        settings.setValue(QString("FSW/%1/upperFrqBound").arg(t_sFSName), m_fUpperFrqBound);
+        settings.setValue(QString("MNESCAN/RTSW/lowerFrqBound").arg(t_sFSName), m_fLowerFrqBound);
+        settings.setValue(QString("MNESCAN/RTSW/upperFrqBound").arg(t_sFSName), m_fUpperFrqBound);
     }
 }
 
@@ -149,8 +149,8 @@ void RealTimeSpectrumWidget::initDisplayControllWidgets()
         QSettings settings("MNECPP");
         if(!m_pFS->getName().isEmpty()) {
             QString t_sFSName = m_pFS->getName();
-            m_fLowerFrqBound = settings.value(QString("FSW/%1/lowerFrqBound").arg(t_sFSName), 0).toFloat();
-            m_fUpperFrqBound = settings.value(QString("FSW/%1/upperFrqBound").arg(t_sFSName), 300).toFloat();
+            m_fLowerFrqBound = settings.value(QString("MNESCAN/RTSW/lowerFrqBound").arg(t_sFSName), 0).toFloat();
+            m_fUpperFrqBound = settings.value(QString("MNESCAN/RTSW/upperFrqBound").arg(t_sFSName), 300).toFloat();
         }
 
         m_pActionFrequencySettings->setVisible(true);
