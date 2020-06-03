@@ -72,8 +72,8 @@ using namespace DISPLIB;
 //=============================================================================================================
 
 RealTimeSpectrumWidget::RealTimeSpectrumWidget(QSharedPointer<RealTimeSpectrum> pFS,
-                                                 QSharedPointer<QTime> &pTime,
-                                                 QWidget* parent)
+                                               QSharedPointer<QTime> &pTime,
+                                               QWidget* parent)
 : MeasurementWidget(parent)
 , m_pFS(pFS)
 , m_fLowerFrqBound(0)
@@ -90,7 +90,7 @@ RealTimeSpectrumWidget::RealTimeSpectrumWidget(QSharedPointer<RealTimeSpectrum> 
 
     m_pActionFrequencySettings->setVisible(false);
 
-    m_pSpectrumView = new SpectrumView(this, Qt::Window);
+    m_pSpectrumView = new SpectrumView("MNESCAN", this, Qt::Window);
 
     //set vertical layout
     QVBoxLayout *neLayout = new QVBoxLayout(this);
@@ -106,7 +106,7 @@ RealTimeSpectrumWidget::RealTimeSpectrumWidget(QSharedPointer<RealTimeSpectrum> 
 
 RealTimeSpectrumWidget::~RealTimeSpectrumWidget()
 {
-    // Store Settings
+    // Save Settings
     if(!m_pFS->getName().isEmpty())  {
         QString t_sFSName = m_pFS->getName();
 
@@ -166,7 +166,7 @@ void RealTimeSpectrumWidget::initDisplayControllWidgets()
 void RealTimeSpectrumWidget::initSettingsWidget()
 {
     if(!m_pSpectrumSettingsView) {
-        m_pSpectrumSettingsView = QSharedPointer<SpectrumSettingsView>(new SpectrumSettingsView(this, Qt::Window));
+        m_pSpectrumSettingsView = QSharedPointer<SpectrumSettingsView>(new SpectrumSettingsView("MNESCAN", this, Qt::Window));
 
         m_pSpectrumSettingsView->setWindowTitle("Frequency Spectrum Settings");
 

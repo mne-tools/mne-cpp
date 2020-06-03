@@ -52,6 +52,7 @@
 #include <QHeaderView>
 #include <QTableView>
 #include <QMouseEvent>
+#include <QSettings>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -164,4 +165,28 @@ bool SpectrumView::eventFilter(QObject * watched,
     } else {
         return QWidget::eventFilter(watched, event);
     }
+}
+
+//=============================================================================================================
+
+void SpectrumView::saveSettings()
+{
+    if(m_sSettingsPath.isEmpty()) {
+        return;
+    }
+
+    // Save Settings
+    QSettings settings("MNECPP");
+}
+
+//=============================================================================================================
+
+void SpectrumView::loadSettings()
+{
+    if(m_sSettingsPath.isEmpty()) {
+        return;
+    }
+
+    // Load Settings
+    QSettings settings("MNECPP");
 }

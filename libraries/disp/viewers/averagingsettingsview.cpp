@@ -267,7 +267,7 @@ void AveragingSettingsView::saveSettings()
         return;
     }
 
-    // Store Settings
+    // Save Settings
     QSettings settings("MNECPP");
 
     settings.setValue(m_sSettingsPath + QString("/preStimSeconds"), m_iPreStimSeconds);

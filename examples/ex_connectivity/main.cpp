@@ -463,7 +463,7 @@ int main(int argc, char *argv[])
                                                       t_sensorSurfaceVV,
                                                       raw.info.bads);
     } else {
-        QPointer<MinimumNormSettingsView> pMinimumNormSettingsView = new MinimumNormSettingsView();
+        QPointer<MinimumNormSettingsView> pMinimumNormSettingsView = new MinimumNormSettingsView("EX_CONNECTIVITY");
         lWidgets << pMinimumNormSettingsView;
 
         QObject::connect(pMinimumNormSettingsView.data(), &MinimumNormSettingsView::timePointChanged,

@@ -83,26 +83,26 @@ DummyYourWidget::~DummyYourWidget()
 
 //=============================================================================================================
 
-void DummyYourWidget::saveSettings(const QString& settingsPath)
+void DummyYourWidget::saveSettings()
 {
-    if(settingsPath.isEmpty()) {
+    if(m_sSettingsPath.isEmpty()) {
         return;
     }
 
-    QSettings settings;
+    QSettings settings("MNECPP");
 
-    settings.setValue(settingsPath + QString("/dummy"), m_pUi->m_pDoubleSpinBox_dummy->value());
+    settings.setValue(m_sSettingsPath + QString("/valueName"), m_pUi->m_pDoubleSpinBox_dummy->value());
 }
 
 //=============================================================================================================
 
-void DummyYourWidget::loadSettings(const QString& settingsPath)
+void DummyYourWidget::loadSettings()
 {
-    if(settingsPath.isEmpty()) {
+    if(m_sSettingsPath.isEmpty()) {
         return;
     }
 
-    QSettings settings;
+    QSettings settings("MNECPP");
 
-    m_pUi->m_pDoubleSpinBox_dummy->setValue(settings.value(settingsPath + QString("/dummy"), 10).toInt());
+    m_pUi->m_pDoubleSpinBox_dummy->setValue(settings.value(m_sSettingsPath + QString("/valueName"), 10).toInt());
 }

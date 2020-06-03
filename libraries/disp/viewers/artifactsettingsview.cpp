@@ -136,7 +136,7 @@ void ArtifactSettingsView::saveSettings()
         return;
     }
 
-    // Store Settings
+    // Save Settings
     QSettings settings("MNECPP");
 
     settings.setValue(m_sSettingsPath + QString("/doArtifactThresholdReduction"), m_bDoArtifactThresholdReduction);

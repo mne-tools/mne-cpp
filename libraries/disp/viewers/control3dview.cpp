@@ -44,6 +44,7 @@
 //=============================================================================================================
 
 #include <QMenu>
+#include <QSettings>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -183,6 +184,30 @@ void Control3DView::onTreeViewDescriptionHide()
     } else {
         ui->m_treeView_loadedData->setColumnHidden(1, true);
     }
+}
+
+//=============================================================================================================
+
+void Control3DView::saveSettings()
+{
+    if(m_sSettingsPath.isEmpty()) {
+        return;
+    }
+
+    // Save Settings
+    QSettings settings("MNECPP");
+}
+
+//=============================================================================================================
+
+void Control3DView::loadSettings()
+{
+    if(m_sSettingsPath.isEmpty()) {
+        return;
+    }
+
+    // Load Settings
+    QSettings settings("MNECPP");
 }
 
 //=============================================================================================================

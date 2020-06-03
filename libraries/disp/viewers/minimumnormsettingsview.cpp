@@ -44,6 +44,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QSettings>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -96,6 +98,30 @@ void MinimumNormSettingsView::setTriggerTypes(const QStringList& lTriggerTypes)
             ui->m_comboBox_triggerType->addItem(sTriggerType);
         }
     }
+}
+
+//=============================================================================================================
+
+void MinimumNormSettingsView::saveSettings()
+{
+    if(m_sSettingsPath.isEmpty()) {
+        return;
+    }
+
+    // Save Settings
+    QSettings settings("MNECPP");
+}
+
+//=============================================================================================================
+
+void MinimumNormSettingsView::loadSettings()
+{
+    if(m_sSettingsPath.isEmpty()) {
+        return;
+    }
+
+    // Load Settings
+    QSettings settings("MNECPP");
 }
 
 //=============================================================================================================

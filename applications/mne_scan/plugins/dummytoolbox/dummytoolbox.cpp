@@ -195,7 +195,7 @@ void DummyToolbox::initPluginControlWidgets()
         QList<QWidget*> plControlWidgets;
 
         // The plugin's control widget
-        DummyYourWidget* pYourWidget = new DummyYourWidget(QString("MNESCAN/%1/").arg(this->getName()));
+        DummyYourWidget* pYourWidget = new DummyYourWidget(QString("MNESCAN/%1").arg(this->getName()));
         pYourWidget->setObjectName("group_tab_Settings_Your Widget");
 
         plControlWidgets.append(pYourWidget);

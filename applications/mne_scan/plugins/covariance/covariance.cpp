@@ -126,7 +126,7 @@ void Covariance::initPluginControlWidgets()
     if(m_pFiffInfo) {
         QList<QWidget*> plControlWidgets;
 
-        CovarianceSettingsWidget* pCovarianceWidget = new CovarianceSettingsWidget();
+        CovarianceSettingsWidget* pCovarianceWidget = new CovarianceSettingsWidget(QString("MNESCAN/%1").arg(this->getName()));
         connect(pCovarianceWidget, &CovarianceSettingsWidget::samplesChanged,
                 this, &Covariance::changeSamples);
         pCovarianceWidget->setMinSamples(m_pFiffInfo->sfreq);
@@ -144,7 +144,7 @@ void Covariance::initPluginControlWidgets()
 
 void Covariance::unload()
 {
-    // Store Settings
+    // Save Settings
     QSettings settings("MNECPP");
     settings.setValue(QString("MNESCAN/%1/estimationSamples").arg(this->getName()), m_iEstimationSamples);
 }

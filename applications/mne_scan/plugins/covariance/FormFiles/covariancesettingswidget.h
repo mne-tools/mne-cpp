@@ -70,7 +70,8 @@ public:
     typedef QSharedPointer<CovarianceSettingsWidget> SPtr;         /**< Shared pointer type for CovarianceAdjustmentWidget. */
     typedef QSharedPointer<CovarianceSettingsWidget> ConstSPtr;    /**< Const shared pointer type for CovarianceAdjustmentWidget. */
 
-    explicit CovarianceSettingsWidget(QWidget *parent = 0);
+    explicit CovarianceSettingsWidget(const QString& sSettingsPath = "",
+                                      QWidget *parent = 0);
 
     //=========================================================================================================
     /**
@@ -88,11 +89,25 @@ public:
      */
     virtual void setMinSamples(int iSamples);
 
+    //=========================================================================================================
+    /**
+     * Saves all important settings of this view via QSettings.
+     */
+    void saveSettings();
+
+    //=========================================================================================================
+    /**
+     * Loads and inits all important settings of this view via QSettings.
+     */
+    void loadSettings();
+
 signals:
     void samplesChanged(int iSamples);
 
 private:
-    QSpinBox* m_pSpinBoxNumSamples;
+    QSpinBox*       m_pSpinBoxNumSamples;
+    QString         m_sSettingsPath;            /**< The settings path to store the GUI settings to. */
+
 };
 } // NAMESPACE
 
