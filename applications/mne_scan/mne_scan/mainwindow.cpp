@@ -168,11 +168,6 @@ void MainWindow::setupUI()
     createPluginDockWindow();
     createLogDockWindow();
 
-//    //ToDo Debug Startup
-//    writeToLog(tr("Test normal message, Max"), _LogKndMessage, _LogLvMax);
-//    writeToLog(tr("Test warning message, Normal"), _LogKndWarning, _LogLvNormal);
-//    writeToLog(tr("Test error message, Min"), _LogKndError, _LogLvMin);
-
     initStatusBar();
 }
 
@@ -412,6 +407,31 @@ void MainWindow::createActions()
         m_pActionMaxLgLv->setChecked(true);
     }
 
+    //Appearance QMenu
+    m_pActionDarkMode = new QAction("Dark Mode");
+    m_pActionDarkMode->setStatusTip(tr("Activate dark mode"));
+    m_pActionDarkMode->setCheckable(true);
+    connect(m_pActionDarkMode, &QAction::toggled,
+        [=](bool checked) {
+        // Styles are from https://github.com/Alexhuszagh/BreezeStyleSheets
+        if(QApplication *pApp = qobject_cast<QApplication *>(QApplication::instance())) {
+            if(checked) {
+                QFile file;
+                file.setFileName(":/dark.qss");
+                file.open(QFile::ReadOnly | QFile::Text);
+                QTextStream stream(&file);
+                pApp->setStyleSheet(stream.readAll());
+            } else {
+                pApp->setStyleSheet("");
+            }
+
+            // Set default font
+            int id = QFontDatabase::addApplicationFont(":/fonts/Roboto-Light.ttf");
+            pApp->setFont(QFont(QFontDatabase::applicationFontFamilies(id).at(0)));
+        }
+    });
+    m_pActionDarkMode->setChecked(false);
+
     //Help QMenu
     m_pActionHelpContents = new QAction(tr("Help &Contents"), this);
     m_pActionHelpContents->setShortcuts(QKeySequence::HelpContents);
@@ -485,8 +505,15 @@ void MainWindow::createMenus()
 
     menuBar()->addSeparator();
 
+    // Help Appearance
+    if(!m_pMenuAppearance) {
+        m_pMenuAppearance = menuBar()->addMenu(tr("&Appearance"));
+        m_pMenuAppearance->addAction(m_pActionDarkMode);
+    }
+
     // Help menu
-    if(!m_pMenuHelp) {m_pMenuHelp = menuBar()->addMenu(tr("&Help"));
+    if(!m_pMenuHelp) {
+        m_pMenuHelp = menuBar()->addMenu(tr("&Help"));
         m_pMenuHelp->addAction(m_pActionHelpContents);
         m_pMenuHelp->addSeparator();
         m_pMenuHelp->addAction(m_pActionAbout);
