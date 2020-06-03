@@ -183,7 +183,7 @@ void RtcMne::initPluginControlWidgets()
 {
     QList<QWidget*> plControlWidgets;
 
-    MinimumNormSettingsView* pMinimumNormSettingsView = new MinimumNormSettingsView;
+    MinimumNormSettingsView* pMinimumNormSettingsView = new MinimumNormSettingsView(QString("MNESCAN/%1").arg(this->getName()));
     pMinimumNormSettingsView->setObjectName("group_tab_Settings_Source Localization");
 
     connect(pMinimumNormSettingsView, &MinimumNormSettingsView::methodChanged,

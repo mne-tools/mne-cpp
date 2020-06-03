@@ -140,6 +140,18 @@ public:
     virtual bool eventFilter(QObject* watched,
                              QEvent* event);
 
+    //=========================================================================================================
+    /**
+     * Saves all important settings of this view via QSettings.
+     */
+    void saveSettings();
+
+    //=========================================================================================================
+    /**
+     * Loads and inits all important settings of this view via QSettings.
+     */
+    void loadSettings();
+
 protected:
     QPointer<QTableView>                                m_pTableView;           /**< The QTableView being part of the model/view framework of Qt */
     QPointer<DISPLIB::FrequencySpectrumDelegate>        m_pFSDelegate;          /**< Frequency spectrum delegate */

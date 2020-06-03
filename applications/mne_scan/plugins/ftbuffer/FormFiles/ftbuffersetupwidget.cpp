@@ -94,7 +94,7 @@ void FtBufferSetupWidget::saveSettings()
         return;
     }
 
-    // Store Settings
+    // Save Settings
     QSettings settings("MNECPP");
 
     settings.setValue(m_sSettingsPath + QString("/IP"), m_pUi->m_lineEditIP->text());

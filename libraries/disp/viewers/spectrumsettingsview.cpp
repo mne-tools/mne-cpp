@@ -46,6 +46,7 @@
 #include <QLabel>
 #include <QGridLayout>
 #include <QSlider>
+#include <QSettings>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -105,4 +106,28 @@ void SpectrumSettingsView::updateValue(qint32 value)
         m_pSliderUpperBound->setValue(m_pSliderLowerBound->value());
 
     emit settingsChanged();
+}
+
+//=============================================================================================================
+
+void SpectrumSettingsView::saveSettings()
+{
+    if(m_sSettingsPath.isEmpty()) {
+        return;
+    }
+
+    // Save Settings
+    QSettings settings("MNECPP");
+}
+
+//=============================================================================================================
+
+void SpectrumSettingsView::loadSettings()
+{
+    if(m_sSettingsPath.isEmpty()) {
+        return;
+    }
+
+    // Load Settings
+    QSettings settings("MNECPP");
 }

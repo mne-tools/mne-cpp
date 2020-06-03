@@ -92,6 +92,18 @@ public:
     void setRecordingElapsedTime(int mSecsElapsed);
     QString getCurrentFileName();
 
+    //=========================================================================================================
+    /**
+     * Saves all important settings of this view via QSettings.
+     */
+    void saveSettings();
+
+    //=========================================================================================================
+    /**
+     * Loads and inits all important settings of this view via QSettings.
+     */
+    void loadSettings();
+
 private:
     void addProject();
     void addSubject();

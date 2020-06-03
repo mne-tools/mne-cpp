@@ -229,7 +229,8 @@ void WriteToFile::initPluginControlWidgets()
         }
 
         // Projects Settings
-        ProjectSettingsView* pProjectSettingsView = new ProjectSettingsView(sMneScanDataPath,
+        ProjectSettingsView* pProjectSettingsView = new ProjectSettingsView(QString("MNESCAN/%1").arg(this->getName()),
+                                                                            sMneScanDataPath,
                                                                             sCurrentProject,
                                                                             sCurrentSubject,
                                                                             "");

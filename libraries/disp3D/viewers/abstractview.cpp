@@ -60,7 +60,6 @@
 //=============================================================================================================
 
 using namespace DISP3DLIB;
-using namespace DISPLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -79,31 +78,31 @@ AbstractView::AbstractView(QWidget* parent,
     // Init 3D control view
     QStringList slControlFlags;
     slControlFlags << "Data" << "View" << "Light";
-    m_pControl3DView = Control3DView::SPtr(new Control3DView(this, slControlFlags));
+    m_pControl3DView = DISPLIB::Control3DView::SPtr(new DISPLIB::Control3DView("DISP3D", this, slControlFlags));
 
     Data3DTreeDelegate* pData3DTreeDelegate = new Data3DTreeDelegate(this);
     m_pControl3DView->setDelegate(pData3DTreeDelegate);
     m_pControl3DView->setModel(m_pData3DModel.data());
 
-    connect(m_pControl3DView.data(), &Control3DView::sceneColorChanged,
+    connect(m_pControl3DView.data(), &DISPLIB::Control3DView::sceneColorChanged,
             m_p3DView.data(), &View3D::setSceneColor);
 
-    connect(m_pControl3DView.data(), &Control3DView::rotationChanged,
+    connect(m_pControl3DView.data(), &DISPLIB::Control3DView::rotationChanged,
             m_p3DView.data(), &View3D::startStopModelRotation);
 
-    connect(m_pControl3DView.data(), &Control3DView::showCoordAxis,
+    connect(m_pControl3DView.data(), &DISPLIB::Control3DView::showCoordAxis,
             m_p3DView.data(), &View3D::toggleCoordAxis);
 
-    connect(m_pControl3DView.data(), &Control3DView::showFullScreen,
+    connect(m_pControl3DView.data(), &DISPLIB::Control3DView::showFullScreen,
             m_p3DView.data(), &View3D::showFullScreen);
 
-    connect(m_pControl3DView.data(), &Control3DView::lightColorChanged,
+    connect(m_pControl3DView.data(), &DISPLIB::Control3DView::lightColorChanged,
             m_p3DView.data(), &View3D::setLightColor);
 
-    connect(m_pControl3DView.data(), &Control3DView::lightIntensityChanged,
+    connect(m_pControl3DView.data(), &DISPLIB::Control3DView::lightIntensityChanged,
             m_p3DView.data(), &View3D::setLightIntensity);
 
-    connect(m_pControl3DView.data(), &Control3DView::takeScreenshotChanged,
+    connect(m_pControl3DView.data(), &DISPLIB::Control3DView::takeScreenshotChanged,
             m_p3DView.data(), &View3D::takeScreenshot);
 
     createGUI();
@@ -138,7 +137,7 @@ QSharedPointer<DISP3DLIB::Data3DTreeModel> AbstractView::getTreeModel()
 
 //=============================================================================================================
 
-QPointer<QuickControlView> AbstractView::getQuickControl()
+QPointer<DISPLIB::QuickControlView> AbstractView::getQuickControl()
 {
     return m_pQuickControlView;
 }
@@ -162,11 +161,11 @@ void AbstractView::setQuickControlWidgets(const QList<QWidget*>& lControlWidgets
 
 void AbstractView::createGUI()
 {
-    m_pQuickControlView = new QuickControlView("3DView",
-                                               "3D View",
-                                               Qt::Widget,
-                                               this,
-                                               false);
+    m_pQuickControlView = new DISPLIB::QuickControlView("3DView",
+                                                        "3D View",
+                                                        Qt::Widget,
+                                                        this,
+                                                        false);
     m_pQuickControlView->setVisiblityHideOpacityClose(false);
 
     //Create widget GUI

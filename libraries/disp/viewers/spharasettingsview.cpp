@@ -44,6 +44,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QSettings>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -90,6 +92,30 @@ SpharaSettingsView::SpharaSettingsView(const QString& sSettingsPath,
 SpharaSettingsView::~SpharaSettingsView()
 {
     delete ui;
+}
+
+//=============================================================================================================
+
+void SpharaSettingsView::saveSettings()
+{
+    if(m_sSettingsPath.isEmpty()) {
+        return;
+    }
+
+    // Save Settings
+    QSettings settings("MNECPP");
+}
+
+//=============================================================================================================
+
+void SpharaSettingsView::loadSettings()
+{
+    if(m_sSettingsPath.isEmpty()) {
+        return;
+    }
+
+    // Load Settings
+    QSettings settings("MNECPP");
 }
 
 //=============================================================================================================

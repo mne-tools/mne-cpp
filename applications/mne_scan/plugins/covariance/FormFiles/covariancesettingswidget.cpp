@@ -46,6 +46,7 @@
 #include <QGridLayout>
 #include <QSpinBox>
 #include <QLabel>
+#include <QSettings>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -57,8 +58,10 @@ using namespace COVARIANCEPLUGIN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-CovarianceSettingsWidget::CovarianceSettingsWidget(QWidget *parent)
+CovarianceSettingsWidget::CovarianceSettingsWidget(const QString& sSettingsPath,
+                                                   QWidget *parent)
 : QWidget(parent)
+, m_sSettingsPath(sSettingsPath)
 {
     this->setWindowTitle("Covariance Settings");
     this->setMinimumWidth(330);
@@ -95,5 +98,28 @@ void CovarianceSettingsWidget::setMinSamples(int iSamples)
 {
     m_pSpinBoxNumSamples->setMinimum(iSamples);
     m_pSpinBoxNumSamples->setMaximum(iSamples*60);
+}
 
+//=============================================================================================================
+
+void CovarianceSettingsWidget::saveSettings()
+{
+    if(m_sSettingsPath.isEmpty()) {
+        return;
+    }
+
+    // Save Settings
+    QSettings settings("MNECPP");
+}
+
+//=============================================================================================================
+
+void CovarianceSettingsWidget::loadSettings()
+{
+    if(m_sSettingsPath.isEmpty()) {
+        return;
+    }
+
+    // Load Settings
+    QSettings settings("MNECPP");
 }

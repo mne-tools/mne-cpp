@@ -99,6 +99,18 @@ public:
      */
     ~SpharaSettingsView();
 
+    //=========================================================================================================
+    /**
+     * Saves all important settings of this view via QSettings.
+     */
+    void saveSettings();
+
+    //=========================================================================================================
+    /**
+     * Loads and inits all important settings of this view via QSettings.
+     */
+    void loadSettings();
+
 protected:
     //=========================================================================================================
     /**

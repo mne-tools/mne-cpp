@@ -124,11 +124,11 @@ RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<QTime> &pTime,
     m_pToolBox->hide();
 
     //Butterfly
-    m_pButterflyView = new ButterflyView(this);
+    m_pButterflyView = new ButterflyView("MNESCAN", this);
     m_pButterflyView->installEventFilter(this);
 
     //2D layout plot
-    m_pAverageLayoutView = new AverageLayoutView(this);
+    m_pAverageLayoutView = new AverageLayoutView("MNESCAN", this);
     //m_pAverageLayoutView->installEventFilter(this);
 
     m_pToolBox->insertItem(0, m_pButterflyView, QIcon(), "Butterfly plot");
@@ -146,7 +146,7 @@ RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<QTime> &pTime,
 
 RealTimeEvokedSetWidget::~RealTimeEvokedSetWidget()
 {
-    // Store Settings
+    // Save Settings
     if(!m_pRTESet->getName().isEmpty())
     {
         QSettings settings("MNECPP");
