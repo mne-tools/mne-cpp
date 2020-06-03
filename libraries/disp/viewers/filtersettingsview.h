@@ -112,9 +112,25 @@ public:
      */
     ~FilterSettingsView();
 
+    //=========================================================================================================
+    /**
+     * Returns the filter design view used to design filters.
+     */
     QSharedPointer<FilterDesignView> getFilterView();
 
+    //=========================================================================================================
+    /**
+     * Returns true if the filters a set as active.
+     */
     bool getFilterActive();
+
+    //=========================================================================================================
+    /**
+     * Inits the filter window.
+     *
+     * @param[in] dSFreq the new sampling frequency
+     */
+    void init(double dSFreq);
 
 protected:
     //=========================================================================================================
@@ -141,9 +157,17 @@ protected:
 
     //=========================================================================================================
     /**
-     * Whenever the filter activation changed
+     * This function is called whenever the filter activation changed
      */
     void onFilterActivationChanged();
+
+    //=========================================================================================================
+    /**
+     * This function is called whenever the filter parameters changed
+     *
+     * @param[in] dValue        the changed value. Unused.
+     */
+    void onFilterParametersChanged(double dValue);
 
     QString                                 m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
 

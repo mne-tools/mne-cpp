@@ -107,7 +107,8 @@ void FilterPlotScene::updateFilter(const FilterData& operatorFilter,
 
 //=============================================================================================================
 
-void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq, QString filtername)
+void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq,
+                                           const QString& filtername)
 {
     //Get row vector with filter coefficients
     int numberCoeff = m_iPlotLength;

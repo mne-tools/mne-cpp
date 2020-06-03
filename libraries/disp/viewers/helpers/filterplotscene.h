@@ -113,10 +113,10 @@ protected:
      * Draws the diagram to plot the magnitude.
      *
      * @param [in] holds the current sampling frequency
-     * @param [in] holds the current name of the filter
+     * @param [in] holds the current name of the filter. Default is an empty QString.
      */
     void plotMagnitudeDiagram(int samplingFreq,
-                              QString filtername = QString());
+                              const QString &filtername = QString());
 
     //=========================================================================================================
     /**
