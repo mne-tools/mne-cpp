@@ -80,8 +80,10 @@ namespace MNEANONYMIZE
  *
  * @brief FiffAnonymizer class declaration.
  */
-class FiffAnonymizer
+class FiffAnonymizer : public QObject
 {
+    Q_OBJECT
+
 public:
     typedef QSharedPointer<FiffAnonymizer> SPtr;            /**< Shared pointer type for FiffAnonymizer. */
     typedef QSharedPointer<const FiffAnonymizer> ConstSPtr; /**< Const shared pointer type for FiffAnonymizer. */
