@@ -56,6 +56,7 @@
 #include <QSvgGenerator>
 #include <QDebug>
 #include <QGraphicsItem>
+#include <QSettings>
 #if !defined(NO_OPENGL)
     #include <QOpenGLWidget>
 #endif
@@ -74,10 +75,11 @@ using namespace FIFFLIB;
 AverageLayoutView::AverageLayoutView(const QString& sSettingsPath,
                                      QWidget *parent,
                                      Qt::WindowFlags f)
-: AbstractView(sSettingsPath, parent, f)
+: AbstractView(parent, f)
 , m_qMapAverageColor(QSharedPointer<QMap<QString, QColor> >::create())
 , m_qMapAverageActivation(QSharedPointer<QMap<QString, bool> >::create())
 {
+    m_sSettingsPath = sSettingsPath;
     this->setWindowTitle("Average Layout");
 
     m_pAverageLayoutView = new QGraphicsView();
@@ -304,10 +306,20 @@ void AverageLayoutView::updateData()
 
 void AverageLayoutView::saveSettings()
 {
+    if(m_sSettingsPath.isEmpty()) {
+        return;
+    }
+
+    QSettings settings("MNECPP");
 }
 
 //=============================================================================================================
 
 void AverageLayoutView::loadSettings()
 {
+    if(m_sSettingsPath.isEmpty()) {
+        return;
+    }
+
+    QSettings settings("MNECPP");
 }

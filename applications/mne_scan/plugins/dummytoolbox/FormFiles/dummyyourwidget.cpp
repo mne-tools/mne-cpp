@@ -65,8 +65,8 @@ DummyYourWidget::DummyYourWidget(const QString& sSettingsPath,
                                  QWidget *parent)
 : QWidget(parent)
 , m_pUi(new Ui::DummyYourWidgetGui)
-, m_sSettingsPath(sSettingsPath)
 {
+m_sSettingsPath = sSettingsPath;
     m_pUi->setupUi(this);
 
     loadSettings(m_sSettingsPath);

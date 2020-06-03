@@ -72,10 +72,11 @@ using namespace FSLIB;
 FwdSettingsView::FwdSettingsView(const QString& sSettingsPath,
                                  QWidget *parent,
                                  Qt::WindowFlags f)
-: AbstractView(sSettingsPath, parent, f)
+: AbstractView(parent, f)
 , m_bAnnotaionsLoaded(false)
 , m_ui(new Ui::FwdSettingsViewWidget)
 {
+    m_sSettingsPath = sSettingsPath;
     m_ui->setupUi(this);
 
     // init

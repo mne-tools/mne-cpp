@@ -72,7 +72,7 @@ ProjectSettingsView::ProjectSettingsView(const QString& sSettingsPath,
                                          const QString& sCurrentSubject,
                                          const QString& sCurrentParadigm,
                                          QWidget *parent)
-: AbstractView(sSettingsPath, parent)
+: AbstractView(parent)
 , m_sDataPath(sDataPath)
 , m_sCurrentProject(sCurrentProject)
 , m_sCurrentSubject(sCurrentSubject)
@@ -80,6 +80,7 @@ ProjectSettingsView::ProjectSettingsView(const QString& sSettingsPath,
 , ui(new Ui::ProjectSettingsViewWidget)
 , m_iRecordingTime(5*60*1000)
 {
+    m_sSettingsPath = sSettingsPath;
     ui->setupUi(this);
 
     scanForProjects();

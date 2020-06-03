@@ -63,9 +63,10 @@ using namespace DISPLIB;
 MinimumNormSettingsView::MinimumNormSettingsView(const QString& sSettingsPath,
                                                  QWidget *parent,
                                                  Qt::WindowFlags f)
-: AbstractView(sSettingsPath, parent, f)
+: AbstractView(parent, f)
 , ui(new Ui::MinimumNormSettingsViewWidget)
 {
+    m_sSettingsPath = sSettingsPath;
     ui->setupUi(this);
 
     connect(ui->m_comboBox_method, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),

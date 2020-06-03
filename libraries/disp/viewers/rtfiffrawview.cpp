@@ -78,7 +78,7 @@ using namespace Eigen;
 RtFiffRawView::RtFiffRawView(const QString& sSettingsPath,
                              QWidget *parent,
                              Qt::WindowFlags f)
-: AbstractView(sSettingsPath, parent, f)
+: AbstractView(parent, f)
 , m_iT(10)
 , m_fSamplingRate(1024)
 , m_fDefaultSectionSize(80.0f)
@@ -86,6 +86,7 @@ RtFiffRawView::RtFiffRawView(const QString& sSettingsPath,
 , m_bHideBadChannels(false)
 , m_iDistanceTimeSpacer(1)
 {
+    m_sSettingsPath = sSettingsPath;
     m_pTableView = new QTableView;
 
 #if !defined(NO_OPENGL)

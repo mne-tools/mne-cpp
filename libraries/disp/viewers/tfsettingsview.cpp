@@ -63,9 +63,10 @@ using namespace DISPLIB;
 TfSettingsView::TfSettingsView(const QString& sSettingsPath,
                                QWidget *parent,
                                Qt::WindowFlags f)
-: AbstractView(sSettingsPath, parent, f)
+: AbstractView(parent, f)
 , ui(new Ui::TfSettingsViewWidget)
 {
+    m_sSettingsPath = sSettingsPath;
     ui->setupUi(this);
 
     loadSettings();

@@ -69,8 +69,9 @@ using namespace Eigen;
 SpectrumView::SpectrumView(const QString& sSettingsPath,
                            QWidget *parent,
                            Qt::WindowFlags f)
-: AbstractView(sSettingsPath, parent, f)
+: AbstractView(parent, f)
 {
+    m_sSettingsPath = sSettingsPath;
     m_pTableView = new QTableView;
 
     m_pTableView->setSelectionMode(QAbstractItemView::ExtendedSelection);

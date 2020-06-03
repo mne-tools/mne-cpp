@@ -65,9 +65,10 @@ using namespace DISPLIB;
 FiffRawViewSettings::FiffRawViewSettings(const QString &sSettingsPath,
                                          QWidget *parent,
                                          Qt::WindowFlags f)
-: AbstractView(sSettingsPath, parent, f)
+: AbstractView(parent, f)
 , m_pUi(new Ui::FiffRawViewSettingsWidget)
 {
+    m_sSettingsPath = sSettingsPath;
     m_pUi->setupUi(this);
 
     this->setWindowTitle("Channel Data View Settings");
@@ -232,11 +233,11 @@ void FiffRawViewSettings::saveSettings()
 
     QSettings settings("MNECPP");
 
-    settings.setValue(m_sSettingsPath + QString("/viewZoomFactor"), getZoom());
-    settings.setValue(m_sSettingsPath + QString("/viewWindowSize"), getWindowSize());
-    settings.setValue(m_sSettingsPath + QString("/signalColor"), getSignalColor());
-    settings.setValue(m_sSettingsPath + QString("/backgroundColor"), getBackgroundColor());
-    settings.setValue(m_sSettingsPath + QString("/distanceTimeSpacer"), getDistanceTimeSpacer());
+    settings.setValue(m_sSettingsPath + QString("/FiffRawViewSettings/viewZoomFactor"), getZoom());
+    settings.setValue(m_sSettingsPath + QString("/FiffRawViewSettings/viewWindowSize"), getWindowSize());
+    settings.setValue(m_sSettingsPath + QString("/FiffRawViewSettings/signalColor"), getSignalColor());
+    settings.setValue(m_sSettingsPath + QString("/FiffRawViewSettings/backgroundColor"), getBackgroundColor());
+    settings.setValue(m_sSettingsPath + QString("/FiffRawViewSettings/distanceTimeSpacer"), getDistanceTimeSpacer());
 }
 
 //=============================================================================================================
@@ -248,13 +249,13 @@ void FiffRawViewSettings::loadSettings()
     }
 
     QSettings settings("MNECPP");
-    setZoom(settings.value(m_sSettingsPath + QString("/viewZoomFactor"), 0.3).toDouble());
-    setWindowSize(settings.value(m_sSettingsPath + QString("/viewWindowSize"), 10).toInt());
+    setZoom(settings.value(m_sSettingsPath + QString("/FiffRawViewSettings/viewZoomFactor"), 0.3).toDouble());
+    setWindowSize(settings.value(m_sSettingsPath + QString("/FiffRawViewSettings/viewWindowSize"), 10).toInt());
     QColor color = Qt::blue;
-    setSignalColor(settings.value(m_sSettingsPath + QString("/signalColor"), color).value<QColor>());
+    setSignalColor(settings.value(m_sSettingsPath + QString("/FiffRawViewSettings/signalColor"), color).value<QColor>());
     color = Qt::white;
-    setBackgroundColor(settings.value(m_sSettingsPath + QString("/backgroundColor"), color).value<QColor>());
-    setDistanceTimeSpacer(settings.value(m_sSettingsPath + QString("/distanceTimeSpacer"), 1000).toInt());
+    setBackgroundColor(settings.value(m_sSettingsPath + QString("/FiffRawViewSettings/backgroundColor"), color).value<QColor>());
+    setDistanceTimeSpacer(settings.value(m_sSettingsPath + QString("/FiffRawViewSettings/distanceTimeSpacer"), 1000).toInt());
 }
 
 //=============================================================================================================

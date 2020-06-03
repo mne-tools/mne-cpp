@@ -69,8 +69,8 @@ QuickControlView::QuickControlView(const QString &sSettingsPath,
 : DraggableFramelessWidget(parent, flags, false, bDraggable, true)
 , ui(new Ui::QuickControlViewWidget)
 , m_sName(name)
-, m_sSettingsPath(sSettingsPath)
 {
+    m_sSettingsPath = sSettingsPath;
     ui->setupUi(this);
     ui->m_pTabWidget->setTabBarAutoHide(true);
     ui->m_pTabWidget->setMovable(true);
@@ -280,8 +280,8 @@ void QuickControlView::saveSettings()
 
     QSettings settings("MNECPP");
 
-    settings.setValue(m_sSettingsPath + QString("/QuickControlViewOpacity"), getOpacityValue());
-    settings.setValue(m_sSettingsPath + QString("/QuickControlViewPos"), this->pos());
+    settings.setValue(m_sSettingsPath + QString("/QuickControlView/ViewOpacity"), getOpacityValue());
+    settings.setValue(m_sSettingsPath + QString("/QuickControlView/ViewPos"), this->pos());
 }
 
 //=============================================================================================================
@@ -294,9 +294,9 @@ void QuickControlView::loadSettings()
 
     QSettings settings("MNECPP");
 
-    setOpacityValue(settings.value(m_sSettingsPath + QString("/QuickControlViewOpacity"), 100).toInt());
+    setOpacityValue(settings.value(m_sSettingsPath + QString("/QuickControlView/ViewOpacity"), 100).toInt());
 
-    QPoint pos = settings.value(m_sSettingsPath + QString("/QuickControlViewPos"), QPoint(100,100)).toPoint();
+    QPoint pos = settings.value(m_sSettingsPath + QString("/QuickControlView/ViewPos"), QPoint(100,100)).toPoint();
 
     QRect screenRect = QApplication::desktop()->screenGeometry();
     if(!screenRect.contains(pos) && QGuiApplication::screens().size() == 1) {

@@ -70,9 +70,10 @@ using namespace FIFFLIB;
 ArtifactSettingsView::ArtifactSettingsView(const QString& sSettingsPath,
                                            const QList<FiffChInfo>& fiffChInfoList,
                                            QWidget *parent)
-: AbstractView(sSettingsPath, parent)
+: AbstractView(parent)
 , m_fiffChInfoList(fiffChInfoList)
 {
+    m_sSettingsPath = sSettingsPath;
     qRegisterMetaType<QMap<QString,double> >("QMap<QString,double>");
 
     this->setWindowTitle("Artifact Rejection Settings");
@@ -139,9 +140,9 @@ void ArtifactSettingsView::saveSettings()
     // Save Settings
     QSettings settings("MNECPP");
 
-    settings.setValue(m_sSettingsPath + QString("/doArtifactThresholdReduction"), m_bDoArtifactThresholdReduction);
+    settings.setValue(m_sSettingsPath + QString("/ArtifactSettingsView/doArtifactThresholdReduction"), m_bDoArtifactThresholdReduction);
 
-    settings.beginGroup(m_sSettingsPath + QString("/artifactThresholdsFirst"));
+    settings.beginGroup(m_sSettingsPath + QString("/ArtifactSettingsView/artifactThresholdsFirst"));
     QMap<QString, double>::const_iterator itrFirst = m_mapThresholdsFirst.constBegin();
     while (itrFirst != m_mapThresholdsFirst.constEnd()) {
          settings.setValue(itrFirst.key(), itrFirst.value());
@@ -149,7 +150,7 @@ void ArtifactSettingsView::saveSettings()
     }
     settings.endGroup();
 
-    settings.beginGroup(m_sSettingsPath + QString("/artifactThresholdsSecond"));
+    settings.beginGroup(m_sSettingsPath + QString("/ArtifactSettingsView/artifactThresholdsSecond"));
     QMap<QString, int>::const_iterator itrSecond = m_mapThresholdsSecond.constBegin();
     while (itrSecond != m_mapThresholdsSecond.constEnd()) {
          settings.setValue(itrSecond.key(), itrSecond.value());
@@ -169,7 +170,7 @@ void ArtifactSettingsView::loadSettings()
     // Load Settings
     QSettings settings("MNECPP");
 
-    m_bDoArtifactThresholdReduction = settings.value(m_sSettingsPath + QString("/doArtifactThresholdReduction"), false).toBool();
+    m_bDoArtifactThresholdReduction = settings.value(m_sSettingsPath + QString("/ArtifactSettingsView/doArtifactThresholdReduction"), false).toBool();
 
     if(m_bDoArtifactThresholdReduction) {
         m_mapThresholds["Active"] = 1.0;
@@ -191,14 +192,14 @@ void ArtifactSettingsView::loadSettings()
     m_mapThresholdsSecond["emg"] = -1;
     m_mapThresholdsSecond["eog"] = -1;
 
-    settings.beginGroup(m_sSettingsPath + QString("/artifactThresholdsFirst"));
+    settings.beginGroup(m_sSettingsPath + QString("/ArtifactSettingsView/artifactThresholdsFirst"));
     QStringList keys = settings.childKeys();
     foreach (QString key, keys) {
          m_mapThresholdsFirst.insert(key, settings.value(key, 1.0).toDouble());
     }
     settings.endGroup();
 
-    settings.beginGroup(m_sSettingsPath + QString("/artifactThresholdsSecond"));
+    settings.beginGroup(m_sSettingsPath + QString("/ArtifactSettingsView/artifactThresholdsSecond"));
     keys = settings.childKeys();
     foreach (QString key, keys) {
          m_mapThresholdsSecond.insert(key, settings.value(key, -1).toInt());
