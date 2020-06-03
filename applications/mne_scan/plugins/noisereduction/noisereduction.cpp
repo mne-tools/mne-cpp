@@ -277,7 +277,7 @@ void NoiseReduction::initPluginControlWidgets()
         connect(pFilterSettingsView, &FilterSettingsView::filterActivationChanged,
                 this, &NoiseReduction::setFilterActive);
 
-        pFilterSettingsView->getFilterView()->init(m_pFiffInfo->sfreq);
+        pFilterSettingsView->init(m_pFiffInfo->sfreq);
         pFilterSettingsView->getFilterView()->setWindowSize(m_iMaxFilterTapSize);
         pFilterSettingsView->getFilterView()->setMaxFilterTaps(m_iMaxFilterTapSize);
 

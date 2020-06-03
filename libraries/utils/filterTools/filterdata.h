@@ -75,7 +75,11 @@ namespace UTILSLIB
 {
 
 //=============================================================================================================
-
+/**
+ * DECLARE CLASS FilterSettingsView
+ *
+ * @brief The FilterSettingsView class provides a view to select between different modalities
+ */
 class UTILSSHARED_EXPORT FilterData
 {
 
@@ -100,11 +104,13 @@ public:
        None
     };
 
+    //=========================================================================================================
     /**
      * @brief FilterData creates a default FilterData object
      */
     FilterData();
 
+    //=========================================================================================================
     /**
      * Constructs a FilterData object 
      * @param [in] unique_name defines the name of the generated filter
@@ -118,6 +124,7 @@ public:
      * @param [in] designMethod specifies the design method to use. Choose between Cosind and Tschebyscheff
      **/
 
+    //=========================================================================================================
     FilterData(QString unique_name,
                FilterType type,
                int order,
@@ -128,16 +135,19 @@ public:
                qint32 fftlength=4096,
                DesignMethod designMethod = Cosine);
 
+    //=========================================================================================================
     /**
      * @brief fftTransformCoeffs transforms the calculated filter coefficients to frequency-domain
      */
     void fftTransformCoeffs();
 
+    //=========================================================================================================
     /**
      * @brief designFilter designs the actual filter with the given parameters
      */
     void designFilter();
 
+    //=========================================================================================================
     /**
      * Applies the current filter to the input data using convolution in time domain. Pro: Uses only past samples (real-time capable) Con: Might not be as ideal as acausal version (steepness etc.)
      *
@@ -150,6 +160,7 @@ public:
                                        bool keepOverhead = false,
                                        CompensateEdgeEffects compensateEdgeEffects = ZeroPad) const;
 
+    //=========================================================================================================
     /**
      * Applies the current filter to the input data using multiplication in frequency domain. Pro: Fast, good filter parameters Con: Smears in error from future samples. Uses future samples (nor real time capable)
      *
@@ -164,21 +175,25 @@ public:
                                       CompensateEdgeEffects compensateEdgeEffects = MirrorData)
                                       const;
 
+    //=========================================================================================================
     /**
      * @brief getStringForDesignMethod returns the current design method as a string
      */
     static QString getStringForDesignMethod(const FilterData::DesignMethod &designMethod);
 
+    //=========================================================================================================
     /**
      * @brief getStringFilterType returns the current filter type as a string
      */
     static QString getStringForFilterType(const FilterData::FilterType &filterType);
 
+    //=========================================================================================================
     /**
      * @brief getStringForDesignMethod returns the current design dependent on an input string
      */
     static FilterData::DesignMethod getDesignMethodForString(const QString &designMethodString);
 
+    //=========================================================================================================
     /**
      * @brief getFilterTypeForString returns the current filter type dependent on an input string
      */
