@@ -1,13 +1,13 @@
 //=============================================================================================================
 /**
- * @file     filtersettingsview.h
+ * @file     abstractview.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>
- * @since    0.1.0
- * @date     July, 2018
+ * @since    0.1.2
+ * @date     June, 2020
  *
  * @section  LICENSE
  *
- * Copyright (C) 2018, Lorenz Esch. All rights reserved.
+ * Copyright (C) 2020, Lorenz Esch. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -28,12 +28,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Declaration of the FilterSettingsView Class.
+ * @brief    Declaration of the AbstractView Class.
  *
  */
 
-#ifndef FILTERSETTINGSVIEW_H
-#define FILTERSETTINGSVIEW_H
+#ifndef ABSTRACTVIEW_H
+#define ABSTRACTVIEW_H
 
 //=============================================================================================================
 // INCLUDES
@@ -41,14 +41,11 @@
 
 #include "../disp_global.h"
 
-#include "abstractview.h"
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QMap>
-#include <QPointer>
+#include <QWidget>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -57,10 +54,6 @@
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
-namespace Ui {
-    class FilterSettingsViewWidget;
-}
 
 //=============================================================================================================
 // DEFINE NAMESPACE DISPLIB
@@ -73,57 +66,37 @@ namespace DISPLIB
 // DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-class FilterDesignView;
-
 //=============================================================================================================
 /**
- * DECLARE CLASS FilterSettingsView
+ * DECLARE CLASS AbstractView
  *
- * @brief The FilterSettingsView class provides a view to select between different modalities
+ * @brief The AbstractView class provides the base calss for all Disp viewers
  */
-class DISPSHARED_EXPORT FilterSettingsView : public AbstractView
+class DISPSHARED_EXPORT AbstractView : public QWidget
 {
     Q_OBJECT
 
 public:    
-    typedef QSharedPointer<FilterSettingsView> SPtr;              /**< Shared pointer type for FilterSettingsView. */
-    typedef QSharedPointer<const FilterSettingsView> ConstSPtr;   /**< Const shared pointer type for FilterSettingsView. */
+    typedef QSharedPointer<AbstractView> SPtr;              /**< Shared pointer type for AbstractView. */
+    typedef QSharedPointer<const AbstractView> ConstSPtr;   /**< Const shared pointer type for AbstractView. */
 
     //=========================================================================================================
     /**
-     * Constructs a FilterSettingsView which is a child of parent.
+     * Constructs a AbstractView which is a child of parent.
      *
      * @param [in] parent        parent of widget
      */
-    FilterSettingsView(const QString& sSettingsPath = "",
-                       QWidget *parent = 0,
-                       Qt::WindowFlags f = Qt::Widget);
+    AbstractView(const QString& sSettingsPath = "",
+                 QWidget *parent = 0,
+                 Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**
-     * Destroys the FilterSettingsView.
-     */
-    ~FilterSettingsView();
-
-    //=========================================================================================================
-    /**
-     * Returns the filter design view used to design filters.
-     */
-    QSharedPointer<FilterDesignView> getFilterView();
-
-    //=========================================================================================================
-    /**
-     * Returns true if the filters a set as active.
-     */
-    bool getFilterActive();
-
-    //=========================================================================================================
-    /**
-     * Inits the filter window.
+     * Set the scientific mode of the view active or inactive
      *
-     * @param[in] dSFreq the new sampling frequency
+     * @param bFlag     The new flag.
      */
-    void init(double dSFreq);
+    virtual void setScientificMode(bool bFlag);
 
 protected:
     //=========================================================================================================
@@ -132,7 +105,7 @@ protected:
      *
      * @param[in] settingsPath        the path to store the settings to.
      */
-    void saveSettings(const QString& settingsPath);
+    virtual void saveSettings(const QString& settingsPath) = 0;
 
     //=========================================================================================================
     /**
@@ -140,37 +113,14 @@ protected:
      *
      * @param[in] settingsPath        the path to load the settings from.
      */
-    void loadSettings(const QString& settingsPath);
+    virtual void loadSettings(const QString& settingsPath) = 0;
 
-    //=========================================================================================================
-    /**
-     * Show the filter option screen to the user.
-     */
-    void onShowFilterView();
+    bool            m_bScientificModeIsActive;  /**< The flag describing whether the scientific mode of the view is active or not. */
 
-    //=========================================================================================================
-    /**
-     * This function is called whenever the filter activation changed
-     */
-    void onFilterActivationChanged();
+    QString         m_sSettingsPath;            /**< The settings path to store the GUI settings to. */
 
-    //=========================================================================================================
-    /**
-     * This function is called whenever the filter parameters changed
-     *
-     * @param[in] dValue        the changed value. Unused.
-     */
-    void onFilterParametersChanged(double dValue);
 
-    QString                                 m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
-
-    QSharedPointer<FilterDesignView>        m_pFilterView;                  /**< The filter view. */
-
-    Ui::FilterSettingsViewWidget*           m_pUi;                          /**< The filter settings GUI view. */
-
-signals:
-    void filterActivationChanged(bool activated);
 };
 } // NAMESPACE
 
-#endif // FILTERSETTINGSVIEW_H
+#endif // ABSTRACTVIEW_H
