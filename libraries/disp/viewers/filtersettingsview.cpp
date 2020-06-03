@@ -40,6 +40,8 @@
 
 #include "filterdesignview.h"
 
+#include "ui_filtersettingsview.h"
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -68,40 +70,21 @@ FilterSettingsView::FilterSettingsView(const QString& sSettingsPath,
                                        Qt::WindowFlags f)
 : QWidget(parent, f)
 , m_sSettingsPath(sSettingsPath)
+, m_pUi(new Ui::FilterSettingsViewWidget)
 {
     this->setWindowTitle("Filter Settings");
-    this->setMinimumWidth(330);
-    this->setMaximumWidth(330);
+
+    m_pUi->setupUi(this);
 
     m_pFilterView = FilterDesignView::SPtr::create(m_sSettingsPath,
                                                    this,
                                                    Qt::Window);
 
-    //Delete all widgets in the filter layout
-    QGridLayout* topLayout = static_cast<QGridLayout*>(this->layout());
-    if(!topLayout) {
-       topLayout = new QGridLayout();
-    }
-
-    //Add filters
-    m_pCheckBox = new QCheckBox("Activate filter");
-
-    connect(m_pCheckBox.data(), &QCheckBox::toggled,
+    //Connect GUI elements
+    connect(m_pUi->m_pCheckBoxActivateFilter, &QCheckBox::toggled,
             this, &FilterSettingsView::onFilterActivationChanged);
-
-    topLayout->addWidget(m_pCheckBox, 0, 0);
-
-    //Add push button for filter options
-    QPushButton* pShowFilterOptions = new QPushButton();
-    pShowFilterOptions->setText("Filter options");
-    pShowFilterOptions->setCheckable(false);
-    connect(pShowFilterOptions, &QPushButton::clicked,
+    connect(m_pUi->m_pPushButtonShowFilterOptions, &QPushButton::clicked,
             this, &FilterSettingsView::onShowFilterView);
-
-    topLayout->addWidget(pShowFilterOptions, 1, 0);
-
-    //Find Filter tab and add current layout
-    this->setLayout(topLayout);
 
     loadSettings(m_sSettingsPath);
 }
@@ -124,7 +107,7 @@ QSharedPointer<FilterDesignView> FilterSettingsView::getFilterView()
 
 bool FilterSettingsView::getFilterActive()
 {
-    return m_pCheckBox->isChecked();
+    return m_pUi->m_pCheckBoxActivateFilter->isChecked();
 }
 
 //=============================================================================================================
@@ -137,7 +120,7 @@ void FilterSettingsView::saveSettings(const QString& settingsPath)
 
     QSettings settings;
 
-    settings.setValue(settingsPath + QString("/filterActivated"), m_pCheckBox->isChecked());
+    settings.setValue(settingsPath + QString("/filterActivated"), m_pUi->m_pCheckBoxActivateFilter->isChecked());
 }
 
 //=============================================================================================================
@@ -150,7 +133,7 @@ void FilterSettingsView::loadSettings(const QString& settingsPath)
 
     QSettings settings;
 
-    m_pCheckBox->setChecked(settings.value(settingsPath + QString("/filterActivated"), false).toBool());
+    m_pUi->m_pCheckBoxActivateFilter->setChecked(settings.value(settingsPath + QString("/filterActivated"), false).toBool());
 }
 
 //=============================================================================================================
@@ -169,7 +152,7 @@ void FilterSettingsView::onShowFilterView()
 
 void FilterSettingsView::onFilterActivationChanged()
 {
-    emit filterActivationChanged(m_pCheckBox->isChecked());
+    emit filterActivationChanged(m_pUi->m_pCheckBoxActivateFilter->isChecked());
 
     saveSettings(m_sSettingsPath);
 }
