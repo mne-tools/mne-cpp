@@ -585,6 +585,8 @@ void MainWindow::about()
 
 void MainWindow::createAveragingWindows()
 {
+    qDebug() << "MainWindow::createAveragingWindows Creating averaging windows";
+
     m_pButterflyView = new ButterflyView();
     m_pAverageLayoutView = new AverageLayoutView();
 

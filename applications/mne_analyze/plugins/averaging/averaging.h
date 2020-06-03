@@ -40,6 +40,7 @@
 //=============================================================================================================
 
 #include "averaging_global.h"
+#include "ave.h"
 #include <anShared/Interfaces/IPlugin.h>
 
 //=============================================================================================================
@@ -121,6 +122,8 @@ private:
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals */
 
     QSharedPointer<ANSHAREDLIB::FiffRawViewModel>           m_pFiffRawModel;            /**< Pointer to currently loaded FiffRawView Model */
+
+    QSharedPointer<Ave>                                     m_pAve;                     /**< Averaging Object */
 
 };
 
