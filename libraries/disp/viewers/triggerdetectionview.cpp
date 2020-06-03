@@ -68,9 +68,10 @@ using namespace FIFFLIB;
 TriggerDetectionView::TriggerDetectionView(const QString& sSettingsPath,
                                            QWidget *parent,
                                            Qt::WindowFlags f)
-: AbstractView(sSettingsPath, parent, f)
+: AbstractView(parent, f)
 , ui(new Ui::TriggerDetectionViewWidget)
 {
+    m_sSettingsPath = sSettingsPath;
     ui->setupUi(this);
 
     this->setWindowTitle("Trigger Detection Settings");
@@ -163,12 +164,12 @@ void TriggerDetectionView::saveSettings()
 
     QSettings settings("MNECPP");
 
-    settings.setValue(m_sSettingsPath + QString("/triggerDetectionActivated"), ui->m_checkBox_activateTriggerDetection->isChecked());
-    settings.setValue(m_sSettingsPath + QString("/triggerDetectionChannelIndex"), ui->m_comboBox_triggerChannels->currentIndex());
-    settings.setValue(m_sSettingsPath + QString("/triggerDetectionFirstThresholdValue"), ui->m_doubleSpinBox_detectionThresholdFirst->value());
-    settings.setValue(m_sSettingsPath + QString("/triggerDetectionSecondThresholdValue"), ui->m_spinBox_detectionThresholdSecond->value());
+    settings.setValue(m_sSettingsPath + QString("/TriggerDetectionView/Activated"), ui->m_checkBox_activateTriggerDetection->isChecked());
+    settings.setValue(m_sSettingsPath + QString("/TriggerDetectionView/ChannelIndex"), ui->m_comboBox_triggerChannels->currentIndex());
+    settings.setValue(m_sSettingsPath + QString("/TriggerDetectionView/FirstThresholdValue"), ui->m_doubleSpinBox_detectionThresholdFirst->value());
+    settings.setValue(m_sSettingsPath + QString("/TriggerDetectionView/SecondThresholdValue"), ui->m_spinBox_detectionThresholdSecond->value());
 
-    settings.beginGroup(m_sSettingsPath + QString("/triggerDetectionColors"));
+    settings.beginGroup(m_sSettingsPath + QString("/TriggerDetectionView/Colors"));
     QMap<double, QColor>::const_iterator i = m_qMapTriggerColor.constBegin();
     while (i != m_qMapTriggerColor.constEnd()) {
          settings.setValue(QString::number(i.key()), i.value());
@@ -187,12 +188,12 @@ void TriggerDetectionView::loadSettings()
 
     QSettings settings("MNECPP");
 
-    ui->m_checkBox_activateTriggerDetection->setChecked(settings.value(m_sSettingsPath + QString("/triggerDetectionActivated"), false).toBool());
-    ui->m_comboBox_triggerChannels->setCurrentIndex(settings.value(m_sSettingsPath + QString("/triggerDetectionChannelIndex"), 0).toInt());
-    ui->m_doubleSpinBox_detectionThresholdFirst->setValue(settings.value(m_sSettingsPath + QString("/triggerDetectionFirstThresholdValue"), 0.1).toDouble());
-    ui->m_spinBox_detectionThresholdSecond->setValue(settings.value(m_sSettingsPath + QString("/triggerDetectionSecondThresholdValue"), -1).toInt());
+    ui->m_checkBox_activateTriggerDetection->setChecked(settings.value(m_sSettingsPath + QString("/TriggerDetectionView/Activated"), false).toBool());
+    ui->m_comboBox_triggerChannels->setCurrentIndex(settings.value(m_sSettingsPath + QString("/TriggerDetectionView/ChannelIndex"), 0).toInt());
+    ui->m_doubleSpinBox_detectionThresholdFirst->setValue(settings.value(m_sSettingsPath + QString("/TriggerDetectionView/FirstThresholdValue"), 0.1).toDouble());
+    ui->m_spinBox_detectionThresholdSecond->setValue(settings.value(m_sSettingsPath + QString("/TriggerDetectionView/SecondThresholdValue"), -1).toInt());
 
-    settings.beginGroup(m_sSettingsPath + QString("/triggerDetectionColors"));
+    settings.beginGroup(m_sSettingsPath + QString("/TriggerDetectionView/Colors"));
     QStringList keys = settings.childKeys();
     foreach (QString key, keys) {
         double dKey = key.toDouble();

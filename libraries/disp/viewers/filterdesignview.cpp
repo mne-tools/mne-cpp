@@ -81,12 +81,13 @@ using namespace UTILSLIB;
 FilterDesignView::FilterDesignView(const QString& sSettingsPath,
                                    QWidget *parent,
                                    Qt::WindowFlags f)
-: AbstractView(sSettingsPath, parent, f)
+: AbstractView(parent, f)
 , m_pUi(new Ui::FilterDesignViewWidget)
 , m_iWindowSize(4016)
 , m_iFilterTaps(512)
 , m_dSFreq(600)
 {
+    m_sSettingsPath = sSettingsPath;
     m_pUi->setupUi(this);
 
     initSpinBoxes();
@@ -237,7 +238,7 @@ void FilterDesignView::saveSettings()
     settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterDesignMethod"), m_filterData.m_designMethod);
     settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterTransition"), m_filterData.m_dParksWidth*(m_filterData.m_sFreq/2));
     settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterChannelType"), getChannelType());
-    settings.setValue(m_sSettingsPath + QString("/FilterDesignView/FilterDesignViewPos"), this->pos());
+    settings.setValue(m_sSettingsPath + QString("/FilterDesignView/Position"), this->pos());
 }
 
 //=============================================================================================================
@@ -258,7 +259,7 @@ void FilterDesignView::loadSettings()
                         settings.value(m_sSettingsPath + QString("/FilterDesignView/filterTransition"), 1.0).toDouble(),
                         settings.value(m_sSettingsPath + QString("/FilterDesignView/filterChannelType"), "MEG").toString());
 
-    QPoint pos = settings.value(m_sSettingsPath + QString("/FilterDesignView/Pos"), QPoint(100,100)).toPoint();
+    QPoint pos = settings.value(m_sSettingsPath + QString("/FilterDesignView/Position"), QPoint(100,100)).toPoint();
 
     QRect screenRect = QApplication::desktop()->screenGeometry();
     if(!screenRect.contains(pos) && QGuiApplication::screens().size() == 1) {

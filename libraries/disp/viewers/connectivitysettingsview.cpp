@@ -63,9 +63,10 @@ using namespace DISPLIB;
 ConnectivitySettingsView::ConnectivitySettingsView(const QString& sSettingsPath,
                                                    QWidget *parent,
                                                    Qt::WindowFlags f)
-: AbstractView(sSettingsPath, parent, f)
+: AbstractView(parent, f)
 , ui(new Ui::ConnectivitySettingsViewWidget)
 {
+    m_sSettingsPath = sSettingsPath;
     ui->setupUi(this);
 
     loadSettings();
@@ -181,12 +182,12 @@ void ConnectivitySettingsView::saveSettings()
 
     QSettings settings("MNECPP");
 
-    settings.setValue(m_sSettingsPath + QString("/connMethod"), ui->m_comboBox_method->currentText());
-    settings.setValue(m_sSettingsPath + QString("/connWindowType"), ui->m_comboBox_windowType->currentText());
-    settings.setValue(m_sSettingsPath + QString("/connNrTrials"), ui->m_spinBox_numberTrials->value());
-    settings.setValue(m_sSettingsPath + QString("/connTriggerType"), ui->m_comboBox_triggerType->currentText());
-    settings.setValue(m_sSettingsPath + QString("/connFreqLow"), ui->m_spinBox_freqLow->value());
-    settings.setValue(m_sSettingsPath + QString("/connFreqHigh"), ui->m_spinBox_freqHigh->value());
+    settings.setValue(m_sSettingsPath + QString("/ConnectivitySettingsView/connMethod"), ui->m_comboBox_method->currentText());
+    settings.setValue(m_sSettingsPath + QString("/ConnectivitySettingsView/connWindowType"), ui->m_comboBox_windowType->currentText());
+    settings.setValue(m_sSettingsPath + QString("/ConnectivitySettingsView/connNrTrials"), ui->m_spinBox_numberTrials->value());
+    settings.setValue(m_sSettingsPath + QString("/ConnectivitySettingsView/connTriggerType"), ui->m_comboBox_triggerType->currentText());
+    settings.setValue(m_sSettingsPath + QString("/ConnectivitySettingsView/connFreqLow"), ui->m_spinBox_freqLow->value());
+    settings.setValue(m_sSettingsPath + QString("/ConnectivitySettingsView/connFreqHigh"), ui->m_spinBox_freqHigh->value());
 }
 
 //=============================================================================================================
@@ -199,13 +200,13 @@ void ConnectivitySettingsView::loadSettings()
 
     QSettings settings("MNECPP");
 
-    ui->m_comboBox_method->setCurrentText(settings.value(m_sSettingsPath + QString("/connMethod"), "COR").toString());
-    ui->m_comboBox_windowType->setCurrentText(settings.value(m_sSettingsPath + QString("/connWindowType"), "Hanning").toString());
-    ui->m_spinBox_numberTrials->setValue(settings.value(m_sSettingsPath + QString("/connNrTrials"), 10).toInt());
-    m_iNumberTrials = settings.value(m_sSettingsPath + QString("/connNrTrials"), 10).toInt();
-    ui->m_comboBox_triggerType->setCurrentText(settings.value(m_sSettingsPath + QString("/connTriggerType"), "1").toString());
-    ui->m_spinBox_freqLow->setValue(settings.value(m_sSettingsPath + QString("/connFreqLow"), 7.0).toDouble());
-    ui->m_spinBox_freqHigh->setValue(settings.value(m_sSettingsPath + QString("/connFreqHigh"), 13.0).toDouble());
+    ui->m_comboBox_method->setCurrentText(settings.value(m_sSettingsPath + QString("/ConnectivitySettingsView/connMethod"), "COR").toString());
+    ui->m_comboBox_windowType->setCurrentText(settings.value(m_sSettingsPath + QString("/ConnectivitySettingsView/connWindowType"), "Hanning").toString());
+    ui->m_spinBox_numberTrials->setValue(settings.value(m_sSettingsPath + QString("/ConnectivitySettingsView/connNrTrials"), 10).toInt());
+    m_iNumberTrials = settings.value(m_sSettingsPath + QString("/ConnectivitySettingsView/connNrTrials"), 10).toInt();
+    ui->m_comboBox_triggerType->setCurrentText(settings.value(m_sSettingsPath + QString("/ConnectivitySettingsView/connTriggerType"), "1").toString());
+    ui->m_spinBox_freqLow->setValue(settings.value(m_sSettingsPath + QString("/ConnectivitySettingsView/connFreqLow"), 7.0).toDouble());
+    ui->m_spinBox_freqHigh->setValue(settings.value(m_sSettingsPath + QString("/ConnectivitySettingsView/connFreqHigh"), 13.0).toDouble());
 }
 
 //=============================================================================================================

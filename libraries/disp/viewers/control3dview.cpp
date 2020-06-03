@@ -72,11 +72,12 @@ Control3DView::Control3DView(const QString& sSettingsPath,
                              QWidget* parent,
                              const QStringList& slFlags,
                              Qt::WindowType type)
-: AbstractView(sSettingsPath, parent, type)
+: AbstractView(parent, type)
 , ui(new Ui::Control3DViewWidget)
 , m_colCurrentSceneColor(QColor(0,0,0))
 , m_colCurrentLightColor(QColor(255,255,255))
 {
+    m_sSettingsPath = sSettingsPath;
     ui->setupUi(this);
 
     setFlags(slFlags);

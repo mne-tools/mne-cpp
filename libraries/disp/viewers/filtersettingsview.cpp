@@ -68,9 +68,10 @@ using namespace DISPLIB;
 FilterSettingsView::FilterSettingsView(const QString& sSettingsPath,
                                        QWidget *parent,
                                        Qt::WindowFlags f)
-: AbstractView(sSettingsPath, parent, f)
+: AbstractView(parent, f)
 , m_pUi(new Ui::FilterSettingsViewWidget)
 {
+    m_sSettingsPath = sSettingsPath;
     this->setWindowTitle("Filter Settings");
 
     m_pUi->setupUi(this);

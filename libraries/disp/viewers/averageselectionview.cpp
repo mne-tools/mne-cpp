@@ -74,11 +74,12 @@ using namespace Eigen;
 AverageSelectionView::AverageSelectionView(const QString& sSettingsPath,
                                            QWidget *parent,
                                            Qt::WindowFlags f)
-: AbstractView(sSettingsPath, parent, f)
+: AbstractView(parent, f)
 , m_iMaxNumAverages(10)
 , m_qMapAverageColor(QSharedPointer<QMap<QString, QColor> >::create())
 , m_qMapAverageActivation(QSharedPointer<QMap<QString, bool> >::create())
 {
+    m_sSettingsPath = sSettingsPath;
     this->setWindowTitle("Average Selection");
     this->setMinimumWidth(330);
     this->setMaximumWidth(330);
@@ -134,7 +135,7 @@ void AverageSelectionView::saveSettings()
 
     QSettings settings("MNECPP");
 
-    settings.beginGroup(m_sSettingsPath + QString("/averageColorMap"));
+    settings.beginGroup(m_sSettingsPath + QString("/AverageSelectionView/averageColorMap"));
     QMap<QString, QColor>::const_iterator iColor = m_qMapAverageColor->constBegin();
     while (iColor != m_qMapAverageColor->constEnd()) {
          settings.setValue(iColor.key(), iColor.value());
@@ -142,7 +143,7 @@ void AverageSelectionView::saveSettings()
     }
     settings.endGroup();
 
-    settings.beginGroup(m_sSettingsPath + QString("/averageActivationMap"));
+    settings.beginGroup(m_sSettingsPath + QString("/AverageSelectionView/averageActivationMap"));
     QMap<QString, bool>::const_iterator iActivation = m_qMapAverageActivation->constBegin();
     while (iActivation != m_qMapAverageActivation->constEnd()) {
          settings.setValue(iActivation.key(), iActivation.value());
@@ -161,14 +162,14 @@ void AverageSelectionView::loadSettings()
 
     QSettings settings("MNECPP");
 
-    settings.beginGroup(m_sSettingsPath + QString("/averageColorMap"));
+    settings.beginGroup(m_sSettingsPath + QString("/AverageSelectionView/averageColorMap"));
     QStringList keys = settings.childKeys();
     foreach (QString key, keys) {
          m_qMapAverageColor->insert(key, settings.value(key).value<QColor>());
     }
     settings.endGroup();
 
-    settings.beginGroup(m_sSettingsPath + QString("/averageActivationMap"));
+    settings.beginGroup(m_sSettingsPath + QString("/AverageSelectionView/averageActivationMap"));
     keys = settings.childKeys();
     foreach (QString key, keys) {
          m_qMapAverageActivation->insert(key, settings.value(key).toBool());

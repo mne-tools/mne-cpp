@@ -68,9 +68,10 @@ using namespace FIFFLIB;
 CompensatorView::CompensatorView(const QString& sSettingsPath,
                                  QWidget *parent,
                                  Qt::WindowFlags f)
-: AbstractView(sSettingsPath, parent, f)
+: AbstractView(parent, f)
 , m_iLastTo(0)
 {
+    m_sSettingsPath = sSettingsPath;
     this->setWindowTitle("Compensators");
     this->setMinimumWidth(330);
     this->setMaximumWidth(330);
@@ -118,7 +119,7 @@ void CompensatorView::saveSettings()
 
     QSettings settings("MNECPP");
 
-    settings.beginGroup(m_sSettingsPath + QString("/compensatorActive"));
+    settings.beginGroup(m_sSettingsPath + QString("/CompensatorView/compensatorActive"));
 
     QMap<int,bool>::const_iterator iComp = m_mapCompActive.constBegin();
     while (iComp != m_mapCompActive.constEnd()) {
@@ -139,7 +140,7 @@ void CompensatorView::loadSettings()
 
     QSettings settings("MNECPP");
 
-    settings.beginGroup(m_sSettingsPath + QString("/compensatorActive"));
+    settings.beginGroup(m_sSettingsPath + QString("/CompensatorView/compensatorActive"));
 
     QStringList keys = settings.childKeys();
     foreach (QString key, keys) {

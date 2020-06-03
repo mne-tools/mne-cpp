@@ -84,10 +84,11 @@ ChannelSelectionView::ChannelSelectionView(const QString& sSettingsPath,
                                            QWidget *parent,
                                            ChannelInfoModel::SPtr pChannelInfoModel,
                                            Qt::WindowType f)
-: AbstractView(sSettingsPath, parent, f)
+: AbstractView(parent, f)
 , ui(new Ui::ChannelSelectionViewWidget)
 , m_pChannelInfoModel(pChannelInfoModel)
 {
+    m_sSettingsPath = sSettingsPath;
     ui->setupUi(this);
 
     //Init gui elements
@@ -411,8 +412,8 @@ void ChannelSelectionView::saveSettings()
 
     QSettings settings("MNECPP");
 
-    settings.setValue(m_sSettingsPath + QString("/selectedLayoutFile"), getCurrentLayoutFile());
-    settings.setValue(m_sSettingsPath + QString("/channelSelectionViewPos"), this->pos());
+    settings.setValue(m_sSettingsPath + QString("/ChannelSelectionView/selectedLayoutFile"), getCurrentLayoutFile());
+    settings.setValue(m_sSettingsPath + QString("/ChannelSelectionView/channelSelectionViewPos"), this->pos());
 }
 
 //=============================================================================================================
@@ -425,9 +426,9 @@ void ChannelSelectionView::loadSettings()
 
     QSettings settings("MNECPP");
 
-    setCurrentLayoutFile(settings.value(m_sSettingsPath + QString("/selectedLayoutFile"), "babymeg-mag-inner-layer.lout").toString());
+    setCurrentLayoutFile(settings.value(m_sSettingsPath + QString("/ChannelSelectionView/selectedLayoutFile"), "babymeg-mag-inner-layer.lout").toString());
 
-    QPoint pos = settings.value(m_sSettingsPath + QString("/channelSelectionViewPos"), QPoint(100,100)).toPoint();
+    QPoint pos = settings.value(m_sSettingsPath + QString("/ChannelSelectionView/channelSelectionViewPos"), QPoint(100,100)).toPoint();
 
     QRect screenRect = QApplication::desktop()->screenGeometry();
     if(!screenRect.contains(pos) && QGuiApplication::screens().size() == 1) {

@@ -86,8 +86,7 @@ public:
      *
      * @param [in] parent        parent of widget
      */
-    AbstractView(const QString& sSettingsPath,
-                 QWidget *parent = 0,
+    AbstractView(QWidget *parent = 0,
                  Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
@@ -110,6 +109,7 @@ public:
      */
     virtual void loadSettings() = 0;
 
+protected:
     bool            m_bScientificModeIsActive;  /**< The flag describing whether the scientific mode of the view is active or not. */
 
     QString         m_sSettingsPath;            /**< The settings path to store the GUI settings to. */

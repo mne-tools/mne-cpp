@@ -66,10 +66,11 @@ using namespace FIFFLIB;
 AveragingSettingsView::AveragingSettingsView(const QString& sSettingsPath,
                                              const QMap<QString, int> &mapStimChsIndexNames,
                                              QWidget *parent)
-: AbstractView(sSettingsPath, parent)
+: AbstractView(parent)
 , ui(new Ui::AverageSettingsViewWidget)
 , m_mapStimChsIndexNames(mapStimChsIndexNames)
 {
+    m_sSettingsPath = sSettingsPath;
     ui->setupUi(this);
 
     this->setWindowTitle("Averaging Settings");
@@ -270,13 +271,13 @@ void AveragingSettingsView::saveSettings()
     // Save Settings
     QSettings settings("MNECPP");
 
-    settings.setValue(m_sSettingsPath + QString("/preStimSeconds"), m_iPreStimSeconds);
-    settings.setValue(m_sSettingsPath + QString("/postStimSeconds"), m_iPostStimSeconds);
-    settings.setValue(m_sSettingsPath + QString("/numAverages"), m_iNumAverages);
-    settings.setValue(m_sSettingsPath + QString("/currentStimChannel"), m_sCurrentStimChan);
-    settings.setValue(m_sSettingsPath + QString("/baselineFromSeconds"), m_iBaselineFromSeconds);
-    settings.setValue(m_sSettingsPath + QString("/baselineToSeconds"), m_iBaselineToSeconds);
-    settings.setValue(m_sSettingsPath + QString("/doBaselineCorrection"), m_bDoBaselineCorrection);
+    settings.setValue(m_sSettingsPath + QString("/AveragingSettingsView/preStimSeconds"), m_iPreStimSeconds);
+    settings.setValue(m_sSettingsPath + QString("/AveragingSettingsView/postStimSeconds"), m_iPostStimSeconds);
+    settings.setValue(m_sSettingsPath + QString("/AveragingSettingsView/numAverages"), m_iNumAverages);
+    settings.setValue(m_sSettingsPath + QString("/AveragingSettingsView/currentStimChannel"), m_sCurrentStimChan);
+    settings.setValue(m_sSettingsPath + QString("/AveragingSettingsView/baselineFromSeconds"), m_iBaselineFromSeconds);
+    settings.setValue(m_sSettingsPath + QString("/AveragingSettingsView/baselineToSeconds"), m_iBaselineToSeconds);
+    settings.setValue(m_sSettingsPath + QString("/AveragingSettingsView/doBaselineCorrection"), m_bDoBaselineCorrection);
 }
 
 //=============================================================================================================
@@ -290,10 +291,10 @@ void AveragingSettingsView::loadSettings()
     // Load Settings
     QSettings settings("MNECPP");
 
-    m_iPreStimSeconds = settings.value(m_sSettingsPath + QString("/preStimSeconds"), 100).toInt();
-    m_iPostStimSeconds = settings.value(m_sSettingsPath + QString("/postStimSeconds"), 400).toInt();
-    m_iBaselineFromSeconds = settings.value(m_sSettingsPath + QString("/baselineFromSeconds"), 0).toInt();
-    m_iBaselineToSeconds = settings.value(m_sSettingsPath + QString("/baselineToSeconds"), 0).toInt();
+    m_iPreStimSeconds = settings.value(m_sSettingsPath + QString("/AveragingSettingsView/preStimSeconds"), 100).toInt();
+    m_iPostStimSeconds = settings.value(m_sSettingsPath + QString("/AveragingSettingsView/postStimSeconds"), 400).toInt();
+    m_iBaselineFromSeconds = settings.value(m_sSettingsPath + QString("/AveragingSettingsView/baselineFromSeconds"), 0).toInt();
+    m_iBaselineToSeconds = settings.value(m_sSettingsPath + QString("/AveragingSettingsView/baselineToSeconds"), 0).toInt();
 
     if(m_iBaselineFromSeconds < -1 * m_iPreStimSeconds || m_iBaselineFromSeconds > m_iPostStimSeconds) {
         m_iBaselineFromSeconds = -1 * m_iPreStimSeconds;
@@ -303,9 +304,9 @@ void AveragingSettingsView::loadSettings()
         m_iBaselineToSeconds = 0;
     }
 
-    m_iNumAverages = settings.value(m_sSettingsPath + QString("/numAverages"), 10).toInt();
-    m_sCurrentStimChan = settings.value(m_sSettingsPath + QString("/currentStimChannel"), "STI014").toString();
-    m_bDoBaselineCorrection = settings.value(m_sSettingsPath + QString("/doBaselineCorrection"), false).toBool();
+    m_iNumAverages = settings.value(m_sSettingsPath + QString("/AveragingSettingsView/numAverages"), 10).toInt();
+    m_sCurrentStimChan = settings.value(m_sSettingsPath + QString("/AveragingSettingsView/currentStimChannel"), "STI014").toString();
+    m_bDoBaselineCorrection = settings.value(m_sSettingsPath + QString("/AveragingSettingsView/doBaselineCorrection"), false).toBool();
 }
 
 //=============================================================================================================

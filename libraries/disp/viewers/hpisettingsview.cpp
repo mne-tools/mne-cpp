@@ -71,9 +71,10 @@ using namespace FIFFLIB;
 HpiSettingsView::HpiSettingsView(const QString& sSettingsPath,
                                  QWidget *parent,
                                  Qt::WindowFlags f)
-: AbstractView(sSettingsPath, parent, f)
+: AbstractView(parent, f)
 , m_ui(new Ui::HpiSettingsViewWidget)
 {
+    m_sSettingsPath = sSettingsPath;
     m_ui->setupUi(this);
 
     connect(m_ui->m_pushButton_loadDigitizers, &QPushButton::released,
@@ -207,16 +208,16 @@ void HpiSettingsView::saveSettings()
     QVariant data;
 
     data.setValue(m_vCoilFreqs);
-    settings.setValue(m_sSettingsPath + QString("/coilFreqs"), data);
+    settings.setValue(m_sSettingsPath + QString("/HpiSettingsView/coilFreqs"), data);
 
     data.setValue(m_ui->m_checkBox_useSSP->isChecked());
-    settings.setValue(m_sSettingsPath + QString("/useSSP"), data);
+    settings.setValue(m_sSettingsPath + QString("/HpiSettingsView/useSSP"), data);
 
     data.setValue(m_ui->m_checkBox_useComp->isChecked());
-    settings.setValue(m_sSettingsPath + QString("/useCOMP"), data);
+    settings.setValue(m_sSettingsPath + QString("/HpiSettingsView/useCOMP"), data);
 
     data.setValue(m_ui->m_doubleSpinBox_maxHPIContinousDist->value());
-    settings.setValue(m_sSettingsPath + QString("/maxError"), data);
+    settings.setValue(m_sSettingsPath + QString("/HpiSettingsView/maxError"), data);
 }
 
 //=============================================================================================================
@@ -231,12 +232,12 @@ void HpiSettingsView::loadSettings()
     QVariant defaultData;
 
     defaultData.setValue(m_vCoilFreqs);
-    m_vCoilFreqs = settings.value(m_sSettingsPath + QString("/coilFreqs"), defaultData).value<QVector<int> >();
+    m_vCoilFreqs = settings.value(m_sSettingsPath + QString("/HpiSettingsView/coilFreqs"), defaultData).value<QVector<int> >();
     emit coilFrequenciesChanged(m_vCoilFreqs);
 
-    m_ui->m_checkBox_useSSP->setChecked(settings.value(m_sSettingsPath + QString("/useSSP"), false).toBool());
-    m_ui->m_checkBox_useComp->setChecked(settings.value(m_sSettingsPath + QString("/useCOMP"), false).toBool());
-    m_ui->m_doubleSpinBox_maxHPIContinousDist->setValue(settings.value(m_sSettingsPath + QString("/maxError"), 10.0).toDouble());
+    m_ui->m_checkBox_useSSP->setChecked(settings.value(m_sSettingsPath + QString("/HpiSettingsView/useSSP"), false).toBool());
+    m_ui->m_checkBox_useComp->setChecked(settings.value(m_sSettingsPath + QString("/HpiSettingsView/useCOMP"), false).toBool());
+    m_ui->m_doubleSpinBox_maxHPIContinousDist->setValue(settings.value(m_sSettingsPath + QString("/HpiSettingsView/maxError"), 10.0).toDouble());
 }
 
 //=============================================================================================================

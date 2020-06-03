@@ -65,8 +65,9 @@ using namespace DISPLIB;
 SpectrumSettingsView::SpectrumSettingsView(const QString& sSettingsPath,
                                            QWidget *parent,
                                            Qt::WindowFlags f)
-: AbstractView(sSettingsPath, parent, f)
+: AbstractView(parent, f)
 {
+    m_sSettingsPath = sSettingsPath;
     this->setWindowTitle("Spectrum Settings");
 
     QGridLayout* t_pGridLayout = new QGridLayout;
