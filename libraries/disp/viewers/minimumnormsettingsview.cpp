@@ -58,9 +58,10 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MinimumNormSettingsView::MinimumNormSettingsView(QWidget *parent,
+MinimumNormSettingsView::MinimumNormSettingsView(const QString& sSettingsPath,
+                                                 QWidget *parent,
                                                  Qt::WindowFlags f)
-: QWidget(parent, f)
+: AbstractView(sSettingsPath, parent, f)
 , ui(new Ui::MinimumNormSettingsViewWidget)
 {
     ui->setupUi(this);

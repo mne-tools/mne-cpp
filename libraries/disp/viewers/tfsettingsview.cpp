@@ -63,13 +63,12 @@ using namespace DISPLIB;
 TfSettingsView::TfSettingsView(const QString& sSettingsPath,
                                QWidget *parent,
                                Qt::WindowFlags f)
-: QWidget(parent, f)
+: AbstractView(sSettingsPath, parent, f)
 , ui(new Ui::TfSettingsViewWidget)
-, m_sSettingsPath(sSettingsPath)
 {
     ui->setupUi(this);
 
-    loadSettings(m_sSettingsPath);
+    loadSettings();
 
     connect(ui->m_spinBox_trialNumber, static_cast<void (QSpinBox::*)(const QString&)>(&QSpinBox::valueChanged),
             this, &TfSettingsView::onNumberTrialRowChanged);
@@ -86,31 +85,31 @@ TfSettingsView::TfSettingsView(const QString& sSettingsPath,
 
 TfSettingsView::~TfSettingsView()
 {
-    saveSettings(m_sSettingsPath);
+    saveSettings();
 
     delete ui;
 }
 
 //=============================================================================================================
 
-void TfSettingsView::saveSettings(const QString& settingsPath)
+void TfSettingsView::saveSettings()
 {
-    if(settingsPath.isEmpty()) {
+    if(m_sSettingsPath.isEmpty()) {
         return;
     }
 
-    QSettings settings;
+    QSettings settings("MNECPP");
 }
 
 //=============================================================================================================
 
-void TfSettingsView::loadSettings(const QString& settingsPath)
+void TfSettingsView::loadSettings()
 {
-    if(settingsPath.isEmpty()) {
+    if(m_sSettingsPath.isEmpty()) {
         return;
     }
 
-    QSettings settings;
+    QSettings settings("MNECPP");
 }
 
 //=============================================================================================================
@@ -118,6 +117,6 @@ void TfSettingsView::loadSettings(const QString& settingsPath)
 void TfSettingsView::onNumberTrialRowChanged()
 {
     emit numberTrialRowChanged(ui->m_spinBox_trialNumber->value(), ui->m_spinBox_rowNumber->value());
-    saveSettings(m_sSettingsPath);
+    saveSettings();
 }
 

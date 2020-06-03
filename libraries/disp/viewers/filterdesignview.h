@@ -41,6 +41,7 @@
 //=============================================================================================================
 
 #include "../disp_global.h"
+#include "abstractview.h"
 
 #include <utils/filterTools/filterdata.h>
 
@@ -48,7 +49,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
 #include <QPointer>
 
 //=============================================================================================================
@@ -83,7 +83,7 @@ class FilterPlotScene;
  *
  * @brief The FilterDesignView class provides the a manager for temporal filtering.
  */
-class DISPSHARED_EXPORT FilterDesignView : public QWidget
+class DISPSHARED_EXPORT FilterDesignView : public AbstractView
 {
     Q_OBJECT
 
@@ -184,14 +184,13 @@ public:
      */
     bool userDesignedFiltersIsActive();
 
-protected:
     //=========================================================================================================
     /**
      * Saves all important settings of this view via QSettings.
      *
      * @param[in] settingsPath        the path to store the settings to.
      */
-    void saveSettings(const QString& settingsPath);
+    void saveSettings();
 
     //=========================================================================================================
     /**
@@ -199,8 +198,9 @@ protected:
      *
      * @param[in] settingsPath        the path to load the settings from.
      */
-    void loadSettings(const QString& settingsPath);
+    void loadSettings();
 
+protected:
     //=========================================================================================================
     /**
      * inits all spin boxes.

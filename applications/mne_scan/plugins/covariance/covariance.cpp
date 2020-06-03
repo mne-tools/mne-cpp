@@ -104,7 +104,7 @@ QSharedPointer<IPlugin> Covariance::clone() const
 void Covariance::init()
 {
     // Load Settings
-    QSettings settings;
+    QSettings settings("MNECPP");
     m_iEstimationSamples = settings.value(QString("MNESCAN/%1/estimationSamples").arg(this->getName()), 5000).toInt();
 
     // Input
@@ -145,7 +145,7 @@ void Covariance::initPluginControlWidgets()
 void Covariance::unload()
 {
     // Store Settings
-    QSettings settings;
+    QSettings settings("MNECPP");
     settings.setValue(QString("MNESCAN/%1/estimationSamples").arg(this->getName()), m_iEstimationSamples);
 }
 

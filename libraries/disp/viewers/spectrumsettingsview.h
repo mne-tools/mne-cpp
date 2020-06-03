@@ -41,12 +41,12 @@
 //=============================================================================================================
 
 #include "../disp_global.h"
+#include "abstractview.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
 #include <QPointer>
 
 //=============================================================================================================
@@ -72,7 +72,7 @@ namespace DISPLIB
  *
  * @brief The SpectrumSettingsView class provides settings for the spectrum estimation
  */
-class DISPSHARED_EXPORT SpectrumSettingsView : public QWidget
+class DISPSHARED_EXPORT SpectrumSettingsView : public AbstractView
 {
     Q_OBJECT
 
@@ -86,7 +86,8 @@ public:
      *
      * @param [in] parent    parent of widget
      */
-    SpectrumSettingsView(QWidget *parent,
+    SpectrumSettingsView(const QString& sSettingsPath = "",
+                         QWidget *parent = Q_NULLPTR,
                          Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================

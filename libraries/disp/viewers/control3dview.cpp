@@ -67,10 +67,11 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Control3DView::Control3DView(QWidget* parent,
+Control3DView::Control3DView(const QString& sSettingsPath,
+                             QWidget* parent,
                              const QStringList& slFlags,
                              Qt::WindowType type)
-: QWidget(parent, type)
+: AbstractView(sSettingsPath, parent, type)
 , ui(new Ui::Control3DViewWidget)
 , m_colCurrentSceneColor(QColor(0,0,0))
 , m_colCurrentLightColor(QColor(255,255,255))

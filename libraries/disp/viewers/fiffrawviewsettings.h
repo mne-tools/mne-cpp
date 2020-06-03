@@ -40,12 +40,12 @@
 //=============================================================================================================
 
 #include "../disp_global.h"
+#include "abstractview.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
 #include <QStringList>
 
 //=============================================================================================================
@@ -77,7 +77,7 @@ namespace DISPLIB
  *
  * @brief The FiffRawViewSettings class provides a view to select different channel data view dependent settings
  */
-class DISPSHARED_EXPORT FiffRawViewSettings : public QWidget
+class DISPSHARED_EXPORT FiffRawViewSettings : public AbstractView
 {
     Q_OBJECT
 
@@ -92,8 +92,8 @@ public:
      * @param [in] parent        parent of widget
      */
     FiffRawViewSettings(const QString& sSettingsPath = "",
-                            QWidget *parent = 0,
-                            Qt::WindowFlags f = Qt::Widget);
+                        QWidget *parent = 0,
+                        Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**
@@ -190,14 +190,13 @@ public:
      */
     int getWindowSize();
 
-protected:
     //=========================================================================================================
     /**
      * Saves all important settings of this view via QSettings.
      *
      * @param[in] settingsPath        the path to store the settings to.
      */
-    void saveSettings(const QString& settingsPath);
+    void saveSettings();
 
     //=========================================================================================================
     /**
@@ -205,8 +204,9 @@ protected:
      *
      * @param[in] settingsPath        the path to load the settings from.
      */
-    void loadSettings(const QString& settingsPath);
+    void loadSettings();
 
+protected:
     //=========================================================================================================
     /**
      * Slot called when time window size changes

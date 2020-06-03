@@ -68,15 +68,14 @@ using namespace FIFFLIB;
 CompensatorView::CompensatorView(const QString& sSettingsPath,
                                  QWidget *parent,
                                  Qt::WindowFlags f)
-: QWidget(parent, f)
-, m_sSettingsPath(sSettingsPath)
+: AbstractView(sSettingsPath, parent, f)
 , m_iLastTo(0)
 {
     this->setWindowTitle("Compensators");
     this->setMinimumWidth(330);
     this->setMaximumWidth(330);
 
-    loadSettings(m_sSettingsPath);
+    loadSettings();
     redrawGUI();
 }
 
@@ -84,7 +83,7 @@ CompensatorView::CompensatorView(const QString& sSettingsPath,
 
 CompensatorView::~CompensatorView()
 {
-    saveSettings(m_sSettingsPath);
+    saveSettings();
 }
 
 //=============================================================================================================
@@ -107,6 +106,47 @@ void CompensatorView::setCompensators(const QList<FIFFLIB::FiffCtfComp>& comps)
     }
 
     redrawGUI();
+}
+
+//=============================================================================================================
+
+void CompensatorView::saveSettings()
+{
+    if(m_sSettingsPath.isEmpty()) {
+        return;
+    }
+
+    QSettings settings("MNECPP");
+
+    settings.beginGroup(m_sSettingsPath + QString("/compensatorActive"));
+
+    QMap<int,bool>::const_iterator iComp = m_mapCompActive.constBegin();
+    while (iComp != m_mapCompActive.constEnd()) {
+         settings.setValue(QString::number(iComp.key()), iComp.value());
+         ++iComp;
+    }
+
+    settings.endGroup();
+}
+
+//=============================================================================================================
+
+void CompensatorView::loadSettings()
+{
+    if(m_sSettingsPath.isEmpty()) {
+        return;
+    }
+
+    QSettings settings("MNECPP");
+
+    settings.beginGroup(m_sSettingsPath + QString("/compensatorActive"));
+
+    QStringList keys = settings.childKeys();
+    foreach (QString key, keys) {
+        m_mapCompActive[key.toInt()] = settings.value(key).toBool();
+    }
+
+    settings.endGroup();
 }
 
 //=============================================================================================================
@@ -149,47 +189,6 @@ void CompensatorView::redrawGUI()
 
 //=============================================================================================================
 
-void CompensatorView::saveSettings(const QString& settingsPath)
-{
-    if(settingsPath.isEmpty()) {
-        return;
-    }
-
-    QSettings settings;
-
-    settings.beginGroup(settingsPath + QString("/compensatorActive"));
-
-    QMap<int,bool>::const_iterator iComp = m_mapCompActive.constBegin();
-    while (iComp != m_mapCompActive.constEnd()) {
-         settings.setValue(QString::number(iComp.key()), iComp.value());
-         ++iComp;
-    }
-
-    settings.endGroup();
-}
-
-//=============================================================================================================
-
-void CompensatorView::loadSettings(const QString& settingsPath)
-{
-    if(settingsPath.isEmpty()) {
-        return;
-    }
-
-    QSettings settings;
-
-    settings.beginGroup(settingsPath + QString("/compensatorActive"));
-
-    QStringList keys = settings.childKeys();
-    foreach (QString key, keys) {
-        m_mapCompActive[key.toInt()] = settings.value(key).toBool();
-    }
-
-    settings.endGroup();
-}
-
-//=============================================================================================================
-
 void CompensatorView::onCheckCompStatusChanged()
 {    
    if(QCheckBox* pCheckBox = qobject_cast<QCheckBox*>(sender())) {
@@ -215,5 +214,5 @@ void CompensatorView::onCheckCompStatusChanged()
         }
    }
 
-   saveSettings(m_sSettingsPath);
+   saveSettings();
 }

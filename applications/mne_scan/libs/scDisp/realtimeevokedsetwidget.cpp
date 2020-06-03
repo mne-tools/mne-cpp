@@ -149,7 +149,7 @@ RealTimeEvokedSetWidget::~RealTimeEvokedSetWidget()
     // Store Settings
     if(!m_pRTESet->getName().isEmpty())
     {
-        QSettings settings;
+        QSettings settings("MNECPP");
 
         //Store current view toolbox index - butterfly or 2D layout
         if(m_pToolBox) {
@@ -199,7 +199,7 @@ void RealTimeEvokedSetWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 void RealTimeEvokedSetWidget::initDisplayControllWidgets()
 {
     if(m_pFiffInfo) {
-        QSettings settings;
+        QSettings settings("MNECPP");
         QString t_sRTESName = m_pRTESet->getName();
 
         //Initialize leftover scalars to default values

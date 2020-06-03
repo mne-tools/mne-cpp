@@ -106,8 +106,8 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager
 #endif
 
     //Load saved GUI geometry and state
-    restoreSettings();
-    m_pMultiView->restoreSettings();
+    loadSettings();
+    m_pMultiView->loadSettings();
 }
 
 //=============================================================================================================
@@ -170,6 +170,30 @@ void MainWindow::writeToLog(QtMsgType type,
     m_pTextBrowser_Log->setTextCursor(c);
 
     m_pTextBrowser_Log->verticalScrollBar()->setValue(m_pTextBrowser_Log->verticalScrollBar()->maximum());
+}
+
+//=============================================================================================================
+
+void MainWindow::saveSettings()
+{
+    QSettings settings("MNECPP", "ANALYZEWINDOW");
+
+    settings.beginGroup("layout");
+    settings.setValue("geometry", saveGeometry());
+    settings.setValue("state", saveState());
+    settings.endGroup();
+}
+
+//=============================================================================================================
+
+void MainWindow::loadSettings()
+{
+    QSettings settings("MNECPP", "ANALYZEWINDOW");
+
+    settings.beginGroup("layout");
+    restoreGeometry(settings.value("geometry").toByteArray());
+    restoreState(settings.value("state").toByteArray());
+    settings.endGroup();
 }
 
 //=============================================================================================================
@@ -376,7 +400,7 @@ void MainWindow::createPluginViews(QSharedPointer<PluginManager> pPluginManager)
             qInfo() << "[MainWindow::createPluginViews] Found and added subwindow for " << pPlugin->getName();
         }
     }
-    //m_pMultiView->restoreSettings();
+    //m_pMultiView->loadSettings();
 }
 
 //=============================================================================================================
@@ -506,28 +530,4 @@ void MainWindow::about()
     }
 
     m_pAboutWindow->show();
-}
-
-//=============================================================================================================
-
-void MainWindow::saveSettings()
-{
-    QSettings settings("MNECPP", "ANALYZEWINDOW");
-
-    settings.beginGroup("layout");
-    settings.setValue("geometry", saveGeometry());
-    settings.setValue("state", saveState());
-    settings.endGroup();
-}
-
-//=============================================================================================================
-
-void MainWindow::restoreSettings()
-{
-    QSettings settings("MNECPP", "ANALYZEWINDOW");
-
-    settings.beginGroup("layout");
-    restoreGeometry(settings.value("geometry").toByteArray());
-    restoreState(settings.value("state").toByteArray());
-    settings.endGroup();
 }

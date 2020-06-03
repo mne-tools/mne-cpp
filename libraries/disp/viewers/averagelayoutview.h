@@ -40,12 +40,12 @@
 //=============================================================================================================
 
 #include "../disp_global.h"
+#include "abstractview.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
 #include <QPointer>
 #include <QMap>
 
@@ -81,7 +81,7 @@ class ChannelInfoModel;
  *
  * @brief The AverageLayoutView class provides a widget for a 2D average layout
  */
-class DISPSHARED_EXPORT AverageLayoutView : public QWidget
+class DISPSHARED_EXPORT AverageLayoutView : public AbstractView
 {
     Q_OBJECT
 
@@ -95,7 +95,8 @@ public:
      *
      * @param [in] parent    parent of widget
      */
-    AverageLayoutView(QWidget *parent = 0,
+    AverageLayoutView(const QString& sSettingsPath = "",
+                      QWidget *parent = 0,
                       Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
@@ -198,6 +199,22 @@ public:
      * call this function whenever the items' data needs to be updated
      */
     void updateData();
+
+    //=========================================================================================================
+    /**
+     * Saves all important settings of this view via QSettings.
+     *
+     * @param[in] settingsPath        the path to store the settings to.
+     */
+    void saveSettings();
+
+    //=========================================================================================================
+    /**
+     * Loads and inits all important settings of this view via QSettings.
+     *
+     * @param[in] settingsPath        the path to load the settings from.
+     */
+    void loadSettings();
 
 protected:
     QSharedPointer<AverageScene>                                m_pAverageScene;            /**< The pointer to the average scene. */

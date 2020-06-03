@@ -70,8 +70,7 @@ using namespace FIFFLIB;
 ScalingView::ScalingView(const QString& sSettingsPath,
                          QWidget *parent,
                          Qt::WindowFlags f)
-: QWidget(parent, f)
-, m_sSettingsPath(sSettingsPath)
+: AbstractView(sSettingsPath, parent, f)
 , m_ui(new Ui::ScalingViewWidget)
 {
     m_ui->setupUi(this);
@@ -80,7 +79,7 @@ ScalingView::ScalingView(const QString& sSettingsPath,
     this->setMinimumWidth(330);
     //this->setMaximumWidth(330);
 
-    loadSettings(m_sSettingsPath);
+    loadSettings();
     redrawGUI();
 }
 
@@ -88,7 +87,7 @@ ScalingView::ScalingView(const QString& sSettingsPath,
 
 ScalingView::~ScalingView()
 {
-    saveSettings(m_sSettingsPath);
+    saveSettings();
 }
 
 //=============================================================================================================
@@ -105,6 +104,70 @@ void ScalingView::setScaleMap(const QMap<qint32,float>& qMapChScaling)
     m_qMapChScaling = qMapChScaling;
 
     redrawGUI();
+}
+
+//=============================================================================================================
+
+void ScalingView::saveSettings()
+{
+    if(m_sSettingsPath.isEmpty()) {
+        return;
+    }
+
+    QSettings settings("MNECPP");
+
+    if(m_qMapChScaling.contains(FIFF_UNIT_T)) {
+        settings.setValue(m_sSettingsPath + QString("/scaleMAG"), m_qMapChScaling[FIFF_UNIT_T]);
+    }
+
+    if(m_qMapChScaling.contains(FIFF_UNIT_T_M)) {
+        settings.setValue(m_sSettingsPath + QString("/scaleGRAD"), m_qMapChScaling[FIFF_UNIT_T_M]);
+    }
+
+    if(m_qMapChScaling.contains(FIFFV_EEG_CH)) {
+        settings.setValue(m_sSettingsPath + QString("/scaleEEG"), m_qMapChScaling[FIFFV_EEG_CH]);
+    }
+
+    if(m_qMapChScaling.contains(FIFFV_EOG_CH)) {
+        settings.setValue(m_sSettingsPath + QString("/scaleEOG"), m_qMapChScaling[FIFFV_EOG_CH]);
+    }
+
+    if(m_qMapChScaling.contains(FIFFV_STIM_CH)) {
+        settings.setValue(m_sSettingsPath + QString("/scaleSTIM"), m_qMapChScaling[FIFFV_STIM_CH]);
+    }
+
+    if(m_qMapChScaling.contains(FIFFV_MISC_CH)) {
+        settings.setValue(m_sSettingsPath + QString("/scaleMISC"), m_qMapChScaling[FIFFV_MISC_CH]);
+    }
+}
+
+//=============================================================================================================
+
+void ScalingView::loadSettings()
+{
+    if(m_sSettingsPath.isEmpty()) {
+        return;
+    }
+
+    QSettings settings("MNECPP");
+
+    float val = settings.value(m_sSettingsPath + QString("/scaleMAG"), 1e-11f).toFloat();
+    m_qMapChScaling.insert(FIFF_UNIT_T, val);
+
+    val = settings.value(m_sSettingsPath + QString("/scaleGRAD"), 1e-10f).toFloat();
+    m_qMapChScaling.insert(FIFF_UNIT_T_M, val);
+
+    val = settings.value(m_sSettingsPath + QString("/scaleEEG"), 1e-4f).toFloat();
+    m_qMapChScaling.insert(FIFFV_EEG_CH, val);
+
+    val = settings.value(m_sSettingsPath + QString("/scaleEOG"), 1e-3f).toFloat();
+    m_qMapChScaling.insert(FIFFV_EOG_CH, val);
+
+    val = settings.value(m_sSettingsPath + QString("/scaleSTIM"), 1e-3f).toFloat();
+    m_qMapChScaling.insert(FIFFV_STIM_CH, val);
+
+    val = settings.value(m_sSettingsPath + QString("/scaleMISC"), 1e-3f).toFloat();
+    m_qMapChScaling.insert(FIFFV_MISC_CH, val);
 }
 
 //=============================================================================================================
@@ -331,70 +394,6 @@ void ScalingView::redrawGUI()
 
 //=============================================================================================================
 
-void ScalingView::saveSettings(const QString& settingsPath)
-{
-    if(settingsPath.isEmpty()) {
-        return;
-    }
-
-    QSettings settings;
-
-    if(m_qMapChScaling.contains(FIFF_UNIT_T)) {
-        settings.setValue(settingsPath + QString("/scaleMAG"), m_qMapChScaling[FIFF_UNIT_T]);
-    }
-
-    if(m_qMapChScaling.contains(FIFF_UNIT_T_M)) {
-        settings.setValue(settingsPath + QString("/scaleGRAD"), m_qMapChScaling[FIFF_UNIT_T_M]);
-    }
-
-    if(m_qMapChScaling.contains(FIFFV_EEG_CH)) {
-        settings.setValue(settingsPath + QString("/scaleEEG"), m_qMapChScaling[FIFFV_EEG_CH]);
-    }
-
-    if(m_qMapChScaling.contains(FIFFV_EOG_CH)) {
-        settings.setValue(settingsPath + QString("/scaleEOG"), m_qMapChScaling[FIFFV_EOG_CH]);
-    }
-
-    if(m_qMapChScaling.contains(FIFFV_STIM_CH)) {
-        settings.setValue(settingsPath + QString("/scaleSTIM"), m_qMapChScaling[FIFFV_STIM_CH]);
-    }
-
-    if(m_qMapChScaling.contains(FIFFV_MISC_CH)) {
-        settings.setValue(settingsPath + QString("/scaleMISC"), m_qMapChScaling[FIFFV_MISC_CH]);
-    }
-}
-
-//=============================================================================================================
-
-void ScalingView::loadSettings(const QString& settingsPath)
-{
-    if(settingsPath.isEmpty()) {
-        return;
-    }
-
-    QSettings settings;
-
-    float val = settings.value(settingsPath + QString("/scaleMAG"), 1e-11f).toFloat();
-    m_qMapChScaling.insert(FIFF_UNIT_T, val);
-
-    val = settings.value(settingsPath + QString("/scaleGRAD"), 1e-10f).toFloat();
-    m_qMapChScaling.insert(FIFF_UNIT_T_M, val);
-
-    val = settings.value(settingsPath + QString("/scaleEEG"), 1e-4f).toFloat();
-    m_qMapChScaling.insert(FIFFV_EEG_CH, val);
-
-    val = settings.value(settingsPath + QString("/scaleEOG"), 1e-3f).toFloat();
-    m_qMapChScaling.insert(FIFFV_EOG_CH, val);
-
-    val = settings.value(settingsPath + QString("/scaleSTIM"), 1e-3f).toFloat();
-    m_qMapChScaling.insert(FIFFV_STIM_CH, val);
-
-    val = settings.value(settingsPath + QString("/scaleMISC"), 1e-3f).toFloat();
-    m_qMapChScaling.insert(FIFFV_MISC_CH, val);
-}
-
-//=============================================================================================================
-
 void ScalingView::onUpdateSpinBoxScaling(double value)
 {
     Q_UNUSED(value)
@@ -457,7 +456,7 @@ void ScalingView::onUpdateSpinBoxScaling(double value)
 
     emit scalingChanged(m_qMapChScaling);
 
-    saveSettings(m_sSettingsPath);
+    saveSettings();
 }
 
 //=============================================================================================================
@@ -522,5 +521,5 @@ void ScalingView::onUpdateSliderScaling(int value)
 
     emit scalingChanged(m_qMapChScaling);
 
-    saveSettings(m_sSettingsPath);
+    saveSettings();
 }

@@ -216,7 +216,7 @@ void WriteToFile::initPluginControlWidgets()
         }
 
         //Test Project
-        QSettings settings;
+        QSettings settings("MNECPP");
         QString sCurrentProject = settings.value(QString("MNESCAN/%1/currentProject").arg(getName()), "TestProject").toString();
         if(!QDir(sMneScanDataPath+"/"+sCurrentProject).exists()) {
             QDir().mkdir(sMneScanDataPath+"/"+sCurrentProject);

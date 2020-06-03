@@ -103,7 +103,7 @@ PluginGui::PluginGui(SCSHAREDLIB::PluginManager *pPluginManager,
     setUnifiedTitleAndToolBarOnMac(true);
 
     //To prevent deadlock on loading with a broken plugin -> save loading state
-    QSettings settings;
+    QSettings settings("MNECPP");
     bool loadingState = settings.value(QString("MNEScan/loadingState"), false).toBool();
 
     if(loadingState)

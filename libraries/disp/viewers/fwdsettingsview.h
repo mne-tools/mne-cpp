@@ -40,6 +40,7 @@
 //=============================================================================================================
 
 #include "../disp_global.h"
+#include "abstractview.h"
 
 #include <fiff/fiff_types.h>
 #include <fs/annotationset.h>
@@ -49,7 +50,6 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
-#include <QWidget>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -79,7 +79,7 @@ namespace DISPLIB
  *
  * @brief The FwdSettingsView class provides a QWidget for the real-time Forward Solution controls.
  */
-class DISPSHARED_EXPORT FwdSettingsView : public QWidget
+class DISPSHARED_EXPORT FwdSettingsView : public AbstractView
 {
     Q_OBJECT
 
@@ -161,15 +161,13 @@ public:
 
     void onClusteringStatusChanged(bool bChecked);
 
-protected:
-
     //=========================================================================================================
     /**
      * Saves all important settings of this view via QSettings.
      *
      * @param[in] settingsPath        the path to store the settings to.
      */
-    void saveSettings(const QString& settingsPath);
+    void saveSettings();
 
     //=========================================================================================================
     /**
@@ -177,8 +175,9 @@ protected:
      *
      * @param[in] settingsPath        the path to load the settings from.
      */
-    void loadSettings(const QString& settingsPath);
+    void loadSettings();
 
+protected:
     bool                                        m_bAnnotaionsLoaded;    /**< If the annotationset is loaded. */
 
     Ui::FwdSettingsViewWidget*                  m_ui;                   /**< The rtFwd dialog. */

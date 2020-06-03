@@ -67,7 +67,7 @@ FtBufferSetupWidget::FtBufferSetupWidget(FtBuffer* toolbox,
 
     this->m_pUi->m_lineEditIP->setText(toolbox->m_pFtBuffProducer->m_pFtConnector->getAddr());
 
-    loadSettings(m_sSettingsPath);
+    loadSettings();
 
     //Always connect GUI elemts after m_pUi->setpUi has been called
     connect(m_pUi->m_qPushButton_Connect, SIGNAL(released()),
@@ -83,7 +83,35 @@ FtBufferSetupWidget::FtBufferSetupWidget(FtBuffer* toolbox,
 
 FtBufferSetupWidget::~FtBufferSetupWidget()
 {
-    saveSettings(m_sSettingsPath);
+    saveSettings();
+}
+
+//=============================================================================================================
+
+void FtBufferSetupWidget::saveSettings()
+{
+    if(m_sSettingsPath.isEmpty()) {
+        return;
+    }
+
+    // Store Settings
+    QSettings settings("MNECPP");
+
+    settings.setValue(m_sSettingsPath + QString("/IP"), m_pUi->m_lineEditIP->text());
+}
+
+//=============================================================================================================
+
+void FtBufferSetupWidget::loadSettings()
+{
+    if(m_sSettingsPath.isEmpty()) {
+        return;
+    }
+
+    // Load Settings
+    QSettings settings("MNECPP");
+
+    m_pUi->m_lineEditIP->setText(settings.value(m_sSettingsPath + QString("/IP"), "127.0.0.1").toString());
 }
 
 //=============================================================================================================
@@ -107,32 +135,4 @@ void FtBufferSetupWidget::isConnected(bool stat)
         msgBox.setText("Unable to find relevant fiff info. Is there header data in the buffer or a fiff file in your bin folder?");
         msgBox.exec();
     }
-}
-
-//=============================================================================================================
-
-void FtBufferSetupWidget::saveSettings(const QString& settingsPath)
-{
-    if(settingsPath.isEmpty()) {
-        return;
-    }
-
-    // Store Settings
-    QSettings settings;
-
-    settings.setValue(settingsPath + QString("/IP"), m_pUi->m_lineEditIP->text());
-}
-
-//=============================================================================================================
-
-void FtBufferSetupWidget::loadSettings(const QString& settingsPath)
-{
-    if(settingsPath.isEmpty()) {
-        return;
-    }
-
-    // Load Settings
-    QSettings settings;
-
-    m_pUi->m_lineEditIP->setText(settings.value(settingsPath + QString("/IP"), "127.0.0.1").toString());
 }

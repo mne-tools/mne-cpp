@@ -108,7 +108,7 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<QT
 
 RealTimeMultiSampleArrayWidget::~RealTimeMultiSampleArrayWidget()
 {
-    QSettings settings;
+    QSettings settings("MNECPP");
 
     if(m_pChannelDataView && m_pRTMSA) {
         settings.setValue(QString("RTMSAW/%1/showHideBad").arg(m_pRTMSA->getName()), m_pChannelDataView->getBadChannelHideStatus());
@@ -155,7 +155,7 @@ void RealTimeMultiSampleArrayWidget::initDisplayControllWidgets()
         this->setMinimumSize(300,50);
 
         // Init channel view
-        QSettings settings;
+        QSettings settings("MNECPP");
         QString sRTMSAWName = m_pRTMSA->getName();
 
         m_pChannelDataView->show();

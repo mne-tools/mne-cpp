@@ -72,10 +72,9 @@ using namespace FSLIB;
 FwdSettingsView::FwdSettingsView(const QString& sSettingsPath,
                                  QWidget *parent,
                                  Qt::WindowFlags f)
-: QWidget(parent, f)
+: AbstractView(sSettingsPath, parent, f)
 , m_bAnnotaionsLoaded(false)
 , m_ui(new Ui::FwdSettingsViewWidget)
-, m_sSettingsPath(sSettingsPath)
 {
     m_ui->setupUi(this);
 
@@ -117,39 +116,39 @@ FwdSettingsView::FwdSettingsView(const QString& sSettingsPath,
             this, &FwdSettingsView::doForwardComputation);
 
     // load settings
-    loadSettings(m_sSettingsPath);
+    loadSettings();
 }
 
 //=============================================================================================================
 
 FwdSettingsView::~FwdSettingsView()
 {
-    saveSettings(m_sSettingsPath);
+    saveSettings();
 
     delete m_ui;
 }
 
 //=============================================================================================================
 
-void FwdSettingsView::loadSettings(const QString& settingsPath)
+void FwdSettingsView::loadSettings()
 {
-    if(settingsPath.isEmpty()) {
+    if(m_sSettingsPath.isEmpty()) {
         return;
     }
 
-    QSettings settings;
+    QSettings settings("MNECPP");
     QVariant defaultData;
 }
 
 //=============================================================================================================
 
-void FwdSettingsView::saveSettings(const QString& settingsPath)
+void FwdSettingsView::saveSettings()
 {
-    if(settingsPath.isEmpty()) {
+    if(m_sSettingsPath.isEmpty()) {
         return;
     }
 
-    QSettings settings;
+    QSettings settings("MNECPP");
     QVariant data;
 }
 

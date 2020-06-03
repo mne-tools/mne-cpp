@@ -65,23 +65,22 @@ using namespace DISPLIB;
 FiffRawViewSettings::FiffRawViewSettings(const QString &sSettingsPath,
                                          QWidget *parent,
                                          Qt::WindowFlags f)
-: QWidget(parent, f)
+: AbstractView(sSettingsPath, parent, f)
 , m_pUi(new Ui::FiffRawViewSettingsWidget)
-, m_sSettingsPath(sSettingsPath)
 {
     m_pUi->setupUi(this);
 
     this->setWindowTitle("Channel Data View Settings");
     this->setMinimumWidth(330);
 
-    loadSettings(m_sSettingsPath);
+    loadSettings();
 }
 
 //=============================================================================================================
 
 FiffRawViewSettings::~FiffRawViewSettings()
 {
-    saveSettings(m_sSettingsPath);
+    saveSettings();
 }
 
 //=============================================================================================================
@@ -225,37 +224,37 @@ int FiffRawViewSettings::getWindowSize()
 
 //=============================================================================================================
 
-void FiffRawViewSettings::saveSettings(const QString& settingsPath)
+void FiffRawViewSettings::saveSettings()
 {
-    if(settingsPath.isEmpty()) {
+    if(m_sSettingsPath.isEmpty()) {
         return;
     }
 
-    QSettings settings;
+    QSettings settings("MNECPP");
 
-    settings.setValue(settingsPath + QString("/viewZoomFactor"), getZoom());
-    settings.setValue(settingsPath + QString("/viewWindowSize"), getWindowSize());
-    settings.setValue(settingsPath + QString("/signalColor"), getSignalColor());
-    settings.setValue(settingsPath + QString("/backgroundColor"), getBackgroundColor());
-    settings.setValue(settingsPath + QString("/distanceTimeSpacer"), getDistanceTimeSpacer());
+    settings.setValue(m_sSettingsPath + QString("/viewZoomFactor"), getZoom());
+    settings.setValue(m_sSettingsPath + QString("/viewWindowSize"), getWindowSize());
+    settings.setValue(m_sSettingsPath + QString("/signalColor"), getSignalColor());
+    settings.setValue(m_sSettingsPath + QString("/backgroundColor"), getBackgroundColor());
+    settings.setValue(m_sSettingsPath + QString("/distanceTimeSpacer"), getDistanceTimeSpacer());
 }
 
 //=============================================================================================================
 
-void FiffRawViewSettings::loadSettings(const QString& settingsPath)
+void FiffRawViewSettings::loadSettings()
 {
-    if(settingsPath.isEmpty()) {
+    if(m_sSettingsPath.isEmpty()) {
         return;
     }
 
-    QSettings settings;
-    setZoom(settings.value(settingsPath + QString("/viewZoomFactor"), 0.3).toDouble());
-    setWindowSize(settings.value(settingsPath + QString("/viewWindowSize"), 10).toInt());
+    QSettings settings("MNECPP");
+    setZoom(settings.value(m_sSettingsPath + QString("/viewZoomFactor"), 0.3).toDouble());
+    setWindowSize(settings.value(m_sSettingsPath + QString("/viewWindowSize"), 10).toInt());
     QColor color = Qt::blue;
-    setSignalColor(settings.value(settingsPath + QString("/signalColor"), color).value<QColor>());
+    setSignalColor(settings.value(m_sSettingsPath + QString("/signalColor"), color).value<QColor>());
     color = Qt::white;
-    setBackgroundColor(settings.value(settingsPath + QString("/backgroundColor"), color).value<QColor>());
-    setDistanceTimeSpacer(settings.value(settingsPath + QString("/distanceTimeSpacer"), 1000).toInt());
+    setBackgroundColor(settings.value(m_sSettingsPath + QString("/backgroundColor"), color).value<QColor>());
+    setDistanceTimeSpacer(settings.value(m_sSettingsPath + QString("/distanceTimeSpacer"), 1000).toInt());
 }
 
 //=============================================================================================================
@@ -282,7 +281,7 @@ void FiffRawViewSettings::onDistanceTimeSpacerChanged(qint32 value)
 
     //emit updateConnectedView();
 
-    saveSettings(m_sSettingsPath);
+    saveSettings();
 }
 
 //=============================================================================================================
@@ -318,7 +317,7 @@ void FiffRawViewSettings::onViewColorButtonClicked()
         emit backgroundColorChanged(m_colCurrentBackgroundColor);
     }
 
-    saveSettings(m_sSettingsPath);
+    saveSettings();
 }
 
 //=============================================================================================================
@@ -327,7 +326,7 @@ void FiffRawViewSettings::onTimeWindowChanged(int value)
 {
     emit timeWindowChanged(value);
 
-    saveSettings(m_sSettingsPath);
+    saveSettings();
 }
 
 //=============================================================================================================
@@ -336,7 +335,7 @@ void FiffRawViewSettings::onZoomChanged(double value)
 {
     emit zoomChanged(value);
 
-    saveSettings(m_sSettingsPath);
+    saveSettings();
 }
 
 //=============================================================================================================

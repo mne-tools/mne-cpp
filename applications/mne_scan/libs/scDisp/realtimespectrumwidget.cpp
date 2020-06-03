@@ -110,7 +110,7 @@ RealTimeSpectrumWidget::~RealTimeSpectrumWidget()
     if(!m_pFS->getName().isEmpty())  {
         QString t_sFSName = m_pFS->getName();
 
-        QSettings settings;
+        QSettings settings("MNECPP");
 
         settings.setValue(QString("FSW/%1/lowerFrqBound").arg(t_sFSName), m_fLowerFrqBound);
         settings.setValue(QString("FSW/%1/upperFrqBound").arg(t_sFSName), m_fUpperFrqBound);
@@ -146,7 +146,7 @@ void RealTimeSpectrumWidget::getData()
 void RealTimeSpectrumWidget::initDisplayControllWidgets()
 {
     if(m_pFS->getFiffInfo()) {
-        QSettings settings;
+        QSettings settings("MNECPP");
         if(!m_pFS->getName().isEmpty()) {
             QString t_sFSName = m_pFS->getName();
             m_fLowerFrqBound = settings.value(QString("FSW/%1/lowerFrqBound").arg(t_sFSName), 0).toFloat();

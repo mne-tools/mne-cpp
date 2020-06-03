@@ -58,9 +58,10 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SpharaSettingsView::SpharaSettingsView(QWidget *parent,
-                         Qt::WindowFlags f)
-: QWidget(parent, f)
+SpharaSettingsView::SpharaSettingsView(const QString& sSettingsPath,
+                                       QWidget *parent,
+                                       Qt::WindowFlags f)
+: AbstractView(sSettingsPath, parent, f)
 , ui(new Ui::SpharaSettingsViewWidget)
 {
     ui->setupUi(this);

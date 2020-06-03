@@ -123,7 +123,7 @@ void BrainAMP::init()
 
     //default values used by the setupGUI class must be set here
 
-    QSettings settings;
+    QSettings settings("MNECPP");
     m_iSamplingFreq = settings.value(QString("BRAINAMP/sFreq"), 1000).toInt();
     m_iSamplesPerBlock = settings.value(QString("BRAINAMP/samplesPerBlock"), 1000).toInt();
     m_bCheckImpedances = false;
@@ -301,7 +301,7 @@ bool BrainAMP::stop()
     m_pCircularBuffer->clear();
 
     //Store settings for next use
-    QSettings settings;
+    QSettings settings("MNECPP");
     settings.setValue(QString("BRAINAMP/sFreq"), m_iSamplingFreq);
     settings.setValue(QString("BRAINAMP/samplesPerBlock"), m_iSamplesPerBlock);
     settings.setValue(QString("BRAINAMP/LPAShift"), m_dLPAShift);

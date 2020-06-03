@@ -40,6 +40,7 @@
 //=============================================================================================================
 
 #include "../disp_global.h"
+#include "abstractview.h"
 
 #include <fiff/fiff_proj.h>
 
@@ -49,7 +50,6 @@
 
 #include <QPointer>
 #include <QMap>
-#include <QWidget>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -91,7 +91,7 @@ class RtFiffRawViewDelegate;
  *
  * @brief The RtFiffRawView class provides a real-time channel view display
  */
-class DISPSHARED_EXPORT RtFiffRawView : public QWidget
+class DISPSHARED_EXPORT RtFiffRawView : public AbstractView
 {    
     Q_OBJECT
 
@@ -373,14 +373,13 @@ public:
      */
     void resetTriggerCounter();
 
-protected:
     //=========================================================================================================
     /**
      * Saves all important settings of this view via QSettings.
      *
      * @param[in] settingsPath        the path to store the settings to.
      */
-    void saveSettings(const QString& settingsPath);
+    void saveSettings();
 
     //=========================================================================================================
     /**
@@ -388,8 +387,9 @@ protected:
      *
      * @param[in] settingsPath        the path to load the settings from.
      */
-    void loadSettings(const QString& settingsPath);
+    void loadSettings();
 
+protected:
     //=========================================================================================================
     /**
      * Show channel context menu

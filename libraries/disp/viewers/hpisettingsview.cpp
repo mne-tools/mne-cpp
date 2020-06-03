@@ -71,9 +71,8 @@ using namespace FIFFLIB;
 HpiSettingsView::HpiSettingsView(const QString& sSettingsPath,
                                  QWidget *parent,
                                  Qt::WindowFlags f)
-: QWidget(parent, f)
+: AbstractView(sSettingsPath, parent, f)
 , m_ui(new Ui::HpiSettingsViewWidget)
-, m_sSettingsPath(sSettingsPath)
 {
     m_ui->setupUi(this);
 
@@ -105,14 +104,14 @@ HpiSettingsView::HpiSettingsView(const QString& sSettingsPath,
     m_vCoilFreqs << 155 << 165 << 190 << 200;
     qRegisterMetaTypeStreamOperators<QVector<int> >("QVector<int>");
 
-    loadSettings(m_sSettingsPath);
+    loadSettings();
 }
 
 //=============================================================================================================
 
 HpiSettingsView::~HpiSettingsView()
 {
-    saveSettings(m_sSettingsPath);
+    saveSettings();
 
     delete m_ui;
 }
@@ -198,46 +197,46 @@ double HpiSettingsView::getAllowedRotationChanged()
 
 //=============================================================================================================
 
-void HpiSettingsView::saveSettings(const QString& settingsPath)
+void HpiSettingsView::saveSettings()
 {
-    if(settingsPath.isEmpty()) {
+    if(m_sSettingsPath.isEmpty()) {
         return;
     }
 
-    QSettings settings;
+    QSettings settings("MNECPP");
     QVariant data;
 
     data.setValue(m_vCoilFreqs);
-    settings.setValue(settingsPath + QString("/coilFreqs"), data);
+    settings.setValue(m_sSettingsPath + QString("/coilFreqs"), data);
 
     data.setValue(m_ui->m_checkBox_useSSP->isChecked());
-    settings.setValue(settingsPath + QString("/useSSP"), data);
+    settings.setValue(m_sSettingsPath + QString("/useSSP"), data);
 
     data.setValue(m_ui->m_checkBox_useComp->isChecked());
-    settings.setValue(settingsPath + QString("/useCOMP"), data);
+    settings.setValue(m_sSettingsPath + QString("/useCOMP"), data);
 
     data.setValue(m_ui->m_doubleSpinBox_maxHPIContinousDist->value());
-    settings.setValue(settingsPath + QString("/maxError"), data);
+    settings.setValue(m_sSettingsPath + QString("/maxError"), data);
 }
 
 //=============================================================================================================
 
-void HpiSettingsView::loadSettings(const QString& settingsPath)
+void HpiSettingsView::loadSettings()
 {
-    if(settingsPath.isEmpty()) {
+    if(m_sSettingsPath.isEmpty()) {
         return;
     }
 
-    QSettings settings;
+    QSettings settings("MNECPP");
     QVariant defaultData;
 
     defaultData.setValue(m_vCoilFreqs);
-    m_vCoilFreqs = settings.value(settingsPath + QString("/coilFreqs"), defaultData).value<QVector<int> >();
+    m_vCoilFreqs = settings.value(m_sSettingsPath + QString("/coilFreqs"), defaultData).value<QVector<int> >();
     emit coilFrequenciesChanged(m_vCoilFreqs);
 
-    m_ui->m_checkBox_useSSP->setChecked(settings.value(settingsPath + QString("/useSSP"), false).toBool());
-    m_ui->m_checkBox_useComp->setChecked(settings.value(settingsPath + QString("/useCOMP"), false).toBool());
-    m_ui->m_doubleSpinBox_maxHPIContinousDist->setValue(settings.value(settingsPath + QString("/maxError"), 10.0).toDouble());
+    m_ui->m_checkBox_useSSP->setChecked(settings.value(m_sSettingsPath + QString("/useSSP"), false).toBool());
+    m_ui->m_checkBox_useComp->setChecked(settings.value(m_sSettingsPath + QString("/useCOMP"), false).toBool());
+    m_ui->m_doubleSpinBox_maxHPIContinousDist->setValue(settings.value(m_sSettingsPath + QString("/maxError"), 10.0).toDouble());
 }
 
 //=============================================================================================================

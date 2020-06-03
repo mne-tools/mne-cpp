@@ -71,9 +71,10 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-AverageLayoutView::AverageLayoutView(QWidget *parent,
+AverageLayoutView::AverageLayoutView(const QString& sSettingsPath,
+                                     QWidget *parent,
                                      Qt::WindowFlags f)
-: QWidget(parent, f)
+: AbstractView(sSettingsPath, parent, f)
 , m_qMapAverageColor(QSharedPointer<QMap<QString, QColor> >::create())
 , m_qMapAverageActivation(QSharedPointer<QMap<QString, bool> >::create())
 {
@@ -299,3 +300,14 @@ void AverageLayoutView::updateData()
     m_pAverageScene->updateScene();
 }
 
+//=============================================================================================================
+
+void AverageLayoutView::saveSettings()
+{
+}
+
+//=============================================================================================================
+
+void AverageLayoutView::loadSettings()
+{
+}

@@ -91,14 +91,14 @@ QuickControlView::QuickControlView(const QString &sSettingsPath,
 
     this->adjustSize();
 
-    loadSettings(m_sSettingsPath);
+    loadSettings();
 }
 
 //=============================================================================================================
 
 QuickControlView::~QuickControlView()
 {
-    saveSettings(m_sSettingsPath);
+    saveSettings();
 
     delete ui;
 }
@@ -272,31 +272,31 @@ void QuickControlView::setVisiblityHideOpacityClose(bool bVisibility)
 
 //=============================================================================================================
 
-void QuickControlView::saveSettings(const QString& settingsPath)
+void QuickControlView::saveSettings()
 {
-    if(settingsPath.isEmpty()) {
+    if(m_sSettingsPath.isEmpty()) {
         return;
     }
 
-    QSettings settings;
+    QSettings settings("MNECPP");
 
-    settings.setValue(settingsPath + QString("/QuickControlViewOpacity"), getOpacityValue());
-    settings.setValue(settingsPath + QString("/QuickControlViewPos"), this->pos());
+    settings.setValue(m_sSettingsPath + QString("/QuickControlViewOpacity"), getOpacityValue());
+    settings.setValue(m_sSettingsPath + QString("/QuickControlViewPos"), this->pos());
 }
 
 //=============================================================================================================
 
-void QuickControlView::loadSettings(const QString& settingsPath)
+void QuickControlView::loadSettings()
 {
-    if(settingsPath.isEmpty()) {
+    if(m_sSettingsPath.isEmpty()) {
         return;
     }
 
-    QSettings settings;
+    QSettings settings("MNECPP");
 
-    setOpacityValue(settings.value(settingsPath + QString("/QuickControlViewOpacity"), 100).toInt());
+    setOpacityValue(settings.value(m_sSettingsPath + QString("/QuickControlViewOpacity"), 100).toInt());
 
-    QPoint pos = settings.value(settingsPath + QString("/QuickControlViewPos"), QPoint(100,100)).toPoint();
+    QPoint pos = settings.value(m_sSettingsPath + QString("/QuickControlViewPos"), QPoint(100,100)).toPoint();
 
     QRect screenRect = QApplication::desktop()->screenGeometry();
     if(!screenRect.contains(pos) && QGuiApplication::screens().size() == 1) {

@@ -95,7 +95,8 @@ public:
     /**
      * The constructor.
      */
-    explicit ButterflyView(QWidget *parent = 0,
+    explicit ButterflyView(const QString& sSettingsPath = "",
+                           QWidget *parent = 0,
                            Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
@@ -257,6 +258,8 @@ protected:
     bool        m_bShowEOG;                     /**< Show EEG channels */
     bool        m_bShowMISC;                    /**< Show Miscellaneous channels */
     bool        m_bIsInit;                      /**< Whether this class has been initialized */
+
+    QString     m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
 
     QColor      m_colCurrentBackgroundColor;    /**< The current background color */
 

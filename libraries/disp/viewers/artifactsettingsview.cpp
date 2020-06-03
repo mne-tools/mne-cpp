@@ -70,8 +70,7 @@ using namespace FIFFLIB;
 ArtifactSettingsView::ArtifactSettingsView(const QString& sSettingsPath,
                                            const QList<FiffChInfo>& fiffChInfoList,
                                            QWidget *parent)
-: QWidget(parent)
-, m_sSettingsPath(sSettingsPath)
+: AbstractView(sSettingsPath, parent)
 , m_fiffChInfoList(fiffChInfoList)
 {
     qRegisterMetaType<QMap<QString,double> >("QMap<QString,double>");
@@ -80,7 +79,7 @@ ArtifactSettingsView::ArtifactSettingsView(const QString& sSettingsPath,
     this->setMinimumWidth(330);
     this->setMaximumWidth(330);
 
-    loadSettings(m_sSettingsPath);
+    loadSettings();
     redrawGUI();
 }
 
@@ -88,7 +87,7 @@ ArtifactSettingsView::ArtifactSettingsView(const QString& sSettingsPath,
 
 ArtifactSettingsView::~ArtifactSettingsView()
 {
-    saveSettings(m_sSettingsPath);
+    saveSettings();
 }
 
 //=============================================================================================================
@@ -127,6 +126,84 @@ bool ArtifactSettingsView::getDoArtifactThresholdRejection()
     }
 
     return false;
+}
+
+//=============================================================================================================
+
+void ArtifactSettingsView::saveSettings()
+{
+    if(m_sSettingsPath.isEmpty()) {
+        return;
+    }
+
+    // Store Settings
+    QSettings settings("MNECPP");
+
+    settings.setValue(m_sSettingsPath + QString("/doArtifactThresholdReduction"), m_bDoArtifactThresholdReduction);
+
+    settings.beginGroup(m_sSettingsPath + QString("/artifactThresholdsFirst"));
+    QMap<QString, double>::const_iterator itrFirst = m_mapThresholdsFirst.constBegin();
+    while (itrFirst != m_mapThresholdsFirst.constEnd()) {
+         settings.setValue(itrFirst.key(), itrFirst.value());
+         ++itrFirst;
+    }
+    settings.endGroup();
+
+    settings.beginGroup(m_sSettingsPath + QString("/artifactThresholdsSecond"));
+    QMap<QString, int>::const_iterator itrSecond = m_mapThresholdsSecond.constBegin();
+    while (itrSecond != m_mapThresholdsSecond.constEnd()) {
+         settings.setValue(itrSecond.key(), itrSecond.value());
+         ++itrSecond;
+    }
+    settings.endGroup();
+}
+
+//=============================================================================================================
+
+void ArtifactSettingsView::loadSettings()
+{
+    if(m_sSettingsPath.isEmpty()) {
+        return;
+    }
+
+    // Load Settings
+    QSettings settings("MNECPP");
+
+    m_bDoArtifactThresholdReduction = settings.value(m_sSettingsPath + QString("/doArtifactThresholdReduction"), false).toBool();
+
+    if(m_bDoArtifactThresholdReduction) {
+        m_mapThresholds["Active"] = 1.0;
+    } else {
+        m_mapThresholds["Active"] = 0.0;
+    }
+
+    m_mapThresholdsFirst["grad"] = 1.0;
+    m_mapThresholdsFirst["mag"] = 1.0;
+    m_mapThresholdsFirst["eeg"] = 1.0;
+    m_mapThresholdsFirst["ecg"] = 1.0;
+    m_mapThresholdsFirst["emg"] = 1.0;
+    m_mapThresholdsFirst["eog"] = 1.0;
+
+    m_mapThresholdsSecond["grad"] = -1;
+    m_mapThresholdsSecond["mag"] = -1;
+    m_mapThresholdsSecond["eeg"] = -1;
+    m_mapThresholdsSecond["ecg"] = -1;
+    m_mapThresholdsSecond["emg"] = -1;
+    m_mapThresholdsSecond["eog"] = -1;
+
+    settings.beginGroup(m_sSettingsPath + QString("/artifactThresholdsFirst"));
+    QStringList keys = settings.childKeys();
+    foreach (QString key, keys) {
+         m_mapThresholdsFirst.insert(key, settings.value(key, 1.0).toDouble());
+    }
+    settings.endGroup();
+
+    settings.beginGroup(m_sSettingsPath + QString("/artifactThresholdsSecond"));
+    keys = settings.childKeys();
+    foreach (QString key, keys) {
+         m_mapThresholdsSecond.insert(key, settings.value(key, -1).toInt());
+    }
+    settings.endGroup();
 }
 
 //=============================================================================================================
@@ -206,84 +283,6 @@ void ArtifactSettingsView::redrawGUI()
 
 //=============================================================================================================
 
-void ArtifactSettingsView::saveSettings(const QString& settingsPath)
-{
-    if(settingsPath.isEmpty()) {
-        return;
-    }
-
-    // Store Settings
-    QSettings settings;
-
-    settings.setValue(settingsPath + QString("/doArtifactThresholdReduction"), m_bDoArtifactThresholdReduction);
-
-    settings.beginGroup(settingsPath + QString("/artifactThresholdsFirst"));
-    QMap<QString, double>::const_iterator itrFirst = m_mapThresholdsFirst.constBegin();
-    while (itrFirst != m_mapThresholdsFirst.constEnd()) {
-         settings.setValue(itrFirst.key(), itrFirst.value());
-         ++itrFirst;
-    }
-    settings.endGroup();
-
-    settings.beginGroup(settingsPath + QString("/artifactThresholdsSecond"));
-    QMap<QString, int>::const_iterator itrSecond = m_mapThresholdsSecond.constBegin();
-    while (itrSecond != m_mapThresholdsSecond.constEnd()) {
-         settings.setValue(itrSecond.key(), itrSecond.value());
-         ++itrSecond;
-    }
-    settings.endGroup();
-}
-
-//=============================================================================================================
-
-void ArtifactSettingsView::loadSettings(const QString& settingsPath)
-{
-    if(settingsPath.isEmpty()) {
-        return;
-    }
-
-    // Load Settings
-    QSettings settings;
-
-    m_bDoArtifactThresholdReduction = settings.value(settingsPath + QString("/doArtifactThresholdReduction"), false).toBool();
-
-    if(m_bDoArtifactThresholdReduction) {
-        m_mapThresholds["Active"] = 1.0;
-    } else {
-        m_mapThresholds["Active"] = 0.0;
-    }
-
-    m_mapThresholdsFirst["grad"] = 1.0;
-    m_mapThresholdsFirst["mag"] = 1.0;
-    m_mapThresholdsFirst["eeg"] = 1.0;
-    m_mapThresholdsFirst["ecg"] = 1.0;
-    m_mapThresholdsFirst["emg"] = 1.0;
-    m_mapThresholdsFirst["eog"] = 1.0;
-
-    m_mapThresholdsSecond["grad"] = -1;
-    m_mapThresholdsSecond["mag"] = -1;
-    m_mapThresholdsSecond["eeg"] = -1;
-    m_mapThresholdsSecond["ecg"] = -1;
-    m_mapThresholdsSecond["emg"] = -1;
-    m_mapThresholdsSecond["eog"] = -1;
-
-    settings.beginGroup(settingsPath + QString("/artifactThresholdsFirst"));
-    QStringList keys = settings.childKeys();
-    foreach (QString key, keys) {
-         m_mapThresholdsFirst.insert(key, settings.value(key, 1.0).toDouble());
-    }
-    settings.endGroup();
-
-    settings.beginGroup(settingsPath + QString("/artifactThresholdsSecond"));
-    keys = settings.childKeys();
-    foreach (QString key, keys) {
-         m_mapThresholdsSecond.insert(key, settings.value(key, -1).toInt());
-    }
-    settings.endGroup();
-}
-
-//=============================================================================================================
-
 void ArtifactSettingsView::onChangeArtifactThreshold()
 {
     m_mapThresholds.clear();
@@ -331,5 +330,5 @@ void ArtifactSettingsView::onChangeArtifactThreshold()
 
     emit changeArtifactThreshold(m_mapThresholds);
 
-    saveSettings(m_sSettingsPath);
+    saveSettings();
 }

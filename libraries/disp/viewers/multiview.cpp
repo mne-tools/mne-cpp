@@ -59,9 +59,11 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MultiView::MultiView(QWidget *parent,
+MultiView::MultiView(const QString& sSettingsPath,
+                     QWidget *parent,
                      Qt::WindowFlags flags)
 : QMainWindow(parent, flags)
+, m_sSettingsPath(sSettingsPath)
 {
     this->setDockNestingEnabled(true);
     if(QWidget* pCentralWidget = this->centralWidget()) {
@@ -141,9 +143,13 @@ MultiViewWindow* MultiView::addWidgetBottom(QWidget* pWidget,
 
 void MultiView::saveSettings()
 {
-    QSettings settings("MNECPP", "ANALYZEWINDOW");
+    if(m_sSettingsPath.isEmpty()) {
+        return;
+    }
 
-    settings.beginGroup("multiview");
+    QSettings settings("MNECPP");
+
+    settings.beginGroup(m_sSettingsPath + QString("/MultiView"));
     settings.setValue("geometry", saveGeometry());
     settings.setValue("state", saveState());
     settings.endGroup();
@@ -151,11 +157,15 @@ void MultiView::saveSettings()
 
 //=============================================================================================================
 
-void MultiView::restoreSettings()
+void MultiView::loadSettings()
 {
-    QSettings settings("MNECPP", "ANALYZEWINDOW");
+    if(m_sSettingsPath.isEmpty()) {
+        return;
+    }
 
-    settings.beginGroup("multiview");
+    QSettings settings("MNECPP");
+
+    settings.beginGroup(m_sSettingsPath + QString("/MultiView"));
     restoreGeometry(settings.value("geometry").toByteArray());
     restoreState(settings.value("state").toByteArray());
     settings.endGroup();

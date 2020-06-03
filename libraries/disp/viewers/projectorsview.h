@@ -40,12 +40,12 @@
 //=============================================================================================================
 
 #include "../disp_global.h"
+#include "abstractview.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
 #include <QMap>
 
 //=============================================================================================================
@@ -79,7 +79,7 @@ namespace DISPLIB
  *
  * @brief The ProjectorsView class provides a view to select projectors
  */
-class DISPSHARED_EXPORT ProjectorsView : public QWidget
+class DISPSHARED_EXPORT ProjectorsView : public AbstractView
 {
     Q_OBJECT
 
@@ -119,7 +119,6 @@ public:
      */
     void setProjectors(const QList<FIFFLIB::FiffProj>& projs);
 
-protected:
     //=========================================================================================================
     /**
      * Redraw the view.
@@ -132,15 +131,16 @@ protected:
      *
      * @param[in] settingsPath        the path to store the settings to.
      */
-    void saveSettings(const QString& settingsPath);
+    void saveSettings();
 
+protected:
     //=========================================================================================================
     /**
      * Loads and inits all important settings of this view via QSettings.
      *
      * @param[in] settingsPath        the path to load the settings from.
      */
-    void loadSettings(const QString& settingsPath);
+    void loadSettings();
 
     //=========================================================================================================
     /**

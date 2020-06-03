@@ -76,15 +76,14 @@ using namespace Eigen;
 //=============================================================================================================
 
 RtFiffRawView::RtFiffRawView(const QString& sSettingsPath,
-                                 QWidget *parent,
-                                 Qt::WindowFlags f)
-: QWidget(parent, f)
+                             QWidget *parent,
+                             Qt::WindowFlags f)
+: AbstractView(sSettingsPath, parent, f)
 , m_iT(10)
 , m_fSamplingRate(1024)
 , m_fDefaultSectionSize(80.0f)
 , m_fZoomFactor(1.0f)
 , m_bHideBadChannels(false)
-, m_sSettingsPath(sSettingsPath)
 , m_iDistanceTimeSpacer(1)
 {
     m_pTableView = new QTableView;
@@ -103,14 +102,14 @@ RtFiffRawView::RtFiffRawView(const QString& sSettingsPath,
     neLayout->setContentsMargins(0,0,0,0);
     this->setLayout(neLayout);
 
-    loadSettings(m_sSettingsPath);
+    loadSettings();
 }
 
 //=============================================================================================================
 
 RtFiffRawView::~RtFiffRawView()
 {
-    saveSettings(m_sSettingsPath);
+    saveSettings();
 }
 
 //=============================================================================================================
@@ -129,7 +128,7 @@ void RtFiffRawView::updateOpenGLViewport()
 void RtFiffRawView::setSettingsPath(const QString& sSettingsPath)
 {
     m_sSettingsPath = sSettingsPath;
-    loadSettings(m_sSettingsPath);
+    loadSettings();
 }
 
 //=============================================================================================================
@@ -476,24 +475,24 @@ void RtFiffRawView::resetTriggerCounter()
 
 //=============================================================================================================
 
-void RtFiffRawView::saveSettings(const QString& settingsPath)
+void RtFiffRawView::saveSettings()
 {
-    if(settingsPath.isEmpty()) {
+    if(m_sSettingsPath.isEmpty()) {
         return;
     }
 
-    QSettings settings;
+    QSettings settings("MNECPP");
 }
 
 //=============================================================================================================
 
-void RtFiffRawView::loadSettings(const QString& settingsPath)
+void RtFiffRawView::loadSettings()
 {
-    if(settingsPath.isEmpty()) {
+    if(m_sSettingsPath.isEmpty()) {
         return;
     }
 
-    QSettings settings;
+    QSettings settings("MNECPP");
 }
 
 //=============================================================================================================

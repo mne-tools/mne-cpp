@@ -41,12 +41,11 @@
 //=============================================================================================================
 
 #include "../disp_global.h"
+#include "abstractview.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-
-#include <QDialog>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -77,12 +76,13 @@ namespace DISPLIB
  *
  * @brief The ProjectSettingsView class provides a viewer to setup and manage the file name before the acquisition starts.
  */
-class DISPSHARED_EXPORT ProjectSettingsView : public QDialog
+class DISPSHARED_EXPORT ProjectSettingsView : public AbstractView
 {
     Q_OBJECT
 
 public:
-    explicit ProjectSettingsView(const QString& sDataPath = "/TestData",
+    explicit ProjectSettingsView(const QString& sSettingsPath = "",
+                                 const QString& sDataPath = "/TestData",
                                  const QString& sCurrentProject = "TestProject",
                                  const QString& sCurrentSubject = "TestSubject",
                                  const QString& sCurrentParadigm = "UnknownParadigm",
