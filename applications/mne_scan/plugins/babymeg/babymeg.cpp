@@ -136,7 +136,7 @@ void BabyMEG::init()
     }
 
     //Test Project
-    QSettings settings;
+    QSettings settings("MNECPP");
     QString sCurrentProject = settings.value(QString("Plugin/%1/currentProject").arg(getName()), "TestProject").toString();
     if(!QDir(sBabyMEGDataPath+"/"+sCurrentProject).exists()) {
         QDir().mkdir(sBabyMEGDataPath+"/"+sCurrentProject);

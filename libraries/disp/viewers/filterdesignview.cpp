@@ -79,14 +79,13 @@ using namespace UTILSLIB;
 //=============================================================================================================
 
 FilterDesignView::FilterDesignView(const QString& sSettingsPath,
-                       QWidget *parent,
-                       Qt::WindowFlags f)
-: QWidget(parent, f)
+                                   QWidget *parent,
+                                   Qt::WindowFlags f)
+: AbstractView(sSettingsPath, parent, f)
 , m_pUi(new Ui::FilterDesignViewWidget)
 , m_iWindowSize(4016)
 , m_iFilterTaps(512)
 , m_dSFreq(600)
-, m_sSettingsPath(sSettingsPath)
 {
     m_pUi->setupUi(this);
 
@@ -95,14 +94,14 @@ FilterDesignView::FilterDesignView(const QString& sSettingsPath,
     initComboBoxes();
     initFilterPlot();
 
-    loadSettings(m_sSettingsPath);
+    loadSettings();
 }
 
 //=============================================================================================================
 
 FilterDesignView::~FilterDesignView()
 {
-    saveSettings(m_sSettingsPath);
+    saveSettings();
 
     delete m_pUi;
 }
@@ -224,42 +223,42 @@ QString FilterDesignView::getChannelType()
 
 //=============================================================================================================
 
-void FilterDesignView::saveSettings(const QString& settingsPath)
+void FilterDesignView::saveSettings()
 {
-    if(settingsPath.isEmpty()) {
+    if(m_sSettingsPath.isEmpty()) {
         return;
     }
 
-    QSettings settings;
+    QSettings settings("MNECPP");
 
-    settings.setValue(settingsPath + QString("/FilterDesignView/filterFrom"), m_filterData.m_dHighpassFreq);
-    settings.setValue(settingsPath + QString("/FilterDesignView/filterTo"), m_filterData.m_dLowpassFreq);
-    settings.setValue(settingsPath + QString("/FilterDesignView/filterOrder"), m_filterData.m_iFilterOrder);
-    settings.setValue(settingsPath + QString("/FilterDesignView/filterDesignMethod"), m_filterData.m_designMethod);
-    settings.setValue(settingsPath + QString("/FilterDesignView/filterTransition"), m_filterData.m_dParksWidth*(m_filterData.m_sFreq/2));
-    settings.setValue(settingsPath + QString("/FilterDesignView/filterChannelType"), getChannelType());
-    settings.setValue(settingsPath + QString("/FilterDesignView/FilterDesignViewPos"), this->pos());
+    settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterFrom"), m_filterData.m_dHighpassFreq);
+    settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterTo"), m_filterData.m_dLowpassFreq);
+    settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterOrder"), m_filterData.m_iFilterOrder);
+    settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterDesignMethod"), m_filterData.m_designMethod);
+    settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterTransition"), m_filterData.m_dParksWidth*(m_filterData.m_sFreq/2));
+    settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterChannelType"), getChannelType());
+    settings.setValue(m_sSettingsPath + QString("/FilterDesignView/FilterDesignViewPos"), this->pos());
 }
 
 //=============================================================================================================
 
-void FilterDesignView::loadSettings(const QString& settingsPath)
+void FilterDesignView::loadSettings()
 {
-    if(settingsPath.isEmpty()) {
+    if(m_sSettingsPath.isEmpty()) {
         return;
     }
 
-    QSettings settings;
+    QSettings settings("MNECPP");
 
     //Set stored filter settings from last session
-    setFilterParameters(settings.value(settingsPath + QString("/FilterDesignView/filterFrom"), 5.0).toDouble(),
-                        settings.value(settingsPath + QString("/FilterDesignView/filterTo"), 40.0).toDouble(),
-                        settings.value(settingsPath + QString("/FilterDesignView/filterOrder"), 128).toInt(),
-                        settings.value(settingsPath + QString("/FilterDesignView/filterDesignMethod"), 0).toInt(),
-                        settings.value(settingsPath + QString("/FilterDesignView/filterTransition"), 1.0).toDouble(),
-                        settings.value(settingsPath + QString("/FilterDesignView/filterChannelType"), "MEG").toString());
+    setFilterParameters(settings.value(m_sSettingsPath + QString("/FilterDesignView/filterFrom"), 5.0).toDouble(),
+                        settings.value(m_sSettingsPath + QString("/FilterDesignView/filterTo"), 40.0).toDouble(),
+                        settings.value(m_sSettingsPath + QString("/FilterDesignView/filterOrder"), 128).toInt(),
+                        settings.value(m_sSettingsPath + QString("/FilterDesignView/filterDesignMethod"), 0).toInt(),
+                        settings.value(m_sSettingsPath + QString("/FilterDesignView/filterTransition"), 1.0).toDouble(),
+                        settings.value(m_sSettingsPath + QString("/FilterDesignView/filterChannelType"), "MEG").toString());
 
-    QPoint pos = settings.value(settingsPath + QString("/FilterDesignView/Pos"), QPoint(100,100)).toPoint();
+    QPoint pos = settings.value(m_sSettingsPath + QString("/FilterDesignView/Pos"), QPoint(100,100)).toPoint();
 
     QRect screenRect = QApplication::desktop()->screenGeometry();
     if(!screenRect.contains(pos) && QGuiApplication::screens().size() == 1) {
@@ -467,7 +466,7 @@ void FilterDesignView::filterParametersChanged()
     //update filter plot
     updateFilterPlot();
 
-    saveSettings(m_sSettingsPath);
+    saveSettings();
 }
 
 //=============================================================================================================

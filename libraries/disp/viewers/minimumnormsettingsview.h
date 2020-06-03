@@ -40,12 +40,11 @@
 //=============================================================================================================
 
 #include "../disp_global.h"
+#include "abstractview.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-
-#include <QWidget>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -76,7 +75,7 @@ namespace DISPLIB
  *
  * @brief The MinimumNormSettingsView class provides a view to control settings for estiamting functional connectivity
  */
-class DISPSHARED_EXPORT MinimumNormSettingsView : public QWidget
+class DISPSHARED_EXPORT MinimumNormSettingsView : public AbstractView
 {
     Q_OBJECT
 
@@ -90,8 +89,9 @@ public:
      *
      * @param [in] parent        parent of widget.
      */
-    MinimumNormSettingsView(QWidget *parent = 0,
-                Qt::WindowFlags f = Qt::Widget);
+    MinimumNormSettingsView(const QString& sSettingsPath = "",
+                            QWidget *parent = 0,
+                            Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**

@@ -41,6 +41,7 @@
 //=============================================================================================================
 
 #include "../disp_global.h"
+#include "abstractview.h"
 
 #include <fiff/fiff_ch_info.h>
 
@@ -48,7 +49,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
 #include <QMap>
 
 //=============================================================================================================
@@ -78,7 +78,7 @@ namespace DISPLIB
  *
  * @brief The ModalitySelectionView class provides a view to select between different modalities
  */
-class DISPSHARED_EXPORT ModalitySelectionView : public QWidget
+class DISPSHARED_EXPORT ModalitySelectionView : public AbstractView
 {
     Q_OBJECT
 
@@ -119,20 +119,13 @@ public:
      */
     QMap<QString, bool> getModalityMap();
 
-protected:
-    //=========================================================================================================
-    /**
-     * Redraw the GUI.
-     */
-    void redrawGUI();
-
     //=========================================================================================================
     /**
      * Saves all important settings of this view via QSettings.
      *
      * @param[in] settingsPath        the path to store the settings to.
      */
-    void saveSettings(const QString& settingsPath);
+    void saveSettings();
 
     //=========================================================================================================
     /**
@@ -140,7 +133,14 @@ protected:
      *
      * @param[in] settingsPath        the path to load the settings from.
      */
-    void loadSettings(const QString& settingsPath);
+    void loadSettings();
+
+protected:
+    //=========================================================================================================
+    /**
+     * Redraw the GUI.
+     */
+    void redrawGUI();
 
     //=========================================================================================================
     /**

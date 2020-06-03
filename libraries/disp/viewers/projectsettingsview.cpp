@@ -65,12 +65,13 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ProjectSettingsView::ProjectSettingsView(const QString& sDataPath,
+ProjectSettingsView::ProjectSettingsView(const QString& sSettingsPath,
+                                         const QString& sDataPath,
                                          const QString& sCurrentProject,
                                          const QString& sCurrentSubject,
                                          const QString& sCurrentParadigm,
                                          QWidget *parent)
-: QDialog(parent)
+: AbstractView(sSettingsPath, parent)
 , m_sDataPath(sDataPath)
 , m_sCurrentProject(sCurrentProject)
 , m_sCurrentSubject(sCurrentSubject)

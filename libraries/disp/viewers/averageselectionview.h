@@ -40,12 +40,12 @@
 //=============================================================================================================
 
 #include "../disp_global.h"
+#include "abstractview.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
 #include <QMap>
 
 //=============================================================================================================
@@ -73,7 +73,7 @@ namespace DISPLIB
  *
  * @brief The AverageSelectionView class provides a view to activate and choose colors for different averages
  */
-class DISPSHARED_EXPORT AverageSelectionView : public QWidget
+class DISPSHARED_EXPORT AverageSelectionView : public AbstractView
 {
     Q_OBJECT
 
@@ -129,14 +129,13 @@ public:
      */
     void setAverageActivation(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation);
 
-protected:
     //=========================================================================================================
     /**
      * Saves all important settings of this view via QSettings.
      *
      * @param[in] settingsPath        the path to store the settings to.
      */
-    void saveSettings(const QString& settingsPath);
+    void saveSettings();
 
     //=========================================================================================================
     /**
@@ -144,8 +143,9 @@ protected:
      *
      * @param[in] settingsPath        the path to load the settings from.
      */
-    void loadSettings(const QString& settingsPath);
+    void loadSettings();
 
+protected:
     //=========================================================================================================
     /**
      * Redraw the GUI.
@@ -162,8 +162,6 @@ protected:
 
     QSharedPointer<QMap<QString, QColor> >      m_qMapAverageColor;             /**< Average colors. */
     QSharedPointer<QMap<QString, bool> >        m_qMapAverageActivation;        /**< Average activation status. */
-
-    QString                                     m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
 
 signals:    
     //=========================================================================================================

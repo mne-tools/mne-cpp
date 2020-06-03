@@ -40,12 +40,12 @@
 //=============================================================================================================
 
 #include "../disp_global.h"
+#include "abstractview.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
 #include <QMap>
 
 //=============================================================================================================
@@ -80,7 +80,7 @@ namespace DISPLIB
  *
  * @brief The ScalingView class provides a view to select the scaling for different channels modalities
  */
-class DISPSHARED_EXPORT ScalingView : public QWidget
+class DISPSHARED_EXPORT ScalingView : public AbstractView
 {
     Q_OBJECT
 
@@ -118,20 +118,13 @@ public:
      */
     void setScaleMap(const QMap<qint32, float> &qMapChScaling);
 
-protected:
-    //=========================================================================================================
-    /**
-     * Redraw the GUI.
-     */
-    void redrawGUI();
-
     //=========================================================================================================
     /**
      * Saves all important settings of this view via QSettings.
      *
      * @param[in] settingsPath        the path to store the settings to.
      */
-    void saveSettings(const QString& settingsPath);
+    void saveSettings();
 
     //=========================================================================================================
     /**
@@ -139,7 +132,14 @@ protected:
      *
      * @param[in] settingsPath        the path to load the settings from.
      */
-    void loadSettings(const QString& settingsPath);
+    void loadSettings();
+
+protected:
+    //=========================================================================================================
+    /**
+     * Redraw the GUI.
+     */
+    void redrawGUI();
 
     //=========================================================================================================
     /**

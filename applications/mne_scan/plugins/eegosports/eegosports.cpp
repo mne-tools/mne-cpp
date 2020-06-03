@@ -140,7 +140,7 @@ void EEGoSports::init()
     m_outputConnectors.append(m_pRMTSA_EEGoSports);
 
     //default values used by the setupGUI class must be set here
-    QSettings settings;
+    QSettings settings("MNECPP");
     m_iSamplingFreq = settings.value(QString("EEGOSPORTS/sFreq"), 512).toInt();
     m_iNumberOfChannels = 90;
     m_iNumberOfEEGChannels = 64;
@@ -585,7 +585,7 @@ bool EEGoSports::stop()
     m_pCircularBuffer->clear();
 
     //Store settings for next use. Do this in stop() since it will crash if we do it in the destructor.
-    QSettings settings;
+    QSettings settings("MNECPP");
     settings.setValue(QString("EEGOSPORTS/sFreq"), m_iSamplingFreq);
     settings.setValue(QString("EEGOSPORTS/samplesPerBlock"), m_iSamplesPerBlock);
     settings.setValue(QString("EEGOSPORTS/LPAShift"), m_dLPAShift);

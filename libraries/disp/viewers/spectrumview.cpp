@@ -65,9 +65,10 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SpectrumView::SpectrumView(QWidget *parent,
+SpectrumView::SpectrumView(const QString& sSettingsPath,
+                           QWidget *parent,
                            Qt::WindowFlags f)
-: QWidget(parent, f)
+: AbstractView(sSettingsPath, parent, f)
 {
     m_pTableView = new QTableView;
 

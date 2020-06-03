@@ -67,15 +67,14 @@ using namespace FIFFLIB;
 ProjectorsView::ProjectorsView(const QString& sSettingsPath,
                                QWidget *parent,
                                Qt::WindowFlags f)
-: QWidget(parent, f)
+: AbstractView(sSettingsPath, parent, f)
 , m_pEnableDisableProjectors(Q_NULLPTR)
-, m_sSettingsPath(sSettingsPath)
 {
     this->setWindowTitle("Projectors");
     this->setMinimumWidth(330);
     this->setMaximumWidth(330);
 
-    loadSettings(m_sSettingsPath);
+    loadSettings();
     redrawGUI();
 }
 
@@ -83,7 +82,7 @@ ProjectorsView::ProjectorsView(const QString& sSettingsPath,
 
 ProjectorsView::~ProjectorsView()
 {
-    saveSettings(m_sSettingsPath);
+    saveSettings();
 }
 
 //=============================================================================================================
@@ -163,15 +162,15 @@ void ProjectorsView::redrawGUI()
 
 //=============================================================================================================
 
-void ProjectorsView::saveSettings(const QString& settingsPath)
+void ProjectorsView::saveSettings()
 {
-    if(settingsPath.isEmpty()) {
+    if(m_sSettingsPath.isEmpty()) {
         return;
     }
 
-    QSettings settings;
+    QSettings settings("MNECPP");
 
-    settings.beginGroup(settingsPath + QString("/projectorsActive"));
+    settings.beginGroup(m_sSettingsPath + QString("/projectorsActive"));
 
     QMap<QString,bool>::const_iterator iProj = m_mapProjActive.constBegin();
     while (iProj != m_mapProjActive.constEnd()) {
@@ -184,15 +183,15 @@ void ProjectorsView::saveSettings(const QString& settingsPath)
 
 //=============================================================================================================
 
-void ProjectorsView::loadSettings(const QString& settingsPath)
+void ProjectorsView::loadSettings()
 {
-    if(settingsPath.isEmpty()) {
+    if(m_sSettingsPath.isEmpty()) {
         return;
     }
 
-    QSettings settings;
+    QSettings settings("MNECPP");
 
-    settings.beginGroup(settingsPath + QString("/projectorsActive"));
+    settings.beginGroup(m_sSettingsPath + QString("/projectorsActive"));
 
     QStringList keys = settings.childKeys();
     foreach (QString key, keys) {
@@ -223,7 +222,7 @@ void ProjectorsView::onEnableDisableAllProj(bool status)
 
     emit projSelectionChanged(m_pProjs);
 
-    saveSettings(m_sSettingsPath);
+    saveSettings();
 }
 
 //=============================================================================================================
@@ -247,5 +246,5 @@ void ProjectorsView::onCheckProjStatusChanged()
 
     emit projSelectionChanged(m_pProjs);
 
-    saveSettings(m_sSettingsPath);
+    saveSettings();
 }

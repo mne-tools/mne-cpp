@@ -40,12 +40,11 @@
 //=============================================================================================================
 
 #include "../disp_global.h"
+#include "abstractview.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-
-#include <QWidget>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -79,7 +78,7 @@ namespace DISPLIB
  *
  * @brief User GUI control for the View3D.
  */
-class DISPSHARED_EXPORT Control3DView : public QWidget
+class DISPSHARED_EXPORT Control3DView : public AbstractView
 {
     Q_OBJECT
 
@@ -95,7 +94,8 @@ public:
      * @param [in] slFlags    The flags indicating which tools to display. Scaling is displayed as default. Possible flags are: "Data", "View", "Light".
      * @param [in] type
      */
-    explicit Control3DView(QWidget* parent = 0,
+    explicit Control3DView(const QString& sSettingsPath = "",
+                           QWidget* parent = 0,
                            const QStringList& slFlags = QStringList() << "Data" << "View" << "Light",
                            Qt::WindowType type = Qt::Widget);
 

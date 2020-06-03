@@ -41,12 +41,11 @@
 //=============================================================================================================
 
 #include "../disp_global.h"
+#include "abstractview.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-
-#include <QWidget>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -77,7 +76,7 @@ namespace DISPLIB
  *
  * @brief The HpiSettingsView class provides a QWidget for the HPI controls.
  */
-class DISPSHARED_EXPORT HpiSettingsView : public QWidget
+class DISPSHARED_EXPORT HpiSettingsView : public AbstractView
 {
     Q_OBJECT
 
@@ -155,14 +154,13 @@ public:
      */
     double getAllowedRotationChanged();
 
-protected:    
     //=========================================================================================================
     /**
      * Saves all important settings of this view via QSettings.
      *
      * @param[in] settingsPath        the path to store the settings to.
      */
-    void saveSettings(const QString& settingsPath);
+    void saveSettings();
 
     //=========================================================================================================
     /**
@@ -170,8 +168,9 @@ protected:
      *
      * @param[in] settingsPath        the path to load the settings from.
      */
-    void loadSettings(const QString& settingsPath);
+    void loadSettings();
 
+protected:
     //=========================================================================================================
     /**
      * Load digitzers from a file.

@@ -82,7 +82,8 @@ public:
     /**
      * Constructs an MultiView.
      */
-    explicit MultiView(QWidget *parent = Q_NULLPTR,
+    explicit MultiView(const QString& sSettingsPath = "",
+                       QWidget *parent = Q_NULLPTR,
                        Qt::WindowFlags flags = Qt::Widget);
 
     //=========================================================================================================
@@ -125,10 +126,11 @@ public:
     /**
      * Restores geometry and state as saved by saveSettings()
      */
-    void restoreSettings();
+    void loadSettings();
 
 private:
-    QList<MultiViewWindow *> m_lDockWidgets;
+    QList<MultiViewWindow *>    m_lDockWidgets;
+    QString                     m_sSettingsPath;            /**< The settings path to store the GUI settings to. */
 
 signals:
     void dockLocationChanged(QWidget* pWidget);

@@ -135,6 +135,18 @@ public:
                     const QMessageLogContext &context,
                     const QString &msg);
 
+    //=========================================================================================================
+    /**
+     * Saves geometry and state of GUI dock widgets that have given a name with setObjectName()
+     */
+    void saveSettings();
+
+    //=========================================================================================================
+    /**
+     * Restores geometry and state as saved by saveSettings()
+     */
+    void loadSettings();
+
 signals:
     void mainWindowClosed();
 
@@ -165,18 +177,6 @@ private:
     void createPluginViews(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager);      /**< Creates all Windows within the MultiView for user interface of MainWindow class. */
     void tabifyDockWindows();                                                                   /**< Tabify all dock windows */
     void about();                                                                               /**< Implements about action.*/
-
-    //=========================================================================================================
-    /**
-     * Saves geometry and state of GUI dock widgets that have given a name with setObjectName()
-     */
-    void saveSettings();
-
-    //=========================================================================================================
-    /**
-     * Restores geometry and state as saved by saveSettings()
-     */
-    void restoreSettings();
 
     QPointer<DISPLIB::MultiView>        m_pMultiView;       /**< The central View.*/
 

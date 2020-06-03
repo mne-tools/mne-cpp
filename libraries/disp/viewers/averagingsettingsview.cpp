@@ -66,9 +66,8 @@ using namespace FIFFLIB;
 AveragingSettingsView::AveragingSettingsView(const QString& sSettingsPath,
                                              const QMap<QString, int> &mapStimChsIndexNames,
                                              QWidget *parent)
-: QWidget(parent)
+: AbstractView(sSettingsPath, parent)
 , ui(new Ui::AverageSettingsViewWidget)
-, m_sSettingsPath(sSettingsPath)
 , m_mapStimChsIndexNames(mapStimChsIndexNames)
 {
     ui->setupUi(this);
@@ -77,7 +76,7 @@ AveragingSettingsView::AveragingSettingsView(const QString& sSettingsPath,
     this->setMinimumWidth(330);
     this->setMaximumWidth(330);
 
-    loadSettings(m_sSettingsPath);
+    loadSettings();
     redrawGUI();
 }
 
@@ -85,7 +84,7 @@ AveragingSettingsView::AveragingSettingsView(const QString& sSettingsPath,
 
 AveragingSettingsView::~AveragingSettingsView()
 {
-    saveSettings(m_sSettingsPath);
+    saveSettings();
 }
 
 //=============================================================================================================
@@ -262,39 +261,39 @@ void AveragingSettingsView::setDetectedEpochs(const FiffEvokedSet& evokedSet)
 
 //=============================================================================================================
 
-void AveragingSettingsView::saveSettings(const QString& settingsPath)
+void AveragingSettingsView::saveSettings()
 {
-    if(settingsPath.isEmpty()) {
+    if(m_sSettingsPath.isEmpty()) {
         return;
     }
 
     // Store Settings
-    QSettings settings;
+    QSettings settings("MNECPP");
 
-    settings.setValue(settingsPath + QString("/preStimSeconds"), m_iPreStimSeconds);
-    settings.setValue(settingsPath + QString("/postStimSeconds"), m_iPostStimSeconds);
-    settings.setValue(settingsPath + QString("/numAverages"), m_iNumAverages);
-    settings.setValue(settingsPath + QString("/currentStimChannel"), m_sCurrentStimChan);
-    settings.setValue(settingsPath + QString("/baselineFromSeconds"), m_iBaselineFromSeconds);
-    settings.setValue(settingsPath + QString("/baselineToSeconds"), m_iBaselineToSeconds);
-    settings.setValue(settingsPath + QString("/doBaselineCorrection"), m_bDoBaselineCorrection);
+    settings.setValue(m_sSettingsPath + QString("/preStimSeconds"), m_iPreStimSeconds);
+    settings.setValue(m_sSettingsPath + QString("/postStimSeconds"), m_iPostStimSeconds);
+    settings.setValue(m_sSettingsPath + QString("/numAverages"), m_iNumAverages);
+    settings.setValue(m_sSettingsPath + QString("/currentStimChannel"), m_sCurrentStimChan);
+    settings.setValue(m_sSettingsPath + QString("/baselineFromSeconds"), m_iBaselineFromSeconds);
+    settings.setValue(m_sSettingsPath + QString("/baselineToSeconds"), m_iBaselineToSeconds);
+    settings.setValue(m_sSettingsPath + QString("/doBaselineCorrection"), m_bDoBaselineCorrection);
 }
 
 //=============================================================================================================
 
-void AveragingSettingsView::loadSettings(const QString& settingsPath)
+void AveragingSettingsView::loadSettings()
 {
-    if(settingsPath.isEmpty()) {
+    if(m_sSettingsPath.isEmpty()) {
         return;
     }
 
     // Load Settings
-    QSettings settings;
+    QSettings settings("MNECPP");
 
-    m_iPreStimSeconds = settings.value(settingsPath + QString("/preStimSeconds"), 100).toInt();
-    m_iPostStimSeconds = settings.value(settingsPath + QString("/postStimSeconds"), 400).toInt();
-    m_iBaselineFromSeconds = settings.value(settingsPath + QString("/baselineFromSeconds"), 0).toInt();
-    m_iBaselineToSeconds = settings.value(settingsPath + QString("/baselineToSeconds"), 0).toInt();
+    m_iPreStimSeconds = settings.value(m_sSettingsPath + QString("/preStimSeconds"), 100).toInt();
+    m_iPostStimSeconds = settings.value(m_sSettingsPath + QString("/postStimSeconds"), 400).toInt();
+    m_iBaselineFromSeconds = settings.value(m_sSettingsPath + QString("/baselineFromSeconds"), 0).toInt();
+    m_iBaselineToSeconds = settings.value(m_sSettingsPath + QString("/baselineToSeconds"), 0).toInt();
 
     if(m_iBaselineFromSeconds < -1 * m_iPreStimSeconds || m_iBaselineFromSeconds > m_iPostStimSeconds) {
         m_iBaselineFromSeconds = -1 * m_iPreStimSeconds;
@@ -304,9 +303,9 @@ void AveragingSettingsView::loadSettings(const QString& settingsPath)
         m_iBaselineToSeconds = 0;
     }
 
-    m_iNumAverages = settings.value(settingsPath + QString("/numAverages"), 10).toInt();
-    m_sCurrentStimChan = settings.value(settingsPath + QString("/currentStimChannel"), "STI014").toString();
-    m_bDoBaselineCorrection = settings.value(settingsPath + QString("/doBaselineCorrection"), false).toBool();
+    m_iNumAverages = settings.value(m_sSettingsPath + QString("/numAverages"), 10).toInt();
+    m_sCurrentStimChan = settings.value(m_sSettingsPath + QString("/currentStimChannel"), "STI014").toString();
+    m_bDoBaselineCorrection = settings.value(m_sSettingsPath + QString("/doBaselineCorrection"), false).toBool();
 }
 
 //=============================================================================================================
@@ -321,7 +320,7 @@ void AveragingSettingsView::onChangePreStim()
 
     emit changePreStim(mSeconds);
 
-    saveSettings(m_sSettingsPath);
+    saveSettings();
 }
 
 //=============================================================================================================
@@ -336,7 +335,7 @@ void AveragingSettingsView::onChangePostStim()
 
     emit changePostStim(mSeconds);
 
-    saveSettings(m_sSettingsPath);
+    saveSettings();
 }
 
 //=============================================================================================================
@@ -350,7 +349,7 @@ void AveragingSettingsView::onChangeBaselineFrom()
 
     emit changeBaselineFrom(mSeconds);
 
-    saveSettings(m_sSettingsPath);
+    saveSettings();
 }
 
 //=============================================================================================================
@@ -364,7 +363,7 @@ void AveragingSettingsView::onChangeBaselineTo()
 
     emit changeBaselineTo(mSeconds);
 
-    saveSettings(m_sSettingsPath);
+    saveSettings();
 }
 
 //=============================================================================================================
@@ -375,7 +374,7 @@ void AveragingSettingsView::onChangeNumAverages()
 
     emit changeNumAverages(ui->m_pSpinBoxNumAverages->value());
 
-    saveSettings(m_sSettingsPath);
+    saveSettings();
 }
 
 //=============================================================================================================
@@ -386,5 +385,5 @@ void AveragingSettingsView::onChangeStimChannel()
 
     emit changeStimChannel(m_sCurrentStimChan);
 
-    saveSettings(m_sSettingsPath);
+    saveSettings();
 }

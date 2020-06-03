@@ -98,14 +98,13 @@ public:
      */
     virtual void setScientificMode(bool bFlag);
 
-protected:
     //=========================================================================================================
     /**
      * Saves all important settings of this view via QSettings.
      *
      * @param[in] settingsPath        the path to store the settings to.
      */
-    virtual void saveSettings(const QString& settingsPath) = 0;
+    virtual void saveSettings() = 0;
 
     //=========================================================================================================
     /**
@@ -113,12 +112,11 @@ protected:
      *
      * @param[in] settingsPath        the path to load the settings from.
      */
-    virtual void loadSettings(const QString& settingsPath) = 0;
+    virtual void loadSettings() = 0;
 
     bool            m_bScientificModeIsActive;  /**< The flag describing whether the scientific mode of the view is active or not. */
 
     QString         m_sSettingsPath;            /**< The settings path to store the GUI settings to. */
-
 
 };
 } // NAMESPACE

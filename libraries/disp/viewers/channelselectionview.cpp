@@ -84,10 +84,9 @@ ChannelSelectionView::ChannelSelectionView(const QString& sSettingsPath,
                                            QWidget *parent,
                                            ChannelInfoModel::SPtr pChannelInfoModel,
                                            Qt::WindowType f)
-: QWidget(parent, f)
+: AbstractView(sSettingsPath, parent, f)
 , ui(new Ui::ChannelSelectionViewWidget)
 , m_pChannelInfoModel(pChannelInfoModel)
-, m_sSettingsPath(sSettingsPath)
 {
     ui->setupUi(this);
 
@@ -98,7 +97,7 @@ ChannelSelectionView::ChannelSelectionView(const QString& sSettingsPath,
     initButtons();
     initCheckBoxes();
 
-    loadSettings(m_sSettingsPath);
+    loadSettings();
 
     setCurrentlyMappedFiffChannels(m_pChannelInfoModel->getMappedChannelsList());
 }
@@ -107,7 +106,7 @@ ChannelSelectionView::ChannelSelectionView(const QString& sSettingsPath,
 
 ChannelSelectionView::~ChannelSelectionView()
 {
-    saveSettings(m_sSettingsPath);
+    saveSettings();
 
     delete ui;
 }
@@ -404,31 +403,31 @@ void ChannelSelectionView::updateDataView()
 
 //=============================================================================================================
 
-void ChannelSelectionView::saveSettings(const QString& settingsPath)
+void ChannelSelectionView::saveSettings()
 {
-    if(settingsPath.isEmpty()) {
+    if(m_sSettingsPath.isEmpty()) {
         return;
     }
 
-    QSettings settings;
+    QSettings settings("MNECPP");
 
-    settings.setValue(settingsPath + QString("/selectedLayoutFile"), getCurrentLayoutFile());
-    settings.setValue(settingsPath + QString("/channelSelectionViewPos"), this->pos());
+    settings.setValue(m_sSettingsPath + QString("/selectedLayoutFile"), getCurrentLayoutFile());
+    settings.setValue(m_sSettingsPath + QString("/channelSelectionViewPos"), this->pos());
 }
 
 //=============================================================================================================
 
-void ChannelSelectionView::loadSettings(const QString& settingsPath)
+void ChannelSelectionView::loadSettings()
 {
-    if(settingsPath.isEmpty()) {
+    if(m_sSettingsPath.isEmpty()) {
         return;
     }
 
-    QSettings settings;
+    QSettings settings("MNECPP");
 
-    setCurrentLayoutFile(settings.value(settingsPath + QString("/selectedLayoutFile"), "babymeg-mag-inner-layer.lout").toString());
+    setCurrentLayoutFile(settings.value(m_sSettingsPath + QString("/selectedLayoutFile"), "babymeg-mag-inner-layer.lout").toString());
 
-    QPoint pos = settings.value(settingsPath + QString("/channelSelectionViewPos"), QPoint(100,100)).toPoint();
+    QPoint pos = settings.value(m_sSettingsPath + QString("/channelSelectionViewPos"), QPoint(100,100)).toPoint();
 
     QRect screenRect = QApplication::desktop()->screenGeometry();
     if(!screenRect.contains(pos) && QGuiApplication::screens().size() == 1) {
