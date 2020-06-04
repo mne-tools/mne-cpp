@@ -136,7 +136,7 @@ public:
     /**
      * Inits widgets which are used to control this plugin, then emits them in form of a QList.
      */
-    virtual void initPluginControlWidgets();
+    void initPluginControlWidgets();
 
 private:
     //=========================================================================================================
