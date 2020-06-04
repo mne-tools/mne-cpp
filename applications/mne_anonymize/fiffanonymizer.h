@@ -273,24 +273,24 @@ public slots:
     void setSubjectHisId(const QString& sSubjectHisId);
 
     //=========================================================================================================
-    /**
-     * Sets fiffanonymizer to delete the input file after anonymization finishes. This is intended to avoid duplication of disk space usage.
-     * If set to true, by its own, a confirmation message will be prompted to the user. Used with the --delete_input_file_after option.
-     * It can be used with the option "avoid_delete_confirmation" so that no confirmation is prompt to the user.
-     *
-     * @param [in] bFlag    Bool argument whether to delete the input file afterwards.
-     */
-    void setDeleteInputFileAfter(bool bFlag);
+//    /**
+//     * Sets fiffanonymizer to delete the input file after anonymization finishes. This is intended to avoid duplication of disk space usage.
+//     * If set to true, by its own, a confirmation message will be prompted to the user. Used with the --delete_input_file_after option.
+//     * It can be used with the option "avoid_delete_confirmation" so that no confirmation is prompt to the user.
+//     *
+//     * @param [in] bFlag    Bool argument whether to delete the input file afterwards.
+//     */
+//    void setDeleteInputFileAfter(bool bFlag);
 
     //=========================================================================================================
-    /**
-     * Method to avoid the need to prompt the user for confirmation of deletion of the input file after anonymization has finished.
-     * As the deletion flag has to manually be set to true and this confirmation flag has to manually be set to false, the chances of
-     * a user disadvertently deleted a relevant input file are (hopefully) minimized.
-     *
-     * @param [in] bFlag    Bool argument whether to ask for confirmation when deleting a file.
-     */
-    void setDeleteInputFileConfirmation(bool bFlag);
+//    /**
+//     * Method to avoid the need to prompt the user for confirmation of deletion of the input file after anonymization has finished.
+//     * As the deletion flag has to manually be set to true and this confirmation flag has to manually be set to false, the chances of
+//     * a user disadvertently deleted a relevant input file are (hopefully) minimized.
+//     *
+//     * @param [in] bFlag    Bool argument whether to ask for confirmation when deleting a file.
+//     */
+//    void setDeleteInputFileConfirmation(bool bFlag);
 
     //=========================================================================================================
     /**
