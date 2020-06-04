@@ -79,6 +79,12 @@ AnalyzeCore *pAnalyzeCore;
 
 int main(int argc, char *argv[])
 {
+    // When building a static version of MNE Scan we have to init all resource (.qrc) files here manually
+    #ifdef STATICBUILD
+    Q_INIT_RESOURCE(styles);
+    Q_INIT_RESOURCE(fonts);
+    #endif
+
     QApplication app(argc, argv);
 
     // Set default font
