@@ -45,6 +45,8 @@
 #include "../anshared_global.h"
 #include "../Utils/types.h"
 
+#include <disp/viewers/abstractview.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -165,8 +167,6 @@ public:
      */
     virtual inline void setGlobalSettings(QSharedPointer<AnalyzeSettings> globalSettings);
 
-public slots:
-
     //=========================================================================================================
     /**
      * Called by the EventManager in case a subscribed-for Event has happened.
@@ -174,6 +174,9 @@ public slots:
      * @param e The Event that has taken place
      */
     virtual void handleEvent(QSharedPointer<Event> e) = 0;
+
+signals:
+    void guiModeChanged(DISPLIB::AbstractView::GuiMode mode);
 
 protected:
     QSharedPointer<AnalyzeData>     m_pAnalyzeData;         /**< Pointer to the global data base */
