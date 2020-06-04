@@ -229,6 +229,14 @@ win32:!contains(MNECPP_CONFIG, static) {
     EXTRA_ARGS =
     DEPLOY_CMD = $$winDeployLibArgs($${TARGET},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
     QMAKE_POST_LINK += $${DEPLOY_CMD}
+
+    # If Qt3D plugins/renderers folder exisits, create and copy renderers folder to mne-cpp/bin manually.
+    # windeployqt does not deploy them. This will be fixed in Qt 5.15.1.
+    exists($$shell_path($$[QT_INSTALL_PLUGINS]/renderers)) {
+        TRGTDIR = $$shell_path($$shell_path($${MNE_BINARY_DIR}/renderers))
+        QMAKE_POST_LINK += $$sprintf($${QMAKE_MKDIR_CMD}, "$${TRGTDIR}") $$escape_expand(\n\t)
+        QMAKE_POST_LINK += $${QMAKE_COPY_DIR} "$$shell_path($$[QT_INSTALL_PLUGINS]/renderers)" "$$shell_path($${MNE_BINARY_DIR}/renderers)" $$escape_expand(\\n\\t)
+    }
 }
 
 # Activate FFTW backend in Eigen for non-static builds only
