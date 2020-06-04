@@ -274,42 +274,58 @@ void MainWindow::createPluginMenus(QSharedPointer<ANSHAREDLIB::PluginManager> pP
     m_pMenuView = menuBar()->addMenu(tr("View"));
 
     //Appearance QMenu
+    // Styles
     QActionGroup* pActionStyleGroup = new QActionGroup(this);
 
-    QAction* pActionDefaultMode = new QAction("Default");
-    pActionDefaultMode->setStatusTip(tr("Activate default style"));
-    pActionDefaultMode->setCheckable(true);
-    pActionDefaultMode->setChecked(true);
-    pActionStyleGroup->addAction(pActionDefaultMode);
-    connect(pActionDefaultMode, &QAction::triggered,
+    QAction* pActionDefaultStyle = new QAction("Default");
+    pActionDefaultStyle->setStatusTip(tr("Activate default style"));
+    pActionDefaultStyle->setCheckable(true);
+    pActionDefaultStyle->setChecked(true);
+    pActionStyleGroup->addAction(pActionDefaultStyle);
+    connect(pActionDefaultStyle, &QAction::triggered,
         [=]() {
         onStyleChanged("default");
     });
 
-    QAction* pActionDarkMode = new QAction("Dark");
-    pActionDarkMode->setStatusTip(tr("Activate dark style"));
-    pActionDarkMode->setCheckable(true);
-    pActionDarkMode->setChecked(false);
-    pActionStyleGroup->addAction(pActionDarkMode);
-    connect(pActionDarkMode, &QAction::triggered,
+    QAction* pActionDarkStyle = new QAction("Dark");
+    pActionDarkStyle->setStatusTip(tr("Activate dark style"));
+    pActionDarkStyle->setCheckable(true);
+    pActionDarkStyle->setChecked(false);
+    pActionStyleGroup->addAction(pActionDarkStyle);
+    connect(pActionDarkStyle, &QAction::triggered,
         [=]() {
         onStyleChanged("dark");
     });
 
-    QAction* pActionLightMode = new QAction("Light");
-    pActionLightMode->setStatusTip(tr("Activate light style"));
-    pActionLightMode->setCheckable(true);
-    pActionLightMode->setChecked(false);
-    pActionStyleGroup->addAction(pActionLightMode);
-    connect(pActionLightMode, &QAction::triggered,
+    QAction* pActionLightStyle = new QAction("Light");
+    pActionLightStyle->setStatusTip(tr("Activate light style"));
+    pActionLightStyle->setCheckable(true);
+    pActionLightStyle->setChecked(false);
+    pActionStyleGroup->addAction(pActionLightStyle);
+    connect(pActionLightStyle, &QAction::triggered,
         [=]() {
         onStyleChanged("light");
     });
 
-    // Help Appearance
+    // Modes
+    QActionGroup* pActionModeGroup = new QActionGroup(this);
+
+    m_pActionScientificMode = new QAction("Scientific");
+    m_pActionScientificMode->setStatusTip(tr("Activate the scientific mode"));
+    m_pActionScientificMode->setCheckable(true);
+    m_pActionScientificMode->setChecked(true);
+    pActionModeGroup->addAction(m_pActionScientificMode);
+
+    m_pActionClinicalMode = new QAction("Clinical");
+    m_pActionClinicalMode->setStatusTip(tr("Activate the clinical mode"));
+    m_pActionClinicalMode->setCheckable(true);
+    m_pActionClinicalMode->setChecked(false);
+    pActionModeGroup->addAction(m_pActionClinicalMode);
+
     if(!m_pMenuAppearance) {
         m_pMenuAppearance = menuBar()->addMenu(tr("&Appearance"));
         m_pMenuAppearance->addMenu("Styles")->addActions(pActionStyleGroup->actions());
+        m_pMenuAppearance->addMenu("Modes")->addActions(pActionModeGroup->actions());
     }
 
     // Help menu
@@ -352,15 +368,19 @@ void MainWindow::createPluginControls(QSharedPointer<ANSHAREDLIB::PluginManager>
 
     //Add Plugin controls to the MainWindow
     for(IPlugin* pPlugin : pPluginManager->getPlugins()) {
-        QDockWidget* pControl = pPlugin->getControl();
-
-        if(pControl) {
+        if(QDockWidget* pControl = pPlugin->getControl()) {
             addDockWidget(Qt::LeftDockWidgetArea, pControl);
             qInfo() << "[MainWindow::createPluginControls] Found and added dock widget for " << pPlugin->getName();
             QAction* pAction = pControl->toggleViewAction();
             pAction->setText(pPlugin->getName()+" Controls");
             m_pMenuView->addAction(pAction);
             qInfo() << "[MainWindow::createPluginControls] Added" << pPlugin->getName() << "controls to View menu";
+
+            // Connect to GUI mode toggling
+            connect(m_pActionClinicalMode.data(), &QAction::triggered,
+                [=]() {
+                onStyleChanged("dark");
+            });
 
             // Disable floating and editable dock widgets, since the wasm QDockWidget version is buggy
             #ifdef WASMBUILD

@@ -162,7 +162,7 @@ private:
      */
     void registerMetaTypes();
 
-    QSharedPointer<ANSHAREDLIB::PluginManager>   m_pPluginManager;    /**< Holds plugin manager. */
+    QSharedPointer<ANSHAREDLIB::PluginManager>      m_pPluginManager;       /**< Holds plugin manager. */
     QSharedPointer<ANSHAREDLIB::AnalyzeSettings>    m_analyzeSettings;      /**< The global settings. */
     QSharedPointer<ANSHAREDLIB::AnalyzeData>        m_analyzeData;          /**< The global data base. */
 };
