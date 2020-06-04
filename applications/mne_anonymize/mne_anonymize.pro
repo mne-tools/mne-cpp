@@ -44,6 +44,12 @@ QT += core gui widgets
 
 CONFIG   += console
 
+CONFIG(debug,debug|release) {
+    macx {
+        CONFIG -= app_bundle
+    }
+}
+
 contains(MNECPP_CONFIG, static) {
     CONFIG += static
     DEFINES += STATICBUILD
