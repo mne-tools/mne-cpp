@@ -51,6 +51,7 @@
 #include <QFontDatabase>
 #include <QtPlugin>
 #include <QSurfaceFormat>
+#include <QScopedPointer>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -75,8 +76,6 @@ Q_IMPORT_PLUGIN(AnnotationManager)
 
 //=============================================================================================================
 
-AnalyzeCore *pAnalyzeCore;
-
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
@@ -94,7 +93,7 @@ int main(int argc, char *argv[])
     QSurfaceFormat::setDefaultFormat(fmt);
 
     //New main window instance
-    pAnalyzeCore = new AnalyzeCore();
+    QScopedPointer<AnalyzeCore> pAnalyzeCore (new AnalyzeCore);
     pAnalyzeCore->showMainWindow();
 
     return app.exec();
