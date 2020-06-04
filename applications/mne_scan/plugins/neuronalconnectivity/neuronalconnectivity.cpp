@@ -155,6 +155,8 @@ void NeuronalConnectivity::initPluginControlWidgets()
     QList<QWidget*> plControlWidgets;
 
     ConnectivitySettingsView* pConnectivitySettingsView = new ConnectivitySettingsView(QString("MNESCAN/%1").arg(this->getName()));
+    connect(this, &NeuronalConnectivity::guiModeChanged,
+            pConnectivitySettingsView, &ConnectivitySettingsView::setGuiMode);
     pConnectivitySettingsView->setObjectName("group_tab_Settings_Connectivity");
 
     //Add control widgets to output data (will be used by QuickControlView by the measurements display)

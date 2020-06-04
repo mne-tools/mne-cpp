@@ -44,6 +44,8 @@
 #include "../Management/pluginoutputdata.h"
 #include "../Management/plugininputdata.h"
 
+#include <disp/viewers/abstractview.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -195,6 +197,14 @@ signals:
      */
     void pluginControlWidgetsChanged(QList<QWidget*>& lControlWidgets,
                                      const QString& sPluginName);
+
+    //=========================================================================================================
+    /**
+     * Signal emmited whenever the gui modes changed
+     *
+     * @param [in] mode       the new gui mode
+     */
+    void guiModeChanged(DISPLIB::AbstractView::GuiMode mode);
 
 protected:
     //=========================================================================================================

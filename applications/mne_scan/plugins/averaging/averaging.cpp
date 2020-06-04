@@ -208,6 +208,8 @@ void Averaging::initPluginControlWidgets()
 
         //Add control widgets to output data (will be used by QuickControlView by the measurements display)
         AveragingSettingsView* pAveragingSettingsView = new AveragingSettingsView(QString("MNESCAN/%1").arg(this->getName()));
+        connect(this, &Averaging::guiModeChanged,
+                pAveragingSettingsView, &AveragingSettingsView::setGuiMode);
         pAveragingSettingsView->setObjectName("group_tab_Settings_Averaging");
 
         connect(pAveragingSettingsView, &AveragingSettingsView::changeNumAverages,
@@ -236,6 +238,8 @@ void Averaging::initPluginControlWidgets()
         plControlWidgets.append(pAveragingSettingsView);
 
         ArtifactSettingsView* pArtifactSettingsView = new ArtifactSettingsView(QString("MNESCAN/%1").arg(this->getName()));
+        connect(this, &Averaging::guiModeChanged,
+                pArtifactSettingsView, &ArtifactSettingsView::setGuiMode);
         pArtifactSettingsView->setObjectName("group_tab_Settings_Artifact");
 
         connect(pArtifactSettingsView, &ArtifactSettingsView::changeArtifactThreshold,

@@ -309,6 +309,8 @@ void RtFwd::initPluginControlWidgets()
         QList<QWidget*> plControlWidgets;
 
         FwdSettingsView* pFwdSettingsView = new FwdSettingsView(QString("MNESCAN/%1/").arg(this->getName()));
+        connect(this, &RtFwd::guiModeChanged,
+                pFwdSettingsView, &FwdSettingsView::setGuiMode);
         pFwdSettingsView->setObjectName("widget_");
 
         // connect incoming signals

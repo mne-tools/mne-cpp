@@ -176,6 +176,12 @@ public:
     virtual void handleEvent(QSharedPointer<Event> e) = 0;
 
 signals:
+    //=========================================================================================================
+    /**
+     * Signal emmited whenever the gui modes changed
+     *
+     * @param [in] mode       the new gui mode
+     */
     void guiModeChanged(DISPLIB::AbstractView::GuiMode mode);
 
 protected:

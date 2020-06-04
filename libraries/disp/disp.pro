@@ -122,6 +122,7 @@ SOURCES += \
     viewers/multiviewwindow.cpp \
     viewers/multiview.cpp \
     viewers/hpisettingsview.cpp \
+    viewers/covariancesettingsview.cpp \
     viewers/helpers/rtfiffrawviewmodel.cpp \
     viewers/helpers/rtfiffrawviewdelegate.cpp \
     viewers/helpers/evokedsetmodel.cpp \
@@ -173,6 +174,7 @@ HEADERS += \
     viewers/multiviewwindow.h \
     viewers/multiview.h \
     viewers/hpisettingsview.h \
+    viewers/covariancesettingsview.h \
     viewers/helpers/rtfiffrawviewdelegate.h \
     viewers/helpers/rtfiffrawviewmodel.h \
     viewers/helpers/evokedsetmodel.h \

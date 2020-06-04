@@ -234,6 +234,8 @@ void Hpi::initPluginControlWidgets()
 
         // Projects Settings
         HpiSettingsView* pHpiSettingsView = new HpiSettingsView(QString("MNESCAN/%1/").arg(this->getName()));
+        connect(this, &Hpi::guiModeChanged,
+                pHpiSettingsView, &HpiSettingsView::setGuiMode);
         pHpiSettingsView->setObjectName("widget_");
 
         connect(pHpiSettingsView, &HpiSettingsView::digitizersChanged,

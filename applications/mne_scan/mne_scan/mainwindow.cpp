@@ -195,6 +195,17 @@ void MainWindow::onStyleChanged(const QString& sStyle)
 
 //=============================================================================================================
 
+void MainWindow::onGuiModeChanged()
+{
+    if(m_pActionScientificMode->isChecked()) {
+        emit guiModeChanged(DISPLIB::AbstractView::GuiMode::Scientific);
+    } else if(m_pActionClinicalMode->isChecked()) {
+        emit guiModeChanged(DISPLIB::AbstractView::GuiMode::Clinical);
+    }
+}
+
+//=============================================================================================================
+
 void MainWindow::setSplashScreen(MainSplashScreen::SPtr& pSplashScreen,
                                  bool bShowSplashScreen)
 {
@@ -430,6 +441,7 @@ void MainWindow::createActions()
     }
 
     //Appearance QMenu
+    // Styles
     m_pActionStyleGroup = new QActionGroup(this);
 
     m_pActionDefaultMode = new QAction("Default");
@@ -461,6 +473,25 @@ void MainWindow::createActions()
         [=]() {
         onStyleChanged("light");
     });
+
+    // Modes
+    m_pActionModeGroup = new QActionGroup(this);
+
+    m_pActionScientificMode = new QAction("Scientific");
+    m_pActionScientificMode->setStatusTip(tr("Activate the scientific GUI mode"));
+    m_pActionScientificMode->setCheckable(true);
+    m_pActionScientificMode->setChecked(true);
+    m_pActionModeGroup->addAction(m_pActionScientificMode);
+    connect(m_pActionScientificMode.data(), &QAction::triggered,
+            this, &MainWindow::onGuiModeChanged);
+
+    m_pActionClinicalMode = new QAction("Clinical");
+    m_pActionClinicalMode->setStatusTip(tr("Activate the clinical GUI mode"));
+    m_pActionClinicalMode->setCheckable(true);
+    m_pActionClinicalMode->setChecked(false);
+    m_pActionModeGroup->addAction(m_pActionClinicalMode);
+    connect(m_pActionClinicalMode.data(), &QAction::triggered,
+            this, &MainWindow::onGuiModeChanged);
 
     //Help QMenu
     m_pActionHelpContents = new QAction(tr("Help &Contents"), this);
@@ -539,6 +570,7 @@ void MainWindow::createMenus()
     if(!m_pMenuAppearance) {
         m_pMenuAppearance = menuBar()->addMenu(tr("&Appearance"));
         m_pMenuAppearance->addMenu("Styles")->addActions(m_pActionStyleGroup->actions());
+        m_pMenuAppearance->addMenu("GUI Modes")->addActions(m_pActionModeGroup->actions());
     }
 
     // Help menu
@@ -684,13 +716,20 @@ void MainWindow::initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::IPlugin> 
 
             if(!m_bIsRunning) {
                 setCentralWidget(lPlugins.at(i)->setupWidget());
-            } else {
+            } else {                
+                // Connect plugin controls to GUI mode toggling
+                connect(this, &MainWindow::guiModeChanged,
+                        lPlugins.at(i).data(), &IPlugin::guiModeChanged);
+
+                // Connect plugin controls to be added to the QuickControlView once available
                 connect(lPlugins.at(i).data(), &IPlugin::pluginControlWidgetsChanged,
                         this, &MainWindow::onPluginControlWidgetsChanged);
 
+                // If a view is avialble for the plugin's output data, setup it up here
                 if(QWidget* pWidget = m_pDisplayManager->show(lPlugins.at(i)->getOutputConnectors(),
                                                               m_pTime,
-                                                              m_qListDynamicDisplayActions)) {
+                                                              m_qListDynamicDisplayActions)) {                     
+                    // Connect the view's controls to be added to the QuickControlView once available
                     for (int i = 0; i < pWidget->layout()->count(); ++i) {
                         if(MeasurementWidget* pMeasWidget = qobject_cast<MeasurementWidget *>(pWidget->layout()->itemAt(i)->widget())) {
                             connect(pMeasWidget, &MeasurementWidget::displayControlWidgetsChanged,

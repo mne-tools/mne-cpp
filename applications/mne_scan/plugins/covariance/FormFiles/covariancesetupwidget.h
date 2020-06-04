@@ -40,7 +40,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_covariancesetup.h"
+#include "../ui_covariancesetupwidget.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -76,7 +76,6 @@ class CovarianceSetupWidget : public QWidget
     Q_OBJECT
 
 public:
-
     //=========================================================================================================
     /**
      * Constructs a CovarianceSetupWidget which is a child of parent.

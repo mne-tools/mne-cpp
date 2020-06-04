@@ -40,7 +40,8 @@
 #include "covariance.h"
 
 #include "FormFiles/covariancesetupwidget.h"
-#include "FormFiles/covariancesettingswidget.h"
+
+#include <disp/viewers/covariancesettingsview.h>
 
 #include <scMeas/realtimemultisamplearray.h>
 #include <scMeas/realtimecov.h>
@@ -66,6 +67,7 @@
 //=============================================================================================================
 
 using namespace COVARIANCEPLUGIN;
+using namespace DISPLIB;
 using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
 using namespace IOBUFFER;
@@ -126,8 +128,10 @@ void Covariance::initPluginControlWidgets()
     if(m_pFiffInfo) {
         QList<QWidget*> plControlWidgets;
 
-        CovarianceSettingsWidget* pCovarianceWidget = new CovarianceSettingsWidget(QString("MNESCAN/%1").arg(this->getName()));
-        connect(pCovarianceWidget, &CovarianceSettingsWidget::samplesChanged,
+        CovarianceSettingsView* pCovarianceWidget = new CovarianceSettingsView(QString("MNESCAN/%1").arg(this->getName()));
+        connect(this, &Covariance::guiModeChanged,
+                pCovarianceWidget, &CovarianceSettingsView::setGuiMode);
+        connect(pCovarianceWidget, &CovarianceSettingsView::samplesChanged,
                 this, &Covariance::changeSamples);
         pCovarianceWidget->setMinSamples(m_pFiffInfo->sfreq);
         pCovarianceWidget->setCurrentSamples(m_iEstimationSamples);

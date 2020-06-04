@@ -149,9 +149,19 @@ public:
      */
     void loadSettings();
 
-signals:
+signals:    
+    //=========================================================================================================
+    /**
+     * Signal emmited when the main window is closed
+     */
     void mainWindowClosed();
 
+    //=========================================================================================================
+    /**
+     * Signal emmited whenever the gui modes changed
+     *
+     * @param [in] mode       the new gui mode
+     */
     void guiModeChanged(DISPLIB::AbstractView::GuiMode mode);
 
 private:
