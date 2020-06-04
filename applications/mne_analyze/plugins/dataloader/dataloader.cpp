@@ -162,7 +162,7 @@ void DataLoader::onLoadFilePressed()
     auto fileContentReady = [&](const QString &filePath, const QByteArray &fileContent) {
         if(!filePath.isNull()) {
             // We need to prepend "wasm/" because QFileDialog::getOpenFileContent does not provide a full
-            // path, which we need for organzing the different models ins AnalyzeData
+            // path, which we need for organzing the different models in AnalyzeData
             m_pAnalyzeData->loadModel<FiffRawViewModel>("wasm/"+filePath, fileContent);
         }
     };
