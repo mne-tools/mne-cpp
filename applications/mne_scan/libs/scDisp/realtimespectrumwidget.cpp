@@ -176,13 +176,10 @@ void RealTimeSpectrumWidget::initSettingsWidget()
     if(m_pFS->isInit() && m_pFS->getFiffInfo())
     {
         m_fUpperFrqBound = m_fLowerFrqBound < m_fUpperFrqBound ? m_fUpperFrqBound : m_fLowerFrqBound;
-        m_pSpectrumSettingsView->m_pSliderLowerBound->setMinimum(0);
-        m_pSpectrumSettingsView->m_pSliderLowerBound->setMaximum((qint32)(m_pFS->getFiffInfo()->sfreq/2)*1000);
-        m_pSpectrumSettingsView->m_pSliderLowerBound->setValue((qint32)(m_fLowerFrqBound*1000));
 
-        m_pSpectrumSettingsView->m_pSliderUpperBound->setMinimum(0);
-        m_pSpectrumSettingsView->m_pSliderUpperBound->setMaximum((qint32)(m_pFS->getFiffInfo()->sfreq/2)*1000);
-        m_pSpectrumSettingsView->m_pSliderUpperBound->setValue((qint32)(m_fUpperFrqBound*1000));
+        m_pSpectrumSettingsView->setBoundaries(m_pFS->getFiffInfo()->sfreq,
+                                               m_fLowerFrqBound,
+                                               m_fUpperFrqBound);
     }
 }
 
@@ -192,9 +189,9 @@ void RealTimeSpectrumWidget::broadcastSettings()
 {
     if(m_pSpectrumSettingsView)
     {
-        m_fLowerFrqBound = m_pSpectrumSettingsView->m_pSliderLowerBound->value()/1000.0f;
-        m_fUpperFrqBound = m_pSpectrumSettingsView->m_pSliderUpperBound->value()/1000.0f;
-        m_pSpectrumView->setBoundaries(m_fLowerFrqBound,m_fUpperFrqBound);
+        m_fLowerFrqBound = m_pSpectrumSettingsView->getLowerBound();
+        m_fUpperFrqBound = m_pSpectrumSettingsView->getUpperBound();
+        m_pSpectrumView->setBoundaries(m_fLowerFrqBound, m_fUpperFrqBound);
     }
 }
 

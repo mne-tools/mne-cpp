@@ -323,3 +323,15 @@ void AverageLayoutView::loadSettings()
 
     QSettings settings("MNECPP");
 }
+
+//=============================================================================================================
+
+void AverageLayoutView::updateGuiMode(GuiMode mode)
+{
+    switch(mode) {
+        case GuiMode::Clinical:
+            break;
+        default: // default is scientific mode
+            break;
+    }
+}

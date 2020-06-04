@@ -65,7 +65,7 @@ AbstractView::AbstractView(QWidget *parent,
 
 //=============================================================================================================
 
-void AbstractView::setScientificMode(bool bFlag)
+void AbstractView::setGuiMode(GuiMode mode)
 {
-    m_bScientificModeIsActive = bFlag;
+    updateGuiMode(mode);
 };

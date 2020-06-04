@@ -203,6 +203,18 @@ void ProjectorsView::loadSettings()
 
 //=============================================================================================================
 
+void ProjectorsView::updateGuiMode(GuiMode mode)
+{
+    switch(mode) {
+        case GuiMode::Clinical:
+            break;
+        default: // default is scientific mode
+            break;
+    }
+}
+
+//=============================================================================================================
+
 void ProjectorsView::onEnableDisableAllProj(bool status)
 {
     //Set all checkboxes to status

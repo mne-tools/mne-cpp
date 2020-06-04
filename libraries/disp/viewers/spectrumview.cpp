@@ -191,3 +191,15 @@ void SpectrumView::loadSettings()
     // Load Settings
     QSettings settings("MNECPP");
 }
+
+//=============================================================================================================
+
+void SpectrumView::updateGuiMode(GuiMode mode)
+{
+    switch(mode) {
+        case GuiMode::Clinical:
+            break;
+        default: // default is scientific mode
+            break;
+    }
+}

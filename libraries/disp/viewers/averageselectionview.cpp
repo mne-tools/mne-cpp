@@ -179,6 +179,18 @@ void AverageSelectionView::loadSettings()
 
 //=============================================================================================================
 
+void AverageSelectionView::updateGuiMode(GuiMode mode)
+{
+    switch(mode) {
+        case GuiMode::Clinical:
+            break;
+        default: // default is scientific mode
+            break;
+    }
+}
+
+//=============================================================================================================
+
 void AverageSelectionView::redrawGUI()
 {
     if(m_qMapAverageColor->size() != m_qMapAverageActivation->size()) {

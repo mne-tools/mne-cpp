@@ -440,6 +440,18 @@ void ChannelSelectionView::loadSettings()
 
 //=============================================================================================================
 
+void ChannelSelectionView::updateGuiMode(GuiMode mode)
+{
+    switch(mode) {
+        case GuiMode::Clinical:
+            break;
+        default: // default is scientific mode
+            break;
+    }
+}
+
+//=============================================================================================================
+
 bool ChannelSelectionView::loadLayout(QString path)
 {
     bool state = LayoutLoader::readMNELoutFile(path, m_layoutMap);

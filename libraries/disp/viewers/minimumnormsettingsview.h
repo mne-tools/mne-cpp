@@ -122,6 +122,14 @@ public:
 protected:
     //=========================================================================================================
     /**
+     * Update the views GUI based on the set GuiMode (Clinical=0, Scientific=1).
+     *
+     * @param mode     The new mode (Clinical=0, Scientific=1).
+     */
+    void updateGuiMode(GuiMode mode);
+
+    //=========================================================================================================
+    /**
      * Slot called when the method changed.
      *
      * @param [in] method        The new method.

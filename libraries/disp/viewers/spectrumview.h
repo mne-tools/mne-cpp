@@ -153,6 +153,14 @@ public:
     void loadSettings();
 
 protected:
+    //=========================================================================================================
+    /**
+     * Update the views GUI based on the set GuiMode (Clinical=0, Scientific=1).
+     *
+     * @param mode     The new mode (Clinical=0, Scientific=1).
+     */
+    void updateGuiMode(GuiMode mode);
+
     QPointer<QTableView>                                m_pTableView;           /**< The QTableView being part of the model/view framework of Qt */
     QPointer<DISPLIB::FrequencySpectrumDelegate>        m_pFSDelegate;          /**< Frequency spectrum delegate */
     QPointer<DISPLIB::FrequencySpectrumModel>           m_pFSModel;             /**< Frequency spectrum model */

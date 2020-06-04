@@ -498,6 +498,18 @@ void RtFiffRawView::loadSettings()
 
 //=============================================================================================================
 
+void RtFiffRawView::updateGuiMode(GuiMode mode)
+{
+    switch(mode) {
+        case GuiMode::Clinical:
+            break;
+        default: // default is scientific mode
+            break;
+    }
+}
+
+//=============================================================================================================
+
 void RtFiffRawView::channelContextMenu(QPoint pos)
 {
     //obtain index where index was clicked

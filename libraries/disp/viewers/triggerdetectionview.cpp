@@ -206,6 +206,18 @@ void TriggerDetectionView::loadSettings()
 
 //=============================================================================================================
 
+void TriggerDetectionView::updateGuiMode(GuiMode mode)
+{
+    switch(mode) {
+        case GuiMode::Clinical:
+            break;
+        default: // default is scientific mode
+            break;
+    }
+}
+
+//=============================================================================================================
+
 void TriggerDetectionView::onTriggerInfoChanged()
 {
     emit triggerInfoChanged(m_qMapTriggerColor,

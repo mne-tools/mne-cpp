@@ -211,6 +211,18 @@ void ConnectivitySettingsView::loadSettings()
 
 //=============================================================================================================
 
+void ConnectivitySettingsView::updateGuiMode(GuiMode mode)
+{
+    switch(mode) {
+        case GuiMode::Clinical:
+            break;
+        default: // default is scientific mode
+            break;
+    }
+}
+
+//=============================================================================================================
+
 void ConnectivitySettingsView::onMetricChanged(const QString& sMetric)
 {
     emit connectivityMetricChanged(sMetric);

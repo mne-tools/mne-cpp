@@ -110,16 +110,52 @@ public:
      */
     void loadSettings();
 
+    //=========================================================================================================
+    /**
+     * Sets the sampling frequency as well as boundaries and configure the GUI elements accordingly
+     *
+     * @param [in] fSFreq           The sampling frequency
+     * @param [in] fLowerBound      The lower bound of the spectrum
+     * @param [in] fUpperBound      The upper bound of the spectrum
+     */
+    void setBoundaries(float fSFreq,
+                       float fLowerBound,
+                       float fUpperBound);
+
+    //=========================================================================================================
+    /**
+     * Returns the lower bound
+     *
+     * @return Returns the lower bound as a float
+     */
+    float getLowerBound();
+
+    //=========================================================================================================
+    /**
+     * Returns the upper bound
+     *
+     * @return Returns the upper bound as a float
+     */
+    float getUpperBound();
+
+protected:
+    //=========================================================================================================
+    /**
+     * Update the views GUI based on the set GuiMode (Clinical=0, Scientific=1).
+     *
+     * @param mode     The new mode (Clinical=0, Scientific=1).
+     */
+    void updateGuiMode(GuiMode mode);
+
+    QPointer<QSlider>   m_pSliderLowerBound;    /**< Lower bound frequency */
+    QPointer<QSlider>   m_pSliderUpperBound;    /**< Upper bound frequency */
+
 signals:
     //=========================================================================================================
     /**
      * Emitted whenever the settings changed and are ready to be retreived.
      */
     void settingsChanged();
-
-public:
-    QPointer<QSlider>   m_pSliderLowerBound;    /**< Lower bound frequency */
-    QPointer<QSlider>   m_pSliderUpperBound;    /**< Upper bound frequency */
 };
 } // NAMESPACE
 

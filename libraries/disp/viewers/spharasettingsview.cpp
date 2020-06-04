@@ -121,6 +121,18 @@ void SpharaSettingsView::loadSettings()
 
 //=============================================================================================================
 
+void SpharaSettingsView::updateGuiMode(GuiMode mode)
+{
+    switch(mode) {
+        case GuiMode::Clinical:
+            break;
+        default: // default is scientific mode
+            break;
+    }
+}
+
+//=============================================================================================================
+
 void SpharaSettingsView::onSpharaButtonClicked(bool state)
 {
     emit spharaActivationChanged(state);

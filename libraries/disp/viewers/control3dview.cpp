@@ -213,6 +213,18 @@ void Control3DView::loadSettings()
 
 //=============================================================================================================
 
+void Control3DView::updateGuiMode(GuiMode mode)
+{
+    switch(mode) {
+        case GuiMode::Clinical:
+            break;
+        default: // default is scientific mode
+            break;
+    }
+}
+
+//=============================================================================================================
+
 void Control3DView::onOpacityChange(qint32 value)
 {
     this->setWindowOpacity(1/(100.0/value));
