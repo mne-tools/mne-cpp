@@ -61,7 +61,7 @@ CONFIG(debug, debug|release) {
             -lmnecppInversed \
             -lmnecppFwdd \
             -lmnecppMned \
-            -lmnecppFiff \
+            -lmnecppFiffd \
             -lmnecppFsd \
             -lmnecppUtilsd \
 } else {
