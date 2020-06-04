@@ -220,11 +220,15 @@ void MainWindow::onStyleChanged(const QString& sStyle)
         if(sStyle == "default") {
             pApp->setStyleSheet("");
         } else {
+        #ifdef WASMBUILD
+            qWarning() << "[MainWindow::onStyleChanged] Changing the style is not supported in the wasm mode yet.";
+        #else
             QFile file;
             file.setFileName(":/styles/"+sStyle+".qss");
             file.open(QFile::ReadOnly | QFile::Text);
             QTextStream stream(&file);
             pApp->setStyleSheet(stream.readAll());
+        #endif
         }
 
         // Set default font
