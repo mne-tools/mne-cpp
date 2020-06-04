@@ -132,3 +132,44 @@ void SpectrumSettingsView::loadSettings()
     // Load Settings
     QSettings settings("MNECPP");
 }
+
+//=============================================================================================================
+
+void SpectrumSettingsView::setBoundaries(float fSFreq,
+                                         float fLowerBound,
+                                         float fUpperBound)
+{
+    m_pSliderLowerBound->setMinimum(0);
+    m_pSliderLowerBound->setMaximum((qint32)(fSFreq/2)*1000);
+    m_pSliderLowerBound->setValue((qint32)(fLowerBound*1000));
+
+    m_pSliderUpperBound->setMinimum(0);
+    m_pSliderUpperBound->setMaximum((qint32)(fSFreq/2)*1000);
+    m_pSliderUpperBound->setValue((qint32)(fUpperBound*1000));
+}
+
+//=============================================================================================================
+
+float SpectrumSettingsView::getLowerBound()
+{
+    return m_pSliderLowerBound->value()/1000.0f;
+}
+
+//=============================================================================================================
+
+float SpectrumSettingsView::getUpperBound()
+{
+    return m_pSliderUpperBound->value()/1000.0f;
+}
+
+//=============================================================================================================
+
+void SpectrumSettingsView::updateGuiMode(GuiMode mode)
+{
+    switch(mode) {
+        case GuiMode::Clinical:
+            break;
+        default: // default is scientific mode
+            break;
+    }
+}

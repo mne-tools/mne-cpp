@@ -168,6 +168,20 @@ void FilterSettingsView::loadSettings()
 
 //=============================================================================================================
 
+void FilterSettingsView::updateGuiMode(GuiMode mode)
+{
+    switch(mode) {
+        case GuiMode::Clinical:
+            m_pUi->m_pPushButtonShowFilterOptions->hide();
+            break;
+        default: // default is scientific mode
+            m_pUi->m_pPushButtonShowFilterOptions->show();
+            break;
+    }
+}
+
+//=============================================================================================================
+
 void FilterSettingsView::onShowFilterView()
 {
     if(m_pFilterView->isActiveWindow()) {

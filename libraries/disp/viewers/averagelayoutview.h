@@ -213,6 +213,14 @@ public:
     void loadSettings();
 
 protected:
+    //=========================================================================================================
+    /**
+     * Update the views GUI based on the set GuiMode (Clinical=0, Scientific=1).
+     *
+     * @param mode     The new mode (Clinical=0, Scientific=1).
+     */
+    void updateGuiMode(GuiMode mode);
+
     QSharedPointer<AverageScene>                                m_pAverageScene;            /**< The pointer to the average scene. */
     QSharedPointer<DISPLIB::EvokedSetModel>                     m_pEvokedSetModel;          /**< The data model */
     QSharedPointer<DISPLIB::ChannelInfoModel>                   m_pChannelInfoModel;        /**< Channel info model. */

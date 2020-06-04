@@ -115,6 +115,18 @@ void TfSettingsView::loadSettings()
 
 //=============================================================================================================
 
+void TfSettingsView::updateGuiMode(GuiMode mode)
+{
+    switch(mode) {
+        case GuiMode::Clinical:
+            break;
+        default: // default is scientific mode
+            break;
+    }
+}
+
+//=============================================================================================================
+
 void TfSettingsView::onNumberTrialRowChanged()
 {
     emit numberTrialRowChanged(ui->m_spinBox_trialNumber->value(), ui->m_spinBox_rowNumber->value());

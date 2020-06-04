@@ -80,6 +80,11 @@ public:
     typedef QSharedPointer<AbstractView> SPtr;              /**< Shared pointer type for AbstractView. */
     typedef QSharedPointer<const AbstractView> ConstSPtr;   /**< Const shared pointer type for AbstractView. */
 
+    enum GuiMode {
+        Clinical,
+        Scientific
+    };
+
     //=========================================================================================================
     /**
      * Constructs a AbstractView which is a child of parent.
@@ -91,11 +96,11 @@ public:
 
     //=========================================================================================================
     /**
-     * Set the scientific mode of the view active or inactive
+     * Sets the GUI of this view to a specific mode. Clinical = 0, Scientific = 0.
      *
-     * @param bFlag     The new flag.
+     * @param mode     The new mode.
      */
-    virtual void setScientificMode(bool bFlag);
+    virtual void setGuiMode(GuiMode mode);
 
     //=========================================================================================================
     /**
@@ -110,6 +115,14 @@ public:
     virtual void loadSettings() = 0;
 
 protected:
+    //=========================================================================================================
+    /**
+     * Update the views GUI based on the set GuiMode (Clinical=0, Scientific=1).
+     *
+     * @param mode     The new mode (Clinical=0, Scientific=1).
+     */
+    virtual void updateGuiMode(GuiMode mode) = 0;
+
     bool            m_bScientificModeIsActive;  /**< The flag describing whether the scientific mode of the view is active or not. */
 
     QString         m_sSettingsPath;            /**< The settings path to store the GUI settings to. */

@@ -311,6 +311,18 @@ void AveragingSettingsView::loadSettings()
 
 //=============================================================================================================
 
+void AveragingSettingsView::updateGuiMode(GuiMode mode)
+{
+    switch(mode) {
+        case GuiMode::Clinical:
+            break;
+        default: // default is scientific mode
+            break;
+    }
+}
+
+//=============================================================================================================
+
 void AveragingSettingsView::onChangePreStim()
 {
     qint32 mSeconds = ui->m_pSpinBoxPreStimMSeconds->value();

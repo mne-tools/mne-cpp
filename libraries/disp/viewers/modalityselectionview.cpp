@@ -175,6 +175,18 @@ void ModalitySelectionView::loadSettings()
 
 //=============================================================================================================
 
+void ModalitySelectionView::updateGuiMode(GuiMode mode)
+{
+    switch(mode) {
+        case GuiMode::Clinical:
+            break;
+        default: // default is scientific mode
+            break;
+    }
+}
+
+//=============================================================================================================
+
 void ModalitySelectionView::setModalityMap(const QMap<QString, bool> &modalityMap)
 {
     m_modalityMap = modalityMap;
