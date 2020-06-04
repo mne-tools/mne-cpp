@@ -234,6 +234,8 @@ void WriteToFile::initPluginControlWidgets()
                                                                             sCurrentProject,
                                                                             sCurrentSubject,
                                                                             "");
+        connect(this, &WriteToFile::guiModeChanged,
+                pProjectSettingsView, &ProjectSettingsView::setGuiMode);
         pProjectSettingsView->setObjectName("widget_");
         m_sRecordFileName = pProjectSettingsView->getCurrentFileName();
 

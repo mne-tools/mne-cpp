@@ -92,6 +92,8 @@ Control3DView::Control3DView(const QString& sSettingsPath,
     ui->m_treeView_loadedData->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->m_treeView_loadedData, &QWidget::customContextMenuRequested,
             this, &Control3DView::onCustomContextMenuRequested);
+
+    loadSettings();
 }
 
 //=============================================================================================================
@@ -141,6 +143,7 @@ void Control3DView::setFlags(const QStringList& slFlags)
 
 Control3DView::~Control3DView()
 {
+    saveSettings();
     delete ui;
 }
 

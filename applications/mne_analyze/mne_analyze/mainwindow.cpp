@@ -323,7 +323,7 @@ void MainWindow::createPluginMenus(QSharedPointer<ANSHAREDLIB::PluginManager> pP
     QActionGroup* pActionModeGroup = new QActionGroup(this);
 
     m_pActionScientificMode = new QAction("Scientific");
-    m_pActionScientificMode->setStatusTip(tr("Activate the scientific mode"));
+    m_pActionScientificMode->setStatusTip(tr("Activate the scientific GUI mode"));
     m_pActionScientificMode->setCheckable(true);
     m_pActionScientificMode->setChecked(true);
     pActionModeGroup->addAction(m_pActionScientificMode);
@@ -331,7 +331,7 @@ void MainWindow::createPluginMenus(QSharedPointer<ANSHAREDLIB::PluginManager> pP
             this, &MainWindow::onGuiModeChanged);
 
     m_pActionClinicalMode = new QAction("Clinical");
-    m_pActionClinicalMode->setStatusTip(tr("Activate the clinical mode"));
+    m_pActionClinicalMode->setStatusTip(tr("Activate the clinical GUI mode"));
     m_pActionClinicalMode->setCheckable(true);
     m_pActionClinicalMode->setChecked(false);
     pActionModeGroup->addAction(m_pActionClinicalMode);
@@ -341,7 +341,7 @@ void MainWindow::createPluginMenus(QSharedPointer<ANSHAREDLIB::PluginManager> pP
     if(!m_pMenuAppearance) {
         m_pMenuAppearance = menuBar()->addMenu(tr("&Appearance"));
         m_pMenuAppearance->addMenu("Styles")->addActions(pActionStyleGroup->actions());
-        m_pMenuAppearance->addMenu("Modes")->addActions(pActionModeGroup->actions());
+        m_pMenuAppearance->addMenu("GUI Modes")->addActions(pActionModeGroup->actions());
     }
 
     // Help menu

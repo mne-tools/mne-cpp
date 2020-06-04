@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
- * @file     covariancesettingswidget.cpp
+ * @file     covariancesettingsview.cpp
  * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @since    0.1.0
- * @date     February, 2013
+ * @since    0.1.2
+ * @date     June, 2020
  *
  * @section  LICENSE
  *
- * Copyright (C) 2013, Christoph Dinh, Lorenz Esch. All rights reserved.
+ * Copyright (C) 2020, Christoph Dinh, Lorenz Esch. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the CovarianceSettingsWidget class.
+ * @brief    Definition of the CovarianceSettingsView class.
  *
  */
 
@@ -37,7 +37,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "covariancesettingswidget.h"
+#include "covariancesettingsview.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -52,15 +52,15 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace COVARIANCEPLUGIN;
+using namespace DISPLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-CovarianceSettingsWidget::CovarianceSettingsWidget(const QString& sSettingsPath,
-                                                   QWidget *parent)
-: QWidget(parent)
+CovarianceSettingsView::CovarianceSettingsView(const QString& sSettingsPath,
+                                               QWidget *parent)
+: AbstractView(parent)
 , m_sSettingsPath(sSettingsPath)
 {
     this->setWindowTitle("Covariance Settings");
@@ -80,21 +80,30 @@ CovarianceSettingsWidget::CovarianceSettingsWidget(const QString& sSettingsPath,
     m_pSpinBoxNumSamples->setMaximum(minSamples*60);
     m_pSpinBoxNumSamples->setSingleStep(minSamples);
     connect(m_pSpinBoxNumSamples, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            this, &CovarianceSettingsWidget::samplesChanged);
+            this, &CovarianceSettingsView::samplesChanged);
     t_pGridLayout->addWidget(m_pSpinBoxNumSamples,0,1,1,1);
     this->setLayout(t_pGridLayout);
+
+    loadSettings();
 }
 
 //=============================================================================================================
 
-void CovarianceSettingsWidget::setCurrentSamples(int iSamples)
+CovarianceSettingsView::~CovarianceSettingsView()
+{
+    saveSettings();
+}
+
+//=============================================================================================================
+
+void CovarianceSettingsView::setCurrentSamples(int iSamples)
 {
     m_pSpinBoxNumSamples->setValue(iSamples);
 }
 
 //=============================================================================================================
 
-void CovarianceSettingsWidget::setMinSamples(int iSamples)
+void CovarianceSettingsView::setMinSamples(int iSamples)
 {
     m_pSpinBoxNumSamples->setMinimum(iSamples);
     m_pSpinBoxNumSamples->setMaximum(iSamples*60);
@@ -102,7 +111,7 @@ void CovarianceSettingsWidget::setMinSamples(int iSamples)
 
 //=============================================================================================================
 
-void CovarianceSettingsWidget::saveSettings()
+void CovarianceSettingsView::saveSettings()
 {
     if(m_sSettingsPath.isEmpty()) {
         return;
@@ -114,7 +123,7 @@ void CovarianceSettingsWidget::saveSettings()
 
 //=============================================================================================================
 
-void CovarianceSettingsWidget::loadSettings()
+void CovarianceSettingsView::loadSettings()
 {
     if(m_sSettingsPath.isEmpty()) {
         return;
@@ -122,4 +131,16 @@ void CovarianceSettingsWidget::loadSettings()
 
     // Load Settings
     QSettings settings("MNECPP");
+}
+
+//=============================================================================================================
+
+void CovarianceSettingsView::updateGuiMode(GuiMode mode)
+{
+    switch(mode) {
+        case GuiMode::Clinical:
+            break;
+        default: // default is scientific mode
+            break;
+    }
 }
