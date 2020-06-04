@@ -139,7 +139,6 @@ public:
      */
     void loadSettings();
 
-protected:
     //=========================================================================================================
     /**
      * Update the views GUI based on the set GuiMode (Clinical=0, Scientific=1).
@@ -148,6 +147,7 @@ protected:
      */
     void updateGuiMode(GuiMode mode);
 
+protected:
     //=========================================================================================================
     /**
      * Redraw the selection.
