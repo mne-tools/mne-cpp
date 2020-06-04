@@ -595,7 +595,6 @@ void RtcMne::run()
         m_qMutex.unlock();
 
         if(bUpdateMinimumNorm) {
-            qDebug() << "Run - rtcmne - update minimumnorm ----------------";
             m_qMutex.lock();
             pMinimumNorm = MinimumNorm::SPtr(new MinimumNorm(m_invOp, lambda2, m_sMethod));
             m_bUpdateMinimumNorm = false;
