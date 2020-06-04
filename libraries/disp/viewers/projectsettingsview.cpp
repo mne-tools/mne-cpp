@@ -169,6 +169,18 @@ void ProjectSettingsView::loadSettings()
 
 //=============================================================================================================
 
+void ProjectSettingsView::updateGuiMode(GuiMode mode)
+{
+    switch(mode) {
+        case GuiMode::Clinical:
+            break;
+        default: // default is scientific mode
+            break;
+    }
+}
+
+//=============================================================================================================
+
 void ProjectSettingsView::setRecordingElapsedTime(int mSecsElapsed)
 {
     QTime remainingTime(0,0,0,0);

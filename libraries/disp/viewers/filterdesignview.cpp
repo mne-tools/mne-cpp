@@ -271,6 +271,18 @@ void FilterDesignView::loadSettings()
 
 //=============================================================================================================
 
+void FilterDesignView::updateGuiMode(GuiMode mode)
+{
+    switch(mode) {
+        case GuiMode::Clinical:
+            break;
+        default: // default is scientific mode
+            break;
+    }
+}
+
+//=============================================================================================================
+
 void FilterDesignView::initSpinBoxes()
 {
     m_pUi->m_doubleSpinBox_from->setValue(5.0);

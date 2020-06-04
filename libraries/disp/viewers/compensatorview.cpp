@@ -152,6 +152,18 @@ void CompensatorView::loadSettings()
 
 //=============================================================================================================
 
+void CompensatorView::updateGuiMode(GuiMode mode)
+{
+    switch(mode) {
+        case GuiMode::Clinical:
+            break;
+        default: // default is scientific mode
+            break;
+    }
+}
+
+//=============================================================================================================
+
 int CompensatorView::getLastTo() const
 {
     return m_iLastTo;

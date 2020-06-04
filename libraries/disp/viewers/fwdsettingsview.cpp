@@ -131,6 +131,18 @@ FwdSettingsView::~FwdSettingsView()
 
 //=============================================================================================================
 
+void FwdSettingsView::saveSettings()
+{
+    if(m_sSettingsPath.isEmpty()) {
+        return;
+    }
+
+    QSettings settings("MNECPP");
+    QVariant data;
+}
+
+//=============================================================================================================
+
 void FwdSettingsView::loadSettings()
 {
     if(m_sSettingsPath.isEmpty()) {
@@ -143,14 +155,14 @@ void FwdSettingsView::loadSettings()
 
 //=============================================================================================================
 
-void FwdSettingsView::saveSettings()
+void FwdSettingsView::updateGuiMode(GuiMode mode)
 {
-    if(m_sSettingsPath.isEmpty()) {
-        return;
+    switch(mode) {
+        case GuiMode::Clinical:
+            break;
+        default: // default is scientific mode
+            break;
     }
-
-    QSettings settings("MNECPP");
-    QVariant data;
 }
 
 //=============================================================================================================
