@@ -77,16 +77,6 @@ bool MainWindow::confirmClose()
     return true;
 }
 
-void MainWindow::setController(MNEANONYMIZE::SettingsControllerGui *c)
-{
-    m_pController = c;
-}
-
-MNEANONYMIZE::SettingsControllerGui* MainWindow::getController() const
-{
-    return m_pController;
-}
-
 //todo
 // set the delete input file
 // set the avoid delete input file confirmation.

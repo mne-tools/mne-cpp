@@ -22,10 +22,6 @@ public:
 
     ~MainWindow() override;
 
-    void setController(SettingsControllerGui*);
-
-    SettingsControllerGui* getController() const;
-
     void setLineEditInFile(const QString&);
     void setLineEditOutFile(const QString &f);
 
