@@ -43,6 +43,8 @@
 #include "info.h"
 #include "mainsplashscreen.h"
 
+#include <disp/viewers/abstractview.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -198,6 +200,12 @@ private:
 
     //=========================================================================================================
     /**
+     * Handles changes made to the application's GUI mode.
+     */
+    void onGuiModeChanged();
+
+    //=========================================================================================================
+    /**
      * Setup the user interface for running mode.
      *
      * @param [in] state whether program is running.
@@ -347,7 +355,8 @@ private:
     int                                 m_iTimeoutMSec;                 /**< Holds milliseconds after which timer timeouts.*/
 
     QPointer<QActionGroup>              m_pActionGroupLgLv;             /**< group log level */
-    QPointer<QActionGroup>              m_pActionStyleGroup;
+    QPointer<QActionGroup>              m_pActionStyleGroup;            /**< group for styles */
+    QPointer<QActionGroup>              m_pActionModeGroup;             /**< group for gui modes */
 
     QPointer<QAction>                   m_pActionNewConfig;             /**< new configuration */
     QPointer<QAction>                   m_pActionOpenConfig;            /**< open configuration */
@@ -362,8 +371,10 @@ private:
     QPointer<QAction>                   m_pActionQuickControl;          /**< Show quick control widget. */
     QPointer<QAction>                   m_pActionRun;                   /**< run application */
     QPointer<QAction>                   m_pActionStop;                  /**< stop application */
-    QPointer<QAction>                   m_pActionDefaultMode;                  /**< stop application */
-    QPointer<QAction>                   m_pActionLightMode;                  /**< stop application */
+    QPointer<QAction>                   m_pActionDefaultMode;           /**< stop application */
+    QPointer<QAction>                   m_pActionLightMode;             /**< stop application */
+    QPointer<QAction>                   m_pActionScientificMode;        /**< activate scientific gui mode */
+    QPointer<QAction>                   m_pActionClinicalMode;          /**< activate clinical gui mode */
 
     QList<QAction*>                     m_qListDynamicPluginActions;    /**< dynamic plugin actions */
     QList<QAction*>                     m_qListDynamicDisplayActions;   /**< dynamic display actions */
@@ -403,6 +414,16 @@ private:
     QSharedPointer<SCSHAREDLIB::PluginSceneManager>     m_pPluginSceneManager;  /**< Plugin scene manager which manages the plugin graph */
     QSharedPointer<QWidget>                             m_pAboutWindow;         /**< Holds the widget containing the about information.*/
     QSharedPointer<SCSHAREDLIB::DisplayManager>         m_pDisplayManager;      /**< display manager */
+
+signals:
+    //=========================================================================================================
+    /**
+     * Signal emmited whenever the gui modes changed
+     *
+     * @param [in] mode       the new gui mode
+     */
+    void guiModeChanged(DISPLIB::AbstractView::GuiMode mode);
+
 };
 }// NAMESPACE
 

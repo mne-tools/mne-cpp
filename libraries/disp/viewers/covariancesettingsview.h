@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
- * @file     covariancesettingswidget.h
+ * @file     covariancesettingsview.h
  * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @since    0.1.0
- * @date     February, 2013
+ * @since    0.1.2
+ * @date     June, 2020
  *
  * @section  LICENSE
  *
- * Copyright (C) 2013, Christoph Dinh, Lorenz Esch. All rights reserved.
+ * Copyright (C) 2020 Christoph Dinh, Lorenz Esch. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -29,16 +29,19 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains the declaration of the CovarianceSettingsWidget class.
+ * @brief    Contains the declaration of the CovarianceSettingsView class.
  *
  */
 
-#ifndef COVARIANCESETTINGSWIDGET_H
-#define COVARIANCESETTINGSWIDGET_H
+#ifndef COVARIANCESETTINGSVIEW_H
+#define COVARIANCESETTINGSVIEW_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
+
+#include "../disp_global.h"
+#include "abstractview.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -52,26 +55,38 @@
 #include <QCheckBox>
 
 //=============================================================================================================
-// DEFINE NAMESPACE COVARIANCEPLUGIN
+// DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
-namespace COVARIANCEPLUGIN
+namespace DISPLIB
 {
 
 //=============================================================================================================
-// COVARIANCEPLUGIN FORWARD DECLARATIONS
+// DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-class CovarianceSettingsWidget : public QWidget
+//=============================================================================================================
+/**
+ * User GUI control for Covariance estimation.
+ *
+ * @brief User GUI control for Covariance estimation.
+ */
+class DISPSHARED_EXPORT CovarianceSettingsView : public AbstractView
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<CovarianceSettingsWidget> SPtr;         /**< Shared pointer type for CovarianceAdjustmentWidget. */
-    typedef QSharedPointer<CovarianceSettingsWidget> ConstSPtr;    /**< Const shared pointer type for CovarianceAdjustmentWidget. */
+    typedef QSharedPointer<CovarianceSettingsView> SPtr;         /**< Shared pointer type for CovarianceAdjustmentWidget. */
+    typedef QSharedPointer<CovarianceSettingsView> ConstSPtr;    /**< Const shared pointer type for CovarianceAdjustmentWidget. */
 
-    explicit CovarianceSettingsWidget(const QString& sSettingsPath = "",
-                                      QWidget *parent = 0);
+    explicit CovarianceSettingsView(const QString& sSettingsPath = "",
+                                    QWidget *parent = 0);
+
+    //=========================================================================================================
+    /**
+     * Destroys the CovarianceSettingsView.
+     */
+    ~CovarianceSettingsView();
 
     //=========================================================================================================
     /**
@@ -79,7 +94,7 @@ public:
      *
      * @param[in] iSamples     new number samples
      */
-    virtual void setCurrentSamples(int iSamples);
+    void setCurrentSamples(int iSamples);
 
     //=========================================================================================================
     /**
@@ -87,7 +102,7 @@ public:
      *
      * @param[in] iSamples     new minimum number of samples
      */
-    virtual void setMinSamples(int iSamples);
+    void setMinSamples(int iSamples);
 
     //=========================================================================================================
     /**
@@ -101,6 +116,15 @@ public:
      */
     void loadSettings();
 
+protected:
+    //=========================================================================================================
+    /**
+     * Update the views GUI based on the set GuiMode (Clinical=0, Scientific=1).
+     *
+     * @param mode     The new mode (Clinical=0, Scientific=1).
+     */
+    void updateGuiMode(GuiMode mode);
+
 signals:
     void samplesChanged(int iSamples);
 
@@ -109,6 +133,6 @@ private:
     QString         m_sSettingsPath;            /**< The settings path to store the GUI settings to. */
 
 };
-} // NAMESPACE
+} // NAMESPACE DISPLIB
 
-#endif // COVARIANCESETTINGSWIDGET_H
+#endif // COVARIANCESETTINGSVIEW_H

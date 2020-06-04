@@ -71,7 +71,9 @@ CONFIG(debug, debug|release) {
     LIBS += -lscSharedd \
             -lscDispd \
             -lscMeasd \
+            -lmnecppDispd \
             -lmnecppRtProcessingd \
+            -lmnecppConnectivityd \
             -lmnecppInversed \
             -lmnecppFwdd \
             -lmnecppMned \
@@ -82,7 +84,9 @@ CONFIG(debug, debug|release) {
     LIBS += -lscShared \
             -lscDisp \
             -lscMeas \
+            -lmnecppDisp \
             -lmnecppRtProcessing \
+            -lmnecppConnectivity \
             -lmnecppInverse \
             -lmnecppFwd \
             -lmnecppMne \
@@ -93,17 +97,15 @@ CONFIG(debug, debug|release) {
 
 SOURCES += \
     covariance.cpp \
-    FormFiles/covariancesetupwidget.cpp \
-    FormFiles/covariancesettingswidget.cpp
+    FormFiles/covariancesetupwidget.cpp
 
 HEADERS += \
     covariance_global.h \
     covariance.h \
-    FormFiles/covariancesetupwidget.h \
-    FormFiles/covariancesettingswidget.h
+    FormFiles/covariancesetupwidget.h
 
 FORMS += \
-    FormFiles/covariancesetup.ui \
+    FormFiles/covariancesetupwidget.ui \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
