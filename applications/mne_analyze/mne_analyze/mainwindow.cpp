@@ -47,6 +47,7 @@
 
 #include <disp/viewers/multiview.h>
 #include <disp/viewers/multiviewwindow.h>
+#include <disp/viewers/abstractview.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -239,6 +240,17 @@ void MainWindow::onStyleChanged(const QString& sStyle)
 
 //=============================================================================================================
 
+void MainWindow::onGuiModeChanged()
+{
+    if(m_pActionScientificMode->isChecked()) {
+        emit guiModeChanged(DISPLIB::AbstractView::GuiMode::Scientific);
+    } else if(m_pActionClinicalMode->isChecked()) {
+        emit guiModeChanged(DISPLIB::AbstractView::GuiMode::Clinical);
+    }
+}
+
+//=============================================================================================================
+
 void MainWindow::createLogDockWindow()
 {
     //Log TextBrowser
@@ -315,12 +327,16 @@ void MainWindow::createPluginMenus(QSharedPointer<ANSHAREDLIB::PluginManager> pP
     m_pActionScientificMode->setCheckable(true);
     m_pActionScientificMode->setChecked(true);
     pActionModeGroup->addAction(m_pActionScientificMode);
+    connect(m_pActionScientificMode.data(), &QAction::triggered,
+            this, &MainWindow::onGuiModeChanged);
 
     m_pActionClinicalMode = new QAction("Clinical");
     m_pActionClinicalMode->setStatusTip(tr("Activate the clinical mode"));
     m_pActionClinicalMode->setCheckable(true);
     m_pActionClinicalMode->setChecked(false);
     pActionModeGroup->addAction(m_pActionClinicalMode);
+    connect(m_pActionClinicalMode.data(), &QAction::triggered,
+            this, &MainWindow::onGuiModeChanged);
 
     if(!m_pMenuAppearance) {
         m_pMenuAppearance = menuBar()->addMenu(tr("&Appearance"));
@@ -376,11 +392,9 @@ void MainWindow::createPluginControls(QSharedPointer<ANSHAREDLIB::PluginManager>
             m_pMenuView->addAction(pAction);
             qInfo() << "[MainWindow::createPluginControls] Added" << pPlugin->getName() << "controls to View menu";
 
-            // Connect to GUI mode toggling
-            connect(m_pActionClinicalMode.data(), &QAction::triggered,
-                [=]() {
-                onStyleChanged("dark");
-            });
+            // Connect plugin controls to GUI mode toggling
+            connect(this, &MainWindow::guiModeChanged,
+                    pPlugin, &IPlugin::guiModeChanged);
 
             // Disable floating and editable dock widgets, since the wasm QDockWidget version is buggy
             #ifdef WASMBUILD

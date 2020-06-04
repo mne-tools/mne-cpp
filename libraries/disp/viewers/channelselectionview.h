@@ -211,7 +211,6 @@ public:
      */
     void loadSettings();
 
-private:
     //=========================================================================================================
     /**
      * Update the views GUI based on the set GuiMode (Clinical=0, Scientific=1).
@@ -220,6 +219,7 @@ private:
      */
     void updateGuiMode(GuiMode mode);
 
+private:
     //=========================================================================================================
     /**
      * Initialises all tabel widgets in the selection window.

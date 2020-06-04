@@ -138,6 +138,8 @@ QDockWidget *RawDataViewer::getControl()
     title_scaling->setText("<b>Channel Scaling</b>");
 
     m_pScalingWidget = new ScalingView("MNEANALYZE");
+    connect(this, &RawDataViewer::guiModeChanged,
+            m_pScalingWidget.data(), &ScalingView::setGuiMode);
     pLayout->addWidget(title_scaling);
     pLayout->addWidget(m_pScalingWidget);
 
@@ -147,6 +149,8 @@ QDockWidget *RawDataViewer::getControl()
     title_viewsettings->setText("<b>View Settings</b>");
 
     m_pSettingsViewWidget = new FiffRawViewSettings("MNEANALYZE");
+    connect(this, &RawDataViewer::guiModeChanged,
+            m_pSettingsViewWidget.data(), &FiffRawViewSettings::setGuiMode);
     m_pSettingsViewWidget->setWidgetList();
     pLayout->addWidget(title_viewsettings);
     pLayout->addWidget(m_pSettingsViewWidget);

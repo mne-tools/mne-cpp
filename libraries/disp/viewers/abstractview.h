@@ -114,7 +114,6 @@ public:
      */
     virtual void loadSettings() = 0;
 
-protected:
     //=========================================================================================================
     /**
      * Update the views GUI based on the set GuiMode (Clinical=0, Scientific=1).
@@ -122,6 +121,8 @@ protected:
      * @param mode     The new mode (Clinical=0, Scientific=1).
      */
     virtual void updateGuiMode(GuiMode mode) = 0;
+
+protected:
 
     bool            m_bScientificModeIsActive;  /**< The flag describing whether the scientific mode of the view is active or not. */
 
