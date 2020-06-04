@@ -178,23 +178,25 @@ private:
     void tabifyDockWindows();                                                                   /**< Tabify all dock windows */
     void about();                                                                               /**< Implements about action.*/
 
-    QPointer<DISPLIB::MultiView>        m_pMultiView;       /**< The central View.*/
+    QPointer<DISPLIB::MultiView>        m_pMultiView;               /**< The central View.*/
 
-    QPointer<QGridLayout>               m_pGridLayout;      /**< Grid Layout is used for MainWindow, so that the MultiView can always fit the size of MainWindow */
+    QPointer<QGridLayout>               m_pGridLayout;              /**< Grid Layout is used for MainWindow, so that the MultiView can always fit the size of MainWindow */
 
     // MainWindow actions
-    QPointer<QAction>                   m_pActionExit;      /**< exit application action */
-    QPointer<QAction>                   m_pActionAbout;     /**< show about dialog action */
+    QPointer<QAction>                   m_pActionExit;              /**< exit application action */
+    QPointer<QAction>                   m_pActionAbout;             /**< show about dialog action */
+    QPointer<QAction>                   m_pActionScientificMode;    /**< toggle scientific mode action */
+    QPointer<QAction>                   m_pActionClinicalMode;      /**< toggle clinical mode action */
 
     // MainWindow menus
-    QPointer<QMenu>                     m_pMenuFile;        /**< Holds the file menu.*/
-    QPointer<QMenu>                     m_pMenuView;        /**< Holds the view menu.*/
-    QPointer<QMenu>                     m_pMenuAppearance;  /**< Holds the appearance menu.*/
-    QPointer<QMenu>                     m_pMenuHelp;        /**< Holds the help menu.*/
+    QPointer<QMenu>                     m_pMenuFile;                /**< Holds the file menu.*/
+    QPointer<QMenu>                     m_pMenuView;                /**< Holds the view menu.*/
+    QPointer<QMenu>                     m_pMenuAppearance;          /**< Holds the appearance menu.*/
+    QPointer<QMenu>                     m_pMenuHelp;                /**< Holds the help menu.*/
 
-    QPointer<QTextBrowser>              m_pTextBrowser_Log; /**< Holds the text browser for the log.*/
+    QPointer<QTextBrowser>              m_pTextBrowser_Log;         /**< Holds the text browser for the log.*/
 
-    QSharedPointer<QWidget>             m_pAboutWindow;     /**< Holds the widget containing the about information.*/
+    QSharedPointer<QWidget>             m_pAboutWindow;             /**< Holds the widget containing the about information.*/
 };
 
 }// NAMESPACE
