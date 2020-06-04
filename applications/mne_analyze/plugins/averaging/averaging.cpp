@@ -40,6 +40,7 @@
 #include <anShared/Management/communicator.h>
 #include <disp/viewers/averagingsettingsview.h>
 #include <anShared/Model/fiffrawviewmodel.h>
+#include <anShared/Model/annotationmodel.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -139,6 +140,8 @@ QDockWidget* Averaging::getControl()
             this, &Averaging::onChangeBaselineActive, Qt::UniqueConnection);
     connect(pAveragingSettingsView, &DISPLIB::AveragingSettingsView::resetAverage,
             this, &Averaging::onResetAverage, Qt::UniqueConnection);
+    connect(pButton, &QPushButton::clicked,
+            this, &Averaging::onComputeButtonCLicked);
 
     pLayout->addWidget(pAveragingSettingsView);
     pLayout->addWidget(pButton);
@@ -294,4 +297,16 @@ void Averaging::onResetAverage(bool state)
     if(m_pAve) {
         m_pAve->reset();
     }
+}
+
+//=============================================================================================================
+
+void Averaging::onComputeButtonCLicked(bool bChecked)
+{
+    Q_UNUSED(bChecked);
+    for (int i = 0; i < m_pFiffRawModel->getTimeListSize(); i++){
+        qDebug() << "At" <<  i << ":" << m_pFiffRawModel->getTimeMarks(i);
+    }
+
+    //this->m_pFiffRawModel->data();
 }

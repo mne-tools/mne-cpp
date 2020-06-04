@@ -175,6 +175,9 @@ private:
      */
     void onResetAverage(bool state);
 
+    //=========================================================================================================
+    void onComputeButtonCLicked(bool bChecked);
+
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals */
 
     QSharedPointer<ANSHAREDLIB::FiffRawViewModel>           m_pFiffRawModel;            /**< Pointer to currently loaded FiffRawView Model */

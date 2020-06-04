@@ -98,8 +98,8 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager
         createPluginMenus(pPluginManager);
         createLogDockWindow();
         createPluginControls(pPluginManager);
-        createPluginViews(pPluginManager);
         createAveragingWindows();
+        createPluginViews(pPluginManager);
     } else {
         qWarning() << "[MainWindow::MainWindow] CRITICAL ! Plugin manager is nullptr";
     }
