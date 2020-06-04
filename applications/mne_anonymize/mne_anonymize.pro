@@ -130,6 +130,9 @@ contains(MNECPP_CONFIG, useFFTW) {
         # On Linux
         LIBS += -lfftw3 \
                 -lfftw3_threads \
+        CONFIG(debug, debug|release) {
+            CONFIG -= app_bundle
+        }
     }
 }
 
