@@ -237,14 +237,11 @@ void MainWindow::createActions()
 
 void MainWindow::onStyleChanged(const QString& sStyle)
 {
-    qDebug() << "MainWindow::onStyleChanged " << qobject_cast<QApplication *>(QApplication::instance());
-    // Styles are from https://github.com/Alexhuszagh/BreezeStyleSheets
     if(QApplication *pApp = qobject_cast<QApplication *>(QApplication::instance())) {
         if(sStyle == "default") {
             m_sCurrentStyle = "default";
-            pApp->setStyleSheet("MainWindow::onStyleChanged - hello");
+            pApp->setStyleSheet("");
         } else {
-            qDebug() << "hello";
             m_sCurrentStyle = "dark";
         #ifdef WASMBUILD
             qWarning() << "[MainWindow::onStyleChanged] Changing the style is not supported in the wasm mode yet.";
