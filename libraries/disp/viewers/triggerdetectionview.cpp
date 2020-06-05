@@ -77,6 +77,8 @@ TriggerDetectionView::TriggerDetectionView(const QString& sSettingsPath,
     this->setWindowTitle("Trigger Detection Settings");
     this->setMinimumWidth(330);
     this->setMaximumWidth(330);
+
+    loadSettings();
 }
 
 //=============================================================================================================

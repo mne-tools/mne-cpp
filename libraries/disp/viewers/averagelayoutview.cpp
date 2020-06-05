@@ -101,6 +101,14 @@ AverageLayoutView::AverageLayoutView(const QString& sSettingsPath,
     neLayout->setContentsMargins(0,0,0,0);
     neLayout->addWidget(m_pAverageLayoutView);
     this->setLayout(neLayout);
+    loadSettings();
+}
+
+//=============================================================================================================
+
+AverageLayoutView::~AverageLayoutView()
+{
+    saveSettings();
 }
 
 //=============================================================================================================

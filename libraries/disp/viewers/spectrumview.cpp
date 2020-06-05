@@ -85,6 +85,14 @@ SpectrumView::SpectrumView(const QString& sSettingsPath,
 
     //set layouts
     this->setLayout(neLayout);
+    loadSettings();
+}
+
+//=============================================================================================================
+
+SpectrumView::~SpectrumView()
+{
+    saveSettings();
 }
 
 //=============================================================================================================

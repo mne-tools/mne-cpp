@@ -104,6 +104,12 @@ public:
 
     //=========================================================================================================
     /**
+     * Destroys the ArtifactSettingsView.
+     */
+    ~SpectrumView();
+
+    //=========================================================================================================
+    /**
      * Initializes the view based on the FiffInfo and scale type.
      *
      * @param [in] info          The FiffInfo.

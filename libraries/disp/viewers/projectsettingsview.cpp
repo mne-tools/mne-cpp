@@ -134,12 +134,15 @@ ProjectSettingsView::ProjectSettingsView(const QString& sSettingsPath,
     //Hide delete buttons
     ui->m_qPushButtonDeleteProject->hide();
     ui->m_qPushButtonDeleteSubject->hide();
+
+    loadSettings();
 }
 
 //=============================================================================================================
 
 ProjectSettingsView::~ProjectSettingsView()
 {
+    saveSettings();
     delete ui;
 }
 
