@@ -853,6 +853,9 @@ void MainWindow::writeToLog(const QString& logMsg,
 
 void MainWindow::startMeasurement()
 {
+    // Save pipeline before starting just in case a crash occurs
+    m_pPluginGui->saveConfig(QStandardPaths::writableLocation(QStandardPaths::DataLocation),"default.xml");
+
     writeToLog(tr("Starting real-time measurement..."), _LogKndMessage, _LogLvMin);
 
     if(!m_pPluginSceneManager->startPlugins()) {

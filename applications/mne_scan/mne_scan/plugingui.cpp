@@ -452,8 +452,6 @@ void PluginGui::newItemSelected()
         m_pCurrentPlugin = SCSHAREDLIB::IPlugin::SPtr();
         emit selectedConnectionChanged(m_pCurrentConnection);
     }
-
-    saveConfig(QStandardPaths::writableLocation(QStandardPaths::DataLocation),"default.xml");
 }
 
 //=============================================================================================================
