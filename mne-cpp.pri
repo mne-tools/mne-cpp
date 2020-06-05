@@ -100,7 +100,7 @@ defineReplace(copyResources) {
 
 ############################################### GLOBAL DEFINES ################################################
 
-VERSION = 0.1.2
+VERSION = 0.1.3
 
 QMAKE_TARGET_PRODUCT = MNE-CPP
 QMAKE_TARGET_DESCRIPTION = MNE-CPP Qt and Eigen based C++ library.

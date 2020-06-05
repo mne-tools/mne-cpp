@@ -7,6 +7,54 @@ nav_order: 1
 
 # Changelog
 
+## Version 0.1.3 - 2020/06/05
+
+### Applications
+
+MNE Analyze
+* Add new AnalyzeDataModel, which allows subject based data organization
+* Improve data loading from QByteArray in AnalyzeData
+* Log Window now has location preserved between sessions
+* Files once again get selected and displayed automatically when first loaded
+* Disconnect everything from old model before loading new one. This solves performance issues when loading multiple files.
+* Signal Viewer and Annotation settings scale depending on available size
+* Add different GUI modes (scientific and clinical) to appearance menu
+* Add dark and light mode to appearance menu
+* Include skeleton of new Filtering plugin in MNE Analyze. Please note that the actual filtering is still WIP and will follow in a future version.
+
+MNE Scan
+* Update Brainflow plugin
+* Separated real-time source localization and forward calculation into two plugins
+* Recalculate forward solution if large head movement occurred
+* Fix thread safety in real-time source localization plugin
+* Save plugin pipeline in MNE Scan more often and everytime we start the pipeline
+* Beautify HPI plugin control settings view
+* Add different GUI modes (scientific and clinical) to appearance menu
+* Add dark and light mode to appearance menu
+
+### API Libraries
+
+Disp
+* Add new view for controlling the forward calculation
+* Make plugin tab bar show vertically in the Quick Control View
+* Create an abstract interface AbstractView for all Disp library viewers to enforce handling different GUI modes and the saving/loading of GUI settings
+* Refactor saving/settings of Disp viewers
+* Improve FilterSettingsView and add different GUI elements based on the currently set GUI mode. For example, scientific mode will enable advanced filter design tools, whereas in clinical mode only the lower and upper cut off frequencies can be defined.
+* Move CovarianceSettingsView from MNE Scan's Covariance plugin to Disp/viewers
+
+Disp3D
+* Add temporary fix on Windows for the Disp3D library and Qt 5.15.0 where the renderers plugin is deployed manually. This will be reverted once Qt 5.15.1 is released.
+
+### Authors
+
+People who contributed to this release (preceded by number of commits):
+
+(64) Ruben Dörfel
+(51) Lorenz Esch
+(16) Gabriel Motta
+(2) Andrey Parfenov
+(1) Juan Garcia-Prieto
+
 ## Version 0.1.2 - 2020/05/21
 
 ### Applications
