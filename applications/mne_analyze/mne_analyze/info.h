@@ -99,7 +99,7 @@ public:
      */
     const static QString AppName()
     {
-        return QObject::tr("Data Analysis and Machine Learning.");
+        return QObject::tr("Browse, Process & Visualize.");
     }
 
     //=========================================================================================================

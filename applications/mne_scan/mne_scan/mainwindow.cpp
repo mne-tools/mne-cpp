@@ -101,6 +101,8 @@ MainWindow::MainWindow(QWidget *parent)
 , m_pPluginManager(new SCSHAREDLIB::PluginManager(this))
 , m_pPluginSceneManager(new SCSHAREDLIB::PluginSceneManager(this))
 , m_pDisplayManager(new SCSHAREDLIB::DisplayManager(this))
+, m_sSettingsPath("MNESCAN/MainWindow")
+, m_sCurrentStyle("default")
 {
     fprintf(stderr, "%s - Version %s\n",
             CInfo::AppNameShort().toUtf8().constData(),
@@ -121,6 +123,8 @@ MainWindow::MainWindow(QWidget *parent)
     setupPlugins();
     setupUI();
 
+    loadSettings();
+
     //Load application icon for linux builds only, mac and win executables have built in icons from .pro file
 #ifdef __linux__
     qInfo() << "Loading icon...";
@@ -132,6 +136,8 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+    saveSettings();
+
     if(m_bIsRunning) {
         this->stopMeasurement();
     }
@@ -169,6 +175,41 @@ void MainWindow::setupUI()
     createLogDockWindow();
 
     initStatusBar();
+}
+
+//=============================================================================================================
+
+void MainWindow::saveSettings()
+{
+    if(m_sSettingsPath.isEmpty()) {
+        return;
+    }
+
+    // Save Settings
+    QSettings settings("MNECPP");
+
+    settings.setValue(m_sSettingsPath + QString("/styleMode"), m_sCurrentStyle);
+}
+
+//=============================================================================================================
+
+void MainWindow::loadSettings()
+{
+    if(m_sSettingsPath.isEmpty()) {
+        return;
+    }
+
+    // Load Settings
+    QSettings settings("MNECPP");
+
+    m_sCurrentStyle = settings.value(m_sSettingsPath + QString("/styleMode"), "default").toString();
+    if(m_sCurrentStyle == "dark") {
+        m_pActionDarkMode->setChecked(true);
+    } else {
+        m_pActionDarkMode->setChecked(false);
+    }
+
+    onStyleChanged(m_sCurrentStyle);
 }
 
 //=============================================================================================================
@@ -451,7 +492,8 @@ void MainWindow::createActions()
     m_pActionStyleGroup->addAction(m_pActionDefaultMode);
     connect(m_pActionDefaultMode, &QAction::triggered,
         [=]() {
-        onStyleChanged("default");
+        m_sCurrentStyle = "default";
+        onStyleChanged(m_sCurrentStyle);
     });
 
     m_pActionDarkMode = new QAction("Dark");
@@ -461,6 +503,7 @@ void MainWindow::createActions()
     m_pActionStyleGroup->addAction(m_pActionDarkMode);
     connect(m_pActionDarkMode, &QAction::triggered,
         [=]() {
+        m_sCurrentStyle = "dark";
         onStyleChanged("dark");
     });
 

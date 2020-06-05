@@ -161,9 +161,9 @@ int main(int argc, char *argv[])
     app.setFont(QFont(QFontDatabase::applicationFontFamilies(id).at(0)));
 
     //Store application info to use QSettings
-    QApplication::setOrganizationName("MNE-CPP");
-    QApplication::setOrganizationDomain("www.mne-cpp.org");
-    QApplication::setApplicationName(CInfo::AppNameShort());
+    QCoreApplication::setOrganizationName(CInfo::OrganizationName());
+    QCoreApplication::setApplicationName(CInfo::AppNameShort());
+    QCoreApplication::setOrganizationDomain("www.mne-cpp.org");
 
     SCMEASLIB::MeasurementTypes::registerTypes();
 

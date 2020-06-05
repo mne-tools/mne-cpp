@@ -82,6 +82,8 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager
 : QMainWindow(parent)
 , m_pMultiView(Q_NULLPTR)
 , m_pGridLayout(Q_NULLPTR)
+, m_sSettingsPath("MNEANALYZE/MainWindow")
+, m_sCurrentStyle("default")
 {
     setWindowState(Qt::WindowMaximized);
     setMinimumSize(400, 400);
@@ -124,7 +126,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
     //Save GUI gemoetry and state;
     m_pMultiView->saveSettings();
-    this->saveSettings();
+    saveSettings();
 
     emit mainWindowClosed();
 
@@ -177,24 +179,43 @@ void MainWindow::writeToLog(QtMsgType type,
 
 void MainWindow::saveSettings()
 {
-    QSettings settings("MNECPP", "ANALYZEWINDOW");
+    if(m_sSettingsPath.isEmpty()) {
+        return;
+    }
 
-    settings.beginGroup("layout");
+    QSettings settings("MNECPP");
+
+    settings.beginGroup(m_sSettingsPath + "/layout");
     settings.setValue("geometry", saveGeometry());
     settings.setValue("state", saveState());
     settings.endGroup();
+
+    settings.setValue(m_sSettingsPath + QString("/styleMode"), m_sCurrentStyle);
 }
 
 //=============================================================================================================
 
 void MainWindow::loadSettings()
 {
-    QSettings settings("MNECPP", "ANALYZEWINDOW");
+    if(m_sSettingsPath.isEmpty()) {
+        return;
+    }
 
-    settings.beginGroup("layout");
+    QSettings settings("MNECPP");
+
+    settings.beginGroup(m_sSettingsPath + "/layout");
     restoreGeometry(settings.value("geometry").toByteArray());
     restoreState(settings.value("state").toByteArray());
     settings.endGroup();
+
+    m_sCurrentStyle = settings.value(m_sSettingsPath + QString("/styleMode"), "default").toString();
+    if(m_sCurrentStyle == "dark") {
+        m_pActionDarkMode->setChecked(true);
+    } else {
+        m_pActionDarkMode->setChecked(false);
+    }
+
+    onStyleChanged(m_sCurrentStyle);
 }
 
 //=============================================================================================================
@@ -216,11 +237,15 @@ void MainWindow::createActions()
 
 void MainWindow::onStyleChanged(const QString& sStyle)
 {
+    qDebug() << "MainWindow::onStyleChanged " << qobject_cast<QApplication *>(QApplication::instance());
     // Styles are from https://github.com/Alexhuszagh/BreezeStyleSheets
     if(QApplication *pApp = qobject_cast<QApplication *>(QApplication::instance())) {
         if(sStyle == "default") {
-            pApp->setStyleSheet("");
+            m_sCurrentStyle = "default";
+            pApp->setStyleSheet("MainWindow::onStyleChanged - hello");
         } else {
+            qDebug() << "hello";
+            m_sCurrentStyle = "dark";
         #ifdef WASMBUILD
             qWarning() << "[MainWindow::onStyleChanged] Changing the style is not supported in the wasm mode yet.";
         #else
@@ -299,12 +324,12 @@ void MainWindow::createPluginMenus(QSharedPointer<ANSHAREDLIB::PluginManager> pP
         onStyleChanged("default");
     });
 
-    QAction* pActionDarkStyle = new QAction("Dark");
-    pActionDarkStyle->setStatusTip(tr("Activate dark style"));
-    pActionDarkStyle->setCheckable(true);
-    pActionDarkStyle->setChecked(false);
-    pActionStyleGroup->addAction(pActionDarkStyle);
-    connect(pActionDarkStyle, &QAction::triggered,
+    m_pActionDarkMode = new QAction("Dark");
+    m_pActionDarkMode->setStatusTip(tr("Activate dark style"));
+    m_pActionDarkMode->setCheckable(true);
+    m_pActionDarkMode->setChecked(false);
+    pActionStyleGroup->addAction(m_pActionDarkMode);
+    connect(m_pActionDarkMode.data(), &QAction::triggered,
         [=]() {
         onStyleChanged("dark");
     });

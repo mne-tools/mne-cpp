@@ -104,7 +104,16 @@ public:
      */
     const static QString AppName()
     {
-        return QObject::tr("Real-Time Acquisition & Processing");
+        return QObject::tr("Acquisition & Real-Time Processing");
+    }
+
+    //=========================================================================================================
+    /**
+     *
+     */
+    const static QString OrganizationName()
+    {
+        return QObject::tr("MNE-CPP");
     }
 
     //=========================================================================================================
