@@ -181,7 +181,7 @@ void MainWindow::onStyleChanged(const QString& sStyle)
             pApp->setStyleSheet("");
         } else {
             QFile file;
-            file.setFileName(":/styles/"+sStyle+".qss");
+            file.setFileName(":"+sStyle+".qss");
             file.open(QFile::ReadOnly | QFile::Text);
             QTextStream stream(&file);
             pApp->setStyleSheet(stream.readAll());
