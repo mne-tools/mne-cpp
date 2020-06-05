@@ -101,6 +101,12 @@ public:
 
     //=========================================================================================================
     /**
+     * Destroys the AverageLayoutView.
+     */
+    ~AverageLayoutView();
+
+    //=========================================================================================================
+    /**
      * Update the OpenGL viewport. This, e.g., necessary if this widget was set to a QDockWidget which changes
      * its floating state.
      */

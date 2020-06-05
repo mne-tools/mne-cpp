@@ -98,6 +98,14 @@ Control3DView::Control3DView(const QString& sSettingsPath,
 
 //=============================================================================================================
 
+Control3DView::~Control3DView()
+{
+    saveSettings();
+    delete ui;
+}
+
+//=============================================================================================================
+
 void Control3DView::setFlags(const QStringList& slFlags)
 {
     //Parse flags
@@ -137,14 +145,6 @@ void Control3DView::setFlags(const QStringList& slFlags)
     } else {
         ui->m_groupBox_lightOptions->hide();
     }
-}
-
-//=============================================================================================================
-
-Control3DView::~Control3DView()
-{
-    saveSettings();
-    delete ui;
 }
 
 //=============================================================================================================

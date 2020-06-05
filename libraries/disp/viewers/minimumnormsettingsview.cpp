@@ -81,12 +81,15 @@ MinimumNormSettingsView::MinimumNormSettingsView(const QString& sSettingsPath,
     this->setWindowTitle("MinimumNorm Settings");
     this->setMinimumWidth(330);
     this->setMaximumWidth(330);
+
+    loadSettings();
 }
 
 //=============================================================================================================
 
 MinimumNormSettingsView::~MinimumNormSettingsView()
 {
+    saveSettings();
     delete ui;
 }
 

@@ -93,6 +93,15 @@ SpectrumSettingsView::SpectrumSettingsView(const QString& sSettingsPath,
     t_pGridLayout->addWidget(m_pSliderUpperBound,1,1);
 
     this->setLayout(t_pGridLayout);
+
+    loadSettings();
+}
+
+//=============================================================================================================
+
+SpectrumSettingsView::~SpectrumSettingsView()
+{
+    saveSettings();
 }
 
 //=============================================================================================================
