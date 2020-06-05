@@ -207,6 +207,7 @@ private:
     QPointer<QAction>                   m_pActionAbout;             /**< show about dialog action */
     QPointer<QAction>                   m_pActionScientificMode;    /**< toggle scientific mode action */
     QPointer<QAction>                   m_pActionClinicalMode;      /**< toggle clinical mode action */
+    QPointer<QAction>                   m_pActionDarkMode;          /**< toggle dark mode */
 
     // MainWindow menus
     QPointer<QMenu>                     m_pMenuFile;                /**< Holds the file menu.*/
@@ -217,6 +218,9 @@ private:
     QPointer<QTextBrowser>              m_pTextBrowser_Log;         /**< Holds the text browser for the log.*/
 
     QSharedPointer<QWidget>             m_pAboutWindow;             /**< Holds the widget containing the about information.*/
+
+    QString                             m_sSettingsPath;            /**< The settings path to store the GUI settings to. */
+    QString                             m_sCurrentStyle;            /**< The currently selected style (dark mode, default mode). */
 };
 
 }// NAMESPACE

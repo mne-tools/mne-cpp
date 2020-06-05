@@ -142,7 +142,6 @@ void ScalingView::saveSettings()
     if(m_qMapChScaling.contains(FIFFV_MISC_CH)) {
         settings.setValue(m_sSettingsPath + QString("/ScalingView/scaleMISC"), m_qMapChScaling[FIFFV_MISC_CH]);
     }
-    qDebug() << "ScalingView::loadSettings" << m_qMapChScaling;
 }
 
 //=============================================================================================================
@@ -172,7 +171,6 @@ void ScalingView::loadSettings()
 
     val = settings.value(m_sSettingsPath + QString("/ScalingView/scaleMISC"), 1e-3f).toFloat();
     m_qMapChScaling.insert(FIFFV_MISC_CH, val);
-    qDebug() << "ScalingView::loadSettings" << m_qMapChScaling;
 }
 
 //=============================================================================================================
