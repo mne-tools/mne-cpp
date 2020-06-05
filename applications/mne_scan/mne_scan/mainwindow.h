@@ -189,6 +189,18 @@ public:
      */
     void setupUI();
 
+    //=========================================================================================================
+    /**
+     * Saves all important settings of this view via QSettings.
+     */
+    void saveSettings();
+
+    //=========================================================================================================
+    /**
+     * Loads and inits all important settings of this view via QSettings.
+     */
+    void loadSettings();
+
 private:
     //=========================================================================================================
     /**
@@ -413,6 +425,9 @@ private:
     QSharedPointer<SCSHAREDLIB::PluginSceneManager>     m_pPluginSceneManager;  /**< Plugin scene manager which manages the plugin graph */
     QSharedPointer<QWidget>                             m_pAboutWindow;         /**< Holds the widget containing the about information.*/
     QSharedPointer<SCSHAREDLIB::DisplayManager>         m_pDisplayManager;      /**< display manager */
+
+    QString                             m_sSettingsPath;                    /**< The settings path to store the GUI settings to. */
+    QString                             m_sCurrentStyle;                    /**< The currently selected style (dark mode, default mode). */
 
 signals:
     //=========================================================================================================

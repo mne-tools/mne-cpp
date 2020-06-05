@@ -80,13 +80,10 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
-    // Set default font
-    int id = QFontDatabase::addApplicationFont(":/fonts/Roboto-Light.ttf");
-    app.setFont(QFont(QFontDatabase::applicationFontFamilies(id).at(0)));
-
     //set application settings
     QCoreApplication::setOrganizationName(CInfo::OrganizationName());
     QCoreApplication::setApplicationName(CInfo::AppNameShort());
+    QCoreApplication::setOrganizationDomain("www.mne-cpp.org");
 
     QSurfaceFormat fmt;
     fmt.setSamples(4);
