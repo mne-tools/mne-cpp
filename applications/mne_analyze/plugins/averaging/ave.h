@@ -150,6 +150,8 @@ public:
      */
     void reset();
 
+    void setTriggerList(QSharedPointer<QList<QPair<int,double>>> lDetectedTriggers, int iOffsetIndex);
+
 protected:
     //=========================================================================================================
     /**
@@ -188,6 +190,8 @@ protected:
      * Check if control values have been changed
      */
     inline bool controlValuesChanged();
+
+    QSharedPointer<QList<QPair<int,double>>>        m_pDetectedTriggers;
 
     qint32                                          m_iNumAverages;             /**< Number of averages */
 
@@ -265,6 +269,7 @@ public:
                    quint32 iBaselineToSecs,
                    quint32 iTriggerIndex,
                    FIFFLIB::FiffInfo::SPtr pFiffInfo,
+                   QSharedPointer<QList<QPair<int,double>>> lDetectedTriggers,
                    QObject *parent = 0);
 
     //=========================================================================================================
@@ -384,6 +389,10 @@ public:
      * Reset the data processing in the real-time worker
      */
     void reset();
+
+
+    //=========================================================================================================
+    void setTriggerList(QList<QPair<int,double>>* lDetectedTriggers, int iOffsetIndex = 0);
 
 protected:
     //=========================================================================================================

@@ -194,13 +194,13 @@ void AveWorker::setBaselineTo(int toSamp, int toMSec)
 
 void AveWorker::doAveraging(const MatrixXd& rawSegment)
 {
-    //Detect trigger
-    QList<QPair<int,double> > lDetectedTriggers = DetectTrigger::detectTriggerFlanksMax(rawSegment, m_iTriggerChIndex, 0, m_fTriggerThreshold, true);
+//    //Detect trigger
+//    QList<QPair<int,double> > m_pDetectedTriggers = DetectTrigger::detectTriggerFlanksMax(rawSegment, m_iTriggerChIndex, 0, m_fTriggerThreshold, true);
 
     //TODO: This does not permit the same trigger type twice in one data block
-    for(int i = 0; i < lDetectedTriggers.size(); ++i) {
-        if(!m_mapFillingBackBuffer.contains(lDetectedTriggers.at(i).second)) {
-            double dTriggerType = lDetectedTriggers.at(i).second;
+    for(int i = 0; i < m_pDetectedTriggers->size(); ++i) {
+        if(!m_mapFillingBackBuffer.contains(m_pDetectedTriggers->at(i).second)) {
+            double dTriggerType = m_pDetectedTriggers->at(i).second;
 
             //qDebug()<<"Adding dTriggerType"<<dTriggerType;
 
@@ -226,7 +226,7 @@ void AveWorker::doAveraging(const MatrixXd& rawSegment)
         double dTriggerType = idx.key();
 
         //Fill front / pre stim buffer
-        if(lDetectedTriggers.isEmpty()) {
+        if(m_pDetectedTriggers->isEmpty()) {
             fillFrontBuffer(rawSegment, -1.0);
         }
 
@@ -242,13 +242,13 @@ void AveWorker::doAveraging(const MatrixXd& rawSegment)
                 emitEvoked(dTriggerType, lResponsibleTriggerTypes);
             }
         } else {
-            if(lDetectedTriggers.isEmpty()) {
+            if(m_pDetectedTriggers->isEmpty()) {
                 //Fill front / pre stim buffer
                 fillFrontBuffer(rawSegment, dTriggerType);
             } else {
-                for(int i = 0; i < lDetectedTriggers.size(); ++i) {
-                    if(dTriggerType == lDetectedTriggers.at(i).second) {
-                        int iTriggerPos = lDetectedTriggers.at(i).first;
+                for(int i = 0; i < m_pDetectedTriggers->size(); ++i) {
+                    if(dTriggerType == m_pDetectedTriggers->at(i).second) {
+                        int iTriggerPos = m_pDetectedTriggers->at(i).first;
 
                         //Do front buffer stuff
                         MatrixXd tempMat;
@@ -502,6 +502,13 @@ void AveWorker::reset()
 }
 
 //=============================================================================================================
+void AveWorker::setTriggerList(QSharedPointer<QList<QPair<int,double>>> lDetectedTriggers, int iOffsetIndex)
+{
+    //TODO - offset
+    m_pDetectedTriggers = lDetectedTriggers;
+}
+
+//=============================================================================================================
 // DEFINE MEMBER METHODS Ave
 //=============================================================================================================
 
@@ -512,6 +519,7 @@ Ave::Ave(quint32 numAverages,
              quint32 iBaselineToSecs,
              quint32 iTriggerIndex,
              FiffInfo::SPtr pFiffInfo,
+             QSharedPointer<QList<QPair<int,double>>> lDetectedTriggers,
              QObject *parent)
 : QObject(parent)
 {
@@ -524,6 +532,7 @@ Ave::Ave(quint32 numAverages,
                                           iBaselineToSecs,
                                           iTriggerIndex,
                                           pFiffInfo);
+    worker->setTriggerList(lDetectedTriggers, 0);
     worker->moveToThread(&m_workerThread);
 
     connect(&m_workerThread, &QThread::finished,

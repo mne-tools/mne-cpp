@@ -121,29 +121,29 @@ QDockWidget* Averaging::getControl()
 {
     QVBoxLayout* pLayout = new QVBoxLayout;
     QWidget* pWidget = new QWidget();
-    DISPLIB::AveragingSettingsView* pAveragingSettingsView = new DISPLIB::AveragingSettingsView(QString("MNEANALYZE/%1").arg(this->getName()));
+    m_pAveragingSettingsView = new DISPLIB::AveragingSettingsView(QString("MNEANALYZE/%1").arg(this->getName()));
     QDockWidget* pControl = new QDockWidget(getName());
     QPushButton* pButton = new QPushButton();
     pButton->setText("COMPUTE");
 
-    connect(pAveragingSettingsView, &DISPLIB::AveragingSettingsView::changeNumAverages,
+    connect(m_pAveragingSettingsView, &DISPLIB::AveragingSettingsView::changeNumAverages,
             this, &Averaging::onChangeNumAverages, Qt::UniqueConnection);
-    connect(pAveragingSettingsView, &DISPLIB::AveragingSettingsView::changeBaselineFrom,
+    connect(m_pAveragingSettingsView, &DISPLIB::AveragingSettingsView::changeBaselineFrom,
             this, &Averaging::onChangeBaselineFrom, Qt::UniqueConnection);
-    connect(pAveragingSettingsView, &DISPLIB::AveragingSettingsView::changeBaselineTo,
+    connect(m_pAveragingSettingsView, &DISPLIB::AveragingSettingsView::changeBaselineTo,
             this, &Averaging::onChangeBaselineTo, Qt::UniqueConnection);
-    connect(pAveragingSettingsView, &DISPLIB::AveragingSettingsView::changePostStim,
+    connect(m_pAveragingSettingsView, &DISPLIB::AveragingSettingsView::changePostStim,
             this, &Averaging::onChangePostStim, Qt::UniqueConnection);
-    connect(pAveragingSettingsView, &DISPLIB::AveragingSettingsView::changePreStim,
+    connect(m_pAveragingSettingsView, &DISPLIB::AveragingSettingsView::changePreStim,
             this, &Averaging::onChangePreStim, Qt::UniqueConnection);
-    connect(pAveragingSettingsView, &DISPLIB::AveragingSettingsView::changeBaselineActive,
+    connect(m_pAveragingSettingsView, &DISPLIB::AveragingSettingsView::changeBaselineActive,
             this, &Averaging::onChangeBaselineActive, Qt::UniqueConnection);
-    connect(pAveragingSettingsView, &DISPLIB::AveragingSettingsView::resetAverage,
+    connect(m_pAveragingSettingsView, &DISPLIB::AveragingSettingsView::resetAverage,
             this, &Averaging::onResetAverage, Qt::UniqueConnection);
     connect(pButton, &QPushButton::clicked,
             this, &Averaging::onComputeButtonCLicked);
 
-    pLayout->addWidget(pAveragingSettingsView);
+    pLayout->addWidget(m_pAveragingSettingsView);
     pLayout->addWidget(pButton);
     pWidget->setLayout(pLayout);
 
@@ -304,9 +304,33 @@ void Averaging::onResetAverage(bool state)
 void Averaging::onComputeButtonCLicked(bool bChecked)
 {
     Q_UNUSED(bChecked);
+    m_lTriggerList = QSharedPointer<QList<QPair<int,double>>>(new QList<QPair<int,double>>);
+
     for (int i = 0; i < m_pFiffRawModel->getTimeListSize(); i++){
         qDebug() << "At" <<  i << ":" << m_pFiffRawModel->getTimeMarks(i);
+        m_lTriggerList->append(QPair<int, double>(i, m_pFiffRawModel->getTimeMarks(i)));
     }
 
+    QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(m_pFiffRawModel->getFiffInfo());
+
+    float fFreq = m_pFiffRawModel->getFiffInfo()->sfreq;
+
+    int iPreStimSamples = ((float)m_pAveragingSettingsView->getPreStimSeconds()/1000)*fFreq;
+    int iPostStimSamples = ((float)m_pAveragingSettingsView->getPostStimSeconds()/1000)*fFreq;
+    int iBaselineFromSamples = ((float)m_pAveragingSettingsView->getBaselineFromSeconds()/1000)*fFreq;
+    int iBaselineToSamples = ((float)m_pAveragingSettingsView->getBaselineToSeconds()/1000)*fFreq;
+
+    m_pAve = QSharedPointer<Ave>(new Ave(m_pAveragingSettingsView->getNumAverages(),
+                                         iPreStimSamples,
+                                         iPostStimSamples,
+                                         m_pAveragingSettingsView->getBaselineFromSeconds(),
+                                         m_pAveragingSettingsView->getBaselineToSeconds(),
+                                         0, //temp value, change later
+                                         pFiffInfo,
+                                         m_lTriggerList));
+
+    m_pAve->setBaselineFrom(iBaselineFromSamples, m_pAveragingSettingsView->getBaselineFromSeconds());
+    m_pAve->setBaselineTo(iBaselineToSamples, m_pAveragingSettingsView->getBaselineToSeconds());
+    m_pAve->setBaselineActive(m_pAveragingSettingsView->getDoBaselineCorrection());
     //this->m_pFiffRawModel->data();
 }
