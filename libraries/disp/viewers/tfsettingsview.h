@@ -126,7 +126,7 @@ protected:
      */
     void onNumberTrialRowChanged();
 
-    Ui::TfSettingsViewWidget* ui;
+    Ui::TfSettingsViewWidget* m_pUi;
 
     QString         m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
 

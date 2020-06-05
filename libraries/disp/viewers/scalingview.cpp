@@ -90,6 +90,7 @@ ScalingView::ScalingView(const QString& sSettingsPath,
 ScalingView::~ScalingView()
 {
     saveSettings();
+    delete m_pUi;
 }
 
 //=============================================================================================================

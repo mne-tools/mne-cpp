@@ -246,7 +246,7 @@ protected:
      */
     void onLightIntensityChanged(double value);
 
-    Ui::Control3DViewWidget*    ui;                         /**< The pointer to the QtDesigner ui class. */
+    Ui::Control3DViewWidget*    m_pUi;                      /**< The pointer to the QtDesigner ui class. */
 
     QColor                      m_colCurrentSceneColor;     /**< Current color of the scene in all View3D's. */
     QColor                      m_colCurrentLightColor;     /**< Current color of the lights in all View3D's. */

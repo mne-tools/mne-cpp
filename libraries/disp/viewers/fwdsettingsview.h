@@ -184,7 +184,7 @@ protected:
 
     bool                                        m_bAnnotaionsLoaded;    /**< If the annotationset is loaded. */
 
-    Ui::FwdSettingsViewWidget*                  m_ui;                   /**< The rtFwd dialog. */
+    Ui::FwdSettingsViewWidget*                  m_pUi;                  /**< The rtFwd dialog. */
 
     QString                                     m_sSettingsPath;        /**< The settings path to store the GUI settings to. */
 
