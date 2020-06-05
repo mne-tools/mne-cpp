@@ -60,6 +60,10 @@ namespace ANSHAREDLIB {
     class AbstractModel;
 }
 
+namespace DISPLIB {
+    class AveragingSettingsView;
+}
+
 //=============================================================================================================
 // DEFINE NAMESPACE averagingPLUGIN
 //=============================================================================================================
@@ -183,6 +187,10 @@ private:
     QSharedPointer<ANSHAREDLIB::FiffRawViewModel>           m_pFiffRawModel;            /**< Pointer to currently loaded FiffRawView Model */
 
     QSharedPointer<Ave>                                     m_pAve;                     /**< Averaging Object */
+
+    DISPLIB::AveragingSettingsView*                         m_pAveragingSettingsView;
+
+    QSharedPointer<QList<QPair<int,double>>>                m_lTriggerList;
 
 };
 
