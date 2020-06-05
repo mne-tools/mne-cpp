@@ -90,6 +90,14 @@ ButterflyView::ButterflyView(const QString& sSettingsPath,
 //    QSurfaceFormat fmt;
 //    fmt.setSamples(4);
 //    this->setFormat(fmt);
+    loadSettings();
+}
+
+//=============================================================================================================
+
+ButterflyView::~ButterflyView()
+{
+    saveSettings();
 }
 
 //=============================================================================================================

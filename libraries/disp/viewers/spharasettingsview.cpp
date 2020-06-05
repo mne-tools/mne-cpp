@@ -86,12 +86,14 @@ SpharaSettingsView::SpharaSettingsView(const QString& sSettingsPath,
     this->setWindowTitle("SPHARA Settings");
     this->setMinimumWidth(330);
     this->setMaximumWidth(330);
+    loadSettings();
 }
 
 //=============================================================================================================
 
 SpharaSettingsView::~SpharaSettingsView()
 {
+    saveSettings();
     delete ui;
 }
 
