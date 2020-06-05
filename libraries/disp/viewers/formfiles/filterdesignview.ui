@@ -115,7 +115,7 @@
               <item row="1" column="0">
                <widget class="QLabel" name="m_label_lowpass">
                 <property name="text">
-                 <string>From (Hz):</string>
+                 <string>From:</string>
                 </property>
                </widget>
               </item>
@@ -144,11 +144,17 @@
               </item>
               <item row="2" column="1">
                <widget class="QDoubleSpinBox" name="m_doubleSpinBox_to">
+                <property name="suffix">
+                 <string>Hz</string>
+                </property>
+                <property name="decimals">
+                 <number>1</number>
+                </property>
                 <property name="maximum">
                  <double>999.000000000000000</double>
                 </property>
                 <property name="singleStep">
-                 <double>1.000000000000000</double>
+                 <double>0.100000000000000</double>
                 </property>
                 <property name="value">
                  <double>40.000000000000000</double>
@@ -165,7 +171,7 @@
               <item row="2" column="0">
                <widget class="QLabel" name="m_label_highpass">
                 <property name="text">
-                 <string>To (Hz):</string>
+                 <string>To:</string>
                 </property>
                </widget>
               </item>
@@ -185,11 +191,17 @@
               </item>
               <item row="1" column="1">
                <widget class="QDoubleSpinBox" name="m_doubleSpinBox_from">
+                <property name="suffix">
+                 <string>Hz</string>
+                </property>
+                <property name="decimals">
+                 <number>1</number>
+                </property>
                 <property name="maximum">
                  <double>999.000000000000000</double>
                 </property>
                 <property name="singleStep">
-                 <double>1.000000000000000</double>
+                 <double>0.100000000000000</double>
                 </property>
                 <property name="value">
                  <double>5.000000000000000</double>
@@ -198,11 +210,17 @@
               </item>
               <item row="3" column="1">
                <widget class="QDoubleSpinBox" name="m_doubleSpinBox_transitionband">
+                <property name="suffix">
+                 <string>Hz</string>
+                </property>
+                <property name="decimals">
+                 <number>1</number>
+                </property>
                 <property name="maximum">
                  <double>999.000000000000000</double>
                 </property>
                 <property name="singleStep">
-                 <double>1.000000000000000</double>
+                 <double>0.100000000000000</double>
                 </property>
                 <property name="value">
                  <double>5.000000000000000</double>

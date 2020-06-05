@@ -88,6 +88,7 @@ ArtifactSettingsView::ArtifactSettingsView(const QString& sSettingsPath,
 
 ArtifactSettingsView::~ArtifactSettingsView()
 {
+
     saveSettings();
 }
 

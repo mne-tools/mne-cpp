@@ -74,46 +74,46 @@ FwdSettingsView::FwdSettingsView(const QString& sSettingsPath,
                                  Qt::WindowFlags f)
 : AbstractView(parent, f)
 , m_bAnnotaionsLoaded(false)
-, m_ui(new Ui::FwdSettingsViewWidget)
+, m_pUi(new Ui::FwdSettingsViewWidget)
 {
     m_sSettingsPath = sSettingsPath;
-    m_ui->setupUi(this);
+    m_pUi->setupUi(this);
 
     // init
-    m_ui->m_checkBox_bDoRecomputation->setChecked(false);
-    m_ui->m_checkBox_bDoClustering->setChecked(false);
-    m_ui->m_lineEdit_iNChan->setText(QString::number(0));
-    m_ui->m_lineEdit_iNSourceSpace->setText(QString::number(0));
-    m_ui->m_lineEdit_iNDipole->setText(QString::number(0));
-    m_ui->m_lineEdit_sSourceOri->setText("fixed");
-    m_ui->m_lineEdit_sCoordFrame->setText("Head Space");
-    m_ui->m_lineEdit_iNDipoleClustered->setText("Not Clustered");
+    m_pUi->m_checkBox_bDoRecomputation->setChecked(false);
+    m_pUi->m_checkBox_bDoClustering->setChecked(false);
+    m_pUi->m_lineEdit_iNChan->setText(QString::number(0));
+    m_pUi->m_lineEdit_iNSourceSpace->setText(QString::number(0));
+    m_pUi->m_lineEdit_iNDipole->setText(QString::number(0));
+    m_pUi->m_lineEdit_sSourceOri->setText("fixed");
+    m_pUi->m_lineEdit_sCoordFrame->setText("Head Space");
+    m_pUi->m_lineEdit_iNDipoleClustered->setText("Not Clustered");
 
     // load init annotation set
     QString t_sAtlasDir = QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/label";
-    m_ui->m_qLineEdit_AtlasDirName->setText(t_sAtlasDir);
+    m_pUi->m_qLineEdit_AtlasDirName->setText(t_sAtlasDir);
 
     AnnotationSet::SPtr t_pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet(t_sAtlasDir+"/lh.aparc.a2009s.annot", t_sAtlasDir+"/rh.aparc.a2009s.annot"));
 
     if(!t_pAnnotationSet->isEmpty() && t_pAnnotationSet->size() == 2)
     {
         emit atlasDirChanged(t_sAtlasDir,t_pAnnotationSet);
-        m_ui->m_qLabel_atlasStat->setText("loaded");
+        m_pUi->m_qLabel_atlasStat->setText("loaded");
         m_bAnnotaionsLoaded = true;
     }
     else
     {
-        m_ui->m_qLabel_atlasStat->setText("not loaded");
+        m_pUi->m_qLabel_atlasStat->setText("not loaded");
     }
 
     // connect
-    connect(m_ui->m_checkBox_bDoRecomputation, &QCheckBox::clicked,
+    connect(m_pUi->m_checkBox_bDoRecomputation, &QCheckBox::clicked,
             this, &FwdSettingsView::recompStatusChanged);
-    connect(m_ui->m_qPushButton_AtlasDirDialog, &QPushButton::released,
+    connect(m_pUi->m_qPushButton_AtlasDirDialog, &QPushButton::released,
             this, &FwdSettingsView::showAtlasDirDialog);
-    connect(m_ui->m_checkBox_bDoClustering, &QCheckBox::clicked,
+    connect(m_pUi->m_checkBox_bDoClustering, &QCheckBox::clicked,
             this, &FwdSettingsView::onClusteringStatusChanged);
-    connect(m_ui->m_qPushButton_ComputeForward, &QPushButton::clicked,
+    connect(m_pUi->m_qPushButton_ComputeForward, &QPushButton::clicked,
             this, &FwdSettingsView::doForwardComputation);
 
     // load settings
@@ -126,7 +126,7 @@ FwdSettingsView::~FwdSettingsView()
 {
     saveSettings();
 
-    delete m_ui;
+    delete m_pUi;
 }
 
 //=============================================================================================================
@@ -169,7 +169,7 @@ void FwdSettingsView::updateGuiMode(GuiMode mode)
 
 bool FwdSettingsView::getRecomputationStatusChanged()
 {
-    return m_ui->m_checkBox_bDoRecomputation->isChecked();
+    return m_pUi->m_checkBox_bDoRecomputation->isChecked();
 }
 
 //=============================================================================================================
@@ -177,23 +177,23 @@ bool FwdSettingsView::getRecomputationStatusChanged()
 void FwdSettingsView::setRecomputationStatus(int iStatus)
 {
     if(iStatus == 0) {
-        m_ui->m_label_recomputationFeedback->setText("Initializing");
-        m_ui->m_label_recomputationFeedback->setStyleSheet("QLabel { background-color : red;}");
+        m_pUi->m_label_recomputationFeedback->setText("Initializing");
+        m_pUi->m_label_recomputationFeedback->setStyleSheet("QLabel { background-color : red;}");
     } else if(iStatus == 1) {
-        m_ui->m_label_recomputationFeedback->setText("Computing");
-        m_ui->m_label_recomputationFeedback->setStyleSheet("QLabel { background-color : red;}");
+        m_pUi->m_label_recomputationFeedback->setText("Computing");
+        m_pUi->m_label_recomputationFeedback->setStyleSheet("QLabel { background-color : red;}");
     } else if (iStatus == 2) {
-        m_ui->m_label_recomputationFeedback->setText("Recomputing");
-        m_ui->m_label_recomputationFeedback->setStyleSheet("QLabel { background-color : red;}");
+        m_pUi->m_label_recomputationFeedback->setText("Recomputing");
+        m_pUi->m_label_recomputationFeedback->setStyleSheet("QLabel { background-color : red;}");
     } else if (iStatus == 3) {
-        m_ui->m_label_recomputationFeedback->setText("Clustering");
-        m_ui->m_label_recomputationFeedback->setStyleSheet("QLabel { background-color : red;}");
+        m_pUi->m_label_recomputationFeedback->setText("Clustering");
+        m_pUi->m_label_recomputationFeedback->setStyleSheet("QLabel { background-color : red;}");
     } else if (iStatus == 4) {
-        m_ui->m_label_recomputationFeedback->setText("Not Computed");
-        m_ui->m_label_recomputationFeedback->setStyleSheet("QLabel { background-color : red;}");
+        m_pUi->m_label_recomputationFeedback->setText("Not Computed");
+        m_pUi->m_label_recomputationFeedback->setStyleSheet("QLabel { background-color : red;}");
     } else {
-        m_ui->m_label_recomputationFeedback->setText("Finished");
-        m_ui->m_label_recomputationFeedback->setStyleSheet("QLabel { background-color : green;}");
+        m_pUi->m_label_recomputationFeedback->setText("Finished");
+        m_pUi->m_label_recomputationFeedback->setStyleSheet("QLabel { background-color : green;}");
     }
 }
 
@@ -207,38 +207,38 @@ void FwdSettingsView::setSolutionInformation(FIFFLIB::fiff_int_t iSourceOri,
 {
     // set source orientation
     if(iSourceOri == 0) {
-        m_ui->m_lineEdit_sSourceOri->setText("fixed");
+        m_pUi->m_lineEdit_sSourceOri->setText("fixed");
     } else {
-        m_ui->m_lineEdit_sSourceOri->setText("free");
+        m_pUi->m_lineEdit_sSourceOri->setText("free");
     }
 
     // set coordinate frame
     if(iCoordFrame == FIFFV_COORD_HEAD) {
-        m_ui->m_lineEdit_sCoordFrame->setText("Head Space");
+        m_pUi->m_lineEdit_sCoordFrame->setText("Head Space");
     } else if (iCoordFrame == FIFFV_COORD_MRI){
-        m_ui->m_lineEdit_sCoordFrame->setText("MRI Space");
+        m_pUi->m_lineEdit_sCoordFrame->setText("MRI Space");
     } else {
-        m_ui->m_lineEdit_sCoordFrame->setText("Unknown");
+        m_pUi->m_lineEdit_sCoordFrame->setText("Unknown");
     }
 
     // set number of sources
-    m_ui->m_lineEdit_iNDipole->setText(QString::number(iNSource));
+    m_pUi->m_lineEdit_iNDipole->setText(QString::number(iNSource));
 
     // set number of clustered sources
-    m_ui->m_lineEdit_iNDipoleClustered->setText("Not clustered");
+    m_pUi->m_lineEdit_iNDipoleClustered->setText("Not clustered");
 
     // set number of channels
-    m_ui->m_lineEdit_iNChan->setText(QString::number(iNChan));
+    m_pUi->m_lineEdit_iNChan->setText(QString::number(iNChan));
 
     // set number of source spaces
-    m_ui->m_lineEdit_iNSourceSpace->setText(QString::number(iNSpaces));
+    m_pUi->m_lineEdit_iNSourceSpace->setText(QString::number(iNSpaces));
 }
 
 //=============================================================================================================
 
 bool FwdSettingsView::getClusteringStatusChanged()
 {
-    return m_ui->m_checkBox_bDoClustering->isChecked();
+    return m_pUi->m_checkBox_bDoClustering->isChecked();
 }
 
 //=============================================================================================================
@@ -249,7 +249,7 @@ void FwdSettingsView::onClusteringStatusChanged(bool bChecked)
         QMessageBox msgBox;
         msgBox.setText("Please load an annotation set before clustering.");
         msgBox.exec();
-        m_ui->m_checkBox_bDoClustering->setChecked(false);
+        m_pUi->m_checkBox_bDoClustering->setChecked(false);
         return;
     } else {
         emit clusteringStatusChanged(bChecked);
@@ -261,7 +261,7 @@ void FwdSettingsView::onClusteringStatusChanged(bool bChecked)
 void FwdSettingsView::setClusteredInformation(int iNSources)
 {
     // set number of clustered sources
-    m_ui->m_lineEdit_iNDipoleClustered->setText(QString::number(iNSources));
+    m_pUi->m_lineEdit_iNDipoleClustered->setText(QString::number(iNSources));
 }
 
 //=============================================================================================================
@@ -273,18 +273,18 @@ void FwdSettingsView::showAtlasDirDialog()
                                                             QFileDialog::ShowDirsOnly
                                                             | QFileDialog::DontResolveSymlinks);
 
-    m_ui->m_qLineEdit_AtlasDirName->setText(t_sAtlasDir);
+    m_pUi->m_qLineEdit_AtlasDirName->setText(t_sAtlasDir);
 
     AnnotationSet::SPtr t_pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet(t_sAtlasDir+"/lh.aparc.a2009s.annot", t_sAtlasDir+"/rh.aparc.a2009s.annot"));
 
     if(!t_pAnnotationSet->isEmpty() && t_pAnnotationSet->size() == 2)
     {
         emit atlasDirChanged(t_sAtlasDir,t_pAnnotationSet);
-        m_ui->m_qLabel_atlasStat->setText("loaded");
+        m_pUi->m_qLabel_atlasStat->setText("loaded");
         m_bAnnotaionsLoaded = true;
     }
     else
     {
-        m_ui->m_qLabel_atlasStat->setText("not loaded");
+        m_pUi->m_qLabel_atlasStat->setText("not loaded");
     }
 }

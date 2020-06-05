@@ -73,24 +73,24 @@ Control3DView::Control3DView(const QString& sSettingsPath,
                              const QStringList& slFlags,
                              Qt::WindowType type)
 : AbstractView(parent, type)
-, ui(new Ui::Control3DViewWidget)
+, m_pUi(new Ui::Control3DViewWidget)
 , m_colCurrentSceneColor(QColor(0,0,0))
 , m_colCurrentLightColor(QColor(255,255,255))
 {
     m_sSettingsPath = sSettingsPath;
-    ui->setupUi(this);
+    m_pUi->setupUi(this);
 
     setFlags(slFlags);
 
     //Init's
-    ui->m_pushButton_sceneColorPicker->setStyleSheet(QString("background-color: rgb(0, 0, 0);"));
-    ui->m_pushButton_lightColorPicker->setStyleSheet(QString("background-color: rgb(255, 255, 255);"));
+    m_pUi->m_pushButton_sceneColorPicker->setStyleSheet(QString("background-color: rgb(0, 0, 0);"));
+    m_pUi->m_pushButton_lightColorPicker->setStyleSheet(QString("background-color: rgb(255, 255, 255);"));
 
     this->adjustSize();
 
     //set context menu
-    ui->m_treeView_loadedData->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(ui->m_treeView_loadedData, &QWidget::customContextMenuRequested,
+    m_pUi->m_treeView_loadedData->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(m_pUi->m_treeView_loadedData, &QWidget::customContextMenuRequested,
             this, &Control3DView::onCustomContextMenuRequested);
 
     loadSettings();
@@ -101,7 +101,7 @@ Control3DView::Control3DView(const QString& sSettingsPath,
 Control3DView::~Control3DView()
 {
     saveSettings();
-    delete ui;
+    delete m_pUi;
 }
 
 //=============================================================================================================
@@ -110,40 +110,40 @@ void Control3DView::setFlags(const QStringList& slFlags)
 {
     //Parse flags
     if(slFlags.contains("Data")) {
-        ui->m_treeView_loadedData->show();
+        m_pUi->m_treeView_loadedData->show();
     } else {
-        ui->m_treeView_loadedData->hide();
+        m_pUi->m_treeView_loadedData->hide();
     }
 
     if(slFlags.contains("View")) {
-        ui->m_groupBox_viewOptions->show();
+        m_pUi->m_groupBox_viewOptions->show();
 
-        connect(ui->m_pushButton_sceneColorPicker, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+        connect(m_pUi->m_pushButton_sceneColorPicker, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
                 this, &Control3DView::onSceneColorPicker);
-        connect(ui->m_checkBox_showFullScreen, &QCheckBox::clicked,
+        connect(m_pUi->m_checkBox_showFullScreen, &QCheckBox::clicked,
                 this, &Control3DView::onShowFullScreen);
 
-        connect(ui->m_checkBox_rotate, &QCheckBox::clicked,
+        connect(m_pUi->m_checkBox_rotate, &QCheckBox::clicked,
                 this, &Control3DView::onRotationClicked);
 
-        connect(ui->m_checkBox_coordAxis, &QCheckBox::clicked,
+        connect(m_pUi->m_checkBox_coordAxis, &QCheckBox::clicked,
                 this, &Control3DView::onCoordAxisClicked);
 
-        connect(ui->m_pushButton_takeScreenshot, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+        connect(m_pUi->m_pushButton_takeScreenshot, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
                 this, &Control3DView::takeScreenshotChanged);
     } else {
-        ui->m_groupBox_viewOptions->hide();
+        m_pUi->m_groupBox_viewOptions->hide();
     }
 
     if(slFlags.contains("Light")) {
-        ui->m_groupBox_lightOptions->show();
+        m_pUi->m_groupBox_lightOptions->show();
 
-        connect(ui->m_pushButton_lightColorPicker, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+        connect(m_pUi->m_pushButton_lightColorPicker, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
                 this, &Control3DView::onLightColorPicker);
-        connect(ui->m_doubleSpinBox_colorIntensity, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+        connect(m_pUi->m_doubleSpinBox_colorIntensity, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
                 this, &Control3DView::onLightIntensityChanged);
     } else {
-        ui->m_groupBox_lightOptions->hide();
+        m_pUi->m_groupBox_lightOptions->hide();
     }
 }
 
@@ -152,9 +152,9 @@ void Control3DView::setFlags(const QStringList& slFlags)
 void Control3DView::setDelegate(QStyledItemDelegate *pItemDelegate)
 {
     //Init tree view properties
-    ui->m_treeView_loadedData->setItemDelegate(pItemDelegate);
-    ui->m_treeView_loadedData->setHeaderHidden(false);
-    ui->m_treeView_loadedData->setEditTriggers(QAbstractItemView::CurrentChanged);
+    m_pUi->m_treeView_loadedData->setItemDelegate(pItemDelegate);
+    m_pUi->m_treeView_loadedData->setHeaderHidden(false);
+    m_pUi->m_treeView_loadedData->setEditTriggers(QAbstractItemView::CurrentChanged);
 }
 
 //=============================================================================================================
@@ -162,20 +162,20 @@ void Control3DView::setDelegate(QStyledItemDelegate *pItemDelegate)
 void Control3DView::setModel(QStandardItemModel* pDataTreeModel)
 {
     //Do the connects from this control widget to the View3D
-    ui->m_treeView_loadedData->setModel(pDataTreeModel);
+    m_pUi->m_treeView_loadedData->setModel(pDataTreeModel);
 
     //Set description hidden as default
-    //ui->m_treeView_loadedData->setColumnHidden(1, true);
+    //m_pUi->m_treeView_loadedData->setColumnHidden(1, true);
 }
 
 //=============================================================================================================
 
 void Control3DView::onTreeViewHeaderHide()
 {
-    if(!ui->m_treeView_loadedData->isHeaderHidden()) {
-        ui->m_treeView_loadedData->setHeaderHidden(true);
+    if(!m_pUi->m_treeView_loadedData->isHeaderHidden()) {
+        m_pUi->m_treeView_loadedData->setHeaderHidden(true);
     } else {
-        ui->m_treeView_loadedData->setHeaderHidden(false);
+        m_pUi->m_treeView_loadedData->setHeaderHidden(false);
     }
 }
 
@@ -183,10 +183,10 @@ void Control3DView::onTreeViewHeaderHide()
 
 void Control3DView::onTreeViewDescriptionHide()
 {
-    if(ui->m_treeView_loadedData->isColumnHidden(1)) {
-        ui->m_treeView_loadedData->setColumnHidden(1, false);
+    if(m_pUi->m_treeView_loadedData->isColumnHidden(1)) {
+        m_pUi->m_treeView_loadedData->setColumnHidden(1, false);
     } else {
-        ui->m_treeView_loadedData->setColumnHidden(1, true);
+        m_pUi->m_treeView_loadedData->setColumnHidden(1, true);
     }
 }
 
@@ -248,7 +248,7 @@ void Control3DView::onSceneColorPicker()
     m_colCurrentSceneColor = pDialog->currentColor();
 
     //Set color of button new new scene color
-    ui->m_pushButton_sceneColorPicker->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(m_colCurrentSceneColor.red()).arg(m_colCurrentSceneColor.green()).arg(m_colCurrentSceneColor.blue()));
+    m_pUi->m_pushButton_sceneColorPicker->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(m_colCurrentSceneColor.red()).arg(m_colCurrentSceneColor.green()).arg(m_colCurrentSceneColor.blue()));
 }
 
 //=============================================================================================================
@@ -268,7 +268,7 @@ void Control3DView::onCustomContextMenuRequested(QPoint pos)
 //            this, &Control3DView::onTreeViewDescriptionHide);
 
     //show context menu
-    menu->popup(ui->m_treeView_loadedData->viewport()->mapToGlobal(pos));
+    menu->popup(m_pUi->m_treeView_loadedData->viewport()->mapToGlobal(pos));
 }
 
 //=============================================================================================================
@@ -327,7 +327,7 @@ void Control3DView::onLightColorPicker()
     m_colCurrentLightColor = pDialog->currentColor();
 
     //Set color of button new new scene color
-    ui->m_pushButton_lightColorPicker->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(m_colCurrentLightColor.red()).arg(m_colCurrentLightColor.green()).arg(m_colCurrentLightColor.blue()));
+    m_pUi->m_pushButton_lightColorPicker->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(m_colCurrentLightColor.red()).arg(m_colCurrentLightColor.green()).arg(m_colCurrentLightColor.blue()));
 }
 
 //=============================================================================================================

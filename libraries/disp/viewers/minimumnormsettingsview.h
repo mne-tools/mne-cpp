@@ -150,7 +150,7 @@ protected:
      */
     void onTimePointValueChanged();
 
-    Ui::MinimumNormSettingsViewWidget* ui;
+    Ui::MinimumNormSettingsViewWidget* m_pUi;
 
 signals:
     //=========================================================================================================
