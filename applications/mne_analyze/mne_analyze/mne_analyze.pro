@@ -80,6 +80,7 @@ contains(MNECPP_CONFIG, static) {
             -ldatamanager \
             -lrawdataviewer \
             -lannotationmanager \
+            -lfiltering \
 }
 
 LIBS += -L$${MNE_LIBRARY_DIR}
