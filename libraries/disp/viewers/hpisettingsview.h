@@ -209,7 +209,7 @@ protected:
      */
     QList<FIFFLIB::FiffDigPoint> readPolhemusDig(const QString& fileName);
 
-    Ui::HpiSettingsViewWidget*                  m_ui;                   /**< The HPI dialog. */
+    Ui::HpiSettingsViewWidget*                  m_pUi;                  /**< The HPI dialog. */
 
     QVector<int>                                m_vCoilFreqs;           /**< Vector contains the HPI coil frequencies. */
 

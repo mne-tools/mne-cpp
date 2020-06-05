@@ -344,7 +344,7 @@ private:
      */
     bool eventFilter(QObject *obj, QEvent *event);
 
-    Ui::ChannelSelectionViewWidget*     ui;                                 /**< Pointer to the qt designer generated ui class. */
+    Ui::ChannelSelectionViewWidget*     m_pUi;                              /**< Pointer to the qt designer generated ui class. */
 
     QSharedPointer<ChannelInfoModel>    m_pChannelInfoModel;                /**< Pointer to the channel info model. */
 

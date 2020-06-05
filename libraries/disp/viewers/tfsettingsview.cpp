@@ -64,17 +64,17 @@ TfSettingsView::TfSettingsView(const QString& sSettingsPath,
                                QWidget *parent,
                                Qt::WindowFlags f)
 : AbstractView(parent, f)
-, ui(new Ui::TfSettingsViewWidget)
+, m_pUi(new Ui::TfSettingsViewWidget)
 {
     m_sSettingsPath = sSettingsPath;
-    ui->setupUi(this);
+    m_pUi->setupUi(this);
 
     loadSettings();
 
-    connect(ui->m_spinBox_trialNumber, static_cast<void (QSpinBox::*)(const QString&)>(&QSpinBox::valueChanged),
+    connect(m_pUi->m_spinBox_trialNumber, static_cast<void (QSpinBox::*)(const QString&)>(&QSpinBox::valueChanged),
             this, &TfSettingsView::onNumberTrialRowChanged);
 
-    connect(ui->m_spinBox_rowNumber, static_cast<void (QSpinBox::*)(const QString&)>(&QSpinBox::valueChanged),
+    connect(m_pUi->m_spinBox_rowNumber, static_cast<void (QSpinBox::*)(const QString&)>(&QSpinBox::valueChanged),
             this, &TfSettingsView::onNumberTrialRowChanged);
 
     this->setWindowTitle("Time frequency Settings");
@@ -88,7 +88,7 @@ TfSettingsView::~TfSettingsView()
 {
     saveSettings();
 
-    delete ui;
+    delete m_pUi;
 }
 
 //=============================================================================================================
@@ -129,7 +129,7 @@ void TfSettingsView::updateGuiMode(GuiMode mode)
 
 void TfSettingsView::onNumberTrialRowChanged()
 {
-    emit numberTrialRowChanged(ui->m_spinBox_trialNumber->value(), ui->m_spinBox_rowNumber->value());
+    emit numberTrialRowChanged(m_pUi->m_spinBox_trialNumber->value(), m_pUi->m_spinBox_rowNumber->value());
     saveSettings();
 }
 

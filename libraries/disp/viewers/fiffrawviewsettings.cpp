@@ -82,6 +82,7 @@ FiffRawViewSettings::FiffRawViewSettings(const QString &sSettingsPath,
 FiffRawViewSettings::~FiffRawViewSettings()
 {
     saveSettings();
+    delete m_pUi;
 }
 
 //=============================================================================================================

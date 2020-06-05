@@ -433,8 +433,8 @@ protected:
     void markChBad();
 
     QPointer<QTableView>                        m_pTableView;                   /**< The QTableView being part of the model/view framework of Qt */
-    QPointer<DISPLIB::RtFiffRawViewDelegate>      m_pDelegate;                    /**< The channel data delegate */
-    QPointer<DISPLIB::RtFiffRawViewModel>         m_pModel;                       /**< The channel data model */
+    QPointer<DISPLIB::RtFiffRawViewDelegate>    m_pDelegate;                    /**< The channel data delegate */
+    QPointer<DISPLIB::RtFiffRawViewModel>       m_pModel;                       /**< The channel data model */
 
     QMap<qint32,float>                          m_qMapChScaling;                /**< Channel scaling values. */
 

@@ -67,11 +67,11 @@ AveragingSettingsView::AveragingSettingsView(const QString& sSettingsPath,
                                              const QMap<QString, int> &mapStimChsIndexNames,
                                              QWidget *parent)
 : AbstractView(parent)
-, ui(new Ui::AverageSettingsViewWidget)
+, m_pUi(new Ui::AverageSettingsViewWidget)
 , m_mapStimChsIndexNames(mapStimChsIndexNames)
 {
     m_sSettingsPath = sSettingsPath;
-    ui->setupUi(this);
+    m_pUi->setupUi(this);
 
     this->setWindowTitle("Averaging Settings");
     this->setMinimumWidth(330);
@@ -86,6 +86,7 @@ AveragingSettingsView::AveragingSettingsView(const QString& sSettingsPath,
 AveragingSettingsView::~AveragingSettingsView()
 {
     saveSettings();
+    delete m_pUi;
 }
 
 //=============================================================================================================
@@ -95,17 +96,17 @@ void AveragingSettingsView::setStimChannels(const QMap<QString,int>& mapStimChsI
     if(!mapStimChsIndexNames.isEmpty()) {
         m_mapStimChsIndexNames = mapStimChsIndexNames;
 
-        ui->m_pComboBoxChSelection->clear();
+        m_pUi->m_pComboBoxChSelection->clear();
 
         QMapIterator<QString, int> i(mapStimChsIndexNames);
         while (i.hasNext()) {
             i.next();
-            ui->m_pComboBoxChSelection->insertItem(ui->m_pComboBoxChSelection->count(),i.key());
+            m_pUi->m_pComboBoxChSelection->insertItem(m_pUi->m_pComboBoxChSelection->count(),i.key());
         }
 
-        ui->m_pComboBoxChSelection->setCurrentText(m_sCurrentStimChan);
+        m_pUi->m_pComboBoxChSelection->setCurrentText(m_sCurrentStimChan);
 
-        connect(ui->m_pComboBoxChSelection, &QComboBox::currentTextChanged,
+        connect(m_pUi->m_pComboBoxChSelection, &QComboBox::currentTextChanged,
                 this, &AveragingSettingsView::onChangeStimChannel);
     }
 }
@@ -163,7 +164,7 @@ int AveragingSettingsView::getPostStimSeconds()
 
 int AveragingSettingsView::getStimChannelIdx()
 {
-    return ui->m_pComboBoxChSelection->currentData().toInt();
+    return m_pUi->m_pComboBoxChSelection->currentData().toInt();
 }
 
 //=============================================================================================================
@@ -171,56 +172,56 @@ int AveragingSettingsView::getStimChannelIdx()
 void AveragingSettingsView::redrawGUI()
 {
     if(!m_mapStimChsIndexNames.isEmpty()) {
-        ui->m_pComboBoxChSelection->clear();
+        m_pUi->m_pComboBoxChSelection->clear();
 
         QMapIterator<QString, int> i(m_mapStimChsIndexNames);
         while (i.hasNext()) {
             i.next();
-            ui->m_pComboBoxChSelection->insertItem(ui->m_pComboBoxChSelection->count(),i.key());
+            m_pUi->m_pComboBoxChSelection->insertItem(m_pUi->m_pComboBoxChSelection->count(),i.key());
         }
 
-        ui->m_pComboBoxChSelection->setCurrentText(m_sCurrentStimChan);
+        m_pUi->m_pComboBoxChSelection->setCurrentText(m_sCurrentStimChan);
 
-        connect(ui->m_pComboBoxChSelection, &QComboBox::currentTextChanged,
+        connect(m_pUi->m_pComboBoxChSelection, &QComboBox::currentTextChanged,
                 this, &AveragingSettingsView::changeStimChannel);
     }
 
-    ui->m_pSpinBoxNumAverages->setValue(m_iNumAverages);
-    connect(ui->m_pSpinBoxNumAverages, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
+    m_pUi->m_pSpinBoxNumAverages->setValue(m_iNumAverages);
+    connect(m_pUi->m_pSpinBoxNumAverages, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
             this, &AveragingSettingsView::onChangeNumAverages);
 
     //Pre Post stimulus
-    ui->m_pSpinBoxPreStimMSeconds->setValue(m_iPreStimSeconds);
-    connect(ui->m_pSpinBoxPreStimMSeconds, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
+    m_pUi->m_pSpinBoxPreStimMSeconds->setValue(m_iPreStimSeconds);
+    connect(m_pUi->m_pSpinBoxPreStimMSeconds, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
             this, &AveragingSettingsView::onChangePreStim);
 
-    ui->m_pSpinBoxPostStimMSeconds->setValue(m_iPostStimSeconds);
-    connect(ui->m_pSpinBoxPostStimMSeconds, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
+    m_pUi->m_pSpinBoxPostStimMSeconds->setValue(m_iPostStimSeconds);
+    connect(m_pUi->m_pSpinBoxPostStimMSeconds, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
             this, &AveragingSettingsView::onChangePostStim);
 
     //Baseline Correction
-    ui->m_pcheckBoxBaselineCorrection->setChecked(m_bDoBaselineCorrection);
-    connect(ui->m_pcheckBoxBaselineCorrection, &QCheckBox::clicked,
+    m_pUi->m_pcheckBoxBaselineCorrection->setChecked(m_bDoBaselineCorrection);
+    connect(m_pUi->m_pcheckBoxBaselineCorrection, &QCheckBox::clicked,
             this, &AveragingSettingsView::changeBaselineActive);
 
-    ui->m_pSpinBoxBaselineFromMSeconds->setMinimum(ui->m_pSpinBoxPreStimMSeconds->value()*-1);
-    ui->m_pSpinBoxBaselineFromMSeconds->setMaximum(ui->m_pSpinBoxPostStimMSeconds->value());
-    ui->m_pSpinBoxBaselineFromMSeconds->setValue(m_iBaselineFromSeconds);
-    connect(ui->m_pSpinBoxBaselineFromMSeconds, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
+    m_pUi->m_pSpinBoxBaselineFromMSeconds->setMinimum(m_pUi->m_pSpinBoxPreStimMSeconds->value()*-1);
+    m_pUi->m_pSpinBoxBaselineFromMSeconds->setMaximum(m_pUi->m_pSpinBoxPostStimMSeconds->value());
+    m_pUi->m_pSpinBoxBaselineFromMSeconds->setValue(m_iBaselineFromSeconds);
+    connect(m_pUi->m_pSpinBoxBaselineFromMSeconds, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
             this, &AveragingSettingsView::onChangeBaselineFrom);
 
-    ui->m_pSpinBoxBaselineToMSeconds->setMinimum(ui->m_pSpinBoxPreStimMSeconds->value()*-1);
-    ui->m_pSpinBoxBaselineToMSeconds->setMaximum(ui->m_pSpinBoxPostStimMSeconds->value());
-    ui->m_pSpinBoxBaselineToMSeconds->setValue(m_iBaselineToSeconds);
-    connect(ui->m_pSpinBoxBaselineToMSeconds, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
+    m_pUi->m_pSpinBoxBaselineToMSeconds->setMinimum(m_pUi->m_pSpinBoxPreStimMSeconds->value()*-1);
+    m_pUi->m_pSpinBoxBaselineToMSeconds->setMaximum(m_pUi->m_pSpinBoxPostStimMSeconds->value());
+    m_pUi->m_pSpinBoxBaselineToMSeconds->setValue(m_iBaselineToSeconds);
+    connect(m_pUi->m_pSpinBoxBaselineToMSeconds, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
             this, &AveragingSettingsView::onChangeBaselineTo);
 
-    connect(ui->m_pushButton_reset, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+    connect(m_pUi->m_pushButton_reset, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             this, &AveragingSettingsView::resetAverage);
 
     setWindowFlags(Qt::WindowStaysOnTopHint);
 
-    ui->m_groupBox_detectedTrials->hide();
+    m_pUi->m_groupBox_detectedTrials->hide();
 }
 
 //=============================================================================================================
@@ -228,13 +229,13 @@ void AveragingSettingsView::redrawGUI()
 void AveragingSettingsView::setDetectedEpochs(const FiffEvokedSet& evokedSet)
 {
     if(evokedSet.evoked.isEmpty()) {
-        ui->m_groupBox_detectedTrials->hide();
+        m_pUi->m_groupBox_detectedTrials->hide();
         return;
     } else {
-        ui->m_groupBox_detectedTrials->show();
+        m_pUi->m_groupBox_detectedTrials->show();
     }
 
-    QGridLayout* topLayout = static_cast<QGridLayout*>(ui->m_groupBox_detectedTrials->layout());
+    QGridLayout* topLayout = static_cast<QGridLayout*>(m_pUi->m_groupBox_detectedTrials->layout());
     if(!topLayout) {
        topLayout = new QGridLayout();
     }
@@ -257,7 +258,7 @@ void AveragingSettingsView::setDetectedEpochs(const FiffEvokedSet& evokedSet)
     }
 
     //Find Filter tab and add current layout
-    ui->m_groupBox_detectedTrials->setLayout(topLayout);
+    m_pUi->m_groupBox_detectedTrials->setLayout(topLayout);
 }
 
 //=============================================================================================================
@@ -325,9 +326,9 @@ void AveragingSettingsView::updateGuiMode(GuiMode mode)
 
 void AveragingSettingsView::onChangePreStim()
 {
-    qint32 mSeconds = ui->m_pSpinBoxPreStimMSeconds->value();
-    ui->m_pSpinBoxBaselineToMSeconds->setMinimum(ui->m_pSpinBoxPreStimMSeconds->value()*-1);
-    ui->m_pSpinBoxBaselineFromMSeconds->setMinimum(ui->m_pSpinBoxPreStimMSeconds->value()*-1);
+    qint32 mSeconds = m_pUi->m_pSpinBoxPreStimMSeconds->value();
+    m_pUi->m_pSpinBoxBaselineToMSeconds->setMinimum(m_pUi->m_pSpinBoxPreStimMSeconds->value()*-1);
+    m_pUi->m_pSpinBoxBaselineFromMSeconds->setMinimum(m_pUi->m_pSpinBoxPreStimMSeconds->value()*-1);
 
     m_iPreStimSeconds = mSeconds;
 
@@ -340,9 +341,9 @@ void AveragingSettingsView::onChangePreStim()
 
 void AveragingSettingsView::onChangePostStim()
 {
-    qint32 mSeconds = ui->m_pSpinBoxPostStimMSeconds->value();
-    ui->m_pSpinBoxBaselineToMSeconds->setMaximum(ui->m_pSpinBoxPostStimMSeconds->value());
-    ui->m_pSpinBoxBaselineFromMSeconds->setMaximum(ui->m_pSpinBoxPostStimMSeconds->value());
+    qint32 mSeconds = m_pUi->m_pSpinBoxPostStimMSeconds->value();
+    m_pUi->m_pSpinBoxBaselineToMSeconds->setMaximum(m_pUi->m_pSpinBoxPostStimMSeconds->value());
+    m_pUi->m_pSpinBoxBaselineFromMSeconds->setMaximum(m_pUi->m_pSpinBoxPostStimMSeconds->value());
 
     m_iPostStimSeconds = mSeconds;
 
@@ -355,8 +356,8 @@ void AveragingSettingsView::onChangePostStim()
 
 void AveragingSettingsView::onChangeBaselineFrom()
 {
-    qint32 mSeconds = ui->m_pSpinBoxBaselineFromMSeconds->value();
-    ui->m_pSpinBoxBaselineToMSeconds->setMinimum(mSeconds);
+    qint32 mSeconds = m_pUi->m_pSpinBoxBaselineFromMSeconds->value();
+    m_pUi->m_pSpinBoxBaselineToMSeconds->setMinimum(mSeconds);
 
     m_iBaselineFromSeconds = mSeconds;
 
@@ -369,8 +370,8 @@ void AveragingSettingsView::onChangeBaselineFrom()
 
 void AveragingSettingsView::onChangeBaselineTo()
 {
-    qint32 mSeconds = ui->m_pSpinBoxBaselineToMSeconds->value();
-    ui->m_pSpinBoxBaselineFromMSeconds->setMaximum(mSeconds);
+    qint32 mSeconds = m_pUi->m_pSpinBoxBaselineToMSeconds->value();
+    m_pUi->m_pSpinBoxBaselineFromMSeconds->setMaximum(mSeconds);
 
     m_iBaselineToSeconds = mSeconds;
 
@@ -383,9 +384,9 @@ void AveragingSettingsView::onChangeBaselineTo()
 
 void AveragingSettingsView::onChangeNumAverages()
 {
-    m_iNumAverages = ui->m_pSpinBoxNumAverages->value();
+    m_iNumAverages = m_pUi->m_pSpinBoxNumAverages->value();
 
-    emit changeNumAverages(ui->m_pSpinBoxNumAverages->value());
+    emit changeNumAverages(m_pUi->m_pSpinBoxNumAverages->value());
 
     saveSettings();
 }
@@ -394,7 +395,7 @@ void AveragingSettingsView::onChangeNumAverages()
 
 void AveragingSettingsView::onChangeStimChannel()
 {
-    m_sCurrentStimChan = ui->m_pComboBoxChSelection->currentText();
+    m_sCurrentStimChan = m_pUi->m_pComboBoxChSelection->currentText();
 
     emit changeStimChannel(m_sCurrentStimChan);
 

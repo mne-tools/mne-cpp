@@ -165,7 +165,7 @@ protected:
      */
     void onResetTriggerNumbers();
 
-    Ui::TriggerDetectionViewWidget* ui;
+    Ui::TriggerDetectionViewWidget*                     m_pUi;
 
     QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                    /**< Connected fiff info. */
 

@@ -220,7 +220,7 @@ protected:
      */
     void onFrequencyBandChanged();
 
-    Ui::ConnectivitySettingsViewWidget* ui;
+    Ui::ConnectivitySettingsViewWidget* m_pUi;
 
     QString         m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
     int             m_iNumberTrials;                /**< The number of trials are stored to check whether the number of trials actually changed. */

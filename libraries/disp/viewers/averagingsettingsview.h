@@ -153,7 +153,7 @@ protected:
     void onChangeNumAverages();    
     void onChangeStimChannel();
 
-    Ui::AverageSettingsViewWidget* ui;              /**< Holds the user interface for the AverageSettingsViewWidget.*/
+    Ui::AverageSettingsViewWidget* m_pUi;              /**< Holds the user interface for the AverageSettingsViewWidget.*/
 
     QString             m_sCurrentStimChan;
 

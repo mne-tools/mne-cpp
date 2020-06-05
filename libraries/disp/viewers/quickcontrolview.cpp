@@ -67,26 +67,26 @@ QuickControlView::QuickControlView(const QString &sSettingsPath,
                                    QWidget *parent,
                                    bool bDraggable)
 : DraggableFramelessWidget(parent, flags, false, bDraggable, true)
-, ui(new Ui::QuickControlViewWidget)
+, m_pUi(new Ui::QuickControlViewWidget)
 , m_sName(name)
 {
     m_sSettingsPath = sSettingsPath;
-    ui->setupUi(this);
-    ui->m_pTabWidget->setTabBarAutoHide(true);
-    ui->m_pTabWidget->setMovable(true);
-    ui->m_pTabWidget->setTabPosition(QTabWidget::West);
+    m_pUi->setupUi(this);
+    m_pUi->m_pTabWidget->setTabBarAutoHide(true);
+    m_pUi->m_pTabWidget->setMovable(true);
+    m_pUi->m_pTabWidget->setTabPosition(QTabWidget::West);
     this->setWindowTitle("Quick Control");
 
     if(!(windowFlags() & Qt::CustomizeWindowHint)) {
-        ui->m_pushButton_close->hide();
+        m_pUi->m_pushButton_close->hide();
     }
 
     //Init opacity slider
-    connect(ui->m_horizontalSlider_opacity, &QSlider::valueChanged,
+    connect(m_pUi->m_horizontalSlider_opacity, &QSlider::valueChanged,
             this, &QuickControlView::onOpacityChange);
 
     //Init and connect close button
-    connect(ui->m_pushButton_close, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+    connect(m_pUi->m_pushButton_close, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             this, &QuickControlView::hide);
 
     this->adjustSize();
@@ -100,16 +100,16 @@ QuickControlView::~QuickControlView()
 {
     saveSettings();
 
-    delete ui;
+    delete m_pUi;
 }
 
 //=============================================================================================================
 
 void QuickControlView::clear()
 {
-    while(ui->m_pTabWidget->count() != 0) {
-        QWidget* pTabWidget = ui->m_pTabWidget->widget(ui->m_pTabWidget->count()-1);
-        ui->m_pTabWidget->removeTab(ui->m_pTabWidget->count()-1);
+    while(m_pUi->m_pTabWidget->count() != 0) {
+        QWidget* pTabWidget = m_pUi->m_pTabWidget->widget(m_pUi->m_pTabWidget->count()-1);
+        m_pUi->m_pTabWidget->removeTab(m_pUi->m_pTabWidget->count()-1);
         delete pTabWidget;
     }
 }
@@ -120,7 +120,7 @@ QVBoxLayout* QuickControlView::findTabWidgetLayout(const QString& sTabName)
 {
     QVBoxLayout* pTabWidgetLayout = Q_NULLPTR;
 
-    if(QWidget* pTabWidget = ui->m_pTabWidget->findChild<QWidget *>(sTabName + "TabWidget")) {
+    if(QWidget* pTabWidget = m_pUi->m_pTabWidget->findChild<QWidget *>(sTabName + "TabWidget")) {
         // Tab widget already exisits. Get the grid layout and return it.
         pTabWidgetLayout = qobject_cast<QVBoxLayout *>(pTabWidget->layout());
     } else {
@@ -130,7 +130,7 @@ QVBoxLayout* QuickControlView::findTabWidgetLayout(const QString& sTabName)
         pTabWidgetLayout = new QVBoxLayout();
         pTabWidgetLayout->setContentsMargins(4,2,4,4);
         pTabWidget->setLayout(pTabWidgetLayout);
-        ui->m_pTabWidget->insertTab(0,pTabWidget, sTabName);
+        m_pUi->m_pTabWidget->insertTab(0,pTabWidget, sTabName);
     }
 
     return pTabWidgetLayout;
@@ -249,7 +249,7 @@ void QuickControlView::addGroupBoxWithTabs(QWidget* pWidget,
 
 void QuickControlView::setOpacityValue(int opactiy)
 {
-    ui->m_horizontalSlider_opacity->setValue(opactiy);
+    m_pUi->m_horizontalSlider_opacity->setValue(opactiy);
 
     onOpacityChange(opactiy);
 }
@@ -258,16 +258,16 @@ void QuickControlView::setOpacityValue(int opactiy)
 
 int QuickControlView::getOpacityValue()
 {
-    return ui->m_horizontalSlider_opacity->value();
+    return m_pUi->m_horizontalSlider_opacity->value();
 }
 
 //=============================================================================================================
 
 void QuickControlView::setVisiblityHideOpacityClose(bool bVisibility)
 {
-    ui->m_pushButton_close->setVisible(bVisibility);
-    ui->m_horizontalSlider_opacity->setVisible(bVisibility);
-    ui->m_label_opacity->setVisible(bVisibility);
+    m_pUi->m_pushButton_close->setVisible(bVisibility);
+    m_pUi->m_horizontalSlider_opacity->setVisible(bVisibility);
+    m_pUi->m_label_opacity->setVisible(bVisibility);
 }
 
 //=============================================================================================================

@@ -226,7 +226,7 @@ protected:
 private:       
     QString                                             m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
     QString                                             m_sName;                        /**< Name of the widget which uses this quick control. */
-    Ui::QuickControlViewWidget*                         ui;                             /**< The generated UI file. */
+    Ui::QuickControlViewWidget*                         m_pUi;                          /**< The generated UI file. */
 
 signals:
 };

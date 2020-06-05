@@ -64,23 +64,23 @@ SpharaSettingsView::SpharaSettingsView(const QString& sSettingsPath,
                                        QWidget *parent,
                                        Qt::WindowFlags f)
 : AbstractView(parent, f)
-, ui(new Ui::SpharaSettingsViewWidget)
+, m_pUi(new Ui::SpharaSettingsViewWidget)
 {
     m_sSettingsPath = sSettingsPath;
-    ui->setupUi(this);
+    m_pUi->setupUi(this);
 
     //Sphara activation changed
-    connect(ui->m_checkBox_activateSphara, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+    connect(m_pUi->m_checkBox_activateSphara, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &SpharaSettingsView::onSpharaButtonClicked);
 
     //Sphara options changed
-    connect(ui->m_comboBox_spharaSystem, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
+    connect(m_pUi->m_comboBox_spharaSystem, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
             this, &SpharaSettingsView::onSpharaOptionsChanged);
 
-    connect(ui->m_spinBox_spharaFirst, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
+    connect(m_pUi->m_spinBox_spharaFirst, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
             this, &SpharaSettingsView::onSpharaOptionsChanged);
 
-    connect(ui->m_spinBox_spharaSecond, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
+    connect(m_pUi->m_spinBox_spharaSecond, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
             this, &SpharaSettingsView::onSpharaOptionsChanged);
 
     this->setWindowTitle("SPHARA Settings");
@@ -94,7 +94,7 @@ SpharaSettingsView::SpharaSettingsView(const QString& sSettingsPath,
 SpharaSettingsView::~SpharaSettingsView()
 {
     saveSettings();
-    delete ui;
+    delete m_pUi;
 }
 
 //=============================================================================================================
@@ -144,37 +144,37 @@ void SpharaSettingsView::onSpharaButtonClicked(bool state)
 
 void SpharaSettingsView::onSpharaOptionsChanged()
 {
-    ui->m_label_spharaFirst->show();
-    ui->m_spinBox_spharaFirst->show();
+    m_pUi->m_label_spharaFirst->show();
+    m_pUi->m_spinBox_spharaFirst->show();
 
-    ui->m_label_spharaSecond->show();
-    ui->m_spinBox_spharaSecond->show();
+    m_pUi->m_label_spharaSecond->show();
+    m_pUi->m_spinBox_spharaSecond->show();
 
-    if(ui->m_comboBox_spharaSystem->currentText() == "VectorView") {
-        ui->m_label_spharaFirst->setText("Mag");
-        ui->m_spinBox_spharaFirst->setMaximum(102);
+    if(m_pUi->m_comboBox_spharaSystem->currentText() == "VectorView") {
+        m_pUi->m_label_spharaFirst->setText("Mag");
+        m_pUi->m_spinBox_spharaFirst->setMaximum(102);
 
-        ui->m_label_spharaSecond->setText("Grad");
-        ui->m_spinBox_spharaSecond->setMaximum(102);
+        m_pUi->m_label_spharaSecond->setText("Grad");
+        m_pUi->m_spinBox_spharaSecond->setMaximum(102);
     }
 
-    if(ui->m_comboBox_spharaSystem->currentText() == "BabyMEG") {
-        ui->m_label_spharaFirst->setText("Inner layer");
-        ui->m_spinBox_spharaFirst->setMaximum(270);
+    if(m_pUi->m_comboBox_spharaSystem->currentText() == "BabyMEG") {
+        m_pUi->m_label_spharaFirst->setText("Inner layer");
+        m_pUi->m_spinBox_spharaFirst->setMaximum(270);
 
-        ui->m_label_spharaSecond->setText("Outer layer");
-        ui->m_spinBox_spharaSecond->setMaximum(105);
+        m_pUi->m_label_spharaSecond->setText("Outer layer");
+        m_pUi->m_spinBox_spharaSecond->setMaximum(105);
     }
 
-    if(ui->m_comboBox_spharaSystem->currentText() == "EEG") {
-        ui->m_label_spharaFirst->setText("EEG");
-        ui->m_spinBox_spharaFirst->setMaximum(256);
+    if(m_pUi->m_comboBox_spharaSystem->currentText() == "EEG") {
+        m_pUi->m_label_spharaFirst->setText("EEG");
+        m_pUi->m_spinBox_spharaFirst->setMaximum(256);
 
-        ui->m_label_spharaSecond->hide();
-        ui->m_spinBox_spharaSecond->hide();
+        m_pUi->m_label_spharaSecond->hide();
+        m_pUi->m_spinBox_spharaSecond->hide();
     }
 
-    emit spharaOptionsChanged(ui->m_comboBox_spharaSystem->currentText(),
-                              ui->m_spinBox_spharaFirst->value(),
-                              ui->m_spinBox_spharaSecond->value());
+    emit spharaOptionsChanged(m_pUi->m_comboBox_spharaSystem->currentText(),
+                              m_pUi->m_spinBox_spharaFirst->value(),
+                              m_pUi->m_spinBox_spharaSecond->value());
 }

@@ -132,7 +132,7 @@ protected:
      */
     void onSpharaOptionsChanged();
 
-    Ui::SpharaSettingsViewWidget* ui;
+    Ui::SpharaSettingsViewWidget* m_pUi;
 
 signals:
     //=========================================================================================================

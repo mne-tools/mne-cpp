@@ -133,7 +133,7 @@ private:
     void onTimeChanged();
     void onRecordingTimerStateChanged(bool state);
 
-    Ui::ProjectSettingsViewWidget*   ui;
+    Ui::ProjectSettingsViewWidget*   m_pUi;
 
     QStringList         m_sListProjects;
     QStringList         m_sListSubjects;

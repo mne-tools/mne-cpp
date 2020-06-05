@@ -77,63 +77,63 @@ ProjectSettingsView::ProjectSettingsView(const QString& sSettingsPath,
 , m_sCurrentProject(sCurrentProject)
 , m_sCurrentSubject(sCurrentSubject)
 , m_sCurrentParadigm(sCurrentParadigm)
-, ui(new Ui::ProjectSettingsViewWidget)
+, m_pUi(new Ui::ProjectSettingsViewWidget)
 , m_iRecordingTime(5*60*1000)
 {
     m_sSettingsPath = sSettingsPath;
-    ui->setupUi(this);
+    m_pUi->setupUi(this);
 
     scanForProjects();
     scanForSubjects();
 
-    connect(ui->m_qComboBox_ProjectSelection,static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentIndexChanged),
+    connect(m_pUi->m_qComboBox_ProjectSelection,static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentIndexChanged),
                 this,&ProjectSettingsView::selectNewProject);
 
-    connect(ui->m_qComboBox_SubjectSelection,static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentIndexChanged),
+    connect(m_pUi->m_qComboBox_SubjectSelection,static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentIndexChanged),
                 this,&ProjectSettingsView::selectNewSubject);
 
-    connect(ui->m_qLineEditParadigm,&QLineEdit::textChanged,
+    connect(m_pUi->m_qLineEditParadigm,&QLineEdit::textChanged,
                 this,&ProjectSettingsView::paradigmChanged);
 
-    connect(ui->m_qPushButtonNewProject,&QPushButton::clicked,
+    connect(m_pUi->m_qPushButtonNewProject,&QPushButton::clicked,
                 this,&ProjectSettingsView::addProject);
 
-    connect(ui->m_qPushButtonNewSubject,&QPushButton::clicked,
+    connect(m_pUi->m_qPushButtonNewSubject,&QPushButton::clicked,
                 this,&ProjectSettingsView::addSubject);
 
-    connect(ui->m_qPushButtonDeleteProject,&QPushButton::clicked,
+    connect(m_pUi->m_qPushButtonDeleteProject,&QPushButton::clicked,
                 this,&ProjectSettingsView::deleteProject);
 
-    connect(ui->m_qPushButtonDeleteSubject,&QPushButton::clicked,
+    connect(m_pUi->m_qPushButtonDeleteSubject,&QPushButton::clicked,
                 this,&ProjectSettingsView::deleteSubject);
 
-    connect(ui->m_spinBox_hours, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+    connect(m_pUi->m_spinBox_hours, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
                 this,&ProjectSettingsView::onTimeChanged);
 
-    connect(ui->m_spinBox_min, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+    connect(m_pUi->m_spinBox_min, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
                 this,&ProjectSettingsView::onTimeChanged);
 
-    connect(ui->m_spinBox_sec, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+    connect(m_pUi->m_spinBox_sec, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
                 this,&ProjectSettingsView::onTimeChanged);
 
-    connect(ui->m_checkBox_useRecordingTimer,&QCheckBox::toggled,
+    connect(m_pUi->m_checkBox_useRecordingTimer,&QCheckBox::toggled,
                 this,&ProjectSettingsView::onRecordingTimerStateChanged);
 
-    ui->m_qLineEditFileName->setReadOnly(true);
+    m_pUi->m_qLineEditFileName->setReadOnly(true);
 
     updateFileName();
 
     //Hide remaining time
-    ui->m_label_RemainingTime->hide();
-    ui->m_label_timeToGo->hide();
+    m_pUi->m_label_RemainingTime->hide();
+    m_pUi->m_label_timeToGo->hide();
 
 //    QString text = QInputDialog::getText(this, tr("QInputDialog::getText()"),
 //                                              tr("User name:"), QLineEdit::Normal,
 //                                              QDir::home().dirName(), &ok);
 
     //Hide delete buttons
-    ui->m_qPushButtonDeleteProject->hide();
-    ui->m_qPushButtonDeleteSubject->hide();
+    m_pUi->m_qPushButtonDeleteProject->hide();
+    m_pUi->m_qPushButtonDeleteSubject->hide();
 
     loadSettings();
 }
@@ -143,7 +143,7 @@ ProjectSettingsView::ProjectSettingsView(const QString& sSettingsPath,
 ProjectSettingsView::~ProjectSettingsView()
 {
     saveSettings();
-    delete ui;
+    delete m_pUi;
 }
 
 //=============================================================================================================
@@ -190,7 +190,7 @@ void ProjectSettingsView::setRecordingElapsedTime(int mSecsElapsed)
 
     QTime remainingTimeFinal = remainingTime.addMSecs(m_iRecordingTime-mSecsElapsed);
 
-    ui->m_label_timeToGo->setText(remainingTimeFinal.toString());
+    m_pUi->m_label_timeToGo->setText(remainingTimeFinal.toString());
 
     QTime passedTime(0,0,0,0);
 
@@ -203,7 +203,7 @@ void ProjectSettingsView::setRecordingElapsedTime(int mSecsElapsed)
 
     QTime passedTimeFinal = passedTime.addMSecs(mSecsElapsed);
 
-    ui->m_label_timePassed->setText(passedTimeFinal.toString("HH:mm:ss"));
+    m_pUi->m_label_timePassed->setText(passedTimeFinal.toString("HH:mm:ss"));
 }
 
 //=============================================================================================================
@@ -221,7 +221,7 @@ QString ProjectSettingsView::getCurrentFileName()
 void ProjectSettingsView::deleteSubject()
 {
     QMessageBox msgBox;
-    msgBox.setText(QString("Deleting subject data '%1'.").arg(ui->m_qComboBox_SubjectSelection->currentText()));
+    msgBox.setText(QString("Deleting subject data '%1'.").arg(m_pUi->m_qComboBox_SubjectSelection->currentText()));
     msgBox.setInformativeText("You are about to delete a subject. Do you want to delete all data corresponding to this subject?");
     msgBox.setIcon(QMessageBox::Warning);
     QPushButton *keepData = msgBox.addButton(tr("Keep data"), QMessageBox::ActionRole);
@@ -234,7 +234,7 @@ void ProjectSettingsView::deleteSubject()
 
     if(msgBox.clickedButton() == deleteData) {
         QMessageBox msgBox;
-        msgBox.setText(QString("Deleting subject data '%1'.").arg(ui->m_qComboBox_SubjectSelection->currentText()));
+        msgBox.setText(QString("Deleting subject data '%1'.").arg(m_pUi->m_qComboBox_SubjectSelection->currentText()));
         msgBox.setInformativeText("Do really want to delete the data permantley? The deleted data cannot be recovered!");
         msgBox.setStandardButtons(QMessageBox::No | QMessageBox::Yes);
         msgBox.setDefaultButton(QMessageBox::No);
@@ -245,7 +245,7 @@ void ProjectSettingsView::deleteSubject()
         if(ret == QMessageBox::No)
             return;
 
-        QString dirName = m_sDataPath + "/" + ui->m_qComboBox_ProjectSelection->currentText() + "/" + ui->m_qComboBox_SubjectSelection->currentText();
+        QString dirName = m_sDataPath + "/" + m_pUi->m_qComboBox_ProjectSelection->currentText() + "/" + m_pUi->m_qComboBox_SubjectSelection->currentText();
 
         QDir dir(dirName);
 
@@ -254,7 +254,7 @@ void ProjectSettingsView::deleteSubject()
         if(!result)
             qDebug()<<"Could not remove all data from the subject folder!";
         else
-            ui->m_qComboBox_SubjectSelection->removeItem(ui->m_qComboBox_SubjectSelection->currentIndex());
+            m_pUi->m_qComboBox_SubjectSelection->removeItem(m_pUi->m_qComboBox_SubjectSelection->currentIndex());
     }
 }
 
@@ -263,7 +263,7 @@ void ProjectSettingsView::deleteSubject()
 void ProjectSettingsView::deleteProject()
 {
     QMessageBox msgBox;
-    msgBox.setText(QString("Deleting project data '%1'.").arg(ui->m_qComboBox_ProjectSelection->currentText()));
+    msgBox.setText(QString("Deleting project data '%1'.").arg(m_pUi->m_qComboBox_ProjectSelection->currentText()));
     msgBox.setInformativeText("You are about to delete a project. Do you want to delete all data corresponding to this project?");
     msgBox.setIcon(QMessageBox::Warning);
     QPushButton *keepData = msgBox.addButton(tr("Keep data"), QMessageBox::ActionRole);
@@ -276,7 +276,7 @@ void ProjectSettingsView::deleteProject()
 
     if(msgBox.clickedButton() == deleteData) {
         QMessageBox msgBox;
-        msgBox.setText(QString("Deleting project data '%1'.").arg(ui->m_qComboBox_ProjectSelection->currentText()));
+        msgBox.setText(QString("Deleting project data '%1'.").arg(m_pUi->m_qComboBox_ProjectSelection->currentText()));
         msgBox.setInformativeText("Do really want to delete the data permantley? All subject data in this project will be lost! The deleted data cannot be recovered!");
         msgBox.setStandardButtons(QMessageBox::No | QMessageBox::Yes);
         msgBox.setDefaultButton(QMessageBox::No);
@@ -287,7 +287,7 @@ void ProjectSettingsView::deleteProject()
         if(ret == QMessageBox::No)
             return;
 
-        QString dirName = m_sDataPath + "/" + ui->m_qComboBox_ProjectSelection->currentText();
+        QString dirName = m_sDataPath + "/" + m_pUi->m_qComboBox_ProjectSelection->currentText();
 
         QDir dir(dirName);
 
@@ -296,7 +296,7 @@ void ProjectSettingsView::deleteProject()
         if(!result)
             qDebug()<<"Could not remove all data from the project folder!";
         else
-            ui->m_qComboBox_ProjectSelection->removeItem(ui->m_qComboBox_ProjectSelection->currentIndex());
+            m_pUi->m_qComboBox_ProjectSelection->removeItem(m_pUi->m_qComboBox_ProjectSelection->currentIndex());
     }
 }
 
@@ -356,7 +356,7 @@ void ProjectSettingsView::paradigmChanged(const QString &sNewParadigm)
 void ProjectSettingsView::scanForProjects()
 {
     //clear
-    ui->m_qComboBox_ProjectSelection->clear();
+    m_pUi->m_qComboBox_ProjectSelection->clear();
     m_sListProjects.clear();
 
     QDir t_qDirData(m_sDataPath);
@@ -367,8 +367,8 @@ void ProjectSettingsView::scanForProjects()
         if(it->isDir() && it->fileName() != "." && it->fileName() != "..")
             m_sListProjects.append(it->fileName());
 
-    ui->m_qComboBox_ProjectSelection->insertItems(0,m_sListProjects);
-    ui->m_qComboBox_ProjectSelection->setCurrentIndex(ui->m_qComboBox_ProjectSelection->findText(m_sCurrentProject));
+    m_pUi->m_qComboBox_ProjectSelection->insertItems(0,m_sListProjects);
+    m_pUi->m_qComboBox_ProjectSelection->setCurrentIndex(m_pUi->m_qComboBox_ProjectSelection->findText(m_sCurrentProject));
 }
 
 //=============================================================================================================
@@ -376,7 +376,7 @@ void ProjectSettingsView::scanForProjects()
 void ProjectSettingsView::scanForSubjects()
 {
     //clear
-    ui->m_qComboBox_SubjectSelection->clear();
+    m_pUi->m_qComboBox_SubjectSelection->clear();
     m_sListSubjects.clear();
 
     QDir t_qDirProject(m_sDataPath+"/"+m_sCurrentProject);
@@ -387,15 +387,15 @@ void ProjectSettingsView::scanForSubjects()
         if(it->isDir() && it->fileName() != "." && it->fileName() != "..")
             m_sListSubjects.append(it->fileName());
 
-    ui->m_qComboBox_SubjectSelection->insertItems(0,m_sListSubjects);
+    m_pUi->m_qComboBox_SubjectSelection->insertItems(0,m_sListSubjects);
 
-    qint32 idx = ui->m_qComboBox_SubjectSelection->findText(m_sCurrentSubject);
+    qint32 idx = m_pUi->m_qComboBox_SubjectSelection->findText(m_sCurrentSubject);
     if(idx >= 0)
-        ui->m_qComboBox_SubjectSelection->setCurrentIndex(idx);
+        m_pUi->m_qComboBox_SubjectSelection->setCurrentIndex(idx);
     else
     {
-        ui->m_qComboBox_SubjectSelection->setCurrentIndex(0);
-        selectNewSubject(ui->m_qComboBox_SubjectSelection->itemText(0));
+        m_pUi->m_qComboBox_SubjectSelection->setCurrentIndex(0);
+        selectNewSubject(m_pUi->m_qComboBox_SubjectSelection->itemText(0));
     }
 }
 
@@ -441,7 +441,7 @@ void ProjectSettingsView::updateFileName(bool currentTime)
 
     m_sFileName = sFilePath;
 
-    ui->m_qLineEditFileName->setText(m_sFileName);
+    m_pUi->m_qLineEditFileName->setText(m_sFileName);
 
     emit fileNameChanged(m_sFileName);
 }
@@ -450,7 +450,7 @@ void ProjectSettingsView::updateFileName(bool currentTime)
 
 void ProjectSettingsView::onTimeChanged()
 {
-    m_iRecordingTime = (ui->m_spinBox_hours->value()*60*60)+(ui->m_spinBox_min->value()*60)+(ui->m_spinBox_sec->value());
+    m_iRecordingTime = (m_pUi->m_spinBox_hours->value()*60*60)+(m_pUi->m_spinBox_min->value()*60)+(m_pUi->m_spinBox_sec->value());
 
     m_iRecordingTime*=1000;
 
@@ -458,7 +458,7 @@ void ProjectSettingsView::onTimeChanged()
 
     QTime remainingTimeFinal = remainingTime.addMSecs(m_iRecordingTime);
 
-    ui->m_label_timeToGo->setText(remainingTimeFinal.toString());
+    m_pUi->m_label_timeToGo->setText(remainingTimeFinal.toString());
 
     emit timerChanged(m_iRecordingTime);
 }

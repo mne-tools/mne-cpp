@@ -64,18 +64,18 @@ MinimumNormSettingsView::MinimumNormSettingsView(const QString& sSettingsPath,
                                                  QWidget *parent,
                                                  Qt::WindowFlags f)
 : AbstractView(parent, f)
-, ui(new Ui::MinimumNormSettingsViewWidget)
+, m_pUi(new Ui::MinimumNormSettingsViewWidget)
 {
     m_sSettingsPath = sSettingsPath;
-    ui->setupUi(this);
+    m_pUi->setupUi(this);
 
-    connect(ui->m_comboBox_method, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
+    connect(m_pUi->m_comboBox_method, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
             this, &MinimumNormSettingsView::onMethodChanged);
 
-    connect(ui->m_comboBox_triggerType, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
+    connect(m_pUi->m_comboBox_triggerType, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
             this, &MinimumNormSettingsView::onTriggerTypeChanged);
 
-    connect(ui->m_spinBox_timepoint, &QSpinBox::editingFinished,
+    connect(m_pUi->m_spinBox_timepoint, &QSpinBox::editingFinished,
             this, &MinimumNormSettingsView::onTimePointValueChanged);
 
     this->setWindowTitle("MinimumNorm Settings");
@@ -90,7 +90,7 @@ MinimumNormSettingsView::MinimumNormSettingsView(const QString& sSettingsPath,
 MinimumNormSettingsView::~MinimumNormSettingsView()
 {
     saveSettings();
-    delete ui;
+    delete m_pUi;
 }
 
 //=============================================================================================================
@@ -98,8 +98,8 @@ MinimumNormSettingsView::~MinimumNormSettingsView()
 void MinimumNormSettingsView::setTriggerTypes(const QStringList& lTriggerTypes)
 {
     for(const QString &sTriggerType : lTriggerTypes) {
-        if(ui->m_comboBox_triggerType->findText(sTriggerType) == -1) {
-            ui->m_comboBox_triggerType->addItem(sTriggerType);
+        if(m_pUi->m_comboBox_triggerType->findText(sTriggerType) == -1) {
+            m_pUi->m_comboBox_triggerType->addItem(sTriggerType);
         }
     }
 }
@@ -158,5 +158,5 @@ void MinimumNormSettingsView::onTriggerTypeChanged(const QString& sTriggerType)
 
 void MinimumNormSettingsView::onTimePointValueChanged()
 {
-    emit timePointChanged(ui->m_spinBox_timepoint->value());
+    emit timePointChanged(m_pUi->m_spinBox_timepoint->value());
 }
