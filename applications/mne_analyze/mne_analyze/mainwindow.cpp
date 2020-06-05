@@ -225,7 +225,7 @@ void MainWindow::onStyleChanged(const QString& sStyle)
             qWarning() << "[MainWindow::onStyleChanged] Changing the style is not supported in the wasm mode yet.";
         #else
             QFile file;
-            file.setFileName(":"+sStyle+".qss");
+            file.setFileName(":/styles/"+sStyle+".qss");
             file.open(QFile::ReadOnly | QFile::Text);
             QTextStream stream(&file);
             pApp->setStyleSheet(stream.readAll());
@@ -307,16 +307,6 @@ void MainWindow::createPluginMenus(QSharedPointer<ANSHAREDLIB::PluginManager> pP
     connect(pActionDarkStyle, &QAction::triggered,
         [=]() {
         onStyleChanged("dark");
-    });
-
-    QAction* pActionLightStyle = new QAction("Light");
-    pActionLightStyle->setStatusTip(tr("Activate light style"));
-    pActionLightStyle->setCheckable(true);
-    pActionLightStyle->setChecked(false);
-    pActionStyleGroup->addAction(pActionLightStyle);
-    connect(pActionLightStyle, &QAction::triggered,
-        [=]() {
-        onStyleChanged("light");
     });
 
     // Modes

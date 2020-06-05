@@ -181,7 +181,7 @@ void MainWindow::onStyleChanged(const QString& sStyle)
             pApp->setStyleSheet("");
         } else {
             QFile file;
-            file.setFileName(":"+sStyle+".qss");
+            file.setFileName(":/styles/"+sStyle+".qss");
             file.open(QFile::ReadOnly | QFile::Text);
             QTextStream stream(&file);
             pApp->setStyleSheet(stream.readAll());
@@ -462,16 +462,6 @@ void MainWindow::createActions()
     connect(m_pActionDarkMode, &QAction::triggered,
         [=]() {
         onStyleChanged("dark");
-    });
-
-    m_pActionLightMode = new QAction("Light");
-    m_pActionLightMode->setStatusTip(tr("Activate light style"));
-    m_pActionLightMode->setCheckable(true);
-    m_pActionLightMode->setChecked(false);
-    m_pActionStyleGroup->addAction(m_pActionLightMode);
-    connect(m_pActionLightMode, &QAction::triggered,
-        [=]() {
-        onStyleChanged("light");
     });
 
     // Modes
