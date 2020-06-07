@@ -64,7 +64,7 @@ using namespace MNEANONYMIZE;
 //=============================================================================================================
 
 SettingsControllerGui::SettingsControllerGui(const QStringList& arguments)
-: m_pWindow(QSharedPointer<MainWindow> (new MainWindow(this)))
+: m_pWin(QSharedPointer<MainWindow> (new MainWindow(this)))
 {
     Q_UNUSED(arguments)
 
@@ -73,38 +73,52 @@ SettingsControllerGui::SettingsControllerGui(const QStringList& arguments)
     parseInputs(arguments);
 
     //initialize options in window
-    QFileInfo fileInfoIn(m_pAnonymizer->getFileNameIn());
-    if (fileInfoIn.isFile())
+    if (m_fiInFileInfo.isFile())
     {
-        m_pWindow->setLineEditInFile(fileInfoIn.absoluteFilePath());
+        m_pWin->setLineEditInFile(m_fiInFileInfo.absoluteFilePath());
     }
 
     QFileInfo fileInfoOut(m_pAnonymizer->getFileNameOut());
-    if (fileInfoOut.isFile())
+    if (m_fiOutFileInfo.isFile())
     {
-        m_pWindow->setLineEditOutFile(fileInfoOut.absoluteFilePath());
+        m_pWin->setLineEditOutFile(m_fiOutFileInfo.absoluteFilePath());
     }
 
-    m_pWindow->setCheckBoxBruteMode(m_pAnonymizer->getBruteMode());
-    m_pWindow->setCheckBoxDeleteInputFileAfter(m_bDeleteInputFileAfter);
-    m_pWindow->setCheckBoxAvoidDeleteConfirmation(m_bDeleteInputFileConfirmation);
-    m_pWindow->setMeasurementDate(m_pAnonymizer->getMeasurementDate());
-    m_pWindow->setCheckBoxMeasurementDateOffset(m_pAnonymizer->getUseMeasurementDayOffset());
-    m_pWindow->setMeasurementDateOffset(m_pAnonymizer->getMeasurementDayOffset());
-    m_pWindow->setCheckBoxSubjectBirthdayOffset(m_pAnonymizer->getUseSubjectBirthdayOffset());
-    m_pWindow->setSubjectBirthdayOffset(m_pAnonymizer->getSubjectBirthdayOffset());
-    m_pWindow->setSubjectHis(m_pAnonymizer->getSubjectHisID());
+    m_pWin->setCheckBoxBruteMode(m_pAnonymizer->getBruteMode());
+    m_pWin->setCheckBoxDeleteInputFileAfter(m_bDeleteInputFileAfter);
+    m_pWin->setCheckBoxAvoidDeleteConfirmation(m_bDeleteInputFileConfirmation);
+    m_pWin->setMeasurementDate(m_pAnonymizer->getMeasurementDate());
+    m_pWin->setCheckBoxMeasurementDateOffset(m_pAnonymizer->getUseMeasurementDayOffset());
+    m_pWin->setMeasurementDateOffset(m_pAnonymizer->getMeasurementDayOffset());
+    m_pWin->setCheckBoxSubjectBirthdayOffset(m_pAnonymizer->getUseSubjectBirthdayOffset());
+    m_pWin->setSubjectBirthdayOffset(m_pAnonymizer->getSubjectBirthdayOffset());
+    m_pWin->setSubjectHis(m_pAnonymizer->getSubjectHisID());
 
     //setup communication
+//    QObject::connect(this, &MNEANONYMIZE::SettingsControllerCl::finished,
+//                     qApp, &QCoreApplication::exit, Qt::QueuedConnection);
+//    QObject::connect(m_pAnonymizer,&FiffAnonymizer::readingIdMeasurementDate,
+//                     m_pWin->m_pUi->
 
+//    conectar todos los signals de mainwindow con los slots de m_pAnonymizer
 
+//    crear hilo de ejecucion cuando el user pincha en leer informacion.
 
+    if(m_fiInFileInfo.isFile())
+    {
+        readData();
+    }
 
-
-//    read data method
-//    recieve a struct.
-//    anonymize method
-
-    m_pWindow->show();
+    m_pWin->show();
 }
 
+void SettingsControllerGui::readData()
+{
+    //set output to a randomFilename
+    QString fileOutStr(QDir(m_fiInFileInfo.absolutePath()).filePath(generateRandomFileName()));
+    m_pAnonymizer->setFileOut(m_fiOutFileInfo.absoluteFilePath());
+    m_pAnonymizer->anonymizeFile();
+    QFile fileOut(fileOutStr);
+    fileOut.remove();
+    m_pAnonymizer->setFileOut(m_fiOutFileInfo.absoluteFilePath());
+}

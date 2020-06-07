@@ -602,7 +602,7 @@ void FiffAnonymizer::updateBlockTypeList()
 
 //=============================================================================================================
 
-bool FiffAnonymizer::checkValidFiffFormatVersion() const
+bool FiffAnonymizer::checkValidFiffFormatVersion()
 {
     if(m_pTag->kind == FIFF_FILE_ID)
     {
@@ -610,6 +610,8 @@ bool FiffAnonymizer::checkValidFiffFormatVersion() const
         int inMayorVersion = (static_cast<uint32_t>(fileId.version) & 0xFFFF0000) >> 16;
         int inMinorVersion = (static_cast<uint32_t>(fileId.version) & 0x0000FFFF);
         double inVersion = inMayorVersion + inMinorVersion/10.0;
+        emit readingIdFileVersion(inVersion);
+        emit readingIdMac(fileId.toMachidString());
 
         if(inVersion > m_dMaxValidFiffVerion) {
             return false;

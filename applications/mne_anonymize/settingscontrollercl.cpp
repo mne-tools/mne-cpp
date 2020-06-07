@@ -162,7 +162,7 @@ void SettingsControllerCl::initParser()
            "\n - *** Additionally if there is MRI data present in the file a warning message will appear.\n"));
     m_parser.addHelpOption();
 
-    //just for completeness.
+    //this needs to be here
     QCommandLineOption noGUIOpt("gui",QCoreApplication::translate("main","GUI version of the application."));
     m_parser.addOption(noGUIOpt);
 
