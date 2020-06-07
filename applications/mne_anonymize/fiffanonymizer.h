@@ -133,10 +133,13 @@ public:
 
     //=========================================================================================================
 signals:
+    void readingIdFileVersion(double v);
     void readingIdMeasurementDate(QDateTime d);
+    void readingIdMac(QString mac);
     void readingFileMeasurementDate(QDateTime d);
     void readingFileComment(QString s);
     void readingFileExperimenter(QString e);
+
     void readingSubjectId(int i);
     void readingSubjectFirstName(QString fn);
     void readingSubjectMiddleName(QString mn);
@@ -401,7 +404,7 @@ private:
      *
      * @param [in] pTag Pointer to the tag being read. Normally, the input Tag.
      */
-    bool checkValidFiffFormatVersion() const;
+    bool checkValidFiffFormatVersion();
 
     //=========================================================================================================
     /**

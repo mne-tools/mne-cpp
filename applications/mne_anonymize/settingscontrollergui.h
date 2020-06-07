@@ -93,11 +93,12 @@ protected:
 //    void parseInputs(const QStringList& arguments);
 
 private:
+    void readData();
 
 signals:
 
 private:
-    QSharedPointer<MainWindow> m_pWindow;
+    QSharedPointer<MainWindow> m_pWin;
 };
 
 //=============================================================================================================
