@@ -103,26 +103,26 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>407</width>
+             <width>398</width>
              <height>452</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_5">
             <item row="3" column="2">
-             <widget class="QDateTimeEdit" name="dateTimeMeasurementDateExtra"/>
+             <widget class="QDateTimeEdit" name="dateTimeIdMeasurementDateExtra"/>
             </item>
             <item row="5" column="1">
              <widget class="QLabel" name="labelMACAddressExtra">
               <property name="text">
-               <string>MAC address</string>
+               <string>Id MAC address</string>
               </property>
              </widget>
             </item>
             <item row="7" column="2">
-             <widget class="QDateTimeEdit" name="dateTimeEditExtra"/>
+             <widget class="QDateTimeEdit" name="dateTimeFileMeasurementDateExtra"/>
             </item>
             <item row="9" column="2">
-             <widget class="QLineEdit" name="lineEditexperimenterExtra"/>
+             <widget class="QLineEdit" name="lineEditExperimenterExtra"/>
             </item>
             <item row="2" column="2">
              <widget class="QLineEdit" name="lineEditFileVersionExtra"/>
@@ -135,7 +135,7 @@
              </widget>
             </item>
             <item row="8" column="2">
-             <widget class="QPlainTextEdit" name="plainTextCommentExtra">
+             <widget class="QPlainTextEdit" name="plainTextFileCommentExtra">
               <property name="maximumSize">
                <size>
                 <width>220</width>
@@ -154,7 +154,7 @@
             <item row="2" column="1">
              <widget class="QLabel" name="labelFileVersionExtra">
               <property name="text">
-               <string>File version</string>
+               <string>Id File version</string>
               </property>
              </widget>
             </item>
@@ -169,9 +169,16 @@
              <widget class="QLineEdit" name="lineEditMACAddressExtra"/>
             </item>
             <item row="3" column="0" colspan="2">
-             <widget class="QLabel" name="labelHeaderMeasurementDateExtra">
+             <widget class="QLabel" name="labelIdMeasurementDateExtra">
               <property name="text">
-               <string>Header Measurement Date</string>
+               <string>Id Measurement Date</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QCheckBox" name="checkBoxEditExtra">
+              <property name="text">
+               <string>Edit Information</string>
               </property>
              </widget>
             </item>
@@ -453,25 +460,15 @@
            <enum>QFrame::Raised</enum>
           </property>
           <layout class="QGridLayout" name="gridLayout_3">
-           <item row="5" column="1">
-            <widget class="QCheckBox" name="checkBoxMeasurementDateOffset">
+           <item row="9" column="1">
+            <widget class="QCheckBox" name="checkBoxBirthdayDateOffset">
              <property name="text">
-              <string>Measurement Date Offset</string>
+              <string>Birthday Date Offset</string>
              </property>
             </widget>
            </item>
-           <item row="3" column="1">
-            <widget class="QLabel" name="labelMeasDate">
-             <property name="maximumSize">
-              <size>
-               <width>16777215</width>
-               <height>20</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>Measurement Date</string>
-             </property>
-            </widget>
+           <item row="6" column="1">
+            <widget class="QSpinBox" name="spinBoxMeasurementDateOffset"/>
            </item>
            <item row="11" column="1">
             <widget class="QLabel" name="labelSubjectHisId">
@@ -493,56 +490,6 @@
              </property>
             </widget>
            </item>
-           <item row="4" column="1">
-            <widget class="QDateTimeEdit" name="dateTimeMeasurementDate"/>
-           </item>
-           <item row="12" column="1">
-            <widget class="QLineEdit" name="lineEditSubjectHisId"/>
-           </item>
-           <item row="10" column="1">
-            <widget class="QSpinBox" name="spinBoxBirthdayDateOffset"/>
-           </item>
-           <item row="9" column="1">
-            <widget class="QCheckBox" name="checkBoxBirthdayDateOffset">
-             <property name="text">
-              <string>Birthday Date Offset</string>
-             </property>
-            </widget>
-           </item>
-           <item row="14" column="1">
-            <widget class="QDialogButtonBox" name="buttonSaveFile">
-             <property name="standardButtons">
-              <set>QDialogButtonBox::Cancel|QDialogButtonBox::Help|QDialogButtonBox::Save</set>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QCheckBox" name="checkBoxBruteMode">
-             <property name="text">
-              <string>Brute Mode</string>
-             </property>
-            </widget>
-           </item>
-           <item row="8" column="1">
-            <widget class="QDateTimeEdit" name="dateTimeBirthdayDate"/>
-           </item>
-           <item row="13" column="1">
-            <widget class="QToolButton" name="toolButton">
-             <property name="text">
-              <string>See Information</string>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="1">
-            <widget class="QSpinBox" name="spinBoxMeasurementDateOffset"/>
-           </item>
-           <item row="0" column="1">
-            <widget class="QCheckBox" name="checkBoxDeleteInputFile">
-             <property name="text">
-              <string>Delete Input File</string>
-             </property>
-            </widget>
-           </item>
            <item row="7" column="1">
             <widget class="QLabel" name="labelSubjectBirthday">
              <property name="maximumSize">
@@ -555,6 +502,66 @@
               <string>Subject Birthday Date</string>
              </property>
             </widget>
+           </item>
+           <item row="4" column="1">
+            <widget class="QDateTimeEdit" name="dateTimeMeasurementDate"/>
+           </item>
+           <item row="14" column="1">
+            <widget class="QDialogButtonBox" name="buttonMenu">
+             <property name="standardButtons">
+              <set>QDialogButtonBox::Cancel|QDialogButtonBox::Help|QDialogButtonBox::Save</set>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QCheckBox" name="checkBoxBruteMode">
+             <property name="text">
+              <string>Brute Mode</string>
+             </property>
+            </widget>
+           </item>
+           <item row="13" column="1">
+            <widget class="QToolButton" name="seeExtraInfoButton">
+             <property name="text">
+              <string>See Information</string>
+             </property>
+            </widget>
+           </item>
+           <item row="8" column="1">
+            <widget class="QDateTimeEdit" name="dateTimeBirthdayDate"/>
+           </item>
+           <item row="3" column="1">
+            <widget class="QLabel" name="labelMeasDate">
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>20</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Measurement Date</string>
+             </property>
+            </widget>
+           </item>
+           <item row="10" column="1">
+            <widget class="QSpinBox" name="spinBoxBirthdayDateOffset"/>
+           </item>
+           <item row="0" column="1">
+            <widget class="QCheckBox" name="checkBoxDeleteInputFile">
+             <property name="text">
+              <string>Delete Input File</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="1">
+            <widget class="QCheckBox" name="checkBoxMeasurementDateOffset">
+             <property name="text">
+              <string>Measurement Date Offset</string>
+             </property>
+            </widget>
+           </item>
+           <item row="12" column="1">
+            <widget class="QLineEdit" name="lineEditSubjectHisId"/>
            </item>
           </layout>
          </widget>
@@ -589,11 +596,11 @@
   <tabstop>spinBoxBirthdayDateOffset</tabstop>
   <tabstop>lineEditSubjectHisId</tabstop>
   <tabstop>lineEditFileVersionExtra</tabstop>
-  <tabstop>dateTimeMeasurementDateExtra</tabstop>
+  <tabstop>dateTimeIdMeasurementDateExtra</tabstop>
   <tabstop>lineEditMACAddressExtra</tabstop>
-  <tabstop>dateTimeEditExtra</tabstop>
-  <tabstop>plainTextCommentExtra</tabstop>
-  <tabstop>lineEditexperimenterExtra</tabstop>
+  <tabstop>dateTimeFileMeasurementDateExtra</tabstop>
+  <tabstop>plainTextFileCommentExtra</tabstop>
+  <tabstop>lineEditExperimenterExtra</tabstop>
   <tabstop>spinBoxSubjectIDExtra</tabstop>
   <tabstop>lineEditSubjectFirstNameExtra</tabstop>
   <tabstop>lineEditSubjectMiddleNameExtra</tabstop>

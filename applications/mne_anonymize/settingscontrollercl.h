@@ -121,12 +121,22 @@ protected:
      */
     int parseInputs(const QStringList& arguments);
 
-private:
+    //=========================================================================================================
+    /**
+     * If the user wants the name of the input file and the output file to be the same, well... it is not possible
+     * in this universe other than masking this behaviour with an auxiliary output filename to be used during the
+     * anonymizing process. Eventually, once the reading has finished correctly, the input file can be deleted and
+     * the output file can then be called as the original input file. This function helps with this process.
+     */
+    QString generateRandomFileName();
+
     //=========================================================================================================
     /**
      * Signals the FiffAnonymizer method handling both the multi-parallel setup and the single-thread setup.
      */
     int execute();
+
+private:
 
     //=========================================================================================================
     /**
@@ -138,15 +148,6 @@ private:
      * @return Returns true if parsing was successful, false otherwise.
      */
     int parseInOutFiles();
-
-    //=========================================================================================================
-    /**
-     * If the user wants the name of the input file and the output file to be the same, well... it is not possible
-     * in this universe other than masking this behaviour with an auxiliary output filename to be used during the
-     * anonymizing process. Eventually, once the reading has finished correctly, the input file can be deleted and
-     * the output file can then be called as the original input file. This function helps with this process.
-     */
-    QString generateRandomFileName();
 
     //=========================================================================================================
     /**

@@ -7,35 +7,40 @@
 #include <QCloseEvent>
 #include <QUrl>
 #include <QDesktopServices>
+#include <QDateTime>
 
 using namespace MNEANONYMIZE;
 
 MainWindow::MainWindow(MNEANONYMIZE::SettingsControllerGui *c)
-: m_bDataModified(true)
-, m_bHideEachField(false)
+: m_bIdFileVersionFound(false)
+, m_bIdMeasurementDateFound(false)
+, m_bIdMacAddressFound(false)
+, m_bFileMeasurementDateFound(false)
+, m_bFileExperimenterFound(false)
+, m_bFileCommentFound(false)
+, m_bSubjectIdFound(false)
+, m_bSubjectFirstNameFound(false)
+, m_bSubjectMiddleNameFound(false)
+, m_bSubjectLastNameFound(false)
+, m_bSubjectBirthdayFound(false)
+, m_bSubjectSexFound(false)
+, m_bSubjectHandFound(false)
+, m_bSubjectWeightFound(false)
+, m_bSubjectHeightFound(false)
+, m_bSubjectCommentFound(false)
+, m_bSubjectHisIdFound(false)
+, m_bProjectIdFound(false)
+, m_bProjectAimFound(false)
+, m_bProjectNameFound(false)
+, m_bProjectPersonsFound(false)
+, m_bProjectCommentFound(false)
+, m_bHideEachField(true)
 , m_pUi(new Ui::MainWindow)
 , m_pController(c)
 {
     m_pUi->setupUi(this);
-
-////    //maybe use getters from fiff_anonymizer obj.?
-//    m_pUi->checkBoxDeleteInputFile->setEnabled(false);
-//    m_pUi->checkBoxAvoidDeleteConfirmation->setEnabled(true);
-
-//    m_pUi->dateTimeMeasurementDate->setEnabled(true);
-//    m_pUi->checkBoxMeasurementDateOffset->setEnabled(false);
-    m_pUi->spinBoxMeasurementDateOffset->setEnabled(false);
-
-//    m_pUi->dateTimeBirthdayDate->setEnabled(true);
-//    m_pUi->checkBoxBirthdayDateOffset->setEnabled(false);
-    m_pUi->spinBoxBirthdayDateOffset->setEnabled(false);
-
-//    m_pUi->lineEditSubjectHisId->setEnabled(true);
-    m_pUi->frameFile->setHidden(m_bHideEachField);
-    m_pUi->frameSubject->setHidden(m_bHideEachField);
-    m_pUi->frameProject->setHidden(m_bHideEachField);
-    m_pUi->lineEditFileVersionExtra->setEnabled(false);
-    m_pUi->lineEditMACAddressExtra->setEnabled(false);
+    setDefautlStateUi();
+    setupConections();
 }
 
 MainWindow::~MainWindow()
@@ -55,56 +60,138 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 bool MainWindow::confirmClose()
 {
-    if (!m_bDataModified)
-    {
-        return true;
-    }
     const QMessageBox::StandardButton ret
             = QMessageBox::warning(this, tr("Application"),
-                                   tr("The document has been modified.\n"
-                                      "Do you want to save your changes?"),
-                                   QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+                                   tr("Are you sure you want to exit?\n"),
+                                   QMessageBox::Yes | QMessageBox::Cancel);
     switch (ret) {
-    case QMessageBox::Save:
-        return true; //save();
+    case QMessageBox::Yes:
+        return true;
     case QMessageBox::Cancel:
         return false;
-    case QMessageBox::Discard:
-        return true;
     default:
         break;
     }
-    return true;
+    return false;
 }
 
-//todo
-// set the delete input file
-// set the avoid delete input file confirmation.
+void MainWindow::setDefautlStateUi()
+{
+    m_pUi->spinBoxMeasurementDateOffset->setEnabled(false);
+    m_pUi->spinBoxBirthdayDateOffset->setEnabled(false);
 
-//generate signals for each of these setters
-//emit whenever there is a change.
-//have the controller not configuring the actual anonymizer state directly.
-//but configure the signals=>slots and then just actively configure the setteers
-//
-//generate a section which is hidden initially named> See and edit all the information
-// then create a reader in the controller gui which will populate the info.
-// then create another column with the actual output to be writtern to the output file
-// syncrhonize the initial controls with these ones.
-//
-// generate a link between Anonymize file and the actual anonymize member in anonymizer
-// solve the issues with input output file the same etc...
-// i think that would be a first approach.
+    m_pUi->frameFile->setHidden(m_bHideEachField);
+    m_pUi->frameSubject->setHidden(m_bHideEachField);
+    m_pUi->frameProject->setHidden(m_bHideEachField);
+
+    m_pUi->lineEditFileVersionExtra->setEnabled(false);
+    m_pUi->lineEditMACAddressExtra->setEnabled(false);
+
+    m_pUi->comboBoxSubjectSexExtra->addItems(QStringList() << "Unknown" << "Male" << "Female");
+    m_pUi->comboBoxSubjectSexExtra->setCurrentIndex(0);
+    m_pUi->comboBoxSubjectSexExtra->setEditable(false);
+
+    m_pUi->comboBoxSubjectHandExtra->addItems(QStringList() << "Unknown" << "Right" << "Left");
+    m_pUi->comboBoxSubjectHandExtra->setCurrentIndex(0);
+    m_pUi->comboBoxSubjectHandExtra->setEditable(false);
+
+    m_bIdFileVersionFound = false;
+    m_bIdMeasurementDateFound = false;
+    m_bIdMacAddressFound = false;
+    m_bFileMeasurementDateFound = false;
+    m_bFileExperimenterFound = false;
+    m_bFileCommentFound = false;
+    m_bSubjectIdFound = false;
+    m_bSubjectFirstNameFound = false;
+    m_bSubjectMiddleNameFound = false;
+    m_bSubjectLastNameFound = false;
+    m_bSubjectBirthdayFound = false;
+    m_bSubjectSexFound = false;
+    m_bSubjectHandFound = false;
+    m_bSubjectWeightFound = false;
+    m_bSubjectHeightFound = false;
+    m_bSubjectCommentFound = false;
+    m_bSubjectHisIdFound = false;
+    m_bProjectIdFound = false;
+    m_bProjectAimFound = false;
+    m_bProjectNameFound = false;
+    m_bProjectPersonsFound = false;
+    m_bProjectCommentFound = false;
+
+}
+
+void MainWindow::setupConections()
+{
+    QObject::connect(m_pUi->checkBoxEditExtra,&QCheckBox::stateChanged,
+                     this,&MainWindow::setExtraObjectstoState);
+    QObject::connect(m_pUi->checkBoxEditExtra,&QCheckBox::stateChanged,
+                     this,&MainWindow::setCheckBoxEditExtraUnmutable);
+
+    QObject::connect(m_pUi->seeExtraInfoButton,&QToolButton::clicked,
+                     this,&MainWindow::seeExtraInformationClicked);
+    QObject::connect(m_pUi->buttonMenu,&QDialogButtonBox::helpRequested,
+                     this,&MainWindow::helpButtonClicked);
+
+    QObject::connect(m_pUi->lineEditInFile,&QLineEdit::editingFinished,
+                     this,&MainWindow::lineEditInFileEditingFinished);
+
+    QObject::connect(m_pUi->lineEditOutFile,&QLineEdit::editingFinished,
+                     this,&MainWindow::lineEditOutFileEditingFinished);
+    QObject::connect(m_pUi->checkBoxMeasurementDateOffset,&QCheckBox::stateChanged,
+                     this,&MainWindow::checkBoxMeasurementDateOffsetStateChanged);
+    QObject::connect(m_pUi->checkBoxBirthdayDateOffset,&QCheckBox::stateChanged,
+                     this,&MainWindow::checkBoxBirthdayDateOffsetStateChanged);
+    QObject::connect(m_pUi->dateTimeMeasurementDate,&QDateTimeEdit::dateTimeChanged,
+                     this,&MainWindow::dateTimeMeasurementDateDateTimeChanged);
+    QObject::connect(m_pUi->spinBoxMeasurementDateOffset,QOverload<int>::of(&QSpinBox::valueChanged),
+                     this,&MainWindow::spinBoxMeasurementDateOffsetValueChanged);
+    QObject::connect(m_pUi->dateTimeBirthdayDate,&QDateTimeEdit::dateTimeChanged,
+                     this,&MainWindow::dateTimeBirthdayDateDateTimeChanged);
+    QObject::connect(m_pUi->spinBoxBirthdayDateOffset,QOverload<int>::of(&QSpinBox::valueChanged),
+                     this,&MainWindow::spinBoxBirthdayDateOffsetValueChanged);
+    QObject::connect(m_pUi->lineEditSubjectHisId,&QLineEdit::editingFinished,
+                     this,&MainWindow::lineEditSubjectHisIdEditingFinished);
+
+
+}
+
+void MainWindow::setExtraObjectstoState()
+{
+    m_pUi->lineEditFileVersionExtra->setEnabled(m_bIdFileVersionFound);
+    m_pUi->dateTimeIdMeasurementDateExtra->setEnabled(m_bIdMeasurementDateFound);
+    m_pUi->lineEditMACAddressExtra->setEnabled(m_bIdMacAddressFound);
+    m_pUi->dateTimeFileMeasurementDateExtra->setEnabled(m_bFileMeasurementDateFound);
+
+    m_pUi->lineEditExperimenterExtra->setEnabled(m_bFileExperimenterFound);
+    m_pUi->plainTextFileCommentExtra->setEnabled(m_bFileCommentFound);
+
+    m_pUi->spinBoxSubjectIDExtra->setEnabled(m_bSubjectIdFound);
+    m_pUi->lineEditSubjectFirstNameExtra->setEnabled(m_bSubjectFirstNameFound);
+    m_pUi->lineEditSubjectMiddleNameExtra->setEnabled(m_bSubjectMiddleNameFound);
+    m_pUi->lineEditSubjectLastNameExtra->setEnabled(m_bSubjectLastNameFound);
+    m_pUi->dateEditSubjectBirthdayExtra->setEnabled(m_bSubjectBirthdayFound);
+    m_pUi->comboBoxSubjectSexExtra->setEnabled(m_bSubjectSexFound);
+    m_pUi->comboBoxSubjectHandExtra->setEnabled(m_bSubjectHandFound);
+    m_pUi->doubleSpinBoxSubjectWeightExtra->setEnabled(m_bSubjectWeightFound);
+    m_pUi->doubleSpinBoxSubjectHeightExtra->setEnabled(m_bSubjectHeightFound);
+    m_pUi->plainTextEditSubjectCommentExtra->setEnabled(m_bSubjectCommentFound);
+    m_pUi->lineEditSubjectHisIdExtra->setEnabled(m_bSubjectHisIdFound);
+
+    m_pUi->spinBoxProjectIDExtra->setEnabled(m_bProjectIdFound);
+    m_pUi->lineEditProjectAimExtra->setEnabled(m_bProjectAimFound);
+    m_pUi->lineEditProjectNameExtra->setEnabled(m_bProjectNameFound);
+    m_pUi->lineEditProjectPersonsExtra->setEnabled(m_bProjectPersonsFound);
+    m_pUi->plainTextEditProjectCommentExtra->setEnabled(m_bProjectCommentFound);
+}
 
 void MainWindow::setLineEditInFile(const QString &f)
 {
     m_pUi->lineEditInFile->setText(f);
-//    std::printf("\n%s\n",f.toUtf8().data());
 }
 
 void MainWindow::setLineEditOutFile(const QString &f)
 {
     m_pUi->lineEditOutFile->setText(f);
-    // std::printf("\n%s\n",f.toUtf8().data());
 }
 
 void MainWindow::setCheckBoxBruteMode(bool b)
@@ -164,59 +251,159 @@ void MainWindow::setSubjectHis(const QString& h)
     m_pUi->lineEditSubjectHisId->setText(h);
 }
 
-// /////////////////////////////// slots
 
-void MNEANONYMIZE::MainWindow::on_lineEditInFile_editingFinished()
+//public slots for extra information
+void MainWindow::setIdFileVersion(double v)
 {
-    //std::printf("\n%s\n",m_pUi->lineEditInFile->text().toUtf8().data());
-    emit fileInChanged(m_pUi->lineEditInFile->text());
+//    m_pUi->lineEditFileVersionExtra->setVisible(true);
+//    m_pUi->labelFileVersionExtra->setVisible(true);
+    m_bIdFileVersionFound = true;
+    m_pUi->lineEditFileVersionExtra->setText(QString::number(v));
 }
 
-void MNEANONYMIZE::MainWindow::on_lineEditOutFile_editingFinished()
+void MainWindow::setIdMeasurementDate(QDateTime d)
 {
-    emit fileOutChanged(m_pUi->lineEditOutFile->text());
+//    m_pUi->labelIdMeasurementDateExtra->setVisible(true);
+//    m_pUi->dateTimeIdMeasurementDateExtra->setVisible(true);
+    m_bIdMeasurementDateFound = true;
+    m_pUi->dateTimeIdMeasurementDateExtra->setDateTime(d);
 }
 
-void MNEANONYMIZE::MainWindow::on_checkBoxMeasurementDateOffset_stateChanged(int state)
+void MainWindow::setIdMacAddress(QString mac)
 {
-     m_pUi->spinBoxMeasurementDateOffset->setEnabled(state);
-     emit useMeasurementOffset(!!state);
-     m_pUi->dateTimeMeasurementDate->setEnabled(!state);
+//    m_pUi->labelMACAddressExtra->setVisible(true);
+//    m_pUi->lineEditMACAddressExtra->setVisible(true);
+    m_bIdMacAddressFound = true;
+    m_pUi->lineEditMACAddressExtra->setText(mac);
 }
 
-void MNEANONYMIZE::MainWindow::on_checkBoxBirthdayDateOffset_stateChanged(int state)
+void MainWindow::setFileMeasurementDate(QDateTime d)
 {
-    m_pUi->spinBoxBirthdayDateOffset->setEnabled(state);
-    emit useBirthdayOffset(!!state);
-    m_pUi->dateTimeBirthdayDate->setEnabled(!state);
+//    m_pUi->labelMeasDate->setVisible(true);
+//    m_pUi->dateTimeFileMeasurementDateExtra->setVisible(true);
+    m_bFileMeasurementDateFound = true;
+    m_pUi->dateTimeFileMeasurementDateExtra->setDateTime(d);
 }
 
-void MNEANONYMIZE::MainWindow::on_dateTimeMeasurementDate_dateTimeChanged(const QDateTime &dateTime)
+void MainWindow::setFileComment(QString c)
 {
-    emit measurementDateChanged(dateTime);
+//    m_pUi->labelFileCommentExtra->setVisible(true);
+//    m_pUi->plainTextFileCommentExtra->setVisible(true);
+    m_bFileCommentFound = true;
+    m_pUi->plainTextFileCommentExtra->setPlainText(c);
 }
 
-void MNEANONYMIZE::MainWindow::on_spinBoxMeasurementDateOffset_valueChanged(int offset)
+void MainWindow::setFileExperimenter(QString e)
 {
-    emit measurementDateOffsetChanged(offset);
+//    m_pUi->labelExperimenterExtra->setVisible(true);
+//    m_pUi->lineEditExperimenterExtra->setVisible(true);
+    m_bFileExperimenterFound = true;
+    m_pUi->lineEditExperimenterExtra->setText(e);
 }
 
-void MNEANONYMIZE::MainWindow::on_dateTimeBirthdayDate_dateTimeChanged(const QDateTime &dateTime)
+void MainWindow::setSubjectId(int i)
 {
-    emit birthdayDateChanged(dateTime);
+//    m_pUi->labelSubjectIDExtra->setVisible(true);
+//    m_pUi->spinBoxSubjectIDExtra->setVisible(true);
+    m_bSubjectIdFound = true;
+    m_pUi->spinBoxSubjectIDExtra->setValue(i);
 }
 
-void MNEANONYMIZE::MainWindow::on_spinBoxBirthdayDateOffset_valueChanged(int offset)
+void MainWindow::setSubjectFirstName(QString fn)
 {
-    emit birthdayOffsetChanged(offset);
+//    m_pUi->labelSubjectFirstNameExtra->setVisible(true);
+//    m_pUi->lineEditSubjectFirstNameExtra->setVisible(true);
+    m_bSubjectFirstNameFound = true;
+    m_pUi->lineEditSubjectFirstNameExtra->setText(fn);
 }
 
-void MNEANONYMIZE::MainWindow::on_lineEditSubjectHisId_editingFinished()
+void MainWindow::setSubjectMiddleName(QString mn)
 {
-    emit subjectHisIdChanged(m_pUi->lineEditSubjectHisId->text());
+    m_bSubjectMiddleNameFound = true;
+    m_pUi->lineEditSubjectMiddleNameExtra->setText(mn);
 }
 
-void MNEANONYMIZE::MainWindow::on_toolButton_clicked()
+void MainWindow::setSubjectLastName(QString ln)
+{
+    m_bSubjectLastNameFound = true;
+    m_pUi->lineEditSubjectLastNameExtra->setText(ln);
+}
+
+void MainWindow::setSubjectBirthday(QDateTime b)
+{
+    m_bSubjectBirthdayFound = true;
+    m_pUi->dateTimeBirthdayDate->setDateTime(b);
+}
+
+void MainWindow::setSubjectSex(int s)
+{
+    m_bSubjectSexFound = true;
+    m_pUi->comboBoxSubjectSexExtra->setCurrentIndex(s);
+}
+
+void MainWindow::setSubjectHand(int h)
+{
+    m_bSubjectHandFound = true;
+    m_pUi->comboBoxSubjectHandExtra->setCurrentIndex(h);
+}
+
+void MainWindow::setSubjectWeight(float w)
+{
+    m_bSubjectWeightFound = true;
+    double wd(static_cast<double>(w));
+    m_pUi->doubleSpinBoxSubjectWeightExtra->setValue(wd);
+}
+
+void MainWindow::setSubjectHeight(float h)
+{
+    m_bSubjectHeightFound = true;
+    double hd(static_cast<double>(h));
+    m_pUi->doubleSpinBoxSubjectHeightExtra->setValue(hd);
+}
+
+void MainWindow::setSubjectComment(QString c)
+{
+    m_bSubjectCommentFound = true;
+    m_pUi->plainTextEditSubjectCommentExtra->setPlainText(c);
+}
+
+void MainWindow::setSubjectHisId(QString his)
+{
+    m_bSubjectHisIdFound = true;
+    m_pUi->lineEditSubjectHisIdExtra->setText(his);
+}
+
+void MainWindow::setProjectId(int id)
+{
+    m_bProjectIdFound = true;
+    m_pUi->spinBoxProjectIDExtra->setValue(id);
+}
+
+void MainWindow::setProjectName(QString p)
+{
+    m_bProjectNameFound = true;
+    m_pUi->lineEditProjectNameExtra->setText(p);
+}
+
+void MainWindow::setProjectAim(QString p)
+{
+    m_bProjectAimFound = true;
+    m_pUi->lineEditProjectAimExtra->setText(p);
+}
+
+void MainWindow::setProjectPersons(QString p)
+{
+    m_bProjectPersonsFound = true;
+    m_pUi->lineEditProjectPersonsExtra->setText(p);
+}
+
+void MainWindow::setProjectComment(QString c)
+{
+    m_bProjectCommentFound = true;
+    m_pUi->plainTextEditProjectCommentExtra->setPlainText(c);
+}
+
+void MainWindow::seeExtraInformationClicked()
 {
     m_bHideEachField = !m_bHideEachField;
     m_pUi->frameFile->setHidden(m_bHideEachField);
@@ -224,8 +411,67 @@ void MNEANONYMIZE::MainWindow::on_toolButton_clicked()
     m_pUi->frameProject->setHidden(m_bHideEachField);
 }
 
-void MNEANONYMIZE::MainWindow::on_buttonSaveFile_helpRequested()
+void MainWindow::helpButtonClicked()
 {
     QDesktopServices::openUrl( QUrl("https://mne-cpp.github.io/pages/learn/mneanonymize.html",
                                QUrl::TolerantMode) );
 }
+
+void MainWindow::setCheckBoxEditExtraUnmutable()
+{
+    m_pUi->checkBoxEditExtra->setDisabled(true);
+}
+
+// /////////////////////////////// ui private slots
+
+void MainWindow::lineEditInFileEditingFinished()
+{
+    //std::printf("\n%s\n",m_pUi->lineEditInFile->text().toUtf8().data());
+    emit fileInChanged(m_pUi->lineEditInFile->text());
+}
+
+void MainWindow::lineEditOutFileEditingFinished()
+{
+    emit fileOutChanged(m_pUi->lineEditOutFile->text());
+}
+
+void MainWindow::checkBoxMeasurementDateOffsetStateChanged(int state)
+{
+     m_pUi->spinBoxMeasurementDateOffset->setEnabled(state);
+     emit useMeasurementOffset(!!state);
+     m_pUi->dateTimeMeasurementDate->setEnabled(!state);
+}
+
+void MainWindow::checkBoxBirthdayDateOffsetStateChanged(int state)
+{
+    m_pUi->spinBoxBirthdayDateOffset->setEnabled(state);
+    emit useBirthdayOffset(!!state);
+    m_pUi->dateTimeBirthdayDate->setEnabled(!state);
+}
+
+void MainWindow::dateTimeMeasurementDateDateTimeChanged(const QDateTime &dateTime)
+{
+    emit measurementDateChanged(dateTime);
+}
+
+void MainWindow::spinBoxMeasurementDateOffsetValueChanged(int offset)
+{
+    emit measurementDateOffsetChanged(offset);
+}
+
+void MainWindow::dateTimeBirthdayDateDateTimeChanged(const QDateTime &dateTime)
+{
+    emit birthdayDateChanged(dateTime);
+}
+
+void MainWindow::spinBoxBirthdayDateOffsetValueChanged(int offset)
+{
+    emit birthdayOffsetChanged(offset);
+}
+
+void MainWindow::lineEditSubjectHisIdEditingFinished()
+{
+    emit subjectHisIdChanged(m_pUi->lineEditSubjectHisId->text());
+}
+
+
