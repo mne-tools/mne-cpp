@@ -107,7 +107,7 @@ unix:!macx {
 macx {
     !contains(MNECPP_CONFIG, static) {
         # 3 entries returned in DEPLOY_CMD
-        EXTRA_ARGS =
+        EXTRA_ARGS = -always-overwrite
         DEPLOY_CMD = $$macDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
         QMAKE_POST_LINK += $${DEPLOY_CMD}
     }
@@ -130,9 +130,6 @@ contains(MNECPP_CONFIG, useFFTW) {
         # On Linux
         LIBS += -lfftw3 \
                 -lfftw3_threads \
-        CONFIG(debug, debug|release) {
-            CONFIG -= app_bundle
-        }
     }
 }
 
