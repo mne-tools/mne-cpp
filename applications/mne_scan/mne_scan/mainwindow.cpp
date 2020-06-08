@@ -238,8 +238,8 @@ void MainWindow::onStyleChanged(const QString& sStyle)
 
 void MainWindow::onGuiModeChanged()
 {
-    if(m_pActionScientificMode->isChecked()) {
-        emit guiModeChanged(DISPLIB::AbstractView::GuiMode::Scientific);
+    if(m_pActionResearchMode->isChecked()) {
+        emit guiModeChanged(DISPLIB::AbstractView::GuiMode::Research);
     } else if(m_pActionClinicalMode->isChecked()) {
         emit guiModeChanged(DISPLIB::AbstractView::GuiMode::Clinical);
     }
@@ -510,12 +510,12 @@ void MainWindow::createActions()
     // Modes
     m_pActionModeGroup = new QActionGroup(this);
 
-    m_pActionScientificMode = new QAction("Scientific");
-    m_pActionScientificMode->setStatusTip(tr("Activate the scientific GUI mode"));
-    m_pActionScientificMode->setCheckable(true);
-    m_pActionScientificMode->setChecked(true);
-    m_pActionModeGroup->addAction(m_pActionScientificMode);
-    connect(m_pActionScientificMode.data(), &QAction::triggered,
+    m_pActionResearchMode = new QAction("Research");
+    m_pActionResearchMode->setStatusTip(tr("Activate the scientific GUI mode"));
+    m_pActionResearchMode->setCheckable(true);
+    m_pActionResearchMode->setChecked(true);
+    m_pActionModeGroup->addAction(m_pActionResearchMode);
+    connect(m_pActionResearchMode.data(), &QAction::triggered,
             this, &MainWindow::onGuiModeChanged);
 
     m_pActionClinicalMode = new QAction("Clinical");
