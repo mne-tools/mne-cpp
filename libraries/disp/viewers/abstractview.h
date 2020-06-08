@@ -82,7 +82,7 @@ public:
 
     enum GuiMode {
         Clinical,
-        Scientific
+        Research
     };
 
     //=========================================================================================================
@@ -96,7 +96,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Sets the GUI of this view to a specific mode. Clinical = 0, Scientific = 0.
+     * Sets the GUI of this view to a specific mode. Clinical = 0, Research = 0.
      *
      * @param mode     The new mode.
      */
@@ -116,15 +116,15 @@ public:
 
     //=========================================================================================================
     /**
-     * Update the views GUI based on the set GuiMode (Clinical=0, Scientific=1).
+     * Update the views GUI based on the set GuiMode (Clinical=0, Research=1).
      *
-     * @param mode     The new mode (Clinical=0, Scientific=1).
+     * @param mode     The new mode (Clinical=0, Research=1).
      */
     virtual void updateGuiMode(GuiMode mode) = 0;
 
 protected:
 
-    bool            m_bScientificModeIsActive;  /**< The flag describing whether the scientific mode of the view is active or not. */
+    bool            m_bResearchModeIsActive;  /**< The flag describing whether the scientific mode of the view is active or not. */
 
     QString         m_sSettingsPath;            /**< The settings path to store the GUI settings to. */
 
