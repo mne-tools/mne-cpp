@@ -30,41 +30,41 @@ public:
     void setCheckBoxDeleteInputFileAfter(bool b);
     void setCheckBoxAvoidDeleteConfirmation(bool b);
 
-    void setMeasurementDate(const QString& d);
     void setMeasurementDate(const QDateTime& dt);
     void setCheckBoxMeasurementDateOffset(bool o);
     void setMeasurementDateOffset(int d);
 
-    void setSubjectBirthday(const QString& d);
+    void setSubjectBirthday(const QDateTime& d);
     void setCheckBoxSubjectBirthdayOffset(bool b);
     void setSubjectBirthdayOffset(int d);
 
     void setSubjectHis(const QString& h);
 
 public slots:
-    void setIdFileVersion(double v);
-    void setIdMeasurementDate(QDateTime d);
-    void setIdMacAddress(QString mac);
-    void setFileMeasurementDate(QDateTime d);
-    void setFileComment(QString c);
-    void setFileExperimenter(QString e);
+    void setLineEditIdFileVersion(double v);
+    void setLineEditIdMeasurementDate(QDateTime d);
+    void setLineEditIdMacAddress(QString mac);
+    void setLineEditFileMeasurementDate(QDateTime d);
+    void setLineEditFileComment(QString c);
+    void setLineEditFileExperimenter(QString e);
 
-    void setSubjectId(int i);
-    void setSubjectFirstName(QString fn);
-    void setSubjectMiddleName(QString mn);
-    void setSubjectLastName(QString ln);
-    void setSubjectBirthday(QDateTime b);
-    void setSubjectSex(int s);
-    void setSubjectHand(int h);
-    void setSubjectWeight(float w);
-    void setSubjectHeight(float h);
-    void setSubjectComment(QString c);
-    void setSubjectHisId(QString);
-    void setProjectId(int);
-    void setProjectName(QString);
-    void setProjectAim(QString);
-    void setProjectPersons(QString);
-    void setProjectComment(QString);
+    void setLineEditSubjectId(int i);
+    void setLineEditSubjectFirstName(QString fn);
+    void setLineEditSubjectMiddleName(QString mn);
+    void setLineEditSubjectLastName(QString ln);
+    void setLineEditSubjectBirthday(QDateTime b);
+    void setLineEditSubjectSex(int s);
+    void setLineEditSubjectHand(int h);
+    void setLineEditSubjectWeight(float w);
+    void setLineEditSubjectHeight(float h);
+    void setLineEditSubjectComment(QString c);
+    void setLineEditSubjectHisId(QString his);
+
+    void setLineEditProjectId(int);
+    void setLineEditProjectName(QString);
+    void setLineEditProjectAim(QString);
+    void setLineEditProjectPersons(QString);
+    void setLineEditProjectComment(QString);
 
 protected:
     void closeEvent(QCloseEvent *event) override;
@@ -72,6 +72,9 @@ protected:
 signals:
     void fileInChanged(const QString& s) const;
     void fileOutChanged(const QString& s) const;
+    void bruteModeChanged(bool b) const;
+    void deleteInputFileChanged(bool b) const;
+    void avoidDeleteConfirmationChanged(bool b) const;
     void measurementDateChanged(const QDateTime& t) const;
     void useMeasurementOffset(bool f) const;
     void measurementDateOffsetChanged(int o) const;
@@ -80,10 +83,11 @@ signals:
     void birthdayOffsetChanged(int o) const;
     void subjectHisIdChanged(const QString& text) const;
 
-//    crear mas signals para cada caja
-
 private slots:
 
+    void checkboxBruteModeChanged();
+    void checkboxDeleteInputFileChanged();
+    void setCheckBoxAvoidDeleteConfirmationChanged();
     void checkBoxMeasurementDateOffsetStateChanged(int arg1);
     void checkBoxBirthdayDateOffsetStateChanged(int arg1);
 
@@ -97,22 +101,19 @@ private slots:
     void spinBoxBirthdayDateOffsetValueChanged(int arg1);
     void lineEditSubjectHisIdEditingFinished();
 
-//    completar signal to signal
-
     void seeExtraInformationClicked();
 
     void helpButtonClicked();
-
-    void setExtraObjectstoState();
-
-    void setCheckBoxEditExtraUnmutable();
 
 private:
 
     bool confirmClose();
 
     void setDefautlStateUi();
-    void setupConections();
+
+    void setupConnections();
+
+    void idMeasurementDateChanged();
 
     bool m_bIdFileVersionFound;
     bool m_bIdMeasurementDateFound;
@@ -139,7 +140,7 @@ private:
     bool m_bProjectPersonsFound;
     bool m_bProjectCommentFound;
 
-    bool m_bHideEachField;
+    bool m_bHideInfoFields;
     Ui::MainWindow* m_pUi;
     SettingsControllerGui* m_pController;
 };

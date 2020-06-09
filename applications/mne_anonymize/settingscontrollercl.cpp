@@ -76,6 +76,7 @@ SettingsControllerCl::SettingsControllerCl()
 , m_bGuiMode(false)
 , m_bDeleteInputFileAfter(false)
 , m_bDeleteInputFileConfirmation(true)
+, m_bHisIdSpecified(false)
 , m_bVerboseMode(false)
 , m_bSilentMode(false)
 , m_bInOutFileNamesEqual(false)
@@ -94,6 +95,7 @@ SettingsControllerCl::SettingsControllerCl(const QStringList& arguments)
 , m_bGuiMode(false)
 , m_bDeleteInputFileAfter(false)
 , m_bDeleteInputFileConfirmation(true)
+, m_bHisIdSpecified(false)
 , m_bVerboseMode(false)
 , m_bSilentMode(false)
 , m_bInOutFileNamesEqual(false)
@@ -328,6 +330,7 @@ int SettingsControllerCl::parseInputs(const QStringList& arguments)
 
     if(m_parser.isSet("his"))
     {
+        m_bHisIdSpecified = true;
         QString strHisId(m_parser.value("his"));
         m_pAnonymizer->setSubjectHisId(strHisId);
     }

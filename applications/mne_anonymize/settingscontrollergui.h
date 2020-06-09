@@ -88,12 +88,20 @@ public:
     * Constructs a SettingsControllerGUI object.
     */
     explicit SettingsControllerGui(const QStringList& arguments);
+public slots:
+    void fileInChanged(const QString& strInFile);
+    void fileOutChanged(const QString& strOutFile);
+
+    void anonymizeFile();
 
 protected:
 //    void parseInputs(const QStringList& arguments);
 
 private:
     void readData();
+    void initializeMenus();
+
+    void setupCommunication();
 
 signals:
 
