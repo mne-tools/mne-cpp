@@ -34,13 +34,13 @@ MainWindow::MainWindow(MNEANONYMIZE::SettingsControllerGui *c)
 , m_bProjectNameFound(false)
 , m_bProjectPersonsFound(false)
 , m_bProjectCommentFound(false)
-, m_bHideEachField(true)
+, m_bHideInfoFields(true)
 , m_pUi(new Ui::MainWindow)
 , m_pController(c)
 {
     m_pUi->setupUi(this);
     setDefautlStateUi();
-    setupConections();
+    setupConnections();
 }
 
 MainWindow::~MainWindow()
@@ -80,9 +80,9 @@ void MainWindow::setDefautlStateUi()
     m_pUi->spinBoxMeasurementDateOffset->setEnabled(false);
     m_pUi->spinBoxBirthdayDateOffset->setEnabled(false);
 
-    m_pUi->frameFile->setHidden(m_bHideEachField);
-    m_pUi->frameSubject->setHidden(m_bHideEachField);
-    m_pUi->frameProject->setHidden(m_bHideEachField);
+    m_pUi->frameFile->setHidden(m_bHideInfoFields);
+    m_pUi->frameSubject->setHidden(m_bHideInfoFields);
+    m_pUi->frameProject->setHidden(m_bHideInfoFields);
 
     m_pUi->lineEditFileVersionExtra->setEnabled(false);
     m_pUi->lineEditMACAddressExtra->setEnabled(false);
@@ -95,40 +95,42 @@ void MainWindow::setDefautlStateUi()
     m_pUi->comboBoxSubjectHandExtra->setCurrentIndex(0);
     m_pUi->comboBoxSubjectHandExtra->setEditable(false);
 
-    m_bIdFileVersionFound = false;
-    m_bIdMeasurementDateFound = false;
-    m_bIdMacAddressFound = false;
-    m_bFileMeasurementDateFound = false;
-    m_bFileExperimenterFound = false;
-    m_bFileCommentFound = false;
-    m_bSubjectIdFound = false;
-    m_bSubjectFirstNameFound = false;
-    m_bSubjectMiddleNameFound = false;
-    m_bSubjectLastNameFound = false;
-    m_bSubjectBirthdayFound = false;
-    m_bSubjectSexFound = false;
-    m_bSubjectHandFound = false;
-    m_bSubjectWeightFound = false;
-    m_bSubjectHeightFound = false;
-    m_bSubjectCommentFound = false;
-    m_bSubjectHisIdFound = false;
-    m_bProjectIdFound = false;
-    m_bProjectAimFound = false;
-    m_bProjectNameFound = false;
-    m_bProjectPersonsFound = false;
-    m_bProjectCommentFound = false;
+    m_pUi->lineEditFileVersionExtra->setEnabled(false);
+    m_pUi->dateTimeIdMeasurementDateExtra->setEnabled(false);
+    m_pUi->lineEditMACAddressExtra->setEnabled(false);
+    m_pUi->dateTimeFileMeasurementDateExtra->setEnabled(false);
+
+    m_pUi->lineEditExperimenterExtra->setEnabled(false);
+    m_pUi->plainTextFileCommentExtra->setEnabled(false);
+
+    m_pUi->spinBoxSubjectIDExtra->setEnabled(false);
+    m_pUi->lineEditSubjectFirstNameExtra->setEnabled(false);
+    m_pUi->lineEditSubjectMiddleNameExtra->setEnabled(false);
+    m_pUi->lineEditSubjectLastNameExtra->setEnabled(false);
+    m_pUi->dateEditSubjectBirthdayExtra->setEnabled(false);
+    m_pUi->comboBoxSubjectSexExtra->setEnabled(false);
+    m_pUi->comboBoxSubjectHandExtra->setEnabled(false);
+    m_pUi->doubleSpinBoxSubjectWeightExtra->setEnabled(false);
+    m_pUi->doubleSpinBoxSubjectHeightExtra->setEnabled(false);
+    m_pUi->plainTextEditSubjectCommentExtra->setEnabled(false);
+    m_pUi->lineEditSubjectHisIdExtra->setEnabled(false);
+
+    m_pUi->spinBoxProjectIDExtra->setEnabled(false);
+    m_pUi->lineEditProjectAimExtra->setEnabled(false);
+    m_pUi->lineEditProjectNameExtra->setEnabled(false);
+    m_pUi->lineEditProjectPersonsExtra->setEnabled(false);
+    m_pUi->plainTextEditProjectCommentExtra->setEnabled(false);
 
 }
 
-void MainWindow::setupConections()
+void MainWindow::setupConnections()
 {
-    QObject::connect(m_pUi->checkBoxEditExtra,&QCheckBox::stateChanged,
-                     this,&MainWindow::setExtraObjectstoState);
-    QObject::connect(m_pUi->checkBoxEditExtra,&QCheckBox::stateChanged,
-                     this,&MainWindow::setCheckBoxEditExtraUnmutable);
-
     QObject::connect(m_pUi->seeExtraInfoButton,&QToolButton::clicked,
                      this,&MainWindow::seeExtraInformationClicked);
+
+    QObject::connect(m_pUi->buttonMenu,&QDialogButtonBox::accepted,
+                     m_pController,&SettingsControllerGui::executeAnonymizer);
+
     QObject::connect(m_pUi->buttonMenu,&QDialogButtonBox::helpRequested,
                      this,&MainWindow::helpButtonClicked);
 
@@ -137,6 +139,15 @@ void MainWindow::setupConections()
 
     QObject::connect(m_pUi->lineEditOutFile,&QLineEdit::editingFinished,
                      this,&MainWindow::lineEditOutFileEditingFinished);
+
+    QObject::connect(m_pUi->checkBoxBruteMode,&QCheckBox::stateChanged,
+                     this,&MainWindow::checkboxBruteModeChanged);
+    QObject::connect(m_pUi->checkBoxDeleteInputFile,&QCheckBox::stateChanged,
+                     this,&MainWindow::checkboxDeleteInputFileChanged);
+    QObject::connect(m_pUi->checkBoxAvoidDeleteConfirmation,&QCheckBox::stateChanged,
+                     this,&MainWindow::setCheckBoxAvoidDeleteConfirmationChanged);
+
+
     QObject::connect(m_pUi->checkBoxMeasurementDateOffset,&QCheckBox::stateChanged,
                      this,&MainWindow::checkBoxMeasurementDateOffsetStateChanged);
     QObject::connect(m_pUi->checkBoxBirthdayDateOffset,&QCheckBox::stateChanged,
@@ -151,38 +162,8 @@ void MainWindow::setupConections()
                      this,&MainWindow::spinBoxBirthdayDateOffsetValueChanged);
     QObject::connect(m_pUi->lineEditSubjectHisId,&QLineEdit::editingFinished,
                      this,&MainWindow::lineEditSubjectHisIdEditingFinished);
-
-
 }
 
-void MainWindow::setExtraObjectstoState()
-{
-    m_pUi->lineEditFileVersionExtra->setEnabled(m_bIdFileVersionFound);
-    m_pUi->dateTimeIdMeasurementDateExtra->setEnabled(m_bIdMeasurementDateFound);
-    m_pUi->lineEditMACAddressExtra->setEnabled(m_bIdMacAddressFound);
-    m_pUi->dateTimeFileMeasurementDateExtra->setEnabled(m_bFileMeasurementDateFound);
-
-    m_pUi->lineEditExperimenterExtra->setEnabled(m_bFileExperimenterFound);
-    m_pUi->plainTextFileCommentExtra->setEnabled(m_bFileCommentFound);
-
-    m_pUi->spinBoxSubjectIDExtra->setEnabled(m_bSubjectIdFound);
-    m_pUi->lineEditSubjectFirstNameExtra->setEnabled(m_bSubjectFirstNameFound);
-    m_pUi->lineEditSubjectMiddleNameExtra->setEnabled(m_bSubjectMiddleNameFound);
-    m_pUi->lineEditSubjectLastNameExtra->setEnabled(m_bSubjectLastNameFound);
-    m_pUi->dateEditSubjectBirthdayExtra->setEnabled(m_bSubjectBirthdayFound);
-    m_pUi->comboBoxSubjectSexExtra->setEnabled(m_bSubjectSexFound);
-    m_pUi->comboBoxSubjectHandExtra->setEnabled(m_bSubjectHandFound);
-    m_pUi->doubleSpinBoxSubjectWeightExtra->setEnabled(m_bSubjectWeightFound);
-    m_pUi->doubleSpinBoxSubjectHeightExtra->setEnabled(m_bSubjectHeightFound);
-    m_pUi->plainTextEditSubjectCommentExtra->setEnabled(m_bSubjectCommentFound);
-    m_pUi->lineEditSubjectHisIdExtra->setEnabled(m_bSubjectHisIdFound);
-
-    m_pUi->spinBoxProjectIDExtra->setEnabled(m_bProjectIdFound);
-    m_pUi->lineEditProjectAimExtra->setEnabled(m_bProjectAimFound);
-    m_pUi->lineEditProjectNameExtra->setEnabled(m_bProjectNameFound);
-    m_pUi->lineEditProjectPersonsExtra->setEnabled(m_bProjectPersonsFound);
-    m_pUi->plainTextEditProjectCommentExtra->setEnabled(m_bProjectCommentFound);
-}
 
 void MainWindow::setLineEditInFile(const QString &f)
 {
@@ -209,12 +190,6 @@ void MainWindow::setCheckBoxAvoidDeleteConfirmation(bool b)
     m_pUi->checkBoxAvoidDeleteConfirmation->setChecked(b);
 }
 
-void MainWindow::setMeasurementDate(const QString& d)
-{
-    m_pUi->dateTimeMeasurementDate->setDateTime(
-            QDateTime(QDate::fromString(d,"ddMMyyyy"),QTime(1,1,0)));
-}
-
 void MainWindow::setMeasurementDate(const QDateTime& dt)
 {
     m_pUi->dateTimeMeasurementDate->setDateTime(dt);
@@ -228,12 +203,6 @@ void MainWindow::setCheckBoxMeasurementDateOffset(bool o)
 void MainWindow::setMeasurementDateOffset(int d)
 {
     m_pUi->spinBoxMeasurementDateOffset->setValue(d);
-}
-
-void MainWindow::setSubjectBirthday(const QString& d)
-{
-    m_pUi->dateTimeBirthdayDate->setDateTime(
-                QDateTime(QDate::fromString(d,"ddMMyyyy"),QTime(1,1,0)));
 }
 
 void MainWindow::setCheckBoxSubjectBirthdayOffset(bool b)
@@ -253,7 +222,8 @@ void MainWindow::setSubjectHis(const QString& h)
 
 
 //public slots for extra information
-void MainWindow::setIdFileVersion(double v)
+
+void MainWindow::setLineEditIdFileVersion(double v)
 {
 //    m_pUi->lineEditFileVersionExtra->setVisible(true);
 //    m_pUi->labelFileVersionExtra->setVisible(true);
@@ -261,7 +231,7 @@ void MainWindow::setIdFileVersion(double v)
     m_pUi->lineEditFileVersionExtra->setText(QString::number(v));
 }
 
-void MainWindow::setIdMeasurementDate(QDateTime d)
+void MainWindow::setLineEditIdMeasurementDate(QDateTime d)
 {
 //    m_pUi->labelIdMeasurementDateExtra->setVisible(true);
 //    m_pUi->dateTimeIdMeasurementDateExtra->setVisible(true);
@@ -269,7 +239,7 @@ void MainWindow::setIdMeasurementDate(QDateTime d)
     m_pUi->dateTimeIdMeasurementDateExtra->setDateTime(d);
 }
 
-void MainWindow::setIdMacAddress(QString mac)
+void MainWindow::setLineEditIdMacAddress(QString mac)
 {
 //    m_pUi->labelMACAddressExtra->setVisible(true);
 //    m_pUi->lineEditMACAddressExtra->setVisible(true);
@@ -277,7 +247,7 @@ void MainWindow::setIdMacAddress(QString mac)
     m_pUi->lineEditMACAddressExtra->setText(mac);
 }
 
-void MainWindow::setFileMeasurementDate(QDateTime d)
+void MainWindow::setLineEditFileMeasurementDate(QDateTime d)
 {
 //    m_pUi->labelMeasDate->setVisible(true);
 //    m_pUi->dateTimeFileMeasurementDateExtra->setVisible(true);
@@ -285,7 +255,7 @@ void MainWindow::setFileMeasurementDate(QDateTime d)
     m_pUi->dateTimeFileMeasurementDateExtra->setDateTime(d);
 }
 
-void MainWindow::setFileComment(QString c)
+void MainWindow::setLineEditFileComment(QString c)
 {
 //    m_pUi->labelFileCommentExtra->setVisible(true);
 //    m_pUi->plainTextFileCommentExtra->setVisible(true);
@@ -293,7 +263,7 @@ void MainWindow::setFileComment(QString c)
     m_pUi->plainTextFileCommentExtra->setPlainText(c);
 }
 
-void MainWindow::setFileExperimenter(QString e)
+void MainWindow::setLineEditFileExperimenter(QString e)
 {
 //    m_pUi->labelExperimenterExtra->setVisible(true);
 //    m_pUi->lineEditExperimenterExtra->setVisible(true);
@@ -301,7 +271,7 @@ void MainWindow::setFileExperimenter(QString e)
     m_pUi->lineEditExperimenterExtra->setText(e);
 }
 
-void MainWindow::setSubjectId(int i)
+void MainWindow::setLineEditSubjectId(int i)
 {
 //    m_pUi->labelSubjectIDExtra->setVisible(true);
 //    m_pUi->spinBoxSubjectIDExtra->setVisible(true);
@@ -309,7 +279,7 @@ void MainWindow::setSubjectId(int i)
     m_pUi->spinBoxSubjectIDExtra->setValue(i);
 }
 
-void MainWindow::setSubjectFirstName(QString fn)
+void MainWindow::setLineEditSubjectFirstName(QString fn)
 {
 //    m_pUi->labelSubjectFirstNameExtra->setVisible(true);
 //    m_pUi->lineEditSubjectFirstNameExtra->setVisible(true);
@@ -317,98 +287,99 @@ void MainWindow::setSubjectFirstName(QString fn)
     m_pUi->lineEditSubjectFirstNameExtra->setText(fn);
 }
 
-void MainWindow::setSubjectMiddleName(QString mn)
+void MainWindow::setLineEditSubjectMiddleName(QString mn)
 {
     m_bSubjectMiddleNameFound = true;
     m_pUi->lineEditSubjectMiddleNameExtra->setText(mn);
 }
 
-void MainWindow::setSubjectLastName(QString ln)
+void MainWindow::setLineEditSubjectLastName(QString ln)
 {
     m_bSubjectLastNameFound = true;
     m_pUi->lineEditSubjectLastNameExtra->setText(ln);
 }
 
-void MainWindow::setSubjectBirthday(QDateTime b)
+void MainWindow::setLineEditSubjectBirthday(QDateTime b)
 {
     m_bSubjectBirthdayFound = true;
     m_pUi->dateTimeBirthdayDate->setDateTime(b);
 }
 
-void MainWindow::setSubjectSex(int s)
+void MainWindow::setLineEditSubjectSex(int s)
 {
     m_bSubjectSexFound = true;
     m_pUi->comboBoxSubjectSexExtra->setCurrentIndex(s);
 }
 
-void MainWindow::setSubjectHand(int h)
+void MainWindow::setLineEditSubjectHand(int h)
 {
     m_bSubjectHandFound = true;
     m_pUi->comboBoxSubjectHandExtra->setCurrentIndex(h);
 }
 
-void MainWindow::setSubjectWeight(float w)
+void MainWindow::setLineEditSubjectWeight(float w)
 {
     m_bSubjectWeightFound = true;
     double wd(static_cast<double>(w));
     m_pUi->doubleSpinBoxSubjectWeightExtra->setValue(wd);
 }
 
-void MainWindow::setSubjectHeight(float h)
+void MainWindow::setLineEditSubjectHeight(float h)
 {
     m_bSubjectHeightFound = true;
     double hd(static_cast<double>(h));
     m_pUi->doubleSpinBoxSubjectHeightExtra->setValue(hd);
 }
 
-void MainWindow::setSubjectComment(QString c)
+void MainWindow::setLineEditSubjectComment(QString c)
 {
     m_bSubjectCommentFound = true;
     m_pUi->plainTextEditSubjectCommentExtra->setPlainText(c);
 }
 
-void MainWindow::setSubjectHisId(QString his)
+void MainWindow::setLineEditSubjectHisId(QString his)
 {
     m_bSubjectHisIdFound = true;
     m_pUi->lineEditSubjectHisIdExtra->setText(his);
 }
 
-void MainWindow::setProjectId(int id)
+void MainWindow::setLineEditProjectId(int id)
 {
     m_bProjectIdFound = true;
     m_pUi->spinBoxProjectIDExtra->setValue(id);
 }
 
-void MainWindow::setProjectName(QString p)
+void MainWindow::setLineEditProjectName(QString p)
 {
     m_bProjectNameFound = true;
     m_pUi->lineEditProjectNameExtra->setText(p);
 }
 
-void MainWindow::setProjectAim(QString p)
+void MainWindow::setLineEditProjectAim(QString p)
 {
     m_bProjectAimFound = true;
     m_pUi->lineEditProjectAimExtra->setText(p);
 }
 
-void MainWindow::setProjectPersons(QString p)
+void MainWindow::setLineEditProjectPersons(QString p)
 {
     m_bProjectPersonsFound = true;
     m_pUi->lineEditProjectPersonsExtra->setText(p);
 }
 
-void MainWindow::setProjectComment(QString c)
+void MainWindow::setLineEditProjectComment(QString c)
 {
     m_bProjectCommentFound = true;
     m_pUi->plainTextEditProjectCommentExtra->setPlainText(c);
 }
 
+
 void MainWindow::seeExtraInformationClicked()
 {
-    m_bHideEachField = !m_bHideEachField;
-    m_pUi->frameFile->setHidden(m_bHideEachField);
-    m_pUi->frameSubject->setHidden(m_bHideEachField);
-    m_pUi->frameProject->setHidden(m_bHideEachField);
+    m_bHideInfoFields = !m_bHideInfoFields;
+    m_pUi->frameFile->setHidden(m_bHideInfoFields);
+    m_pUi->frameSubject->setHidden(m_bHideInfoFields);
+    m_pUi->frameProject->setHidden(m_bHideInfoFields);
 }
 
 void MainWindow::helpButtonClicked()
@@ -417,22 +388,52 @@ void MainWindow::helpButtonClicked()
                                QUrl::TolerantMode) );
 }
 
-void MainWindow::setCheckBoxEditExtraUnmutable()
-{
-    m_pUi->checkBoxEditExtra->setDisabled(true);
-}
 
 // /////////////////////////////// ui private slots
-
 void MainWindow::lineEditInFileEditingFinished()
 {
     //std::printf("\n%s\n",m_pUi->lineEditInFile->text().toUtf8().data());
+    QFileInfo inFile(m_pUi->lineEditInFile->text());
+//    if(!inFile.isFile())
+//    {
+//        QMessageBox msgBox;
+//        msgBox.setText("The input file must be a valid file name.");
+//        msgBox.exec();
+//        m_pUi->lineEditInFile->clear();
+//    }
+    if(QString::compare(inFile.suffix(),QString("fif")) != 0)
+    {
+        QMessageBox msgBox;
+        msgBox.setText("The input file extension must be \".fif\" 0.");
+        msgBox.exec();
+        m_pUi->lineEditInFile->clear();
+    }
+
     emit fileInChanged(m_pUi->lineEditInFile->text());
 }
 
 void MainWindow::lineEditOutFileEditingFinished()
 {
     emit fileOutChanged(m_pUi->lineEditOutFile->text());
+}
+
+
+void MainWindow::checkboxBruteModeChanged()
+{
+    bool state(m_pUi->checkBoxBruteMode->isChecked());
+    emit bruteModeChanged(state);
+}
+
+void MainWindow::checkboxDeleteInputFileChanged()
+{
+    bool state(m_pUi->checkBoxDeleteInputFile->isChecked());
+    emit deleteInputFileChanged(state);
+}
+
+void MainWindow::setCheckBoxAvoidDeleteConfirmationChanged()
+{
+    bool state(m_pUi->checkBoxAvoidDeleteConfirmation->isChecked());
+    emit avoidDeleteConfirmationChanged(state);
 }
 
 void MainWindow::checkBoxMeasurementDateOffsetStateChanged(int state)

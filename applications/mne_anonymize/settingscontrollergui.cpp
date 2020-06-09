@@ -44,6 +44,7 @@
 //=============================================================================================================
 
 #include <QDir>
+#include <QStandardPaths>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -66,23 +67,148 @@ using namespace MNEANONYMIZE;
 SettingsControllerGui::SettingsControllerGui(const QStringList& arguments)
 : m_pWin(QSharedPointer<MainWindow> (new MainWindow(this)))
 {
-    Q_UNUSED(arguments)
-
     initParser();
-
     parseInputs(arguments);
+    setupCommunication();
 
-    //initialize options in window
-    if (m_fiInFileInfo.isFile())
+    initializeMenus();
+
+    m_pWin->show();
+
+    if(m_fiInFileInfo.isFile())
     {
-        m_pWin->setLineEditInFile(m_fiInFileInfo.absoluteFilePath());
+        readData();
+    }
+}
+
+void SettingsControllerGui::executeAnonymizer()
+{
+    m_pAnonymizer->anonymizeFile();
+
+//    if(checkDeleteInputFile())
+//    {
+//        deleteInputFile();
+//    }
+
+}
+
+void SettingsControllerGui::readData()
+{
+    //set output to a randomFilename
+    QString stringTempDir(QStandardPaths::writableLocation(QStandardPaths::TempLocation));
+    QString fileOutStr(QDir(stringTempDir).filePath(generateRandomFileName()));
+    m_pAnonymizer->setFileOut(fileOutStr);
+    m_pAnonymizer->anonymizeFile();
+    QFile fileOut(fileOutStr);
+    fileOut.remove();
+    m_pAnonymizer->setFileOut(m_fiOutFileInfo.absoluteFilePath());
+}
+
+void SettingsControllerGui::fileInChanged(const QString& strInFile)
+{
+    m_fiInFileInfo.setFile(strInFile);
+    m_pAnonymizer->setFileIn(m_fiInFileInfo.absoluteFilePath());
+
+    if(m_fiInFileInfo.isFile())
+    {
+        readData();
     }
 
-    QFileInfo fileInfoOut(m_pAnonymizer->getFileNameOut());
-    if (m_fiOutFileInfo.isFile())
-    {
-        m_pWin->setLineEditOutFile(m_fiOutFileInfo.absoluteFilePath());
-    }
+}
+
+void SettingsControllerGui::fileOutChanged(const QString& strOutFile)
+{
+    m_fiOutFileInfo.setFile(strOutFile);
+    m_pAnonymizer->setFileOut(m_fiOutFileInfo.absoluteFilePath());
+}
+
+void SettingsControllerGui::setupCommunication()
+{
+
+    //from view to model
+    QObject::connect(m_pWin.data(),&MainWindow::fileInChanged,
+                     this,&SettingsControllerGui::fileInChanged);
+    QObject::connect(m_pWin.data(),&MainWindow::fileOutChanged,
+                     this,&SettingsControllerGui::fileOutChanged);
+
+
+
+    QObject::connect(m_pWin.data(),&MainWindow::fileOutChanged,
+                     m_pAnonymizer.data(),&FiffAnonymizer::setFileOut);
+    QObject::connect(m_pWin.data(),&MainWindow::fileOutChanged,
+                     m_pAnonymizer.data(),&FiffAnonymizer::setFileOut);
+    QObject::connect(m_pWin.data(),&MainWindow::fileOutChanged,
+                     m_pAnonymizer.data(),&FiffAnonymizer::setFileOut);
+    QObject::connect(m_pWin.data(),&MainWindow::fileOutChanged,
+                     m_pAnonymizer.data(),&FiffAnonymizer::setFileOut);
+    QObject::connect(m_pWin.data(),&MainWindow::fileOutChanged,
+                     m_pAnonymizer.data(),&FiffAnonymizer::setFileOut);
+    QObject::connect(m_pWin.data(),&MainWindow::fileOutChanged,
+                     m_pAnonymizer.data(),&FiffAnonymizer::setFileOut);
+    QObject::connect(m_pWin.data(),&MainWindow::fileOutChanged,
+                     m_pAnonymizer.data(),&FiffAnonymizer::setFileOut);
+    QObject::connect(m_pWin.data(),&MainWindow::fileOutChanged,
+                     m_pAnonymizer.data(),&FiffAnonymizer::setFileOut);
+
+
+
+
+    //from model to view
+    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingIdFileVersion,
+                     m_pWin.data(),&MainWindow::setLineEditIdFileVersion);
+    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingIdMeasurementDate,
+                     m_pWin.data(),&MainWindow::setLineEditIdMeasurementDate);
+    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingIdMac,
+                     m_pWin.data(),&MainWindow::setLineEditIdMacAddress);
+
+    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingFileMeasurementDate,
+                     m_pWin.data(),&MainWindow::setLineEditFileMeasurementDate);
+    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingFileComment,
+                     m_pWin.data(),&MainWindow::setLineEditFileComment);
+    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingFileExperimenter,
+                     m_pWin.data(),&MainWindow::setLineEditFileExperimenter);
+
+    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingSubjectId,
+                     m_pWin.data(),&MainWindow::setLineEditSubjectId);
+    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingSubjectFirstName,
+                     m_pWin.data(),&MainWindow::setLineEditSubjectFirstName);
+    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingSubjectMiddleName,
+                     m_pWin.data(),&MainWindow::setLineEditSubjectMiddleName);
+    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingSubjectLastName,
+                     m_pWin.data(),&MainWindow::setLineEditSubjectLastName);
+
+    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingSubjectBirthday,
+                     m_pWin.data(),&MainWindow::setLineEditSubjectBirthday);
+    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingSubjectSex,
+                     m_pWin.data(),&MainWindow::setLineEditSubjectSex);
+    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingSubjectHand,
+                     m_pWin.data(),&MainWindow::setLineEditSubjectHand);
+    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingSubjectWeight,
+                     m_pWin.data(),&MainWindow::setLineEditSubjectHand);
+    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingSubjectHeight,
+                     m_pWin.data(),&MainWindow::setLineEditSubjectHeight);
+    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingSubjectComment,
+                     m_pWin.data(),&MainWindow::setLineEditSubjectComment);
+    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingSubjectHisId,
+                     m_pWin.data(),&MainWindow::setLineEditSubjectHisId);
+
+
+    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingProjectId,
+                     m_pWin.data(),&MainWindow::setLineEditProjectId);
+    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingProjectName,
+                     m_pWin.data(),&MainWindow::setLineEditProjectName);
+    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingProjectAim,
+                     m_pWin.data(),&MainWindow::setLineEditProjectAim);
+    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingProjectPersons,
+                     m_pWin.data(),&MainWindow::setLineEditProjectPersons);
+    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingProjectComment,
+                     m_pWin.data(),&MainWindow::setLineEditProjectComment);
+}
+
+void SettingsControllerGui::initializeMenus()
+{
+    m_pWin->setLineEditInFile(m_fiInFileInfo.absoluteFilePath());
+    m_pWin->setLineEditOutFile(m_fiOutFileInfo.absoluteFilePath());
 
     m_pWin->setCheckBoxBruteMode(m_pAnonymizer->getBruteMode());
     m_pWin->setCheckBoxDeleteInputFileAfter(m_bDeleteInputFileAfter);
@@ -92,33 +218,8 @@ SettingsControllerGui::SettingsControllerGui(const QStringList& arguments)
     m_pWin->setMeasurementDateOffset(m_pAnonymizer->getMeasurementDayOffset());
     m_pWin->setCheckBoxSubjectBirthdayOffset(m_pAnonymizer->getUseSubjectBirthdayOffset());
     m_pWin->setSubjectBirthdayOffset(m_pAnonymizer->getSubjectBirthdayOffset());
-    m_pWin->setSubjectHis(m_pAnonymizer->getSubjectHisID());
-
-    //setup communication
-//    QObject::connect(this, &MNEANONYMIZE::SettingsControllerCl::finished,
-//                     qApp, &QCoreApplication::exit, Qt::QueuedConnection);
-//    QObject::connect(m_pAnonymizer,&FiffAnonymizer::readingIdMeasurementDate,
-//                     m_pWin->m_pUi->
-
-//    conectar todos los signals de mainwindow con los slots de m_pAnonymizer
-
-//    crear hilo de ejecucion cuando el user pincha en leer informacion.
-
-    if(m_fiInFileInfo.isFile())
+    if(m_bHisIdSpecified)
     {
-        readData();
+        m_pWin->setSubjectHis(m_pAnonymizer->getSubjectHisID());
     }
-
-    m_pWin->show();
-}
-
-void SettingsControllerGui::readData()
-{
-    //set output to a randomFilename
-    QString fileOutStr(QDir(m_fiInFileInfo.absolutePath()).filePath(generateRandomFileName()));
-    m_pAnonymizer->setFileOut(m_fiOutFileInfo.absoluteFilePath());
-    m_pAnonymizer->anonymizeFile();
-    QFile fileOut(fileOutStr);
-    fileOut.remove();
-    m_pAnonymizer->setFileOut(m_fiOutFileInfo.absoluteFilePath());
 }

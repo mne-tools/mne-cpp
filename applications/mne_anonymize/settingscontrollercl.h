@@ -226,6 +226,7 @@ protected:
     bool m_bGuiMode;                        /**< Object running in GUI mode.*/
     bool m_bDeleteInputFileAfter;           /**< User's request to delete the input file after anonymization.*/
     bool m_bDeleteInputFileConfirmation;    /**< User's request to avoid confirmation prompt for input file deletion.*/
+    bool m_bHisIdSpecified;                 /**< User specified a "his_id" field to be used if that info is present in the input file.*/
 
 private:
     bool m_bVerboseMode;                    /**< Show header when executing.*/
