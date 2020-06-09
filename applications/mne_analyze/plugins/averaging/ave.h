@@ -304,6 +304,7 @@ public:
                  quint32 iBaselineFromSecs,
                  quint32 iBaselineToSecs,
                  quint32 iTriggerIndex,
+                 QSharedPointer<QList<QPair<int,double>>> lDetectedTriggers,
                  FIFFLIB::FiffInfo::SPtr pFiffInfo);
 
     //=========================================================================================================
