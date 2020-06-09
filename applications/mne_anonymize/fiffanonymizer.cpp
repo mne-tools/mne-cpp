@@ -204,6 +204,18 @@ FiffAnonymizer::FiffAnonymizer(FiffAnonymizer &&obj)
 
 int FiffAnonymizer::anonymizeFile()
 {
+    if(!m_bFileInSet)
+    {
+        qCritical() << "Input file has not been specified.";
+        return 1;
+    }
+
+    if(!m_bFileOutSet)
+    {
+        qCritical() << "Output file has not been specified.";
+        return 1;
+    }
+
     printIfVerbose("Max. Valid Fiff version: " + QString::number(m_dMaxValidFiffVerion));
     printIfVerbose("Current date: " + QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz t"));
     printIfVerbose(" ");
