@@ -974,3 +974,10 @@ void FiffRawViewModel::updateDisplayData()
                                                                                                times.block(0, i*m_iSamplesPerBlock, times.rows(), m_iSamplesPerBlock))));
     }
 }
+
+//=============================================================================================================
+
+QSharedPointer<FIFFLIB::FiffIO> FiffRawViewModel::getFiffIO() const
+{
+    return m_pFiffIO;
+}

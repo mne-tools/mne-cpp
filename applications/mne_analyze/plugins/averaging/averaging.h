@@ -41,7 +41,11 @@
 
 #include "averaging_global.h"
 #include "ave.h"
+
 #include <anShared/Interfaces/IPlugin.h>
+
+#include <mne/mne_epoch_data_list.h>
+#include <mne/mne_epoch_data.h>
 
 //=============================================================================================================
 // QT INCLUDES

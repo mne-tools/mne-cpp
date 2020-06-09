@@ -304,39 +304,54 @@ void Averaging::onResetAverage(bool state)
 void Averaging::onComputeButtonCLicked(bool bChecked)
 {
     qDebug() << "[Averaging::onComputeButtonCLicked]";
-    Q_UNUSED(bChecked);
-    m_lTriggerList = QSharedPointer<QList<QPair<int,double>>>(new QList<QPair<int,double>>);
+//    Q_UNUSED(bChecked);
+//    m_lTriggerList = QSharedPointer<QList<QPair<int,double>>>(new QList<QPair<int,double>>);
 
-    for (int i = 0; i < m_pFiffRawModel->getTimeListSize(); i++){
-        qDebug() << "At" <<  i << ":" << m_pFiffRawModel->getTimeMarks(i);
-        m_lTriggerList->append(QPair<int, double>(i, m_pFiffRawModel->getTimeMarks(i)));
-    }
+//    for (int i = 0; i < m_pFiffRawModel->getTimeListSize(); i++){
+//        qDebug() << "At" <<  i << ":" << m_pFiffRawModel->getTimeMarks(i);
+//        m_lTriggerList->append(QPair<int, double>(i, m_pFiffRawModel->getTimeMarks(i)));
+//    }
 
-    QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(m_pFiffRawModel->getFiffInfo());
+//    QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(m_pFiffRawModel->getFiffInfo());
 
-    float fFreq = m_pFiffRawModel->getFiffInfo()->sfreq;
+//    float fFreq = m_pFiffRawModel->getFiffInfo()->sfreq;
 
-    int iPreStimSamples = ((float)m_pAveragingSettingsView->getPreStimSeconds()/1000)*fFreq;
-    int iPostStimSamples = ((float)m_pAveragingSettingsView->getPostStimSeconds()/1000)*fFreq;
-    int iBaselineFromSamples = ((float)m_pAveragingSettingsView->getBaselineFromSeconds()/1000)*fFreq;
-    int iBaselineToSamples = ((float)m_pAveragingSettingsView->getBaselineToSeconds()/1000)*fFreq;
+//    int iPreStimSamples = ((float)m_pAveragingSettingsView->getPreStimSeconds()/1000)*fFreq;
+//    int iPostStimSamples = ((float)m_pAveragingSettingsView->getPostStimSeconds()/1000)*fFreq;
+//    int iBaselineFromSamples = ((float)m_pAveragingSettingsView->getBaselineFromSeconds()/1000)*fFreq;
+//    int iBaselineToSamples = ((float)m_pAveragingSettingsView->getBaselineToSeconds()/1000)*fFreq;
 
-    m_pAve = QSharedPointer<Ave>(new Ave(m_pAveragingSettingsView->getNumAverages(),
-                                         iPreStimSamples,
-                                         iPostStimSamples,
-                                         m_pAveragingSettingsView->getBaselineFromSeconds(),
-                                         m_pAveragingSettingsView->getBaselineToSeconds(),
-                                         0, //temp value, change later
-                                         pFiffInfo,
-                                         m_lTriggerList));
+//    m_pAve = QSharedPointer<Ave>(new Ave(m_pAveragingSettingsView->getNumAverages(),
+//                                         iPreStimSamples,
+//                                         iPostStimSamples,
+//                                         m_pAveragingSettingsView->getBaselineFromSeconds(),
+//                                         m_pAveragingSettingsView->getBaselineToSeconds(),
+//                                         0, //temp value, change later
+//                                         pFiffInfo,
+//                                         m_lTriggerList));
 
-    m_pAve->setBaselineFrom(iBaselineFromSamples, m_pAveragingSettingsView->getBaselineFromSeconds());
-    m_pAve->setBaselineTo(iBaselineToSamples, m_pAveragingSettingsView->getBaselineToSeconds());
-    m_pAve->setBaselineActive(m_pAveragingSettingsView->getDoBaselineCorrection());
+//    m_pAve->setBaselineFrom(iBaselineFromSamples, m_pAveragingSettingsView->getBaselineFromSeconds());
+//    m_pAve->setBaselineTo(iBaselineToSamples, m_pAveragingSettingsView->getBaselineToSeconds());
+//    m_pAve->setBaselineActive(m_pAveragingSettingsView->getDoBaselineCorrection());
 
-    connect(m_pAve.data(), &Ave::evokedStim,
-            this, &Averaging::onNewEvokedSet);
-    //this->m_pFiffRawModel->data();
+//    connect(m_pAve.data(), &Ave::evokedStim,
+//            this, &Averaging::onNewEvokedSet);
+
+    MatrixXi matEvents;
+    MNELIB::MNEEpochDataList pEpochDataList;
+    float fStartTime = -1.5f, fEndTime = 1.5f;
+    int iType = 0;
+    QMap<QString,double> mapReject;
+    mapReject.insert("eog", 300e-06);
+
+    FIFFLIB::FiffRawData* pFiffRaw = this->m_pFiffRawModel->getFiffIO()->m_qlistRaw.first().data();
+
+    pEpochDataList = MNELIB::MNEEpochDataList::readEpochs(*pFiffRaw,
+                                                          matEvents,
+                                                          fStartTime,
+                                                          fEndTime,
+                                                          iType,
+                                                          mapReject);
 }
 
 //=============================================================================================================
