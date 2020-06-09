@@ -597,6 +597,7 @@ void Ave::restart(quint32 numAverages,
                     quint32 iBaselineFromSecs,
                     quint32 iBaselineToSecs,
                     quint32 iTriggerIndex,
+                    QSharedPointer<QList<QPair<int,double>>> lDetectedTriggers,
                     FiffInfo::SPtr pFiffInfo)
 {
     stop();
@@ -608,6 +609,7 @@ void Ave::restart(quint32 numAverages,
                                           iBaselineToSecs,
                                           iTriggerIndex,
                                           pFiffInfo);
+    worker->setTriggerList(lDetectedTriggers, 0);
     worker->moveToThread(&m_workerThread);
 
     connect(&m_workerThread, &QThread::finished,

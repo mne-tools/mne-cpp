@@ -303,6 +303,7 @@ void Averaging::onResetAverage(bool state)
 
 void Averaging::onComputeButtonCLicked(bool bChecked)
 {
+    qDebug() << "[Averaging::onComputeButtonCLicked]";
     Q_UNUSED(bChecked);
     m_lTriggerList = QSharedPointer<QList<QPair<int,double>>>(new QList<QPair<int,double>>);
 
@@ -332,5 +333,16 @@ void Averaging::onComputeButtonCLicked(bool bChecked)
     m_pAve->setBaselineFrom(iBaselineFromSamples, m_pAveragingSettingsView->getBaselineFromSeconds());
     m_pAve->setBaselineTo(iBaselineToSamples, m_pAveragingSettingsView->getBaselineToSeconds());
     m_pAve->setBaselineActive(m_pAveragingSettingsView->getDoBaselineCorrection());
+
+    connect(m_pAve.data(), &Ave::evokedStim,
+            this, &Averaging::onNewEvokedSet);
     //this->m_pFiffRawModel->data();
+}
+
+//=============================================================================================================
+
+void Averaging::onNewEvokedSet(const FIFFLIB::FiffEvokedSet& evokedSet,
+                               const QStringList& lResponsibleTriggerTypes)
+{
+
 }

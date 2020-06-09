@@ -182,6 +182,16 @@ private:
     //=========================================================================================================
     void onComputeButtonCLicked(bool bChecked);
 
+    //=========================================================================================================
+    /**
+     * Append new FiffEvokedSet to the buffer
+     *
+     * @param[in] evokedSet                  The new FiffEvokedSet
+     * @param[in] lResponsibleTriggerTypes   List of all trigger types which lead to the recent emit of a new evoked set.
+     */
+    void onNewEvokedSet(const FIFFLIB::FiffEvokedSet& evokedSet,
+                        const QStringList &lResponsibleTriggerTypes);
+
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals */
 
     QSharedPointer<ANSHAREDLIB::FiffRawViewModel>           m_pFiffRawModel;            /**< Pointer to currently loaded FiffRawView Model */
@@ -191,6 +201,8 @@ private:
     DISPLIB::AveragingSettingsView*                         m_pAveragingSettingsView;
 
     QSharedPointer<QList<QPair<int,double>>>                m_lTriggerList;
+
+    FIFFLIB::FiffInfo::SPtr                                 m_pFiffInfo;
 
 };
 
