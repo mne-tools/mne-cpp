@@ -474,6 +474,22 @@ public:
      */
     void setFilterChannelType(const QString &channelType);
 
+    //=========================================================================================================
+    /**
+     * Returns true if temporal fitlering is activated
+     *
+     * @return    Whether temporal filterins activated.
+     */
+    bool isFilterActive() const;
+
+    //=========================================================================================================
+    /**
+     * Returns the length/order of the currently set filter.
+     *
+     * @return    The length/order of the currently set filter.
+     */
+    int getFilterLength() const;
+
 private:
     //=========================================================================================================
     /**
@@ -557,12 +573,12 @@ private:
     QBuffer m_buffer;
 
     // Filter stuff
-    bool                                        m_bPerformFiltering;                        /**< Flag whether to activate/deactivate filtering. */
-    QList<UTILSLIB::FilterData>                 m_filterData;                               /**< List of currently active filters. */
     qint32                                      m_iMaxFilterLength;                         /**< Max order of the current filters */
     QString                                     m_sFilterChannelType;                       /**< Kind of channel which is to be filtered */
     QSharedPointer<RTPROCESSINGLIB::RtFilter>   m_pRtFilter;
     Eigen::RowVectorXi                          m_lFilterChannelList;                       /**< The indices of the channels to be filtered.*/
+    bool                                        m_bPerformFiltering;                        /**< Flag whether to activate/deactivate filtering. */
+    QList<UTILSLIB::FilterData>                 m_filterData;                               /**< List of currently active filters. */
 
     // fiff stuff
     QSharedPointer<FIFFLIB::FiffIO>             m_pFiffIO;                                  /**< Fiff IO */
