@@ -559,7 +559,6 @@ private:
     bool                                        m_bPerformFiltering;                        /**< Flag whether to activate/deactivate filtering. */
     QList<UTILSLIB::FilterData>                 m_filterData;                               /**< List of currently active filters. */
     qint32                                      m_iMaxFilterLength;                         /**< Max order of the current filters */
-    Eigen::MatrixXd                             m_matOverlap;                               /**< Last overlap block for the back */
     QString                                     m_sFilterChannelType;                       /**< Kind of channel which is to be filtered */
     QSharedPointer<RTPROCESSINGLIB::RtFilter>   m_pRtFilter;
     Eigen::RowVectorXi                          m_lFilterChannelList;                       /**< The indices of the channels to be filtered.*/
