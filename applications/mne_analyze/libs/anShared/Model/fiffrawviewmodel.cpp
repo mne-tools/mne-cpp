@@ -582,7 +582,6 @@ void FiffRawViewModel::setFilter(const QList<FilterData>& filterData)
 void FiffRawViewModel::setFilterActive(bool bState)
 {
     m_bPerformFiltering = bState;
-    qDebug () << "FiffRawViewModel::setFilterActive m_bPerformFiltering" << m_bPerformFiltering;
 
     //Filter all data channels at once
     filterAllDataBlocks();
@@ -656,7 +655,7 @@ void FiffRawViewModel::filterDataBlock(MatrixXd& pData)
     pData = m_pRtFilter->filterDataBlock(pData,
                                          m_iMaxFilterLength,
                                          m_lFilterChannelList,
-                                         m_filterData);
+                                         m_filterData).eval();
 }
 
 //=============================================================================================================
@@ -680,7 +679,7 @@ void FiffRawViewModel::filterAllDataBlocks()
     m_lFilteredData.clear();
 
     QSharedPointer<QPair<MatrixXd, MatrixXd> > pPair;
-    std::list<QSharedPointer<QPair<MatrixXd, MatrixXd>>>::const_iterator itr;
+    std::list<QSharedPointer<QPair<MatrixXd, MatrixXd> > >::const_iterator itr;
 
     for(int i = 0; i < m_lData.size(); ++i) {
         itr = std::next(m_lData.begin(), i);
@@ -734,8 +733,9 @@ int FiffRawViewModel::loadEarlierBlocks(qint32 numBlocks)
         }
     }
 
-    // we expect m_lNewData to be empty:
-    if (m_lNewData.empty() == false) {
+    // we expect m_lNewData and m_lFilteredNewData to be empty:
+    if (m_lNewData.empty() == false &&
+        m_lFilteredNewData.empty() == false) {
         qInfo() << "[FiffRawViewModel::loadEarlierBlocks] FATAL, temporary data storage non empty !";
         return -1;
     }
@@ -800,8 +800,9 @@ int FiffRawViewModel::loadLaterBlocks(qint32 numBlocks)
         }
     }
 
-    // we expect m_lNewData to be empty:
-    if (m_lNewData.empty() == false) {
+    // we expect m_lNewData and m_lFilteredNewData to be empty:
+    if (m_lNewData.empty() == false &&
+        m_lFilteredNewData.empty() == false) {
         qCritical() << "[FiffRawViewModel::loadLaterBlocks] FATAL, temporary data storage non empty !";
         return -1;
     }
@@ -921,6 +922,7 @@ void FiffRawViewModel::postBlockLoad(int result)
 void FiffRawViewModel::updateDisplayData()
 {
     m_lData.clear();
+    m_lFilteredData.clear();
 
     MatrixXd data, times;
 
@@ -947,5 +949,12 @@ void FiffRawViewModel::updateDisplayData()
     for(int i = 0; i < m_iTotalBlockCount; ++i) {
         m_lData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data.block(0, i*m_iSamplesPerBlock, data.rows(), m_iSamplesPerBlock),
                                                                                        times.block(0, i*m_iSamplesPerBlock, times.rows(), m_iSamplesPerBlock))));
+    }
+
+    // Filtered data
+    filterDataBlock(data);
+    for(int i = 0; i < m_iTotalBlockCount; ++i) {
+        m_lFilteredData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data.block(0, i*m_iSamplesPerBlock, data.rows(), m_iSamplesPerBlock),
+                                                                                               times.block(0, i*m_iSamplesPerBlock, times.rows(), m_iSamplesPerBlock))));
     }
 }

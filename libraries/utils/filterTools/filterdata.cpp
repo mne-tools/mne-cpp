@@ -229,7 +229,7 @@ void FilterData::fftTransformCoeffs()
 RowVectorXd FilterData::applyConvFilter(const RowVectorXd& data, bool keepOverhead, CompensateEdgeEffects compensateEdgeEffects) const
 {
     if(data.cols()<m_dCoeffA.cols() && compensateEdgeEffects==MirrorData){
-        qDebug()<<QString("Error in FilterData: Number of filter taps(%1) bigger then data size(%2). Not enough data to perform mirroring!").arg(m_dCoeffA.cols()).arg(data.cols());
+        std::cout << QString("Error in FilterData: Number of filter taps(%1) bigger then data size(%2). Not enough data to perform mirroring!").arg(m_dCoeffA.cols()).arg(data.cols()).toLocal8Bit().data() << std::endl;
         return data;
     }
 
@@ -273,12 +273,12 @@ RowVectorXd FilterData::applyFFTFilter(const RowVectorXd& data, bool keepOverhea
     #endif
 
     if(data.cols()<m_dCoeffA.cols()/2 && compensateEdgeEffects==MirrorData) {
-        qDebug()<<QString("Error in FilterData: Number of filter taps(%1) bigger then data size(%2). Not enough data to perform mirroring!").arg(m_dCoeffA.cols()).arg(data.cols());
+        std::cout << QString("Error in FilterData: Number of filter taps(%1) bigger then data size(%2). Not enough data to perform mirroring!").arg(m_dCoeffA.cols()).arg(data.cols()).toLocal8Bit().data() << std::endl;
         return data;
     }
 
     if(m_dCoeffA.cols() + data.cols()>m_iFFTlength) {
-        qDebug()<<"Error in FilterData: Number of mirroring/zeropadding size plus data size is bigger then fft length!";
+        std::cout <<"Error in FilterData: Number of mirroring/zeropadding size plus data size is bigger then fft length!" << std::endl;
         return data;
     }
 
