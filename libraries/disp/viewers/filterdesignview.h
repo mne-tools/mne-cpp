@@ -186,6 +186,14 @@ public:
 
     //=========================================================================================================
     /**
+     * Sets the current channel type which is to be filtered.
+     *
+     * @param[in] sType               The new channel type to be filtered.
+     */
+    void setChannelType(const QString& sType);
+
+    //=========================================================================================================
+    /**
      * Sets the new samplingRate.
      *
      * @return return true if user designed filter is active

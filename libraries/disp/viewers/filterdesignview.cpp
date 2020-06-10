@@ -233,6 +233,13 @@ QString FilterDesignView::getChannelType()
 
 //=============================================================================================================
 
+void FilterDesignView::setChannelType(const QString& sType)
+{
+    m_pUi->m_comboBox_filterApplyTo->setCurrentText(sType);
+}
+
+//=============================================================================================================
+
 void FilterDesignView::saveSettings()
 {
     if(m_sSettingsPath.isEmpty()) {
