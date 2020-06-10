@@ -98,8 +98,6 @@ MatrixXd RtFilter::filterDataBlock(const MatrixXd& matDataIn,
         m_matDelay.setZero();
     }
 
-    qDebug() << "[RtFilter::filterDataBlock] 0";
-
     //Copy input data
     MatrixXd matDataOut = matDataIn;
 
@@ -108,7 +106,6 @@ MatrixXd RtFilter::filterDataBlock(const MatrixXd& matDataIn,
         //Generate QList structure which can be handled by the QConcurrent framework
         QList<RtFilterData> timeData;
 
-        qDebug() << "[RtFilter::filterDataBlock] 1";
         //Only select channels specified in vecPicks
         RtFilterData data;
         for(qint32 i = 0; i < vecPicks.cols(); ++i) {
@@ -117,24 +114,20 @@ MatrixXd RtFilter::filterDataBlock(const MatrixXd& matDataIn,
             data.vecData = matDataIn.row(vecPicks[i]);
             timeData.append(data);
         }
-        qDebug() << "[RtFilter::filterDataBlock] 2";
 
         // Copy in data from last data block. This is necessary in order to also delay channels which are not filtered.
         matDataOut.block(0, iOrder/2, matDataIn.rows(), matDataOut.cols()-iOrder/2) = matDataIn.block(0, 0, matDataIn.rows(), matDataOut.cols()-iOrder/2);
         matDataOut.block(0, 0, matDataIn.rows(), iOrder/2) = m_matDelay;
 
-        qDebug() << "[RtFilter::filterDataBlock] 3";
         QFuture<void> future = QtConcurrent::map(timeData,
                                                  filterChannel);
 
         future.waitForFinished();
 
-        qDebug() << "[RtFilter::filterDataBlock] 4";
         //Do the overlap add method and store in matDataOut
         int iFilteredNumberCols = timeData.at(0).vecData.cols();
         RowVectorXd tempData;
 
-        qDebug() << "[RtFilter::filterDataBlock] 5";
         for(int r = 0; r < timeData.size(); r++) {
             //Get the currently filtered data. This data has a delay of filterLength/2 in front and back.
             tempData = timeData.at(r).vecData;
@@ -150,7 +143,6 @@ MatrixXd RtFilter::filterDataBlock(const MatrixXd& matDataIn,
             //Refresh the m_matOverlap with the new calculated filtered data.
             m_matOverlap.row(timeData.at(r).iRow) = timeData.at(r).vecData.tail(iOrder);
         }
-        qDebug() << "[RtFilter::filterDataBlock] 6";
 
         if(matDataIn.cols() >= iOrder/2) {
             m_matDelay = matDataIn.block(0, matDataIn.cols()-iOrder/2, matDataIn.rows(), iOrder/2);
@@ -174,12 +166,11 @@ MatrixXd RtFilter::filterData(const MatrixXd& matDataIn,
                               double dSFreq,
                               const RowVectorXi& vecPicks,
                               int iOrder,
-                              qint32 iFftLength,
                               FilterData::DesignMethod designMethod)
 {
     // Check for size of data
-    if (matDataIn.cols()<iOrder){
-        qDebug() << QString("[RtFilter::filterData] Filter length bigger then data length.");
+    if (matDataIn.cols() < iOrder){
+        qDebug() << QString("[RtFilter::filterData] Filter length is bigger than data length.");
     }
 
     // Normalize cut off frequencies to nyquist
