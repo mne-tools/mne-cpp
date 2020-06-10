@@ -644,15 +644,11 @@ void FiffRawViewModel::filterAllDataBlocks()
 
         qDebug() << "FiffRawViewModel::filterAllDataBlocks (*itr)->first.cols()"<<(*itr)->first.cols();
         qDebug() << "FiffRawViewModel::filterAllDataBlocks (*itr)->first.rows()"<<(*itr)->first.rows();
-        qDebug() << "FiffRawViewModel::filterAllDataBlocks (*itr)->second.cols()"<<(*itr)->second.cols();
-        qDebug() << "FiffRawViewModel::filterAllDataBlocks (*itr)->second.rows()"<<(*itr)->second.rows();
 
-        MatrixXd data = m_pRtFilter->filterDataBlock((*itr)->first,
-                                                     m_iMaxFilterLength,
-                                                     m_lFilterChannelList,
-                                                     m_filterData);
-        qDebug() << "FiffRawViewModel::filterAllDataBlocks data";
-        pPair = QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data,
+        pPair = QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(m_pRtFilter->filterDataBlock((*itr)->first,
+                                                                                                          m_iMaxFilterLength,
+                                                                                                          m_lFilterChannelList,
+                                                                                                          m_filterData),
                                                                              (*itr)->second));
         m_lFilteredData.push_back(pPair);
         qDebug() << "FiffRawViewModel::filterAllDataBlocks filtering block"<<i;
