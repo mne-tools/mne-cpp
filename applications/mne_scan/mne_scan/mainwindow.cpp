@@ -603,7 +603,7 @@ void MainWindow::createMenus()
     if(!m_pMenuAppearance) {
         m_pMenuAppearance = menuBar()->addMenu(tr("&Appearance"));
         m_pMenuAppearance->addMenu("Styles")->addActions(m_pActionStyleGroup->actions());
-        m_pMenuAppearance->addMenu("GUI Modes")->addActions(m_pActionModeGroup->actions());
+        m_pMenuAppearance->addMenu("Modes")->addActions(m_pActionModeGroup->actions());
     }
 
     // Help menu
