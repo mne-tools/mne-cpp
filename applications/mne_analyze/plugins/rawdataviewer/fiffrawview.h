@@ -67,6 +67,10 @@ namespace ANSHAREDLIB {
     class FiffRawViewModel;
 }
 
+namespace UTILSLIB {
+    class FilterData;
+}
+
 class QTableView;
 class QLabel;
 
@@ -227,8 +231,31 @@ public:
      */
     void updateScrollPosition();
 
-signals:
+    //=========================================================================================================
+    /**
+     * Filter parameters changed
+     *
+     * @param[in] filterData   the currently active filter
+     */
+    void setFilter(const UTILSLIB::FilterData &filterData);
 
+    //=========================================================================================================
+    /**
+     * Filter avtivated
+     *
+     * @param[in] state    filter on/off flag
+     */
+    void setFilterActive(bool state);
+
+    //=========================================================================================================
+    /**
+     * Sets the type of channel which are to be filtered
+     *
+     * @param[in] channelType    the channel type which is to be filtered (EEG, MEG, All)
+     */
+    void setFilterChannelType(const QString& channelType);
+
+signals:
     //=========================================================================================================
     /**
      * Emits sample number to be added aan annotation

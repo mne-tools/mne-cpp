@@ -179,6 +179,8 @@ void FilterDesignView::setSamplingRate(double dSamplingRate)
     if(m_pUi->m_doubleSpinBox_from->value()>m_dSFreq/2) {
         m_pUi->m_doubleSpinBox_from->setValue(m_dSFreq/2);
     }
+
+    updateFilterPlot();
 }
 
 //=============================================================================================================
