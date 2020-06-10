@@ -149,6 +149,8 @@ MatrixXd RtFilter::filterDataBlock(const MatrixXd& matDataIn,
         } else {
             qWarning() << "[RtFilter::filterDataBlock] Half of filter length is larger than data size. Not filling m_matDelay for next step.";
         }
+    } else {
+        qWarning() << "[RtFilter::filterDataBlock] Nubmer of picked channels is zero.";
     }
 
     return matDataOut;
@@ -216,9 +218,9 @@ MatrixXd RtFilter::filterData(const MatrixXd& matDataIn,
         }
     } else {
         matDataOut = filterDataBlock(matDataIn,
-                                    iOrder,
-                                    vecPicks,
-                                    filterList);
+                                     iOrder,
+                                     vecPicks,
+                                     filterList);
     }
     return matDataOut;
 }

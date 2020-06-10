@@ -41,8 +41,11 @@
 
 #include "fiffrawview.h"
 #include "fiffrawviewdelegate.h"
+
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <anShared/Model/annotationmodel.h>
+
+#include <utils/filterTools/filterdata.h>
 
 //=============================================================================================================
 // Qt INCLUDES
@@ -71,6 +74,7 @@
 
 using namespace RAWDATAVIEWERPLUGIN;
 using namespace ANSHAREDLIB;
+using namespace UTILSLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -419,6 +423,27 @@ void FiffRawView::updateScrollPosition()
     //qDebug() << "Current scroll:" << m_pTableView->horizontalScrollBar()->value();
 
     m_pTableView->horizontalScrollBar()->setValue(iPos);
+}
+
+//=============================================================================================================
+
+void FiffRawView::setFilter(const FilterData& filterData)
+{
+    m_pModel->setFilter(QList<FilterData>() << filterData);
+}
+
+//=============================================================================================================
+
+void FiffRawView::setFilterActive(bool state)
+{
+    m_pModel->setFilterActive(state);
+}
+
+//=============================================================================================================
+
+void FiffRawView::setFilterChannelType(const QString &channelType)
+{
+    m_pModel->setFilterChannelType(channelType);
 }
 
 //=============================================================================================================

@@ -51,6 +51,8 @@
 #include <disp/viewers/fiffrawviewsettings.h>
 #include <disp/viewers/scalingview.h>
 
+#include <utils/filterTools/filterdata.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -64,6 +66,7 @@
 using namespace RAWDATAVIEWERPLUGIN;
 using namespace ANSHAREDLIB;
 using namespace DISPLIB;
+using namespace UTILSLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -185,22 +188,35 @@ void RawDataViewer::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
     case TRIGGER_REDRAW:
-        m_pFiffRawView->updateView();
+        if(m_pFiffRawView) {
+            m_pFiffRawView->updateView();
+        }
         break;
     case TRIGGER_VIEWER_MOVE:
-        m_pFiffRawView->updateScrollPosition();
+        if(m_pFiffRawView) {
+            m_pFiffRawView->updateScrollPosition();
+        }
         break;
     case SELECTED_MODEL_CHANGED:
         onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
         break;
     case FILTER_CHANNEL_TYPE_CHANGED:
-        qDebug() << "FILTER_CHANNEL_TYPE_CHANGED";
+        if(m_pFiffRawView) {
+            m_pFiffRawView->setFilterChannelType(e->getData().toString());
+            qDebug() << "FILTER_CHANNEL_TYPE_CHANGED";
+        }
         break;
     case FILTER_ACTIVE_CHANGED:
-        qDebug() << "FILTER_ACTIVE_CHANGED";
+        if(m_pFiffRawView) {
+            m_pFiffRawView->setFilterActive(e->getData().toBool());
+            qDebug() << "FILTER_ACTIVE_CHANGED";
+        }
         break;
     case FILTER_DESIGN_CHANGED:
-        qDebug() << "FILTER_DESIGN_CHANGED";
+        if(m_pFiffRawView) {
+            m_pFiffRawView->setFilter(e->getData().value<FilterData>());
+            qDebug() << "FILTER_DESIGN_CHANGED";
+        }
         break;
     default:
         qWarning() << "[RawDataViewer::handleEvent] Received an Event that is not handled by switch cases.";

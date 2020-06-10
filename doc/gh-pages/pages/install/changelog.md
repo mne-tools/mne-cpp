@@ -49,10 +49,10 @@ Disp3D
 
 People who contributed to this release (preceded by number of commits):
 
-(64) Ruben Dörfel
-(51) Lorenz Esch
-(16) Gabriel Motta
-(2) Andrey Parfenov
+(64) Ruben Dörfel,
+(51) Lorenz Esch,
+(16) Gabriel Motta,
+(2) Andrey Parfenov,
 (1) Juan Garcia-Prieto
 
 ## Version 0.1.2 - 2020/05/21

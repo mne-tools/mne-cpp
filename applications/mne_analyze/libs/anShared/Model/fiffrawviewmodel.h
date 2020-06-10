@@ -72,6 +72,14 @@ namespace FIFFLIB {
     class FiffChInfo;
 }
 
+namespace UTILSLIB {
+    class FilterData;
+}
+
+namespace RTPROCESSINGLIB {
+    class RtFilter;
+}
+
 //=============================================================================================================
 // DEFINE NAMESPACE ANSHAREDLIB
 //=============================================================================================================
@@ -316,7 +324,6 @@ public:
      */
     qint32 getUnit(const qint32 &index) const;
 
-
     //=========================================================================================================
     /**
      * Set scaling channel scaling
@@ -443,7 +450,37 @@ public:
      */
     void addTimeMark(int iLastClicked);
 
+    //=========================================================================================================
+    /**
+     * Set new filter parameters
+     *
+     * @param[in] filterData    list of the new filter
+     */
+    void setFilter(const QList<UTILSLIB::FilterData> &filterData);
+
+    //=========================================================================================================
+    /**
+     * Set filter activation
+     *
+     * @param[in] bState    filter on/off flag
+     */
+    void setFilterActive(bool bState);
+
+    //=========================================================================================================
+    /**
+     * Sets the type of channel which are to be filtered
+     *
+     * @param[in] channelType    the channel type which is to be filtered (EEG, MEG, All)
+     */
+    void setFilterChannelType(const QString &channelType);
+
 private:
+    //=========================================================================================================
+    /**
+     * Calculates the filtered version of loaded data
+     */
+    void filterAllDataBlocks();
+
     //=========================================================================================================
     /**
      * This is a helper method thats is meant to correctly set the endOfFile / startOfFile flags whenever needed
@@ -489,17 +526,10 @@ private:
      */
     void updateDisplayData();
 
-signals:
-    //=========================================================================================================
-    /**
-      * Emits that new block data is loaded
-      */
-    void newBlocksLoaded();
-
-private:
-
-    std::list<QSharedPointer<QPair<MatrixXd, MatrixXd> > > m_lData;    /**< Data */
-    std::list<QSharedPointer<QPair<MatrixXd, MatrixXd> > > m_lNewData; /**< Data that is to be appended or prepended */
+    std::list<QSharedPointer<QPair<MatrixXd, MatrixXd> > > m_lData;             /**< Data */
+    std::list<QSharedPointer<QPair<MatrixXd, MatrixXd> > > m_lNewData;          /**< Data that is to be appended or prepended */
+    std::list<QSharedPointer<QPair<MatrixXd, MatrixXd> > > m_lFilteredData;     /**< Filtered data */
+    std::list<QSharedPointer<QPair<MatrixXd, MatrixXd> > > m_lFilteredNewData;  /**< Filtered data that is to be appended or prepended */
 
     // Display stuff
     double      m_dDx;              /**< pixel difference to the next sample. */
@@ -525,22 +555,38 @@ private:
     QByteArray m_byteLoadedData;
     QBuffer m_buffer;
 
+    // Filter stuff
+    bool                                        m_bPerformFiltering;                        /**< Flag whether to activate/deactivate filtering. */
+    QList<UTILSLIB::FilterData>                 m_filterData;                               /**< List of currently active filters. */
+    qint32                                      m_iMaxFilterLength;                         /**< Max order of the current filters */
+    Eigen::MatrixXd                             m_matOverlap;                               /**< Last overlap block for the back */
+    QString                                     m_sFilterChannelType;                       /**< Kind of channel which is to be filtered */
+    QSharedPointer<RTPROCESSINGLIB::RtFilter>   m_pRtFilter;
+    Eigen::RowVectorXi                          m_lFilterChannelList;                       /**< The indices of the channels to be filtered.*/
+
     // fiff stuff
-    QSharedPointer<FIFFLIB::FiffIO>     m_pFiffIO;              /**< Fiff IO */
-    QSharedPointer<FIFFLIB::FiffInfo>   m_pFiffInfo;            /**< Fiff info of whole fiff file */
-    QList<FIFFLIB::FiffChInfo>          m_ChannelInfoList;      /**< List of FiffChInfo objects that holds the corresponding channels information */
+    QSharedPointer<FIFFLIB::FiffIO>             m_pFiffIO;                                  /**< Fiff IO */
+    QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;                                /**< Fiff info of whole fiff file */
+    QList<FIFFLIB::FiffChInfo>                  m_ChannelInfoList;                          /**< List of FiffChInfo objects that holds the corresponding channels information */
 
-    QMap<qint32,float>                  m_qMapChScaling;                            /**< Channel scaling map. */
+    QMap<qint32,float>                          m_qMapChScaling;                            /**< Channel scaling map. */
 
-    QColor                              m_colBackground;                            /**< The background color.*/
+    QColor                                      m_colBackground;                            /**< The background color.*/
 
-    int                                 m_iDistanceTimerSpacer;                     /**< The distance for the horizontal time spacers in the view in ms */
+    int                                         m_iDistanceTimerSpacer;                     /**< The distance for the horizontal time spacers in the view in ms */
 
-    qint32                              m_iScrollPos;                               /**< Position of the scrollbar */
+    qint32                                      m_iScrollPos;                               /**< Position of the scrollbar */
 
-    bool                                m_bDispAnn;                                 /**< Whether annotations wil be shown */
+    bool                                        m_bDispAnn;                                 /**< Whether annotations wil be shown */
 
-    QSharedPointer<AnnotationModel>     m_pAnnotationModel;                         /**< Model to stored annotations to be displayed */
+    QSharedPointer<AnnotationModel>             m_pAnnotationModel;                         /**< Model to stored annotations to be displayed */
+
+signals:
+    //=========================================================================================================
+    /**
+      * Emits that new block data is loaded
+      */
+    void newBlocksLoaded();
 };
 
 //=============================================================================================================

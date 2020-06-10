@@ -912,7 +912,7 @@ void RtFiffRawViewModel::setBackgroundColor(const QColor& color)
 
 //=============================================================================================================
 
-void RtFiffRawViewModel::setFilterChannelType(QString channelType)
+void RtFiffRawViewModel::setFilterChannelType(const QString &channelType)
 {
     m_sFilterChannelType = channelType;
     m_filterChannelList = m_visibleChannelList;
