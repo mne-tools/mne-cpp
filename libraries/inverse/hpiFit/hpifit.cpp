@@ -257,12 +257,12 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
         vecChIdcs(j) = iChIdx;
     }
 
-    //Generate seed point by projection the found channel position 3cm inwards
     vecError.resize(iNumCoils);
     double dError = std::accumulate(vecError.begin(), vecError.end(), .0) / vecError.size();
     MatrixXd matCoilPos = MatrixXd::Zero(iNumCoils,3);
 
-    if(transDevHead.trans == MatrixXd::Identity(4,4).cast<float>() /*|| dError > 0.003*/){
+    // Generate seed point by projection the found channel position 3cm inwards if previous transDevHead is identity or bad fit
+    if(transDevHead.trans == MatrixXd::Identity(4,4).cast<float>() || dError > 0.010) {
         for (int j = 0; j < vecChIdcs.rows(); ++j) {
             if(vecChIdcs(j) < pFiffInfo->chs.size()) {
                 Vector3f r0 = pFiffInfo->chs.at(vecChIdcs(j)).chpos.r0;
@@ -375,6 +375,9 @@ void HPIFit::findOrder(const MatrixXd& t_mat,
 {
     // create temporary copies that are necessary to reset values that are passed to fitHpi()
     fittedPointSet.clear();
+    transDevHead.clear();
+    vecError.fill(0);
+
     FiffDigPointSet fittedPointSetTemp = fittedPointSet;
     FiffCoordTrans transDevHeadTemp = transDevHead;
     FiffInfo::SPtr pFiffInfoTemp = pFiffInfo;
@@ -383,7 +386,6 @@ void HPIFit::findOrder(const MatrixXd& t_mat,
     QVector<double> vecErrorTemp = vecError;
     VectorXd vecGoFTemp = vecGoF;
     bool bIdentity = false;
-    fittedPointSetTemp.clear();
 
     MatrixXf matTrans = transDevHead.trans;
     if(transDevHead.trans == MatrixXf::Identity(4,4).cast<float>()) {
