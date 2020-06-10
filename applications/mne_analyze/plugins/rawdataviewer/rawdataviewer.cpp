@@ -193,6 +193,15 @@ void RawDataViewer::handleEvent(QSharedPointer<Event> e)
     case SELECTED_MODEL_CHANGED:
         onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
         break;
+    case FILTER_CHANNEL_TYPE_CHANGED:
+        qDebug() << "FILTER_CHANNEL_TYPE_CHANGED";
+        break;
+    case FILTER_ACTIVE_CHANGED:
+        qDebug() << "FILTER_ACTIVE_CHANGED";
+        break;
+    case FILTER_DESIGN_CHANGED:
+        qDebug() << "FILTER_DESIGN_CHANGED";
+        break;
     default:
         qWarning() << "[RawDataViewer::handleEvent] Received an Event that is not handled by switch cases.";
     }
@@ -206,6 +215,9 @@ QVector<EVENT_TYPE> RawDataViewer::getEventSubscriptions(void) const
     temp.push_back(TRIGGER_REDRAW);
     temp.push_back(TRIGGER_VIEWER_MOVE);
     temp.push_back(SELECTED_MODEL_CHANGED);
+    temp.push_back(FILTER_CHANNEL_TYPE_CHANGED);
+    temp.push_back(FILTER_ACTIVE_CHANGED);
+    temp.push_back(FILTER_DESIGN_CHANGED);
 
     return temp;
 }

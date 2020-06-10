@@ -44,6 +44,9 @@
 #include <anShared/Utils/metatypes.h>
 
 #include <disp/viewers/filtersettingsview.h>
+#include <disp/viewers/filterdesignview.h>
+
+#include <utils/filterTools/filterdata.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -56,6 +59,7 @@
 using namespace FILTERINGPLUGIN;
 using namespace ANSHAREDLIB;
 using namespace DISPLIB;
+using namespace UTILSLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -114,6 +118,15 @@ QDockWidget *Filtering::getControl()
     connect(this, &Filtering::guiModeChanged,
             pFilterSettingsView, &FilterSettingsView::setGuiMode);
 
+    connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChannelTypeChanged,
+            this, &Filtering::setFilterChannelType);
+
+    connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChanged,
+            this, &Filtering::setFilter);
+
+    connect(pFilterSettingsView, &FilterSettingsView::filterActivationChanged,
+            this, &Filtering::setFilterActive);
+
     QDockWidget* pControlDock = new QDockWidget(getName());
     pControlDock->setAllowedAreas(Qt::RightDockWidgetArea | Qt::LeftDockWidgetArea);
     pControlDock->setWidget(pFilterSettingsView);
@@ -148,3 +161,29 @@ QVector<EVENT_TYPE> Filtering::getEventSubscriptions(void) const
     return temp;
 }
 
+//=============================================================================================================
+
+void Filtering::setFilterChannelType(const QString& sType)
+{
+    QVariant data;
+    data.setValue(sType);
+    m_pCommu->publishEvent(EVENT_TYPE::FILTER_CHANNEL_TYPE_CHANGED, data);
+}
+
+//=============================================================================================================
+
+void Filtering::setFilter(const FilterData& filterData)
+{
+    QVariant data;
+    data.setValue(filterData);
+    m_pCommu->publishEvent(EVENT_TYPE::FILTER_DESIGN_CHANGED, data);
+}
+
+//=============================================================================================================
+
+void Filtering::setFilterActive(bool state)
+{
+    QVariant data;
+    data.setValue(state);
+    m_pCommu->publishEvent(EVENT_TYPE::FILTER_ACTIVE_CHANGED, data);
+}
