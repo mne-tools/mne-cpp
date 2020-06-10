@@ -42,6 +42,7 @@
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Management/communicator.h>
 #include <anShared/Utils/metatypes.h>
+#include <anShared/Model/fiffrawviewmodel.h>
 
 #include <disp/viewers/filtersettingsview.h>
 #include <disp/viewers/filterdesignview.h>
@@ -118,6 +119,9 @@ QDockWidget *Filtering::getControl()
     connect(this, &Filtering::guiModeChanged,
             pFilterSettingsView, &FilterSettingsView::setGuiMode);
 
+    connect(this, &Filtering::samplingFrequencyChanged,
+            pFilterSettingsView->getFilterView().data(), &FilterDesignView::setSamplingRate);
+
     connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChannelTypeChanged,
             this, &Filtering::setFilterChannelType);
 
@@ -147,6 +151,11 @@ QWidget *Filtering::getView()
 void Filtering::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
+    case SELECTED_MODEL_CHANGED:
+        if(QSharedPointer<FiffRawViewModel> pModel = qSharedPointerCast<FiffRawViewModel>(e->getData().value<QSharedPointer<AbstractModel> >())) {
+            emit samplingFrequencyChanged(pModel->getFiffInfo()->sfreq);
+        }
+        break;
     default:
         qWarning() << "[Filtering::handleEvent] received an Event that is not handled by switch-cases";
     }
@@ -157,6 +166,7 @@ void Filtering::handleEvent(QSharedPointer<Event> e)
 QVector<EVENT_TYPE> Filtering::getEventSubscriptions(void) const
 {
     QVector<EVENT_TYPE> temp;
+    temp.push_back(SELECTED_MODEL_CHANGED);
 
     return temp;
 }

@@ -134,6 +134,15 @@ private:
     void setFilterActive(bool state);
 
     QPointer<ANSHAREDLIB::Communicator> m_pCommu;               /**< To broadcst signals */
+
+signals:
+    //=========================================================================================================
+    /**
+     * Signal emmited whenever the sampling frequency changed
+     *
+     * @param [in] fSFreq       the new sampling frequency
+     */
+    void samplingFrequencyChanged(float fSFreq);
 };
 
 //=============================================================================================================

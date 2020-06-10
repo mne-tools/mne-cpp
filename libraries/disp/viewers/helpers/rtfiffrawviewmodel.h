@@ -356,7 +356,7 @@ public:
      *
      * @param[in] channelType    the channel type which is to be filtered (EEG, MEG, All)
      */
-    void setFilterChannelType(QString channelType);
+    void setFilterChannelType(const QString &channelType);
 
     //=========================================================================================================
     /**
