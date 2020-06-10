@@ -353,7 +353,7 @@ void MainWindow::createPluginMenus(QSharedPointer<ANSHAREDLIB::PluginManager> pP
     if(!m_pMenuAppearance) {
         m_pMenuAppearance = menuBar()->addMenu(tr("&Appearance"));
         m_pMenuAppearance->addMenu("Styles")->addActions(pActionStyleGroup->actions());
-        m_pMenuAppearance->addMenu("GUI Modes")->addActions(pActionModeGroup->actions());
+        m_pMenuAppearance->addMenu("Modes")->addActions(pActionModeGroup->actions());
     }
 
     // Help menu
