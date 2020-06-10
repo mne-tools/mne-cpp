@@ -979,5 +979,6 @@ void FiffRawViewModel::updateDisplayData()
 
 QSharedPointer<FIFFLIB::FiffIO> FiffRawViewModel::getFiffIO() const
 {
+    qDebug() << "[FiffRawViewModel::getFiffIO]";
     return m_pFiffIO;
 }

@@ -208,6 +208,14 @@ private:
 
     FIFFLIB::FiffInfo::SPtr                                 m_pFiffInfo;
 
+    int                                                     m_iNumAve;
+    int                                                     m_iBaselineFrom;
+    int                                                     m_iBaselineTo;
+
+    float                                                   m_fPreStim;
+    float                                                   m_fPostStim;
+
+
 };
 
 } // NAMESPACE

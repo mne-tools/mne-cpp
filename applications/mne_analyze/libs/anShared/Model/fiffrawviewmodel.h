@@ -488,6 +488,11 @@ public:
     int getFilterLength() const;
 
     //=========================================================================================================
+    /**
+     * Returns the member FiffIO, containing a list of FiffRawData and FiffEvoked
+     *
+     * @return m_pFiffIO, member varaible saving the FiffRawData and FiffEvoked parameters
+     */
     QSharedPointer<FIFFLIB::FiffIO> getFiffIO() const;
 
 

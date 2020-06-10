@@ -60,6 +60,16 @@ using namespace ANSHAREDLIB;
 //=============================================================================================================
 
 Averaging::Averaging()
+: m_pCommu(Q_NULLPTR)
+, m_pFiffRawModel(Q_NULLPTR)
+, m_pAveragingSettingsView(Q_NULLPTR)
+, m_lTriggerList(Q_NULLPTR)
+, m_pFiffInfo(Q_NULLPTR)
+, m_iNumAve(0)
+, m_iBaselineFrom(0)
+, m_iBaselineTo(0)
+, m_fPreStim(0)
+, m_fPostStim(0)
 {
 
 }
@@ -153,6 +163,13 @@ QDockWidget* Averaging::getControl()
     pControl->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,
                                         QSizePolicy::Preferred));
 
+    m_iNumAve = m_pAveragingSettingsView->getNumAverages();
+    m_iBaselineFrom = m_pAveragingSettingsView->getBaselineFromSeconds();
+    m_iBaselineTo = m_pAveragingSettingsView->getBaselineToSeconds();
+
+    m_fPreStim = m_pAveragingSettingsView->getPreStimSeconds();
+    m_fPostStim = m_pAveragingSettingsView->getPostStimSeconds();
+
     return pControl;
 }
 
@@ -200,10 +217,11 @@ void Averaging::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewMo
 
 void Averaging::onChangeNumAverages(qint32 numAve)
 {
-    qDebug() << "[Averaging::onChangeNumAverages]";
-    if(m_pAve) {
-        m_pAve->setAverageNumber(numAve);
-    }
+    qDebug() << "[Averaging::onChangeNumAverages]" << numAve;
+    m_iNumAve = numAve;
+//    if(m_pAve) {
+//        m_pAve->setAverageNumber(numAve);
+//    }
 }
 
 //=============================================================================================================
@@ -211,7 +229,8 @@ void Averaging::onChangeNumAverages(qint32 numAve)
 void Averaging::onChangeBaselineFrom(qint32 fromMSeconds)
 {
 
-    qDebug() << "[Averaging::onChangeBaselineFrom]";
+    qDebug() << "[Averaging::onChangeBaselineFrom]" << fromMSeconds;
+    m_iBaselineFrom = fromMSeconds;
 //    if(!m_pFiffInfo) {
 //        return;
 //    }
@@ -228,7 +247,8 @@ void Averaging::onChangeBaselineFrom(qint32 fromMSeconds)
 
 void Averaging::onChangeBaselineTo(qint32 toMSeconds)
 {
-    qDebug() << "[Averaging::onChangeBaselineTo]";
+    qDebug() << "[Averaging::onChangeBaselineTo]" << toMSeconds;
+    m_iBaselineTo = toMSeconds;
 //    if(!m_pFiffInfo) {
 //        return;
 //    }
@@ -244,7 +264,10 @@ void Averaging::onChangeBaselineTo(qint32 toMSeconds)
 
 void Averaging::onChangePreStim(qint32 mseconds)
 {
-    qDebug() << "[Averaging::onChangePreStim]";
+    qDebug() << "[Averaging::onChangePreStim]" << mseconds;
+
+    m_fPreStim =  -(static_cast<float>(mseconds)/1000);
+
 //    if(!m_pFiffInfo) {
 //        return;
 //    }
@@ -266,6 +289,8 @@ void Averaging::onChangePostStim(qint32 mseconds)
 {
 
     qDebug() << "[Averaging::onChangePostStim]";
+
+    m_fPostStim = (static_cast<float>(mseconds)/1000);
 //    if(!m_pFiffInfo) {
 //        return;
 //    }
@@ -339,17 +364,18 @@ void Averaging::onComputeButtonCLicked(bool bChecked)
 
     MatrixXi matEvents;
     MNELIB::MNEEpochDataList pEpochDataList;
-    float fStartTime = -1.5f, fEndTime = 1.5f;
+    //float fStartTime = -1.5f, fEndTime = 1.5f;
     int iType = 0;
     QMap<QString,double> mapReject;
     mapReject.insert("eog", 300e-06);
 
     FIFFLIB::FiffRawData* pFiffRaw = this->m_pFiffRawModel->getFiffIO()->m_qlistRaw.first().data();
+    //*(this->m_pFiffRawModel->getFiffIO()->m_qlistRaw.first().data());
 
     pEpochDataList = MNELIB::MNEEpochDataList::readEpochs(*pFiffRaw,
                                                           matEvents,
-                                                          fStartTime,
-                                                          fEndTime,
+                                                          m_fPreStim,
+                                                          m_fPostStim,
                                                           iType,
                                                           mapReject);
 }
