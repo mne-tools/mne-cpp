@@ -166,6 +166,7 @@ MatrixXd RtFilter::filterData(const MatrixXd& matDataIn,
                               double dSFreq,
                               const RowVectorXi& vecPicks,
                               int iOrder,
+                              qint32 iFftLength,
                               FilterData::DesignMethod designMethod)
 {
     // Check for size of data

@@ -117,19 +117,22 @@ QDockWidget *Filtering::getControl()
 {
     FilterSettingsView* pFilterSettingsView = new FilterSettingsView("MNEANALYZE");
     connect(this, &Filtering::guiModeChanged,
-            pFilterSettingsView, &FilterSettingsView::setGuiMode);
+            pFilterSettingsView, &FilterSettingsView::setGuiMode, Qt::UniqueConnection);
 
     connect(this, &Filtering::samplingFrequencyChanged,
-            pFilterSettingsView->getFilterView().data(), &FilterDesignView::setSamplingRate);
+            pFilterSettingsView->getFilterView().data(), &FilterDesignView::setSamplingRate, Qt::UniqueConnection);
+
+    connect(this, &Filtering::samplingFrequencyChanged,
+            pFilterSettingsView->getFilterView().data(), &FilterDesignView::setMaxFilterTaps, Qt::UniqueConnection);
 
     connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChannelTypeChanged,
-            this, &Filtering::setFilterChannelType);
+            this, &Filtering::setFilterChannelType, Qt::UniqueConnection);
 
     connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChanged,
-            this, &Filtering::setFilter);
+            this, &Filtering::setFilter, Qt::UniqueConnection);
 
     connect(pFilterSettingsView, &FilterSettingsView::filterActivationChanged,
-            this, &Filtering::setFilterActive);
+            this, &Filtering::setFilterActive, Qt::UniqueConnection);
 
     QDockWidget* pControlDock = new QDockWidget(getName());
     pControlDock->setAllowedAreas(Qt::RightDockWidgetArea | Qt::LeftDockWidgetArea);

@@ -124,8 +124,8 @@ public:
      */
     FiffRawViewModel(const QString &sFilePath,
                      const QByteArray& byteLoadedData = QByteArray(),
-                     qint32 iVisibleWindowSize = 10,
-                     qint32 iPreloadBufferSize = 10,
+                     qint32 iVisibleWindowSize = 3,
+                     qint32 iPreloadBufferSize = 3,
                      QObject *pParent = Q_NULLPTR);
 
     //=========================================================================================================
@@ -480,6 +480,7 @@ private:
      * Calculates the filtered version of loaded data
      */
     void filterAllDataBlocks();
+    void filterDataBlock(QSharedPointer<QPair<MatrixXd, MatrixXd> > pData);
 
     //=========================================================================================================
     /**

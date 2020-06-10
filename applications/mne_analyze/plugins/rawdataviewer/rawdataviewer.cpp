@@ -187,7 +187,6 @@ QWidget *RawDataViewer::getView()
 
 void RawDataViewer::handleEvent(QSharedPointer<Event> e)
 {
-    qDebug() << "RawDataViewer::handleEvent";
     switch (e->getType()) {
     case TRIGGER_REDRAW:
         if(m_pFiffRawView) {
@@ -202,20 +201,16 @@ void RawDataViewer::handleEvent(QSharedPointer<Event> e)
         break;
     case FILTER_CHANNEL_TYPE_CHANGED:
         m_pFiffRawView->setFilterChannelType(e->getData().toString());
-        qDebug() << "FILTER_CHANNEL_TYPE_CHANGED";
         break;
     case FILTER_ACTIVE_CHANGED:
-        qDebug() << "FILTER_ACTIVE_CHANGED";
         m_pFiffRawView->setFilterActive(e->getData().toBool());
         break;
     case FILTER_DESIGN_CHANGED:
         m_pFiffRawView->setFilter(e->getData().value<FilterData>());
-        qDebug() << "FILTER_DESIGN_CHANGED";
         break;
     default:
         qWarning() << "[RawDataViewer::handleEvent] Received an Event that is not handled by switch cases.";
     }
-    qDebug() << "RawDataViewer::handleEvent end";
 }
 
 //=============================================================================================================

@@ -52,8 +52,6 @@
 
 #include <rtprocessing/rtfilter.h>
 
-#include <iostream>
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -192,14 +190,12 @@ void FiffRawViewModel::initFiffData(QIODevice& p_IODevice)
                                                                                        times.block(0, i*m_iSamplesPerBlock, times.rows(), m_iSamplesPerBlock))));
     }
 
-    qInfo() << "[FiffRawViewModel::initFiffData] Loaded " << m_lData.size() << " blocks";
+    qInfo() << "[FiffRawViewModel::initFiffData] Loaded" << m_lData.size() << "blocks with size"<<data.rows()<<"x"<<m_iSamplesPerBlock;
 
     // need to close the file manually
     p_IODevice.close();
 
     m_bIsInit = true;
-
-    filterAllDataBlocks();
 }
 
 //=============================================================================================================
@@ -584,6 +580,8 @@ void FiffRawViewModel::setFilterActive(bool bState)
 
     //Filter all visible data channels at once
     filterAllDataBlocks();
+
+    emit dataChanged(createIndex(0,0), createIndex(rowCount(), columnCount()));
 }
 
 //=============================================================================================================
@@ -617,7 +615,7 @@ void FiffRawViewModel::setFilterChannelType(const QString& channelType)
 
 //=============================================================================================================
 
-void FiffRawViewModel::filterAllDataBlocks()
+void FiffRawViewModel::filterDataBlock(QSharedPointer<QPair<MatrixXd, MatrixXd> > pData)
 {
     if(!m_bPerformFiltering) {
         qWarning() << "[FiffRawViewModel::filterAllDataBlocks] Filtering is deactivated.";
@@ -632,18 +630,35 @@ void FiffRawViewModel::filterAllDataBlocks()
         return;
     }
 
-    qDebug() << "FiffRawViewModel::filterAllDataBlocks m_iMaxFilterLength"<<m_iMaxFilterLength;
-    qDebug() << "FiffRawViewModel::filterAllDataBlocks m_filterData.first().m_Type"<<m_filterData.first().m_Type;
+    pData->first = m_pRtFilter->filterDataBlock(pData->first,
+                                                m_iMaxFilterLength,
+                                                m_lFilterChannelList,
+                                                m_filterData);
+}
+
+//=============================================================================================================
+
+void FiffRawViewModel::filterAllDataBlocks()
+{
+    if(!m_bPerformFiltering) {
+        return;
+    }
+    if(m_lFilterChannelList.cols() == 0) {
+        qWarning() << "[FiffRawViewModel::filterAllDataBlocks] No channels to filter specified.";
+        return;
+    }
+    if(m_filterData.isEmpty()) {
+        qWarning() << "[FiffRawViewModel::filterAllDataBlocks] Filter is unspecified.";
+        return;
+    }
 
     m_lFilteredData.clear();
 
     QSharedPointer<QPair<MatrixXd, MatrixXd> > pPair;
     std::list<QSharedPointer<QPair<MatrixXd, MatrixXd>>>::const_iterator itr;
+
     for(int i = 0; i < m_lData.size(); ++i) {
         itr = std::next(m_lData.begin(), i);
-
-        qDebug() << "FiffRawViewModel::filterAllDataBlocks (*itr)->first.cols()"<<(*itr)->first.cols();
-        qDebug() << "FiffRawViewModel::filterAllDataBlocks (*itr)->first.rows()"<<(*itr)->first.rows();
 
         pPair = QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(m_pRtFilter->filterDataBlock((*itr)->first,
                                                                                                           m_iMaxFilterLength,
@@ -653,6 +668,8 @@ void FiffRawViewModel::filterAllDataBlocks()
         m_lFilteredData.push_back(pPair);
         qDebug() << "FiffRawViewModel::filterAllDataBlocks filtering block"<<i;
     }
+
+    emit dataChanged(createIndex(0,0), createIndex(rowCount(), columnCount()));
 }
 
 //=============================================================================================================
@@ -826,9 +843,17 @@ void FiffRawViewModel::postBlockLoad(int result)
 
         m_dataMutex.lock();
         for (int i = 0; i < iNewBlocks; ++i) {
+            //Raw data
             m_lData.push_back(m_lNewData.front());
-            m_lNewData.pop_front();
             m_lData.pop_front();
+
+            //Filter new data in place
+            filterDataBlock(m_lNewData.front());
+            m_lFilteredData.push_back(m_lNewData.front());
+            m_lFilteredData.pop_front();
+
+            //Pop new data, which is now stored in m_lData and m_lFilteredData
+            m_lNewData.pop_front();
         }
         m_dataMutex.unlock();
 
@@ -842,7 +867,6 @@ void FiffRawViewModel::postBlockLoad(int result)
 
     updateEndStartFlags();
     m_bCurrentlyLoading = false;
-    filterAllDataBlocks();
     emit dataChanged(createIndex(0,0), createIndex(rowCount(), columnCount()));
 }
 
