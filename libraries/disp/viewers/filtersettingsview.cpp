@@ -210,7 +210,7 @@ void FilterSettingsView::onFilterParametersChanged(double dValue)
 
     m_pFilterView->setFilterParameters(m_pUi->m_pDoubleSpinBoxFrom->value(),
                                        m_pUi->m_pDoubleSpinBoxTo->value(),
-                                       512,
+                                       m_pFilterView->getMaxFilterTaps(),
                                        1, //Cosine
                                        0.1,
                                        "All");
