@@ -37,10 +37,17 @@
 //=============================================================================================================
 
 #include "averaging.h"
+
 #include <anShared/Management/communicator.h>
-#include <disp/viewers/averagingsettingsview.h>
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <anShared/Model/annotationmodel.h>
+
+#include <disp/viewers/averagingsettingsview.h>
+
+#include <mne/mne_epoch_data_list.h>
+#include <mne/mne_epoch_data.h>
+
+#include <fiff/fiff_evoked.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -63,7 +70,7 @@ Averaging::Averaging()
 : m_pCommu(Q_NULLPTR)
 , m_pFiffRawModel(Q_NULLPTR)
 , m_pAveragingSettingsView(Q_NULLPTR)
-, m_lTriggerList(Q_NULLPTR)
+, m_pTriggerList(Q_NULLPTR)
 , m_pFiffInfo(Q_NULLPTR)
 , m_iNumAve(0)
 , m_iBaselineFrom(0)
@@ -363,10 +370,12 @@ void Averaging::onComputeButtonCLicked(bool bChecked)
 //            this, &Averaging::onNewEvokedSet);
 
     MatrixXi matEvents;
-    MNELIB::MNEEpochDataList pEpochDataList;
-    //float fStartTime = -1.5f, fEndTime = 1.5f;
-    int iType = 0;
     QMap<QString,double> mapReject;
+    MNELIB::MNEEpochDataList pEpochDataList;
+//    FIFFLIB::FiffEvoked FiffEvoked;
+
+    m_pFiffEvoked = QSharedPointer<FIFFLIB::FiffEvoked>(new FIFFLIB::FiffEvoked());
+    int iType = 0;
     mapReject.insert("eog", 300e-06);
 
     FIFFLIB::FiffRawData* pFiffRaw = this->m_pFiffRawModel->getFiffIO()->m_qlistRaw.first().data();
@@ -378,12 +387,13 @@ void Averaging::onComputeButtonCLicked(bool bChecked)
                                                           m_fPostStim,
                                                           iType,
                                                           mapReject);
-}
 
-//=============================================================================================================
+//    FiffEvoked = pEpochDataList.average(pFiffRaw->info,
+//                                            pFiffRaw->first_samp,
+//                                            pFiffRaw->last_samp);
 
-void Averaging::onNewEvokedSet(const FIFFLIB::FiffEvokedSet& evokedSet,
-                               const QStringList& lResponsibleTriggerTypes)
-{
+    *m_pFiffEvoked = pEpochDataList.average(pFiffRaw->info,
+                                            pFiffRaw->first_samp,
+                                            pFiffRaw->last_samp);
 
 }
