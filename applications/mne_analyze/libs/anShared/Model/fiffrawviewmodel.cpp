@@ -190,6 +190,12 @@ void FiffRawViewModel::initFiffData(QIODevice& p_IODevice)
                                                                                        times.block(0, i*m_iSamplesPerBlock, times.rows(), m_iSamplesPerBlock))));
     }
 
+    filterDataBlock(data);
+    for(int i = 0; i < m_iTotalBlockCount; ++i) {
+        m_lFilteredData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data.block(0, i*m_iSamplesPerBlock, data.rows(), m_iSamplesPerBlock),
+                                                                                       times.block(0, i*m_iSamplesPerBlock, times.rows(), m_iSamplesPerBlock))));
+    }
+
     qInfo() << "[FiffRawViewModel::initFiffData] Loaded" << m_lData.size() << "blocks with size"<<data.rows()<<"x"<<m_iSamplesPerBlock;
 
     // need to close the file manually
@@ -578,7 +584,7 @@ void FiffRawViewModel::setFilterActive(bool bState)
     m_bPerformFiltering = bState;
     qDebug () << "FiffRawViewModel::setFilterActive m_bPerformFiltering" << m_bPerformFiltering;
 
-    //Filter all visible data channels at once
+    //Filter all data channels at once
     filterAllDataBlocks();
 
     emit dataChanged(createIndex(0,0), createIndex(rowCount(), columnCount()));
@@ -609,7 +615,7 @@ void FiffRawViewModel::setFilterChannelType(const QString& channelType)
         }
     }
 
-    //Filter all visible data channels at once
+    //Filter all data channels at once
     filterAllDataBlocks();
 }
 
@@ -631,7 +637,7 @@ int FiffRawViewModel::getFilterLength() const
 
 //=============================================================================================================
 
-void FiffRawViewModel::filterDataBlock(QSharedPointer<QPair<MatrixXd, MatrixXd> > pData)
+void FiffRawViewModel::filterDataBlock(MatrixXd& pData)
 {
     if(!m_bPerformFiltering) {
         return;
@@ -647,10 +653,10 @@ void FiffRawViewModel::filterDataBlock(QSharedPointer<QPair<MatrixXd, MatrixXd> 
         return;
     }
 
-    pData->first = m_pRtFilter->filterDataBlock(pData->first,
-                                                m_iMaxFilterLength,
-                                                m_lFilterChannelList,
-                                                m_filterData);
+    pData = m_pRtFilter->filterDataBlock(pData,
+                                         m_iMaxFilterLength,
+                                         m_lFilterChannelList,
+                                         m_filterData);
 }
 
 //=============================================================================================================
@@ -750,11 +756,19 @@ int FiffRawViewModel::loadEarlierBlocks(qint32 numBlocks)
         qWarning() << "[FiffRawViewModel::loadEarlierBlocks] Could not read block ";
         return -1;
     }
+
 //    qDebug() << "[FiffRawViewModel::loadEarlierBlocks] read_raw_segment timer.elapsed()" << timer.elapsed();
 
     for(int i = 0; i < numBlocks; ++i) {
         m_lNewData.push_front(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data.block(0, i*m_iSamplesPerBlock, data.rows(), m_iSamplesPerBlock),
                                                                                            times.block(0, i*m_iSamplesPerBlock, times.rows(), m_iSamplesPerBlock))));
+    }
+
+    // Filter data
+    filterDataBlock(data);
+    for(int i = 0; i < numBlocks; ++i) {
+        m_lFilteredNewData.push_front(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data.block(0, i*m_iSamplesPerBlock, data.rows(), m_iSamplesPerBlock),
+                                                                                                   times.block(0, i*m_iSamplesPerBlock, times.rows(), m_iSamplesPerBlock))));
     }
 
     // adjust fiff cursor
@@ -815,6 +829,13 @@ int FiffRawViewModel::loadLaterBlocks(qint32 numBlocks)
                                                                                           times.block(0, i*m_iSamplesPerBlock, times.rows(), m_iSamplesPerBlock))));
     }
 
+    // Filter data
+    filterDataBlock(data);
+    for(int i = 0; i < numBlocks; ++i) {
+        m_lFilteredNewData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data.block(0, i*m_iSamplesPerBlock, data.rows(), m_iSamplesPerBlock),
+                                                                                                  times.block(0, i*m_iSamplesPerBlock, times.rows(), m_iSamplesPerBlock))));
+    }
+
     // adjust fiff cursor
     m_iFiffCursorBegin += numBlocks * m_iSamplesPerBlock;
 
@@ -846,13 +867,13 @@ void FiffRawViewModel::postBlockLoad(int result)
             m_lData.push_front(m_lNewData.front());            
             m_lData.pop_back(); // @TODO check if this really frees the associated memory
 
-            //Filter new data in place
-            filterDataBlock(m_lNewData.front());
-            m_lFilteredData.push_front(m_lNewData.front());
+            //Filtered data
+            m_lFilteredData.push_front(m_lFilteredNewData.front());
             m_lFilteredData.pop_back();
 
             //Pop new data, which is now stored in m_lData and m_lFilteredData
             m_lNewData.pop_front();
+            m_lFilteredNewData.pop_front();
         }
         m_dataMutex.unlock();
 
@@ -872,13 +893,13 @@ void FiffRawViewModel::postBlockLoad(int result)
             m_lData.push_back(m_lNewData.front());
             m_lData.pop_front();
 
-            //Filter new data in place
-            filterDataBlock(m_lNewData.front());
-            m_lFilteredData.push_back(m_lNewData.front());
+            //Filtered data
+            m_lFilteredData.push_back(m_lFilteredNewData.front());
             m_lFilteredData.pop_front();
 
             //Pop new data, which is now stored in m_lData and m_lFilteredData
             m_lNewData.pop_front();
+            m_lFilteredNewData.pop_front();
         }
         m_dataMutex.unlock();
 

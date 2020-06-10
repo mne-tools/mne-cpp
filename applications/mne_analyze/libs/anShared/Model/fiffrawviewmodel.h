@@ -496,7 +496,7 @@ private:
      * Calculates the filtered version of loaded data
      */
     void filterAllDataBlocks();
-    void filterDataBlock(QSharedPointer<QPair<MatrixXd, MatrixXd> > pData);
+    void filterDataBlock(MatrixXd& pData);
 
     //=========================================================================================================
     /**
