@@ -842,10 +842,17 @@ void FiffRawViewModel::postBlockLoad(int result)
 
         m_dataMutex.lock();
         for (int i = 0; i < iNewBlocks; ++i) {
-            m_lData.push_front(m_lNewData.front());
+            //Raw data
+            m_lData.push_front(m_lNewData.front());            
+            m_lData.pop_back(); // @TODO check if this really frees the associated memory
+
+            //Filter new data in place
+            filterDataBlock(m_lNewData.front());
+            m_lFilteredData.push_front(m_lNewData.front());
+            m_lFilteredData.pop_back();
+
+            //Pop new data, which is now stored in m_lData and m_lFilteredData
             m_lNewData.pop_front();
-            // @TODO check if this really frees the associated memory
-            m_lData.pop_back();
         }
         m_dataMutex.unlock();
 
