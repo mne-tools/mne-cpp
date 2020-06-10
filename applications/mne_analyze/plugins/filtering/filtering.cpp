@@ -67,6 +67,7 @@ using namespace UTILSLIB;
 //=============================================================================================================
 
 Filtering::Filtering()
+: m_pFilterSettingsView(Q_NULLPTR)
 {
 }
 
@@ -101,7 +102,7 @@ void Filtering::unload()
 
 QString Filtering::getName() const
 {
-    return "Filtering";
+    return "Filter";
 }
 
 //=============================================================================================================
@@ -115,28 +116,22 @@ QMenu *Filtering::getMenu()
 
 QDockWidget *Filtering::getControl()
 {
-    FilterSettingsView* pFilterSettingsView = new FilterSettingsView("MNEANALYZE");
+    m_pFilterSettingsView = new FilterSettingsView("MNEANALYZE");
     connect(this, &Filtering::guiModeChanged,
-            pFilterSettingsView, &FilterSettingsView::setGuiMode, Qt::UniqueConnection);
+            m_pFilterSettingsView.data(), &FilterSettingsView::setGuiMode, Qt::UniqueConnection);
 
-    connect(this, &Filtering::samplingFrequencyChanged,
-            pFilterSettingsView->getFilterView().data(), &FilterDesignView::setSamplingRate, Qt::UniqueConnection);
-
-    connect(this, &Filtering::samplingFrequencyChanged,
-            pFilterSettingsView->getFilterView().data(), &FilterDesignView::setMaxFilterTaps, Qt::UniqueConnection);
-
-    connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChannelTypeChanged,
+    connect(m_pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChannelTypeChanged,
             this, &Filtering::setFilterChannelType, Qt::UniqueConnection);
 
-    connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChanged,
+    connect(m_pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChanged,
             this, &Filtering::setFilter, Qt::UniqueConnection);
 
-    connect(pFilterSettingsView, &FilterSettingsView::filterActivationChanged,
+    connect(m_pFilterSettingsView.data(), &FilterSettingsView::filterActivationChanged,
             this, &Filtering::setFilterActive, Qt::UniqueConnection);
 
     QDockWidget* pControlDock = new QDockWidget(getName());
     pControlDock->setAllowedAreas(Qt::RightDockWidgetArea | Qt::LeftDockWidgetArea);
-    pControlDock->setWidget(pFilterSettingsView);
+    pControlDock->setWidget(m_pFilterSettingsView);
     pControlDock->setObjectName(getName());
 
     return pControlDock;
@@ -156,7 +151,13 @@ void Filtering::handleEvent(QSharedPointer<Event> e)
     switch (e->getType()) {
     case SELECTED_MODEL_CHANGED:
         if(QSharedPointer<FiffRawViewModel> pModel = qSharedPointerCast<FiffRawViewModel>(e->getData().value<QSharedPointer<AbstractModel> >())) {
-            emit samplingFrequencyChanged(pModel->getFiffInfo()->sfreq);
+            if(m_pFilterSettingsView) {
+                m_pFilterSettingsView->getFilterView()->setSamplingRate(pModel->getFiffInfo()->sfreq);
+                m_pFilterSettingsView->getFilterView()->setMaxFilterTaps(pModel->getFiffInfo()->sfreq);
+                setFilterChannelType(m_pFilterSettingsView->getFilterView()->getChannelType());
+                setFilter(m_pFilterSettingsView->getFilterView()->getCurrentFilter());
+                setFilterActive(m_pFilterSettingsView->getFilterActive());
+            }
         }
         break;
     default:

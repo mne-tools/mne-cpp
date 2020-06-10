@@ -64,6 +64,10 @@ namespace UTILSLIB{
     class FilterData;
 }
 
+namespace DISPLIB{
+    class FilterSettingsView;
+}
+
 //=============================================================================================================
 // DEFINE NAMESPACE SURFERPLUGIN
 //=============================================================================================================
@@ -133,16 +137,9 @@ private:
      */
     void setFilterActive(bool state);
 
-    QPointer<ANSHAREDLIB::Communicator> m_pCommu;               /**< To broadcst signals */
+    QPointer<ANSHAREDLIB::Communicator>         m_pCommu;               /**< To broadcst signals */
+    QPointer<DISPLIB::FilterSettingsView>       m_pFilterSettingsView;
 
-signals:
-    //=========================================================================================================
-    /**
-     * Signal emmited whenever the sampling frequency changed
-     *
-     * @param [in] fSFreq       the new sampling frequency
-     */
-    void samplingFrequencyChanged(float fSFreq);
 };
 
 //=============================================================================================================
