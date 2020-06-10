@@ -525,6 +525,7 @@ void FiffAnonymizer::censorTag()
         printIfVerbose("Warning: Beware that a subject''s face can be reconstructed from it");
         printIfVerbose("Warning: This software can not anonymize MRI data, at the moment.");
         printIfVerbose("  ");
+        emit mriDataFoundInFile(true);
         break;
     }
     default:

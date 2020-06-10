@@ -71,7 +71,7 @@ SettingsControllerGui::SettingsControllerGui(const QStringList& arguments)
     parseInputs(arguments);
     setupCommunication();
 
-    initializeMenus();
+    initializeOptionsState();
 
     m_pWin->show();
 
@@ -131,8 +131,6 @@ void SettingsControllerGui::setupCommunication()
     QObject::connect(m_pWin.data(),&MainWindow::fileOutChanged,
                      this,&SettingsControllerGui::fileOutChanged);
 
-
-
     QObject::connect(m_pWin.data(),&MainWindow::fileOutChanged,
                      m_pAnonymizer.data(),&FiffAnonymizer::setFileOut);
     QObject::connect(m_pWin.data(),&MainWindow::fileOutChanged,
@@ -149,9 +147,6 @@ void SettingsControllerGui::setupCommunication()
                      m_pAnonymizer.data(),&FiffAnonymizer::setFileOut);
     QObject::connect(m_pWin.data(),&MainWindow::fileOutChanged,
                      m_pAnonymizer.data(),&FiffAnonymizer::setFileOut);
-
-
-
 
     //from model to view
     QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingIdFileVersion,
@@ -203,16 +198,18 @@ void SettingsControllerGui::setupCommunication()
                      m_pWin.data(),&MainWindow::setLineEditProjectPersons);
     QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingProjectComment,
                      m_pWin.data(),&MainWindow::setLineEditProjectComment);
+    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::mriDataFoundInFile,
+                     m_pWin.data(),&MainWindow::setLabelMriDataFoundVisible);
 }
 
-void SettingsControllerGui::initializeMenus()
+void SettingsControllerGui::initializeOptionsState()
 {
     m_pWin->setLineEditInFile(m_fiInFileInfo.absoluteFilePath());
     m_pWin->setLineEditOutFile(m_fiOutFileInfo.absoluteFilePath());
 
     m_pWin->setCheckBoxBruteMode(m_pAnonymizer->getBruteMode());
-    m_pWin->setCheckBoxDeleteInputFileAfter(m_bDeleteInputFileAfter);
-    m_pWin->setCheckBoxAvoidDeleteConfirmation(m_bDeleteInputFileConfirmation);
+//    m_pWin->setCheckBoxDeleteInputFileAfter(m_bDeleteInputFileAfter);
+//    m_pWin->setCheckBoxAvoidDeleteConfirmation(m_bDeleteInputFileConfirmation);
     m_pWin->setMeasurementDate(m_pAnonymizer->getMeasurementDate());
     m_pWin->setCheckBoxMeasurementDateOffset(m_pAnonymizer->getUseMeasurementDayOffset());
     m_pWin->setMeasurementDateOffset(m_pAnonymizer->getMeasurementDayOffset());
