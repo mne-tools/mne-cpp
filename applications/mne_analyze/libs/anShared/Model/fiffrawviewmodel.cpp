@@ -615,18 +615,35 @@ void FiffRawViewModel::setFilterChannelType(const QString& channelType)
 
 //=============================================================================================================
 
+bool FiffRawViewModel::isFilterActive() const
+{
+    return m_bPerformFiltering;
+}
+
+//=============================================================================================================
+
+int FiffRawViewModel::getFilterLength() const
+{
+    if(!m_filterData.isEmpty()) {
+        return m_filterData.first().m_iFilterOrder;
+    }
+}
+
+//=============================================================================================================
+
 void FiffRawViewModel::filterDataBlock(QSharedPointer<QPair<MatrixXd, MatrixXd> > pData)
 {
     if(!m_bPerformFiltering) {
-        qWarning() << "[FiffRawViewModel::filterAllDataBlocks] Filtering is deactivated.";
         return;
     }
+
     if(m_lFilterChannelList.cols() == 0) {
-        qWarning() << "[FiffRawViewModel::filterAllDataBlocks] No channels to filter specified.";
+        qWarning() << "[FiffRawViewModel::filterDataBlock] No channels to filter specified.";
         return;
     }
+
     if(m_filterData.isEmpty()) {
-        qWarning() << "[FiffRawViewModel::filterAllDataBlocks] Filter is unspecified.";
+        qWarning() << "[FiffRawViewModel::filterDataBlock] Filter is unspecified.";
         return;
     }
 
@@ -643,10 +660,12 @@ void FiffRawViewModel::filterAllDataBlocks()
     if(!m_bPerformFiltering) {
         return;
     }
+
     if(m_lFilterChannelList.cols() == 0) {
         qWarning() << "[FiffRawViewModel::filterAllDataBlocks] No channels to filter specified.";
         return;
     }
+
     if(m_filterData.isEmpty()) {
         qWarning() << "[FiffRawViewModel::filterAllDataBlocks] Filter is unspecified.";
         return;
@@ -666,7 +685,6 @@ void FiffRawViewModel::filterAllDataBlocks()
                                                                                                           m_filterData),
                                                                              (*itr)->second));
         m_lFilteredData.push_back(pPair);
-        qDebug() << "FiffRawViewModel::filterAllDataBlocks filtering block"<<i;
     }
 
     emit dataChanged(createIndex(0,0), createIndex(rowCount(), columnCount()));
