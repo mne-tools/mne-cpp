@@ -23,12 +23,10 @@ public:
 
     ~MainWindow() override;
 
-    void setLineEditInFile(const QString&);
-    void setLineEditOutFile(const QString &f);
+    void setLineEditInFile(const QString& s);
+    void setLineEditOutFile(const QString &s);
 
     void setCheckBoxBruteMode(bool b);
-    void setCheckBoxDeleteInputFileAfter(bool b);
-    void setCheckBoxAvoidDeleteConfirmation(bool b);
 
     void setMeasurementDate(const QDateTime& dt);
     void setCheckBoxMeasurementDateOffset(bool o);
@@ -66,6 +64,8 @@ public slots:
     void setLineEditProjectPersons(QString);
     void setLineEditProjectComment(QString);
 
+    void setLabelMriDataFoundVisible(bool);
+
 protected:
     void closeEvent(QCloseEvent *event) override;
 
@@ -73,8 +73,6 @@ signals:
     void fileInChanged(const QString& s) const;
     void fileOutChanged(const QString& s) const;
     void bruteModeChanged(bool b) const;
-    void deleteInputFileChanged(bool b) const;
-    void avoidDeleteConfirmationChanged(bool b) const;
     void measurementDateChanged(const QDateTime& t) const;
     void useMeasurementOffset(bool f) const;
     void measurementDateOffsetChanged(int o) const;
@@ -86,14 +84,11 @@ signals:
 private slots:
 
     void checkboxBruteModeChanged();
-    void checkboxDeleteInputFileChanged();
-    void setCheckBoxAvoidDeleteConfirmationChanged();
     void checkBoxMeasurementDateOffsetStateChanged(int arg1);
     void checkBoxBirthdayDateOffsetStateChanged(int arg1);
 
-    //estos se pueden eliminar al connect signal to signal
-    void lineEditInFileEditingFinished(); //
-    void lineEditOutFileEditingFinished();//
+    void lineEditInFileEditingFinished();
+    void lineEditOutFileEditingFinished();
 
     void dateTimeMeasurementDateDateTimeChanged(const QDateTime &dateTime);
     void spinBoxMeasurementDateOffsetValueChanged(int arg1);
@@ -101,7 +96,8 @@ private slots:
     void spinBoxBirthdayDateOffsetValueChanged(int arg1);
     void lineEditSubjectHisIdEditingFinished();
 
-    void seeExtraInformationClicked();
+    void openInFileDialog();
+    void openOutFileDialog();
 
     void helpButtonClicked();
 
@@ -115,32 +111,9 @@ private:
 
     void idMeasurementDateChanged();
 
-    bool m_bIdFileVersionFound;
-    bool m_bIdMeasurementDateFound;
-    bool m_bIdMacAddressFound;
-    bool m_bFileMeasurementDateFound;
-    bool m_bFileExperimenterFound;
-    bool m_bFileCommentFound;
+    void clearInfo();
 
-    bool m_bSubjectIdFound;
-    bool m_bSubjectFirstNameFound;
-    bool m_bSubjectMiddleNameFound;
-    bool m_bSubjectLastNameFound;
-    bool m_bSubjectBirthdayFound;
-    bool m_bSubjectSexFound;
-    bool m_bSubjectHandFound;
-    bool m_bSubjectWeightFound;
-    bool m_bSubjectHeightFound;
-    bool m_bSubjectCommentFound;
-    bool m_bSubjectHisIdFound;
-
-    bool m_bProjectIdFound;
-    bool m_bProjectAimFound;
-    bool m_bProjectNameFound;
-    bool m_bProjectPersonsFound;
-    bool m_bProjectCommentFound;
-
-    bool m_bHideInfoFields;
+//    bool m_bHideInfoFields;
     Ui::MainWindow* m_pUi;
     SettingsControllerGui* m_pController;
 };
