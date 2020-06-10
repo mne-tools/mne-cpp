@@ -92,15 +92,11 @@ public slots:
     void fileInChanged(const QString& strInFile);
     void fileOutChanged(const QString& strOutFile);
 
-    void anonymizeFile();
-
-protected:
-//    void parseInputs(const QStringList& arguments);
+    void executeAnonymizer();
 
 private:
     void readData();
-    void initializeMenus();
-
+    void initializeOptionsState();
     void setupCommunication();
 
 signals:
