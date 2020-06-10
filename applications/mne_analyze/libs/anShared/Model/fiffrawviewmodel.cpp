@@ -571,9 +571,6 @@ void FiffRawViewModel::setFilter(const QList<FilterData>& filterData)
         }
     }
 
-    m_matOverlap.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxFilterLength);
-    m_matOverlap.setZero();
-
     //Filter all visible data channels at once
     filterAllDataBlocks();
 }
@@ -584,6 +581,9 @@ void FiffRawViewModel::setFilterActive(bool bState)
 {
     m_bPerformFiltering = bState;
     qDebug () << "FiffRawViewModel::setFilterActive m_bPerformFiltering" << m_bPerformFiltering;
+
+    //Filter all visible data channels at once
+    filterAllDataBlocks();
 }
 
 //=============================================================================================================
@@ -611,8 +611,6 @@ void FiffRawViewModel::setFilterChannelType(const QString& channelType)
         }
     }
 
-    std::cout << m_lFilterChannelList;
-
     //Filter all visible data channels at once
     filterAllDataBlocks();
 }
@@ -622,12 +620,22 @@ void FiffRawViewModel::setFilterChannelType(const QString& channelType)
 void FiffRawViewModel::filterAllDataBlocks()
 {
     if(!m_bPerformFiltering) {
+        qWarning() << "[FiffRawViewModel::filterAllDataBlocks] Filtering is deactivated.";
+        return;
+    }
+    if(m_lFilterChannelList.cols() == 0) {
+        qWarning() << "[FiffRawViewModel::filterAllDataBlocks] No channels to filter specified.";
+        return;
+    }
+    if(m_filterData.isEmpty()) {
+        qWarning() << "[FiffRawViewModel::filterAllDataBlocks] Filter is unspecified.";
         return;
     }
 
-    m_lFilteredData.clear();
     qDebug() << "FiffRawViewModel::filterAllDataBlocks m_iMaxFilterLength"<<m_iMaxFilterLength;
     qDebug() << "FiffRawViewModel::filterAllDataBlocks m_filterData.first().m_Type"<<m_filterData.first().m_Type;
+
+    m_lFilteredData.clear();
 
     QSharedPointer<QPair<MatrixXd, MatrixXd> > pPair;
     std::list<QSharedPointer<QPair<MatrixXd, MatrixXd>>>::const_iterator itr;
@@ -636,11 +644,15 @@ void FiffRawViewModel::filterAllDataBlocks()
 
         qDebug() << "FiffRawViewModel::filterAllDataBlocks (*itr)->first.cols()"<<(*itr)->first.cols();
         qDebug() << "FiffRawViewModel::filterAllDataBlocks (*itr)->first.rows()"<<(*itr)->first.rows();
+        qDebug() << "FiffRawViewModel::filterAllDataBlocks (*itr)->second.cols()"<<(*itr)->second.cols();
+        qDebug() << "FiffRawViewModel::filterAllDataBlocks (*itr)->second.rows()"<<(*itr)->second.rows();
 
-        pPair = QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(m_pRtFilter->filterDataBlock((*itr)->first,
-                                                                                                          m_iMaxFilterLength,
-                                                                                                          m_lFilterChannelList,
-                                                                                                          m_filterData),
+        MatrixXd data = m_pRtFilter->filterDataBlock((*itr)->first,
+                                                     m_iMaxFilterLength,
+                                                     m_lFilterChannelList,
+                                                     m_filterData);
+        qDebug() << "FiffRawViewModel::filterAllDataBlocks data";
+        pPair = QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data,
                                                                              (*itr)->second));
         m_lFilteredData.push_back(pPair);
         qDebug() << "FiffRawViewModel::filterAllDataBlocks filtering block"<<i;

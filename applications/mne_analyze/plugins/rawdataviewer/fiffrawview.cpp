@@ -429,21 +429,27 @@ void FiffRawView::updateScrollPosition()
 
 void FiffRawView::setFilter(const FilterData& filterData)
 {
-    m_pModel->setFilter(QList<FilterData>() << filterData);
+    if(m_pModel) {
+        m_pModel->setFilter(QList<FilterData>() << filterData);
+    }
 }
 
 //=============================================================================================================
 
 void FiffRawView::setFilterActive(bool state)
 {
-    m_pModel->setFilterActive(state);
+    if(m_pModel) {
+        m_pModel->setFilterActive(state);
+    }
 }
 
 //=============================================================================================================
 
 void FiffRawView::setFilterChannelType(const QString &channelType)
 {
-    m_pModel->setFilterChannelType(channelType);
+    if(m_pModel) {
+        m_pModel->setFilterChannelType(channelType);
+    }
 }
 
 //=============================================================================================================
