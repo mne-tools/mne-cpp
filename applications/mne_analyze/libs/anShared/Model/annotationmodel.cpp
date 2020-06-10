@@ -578,3 +578,17 @@ void AnnotationModel::appendSelected(int iSelectedIndex)
     m_dataSelectedRows.append(iSelectedIndex);
 //    qDebug() << m_dataSelectedRows;
 }
+
+//=============================================================================================================
+
+MatrixXi AnnotationModel::getAnnotationMatrix()
+{
+    MatrixXi EventDataMatrix;
+    EventDataMatrix.resize(getNumberOfAnnotations(), 3);
+
+    for (int i = 0; i < getNumberOfAnnotations(); i++){
+        EventDataMatrix(i,0) = getAnnotation(i);
+        //EventDataMatrix(i,1) = ;
+        //EventDataMatrix(i,2) = ;
+    }
+}

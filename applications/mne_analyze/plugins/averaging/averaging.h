@@ -44,9 +44,6 @@
 
 #include <anShared/Interfaces/IPlugin.h>
 
-#include <mne/mne_epoch_data_list.h>
-#include <mne/mne_epoch_data.h>
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -66,6 +63,10 @@ namespace ANSHAREDLIB {
 
 namespace DISPLIB {
     class AveragingSettingsView;
+}
+
+namespace FIFFLIB {
+    class FiffEvoked;
 }
 
 //=============================================================================================================
@@ -186,25 +187,16 @@ private:
     //=========================================================================================================
     void onComputeButtonCLicked(bool bChecked);
 
-    //=========================================================================================================
-    /**
-     * Append new FiffEvokedSet to the buffer
-     *
-     * @param[in] evokedSet                  The new FiffEvokedSet
-     * @param[in] lResponsibleTriggerTypes   List of all trigger types which lead to the recent emit of a new evoked set.
-     */
-    void onNewEvokedSet(const FIFFLIB::FiffEvokedSet& evokedSet,
-                        const QStringList &lResponsibleTriggerTypes);
-
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals */
 
     QSharedPointer<ANSHAREDLIB::FiffRawViewModel>           m_pFiffRawModel;            /**< Pointer to currently loaded FiffRawView Model */
-
+    QSharedPointer<QList<QPair<int,double>>>                m_pTriggerList;
+    QSharedPointer<FIFFLIB::FiffEvoked>                     m_pFiffEvoked;
     QSharedPointer<Ave>                                     m_pAve;                     /**< Averaging Object */
 
     DISPLIB::AveragingSettingsView*                         m_pAveragingSettingsView;
 
-    QSharedPointer<QList<QPair<int,double>>>                m_lTriggerList;
+
 
     FIFFLIB::FiffInfo::SPtr                                 m_pFiffInfo;
 
