@@ -136,6 +136,14 @@ public:
 
     //=========================================================================================================
     /**
+     * Gets the max number of allowed filter taps depending on the current block size of the incoming data.
+     *
+     * @return The number of max allowed filter taps
+     */
+    int getMaxFilterTaps();
+
+    //=========================================================================================================
+    /**
      * Sets the new samplingRate.
      *
      * @param[in] dSamplingRate the new sampling rate

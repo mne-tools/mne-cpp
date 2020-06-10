@@ -168,6 +168,13 @@ void FilterDesignView::setMaxFilterTaps(int iMaxNumberFilterTaps)
 
 //=============================================================================================================
 
+int FilterDesignView::getMaxFilterTaps()
+{
+    return m_pUi->m_spinBox_filterTaps->maximum();
+}
+
+//=============================================================================================================
+
 void FilterDesignView::setSamplingRate(double dSamplingRate)
 {
     m_dSFreq = dSamplingRate;
