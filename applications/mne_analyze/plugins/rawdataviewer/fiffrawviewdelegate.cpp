@@ -45,6 +45,8 @@
 #include <anShared/Model/annotationmodel.h>
 #include <anShared/Utils/metatypes.h>
 
+#include <utils/filterTools/filterdata.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -212,6 +214,12 @@ void FiffRawViewDelegate::createPlotPath(const QStyleOptionViewItem &option,
 
     const FiffRawViewModel* t_pModel = static_cast<const FiffRawViewModel*>(index.model());
 
+    // Adjust for the temporal filter delay
+    int iStartIdx = 0;
+    if(t_pModel->isFilterActive()) {
+        iStartIdx = t_pModel->getFilterLength()/2;
+    }
+
     qint32 kind = t_pModel->getKind(index.row());
     double dMaxValue = 1.0e-10;
 
@@ -273,8 +281,8 @@ void FiffRawViewDelegate::createPlotPath(const QStyleOptionViewItem &option,
         iPaintStep = 1;
     }
 
-    for(unsigned int j = 0; j < data.size(); j = j + iPaintStep) {
-        dValue = data[j] * dScaleY;
+    for(unsigned int j = 0; j < data.size()-iStartIdx; j = j + iPaintStep) {
+        dValue = data[iStartIdx+j] * dScaleY;
 
         //Reverse direction -> plot the right way
         newY = y_base - dValue;

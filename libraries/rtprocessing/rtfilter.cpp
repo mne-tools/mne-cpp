@@ -87,7 +87,7 @@ MatrixXd RtFilter::filterDataBlock(const MatrixXd& matDataIn,
                                    const RowVectorXi &vecPicks,
                                    const QList<FilterData>& lFilterData)
 {
-    //Initialise the overlay matrix
+    //Initialise the overlap matrix
     if(m_matOverlap.cols() != iOrder || m_matOverlap.rows() < matDataIn.rows()) {
         m_matOverlap.resize(matDataIn.rows(), iOrder);
         m_matOverlap.setZero();
@@ -136,7 +136,6 @@ MatrixXd RtFilter::filterDataBlock(const MatrixXd& matDataIn,
             tempData.head(iOrder) += m_matOverlap.row(timeData.at(r).iRow);
 
             //Write the newly calculated filtered data to the filter data matrix.
-            //Keep in mind that the current block also effect last part of the last block (begin at dataIndex-iFilterDelay).
             int start = 0;
             matDataOut.row(timeData.at(r).iRow).segment(start,iFilteredNumberCols-iOrder) = tempData.head(iFilteredNumberCols-iOrder);
 

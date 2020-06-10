@@ -87,9 +87,9 @@ FilterSettingsView::FilterSettingsView(const QString& sSettingsPath,
             this, &FilterSettingsView::onFilterActivationChanged);
     connect(m_pUi->m_pPushButtonShowFilterOptions, &QPushButton::clicked,
             this, &FilterSettingsView::onShowFilterView);
-    connect(m_pUi->m_pDoubleSpinBoxFrom, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+    connect(m_pUi->m_pDoubleSpinBoxFrom, &QDoubleSpinBox::editingFinished,
             this, &FilterSettingsView::onFilterParametersChanged);
-    connect(m_pUi->m_pDoubleSpinBoxTo, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+    connect(m_pUi->m_pDoubleSpinBoxTo, &QDoubleSpinBox::editingFinished,
             this, &FilterSettingsView::onFilterParametersChanged);
 }
 
@@ -203,9 +203,8 @@ void FilterSettingsView::onFilterActivationChanged()
 
 //=============================================================================================================
 
-void FilterSettingsView::onFilterParametersChanged(double dValue)
+void FilterSettingsView::onFilterParametersChanged()
 {
-    Q_UNUSED(dValue)
     m_pUi->m_pDoubleSpinBoxFrom->setMaximum(m_pUi->m_pDoubleSpinBoxTo->value());
 
     m_pFilterView->setFilterParameters(m_pUi->m_pDoubleSpinBoxFrom->value(),

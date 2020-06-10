@@ -164,7 +164,7 @@ protected:
      *
      * @param[in] dValue        the changed value. Unused.
      */
-    void onFilterParametersChanged(double dValue);
+    void onFilterParametersChanged();
 
     QString                                 m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
 
