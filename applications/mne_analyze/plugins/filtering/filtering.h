@@ -60,6 +60,10 @@ namespace ANSHAREDLIB {
     class Communicator;
 }
 
+namespace UTILSLIB{
+    class FilterData;
+}
+
 //=============================================================================================================
 // DEFINE NAMESPACE SURFERPLUGIN
 //=============================================================================================================
@@ -104,8 +108,32 @@ public:
     virtual void handleEvent(QSharedPointer<ANSHAREDLIB::Event> e) override;
     virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
 
-private:
-    QPointer<ANSHAREDLIB::Communicator> m_pCommu;
+private:    
+    //=========================================================================================================
+    /**
+     * Sets the type of channel which are to be filtered
+     *
+     * @param[in] sType    The channel type which is to be filtered (EEG, MEG, All)
+     */
+    void setFilterChannelType(const QString& sType);
+
+    //=========================================================================================================
+    /**
+     * Filter parameters changed
+     *
+     * @param[in] filterData    The currently active filter
+     */
+    void setFilter(const UTILSLIB::FilterData& filterData);
+
+    //=========================================================================================================
+    /**
+     * Filter avtivated
+     *
+     * @param[in] state    The filter on/off flag
+     */
+    void setFilterActive(bool state);
+
+    QPointer<ANSHAREDLIB::Communicator> m_pCommu;               /**< To broadcst signals */
 };
 
 //=============================================================================================================

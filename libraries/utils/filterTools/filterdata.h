@@ -233,4 +233,9 @@ Q_DECLARE_METATYPE(UTILSLIB::FilterData::FilterType)
 Q_DECLARE_METATYPE(UTILSLIB::FilterData::DesignMethod)
 #endif
 
+#ifndef metatype_filterdata
+#define metatype_filterdata
+Q_DECLARE_METATYPE(UTILSLIB::FilterData)
+#endif
+
 #endif // FILTERDATA_H
