@@ -214,7 +214,7 @@ void FilterSettingsView::onFilterParametersChanged()
                                        m_pFilterView->getMaxFilterTaps(),
                                        1, //Cosine
                                        0.1,
-                                       "All");
+                                       m_pFilterView->getChannelType());
 
     saveSettings();
 }
