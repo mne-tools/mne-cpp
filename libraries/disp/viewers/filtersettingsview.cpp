@@ -91,6 +91,8 @@ FilterSettingsView::FilterSettingsView(const QString& sSettingsPath,
             this, &FilterSettingsView::onFilterParametersChanged);
     connect(m_pUi->m_pDoubleSpinBoxTo, &QDoubleSpinBox::editingFinished,
             this, &FilterSettingsView::onFilterParametersChanged);
+    connect(m_pUi->m_pcomboBoxChannelTypes, &QComboBox::currentTextChanged,
+            this, &FilterSettingsView::onFilterChannelTypeChanged);
 }
 
 //=============================================================================================================
@@ -215,4 +217,11 @@ void FilterSettingsView::onFilterParametersChanged()
                                        "All");
 
     saveSettings();
+}
+
+//=============================================================================================================
+
+void FilterSettingsView::onFilterChannelTypeChanged(const QString& sType)
+{
+    m_pFilterView->setChannelType(sType);
 }

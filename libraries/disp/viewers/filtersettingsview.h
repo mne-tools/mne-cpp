@@ -161,10 +161,16 @@ protected:
     //=========================================================================================================
     /**
      * This function is called whenever the filter parameters changed
-     *
-     * @param[in] dValue        the changed value. Unused.
      */
     void onFilterParametersChanged();
+
+    //=========================================================================================================
+    /**
+     * This function is called whenever the channel type changed
+     *
+     * @param[in] sType        the channel type
+     */
+    void onFilterChannelTypeChanged(const QString& sType);
 
     QString                                 m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
 
