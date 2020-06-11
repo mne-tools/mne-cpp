@@ -38,6 +38,8 @@ public:
 
     void setSubjectHis(const QString& h);
 
+    void setDefaultStateExtraInfo();
+
 public slots:
     void showMessage(QString s);
 
@@ -67,9 +69,6 @@ public slots:
     void setLineEditProjectComment(QString);
 
     void setLabelMriDataFoundVisible(bool);
-
-    void setDefaultStateExtraInfo();
-
 
 
 protected:
