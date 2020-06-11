@@ -203,26 +203,28 @@ void MainWindow::setupConnections()
     QObject::connect(m_pUi->lineEditOutFile,&QLineEdit::editingFinished,
                      this,&MainWindow::lineEditOutFileEditingFinished);
 
-    QObject::connect(m_pUi->checkBoxBruteMode,&QCheckBox::stateChanged,
-                     this,&MainWindow::checkboxBruteModeChanged);
-
     QObject::connect(m_pUi->openInFileWindowButton,&QToolButton::clicked,
                      this,&MainWindow::openInFileDialog);
     QObject::connect(m_pUi->openOutFileWindowButton,&QToolButton::clicked,
                      this,&MainWindow::openOutFileDialog);
 
+    QObject::connect(m_pUi->checkBoxBruteMode,&QCheckBox::stateChanged,
+                     this,&MainWindow::checkboxBruteModeChanged);
+
     QObject::connect(m_pUi->checkBoxMeasurementDateOffset,&QCheckBox::stateChanged,
                      this,&MainWindow::checkBoxMeasurementDateOffsetStateChanged);
-    QObject::connect(m_pUi->checkBoxBirthdayDateOffset,&QCheckBox::stateChanged,
-                     this,&MainWindow::checkBoxBirthdayDateOffsetStateChanged);
-    QObject::connect(m_pUi->dateTimeMeasurementDate,&QDateTimeEdit::dateTimeChanged,
-                     this,&MainWindow::dateTimeMeasurementDateDateTimeChanged);
     QObject::connect(m_pUi->spinBoxMeasurementDateOffset,QOverload<int>::of(&QSpinBox::valueChanged),
                      this,&MainWindow::spinBoxMeasurementDateOffsetValueChanged);
+    QObject::connect(m_pUi->dateTimeMeasurementDate,&QDateTimeEdit::dateTimeChanged,
+                     this,&MainWindow::dateTimeMeasurementDateDateTimeChanged);
+
+    QObject::connect(m_pUi->checkBoxBirthdayDateOffset,&QCheckBox::stateChanged,
+                     this,&MainWindow::checkBoxBirthdayDateOffsetStateChanged);
     QObject::connect(m_pUi->dateTimeBirthdayDate,&QDateTimeEdit::dateTimeChanged,
                      this,&MainWindow::dateTimeBirthdayDateDateTimeChanged);
     QObject::connect(m_pUi->spinBoxBirthdayDateOffset,QOverload<int>::of(&QSpinBox::valueChanged),
                      this,&MainWindow::spinBoxBirthdayDateOffsetValueChanged);
+
     QObject::connect(m_pUi->lineEditSubjectHisId,&QLineEdit::editingFinished,
                      this,&MainWindow::lineEditSubjectHisIdEditingFinished);
 }
