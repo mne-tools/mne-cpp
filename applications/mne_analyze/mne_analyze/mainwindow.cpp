@@ -434,8 +434,10 @@ void MainWindow::createPluginViews(QSharedPointer<PluginManager> pPluginManager)
             MultiViewWindow* pWindow = Q_NULLPTR;
 
             if(sCurPluginName == "RawDataViewer") {
+                qDebug() << "Bottom";
                 pWindow = m_pMultiView->addWidgetBottom(pView, sCurPluginName);
             } else {
+                qDebug() << "Top";
                 pWindow = m_pMultiView->addWidgetTop(pView, sCurPluginName);
             }
 

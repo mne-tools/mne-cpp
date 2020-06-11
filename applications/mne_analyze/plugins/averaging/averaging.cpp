@@ -138,22 +138,37 @@ QMenu *Averaging::getMenu()
 QWidget *Averaging::getView()
 {
     qDebug() << "[Averaging::getView]";
-//    m_pButterflyView = new DISPLIB::ButterflyView();
-//    m_pAverageLayoutView = new DISPLIB::AverageLayoutView();
 
-//    QTabWidget* pTabView = new QTabWidget();
+    //return Q_NULLPTR;
+    m_pButterflyView = new DISPLIB::ButterflyView();
+    m_pAverageLayoutView = new DISPLIB::AverageLayoutView();
 
-//    pTabView->addTab(m_pButterflyView, "Butterfly View");
-//    pTabView->addTab(m_pAverageLayoutView, "2D Layout");
+    QTabWidget* pTabView = new QTabWidget();
 
 //    return m_pButterflyView;
 
+    pTabView->addTab(m_pButterflyView, "Butterfly View");
+    pTabView->addTab(m_pAverageLayoutView, "2D Layout View");
+
     QWidget* testWidget = new QWidget();
+    QVBoxLayout* testLayout = new QVBoxLayout();
+    //QLabel* testLabel = new QLabel("Test Test");
+
+    testLayout->addWidget(pTabView);
+    testWidget->setLayout(testLayout);
+
+//    testLayout->addWidget(m_pButterflyView);
+//    testWidget->setLayout(testLayout);
+
     qDebug() << "Created Widget";
 
-//    return testWidget;
+    testWidget->setMinimumSize(256, 256);
+    testWidget->setFocusPolicy(Qt::TabFocus);
+    testWidget->setAttribute(Qt::WA_DeleteOnClose, false);
 
-    return Q_NULLPTR;
+    return testWidget;
+
+//    return Q_NULLPTR;
 }
 
 //=============================================================================================================
@@ -386,7 +401,7 @@ void Averaging::onResetAverage(bool state)
 void Averaging::onComputeButtonClicked(bool bChecked)
 {
     qDebug() << "[Averaging::onComputeButtonCLicked]";
-//    Q_UNUSED(bChecked);
+    Q_UNUSED(bChecked);
 //    m_lTriggerList = QSharedPointer<QList<QPair<int,double>>>(new QList<QPair<int,double>>);
 
 //    for (int i = 0; i < m_pFiffRawModel->getTimeListSize(); i++){
