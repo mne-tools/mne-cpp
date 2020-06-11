@@ -381,6 +381,10 @@ public:
      */
     QString getSubjectHisID();
 
+    bool isFileInSet() const;
+
+    bool isFileOutSet() const;
+
 private:
     //=========================================================================================================
     /**

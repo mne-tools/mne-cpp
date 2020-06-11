@@ -869,3 +869,12 @@ bool FiffAnonymizer::getUseSubjectBirthdayOffset()
     return m_bUseSubjectBirthdayOffset;
 }
 
+bool FiffAnonymizer::isFileInSet() const
+{
+    return m_bFileInSet;
+}
+
+bool FiffAnonymizer::isFileOutSet() const
+{
+    return m_bFileOutSet;
+}
