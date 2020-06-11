@@ -102,7 +102,7 @@ void FilterPlotScene::updateFilter(const FilterData& operatorFilter,
     plotFilterFrequencyResponse();
 
     //Plot the magnitude diagram
-    plotMagnitudeDiagram(samplingFreq, operatorFilter.m_sName);
+    plotMagnitudeDiagram(samplingFreq, operatorFilter.m_sFilterName);
 }
 
 //=============================================================================================================

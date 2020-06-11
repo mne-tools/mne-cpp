@@ -118,7 +118,7 @@ void TestFiltering::initTestCase()
     QFile t_fileOut(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/rtfilter_filterdata_out_raw.fif");
 
     // Filter in Python is created with following function: mne.filter.design_mne_c_filter(raw.info['sfreq'], 5, 10, 1, 1)
-    // This will create a filter with with 8193 elements/taps/Order. In iOrder to be concise with the MNE-CPP implementation
+    // This will create a filter with with 8193 elements/taps/Order. In order to be concise with the MNE-CPP implementation
     // the filter is cut to the Order used in mne-cpp (1024, see below).//
     // The actual filtering was performed with the function: mne.filter._overlap_add_filter(dataIn, filter_python, phase = 'linear')
     QFile t_fileRef(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/ref_rtfilter_filterdata_raw.fif");
@@ -167,7 +167,16 @@ void TestFiltering::initTestCase()
 
     // Filtering
     printf("Filtering...");
-    mFirstFiltered = rtFilter.filterData(mFirstInData, type, dCenterfreq, dBandwidth, dTransition, dSFreq, vPicks);
+    mFirstFiltered = rtFilter.filterData(mFirstInData,
+                                         type,
+                                         dCenterfreq,
+                                         dBandwidth,
+                                         dTransition,
+                                         dSFreq,
+                                         1024,
+                                         4096,
+                                         UTILSLIB::FilterData::Cosine,
+                                         vPicks);
     printf("[done]\n");
 
     // Writing

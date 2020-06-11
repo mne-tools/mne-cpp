@@ -1115,7 +1115,7 @@ void RtFiffRawViewModel::filterDataBlock()
     fftLength = pow(2, exp) < 512 ? 512 : pow(2, exp);
 
     for(int i = 0; i<m_filterKernel.size(); ++i) {
-        FilterData tempFilter(m_filterKernel.at(i).m_sName,
+        FilterData tempFilter(m_filterKernel.at(i).m_sFilterName,
                               m_filterKernel.at(i).m_Type,
                               m_filterKernel.at(i).m_iFilterOrder,
                               m_filterKernel.at(i).m_dCenterFreq,
