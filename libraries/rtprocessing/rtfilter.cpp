@@ -41,6 +41,8 @@
 #include <Eigen/Dense>
 #include <Eigen/Core>
 
+#include <iostream>
+
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -84,11 +86,120 @@ void RtFilter::filterChannel(RtFilter::RtFilterData &channelDataTime)
 
 //=============================================================================================================
 
+MatrixXd RtFilter::filterData(const MatrixXd& matDataIn,
+                              FilterData::FilterType type,
+                              double dCenterfreq,
+                              double bandwidth,
+                              double dTransition,
+                              double dSFreq,
+                              int iOrder,
+                              int iFftLength,
+                              FilterData::DesignMethod designMethod,
+                              const RowVectorXi& vecPicks,
+                              bool bUseThreads)
+{
+    // Check for size of data
+    if (matDataIn.cols() < iOrder){
+        qDebug() << QString("[RtFilter::filterData] Filter length is bigger than data length.");
+    }
+
+    // Normalize cut off frequencies to nyquist
+    dCenterfreq = dCenterfreq/(dSFreq/2.0);
+    bandwidth = bandwidth/(dSFreq/2.0);
+    dTransition = dTransition/(dSFreq/2.0);
+
+    // create filter
+    FilterData filter = FilterData("filter_kernel",
+                                   type,
+                                   iOrder,
+                                   dCenterfreq,
+                                   bandwidth,
+                                   dTransition,
+                                   dSFreq,
+                                   iFftLength,
+                                   designMethod);
+
+    return filterData(matDataIn,
+                      QList<FilterData>() << filter,
+                      vecPicks,
+                      bUseThreads);
+
+}
+
+//=============================================================================================================
+
+MatrixXd RtFilter::filterData(const MatrixXd& matDataIn,
+                              const QList<FilterData>& lFilterData,
+                              const RowVectorXi& vecPicks,
+                              bool bUseThreads)
+{
+    // create output matrix with size of inputmatrix and temporal input matrix with size of pick
+    MatrixXd matDataOut = matDataIn;
+    MatrixXd sliceFiltered;
+
+    if(lFilterData.isEmpty()) {
+        return matDataOut;
+    }
+
+    int iOrder = lFilterData.first().m_iFilterOrder;
+    for(int i = 0; i < lFilterData.size(); ++i) {
+        if(lFilterData.at(i).m_iFilterOrder > iOrder) {
+            iOrder = lFilterData.at(i).m_iFilterOrder;
+        }
+    }
+
+    int iFFTLength = lFilterData.first().m_iFFTlength;
+    for(int i = 0; i < lFilterData.size(); ++i) {
+        if(lFilterData.at(i).m_iFFTlength > iFFTLength) {
+            iFFTLength = lFilterData.at(i).m_iFFTlength;
+        }
+    }
+
+    std::cout << "RtFilter::filterData iFFTLength" << iFFTLength << std::endl;
+    std::cout << "RtFilter::filterData iOrder" << iOrder << std::endl;
+
+    // Check for size of data
+    if(matDataIn.cols() < iOrder){
+        qDebug() << QString("[RtFilter::filterData] Filter length is bigger than data length.");
+    }
+
+    // slice input data into data junks with proper length for fft
+    int iSize = iFFTLength - iOrder;
+
+    if(matDataIn.cols() > iSize) {
+        int from = 0;
+        int numSlices = ceil(float(matDataIn.cols())/float(iSize)); //calculate number of data slices
+
+        for (int i = 0; i<numSlices; i++) {
+            if(i == numSlices-1) {
+                //catch the last one that might be shorter then original size
+                iSize = matDataIn.cols() - (iSize * (numSlices -1));
+            }
+            sliceFiltered = filterDataBlock(matDataIn.block(0,from,matDataIn.rows(),iSize),
+                                            vecPicks,
+                                            lFilterData,
+                                            bUseThreads);
+            matDataOut.block(0,from,matDataIn.rows(),iSize) = sliceFiltered;
+            from += iSize;
+        }
+    } else {
+        matDataOut = filterDataBlock(matDataIn,
+                                     vecPicks,
+                                     lFilterData,
+                                     bUseThreads);
+    }
+
+    return matDataOut;
+}
+
+//=============================================================================================================
+
 MatrixXd RtFilter::filterDataBlock(const MatrixXd& matDataIn,
-                                   const RowVectorXi &vecPicks,
+                                   const RowVectorXi& vecPicks,
                                    const QList<FilterData>& lFilterData,
                                    bool bUseThreads)
 {
+    std::cout << "RtFilter::filterDataBlock 0" << std::endl;
     //Copy input data
     MatrixXd matDataOut = matDataIn;
 
@@ -102,17 +213,20 @@ MatrixXd RtFilter::filterDataBlock(const MatrixXd& matDataIn,
             iOrder = lFilterData.at(i).m_iFilterOrder;
         }
     }
+    std::cout << "RtFilter::filterDataBlock 1" << std::endl;
 
     //Initialise the overlap matrix
     if(m_matOverlap.cols() != iOrder || m_matOverlap.rows() < matDataIn.rows()) {
         m_matOverlap.resize(matDataIn.rows(), iOrder);
         m_matOverlap.setZero();
     }
+    std::cout << "RtFilter::filterDataBlock 2" << std::endl;
 
     if(m_matDelay.cols() != iOrder/2 || m_matOverlap.rows() < matDataIn.rows()) {
         m_matDelay.resize(matDataIn.rows(), iOrder/2);
         m_matDelay.setZero();
     }
+    std::cout << "RtFilter::filterDataBlock 3" << std::endl;
 
     //Do the concurrent filtering
     if(vecPicks.cols() > 0) {
@@ -128,10 +242,20 @@ MatrixXd RtFilter::filterDataBlock(const MatrixXd& matDataIn,
             timeData.append(data);
         }
 
+        std::cout << "RtFilter::filterDataBlock 4" << std::endl;
+        std::cout << "matDataIn.cols()" << matDataIn.cols()<< std::endl;
+        std::cout << "matDataIn.rows()" << matDataIn.rows()<< std::endl;
+        std::cout << "matDataOut.cols()" << matDataOut.cols()<< std::endl;
+        std::cout << "matDataOut.rows()" << matDataOut.rows()<< std::endl;
+        std::cout << "m_matDelay.cols()" << m_matDelay.cols()<< std::endl;
+        std::cout << "m_matDelay.rows()" << m_matDelay.rows()<< std::endl;
+
         // Copy in data from last data block. This is necessary in order to also delay channels which are not filtered.
         matDataOut.block(0, iOrder/2, matDataIn.rows(), matDataOut.cols()-iOrder/2) = matDataIn.block(0, 0, matDataIn.rows(), matDataOut.cols()-iOrder/2);
+        std::cout << "RtFilter::filterDataBlock 4.0" << std::endl;
         matDataOut.block(0, 0, matDataIn.rows(), iOrder/2) = m_matDelay;
 
+        std::cout << "RtFilter::filterDataBlock 4.1" << std::endl;
         if(bUseThreads) {
             QFuture<void> future = QtConcurrent::map(timeData,
                                                      filterChannel);
@@ -143,6 +267,7 @@ MatrixXd RtFilter::filterDataBlock(const MatrixXd& matDataIn,
             }
         }
 
+        std::cout << "RtFilter::filterDataBlock 5" << std::endl;
         //Do the overlap add method and store in matDataOut
         int iFilteredNumberCols = timeData.at(0).vecData.cols();
         RowVectorXd tempData;
@@ -162,81 +287,17 @@ MatrixXd RtFilter::filterDataBlock(const MatrixXd& matDataIn,
             m_matOverlap.row(timeData.at(r).iRow) = timeData.at(r).vecData.tail(iOrder);
         }
 
+        std::cout << "RtFilter::filterDataBlock 6" << std::endl;
         if(matDataIn.cols() >= iOrder/2) {
             m_matDelay = matDataIn.block(0, matDataIn.cols()-iOrder/2, matDataIn.rows(), iOrder/2);
         } else {
             qWarning() << "[RtFilter::filterDataBlock] Half of filter length is larger than data size. Not filling m_matDelay for next step.";
         }
+        std::cout << "RtFilter::filterDataBlock 7" << std::endl;
     } else {
         qWarning() << "[RtFilter::filterDataBlock] Nubmer of picked channels is zero.";
     }
+    std::cout << "RtFilter::filterDataBlock 8" << std::endl;
 
-    return matDataOut;
-}
-
-//=============================================================================================================
-
-MatrixXd RtFilter::filterData(const MatrixXd& matDataIn,
-                              FilterData::FilterType type,
-                              double dCenterfreq,
-                              double bandwidth,
-                              double dTransition,
-                              double dSFreq,
-                              const RowVectorXi& vecPicks,
-                              int iOrder,
-                              qint32 iFftLength,
-                              FilterData::DesignMethod designMethod)
-{
-    // Check for size of data
-    if (matDataIn.cols() < iOrder){
-        qDebug() << QString("[RtFilter::filterData] Filter length is bigger than data length.");
-    }
-
-    // Normalize cut off frequencies to nyquist
-    dCenterfreq = dCenterfreq/(dSFreq/2.0);
-    bandwidth = bandwidth/(dSFreq/2.0);
-    dTransition = dTransition/(dSFreq/2.0);
-
-    // create output matrix with size of inputmatrix and temporal input matrix with size of pick
-    MatrixXd matDataOut = matDataIn;
-    MatrixXd sliceFiltered;
-
-    // create filter
-    FilterData filter = FilterData("rt_filter",
-                                   type,
-                                   iOrder,
-                                   dCenterfreq,
-                                   bandwidth,
-                                   dTransition,
-                                   dSFreq,
-                                   iFftLength,
-                                   designMethod);
-
-    QList<FilterData> filterList;
-    filterList << filter;
-
-    // slice input data into data junks with proper length for fft
-    int iSize = iFftLength-iOrder;
-
-    if(matDataIn.cols() > iSize) {
-        int from = 0;
-        int numSlices = ceil(float(matDataIn.cols())/float(iSize)); //calculate number of data slices
-
-        for (int i = 0; i<numSlices; i++) {
-            if(i == numSlices-1) {
-                //catch the last one that might be shorter then original size
-                iSize = matDataIn.cols() - (iSize * (numSlices -1));
-            }
-            sliceFiltered = filterDataBlock(matDataIn.block(0,from,matDataIn.rows(),iSize),
-                                            vecPicks,
-                                            filterList);
-            matDataOut.block(0,from,matDataIn.rows(),iSize) = sliceFiltered;
-            from += iSize;
-        }
-    } else {
-        matDataOut = filterDataBlock(matDataIn,
-                                     vecPicks,
-                                     filterList);
-    }
     return matDataOut;
 }

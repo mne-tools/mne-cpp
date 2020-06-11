@@ -141,6 +141,9 @@ int main(int argc, char *argv[])
                                        dBandwidth,
                                        dTransition,
                                        sFreq,
+                                       1024,
+                                       4096,
+                                       UTILSLIB::FilterData::Cosine,
                                        picks);
     printf("[done]\n");
 

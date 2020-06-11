@@ -76,7 +76,7 @@ FilterData::FilterData()
 : m_Type(UNKNOWN)
 , m_iFilterOrder(80)
 , m_iFFTlength(512)
-, m_sName("Unknown")
+, m_sFilterName("Unknown")
 , m_dParksWidth(0.1)
 , m_designMethod(External)
 , m_dCenterFreq(0.5)
@@ -90,7 +90,7 @@ FilterData::FilterData()
 
 //=============================================================================================================
 
-FilterData::FilterData(QString unique_name,
+FilterData::FilterData(const QString& sFilterName,
                        FilterType type,
                        int order,
                        double centerfreq,
@@ -107,7 +107,7 @@ FilterData::FilterData(QString unique_name,
 , m_dParksWidth(parkswidth)
 , m_iFilterOrder(order)
 , m_iFFTlength(fftlength)
-, m_sName(unique_name)
+, m_sFilterName(sFilterName)
 {
     if(order < 9) {
        qWarning() << "[FilterData::FilterData] Less than 9 taps were provided. Setting number of taps to 9.";
@@ -226,7 +226,9 @@ void FilterData::fftTransformCoeffs()
 
 //=============================================================================================================
 
-RowVectorXd FilterData::applyConvFilter(const RowVectorXd& data, bool keepOverhead, CompensateEdgeEffects compensateEdgeEffects) const
+RowVectorXd FilterData::applyConvFilter(const RowVectorXd& data,
+                                        bool keepOverhead,
+                                        CompensateEdgeEffects compensateEdgeEffects) const
 {
     if(data.cols()<m_dCoeffA.cols() && compensateEdgeEffects==MirrorData){
         std::cout << QString("Error in FilterData: Number of filter taps(%1) bigger then data size(%2). Not enough data to perform mirroring!").arg(m_dCoeffA.cols()).arg(data.cols()).toLocal8Bit().data() << std::endl;
@@ -254,7 +256,7 @@ RowVectorXd FilterData::applyConvFilter(const RowVectorXd& data, bool keepOverhe
     }
 
     //Do the convolution
-    for(int i=m_dCoeffA.cols(); i<t_filteredTime.cols(); i++)
+    for(int i = m_dCoeffA.cols(); i < t_filteredTime.cols(); i++)
         t_filteredTime(i-m_dCoeffA.cols()) = t_dataZeroPad.segment(i-m_dCoeffA.cols(),m_dCoeffA.cols()) * m_dCoeffA.transpose();
 
     //Return filtered data
@@ -266,19 +268,21 @@ RowVectorXd FilterData::applyConvFilter(const RowVectorXd& data, bool keepOverhe
 
 //=============================================================================================================
 
-RowVectorXd FilterData::applyFFTFilter(const RowVectorXd& data, bool keepOverhead, CompensateEdgeEffects compensateEdgeEffects) const
+RowVectorXd FilterData::applyFFTFilter(const RowVectorXd& data,
+                                       bool keepOverhead,
+                                       CompensateEdgeEffects compensateEdgeEffects) const
 {
     #ifdef EIGEN_FFTW_DEFAULT
         fftw_make_planner_thread_safe();
     #endif
 
-    if(data.cols()<m_dCoeffA.cols()/2 && compensateEdgeEffects==MirrorData) {
-        std::cout << QString("Error in FilterData: Number of filter taps(%1) bigger then data size(%2). Not enough data to perform mirroring!").arg(m_dCoeffA.cols()).arg(data.cols()).toLocal8Bit().data() << std::endl;
+    if((data.cols() < m_dCoeffA.cols()/2) && (compensateEdgeEffects == MirrorData)) {
+        std::cout << QString("[FilterData::applyFFTFilter] Number of filter taps(%1) bigger then data size(%2). Not enough data to perform mirroring!").arg(m_dCoeffA.cols()).arg(data.cols()).toLocal8Bit().data() << std::endl;
         return data;
     }
 
-    if(m_dCoeffA.cols() + data.cols()>m_iFFTlength) {
-        std::cout <<"Error in FilterData: Number of mirroring/zeropadding size plus data size is bigger then fft length!" << std::endl;
+    if((m_dCoeffA.cols() + data.cols()) > m_iFFTlength) {
+        std::cout <<"[FilterData::applyFFTFilter] Number of mirroring/zeropadding size plus data size is bigger then fft length!" << std::endl;
         return data;
     }
 
@@ -288,7 +292,7 @@ RowVectorXd FilterData::applyFFTFilter(const RowVectorXd& data, bool keepOverhea
     switch(compensateEdgeEffects) {
         case MirrorData:
             t_dataZeroPad.head(m_dCoeffA.cols()/2) = data.head(m_dCoeffA.cols()/2).reverse();   //front
-            t_dataZeroPad.segment(m_dCoeffA.cols()/2, data.cols()) = data;                    //middle
+            t_dataZeroPad.segment(m_dCoeffA.cols()/2, data.cols()) = data;                      //middle
             t_dataZeroPad.tail(m_dCoeffA.cols()/2) = data.tail(m_dCoeffA.cols()/2).reverse();   //back
             break;
 
@@ -314,11 +318,12 @@ RowVectorXd FilterData::applyFFTFilter(const RowVectorXd& data, bool keepOverhea
 
     //inverse-FFT
     RowVectorXd t_filteredTime;
-    fft.inv(t_filteredTime,t_filteredFreq);
+    fft.inv(t_filteredTime, t_filteredFreq);
 
     //Return filtered data
-    if(!keepOverhead)
+    if(!keepOverhead) {
         return t_filteredTime.segment(m_dCoeffA.cols()/2, data.cols());
+    }
 
     return t_filteredTime.head(data.cols()+m_dCoeffA.cols());
 }
