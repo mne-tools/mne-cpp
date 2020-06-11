@@ -50,7 +50,7 @@
 #include <utils/filterTools/filterdata.h>
 #include <utils/mnemath.h>
 
-#include <rtprocessing/rtfilter.h>
+#include <rtprocessing/filter.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -112,7 +112,7 @@ FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
 , m_bDispAnnotation(true)
 , m_bPerformFiltering(false)
 , m_pAnnotationModel(QSharedPointer<AnnotationModel>::create(this))
-, m_pRtFilter(RtFilter::SPtr::create())
+, m_pRtFilter(Filter::SPtr::create())
 {
     Q_UNUSED(sFilePath)
 

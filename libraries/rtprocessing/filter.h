@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
- * @file     rtfilter.h
+ * @file     filter.h
  * @author   Ruben Doerfel <Ruben.Doerfel@tu-ilmenau.de>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @since    0.1.0
- * @date     April, 2016
+ * @since    0.1.3
+ * @date     June, 2020
  *
  * @section  LICENSE
  *
- * Copyright (C) 2016, Ruben Doerfel, Lorenz Esch. All rights reserved.
+ * Copyright (C) 2020, Ruben Doerfel, Lorenz Esch. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -29,12 +29,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     RtFilter class declaration.
+ * @brief     Filter class declaration.
  *
  */
 
-#ifndef RTFILTER_H
-#define RTFILTER_H
+#ifndef FILTER_H
+#define FILTER_H
 
 //=============================================================================================================
 // INCLUDES
@@ -43,6 +43,7 @@
 #include "rtprocessing_global.h"
 
 #include <utils/filterTools/filterdata.h>
+
 #include <fiff/fiff_info.h>
 
 //=============================================================================================================
@@ -73,35 +74,34 @@ namespace RTPROCESSINGLIB
 
 //=============================================================================================================
 /**
- * Real-time filtering with fft overlap
+ * Filtering with FFT convolution and the overlap add method
  *
- * @brief Real-time filtering
+ * @brief Filtering with FFT convolution and the overlap add method
  */
-class RTPROCESINGSHARED_EXPORT RtFilter
+class RTPROCESINGSHARED_EXPORT Filter
 {
 
 public:
-    typedef QSharedPointer<RtFilter> SPtr;             /**< Shared pointer type for RtFilter. */
-    typedef QSharedPointer<const RtFilter> ConstSPtr;  /**< Const shared pointer type for RtFilter. */
+    typedef QSharedPointer<Filter> SPtr;             /**< Shared pointer type for Filter. */
+    typedef QSharedPointer<const Filter> ConstSPtr;  /**< Const shared pointer type for Filter. */
+
     typedef struct {
         QList<UTILSLIB::FilterData> lFilterData;
         int iRow;
         Eigen::RowVectorXd vecData;
-    } RtFilterData;
+    } FilterObject;
 
     //=========================================================================================================
     /**
      * Creates the real-time covariance estimation object.
      */
-    explicit RtFilter();
+    explicit Filter();
 
     //=========================================================================================================
     /**
      * Destroys the Real-time noise estimation object.
      */
-    ~RtFilter();
-
-    static void filterChannel(RtFilter::RtFilterData &channelDataTime);
+    ~Filter();
 
     /**
      * Calculates a suer designed filter kernel and filteres the raw input data
@@ -149,6 +149,14 @@ public:
 private:
     //=========================================================================================================
     /**
+     * This static function is used to filter row-wise in parallel
+     *
+     * @param [in] channelDataTime  The channel data to perform the filtering on
+     */
+    static void filterChannel(Filter::FilterObject &channelDataTime);
+
+    //=========================================================================================================
+    /**
      * Calculates the filtered version of the raw input data
      *
      * @param [in] matDataIn    The data which is to be filtered
@@ -165,13 +173,12 @@ private:
 
     Eigen::MatrixXd                 m_matOverlap;                   /**< Last overlap block */
     Eigen::MatrixXd                 m_matDelay;                     /**< Last delay block */
-
-private:
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+
 } // NAMESPACE
 
-#endif // RTFILTER_H
+#endif // FILTER_H
