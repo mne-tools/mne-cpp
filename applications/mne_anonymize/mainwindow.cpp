@@ -435,9 +435,7 @@ void MainWindow::openInFileDialog()
 void MainWindow::openOutFileDialog()
 {
     QFileDialog dialog(this);
-    dialog.setNameFilter(tr("Fif files (*.fif)"));
     dialog.setViewMode(QFileDialog::Detail);
-    dialog.setFileMode(QFileDialog::AnyFile);
     QStringList fileNames;
     if (dialog.exec())
     {
