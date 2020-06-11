@@ -455,49 +455,12 @@ void MainWindow::helpButtonClicked()
 
 void MainWindow::lineEditInFileEditingFinished()
 {
-    QFileInfo inFile(m_pUi->lineEditInFile->text());
-    if(!inFile.isFile())
-    {
-        QMessageBox msgBox;
-        msgBox.setText("The input file must be a valid file name.");
-        msgBox.exec();
-        m_pUi->lineEditInFile->clear();
-        return;
-    }
-
-    if(QString::compare(inFile.suffix(),QString("fif")) != 0)
-    {
-        QMessageBox msgBox;
-        msgBox.setText("The input file extension must be \".fif\" 0.");
-        msgBox.exec();
-        m_pUi->lineEditInFile->clear();
-        return;
-    }
-
-    emit fileInChanged(inFile.absoluteFilePath());
+    emit fileInChanged(m_pUi->lineEditInFile->text());
 }
 
 void MainWindow::lineEditOutFileEditingFinished()
 {
-    QFileInfo outFile(m_pUi->lineEditOutFile->text());
-    if(outFile.isDir())
-    {
-        QMessageBox msgBox;
-        msgBox.setText("The output file must not be a folder.");
-        msgBox.exec();
-        m_pUi->lineEditOutFile->clear();
-        return;
-    }
-
-    if(QString::compare(outFile.suffix(),QString("fif")) != 0)
-    {
-        QMessageBox msgBox;
-        msgBox.setText("The output file extension must be \".fif\" 0.");
-        msgBox.exec();
-        m_pUi->lineEditOutFile->clear();
-        return;
-    }
-    emit fileOutChanged(outFile.absoluteFilePath());
+    emit fileOutChanged(m_pUi->lineEditOutFile->text());
 }
 
 
@@ -546,4 +509,10 @@ void MainWindow::lineEditSubjectHisIdEditingFinished()
     emit subjectHisIdChanged(m_pUi->lineEditSubjectHisId->text());
 }
 
-
+void MainWindow::showMessage(QString s)
+{
+    QMessageBox msgBox;
+    msgBox.setText(s);
+    msgBox.exec();
+    return;
+}
