@@ -42,7 +42,7 @@
 
 #include "rtprocessing_global.h"
 
-#include <utils/filterTools/filterdata.h>
+#include "helpers/filterdata.h"
 
 #include <fiff/fiff_info.h>
 
@@ -86,7 +86,7 @@ public:
     typedef QSharedPointer<const Filter> ConstSPtr;  /**< Const shared pointer type for Filter. */
 
     typedef struct {
-        QList<UTILSLIB::FilterData> lFilterData;
+        QList<RTPROCESSINGLIB::FilterData> lFilterData;
         int iRow;
         Eigen::RowVectorXd vecData;
     } FilterObject;
@@ -121,14 +121,14 @@ public:
      * @return The filtered data in form of a matrix.
      */
     Eigen::MatrixXd filterData(const Eigen::MatrixXd& matDataIn,
-                               UTILSLIB::FilterData::FilterType type,
+                               RTPROCESSINGLIB::FilterData::FilterType type,
                                double dCenterfreq,
                                double dBandwidth,
                                double dTransition,
                                double dSFreq,
                                int iOrder = 1024,
                                int iFftLength = 4096,
-                               UTILSLIB::FilterData::DesignMethod designMethod = UTILSLIB::FilterData::Cosine,
+                               RTPROCESSINGLIB::FilterData::DesignMethod designMethod = RTPROCESSINGLIB::FilterData::Cosine,
                                const Eigen::RowVectorXi &vecPicks = Eigen::RowVectorXi(),
                                bool bUseThreads = true);
     /**
@@ -142,7 +142,7 @@ public:
      * @return The filtered data in form of a matrix.
      */
     Eigen::MatrixXd filterData(const Eigen::MatrixXd& matDataIn,
-                               const QList<UTILSLIB::FilterData>& lFilterData,
+                               const QList<RTPROCESSINGLIB::FilterData>& lFilterData,
                                const Eigen::RowVectorXi& vecPicks = Eigen::RowVectorXi(),
                                bool bUseThreads = true);
 
@@ -168,7 +168,7 @@ private:
      */
     Eigen::MatrixXd filterDataBlock(const Eigen::MatrixXd& matDataIn,
                                     const Eigen::RowVectorXi& vecPicks,
-                                    const QList<UTILSLIB::FilterData> &lFilterData,
+                                    const QList<RTPROCESSINGLIB::FilterData> &lFilterData,
                                     bool bUseThreads = true);
 
     Eigen::MatrixXd                 m_matOverlap;                   /**< Last overlap block */

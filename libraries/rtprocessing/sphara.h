@@ -1,14 +1,13 @@
 //=============================================================================================================
 /**
- * @file     filterio.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
+ * @file     sphara.h
+ * @author   Lorenz Esch <lesch@mgh.harvard.edu>
  * @since    0.1.0
- * @date     April, 2015
+ * @date     February, 2016
  *
  * @section  LICENSE
  *
- * Copyright (C) 2015, Lorenz Esch, Christoph Dinh. All rights reserved.
+ * Copyright (C) 2016, Lorenz Esch. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -29,32 +28,30 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    FilterIO class declaration.
+ * @brief    Declaration of the Sphara class
  *
  */
 
-#ifndef FILTERIO_H
-#define FILTERIO_H
+#ifndef SPHARA_H
+#define SPHARA_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../utils_global.h"
-#include "filterdata.h"
+#include "rtprocessing_global.h"
 
 //=============================================================================================================
-// QT INCLUDES
+// EIGEN INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
-#include <QString>
+#include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE UTILSLIB
+// DEFINE NAMESPACE RTPROCESSINGLIB
 //=============================================================================================================
 
-namespace UTILSLIB
+namespace RTPROCESSINGLIB
 {
 
 //=============================================================================================================
@@ -62,53 +59,39 @@ namespace UTILSLIB
 //=============================================================================================================
 
 //=============================================================================================================
-// DEFINE FORWARD DECLARATIONS
-//=============================================================================================================
-
-class FilterData;
-
-//=============================================================================================================
 /**
- * Processes txt files which hold filter coefficients.
+ * Creates a SPHARA operator.
  *
- * @brief Processes txt files which hold filter coefficients.
+ * @brief Creates a SPHARA operator.
  */
-class UTILSSHARED_EXPORT FilterIO
+class RTPROCESINGSHARED_EXPORT Sphara
 {
-public:
-    typedef QSharedPointer<FilterIO> SPtr;            /**< Shared pointer type for FilterIO. */
-    typedef QSharedPointer<const FilterIO> ConstSPtr; /**< Const shared pointer type for FilterIO. */
+public:   
+    //=========================================================================================================
+    /**
+     * Constructs a Sphara object.
+     *
+     */
+    Sphara();
 
     //=========================================================================================================
     /**
-     * Constructs a FilterIO object.
+     * Constructs a SPHARA operator.
+     *
+     * @param [in] matBaseFct        The SPHARA basis functions.
+     * @param [in] vecIndices        The indices of the positions in the final oeprator which are to be filled with the basis functions weights (i.e. these indices could respond to the indices of gradioemteres in a VectorView system).
+     * @param [in] iOperatorDim      The dimensions of the final SPHARA operator. Make sure that these correspond to the dimensions of the data matrix you want tol multiply with the SPHARA operator.
+     * @param [in] iNBaseFct         The number of SPHARA basis functions to take.
+     * @param [in] skip              The value to skip when reading the vecIndices variabel. I.e. use this when dealing with VectorView triplets, which include two gradiometers.
+     *
+     * @return Returns the final SPHARA operator with dimensions (iOperatorDim,iOperatorDim).
      */
-    FilterIO();
-
-    //=========================================================================================================
-    /**
-     * Reads a given txt file and scans it for filter coefficients. Pls see sample file for file syntax.
-     *
-     * @param [in] path holds the file path of the txt file which is to be read.
-     * @param [out] filter holds the filter which the read parameters are to be saved to.
-     *
-     * @return true if reading was successful, false otherwise.
-     */
-    static bool readFilter(QString path, FilterData &filter);
-
-    //=========================================================================================================
-    /**
-     * Writes a given filter to txt file .
-     *
-     * @param [in] path holds the file path of the txt file which is to be written to.
-     * @param [in] filter holds the filter which is to be written to file.
-     *
-     * @return true if reading was successful, false otherwise.
-     */
-    static bool writeFilter(const QString &path, const FilterData &filter);
-
-private:
+    static Eigen::MatrixXd makeSpharaProjector(const Eigen::MatrixXd& matBaseFct,
+                                               const Eigen::VectorXi& vecIndices,
+                                               int iOperatorDim,
+                                               int iNBaseFct,
+                                               int skip = 0);
 };
-} // NAMESPACE
+} // NAMESPACE RTPROCESSINGLIB
 
-#endif // FILTERIO_H
+#endif // SPHARA_H

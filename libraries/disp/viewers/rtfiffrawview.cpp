@@ -42,7 +42,7 @@
 #include "helpers/rtfiffrawviewdelegate.h"
 #include "helpers/rtfiffrawviewmodel.h"
 
-#include <utils/filterTools/filterdata.h>
+#include <rtprocessing/helpers/filterdata.h>
 #include <fiff/fiff_info.h>
 
 //=============================================================================================================
@@ -67,9 +67,9 @@
 //=============================================================================================================
 
 using namespace DISPLIB;
-using namespace UTILSLIB;
 using namespace FIFFLIB;
 using namespace Eigen;
+using namespace RTPROCESSINGLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

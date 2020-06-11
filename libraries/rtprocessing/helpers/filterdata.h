@@ -52,7 +52,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../utils_global.h"
+#include "../rtprocessing_global.h"
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -68,10 +68,10 @@
 #include <QMetaType>
 
 //=============================================================================================================
-// DEFINE NAMESPACE UTILSLIB
+// DEFINE NAMESPACE RTPROCESSINGLIB
 //=============================================================================================================
 
-namespace UTILSLIB
+namespace RTPROCESSINGLIB
 {
 
 //=============================================================================================================
@@ -80,7 +80,7 @@ namespace UTILSLIB
  *
  * @brief The FilterSettingsView class provides a view to select between different modalities
  */
-class UTILSSHARED_EXPORT FilterData
+class RTPROCESINGSHARED_EXPORT FilterData
 {
 
 public:
@@ -220,21 +220,21 @@ public:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // NAMESPACE UTILSLIB
+} // NAMESPACE RTPROCESSINGLIB
 
 #ifndef metatype_filtertype
 #define metatype_filtertype
-Q_DECLARE_METATYPE(UTILSLIB::FilterData::FilterType)
+Q_DECLARE_METATYPE(RTPROCESSINGLIB::FilterData::FilterType)
 #endif
 
 #ifndef metatype_filterdesign
 #define metatype_filterdesign
-Q_DECLARE_METATYPE(UTILSLIB::FilterData::DesignMethod)
+Q_DECLARE_METATYPE(RTPROCESSINGLIB::FilterData::DesignMethod)
 #endif
 
 #ifndef metatype_filterdata
 #define metatype_filterdata
-Q_DECLARE_METATYPE(UTILSLIB::FilterData)
+Q_DECLARE_METATYPE(RTPROCESSINGLIB::FilterData)
 #endif
 
 #endif // FILTERDATA_H

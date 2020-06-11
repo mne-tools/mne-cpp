@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
- * @file     cosinefilter.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
+ * @file     sphara.cpp
+ * @author   Robert Dicamillo <rd521@nmr.mgh.harvard.edu>;
+ *           Lorenz Esch <lesch@mgh.harvard.edu>
  * @since    0.1.0
- * @date     November, 2014
+ * @date     February, 2016
  *
  * @section  LICENSE
  *
- * Copyright (C) 2014, Lorenz Esch, Christoph Dinh. All rights reserved.
+ * Copyright (C) 2016, Robert Dicamillo, Lorenz Esch. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -29,79 +29,78 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Declaration of the CosineFilter class
+ * @brief    Definition of the Sphara class
  *
  */
-
-#ifndef COSINEFILTER_H
-#define COSINEFILTER_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../utils_global.h"
+#include "sphara.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-//=============================================================================================================
-// EIGEN INCLUDES
-//=============================================================================================================
-
-#include <Eigen/Core>
+#include <QDebug>
 
 //=============================================================================================================
-// DEFINE NAMESPACE UTILSLIB
+// USED NAMESPACES
 //=============================================================================================================
 
-namespace UTILSLIB
+using namespace RTPROCESSINGLIB;
+using namespace Eigen;
+
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+Sphara::Sphara()
 {
+}
 
 //=============================================================================================================
-/**
- * Creates a cosine filter response in the frequency domain.
- *
- * @brief Creates a cosine filter response in the frequency domain.
- */
-class UTILSSHARED_EXPORT CosineFilter
+
+MatrixXd Sphara::makeSpharaProjector(const MatrixXd& matBaseFct, const VectorXi& vecIndices, int iOperatorDim, int iNBaseFct, int skip)
 {
-public:
-    enum TPassType {LPF, HPF, BPF, NOTCH };
+    MatrixXd matSpharaOperator = MatrixXd::Identity(iOperatorDim, iOperatorDim);
 
-    //=========================================================================================================
-    /**
-     * Constructs a CosineFilter object.
-     *
-     */
-    CosineFilter();
+    if(matBaseFct.size() == 0) {
+        qWarning()<<"Sphara::makeSpharaProjector - Basis function matrix was empty. Returning identity matrix instead.";
+        return matSpharaOperator;
+    }
 
-    //=========================================================================================================
-    /**
-     * Constructs a CosineFilter object.
-     *
-     * @param fftLength length of the fft (multiple integer of 2^x)
-     * @param lowpass low cutoff frequency in Hz (not normed to sampling freq)
-     * @param lowpass_width determines the width of the filter slopes (steepness) in Hz (not normed to sampling freq)
-     * @param highpass highpass high cutoff frequency in Hz (not normed to sampling freq)
-     * @param highpass_width determines the width of the filter slopes (steepness) in Hz (not normed to sampling freq)
-     * @param sFreq sampling frequency
-     * @param type filter type (lowpass, highpass, etc.)
-     */
-    CosineFilter(int fftLength,
-                 float lowpass,
-                 float lowpass_width,
-                 float highpass,
-                 float highpass_width,
-                 double sFreq,
-                 TPassType type);
+    //Remove unwanted base functions
+    MatrixXd matSpharaGradCut = matBaseFct.block(0,0,matBaseFct.rows(),iNBaseFct);
+    MatrixXd matSpharaMultGrad = matSpharaGradCut * matSpharaGradCut.transpose().eval();
 
-    Eigen::RowVectorXcd    m_dFFTCoeffA;   /**< the FFT-transformed forward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength. */
-    Eigen::RowVectorXd     m_dCoeffA;      /**< the time filter coefficient set*/
+    //Create the SPHARA operator
+    int rowIndex = 0;
+    int colIndex = 0;
 
-    int             m_iFilterOrder;
-};
-} // NAMESPACE UTILSLIB
+    for(int i = 0; i<=skip; i++) {
+        for(int r = i; r<vecIndices.rows(); r+=1+skip) {
+            for(int c = i; c<vecIndices.rows(); c+=1+skip) {
+                if((r < vecIndices.rows() || c < vecIndices.rows()) && (rowIndex < matSpharaMultGrad.rows() || colIndex < matSpharaMultGrad.cols())) {
+                    matSpharaOperator(vecIndices(r),vecIndices(c)) = matSpharaMultGrad(rowIndex,colIndex);
+                } else {
+                    qWarning()<<"Sphara::makeSpharaProjector - Index is out of range. Returning identity matrix.";
+                    //matSpharaOperator.setZero();
+                    matSpharaOperator = MatrixXd::Identity(iOperatorDim, iOperatorDim);
+                    return matSpharaOperator;
+                }
 
-#endif // COSINEFILTER_H
+                ++colIndex;
+            }
+
+            colIndex = 0;
+            ++rowIndex;
+        }
+
+        rowIndex = 0;
+    }
+
+    return matSpharaOperator;
+}
+

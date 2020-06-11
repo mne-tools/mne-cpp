@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
- * @file     sphara.cpp
- * @author   Robert Dicamillo <rd521@nmr.mgh.harvard.edu>;
- *           Lorenz Esch <lesch@mgh.harvard.edu>
+ * @file     filterio.h
+ * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
+ *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
  * @since    0.1.0
- * @date     February, 2016
+ * @date     April, 2015
  *
  * @section  LICENSE
  *
- * Copyright (C) 2016, Robert Dicamillo, Lorenz Esch. All rights reserved.
+ * Copyright (C) 2015, Lorenz Esch, Christoph Dinh. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -29,78 +29,86 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the Sphara class
+ * @brief    FilterIO class declaration.
  *
  */
+
+#ifndef FILTERIO_H
+#define FILTERIO_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "sphara.h"
+#include "../rtprocessing_global.h"
+#include "filterdata.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDebug>
+#include <QSharedPointer>
+#include <QString>
 
 //=============================================================================================================
-// USED NAMESPACES
+// DEFINE NAMESPACE RTPROCESSINGLIB
 //=============================================================================================================
 
-using namespace UTILSLIB;
-using namespace Eigen;
-
-//=============================================================================================================
-// DEFINE MEMBER METHODS
-//=============================================================================================================
-
-Sphara::Sphara()
+namespace RTPROCESSINGLIB
 {
-}
 
 //=============================================================================================================
+// DEFINES
+//=============================================================================================================
 
-MatrixXd Sphara::makeSpharaProjector(const MatrixXd& matBaseFct, const VectorXi& vecIndices, int iOperatorDim, int iNBaseFct, int skip)
+//=============================================================================================================
+// DEFINE FORWARD DECLARATIONS
+//=============================================================================================================
+
+class FilterData;
+
+//=============================================================================================================
+/**
+ * Processes txt files which hold filter coefficients.
+ *
+ * @brief Processes txt files which hold filter coefficients.
+ */
+class RTPROCESINGSHARED_EXPORT FilterIO
 {
-    MatrixXd matSpharaOperator = MatrixXd::Identity(iOperatorDim, iOperatorDim);
+public:
+    typedef QSharedPointer<FilterIO> SPtr;            /**< Shared pointer type for FilterIO. */
+    typedef QSharedPointer<const FilterIO> ConstSPtr; /**< Const shared pointer type for FilterIO. */
 
-    if(matBaseFct.size() == 0) {
-        qWarning()<<"Sphara::makeSpharaProjector - Basis function matrix was empty. Returning identity matrix instead.";
-        return matSpharaOperator;
-    }
+    //=========================================================================================================
+    /**
+     * Constructs a FilterIO object.
+     */
+    FilterIO();
 
-    //Remove unwanted base functions
-    MatrixXd matSpharaGradCut = matBaseFct.block(0,0,matBaseFct.rows(),iNBaseFct);
-    MatrixXd matSpharaMultGrad = matSpharaGradCut * matSpharaGradCut.transpose().eval();
+    //=========================================================================================================
+    /**
+     * Reads a given txt file and scans it for filter coefficients. Pls see sample file for file syntax.
+     *
+     * @param [in] path holds the file path of the txt file which is to be read.
+     * @param [out] filter holds the filter which the read parameters are to be saved to.
+     *
+     * @return true if reading was successful, false otherwise.
+     */
+    static bool readFilter(QString path, FilterData &filter);
 
-    //Create the SPHARA operator
-    int rowIndex = 0;
-    int colIndex = 0;
+    //=========================================================================================================
+    /**
+     * Writes a given filter to txt file .
+     *
+     * @param [in] path holds the file path of the txt file which is to be written to.
+     * @param [in] filter holds the filter which is to be written to file.
+     *
+     * @return true if reading was successful, false otherwise.
+     */
+    static bool writeFilter(const QString &path, const FilterData &filter);
 
-    for(int i = 0; i<=skip; i++) {
-        for(int r = i; r<vecIndices.rows(); r+=1+skip) {
-            for(int c = i; c<vecIndices.rows(); c+=1+skip) {
-                if((r < vecIndices.rows() || c < vecIndices.rows()) && (rowIndex < matSpharaMultGrad.rows() || colIndex < matSpharaMultGrad.cols())) {
-                    matSpharaOperator(vecIndices(r),vecIndices(c)) = matSpharaMultGrad(rowIndex,colIndex);
-                } else {
-                    qWarning()<<"Sphara::makeSpharaProjector - Index is out of range. Returning identity matrix.";
-                    //matSpharaOperator.setZero();
-                    matSpharaOperator = MatrixXd::Identity(iOperatorDim, iOperatorDim);
-                    return matSpharaOperator;
-                }
+private:
+};
+} // NAMESPACE RTPROCESSINGLIB
 
-                ++colIndex;
-            }
-
-            colIndex = 0;
-            ++rowIndex;
-        }
-
-        rowIndex = 0;
-    }
-
-    return matSpharaOperator;
-}
-
+#endif // FILTERIO_H

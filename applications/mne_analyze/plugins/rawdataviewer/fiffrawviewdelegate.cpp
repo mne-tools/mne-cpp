@@ -45,7 +45,7 @@
 #include <anShared/Model/annotationmodel.h>
 #include <anShared/Utils/metatypes.h>
 
-#include <utils/filterTools/filterdata.h>
+#include <rtprocessing/helpers/filterdata.h>
 
 //=============================================================================================================
 // QT INCLUDES

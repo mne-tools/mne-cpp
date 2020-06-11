@@ -66,7 +66,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../utils_global.h"
+#include "../rtprocessing_global.h"
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -81,10 +81,10 @@
 #include <QObject>
 
 //=============================================================================================================
-// DEFINE NAMESPACE UTILSLIB
+// DEFINE NAMESPACE RTPROCESSINGLIB
 //=============================================================================================================
 
-namespace UTILSLIB
+namespace RTPROCESSINGLIB
 {
 
 /**
@@ -92,7 +92,7 @@ namespace UTILSLIB
  *
  * @brief The ParksMcClellan class provides the ParksMcClellan filter desing algorithm.
  */
-class UTILSSHARED_EXPORT ParksMcClellan : public QObject
+class RTPROCESINGSHARED_EXPORT ParksMcClellan : public QObject
 {
     Q_OBJECT
     Q_ENUMS(TPassType) //makes enum available to the class' Qt meta object
@@ -201,6 +201,6 @@ private:
 
     bool InitDone2;
 };
-} // NAMESPACE UTILSLIB
+} // NAMESPACE RTPROCESSINGLIB
 
 #endif // PARKSMCCLELLAN_H

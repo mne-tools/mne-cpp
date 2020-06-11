@@ -43,7 +43,7 @@
 #include <math.h>
 
 #include <fiff/fiff.h>
-#include <utils/filterTools/filterdata.h>
+#include <rtprocessing/helpers/filterdata.h>
 #include <rtprocessing/filter.h>
 
 #include <Eigen/Dense>
@@ -175,7 +175,7 @@ void TestFiltering::initTestCase()
                                          dSFreq,
                                          1024,
                                          4096,
-                                         UTILSLIB::FilterData::Cosine,
+                                         RTPROCESSINGLIB::FilterData::Cosine,
                                          vPicks);
     printf("[done]\n");
 

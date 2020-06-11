@@ -85,7 +85,12 @@ SOURCES += \
     rtnoise.cpp \
     rthpis.cpp \
     filter.cpp \
-    rtconnectivity.cpp
+    rtconnectivity.cpp \
+    sphara.cpp \
+    helpers/cosinefilter.cpp \
+    helpers/parksmcclellan.cpp \
+    helpers/filterdata.cpp \
+    helpers/filterio.cpp \
 
 HEADERS +=  \
     rtprocessing_global.h \
@@ -95,7 +100,12 @@ HEADERS +=  \
     rtnoise.h \
     rthpis.h \
     filter.h \
-    rtconnectivity.h
+    sphara.h \
+    rtconnectivity.h \
+    helpers/cosinefilter.h \
+    helpers/parksmcclellan.h \
+    helpers/filterdata.h \
+    helpers/filterio.h \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

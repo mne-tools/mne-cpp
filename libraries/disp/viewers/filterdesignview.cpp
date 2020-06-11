@@ -44,7 +44,8 @@
 #include "helpers/filterplotscene.h"
 
 #include "utils/mnemath.h"
-#include "utils/filterTools/filterio.h"
+
+#include <rtprocessing/helpers/filterio.h>
 
 #include <fiff/fiff_info.h>
 
@@ -73,6 +74,7 @@
 using namespace DISPLIB;
 using namespace FIFFLIB;
 using namespace UTILSLIB;
+using namespace RTPROCESSINGLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

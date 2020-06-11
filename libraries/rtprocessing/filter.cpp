@@ -56,7 +56,6 @@
 
 using namespace RTPROCESSINGLIB;
 using namespace Eigen;
-using namespace UTILSLIB;
 using namespace FIFFLIB;
 
 //=============================================================================================================

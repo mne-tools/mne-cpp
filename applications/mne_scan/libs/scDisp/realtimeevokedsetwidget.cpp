@@ -56,7 +56,7 @@
 
 #include <scMeas/realtimeevokedset.h>
 
-#include <utils/filterTools/filterdata.h>
+#include <rtprocessing/helpers/filterdata.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -86,7 +86,7 @@
 using namespace SCDISPLIB;
 using namespace SCMEASLIB;
 using namespace DISPLIB;
-using namespace UTILSLIB;
+using namespace RTPROCESSINGLIB;
 using namespace FIFFLIB;
 
 //=============================================================================================================

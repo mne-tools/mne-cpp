@@ -51,7 +51,7 @@
 #include <disp/viewers/fiffrawviewsettings.h>
 #include <disp/viewers/scalingview.h>
 
-#include <utils/filterTools/filterdata.h>
+#include <rtprocessing/helpers/filterdata.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -66,7 +66,7 @@
 using namespace RAWDATAVIEWERPLUGIN;
 using namespace ANSHAREDLIB;
 using namespace DISPLIB;
-using namespace UTILSLIB;
+using namespace RTPROCESSINGLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

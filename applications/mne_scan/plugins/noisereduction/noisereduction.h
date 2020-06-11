@@ -43,8 +43,11 @@
 #include "noisereduction_global.h"
 
 #include <utils/generics/circularbuffer.h>
-#include <utils/filterTools/filterdata.h>
+
 #include <fiff/fiff_proj.h>
+
+#include <rtprocessing/helpers/filterdata.h>
+
 #include <scShared/Interfaces/IAlgorithm.h>
 
 //=============================================================================================================
@@ -60,10 +63,6 @@
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
-namespace UTILSLIB{
-    class FilterData;
-}
 
 namespace FIFFLIB{
     class FiffInfo;
@@ -196,7 +195,7 @@ protected:
      *
      * @param[in] filterData    currently active filter
      */
-    void setFilter(const UTILSLIB::FilterData& filterData);
+    void setFilter(const RTPROCESSINGLIB::FilterData& filterData);
 
     //=========================================================================================================
     /**
@@ -234,7 +233,7 @@ private:
     QString                         m_sCurrentSystem;                           /**< The current acquisition system (EEG, babyMEG, VectorView).*/
     QString                         m_sFilterChannelType;                       /**< Kind of channel which is to be filtered */
 
-    UTILSLIB::FilterData            m_filterKernel;                               /**< The currently active filter. */
+    RTPROCESSINGLIB::FilterData     m_filterKernel;                             /**< The currently active filter. */
 
     Eigen::VectorXi                 m_vecIndicesFirstVV;                        /**< The indices of the channels to pick for the first SPHARA oerpator in case of a VectorView system.*/
     Eigen::VectorXi                 m_vecIndicesSecondVV;                       /**< The indices of the channels to pick for the second SPHARA oerpator in case of a VectorView system.*/

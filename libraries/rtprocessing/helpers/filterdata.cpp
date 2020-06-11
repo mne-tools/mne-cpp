@@ -40,7 +40,7 @@
 
 #include "filterdata.h"
 
-#include "../mnemath.h"
+#include <utils/mnemath.h>
 
 #include "parksmcclellan.h"
 #include "cosinefilter.h"
@@ -67,7 +67,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace UTILSLIB;
+using namespace RTPROCESSINGLIB;
 using namespace Eigen;
 
 //=============================================================================================================

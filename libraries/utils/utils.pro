@@ -68,14 +68,9 @@ SOURCES += \
     layoutloader.cpp \
     layoutmaker.cpp \
     selectionio.cpp \
-    filterTools/cosinefilter.cpp \
-    filterTools/parksmcclellan.cpp \
-    filterTools/filterdata.cpp \
-    filterTools/filterio.cpp \
     detecttrigger.cpp \
     spectrogram.cpp \
     warp.cpp \
-    filterTools/sphara.cpp \
     sphere.cpp \
     generics/circularbuffer.cpp \
     generics/observerpattern.cpp \
@@ -91,14 +86,9 @@ HEADERS += \
     layoutmaker.h \
     selectionio.h \
     layoutmaker.h \
-    filterTools/cosinefilter.h \
-    filterTools/parksmcclellan.h \
-    filterTools/filterdata.h \
-    filterTools/filterio.h \
     detecttrigger.h \
     spectrogram.h \
     warp.h \
-    filterTools/sphara.h \
     sphere.h \
     simplex_algorithm.h \
     generics/circularbuffer.h \

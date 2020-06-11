@@ -75,5 +75,5 @@ inverse.depends = utils fs fiff mne fwd
 communication.depends = utils fiff
 rtprocessing.depends = utils connectivity fiff mne fwd inverse
 connectivity.depends = utils fs fiff mne
-disp.depends = utils fs fiff mne fwd inverse
+disp.depends = utils fs fiff mne fwd inverse rtprocessing
 disp3D.depends = utils connectivity rtprocessing fs fiff mne fwd inverse disp
