@@ -583,12 +583,14 @@ void AnnotationModel::appendSelected(int iSelectedIndex)
 
 MatrixXi AnnotationModel::getAnnotationMatrix()
 {
-    MatrixXi EventDataMatrix;
-    EventDataMatrix.resize(getNumberOfAnnotations(), 3);
+    MatrixXi matEventDataMatrix;
+    matEventDataMatrix.resize(getNumberOfAnnotations(), 3);
 
     for (int i = 0; i < getNumberOfAnnotations(); i++){
-        EventDataMatrix(i,0) = getAnnotation(i);
-        //EventDataMatrix(i,1) = ;
-        //EventDataMatrix(i,2) = ;
+        matEventDataMatrix(i,0) = getAnnotation(i);
+        matEventDataMatrix(i,1) = 0;
+        matEventDataMatrix(i,2) = 1;
     }
+
+    return matEventDataMatrix;
 }
