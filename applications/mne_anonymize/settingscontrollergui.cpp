@@ -96,10 +96,13 @@ void SettingsControllerGui::readData()
     QString fileOutStr(QDir(stringTempDir).filePath(generateRandomFileName()));
     m_pAnonymizer->setFileOut(fileOutStr);
     m_pWin->setDefaultStateExtraInfo();
+    bool verboseMode(m_pAnonymizer->getVerboseMode());
+    m_pAnonymizer->setVerboseMode(false);
     m_pAnonymizer->anonymizeFile();
     QFile fileOut(fileOutStr);
     fileOut.remove();
     m_pAnonymizer->setFileOut(m_fiOutFileInfo.absoluteFilePath());
+    m_pAnonymizer->setVerboseMode(verboseMode);
 }
 
 void SettingsControllerGui::fileInChanged(const QString& strInFile)
