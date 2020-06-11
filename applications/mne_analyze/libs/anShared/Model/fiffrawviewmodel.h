@@ -348,9 +348,9 @@ public:
      * @param[in] iColWidth         How wide the data column should be
      * @param[in] iScrollPos        Where in the data scrollable area should go to after resizing
      */
-    void setWindowSize(const int& iNumSeconds,
-                       const int& iColWidth,
-                       const int& iScrollPos);
+    void setWindowSize(int iNumSeconds,
+                       int iColWidth,
+                       int iScrollPos);
 
     //=========================================================================================================
     /**
@@ -358,7 +358,7 @@ public:
      *
      * @param value the new distance for the time spacers
      */
-    void distanceTimeSpacerChanged(const int& iNewValue);
+    void distanceTimeSpacerChanged(int iNewValue);
 
     //=========================================================================================================
     /**

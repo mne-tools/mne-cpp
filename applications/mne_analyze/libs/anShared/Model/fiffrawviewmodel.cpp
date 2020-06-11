@@ -193,7 +193,7 @@ void FiffRawViewModel::initFiffData(QIODevice& p_IODevice)
     filterDataBlock(data);
     for(int i = 0; i < m_iTotalBlockCount; ++i) {
         m_lFilteredData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data.block(0, i*m_iSamplesPerBlock, data.rows(), m_iSamplesPerBlock),
-                                                                                       times.block(0, i*m_iSamplesPerBlock, times.rows(), m_iSamplesPerBlock))));
+                                                                                               times.block(0, i*m_iSamplesPerBlock, times.rows(), m_iSamplesPerBlock))));
     }
 
     qInfo() << "[FiffRawViewModel::initFiffData] Loaded" << m_lData.size() << "blocks with size"<<data.rows()<<"x"<<m_iSamplesPerBlock;
@@ -461,9 +461,9 @@ void FiffRawViewModel::setBackgroundColor(const QColor& color)
 
 //=============================================================================================================
 
-void FiffRawViewModel::setWindowSize(const int& iNumSeconds,
-                                     const int& iColWidth,
-                                     const int& iScrollPos)
+void FiffRawViewModel::setWindowSize(int iNumSeconds,
+                                     int iColWidth,
+                                     int iScrollPos)
 {
     Q_UNUSED(iScrollPos);
 
@@ -484,7 +484,7 @@ void FiffRawViewModel::setWindowSize(const int& iNumSeconds,
 
 //=============================================================================================================
 
-void FiffRawViewModel::distanceTimeSpacerChanged(const int& iNewValue)
+void FiffRawViewModel::distanceTimeSpacerChanged(int iNewValue)
 {
     if(iNewValue <= 0) {
         m_iDistanceTimerSpacer = 1000;
