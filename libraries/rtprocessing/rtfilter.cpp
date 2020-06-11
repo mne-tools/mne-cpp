@@ -85,10 +85,24 @@ void RtFilter::filterChannel(RtFilter::RtFilterData &channelDataTime)
 //=============================================================================================================
 
 MatrixXd RtFilter::filterDataBlock(const MatrixXd& matDataIn,
-                                   int iOrder,
                                    const RowVectorXi &vecPicks,
-                                   const QList<FilterData>& lFilterData)
+                                   const QList<FilterData>& lFilterData,
+                                   bool bUseThreads)
 {
+    //Copy input data
+    MatrixXd matDataOut = matDataIn;
+
+    if(lFilterData.isEmpty()) {
+        return matDataOut;
+    }
+
+    int iOrder = lFilterData.first().m_iFilterOrder;
+    for(int i = 0; i < lFilterData.size(); ++i) {
+        if(lFilterData.at(i).m_iFilterOrder > iOrder) {
+            iOrder = lFilterData.at(i).m_iFilterOrder;
+        }
+    }
+
     //Initialise the overlap matrix
     if(m_matOverlap.cols() != iOrder || m_matOverlap.rows() < matDataIn.rows()) {
         m_matOverlap.resize(matDataIn.rows(), iOrder);
@@ -99,9 +113,6 @@ MatrixXd RtFilter::filterDataBlock(const MatrixXd& matDataIn,
         m_matDelay.resize(matDataIn.rows(), iOrder/2);
         m_matDelay.setZero();
     }
-
-    //Copy input data
-    MatrixXd matDataOut = matDataIn;
 
     //Do the concurrent filtering
     if(vecPicks.cols() > 0) {
@@ -121,10 +132,16 @@ MatrixXd RtFilter::filterDataBlock(const MatrixXd& matDataIn,
         matDataOut.block(0, iOrder/2, matDataIn.rows(), matDataOut.cols()-iOrder/2) = matDataIn.block(0, 0, matDataIn.rows(), matDataOut.cols()-iOrder/2);
         matDataOut.block(0, 0, matDataIn.rows(), iOrder/2) = m_matDelay;
 
-        QFuture<void> future = QtConcurrent::map(timeData,
-                                                 filterChannel);
+        if(bUseThreads) {
+            QFuture<void> future = QtConcurrent::map(timeData,
+                                                     filterChannel);
 
-        future.waitForFinished();
+            future.waitForFinished();
+        } else {
+            for(int i = 0; i < timeData.size(); ++i) {
+                filterChannel(timeData[i]);
+            }
+        }
 
         //Do the overlap add method and store in matDataOut
         int iFilteredNumberCols = timeData.at(0).vecData.cols();
@@ -211,7 +228,6 @@ MatrixXd RtFilter::filterData(const MatrixXd& matDataIn,
                 iSize = matDataIn.cols() - (iSize * (numSlices -1));
             }
             sliceFiltered = filterDataBlock(matDataIn.block(0,from,matDataIn.rows(),iSize),
-                                            iOrder,
                                             vecPicks,
                                             filterList);
             matDataOut.block(0,from,matDataIn.rows(),iSize) = sliceFiltered;
@@ -219,7 +235,6 @@ MatrixXd RtFilter::filterData(const MatrixXd& matDataIn,
         }
     } else {
         matDataOut = filterDataBlock(matDataIn,
-                                     iOrder,
                                      vecPicks,
                                      filterList);
     }

@@ -566,14 +566,7 @@ void FiffRawViewModel::setFilter(const QList<FilterData>& filterData)
 {
     m_filterData = filterData;
 
-    m_iMaxFilterLength = 1;
-    for(int i=0; i<filterData.size(); ++i) {
-        if(m_iMaxFilterLength<filterData.at(i).m_iFilterOrder) {
-            m_iMaxFilterLength = filterData.at(i).m_iFilterOrder;
-        }
-    }
-
-    //Filter all visible data channels at once
+     //Filter all visible data channels at once
     filterAllDataBlocks();
 }
 
@@ -652,10 +645,17 @@ void FiffRawViewModel::filterDataBlock(MatrixXd& pData)
         return;
     }
 
+    // In WASM mode do not use multithreading for filtering
+    #ifdef WASMBUILD
     pData = m_pRtFilter->filterDataBlock(pData,
-                                         m_iMaxFilterLength,
                                          m_lFilterChannelList,
-                                         m_filterData).eval();
+                                         m_filterData,
+                                         false);
+    #else
+    pData = m_pRtFilter->filterDataBlock(pData,
+                                         m_lFilterChannelList,
+                                         m_filterData);
+    #endif
 }
 
 //=============================================================================================================
@@ -684,11 +684,19 @@ void FiffRawViewModel::filterAllDataBlocks()
     for(int i = 0; i < m_lData.size(); ++i) {
         itr = std::next(m_lData.begin(), i);
 
+        #ifdef WASMBUILD
         pPair = QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(m_pRtFilter->filterDataBlock((*itr)->first,
-                                                                                                          m_iMaxFilterLength,
+                                                                                                          m_lFilterChannelList,
+                                                                                                          m_filterData,
+                                                                                                          false),
+                                                                             (*itr)->second));
+        #else
+        pPair = QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(m_pRtFilter->filterDataBlock((*itr)->first,
                                                                                                           m_lFilterChannelList,
                                                                                                           m_filterData),
                                                                              (*itr)->second));
+        #endif
+
         m_lFilteredData.push_back(pPair);
     }
 
