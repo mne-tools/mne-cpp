@@ -64,7 +64,7 @@ FilterIO::FilterIO()
 
 //=============================================================================================================
 
-bool FilterIO::readFilter(QString path, FilterData &filter)
+bool FilterIO::readFilter(QString path, FilterKernel &filter)
 {
     //Open .txt file
     if(!path.contains(".txt"))
@@ -109,7 +109,7 @@ bool FilterIO::readFilter(QString path, FilterData &filter)
 
             //Read the filter type
             if(line.contains("type") && fields.size()==2)
-                filter.m_Type = FilterData::getFilterTypeForString(fields.at(1));
+                filter.m_Type = FilterKernel::getFilterTypeForString(fields.at(1));
 
             //Read the filter LPFreq
             if(line.contains("LPFreq") && fields.size()==2)
@@ -125,7 +125,7 @@ bool FilterIO::readFilter(QString path, FilterData &filter)
 
             //Read the filter DesignMethod
             if(line.contains("DesignMethod") && fields.size()==2)
-                filter.m_designMethod = FilterData::getDesignMethodForString(fields.at(1));
+                filter.m_designMethod = FilterKernel::getDesignMethodForString(fields.at(1));
 
         } else // Read filter coefficients
             coefficientsTemp.push_back(fields.join("").toDouble());
@@ -160,7 +160,7 @@ bool FilterIO::readFilter(QString path, FilterData &filter)
 
 //=============================================================================================================
 
-bool FilterIO::writeFilter(const QString &path, const FilterData &filter)
+bool FilterIO::writeFilter(const QString &path, const FilterKernel &filter)
 {
     // Open file dialog
     if(!path.isEmpty())
@@ -176,12 +176,12 @@ bool FilterIO::writeFilter(const QString &path, const FilterData &filter)
 
         out << "#sFreq " << filter.m_sFreq << "\n";
         out << "#name " << filter.m_sFilterName << "\n";
-        out << "#type " << FilterData::getStringForFilterType(filter.m_Type) << "\n";
+        out << "#type " << FilterKernel::getStringForFilterType(filter.m_Type) << "\n";
         out << "#order " << filter.m_iFilterOrder << "\n";
         out << "#HPFreq " << filter.m_dHighpassFreq << "\n";
         out << "#LPFreq " << filter.m_dLowpassFreq << "\n";
         out << "#CenterFreq " << filter.m_dCenterFreq << "\n";
-        out << "#DesignMethod " << FilterData::getStringForDesignMethod(filter.m_designMethod) << "\n";
+        out << "#DesignMethod " << FilterKernel::getStringForDesignMethod(filter.m_designMethod) << "\n";
 
         for(int i = 0 ; i<filter.m_dCoeffA.cols() ;i++)
             out << filter.m_dCoeffA(i) << "\n";

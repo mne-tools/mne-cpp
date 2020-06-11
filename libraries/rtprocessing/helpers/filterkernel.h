@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
- * @file     filterdata.h
+ * @file     filterkernel.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Ruben Doerfel <Ruben.Doerfel@tu-ilmenau.de>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     February, 2014
+ * @since    0.1.3
+ * @date     June, 2020
  *
  * @section  LICENSE
  *
- * Copyright (C) 2014, Lorenz Esch, Ruben Doerfel, Christoph Dinh. All rights reserved.
+ * Copyright (C) 2020, Lorenz Esch, Ruben Doerfel, Christoph Dinh. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -30,8 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    The FilterData class represents a derived class from an arbitrary MNEOperator class object.
- *           Thus, it is a filter object that generates the FIR filter coefficients using Park's McClellan's
+ * @brief    The FilterKernel class represents a filter object that generates the FIR filter coefficients using Park's McClellan's
  *           filter design algorithm [1] and offers a overlap-add method [2] for frequency filtering of an input
  *           sequence. In this regard, the filter coefficients of a certain filter order are zero-padded to fill
  *           a length of an multiple integer of a power of 2 in order to efficiently compute a FFT. The length of
@@ -45,8 +44,8 @@
  *           [2] http://en.wikipedia.org/wiki/Overlap_add
  */
 
-#ifndef FILTERDATA_H
-#define FILTERDATA_H
+#ifndef FILTERKERNEL_H
+#define FILTERKERNEL_H
 
 //=============================================================================================================
 // INCLUDES
@@ -80,7 +79,7 @@ namespace RTPROCESSINGLIB
  *
  * @brief The FilterSettingsView class provides a view to select between different modalities
  */
-class RTPROCESINGSHARED_EXPORT FilterData
+class RTPROCESINGSHARED_EXPORT FilterKernel
 {
 
 public:
@@ -106,13 +105,13 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief FilterData creates a default FilterData object
+     * @brief FilterKernel creates a default FilterKernel object
      */
-    FilterData();
+    FilterKernel();
 
     //=========================================================================================================
     /**
-     * Constructs a FilterData object 
+     * Constructs a FilterKernel object
      *
      * @param [in] sFilterName      defines the name of the generated filter
      * @param [in] type             of the filter: LPF, HPF, BPF, NOTCH (from enum FilterType)
@@ -124,15 +123,15 @@ public:
      * @param [in] fftlength        length of the fft (multiple integer of 2^x)
      * @param [in] designMethod     specifies the design method to use. Choose between Cosind and Tschebyscheff
      **/
-    FilterData(const QString &sFilterName,
-               FilterType type,
-               int order,
-               double centerfreq,
-               double bandwidth,
-               double parkswidth,
-               double sFreq,
-               qint32 fftlength = 4096,
-               DesignMethod designMethod = Cosine);
+    FilterKernel(const QString &sFilterName,
+                 FilterType type,
+                 int order,
+                 double centerfreq,
+                 double bandwidth,
+                 double parkswidth,
+                 double sFreq,
+                 qint32 fftlength = 4096,
+                 DesignMethod designMethod = Cosine);
 
     //=========================================================================================================
     /**
@@ -178,25 +177,25 @@ public:
     /**
      * Returns the current design method as a string
      */
-    static QString getStringForDesignMethod(const FilterData::DesignMethod &designMethod);
+    static QString getStringForDesignMethod(const FilterKernel::DesignMethod& designMethod);
 
     //=========================================================================================================
     /**
      * Returns the current filter type as a string
      */
-    static QString getStringForFilterType(const FilterData::FilterType &filterType);
+    static QString getStringForFilterType(const FilterKernel::FilterType& filterType);
 
     //=========================================================================================================
     /**
      * Returns the current design dependent on an input string
      */
-    static FilterData::DesignMethod getDesignMethodForString(const QString &designMethodString);
+    static FilterKernel::DesignMethod getDesignMethodForString(const QString& designMethodString);
 
     //=========================================================================================================
     /**
      * Returns the current filter type dependent on an input string
      */
-    static FilterData::FilterType getFilterTypeForString(const QString &filerTypeString);
+    static FilterKernel::FilterType getFilterTypeForString(const QString& filerTypeString);
 
     double          m_sFreq;                /**< the sampling frequency. */
     double          m_dCenterFreq;          /**< contains center freq of the filter. */
@@ -224,17 +223,17 @@ public:
 
 #ifndef metatype_filtertype
 #define metatype_filtertype
-Q_DECLARE_METATYPE(RTPROCESSINGLIB::FilterData::FilterType)
+Q_DECLARE_METATYPE(RTPROCESSINGLIB::FilterKernel::FilterType)
 #endif
 
 #ifndef metatype_filterdesign
 #define metatype_filterdesign
-Q_DECLARE_METATYPE(RTPROCESSINGLIB::FilterData::DesignMethod)
+Q_DECLARE_METATYPE(RTPROCESSINGLIB::FilterKernel::DesignMethod)
 #endif
 
 #ifndef metatype_filterdata
 #define metatype_filterdata
-Q_DECLARE_METATYPE(RTPROCESSINGLIB::FilterData)
+Q_DECLARE_METATYPE(RTPROCESSINGLIB::FilterKernel)
 #endif
 
-#endif // FILTERDATA_H
+#endif // FILTERKERNEL_H

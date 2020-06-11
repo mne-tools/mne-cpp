@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     filterdata.cpp
+ * @file     filterkernel.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Ruben Doerfel <Ruben.Doerfel@tu-ilmenau.de>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains all FilterData.
+ * @brief    Contains all FilterKernel.
  *
  */
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "filterdata.h"
+#include "filterkernel.h"
 
 #include <utils/mnemath.h>
 
@@ -72,7 +72,7 @@ using namespace Eigen;
 
 //=============================================================================================================
 
-FilterData::FilterData()
+FilterKernel::FilterKernel()
 : m_Type(UNKNOWN)
 , m_iFilterOrder(80)
 , m_iFFTlength(512)
@@ -90,7 +90,7 @@ FilterData::FilterData()
 
 //=============================================================================================================
 
-FilterData::FilterData(const QString& sFilterName,
+FilterKernel::FilterKernel(const QString& sFilterName,
                        FilterType type,
                        int order,
                        double centerfreq,
@@ -110,7 +110,7 @@ FilterData::FilterData(const QString& sFilterName,
 , m_sFilterName(sFilterName)
 {
     if(order < 9) {
-       qWarning() << "[FilterData::FilterData] Less than 9 taps were provided. Setting number of taps to 9.";
+       qWarning() << "[FilterKernel::FilterKernel] Less than 9 taps were provided. Setting number of taps to 9.";
     }
 
     designFilter();
@@ -118,7 +118,7 @@ FilterData::FilterData(const QString& sFilterName,
 
 //=============================================================================================================
 
-void FilterData::designFilter()
+void FilterKernel::designFilter()
 {
     switch(m_designMethod) {
         case Tschebyscheff: {
@@ -205,7 +205,7 @@ void FilterData::designFilter()
 
 //=============================================================================================================
 
-void FilterData::fftTransformCoeffs()
+void FilterKernel::fftTransformCoeffs()
 {
     #ifdef EIGEN_FFTW_DEFAULT
         fftw_make_planner_thread_safe();
@@ -226,12 +226,12 @@ void FilterData::fftTransformCoeffs()
 
 //=============================================================================================================
 
-RowVectorXd FilterData::applyConvFilter(const RowVectorXd& data,
-                                        bool keepOverhead,
-                                        CompensateEdgeEffects compensateEdgeEffects) const
+RowVectorXd FilterKernel::applyConvFilter(const RowVectorXd& data,
+                                          bool keepOverhead,
+                                          CompensateEdgeEffects compensateEdgeEffects) const
 {
-    if(data.cols()<m_dCoeffA.cols() && compensateEdgeEffects==MirrorData){
-        std::cout << QString("Error in FilterData: Number of filter taps(%1) bigger then data size(%2). Not enough data to perform mirroring!").arg(m_dCoeffA.cols()).arg(data.cols()).toLocal8Bit().data() << std::endl;
+    if(data.cols() < m_dCoeffA.cols() && compensateEdgeEffects == MirrorData){
+        std::cout << QString("Error in FilterKernel: Number of filter taps(%1) bigger then data size(%2). Not enough data to perform mirroring!").arg(m_dCoeffA.cols()).arg(data.cols()).toLocal8Bit().data() << std::endl;
         return data;
     }
 
@@ -256,33 +256,35 @@ RowVectorXd FilterData::applyConvFilter(const RowVectorXd& data,
     }
 
     //Do the convolution
-    for(int i = m_dCoeffA.cols(); i < t_filteredTime.cols(); i++)
+    for(int i = m_dCoeffA.cols(); i < t_filteredTime.cols(); i++) {
         t_filteredTime(i-m_dCoeffA.cols()) = t_dataZeroPad.segment(i-m_dCoeffA.cols(),m_dCoeffA.cols()) * m_dCoeffA.transpose();
+    }
 
     //Return filtered data
-    if(!keepOverhead)
+    if(!keepOverhead) {
         return t_filteredTime.segment(m_dCoeffA.cols()/2, data.cols());
+    }
 
     return t_filteredTime.head(data.cols()+m_dCoeffA.cols());
 }
 
 //=============================================================================================================
 
-RowVectorXd FilterData::applyFFTFilter(const RowVectorXd& data,
-                                       bool keepOverhead,
-                                       CompensateEdgeEffects compensateEdgeEffects) const
+RowVectorXd FilterKernel::applyFFTFilter(const RowVectorXd& data,
+                                         bool keepOverhead,
+                                         CompensateEdgeEffects compensateEdgeEffects) const
 {
     #ifdef EIGEN_FFTW_DEFAULT
         fftw_make_planner_thread_safe();
     #endif
 
     if((data.cols() < m_dCoeffA.cols()/2) && (compensateEdgeEffects == MirrorData)) {
-        std::cout << QString("[FilterData::applyFFTFilter] Number of filter taps(%1) bigger then data size(%2). Not enough data to perform mirroring!").arg(m_dCoeffA.cols()).arg(data.cols()).toLocal8Bit().data() << std::endl;
+        std::cout << QString("[FilterKernel::applyFFTFilter] Number of filter taps(%1) bigger then data size(%2). Not enough data to perform mirroring!").arg(m_dCoeffA.cols()).arg(data.cols()).toLocal8Bit().data() << std::endl;
         return data;
     }
 
     if((m_dCoeffA.cols() + data.cols()) > m_iFFTlength) {
-        std::cout <<"[FilterData::applyFFTFilter] Number of mirroring/zeropadding size plus data size is bigger then fft length!" << std::endl;
+        std::cout <<"[FilterKernel::applyFFTFilter] Number of mirroring/zeropadding size plus data size is bigger then fft length!" << std::endl;
         return data;
     }
 
@@ -330,17 +332,17 @@ RowVectorXd FilterData::applyFFTFilter(const RowVectorXd& data,
 
 //=============================================================================================================
 
-QString FilterData::getStringForDesignMethod(const FilterData::DesignMethod &designMethod)
+QString FilterKernel::getStringForDesignMethod(const FilterKernel::DesignMethod &designMethod)
 {
     QString designMethodString = "External";
 
-    if(designMethod == FilterData::External)
+    if(designMethod == FilterKernel::External)
         designMethodString = "External";
 
-    if(designMethod == FilterData::Cosine)
+    if(designMethod == FilterKernel::Cosine)
         designMethodString = "Cosine";
 
-    if(designMethod == FilterData::Tschebyscheff)
+    if(designMethod == FilterKernel::Tschebyscheff)
         designMethodString = "Tschebyscheff";
 
     return designMethodString;
@@ -348,20 +350,20 @@ QString FilterData::getStringForDesignMethod(const FilterData::DesignMethod &des
 
 //=============================================================================================================
 
-QString FilterData::getStringForFilterType(const FilterData::FilterType &filterType)
+QString FilterKernel::getStringForFilterType(const FilterKernel::FilterType &filterType)
 {
     QString filterTypeString = "LPF";
 
-    if(filterType == FilterData::LPF)
+    if(filterType == FilterKernel::LPF)
         filterTypeString = "LPF";
 
-    if(filterType == FilterData::HPF)
+    if(filterType == FilterKernel::HPF)
         filterTypeString = "HPF";
 
-    if(filterType == FilterData::BPF)
+    if(filterType == FilterKernel::BPF)
         filterTypeString = "BPF";
 
-    if(filterType == FilterData::NOTCH)
+    if(filterType == FilterKernel::NOTCH)
         filterTypeString = "NOTCH";
 
     return filterTypeString;
@@ -369,39 +371,39 @@ QString FilterData::getStringForFilterType(const FilterData::FilterType &filterT
 
 //=============================================================================================================
 
-FilterData::DesignMethod FilterData::getDesignMethodForString(const QString &designMethodString)
+FilterKernel::DesignMethod FilterKernel::getDesignMethodForString(const QString &designMethodString)
 {
-    FilterData::DesignMethod designMethod = FilterData::External;
+    FilterKernel::DesignMethod designMethod = FilterKernel::External;
 
     if(designMethodString == "External")
-        designMethod = FilterData::External;
+        designMethod = FilterKernel::External;
 
     if(designMethodString == "Tschebyscheff")
-        designMethod = FilterData::Tschebyscheff;
+        designMethod = FilterKernel::Tschebyscheff;
 
     if(designMethodString == "Cosine")
-        designMethod = FilterData::Cosine;
+        designMethod = FilterKernel::Cosine;
 
     return designMethod;
 }
 
 //=============================================================================================================
 
-FilterData::FilterType FilterData::getFilterTypeForString(const QString &filterTypeString)
+FilterKernel::FilterType FilterKernel::getFilterTypeForString(const QString &filterTypeString)
 {
-    FilterData::FilterType filterType = FilterData::UNKNOWN;
+    FilterKernel::FilterType filterType = FilterKernel::UNKNOWN;
 
     if(filterTypeString == "LPF")
-        filterType = FilterData::LPF;
+        filterType = FilterKernel::LPF;
 
     if(filterTypeString == "HPF")
-        filterType = FilterData::HPF;
+        filterType = FilterKernel::HPF;
 
     if(filterTypeString == "BPF")
-        filterType = FilterData::BPF;
+        filterType = FilterKernel::BPF;
 
     if(filterTypeString == "NOTCH")
-        filterType = FilterData::NOTCH;
+        filterType = FilterKernel::NOTCH;
 
     return filterType;
 }

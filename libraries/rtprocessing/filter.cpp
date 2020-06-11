@@ -75,14 +75,14 @@ Filter::~Filter()
 //=============================================================================================================
 
 MatrixXd Filter::filterData(const MatrixXd& matDataIn,
-                            FilterData::FilterType type,
+                            FilterKernel::FilterType type,
                             double dCenterfreq,
                             double bandwidth,
                             double dTransition,
                             double dSFreq,
                             int iOrder,
                             int iFftLength,
-                            FilterData::DesignMethod designMethod,
+                            FilterKernel::DesignMethod designMethod,
                             const RowVectorXi& vecPicks,
                             bool bUseThreads)
 {
@@ -97,7 +97,7 @@ MatrixXd Filter::filterData(const MatrixXd& matDataIn,
     dTransition = dTransition/(dSFreq/2.0);
 
     // create filter
-    FilterData filter = FilterData("filter_kernel",
+    FilterKernel filter = FilterKernel("filter_kernel",
                                    type,
                                    iOrder,
                                    dCenterfreq,
@@ -108,7 +108,7 @@ MatrixXd Filter::filterData(const MatrixXd& matDataIn,
                                    designMethod);
 
     return filterData(matDataIn,
-                      QList<FilterData>() << filter,
+                      QList<FilterKernel>() << filter,
                       vecPicks,
                       bUseThreads);
 
@@ -117,7 +117,7 @@ MatrixXd Filter::filterData(const MatrixXd& matDataIn,
 //=============================================================================================================
 
 MatrixXd Filter::filterData(const MatrixXd& matDataIn,
-                            const QList<FilterData>& lFilterData,
+                            const QList<FilterKernel>& lFilterKernel,
                             const RowVectorXi& vecPicks,
                             bool bUseThreads)
 {
@@ -125,21 +125,21 @@ MatrixXd Filter::filterData(const MatrixXd& matDataIn,
     MatrixXd matDataOut = matDataIn;
     MatrixXd sliceFiltered;
 
-    if(lFilterData.isEmpty()) {
+    if(lFilterKernel.isEmpty()) {
         return matDataOut;
     }
 
-    int iOrder = lFilterData.first().m_iFilterOrder;
-    for(int i = 0; i < lFilterData.size(); ++i) {
-        if(lFilterData.at(i).m_iFilterOrder > iOrder) {
-            iOrder = lFilterData.at(i).m_iFilterOrder;
+    int iOrder = lFilterKernel.first().m_iFilterOrder;
+    for(int i = 0; i < lFilterKernel.size(); ++i) {
+        if(lFilterKernel.at(i).m_iFilterOrder > iOrder) {
+            iOrder = lFilterKernel.at(i).m_iFilterOrder;
         }
     }
 
-    int iFFTLength = lFilterData.first().m_iFFTlength;
-    for(int i = 0; i < lFilterData.size(); ++i) {
-        if(lFilterData.at(i).m_iFFTlength > iFFTLength) {
-            iFFTLength = lFilterData.at(i).m_iFFTlength;
+    int iFFTLength = lFilterKernel.first().m_iFFTlength;
+    for(int i = 0; i < lFilterKernel.size(); ++i) {
+        if(lFilterKernel.at(i).m_iFFTlength > iFFTLength) {
+            iFFTLength = lFilterKernel.at(i).m_iFFTlength;
         }
     }
 
@@ -165,7 +165,7 @@ MatrixXd Filter::filterData(const MatrixXd& matDataIn,
             }
             sliceFiltered = filterDataBlock(matDataIn.block(0,from,matDataIn.rows(),iSize),
                                             vecPicks,
-                                            lFilterData,
+                                            lFilterKernel,
                                             bUseThreads);
             matDataOut.block(0,from,matDataIn.rows(),iSize) = sliceFiltered;
             from += iSize;
@@ -173,7 +173,7 @@ MatrixXd Filter::filterData(const MatrixXd& matDataIn,
     } else {
         matDataOut = filterDataBlock(matDataIn,
                                      vecPicks,
-                                     lFilterData,
+                                     lFilterKernel,
                                      bUseThreads);
     }
 
@@ -184,11 +184,11 @@ MatrixXd Filter::filterData(const MatrixXd& matDataIn,
 
 void Filter::filterChannel(Filter::FilterObject& channelDataTime)
 {
-    for(int i = 0; i < channelDataTime.lFilterData.size(); ++i) {
-        //channelDataTime.vecData = channelDataTime.first.at(i).applyConvFilter(channelDataTime.vecData, true, FilterData::ZeroPad);
-        channelDataTime.vecData = channelDataTime.lFilterData.at(i).applyFFTFilter(channelDataTime.vecData,
+    for(int i = 0; i < channelDataTime.lFilterKernel.size(); ++i) {
+        //channelDataTime.vecData = channelDataTime.first.at(i).applyConvFilter(channelDataTime.vecData, true, FilterKernel::ZeroPad);
+        channelDataTime.vecData = channelDataTime.lFilterKernel.at(i).applyFFTFilter(channelDataTime.vecData,
                                                                                    true,
-                                                                                   FilterData::ZeroPad); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
+                                                                                   FilterKernel::ZeroPad); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
     }
 }
 
@@ -196,21 +196,21 @@ void Filter::filterChannel(Filter::FilterObject& channelDataTime)
 
 MatrixXd Filter::filterDataBlock(const MatrixXd& matDataIn,
                                  const RowVectorXi& vecPicks,
-                                 const QList<FilterData>& lFilterData,
+                                 const QList<FilterKernel>& lFilterKernel,
                                  bool bUseThreads)
 {
     std::cout << "Filter::filterDataBlock 0" << std::endl;
     //Copy input data
     MatrixXd matDataOut = matDataIn;
 
-    if(lFilterData.isEmpty()) {
+    if(lFilterKernel.isEmpty()) {
         return matDataOut;
     }
 
-    int iOrder = lFilterData.first().m_iFilterOrder;
-    for(int i = 0; i < lFilterData.size(); ++i) {
-        if(lFilterData.at(i).m_iFilterOrder > iOrder) {
-            iOrder = lFilterData.at(i).m_iFilterOrder;
+    int iOrder = lFilterKernel.first().m_iFilterOrder;
+    for(int i = 0; i < lFilterKernel.size(); ++i) {
+        if(lFilterKernel.at(i).m_iFilterOrder > iOrder) {
+            iOrder = lFilterKernel.at(i).m_iFilterOrder;
         }
     }
     std::cout << "Filter::filterDataBlock 1" << std::endl;
@@ -236,7 +236,7 @@ MatrixXd Filter::filterDataBlock(const MatrixXd& matDataIn,
         //Only select channels specified in vecPicks
         FilterObject data;
         for(qint32 i = 0; i < vecPicks.cols(); ++i) {
-            data.lFilterData = lFilterData;
+            data.lFilterKernel = lFilterKernel;
             data.iRow = vecPicks[i];
             data.vecData = matDataIn.row(vecPicks[i]);
             timeData.append(data);

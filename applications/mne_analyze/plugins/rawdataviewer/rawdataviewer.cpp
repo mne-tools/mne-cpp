@@ -51,7 +51,7 @@
 #include <disp/viewers/fiffrawviewsettings.h>
 #include <disp/viewers/scalingview.h>
 
-#include <rtprocessing/helpers/filterdata.h>
+#include <rtprocessing/helpers/filterkernel.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -206,7 +206,7 @@ void RawDataViewer::handleEvent(QSharedPointer<Event> e)
         m_pFiffRawView->setFilterActive(e->getData().toBool());
         break;
     case FILTER_DESIGN_CHANGED:
-        m_pFiffRawView->setFilter(e->getData().value<FilterData>());
+        m_pFiffRawView->setFilter(e->getData().value<FilterKernel>());
         break;
     default:
         qWarning() << "[RawDataViewer::handleEvent] Received an Event that is not handled by switch cases.";

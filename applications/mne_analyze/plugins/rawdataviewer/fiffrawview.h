@@ -68,7 +68,7 @@ namespace ANSHAREDLIB {
 }
 
 namespace RTPROCESSINGLIB {
-    class FilterData;
+    class FilterKernel;
 }
 
 class QTableView;
@@ -237,7 +237,7 @@ public:
      *
      * @param[in] filterData   the currently active filter
      */
-    void setFilter(const RTPROCESSINGLIB::FilterData &filterData);
+    void setFilter(const RTPROCESSINGLIB::FilterKernel &filterData);
 
     //=========================================================================================================
     /**

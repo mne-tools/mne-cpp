@@ -61,7 +61,7 @@ namespace ANSHAREDLIB {
 }
 
 namespace RTPROCESSINGLIB {
-    class FilterData;
+    class FilterKernel;
 }
 
 namespace DISPLIB {
@@ -127,7 +127,7 @@ private:
      *
      * @param[in] filterData    The currently active filter
      */
-    void setFilter(const RTPROCESSINGLIB::FilterData& filterData);
+    void setFilter(const RTPROCESSINGLIB::FilterKernel& filterData);
 
     //=========================================================================================================
     /**

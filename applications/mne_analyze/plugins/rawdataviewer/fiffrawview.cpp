@@ -45,7 +45,7 @@
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <anShared/Model/annotationmodel.h>
 
-#include <rtprocessing/helpers/filterdata.h>
+#include <rtprocessing/helpers/filterkernel.h>
 
 //=============================================================================================================
 // Qt INCLUDES
@@ -427,10 +427,10 @@ void FiffRawView::updateScrollPositionToAnnotation()
 
 //=============================================================================================================
 
-void FiffRawView::setFilter(const FilterData& filterData)
+void FiffRawView::setFilter(const FilterKernel& filterData)
 {
     if(m_pModel) {
-        m_pModel->setFilter(QList<FilterData>() << filterData);
+        m_pModel->setFilter(QList<FilterKernel>() << filterData);
     }
 }
 

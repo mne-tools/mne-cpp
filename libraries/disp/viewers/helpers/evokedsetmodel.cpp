@@ -845,7 +845,7 @@ void EvokedSetModel::toggleFreeze()
 
 //=============================================================================================================
 
-void EvokedSetModel::setFilter(const FilterData& filterData)
+void EvokedSetModel::setFilter(const FilterKernel& filterData)
 {
     m_filterKernel.clear();
     m_filterKernel << filterData;
@@ -949,11 +949,11 @@ void EvokedSetModel::createFilterChannelList(QStringList channelNames)
 
 //=============================================================================================================
 
-void doFilterPerChannelRTESet(QPair<QList<FilterData>,QPair<int,RowVectorXd> > &channelDataTime)
+void doFilterPerChannelRTESet(QPair<QList<FilterKernel>,QPair<int,RowVectorXd> > &channelDataTime)
 {
     for(int i=0; i < channelDataTime.first.size(); ++i) {
-        //channelDataTime.second.second = channelDataTime.first.at(i).applyConvFilter(channelDataTime.second.second, true, FilterData::ZeroPad);
-        channelDataTime.second.second = channelDataTime.first.at(i).applyFFTFilter(channelDataTime.second.second, true, FilterData::ZeroPad); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
+        //channelDataTime.second.second = channelDataTime.first.at(i).applyConvFilter(channelDataTime.second.second, true, FilterKernel::ZeroPad);
+        channelDataTime.second.second = channelDataTime.first.at(i).applyFFTFilter(channelDataTime.second.second, true, FilterKernel::ZeroPad); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
     }
 }
 
@@ -967,7 +967,7 @@ void EvokedSetModel::filterDataBlock()
 
     //Generate QList structure which can be handled by the QConcurrent framework for each average in set
     for(int j = 0; j < m_matData.size(); ++j) {
-        QList<QPair<QList<FilterData>,QPair<int,RowVectorXd> > > timeData;
+        QList<QPair<QList<FilterKernel>,QPair<int,RowVectorXd> > > timeData;
         QList<int> notFilterChannelIndex;
 
         //Also append mirrored data in front and back to get rid of edge effects
@@ -975,7 +975,7 @@ void EvokedSetModel::filterDataBlock()
             if(m_filterChannelList.contains(m_pEvokedSet->info.chs.at(i).ch_name)) {
                 RowVectorXd datTemp(m_matData.at(j).row(i).cols() + 2 * m_iMaxFilterLength);
                 datTemp << m_matData.at(j).row(i).head(m_iMaxFilterLength).reverse(), m_matData.at(j).row(i), m_matData.at(j).row(i).tail(m_iMaxFilterLength).reverse();
-                timeData.append(QPair<QList<FilterData>,QPair<int,RowVectorXd> >(m_filterKernel,QPair<int,RowVectorXd>(i,datTemp)));
+                timeData.append(QPair<QList<FilterKernel>,QPair<int,RowVectorXd> >(m_filterKernel,QPair<int,RowVectorXd>(i,datTemp)));
             } else {
                 notFilterChannelIndex.append(i);
             }

@@ -42,7 +42,7 @@
 #include "helpers/rtfiffrawviewdelegate.h"
 #include "helpers/rtfiffrawviewmodel.h"
 
-#include <rtprocessing/helpers/filterdata.h>
+#include <rtprocessing/helpers/filterkernel.h>
 #include <fiff/fiff_info.h>
 
 //=============================================================================================================
@@ -423,9 +423,9 @@ void RtFiffRawView::updateSpharaOptions(const QString& sSytemType, int nBaseFcts
 
 //=============================================================================================================
 
-void RtFiffRawView::setFilter(const FilterData& filterData)
+void RtFiffRawView::setFilter(const FilterKernel& filterData)
 {
-    m_pModel->setFilter(QList<FilterData>() << filterData);
+    m_pModel->setFilter(QList<FilterKernel>() << filterData);
 }
 
 //=============================================================================================================

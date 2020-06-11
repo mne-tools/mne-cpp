@@ -81,7 +81,7 @@ FilterPlotScene::FilterPlotScene(QGraphicsView *view, QObject *parent)
 
 //=============================================================================================================
 
-void FilterPlotScene::updateFilter(const FilterData& operatorFilter,
+void FilterPlotScene::updateFilter(const FilterKernel& operatorFilter,
                                    int samplingFreq,
                                    int cutOffLow,
                                    int cutOffHigh)

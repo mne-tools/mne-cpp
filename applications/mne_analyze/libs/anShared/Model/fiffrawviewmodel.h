@@ -74,7 +74,7 @@ namespace FIFFLIB {
 
 namespace RTPROCESSINGLIB {
     class Filter;
-    class FilterData;
+    class FilterKernel;
 }
 
 //=============================================================================================================
@@ -453,7 +453,7 @@ public:
      *
      * @param[in] filterData    list of the new filter
      */
-    void setFilter(const QList<RTPROCESSINGLIB::FilterData> &filterData);
+    void setFilter(const QList<RTPROCESSINGLIB::FilterKernel> &filterData);
 
     //=========================================================================================================
     /**
@@ -582,7 +582,7 @@ private:
     QSharedPointer<RTPROCESSINGLIB::Filter>   m_pRtFilter;
     Eigen::RowVectorXi                          m_lFilterChannelList;                       /**< The indices of the channels to be filtered.*/
     bool                                        m_bPerformFiltering;                        /**< Flag whether to activate/deactivate filtering. */
-    QList<RTPROCESSINGLIB::FilterData>                 m_filterKernel;                               /**< List of currently active filters. */
+    QList<RTPROCESSINGLIB::FilterKernel>                 m_filterKernel;                               /**< List of currently active filters. */
 
     // fiff stuff
     QSharedPointer<FIFFLIB::FiffIO>             m_pFiffIO;                                  /**< Fiff IO */
