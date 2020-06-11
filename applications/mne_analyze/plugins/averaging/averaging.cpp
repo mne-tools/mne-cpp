@@ -74,16 +74,19 @@ using namespace ANSHAREDLIB;
 Averaging::Averaging()
 : m_pCommu(Q_NULLPTR)
 , m_pFiffRawModel(Q_NULLPTR)
-, m_pAveragingSettingsView(Q_NULLPTR)
 , m_pTriggerList(Q_NULLPTR)
+, m_pAveragingSettingsView(Q_NULLPTR)
 , m_pFiffInfo(Q_NULLPTR)
 , m_iNumAve(0)
 , m_iBaselineFrom(0)
 , m_iBaselineTo(0)
 , m_fPreStim(0)
 , m_fPostStim(0)
+, m_bUseAnn(0)
+, m_pAnnCheck(Q_NULLPTR)
+, m_pStimCheck(Q_NULLPTR)
 {
-
+    qDebug() << "[Averaging::Averaging]";
 }
 
 //=============================================================================================================
@@ -134,6 +137,7 @@ QMenu *Averaging::getMenu()
 
 QWidget *Averaging::getView()
 {
+    qDebug() << "[Averaging::getView]";
 //    m_pButterflyView = new DISPLIB::ButterflyView();
 //    m_pAverageLayoutView = new DISPLIB::AverageLayoutView();
 
@@ -143,6 +147,11 @@ QWidget *Averaging::getView()
 //    pTabView->addTab(m_pAverageLayoutView, "2D Layout");
 
 //    return m_pButterflyView;
+
+    QWidget* testWidget = new QWidget();
+    qDebug() << "Created Widget";
+
+//    return testWidget;
 
     return Q_NULLPTR;
 }
@@ -173,9 +182,35 @@ QDockWidget* Averaging::getControl()
     connect(m_pAveragingSettingsView, &DISPLIB::AveragingSettingsView::resetAverage,
             this, &Averaging::onResetAverage, Qt::UniqueConnection);
     connect(pButton, &QPushButton::clicked,
-            this, &Averaging::onComputeButtonCLicked);
+            this, &Averaging::onComputeButtonClicked);
+
+    m_pAnnCheck = new QRadioButton("Average with annotations");
+    m_pStimCheck = new QRadioButton("Average with stim channels");
+
+    connect(m_pAnnCheck, &QCheckBox::toggled,
+            this, &Averaging::onCheckBoxStateChanged);
+
+    connect(m_pStimCheck, &QRadioButton::toggled,
+            this, &Averaging::onCheckBoxStateChanged);
+
+    //Sets Default state
+    m_pAnnCheck->click();
+//    m_pStimCheck->click()
+
+//    QGroupBox* pGBox = new QGroupBox();
+//    QVBoxLayout* pVBLayout = new QVBoxLayout();
+
+//    pGBox->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
+//    pVBLayout->addWidget(m_pAnnCheck);
+//    pVBLayout->addWidget(m_pStimCheck);
+//    pVBLayout->addWidget(pButton);
+
+//    pGBox->setLayout(pVBLayout);
 
     pLayout->addWidget(m_pAveragingSettingsView);
+//    pLayout->addWidget(pGBox);
+    pLayout->addWidget(m_pAnnCheck);
+    pLayout->addWidget(m_pStimCheck);
     pLayout->addWidget(pButton);
     pWidget->setLayout(pLayout);
 
@@ -348,7 +383,7 @@ void Averaging::onResetAverage(bool state)
 
 //=============================================================================================================
 
-void Averaging::onComputeButtonCLicked(bool bChecked)
+void Averaging::onComputeButtonClicked(bool bChecked)
 {
     qDebug() << "[Averaging::onComputeButtonCLicked]";
 //    Q_UNUSED(bChecked);
@@ -383,6 +418,10 @@ void Averaging::onComputeButtonCLicked(bool bChecked)
 
 //    connect(m_pAve.data(), &Ave::evokedStim,
 //            this, &Averaging::onNewEvokedSet);
+    if(!m_pFiffRawModel){
+        qWarning() << "No model loaded. Cannot calculate average";
+        return;
+    }
 
     if(m_pFiffRawModel->getAnnotationModel()->getNumberOfAnnotations() < 2){
         qWarning() << "Not enough annotations to calculate average.";
@@ -395,7 +434,7 @@ void Averaging::onComputeButtonCLicked(bool bChecked)
 //    FIFFLIB::FiffEvoked FiffEvoked;
 
     m_pFiffEvoked = QSharedPointer<FIFFLIB::FiffEvoked>(new FIFFLIB::FiffEvoked());
-    int iType = 1;
+    int iType = 1; //hardwired for now, change later to annotation type
     mapReject.insert("eog", 300e-06);
 
     FIFFLIB::FiffRawData* pFiffRaw = this->m_pFiffRawModel->getFiffIO()->m_qlistRaw.first().data();
@@ -403,10 +442,20 @@ void Averaging::onComputeButtonCLicked(bool bChecked)
 
     qDebug() << "Initialized varibles";
 
-    matEvents = m_pFiffRawModel->getAnnotationModel()->getAnnotationMatrix();
+    if (m_bUseAnn){
+        qDebug() << "using annotations";
+        matEvents = m_pFiffRawModel->getAnnotationModel()->getAnnotationMatrix();
 
-    qDebug() << "Event Matrix:";
-    std::cout << matEvents;
+        qDebug() << "Event Matrix:";
+        std::cout << matEvents;
+    } else {
+        qDebug() << "using stim";
+        //TODO : add reading from stim channels
+    }
+
+
+    qDebug() << "PreStim:" << m_fPreStim <<", Post Stim:" << m_fPostStim;
+    qDebug() << "Type:" << iType;
 
     lstEpochDataList = MNELIB::MNEEpochDataList::readEpochs(*pFiffRaw,
                                                           matEvents,
@@ -429,4 +478,19 @@ void Averaging::onComputeButtonCLicked(bool bChecked)
 
 
     qDebug() << "Averaging done.";
+}
+
+//=============================================================================================================
+
+void Averaging::onCheckBoxStateChanged()
+{
+    qDebug() << "[Averaging::onCheckBoxStateChanged]";
+
+    if (m_pAnnCheck->isChecked()){
+        m_bUseAnn = true;
+    } else {
+        m_bUseAnn = false;
+    }
+
+    qDebug() << "useAnn:" << m_bUseAnn;
 }
