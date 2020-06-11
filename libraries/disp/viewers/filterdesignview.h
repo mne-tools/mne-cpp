@@ -307,7 +307,7 @@ protected:
 
     QPointer<FilterPlotScene>           m_pFilterPlotScene;         /**< Pointer to the QGraphicsScene which holds the filter plotting.*/
 
-    UTILSLIB::FilterData                m_filterData;               /**< The current filter operator.*/
+    UTILSLIB::FilterData                m_filterKernel;               /**< The current filter operator.*/
 
     QString                             m_sSettingsPath;            /**< The settings path to store the GUI settings to. */
 

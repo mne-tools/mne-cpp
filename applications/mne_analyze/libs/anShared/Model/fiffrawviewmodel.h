@@ -312,7 +312,7 @@ public:
      *
      * @return the kind of channel the index row is
      */
-    qint32 getKind(const qint32 &index) const;
+    qint32 getKind(qint32 index) const;
 
     //=========================================================================================================
     /**
@@ -322,7 +322,7 @@ public:
      *
      * @return the unit of the channel the index row is
      */
-    qint32 getUnit(const qint32 &index) const;
+    qint32 getUnit(qint32 index) const;
 
     //=========================================================================================================
     /**
@@ -424,7 +424,7 @@ public:
      *
      * @param[in] iToggleDisp   0 for no, 1+ for yes
      */
-    void toggleDispAnn(const int& iToggleDisp);
+    void toggleDispAnnotation(int iToggleDisp);
 
     //=========================================================================================================
     /**
@@ -432,7 +432,7 @@ public:
      *
      * @return m_bDispAnn
      */
-    bool shouldDisplayAnn() const;
+    bool shouldDisplayAnnotation() const;
 
     //=========================================================================================================
     /**
@@ -493,10 +493,17 @@ public:
 private:
     //=========================================================================================================
     /**
-     * Calculates the filtered version of loaded data
+     * Calculates the filtered version of all loaded data blocks
      */
     void filterAllDataBlocks();
-    void filterDataBlock(MatrixXd& pData);
+
+    //=========================================================================================================
+    /**
+     * Calculates the filtered version of one single datablock
+     *
+     * @param[in] matData     The data block to be filtered.
+     */
+    void filterDataBlock(MatrixXd& matData);
 
     //=========================================================================================================
     /**
@@ -578,7 +585,7 @@ private:
     QSharedPointer<RTPROCESSINGLIB::RtFilter>   m_pRtFilter;
     Eigen::RowVectorXi                          m_lFilterChannelList;                       /**< The indices of the channels to be filtered.*/
     bool                                        m_bPerformFiltering;                        /**< Flag whether to activate/deactivate filtering. */
-    QList<UTILSLIB::FilterData>                 m_filterData;                               /**< List of currently active filters. */
+    QList<UTILSLIB::FilterData>                 m_filterKernel;                               /**< List of currently active filters. */
 
     // fiff stuff
     QSharedPointer<FIFFLIB::FiffIO>             m_pFiffIO;                                  /**< Fiff IO */
@@ -593,7 +600,7 @@ private:
 
     qint32                                      m_iScrollPos;                               /**< Position of the scrollbar */
 
-    bool                                        m_bDispAnn;                                 /**< Whether annotations wil be shown */
+    bool                                        m_bDispAnnotation;                          /**< Whether annotations wil be shown */
 
     QSharedPointer<AnnotationModel>             m_pAnnotationModel;                         /**< Model to stored annotations to be displayed */
 
@@ -660,7 +667,6 @@ inline qint32 FiffRawViewModel::sampleWindowSize() const {
 
 inline void FiffRawViewModel::setDataColumnWidth(int iWidth) {
     m_dDx = (double)iWidth / double(m_iVisibleWindowSize*m_iSamplesPerBlock);
-    //qInfo() << "[FiffRawViewModel::setDataColumnWidth] m_dDx:" << m_dDx;
 }
 
 //=============================================================================================================

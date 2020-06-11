@@ -273,18 +273,18 @@ void FiffRawView::setZoom(double zoomFac)
 
 //=============================================================================================================
 
-void FiffRawView::setWindowSize(int T)
+void FiffRawView::setWindowSize(int iT)
 {
     int iNewPos;
-    iNewPos = ((m_pTableView->horizontalScrollBar()->value() * m_iT) / T);
+    iNewPos = ((m_pTableView->horizontalScrollBar()->value() * m_iT) / iT);
 
     if (iNewPos < 0) {
         iNewPos = m_pTableView->horizontalScrollBar()->value();
     }
 
-    m_iT = T;
+    m_iT = iT;
 
-    m_pModel->setWindowSize(T,
+    m_pModel->setWindowSize(iT,
                             m_pTableView->width() - m_pTableView->verticalHeader()->width()/*- m_pTableView->columnWidth(0)*/,
                             iNewPos);
 
@@ -298,9 +298,9 @@ void FiffRawView::setWindowSize(int T)
 
 //=============================================================================================================
 
-void FiffRawView::setDistanceTimeSpacer(int value)
+void FiffRawView::setDistanceTimeSpacer(int iValue)
 {
-    m_pModel->distanceTimeSpacerChanged(value);
+    m_pModel->distanceTimeSpacerChanged(iValue);
 
     //Wiggle view area to trigger update (there's probably a better way of doing this)
     m_pTableView->horizontalScrollBar()->setValue(m_pTableView->horizontalScrollBar()->value()+1);
@@ -373,7 +373,7 @@ void FiffRawView::toggleDisplayEvent(const int& iToggle)
 {
     int m_iToggle = iToggle;
     //qDebug() << "toggleDisplayEvent" << iToggle;
-    m_pModel->toggleDispAnn(m_iToggle);
+    m_pModel->toggleDispAnnotation(m_iToggle);
     m_pTableView->viewport()->repaint();
 }
 
@@ -410,7 +410,7 @@ bool FiffRawView::eventFilter(QObject *object, QEvent *event)
 
 //=============================================================================================================
 
-void FiffRawView::updateScrollPosition()
+void FiffRawView::updateScrollPositionToAnnotation()
 {
     int iSample = m_pModel->getAnnotationModel()->getAnnotation(m_pModel->getAnnotationModel()->getSelectedAnn()) - m_pModel->absoluteFirstSample();
     double dDx = m_pModel->pixelDifference();

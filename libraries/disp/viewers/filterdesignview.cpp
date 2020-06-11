@@ -221,7 +221,7 @@ void FilterDesignView::setFilterParameters(double from,
 
 FilterData FilterDesignView::getCurrentFilter()
 {
-    return m_filterData;
+    return m_filterKernel;
 }
 
 //=============================================================================================================
@@ -248,11 +248,11 @@ void FilterDesignView::saveSettings()
 
     QSettings settings("MNECPP");
 
-    settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterFrom"), m_filterData.m_dHighpassFreq);
-    settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterTo"), m_filterData.m_dLowpassFreq);
-    settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterOrder"), m_filterData.m_iFilterOrder);
-    settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterDesignMethod"), m_filterData.m_designMethod);
-    settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterTransition"), m_filterData.m_dParksWidth*(m_filterData.m_sFreq/2));
+    settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterFrom"), m_filterKernel.m_dHighpassFreq);
+    settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterTo"), m_filterKernel.m_dLowpassFreq);
+    settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterOrder"), m_filterKernel.m_iFilterOrder);
+    settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterDesignMethod"), m_filterKernel.m_designMethod);
+    settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterTransition"), m_filterKernel.m_dParksWidth*(m_filterKernel.m_sFreq/2));
     settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterChannelType"), getChannelType());
     settings.setValue(m_sSettingsPath + QString("/FilterDesignView/Position"), this->pos());
 }
@@ -397,8 +397,8 @@ void FilterDesignView::keyPressEvent(QKeyEvent * event)
 void FilterDesignView::updateFilterPlot()
 {
     //Update the filter of the scene
-    m_pFilterPlotScene->updateFilter(m_filterData,
-                                     m_filterData.m_sFreq, //Pass the filters sampling frequency, not the one from the fiff info. Reason: sFreq from a loaded filter could be different
+    m_pFilterPlotScene->updateFilter(m_filterKernel,
+                                     m_filterKernel.m_sFreq, //Pass the filters sampling frequency, not the one from the fiff info. Reason: sFreq from a loaded filter could be different
                                      m_pUi->m_doubleSpinBox_from->value(),
                                      m_pUi->m_doubleSpinBox_to->value());
 
@@ -480,7 +480,7 @@ void FilterDesignView::filterParametersChanged()
     }
 
     //Generate filters
-    m_filterData = FilterData("Designed Filter",
+    m_filterKernel = FilterData("Designed Filter",
                               FilterData::BPF,
                               m_iFilterTaps,
                               (double)center/nyquistFrequency,
@@ -490,7 +490,7 @@ void FilterDesignView::filterParametersChanged()
                               fftLength,
                               dMethod);
 
-    emit filterChanged(m_filterData);
+    emit filterChanged(m_filterKernel);
 
     //update filter plot
     updateFilterPlot();
@@ -549,10 +549,10 @@ void FilterDesignView::onBtnExportFilterCoefficients()
     //Generate appropriate name for the filter to be saved
     QString filtername;
 
-    filtername = QString("%1_%2_%3_Fs%4").arg(FilterData::getStringForFilterType(m_filterData.m_Type)).arg((int)m_filterData.m_dHighpassFreq).arg((int)m_filterData.m_dLowpassFreq).arg((int)m_filterData.m_sFreq);
+    filtername = QString("%1_%2_%3_Fs%4").arg(FilterData::getStringForFilterType(m_filterKernel.m_Type)).arg((int)m_filterKernel.m_dHighpassFreq).arg((int)m_filterKernel.m_dLowpassFreq).arg((int)m_filterKernel.m_sFreq);
 
-    //Do not pass m_filterData because this is most likely the User Defined filter which name should not change due to the filter model implementation. Hence use temporal copy of m_filterData.
-    FilterData filterWriteTemp = m_filterData;
+    //Do not pass m_filterKernel because this is most likely the User Defined filter which name should not change due to the filter model implementation. Hence use temporal copy of m_filterKernel.
+    FilterData filterWriteTemp = m_filterKernel;
     filterWriteTemp.m_sName = filtername;
 
     QString fileName = QFileDialog::getSaveFileName(this,
@@ -580,9 +580,9 @@ void FilterDesignView::onBtnLoadFilter()
             return;
         }
 
-        m_filterData = filterLoadTemp;
+        m_filterKernel = filterLoadTemp;
 
-        emit filterChanged(m_filterData);
+        emit filterChanged(m_filterKernel);
 
         updateFilterPlot();
     } else {

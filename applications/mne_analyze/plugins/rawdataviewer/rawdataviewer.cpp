@@ -194,7 +194,7 @@ void RawDataViewer::handleEvent(QSharedPointer<Event> e)
         }
         break;
     case TRIGGER_VIEWER_MOVE:
-        m_pFiffRawView->updateScrollPosition();
+        m_pFiffRawView->updateScrollPositionToAnnotation();
         break;
     case SELECTED_MODEL_CHANGED:
         onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
@@ -271,6 +271,7 @@ void RawDataViewer::updateControls()
                 m_pFiffRawView.data(), &FiffRawView::onMakeScreenshot, Qt::UniqueConnection);
 
         // Preserve settings between different file sessions
+        m_pFiffRawView->setScalingMap(m_pScalingWidget->getScaleMap());
         m_pFiffRawView->setWindowSize(m_pSettingsViewWidget->getWindowSize());
         m_pFiffRawView->setSignalColor(m_pSettingsViewWidget->getSignalColor());
         m_pFiffRawView->setBackgroundColor(m_pSettingsViewWidget->getBackgroundColor());
