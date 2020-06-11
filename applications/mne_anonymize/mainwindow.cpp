@@ -468,7 +468,6 @@ void MainWindow::lineEditOutFileEditingFinished()
     emit fileOutChanged(m_pUi->lineEditOutFile->text());
 }
 
-
 void MainWindow::checkboxBruteModeChanged()
 {
     bool state(m_pUi->checkBoxBruteMode->isChecked());
