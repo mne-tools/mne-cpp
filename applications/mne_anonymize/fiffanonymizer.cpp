@@ -712,13 +712,6 @@ void FiffAnonymizer::setMeasurementDate(const QDateTime& d)
 
 //=============================================================================================================
 
-void FiffAnonymizer::setMeasurementDate(const QDate& d)
-{
-    m_dMeasurementDate = QDateTime(d,QTime(1,1,0));
-}
-
-//=============================================================================================================
-
 void FiffAnonymizer::setMeasurementDate(const QString& sMeasDay)
 {
 

@@ -194,15 +194,6 @@ public slots:
     //=========================================================================================================
     /**
      * If found in the fiff file, the measurement date information will be overwritten with the date specified
-     * with this function. Format: YYYMMDD. Default: 20000101
-     *
-     * @param [in] sMeasDay     String containing the desired measurement day.
-     */
-    void setMeasurementDate(const QString& sMeasDay);
-
-    //=========================================================================================================
-    /**
-     * If found in the fiff file, the measurement date information will be overwritten with the date specified
      * with this function.
      *
      * @param [in] d     QDateTime object containing the desired measurement day.
@@ -216,7 +207,7 @@ public slots:
      *
      * @param [in] d     QDate object containing the desired measurement day.
      */
-    void setMeasurementDate(const QDate& d);
+    void setMeasurementDate(const QString& s);
 
     //=========================================================================================================
     /**
@@ -224,7 +215,7 @@ public slots:
      *
      * @param [in] iMeasDayOffset   Integer with the number of dates to subtract from the measurement date.
      */
-    void setMeasurementDateOffset(int iMeasDayOffset);
+    void setMeasurementDateOffset(int iMeasDateDaysOffset);
 
     //=========================================================================================================
     /**
