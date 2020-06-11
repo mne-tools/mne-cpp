@@ -139,6 +139,29 @@ void MainWindow::setDefaultStateExtraInfo()
     m_pUi->lineEditProjectPersonsExtra->setEnabled(false);
     m_pUi->plainTextEditProjectCommentExtra->setEnabled(false);
 
+    //tooltips
+    m_pUi->checkBoxBruteMode->setToolTip("Apart from other fields already anonymized by default, also anonymize subject’s weight, height, sex and handedness, and project’s ID, name, aim and comment.");
+    m_pUi->labelMeasDate->setToolTip("Specify the measurement date.");
+    m_pUi->dateTimeMeasurementDate->setToolTip("Specify the measurement date.");
+    m_pUi->checkBoxMeasurementDateOffset->setToolTip("Specify number of days to subtract to the measurement.");
+    m_pUi->spinBoxMeasurementDateOffset->setToolTip("Specify number of days to subtract to the measurement.");
+
+    m_pUi->labelSubjectBirthday->setToolTip("Specify the subject’s birthday.");
+    m_pUi->dateTimeBirthdayDate->setToolTip("Specify the subject’s birthday.");
+    m_pUi->checkBoxBirthdayDateOffset->setToolTip("Specify a number of to subtract from the subject's birthday.");
+    m_pUi->spinBoxBirthdayDateOffset->setToolTip("Specify a number of to subtract from the subject's birthday.");
+
+    m_pUi->labelSubjectHisId->setToolTip("Specify the Subject’s ID within the Hospital system.");
+    m_pUi->lineEditSubjectHisId->setToolTip("Specify the Subject’s ID within the Hospital system.");
+
+    m_pUi->buttonMenu->setToolTip("[Help] See the MNE-CPP project's documentation website.\n[Save] Save the anonymized file.");
+
+    m_pUi->labelInFile->setToolTip("File to anonymize");
+    m_pUi->lineEditInFile->setToolTip("File to anonymize.");
+    m_pUi->openInFileWindowButton->setToolTip("Select a file to anonymize.");
+    m_pUi->labelOutFile->setToolTip("Output anonymized file. By default a \"_anonymized\" suffix is added to the name of the input file.");
+    m_pUi->lineEditOutFile->setToolTip("Output anonymized file. By default a \"_anonymized\" suffix is added to the name of the input file.");
+    m_pUi->openOutFileWindowButton->setToolTip("Select a folder or a file where to save the output anonymized fif file.");
 }
 
 void MainWindow::setDefautlStateUi()

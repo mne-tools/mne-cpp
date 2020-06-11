@@ -237,6 +237,9 @@
                   <verstretch>0</verstretch>
                  </sizepolicy>
                 </property>
+                <property name="calendarPopup">
+                 <bool>true</bool>
+                </property>
                </widget>
               </item>
               <item row="5" column="0">
@@ -323,7 +326,7 @@
                 </property>
                 <layout class="QHBoxLayout" name="horizontalLayout_3">
                  <item>
-                  <widget class="QLabel" name="labelMeasDate_2">
+                  <widget class="QLabel" name="labelExtraInfoTitle">
                    <property name="maximumSize">
                     <size>
                      <width>16777215</width>
@@ -365,7 +368,7 @@
                    </widget>
                   </item>
                   <item row="3" column="0">
-                   <widget class="QLabel" name="labelMeasurementDateExtra">
+                   <widget class="QLabel" name="labelFileMeasurementDateExtra">
                     <property name="text">
                      <string>Measurement Date</string>
                     </property>
