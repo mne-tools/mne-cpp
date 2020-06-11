@@ -234,7 +234,7 @@ private:
     QString                         m_sCurrentSystem;                           /**< The current acquisition system (EEG, babyMEG, VectorView).*/
     QString                         m_sFilterChannelType;                       /**< Kind of channel which is to be filtered */
 
-    UTILSLIB::FilterData            m_filterData;                               /**< The currently active filter. */
+    UTILSLIB::FilterData            m_filterKernel;                               /**< The currently active filter. */
 
     Eigen::VectorXi                 m_vecIndicesFirstVV;                        /**< The indices of the channels to pick for the first SPHARA oerpator in case of a VectorView system.*/
     Eigen::VectorXi                 m_vecIndicesSecondVV;                       /**< The indices of the channels to pick for the second SPHARA oerpator in case of a VectorView system.*/

@@ -147,7 +147,7 @@ QVariant RtFiffRawViewModel::data(const QModelIndex &index, int role) const
                 case Qt::DisplayRole: {
                     if(m_bIsFreezed) {
                         // data freeze
-                        if(!m_filterData.isEmpty() && m_bPerformFiltering) {
+                        if(!m_filterKernel.isEmpty() && m_bPerformFiltering) {
                             rowVectorPair.first = m_matDataFilteredFreeze.data() + row*m_matDataFilteredFreeze.cols();
                             rowVectorPair.second  = m_matDataFilteredFreeze.cols();
                             v.setValue(rowVectorPair);
@@ -159,7 +159,7 @@ QVariant RtFiffRawViewModel::data(const QModelIndex &index, int role) const
                     }
                     else {
                         // data stream
-                        if(!m_filterData.isEmpty() && m_bPerformFiltering) {
+                        if(!m_filterKernel.isEmpty() && m_bPerformFiltering) {
                             rowVectorPair.first = m_matDataFiltered.data() + row*m_matDataFiltered.cols();
                             rowVectorPair.second  = m_matDataFiltered.cols();
                             v.setValue(rowVectorPair);
@@ -392,7 +392,7 @@ void RtFiffRawViewModel::setSamplingInfo(float sps, int T, bool bSetZero)
 
 MatrixXd RtFiffRawViewModel::getLastBlock()
 {
-    if(!m_filterData.isEmpty() && m_bPerformFiltering) {
+    if(!m_filterKernel.isEmpty() && m_bPerformFiltering) {
         return m_matDataFiltered.block(0, m_iCurrentSample-m_iCurrentBlockSize, m_matDataFiltered.rows(), m_iCurrentBlockSize);
     }
 
@@ -497,7 +497,7 @@ void RtFiffRawViewModel::addData(const QList<MatrixXd> &data)
         }
 
         //Filter if neccessary else set filtered data matrix to zero
-        if(!m_filterData.isEmpty() && m_bPerformFiltering) {
+        if(!m_filterKernel.isEmpty() && m_bPerformFiltering) {
             filterDataBlock(m_matDataRaw.block(0, m_iCurrentSample, nRow, nCol), m_iCurrentSample);
 
             //Perform SPHARA on filtered data after actual filtering - SPHARA should be applied on the best possible data
@@ -878,7 +878,7 @@ void RtFiffRawViewModel::updateSpharaOptions(const QString& sSytemType, int nBas
 
 void RtFiffRawViewModel::setFilter(QList<FilterData> filterData)
 {
-    m_filterData = filterData;
+    m_filterKernel = filterData;
 
     m_iMaxFilterLength = 1;
     for(int i=0; i<filterData.size(); ++i) {
@@ -1103,7 +1103,7 @@ void RtFiffRawViewModel::filterDataBlock()
 {
     //std::cout<<"START RtFiffRawViewModel::filterDataBlock"<<std::endl;
 
-    if(m_filterData.isEmpty() || !m_bPerformFiltering) {
+    if(m_filterKernel.isEmpty() || !m_bPerformFiltering) {
         return;
     }
 
@@ -1114,16 +1114,16 @@ void RtFiffRawViewModel::filterDataBlock()
     int exp = ceil(MNEMath::log2(fftLength));
     fftLength = pow(2, exp) < 512 ? 512 : pow(2, exp);
 
-    for(int i = 0; i<m_filterData.size(); ++i) {
-        FilterData tempFilter(m_filterData.at(i).m_sName,
-                              m_filterData.at(i).m_Type,
-                              m_filterData.at(i).m_iFilterOrder,
-                              m_filterData.at(i).m_dCenterFreq,
-                              m_filterData.at(i).m_dBandwidth,
-                              m_filterData.at(i).m_dParksWidth,
-                              m_filterData.at(i).m_sFreq,
+    for(int i = 0; i<m_filterKernel.size(); ++i) {
+        FilterData tempFilter(m_filterKernel.at(i).m_sName,
+                              m_filterKernel.at(i).m_Type,
+                              m_filterKernel.at(i).m_iFilterOrder,
+                              m_filterKernel.at(i).m_dCenterFreq,
+                              m_filterKernel.at(i).m_dBandwidth,
+                              m_filterKernel.at(i).m_dParksWidth,
+                              m_filterKernel.at(i).m_sFreq,
                               fftLength,
-                              m_filterData.at(i).m_designMethod);
+                              m_filterKernel.at(i).m_designMethod);
 
         tempFilterList.append(tempFilter);
     }
@@ -1184,7 +1184,7 @@ void RtFiffRawViewModel::filterDataBlock(const MatrixXd &data, int iDataIndex)
 
     for(qint32 i = 0; i < data.rows(); ++i) {
         if(m_filterChannelList.contains(m_pFiffInfo->chs.at(i).ch_name)) {
-            timeData.append(QPair<QList<FilterData>,QPair<int,RowVectorXd> >(m_filterData,QPair<int,RowVectorXd>(i,data.row(i))));
+            timeData.append(QPair<QList<FilterData>,QPair<int,RowVectorXd> >(m_filterKernel,QPair<int,RowVectorXd>(i,data.row(i))));
         } else {
             notFilterChannelIndex.append(i);
             }

@@ -176,17 +176,17 @@ public:
     /**
      * Sets new time window size
      *
-     * @param [in] T  time window size;
+     * @param [in] iT  time window size;
      */
-    void setWindowSize(int T);
+    void setWindowSize(int iT);
 
     //=========================================================================================================
     /**
      * distanceTimeSpacerChanged changes the distance of the time spacers
      *
-     * @param value the new distance for the time spacers
+     * @param iValue the new distance for the time spacers
      */
-    void setDistanceTimeSpacer(int value);
+    void setDistanceTimeSpacer(int iValue);
 
     //=========================================================================================================
     /**
@@ -229,7 +229,7 @@ public:
     /**
      * Moves data viewer to a position where the selected annotation is in the middle of the viewer.
      */
-    void updateScrollPosition();
+    void updateScrollPositionToAnnotation();
 
     //=========================================================================================================
     /**

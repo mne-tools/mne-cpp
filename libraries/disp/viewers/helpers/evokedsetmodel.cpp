@@ -137,7 +137,7 @@ QVariant EvokedSetModel::data(const QModelIndex &index, int role) const
 
                     if(m_bIsFreezed) {
                         // data freeze
-                        if(!m_filterData.isEmpty() && m_bPerformFiltering) {
+                        if(!m_filterKernel.isEmpty() && m_bPerformFiltering) {
                             for(int i = 0; i < m_matDataFilteredFreeze.size(); ++i) {
                                 pairItem.first = m_lAvrTypes.at(i);
                                 pairItem.second = m_matDataFilteredFreeze.at(i).row(row);
@@ -152,7 +152,7 @@ QVariant EvokedSetModel::data(const QModelIndex &index, int role) const
                         }
                     } else {
                         // data stream
-                        if(!m_filterData.isEmpty() && m_bPerformFiltering) {
+                        if(!m_filterKernel.isEmpty() && m_bPerformFiltering) {
                             for(int i = 0; i < m_matDataFiltered.size(); ++i) {
                                 pairItem.first = m_lAvrTypes.at(i);
                                 pairItem.second = m_matDataFiltered.at(i).row(row);
@@ -198,7 +198,7 @@ QVariant EvokedSetModel::data(const QModelIndex &index, int role) const
                 case EvokedSetModelRoles::GetAverageData: {
                     if(m_bIsFreezed){
                         // data freeze
-                        if(!m_filterData.isEmpty() && m_bPerformFiltering) {
+                        if(!m_filterKernel.isEmpty() && m_bPerformFiltering) {
                             for(int i = 0; i < m_matDataFilteredFreeze.size(); ++i) {
                                 averagedData.first = m_lAvrTypes.at(i);
                                 averagedData.second.first = m_matDataFilteredFreeze.at(i).data();
@@ -217,7 +217,7 @@ QVariant EvokedSetModel::data(const QModelIndex &index, int role) const
                         }
                     } else {
                         // data
-                        if(!m_filterData.isEmpty() && m_bPerformFiltering) {
+                        if(!m_filterKernel.isEmpty() && m_bPerformFiltering) {
                             for(int i = 0; i < m_matDataFiltered.size(); ++i) {
                                 averagedData.first = m_lAvrTypes.at(i);
                                 averagedData.second.first = m_matDataFiltered.at(i).data();
@@ -387,7 +387,7 @@ void EvokedSetModel::updateData()
         m_lAvrTypes.append(m_pEvokedSet->evoked.at(i).comment);
     }
 
-    if(!m_filterData.isEmpty() && m_bPerformFiltering) {
+    if(!m_filterKernel.isEmpty() && m_bPerformFiltering) {
         filterDataBlock();
     }
 
@@ -847,13 +847,13 @@ void EvokedSetModel::toggleFreeze()
 
 void EvokedSetModel::setFilter(const FilterData& filterData)
 {
-    m_filterData.clear();
-    m_filterData << filterData;
+    m_filterKernel.clear();
+    m_filterKernel << filterData;
 
     m_iMaxFilterLength = 1;
-    for(int i=0; i<m_filterData.size(); i++) {
-        if(m_iMaxFilterLength < m_filterData.at(i).m_iFilterOrder) {
-            m_iMaxFilterLength = m_filterData.at(i).m_iFilterOrder;
+    for(int i=0; i<m_filterKernel.size(); i++) {
+        if(m_iMaxFilterLength < m_filterKernel.at(i).m_iFilterOrder) {
+            m_iMaxFilterLength = m_filterKernel.at(i).m_iFilterOrder;
         }
     }
 
@@ -961,7 +961,7 @@ void doFilterPerChannelRTESet(QPair<QList<FilterData>,QPair<int,RowVectorXd> > &
 
 void EvokedSetModel::filterDataBlock()
 {
-    if(m_filterData.isEmpty() || !m_bPerformFiltering) {
+    if(m_filterKernel.isEmpty() || !m_bPerformFiltering) {
         return;
     }
 
@@ -975,7 +975,7 @@ void EvokedSetModel::filterDataBlock()
             if(m_filterChannelList.contains(m_pEvokedSet->info.chs.at(i).ch_name)) {
                 RowVectorXd datTemp(m_matData.at(j).row(i).cols() + 2 * m_iMaxFilterLength);
                 datTemp << m_matData.at(j).row(i).head(m_iMaxFilterLength).reverse(), m_matData.at(j).row(i), m_matData.at(j).row(i).tail(m_iMaxFilterLength).reverse();
-                timeData.append(QPair<QList<FilterData>,QPair<int,RowVectorXd> >(m_filterData,QPair<int,RowVectorXd>(i,datTemp)));
+                timeData.append(QPair<QList<FilterData>,QPair<int,RowVectorXd> >(m_filterKernel,QPair<int,RowVectorXd>(i,datTemp)));
             } else {
                 notFilterChannelIndex.append(i);
             }

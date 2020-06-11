@@ -449,7 +449,7 @@ private:
     qint32                                  m_iMaxFilterLength;             /**< Max order of the current filters */
 
     QString                                 m_sFilterChannelType;           /**< Kind of channel which is to be filtered */
-    QList<UTILSLIB::FilterData>             m_filterData;                   /**< List of currently active filters. */
+    QList<UTILSLIB::FilterData>             m_filterKernel;                   /**< List of currently active filters. */
     QStringList                             m_filterChannelList;            /**< List of channels which are to be filtered.*/
     QStringList                             m_visibleChannelList;           /**< List of currently visible channels in the view.*/
 

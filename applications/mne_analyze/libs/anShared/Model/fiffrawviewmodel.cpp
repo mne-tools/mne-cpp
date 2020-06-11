@@ -109,7 +109,7 @@ FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
 , m_bCurrentlyLoading(false)
 , m_iDistanceTimerSpacer(1000)
 , m_iScrollPos(0)
-, m_bDispAnn(true)
+, m_bDispAnnotation(true)
 , m_bPerformFiltering(false)
 , m_pAnnotationModel(QSharedPointer<AnnotationModel>::create(this))
 , m_pRtFilter(RtFilter::SPtr::create())
@@ -405,7 +405,7 @@ void FiffRawViewModel::updateScrollPosition(qint32 newScrollPosition)
 
         if (blockDist >= m_iTotalBlockCount) {
             // we must "jump" to the new cursor ...
-            m_iFiffCursorBegin = std::min(absoluteLastSample() - m_iTotalBlockCount * m_iSamplesPerBlock, m_iFiffCursorBegin +  blockDist * m_iSamplesPerBlock);
+            m_iFiffCursorBegin = std::min(absoluteLastSample() - m_iTotalBlockCount * m_iSamplesPerBlock, m_iFiffCursorBegin + blockDist * m_iSamplesPerBlock);
 
             // ... and load the whole model anew
             //startBackgroundOperation(&FiffRawViewModel::loadLaterBlocks, m_iTotalBlockCount);
@@ -440,14 +440,14 @@ void FiffRawViewModel::setScaling(const QMap< qint32,float >& p_qMapChScaling)
 
 //=============================================================================================================
 
-qint32 FiffRawViewModel::getKind(const qint32 &index) const
+qint32 FiffRawViewModel::getKind(qint32 index) const
 {
     return m_ChannelInfoList.at(index).kind;
 }
 
 //=============================================================================================================
 
-qint32 FiffRawViewModel::getUnit(const qint32 &index) const
+qint32 FiffRawViewModel::getUnit(qint32 index) const
 {
     return m_ChannelInfoList.at(index).unit;
 }
@@ -476,7 +476,7 @@ void FiffRawViewModel::setWindowSize(int iNumSeconds,
     //reload data to accomodate new size
     updateDisplayData();
 
-    //Update m_dDx basedon new size
+    //Update m_dDx based on new size
     setDataColumnWidth(iColWidth);
 
     endResetModel();
@@ -504,8 +504,6 @@ float FiffRawViewModel::getNumberOfTimeSpacers() const
 
 int FiffRawViewModel::getTimeMarks(int iIndex) const
 {
-
-//    qDebug() << "getTimeMarks" << m_pAnnotationModel->getAnnotation(iIndex);
     return m_pAnnotationModel->getAnnotation(iIndex);
 }
 
@@ -513,7 +511,6 @@ int FiffRawViewModel::getTimeMarks(int iIndex) const
 
 int FiffRawViewModel::getTimeListSize() const
 {
-//    qDebug() << "getTimeListSize" << m_pAnnotationModel->getNumberOfAnnotations();
     return m_pAnnotationModel->getNumberOfAnnotations();
 }
 
@@ -533,16 +530,16 @@ int FiffRawViewModel::getWindowSizeBlocks() const
 
 //=============================================================================================================
 
-void FiffRawViewModel::toggleDispAnn(const int& iToggleDisp)
+void FiffRawViewModel::toggleDispAnnotation(int iToggleDisp)
 {
-    m_bDispAnn = (iToggleDisp ? true : false);
+    m_bDispAnnotation = (iToggleDisp ? true : false);
 }
 
 //=============================================================================================================
 
-bool FiffRawViewModel::shouldDisplayAnn() const
+bool FiffRawViewModel::shouldDisplayAnnotation() const
 {
-    return (m_bDispAnn && getTimeListSize());
+    return (m_bDispAnnotation && getTimeListSize());
 }
 
 //=============================================================================================================
@@ -564,10 +561,12 @@ void FiffRawViewModel::addTimeMark(int iLastClicked)
 
 void FiffRawViewModel::setFilter(const QList<FilterData>& filterData)
 {
-    m_filterData = filterData;
+    m_filterKernel = filterData;
 
      //Filter all visible data channels at once
     filterAllDataBlocks();
+
+    emit dataChanged(createIndex(0,0), createIndex(rowCount(), columnCount()));
 }
 
 //=============================================================================================================
@@ -609,6 +608,8 @@ void FiffRawViewModel::setFilterChannelType(const QString& channelType)
 
     //Filter all data channels at once
     filterAllDataBlocks();
+
+    emit dataChanged(createIndex(0,0), createIndex(rowCount(), columnCount()));
 }
 
 //=============================================================================================================
@@ -622,14 +623,14 @@ bool FiffRawViewModel::isFilterActive() const
 
 int FiffRawViewModel::getFilterLength() const
 {
-    if(!m_filterData.isEmpty()) {
-        return m_filterData.first().m_iFilterOrder;
+    if(!m_filterKernel.isEmpty()) {
+        return m_filterKernel.first().m_iFilterOrder;
     }
 }
 
 //=============================================================================================================
 
-void FiffRawViewModel::filterDataBlock(MatrixXd& pData)
+void FiffRawViewModel::filterDataBlock(MatrixXd& matData)
 {
     if(!m_bPerformFiltering) {
         return;
@@ -640,7 +641,7 @@ void FiffRawViewModel::filterDataBlock(MatrixXd& pData)
         return;
     }
 
-    if(m_filterData.isEmpty()) {
+    if(m_filterKernel.isEmpty()) {
         qWarning() << "[FiffRawViewModel::filterDataBlock] Filter is unspecified.";
         return;
     }
@@ -649,12 +650,12 @@ void FiffRawViewModel::filterDataBlock(MatrixXd& pData)
     #ifdef WASMBUILD
     pData = m_pRtFilter->filterDataBlock(pData,
                                          m_lFilterChannelList,
-                                         m_filterData,
+                                         m_filterKernel,
                                          false);
     #else
-    pData = m_pRtFilter->filterDataBlock(pData,
-                                         m_lFilterChannelList,
-                                         m_filterData);
+    matData = m_pRtFilter->filterDataBlock(matData,
+                                           m_lFilterChannelList,
+                                           m_filterKernel);
     #endif
 }
 
@@ -671,7 +672,7 @@ void FiffRawViewModel::filterAllDataBlocks()
         return;
     }
 
-    if(m_filterData.isEmpty()) {
+    if(m_filterKernel.isEmpty()) {
         qWarning() << "[FiffRawViewModel::filterAllDataBlocks] Filter is unspecified.";
         return;
     }
@@ -687,20 +688,18 @@ void FiffRawViewModel::filterAllDataBlocks()
         #ifdef WASMBUILD
         pPair = QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(m_pRtFilter->filterDataBlock((*itr)->first,
                                                                                                           m_lFilterChannelList,
-                                                                                                          m_filterData,
+                                                                                                          m_filterKernel,
                                                                                                           false),
                                                                              (*itr)->second));
         #else
         pPair = QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(m_pRtFilter->filterDataBlock((*itr)->first,
                                                                                                           m_lFilterChannelList,
-                                                                                                          m_filterData),
+                                                                                                          m_filterKernel),
                                                                              (*itr)->second));
         #endif
 
         m_lFilteredData.push_back(pPair);
     }
-
-    emit dataChanged(createIndex(0,0), createIndex(rowCount(), columnCount()));
 }
 
 //=============================================================================================================
@@ -934,7 +933,7 @@ void FiffRawViewModel::updateDisplayData()
 
     MatrixXd data, times;
 
-    m_iFiffCursorBegin = m_pFiffIO->m_qlistRaw[0]->first_samp;
+    //m_iFiffCursorBegin = m_pFiffIO->m_qlistRaw[0]->first_samp;
 
     int start = m_iFiffCursorBegin;
     m_iSamplesPerBlock = m_pFiffInfo->sfreq;

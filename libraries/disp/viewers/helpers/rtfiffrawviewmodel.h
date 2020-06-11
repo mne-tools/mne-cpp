@@ -598,7 +598,7 @@ private:
     QMap<int,QList<QPair<int,double> > >m_qMapDetectedTriggerOld;                   /**< Old detected trigger for each trigger channel. */
     QMap<int,QList<QPair<int,double> > >m_qMapDetectedTriggerOldFreeze;             /**< Old detected trigger for each trigger channel while display is freezed. */
     QMap<qint32,float>                  m_qMapChScaling;                            /**< Channel scaling map. */
-    QList<UTILSLIB::FilterData>         m_filterData;                               /**< List of currently active filters. */
+    QList<UTILSLIB::FilterData>         m_filterKernel;                               /**< List of currently active filters. */
     QStringList                         m_filterChannelList;                        /**< List of channels which are to be filtered.*/
     QStringList                         m_visibleChannelList;                       /**< List of currently visible channels in the view.*/
     QMap<qint32,qint32>                 m_qMapIdxRowSelection;                      /**< Selection mapping.*/
@@ -646,7 +646,7 @@ inline qint32 RtFiffRawViewModel::getCurrentSampleIndex() const
         return m_iCurrentSampleFreeze;
     }
 
-    if(!m_filterData.isEmpty() && m_bPerformFiltering) {
+    if(!m_filterKernel.isEmpty() && m_bPerformFiltering) {
         return m_iCurrentSample-m_iMaxFilterLength/2;
     }
 
@@ -660,7 +660,7 @@ inline double RtFiffRawViewModel::getLastBlockFirstValue(int row) const
     if(row>m_vecLastBlockFirstValuesFiltered.rows() || row>m_vecLastBlockFirstValuesRaw.rows())
         return 0;
 
-    if(!m_filterData.isEmpty())
+    if(!m_filterKernel.isEmpty())
         return m_vecLastBlockFirstValuesFiltered[row];
 
     return m_vecLastBlockFirstValuesRaw[row];
@@ -778,7 +778,7 @@ inline bool RtFiffRawViewModel::triggerDetectionActive() const
 
 inline int RtFiffRawViewModel::getCurrentOverlapAddDelay() const
 {
-    if(!m_filterData.isEmpty())
+    if(!m_filterKernel.isEmpty())
         return m_iMaxFilterLength/2;
     else
         return 0;
