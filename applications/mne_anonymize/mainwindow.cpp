@@ -78,21 +78,12 @@ bool MainWindow::confirmClose()
     return false;
 }
 
-void MainWindow::clearInfo()
+void MainWindow::setDefaultStateExtraInfo()
 {
-    m_pUi->spinBoxMeasurementDateOffset->setValue(0);
-    m_pUi->spinBoxBirthdayDateOffset->setValue(0);
-
-    m_pUi->lineEditFileVersionExtra->clear();
-    m_pUi->lineEditMACAddressExtra->clear();
-
-    m_pUi->comboBoxSubjectSexExtra->setCurrentIndex(0);
-
-    m_pUi->comboBoxSubjectHandExtra->setCurrentIndex(0);
-
-    m_pUi->lineEditFileVersionExtra->clear();
+    m_pUi->lineEditIdFileVersionExtra->clear();
+    m_pUi->lineEditIdMACAddressExtra->clear();
     m_pUi->dateTimeIdMeasurementDateExtra->clear();
-    m_pUi->lineEditMACAddressExtra->clear();
+
     m_pUi->dateTimeFileMeasurementDateExtra->clear();
 
     m_pUi->lineEditExperimenterExtra->clear();
@@ -104,6 +95,8 @@ void MainWindow::clearInfo()
     m_pUi->lineEditSubjectLastNameExtra->clear();
     m_pUi->dateEditSubjectBirthdayExtra->clear();
 
+    m_pUi->comboBoxSubjectSexExtra->setCurrentIndex(0);
+    m_pUi->comboBoxSubjectHandExtra->setCurrentIndex(0);
     m_pUi->doubleSpinBoxSubjectWeightExtra->clear();
     m_pUi->doubleSpinBoxSubjectHeightExtra->clear();
     m_pUi->plainTextEditSubjectCommentExtra->clear();
@@ -116,29 +109,11 @@ void MainWindow::clearInfo()
     m_pUi->lineEditProjectNameExtra->clear();
     m_pUi->lineEditProjectPersonsExtra->clear();
     m_pUi->plainTextEditProjectCommentExtra->clear();
-}
 
-void MainWindow::setDefautlStateUi()
-{
-    m_pUi->spinBoxMeasurementDateOffset->setEnabled(false);
-    m_pUi->spinBoxBirthdayDateOffset->setEnabled(false);
-
-    m_pUi->frameExtraInfo->setVisible(m_bHideExtraInfoFields);
-
-    m_pUi->lineEditFileVersionExtra->setEnabled(false);
-    m_pUi->lineEditMACAddressExtra->setEnabled(false);
-
-    m_pUi->comboBoxSubjectSexExtra->addItems(QStringList() << "Unknown" << "Male" << "Female");
-    m_pUi->comboBoxSubjectSexExtra->setCurrentIndex(0);
-    m_pUi->comboBoxSubjectSexExtra->setEditable(false);
-
-    m_pUi->comboBoxSubjectHandExtra->addItems(QStringList() << "Unknown" << "Right" << "Left");
-    m_pUi->comboBoxSubjectHandExtra->setCurrentIndex(0);
-    m_pUi->comboBoxSubjectHandExtra->setEditable(false);
-
-    m_pUi->lineEditFileVersionExtra->setEnabled(false);
+    m_pUi->lineEditIdFileVersionExtra->setEnabled(false);
+    m_pUi->lineEditIdMACAddressExtra->setEnabled(false);
     m_pUi->dateTimeIdMeasurementDateExtra->setEnabled(false);
-    m_pUi->lineEditMACAddressExtra->setEnabled(false);
+
     m_pUi->dateTimeFileMeasurementDateExtra->setEnabled(false);
 
     m_pUi->lineEditExperimenterExtra->setEnabled(false);
@@ -164,6 +139,51 @@ void MainWindow::setDefautlStateUi()
     m_pUi->lineEditProjectPersonsExtra->setEnabled(false);
     m_pUi->plainTextEditProjectCommentExtra->setEnabled(false);
 
+}
+
+void MainWindow::setDefautlStateUi()
+{
+    m_pUi->spinBoxMeasurementDateOffset->setEnabled(false);
+    m_pUi->spinBoxBirthdayDateOffset->setEnabled(false);
+    m_pUi->spinBoxMeasurementDateOffset->setValue(0);
+    m_pUi->spinBoxBirthdayDateOffset->setValue(0);
+
+    m_pUi->frameExtraInfo->setVisible(m_bHideExtraInfoFields);
+
+    m_pUi->comboBoxSubjectSexExtra->addItems(QStringList() << "Unknown" << "Male" << "Female");
+    m_pUi->comboBoxSubjectSexExtra->setCurrentIndex(0);
+    m_pUi->comboBoxSubjectSexExtra->setEditable(false);
+
+    m_pUi->comboBoxSubjectHandExtra->addItems(QStringList() << "Unknown" << "Right" << "Left");
+    m_pUi->comboBoxSubjectHandExtra->setCurrentIndex(0);
+    m_pUi->comboBoxSubjectHandExtra->setEditable(false);
+
+    m_pUi->lineEditIdFileVersionExtra->setReadOnly(true);
+    m_pUi->lineEditIdMACAddressExtra->setReadOnly(true);
+    m_pUi->dateTimeIdMeasurementDateExtra->setReadOnly(true);
+
+    m_pUi->dateTimeFileMeasurementDateExtra->setReadOnly(true);
+
+    m_pUi->lineEditExperimenterExtra->setReadOnly(true);
+    m_pUi->plainTextFileCommentExtra->setReadOnly(true);
+
+    m_pUi->spinBoxSubjectIDExtra->setReadOnly(true);
+    m_pUi->lineEditSubjectFirstNameExtra->setReadOnly(true);
+    m_pUi->lineEditSubjectMiddleNameExtra->setReadOnly(true);
+    m_pUi->lineEditSubjectLastNameExtra->setReadOnly(true);
+    m_pUi->dateEditSubjectBirthdayExtra->setReadOnly(true);
+    m_pUi->doubleSpinBoxSubjectWeightExtra->setReadOnly(true);
+    m_pUi->doubleSpinBoxSubjectHeightExtra->setReadOnly(true);
+    m_pUi->plainTextEditSubjectCommentExtra->setReadOnly(true);
+    m_pUi->lineEditSubjectHisIdExtra->setReadOnly(true);
+
+    m_pUi->labelSubjectMriDataFoundExtra->setVisible(false);
+
+    m_pUi->spinBoxProjectIDExtra->setReadOnly(true);
+    m_pUi->lineEditProjectAimExtra->setReadOnly(true);
+    m_pUi->lineEditProjectNameExtra->setReadOnly(true);
+    m_pUi->lineEditProjectPersonsExtra->setReadOnly(true);
+    m_pUi->plainTextEditProjectCommentExtra->setReadOnly(true);
 }
 
 void MainWindow::setupConnections()
