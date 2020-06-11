@@ -280,151 +280,135 @@ void MainWindow::setSubjectHis(const QString& h)
 
 void MainWindow::setLineEditIdFileVersion(double v)
 {
-//    m_pUi->lineEditFileVersionExtra->setVisible(true);
-//    m_pUi->labelFileVersionExtra->setVisible(true);
-//    m_bIdFileVersionFound = true;
-    m_pUi->lineEditFileVersionExtra->setText(QString::number(v));
+    m_pUi->lineEditIdFileVersionExtra->setEnabled(true);
+    m_pUi->lineEditIdFileVersionExtra->setText(QString::number(v));
 }
 
 void MainWindow::setLineEditIdMeasurementDate(QDateTime d)
 {
-//    m_pUi->labelIdMeasurementDateExtra->setVisible(true);
-//    m_pUi->dateTimeIdMeasurementDateExtra->setVisible(true);
-//    m_bIdMeasurementDateFound = true;
+    m_pUi->dateTimeIdMeasurementDateExtra->setEnabled(true);
     m_pUi->dateTimeIdMeasurementDateExtra->setDateTime(d);
 }
 
 void MainWindow::setLineEditIdMacAddress(QString mac)
 {
-//    m_pUi->labelMACAddressExtra->setVisible(true);
-//    m_pUi->lineEditMACAddressExtra->setVisible(true);
-//    m_bIdMacAddressFound = true;
-    m_pUi->lineEditMACAddressExtra->setText(mac);
+    m_pUi->lineEditIdMACAddressExtra->setEnabled(true);
+    m_pUi->lineEditIdMACAddressExtra->setText(mac);
 }
 
 void MainWindow::setLineEditFileMeasurementDate(QDateTime d)
 {
-//    m_pUi->labelMeasDate->setVisible(true);
-//    m_pUi->dateTimeFileMeasurementDateExtra->setVisible(true);
-//    m_bFileMeasurementDateFound = true;
+    m_pUi->dateTimeFileMeasurementDateExtra->setEnabled(true);
     m_pUi->dateTimeFileMeasurementDateExtra->setDateTime(d);
 }
 
 void MainWindow::setLineEditFileComment(QString c)
 {
-//    m_pUi->labelFileCommentExtra->setVisible(true);
-//    m_pUi->plainTextFileCommentExtra->setVisible(true);
-//    m_bFileCommentFound = true;
+    m_pUi->plainTextFileCommentExtra->setEnabled(true);
     m_pUi->plainTextFileCommentExtra->setPlainText(c);
 }
 
 void MainWindow::setLineEditFileExperimenter(QString e)
 {
-//    m_pUi->labelExperimenterExtra->setVisible(true);
-//    m_pUi->lineEditExperimenterExtra->setVisible(true);
-//    m_bFileExperimenterFound = true;
+    m_pUi->lineEditExperimenterExtra->setEnabled(true);
     m_pUi->lineEditExperimenterExtra->setText(e);
 }
 
 void MainWindow::setLineEditSubjectId(int i)
 {
-//    m_pUi->labelSubjectIDExtra->setVisible(true);
-//    m_pUi->spinBoxSubjectIDExtra->setVisible(true);
-//    m_bSubjectIdFound = true;
+    m_pUi->spinBoxSubjectIDExtra->setEnabled(true);
     m_pUi->spinBoxSubjectIDExtra->setValue(i);
 }
 
 void MainWindow::setLineEditSubjectFirstName(QString fn)
 {
-//    m_pUi->labelSubjectFirstNameExtra->setVisible(true);
-//    m_pUi->lineEditSubjectFirstNameExtra->setVisible(true);
-//    m_bSubjectFirstNameFound = true;
+    m_pUi->lineEditSubjectFirstNameExtra->setEnabled(true);
     m_pUi->lineEditSubjectFirstNameExtra->setText(fn);
 }
 
 void MainWindow::setLineEditSubjectMiddleName(QString mn)
 {
-//    m_bSubjectMiddleNameFound = true;
+    m_pUi->lineEditSubjectMiddleNameExtra->setEnabled(true);
     m_pUi->lineEditSubjectMiddleNameExtra->setText(mn);
 }
 
 void MainWindow::setLineEditSubjectLastName(QString ln)
 {
-//    m_bSubjectLastNameFound = true;
+    m_pUi->lineEditSubjectLastNameExtra->setEnabled(true);
     m_pUi->lineEditSubjectLastNameExtra->setText(ln);
 }
 
 void MainWindow::setLineEditSubjectBirthday(QDateTime b)
 {
-//    m_bSubjectBirthdayFound = true;
+    m_pUi->dateTimeBirthdayDate->setEnabled(true);
     m_pUi->dateTimeBirthdayDate->setDateTime(b);
 }
 
-void MainWindow::setLineEditSubjectSex(int s)
+void MainWindow::setComboBoxSubjectSex(int s)
 {
-//    m_bSubjectSexFound = true;
+    m_pUi->comboBoxSubjectSexExtra->setEnabled(true);
     m_pUi->comboBoxSubjectSexExtra->setCurrentIndex(s);
 }
 
 void MainWindow::setLineEditSubjectHand(int h)
 {
-//    m_bSubjectHandFound = true;
+    m_pUi->comboBoxSubjectHandExtra->setEnabled(true);
     m_pUi->comboBoxSubjectHandExtra->setCurrentIndex(h);
 }
 
 void MainWindow::setLineEditSubjectWeight(float w)
 {
-//    m_bSubjectWeightFound = true;
+    m_pUi->doubleSpinBoxSubjectWeightExtra->setEnabled(true);
     double wd(static_cast<double>(w));
     m_pUi->doubleSpinBoxSubjectWeightExtra->setValue(wd);
 }
 
 void MainWindow::setLineEditSubjectHeight(float h)
 {
-//    m_bSubjectHeightFound = true;
+    m_pUi->doubleSpinBoxSubjectHeightExtra->setEnabled(true);
     double hd(static_cast<double>(h));
     m_pUi->doubleSpinBoxSubjectHeightExtra->setValue(hd);
 }
 
 void MainWindow::setLineEditSubjectComment(QString c)
 {
-//    m_bSubjectCommentFound = true;
+    m_pUi->plainTextEditSubjectCommentExtra->setEnabled(true);
     m_pUi->plainTextEditSubjectCommentExtra->setPlainText(c);
 }
 
 void MainWindow::setLineEditSubjectHisId(QString his)
 {
-//    m_bSubjectHisIdFound = true;
+    m_pUi->lineEditSubjectHisIdExtra->setEnabled(true);
     m_pUi->lineEditSubjectHisIdExtra->setText(his);
 }
 
 void MainWindow::setLineEditProjectId(int id)
 {
-//    m_bProjectIdFound = true;
+    m_pUi->spinBoxProjectIDExtra->setEnabled(true);
     m_pUi->spinBoxProjectIDExtra->setValue(id);
 }
 
 void MainWindow::setLineEditProjectName(QString p)
 {
-//    m_bProjectNameFound = true;
+    m_pUi->lineEditProjectNameExtra->setEnabled(true);
     m_pUi->lineEditProjectNameExtra->setText(p);
 }
 
 void MainWindow::setLineEditProjectAim(QString p)
 {
-//    m_bProjectAimFound = true;
+    m_pUi->lineEditProjectAimExtra->setEnabled(true);
     m_pUi->lineEditProjectAimExtra->setText(p);
 }
 
 void MainWindow::setLineEditProjectPersons(QString p)
 {
-//    m_bProjectPersonsFound = true;
+    m_pUi->lineEditProjectPersonsExtra->setEnabled(true);
     m_pUi->lineEditProjectPersonsExtra->setText(p);
 }
 
 void MainWindow::setLineEditProjectComment(QString c)
 {
-//    m_bProjectCommentFound = true;
+    m_pUi->plainTextEditProjectCommentExtra->setEnabled(true);
     m_pUi->plainTextEditProjectCommentExtra->setPlainText(c);
 }
 
