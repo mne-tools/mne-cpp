@@ -382,9 +382,7 @@ int SettingsControllerCl::parseInOutFiles()
             }
         }
     } else {
-        QString fileOut(QDir(m_fiInFileInfo.absolutePath()).filePath(
-                    m_fiInFileInfo.baseName() + "_anonymized." + m_fiInFileInfo.completeSuffix()));
-        m_fiOutFileInfo.setFile(fileOut);
+        generateDefaultOutputFileName();
     }
     if(m_pAnonymizer->setFileOut(m_fiOutFileInfo.absoluteFilePath()))
     {
@@ -558,4 +556,13 @@ QString SettingsControllerCl::generateRandomFileName()
     }
 
     return randomFileName.append(".fif");
+}
+
+
+QString SettingsControllerCl::generateDefaultOutputFileName()
+{
+    QString fileOut(QDir(m_fiInFileInfo.absolutePath()).filePath(
+                m_fiInFileInfo.baseName() + "_anonymized." + m_fiInFileInfo.completeSuffix()));
+    m_fiOutFileInfo.setFile(fileOut);
+    return m_fiOutFileInfo.absoluteFilePath();
 }
