@@ -136,6 +136,9 @@ protected:
      */
     int execute();
 
+    QString generateDefaultOutputFileName();
+
+
 private:
 
     //=========================================================================================================
