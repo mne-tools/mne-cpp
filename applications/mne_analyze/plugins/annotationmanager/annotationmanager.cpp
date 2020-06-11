@@ -211,7 +211,7 @@ void AnnotationManager::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel
 void AnnotationManager::toggleDisplayEvent(const int& iToggle)
 {
     int m_iToggle = iToggle;
-    m_pFiffRawModel->toggleDispAnn(m_iToggle);
+    m_pFiffRawModel->toggleDispAnnotation(m_iToggle);
     m_pCommu->publishEvent(TRIGGER_REDRAW);
 }
 
