@@ -140,7 +140,9 @@ void MainWindow::setDefaultStateExtraInfo()
     m_pUi->plainTextEditProjectCommentExtra->setEnabled(false);
 
     //tooltips
-    m_pUi->checkBoxBruteMode->setToolTip("Apart from other fields already anonymized by default, also anonymize subject’s weight, height, sex and handedness, and project’s ID, name, aim and comment.");
+
+    m_pUi->checkBoxBruteMode->setToolTip("Advanced anonymization. Anonymize also weight, height and some other fields. See Help.");
+//    m_pUi->checkBoxBruteMode->setToolTip("Apart from other fields already anonymized by default, \nalso anonymize subject’s weight, height, sex and handedness, and project’s ID, name, aim and comment.");
     m_pUi->labelMeasDate->setToolTip("Specify the measurement date.");
     m_pUi->dateTimeMeasurementDate->setToolTip("Specify the measurement date.");
     m_pUi->checkBoxMeasurementDateOffset->setToolTip("Specify number of days to subtract to the measurement.");
