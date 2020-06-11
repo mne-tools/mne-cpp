@@ -75,7 +75,7 @@ SettingsControllerGui::SettingsControllerGui(const QStringList& arguments)
 
     m_pWin->show();
 
-    if(m_fiInFileInfo.isFile())
+    if(m_pAnonymizer->isFileInSet())
     {
         readData();
     }
@@ -84,12 +84,6 @@ SettingsControllerGui::SettingsControllerGui(const QStringList& arguments)
 void SettingsControllerGui::executeAnonymizer()
 {
     m_pAnonymizer->anonymizeFile();
-
-//    if(checkDeleteInputFile())
-//    {
-//        deleteInputFile();
-//    }
-
 }
 
 void SettingsControllerGui::readData()
