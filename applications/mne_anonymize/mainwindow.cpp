@@ -36,8 +36,8 @@ MainWindow::MainWindow(MNEANONYMIZE::SettingsControllerGui *c)
 //, m_bProjectNameFound(false)
 //, m_bProjectPersonsFound(false)
 //, m_bProjectCommentFound(false)
-//  m_bHideInfoFields(true)
- m_pUi(new Ui::MainWindow)
+  m_bHideExtraInfoFields(false)
+, m_pUi(new Ui::MainWindow)
 , m_pController(c)
 {
     m_pUi->setupUi(this);
@@ -122,9 +122,7 @@ void MainWindow::setDefautlStateUi()
     m_pUi->spinBoxMeasurementDateOffset->setEnabled(false);
     m_pUi->spinBoxBirthdayDateOffset->setEnabled(false);
 
-//    m_pUi->frameFile->setHidden(m_bHideInfoFields);
-//    m_pUi->frameSubject->setHidden(m_bHideInfoFields);
-//    m_pUi->frameProject->setHidden(m_bHideInfoFields);
+    m_pUi->frameExtraInfo->setVisible(m_bHideExtraInfoFields);
 
     m_pUi->lineEditFileVersionExtra->setEnabled(false);
     m_pUi->lineEditMACAddressExtra->setEnabled(false);
@@ -169,6 +167,9 @@ void MainWindow::setDefautlStateUi()
 
 void MainWindow::setupConnections()
 {
+
+    QObject::connect(m_pUi->seeExtraInfoButton,&QToolButton::clicked,
+                     this,&MainWindow::showExtraInfo);
 
     QObject::connect(m_pUi->buttonMenu,&QDialogButtonBox::accepted,
                      m_pController,&SettingsControllerGui::executeAnonymizer);
@@ -438,6 +439,13 @@ void MainWindow::openOutFileDialog()
         lineEditOutFileEditingFinished();
     }
 }
+
+void MainWindow::showExtraInfo()
+{
+    m_bHideExtraInfoFields = !m_bHideExtraInfoFields;
+    m_pUi->frameExtraInfo->setVisible(m_bHideExtraInfoFields);
+}
+
 
 void MainWindow::helpButtonClicked()
 {
