@@ -187,7 +187,9 @@ private:
     void onResetAverage(bool state);
 
     //=========================================================================================================
-    void onComputeButtonCLicked(bool bChecked);
+    void onComputeButtonClicked(bool bChecked);
+
+    void onCheckBoxStateChanged();
 
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals */
 
@@ -210,6 +212,11 @@ private:
 
     float                                                   m_fPreStim;
     float                                                   m_fPostStim;
+
+    bool m_bUseAnn;
+
+    QRadioButton* m_pAnnCheck;
+    QRadioButton* m_pStimCheck;
 
 
 };
