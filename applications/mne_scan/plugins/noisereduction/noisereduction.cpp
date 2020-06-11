@@ -46,9 +46,12 @@
 #include <disp/viewers/filterdesignview.h>
 #include <disp/viewers/compensatorview.h>
 #include <disp/viewers/spharasettingsview.h>
-#include <utils/filterTools/sphara.h>
-#include <utils/ioutils.h>
+
 #include <rtprocessing/filter.h>
+#include <rtprocessing/sphara.h>
+
+#include <utils/ioutils.h>
+
 #include <scMeas/realtimemultisamplearray.h>
 
 #include "FormFiles/noisereductionsetupwidget.h"

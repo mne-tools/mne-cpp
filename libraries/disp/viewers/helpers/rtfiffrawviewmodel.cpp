@@ -45,8 +45,8 @@
 #include <utils/mnemath.h>
 #include <utils/detecttrigger.h>
 #include <utils/ioutils.h>
-#include <utils/filterTools/sphara.h>
 
+#include <rtprocessing/sphara.h>
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -68,6 +68,7 @@ using namespace DISPLIB;
 using namespace UTILSLIB;
 using namespace FIFFLIB;
 using namespace Eigen;
+using namespace RTPROCESSINGLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

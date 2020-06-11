@@ -1,13 +1,14 @@
 //=============================================================================================================
 /**
- * @file     sphara.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>
+ * @file     cosinefilter.h
+ * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
+ *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
  * @since    0.1.0
- * @date     February, 2016
+ * @date     November, 2014
  *
  * @section  LICENSE
  *
- * Copyright (C) 2016, Lorenz Esch. All rights reserved.
+ * Copyright (C) 2014, Lorenz Esch, Christoph Dinh. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -28,18 +29,22 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Declaration of the Sphara class
+ * @brief    Declaration of the CosineFilter class
  *
  */
 
-#ifndef SPHARA_H
-#define SPHARA_H
+#ifndef COSINEFILTER_H
+#define COSINEFILTER_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../utils_global.h"
+#include "../rtprocessing_global.h"
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -48,50 +53,55 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE UTILSLIB
+// DEFINE NAMESPACE RTPROCESSINGLIB
 //=============================================================================================================
 
-namespace UTILSLIB
+namespace RTPROCESSINGLIB
 {
-
-//=============================================================================================================
-// DEFINES
-//=============================================================================================================
 
 //=============================================================================================================
 /**
- * Creates a SPHARA operator.
+ * Creates a cosine filter response in the frequency domain.
  *
- * @brief Creates a SPHARA operator.
+ * @brief Creates a cosine filter response in the frequency domain.
  */
-class UTILSSHARED_EXPORT Sphara
+class RTPROCESINGSHARED_EXPORT CosineFilter
 {
-public:   
-    //=========================================================================================================
-    /**
-     * Constructs a Sphara object.
-     *
-     */
-    Sphara();
+public:
+    enum TPassType {LPF, HPF, BPF, NOTCH };
 
     //=========================================================================================================
     /**
-     * Constructs a SPHARA operator.
+     * Constructs a CosineFilter object.
      *
-     * @param [in] matBaseFct        The SPHARA basis functions.
-     * @param [in] vecIndices        The indices of the positions in the final oeprator which are to be filled with the basis functions weights (i.e. these indices could respond to the indices of gradioemteres in a VectorView system).
-     * @param [in] iOperatorDim      The dimensions of the final SPHARA operator. Make sure that these correspond to the dimensions of the data matrix you want tol multiply with the SPHARA operator.
-     * @param [in] iNBaseFct         The number of SPHARA basis functions to take.
-     * @param [in] skip              The value to skip when reading the vecIndices variabel. I.e. use this when dealing with VectorView triplets, which include two gradiometers.
-     *
-     * @return Returns the final SPHARA operator with dimensions (iOperatorDim,iOperatorDim).
      */
-    static Eigen::MatrixXd makeSpharaProjector(const Eigen::MatrixXd& matBaseFct,
-                                               const Eigen::VectorXi& vecIndices,
-                                               int iOperatorDim,
-                                               int iNBaseFct,
-                                               int skip = 0);
+    CosineFilter();
+
+    //=========================================================================================================
+    /**
+     * Constructs a CosineFilter object.
+     *
+     * @param fftLength length of the fft (multiple integer of 2^x)
+     * @param lowpass low cutoff frequency in Hz (not normed to sampling freq)
+     * @param lowpass_width determines the width of the filter slopes (steepness) in Hz (not normed to sampling freq)
+     * @param highpass highpass high cutoff frequency in Hz (not normed to sampling freq)
+     * @param highpass_width determines the width of the filter slopes (steepness) in Hz (not normed to sampling freq)
+     * @param sFreq sampling frequency
+     * @param type filter type (lowpass, highpass, etc.)
+     */
+    CosineFilter(int fftLength,
+                 float lowpass,
+                 float lowpass_width,
+                 float highpass,
+                 float highpass_width,
+                 double sFreq,
+                 TPassType type);
+
+    Eigen::RowVectorXcd    m_dFFTCoeffA;   /**< the FFT-transformed forward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength. */
+    Eigen::RowVectorXd     m_dCoeffA;      /**< the time filter coefficient set*/
+
+    int             m_iFilterOrder;
 };
-} // NAMESPACE UTILSLIB
+} // NAMESPACE RTPROCESSINGLIB
 
-#endif // SPHARA_H
+#endif // COSINEFILTER_H
