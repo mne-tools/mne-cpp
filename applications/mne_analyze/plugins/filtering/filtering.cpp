@@ -47,7 +47,7 @@
 #include <disp/viewers/filtersettingsview.h>
 #include <disp/viewers/filterdesignview.h>
 
-#include <rtprocessing/helpers/filterdata.h>
+#include <rtprocessing/helpers/filterkernel.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -186,7 +186,7 @@ void Filtering::setFilterChannelType(const QString& sType)
 
 //=============================================================================================================
 
-void Filtering::setFilter(const FilterData& filterData)
+void Filtering::setFilter(const FilterKernel& filterData)
 {
     QVariant data;
     data.setValue(filterData);

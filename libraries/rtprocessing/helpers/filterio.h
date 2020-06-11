@@ -41,7 +41,7 @@
 //=============================================================================================================
 
 #include "../rtprocessing_global.h"
-#include "filterdata.h"
+#include "filterkernel.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -65,7 +65,7 @@ namespace RTPROCESSINGLIB
 // DEFINE FORWARD DECLARATIONS
 //=============================================================================================================
 
-class FilterData;
+class FilterKernel;
 
 //=============================================================================================================
 /**
@@ -94,7 +94,7 @@ public:
      *
      * @return true if reading was successful, false otherwise.
      */
-    static bool readFilter(QString path, FilterData &filter);
+    static bool readFilter(QString path, FilterKernel &filter);
 
     //=========================================================================================================
     /**
@@ -105,7 +105,7 @@ public:
      *
      * @return true if reading was successful, false otherwise.
      */
-    static bool writeFilter(const QString &path, const FilterData &filter);
+    static bool writeFilter(const QString &path, const FilterKernel &filter);
 
 private:
 };

@@ -43,7 +43,7 @@
 #include "../disp_global.h"
 #include "abstractview.h"
 
-#include <rtprocessing/helpers/filterdata.h>
+#include <rtprocessing/helpers/filterkernel.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -174,7 +174,7 @@ public:
      *
      * @return returns the current filter
      */
-    RTPROCESSINGLIB::FilterData getCurrentFilter();
+    RTPROCESSINGLIB::FilterKernel getCurrentFilter();
 
     //=========================================================================================================
     /**
@@ -307,7 +307,7 @@ protected:
 
     QPointer<FilterPlotScene>           m_pFilterPlotScene;         /**< Pointer to the QGraphicsScene which holds the filter plotting.*/
 
-    RTPROCESSINGLIB::FilterData                m_filterKernel;               /**< The current filter operator.*/
+    RTPROCESSINGLIB::FilterKernel                m_filterKernel;               /**< The current filter operator.*/
 
     QString                             m_sSettingsPath;            /**< The settings path to store the GUI settings to. */
 
@@ -322,7 +322,7 @@ signals:
      *
      * @param activeFilter  The currently active filters.
      */
-    void filterChanged(const RTPROCESSINGLIB::FilterData& activeFilter);
+    void filterChanged(const RTPROCESSINGLIB::FilterKernel& activeFilter);
 
     //=========================================================================================================
     /**

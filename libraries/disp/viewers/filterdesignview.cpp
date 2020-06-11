@@ -221,7 +221,7 @@ void FilterDesignView::setFilterParameters(double from,
 
 //=============================================================================================================
 
-FilterData FilterDesignView::getCurrentFilter()
+FilterKernel FilterDesignView::getCurrentFilter()
 {
     return m_filterKernel;
 }
@@ -471,18 +471,18 @@ void FilterDesignView::filterParametersChanged()
     m_pUi->m_doubleSpinBox_from->setMaximum(m_pUi->m_doubleSpinBox_to->value());
 
     //set filter design method
-    FilterData::DesignMethod dMethod = FilterData::Tschebyscheff;
+    FilterKernel::DesignMethod dMethod = FilterKernel::Tschebyscheff;
     if(m_pUi->m_comboBox_designMethod->currentText() == "Tschebyscheff") {
-        dMethod = FilterData::Tschebyscheff;
+        dMethod = FilterKernel::Tschebyscheff;
     }
 
     if(m_pUi->m_comboBox_designMethod->currentText() == "Cosine") {
-        dMethod = FilterData::Cosine;
+        dMethod = FilterKernel::Cosine;
     }
 
     //Generate filters
-    m_filterKernel = FilterData("Designed Filter",
-                              FilterData::BPF,
+    m_filterKernel = FilterKernel("Designed Filter",
+                              FilterKernel::BPF,
                               m_iFilterTaps,
                               (double)center/nyquistFrequency,
                               (double)bw/nyquistFrequency,
@@ -550,10 +550,10 @@ void FilterDesignView::onBtnExportFilterCoefficients()
     //Generate appropriate name for the filter to be saved
     QString filtername;
 
-    filtername = QString("%1_%2_%3_Fs%4").arg(FilterData::getStringForFilterType(m_filterKernel.m_Type)).arg((int)m_filterKernel.m_dHighpassFreq).arg((int)m_filterKernel.m_dLowpassFreq).arg((int)m_filterKernel.m_sFreq);
+    filtername = QString("%1_%2_%3_Fs%4").arg(FilterKernel::getStringForFilterType(m_filterKernel.m_Type)).arg((int)m_filterKernel.m_dHighpassFreq).arg((int)m_filterKernel.m_dLowpassFreq).arg((int)m_filterKernel.m_sFreq);
 
     //Do not pass m_filterKernel because this is most likely the User Defined filter which name should not change due to the filter model implementation. Hence use temporal copy of m_filterKernel.
-    FilterData filterWriteTemp = m_filterKernel;
+    FilterKernel filterWriteTemp = m_filterKernel;
     filterWriteTemp.m_sFilterName = filtername;
 
     QString fileName = QFileDialog::getSaveFileName(this,
@@ -575,7 +575,7 @@ void FilterDesignView::onBtnLoadFilter()
 
     if(!path.isEmpty()) {
         //Replace old with new filter operator
-        FilterData filterLoadTemp;
+        FilterKernel filterLoadTemp;
 
         if(!FilterIO::readFilter(path, filterLoadTemp)) {
             return;

@@ -89,7 +89,7 @@ SOURCES += \
     sphara.cpp \
     helpers/cosinefilter.cpp \
     helpers/parksmcclellan.cpp \
-    helpers/filterdata.cpp \
+    helpers/filterkernel.cpp \
     helpers/filterio.cpp \
 
 HEADERS +=  \
@@ -104,7 +104,7 @@ HEADERS +=  \
     rtconnectivity.h \
     helpers/cosinefilter.h \
     helpers/parksmcclellan.h \
-    helpers/filterdata.h \
+    helpers/filterkernel.h \
     helpers/filterio.h \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}

@@ -47,7 +47,7 @@
 
 #include <fiff/fiff.h>
 
-#include <rtprocessing/helpers/filterdata.h>
+#include <rtprocessing/helpers/filterkernel.h>
 #include <utils/mnemath.h>
 
 #include <rtprocessing/filter.h>
@@ -559,7 +559,7 @@ void FiffRawViewModel::addTimeMark(int iLastClicked)
 
 //=============================================================================================================
 
-void FiffRawViewModel::setFilter(const QList<FilterData>& filterData)
+void FiffRawViewModel::setFilter(const QList<FilterKernel>& filterData)
 {
     m_filterKernel = filterData;
 

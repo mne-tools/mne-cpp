@@ -370,7 +370,7 @@ void NoiseReduction::run()
 
             //Do temporal filtering here
             if(m_bFilterActivated) {
-                QList<FilterData> list;
+                QList<FilterKernel> list;
                 list << m_filterKernel;
                 matData = pRtFilter->filterData(matData,
                                                      list,
@@ -561,7 +561,7 @@ void NoiseReduction::setFilterChannelType(QString sType)
 
 //=============================================================================================================
 
-void NoiseReduction::setFilter(const FilterData& filterData)
+void NoiseReduction::setFilter(const FilterKernel& filterData)
 {
     m_mutex.lock();
     m_filterKernel = filterData;

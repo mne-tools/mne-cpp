@@ -43,7 +43,7 @@
 
 #include <fiff/fiff.h>
 
-#include <rtprocessing/helpers/filterdata.h>
+#include <rtprocessing/helpers/filterkernel.h>
 #include <utils/generics/applicationlogger.h>
 
 #include <rtprocessing/filter.h>
@@ -111,7 +111,7 @@ int main(int argc, char *argv[])
 
     // Initialize filter settings
     QString filter_name =  "Cosine_BPF";
-    FilterData::FilterType type = FilterData::BPF;
+    FilterKernel::FilterType type = FilterKernel::BPF;
     double sFreq = raw.info.sfreq;
     double dCenterfreq = 10;
     double dBandwidth = 10;
@@ -143,7 +143,7 @@ int main(int argc, char *argv[])
                                        sFreq,
                                        1024,
                                        4096,
-                                       RTPROCESSINGLIB::FilterData::Cosine,
+                                       RTPROCESSINGLIB::FilterKernel::Cosine,
                                        picks);
     printf("[done]\n");
 

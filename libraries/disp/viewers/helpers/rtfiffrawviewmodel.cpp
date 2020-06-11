@@ -877,7 +877,7 @@ void RtFiffRawViewModel::updateSpharaOptions(const QString& sSytemType, int nBas
 
 //=============================================================================================================
 
-void RtFiffRawViewModel::setFilter(QList<FilterData> filterData)
+void RtFiffRawViewModel::setFilter(QList<FilterKernel> filterData)
 {
     m_filterKernel = filterData;
 
@@ -1090,11 +1090,11 @@ void RtFiffRawViewModel::markChBad(QModelIndexList chlist, bool status)
 
 //=============================================================================================================
 
-void RtFiffRawViewModel::doFilterPerChannelRTMSA(QPair<QList<FilterData>,QPair<int,RowVectorXd> > &channelDataTime)
+void RtFiffRawViewModel::doFilterPerChannelRTMSA(QPair<QList<FilterKernel>,QPair<int,RowVectorXd> > &channelDataTime)
 {
     for(int i = 0; i < channelDataTime.first.size(); ++i) {
-        //channelDataTime.second.second = channelDataTime.first.at(i).applyConvFilter(channelDataTime.second.second, true, FilterData::ZeroPad);
-        channelDataTime.second.second = channelDataTime.first.at(i).applyFFTFilter(channelDataTime.second.second, true, FilterData::ZeroPad); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
+        //channelDataTime.second.second = channelDataTime.first.at(i).applyConvFilter(channelDataTime.second.second, true, FilterKernel::ZeroPad);
+        channelDataTime.second.second = channelDataTime.first.at(i).applyFFTFilter(channelDataTime.second.second, true, FilterKernel::ZeroPad); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
     }
 }
 
@@ -1109,14 +1109,14 @@ void RtFiffRawViewModel::filterDataBlock()
     }
 
     //Create temporary filters with higher fft length because we are going to filter all available data at once for one time
-    QList<FilterData> tempFilterList;
+    QList<FilterKernel> tempFilterList;
 
     int fftLength = m_matDataRaw.row(0).cols() + 4 * m_iMaxFilterLength;
     int exp = ceil(MNEMath::log2(fftLength));
     fftLength = pow(2, exp) < 512 ? 512 : pow(2, exp);
 
     for(int i = 0; i<m_filterKernel.size(); ++i) {
-        FilterData tempFilter(m_filterKernel.at(i).m_sFilterName,
+        FilterKernel tempFilter(m_filterKernel.at(i).m_sFilterName,
                               m_filterKernel.at(i).m_Type,
                               m_filterKernel.at(i).m_iFilterOrder,
                               m_filterKernel.at(i).m_dCenterFreq,
@@ -1130,7 +1130,7 @@ void RtFiffRawViewModel::filterDataBlock()
     }
 
     //Generate QList structure which can be handled by the QConcurrent framework
-    QList<QPair<QList<FilterData>,QPair<int,RowVectorXd> > > timeData;
+    QList<QPair<QList<FilterKernel>,QPair<int,RowVectorXd> > > timeData;
     QList<int> notFilterChannelIndex;
 
     //Also append mirrored data in front and back to get rid of edge effects
@@ -1138,7 +1138,7 @@ void RtFiffRawViewModel::filterDataBlock()
         if(m_filterChannelList.contains(m_pFiffInfo->chs.at(i).ch_name)) {
             RowVectorXd datTemp(m_matDataRaw.row(i).cols() + 2 * m_iMaxFilterLength);
             datTemp << m_matDataRaw.row(i).head(m_iMaxFilterLength).reverse(), m_matDataRaw.row(i), m_matDataRaw.row(i).tail(m_iMaxFilterLength).reverse();
-            timeData.append(QPair<QList<FilterData>,QPair<int,RowVectorXd> >(tempFilterList,QPair<int,RowVectorXd>(i,datTemp)));
+            timeData.append(QPair<QList<FilterKernel>,QPair<int,RowVectorXd> >(tempFilterList,QPair<int,RowVectorXd>(i,datTemp)));
         } else {
             notFilterChannelIndex.append(i);
         }
@@ -1180,12 +1180,12 @@ void RtFiffRawViewModel::filterDataBlock(const MatrixXd &data, int iDataIndex)
     }
 
     //Generate QList structure which can be handled by the QConcurrent framework
-    QList<QPair<QList<FilterData>,QPair<int,RowVectorXd> > > timeData;
+    QList<QPair<QList<FilterKernel>,QPair<int,RowVectorXd> > > timeData;
     QList<int> notFilterChannelIndex;
 
     for(qint32 i = 0; i < data.rows(); ++i) {
         if(m_filterChannelList.contains(m_pFiffInfo->chs.at(i).ch_name)) {
-            timeData.append(QPair<QList<FilterData>,QPair<int,RowVectorXd> >(m_filterKernel,QPair<int,RowVectorXd>(i,data.row(i))));
+            timeData.append(QPair<QList<FilterKernel>,QPair<int,RowVectorXd> >(m_filterKernel,QPair<int,RowVectorXd>(i,data.row(i))));
         } else {
             notFilterChannelIndex.append(i);
             }
