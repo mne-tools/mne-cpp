@@ -100,20 +100,72 @@ void SettingsControllerGui::readData()
 
 void SettingsControllerGui::fileInChanged(const QString& strInFile)
 {
-    m_fiInFileInfo.setFile(strInFile);
-    m_pAnonymizer->setFileIn(m_fiInFileInfo.absoluteFilePath());
+    QFileInfo newfiInFile(strInFile);
 
-    if(m_fiInFileInfo.isFile())
+    if(newfiInFile.isDir())
     {
-        readData();
+        m_pWin->showMessage("Invalid input file. That's a directory");
+        m_pWin->setLineEditInFile(m_fiInFileInfo.absoluteFilePath());
+        return;
+    }
+    if(QString::compare(newfiInFile.suffix(),QString("fif")) != 0)
+    {
+        m_pWin->showMessage("The input file extension must be \".fif\" 0.");
+        m_pWin->setLineEditOutFile(m_fiOutFileInfo.absoluteFilePath());
+        return;
+    }
+    QFileInfo inDir(newfiInFile.absolutePath());
+    if(!inDir.isReadable())
+    {
+        m_pWin->showMessage("You might not have reading permissions to this folder");
+        m_pWin->setLineEditInFile(m_fiInFileInfo.absoluteFilePath());
+        return;
     }
 
+    if( m_fiInFileInfo != newfiInFile )
+    {
+        m_fiInFileInfo.setFile(strInFile);
+        m_pAnonymizer->setFileIn(m_fiInFileInfo.absoluteFilePath());
+
+        if(m_fiInFileInfo.isFile() && m_fiInFileInfo.isReadable())
+        {
+            readData();
+        }
+    generateDefaultOutputFileName();
+    m_pWin->setLineEditInFile(m_fiOutFileInfo.absoluteFilePath());
+    }
 }
 
 void SettingsControllerGui::fileOutChanged(const QString& strOutFile)
 {
-    m_fiOutFileInfo.setFile(strOutFile);
-    m_pAnonymizer->setFileOut(m_fiOutFileInfo.absoluteFilePath());
+    QFileInfo newfiOutFile(strOutFile);
+    if(m_fiOutFileInfo.isDir())
+    {
+        m_pWin->showMessage("Invalid output file. That's a directory!");
+        m_pWin->setLineEditOutFile(m_fiOutFileInfo.absoluteFilePath());
+        return;
+    }
+
+    if(QString::compare(newfiOutFile.suffix(),QString("fif")) != 0)
+    {
+        m_pWin->showMessage("The output file extension must be \".fif\" 0.");
+        m_pWin->setLineEditOutFile(m_fiOutFileInfo.absoluteFilePath());
+        return;
+    }
+
+    QFileInfo outDir(newfiOutFile.absolutePath());
+    if(!outDir.isWritable())
+    {
+        m_pWin->showMessage("You might not have writing permissions to this folder");
+        m_pWin->setLineEditOutFile(m_fiOutFileInfo.absoluteFilePath());
+        return;
+    }
+
+    if(m_fiOutFileInfo != newfiOutFile)
+    {
+        m_fiOutFileInfo.setFile(strOutFile);
+        m_pAnonymizer->setFileOut(m_fiOutFileInfo.absoluteFilePath());
+    }
 }
 
 void SettingsControllerGui::setupCommunication()
@@ -180,7 +232,6 @@ void SettingsControllerGui::setupCommunication()
                      m_pWin.data(),&MainWindow::setLineEditSubjectComment);
     QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingSubjectHisId,
                      m_pWin.data(),&MainWindow::setLineEditSubjectHisId);
-
 
     QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingProjectId,
                      m_pWin.data(),&MainWindow::setLineEditProjectId);
