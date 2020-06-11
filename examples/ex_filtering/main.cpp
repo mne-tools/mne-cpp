@@ -43,7 +43,7 @@
 
 #include <fiff/fiff.h>
 
-#include <utils/filterTools/filterdata.h>
+#include <rtprocessing/helpers/filterdata.h>
 #include <utils/generics/applicationlogger.h>
 
 #include <rtprocessing/filter.h>
@@ -143,7 +143,7 @@ int main(int argc, char *argv[])
                                        sFreq,
                                        1024,
                                        4096,
-                                       UTILSLIB::FilterData::Cosine,
+                                       RTPROCESSINGLIB::FilterData::Cosine,
                                        picks);
     printf("[done]\n");
 

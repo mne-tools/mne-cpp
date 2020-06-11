@@ -45,7 +45,7 @@
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <anShared/Model/annotationmodel.h>
 
-#include <utils/filterTools/filterdata.h>
+#include <rtprocessing/helpers/filterdata.h>
 
 //=============================================================================================================
 // Qt INCLUDES
@@ -74,7 +74,7 @@
 
 using namespace RAWDATAVIEWERPLUGIN;
 using namespace ANSHAREDLIB;
-using namespace UTILSLIB;
+using namespace RTPROCESSINGLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

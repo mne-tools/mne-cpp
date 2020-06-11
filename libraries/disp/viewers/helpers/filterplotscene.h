@@ -43,7 +43,7 @@
 #include "../../disp_global.h"
 #include "layoutscene.h"
 
-#include <utils/filterTools/filterdata.h>
+#include <rtprocessing/helpers/filterdata.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -102,7 +102,7 @@ public:
      * @param [in] cutOffLow cut off frequqency lowpass or lower cut off when filter is a bandpass
      * @param [in] cutOffHigh cut off frequqency highpass or higher cut off when filter is a bandpass
      */
-    void updateFilter(const UTILSLIB::FilterData &operatorFilter,
+    void updateFilter(const RTPROCESSINGLIB::FilterData &operatorFilter,
                       int samplingFreq,
                       int cutOffLow,
                       int cutOffHigh);
@@ -125,7 +125,7 @@ protected:
      */
     void plotFilterFrequencyResponse();
 
-    UTILSLIB::FilterData    m_pCurrentFilter;       /**< Pointer to the filter operator */
+    RTPROCESSINGLIB::FilterData    m_pCurrentFilter;       /**< Pointer to the filter operator */
 
     QGraphicsPathItem*      m_pGraphicsItemPath;    /**< Pointer to the graphics path item in the filterplotscene */
 

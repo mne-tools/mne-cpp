@@ -47,7 +47,7 @@
 
 #include <fiff/fiff.h>
 
-#include <utils/filterTools/filterdata.h>
+#include <rtprocessing/helpers/filterdata.h>
 #include <utils/mnemath.h>
 
 #include <rtprocessing/filter.h>

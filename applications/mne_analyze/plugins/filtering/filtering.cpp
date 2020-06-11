@@ -47,7 +47,7 @@
 #include <disp/viewers/filtersettingsview.h>
 #include <disp/viewers/filterdesignview.h>
 
-#include <utils/filterTools/filterdata.h>
+#include <rtprocessing/helpers/filterdata.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -60,7 +60,7 @@
 using namespace FILTERINGPLUGIN;
 using namespace ANSHAREDLIB;
 using namespace DISPLIB;
-using namespace UTILSLIB;
+using namespace RTPROCESSINGLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
