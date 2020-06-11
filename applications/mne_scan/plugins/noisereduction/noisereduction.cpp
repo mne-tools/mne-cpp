@@ -370,7 +370,6 @@ void NoiseReduction::run()
                 QList<FilterData> list;
                 list << m_filterData;
                 matData = pRtFilter->filterDataBlock(matData,
-                                                     m_iMaxFilterLength,
                                                      m_lFilterChannelList,
                                                      list);
             }
