@@ -300,6 +300,7 @@ int SettingsControllerCl::parseInputs(const QStringList& arguments)
         }
 
         int intMeasDateOffset(m_parser.value("measurement_date_offset").toInt());
+        m_pAnonymizer->setUseMeasurementDateOffset(true);
         m_pAnonymizer->setMeasurementDateOffset(intMeasDateOffset);
     }
 
@@ -325,6 +326,7 @@ int SettingsControllerCl::parseInputs(const QStringList& arguments)
             m_parser.showHelp();
         }
         int strBirthdayOffset(m_parser.value("subject_birthday_offset").toInt());
+        m_pAnonymizer->setUseSubjectBirthdayOffset(true);
         m_pAnonymizer->setSubjectBirthdayOffset(strBirthdayOffset);
     }
 

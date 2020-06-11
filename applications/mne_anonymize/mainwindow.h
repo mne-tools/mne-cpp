@@ -89,8 +89,8 @@ signals:
 private slots:
 
     void checkboxBruteModeChanged();
-    void checkBoxMeasurementDateOffsetStateChanged(int arg1);
-    void checkBoxBirthdayDateOffsetStateChanged(int arg1);
+    void checkBoxMeasurementDateOffsetStateChanged(int arg);
+    void checkBoxBirthdayDateOffsetStateChanged(int arg);
 
     void lineEditInFileEditingFinished();
     void lineEditOutFileEditingFinished();
