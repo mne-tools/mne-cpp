@@ -113,26 +113,25 @@ public:
     //=========================================================================================================
     /**
      * Constructs a FilterData object 
-     * @param [in] unique_name defines the name of the generated filter
-     * @param [in] type of the filter: LPF, HPF, BPF, NOTCH (from enum FilterType)
-     * @param [in] order represents the order of the filter, the higher the higher is the stopband attenuation
-     * @param [in] centerfreq determines the center of the frequency - normed to sFreq/2 (nyquist)
-     * @param [in] bandwidth ignored if FilterType is set to LPF,HPF. if NOTCH/BPF: bandwidth of stop-/passband - normed to sFreq/2 (nyquist)
-     * @param [in] parkswidth determines the width of the filter slopes (steepness) - normed to sFreq/2 (nyquist)
-     * @param [in] sFreq sampling frequency
-     * @param [in] fftlength length of the fft (multiple integer of 2^x)
-     * @param [in] designMethod specifies the design method to use. Choose between Cosind and Tschebyscheff
+     *
+     * @param [in] sFilterName      defines the name of the generated filter
+     * @param [in] type             of the filter: LPF, HPF, BPF, NOTCH (from enum FilterType)
+     * @param [in] order            represents the order of the filter, the higher the higher is the stopband attenuation
+     * @param [in] centerfreq       determines the center of the frequency - normed to sFreq/2 (nyquist)
+     * @param [in] bandwidth        ignored if FilterType is set to LPF,HPF. if NOTCH/BPF: bandwidth of stop-/passband - normed to sFreq/2 (nyquist)
+     * @param [in] parkswidth       determines the width of the filter slopes (steepness) - normed to sFreq/2 (nyquist)
+     * @param [in] sFreq            sampling frequency
+     * @param [in] fftlength        length of the fft (multiple integer of 2^x)
+     * @param [in] designMethod     specifies the design method to use. Choose between Cosind and Tschebyscheff
      **/
-
-    //=========================================================================================================
-    FilterData(QString unique_name,
+    FilterData(const QString &sFilterName,
                FilterType type,
                int order,
                double centerfreq,
                double bandwidth,
                double parkswidth,
                double sFreq,
-               qint32 fftlength=4096,
+               qint32 fftlength = 4096,
                DesignMethod designMethod = Cosine);
 
     //=========================================================================================================
@@ -151,8 +150,8 @@ public:
     /**
      * Applies the current filter to the input data using convolution in time domain. Pro: Uses only past samples (real-time capable) Con: Might not be as ideal as acausal version (steepness etc.)
      *
-     * @param [in] data holds the data to be filtered
-     * @param [in] keepOverhead whether the result should still include the overhead information in front and back of the data
+     * @param [in] data             holds the data to be filtered
+     * @param [in] keepOverhead     whether the result should still include the overhead information in front and back of the data
      *
      * @return the filtered data in form of a RoVecotrXd
      */
@@ -164,9 +163,9 @@ public:
     /**
      * Applies the current filter to the input data using multiplication in frequency domain. Pro: Fast, good filter parameters Con: Smears in error from future samples. Uses future samples (nor real time capable)
      *
-     * @param [in] data holds the data to be filtered
-     * @param [in] keepOverhead whether the result should still include the overhead information in front and back of the data
-     * @param [in] compensateEdgeEffects defines how the edge effects should be handlted. Choose between ZeroPad and Mirroring
+     * @param [in] data                     holds the data to be filtered
+     * @param [in] keepOverhead             whether the result should still include the overhead information in front and back of the data
+     * @param [in] compensateEdgeEffects    defines how the edge effects should be handlted. Choose between ZeroPad and Mirroring
      *
      * @return the filtered data in form of a RoVecotrXd
      */
@@ -177,25 +176,25 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief getStringForDesignMethod returns the current design method as a string
+     * Returns the current design method as a string
      */
     static QString getStringForDesignMethod(const FilterData::DesignMethod &designMethod);
 
     //=========================================================================================================
     /**
-     * @brief getStringFilterType returns the current filter type as a string
+     * Returns the current filter type as a string
      */
     static QString getStringForFilterType(const FilterData::FilterType &filterType);
 
     //=========================================================================================================
     /**
-     * @brief getStringForDesignMethod returns the current design dependent on an input string
+     * Returns the current design dependent on an input string
      */
     static FilterData::DesignMethod getDesignMethodForString(const QString &designMethodString);
 
     //=========================================================================================================
     /**
-     * @brief getFilterTypeForString returns the current filter type dependent on an input string
+     * Returns the current filter type dependent on an input string
      */
     static FilterData::FilterType getFilterTypeForString(const QString &filerTypeString);
 
@@ -209,7 +208,7 @@ public:
     int             m_iFilterOrder;         /**< represents the order of the filter instance. */
     int             m_iFFTlength;           /**< represents the filter length. */
 
-    QString         m_sName;                /**< contains name of the filter. */
+    QString         m_sFilterName;          /**< contains name of the filter. */
 
     Eigen::RowVectorXd     m_dCoeffA;       /**< contains the forward filter coefficient set. */
     Eigen::RowVectorXd     m_dCoeffB;       /**< contains the backward filter coefficient set (empty if FIR filter). */

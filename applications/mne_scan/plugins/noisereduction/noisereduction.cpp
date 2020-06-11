@@ -369,9 +369,9 @@ void NoiseReduction::run()
             if(m_bFilterActivated) {
                 QList<FilterData> list;
                 list << m_filterKernel;
-                matData = pRtFilter->filterDataBlock(matData,
-                                                     m_lFilterChannelList,
-                                                     list);
+                matData = pRtFilter->filterData(matData,
+                                                     list,
+                                                     m_lFilterChannelList);
             }
 
             //Do SPHARA here

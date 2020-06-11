@@ -453,7 +453,7 @@ void FilterDesignView::filterParametersChanged()
 
     int fftLength = m_iWindowSize + m_pUi->m_spinBox_filterTaps->value() * 4; // *2 to take into account the overlap in front and back after the convolution. Another *2 to take into account the appended and prepended data.
     int exp = ceil(MNEMath::log2(fftLength));
-    fftLength = pow(2, exp) < 4096 ? 4096 : pow(2, exp);
+    fftLength = pow(2, exp) > 4096 ? 4096 : pow(2, exp);
 
     //set maximum and minimum for cut off frequency spin boxes
     m_pUi->m_doubleSpinBox_to->setMaximum(nyquistFrequency);
@@ -467,7 +467,6 @@ void FilterDesignView::filterParametersChanged()
 
     m_pUi->m_doubleSpinBox_to->setMinimum(m_pUi->m_doubleSpinBox_from->value());
     m_pUi->m_doubleSpinBox_from->setMaximum(m_pUi->m_doubleSpinBox_to->value());
-
 
     //set filter design method
     FilterData::DesignMethod dMethod = FilterData::Tschebyscheff;
@@ -553,7 +552,7 @@ void FilterDesignView::onBtnExportFilterCoefficients()
 
     //Do not pass m_filterKernel because this is most likely the User Defined filter which name should not change due to the filter model implementation. Hence use temporal copy of m_filterKernel.
     FilterData filterWriteTemp = m_filterKernel;
-    filterWriteTemp.m_sName = filtername;
+    filterWriteTemp.m_sFilterName = filtername;
 
     QString fileName = QFileDialog::getSaveFileName(this,
                                                     "Save filter coefficients",

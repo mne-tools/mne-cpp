@@ -98,9 +98,9 @@ bool FilterIO::readFilter(QString path, FilterData &filter)
 
             //Read filter name
             if(line.contains("name")) {
-                filter.m_sName.clear();
+                filter.m_sFilterName.clear();
                 for(int i=1; i<fields.size(); i++)
-                    filter.m_sName.append(fields.at(i));
+                    filter.m_sFilterName.append(fields.at(i));
             }
 
             //Read the filter order
@@ -136,7 +136,7 @@ bool FilterIO::readFilter(QString path, FilterData &filter)
 
 //    if(filter.m_sFreq)
 
-//    if(filter.m_sName)
+//    if(filter.m_sFilterName)
 
 //    if(filter.m_Type)
 
@@ -175,7 +175,7 @@ bool FilterIO::writeFilter(const QString &path, const FilterData &filter)
         QTextStream out(&file);
 
         out << "#sFreq " << filter.m_sFreq << "\n";
-        out << "#name " << filter.m_sName << "\n";
+        out << "#name " << filter.m_sFilterName << "\n";
         out << "#type " << FilterData::getStringForFilterType(filter.m_Type) << "\n";
         out << "#order " << filter.m_iFilterOrder << "\n";
         out << "#HPFreq " << filter.m_dHighpassFreq << "\n";
