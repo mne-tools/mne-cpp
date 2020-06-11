@@ -38,11 +38,15 @@
 
 #include "averaging.h"
 
+#include <iostream>
+
 #include <anShared/Management/communicator.h>
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <anShared/Model/annotationmodel.h>
 
 #include <disp/viewers/averagingsettingsview.h>
+#include <disp/viewers/averagelayoutview.h>
+#include <disp/viewers/butterflyview.h>
 
 #include <mne/mne_epoch_data_list.h>
 #include <mne/mne_epoch_data.h>
@@ -54,6 +58,7 @@
 //=============================================================================================================
 
 #include <QDebug>
+#include <QTabWidget>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -129,6 +134,16 @@ QMenu *Averaging::getMenu()
 
 QWidget *Averaging::getView()
 {
+//    m_pButterflyView = new DISPLIB::ButterflyView();
+//    m_pAverageLayoutView = new DISPLIB::AverageLayoutView();
+
+//    QTabWidget* pTabView = new QTabWidget();
+
+//    pTabView->addTab(m_pButterflyView, "Butterfly View");
+//    pTabView->addTab(m_pAverageLayoutView, "2D Layout");
+
+//    return m_pButterflyView;
+
     return Q_NULLPTR;
 }
 
@@ -369,31 +384,49 @@ void Averaging::onComputeButtonCLicked(bool bChecked)
 //    connect(m_pAve.data(), &Ave::evokedStim,
 //            this, &Averaging::onNewEvokedSet);
 
+    if(m_pFiffRawModel->getAnnotationModel()->getNumberOfAnnotations() < 2){
+        qWarning() << "Not enough annotations to calculate average.";
+        return;
+    }
+
     MatrixXi matEvents;
     QMap<QString,double> mapReject;
-    MNELIB::MNEEpochDataList pEpochDataList;
+    MNELIB::MNEEpochDataList lstEpochDataList;
 //    FIFFLIB::FiffEvoked FiffEvoked;
 
     m_pFiffEvoked = QSharedPointer<FIFFLIB::FiffEvoked>(new FIFFLIB::FiffEvoked());
-    int iType = 0;
+    int iType = 1;
     mapReject.insert("eog", 300e-06);
 
     FIFFLIB::FiffRawData* pFiffRaw = this->m_pFiffRawModel->getFiffIO()->m_qlistRaw.first().data();
     //*(this->m_pFiffRawModel->getFiffIO()->m_qlistRaw.first().data());
 
-    pEpochDataList = MNELIB::MNEEpochDataList::readEpochs(*pFiffRaw,
+    qDebug() << "Initialized varibles";
+
+    matEvents = m_pFiffRawModel->getAnnotationModel()->getAnnotationMatrix();
+
+    qDebug() << "Event Matrix:";
+    std::cout << matEvents;
+
+    lstEpochDataList = MNELIB::MNEEpochDataList::readEpochs(*pFiffRaw,
                                                           matEvents,
                                                           m_fPreStim,
                                                           m_fPostStim,
                                                           iType,
                                                           mapReject);
 
+    lstEpochDataList.dropRejected();
+
+    qDebug() << "Got Epoch List and dropped rejected";
+
 //    FiffEvoked = pEpochDataList.average(pFiffRaw->info,
 //                                            pFiffRaw->first_samp,
 //                                            pFiffRaw->last_samp);
 
-    *m_pFiffEvoked = pEpochDataList.average(pFiffRaw->info,
+    *m_pFiffEvoked = lstEpochDataList.average(pFiffRaw->info,
                                             pFiffRaw->first_samp,
                                             pFiffRaw->last_samp);
 
+
+    qDebug() << "Averaging done.";
 }

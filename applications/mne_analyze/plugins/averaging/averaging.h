@@ -63,6 +63,8 @@ namespace ANSHAREDLIB {
 
 namespace DISPLIB {
     class AveragingSettingsView;
+    class ButterflyView;
+    class AverageLayoutView;
 }
 
 namespace FIFFLIB {
@@ -196,6 +198,8 @@ private:
 
     DISPLIB::AveragingSettingsView*                         m_pAveragingSettingsView;
 
+    QPointer<DISPLIB::ButterflyView>                        m_pButterflyView;       /**< The butterfly plot view. */
+    QPointer<DISPLIB::AverageLayoutView>                    m_pAverageLayoutView;   /**< The average layout plot view */
 
 
     FIFFLIB::FiffInfo::SPtr                                 m_pFiffInfo;
