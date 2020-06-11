@@ -277,7 +277,7 @@ void MainWindow::setMeasurementDate(const QDateTime& dt)
 
 void MainWindow::setCheckBoxMeasurementDateOffset(bool o)
 {
-    m_pUi->checkBoxMeasurementDateOffset->setCheckState(Qt::CheckState(o));
+    m_pUi->checkBoxMeasurementDateOffset->setChecked(o);
 }
 
 void MainWindow::setMeasurementDateOffset(int d)
@@ -499,17 +499,21 @@ void MainWindow::checkboxBruteModeChanged()
     emit bruteModeChanged(state);
 }
 
-void MainWindow::checkBoxMeasurementDateOffsetStateChanged(int state)
+void MainWindow::checkBoxMeasurementDateOffsetStateChanged(int arg)
 {
-     m_pUi->spinBoxMeasurementDateOffset->setEnabled(state);
-     emit useMeasurementOffset(!!state);
-     m_pUi->dateTimeMeasurementDate->setEnabled(!state);
+    Q_UNUSED(arg)
+    bool state(m_pUi->checkBoxMeasurementDateOffset->isChecked());
+    m_pUi->spinBoxMeasurementDateOffset->setEnabled(state);
+    emit useMeasurementOffset(state);
+    m_pUi->dateTimeMeasurementDate->setEnabled(!state);
 }
 
-void MainWindow::checkBoxBirthdayDateOffsetStateChanged(int state)
+void MainWindow::checkBoxBirthdayDateOffsetStateChanged(int arg)
 {
+    Q_UNUSED(arg)
+    bool state(m_pUi->checkBoxBirthdayDateOffset->isChecked());
     m_pUi->spinBoxBirthdayDateOffset->setEnabled(state);
-    emit useBirthdayOffset(!!state);
+    emit useBirthdayOffset(state);
     m_pUi->dateTimeBirthdayDate->setEnabled(!state);
 }
 
