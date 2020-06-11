@@ -249,12 +249,16 @@ void SettingsControllerGui::setupCommunication()
 
 void SettingsControllerGui::initializeOptionsState()
 {
-    m_pWin->setLineEditInFile(m_fiInFileInfo.absoluteFilePath());
-    m_pWin->setLineEditOutFile(m_fiOutFileInfo.absoluteFilePath());
+    if(m_pAnonymizer->isFileInSet())
+    {
+        m_pWin->setLineEditInFile(m_fiInFileInfo.absoluteFilePath());
+    }
+    if(m_pAnonymizer->isFileOutSet())
+    {
+        m_pWin->setLineEditOutFile(m_fiOutFileInfo.absoluteFilePath());
+    }
 
     m_pWin->setCheckBoxBruteMode(m_pAnonymizer->getBruteMode());
-//    m_pWin->setCheckBoxDeleteInputFileAfter(m_bDeleteInputFileAfter);
-//    m_pWin->setCheckBoxAvoidDeleteConfirmation(m_bDeleteInputFileConfirmation);
     m_pWin->setMeasurementDate(m_pAnonymizer->getMeasurementDate());
     m_pWin->setCheckBoxMeasurementDateOffset(m_pAnonymizer->getUseMeasurementDayOffset());
     m_pWin->setMeasurementDateOffset(m_pAnonymizer->getMeasurementDayOffset());
