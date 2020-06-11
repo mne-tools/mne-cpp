@@ -70,7 +70,7 @@ namespace FIFFLIB{
 }
 
 namespace RTPROCESSINGLIB{
-    class RtFilter;
+    class Filter;
 }
 
 namespace SCMEASLIB{

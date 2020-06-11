@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
- * @file     rtfilter.cpp
+ * @file     filter.cpp
  * @author   Ruben Doerfel <Ruben.Doerfel@tu-ilmenau.de>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @since    0.1.0
- * @date     April, 2016
+ * @since    0.1.3
+ * @date     June, 2020
  *
  * @section  LICENSE
  *
- * Copyright (C) 2016, Ruben Doerfel, Lorenz Esch. All rights reserved.
+ * Copyright (C) 2020, Ruben Doerfel, Lorenz Esch. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     RtFilter class definition.
+ * @brief     Filter class definition.
  *
  */
 
@@ -37,11 +37,18 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "rtfilter.h"
+#include "filter.h"
+
 #include <Eigen/Dense>
 #include <Eigen/Core>
 
 #include <iostream>
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -53,54 +60,36 @@ using namespace UTILSLIB;
 using namespace FIFFLIB;
 
 //=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QDebug>
-
-//=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtFilter::RtFilter()
+Filter::Filter()
 {
 }
 
 //=============================================================================================================
 
-RtFilter::~RtFilter()
+Filter::~Filter()
 {
 }
 
 //=============================================================================================================
 
-void RtFilter::filterChannel(RtFilter::RtFilterData &channelDataTime)
-{
-    for(int i = 0; i < channelDataTime.lFilterData.size(); ++i) {
-        //channelDataTime.vecData = channelDataTime.first.at(i).applyConvFilter(channelDataTime.vecData, true, FilterData::ZeroPad);
-        channelDataTime.vecData = channelDataTime.lFilterData.at(i).applyFFTFilter(channelDataTime.vecData,
-                                                                                   true,
-                                                                                   FilterData::ZeroPad); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
-    }
-}
-
-//=============================================================================================================
-
-MatrixXd RtFilter::filterData(const MatrixXd& matDataIn,
-                              FilterData::FilterType type,
-                              double dCenterfreq,
-                              double bandwidth,
-                              double dTransition,
-                              double dSFreq,
-                              int iOrder,
-                              int iFftLength,
-                              FilterData::DesignMethod designMethod,
-                              const RowVectorXi& vecPicks,
-                              bool bUseThreads)
+MatrixXd Filter::filterData(const MatrixXd& matDataIn,
+                            FilterData::FilterType type,
+                            double dCenterfreq,
+                            double bandwidth,
+                            double dTransition,
+                            double dSFreq,
+                            int iOrder,
+                            int iFftLength,
+                            FilterData::DesignMethod designMethod,
+                            const RowVectorXi& vecPicks,
+                            bool bUseThreads)
 {
     // Check for size of data
     if (matDataIn.cols() < iOrder){
-        qDebug() << QString("[RtFilter::filterData] Filter length is bigger than data length.");
+        qDebug() << QString("[Filter::filterData] Filter length is bigger than data length.");
     }
 
     // Normalize cut off frequencies to nyquist
@@ -128,10 +117,10 @@ MatrixXd RtFilter::filterData(const MatrixXd& matDataIn,
 
 //=============================================================================================================
 
-MatrixXd RtFilter::filterData(const MatrixXd& matDataIn,
-                              const QList<FilterData>& lFilterData,
-                              const RowVectorXi& vecPicks,
-                              bool bUseThreads)
+MatrixXd Filter::filterData(const MatrixXd& matDataIn,
+                            const QList<FilterData>& lFilterData,
+                            const RowVectorXi& vecPicks,
+                            bool bUseThreads)
 {
     // create output matrix with size of inputmatrix and temporal input matrix with size of pick
     MatrixXd matDataOut = matDataIn;
@@ -155,12 +144,12 @@ MatrixXd RtFilter::filterData(const MatrixXd& matDataIn,
         }
     }
 
-    std::cout << "RtFilter::filterData iFFTLength" << iFFTLength << std::endl;
-    std::cout << "RtFilter::filterData iOrder" << iOrder << std::endl;
+    std::cout << "Filter::filterData iFFTLength" << iFFTLength << std::endl;
+    std::cout << "Filter::filterData iOrder" << iOrder << std::endl;
 
     // Check for size of data
     if(matDataIn.cols() < iOrder){
-        qDebug() << QString("[RtFilter::filterData] Filter length is bigger than data length.");
+        qDebug() << QString("[Filter::filterData] Filter length is bigger than data length.");
     }
 
     // slice input data into data junks with proper length for fft
@@ -194,12 +183,24 @@ MatrixXd RtFilter::filterData(const MatrixXd& matDataIn,
 
 //=============================================================================================================
 
-MatrixXd RtFilter::filterDataBlock(const MatrixXd& matDataIn,
-                                   const RowVectorXi& vecPicks,
-                                   const QList<FilterData>& lFilterData,
-                                   bool bUseThreads)
+void Filter::filterChannel(Filter::FilterObject& channelDataTime)
 {
-    std::cout << "RtFilter::filterDataBlock 0" << std::endl;
+    for(int i = 0; i < channelDataTime.lFilterData.size(); ++i) {
+        //channelDataTime.vecData = channelDataTime.first.at(i).applyConvFilter(channelDataTime.vecData, true, FilterData::ZeroPad);
+        channelDataTime.vecData = channelDataTime.lFilterData.at(i).applyFFTFilter(channelDataTime.vecData,
+                                                                                   true,
+                                                                                   FilterData::ZeroPad); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
+    }
+}
+
+//=============================================================================================================
+
+MatrixXd Filter::filterDataBlock(const MatrixXd& matDataIn,
+                                 const RowVectorXi& vecPicks,
+                                 const QList<FilterData>& lFilterData,
+                                 bool bUseThreads)
+{
+    std::cout << "Filter::filterDataBlock 0" << std::endl;
     //Copy input data
     MatrixXd matDataOut = matDataIn;
 
@@ -213,28 +214,28 @@ MatrixXd RtFilter::filterDataBlock(const MatrixXd& matDataIn,
             iOrder = lFilterData.at(i).m_iFilterOrder;
         }
     }
-    std::cout << "RtFilter::filterDataBlock 1" << std::endl;
+    std::cout << "Filter::filterDataBlock 1" << std::endl;
 
     //Initialise the overlap matrix
     if(m_matOverlap.cols() != iOrder || m_matOverlap.rows() < matDataIn.rows()) {
         m_matOverlap.resize(matDataIn.rows(), iOrder);
         m_matOverlap.setZero();
     }
-    std::cout << "RtFilter::filterDataBlock 2" << std::endl;
+    std::cout << "Filter::filterDataBlock 2" << std::endl;
 
     if(m_matDelay.cols() != iOrder/2 || m_matOverlap.rows() < matDataIn.rows()) {
         m_matDelay.resize(matDataIn.rows(), iOrder/2);
         m_matDelay.setZero();
     }
-    std::cout << "RtFilter::filterDataBlock 3" << std::endl;
+    std::cout << "Filter::filterDataBlock 3" << std::endl;
 
     //Do the concurrent filtering
     if(vecPicks.cols() > 0) {
         //Generate QList structure which can be handled by the QConcurrent framework
-        QList<RtFilterData> timeData;
+        QList<FilterObject> timeData;
 
         //Only select channels specified in vecPicks
-        RtFilterData data;
+        FilterObject data;
         for(qint32 i = 0; i < vecPicks.cols(); ++i) {
             data.lFilterData = lFilterData;
             data.iRow = vecPicks[i];
@@ -242,7 +243,7 @@ MatrixXd RtFilter::filterDataBlock(const MatrixXd& matDataIn,
             timeData.append(data);
         }
 
-        std::cout << "RtFilter::filterDataBlock 4" << std::endl;
+        std::cout << "Filter::filterDataBlock 4" << std::endl;
         std::cout << "matDataIn.cols()" << matDataIn.cols()<< std::endl;
         std::cout << "matDataIn.rows()" << matDataIn.rows()<< std::endl;
         std::cout << "matDataOut.cols()" << matDataOut.cols()<< std::endl;
@@ -252,10 +253,10 @@ MatrixXd RtFilter::filterDataBlock(const MatrixXd& matDataIn,
 
         // Copy in data from last data block. This is necessary in order to also delay channels which are not filtered.
         matDataOut.block(0, iOrder/2, matDataIn.rows(), matDataOut.cols()-iOrder/2) = matDataIn.block(0, 0, matDataIn.rows(), matDataOut.cols()-iOrder/2);
-        std::cout << "RtFilter::filterDataBlock 4.0" << std::endl;
+        std::cout << "Filter::filterDataBlock 4.0" << std::endl;
         matDataOut.block(0, 0, matDataIn.rows(), iOrder/2) = m_matDelay;
 
-        std::cout << "RtFilter::filterDataBlock 4.1" << std::endl;
+        std::cout << "Filter::filterDataBlock 4.1" << std::endl;
         if(bUseThreads) {
             QFuture<void> future = QtConcurrent::map(timeData,
                                                      filterChannel);
@@ -267,7 +268,7 @@ MatrixXd RtFilter::filterDataBlock(const MatrixXd& matDataIn,
             }
         }
 
-        std::cout << "RtFilter::filterDataBlock 5" << std::endl;
+        std::cout << "Filter::filterDataBlock 5" << std::endl;
         //Do the overlap add method and store in matDataOut
         int iFilteredNumberCols = timeData.at(0).vecData.cols();
         RowVectorXd tempData;
@@ -287,17 +288,17 @@ MatrixXd RtFilter::filterDataBlock(const MatrixXd& matDataIn,
             m_matOverlap.row(timeData.at(r).iRow) = timeData.at(r).vecData.tail(iOrder);
         }
 
-        std::cout << "RtFilter::filterDataBlock 6" << std::endl;
+        std::cout << "Filter::filterDataBlock 6" << std::endl;
         if(matDataIn.cols() >= iOrder/2) {
             m_matDelay = matDataIn.block(0, matDataIn.cols()-iOrder/2, matDataIn.rows(), iOrder/2);
         } else {
-            qWarning() << "[RtFilter::filterDataBlock] Half of filter length is larger than data size. Not filling m_matDelay for next step.";
+            qWarning() << "[Filter::filterDataBlock] Half of filter length is larger than data size. Not filling m_matDelay for next step.";
         }
-        std::cout << "RtFilter::filterDataBlock 7" << std::endl;
+        std::cout << "Filter::filterDataBlock 7" << std::endl;
     } else {
-        qWarning() << "[RtFilter::filterDataBlock] Nubmer of picked channels is zero.";
+        qWarning() << "[Filter::filterDataBlock] Nubmer of picked channels is zero.";
     }
-    std::cout << "RtFilter::filterDataBlock 8" << std::endl;
+    std::cout << "Filter::filterDataBlock 8" << std::endl;
 
     return matDataOut;
 }

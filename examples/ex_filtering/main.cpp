@@ -46,7 +46,7 @@
 #include <utils/filterTools/filterdata.h>
 #include <utils/generics/applicationlogger.h>
 
-#include <rtprocessing/rtfilter.h>
+#include <rtprocessing/filter.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -117,7 +117,7 @@ int main(int argc, char *argv[])
     double dBandwidth = 10;
     double dTransition = 1;
 
-    RtFilter rtFilter;
+    Filter rtFilter;
     MatrixXd dataFiltered;
 
     // Only filter MEG and EEG channels

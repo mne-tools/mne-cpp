@@ -48,7 +48,7 @@
 #include <disp/viewers/spharasettingsview.h>
 #include <utils/filterTools/sphara.h>
 #include <utils/ioutils.h>
-#include <rtprocessing/rtfilter.h>
+#include <rtprocessing/filter.h>
 #include <scMeas/realtimemultisamplearray.h>
 
 #include "FormFiles/noisereductionsetupwidget.h"
@@ -341,7 +341,7 @@ void NoiseReduction::run()
 
     // Init
     MatrixXd matData;
-    QScopedPointer<RTPROCESSINGLIB::RtFilter> pRtFilter(new RTPROCESSINGLIB::RtFilter());
+    QScopedPointer<RTPROCESSINGLIB::Filter> pRtFilter(new RTPROCESSINGLIB::Filter());
 
     while(!isInterruptionRequested()) {
         // Get the current data

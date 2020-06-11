@@ -44,7 +44,7 @@
 
 #include <fiff/fiff.h>
 #include <utils/filterTools/filterdata.h>
-#include <rtprocessing/rtfilter.h>
+#include <rtprocessing/filter.h>
 
 #include <Eigen/Dense>
 
@@ -157,7 +157,7 @@ void TestFiltering::initTestCase()
     double dTransition = 1;
     iOrder = 1024;
 
-    RtFilter rtFilter;
+    Filter rtFilter;
     MatrixXd mDataFiltered;
 
     // Reading

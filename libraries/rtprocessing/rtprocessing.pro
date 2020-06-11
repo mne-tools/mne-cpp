@@ -84,7 +84,7 @@ SOURCES += \
     rtave.cpp \
     rtnoise.cpp \
     rthpis.cpp \
-    rtfilter.cpp \
+    filter.cpp \
     rtconnectivity.cpp
 
 HEADERS +=  \
@@ -94,7 +94,7 @@ HEADERS +=  \
     rtave.h \
     rtnoise.h \
     rthpis.h \
-    rtfilter.h \
+    filter.h \
     rtconnectivity.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
