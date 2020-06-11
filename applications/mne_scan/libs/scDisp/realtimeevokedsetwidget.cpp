@@ -56,7 +56,7 @@
 
 #include <scMeas/realtimeevokedset.h>
 
-#include <rtprocessing/helpers/filterdata.h>
+#include <rtprocessing/helpers/filterkernel.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES

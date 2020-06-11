@@ -54,7 +54,7 @@
 
 #include <scMeas/realtimemultisamplearray.h>
 
-#include <rtprocessing/helpers/filterdata.h>
+#include <rtprocessing/helpers/filterkernel.h>
 
 //=============================================================================================================
 // QT INCLUDES

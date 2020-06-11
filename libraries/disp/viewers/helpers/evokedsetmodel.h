@@ -41,7 +41,7 @@
 
 #include "../../disp_global.h"
 
-#include <rtprocessing/helpers/filterdata.h>
+#include <rtprocessing/helpers/filterkernel.h>
 #include <fiff/fiff_types.h>
 
 //=============================================================================================================
@@ -391,7 +391,7 @@ public:
      *
      * @param[in] filterData    list of the currently active filter
      */
-    void setFilter(const RTPROCESSINGLIB::FilterData &filterData);
+    void setFilter(const RTPROCESSINGLIB::FilterKernel &filterData);
 
     //=========================================================================================================
     /**
@@ -449,7 +449,7 @@ private:
     qint32                                  m_iMaxFilterLength;             /**< Max order of the current filters */
 
     QString                                 m_sFilterChannelType;           /**< Kind of channel which is to be filtered */
-    QList<RTPROCESSINGLIB::FilterData>             m_filterKernel;                   /**< List of currently active filters. */
+    QList<RTPROCESSINGLIB::FilterKernel>             m_filterKernel;                   /**< List of currently active filters. */
     QStringList                             m_filterChannelList;            /**< List of channels which are to be filtered.*/
     QStringList                             m_visibleChannelList;           /**< List of currently visible channels in the view.*/
 

@@ -43,7 +43,7 @@
 #include <math.h>
 
 #include <fiff/fiff.h>
-#include <rtprocessing/helpers/filterdata.h>
+#include <rtprocessing/helpers/filterkernel.h>
 #include <rtprocessing/filter.h>
 
 #include <Eigen/Dense>
@@ -150,7 +150,7 @@ void TestFiltering::initTestCase()
 
     // initialize filter settings
     QString sFilterName = "example_cosine";
-    FilterData::FilterType type = FilterData::BPF;
+    FilterKernel::FilterType type = FilterKernel::BPF;
     double dSFreq = rawFirstInRaw.info.sfreq;
     double dCenterfreq = 10;
     double dBandwidth = 10;
@@ -175,7 +175,7 @@ void TestFiltering::initTestCase()
                                          dSFreq,
                                          1024,
                                          4096,
-                                         RTPROCESSINGLIB::FilterData::Cosine,
+                                         RTPROCESSINGLIB::FilterKernel::Cosine,
                                          vPicks);
     printf("[done]\n");
 
