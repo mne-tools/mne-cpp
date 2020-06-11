@@ -45,6 +45,9 @@
 
 #include <QDir>
 #include <QStandardPaths>
+#include <QDesktopServices>
+#include <QDateTime>
+#include <QtGlobal>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -92,6 +95,7 @@ void SettingsControllerGui::readData()
     QString stringTempDir(QStandardPaths::writableLocation(QStandardPaths::TempLocation));
     QString fileOutStr(QDir(stringTempDir).filePath(generateRandomFileName()));
     m_pAnonymizer->setFileOut(fileOutStr);
+    m_pWin->setDefaultStateExtraInfo();
     m_pAnonymizer->anonymizeFile();
     QFile fileOut(fileOutStr);
     fileOut.remove();
@@ -124,7 +128,7 @@ void SettingsControllerGui::fileInChanged(const QString& strInFile)
 
     if( m_fiInFileInfo != newfiInFile )
     {
-        m_fiInFileInfo.setFile(strInFile);
+        m_fiInFileInfo.setFile(newfiInFile.absoluteFilePath());
         m_pAnonymizer->setFileIn(m_fiInFileInfo.absoluteFilePath());
 
         if(m_fiInFileInfo.isFile() && m_fiInFileInfo.isReadable())
@@ -132,7 +136,8 @@ void SettingsControllerGui::fileInChanged(const QString& strInFile)
             readData();
         }
     generateDefaultOutputFileName();
-    m_pWin->setLineEditInFile(m_fiOutFileInfo.absoluteFilePath());
+    m_pWin->setLineEditInFile(m_fiInFileInfo.absoluteFilePath());
+    m_pWin->setLineEditOutFile(m_fiOutFileInfo.absoluteFilePath());
     }
 }
 
@@ -141,7 +146,9 @@ void SettingsControllerGui::fileOutChanged(const QString& strOutFile)
     QFileInfo newfiOutFile(strOutFile);
     if(m_fiOutFileInfo.isDir())
     {
-        m_pWin->showMessage("Invalid output file. That's a directory!");
+        QString fileOutDefaultName(newfiOutFile.absolutePath() + m_fiInFileInfo.baseName() +
+                        "_anonymized." + m_fiInFileInfo.completeSuffix());
+        m_fiOutFileInfo.setFile(fileOutDefaultName);
         m_pWin->setLineEditOutFile(m_fiOutFileInfo.absoluteFilePath());
         return;
     }
@@ -171,28 +178,30 @@ void SettingsControllerGui::fileOutChanged(const QString& strOutFile)
 void SettingsControllerGui::setupCommunication()
 {
 
-    //from view to model
+    //from view to controller (to model)
     QObject::connect(m_pWin.data(),&MainWindow::fileInChanged,
                      this,&SettingsControllerGui::fileInChanged);
     QObject::connect(m_pWin.data(),&MainWindow::fileOutChanged,
                      this,&SettingsControllerGui::fileOutChanged);
 
-    QObject::connect(m_pWin.data(),&MainWindow::fileOutChanged,
-                     m_pAnonymizer.data(),&FiffAnonymizer::setFileOut);
-    QObject::connect(m_pWin.data(),&MainWindow::fileOutChanged,
-                     m_pAnonymizer.data(),&FiffAnonymizer::setFileOut);
-    QObject::connect(m_pWin.data(),&MainWindow::fileOutChanged,
-                     m_pAnonymizer.data(),&FiffAnonymizer::setFileOut);
-    QObject::connect(m_pWin.data(),&MainWindow::fileOutChanged,
-                     m_pAnonymizer.data(),&FiffAnonymizer::setFileOut);
-    QObject::connect(m_pWin.data(),&MainWindow::fileOutChanged,
-                     m_pAnonymizer.data(),&FiffAnonymizer::setFileOut);
-    QObject::connect(m_pWin.data(),&MainWindow::fileOutChanged,
-                     m_pAnonymizer.data(),&FiffAnonymizer::setFileOut);
-    QObject::connect(m_pWin.data(),&MainWindow::fileOutChanged,
-                     m_pAnonymizer.data(),&FiffAnonymizer::setFileOut);
-    QObject::connect(m_pWin.data(),&MainWindow::fileOutChanged,
-                     m_pAnonymizer.data(),&FiffAnonymizer::setFileOut);
+    //from view to model
+    QObject::connect(m_pWin.data(),&MainWindow::bruteModeChanged,
+                     m_pAnonymizer.data(),&FiffAnonymizer::setBruteMode);
+    QObject::connect(m_pWin.data(),&MainWindow::measurementDateChanged,
+                     m_pAnonymizer.data(),QOverload<const QDateTime&>::of(&FiffAnonymizer::setMeasurementDate));
+    QObject::connect(m_pWin.data(),&MainWindow::useMeasurementOffset,
+                     m_pAnonymizer.data(),&FiffAnonymizer::setUseMeasurementDateOffset);
+    QObject::connect(m_pWin.data(),&MainWindow::measurementDateOffsetChanged,
+                     m_pAnonymizer.data(),&FiffAnonymizer::setMeasurementDateOffset);
+    QObject::connect(m_pWin.data(),&MainWindow::birthdayDateChanged,
+                     m_pAnonymizer.data(),QOverload<const QDateTime&>::of(&FiffAnonymizer::setSubjectBirthday));
+    QObject::connect(m_pWin.data(),&MainWindow::useBirthdayOffset,
+                     m_pAnonymizer.data(),&FiffAnonymizer::setUseSubjectBirthdayOffset);
+    QObject::connect(m_pWin.data(),&MainWindow::birthdayOffsetChanged,
+                     m_pAnonymizer.data(),&FiffAnonymizer::setSubjectBirthdayOffset);
+    QObject::connect(m_pWin.data(),&MainWindow::subjectHisIdChanged,
+                     m_pAnonymizer.data(),&FiffAnonymizer::setSubjectHisId);
+
 
     //from model to view
     QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingIdFileVersion,
@@ -221,7 +230,7 @@ void SettingsControllerGui::setupCommunication()
     QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingSubjectBirthday,
                      m_pWin.data(),&MainWindow::setLineEditSubjectBirthday);
     QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingSubjectSex,
-                     m_pWin.data(),&MainWindow::setLineEditSubjectSex);
+                     m_pWin.data(),&MainWindow::setComboBoxSubjectSex);
     QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingSubjectHand,
                      m_pWin.data(),&MainWindow::setLineEditSubjectHand);
     QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingSubjectWeight,
