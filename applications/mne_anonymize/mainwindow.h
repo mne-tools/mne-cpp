@@ -39,6 +39,8 @@ public:
     void setSubjectHis(const QString& h);
 
 public slots:
+    void showMessage(QString s);
+
     void setLineEditIdFileVersion(double v);
     void setLineEditIdMeasurementDate(QDateTime d);
     void setLineEditIdMacAddress(QString mac);
@@ -97,7 +99,10 @@ private slots:
     void lineEditSubjectHisIdEditingFinished();
 
     void openInFileDialog();
+
     void openOutFileDialog();
+
+    void showExtraInfo();
 
     void helpButtonClicked();
 
@@ -113,7 +118,7 @@ private:
 
     void clearInfo();
 
-//    bool m_bHideInfoFields;
+    bool m_bHideExtraInfoFields;
     Ui::MainWindow* m_pUi;
     SettingsControllerGui* m_pController;
 };
