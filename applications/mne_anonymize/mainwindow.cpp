@@ -36,12 +36,13 @@ MainWindow::MainWindow(MNEANONYMIZE::SettingsControllerGui *c)
 //, m_bProjectNameFound(false)
 //, m_bProjectPersonsFound(false)
 //, m_bProjectCommentFound(false)
-  m_bHideExtraInfoFields(false)
+  m_bHideExtraInfoFields(true)
 , m_pUi(new Ui::MainWindow)
 , m_pController(c)
 {
     m_pUi->setupUi(this);
     setDefautlStateUi();
+    setDefaultStateExtraInfo();
     setupConnections();
 }
 
