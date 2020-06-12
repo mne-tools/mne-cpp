@@ -113,7 +113,7 @@ void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq,
     //Get row vector with filter coefficients
     int numberCoeff = m_iPlotLength;
 
-//    RowVectorXcd coefficientsAFreq = m_pCurrentFilter.m_vecFFTCoeff;
+//    RowVectorXcd coefficientsAFreq = m_pCurrentFilter.m_vecFftCoeff;
 //    if(coefficientsAFreq.cols() > 2000) {//if to large downsample
 //        int dsFactor = coefficientsAFreq.cols()/2000;
 //        numberCoeff = coefficientsAFreq.cols()/dsFactor;

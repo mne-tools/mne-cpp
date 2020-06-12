@@ -66,7 +66,7 @@ RtNoise::RtNoise(qint32 p_iMaxSamples,
                  qint32 p_dataLen,
                  QObject *parent)
 : QThread(parent)
-, m_iFFTlength(p_iMaxSamples)
+, m_iFftLength(p_iMaxSamples)
 , m_pFiffInfo(p_pFiffInfo)
 , m_dataLength(p_dataLen)
 , m_bIsRunning(false)
@@ -85,7 +85,7 @@ RtNoise::RtNoise(qint32 p_iMaxSamples,
     m_fWin.clear();
 
     //create a hanning window
-    m_fWin = hanning(m_iFFTlength,0);
+    m_fWin = hanning(m_iFftLength,0);
 
     qDebug()<<"Hanning window is created.";
 }
@@ -223,20 +223,20 @@ void RtNoise::run()
                     //stop collect block and start to calculate the spectrum
                     m_iBlockIndex = 0;
 
-                    MatrixXd sum_psdx = MatrixXd::Zero(m_iSensors,m_iFFTlength/2+1);
+                    MatrixXd sum_psdx = MatrixXd::Zero(m_iSensors,m_iFftLength/2+1);
 
-                    int nb = floor(m_iNumOfBlocks*m_iBlockSize/m_iFFTlength)+1;
+                    int nb = floor(m_iNumOfBlocks*m_iBlockSize/m_iFftLength)+1;
                     qDebug()<<"nb"<<nb<<"NumOfBlocks"<<m_iNumOfBlocks<<"BlockSize"<<m_iBlockSize;
-                    MatrixXd t_mat(m_iSensors,m_iFFTlength);
-                    MatrixXd t_psdx(m_iSensors,m_iFFTlength/2+1);
+                    MatrixXd t_mat(m_iSensors,m_iFftLength);
+                    MatrixXd t_psdx(m_iSensors,m_iFftLength/2+1);
                     for (int n = 0; n<nb; n++){
-                        //collect a data block with data length of m_iFFTlength;
+                        //collect a data block with data length of m_iFftLength;
                         if(n==nb-1)
                         {
                             for(qint32 ii=0; ii<m_iSensors; ii++)
-                            for(qint32 jj=0; jj<m_iFFTlength; jj++)
-                                if(jj+n*m_iFFTlength<m_iNumOfBlocks*m_iBlockSize)
-                                    t_mat(ii,jj) = m_matCircBuf(ii,jj+n*m_iFFTlength);
+                            for(qint32 jj=0; jj<m_iFftLength; jj++)
+                                if(jj+n*m_iFftLength<m_iNumOfBlocks*m_iBlockSize)
+                                    t_mat(ii,jj) = m_matCircBuf(ii,jj+n*m_iFftLength);
                                 else
                                     t_mat(ii,jj) = 0.0;
 
@@ -244,8 +244,8 @@ void RtNoise::run()
                         else
                         {
                             for(qint32 ii=0; ii<m_iSensors; ii++)
-                            for(qint32 jj=0; jj<m_iFFTlength; jj++)
-                                t_mat(ii,jj) = m_matCircBuf(ii,jj+n*m_iFFTlength);
+                            for(qint32 jj=0; jj<m_iFftLength; jj++)
+                                t_mat(ii,jj) = m_matCircBuf(ii,jj+n*m_iFftLength);
                         }
 
                         //FFT calculation by row
@@ -254,27 +254,27 @@ void RtNoise::run()
 
                             data = t_mat.row(i);
 
-                            //zero-pad data to m_iFFTlength
-                            RowVectorXd t_dataZeroPad = RowVectorXd::Zero(m_iFFTlength);
-                            t_dataZeroPad.head(data.cols()) = data;
+                            //zero-pad data to m_iFftLength
+                            RowVectorXd vecDataZeroPad = RowVectorXd::Zero(m_iFftLength);
+                            vecDataZeroPad.head(data.cols()) = data;
 
-                            for (qint32 lk = 0; lk<m_iFFTlength; lk++)
-                                t_dataZeroPad[lk] = t_dataZeroPad[lk]*m_fWin[lk];
+                            for (qint32 lk = 0; lk<m_iFftLength; lk++)
+                                vecDataZeroPad[lk] = vecDataZeroPad[lk]*m_fWin[lk];
 
                             //generate fft object
                             Eigen::FFT<double> fft;
                             fft.SetFlag(fft.HalfSpectrum);
 
                             //fft-transform data sequence
-                            RowVectorXcd t_freqData(m_iFFTlength/2+1);
-                            fft.fwd(t_freqData,t_dataZeroPad);
+                            RowVectorXcd vecFreqData(m_iFftLength/2+1);
+                            fft.fwd(vecFreqData,vecDataZeroPad);
 
                             // calculate spectrum from FFT
-                            for(qint32 j=0; j<m_iFFTlength/2+1;j++)
+                            for(qint32 j=0; j<m_iFftLength/2+1;j++)
                             {
-                                double mag_abs = sqrt(t_freqData(j).real()* t_freqData(j).real() +  t_freqData(j).imag()*t_freqData(j).imag());
-                                double spower = (1.0/(m_Fs*m_iFFTlength))* mag_abs;
-                                if (j>0&&j<m_iFFTlength/2) spower = 2.0*spower;
+                                double mag_abs = sqrt(vecFreqData(j).real()* vecFreqData(j).real() +  vecFreqData(j).imag()*vecFreqData(j).imag());
+                                double spower = (1.0/(m_Fs*m_iFftLength))* mag_abs;
+                                if (j>0&&j<m_iFftLength/2) spower = 2.0*spower;
                                 sum_psdx(i,j) = sum_psdx(i,j) + spower;
                             }
                          }//row computing is done
@@ -282,7 +282,7 @@ void RtNoise::run()
 
                     //DB-calculation
                     for(qint32 ii=0; ii<m_iSensors; ii++)
-                        for(qint32 jj=0; jj<m_iFFTlength/2+1; jj++)
+                        for(qint32 jj=0; jj<m_iFftLength/2+1; jj++)
                             t_psdx(ii,jj) = 10.0*log10(sum_psdx(ii,jj)/nb);
 
                     qDebug()<<"Send spectrum to Noise Estimator";
