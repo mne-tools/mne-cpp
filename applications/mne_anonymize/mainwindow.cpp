@@ -68,6 +68,7 @@ void MainWindow::setDefautlStateUi()
         m_pUi->checkBoxShowOptions->setCheckState(Qt::Unchecked);
     }
     m_pUi->frameOptions->setVisible(m_bOptionsVisibility);
+    m_pUi->frameOptionsAndExtraInfo->setVisible(m_bOptionsVisibility);
 
     m_pUi->spinBoxMeasurementDateOffset->setEnabled(false);
     m_pUi->spinBoxBirthdayDateOffset->setEnabled(false);
@@ -150,8 +151,8 @@ void MainWindow::setDefaultStateExtraInfo()
 
     m_pUi->dateTimeFileMeasurementDateExtra->setEnabled(false);
 
-    m_pUi->lineEditExperimenterExtra->setEnabled(false);
     m_pUi->plainTextFileCommentExtra->setEnabled(false);
+    m_pUi->lineEditExperimenterExtra->setEnabled(false);
 
     m_pUi->spinBoxSubjectIDExtra->setEnabled(false);
     m_pUi->lineEditSubjectFirstNameExtra->setEnabled(false);
@@ -591,7 +592,7 @@ void MainWindow::resizeEvent(QResizeEvent* event)
 
 void MainWindow::checkSmallGui()
 {
-    int criticalWidth(500);
+    int criticalWidth(250);
 
     if( !m_pUi->lineEditInFile->text().isEmpty())
     {

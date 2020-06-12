@@ -80,13 +80,13 @@ SettingsControllerGui::SettingsControllerGui(const QStringList& arguments)
     m_bInputFileInformationVisible = m_pWin->getExtraInfoVisibility();
 
     readData();
-
-    m_pWin->statusMsg("Mellow greetings!",1000);
+    QString msg("Mellow greetings!");
+    m_pWin->statusMsg(msg,2000);
 }
 
 void SettingsControllerGui::executeAnonymizer()
 {
-    m_pWin->statusMsg("Anonymizing the input file into the output file.");
+    m_pWin->statusMsg("Anonymizing the input file into the output file.",2000);
     m_pAnonymizer->anonymizeFile();
     m_pWin->statusMsg("Your file is ready!");
 }
@@ -95,8 +95,8 @@ void SettingsControllerGui::readData()
 {
     if(m_pAnonymizer->isFileInSet() && m_bInputFileInformationVisible)
     {
-        m_pWin->statusMsg("Reading input File information...");
-        //set output to a randomFilename
+        QString msg("Reading input File information...");
+        m_pWin->statusMsg(msg);
         QString stringTempDir(QStandardPaths::writableLocation(QStandardPaths::TempLocation));
         QString fileOutStr(QDir(stringTempDir).filePath(generateRandomFileName()));
         m_pAnonymizer->setFileOut(fileOutStr);
@@ -108,7 +108,8 @@ void SettingsControllerGui::readData()
         fileOut.remove();
         m_pAnonymizer->setFileOut(m_fiOutFileInfo.absoluteFilePath());
         m_pAnonymizer->setVerboseMode(verboseMode);
-        m_pWin->statusMsg("Input file information read correctly.",2000);
+        QString msg2("Input file information read correctly.");
+        m_pWin->statusMsg(msg2,2000);
     }
 }
 
