@@ -76,6 +76,8 @@ SettingsControllerGui::SettingsControllerGui(const QStringList& arguments)
 
     initializeOptionsState();
 
+    qApp->setAttribute(Qt::AA_DontUseNativeMenuBar);
+
     m_pWin->show();
 
     if(m_pAnonymizer->isFileInSet())
