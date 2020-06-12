@@ -186,9 +186,8 @@ void Filter::filterChannel(Filter::FilterObject& channelDataTime)
 {
     for(int i = 0; i < channelDataTime.lFilterKernel.size(); ++i) {
         //channelDataTime.vecData = channelDataTime.first.at(i).applyConvFilter(channelDataTime.vecData, true, FilterKernel::ZeroPad);
-        channelDataTime.vecData = channelDataTime.lFilterKernel.at(i).applyFFTFilter(channelDataTime.vecData,
-                                                                                   true,
-                                                                                   FilterKernel::ZeroPad); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
+        channelDataTime.vecData = channelDataTime.lFilterKernel.at(i).applyFftFilter(channelDataTime.vecData,
+                                                                                   true); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
     }
 }
 

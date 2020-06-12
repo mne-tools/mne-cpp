@@ -97,12 +97,6 @@ public:
         UNKNOWN
     } m_Type;
 
-    enum CompensateEdgeEffects {
-       ZeroPad,
-       MirrorData,
-       None
-    };
-
     //=========================================================================================================
     /**
      * @brief FilterKernel creates a default FilterKernel object
@@ -135,30 +129,27 @@ public:
 
     //=========================================================================================================
     /**
-     * Applies the current filter to the input data using convolution in time domain. Pro: Uses only past samples (real-time capable) Con: Might not be as ideal as acausal version (steepness etc.)
+     * Applies the current filter to the input data using convolution in time domain.
      *
-     * @param [in] data             holds the data to be filtered
-     * @param [in] keepOverhead     whether the result should still include the overhead information in front and back of the data
+     * @param [in] vecData          holds the data to be filtered
+     * @param [in] bKeepOverhead     whether the result should still include the overhead information in front and back of the data
      *
      * @return the filtered data in form of a RoVecotrXd
      */
-    Eigen::RowVectorXd applyConvFilter(const Eigen::RowVectorXd& data,
-                                       bool keepOverhead = false,
-                                       CompensateEdgeEffects compensateEdgeEffects = ZeroPad) const;
+    Eigen::RowVectorXd applyConvFilter(const Eigen::RowVectorXd& vecData,
+                                       bool bKeepOverhead = false) const;
 
     //=========================================================================================================
     /**
-     * Applies the current filter to the input data using multiplication in frequency domain. Pro: Fast, good filter parameters Con: Smears in error from future samples. Uses future samples (nor real time capable)
+     * Applies the current filter to the input data using multiplication in frequency domain.
      *
-     * @param [in] data                     holds the data to be filtered
-     * @param [in] keepOverhead             whether the result should still include the overhead information in front and back of the data
-     * @param [in] compensateEdgeEffects    defines how the edge effects should be handlted. Choose between ZeroPad and Mirroring
+     * @param [in] vecData                  holds the data to be filtered
+     * @param [in] bKeepOverhead             whether the result should still include the overhead information in front and back of the data
      *
      * @return the filtered data in form of a RoVecotrXd
      */
-    Eigen::RowVectorXd applyFFTFilter(const Eigen::RowVectorXd& data,
-                                      bool keepOverhead = false,
-                                      CompensateEdgeEffects compensateEdgeEffects = MirrorData) const;
+    Eigen::RowVectorXd applyFftFilter(const Eigen::RowVectorXd& vecData,
+                                      bool bKeepOverhead = false) const;
 
     //=========================================================================================================
     /**
@@ -238,12 +229,12 @@ private:
     double          m_dHighpassFreq;        /**< lowpass freq (lower cut off) of the filter. */
 
     int             m_iFilterOrder;         /**< represents the order of the filter instance. */
-    int             m_iFFTlength;           /**< represents the filter length. */
+    int             m_iFftLength;           /**< represents the filter length. */
 
     QString         m_sFilterName;          /**< contains name of the filter. */
 
     Eigen::RowVectorXd     m_vecCoeff;       /**< contains the forward filter coefficient set. */
-    Eigen::RowVectorXcd    m_vecFFTCoeff;    /**< the FFT-transformed forward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength. */
+    Eigen::RowVectorXcd    m_vecFftCoeff;    /**< the FFT-transformed forward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFftLength. */
 };
 
 //=============================================================================================================
