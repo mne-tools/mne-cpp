@@ -126,6 +126,65 @@
          </widget>
         </item>
         <item>
+         <widget class="QFrame" name="frame_3">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+          <layout class="QGridLayout" name="gridLayout">
+           <item row="0" column="0">
+            <widget class="QToolButton" name="seeExtraInfoButton_2">
+             <property name="text">
+              <string>More Information</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="4">
+            <widget class="QPushButton" name="pushButton_2">
+             <property name="text">
+              <string>Anonymize the input file</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2">
+            <widget class="QCheckBox" name="checkBoxBruteMode_2">
+             <property name="text">
+              <string>Expert Mode</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <spacer name="horizontalSpacer">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="0" column="3">
+            <spacer name="horizontalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
          <widget class="QFrame" name="frame_2">
           <property name="minimumSize">
            <size>
@@ -182,8 +241,15 @@
               <enum>QFrame::Raised</enum>
              </property>
              <layout class="QGridLayout" name="gridLayout_3">
-              <item row="7" column="0">
-               <widget class="QLabel" name="labelSubjectBirthday">
+              <item row="5" column="0">
+               <widget class="QCheckBox" name="checkBoxMeasurementDateOffset">
+                <property name="text">
+                 <string>Measurement date offset</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="labelMeasDate">
                 <property name="maximumSize">
                  <size>
                   <width>16777215</width>
@@ -191,12 +257,12 @@
                  </size>
                 </property>
                 <property name="text">
-                 <string>Subject birthday</string>
+                 <string>Measurement date</string>
                 </property>
                </widget>
               </item>
-              <item row="15" column="0">
-               <spacer name="verticalSpacer_3">
+              <item row="12" column="0">
+               <spacer name="verticalSpacer_6">
                 <property name="orientation">
                  <enum>Qt::Vertical</enum>
                 </property>
@@ -209,14 +275,10 @@
                </spacer>
               </item>
               <item row="9" column="0">
-               <widget class="QCheckBox" name="checkBoxBirthdayDateOffset">
-                <property name="text">
-                 <string>Subject birthday offset</string>
-                </property>
-               </widget>
+               <widget class="QDateTimeEdit" name="dateTimeBirthdayDate"/>
               </item>
-              <item row="12" column="0">
-               <widget class="QLabel" name="labelSubjectHisId">
+              <item row="8" column="0">
+               <widget class="QLabel" name="labelSubjectBirthday">
                 <property name="maximumSize">
                  <size>
                   <width>16777215</width>
@@ -224,87 +286,35 @@
                  </size>
                 </property>
                 <property name="text">
-                 <string>Subject &quot;his_id&quot;</string>
+                 <string>Subject birthday</string>
                 </property>
                </widget>
               </item>
-              <item row="6" column="0">
-               <spacer name="verticalSpacer_5">
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
+              <item row="11" column="0">
+               <widget class="QSpinBox" name="spinBoxBirthdayDateOffset">
+                <property name="maximumSize">
                  <size>
-                  <width>20</width>
-                  <height>40</height>
+                  <width>60</width>
+                  <height>16777215</height>
                  </size>
                 </property>
-               </spacer>
+               </widget>
               </item>
-              <item row="0" column="0">
+              <item row="1" column="0">
                <widget class="QCheckBox" name="checkBoxBruteMode">
                 <property name="text">
                  <string>Brute mode</string>
                 </property>
                </widget>
               </item>
-              <item row="4" column="0">
-               <widget class="QCheckBox" name="checkBoxMeasurementDateOffset">
-                <property name="text">
-                 <string>Measurement date offset</string>
-                </property>
-               </widget>
-              </item>
-              <item row="13" column="0">
-               <widget class="QLineEdit" name="lineEditSubjectHisId"/>
-              </item>
-              <item row="16" column="0">
-               <widget class="QDialogButtonBox" name="buttonMenu">
-                <property name="standardButtons">
-                 <set>QDialogButtonBox::Help|QDialogButtonBox::Save</set>
-                </property>
-                <property name="centerButtons">
-                 <bool>false</bool>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="0">
-               <widget class="QDateTimeEdit" name="dateTimeMeasurementDate">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="calendarPopup">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item row="14" column="0">
+              <item row="15" column="0">
                <widget class="QToolButton" name="seeExtraInfoButton">
                 <property name="text">
                  <string>Show info in the input file</string>
                 </property>
                </widget>
               </item>
-              <item row="1" column="0">
-               <spacer name="verticalSpacer_4">
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>20</width>
-                  <height>40</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item row="8" column="0">
-               <widget class="QDateTimeEdit" name="dateTimeBirthdayDate"/>
-              </item>
-              <item row="5" column="0">
+              <item row="6" column="0">
                <widget class="QSpinBox" name="spinBoxMeasurementDateOffset">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -320,18 +330,44 @@
                 </property>
                </widget>
               </item>
-              <item row="10" column="0">
-               <widget class="QSpinBox" name="spinBoxBirthdayDateOffset">
-                <property name="maximumSize">
+              <item row="16" column="0">
+               <spacer name="verticalSpacer_3">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
                  <size>
-                  <width>60</width>
-                  <height>16777215</height>
+                  <width>20</width>
+                  <height>40</height>
                  </size>
+                </property>
+               </spacer>
+              </item>
+              <item row="14" column="0">
+               <widget class="QLineEdit" name="lineEditSubjectHisId"/>
+              </item>
+              <item row="4" column="0">
+               <widget class="QDateTimeEdit" name="dateTimeMeasurementDate">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="calendarPopup">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="labelMeasDate">
+              <item row="10" column="0">
+               <widget class="QCheckBox" name="checkBoxBirthdayDateOffset">
+                <property name="text">
+                 <string>Subject birthday offset</string>
+                </property>
+               </widget>
+              </item>
+              <item row="13" column="0">
+               <widget class="QLabel" name="labelSubjectHisId">
                 <property name="maximumSize">
                  <size>
                   <width>16777215</width>
@@ -339,12 +375,38 @@
                  </size>
                 </property>
                 <property name="text">
-                 <string>Measurement date</string>
+                 <string>Subject &quot;his_id&quot;</string>
                 </property>
                </widget>
               </item>
-              <item row="11" column="0">
-               <spacer name="verticalSpacer_6">
+              <item row="7" column="0">
+               <spacer name="verticalSpacer_5">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>40</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item row="2" column="0">
+               <spacer name="verticalSpacer_4">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>40</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item row="0" column="0">
+               <spacer name="verticalSpacer_7">
                 <property name="orientation">
                  <enum>Qt::Vertical</enum>
                 </property>
@@ -357,6 +419,23 @@
                </spacer>
               </item>
              </layout>
+             <zorder>checkBoxBirthdayDateOffset</zorder>
+             <zorder>labelSubjectHisId</zorder>
+             <zorder>checkBoxMeasurementDateOffset</zorder>
+             <zorder>dateTimeBirthdayDate</zorder>
+             <zorder>labelMeasDate</zorder>
+             <zorder>spinBoxMeasurementDateOffset</zorder>
+             <zorder>dateTimeMeasurementDate</zorder>
+             <zorder>labelSubjectBirthday</zorder>
+             <zorder>lineEditSubjectHisId</zorder>
+             <zorder>spinBoxBirthdayDateOffset</zorder>
+             <zorder>checkBoxBruteMode</zorder>
+             <zorder>seeExtraInfoButton</zorder>
+             <zorder>verticalSpacer_3</zorder>
+             <zorder>verticalSpacer_4</zorder>
+             <zorder>verticalSpacer_5</zorder>
+             <zorder>verticalSpacer_6</zorder>
+             <zorder>verticalSpacer_7</zorder>
             </widget>
            </item>
            <item>
@@ -414,7 +493,7 @@
                  <bool>true</bool>
                 </property>
                 <property name="currentIndex">
-                 <number>0</number>
+                 <number>2</number>
                 </property>
                 <widget class="QWidget" name="tab">
                  <attribute name="title">
@@ -528,6 +607,22 @@ asdflkasdjf;lasdkjf;laskdjflasdfj</string>
                   <string>Subject Info</string>
                  </attribute>
                  <layout class="QGridLayout" name="gridLayout_4">
+                  <item row="5" column="0" colspan="2">
+                   <widget class="QLabel" name="labelSubjectSexExtra">
+                    <property name="text">
+                     <string>Subject Sex</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="8" column="2">
+                   <widget class="QDoubleSpinBox" name="doubleSpinBoxSubjectHeightExtra"/>
+                  </item>
+                  <item row="3" column="2">
+                   <widget class="QLineEdit" name="lineEditSubjectLastNameExtra"/>
+                  </item>
+                  <item row="2" column="2">
+                   <widget class="QLineEdit" name="lineEditSubjectMiddleNameExtra"/>
+                  </item>
                   <item row="9" column="0">
                    <widget class="QLabel" name="labelSubjectCommentExtra">
                     <property name="maximumSize">
@@ -541,6 +636,9 @@ asdflkasdjf;lasdkjf;laskdjflasdfj</string>
                     </property>
                    </widget>
                   </item>
+                  <item row="4" column="2">
+                   <widget class="QDateEdit" name="dateEditSubjectBirthdayExtra"/>
+                  </item>
                   <item row="0" column="2">
                    <widget class="QSpinBox" name="spinBoxSubjectIDExtra">
                     <property name="maximumSize">
@@ -551,54 +649,7 @@ asdflkasdjf;lasdkjf;laskdjflasdfj</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="7" column="0" colspan="2">
-                   <widget class="QLabel" name="labelSubjectWeightExtra">
-                    <property name="text">
-                     <string>Subject Weight</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="4" column="0" colspan="2">
-                   <widget class="QLabel" name="labelSubjectBirthdayExtra">
-                    <property name="text">
-                     <string>Subject Birthday</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="3" column="2">
-                   <widget class="QLineEdit" name="lineEditSubjectLastNameExtra"/>
-                  </item>
-                  <item row="3" column="0" colspan="2">
-                   <widget class="QLabel" name="labelSubjectLastNameExtra">
-                    <property name="text">
-                     <string>Subject Last Name</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="2">
-                   <widget class="QLineEdit" name="lineEditSubjectMiddleNameExtra"/>
-                  </item>
-                  <item row="8" column="2">
-                   <widget class="QDoubleSpinBox" name="doubleSpinBoxSubjectHeightExtra"/>
-                  </item>
-                  <item row="8" column="0" colspan="2">
-                   <widget class="QLabel" name="labelSubjectHeightExtra">
-                    <property name="text">
-                     <string>Subject Height</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="4" column="2">
-                   <widget class="QDateEdit" name="dateEditSubjectBirthdayExtra"/>
-                  </item>
-                  <item row="1" column="0" colspan="2">
-                   <widget class="QLabel" name="labelSubjectFirstNameExtra">
-                    <property name="text">
-                     <string>Subject First Name</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="11" column="0" colspan="3">
+                  <item row="12" column="0" colspan="3">
                    <widget class="QLabel" name="labelSubjectMriDataFoundExtra">
                     <property name="maximumSize">
                      <size>
@@ -617,13 +668,10 @@ asdflkasdjf;lasdkjf;laskdjflasdfj</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="6" column="2">
-                   <widget class="QComboBox" name="comboBoxSubjectHandExtra"/>
-                  </item>
-                  <item row="6" column="0" colspan="2">
-                   <widget class="QLabel" name="labelSubjectHandExtra">
+                  <item row="1" column="0" colspan="2">
+                   <widget class="QLabel" name="labelSubjectFirstNameExtra">
                     <property name="text">
-                     <string>Subject Handedness</string>
+                     <string>Subject First Name</string>
                     </property>
                    </widget>
                   </item>
@@ -634,15 +682,8 @@ asdflkasdjf;lasdkjf;laskdjflasdfj</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="1" column="2">
-                   <widget class="QLineEdit" name="lineEditSubjectFirstNameExtra"/>
-                  </item>
-                  <item row="5" column="0" colspan="2">
-                   <widget class="QLabel" name="labelSubjectSexExtra">
-                    <property name="text">
-                     <string>Subject Sex</string>
-                    </property>
-                   </widget>
+                  <item row="6" column="2">
+                   <widget class="QComboBox" name="comboBoxSubjectHandExtra"/>
                   </item>
                   <item row="2" column="0" colspan="2">
                    <widget class="QLabel" name="labelSubjectMiddleNameExtra">
@@ -651,21 +692,22 @@ asdflkasdjf;lasdkjf;laskdjflasdfj</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="7" column="2">
-                   <widget class="QDoubleSpinBox" name="doubleSpinBoxSubjectWeightExtra"/>
-                  </item>
-                  <item row="5" column="2">
-                   <widget class="QComboBox" name="comboBoxSubjectSexExtra"/>
-                  </item>
-                  <item row="10" column="0">
-                   <widget class="QLabel" name="labelHisIDExtra">
+                  <item row="8" column="0" colspan="2">
+                   <widget class="QLabel" name="labelSubjectHeightExtra">
                     <property name="text">
-                     <string>Subject His ID</string>
+                     <string>Subject Height</string>
                     </property>
                    </widget>
                   </item>
                   <item row="10" column="2">
                    <widget class="QLineEdit" name="lineEditSubjectHisIdExtra"/>
+                  </item>
+                  <item row="7" column="0" colspan="2">
+                   <widget class="QLabel" name="labelSubjectWeightExtra">
+                    <property name="text">
+                     <string>Subject Weight</string>
+                    </property>
+                   </widget>
                   </item>
                   <item row="9" column="2">
                    <widget class="QPlainTextEdit" name="plainTextEditSubjectCommentExtra">
@@ -688,6 +730,56 @@ asdflkasdjf;lasdkjf;laskdjflasdfj</string>
                      </size>
                     </property>
                    </widget>
+                  </item>
+                  <item row="7" column="2">
+                   <widget class="QDoubleSpinBox" name="doubleSpinBoxSubjectWeightExtra"/>
+                  </item>
+                  <item row="1" column="2">
+                   <widget class="QLineEdit" name="lineEditSubjectFirstNameExtra"/>
+                  </item>
+                  <item row="10" column="0">
+                   <widget class="QLabel" name="labelHisIDExtra">
+                    <property name="text">
+                     <string>Subject His ID</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="0" colspan="2">
+                   <widget class="QLabel" name="labelSubjectLastNameExtra">
+                    <property name="text">
+                     <string>Subject Last Name</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="5" column="2">
+                   <widget class="QComboBox" name="comboBoxSubjectSexExtra"/>
+                  </item>
+                  <item row="6" column="0" colspan="2">
+                   <widget class="QLabel" name="labelSubjectHandExtra">
+                    <property name="text">
+                     <string>Subject Handedness</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="0" colspan="2">
+                   <widget class="QLabel" name="labelSubjectBirthdayExtra">
+                    <property name="text">
+                     <string>Subject Birthday</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="11" column="0">
+                   <spacer name="verticalSpacer_8">
+                    <property name="orientation">
+                     <enum>Qt::Vertical</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>20</width>
+                      <height>40</height>
+                     </size>
+                    </property>
+                   </spacer>
                   </item>
                  </layout>
                 </widget>
@@ -797,11 +889,10 @@ asdflkasdjf;lasdkjf;laskdjflasdfj</string>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <tabstops>
-  <tabstop>openInFileWindowButton</tabstop>
   <tabstop>lineEditInFile</tabstop>
-  <tabstop>openOutFileWindowButton</tabstop>
   <tabstop>lineEditOutFile</tabstop>
-  <tabstop>scrollArea</tabstop>
+  <tabstop>pushButton_2</tabstop>
+  <tabstop>checkBoxBruteMode_2</tabstop>
   <tabstop>checkBoxBruteMode</tabstop>
   <tabstop>dateTimeMeasurementDate</tabstop>
   <tabstop>checkBoxMeasurementDateOffset</tabstop>
@@ -812,6 +903,12 @@ asdflkasdjf;lasdkjf;laskdjflasdfj</string>
   <tabstop>lineEditSubjectHisId</tabstop>
   <tabstop>seeExtraInfoButton</tabstop>
   <tabstop>tabWidget</tabstop>
+  <tabstop>lineEditIdFileVersionExtra</tabstop>
+  <tabstop>dateTimeIdMeasurementDateExtra</tabstop>
+  <tabstop>lineEditIdMACAddressExtra</tabstop>
+  <tabstop>dateTimeFileMeasurementDateExtra</tabstop>
+  <tabstop>plainTextFileCommentExtra</tabstop>
+  <tabstop>lineEditExperimenterExtra</tabstop>
   <tabstop>spinBoxSubjectIDExtra</tabstop>
   <tabstop>lineEditSubjectFirstNameExtra</tabstop>
   <tabstop>lineEditSubjectMiddleNameExtra</tabstop>
@@ -822,18 +919,16 @@ asdflkasdjf;lasdkjf;laskdjflasdfj</string>
   <tabstop>doubleSpinBoxSubjectWeightExtra</tabstop>
   <tabstop>doubleSpinBoxSubjectHeightExtra</tabstop>
   <tabstop>plainTextEditSubjectCommentExtra</tabstop>
-  <tabstop>lineEditExperimenterExtra</tabstop>
   <tabstop>lineEditSubjectHisIdExtra</tabstop>
   <tabstop>spinBoxProjectIDExtra</tabstop>
   <tabstop>lineEditProjectAimExtra</tabstop>
   <tabstop>lineEditProjectNameExtra</tabstop>
   <tabstop>lineEditProjectPersonsExtra</tabstop>
   <tabstop>plainTextEditProjectCommentExtra</tabstop>
-  <tabstop>lineEditIdFileVersionExtra</tabstop>
-  <tabstop>dateTimeIdMeasurementDateExtra</tabstop>
-  <tabstop>lineEditIdMACAddressExtra</tabstop>
-  <tabstop>dateTimeFileMeasurementDateExtra</tabstop>
-  <tabstop>plainTextFileCommentExtra</tabstop>
+  <tabstop>scrollArea</tabstop>
+  <tabstop>openInFileWindowButton</tabstop>
+  <tabstop>seeExtraInfoButton_2</tabstop>
+  <tabstop>openOutFileWindowButton</tabstop>
  </tabstops>
  <resources/>
  <connections/>
