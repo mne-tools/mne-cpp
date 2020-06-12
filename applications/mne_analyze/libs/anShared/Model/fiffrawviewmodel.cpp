@@ -322,7 +322,9 @@ Qt::ItemFlags FiffRawViewModel::flags(const QModelIndex &index) const
 
 //=============================================================================================================
 
-QModelIndex FiffRawViewModel::index(int row, int column, const QModelIndex &parent) const
+QModelIndex FiffRawViewModel::index(int row,
+                                    int column,
+                                    const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
     return createIndex(row, column);
@@ -666,6 +668,7 @@ void FiffRawViewModel::filterDataBlock(MatrixXd& matData)
 
 void FiffRawViewModel::filterAllDataBlocks()
 {
+    qDebug() << "FiffRawViewModel::filterAllDataBlocks";
     if(!m_bPerformFiltering) {
         return;
     }

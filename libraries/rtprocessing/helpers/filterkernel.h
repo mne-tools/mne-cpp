@@ -84,8 +84,8 @@ class RTPROCESINGSHARED_EXPORT FilterKernel
 
 public:
     enum DesignMethod {
-        Tschebyscheff,
         Cosine,
+        Tschebyscheff,
         External
     } m_designMethod;
 
