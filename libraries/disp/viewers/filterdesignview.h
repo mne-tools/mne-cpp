@@ -134,23 +134,8 @@ public:
      */
     void setSamplingRate(double dSamplingRate);
 
-    //=========================================================================================================
-    /**
-     * Sets the new filter parameters.
-     *
-     * @param[in] from               The lower bound of the filter in Hz.
-     * @param[in] to                 The upper bound of the filter in Hz.
-     * @param[in] order              The order of the.
-     * @param[in] designMethod       The filter design method.
-     * @param[in] transition         The transition frequency.
-     * @param[in] channelType        the channel Type.
-     */
-    void setFilterParameters(double from,
-                             double to,
-                             int order,
-                             int designMethod,
-                             double transition,
-                             const QString &sChannelType);
+    void setFrom(double dFrom);
+    void setTo(double dTo);
 
     //=========================================================================================================
     /**
@@ -287,7 +272,6 @@ protected:
 
     QString                             m_sSettingsPath;            /**< The settings path to store the GUI settings to. */
 
-    int                                 m_iWindowSize;              /**< The current window size of the loaded fiff data in the DataWindow class.*/
     int                                 m_iFilterTaps;              /**< The current number of filter taps.*/
     double                              m_dSFreq;                   /**< The current sampling frequency.*/
 
