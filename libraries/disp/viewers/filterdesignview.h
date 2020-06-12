@@ -112,14 +112,6 @@ public:
 
     //=========================================================================================================
     /**
-     * Inits the filter window.
-     *
-     * @param[in] dSFreq the new sampling frequency
-     */
-    void init(double dSFreq);
-
-    //=========================================================================================================
-    /**
      * Sets the new window size for the filter.
      *
      * @param[in] iWindowSize length of the data which is to be filtered
@@ -191,14 +183,6 @@ public:
      * @param[in] sType               The new channel type to be filtered.
      */
     void setChannelType(const QString& sType);
-
-    //=========================================================================================================
-    /**
-     * Sets the new samplingRate.
-     *
-     * @return return true if user designed filter is active
-     */
-    bool userDesignedFiltersIsActive();
 
     //=========================================================================================================
     /**
@@ -307,7 +291,7 @@ protected:
 
     QPointer<FilterPlotScene>           m_pFilterPlotScene;         /**< Pointer to the QGraphicsScene which holds the filter plotting.*/
 
-    RTPROCESSINGLIB::FilterKernel                m_filterKernel;               /**< The current filter operator.*/
+    RTPROCESSINGLIB::FilterKernel       m_filterKernel;             /**< The current filter operator.*/
 
     QString                             m_sSettingsPath;            /**< The settings path to store the GUI settings to. */
 
@@ -326,7 +310,7 @@ signals:
 
     //=========================================================================================================
     /**
-     * Emitted when the filter should be applied.
+     * Emitted when the filter channel type changed.
      *
      * @param channelType  The channel type on which the filter should be performed on.
      */

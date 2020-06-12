@@ -119,11 +119,11 @@ public:
 
     //=========================================================================================================
     /**
-     * Inits the filter window.
+     * Sets the sampling frequency and setups this view accrodingly.
      *
      * @param[in] dSFreq the new sampling frequency
      */
-    void init(double dSFreq);
+    void setSamplingRate(double dSFreq);
 
     //=========================================================================================================
     /**
