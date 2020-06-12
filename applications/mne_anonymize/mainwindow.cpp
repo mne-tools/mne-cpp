@@ -169,11 +169,7 @@ void MainWindow::setDefaultStateExtraInfo()
 void MainWindow::setDefautlStateUi()
 {
 
-    this->setWindowTitle(qApp->applicationName() + " ~ " + qApp->organizationName());
-//    QMenu *aboutMenu(m_pUi->menubar->addMenu("&About"));
-//    aboutMenu->addAction(tr("&About"), this, &MainWindow::about);
-    //helpMenu->addAction(tr("About &MNE-CPP"), qApp, &QApplication::aboutQt);
-    m_pUi->menuAbout->addAction(tr("&About"),this,&MainWindow::about);
+    this->setWindowTitle(qApp->organizationName() + " ~ " + qApp->applicationName() + " ~ " + qApp->applicationVersion());
 
     m_pUi->spinBoxMeasurementDateOffset->setEnabled(false);
     m_pUi->spinBoxBirthdayDateOffset->setEnabled(false);
