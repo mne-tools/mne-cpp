@@ -194,6 +194,8 @@ private:
 
     void onCheckBoxStateChanged();
 
+    void onChannelButtonClicked();
+
     void loadFullGUI();
 
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals */

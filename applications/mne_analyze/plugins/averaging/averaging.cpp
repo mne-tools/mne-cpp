@@ -262,7 +262,7 @@ QDockWidget* Averaging::getControl()
 
     //Sets Default state
     m_pAnnCheck->click();
-    m_pStimCheck->click();
+    //m_pStimCheck->click();
 
     QGroupBox* pGBox = new QGroupBox();
     QVBoxLayout* pVBLayout = new QVBoxLayout();
@@ -281,9 +281,6 @@ QDockWidget* Averaging::getControl()
     m_pLayout->addWidget(m_pStimCheck);
     m_pLayout->addWidget(pButton);
 
-    QLabel* label = new QLabel("No File loaded");
-
-    m_pLayout->addWidget(label);
     pWidget->setLayout(m_pLayout);
 
     pControl->setWidget(pWidget);
@@ -593,6 +590,12 @@ void Averaging::loadFullGUI()
 {
     qDebug() << "[Averaging::loadFullGUI]";
 
+    QPushButton* pButton = new QPushButton();
+    pButton->setText("Channel Selection");
+    connect(pButton, &QPushButton::clicked,
+            this, &Averaging::onChannelButtonClicked);
+
+
     //Init Models
 
     //m_pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FIFFLIB::FiffInfo(*(m_pFiffRawModel->getFiffInfo())));
@@ -607,7 +610,8 @@ void Averaging::loadFullGUI()
     //Channel Selection View
     m_pChannelSelectionView = QSharedPointer<DISPLIB::ChannelSelectionView>(new DISPLIB::ChannelSelectionView(QString("MNEANALYZE/AVERAGING"),
                                                                            Q_NULLPTR,
-                                                                           m_pChannelInfoModel));
+                                                                           m_pChannelInfoModel,
+                                                                           Qt::Window));
 
     connect(m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::loadedLayoutMap,
             m_pChannelInfoModel.data(), &DISPLIB::ChannelInfoModel::layoutChanged);
@@ -631,7 +635,8 @@ void Averaging::loadFullGUI()
 
     qDebug() << "3";
     //Add new widgets
-    m_pLayout->addWidget(m_pChannelSelectionView.data());
+    m_pLayout->addWidget(pButton);
+    //m_pLayout->addWidget(m_pChannelSelectionView.data());
 
     qDebug() << "4";
     //Update saved params
@@ -641,4 +646,16 @@ void Averaging::loadFullGUI()
 
     m_fPreStim = m_pAveragingSettingsView->getPreStimSeconds();
     m_fPostStim = m_pAveragingSettingsView->getPostStimSeconds();
+}
+
+//=============================================================================================================
+
+void Averaging::onChannelButtonClicked()
+{
+    if(m_pChannelSelectionView->isActiveWindow()) {
+        m_pChannelSelectionView->hide();
+    } else {
+        m_pChannelSelectionView->activateWindow();
+        m_pChannelSelectionView->show();
+    }
 }
