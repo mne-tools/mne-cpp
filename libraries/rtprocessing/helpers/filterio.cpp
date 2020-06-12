@@ -94,18 +94,19 @@ bool FilterIO::readFilter(QString path, FilterKernel &filter)
         {
             //Read filter sFreq
             if(line.contains("sFreq") && fields.size()==2)
-                filter.m_sFreq = fields.at(1).toDouble();
+                filter.setSamplingFrequency(fields.at(1).toDouble());
 
             //Read filter name
             if(line.contains("name")) {
-                filter.m_sFilterName.clear();
+                QString sFilterName;
                 for(int i=1; i<fields.size(); i++)
-                    filter.m_sFilterName.append(fields.at(i));
+                    sFilterName.append(fields.at(i));
+                filter.setName(sFilterName);
             }
 
             //Read the filter order
             if(line.contains("order") && fields.size()==2)
-                filter.m_iFilterOrder = fields.at(1).toInt();
+                filter.setFilterOrder(fields.at(1).toInt());
 
             //Read the filter type
             if(line.contains("type") && fields.size()==2)
@@ -113,15 +114,15 @@ bool FilterIO::readFilter(QString path, FilterKernel &filter)
 
             //Read the filter LPFreq
             if(line.contains("LPFreq") && fields.size()==2)
-                filter.m_dLowpassFreq = fields.at(1).toDouble();
+                filter.setLowpassFreq(fields.at(1).toDouble());
 
             //Read the filter HPFreq
             if(line.contains("HPFreq") && fields.size()==2)
-                filter.m_dHighpassFreq = fields.at(1).toDouble();
+                filter.setHighpassFreq(fields.at(1).toDouble());
 
             //Read the filter CenterFreq
             if(line.contains("CenterFreq") && fields.size()==2)
-                filter.m_dCenterFreq = fields.at(1).toDouble();
+                filter.setCenterFrequency(fields.at(1).toDouble());
 
             //Read the filter DesignMethod
             if(line.contains("DesignMethod") && fields.size()==2)
@@ -131,27 +132,15 @@ bool FilterIO::readFilter(QString path, FilterKernel &filter)
             coefficientsTemp.push_back(fields.join("").toDouble());
     }
     // Check if reading was successful and correct
-    if(filter.m_iFilterOrder != coefficientsTemp.size())
-        filter.m_iFilterOrder = coefficientsTemp.size();
+    if(filter.getFilterOrder() != coefficientsTemp.size()) {
+        filter.setFilterOrder(coefficientsTemp.size());
+    }
 
-//    if(filter.m_sFreq)
-
-//    if(filter.m_sFilterName)
-
-//    if(filter.m_Type)
-
-//    if(filter.m_dLowpassFreq)
-
-//    if(filter.m_dHighFreq)
-
-//    if(filter.m_designMethod)
-
-    filter.m_dCoeffA = RowVectorXd::Zero(coefficientsTemp.size());
-    for(int i=0; i<filter.m_dCoeffA.cols(); i++)
-        filter.m_dCoeffA(i) = coefficientsTemp.at(i);
-
-    //Compute fft of filtercoeeficients
-    filter.fftTransformCoeffs();
+    RowVectorXd vecCoeff = RowVectorXd::Zero(coefficientsTemp.size());
+    for(int i=0; i < vecCoeff.cols(); i++) {
+        vecCoeff(i) = coefficientsTemp.at(i);
+    }
+    filter.setCoefficients(vecCoeff);
 
     file.close();
 
@@ -174,17 +163,17 @@ bool FilterIO::writeFilter(const QString &path, const FilterKernel &filter)
         //Write coefficients to file
         QTextStream out(&file);
 
-        out << "#sFreq " << filter.m_sFreq << "\n";
-        out << "#name " << filter.m_sFilterName << "\n";
+        out << "#sFreq " << filter.getSamplingFrequency() << "\n";
+        out << "#name " << filter.getName() << "\n";
         out << "#type " << FilterKernel::getStringForFilterType(filter.m_Type) << "\n";
-        out << "#order " << filter.m_iFilterOrder << "\n";
-        out << "#HPFreq " << filter.m_dHighpassFreq << "\n";
-        out << "#LPFreq " << filter.m_dLowpassFreq << "\n";
-        out << "#CenterFreq " << filter.m_dCenterFreq << "\n";
+        out << "#order " << filter.getFilterOrder() << "\n";
+        out << "#HPFreq " << filter.getHighpassFreq() << "\n";
+        out << "#LPFreq " << filter.getLowpassFreq() << "\n";
+        out << "#CenterFreq " << filter.getCenterFrequency() << "\n";
         out << "#DesignMethod " << FilterKernel::getStringForDesignMethod(filter.m_designMethod) << "\n";
 
-        for(int i = 0 ; i<filter.m_dCoeffA.cols() ;i++)
-            out << filter.m_dCoeffA(i) << "\n";
+        for(int i = 0 ; i<filter.getCoefficients().cols() ;i++)
+            out << filter.getCoefficients()(i) << "\n";
 
         file.close();
 
