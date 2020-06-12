@@ -120,6 +120,7 @@ private:
 
     void idMeasurementDateChanged();
 
+    void statusMsg(const QString& s, int to);
 
 //    bool m_bIdFileVersionFound;
 //    bool m_bIdMeasurementDateFound;
