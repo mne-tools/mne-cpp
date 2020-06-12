@@ -85,7 +85,6 @@ FilterDesignView::FilterDesignView(const QString& sSettingsPath,
                                    Qt::WindowFlags f)
 : AbstractView(parent, f)
 , m_pUi(new Ui::FilterDesignViewWidget)
-, m_iWindowSize(4016)
 , m_iFilterTaps(512)
 , m_dSFreq(600)
 {
@@ -162,29 +161,16 @@ void FilterDesignView::setSamplingRate(double dSamplingRate)
 
 //=============================================================================================================
 
-void FilterDesignView::setFilterParameters(double from,
-                                           double to,
-                                           int order,
-                                           int designMethod,
-                                           double transition,
-                                           const QString &sChannelType)
+void FilterDesignView::setFrom(double dFrom)
 {
-    m_pUi->m_doubleSpinBox_to->setValue(to);
-    m_pUi->m_doubleSpinBox_from->setValue(from);
-    m_pUi->m_spinBox_filterTaps->setValue(order);
+    m_pUi->m_doubleSpinBox_from->setValue(dFrom);
+}
 
-    if(designMethod == 0) {
-        m_pUi->m_comboBox_designMethod->setCurrentText("Tschebyscheff");
-    }
-    if(designMethod == 1) {
-        m_pUi->m_comboBox_designMethod->setCurrentText("Cosine");
-    }
+//=============================================================================================================
 
-    m_pUi->m_doubleSpinBox_transitionband->setValue(transition);
-
-    m_pUi->m_comboBox_filterApplyTo->setCurrentText(sChannelType);
-
-    filterParametersChanged();
+void FilterDesignView::setTo(double dTo)
+{
+    m_pUi->m_doubleSpinBox_to->setValue(dTo);
 }
 
 //=============================================================================================================
@@ -238,12 +224,14 @@ void FilterDesignView::loadSettings()
     QSettings settings("MNECPP");
 
     //Set stored filter settings from last session
-    setFilterParameters(settings.value(m_sSettingsPath + QString("/FilterDesignView/filterFrom"), 5.0).toDouble(),
-                        settings.value(m_sSettingsPath + QString("/FilterDesignView/filterTo"), 40.0).toDouble(),
-                        settings.value(m_sSettingsPath + QString("/FilterDesignView/filterOrder"), 128).toInt(),
-                        settings.value(m_sSettingsPath + QString("/FilterDesignView/filterDesignMethod"), 0).toInt(),
-                        settings.value(m_sSettingsPath + QString("/FilterDesignView/filterTransition"), 1.0).toDouble(),
-                        settings.value(m_sSettingsPath + QString("/FilterDesignView/filterChannelType"), "MEG").toString());
+    m_pUi->m_doubleSpinBox_to->setValue(settings.value(m_sSettingsPath + QString("/FilterDesignView/filterTo"), 40.0).toDouble());
+    m_pUi->m_doubleSpinBox_from->setValue(settings.value(m_sSettingsPath + QString("/FilterDesignView/filterFrom"), 1.0).toDouble());
+    m_pUi->m_spinBox_filterTaps->setValue(settings.value(m_sSettingsPath + QString("/FilterDesignView/filterOrder"), 128).toInt());
+    m_pUi->m_comboBox_designMethod->setCurrentIndex(settings.value(m_sSettingsPath + QString("/FilterDesignView/filterDesignMethod"), FilterKernel::DesignMethod::Cosine).toInt());
+    m_pUi->m_doubleSpinBox_transitionband->setValue(settings.value(m_sSettingsPath + QString("/FilterDesignView/filterTransition"), 0.1).toDouble());
+    m_pUi->m_comboBox_filterApplyTo->setCurrentText(settings.value(m_sSettingsPath + QString("/FilterDesignView/filterChannelType"), "All").toString());
+
+    filterParametersChanged();
 
     QPoint pos = settings.value(m_sSettingsPath + QString("/FilterDesignView/Position"), QPoint(100,100)).toPoint();
 
@@ -271,10 +259,6 @@ void FilterDesignView::updateGuiMode(GuiMode mode)
 
 void FilterDesignView::initSpinBoxes()
 {
-    m_pUi->m_doubleSpinBox_from->setValue(5.0);
-    m_pUi->m_doubleSpinBox_to->setValue(50.0);
-    m_pUi->m_doubleSpinBox_transitionband->setValue(1.0);
-
     connect(m_pUi->m_doubleSpinBox_from,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
                 this,&FilterDesignView::filterParametersChanged);
 
