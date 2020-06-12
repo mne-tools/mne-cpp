@@ -341,8 +341,7 @@ void FiffAnonymizer::censorTag()
     }
     case FIFF_SUBJ_FIRST_NAME:
     {
-        QString inFirstName
-                (m_pTag->data());
+        QString inFirstName(m_pTag->data());
         emit readingSubjectFirstName(inFirstName);
         QString outFirstName(m_sSubjectFirstName);
         m_pTag->resize(outFirstName.size());

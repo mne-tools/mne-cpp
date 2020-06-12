@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>686</width>
-    <height>796</height>
+    <width>648</width>
+    <height>744</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -38,6 +38,12 @@
         <height>0</height>
        </size>
       </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>16777215</height>
+       </size>
+      </property>
       <property name="autoFillBackground">
        <bool>false</bool>
       </property>
@@ -55,8 +61,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>658</width>
-         <height>741</height>
+         <width>620</width>
+         <height>692</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -499,7 +505,7 @@
                  <bool>true</bool>
                 </property>
                 <property name="currentIndex">
-                 <number>0</number>
+                 <number>1</number>
                 </property>
                 <widget class="QWidget" name="tab">
                  <attribute name="title">
@@ -536,7 +542,7 @@
                   <item row="0" column="0">
                    <widget class="QLabel" name="labelFileVersionExtra">
                     <property name="text">
-                     <string>ID File version</string>
+                     <string>ID File FIFF version</string>
                     </property>
                    </widget>
                   </item>
@@ -708,7 +714,7 @@
                    <widget class="QSpinBox" name="spinBoxSubjectIDExtra">
                     <property name="maximumSize">
                      <size>
-                      <width>192</width>
+                      <width>218</width>
                       <height>16777215</height>
                      </size>
                     </property>
