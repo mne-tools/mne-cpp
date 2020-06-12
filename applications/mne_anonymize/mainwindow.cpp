@@ -36,7 +36,7 @@ MainWindow::MainWindow(MNEANONYMIZE::SettingsControllerGui *c)
 //, m_bProjectNameFound(false)
 //, m_bProjectPersonsFound(false)
 //, m_bProjectCommentFound(false)
-  m_bShowExtraInfoFields(true)
+  m_bExtraInfoVisibility(true)
 , m_pUi(new Ui::MainWindow)
 , m_pController(c)
 {
@@ -175,7 +175,7 @@ void MainWindow::setDefautlStateUi()
     m_pUi->spinBoxMeasurementDateOffset->setValue(0);
     m_pUi->spinBoxBirthdayDateOffset->setValue(0);
 
-    m_pUi->frameExtraInfo->setVisible(m_bShowExtraInfoFields);
+    m_pUi->frameExtraInfo->setVisible(m_bExtraInfoVisibility);
 
     m_pUi->comboBoxSubjectSexExtra->addItems(QStringList() << "Unknown" << "Male" << "Female");
     m_pUi->comboBoxSubjectSexExtra->setCurrentIndex(0);
@@ -495,8 +495,9 @@ void MainWindow::openOutFileDialog()
 
 void MainWindow::showExtraInfo()
 {
-    m_bShowExtraInfoFields = !m_bShowExtraInfoFields;
-    m_pUi->frameExtraInfo->setVisible(m_bShowExtraInfoFields);
+    m_bExtraInfoVisibility = !m_bExtraInfoVisibility;
+    m_pUi->frameExtraInfo->setVisible(m_bExtraInfoVisibility);
+    emit extraInfoVisibilityChanged(m_bExtraInfoVisibility);
 }
 
 
@@ -587,4 +588,15 @@ void MainWindow::statusMsg(const QString &s,int to)
     } else {
         m_pUi->statusbar->showMessage(s,to);
     }
+}
+
+bool MainWindow::getExtraInfoVisibility()
+{
+    return m_bExtraInfoVisibility;
+}
+
+void MainWindow::setExtraInfoVisibility(bool b)
+{
+    m_bExtraInfoVisibility = b;
+    emit extraInfoVisibilityChanged(m_bExtraInfoVisibility);
 }
