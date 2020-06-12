@@ -14,7 +14,7 @@ using namespace MNEANONYMIZE;
 
 MainWindow::MainWindow(MNEANONYMIZE::SettingsControllerGui *c)
 : m_bOptionsVisibility(false)
-, m_bExtraInfoVisibility(true)
+, m_bExtraInfoVisibility(false)
 , m_pUi(new Ui::MainWindow)
 , m_pController(c)
 {
@@ -564,12 +564,7 @@ void MainWindow::winPopup(QString s)
 
 void MainWindow::statusMsg(const QString &s,int to)
 {
-    if( to == 0 )
-    {
-        m_pUi->statusbar->showMessage(s);
-    } else {
-        m_pUi->statusbar->showMessage(s,to);
-    }
+    m_pUi->statusbar->showMessage(s,to);
 }
 
 bool MainWindow::getExtraInfoVisibility()
@@ -632,5 +627,6 @@ void MainWindow::checkBoxShowOptionsChanged()
     m_bOptionsVisibility = m_pUi->checkBoxShowOptions->isChecked();
     m_pUi->frameOptions->setVisible(m_bOptionsVisibility);
     m_pUi->frameExtraInfo->setVisible(m_bExtraInfoVisibility);
+    m_pUi->frameOptionsAndExtraInfo->setVisible(m_bOptionsVisibility);
     emit showOptionsChanged(m_bOptionsVisibility);
 }

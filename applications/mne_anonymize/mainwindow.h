@@ -41,7 +41,7 @@ public:
 
     void setDefaultStateExtraInfo();
 
-    void statusMsg(const QString& s, int to = 1000);
+    void statusMsg(const QString& s, int to = 2000);
 
     bool getExtraInfoVisibility();
     void setExtraInfoVisibility(bool b);

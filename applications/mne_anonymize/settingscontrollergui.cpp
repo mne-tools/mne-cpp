@@ -95,7 +95,7 @@ void SettingsControllerGui::readData()
 {
     if(m_pAnonymizer->isFileInSet() && m_bInputFileInformationVisible)
     {
-        m_pWin->statusMsg("Reading input File information...",0);
+        m_pWin->statusMsg("Reading input File information...");
         //set output to a randomFilename
         QString stringTempDir(QStandardPaths::writableLocation(QStandardPaths::TempLocation));
         QString fileOutStr(QDir(stringTempDir).filePath(generateRandomFileName()));

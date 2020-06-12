@@ -23,7 +23,7 @@
    <bool>false</bool>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout">
+   <layout class="QVBoxLayout" name="verticalLayout_4">
     <item>
      <widget class="QScrollArea" name="scrollAreaMainMenu">
       <property name="sizePolicy">
@@ -134,6 +134,12 @@
         </item>
         <item>
          <widget class="QFrame" name="frameMainMenu">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>50</height>
+           </size>
+          </property>
           <property name="frameShape">
            <enum>QFrame::StyledPanel</enum>
           </property>
@@ -201,7 +207,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QFrame" name="frame_2">
+         <widget class="QFrame" name="frameOptionsAndExtraInfo">
           <property name="minimumSize">
            <size>
             <width>300</width>
@@ -246,8 +252,8 @@
              </property>
              <property name="maximumSize">
               <size>
-               <width>16777215</width>
-               <height>16777215</height>
+               <width>400</width>
+               <height>800</height>
               </size>
              </property>
              <property name="frameShape">
@@ -426,6 +432,12 @@
               <size>
                <width>307</width>
                <height>9</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>500</width>
+               <height>16777215</height>
               </size>
              </property>
              <property name="frameShape">
