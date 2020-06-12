@@ -43,8 +43,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QObject>
-#include <QThread>
 #include <QDir>
 #include <QStandardPaths>
 #include <QDesktopServices>
@@ -89,8 +87,7 @@ SettingsControllerGui::SettingsControllerGui(const QStringList& arguments)
         readData();
     }
 
-    QObject().thread()->usleep(1000*2000);
-    m_pWin->statusMsg("Howdy!",1000);
+    m_pWin->statusMsg("Mellow greetings!",1000);
 }
 
 void SettingsControllerGui::executeAnonymizer()
