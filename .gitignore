@@ -63,3 +63,6 @@ Makefile
 .settings
 .vscode
 mne-cpp.pro.user*
+
+# FFTW
+/include/3rdParty/fftw
