@@ -297,7 +297,7 @@ void RealTimeEvokedSetWidget::initDisplayControllWidgets()
 //                pFilterSettingsView->getFilterView().data(), &FilterDesignView::setWindowSize);
 
 //        connect(this, &RealTimeEvokedSetWidget::windowSizeChanged,
-//                pFilterSettingsView->getFilterView().data(), &FilterDesignView::setMaxFilterTaps);
+//                pFilterSettingsView->getFilterView().data(), &FilterDesignView::setMaxAllowedFilterTaps);
 
 //        connect(pFilterSettingsView, &FilterSettingsView::filterActivationChanged,
 //                m_pEvokedSetModel.data(), &EvokedSetModel::setFilterActive);
@@ -310,7 +310,7 @@ void RealTimeEvokedSetWidget::initDisplayControllWidgets()
 //            m_iMaxFilterTapSize = m_pRTESet->getValue()->evoked.first().data.cols();
 
 //            pFilterSettingsView->getFilterView()->setWindowSize(m_iMaxFilterTapSize);
-//            pFilterSettingsView->getFilterView()->setMaxFilterTaps(m_iMaxFilterTapSize);
+//            pFilterSettingsView->getFilterView()->setMaxAllowedFilterTaps(m_iMaxFilterTapSize);
 //        }
 
         // Scaling

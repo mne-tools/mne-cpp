@@ -109,14 +109,14 @@ public:
      * @param[in] matData         input matrix data (time domain), for which the spectrum is computed.
      * @param[in] matTaper        tapers used to compute the spectra.
      * @param[in] iNfft           FFT length.
-     * @param[in] bUseMultithread Whether to use multiple threads.
+     * @param[in] bUseThreads Whether to use multiple threads.
      *
      * @return tapered spectra of the input data
      */
     static QVector<Eigen::MatrixXcd> computeTaperedSpectraMatrix(const Eigen::MatrixXd &matData,
                                                                  const Eigen::MatrixXd &matTaper,
                                                                  int iNfft,
-                                                                 bool bUseMultithread = true);
+                                                                 bool bUseThreads = true);
 
     //=========================================================================================================
     /**

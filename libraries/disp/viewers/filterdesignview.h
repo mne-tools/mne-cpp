@@ -120,11 +120,11 @@ public:
 
     //=========================================================================================================
     /**
-     * Sets the max number of allowed filter taps depending on the current block size of the incoming data.
+     * Sets the max number of allowed filter taps.
      *
      * @param[in] iMaxNumberFilterTaps  number of max allowed filter taps
      */
-    void setMaxFilterTaps(int iMaxNumberFilterTaps);
+    void setMaxAllowedFilterTaps(int iMaxNumberFilterTaps);
 
     //=========================================================================================================
     /**
