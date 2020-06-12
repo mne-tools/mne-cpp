@@ -79,10 +79,9 @@ SettingsControllerGui::SettingsControllerGui(const QStringList& arguments)
     qApp->setAttribute(Qt::AA_DontUseNativeMenuBar);
 
     m_pWin->show();
+    m_bInputFileInformationVisible = m_pWin->getExtraInfoVisibility();
 
-
-
-    if(m_pAnonymizer->isFileInSet())
+    if(m_pAnonymizer->isFileInSet() && m_bInputFileInformationVisible)
     {
         readData();
     }
@@ -144,9 +143,12 @@ void SettingsControllerGui::fileInChanged(const QString& strInFile)
         m_fiInFileInfo.setFile(newfiInFile.absoluteFilePath());
         m_pAnonymizer->setFileIn(m_fiInFileInfo.absoluteFilePath());
 
-        if(m_fiInFileInfo.isFile() && m_fiInFileInfo.isReadable())
+        if( m_fiInFileInfo.isFile() && m_fiInFileInfo.isReadable())
         {
-            readData();
+            if(m_bInputFileInformationVisible)
+            {
+                readData();
+            }
         }
     generateDefaultOutputFileName();
     m_pWin->setLineEditInFile(m_fiInFileInfo.absoluteFilePath());
@@ -195,6 +197,8 @@ void SettingsControllerGui::setupCommunication()
                      this,&SettingsControllerGui::fileInChanged);
     QObject::connect(m_pWin.data(),&MainWindow::fileOutChanged,
                      this,&SettingsControllerGui::fileOutChanged);
+    QObject::connect(m_pWin.data(),&MainWindow::extraInfoVisibilityChanged,
+                     this,&SettingsControllerGui::setInputFileInformationVisible);
 
     //from view to model
     QObject::connect(m_pWin.data(),&MainWindow::bruteModeChanged,
@@ -289,4 +293,9 @@ void SettingsControllerGui::initializeOptionsState()
     {
         m_pWin->setSubjectHis(m_pAnonymizer->getSubjectHisID());
     }
+}
+
+void SettingsControllerGui::setInputFileInformationVisible(bool b)
+{
+    m_bInputFileInformationVisible = b;
 }

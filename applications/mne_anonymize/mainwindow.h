@@ -42,6 +42,9 @@ public:
 
     void statusMsg(const QString& s, int to = 1000);
 
+    bool getExtraInfoVisibility();
+    void setExtraInfoVisibility(bool b);
+
 public slots:
     void winPopup(QString s);
 
@@ -72,9 +75,6 @@ public slots:
 
     void setLabelMriDataFoundVisible(bool);
 
-protected:
-    void closeEvent(QCloseEvent *event) override;
-
 signals:
     void fileInChanged(const QString& s) const;
     void fileOutChanged(const QString& s) const;
@@ -86,6 +86,10 @@ signals:
     void useBirthdayOffset(bool f) const;
     void birthdayOffsetChanged(int o) const;
     void subjectHisIdChanged(const QString& text) const;
+    void extraInfoVisibilityChanged(bool b);
+
+protected:
+    void closeEvent(QCloseEvent *event) override;
 
 private slots:
     void checkboxBruteModeChanged();
@@ -144,7 +148,7 @@ private:
 //    bool m_bProjectPersonsFound;
 //    bool m_bProjectCommentFound;
 
-    bool m_bShowExtraInfoFields;
+    bool m_bExtraInfoVisibility;
     Ui::MainWindow* m_pUi;
     SettingsControllerGui* m_pController;
 };
