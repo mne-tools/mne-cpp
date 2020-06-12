@@ -87,7 +87,7 @@ signals:
     void subjectHisIdChanged(const QString& text) const;
 
 private slots:
-
+    void about();
     void checkboxBruteModeChanged();
     void checkBoxMeasurementDateOffsetStateChanged(int arg);
     void checkBoxBirthdayDateOffsetStateChanged(int arg);

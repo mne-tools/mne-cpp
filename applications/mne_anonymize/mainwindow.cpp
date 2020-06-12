@@ -168,6 +168,11 @@ void MainWindow::setDefaultStateExtraInfo()
 
 void MainWindow::setDefautlStateUi()
 {
+//    QMenu *aboutMenu(m_pUi->menubar->addMenu("&About"));
+//    aboutMenu->addAction(tr("&About"), this, &MainWindow::about);
+    //helpMenu->addAction(tr("About &MNE-CPP"), qApp, &QApplication::aboutQt);
+    m_pUi->menuAbout->addAction(tr("&About"),this,&MainWindow::about);
+
     m_pUi->spinBoxMeasurementDateOffset->setEnabled(false);
     m_pUi->spinBoxBirthdayDateOffset->setEnabled(false);
     m_pUi->spinBoxMeasurementDateOffset->setValue(0);
@@ -569,4 +574,12 @@ void MainWindow::showMessage(QString s)
     msgBox.setText(s);
     msgBox.exec();
     return;
+}
+
+void MainWindow::about()
+{
+    QMessageBox::about(this, tr("About Icons"),
+            tr("The <b>Icons</b> example illustrates how Qt renders an icon in "
+               "different modes (active, normal, disabled, and selected) and "
+               "states (on and off) based on a set of images."));
 }
