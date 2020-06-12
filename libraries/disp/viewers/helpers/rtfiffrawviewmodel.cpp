@@ -1094,7 +1094,7 @@ void RtFiffRawViewModel::doFilterPerChannelRTMSA(QPair<QList<FilterKernel>,QPair
 {
     for(int i = 0; i < channelDataTime.first.size(); ++i) {
         //channelDataTime.second.second = channelDataTime.first.at(i).applyConvFilter(channelDataTime.second.second, true);
-        channelDataTime.second.second = channelDataTime.first.at(i).applyFftFilter(channelDataTime.second.second, true); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
+        channelDataTime.second.second = channelDataTime.first[i].applyFftFilter(channelDataTime.second.second, true); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
     }
 }
 
@@ -1123,7 +1123,6 @@ void RtFiffRawViewModel::filterDataBlock()
                                 m_filterKernel.at(i).getBandwidth(),
                                 m_filterKernel.at(i).getParksWidth(),
                                 m_filterKernel.at(i).getSamplingFrequency(),
-                                fftLength,
                                 m_filterKernel.at(i).m_designMethod);
 
         tempFilterList.append(tempFilter);

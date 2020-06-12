@@ -112,14 +112,6 @@ public:
 
     //=========================================================================================================
     /**
-     * Sets the new window size for the filter.
-     *
-     * @param[in] iWindowSize length of the data which is to be filtered
-     */
-    void setWindowSize(int iWindowSize);
-
-    //=========================================================================================================
-    /**
      * Sets the max number of allowed filter taps.
      *
      * @param[in] iMaxNumberFilterTaps  number of max allowed filter taps
@@ -128,11 +120,11 @@ public:
 
     //=========================================================================================================
     /**
-     * Gets the max number of allowed filter taps depending on the current block size of the incoming data.
+     * Returns the currently set number of filter taps.
      *
-     * @return The number of max allowed filter taps
+     * @return returns the currently set number of filter taps.
      */
-    int getMaxFilterTaps();
+    int getFilterTaps();
 
     //=========================================================================================================
     /**

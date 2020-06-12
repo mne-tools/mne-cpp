@@ -142,7 +142,6 @@ int main(int argc, char *argv[])
                                        dTransition,
                                        sFreq,
                                        1024,
-                                       4096,
                                        RTPROCESSINGLIB::FilterKernel::Cosine,
                                        picks);
     printf("[done]\n");

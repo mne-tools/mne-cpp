@@ -174,7 +174,6 @@ void TestFiltering::initTestCase()
                                          dTransition,
                                          dSFreq,
                                          1024,
-                                         4096,
                                          RTPROCESSINGLIB::FilterKernel::Cosine,
                                          vPicks);
     printf("[done]\n");

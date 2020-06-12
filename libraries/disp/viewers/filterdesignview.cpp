@@ -111,28 +111,10 @@ FilterDesignView::~FilterDesignView()
 
 //=============================================================================================================
 
-void FilterDesignView::setWindowSize(int iWindowSize)
-{
-    m_iWindowSize = iWindowSize;
-
-    //Only set even numbers -> otherwise cosine design method gives wrong results
-    if(m_iWindowSize%2 != 0) {
-        m_iWindowSize--;
-    }
-
-    //m_pUi->m_spinBox_filterTaps->setValue(m_iWindowSize);
-}
-
-//=============================================================================================================
-
 void FilterDesignView::setMaxAllowedFilterTaps(int iMaxNumberFilterTaps)
 {
     if(iMaxNumberFilterTaps%2 != 0) {
         iMaxNumberFilterTaps--;
-    }
-
-    if(iMaxNumberFilterTaps > 4096) {
-        iMaxNumberFilterTaps = 4096;
     }
 
     m_pUi->m_spinBox_filterTaps->setMaximum(iMaxNumberFilterTaps);
@@ -144,9 +126,9 @@ void FilterDesignView::setMaxAllowedFilterTaps(int iMaxNumberFilterTaps)
 
 //=============================================================================================================
 
-int FilterDesignView::getMaxFilterTaps()
+int FilterDesignView::getFilterTaps()
 {
-    return m_pUi->m_spinBox_filterTaps->maximum();
+    return m_pUi->m_spinBox_filterTaps->value();
 }
 
 //=============================================================================================================
@@ -438,10 +420,6 @@ void FilterDesignView::filterParametersChanged()
         m_iFilterTaps--;
     }
 
-    int fftLength = m_pUi->m_spinBox_filterTaps->value() * 4; // *2 to take into account the overlap in front and back after the convolution. Another *2 to take into account the appended and prepended data.
-    int exp = ceil(MNEMath::log2(fftLength));
-    fftLength = pow(2, exp) > 4096 ? 4096 : pow(2, exp);
-
     //set maximum and minimum for cut off frequency spin boxes
     m_pUi->m_doubleSpinBox_to->setMaximum(nyquistFrequency);
     m_pUi->m_doubleSpinBox_from->setMaximum(nyquistFrequency);
@@ -467,14 +445,13 @@ void FilterDesignView::filterParametersChanged()
 
     //Generate filters
     m_filterKernel = FilterKernel("Designed Filter",
-                              FilterKernel::BPF,
-                              m_iFilterTaps,
-                              (double)center/nyquistFrequency,
-                              (double)bw/nyquistFrequency,
-                              (double)trans_width/nyquistFrequency,
-                              m_dSFreq,
-                              fftLength,
-                              dMethod);
+                                  FilterKernel::BPF,
+                                  m_iFilterTaps,
+                                  (double)center/nyquistFrequency,
+                                  (double)bw/nyquistFrequency,
+                                  (double)trans_width/nyquistFrequency,
+                                  m_dSFreq,
+                                  dMethod);
 
     emit filterChanged(m_filterKernel);
 
