@@ -6,13 +6,13 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>778</width>
+    <width>550</width>
     <height>814</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>420</width>
+    <width>550</width>
     <height>0</height>
    </size>
   </property>
@@ -55,7 +55,7 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>750</width>
+         <width>522</width>
          <height>759</height>
         </rect>
        </property>
@@ -76,7 +76,11 @@
           </property>
           <layout class="QGridLayout" name="gridLayout_6">
            <item row="0" column="2">
-            <widget class="QLineEdit" name="lineEditInFile"/>
+            <widget class="QLineEdit" name="lineEditInFile">
+             <property name="placeholderText">
+              <string>Input File Path</string>
+             </property>
+            </widget>
            </item>
            <item row="3" column="2">
             <widget class="QLineEdit" name="lineEditOutFile">
@@ -91,6 +95,9 @@
                <width>0</width>
                <height>0</height>
               </size>
+             </property>
+             <property name="placeholderText">
+              <string>Output File Path</string>
              </property>
             </widget>
            </item>
