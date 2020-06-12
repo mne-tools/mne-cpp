@@ -196,11 +196,11 @@ void MainWindow::setupConnections()
     QObject::connect(m_pUi->seeExtraInfoButton,&QToolButton::clicked,
                      this,&MainWindow::showExtraInfo);
 
-    QObject::connect(m_pUi->buttonMenu,&QDialogButtonBox::accepted,
-                     m_pController,&SettingsControllerGui::executeAnonymizer);
+//    QObject::connect(m_pUi->buttonMenu,&QDialogButtonBox::accepted,
+//                     m_pController,&SettingsControllerGui::executeAnonymizer);
 
-    QObject::connect(m_pUi->buttonMenu,&QDialogButtonBox::helpRequested,
-                     this,&MainWindow::helpButtonClicked);
+//    QObject::connect(m_pUi->buttonMenu,&QDialogButtonBox::helpRequested,
+//                     this,&MainWindow::helpButtonClicked);
 
     QObject::connect(m_pUi->lineEditInFile,&QLineEdit::editingFinished,
                      this,&MainWindow::lineEditInFileEditingFinished);
