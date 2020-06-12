@@ -114,7 +114,6 @@ public:
      * @param [in] dBandwidth       ignored if FilterType is set to LPF,HPF. if NOTCH/BPF: bandwidth of stop-/passband - normed to sFreq/2 (nyquist)
      * @param [in] dParkswidth      determines the width of the filter slopes (steepness) - normed to sFreq/2 (nyquist)
      * @param [in] dSFreq           sampling frequency
-     * @param [in] iFftLength       length of the fft (multiple integer of 2^x)
      * @param [in] designMethod     specifies the design method to use. Choose between Cosind and Tschebyscheff
      **/
     FilterKernel(const QString &sFilterName,
@@ -124,7 +123,6 @@ public:
                  double dBandwidth,
                  double dParkswidth,
                  double dSFreq,
-                 qint32 iFftLength = 4096,
                  DesignMethod designMethod = Cosine);
 
     //=========================================================================================================
@@ -134,7 +132,7 @@ public:
      * @param [in] vecData          holds the data to be filtered
      * @param [in] bKeepOverhead     whether the result should still include the overhead information in front and back of the data
      *
-     * @return the filtered data in form of a RoVecotrXd
+     * @return the filtered data in form of a RowVectorXd
      */
     Eigen::RowVectorXd applyConvFilter(const Eigen::RowVectorXd& vecData,
                                        bool bKeepOverhead = false) const;
@@ -146,10 +144,10 @@ public:
      * @param [in] vecData                  holds the data to be filtered
      * @param [in] bKeepOverhead             whether the result should still include the overhead information in front and back of the data
      *
-     * @return the filtered data in form of a RoVecotrXd
+     * @return the filtered data in form of a RowVectorXd
      */
     Eigen::RowVectorXd applyFftFilter(const Eigen::RowVectorXd& vecData,
-                                      bool bKeepOverhead = false) const;
+                                      bool bKeepOverhead = false);
 
     //=========================================================================================================
     /**
@@ -199,9 +197,6 @@ public:
     double getLowpassFreq() const;
     void setLowpassFreq(double dLowpassFreq);
 
-    int getFftLength() const;
-    void setFftLength(int dFftLength);
-
     Eigen::RowVectorXd getCoefficients() const;
     void setCoefficients(const Eigen::RowVectorXd& vecCoeff);
 
@@ -213,7 +208,7 @@ private:
     /**
      * @brief fftTransformCoeffs transforms the calculated filter coefficients to frequency-domain
      */
-    void fftTransformCoeffs();
+    bool fftTransformCoeffs(int iFftLength);
 
     //=========================================================================================================
     /**
@@ -229,7 +224,6 @@ private:
     double          m_dHighpassFreq;        /**< lowpass freq (lower cut off) of the filter. */
 
     int             m_iFilterOrder;         /**< represents the order of the filter instance. */
-    int             m_iFftLength;           /**< represents the filter length. */
 
     QString         m_sFilterName;          /**< contains name of the filter. */
 

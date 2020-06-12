@@ -211,7 +211,7 @@ void FilterSettingsView::onFilterParametersChanged()
 
     m_pFilterView->setFilterParameters(m_pUi->m_pDoubleSpinBoxFrom->value(),
                                        m_pUi->m_pDoubleSpinBoxTo->value(),
-                                       m_pFilterView->getMaxFilterTaps(),
+                                       m_pFilterView->getFilterTaps(),
                                        1, //Cosine
                                        0.1,
                                        m_pFilterView->getChannelType());

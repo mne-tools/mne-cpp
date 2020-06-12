@@ -113,7 +113,6 @@ public:
      * @param [in] dTransition      determines the width of the filter slopes (steepness)
      * @param [in] dSFreq           sampling frequency
      * @param [in] iOrder           represents the order of the filter, the higher the higher is the stopband attenuation
-     * @param [in] iFftLength       length of the fft (multiple integer of 2^x) - Default = 4096
      * @param [in] designMethod     specifies the design method to use. Choose between Cosind and Tschebyscheff; Defaul = Cosine
      * @param [in] vecPicks         used channel as index in QVector
      * @param [in] bUseThreads      Whether to use multiple threads
@@ -127,7 +126,6 @@ public:
                                double dTransition,
                                double dSFreq,
                                int iOrder = 1024,
-                               int iFftLength = 4096,
                                RTPROCESSINGLIB::FilterKernel::DesignMethod designMethod = RTPROCESSINGLIB::FilterKernel::Cosine,
                                const Eigen::RowVectorXi &vecPicks = Eigen::RowVectorXi(),
                                bool bUseThreads = true);

@@ -69,13 +69,13 @@
 
 using namespace RTPROCESSINGLIB;
 using namespace Eigen;
+using namespace UTILSLIB;
 
 //=============================================================================================================
 
 FilterKernel::FilterKernel()
 : m_Type(UNKNOWN)
 , m_iFilterOrder(80)
-, m_iFftLength(512)
 , m_sFilterName("Unknown")
 , m_dParksWidth(0.1)
 , m_designMethod(External)
@@ -97,7 +97,6 @@ FilterKernel::FilterKernel(const QString& sFilterName,
                            double dBandwidth,
                            double dParkswidth,
                            double dSFreq,
-                           qint32 iFftlength,
                            DesignMethod designMethod)
 : m_designMethod(designMethod)
 , m_Type(type)
@@ -106,7 +105,6 @@ FilterKernel::FilterKernel(const QString& sFilterName,
 , m_dBandwidth(dBandwidth)
 , m_dParksWidth(dParkswidth)
 , m_iFilterOrder(iOrder)
-, m_iFftLength(iFftlength)
 , m_sFilterName(sFilterName)
 {
     if(iOrder < 9) {
@@ -118,23 +116,25 @@ FilterKernel::FilterKernel(const QString& sFilterName,
 
 //=============================================================================================================
 
-void FilterKernel::fftTransformCoeffs()
+bool FilterKernel::fftTransformCoeffs(int iFftLength)
 {
     #ifdef EIGEN_FFTW_DEFAULT
         fftw_make_planner_thread_safe();
     #endif
 
-    //zero-pad m_vecCoeff to m_iFftLength
-    RowVectorXd vecCoeffZeroPad = RowVectorXd::Zero(m_iFftLength);
-    vecCoeffZeroPad.head(m_vecCoeff.cols()) = m_vecCoeff;
+    if(m_vecCoeff.cols() > iFftLength) {
+        std::cout <<"[FilterKernel::fftTransformCoeffs] The number of filter taps is bigger than the FFT length."<< std::endl;
+        return false;
+    }
 
     //generate fft object
     Eigen::FFT<double> fft;
     fft.SetFlag(fft.HalfSpectrum);
 
     //fft-transform filter coeffs.
-    m_vecFftCoeff = RowVectorXcd::Zero(m_iFftLength);
-    fft.fwd(m_vecFftCoeff,vecCoeffZeroPad);
+    fft.fwd(m_vecFftCoeff, m_vecCoeff, iFftLength);
+
+    return true;
 }
 
 //=============================================================================================================
@@ -164,24 +164,29 @@ RowVectorXd FilterKernel::applyConvFilter(const RowVectorXd& vecData,
 //=============================================================================================================
 
 RowVectorXd FilterKernel::applyFftFilter(const RowVectorXd& vecData,
-                                         bool bKeepOverhead) const
+                                         bool bKeepOverhead)
 {
     #ifdef EIGEN_FFTW_DEFAULT
         fftw_make_planner_thread_safe();
     #endif
 
-    if(vecData.cols() > m_iFftLength) {
-        std::cout <<"[FilterKernel::applyFftFilter] Size of output data (data + overlap) is bigger than the FFT length. Returning." << std::endl;
-        return vecData;
+    // Make sure we always have the correct FFT length for the given input data
+    int iFftLength = vecData.cols() + m_vecCoeff.cols();
+    int exp = ceil(MNEMath::log2(iFftLength));
+    iFftLength = pow(2, exp);
+
+    // Transform coefficients anew if needed
+    if(m_vecFftCoeff.cols() != (iFftLength/2+1)) {
+        fftTransformCoeffs(iFftLength);
     }
 
     //generate fft object
     Eigen::FFT<double> fft;
     fft.SetFlag(fft.HalfSpectrum);
 
-    //fft-transform data sequence. Please note: The Eigen FFT does perform zero padding if the data size is < fft length
+    //fft-transform data sequence. Please note: The Eigen FFT does perform zero padding automatically if the data size is < fft length
     RowVectorXcd vecFreqData;
-    fft.fwd(vecFreqData, vecData, m_iFftLength);
+    fft.fwd(vecFreqData, vecData, iFftLength);
 
     //perform frequency-domain filtering
     RowVectorXcd vecFilteredFreq = m_vecFftCoeff.array() * vecFreqData.array();
@@ -390,20 +395,6 @@ void FilterKernel::setLowpassFreq(double dLowpassFreq)
 
 //=============================================================================================================
 
-int FilterKernel::getFftLength() const
-{
-    return m_iFftLength;
-}
-
-//=============================================================================================================
-
-void FilterKernel::setFftLength(int dFftLength)
-{
-    m_iFftLength = dFftLength;
-}
-
-//=============================================================================================================
-
 Eigen::RowVectorXd FilterKernel::getCoefficients() const
 {
     return m_vecCoeff;
@@ -414,7 +405,6 @@ Eigen::RowVectorXd FilterKernel::getCoefficients() const
 void FilterKernel::setCoefficients(const Eigen::RowVectorXd& vecCoeff)
 {
     m_vecCoeff = vecCoeff;
-    fftTransformCoeffs();
 }
 
 //=============================================================================================================
@@ -435,6 +425,8 @@ void FilterKernel::setFftCoefficients(const Eigen::RowVectorXcd& vecFftCoeff)
 
 void FilterKernel::designFilter()
 {
+    int iFftLength = 4096;
+
     switch(m_designMethod) {
         case Tschebyscheff: {
             ParksMcClellan filter(m_iFilterOrder,
@@ -445,7 +437,7 @@ void FilterKernel::designFilter()
             m_vecCoeff = filter.FirCoeff;
 
             //fft-transform m_vecCoeff in order to be able to perform frequency-domain filtering
-            fftTransformCoeffs();
+            fftTransformCoeffs(iFftLength);
 
             break;
         }
@@ -455,7 +447,7 @@ void FilterKernel::designFilter()
 
             switch(m_Type) {
                 case LPF:
-                    filtercos = CosineFilter(m_iFftLength,
+                    filtercos = CosineFilter(iFftLength,
                                              (m_dCenterFreq)*(m_sFreq/2.),
                                              m_dParksWidth*(m_sFreq/2),
                                              (m_dCenterFreq)*(m_sFreq/2),
@@ -466,7 +458,7 @@ void FilterKernel::designFilter()
                     break;
 
                 case HPF:
-                    filtercos = CosineFilter(m_iFftLength,
+                    filtercos = CosineFilter(iFftLength,
                                              (m_dCenterFreq)*(m_sFreq/2),
                                              m_dParksWidth*(m_sFreq/2),
                                              (m_dCenterFreq)*(m_sFreq/2),
@@ -477,7 +469,7 @@ void FilterKernel::designFilter()
                     break;
 
                 case BPF:
-                    filtercos = CosineFilter(m_iFftLength,
+                    filtercos = CosineFilter(iFftLength,
                                              (m_dCenterFreq + m_dBandwidth/2)*(m_sFreq/2),
                                              m_dParksWidth*(m_sFreq/2),
                                              (m_dCenterFreq - m_dBandwidth/2)*(m_sFreq/2),
@@ -494,7 +486,7 @@ void FilterKernel::designFilter()
             m_vecCoeff.tail(m_iFilterOrder/2) = filtercos.m_vecCoeff.head(m_iFilterOrder/2);
 
             //Now generate the fft version of the shortened impulse response
-            fftTransformCoeffs();
+            fftTransformCoeffs(iFftLength);
 
             break;
         }
