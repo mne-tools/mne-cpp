@@ -44,6 +44,7 @@
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <anShared/Model/annotationmodel.h>
 
+#include <disp/viewers/helpers/evokedsetmodel.h>
 #include <disp/viewers/averagingsettingsview.h>
 #include <disp/viewers/averagelayoutview.h>
 #include <disp/viewers/butterflyview.h>
@@ -491,6 +492,18 @@ void Averaging::onComputeButtonClicked(bool bChecked)
                                             pFiffRaw->first_samp,
                                             pFiffRaw->last_samp);
 
+
+
+    //m_pFiffEvokedSet = QSharedPointer<FIFFLIB::FiffEvokedSet>(new FIFFLIB::FiffEvokedSet());
+    //m_pFiffEvokedSet->evoked.append(*(m_pFiffEvoked.data()));
+    //m_pFiffEvokedSet->info = *(m_pFiffInfo.data());
+
+
+//    m_pEvokedModel = QSharedPointer<DISPLIB::EvokedSetModel>(new DISPLIB::EvokedSetModel());
+//    m_pEvokedModel->setEvokedSet(m_pFiffEvokedSet);
+
+//    m_pButterflyView->setEvokedSetModel(m_pEvokedModel);
+//    m_pAverageLayoutView->setEvokedSetModel(m_pEvokedModel);
 
     qDebug() << "Averaging done.";
 }
