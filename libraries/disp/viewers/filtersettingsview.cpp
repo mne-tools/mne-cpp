@@ -119,7 +119,7 @@ bool FilterSettingsView::getFilterActive()
 
 //=============================================================================================================
 
-void FilterSettingsView::init(double dSFreq)
+void FilterSettingsView::setSamplingRate(double dSFreq)
 {
     //Update min max of spin boxes to nyquist
     double nyquistFrequency = dSFreq/2;
@@ -135,7 +135,7 @@ void FilterSettingsView::init(double dSFreq)
         m_pUi->m_pDoubleSpinBoxTo->setValue(dSFreq/2);
     }
 
-    m_pFilterView->init(dSFreq);
+    m_pFilterView->setSamplingRate(dSFreq);
 }
 
 //=============================================================================================================
