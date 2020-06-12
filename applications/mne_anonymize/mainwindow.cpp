@@ -13,7 +13,8 @@
 using namespace MNEANONYMIZE;
 
 MainWindow::MainWindow(MNEANONYMIZE::SettingsControllerGui *c)
-: m_bExtraInfoVisibility(true)
+: m_bOptionsVisibility(false)
+, m_bExtraInfoVisibility(true)
 , m_pUi(new Ui::MainWindow)
 , m_pController(c)
 {
@@ -53,6 +54,62 @@ bool MainWindow::confirmClose()
         break;
     }
     return false;
+}
+
+void MainWindow::setDefautlStateUi()
+{
+
+    this->setWindowTitle(qApp->organizationName() + " ~ " + qApp->applicationName() + " ~ " + qApp->applicationVersion());
+
+    if(m_bOptionsVisibility)
+    {
+        m_pUi->checkBoxShowOptions->setCheckState(Qt::Checked);
+    } else {
+        m_pUi->checkBoxShowOptions->setCheckState(Qt::Unchecked);
+    }
+    m_pUi->frameOptions->setVisible(m_bOptionsVisibility);
+
+    m_pUi->spinBoxMeasurementDateOffset->setEnabled(false);
+    m_pUi->spinBoxBirthdayDateOffset->setEnabled(false);
+    m_pUi->spinBoxMeasurementDateOffset->setValue(0);
+    m_pUi->spinBoxBirthdayDateOffset->setValue(0);
+
+    m_pUi->frameExtraInfo->setVisible(m_bExtraInfoVisibility);
+
+    m_pUi->comboBoxSubjectSexExtra->addItems(QStringList() << "Unknown" << "Male" << "Female");
+    m_pUi->comboBoxSubjectSexExtra->setCurrentIndex(0);
+    m_pUi->comboBoxSubjectSexExtra->setEditable(false);
+
+    m_pUi->comboBoxSubjectHandExtra->addItems(QStringList() << "Unknown" << "Right" << "Left");
+    m_pUi->comboBoxSubjectHandExtra->setCurrentIndex(0);
+    m_pUi->comboBoxSubjectHandExtra->setEditable(false);
+
+    m_pUi->lineEditIdFileVersionExtra->setReadOnly(true);
+    m_pUi->lineEditIdMACAddressExtra->setReadOnly(true);
+    m_pUi->dateTimeIdMeasurementDateExtra->setReadOnly(true);
+
+    m_pUi->dateTimeFileMeasurementDateExtra->setReadOnly(true);
+
+    m_pUi->lineEditExperimenterExtra->setReadOnly(true);
+    m_pUi->plainTextFileCommentExtra->setReadOnly(true);
+
+    m_pUi->spinBoxSubjectIDExtra->setReadOnly(true);
+    m_pUi->lineEditSubjectFirstNameExtra->setReadOnly(true);
+    m_pUi->lineEditSubjectMiddleNameExtra->setReadOnly(true);
+    m_pUi->lineEditSubjectLastNameExtra->setReadOnly(true);
+    m_pUi->dateEditSubjectBirthdayExtra->setReadOnly(true);
+    m_pUi->doubleSpinBoxSubjectWeightExtra->setReadOnly(true);
+    m_pUi->doubleSpinBoxSubjectHeightExtra->setReadOnly(true);
+    m_pUi->plainTextEditSubjectCommentExtra->setReadOnly(true);
+    m_pUi->lineEditSubjectHisIdExtra->setReadOnly(true);
+
+    m_pUi->labelSubjectMriDataFoundExtra->setVisible(false);
+
+    m_pUi->spinBoxProjectIDExtra->setReadOnly(true);
+    m_pUi->lineEditProjectAimExtra->setReadOnly(true);
+    m_pUi->lineEditProjectNameExtra->setReadOnly(true);
+    m_pUi->lineEditProjectPersonsExtra->setReadOnly(true);
+    m_pUi->plainTextEditProjectCommentExtra->setReadOnly(true);
 }
 
 void MainWindow::setDefaultStateExtraInfo()
@@ -117,9 +174,8 @@ void MainWindow::setDefaultStateExtraInfo()
     m_pUi->plainTextEditProjectCommentExtra->setEnabled(false);
 
     //tooltips
-
+    m_pUi->checkBoxShowOptions->setToolTip("Show the options menu.");
     m_pUi->checkBoxBruteMode->setToolTip("Advanced anonymization. Anonymize also weight, height and some other fields. See Help.");
-//    m_pUi->checkBoxBruteMode->setToolTip("Apart from other fields already anonymized by default, \nalso anonymize subject’s weight, height, sex and handedness, and project’s ID, name, aim and comment.");
     m_pUi->labelMeasDate->setToolTip("Specify the measurement date.");
     m_pUi->dateTimeMeasurementDate->setToolTip("Specify the measurement date.");
     m_pUi->checkBoxMeasurementDateOffset->setToolTip("Specify number of days to subtract to the measurement.");
@@ -133,8 +189,8 @@ void MainWindow::setDefaultStateExtraInfo()
     m_pUi->labelSubjectHisId->setToolTip("Specify the Subject’s ID within the Hospital system.");
     m_pUi->lineEditSubjectHisId->setToolTip("Specify the Subject’s ID within the Hospital system.");
 
-    m_pUi->buttonMenu->setToolTip("[Help] See the MNE-CPP project's documentation website.\n[Save] Save the anonymized file.");
-
+    m_pUi->moreInfoButton->setToolTip("See the MNE-CPP project's web for this application.");
+    m_pUi->pushButtonAnonymizeFile->setToolTip("Anonymize the input file.");
     m_pUi->labelInFile->setToolTip("File to anonymize");
     m_pUi->lineEditInFile->setToolTip("File to anonymize.");
     m_pUi->openInFileWindowButton->setToolTip("Select a file to anonymize.");
@@ -143,64 +199,19 @@ void MainWindow::setDefaultStateExtraInfo()
     m_pUi->openOutFileWindowButton->setToolTip("Select a folder or a file where to save the output anonymized fif file.");
 }
 
-void MainWindow::setDefautlStateUi()
-{
-
-    this->setWindowTitle(qApp->organizationName() + " ~ " + qApp->applicationName() + " ~ " + qApp->applicationVersion());
-    m_pUi->spinBoxMeasurementDateOffset->setEnabled(false);
-    m_pUi->spinBoxBirthdayDateOffset->setEnabled(false);
-    m_pUi->spinBoxMeasurementDateOffset->setValue(0);
-    m_pUi->spinBoxBirthdayDateOffset->setValue(0);
-
-    m_pUi->frameExtraInfo->setVisible(m_bExtraInfoVisibility);
-
-    m_pUi->comboBoxSubjectSexExtra->addItems(QStringList() << "Unknown" << "Male" << "Female");
-    m_pUi->comboBoxSubjectSexExtra->setCurrentIndex(0);
-    m_pUi->comboBoxSubjectSexExtra->setEditable(false);
-
-    m_pUi->comboBoxSubjectHandExtra->addItems(QStringList() << "Unknown" << "Right" << "Left");
-    m_pUi->comboBoxSubjectHandExtra->setCurrentIndex(0);
-    m_pUi->comboBoxSubjectHandExtra->setEditable(false);
-
-    m_pUi->lineEditIdFileVersionExtra->setReadOnly(true);
-    m_pUi->lineEditIdMACAddressExtra->setReadOnly(true);
-    m_pUi->dateTimeIdMeasurementDateExtra->setReadOnly(true);
-
-    m_pUi->dateTimeFileMeasurementDateExtra->setReadOnly(true);
-
-    m_pUi->lineEditExperimenterExtra->setReadOnly(true);
-    m_pUi->plainTextFileCommentExtra->setReadOnly(true);
-
-    m_pUi->spinBoxSubjectIDExtra->setReadOnly(true);
-    m_pUi->lineEditSubjectFirstNameExtra->setReadOnly(true);
-    m_pUi->lineEditSubjectMiddleNameExtra->setReadOnly(true);
-    m_pUi->lineEditSubjectLastNameExtra->setReadOnly(true);
-    m_pUi->dateEditSubjectBirthdayExtra->setReadOnly(true);
-    m_pUi->doubleSpinBoxSubjectWeightExtra->setReadOnly(true);
-    m_pUi->doubleSpinBoxSubjectHeightExtra->setReadOnly(true);
-    m_pUi->plainTextEditSubjectCommentExtra->setReadOnly(true);
-    m_pUi->lineEditSubjectHisIdExtra->setReadOnly(true);
-
-    m_pUi->labelSubjectMriDataFoundExtra->setVisible(false);
-
-    m_pUi->spinBoxProjectIDExtra->setReadOnly(true);
-    m_pUi->lineEditProjectAimExtra->setReadOnly(true);
-    m_pUi->lineEditProjectNameExtra->setReadOnly(true);
-    m_pUi->lineEditProjectPersonsExtra->setReadOnly(true);
-    m_pUi->plainTextEditProjectCommentExtra->setReadOnly(true);
-}
-
 void MainWindow::setupConnections()
 {
 
     QObject::connect(m_pUi->seeExtraInfoButton,&QToolButton::clicked,
-                     this,&MainWindow::showExtraInfo);
+                     this,&MainWindow::showExtraInfoClicked);
+    QObject::connect(m_pUi->checkBoxShowOptions,&QCheckBox::stateChanged,
+                     this,&MainWindow::checkBoxShowOptionsChanged);
 
-//    QObject::connect(m_pUi->buttonMenu,&QDialogButtonBox::accepted,
-//                     m_pController,&SettingsControllerGui::executeAnonymizer);
+    QObject::connect(m_pUi->pushButtonAnonymizeFile,&QPushButton::clicked,
+                     m_pController,&SettingsControllerGui::executeAnonymizer);
 
-//    QObject::connect(m_pUi->buttonMenu,&QDialogButtonBox::helpRequested,
-//                     this,&MainWindow::helpButtonClicked);
+    QObject::connect(m_pUi->moreInfoButton,&QToolButton::clicked,
+                     this,&MainWindow::helpButtonClicked);
 
     QObject::connect(m_pUi->lineEditInFile,&QLineEdit::editingFinished,
                      this,&MainWindow::lineEditInFileEditingFinished);
@@ -213,7 +224,7 @@ void MainWindow::setupConnections()
                      this,&MainWindow::openOutFileDialog);
 
     QObject::connect(m_pUi->checkBoxBruteMode,&QCheckBox::stateChanged,
-                     this,&MainWindow::checkboxBruteModeChanged);
+                     this,&MainWindow::checkBoxBruteModeChanged);
 
     QObject::connect(m_pUi->checkBoxMeasurementDateOffset,&QCheckBox::stateChanged,
                      this,&MainWindow::checkBoxMeasurementDateOffsetStateChanged);
@@ -236,12 +247,14 @@ void MainWindow::setupConnections()
 
 void MainWindow::setLineEditInFile(const QString &s)
 {
-    m_pUi->lineEditInFile->setText(s);
+    m_fiInFile.setFile(s);
+    m_pUi->lineEditInFile->setText(m_fiInFile.absoluteFilePath());
 }
 
 void MainWindow::setLineEditOutFile(const QString &s)
 {
-    m_pUi->lineEditOutFile->setText(s);
+    m_fiOutFile.setFile(s);
+    m_pUi->lineEditOutFile->setText(m_fiOutFile.absoluteFilePath());
 }
 
 void MainWindow::setCheckBoxBruteMode(bool b)
@@ -470,14 +483,6 @@ void MainWindow::openOutFileDialog()
     }
 }
 
-void MainWindow::showExtraInfo()
-{
-    m_bExtraInfoVisibility = !m_bExtraInfoVisibility;
-    m_pUi->frameExtraInfo->setVisible(m_bExtraInfoVisibility);
-    emit extraInfoVisibilityChanged(m_bExtraInfoVisibility);
-}
-
-
 void MainWindow::helpButtonClicked()
 {
     QDesktopServices::openUrl( QUrl("https://mne-cpp.github.io/pages/learn/mneanonymize.html",
@@ -486,15 +491,15 @@ void MainWindow::helpButtonClicked()
 
 void MainWindow::lineEditInFileEditingFinished()
 {
-    emit fileInChanged(m_pUi->lineEditInFile->text());
+    emit fileInChanged(m_fiInFile.absoluteFilePath());
 }
 
 void MainWindow::lineEditOutFileEditingFinished()
 {
-    emit fileOutChanged(m_pUi->lineEditOutFile->text());
+    emit fileOutChanged(m_fiOutFile.absoluteFilePath());
 }
 
-void MainWindow::checkboxBruteModeChanged()
+void MainWindow::checkBoxBruteModeChanged()
 {
     bool state(m_pUi->checkBoxBruteMode->isChecked());
     emit bruteModeChanged(state);
@@ -574,8 +579,11 @@ bool MainWindow::getExtraInfoVisibility()
 
 void MainWindow::setExtraInfoVisibility(bool b)
 {
-    m_bExtraInfoVisibility = b;
-    emit extraInfoVisibilityChanged(m_bExtraInfoVisibility);
+    if(m_bExtraInfoVisibility != b)
+    {
+        m_bExtraInfoVisibility = b;
+        emit extraInfoVisibilityChanged(m_bExtraInfoVisibility);
+    }
 }
 
 void MainWindow::resizeEvent(QResizeEvent* event)
@@ -583,14 +591,46 @@ void MainWindow::resizeEvent(QResizeEvent* event)
 
     Q_UNUSED(event)
     checkSmallGui();
-    statusMsg("width: " + QString::number(m_pUi->centralwidget->width()));
+//    statusMsg("width: " + QString::number(m_pUi->centralwidget->width()));
 }
 
 void MainWindow::checkSmallGui()
 {
-    if( m_pUi->lineEditInFile->width() < 500)
+    int criticalWidth(500);
+
+    if( !m_pUi->lineEditInFile->text().isEmpty())
     {
-        QFileInfo inFile(m_pUi->lineEditInFile->text());
-        m_pUi->lineEditInFile->setText("(...)/" + inFile.fileName());
+        if(m_pUi->lineEditInFile->width() < criticalWidth)
+        {
+            m_pUi->lineEditInFile->setText("(...)/" + m_fiInFile.fileName());
+        } else {
+            m_pUi->lineEditInFile->setText(m_fiInFile.absoluteFilePath());
+        }
     }
+
+    if( !m_pUi->lineEditOutFile->text().isEmpty())
+    {
+        if(m_pUi->lineEditOutFile->width() < criticalWidth)
+        {
+            m_pUi->lineEditOutFile->setText("(...)/" + m_fiOutFile.fileName());
+        } else {
+            m_pUi->lineEditOutFile->setText(m_fiOutFile.absoluteFilePath());
+        }
+    }
+}
+
+
+void MainWindow::showExtraInfoClicked()
+{
+    m_bExtraInfoVisibility = !m_bExtraInfoVisibility;
+    m_pUi->frameExtraInfo->setVisible(m_bExtraInfoVisibility);
+    emit extraInfoVisibilityChanged(m_bExtraInfoVisibility);
+}
+
+void MainWindow::checkBoxShowOptionsChanged()
+{
+    m_bOptionsVisibility = m_pUi->checkBoxShowOptions->isChecked();
+    m_pUi->frameOptions->setVisible(m_bOptionsVisibility);
+    m_pUi->frameExtraInfo->setVisible(m_bExtraInfoVisibility);
+    emit showOptionsChanged(m_bOptionsVisibility);
 }

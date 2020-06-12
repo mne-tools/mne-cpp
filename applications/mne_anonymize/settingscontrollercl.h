@@ -62,6 +62,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+
 //=============================================================================================================
 // DEFINE NAMESPACE MNEANONYMIZE
 //=============================================================================================================
@@ -102,6 +103,10 @@ public:
      * @param [in] arguments    String list containing the input arguments in form of a QStringList.
      */
     SettingsControllerCl(const QStringList& arguments);
+
+    QFileInfo getQFiInFile();
+
+    QFileInfo getQFiOutFile();
 
 protected:
     //=========================================================================================================
@@ -208,7 +213,6 @@ private:
      */
     void printIfVerbose(const QString& str) const;
 
-protected:
 signals:
     /**
      * Signal the main qt core application to stop running and exit.
