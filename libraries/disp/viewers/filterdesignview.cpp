@@ -250,11 +250,11 @@ void FilterDesignView::saveSettings()
 
     QSettings settings("MNECPP");
 
-    settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterFrom"), m_filterKernel.m_dHighpassFreq);
-    settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterTo"), m_filterKernel.m_dLowpassFreq);
-    settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterOrder"), m_filterKernel.m_iFilterOrder);
+    settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterFrom"), m_filterKernel.getHighpassFreq());
+    settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterTo"), m_filterKernel.getLowpassFreq());
+    settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterOrder"), m_filterKernel.getFilterOrder());
     settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterDesignMethod"), m_filterKernel.m_designMethod);
-    settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterTransition"), m_filterKernel.m_dParksWidth*(m_filterKernel.m_sFreq/2));
+    settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterTransition"), m_filterKernel.getParksWidth()*(m_filterKernel.getSamplingFrequency()/2));
     settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterChannelType"), getChannelType());
     settings.setValue(m_sSettingsPath + QString("/FilterDesignView/Position"), this->pos());
 }
@@ -400,7 +400,7 @@ void FilterDesignView::updateFilterPlot()
 {
     //Update the filter of the scene
     m_pFilterPlotScene->updateFilter(m_filterKernel,
-                                     m_filterKernel.m_sFreq, //Pass the filters sampling frequency, not the one from the fiff info. Reason: sFreq from a loaded filter could be different
+                                     m_filterKernel.getSamplingFrequency(), //Pass the filters sampling frequency, not the one from the fiff info. Reason: sFreq from a loaded filter could be different
                                      m_pUi->m_doubleSpinBox_from->value(),
                                      m_pUi->m_doubleSpinBox_to->value());
 
@@ -550,11 +550,11 @@ void FilterDesignView::onBtnExportFilterCoefficients()
     //Generate appropriate name for the filter to be saved
     QString filtername;
 
-    filtername = QString("%1_%2_%3_Fs%4").arg(FilterKernel::getStringForFilterType(m_filterKernel.m_Type)).arg((int)m_filterKernel.m_dHighpassFreq).arg((int)m_filterKernel.m_dLowpassFreq).arg((int)m_filterKernel.m_sFreq);
+    filtername = QString("%1_%2_%3_Fs%4").arg(FilterKernel::getStringForFilterType(m_filterKernel.m_Type)).arg((int)m_filterKernel.getHighpassFreq()).arg((int)m_filterKernel.getLowpassFreq()).arg((int)m_filterKernel.getSamplingFrequency());
 
     //Do not pass m_filterKernel because this is most likely the User Defined filter which name should not change due to the filter model implementation. Hence use temporal copy of m_filterKernel.
     FilterKernel filterWriteTemp = m_filterKernel;
-    filterWriteTemp.m_sFilterName = filtername;
+    filterWriteTemp.getName() = filtername;
 
     QString fileName = QFileDialog::getSaveFileName(this,
                                                     "Save filter coefficients",

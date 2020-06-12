@@ -883,8 +883,8 @@ void RtFiffRawViewModel::setFilter(QList<FilterKernel> filterData)
 
     m_iMaxFilterLength = 1;
     for(int i=0; i<filterData.size(); ++i) {
-        if(m_iMaxFilterLength<filterData.at(i).m_iFilterOrder) {
-            m_iMaxFilterLength = filterData.at(i).m_iFilterOrder;
+        if(m_iMaxFilterLength<filterData.at(i).getFilterOrder()) {
+            m_iMaxFilterLength = filterData.at(i).getFilterOrder();
         }
     }
 
@@ -1116,15 +1116,15 @@ void RtFiffRawViewModel::filterDataBlock()
     fftLength = pow(2, exp) < 512 ? 512 : pow(2, exp);
 
     for(int i = 0; i<m_filterKernel.size(); ++i) {
-        FilterKernel tempFilter(m_filterKernel.at(i).m_sFilterName,
-                              m_filterKernel.at(i).m_Type,
-                              m_filterKernel.at(i).m_iFilterOrder,
-                              m_filterKernel.at(i).m_dCenterFreq,
-                              m_filterKernel.at(i).m_dBandwidth,
-                              m_filterKernel.at(i).m_dParksWidth,
-                              m_filterKernel.at(i).m_sFreq,
-                              fftLength,
-                              m_filterKernel.at(i).m_designMethod);
+        FilterKernel tempFilter(m_filterKernel.at(i).getName(),
+                                m_filterKernel.at(i).m_Type,
+                                m_filterKernel.at(i).getFilterOrder(),
+                                m_filterKernel.at(i).getCenterFrequency(),
+                                m_filterKernel.at(i).getBandwidth(),
+                                m_filterKernel.at(i).getParksWidth(),
+                                m_filterKernel.at(i).getSamplingFrequency(),
+                                fftLength,
+                                m_filterKernel.at(i).m_designMethod);
 
         tempFilterList.append(tempFilter);
     }

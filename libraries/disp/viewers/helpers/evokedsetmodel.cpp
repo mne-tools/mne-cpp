@@ -852,8 +852,8 @@ void EvokedSetModel::setFilter(const FilterKernel& filterData)
 
     m_iMaxFilterLength = 1;
     for(int i=0; i<m_filterKernel.size(); i++) {
-        if(m_iMaxFilterLength < m_filterKernel.at(i).m_iFilterOrder) {
-            m_iMaxFilterLength = m_filterKernel.at(i).m_iFilterOrder;
+        if(m_iMaxFilterLength < m_filterKernel.at(i).getFilterOrder()) {
+            m_iMaxFilterLength = m_filterKernel.at(i).getFilterOrder();
         }
     }
 
