@@ -197,5 +197,11 @@ isEmpty( MNE_INSTALL_INCLUDE_DIR ) {
 }
 
 # FFTW dir
-FFTW_DIR_LIBS = $$shell_path(C:\fftw-3.3.5-dll64)
-FFTW_DIR_INCLUDE = $$shell_path(C:\fftw-3.3.5-dll64)
+win32 {
+    FFTW_DIR_LIBS = $$shell_path($${PWD}/include/3rdParty/fftw)
+    FFTW_DIR_INCLUDE = $$shell_path($${PWD}/include/3rdParty/fftw)
+}
+unix {
+    FFTW_DIR_LIBS = $$shell_path($${PWD}/include/3rdParty/fftw/lib)
+    FFTW_DIR_INCLUDE = $$shell_path($${PWD}/include/3rdParty/fftw/include)
+}

@@ -206,7 +206,8 @@ void FiffRawViewModel::initFiffData(QIODevice& p_IODevice)
 
 //=============================================================================================================
 
-QVariant FiffRawViewModel::data(const QModelIndex &index, int role) const
+QVariant FiffRawViewModel::data(const QModelIndex &index,
+                                int role) const
 {
     // early filtering of unimplemented display roles
     if (role == Qt::BackgroundRole) {
@@ -293,7 +294,9 @@ bool FiffRawViewModel::saveToFile(const QString& sPath)
 
 //=============================================================================================================
 
-QVariant FiffRawViewModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant FiffRawViewModel::headerData(int section,
+                                      Qt::Orientation orientation,
+                                      int role) const
 {
     if(role != Qt::DisplayRole && role != Qt::TextAlignmentRole)
         return QVariant();
