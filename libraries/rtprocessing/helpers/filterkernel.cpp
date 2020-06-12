@@ -170,7 +170,7 @@ RowVectorXd FilterKernel::applyFftFilter(const RowVectorXd& vecData,
         fftw_make_planner_thread_safe();
     #endif
 
-    // Make sure we always have the correct FFT length for the given input data
+    // Make sure we always have the correct FFT length for the given input data and filter overlap
     int iFftLength = vecData.cols() + m_vecCoeff.cols();
     int exp = ceil(MNEMath::log2(iFftLength));
     iFftLength = pow(2, exp);
@@ -425,7 +425,10 @@ void FilterKernel::setFftCoefficients(const Eigen::RowVectorXcd& vecFftCoeff)
 
 void FilterKernel::designFilter()
 {
-    int iFftLength = 4096;
+    // Make sure we only use a minimum needed FFT size
+    int iFftLength = m_iFilterOrder;
+    int exp = ceil(MNEMath::log2(iFftLength));
+    iFftLength = pow(2, exp);
 
     switch(m_designMethod) {
         case Tschebyscheff: {
