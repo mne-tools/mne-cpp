@@ -56,15 +56,16 @@
 //=============================================================================================================
 
 namespace ANSHAREDLIB {
-    class Communicator;
     class FiffRawViewModel;
     class AbstractModel;
+    class Communicator;
 }
 
 namespace DISPLIB {
     class AveragingSettingsView;
-    class ButterflyView;
     class AverageLayoutView;
+    class EvokedSetModel;
+    class ButterflyView;
 }
 
 namespace FIFFLIB {
@@ -196,7 +197,9 @@ private:
     QSharedPointer<ANSHAREDLIB::FiffRawViewModel>           m_pFiffRawModel;            /**< Pointer to currently loaded FiffRawView Model */
     QSharedPointer<QList<QPair<int,double>>>                m_pTriggerList;
     QSharedPointer<FIFFLIB::FiffEvoked>                     m_pFiffEvoked;
+    QSharedPointer<FIFFLIB::FiffEvokedSet>                  m_pFiffEvokedSet;
     QSharedPointer<Ave>                                     m_pAve;                     /**< Averaging Object */
+    QSharedPointer<DISPLIB::EvokedSetModel>                 m_pEvokedModel;
 
     DISPLIB::AveragingSettingsView*                         m_pAveragingSettingsView;
 
