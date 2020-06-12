@@ -104,7 +104,7 @@ public:
     ~Filter();
 
     /**
-     * Calculates a suer designed filter kernel and filteres the raw input data
+     * Calculates a user designed filter kernel and filters the raw input data
      *
      * @param [in] matDataIn        The data which is to be filtered
      * @param [in] type             of the filter: LPF, HPF, BPF, NOTCH (from enum FilterType)
@@ -132,10 +132,10 @@ public:
                                const Eigen::RowVectorXi &vecPicks = Eigen::RowVectorXi(),
                                bool bUseThreads = true);
     /**
-     * Calculates the filtered version of the raw input data based on a given filter
+     * Calculates the filtered version of the raw input data based on a given list filters
      *
      * @param [in] matDataIn        The data which is to be filtered
-     * @param [in] lFilterKernel      The list of filter kernels to use
+     * @param [in] lFilterKernel    The list of filter kernels to use
      * @param [in] vecPicks         used channel as index in QVector
      * @param [in] bUseThreads      Whether to use multiple threads
      *

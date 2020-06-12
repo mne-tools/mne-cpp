@@ -91,25 +91,25 @@ FilterKernel::FilterKernel()
 //=============================================================================================================
 
 FilterKernel::FilterKernel(const QString& sFilterName,
-                       FilterType type,
-                       int order,
-                       double centerfreq,
-                       double bandwidth,
-                       double parkswidth,
-                       double sFreq,
-                       qint32 fftlength,
-                       DesignMethod designMethod)
+                           FilterType type,
+                           int iOrder,
+                           double dCenterfreq,
+                           double dBandwidth,
+                           double dParkswidth,
+                           double dSFreq,
+                           qint32 iFftlength,
+                           DesignMethod designMethod)
 : m_designMethod(designMethod)
 , m_Type(type)
-, m_sFreq(sFreq)
-, m_dCenterFreq(centerfreq)
-, m_dBandwidth(bandwidth)
-, m_dParksWidth(parkswidth)
-, m_iFilterOrder(order)
-, m_iFFTlength(fftlength)
+, m_sFreq(dSFreq)
+, m_dCenterFreq(dCenterfreq)
+, m_dBandwidth(dBandwidth)
+, m_dParksWidth(dParkswidth)
+, m_iFilterOrder(iOrder)
+, m_iFFTlength(iFftlength)
 , m_sFilterName(sFilterName)
 {
-    if(order < 9) {
+    if(iOrder < 9) {
        qWarning() << "[FilterKernel::FilterKernel] Less than 9 taps were provided. Setting number of taps to 9.";
     }
 
