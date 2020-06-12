@@ -98,10 +98,12 @@ private:
     void readData();
     void initializeOptionsState();
     void setupCommunication();
+    void setInputFileInformationVisible(bool b);
 
 signals:
 
 private:
+    bool m_bInputFileInformationVisible;
     QSharedPointer<MainWindow> m_pWin;
 };
 
