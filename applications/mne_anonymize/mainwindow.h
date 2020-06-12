@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QDateTime>
+#include <QFileInfo>
 
 namespace Ui {
 class MainWindow;
@@ -45,6 +46,20 @@ public:
     bool getExtraInfoVisibility();
     void setExtraInfoVisibility(bool b);
 
+signals:
+    void fileInChanged(const QString& s) const;
+    void fileOutChanged(const QString& s) const;
+    void bruteModeChanged(bool b) const;
+    void measurementDateChanged(const QDateTime& t) const;
+    void useMeasurementOffset(bool f) const;
+    void measurementDateOffsetChanged(int o) const;
+    void birthdayDateChanged(const QDateTime& d) const;
+    void useBirthdayOffset(bool f) const;
+    void birthdayOffsetChanged(int o) const;
+    void subjectHisIdChanged(const QString& text) const;
+    void extraInfoVisibilityChanged(bool b);
+    void showOptionsChanged(bool b);
+
 public slots:
     void winPopup(QString s);
 
@@ -75,24 +90,13 @@ public slots:
 
     void setLabelMriDataFoundVisible(bool);
 
-signals:
-    void fileInChanged(const QString& s) const;
-    void fileOutChanged(const QString& s) const;
-    void bruteModeChanged(bool b) const;
-    void measurementDateChanged(const QDateTime& t) const;
-    void useMeasurementOffset(bool f) const;
-    void measurementDateOffsetChanged(int o) const;
-    void birthdayDateChanged(const QDateTime& d) const;
-    void useBirthdayOffset(bool f) const;
-    void birthdayOffsetChanged(int o) const;
-    void subjectHisIdChanged(const QString& text) const;
-    void extraInfoVisibilityChanged(bool b);
 
 protected:
     void closeEvent(QCloseEvent *event) override;
 
 private slots:
-    void checkboxBruteModeChanged();
+    void checkBoxShowOptionsChanged();
+    void checkBoxBruteModeChanged();
     void checkBoxMeasurementDateOffsetStateChanged(int arg);
     void checkBoxBirthdayDateOffsetStateChanged(int arg);
 
@@ -109,7 +113,7 @@ private slots:
 
     void openOutFileDialog();
 
-    void showExtraInfo();
+    void showExtraInfoClicked ();
 
     void helpButtonClicked();
 
@@ -128,7 +132,12 @@ private:
 
     void checkSmallGui();
 
+    bool m_bOptionsVisibility;
     bool m_bExtraInfoVisibility;
+
+    QFileInfo m_fiInFile;
+    QFileInfo m_fiOutFile;
+
     Ui::MainWindow* m_pUi;
     SettingsControllerGui* m_pController;
 };
