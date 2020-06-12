@@ -111,32 +111,6 @@ FilterDesignView::~FilterDesignView()
 
 //=============================================================================================================
 
-void FilterDesignView::init(double dSFreq)
-{
-    setSamplingRate(dSFreq);
-
-    //Update min max of spin boxes to nyquist
-    double samplingFrequency = m_dSFreq;
-    double nyquistFrequency = samplingFrequency/2;
-
-    m_pUi->m_doubleSpinBox_to->setMaximum(nyquistFrequency);
-    m_pUi->m_doubleSpinBox_from->setMaximum(nyquistFrequency);
-
-    if(m_pUi->m_doubleSpinBox_to->value()>m_dSFreq/2) {
-        m_pUi->m_doubleSpinBox_to->setValue(m_dSFreq/2);
-    }
-
-    if(m_pUi->m_doubleSpinBox_from->value()>m_dSFreq/2) {
-        m_pUi->m_doubleSpinBox_from->setValue(m_dSFreq/2);
-    }
-
-    filterParametersChanged();
-
-    updateFilterPlot();
-}
-
-//=============================================================================================================
-
 void FilterDesignView::setWindowSize(int iWindowSize)
 {
     m_iWindowSize = iWindowSize;
@@ -179,7 +153,17 @@ int FilterDesignView::getMaxFilterTaps()
 
 void FilterDesignView::setSamplingRate(double dSamplingRate)
 {
+    if(dSamplingRate <= 0) {
+        qWarning() << "[FilterDesignView::setSamplingRate] Sampling frequency is <= 0. Returning.";
+    }
+
     m_dSFreq = dSamplingRate;
+
+    //Update min max of spin boxes to nyquist
+    double nyquistFrequency = m_dSFreq/2;
+
+    m_pUi->m_doubleSpinBox_to->setMaximum(nyquistFrequency);
+    m_pUi->m_doubleSpinBox_from->setMaximum(nyquistFrequency);
 
     if(m_pUi->m_doubleSpinBox_to->value()>m_dSFreq/2) {
         m_pUi->m_doubleSpinBox_to->setValue(m_dSFreq/2);
@@ -188,6 +172,8 @@ void FilterDesignView::setSamplingRate(double dSamplingRate)
     if(m_pUi->m_doubleSpinBox_from->value()>m_dSFreq/2) {
         m_pUi->m_doubleSpinBox_from->setValue(m_dSFreq/2);
     }
+
+    filterParametersChanged();
 
     updateFilterPlot();
 }
@@ -444,8 +430,7 @@ void FilterDesignView::filterParametersChanged()
     double bw = to-from;
     double center = from+bw/2;
 
-    double samplingFrequency = m_dSFreq <= 0 ? 600 : m_dSFreq;
-    double nyquistFrequency = samplingFrequency/2;
+    double nyquistFrequency = m_dSFreq/2;
 
     //Calculate the needed fft length
     m_iFilterTaps = m_pUi->m_spinBox_filterTaps->value();
@@ -487,7 +472,7 @@ void FilterDesignView::filterParametersChanged()
                               (double)center/nyquistFrequency,
                               (double)bw/nyquistFrequency,
                               (double)trans_width/nyquistFrequency,
-                              samplingFrequency,
+                              m_dSFreq,
                               fftLength,
                               dMethod);
 
