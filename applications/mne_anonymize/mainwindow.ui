@@ -56,7 +56,7 @@
          <x>0</x>
          <y>0</y>
          <width>750</width>
-         <height>737</height>
+         <height>759</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -741,28 +741,6 @@ asdflkasdjf;lasdkjf;laskdjflasdfj</string>
      </widget>
     </item>
    </layout>
-  </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>778</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <widget class="QMenu" name="menuAbout">
-    <property name="title">
-     <string>About</string>
-    </property>
-   </widget>
-   <widget class="QMenu" name="menuAbout_MNE_CPP">
-    <property name="title">
-     <string>About MNE-CPP</string>
-    </property>
-   </widget>
-   <addaction name="menuAbout"/>
-   <addaction name="menuAbout_MNE_CPP"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
