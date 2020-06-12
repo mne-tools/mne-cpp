@@ -40,8 +40,10 @@ public:
 
     void setDefaultStateExtraInfo();
 
+    void statusMsg(const QString& s, int to = 1000);
+
 public slots:
-    void showMessage(QString s);
+    void winPopup(QString s);
 
     void setLineEditIdFileVersion(double v);
     void setLineEditIdMeasurementDate(QDateTime d);
@@ -87,7 +89,6 @@ signals:
     void subjectHisIdChanged(const QString& text) const;
 
 private slots:
-    void about();
     void checkboxBruteModeChanged();
     void checkBoxMeasurementDateOffsetStateChanged(int arg);
     void checkBoxBirthdayDateOffsetStateChanged(int arg);
@@ -120,7 +121,6 @@ private:
 
     void idMeasurementDateChanged();
 
-    void statusMsg(const QString& s, int to);
 
 //    bool m_bIdFileVersionFound;
 //    bool m_bIdMeasurementDateFound;

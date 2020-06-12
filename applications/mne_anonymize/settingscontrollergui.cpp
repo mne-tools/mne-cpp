@@ -43,6 +43,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QObject>
+#include <QThread>
 #include <QDir>
 #include <QStandardPaths>
 #include <QDesktopServices>
@@ -80,19 +82,27 @@ SettingsControllerGui::SettingsControllerGui(const QStringList& arguments)
 
     m_pWin->show();
 
+
+
     if(m_pAnonymizer->isFileInSet())
     {
         readData();
     }
+
+    QObject().thread()->usleep(1000*2000);
+    m_pWin->statusMsg("Howdy!",1000);
 }
 
 void SettingsControllerGui::executeAnonymizer()
 {
+    m_pWin->statusMsg("Anonymizing the input file into the output file.");
     m_pAnonymizer->anonymizeFile();
+    m_pWin->statusMsg("Your file is ready!");
 }
 
 void SettingsControllerGui::readData()
 {
+    m_pWin->statusMsg("Reading input File information...",0);
     //set output to a randomFilename
     QString stringTempDir(QStandardPaths::writableLocation(QStandardPaths::TempLocation));
     QString fileOutStr(QDir(stringTempDir).filePath(generateRandomFileName()));
@@ -105,6 +115,7 @@ void SettingsControllerGui::readData()
     fileOut.remove();
     m_pAnonymizer->setFileOut(m_fiOutFileInfo.absoluteFilePath());
     m_pAnonymizer->setVerboseMode(verboseMode);
+    m_pWin->statusMsg("Information read correctly.");
 }
 
 void SettingsControllerGui::fileInChanged(const QString& strInFile)
@@ -113,20 +124,20 @@ void SettingsControllerGui::fileInChanged(const QString& strInFile)
 
     if(newfiInFile.isDir())
     {
-        m_pWin->showMessage("Invalid input file. That's a directory");
+        m_pWin->statusMsg("Invalid input file. That's a directory");
         m_pWin->setLineEditInFile(m_fiInFileInfo.absoluteFilePath());
         return;
     }
     if(QString::compare(newfiInFile.suffix(),QString("fif")) != 0)
     {
-        m_pWin->showMessage("The input file extension must be \".fif\" 0.");
+        m_pWin->statusMsg("The input file extension must be \".fif\" 0.");
         m_pWin->setLineEditOutFile(m_fiOutFileInfo.absoluteFilePath());
         return;
     }
     QFileInfo inDir(newfiInFile.absolutePath());
     if(!inDir.isReadable())
     {
-        m_pWin->showMessage("You might not have reading permissions to this folder");
+        m_pWin->statusMsg("You might not have reading permissions to this folder");
         m_pWin->setLineEditInFile(m_fiInFileInfo.absoluteFilePath());
         return;
     }
@@ -160,7 +171,7 @@ void SettingsControllerGui::fileOutChanged(const QString& strOutFile)
 
     if(QString::compare(newfiOutFile.suffix(),QString("fif")) != 0)
     {
-        m_pWin->showMessage("The output file extension must be \".fif\" 0.");
+        m_pWin->statusMsg("The output file extension must be \".fif\" 0.");
         m_pWin->setLineEditOutFile(m_fiOutFileInfo.absoluteFilePath());
         return;
     }
@@ -168,7 +179,7 @@ void SettingsControllerGui::fileOutChanged(const QString& strOutFile)
     QFileInfo outDir(newfiOutFile.absolutePath());
     if(!outDir.isWritable())
     {
-        m_pWin->showMessage("You might not have writing permissions to this folder");
+        m_pWin->winPopup("You might not have writing permissions to this folder");
         m_pWin->setLineEditOutFile(m_fiOutFileInfo.absoluteFilePath());
         return;
     }
@@ -182,7 +193,6 @@ void SettingsControllerGui::fileOutChanged(const QString& strOutFile)
 
 void SettingsControllerGui::setupCommunication()
 {
-
     //from view to controller (to model)
     QObject::connect(m_pWin.data(),&MainWindow::fileInChanged,
                      this,&SettingsControllerGui::fileInChanged);

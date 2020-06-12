@@ -170,8 +170,6 @@ void MainWindow::setDefautlStateUi()
 {
 
     this->setWindowTitle(qApp->organizationName() + " ~ " + qApp->applicationName() + " ~ " + qApp->applicationVersion());
-    m_pUi->statusbar->showMessage("Howdy!",2);
-
     m_pUi->spinBoxMeasurementDateOffset->setEnabled(false);
     m_pUi->spinBoxBirthdayDateOffset->setEnabled(false);
     m_pUi->spinBoxMeasurementDateOffset->setValue(0);
@@ -524,9 +522,9 @@ void MainWindow::checkboxBruteModeChanged()
     emit bruteModeChanged(state);
     if(state)
     {
-        m_pUi->statusbar->showMessage("Brute mode selected",700);
+        statusMsg("Brute mode selected",700);
     } else {
-        m_pUi->statusbar->showMessage("Brute mode deselected",700);
+        statusMsg("Brute mode deselected",700);
     }
 }
 
@@ -573,7 +571,7 @@ void MainWindow::lineEditSubjectHisIdEditingFinished()
     emit subjectHisIdChanged(m_pUi->lineEditSubjectHisId->text());
 }
 
-void MainWindow::showMessage(QString s)
+void MainWindow::winPopup(QString s)
 {
     QMessageBox msgBox;
     msgBox.setText(s);
@@ -581,15 +579,12 @@ void MainWindow::showMessage(QString s)
     return;
 }
 
-void MainWindow::about()
-{
-    QMessageBox::about(this, tr("About Icons"),
-            tr("The <b>Icons</b> example illustrates how Qt renders an icon in "
-               "different modes (active, normal, disabled, and selected) and "
-               "states (on and off) based on a set of images."));
-}
-
 void MainWindow::statusMsg(const QString &s,int to)
 {
-    m_pUi->statusbar->showMessage(s,to);
+    if( to == 0 )
+    {
+        m_pUi->statusbar->showMessage(s);
+    } else {
+        m_pUi->statusbar->showMessage(s,to);
+    }
 }
