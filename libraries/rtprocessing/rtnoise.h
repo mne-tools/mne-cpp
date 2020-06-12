@@ -170,7 +170,7 @@ private:
 
     double m_Fs;
 
-    qint32 m_iFFTlength;
+    qint32 m_iFftLength;
     qint32 m_dataLength;
 
 signals:

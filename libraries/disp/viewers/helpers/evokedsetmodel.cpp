@@ -953,7 +953,7 @@ void doFilterPerChannelRTESet(QPair<QList<FilterKernel>,QPair<int,RowVectorXd> >
 {
     for(int i=0; i < channelDataTime.first.size(); ++i) {
         //channelDataTime.second.second = channelDataTime.first.at(i).applyConvFilter(channelDataTime.second.second, true, FilterKernel::ZeroPad);
-        channelDataTime.second.second = channelDataTime.first.at(i).applyFFTFilter(channelDataTime.second.second, true, FilterKernel::ZeroPad); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
+        channelDataTime.second.second = channelDataTime.first.at(i).applyFftFilter(channelDataTime.second.second, true); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
     }
 }
 

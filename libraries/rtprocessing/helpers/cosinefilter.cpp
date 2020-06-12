@@ -151,7 +151,7 @@ CosineFilter::CosineFilter(int fftLength,
         }
     }
 
-    m_vecFFTCoeff = filterFreqResp;
+    m_vecFftCoeff = filterFreqResp;
 
     //Generate windowed impulse response - invert fft coeeficients to time domain
     Eigen::FFT<double> fft;
@@ -161,13 +161,13 @@ CosineFilter::CosineFilter(int fftLength,
     fft.inv(m_vecCoeff, filterFreqResp);/*
     m_vecCoeff = m_vecCoeff.segment(0,1024).eval();
 
-    //window/zero-pad m_vecCoeff to m_iFFTlength
-    RowVectorXd t_coeffAzeroPad = RowVectorXd::Zero(fftLength);
-    t_coeffAzeroPad.head(m_vecCoeff.cols()) = m_vecCoeff;
+    //window/zero-pad m_vecCoeff to m_iFftLength
+    RowVectorXd vecCoeffZeroPad = RowVectorXd::Zero(fftLength);
+    vecCoeffZeroPad.head(m_vecCoeff.cols()) = m_vecCoeff;
 
     //fft-transform filter coeffs
-    m_vecFFTCoeff = RowVectorXcd::Zero(fftLength);
-    fft.fwd(m_vecFFTCoeff,t_coeffAzeroPad);*/
+    m_vecFftCoeff = RowVectorXcd::Zero(fftLength);
+    fft.fwd(m_vecFftCoeff,vecCoeffZeroPad);*/
 }
 
 //=============================================================================================================

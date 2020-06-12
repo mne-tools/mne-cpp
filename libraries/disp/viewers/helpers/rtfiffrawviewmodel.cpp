@@ -1093,8 +1093,8 @@ void RtFiffRawViewModel::markChBad(QModelIndexList chlist, bool status)
 void RtFiffRawViewModel::doFilterPerChannelRTMSA(QPair<QList<FilterKernel>,QPair<int,RowVectorXd> > &channelDataTime)
 {
     for(int i = 0; i < channelDataTime.first.size(); ++i) {
-        //channelDataTime.second.second = channelDataTime.first.at(i).applyConvFilter(channelDataTime.second.second, true, FilterKernel::ZeroPad);
-        channelDataTime.second.second = channelDataTime.first.at(i).applyFFTFilter(channelDataTime.second.second, true, FilterKernel::ZeroPad); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
+        //channelDataTime.second.second = channelDataTime.first.at(i).applyConvFilter(channelDataTime.second.second, true);
+        channelDataTime.second.second = channelDataTime.first.at(i).applyFftFilter(channelDataTime.second.second, true); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
     }
 }
 

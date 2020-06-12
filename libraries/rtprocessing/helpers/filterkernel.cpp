@@ -75,7 +75,7 @@ using namespace Eigen;
 FilterKernel::FilterKernel()
 : m_Type(UNKNOWN)
 , m_iFilterOrder(80)
-, m_iFFTlength(512)
+, m_iFftLength(512)
 , m_sFilterName("Unknown")
 , m_dParksWidth(0.1)
 , m_designMethod(External)
@@ -106,7 +106,7 @@ FilterKernel::FilterKernel(const QString& sFilterName,
 , m_dBandwidth(dBandwidth)
 , m_dParksWidth(dParkswidth)
 , m_iFilterOrder(iOrder)
-, m_iFFTlength(iFftlength)
+, m_iFftLength(iFftlength)
 , m_sFilterName(sFilterName)
 {
     if(iOrder < 9) {
@@ -124,123 +124,78 @@ void FilterKernel::fftTransformCoeffs()
         fftw_make_planner_thread_safe();
     #endif
 
-    //zero-pad m_vecCoeff to m_iFFTlength
-    RowVectorXd t_coeffAzeroPad = RowVectorXd::Zero(m_iFFTlength);
-    t_coeffAzeroPad.head(m_vecCoeff.cols()) = m_vecCoeff;
+    //zero-pad m_vecCoeff to m_iFftLength
+    RowVectorXd vecCoeffZeroPad = RowVectorXd::Zero(m_iFftLength);
+    vecCoeffZeroPad.head(m_vecCoeff.cols()) = m_vecCoeff;
 
     //generate fft object
     Eigen::FFT<double> fft;
     fft.SetFlag(fft.HalfSpectrum);
 
-    //fft-transform filter coeffs
-    m_vecFFTCoeff = RowVectorXcd::Zero(m_iFFTlength);
-    fft.fwd(m_vecFFTCoeff,t_coeffAzeroPad);
+    //fft-transform filter coeffs.
+    m_vecFftCoeff = RowVectorXcd::Zero(m_iFftLength);
+    fft.fwd(m_vecFftCoeff,vecCoeffZeroPad);
 }
 
 //=============================================================================================================
 
-RowVectorXd FilterKernel::applyConvFilter(const RowVectorXd& data,
-                                          bool keepOverhead,
-                                          CompensateEdgeEffects compensateEdgeEffects) const
+RowVectorXd FilterKernel::applyConvFilter(const RowVectorXd& vecData,
+                                          bool bKeepOverhead) const
 {
-    if(data.cols() < m_vecCoeff.cols() && compensateEdgeEffects == MirrorData){
-        std::cout << QString("Error in FilterKernel: Number of filter taps(%1) bigger then data size(%2). Not enough data to perform mirroring!").arg(m_vecCoeff.cols()).arg(data.cols()).toLocal8Bit().data() << std::endl;
-        return data;
-    }
-
     //Do zero padding or mirroring depending on user input
-    RowVectorXd t_dataZeroPad = RowVectorXd::Zero(2*m_vecCoeff.cols() + data.cols());
-    RowVectorXd t_filteredTime = RowVectorXd::Zero(2*m_vecCoeff.cols() + data.cols());
+    RowVectorXd vecDataZeroPad = RowVectorXd::Zero(2*m_vecCoeff.cols() + vecData.cols());
+    RowVectorXd vecFilteredTime = RowVectorXd::Zero(2*m_vecCoeff.cols() + vecData.cols());
 
-    switch(compensateEdgeEffects) {
-        case MirrorData:
-            t_dataZeroPad.head(m_vecCoeff.cols()) = data.head(m_vecCoeff.cols()).reverse();   //front
-            t_dataZeroPad.segment(m_vecCoeff.cols(), data.cols()) = data;                    //middle
-            t_dataZeroPad.tail(m_vecCoeff.cols()) = data.tail(m_vecCoeff.cols()).reverse();   //back
-            break;
-
-        case ZeroPad:
-            t_dataZeroPad.segment(m_vecCoeff.cols(), data.cols()) = data;
-            break;
-
-        default:
-            t_dataZeroPad.segment(m_vecCoeff.cols(), data.cols()) = data;
-            break;
-    }
+    vecDataZeroPad.segment(m_vecCoeff.cols(), vecData.cols()) = vecData;
 
     //Do the convolution
-    for(int i = m_vecCoeff.cols(); i < t_filteredTime.cols(); i++) {
-        t_filteredTime(i-m_vecCoeff.cols()) = t_dataZeroPad.segment(i-m_vecCoeff.cols(),m_vecCoeff.cols()) * m_vecCoeff.transpose();
+    for(int i = m_vecCoeff.cols(); i < vecFilteredTime.cols(); i++) {
+        vecFilteredTime(i-m_vecCoeff.cols()) = vecDataZeroPad.segment(i-m_vecCoeff.cols(),m_vecCoeff.cols()) * m_vecCoeff.transpose();
     }
 
     //Return filtered data
-    if(!keepOverhead) {
-        return t_filteredTime.segment(m_vecCoeff.cols()/2, data.cols());
+    if(!bKeepOverhead) {
+        return vecFilteredTime.segment(m_vecCoeff.cols()/2, vecData.cols());
     }
 
-    return t_filteredTime.head(data.cols()+m_vecCoeff.cols());
+    return vecFilteredTime.head(vecData.cols()+m_vecCoeff.cols());
 }
 
 //=============================================================================================================
 
-RowVectorXd FilterKernel::applyFFTFilter(const RowVectorXd& data,
-                                         bool keepOverhead,
-                                         CompensateEdgeEffects compensateEdgeEffects) const
+RowVectorXd FilterKernel::applyFftFilter(const RowVectorXd& vecData,
+                                         bool bKeepOverhead) const
 {
     #ifdef EIGEN_FFTW_DEFAULT
         fftw_make_planner_thread_safe();
     #endif
 
-    if((data.cols() < m_vecCoeff.cols()/2) && (compensateEdgeEffects == MirrorData)) {
-        std::cout << QString("[FilterKernel::applyFFTFilter] Number of filter taps(%1) bigger then data size(%2). Not enough data to perform mirroring!").arg(m_vecCoeff.cols()).arg(data.cols()).toLocal8Bit().data() << std::endl;
-        return data;
-    }
-
-    if((m_vecCoeff.cols() + data.cols()) > m_iFFTlength) {
-        std::cout <<"[FilterKernel::applyFFTFilter] Number of mirroring/zeropadding size plus data size is bigger then fft length!" << std::endl;
-        return data;
-    }
-
-    //Do zero padding or mirroring depending on user input
-    RowVectorXd t_dataZeroPad = RowVectorXd::Zero(m_iFFTlength);
-
-    switch(compensateEdgeEffects) {
-        case MirrorData:
-            t_dataZeroPad.head(m_vecCoeff.cols()/2) = data.head(m_vecCoeff.cols()/2).reverse();   //front
-            t_dataZeroPad.segment(m_vecCoeff.cols()/2, data.cols()) = data;                      //middle
-            t_dataZeroPad.tail(m_vecCoeff.cols()/2) = data.tail(m_vecCoeff.cols()/2).reverse();   //back
-            break;
-
-        case ZeroPad:
-            t_dataZeroPad.head(data.cols()) = data;
-            break;
-
-        default:
-            t_dataZeroPad.head(data.cols()) = data;
-            break;
+    if(vecData.cols() > m_iFftLength) {
+        std::cout <<"[FilterKernel::applyFftFilter] Size of output data (data + overlap) is bigger than the FFT length. Returning." << std::endl;
+        return vecData;
     }
 
     //generate fft object
     Eigen::FFT<double> fft;
     fft.SetFlag(fft.HalfSpectrum);
 
-    //fft-transform data sequence
-    RowVectorXcd t_freqData;
-    fft.fwd(t_freqData,t_dataZeroPad);
+    //fft-transform data sequence. Please note: The Eigen FFT does perform zero padding if the data size is < fft length
+    RowVectorXcd vecFreqData;
+    fft.fwd(vecFreqData, vecData, m_iFftLength);
 
     //perform frequency-domain filtering
-    RowVectorXcd t_filteredFreq = m_vecFFTCoeff.array()*t_freqData.array();
+    RowVectorXcd vecFilteredFreq = m_vecFftCoeff.array() * vecFreqData.array();
 
     //inverse-FFT
-    RowVectorXd t_filteredTime;
-    fft.inv(t_filteredTime, t_filteredFreq);
+    RowVectorXd vecFilteredTime;
+    fft.inv(vecFilteredTime, vecFilteredFreq);
 
     //Return filtered data
-    if(!keepOverhead) {
-        return t_filteredTime.segment(m_vecCoeff.cols()/2, data.cols());
+    if(!bKeepOverhead) {
+        return vecFilteredTime.segment(m_vecCoeff.cols()/2, vecData.cols());
     }
 
-    return t_filteredTime.head(data.cols()+m_vecCoeff.cols());
+    return vecFilteredTime.head(vecData.cols()+m_vecCoeff.cols());
 }
 
 //=============================================================================================================
@@ -437,14 +392,14 @@ void FilterKernel::setLowpassFreq(double dLowpassFreq)
 
 int FilterKernel::getFftLength() const
 {
-    return m_iFFTlength;
+    return m_iFftLength;
 }
 
 //=============================================================================================================
 
 void FilterKernel::setFftLength(int dFftLength)
 {
-    m_iFFTlength = dFftLength;
+    m_iFftLength = dFftLength;
 }
 
 //=============================================================================================================
@@ -466,14 +421,14 @@ void FilterKernel::setCoefficients(const Eigen::RowVectorXd& vecCoeff)
 
 Eigen::RowVectorXcd FilterKernel::getFftCoefficients() const
 {
-    return m_vecFFTCoeff;
+    return m_vecFftCoeff;
 }
 
 //=============================================================================================================
 
 void FilterKernel::setFftCoefficients(const Eigen::RowVectorXcd& vecFftCoeff)
 {
-    m_vecFFTCoeff = vecFftCoeff;
+    m_vecFftCoeff = vecFftCoeff;
 }
 
 //=============================================================================================================
@@ -500,7 +455,7 @@ void FilterKernel::designFilter()
 
             switch(m_Type) {
                 case LPF:
-                    filtercos = CosineFilter(m_iFFTlength,
+                    filtercos = CosineFilter(m_iFftLength,
                                              (m_dCenterFreq)*(m_sFreq/2.),
                                              m_dParksWidth*(m_sFreq/2),
                                              (m_dCenterFreq)*(m_sFreq/2),
@@ -511,7 +466,7 @@ void FilterKernel::designFilter()
                     break;
 
                 case HPF:
-                    filtercos = CosineFilter(m_iFFTlength,
+                    filtercos = CosineFilter(m_iFftLength,
                                              (m_dCenterFreq)*(m_sFreq/2),
                                              m_dParksWidth*(m_sFreq/2),
                                              (m_dCenterFreq)*(m_sFreq/2),
@@ -522,7 +477,7 @@ void FilterKernel::designFilter()
                     break;
 
                 case BPF:
-                    filtercos = CosineFilter(m_iFFTlength,
+                    filtercos = CosineFilter(m_iFftLength,
                                              (m_dCenterFreq + m_dBandwidth/2)*(m_sFreq/2),
                                              m_dParksWidth*(m_sFreq/2),
                                              (m_dCenterFreq - m_dBandwidth/2)*(m_sFreq/2),
