@@ -115,22 +115,22 @@ public:
      *
      * @param [in] sFilterName      defines the name of the generated filter
      * @param [in] type             of the filter: LPF, HPF, BPF, NOTCH (from enum FilterType)
-     * @param [in] order            represents the order of the filter, the higher the higher is the stopband attenuation
-     * @param [in] centerfreq       determines the center of the frequency - normed to sFreq/2 (nyquist)
-     * @param [in] bandwidth        ignored if FilterType is set to LPF,HPF. if NOTCH/BPF: bandwidth of stop-/passband - normed to sFreq/2 (nyquist)
-     * @param [in] parkswidth       determines the width of the filter slopes (steepness) - normed to sFreq/2 (nyquist)
-     * @param [in] sFreq            sampling frequency
-     * @param [in] fftlength        length of the fft (multiple integer of 2^x)
+     * @param [in] iOrder            represents the order of the filter, the higher the higher is the stopband attenuation
+     * @param [in] dCenterfreq      determines the center of the frequency - normed to sFreq/2 (nyquist)
+     * @param [in] dBandwidth       ignored if FilterType is set to LPF,HPF. if NOTCH/BPF: bandwidth of stop-/passband - normed to sFreq/2 (nyquist)
+     * @param [in] dParkswidth      determines the width of the filter slopes (steepness) - normed to sFreq/2 (nyquist)
+     * @param [in] dSFreq           sampling frequency
+     * @param [in] iFftLength       length of the fft (multiple integer of 2^x)
      * @param [in] designMethod     specifies the design method to use. Choose between Cosind and Tschebyscheff
      **/
     FilterKernel(const QString &sFilterName,
                  FilterType type,
-                 int order,
-                 double centerfreq,
-                 double bandwidth,
-                 double parkswidth,
-                 double sFreq,
-                 qint32 fftlength = 4096,
+                 int iOrder,
+                 double dCenterfreq,
+                 double dBandwidth,
+                 double dParkswidth,
+                 double dSFreq,
+                 qint32 iFftLength = 4096,
                  DesignMethod designMethod = Cosine);
 
     //=========================================================================================================
@@ -158,8 +158,7 @@ public:
      */
     Eigen::RowVectorXd applyFFTFilter(const Eigen::RowVectorXd& data,
                                       bool keepOverhead = false,
-                                      CompensateEdgeEffects compensateEdgeEffects = MirrorData)
-                                      const;
+                                      CompensateEdgeEffects compensateEdgeEffects = MirrorData) const;
 
     //=========================================================================================================
     /**
@@ -244,7 +243,6 @@ private:
     QString         m_sFilterName;          /**< contains name of the filter. */
 
     Eigen::RowVectorXd     m_vecCoeff;       /**< contains the forward filter coefficient set. */
-
     Eigen::RowVectorXcd    m_vecFFTCoeff;    /**< the FFT-transformed forward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength. */
 };
 

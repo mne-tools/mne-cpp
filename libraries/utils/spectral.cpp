@@ -99,7 +99,7 @@ MatrixXcd Spectral::computeTaperedSpectraRow(const RowVectorXd &vecData,
 QVector<MatrixXcd> Spectral::computeTaperedSpectraMatrix(const MatrixXd &matData,
                                                          const MatrixXd &matTaper,
                                                          int iNfft,
-                                                         bool bUseMultithread)
+                                                         bool bUseThreads)
 {
     #ifdef EIGEN_FFTW_DEFAULT
         fftw_make_planner_thread_safe();
@@ -107,7 +107,7 @@ QVector<MatrixXcd> Spectral::computeTaperedSpectraMatrix(const MatrixXd &matData
 
     QVector<MatrixXcd> finalResult;
 
-    if(!bUseMultithread) {
+    if(!bUseThreads) {
         // Sequential
 //        QElapsedTimer timer;
 //        int iTime = 0;
