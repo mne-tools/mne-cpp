@@ -142,21 +142,21 @@
           </property>
           <layout class="QGridLayout" name="gridLayout">
            <item row="0" column="0">
-            <widget class="QToolButton" name="seeExtraInfoButton_2">
+            <widget class="QToolButton" name="moreInformationButton">
              <property name="text">
               <string>More Information</string>
              </property>
             </widget>
            </item>
            <item row="0" column="4">
-            <widget class="QPushButton" name="pushButton_2">
+            <widget class="QPushButton" name="pushButtonAnonymizeFile">
              <property name="text">
               <string>Anonymize the input file</string>
              </property>
             </widget>
            </item>
            <item row="0" column="2">
-            <widget class="QCheckBox" name="checkBoxBruteMode_2">
+            <widget class="QCheckBox" name="checkBoxExpertMode">
              <property name="text">
               <string>Expert Mode</string>
              </property>
@@ -898,8 +898,8 @@ asdflkasdjf;lasdkjf;laskdjflasdfj</string>
  <tabstops>
   <tabstop>lineEditInFile</tabstop>
   <tabstop>lineEditOutFile</tabstop>
-  <tabstop>pushButton_2</tabstop>
-  <tabstop>checkBoxBruteMode_2</tabstop>
+  <tabstop>pushButtonAnonymizeFile</tabstop>
+  <tabstop>checkBoxExpertMode</tabstop>
   <tabstop>checkBoxBruteMode</tabstop>
   <tabstop>dateTimeMeasurementDate</tabstop>
   <tabstop>checkBoxMeasurementDateOffset</tabstop>
@@ -934,7 +934,7 @@ asdflkasdjf;lasdkjf;laskdjflasdfj</string>
   <tabstop>plainTextEditProjectCommentExtra</tabstop>
   <tabstop>scrollArea</tabstop>
   <tabstop>openInFileWindowButton</tabstop>
-  <tabstop>seeExtraInfoButton_2</tabstop>
+  <tabstop>moreInformationButton</tabstop>
   <tabstop>openOutFileWindowButton</tabstop>
  </tabstops>
  <resources/>
