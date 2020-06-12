@@ -168,6 +168,8 @@ void MainWindow::setDefaultStateExtraInfo()
 
 void MainWindow::setDefautlStateUi()
 {
+
+    this->setWindowTitle(qApp->applicationName() + " ~ " + qApp->organizationName());
 //    QMenu *aboutMenu(m_pUi->menubar->addMenu("&About"));
 //    aboutMenu->addAction(tr("&About"), this, &MainWindow::about);
     //helpMenu->addAction(tr("About &MNE-CPP"), qApp, &QApplication::aboutQt);
