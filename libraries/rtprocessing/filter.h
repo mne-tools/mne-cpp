@@ -142,7 +142,7 @@ public:
     Eigen::MatrixXd filterData(const Eigen::MatrixXd& matDataIn,
                                const QList<RTPROCESSINGLIB::FilterKernel>& lFilterKernel,
                                const Eigen::RowVectorXi& vecPicks = Eigen::RowVectorXi(),
-                               bool bUseThreads = true);
+                               bool bUseThreads = false);
 
 private:
     //=========================================================================================================

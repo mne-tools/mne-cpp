@@ -203,6 +203,12 @@ MatrixXd Filter::filterDataBlock(const MatrixXd& matDataIn,
         }
     }
 
+    // Check for size of data
+    if(matDataIn.cols() < iOrder){
+        qWarning() << QString("[Filter::filterDataBlock] Filter length/order is bigger than data length. Returning.");
+        return matDataIn;
+    }
+
     //Initialise the overlap matrix
     if(m_matOverlap.cols() != iOrder || m_matOverlap.rows() < matDataIn.rows()) {
         m_matOverlap.resize(matDataIn.rows(), iOrder);
