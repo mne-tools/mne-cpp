@@ -444,8 +444,19 @@ void MainWindow::setLabelMriDataFoundVisible(bool b)
 
 void MainWindow::openInFileDialog()
 {
+#ifdef WASMBUILD
+    auto fileContentReady = [&](const QString &filePath, const QByteArray &fileContent) {
+        if(!filePath.isNull()) {
+            // We need to prepend "wasm/" because QFileDialog::getOpenFileContent does not provide a full
+            // path, which we need for organzing the different models in AnalyzeData
+            m_pAnalyzeData->loadModel<FiffRawViewModel>("wasm/"+filePath, fileContent);
+        }
+    };
+    QFileDialog::getOpenFileContent("Fiff File (*.fif *.fiff)",  fileContentReady);
+#else
     QFileDialog dialog(this);
-    dialog.setNameFilter(tr("Fif files (*.fif)"));
+    dialog.setNameFilter(tr("Fiff file (*.fif *.fiff)"));
+    dialog.setDirectory(QDir::currentPath());
     dialog.setViewMode(QFileDialog::Detail);
     dialog.setFileMode(QFileDialog::ExistingFile);
     QStringList fileNames;
@@ -455,11 +466,21 @@ void MainWindow::openInFileDialog()
         setLineEditInFile(fileNames.at(0));
         lineEditInFileEditingFinished();
     }
+#endif
 }
 
 void MainWindow::openOutFileDialog()
 {
+    QFileInfo inFile(m_pUi->lineEditInFile->text());
+    QDir inDir;
+    if(inFile.isFile())
+    {
+        inDir.setPath(inFile.absolutePath());
+    } else {
+        inDir.setPath(QDir::currentPath());
+    }
     QFileDialog dialog(this);
+    dialog.setDirectory(inDir);
     dialog.setViewMode(QFileDialog::Detail);
     QStringList fileNames;
     if (dialog.exec())
