@@ -50,6 +50,7 @@
 #include <QCommandLineOption>
 #include <QRandomGenerator>
 #include <QDir>
+#include <QFileInfo>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -567,4 +568,14 @@ QString SettingsControllerCl::generateDefaultOutputFileName()
                 m_fiInFileInfo.baseName() + "_anonymized." + m_fiInFileInfo.completeSuffix()));
     m_fiOutFileInfo.setFile(fileOut);
     return m_fiOutFileInfo.absoluteFilePath();
+}
+
+QFileInfo SettingsControllerCl::getQFiInFile()
+{
+    return m_fiInFileInfo;
+}
+
+QFileInfo SettingsControllerCl::getQFiOutFile()
+{
+    return m_fiOutFileInfo;
 }
