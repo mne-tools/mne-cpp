@@ -72,7 +72,6 @@ public slots:
 
     void setLabelMriDataFoundVisible(bool);
 
-
 protected:
     void closeEvent(QCloseEvent *event) override;
 
@@ -145,7 +144,7 @@ private:
 //    bool m_bProjectPersonsFound;
 //    bool m_bProjectCommentFound;
 
-    bool m_bHideExtraInfoFields;
+    bool m_bShowExtraInfoFields;
     Ui::MainWindow* m_pUi;
     SettingsControllerGui* m_pController;
 };
