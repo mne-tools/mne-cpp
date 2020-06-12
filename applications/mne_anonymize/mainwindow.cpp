@@ -13,30 +13,7 @@
 using namespace MNEANONYMIZE;
 
 MainWindow::MainWindow(MNEANONYMIZE::SettingsControllerGui *c)
-:
-//  m_bIdFileVersionFound(false)
-//, m_bIdMeasurementDateFound(false)
-//, m_bIdMacAddressFound(false)
-//, m_bFileMeasurementDateFound(false)
-//, m_bFileExperimenterFound(false)
-//, m_bFileCommentFound(false)
-//, m_bSubjectIdFound(false)
-//, m_bSubjectFirstNameFound(false)
-//, m_bSubjectMiddleNameFound(false)
-//, m_bSubjectLastNameFound(false)
-//, m_bSubjectBirthdayFound(false)
-//, m_bSubjectSexFound(false)
-//, m_bSubjectHandFound(false)
-//, m_bSubjectWeightFound(false)
-//, m_bSubjectHeightFound(false)
-//, m_bSubjectCommentFound(false)
-//, m_bSubjectHisIdFound(false)
-//, m_bProjectIdFound(false)
-//, m_bProjectAimFound(false)
-//, m_bProjectNameFound(false)
-//, m_bProjectPersonsFound(false)
-//, m_bProjectCommentFound(false)
-  m_bExtraInfoVisibility(true)
+: m_bExtraInfoVisibility(true)
 , m_pUi(new Ui::MainWindow)
 , m_pController(c)
 {
@@ -253,7 +230,7 @@ void MainWindow::setupConnections()
                      this,&MainWindow::spinBoxBirthdayDateOffsetValueChanged);
 
     QObject::connect(m_pUi->lineEditSubjectHisId,&QLineEdit::editingFinished,
-                     this,&MainWindow::lineEditSubjectHisIdEditingFinished);
+                     this,&MainWindow::lineEditSubjectHisIdEditingFinished);   
 }
 
 
@@ -599,4 +576,21 @@ void MainWindow::setExtraInfoVisibility(bool b)
 {
     m_bExtraInfoVisibility = b;
     emit extraInfoVisibilityChanged(m_bExtraInfoVisibility);
+}
+
+void MainWindow::resizeEvent(QResizeEvent* event)
+{
+
+    Q_UNUSED(event)
+    checkSmallGui();
+    statusMsg("width: " + QString::number(m_pUi->centralwidget->width()));
+}
+
+void MainWindow::checkSmallGui()
+{
+    if( m_pUi->lineEditInFile->width() < 500)
+    {
+        QFileInfo inFile(m_pUi->lineEditInFile->text());
+        m_pUi->lineEditInFile->setText("(...)/" + inFile.fileName());
+    }
 }

@@ -124,29 +124,9 @@ private:
 
     void idMeasurementDateChanged();
 
+    void resizeEvent(QResizeEvent* event) override;
 
-//    bool m_bIdFileVersionFound;
-//    bool m_bIdMeasurementDateFound;
-//    bool m_bIdMacAddressFound;
-//    bool m_bFileMeasurementDateFound;
-//    bool m_bFileExperimenterFound;
-//    bool m_bFileCommentFound;
-//    bool m_bSubjectIdFound;
-//    bool m_bSubjectFirstNameFound;
-//    bool m_bSubjectMiddleNameFound;
-//    bool m_bSubjectLastNameFound;
-//    bool m_bSubjectBirthdayFound;
-//    bool m_bSubjectSexFound;
-//    bool m_bSubjectHandFound;
-//    bool m_bSubjectWeightFound;
-//    bool m_bSubjectHeightFound;
-//    bool m_bSubjectCommentFound;
-//    bool m_bSubjectHisIdFound;
-//    bool m_bProjectIdFound;
-//    bool m_bProjectAimFound;
-//    bool m_bProjectNameFound;
-//    bool m_bProjectPersonsFound;
-//    bool m_bProjectCommentFound;
+    void checkSmallGui();
 
     bool m_bExtraInfoVisibility;
     Ui::MainWindow* m_pUi;
