@@ -118,110 +118,23 @@ FilterKernel::FilterKernel(const QString& sFilterName,
 
 //=============================================================================================================
 
-void FilterKernel::designFilter()
-{
-    switch(m_designMethod) {
-        case Tschebyscheff: {
-            ParksMcClellan filter(m_iFilterOrder,
-                                  m_dCenterFreq,
-                                  m_dBandwidth,
-                                  m_dParksWidth,
-                                  static_cast<ParksMcClellan::TPassType>(m_Type));
-            m_dCoeffA = filter.FirCoeff;
-
-            //fft-transform m_dCoeffA in order to be able to perform frequency-domain filtering
-            fftTransformCoeffs();
-
-            break;
-        }
-
-        case Cosine: {
-            CosineFilter filtercos;
-
-            switch(m_Type) {
-                case LPF:
-                    filtercos = CosineFilter(m_iFFTlength,
-                                             (m_dCenterFreq)*(m_sFreq/2.),
-                                             m_dParksWidth*(m_sFreq/2),
-                                             (m_dCenterFreq)*(m_sFreq/2),
-                                             m_dParksWidth*(m_sFreq/2),
-                                             m_sFreq,
-                                             (CosineFilter::TPassType)m_Type);
-
-                    break;
-
-                case HPF:
-                    filtercos = CosineFilter(m_iFFTlength,
-                                             (m_dCenterFreq)*(m_sFreq/2),
-                                             m_dParksWidth*(m_sFreq/2),
-                                             (m_dCenterFreq)*(m_sFreq/2),
-                                             m_dParksWidth*(m_sFreq/2),
-                                             m_sFreq,
-                                             (CosineFilter::TPassType)m_Type);
-
-                    break;
-
-                case BPF:
-                    filtercos = CosineFilter(m_iFFTlength,
-                                             (m_dCenterFreq + m_dBandwidth/2)*(m_sFreq/2),
-                                             m_dParksWidth*(m_sFreq/2),
-                                             (m_dCenterFreq - m_dBandwidth/2)*(m_sFreq/2),
-                                             m_dParksWidth*(m_sFreq/2),
-                                             m_sFreq,
-                                             (CosineFilter::TPassType)m_Type);
-
-                    break;
-            }
-
-            //This filter is designed in the frequency domain, hence the time domain impulse response need to be shortend by the users dependent number of taps
-            m_dCoeffA.resize(m_iFilterOrder);
-            m_dCoeffA.head(m_iFilterOrder/2) = filtercos.m_dCoeffA.tail(m_iFilterOrder/2);
-            m_dCoeffA.tail(m_iFilterOrder/2) = filtercos.m_dCoeffA.head(m_iFilterOrder/2);
-
-            //Now generate the fft version of the shortened impulse response
-            fftTransformCoeffs();
-
-            break;
-        }
-    }
-
-    switch(m_Type) {
-        case LPF:
-            m_dLowpassFreq = 0;
-            m_dHighpassFreq = m_dCenterFreq*(m_sFreq/2);
-        break;
-
-        case HPF:
-            m_dLowpassFreq = m_dCenterFreq*(m_sFreq/2);
-            m_dHighpassFreq = 0;
-        break;
-
-        case BPF:
-            m_dLowpassFreq = (m_dCenterFreq + m_dBandwidth/2)*(m_sFreq/2);
-            m_dHighpassFreq = (m_dCenterFreq - m_dBandwidth/2)*(m_sFreq/2);
-        break;
-    }
-}
-
-//=============================================================================================================
-
 void FilterKernel::fftTransformCoeffs()
 {
     #ifdef EIGEN_FFTW_DEFAULT
         fftw_make_planner_thread_safe();
     #endif
 
-    //zero-pad m_dCoeffA to m_iFFTlength
+    //zero-pad m_vecCoeff to m_iFFTlength
     RowVectorXd t_coeffAzeroPad = RowVectorXd::Zero(m_iFFTlength);
-    t_coeffAzeroPad.head(m_dCoeffA.cols()) = m_dCoeffA;
+    t_coeffAzeroPad.head(m_vecCoeff.cols()) = m_vecCoeff;
 
     //generate fft object
     Eigen::FFT<double> fft;
     fft.SetFlag(fft.HalfSpectrum);
 
     //fft-transform filter coeffs
-    m_dFFTCoeffA = RowVectorXcd::Zero(m_iFFTlength);
-    fft.fwd(m_dFFTCoeffA,t_coeffAzeroPad);
+    m_vecFFTCoeff = RowVectorXcd::Zero(m_iFFTlength);
+    fft.fwd(m_vecFFTCoeff,t_coeffAzeroPad);
 }
 
 //=============================================================================================================
@@ -230,42 +143,42 @@ RowVectorXd FilterKernel::applyConvFilter(const RowVectorXd& data,
                                           bool keepOverhead,
                                           CompensateEdgeEffects compensateEdgeEffects) const
 {
-    if(data.cols() < m_dCoeffA.cols() && compensateEdgeEffects == MirrorData){
-        std::cout << QString("Error in FilterKernel: Number of filter taps(%1) bigger then data size(%2). Not enough data to perform mirroring!").arg(m_dCoeffA.cols()).arg(data.cols()).toLocal8Bit().data() << std::endl;
+    if(data.cols() < m_vecCoeff.cols() && compensateEdgeEffects == MirrorData){
+        std::cout << QString("Error in FilterKernel: Number of filter taps(%1) bigger then data size(%2). Not enough data to perform mirroring!").arg(m_vecCoeff.cols()).arg(data.cols()).toLocal8Bit().data() << std::endl;
         return data;
     }
 
     //Do zero padding or mirroring depending on user input
-    RowVectorXd t_dataZeroPad = RowVectorXd::Zero(2*m_dCoeffA.cols() + data.cols());
-    RowVectorXd t_filteredTime = RowVectorXd::Zero(2*m_dCoeffA.cols() + data.cols());
+    RowVectorXd t_dataZeroPad = RowVectorXd::Zero(2*m_vecCoeff.cols() + data.cols());
+    RowVectorXd t_filteredTime = RowVectorXd::Zero(2*m_vecCoeff.cols() + data.cols());
 
     switch(compensateEdgeEffects) {
         case MirrorData:
-            t_dataZeroPad.head(m_dCoeffA.cols()) = data.head(m_dCoeffA.cols()).reverse();   //front
-            t_dataZeroPad.segment(m_dCoeffA.cols(), data.cols()) = data;                    //middle
-            t_dataZeroPad.tail(m_dCoeffA.cols()) = data.tail(m_dCoeffA.cols()).reverse();   //back
+            t_dataZeroPad.head(m_vecCoeff.cols()) = data.head(m_vecCoeff.cols()).reverse();   //front
+            t_dataZeroPad.segment(m_vecCoeff.cols(), data.cols()) = data;                    //middle
+            t_dataZeroPad.tail(m_vecCoeff.cols()) = data.tail(m_vecCoeff.cols()).reverse();   //back
             break;
 
         case ZeroPad:
-            t_dataZeroPad.segment(m_dCoeffA.cols(), data.cols()) = data;
+            t_dataZeroPad.segment(m_vecCoeff.cols(), data.cols()) = data;
             break;
 
         default:
-            t_dataZeroPad.segment(m_dCoeffA.cols(), data.cols()) = data;
+            t_dataZeroPad.segment(m_vecCoeff.cols(), data.cols()) = data;
             break;
     }
 
     //Do the convolution
-    for(int i = m_dCoeffA.cols(); i < t_filteredTime.cols(); i++) {
-        t_filteredTime(i-m_dCoeffA.cols()) = t_dataZeroPad.segment(i-m_dCoeffA.cols(),m_dCoeffA.cols()) * m_dCoeffA.transpose();
+    for(int i = m_vecCoeff.cols(); i < t_filteredTime.cols(); i++) {
+        t_filteredTime(i-m_vecCoeff.cols()) = t_dataZeroPad.segment(i-m_vecCoeff.cols(),m_vecCoeff.cols()) * m_vecCoeff.transpose();
     }
 
     //Return filtered data
     if(!keepOverhead) {
-        return t_filteredTime.segment(m_dCoeffA.cols()/2, data.cols());
+        return t_filteredTime.segment(m_vecCoeff.cols()/2, data.cols());
     }
 
-    return t_filteredTime.head(data.cols()+m_dCoeffA.cols());
+    return t_filteredTime.head(data.cols()+m_vecCoeff.cols());
 }
 
 //=============================================================================================================
@@ -278,12 +191,12 @@ RowVectorXd FilterKernel::applyFFTFilter(const RowVectorXd& data,
         fftw_make_planner_thread_safe();
     #endif
 
-    if((data.cols() < m_dCoeffA.cols()/2) && (compensateEdgeEffects == MirrorData)) {
-        std::cout << QString("[FilterKernel::applyFFTFilter] Number of filter taps(%1) bigger then data size(%2). Not enough data to perform mirroring!").arg(m_dCoeffA.cols()).arg(data.cols()).toLocal8Bit().data() << std::endl;
+    if((data.cols() < m_vecCoeff.cols()/2) && (compensateEdgeEffects == MirrorData)) {
+        std::cout << QString("[FilterKernel::applyFFTFilter] Number of filter taps(%1) bigger then data size(%2). Not enough data to perform mirroring!").arg(m_vecCoeff.cols()).arg(data.cols()).toLocal8Bit().data() << std::endl;
         return data;
     }
 
-    if((m_dCoeffA.cols() + data.cols()) > m_iFFTlength) {
+    if((m_vecCoeff.cols() + data.cols()) > m_iFFTlength) {
         std::cout <<"[FilterKernel::applyFFTFilter] Number of mirroring/zeropadding size plus data size is bigger then fft length!" << std::endl;
         return data;
     }
@@ -293,9 +206,9 @@ RowVectorXd FilterKernel::applyFFTFilter(const RowVectorXd& data,
 
     switch(compensateEdgeEffects) {
         case MirrorData:
-            t_dataZeroPad.head(m_dCoeffA.cols()/2) = data.head(m_dCoeffA.cols()/2).reverse();   //front
-            t_dataZeroPad.segment(m_dCoeffA.cols()/2, data.cols()) = data;                      //middle
-            t_dataZeroPad.tail(m_dCoeffA.cols()/2) = data.tail(m_dCoeffA.cols()/2).reverse();   //back
+            t_dataZeroPad.head(m_vecCoeff.cols()/2) = data.head(m_vecCoeff.cols()/2).reverse();   //front
+            t_dataZeroPad.segment(m_vecCoeff.cols()/2, data.cols()) = data;                      //middle
+            t_dataZeroPad.tail(m_vecCoeff.cols()/2) = data.tail(m_vecCoeff.cols()/2).reverse();   //back
             break;
 
         case ZeroPad:
@@ -316,7 +229,7 @@ RowVectorXd FilterKernel::applyFFTFilter(const RowVectorXd& data,
     fft.fwd(t_freqData,t_dataZeroPad);
 
     //perform frequency-domain filtering
-    RowVectorXcd t_filteredFreq = m_dFFTCoeffA.array()*t_freqData.array();
+    RowVectorXcd t_filteredFreq = m_vecFFTCoeff.array()*t_freqData.array();
 
     //inverse-FFT
     RowVectorXd t_filteredTime;
@@ -324,10 +237,10 @@ RowVectorXd FilterKernel::applyFFTFilter(const RowVectorXd& data,
 
     //Return filtered data
     if(!keepOverhead) {
-        return t_filteredTime.segment(m_dCoeffA.cols()/2, data.cols());
+        return t_filteredTime.segment(m_vecCoeff.cols()/2, data.cols());
     }
 
-    return t_filteredTime.head(data.cols()+m_dCoeffA.cols());
+    return t_filteredTime.head(data.cols()+m_vecCoeff.cols());
 }
 
 //=============================================================================================================
@@ -406,4 +319,246 @@ FilterKernel::FilterType FilterKernel::getFilterTypeForString(const QString &fil
         filterType = FilterKernel::NOTCH;
 
     return filterType;
+}
+
+//=============================================================================================================
+
+QString FilterKernel::getName() const
+{
+    return m_sFilterName;
+}
+
+//=============================================================================================================
+
+void FilterKernel::setName(const QString& sFilterName)
+{
+    m_sFilterName = sFilterName;
+}
+
+//=============================================================================================================
+
+double FilterKernel::getSamplingFrequency() const
+{
+    return m_sFreq;
+}
+
+//=============================================================================================================
+
+void FilterKernel::setSamplingFrequency(double dSFreq)
+{
+    m_sFreq = dSFreq;
+}
+
+//=============================================================================================================
+
+int FilterKernel::getFilterOrder() const
+{
+    return m_iFilterOrder;
+}
+
+//=============================================================================================================
+
+void FilterKernel::setFilterOrder(int iOrder)
+{
+    m_iFilterOrder = iOrder;
+}
+
+//=============================================================================================================
+
+double FilterKernel::getCenterFrequency() const
+{
+    return m_dCenterFreq;
+}
+
+//=============================================================================================================
+
+void FilterKernel::setCenterFrequency(double dCenterFreq)
+{
+    m_dCenterFreq = dCenterFreq;
+}
+
+//=============================================================================================================
+
+double FilterKernel::getBandwidth() const
+{
+    return m_dBandwidth;
+}
+
+//=============================================================================================================
+
+void FilterKernel::setBandwidth(double dBandwidth)
+{
+    m_dBandwidth = dBandwidth;
+}
+
+//=============================================================================================================
+
+double FilterKernel::getParksWidth() const
+{
+    return m_dParksWidth;
+}
+
+//=============================================================================================================
+
+void FilterKernel::setParksWidth(double dParksWidth)
+{
+    m_dParksWidth = dParksWidth;
+}
+
+//=============================================================================================================
+
+double FilterKernel::getHighpassFreq() const
+{
+    return m_dHighpassFreq;
+}
+
+//=============================================================================================================
+
+void FilterKernel::setHighpassFreq(double dHighpassFreq)
+{
+    m_dHighpassFreq = dHighpassFreq;
+}
+
+//=============================================================================================================
+
+double FilterKernel::getLowpassFreq() const
+{
+    return m_dLowpassFreq;
+}
+
+//=============================================================================================================
+
+void FilterKernel::setLowpassFreq(double dLowpassFreq)
+{
+    m_dLowpassFreq = dLowpassFreq;
+}
+
+//=============================================================================================================
+
+int FilterKernel::getFftLength() const
+{
+    return m_iFFTlength;
+}
+
+//=============================================================================================================
+
+void FilterKernel::setFftLength(int dFftLength)
+{
+    m_iFFTlength = dFftLength;
+}
+
+//=============================================================================================================
+
+Eigen::RowVectorXd FilterKernel::getCoefficients() const
+{
+    return m_vecCoeff;
+}
+
+//=============================================================================================================
+
+void FilterKernel::setCoefficients(const Eigen::RowVectorXd& vecCoeff)
+{
+    m_vecCoeff = vecCoeff;
+    fftTransformCoeffs();
+}
+
+//=============================================================================================================
+
+Eigen::RowVectorXcd FilterKernel::getFftCoefficients() const
+{
+    return m_vecFFTCoeff;
+}
+
+//=============================================================================================================
+
+void FilterKernel::setFftCoefficients(const Eigen::RowVectorXcd& vecFftCoeff)
+{
+    m_vecFFTCoeff = vecFftCoeff;
+}
+
+//=============================================================================================================
+
+void FilterKernel::designFilter()
+{
+    switch(m_designMethod) {
+        case Tschebyscheff: {
+            ParksMcClellan filter(m_iFilterOrder,
+                                  m_dCenterFreq,
+                                  m_dBandwidth,
+                                  m_dParksWidth,
+                                  static_cast<ParksMcClellan::TPassType>(m_Type));
+            m_vecCoeff = filter.FirCoeff;
+
+            //fft-transform m_vecCoeff in order to be able to perform frequency-domain filtering
+            fftTransformCoeffs();
+
+            break;
+        }
+
+        case Cosine: {
+            CosineFilter filtercos;
+
+            switch(m_Type) {
+                case LPF:
+                    filtercos = CosineFilter(m_iFFTlength,
+                                             (m_dCenterFreq)*(m_sFreq/2.),
+                                             m_dParksWidth*(m_sFreq/2),
+                                             (m_dCenterFreq)*(m_sFreq/2),
+                                             m_dParksWidth*(m_sFreq/2),
+                                             m_sFreq,
+                                             (CosineFilter::TPassType)m_Type);
+
+                    break;
+
+                case HPF:
+                    filtercos = CosineFilter(m_iFFTlength,
+                                             (m_dCenterFreq)*(m_sFreq/2),
+                                             m_dParksWidth*(m_sFreq/2),
+                                             (m_dCenterFreq)*(m_sFreq/2),
+                                             m_dParksWidth*(m_sFreq/2),
+                                             m_sFreq,
+                                             (CosineFilter::TPassType)m_Type);
+
+                    break;
+
+                case BPF:
+                    filtercos = CosineFilter(m_iFFTlength,
+                                             (m_dCenterFreq + m_dBandwidth/2)*(m_sFreq/2),
+                                             m_dParksWidth*(m_sFreq/2),
+                                             (m_dCenterFreq - m_dBandwidth/2)*(m_sFreq/2),
+                                             m_dParksWidth*(m_sFreq/2),
+                                             m_sFreq,
+                                             (CosineFilter::TPassType)m_Type);
+
+                    break;
+            }
+
+            //This filter is designed in the frequency domain, hence the time domain impulse response need to be shortend by the users dependent number of taps
+            m_vecCoeff.resize(m_iFilterOrder);
+            m_vecCoeff.head(m_iFilterOrder/2) = filtercos.m_vecCoeff.tail(m_iFilterOrder/2);
+            m_vecCoeff.tail(m_iFilterOrder/2) = filtercos.m_vecCoeff.head(m_iFilterOrder/2);
+
+            //Now generate the fft version of the shortened impulse response
+            fftTransformCoeffs();
+
+            break;
+        }
+    }
+
+    switch(m_Type) {
+        case LPF:
+            m_dLowpassFreq = 0;
+            m_dHighpassFreq = m_dCenterFreq*(m_sFreq/2);
+        break;
+
+        case HPF:
+            m_dLowpassFreq = m_dCenterFreq*(m_sFreq/2);
+            m_dHighpassFreq = 0;
+        break;
+
+        case BPF:
+            m_dLowpassFreq = (m_dCenterFreq + m_dBandwidth/2)*(m_sFreq/2);
+            m_dHighpassFreq = (m_dCenterFreq - m_dBandwidth/2)*(m_sFreq/2);
+        break;
+    }
 }

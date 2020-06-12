@@ -129,17 +129,17 @@ MatrixXd Filter::filterData(const MatrixXd& matDataIn,
         return matDataOut;
     }
 
-    int iOrder = lFilterKernel.first().m_iFilterOrder;
+    int iOrder = lFilterKernel.first().getFilterOrder();
     for(int i = 0; i < lFilterKernel.size(); ++i) {
-        if(lFilterKernel.at(i).m_iFilterOrder > iOrder) {
-            iOrder = lFilterKernel.at(i).m_iFilterOrder;
+        if(lFilterKernel.at(i).getFilterOrder() > iOrder) {
+            iOrder = lFilterKernel.at(i).getFilterOrder();
         }
     }
 
-    int iFFTLength = lFilterKernel.first().m_iFFTlength;
+    int iFFTLength = lFilterKernel.first().getFftLength();
     for(int i = 0; i < lFilterKernel.size(); ++i) {
-        if(lFilterKernel.at(i).m_iFFTlength > iFFTLength) {
-            iFFTLength = lFilterKernel.at(i).m_iFFTlength;
+        if(lFilterKernel.at(i).getFftLength() > iFFTLength) {
+            iFFTLength = lFilterKernel.at(i).getFftLength();
         }
     }
 
@@ -207,10 +207,10 @@ MatrixXd Filter::filterDataBlock(const MatrixXd& matDataIn,
         return matDataOut;
     }
 
-    int iOrder = lFilterKernel.first().m_iFilterOrder;
+    int iOrder = lFilterKernel.first().getFilterOrder();
     for(int i = 0; i < lFilterKernel.size(); ++i) {
-        if(lFilterKernel.at(i).m_iFilterOrder > iOrder) {
-            iOrder = lFilterKernel.at(i).m_iFilterOrder;
+        if(lFilterKernel.at(i).getFilterOrder() > iOrder) {
+            iOrder = lFilterKernel.at(i).getFilterOrder();
         }
     }
     std::cout << "Filter::filterDataBlock 1" << std::endl;

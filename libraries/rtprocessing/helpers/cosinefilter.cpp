@@ -151,23 +151,23 @@ CosineFilter::CosineFilter(int fftLength,
         }
     }
 
-    m_dFFTCoeffA = filterFreqResp;
+    m_vecFFTCoeff = filterFreqResp;
 
     //Generate windowed impulse response - invert fft coeeficients to time domain
     Eigen::FFT<double> fft;
     fft.SetFlag(fft.HalfSpectrum);
 
     //invert to time domain and
-    fft.inv(m_dCoeffA, filterFreqResp);/*
-    m_dCoeffA = m_dCoeffA.segment(0,1024).eval();
+    fft.inv(m_vecCoeff, filterFreqResp);/*
+    m_vecCoeff = m_vecCoeff.segment(0,1024).eval();
 
-    //window/zero-pad m_dCoeffA to m_iFFTlength
+    //window/zero-pad m_vecCoeff to m_iFFTlength
     RowVectorXd t_coeffAzeroPad = RowVectorXd::Zero(fftLength);
-    t_coeffAzeroPad.head(m_dCoeffA.cols()) = m_dCoeffA;
+    t_coeffAzeroPad.head(m_vecCoeff.cols()) = m_vecCoeff;
 
     //fft-transform filter coeffs
-    m_dFFTCoeffA = RowVectorXcd::Zero(fftLength);
-    fft.fwd(m_dFFTCoeffA,t_coeffAzeroPad);*/
+    m_vecFFTCoeff = RowVectorXcd::Zero(fftLength);
+    fft.fwd(m_vecFFTCoeff,t_coeffAzeroPad);*/
 }
 
 //=============================================================================================================

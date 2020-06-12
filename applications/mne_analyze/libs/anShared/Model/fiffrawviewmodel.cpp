@@ -624,7 +624,7 @@ bool FiffRawViewModel::isFilterActive() const
 int FiffRawViewModel::getFilterLength() const
 {
     if(!m_filterKernel.isEmpty()) {
-        return m_filterKernel.first().m_iFilterOrder;
+        return m_filterKernel.first().getFilterOrder();
     }
 }
 

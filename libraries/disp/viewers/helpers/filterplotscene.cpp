@@ -86,7 +86,7 @@ void FilterPlotScene::updateFilter(const FilterKernel& operatorFilter,
                                    int cutOffLow,
                                    int cutOffHigh)
 {
-    if(operatorFilter.m_dCoeffA.cols() == 0)
+    if(operatorFilter.getCoefficients().cols() == 0)
         return;
 
     m_pCurrentFilter = operatorFilter;
@@ -102,7 +102,7 @@ void FilterPlotScene::updateFilter(const FilterKernel& operatorFilter,
     plotFilterFrequencyResponse();
 
     //Plot the magnitude diagram
-    plotMagnitudeDiagram(samplingFreq, operatorFilter.m_sFilterName);
+    plotMagnitudeDiagram(samplingFreq, operatorFilter.getName());
 }
 
 //=============================================================================================================
@@ -113,7 +113,7 @@ void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq,
     //Get row vector with filter coefficients
     int numberCoeff = m_iPlotLength;
 
-//    RowVectorXcd coefficientsAFreq = m_pCurrentFilter.m_dFFTCoeffA;
+//    RowVectorXcd coefficientsAFreq = m_pCurrentFilter.m_vecFFTCoeff;
 //    if(coefficientsAFreq.cols() > 2000) {//if to large downsample
 //        int dsFactor = coefficientsAFreq.cols()/2000;
 //        numberCoeff = coefficientsAFreq.cols()/dsFactor;
@@ -211,7 +211,7 @@ void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq,
 void FilterPlotScene::plotFilterFrequencyResponse()
 {
     //Get row vector with filter coefficients and norm to 1
-    RowVectorXcd coefficientsAFreq = m_pCurrentFilter.m_dFFTCoeffA;
+    RowVectorXcd coefficientsAFreq = m_pCurrentFilter.getFftCoefficients();
 
     float numberCoeff = coefficientsAFreq.cols();
     float dsFactor = numberCoeff/2000.0f;

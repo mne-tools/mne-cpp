@@ -135,18 +135,6 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief fftTransformCoeffs transforms the calculated filter coefficients to frequency-domain
-     */
-    void fftTransformCoeffs();
-
-    //=========================================================================================================
-    /**
-     * @brief designFilter designs the actual filter with the given parameters
-     */
-    void designFilter();
-
-    //=========================================================================================================
-    /**
      * Applies the current filter to the input data using convolution in time domain. Pro: Uses only past samples (real-time capable) Con: Might not be as ideal as acausal version (steepness etc.)
      *
      * @param [in] data             holds the data to be filtered
@@ -197,6 +185,52 @@ public:
      */
     static FilterKernel::FilterType getFilterTypeForString(const QString& filerTypeString);
 
+    QString getName() const;
+    void setName(const QString& sFilterName);
+
+    double getSamplingFrequency() const;
+    void setSamplingFrequency(double dSFreq);
+
+    int getFilterOrder() const;
+    void setFilterOrder(int iOrder);
+
+    double getCenterFrequency() const;
+    void setCenterFrequency(double dCenterFreq);
+
+    double getBandwidth() const;
+    void setBandwidth(double dBandwidth);
+
+    double getParksWidth() const;
+    void setParksWidth(double dParksWidth);
+
+    double getHighpassFreq() const;
+    void setHighpassFreq(double dHighpassFreq);
+
+    double getLowpassFreq() const;
+    void setLowpassFreq(double dLowpassFreq);
+
+    int getFftLength() const;
+    void setFftLength(int dFftLength);
+
+    Eigen::RowVectorXd getCoefficients() const;
+    void setCoefficients(const Eigen::RowVectorXd& vecCoeff);
+
+    Eigen::RowVectorXcd getFftCoefficients() const;
+    void setFftCoefficients(const Eigen::RowVectorXcd& vecFftCoeff);
+
+private:
+    //=========================================================================================================
+    /**
+     * @brief fftTransformCoeffs transforms the calculated filter coefficients to frequency-domain
+     */
+    void fftTransformCoeffs();
+
+    //=========================================================================================================
+    /**
+     * @brief designFilter designs the actual filter with the given parameters
+     */
+    void designFilter();
+
     double          m_sFreq;                /**< the sampling frequency. */
     double          m_dCenterFreq;          /**< contains center freq of the filter. */
     double          m_dBandwidth;           /**< contains bandwidth of the filter. */
@@ -209,11 +243,9 @@ public:
 
     QString         m_sFilterName;          /**< contains name of the filter. */
 
-    Eigen::RowVectorXd     m_dCoeffA;       /**< contains the forward filter coefficient set. */
-    Eigen::RowVectorXd     m_dCoeffB;       /**< contains the backward filter coefficient set (empty if FIR filter). */
+    Eigen::RowVectorXd     m_vecCoeff;       /**< contains the forward filter coefficient set. */
 
-    Eigen::RowVectorXcd    m_dFFTCoeffA;    /**< the FFT-transformed forward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength. */
-    Eigen::RowVectorXcd    m_dFFTCoeffB;    /**< the FFT-transformed backward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength. */
+    Eigen::RowVectorXcd    m_vecFFTCoeff;    /**< the FFT-transformed forward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength. */
 };
 
 //=============================================================================================================
