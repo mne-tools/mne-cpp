@@ -436,6 +436,14 @@ FIFFLIB::FiffInfo* FiffRawViewModel::getFiffInfo() const
 
 //=============================================================================================================
 
+QSharedPointer<FIFFLIB::FiffInfo> FiffRawViewModel::getFiffInfo(bool bPlaceholder) const
+{
+    Q_UNUSED(bPlaceholder);
+    return m_pFiffInfo;
+}
+
+//=============================================================================================================
+
 void FiffRawViewModel::setScaling(const QMap< qint32,float >& p_qMapChScaling)
 {
     beginResetModel();

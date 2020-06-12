@@ -63,7 +63,9 @@ namespace ANSHAREDLIB {
 
 namespace DISPLIB {
     class AveragingSettingsView;
+    class ChannelSelectionView;
     class AverageLayoutView;
+    class ChannelInfoModel;
     class EvokedSetModel;
     class ButterflyView;
 }
@@ -192,6 +194,8 @@ private:
 
     void onCheckBoxStateChanged();
 
+    void loadFullGUI();
+
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals */
 
     QSharedPointer<ANSHAREDLIB::FiffRawViewModel>           m_pFiffRawModel;            /**< Pointer to currently loaded FiffRawView Model */
@@ -200,6 +204,9 @@ private:
     QSharedPointer<FIFFLIB::FiffEvokedSet>                  m_pFiffEvokedSet;
     QSharedPointer<Ave>                                     m_pAve;                     /**< Averaging Object */
     QSharedPointer<DISPLIB::EvokedSetModel>                 m_pEvokedModel;
+    QSharedPointer<DISPLIB::ChannelSelectionView>           m_pChannelSelectionView;
+
+    QSharedPointer<DISPLIB::ChannelInfoModel>               m_pChannelInfoModel;
 
     DISPLIB::AveragingSettingsView*                         m_pAveragingSettingsView;
 
@@ -207,7 +214,7 @@ private:
     QPointer<DISPLIB::AverageLayoutView>                    m_pAverageLayoutView;   /**< The average layout plot view */
 
 
-    FIFFLIB::FiffInfo::SPtr                                 m_pFiffInfo;
+    QSharedPointer<FIFFLIB::FiffInfo>                       m_pFiffInfo;
 
     int                                                     m_iNumAve;
     int                                                     m_iBaselineFrom;
@@ -215,6 +222,8 @@ private:
 
     float                                                   m_fPreStim;
     float                                                   m_fPostStim;
+
+    QVBoxLayout*                                            m_pLayout;
 
     bool m_bUseAnn;
 

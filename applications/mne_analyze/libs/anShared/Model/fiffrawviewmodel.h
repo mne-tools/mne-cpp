@@ -303,6 +303,16 @@ public:
 
     //=========================================================================================================
     /**
+     * @brief getFiffInfo
+     *
+     * @param [in] bPlaceholder
+     *
+     * @return
+     */
+    QSharedPointer<FIFFLIB::FiffInfo> getFiffInfo(bool bPlaceholder) const;
+
+    //=========================================================================================================
+    /**
      * Returns the kind of channel at the given row index
      *
      * @param[in] index     index of the row we are requesting the kind
