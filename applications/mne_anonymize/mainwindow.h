@@ -43,9 +43,6 @@ public:
 
     void statusMsg(const QString s, int to = 0);
 
-    bool getExtraInfoVisibility();
-    void setExtraInfoVisibility(bool b);
-
 signals:
     void fileInChanged(const QString& s) const;
     void fileOutChanged(const QString& s) const;
@@ -57,8 +54,8 @@ signals:
     void useBirthdayOffset(bool f) const;
     void birthdayOffsetChanged(int o) const;
     void subjectHisIdChanged(const QString& text) const;
-    void extraInfoVisibilityChanged(bool b);
     void showOptionsChanged(bool b);
+    void readInputDataButtonClicked();
 
 public slots:
     void winPopup(QString s);
@@ -100,8 +97,8 @@ private slots:
     void checkBoxMeasurementDateOffsetStateChanged(int arg);
     void checkBoxBirthdayDateOffsetStateChanged(int arg);
 
-    void lineEditInFileEditingFinished();
-    void lineEditOutFileEditingFinished();
+    void inFileEditingFinished();
+    void outFileEditingFinished();
 
     void dateTimeMeasurementDateDateTimeChanged(const QDateTime &dateTime);
     void spinBoxMeasurementDateOffsetValueChanged(int arg1);
@@ -112,8 +109,6 @@ private slots:
     void openInFileDialog();
 
     void openOutFileDialog();
-
-    void showExtraInfoClicked ();
 
     void helpButtonClicked();
 
@@ -133,7 +128,6 @@ private:
     void checkSmallGui();
 
     bool m_bOptionsVisibility;
-    bool m_bExtraInfoVisibility;
 
     QFileInfo m_fiInFile;
     QFileInfo m_fiOutFile;

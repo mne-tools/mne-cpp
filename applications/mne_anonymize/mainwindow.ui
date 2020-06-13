@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>560</width>
-    <height>223</height>
+    <width>666</width>
+    <height>666</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -24,6 +24,12 @@
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
+  </property>
+  <property name="accessibleName">
+   <string>mne_anonymize</string>
+  </property>
+  <property name="accessibleDescription">
+   <string>Fiff anonymizer application of the MNE-CPP project.</string>
   </property>
   <property name="documentMode">
    <bool>false</bool>
@@ -59,6 +65,9 @@
       <property name="verticalScrollBarPolicy">
        <enum>Qt::ScrollBarAsNeeded</enum>
       </property>
+      <property name="sizeAdjustPolicy">
+       <enum>QAbstractScrollArea::AdjustToContents</enum>
+      </property>
       <property name="widgetResizable">
        <bool>true</bool>
       </property>
@@ -67,8 +76,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>532</width>
-         <height>586</height>
+         <width>638</width>
+         <height>611</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -159,33 +168,10 @@
            <enum>QFrame::Raised</enum>
           </property>
           <layout class="QGridLayout" name="gridLayout">
-           <item row="0" column="0">
-            <widget class="QToolButton" name="moreInfoButton">
-             <property name="minimumSize">
-              <size>
-               <width>55</width>
-               <height>25</height>
-              </size>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">font:13pt;</string>
-             </property>
-             <property name="text">
-              <string>Help</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="4">
+           <item row="0" column="6">
             <widget class="QPushButton" name="pushButtonAnonymizeFile">
              <property name="text">
-              <string>Anonymize the input file</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="2">
-            <widget class="QCheckBox" name="checkBoxShowOptions">
-             <property name="text">
-              <string>Show Options</string>
+              <string>Save Output File</string>
              </property>
             </widget>
            </item>
@@ -204,6 +190,49 @@
            </item>
            <item row="0" column="3">
             <spacer name="horizontalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="0" column="0">
+            <widget class="QToolButton" name="moreInfoButton">
+             <property name="minimumSize">
+              <size>
+               <width>55</width>
+               <height>25</height>
+              </size>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">font:13pt;</string>
+             </property>
+             <property name="text">
+              <string>Help</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="4">
+            <widget class="QPushButton" name="pushButtonReadData">
+             <property name="text">
+              <string>Read Input File</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2">
+            <widget class="QCheckBox" name="checkBoxShowOptions">
+             <property name="text">
+              <string>Show Options</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="5">
+            <spacer name="horizontalSpacer_3">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
@@ -275,80 +304,10 @@
               <enum>QFrame::Raised</enum>
              </property>
              <layout class="QGridLayout" name="gridLayout_3">
-              <item row="7" column="0">
-               <widget class="QDateTimeEdit" name="dateTimeBirthdayDate"/>
-              </item>
-              <item row="5" column="0">
-               <widget class="QSpinBox" name="spinBoxMeasurementDateOffset">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>60</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-               </widget>
-              </item>
               <item row="1" column="0">
                <widget class="QCheckBox" name="checkBoxBruteMode">
                 <property name="text">
                  <string>Brute mode</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="0">
-               <widget class="QLabel" name="labelMeasDate_2">
-                <property name="maximumSize">
-                 <size>
-                  <width>16777215</width>
-                  <height>20</height>
-                 </size>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true">font:14pt;</string>
-                </property>
-                <property name="text">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Options Menu&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item row="11" column="0">
-               <widget class="QLineEdit" name="lineEditSubjectHisId"/>
-              </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="labelMeasDate">
-                <property name="maximumSize">
-                 <size>
-                  <width>16777215</width>
-                  <height>20</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Measurement date&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-               </widget>
-              </item>
-              <item row="12" column="0">
-               <widget class="QToolButton" name="seeExtraInfoButton">
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>8</height>
-                 </size>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true">font: 12pt;</string>
-                </property>
-                <property name="text">
-                 <string>Show info in the input file</string>
                 </property>
                </widget>
               </item>
@@ -362,43 +321,6 @@
                 </property>
                 <property name="text">
                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Subject &amp;quot;his_id&amp;quot;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-               </widget>
-              </item>
-              <item row="6" column="0">
-               <widget class="QLabel" name="labelSubjectBirthday">
-                <property name="maximumSize">
-                 <size>
-                  <width>16777215</width>
-                  <height>20</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Subject birthday&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-               </widget>
-              </item>
-              <item row="4" column="0">
-               <widget class="QCheckBox" name="checkBoxMeasurementDateOffset">
-                <property name="text">
-                 <string>Measurement date offset</string>
-                </property>
-               </widget>
-              </item>
-              <item row="9" column="0">
-               <widget class="QSpinBox" name="spinBoxBirthdayDateOffset">
-                <property name="maximumSize">
-                 <size>
-                  <width>60</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-               </widget>
-              </item>
-              <item row="8" column="0">
-               <widget class="QCheckBox" name="checkBoxBirthdayDateOffset">
-                <property name="text">
-                 <string>Subject birthday offset</string>
                 </property>
                </widget>
               </item>
@@ -422,6 +344,97 @@
                 </property>
                </widget>
               </item>
+              <item row="4" column="0">
+               <widget class="QCheckBox" name="checkBoxMeasurementDateOffset">
+                <property name="text">
+                 <string>Measurement date offset</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QLabel" name="labelMeasDate_2">
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>20</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">font:14pt;</string>
+                </property>
+                <property name="text">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Options Menu&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="6" column="0">
+               <widget class="QLabel" name="labelSubjectBirthday">
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>20</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Subject birthday&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+               </widget>
+              </item>
+              <item row="11" column="0">
+               <widget class="QLineEdit" name="lineEditSubjectHisId"/>
+              </item>
+              <item row="9" column="0">
+               <widget class="QSpinBox" name="spinBoxBirthdayDateOffset">
+                <property name="maximumSize">
+                 <size>
+                  <width>60</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="0">
+               <widget class="QSpinBox" name="spinBoxMeasurementDateOffset">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>60</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="labelMeasDate">
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>20</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Measurement date&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+               </widget>
+              </item>
+              <item row="8" column="0">
+               <widget class="QCheckBox" name="checkBoxBirthdayDateOffset">
+                <property name="text">
+                 <string>Subject birthday offset</string>
+                </property>
+               </widget>
+              </item>
+              <item row="7" column="0">
+               <widget class="QDateTimeEdit" name="dateTimeBirthdayDate"/>
+              </item>
              </layout>
              <zorder>checkBoxBirthdayDateOffset</zorder>
              <zorder>labelSubjectHisId</zorder>
@@ -435,7 +448,6 @@
              <zorder>spinBoxBirthdayDateOffset</zorder>
              <zorder>checkBoxBruteMode</zorder>
              <zorder>labelMeasDate_2</zorder>
-             <zorder>seeExtraInfoButton</zorder>
             </widget>
            </item>
            <item>
@@ -679,28 +691,6 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="9" column="2">
-                   <widget class="QPlainTextEdit" name="plainTextEditSubjectCommentExtra">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>0</width>
-                      <height>30</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>400</width>
-                      <height>92</height>
-                     </size>
-                    </property>
-                   </widget>
-                  </item>
                   <item row="1" column="0" colspan="2">
                    <widget class="QLabel" name="labelSubjectFirstNameExtra">
                     <property name="text">
@@ -757,6 +747,12 @@
                   </item>
                   <item row="11" column="0" colspan="3">
                    <widget class="QLabel" name="labelSubjectMriDataFoundExtra">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>21</height>
+                     </size>
+                    </property>
                     <property name="maximumSize">
                      <size>
                       <width>16777215</width>
@@ -776,6 +772,9 @@
                   </item>
                   <item row="6" column="2">
                    <widget class="QComboBox" name="comboBoxSubjectHandExtra"/>
+                  </item>
+                  <item row="9" column="2">
+                   <widget class="QLineEdit" name="lineEditSubjectCommentExtra"/>
                   </item>
                  </layout>
                 </widget>
@@ -920,7 +919,6 @@
   <tabstop>comboBoxSubjectHandExtra</tabstop>
   <tabstop>doubleSpinBoxSubjectWeightExtra</tabstop>
   <tabstop>doubleSpinBoxSubjectHeightExtra</tabstop>
-  <tabstop>plainTextEditSubjectCommentExtra</tabstop>
   <tabstop>lineEditSubjectHisIdExtra</tabstop>
   <tabstop>spinBoxProjectIDExtra</tabstop>
   <tabstop>lineEditProjectAimExtra</tabstop>
