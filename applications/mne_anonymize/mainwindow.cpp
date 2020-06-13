@@ -91,7 +91,7 @@ void MainWindow::setDefautlStateUi()
 
     m_pUi->dateTimeFileMeasurementDateExtra->setReadOnly(true);
 
-    m_pUi->lineEditExperimenterExtra->setReadOnly(true);
+    m_pUi->lineEditFileExperimenterExtra->setReadOnly(true);
     m_pUi->plainTextFileCommentExtra->setReadOnly(true);
 
     m_pUi->spinBoxSubjectIDExtra->setReadOnly(true);
@@ -121,7 +121,7 @@ void MainWindow::setDefaultStateExtraInfo()
 
     m_pUi->dateTimeFileMeasurementDateExtra->clear();
 
-    m_pUi->lineEditExperimenterExtra->clear();
+    m_pUi->lineEditFileExperimenterExtra->clear();
     m_pUi->plainTextFileCommentExtra->clear();
 
     m_pUi->spinBoxSubjectIDExtra->clear();
@@ -152,7 +152,7 @@ void MainWindow::setDefaultStateExtraInfo()
     m_pUi->dateTimeFileMeasurementDateExtra->setEnabled(false);
 
     m_pUi->plainTextFileCommentExtra->setEnabled(false);
-    m_pUi->lineEditExperimenterExtra->setEnabled(false);
+    m_pUi->lineEditFileExperimenterExtra->setEnabled(false);
 
     m_pUi->spinBoxSubjectIDExtra->setEnabled(false);
     m_pUi->lineEditSubjectFirstNameExtra->setEnabled(false);
@@ -198,11 +198,34 @@ void MainWindow::setDefaultStateExtraInfo()
     m_pUi->labelOutFile->setToolTip("Output anonymized file. By default a \"_anonymized\" suffix is added to the name of the input file.");
     m_pUi->lineEditOutFile->setToolTip("Output anonymized file. By default a \"_anonymized\" suffix is added to the name of the input file.");
     m_pUi->openOutFileWindowButton->setToolTip("Select a folder or a file where to save the output anonymized fif file.");
+
+    m_pUi->lineEditIdFileVersionExtra->setToolTip("This value is not modified. It is shown for completion.");
+    m_pUi->lineEditIdMACAddressExtra->setToolTip("MAC address of the main acquisition system. Substitution value: 00:00:00:00:00:00:00:00");
+    m_pUi->dateTimeIdMeasurementDateExtra->setToolTip("Default substitution value: 01/01/2000 00:01:01");
+    m_pUi->dateTimeFileMeasurementDateExtra->setToolTip("Default substitution value: 01/01/2000 00:01:01");
+    m_pUi->lineEditFileExperimenterExtra->setToolTip("Default substitution value: mne_anonymize");
+    m_pUi->plainTextFileCommentExtra->setToolTip("Default substitution value: mne_anonymize");
+    m_pUi->spinBoxSubjectIDExtra->setToolTip("Default substitution value: 0");
+    m_pUi->lineEditSubjectFirstNameExtra->setToolTip("Default substitution value: mne_anonymize");
+    m_pUi->lineEditSubjectMiddleNameExtra->setToolTip("Default substitution value: mne-cpp");
+    m_pUi->lineEditSubjectLastNameExtra->setToolTip("Default substitution value: mne_anonyze");
+    m_pUi->dateTimeBirthdayDate->setToolTip("Default substitution value: 01/01/2000 00:01:01");
+    m_pUi->spinBoxBirthdayDateOffset->setToolTip("Default substitution value: 0");
+    m_pUi->plainTextEditSubjectCommentExtra->setToolTip("Default substitution value: mne_anonymize");
+    m_pUi->comboBoxSubjectSexExtra->setToolTip("Default substitution value: unknown");
+    m_pUi->comboBoxSubjectHandExtra->setToolTip("Default substitution value: unknown");
+    m_pUi->doubleSpinBoxSubjectWeightExtra->setToolTip("Default substitution value: 0.0");
+    m_pUi->doubleSpinBoxSubjectHeightExtra->setToolTip("Default substitution value: 0.0");
+    m_pUi->lineEditSubjectHisIdExtra->setToolTip("Default substitution value: mne_anonymize");
+    m_pUi->spinBoxProjectIDExtra->setToolTip("Default substitution value: 0");
+    m_pUi->lineEditProjectNameExtra->setToolTip("Default substitution value: mne_anonymize");
+    m_pUi->lineEditProjectAimExtra->setToolTip("Default substitution value: mne_anonymize");
+    m_pUi->lineEditProjectPersonsExtra->setToolTip("Default substitution value: mne_anonymize");
+    m_pUi->plainTextEditProjectCommentExtra->setToolTip("Default substitution value: mne_anonymize");
 }
 
 void MainWindow::setupConnections()
 {
-
     QObject::connect(m_pUi->seeExtraInfoButton,&QToolButton::clicked,
                      this,&MainWindow::showExtraInfoClicked);
     QObject::connect(m_pUi->checkBoxShowOptions,&QCheckBox::stateChanged,
@@ -328,8 +351,8 @@ void MainWindow::setLineEditFileComment(QString c)
 
 void MainWindow::setLineEditFileExperimenter(QString e)
 {
-    m_pUi->lineEditExperimenterExtra->setEnabled(true);
-    m_pUi->lineEditExperimenterExtra->setText(e);
+    m_pUi->lineEditFileExperimenterExtra->setEnabled(true);
+    m_pUi->lineEditFileExperimenterExtra->setText(e);
 }
 
 void MainWindow::setLineEditSubjectId(int i)
@@ -563,7 +586,7 @@ void MainWindow::winPopup(QString s)
     return;
 }
 
-void MainWindow::statusMsg(const QString &s,int to)
+void MainWindow::statusMsg(const QString s,int to)
 {
     m_pUi->statusbar->showMessage(s,to);
 }
@@ -592,7 +615,7 @@ void MainWindow::resizeEvent(QResizeEvent* event)
 
 void MainWindow::checkSmallGui()
 {
-    int criticalWidth(250);
+    int criticalWidth(350);
 
     if( !m_pUi->lineEditInFile->text().isEmpty())
     {
