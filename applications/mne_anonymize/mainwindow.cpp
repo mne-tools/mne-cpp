@@ -14,7 +14,6 @@ using namespace MNEANONYMIZE;
 
 MainWindow::MainWindow(MNEANONYMIZE::SettingsControllerGui *c)
 : m_bOptionsVisibility(false)
-, m_bExtraInfoVisibility(false)
 , m_pUi(new Ui::MainWindow)
 , m_pController(c)
 {
@@ -41,25 +40,27 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 bool MainWindow::confirmClose()
 {
-    const QMessageBox::StandardButton ret
-            = QMessageBox::warning(this, tr("Application"),
-                                   tr("Are you sure you want to exit?\n"),
-                                   QMessageBox::Yes | QMessageBox::Cancel);
-    switch (ret) {
-    case QMessageBox::Yes:
-        return true;
-    case QMessageBox::Cancel:
-        return false;
-    default:
-        break;
-    }
-    return false;
+    return true;
+//    const QMessageBox::StandardButton ret
+//            = QMessageBox::warning(this, tr("Application"),
+//                                   tr("Are you sure you want to exit?\n"),
+//                                   QMessageBox::Yes | QMessageBox::Cancel);
+//    switch (ret) {
+//    case QMessageBox::Yes:
+//        return true;
+//    case QMessageBox::Cancel:
+//        return false;
+//    default:
+//        break;
+//    }
+//    return false;
 }
 
 void MainWindow::setDefautlStateUi()
 {
-
     this->setWindowTitle(qApp->organizationName() + " ~ " + qApp->applicationName() + " ~ " + qApp->applicationVersion());
+
+    resize(666,222);
 
     if(m_bOptionsVisibility)
     {
@@ -67,15 +68,13 @@ void MainWindow::setDefautlStateUi()
     } else {
         m_pUi->checkBoxShowOptions->setCheckState(Qt::Unchecked);
     }
-    m_pUi->frameOptions->setVisible(m_bOptionsVisibility);
-    m_pUi->frameOptionsAndExtraInfo->setVisible(m_bOptionsVisibility);
 
+    m_pUi->frameOptionsAndExtraInfo->setVisible(m_bOptionsVisibility);
+    m_pUi->pushButtonReadData->setVisible(m_bOptionsVisibility);
     m_pUi->spinBoxMeasurementDateOffset->setEnabled(false);
     m_pUi->spinBoxBirthdayDateOffset->setEnabled(false);
     m_pUi->spinBoxMeasurementDateOffset->setValue(0);
     m_pUi->spinBoxBirthdayDateOffset->setValue(0);
-
-    m_pUi->frameExtraInfo->setVisible(m_bExtraInfoVisibility);
 
     m_pUi->comboBoxSubjectSexExtra->addItems(QStringList() << "Unknown" << "Male" << "Female");
     m_pUi->comboBoxSubjectSexExtra->setCurrentIndex(0);
@@ -101,7 +100,7 @@ void MainWindow::setDefautlStateUi()
     m_pUi->dateEditSubjectBirthdayExtra->setReadOnly(true);
     m_pUi->doubleSpinBoxSubjectWeightExtra->setReadOnly(true);
     m_pUi->doubleSpinBoxSubjectHeightExtra->setReadOnly(true);
-    m_pUi->plainTextEditSubjectCommentExtra->setReadOnly(true);
+    m_pUi->lineEditSubjectCommentExtra->setReadOnly(true);
     m_pUi->lineEditSubjectHisIdExtra->setReadOnly(true);
 
     m_pUi->labelSubjectMriDataFoundExtra->setVisible(false);
@@ -111,6 +110,55 @@ void MainWindow::setDefautlStateUi()
     m_pUi->lineEditProjectNameExtra->setReadOnly(true);
     m_pUi->lineEditProjectPersonsExtra->setReadOnly(true);
     m_pUi->plainTextEditProjectCommentExtra->setReadOnly(true);
+
+    //tooltips
+    m_pUi->checkBoxShowOptions->setToolTip("Show the options menu.");
+    m_pUi->checkBoxBruteMode->setToolTip("Advanced anonymization. Anonymize also weight, height and some other fields. See Help.");
+    m_pUi->labelMeasDate->setToolTip("Specify the measurement date.");
+    m_pUi->dateTimeMeasurementDate->setToolTip("Specify the measurement date.");
+    m_pUi->checkBoxMeasurementDateOffset->setToolTip("Specify number of days to subtract to the measurement.");
+    m_pUi->spinBoxMeasurementDateOffset->setToolTip("Specify number of days to subtract to the measurement.");
+
+    m_pUi->labelSubjectBirthday->setToolTip("Specify the subject’s birthday.");
+    m_pUi->dateTimeBirthdayDate->setToolTip("Specify the subject’s birthday.");
+    m_pUi->checkBoxBirthdayDateOffset->setToolTip("Specify a number of to subtract from the subject's birthday.");
+    m_pUi->spinBoxBirthdayDateOffset->setToolTip("Specify a number of to subtract from the subject's birthday.");
+
+    m_pUi->labelSubjectHisId->setToolTip("Specify the Subject’s ID within the Hospital system.");
+    m_pUi->lineEditSubjectHisId->setToolTip("Specify the Subject’s ID within the Hospital system.");
+
+    m_pUi->moreInfoButton->setToolTip("See the MNE-CPP project's web for this application.");
+    m_pUi->pushButtonAnonymizeFile->setToolTip("Anonymize the input file.");
+    m_pUi->labelInFile->setToolTip("File to anonymize");
+    m_pUi->lineEditInFile->setToolTip("File to anonymize.");
+    m_pUi->openInFileWindowButton->setToolTip("Select a file to anonymize.");
+    m_pUi->labelOutFile->setToolTip("Output anonymized file. By default a \"_anonymized\" suffix is added to the name of the input file.");
+    m_pUi->lineEditOutFile->setToolTip("Output anonymized file. By default a \"_anonymized\" suffix is added to the name of the input file.");
+    m_pUi->openOutFileWindowButton->setToolTip("Select a folder or a file where to save the output anonymized fif file.");
+
+    m_pUi->lineEditIdFileVersionExtra->setToolTip("This value is not modified. It is shown for completion.");
+    m_pUi->lineEditIdMACAddressExtra->setToolTip("MAC address of the main acquisition system. Substitution value: 00:00:00:00:00:00:00:00");
+    m_pUi->dateTimeIdMeasurementDateExtra->setToolTip("Default substitution value: 01/01/2000 00:01:01");
+    m_pUi->dateTimeFileMeasurementDateExtra->setToolTip("Default substitution value: 01/01/2000 00:01:01");
+    m_pUi->lineEditFileExperimenterExtra->setToolTip("Default substitution value: mne_anonymize");
+    m_pUi->plainTextFileCommentExtra->setToolTip("Default substitution value: mne_anonymize");
+    m_pUi->spinBoxSubjectIDExtra->setToolTip("Default substitution value: 0");
+    m_pUi->lineEditSubjectFirstNameExtra->setToolTip("Default substitution value: mne_anonymize");
+    m_pUi->lineEditSubjectMiddleNameExtra->setToolTip("Default substitution value: mne-cpp");
+    m_pUi->lineEditSubjectLastNameExtra->setToolTip("Default substitution value: mne_anonyze");
+    m_pUi->dateTimeBirthdayDate->setToolTip("Default substitution value: 01/01/2000 00:01:01");
+    m_pUi->spinBoxBirthdayDateOffset->setToolTip("Default substitution value: 0");
+    m_pUi->lineEditSubjectCommentExtra->setToolTip("Default substitution value: mne_anonymize");
+    m_pUi->comboBoxSubjectSexExtra->setToolTip("Default substitution value: unknown");
+    m_pUi->comboBoxSubjectHandExtra->setToolTip("Default substitution value: unknown");
+    m_pUi->doubleSpinBoxSubjectWeightExtra->setToolTip("Default substitution value: 0.0");
+    m_pUi->doubleSpinBoxSubjectHeightExtra->setToolTip("Default substitution value: 0.0");
+    m_pUi->lineEditSubjectHisIdExtra->setToolTip("Default substitution value: mne_anonymize");
+    m_pUi->spinBoxProjectIDExtra->setToolTip("Default substitution value: 0");
+    m_pUi->lineEditProjectNameExtra->setToolTip("Default substitution value: mne_anonymize");
+    m_pUi->lineEditProjectAimExtra->setToolTip("Default substitution value: mne_anonymize");
+    m_pUi->lineEditProjectPersonsExtra->setToolTip("Default substitution value: mne_anonymize");
+    m_pUi->plainTextEditProjectCommentExtra->setToolTip("Default substitution value: mne_anonymize");
 }
 
 void MainWindow::setDefaultStateExtraInfo()
@@ -134,7 +182,7 @@ void MainWindow::setDefaultStateExtraInfo()
     m_pUi->comboBoxSubjectHandExtra->setCurrentIndex(0);
     m_pUi->doubleSpinBoxSubjectWeightExtra->clear();
     m_pUi->doubleSpinBoxSubjectHeightExtra->clear();
-    m_pUi->plainTextEditSubjectCommentExtra->clear();
+    m_pUi->lineEditSubjectCommentExtra->clear();
     m_pUi->lineEditSubjectHisIdExtra->clear();
 
     m_pUi->labelSubjectMriDataFoundExtra->setVisible(false);
@@ -163,7 +211,7 @@ void MainWindow::setDefaultStateExtraInfo()
     m_pUi->comboBoxSubjectHandExtra->setEnabled(false);
     m_pUi->doubleSpinBoxSubjectWeightExtra->setEnabled(false);
     m_pUi->doubleSpinBoxSubjectHeightExtra->setEnabled(false);
-    m_pUi->plainTextEditSubjectCommentExtra->setEnabled(false);
+    m_pUi->lineEditSubjectCommentExtra->setEnabled(false);
     m_pUi->lineEditSubjectHisIdExtra->setEnabled(false);
 
     m_pUi->labelSubjectMriDataFoundExtra->setVisible(false);
