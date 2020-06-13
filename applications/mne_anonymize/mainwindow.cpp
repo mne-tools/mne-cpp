@@ -239,9 +239,9 @@ void MainWindow::setupConnections()
                      this,&MainWindow::helpButtonClicked);
 
     QObject::connect(m_pUi->lineEditInFile,&QLineEdit::editingFinished,
-                     this,&MainWindow::lineEditInFileEditingFinished);
+                     this,&MainWindow::inFileEditingFinished);
     QObject::connect(m_pUi->lineEditOutFile,&QLineEdit::editingFinished,
-                     this,&MainWindow::lineEditOutFileEditingFinished);
+                     this,&MainWindow::outFileEditingFinished);
 
     QObject::connect(m_pUi->openInFileWindowButton,&QToolButton::clicked,
                      this,&MainWindow::openInFileDialog);
@@ -319,7 +319,6 @@ void MainWindow::setSubjectHis(const QString& h)
 
 
 //public slots for extra information
-
 void MainWindow::setLineEditIdFileVersion(double v)
 {
     m_pUi->lineEditIdFileVersionExtra->setEnabled(true);
@@ -414,8 +413,8 @@ void MainWindow::setLineEditSubjectHeight(float h)
 
 void MainWindow::setLineEditSubjectComment(QString c)
 {
-    m_pUi->plainTextEditSubjectCommentExtra->setEnabled(true);
-    m_pUi->plainTextEditSubjectCommentExtra->setPlainText(c);
+    m_pUi->lineEditSubjectCommentExtra->setEnabled(true);
+    m_pUi->lineEditSubjectCommentExtra->setText(c);
 }
 
 void MainWindow::setLineEditSubjectHisId(QString his)
@@ -481,7 +480,7 @@ void MainWindow::openInFileDialog()
     {
         fileNames = dialog.selectedFiles();
         setLineEditInFile(fileNames.at(0));
-        lineEditInFileEditingFinished();
+        inFileEditingFinished();
     }
 #endif
 }
@@ -504,7 +503,7 @@ void MainWindow::openOutFileDialog()
     {
         fileNames = dialog.selectedFiles();
         setLineEditOutFile(fileNames.at(0));
-        lineEditOutFileEditingFinished();
+        outFileEditingFinished();
     }
 }
 
@@ -514,12 +513,12 @@ void MainWindow::helpButtonClicked()
                                QUrl::TolerantMode) );
 }
 
-void MainWindow::lineEditInFileEditingFinished()
+void MainWindow::inFileEditingFinished()
 {
     emit fileInChanged(m_fiInFile.absoluteFilePath());
 }
 
-void MainWindow::lineEditOutFileEditingFinished()
+void MainWindow::outFileEditingFinished()
 {
     emit fileOutChanged(m_fiOutFile.absoluteFilePath());
 }
@@ -530,9 +529,9 @@ void MainWindow::checkBoxBruteModeChanged()
     emit bruteModeChanged(state);
     if(state)
     {
-        statusMsg("Brute mode selected",700);
+        statusMsg("Brute mode selected",2000);
     } else {
-        statusMsg("Brute mode deselected",700);
+        statusMsg("Brute mode deselected",2000);
     }
 }
 
@@ -543,6 +542,12 @@ void MainWindow::checkBoxMeasurementDateOffsetStateChanged(int arg)
     m_pUi->spinBoxMeasurementDateOffset->setEnabled(state);
     emit useMeasurementOffset(state);
     m_pUi->dateTimeMeasurementDate->setEnabled(!state);
+    if(state)
+    {
+        statusMsg("Specify a measurement date offset.",2000);
+    } else {
+        statusMsg("Specify the measurement date.",2000);
+    }
 }
 
 void MainWindow::checkBoxBirthdayDateOffsetStateChanged(int arg)
@@ -552,6 +557,12 @@ void MainWindow::checkBoxBirthdayDateOffsetStateChanged(int arg)
     m_pUi->spinBoxBirthdayDateOffset->setEnabled(state);
     emit useBirthdayOffset(state);
     m_pUi->dateTimeBirthdayDate->setEnabled(!state);
+    if(state)
+    {
+        statusMsg("Specify a subject's birthday offset.",2000);
+    } else {
+        statusMsg("Specify the subject's birthday.",2000);
+    }
 }
 
 void MainWindow::dateTimeMeasurementDateDateTimeChanged(const QDateTime &dateTime)
@@ -589,26 +600,12 @@ void MainWindow::winPopup(QString s)
 
 void MainWindow::statusMsg(const QString s,int to)
 {
-    m_pUi->statusbar->showMessage(s,to);
-}
-
-bool MainWindow::getExtraInfoVisibility()
-{
-    return m_bExtraInfoVisibility;
-}
-
-void MainWindow::setExtraInfoVisibility(bool b)
-{
-    if(m_bExtraInfoVisibility != b)
-    {
-        m_bExtraInfoVisibility = b;
-        emit extraInfoVisibilityChanged(m_bExtraInfoVisibility);
-    }
+    QString ss(s);
+    m_pUi->statusbar->showMessage(ss,to);
 }
 
 void MainWindow::resizeEvent(QResizeEvent* event)
 {
-
     Q_UNUSED(event)
     checkSmallGui();
 //    statusMsg("width: " + QString::number(m_pUi->centralwidget->width()));
@@ -639,19 +636,20 @@ void MainWindow::checkSmallGui()
     }
 }
 
-
-void MainWindow::showExtraInfoClicked()
-{
-    m_bExtraInfoVisibility = !m_bExtraInfoVisibility;
-    m_pUi->frameExtraInfo->setVisible(m_bExtraInfoVisibility);
-    emit extraInfoVisibilityChanged(m_bExtraInfoVisibility);
-}
-
 void MainWindow::checkBoxShowOptionsChanged()
 {
     m_bOptionsVisibility = m_pUi->checkBoxShowOptions->isChecked();
-    m_pUi->frameOptions->setVisible(m_bOptionsVisibility);
-    m_pUi->frameExtraInfo->setVisible(m_bExtraInfoVisibility);
     m_pUi->frameOptionsAndExtraInfo->setVisible(m_bOptionsVisibility);
-    emit showOptionsChanged(m_bOptionsVisibility);
+    m_pUi->pushButtonReadData->setVisible(m_bOptionsVisibility);
+
+    if(m_bOptionsVisibility)
+    {
+        if(height() < 666)
+        {
+            resize(width(),666);
+        }
+    } else {
+        if(height() > 222)
+            resize(width(),222);
+    }
 }
