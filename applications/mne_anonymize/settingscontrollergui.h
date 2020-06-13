@@ -88,23 +88,18 @@ public:
     * Constructs a SettingsControllerGUI object.
     */
     explicit SettingsControllerGui(const QStringList& arguments);
+
 public slots:
     void fileInChanged(const QString& strInFile);
     void fileOutChanged(const QString& strOutFile);
-
-    void readData();
-
     void executeAnonymizer();
 
 private:
+    void readData();
     void initializeOptionsState();
     void setupCommunication();
-    void setInputFileInformationVisible(bool b);
-
-signals:
 
 private:
-    bool m_bInputFileInformationVisible;
     QSharedPointer<MainWindow> m_pWin;
 };
 

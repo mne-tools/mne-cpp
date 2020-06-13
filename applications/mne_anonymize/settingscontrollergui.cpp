@@ -77,9 +77,9 @@ SettingsControllerGui::SettingsControllerGui(const QStringList& arguments)
     initializeOptionsState();
 
     m_pWin->show();
-    m_bInputFileInformationVisible = m_pWin->getExtraInfoVisibility();
+//    m_bInputFileInformationVisible = m_pWin->getExtraInfoVisibility();
 
-    readData();
+//    readData();
     QString msg("Mellow greetings!");
     m_pWin->statusMsg(msg,2000);
 }
@@ -93,16 +93,15 @@ void SettingsControllerGui::executeAnonymizer()
 
 void SettingsControllerGui::readData()
 {
-    if(m_pAnonymizer->isFileInSet() && m_bInputFileInformationVisible)
+    if(m_pAnonymizer->isFileInSet())
     {
-        QString msg("Reading input File information...");
-        m_pWin->statusMsg(msg);
         QString stringTempDir(QStandardPaths::writableLocation(QStandardPaths::TempLocation));
         QString fileOutStr(QDir(stringTempDir).filePath(generateRandomFileName()));
         m_pAnonymizer->setFileOut(fileOutStr);
         m_pWin->setDefaultStateExtraInfo();
         bool verboseMode(m_pAnonymizer->getVerboseMode());
         m_pAnonymizer->setVerboseMode(false);
+        m_pWin->statusMsg("Reading input File information...");
         m_pAnonymizer->anonymizeFile();
         QFile fileOut(fileOutStr);
         fileOut.remove();
@@ -110,6 +109,8 @@ void SettingsControllerGui::readData()
         m_pAnonymizer->setVerboseMode(verboseMode);
         QString msg2("Input file information read correctly.");
         m_pWin->statusMsg(msg2,2000);
+    } else {
+        m_pWin->winPopup("Please select a valid input file first.");
     }
 }
 
@@ -142,13 +143,9 @@ void SettingsControllerGui::fileInChanged(const QString& strInFile)
         m_fiInFileInfo.setFile(newfiInFile.absoluteFilePath());
         m_pAnonymizer->setFileIn(m_fiInFileInfo.absoluteFilePath());
 
-        if( m_fiInFileInfo.isFile() && m_fiInFileInfo.isReadable())
-        {
-            readData();
-        }
-    generateDefaultOutputFileName();
-    m_pWin->setLineEditInFile(m_fiInFileInfo.absoluteFilePath());
-    m_pWin->setLineEditOutFile(m_fiOutFileInfo.absoluteFilePath());
+        generateDefaultOutputFileName();
+        m_pWin->setLineEditInFile(m_fiInFileInfo.absoluteFilePath());
+        m_pWin->setLineEditOutFile(m_fiOutFileInfo.absoluteFilePath());
     }
 }
 
@@ -188,14 +185,13 @@ void SettingsControllerGui::fileOutChanged(const QString& strOutFile)
 
 void SettingsControllerGui::setupCommunication()
 {
-    //from view to controller (to model)
+    //view to controller
     QObject::connect(m_pWin.data(),&MainWindow::fileInChanged,
                      this,&SettingsControllerGui::fileInChanged);
     QObject::connect(m_pWin.data(),&MainWindow::fileOutChanged,
                      this,&SettingsControllerGui::fileOutChanged);
-    QObject::connect(m_pWin.data(),&MainWindow::extraInfoVisibilityChanged,
-                     this,&SettingsControllerGui::setInputFileInformationVisible);
-
+    QObject::connect(m_pWin.data(),&MainWindow::readInputDataButtonClicked,
+                     this,&SettingsControllerGui::readData);
 
     //from view to model
     QObject::connect(m_pWin.data(),&MainWindow::bruteModeChanged,
@@ -290,10 +286,4 @@ void SettingsControllerGui::initializeOptionsState()
     {
         m_pWin->setSubjectHis(m_pAnonymizer->getSubjectHisID());
     }
-}
-
-void SettingsControllerGui::setInputFileInformationVisible(bool b)
-{
-    m_bInputFileInformationVisible = b;
-    readData();
 }
