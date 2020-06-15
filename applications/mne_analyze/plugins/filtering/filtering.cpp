@@ -117,6 +117,7 @@ QMenu *Filtering::getMenu()
 QDockWidget *Filtering::getControl()
 {
     m_pFilterSettingsView = new FilterSettingsView("MNEANALYZE");
+
     connect(this, &Filtering::guiModeChanged,
             m_pFilterSettingsView.data(), &FilterSettingsView::setGuiMode, Qt::UniqueConnection);
 
@@ -128,6 +129,8 @@ QDockWidget *Filtering::getControl()
 
     connect(m_pFilterSettingsView.data(), &FilterSettingsView::filterActivationChanged,
             this, &Filtering::setFilterActive, Qt::UniqueConnection);
+
+    setFilter(m_pFilterSettingsView->getFilterView()->getCurrentFilter());
 
     QDockWidget* pControlDock = new QDockWidget(getName());
     pControlDock->setAllowedAreas(Qt::RightDockWidgetArea | Qt::LeftDockWidgetArea);
@@ -160,6 +163,7 @@ void Filtering::handleEvent(QSharedPointer<Event> e)
             }
         }
         break;
+
     default:
         qWarning() << "[Filtering::handleEvent] received an Event that is not handled by switch-cases";
     }

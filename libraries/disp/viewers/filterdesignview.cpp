@@ -164,6 +164,7 @@ void FilterDesignView::setSamplingRate(double dSamplingRate)
 void FilterDesignView::setFrom(double dFrom)
 {
     m_pUi->m_doubleSpinBox_from->setValue(dFrom);
+    filterParametersChanged();
 }
 
 //=============================================================================================================
@@ -171,6 +172,7 @@ void FilterDesignView::setFrom(double dFrom)
 void FilterDesignView::setTo(double dTo)
 {
     m_pUi->m_doubleSpinBox_to->setValue(dTo);
+    filterParametersChanged();
 }
 
 //=============================================================================================================
