@@ -86,6 +86,16 @@ SettingsControllerGui::SettingsControllerGui(const QStringList& arguments)
 
 void SettingsControllerGui::executeAnonymizer()
 {
+    if(!m_pAnonymizer->isFileInSet())
+    {
+        m_pWin->winPopup("Please specify a valid input file first.");
+        return;
+    }
+    if(!m_pAnonymizer->isFileOutSet())
+    {
+        m_pWin->winPopup("Please specify a valid output file first.");
+        return;
+    }
     m_pWin->statusMsg("Anonymizing the input file into the output file.",2000);
     m_pAnonymizer->anonymizeFile();
     m_pWin->statusMsg("Your file is ready!");
