@@ -126,6 +126,7 @@ void MainWindow::setDefautlStateUi()
 
     m_pUi->labelSubjectHisId->setToolTip("Specify the Subject’s ID within the Hospital system.");
     m_pUi->lineEditSubjectHisId->setToolTip("Specify the Subject’s ID within the Hospital system.");
+    m_pUi->checkBoxMNEEnvironment->setToolTip("Make information related to MNE Toolbox also anonymized.");
 
     m_pUi->moreInfoButton->setToolTip("See the MNE-CPP project's web for this application.");
     m_pUi->pushButtonAnonymizeFile->setToolTip("Anonymize the input file.");
