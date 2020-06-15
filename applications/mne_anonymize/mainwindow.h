@@ -87,6 +87,8 @@ public slots:
 
     void setLabelMriDataFoundVisible(bool);
 
+    void setLineEditMNEWorkingDir(QString s);
+    void setLineEditMNECommand(QString s);
 
 protected:
     void closeEvent(QCloseEvent *event) override;
