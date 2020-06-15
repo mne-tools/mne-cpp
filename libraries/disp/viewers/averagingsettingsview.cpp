@@ -148,14 +148,14 @@ int AveragingSettingsView::getBaselineToSeconds()
 
 //=============================================================================================================
 
-int AveragingSettingsView::getPreStimSeconds()
+int AveragingSettingsView::getPreStimMSeconds()
 {
     return m_iPreStimSeconds;
 }
 
 //=============================================================================================================
 
-int AveragingSettingsView::getPostStimSeconds()
+int AveragingSettingsView::getPostStimMSeconds()
 {
     return m_iPostStimSeconds;
 }

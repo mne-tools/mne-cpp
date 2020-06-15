@@ -550,18 +550,29 @@ void Averaging::onComputeButtonClicked(bool bChecked)
 //                                            pFiffRaw->last_samp);
 
     *m_pFiffEvoked = lstEpochDataList.average(pFiffRaw->info,
-                                            pFiffRaw->first_samp,
-                                            pFiffRaw->last_samp/*,
+                                            0,
+                                            lstEpochDataList.first()->epoch.cols()/*,
                                             FIFFLIB::defaultVectorXi,
                                             true*/);
 
-    std::cout << "FiffEvoked Set:";
+    std::cout << "lstEpochDataList.first()->epoch.cols()" << lstEpochDataList.first()->epoch.cols() << std::endl;
+
+    std::cout << "lstEpochDataList.first()->tmin" << lstEpochDataList.first()->tmin<< std::endl;
+    std::cout << "lstEpochDataList.first()->tmax" << lstEpochDataList.first()->tmax<< std::endl;
+
+    std::cout << "m_pFiffEvoked->data.block(0,0,10,10)" << m_pFiffEvoked->data.block(0,0,10,10) << std::endl;
+
+    std::cout << "m_pFiffEvoked->data.cols()" << m_pFiffEvoked->data.cols()<< std::endl;
+
+
 
     m_pFiffEvokedSet = QSharedPointer<FIFFLIB::FiffEvokedSet>(new FIFFLIB::FiffEvokedSet());
     m_pFiffEvokedSet->evoked.append(*(m_pFiffEvoked.data()));
     m_pFiffEvokedSet->info = *(m_pFiffRawModel->getFiffInfo());
 
     std::cout << "set models:";
+
+    m_pEvokedModel->setEvokedSet(m_pFiffEvokedSet);
 
     m_pButterflyView->setEvokedSetModel(m_pEvokedModel);
     m_pAverageLayoutView->setEvokedSetModel(m_pEvokedModel);
@@ -570,8 +581,10 @@ void Averaging::onComputeButtonClicked(bool bChecked)
     m_pAverageLayoutView->setChannelInfoModel(m_pChannelInfoModel);
 
 
+    m_pButterflyView->dataUpdate();
     m_pButterflyView->updateView();
     m_pAverageLayoutView->updateData();
+
 
     qDebug() << "Averaging done.";
 }
@@ -717,8 +730,8 @@ void Averaging::loadFullGUI()
     m_iBaselineFrom = m_pAveragingSettingsView->getBaselineFromSeconds();
     m_iBaselineTo = m_pAveragingSettingsView->getBaselineToSeconds();
 
-    m_fPreStim = m_pAveragingSettingsView->getPreStimSeconds();
-    m_fPostStim = m_pAveragingSettingsView->getPostStimSeconds();
+    m_fPreStim = -(static_cast<float>(m_pAveragingSettingsView->getPreStimMSeconds())/1000);
+    m_fPostStim = static_cast<float>(m_pAveragingSettingsView->getPostStimMSeconds()/1000);
 }
 
 //=============================================================================================================
