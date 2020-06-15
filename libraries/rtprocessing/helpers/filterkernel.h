@@ -203,16 +203,31 @@ public:
     Eigen::RowVectorXcd getFftCoefficients() const;
     void setFftCoefficients(const Eigen::RowVectorXcd& vecFftCoeff);
 
+    //=========================================================================================================
+    /**
+     * Prepares a list of filter kernels to be used wiht a specific data block length.
+     * This is favorable to call before filtering, in order to avoid transforming the
+     * filter coefficients anew during filtering. This functions was introduced since
+     * one does not always know the data length of the data blocks to be filtered when
+     * designing the filter.
+     *
+     * @param [in] lFilterKernel        The list of filter kernels to prepare
+     * @param [in] iDataSize            The data size to setup the filters to
+     */
+    static void prepareFilters(QList<FilterKernel>& lFilterKernel,
+                               int iDataSize);
 private:
     //=========================================================================================================
     /**
-     * @brief fftTransformCoeffs transforms the calculated filter coefficients to frequency-domain
+     * Transforms the calculated filter coefficients to frequency-domain
+     *
+     * @param [in] iFftLength                  The FFT length to use
      */
     bool fftTransformCoeffs(int iFftLength);
 
     //=========================================================================================================
     /**
-     * @brief designFilter designs the actual filter with the given parameters
+     * Designs the actual filter with the given parameters
      */
     void designFilter();
 
