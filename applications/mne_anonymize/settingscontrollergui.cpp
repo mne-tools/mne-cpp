@@ -272,6 +272,12 @@ void SettingsControllerGui::setupCommunication()
                      m_pWin.data(),&MainWindow::setLineEditProjectComment);
     QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::mriDataFoundInFile,
                      m_pWin.data(),&MainWindow::setLabelMriDataFoundVisible);
+
+    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingMNEWorkingDir,
+                     m_pWin.data(),&MainWindow::setLineEditMNEWorkingDir);
+    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingMNECommandLine,
+                     m_pWin.data(),&MainWindow::setLineEditMNECommand);
+
 }
 
 void SettingsControllerGui::initializeOptionsState()
