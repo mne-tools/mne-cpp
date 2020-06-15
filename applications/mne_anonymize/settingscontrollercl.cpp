@@ -376,21 +376,28 @@ int SettingsControllerCl::parseInOutFiles()
             qCritical() << "Error. Output file is infact a folder.";
             return 1;
         } else {
-            if((m_fiInFileInfo.absoluteFilePath() == m_fiOutFileInfo.absoluteFilePath()) &&
-                    !m_bGuiMode)
+            if((m_fiInFileInfo.absoluteFilePath() == m_fiOutFileInfo.absoluteFilePath()))
             {
                 m_bInOutFileNamesEqual = true;
                 QString fileOut(QDir(m_fiInFileInfo.absolutePath()).filePath(generateRandomFileName()));
                 m_fiOutFileInfo.setFile(fileOut);
+                if(m_pAnonymizer->setFileOut(m_fiOutFileInfo.absoluteFilePath()))
+                {
+                    qCritical() << "Error while setting the output file.";
+                    return 1;
+                }
             }
         }
     } else {
-        generateDefaultOutputFileName();
-    }
-    if(m_pAnonymizer->setFileOut(m_fiOutFileInfo.absoluteFilePath()))
-    {
-        qCritical() << "Error while setting the output file.";
-        return 1;
+        if(!m_bGuiMode)
+        {
+            generateDefaultOutputFileName();
+            if(m_pAnonymizer->setFileOut(m_fiOutFileInfo.absoluteFilePath()))
+            {
+                qCritical() << "Error while setting the output file.";
+                return 1;
+            }
+        }
     }
     return 0;
 }
