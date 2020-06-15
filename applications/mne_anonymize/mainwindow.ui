@@ -304,10 +304,16 @@
               <enum>QFrame::Raised</enum>
              </property>
              <layout class="QGridLayout" name="gridLayout_3">
-              <item row="1" column="0">
-               <widget class="QCheckBox" name="checkBoxBruteMode">
+              <item row="2" column="0">
+               <widget class="QLabel" name="labelMeasDate">
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>20</height>
+                 </size>
+                </property>
                 <property name="text">
-                 <string>Brute mode</string>
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Measurement date&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                 </property>
                </widget>
               </item>
@@ -321,33 +327,6 @@
                 </property>
                 <property name="text">
                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Subject &amp;quot;his_id&amp;quot;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="0">
-               <widget class="QDateTimeEdit" name="dateTimeMeasurementDate">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="time">
-                 <time>
-                  <hour>0</hour>
-                  <minute>0</minute>
-                  <second>0</second>
-                 </time>
-                </property>
-                <property name="calendarPopup">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item row="4" column="0">
-               <widget class="QCheckBox" name="checkBoxMeasurementDateOffset">
-                <property name="text">
-                 <string>Measurement date offset</string>
                 </property>
                </widget>
               </item>
@@ -370,6 +349,23 @@
                 </property>
                </widget>
               </item>
+              <item row="7" column="0">
+               <widget class="QDateTimeEdit" name="dateTimeBirthdayDate"/>
+              </item>
+              <item row="4" column="0">
+               <widget class="QCheckBox" name="checkBoxMeasurementDateOffset">
+                <property name="text">
+                 <string>Measurement date offset</string>
+                </property>
+               </widget>
+              </item>
+              <item row="8" column="0">
+               <widget class="QCheckBox" name="checkBoxBirthdayDateOffset">
+                <property name="text">
+                 <string>Subject birthday offset</string>
+                </property>
+               </widget>
+              </item>
               <item row="6" column="0">
                <widget class="QLabel" name="labelSubjectBirthday">
                 <property name="maximumSize">
@@ -382,9 +378,6 @@
                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Subject birthday&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                 </property>
                </widget>
-              </item>
-              <item row="11" column="0">
-               <widget class="QLineEdit" name="lineEditSubjectHisId"/>
               </item>
               <item row="9" column="0">
                <widget class="QSpinBox" name="spinBoxBirthdayDateOffset">
@@ -412,28 +405,42 @@
                 </property>
                </widget>
               </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="labelMeasDate">
-                <property name="maximumSize">
-                 <size>
-                  <width>16777215</width>
-                  <height>20</height>
-                 </size>
+              <item row="3" column="0">
+               <widget class="QDateTimeEdit" name="dateTimeMeasurementDate">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
                 </property>
-                <property name="text">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Measurement date&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <property name="time">
+                 <time>
+                  <hour>0</hour>
+                  <minute>0</minute>
+                  <second>0</second>
+                 </time>
+                </property>
+                <property name="calendarPopup">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
-              <item row="8" column="0">
-               <widget class="QCheckBox" name="checkBoxBirthdayDateOffset">
+              <item row="11" column="0">
+               <widget class="QLineEdit" name="lineEditSubjectHisId"/>
+              </item>
+              <item row="1" column="0">
+               <widget class="QCheckBox" name="checkBoxBruteMode">
                 <property name="text">
-                 <string>Subject birthday offset</string>
+                 <string>Brute mode</string>
                 </property>
                </widget>
               </item>
-              <item row="7" column="0">
-               <widget class="QDateTimeEdit" name="dateTimeBirthdayDate"/>
+              <item row="12" column="0">
+               <widget class="QCheckBox" name="checkBoxMNEEnvironment">
+                <property name="text">
+                 <string>MNE Environment</string>
+                </property>
+               </widget>
               </item>
              </layout>
              <zorder>checkBoxBirthdayDateOffset</zorder>
@@ -448,6 +455,7 @@
              <zorder>spinBoxBirthdayDateOffset</zorder>
              <zorder>checkBoxBruteMode</zorder>
              <zorder>labelMeasDate_2</zorder>
+             <zorder>checkBoxMNEEnvironment</zorder>
             </widget>
            </item>
            <item>
