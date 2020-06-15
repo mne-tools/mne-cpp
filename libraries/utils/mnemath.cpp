@@ -66,6 +66,17 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
+int MNEMath::gcd(int iA, int iB)
+{
+    if (iB == 0) {
+        return iA;
+    }
+
+    return gcd(iB, iA % iB);
+}
+
+//=============================================================================================================
+
 VectorXd* MNEMath::combine_xyz(const VectorXd& vec)
 {
     if (vec.size() % 3 != 0)
@@ -89,7 +100,8 @@ VectorXd* MNEMath::combine_xyz(const VectorXd& vec)
 
 //=============================================================================================================
 
-double MNEMath::getConditionNumber(const MatrixXd& A, VectorXd &s)
+double MNEMath::getConditionNumber(const MatrixXd& A,
+                                   VectorXd &s)
 {
     JacobiSVD<MatrixXd> svd(A);
     s = svd.singularValues();
@@ -101,7 +113,8 @@ double MNEMath::getConditionNumber(const MatrixXd& A, VectorXd &s)
 
 //=============================================================================================================
 
-double MNEMath::getConditionSlope(const MatrixXd& A, VectorXd &s)
+double MNEMath::getConditionSlope(const MatrixXd& A,
+                                  VectorXd &s)
 {
     JacobiSVD<MatrixXd> svd(A);
     s = svd.singularValues();
@@ -113,7 +126,11 @@ double MNEMath::getConditionSlope(const MatrixXd& A, VectorXd &s)
 
 //=============================================================================================================
 
-void MNEMath::get_whitener(MatrixXd &A, bool pca, QString ch_type, VectorXd &eig, MatrixXd &eigvec)
+void MNEMath::get_whitener(MatrixXd &A,
+                           bool pca,
+                           QString ch_type,
+                           VectorXd &eig,
+                           MatrixXd &eigvec)
 {
     // whitening operator
     SelfAdjointEigenSolver<MatrixXd> t_eigenSolver(A);//Can be used because, covariance matrices are self-adjoint matrices.
@@ -141,7 +158,9 @@ void MNEMath::get_whitener(MatrixXd &A, bool pca, QString ch_type, VectorXd &eig
 
 //=============================================================================================================
 
-VectorXi MNEMath::intersect(const VectorXi &v1, const VectorXi &v2, VectorXi &idx_sel)
+VectorXi MNEMath::intersect(const VectorXi &v1,
+                            const VectorXi &v2,
+                            VectorXi &idx_sel)
 {
     std::vector<int> tmp;
 
@@ -254,7 +273,9 @@ bool MNEMath::issparse(VectorXd &v)
 
 //=============================================================================================================
 
-MatrixXd MNEMath::legendre(qint32 n, const VectorXd &X, QString normalize)
+MatrixXd MNEMath::legendre(qint32 n,
+                           const VectorXd &X,
+                           QString normalize)
 {
     MatrixXd y;
 
@@ -271,7 +292,8 @@ MatrixXd MNEMath::legendre(qint32 n, const VectorXd &X, QString normalize)
 
 //=============================================================================================================
 
-SparseMatrix<double>* MNEMath::make_block_diag(const MatrixXd &A, qint32 n)
+SparseMatrix<double>* MNEMath::make_block_diag(const MatrixXd &A,
+                                               qint32 n)
 {
 
     qint32 ma = A.rows();
@@ -322,7 +344,8 @@ int MNEMath::nchoose2(int n)
 
 //=============================================================================================================
 
-qint32 MNEMath::rank(const MatrixXd& A, double tol)
+qint32 MNEMath::rank(const MatrixXd& A,
+                     double tol)
 {
     JacobiSVD<MatrixXd> t_svdA(A);//U and V are not computed
     VectorXd s = t_svdA.singularValues();
@@ -336,7 +359,10 @@ qint32 MNEMath::rank(const MatrixXd& A, double tol)
 
 //=============================================================================================================
 
-MatrixXd MNEMath::rescale(const MatrixXd &data, const RowVectorXf &times, QPair<QVariant,QVariant> baseline, QString mode)
+MatrixXd MNEMath::rescale(const MatrixXd &data,
+                          const RowVectorXf &times,
+                          QPair<QVariant,QVariant> baseline,
+                          QString mode)
 {
     MatrixXd data_out = data;
     QStringList valid_modes;

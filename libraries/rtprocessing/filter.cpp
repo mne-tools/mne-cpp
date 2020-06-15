@@ -39,10 +39,7 @@
 
 #include "filter.h"
 
-#include <Eigen/Dense>
-#include <Eigen/Core>
-
-#include <iostream>
+#include <utils/mnemath.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -51,12 +48,20 @@
 #include <QDebug>
 
 //=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Dense>
+#include <Eigen/Core>
+
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace RTPROCESSINGLIB;
 using namespace Eigen;
 using namespace FIFFLIB;
+using namespace UTILSLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -134,16 +139,24 @@ MatrixXd Filter::filterData(const MatrixXd& mataData,
 
     // Check for size of data
     if(mataData.cols() < iOrder){
-        qWarning() << QString("[Filter::filterData] Filter length/order is bigger than data length. Returning.");
+        qWarning() << "[Filter::filterData] Filter length/order is bigger than data length. Returning.";
         return mataData;
     }
 
-    // create output matrix with size of inputmatrix and temporal input matrix with size of pick
-    MatrixXd matDataOut = mataData;
+    // Create output matrix with size of input matrix
+    MatrixXd matDataOut(mataData.rows(), mataData.cols());
     MatrixXd sliceFiltered;
 
     // slice input data into data junks with proper length for fft
-    int iSize = 4096 - iOrder;
+    int iGcd = MNEMath::gcd(mataData.cols(), iOrder);
+    int iFactorOrder = (iOrder/iGcd);
+    int iFactorData = (mataData.cols()/iGcd);
+    int iSize = iGcd * ceil((iFactorData + iFactorOrder) / 2);
+
+    if(iSize < iOrder) {
+        qWarning() << "[Filter::filterData] Data block is too small. Filtering whole block at once.";
+        iSize = 0;
+    }
 
     if(mataData.cols() > iSize) {
         int from = 0;

@@ -94,6 +94,17 @@ public:
 
     //=========================================================================================================
     /**
+     * Finds the Greatest Common Divisor (GCD) of two integer values
+     *
+     * @param[in] a    First input integer
+     * @param[in] b    Second input integer
+     *
+     * @return The Greatest Common Divisor (GCD) of a and b
+     */
+    static int gcd(int iA, int iB);
+
+    //=========================================================================================================
+    /**
      * ToDo make this a template function
      *
      * mne_combine_xyz
@@ -122,7 +133,8 @@ public:
      *
      * @return the condition number
      */
-    static double getConditionNumber(const Eigen::MatrixXd& A, Eigen::VectorXd &s);
+    static double getConditionNumber(const Eigen::MatrixXd& A,
+                                     Eigen::VectorXd &s);
 
     //=========================================================================================================
     /**
@@ -132,7 +144,8 @@ public:
      *
      * @return the condition slope
      */
-    static double getConditionSlope(const Eigen::MatrixXd& A, Eigen::VectorXd &s);
+    static double getConditionSlope(const Eigen::MatrixXd& A,
+                                    Eigen::VectorXd &s);
 
     //=========================================================================================================
     /**
@@ -143,7 +156,11 @@ public:
      *
      * @return rank of matrix A
      */
-    static void get_whitener(Eigen::MatrixXd& A, bool pca, QString ch_type, Eigen::VectorXd& eig, Eigen::MatrixXd& eigvec);
+    static void get_whitener(Eigen::MatrixXd& A,
+                             bool pca,
+                             QString ch_type,
+                             Eigen::VectorXd& eig,
+                             Eigen::MatrixXd& eigvec);
 
     //=========================================================================================================
     /**
@@ -155,7 +172,9 @@ public:
      *
      * @return the sorted, unique values that are in both of the input arrays.
      */
-    static Eigen::VectorXi intersect(const Eigen::VectorXi &v1, const Eigen::VectorXi &v2, Eigen::VectorXi &idx_sel);
+    static Eigen::VectorXi intersect(const Eigen::VectorXi &v1,
+                                     const Eigen::VectorXi &v2,
+                                     Eigen::VectorXi &idx_sel);
 
     //=========================================================================================================
     /**
@@ -179,7 +198,9 @@ public:
      *
      * @return associated Legendre functions
      */
-    static Eigen::MatrixXd legendre(qint32 n, const Eigen::VectorXd &X, QString normalize = QString("unnorm"));
+    static Eigen::MatrixXd legendre(qint32 n,
+                                    const Eigen::VectorXd &X,
+                                    QString normalize = QString("unnorm"));
 
     //=========================================================================================================
     /**
@@ -198,7 +219,8 @@ public:
      *
      * @return A sparse block diagonal, diagonalized from the elements in "A".
      */
-    static Eigen::SparseMatrix<double>* make_block_diag(const Eigen::MatrixXd &A, qint32 n);
+    static Eigen::SparseMatrix<double>* make_block_diag(const Eigen::MatrixXd &A,
+                                                        qint32 n);
 
     //=========================================================================================================
     /**
@@ -220,7 +242,8 @@ public:
      *
      * @return rank of matrix A
      */
-    static qint32 rank(const Eigen::MatrixXd& A, double tol = 1e-8);
+    static qint32 rank(const Eigen::MatrixXd& A,
+                       double tol = 1e-8);
 
     //=========================================================================================================
     /**
@@ -240,7 +263,10 @@ public:
      *
      * @return   rescaled data matrix rescaling.
      */
-    static Eigen::MatrixXd rescale(const Eigen::MatrixXd &data, const Eigen::RowVectorXf &times, QPair<QVariant,QVariant> baseline, QString mode);
+    static Eigen::MatrixXd rescale(const Eigen::MatrixXd &data,
+                                   const Eigen::RowVectorXf &times,
+                                   QPair<QVariant,QVariant> baseline,
+                                   QString mode);
 
     //=========================================================================================================
     /**
@@ -252,7 +278,8 @@ public:
      * @return Vector of the original indeces in the new order
      */
     template<typename T>
-    static Eigen::VectorXi sort(Eigen::Matrix<T, Eigen::Dynamic, 1> &v, bool desc = true);
+    static Eigen::VectorXi sort(Eigen::Matrix<T, Eigen::Dynamic, 1> &v,
+                                bool desc = true);
 
     //=========================================================================================================
     /**
@@ -266,7 +293,9 @@ public:
      * @return Vector of the original indeces in the new order
      */
     template<typename T>
-    static Eigen::VectorXi sort(Eigen::Matrix<T, Eigen::Dynamic, 1> &v_prime, Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &mat, bool desc = true);
+    static Eigen::VectorXi sort(Eigen::Matrix<T, Eigen::Dynamic, 1> &v_prime,
+                                Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &mat,
+                                bool desc = true);
 
     //=========================================================================================================
     /**
@@ -278,7 +307,8 @@ public:
      * @return Vector of the original indeces in the new order
      */
     template<typename T>
-    static std::vector<Eigen::Triplet<T> > sortrows(const std::vector<Eigen::Triplet<T> > &A, qint32 column = 0);
+    static std::vector<Eigen::Triplet<T> > sortrows(const std::vector<Eigen::Triplet<T> > &A,
+                                                    qint32 column = 0);
 
     //=========================================================================================================
     /**
@@ -290,7 +320,8 @@ public:
      * @return true if value of lhs is bigger than value of rhs
      */
     template<typename T>
-    static inline bool compareIdxValuePairBiggerThan(const std::pair<int,T>& lhs, const std::pair<int,T>& rhs);
+    static inline bool compareIdxValuePairBiggerThan(const std::pair<int,T>& lhs,
+                                                     const std::pair<int,T>& rhs);
 
     //=========================================================================================================
     /**
@@ -302,7 +333,8 @@ public:
      * @return true if value of lhs is smaller than value of rhs
      */
     template<typename T>
-    static inline bool compareIdxValuePairSmallerThan(const std::pair<int,T>& lhs, const std::pair<int,T>& rhs);
+    static inline bool compareIdxValuePairSmallerThan(const std::pair<int,T>& lhs,
+                                                      const std::pair<int,T>& rhs);
 
     //=========================================================================================================
     /**
@@ -314,7 +346,8 @@ public:
      * @return true if value of lhs is smaller than value of rhs
      */
     template<typename T>
-    static inline bool compareTripletFirstEntry(const Eigen::Triplet<T>& lhs, const Eigen::Triplet<T> & rhs);
+    static inline bool compareTripletFirstEntry(const Eigen::Triplet<T>& lhs,
+                                                const Eigen::Triplet<T> & rhs);
 
     //=========================================================================================================
     /**
@@ -326,7 +359,8 @@ public:
      * @return true if value of lhs is smaller than value of rhs
      */
     template<typename T>
-    static inline bool compareTripletSecondEntry(const Eigen::Triplet<T>& lhs, const Eigen::Triplet<T> & rhs);
+    static inline bool compareTripletSecondEntry(const Eigen::Triplet<T>& lhs,
+                                                 const Eigen::Triplet<T> & rhs);
 
     //=========================================================================================================
     /**
@@ -409,7 +443,8 @@ public:
 //=============================================================================================================
 
 template< typename T>
-Eigen::VectorXi MNEMath::sort(Eigen::Matrix<T, Eigen::Dynamic, 1> &v, bool desc)
+Eigen::VectorXi MNEMath::sort(Eigen::Matrix<T, Eigen::Dynamic, 1> &v,
+                              bool desc)
 {
     std::vector< std::pair<int,T> > t_vecIdxValue;
     Eigen::VectorXi idx(v.size());
@@ -440,7 +475,9 @@ Eigen::VectorXi MNEMath::sort(Eigen::Matrix<T, Eigen::Dynamic, 1> &v, bool desc)
 //=============================================================================================================
 
 template<typename T>
-Eigen::VectorXi MNEMath::sort(Eigen::Matrix<T, Eigen::Dynamic, 1> &v_prime, Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &mat, bool desc)
+Eigen::VectorXi MNEMath::sort(Eigen::Matrix<T, Eigen::Dynamic, 1> &v_prime,
+                              Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &mat,
+                              bool desc)
 {
     Eigen::VectorXi idx = MNEMath::sort<T>(v_prime, desc);
 
@@ -459,7 +496,8 @@ Eigen::VectorXi MNEMath::sort(Eigen::Matrix<T, Eigen::Dynamic, 1> &v_prime, Eige
 //=============================================================================================================
 
 template<typename T>
-std::vector<Eigen::Triplet<T> > MNEMath::sortrows(const std::vector<Eigen::Triplet<T> > &A, qint32 column)
+std::vector<Eigen::Triplet<T> > MNEMath::sortrows(const std::vector<Eigen::Triplet<T> > &A,
+                                                  qint32 column)
 {
     std::vector<Eigen::Triplet<T> > p_ASorted;
 
@@ -477,7 +515,8 @@ std::vector<Eigen::Triplet<T> > MNEMath::sortrows(const std::vector<Eigen::Tripl
 //=============================================================================================================
 
 template<typename T>
-inline bool MNEMath::compareIdxValuePairBiggerThan(const std::pair<int,T>& lhs, const std::pair<int,T>& rhs)
+inline bool MNEMath::compareIdxValuePairBiggerThan(const std::pair<int,T>& lhs,
+                                                   const std::pair<int,T>& rhs)
 {
     return lhs.second > rhs.second;
 }
@@ -485,7 +524,8 @@ inline bool MNEMath::compareIdxValuePairBiggerThan(const std::pair<int,T>& lhs, 
 //=============================================================================================================
 
 template<typename T>
-inline bool MNEMath::compareIdxValuePairSmallerThan( const std::pair<int,T>& lhs, const std::pair<int,T>& rhs)
+inline bool MNEMath::compareIdxValuePairSmallerThan( const std::pair<int,T>& lhs,
+                                                     const std::pair<int,T>& rhs)
 {
     return lhs.second < rhs.second;
 }
@@ -493,7 +533,8 @@ inline bool MNEMath::compareIdxValuePairSmallerThan( const std::pair<int,T>& lhs
 //=============================================================================================================
 
 template<typename T>
-inline bool MNEMath::compareTripletFirstEntry( const Eigen::Triplet<T>& lhs, const Eigen::Triplet<T> & rhs)
+inline bool MNEMath::compareTripletFirstEntry( const Eigen::Triplet<T>& lhs,
+                                               const Eigen::Triplet<T> & rhs)
 {
     return lhs.row() < rhs.row();
 }
@@ -501,7 +542,8 @@ inline bool MNEMath::compareTripletFirstEntry( const Eigen::Triplet<T>& lhs, con
 //=============================================================================================================
 
 template<typename T>
-inline bool MNEMath::compareTripletSecondEntry( const Eigen::Triplet<T>& lhs, const Eigen::Triplet<T> & rhs)
+inline bool MNEMath::compareTripletSecondEntry( const Eigen::Triplet<T>& lhs,
+                                                const Eigen::Triplet<T> & rhs)
 {
     return lhs.col() < rhs.col();
 }
@@ -657,7 +699,9 @@ void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>&
 //=============================================================================================================
 
 template<typename T>
-Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> MNEMath::pinv(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& a)
+Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> MNEMath::pinv(const Eigen::Matrix<T,
+                                                               Eigen::Dynamic,
+                                                               Eigen::Dynamic>& a)
 {
     double epsilon = std::numeric_limits<double>::epsilon();
     Eigen::JacobiSVD< Eigen::MatrixXd > svd(a ,Eigen::ComputeThinU | Eigen::ComputeThinV);

@@ -177,7 +177,6 @@ RowVectorXd FilterKernel::applyFftFilter(const RowVectorXd& vecData,
 
     // Transform coefficients anew if needed
     if(m_vecFftCoeff.cols() != (iFftLength/2+1)) {
-        std::cout << "FilterKernel::applyFftFilter transform coeff";
         fftTransformCoeffs(iFftLength);
     }
 
