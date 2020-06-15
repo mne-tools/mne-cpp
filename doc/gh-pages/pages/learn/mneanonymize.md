@@ -74,12 +74,13 @@ MNE Anonymize binary file is named `mne_anonymize`. The application recognizes t
 |`--mdo --measurement_date_offset <value>` *optional*| Specify number of days to subtract to the measurement <date>. Only allowed when anonymizing a single file. Default: 0 |
 |`--sb --subject_birthday <value>` *optional*| Specify the subject's birthday <date>. Only allowed when anonymizing a single file. Format: DDMMYYYY. Default: 01012000 |
 |`--sbo --subject_birthday_offset <value>` *optional*| Specify number of <days> to subtract to the subject's birthday. Only allowed when anonymizing a single file. Default: 0 |
-|`--his <value>` *optional*| Specify the Subject's ID within the Hospital system. Only allowed when anonymizing a single file. Default: 'mne_anonymize' |
+|`--his <value>` *optional*| Specify a Subject's ID within the Hospital system. Only allowed when anonymizing a single file. Default: 'mne_anonymize' |
+|`--mne_environment` *optional*| Also anonymize information added to the fif file through MNE Toolbox, like Working Directory or Command used. Default: false |
 
 
 ## Modified FIFF *tags*
 
-Specifically, this utility modifies the following `tags` from the fiff file:
+It is important to remark that tags will not be deleted. The information in the tag will be substituted by other information, either specified by the user or defined in the application by default. This utility modifies the following `tags` from the fiff file:
 
 | Tag | Description | Default Anonymization Value |
 |-----|-------------|-----------------------------|
@@ -103,6 +104,8 @@ Specifically, this utility modifies the following `tags` from the fiff file:
 |`FIFF_PROJ_AIM`| The project aim. | 'mne_anonymize' *brute mode only* |
 |`FIFF_PROJ_PERSONS`| Persons participating in the project. | 'mne_anonymize' |
 |`FIFF_PROJ_COMMENT`| Comment about the project | 'mne_anonymize' *brute mode only* |
+|`FIFF_MNE_ENV_WORKING_DIR` | Working directory where the file was created. *mne_environment mode only* | 
+|`FIFF_MNE_ENV_COMMAND_LINE` | The command used to create the file. *mne_environment mode only* |
 
 | **Please note:** MNE Anonymize can also alter the measurement date or the subject's birthday date, by offsetting it some number of days before or after the date which is stored in the input file. |
 
