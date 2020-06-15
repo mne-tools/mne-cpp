@@ -47,9 +47,13 @@
 #include <disp/viewers/helpers/channelinfomodel.h>
 #include <disp/viewers/helpers/evokedsetmodel.h>
 #include <disp/viewers/averagingsettingsview.h>
+#include <disp/viewers/modalityselectionview.h>
 #include <disp/viewers/channelselectionview.h>
+#include <disp/viewers/averageselectionview.h>
 #include <disp/viewers/averagelayoutview.h>
 #include <disp/viewers/butterflyview.h>
+#include <disp/viewers/scalingview.h>
+
 
 #include <mne/mne_epoch_data_list.h>
 #include <mne/mne_epoch_data.h>
@@ -632,6 +636,64 @@ void Averaging::loadFullGUI()
     m_pAverageLayoutView->setEvokedSetModel(m_pEvokedModel);
     m_pAverageLayoutView->setChannelInfoModel(m_pChannelInfoModel);
     m_pChannelInfoModel->layoutChanged(m_pChannelSelectionView->getLayoutMap());
+
+    //Scaling View
+    DISPLIB::ScalingView* pScalingView = new DISPLIB::ScalingView(QString("MNEANALYZE/AVERAGING"));
+    pScalingView->setObjectName("group_tab_View_Scaling");
+
+    connect(pScalingView, &DISPLIB::ScalingView::scalingChanged,
+            m_pButterflyView.data(), &DISPLIB::ButterflyView::setScaleMap);
+
+    connect(pScalingView, &DISPLIB::ScalingView::scalingChanged,
+            m_pAverageLayoutView.data(), &DISPLIB::AverageLayoutView::setScaleMap);
+
+
+    m_pButterflyView->setScaleMap(pScalingView->getScaleMap());
+    m_pAverageLayoutView->setScaleMap(pScalingView->getScaleMap());
+
+    //Modality selection
+    DISPLIB::ModalitySelectionView* pModalitySelectionView = new DISPLIB::ModalitySelectionView(m_pFiffInfo->chs,
+                                                                              QString("MNEANALYZE/AVERAGING"));
+    pModalitySelectionView->setObjectName("group_tab_View_Modalities");
+
+    connect(pModalitySelectionView, &DISPLIB::ModalitySelectionView::modalitiesChanged,
+            m_pButterflyView.data(), &DISPLIB::ButterflyView::setModalityMap);
+
+    m_pButterflyView->setModalityMap(pModalitySelectionView->getModalityMap());
+
+    // Quick control average selection
+    DISPLIB::AverageSelectionView* pAverageSelectionView = new DISPLIB::AverageSelectionView(QString("MNEANALYZE/AVERAGING"));
+    pAverageSelectionView->setObjectName("group_tab_View_Selection");
+
+    connect(m_pEvokedModel.data(), &DISPLIB::EvokedSetModel::newAverageActivationMap,
+            pAverageSelectionView, &DISPLIB::AverageSelectionView::setAverageActivation);
+    connect(m_pEvokedModel.data(), &DISPLIB::EvokedSetModel::newAverageColorMap,
+            pAverageSelectionView, &DISPLIB::AverageSelectionView::setAverageColor);
+
+    connect(m_pEvokedModel.data(), &DISPLIB::EvokedSetModel::newAverageColorMap,
+            m_pButterflyView.data(), &DISPLIB::ButterflyView::setAverageColor);
+    connect(m_pEvokedModel.data(), &DISPLIB::EvokedSetModel::newAverageActivationMap,
+            m_pButterflyView.data(), &DISPLIB::ButterflyView::setAverageActivation);
+    connect(pAverageSelectionView, &DISPLIB::AverageSelectionView::newAverageActivationMap,
+            m_pButterflyView.data(), &DISPLIB::ButterflyView::setAverageActivation);
+    connect(pAverageSelectionView, &DISPLIB::AverageSelectionView::newAverageColorMap,
+            m_pButterflyView.data(), &DISPLIB::ButterflyView::setAverageColor);
+
+    connect(m_pEvokedModel.data(), &DISPLIB::EvokedSetModel::newAverageColorMap,
+            m_pAverageLayoutView.data(), &DISPLIB::AverageLayoutView::setAverageColor);
+    connect(m_pEvokedModel.data(), &DISPLIB::EvokedSetModel::newAverageActivationMap,
+            m_pAverageLayoutView.data(), &DISPLIB::AverageLayoutView::setAverageActivation);
+    connect(pAverageSelectionView, &DISPLIB::AverageSelectionView::newAverageActivationMap,
+            m_pAverageLayoutView.data(), &DISPLIB::AverageLayoutView::setAverageActivation);
+    connect(pAverageSelectionView, &DISPLIB::AverageSelectionView::newAverageColorMap,
+            m_pAverageLayoutView.data(), &DISPLIB::AverageLayoutView::setAverageColor);
+
+    m_pEvokedModel->setAverageActivation(pAverageSelectionView->getAverageActivation());
+    m_pEvokedModel->setAverageColor(pAverageSelectionView->getAverageColor());
+    m_pButterflyView->setAverageActivation(pAverageSelectionView->getAverageActivation());
+    m_pButterflyView->setAverageColor(pAverageSelectionView->getAverageColor());
+    m_pAverageLayoutView->setAverageActivation(pAverageSelectionView->getAverageActivation());
+    m_pAverageLayoutView->setAverageColor(pAverageSelectionView->getAverageColor());
 
     qDebug() << "3";
     //Add new widgets
