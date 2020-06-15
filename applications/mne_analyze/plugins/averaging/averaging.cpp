@@ -185,6 +185,7 @@ QDockWidget* Averaging::getControl()
     QDockWidget* pControl = new QDockWidget(getName());
     m_pLayout = new QVBoxLayout;
     QWidget* pWidget = new QWidget();
+    m_pTabView = new QTabWidget();
 
 //    qDebug() << "1";
 
@@ -287,7 +288,9 @@ QDockWidget* Averaging::getControl()
 
     pWidget->setLayout(m_pLayout);
 
-    pControl->setWidget(pWidget);
+    m_pTabView->addTab(pWidget, "Parameters");
+
+    pControl->setWidget(m_pTabView);
     pControl->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
     pControl->setObjectName("Averaging");
     pControl->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,
@@ -698,7 +701,15 @@ void Averaging::loadFullGUI()
     qDebug() << "3";
     //Add new widgets
     m_pLayout->addWidget(pButton);
+//    m_pLayout->addWidget(pScalingView);
+//    m_pLayout->addWidget(pModalitySelectionView);
+//    m_pLayout->addWidget(pAverageSelectionView);
+//    m_pLayout->addWidget();
+//    m_pLayout->addWidget();
     //m_pLayout->addWidget(m_pChannelSelectionView.data());
+    m_pTabView->addTab(pScalingView, "Scaling");
+    m_pTabView->addTab(pModalitySelectionView, "Modality");
+//    m_pTabView->addTab(pAverageSelectionView, "Average Selection");
 
     qDebug() << "4";
     //Update saved params
