@@ -226,9 +226,9 @@ void SettingsControllerCl::initParser()
                                          QCoreApplication::translate("main","days"));
     m_parser.addOption(birthdayOffsetOpt);
 
-    QCommandLineOption SubjectIdOpt("his",QCoreApplication::translate("main","Specify the subject’s ID within the Hospital information system. Default: ‘mne_anonymize’"),
+    QCommandLineOption subjectIdOpt("his",QCoreApplication::translate("main","Specify the subject’s ID within the Hospital information system. Default: ‘mne_anonymize’"),
                                           QCoreApplication::translate("main","id#"));
-    m_parser.addOption(SubjectIdOpt);
+    m_parser.addOption(subjectIdOpt);
 
     QCommandLineOption mneEnvironmentOpt("mne_environment",
                                          QCoreApplication::translate("main","Anonymize information related to the MNE environment. "
