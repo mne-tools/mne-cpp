@@ -177,6 +177,7 @@ RowVectorXd FilterKernel::applyFftFilter(const RowVectorXd& vecData,
 
     // Transform coefficients anew if needed
     if(m_vecFftCoeff.cols() != (iFftLength/2+1)) {
+        std::cout << "FilterKernel::applyFftFilter transform coeff";
         fftTransformCoeffs(iFftLength);
     }
 
@@ -419,6 +420,26 @@ Eigen::RowVectorXcd FilterKernel::getFftCoefficients() const
 void FilterKernel::setFftCoefficients(const Eigen::RowVectorXcd& vecFftCoeff)
 {
     m_vecFftCoeff = vecFftCoeff;
+}
+
+//=============================================================================================================
+
+void FilterKernel::prepareFilters(QList<FilterKernel>& lFilterKernel,
+                                int iDataSize)
+{
+    int iFftLength, exp;
+
+    for(int i = 0; i < lFilterKernel.size(); ++i) {
+        // Make sure we always have the correct FFT length for the given input data and filter overlap
+        iFftLength = iDataSize + lFilterKernel.at(i).getCoefficients().cols();
+        exp = ceil(MNEMath::log2(iFftLength));
+        iFftLength = pow(2, exp);
+
+        // Transform coefficients anew if needed
+        if(lFilterKernel.at(i).getCoefficients().cols() != (iFftLength/2+1)) {
+            lFilterKernel[i].fftTransformCoeffs(iFftLength);
+        }
+    }
 }
 
 //=============================================================================================================

@@ -668,7 +668,6 @@ void FiffRawViewModel::filterDataBlock(MatrixXd& matData)
 
 void FiffRawViewModel::filterAllDataBlocks()
 {
-    qDebug() << "FiffRawViewModel::filterAllDataBlocks";
     if(!m_bPerformFiltering) {
         return;
     }
