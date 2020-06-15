@@ -161,6 +161,8 @@ void SettingsControllerCl::initParser()
            "\n - Project's Aim (only with brute option)"
            "\n - Project's Persons"
            "\n - Project's Comment (only with brute option)"
+           "\n - MNE Toolbox info: Working Directory"
+           "\n - MNE Toolbox info: Command line used"
            "\n "
            "\n - *** Additionally if there is MRI data present in the file a warning message will appear.\n"));
     m_parser.addHelpOption();
@@ -228,6 +230,10 @@ void SettingsControllerCl::initParser()
                                           QCoreApplication::translate("main","id#"));
     m_parser.addOption(SubjectIdOpt);
 
+    QCommandLineOption mneEnvironmentOpt("mne_environment",
+                                         QCoreApplication::translate("main","Anonymize information related to the MNE environment. "
+                                                                                       "If found in the file, Working Directory or Command-line tags will be anonymized."));
+    m_parser.addOption(mneEnvironmentOpt);
 }
 
 //=============================================================================================================
@@ -336,6 +342,11 @@ int SettingsControllerCl::parseInputs(const QStringList& arguments)
         m_bHisIdSpecified = true;
         QString strHisId(m_parser.value("his"));
         m_pAnonymizer->setSubjectHisId(strHisId);
+    }
+
+    if(m_parser.isSet("mne_environment"))
+    {
+        m_pAnonymizer->setMNEEnvironmentMode(true);
     }
 
     return 0;

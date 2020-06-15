@@ -74,6 +74,7 @@ FiffAnonymizer::FiffAnonymizer()
 , m_bFileOutSet(false)
 , m_bVerboseMode(false)
 , m_bBruteMode(false)
+, m_bMNEEnvironmentMode(false)
 , m_dMaxValidFiffVerion(1.3)
 , m_sDefaultString("mne_anonymize")
 , m_sDefaultShortString("mne-cpp")
@@ -101,6 +102,8 @@ FiffAnonymizer::FiffAnonymizer()
 , m_sProjectAim(m_sDefaultString)
 , m_sProjectPersons(m_sDefaultString)
 , m_sProjectComment(m_sDefaultString)
+, m_sMNEWorkingDir(m_sDefaultString)
+, m_sMNECommand(m_sDefaultString)
 {
     //MAC addresses have 6 bytes. We use 2 more here to complete 2 int32 (2bytes) reads.
     //check->sometimes MAC address is stored in the 0-5 bytes some other times it
@@ -120,6 +123,7 @@ FiffAnonymizer::FiffAnonymizer(const FiffAnonymizer& obj)
 , m_bFileOutSet(obj.m_bFileOutSet)
 , m_bVerboseMode(obj.m_bVerboseMode)
 , m_bBruteMode(obj.m_bBruteMode)
+, m_bMNEEnvironmentMode(obj.m_bMNEEnvironmentMode)
 , m_dMaxValidFiffVerion(obj.m_dMaxValidFiffVerion)
 , m_sDefaultString(obj.m_sDefaultString)
 , m_sDefaultShortString(obj.m_sDefaultShortString)
@@ -147,6 +151,8 @@ FiffAnonymizer::FiffAnonymizer(const FiffAnonymizer& obj)
 , m_sProjectAim(obj.m_sProjectAim)
 , m_sProjectPersons(obj.m_sProjectPersons)
 , m_sProjectComment(obj.m_sProjectComment)
+, m_sMNEWorkingDir(obj.m_sDefaultString)
+, m_sMNECommand(obj.m_sDefaultString)
 {
     memcpy(m_pTag->data(),obj.m_pTag->data(),static_cast<size_t>(obj.m_pTag->size()));
 
@@ -164,6 +170,7 @@ FiffAnonymizer::FiffAnonymizer(FiffAnonymizer &&obj)
 , m_bFileOutSet(obj.m_bFileOutSet)
 , m_bVerboseMode(obj.m_bVerboseMode)
 , m_bBruteMode(obj.m_bBruteMode)
+, m_bMNEEnvironmentMode(obj.m_bMNEEnvironmentMode)
 , m_dMaxValidFiffVerion(obj.m_dMaxValidFiffVerion)
 , m_sDefaultString(obj.m_sDefaultString)
 , m_sDefaultShortString(obj.m_sDefaultShortString)
@@ -191,6 +198,8 @@ FiffAnonymizer::FiffAnonymizer(FiffAnonymizer &&obj)
 , m_sProjectAim(obj.m_sProjectAim)
 , m_sProjectPersons(obj.m_sProjectPersons)
 , m_sProjectComment(obj.m_sProjectComment)
+, m_sMNEWorkingDir(obj.m_sDefaultString)
+, m_sMNECommand(obj.m_sDefaultString)
 {
     memcpy(m_pTag->data(),obj.m_pTag->data(),static_cast<size_t>(obj.m_pTag->size()));
 
@@ -527,6 +536,32 @@ void FiffAnonymizer::censorTag()
         emit mriDataFoundInFile(true);
         break;
     }
+    case FIFF_MNE_ENV_WORKING_DIR:
+    {
+        QString inStr(m_pTag->data());
+        emit readingMNEWorkingDir(inStr);
+        if(m_bMNEEnvironmentMode)
+        {
+            QString outStr(m_sMNEWorkingDir);
+            m_pTag->resize(outStr.size());
+            memcpy(m_pTag->data(),outStr.toUtf8(),static_cast<size_t>(outStr.size()));
+            printIfVerbose("MNE working directory info changed: " + inStr + " -> " + outStr);
+        }
+        break;
+    }
+    case FIFF_MNE_ENV_COMMAND_LINE:
+    {
+        QString inStr(m_pTag->data());
+        emit readingMNECommandLine(inStr);
+        if(m_bMNEEnvironmentMode)
+        {
+            QString outStr(m_sMNECommand);
+            m_pTag->resize(outStr.size());
+            memcpy(m_pTag->data(),outStr.toUtf8(),static_cast<size_t>(outStr.size()));
+            printIfVerbose("MNE command line info changed: " + inStr + " -> " + outStr);
+        }
+        break;
+    }
     default:
     {
     }//default
@@ -686,6 +721,20 @@ void FiffAnonymizer::setVerboseMode(bool bFlag)
 bool FiffAnonymizer::getVerboseMode() const
 {
     return m_bVerboseMode;
+}
+
+//=============================================================================================================
+
+void FiffAnonymizer::setMNEEnvironmentMode(bool bFlag)
+{
+    m_bMNEEnvironmentMode = bFlag;
+}
+
+//=============================================================================================================
+
+bool FiffAnonymizer::getMNEEnvironmentMode()
+{
+    return m_bMNEEnvironmentMode;
 }
 
 //=============================================================================================================
