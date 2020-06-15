@@ -95,13 +95,14 @@ void SettingsControllerGui::readData()
 {
     if(m_pAnonymizer->isFileInSet())
     {
+
         QString stringTempDir(QStandardPaths::writableLocation(QStandardPaths::TempLocation));
         QString fileOutStr(QDir(stringTempDir).filePath(generateRandomFileName()));
         m_pAnonymizer->setFileOut(fileOutStr);
         m_pWin->setDefaultStateExtraInfo();
         bool verboseMode(m_pAnonymizer->getVerboseMode());
         m_pAnonymizer->setVerboseMode(false);
-        m_pWin->statusMsg("Reading input File information...");
+        m_pWin->statusMsg("Reading input file information...",0);
         m_pAnonymizer->anonymizeFile();
         QFile fileOut(fileOutStr);
         fileOut.remove();
@@ -110,7 +111,7 @@ void SettingsControllerGui::readData()
         QString msg2("Input file information read correctly.");
         m_pWin->statusMsg(msg2,2000);
     } else {
-        m_pWin->winPopup("Please select a valid input file first.");
+        m_pWin->winPopup("Cannot read data. Please select a valid input file first.");
     }
 }
 
