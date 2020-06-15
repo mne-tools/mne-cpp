@@ -111,6 +111,9 @@ void MainWindow::setDefautlStateUi()
     m_pUi->lineEditProjectPersonsExtra->setReadOnly(true);
     m_pUi->plainTextEditProjectCommentExtra->setReadOnly(true);
 
+    m_pUi->lineEditMNEEnvironmentWorkingDirExtra->setReadOnly(true);
+    m_pUi->lineEditMNEEnvironmentCommandExtra->setReadOnly(true);
+
     //tooltips
     m_pUi->checkBoxShowOptions->setToolTip("Show the options menu.");
     m_pUi->checkBoxBruteMode->setToolTip("Advanced anonymization. Anonymize also weight, height and some other fields. See Help.");
@@ -222,6 +225,9 @@ void MainWindow::setDefaultStateExtraInfo()
     m_pUi->lineEditProjectNameExtra->setEnabled(false);
     m_pUi->lineEditProjectPersonsExtra->setEnabled(false);
     m_pUi->plainTextEditProjectCommentExtra->setEnabled(false);
+
+    m_pUi->lineEditMNEEnvironmentWorkingDirExtra->setEnabled(false);
+    m_pUi->lineEditMNEEnvironmentCommandExtra->setEnabled(false);
 }
 
 void MainWindow::setupConnections()
@@ -457,6 +463,19 @@ void MainWindow::setLineEditProjectComment(QString c)
 void MainWindow::setLabelMriDataFoundVisible(bool b)
 {
     m_pUi->labelSubjectMriDataFoundExtra->setVisible(b);
+}
+
+
+void MainWindow::setLineEditMNEWorkingDir(QString s)
+{
+    m_pUi->lineEditMNEEnvironmentWorkingDirExtra->setEnabled(true);
+    m_pUi->lineEditMNEEnvironmentWorkingDirExtra->setText(s);
+}
+
+void MainWindow::setLineEditMNECommand(QString s)
+{
+    m_pUi->lineEditMNEEnvironmentCommandExtra->setEnabled(true);
+    m_pUi->lineEditMNEEnvironmentCommandExtra->setText(s);
 }
 
 void MainWindow::openInFileDialog()
