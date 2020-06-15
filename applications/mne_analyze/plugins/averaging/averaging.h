@@ -226,6 +226,7 @@ private:
     float                                                   m_fPostStim;
 
     QVBoxLayout*                                            m_pLayout;
+    QTabWidget*                                             m_pTabView;
 
     bool m_bUseAnn;
 
