@@ -523,6 +523,12 @@ void ButterflyView::createPlotPath(qint32 row, QPainter& painter) const
                 fMaxValue = m_scaleMap[FIFFV_EOG_CH];
             break;
         }
+        case FIFFV_ECG_CH: {
+            fMaxValue = 1e-6f;
+            if(m_scaleMap.contains(FIFFV_ECG_CH))
+                fMaxValue = m_scaleMap[FIFFV_ECG_CH];
+            break;
+        }
         case FIFFV_STIM_CH: {
             fMaxValue = 5;
             if(m_scaleMap.contains(FIFFV_STIM_CH))

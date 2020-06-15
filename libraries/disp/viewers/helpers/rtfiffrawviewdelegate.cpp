@@ -158,6 +158,12 @@ void createPaths(const QModelIndex &index,
                 dMaxValue = t_pModel->getScaling()[FIFFV_EOG_CH];
             break;
         }
+        case FIFFV_ECG_CH: {
+            dMaxValue = 1e-6f;
+            if(t_pModel->getScaling().contains(FIFFV_ECG_CH))
+            dMaxValue = t_pModel->getScaling()[FIFFV_ECG_CH];
+            break;
+        }
         case FIFFV_STIM_CH: {
             dMaxValue = 5;
             if(t_pModel->getScaling().contains(FIFFV_STIM_CH))
