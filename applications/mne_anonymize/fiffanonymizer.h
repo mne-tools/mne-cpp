@@ -160,6 +160,9 @@ signals:
 
     void mriDataFoundInFile(bool);
 
+    void readingMNEWorkingDir(QString);
+    void readingMNECommandLine(QString);
+
     //=========================================================================================================
 
 public slots:
@@ -296,6 +299,15 @@ public slots:
      */
     void setVerboseMode(bool bFlag);
 
+    //=========================================================================================================
+    /**
+     * Sets the FiffAnonymizer object's mode to anonymize information related to MNE toolbox like the
+     * Working Directory or the command line used to process the data.
+     *
+     * @param [in] bFlag    Bool argument whether to anonymize MNE related information.
+     */
+    void setMNEEnvironmentMode(bool bFlag);
+
 public:
     //=========================================================================================================
     /**
@@ -375,6 +387,8 @@ public:
     bool isFileInSet() const;
 
     bool isFileOutSet() const;
+
+    bool getMNEEnvironmentMode();
 
 private:
     //=========================================================================================================
@@ -487,7 +501,7 @@ private:
 
     bool m_bVerboseMode;                /**< Verbosity mode enabler.*/
     bool m_bBruteMode;                  /**< Advanced anonymization. Anonymize also weight, height and some other fields.*/
-
+    bool m_bMNEEnvironmentMode;    /**< User's request to anonymize info related to the MNE toolbox.*/
     //fiff version of standard
     const double m_dMaxValidFiffVerion; /**< Maximum version of the Fiff file standard compatible with this application.*/
 
@@ -522,6 +536,8 @@ private:
     QString m_sProjectAim;              /**< Project's aim substitutor.*/
     QString m_sProjectPersons;          /**< Project's Persons substitutor.*/
     QString m_sProjectComment;          /**< Project's comment substitutor.*/
+    QString m_sMNEWorkingDir;           /**< MNE Toolbox working directory used while processing the file.*/
+    QString m_sMNECommand;              /**< MNE Toolbox command line used used while processing the file.*/
 };
 
 //=============================================================================================================
