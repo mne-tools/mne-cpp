@@ -515,11 +515,13 @@ void MainWindow::helpButtonClicked()
 
 void MainWindow::inFileEditingFinished()
 {
+    m_fiInFile.setFile(m_pUi->lineEditInFile->text());
     emit fileInChanged(m_fiInFile.absoluteFilePath());
 }
 
 void MainWindow::outFileEditingFinished()
 {
+    m_fiOutFile.setFile(m_pUi->lineEditOutFile->text());
     emit fileOutChanged(m_fiOutFile.absoluteFilePath());
 }
 
