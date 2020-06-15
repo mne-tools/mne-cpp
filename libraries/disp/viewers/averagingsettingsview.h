@@ -113,9 +113,9 @@ public:
 
     int getStimChannelIdx();
 
-    int getPreStimSeconds();
+    int getPreStimMSeconds();
 
-    int getPostStimSeconds();
+    int getPostStimMSeconds();
 
     void setDetectedEpochs(const FIFFLIB::FiffEvokedSet& evokedSet);
 
