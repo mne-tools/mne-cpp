@@ -91,12 +91,12 @@ FilterDesignView::FilterDesignView(const QString& sSettingsPath,
     m_sSettingsPath = sSettingsPath;
     m_pUi->setupUi(this);
 
+    loadSettings();
+
     initSpinBoxes();
     initButtons();
     initComboBoxes();
     initFilterPlot();
-
-    loadSettings();
 }
 
 //=============================================================================================================
@@ -192,6 +192,7 @@ QString FilterDesignView::getChannelType()
 void FilterDesignView::setChannelType(const QString& sType)
 {
     m_pUi->m_comboBox_filterApplyTo->setCurrentText(sType);
+    saveSettings();
 }
 
 //=============================================================================================================
@@ -231,8 +232,6 @@ void FilterDesignView::loadSettings()
     m_pUi->m_doubleSpinBox_transitionband->setValue(settings.value(m_sSettingsPath + QString("/FilterDesignView/filterTransition"), 0.1).toDouble());
     m_pUi->m_comboBox_filterApplyTo->setCurrentText(settings.value(m_sSettingsPath + QString("/FilterDesignView/filterChannelType"), "All").toString());
 
-    filterParametersChanged();
-
     QPoint pos = settings.value(m_sSettingsPath + QString("/FilterDesignView/Position"), QPoint(100,100)).toPoint();
 
     QRect screenRect = QApplication::desktop()->screenGeometry();
@@ -259,16 +258,16 @@ void FilterDesignView::updateGuiMode(GuiMode mode)
 
 void FilterDesignView::initSpinBoxes()
 {
-    connect(m_pUi->m_doubleSpinBox_from,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+    connect(m_pUi->m_doubleSpinBox_from, &QDoubleSpinBox::editingFinished,
+                this, &FilterDesignView::filterParametersChanged);
+
+    connect(m_pUi->m_doubleSpinBox_to, &QDoubleSpinBox::editingFinished,
                 this,&FilterDesignView::filterParametersChanged);
 
-    connect(m_pUi->m_doubleSpinBox_to,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+    connect(m_pUi->m_doubleSpinBox_transitionband, &QDoubleSpinBox::editingFinished,
                 this,&FilterDesignView::filterParametersChanged);
 
-    connect(m_pUi->m_doubleSpinBox_transitionband,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-                this,&FilterDesignView::filterParametersChanged);
-
-    connect(m_pUi->m_spinBox_filterTaps,static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+    connect(m_pUi->m_spinBox_filterTaps, &QSpinBox::editingFinished,
                 this,&FilterDesignView::filterParametersChanged);
 
     //Intercept events from the spin boxes to get control over key events
@@ -310,8 +309,6 @@ void FilterDesignView::initComboBoxes()
 
     connect(m_pUi->m_comboBox_filterApplyTo, &QComboBox::currentTextChanged,
             this, &FilterDesignView::onSpinBoxFilterChannelType);
-
-    m_pUi->m_comboBox_filterApplyTo->setCurrentIndex(1);
 }
 
 //=============================================================================================================

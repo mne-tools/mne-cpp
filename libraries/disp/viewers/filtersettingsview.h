@@ -160,9 +160,15 @@ protected:
 
     //=========================================================================================================
     /**
-     * This function is called whenever the filter parameters changed
+     * This function is called whenever the filter parameters From changed
      */
-    void onFilterParametersChanged();
+    void onFilterFromChanged();
+
+    //=========================================================================================================
+    /**
+     * This function is called whenever the filter parameters To changed
+     */
+    void onFilterToChanged();
 
     //=========================================================================================================
     /**

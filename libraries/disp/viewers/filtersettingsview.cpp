@@ -88,9 +88,9 @@ FilterSettingsView::FilterSettingsView(const QString& sSettingsPath,
     connect(m_pUi->m_pPushButtonShowFilterOptions, &QPushButton::clicked,
             this, &FilterSettingsView::onShowFilterView);
     connect(m_pUi->m_pDoubleSpinBoxFrom, &QDoubleSpinBox::editingFinished,
-            this, &FilterSettingsView::onFilterParametersChanged);
+            this, &FilterSettingsView::onFilterFromChanged);
     connect(m_pUi->m_pDoubleSpinBoxTo, &QDoubleSpinBox::editingFinished,
-            this, &FilterSettingsView::onFilterParametersChanged);
+            this, &FilterSettingsView::onFilterToChanged);
     connect(m_pUi->m_pcomboBoxChannelTypes, &QComboBox::currentTextChanged,
             this, &FilterSettingsView::onFilterChannelTypeChanged);
 }
@@ -151,6 +151,7 @@ void FilterSettingsView::saveSettings()
     settings.setValue(m_sSettingsPath + QString("/FilterSettingsView/filterActivated"), m_pUi->m_pCheckBoxActivateFilter->isChecked());
     settings.setValue(m_sSettingsPath + QString("/FilterSettingsView/filterFrom"), m_pUi->m_pDoubleSpinBoxFrom->value());
     settings.setValue(m_sSettingsPath + QString("/FilterSettingsView/filterTo"), m_pUi->m_pDoubleSpinBoxTo->value());
+    settings.setValue(m_sSettingsPath + QString("/FilterSettingsView/filterChannelType"), m_pUi->m_pcomboBoxChannelTypes->currentText());
 }
 
 //=============================================================================================================
@@ -166,6 +167,7 @@ void FilterSettingsView::loadSettings()
     m_pUi->m_pCheckBoxActivateFilter->setChecked(settings.value(m_sSettingsPath + QString("/FilterSettingsView/filterActivated"), false).toBool());
     m_pUi->m_pDoubleSpinBoxTo->setValue(settings.value(m_sSettingsPath + QString("/FilterSettingsView/filterTo"), 0).toDouble());
     m_pUi->m_pDoubleSpinBoxFrom->setValue(settings.value(m_sSettingsPath + QString("/FilterSettingsView/filterFrom"), 0).toDouble());
+    m_pUi->m_pcomboBoxChannelTypes->setCurrentText(settings.value(m_sSettingsPath + QString("/FilterSettingsView/filterChannelType"), "All").toString());
 }
 
 //=============================================================================================================
@@ -205,11 +207,19 @@ void FilterSettingsView::onFilterActivationChanged()
 
 //=============================================================================================================
 
-void FilterSettingsView::onFilterParametersChanged()
+void FilterSettingsView::onFilterFromChanged()
+{
+    m_pFilterView->setFrom(m_pUi->m_pDoubleSpinBoxFrom->value());
+
+    saveSettings();
+}
+
+//=============================================================================================================
+
+void FilterSettingsView::onFilterToChanged()
 {
     m_pUi->m_pDoubleSpinBoxFrom->setMaximum(m_pUi->m_pDoubleSpinBoxTo->value());
 
-    m_pFilterView->setFrom(m_pUi->m_pDoubleSpinBoxFrom->value());
     m_pFilterView->setTo(m_pUi->m_pDoubleSpinBoxTo->value());
 
     saveSettings();
@@ -220,4 +230,6 @@ void FilterSettingsView::onFilterParametersChanged()
 void FilterSettingsView::onFilterChannelTypeChanged(const QString& sType)
 {
     m_pFilterView->setChannelType(sType);
+
+    saveSettings();
 }
