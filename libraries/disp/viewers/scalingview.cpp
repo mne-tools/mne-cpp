@@ -490,7 +490,7 @@ void ScalingView::onUpdateSpinBoxScaling(double value)
                 break;
             case FIFFV_ECG_CH:
                 //ECG
-                scaleValue = 1e-03;
+                scaleValue = 1e-06;
                 m_qMapScalingSlider[it.key()]->setValue(it.value()->value()*10);
                 break;
             case FIFFV_MISC_CH:
@@ -557,7 +557,7 @@ void ScalingView::onUpdateSliderScaling(int value)
                 break;
             case FIFFV_ECG_CH:
                 //ECG
-                scaleValue = 1e-03;
+                scaleValue = 1e-06;
                 it.value()->setValue((double)m_qMapScalingSlider[it.key()]->value()/10);
                 break;
             case FIFFV_MISC_CH:
