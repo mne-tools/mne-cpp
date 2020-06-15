@@ -600,8 +600,8 @@ void MainWindow::winPopup(QString s)
 
 void MainWindow::statusMsg(const QString s,int to)
 {
-    QString ss(s);
-    m_pUi->statusbar->showMessage(ss,to);
+    m_pUi->statusbar->clearMessage();
+    m_pUi->statusbar->showMessage(s,to);
 }
 
 void MainWindow::resizeEvent(QResizeEvent* event)
