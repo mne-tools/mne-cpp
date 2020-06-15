@@ -100,8 +100,8 @@ public:
      *
      * @param[in] raw            The raw data.
      * @param[in] events         The events provided in samples and event kind.
-     * @param[in] tmin           The start time relative to the event in samples.
-     * @param[in] tmax           The end time relative to the event in samples.
+     * @param[in] tmin           The start time relative to the event in seconds.
+     * @param[in] tmax           The end time relative to the event in seconds.
      * @param[in] event          The event kind.
      * @param[in] dThreshold     The threshold value to use to reject epochs. Default is set to 0.0.
      * @param[in] sChType        The channel data type to scan for. EEG, MEG or EOG. Default is none.

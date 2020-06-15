@@ -262,8 +262,8 @@ void Averaging::initPluginControlWidgets()
         }
 
         // Init Real-Time average
-        int iPreStimSamples = ((float)pAveragingSettingsView->getPreStimSeconds()/1000)*m_pFiffInfo->sfreq;
-        int iPostStimSamples = ((float)pAveragingSettingsView->getPostStimSeconds()/1000)*m_pFiffInfo->sfreq;
+        int iPreStimSamples = ((float)pAveragingSettingsView->getPreStimMSeconds()/1000)*m_pFiffInfo->sfreq;
+        int iPostStimSamples = ((float)pAveragingSettingsView->getPostStimMSeconds()/1000)*m_pFiffInfo->sfreq;
         int iBaselineFromSamples = ((float)pAveragingSettingsView->getBaselineFromSeconds()/1000)*m_pFiffInfo->sfreq;
         int iBaselineToSamples = ((float)pAveragingSettingsView->getBaselineToSeconds()/1000)*m_pFiffInfo->sfreq;
 
