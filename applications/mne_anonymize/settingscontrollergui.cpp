@@ -77,9 +77,7 @@ SettingsControllerGui::SettingsControllerGui(const QStringList& arguments)
     initializeOptionsState();
 
     m_pWin->show();
-//    m_bInputFileInformationVisible = m_pWin->getExtraInfoVisibility();
 
-//    readData();
     QString msg("Mellow greetings!");
     m_pWin->statusMsg(msg,2000);
 }
