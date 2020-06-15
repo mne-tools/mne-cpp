@@ -135,6 +135,10 @@ void ScalingView::saveSettings()
         settings.setValue(m_sSettingsPath + QString("/ScalingView/scaleEOG"), m_qMapChScaling[FIFFV_EOG_CH]);
     }
 
+    if(m_qMapChScaling.contains(FIFFV_ECG_CH)) {
+        settings.setValue(m_sSettingsPath + QString("/ScalingView/scaleECG"), m_qMapChScaling[FIFFV_ECG_CH]);
+    }
+
     if(m_qMapChScaling.contains(FIFFV_STIM_CH)) {
         settings.setValue(m_sSettingsPath + QString("/ScalingView/scaleSTIM"), m_qMapChScaling[FIFFV_STIM_CH]);
     }
@@ -165,6 +169,9 @@ void ScalingView::loadSettings()
 
     val = settings.value(m_sSettingsPath + QString("/ScalingView/scaleEOG"), 1e-3f).toFloat();
     m_qMapChScaling.insert(FIFFV_EOG_CH, val);
+
+    val = settings.value(m_sSettingsPath + QString("/ScalingView/scaleECG"), 1e-3f).toFloat();
+    m_qMapChScaling.insert(FIFFV_ECG_CH, val);
 
     val = settings.value(m_sSettingsPath + QString("/ScalingView/scaleSTIM"), 1e-3f).toFloat();
     m_qMapChScaling.insert(FIFFV_STIM_CH, val);
@@ -327,6 +334,42 @@ void ScalingView::redrawGUI()
         t_pHorizontalSlider->setPageStep(1);
         t_pHorizontalSlider->setValue(m_qMapChScaling.value(FIFFV_EOG_CH)/(1e-06)*10);
         m_qMapScalingSlider.insert(FIFFV_EOG_CH,t_pHorizontalSlider);
+        connect(t_pHorizontalSlider,static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
+                this,&ScalingView::onUpdateSliderScaling);
+        m_pUi->m_formLayout_Scaling->addWidget(t_pHorizontalSlider,i+1,1,1,1);
+
+        i+=2;
+    }
+
+    //ECG
+    if(m_qMapChScaling.contains(FIFFV_ECG_CH))
+    {
+        QLabel* t_pLabelModality = new QLabel;
+        t_pLabelModality->setText("ECG (uV)");
+        m_pUi->m_formLayout_Scaling->addWidget(t_pLabelModality,i,0,1,1);
+
+        QDoubleSpinBox* t_pDoubleSpinBoxScale = new QDoubleSpinBox;
+        t_pDoubleSpinBoxScale->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
+        t_pDoubleSpinBoxScale->setMinimum(0.1);
+        t_pDoubleSpinBoxScale->setMaximum(102500e14);
+        t_pDoubleSpinBoxScale->setMaximumWidth(100);
+        t_pDoubleSpinBoxScale->setSingleStep(0.1);
+        t_pDoubleSpinBoxScale->setDecimals(1);
+        t_pDoubleSpinBoxScale->setPrefix("+/- ");
+        t_pDoubleSpinBoxScale->setValue(m_qMapChScaling.value(FIFFV_ECG_CH)/(1e-06));
+        m_qMapScalingDoubleSpinBox.insert(FIFFV_ECG_CH,t_pDoubleSpinBoxScale);
+        connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+                this,&ScalingView::onUpdateSpinBoxScaling);
+        m_pUi->m_formLayout_Scaling->addWidget(t_pDoubleSpinBoxScale,i+1,0,1,1);
+
+        QSlider* t_pHorizontalSlider = new QSlider(Qt::Horizontal);
+        t_pHorizontalSlider->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
+        t_pHorizontalSlider->setMinimum(1);
+        t_pHorizontalSlider->setMaximum(1000);
+        t_pHorizontalSlider->setSingleStep(1);
+        t_pHorizontalSlider->setPageStep(1);
+        t_pHorizontalSlider->setValue(m_qMapChScaling.value(FIFFV_ECG_CH)/(1e-06)*10);
+        m_qMapScalingSlider.insert(FIFFV_ECG_CH,t_pHorizontalSlider);
         connect(t_pHorizontalSlider,static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
                 this,&ScalingView::onUpdateSliderScaling);
         m_pUi->m_formLayout_Scaling->addWidget(t_pHorizontalSlider,i+1,1,1,1);
