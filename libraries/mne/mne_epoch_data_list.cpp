@@ -231,8 +231,9 @@ FiffEvoked MNEEpochDataList::average(FiffInfo& info, fiff_int_t first, fiff_int_
         printf("\tSSP projectors applied to the evoked data\n");
     }
 
-    p_evoked.baseline.first = QVariant(this->first()->tmin);
-    p_evoked.baseline.second = QVariant(this->first()->tmax);
+//    std::cout << std::endl << "this->first()->tmin: " << this->first()->tmin << std::endl;
+//    p_evoked.baseline.first = QVariant(this->first()->tmin);
+//    p_evoked.baseline.second = QVariant(this->first()->tmax);
     p_evoked.data = matAverage;
 
     return p_evoked;
