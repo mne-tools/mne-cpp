@@ -40,7 +40,6 @@
 //=============================================================================================================
 
 #include "averaging_global.h"
-#include "ave.h"
 
 #include <anShared/Interfaces/IPlugin.h>
 
@@ -71,7 +70,9 @@ namespace DISPLIB {
 }
 
 namespace FIFFLIB {
+    class FiffEvokedSet;
     class FiffEvoked;
+    class FiffInfo;
 }
 
 //=============================================================================================================
@@ -198,13 +199,15 @@ private:
 
     void loadFullGUI();
 
+    void clearAveraging();
+
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals */
 
     QSharedPointer<ANSHAREDLIB::FiffRawViewModel>           m_pFiffRawModel;            /**< Pointer to currently loaded FiffRawView Model */
     QSharedPointer<QList<QPair<int,double>>>                m_pTriggerList;
     QSharedPointer<FIFFLIB::FiffEvoked>                     m_pFiffEvoked;
     QSharedPointer<FIFFLIB::FiffEvokedSet>                  m_pFiffEvokedSet;
-    QSharedPointer<Ave>                                     m_pAve;                     /**< Averaging Object */
+
     QSharedPointer<DISPLIB::EvokedSetModel>                 m_pEvokedModel;
     QSharedPointer<DISPLIB::ChannelSelectionView>           m_pChannelSelectionView;
 
@@ -219,19 +222,20 @@ private:
     QSharedPointer<FIFFLIB::FiffInfo>                       m_pFiffInfo;
 
     int                                                     m_iNumAve;
-    int                                                     m_iBaselineFrom;
-    int                                                     m_iBaselineTo;
 
+    float                                                   m_fBaselineFrom;
+    float                                                   m_fBaselineTo;
     float                                                   m_fPreStim;
     float                                                   m_fPostStim;
 
     QVBoxLayout*                                            m_pLayout;
     QTabWidget*                                             m_pTabView;
 
-    bool m_bUseAnn;
+    bool                                                    m_bUseAnn;
+    bool                                                    m_bBasline;
 
-    QRadioButton* m_pAnnCheck;
-    QRadioButton* m_pStimCheck;
+    QRadioButton*                                           m_pAnnCheck;
+    QRadioButton*                                           m_pStimCheck;
 
 
 };
