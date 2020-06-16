@@ -498,9 +498,11 @@ private:
     /**
      * Calculates the filtered version of one single datablock
      *
-     * @param[in] matData     The data block to be filtered.
+     * @param[in]   matData         The data block to be filtered.
+     * @param [in]  bFilterEnd      Whether to perform the overlap add in the beginning or end of the data.
      */
-    void filterDataBlock(MatrixXd& matData);
+    void filterDataBlock(MatrixXd& matData,
+                         bool bFilterEnd);
 
     //=========================================================================================================
     /**

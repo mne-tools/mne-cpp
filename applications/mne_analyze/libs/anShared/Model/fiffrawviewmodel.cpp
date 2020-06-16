@@ -190,7 +190,7 @@ void FiffRawViewModel::initFiffData(QIODevice& p_IODevice)
                                                                                        times.block(0, i*m_iSamplesPerBlock, times.rows(), m_iSamplesPerBlock))));
     }
 
-    filterDataBlock(data);
+    filterDataBlock(data, true);
     for(int i = 0; i < m_iTotalBlockCount; ++i) {
         m_lFilteredData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data.block(0, i*m_iSamplesPerBlock, data.rows(), m_iSamplesPerBlock),
                                                                                                times.block(0, i*m_iSamplesPerBlock, times.rows(), m_iSamplesPerBlock))));
@@ -635,7 +635,8 @@ int FiffRawViewModel::getFilterLength() const
 
 //=============================================================================================================
 
-void FiffRawViewModel::filterDataBlock(MatrixXd& matData)
+void FiffRawViewModel::filterDataBlock(MatrixXd& matData,
+                                       bool bFilterEnd)
 {
     if(!m_bPerformFiltering) {
         return;
@@ -660,7 +661,8 @@ void FiffRawViewModel::filterDataBlock(MatrixXd& matData)
     #else
     matData = m_pRtFilter->filterData(matData,
                                       m_filterKernel,
-                                      m_lFilterChannelList);
+                                      m_lFilterChannelList,
+                                      bFilterEnd);
     #endif
 }
 
@@ -777,7 +779,7 @@ int FiffRawViewModel::loadEarlierBlocks(qint32 numBlocks)
     }
 
     // Filter data
-    filterDataBlock(data);
+    filterDataBlock(data, false);
     for(int i = 0; i < numBlocks; ++i) {
         m_lFilteredNewData.push_front(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data.block(0, i*m_iSamplesPerBlock, data.rows(), m_iSamplesPerBlock),
                                                                                                    times.block(0, i*m_iSamplesPerBlock, times.rows(), m_iSamplesPerBlock))));
@@ -843,7 +845,7 @@ int FiffRawViewModel::loadLaterBlocks(qint32 numBlocks)
     }
 
     // Filter data
-    filterDataBlock(data);
+    filterDataBlock(data, true);
     for(int i = 0; i < numBlocks; ++i) {
         m_lFilteredNewData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data.block(0, i*m_iSamplesPerBlock, data.rows(), m_iSamplesPerBlock),
                                                                                                   times.block(0, i*m_iSamplesPerBlock, times.rows(), m_iSamplesPerBlock))));
@@ -964,7 +966,7 @@ void FiffRawViewModel::updateDisplayData()
     }
 
     // Filtered data
-    filterDataBlock(data);
+    filterDataBlock(data, true);
     for(int i = 0; i < m_iTotalBlockCount; ++i) {
         m_lFilteredData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data.block(0, i*m_iSamplesPerBlock, data.rows(), m_iSamplesPerBlock),
                                                                                                times.block(0, i*m_iSamplesPerBlock, times.rows(), m_iSamplesPerBlock))));
