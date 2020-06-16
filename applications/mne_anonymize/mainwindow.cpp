@@ -14,6 +14,8 @@ using namespace MNEANONYMIZE;
 
 MainWindow::MainWindow(MNEANONYMIZE::SettingsControllerGui *c)
 : m_bOptionsVisibility(false)
+, m_iDefaultHeight(222)
+, m_iDefaultWidth(666)
 , m_pUi(new Ui::MainWindow)
 , m_pController(c)
 {
@@ -60,7 +62,8 @@ void MainWindow::setDefautlStateUi()
 {
     this->setWindowTitle(qApp->organizationName() + " ~ " + qApp->applicationName() + " ~ " + qApp->applicationVersion());
 
-    resize(666,222);
+    resize(m_iDefaultWidth,m_iDefaultHeight);
+    setMaximumHeight(m_iDefaultHeight);
 
     if(m_bOptionsVisibility)
     {
@@ -676,17 +679,21 @@ void MainWindow::checkSmallGui()
 void MainWindow::checkBoxShowOptionsChanged()
 {
     m_bOptionsVisibility = m_pUi->checkBoxShowOptions->isChecked();
-    m_pUi->frameOptionsAndExtraInfo->setVisible(m_bOptionsVisibility);
-    m_pUi->pushButtonReadData->setVisible(m_bOptionsVisibility);
-
     if(m_bOptionsVisibility)
     {
-        if(height() < 666)
+        setMaximumHeight(10*m_iDefaultHeight);
+        if(height() < 3*m_iDefaultHeight)
         {
-            resize(width(),666);
+            resize(width(),m_iDefaultWidth);
         }
     } else {
-        if(height() > 222)
-            resize(width(),222);
+        if(height() > m_iDefaultHeight)
+        {
+            resize(width(),m_iDefaultHeight);
+        }
+        setMaximumHeight(m_iDefaultHeight);
     }
+
+    m_pUi->frameOptionsAndExtraInfo->setVisible(m_bOptionsVisibility);
+    m_pUi->pushButtonReadData->setVisible(m_bOptionsVisibility);
 }
