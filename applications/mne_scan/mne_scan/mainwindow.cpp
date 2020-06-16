@@ -216,14 +216,14 @@ void MainWindow::loadSettings()
 
 void MainWindow::onStyleChanged(const QString& sStyle)
 {
-    // Styles are from https://github.com/Alexhuszagh/BreezeStyleSheets
     if(QApplication *pApp = qobject_cast<QApplication *>(QApplication::instance())) {
         if(sStyle == "default") {
+            m_sCurrentStyle = "default";
             pApp->setStyleSheet("");
-        } else {
-            QFile file;
-            file.setFileName(":/styles/"+sStyle+".qss");
-            file.open(QFile::ReadOnly | QFile::Text);
+        } else if (sStyle == "dark") {
+            m_sCurrentStyle = "dark";
+            QFile file(":/dark.qss");
+            file.open(QFile::ReadOnly);
             QTextStream stream(&file);
             pApp->setStyleSheet(stream.readAll());
         }
@@ -492,7 +492,6 @@ void MainWindow::createActions()
     m_pActionStyleGroup->addAction(m_pActionDefaultMode);
     connect(m_pActionDefaultMode, &QAction::triggered,
         [=]() {
-        m_sCurrentStyle = "default";
         onStyleChanged(m_sCurrentStyle);
     });
 
@@ -503,7 +502,6 @@ void MainWindow::createActions()
     m_pActionStyleGroup->addAction(m_pActionDarkMode);
     connect(m_pActionDarkMode, &QAction::triggered,
         [=]() {
-        m_sCurrentStyle = "dark";
         onStyleChanged("dark");
     });
 

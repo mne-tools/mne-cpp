@@ -241,17 +241,12 @@ void MainWindow::onStyleChanged(const QString& sStyle)
         if(sStyle == "default") {
             m_sCurrentStyle = "default";
             pApp->setStyleSheet("");
-        } else {
+        } else if (sStyle == "dark") {
             m_sCurrentStyle = "dark";
-        #ifdef WASMBUILD
-            qWarning() << "[MainWindow::onStyleChanged] Changing the style is not supported in the wasm mode yet.";
-        #else
-            QFile file;
-            file.setFileName(":/styles/"+sStyle+".qss");
-            file.open(QFile::ReadOnly | QFile::Text);
+            QFile file(":/dark.qss");
+            file.open(QFile::ReadOnly);
             QTextStream stream(&file);
             pApp->setStyleSheet(stream.readAll());
-        #endif
         }
 
         // Set default font
