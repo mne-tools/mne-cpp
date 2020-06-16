@@ -104,8 +104,8 @@ It is important to remark that tags will not be deleted. The information in the 
 |`FIFF_PROJ_AIM`| The project aim. | 'mne_anonymize' *brute mode only* |
 |`FIFF_PROJ_PERSONS`| Persons participating in the project. | 'mne_anonymize' |
 |`FIFF_PROJ_COMMENT`| Comment about the project | 'mne_anonymize' *brute mode only* |
-|`FIFF_MNE_ENV_WORKING_DIR` | Working directory where the file was created. *mne_environment mode only* | 
-|`FIFF_MNE_ENV_COMMAND_LINE` | The command used to create the file. *mne_environment mode only* |
+|`FIFF_MNE_ENV_WORKING_DIR` | Working directory where the file was created. | 'mne_anonymize' *mne_environment or brute mode only* | 
+|`FIFF_MNE_ENV_COMMAND_LINE` | The command used to create the file. | 'mne_anonymize' *mne_environment or brute mode only* |
 
 | **Please note:** MNE Anonymize can also alter the measurement date or the subject's birthday date, by offsetting it some number of days before or after the date which is stored in the input file. |
 
