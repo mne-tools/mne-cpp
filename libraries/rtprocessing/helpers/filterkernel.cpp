@@ -283,6 +283,26 @@ FilterKernel::FilterType FilterKernel::getFilterTypeForString(const QString &fil
 
 //=============================================================================================================
 
+void FilterKernel::prepareFilters(QList<FilterKernel>& lFilterKernel,
+                                int iDataSize)
+{
+    int iFftLength, exp;
+
+    for(int i = 0; i < lFilterKernel.size(); ++i) {
+        // Make sure we always have the correct FFT length for the given input data and filter overlap
+        iFftLength = iDataSize + lFilterKernel.at(i).getCoefficients().cols();
+        exp = ceil(MNEMath::log2(iFftLength));
+        iFftLength = pow(2, exp);
+
+        // Transform coefficients anew if needed
+        if(lFilterKernel.at(i).getCoefficients().cols() != (iFftLength/2+1)) {
+            lFilterKernel[i].fftTransformCoeffs(iFftLength);
+        }
+    }
+}
+
+//=============================================================================================================
+
 QString FilterKernel::getName() const
 {
     return m_sFilterName;
@@ -423,33 +443,13 @@ void FilterKernel::setFftCoefficients(const Eigen::RowVectorXcd& vecFftCoeff)
 
 //=============================================================================================================
 
-void FilterKernel::prepareFilters(QList<FilterKernel>& lFilterKernel,
-                                int iDataSize)
-{
-    int iFftLength, exp;
-
-    for(int i = 0; i < lFilterKernel.size(); ++i) {
-        // Make sure we always have the correct FFT length for the given input data and filter overlap
-        iFftLength = iDataSize + lFilterKernel.at(i).getCoefficients().cols();
-        exp = ceil(MNEMath::log2(iFftLength));
-        iFftLength = pow(2, exp);
-
-        // Transform coefficients anew if needed
-        if(lFilterKernel.at(i).getCoefficients().cols() != (iFftLength/2+1)) {
-            lFilterKernel[i].fftTransformCoeffs(iFftLength);
-        }
-    }
-}
-
-//=============================================================================================================
-
 void FilterKernel::designFilter()
 {
     // Make sure we only use a minimum needed FFT size
     int iFftLength = m_iFilterOrder;
     int exp = ceil(MNEMath::log2(iFftLength));
     iFftLength = pow(2, exp);
-
+    iFftLength= 4096;
     switch(m_designMethod) {
         case Tschebyscheff: {
             ParksMcClellan filter(m_iFilterOrder,

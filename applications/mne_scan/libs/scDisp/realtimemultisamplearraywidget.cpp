@@ -255,7 +255,6 @@ void RealTimeMultiSampleArrayWidget::initDisplayControllWidgets()
 
         // Quick control channel data settings
         FiffRawViewSettings* pChannelDataSettingsView = new FiffRawViewSettings(QString("MNESCAN/RTMSAW"));
-        pChannelDataSettingsView->setWidgetList();
         pChannelDataSettingsView->setObjectName("group_tab_View_General");
         lControlWidgets.append(pChannelDataSettingsView);
 
