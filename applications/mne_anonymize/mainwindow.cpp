@@ -481,14 +481,26 @@ void MainWindow::setLineEditMNECommand(QString s)
 void MainWindow::openInFileDialog()
 {
 #ifdef WASMBUILD
-    auto fileContentReady = [&](const QString &filePath, const QByteArray &fileContent) {
-        if(!filePath.isNull()) {
-            // We need to prepend "wasm/" because QFileDialog::getOpenFileContent does not provide a full
-            // path, which we need for organzing the different models in AnalyzeData
-            m_pAnalyzeData->loadModel<FiffRawViewModel>("wasm/"+filePath, fileContent);
-        }
-    };
-    QFileDialog::getOpenFileContent("Fiff File (*.fif *.fiff)",  fileContentReady);
+//    auto fileContentReady = [&](const QString &filePath, const QByteArray &fileContent) {
+//        if(!filePath.isNull()) {
+//            // We need to prepend "wasm/" because QFileDialog::getOpenFileContent does not provide a full
+//            // path, which we need for organzing the different models in AnalyzeData
+//            //m_pAnalyzeData->loadModel<FiffRawViewModel>("wasm/"+filePath, fileContent);
+//            //mirar path y si es diferente al que ya hay, copiaar la informacion al disco duro local de wasm
+//            //y activar una flag en controller diciendo que hay dos nombres, el figurado y el real en /.
+//            //copiar el archivo al disco duro local y pasarle al controlador el path del archivo copiado.
+//            //actiavndo a anonymizer
+//            //parecido con output file set
+//            //anonymizer ni se entera, tanto de la lectura como de la anonymization
+//            //la lectura tambien hay que hacer ifdef wasmbuild para que cree un archivo en otra parte.
+//            //asi funcionara.
+//            //para no saturar los 4gb hay que ver el tamano del file y dividir la lectura en partes de 500mb.
+//            //y ir leyendo de una en una y anonymizando de medio gb en medio gb. en el output file si se hace bien.
+//                    // pero el controlador pega todos los blubs de 500mb (max 4) en una sola file y luego la descarga.
+//                    //todo ocurre a nivel controlador y un poquito la ventana mainwindow pero 90% es a nivel controller.
+//        }
+//    };
+    //QFileDialog::getOpenFileContent("Fiff File (*.fif *.fiff)",  fileContentReady);
 #else
     QFileDialog dialog(this);
     dialog.setNameFilter(tr("Fiff file (*.fif *.fiff)"));
