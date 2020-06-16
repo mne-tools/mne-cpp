@@ -191,14 +191,41 @@ private:
     void onResetAverage(bool state);
 
     //=========================================================================================================
+    /**
+     * Gets called when compute button on GUI is clicked
+     *
+     * @param [in] bChecked     UNUSED - state of the button
+     */
     void onComputeButtonClicked(bool bChecked);
 
+    //=========================================================================================================
+    /**
+     * Computes average and updates butterfly and 2D layout views
+     */
+    void computeAverage();
+
+    //=========================================================================================================
+    /**
+     * Saves state of 'use averaging / use stim' checkboxes based on gui
+     */
     void onCheckBoxStateChanged();
 
+    //=========================================================================================================
+    /**
+     * Toggles display of Channel Selection widget GUI
+     */
     void onChannelButtonClicked();
 
+    //=========================================================================================================
+    /**
+     *  Loads averging GUI components that are dependent on FiffRawModel to be initialized
+     */
     void loadFullGUI();
 
+    //=========================================================================================================
+    /**
+     * Clears saved averaging data
+     */
     void clearAveraging();
 
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals */

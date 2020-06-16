@@ -150,7 +150,6 @@ QWidget *Averaging::getView()
 
     m_pButterflyView = new DISPLIB::ButterflyView();
     m_pAverageLayoutView = new DISPLIB::AverageLayoutView();
-    //return Q_NULLPTR;
 
     QTabWidget* pTabView = new QTabWidget();
 
@@ -188,39 +187,6 @@ QDockWidget* Averaging::getControl()
     m_pLayout = new QVBoxLayout;
     QWidget* pWidget = new QWidget();
     m_pTabView = new QTabWidget();
-
-//    qDebug() << "1";
-
-//    qDebug() << "2";
-
-//    //Init Models
-
-//    //m_pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FIFFLIB::FiffInfo(*(m_pFiffRawModel->getFiffInfo())));
-//    //m_pFiffInfo = m_pFiffRawModel->getFiffInfo(0);
-//    m_pChannelInfoModel = DISPLIB::ChannelInfoModel::SPtr::create(m_pFiffInfo);
-
-//    m_pEvokedModel = QSharedPointer<DISPLIB::EvokedSetModel>(new DISPLIB::EvokedSetModel());
-//    m_pFiffEvokedSet = QSharedPointer<FIFFLIB::FiffEvokedSet>(new FIFFLIB::FiffEvokedSet());
-//    //m_pEvokedModel->setEvokedSet(m_pFiffEvokedSet);
-
-//    qDebug() << "3";
-
-//    //Channel Selection View
-//    m_pChannelSelectionView = QSharedPointer<DISPLIB::ChannelSelectionView>(new DISPLIB::ChannelSelectionView(QString("MNEANALYZE/AVERAGING"),
-//                                                                           Q_NULLPTR,
-//                                                                           m_pChannelInfoModel));
-
-////    connect(m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::loadedLayoutMap,
-////            m_pChannelInfoModel.data(), &DISPLIB::ChannelInfoModel::layoutChanged);
-
-////    connect(m_pChannelInfoModel.data(), &DISPLIB::ChannelInfoModel::channelsMappedToLayout,
-////            m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::setCurrentlyMappedFiffChannels);
-
-////    connect(m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::showSelectedChannelsOnly,
-////            m_pButterflyView.data(), &DISPLIB::ButterflyView::showSelectedChannelsOnly);
-
-////    connect(m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::selectionChanged,
-////            m_pAverageLayoutView.data(), &DISPLIB::AverageLayoutView::channelSelectionManagerChanged);
 
     qDebug() << "4";
 
@@ -355,9 +321,7 @@ void Averaging::onChangeNumAverages(qint32 numAve)
 {
     qDebug() << "[Averaging::onChangeNumAverages]" << numAve;
     m_iNumAve = numAve;
-//    if(m_pAve) {
-//        m_pAve->setAverageNumber(numAve);
-//    }
+
 }
 
 //=============================================================================================================
@@ -367,15 +331,7 @@ void Averaging::onChangeBaselineFrom(qint32 fromMSeconds)
 
     qDebug() << "[Averaging::onChangeBaselineFrom]" << fromMSeconds;
     m_fBaselineFrom = static_cast<float>(fromMSeconds) / 1000.f;
-//    if(!m_pFiffInfo) {
-//        return;
-//    }
 
-//    int iBaselineFromSamples = ((float)(fromMSeconds)/1000)*m_pFiffInfo->sfreq;
-
-//    if(m_pAve) {
-//        m_pAve->setBaselineFrom(iBaselineFromSamples, fromMSeconds);
-//    }
 }
 
 
@@ -385,15 +341,7 @@ void Averaging::onChangeBaselineTo(qint32 toMSeconds)
 {
     qDebug() << "[Averaging::onChangeBaselineTo]" << toMSeconds;
     m_fBaselineTo = static_cast<float>(toMSeconds) / 1000.f;
-//    if(!m_pFiffInfo) {
-//        return;
-//    }
 
-//    int iBaselineToSamples = ((float)(toMSeconds)/1000)*m_pFiffInfo->sfreq;
-
-//    if(m_tAve) {
-//        m_tAve->setBaselineTo(iBaselineToSamples, toMSeconds);
-//    }
 }
 
 //=============================================================================================================
@@ -404,19 +352,7 @@ void Averaging::onChangePreStim(qint32 mseconds)
 
     m_fPreStim =  -(static_cast<float>(mseconds)/1000);
 
-//    if(!m_pFiffInfo) {
-//        return;
-//    }
 
-//    int iPreStimSamples = ((float)(mseconds)/1000)*m_pFiffInfo->sfreq;
-
-//    if(m_pAveragingOutput) {
-//        m_pAveragingOutput->data()->setNumPreStimSamples(iPreStimSamples);
-//    }
-
-//    if(m_pAve) {
-//        m_pAve->setPreStim(iPreStimSamples, mseconds);
-//    }
 }
 
 //=============================================================================================================
@@ -427,15 +363,7 @@ void Averaging::onChangePostStim(qint32 mseconds)
     qDebug() << "[Averaging::onChangePostStim]";
 
     m_fPostStim = (static_cast<float>(mseconds)/1000);
-//    if(!m_pFiffInfo) {
-//        return;
-//    }
 
-//    int iPostStimSamples = ((float)(mseconds)/1000)*m_pFiffInfo->sfreq;
-
-//    if(m_pAve) {
-//        m_pAve->setPostStim(iPostStimSamples, mseconds);
-//    }
 }
 
 //=============================================================================================================
@@ -460,8 +388,16 @@ void Averaging::onResetAverage(bool state)
 
 void Averaging::onComputeButtonClicked(bool bChecked)
 {
-    qDebug() << "[Averaging::onComputeButtonCLicked]";
     Q_UNUSED(bChecked);
+    qDebug() << "[Averaging::onComputeButtonClicked]";
+    computeAverage();
+}
+
+//=============================================================================================================
+
+void Averaging::computeAverage()
+{
+    qDebug() << "[Averaging::computeAverage]";
 
     clearAveraging();
 
@@ -593,6 +529,7 @@ void Averaging::onCheckBoxStateChanged()
 
 void Averaging::loadFullGUI()
 {
+    //This function needs to be called after we have the FiffRawModel, because we need FiffInfo to initialize objects herein
     qDebug() << "[Averaging::loadFullGUI]";
 
     QPushButton* pButton = new QPushButton();
