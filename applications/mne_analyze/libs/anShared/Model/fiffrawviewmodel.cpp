@@ -653,10 +653,10 @@ void FiffRawViewModel::filterDataBlock(MatrixXd& matData)
 
     // In WASM mode do not use multithreading for filtering
     #ifdef WASMBUILD
-    pData = m_pRtFilter->filterData(pData,
-                                    m_filterKernel,
-                                    m_lFilterChannelList,
-                                    false);
+    matData = m_pRtFilter->filterData(matData,
+                                      m_filterKernel,
+                                      m_lFilterChannelList,
+                                      false);
     #else
     matData = m_pRtFilter->filterData(matData,
                                       m_filterKernel,

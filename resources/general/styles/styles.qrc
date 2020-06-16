@@ -209,7 +209,7 @@
         <file>rc/window_undock_pressed.png</file>
         <file>rc/window_undock_pressed@2x.png</file>
     </qresource>
-    <qresource prefix="/styles">
+    <qresource prefix="/">
         <file>dark.qss</file>
     </qresource>
 </RCC>
