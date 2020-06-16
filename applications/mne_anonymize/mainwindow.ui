@@ -76,8 +76,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>638</width>
-         <height>611</height>
+         <width>644</width>
+         <height>623</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -516,7 +516,7 @@
                  <bool>true</bool>
                 </property>
                 <property name="currentIndex">
-                 <number>3</number>
+                 <number>1</number>
                 </property>
                 <widget class="QWidget" name="tab">
                  <attribute name="title">
@@ -739,7 +739,7 @@
                    <widget class="QSpinBox" name="spinBoxSubjectIDExtra">
                     <property name="maximumSize">
                      <size>
-                      <width>218</width>
+                      <width>16777215</width>
                       <height>16777215</height>
                      </size>
                     </property>
@@ -780,7 +780,7 @@
                      </size>
                     </property>
                     <property name="text">
-                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt; color:#ff0000;&quot;&gt;Warning! There is MRI data in this file.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:11pt; color:#ff0000;&quot;&gt;Warning! There is MRI data in this file.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                     </property>
                     <property name="textFormat">
                      <enum>Qt::RichText</enum>
@@ -909,15 +909,15 @@
                   <item row="0" column="1">
                    <widget class="QLineEdit" name="lineEditMNEEnvironmentWorkingDirExtra"/>
                   </item>
-                  <item row="1" column="1">
-                   <widget class="QLineEdit" name="lineEditMNEEnvironmentCommandExtra"/>
-                  </item>
                   <item row="1" column="0">
                    <widget class="QLabel" name="labelMNEEnvironmentCommandExtra">
                     <property name="text">
                      <string>Command Line</string>
                     </property>
                    </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QLineEdit" name="lineEditMNEEnvironmentCommandExtra"/>
                   </item>
                  </layout>
                 </widget>
