@@ -91,9 +91,12 @@ Averaging::Averaging()
 , m_fBaselineTo(0)
 , m_fPreStim(0)
 , m_fPostStim(0)
-, m_bUseAnn(0)
+, m_bUseAnn(1)
+, m_bBasline(0)
+, m_bRejection(0)
 , m_pAnnCheck(Q_NULLPTR)
 , m_pStimCheck(Q_NULLPTR)
+, m_pCheckRejection(Q_NULLPTR)
 {
     qDebug() << "[Averaging::Averaging]";
 }
@@ -226,7 +229,12 @@ QDockWidget* Averaging::getControl()
     m_pAnnCheck = new QRadioButton("Average with annotations");
     m_pStimCheck = new QRadioButton("Average with stim channels");
 
-    connect(m_pAnnCheck, &QCheckBox::toggled,
+    m_pCheckRejection = new QCheckBox("Drop Rejected");
+
+    connect(m_pCheckRejection, &QCheckBox::toggled,
+            this, &Averaging::onRejectionChecked);
+
+    connect(m_pAnnCheck, &QRadioButton::toggled,
             this, &Averaging::onCheckBoxStateChanged);
     connect(m_pStimCheck, &QRadioButton::toggled,
             this, &Averaging::onCheckBoxStateChanged);
@@ -250,8 +258,10 @@ QDockWidget* Averaging::getControl()
     m_pLayout->addWidget(m_pAveragingSettingsView);
 ////    pLayout->addWidget(pGBox);
 ////    pLayout->addWidget(m_pChannelSelectionView.data());
-    m_pLayout->addWidget(m_pAnnCheck);
-    m_pLayout->addWidget(m_pStimCheck);
+
+//    m_pLayout->addWidget(m_pAnnCheck);
+//    m_pLayout->addWidget(m_pStimCheck);
+    m_pLayout->addWidget(m_pCheckRejection);
     m_pLayout->addWidget(pButton);
 
     pWidget->setLayout(m_pLayout);
@@ -454,7 +464,9 @@ void Averaging::computeAverage()
         lstEpochDataList.applyBaselineCorrection(baselinePair);
     }
 
-    //lstEpochDataList.dropRejected();
+    if(m_bRejection){
+        lstEpochDataList.dropRejected();
+    }
 
     std::cout << "Got Epoch List and dropped rejected";
 
@@ -676,4 +688,16 @@ void Averaging::clearAveraging()
     m_pFiffEvokedSet->evoked.clear();
     m_pFiffEvokedSet.clear();
     m_pFiffEvoked.clear();
+}
+
+//=============================================================================================================
+
+void Averaging::onRejectionChecked()
+{
+    qDebug() << "[Averaging::onRejectionChecked]" << m_pCheckRejection->isChecked();
+    if (m_pCheckRejection->isChecked()){
+        m_bRejection = true;
+    } else {
+        m_bRejection = false;
+    }
 }
