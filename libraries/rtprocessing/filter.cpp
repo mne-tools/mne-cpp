@@ -165,7 +165,7 @@ MatrixXd Filter::filterData(const MatrixXd& mataData,
         int from = 0;
         int numSlices = ceil(float(mataData.cols())/float(iSize)); //calculate number of data slices
 
-        for (int i = 0; i<numSlices; i++) {
+        for (int i = 0; i < numSlices; i++) {
             if(i == numSlices-1) {
                 //catch the last one that might be shorter then original size
                 iSize = mataData.cols() - (iSize * (numSlices -1));
@@ -277,7 +277,6 @@ MatrixXd Filter::filterDataBlock(const MatrixXd& mataData,
     if(bUseThreads) {
         QFuture<void> future = QtConcurrent::map(timeData,
                                                  filterChannel);
-
         future.waitForFinished();
     } else {
         for(int i = 0; i < timeData.size(); ++i) {
