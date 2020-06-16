@@ -237,8 +237,6 @@ bool LayoutScene::gestureEvent(QGestureEvent *event)
 
 void LayoutScene::panTriggered(QPanGesture *gesture)
 {
-    qDebug()<<"panTriggered";
-
     QPointF delta = gesture->delta();
 
     m_qvView->verticalScrollBar()->setValue(m_qvView->verticalScrollBar()->value() + delta.y());
@@ -249,8 +247,6 @@ void LayoutScene::panTriggered(QPanGesture *gesture)
 
 void LayoutScene::pinchTriggered(QPinchGesture *gesture)
 {
-    qDebug()<<"pinchTriggered";
-
     m_qvView->setTransformationAnchor(QGraphicsView::NoAnchor);
     m_qvView->scale(gesture->scaleFactor(), gesture->scaleFactor());
 }
