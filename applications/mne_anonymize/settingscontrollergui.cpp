@@ -103,14 +103,13 @@ void SettingsControllerGui::readData()
 {
     if(m_pAnonymizer->isFileInSet())
     {
-
+        m_pWin->statusMsg("Reading input file information...",0);
         QString stringTempDir(QStandardPaths::writableLocation(QStandardPaths::TempLocation));
         QString fileOutStr(QDir(stringTempDir).filePath(generateRandomFileName()));
         m_pAnonymizer->setFileOut(fileOutStr);
         m_pWin->setDefaultStateExtraInfo();
         bool verboseMode(m_pAnonymizer->getVerboseMode());
         m_pAnonymizer->setVerboseMode(false);
-        m_pWin->statusMsg("Reading input file information...",0);
         m_pAnonymizer->anonymizeFile();
         QFile fileOut(fileOutStr);
         fileOut.remove();
@@ -277,7 +276,6 @@ void SettingsControllerGui::setupCommunication()
                      m_pWin.data(),&MainWindow::setLineEditMNEWorkingDir);
     QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingMNECommandLine,
                      m_pWin.data(),&MainWindow::setLineEditMNECommand);
-
 }
 
 void SettingsControllerGui::initializeOptionsState()
