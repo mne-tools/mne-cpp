@@ -71,8 +71,10 @@ FiffRawViewSettings::FiffRawViewSettings(const QString &sSettingsPath,
     m_sSettingsPath = sSettingsPath;
     m_pUi->setupUi(this);
 
-    this->setWindowTitle("Channel Data View Settings");
+    this->setWindowTitle("Fiff Raw View Settings");
     this->setMinimumWidth(330);
+
+    setWidgetList();
 
     loadSettings();
 }
@@ -151,8 +153,6 @@ void FiffRawViewSettings::setWidgetList(const QStringList& lVisibleWidgets)
 void FiffRawViewSettings::setWindowSize(int windowSize)
 {
     m_pUi->m_spinBox_windowSize->setValue(windowSize);
-
-    timeWindowChanged(windowSize);
 }
 
 //=============================================================================================================
@@ -160,8 +160,6 @@ void FiffRawViewSettings::setWindowSize(int windowSize)
 void FiffRawViewSettings::setZoom(double zoomFactor)
 {
     m_pUi->m_doubleSpinBox_numberVisibleChannels->setValue(zoomFactor);
-
-    zoomChanged(zoomFactor);
 }
 
 //=============================================================================================================
@@ -250,13 +248,19 @@ void FiffRawViewSettings::loadSettings()
     }
 
     QSettings settings("MNECPP");
-    setZoom(settings.value(m_sSettingsPath + QString("/FiffRawViewSettings/viewZoomFactor"), 0.3).toDouble());
-    setWindowSize(settings.value(m_sSettingsPath + QString("/FiffRawViewSettings/viewWindowSize"), 10).toInt());
-    QColor color = Qt::blue;
-    setSignalColor(settings.value(m_sSettingsPath + QString("/FiffRawViewSettings/signalColor"), color).value<QColor>());
-    color = Qt::white;
-    setBackgroundColor(settings.value(m_sSettingsPath + QString("/FiffRawViewSettings/backgroundColor"), color).value<QColor>());
-    setDistanceTimeSpacer(settings.value(m_sSettingsPath + QString("/FiffRawViewSettings/distanceTimeSpacer"), 1000).toInt());
+
+    m_pUi->m_doubleSpinBox_numberVisibleChannels->setValue(settings.value(m_sSettingsPath + QString("/FiffRawViewSettings/viewZoomFactor"), 0.3).toDouble());
+    m_pUi->m_spinBox_windowSize->setValue(settings.value(m_sSettingsPath + QString("/FiffRawViewSettings/viewWindowSize"), 10).toInt());
+
+    QColor colorDefault = Qt::blue;
+    m_colCurrentSignalColor = settings.value(m_sSettingsPath + QString("/FiffRawViewSettings/signalColor"), colorDefault).value<QColor>();
+    m_pUi->m_pushButton_signalColor->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(m_colCurrentSignalColor.red()).arg(m_colCurrentSignalColor.green()).arg(m_colCurrentSignalColor.blue()));
+
+    colorDefault = Qt::white;
+    m_colCurrentBackgroundColor = settings.value(m_sSettingsPath + QString("/FiffRawViewSettings/backgroundColor"), colorDefault).value<QColor>();
+    m_pUi->m_pushButton_backgroundColor->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(m_colCurrentBackgroundColor.red()).arg(m_colCurrentBackgroundColor.green()).arg(m_colCurrentBackgroundColor.blue()));
+
+    m_pUi->m_comboBox_distaceTimeSpacer->setCurrentText(QString::number(settings.value(m_sSettingsPath + QString("/FiffRawViewSettings/distanceTimeSpacer"), 1000).toInt()));
 }
 
 //=============================================================================================================
@@ -302,7 +306,7 @@ void FiffRawViewSettings::onDistanceTimeSpacerChanged(qint32 value)
 
 void FiffRawViewSettings::onViewColorButtonClicked()
 {
-    QColorDialog* pDialog = new QColorDialog(this);
+    QColorDialog* pDialog = new QColorDialog(m_colCurrentSignalColor, this);
 
     QObject* obj = sender();
     if(obj == m_pUi->m_pushButton_signalColor) {

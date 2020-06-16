@@ -155,7 +155,6 @@ QDockWidget *RawDataViewer::getControl()
     m_pSettingsViewWidget = new FiffRawViewSettings("MNEANALYZE");
     connect(this, &RawDataViewer::guiModeChanged,
             m_pSettingsViewWidget.data(), &FiffRawViewSettings::setGuiMode);
-    m_pSettingsViewWidget->setWidgetList();
     pLayout->addWidget(title_viewsettings);
     pLayout->addWidget(m_pSettingsViewWidget);
 
