@@ -540,7 +540,7 @@ void FiffAnonymizer::censorTag()
     {
         QString inStr(m_pTag->data());
         emit readingMNEWorkingDir(inStr);
-        if(m_bMNEEnvironmentMode)
+        if(m_bMNEEnvironmentMode || m_bBruteMode)
         {
             QString outStr(m_sMNEWorkingDir);
             m_pTag->resize(outStr.size());
@@ -553,7 +553,7 @@ void FiffAnonymizer::censorTag()
     {
         QString inStr(m_pTag->data());
         emit readingMNECommandLine(inStr);
-        if(m_bMNEEnvironmentMode)
+        if(m_bMNEEnvironmentMode || m_bBruteMode)
         {
             QString outStr(m_sMNECommand);
             m_pTag->resize(outStr.size());
