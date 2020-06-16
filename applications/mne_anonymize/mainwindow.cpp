@@ -15,7 +15,7 @@ using namespace MNEANONYMIZE;
 MainWindow::MainWindow(MNEANONYMIZE::SettingsControllerGui *c)
 : m_bOptionsVisibility(false)
 , m_iDefaultHeight(222)
-, m_iDefaultWidth(666)
+, m_iDefaultHeightLarge(666)
 , m_pUi(new Ui::MainWindow)
 , m_pController(c)
 {
@@ -62,7 +62,7 @@ void MainWindow::setDefautlStateUi()
 {
     this->setWindowTitle(qApp->organizationName() + " ~ " + qApp->applicationName() + " ~ " + qApp->applicationVersion());
 
-    resize(m_iDefaultWidth,m_iDefaultHeight);
+    resize(m_iDefaultHeightLarge,m_iDefaultHeight);
     setMaximumHeight(m_iDefaultHeight);
 
     if(m_bOptionsVisibility)
@@ -682,9 +682,9 @@ void MainWindow::checkBoxShowOptionsChanged()
     if(m_bOptionsVisibility)
     {
         setMaximumHeight(10*m_iDefaultHeight);
-        if(height() < 3*m_iDefaultHeight)
+        if(height() < m_iDefaultHeightLarge)
         {
-            resize(width(),m_iDefaultWidth);
+            resize(width(),m_iDefaultHeightLarge);
         }
     } else {
         if(height() > m_iDefaultHeight)
