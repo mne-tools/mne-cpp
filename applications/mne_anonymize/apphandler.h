@@ -105,7 +105,7 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief Creates a QApplication or a QCoreApplication according tu user's preference for a command line or a
+     * @brief Creates a controller object according tu user's preference for a command line or a
      *  GUI application.
      *
      * @details Handles input arguments and searches for a "--no-gui" option. If found, this will create a
