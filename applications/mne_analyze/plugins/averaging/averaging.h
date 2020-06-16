@@ -211,6 +211,9 @@ private:
     void onCheckBoxStateChanged();
 
     //=========================================================================================================
+    void onRejectionChecked();
+
+    //=========================================================================================================
     /**
      * Toggles display of Channel Selection widget GUI
      */
@@ -260,9 +263,12 @@ private:
 
     bool                                                    m_bUseAnn;
     bool                                                    m_bBasline;
+    bool                                                    m_bRejection;
 
     QRadioButton*                                           m_pAnnCheck;
     QRadioButton*                                           m_pStimCheck;
+
+    QCheckBox*                                              m_pCheckRejection;
 
 
 };
