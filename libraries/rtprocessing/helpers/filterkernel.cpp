@@ -131,7 +131,7 @@ bool FilterKernel::fftTransformCoeffs(int iFftLength)
     Eigen::FFT<double> fft;
     fft.SetFlag(fft.HalfSpectrum);
 
-    //fft-transform filter coeffs.
+    //fft-transform filter coeffs
     fft.fwd(m_vecFftCoeff, m_vecCoeff, iFftLength);
 
     return true;
@@ -284,7 +284,7 @@ FilterKernel::FilterType FilterKernel::getFilterTypeForString(const QString &fil
 //=============================================================================================================
 
 void FilterKernel::prepareFilters(QList<FilterKernel>& lFilterKernel,
-                                int iDataSize)
+                                  int iDataSize)
 {
     int iFftLength, exp;
 
@@ -295,7 +295,7 @@ void FilterKernel::prepareFilters(QList<FilterKernel>& lFilterKernel,
         iFftLength = pow(2, exp);
 
         // Transform coefficients anew if needed
-        if(lFilterKernel.at(i).getCoefficients().cols() != (iFftLength/2+1)) {
+        if(lFilterKernel.at(i).getFftCoefficients().cols() != (iFftLength/2+1)) {
             lFilterKernel[i].fftTransformCoeffs(iFftLength);
         }
     }

@@ -79,8 +79,8 @@ FilterSettingsView::FilterSettingsView(const QString& sSettingsPath,
     loadSettings();
 
     m_pFilterView = FilterDesignView::SPtr::create(m_sSettingsPath,
-                                                   this,
-                                                   Qt::Window);
+                                                   Q_NULLPTR,
+                                                   Qt::Dialog);
 
     //Connect GUI elements
     connect(m_pUi->m_pCheckBoxActivateFilter, &QCheckBox::toggled,

@@ -657,6 +657,7 @@ void FiffRawViewModel::filterDataBlock(MatrixXd& matData,
     matData = m_pRtFilter->filterData(matData,
                                       m_filterKernel,
                                       m_lFilterChannelList,
+                                      bFilterEnd,
                                       false);
     #else
     matData = m_pRtFilter->filterData(matData,
@@ -696,6 +697,7 @@ void FiffRawViewModel::filterAllDataBlocks()
         pPair = QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(m_pRtFilter->filterData((*itr)->first,
                                                                                                      m_filterKernel,
                                                                                                      m_lFilterChannelList,
+                                                                                                     false,
                                                                                                      false),
                                                                              (*itr)->second));
         #else
