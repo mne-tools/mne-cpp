@@ -449,7 +449,7 @@ void FilterKernel::designFilter()
     int iFftLength = m_iFilterOrder;
     int exp = ceil(MNEMath::log2(iFftLength));
     iFftLength = pow(2, exp);
-    iFftLength= 4096;
+
     switch(m_designMethod) {
         case Tschebyscheff: {
             ParksMcClellan filter(m_iFilterOrder,
@@ -505,6 +505,7 @@ void FilterKernel::designFilter()
 
             //This filter is designed in the frequency domain, hence the time domain impulse response need to be shortend by the users dependent number of taps
             m_vecCoeff.resize(m_iFilterOrder);
+
             m_vecCoeff.head(m_iFilterOrder/2) = filtercos.m_vecCoeff.tail(m_iFilterOrder/2);
             m_vecCoeff.tail(m_iFilterOrder/2) = filtercos.m_vecCoeff.head(m_iFilterOrder/2);
 
