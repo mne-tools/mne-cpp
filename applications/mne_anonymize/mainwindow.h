@@ -850,7 +850,7 @@ private:
 
     bool m_bOptionsVisibility;                  /**< Options and input file info is shown.*/
     const int m_iDefaultHeight;
-    const int m_iDefaultWidth;
+    const int m_iDefaultHeightLarge;
 
     QFileInfo m_fiInFile;                       /**< Input file QFileInfo object.*/
     QFileInfo m_fiOutFile;                      /**< Output file QFileInfo object.*/
