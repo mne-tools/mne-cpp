@@ -88,6 +88,7 @@ MatrixXd Filter::filterData(const MatrixXd& mataData,
                             int iOrder,
                             FilterKernel::DesignMethod designMethod,
                             const RowVectorXi& vecPicks,
+                            bool bFilterEnd,
                             bool bUseThreads)
 {
     // Check for size of data
@@ -114,6 +115,7 @@ MatrixXd Filter::filterData(const MatrixXd& mataData,
     return filterData(mataData,
                       QList<FilterKernel>() << filter,
                       vecPicks,
+                      bFilterEnd,
                       bUseThreads);
 
 }
@@ -123,6 +125,7 @@ MatrixXd Filter::filterData(const MatrixXd& mataData,
 MatrixXd Filter::filterData(const MatrixXd& mataData,
                             const QList<FilterKernel>& lFilterKernel,
                             const RowVectorXi& vecPicks,
+                            bool bFilterEnd,
                             bool bUseThreads)
 {
     if(lFilterKernel.isEmpty()) {
@@ -178,6 +181,7 @@ MatrixXd Filter::filterData(const MatrixXd& mataData,
         matDataOut = filterDataBlock(mataData,
                                      vecPicks,
                                      lFilterKernel,
+                                     bFilterEnd,
                                      bUseThreads);
     }
 
@@ -200,6 +204,7 @@ void Filter::filterChannel(Filter::FilterObject& channelDataTime)
 MatrixXd Filter::filterDataBlock(const MatrixXd& mataData,
                                  const RowVectorXi& vecPicks,
                                  const QList<FilterKernel>& lFilterKernel,
+                                 bool bFilterEnd,
                                  bool bUseThreads)
 {
     if(lFilterKernel.isEmpty()) {
@@ -220,15 +225,25 @@ MatrixXd Filter::filterDataBlock(const MatrixXd& mataData,
         return mataData;
     }
 
-    //Initialise the overlap matrix
-    if(m_matOverlap.cols() != iOrder || m_matOverlap.rows() < mataData.rows()) {
-        m_matOverlap.resize(mataData.rows(), iOrder);
-        m_matOverlap.setZero();
+    //Initialise the overlap add matrices
+    if(m_matOverlapBack.cols() != iOrder || m_matOverlapBack.rows() < mataData.rows()) {
+        m_matOverlapBack.resize(mataData.rows(), iOrder);
+        m_matOverlapBack.setZero();
     }
 
-    if(m_matDelay.cols() != iOrder/2 || m_matOverlap.rows() < mataData.rows()) {
-        m_matDelay.resize(mataData.rows(), iOrder/2);
-        m_matDelay.setZero();
+    if(m_matDelayBack.cols() != iOrder/2 || m_matOverlapBack.rows() < mataData.rows()) {
+        m_matDelayBack.resize(mataData.rows(), iOrder/2);
+        m_matDelayBack.setZero();
+    }
+
+    if(m_matOverlapFront.cols() != iOrder || m_matOverlapFront.rows() < mataData.rows()) {
+        m_matOverlapFront.resize(mataData.rows(), iOrder);
+        m_matOverlapFront.setZero();
+    }
+
+    if(m_matDelayFront.cols() != iOrder/2 || m_matDelayFront.rows() < mataData.rows()) {
+        m_matDelayFront.resize(mataData.rows(), iOrder/2);
+        m_matDelayFront.setZero();
     }
 
     // Setup filters to the correct length, so we do not have to do this everytime we call the FFT filter function
@@ -257,7 +272,7 @@ MatrixXd Filter::filterDataBlock(const MatrixXd& mataData,
     // Copy in data from last data block. This is necessary in order to also delay channels which are not filtered
     MatrixXd matDataOut(mataData.rows(), mataData.cols());
     matDataOut.block(0, iOrder/2, mataData.rows(), matDataOut.cols()-iOrder/2) = mataData.block(0, 0, mataData.rows(), matDataOut.cols()-iOrder/2);
-    matDataOut.block(0, 0, mataData.rows(), iOrder/2) = m_matDelay;
+    matDataOut.block(0, 0, mataData.rows(), iOrder/2) = m_matDelayBack;
 
     if(bUseThreads) {
         QFuture<void> future = QtConcurrent::map(timeData,
@@ -279,20 +294,30 @@ MatrixXd Filter::filterDataBlock(const MatrixXd& mataData,
         tempData = timeData.at(r).vecData;
 
         //Perform the actual overlap add by adding the last filter length data to the newly filtered one
-        tempData.head(iOrder) += m_matOverlap.row(timeData.at(r).iRow);
+        if(bFilterEnd) {
+            tempData.head(iOrder) += m_matOverlapBack.row(timeData.at(r).iRow);
+        } else {
+            tempData.tail(iOrder) += m_matOverlapFront.row(timeData.at(r).iRow);
+        }
 
         //Write the newly calculated filtered data to the filter data matrix
         int start = 0;
-        matDataOut.row(timeData.at(r).iRow).segment(start,iFilteredNumberCols-iOrder) = tempData.head(iFilteredNumberCols-iOrder);
+        if(bFilterEnd) {
+            matDataOut.row(timeData.at(r).iRow).segment(start,iFilteredNumberCols-iOrder) = tempData.head(iFilteredNumberCols-iOrder);
+        } else {
+            matDataOut.row(timeData.at(r).iRow).segment(start,iFilteredNumberCols-iOrder) = tempData.tail(iFilteredNumberCols-iOrder);
+        }
 
-        //Refresh the m_matOverlap with the new calculated filtered data
-        m_matOverlap.row(timeData.at(r).iRow) = timeData.at(r).vecData.tail(iOrder);
+        //Refresh the overlap matrix with the new calculated filtered data
+        m_matOverlapBack.row(timeData.at(r).iRow) = timeData.at(r).vecData.tail(iOrder);
+        m_matOverlapFront.row(timeData.at(r).iRow) = timeData.at(r).vecData.head(iOrder);
     }
 
     if(mataData.cols() >= iOrder/2) {
-        m_matDelay = mataData.block(0, mataData.cols()-iOrder/2, mataData.rows(), iOrder/2);
+        m_matDelayBack = mataData.block(0, mataData.cols()-iOrder/2, mataData.rows(), iOrder/2);
+        m_matDelayFront = mataData.block(0, 0, mataData.rows(), iOrder/2);
     } else {
-        qWarning() << "[Filter::filterDataBlock] Half of filter length is larger than data size. Not filling m_matDelay for next step.";
+        qWarning() << "[Filter::filterDataBlock] Half of filter length is larger than data size. Not filling m_matDelayBack for next step.";
     }
 
     return matDataOut;
