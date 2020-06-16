@@ -120,8 +120,7 @@ protected:
 
     //=========================================================================================================
     /**
-     * Draws the filter's frequency response.
-     *
+     * Plots the filter's frequency response.
      */
     void plotFilterFrequencyResponse();
 

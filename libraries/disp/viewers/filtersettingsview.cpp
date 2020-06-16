@@ -218,7 +218,11 @@ void FilterSettingsView::onFilterFromChanged()
 
 void FilterSettingsView::onFilterToChanged()
 {
-    m_pUi->m_pDoubleSpinBoxFrom->setMaximum(m_pUi->m_pDoubleSpinBoxTo->value());
+    if(m_pUi->m_pDoubleSpinBoxFrom->value() >= 2) {
+        m_pUi->m_pDoubleSpinBoxFrom->setMaximum(m_pUi->m_pDoubleSpinBoxTo->value()-1);
+    } else {
+        m_pUi->m_pDoubleSpinBoxFrom->setMaximum(m_pUi->m_pDoubleSpinBoxTo->value());
+    }
 
     m_pFilterView->setTo(m_pUi->m_pDoubleSpinBoxTo->value());
 
