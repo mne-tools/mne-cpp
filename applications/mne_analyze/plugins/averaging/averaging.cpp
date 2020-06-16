@@ -58,7 +58,9 @@
 #include <mne/mne_epoch_data_list.h>
 #include <mne/mne_epoch_data.h>
 
+#include <fiff/fiff_evoked_set.h>
 #include <fiff/fiff_evoked.h>
+#include <fiff/fiff_info.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -85,8 +87,8 @@ Averaging::Averaging()
 , m_pAveragingSettingsView(Q_NULLPTR)
 , m_pFiffInfo(Q_NULLPTR)
 , m_iNumAve(0)
-, m_iBaselineFrom(0)
-, m_iBaselineTo(0)
+, m_fBaselineFrom(0)
+, m_fBaselineTo(0)
 , m_fPreStim(0)
 , m_fPostStim(0)
 , m_bUseAnn(0)
@@ -364,7 +366,7 @@ void Averaging::onChangeBaselineFrom(qint32 fromMSeconds)
 {
 
     qDebug() << "[Averaging::onChangeBaselineFrom]" << fromMSeconds;
-    m_iBaselineFrom = fromMSeconds;
+    m_fBaselineFrom = static_cast<float>(fromMSeconds) / 1000.f;
 //    if(!m_pFiffInfo) {
 //        return;
 //    }
@@ -382,7 +384,7 @@ void Averaging::onChangeBaselineFrom(qint32 fromMSeconds)
 void Averaging::onChangeBaselineTo(qint32 toMSeconds)
 {
     qDebug() << "[Averaging::onChangeBaselineTo]" << toMSeconds;
-    m_iBaselineTo = toMSeconds;
+    m_fBaselineTo = static_cast<float>(toMSeconds) / 1000.f;
 //    if(!m_pFiffInfo) {
 //        return;
 //    }
@@ -440,10 +442,8 @@ void Averaging::onChangePostStim(qint32 mseconds)
 
 void Averaging::onChangeBaselineActive(bool state)
 {
-    qDebug() << "[Averaging::onChangeBaselineActive]";
-    if(m_pAve) {
-        m_pAve->setBaselineActive(state);
-    }
+    qDebug() << "[Averaging::onChangeBaselineActive]" << state;
+    m_bBasline = state;
 }
 
 //=============================================================================================================
@@ -451,11 +451,9 @@ void Averaging::onChangeBaselineActive(bool state)
 void Averaging::onResetAverage(bool state)
 {
     Q_UNUSED(state)
-
     qDebug() << "[Averaging::onResetAverage]";
-    if(m_pAve) {
-        m_pAve->reset();
-    }
+
+
 }
 
 //=============================================================================================================
@@ -464,37 +462,9 @@ void Averaging::onComputeButtonClicked(bool bChecked)
 {
     qDebug() << "[Averaging::onComputeButtonCLicked]";
     Q_UNUSED(bChecked);
-//    m_lTriggerList = QSharedPointer<QList<QPair<int,double>>>(new QList<QPair<int,double>>);
 
-//    for (int i = 0; i < m_pFiffRawModel->getTimeListSize(); i++){
-//        qDebug() << "At" <<  i << ":" << m_pFiffRawModel->getTimeMarks(i);
-//        m_lTriggerList->append(QPair<int, double>(i, m_pFiffRawModel->getTimeMarks(i)));
-//    }
+    clearAveraging();
 
-//    QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(m_pFiffRawModel->getFiffInfo());
-
-//    float fFreq = m_pFiffRawModel->getFiffInfo()->sfreq;
-
-//    int iPreStimSamples = ((float)m_pAveragingSettingsView->getPreStimSeconds()/1000)*fFreq;
-//    int iPostStimSamples = ((float)m_pAveragingSettingsView->getPostStimSeconds()/1000)*fFreq;
-//    int iBaselineFromSamples = ((float)m_pAveragingSettingsView->getBaselineFromSeconds()/1000)*fFreq;
-//    int iBaselineToSamples = ((float)m_pAveragingSettingsView->getBaselineToSeconds()/1000)*fFreq;
-
-//    m_pAve = QSharedPointer<Ave>(new Ave(m_pAveragingSettingsView->getNumAverages(),
-//                                         iPreStimSamples,
-//                                         iPostStimSamples,
-//                                         m_pAveragingSettingsView->getBaselineFromSeconds(),
-//                                         m_pAveragingSettingsView->getBaselineToSeconds(),
-//                                         0, //temp value, change later
-//                                         pFiffInfo,
-//                                         m_lTriggerList));
-
-//    m_pAve->setBaselineFrom(iBaselineFromSamples, m_pAveragingSettingsView->getBaselineFromSeconds());
-//    m_pAve->setBaselineTo(iBaselineToSamples, m_pAveragingSettingsView->getBaselineToSeconds());
-//    m_pAve->setBaselineActive(m_pAveragingSettingsView->getDoBaselineCorrection());
-
-//    connect(m_pAve.data(), &Ave::evokedStim,
-//            this, &Averaging::onNewEvokedSet);
     if(!m_pFiffRawModel){
         qWarning() << "No model loaded. Cannot calculate average";
         return;
@@ -541,6 +511,13 @@ void Averaging::onComputeButtonClicked(bool bChecked)
                                                           iType,
                                                           mapReject);
 
+    if(m_bBasline){
+        QPair<QVariant, QVariant> baselinePair;
+        baselinePair.first = QVariant(m_fBaselineFrom);
+        baselinePair.second = QVariant(m_fBaselineTo);
+        lstEpochDataList.applyBaselineCorrection(baselinePair);
+    }
+
     //lstEpochDataList.dropRejected();
 
     std::cout << "Got Epoch List and dropped rejected";
@@ -571,6 +548,14 @@ void Averaging::onComputeButtonClicked(bool bChecked)
     m_pFiffEvokedSet->info = *(m_pFiffRawModel->getFiffInfo());
 
     std::cout << "set models:";
+
+    if(m_bBasline){
+        std::cout << std::endl << "m_fBaselineFrom: " << m_fBaselineFrom << std::endl;
+        std::cout << std::endl << "m_fBaselineTo: " << m_fBaselineTo << std::endl;
+
+        m_pFiffEvokedSet->evoked[0].baseline.first = QVariant(m_fBaselineFrom);
+        m_pFiffEvokedSet->evoked[0].baseline.second = QVariant(m_fBaselineTo);
+    }
 
     m_pEvokedModel->setEvokedSet(m_pFiffEvokedSet);
 
@@ -727,11 +712,11 @@ void Averaging::loadFullGUI()
     qDebug() << "4";
     //Update saved params
     m_iNumAve = m_pAveragingSettingsView->getNumAverages();
-    m_iBaselineFrom = m_pAveragingSettingsView->getBaselineFromSeconds();
-    m_iBaselineTo = m_pAveragingSettingsView->getBaselineToSeconds();
+    m_fBaselineFrom = static_cast<float>(m_pAveragingSettingsView->getBaselineFromSeconds())/1000.f;
+    m_fBaselineTo = static_cast<float>(m_pAveragingSettingsView->getBaselineToSeconds())/1000.f;
 
-    m_fPreStim = -(static_cast<float>(m_pAveragingSettingsView->getPreStimMSeconds())/1000);
-    m_fPostStim = static_cast<float>(m_pAveragingSettingsView->getPostStimMSeconds()/1000);
+    m_fPreStim = -(static_cast<float>(m_pAveragingSettingsView->getPreStimMSeconds())/1000.f);
+    m_fPostStim = static_cast<float>(m_pAveragingSettingsView->getPostStimMSeconds())/1000.f;
 }
 
 //=============================================================================================================
@@ -744,4 +729,14 @@ void Averaging::onChannelButtonClicked()
         m_pChannelSelectionView->activateWindow();
         m_pChannelSelectionView->show();
     }
+}
+
+//=============================================================================================================
+
+void Averaging::clearAveraging()
+{
+    qDebug() << "[Averaging::clearAveraging]";
+    m_pFiffEvokedSet->evoked.clear();
+    m_pFiffEvokedSet.clear();
+    m_pFiffEvoked.clear();
 }
