@@ -331,11 +331,15 @@ void AveragingSettingsView::updateProcessingMode(ProcessingMode mode)
             m_pUi->m_pSpinBoxNumAverages->hide();
             m_pUi->m_pComboBoxChSelection->hide();
             m_pUi->m_pushButton_reset->hide();
+            m_pUi->label->hide();
+            m_pUi->m_label_numberAverages->hide();
             break;
         default: // default is scientific mode
             m_pUi->m_pSpinBoxNumAverages->show();
             m_pUi->m_pComboBoxChSelection->show();
             m_pUi->m_pushButton_reset->show();
+            m_pUi->label->show();
+            m_pUi->m_label_numberAverages->show();
             break;
     }
 }
