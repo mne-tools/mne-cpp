@@ -254,6 +254,18 @@ void HpiSettingsView::updateGuiMode(GuiMode mode)
 
 //=============================================================================================================
 
+void HpiSettingsView::updateProcessingMode(ProcessingMode mode)
+{
+    switch(mode) {
+        case ProcessingMode::Offline:
+            break;
+        default: // default is scientific mode
+            break;
+    }
+}
+
+//=============================================================================================================
+
 void HpiSettingsView::onLoadDigitizers()
 {
     //Get file location

@@ -210,13 +210,13 @@ private:
      */
     void onCheckBoxStateChanged();
 
-    //=========================================================================================================
-    /**
-     * Change the stim channel
-     *
-     * @param[in] sStimCh     the new stim channel name
-     */
-    void onChangeStimChannel(const QString &sStimCh);
+//    //=========================================================================================================
+//    /**
+//     * Change the stim channel
+//     *
+//     * @param[in] sStimCh     the new stim channel name
+//     */
+//    void onChangeStimChannel(const QString &sStimCh);
 
     //=========================================================================================================
     /**

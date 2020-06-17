@@ -324,6 +324,23 @@ void AveragingSettingsView::updateGuiMode(GuiMode mode)
 
 //=============================================================================================================
 
+void AveragingSettingsView::updateProcessingMode(ProcessingMode mode)
+{
+    switch(mode) {
+        case ProcessingMode::Offline:
+            m_pUi->m_pSpinBoxNumAverages->hide();
+            m_pUi->m_pComboBoxChSelection->hide();
+            m_pUi->m_pushButton_reset->hide();
+            break;
+        default: // default is scientific mode
+            m_pUi->m_pSpinBoxNumAverages->show();
+            m_pUi->m_pComboBoxChSelection->show();
+            m_pUi->m_pushButton_reset->show();
+            break;
+    }
+}
+//=============================================================================================================
+
 void AveragingSettingsView::onChangePreStim()
 {
     qint32 mSeconds = m_pUi->m_pSpinBoxPreStimMSeconds->value();

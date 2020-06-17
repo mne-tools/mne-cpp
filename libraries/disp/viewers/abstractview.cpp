@@ -69,3 +69,10 @@ void AbstractView::setGuiMode(GuiMode mode)
 {
     updateGuiMode(mode);
 };
+
+//=============================================================================================================
+
+void AbstractView::setProcessingMode(ProcessingMode mode)
+{
+    updateProcessingMode(mode);
+}

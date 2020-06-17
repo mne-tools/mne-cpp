@@ -510,6 +510,18 @@ void RtFiffRawView::updateGuiMode(GuiMode mode)
 
 //=============================================================================================================
 
+void RtFiffRawView::updateProcessingMode(ProcessingMode mode)
+{
+    switch(mode) {
+        case ProcessingMode::Offline:
+            break;
+        default: // default is scientific mode
+            break;
+    }
+}
+
+//=============================================================================================================
+
 void RtFiffRawView::channelContextMenu(QPoint pos)
 {
     //obtain index where index was clicked

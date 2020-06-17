@@ -113,6 +113,14 @@ protected:
      */
     void updateGuiMode(GuiMode mode);
 
+    //=========================================================================================================
+    /**
+     * Update the views GUI based on the set ProcessingMode (Clinical=0, Research=1).
+     *
+     * @param mode     The new mode (Clinical=0, Research=1).
+     */
+    void updateProcessingMode(ProcessingMode mode);
+
 private:
     void addProject();
     void addSubject();

@@ -85,6 +85,11 @@ public:
         Research
     };
 
+    enum ProcessingMode {
+        RealTime,
+        Offline
+    };
+
     //=========================================================================================================
     /**
      * Constructs a AbstractView which is a child of parent.
@@ -101,6 +106,14 @@ public:
      * @param mode     The new mode.
      */
     virtual void setGuiMode(GuiMode mode);
+
+    //=========================================================================================================
+    /**
+     * Sets the GUI of this view to a specific mode. RealTime = 0, Offline = 0.
+     *
+     * @param mode     The new mode.
+     */
+    virtual void setProcessingMode(ProcessingMode mode);
 
     //=========================================================================================================
     /**
@@ -122,9 +135,18 @@ public:
      */
     virtual void updateGuiMode(GuiMode mode) = 0;
 
+    //=========================================================================================================
+    /**
+     * Update the views GUI based on the set ProcessingMode (Clinical=0, Research=1).
+     *
+     * @param mode     The new mode (Clinical=0, Research=1).
+     */
+    virtual void updateProcessingMode(ProcessingMode mode) = 0;
+
 protected:
 
     bool            m_bResearchModeIsActive;  /**< The flag describing whether the scientific mode of the view is active or not. */
+    bool            m_bRealtimeModeIsActive;
 
     QString         m_sSettingsPath;            /**< The settings path to store the GUI settings to. */
 

@@ -343,3 +343,15 @@ void AverageLayoutView::updateGuiMode(GuiMode mode)
             break;
     }
 }
+
+//=============================================================================================================
+
+void AverageLayoutView::updateProcessingMode(ProcessingMode mode)
+{
+    switch(mode) {
+        case ProcessingMode::Offline:
+            break;
+        default: // default is scientific mode
+            break;
+    }
+}

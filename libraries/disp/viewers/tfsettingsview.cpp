@@ -127,6 +127,18 @@ void TfSettingsView::updateGuiMode(GuiMode mode)
 
 //=============================================================================================================
 
+void TfSettingsView::updateProcessingMode(ProcessingMode mode)
+{
+    switch(mode) {
+        case ProcessingMode::Offline:
+            break;
+        default: // default is scientific mode
+            break;
+    }
+}
+
+//=============================================================================================================
+
 void TfSettingsView::onNumberTrialRowChanged()
 {
     emit numberTrialRowChanged(m_pUi->m_spinBox_trialNumber->value(), m_pUi->m_spinBox_rowNumber->value());
