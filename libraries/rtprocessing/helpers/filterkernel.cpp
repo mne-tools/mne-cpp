@@ -131,8 +131,19 @@ bool FilterKernel::fftTransformCoeffs(int iFftLength)
     Eigen::FFT<double> fft;
     fft.SetFlag(fft.HalfSpectrum);
 
+    // Zero padd if necessary. Please note: The zero padding in Eigen's FFT is only working for column vectors -> We have to zero pad manually here
+    RowVectorXd vecInputFft;
+    if (m_vecCoeff.cols() < iFftLength) {
+        vecInputFft.setZero(iFftLength);
+        vecInputFft.block(0,0,1,m_vecCoeff.cols()) = m_vecCoeff;
+    } else {
+        vecInputFft = m_vecCoeff;
+    }
+
     //fft-transform filter coeffs
-    fft.fwd(m_vecFftCoeff, m_vecCoeff, iFftLength);
+    RowVectorXcd vecFreqData;
+    fft.fwd(vecFreqData, vecInputFft, iFftLength);
+    m_vecFftCoeff = vecFreqData;;
 
     return true;
 }
@@ -184,9 +195,18 @@ RowVectorXd FilterKernel::applyFftFilter(const RowVectorXd& vecData,
     Eigen::FFT<double> fft;
     fft.SetFlag(fft.HalfSpectrum);
 
-    //fft-transform data sequence. Please note: The Eigen FFT does perform zero padding automatically if the data size is < fft length
+    // Zero padd if necessary. Please note: The zero padding in Eigen's FFT is only working for column vectors -> We have to zero pad manually here
+    RowVectorXd vecInputFft;
+    if (vecData.cols() < iFftLength) {
+        vecInputFft.setZero(iFftLength);
+        vecInputFft.block(0,0,1,vecData.cols()) = vecData;
+    } else {
+        vecInputFft = vecData;
+    }
+
+    //fft-transform data sequence
     RowVectorXcd vecFreqData;
-    fft.fwd(vecFreqData, vecData, iFftLength);
+    fft.fwd(vecFreqData, vecInputFft, iFftLength);
 
     //perform frequency-domain filtering
     RowVectorXcd vecFilteredFreq = m_vecFftCoeff.array() * vecFreqData.array();

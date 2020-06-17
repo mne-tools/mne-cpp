@@ -152,12 +152,12 @@ MatrixXd Filter::filterData(const MatrixXd& mataData,
 
     // slice input data into data junks with proper length so that the slices are always >= the filter order
     int iGcd = MNEMath::gcd(mataData.cols(), iOrder);
-    int iFactorOrder = (iOrder/iGcd);
-    int iFactorData = (mataData.cols()/iGcd);
-    int iSize = iGcd * ceil((iFactorData + iFactorOrder) / 2);
+    int iFactor = floor((8196.0-iOrder)/iGcd);
+    int iSize = iGcd * iFactor;
+    int residual = mataData.cols() % iSize;
 
-    if((iSize < iOrder) || (mataData.cols() % iSize != 0) || (iSize < 4096 - iOrder)) {
-        //qWarning() << "[Filter::filterData] Data block is too small. Filtering whole block at once.";
+    if((iSize < iOrder) || (residual < iOrder)) {
+        //qWarning() << "[Filter::filterData] Sliced data block size is too small. Filtering whole block at once.";
         iSize = mataData.cols();
     }
 
