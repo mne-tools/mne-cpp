@@ -219,6 +219,14 @@ void AveragingSettingsView::redrawGUI()
     connect(m_pUi->m_pushButton_reset, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             this, &AveragingSettingsView::resetAverage);
 
+    connect(m_pUi->m_pushButton_compute, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+            this, &AveragingSettingsView::calculateAverage);
+    connect(m_pUi->m_checkBox_reject, &QCheckBox::clicked,
+            this, &AveragingSettingsView::changeDropActive);
+
+    m_pUi->m_pushButton_compute->hide();
+    m_pUi->m_checkBox_reject->hide();
+
     setWindowFlags(Qt::WindowStaysOnTopHint);
 
     m_pUi->m_groupBox_detectedTrials->hide();
@@ -333,13 +341,17 @@ void AveragingSettingsView::updateProcessingMode(ProcessingMode mode)
             m_pUi->m_pushButton_reset->hide();
             m_pUi->label->hide();
             m_pUi->m_label_numberAverages->hide();
+            m_pUi->m_pushButton_compute->show();
+            m_pUi->m_checkBox_reject->show();
             break;
-        default: // default is scientific mode
+        default: // default is realtime mode
             m_pUi->m_pSpinBoxNumAverages->show();
             m_pUi->m_pComboBoxChSelection->show();
             m_pUi->m_pushButton_reset->show();
             m_pUi->label->show();
             m_pUi->m_label_numberAverages->show();
+            m_pUi->m_pushButton_compute->hide();
+            m_pUi->m_checkBox_reject->hide();
             break;
     }
 }

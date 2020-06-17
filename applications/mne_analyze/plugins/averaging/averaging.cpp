@@ -2,7 +2,7 @@
 /**
  * @file     averaging.cpp
  * @author   Gabriel Motta <gbmotta@mgh.harvard.edu>
- * @since    0.1.2
+ * @since    0.1.3
  * @date     May, 2020
  *
  * @section  LICENSE
@@ -82,11 +82,11 @@ using namespace ANSHAREDLIB;
 //=============================================================================================================
 
 Averaging::Averaging()
-: m_pCommu(Q_NULLPTR)
-, m_pFiffRawModel(Q_NULLPTR)
+: m_pFiffRawModel(Q_NULLPTR)
 , m_pTriggerList(Q_NULLPTR)
-, m_pAveragingSettingsView(Q_NULLPTR)
 , m_pFiffInfo(Q_NULLPTR)
+, m_pCommu(Q_NULLPTR)
+, m_pAveragingSettingsView(Q_NULLPTR)
 , m_fBaselineFrom(0)
 , m_fBaselineTo(0)
 , m_fPreStim(0)
@@ -97,7 +97,6 @@ Averaging::Averaging()
 , m_bRejection(0)
 , m_pAnnCheck(Q_NULLPTR)
 , m_pStimCheck(Q_NULLPTR)
-, m_pCheckRejection(Q_NULLPTR)
 {
 }
 
@@ -198,26 +197,21 @@ QDockWidget* Averaging::getControl()
             this, &Averaging::onResetAverage, Qt::UniqueConnection);
 //    connect(m_pAveragingSettingsView, &DISPLIB::AveragingSettingsView::changeStimChannel,
 //            this, &Averaging::onChangeStimChannel);
+    connect(m_pAveragingSettingsView, &DISPLIB::AveragingSettingsView::calculateAverage,
+            this, &Averaging::onComputeButtonClicked, Qt::UniqueConnection);
+    connect(m_pAveragingSettingsView, &DISPLIB::AveragingSettingsView::changeDropActive,
+            this, &Averaging::onRejectionChecked, Qt::UniqueConnection);
 
     m_pAveragingSettingsView->setProcessingMode(DISPLIB::AbstractView::ProcessingMode::Offline);
 
     // Buttons
-    QPushButton* pButton = new QPushButton();
-    pButton->setText("COMPUTE");
     m_pAnnCheck = new QRadioButton("Average with annotations");
     m_pStimCheck = new QRadioButton("Average with stim channels");
-
-    m_pCheckRejection = new QCheckBox("Drop Rejected");
-
-    connect(m_pCheckRejection, &QCheckBox::toggled,
-            this, &Averaging::onRejectionChecked, Qt::UniqueConnection);
 
     connect(m_pAnnCheck, &QRadioButton::toggled,
             this, &Averaging::onCheckBoxStateChanged, Qt::UniqueConnection);
     connect(m_pStimCheck, &QRadioButton::toggled,
             this, &Averaging::onCheckBoxStateChanged, Qt::UniqueConnection);
-    connect(pButton, &QPushButton::clicked,
-            this, &Averaging::onComputeButtonClicked, Qt::UniqueConnection);
 
     //Sets Default state
     m_pAnnCheck->click();
@@ -229,22 +223,20 @@ QDockWidget* Averaging::getControl()
     pGBox->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
     pVBLayout->addWidget(m_pAnnCheck);
     pVBLayout->addWidget(m_pStimCheck);
-    pVBLayout->addWidget(pButton);
+
 
     pGBox->setLayout(pVBLayout);
 
     m_pLayout->addWidget(m_pAveragingSettingsView);
 //    m_pLayout->addWidget(m_pAnnCheck);
 //    m_pLayout->addWidget(m_pStimCheck);
-    m_pLayout->addWidget(m_pCheckRejection);
-    m_pLayout->addWidget(pButton);
 
     pWidget->setLayout(m_pLayout);
 
     m_pTabView->addTab(pWidget, "Parameters");
 
     pControl->setWidget(m_pTabView);
-    pControl->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
+    pControl->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     pControl->setObjectName("Averaging");
     pControl->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,
                                         QSizePolicy::Preferred));
@@ -286,7 +278,7 @@ void Averaging::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewMo
             }
         }
         m_pFiffRawModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
-        loadFullGUI();
+        loadFullGui();
     }
 }
 
@@ -303,7 +295,6 @@ void Averaging::onChangeBaselineFrom(qint32 fromMSeconds)
 {
     m_fBaselineFrom = static_cast<float>(fromMSeconds) / 1000.f;
 }
-
 
 //=============================================================================================================
 
@@ -411,7 +402,7 @@ void Averaging::computeAverage()
 
     m_pFiffEvokedSet = QSharedPointer<FIFFLIB::FiffEvokedSet>(new FIFFLIB::FiffEvokedSet());
     m_pFiffEvokedSet->evoked.append(*(m_pFiffEvoked.data()));
-    m_pFiffEvokedSet->info = *(m_pFiffRawModel->getFiffInfo());
+    m_pFiffEvokedSet->info = *(m_pFiffRawModel->getFiffInfo().data());
 
     if(m_bBasline){
         m_pFiffEvokedSet->evoked[0].baseline.first = QVariant(m_fBaselineFrom);
@@ -446,10 +437,10 @@ void Averaging::onCheckBoxStateChanged()
 
 //=============================================================================================================
 
-void Averaging::loadFullGUI()
+void Averaging::loadFullGui()
 {
     //This function needs to be called after we have the FiffRawModel, because we need FiffInfo to initialize objects herein
-    m_pFiffInfo = m_pFiffRawModel->getFiffInfo(0);
+    m_pFiffInfo = m_pFiffRawModel->getFiffInfo();
 
     //Init Models
     m_pChannelInfoModel = DISPLIB::ChannelInfoModel::SPtr::create(m_pFiffInfo);
@@ -600,13 +591,9 @@ void Averaging::clearAveraging()
 
 //=============================================================================================================
 
-void Averaging::onRejectionChecked()
+void Averaging::onRejectionChecked(bool bState)
 {
-    if (m_pCheckRejection->isChecked()){
-        m_bRejection = true;
-    } else {
-        m_bRejection = false;
-    }
+    m_bRejection = bState;
 }
 
 //=============================================================================================================

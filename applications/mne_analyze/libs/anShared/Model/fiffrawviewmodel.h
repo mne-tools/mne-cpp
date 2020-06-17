@@ -295,21 +295,13 @@ public:
 
     //=========================================================================================================
     /**
-     * Returns Fiff Info
-     *
-     * @return saved Fiff Info
-     */
-    FIFFLIB::FiffInfo* getFiffInfo() const;
-
-    //=========================================================================================================
-    /**
      * @brief getFiffInfo
      *
      * @param [in] bPlaceholder
      *
      * @return
      */
-    QSharedPointer<FIFFLIB::FiffInfo> getFiffInfo(bool bPlaceholder) const;
+    QSharedPointer<FIFFLIB::FiffInfo> getFiffInfo() const;
 
     //=========================================================================================================
     /**
