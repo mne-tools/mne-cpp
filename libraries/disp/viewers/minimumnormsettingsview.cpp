@@ -142,6 +142,18 @@ void MinimumNormSettingsView::updateGuiMode(GuiMode mode)
 
 //=============================================================================================================
 
+void MinimumNormSettingsView::updateProcessingMode(ProcessingMode mode)
+{
+    switch(mode) {
+        case ProcessingMode::Offline:
+            break;
+        default: // default is scientific mode
+            break;
+    }
+}
+
+//=============================================================================================================
+
 void MinimumNormSettingsView::onMethodChanged(const QString& method)
 {
     emit methodChanged(method);

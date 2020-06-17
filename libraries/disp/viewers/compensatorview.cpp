@@ -164,6 +164,18 @@ void CompensatorView::updateGuiMode(GuiMode mode)
 
 //=============================================================================================================
 
+void CompensatorView::updateProcessingMode(ProcessingMode mode)
+{
+    switch(mode) {
+        case ProcessingMode::Offline:
+            break;
+        default: // default is scientific mode
+            break;
+    }
+}
+
+//=============================================================================================================
+
 int CompensatorView::getLastTo() const
 {
     return m_iLastTo;

@@ -182,3 +182,15 @@ void SpectrumSettingsView::updateGuiMode(GuiMode mode)
             break;
     }
 }
+
+//=============================================================================================================
+
+void SpectrumSettingsView::updateProcessingMode(ProcessingMode mode)
+{
+    switch(mode) {
+        case ProcessingMode::Offline:
+            break;
+        default: // default is scientific mode
+            break;
+    }
+}
