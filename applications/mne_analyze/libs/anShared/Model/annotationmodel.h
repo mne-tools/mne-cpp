@@ -265,7 +265,11 @@ public:
     void appendSelected(int iSelectedIndex);
 
     //=========================================================================================================
-
+    /**
+     * Returns formatted matric with annotation data based on current display and type settings
+     *
+     * @return Returns a matrix of formatted annotation data
+     */
     MatrixXi getAnnotationMatrix();
 
     //=========================================================================================================
