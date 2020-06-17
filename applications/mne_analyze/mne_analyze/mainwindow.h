@@ -191,8 +191,6 @@ private:
      */
     void createLogDockWindow();
 
-//    void createAveragingWindows();
-
     /**< Creates all actions for user interface of MainWindow class. */
     void createPluginMenus(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager);          /**< Creates all menus for user interface of MainWindow class. */
     void createPluginControls(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager);    /**< Creates all dock windows for user interface of MainWindow class. */

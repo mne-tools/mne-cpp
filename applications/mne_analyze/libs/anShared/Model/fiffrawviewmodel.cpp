@@ -429,16 +429,8 @@ void FiffRawViewModel::updateScrollPosition(qint32 newScrollPosition)
 
 //=============================================================================================================
 
-FIFFLIB::FiffInfo* FiffRawViewModel::getFiffInfo() const
+QSharedPointer<FIFFLIB::FiffInfo> FiffRawViewModel::getFiffInfo() const
 {
-    return m_pFiffInfo.data();
-}
-
-//=============================================================================================================
-
-QSharedPointer<FIFFLIB::FiffInfo> FiffRawViewModel::getFiffInfo(bool bPlaceholder) const
-{
-    Q_UNUSED(bPlaceholder);
     return m_pFiffInfo;
 }
 
@@ -987,6 +979,5 @@ void FiffRawViewModel::updateDisplayData()
 
 QSharedPointer<FIFFLIB::FiffIO> FiffRawViewModel::getFiffIO() const
 {
-    qDebug() << "[FiffRawViewModel::getFiffIO]";
     return m_pFiffIO;
 }

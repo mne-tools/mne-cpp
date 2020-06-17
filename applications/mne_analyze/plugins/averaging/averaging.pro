@@ -3,8 +3,8 @@
 # @file     averaging.pro
 # @author   Lorenz Esch <lesch@mgh.harvard.edu>;
 #           Gabriel Motta <gbmotta@mgh.harvard.edu>
-# @since    0.1.0
-# @date     Februrary, 2020
+# @since    0.1.3
+# @date     May, 2020
 #
 # @section  LICENSE
 #

@@ -141,9 +141,9 @@ public:
 
     //=========================================================================================================
     /**
-     * Update the views GUI based on the set ProcessingMode (Clinical=0, Research=1).
+     * Update the views GUI based on the set ProcessingMode (RealTime=0, Offline=1).
      *
-     * @param mode     The new mode (Clinical=0, Research=1).
+     * @param mode     The new mode (RealTime=0, Offline=1).
      */
     void updateProcessingMode(ProcessingMode mode);
 
@@ -184,6 +184,8 @@ signals:
     void changeBaselineActive(bool state);
     void resetAverage(bool state);
     void changeAverageMode(qint32 index);
+    void calculateAverage(bool state);
+    void changeDropActive(bool state);
 };
 } // NAMESPACE
 

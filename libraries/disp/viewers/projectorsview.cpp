@@ -220,7 +220,7 @@ void ProjectorsView::updateProcessingMode(ProcessingMode mode)
     switch(mode) {
         case ProcessingMode::Offline:
             break;
-        default: // default is scientific mode
+        default: // default is realtime mode
             break;
     }
 }
