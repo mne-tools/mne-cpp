@@ -242,6 +242,14 @@ private:
      */
     void clearAveraging();
 
+    //=========================================================================================================
+    /**
+     * Call this slot whenever you want to make a screenshot of the butterfly or layout view.
+     *
+     * @param[out] imageType     The current iamge type: png, svg.
+     */
+    void onMakeScreenshot(const QString& imageType);
+
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals */
 
     QSharedPointer<ANSHAREDLIB::FiffRawViewModel>           m_pFiffRawModel;            /**< Pointer to currently loaded FiffRawView Model */
@@ -261,8 +269,6 @@ private:
 
 
     QSharedPointer<FIFFLIB::FiffInfo>                       m_pFiffInfo;
-
-    int                                                     m_iNumAve;
 
     float                                                   m_fBaselineFrom;
     float                                                   m_fBaselineTo;
