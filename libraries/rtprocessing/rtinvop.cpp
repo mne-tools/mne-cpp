@@ -136,6 +136,13 @@ void RtInvOp::append(const FIFFLIB::FiffCov &noiseCov)
 
 //=============================================================================================================
 
+void RtInvOp::setFwdSolution(QSharedPointer<MNELIB::MNEForwardSolution> pFwd)
+{
+    m_pFwd = pFwd;
+}
+
+//=============================================================================================================
+
 void RtInvOp::handleResults(const MNELIB::MNEInverseOperator& invOp)
 {
     emit invOperatorCalculated(invOp);

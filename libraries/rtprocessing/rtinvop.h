@@ -152,6 +152,14 @@ public:
 
     //=========================================================================================================
     /**
+     * Slot to receive incoming forward solution.
+     *
+     * @param[in] pFwd     Noise covariance estimation
+     */
+    void setFwdSolution(QSharedPointer<MNELIB::MNEForwardSolution> pFwd);
+
+    //=========================================================================================================
+    /**
      * Restarts the thread by interrupting its computation queue, quitting, waiting and then starting it again.
      */
     void restart();
