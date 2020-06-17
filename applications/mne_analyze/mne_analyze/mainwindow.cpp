@@ -434,10 +434,8 @@ void MainWindow::createPluginViews(QSharedPointer<PluginManager> pPluginManager)
             MultiViewWindow* pWindow = Q_NULLPTR;
 
             if(sCurPluginName == "RawDataViewer") {
-                qDebug() << "Bottom";
                 pWindow = m_pMultiView->addWidgetBottom(pView, sCurPluginName);
             } else {
-                qDebug() << "Top";
                 pWindow = m_pMultiView->addWidgetTop(pView, sCurPluginName);
             }
 
@@ -579,30 +577,3 @@ void MainWindow::about()
 
     m_pAboutWindow->show();
 }
-
-//=============================================================================================================
-
-//void MainWindow::createAveragingWindows()
-//{
-//    qDebug() << "MainWindow::createAveragingWindows Creating averaging windows";
-
-//    m_pButterflyView = new ButterflyView();
-//    m_pAverageLayoutView = new AverageLayoutView();
-
-//    QDockWidget* pDockWidgetBF = new QDockWidget(tr("Butterfly Plot"), this);
-//    QDockWidget* pDockWidgetAL = new QDockWidget(tr("2D Layout"), this);
-//    pDockWidgetBF->setObjectName("Butterfly Plot");
-//    pDockWidgetAL->setObjectName("2D Layout");
-
-//    pDockWidgetBF->setWidget(m_pButterflyView);
-//    pDockWidgetAL->setWidget(m_pAverageLayoutView);
-//    pDockWidgetBF->setAllowedAreas(Qt::BottomDockWidgetArea);
-//    pDockWidgetAL->setAllowedAreas(Qt::BottomDockWidgetArea);
-//    addDockWidget(Qt::BottomDockWidgetArea, pDockWidgetBF);
-//    addDockWidget(Qt::BottomDockWidgetArea, pDockWidgetAL);
-
-//    m_pMenuView->addAction(pDockWidgetBF->toggleViewAction());
-//    m_pMenuView->addAction(pDockWidgetAL->toggleViewAction());
-
-//    tabifyDockWindows();
-//}

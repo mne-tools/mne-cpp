@@ -73,6 +73,7 @@ Q_IMPORT_PLUGIN(DataManager)
 Q_IMPORT_PLUGIN(RawDataViewer)
 Q_IMPORT_PLUGIN(AnnotationManager)
 Q_IMPORT_PLUGIN(Filtering)
+Q_IMPORT_PLUGIN(Averaging)
 #endif
 
 //=============================================================================================================

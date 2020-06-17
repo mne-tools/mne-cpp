@@ -266,7 +266,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Returns formatted matric with annotation data based on current display and type settings
+     * Returns formatted matrix with annotation data based on current display and type settings
      *
      * @return Returns a matrix of formatted annotation data
      */

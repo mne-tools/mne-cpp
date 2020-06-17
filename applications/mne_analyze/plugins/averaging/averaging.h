@@ -2,7 +2,7 @@
 /**
  * @file     averaging.h
  * @author   Gabriel Motta <gbmotta@mgh.harvard.edu>
- * @since    0.1.2
+ * @since    0.1.3
  * @date     May, 2020
  *
  * @section  LICENSE
@@ -76,7 +76,7 @@ namespace FIFFLIB {
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE averagingPLUGIN
+// DEFINE NAMESPACE AVERAGINGPLUGIN
 //=============================================================================================================
 
 namespace AVERAGINGPLUGIN
@@ -88,9 +88,9 @@ namespace AVERAGINGPLUGIN
 
 //=============================================================================================================
 /**
- * averaging Plugin
+ * Averaging Plugin
  *
- * @brief The averaging class provides input and output capabilities for the fiff file format.
+ * @brief The averaging class provides a plugin for computing averages.
  */
 class AVERAGINGSHARED_EXPORT Averaging : public ANSHAREDLIB::IPlugin
 {
@@ -146,7 +146,7 @@ private:
     /**
      * Change the baseline from value
      *
-     * @param[in] fromMSeconds     the new baseline from value in seconds
+     * @param[in] fromMSeconds     the new baseline from value in milliseconds
      */
     void onChangeBaselineFrom(qint32 fromMSeconds);
 
@@ -154,7 +154,7 @@ private:
     /**
      * Change the baseline to value
      *
-     * @param[in] fromMSeconds     the new baseline to value in seconds
+     * @param[in] fromMSeconds     the new baseline to value in milliseconds
      */
     void onChangeBaselineTo(qint32 toMSeconds);
 
@@ -162,7 +162,7 @@ private:
     /**
      * Change the pre stim stim
      *
-     * @param[in] mseconds     the new pres stim in seconds
+     * @param[in] mseconds     the new pres stim in milliseconds
      */
     void onChangePreStim(qint32 mseconds);
 
@@ -170,7 +170,7 @@ private:
     /**
      * Change the post stim stim
      *
-     * @param[in] mseconds     the new post stim in seconds
+     * @param[in] mseconds     the new post stim in milliseconds
      */
     void onChangePostStim(qint32 mseconds);
 
@@ -222,7 +222,7 @@ private:
     /**
      * Toggles dropping rejected when computing average
      */
-    void onRejectionChecked();
+    void onRejectionChecked(bool bState);
 
     //=========================================================================================================
     /**
@@ -234,7 +234,7 @@ private:
     /**
      *  Loads averging GUI components that are dependent on FiffRawModel to be initialized
      */
-    void loadFullGUI();
+    void loadFullGui();
 
     //=========================================================================================================
     /**
@@ -250,44 +250,36 @@ private:
      */
     void onMakeScreenshot(const QString& imageType);
 
-    QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals */
-
     QSharedPointer<ANSHAREDLIB::FiffRawViewModel>           m_pFiffRawModel;            /**< Pointer to currently loaded FiffRawView Model */
-    QSharedPointer<QList<QPair<int,double>>>                m_pTriggerList;
-    QSharedPointer<FIFFLIB::FiffEvoked>                     m_pFiffEvoked;
-    QSharedPointer<FIFFLIB::FiffEvokedSet>                  m_pFiffEvokedSet;
+    QSharedPointer<QList<QPair<int,double>>>                m_pTriggerList;             /**< Pointer to list of stim triggers */
+    QSharedPointer<FIFFLIB::FiffEvoked>                     m_pFiffEvoked;              /**< Pointer to object to store averaging data */
+    QSharedPointer<FIFFLIB::FiffEvokedSet>                  m_pFiffEvokedSet;           /**< Pointer to object that can store m_pFiffEvoked and be added to a model */
+    QSharedPointer<DISPLIB::EvokedSetModel>                 m_pEvokedModel;             /**< Pointer to model used to display averaging data from m_pFiffEvokedSet and m_pFiffEvoked */
+    QSharedPointer<DISPLIB::ChannelSelectionView>           m_pChannelSelectionView;    /**< Pointer to Channel selection GUI */
+    QSharedPointer<DISPLIB::ChannelInfoModel>               m_pChannelInfoModel;        /**< Pointer to model that holds channel info data */
+    QSharedPointer<FIFFLIB::FiffInfo>                       m_pFiffInfo;                /**< Pointer to info about loaded fiff data */
 
-    QSharedPointer<DISPLIB::EvokedSetModel>                 m_pEvokedModel;
-    QSharedPointer<DISPLIB::ChannelSelectionView>           m_pChannelSelectionView;
+    QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals */
+    QPointer<DISPLIB::ButterflyView>                        m_pButterflyView;           /**< The butterfly plot view. */
+    QPointer<DISPLIB::AverageLayoutView>                    m_pAverageLayoutView;       /**< The average layout plot view */
 
-    QSharedPointer<DISPLIB::ChannelInfoModel>               m_pChannelInfoModel;
+    DISPLIB::AveragingSettingsView*                         m_pAveragingSettingsView;   /**< Pointer to averaging settings GUI */
 
-    DISPLIB::AveragingSettingsView*                         m_pAveragingSettingsView;
+    float                                                   m_fBaselineFrom;            /**< Baseline start - in seconds relative to stim(0) - can be negative*/
+    float                                                   m_fBaselineTo;              /**< Baseline end - in seconds relative to stim(0) - can be negative*/
+    float                                                   m_fPreStim;                 /**< Time before stim - in seconds - stored as positive number (>0) */
+    float                                                   m_fPostStim;                /**< Time after stim - in seconds - stored as positive number (>0) */
+    float                                                   m_fTriggerThreshold;        /**< Threshold to count stim channel events */
 
-    QPointer<DISPLIB::ButterflyView>                        m_pButterflyView;       /**< The butterfly plot view. */
-    QPointer<DISPLIB::AverageLayoutView>                    m_pAverageLayoutView;   /**< The average layout plot view */
+    QVBoxLayout*                                            m_pLayout;                  /**< Pointer to layout that holds parameter GUI tab elements */
+    QTabWidget*                                             m_pTabView;                 /**< Pointer to object that stores multiple tabs of GUI items */
 
+    bool                                                    m_bUseAnn;                  /**< Whether to use annotations to compute average. Currently always set to true (1) */
+    bool                                                    m_bBasline;                 /**< Whether to apply baseline correction */
+    bool                                                    m_bRejection;               /**< Whether to drop data points marked fro rejection when calculating average */
 
-    QSharedPointer<FIFFLIB::FiffInfo>                       m_pFiffInfo;
-
-    float                                                   m_fBaselineFrom;
-    float                                                   m_fBaselineTo;
-    float                                                   m_fPreStim;
-    float                                                   m_fPostStim;
-    float                                                   m_fTriggerThreshold;
-
-    QVBoxLayout*                                            m_pLayout;
-    QTabWidget*                                             m_pTabView;
-
-    bool                                                    m_bUseAnn;
-    bool                                                    m_bBasline;
-    bool                                                    m_bRejection;
-
-    QRadioButton*                                           m_pAnnCheck;
-    QRadioButton*                                           m_pStimCheck;
-
-    QCheckBox*                                              m_pCheckRejection;
-
+    QRadioButton*                                           m_pAnnCheck;                /**< Radio Buttons to control m_bUseAnn. True (1) if this is checked. */
+    QRadioButton*                                           m_pStimCheck;               /**< Radio Buttons to control m_bUseAnn. False (0) if this is checked. */
 
 };
 
