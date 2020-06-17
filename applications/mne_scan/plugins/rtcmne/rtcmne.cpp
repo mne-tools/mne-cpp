@@ -367,6 +367,12 @@ void RtcMne::updateRTFS(SCMEASLIB::Measurement::SPtr pMeasurement)
             m_qMutex.lock();
             m_pFiffInfoForward = QSharedPointer<FiffInfoBase>(new FiffInfoBase(m_pFwd->info));
             m_qMutex.unlock();
+
+            // update inverse operator
+            if(this->isRunning() && m_pRtInvOp) {
+                m_pRtInvOp->setFwdSolution(m_pFwd);
+                m_pRtInvOp->append(*m_pNoiseCov);
+            }
         } else if(!pRTFS->isClustered()) {
             qWarning() << "[RtcMne::updateRTFS] The forward solution has not been clustered yet.";
         }
@@ -441,7 +447,8 @@ void RtcMne::updateRTC(SCMEASLIB::Measurement::SPtr pMeasurement)
             }
 
             if(this->isRunning() && m_pRtInvOp){
-                m_pRtInvOp->append(*pRTC->getValue());
+                m_pNoiseCov = pRTC->getValue();
+                m_pRtInvOp->append(*m_pNoiseCov);
             }
         }
     }
