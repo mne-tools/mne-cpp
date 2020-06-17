@@ -86,7 +86,6 @@ Averaging::Averaging()
 , m_pTriggerList(Q_NULLPTR)
 , m_pAveragingSettingsView(Q_NULLPTR)
 , m_pFiffInfo(Q_NULLPTR)
-, m_iNumAve(0)
 , m_fBaselineFrom(0)
 , m_fBaselineTo(0)
 , m_fPreStim(0)
@@ -99,7 +98,6 @@ Averaging::Averaging()
 , m_pStimCheck(Q_NULLPTR)
 , m_pCheckRejection(Q_NULLPTR)
 {
-    qDebug() << "[Averaging::Averaging]";
 }
 
 //=============================================================================================================
@@ -150,37 +148,24 @@ QMenu *Averaging::getMenu()
 
 QWidget *Averaging::getView()
 {
-    qDebug() << "[Averaging::getView]";
-
     m_pButterflyView = new DISPLIB::ButterflyView();
     m_pAverageLayoutView = new DISPLIB::AverageLayoutView();
 
     QTabWidget* pTabView = new QTabWidget();
-
-//    return m_pButterflyView;
+    QWidget* testWidget = new QWidget();
+    QVBoxLayout* testLayout = new QVBoxLayout();
 
     pTabView->addTab(m_pButterflyView, "Butterfly View");
     pTabView->addTab(m_pAverageLayoutView, "2D Layout View");
 
-    QWidget* testWidget = new QWidget();
-    QVBoxLayout* testLayout = new QVBoxLayout();
-    //QLabel* testLabel = new QLabel("Test Test");
-
     testLayout->addWidget(pTabView);
     testWidget->setLayout(testLayout);
-
-//    testLayout->addWidget(m_pButterflyView);
-//    testWidget->setLayout(testLayout);
-
-    qDebug() << "Created Widget";
 
     testWidget->setMinimumSize(256, 256);
     testWidget->setFocusPolicy(Qt::TabFocus);
     testWidget->setAttribute(Qt::WA_DeleteOnClose, false);
 
     return testWidget;
-
-//    return Q_NULLPTR;
 }
 
 //=============================================================================================================
@@ -188,11 +173,10 @@ QWidget *Averaging::getView()
 QDockWidget* Averaging::getControl()
 {
     QDockWidget* pControl = new QDockWidget(getName());
-    m_pLayout = new QVBoxLayout;
     QWidget* pWidget = new QWidget();
-    m_pTabView = new QTabWidget();
 
-    qDebug() << "4";
+    m_pLayout = new QVBoxLayout;
+    m_pTabView = new QTabWidget();
 
     //Average Settings View
     m_pAveragingSettingsView = new DISPLIB::AveragingSettingsView(QString("MNEANALYZE/%1").arg(this->getName()));
@@ -215,17 +199,6 @@ QDockWidget* Averaging::getControl()
 //            this, &Averaging::onChangeStimChannel);
 
     m_pAveragingSettingsView->setProcessingMode(DISPLIB::AbstractView::ProcessingMode::Offline);
-
-    qDebug() << "5";
-
-
-    //Init View components
-//    m_pButterflyView->setChannelInfoModel(m_pChannelInfoModel);
-//    m_pChannelSelectionView->updateDataView();
-//    m_pAverageLayoutView->setEvokedSetModel(m_pEvokedModel);
-//    m_pAverageLayoutView->setChannelInfoModel(m_pChannelInfoModel);
-//    m_pChannelInfoModel->layoutChanged(m_pChannelSelectionView->getLayoutMap());
-
 
     // Buttons
     QPushButton* pButton = new QPushButton();
@@ -260,9 +233,6 @@ QDockWidget* Averaging::getControl()
     pGBox->setLayout(pVBLayout);
 
     m_pLayout->addWidget(m_pAveragingSettingsView);
-////    pLayout->addWidget(pGBox);
-////    pLayout->addWidget(m_pChannelSelectionView.data());
-
 //    m_pLayout->addWidget(m_pAnnCheck);
 //    m_pLayout->addWidget(m_pStimCheck);
     m_pLayout->addWidget(m_pCheckRejection);
@@ -277,14 +247,6 @@ QDockWidget* Averaging::getControl()
     pControl->setObjectName("Averaging");
     pControl->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,
                                         QSizePolicy::Preferred));
-
-//    m_iNumAve = m_pAveragingSettingsView->getNumAverages();
-//    m_iBaselineFrom = m_pAveragingSettingsView->getBaselineFromSeconds();
-//    m_iBaselineTo = m_pAveragingSettingsView->getBaselineToSeconds();
-
-//    m_fPreStim = m_pAveragingSettingsView->getPreStimSeconds();
-//    m_fPostStim = m_pAveragingSettingsView->getPostStimSeconds();
-
     return pControl;
 }
 
@@ -294,7 +256,6 @@ void Averaging::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
         case EVENT_TYPE::SELECTED_MODEL_CHANGED:
-            qDebug() << "[Averaging::handleEvent] SELECTED_MODEL_CHANGED";
             onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
             break;
         default:
@@ -319,13 +280,12 @@ void Averaging::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewMo
     if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
         if(m_pFiffRawModel) {
             if(m_pFiffRawModel == pNewModel) {
-                qDebug() << "[Averaging::onModelChanged] Model is the same";
+                qInfo() << "[Averaging::onModelChanged] New model is the same as old model";
                 return;
             }
         }
         m_pFiffRawModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
         loadFullGUI();
-        qDebug() << "[Averaging::onModelChanged] New model loaded";
     }
 }
 
@@ -333,19 +293,14 @@ void Averaging::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewMo
 
 void Averaging::onChangeNumAverages(qint32 numAve)
 {
-    qDebug() << "[Averaging::onChangeNumAverages]" << numAve;
-    m_iNumAve = numAve;
-
+    Q_UNUSED(numAve)
 }
 
 //=============================================================================================================
 
 void Averaging::onChangeBaselineFrom(qint32 fromMSeconds)
 {
-
-    qDebug() << "[Averaging::onChangeBaselineFrom]" << fromMSeconds;
     m_fBaselineFrom = static_cast<float>(fromMSeconds) / 1000.f;
-
 }
 
 
@@ -353,38 +308,27 @@ void Averaging::onChangeBaselineFrom(qint32 fromMSeconds)
 
 void Averaging::onChangeBaselineTo(qint32 toMSeconds)
 {
-    qDebug() << "[Averaging::onChangeBaselineTo]" << toMSeconds;
     m_fBaselineTo = static_cast<float>(toMSeconds) / 1000.f;
-
 }
 
 //=============================================================================================================
 
 void Averaging::onChangePreStim(qint32 mseconds)
 {
-    qDebug() << "[Averaging::onChangePreStim]" << mseconds;
-
     m_fPreStim =  -(static_cast<float>(mseconds)/1000);
-
-
 }
 
 //=============================================================================================================
 
 void Averaging::onChangePostStim(qint32 mseconds)
 {
-
-    qDebug() << "[Averaging::onChangePostStim]";
-
     m_fPostStim = (static_cast<float>(mseconds)/1000);
-
 }
 
 //=============================================================================================================
 
 void Averaging::onChangeBaselineActive(bool state)
 {
-    qDebug() << "[Averaging::onChangeBaselineActive]" << state;
     m_bBasline = state;
 }
 
@@ -393,9 +337,6 @@ void Averaging::onChangeBaselineActive(bool state)
 void Averaging::onResetAverage(bool state)
 {
     Q_UNUSED(state)
-    qDebug() << "[Averaging::onResetAverage]";
-
-
 }
 
 //=============================================================================================================
@@ -403,7 +344,6 @@ void Averaging::onResetAverage(bool state)
 void Averaging::onComputeButtonClicked(bool bChecked)
 {
     Q_UNUSED(bChecked);
-    qDebug() << "[Averaging::onComputeButtonClicked]";
     computeAverage();
 }
 
@@ -411,8 +351,6 @@ void Averaging::onComputeButtonClicked(bool bChecked)
 
 void Averaging::computeAverage()
 {
-    qDebug() << "[Averaging::computeAverage]";
-
     clearAveraging();
 
     if(!m_pFiffRawModel){
@@ -421,41 +359,25 @@ void Averaging::computeAverage()
     }
 
     if(m_pFiffRawModel->getAnnotationModel()->getNumberOfAnnotations() < 2){
-        qWarning() << "Not enough annotations to calculate average.";
+        qWarning() << "Not enough data points to calculate average.";
         return;
     }
 
     MatrixXi matEvents;
     QMap<QString,double> mapReject;
     MNELIB::MNEEpochDataList lstEpochDataList;
-//    FIFFLIB::FiffEvoked FiffEvoked;
 
     m_pFiffEvoked = QSharedPointer<FIFFLIB::FiffEvoked>(new FIFFLIB::FiffEvoked());
-    int iType = 1; //hardwired for now, change later to annotation type
+    int iType = 1; //hardwired for now, change later to type
     mapReject.insert("eog", 300e-06);
 
     FIFFLIB::FiffRawData* pFiffRaw = this->m_pFiffRawModel->getFiffIO()->m_qlistRaw.first().data();
-    //*(this->m_pFiffRawModel->getFiffIO()->m_qlistRaw.first().data());
-
-    qDebug() << "Initialized varibles";
 
     if (m_bUseAnn){
-        qDebug() << "using annotations";
         matEvents = m_pFiffRawModel->getAnnotationModel()->getAnnotationMatrix();
-
-        qDebug() << "Event Matrix:";
-        std::cout << matEvents;
     } else {
-        qDebug() << "using stim";
-
-        //QList<QPair<int,double> > lDetectedTriggers;
-
-        //lDetectedTriggers;
+        //NOT IMPLEMENTED
     }
-
-
-    qDebug() << "PreStim:" << m_fPreStim <<", Post Stim:" << m_fPostStim;
-    qDebug() << "Type:" << iType;
 
     lstEpochDataList = MNELIB::MNEEpochDataList::readEpochs(*pFiffRaw,
                                                           matEvents,
@@ -475,39 +397,22 @@ void Averaging::computeAverage()
         lstEpochDataList.dropRejected();
     }
 
-    std::cout << "Got Epoch List and dropped rejected";
-
-//    FiffEvoked = pEpochDataList.average(pFiffRaw->info,
-//                                            pFiffRaw->first_samp,
-//                                            pFiffRaw->last_samp);
-
     *m_pFiffEvoked = lstEpochDataList.average(pFiffRaw->info,
                                             0,
-                                            lstEpochDataList.first()->epoch.cols()/*,
-                                            FIFFLIB::defaultVectorXi,
-                                            true*/);
+                                            lstEpochDataList.first()->epoch.cols());
 
-    std::cout << "lstEpochDataList.first()->epoch.cols()" << lstEpochDataList.first()->epoch.cols() << std::endl;
-
-    std::cout << "lstEpochDataList.first()->tmin" << lstEpochDataList.first()->tmin<< std::endl;
-    std::cout << "lstEpochDataList.first()->tmax" << lstEpochDataList.first()->tmax<< std::endl;
-
-    std::cout << "m_pFiffEvoked->data.block(0,0,10,10)" << m_pFiffEvoked->data.block(0,0,10,10) << std::endl;
-
-    std::cout << "m_pFiffEvoked->data.cols()" << m_pFiffEvoked->data.cols()<< std::endl;
-
-
+//    //DEBUG
+//    std::cout << "lstEpochDataList.first()->epoch.cols()" << lstEpochDataList.first()->epoch.cols() << std::endl;
+//    std::cout << "lstEpochDataList.first()->tmin" << lstEpochDataList.first()->tmin<< std::endl;
+//    std::cout << "lstEpochDataList.first()->tmax" << lstEpochDataList.first()->tmax<< std::endl;
+//    std::cout << "m_pFiffEvoked->data.block(0,0,10,10)" << m_pFiffEvoked->data.block(0,0,10,10) << std::endl;
+//    std::cout << "m_pFiffEvoked->data.cols()" << m_pFiffEvoked->data.cols()<< std::endl;
 
     m_pFiffEvokedSet = QSharedPointer<FIFFLIB::FiffEvokedSet>(new FIFFLIB::FiffEvokedSet());
     m_pFiffEvokedSet->evoked.append(*(m_pFiffEvoked.data()));
     m_pFiffEvokedSet->info = *(m_pFiffRawModel->getFiffInfo());
 
-    std::cout << "set models:";
-
     if(m_bBasline){
-        std::cout << std::endl << "m_fBaselineFrom: " << m_fBaselineFrom << std::endl;
-        std::cout << std::endl << "m_fBaselineTo: " << m_fBaselineTo << std::endl;
-
         m_pFiffEvokedSet->evoked[0].baseline.first = QVariant(m_fBaselineFrom);
         m_pFiffEvokedSet->evoked[0].baseline.second = QVariant(m_fBaselineTo);
     }
@@ -520,28 +425,22 @@ void Averaging::computeAverage()
     m_pButterflyView->setChannelInfoModel(m_pChannelInfoModel);
     m_pAverageLayoutView->setChannelInfoModel(m_pChannelInfoModel);
 
-
     m_pButterflyView->dataUpdate();
     m_pButterflyView->updateView();
     m_pAverageLayoutView->updateData();
 
-
-    qDebug() << "Averaging done.";
+    qInfo() << "[Averaging::computeAverage] Average computed.";
 }
 
 //=============================================================================================================
 
 void Averaging::onCheckBoxStateChanged()
 {
-    qDebug() << "[Averaging::onCheckBoxStateChanged]";
-
     if (m_pAnnCheck->isChecked()){
         m_bUseAnn = true;
     } else {
         m_bUseAnn = false;
     }
-
-    qDebug() << "useAnn:" << m_bUseAnn;
 }
 
 //=============================================================================================================
@@ -549,25 +448,13 @@ void Averaging::onCheckBoxStateChanged()
 void Averaging::loadFullGUI()
 {
     //This function needs to be called after we have the FiffRawModel, because we need FiffInfo to initialize objects herein
-    qDebug() << "[Averaging::loadFullGUI]";
-
-    QPushButton* pButton = new QPushButton();
-    pButton->setText("Channel Selection");
-    connect(pButton, &QPushButton::clicked,
-            this, &Averaging::onChannelButtonClicked);
-
+    m_pFiffInfo = m_pFiffRawModel->getFiffInfo(0);
 
     //Init Models
-
-    //m_pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FIFFLIB::FiffInfo(*(m_pFiffRawModel->getFiffInfo())));
-    m_pFiffInfo = m_pFiffRawModel->getFiffInfo(0);
     m_pChannelInfoModel = DISPLIB::ChannelInfoModel::SPtr::create(m_pFiffInfo);
-
     m_pEvokedModel = QSharedPointer<DISPLIB::EvokedSetModel>(new DISPLIB::EvokedSetModel());
     m_pFiffEvokedSet = QSharedPointer<FIFFLIB::FiffEvokedSet>(new FIFFLIB::FiffEvokedSet());
-    //m_pEvokedModel->setEvokedSet(m_pFiffEvokedSet);
 
-    qDebug() << "1";
     //Channel Selection View
     m_pChannelSelectionView = QSharedPointer<DISPLIB::ChannelSelectionView>(new DISPLIB::ChannelSelectionView(QString("MNEANALYZE/AVERAGING"),
                                                                            Q_NULLPTR,
@@ -586,7 +473,11 @@ void Averaging::loadFullGUI()
     connect(m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::selectionChanged,
             m_pAverageLayoutView.data(), &DISPLIB::AverageLayoutView::channelSelectionManagerChanged);
 
-    qDebug() << "2";
+    QPushButton* pChanSelButton = new QPushButton();
+    pChanSelButton->setText("Channel Selection");
+    connect(pChanSelButton, &QPushButton::clicked,
+            this, &Averaging::onChannelButtonClicked);
+
     //Init View components
     m_pButterflyView->setChannelInfoModel(m_pChannelInfoModel);
     m_pChannelSelectionView->updateDataView();
@@ -652,22 +543,13 @@ void Averaging::loadFullGUI()
     m_pAverageLayoutView->setAverageActivation(pAverageSelectionView->getAverageActivation());
     m_pAverageLayoutView->setAverageColor(pAverageSelectionView->getAverageColor());
 
-    qDebug() << "3";
     //Add new widgets
-    m_pLayout->addWidget(pButton);
-//    m_pLayout->addWidget(pScalingView);
-//    m_pLayout->addWidget(pModalitySelectionView);
-//    m_pLayout->addWidget(pAverageSelectionView);
-//    m_pLayout->addWidget();
-//    m_pLayout->addWidget();
-    //m_pLayout->addWidget(m_pChannelSelectionView.data());
+    m_pLayout->addWidget(pChanSelButton);
     m_pTabView->addTab(pScalingView, "Scaling");
     m_pTabView->addTab(pModalitySelectionView, "Modality");
 //    m_pTabView->addTab(pAverageSelectionView, "Average Selection");
 
-    qDebug() << "4";
     //Update saved params
-    m_iNumAve = m_pAveragingSettingsView->getNumAverages();
     m_fBaselineFrom = static_cast<float>(m_pAveragingSettingsView->getBaselineFromSeconds())/1000.f;
     m_fBaselineTo = static_cast<float>(m_pAveragingSettingsView->getBaselineToSeconds())/1000.f;
 
@@ -691,7 +573,6 @@ void Averaging::onChannelButtonClicked()
 
 void Averaging::clearAveraging()
 {
-    qDebug() << "[Averaging::clearAveraging]";
     m_pFiffEvokedSet->evoked.clear();
     m_pFiffEvokedSet.clear();
     m_pFiffEvoked.clear();
@@ -701,7 +582,6 @@ void Averaging::clearAveraging()
 
 void Averaging::onRejectionChecked()
 {
-    qDebug() << "[Averaging::onRejectionChecked]" << m_pCheckRejection->isChecked();
     if (m_pCheckRejection->isChecked()){
         m_bRejection = true;
     } else {
