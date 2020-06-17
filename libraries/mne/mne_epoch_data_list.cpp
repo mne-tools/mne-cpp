@@ -43,8 +43,6 @@
 
 #include <utils/mnemath.h>
 
-#include <iostream>
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -221,9 +219,6 @@ FiffEvoked MNEEpochDataList::average(FiffInfo& info, fiff_int_t first, fiff_int_
 
     p_evoked.times[static_cast<int>(this->first()->tmin * -1 * info.sfreq)] = 0;
 
-    std::cout << "TIMES";
-    std::cout << p_evoked.times;
-
     p_evoked.comment = QString::number(this->at(0)->event);
 
     if(p_evoked.proj.rows() > 0) {
@@ -231,9 +226,6 @@ FiffEvoked MNEEpochDataList::average(FiffInfo& info, fiff_int_t first, fiff_int_
         printf("\tSSP projectors applied to the evoked data\n");
     }
 
-//    std::cout << std::endl << "this->first()->tmin: " << this->first()->tmin << std::endl;
-//    p_evoked.baseline.first = QVariant(this->first()->tmin);
-//    p_evoked.baseline.second = QVariant(this->first()->tmax);
     p_evoked.data = matAverage;
 
     return p_evoked;
