@@ -566,7 +566,7 @@ void Averaging::loadFullGUI()
 
     m_pTabView->addTab(pScalingView, "Scaling");
     m_pTabView->addTab(pModalitySelectionView, "Modality");
-    m_pTabView->addTab(pChannelDataSettingsView, "View");
+//    m_pTabView->addTab(pChannelDataSettingsView, "View");
 //    m_pTabView->addTab(pAverageSelectionView, "Average Selection");
 
     //Update saved params
