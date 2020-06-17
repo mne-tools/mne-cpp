@@ -352,8 +352,6 @@ void Averaging::onComputeButtonClicked(bool bChecked)
 
 void Averaging::computeAverage()
 {
-    clearAveraging();
-
     if(!m_pFiffRawModel){
         qWarning() << "No model loaded. Cannot calculate average";
         return;
@@ -363,6 +361,8 @@ void Averaging::computeAverage()
         qWarning() << "Not enough data points to calculate average.";
         return;
     }
+
+    clearAveraging();
 
     MatrixXi matEvents;
     QMap<QString,double> mapReject;
