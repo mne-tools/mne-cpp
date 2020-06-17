@@ -297,9 +297,7 @@ public:
     /**
      * @brief getFiffInfo
      *
-     * @param [in] bPlaceholder
-     *
-     * @return
+     * @return Shared Pointer pointing to m_pFiffInfo
      */
     QSharedPointer<FIFFLIB::FiffInfo> getFiffInfo() const;
 
