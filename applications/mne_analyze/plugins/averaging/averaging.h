@@ -211,6 +211,17 @@ private:
     void onCheckBoxStateChanged();
 
     //=========================================================================================================
+    /**
+     * Change the stim channel
+     *
+     * @param[in] sStimCh     the new stim channel name
+     */
+    void onChangeStimChannel(const QString &sStimCh);
+
+    //=========================================================================================================
+    /**
+     * Toggles dropping rejected when computing average
+     */
     void onRejectionChecked();
 
     //=========================================================================================================
@@ -257,6 +268,7 @@ private:
     float                                                   m_fBaselineTo;
     float                                                   m_fPreStim;
     float                                                   m_fPostStim;
+    float                                                   m_fTriggerThreshold;
 
     QVBoxLayout*                                            m_pLayout;
     QTabWidget*                                             m_pTabView;

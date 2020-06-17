@@ -91,6 +91,7 @@ Averaging::Averaging()
 , m_fBaselineTo(0)
 , m_fPreStim(0)
 , m_fPostStim(0)
+, m_fTriggerThreshold(0.5)
 , m_bUseAnn(1)
 , m_bBasline(0)
 , m_bRejection(0)
@@ -210,6 +211,8 @@ QDockWidget* Averaging::getControl()
             this, &Averaging::onChangeBaselineActive, Qt::UniqueConnection);
     connect(m_pAveragingSettingsView, &DISPLIB::AveragingSettingsView::resetAverage,
             this, &Averaging::onResetAverage, Qt::UniqueConnection);
+    connect(m_pAveragingSettingsView, &DISPLIB::AveragingSettingsView::changeStimChannel,
+            this, &Averaging::onChangeStimChannel);
 
 
     qDebug() << "5";
@@ -443,7 +446,10 @@ void Averaging::computeAverage()
         std::cout << matEvents;
     } else {
         qDebug() << "using stim";
-        //TODO : add reading from stim channels
+
+        QList<QPair<int,double> > lDetectedTriggers;
+
+        lDetectedTriggers;
     }
 
 
