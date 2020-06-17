@@ -50,6 +50,7 @@
 #include <disp/viewers/modalityselectionview.h>
 #include <disp/viewers/channelselectionview.h>
 #include <disp/viewers/averageselectionview.h>
+#include <disp/viewers/fiffrawviewsettings.h>
 #include <disp/viewers/averagelayoutview.h>
 #include <disp/viewers/butterflyview.h>
 #include <disp/viewers/scalingview.h>
@@ -209,14 +210,14 @@ QDockWidget* Averaging::getControl()
     m_pCheckRejection = new QCheckBox("Drop Rejected");
 
     connect(m_pCheckRejection, &QCheckBox::toggled,
-            this, &Averaging::onRejectionChecked);
+            this, &Averaging::onRejectionChecked, Qt::UniqueConnection);
 
     connect(m_pAnnCheck, &QRadioButton::toggled,
-            this, &Averaging::onCheckBoxStateChanged);
+            this, &Averaging::onCheckBoxStateChanged, Qt::UniqueConnection);
     connect(m_pStimCheck, &QRadioButton::toggled,
-            this, &Averaging::onCheckBoxStateChanged);
+            this, &Averaging::onCheckBoxStateChanged, Qt::UniqueConnection);
     connect(pButton, &QPushButton::clicked,
-            this, &Averaging::onComputeButtonClicked);
+            this, &Averaging::onComputeButtonClicked, Qt::UniqueConnection);
 
     //Sets Default state
     m_pAnnCheck->click();
@@ -462,16 +463,16 @@ void Averaging::loadFullGUI()
                                                                            Qt::Window));
 
     connect(m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::loadedLayoutMap,
-            m_pChannelInfoModel.data(), &DISPLIB::ChannelInfoModel::layoutChanged);
+            m_pChannelInfoModel.data(), &DISPLIB::ChannelInfoModel::layoutChanged, Qt::UniqueConnection);
 
     connect(m_pChannelInfoModel.data(), &DISPLIB::ChannelInfoModel::channelsMappedToLayout,
-            m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::setCurrentlyMappedFiffChannels);
+            m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::setCurrentlyMappedFiffChannels, Qt::UniqueConnection);
 
     connect(m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::showSelectedChannelsOnly,
-            m_pButterflyView.data(), &DISPLIB::ButterflyView::showSelectedChannelsOnly);
+            m_pButterflyView.data(), &DISPLIB::ButterflyView::showSelectedChannelsOnly, Qt::UniqueConnection);
 
     connect(m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::selectionChanged,
-            m_pAverageLayoutView.data(), &DISPLIB::AverageLayoutView::channelSelectionManagerChanged);
+            m_pAverageLayoutView.data(), &DISPLIB::AverageLayoutView::channelSelectionManagerChanged, Qt::UniqueConnection);
 
     QPushButton* pChanSelButton = new QPushButton();
     pChanSelButton->setText("Channel Selection");
@@ -490,10 +491,10 @@ void Averaging::loadFullGUI()
     pScalingView->setObjectName("group_tab_View_Scaling");
 
     connect(pScalingView, &DISPLIB::ScalingView::scalingChanged,
-            m_pButterflyView.data(), &DISPLIB::ButterflyView::setScaleMap);
+            m_pButterflyView.data(), &DISPLIB::ButterflyView::setScaleMap, Qt::UniqueConnection);
 
     connect(pScalingView, &DISPLIB::ScalingView::scalingChanged,
-            m_pAverageLayoutView.data(), &DISPLIB::AverageLayoutView::setScaleMap);
+            m_pAverageLayoutView.data(), &DISPLIB::AverageLayoutView::setScaleMap, Qt::UniqueConnection);
 
 
     m_pButterflyView->setScaleMap(pScalingView->getScaleMap());
@@ -505,7 +506,7 @@ void Averaging::loadFullGUI()
     pModalitySelectionView->setObjectName("group_tab_View_Modalities");
 
     connect(pModalitySelectionView, &DISPLIB::ModalitySelectionView::modalitiesChanged,
-            m_pButterflyView.data(), &DISPLIB::ButterflyView::setModalityMap);
+            m_pButterflyView.data(), &DISPLIB::ButterflyView::setModalityMap, Qt::UniqueConnection);
 
     m_pButterflyView->setModalityMap(pModalitySelectionView->getModalityMap());
 
@@ -514,27 +515,27 @@ void Averaging::loadFullGUI()
     pAverageSelectionView->setObjectName("group_tab_View_Selection");
 
     connect(m_pEvokedModel.data(), &DISPLIB::EvokedSetModel::newAverageActivationMap,
-            pAverageSelectionView, &DISPLIB::AverageSelectionView::setAverageActivation);
+            pAverageSelectionView, &DISPLIB::AverageSelectionView::setAverageActivation, Qt::UniqueConnection);
     connect(m_pEvokedModel.data(), &DISPLIB::EvokedSetModel::newAverageColorMap,
-            pAverageSelectionView, &DISPLIB::AverageSelectionView::setAverageColor);
+            pAverageSelectionView, &DISPLIB::AverageSelectionView::setAverageColor, Qt::UniqueConnection);
 
     connect(m_pEvokedModel.data(), &DISPLIB::EvokedSetModel::newAverageColorMap,
-            m_pButterflyView.data(), &DISPLIB::ButterflyView::setAverageColor);
+            m_pButterflyView.data(), &DISPLIB::ButterflyView::setAverageColor, Qt::UniqueConnection);
     connect(m_pEvokedModel.data(), &DISPLIB::EvokedSetModel::newAverageActivationMap,
-            m_pButterflyView.data(), &DISPLIB::ButterflyView::setAverageActivation);
+            m_pButterflyView.data(), &DISPLIB::ButterflyView::setAverageActivation, Qt::UniqueConnection);
     connect(pAverageSelectionView, &DISPLIB::AverageSelectionView::newAverageActivationMap,
-            m_pButterflyView.data(), &DISPLIB::ButterflyView::setAverageActivation);
+            m_pButterflyView.data(), &DISPLIB::ButterflyView::setAverageActivation, Qt::UniqueConnection);
     connect(pAverageSelectionView, &DISPLIB::AverageSelectionView::newAverageColorMap,
-            m_pButterflyView.data(), &DISPLIB::ButterflyView::setAverageColor);
+            m_pButterflyView.data(), &DISPLIB::ButterflyView::setAverageColor, Qt::UniqueConnection);
 
     connect(m_pEvokedModel.data(), &DISPLIB::EvokedSetModel::newAverageColorMap,
-            m_pAverageLayoutView.data(), &DISPLIB::AverageLayoutView::setAverageColor);
+            m_pAverageLayoutView.data(), &DISPLIB::AverageLayoutView::setAverageColor, Qt::UniqueConnection);
     connect(m_pEvokedModel.data(), &DISPLIB::EvokedSetModel::newAverageActivationMap,
-            m_pAverageLayoutView.data(), &DISPLIB::AverageLayoutView::setAverageActivation);
+            m_pAverageLayoutView.data(), &DISPLIB::AverageLayoutView::setAverageActivation, Qt::UniqueConnection);
     connect(pAverageSelectionView, &DISPLIB::AverageSelectionView::newAverageActivationMap,
-            m_pAverageLayoutView.data(), &DISPLIB::AverageLayoutView::setAverageActivation);
+            m_pAverageLayoutView.data(), &DISPLIB::AverageLayoutView::setAverageActivation, Qt::UniqueConnection);
     connect(pAverageSelectionView, &DISPLIB::AverageSelectionView::newAverageColorMap,
-            m_pAverageLayoutView.data(), &DISPLIB::AverageLayoutView::setAverageColor);
+            m_pAverageLayoutView.data(), &DISPLIB::AverageLayoutView::setAverageColor, Qt::UniqueConnection);
 
     m_pEvokedModel->setAverageActivation(pAverageSelectionView->getAverageActivation());
     m_pEvokedModel->setAverageColor(pAverageSelectionView->getAverageColor());
@@ -543,10 +544,29 @@ void Averaging::loadFullGUI()
     m_pAverageLayoutView->setAverageActivation(pAverageSelectionView->getAverageActivation());
     m_pAverageLayoutView->setAverageColor(pAverageSelectionView->getAverageColor());
 
+    //Data customization:
+    DISPLIB::FiffRawViewSettings* pChannelDataSettingsView = new DISPLIB::FiffRawViewSettings(QString("MNESCAN/RTESW"));
+    pChannelDataSettingsView->setWidgetList(QStringList() << "screenshot" << "backgroundColor");
+    pChannelDataSettingsView->setObjectName("group_tab_View_General");
+
+    connect(pChannelDataSettingsView, &DISPLIB::FiffRawViewSettings::backgroundColorChanged,
+            m_pAverageLayoutView.data(), &DISPLIB::AverageLayoutView::setBackgroundColor, Qt::UniqueConnection);
+
+    connect(pChannelDataSettingsView, &DISPLIB::FiffRawViewSettings::backgroundColorChanged,
+            m_pButterflyView.data(), &DISPLIB::ButterflyView::setBackgroundColor, Qt::UniqueConnection);
+
+    connect(pChannelDataSettingsView, &DISPLIB::FiffRawViewSettings::makeScreenshot,
+            this, &Averaging::onMakeScreenshot, Qt::UniqueConnection);
+
+    m_pAverageLayoutView->setBackgroundColor(pChannelDataSettingsView->getBackgroundColor());
+    m_pButterflyView->setBackgroundColor(pChannelDataSettingsView->getBackgroundColor());
+
     //Add new widgets
     m_pLayout->addWidget(pChanSelButton);
+
     m_pTabView->addTab(pScalingView, "Scaling");
     m_pTabView->addTab(pModalitySelectionView, "Modality");
+    m_pTabView->addTab(pChannelDataSettingsView, "View");
 //    m_pTabView->addTab(pAverageSelectionView, "Average Selection");
 
     //Update saved params
@@ -587,4 +607,27 @@ void Averaging::onRejectionChecked()
     } else {
         m_bRejection = false;
     }
+}
+
+//=============================================================================================================
+
+void Averaging::onMakeScreenshot(const QString& imageType)
+{
+    // Create file name
+    QString sDate = QDate::currentDate().toString("yyyy_MM_dd");
+    QString sTime = QTime::currentTime().toString("hh_mm_ss");
+
+    if(!QDir("./Screenshots").exists()) {
+        QDir().mkdir("./Screenshots");
+    }
+
+    QString fileName;
+
+    if(imageType.contains("SVG")) {
+        fileName = QString("./Screenshots/%1-%2-ButterflyScreenshot.svg").arg(sDate).arg(sTime);
+    } else if(imageType.contains("PNG")) {
+        fileName = QString("./Screenshots/%1-%2-ButterflyScreenshot.png").arg(sDate).arg(sTime);
+    }
+
+    m_pButterflyView->takeScreenshot(fileName);
 }
