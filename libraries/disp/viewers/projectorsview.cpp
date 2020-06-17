@@ -215,6 +215,18 @@ void ProjectorsView::updateGuiMode(GuiMode mode)
 
 //=============================================================================================================
 
+void ProjectorsView::updateProcessingMode(ProcessingMode mode)
+{
+    switch(mode) {
+        case ProcessingMode::Offline:
+            break;
+        default: // default is scientific mode
+            break;
+    }
+}
+
+//=============================================================================================================
+
 void ProjectorsView::onEnableDisableAllProj(bool status)
 {
     //Set all checkboxes to status

@@ -258,6 +258,18 @@ void FilterDesignView::updateGuiMode(GuiMode mode)
 
 //=============================================================================================================
 
+void FilterDesignView::updateProcessingMode(ProcessingMode mode)
+{
+    switch(mode) {
+        case ProcessingMode::Offline:
+            break;
+        default: // default is scientific mode
+            break;
+    }
+}
+
+//=============================================================================================================
+
 void FilterDesignView::initSpinBoxes()
 {
     connect(m_pUi->m_doubleSpinBox_from, &QDoubleSpinBox::editingFinished,

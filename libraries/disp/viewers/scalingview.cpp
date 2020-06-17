@@ -187,6 +187,18 @@ void ScalingView::updateGuiMode(GuiMode mode)
 
 //=============================================================================================================
 
+void ScalingView::updateProcessingMode(ProcessingMode mode)
+{
+    switch(mode) {
+        case ProcessingMode::Offline:
+            break;
+        default: // default is scientific mode
+            break;
+    }
+}
+
+//=============================================================================================================
+
 void ScalingView::redrawGUI()
 {
     qint32 i = 0;

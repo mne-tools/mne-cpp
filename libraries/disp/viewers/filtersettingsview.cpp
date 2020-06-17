@@ -186,6 +186,18 @@ void FilterSettingsView::updateGuiMode(GuiMode mode)
 
 //=============================================================================================================
 
+void FilterSettingsView::updateProcessingMode(ProcessingMode mode)
+{
+    switch(mode) {
+        case ProcessingMode::Offline:
+            break;
+        default: // default is scientific mode
+            break;
+    }
+}
+
+//=============================================================================================================
+
 void FilterSettingsView::onShowFilterView()
 {
     if(m_pFilterView->isActiveWindow()) {

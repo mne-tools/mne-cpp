@@ -223,6 +223,18 @@ void ConnectivitySettingsView::updateGuiMode(GuiMode mode)
 
 //=============================================================================================================
 
+void ConnectivitySettingsView::updateProcessingMode(ProcessingMode mode)
+{
+    switch(mode) {
+        case ProcessingMode::Offline:
+            break;
+        default: // default is scientific mode
+            break;
+    }
+}
+
+//=============================================================================================================
+
 void ConnectivitySettingsView::onMetricChanged(const QString& sMetric)
 {
     emit connectivityMetricChanged(sMetric);

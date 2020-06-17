@@ -167,6 +167,18 @@ void FwdSettingsView::updateGuiMode(GuiMode mode)
 
 //=============================================================================================================
 
+void FwdSettingsView::updateProcessingMode(ProcessingMode mode)
+{
+    switch(mode) {
+        case ProcessingMode::Offline:
+            break;
+        default: // default is scientific mode
+            break;
+    }
+}
+
+//=============================================================================================================
+
 bool FwdSettingsView::getRecomputationStatusChanged()
 {
     return m_pUi->m_checkBox_bDoRecomputation->isChecked();

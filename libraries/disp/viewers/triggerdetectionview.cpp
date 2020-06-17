@@ -220,6 +220,18 @@ void TriggerDetectionView::updateGuiMode(GuiMode mode)
 
 //=============================================================================================================
 
+void TriggerDetectionView::updateProcessingMode(ProcessingMode mode)
+{
+    switch(mode) {
+        case ProcessingMode::Offline:
+            break;
+        default: // default is scientific mode
+            break;
+    }
+}
+
+//=============================================================================================================
+
 void TriggerDetectionView::onTriggerInfoChanged()
 {
     emit triggerInfoChanged(m_qMapTriggerColor,

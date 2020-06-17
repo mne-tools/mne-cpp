@@ -211,9 +211,10 @@ QDockWidget* Averaging::getControl()
             this, &Averaging::onChangeBaselineActive, Qt::UniqueConnection);
     connect(m_pAveragingSettingsView, &DISPLIB::AveragingSettingsView::resetAverage,
             this, &Averaging::onResetAverage, Qt::UniqueConnection);
-    connect(m_pAveragingSettingsView, &DISPLIB::AveragingSettingsView::changeStimChannel,
-            this, &Averaging::onChangeStimChannel);
+//    connect(m_pAveragingSettingsView, &DISPLIB::AveragingSettingsView::changeStimChannel,
+//            this, &Averaging::onChangeStimChannel);
 
+    m_pAveragingSettingsView->setProcessingMode(DISPLIB::AbstractView::ProcessingMode::Offline);
 
     qDebug() << "5";
 
@@ -447,9 +448,9 @@ void Averaging::computeAverage()
     } else {
         qDebug() << "using stim";
 
-        QList<QPair<int,double> > lDetectedTriggers;
+        //QList<QPair<int,double> > lDetectedTriggers;
 
-        lDetectedTriggers;
+        //lDetectedTriggers;
     }
 
 

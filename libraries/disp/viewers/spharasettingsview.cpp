@@ -135,6 +135,18 @@ void SpharaSettingsView::updateGuiMode(GuiMode mode)
 
 //=============================================================================================================
 
+void SpharaSettingsView::updateProcessingMode(ProcessingMode mode)
+{
+    switch(mode) {
+        case ProcessingMode::Offline:
+            break;
+        default: // default is scientific mode
+            break;
+    }
+}
+
+//=============================================================================================================
+
 void SpharaSettingsView::onSpharaButtonClicked(bool state)
 {
     emit spharaActivationChanged(state);

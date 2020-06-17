@@ -227,6 +227,14 @@ protected:
      */
     void updateGuiMode(GuiMode mode);
 
+    //=========================================================================================================
+    /**
+     * Update the views GUI based on the set ProcessingMode (Clinical=0, Research=1).
+     *
+     * @param mode     The new mode (Clinical=0, Research=1).
+     */
+    void updateProcessingMode(ProcessingMode mode);
+
     QSharedPointer<AverageScene>                                m_pAverageScene;            /**< The pointer to the average scene. */
     QSharedPointer<DISPLIB::EvokedSetModel>                     m_pEvokedSetModel;          /**< The data model */
     QSharedPointer<DISPLIB::ChannelInfoModel>                   m_pChannelInfoModel;        /**< Channel info model. */

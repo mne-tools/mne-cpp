@@ -228,6 +228,18 @@ void Control3DView::updateGuiMode(GuiMode mode)
 
 //=============================================================================================================
 
+void Control3DView::updateProcessingMode(ProcessingMode mode)
+{
+    switch(mode) {
+        case ProcessingMode::Offline:
+            break;
+        default: // default is scientific mode
+            break;
+    }
+}
+
+//=============================================================================================================
+
 void Control3DView::onOpacityChange(qint32 value)
 {
     this->setWindowOpacity(1/(100.0/value));

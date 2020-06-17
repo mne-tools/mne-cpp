@@ -222,6 +222,18 @@ void ArtifactSettingsView::updateGuiMode(GuiMode mode)
 
 //=============================================================================================================
 
+void ArtifactSettingsView::updateProcessingMode(ProcessingMode mode)
+{
+    switch(mode) {
+        case ProcessingMode::Offline:
+            break;
+        default: // default is scientific mode
+            break;
+    }
+}
+
+//=============================================================================================================
+
 void ArtifactSettingsView::redrawGUI()
 {
     if(QLayout* layout = this->layout()) {

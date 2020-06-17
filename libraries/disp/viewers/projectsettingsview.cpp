@@ -184,6 +184,18 @@ void ProjectSettingsView::updateGuiMode(GuiMode mode)
 
 //=============================================================================================================
 
+void ProjectSettingsView::updateProcessingMode(ProcessingMode mode)
+{
+    switch(mode) {
+        case ProcessingMode::Offline:
+            break;
+        default: // default is scientific mode
+            break;
+    }
+}
+
+//=============================================================================================================
+
 void ProjectSettingsView::setRecordingElapsedTime(int mSecsElapsed)
 {
     QTime remainingTime(0,0,0,0);

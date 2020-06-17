@@ -277,6 +277,18 @@ void FiffRawViewSettings::updateGuiMode(GuiMode mode)
 
 //=============================================================================================================
 
+void FiffRawViewSettings::updateProcessingMode(ProcessingMode mode)
+{
+    switch(mode) {
+        case ProcessingMode::Offline:
+            break;
+        default: // default is scientific mode
+            break;
+    }
+}
+
+//=============================================================================================================
+
 void FiffRawViewSettings::onDistanceTimeSpacerChanged(qint32 value)
 {
     switch(value) {

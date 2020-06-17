@@ -187,6 +187,18 @@ void ModalitySelectionView::updateGuiMode(GuiMode mode)
 
 //=============================================================================================================
 
+void ModalitySelectionView::updateProcessingMode(ProcessingMode mode)
+{
+    switch(mode) {
+        case ProcessingMode::Offline:
+            break;
+        default: // default is scientific mode
+            break;
+    }
+}
+
+//=============================================================================================================
+
 void ModalitySelectionView::setModalityMap(const QMap<QString, bool> &modalityMap)
 {
     m_modalityMap = modalityMap;
