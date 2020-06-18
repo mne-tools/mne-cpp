@@ -85,6 +85,7 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager
 , m_sSettingsPath("MNEANALYZE/MainWindow")
 , m_sCurrentStyle("default")
 {
+    this->setObjectName("mainwindow");
     setWindowState(Qt::WindowMaximized);
     setMinimumSize(400, 400);
     setWindowTitle(CInfo::AppNameShort());
@@ -422,6 +423,7 @@ void MainWindow::createPluginViews(QSharedPointer<PluginManager> pPluginManager)
     m_pMultiView = new MultiView();
     m_pGridLayout->addWidget(m_pMultiView);
     m_pMultiView->show();
+    m_pMultiView->setObjectName("multiview");
     setCentralWidget(m_pMultiView);
 
     QString sCurPluginName;
@@ -438,6 +440,8 @@ void MainWindow::createPluginViews(QSharedPointer<PluginManager> pPluginManager)
             } else {
                 pWindow = m_pMultiView->addWidgetTop(pView, sCurPluginName);
             }
+
+            pWindow->setObjectName(sCurPluginName);
 
             QAction* pAction = pWindow->toggleViewAction();
             pAction->setText(pPlugin->getName());
