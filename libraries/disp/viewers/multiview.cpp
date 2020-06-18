@@ -116,6 +116,8 @@ MultiViewWindow* MultiView::addWidgetBottom(QWidget* pWidget,
     pDockWidget->setWindowTitle(sName);
     pDockWidget->setWidget(pWidget);
 
+    pWidget->setParent(pDockWidget);
+
     // Disable floating and editable dock widgets, since the wasm QDockWidget version is buggy
     #ifdef WASMBUILD
     pDockWidget->setFeatures(QDockWidget::DockWidgetClosable);
