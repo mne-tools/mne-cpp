@@ -1,7 +1,53 @@
+//=============================================================================================================
+/**
+ * @file     mainwindow.cpp
+ * @author   Wayne Mead <wayne.mead@uth.tmc.edu>;
+ *           Juan Garcia-Prieto <juangpc@gmail.com>;
+ *           Lorenz Esch <lesch@mgh.harvard.edu>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           John C. Mosher <John.C.Mosher@uth.tmc.edu>
+ * @since    0.1.0
+ * @date     May, 2020
+ *
+ * @section  LICENSE
+ *
+ * Copyright (C) 2019, Wayne Mead, Juan Garcia-Prieto, Lorenz Esch, Matti Hamalainen, John C. Mosher. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+ * the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+ *       following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+ *       the following disclaimer in the documentation and/or other materials provided with the distribution.
+ *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
+ *       to endorse or promote products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * @brief    Mainwindow class definition.
+ *
+ */
+
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <settingscontrollergui.h>
 #include <iostream>
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
 
 #include <QMessageBox>
 #include <QCloseEvent>
@@ -10,7 +56,23 @@
 #include <QDateTime>
 #include <QFileDialog>
 
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
 using namespace MNEANONYMIZE;
+
+//=============================================================================================================
+// DEFINE GLOBAL METHODS
+//=============================================================================================================
+
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
 
 MainWindow::MainWindow(MNEANONYMIZE::SettingsControllerGui *c)
 : m_bOptionsVisibility(false)
@@ -25,10 +87,14 @@ MainWindow::MainWindow(MNEANONYMIZE::SettingsControllerGui *c)
     setupConnections();
 }
 
+//=============================================================================================================
+
 MainWindow::~MainWindow()
 {
     delete m_pUi;
 }
+
+//=============================================================================================================
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
@@ -39,6 +105,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
         event->ignore();
     }
 }
+
+//=============================================================================================================
 
 bool MainWindow::confirmClose()
 {
@@ -57,6 +125,8 @@ bool MainWindow::confirmClose()
 //    }
 //    return false;
 }
+
+//=============================================================================================================
 
 void MainWindow::setDefautlStateUi()
 {
@@ -171,6 +241,8 @@ void MainWindow::setDefautlStateUi()
     m_pUi->lineEditMNEEnvironmentWorkingDirExtra->setToolTip("Working directory within MNE toolbox.");
 }
 
+//=============================================================================================================
+
 void MainWindow::setDefaultStateExtraInfo()
 {
     m_pUi->lineEditIdFileVersionExtra->clear();
@@ -236,6 +308,8 @@ void MainWindow::setDefaultStateExtraInfo()
     m_pUi->lineEditMNEEnvironmentCommandExtra->setEnabled(false);
 }
 
+//=============================================================================================================
+
 void MainWindow::setupConnections()
 {
 
@@ -282,6 +356,7 @@ void MainWindow::setupConnections()
                      this,&MainWindow::lineEditSubjectHisIdEditingFinished);   
 }
 
+//=============================================================================================================
 
 void MainWindow::setLineEditInFile(const QString &s)
 {
@@ -289,54 +364,72 @@ void MainWindow::setLineEditInFile(const QString &s)
     m_pUi->lineEditInFile->setText(m_fiInFile.absoluteFilePath());
 }
 
+//=============================================================================================================
+
 void MainWindow::setLineEditOutFile(const QString &s)
 {
     m_fiOutFile.setFile(s);
     m_pUi->lineEditOutFile->setText(m_fiOutFile.absoluteFilePath());
 }
 
+//=============================================================================================================
+
 void MainWindow::setCheckBoxBruteMode(bool b)
 {
     m_pUi->checkBoxBruteMode->setChecked(b);
 }
+
+//=============================================================================================================
 
 void MainWindow::setMeasurementDate(const QDateTime& dt)
 {
     m_pUi->dateTimeMeasurementDate->setDateTime(dt);
 }
 
+//=============================================================================================================
+
 void MainWindow::setCheckBoxMeasurementDateOffset(bool o)
 {
     m_pUi->checkBoxMeasurementDateOffset->setChecked(o);
 }
+
+//=============================================================================================================
 
 void MainWindow::setMeasurementDateOffset(int d)
 {
     m_pUi->spinBoxMeasurementDateOffset->setValue(d);
 }
 
+//=============================================================================================================
+
 void MainWindow::setCheckBoxSubjectBirthdayOffset(bool b)
 {
     m_pUi->checkBoxBirthdayDateOffset->setChecked(b);
 }
+
+//=============================================================================================================
 
 void MainWindow::setSubjectBirthdayOffset(int d)
 {
     m_pUi->spinBoxBirthdayDateOffset->setValue(d);
 }
 
+//=============================================================================================================
+
 void MainWindow::setSubjectHis(const QString& h)
 {
     m_pUi->lineEditSubjectHisId->setText(h);
 }
 
+//=============================================================================================================
 
-//public slots for extra information
 void MainWindow::setLineEditIdFileVersion(double v)
 {
     m_pUi->lineEditIdFileVersionExtra->setEnabled(true);
     m_pUi->lineEditIdFileVersionExtra->setText(QString::number(v));
 }
+
+//=============================================================================================================
 
 void MainWindow::setLineEditIdMeasurementDate(QDateTime d)
 {
@@ -344,11 +437,15 @@ void MainWindow::setLineEditIdMeasurementDate(QDateTime d)
     m_pUi->dateTimeIdMeasurementDateExtra->setDateTime(d);
 }
 
+//=============================================================================================================
+
 void MainWindow::setLineEditIdMacAddress(QString mac)
 {
     m_pUi->lineEditIdMACAddressExtra->setEnabled(true);
     m_pUi->lineEditIdMACAddressExtra->setText(mac);
 }
+
+//=============================================================================================================
 
 void MainWindow::setLineEditFileMeasurementDate(QDateTime d)
 {
@@ -356,11 +453,15 @@ void MainWindow::setLineEditFileMeasurementDate(QDateTime d)
     m_pUi->dateTimeFileMeasurementDateExtra->setDateTime(d);
 }
 
+//=============================================================================================================
+
 void MainWindow::setLineEditFileComment(QString c)
 {
     m_pUi->plainTextFileCommentExtra->setEnabled(true);
     m_pUi->plainTextFileCommentExtra->setPlainText(c);
 }
+
+//=============================================================================================================
 
 void MainWindow::setLineEditFileExperimenter(QString e)
 {
@@ -368,11 +469,15 @@ void MainWindow::setLineEditFileExperimenter(QString e)
     m_pUi->lineEditFileExperimenterExtra->setText(e);
 }
 
+//=============================================================================================================
+
 void MainWindow::setLineEditSubjectId(int i)
 {
     m_pUi->spinBoxSubjectIDExtra->setEnabled(true);
     m_pUi->spinBoxSubjectIDExtra->setValue(i);
 }
+
+//=============================================================================================================
 
 void MainWindow::setLineEditSubjectFirstName(QString fn)
 {
@@ -380,11 +485,15 @@ void MainWindow::setLineEditSubjectFirstName(QString fn)
     m_pUi->lineEditSubjectFirstNameExtra->setText(fn);
 }
 
+//=============================================================================================================
+
 void MainWindow::setLineEditSubjectMiddleName(QString mn)
 {
     m_pUi->lineEditSubjectMiddleNameExtra->setEnabled(true);
     m_pUi->lineEditSubjectMiddleNameExtra->setText(mn);
 }
+
+//=============================================================================================================
 
 void MainWindow::setLineEditSubjectLastName(QString ln)
 {
@@ -392,11 +501,15 @@ void MainWindow::setLineEditSubjectLastName(QString ln)
     m_pUi->lineEditSubjectLastNameExtra->setText(ln);
 }
 
+//=============================================================================================================
+
 void MainWindow::setLineEditSubjectBirthday(QDateTime b)
 {
     m_pUi->dateTimeBirthdayDate->setEnabled(true);
     m_pUi->dateTimeBirthdayDate->setDateTime(b);
 }
+
+//=============================================================================================================
 
 void MainWindow::setComboBoxSubjectSex(int s)
 {
@@ -404,11 +517,15 @@ void MainWindow::setComboBoxSubjectSex(int s)
     m_pUi->comboBoxSubjectSexExtra->setCurrentIndex(s);
 }
 
+//=============================================================================================================
+
 void MainWindow::setLineEditSubjectHand(int h)
 {
     m_pUi->comboBoxSubjectHandExtra->setEnabled(true);
     m_pUi->comboBoxSubjectHandExtra->setCurrentIndex(h);
 }
+
+//=============================================================================================================
 
 void MainWindow::setLineEditSubjectWeight(float w)
 {
@@ -417,6 +534,8 @@ void MainWindow::setLineEditSubjectWeight(float w)
     m_pUi->doubleSpinBoxSubjectWeightExtra->setValue(wd);
 }
 
+//=============================================================================================================
+
 void MainWindow::setLineEditSubjectHeight(float h)
 {
     m_pUi->doubleSpinBoxSubjectHeightExtra->setEnabled(true);
@@ -424,11 +543,15 @@ void MainWindow::setLineEditSubjectHeight(float h)
     m_pUi->doubleSpinBoxSubjectHeightExtra->setValue(hd);
 }
 
+//=============================================================================================================
+
 void MainWindow::setLineEditSubjectComment(QString c)
 {
     m_pUi->lineEditSubjectCommentExtra->setEnabled(true);
     m_pUi->lineEditSubjectCommentExtra->setText(c);
 }
+
+//=============================================================================================================
 
 void MainWindow::setLineEditSubjectHisId(QString his)
 {
@@ -436,11 +559,15 @@ void MainWindow::setLineEditSubjectHisId(QString his)
     m_pUi->lineEditSubjectHisIdExtra->setText(his);
 }
 
+//=============================================================================================================
+
 void MainWindow::setLineEditProjectId(int id)
 {
     m_pUi->spinBoxProjectIDExtra->setEnabled(true);
     m_pUi->spinBoxProjectIDExtra->setValue(id);
 }
+
+//=============================================================================================================
 
 void MainWindow::setLineEditProjectName(QString p)
 {
@@ -448,11 +575,15 @@ void MainWindow::setLineEditProjectName(QString p)
     m_pUi->lineEditProjectNameExtra->setText(p);
 }
 
+//=============================================================================================================
+
 void MainWindow::setLineEditProjectAim(QString p)
 {
     m_pUi->lineEditProjectAimExtra->setEnabled(true);
     m_pUi->lineEditProjectAimExtra->setText(p);
 }
+
+//=============================================================================================================
 
 void MainWindow::setLineEditProjectPersons(QString p)
 {
@@ -460,17 +591,22 @@ void MainWindow::setLineEditProjectPersons(QString p)
     m_pUi->lineEditProjectPersonsExtra->setText(p);
 }
 
+//=============================================================================================================
+
 void MainWindow::setLineEditProjectComment(QString c)
 {
     m_pUi->plainTextEditProjectCommentExtra->setEnabled(true);
     m_pUi->plainTextEditProjectCommentExtra->setPlainText(c);
 }
 
+//=============================================================================================================
+
 void MainWindow::setLabelMriDataFoundVisible(bool b)
 {
     m_pUi->labelSubjectMriDataFoundExtra->setVisible(b);
 }
 
+//=============================================================================================================
 
 void MainWindow::setLineEditMNEWorkingDir(QString s)
 {
@@ -478,11 +614,15 @@ void MainWindow::setLineEditMNEWorkingDir(QString s)
     m_pUi->lineEditMNEEnvironmentWorkingDirExtra->setText(s);
 }
 
+//=============================================================================================================
+
 void MainWindow::setLineEditMNECommand(QString s)
 {
     m_pUi->lineEditMNEEnvironmentCommandExtra->setEnabled(true);
     m_pUi->lineEditMNEEnvironmentCommandExtra->setText(s);
 }
+
+//=============================================================================================================
 
 void MainWindow::openInFileDialog()
 {
@@ -523,6 +663,8 @@ void MainWindow::openInFileDialog()
 #endif
 }
 
+//=============================================================================================================
+
 void MainWindow::openOutFileDialog()
 {
     QFileInfo inFile(m_pUi->lineEditInFile->text());
@@ -545,11 +687,15 @@ void MainWindow::openOutFileDialog()
     }
 }
 
+//=============================================================================================================
+
 void MainWindow::helpButtonClicked()
 {
     QDesktopServices::openUrl( QUrl("https://mne-cpp.github.io/pages/learn/mneanonymize.html",
                                QUrl::TolerantMode) );
 }
+
+//=============================================================================================================
 
 void MainWindow::inFileEditingFinished()
 {
@@ -557,11 +703,15 @@ void MainWindow::inFileEditingFinished()
     emit fileInChanged(m_fiInFile.absoluteFilePath());
 }
 
+//=============================================================================================================
+
 void MainWindow::outFileEditingFinished()
 {
     m_fiOutFile.setFile(m_pUi->lineEditOutFile->text());
     emit fileOutChanged(m_fiOutFile.absoluteFilePath());
 }
+
+//=============================================================================================================
 
 void MainWindow::checkBoxBruteModeChanged()
 {
@@ -574,6 +724,8 @@ void MainWindow::checkBoxBruteModeChanged()
         statusMsg("Brute mode deselected",2000);
     }
 }
+
+//=============================================================================================================
 
 void MainWindow::checkBoxMeasurementDateOffsetStateChanged(int arg)
 {
@@ -590,6 +742,8 @@ void MainWindow::checkBoxMeasurementDateOffsetStateChanged(int arg)
     }
 }
 
+//=============================================================================================================
+
 void MainWindow::checkBoxBirthdayDateOffsetStateChanged(int arg)
 {
     Q_UNUSED(arg)
@@ -605,30 +759,42 @@ void MainWindow::checkBoxBirthdayDateOffsetStateChanged(int arg)
     }
 }
 
+//=============================================================================================================
+
 void MainWindow::dateTimeMeasurementDateDateTimeChanged(const QDateTime &dateTime)
 {
     emit measurementDateChanged(dateTime);
 }
+
+//=============================================================================================================
 
 void MainWindow::spinBoxMeasurementDateOffsetValueChanged(int offset)
 {
     emit measurementDateOffsetChanged(offset);
 }
 
+//=============================================================================================================
+
 void MainWindow::dateTimeBirthdayDateDateTimeChanged(const QDateTime &dateTime)
 {
     emit birthdayDateChanged(dateTime);
 }
+
+//=============================================================================================================
 
 void MainWindow::spinBoxBirthdayDateOffsetValueChanged(int offset)
 {
     emit birthdayOffsetChanged(offset);
 }
 
+//=============================================================================================================
+
 void MainWindow::lineEditSubjectHisIdEditingFinished()
 {
     emit subjectHisIdChanged(m_pUi->lineEditSubjectHisId->text());
 }
+
+//=============================================================================================================
 
 void MainWindow::winPopup(QString s)
 {
@@ -638,11 +804,15 @@ void MainWindow::winPopup(QString s)
     return;
 }
 
+//=============================================================================================================
+
 void MainWindow::statusMsg(const QString s,int to)
 {
     m_pUi->statusbar->clearMessage();
     m_pUi->statusbar->showMessage(s,to);
 }
+
+//=============================================================================================================
 
 void MainWindow::resizeEvent(QResizeEvent* event)
 {
@@ -650,6 +820,8 @@ void MainWindow::resizeEvent(QResizeEvent* event)
     checkSmallGui();
 //    statusMsg("width: " + QString::number(m_pUi->centralwidget->width()));
 }
+
+//=============================================================================================================
 
 void MainWindow::checkSmallGui()
 {
@@ -676,6 +848,8 @@ void MainWindow::checkSmallGui()
     }
 }
 
+//=============================================================================================================
+
 void MainWindow::checkBoxShowOptionsChanged()
 {
     m_bOptionsVisibility = m_pUi->checkBoxShowOptions->isChecked();
@@ -697,3 +871,4 @@ void MainWindow::checkBoxShowOptionsChanged()
     m_pUi->frameOptionsAndExtraInfo->setVisible(m_bOptionsVisibility);
     m_pUi->pushButtonReadData->setVisible(m_bOptionsVisibility);
 }
+
