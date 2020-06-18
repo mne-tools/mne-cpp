@@ -67,9 +67,10 @@ namespace MNEANONYMIZE {
 
 //=============================================================================================================
 /**
- * Description of what this class is intended to do (in detail).
+ * Apphandler class serves as a factory class that generates heap located objects to main. This class generates
+ * a QApplication object and a Controller object.
  *
- * @brief Brief description of this class.
+ * @brief Object factory class.
  */
 class AppHandler
 {
@@ -89,9 +90,9 @@ public:
      * @brief Creates a QApplication or a QCoreApplication according tu user's preference for a command line or a
      *  GUI application.
      *
-     * @details Handles input arguments and searches for a "--no-gui" option. If found, this will create a
+     * @details Handles input arguments and searches for a "--gui" option. If found, this will create a
      *  QCoreApplication so that main can execute the appplication as a command line one. If not found, it creates a
-     *  QApplication so that main can execute a GUI.
+     *  QApplication so that main can execute a GUI. Boolean member variable m_bGuiMode is updated here.
      *
      * @see QT Documentation
      * @see https://doc.qt.io/qt-5/qapplication.html#details
@@ -99,7 +100,7 @@ public:
      * @param [in] argc (argument count) number of arguments on the command line.
      * @param [in] argv (argument vector) an array of pointers to arrays of characters.
      *
-     * @return Pointer to a QApplication or a QCoreApplication.
+     * @return Pointer to a QCoreApplication.
      */
     QCoreApplication* createApplication(int& argc, char * argv[]);
 
@@ -108,17 +109,16 @@ public:
      * @brief Creates a controller object according tu user's preference for a command line or a
      *  GUI application.
      *
-     * @details Handles input arguments and searches for a "--no-gui" option. If found, this will create a
-     *  QCoreApplication so that main can execute the appplication as a command line one. If not found, it creates a
-     *  QApplication so that main can execute a GUI.
+     * @details Depending on the state of the bool member variable m_bGuiMode, the method creates a command-line or a
+     * GUI oriented controller object of the SettingsControllerCL or the SettingsControllerGui class.
      *
-     * @see QT Documentation
-     * @see https://doc.qt.io/qt-5/qapplication.html#details
+     * @see MNE-CPP Documentation
+     * @see https://mne-cpp.github.io/
      *
      * @param [in] argc (argument count) number of arguments on the command line.
      * @param [in] argv (argument vector) an array of pointers to arrays of characters.
      *
-     * @return Pointer to a QApplication or a QCoreApplication.
+     * @return Pointer to a QObject.
      */
     /**
     * Constructs an appropiate controller QApplication (GUI application).
@@ -130,7 +130,7 @@ protected:
 
 private:
 
-bool m_bAppHasGui;  /**< Show if the app is a GUI based app, or a Command-line one.*/
+bool m_bGuiMode;  /**< GUI based app, or a command-line one.*/
 
 };
 
