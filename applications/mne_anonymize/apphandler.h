@@ -68,7 +68,7 @@ namespace MNEANONYMIZE {
 //=============================================================================================================
 /**
  * Apphandler class serves as a factory class that generates heap located objects to main. This class generates
- * a QApplication object and a Controller object.
+ * a QCoreApplication object and a Controller object.
  *
  * @brief Object factory class.
  */
