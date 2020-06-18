@@ -80,7 +80,6 @@ void DataManagerView::setModel(QAbstractItemModel *pModel)
 
     connect(m_pUi->m_pTreeView->selectionModel(), &QItemSelectionModel::selectionChanged,
             this, &DataManagerView::onCurrentItemChanged, Qt::UniqueConnection);
-    //static_cast<ANSHAREDLIB::AnalyzeDataModel*>(pModel);
     connect(static_cast<ANSHAREDLIB::AnalyzeDataModel*>(pModel), &ANSHAREDLIB::AnalyzeDataModel::newFileAdded,
             this, &DataManagerView::onNewFileLoaded);
 }
@@ -89,15 +88,15 @@ void DataManagerView::setModel(QAbstractItemModel *pModel)
 
 void DataManagerView::customMenuRequested(QPoint pos)
 {
-//    QMenu *menu = new QMenu(this);
+    QMenu *menu = new QMenu(this);
 
-//    QAction* pAction = new QAction("Remove", this);
-//    connect(pAction, &QAction::triggered, [=]() {
-//        emit removeItem(m_pUi->m_pTreeView->indexAt(pos));
-//    });
+    QAction* pAction = new QAction("Remove", this);
+    connect(pAction, &QAction::triggered, [=]() {
+        emit removeItem(m_pUi->m_pTreeView->indexAt(pos));
+    });
 
-//    menu->addAction(pAction);
-//    menu->popup(m_pUi->m_pTreeView->viewport()->mapToGlobal(pos));
+    menu->addAction(pAction);
+    menu->popup(m_pUi->m_pTreeView->viewport()->mapToGlobal(pos));
 }
 
 //=============================================================================================================
@@ -106,6 +105,9 @@ void DataManagerView::onCurrentItemChanged(const QItemSelection &selected,
                                            const QItemSelection &deselected)
 {
     Q_UNUSED(deselected)
+    if(selected.indexes().empty()) {
+        return;
+    }
 
     if(QStandardItemModel *pModel = qobject_cast<QStandardItemModel *>(m_pUi->m_pTreeView->model())) {        
         if(QStandardItem* pItem = pModel->itemFromIndex(selected.indexes().first())) {

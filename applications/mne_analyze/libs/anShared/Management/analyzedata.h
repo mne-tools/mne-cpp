@@ -156,6 +156,16 @@ public:
 
     //=========================================================================================================
     /**
+     * Removes model stored under the given index.
+     *
+     * @param[in] index     The index to the item to be deleted.
+     *
+     * @return              Returns true if successful
+     */
+    bool removeModel(const QModelIndex &index);
+
+    //=========================================================================================================
+    /**
      * This is the main function for instanciating models. It simply calls the models constructor with the
      * provided path and inserts the model to the central item model. NO ERROR CHECKING IS PERFORMED !
      */
@@ -192,14 +202,6 @@ public:
             return Q_NULLPTR;
         }
     }
-
-    //=========================================================================================================
-    /**
-     * Removes model stored under the given index.
-     *
-     * @param[in] index     The index to the item to be deleted.
-     */
-    void removeModel(const QModelIndex &index);
 
 private:
     QPointer<AnalyzeDataModel>            m_pData;         /**< The loaded models in form of a QStandardItemModel. */

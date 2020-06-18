@@ -82,13 +82,11 @@ MultiView::~MultiView()
 MultiViewWindow* MultiView::addWidgetTop(QWidget* pWidget,
                                          const QString& sName)
 {
-    qDebug() << "1";
     MultiViewWindow* pDockWidget = new MultiViewWindow(this);
     pDockWidget->setObjectName(sName);
     pDockWidget->setWindowTitle(sName);
     pDockWidget->setWidget(pWidget);
 
-    qDebug() << "2";
     // Disable floating and editable dock widgets, since the wasm QDockWidget version is buggy
     #ifdef WASMBUILD
     pDockWidget->setFeatures(QDockWidget::DockWidgetClosable);
@@ -99,14 +97,12 @@ MultiViewWindow* MultiView::addWidgetTop(QWidget* pWidget,
         pDockWidget->layout()->setContentsMargins(0,0,0,0);
     }
 
-    qDebug() << "3";
     this->addDockWidget(Qt::DockWidgetArea::TopDockWidgetArea, pDockWidget);
 
     connect(pDockWidget, &MultiViewWindow::dockLocationChanged, [=]() {
         emit dockLocationChanged(pWidget);
     });
 
-    qDebug() << "4";
     return pDockWidget;
 }
 

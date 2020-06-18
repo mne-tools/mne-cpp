@@ -165,6 +165,14 @@ void DataManager::onCurrentlySelectedModelChanged(const QVariant& data)
 //=============================================================================================================
 
 void DataManager::onRemoveItem(const QModelIndex& index)
-{
-    m_pAnalyzeData->removeModel(index);
+{    
+    if(m_pAnalyzeData->removeModel(index)) {
+        if(m_pAnalyzeData->getDataModel()->rowCount() < 0) {
+            // If successful and the data model is not empty yet try to set current item to first in the data model
+
+        } else {
+            // If model is empty make sure we delete all other shared pointers to the just deleted model
+
+        }
+    }
 }
