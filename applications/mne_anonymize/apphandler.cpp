@@ -65,7 +65,7 @@ using namespace MNEANONYMIZE;
 //=============================================================================================================
 
 AppHandler::AppHandler()
-: m_bAppHasGui(false)
+: m_bGuiMode(false)
 {
 }
 
@@ -77,7 +77,7 @@ QCoreApplication* AppHandler::createApplication(int& argc, char* argv[])
     {
         if (!qstrcmp(argv[i], "--gui"))
         {
-            m_bAppHasGui = true;
+            m_bGuiMode = true;
             return new QApplication(argc, argv);
         }
     }
@@ -88,7 +88,7 @@ QCoreApplication* AppHandler::createApplication(int& argc, char* argv[])
 
 QObject* AppHandler::createController(const QStringList& args)
 {
-    if(m_bAppHasGui)
+    if(m_bGuiMode)
     {
         return new SettingsControllerGui(args);
     } else {
