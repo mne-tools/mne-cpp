@@ -511,6 +511,7 @@ void Hpi::run()
                 m_mutex.lock();
                 if(m_bDoSingleHpi) {
                     m_bDoSingleHpi = false;
+                    fitResult.devHeadTrans.clear();
                 }
                 fitResult.sFilePathDigitzers = m_sFilePathDigitzers;
                 m_mutex.unlock();
