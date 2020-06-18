@@ -145,7 +145,7 @@ public:
 
 protected:
 
-    bool            m_bResearchModeIsActive;  /**< The flag describing whether the scientific mode of the view is active or not. */
+    bool            m_bResearchModeIsActive;  /**< The flag describing whether the research mode of the view is active or not. */
     bool            m_bOfflineModeIsActive;  /**< The flag describing whether offline mode of the view is active or not. */
 
     QString         m_sSettingsPath;            /**< The settings path to store the GUI settings to. */

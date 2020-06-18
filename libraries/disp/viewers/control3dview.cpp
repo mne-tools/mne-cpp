@@ -221,7 +221,7 @@ void Control3DView::updateGuiMode(GuiMode mode)
     switch(mode) {
         case GuiMode::Clinical:
             break;
-        default: // default is scientific mode
+        default: // default is research mode
             break;
     }
 }
