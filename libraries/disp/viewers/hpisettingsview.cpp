@@ -216,6 +216,9 @@ void HpiSettingsView::saveSettings()
     data.setValue(m_pUi->m_checkBox_useComp->isChecked());
     settings.setValue(m_sSettingsPath + QString("/HpiSettingsView/useCOMP"), data);
 
+    data.setValue(m_pUi->m_checkBox_continousHPI->isChecked());
+    settings.setValue(m_sSettingsPath + QString("/HpiSettingsView/continousHPI"), data);
+
     data.setValue(m_pUi->m_doubleSpinBox_maxHPIContinousDist->value());
     settings.setValue(m_sSettingsPath + QString("/HpiSettingsView/maxError"), data);
 }
@@ -237,6 +240,7 @@ void HpiSettingsView::loadSettings()
 
     m_pUi->m_checkBox_useSSP->setChecked(settings.value(m_sSettingsPath + QString("/HpiSettingsView/useSSP"), false).toBool());
     m_pUi->m_checkBox_useComp->setChecked(settings.value(m_sSettingsPath + QString("/HpiSettingsView/useCOMP"), false).toBool());
+    m_pUi->m_checkBox_continousHPI->setChecked(settings.value(m_sSettingsPath + QString("/HpiSettingsView/continousHPI"), false).toBool());
     m_pUi->m_doubleSpinBox_maxHPIContinousDist->setValue(settings.value(m_sSettingsPath + QString("/HpiSettingsView/maxError"), 10.0).toDouble());
 }
 
