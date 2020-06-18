@@ -160,8 +160,8 @@ QStandardItemModel* AnalyzeData::getDataModel()
 }
 
 //=============================================================================================================
-
-void AnalyzeData::removeModel(const QModelIndex& index)
+#include <iostream>
+bool AnalyzeData::removeModel(const QModelIndex& index)
 {
     if(QStandardItem* pItem = m_pData->itemFromIndex(index)) {
         QString sModelPath = pItem->toolTip();
@@ -169,14 +169,36 @@ void AnalyzeData::removeModel(const QModelIndex& index)
 
         QMessageBox msgBox;
         msgBox.setText("Are you sure you want to remove the model "+info.fileName()+"?");
-        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
         msgBox.setDefaultButton(QMessageBox::No);
         int ret = msgBox.exec();
 
         if(ret == QMessageBox::Yes) {
-            if(m_pData->removeRows(index.row(), 1, index)) {
-                emit modelRemoved(sModelPath);
+            // Check if the parent of the deleted item holds any other data. If not delete it as well.
+            if(QStandardItem* pItemParent = m_pData->itemFromIndex(index.parent())) {
+                if(pItemParent->rowCount() <= 1) {
+                    std::cout << "index.parent().row()" << index.parent().row() << std::endl;
+                    if(m_pData->removeRows(index.parent().row(), 1)) {
+                        emit modelRemoved(sModelPath);
+                        qDebug() << "[AnalyzeData::removeModel] Removed model and parent at index" << index;
+                        return true;
+                    } else {
+                        qDebug() << "[AnalyzeData::removeModel] Could not remove model and parent at index" << index;
+                        return false;
+                    }
+                } else {
+                    if(m_pData->removeRows(index.row(), 1, index.parent())) {
+                        emit modelRemoved(sModelPath);
+                        qDebug() << "[AnalyzeData::removeModel] Removed model at index" << index;
+                        return true;
+                    } else {
+                        qDebug() << "[AnalyzeData::removeModel] Could not remove model at index" << index;
+                        return false;
+                    }
+                }
             }
         }
     }
+
+    return false;
 }
