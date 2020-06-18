@@ -11,7 +11,7 @@
  *
  * @section  LICENSE
  *
- * Copyright (C) 2019, Wayne Mead, Juan Garcia-Prieto, Lorenz Esch, Matti Hamalainen, John C. Mosher. All rights reserved.
+ * Copyright (C) 2020, Wayne Mead, Juan Garcia-Prieto, Lorenz Esch, Matti Hamalainen, John C. Mosher. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -133,6 +133,13 @@ public:
 
     //=========================================================================================================
 signals:
+
+    /**
+     * This method is the main method in the class. It goes through the input file and tag by tag
+     * analyses if there might be some relevant information to anonymize and eventually does so. Initially it
+     * checks for valid file formating. Finally the method would test if the input file should be deleted or
+     * renamed according to the flags configured in the class.
+     */
     void readingIdFileVersion(double v);
     void readingIdMeasurementDate(QDateTime d);
     void readingIdMac(QString mac);
