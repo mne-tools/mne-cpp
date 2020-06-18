@@ -178,7 +178,7 @@ void FilterSettingsView::updateGuiMode(GuiMode mode)
         case GuiMode::Clinical:
             m_pUi->m_pPushButtonShowFilterOptions->hide();
             break;
-        default: // default is scientific mode
+        default: // default is research mode
             m_pUi->m_pPushButtonShowFilterOptions->show();
             break;
     }

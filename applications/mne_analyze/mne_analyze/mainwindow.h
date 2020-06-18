@@ -205,7 +205,7 @@ private:
     // MainWindow actions
     QPointer<QAction>                   m_pActionExit;              /**< exit application action */
     QPointer<QAction>                   m_pActionAbout;             /**< show about dialog action */
-    QPointer<QAction>                   m_pActionResearchMode;      /**< toggle scientific mode action */
+    QPointer<QAction>                   m_pActionResearchMode;      /**< toggle research mode action */
     QPointer<QAction>                   m_pActionClinicalMode;      /**< toggle clinical mode action */
     QPointer<QAction>                   m_pActionDarkMode;          /**< toggle dark mode */
 

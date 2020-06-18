@@ -331,7 +331,7 @@ void MainWindow::createPluginMenus(QSharedPointer<ANSHAREDLIB::PluginManager> pP
     QActionGroup* pActionModeGroup = new QActionGroup(this);
 
     m_pActionResearchMode = new QAction("Research");
-    m_pActionResearchMode->setStatusTip(tr("Activate the scientific GUI mode"));
+    m_pActionResearchMode->setStatusTip(tr("Activate the research GUI mode"));
     m_pActionResearchMode->setCheckable(true);
     m_pActionResearchMode->setChecked(true);
     pActionModeGroup->addAction(m_pActionResearchMode);
