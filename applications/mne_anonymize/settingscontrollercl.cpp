@@ -167,7 +167,7 @@ void SettingsControllerCl::initParser()
            "\n - *** Additionally if there is MRI data present in the file a warning message will appear.\n"));
     m_parser.addHelpOption();
 
-    //this needs to be here
+    //this breaks encapsulation. damn it. it has to be here in order to show in the help text.
     QCommandLineOption noGUIOpt("gui",QCoreApplication::translate("main","GUI version of the application."));
     m_parser.addOption(noGUIOpt);
 

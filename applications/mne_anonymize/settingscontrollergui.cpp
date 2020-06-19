@@ -82,6 +82,8 @@ SettingsControllerGui::SettingsControllerGui(const QStringList& arguments)
     m_pWin->statusMsg(msg,2000);
 }
 
+//=============================================================================================================
+
 void SettingsControllerGui::executeAnonymizer()
 {
     if(!m_pAnonymizer->isFileInSet())
@@ -98,6 +100,8 @@ void SettingsControllerGui::executeAnonymizer()
     m_pAnonymizer->anonymizeFile();
     m_pWin->statusMsg("Your file is ready!");
 }
+
+//=============================================================================================================
 
 void SettingsControllerGui::readData()
 {
@@ -121,6 +125,8 @@ void SettingsControllerGui::readData()
         m_pWin->winPopup("Cannot read data. Please select a valid input file first.");
     }
 }
+
+//=============================================================================================================
 
 void SettingsControllerGui::fileInChanged(const QString& strInFile)
 {
@@ -157,6 +163,8 @@ void SettingsControllerGui::fileInChanged(const QString& strInFile)
     }
 }
 
+//=============================================================================================================
+
 void SettingsControllerGui::fileOutChanged(const QString& strOutFile)
 {
     QFileInfo newfiOutFile(strOutFile);
@@ -190,6 +198,8 @@ void SettingsControllerGui::fileOutChanged(const QString& strOutFile)
         m_pAnonymizer->setFileOut(m_fiOutFileInfo.absoluteFilePath());
     }
 }
+
+//=============================================================================================================
 
 void SettingsControllerGui::setupCommunication()
 {
@@ -277,6 +287,8 @@ void SettingsControllerGui::setupCommunication()
     QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingMNECommandLine,
                      m_pWin.data(),&MainWindow::setLineEditMNECommand);
 }
+
+//=============================================================================================================
 
 void SettingsControllerGui::initializeOptionsState()
 {
