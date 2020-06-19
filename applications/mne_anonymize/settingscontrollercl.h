@@ -209,7 +209,14 @@ private:
 
     //=========================================================================================================
     /**
-     * Prints a message if the Verbose option has been set.
+     *
+     * @brief print string to console if the object is set to Verbose Mode on. Or if Silent Mode has not been set.
+     *
+     * @details Many memeber functions require some text to be printed in the console. This member method allows to abstract from that call
+     * the state of the object (Verbose Mode On/Off, Silent Mode On/Off) making it more easily readable.
+     *
+     * @param [in] str String to print.
+     *
      */
     void printIfVerbose(const QString& str) const;
 
