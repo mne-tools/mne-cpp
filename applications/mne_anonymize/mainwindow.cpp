@@ -76,8 +76,8 @@ using namespace MNEANONYMIZE;
 
 MainWindow::MainWindow(MNEANONYMIZE::SettingsControllerGui *c)
 : m_bOptionsVisibility(false)
-, m_iDefaultHeight(222)
-, m_iDefaultHeightLarge(666)
+, m_iDefaultWindowHeight(222)
+, m_iDefaultWindowHeightLarge(666)
 , m_pUi(new Ui::MainWindow)
 , m_pController(c)
 {
