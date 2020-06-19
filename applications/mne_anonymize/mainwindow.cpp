@@ -132,8 +132,8 @@ void MainWindow::setDefautlStateUi()
 {
     this->setWindowTitle(qApp->organizationName() + " ~ " + qApp->applicationName() + " ~ " + qApp->applicationVersion());
 
-    resize(m_iDefaultHeightLarge,m_iDefaultHeight);
-    setMaximumHeight(m_iDefaultHeight);
+    resize(m_iDefaultWindowHeightLarge,m_iDefaultWindowHeight);
+    setMaximumHeight(m_iDefaultWindowHeight);
 
     if(m_bOptionsVisibility)
     {
@@ -855,17 +855,17 @@ void MainWindow::checkBoxShowOptionsChanged()
     m_bOptionsVisibility = m_pUi->checkBoxShowOptions->isChecked();
     if(m_bOptionsVisibility)
     {
-        setMaximumHeight(10*m_iDefaultHeight);
-        if(height() < m_iDefaultHeightLarge)
+        setMaximumHeight(10*m_iDefaultWindowHeight);
+        if(height() < m_iDefaultWindowHeightLarge)
         {
-            resize(width(),m_iDefaultHeightLarge);
+            resize(width(),m_iDefaultWindowHeightLarge);
         }
     } else {
-        if(height() > m_iDefaultHeight)
+        if(height() > m_iDefaultWindowHeight)
         {
-            resize(width(),m_iDefaultHeight);
+            resize(width(),m_iDefaultWindowHeight);
         }
-        setMaximumHeight(m_iDefaultHeight);
+        setMaximumHeight(m_iDefaultWindowHeight);
     }
 
     m_pUi->frameOptionsAndExtraInfo->setVisible(m_bOptionsVisibility);

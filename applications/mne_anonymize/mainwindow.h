@@ -462,154 +462,134 @@ public slots:
 
     //=========================================================================================================
     /**
-     * @brief Specify the
+     * @brief Specify the sex of the subject in the combo box of the user interface.
      *
-     * @details
+     * @details As per FIFF standard (v1.3) 0 = "unknown", 1 = "male", 2 = "female".
      *
-     * @param [in]
+     * @param [in] s Code with the sex of the subject.
      *
      */
     void setComboBoxSubjectSex(int s);
 
     //=========================================================================================================
     /**
-     * @brief Specify the
+     * @brief Specify the handedness or principal hand of the subject.
      *
-     * @details
+     * @details As per FIFF standard (v1.3) 0 = "unknown", 1 = "right", 2 = "left".
      *
-     * @param [in]
+     * @param [in] w Code with the hand of the subject.
      *
      */
     void setLineEditSubjectHand(int h);
 
     //=========================================================================================================
     /**
-     * @brief Specify the
+     * @brief Specify the weight of the subject in Kg.
      *
-     * @details
+     * @details Weigth of the subject is specified in a FIFF file as a floating point value (float).
      *
-     * @param [in]
+     * @param [in] w Weight of the subject in kg.
      *
      */
     void setLineEditSubjectWeight(float w);
 
     //=========================================================================================================
     /**
-     * @brief Specify the
+     * @brief Specify the height of the subject in cm.
      *
-     * @details
+     * @details The height of the subject is specified in a FIFF file as a floating point value (float).
      *
-     * @param [in]
+     * @param [in] h Height of the subject.
      *
      */
     void setLineEditSubjectHeight(float h);
 
     //=========================================================================================================
     /**
-     * @brief Specify the
+     * @brief Specify the value of the Subject comment line edit.
      *
-     * @details
-     *
-     * @param [in]
+     * @param [in] c String to show.
      *
      */
     void setLineEditSubjectComment(QString c);
 
     //=========================================================================================================
     /**
-     * @brief Specify the
+     * @brief Specify the text to show in the His Id line edit.
      *
-     * @details
-     *
-     * @param [in]
+     * @param [in] his String to show.
      *
      */
     void setLineEditSubjectHisId(QString his);
 
     //=========================================================================================================
     /**
-     * @brief Specify the
+     * @brief Specify the Project id number in the window.
      *
-     * @details
-     *
-     * @param [in]
+     * @param [in] i Id of the project.
      *
      */
-    void setLineEditProjectId(int);
+    void setLineEditProjectId(int i);
 
     //=========================================================================================================
     /**
-     * @brief Specify the
+     * @brief Specify the string to show in the Project name edit line.
      *
-     * @details
-     *
-     * @param [in]
+     * @param [in] pname Text with the name of the project.
      *
      */
-    void setLineEditProjectName(QString);
+    void setLineEditProjectName(QString pname);
 
     //=========================================================================================================
     /**
-     * @brief Specify the
+     * @brief Specify the string to show in the Project aim edit line
      *
-     * @details
-     *
-     * @param [in]
+     * @param [in] pAim Text containing the project aim.
      *
      */
-    void setLineEditProjectAim(QString);
+    void setLineEditProjectAim(QString pAim);
 
     //=========================================================================================================
     /**
-     * @brief Specify the
+     * @brief Specify the string containing the Persons involved in the project to show in that edit line.
      *
-     * @details
-     *
-     * @param [in]
+     * @param [in] pPersons String text containing the persons involved in the project.
      *
      */
-    void setLineEditProjectPersons(QString);
+    void setLineEditProjectPersons(QString pPersons);
 
     //=========================================================================================================
     /**
-     * @brief Specify the
+     * @brief Specify the text to show as the project comment.
      *
-     * @details
-     *
-     * @param [in]
+     * @param [in] pComment Text containing the project comment.
      *
      */
-    void setLineEditProjectComment(QString);
+    void setLineEditProjectComment(QString pComment);
 
     //=========================================================================================================
     /**
-     * @brief Specify the
+     * @brief Specify if the message warning the user that there is MRI data in the fif file should be shown.
      *
-     * @details
-     *
-     * @param [in]
+     * @param [in] b Bool value to show or not the warning mri data message.
      *
      */
-    void setLabelMriDataFoundVisible(bool);
+    void setLabelMriDataFoundVisible(bool b);
 
     //=========================================================================================================
     /**
-     * @brief Specify the
+     * @brief Specify the text to show in the MNE toolbox working directory line edit.
      *
-     * @details
-     *
-     * @param [in]
+     * @param [in] s Text containing the working directory.
      *
      */
     void setLineEditMNEWorkingDir(QString s);
 
     //=========================================================================================================
     /**
-     * @brief Specify the
+     * @brief Specify the text to show in the MNE toolbox command used line edit.
      *
-     * @details
-     *
-     * @param [in]
+     * @param [in] s Text containing the command shown.
      *
      */
     void setLineEditMNECommand(QString s);
@@ -619,11 +599,9 @@ public slots:
 protected:
     //=========================================================================================================
     /**
-     * @brief Specify the
+     * @brief Event triggered when the close window icon is clicked.
      *
-     * @details
-     *
-     * @param [in]
+     * @param [in] event Event triggered.
      *
      */
     void closeEvent(QCloseEvent *event) override;
@@ -633,154 +611,104 @@ private slots:
 
     //=========================================================================================================
     /**
-     * @brief Specify the
-     *
-     * @details
-     *
-     * @param [in]
+     * @brief This member allows to manage the event of the checkbox "Show Options" has been changed.
      *
      */
     void checkBoxShowOptionsChanged();
 
     //=========================================================================================================
     /**
-     * @brief Specify the
-     *
-     * @details
-     *
-     * @param [in]
+     * @brief Allows to manage the event of "Brute Mode" checkbox's state has changed.
      *
      */
     void checkBoxBruteModeChanged();
 
     //=========================================================================================================
     /**
-     * @brief Specify the
+     * @brief Allows to manage the event of a new number of days to offset the measurement date has been changed.
      *
-     * @details
-     *
-     * @param [in]
+     * @details This is only possibly triggered when the checkbox to use offset for the measurement date is clicked.
+     * Since the control for the number of offset days is otherwise disabled.
      *
      */
     void checkBoxMeasurementDateOffsetStateChanged(int arg);
 
     //=========================================================================================================
     /**
-     * @brief Specify the
-     *
-     * @details
-     *
-     * @param [in]
+     * @brief Allows to manage the change of the state in the checkbox defining to use a specific birthday for
+     * substituting the subject's birthday or to use a number of offset days.
      *
      */
     void checkBoxBirthdayDateOffsetStateChanged(int arg);
 
     //=========================================================================================================
     /**
-     * @brief Specify the
-     *
-     * @details
-     *
-     * @param [in]
+     * @brief Allows to manage the event of the input file path being changed.
      *
      */
     void inFileEditingFinished();
 
     //=========================================================================================================
     /**
-     * @brief Specify the
+     * @brief Allows to manage the event of the output file path being changed.
      *
-     * @details
-     *
-     * @param [in]
-     *
-     */
-    void outFileEditingFinished();
+     */    void outFileEditingFinished();
 
     //=========================================================================================================
     /**
-     * @brief Specify the
-     *
-     * @details
-     *
-     * @param [in]
+     * @brief Allows to manage the event of the measurement date control being changed.
      *
      */
     void dateTimeMeasurementDateDateTimeChanged(const QDateTime &dateTime);
 
     //=========================================================================================================
     /**
-     * @brief Specify the
-     *
-     * @details
-     *
-     * @param [in]
+     * @brief Allows to manage the event of the measurement date offset being changed.
      *
      */
     void spinBoxMeasurementDateOffsetValueChanged(int arg1);
 
     //=========================================================================================================
     /**
-     * @brief Specify the
-     *
-     * @details
-     *
-     * @param [in]
+     * @brief Allows to manage the event of the birthday date control being changed.
      *
      */
     void dateTimeBirthdayDateDateTimeChanged(const QDateTime &dateTime);
 
     //=========================================================================================================
     /**
-     * @brief Specify the
-     *
-     * @details
-     *
-     * @param [in]
+     * @brief Allows to manage the event of the checkbox for specifying a birthday date or an offset in days,
+     *  being changed.
      *
      */
     void spinBoxBirthdayDateOffsetValueChanged(int arg1);
 
     //=========================================================================================================
     /**
-     * @brief Specify the
-     *
-     * @details
-     *
-     * @param [in]
+     * @brief Allows to manage the event of His-Id control text being changed.
      *
      */
     void lineEditSubjectHisIdEditingFinished();
 
     //=========================================================================================================
     /**
-     * @brief Specify the
-     *
-     * @details
-     *
-     * @param [in]
+     * @brief Allows to start a input file dialog window. This event is triggered when the "..." tool icon is
+     * clicked.
      *
      */
     void openInFileDialog();
 
     //=========================================================================================================
     /**
-     * @brief Specify the
-     *
-     * @details
-     *
-     * @param [in]
+     * @brief Allows to start a output file dialog window. This event is triggered when the "..." tool icon is
+     * clicked.
      *
      */
     void openOutFileDialog();
 
     //=========================================================================================================
     /**
-     * @brief Specify the
-     *
-     * @details
-     *
-     * @param [in]
+     * @brief This event is triggered when the Help tool icon is clicked.
      *
      */
     void helpButtonClicked();
@@ -791,66 +719,43 @@ private:
 
     //=========================================================================================================
     /**
-     * @brief Specify the
-     *
-     * @details
-     *
-     * @param [in]
+     * @brief Window popup to allow the user to confirm exiting the application.
      *
      */
     bool confirmClose();
 
     //=========================================================================================================
     /**
-     * @brief Specify the
-     *
-     * @details
-     *
-     * @param [in]
+     * @brief Specify the state of all the controls and line text containers as it should be at the start of the
+     * application.
      *
      */
     void setDefautlStateUi();
 
     //=========================================================================================================
     /**
-     * @brief Specify the
-     *
-     * @details
-     *
-     * @param [in]
+     * @brief Specify SIGNAL->SLOT connections between the UI and this class' member methods.
      *
      */
     void setupConnections();
 
     //=========================================================================================================
     /**
-     * @brief Specify the
-     *
-     * @details
-     *
-     * @param [in]
+     * @brief The measurement date control has changed.
      *
      */
     void idMeasurementDateChanged();
 
     //=========================================================================================================
     /**
-     * @brief Specify the
-     *
-     * @details
-     *
-     * @param [in]
+     * @brief The main window of the application has been resized.
      *
      */
     void resizeEvent(QResizeEvent* event) override;
 
     //=========================================================================================================
     /**
-     * @brief Specify the
-     *
-     * @details
-     *
-     * @param [in]
+     * @brief Check if the main window is too small to allow for a correct display of the controls.
      *
      */
     void checkSmallGui();
@@ -858,8 +763,8 @@ private:
     //=========================================================================================================
 
     bool m_bOptionsVisibility;                  /**< Options and input file info is shown.*/
-    const int m_iDefaultHeight;
-    const int m_iDefaultHeightLarge;
+    const int m_iDefaultWindowHeight;           /**< Default UI window height when the options are hidden.*/
+    const int m_iDefaultWindowHeightLarge;      /**< Defailt UI window height when the options are shown.*/
 
     QFileInfo m_fiInFile;                       /**< Input file QFileInfo object.*/
     QFileInfo m_fiOutFile;                      /**< Output file QFileInfo object.*/
