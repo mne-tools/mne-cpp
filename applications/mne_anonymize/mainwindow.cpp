@@ -237,8 +237,8 @@ void MainWindow::setDefautlStateUi()
     m_pUi->lineEditProjectPersonsExtra->setToolTip("Default substitution value: mne_anonymize");
     m_pUi->plainTextEditProjectCommentExtra->setToolTip("Default substitution value: mne_anonymize");
 
-    m_pUi->lineEditMNEEnvironmentCommandExtra->setToolTip("Command used to modify the fif file with the MNE toolbox.");
-    m_pUi->lineEditMNEEnvironmentWorkingDirExtra->setToolTip("Working directory within MNE toolbox.");
+    m_pUi->lineEditMNEEnvironmentCommandExtra->setToolTip("Command used to modify the fif file with the MNE toolbox. Default substitution value: mne_anonymize");
+    m_pUi->lineEditMNEEnvironmentWorkingDirExtra->setToolTip("Working directory within MNE toolbox. Default substitution value: mne_anonymize");
 }
 
 //=============================================================================================================
