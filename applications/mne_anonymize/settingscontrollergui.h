@@ -89,18 +89,67 @@ public:
     */
     explicit SettingsControllerGui(const QStringList& arguments);
 
+    //=========================================================================================================
+
 public slots:
+    //=========================================================================================================
+    /**
+     *
+     * @brief Manages the event of the input file path (through the QLineEdit or throught he fileMenu) has been updated.
+     *
+     * @param [in] str String containing the path of the input file.
+     *
+     */
     void fileInChanged(const QString& strInFile);
+
+    //=========================================================================================================
+    /**
+     *
+     * @brief Manages the event of the input file path (through the QLineEdit or throught he fileMenu) has been updated.
+     *
+     * @param [in] str String containing the path of the input file.
+     *
+     */
     void fileOutChanged(const QString& strOutFile);
+
+    //=========================================================================================================
+    /**
+     *
+     * @brief Manages the event of the anonymize input file button being clicked.
+     *
+     */
     void executeAnonymizer();
 
+    //=========================================================================================================
 private:
+
+    //=========================================================================================================
+    /**
+     *
+     * @brief Manages the event of the read input file, button being clicked.
+     *
+     */
     void readData();
+
+    //=========================================================================================================
+    /**
+     *
+     * @brief Sets the state of the Option controls according to the text command line call to open the gui.
+     *
+     */
     void initializeOptionsState();
+
+    //=========================================================================================================
+    /**
+     *
+     * @brief Sets up communication between this controller and the model (fiffanonymizer class) and the view (mainwindow class).
+     * And also the communication between them.
+     *
+     */
     void setupCommunication();
 
 private:
-    QSharedPointer<MainWindow> m_pWin;
+    QSharedPointer<MainWindow> m_pWin;      /**< A QShared pointer to the address of the MainWindow object containing the GUI.*/
 };
 
 //=============================================================================================================
