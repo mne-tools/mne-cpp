@@ -76,7 +76,11 @@ namespace MNEANONYMIZE
 
 //=============================================================================================================
 /**
- * Description of what this class is intended to do (in detail).
+ * A straight forward object which opens an input fif file, reads sequentially (linked list) all its tags and saves
+ * an anonymized copy of each tag into an output file. The class is intentionally concieved as "not-smart" or
+ * restricted to the actual anonymization process. It has several getters and setters, and a main anonymizer member
+ * method. Several member variable help keep track of how the anonymization process should take place, but the
+ * anonymization flow is intended to be taken care of by a controller.
  *
  * @brief FiffAnonymizer class declaration.
  */
@@ -124,7 +128,9 @@ public:
 
     //=========================================================================================================
     /**
-     * This method is the main method in the class. It goes through the input file and tag by tag
+     * @brief Anonymize the input file and save resutls in the output file.
+     *
+     * @details This method is the main method in the class. It goes through the input file and tag by tag
      * analyses if there might be some relevant information to anonymize and eventually does so. Initially it
      * checks for valid file formating. Finally the method would test if the input file should be deleted or
      * renamed according to the flags configured in the class.
@@ -809,6 +815,16 @@ private:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+/**
+ *
+ * @brief Transfrom the sex code of the subject into a string ["unknown", "male" or "female"].
+ *
+ * @details Fiff standard codes the sex of the subject as an integer value. This helper method allows to easily transform it into a
+ * more user friendly format.
+ *
+ * @param [in] sexCode the code with the sex of the subject.
+ *
+ */
 
 inline QString FiffAnonymizer::subjectSexToString(int sexCode) const
 {
@@ -829,6 +845,17 @@ inline QString FiffAnonymizer::subjectSexToString(int sexCode) const
 }
 
 //=============================================================================================================
+/**
+ *
+ * @brief Transfrom the handedness code of the subject into a string ["unknown", "right" or "left"], expressing the right or left-handness of the the
+ * subject.
+ *
+ * @details Fiff standard codes the handness (or handedness) of the subject as an integer value. This helper method allows to easily transform it into a
+ * more user friendly format.
+ *
+ * @param [in] handCode the code with the handedness of the subject.
+ *
+ */
 
 inline QString FiffAnonymizer::subjectHandToString(int handCode) const
 {
@@ -850,7 +877,16 @@ inline QString FiffAnonymizer::subjectHandToString(int handCode) const
 }
 
 //=============================================================================================================
-
+/**
+ *
+ * @brief print string to console if the object is set to Verbose Mode on. Or if Silent Mode has not been set.
+ *
+ * @details Many memeber functions require some text to be printed in the console. This member method allows to abstract from that call
+ * the state of the object (Verbose Mode On/Off, Silent Mode On/Off) making it more easily readable.
+ *
+ * @param [in] str String to print.
+ *
+ */
 inline void FiffAnonymizer::printIfVerbose(const QString& str) const
 {
     if(m_bVerboseMode)
