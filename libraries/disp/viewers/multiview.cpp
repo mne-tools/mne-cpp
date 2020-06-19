@@ -150,6 +150,7 @@ MultiViewWindow* MultiView::addWidgetBottom(QWidget* pWidget,
 void MultiView::saveSettings()
 {
     if(m_sSettingsPath.isEmpty()) {
+        qWarning() << "[MultiView::saveSettings] Settings path not set for main window. Cannot save central widget state.";
         return;
     }
 
@@ -166,6 +167,7 @@ void MultiView::saveSettings()
 void MultiView::loadSettings()
 {
     if(m_sSettingsPath.isEmpty()) {
+        qWarning() << "[MultiView::loadSettings] Settings path not set for main window. Cannot load central widget state.";
         return;
     }
 

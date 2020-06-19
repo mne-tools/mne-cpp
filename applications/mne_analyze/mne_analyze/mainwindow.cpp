@@ -87,7 +87,7 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager
 {
     this->setObjectName("mainwindow");
     setWindowState(Qt::WindowMaximized);
-    setMinimumSize(400, 400);
+    setMinimumSize(900, 700);
     setWindowTitle(CInfo::AppNameShort());
 
     if(!pPluginManager.isNull()) {
@@ -96,7 +96,6 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager
         createPluginMenus(pPluginManager);
         createLogDockWindow();
         createPluginControls(pPluginManager);
-//        createAveragingWindows();
         createPluginViews(pPluginManager);
     } else {
         qWarning() << "[MainWindow::MainWindow] CRITICAL ! Plugin manager is nullptr";
@@ -395,6 +394,7 @@ void MainWindow::createPluginControls(QSharedPointer<ANSHAREDLIB::PluginManager>
     for(IPlugin* pPlugin : pPluginManager->getPlugins()) {
         if(QDockWidget* pControl = pPlugin->getControl()) {
             addDockWidget(Qt::LeftDockWidgetArea, pControl);
+            pControl->setParent(this);
             qInfo() << "[MainWindow::createPluginControls] Found and added dock widget for " << pPlugin->getName();
             QAction* pAction = pControl->toggleViewAction();
             pAction->setText(pPlugin->getName()+" Controls");
@@ -420,7 +420,8 @@ void MainWindow::createPluginControls(QSharedPointer<ANSHAREDLIB::PluginManager>
 void MainWindow::createPluginViews(QSharedPointer<PluginManager> pPluginManager)
 {
     m_pGridLayout = new QGridLayout(this);
-    m_pMultiView = new MultiView();
+    m_pMultiView = new MultiView(m_sSettingsPath);
+    m_pMultiView->setParent(this);
     m_pGridLayout->addWidget(m_pMultiView);
     m_pMultiView->show();
     m_pMultiView->setObjectName("multiview");

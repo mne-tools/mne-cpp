@@ -167,11 +167,16 @@ QDockWidget *RawDataViewer::getControl()
                                              QSizePolicy::Expanding);
     pLayout->addSpacerItem(endSpacer);
 
+    QScrollArea* wrappedScrollArea = new QScrollArea();
+    wrappedScrollArea->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,
+                                                 QSizePolicy::Preferred));
     QWidget* pWidget = new QWidget();
     pWidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,
                                        QSizePolicy::Preferred));
-    pWidget->setLayout(pLayout);
-    pControlDock->setWidget(pWidget);
+    //pWidget->setLayout(pLayout);
+    wrappedScrollArea->setLayout(pLayout);
+
+    pControlDock->setWidget(wrappedScrollArea);
     pControlDock->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,
                                             QSizePolicy::Preferred));
 
