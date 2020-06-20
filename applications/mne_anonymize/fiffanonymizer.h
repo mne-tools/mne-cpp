@@ -76,13 +76,16 @@ namespace MNEANONYMIZE
 
 //=============================================================================================================
 /**
- * A straight forward object which opens an input fif file, reads sequentially (linked list) all its tags and saves
- * an anonymized copy of each tag into an output file. The class is intentionally concieved as "not-smart" or
- * restricted to the actual anonymization process. It has several getters and setters, and a main anonymizer member
- * method. Several member variable help keep track of how the anonymization process should take place, but the
- * anonymization flow is intended to be taken care of by a controller.
+ * This class opens an input fif file, reads sequentially  all its tags (linked list) and saves
+ * an anonymized copy of each tag into an output file.
+ *
+ * @details The class is intentionally concieved as "not-smart" or restricted to the actual anonymization
+ * process. It has several getters and setters, and a main anonymizer member method. Several member variable help
+ * keep track of how the anonymization process should take place, but the anonymization flow is intended to be
+ * taken care of by a controller.
  *
  * @brief FiffAnonymizer class declaration.
+ *
  */
 class FiffAnonymizer : public QObject
 {
