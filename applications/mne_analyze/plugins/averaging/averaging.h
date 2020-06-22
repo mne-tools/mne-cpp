@@ -277,6 +277,7 @@ private:
     bool                                                    m_bUseAnn;                  /**< Whether to use annotations to compute average. Currently always set to true (1) */
     bool                                                    m_bBasline;                 /**< Whether to apply baseline correction */
     bool                                                    m_bRejection;               /**< Whether to drop data points marked fro rejection when calculating average */
+    bool                                                    m_bLoaded;
 
     QRadioButton*                                           m_pAnnCheck;                /**< Radio Buttons to control m_bUseAnn. True (1) if this is checked. */
     QRadioButton*                                           m_pStimCheck;               /**< Radio Buttons to control m_bUseAnn. False (0) if this is checked. */
