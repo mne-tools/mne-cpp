@@ -81,6 +81,13 @@ AnnotationSettingsView::AnnotationSettingsView()
 
 //=============================================================================================================
 
+void AnnotationSettingsView::reset()
+{
+    setModel(QSharedPointer<ANSHAREDLIB::AnnotationModel>::create());
+}
+
+//=============================================================================================================
+
 void AnnotationSettingsView::initMSVCSettings()
 {
     //Model
@@ -185,7 +192,6 @@ void AnnotationSettingsView::setModel(QSharedPointer<ANSHAREDLIB::AnnotationMode
 
 void AnnotationSettingsView::onDataChanged()
 {
-    //qDebug() << "AnnotationSettingsView::onDataChanged";
     m_pUi->m_tableView_eventTableView->viewport()->update();
     m_pUi->m_tableView_eventTableView->viewport()->repaint();
     emit triggerRedraw();
@@ -193,7 +199,9 @@ void AnnotationSettingsView::onDataChanged()
 
 //=============================================================================================================
 
-void AnnotationSettingsView::passFiffParams(int iFirst,int iLast,float fFreq)
+void AnnotationSettingsView::passFiffParams(int iFirst,
+                                            int iLast,
+                                            float fFreq)
 {
     m_pAnnModel->setFirstLastSample(iFirst, iLast);
     m_pAnnModel->setSampleFreq(fFreq);
@@ -203,7 +211,6 @@ void AnnotationSettingsView::passFiffParams(int iFirst,int iLast,float fFreq)
 
 void AnnotationSettingsView::removeAnnotationfromModel()
 {
-    //QModelIndexList indexList = m_pUi->m_tableView_eventTableView->selectionModel()->selectedIndexes();
     QModelIndexList indexList = m_pUi->m_tableView_eventTableView->selectionModel()->selectedRows();
 
     for(int i = 0; i<indexList.size(); i++) {
@@ -308,7 +315,6 @@ void AnnotationSettingsView::keyPressEvent(QKeyEvent* event)
 void AnnotationSettingsView::realTimeDataSample(int iValue)
 {
     m_pAnnModel->setSelectedAnn(m_pUi->m_tableView_eventTableView->selectionModel()->currentIndex().row());
-    //qDebug() << "AnnotationSettingsView::realTimeData --" << iValue;
     m_pAnnModel->updateFilteredSample(iValue);
     this->onDataChanged();
 }
@@ -318,9 +324,7 @@ void AnnotationSettingsView::realTimeDataSample(int iValue)
 void AnnotationSettingsView::realTimeDataTime(double dValue)
 {
     m_pAnnModel->setSelectedAnn(m_pUi->m_tableView_eventTableView->selectionModel()->currentIndex().row());
-    //qDebug() << "AnnotationSettingsView::realTimeDataTime" << dValue;
     dValue *= m_pAnnModel->getFreq();
-    //qDebug() << "AnnotationSettingsView::realTimeDataTime" << dValue;
     int t_iSample = static_cast<int>(dValue);
     m_pAnnModel->updateFilteredSample(t_iSample);
     this->onDataChanged();

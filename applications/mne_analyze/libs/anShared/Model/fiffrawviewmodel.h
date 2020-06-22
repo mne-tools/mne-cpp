@@ -375,6 +375,14 @@ public:
 
     //=========================================================================================================
     /**
+     * Returns whether there is currently data stored in the model
+     *
+     * @return Returns false if model is empty
+     */
+    inline bool isEmpty() const;
+
+    //=========================================================================================================
+    /**
      * Get sample annotation at iIndex
      *
      * @param[in] index     Index of sample data we want to retreive
@@ -494,7 +502,6 @@ public:
      * @return m_pFiffIO, member varaible saving the FiffRawData and FiffEvoked parameters
      */
     QSharedPointer<FIFFLIB::FiffIO> getFiffIO() const;
-
 
 private:
     //=========================================================================================================
@@ -697,6 +704,12 @@ inline qint32 FiffRawViewModel::numVLines() const
     return (m_iVisibleWindowSize - 1);
 }
 
+//=============================================================================================================
+
+inline bool FiffRawViewModel::isEmpty() const
+{
+    return m_lData.empty();
+}
 
 //=============================================================================================================
 // CHANNELDATA / CHANNELITERATOR DEFINITION
