@@ -61,7 +61,6 @@ AbstractView::AbstractView(QWidget *parent,
                            Qt::WindowFlags f)
 : QWidget(parent, f)
 {
-    //this->setAttribute(Qt::WA_DeleteOnClose);
 }
 
 //=============================================================================================================

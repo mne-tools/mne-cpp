@@ -89,7 +89,7 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager
 {
     this->setObjectName("mainwindow");
     setWindowState(Qt::WindowMaximized);
-    setMinimumSize(900, 700);
+    setMinimumSize(1280, 720);
     setWindowTitle(CInfo::AppNameShort());
 
     this->setAttribute(Qt::WA_DeleteOnClose);
@@ -135,7 +135,9 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
     for(QDockWidget* widget : this->findChildren<QDockWidget*>()){
         widget->setAttribute(Qt::WA_DeleteOnClose);
-        widget->close();
+        for(QWidget* subwidget : widget->findChildren<QWidget*>()){
+            subwidget->setAttribute(Qt::WA_DeleteOnClose);
+        }
     }
 
     std::cout << "MainWindow::closeEvent 1" << std::endl;

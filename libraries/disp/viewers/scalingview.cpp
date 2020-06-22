@@ -41,7 +41,6 @@
 #include "ui_scalingview.h"
 
 #include <fiff/fiff_constants.h>
-#include <iostream>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -84,16 +83,12 @@ ScalingView::ScalingView(const QString& sSettingsPath,
 
     loadSettings();
     redrawGUI();
-    qDebug() << "ScalingView::ScalingView";
-    std::cout << "ScalingView::ScalingView";
 }
 
 //=============================================================================================================
 
 ScalingView::~ScalingView()
 {
-    qDebug() << "ScalingView::~ScalingView";
-    std::cout << "ScalingView::~ScalingView";
     saveSettings();
     delete m_pUi;
 }
