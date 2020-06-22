@@ -104,15 +104,15 @@ public:
 
     //=========================================================================================================
     /**
-     * Constructs a FiffIO object by reading from a I/O device p_IODevice.
+     * Constructs a FiffIO object by reading from a I/O device pIODevice.
      *
-     * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
+     * @param[in] pIODevice    A fiff IO device like a fiff QFile or QTCPSocket
      */
-    FiffIO(QIODevice& p_IODevice);
+    FiffIO(QIODevice& pIODevice);
 
     //=========================================================================================================
     /**
-     * Constructs a FiffIO object that uses the I/O device p_IODevice.
+     * Constructs a FiffIO object that uses the I/O device pIODevice.
      *
      * @param[in] p_qlistIODevices    A QList of fiff IO devices like a fiff QFile or QTCPSocket
      */
@@ -130,27 +130,27 @@ public:
     /**
      * Setup a FiffStream
      *
-     * @param[in] p_IODevice     An fiff IO device like a fiff QFile or QTCPSocket
+     * @param[in] pIODevice      An fiff IO device like a fiff QFile or QTCPSocket
      * @param[in] info           Overall info for fiff IO device
      * @param[out] dirTree       Node directory structure
      *
      * @return true if succeeded, false otherwise
      */
-    static bool setup_read(QIODevice& p_IODevice,
+    static bool setup_read(QIODevice& pIODevice,
                            FiffInfo& info,
                            FiffDirNode::SPtr& dirTree);
 
     //=========================================================================================================
     /**
-     * Read data from a p_IODevice.
+     * Read data from a pIODevice.
      *
-     * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
+     * @param[in] pIODevice    A fiff IO device like a fiff QFile or QTCPSocket
      */
-    bool read(QIODevice& p_IODevice);
+    bool read(QIODevice& pIODevice);
 
     //=========================================================================================================
     /**
-     * Read data from a QList of p_IODevices.
+     * Read data from a QList of pIODevices.
      *
      * @param[in] p_qlistIODevices    A QList of fiff IO devices like a fiff QFile or QTCPSocket
      */
@@ -158,14 +158,14 @@ public:
 
     //=========================================================================================================
     /**
-     * Write data to a single p_IODevice.
+     * Write data to a single pIODevice.
      *
-     * @param[in] p_IODevice             A fiff IO device like a fiff QFile or QTCPSocket
+     * @param[in] pIODevice               A fiff IO device like a fiff QFile or QTCPSocket
      * @param[in] type of data to write  fiff constants types, e.g. FIFFB_RAW_DATA
      * @param[in] idx                    index of type, -1 for all entities of this type
      *
      */
-    bool write(QIODevice& p_IODevice,
+    bool write(QIODevice& pIODevice,
                const fiff_int_t type,
                const fiff_int_t idx) const;
 
@@ -183,27 +183,14 @@ public:
 
     //=========================================================================================================
     /**
-     * Write raw data to a p_IODevice.
+     * Write raw data to a pIODevice.
      *
-     * @param[in] p_IODevice             A fiff IO device like a fiff QFile or QTCPSocket
+     * @param[in] pIODevice               A fiff IO device like a fiff QFile or QTCPSocket
      * @param[in] idx                    index of type, -1 for all entities of this type
      *
      */
-    bool write_raw(QIODevice& p_IODevice,
+    bool write_raw(QIODevice& pIODevice,
                    const fiff_int_t idx) const;
-
-    //=========================================================================================================
-    /**
-     * Write filtered data to a p_IODevice.
-     *
-     * @param[in] p_IODevice             A fiff IO device like a fiff QFile or QTCPSocket
-     * @param[in] lFilterKernel          A fiff IO device like a fiff QFile or QTCPSocket
-     * @param[in] idx                    index of type, -1 for all entities of this type
-     *
-     */
-    bool write_filtered(QIODevice& p_IODevice,
-                        const QList<RTPROCESSINGLIB::FilterKernel>& lFilterKernel,
-                        const fiff_int_t idx) const;
 
     //=========================================================================================================
     /**
