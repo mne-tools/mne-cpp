@@ -170,7 +170,7 @@ void ScalingView::loadSettings()
     val = settings.value(m_sSettingsPath + QString("/ScalingView/scaleEOG"), 1e-3f).toFloat();
     m_qMapChScaling.insert(FIFFV_EOG_CH, val);
 
-    val = settings.value(m_sSettingsPath + QString("/ScalingView/scaleECG"), 1e-3f).toFloat();
+    val = settings.value(m_sSettingsPath + QString("/ScalingView/scaleECG"), 1e-6f).toFloat();
     m_qMapChScaling.insert(FIFFV_ECG_CH, val);
 
     val = settings.value(m_sSettingsPath + QString("/ScalingView/scaleSTIM"), 1e-3f).toFloat();
@@ -178,6 +178,64 @@ void ScalingView::loadSettings()
 
     val = settings.value(m_sSettingsPath + QString("/ScalingView/scaleMISC"), 1e-3f).toFloat();
     m_qMapChScaling.insert(FIFFV_MISC_CH, val);
+}
+
+//=============================================================================================================
+
+float ScalingView::getScalingValueFromType(const QMap<qint32, float>& mapScaling,
+                                           int iFiffChKind)
+{
+    float dMaxValue = 1e-9f;
+
+    switch(iFiffChKind) {
+        case FIFFV_MEG_CH: {
+            if(mapScaling.contains(FIFF_UNIT_T_M)) { //gradiometers
+                dMaxValue = 1e-10f;
+            if(mapScaling.contains(FIFF_UNIT_T_M))
+                dMaxValue = mapScaling[FIFF_UNIT_T_M];
+            }
+            else if(m_iChannelUnit == FIFF_UNIT_T) //magnitometers
+            {
+                dMaxValue = 1e-11f;
+
+                if(m_scaleMap.contains(FIFF_UNIT_T))
+                    dMaxValue = m_scaleMap[FIFF_UNIT_T];
+            }
+            break;
+        }
+
+        case FIFFV_REF_MEG_CH: {  /*11/04/14 Added by Limin: MEG reference channel */
+            dMaxValue = 1e-11f;
+            if(m_scaleMap.contains(FIFF_UNIT_T))
+                dMaxValue = m_scaleMap[FIFF_UNIT_T];
+            break;
+        }
+        case FIFFV_EEG_CH: {
+            dMaxValue = 1e-4f;
+            if(m_scaleMap.contains(FIFFV_EEG_CH))
+                dMaxValue = m_scaleMap[FIFFV_EEG_CH];
+            break;
+        }
+        case FIFFV_EOG_CH: {
+            dMaxValue = 1e-3f;
+            if(m_scaleMap.contains(FIFFV_EOG_CH))
+                dMaxValue = m_scaleMap[FIFFV_EOG_CH];
+            break;
+        }
+        case FIFFV_STIM_CH: {
+            dMaxValue = 5;
+            if(m_scaleMap.contains(FIFFV_STIM_CH))
+                dMaxValue = m_scaleMap[FIFFV_STIM_CH];
+            break;
+        }
+        case FIFFV_MISC_CH: {
+            dMaxValue = 1e-3f;
+            if(m_scaleMap.contains(FIFFV_MISC_CH))
+                dMaxScaleValue = m_scaleMap[FIFFV_MISC_CH];
+            break;
+        }
+    }
+
 }
 
 //=============================================================================================================

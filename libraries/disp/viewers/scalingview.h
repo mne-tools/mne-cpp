@@ -114,6 +114,14 @@ public:
 
     //=========================================================================================================
     /**
+     * Get the default scaling value by Qmap channel type
+     *
+     * @return The static default scaling values by Qmap and channel type
+     */
+    static float getScalingValueFromType(const QMap<qint32, float>& mapScaling, int iFiffChKind);
+
+    //=========================================================================================================
+    /**
      * Set the current scaling map. This also recreates the GUI.
      */
     void setScaleMap(const QMap<qint32, float> &qMapChScaling);
