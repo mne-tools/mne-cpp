@@ -270,7 +270,11 @@ bool FiffRawViewModel::saveToFile(const QString& sPath)
     QBuffer* bufferOut = new QBuffer;
 
     if(m_pFiffIO->m_qlistRaw.size() > 0) {
-        m_pFiffIO->write_raw(*bufferOut, 0);
+        if(m_bPerformFiltering) {
+            return m_pFiffIO->write_filtered(*bufferOut, m_filterKernel, 0);
+        } else {
+            return m_pFiffIO->write_raw(*bufferOut, 0);
+        }
 
         // Wee need to call the QFileDialog here instead of the data load plugin since we need access to the QByteArray
         QFileDialog::saveFileContent(bufferOut->data(), getModelName());
@@ -285,7 +289,11 @@ bool FiffRawViewModel::saveToFile(const QString& sPath)
     QFile fFileOut(sPath);
 
     if(m_pFiffIO->m_qlistRaw.size() > 0) {
-        return m_pFiffIO->write_raw(fFileOut, 0);
+        if(m_bPerformFiltering) {
+            return m_pFiffIO->write_filtered(fFileOut, m_filterKernel, 0);
+        } else {
+            return m_pFiffIO->write_raw(fFileOut, 0);
+        }
     }
 
     return false;
