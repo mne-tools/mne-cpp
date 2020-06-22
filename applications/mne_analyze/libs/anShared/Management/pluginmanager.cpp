@@ -42,7 +42,6 @@ Copyright (C) 2017, Christoph Dinh, Lars Debor, Simon Heinke and Matti Hamalaine
 #include "pluginmanager.h"
 #include "../Interfaces/IPlugin.h"
 #include "communicator.h"
-#include <iostream>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -145,7 +144,6 @@ int PluginManager::findByName(const QString& name)
 
 void PluginManager::shutdown()
 {
-    std::cout << "PluginManager::shutdown";
     for(IPlugin* plugin : m_qVecPlugins)
     {
         plugin->unload();
