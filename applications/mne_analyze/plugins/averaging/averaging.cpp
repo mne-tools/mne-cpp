@@ -95,6 +95,7 @@ Averaging::Averaging()
 , m_bUseAnn(1)
 , m_bBasline(0)
 , m_bRejection(0)
+, m_bLoaded(0)
 , m_pAnnCheck(Q_NULLPTR)
 , m_pStimCheck(Q_NULLPTR)
 {
@@ -443,6 +444,10 @@ void Averaging::onCheckBoxStateChanged()
 
 void Averaging::loadFullGui()
 {
+    if(m_bLoaded) {
+        return;
+    }
+
     //This function needs to be called after we have the FiffRawModel, because we need FiffInfo to initialize objects herein
     m_pFiffInfo = m_pFiffRawModel->getFiffInfo();
 
@@ -570,6 +575,8 @@ void Averaging::loadFullGui()
 
     m_fPreStim = -(static_cast<float>(m_pAveragingSettingsView->getPreStimMSeconds())/1000.f);
     m_fPostStim = static_cast<float>(m_pAveragingSettingsView->getPostStimMSeconds())/1000.f;
+
+    m_bLoaded = true;
 }
 
 //=============================================================================================================
