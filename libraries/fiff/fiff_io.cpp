@@ -43,12 +43,16 @@
 #include "fiff_evoked_set.h"
 #include "fiff_stream.h"
 
+#include <rtprocessing/filter.h>
+#include <rtprocessing/helpers/filterkernel.h>
+
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace FIFFLIB;
 using namespace Eigen;
+using namespace RTPROCESSINGLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -285,8 +289,21 @@ bool FiffIO::write_raw(QIODevice &p_IODevice,
 //=============================================================================================================
 
 bool FiffIO::write_filtered(QIODevice &p_IODevice,
+                            const QList<FilterKernel>& lFilterKernel,
                             const fiff_int_t idx) const
 {
+    if(lFilterKernel.isEmpty()) {
+        qWarning() << "[FiffIO::write_filtered] Passed filter kernel lsit is empty. Returning.";
+        return false;
+    }
+
+    int iOrder = lFilterKernel.first().getFilterOrder();
+    for(int i = 0; i < lFilterKernel.size(); ++i) {
+        if(lFilterKernel[i].getFilterOrder() > iOrder) {
+            iOrder = lFilterKernel[i].getFilterOrder();
+        }
+    }
+
     RowVectorXd cals;
     SparseMatrix<double> mult;
     RowVectorXi sel;
@@ -307,24 +324,35 @@ bool FiffIO::write_filtered(QIODevice &p_IODevice,
     fiff_int_t first, last;
     MatrixXd data;
     MatrixXd times;
+    Filter filter;
 
     for(first = from; first < to; first+=quantum) {
         last = first+quantum-1;
-        if (last > to)
+        if (last > to) {
             last = to;
+        }
 
         if (!m_qlistRaw[idx]->read_raw_segment(data, times, mult, first, last, sel)) {
             qDebug("error during read_raw_segment\n");
             return false;
         }
 
-        qDebug("Writing...");
+        qDebug("Filtering and writing...");
         if (first_buffer) {
-           if (first > 0)
+           if (first > 0) {
                outfid->write_int(FIFF_FIRST_SAMPLE,&first);
+           }
            first_buffer = false;
         }
-        outfid->write_raw_buffer(data, cals);
+
+        data = filter.filterData(data,lFilterKernel);
+
+        if(first == from) {
+            outfid->write_raw_buffer(data.block(0,iOrder/2,data.rows(),data.cols()-iOrder), cals);
+        } else {
+            outfid->write_raw_buffer(data, cals);
+        }
+
         qDebug("[done]\n");
     }
 
