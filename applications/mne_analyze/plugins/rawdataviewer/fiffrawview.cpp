@@ -114,6 +114,14 @@ FiffRawView::~FiffRawView()
 
 //=============================================================================================================
 
+void FiffRawView::reset()
+{
+    disconnectModel();
+    setModel(QSharedPointer<ANSHAREDLIB::FiffRawViewModel>::create());
+}
+
+//=============================================================================================================
+
 void FiffRawView::setDelegate(const QSharedPointer<FiffRawViewDelegate>& pDelegate)
 {
     if(!pDelegate) {
@@ -240,6 +248,10 @@ void FiffRawView::resizeEvent(QResizeEvent * event)
 
 void FiffRawView::setScalingMap(const QMap<qint32, float>& scaleMap)
 {
+    if(!m_pModel) {
+        return;
+    }
+
     m_qMapChScaling = scaleMap;
     m_pModel->setScaling(scaleMap);
 }
@@ -255,11 +267,12 @@ void FiffRawView::setSignalColor(const QColor& signalColor)
 
 void FiffRawView::setBackgroundColor(const QColor& backgroundColor)
 {
-    m_backgroundColor = backgroundColor;
-
-    if(m_pModel) {
-        m_pModel->setBackgroundColor(m_backgroundColor);
+    if(!m_pModel) {
+        return;
     }
+
+    m_backgroundColor = backgroundColor;
+    m_pModel->setBackgroundColor(m_backgroundColor);
 }
 
 //=============================================================================================================
@@ -275,6 +288,10 @@ void FiffRawView::setZoom(double zoomFac)
 
 void FiffRawView::setWindowSize(int iT)
 {
+    if(!m_pModel) {
+        return;
+    }
+
     int iNewPos;
     iNewPos = ((m_pTableView->horizontalScrollBar()->value() * m_iT) / iT);
 
@@ -300,6 +317,10 @@ void FiffRawView::setWindowSize(int iT)
 
 void FiffRawView::setDistanceTimeSpacer(int iValue)
 {
+    if(!m_pModel) {
+        return;
+    }
+
     m_pModel->distanceTimeSpacerChanged(iValue);
 
     //Wiggle view area to trigger update (there's probably a better way of doing this)
@@ -342,6 +363,10 @@ void FiffRawView::onMakeScreenshot(const QString& imageType)
 
 void FiffRawView::customContextMenuRequested(const QPoint &pos)
 {
+    if(!m_pModel || m_pModel->isEmpty()) {
+        return;
+    }
+
     //double dScrollDiff = static_cast<double>(m_pTableView->horizontalScrollBar()->maximum()) / static_cast<double>(m_pModel->absoluteLastSample() - m_pModel->absoluteFirstSample());
     m_fLastClickedSample = floor((float)m_pModel->absoluteFirstSample() + //accounting for first sample offset
                              (m_pTableView->horizontalScrollBar()->value() / m_pModel->pixelDifference()) + //accounting for scroll offset
@@ -363,6 +388,11 @@ void FiffRawView::customContextMenuRequested(const QPoint &pos)
 void FiffRawView::addTimeMark(bool con)
 {
     Q_UNUSED(con);
+
+    if(!m_pModel) {
+        return;
+    }
+
     m_pModel->addTimeMark(static_cast<int>(m_fLastClickedSample));
 //    emit sendSamplePos(m_fLastClickedPoint);
 }
@@ -371,6 +401,10 @@ void FiffRawView::addTimeMark(bool con)
 
 void FiffRawView::toggleDisplayEvent(const int& iToggle)
 {
+    if(!m_pModel) {
+        return;
+    }
+
     int m_iToggle = iToggle;
     //qDebug() << "toggleDisplayEvent" << iToggle;
     m_pModel->toggleDispAnnotation(m_iToggle);
@@ -412,6 +446,10 @@ bool FiffRawView::eventFilter(QObject *object, QEvent *event)
 
 void FiffRawView::updateScrollPositionToAnnotation()
 {
+    if(!m_pModel) {
+        return;
+    }
+
     int iSample = m_pModel->getAnnotationModel()->getAnnotation(m_pModel->getAnnotationModel()->getSelectedAnn()) - m_pModel->absoluteFirstSample();
     double dDx = m_pModel->pixelDifference();
 
@@ -429,27 +467,33 @@ void FiffRawView::updateScrollPositionToAnnotation()
 
 void FiffRawView::setFilter(const FilterKernel& filterData)
 {
-    if(m_pModel) {
-        m_pModel->setFilter(QList<FilterKernel>() << filterData);
+    if(!m_pModel) {
+        return;
     }
+
+    m_pModel->setFilter(QList<FilterKernel>() << filterData);
 }
 
 //=============================================================================================================
 
 void FiffRawView::setFilterActive(bool state)
 {
-    if(m_pModel) {
-        m_pModel->setFilterActive(state);
+    if(!m_pModel) {
+        return;
     }
+
+    m_pModel->setFilterActive(state);
 }
 
 //=============================================================================================================
 
 void FiffRawView::setFilterChannelType(const QString &channelType)
 {
-    if(m_pModel) {
-        m_pModel->setFilterChannelType(channelType);
+    if(!m_pModel) {
+        return;
     }
+
+    m_pModel->setFilterChannelType(channelType);
 }
 
 //=============================================================================================================
@@ -485,7 +529,17 @@ void FiffRawView::updateLabels(int iValue)
 {
     Q_UNUSED(iValue);
 
+    if(!m_pModel) {
+        return;
+    }
+
     QString strLeft, strRight;
+
+    if(m_pModel->isEmpty()) {
+        m_pRightLabel->setText("0 | 0 sec");
+        m_pLeftLabel->setText("0 | 0 sec");
+        return;
+    }
 
     //Left Label
     int iSample = static_cast<int>(m_pTableView->horizontalScrollBar()->value() / m_pModel->pixelDifference());

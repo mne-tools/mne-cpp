@@ -590,6 +590,10 @@ void FiffRawViewModel::setFilterActive(bool bState)
 
 void FiffRawViewModel::setFilterChannelType(const QString& channelType)
 {
+    if(!m_pFiffInfo) {
+        return;
+    }
+
     m_sFilterChannelType = channelType;
 
     //This version is for when all channels of a type are to be filtered (not only the visible ones).

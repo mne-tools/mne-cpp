@@ -41,6 +41,7 @@
 
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <anShared/Management/communicator.h>
+#include <anShared/Management/analyzedata.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -139,6 +140,9 @@ QDockWidget *AnnotationManager::getControl()
     connect(pAnnotationSettingsView, &AnnotationSettingsView::activeEventsChecked,
             this, &AnnotationManager::toggleDisplayEvent);
 
+    connect(m_pAnalyzeData.data(), &AnalyzeData::modelIsEmpty,
+            pAnnotationSettingsView, &AnnotationSettingsView::reset);
+
     QDockWidget* pControl = new QDockWidget(getName());
     pControl->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
     pControl->setWidget(pAnnotationSettingsView);
@@ -189,20 +193,13 @@ QVector<EVENT_TYPE> AnnotationManager::getEventSubscriptions(void) const
 void AnnotationManager::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel)
 {
     if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
-        if(m_pFiffRawModel) {
-            if(m_pFiffRawModel == pNewModel) {
-                return;
-            }
-        }
-
         emit disconnectFromModel();
-        m_pFiffRawModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
-        m_pAnnotationModel = m_pFiffRawModel->getAnnotationModel();
+        FiffRawViewModel::SPtr pFiffRawModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
 
-        emit newAnnotationModelAvailable(m_pAnnotationModel);
-        emit newFiffParamsAvailable(m_pFiffRawModel->absoluteFirstSample(),
-                                    m_pFiffRawModel->absoluteLastSample(),
-                                    m_pFiffRawModel->getFiffInfo()->sfreq);
+        emit newAnnotationModelAvailable(pFiffRawModel->getAnnotationModel());
+        emit newFiffParamsAvailable(pFiffRawModel->absoluteFirstSample(),
+                                    pFiffRawModel->absoluteLastSample(),
+                                    pFiffRawModel->getFiffInfo()->sfreq);
     }
 }
 
@@ -210,9 +207,9 @@ void AnnotationManager::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel
 
 void AnnotationManager::toggleDisplayEvent(const int& iToggle)
 {
-    int m_iToggle = iToggle;
-    m_pFiffRawModel->toggleDispAnnotation(m_iToggle);
-    m_pCommu->publishEvent(TRIGGER_REDRAW);
+    QVariant data;
+    data.setValue(iToggle);
+    m_pCommu->publishEvent(EVENT_TYPE::TRIGGER_ACTIVE_CHANGED, data);
 }
 
 //=============================================================================================================

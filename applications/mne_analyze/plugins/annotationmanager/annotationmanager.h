@@ -143,10 +143,6 @@ private:
 
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals */
 
-    QSharedPointer<ANSHAREDLIB::AnnotationModel>            m_pAnnotationModel;         /**< Pointer to associated Model for this plugin */
-
-    QSharedPointer<ANSHAREDLIB::FiffRawViewModel>           m_pFiffRawModel;            /**< Pointer to currently loaded FiffRawView Model */
-
 signals:
     void newAnnotationAvailable(int iAnnotation);
     void disconnectFromModel();

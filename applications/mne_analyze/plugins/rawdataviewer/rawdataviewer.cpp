@@ -104,6 +104,9 @@ void RawDataViewer::init()
     m_pFiffRawView->setMinimumSize(256, 256);
     m_pFiffRawView->setFocusPolicy(Qt::TabFocus);
     m_pFiffRawView->setAttribute(Qt::WA_DeleteOnClose, false);
+
+    connect(m_pAnalyzeData.data(), &AnalyzeData::modelIsEmpty,
+            this, &RawDataViewer::onModelIsEmpty);
 }
 
 //=============================================================================================================
@@ -195,6 +198,9 @@ void RawDataViewer::handleEvent(QSharedPointer<Event> e)
     case TRIGGER_VIEWER_MOVE:
         m_pFiffRawView->updateScrollPositionToAnnotation();
         break;
+    case TRIGGER_ACTIVE_CHANGED:
+        m_pFiffRawView->getModel()->toggleDispAnnotation(e->getData().toInt());
+        break;
     case SELECTED_MODEL_CHANGED:
         onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
         break;
@@ -219,12 +225,20 @@ QVector<EVENT_TYPE> RawDataViewer::getEventSubscriptions(void) const
     QVector<EVENT_TYPE> temp = {};
     temp.push_back(TRIGGER_REDRAW);
     temp.push_back(TRIGGER_VIEWER_MOVE);
+    temp.push_back(TRIGGER_ACTIVE_CHANGED);
     temp.push_back(SELECTED_MODEL_CHANGED);
     temp.push_back(FILTER_CHANNEL_TYPE_CHANGED);
     temp.push_back(FILTER_ACTIVE_CHANGED);
     temp.push_back(FILTER_DESIGN_CHANGED);
 
     return temp;
+}
+
+//=============================================================================================================
+
+void RawDataViewer::onModelIsEmpty()
+{
+    m_pFiffRawView->reset();
 }
 
 //=============================================================================================================

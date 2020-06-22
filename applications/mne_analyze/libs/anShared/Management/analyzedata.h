@@ -217,11 +217,9 @@ signals:
 
     //=========================================================================================================
     /**
-     * This is emitted whenever a model is removed.
-     *
-     * @param[in] sModelPath      The path where the model is stored.
+     * This is emitted whenever the model is completely.
      */
-    void modelRemoved(const QString &sModelPath);
+    void modelIsEmpty();
 
     //=========================================================================================================
     /**
