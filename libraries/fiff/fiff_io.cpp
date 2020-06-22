@@ -233,7 +233,8 @@ bool FiffIO::write(QFile& p_QFile,
 
 //=============================================================================================================
 
-bool FiffIO::write_raw(QIODevice &p_IODevice, const fiff_int_t idx) const
+bool FiffIO::write_raw(QIODevice &p_IODevice,
+                       const fiff_int_t idx) const
 {
     RowVectorXd cals;
     SparseMatrix<double> mult;
@@ -282,3 +283,52 @@ bool FiffIO::write_raw(QIODevice &p_IODevice, const fiff_int_t idx) const
 }
 
 //=============================================================================================================
+
+bool FiffIO::write_filtered(QIODevice &p_IODevice,
+                            const fiff_int_t idx) const
+{
+    RowVectorXd cals;
+    SparseMatrix<double> mult;
+    RowVectorXi sel;
+    FiffStream::SPtr outfid = FiffStream::start_writing_raw(p_IODevice, this->m_qlistRaw[idx]->info, cals);
+
+    //Setup reading parameters
+    fiff_int_t from = m_qlistRaw[idx]->first_samp;
+    fiff_int_t to = m_qlistRaw[idx]->last_samp;
+    float quantum_sec = 30.0f;//read and write in 30 sec junks
+    fiff_int_t quantum = ceil(quantum_sec*m_qlistRaw[idx]->info.sfreq);
+
+    // Uncomment to read the whole file at once. Warning Matrix may be none-initialisable because its huge
+    //quantum = to - from + 1;
+
+    // Read and write all the data
+    bool first_buffer = true;
+
+    fiff_int_t first, last;
+    MatrixXd data;
+    MatrixXd times;
+
+    for(first = from; first < to; first+=quantum) {
+        last = first+quantum-1;
+        if (last > to)
+            last = to;
+
+        if (!m_qlistRaw[idx]->read_raw_segment(data, times, mult, first, last, sel)) {
+            qDebug("error during read_raw_segment\n");
+            return false;
+        }
+
+        qDebug("Writing...");
+        if (first_buffer) {
+           if (first > 0)
+               outfid->write_int(FIFF_FIRST_SAMPLE,&first);
+           first_buffer = false;
+        }
+        outfid->write_raw_buffer(data, cals);
+        qDebug("[done]\n");
+    }
+
+    outfid->finish_writing_raw();
+
+    return true;
+}

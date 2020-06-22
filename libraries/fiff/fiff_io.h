@@ -127,7 +127,9 @@ public:
      *
      * @return true if succeeded, false otherwise
      */
-    static bool setup_read(QIODevice& p_IODevice, FiffInfo& info, FiffDirNode::SPtr& dirTree);
+    static bool setup_read(QIODevice& p_IODevice,
+                           FiffInfo& info,
+                           FiffDirNode::SPtr& dirTree);
 
     //=========================================================================================================
     /**
@@ -154,7 +156,9 @@ public:
      * @param[in] idx                    index of type, -1 for all entities of this type
      *
      */
-    bool write(QIODevice& p_IODevice, const fiff_int_t type, const fiff_int_t idx) const;
+    bool write(QIODevice& p_IODevice,
+               const fiff_int_t type,
+               const fiff_int_t idx) const;
 
     //=========================================================================================================
     /**
@@ -164,18 +168,33 @@ public:
      * @param[in] type of data to write     fiff constants types, e.g. FIFFB_RAW_DATA
      * @param[in] idx                       index of type, -1 for all entities of this type
      */
-    bool write(QFile& p_QFile, const fiff_int_t type, const fiff_int_t idx) const;
+    bool write(QFile& p_QFile,
+               const fiff_int_t type,
+               const fiff_int_t idx) const;
 
     //=========================================================================================================
     /**
      * Write raw data to a p_IODevice.
      *
      * @param[in] p_IODevice             A fiff IO device like a fiff QFile or QTCPSocket
-     * @param[in] type of data to write  fiff constants types, e.g. FIFFB_RAW_DATA
      * @param[in] idx                    index of type, -1 for all entities of this type
      *
      */
-    bool write_raw(QIODevice& p_IODevice, const fiff_int_t idx) const;
+    bool write_raw(QIODevice& p_IODevice,
+                   const fiff_int_t idx) const;
+
+    //=========================================================================================================
+    /**
+     * Write filtered data to a p_IODevice.
+     *
+     * @param[in] p_IODevice             A fiff IO device like a fiff QFile or QTCPSocket
+     * @param[in] lFilterKernel          A fiff IO device like a fiff QFile or QTCPSocket
+     * @param[in] idx                    index of type, -1 for all entities of this type
+     *
+     */
+    bool write_filtered(QIODevice& p_IODevice,
+                        const QList<FilterKernel>& lFilterKernel,
+                        const fiff_int_t idx) const;
 
     //=========================================================================================================
     /**
@@ -184,7 +203,8 @@ public:
      * @param[in] p_fiffIO    the fiffIO, whose members shall be printed
      */
 
-    friend std::ostream& operator<<(std::ostream& out, const FiffIO &p_fiffIO) {
+    friend std::ostream& operator<<(std::ostream& out,
+                                    const FiffIO &p_fiffIO) {
         out << "\n\n---------------------- Fiff data read summary ---------------------- " << std::endl;
         out << "fiff data contains" << std::endl;
         out << p_fiffIO.m_qlistRaw.size() << " raw data sets" << std::endl;
