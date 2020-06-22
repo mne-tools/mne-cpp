@@ -169,7 +169,7 @@ void AnalyzeCore::initMainWindow()
 {
     m_pMainWindow = new MainWindow(m_pPluginManager);
     QObject::connect(m_pMainWindow.data(), &MainWindow::mainWindowClosed,
-                     this, &AnalyzeCore::onMainWindowClosed);
+                     this, &AnalyzeCore::onMainWindowClosed, Qt::DirectConnection);
 }
 
 //=============================================================================================================
@@ -184,6 +184,7 @@ void AnalyzeCore::registerMetaTypes()
 
 void AnalyzeCore::onMainWindowClosed()
 {
+    std::cout << "AnalyzeCore::onMainWindowClosed";
     EventManager::getEventManager().shutdown();
     // shutdown every plugin, empty analzye data etc.
     m_pPluginManager->shutdown();
