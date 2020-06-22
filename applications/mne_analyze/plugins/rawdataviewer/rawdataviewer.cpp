@@ -144,7 +144,7 @@ QDockWidget *RawDataViewer::getControl()
     title_scaling->setTextFormat(Qt::RichText);
     title_scaling->setText("<b>Channel Scaling</b>");
 
-    m_pScalingWidget = new ScalingView("MNEANALYZE");
+    m_pScalingWidget = new ScalingView("MNEANALYZE", pControlDock);
     connect(this, &RawDataViewer::guiModeChanged,
             m_pScalingWidget.data(), &ScalingView::setGuiMode);
     pLayout->addWidget(title_scaling);
@@ -155,7 +155,7 @@ QDockWidget *RawDataViewer::getControl()
     title_viewsettings->setTextFormat(Qt::RichText);
     title_viewsettings->setText("<b>View Settings</b>");
 
-    m_pSettingsViewWidget = new FiffRawViewSettings("MNEANALYZE");
+    m_pSettingsViewWidget = new FiffRawViewSettings("MNEANALYZE", pControlDock);
     connect(this, &RawDataViewer::guiModeChanged,
             m_pSettingsViewWidget.data(), &FiffRawViewSettings::setGuiMode);
     pLayout->addWidget(title_viewsettings);
@@ -167,10 +167,10 @@ QDockWidget *RawDataViewer::getControl()
                                              QSizePolicy::Expanding);
     pLayout->addSpacerItem(endSpacer);
 
-    QScrollArea* wrappedScrollArea = new QScrollArea();
+    QScrollArea* wrappedScrollArea = new QScrollArea(pControlDock);
     wrappedScrollArea->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,
                                                  QSizePolicy::Preferred));
-    QWidget* pWidget = new QWidget();
+    QWidget* pWidget = new QWidget(pControlDock);
     pWidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,
                                        QSizePolicy::Preferred));
     //pWidget->setLayout(pLayout);

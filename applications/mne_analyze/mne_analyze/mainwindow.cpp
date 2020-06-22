@@ -49,6 +49,8 @@
 #include <disp/viewers/multiviewwindow.h>
 #include <disp/viewers/abstractview.h>
 
+#include <iostream>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -90,6 +92,8 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager
     setMinimumSize(900, 700);
     setWindowTitle(CInfo::AppNameShort());
 
+    this->setAttribute(Qt::WA_DeleteOnClose);
+
     if(!pPluginManager.isNull()) {
         // The order we call these functions is important!
         createActions();
@@ -118,7 +122,7 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager
 
 MainWindow::~MainWindow()
 {
-
+    std::cout << "MainWindow::~MainWindow" << std::endl;
 }
 
 //=============================================================================================================
@@ -129,9 +133,17 @@ void MainWindow::closeEvent(QCloseEvent *event)
     m_pMultiView->saveSettings();
     saveSettings();
 
+    for(QDockWidget* widget : this->findChildren<QDockWidget*>()){
+        widget->setAttribute(Qt::WA_DeleteOnClose);
+        widget->close();
+    }
+
+    std::cout << "MainWindow::closeEvent 1" << std::endl;
     emit mainWindowClosed();
+    std::cout << "MainWindow::closeEvent 2" << std::endl;
 
     // default implementation does this, so its probably a good idea
+    QMainWindow::closeEvent(event);
     event->accept();
 }
 
@@ -390,11 +402,13 @@ void MainWindow::createPluginControls(QSharedPointer<ANSHAREDLIB::PluginManager>
     setTabPosition(Qt::RightDockWidgetArea,QTabWidget::East);
     setDockOptions(QMainWindow::ForceTabbedDocks);
 
+    pPluginManager->setParent(this);
     //Add Plugin controls to the MainWindow
     for(IPlugin* pPlugin : pPluginManager->getPlugins()) {
         if(QDockWidget* pControl = pPlugin->getControl()) {
             addDockWidget(Qt::LeftDockWidgetArea, pControl);
             pControl->setParent(this);
+            //pControl->setAttribute(Qt::WA_DeleteOnClose);
             qInfo() << "[MainWindow::createPluginControls] Found and added dock widget for " << pPlugin->getName();
             QAction* pAction = pControl->toggleViewAction();
             pAction->setText(pPlugin->getName()+" Controls");
@@ -421,7 +435,6 @@ void MainWindow::createPluginViews(QSharedPointer<PluginManager> pPluginManager)
 {
     m_pGridLayout = new QGridLayout(this);
     m_pMultiView = new MultiView(m_sSettingsPath);
-    m_pMultiView->setParent(this);
     m_pGridLayout->addWidget(m_pMultiView);
     m_pMultiView->show();
     m_pMultiView->setObjectName("multiview");
@@ -441,8 +454,6 @@ void MainWindow::createPluginViews(QSharedPointer<PluginManager> pPluginManager)
             } else {
                 pWindow = m_pMultiView->addWidgetTop(pView, sCurPluginName);
             }
-
-            pWindow->setObjectName(sCurPluginName);
 
             QAction* pAction = pWindow->toggleViewAction();
             pAction->setText(pPlugin->getName());
