@@ -114,6 +114,12 @@ public:
 
     //=========================================================================================================
     /**
+     * Resets the view to its default settings.
+     */
+    void reset();
+
+    //=========================================================================================================
+    /**
      * Returns the currently set delegate
      */
     QSharedPointer<FiffRawViewDelegate> getDelegate();

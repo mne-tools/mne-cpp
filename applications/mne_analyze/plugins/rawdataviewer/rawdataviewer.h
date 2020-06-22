@@ -116,6 +116,8 @@ public:
     virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
 
 private:
+    void onModelIsEmpty();
+
     //=========================================================================================================
     /**
      * Handles if a new model is present. Only works on FiffRawViewModels

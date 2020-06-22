@@ -178,7 +178,9 @@ bool AnalyzeData::removeModel(const QModelIndex& index)
             if(QStandardItem* pItemParent = m_pData->itemFromIndex(index.parent())) {
                 if(pItemParent->rowCount() <= 1) {
                     if(m_pData->removeRows(index.parent().row(), 1)) {
-                        emit modelRemoved(sModelPath);
+                        if(m_pData->rowCount() == 0) {
+                            emit modelIsEmpty();
+                        }
                         qDebug() << "[AnalyzeData::removeModel] Removed model and parent at index" << index;
                         return true;
                     } else {
@@ -187,7 +189,9 @@ bool AnalyzeData::removeModel(const QModelIndex& index)
                     }
                 } else {
                     if(m_pData->removeRows(index.row(), 1, index.parent())) {
-                        emit modelRemoved(sModelPath);
+                        if(m_pData->rowCount() == 0) {
+                            emit modelIsEmpty();
+                        }
                         qDebug() << "[AnalyzeData::removeModel] Removed model at index" << index;
                         return true;
                     } else {

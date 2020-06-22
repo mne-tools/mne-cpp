@@ -79,6 +79,12 @@ public:
 
     //=========================================================================================================
     /**
+     * Resets the view to its default settings.
+     */
+    void reset();
+
+    //=========================================================================================================
+    /**
      * Updates the GUI combo box with a new item type, given by the input parameter.
      *
      * @param [in] currentAnnotationType    New annotation type to be added to the combo box
