@@ -160,7 +160,7 @@ QStandardItemModel* AnalyzeData::getDataModel()
 }
 
 //=============================================================================================================
-#include <iostream>
+
 bool AnalyzeData::removeModel(const QModelIndex& index)
 {
     if(QStandardItem* pItem = m_pData->itemFromIndex(index)) {
@@ -177,7 +177,6 @@ bool AnalyzeData::removeModel(const QModelIndex& index)
             // Check if the parent of the deleted item holds any other data. If not delete it as well.
             if(QStandardItem* pItemParent = m_pData->itemFromIndex(index.parent())) {
                 if(pItemParent->rowCount() <= 1) {
-                    std::cout << "index.parent().row()" << index.parent().row() << std::endl;
                     if(m_pData->removeRows(index.parent().row(), 1)) {
                         emit modelRemoved(sModelPath);
                         qDebug() << "[AnalyzeData::removeModel] Removed model and parent at index" << index;
