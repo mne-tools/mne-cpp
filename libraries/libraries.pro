@@ -47,13 +47,9 @@ SUBDIRS += \
     fwd \
     inverse \
     communication \
-
-# Libraries which are not supported in the minimalVersion
-!contains(MNECPP_CONFIG, minimalVersion) {
-    SUBDIRS += \
-        rtprocessing \
-        connectivity \
-        disp \
+    rtprocessing \
+    connectivity \
+    disp \
 
     qtHaveModule(charts) {
         # The Qt3D module is not yet Wasm supported
@@ -63,7 +59,6 @@ SUBDIRS += \
     } else {
         message("libraries.pro - The Qt Charts module is missing. Please install to build the disp3D library.")
     }
-}
 
 # Specify library dependencies
 utils.depends =

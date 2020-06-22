@@ -108,7 +108,6 @@ QMAKE_TARGET_COPYRIGHT = Copyright (C) 2020 Authors of MNE-CPP. All rights reser
 
 ########################################### PROJECT CONFIGURATION #############################################
 
-## To build the minimal version of MNE-CPP run: qmake MNECPP_CONFIG+=minimalVersion
 ## To compile with code coverage support run: qmake MNECPP_CONFIG+=withCodeCov
 ## To disable tests run: qmake MNECPP_CONFIG+=noTests
 ## To disable examples run: qmake MNECPP_CONFIG+=noExamples
@@ -127,16 +126,9 @@ QMAKE_TARGET_COPYRIGHT = Copyright (C) 2020 Authors of MNE-CPP. All rights reser
 # Default flags
 MNECPP_CONFIG +=
 
-# Minimal version needs at least qt version 5.2.1
-!minQtVersion(5, 2, 1) {
-    message("Cannot build MNE-CPP with Qt version $${QT_VERSION}.")
-    error("Use at least Qt 5.2.1. Please note that you may only be able to build the minimal MNE-CPP version.")
-}
-
-# Build minimalVersion for qt versions < 5.10.0
+# Check versions
 !minQtVersion(5, 10, 0) {
-    message("Building minimal version of MNE-CPP due to Qt version $${QT_VERSION}.")
-    MNECPP_CONFIG += minimalVersion
+    error("You are trying to build with Qt version $${QT_VERSION}. However, the minimal Qt version to build MNE-CPP is 5.10.0.")
 }
 
 # Build static version if wasm flag was defined
