@@ -40,6 +40,7 @@
 
 #include "datamanagerview.h"
 #include "ui_datamanagerview.h"
+
 #include <anShared/Management/analyzedatamodel.h>
 
 //=============================================================================================================
@@ -50,6 +51,7 @@
 #include <QStandardItemModel>
 #include <QDebug>
 #include <QMenu>
+#include <QKeyEvent>
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -125,4 +127,19 @@ void DataManagerView::onNewFileLoaded(int iSubject,
 {
     m_pUi->m_pTreeView->selectionModel()->select(m_pUi->m_pTreeView->model()->index(iModel, 0, m_pUi->m_pTreeView->model()->index(iSubject, 0)),
                                                  QItemSelectionModel::ClearAndSelect);
+}
+
+//=============================================================================================================
+
+void DataManagerView::keyPressEvent(QKeyEvent *event)
+{
+    switch (event->key())
+    {
+        case Qt::Key_Delete:
+            emit removeItem(m_pUi->m_pTreeView->currentIndex());
+            break;
+
+        default:
+            QWidget::keyPressEvent(event);
+    }
 }
