@@ -590,10 +590,10 @@ private:
     // Filter stuff
     qint32                                      m_iMaxFilterLength;                         /**< Max order of the current filters */
     QString                                     m_sFilterChannelType;                       /**< Kind of channel which is to be filtered */
-    QSharedPointer<RTPROCESSINGLIB::Filter>   m_pRtFilter;
+    QSharedPointer<RTPROCESSINGLIB::Filter>     m_pRtFilter;                                /**< The filter object. */
     Eigen::RowVectorXi                          m_lFilterChannelList;                       /**< The indices of the channels to be filtered.*/
     bool                                        m_bPerformFiltering;                        /**< Flag whether to activate/deactivate filtering. */
-    QList<RTPROCESSINGLIB::FilterKernel>                 m_filterKernel;                               /**< List of currently active filters. */
+    QList<RTPROCESSINGLIB::FilterKernel>        m_filterKernel;                             /**< List of currently active filters. */
 
     // fiff stuff
     QSharedPointer<FIFFLIB::FiffIO>             m_pFiffIO;                                  /**< Fiff IO */

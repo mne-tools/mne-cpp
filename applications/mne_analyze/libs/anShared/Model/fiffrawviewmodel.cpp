@@ -111,7 +111,7 @@ FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
 , m_iScrollPos(0)
 , m_bDispAnnotation(true)
 , m_bPerformFiltering(false)
-, m_pAnnotationModel(QSharedPointer<AnnotationModel>::create(this))
+, m_pAnnotationModel(QSharedPointer<AnnotationModel>::create())
 , m_pRtFilter(Filter::SPtr::create())
 {
     Q_UNUSED(sFilePath)
