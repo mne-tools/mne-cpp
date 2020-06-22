@@ -62,7 +62,6 @@ SUBDIRS += \
     ex_read_raw \
     ex_read_write_raw \
 
-!contains(MNECPP_CONFIG, minimalVersion) {
     qtHaveModule(charts) {
         SUBDIRS += \
             ex_clustered_inverse_mne \
@@ -91,4 +90,3 @@ SUBDIRS += \
     else {
         message("examples.pro - The Qt Charts module is missing. Please install to build the complete set of MNE-CPP features.")
     }
-}
