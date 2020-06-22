@@ -124,6 +124,8 @@ private:
     void onNewFileLoaded(int iSubject,
                          int iModel);
 
+    void keyPressEvent(QKeyEvent *event);
+
     Ui::DataManagerView *m_pUi;   /**< The user interface */
 
 signals:
