@@ -170,7 +170,7 @@ void DataLoader::onLoadFilePressed()
 #else
     //Get the path
     QString filePath = QFileDialog::getOpenFileName(Q_NULLPTR,
-                                                    tr("Open Fiff File"),
+                                                    tr("Open File"),
                                                     QDir::currentPath()+"/MNE-sample-data",
                                                     tr("Fiff file(*.fif *.fiff)"));
 
@@ -196,7 +196,7 @@ void DataLoader::onSaveFilePressed()
 #else
     //Get the path
     QString filePath = QFileDialog::getSaveFileName(Q_NULLPTR,
-                                                    tr("Save Fiff File"),
+                                                    tr("Save File"),
                                                     QDir::currentPath()+"/MNE-sample-data",
                                                     tr("Fiff file(*.fif *.fiff)"));
 
