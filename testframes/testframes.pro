@@ -56,7 +56,6 @@ SUBDIRS += \
     test_fiff_digitizer \
     test_mne_msh_display_surface_set \
 
-!contains(MNECPP_CONFIG, minimalVersion) {
     qtHaveModule(charts) {
         SUBDIRS += \
             test_interpolation \
@@ -64,4 +63,3 @@ SUBDIRS += \
             test_spectral_connectivity \
             test_mne_anonymize
     }
-}
