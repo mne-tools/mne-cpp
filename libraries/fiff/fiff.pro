@@ -66,12 +66,10 @@ contains(MNECPP_CONFIG, static) {
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lmnecppRtProcessingd \
-            -lmnecppUtilsd \
+    LIBS += -lmnecppUtilsd \
 
 } else {
-    LIBS += -lmnecppRtProcessing \
-            -lmnecppUtils \
+    LIBS += -lmnecppUtils \
 }
 
 SOURCES += fiff.cpp \
