@@ -62,15 +62,19 @@
 #include <unsupported/Eigen/FFT>
 
 //=============================================================================================================
+// FIFFLIB FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace FIFFLIB {
+    class FiffRawData;
+}
+
+//=============================================================================================================
 // DEFINE NAMESPACE RTPROCESSINGLIB
 //=============================================================================================================
 
 namespace RTPROCESSINGLIB
 {
-
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
 
 //=============================================================================================================
 /**
@@ -102,6 +106,20 @@ public:
      * Destroys the Real-time noise estimation object.
      */
     ~Filter();
+
+    //=========================================================================================================
+    /**
+     * Write filtered data to a pIODevice.
+     *
+     * @param[in] pIODevice              The IO device to write to.
+     * @param[in] pFiffRawData           The fiff raw data object to read from.
+     * @param[in] lFilterKernel          The list of filter kernels to use.
+     *
+     * @return Returns true if successfull, false otherwise.
+     */
+    bool filterData(QIODevice& pIODevice,
+                    QSharedPointer<FIFFLIB::FiffRawData> pFiffRawData,
+                    const QList<RTPROCESSINGLIB::FilterKernel>& lFilterKernel) const;
 
     /**
      * Calculates a user designed filter kernel and filters the raw input data

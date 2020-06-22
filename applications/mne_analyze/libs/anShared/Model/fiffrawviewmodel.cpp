@@ -271,7 +271,8 @@ bool FiffRawViewModel::saveToFile(const QString& sPath)
 
     if(m_pFiffIO->m_qlistRaw.size() > 0) {
         if(m_bPerformFiltering) {
-            return m_pFiffIO->write_filtered(*bufferOut, m_filterKernel, 0);
+            Filter filter;
+            return filter.filterData(*bufferOut, m_pFiffIO->m_qlistRaw[0], m_filterKernel);
         } else {
             return m_pFiffIO->write_raw(*bufferOut, 0);
         }
@@ -290,7 +291,8 @@ bool FiffRawViewModel::saveToFile(const QString& sPath)
 
     if(m_pFiffIO->m_qlistRaw.size() > 0) {
         if(m_bPerformFiltering) {
-            return m_pFiffIO->write_filtered(fFileOut, m_filterKernel, 0);
+            Filter filter;
+            return filter.filterData(fFileOut, m_pFiffIO->m_qlistRaw[0], m_filterKernel);
         } else {
             return m_pFiffIO->write_raw(fFileOut, 0);
         }
