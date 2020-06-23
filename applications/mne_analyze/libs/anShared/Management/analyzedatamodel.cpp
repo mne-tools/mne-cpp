@@ -75,7 +75,7 @@ void AnalyzeDataModel::addData(const QString &sSubjectName,
 
     if(pItemList.isEmpty()) {
         QStandardItem* pSubjectItem = new QStandardItem(sSubjectName);
-        pSubjectItem->setToolTip("The subject");
+        pSubjectItem->setToolTip("Subject item");
         pSubjectItem->setChild(pSubjectItem->rowCount(), pNewItem);
         iSubjectIndex = this->rowCount();
         this->appendRow(pSubjectItem);
