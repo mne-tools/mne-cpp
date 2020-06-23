@@ -90,15 +90,19 @@ void DataManagerView::setModel(QAbstractItemModel *pModel)
 
 void DataManagerView::customMenuRequested(QPoint pos)
 {
-    QMenu *menu = new QMenu(this);
+    QString sToolTip = m_pUi->m_pTreeView->model()->data(m_pUi->m_pTreeView->indexAt(pos), Qt::ToolTipRole).toString();
 
-    QAction* pAction = new QAction("Remove", this);
-    connect(pAction, &QAction::triggered, [=]() {
-        emit removeItem(m_pUi->m_pTreeView->indexAt(pos));
-    });
+    if(sToolTip != "Subject item") {
+        QMenu *menu = new QMenu(this);
 
-    menu->addAction(pAction);
-    menu->popup(m_pUi->m_pTreeView->viewport()->mapToGlobal(pos));
+        QAction* pAction = new QAction("Remove model", this);
+        connect(pAction, &QAction::triggered, [=]() {
+            emit removeItem(m_pUi->m_pTreeView->indexAt(pos));
+        });
+
+        menu->addAction(pAction);
+        menu->popup(m_pUi->m_pTreeView->viewport()->mapToGlobal(pos));
+    }
 }
 
 //=============================================================================================================
