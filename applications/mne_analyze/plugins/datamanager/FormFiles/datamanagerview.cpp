@@ -95,7 +95,7 @@ void DataManagerView::customMenuRequested(QPoint pos)
     if(sToolTip != "Subject item") {
         QMenu *menu = new QMenu(this);
 
-        QAction* pAction = new QAction("Remove model", this);
+        QAction* pAction = new QAction("Remove", this);
         connect(pAction, &QAction::triggered, [=]() {
             emit removeItem(m_pUi->m_pTreeView->indexAt(pos));
         });
@@ -137,10 +137,11 @@ void DataManagerView::onNewFileLoaded(int iSubject,
 
 void DataManagerView::keyPressEvent(QKeyEvent *event)
 {
-    switch (event->key())
-    {
+    switch (event->key()) {
         case Qt::Key_Delete:
-            emit removeItem(m_pUi->m_pTreeView->currentIndex());
+            if(m_pUi->m_pTreeView->model()->data(m_pUi->m_pTreeView->currentIndex(), Qt::ToolTipRole).toString() != "Subject item") {
+                emit removeItem(m_pUi->m_pTreeView->currentIndex());
+            }
             break;
 
         default:
