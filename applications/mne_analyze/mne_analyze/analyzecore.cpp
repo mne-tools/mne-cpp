@@ -184,7 +184,6 @@ void AnalyzeCore::registerMetaTypes()
 
 void AnalyzeCore::onMainWindowClosed()
 {
-    std::cout << "AnalyzeCore::onMainWindowClosed";
     EventManager::getEventManager().shutdown();
     // shutdown every plugin, empty analzye data etc.
     m_pPluginManager->shutdown();
