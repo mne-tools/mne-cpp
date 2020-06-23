@@ -92,8 +92,6 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager
     setMinimumSize(1280, 720);
     setWindowTitle(CInfo::AppNameShort());
 
-    this->setAttribute(Qt::WA_DeleteOnClose);
-
     if(!pPluginManager.isNull()) {
         // The order we call these functions is important!
         createActions();
@@ -133,20 +131,23 @@ void MainWindow::closeEvent(QCloseEvent *event)
     m_pMultiView->saveSettings();
     saveSettings();
 
+    this->setAttribute(Qt::WA_DeleteOnClose);
+
     for(QDockWidget* widget : this->findChildren<QDockWidget*>()){
         widget->setAttribute(Qt::WA_DeleteOnClose);
         for(QWidget* subwidget : widget->findChildren<QWidget*>()){
             subwidget->setAttribute(Qt::WA_DeleteOnClose);
+            //delete subwidget;
         }
     }
 
-    std::cout << "MainWindow::closeEvent 1" << std::endl;
     emit mainWindowClosed();
-    std::cout << "MainWindow::closeEvent 2" << std::endl;
 
     // default implementation does this, so its probably a good idea
     QMainWindow::closeEvent(event);
+    std::cout << "MainWindow::closeEvent 2" << std::endl;
     event->accept();
+    std::cout << "MainWindow::closeEvent 1" << std::endl;
 }
 
 //=============================================================================================================
