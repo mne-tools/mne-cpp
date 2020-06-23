@@ -168,7 +168,7 @@ bool AnalyzeData::removeModel(const QModelIndex& index)
         QFileInfo info (sModelPath);
 
         QMessageBox msgBox;
-        msgBox.setText("Are you sure you want to remove the model "+info.fileName()+"?");
+        msgBox.setText("Are you sure you want to remove "+info.fileName()+"?");
         msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
         msgBox.setDefaultButton(QMessageBox::No);
         int ret = msgBox.exec();
