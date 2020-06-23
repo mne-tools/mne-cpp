@@ -49,8 +49,6 @@
 #include <disp/viewers/multiviewwindow.h>
 #include <disp/viewers/abstractview.h>
 
-#include <iostream>
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -120,7 +118,6 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager
 
 MainWindow::~MainWindow()
 {
-    std::cout << "MainWindow::~MainWindow" << std::endl;
 }
 
 //=============================================================================================================
@@ -132,22 +129,18 @@ void MainWindow::closeEvent(QCloseEvent *event)
     saveSettings();
 
     this->setAttribute(Qt::WA_DeleteOnClose);
+    m_pMenuView->setAttribute(Qt::WA_DeleteOnClose);
 
     for(QDockWidget* widget : this->findChildren<QDockWidget*>()){
         widget->setAttribute(Qt::WA_DeleteOnClose);
-        for(QWidget* subwidget : widget->findChildren<QWidget*>()){
-            subwidget->setAttribute(Qt::WA_DeleteOnClose);
-            //delete subwidget;
-        }
+        widget->close();
     }
 
     emit mainWindowClosed();
+    QMainWindow::closeEvent(event);
 
     // default implementation does this, so its probably a good idea
-    QMainWindow::closeEvent(event);
-    std::cout << "MainWindow::closeEvent 2" << std::endl;
     event->accept();
-    std::cout << "MainWindow::closeEvent 1" << std::endl;
 }
 
 //=============================================================================================================
