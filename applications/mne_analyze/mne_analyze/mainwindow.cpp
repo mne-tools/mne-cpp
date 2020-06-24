@@ -85,8 +85,9 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager
 , m_sSettingsPath("MNEANALYZE/MainWindow")
 , m_sCurrentStyle("default")
 {
+    this->setObjectName("mainwindow");
     setWindowState(Qt::WindowMaximized);
-    setMinimumSize(400, 400);
+    setMinimumSize(800, 450);
     setWindowTitle(CInfo::AppNameShort());
 
     if(!pPluginManager.isNull()) {
@@ -95,7 +96,6 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager
         createPluginMenus(pPluginManager);
         createLogDockWindow();
         createPluginControls(pPluginManager);
-//        createAveragingWindows();
         createPluginViews(pPluginManager);
     } else {
         qWarning() << "[MainWindow::MainWindow] CRITICAL ! Plugin manager is nullptr";
@@ -118,7 +118,6 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager
 
 MainWindow::~MainWindow()
 {
-
 }
 
 //=============================================================================================================
@@ -129,10 +128,14 @@ void MainWindow::closeEvent(QCloseEvent *event)
     m_pMultiView->saveSettings();
     saveSettings();
 
-    emit mainWindowClosed();
+    this->setAttribute(Qt::WA_DeleteOnClose);
 
-    // default implementation does this, so its probably a good idea
-    event->accept();
+    for(QDockWidget* widget : this->findChildren<QDockWidget*>()){
+        widget->setAttribute(Qt::WA_DeleteOnClose);
+    }
+
+    emit mainWindowClosed();
+    QMainWindow::closeEvent(event);
 }
 
 //=============================================================================================================
@@ -419,9 +422,10 @@ void MainWindow::createPluginControls(QSharedPointer<ANSHAREDLIB::PluginManager>
 void MainWindow::createPluginViews(QSharedPointer<PluginManager> pPluginManager)
 {
     m_pGridLayout = new QGridLayout(this);
-    m_pMultiView = new MultiView();
+    m_pMultiView = new MultiView(m_sSettingsPath);
     m_pGridLayout->addWidget(m_pMultiView);
     m_pMultiView->show();
+    m_pMultiView->setObjectName("multiview");
     setCentralWidget(m_pMultiView);
 
     QString sCurPluginName;

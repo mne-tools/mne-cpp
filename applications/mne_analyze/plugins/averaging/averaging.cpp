@@ -95,6 +95,7 @@ Averaging::Averaging()
 , m_bUseAnn(1)
 , m_bBasline(0)
 , m_bRejection(0)
+, m_bLoaded(0)
 , m_pAnnCheck(Q_NULLPTR)
 , m_pStimCheck(Q_NULLPTR)
 {
@@ -148,24 +149,28 @@ QMenu *Averaging::getMenu()
 
 QWidget *Averaging::getView()
 {
-    m_pButterflyView = new DISPLIB::ButterflyView();
-    m_pAverageLayoutView = new DISPLIB::AverageLayoutView();
+    QWidget* pAveragingViewWidget = new QWidget();
+    QTabWidget* pTabView = new QTabWidget(pAveragingViewWidget);
+    QVBoxLayout* pAveragingViewLayout = new QVBoxLayout();
 
-    QTabWidget* pTabView = new QTabWidget();
-    QWidget* testWidget = new QWidget();
-    QVBoxLayout* testLayout = new QVBoxLayout();
+    m_pButterflyView = new DISPLIB::ButterflyView("", pTabView);
+    m_pAverageLayoutView = new DISPLIB::AverageLayoutView("", pTabView);
+
+    m_pButterflyView->setObjectName("butterflyview");
+    m_pAverageLayoutView->setObjectName("layoutview");
+    pAveragingViewWidget->setObjectName("AvgView");
 
     pTabView->addTab(m_pButterflyView, "Butterfly View");
     pTabView->addTab(m_pAverageLayoutView, "2D Layout View");
 
-    testLayout->addWidget(pTabView);
-    testWidget->setLayout(testLayout);
+    pAveragingViewLayout->addWidget(pTabView);
+    pAveragingViewWidget->setLayout(pAveragingViewLayout);
 
-    testWidget->setMinimumSize(256, 256);
-    testWidget->setFocusPolicy(Qt::TabFocus);
-    testWidget->setAttribute(Qt::WA_DeleteOnClose, false);
+    pAveragingViewWidget->setMinimumSize(256, 256);
+    pAveragingViewWidget->setFocusPolicy(Qt::TabFocus);
+    pAveragingViewWidget->setAttribute(Qt::WA_DeleteOnClose, false);
 
-    return testWidget;
+    return pAveragingViewWidget;
 }
 
 //=============================================================================================================
@@ -439,6 +444,10 @@ void Averaging::onCheckBoxStateChanged()
 
 void Averaging::loadFullGui()
 {
+    if(m_bLoaded) {
+        return;
+    }
+
     //This function needs to be called after we have the FiffRawModel, because we need FiffInfo to initialize objects herein
     m_pFiffInfo = m_pFiffRawModel->getFiffInfo();
 
@@ -566,6 +575,8 @@ void Averaging::loadFullGui()
 
     m_fPreStim = -(static_cast<float>(m_pAveragingSettingsView->getPreStimMSeconds())/1000.f);
     m_fPostStim = static_cast<float>(m_pAveragingSettingsView->getPostStimMSeconds())/1000.f;
+
+    m_bLoaded = true;
 }
 
 //=============================================================================================================

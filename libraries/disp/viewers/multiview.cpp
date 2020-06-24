@@ -116,6 +116,8 @@ MultiViewWindow* MultiView::addWidgetBottom(QWidget* pWidget,
     pDockWidget->setWindowTitle(sName);
     pDockWidget->setWidget(pWidget);
 
+    pWidget->setParent(pDockWidget);
+
     // Disable floating and editable dock widgets, since the wasm QDockWidget version is buggy
     #ifdef WASMBUILD
     pDockWidget->setFeatures(QDockWidget::DockWidgetClosable);
@@ -148,6 +150,7 @@ MultiViewWindow* MultiView::addWidgetBottom(QWidget* pWidget,
 void MultiView::saveSettings()
 {
     if(m_sSettingsPath.isEmpty()) {
+        qWarning() << "[MultiView::saveSettings] Settings path not set for main window. Cannot save central widget state.";
         return;
     }
 
@@ -164,6 +167,7 @@ void MultiView::saveSettings()
 void MultiView::loadSettings()
 {
     if(m_sSettingsPath.isEmpty()) {
+        qWarning() << "[MultiView::loadSettings] Settings path not set for main window. Cannot load central widget state.";
         return;
     }
 

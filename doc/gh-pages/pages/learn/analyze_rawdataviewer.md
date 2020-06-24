@@ -5,9 +5,9 @@ parent: MNE Analyze GUI
 grand_parent: Learn
 nav_order: 3
 ---
-# Raw Data Viewer
+# Signal Viewer
 
-The raw data viewer controls the plotting and displaying of the currently selected data file. It is separated into two components: the control widget and the viewer
+The signal viewer controls the plotting and displaying of the currently selected data file. It is separated into two components: the control widget and the viewer
 
 ![](../../images/analyze/mne_an_1.png)
 
