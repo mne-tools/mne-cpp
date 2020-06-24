@@ -87,7 +87,7 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager
 {
     this->setObjectName("mainwindow");
     setWindowState(Qt::WindowMaximized);
-    setMinimumSize(1280, 720);
+    setMinimumSize(800, 450);
     setWindowTitle(CInfo::AppNameShort());
 
     if(!pPluginManager.isNull()) {
@@ -129,18 +129,13 @@ void MainWindow::closeEvent(QCloseEvent *event)
     saveSettings();
 
     this->setAttribute(Qt::WA_DeleteOnClose);
-    m_pMenuView->setAttribute(Qt::WA_DeleteOnClose);
 
     for(QDockWidget* widget : this->findChildren<QDockWidget*>()){
         widget->setAttribute(Qt::WA_DeleteOnClose);
-        widget->close();
     }
 
     emit mainWindowClosed();
     QMainWindow::closeEvent(event);
-
-    // default implementation does this, so its probably a good idea
-    event->accept();
 }
 
 //=============================================================================================================
@@ -398,13 +393,10 @@ void MainWindow::createPluginControls(QSharedPointer<ANSHAREDLIB::PluginManager>
     setTabPosition(Qt::RightDockWidgetArea,QTabWidget::East);
     setDockOptions(QMainWindow::ForceTabbedDocks);
 
-    pPluginManager->setParent(this);
     //Add Plugin controls to the MainWindow
     for(IPlugin* pPlugin : pPluginManager->getPlugins()) {
         if(QDockWidget* pControl = pPlugin->getControl()) {
             addDockWidget(Qt::LeftDockWidgetArea, pControl);
-            pControl->setParent(this);
-            //pControl->setAttribute(Qt::WA_DeleteOnClose);
             qInfo() << "[MainWindow::createPluginControls] Found and added dock widget for " << pPlugin->getName();
             QAction* pAction = pControl->toggleViewAction();
             pAction->setText(pPlugin->getName()+" Controls");
