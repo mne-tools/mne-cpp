@@ -169,7 +169,7 @@ void AnalyzeCore::initMainWindow()
 {
     m_pMainWindow = new MainWindow(m_pPluginManager);
     QObject::connect(m_pMainWindow.data(), &MainWindow::mainWindowClosed,
-                     this, &AnalyzeCore::onMainWindowClosed, Qt::DirectConnection);
+                     this, &AnalyzeCore::onMainWindowClosed);
 }
 
 //=============================================================================================================
