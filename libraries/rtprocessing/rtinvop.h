@@ -154,7 +154,7 @@ public:
     /**
      * Slot to receive incoming forward solution.
      *
-     * @param[in] pFwd     Noise covariance estimation
+     * @param[in] pFwd     Forward solution
      */
     void setFwdSolution(QSharedPointer<MNELIB::MNEForwardSolution> pFwd);
 
