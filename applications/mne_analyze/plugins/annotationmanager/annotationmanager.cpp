@@ -98,7 +98,7 @@ void AnnotationManager::unload()
 
 QString AnnotationManager::getName() const
 {
-    return "Annotations";
+    return "Events";
 }
 
 //=============================================================================================================

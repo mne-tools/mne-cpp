@@ -44,7 +44,7 @@
       </sizepolicy>
      </property>
      <property name="title">
-      <string>Annotation types</string>
+      <string>Event Types</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
@@ -158,7 +158,7 @@
    <item row="9" column="0">
     <widget class="QPushButton" name="m_pushButtonSave">
      <property name="text">
-      <string>Save Annotations</string>
+      <string>Save Events</string>
      </property>
     </widget>
    </item>
@@ -198,7 +198,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>Activate annotations</string>
+           <string>Show Events</string>
           </property>
           <property name="checked">
            <bool>true</bool>
@@ -213,7 +213,7 @@
    <item row="8" column="0">
     <widget class="QPushButton" name="m_pushButtonDelete">
      <property name="text">
-      <string>Remove Annotation</string>
+      <string>Remove Event</string>
      </property>
     </widget>
    </item>

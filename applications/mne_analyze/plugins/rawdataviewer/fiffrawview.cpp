@@ -376,7 +376,7 @@ void FiffRawView::customContextMenuRequested(const QPoint &pos)
 
     QMenu* menu = new QMenu(this);
 
-    QAction* markTime = menu->addAction(tr("Mark time"));
+    QAction* markTime = menu->addAction(tr("Add Event"));
     connect(markTime, &QAction::triggered,
             this, &FiffRawView::addTimeMark, Qt::UniqueConnection);
 
