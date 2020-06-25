@@ -166,15 +166,13 @@ public:
                                bool bFilterEnd = true,
                                bool bUseThreads = true);
 
-private:
     //=========================================================================================================
     /**
-     * This static function is used to filter row-wise in parallel
-     *
-     * @param [in] channelDataTime  The channel data to perform the filtering on
+     * Reset the stored overlap and delay matrices
      */
-    static void filterChannel(Filter::FilterObject &channelDataTime);
+    void reset();
 
+private:
     //=========================================================================================================
     /**
      * Calculates the filtered version of the raw input data
@@ -192,6 +190,14 @@ private:
                                     const QList<RTPROCESSINGLIB::FilterKernel> &lFilterKernel,
                                     bool bFilterEnd = true,
                                     bool bUseThreads = true);
+
+    //=========================================================================================================
+    /**
+     * This static function is used to filter row-wise in parallel threads
+     *
+     * @param [in] channelDataTime  The channel data to perform the filtering on
+     */
+    static void filterChannel(Filter::FilterObject &channelDataTime);
 
     Eigen::MatrixXd                 m_matOverlapBack;                   /**< Overlap block for the end of the data block */
     Eigen::MatrixXd                 m_matDelayBack;                     /**< Delay block for the end of the data block */

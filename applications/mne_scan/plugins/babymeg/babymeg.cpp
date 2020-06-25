@@ -46,7 +46,7 @@
 #include "babymeginfo.h"
 
 #include <utils/ioutils.h>
-#include <utils/detecttrigger.h>
+#include <rtprocessing/detecttrigger.h>
 #include <fiff/fiff_types.h>
 #include <fiff/fiff_dig_point_set.h>
 #include <disp/viewers/projectsettingsview.h>
@@ -76,6 +76,7 @@ using namespace SCMEASLIB;
 using namespace DISPLIB;
 using namespace FIFFLIB;
 using namespace Eigen;
+using namespace RTPROCESSINGLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
