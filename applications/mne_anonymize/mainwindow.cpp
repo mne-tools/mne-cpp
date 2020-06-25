@@ -322,6 +322,7 @@ void MainWindow::setDefaultStateExtraInfo()
 void MainWindow::setupConnections()
 {
 
+    //from gui to mainwindow class
     QObject::connect(m_pUi->checkBoxShowOptions,&QCheckBox::stateChanged,
                      this,&MainWindow::checkBoxShowOptionsChanged);
 
