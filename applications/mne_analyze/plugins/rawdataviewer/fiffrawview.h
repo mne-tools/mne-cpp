@@ -308,6 +308,14 @@ private:
      */
     void disconnectModel();
 
+    //=========================================================================================================
+    /**
+     * This tells the model where the view currently is vertically.
+     *
+     * @param newScrollPosition Absolute sample number.
+     */
+    void updateVerticalScrollPosition(qint32 newScrollPosition);
+
     QPointer<QTableView>                                m_pTableView;                   /**< Pointer to table view ui element */
 
     QSharedPointer<ANSHAREDLIB::FiffRawViewModel>       m_pModel;                       /**< Pointer to associated Model */
@@ -315,8 +323,6 @@ private:
     QSharedPointer<FiffRawViewDelegate>                 m_pDelegate;                    /**< Pointer to associated Delegate */
 
     QMap<qint32,float>                                  m_qMapChScaling;                /**< Channel scaling values. */
-
-    QColor                                              m_backgroundColor;              /**< Current background color. */
 
     float                                               m_fDefaultSectionSize;          /**< Default row height */
     float                                               m_fZoomFactor;                  /**< Zoom factor */
