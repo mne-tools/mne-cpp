@@ -343,6 +343,13 @@ signals:
      */
     void readInputDataButtonClicked();
 
+    //=========================================================================================================
+    /**
+     * @brief Signal triggered when the save output file button has been pressed.
+     *
+     */
+    void saveOutputFileClicked();
+
 public slots:
     //=========================================================================================================
     /**
@@ -595,6 +602,11 @@ public slots:
     void setLineEditMNECommand(QString s);
 
     //=========================================================================================================
+    /**
+     * @brief Anonymized ouptut file is ready.
+     *
+     */
+    void outputFileReady();
 
 protected:
     //=========================================================================================================
@@ -765,9 +777,12 @@ private:
     bool m_bOptionsVisibility;                  /**< Options and input file info is shown.*/
     const int m_iDefaultWindowHeight;           /**< Default UI window height when the options are hidden.*/
     const int m_iDefaultWindowHeightLarge;      /**< Defailt UI window height when the options are shown.*/
+    bool m_bShowWraningMsgBoxInWasm;                  /**< Flag to show a warning box about the size of the files, only once.*/
 
     QFileInfo m_fiInFile;                       /**< Input file QFileInfo object.*/
     QFileInfo m_fiOutFile;                      /**< Output file QFileInfo object.*/
+    const QString m_sDefaultWasmInFile;     /**< In Web Assembly context, the file name of the input file.*/
+    const QString m_sDefaultWasmOutFile;    /**< In Web Assembly context, the file name of the output file.*/
 
     Ui::MainWindow* m_pUi;                      /**< Pointer to the user interface form.*/
     SettingsControllerGui* m_pController;       /**< Pointer to the controller object.*/

@@ -69,7 +69,9 @@ contains(MNECPP_CONFIG, wasm) {
     DEFINES += __EMSCRIPTEN__
     LIBS += -lidbfs.js
     INCLUDEPATH += /home/lorenz/Git/emsdk/usptream/emscripten/src
-
+#    QMAKE_CFLAGS += TOTAL_MEMORY=4GB
+#    QMAKE_LFLAGS += TOTAL_MEMORY=4GB
+#    QMAKE_CXXFLAGS += TOTAL_MEMORY=4GB
     DEFINES += WASMBUILD
 }
 
