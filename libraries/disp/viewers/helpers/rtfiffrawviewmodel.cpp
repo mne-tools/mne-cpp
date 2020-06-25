@@ -43,10 +43,11 @@
 #include <fiff/fiff_info.h>
 
 #include <utils/mnemath.h>
-#include <utils/detecttrigger.h>
 #include <utils/ioutils.h>
 
 #include <rtprocessing/sphara.h>
+#include <rtprocessing/detecttrigger.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================

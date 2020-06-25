@@ -78,7 +78,6 @@ Filter::~Filter()
 {
 }
 
-
 //=============================================================================================================
 
 bool Filter::filterData(QIODevice &pIODevice,
@@ -283,13 +282,13 @@ MatrixXd Filter::filterData(const MatrixXd& mataData,
 
 //=============================================================================================================
 
-void Filter::filterChannel(Filter::FilterObject& channelDataTime)
+void Filter::reset()
 {
-    for(int i = 0; i < channelDataTime.lFilterKernel.size(); ++i) {
-        //channelDataTime.vecData = channelDataTime.first.at(i).applyConvFilter(channelDataTime.vecData, true, FilterKernel::ZeroPad);
-        channelDataTime.vecData = channelDataTime.lFilterKernel[i].applyFftFilter(channelDataTime.vecData,
-                                                                                  true); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
-    }
+    m_matOverlapBack.resize(0,0);
+    m_matDelayBack.resize(0,0);
+    m_matOverlapFront.resize(0,0);
+    m_matDelayFront.resize(0,0);
+
 }
 
 //=============================================================================================================
@@ -413,4 +412,15 @@ MatrixXd Filter::filterDataBlock(const MatrixXd& mataData,
     }
 
     return matDataOut;
+}
+
+//=============================================================================================================
+
+void Filter::filterChannel(Filter::FilterObject& channelDataTime)
+{
+    for(int i = 0; i < channelDataTime.lFilterKernel.size(); ++i) {
+        //channelDataTime.vecData = channelDataTime.first.at(i).applyConvFilter(channelDataTime.vecData, true, FilterKernel::ZeroPad);
+        channelDataTime.vecData = channelDataTime.lFilterKernel[i].applyFftFilter(channelDataTime.vecData,
+                                                                                  true); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
+    }
 }

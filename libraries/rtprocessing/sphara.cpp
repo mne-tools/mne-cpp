@@ -62,7 +62,11 @@ Sphara::Sphara()
 
 //=============================================================================================================
 
-MatrixXd Sphara::makeSpharaProjector(const MatrixXd& matBaseFct, const VectorXi& vecIndices, int iOperatorDim, int iNBaseFct, int skip)
+MatrixXd Sphara::makeSpharaProjector(const MatrixXd& matBaseFct,
+                                     const VectorXi& vecIndices,
+                                     int iOperatorDim,
+                                     int iNBaseFct,
+                                     int iSkip)
 {
     MatrixXd matSpharaOperator = MatrixXd::Identity(iOperatorDim, iOperatorDim);
 
@@ -79,9 +83,9 @@ MatrixXd Sphara::makeSpharaProjector(const MatrixXd& matBaseFct, const VectorXi&
     int rowIndex = 0;
     int colIndex = 0;
 
-    for(int i = 0; i<=skip; i++) {
-        for(int r = i; r<vecIndices.rows(); r+=1+skip) {
-            for(int c = i; c<vecIndices.rows(); c+=1+skip) {
+    for(int i = 0; i<=iSkip; i++) {
+        for(int r = i; r<vecIndices.rows(); r+=1+iSkip) {
+            for(int c = i; c<vecIndices.rows(); c+=1+iSkip) {
                 if((r < vecIndices.rows() || c < vecIndices.rows()) && (rowIndex < matSpharaMultGrad.rows() || colIndex < matSpharaMultGrad.cols())) {
                     matSpharaOperator(vecIndices(r),vecIndices(c)) = matSpharaMultGrad(rowIndex,colIndex);
                 } else {

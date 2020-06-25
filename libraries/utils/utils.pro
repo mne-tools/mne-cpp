@@ -68,7 +68,6 @@ SOURCES += \
     layoutloader.cpp \
     layoutmaker.cpp \
     selectionio.cpp \
-    detecttrigger.cpp \
     spectrogram.cpp \
     warp.cpp \
     sphere.cpp \
@@ -86,7 +85,6 @@ HEADERS += \
     layoutmaker.h \
     selectionio.h \
     layoutmaker.h \
-    detecttrigger.h \
     spectrogram.h \
     warp.h \
     sphere.h \

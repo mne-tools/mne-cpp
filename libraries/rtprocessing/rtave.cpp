@@ -42,7 +42,7 @@
 #include <mne/mne_epoch_data_list.h>
 
 #include <utils/ioutils.h>
-#include <utils/detecttrigger.h>
+#include <rtprocessing/detecttrigger.h>
 #include <utils/mnemath.h>
 
 //=============================================================================================================
@@ -70,12 +70,12 @@ using namespace MNELIB;
 //=============================================================================================================
 
 RtAveWorker::RtAveWorker(quint32 numAverages,
-             quint32 iPreStimSamples,
-             quint32 iPostStimSamples,
-             quint32 iBaselineFromSecs,
-             quint32 iBaselineToSecs,
-             quint32 iTriggerIndex,
-             FiffInfo::SPtr pFiffInfo)
+                         quint32 iPreStimSamples,
+                         quint32 iPostStimSamples,
+                         quint32 iBaselineFromSecs,
+                         quint32 iBaselineToSecs,
+                         quint32 iTriggerIndex,
+                         FiffInfo::SPtr pFiffInfo)
 : QObject()
 , m_iNumAverages(numAverages)
 , m_iPreStimSamples(iPreStimSamples)

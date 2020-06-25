@@ -87,6 +87,7 @@ SOURCES += \
     filter.cpp \
     rtconnectivity.cpp \
     sphara.cpp \
+    detecttrigger.cpp \
     helpers/cosinefilter.cpp \
     helpers/parksmcclellan.cpp \
     helpers/filterkernel.cpp \
@@ -100,6 +101,7 @@ HEADERS +=  \
     rtnoise.h \
     rthpis.h \
     filter.h \
+    detecttrigger.h \
     sphara.h \
     rtconnectivity.h \
     helpers/cosinefilter.h \
