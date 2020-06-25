@@ -70,6 +70,7 @@ LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lscSharedd \
             -lscDispd \
+            -lmnecppRtProcessingd \
             -lscMeasd \
             -lmnecppCommunicationd \
             -lmnecppFiffd \
@@ -78,6 +79,7 @@ CONFIG(debug, debug|release) {
 } else {
     LIBS += -lscShared \
             -lscDisp \
+            -lmnecppRtProcessing \
             -lscMeas \
             -lmnecppCommunication \
             -lmnecppFiff \
