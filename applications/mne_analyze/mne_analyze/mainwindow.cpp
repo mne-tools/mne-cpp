@@ -87,7 +87,7 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager
 {
     this->setObjectName("mainwindow");
     setWindowState(Qt::WindowMaximized);
-    setMinimumSize(800, 450);
+    setMinimumSize(1280, 720);
     setWindowTitle(CInfo::AppNameShort());
 
     if(!pPluginManager.isNull()) {
