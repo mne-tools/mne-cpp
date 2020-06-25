@@ -99,6 +99,15 @@ public:
 
     //=========================================================================================================
     /**
+     * Set the new upper item index color. This is used to only plot the background for the upper, visible item in the QTableView.
+     * This is a rather ugly hack in order to cope with QOpenGLWidget's/QtableView's problem when setting a background color.
+     *
+     * @param [in] iUpperItem  The new upper item index color.
+     */
+    void setUpperItemIndex(int iUpperItemIndex);
+
+       //=========================================================================================================
+    /**
      * Use the painter and style option to render the item specified by the item index.
      *
      * (sizeHint() must be implemented also)
@@ -175,6 +184,7 @@ private:
                                ANSHAREDLIB::ChannelData &data,
                                QPainter* painter) const;
 
+    int         m_iUpperItemIndex;          /**< The current upper item index visible in the QTableView. */
 
     QPen        m_penGrid;                  /**< Pen for drawing the data grid. */
     QPen        m_penNormal;                /**< Pen for drawing the data when data is plotted normally without freeze on.  */

@@ -161,9 +161,9 @@ void FiffRawView::setModel(const QSharedPointer<FiffRawViewModel>& pModel)
 
     m_pTableView->setModel(m_pModel.data());
 
-#if !defined(NO_OPENGL)
+    #if !defined(NO_OPENGL)
     m_pTableView->setViewport(new QOpenGLWidget);
-#endif
+    #endif
 
     m_pTableView->setObjectName(QString::fromUtf8("m_pTableView"));
     QSizePolicy sizePolicy3(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -203,7 +203,10 @@ void FiffRawView::setModel(const QSharedPointer<FiffRawViewModel>& pModel)
 
     // Connect QScrollBar with model in order to reload data samples
     connect(m_pTableView->horizontalScrollBar(), &QScrollBar::valueChanged,
-            m_pModel.data(), &FiffRawViewModel::updateScrollPosition, Qt::UniqueConnection);
+            m_pModel.data(), &FiffRawViewModel::updateHorizontalScrollPosition, Qt::UniqueConnection);
+
+    connect(m_pTableView->verticalScrollBar(), &QScrollBar::valueChanged,
+            this, &FiffRawView::updateVerticalScrollPosition, Qt::UniqueConnection);
 
     // Connect and init resizing of the table view to the MVC
     connect(this, &FiffRawView::tableViewDataWidthChanged,
@@ -271,8 +274,7 @@ void FiffRawView::setBackgroundColor(const QColor& backgroundColor)
         return;
     }
 
-    m_backgroundColor = backgroundColor;
-    m_pModel->setBackgroundColor(m_backgroundColor);
+    m_pModel->setBackgroundColor(backgroundColor);
 }
 
 //=============================================================================================================
@@ -374,8 +376,6 @@ void FiffRawView::customContextMenuRequested(const QPoint &pos)
 
     QMenu* menu = new QMenu(this);
 
-    //qDebug() << "MAX:" << m_pTableView->horizontalScrollBar()->maximum();
-
     QAction* markTime = menu->addAction(tr("Mark time"));
     connect(markTime, &QAction::triggered,
             this, &FiffRawView::addTimeMark, Qt::UniqueConnection);
@@ -406,7 +406,7 @@ void FiffRawView::toggleDisplayEvent(const int& iToggle)
     }
 
     int m_iToggle = iToggle;
-    //qDebug() << "toggleDisplayEvent" << iToggle;
+
     m_pModel->toggleDispAnnotation(m_iToggle);
     m_pTableView->viewport()->repaint();
 }
@@ -558,9 +558,22 @@ void FiffRawView::disconnectModel()
 {
     // Disconnect QScrollBar with model
     disconnect(m_pTableView->horizontalScrollBar(), &QScrollBar::valueChanged,
-            m_pModel.data(), &FiffRawViewModel::updateScrollPosition);
+               m_pModel.data(), &FiffRawViewModel::updateHorizontalScrollPosition);
+
+    disconnect(m_pTableView->verticalScrollBar(), &QScrollBar::valueChanged,
+               this, &FiffRawView::updateVerticalScrollPosition);
 
     // Disconnect resizing of the table view to the MVC
     disconnect(this, &FiffRawView::tableViewDataWidthChanged,
             m_pModel.data(), &FiffRawViewModel::setDataColumnWidth);
+}
+
+//=============================================================================================================
+
+void FiffRawView::updateVerticalScrollPosition(qint32 newScrollPosition)
+{
+    Q_UNUSED(newScrollPosition);
+    if(FiffRawViewDelegate *pDelegate = qobject_cast<FiffRawViewDelegate *>(m_pTableView->itemDelegate())) {
+        pDelegate->setUpperItemIndex(m_pTableView->rowAt(0));
+    }
 }

@@ -252,7 +252,9 @@ void createPaths(const QModelIndex &index,
 
 //=============================================================================================================
 
-void RtFiffRawViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+void RtFiffRawViewDelegate::paint(QPainter *painter,
+                                  const QStyleOptionViewItem &option,
+                                  const QModelIndex &index) const
 {
     float t_fPlotHeight = option.rect.height();
     painter->setRenderHint(QPainter::Antialiasing, true);
@@ -422,7 +424,8 @@ void RtFiffRawViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
 
 //=============================================================================================================
 
-QSize RtFiffRawViewDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
+QSize RtFiffRawViewDelegate::sizeHint(const QStyleOptionViewItem &option,
+                                      const QModelIndex &index) const
 {
     QSize size = option.rect.size();
 

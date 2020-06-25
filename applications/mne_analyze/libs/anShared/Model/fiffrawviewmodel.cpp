@@ -209,14 +209,13 @@ void FiffRawViewModel::initFiffData(QIODevice& p_IODevice)
 QVariant FiffRawViewModel::data(const QModelIndex &index,
                                 int role) const
 {
-    // early filtering of unimplemented display roles
-    if (role == Qt::BackgroundRole) {
-        return QVariant(QBrush(m_colBackground));
-    }
-
-    if (role != Qt::DisplayRole) {
+    if(role != Qt::DisplayRole && role != Qt::BackgroundRole) {
         qInfo() << "[FiffRawViewModel::data] Role " << role << " not implemented yet.";
         return QVariant();
+    }
+
+    if (role == Qt::BackgroundRole) {
+        return QVariant(QBrush(m_colBackground));
     }
 
     if (index.isValid()) {
@@ -380,7 +379,7 @@ bool FiffRawViewModel::hasChildren(const QModelIndex &parent) const
 
 //=============================================================================================================
 
-void FiffRawViewModel::updateScrollPosition(qint32 newScrollPosition)
+void FiffRawViewModel::updateHorizontalScrollPosition(qint32 newScrollPosition)
 {
 //    QElapsedTimer timer;
 //    timer.start();
@@ -405,7 +404,7 @@ void FiffRawViewModel::updateScrollPosition(qint32 newScrollPosition)
             // ... and load the whole model anew
             //startBackgroundOperation(&FiffRawViewModel::loadLaterBlocks, m_iTotalBlockCount);
             postBlockLoad(loadEarlierBlocks(m_iTotalBlockCount));
-            updateScrollPosition(newScrollPosition);
+            updateHorizontalScrollPosition(newScrollPosition);
         } else {
             // there are some blocks in the intersection of the old and the new window that can stay in the buffer:
             // simply load earlier blocks
@@ -425,7 +424,7 @@ void FiffRawViewModel::updateScrollPosition(qint32 newScrollPosition)
             // ... and load the whole model anew
             //startBackgroundOperation(&FiffRawViewModel::loadLaterBlocks, m_iTotalBlockCount);
             postBlockLoad(loadLaterBlocks(m_iTotalBlockCount));
-            updateScrollPosition(newScrollPosition);
+            updateHorizontalScrollPosition(newScrollPosition);
         } else {
             // there are some blocks in the intersection of the old and the new window that can stay in the buffer:
             // simply load later blocks
@@ -435,7 +434,6 @@ void FiffRawViewModel::updateScrollPosition(qint32 newScrollPosition)
     }
     //qDebug() << "[FiffRawViewModel::updateScrollPosition] timer.elapsed()" << timer.elapsed();
 }
-
 
 //=============================================================================================================
 

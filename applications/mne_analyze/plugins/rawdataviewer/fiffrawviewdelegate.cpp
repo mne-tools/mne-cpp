@@ -72,8 +72,16 @@ using namespace ANSHAREDLIB;
 
 FiffRawViewDelegate::FiffRawViewDelegate(QObject *parent)
 : QAbstractItemDelegate(parent)
+, m_iUpperItemIndex(0)
 {
 
+}
+
+//=============================================================================================================
+
+void FiffRawViewDelegate::setUpperItemIndex(int iUpperItemIndex)
+{
+    m_iUpperItemIndex = iUpperItemIndex;
 }
 
 //=============================================================================================================
@@ -88,19 +96,28 @@ void FiffRawViewDelegate::paint(QPainter *painter,
     switch(index.column()) {
         case 1: { //data plot
             QBrush backgroundBrush = index.model()->data(index, Qt::BackgroundRole).value<QBrush>();
-            bool bIsBadChannel = index.model()->data(index.model()->index(index.row(), 2), Qt::DisplayRole).toBool();
+
+            // Plot background based on user chosen color
+            // This is a rather ugly hack in order to cope with QOpenGLWidget's/QtableView's problem when setting a background color
+            if(index.row() == m_iUpperItemIndex) {
+                // Plot background based on user chosen color
+                // This is a rather ugly hack in order to cope with QOpenGLWidget's/QtableView's problem when setting a background color
+                painter->save();
+                painter->setBrushOrigin(option.rect.topLeft());
+                QRect rect = option.rect;
+                rect.setHeight(2000);
+                painter->fillRect(rect, backgroundBrush);
+                painter->restore();
+            }
 
             // Draw special background when channel is marked as bad
+            bool bIsBadChannel = index.model()->data(index.model()->index(index.row(), 2), Qt::DisplayRole).toBool();
+
             if(bIsBadChannel) {
                 painter->save();
                 QBrush brush(QColor(254,74,93,40));
                 painter->setBrushOrigin(option.rect.topLeft());
                 painter->fillRect(option.rect, brush);
-                painter->restore();
-            } else {
-                painter->save();
-                painter->setBrushOrigin(option.rect.topLeft());
-                painter->fillRect(option.rect, backgroundBrush);
                 painter->restore();
             }
 
@@ -197,8 +214,6 @@ QSize FiffRawViewDelegate::sizeHint(const QStyleOptionViewItem &option,
 
             break;
     }
-
-    Q_UNUSED(option);
 
     return size;
 }

@@ -129,8 +129,13 @@ int RtFiffRawViewModel::columnCount(const QModelIndex & /*parent*/) const
 
 QVariant RtFiffRawViewModel::data(const QModelIndex &index, int role) const
 {
-    if(role != Qt::DisplayRole && role != Qt::BackgroundRole)
+    if(role != Qt::DisplayRole && role != Qt::BackgroundRole) {
         return QVariant();
+    }
+
+    if (role == Qt::BackgroundRole) {
+        return QVariant(QBrush(m_colBackground));
+    }
 
     if (index.isValid()) {
         qint32 row = m_qMapIdxRowSelection.value(index.row(),0);
@@ -172,10 +177,6 @@ QVariant RtFiffRawViewModel::data(const QModelIndex &index, int role) const
                     }
 
                     return v;
-                }
-
-                case Qt::BackgroundRole: {
-                    return QVariant(QBrush(m_colBackground));
                 }
             } // end role switch
         } // end column check
