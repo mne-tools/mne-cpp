@@ -579,6 +579,7 @@ QString SettingsControllerCl::generateRandomFileName()
     return randomFileName.append(".fif");
 }
 
+//=============================================================================================================
 
 QString SettingsControllerCl::generateDefaultOutputFileName()
 {
@@ -588,10 +589,14 @@ QString SettingsControllerCl::generateDefaultOutputFileName()
     return m_fiOutFileInfo.absoluteFilePath();
 }
 
+//=============================================================================================================
+
 QFileInfo SettingsControllerCl::getQFiInFile()
 {
     return m_fiInFileInfo;
 }
+
+//=============================================================================================================
 
 QFileInfo SettingsControllerCl::getQFiOutFile()
 {

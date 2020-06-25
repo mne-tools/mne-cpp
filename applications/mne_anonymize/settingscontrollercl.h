@@ -104,8 +104,18 @@ public:
      */
     SettingsControllerCl(const QStringList& arguments);
 
+    //=========================================================================================================
+    /**
+     * Return a the input file QFileInfo.
+     *
+     */
     QFileInfo getQFiInFile();
 
+    //=========================================================================================================
+    /**
+     * Return a the output file QFileInfo.
+     *
+     */
     QFileInfo getQFiOutFile();
 
 protected:
@@ -142,7 +152,6 @@ protected:
     int execute();
 
     QString generateDefaultOutputFileName();
-
 
 private:
 

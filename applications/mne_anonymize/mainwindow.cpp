@@ -703,18 +703,43 @@ void MainWindow::openOutFileDialog()
     if (dialog.exec())
     {
         fileNames = dialog.selectedFiles();
-        setLineEditOutFile(fileNames.at(0));
-        outFileEditingFinished();
+        m_fiOutFile.setFile(fileNames.at(0));
+        m_pUi->lineEditOutFile->setText(m_fiOutFile.absoluteFilePath());
+        emit fileOutChanged(m_fiOutFile.absoluteFilePath());
     }
+}
+
+//=============================================================================================================
+
+void MainWindow::outputFileReady()
+{
+#ifdef WASMBUILD
+    QFile file(m_sDefaultWasmOutFile);
+    if (!file.open(QIODevice::ReadOnly)) return;
+    QByteArray  oufFileContent;
+    oufFileContent = file.readAll();
+
+    QFileDialog::saveFileContent(oufFileContent, m_fiOutFile.absolutePath());
+#else
+    statusMsg("Your file is ready!");
+#endif
 }
 
 //=============================================================================================================
 
 void MainWindow::helpButtonClicked()
 {
-    QDesktopServices::openUrl( QUrl("https://mne-cpp.github.io/pages/learn/mneanonymize.html",
-                               QUrl::TolerantMode) );
+    QMessageBox msgBox(this);
+    msgBox.setWindowTitle(qApp->organizationName() + " ~ " + qApp->applicationName() + " ~ " + qApp->applicationVersion());
+    msgBox.setTextFormat(Qt::RichText);   //this is what makes the links clickable
+    msgBox.setText("<p>June 2020<br>mne_anonymize <br>version: " + qApp->applicationVersion() + "</p>"
+                   "<p>This applcation allows to anonymize and deidentify FIFF files.</p>"
+                   "<p>For more information please visit "
+                   "<a href='https://mne-cpp.github.io/pages/learn/mneanonymize.html'>mne_anonymize's documentation web</a>.</p>"
+                   "<p style=""text-align:right"">Sincerely, the development team @ MNE-CPP.</p>");
+    msgBox.exec();
 }
+
 
 //=============================================================================================================
 
@@ -838,7 +863,9 @@ void MainWindow::statusMsg(const QString s,int to)
 void MainWindow::resizeEvent(QResizeEvent* event)
 {
     Q_UNUSED(event)
+#ifndef WASMBUILD
     checkSmallGui();
+#endif
 //    statusMsg("width: " + QString::number(m_pUi->centralwidget->width()));
 }
 
