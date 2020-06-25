@@ -103,7 +103,6 @@ public:
                  QStandardItem *pNewItem);
 
 signals:
-
     //=========================================================================================================
     /**
      * Send index of newly added file model and index of subject it was added to

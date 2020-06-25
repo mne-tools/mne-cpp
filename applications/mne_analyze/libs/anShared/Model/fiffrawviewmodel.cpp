@@ -485,7 +485,6 @@ void FiffRawViewModel::setWindowSize(int iNumSeconds,
     beginResetModel();
 
     m_iVisibleWindowSize = iNumSeconds;
-    m_iPreloadBufferSize = m_iVisibleWindowSize;
     m_iTotalBlockCount = m_iVisibleWindowSize + 2 * m_iPreloadBufferSize;
 
     //reload data to accomodate new size
