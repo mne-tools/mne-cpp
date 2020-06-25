@@ -49,7 +49,7 @@
 #include <QMap>
 #include <QWidget>
 #if !defined(NO_OPENGL)
-    #include <QOpenGLWidget>
+#include <QOpenGLWidget>
 #endif
 
 //=============================================================================================================
@@ -80,9 +80,9 @@ class ChannelInfoModel;
  * @brief The ButterflyView class provides a butterfly view.
  */
 #if !defined(NO_OPENGL)
-    class DISPSHARED_EXPORT ButterflyView : public QOpenGLWidget
+class DISPSHARED_EXPORT ButterflyView : public QOpenGLWidget
 #else
-    class DISPSHARED_EXPORT ButterflyView : public QWidget
+class DISPSHARED_EXPORT ButterflyView : public QWidget
 #endif
 {
     Q_OBJECT
@@ -256,11 +256,11 @@ protected:
      *
      * @param [in] event pointer to PaintEvent -> not used.
      */
-#if !defined(NO_OPENGL)
+    #if !defined(NO_OPENGL)
     virtual void paintGL();
-#else
+    #else
     virtual void paintEvent(QPaintEvent *event);
-#endif
+    #endif
 
     //=========================================================================================================
     /**

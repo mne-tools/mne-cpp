@@ -417,11 +417,11 @@ public:
 
     //=========================================================================================================
     /**
-     * This tells the model where the view currently is.
+     * This tells the model where the view currently is horizontally.
      *
      * @param newScrollPosition Absolute sample number.
      */
-    void updateScrollPosition(qint32 newScrollPosition);
+    void updateHorizontalScrollPosition(qint32 newScrollPosition);
 
     //=========================================================================================================
     /**
