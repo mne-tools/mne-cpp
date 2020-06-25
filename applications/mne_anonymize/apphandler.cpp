@@ -71,8 +71,14 @@ AppHandler::AppHandler()
 
 //=============================================================================================================
 
-QCoreApplication* AppHandler::createApplication(int& argc, char* argv[])
+QCoreApplication* AppHandler::createApplication(int& argc, char* argv[], bool forceGUI)
 {
+    if(forceGUI)
+    {
+        m_bGuiMode = true;
+        return new QApplication(argc, argv);
+    }
+
     for (int i = 1; i < argc; ++i)
     {
         if (!qstrcmp(argv[i], "--gui"))
