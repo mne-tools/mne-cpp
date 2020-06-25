@@ -244,6 +244,8 @@ int FiffAnonymizer::anonymizeFile()
 
     closeInOutStreams();
 
+    emit outFileReady();
+
     return 0;
 }
 
