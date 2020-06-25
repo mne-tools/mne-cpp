@@ -68,7 +68,7 @@ using namespace MNEANONYMIZE;
 //=============================================================================================================
 
 SettingsControllerGui::SettingsControllerGui(const QStringList& arguments)
-: m_pWin(QSharedPointer<MainWindow> (new MainWindow(this)))
+: m_pWin(QSharedPointer<MainWindow> (new MainWindow))
 {
     initParser();
     m_bGuiMode = true;
