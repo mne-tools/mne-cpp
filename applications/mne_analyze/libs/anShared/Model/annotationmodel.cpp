@@ -110,7 +110,7 @@ bool AnnotationModel::insertRows(int position, int span, const QModelIndex & par
 {
     Q_UNUSED(parent);
 
-    //qDebug() << "AnnotationModel::insertRows here";
+    qDebug() << "AnnotationModel::insertRows here";
     //qDebug() << "iSamplePos:" << m_iSamplePos;
 
     if(m_dataSamples.isEmpty()) {
@@ -593,4 +593,42 @@ MatrixXi AnnotationModel::getAnnotationMatrix()
     }
 
     return matEventDataMatrix;
+}
+
+//=============================================================================================================
+
+int AnnotationModel::createCategory(QString sCategoryName, bool bIsUserMade)
+{
+    EventCategory* newEvent = new EventCategory();
+    int iSize = m_mAnnotationHub.size();
+
+    *newEvent = {iSize,                         //categoryNumber
+                 sCategoryName,                 //categoryName
+                 bIsUserMade,                   //isUserMade
+                 QVector<int>(),                //dataSamples
+                 QVector<int>(),                //dataTypes
+                 QVector<int>(),                //dataIsUserEvent
+                 QVector<int>(),                //dataSamples_Filtered
+                 QVector<int>(),                //dataTypes_Filtered
+                 QVector<int>()};               //dataIsUserEvent_Filtered
+
+    m_mAnnotationHub.insert(iSize, newEvent);
+
+    return iSize;
+}
+
+//=============================================================================================================
+
+void AnnotationModel::swithCategories(int iCategoryIndex)
+{
+    m_dataSamples = m_mAnnotationHub[iCategoryIndex]->dataSamples;
+    m_dataTypes = m_mAnnotationHub[iCategoryIndex]->dataTypes;
+    m_dataIsUserEvent = m_mAnnotationHub[iCategoryIndex]->dataIsUserEvent;
+
+    m_dataSamples_Filtered = m_mAnnotationHub[iCategoryIndex]->dataSamples_Filtered;
+    m_dataTypes_Filtered = m_mAnnotationHub[iCategoryIndex]->dataTypes_Filtered;
+    m_dataIsUserEvent_Filtered = m_mAnnotationHub[iCategoryIndex]->dataIsUserEvent_Filtered;
+
+    m_iSelectedCategory = m_mAnnotationHub[iCategoryIndex]->categoryNumber;
+    m_bIsUserMade = m_mAnnotationHub[iCategoryIndex]->isUserMade;
 }

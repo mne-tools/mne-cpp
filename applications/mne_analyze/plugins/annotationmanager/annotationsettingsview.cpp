@@ -65,6 +65,7 @@ AnnotationSettingsView::AnnotationSettingsView()
 , m_iCheckState(0)
 , m_iLastSampClicked(0)
 , m_pAnnModel(Q_NULLPTR)
+, m_pStrListModel(QSharedPointer<QStringListModel>::create())
 , m_pColordialog(new QColorDialog(this))
 {
     m_pUi->setupUi(this);
@@ -94,6 +95,10 @@ void AnnotationSettingsView::initMSVCSettings()
     m_pUi->m_tableView_eventTableView->setModel(m_pAnnModel.data());
     connect(m_pAnnModel.data(),&ANSHAREDLIB::AnnotationModel::dataChanged,
             this, &AnnotationSettingsView::onDataChanged, Qt::UniqueConnection);
+
+    m_pUi->listView->setModel(m_pStrListModel.data());
+
+    m_pUi->columnView->setModel(m_pStrListModel.data());
 
     //Delegate
     m_pAnnDelegate = QSharedPointer<AnnotationDelegate>(new AnnotationDelegate(this));
@@ -141,6 +146,9 @@ void AnnotationSettingsView::initGUIFunctionality()
     //Delete button
     connect(m_pUi->m_pushButtonDelete, &QPushButton::clicked,
             this, &AnnotationSettingsView::removeAnnotationfromModel, Qt::UniqueConnection);
+
+    connect(m_pAnnModel.data(), &ANSHAREDLIB::AnnotationModel::addNewAnnotation,
+            this, &AnnotationSettingsView::addAnnotationToModel);
 }
 
 //=============================================================================================================
@@ -168,11 +176,13 @@ void AnnotationSettingsView::updateComboBox(const QString &currentAnnotationType
 
 //=============================================================================================================
 
-void AnnotationSettingsView::addAnnotationToModel(const int iSample)
+void AnnotationSettingsView::addAnnotationToModel()
 {
-    //qDebug() << "AnnotationSettingsView::addAnnotationToModel -- Here";
-    m_iLastSampClicked = iSample;
-    m_pAnnModel->setSamplePos(m_iLastSampClicked);
+    qDebug() << "AnnotationSettingsView::addAnnotationToModel -- Here";
+    if (m_pStrListModel->stringList().isEmpty()) {
+        newUserCateogry("User Made");
+    }
+
     m_pAnnModel->insertRow(0, QModelIndex());
     emit triggerRedraw();
 }
@@ -257,6 +267,8 @@ void AnnotationSettingsView::disconnectFromModel()
             this, &AnnotationSettingsView::updateComboBox);
     disconnect(m_pUi->m_pushButton_addEventType, &QPushButton::clicked,
             this, &AnnotationSettingsView::addNewAnnotationType);
+    disconnect(m_pAnnModel.data(), &ANSHAREDLIB::AnnotationModel::addNewAnnotation,
+            this, &AnnotationSettingsView::addAnnotationToModel);
 
 }
 
@@ -328,4 +340,18 @@ void AnnotationSettingsView::realTimeDataTime(double dValue)
     int t_iSample = static_cast<int>(dValue);
     m_pAnnModel->updateFilteredSample(t_iSample);
     this->onDataChanged();
+}
+
+//=============================================================================================================
+
+void AnnotationSettingsView::newUserCateogry(QString sName)
+{
+    qDebug() << "AnnotationSettingsView::newUserCateogry";
+
+    QStringList* list = new QStringList(m_pStrListModel->stringList());
+    list->append(sName);
+    m_pStrListModel->setStringList(*list);
+
+    int iCat = m_pAnnModel->createCategory(sName, true);
+    m_pAnnModel->swithCategories(iCat);
 }
