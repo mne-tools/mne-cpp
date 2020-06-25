@@ -71,6 +71,7 @@ SettingsControllerGui::SettingsControllerGui(const QStringList& arguments)
 : m_pWin(QSharedPointer<MainWindow> (new MainWindow(this)))
 {
     initParser();
+    m_bGuiMode = true;
     parseInputs(arguments);
     setupCommunication();
 
@@ -98,7 +99,7 @@ void SettingsControllerGui::executeAnonymizer()
     }
     m_pWin->statusMsg("Anonymizing the input file into the output file.",2000);
     m_pAnonymizer->anonymizeFile();
-    m_pWin->statusMsg("Your file is ready!");
+    m_pWin->outputFileReady();
 }
 
 //=============================================================================================================
@@ -206,10 +207,13 @@ void SettingsControllerGui::setupCommunication()
     //view to controller
     QObject::connect(m_pWin.data(),&MainWindow::fileInChanged,
                      this,&SettingsControllerGui::fileInChanged);
+
     QObject::connect(m_pWin.data(),&MainWindow::fileOutChanged,
                      this,&SettingsControllerGui::fileOutChanged);
     QObject::connect(m_pWin.data(),&MainWindow::readInputDataButtonClicked,
                      this,&SettingsControllerGui::readData);
+    QObject::connect(m_pWin.data(),&MainWindow::saveOutputFileClicked,
+                     this,&SettingsControllerGui::executeAnonymizer);
 
     //from view to model
     QObject::connect(m_pWin.data(),&MainWindow::bruteModeChanged,
@@ -228,7 +232,6 @@ void SettingsControllerGui::setupCommunication()
                      m_pAnonymizer.data(),&FiffAnonymizer::setSubjectBirthdayOffset);
     QObject::connect(m_pWin.data(),&MainWindow::subjectHisIdChanged,
                      m_pAnonymizer.data(),&FiffAnonymizer::setSubjectHisId);
-
 
     //from model to view
     QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingIdFileVersion,
@@ -286,6 +289,7 @@ void SettingsControllerGui::setupCommunication()
                      m_pWin.data(),&MainWindow::setLineEditMNEWorkingDir);
     QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingMNECommandLine,
                      m_pWin.data(),&MainWindow::setLineEditMNECommand);
+
 }
 
 //=============================================================================================================
