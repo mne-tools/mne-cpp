@@ -74,7 +74,7 @@ using namespace MNEANONYMIZE;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MainWindow::MainWindow(MNEANONYMIZE::SettingsControllerGui *c)
+MainWindow::MainWindow()
 : m_bOptionsVisibility(false)
 , m_iDefaultWindowHeight(222)
 , m_iDefaultWindowHeightLarge(666)
@@ -82,7 +82,6 @@ MainWindow::MainWindow(MNEANONYMIZE::SettingsControllerGui *c)
 , m_sDefaultWasmInFile("/in.fif")
 , m_sDefaultWasmOutFile("/out.fif")
 , m_pUi(new Ui::MainWindow)
-, m_pController(c)
 {
     m_pUi->setupUi(this);
     setDefautlStateUi();
