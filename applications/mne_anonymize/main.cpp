@@ -73,12 +73,15 @@
  */
 int main(int argc, char* argv[])
 {
+    bool forceGUI(false);
+    #ifdef WASMBUILD
+    forceGUI = true;
+    #endif
+
     qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
 
-    QScopedPointer<MNEANONYMIZE::AppHandler>
-            h(new MNEANONYMIZE::AppHandler);
-    QScopedPointer<QCoreApplication>
-            qtApp(h->createApplication(argc, argv));
+    QScopedPointer<MNEANONYMIZE::AppHandler> h(new MNEANONYMIZE::AppHandler);
+    QScopedPointer<QCoreApplication> qtApp(h->createApplication(argc, argv, forceGUI));
 
     qtApp->setOrganizationName("MNE-CPP Project");
     qtApp->setApplicationName("MNE Anonymize");
