@@ -637,26 +637,36 @@ void MainWindow::setLineEditMNECommand(QString s)
 void MainWindow::openInFileDialog()
 {
 #ifdef WASMBUILD
-//    auto fileContentReady = [&](const QString &filePath, const QByteArray &fileContent) {
-//        if(!filePath.isNull()) {
-//            // We need to prepend "wasm/" because QFileDialog::getOpenFileContent does not provide a full
-//            // path, which we need for organzing the different models in AnalyzeData
-//            //m_pAnalyzeData->loadModel<FiffRawViewModel>("wasm/"+filePath, fileContent);
-//            //mirar path y si es diferente al que ya hay, copiaar la informacion al disco duro local de wasm
-//            //y activar una flag en controller diciendo que hay dos nombres, el figurado y el real en /.
-//            //copiar el archivo al disco duro local y pasarle al controlador el path del archivo copiado.
-//            //actiavndo a anonymizer
-//            //parecido con output file set
-//            //anonymizer ni se entera, tanto de la lectura como de la anonymization
-//            //la lectura tambien hay que hacer ifdef wasmbuild para que cree un archivo en otra parte.
-//            //asi funcionara.
-//            //para no saturar los 4gb hay que ver el tamano del file y dividir la lectura en partes de 500mb.
-//            //y ir leyendo de una en una y anonymizando de medio gb en medio gb. en el output file si se hace bien.
-//                    // pero el controlador pega todos los blubs de 500mb (max 4) en una sola file y luego la descarga.
-//                    //todo ocurre a nivel controlador y un poquito la ventana mainwindow pero 90% es a nivel controller.
-//        }
-//    };
-    //QFileDialog::getOpenFileContent("Fiff File (*.fif *.fiff)",  fileContentReady);
+    if(m_bShowWraningMsgBoxInWasm)
+    {
+        m_bShowWraningMsgBoxInWasm = false;
+        m_pUi->labelInFile->setText(m_pUi->labelInFile->text() + " [Max. 250MB]. ");
+        QMessageBox msgBox(this);
+        msgBox.setWindowTitle("Warning on FIFF maximum size.");
+        msgBox.setTextFormat(Qt::RichText);   //this is what makes the links clickable
+        msgBox.setText("Warning. Development version.\nBrowser-based MNE Anonymize is compatible with FIFF files up to 250MB.\n"
+                       "For bigger files, download MNE-CPP suite from <a href='https://mne-cpp.github.io/pages/install/binaries.html'>here</a>.\n"
+                       "                Sincerely, the development team @ MNE-CPP.");
+        msgBox.exec();
+    } else {
+        auto fileContentReady = [&](const QString &filePath, const QByteArray &fileContent) {
+            if(!filePath.isNull()) {
+
+                QFile fileIn(m_sDefaultWasmInFile);
+                fileIn.open(QIODevice::WriteOnly);
+                fileIn.write(fileContent);
+                fileIn.close();
+
+                m_fiInFile.setFile(filePath);
+                m_pUi->lineEditInFile->setText(filePath);
+                emit fileInChanged(m_sDefaultWasmInFile);
+
+                m_fiOutFile.setFile(m_sDefaultWasmOutFile);
+                emit fileOutChanged(m_sDefaultWasmOutFile);
+            }
+        };
+        QFileDialog::getOpenFileContent("Fiff File (*.fif *.fiff)",  fileContentReady);
+    }
 #else
     QFileDialog dialog(this);
     dialog.setNameFilter(tr("Fiff file (*.fif *.fiff)"));
@@ -667,8 +677,9 @@ void MainWindow::openInFileDialog()
     if (dialog.exec())
     {
         fileNames = dialog.selectedFiles();
-        setLineEditInFile(fileNames.at(0));
-        inFileEditingFinished();
+        m_fiInFile.setFile(fileNames.at(0));
+        m_pUi->lineEditInFile->setText(m_fiInFile.absoluteFilePath());
+        emit fileInChanged(m_fiInFile.absoluteFilePath());
     }
 #endif
 }
