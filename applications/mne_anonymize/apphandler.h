@@ -87,22 +87,24 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief Creates a QApplication or a QCoreApplication according tu user's preference for a command line or a
-     *  GUI application.
+     * @brief Creates a QApplication or a QCoreApplication according to user's preference for a command line or a
+     * GUI application.
      *
-     * @details Handles input arguments and searches for a "--gui" option. If found, this will create a
+     * @details Handles input arguments and searches for a "--gui" option, or the compilation context. If found, this will create a
      *  QCoreApplication so that main can execute the appplication as a command line one. If not found, it creates a
-     *  QApplication so that main can execute a GUI. Boolean member variable m_bGuiMode is updated here.
+     *  QApplication so that main can execute a GUI. Boolean member variable m_bGuiMode is updated here. forceGUI flag can be easily
+     * defined during compilation and thus allows for forcing a GUI application during compilation for a specific context (i.e. WASM).
      *
      * @see QT Documentation
      * @see https://doc.qt.io/qt-5/qapplication.html#details
      *
      * @param [in] argc (argument count) number of arguments on the command line.
      * @param [in] argv (argument vector) an array of pointers to arrays of characters.
+     * @param [in] forceGUI Allows to ensure a GUI application depending on a boolean value flag.
      *
      * @return Pointer to a QCoreApplication.
      */
-    QCoreApplication* createApplication(int& argc, char * argv[]);
+    QCoreApplication* createApplication(int& argc, char * argv[], bool forceGUI = false);
 
     //=========================================================================================================
     /**
