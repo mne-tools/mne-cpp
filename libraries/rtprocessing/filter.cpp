@@ -86,15 +86,21 @@ bool Filter::filterData(QIODevice &pIODevice,
                         const QList<FilterKernel>& lFilterKernel) const
 {
     if(lFilterKernel.isEmpty()) {
-        qWarning() << "[FiffIO::write_filtered] Passed filter kernel lsit is empty. Returning.";
+        qWarning() << "[FiffIO::write_filtered] Passed filter kernel list is empty. Returning.";
         return false;
     }
 
-    int iOrder = lFilterKernel.first().getFilterOrder();
-    for(int i = 0; i < lFilterKernel.size(); ++i) {
-        if(lFilterKernel[i].getFilterOrder() > iOrder) {
-            iOrder = lFilterKernel[i].getFilterOrder();
-        }
+    int iOrder = 4096;
+    QList<FilterKernel> lFilterKernelNew = lFilterKernel;
+    for(int i = 0; i < lFilterKernelNew.size(); ++i) {
+        lFilterKernelNew[i] = FilterKernel(lFilterKernelNew[i].getName(),
+                                           lFilterKernelNew[i].m_Type,
+                                           iOrder,
+                                           lFilterKernelNew[i].getCenterFrequency(),
+                                           lFilterKernelNew[i].getBandwidth(),
+                                           lFilterKernelNew[i].getParksWidth(),
+                                           lFilterKernelNew[i].getSamplingFrequency(),
+                                           lFilterKernelNew[i].m_designMethod);
     }
 
     RowVectorXd cals;
@@ -105,13 +111,22 @@ bool Filter::filterData(QIODevice &pIODevice,
     //Setup reading parameters
     fiff_int_t from = pFiffRawData->first_samp;
     fiff_int_t to = pFiffRawData->last_samp;
-    float quantum_sec = 30.0f;//read and write in 30 sec junks
+
+    // slice input data into data junks with proper length so that the slices are always >= the filter order
+    int iGcd = MNEMath::gcd(to - from, iOrder);
+    int iFactor = floor((8196.0-iOrder)/iGcd);
+    int iSize = iGcd * iFactor;
+    int residual = (to - from) % iSize;
+
+    if((iSize < iOrder) || (residual < iOrder)) {
+        qWarning() << "[Filter::filterData] Sliced data block size is too small. Filtering whole block at once.";
+        iSize = to - from;
+    }
+
+    float quantum_sec = iSize/pFiffRawData->info.sfreq;
     fiff_int_t quantum = ceil(quantum_sec*pFiffRawData->info.sfreq);
 
-    // Uncomment to read the whole file at once. Warning Matrix may be none-initialisable because its huge
-    //quantum = to - from + 1;
-
-    // Read and write all the data
+    // Read, filter and write the data
     bool first_buffer = true;
 
     fiff_int_t first, last;
@@ -138,7 +153,7 @@ bool Filter::filterData(QIODevice &pIODevice,
            first_buffer = false;
         }
 
-        data = filter.filterData(data,lFilterKernel);
+        data = filter.filterData(data, lFilterKernelNew);
 
         if(first == from) {
             outfid->write_raw_buffer(data.block(0,iOrder/2,data.rows(),data.cols()-iOrder), cals);
