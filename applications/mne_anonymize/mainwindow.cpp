@@ -330,7 +330,7 @@ void MainWindow::setupConnections()
                      this,&MainWindow::readInputDataButtonClicked);
 
     QObject::connect(m_pUi->pushButtonAnonymizeFile,&QPushButton::clicked,
-                     m_pController,&SettingsControllerGui::executeAnonymizer);
+                     this,&MainWindow::saveOutputFileClicked);
 
     QObject::connect(m_pUi->moreInfoButton,&QToolButton::clicked,
                      this,&MainWindow::helpButtonClicked);
