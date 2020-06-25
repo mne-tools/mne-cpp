@@ -447,9 +447,13 @@ signals:
     void readingMNECommandLine(QString cl);
 
     //=========================================================================================================
+    /**
+     *  @brief Send the a signal to alert that the anonymization has finished and the output file is ready.
+     *
+     */
+    void outFileReady();
 
 public slots:
-
     //=========================================================================================================
     /**
      * Configure the input file to anonymize.
@@ -773,6 +777,7 @@ private:
 
     QFile m_fFileIn;                    /**< Input file.*/
     QFile m_fFileOut;                   /**< Output file.*/
+
     bool m_bFileInSet;                  /**< Input file set.*/
     bool m_bFileOutSet;                 /**< Output file set.*/
 
