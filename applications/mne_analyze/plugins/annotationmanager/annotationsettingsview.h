@@ -50,6 +50,7 @@
 
 #include <QWidget>
 #include <QColorDialog>
+#include <QStringListModel>
 
 //=============================================================================================================
 // Eigen INCLUDES
@@ -124,7 +125,7 @@ public slots:
      *
      * @param [in] iSample   Sample number to be added to annotation model
      */
-    void addAnnotationToModel(const int iSample);
+    void addAnnotationToModel();
 
 signals:
     //=========================================================================================================
@@ -229,6 +230,8 @@ private:
      */
     void initMSVCSettings();
 
+    void newUserCateogry(QString sName);
+
     Ui::EventWindowDockWidget*                      m_pUi;                          /** < Pointer to GUI elements */
 
     int                                             m_iCheckState;                  /** < State of show annotations checkbox (0 unchecked, 2 checked) */
@@ -237,6 +240,7 @@ private:
 
     QSharedPointer<AnnotationDelegate>              m_pAnnDelegate;                 /** < Pointer to associated delegate */
     QSharedPointer<ANSHAREDLIB::AnnotationModel>    m_pAnnModel;                    /** < Pointer to associated model. Points to currently loaded. */
+    QSharedPointer<QStringListModel>                m_pStrListModel;                /** < */
 
     QColorDialog*                                   m_pColordialog;                 /** < USed for Prompting users for annotation type colors */
 };

@@ -49,7 +49,6 @@
 //=============================================================================================================
 
 #include <QColor>
-//#include <QAbstractTableModel>
 
 //=============================================================================================================
 // Eigen INCLUDES
@@ -62,6 +61,25 @@
 
 namespace ANSHAREDLIB {
 
+//=============================================================================================================
+// DEFINE STRUCTS
+//=============================================================================================================
+
+struct EventCategory{
+    int                 categoryNumber;
+
+    QString             categoryName;
+
+    bool                isUserMade;
+
+    QVector<int>        dataSamples;
+    QVector<int>        dataTypes;
+    QVector<int>        dataIsUserEvent;
+
+    QVector<int>        dataSamples_Filtered;
+    QVector<int>        dataTypes_Filtered;
+    QVector<int>        dataIsUserEvent_Filtered;
+};
 
 class ANSHAREDSHARED_EXPORT AnnotationModel : public AbstractModel
 {
@@ -272,6 +290,10 @@ public:
      */
     MatrixXi getAnnotationMatrix();
 
+    int createCategory(QString sCategoryName, bool bIsUserMade = false);
+
+    void swithCategories(int iCategoryIndex);
+
     //=========================================================================================================
     /**
      * The type of this model (AnnotationModel)
@@ -311,34 +333,42 @@ signals:
      */
     void updateEventTypes(const QString& currentFilterType);
 
+    void addNewAnnotation();
+
 private:
 
-    QStringList         m_eventTypeList;
+    QStringList                         m_eventTypeList;
 
-    QVector<int>        m_dataSamples;
-    QVector<int>        m_dataTypes;
-    QVector<int>        m_dataIsUserEvent;
+    QMap<int,EventCategory*>            m_mAnnotationHub;
 
-    QVector<int>        m_dataSamples_Filtered;
-    QVector<int>        m_dataTypes_Filtered;
-    QVector<int>        m_dataIsUserEvent_Filtered;
+    int                                 m_iSelectedCategory;
 
-    int                 m_iSamplePos;
-    int                 m_iFirstSample;
-    int                 m_iLastSample;
+    QVector<int>                        m_dataSamples;
+    QVector<int>                        m_dataTypes;
+    QVector<int>                        m_dataIsUserEvent;
 
-    int                 m_iActiveCheckState;
-    int                 m_iSelectedCheckState;
-    int                 m_iSelectedAnn;
+    QVector<int>                        m_dataSamples_Filtered;
+    QVector<int>                        m_dataTypes_Filtered;
+    QVector<int>                        m_dataIsUserEvent_Filtered;
 
-    QList<int>          m_dataSelectedRows;
+    bool                                m_bIsUserMade;
 
-    int                 m_iLastTypeAdded;
+    int                                 m_iSamplePos;
+    int                                 m_iFirstSample;
+    int                                 m_iLastSample;
 
-    float               m_fFreq;
+    int                                 m_iActiveCheckState;
+    int                                 m_iSelectedCheckState;
+    int                                 m_iSelectedAnn;
 
-    QString             m_sFilterEventType;
-    QMap<int, QColor>   m_eventTypeColor;
+    QList<int>                          m_dataSelectedRows;
+
+    int                                 m_iLastTypeAdded;
+
+    float                               m_fFreq;
+
+    QString                             m_sFilterEventType;
+    QMap<int, QColor>                   m_eventTypeColor;
 
 };
 
