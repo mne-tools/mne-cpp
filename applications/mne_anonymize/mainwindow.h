@@ -89,7 +89,7 @@ public:
     /**
     * Constructs a MainWindow object.
     */
-    explicit MainWindow(SettingsControllerGui* controller = nullptr);
+    explicit MainWindow();
 
     /**
     * Destructs MainWindow object.
@@ -785,7 +785,6 @@ private:
     const QString m_sDefaultWasmOutFile;    /**< In Web Assembly context, the file name of the output file.*/
 
     Ui::MainWindow* m_pUi;                      /**< Pointer to the user interface form.*/
-    SettingsControllerGui* m_pController;       /**< Pointer to the controller object.*/
 };
 
 }
