@@ -78,6 +78,9 @@ MainWindow::MainWindow(MNEANONYMIZE::SettingsControllerGui *c)
 : m_bOptionsVisibility(false)
 , m_iDefaultWindowHeight(222)
 , m_iDefaultWindowHeightLarge(666)
+, m_bShowWraningMsgBoxInWasm(true)
+, m_sDefaultWasmInFile("/in.fif")
+, m_sDefaultWasmOutFile("/out.fif")
 , m_pUi(new Ui::MainWindow)
 , m_pController(c)
 {
@@ -131,7 +134,13 @@ bool MainWindow::confirmClose()
 void MainWindow::setDefautlStateUi()
 {
     this->setWindowTitle(qApp->organizationName() + " ~ " + qApp->applicationName() + " ~ " + qApp->applicationVersion());
-
+#ifdef WASMBUILD
+    m_pUi->lineEditInFile->setReadOnly(true);
+    m_pUi->labelOutFile->setVisible(false);
+    m_pUi->openOutFileWindowButton->setVisible(false);
+    m_pUi->lineEditOutFile->setVisible(false);
+    m_bOptionsVisibility = true;
+#endif
     resize(m_iDefaultWindowHeightLarge,m_iDefaultWindowHeight);
     setMaximumHeight(m_iDefaultWindowHeight);
 
