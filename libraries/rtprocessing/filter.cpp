@@ -80,7 +80,7 @@ Filter::~Filter()
 
 //=============================================================================================================
 
-bool Filter::filterData(QIODevice &pIODevice,
+bool Filter::filterFile(QIODevice &pIODevice,
                         QSharedPointer<FiffRawData> pFiffRawData,
                         FilterKernel::FilterType type,
                         double dCenterfreq,
@@ -107,7 +107,7 @@ bool Filter::filterData(QIODevice &pIODevice,
                                        dSFreq,
                                        designMethod);
 
-    return filterData(pIODevice,
+    return filterFile(pIODevice,
                       pFiffRawData,
                       QList<FilterKernel>() << filter,
                       vecPicks,
@@ -116,7 +116,7 @@ bool Filter::filterData(QIODevice &pIODevice,
 
 //=============================================================================================================
 
-bool Filter::filterData(QIODevice &pIODevice,
+bool Filter::filterFile(QIODevice &pIODevice,
                         QSharedPointer<FiffRawData> pFiffRawData,
                         const QList<FilterKernel>& lFilterKernel,
                         const RowVectorXi& vecPicks,
@@ -127,17 +127,20 @@ bool Filter::filterData(QIODevice &pIODevice,
         return false;
     }
 
+    // Try to filter with at least order of 4096
     int iOrder = 4096;
     QList<FilterKernel> lFilterKernelNew = lFilterKernel;
     for(int i = 0; i < lFilterKernelNew.size(); ++i) {
-        lFilterKernelNew[i] = FilterKernel(lFilterKernelNew[i].getName(),
-                                           lFilterKernelNew[i].m_Type,
-                                           iOrder,
-                                           lFilterKernelNew[i].getCenterFrequency(),
-                                           lFilterKernelNew[i].getBandwidth(),
-                                           lFilterKernelNew[i].getParksWidth(),
-                                           lFilterKernelNew[i].getSamplingFrequency(),
-                                           lFilterKernelNew[i].m_designMethod);
+        if(lFilterKernelNew[i].getFilterOrder() < iOrder) {
+            lFilterKernelNew[i] = FilterKernel(lFilterKernelNew[i].getName(),
+                                               lFilterKernelNew[i].m_Type,
+                                               iOrder,
+                                               lFilterKernelNew[i].getCenterFrequency(),
+                                               lFilterKernelNew[i].getBandwidth(),
+                                               lFilterKernelNew[i].getParksWidth(),
+                                               lFilterKernelNew[i].getSamplingFrequency(),
+                                               lFilterKernelNew[i].m_designMethod);
+        }
     }
 
     RowVectorXd cals;
@@ -226,7 +229,8 @@ MatrixXd Filter::filterData(const MatrixXd& mataData,
                             FilterKernel::DesignMethod designMethod,
                             const RowVectorXi& vecPicks,
                             bool bFilterEnd,
-                            bool bUseThreads)
+                            bool bUseThreads,
+                            bool bKeepOverhead)
 {
     // Check for size of data
     if(mataData.cols() < iOrder){
@@ -253,7 +257,8 @@ MatrixXd Filter::filterData(const MatrixXd& mataData,
                       QList<FilterKernel>() << filter,
                       vecPicks,
                       bFilterEnd,
-                      bUseThreads);
+                      bUseThreads,
+                      bKeepOverhead);
 }
 
 //=============================================================================================================
@@ -262,7 +267,8 @@ MatrixXd Filter::filterData(const MatrixXd& mataData,
                             const QList<FilterKernel>& lFilterKernel,
                             const RowVectorXi& vecPicks,
                             bool bFilterEnd,
-                            bool bUseThreads)
+                            bool bUseThreads,
+                            bool bKeepOverhead)
 {
     if(lFilterKernel.isEmpty()) {
         qWarning() << "[Filter::filterData] Filter kernel list is empty. Returning.";
@@ -325,7 +331,13 @@ MatrixXd Filter::filterData(const MatrixXd& mataData,
                                      bUseThreads);
     }
 
-    return matDataOut;
+    if(bKeepOverhead) {
+        return matDataOut;
+    } else {
+        matDataOut.block(0,0,matDataOut.rows(),matDataOut.cols()-iOrder/2) = matDataOut.block(0,iOrder/2,matDataOut.rows(),matDataOut.cols()-iOrder/2).eval();
+        matDataOut.block(0,matDataOut.cols()-iOrder/2,matDataOut.rows(),iOrder/2) = m_matOverlapBack.block(0,0,m_matOverlapBack.rows(),iOrder/2);
+        return matDataOut;
+    }
 }
 
 //=============================================================================================================
@@ -411,9 +423,6 @@ MatrixXd Filter::filterDataBlock(const MatrixXd& mataData,
 
     // Copy in data from last data block. This is necessary in order to also delay channels which are not filtered
     MatrixXd matDataOut = mataData;
-//    MatrixXd matDataOut(mataData.rows(), mataData.cols());
-//    matDataOut.block(0, iOrder/2, mataData.rows(), matDataOut.cols()-iOrder/2) = mataData.block(0, 0, mataData.rows(), matDataOut.cols()-iOrder/2);
-//    matDataOut.block(0, 0, mataData.rows(), iOrder/2) = m_matDelayBack;
 
     if(bUseThreads) {
         QFuture<void> future = QtConcurrent::map(timeData,
@@ -425,7 +434,7 @@ MatrixXd Filter::filterDataBlock(const MatrixXd& mataData,
         }
     }
 
-    //Do the overlap add method and store in matDataOut
+    // Do the overlap add method and store in matDataOut
     int iFilteredNumberCols = timeData.at(0).vecData.cols();
     RowVectorXd tempData;
 
@@ -433,14 +442,14 @@ MatrixXd Filter::filterDataBlock(const MatrixXd& mataData,
         //Get the currently filtered data. This data has a delay of filterLength/2 in front and back
         tempData = timeData.at(r).vecData;
 
-        //Perform the actual overlap add by adding the last filter length data to the newly filtered one
+        // Perform the actual overlap add by adding the last filter length data to the newly filtered one
         if(bFilterEnd) {
             tempData.head(iOrder) += m_matOverlapBack.row(timeData.at(r).iRow);
         } else {
             tempData.tail(iOrder) += m_matOverlapFront.row(timeData.at(r).iRow);
         }
 
-        //Write the newly calculated filtered data to the filter data matrix
+        // Write the newly calculated filtered data to the filter data matrix
         int start = 0;
         if(bFilterEnd) {
             matDataOut.row(timeData.at(r).iRow).segment(start,iFilteredNumberCols-iOrder) = tempData.head(iFilteredNumberCols-iOrder);
@@ -448,7 +457,7 @@ MatrixXd Filter::filterDataBlock(const MatrixXd& mataData,
             matDataOut.row(timeData.at(r).iRow).segment(start,iFilteredNumberCols-iOrder) = tempData.tail(iFilteredNumberCols-iOrder);
         }
 
-        //Refresh the overlap matrix with the new calculated filtered data
+        // Refresh the overlap matrix with the new calculated filtered data
         m_matOverlapBack.row(timeData.at(r).iRow) = timeData.at(r).vecData.tail(iOrder);
         m_matOverlapFront.row(timeData.at(r).iRow) = timeData.at(r).vecData.head(iOrder);
     }
@@ -468,8 +477,7 @@ MatrixXd Filter::filterDataBlock(const MatrixXd& mataData,
 void Filter::filterChannel(Filter::FilterObject& channelDataTime)
 {
     for(int i = 0; i < channelDataTime.lFilterKernel.size(); ++i) {
-        //channelDataTime.vecData = channelDataTime.first.at(i).applyConvFilter(channelDataTime.vecData, true, FilterKernel::ZeroPad);
-        channelDataTime.vecData = channelDataTime.lFilterKernel[i].applyFftFilter(channelDataTime.vecData,
-                                                                                  true); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
+        //channelDataTime.vecData = channelDataTime.first.at(i).applyConvFilter(channelDataTime.vecData, true);
+        channelDataTime.vecData = channelDataTime.lFilterKernel[i].applyFftFilter(channelDataTime.vecData, true); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
     }
 }
