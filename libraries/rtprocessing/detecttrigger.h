@@ -85,7 +85,18 @@ public:
 
     //=========================================================================================================
     /**
-     * detectTriggerFlanks detects flanks from a given data matrix in row wise order. This function uses a simple maxCoeff function implemented by eigen to locate the triggers.
+     * Transforms QMap with stored information about events per stim channel to a list of event matrices.
+     *
+     * @param[in]       mapTriggers  The QMap to be transformed
+     *
+     * @param return    A list of transformed Eigen matrices.
+     */
+    static QList<Eigen::MatrixXi> toEventMatrix(QMap<int,QList<QPair<int,double> > > mapTriggers);
+
+    //=========================================================================================================
+    /**
+     * detectTriggerFlanks detects flanks from a given data matrix in row wise order. This function uses a simple
+     * maxCoeff function implemented by eigen to locate the triggers.
      *
      * @param[in]        data  the data used to find the trigger flanks
      * @param[in]        lTriggerChannels  The indeces of the trigger channels
@@ -94,7 +105,8 @@ public:
      * @param[in]        bRemoveOffset  remove the first sample as offset
      * @param[in]        iBurstLengthMs  The length in samples which is skipped after a trigger was found
      *
-     * @param return     This map holds the indices of the channels which are to be read from data. For each index/channel the found triggersand corresponding signal values are written to the value of the map.
+     * @param return     This map holds the indices of the channels which are to be read from data. For each
+     *                   index/channel the found triggersand corresponding signal values are written to the value of the map.
      */
     static QMap<int, QList<QPair<int, double> > > detectTriggerFlanksMax(const Eigen::MatrixXd &data,
                                                                          const QList<int>& lTriggerChannels,
