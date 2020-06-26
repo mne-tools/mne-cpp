@@ -98,8 +98,6 @@ void AnnotationSettingsView::initMSVCSettings()
 
     m_pUi->listView->setModel(m_pStrListModel.data());
 
-    m_pUi->columnView->setModel(m_pStrListModel.data());
-
     //Delegate
     m_pAnnDelegate = QSharedPointer<AnnotationDelegate>(new AnnotationDelegate(this));
     m_pUi->m_tableView_eventTableView->setItemDelegate(m_pAnnDelegate.data());
