@@ -291,7 +291,7 @@ bool FiffRawViewModel::saveToFile(const QString& sPath)
     if(m_pFiffIO->m_qlistRaw.size() > 0) {
         if(m_bPerformFiltering) {
             Filter filter;
-            return filter.filterData(fFileOut, m_pFiffIO->m_qlistRaw[0], m_filterKernel);
+            return filter.filterFile(fFileOut, m_pFiffIO->m_qlistRaw[0], m_filterKernel);
         } else {
             return m_pFiffIO->write_raw(fFileOut, 0);
         }
@@ -381,13 +381,12 @@ bool FiffRawViewModel::hasChildren(const QModelIndex &parent) const
 
 void FiffRawViewModel::updateHorizontalScrollPosition(qint32 newScrollPosition)
 {
-//    QElapsedTimer timer;
-//    timer.start();
     // check if we are currently loading something in the background. This is a rudimentary solution.
     if (m_bCurrentlyLoading) {
         qInfo() << "[FiffRawViewModel::updateScrollPosition] Background operation still pending, try again later...";
         return;
     }
+
     m_iScrollPos = newScrollPosition;
     qint32 targetCursor = (newScrollPosition / m_dDx) + absoluteFirstSample() ;
 
@@ -432,7 +431,6 @@ void FiffRawViewModel::updateHorizontalScrollPosition(qint32 newScrollPosition)
             postBlockLoad(loadLaterBlocks(blockDist));
         }
     }
-    //qDebug() << "[FiffRawViewModel::updateScrollPosition] timer.elapsed()" << timer.elapsed();
 }
 
 //=============================================================================================================
@@ -671,10 +669,13 @@ void FiffRawViewModel::filterDataBlock(MatrixXd& matData,
                                       bFilterEnd,
                                       false);
     #else
+    // We keep the overhead becuase this excludes extra copying in the filterData function which leads to a smoother scrolling
     matData = m_pRtFilter->filterData(matData,
                                       m_filterKernel,
                                       m_lFilterChannelList,
-                                      bFilterEnd);
+                                      bFilterEnd,
+                                      true,
+                                      true);
     #endif
 }
 
@@ -714,7 +715,10 @@ void FiffRawViewModel::filterAllDataBlocks()
         #else
         pPair = QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(m_pRtFilter->filterData((*itr)->first,
                                                                                                      m_filterKernel,
-                                                                                                     m_lFilterChannelList),
+                                                                                                     m_lFilterChannelList,
+                                                                                                     true,
+                                                                                                     true,
+                                                                                                     true),
                                                                              (*itr)->second));
         #endif
 
@@ -774,16 +778,12 @@ int FiffRawViewModel::loadEarlierBlocks(qint32 numBlocks)
     int end = m_iFiffCursorBegin - 1;
 
     // read data, use the already prepared list m_lNewData
-//    QElapsedTimer timer;
-//    timer.start();
     if(m_pFiffIO->m_qlistRaw[0]->read_raw_segment(data, times, start, end)) {
         // qDebug() << "[FiffRawViewModel::loadFiffData] Successfully read a block ";
     } else {
         qWarning() << "[FiffRawViewModel::loadEarlierBlocks] Could not read block ";
         return -1;
     }
-
-//    qDebug() << "[FiffRawViewModel::loadEarlierBlocks] read_raw_segment timer.elapsed()" << timer.elapsed();
 
     for(int i = 0; i < numBlocks; ++i) {
         m_lNewData.push_front(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data.block(0, i*m_iSamplesPerBlock, data.rows(), m_iSamplesPerBlock),
@@ -799,8 +799,6 @@ int FiffRawViewModel::loadEarlierBlocks(qint32 numBlocks)
 
     // adjust fiff cursor
     m_iFiffCursorBegin = start;
-
-    //qDebug() << "[FiffRawViewModel::loadEarlierBlocks] |TIME| " << ((float) timer.elapsed()) / ((float) numBlocks) << " (per block) [FiffRawViewModel::loadEarlierBlocks]";
 
     // return 0, meaning that this was a loading of earlier blocks
     return 0;
@@ -841,15 +839,12 @@ int FiffRawViewModel::loadLaterBlocks(qint32 numBlocks)
     int end = start + (m_iSamplesPerBlock * numBlocks) - 1;
 
     // read data, use the already prepaired list m_lNewData
-//    QElapsedTimer timer;
-//    timer.start();
     if(m_pFiffIO->m_qlistRaw[0]->read_raw_segment(data, times, start, end)) {
         // qDebug() << "[FiffRawViewModel::loadFiffData] Successfully read a block ";
     } else {
         qWarning() << "[FiffRawViewModel::loadLaterBlocks] Could not read block ";
         return -1;
     }
-//    qDebug() << "[FiffRawViewModel::loadLaterBlocks] read_raw_segment timer.elapsed()" << timer.elapsed();
 
     for(int i = 0; i < numBlocks; ++i) {
         m_lNewData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data.block(0, i*m_iSamplesPerBlock, data.rows(), m_iSamplesPerBlock),
@@ -866,8 +861,6 @@ int FiffRawViewModel::loadLaterBlocks(qint32 numBlocks)
     // adjust fiff cursor
     m_iFiffCursorBegin += numBlocks * m_iSamplesPerBlock;
 
-    //qInfo() << "[FiffRawViewModel::loadLaterBlocks] |TIME| " << ((float) timer.elapsed()) / ((float) numBlocks) << " (per block) [FiffRawViewModel::loadLaterBlocks]";
-
     // return 1, meaning that this was a loading of later blocks
     return 1;
 }
@@ -876,9 +869,6 @@ int FiffRawViewModel::loadLaterBlocks(qint32 numBlocks)
 
 void FiffRawViewModel::postBlockLoad(int result)
 {
-//    QElapsedTimer timer;
-//    timer.start();
-
     switch(result){
     case -1:
         qWarning() << "[FiffRawViewModel::postBlockLoad] QFuture returned an error: " << result;
@@ -904,7 +894,6 @@ void FiffRawViewModel::postBlockLoad(int result)
         }
         m_dataMutex.unlock();
 
-        //qInfo() << "[FiffRawViewModel::postBlockLoad] |TIME| " << timer.elapsed() << " [FiffRawViewModel::postBlockLoad]";
         emit newBlocksLoaded();
 
         break;

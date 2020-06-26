@@ -109,7 +109,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Creates a user designed filter kernel and writes the filtered data to a pIODevice.
+     * Creates a user designed filter kernel, filters data from an input file and writes the filtered data to a pIODevice.
      *
      * @param [in] pIODevice            The IO device to write to.
      * @param [in] pFiffRawData         The fiff raw data object to read from.
@@ -125,7 +125,7 @@ public:
      *
      * @return Returns true if successfull, false otherwise.
      */
-    bool filterData(QIODevice& pIODevice,
+    bool filterFile(QIODevice& pIODevice,
                     QSharedPointer<FIFFLIB::FiffRawData> pFiffRawData,
                     RTPROCESSINGLIB::FilterKernel::FilterType type,
                     double dCenterfreq,
@@ -139,7 +139,8 @@ public:
 
     //=========================================================================================================
     /**
-     * Write filtered data to a pIODevice.
+     * Filters data from an input file based on an exisiting filter kernel and writes the filtered data to a
+     * pIODevice.
      *
      * @param [in] pIODevice            The IO device to write to.
      * @param [in] pFiffRawData         The fiff raw data object to read from.
@@ -149,12 +150,13 @@ public:
      *
      * @return Returns true if successfull, false otherwise.
      */
-    bool filterData(QIODevice& pIODevice,
+    bool filterFile(QIODevice& pIODevice,
                     QSharedPointer<FIFFLIB::FiffRawData> pFiffRawData,
                     const QList<RTPROCESSINGLIB::FilterKernel>& lFilterKernel,
                     const Eigen::RowVectorXi &vecPicks = Eigen::RowVectorXi(),
-                    bool bUseThreads = true) const;
+                    bool bUseThreads = false) const;
 
+    //=========================================================================================================
     /**
      * Creates a user designed filter kernel and filters the raw input data
      *
@@ -169,6 +171,7 @@ public:
      * @param [in] vecPicks         Channel indexes to filter. Default is filter all channels.
      * @param [in] bFilterEnd       Whether to perform the overlap add in the beginning or end of the data. Default is set to true.
      * @param [in] bUseThreads      Whether to use multiple threads. Default is set to true.
+     * @param [in] bKeepOverhead    Whether to keep the delayed part of the data after filtering. Default is set to false .
      *
      * @return The filtered data in form of a matrix.
      */
@@ -182,7 +185,10 @@ public:
                                RTPROCESSINGLIB::FilterKernel::DesignMethod designMethod = RTPROCESSINGLIB::FilterKernel::Cosine,
                                const Eigen::RowVectorXi &vecPicks = Eigen::RowVectorXi(),
                                bool bFilterEnd = true,
-                               bool bUseThreads = true);
+                               bool bUseThreads = true,
+                               bool bKeepOverhead = false);
+
+    //=========================================================================================================
     /**
      * Calculates the filtered version of the raw input data based on a given list filters
      *
@@ -191,6 +197,7 @@ public:
      * @param [in] vecPicks         Channel indexes to filter. Default is filter all channels.
      * @param [in] bFilterEnd       Whether to perform the overlap add in the beginning or end of the data. Default is set to true.
      * @param [in] bUseThreads      Whether to use multiple threads. Default is set to true.
+     * @param [in] bKeepOverhead    Whether to keep the delayed part of the data after filtering. Default is set to false .
      *
      * @return The filtered data in form of a matrix.
      */
@@ -198,7 +205,8 @@ public:
                                const QList<RTPROCESSINGLIB::FilterKernel>& lFilterKernel,
                                const Eigen::RowVectorXi& vecPicks = Eigen::RowVectorXi(),
                                bool bFilterEnd = true,
-                               bool bUseThreads = true);
+                               bool bUseThreads = true,
+                               bool bKeepOverhead = false);
 
     //=========================================================================================================
     /**

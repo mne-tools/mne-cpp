@@ -108,12 +108,12 @@ int main(int argc, char *argv[])
     // Filtering
     Filter rtFilter;
     printf("Filtering...");
-    if(rtFilter.filterData(fileOut,
+    if(rtFilter.filterFile(fileOut,
                            pRaw,
                            FilterKernel::BPF,
                            10,
                            10,
-                           1,
+                           0.1,
                            pRaw->info.sfreq,
                            1024,
                            RTPROCESSINGLIB::FilterKernel::Cosine,
