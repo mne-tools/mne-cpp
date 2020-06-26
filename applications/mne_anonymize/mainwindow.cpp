@@ -639,11 +639,11 @@ void MainWindow::openInFileDialog()
     if(m_bShowWraningMsgBoxInWasm)
     {
         m_bShowWraningMsgBoxInWasm = false;
-        m_pUi->labelInFile->setText(m_pUi->labelInFile->text() + " [Max. 250MB]. ");
+        m_pUi->labelInFile->setText(m_pUi->labelInFile->text() + " [Max. 450MB]. ");
         QMessageBox msgBox(this);
         msgBox.setWindowTitle("Warning on FIFF maximum size.");
         msgBox.setTextFormat(Qt::RichText);   //this is what makes the links clickable
-        msgBox.setText("Warning. Development version.\nBrowser-based MNE Anonymize is compatible with FIFF files up to 250MB.\n"
+        msgBox.setText("Warning. Development version.\nBrowser-based MNE Anonymize is compatible with FIFF files up to 450MB.\n"
                        "For bigger files, download MNE-CPP suite from <a href='https://mne-cpp.github.io/pages/install/binaries.html'>here</a>.\n"
                        "                Sincerely, the development team @ MNE-CPP.");
         msgBox.exec();
