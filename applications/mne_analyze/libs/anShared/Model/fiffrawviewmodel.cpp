@@ -752,8 +752,7 @@ int FiffRawViewModel::loadEarlierBlocks(qint32 numBlocks)
         //qInfo() << "[FiffRawViewModel::loadEarlierBlocks] Loading " << maxNumBlocks << " earlier blocks instead of requested " << numBlocks;
         if (maxNumBlocks != 0) {
             numBlocks = maxNumBlocks;
-        }
-        else {
+        } else {
             // nothing to be done, cant load any more blocks
             // return 0, meaning that this was a loading of earlier blocks
             return 0;
@@ -814,7 +813,7 @@ int FiffRawViewModel::loadLaterBlocks(qint32 numBlocks)
     // check if end of file is reached:
     int leftSamples = absoluteLastSample() - (m_iFiffCursorBegin + (m_iTotalBlockCount + numBlocks) * m_iSamplesPerBlock);
     if (leftSamples < 0) {
-        qInfo() << "[FiffRawViewModel::loadLaterBlocks] Reached end of file !";
+        //qInfo() << "[FiffRawViewModel::loadLaterBlocks] Reached end of file !";
         // see how many blocks we still can load
         int maxNumBlocks = (absoluteLastSample() - (m_iFiffCursorBegin + m_iTotalBlockCount * m_iSamplesPerBlock)) / m_iSamplesPerBlock;
         //qInfo() << "[FiffRawViewModel::loadLaterBlocks] Loading " << maxNumBlocks << " later blocks instead of requested " << numBlocks;

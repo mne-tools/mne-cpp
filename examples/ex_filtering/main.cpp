@@ -97,62 +97,32 @@ int main(int argc, char *argv[])
     parser.process(a);
 
     // Init data loading and writing
-    QFile t_fileIn(parser.value(inputOption));
-    QFile t_fileOut(parser.value(outputOption));
+    QFile fileIn(parser.value(inputOption));
+    QFile fileOut(parser.value(outputOption));
 
-    FiffRawData raw(t_fileIn);
-
-    RowVectorXd cals;
-    FiffStream::SPtr outfid = FiffStream::start_writing_raw(t_fileOut, raw.info, cals);
-
-    // Set up the reading parameters to read the whole file at once
-    fiff_int_t from = raw.first_samp;
-    fiff_int_t to = raw.last_samp;
-
-    // Initialize filter settings
-    QString filter_name =  "Cosine_BPF";
-    FilterKernel::FilterType type = FilterKernel::BPF;
-    double sFreq = raw.info.sfreq;
-    double dCenterfreq = 10;
-    double dBandwidth = 10;
-    double dTransition = 1;
-
-    Filter rtFilter;
-    MatrixXd dataFiltered;
+    FiffRawData::SPtr pRaw = FiffRawData::SPtr::create(fileIn);
 
     // Only filter MEG and EEG channels
-    RowVectorXi picks = raw.info.pick_types(true, false, false);
-
-    // Read, filter and write the data
-    MatrixXd data;
-    MatrixXd times;
-
-    // Reading
-    if(!raw.read_raw_segment(data, times, from, to)) {
-        printf("error during read_raw_segment\n");
-        return -1;
-    }
+    RowVectorXi picks = pRaw->info.pick_types(true, false, false);
 
     // Filtering
+    Filter rtFilter;
     printf("Filtering...");
-    dataFiltered = rtFilter.filterData(data,
-                                       type,
-                                       dCenterfreq,
-                                       dBandwidth,
-                                       dTransition,
-                                       sFreq,
-                                       1024,
-                                       RTPROCESSINGLIB::FilterKernel::Cosine,
-                                       picks);
-    printf("[done]\n");
+    if(rtFilter.filterData(fileOut,
+                           pRaw,
+                           FilterKernel::BPF,
+                           10,
+                           10,
+                           1,
+                           pRaw->info.sfreq,
+                           1024,
+                           RTPROCESSINGLIB::FilterKernel::Cosine,
+                           picks)) {
+        printf("[done]\n");
+    } else {
+        printf("[failed]\n");
+    }
 
-    // Writing
-    printf("Writing...");
-    outfid->write_int(FIFF_FIRST_SAMPLE, &from);
-    outfid->write_raw_buffer(dataFiltered,cals);
-    printf("[done]\n");
-
-    outfid->finish_writing_raw();
 
     return 0;
 }

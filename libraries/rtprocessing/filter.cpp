@@ -82,7 +82,45 @@ Filter::~Filter()
 
 bool Filter::filterData(QIODevice &pIODevice,
                         QSharedPointer<FiffRawData> pFiffRawData,
-                        const QList<FilterKernel>& lFilterKernel) const
+                        FilterKernel::FilterType type,
+                        double dCenterfreq,
+                        double bandwidth,
+                        double dTransition,
+                        double dSFreq,
+                        int iOrder,
+                        FilterKernel::DesignMethod designMethod,
+                        const RowVectorXi& vecPicks,
+                        bool bUseThreads) const
+{
+    // Normalize cut off frequencies to nyquist
+    dCenterfreq = dCenterfreq/(dSFreq/2.0);
+    bandwidth = bandwidth/(dSFreq/2.0);
+    dTransition = dTransition/(dSFreq/2.0);
+
+    // create filter
+    FilterKernel filter = FilterKernel("filter_kernel",
+                                       type,
+                                       iOrder,
+                                       dCenterfreq,
+                                       bandwidth,
+                                       dTransition,
+                                       dSFreq,
+                                       designMethod);
+
+    return filterData(pIODevice,
+                      pFiffRawData,
+                      QList<FilterKernel>() << filter,
+                      vecPicks,
+                      bUseThreads);
+}
+
+//=============================================================================================================
+
+bool Filter::filterData(QIODevice &pIODevice,
+                        QSharedPointer<FiffRawData> pFiffRawData,
+                        const QList<FilterKernel>& lFilterKernel,
+                        const RowVectorXi& vecPicks,
+                        bool bUseThreads) const
 {
     if(lFilterKernel.isEmpty()) {
         qWarning() << "[FiffIO::write_filtered] Passed filter kernel list is empty. Returning.";
@@ -112,14 +150,19 @@ bool Filter::filterData(QIODevice &pIODevice,
     fiff_int_t to = pFiffRawData->last_samp;
 
     // slice input data into data junks with proper length so that the slices are always >= the filter order
-    int iGcd = MNEMath::gcd(to - from, iOrder);
-    int iFactor = floor((8196.0-iOrder)/iGcd);
-    int iSize = iGcd * iFactor;
+    float fFactor = 2.0f;
+    int iSize = fFactor * iOrder;
     int residual = (to - from) % iSize;
+    while(residual < iOrder) {
+        fFactor = fFactor - 0.1f;
+        iSize = fFactor * iOrder;
+        residual = (to - from) % iSize;
 
-    if((iSize < iOrder) || (residual < iOrder)) {
-        qWarning() << "[Filter::filterData] Sliced data block size is too small. Filtering whole block at once.";
-        iSize = to - from;
+        if((iSize < iOrder)) {
+            qInfo() << "[Filter::filterData] Sliced data block size is too small. Filtering whole block at once.";
+            iSize = to - from;
+            break;
+        }
     }
 
     float quantum_sec = iSize/pFiffRawData->info.sfreq;
@@ -140,11 +183,11 @@ bool Filter::filterData(QIODevice &pIODevice,
         }
 
         if (!pFiffRawData->read_raw_segment(data, times, mult, first, last, sel)) {
-            qDebug("error during read_raw_segment\n");
+            qWarning("[Filter::filterData] Error during read_raw_segment\n");
             return false;
         }
 
-        qDebug("Filtering and writing...");
+        qInfo() << "Filtering and writing block" << first << "to" << last;
         if (first_buffer) {
            if (first > 0) {
                outfid->write_int(FIFF_FIRST_SAMPLE,&first);
@@ -152,15 +195,17 @@ bool Filter::filterData(QIODevice &pIODevice,
            first_buffer = false;
         }
 
-        data = filter.filterData(data, lFilterKernelNew);
+        data = filter.filterDataBlock(data,
+                                      vecPicks,
+                                      lFilterKernelNew,
+                                      true,
+                                      bUseThreads);
 
         if(first == from) {
             outfid->write_raw_buffer(data.block(0,iOrder/2,data.rows(),data.cols()-iOrder), cals);
         } else {
             outfid->write_raw_buffer(data, cals);
         }
-
-        qDebug("[done]\n");
     }
 
     outfid->finish_writing_raw();
@@ -209,7 +254,6 @@ MatrixXd Filter::filterData(const MatrixXd& mataData,
                       vecPicks,
                       bFilterEnd,
                       bUseThreads);
-
 }
 
 //=============================================================================================================
@@ -243,14 +287,18 @@ MatrixXd Filter::filterData(const MatrixXd& mataData,
     MatrixXd sliceFiltered;
 
     // slice input data into data junks with proper length so that the slices are always >= the filter order
-    int iGcd = MNEMath::gcd(mataData.cols(), iOrder);
-    int iFactor = floor((8196.0-iOrder)/iGcd);
-    int iSize = iGcd * iFactor;
+    float fFactor = 2.0f;
+    int iSize = fFactor * iOrder;
     int residual = mataData.cols() % iSize;
+    while(residual < iOrder) {
+        fFactor = fFactor - 0.1f;
+        iSize = fFactor * iOrder;
+        residual = mataData.cols() % iSize;
 
-    if((iSize < iOrder) || (residual < iOrder)) {
-        //qWarning() << "[Filter::filterData] Sliced data block size is too small. Filtering whole block at once.";
-        iSize = mataData.cols();
+        if(iSize < iOrder) {
+            iSize = mataData.cols();
+            break;
+        }
     }
 
     if(mataData.cols() > iSize) {
@@ -362,9 +410,10 @@ MatrixXd Filter::filterDataBlock(const MatrixXd& mataData,
     }
 
     // Copy in data from last data block. This is necessary in order to also delay channels which are not filtered
-    MatrixXd matDataOut(mataData.rows(), mataData.cols());
-    matDataOut.block(0, iOrder/2, mataData.rows(), matDataOut.cols()-iOrder/2) = mataData.block(0, 0, mataData.rows(), matDataOut.cols()-iOrder/2);
-    matDataOut.block(0, 0, mataData.rows(), iOrder/2) = m_matDelayBack;
+    MatrixXd matDataOut = mataData;
+//    MatrixXd matDataOut(mataData.rows(), mataData.cols());
+//    matDataOut.block(0, iOrder/2, mataData.rows(), matDataOut.cols()-iOrder/2) = mataData.block(0, 0, mataData.rows(), matDataOut.cols()-iOrder/2);
+//    matDataOut.block(0, 0, mataData.rows(), iOrder/2) = m_matDelayBack;
 
     if(bUseThreads) {
         QFuture<void> future = QtConcurrent::map(timeData,
