@@ -121,7 +121,6 @@ QSharedPointer<IPlugin> Averaging::clone() const
 void Averaging::init()
 {
     m_pCommu = new Communicator(this);
-
 }
 
 //=============================================================================================================
@@ -377,11 +376,11 @@ void Averaging::computeAverage()
     }
 
     lstEpochDataList = MNELIB::MNEEpochDataList::readEpochs(*pFiffRaw,
-                                                          matEvents,
-                                                          m_fPreStim,
-                                                          m_fPostStim,
-                                                          iType,
-                                                          mapReject);
+                                                            matEvents,
+                                                            m_fPreStim,
+                                                            m_fPostStim,
+                                                            iType,
+                                                            mapReject);
 
     if(m_bBasline){
         QPair<QVariant, QVariant> baselinePair;
