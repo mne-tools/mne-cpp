@@ -107,7 +107,7 @@ public:
      * @param [in] s QString containing the complete absolute path of the input file.
      *
      */
-    void setLineEditInFile(const QString& s);
+    void setInFile(const QString& s);
 
     //=========================================================================================================
     /**
@@ -120,7 +120,7 @@ public:
      * @param [in] s QString containing the complete absolute path of the output file.
      *
      */
-    void setLineEditOutFile(const QString &s);
+    void setOutFile(const QString &s);
 
     //=========================================================================================================
     /**
