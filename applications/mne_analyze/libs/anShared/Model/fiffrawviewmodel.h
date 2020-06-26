@@ -48,6 +48,8 @@
 
 #include <fiff/fiff_io.h>
 
+#include <rtprocessing/helpers/filterkernel.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -74,7 +76,6 @@ namespace FIFFLIB {
 
 namespace RTPROCESSINGLIB {
     class Filter;
-    class FilterKernel;
 }
 
 //=============================================================================================================
@@ -461,7 +462,7 @@ public:
      *
      * @param[in] filterData    list of the new filter
      */
-    void setFilter(const QList<RTPROCESSINGLIB::FilterKernel> &filterData);
+    void setFilter(const RTPROCESSINGLIB::FilterKernel& filterData);
 
     //=========================================================================================================
     /**
@@ -600,7 +601,7 @@ private:
     QSharedPointer<RTPROCESSINGLIB::Filter>     m_pRtFilter;                                /**< The filter object. */
     Eigen::RowVectorXi                          m_lFilterChannelList;                       /**< The indices of the channels to be filtered.*/
     bool                                        m_bPerformFiltering;                        /**< Flag whether to activate/deactivate filtering. */
-    QList<RTPROCESSINGLIB::FilterKernel>        m_filterKernel;                             /**< List of currently active filters. */
+    RTPROCESSINGLIB::FilterKernel               m_filterKernel;                             /**< List of currently active filters. */
 
     // fiff stuff
     QSharedPointer<FIFFLIB::FiffIO>             m_pFiffIO;                                  /**< Fiff IO */

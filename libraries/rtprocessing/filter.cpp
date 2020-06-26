@@ -109,7 +109,7 @@ bool Filter::filterFile(QIODevice &pIODevice,
 
     return filterFile(pIODevice,
                       pFiffRawData,
-                      QList<FilterKernel>() << filter,
+                      filter,
                       vecPicks,
                       bUseThreads);
 }
@@ -118,21 +118,11 @@ bool Filter::filterFile(QIODevice &pIODevice,
 
 bool Filter::filterFile(QIODevice &pIODevice,
                         QSharedPointer<FiffRawData> pFiffRawData,
-                        const QList<FilterKernel>& lFilterKernel,
+                        const FilterKernel& filterKernel,
                         const RowVectorXi& vecPicks,
                         bool bUseThreads) const
 {
-    if(lFilterKernel.isEmpty()) {
-        qWarning() << "[FiffIO::write_filtered] Passed filter kernel list is empty. Returning.";
-        return false;
-    }
-
-    int iOrder = lFilterKernel.first().getFilterOrder();
-    for(int i = 0; i < lFilterKernel.size(); ++i) {
-        if(lFilterKernel[i].getFilterOrder() > iOrder) {
-            iOrder = lFilterKernel[i].getFilterOrder();
-        }
-    }
+    int iOrder = filterKernel.getFilterOrder();
 
     RowVectorXd cals;
     SparseMatrix<double> mult;
@@ -191,7 +181,7 @@ bool Filter::filterFile(QIODevice &pIODevice,
 
         data = filter.filterDataBlock(data,
                                       vecPicks,
-                                      lFilterKernel,
+                                      filterKernel,
                                       true,
                                       bUseThreads);
 
@@ -245,7 +235,7 @@ MatrixXd Filter::filterData(const MatrixXd& mataData,
                                        designMethod);
 
     return filterData(mataData,
-                      QList<FilterKernel>() << filter,
+                      filter,
                       vecPicks,
                       bFilterEnd,
                       bUseThreads,
@@ -255,23 +245,13 @@ MatrixXd Filter::filterData(const MatrixXd& mataData,
 //=============================================================================================================
 
 MatrixXd Filter::filterData(const MatrixXd& mataData,
-                            const QList<FilterKernel>& lFilterKernel,
+                            const FilterKernel& filterKernel,
                             const RowVectorXi& vecPicks,
                             bool bFilterEnd,
                             bool bUseThreads,
                             bool bKeepOverhead)
 {
-    if(lFilterKernel.isEmpty()) {
-        qWarning() << "[Filter::filterData] Filter kernel list is empty. Returning.";
-        return mataData;
-    }
-
-    int iOrder = lFilterKernel.first().getFilterOrder();
-    for(int i = 0; i < lFilterKernel.size(); ++i) {
-        if(lFilterKernel[i].getFilterOrder() > iOrder) {
-            iOrder = lFilterKernel[i].getFilterOrder();
-        }
-    }
+    int iOrder = filterKernel.getFilterOrder();
 
     // Check for size of data
     if(mataData.cols() < iOrder){
@@ -309,7 +289,7 @@ MatrixXd Filter::filterData(const MatrixXd& mataData,
             }
             sliceFiltered = filterDataBlock(mataData.block(0,from,mataData.rows(),iSize),
                                             vecPicks,
-                                            lFilterKernel,
+                                            filterKernel,
                                             bUseThreads);
             matDataOut.block(0,from,mataData.rows(),iSize) = sliceFiltered;
             from += iSize;
@@ -317,7 +297,7 @@ MatrixXd Filter::filterData(const MatrixXd& mataData,
     } else {
         matDataOut = filterDataBlock(mataData,
                                      vecPicks,
-                                     lFilterKernel,
+                                     filterKernel,
                                      bFilterEnd,
                                      bUseThreads);
     }
@@ -346,21 +326,11 @@ void Filter::reset()
 
 MatrixXd Filter::filterDataBlock(const MatrixXd& mataData,
                                  const RowVectorXi& vecPicks,
-                                 const QList<FilterKernel>& lFilterKernel,
+                                 const FilterKernel& filterKernel,
                                  bool bFilterEnd,
                                  bool bUseThreads)
 {
-    if(lFilterKernel.isEmpty()) {
-        return mataData;
-    }
-
-    // Find highest order
-    int iOrder = lFilterKernel.first().getFilterOrder();
-    for(int i = 0; i < lFilterKernel.size(); ++i) {
-        if(lFilterKernel[i].getFilterOrder() > iOrder) {
-            iOrder = lFilterKernel[i].getFilterOrder();
-        }
-    }
+    int iOrder = filterKernel.getFilterOrder();
 
     // Check for size of data
     if(mataData.cols() < iOrder){
@@ -390,9 +360,9 @@ MatrixXd Filter::filterDataBlock(const MatrixXd& mataData,
     }
 
     // Setup filters to the correct length, so we do not have to do this everytime we call the FFT filter function
-    QList<FilterKernel> lFilterKernelSetup = lFilterKernel;
-    FilterKernel::prepareFilters(lFilterKernelSetup,
-                                 mataData.cols());
+    FilterKernel filterKernelSetup = filterKernel;
+    FilterKernel::prepareFilter(filterKernelSetup,
+                                mataData.cols());
 
     //Do the concurrent filtering
     RowVectorXi vecPicksNew = vecPicks;
@@ -406,7 +376,7 @@ MatrixXd Filter::filterDataBlock(const MatrixXd& mataData,
     //Only select channels specified in vecPicksNew
     FilterObject data;
     for(qint32 i = 0; i < vecPicksNew.cols(); ++i) {
-        data.lFilterKernel = lFilterKernelSetup;
+        data.filterKernel = filterKernelSetup;
         data.iRow = vecPicksNew[i];
         data.vecData = mataData.row(vecPicksNew[i]);
         timeData.append(data);
@@ -467,8 +437,6 @@ MatrixXd Filter::filterDataBlock(const MatrixXd& mataData,
 
 void Filter::filterChannel(Filter::FilterObject& channelDataTime)
 {
-    for(int i = 0; i < channelDataTime.lFilterKernel.size(); ++i) {
-        //channelDataTime.vecData = channelDataTime.first.at(i).applyConvFilter(channelDataTime.vecData, true);
-        channelDataTime.vecData = channelDataTime.lFilterKernel[i].applyFftFilter(channelDataTime.vecData, true); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
-    }
+    //channelDataTime.vecData = channelDataTime.first.at(i).applyConvFilter(channelDataTime.vecData, true);
+    channelDataTime.vecData = channelDataTime.filterKernel.applyFftFilter(channelDataTime.vecData, true); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
 }

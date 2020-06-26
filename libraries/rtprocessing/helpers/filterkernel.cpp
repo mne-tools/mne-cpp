@@ -303,21 +303,18 @@ FilterKernel::FilterType FilterKernel::getFilterTypeForString(const QString &fil
 
 //=============================================================================================================
 
-void FilterKernel::prepareFilters(QList<FilterKernel>& lFilterKernel,
-                                  int iDataSize)
+void FilterKernel::prepareFilter(FilterKernel& filterKernel,
+                                 int iDataSize)
 {
     int iFftLength, exp;
 
-    for(int i = 0; i < lFilterKernel.size(); ++i) {
-        // Make sure we always have the correct FFT length for the given input data and filter overlap
-        iFftLength = iDataSize + lFilterKernel.at(i).getCoefficients().cols();
-        exp = ceil(MNEMath::log2(iFftLength));
-        iFftLength = pow(2, exp);
+    iFftLength = iDataSize + filterKernel.getCoefficients().cols();
+    exp = ceil(MNEMath::log2(iFftLength));
+    iFftLength = pow(2, exp);
 
-        // Transform coefficients anew if needed
-        if(lFilterKernel.at(i).getFftCoefficients().cols() != (iFftLength/2+1)) {
-            lFilterKernel[i].fftTransformCoeffs(iFftLength);
-        }
+    // Transform coefficients anew if needed
+    if(filterKernel.getFftCoefficients().cols() != (iFftLength/2+1)) {
+        filterKernel.fftTransformCoeffs(iFftLength);
     }
 }
 
