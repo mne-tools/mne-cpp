@@ -712,7 +712,6 @@ void MainWindow::openOutFileDialog()
 
 void MainWindow::outputFileReady()
 {
-#define WASMBUILD
 #ifdef WASMBUILD
     QFile::remove(m_sDefaultWasmInFile);
     setInFile("");
