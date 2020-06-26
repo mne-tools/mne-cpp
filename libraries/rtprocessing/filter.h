@@ -90,7 +90,7 @@ public:
     typedef QSharedPointer<const Filter> ConstSPtr;  /**< Const shared pointer type for Filter. */
 
     typedef struct {
-        QList<RTPROCESSINGLIB::FilterKernel> lFilterKernel;
+        RTPROCESSINGLIB::FilterKernel filterKernel;
         int iRow;
         Eigen::RowVectorXd vecData;
     } FilterObject;
@@ -144,7 +144,7 @@ public:
      *
      * @param [in] pIODevice            The IO device to write to.
      * @param [in] pFiffRawData         The fiff raw data object to read from.
-     * @param [in] lFilterKernel        The list of filter kernels to use.
+     * @param [in] filterKernel        The list of filter kernels to use.
      * @param [in] vecPicks             Channel indexes to filter. Default is filter all channels.
      * @param [in] bUseThreads          hether to use multiple threads. Default is set to true.
      *
@@ -152,7 +152,7 @@ public:
      */
     bool filterFile(QIODevice& pIODevice,
                     QSharedPointer<FIFFLIB::FiffRawData> pFiffRawData,
-                    const QList<RTPROCESSINGLIB::FilterKernel>& lFilterKernel,
+                    const RTPROCESSINGLIB::FilterKernel& filterKernel,
                     const Eigen::RowVectorXi &vecPicks = Eigen::RowVectorXi(),
                     bool bUseThreads = false) const;
 
@@ -193,7 +193,7 @@ public:
      * Calculates the filtered version of the raw input data based on a given list filters
      *
      * @param [in] mataData         The data which is to be filtered.
-     * @param [in] lFilterKernel    The list of filter kernels to use.
+     * @param [in] filterKernel    The list of filter kernels to use.
      * @param [in] vecPicks         Channel indexes to filter. Default is filter all channels.
      * @param [in] bFilterEnd       Whether to perform the overlap add in the beginning or end of the data. Default is set to true.
      * @param [in] bUseThreads      Whether to use multiple threads. Default is set to true.
@@ -202,7 +202,7 @@ public:
      * @return The filtered data in form of a matrix.
      */
     Eigen::MatrixXd filterData(const Eigen::MatrixXd& mataData,
-                               const QList<RTPROCESSINGLIB::FilterKernel>& lFilterKernel,
+                               const RTPROCESSINGLIB::FilterKernel& filterKernel,
                                const Eigen::RowVectorXi& vecPicks = Eigen::RowVectorXi(),
                                bool bFilterEnd = true,
                                bool bUseThreads = true,
@@ -221,7 +221,7 @@ private:
      *
      * @param [in] mataData         The data which is to be filtered
      * @param [in] vecPicks         The used channel as index in RowVector
-     * @param [in] lFilterKernel    The FilterKernel to to filter the data with
+     * @param [in] filterKernel    The FilterKernel to to filter the data with
      * @param [in] bFilterEnd       Whether to perform the overlap add in the beginning or end of the data. Default is set to true.
      * @param [in] bUseThreads      Whether to use multiple threads
      *
@@ -229,7 +229,7 @@ private:
      */
     Eigen::MatrixXd filterDataBlock(const Eigen::MatrixXd& mataData,
                                     const Eigen::RowVectorXi& vecPicks,
-                                    const QList<RTPROCESSINGLIB::FilterKernel> &lFilterKernel,
+                                    const RTPROCESSINGLIB::FilterKernel& filterKernel,
                                     bool bFilterEnd = true,
                                     bool bUseThreads = true);
 

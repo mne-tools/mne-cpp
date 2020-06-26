@@ -471,7 +471,7 @@ void FiffRawView::setFilter(const FilterKernel& filterData)
         return;
     }
 
-    m_pModel->setFilter(QList<FilterKernel>() << filterData);
+    m_pModel->setFilter(filterData);
 }
 
 //=============================================================================================================
