@@ -597,12 +597,13 @@ MatrixXi AnnotationModel::getAnnotationMatrix()
 
 //=============================================================================================================
 
-int AnnotationModel::createCategory(QString sCategoryName, bool bIsUserMade)
+int AnnotationModel::createCategory(QString sCategoryName, bool bIsUserMade, int iType)
 {
     EventCategory* newEvent = new EventCategory();
     int iSize = m_mAnnotationHub.size();
 
     *newEvent = {iSize,                         //categoryNumber
+                 iType,                         //categoryType
                  sCategoryName,                 //categoryName
                  bIsUserMade,                   //isUserMade
                  QVector<int>(),                //dataSamples
@@ -631,6 +632,7 @@ void AnnotationModel::swithCategories(int iCategoryIndex)
 
     m_iSelectedCategory = m_mAnnotationHub[iCategoryIndex]->categoryNumber;
     m_bIsUserMade = m_mAnnotationHub[iCategoryIndex]->isUserMade;
+    m_iType = m_mAnnotationHub[iCategoryIndex]->categoryType;
 }
 
 //=============================================================================================================

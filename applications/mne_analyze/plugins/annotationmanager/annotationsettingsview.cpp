@@ -77,6 +77,10 @@ AnnotationSettingsView::AnnotationSettingsView()
     m_pUi->m_comboBox_filterTypes->addItem("0");
     m_pUi->m_comboBox_filterTypes->setCurrentText("All");
 
+    m_pUi->m_comboBox_filterTypes->hide();
+    m_pUi->line->hide();
+    m_pUi->m_label_filterEvents->hide();
+
     onDataChanged();
 }
 
@@ -148,8 +152,6 @@ void AnnotationSettingsView::initGUIFunctionality()
     connect(m_pAnnModel.data(), &ANSHAREDLIB::AnnotationModel::addNewAnnotation,
             this, &AnnotationSettingsView::addAnnotationToModel);
 
-    connect(m_pUi->m_pushButtonTest, &QPushButton::clicked,
-            this, &AnnotationSettingsView::testButton);
 }
 
 //=============================================================================================================
@@ -245,6 +247,7 @@ void AnnotationSettingsView::addNewAnnotationType()
 {
     m_pAnnModel->addNewAnnotationType(QString().number(m_pUi->m_spinBox_addEventType->value()), m_pColordialog->getColor(Qt::black, this));
     //m_pAnnModel->setEventFilterType(QString().number(m_pUi->m_spinBox_addEventType->value()));
+    newUserCateogry(m_pUi->lineEdit->text(), m_pUi->m_spinBox_addEventType->value());
     emit triggerRedraw();
 }
 
@@ -353,7 +356,7 @@ void AnnotationSettingsView::realTimeDataTime(double dValue)
 
 //=============================================================================================================
 
-void AnnotationSettingsView::newUserCateogry(QString sName)
+void AnnotationSettingsView::newUserCateogry(QString sName, int iType)
 {
     qDebug() << "AnnotationSettingsView::newUserCateogry";
 
@@ -361,25 +364,6 @@ void AnnotationSettingsView::newUserCateogry(QString sName)
     list->append(sName);
     m_pStrListModel->setStringList(*list);
 
-    int iCat = m_pAnnModel->createCategory(sName, true);
+    int iCat = m_pAnnModel->createCategory(sName, true, iType);
     m_pAnnModel->swithCategories(iCat);
-}
-
-//=============================================================================================================
-
-void AnnotationSettingsView::testButton()
-{
-    //if (m_pStrListModel->stringList().isEmpty()) {
-
-        int cat = m_pAnnModel->createCategory("Test");
-        m_pAnnModel->swithCategories(cat);
-
-        QStringList* list = new QStringList(m_pStrListModel->stringList());
-        list->append("Test");
-        m_pStrListModel->setStringList(*list);
-
-        int random = rand() % 1000 + 26000;
-        m_pAnnModel->setSamplePos(random);
-        m_pAnnModel->insertRow(0, QModelIndex());
-    //}
 }
