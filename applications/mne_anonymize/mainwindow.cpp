@@ -656,7 +656,7 @@ void MainWindow::openInFileDialog()
                 fileIn.write(fileContent);
                 fileIn.close();
 
-                m_fiInFile.setFile(filePath);
+                m_fiInFile.setFile(m_sDefaultWasmInFile);
                 m_pUi->lineEditInFile->setText(filePath);
                 emit fileInChanged(m_sDefaultWasmInFile);
 
@@ -712,13 +712,18 @@ void MainWindow::openOutFileDialog()
 
 void MainWindow::outputFileReady()
 {
+#define WASMBUILD
 #ifdef WASMBUILD
-    QFile file(m_sDefaultWasmOutFile);
-    if (!file.open(QIODevice::ReadOnly)) return;
+    QFile::remove(m_sDefaultWasmInFile);
+    setInFile("");
+    QFile fileOut(m_sDefaultWasmOutFile);
+    if (!fileOut.open(QIODevice::ReadOnly)) return;
     QByteArray  oufFileContent;
-    oufFileContent = file.readAll();
+    oufFileContent = fileOut.readAll();
 
-    QFileDialog::saveFileContent(oufFileContent, m_fiOutFile.absolutePath());
+    QFileInfo fiInFile(m_pUi->lineEditInFile->text());
+    QString fileOutName(fiInFile.baseName() + "_anonymized." + fiInFile.completeSuffix());
+    QFileDialog::saveFileContent(oufFileContent,fileOutName);
 #else
     statusMsg("Your file is ready!");
 #endif
