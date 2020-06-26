@@ -61,7 +61,7 @@ namespace SCMEASLIB{
 }
 
 namespace RTPROCESSINGLIB{
-    class RtAve;
+    class RtAveraging;
 }
 
 //=============================================================================================================
@@ -230,7 +230,7 @@ private:
 
     FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;                        /**< Fiff measurement info.*/
 
-    QSharedPointer<RTPROCESSINGLIB::RtAve>          m_pRtAve;                           /**< Real-time average object. */
+    QSharedPointer<RTPROCESSINGLIB::RtAveraging>          m_pRtAve;                           /**< Real-time average object. */
 
     QStringList                                     m_lResponsibleTriggerTypes;         /**< List of all trigger types which lead to the recent emit of a new evoked set. */
 

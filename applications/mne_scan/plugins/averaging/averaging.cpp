@@ -46,7 +46,7 @@
 #include <scMeas/realtimeevokedset.h>
 #include <scMeas/realtimemultisamplearray.h>
 
-#include <rtprocessing/rtave.h>
+#include <rtprocessing/rtaveraging.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -253,7 +253,7 @@ void Averaging::initPluginControlWidgets()
 
         emit pluginControlWidgetsChanged(plControlWidgets, this->getName());
 
-        // Init RtAve
+        // Init RtAveraging
         int iCurrentStimChIdx = m_mapStimChsIndexNames.value(pAveragingSettingsView->getCurrentStimCh());
 
         if(!m_mapStimChsIndexNames.contains(pAveragingSettingsView->getCurrentStimCh())) {
@@ -267,7 +267,7 @@ void Averaging::initPluginControlWidgets()
         int iBaselineFromSamples = ((float)pAveragingSettingsView->getBaselineFromSeconds()/1000)*m_pFiffInfo->sfreq;
         int iBaselineToSamples = ((float)pAveragingSettingsView->getBaselineToSeconds()/1000)*m_pFiffInfo->sfreq;
 
-        m_pRtAve = RtAve::SPtr::create(pAveragingSettingsView->getNumAverages(),
+        m_pRtAve = RtAveraging::SPtr::create(pAveragingSettingsView->getNumAverages(),
                                        iPreStimSamples,
                                        iPostStimSamples,
                                        pAveragingSettingsView->getBaselineFromSeconds(),
@@ -275,7 +275,7 @@ void Averaging::initPluginControlWidgets()
                                        iCurrentStimChIdx,
                                        m_pFiffInfo);
 
-        connect(m_pRtAve.data(), &RtAve::evokedStim,
+        connect(m_pRtAve.data(), &RtAveraging::evokedStim,
                 this, &Averaging::onNewEvokedSet);
 
         m_pRtAve->setBaselineFrom(iBaselineFromSamples, pAveragingSettingsView->getBaselineFromSeconds());

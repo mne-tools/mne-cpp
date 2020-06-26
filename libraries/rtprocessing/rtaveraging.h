@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
- * @file     rtave.h
+ * @file     rtaveraging.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     September, 2015
+ * @since    0.1.3
+ * @date     June, 2020
  *
  * @section  LICENSE
  *
- * Copyright (C) 2015, Lorenz Esch, Christoph Dinh. All rights reserved.
+ * Copyright (C) 2020, Lorenz Esch, Christoph Dinh. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -29,12 +29,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     RtAveWorker class declaration.
+ * @brief     RtAveragingWorker class declaration.
  *
  */
 
-#ifndef RTAVE_H
-#define RTAVE_H
+#ifndef RTAVERAGING_H
+#define RTAVERAGING_H
 
 //=============================================================================================================
 // INCLUDES
@@ -80,7 +80,7 @@ namespace RTPROCESSINGLIB
  *
  * @brief Real-time averaging worker
  */
-class RTPROCESINGSHARED_EXPORT RtAveWorker : public QObject
+class RTPROCESINGSHARED_EXPORT RtAveragingWorker : public QObject
 {
     Q_OBJECT
 
@@ -97,13 +97,13 @@ public:
      * @param[in] iTriggerIndex        Row in dex of channel which is to be scanned for triggers
      * @param[in] pFiffInfo            Associated Fiff Information
      */
-    RtAveWorker(quint32 numAverages,
-                quint32 iPreStimSamples,
-                quint32 iPostStimSamples,
-                quint32 iBaselineFromSecs,
-                quint32 iBaselineToSecs,
-                quint32 iTriggerIndex,
-                FIFFLIB::FiffInfo::SPtr pFiffInfo);
+    RtAveragingWorker(quint32 numAverages,
+                      quint32 iPreStimSamples,
+                      quint32 iPostStimSamples,
+                      quint32 iBaselineFromSecs,
+                      quint32 iBaselineToSecs,
+                      quint32 iTriggerIndex,
+                      FIFFLIB::FiffInfo::SPtr pFiffInfo);
 
     //=========================================================================================================
     /**
@@ -202,15 +202,18 @@ protected:
     /**
      * Prepends incoming data to front/pre stim buffer.
      */
-    void fillFrontBuffer(const Eigen::MatrixXd& data, double dTriggerType);
+    void fillFrontBuffer(const Eigen::MatrixXd& data,
+                         double dTriggerType);
 
-    void emitEvoked(double dTriggerType, QStringList& lResponsibleTriggerTypes);
+    void emitEvoked(double dTriggerType,
+                    QStringList& lResponsibleTriggerTypes);
 
     //=========================================================================================================
     /**
      * Prepends incoming data to back/post stim buffer.
      */
-    void fillBackBuffer(const Eigen::MatrixXd& data, double dTriggerType);
+    void fillBackBuffer(const Eigen::MatrixXd& data,
+                        double dTriggerType);
 
     //=========================================================================================================
     /**
@@ -278,13 +281,13 @@ signals:
  *
  * @brief Real-time averaging
  */
-class RTPROCESINGSHARED_EXPORT RtAve : public QObject
+class RTPROCESINGSHARED_EXPORT RtAveraging : public QObject
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<RtAve> SPtr;             /**< Shared pointer type for RtAve. */
-    typedef QSharedPointer<const RtAve> ConstSPtr;  /**< Const shared pointer type for RtAve. */
+    typedef QSharedPointer<RtAveraging> SPtr;             /**< Shared pointer type for RtAveraging. */
+    typedef QSharedPointer<const RtAveraging> ConstSPtr;  /**< Const shared pointer type for RtAveraging. */
 
     //=========================================================================================================
     /**
@@ -299,20 +302,20 @@ public:
      * @param[in] pFiffInfo            Associated Fiff Information
      * @param[in] parent     Parent QObject (optional)
      */
-    explicit RtAve(quint32 numAverages,
-                   quint32 iPreStimSamples,
-                   quint32 iPostStimSamples,
-                   quint32 iBaselineFromSecs,
-                   quint32 iBaselineToSecs,
-                   quint32 iTriggerIndex,
-                   FIFFLIB::FiffInfo::SPtr pFiffInfo,
-                   QObject *parent = 0);
+    explicit RtAveraging(quint32 numAverages,
+                         quint32 iPreStimSamples,
+                         quint32 iPostStimSamples,
+                         quint32 iBaselineFromSecs,
+                         quint32 iBaselineToSecs,
+                         quint32 iTriggerIndex,
+                         FIFFLIB::FiffInfo::SPtr pFiffInfo,
+                         QObject *parent = 0);
 
     //=========================================================================================================
     /**
      * Destroys the real-time averaging object.
      */
-    ~RtAve();
+    ~RtAveraging();
 
     //=========================================================================================================
     /**
@@ -459,7 +462,7 @@ signals:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool RtAveWorker::controlValuesChanged()
+inline bool RtAveragingWorker::controlValuesChanged()
 {
     bool result = false;
 
@@ -473,4 +476,4 @@ inline bool RtAveWorker::controlValuesChanged()
 }
 } // NAMESPACE
 
-#endif // RTAVE_H
+#endif // RTAVERAGING_H
