@@ -203,6 +203,7 @@ void RawDataViewer::handleEvent(QSharedPointer<Event> e)
         break;
     case TRIGGER_ACTIVE_CHANGED:
         m_pFiffRawView->getModel()->toggleDispAnnotation(e->getData().toInt());
+        m_pFiffRawView->updateView();
         break;
     case SELECTED_MODEL_CHANGED:
         onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
