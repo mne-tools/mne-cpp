@@ -67,6 +67,7 @@ namespace ANSHAREDLIB {
 
 struct EventCategory{
     int                 categoryNumber;
+    int                 categoryType;
 
     QString             categoryName;
 
@@ -290,7 +291,7 @@ public:
      */
     MatrixXi getAnnotationMatrix();
 
-    int createCategory(QString sCategoryName, bool bIsUserMade = false);
+    int createCategory(QString sCategoryName, bool bIsUserMade = false, int iType = 0);
 
     void swithCategories(int iCategoryIndex);
 
@@ -348,6 +349,8 @@ private:
     QMap<int,EventCategory*>            m_mAnnotationHub;
 
     int                                 m_iSelectedCategory;
+
+    int                                 m_iType;
 
     QVector<int>                        m_dataSamples;
     QVector<int>                        m_dataTypes;
