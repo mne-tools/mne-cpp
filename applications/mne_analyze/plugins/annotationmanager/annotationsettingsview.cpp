@@ -149,6 +149,9 @@ void AnnotationSettingsView::initGUIFunctionality()
 
     connect(m_pAnnModel.data(), &ANSHAREDLIB::AnnotationModel::addNewAnnotation,
             this, &AnnotationSettingsView::addAnnotationToModel);
+
+    connect(m_pUi->m_pushButtonTest, &QPushButton::clicked,
+            this, &AnnotationSettingsView::testButton);
 }
 
 //=============================================================================================================
@@ -179,9 +182,17 @@ void AnnotationSettingsView::updateComboBox(const QString &currentAnnotationType
 void AnnotationSettingsView::addAnnotationToModel()
 {
     qDebug() << "AnnotationSettingsView::addAnnotationToModel -- Here";
+
     if (m_pStrListModel->stringList().isEmpty()) {
         newUserCateogry("User Made");
-    }
+    } /*else {
+        if(m_pAnnModel->isUserMade()){
+            //Do nothing
+        } else {
+            for (int i = 0; i < m_pAnnModel->getHubSize(); i++){
+                if (
+        }
+    }*/
 
     m_pAnnModel->insertRow(0, QModelIndex());
     emit triggerRedraw();
@@ -354,4 +365,23 @@ void AnnotationSettingsView::newUserCateogry(QString sName)
 
     int iCat = m_pAnnModel->createCategory(sName, true);
     m_pAnnModel->swithCategories(iCat);
+}
+
+//=============================================================================================================
+
+void AnnotationSettingsView::testButton()
+{
+    //if (m_pStrListModel->stringList().isEmpty()) {
+
+        int cat = m_pAnnModel->createCategory("Test");
+        m_pAnnModel->swithCategories(cat);
+
+        QStringList* list = new QStringList(m_pStrListModel->stringList());
+        list->append("Test");
+        m_pStrListModel->setStringList(*list);
+
+        int random = rand() % 1000 + 26000;
+        m_pAnnModel->setSamplePos(random);
+        m_pAnnModel->insertRow(0, QModelIndex());
+    //}
 }

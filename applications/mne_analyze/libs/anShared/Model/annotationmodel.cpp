@@ -632,3 +632,24 @@ void AnnotationModel::swithCategories(int iCategoryIndex)
     m_iSelectedCategory = m_mAnnotationHub[iCategoryIndex]->categoryNumber;
     m_bIsUserMade = m_mAnnotationHub[iCategoryIndex]->isUserMade;
 }
+
+//=============================================================================================================
+
+bool AnnotationModel::isUserMade()
+{
+    return m_bIsUserMade;
+}
+
+//=============================================================================================================
+
+int AnnotationModel::getHubSize()
+{
+    return m_mAnnotationHub.size();
+}
+
+//=============================================================================================================
+
+bool AnnotationModel::getHubUserMade(int iIndex)
+{
+    return m_mAnnotationHub[iIndex]->isUserMade;
+}
