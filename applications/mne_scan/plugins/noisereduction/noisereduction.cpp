@@ -369,11 +369,9 @@ void NoiseReduction::run()
 
             //Do temporal filtering here
             if(m_bFilterActivated) {
-                QList<FilterKernel> list;
-                list << m_filterKernel;
                 matData = pRtFilter->filterData(matData,
-                                                     list,
-                                                     m_lFilterChannelList);
+                                                m_filterKernel,
+                                                m_lFilterChannelList);
             }
 
             //Do SPHARA here

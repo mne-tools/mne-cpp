@@ -308,22 +308,20 @@ bool FiffRawViewModel::saveToFile(const QString& sPath)
         if(m_bPerformFiltering) {
             // Write to file with a better filter kernel with 4096 filter taps
             int iOrder = 4096;
-            QList<FilterKernel> lFilterKernelNew = m_filterKernel;
-            for(int i = 0; i < lFilterKernelNew.size(); ++i) {
-                if(lFilterKernelNew[i].getFilterOrder() < iOrder) {
-                    lFilterKernelNew[i] = FilterKernel(lFilterKernelNew[i].getName(),
-                                                       lFilterKernelNew[i].m_Type,
-                                                       iOrder,
-                                                       lFilterKernelNew[i].getCenterFrequency(),
-                                                       lFilterKernelNew[i].getBandwidth(),
-                                                       lFilterKernelNew[i].getParksWidth(),
-                                                       lFilterKernelNew[i].getSamplingFrequency(),
-                                                       lFilterKernelNew[i].m_designMethod);
-                }
+            FilterKernel filterKernelNew = m_filterKernel;
+            if(filterKernelNew.getFilterOrder() < iOrder) {
+                filterKernelNew = FilterKernel(filterKernelNew.getName(),
+                                               filterKernelNew.m_Type,
+                                               iOrder,
+                                               filterKernelNew.getCenterFrequency(),
+                                               filterKernelNew.getBandwidth(),
+                                               filterKernelNew.getParksWidth(),
+                                               filterKernelNew.getSamplingFrequency(),
+                                               filterKernelNew.m_designMethod);
             }
 
             Filter filter;
-            return filter.filterFile(fFileOut, m_pFiffIO->m_qlistRaw[0], lFilterKernelNew);
+            return filter.filterFile(fFileOut, m_pFiffIO->m_qlistRaw[0], filterKernelNew);
         } else {
             return m_pFiffIO->write_raw(fFileOut, 0);
         }
@@ -601,7 +599,7 @@ void FiffRawViewModel::addTimeMark(int iLastClicked)
 
 //=============================================================================================================
 
-void FiffRawViewModel::setFilter(const QList<FilterKernel>& filterData)
+void FiffRawViewModel::setFilter(const FilterKernel& filterData)
 {
     m_filterKernel = filterData;
 
@@ -668,10 +666,8 @@ bool FiffRawViewModel::isFilterActive() const
 //=============================================================================================================
 
 int FiffRawViewModel::getFilterLength() const
-{
-    if(!m_filterKernel.isEmpty()) {
-        return m_filterKernel.first().getFilterOrder();
-    }
+{    
+    return m_filterKernel.getFilterOrder();
 }
 
 //=============================================================================================================
@@ -685,11 +681,6 @@ void FiffRawViewModel::filterDataBlock(MatrixXd& matData,
 
     if(m_lFilterChannelList.cols() == 0) {
         qWarning() << "[FiffRawViewModel::filterDataBlock] No channels to filter specified.";
-        return;
-    }
-
-    if(m_filterKernel.isEmpty()) {
-        qWarning() << "[FiffRawViewModel::filterDataBlock] Filter is unspecified.";
         return;
     }
 
@@ -721,11 +712,6 @@ void FiffRawViewModel::filterAllDataBlocks()
 
     if(m_lFilterChannelList.cols() == 0) {
         qWarning() << "[FiffRawViewModel::filterAllDataBlocks] No channels to filter specified.";
-        return;
-    }
-
-    if(m_filterKernel.isEmpty()) {
-        qWarning() << "[FiffRawViewModel::filterAllDataBlocks] Filter is unspecified.";
         return;
     }
 
