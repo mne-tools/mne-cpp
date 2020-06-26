@@ -65,6 +65,30 @@ DetectTrigger::DetectTrigger()
 
 //=============================================================================================================
 
+QList<MatrixXi> DetectTrigger::toEventMatrix(QMap<int,QList<QPair<int,double> > > mapTriggers)
+{
+    QList<MatrixXi> lMatDetectedTrigger;
+
+    QMapIterator<int,QList<QPair<int,double> > > idx(mapTriggers);
+
+    while (idx.hasNext()) {
+        idx.next();
+        MatrixXi matDetectedTrigger(idx.value().size(),3);
+
+        for(int i = 0; i < idx.value().size(); ++i) {
+            matDetectedTrigger(i,0) = idx.value().at(i).first;
+            matDetectedTrigger(i,1) = 0;
+            matDetectedTrigger(i,2) = idx.value().at(i).second;
+        }
+
+        lMatDetectedTrigger << matDetectedTrigger;
+    }
+
+    return lMatDetectedTrigger;
+}
+
+//=============================================================================================================
+
 QMap<int,QList<QPair<int,double> > > DetectTrigger::detectTriggerFlanksMax(const MatrixXd &data,
                                                                            const QList<int>& lTriggerChannels,
                                                                            int iOffsetIndex,
