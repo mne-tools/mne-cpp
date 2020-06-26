@@ -294,6 +294,12 @@ public:
 
     void swithCategories(int iCategoryIndex);
 
+    int getHubSize();
+
+    bool getHubUserMade(int iIndex);
+
+    bool isUserMade();
+
     //=========================================================================================================
     /**
      * The type of this model (AnnotationModel)

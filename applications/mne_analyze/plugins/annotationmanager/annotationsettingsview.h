@@ -217,6 +217,8 @@ private slots:
      */
     void realTimeDataTime(double dValue);
 
+    void testButton();
+
 private:
     //=========================================================================================================
     /**
