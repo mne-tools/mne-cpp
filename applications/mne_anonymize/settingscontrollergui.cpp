@@ -136,20 +136,20 @@ void SettingsControllerGui::fileInChanged(const QString& strInFile)
     if(newfiInFile.isDir())
     {
         m_pWin->statusMsg("Invalid input file. That's a directory");
-        m_pWin->setLineEditInFile(m_fiInFileInfo.absoluteFilePath());
+        m_pWin->setInFile(m_fiInFileInfo.absoluteFilePath());
         return;
     }
     if(QString::compare(newfiInFile.suffix(),QString("fif")) != 0)
     {
         m_pWin->statusMsg("The input file extension must be \".fif\" 0.");
-        m_pWin->setLineEditOutFile(m_fiOutFileInfo.absoluteFilePath());
+        m_pWin->setOutFile(m_fiOutFileInfo.absoluteFilePath());
         return;
     }
     QFileInfo inDir(newfiInFile.absolutePath());
     if(!inDir.isReadable())
     {
         m_pWin->statusMsg("You might not have reading permissions to this folder");
-        m_pWin->setLineEditInFile(m_fiInFileInfo.absoluteFilePath());
+        m_pWin->setInFile(m_fiInFileInfo.absoluteFilePath());
         return;
     }
 
@@ -159,8 +159,8 @@ void SettingsControllerGui::fileInChanged(const QString& strInFile)
         m_pAnonymizer->setFileIn(m_fiInFileInfo.absoluteFilePath());
 
         generateDefaultOutputFileName();
-        m_pWin->setLineEditInFile(m_fiInFileInfo.absoluteFilePath());
-        m_pWin->setLineEditOutFile(m_fiOutFileInfo.absoluteFilePath());
+        m_pWin->setInFile(m_fiInFileInfo.absoluteFilePath());
+        m_pWin->setOutFile(m_fiOutFileInfo.absoluteFilePath());
     }
 }
 
@@ -174,14 +174,14 @@ void SettingsControllerGui::fileOutChanged(const QString& strOutFile)
         QString fileOutDefaultName(newfiOutFile.absolutePath() + m_fiInFileInfo.baseName() +
                         "_anonymized." + m_fiInFileInfo.completeSuffix());
         m_fiOutFileInfo.setFile(fileOutDefaultName);
-        m_pWin->setLineEditOutFile(m_fiOutFileInfo.absoluteFilePath());
+        m_pWin->setOutFile(m_fiOutFileInfo.absoluteFilePath());
         return;
     }
 
     if(QString::compare(newfiOutFile.suffix(),QString("fif")) != 0)
     {
         m_pWin->statusMsg("The output file extension must be \".fif\" 0.");
-        m_pWin->setLineEditOutFile(m_fiOutFileInfo.absoluteFilePath());
+        m_pWin->setOutFile(m_fiOutFileInfo.absoluteFilePath());
         return;
     }
 
@@ -189,7 +189,7 @@ void SettingsControllerGui::fileOutChanged(const QString& strOutFile)
     if(!outDir.isWritable())
     {
         m_pWin->winPopup("You might not have writing permissions to this folder");
-        m_pWin->setLineEditOutFile(m_fiOutFileInfo.absoluteFilePath());
+        m_pWin->setOutFile(m_fiOutFileInfo.absoluteFilePath());
         return;
     }
 
@@ -298,11 +298,11 @@ void SettingsControllerGui::initializeOptionsState()
 {
     if(m_pAnonymizer->isFileInSet())
     {
-        m_pWin->setLineEditInFile(m_fiInFileInfo.absoluteFilePath());
+        m_pWin->setInFile(m_fiInFileInfo.absoluteFilePath());
     }
     if(m_pAnonymizer->isFileOutSet())
     {
-        m_pWin->setLineEditOutFile(m_fiOutFileInfo.absoluteFilePath());
+        m_pWin->setOutFile(m_fiOutFileInfo.absoluteFilePath());
     }
 
     m_pWin->setCheckBoxBruteMode(m_pAnonymizer->getBruteMode());
