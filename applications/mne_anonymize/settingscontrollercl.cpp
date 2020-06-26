@@ -398,6 +398,11 @@ int SettingsControllerCl::parseInOutFiles()
                     return 1;
                 }
             }
+            if(m_pAnonymizer->setFileOut(m_fiOutFileInfo.absoluteFilePath()))
+            {
+                qCritical() << "Error while setting the output file.";
+                return 1;
+            }
         }
     } else {
         if(!m_bGuiMode)
