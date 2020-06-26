@@ -109,20 +109,54 @@ public:
 
     //=========================================================================================================
     /**
-     * Write filtered data to a pIODevice.
+     * Creates a user designed filter kernel and writes the filtered data to a pIODevice.
      *
-     * @param[in] pIODevice              The IO device to write to.
-     * @param[in] pFiffRawData           The fiff raw data object to read from.
-     * @param[in] lFilterKernel          The list of filter kernels to use.
+     * @param [in] pIODevice            The IO device to write to.
+     * @param [in] pFiffRawData         The fiff raw data object to read from.
+     * @param [in] type                 The type of the filter: LPF, HPF, BPF, NOTCH (from enum FilterType).
+     * @param [in] dCenterfreq          The center of the frequency.
+     * @param [in] dBandwidth           The filter bandwidth. Ignored if FilterType is set to LPF,HPF. If NOTCH/BPF: bandwidth of stop-/passband
+     * @param [in] dTransition          The transistion band determines the width of the filter slopes (steepness)
+     * @param [in] dSFreq               The input data sampling frequency.
+     * @param [in] iOrder               Represents the order of the filter, the higher the higher is the stopband attenuation. Default is 1024 taps.
+     * @param [in] designMethod         The design method to use. Choose between Cosine and Tschebyscheff. Defaul is set to Cosine.
+     * @param [in] vecPicks             Channel indexes to filter. Default is filter all channels.
+     * @param [in] bUseThreads          hether to use multiple threads. Default is set to true.
      *
      * @return Returns true if successfull, false otherwise.
      */
     bool filterData(QIODevice& pIODevice,
                     QSharedPointer<FIFFLIB::FiffRawData> pFiffRawData,
-                    const QList<RTPROCESSINGLIB::FilterKernel>& lFilterKernel) const;
+                    RTPROCESSINGLIB::FilterKernel::FilterType type,
+                    double dCenterfreq,
+                    double dBandwidth,
+                    double dTransition,
+                    double dSFreq,
+                    int iOrder = 1024,
+                    RTPROCESSINGLIB::FilterKernel::DesignMethod designMethod = RTPROCESSINGLIB::FilterKernel::Cosine,
+                    const Eigen::RowVectorXi &vecPicks = Eigen::RowVectorXi(),
+                    bool bUseThreads = true) const;
+
+    //=========================================================================================================
+    /**
+     * Write filtered data to a pIODevice.
+     *
+     * @param [in] pIODevice            The IO device to write to.
+     * @param [in] pFiffRawData         The fiff raw data object to read from.
+     * @param [in] lFilterKernel        The list of filter kernels to use.
+     * @param [in] vecPicks             Channel indexes to filter. Default is filter all channels.
+     * @param [in] bUseThreads          hether to use multiple threads. Default is set to true.
+     *
+     * @return Returns true if successfull, false otherwise.
+     */
+    bool filterData(QIODevice& pIODevice,
+                    QSharedPointer<FIFFLIB::FiffRawData> pFiffRawData,
+                    const QList<RTPROCESSINGLIB::FilterKernel>& lFilterKernel,
+                    const Eigen::RowVectorXi &vecPicks = Eigen::RowVectorXi(),
+                    bool bUseThreads = true) const;
 
     /**
-     * Calculates a user designed filter kernel and filters the raw input data
+     * Creates a user designed filter kernel and filters the raw input data
      *
      * @param [in] matData          The data which is to be filtered.
      * @param [in] type             The type of the filter: LPF, HPF, BPF, NOTCH (from enum FilterType).
