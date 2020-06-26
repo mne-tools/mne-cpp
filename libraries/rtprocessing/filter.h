@@ -118,7 +118,7 @@ public:
      * @param [in] dBandwidth           The filter bandwidth. Ignored if FilterType is set to LPF,HPF. If NOTCH/BPF: bandwidth of stop-/passband
      * @param [in] dTransition          The transistion band determines the width of the filter slopes (steepness)
      * @param [in] dSFreq               The input data sampling frequency.
-     * @param [in] iOrder               Represents the order of the filter, the higher the higher is the stopband attenuation. Default is 1024 taps.
+     * @param [in] iOrder               Represents the order of the filter, the higher the higher is the stopband attenuation. Default is 4096 taps.
      * @param [in] designMethod         The design method to use. Choose between Cosine and Tschebyscheff. Defaul is set to Cosine.
      * @param [in] vecPicks             Channel indexes to filter. Default is filter all channels.
      * @param [in] bUseThreads          hether to use multiple threads. Default is set to true.
@@ -132,7 +132,7 @@ public:
                     double dBandwidth,
                     double dTransition,
                     double dSFreq,
-                    int iOrder = 1024,
+                    int iOrder = 4096,
                     RTPROCESSINGLIB::FilterKernel::DesignMethod designMethod = RTPROCESSINGLIB::FilterKernel::Cosine,
                     const Eigen::RowVectorXi &vecPicks = Eigen::RowVectorXi(),
                     bool bUseThreads = true) const;

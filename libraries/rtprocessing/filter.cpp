@@ -127,19 +127,10 @@ bool Filter::filterFile(QIODevice &pIODevice,
         return false;
     }
 
-    // Try to filter with at least order of 4096
-    int iOrder = 4096;
-    QList<FilterKernel> lFilterKernelNew = lFilterKernel;
-    for(int i = 0; i < lFilterKernelNew.size(); ++i) {
-        if(lFilterKernelNew[i].getFilterOrder() < iOrder) {
-            lFilterKernelNew[i] = FilterKernel(lFilterKernelNew[i].getName(),
-                                               lFilterKernelNew[i].m_Type,
-                                               iOrder,
-                                               lFilterKernelNew[i].getCenterFrequency(),
-                                               lFilterKernelNew[i].getBandwidth(),
-                                               lFilterKernelNew[i].getParksWidth(),
-                                               lFilterKernelNew[i].getSamplingFrequency(),
-                                               lFilterKernelNew[i].m_designMethod);
+    int iOrder = lFilterKernel.first().getFilterOrder();
+    for(int i = 0; i < lFilterKernel.size(); ++i) {
+        if(lFilterKernel[i].getFilterOrder() > iOrder) {
+            iOrder = lFilterKernel[i].getFilterOrder();
         }
     }
 
@@ -200,7 +191,7 @@ bool Filter::filterFile(QIODevice &pIODevice,
 
         data = filter.filterDataBlock(data,
                                       vecPicks,
-                                      lFilterKernelNew,
+                                      lFilterKernel,
                                       true,
                                       bUseThreads);
 

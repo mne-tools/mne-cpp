@@ -270,8 +270,24 @@ bool FiffRawViewModel::saveToFile(const QString& sPath)
 
     if(m_pFiffIO->m_qlistRaw.size() > 0) {
         if(m_bPerformFiltering) {
+            // Write to file with a better filter kernel with 4096 filter taps
+            int iOrder = 4096;
+            QList<FilterKernel> lFilterKernelNew = m_filterKernel;
+            for(int i = 0; i < lFilterKernelNew.size(); ++i) {
+                if(lFilterKernelNew[i].getFilterOrder() < iOrder) {
+                    lFilterKernelNew[i] = FilterKernel(lFilterKernelNew[i].getName(),
+                                                       lFilterKernelNew[i].m_Type,
+                                                       iOrder,
+                                                       lFilterKernelNew[i].getCenterFrequency(),
+                                                       lFilterKernelNew[i].getBandwidth(),
+                                                       lFilterKernelNew[i].getParksWidth(),
+                                                       lFilterKernelNew[i].getSamplingFrequency(),
+                                                       lFilterKernelNew[i].m_designMethod);
+                }
+            }
+
             Filter filter;
-            return filter.filterData(*bufferOut, m_pFiffIO->m_qlistRaw[0], m_filterKernel);
+            return filter.filterData(*bufferOut, m_pFiffIO->m_qlistRaw[0], lFilterKernelNew);
         } else {
             return m_pFiffIO->write_raw(*bufferOut, 0);
         }
@@ -290,8 +306,24 @@ bool FiffRawViewModel::saveToFile(const QString& sPath)
 
     if(m_pFiffIO->m_qlistRaw.size() > 0) {
         if(m_bPerformFiltering) {
+            // Write to file with a better filter kernel with 4096 filter taps
+            int iOrder = 4096;
+            QList<FilterKernel> lFilterKernelNew = m_filterKernel;
+            for(int i = 0; i < lFilterKernelNew.size(); ++i) {
+                if(lFilterKernelNew[i].getFilterOrder() < iOrder) {
+                    lFilterKernelNew[i] = FilterKernel(lFilterKernelNew[i].getName(),
+                                                       lFilterKernelNew[i].m_Type,
+                                                       iOrder,
+                                                       lFilterKernelNew[i].getCenterFrequency(),
+                                                       lFilterKernelNew[i].getBandwidth(),
+                                                       lFilterKernelNew[i].getParksWidth(),
+                                                       lFilterKernelNew[i].getSamplingFrequency(),
+                                                       lFilterKernelNew[i].m_designMethod);
+                }
+            }
+
             Filter filter;
-            return filter.filterFile(fFileOut, m_pFiffIO->m_qlistRaw[0], m_filterKernel);
+            return filter.filterFile(fFileOut, m_pFiffIO->m_qlistRaw[0], lFilterKernelNew);
         } else {
             return m_pFiffIO->write_raw(fFileOut, 0);
         }
