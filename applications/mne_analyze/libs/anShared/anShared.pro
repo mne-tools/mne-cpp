@@ -83,7 +83,6 @@ CONFIG(debug, debug|release) {
 
 SOURCES += \
     Management/analyzedata.cpp \
-    Management/analyzedatamodel.cpp \
     Management/analyzesettings.cpp \
     Management/pluginmanager.cpp \
     Management/event.cpp \
@@ -92,12 +91,12 @@ SOURCES += \
     Management/statusbar.cpp \
     Model/fiffrawviewmodel.cpp \
     Model/annotationmodel.cpp \
+    Model/analyzedatamodel.cpp \
 
 HEADERS += \
     anshared_global.h \
     Model/abstractmodel.h \
     Management/analyzedata.h \
-    Management/analyzedatamodel.h \
     Management/analyzesettings.h \
     Management/pluginmanager.h \
     Management/event.h \
@@ -110,6 +109,7 @@ HEADERS += \
     Utils/types.h \
     Model/fiffrawviewmodel.h \
     Model/annotationmodel.h \
+    Model/analyzedatamodel.h \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
