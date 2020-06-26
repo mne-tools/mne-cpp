@@ -367,7 +367,7 @@ void MainWindow::setupConnections()
 
 //=============================================================================================================
 
-void MainWindow::setLineEditInFile(const QString &s)
+void MainWindow::setInFile(const QString &s)
 {
     m_fiInFile.setFile(s);
     m_pUi->lineEditInFile->setText(m_fiInFile.absoluteFilePath());
@@ -375,7 +375,7 @@ void MainWindow::setLineEditInFile(const QString &s)
 
 //=============================================================================================================
 
-void MainWindow::setLineEditOutFile(const QString &s)
+void MainWindow::setOutFile(const QString &s)
 {
     m_fiOutFile.setFile(s);
     m_pUi->lineEditOutFile->setText(m_fiOutFile.absoluteFilePath());
