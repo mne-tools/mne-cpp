@@ -178,7 +178,7 @@ RowVectorXd FilterKernel::applyFftFilter(const RowVectorXd& vecData,
                                          bool bKeepOverhead)
 {
     #ifdef EIGEN_FFTW_DEFAULT
-        fftw_make_planner_thread_safe();
+    fftw_make_planner_thread_safe();
     #endif
 
     // Make sure we always have the correct FFT length for the given input data and filter overlap
