@@ -217,8 +217,6 @@ private slots:
      */
     void realTimeDataTime(double dValue);
 
-    void testButton();
-
 private:
     //=========================================================================================================
     /**
@@ -232,7 +230,7 @@ private:
      */
     void initMSVCSettings();
 
-    void newUserCateogry(QString sName);
+    void newUserCateogry(QString sName, int iType = 0);
 
     Ui::EventWindowDockWidget*                      m_pUi;                          /** < Pointer to GUI elements */
 
