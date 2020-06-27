@@ -6,7 +6,7 @@
  *           Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           John C. Mosher <John.C.Mosher@uth.tmc.edu>
- * @since    0.1.0
+ * @since    0.1.3
  * @date     September, 2019
  *
  * @section  LICENSE
