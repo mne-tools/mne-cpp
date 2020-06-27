@@ -42,7 +42,7 @@
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <settingscontrollergui.h>
+#include "settingscontrollergui.h"
 #include <iostream>
 
 //=============================================================================================================
