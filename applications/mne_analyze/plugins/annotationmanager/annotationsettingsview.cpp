@@ -149,8 +149,13 @@ void AnnotationSettingsView::initGUIFunctionality()
     connect(m_pUi->m_pushButtonDelete, &QPushButton::clicked,
             this, &AnnotationSettingsView::removeAnnotationfromModel, Qt::UniqueConnection);
 
+    //Adding Events
     connect(m_pAnnModel.data(), &ANSHAREDLIB::AnnotationModel::addNewAnnotation,
-            this, &AnnotationSettingsView::addAnnotationToModel);
+            this, &AnnotationSettingsView::addAnnotationToModel, Qt::UniqueConnection);
+
+    //Switching groups
+    connect(m_pUi->listView->selectionModel(), &QItemSelectionModel::selectionChanged,
+            this, &AnnotationSettingsView::categoryChanged, Qt::UniqueConnection);
 
 }
 
@@ -232,6 +237,7 @@ void AnnotationSettingsView::passFiffParams(int iFirst,
 
 void AnnotationSettingsView::removeAnnotationfromModel()
 {
+    qDebug() << "m_pUi->listView->selectionModel()->selectedRows().isEmpty() --" << m_pUi->listView->selectionModel()->selectedRows().isEmpty();
     QModelIndexList indexList = m_pUi->m_tableView_eventTableView->selectionModel()->selectedRows();
 
     for(int i = 0; i<indexList.size(); i++) {
@@ -281,6 +287,8 @@ void AnnotationSettingsView::disconnectFromModel()
             this, &AnnotationSettingsView::addNewAnnotationType);
     disconnect(m_pAnnModel.data(), &ANSHAREDLIB::AnnotationModel::addNewAnnotation,
             this, &AnnotationSettingsView::addAnnotationToModel);
+    disconnect(m_pUi->listView->selectionModel(), &QItemSelectionModel::selectionChanged,
+            this, &AnnotationSettingsView::categoryChanged);
 
 }
 
@@ -365,5 +373,17 @@ void AnnotationSettingsView::newUserCateogry(QString sName, int iType)
     m_pStrListModel->setStringList(*list);
 
     int iCat = m_pAnnModel->createCategory(sName, true, iType);
-    m_pAnnModel->swithCategories(iCat);
+    //m_pAnnModel->swithCategories(iCat);
+    m_pUi->listView->selectionModel()->select(m_pStrListModel->index(iCat), QItemSelectionModel::ClearAndSelect);
+}
+
+//=============================================================================================================
+
+void AnnotationSettingsView::categoryChanged()
+{
+    qDebug() << "AnnotationSettingsView::categoryChanged";
+    m_pAnnModel->swithCategories(m_pUi->listView->selectionModel()->selectedRows().at(0).row());
+    m_pUi->listView->repaint();
+    m_pUi->m_tableView_eventTableView->repaint();
+    emit triggerRedraw();
 }
