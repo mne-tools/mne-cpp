@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     RtAveragingWorker class declaration.
+ * @brief     Declaration of the RtAveraging and RtAveragingWorker classes.
  *
  */
 
