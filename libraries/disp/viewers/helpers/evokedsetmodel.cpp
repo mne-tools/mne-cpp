@@ -858,12 +858,12 @@ void EvokedSetModel::setFilter(const FilterKernel& filterData)
     }
 
     //Filter all visible data channels at once
-    //filterDataBlock();
+    filterDataBlock();
 }
 
 //=============================================================================================================
 
-void EvokedSetModel::setFilterChannelType(QString channelType)
+void EvokedSetModel::setFilterChannelType(const QString& channelType)
 {
     if(!m_pEvokedSet) {
         return;
@@ -984,7 +984,7 @@ void EvokedSetModel::filterDataBlock()
         //Do the concurrent filtering
         if(!timeData.isEmpty()) {
             QFuture<void> future = QtConcurrent::map(timeData,
-                                                 doFilterPerChannelRTESet);
+                                                     doFilterPerChannelRTESet);
 
             future.waitForFinished();
 
