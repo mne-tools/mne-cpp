@@ -384,6 +384,6 @@ void AnnotationSettingsView::categoryChanged()
     qDebug() << "AnnotationSettingsView::categoryChanged";
     m_pAnnModel->swithCategories(m_pUi->listView->selectionModel()->selectedRows().at(0).row());
     m_pUi->listView->repaint();
-    m_pUi->m_tableView_eventTableView->repaint();
-    emit triggerRedraw();
+    m_pUi->m_tableView_eventTableView->reset();
+    this->onDataChanged();
 }
