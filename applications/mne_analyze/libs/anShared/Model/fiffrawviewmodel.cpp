@@ -265,29 +265,27 @@ QVariant FiffRawViewModel::data(const QModelIndex &index,
 
 bool FiffRawViewModel::saveToFile(const QString& sPath)
 {
-#ifdef WASMBUILD
+    #ifdef WASMBUILD
     QBuffer* bufferOut = new QBuffer;
 
     if(m_pFiffIO->m_qlistRaw.size() > 0) {
         if(m_bPerformFiltering) {
             // Write to file with a better filter kernel with 4096 filter taps
             int iOrder = 4096;
-            QList<FilterKernel> lFilterKernelNew = m_filterKernel;
-            for(int i = 0; i < lFilterKernelNew.size(); ++i) {
-                if(lFilterKernelNew[i].getFilterOrder() < iOrder) {
-                    lFilterKernelNew[i] = FilterKernel(lFilterKernelNew[i].getName(),
-                                                       lFilterKernelNew[i].m_Type,
-                                                       iOrder,
-                                                       lFilterKernelNew[i].getCenterFrequency(),
-                                                       lFilterKernelNew[i].getBandwidth(),
-                                                       lFilterKernelNew[i].getParksWidth(),
-                                                       lFilterKernelNew[i].getSamplingFrequency(),
-                                                       lFilterKernelNew[i].m_designMethod);
-                }
+            FilterKernel filterKernelNew = m_filterKernel;
+            if(filterKernelNew.getFilterOrder() < iOrder) {
+                filterKernelNew = FilterKernel(filterKernelNew.getName(),
+                                               filterKernelNew.m_Type,
+                                               iOrder,
+                                               filterKernelNew.getCenterFrequency(),
+                                               filterKernelNew.getBandwidth(),
+                                               filterKernelNew.getParksWidth(),
+                                               filterKernelNew.getSamplingFrequency(),
+                                               filterKernelNew.m_designMethod);
             }
 
             Filter filter;
-            return filter.filterData(*bufferOut, m_pFiffIO->m_qlistRaw[0], lFilterKernelNew);
+            return filter.filterFile(*bufferOut, m_pFiffIO->m_qlistRaw[0], filterKernelNew);
         } else {
             return m_pFiffIO->write_raw(*bufferOut, 0);
         }
@@ -301,7 +299,7 @@ bool FiffRawViewModel::saveToFile(const QString& sPath)
     //bufferOut->deleteLater();
 
     return false;
-#else
+    #else
     QFile fFileOut(sPath);
 
     if(m_pFiffIO->m_qlistRaw.size() > 0) {
@@ -328,7 +326,7 @@ bool FiffRawViewModel::saveToFile(const QString& sPath)
     }
 
     return false;
-#endif
+    #endif
 }
 
 //=============================================================================================================

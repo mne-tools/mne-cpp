@@ -162,8 +162,8 @@ public:
      * @return the accessed data
      */
     QVariant data(int row,
-                         int column,
-                         int role = Qt::DisplayRole) const;
+                  int column,
+                  int role = Qt::DisplayRole) const;
 
     //=========================================================================================================
     /**
@@ -399,7 +399,7 @@ public:
      *
      * @param[in] channelType    the channel type which is to be filtered (EEG, MEG, All)
      */
-    void setFilterChannelType(QString channelType);
+    void setFilterChannelType(const QString &channelType);
 
     //=========================================================================================================
     /**

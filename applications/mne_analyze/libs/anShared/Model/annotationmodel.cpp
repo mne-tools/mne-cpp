@@ -509,7 +509,7 @@ float AnnotationModel::getFreq()
 
 bool AnnotationModel::saveToFile(const QString& sPath)
 {
-#ifdef WASMBUILD
+    #ifdef WASMBUILD
     //QBuffer* bufferOut = new QBuffer;
     QByteArray* bufferOut = new QByteArray;
 
@@ -525,7 +525,7 @@ bool AnnotationModel::saveToFile(const QString& sPath)
    // bufferOut->deleteLater();
 
     return true;
-#else
+    #else
     qInfo() << "AnnotationSettingsView::saveToFile";
 
     QFile file(sPath);
@@ -540,7 +540,7 @@ bool AnnotationModel::saveToFile(const QString& sPath)
         out << "  " << this->getAnnotation(i) << "   " << QString::number(static_cast<float>(this->getAnnotation(i)) / this->getFreq(), 'f', 4) << "          1         0" << endl;
     }
     return true;
-#endif
+    #endif
 }
 
 //=============================================================================================================
