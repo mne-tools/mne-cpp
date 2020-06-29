@@ -90,7 +90,7 @@ bool Filter::filterFile(QIODevice &pIODevice,
                         int iOrder,
                         FilterKernel::DesignMethod designMethod,
                         const RowVectorXi& vecPicks,
-                        bool bUseThreads) const
+                        bool bUseThreads)
 {
     // Normalize cut off frequencies to nyquist
     dCenterfreq = dCenterfreq/(dSFreq/2.0);
@@ -120,7 +120,7 @@ bool Filter::filterFile(QIODevice &pIODevice,
                         QSharedPointer<FiffRawData> pFiffRawData,
                         const FilterKernel& filterKernel,
                         const RowVectorXi& vecPicks,
-                        bool bUseThreads) const
+                        bool bUseThreads)
 {
     int iOrder = filterKernel.getFilterOrder();
 
@@ -158,7 +158,6 @@ bool Filter::filterFile(QIODevice &pIODevice,
     fiff_int_t first, last;
     MatrixXd data;
     MatrixXd times;
-    Filter filter;
 
     for(first = from; first < to; first+=quantum) {
         last = first+quantum-1;
@@ -179,11 +178,11 @@ bool Filter::filterFile(QIODevice &pIODevice,
            first_buffer = false;
         }
 
-        data = filter.filterDataBlock(data,
-                                      vecPicks,
-                                      filterKernel,
-                                      true,
-                                      bUseThreads);
+        data = filterDataBlock(data,
+                               vecPicks,
+                               filterKernel,
+                               true,
+                               bUseThreads);
 
         if(first == from) {
             outfid->write_raw_buffer(data.block(0,iOrder/2,data.rows(),data.cols()-iOrder), cals);
