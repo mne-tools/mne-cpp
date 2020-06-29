@@ -81,6 +81,7 @@ CONFIG(debug, debug|release) {
 SOURCES += \
     rtcov.cpp \
     rtinvop.cpp \
+    averaging.cpp \
     rtaveraging.cpp \
     rtnoise.cpp \
     rthpis.cpp \
@@ -97,6 +98,7 @@ HEADERS +=  \
     rtprocessing_global.h \
     rtcov.h \
     rtinvop.h \
+    averaging.h \
     rtaveraging.h \
     rtnoise.h \
     rthpis.h \
