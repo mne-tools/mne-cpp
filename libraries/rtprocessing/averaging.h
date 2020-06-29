@@ -1,14 +1,13 @@
 //=============================================================================================================
 /**
  * @file     averaging.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
+ * @author   Lorenz Esch <lesch@mgh.harvard.edu>
  * @since    0.1.3
  * @date     June, 2020
  *
  * @section  LICENSE
  *
- * Copyright (C) 2020, Lorenz Esch, Christoph Dinh. All rights reserved.
+ * Copyright (C) 2020, Lorenz Esch. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -49,8 +48,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QThread>
-#include <QSharedPointer>
 #include <QObject>
 
 //=============================================================================================================
@@ -76,9 +73,9 @@ namespace RTPROCESSINGLIB
 
 //=============================================================================================================
 /**
- * Averaging
+ * Averaging can be used to compute averages.
  *
- * @brief Averaging
+ * @brief Averaging can be used to compute averages.
  */
 class RTPROCESINGSHARED_EXPORT Averaging : public QObject
 {
@@ -90,9 +87,9 @@ public:
 
     //=========================================================================================================
     /**
-     * Creates the real-time averaging object.
+     * Creates the averaging object.
      *
-     * @param[in] parent     Parent QObject (optional)
+     * @param[in] parent     The parent QObject. Default is set to 0.
      */
     explicit Averaging(QObject *parent = 0);
 
@@ -102,7 +99,7 @@ public:
      */
     ~Averaging();
 
-protected:
+private:
 };
 
 //=============================================================================================================

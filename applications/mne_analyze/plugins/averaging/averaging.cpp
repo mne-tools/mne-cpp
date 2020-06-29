@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the Averaging class.
+ * @brief    Averaging class defintion.
  *
  */
 
