@@ -2,8 +2,8 @@
 /**
  * @file     averaging.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>
- * @since    0.1.0
- * @date     September, 2015
+ * @since    0.1.3
+ * @date     June, 2020
  *
  * @section  LICENSE
  *

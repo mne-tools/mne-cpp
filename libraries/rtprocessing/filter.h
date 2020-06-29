@@ -52,7 +52,6 @@
 
 #include <QSharedPointer>
 #include <QtConcurrent/QtConcurrent>
-#include <QFuture>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -135,7 +134,7 @@ public:
                     int iOrder = 4096,
                     RTPROCESSINGLIB::FilterKernel::DesignMethod designMethod = RTPROCESSINGLIB::FilterKernel::Cosine,
                     const Eigen::RowVectorXi &vecPicks = Eigen::RowVectorXi(),
-                    bool bUseThreads = true) const;
+                    bool bUseThreads = true);
 
     //=========================================================================================================
     /**
@@ -144,7 +143,7 @@ public:
      *
      * @param [in] pIODevice            The IO device to write to.
      * @param [in] pFiffRawData         The fiff raw data object to read from.
-     * @param [in] filterKernel        The list of filter kernels to use.
+     * @param [in] filterKernel         The list of filter kernels to use.
      * @param [in] vecPicks             Channel indexes to filter. Default is filter all channels.
      * @param [in] bUseThreads          hether to use multiple threads. Default is set to true.
      *
@@ -154,7 +153,7 @@ public:
                     QSharedPointer<FIFFLIB::FiffRawData> pFiffRawData,
                     const RTPROCESSINGLIB::FilterKernel& filterKernel,
                     const Eigen::RowVectorXi &vecPicks = Eigen::RowVectorXi(),
-                    bool bUseThreads = false) const;
+                    bool bUseThreads = false);
 
     //=========================================================================================================
     /**
@@ -193,7 +192,7 @@ public:
      * Calculates the filtered version of the raw input data based on a given list filters
      *
      * @param [in] mataData         The data which is to be filtered.
-     * @param [in] filterKernel    The list of filter kernels to use.
+     * @param [in] filterKernel     The list of filter kernels to use.
      * @param [in] vecPicks         Channel indexes to filter. Default is filter all channels.
      * @param [in] bFilterEnd       Whether to perform the overlap add in the beginning or end of the data. Default is set to true.
      * @param [in] bUseThreads      Whether to use multiple threads. Default is set to true.
@@ -221,7 +220,7 @@ private:
      *
      * @param [in] mataData         The data which is to be filtered
      * @param [in] vecPicks         The used channel as index in RowVector
-     * @param [in] filterKernel    The FilterKernel to to filter the data with
+     * @param [in] filterKernel     The FilterKernel to to filter the data with
      * @param [in] bFilterEnd       Whether to perform the overlap add in the beginning or end of the data. Default is set to true.
      * @param [in] bUseThreads      Whether to use multiple threads
      *

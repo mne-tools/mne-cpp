@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains the declaration of the averaging class.
+ * @brief    Averaging class declaration.
  *
  */
 
