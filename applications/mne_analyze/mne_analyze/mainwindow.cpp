@@ -98,7 +98,7 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager
         createPluginControls(pPluginManager);
         createPluginViews(pPluginManager);
     } else {
-        qWarning() << "[MainWindow::MainWindow] CRITICAL ! Plugin manager is nullptr";
+        qWarning() << "[MainWindow::MainWindow] Plugin manager is nullptr!";
     }
 
     this->setStatusBar(new StatusBar());

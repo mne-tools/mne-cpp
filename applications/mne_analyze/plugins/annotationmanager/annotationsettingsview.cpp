@@ -281,9 +281,9 @@ void AnnotationSettingsView::onCurrentSelectedChanged()
 
 void AnnotationSettingsView::onSaveButton()
 {
-#ifdef WASMBUILD
+    #ifdef WASMBUILD
     m_pAnnModel->saveToFile("");
-#else
+    #else
     QString fileName = QFileDialog::getSaveFileName(Q_NULLPTR,
                                                     tr("Save Annotations"), "",
                                                     tr("Event file (*.eve);;All Files (*)"));
@@ -294,7 +294,7 @@ void AnnotationSettingsView::onSaveButton()
     qInfo() << "AnnotationSettingsView::onSaveButton";
 
     m_pAnnModel->saveToFile(fileName);
-#endif
+    #endif
 }
 
 //=============================================================================================================

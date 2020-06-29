@@ -127,7 +127,7 @@ bool FiffId::get_machid(int *fixed_id)
 {
     QList<QString> possibleHardwareAdresses;
 
-#ifndef WASMBUILD
+    #ifndef WASMBUILD
     QList<QNetworkInterface> ifaces = QNetworkInterface::allInterfaces();
 
     fixed_id[0] = 0;
@@ -154,7 +154,7 @@ bool FiffId::get_machid(int *fixed_id)
             }
         }
     }
-#endif
+    #endif
 
     return false;
 }

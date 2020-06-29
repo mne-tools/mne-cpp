@@ -55,6 +55,7 @@
 #include <disp/viewers/butterflyview.h>
 #include <disp/viewers/scalingview.h>
 
+#include <rtprocessing/helpers/filterkernel.h>
 
 #include <mne/mne_epoch_data_list.h>
 #include <mne/mne_epoch_data.h>
@@ -76,6 +77,7 @@
 
 using namespace AVERAGINGPLUGIN;
 using namespace ANSHAREDLIB;
+using namespace RTPROCESSINGLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -255,6 +257,21 @@ void Averaging::handleEvent(QSharedPointer<Event> e)
         case EVENT_TYPE::SELECTED_MODEL_CHANGED:
             onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
             break;
+        case FILTER_CHANNEL_TYPE_CHANGED:
+            if(m_pEvokedModel) {
+                m_pEvokedModel->setFilterChannelType(e->getData().toString());
+            }
+            break;
+        case FILTER_ACTIVE_CHANGED:
+            if(m_pEvokedModel) {
+                m_pEvokedModel->setFilterActive(e->getData().toBool());
+            }
+            break;
+        case FILTER_DESIGN_CHANGED:
+            if(m_pEvokedModel) {
+                m_pEvokedModel->setFilter(e->getData().value<FilterKernel>());
+            }
+            break;
         default:
             qWarning() << "[Averaging::handleEvent] Received an Event that is not handled by switch cases.";
     }
@@ -266,6 +283,9 @@ QVector<EVENT_TYPE> Averaging::getEventSubscriptions(void) const
 {
     QVector<EVENT_TYPE> temp;
     temp.push_back(SELECTED_MODEL_CHANGED);
+    temp.push_back(FILTER_CHANNEL_TYPE_CHANGED);
+    temp.push_back(FILTER_ACTIVE_CHANGED);
+    temp.push_back(FILTER_DESIGN_CHANGED);
 
     return temp;
 }

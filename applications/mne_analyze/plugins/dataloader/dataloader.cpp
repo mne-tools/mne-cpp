@@ -158,7 +158,7 @@ QVector<EVENT_TYPE> DataLoader::getEventSubscriptions(void) const
 
 void DataLoader::onLoadFilePressed()
 {
-#ifdef WASMBUILD
+    #ifdef WASMBUILD
     auto fileContentReady = [&](const QString &filePath, const QByteArray &fileContent) {
         if(!filePath.isNull()) {
             // We need to prepend "wasm/" because QFileDialog::getOpenFileContent does not provide a full
@@ -167,7 +167,7 @@ void DataLoader::onLoadFilePressed()
         }
     };
     QFileDialog::getOpenFileContent("Fiff File (*.fif *.fiff)",  fileContentReady);
-#else
+    #else
     //Get the path
     QString filePath = QFileDialog::getOpenFileName(Q_NULLPTR,
                                                     tr("Open File"),
@@ -179,7 +179,7 @@ void DataLoader::onLoadFilePressed()
     if(fileInfo.exists() && (fileInfo.completeSuffix() == "fif")) {
         m_pAnalyzeData->loadModel<FiffRawViewModel>(filePath);
     }
-#endif
+    #endif
 }
 
 //=============================================================================================================
@@ -191,9 +191,9 @@ void DataLoader::onSaveFilePressed()
         return;
     }
 
-#ifdef WASMBUILD
+    #ifdef WASMBUILD
     m_pSelectedModel->saveToFile("");
-#else
+    #else
     //Get the path
     QString filePath = QFileDialog::getSaveFileName(Q_NULLPTR,
                                                     tr("Save File"),
@@ -202,5 +202,5 @@ void DataLoader::onSaveFilePressed()
 
     QFileInfo fileInfo(filePath);
     m_pSelectedModel->saveToFile(filePath);
-#endif
+    #endif
 }
