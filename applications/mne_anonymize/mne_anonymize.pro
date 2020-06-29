@@ -42,7 +42,7 @@ TEMPLATE = app
 
 QT += widgets network
 
-CONFIG   += console
+#CONFIG += console
 
 CONFIG(debug,debug|release) {
     macx {
