@@ -3,12 +3,12 @@
  * @file     rtaveraging.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     September, 2015
+ * @since    0.1.3
+ * @date     June, 2020
  *
  * @section  LICENSE
  *
- * Copyright (C) 2015, Lorenz Esch, Christoph Dinh. All rights reserved.
+ * Copyright (C) 2020, Lorenz Esch, Christoph Dinh. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
