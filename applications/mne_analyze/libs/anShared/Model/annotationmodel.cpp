@@ -50,6 +50,7 @@
 #include <QFileInfo>
 #include <QFileDialog>
 #include <QBuffer>
+#include <QMessageBox>
 
 //=============================================================================================================
 // Eigen INCLUDES
@@ -110,12 +111,20 @@ bool AnnotationModel::insertRows(int position, int span, const QModelIndex & par
 {
     Q_UNUSED(parent);
 
+    if (m_mAnnotationHub.isEmpty()) {
+        QMessageBox msgBox;
+        msgBox.setText("Unable to add user Event.");
+        msgBox.setInformativeText("Please create an event group.");
+        msgBox.exec();
+        return false;
+    }
+
     qDebug() << "AnnotationModel::insertRows here";
     //qDebug() << "iSamplePos:" << m_iSamplePos;
 
     if(m_dataSamples.isEmpty()) {
         m_dataSamples.insert(0, m_iSamplePos);
-        m_dataTypes.insert(0, m_iLastTypeAdded);
+        m_dataTypes.insert(0, m_iType);
         m_dataIsUserEvent.insert(0, 1);
     }
     else {
@@ -125,7 +134,7 @@ bool AnnotationModel::insertRows(int position, int span, const QModelIndex & par
                     m_dataSamples.insert(t, m_iSamplePos);
 
                     if(m_sFilterEventType == "All")
-                        m_dataTypes.insert(t, m_iLastTypeAdded);
+                        m_dataTypes.insert(t, m_iType);
                     else
                         m_dataTypes.insert(t, m_sFilterEventType.toInt());
 
@@ -137,7 +146,7 @@ bool AnnotationModel::insertRows(int position, int span, const QModelIndex & par
                     m_dataSamples.append(m_iSamplePos);
 
                     if(m_sFilterEventType == "All")
-                        m_dataTypes.append(m_iLastTypeAdded);
+                        m_dataTypes.append(m_iType);
                     else
                         m_dataTypes.append(m_sFilterEventType.toInt());
 
