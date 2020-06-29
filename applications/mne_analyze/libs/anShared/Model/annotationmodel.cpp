@@ -290,6 +290,7 @@ bool AnnotationModel::setData(const QModelIndex &index, const QVariant &value, i
 
     //Update filtered event data
     setEventFilterType(m_sFilterEventType);
+    emit dataChanged(QModelIndex(), QModelIndex());
 
     return true;
 }
@@ -622,6 +623,18 @@ int AnnotationModel::createCategory(QString sCategoryName, bool bIsUserMade, int
 
 void AnnotationModel::swithCategories(int iCategoryIndex)
 {
+    qDebug() << "AnnotationModel::swithCategories";
+
+    if (!m_dataSamples.isEmpty()){
+        m_mAnnotationHub[m_iSelectedCategory]->dataSamples = m_dataSamples;
+        m_mAnnotationHub[m_iSelectedCategory]->dataTypes = m_dataTypes;
+        m_mAnnotationHub[m_iSelectedCategory]->dataIsUserEvent = m_dataIsUserEvent;
+
+        m_mAnnotationHub[m_iSelectedCategory]->dataSamples_Filtered = m_dataSamples_Filtered;
+        m_mAnnotationHub[m_iSelectedCategory]->dataTypes_Filtered = m_dataTypes_Filtered;
+        m_mAnnotationHub[m_iSelectedCategory]->dataIsUserEvent_Filtered = m_dataIsUserEvent_Filtered;
+    }
+
     m_dataSamples = m_mAnnotationHub[iCategoryIndex]->dataSamples;
     m_dataTypes = m_mAnnotationHub[iCategoryIndex]->dataTypes;
     m_dataIsUserEvent = m_mAnnotationHub[iCategoryIndex]->dataIsUserEvent;
@@ -633,6 +646,8 @@ void AnnotationModel::swithCategories(int iCategoryIndex)
     m_iSelectedCategory = m_mAnnotationHub[iCategoryIndex]->categoryNumber;
     m_bIsUserMade = m_mAnnotationHub[iCategoryIndex]->isUserMade;
     m_iType = m_mAnnotationHub[iCategoryIndex]->categoryType;
+
+    emit dataChanged(QModelIndex(), QModelIndex());
 }
 
 //=============================================================================================================
