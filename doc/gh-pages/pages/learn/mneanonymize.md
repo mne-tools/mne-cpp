@@ -5,9 +5,11 @@ parent: Learn
 nav_order: 3
 has_toc: false
 ---
-# MNE Anonymize CLI
+# MNE Anonymize GUI/CLI
 
 This page describes the application MNE Anonymize, i.e. `mne_anonymize`. This application substitutes **Personal Health Information** (PHI) and **Personal Identifiable Information** (PII) from a [FIFF (Functional Imaging File Format)](https://bids-specification.readthedocs.io/en/stable/99-appendices/06-meg-file-formats.html) file (*.fif*).
+
+![](../../images/mn_anonymizer_gui.png)
 
 ##### De-identifying vs Anonymizing
 PHI or PII can be substituted with default or user-specified values. This way, it is up to the user to have the output file, either anonymized or de-identified. The difference is that a de-identified file can be **re-identified** back while an anonymized one cannot.
@@ -52,14 +54,20 @@ This implies that the actual final size of the output file will slightly differ 
 MNE Anonymize does not modify the input file. This application can even read from write-protected folders. The new/altered output information will be stored in a newly created FIFF file.
 
 Depending on the options, after MNE Anonymize has processed a FIFF file, there might be no way to recover the original information. Use this application with caution.
+## GUI Mode
 
-## Command-line options 
+MNE Anonymize binary file is named `mne_anonymize`. The application recognizes several command-line options. In order to execute in GUI mode, use: 
+`mne_anonymize --gui`.
 
-MNE Anonymize binary file is named `mne_anonymize`. The application recognizes the following command-line options:
+## Command-line Mode 
+
+MNE Anonymize can also be executed in command-line mode. The following table shows all valid command-line options. If you want to run `mne_anonymize` in Gui mode but you want to initially set some of the options through the command-line call, you can allways do so through the actual call. For example, if you execute `mne_anonymize --in example.fif -bdf --gui` the GUI will start and the options in it will be already set accordingly.
+
+### Command-line Options
 
 | Option | Description | 
 |--------|-------------|
-|`-h --help`| Displays help on the command line.|
+|`-h --help`| Displays help on the command-line.|
 |`--help-all`| Displays help, including Qt specific options on the command line.|
 |`--gui`| GUI version of the application.|
 |`--version`| Show the version of this appliation.|
