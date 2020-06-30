@@ -33,8 +33,8 @@
  *
  */
 
-#ifndef FILTER_H
-#define FILTER_H
+#ifndef FILTER_RTPROCESSING_H
+#define FILTER_RTPROCESSING_H
 
 //=============================================================================================================
 // INCLUDES
@@ -252,4 +252,4 @@ private:
 
 } // NAMESPACE
 
-#endif // FILTER_H
+#endif // FILTER_RTPROCESSING_H

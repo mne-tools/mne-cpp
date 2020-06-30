@@ -53,16 +53,10 @@ using namespace RTPROCESSINGLIB;
 using namespace Eigen;
 
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// DEFINE GLOBAL RTPROCESSINGLIB METHODS
 //=============================================================================================================
 
-Sphara::Sphara()
-{
-}
-
-//=============================================================================================================
-
-MatrixXd Sphara::makeSpharaProjector(const MatrixXd& matBaseFct,
+MatrixXd RTPROCESSINGLIB::makeSpharaProjector(const MatrixXd& matBaseFct,
                                      const VectorXi& vecIndices,
                                      int iOperatorDim,
                                      int iNBaseFct,
@@ -71,7 +65,7 @@ MatrixXd Sphara::makeSpharaProjector(const MatrixXd& matBaseFct,
     MatrixXd matSpharaOperator = MatrixXd::Identity(iOperatorDim, iOperatorDim);
 
     if(matBaseFct.size() == 0) {
-        qWarning()<<"Sphara::makeSpharaProjector - Basis function matrix was empty. Returning identity matrix instead.";
+        qWarning()<<"[RTPROCESSINGLIB::makeSpharaProjector] Basis function matrix was empty. Returning identity matrix instead.";
         return matSpharaOperator;
     }
 
@@ -89,7 +83,7 @@ MatrixXd Sphara::makeSpharaProjector(const MatrixXd& matBaseFct,
                 if((r < vecIndices.rows() || c < vecIndices.rows()) && (rowIndex < matSpharaMultGrad.rows() || colIndex < matSpharaMultGrad.cols())) {
                     matSpharaOperator(vecIndices(r),vecIndices(c)) = matSpharaMultGrad(rowIndex,colIndex);
                 } else {
-                    qWarning()<<"Sphara::makeSpharaProjector - Index is out of range. Returning identity matrix.";
+                    qWarning()<<"RTPROCESSINGLIB::makeSpharaProjector - Index is out of range. Returning identity matrix.";
                     //matSpharaOperator.setZero();
                     matSpharaOperator = MatrixXd::Identity(iOperatorDim, iOperatorDim);
                     return matSpharaOperator;

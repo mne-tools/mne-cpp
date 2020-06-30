@@ -32,8 +32,8 @@
  *
  */
 
-#ifndef DETECTTRIGGER_H
-#define DETECTTRIGGER_H
+#ifndef DETECTTRIGGER_RTPROCESSING_H
+#define DETECTTRIGGER_RTPROCESSING_H
 
 //=============================================================================================================
 // INCLUDES
@@ -186,4 +186,4 @@ public:
 
 } // NAMESPACE
 
-#endif // DETECTTRIGGER_H
+#endif // DETECTTRIGGER_RTPROCESSING_H
