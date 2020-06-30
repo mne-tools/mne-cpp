@@ -67,6 +67,7 @@ using namespace ANSHAREDLIB;
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
+#define ALLGROUPS 9999
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -116,6 +117,9 @@ bool AnnotationModel::insertRows(int position, int span, const QModelIndex & par
         msgBox.setText("Unable to add user Event.");
         msgBox.setInformativeText("Please create an event group.");
         msgBox.exec();
+        return false;
+    }
+    if (m_iSelectedGroup == ALLGROUPS){
         return false;
     }
 
@@ -299,7 +303,6 @@ bool AnnotationModel::setData(const QModelIndex &index, const QVariant &value, i
 
     //Update filtered event data
     setEventFilterType(m_sFilterEventType);
-    emit dataChanged(QModelIndex(), QModelIndex());
 
     return true;
 }
@@ -632,9 +635,9 @@ int AnnotationModel::createGroup(QString sGroupName, bool bIsUserMade, int iType
 
 void AnnotationModel::switchGroup(int iGroupIndex)
 {
-    qDebug() << "AnnotationModel::switchGroup";
+    beginResetModel();
 
-    if (!m_dataSamples.isEmpty()){
+    if ((!m_dataSamples.isEmpty()) && (m_iSelectedGroup != ALLGROUPS)){
         m_mAnnotationHub[m_iSelectedGroup]->dataSamples = m_dataSamples;
         m_mAnnotationHub[m_iSelectedGroup]->dataTypes = m_dataTypes;
         m_mAnnotationHub[m_iSelectedGroup]->dataIsUserEvent = m_dataIsUserEvent;
@@ -656,7 +659,7 @@ void AnnotationModel::switchGroup(int iGroupIndex)
     m_bIsUserMade = m_mAnnotationHub[iGroupIndex]->isUserMade;
     m_iType = m_mAnnotationHub[iGroupIndex]->groupType;
 
-    emit dataChanged(QModelIndex(), QModelIndex());
+    endResetModel();
 }
 
 //=============================================================================================================
@@ -684,8 +687,10 @@ bool AnnotationModel::getHubUserMade(int iIndex)
 
 void AnnotationModel::showAll(bool bSet)
 {
+    beginResetModel();
+
     if (bSet) {
-        if (!m_dataSamples.isEmpty()){
+        if ((!m_dataSamples.isEmpty()) && (m_iSelectedGroup != ALLGROUPS)){
             m_mAnnotationHub[m_iSelectedGroup]->dataSamples = m_dataSamples;
             m_mAnnotationHub[m_iSelectedGroup]->dataTypes = m_dataTypes;
             m_mAnnotationHub[m_iSelectedGroup]->dataIsUserEvent = m_dataIsUserEvent;
@@ -695,12 +700,48 @@ void AnnotationModel::showAll(bool bSet)
             m_mAnnotationHub[m_iSelectedGroup]->dataIsUserEvent_Filtered = m_dataIsUserEvent_Filtered;
         }
 
-        m_dataSamples.clear();
-        m_dataTypes.clear();
-        m_dataIsUserEvent.clear();
+        m_iSelectedGroup = ALLGROUPS;
 
-        m_dataSamples_Filtered.clear();
-        m_dataTypes_Filtered.clear();
-        m_dataIsUserEvent_Filtered.clear();
+        resetSelection();
+        loadAllGroups();
     }
+
+    endResetModel();
+}
+
+//=============================================================================================================
+
+void AnnotationModel::loadAllGroups()
+{
+    for (EventGroup* e : m_mAnnotationHub) {
+        m_dataSamples.append(e->dataSamples);
+        m_dataTypes.append(e->dataTypes);
+        m_dataIsUserEvent.append(e->dataIsUserEvent);
+
+        m_dataSamples_Filtered.append(e->dataSamples_Filtered);
+        m_dataTypes_Filtered.append(e->dataTypes_Filtered);
+        m_dataIsUserEvent_Filtered = e->dataIsUserEvent_Filtered;
+    }
+}
+
+//=============================================================================================================
+
+void AnnotationModel::resetSelection()
+{
+    m_dataSamples.clear();
+    m_dataTypes.clear();
+    m_dataIsUserEvent.clear();
+
+    m_dataSamples_Filtered.clear();
+    m_dataTypes_Filtered.clear();
+    m_dataIsUserEvent_Filtered.clear();
+}
+
+//=============================================================================================================
+
+void AnnotationModel::hideAll()
+{
+    beginResetModel();
+    resetSelection();
+    endResetModel();
 }

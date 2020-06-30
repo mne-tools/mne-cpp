@@ -133,7 +133,7 @@ void AnnotationDelegate::setEditorData(QWidget *editor, const QModelIndex &index
 void AnnotationDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
                                     const QModelIndex &index) const
 {
-    //qDebug() << "setModelData";
+    qDebug() << "setModelData";
     switch(index.column()) {
         case 0: {
             QSpinBox *spinBox = static_cast<QSpinBox*>(editor);
@@ -168,6 +168,7 @@ void AnnotationDelegate::setModelData(QWidget *editor, QAbstractItemModel *model
 void AnnotationDelegate::updateEditorGeometry(QWidget *editor,
     const QStyleOptionViewItem &option, const QModelIndex &/* index */) const
 {
+    qDebug() << "updateEditorGeometry";
     editor->setGeometry(option.rect);
 }
 

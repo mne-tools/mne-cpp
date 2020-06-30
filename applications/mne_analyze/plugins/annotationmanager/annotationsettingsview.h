@@ -232,8 +232,19 @@ private:
      */
     void initMSVCSettings();
 
+    //=========================================================================================================
+    /**
+     * Creates a new user-made group of events
+     *
+     * @param[in] sName     group name
+     * @param[in] iType     group default type
+     */
     void newUserGroup(QString sName, int iType = 0);
 
+    //=========================================================================================================
+    /**
+     * Changes currently loaded group based on selection in the group list view
+     */
     void groupChanged();
 
     Ui::EventWindowDockWidget*                      m_pUi;                          /** < Pointer to GUI elements */

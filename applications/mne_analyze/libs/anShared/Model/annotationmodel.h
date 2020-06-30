@@ -291,17 +291,70 @@ public:
      */
     MatrixXi getAnnotationMatrix();
 
+    //=========================================================================================================
+    /**
+     * Creates a new event group with the passed parameters
+     *
+     * @param[in] sGroupName        name of the group
+     * @param[in] bIsUserMade       whether the group is user made
+     * @param[in] iType             default group type when adding events
+     *
+     * @return the index of the newly added group
+     */
     int createGroup(QString sGroupName, bool bIsUserMade = false, int iType = 0);
 
+    //=========================================================================================================
+    /**
+     * Switches to a group based on the index, triggers view to update
+     *
+     * @param[in] iGroupIndex   index of desired group
+     */
     void switchGroup(int iGroupIndex);
 
+    //=========================================================================================================
+    /**
+     * Retruns how many groups are stored in m_mAnnotationHub
+     *
+     * @return the amount of groups stored
+     */
     int getHubSize();
 
+    //=========================================================================================================
+    /**
+     * Returns whether the group at a certain index is user made
+     *
+     * @param[in] iIndex    index of the stored group
+     *
+     * @return whether the group is user made
+     */
     bool getHubUserMade(int iIndex);
 
+    //=========================================================================================================
+    /**
+     * Retruns whether current slected group is made by the user
+     *
+     * @return whether current group is use made
+     */
     bool isUserMade();
 
+    /**
+     * Displays all events from all groups and triggers view updates
+     *
+     * @param[in] bSet      whether the checkbox is checked or not
+     */
     void showAll(bool bSet);
+
+    //=========================================================================================================
+    /**
+     * Loads events from all groups
+     */
+    void loadAllGroups();
+
+    //=========================================================================================================
+    /**
+     * Clears events and triggers view to update
+     */
+    void hideAll();
 
     //=========================================================================================================
     /**
@@ -346,11 +399,15 @@ signals:
 
 private:
 
-    void loadAllGroups();
+    //=========================================================================================================
+    /**
+     * Clears selected group of events
+     */
+    void resetSelection();
 
     QStringList                         m_eventTypeList;
 
-    QMap<int,EventGroup*>            m_mAnnotationHub;
+    QMap<int,EventGroup*>               m_mAnnotationHub;
 
     int                                 m_iSelectedGroup;
 
