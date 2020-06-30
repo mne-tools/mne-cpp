@@ -174,6 +174,8 @@ protected slots:
      */
     void onSelectedEventsChecked(int iCheckBoxState);
 
+    void onShowAllChecked(int iCheckBoxState);
+
     //=========================================================================================================
     /**
      * Sets the current selected annotation in the gui and passes it to the model

@@ -293,13 +293,15 @@ public:
 
     int createCategory(QString sCategoryName, bool bIsUserMade = false, int iType = 0);
 
-    void swithCategories(int iCategoryIndex);
+    void switchCategories(int iCategoryIndex);
 
     int getHubSize();
 
     bool getHubUserMade(int iIndex);
 
     bool isUserMade();
+
+    void showAll(bool bSet);
 
     //=========================================================================================================
     /**

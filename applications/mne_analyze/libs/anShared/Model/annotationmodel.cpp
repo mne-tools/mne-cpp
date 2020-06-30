@@ -630,7 +630,7 @@ int AnnotationModel::createCategory(QString sCategoryName, bool bIsUserMade, int
 
 //=============================================================================================================
 
-void AnnotationModel::swithCategories(int iCategoryIndex)
+void AnnotationModel::switchCategories(int iCategoryIndex)
 {
     qDebug() << "AnnotationModel::swithCategories";
 
@@ -678,4 +678,31 @@ int AnnotationModel::getHubSize()
 bool AnnotationModel::getHubUserMade(int iIndex)
 {
     return m_mAnnotationHub[iIndex]->isUserMade;
+}
+
+//=============================================================================================================
+
+void AnnotationModel::showAll(bool bSet)
+{
+    if (bSet) {
+        if (!m_dataSamples.isEmpty()){
+            m_mAnnotationHub[m_iSelectedCategory]->dataSamples = m_dataSamples;
+            m_mAnnotationHub[m_iSelectedCategory]->dataTypes = m_dataTypes;
+            m_mAnnotationHub[m_iSelectedCategory]->dataIsUserEvent = m_dataIsUserEvent;
+
+            m_mAnnotationHub[m_iSelectedCategory]->dataSamples_Filtered = m_dataSamples_Filtered;
+            m_mAnnotationHub[m_iSelectedCategory]->dataTypes_Filtered = m_dataTypes_Filtered;
+            m_mAnnotationHub[m_iSelectedCategory]->dataIsUserEvent_Filtered = m_dataIsUserEvent_Filtered;
+        }
+
+        m_dataSamples.clear();
+        m_dataTypes.clear();
+        m_dataIsUserEvent.clear();
+
+        m_dataSamples_Filtered.clear();
+        m_dataTypes_Filtered.clear();
+        m_dataIsUserEvent_Filtered.clear();
+
+
+    }
 }
