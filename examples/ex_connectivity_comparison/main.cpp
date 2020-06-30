@@ -235,7 +235,7 @@ int main(int argc, char *argv[])
                                                          iEvent,
                                                          mapReject);
     data.dropRejected();
-    QPair<QVariant, QVariant> pair(QVariant(fTMin), QVariant("0.0"));
+    QPair<float, float> pair(fTMin, 0.0f);
     data.applyBaselineCorrection(pair);
 
     FiffEvoked evoked = data.average(raw.info,

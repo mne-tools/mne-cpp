@@ -89,19 +89,19 @@ public:
     /**
      * Creates the real-time averaging object.
      *
-     * @param[in] numAverages            Number of evkos to average
+     * @param[in] numAverages          Number of evkos to average
      * @param[in] iPreStimSamples      Number of samples averaged before the stimulus
      * @param[in] iPostStimSamples     Number of samples averaged after the stimulus (including the stimulus)
-     * @param[in] iBaselineFromSecs    Start of baseline area which was/is used for correction in msecs
-     * @param[in] iBaselineToSSecs     End of baseline area which was/is used for correction in msecs
+     * @param[in] iBaselineFromMSecs   Start of baseline area which was/is used for correction in msecs
+     * @param[in] iBaselineToMSecs     End of baseline area which was/is used for correction in msecs
      * @param[in] iTriggerIndex        Row in dex of channel which is to be scanned for triggers
      * @param[in] pFiffInfo            Associated Fiff Information
      */
     RtAveragingWorker(quint32 numAverages,
                       quint32 iPreStimSamples,
                       quint32 iPostStimSamples,
-                      quint32 iBaselineFromSecs,
-                      quint32 iBaselineToSecs,
+                      quint32 iBaselineFromMSecs,
+                      quint32 iBaselineToMSecs,
                       quint32 iTriggerIndex,
                       FIFFLIB::FiffInfo::SPtr pFiffInfo);
 
@@ -250,8 +250,8 @@ protected:
 
     bool                                            m_bDoBaselineCorrection;    /**< Whether to perform baseline correction. */
 
-    QPair<QVariant,QVariant>                        m_pairBaselineSec;          /**< Baseline information in seconds form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
-    QPair<QVariant,QVariant>                        m_pairBaselineSamp;         /**< Baseline information in samples form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
+    QPair<float,float>                              m_pairBaselineSec;          /**< Baseline information in seconds form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
+    QPair<float,float>                              m_pairBaselineSamp;         /**< Baseline information in samples form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
 
     FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;                /**< Holds the fiff measurement information. */
     FIFFLIB::FiffEvokedSet                          m_stimEvokedSet;            /**< Holds the evoked information. */

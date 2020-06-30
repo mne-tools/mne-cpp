@@ -482,7 +482,7 @@ int main(int argc, char *argv[])
 
     FiffEvoked evoked = data.average(raw.info, tmin*raw.info.sfreq, floor(tmax*raw.info.sfreq + 0.5), vecSel, true); //FIFFLIB::defaultVectorXi
 
-    QPair<QVariant, QVariant> baseline(QVariant(), 0);
+    QPair<float, float> baseline(-1.0f, -1.0f);
     evoked.applyBaselineCorrection(baseline);
 
     //########################################################################################

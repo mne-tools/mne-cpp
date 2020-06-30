@@ -103,7 +103,7 @@ public:
      *
      * @param[in] baseline     time definition of the baseline in seconds [from, to]
      */
-    void applyBaselineCorrection(QPair<QVariant,QVariant>& baseline);
+    void applyBaselineCorrection(const QPair<float,float>& baseline);
 
         //=========================================================================================================
     /**
@@ -117,17 +117,17 @@ public:
     /**
      * Comparison of two Epoch data
      *
-     * @param[in] MED_other     Epoch data to compare with
+     * @param[in] b     Epoch data to compare with
      *
      * @return true if equal; false otherwise
      */
-    bool operator== (const MNEEpochData& MED_other) const
+    friend bool operator== (const MNEEpochData &a, const MNEEpochData &b)
     {
-        return (this->epoch == MED_other.epoch &&
-                this->event == MED_other.event&&
-                this->tmin == MED_other.tmin&&
-                this->tmax == MED_other.tmax&&
-                this->bReject == MED_other.bReject);
+        return (a.epoch == b.epoch &&
+                a.event == b.event&&
+                a.tmin == b.tmin&&
+                a.tmax == b.tmax&&
+                a.bReject == b.bReject);
     }
 
 public:

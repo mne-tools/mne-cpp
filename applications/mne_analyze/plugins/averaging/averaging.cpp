@@ -405,8 +405,8 @@ void Averaging::computeAverage()
     m_pFiffEvokedSet->info = *(m_pFiffRawModel->getFiffInfo().data());
 
     if(m_bBasline){
-        m_pFiffEvokedSet->evoked[0].baseline.first = QVariant(m_fBaselineFrom);
-        m_pFiffEvokedSet->evoked[0].baseline.second = QVariant(m_fBaselineTo);
+        m_pFiffEvokedSet->evoked[0].baseline.first = m_fBaselineFrom;
+        m_pFiffEvokedSet->evoked[0].baseline.second = m_fBaselineTo;
     }
 
     m_pEvokedModel->setEvokedSet(m_pFiffEvokedSet);

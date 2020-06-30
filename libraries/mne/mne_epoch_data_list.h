@@ -103,8 +103,6 @@ public:
      * @param[in] tmin           The start time relative to the event in seconds.
      * @param[in] tmax           The end time relative to the event in seconds.
      * @param[in] event          The event kind.
-     * @param[in] dThreshold     The threshold value to use to reject epochs. Default is set to 0.0.
-     * @param[in] sChType        The channel data type to scan for. EEG, MEG or EOG. Default is none.
      * @param[in] lExcludeChs    List of channel names to exclude.
      * @param[in] picks          Which channels to pick.
      */
@@ -127,7 +125,7 @@ public:
      * @param[in] sel      Which epochs should be averaged (optional)
      * @param[in] proj     Apply SSP projection vectors (optional, default = false)
      */
-    FIFFLIB::FiffEvoked average(FIFFLIB::FiffInfo& p_info,
+    FIFFLIB::FiffEvoked average(const FIFFLIB::FiffInfo &p_info,
                                 FIFFLIB::fiff_int_t first,
                                 FIFFLIB::fiff_int_t last,
                                 Eigen::VectorXi sel = FIFFLIB::defaultVectorXi,
@@ -139,7 +137,7 @@ public:
      *
      * @param[in] baseline     time definition of the baseline in seconds [from, to]
      */
-    void applyBaselineCorrection(QPair<QVariant,QVariant>& baseline);
+    void applyBaselineCorrection(const QPair<float, float> &baseline);
 
     //=========================================================================================================
     /**
