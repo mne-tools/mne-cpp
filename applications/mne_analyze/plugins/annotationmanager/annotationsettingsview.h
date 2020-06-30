@@ -232,9 +232,9 @@ private:
      */
     void initMSVCSettings();
 
-    void newUserCateogry(QString sName, int iType = 0);
+    void newUserGroup(QString sName, int iType = 0);
 
-    void categoryChanged();
+    void groupChanged();
 
     Ui::EventWindowDockWidget*                      m_pUi;                          /** < Pointer to GUI elements */
 
