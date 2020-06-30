@@ -1,14 +1,13 @@
 //=============================================================================================================
 /**
  * @file     main.cpp
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
- *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @since    0.1.0
- * @date     July, 2012
+ * @author   Lorenz Esch <lesch@mgh.harvard.edu>
+ * @since    0.1.3
+ * @date     July, 2020
  *
  * @section  LICENSE
  *
- * Copyright (C) 2012, Christoph Dinh, Lorenz Esch. All rights reserved.
+ * Copyright (C) 2020, Lorenz Esch. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -29,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Read epoch data from a raw data file
+ * @brief    Average data from a raw data file
  *
  */
 
@@ -41,16 +40,14 @@
 #include <vector>
 #include <math.h>
 
-//=============================================================================================================
-// MNE INCLUDES
-//=============================================================================================================
-
 #include <fiff/fiff.h>
-#include <mne/mne.h>
 
+#include <mne/mne.h>
 #include <mne/mne_epoch_data_list.h>
 
 #include <utils/generics/applicationlogger.h>
+
+#include <rtprocessing/averaging.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -67,6 +64,7 @@ using namespace FIFFLIB;
 using namespace MNELIB;
 using namespace UTILSLIB;
 using namespace Eigen;
+using namespace RTPROCESSINGLIB;
 
 //=============================================================================================================
 // MAIN
@@ -88,7 +86,7 @@ int main(int argc, char *argv[])
 
     // Command Line Parser
     QCommandLineParser parser;
-    parser.setApplicationDescription("Read Epochs Example");
+    parser.setApplicationDescription("Average Data Example");
     parser.addHelpOption();
 
     QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
@@ -168,14 +166,17 @@ int main(int argc, char *argv[])
     QMap<QString,double> mapReject;
     mapReject.insert("eog", 300e-06);
 
-    MNEEpochDataList data = MNEEpochDataList::readEpochs(raw,
-                                                         events,
-                                                         fTMin,
-                                                         fTMax,
-                                                         event,
-                                                         mapReject,
-                                                         QStringList(),
-                                                         picks);
+    FiffEvoked evoked = RTPROCESSINGLIB::computeAverage(raw,
+                                                        events,
+                                                        fTMin,
+                                                        fTMax,
+                                                        event,
+                                                        -1.0f,
+                                                        -1.0f,
+                                                        true,
+                                                        mapReject,
+                                                        QStringList(),
+                                                        picks);
 
     return a.exec();
 }

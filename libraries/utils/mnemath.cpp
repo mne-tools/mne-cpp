@@ -369,11 +369,11 @@ MatrixXd MNEMath::rescale(const MatrixXd &data,
     valid_modes << "logratio" << "ratio" << "zscore" << "mean" << "percent";
     if(!valid_modes.contains(mode))
     {
-        qWarning() << "[MNEMath::rescale] Mode" << mode << "is not supported. Supported modes are:" << valid_modes << "Returning input data.";
+        qWarning().noquote() << "[MNEMath::rescale] Mode" << mode << "is not supported. Supported modes are:" << valid_modes << "Returning input data.";
         return data_out;
     }
 
-    qInfo() << QString("[MNEMath::rescale] Applying baseline correction ... (mode: %1)").arg(mode);
+    qInfo().noquote() << QString("[MNEMath::rescale] Applying baseline correction ... (mode: %1)").arg(mode);
 
     qint32 imin = 0;
     qint32 imax = times.size();
