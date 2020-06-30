@@ -41,9 +41,6 @@
 
 #include "rtprocessing_global.h"
 
-#include <fiff/fiff_evoked_set.h>
-#include <fiff/fiff_info.h>
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -60,6 +57,11 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+namespace FIFFLIB {
+    class FiffEvoked;
+    class FiffRawData;
+}
+
 //=============================================================================================================
 // DEFINE NAMESPACE RTPROCESSINGLIB
 //=============================================================================================================
@@ -73,38 +75,24 @@ namespace RTPROCESSINGLIB
 
 //=============================================================================================================
 /**
- * Averaging can be used to compute averages.
+ * Compute the average for given fiff raw data.
  *
- * @brief Averaging can be used to compute averages.
+ * @param[in] raw            The raw data.
+ * @param[in] events         The events provided in samples and event kind.
+ * @param[in] tmin           The start time relative to the event in seconds.
+ * @param[in] tmax           The end time relative to the event in seconds.
+ * @param[in] eventType      The event type.
+ * @param[in] lExcludeChs    List of channel names to exclude.
+ * @param[in] picks          Which channels to pick.
  */
-class RTPROCESINGSHARED_EXPORT Averaging : public QObject
-{
-    Q_OBJECT
-
-public:
-    typedef QSharedPointer<Averaging> SPtr;             /**< Shared pointer type for Averaging. */
-    typedef QSharedPointer<const Averaging> ConstSPtr;  /**< Const shared pointer type for Averaging. */
-
-    //=========================================================================================================
-    /**
-     * Creates the averaging object.
-     *
-     * @param[in] parent     The parent QObject. Default is set to 0.
-     */
-    explicit Averaging(QObject *parent = 0);
-
-    //=========================================================================================================
-    /**
-     * Destroys the real-time averaging object.
-     */
-    ~Averaging();
-
-private:
-};
-
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
+FIFFLIB::FiffEvoked computeAverage(const FIFFLIB::FiffRawData& raw,
+                                   const Eigen::MatrixXi& events,
+                                   float tmin,
+                                   float tmax,
+                                   qint32 eventType,
+                                   const QMap<QString,double>& mapReject,
+                                   const QStringList &lExcludeChs = QStringList(),
+                                   const Eigen::RowVectorXi& picks = Eigen::RowVectorXi());
 
 } // NAMESPACE
 

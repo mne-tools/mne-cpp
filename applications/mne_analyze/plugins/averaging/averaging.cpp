@@ -56,13 +56,12 @@
 #include <disp/viewers/scalingview.h>
 
 #include <rtprocessing/helpers/filterkernel.h>
-
-#include <mne/mne_epoch_data_list.h>
-#include <mne/mne_epoch_data.h>
+#include <rtprocessing/averaging.h>
 
 #include <fiff/fiff_evoked_set.h>
 #include <fiff/fiff_evoked.h>
 #include <fiff/fiff_info.h>
+
 
 //=============================================================================================================
 // QT INCLUDES
@@ -381,7 +380,6 @@ void Averaging::computeAverage()
 
     MatrixXi matEvents;
     QMap<QString,double> mapReject;
-    MNELIB::MNEEpochDataList lstEpochDataList;
 
     m_pFiffEvoked = QSharedPointer<FIFFLIB::FiffEvoked>(new FIFFLIB::FiffEvoked());
     int iType = 1; //hardwired for now, change later to type
@@ -395,34 +393,12 @@ void Averaging::computeAverage()
         //NOT IMPLEMENTED
     }
 
-    lstEpochDataList = MNELIB::MNEEpochDataList::readEpochs(*pFiffRaw,
-                                                            matEvents,
-                                                            m_fPreStim,
-                                                            m_fPostStim,
-                                                            iType,
-                                                            mapReject);
-
-    if(m_bBasline){
-        QPair<QVariant, QVariant> baselinePair;
-        baselinePair.first = QVariant(m_fBaselineFrom);
-        baselinePair.second = QVariant(m_fBaselineTo);
-        lstEpochDataList.applyBaselineCorrection(baselinePair);
-    }
-
-    if(m_bRejection){
-        lstEpochDataList.dropRejected();
-    }
-
-    *m_pFiffEvoked = lstEpochDataList.average(pFiffRaw->info,
-                                            0,
-                                            lstEpochDataList.first()->epoch.cols());
-
-//    //DEBUG
-//    std::cout << "lstEpochDataList.first()->epoch.cols()" << lstEpochDataList.first()->epoch.cols() << std::endl;
-//    std::cout << "lstEpochDataList.first()->tmin" << lstEpochDataList.first()->tmin<< std::endl;
-//    std::cout << "lstEpochDataList.first()->tmax" << lstEpochDataList.first()->tmax<< std::endl;
-//    std::cout << "m_pFiffEvoked->data.block(0,0,10,10)" << m_pFiffEvoked->data.block(0,0,10,10) << std::endl;
-//    std::cout << "m_pFiffEvoked->data.cols()" << m_pFiffEvoked->data.cols()<< std::endl;
+    *m_pFiffEvoked = RTPROCESSINGLIB::computeAverage(*pFiffRaw,
+                                                     matEvents,
+                                                     m_fPreStim,
+                                                     m_fPostStim,
+                                                     iType,
+                                                     mapReject);
 
     m_pFiffEvokedSet = QSharedPointer<FIFFLIB::FiffEvokedSet>(new FIFFLIB::FiffEvokedSet());
     m_pFiffEvokedSet->evoked.append(*(m_pFiffEvoked.data()));
