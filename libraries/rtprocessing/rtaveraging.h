@@ -33,8 +33,8 @@
  *
  */
 
-#ifndef RTAVERAGING_H
-#define RTAVERAGING_H
+#ifndef RTAVERAGING_RTPROCESSING_H
+#define RTAVERAGING_RTPROCESSING_H
 
 //=============================================================================================================
 // INCLUDES
@@ -476,4 +476,4 @@ inline bool RtAveragingWorker::controlValuesChanged()
 }
 } // NAMESPACE
 
-#endif // RTAVERAGING_H
+#endif // RTAVERAGING_RTPROCESSING_H

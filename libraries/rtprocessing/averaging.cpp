@@ -38,11 +38,7 @@
 
 #include "averaging.h"
 
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_info.h>
-
 #include <mne/mne_epoch_data_list.h>
-#include <mne/mne_epoch_data.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -64,8 +60,8 @@ using namespace MNELIB;
 // DEFINE GLOBAL RTPROCESSINGLIB METHODS
 //=============================================================================================================
 
-FiffEvoked RTPROCESSINGLIB::computeAverage(const FIFFLIB::FiffRawData& raw,
-                                           const Eigen::MatrixXi& matEvents,
+FiffEvoked RTPROCESSINGLIB::computeAverage(const FiffRawData& raw,
+                                           const MatrixXi& matEvents,
                                            float fTMinS,
                                            float fTMaxS,
                                            qint32 eventType,

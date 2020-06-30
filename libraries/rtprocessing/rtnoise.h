@@ -33,8 +33,8 @@
  *
  */
 
-#ifndef RTNOISE_H
-#define RTNOISE_H
+#ifndef RTNOISE_RTPROCESSING_H
+#define RTNOISE_RTPROCESSING_H
 
 //=============================================================================================================
 // INCLUDES
@@ -198,4 +198,4 @@ inline bool RtNoise::isRunning()
 Q_DECLARE_METATYPE(Eigen::MatrixXd); /**< Provides QT META type declaration of the Eigen::MatrixXd type. For signal/slot usage.*/
 #endif
 
-#endif // RtNoise_H
+#endif // RTNOISE_RTPROCESSING_H

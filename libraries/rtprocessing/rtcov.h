@@ -33,8 +33,8 @@
  *
  */
 
-#ifndef RTCOV_H
-#define RTCOV_H
+#ifndef RTCOV_RTPROCESSING_H
+#define RTCOV_RTPROCESSING_H
 
 //=============================================================================================================
 // INCLUDES
@@ -136,4 +136,4 @@ protected:
 //=============================================================================================================
 } // NAMESPACE
 
-#endif // RTCOV_H
+#endif // RTCOV_RTPROCESSING_H
