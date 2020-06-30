@@ -81,7 +81,7 @@ MNEEpochData::~MNEEpochData()
 
 //=============================================================================================================
 
-void MNEEpochData::applyBaselineCorrection(QPair<QVariant, QVariant>& baseline)
+void MNEEpochData::applyBaselineCorrection(const QPair<float, float>& baseline)
 {
     // Run baseline correction
     RowVectorXf times = RowVectorXf::LinSpaced(this->epoch.cols(), this->tmin, this->tmax);

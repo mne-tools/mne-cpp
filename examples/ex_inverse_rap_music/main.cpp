@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
 
     // Load data
     fiff_int_t setno = 1;
-    QPair<QVariant, QVariant> baseline(QVariant(), 0);
+    QPair<float, float> baseline(-1.0f, -1.0f);
     FiffEvoked evoked(t_fileEvoked, setno, baseline);
     if(evoked.isEmpty())
         return 1;

@@ -419,7 +419,7 @@ public:
     static inline bool read_evoked(QIODevice& p_IODevice,
                                    FiffEvoked& data,
                                    QVariant setno = 0,
-                                   QPair<QVariant,QVariant> baseline = defaultVariantPair,
+                                   QPair<float,float> baseline = defaultFloatPair,
                                    bool proj = true,
                                    fiff_int_t p_aspect_kind = FIFFV_ASPECT_AVERAGE)
     {

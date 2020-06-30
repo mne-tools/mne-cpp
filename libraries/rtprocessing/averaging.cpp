@@ -38,7 +38,6 @@
 
 #include "averaging.h"
 
-#include <fiff/fiff_evoked.h>
 #include <fiff/fiff_raw_data.h>
 #include <fiff/fiff_info.h>
 
@@ -57,24 +56,22 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace RTPROCESSINGLIB;
 using namespace FIFFLIB;
 using namespace Eigen;
 using namespace MNELIB;
 
-
 //=============================================================================================================
-// DEFINE GLOBAL METHODS
+// DEFINE GLOBAL RTPROCESSINGLIB METHODS
 //=============================================================================================================
 
-FiffEvoked computeAverage(const FiffRawData& raw,
-                          const MatrixXi& events,
-                          float tmin,
-                          float tmax,
-                          qint32 eventType,
-                          const QMap<QString,double>& mapReject,
-                          const QStringList& lExcludeChs,
-                          const RowVectorXi& picks)
+FiffEvoked RTPROCESSINGLIB::computeAverage(const FiffRawData& raw,
+                                           const MatrixXi& events,
+                                           float tmin,
+                                           float tmax,
+                                           qint32 eventType,
+                                           const QMap<QString,double>& mapReject,
+                                           const QStringList& lExcludeChs,
+                                           const RowVectorXi& picks)
 {
 
     MNEEpochDataList lstEpochDataList = MNEEpochDataList::readEpochs(raw,
@@ -87,7 +84,7 @@ FiffEvoked computeAverage(const FiffRawData& raw,
                                                                      picks);
 
 //    if(m_bBasline){
-//        QPair<QVariant, QVariant> baselinePair;
+//        QPair<float, float> baselinePair;
 //        baselinePair.first = QVariant(m_fBaselineFrom);
 //        baselinePair.second = QVariant(m_fBaselineTo);
 //        lstEpochDataList.applyBaselineCorrection(baselinePair);

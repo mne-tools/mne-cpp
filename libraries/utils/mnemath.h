@@ -254,9 +254,7 @@ public:
      * @param[in] data           Data Matrix (m x n_time)
      * @param[in] times          Time instants is seconds.
      * @param[in] baseline       If baseline is (a, b) the interval is between "a (s)" and "b (s)".
-     *                           If a is invalid the beginning of the data is used and if b is invalid then b is set to the end of the interval.
-     *                           If baseline is equal to (invalid, invalid) all the time interval is used.
-     * @param[in] baseline_usage See description of parameter baseline.
+     *                           If a and b are equal use interval between the beginning of the data and the time point 0 (stimulus onset).
      * @param[in] mode           Do baseline correction with ratio (power is divided by mean power during baseline) or zscore (power is divided by standard
      *                           deviatio of power during baseline after substracting the mean, power = [power - mean(power_baseline)] / std(power_baseline)).
      *                           ("logratio" | "ratio" | "zscore" | "mean" | "percent")
@@ -265,7 +263,7 @@ public:
      */
     static Eigen::MatrixXd rescale(const Eigen::MatrixXd &data,
                                    const Eigen::RowVectorXf &times,
-                                   QPair<QVariant,QVariant> baseline,
+                                   const QPair<float, float> &baseline,
                                    QString mode);
 
     //=========================================================================================================

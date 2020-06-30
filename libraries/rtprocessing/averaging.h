@@ -41,6 +41,8 @@
 
 #include "rtprocessing_global.h"
 
+#include <fiff/fiff_evoked.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -58,7 +60,6 @@
 //=============================================================================================================
 
 namespace FIFFLIB {
-    class FiffEvoked;
     class FiffRawData;
 }
 
@@ -85,14 +86,14 @@ namespace RTPROCESSINGLIB
  * @param[in] lExcludeChs    List of channel names to exclude.
  * @param[in] picks          Which channels to pick.
  */
-FIFFLIB::FiffEvoked computeAverage(const FIFFLIB::FiffRawData& raw,
-                                   const Eigen::MatrixXi& events,
-                                   float tmin,
-                                   float tmax,
-                                   qint32 eventType,
-                                   const QMap<QString,double>& mapReject,
-                                   const QStringList &lExcludeChs = QStringList(),
-                                   const Eigen::RowVectorXi& picks = Eigen::RowVectorXi());
+RTPROCESINGSHARED_EXPORT FIFFLIB::FiffEvoked computeAverage(const FIFFLIB::FiffRawData& raw,
+                                                            const Eigen::MatrixXi& events,
+                                                            float tmin,
+                                                            float tmax,
+                                                            qint32 eventType,
+                                                            const QMap<QString,double>& mapReject,
+                                                            const QStringList &lExcludeChs = QStringList(),
+                                                            const Eigen::RowVectorXi& picks = Eigen::RowVectorXi());
 
 } // NAMESPACE
 

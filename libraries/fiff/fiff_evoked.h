@@ -99,7 +99,11 @@ public:
      * @param[in] proj           Apply SSP projection vectors (optional, default = true)
      * @param[in] p_aspect_kind  Either "FIFFV_ASPECT_AVERAGE" or "FIFFV_ASPECT_STD_ERR". The type of data to read. Only used if "setno" is a str.
      */
-    FiffEvoked(QIODevice& p_IODevice, QVariant setno = 0, QPair<QVariant,QVariant> t_baseline = defaultVariantPair, bool proj = true, fiff_int_t p_aspect_kind = FIFFV_ASPECT_AVERAGE);
+    FiffEvoked(QIODevice& p_IODevice,
+               QVariant setno = 0,
+               QPair<float,float> t_baseline = defaultFloatPair,
+               bool proj = true,
+               fiff_int_t p_aspect_kind = FIFFV_ASPECT_AVERAGE);
 
     //=========================================================================================================
     /**
@@ -157,7 +161,8 @@ public:
      *
      * @return the desired fiff evoked data
      */
-    FiffEvoked pick_channels(const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList) const;
+    FiffEvoked pick_channels(const QStringList& include = defaultQStringList,
+                             const QStringList& exclude = defaultQStringList) const;
 
     //=========================================================================================================
     /**
@@ -181,7 +186,11 @@ public:
      *
      * @return true if successful, false otherwise
      */
-    static bool read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant setno = 0, QPair<QVariant,QVariant> t_baseline = defaultVariantPair, bool proj = true, fiff_int_t p_aspect_kind = FIFFV_ASPECT_AVERAGE);
+    static bool read(QIODevice& p_IODevice,
+                     FiffEvoked& p_FiffEvoked,
+                     QVariant setno = 0, QPair<float,float> t_baseline = defaultFloatPair,
+                     bool proj = true,
+                     fiff_int_t p_aspect_kind = FIFFV_ASPECT_AVERAGE);
 
     //=========================================================================================================
     /**
@@ -190,7 +199,8 @@ public:
      * @param[in] p_info     Info to set
      * @param[in] proj       Apply SSP projection vectors (optional, default = true)
      */
-    void setInfo(FiffInfo &p_info, bool proj = true);
+    void setInfo(const FiffInfo &p_info,
+                 bool proj = true);
 
     //=========================================================================================================
     /**
@@ -208,7 +218,7 @@ public:
      *
      * @param[in] p_baseline     time definition of the baseline in seconds [from, to]
      */
-    void applyBaselineCorrection(QPair<QVariant,QVariant>& p_baseline);
+    void applyBaselineCorrection(QPair<float,float>& p_baseline);
 
 public:
     FiffInfo                    info;               /**< Measurement info. */
@@ -220,7 +230,7 @@ public:
     Eigen::RowVectorXf          times;              /**< Vector of time instants in seconds. */
     Eigen::MatrixXd             data;               /**< 2D array of shape [n_channels x n_times]; Evoked response. */
     Eigen::MatrixXd             proj;               /**< SSP projection */
-    QPair<QVariant,QVariant>    baseline;           /**< Baseline information in seconds form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
+    QPair<float,float>          baseline;           /**< Baseline information in seconds form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
 };
 
 //=============================================================================================================

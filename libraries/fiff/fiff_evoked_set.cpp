@@ -110,7 +110,8 @@ void FiffEvokedSet::clear()
 
 //=============================================================================================================
 
-FiffEvokedSet FiffEvokedSet::pick_channels(const QStringList& include, const QStringList& exclude) const
+FiffEvokedSet FiffEvokedSet::pick_channels(const QStringList& include,
+                                           const QStringList& exclude) const
 {
     FiffEvokedSet res;
     res.info = this->info;
@@ -161,7 +162,8 @@ FiffEvokedSet FiffEvokedSet::pick_channels(const QStringList& include, const QSt
 
 //=============================================================================================================
 
-bool FiffEvokedSet::compensate_to(FiffEvokedSet& p_FiffEvokedSet, fiff_int_t to) const
+bool FiffEvokedSet::compensate_to(FiffEvokedSet& p_FiffEvokedSet,
+                                  fiff_int_t to) const
 {
     qint32 now = p_FiffEvokedSet.info.get_current_comp();
     FiffCtfComp ctf_comp;
@@ -206,7 +208,9 @@ bool FiffEvokedSet::find_evoked(const FiffEvokedSet& p_FiffEvokedSet) const
 
 //=============================================================================================================
 
-bool FiffEvokedSet::read(QIODevice& p_IODevice, FiffEvokedSet& p_FiffEvokedSet, QPair<QVariant,QVariant> baseline, bool proj)
+bool FiffEvokedSet::read(QIODevice& p_IODevice,
+                         FiffEvokedSet& p_FiffEvokedSet, QPair<float,float> baseline,
+                         bool proj)
 {
     p_FiffEvokedSet.clear();
 

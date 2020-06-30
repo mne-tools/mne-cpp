@@ -361,7 +361,7 @@ qint32 MNEMath::rank(const MatrixXd& A,
 
 MatrixXd MNEMath::rescale(const MatrixXd &data,
                           const RowVectorXf &times,
-                          QPair<QVariant,QVariant> baseline,
+                          const QPair<float,float>& baseline,
                           QString mode)
 {
     MatrixXd data_out = data;
@@ -369,60 +369,55 @@ MatrixXd MNEMath::rescale(const MatrixXd &data,
     valid_modes << "logratio" << "ratio" << "zscore" << "mean" << "percent";
     if(!valid_modes.contains(mode))
     {
-        qWarning() << "\tWarning: mode should be any of : " << valid_modes;
+        qWarning() << "[MNEMath::rescale] Mode" << mode << "is not supported. Supported modes are:" << valid_modes << "Returning input data.";
         return data_out;
     }
-    printf("\tApplying baseline correction ... (mode: %s)\n", mode.toUtf8().constData());
+
+    qInfo() << QString("[MNEMath::rescale] Applying baseline correction ... (mode: %1)").arg(mode);
 
     qint32 imin = 0;
     qint32 imax = times.size();
 
-    if(!baseline.first.isValid())
+    if (baseline.second == baseline.first) {
         imin = 0;
-    else
-    {
-        float bmin = baseline.first.toFloat();
-        for(qint32 i = 0; i < times.size(); ++i)
-        {
-            if(times[i] >= bmin)
-            {
+    } else {
+        float bmin = baseline.first;
+        for(qint32 i = 0; i < times.size(); ++i) {
+            if(times[i] >= bmin) {
                 imin = i;
                 break;
             }
         }
     }
-    if (!baseline.second.isValid())
-        imax = times.size();
-    else
-    {
-        float bmax = baseline.second.toFloat();
-        for(qint32 i = times.size()-1; i >= 0; --i)
-        {
-            if(times[i] <= bmax)
-            {
-                imax = i+1;
-                break;
-            }
+
+    float bmax = baseline.second;
+
+    if (baseline.second == baseline.first) {
+        bmax = 0;
+    }
+
+    for(qint32 i = times.size()-1; i >= 0; --i) {
+        if(times[i] <= bmax) {
+            imax = i+1;
+            break;
         }
     }
 
-    VectorXd mean = data_out.block(0, imin,data_out.rows(),imax-imin).rowwise().mean();
-    if(mode.compare("mean") == 0)
-    {
-        data_out -= mean.rowwise().replicate(data.cols());
+    if(imax < imin) {
+        qWarning() << "[MNEMath::rescale] imax < imin. Returning input data.";
+        return data_out;
     }
-    else if(mode.compare("logratio") == 0)
-    {
+
+    VectorXd mean = data_out.block(0, imin,data_out.rows(),imax-imin).rowwise().mean();
+    if(mode.compare("mean") == 0) {
+        data_out -= mean.rowwise().replicate(data.cols());
+    } else if(mode.compare("logratio") == 0) {
         for(qint32 i = 0; i < data_out.rows(); ++i)
             for(qint32 j = 0; j < data_out.cols(); ++j)
                 data_out(i,j) = log10(data_out(i,j)/mean[i]); // a value of 1 means 10 times bigger
-    }
-    else if(mode.compare("ratio") == 0)
-    {
+    } else if(mode.compare("ratio") == 0) {
         data_out = data_out.cwiseQuotient(mean.rowwise().replicate(data_out.cols()));
-    }
-    else if(mode.compare("zscore") == 0)
-    {
+    } else if(mode.compare("zscore") == 0) {
         MatrixXd std_mat = data.block(0, imin, data.rows(), imax-imin) - mean.rowwise().replicate(imax-imin);
         std_mat = std_mat.cwiseProduct(std_mat);
         VectorXd std_v = std_mat.rowwise().mean();
@@ -431,9 +426,7 @@ MatrixXd MNEMath::rescale(const MatrixXd &data,
 
         data_out -= mean.rowwise().replicate(data_out.cols());
         data_out = data_out.cwiseQuotient(std_v.rowwise().replicate(data_out.cols()));
-    }
-    else if(mode.compare("percent") == 0)
-    {
+    } else if(mode.compare("percent") == 0) {
         data_out -= mean.rowwise().replicate(data_out.cols());
         data_out = data_out.cwiseQuotient(mean.rowwise().replicate(data_out.cols()));
     }

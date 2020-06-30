@@ -72,8 +72,8 @@ using namespace MNELIB;
 RtAveragingWorker::RtAveragingWorker(quint32 numAverages,
                                      quint32 iPreStimSamples,
                                      quint32 iPostStimSamples,
-                                     quint32 iBaselineFromSecs,
-                                     quint32 iBaselineToSecs,
+                                     quint32 iBaselineFromMSecs,
+                                     quint32 iBaselineToMSecs,
                                      quint32 iTriggerIndex,
                                      FiffInfo::SPtr pFiffInfo)
 : QObject()
@@ -81,11 +81,11 @@ RtAveragingWorker::RtAveragingWorker(quint32 numAverages,
 , m_iPreStimSamples(iPreStimSamples)
 , m_iPostStimSamples(iPostStimSamples)
 , m_pFiffInfo(pFiffInfo)
-, m_fTriggerThreshold(0.5)
+, m_fTriggerThreshold(0.5f)
 , m_iTriggerChIndex(-1)
 , m_iNewTriggerIndex(iTriggerIndex)
 , m_bDoBaselineCorrection(false)
-, m_pairBaselineSec(qMakePair(QVariant(QString::number(iBaselineFromSecs)),QVariant(QString::number(iBaselineToSecs))))
+, m_pairBaselineSec(qMakePair(float(iBaselineFromMSecs),float(iBaselineToMSecs)))
 , m_bActivateThreshold(false)
 {
     m_mapThresholds["eog"] = 300e-6;
@@ -121,7 +121,7 @@ void RtAveragingWorker::doWork(const MatrixXd& rawSegment)
 void RtAveragingWorker::setAverageNumber(qint32 numAve)
 {
     if(numAve <= 0) {
-        qDebug() << "RtAveragingWorker::setAverageNumber - Number of averages <= 0 are not allowed. Returning.";
+        qDebug() << "[RtAveragingWorker::setAverageNumber] Number of averages <= 0 are not allowed. Returning.";
         return;
     }
 
@@ -192,7 +192,7 @@ void RtAveragingWorker::setBaselineActive(bool activate)
 
     if(!m_bDoBaselineCorrection) {
         for(int i = 0; i < m_stimEvokedSet.evoked.size(); ++i) {
-            m_stimEvokedSet.evoked[i].baseline = qMakePair(QVariant("None"), QVariant("None"));
+            m_stimEvokedSet.evoked[i].baseline = qMakePair(-1.0f, -1.0f);
         }
     } else {
         for(int i = 0; i < m_stimEvokedSet.evoked.size(); ++i) {
@@ -203,25 +203,27 @@ void RtAveragingWorker::setBaselineActive(bool activate)
 
 //=============================================================================================================
 
-void RtAveragingWorker::setBaselineFrom(int fromSamp, int fromMSec)
+void RtAveragingWorker::setBaselineFrom(int fromSamp,
+                                        int fromMSec)
 {
-    m_pairBaselineSec.first = QVariant(QString::number(float(fromMSec)/1000));
-    m_pairBaselineSamp.first = QVariant(QString::number(fromSamp));
+    m_pairBaselineSec.first = float(fromMSec)/1000.0f;
+    m_pairBaselineSamp.first = float(fromSamp);
 
     for(int i = 0; i < m_stimEvokedSet.evoked.size(); ++i) {
-        m_stimEvokedSet.evoked[i].baseline.first = QVariant(QString::number(float(fromMSec)/1000));
+        m_stimEvokedSet.evoked[i].baseline.first = float(fromMSec)/1000.0f;
     }
 }
 
 //=============================================================================================================
 
-void RtAveragingWorker::setBaselineTo(int toSamp, int toMSec)
+void RtAveragingWorker::setBaselineTo(int toSamp,
+                                      int toMSec)
 {
-    m_pairBaselineSec.second = QVariant(QString::number(float(toMSec)/1000));
-    m_pairBaselineSamp.second = QVariant(QString::number(toSamp));
+    m_pairBaselineSec.second = float(toMSec)/1000.0f;
+    m_pairBaselineSamp.second = float(toSamp);
 
     for(int i = 0; i < m_stimEvokedSet.evoked.size(); ++i) {
-        m_stimEvokedSet.evoked[i].baseline.second = QVariant(QString::number(float(toMSec)/1000));
+        m_stimEvokedSet.evoked[i].baseline.second = float(toMSec)/1000.0f;
     }
 }
 
@@ -417,7 +419,7 @@ void RtAveragingWorker::fillFrontBuffer(const MatrixXd &data, double dTriggerTyp
 void RtAveragingWorker::mergeData(double dTriggerType)
 {
     if(m_mapDataPre[dTriggerType].rows() != m_mapDataPost[dTriggerType].rows()) {
-        qDebug() << "RtAveragingWorker::mergeData - Rows of m_mapDataPre (" << m_mapDataPre[dTriggerType].rows() << ") and m_mapDataPost (" << m_mapDataPost[dTriggerType].rows() << ") are not the same. Returning.";
+        qDebug() << "[RtAveragingWorker::mergeData] Rows of m_mapDataPre (" << m_mapDataPre[dTriggerType].rows() << ") and m_mapDataPost (" << m_mapDataPost[dTriggerType].rows() << ") are not the same. Returning.";
         return;
     }
 
@@ -429,7 +431,7 @@ void RtAveragingWorker::mergeData(double dTriggerType)
     bool bArtifactDetected = false;
 
     if(m_bActivateThreshold && m_pFiffInfo) {
-        qDebug() << "RtAveragingWorker::mergeData - Doing artifact reduction for" << m_mapThresholds;
+        qDebug() << "[RtAveragingWorker::mergeData] Doing artifact reduction for" << m_mapThresholds;
 
         bArtifactDetected = MNEEpochDataList::checkForArtifact(mergedData,
                                                                *m_pFiffInfo,
@@ -455,7 +457,7 @@ void RtAveragingWorker::mergeData(double dTriggerType)
 void RtAveragingWorker::generateEvoked(double dTriggerType)
 {
     if(m_mapStimAve[dTriggerType].isEmpty()) {
-        qDebug() << "RtAveragingWorker::generateEvoked - m_mapStimAve is empty for type" << dTriggerType << "Returning.";
+        qDebug() << "[RtAveragingWorker::generateEvoked] m_mapStimAve is empty for type" << dTriggerType << "Returning.";
         return;
     }
 
@@ -553,12 +555,12 @@ RtAveraging::RtAveraging(quint32 numAverages,
     qRegisterMetaType<Eigen::MatrixXd>("Eigen::MatrixXd");
 
     RtAveragingWorker *worker = new RtAveragingWorker(numAverages,
-                                          iPreStimSamples,
-                                          iPostStimSamples,
-                                          iBaselineFromSecs,
-                                          iBaselineToSecs,
-                                          iTriggerIndex,
-                                          pFiffInfo);
+                                                      iPreStimSamples,
+                                                      iPostStimSamples,
+                                                      iBaselineFromSecs,
+                                                      iBaselineToSecs,
+                                                      iTriggerIndex,
+                                                      pFiffInfo);
     worker->moveToThread(&m_workerThread);
 
     connect(&m_workerThread, &QThread::finished,
@@ -628,12 +630,12 @@ void RtAveraging::restart(quint32 numAverages,
     stop();
 
     RtAveragingWorker *worker = new RtAveragingWorker(numAverages,
-                                          iPreStimSamples,
-                                          iPostStimSamples,
-                                          iBaselineFromSecs,
-                                          iBaselineToSecs,
-                                          iTriggerIndex,
-                                          pFiffInfo);
+                                                      iPreStimSamples,
+                                                      iPostStimSamples,
+                                                      iBaselineFromSecs,
+                                                      iBaselineToSecs,
+                                                      iTriggerIndex,
+                                                      pFiffInfo);
     worker->moveToThread(&m_workerThread);
 
     connect(&m_workerThread, &QThread::finished,

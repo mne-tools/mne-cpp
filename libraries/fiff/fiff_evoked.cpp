@@ -62,14 +62,18 @@ FiffEvoked::FiffEvoked()
 , aspect_kind(-1)
 , first(-1)
 , last(-1)
-, baseline(qMakePair(QVariant("None"), QVariant("None")))
+, baseline(qMakePair(-1.0f, -1.0f))
 {
 
 }
 
 //=============================================================================================================
 
-FiffEvoked::FiffEvoked(QIODevice& p_IODevice, QVariant setno, QPair<QVariant,QVariant> t_baseline, bool proj, fiff_int_t p_aspect_kind)
+FiffEvoked::FiffEvoked(QIODevice& p_IODevice,
+                       QVariant setno,
+                       QPair<float,float> t_baseline,
+                       bool proj,
+                       fiff_int_t p_aspect_kind)
 {
     if(!FiffEvoked::read(p_IODevice, *this, setno, t_baseline, proj, p_aspect_kind))
     {
@@ -121,7 +125,8 @@ void FiffEvoked::clear()
 
 //=============================================================================================================
 
-FiffEvoked FiffEvoked::pick_channels(const QStringList& include, const QStringList& exclude) const
+FiffEvoked FiffEvoked::pick_channels(const QStringList& include,
+                                     const QStringList& exclude) const
 {
     if(include.size() == 0 && exclude.size() == 0)
         return FiffEvoked(*this);
@@ -161,7 +166,12 @@ FiffEvoked FiffEvoked::pick_channels(const QStringList& include, const QStringLi
 
 //=============================================================================================================
 
-bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant setno, QPair<QVariant,QVariant> t_baseline, bool proj, fiff_int_t p_aspect_kind)
+bool FiffEvoked::read(QIODevice& p_IODevice,
+                      FiffEvoked& p_FiffEvoked,
+                      QVariant setno,
+                      QPair<float,float> t_baseline,
+                      bool proj,
+                      fiff_int_t p_aspect_kind)
 {
     p_FiffEvoked.clear();
 
@@ -487,7 +497,8 @@ bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant 
 
 //=============================================================================================================
 
-void FiffEvoked::setInfo(FiffInfo &p_info, bool proj)
+void FiffEvoked::setInfo(const FiffInfo &p_info,
+                         bool proj)
 {
     info = p_info;
     //
@@ -548,7 +559,7 @@ FiffEvoked & FiffEvoked::operator+=(const MatrixXd &newData)
 
 //=============================================================================================================
 
-void FiffEvoked::applyBaselineCorrection(QPair<QVariant, QVariant>& p_baseline)
+void FiffEvoked::applyBaselineCorrection(QPair<float, float>& p_baseline)
 {
     // Run baseline correction
     printf("Applying baseline correction ... (mode: mean)\n");
