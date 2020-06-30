@@ -33,8 +33,8 @@
  *
  */
 
-#ifndef RTINVOP_H
-#define RTINVOP_H
+#ifndef RTINVOP_RTPROCESSING_H
+#define RTINVOP_RTPROCESSING_H
 
 //=============================================================================================================
 // INCLUDES
@@ -205,4 +205,4 @@ signals:
 //=============================================================================================================
 } // NAMESPACE
 
-#endif // RTINV_H
+#endif // RTINV_RTPROCESSING_H

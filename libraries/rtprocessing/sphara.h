@@ -32,8 +32,8 @@
  *
  */
 
-#ifndef SPHARA_H
-#define SPHARA_H
+#ifndef SPHARA_RTPROCESSING_H
+#define SPHARA_RTPROCESSING_H
 
 //=============================================================================================================
 // INCLUDES
@@ -58,40 +58,24 @@ namespace RTPROCESSINGLIB
 // DEFINES
 //=============================================================================================================
 
-//=============================================================================================================
+//=========================================================================================================
 /**
- * Creates a SPHARA operator.
+ * Constructs a SPHARA operator.
  *
- * @brief Creates a SPHARA operator.
+ * @param [in] matBaseFct        The SPHARA basis functions.
+ * @param [in] vecIndices        The indices of the positions in the final oeprator which are to be filled with the basis functions weights (i.e. these indices could respond to the indices of gradioemteres in a VectorView system).
+ * @param [in] iOperatorDim      The dimensions of the final SPHARA operator. Make sure that these correspond to the dimensions of the data matrix you want tol multiply with the SPHARA operator.
+ * @param [in] iNBaseFct         The number of SPHARA basis functions to take.
+ * @param [in] iSkip             The value to skip when reading the vecIndices variabel. I.e. use this when dealing with VectorView triplets, which include two gradiometers.
+ *
+ * @return Returns the final SPHARA operator with dimensions (iOperatorDim,iOperatorDim).
  */
-class RTPROCESINGSHARED_EXPORT Sphara
-{
-public:   
-    //=========================================================================================================
-    /**
-     * Constructs a Sphara object.
-     *
-     */
-    Sphara();
+RTPROCESINGSHARED_EXPORT Eigen::MatrixXd makeSpharaProjector(const Eigen::MatrixXd& matBaseFct,
+                                                             const Eigen::VectorXi& vecIndices,
+                                                             int iOperatorDim,
+                                                             int iNBaseFct,
+                                                             int iSkip = 0);
 
-    //=========================================================================================================
-    /**
-     * Constructs a SPHARA operator.
-     *
-     * @param [in] matBaseFct        The SPHARA basis functions.
-     * @param [in] vecIndices        The indices of the positions in the final oeprator which are to be filled with the basis functions weights (i.e. these indices could respond to the indices of gradioemteres in a VectorView system).
-     * @param [in] iOperatorDim      The dimensions of the final SPHARA operator. Make sure that these correspond to the dimensions of the data matrix you want tol multiply with the SPHARA operator.
-     * @param [in] iNBaseFct         The number of SPHARA basis functions to take.
-     * @param [in] iSkip             The value to skip when reading the vecIndices variabel. I.e. use this when dealing with VectorView triplets, which include two gradiometers.
-     *
-     * @return Returns the final SPHARA operator with dimensions (iOperatorDim,iOperatorDim).
-     */
-    static Eigen::MatrixXd makeSpharaProjector(const Eigen::MatrixXd& matBaseFct,
-                                               const Eigen::VectorXi& vecIndices,
-                                               int iOperatorDim,
-                                               int iNBaseFct,
-                                               int iSkip = 0);
-};
 } // NAMESPACE RTPROCESSINGLIB
 
-#endif // SPHARA_H
+#endif // SPHARA_RTPROCESSING_H

@@ -32,8 +32,8 @@
  *
  */
 
-#ifndef RTHPIS_H
-#define RTHPIS_H
+#ifndef RTHPIS_RTPROCESSING_H
+#define RTHPIS_RTPROCESSING_H
 
 //=============================================================================================================
 // INCLUDES
@@ -210,4 +210,4 @@ signals:
 //=============================================================================================================
 } // NAMESPACE
 
-#endif // RTHPIS_H
+#endif // RTHPIS_RTPROCESSING_H

@@ -32,8 +32,8 @@
  *
  */
 
-#ifndef RTCONNECTIVITY_H
-#define RTCONNECTIVITY_H
+#ifndef RTCONNECTIVITY_RTPROCESSING_H
+#define RTCONNECTIVITY_RTPROCESSING_H
 
 //=============================================================================================================
 // INCLUDES
@@ -161,4 +161,4 @@ signals:
 //=============================================================================================================
 } // NAMESPACE
 
-#endif // RTCONNECTIVITY_H
+#endif // RTCONNECTIVITY_RTPROCESSING_H
