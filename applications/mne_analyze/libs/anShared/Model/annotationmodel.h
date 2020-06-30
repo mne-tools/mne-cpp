@@ -65,11 +65,11 @@ namespace ANSHAREDLIB {
 // DEFINE STRUCTS
 //=============================================================================================================
 
-struct EventCategory{
-    int                 categoryNumber;
-    int                 categoryType;
+struct EventGroup{
+    int                 groupNumber;
+    int                 groupType;
 
-    QString             categoryName;
+    QString             groupName;
 
     bool                isUserMade;
 
@@ -291,9 +291,9 @@ public:
      */
     MatrixXi getAnnotationMatrix();
 
-    int createCategory(QString sCategoryName, bool bIsUserMade = false, int iType = 0);
+    int createGroup(QString sGroupName, bool bIsUserMade = false, int iType = 0);
 
-    void switchCategories(int iCategoryIndex);
+    void switchGroup(int iGroupIndex);
 
     int getHubSize();
 
@@ -346,11 +346,13 @@ signals:
 
 private:
 
+    void loadAllGroups();
+
     QStringList                         m_eventTypeList;
 
-    QMap<int,EventCategory*>            m_mAnnotationHub;
+    QMap<int,EventGroup*>            m_mAnnotationHub;
 
-    int                                 m_iSelectedCategory;
+    int                                 m_iSelectedGroup;
 
     int                                 m_iType;
 
