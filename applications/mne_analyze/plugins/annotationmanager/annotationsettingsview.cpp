@@ -159,7 +159,7 @@ void AnnotationSettingsView::initGUIFunctionality()
 
     //Switching groups
     connect(m_pUi->listView->selectionModel(), &QItemSelectionModel::selectionChanged,
-            this, &AnnotationSettingsView::categoryChanged, Qt::UniqueConnection);
+            this, &AnnotationSettingsView::groupChanged, Qt::UniqueConnection);
 
 }
 
@@ -193,7 +193,7 @@ void AnnotationSettingsView::addAnnotationToModel()
     qDebug() << "AnnotationSettingsView::addAnnotationToModel -- Here";
 
     if (m_pStrListModel->stringList().isEmpty()) {
-        newUserCateogry("User Made");
+        newUserGroup("User Made");
     } /*else {
         if(m_pAnnModel->isUserMade()){
             //Do nothing
@@ -257,7 +257,7 @@ void AnnotationSettingsView::addNewAnnotationType()
 {
     m_pAnnModel->addNewAnnotationType(QString().number(m_pUi->m_spinBox_addEventType->value()), m_pColordialog->getColor(Qt::black, this));
     //m_pAnnModel->setEventFilterType(QString().number(m_pUi->m_spinBox_addEventType->value()));
-    newUserCateogry(m_pUi->lineEdit->text(), m_pUi->m_spinBox_addEventType->value());
+    newUserGroup(m_pUi->lineEdit->text(), m_pUi->m_spinBox_addEventType->value());
     emit triggerRedraw();
 }
 
@@ -292,7 +292,7 @@ void AnnotationSettingsView::disconnectFromModel()
     disconnect(m_pAnnModel.data(), &ANSHAREDLIB::AnnotationModel::addNewAnnotation,
             this, &AnnotationSettingsView::addAnnotationToModel);
     disconnect(m_pUi->listView->selectionModel(), &QItemSelectionModel::selectionChanged,
-            this, &AnnotationSettingsView::categoryChanged);
+            this, &AnnotationSettingsView::groupChanged);
     disconnect(m_pUi->m_checkBox_showAll, &QCheckBox::stateChanged,
             this, &AnnotationSettingsView::onShowAllChecked);
 
@@ -370,7 +370,7 @@ void AnnotationSettingsView::realTimeDataTime(double dValue)
 
 //=============================================================================================================
 
-void AnnotationSettingsView::newUserCateogry(QString sName, int iType)
+void AnnotationSettingsView::newUserGroup(QString sName, int iType)
 {
     qDebug() << "AnnotationSettingsView::newUserCateogry";
 
@@ -378,16 +378,16 @@ void AnnotationSettingsView::newUserCateogry(QString sName, int iType)
     list->append(sName);
     m_pStrListModel->setStringList(*list);
 
-    int iCat = m_pAnnModel->createCategory(sName, true, iType);
+    int iCat = m_pAnnModel->createGroup(sName, true, iType);
     //m_pAnnModel->swithCategories(iCat);
     m_pUi->listView->selectionModel()->select(m_pStrListModel->index(iCat), QItemSelectionModel::ClearAndSelect);
 }
 
 //=============================================================================================================
 
-void AnnotationSettingsView::categoryChanged()
+void AnnotationSettingsView::groupChanged()
 {
-    qDebug() << "AnnotationSettingsView::categoryChanged";
+    qDebug() << "AnnotationSettingsView::groupChanged";
 
     if(!m_pUi->listView->selectionModel()->selectedRows().size()){
         qDebug() << "Nothing selected, not switching.";
@@ -398,7 +398,7 @@ void AnnotationSettingsView::categoryChanged()
         m_pUi->m_checkBox_showAll->setCheckState(Qt::Unchecked);
     }
 
-    m_pAnnModel->switchCategories(m_pUi->listView->selectionModel()->selectedRows().at(0).row());
+    m_pAnnModel->switchGroup(m_pUi->listView->selectionModel()->selectedRows().at(0).row());
     m_pUi->listView->repaint();
     m_pUi->m_tableView_eventTableView->reset();
     this->onDataChanged();

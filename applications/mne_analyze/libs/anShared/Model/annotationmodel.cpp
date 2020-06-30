@@ -607,14 +607,14 @@ MatrixXi AnnotationModel::getAnnotationMatrix()
 
 //=============================================================================================================
 
-int AnnotationModel::createCategory(QString sCategoryName, bool bIsUserMade, int iType)
+int AnnotationModel::createGroup(QString sGroupName, bool bIsUserMade, int iType)
 {
-    EventCategory* newEvent = new EventCategory();
+    EventGroup* newEvent = new EventGroup();
     int iSize = m_mAnnotationHub.size();
 
-    *newEvent = {iSize,                         //categoryNumber
-                 iType,                         //categoryType
-                 sCategoryName,                 //categoryName
+    *newEvent = {iSize,                         //groupNumber
+                 iType,                         //groupType
+                 sGroupName,                    //groupName
                  bIsUserMade,                   //isUserMade
                  QVector<int>(),                //dataSamples
                  QVector<int>(),                //dataTypes
@@ -630,31 +630,31 @@ int AnnotationModel::createCategory(QString sCategoryName, bool bIsUserMade, int
 
 //=============================================================================================================
 
-void AnnotationModel::switchCategories(int iCategoryIndex)
+void AnnotationModel::switchGroup(int iGroupIndex)
 {
-    qDebug() << "AnnotationModel::swithCategories";
+    qDebug() << "AnnotationModel::switchGroup";
 
     if (!m_dataSamples.isEmpty()){
-        m_mAnnotationHub[m_iSelectedCategory]->dataSamples = m_dataSamples;
-        m_mAnnotationHub[m_iSelectedCategory]->dataTypes = m_dataTypes;
-        m_mAnnotationHub[m_iSelectedCategory]->dataIsUserEvent = m_dataIsUserEvent;
+        m_mAnnotationHub[m_iSelectedGroup]->dataSamples = m_dataSamples;
+        m_mAnnotationHub[m_iSelectedGroup]->dataTypes = m_dataTypes;
+        m_mAnnotationHub[m_iSelectedGroup]->dataIsUserEvent = m_dataIsUserEvent;
 
-        m_mAnnotationHub[m_iSelectedCategory]->dataSamples_Filtered = m_dataSamples_Filtered;
-        m_mAnnotationHub[m_iSelectedCategory]->dataTypes_Filtered = m_dataTypes_Filtered;
-        m_mAnnotationHub[m_iSelectedCategory]->dataIsUserEvent_Filtered = m_dataIsUserEvent_Filtered;
+        m_mAnnotationHub[m_iSelectedGroup]->dataSamples_Filtered = m_dataSamples_Filtered;
+        m_mAnnotationHub[m_iSelectedGroup]->dataTypes_Filtered = m_dataTypes_Filtered;
+        m_mAnnotationHub[m_iSelectedGroup]->dataIsUserEvent_Filtered = m_dataIsUserEvent_Filtered;
     }
 
-    m_dataSamples = m_mAnnotationHub[iCategoryIndex]->dataSamples;
-    m_dataTypes = m_mAnnotationHub[iCategoryIndex]->dataTypes;
-    m_dataIsUserEvent = m_mAnnotationHub[iCategoryIndex]->dataIsUserEvent;
+    m_dataSamples = m_mAnnotationHub[iGroupIndex]->dataSamples;
+    m_dataTypes = m_mAnnotationHub[iGroupIndex]->dataTypes;
+    m_dataIsUserEvent = m_mAnnotationHub[iGroupIndex]->dataIsUserEvent;
 
-    m_dataSamples_Filtered = m_mAnnotationHub[iCategoryIndex]->dataSamples_Filtered;
-    m_dataTypes_Filtered = m_mAnnotationHub[iCategoryIndex]->dataTypes_Filtered;
-    m_dataIsUserEvent_Filtered = m_mAnnotationHub[iCategoryIndex]->dataIsUserEvent_Filtered;
+    m_dataSamples_Filtered = m_mAnnotationHub[iGroupIndex]->dataSamples_Filtered;
+    m_dataTypes_Filtered = m_mAnnotationHub[iGroupIndex]->dataTypes_Filtered;
+    m_dataIsUserEvent_Filtered = m_mAnnotationHub[iGroupIndex]->dataIsUserEvent_Filtered;
 
-    m_iSelectedCategory = m_mAnnotationHub[iCategoryIndex]->categoryNumber;
-    m_bIsUserMade = m_mAnnotationHub[iCategoryIndex]->isUserMade;
-    m_iType = m_mAnnotationHub[iCategoryIndex]->categoryType;
+    m_iSelectedGroup = m_mAnnotationHub[iGroupIndex]->groupNumber;
+    m_bIsUserMade = m_mAnnotationHub[iGroupIndex]->isUserMade;
+    m_iType = m_mAnnotationHub[iGroupIndex]->groupType;
 
     emit dataChanged(QModelIndex(), QModelIndex());
 }
@@ -686,13 +686,13 @@ void AnnotationModel::showAll(bool bSet)
 {
     if (bSet) {
         if (!m_dataSamples.isEmpty()){
-            m_mAnnotationHub[m_iSelectedCategory]->dataSamples = m_dataSamples;
-            m_mAnnotationHub[m_iSelectedCategory]->dataTypes = m_dataTypes;
-            m_mAnnotationHub[m_iSelectedCategory]->dataIsUserEvent = m_dataIsUserEvent;
+            m_mAnnotationHub[m_iSelectedGroup]->dataSamples = m_dataSamples;
+            m_mAnnotationHub[m_iSelectedGroup]->dataTypes = m_dataTypes;
+            m_mAnnotationHub[m_iSelectedGroup]->dataIsUserEvent = m_dataIsUserEvent;
 
-            m_mAnnotationHub[m_iSelectedCategory]->dataSamples_Filtered = m_dataSamples_Filtered;
-            m_mAnnotationHub[m_iSelectedCategory]->dataTypes_Filtered = m_dataTypes_Filtered;
-            m_mAnnotationHub[m_iSelectedCategory]->dataIsUserEvent_Filtered = m_dataIsUserEvent_Filtered;
+            m_mAnnotationHub[m_iSelectedGroup]->dataSamples_Filtered = m_dataSamples_Filtered;
+            m_mAnnotationHub[m_iSelectedGroup]->dataTypes_Filtered = m_dataTypes_Filtered;
+            m_mAnnotationHub[m_iSelectedGroup]->dataIsUserEvent_Filtered = m_dataIsUserEvent_Filtered;
         }
 
         m_dataSamples.clear();
@@ -702,7 +702,5 @@ void AnnotationModel::showAll(bool bSet)
         m_dataSamples_Filtered.clear();
         m_dataTypes_Filtered.clear();
         m_dataIsUserEvent_Filtered.clear();
-
-
     }
 }
