@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     Averaging class defintion.
+ * @brief     Averaging methods defintions.
  *
  */
 

@@ -28,12 +28,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     Averaging class declaration.
+ * @brief     Averaging methods declarations.
  *
  */
 
-#ifndef AVERAGING_H
-#define AVERAGING_H
+#ifndef AVERAGING_RTPROCESSING_H
+#define AVERAGING_RTPROCESSING_H
 
 //=============================================================================================================
 // INCLUDES
@@ -103,4 +103,4 @@ RTPROCESINGSHARED_EXPORT FIFFLIB::FiffEvoked computeAverage(const FIFFLIB::FiffR
 
 } // NAMESPACE
 
-#endif // AVERAGING_H
+#endif // AVERAGING_RTPROCESSING_H

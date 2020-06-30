@@ -106,9 +106,9 @@ MNEEpochDataList MNEEpochDataList::readEpochs(const FiffRawData& raw,
     }
     selected.conservativeResize(1, count);
     if (count > 0) {
-        printf("%d matching events found\n",count);
+        qInfo("[MNEEpochDataList::readEpochs] %d matching events found",count);
     } else {
-        printf("No desired events found.\n");
+        qWarning("[MNEEpochDataList::readEpochs] No desired events found.");
         return MNEEpochDataList();
     }
 
@@ -165,11 +165,11 @@ MNEEpochDataList MNEEpochDataList::readEpochs(const FiffRawData& raw,
                 data.append(MNEEpochData::SPtr(epoch.take()));//List takes ownwership of the pointer - no delete need
             }
         } else {
-            printf("Can't read the event data segments\n");
+            qWarning("[MNEEpochDataList::readEpochs] Can't read the event data segments.");
         }
     }
 
-    qDebug() << "MNEEpochDataList::readEpochs - Read a total of"<< data.size() <<"epochs of type" << event << "and marked"<< dropCount <<"for rejection";
+    qInfo().noquote() << "[MNEEpochDataList::readEpochs] Read a total of"<< data.size() <<"epochs of type" << event << "and marked"<< dropCount <<"for rejection.";
 
     return data;
 }
@@ -184,7 +184,7 @@ FiffEvoked MNEEpochDataList::average(const FiffInfo& info,
 {
     FiffEvoked p_evoked;
 
-    printf("Calculate evoked... ");
+    qInfo("[MNEEpochDataList::average] Calculate evoked. ");
 
     MatrixXd matAverage;
 
@@ -210,7 +210,7 @@ FiffEvoked MNEEpochDataList::average(const FiffInfo& info,
     }
     matAverage.array() /= p_evoked.nave;
 
-    printf("%d averages used [done]\n ", p_evoked.nave);
+    qInfo("[MNEEpochDataList::average] %d averages used [done]", p_evoked.nave);
 
     p_evoked.setInfo(info, proj);
 
@@ -227,7 +227,7 @@ FiffEvoked MNEEpochDataList::average(const FiffInfo& info,
 
     if(p_evoked.proj.rows() > 0) {
         matAverage = p_evoked.proj * matAverage;
-        printf("\tSSP projectors applied to the evoked data\n");
+        qInfo("[MNEEpochDataList::average] SSP projectors applied to the evoked data");
     }
 
     p_evoked.data = matAverage;
@@ -333,7 +333,7 @@ bool MNEEpochDataList::checkForArtifact(const MatrixXd& data,
     }
 
     if(lchData.isEmpty()) {
-        qDebug() << "MNEEpochDataList::checkForArtifact - No channels found to scan for artifacts. Do not reject. Returning.";
+        qWarning() << "[MNEEpochDataList::checkForArtifact] No channels found to scan for artifacts. Do not reject. Returning.";
 
         return bReject;
     }
@@ -347,7 +347,7 @@ bool MNEEpochDataList::checkForArtifact(const MatrixXd& data,
     for(int i = 0; i < lchData.size(); ++i) {
         if(lchData.at(i).bRejected) {
             bReject = true;
-            qDebug() << "MNEEpochDataList::checkForArtifact - Reject trial because of channel"<<lchData.at(i).sChName;
+            qInfo().noquote() << "[MNEEpochDataList::checkForArtifact] Reject trial because of channel"<<lchData.at(i).sChName;
             break;
         }
     }
