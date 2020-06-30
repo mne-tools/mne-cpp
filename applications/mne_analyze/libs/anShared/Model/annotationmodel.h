@@ -405,40 +405,38 @@ private:
      */
     void resetSelection();
 
-    QStringList                         m_eventTypeList;
+    QStringList                         m_eventTypeList;                /** <List of the possible event types */
 
-    QMap<int,EventGroup*>               m_mAnnotationHub;
+    QMap<int,EventGroup*>               m_mAnnotationHub;               /** <Map of the EventGroups, which holds groups of events */
 
-    int                                 m_iSelectedGroup;
+    int                                 m_iSelectedGroup;               /** <Index in m_mAnnotationHub of the current selected group */
+    int                                 m_iType;                        /** <Type of the currently selected event group */
 
-    int                                 m_iType;
+    QVector<int>                        m_dataSamples;                  /**< Vector of samples of events of the currently loded event group */
+    QVector<int>                        m_dataTypes;                    /**< Types of the events of the currently loaded event group */
+    QVector<int>                        m_dataIsUserEvent;              /**< Whether the events in the currently loaded event group are user-made */
 
-    QVector<int>                        m_dataSamples;
-    QVector<int>                        m_dataTypes;
-    QVector<int>                        m_dataIsUserEvent;
+    QVector<int>                        m_dataSamples_Filtered;         /**< Vector of samples of events to be displayed of the currently loded event group */
+    QVector<int>                        m_dataTypes_Filtered;           /**< Types of the events to be displayed of the currently loaded event group */
+    QVector<int>                        m_dataIsUserEvent_Filtered;     /**< Whether the events to be displayed in the currently loaded event group are user-made */
 
-    QVector<int>                        m_dataSamples_Filtered;
-    QVector<int>                        m_dataTypes_Filtered;
-    QVector<int>                        m_dataIsUserEvent_Filtered;
+    bool                                m_bIsUserMade;                  /**< Whether the current loaded group is user made */
 
-    bool                                m_bIsUserMade;
+    int                                 m_iSamplePos;                   /**< Sample of event to be added */
+    int                                 m_iFirstSample;                 /**< First sample of file */
+    int                                 m_iLastSample;                  /**< Last sample of file */
 
-    int                                 m_iSamplePos;
-    int                                 m_iFirstSample;
-    int                                 m_iLastSample;
+    int                                 m_iSelectedCheckState;          /**< State of checkbox of whether to show only selected events */
+    int                                 m_iSelectedAnn;                 /**< Index of selected events */
 
-    int                                 m_iActiveCheckState;
-    int                                 m_iSelectedCheckState;
-    int                                 m_iSelectedAnn;
+    QList<int>                          m_dataSelectedRows;             /**< List of selected rows for multiple evnt selection */
 
-    QList<int>                          m_dataSelectedRows;
+    int                                 m_iLastTypeAdded;               /**< Stores last created type */
 
-    int                                 m_iLastTypeAdded;
+    float                               m_fFreq;                        /**< Frequency of data file */
 
-    float                               m_fFreq;
-
-    QString                             m_sFilterEventType;
-    QMap<int, QColor>                   m_eventTypeColor;
+    QString                             m_sFilterEventType;             /**< String for diplaying event types */
+    QMap<int, QColor>                   m_eventTypeColor;               /**< Stores colors to display for each event type */
 
 };
 
