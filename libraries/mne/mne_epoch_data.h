@@ -99,7 +99,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Applies baseline correction to the evoked data.
+     * Applies baseline (mode=mean) correction to the evoked data.
      *
      * @param[in] baseline     time definition of the baseline in seconds [from, to]
      */

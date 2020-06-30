@@ -78,22 +78,28 @@ namespace RTPROCESSINGLIB
 /**
  * Compute the average for given fiff raw data.
  *
- * @param[in] raw            The raw data.
- * @param[in] events         The events provided in samples and event kind.
- * @param[in] tmin           The start time relative to the event in seconds.
- * @param[in] tmax           The end time relative to the event in seconds.
- * @param[in] eventType      The event type.
- * @param[in] lExcludeChs    List of channel names to exclude.
- * @param[in] picks          Which channels to pick.
+ * @param[in] raw               The raw data.
+ * @param[in] matEvents         The events provided in samples and event kinds.
+ * @param[in] fTMinS            The start time relative to the event in seconds.
+ * @param[in] fTMaxS            The end time relative to the event in seconds.
+ * @param[in] eventType         The event type.
+ * @param[in] bApplyBaseline    Whether to use baseline correction (mode=mean).
+ * @param[in] fTBaselineFromS   The start baseline correction time relative to the event in seconds.
+ * @param[in] fTBaselineToS     The end baseline correction time relative to the event in seconds.
+ * @param[in] lExcludeChs       List of channel names to exclude.
+ * @param[in] vecPicks          Which channels to pick.
  */
 RTPROCESINGSHARED_EXPORT FIFFLIB::FiffEvoked computeAverage(const FIFFLIB::FiffRawData& raw,
-                                                            const Eigen::MatrixXi& events,
-                                                            float tmin,
-                                                            float tmax,
+                                                            const Eigen::MatrixXi& matEvents,
+                                                            float fTMinS,
+                                                            float fTMaxS,
                                                             qint32 eventType,
+                                                            bool bApplyBaseline,
+                                                            float fTBaselineFromS,
+                                                            float fTBaselineToS,
                                                             const QMap<QString,double>& mapReject,
                                                             const QStringList &lExcludeChs = QStringList(),
-                                                            const Eigen::RowVectorXi& picks = Eigen::RowVectorXi());
+                                                            const Eigen::RowVectorXi& vecPicks = Eigen::RowVectorXi());
 
 } // NAMESPACE
 
