@@ -146,17 +146,17 @@ private:
     /**
      * Change the baseline from value
      *
-     * @param[in] fromMSeconds     the new baseline from value in milliseconds
+     * @param[in] fromMS     the new baseline from value in milliseconds
      */
-    void onChangeBaselineFrom(qint32 fromMSeconds);
+    void onChangeBaselineFrom(qint32 fromMS);
 
     //=========================================================================================================
     /**
      * Change the baseline to value
      *
-     * @param[in] fromMSeconds     the new baseline to value in milliseconds
+     * @param[in] fromMS     the new baseline to value in milliseconds
      */
-    void onChangeBaselineTo(qint32 toMSeconds);
+    void onChangeBaselineTo(qint32 toMS);
 
     //=========================================================================================================
     /**
@@ -265,8 +265,8 @@ private:
 
     DISPLIB::AveragingSettingsView*                         m_pAveragingSettingsView;   /**< Pointer to averaging settings GUI */
 
-    float                                                   m_fBaselineFrom;            /**< Baseline start - in seconds relative to stim(0) - can be negative*/
-    float                                                   m_fBaselineTo;              /**< Baseline end - in seconds relative to stim(0) - can be negative*/
+    float                                                   m_fBaselineFromS;            /**< Baseline start - in seconds relative to stim(0) - can be negative*/
+    float                                                   m_fBaselineToS;              /**< Baseline end - in seconds relative to stim(0) - can be negative*/
     float                                                   m_fPreStim;                 /**< Time before stim - in seconds - stored as positive number (>0) */
     float                                                   m_fPostStim;                /**< Time after stim - in seconds - stored as positive number (>0) */
     float                                                   m_fTriggerThreshold;        /**< Threshold to count stim channel events */

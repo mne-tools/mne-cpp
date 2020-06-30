@@ -359,7 +359,7 @@ void Averaging::onChangeArtifactThreshold(const QMap<QString,double>& mapThresho
 
 //=============================================================================================================
 
-void Averaging::onChangeBaselineFrom(qint32 fromMSeconds)
+void Averaging::onChangeBaselineFrom(qint32 fromMS)
 {
     QMutexLocker locker(&m_qMutex);
 
@@ -367,10 +367,10 @@ void Averaging::onChangeBaselineFrom(qint32 fromMSeconds)
         return;
     }
 
-    int iBaselineFromSamples = ((float)(fromMSeconds)/1000)*m_pFiffInfo->sfreq;
+    int iBaselineFromSamples = ((float)(fromMS)/1000)*m_pFiffInfo->sfreq;
 
     if(m_pRtAve) {
-        m_pRtAve->setBaselineFrom(iBaselineFromSamples, fromMSeconds);
+        m_pRtAve->setBaselineFrom(iBaselineFromSamples, fromMS);
     }
 }
 
