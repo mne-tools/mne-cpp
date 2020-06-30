@@ -131,6 +131,10 @@ void AnnotationSettingsView::initGUIFunctionality()
     connect(m_pUi->m_tableView_eventTableView->selectionModel(), &QItemSelectionModel::selectionChanged,
             this, &AnnotationSettingsView::onCurrentSelectedChanged, Qt::UniqueConnection);
 
+    //'Show all' checkbox
+    connect(m_pUi->m_checkBox_showAll, &QCheckBox::stateChanged,
+            this, &AnnotationSettingsView::onShowAllChecked, Qt::UniqueConnection);
+
     //Annotation types combo box
     connect(m_pUi->m_comboBox_filterTypes, &QComboBox::currentTextChanged,
             m_pAnnModel.data(), &ANSHAREDLIB::AnnotationModel::setEventFilterType, Qt::UniqueConnection);
@@ -289,6 +293,8 @@ void AnnotationSettingsView::disconnectFromModel()
             this, &AnnotationSettingsView::addAnnotationToModel);
     disconnect(m_pUi->listView->selectionModel(), &QItemSelectionModel::selectionChanged,
             this, &AnnotationSettingsView::categoryChanged);
+    disconnect(m_pUi->m_checkBox_showAll, &QCheckBox::stateChanged,
+            this, &AnnotationSettingsView::onShowAllChecked);
 
 }
 
@@ -382,8 +388,28 @@ void AnnotationSettingsView::newUserCateogry(QString sName, int iType)
 void AnnotationSettingsView::categoryChanged()
 {
     qDebug() << "AnnotationSettingsView::categoryChanged";
-    m_pAnnModel->swithCategories(m_pUi->listView->selectionModel()->selectedRows().at(0).row());
+
+    if(!m_pUi->listView->selectionModel()->selectedRows().size()){
+        qDebug() << "Nothing selected, not switching.";
+        return;
+    }
+
+    if(m_pUi->m_checkBox_showAll->isChecked()){
+        m_pUi->m_checkBox_showAll->setCheckState(Qt::Unchecked);
+    }
+
+    m_pAnnModel->switchCategories(m_pUi->listView->selectionModel()->selectedRows().at(0).row());
     m_pUi->listView->repaint();
     m_pUi->m_tableView_eventTableView->reset();
     this->onDataChanged();
+}
+
+//=============================================================================================================
+
+void AnnotationSettingsView::onShowAllChecked(int iCheckBoxState)
+{
+    if (iCheckBoxState){
+        m_pUi->listView->clearSelection();
+        m_pAnnModel->showAll(iCheckBoxState);
+    }
 }
