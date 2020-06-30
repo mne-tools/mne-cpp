@@ -47,6 +47,7 @@ include(../mne-cpp.pri)
 TEMPLATE = subdirs
 
 SUBDIRS += \
+    ex_averaging \
     ex_cancel_noise \
     ex_compute_forward \
     ex_evoked_grad_amp \
