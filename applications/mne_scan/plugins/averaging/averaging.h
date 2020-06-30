@@ -180,15 +180,15 @@ public:
     /**
      * Change the baseline from value
      *
-     * @param[in] fromMSeconds     the new baseline from value in seconds
+     * @param[in] fromMS     the new baseline from value in seconds
      */
-    void onChangeBaselineFrom(qint32 fromMSeconds);
+    void onChangeBaselineFrom(qint32 fromMS);
 
     //=========================================================================================================
     /**
      * Change the baseline to value
      *
-     * @param[in] fromMSeconds     the new baseline to value in seconds
+     * @param[in] fromMS     the new baseline to value in seconds
      */
     void onChangeBaselineTo(qint32 toMSeconds);
 

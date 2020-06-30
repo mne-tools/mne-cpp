@@ -64,31 +64,32 @@ using namespace MNELIB;
 // DEFINE GLOBAL RTPROCESSINGLIB METHODS
 //=============================================================================================================
 
-FiffEvoked RTPROCESSINGLIB::computeAverage(const FiffRawData& raw,
-                                           const MatrixXi& events,
-                                           float tmin,
-                                           float tmax,
+FiffEvoked RTPROCESSINGLIB::computeAverage(const FIFFLIB::FiffRawData& raw,
+                                           const Eigen::MatrixXi& matEvents,
+                                           float fTMinS,
+                                           float fTMaxS,
                                            qint32 eventType,
+                                           bool bApplyBaseline,
+                                           float fTBaselineFromS,
+                                           float fTBaselineToS,
                                            const QMap<QString,double>& mapReject,
                                            const QStringList& lExcludeChs,
                                            const RowVectorXi& picks)
 {
 
     MNEEpochDataList lstEpochDataList = MNEEpochDataList::readEpochs(raw,
-                                                                     events,
-                                                                     tmin,
-                                                                     tmax,
+                                                                     matEvents,
+                                                                     fTMinS,
+                                                                     fTMaxS,
                                                                      eventType,
                                                                      mapReject,
                                                                      lExcludeChs,
                                                                      picks);
 
-//    if(m_bBasline){
-//        QPair<float, float> baselinePair;
-//        baselinePair.first = QVariant(m_fBaselineFrom);
-//        baselinePair.second = QVariant(m_fBaselineTo);
-//        lstEpochDataList.applyBaselineCorrection(baselinePair);
-//    }
+    if(bApplyBaseline){
+        QPair<float, float> baselinePair(fTBaselineFromS, fTBaselineToS);
+        lstEpochDataList.applyBaselineCorrection(baselinePair);
+    }
 
     if(!mapReject.isEmpty()){
         lstEpochDataList.dropRejected();

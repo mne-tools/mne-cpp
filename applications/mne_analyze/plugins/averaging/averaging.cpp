@@ -88,8 +88,8 @@ Averaging::Averaging()
 , m_pFiffInfo(Q_NULLPTR)
 , m_pCommu(Q_NULLPTR)
 , m_pAveragingSettingsView(Q_NULLPTR)
-, m_fBaselineFrom(0)
-, m_fBaselineTo(0)
+, m_fBaselineFromS(0)
+, m_fBaselineToS(0)
 , m_fPreStim(0)
 , m_fPostStim(0)
 , m_fTriggerThreshold(0.5)
@@ -314,16 +314,16 @@ void Averaging::onChangeNumAverages(qint32 numAve)
 
 //=============================================================================================================
 
-void Averaging::onChangeBaselineFrom(qint32 fromMSeconds)
+void Averaging::onChangeBaselineFrom(qint32 fromMS)
 {
-    m_fBaselineFrom = static_cast<float>(fromMSeconds) / 1000.f;
+    m_fBaselineFromS = static_cast<float>(fromMS) / 1000.f;
 }
 
 //=============================================================================================================
 
-void Averaging::onChangeBaselineTo(qint32 toMSeconds)
+void Averaging::onChangeBaselineTo(qint32 toMS)
 {
-    m_fBaselineTo = static_cast<float>(toMSeconds) / 1000.f;
+    m_fBaselineToS = static_cast<float>(toMS) / 1000.f;
 }
 
 //=============================================================================================================
@@ -398,6 +398,9 @@ void Averaging::computeAverage()
                                                      m_fPreStim,
                                                      m_fPostStim,
                                                      iType,
+                                                     m_bBasline,
+                                                     m_fBaselineFromS,
+                                                     m_fBaselineToS,
                                                      mapReject);
 
     m_pFiffEvokedSet = QSharedPointer<FIFFLIB::FiffEvokedSet>(new FIFFLIB::FiffEvokedSet());
@@ -405,8 +408,8 @@ void Averaging::computeAverage()
     m_pFiffEvokedSet->info = *(m_pFiffRawModel->getFiffInfo().data());
 
     if(m_bBasline){
-        m_pFiffEvokedSet->evoked[0].baseline.first = m_fBaselineFrom;
-        m_pFiffEvokedSet->evoked[0].baseline.second = m_fBaselineTo;
+        m_pFiffEvokedSet->evoked[0].baseline.first = m_fBaselineFromS;
+        m_pFiffEvokedSet->evoked[0].baseline.second = m_fBaselineToS;
     }
 
     m_pEvokedModel->setEvokedSet(m_pFiffEvokedSet);
@@ -565,8 +568,8 @@ void Averaging::loadFullGui()
 //    m_pTabView->addTab(pAverageSelectionView, "Average Selection");
 
     //Update saved params
-    m_fBaselineFrom = static_cast<float>(m_pAveragingSettingsView->getBaselineFromSeconds())/1000.f;
-    m_fBaselineTo = static_cast<float>(m_pAveragingSettingsView->getBaselineToSeconds())/1000.f;
+    m_fBaselineFromS = static_cast<float>(m_pAveragingSettingsView->getBaselineFromSeconds())/1000.f;
+    m_fBaselineToS = static_cast<float>(m_pAveragingSettingsView->getBaselineToSeconds())/1000.f;
 
     m_fPreStim = -(static_cast<float>(m_pAveragingSettingsView->getPreStimMSeconds())/1000.f);
     m_fPostStim = static_cast<float>(m_pAveragingSettingsView->getPostStimMSeconds())/1000.f;
