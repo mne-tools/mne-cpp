@@ -38,6 +38,13 @@
 
 #include "averaging.h"
 
+#include <fiff/fiff_evoked.h>
+#include <fiff/fiff_raw_data.h>
+#include <fiff/fiff_info.h>
+
+#include <mne/mne_epoch_data_list.h>
+#include <mne/mne_epoch_data.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -51,19 +58,46 @@
 //=============================================================================================================
 
 using namespace RTPROCESSINGLIB;
+using namespace FIFFLIB;
+using namespace Eigen;
+using namespace MNELIB;
+
 
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-Averaging::Averaging(QObject *parent)
-: QObject(parent)
+FiffEvoked computeAverage(const FiffRawData& raw,
+                          const MatrixXi& events,
+                          float tmin,
+                          float tmax,
+                          qint32 eventType,
+                          const QMap<QString,double>& mapReject,
+                          const QStringList& lExcludeChs,
+                          const RowVectorXi& picks)
 {
-}
 
-//=============================================================================================================
+    MNEEpochDataList lstEpochDataList = MNEEpochDataList::readEpochs(raw,
+                                                                     events,
+                                                                     tmin,
+                                                                     tmax,
+                                                                     eventType,
+                                                                     mapReject,
+                                                                     lExcludeChs,
+                                                                     picks);
 
-Averaging::~Averaging()
-{
+//    if(m_bBasline){
+//        QPair<QVariant, QVariant> baselinePair;
+//        baselinePair.first = QVariant(m_fBaselineFrom);
+//        baselinePair.second = QVariant(m_fBaselineTo);
+//        lstEpochDataList.applyBaselineCorrection(baselinePair);
+//    }
 
+    if(!mapReject.isEmpty()){
+        lstEpochDataList.dropRejected();
+    }
+
+    return lstEpochDataList.average(raw.info,
+                                    0,
+                                    lstEpochDataList.first()->epoch.cols());
 }
