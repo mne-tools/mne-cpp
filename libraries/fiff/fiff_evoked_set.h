@@ -127,7 +127,8 @@ public:
      *
      * @return the desired fiff evoked data set
      */
-    FiffEvokedSet pick_channels(const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList) const;
+    FiffEvokedSet pick_channels(const QStringList& include = defaultQStringList,
+                                const QStringList& exclude = defaultQStringList) const;
 
     //=========================================================================================================
     /**
@@ -142,7 +143,8 @@ public:
      *
      * @return true if succeeded, false otherwise
      */
-    bool compensate_to(FiffEvokedSet &p_FiffEvokedSet, fiff_int_t to) const;
+    bool compensate_to(FiffEvokedSet &p_FiffEvokedSet,
+                       fiff_int_t to) const;
 
     //=========================================================================================================
     /**
@@ -174,11 +176,14 @@ public:
      *                               the interval is between "a (s)" and "b (s)". If a is None the beginning of the data is used and if b is
      *                               None then b is set to the end of the interval. If baseline is equal ot (None, None) all the time interval is used.
      *                               If None, no correction is applied.
-     * @param[in] proj           Apply SSP projection vectors (optional, default = true)
+     * @param[in] proj               Apply SSP projection vectors (optional, default = true)
      *
      * @return true when successful, false otherwise
      */
-    static bool read(QIODevice& p_IODevice, FiffEvokedSet& p_FiffEvokedSet, QPair<QVariant,QVariant> baseline = defaultVariantPair, bool proj = true);
+    static bool read(QIODevice& p_IODevice,
+                     FiffEvokedSet& p_FiffEvokedSet,
+                     QPair<float,float> baseline = defaultFloatPair,
+                     bool proj = true);
 
 public:
     FiffInfo             info;   /**< FIFF measurement information */

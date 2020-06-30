@@ -176,7 +176,11 @@ MNEEpochDataList MNEEpochDataList::readEpochs(const FiffRawData& raw,
 
 //=============================================================================================================
 
-FiffEvoked MNEEpochDataList::average(FiffInfo& info, fiff_int_t first, fiff_int_t last, VectorXi sel, bool proj)
+FiffEvoked MNEEpochDataList::average(const FiffInfo& info,
+                                     fiff_int_t first,
+                                     fiff_int_t last,
+                                     VectorXi sel,
+                                     bool proj)
 {
     FiffEvoked p_evoked;
 
@@ -233,7 +237,7 @@ FiffEvoked MNEEpochDataList::average(FiffInfo& info, fiff_int_t first, fiff_int_
 
 //=============================================================================================================
 
-void MNEEpochDataList::applyBaselineCorrection(QPair<QVariant, QVariant>& baseline)
+void MNEEpochDataList::applyBaselineCorrection(const QPair<float, float> &baseline)
 {
     // Run baseline correction
     QMutableListIterator<MNEEpochData::SPtr> i(*this);

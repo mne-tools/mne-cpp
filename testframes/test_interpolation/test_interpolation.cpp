@@ -114,7 +114,7 @@ void TestInterpolation::initTestCase()
     realSurface = t_sensorSurfaceVV[0];
     QFile t_fileEvoked(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif");
     fiff_int_t setno = 0;
-    QPair<QVariant, QVariant> baseline(QVariant(), 0);
+    QPair<float, float> baseline(-1.0f, -1.0f);
     evoked = FiffEvoked(t_fileEvoked, setno, baseline);
     if(evoked.isEmpty()) {
         return;

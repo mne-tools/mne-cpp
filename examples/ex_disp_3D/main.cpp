@@ -178,7 +178,7 @@ int main(int argc, char *argv[])
     //########################################################################################
 
     // Load data
-    QPair<QVariant, QVariant> baseline(QVariant(), 0);
+    QPair<float, float> baseline(-1.0f, -1.0f);
     MNESourceEstimate sourceEstimate;
     FiffEvoked evoked(t_fileEvoked, parser.value(evokedIndexOption).toInt(), baseline);
 
