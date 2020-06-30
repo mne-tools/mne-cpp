@@ -100,7 +100,7 @@ void AnnotationSettingsView::initMSVCSettings()
     connect(m_pAnnModel.data(),&ANSHAREDLIB::AnnotationModel::dataChanged,
             this, &AnnotationSettingsView::onDataChanged, Qt::UniqueConnection);
 
-    m_pUi->listView->setModel(m_pStrListModel.data());
+    m_pUi->m_listView_groupListView->setModel(m_pStrListModel.data());
 
     //Delegate
     m_pAnnDelegate = QSharedPointer<AnnotationDelegate>(new AnnotationDelegate(this));
@@ -158,7 +158,7 @@ void AnnotationSettingsView::initGUIFunctionality()
             this, &AnnotationSettingsView::addAnnotationToModel, Qt::UniqueConnection);
 
     //Switching groups
-    connect(m_pUi->listView->selectionModel(), &QItemSelectionModel::selectionChanged,
+    connect(m_pUi->m_listView_groupListView->selectionModel(), &QItemSelectionModel::selectionChanged,
             this, &AnnotationSettingsView::groupChanged, Qt::UniqueConnection);
 
 }
@@ -222,6 +222,8 @@ void AnnotationSettingsView::setModel(QSharedPointer<ANSHAREDLIB::AnnotationMode
 
 void AnnotationSettingsView::onDataChanged()
 {
+    m_pUi->m_tableView_eventTableView->update();
+    m_pUi->m_tableView_eventTableView->repaint();
     m_pUi->m_tableView_eventTableView->viewport()->update();
     m_pUi->m_tableView_eventTableView->viewport()->repaint();
     emit triggerRedraw();
@@ -241,7 +243,7 @@ void AnnotationSettingsView::passFiffParams(int iFirst,
 
 void AnnotationSettingsView::removeAnnotationfromModel()
 {
-    qDebug() << "m_pUi->listView->selectionModel()->selectedRows().isEmpty() --" << m_pUi->listView->selectionModel()->selectedRows().isEmpty();
+    qDebug() << "m_pUi->listView->selectionModel()->selectedRows().isEmpty() --" << m_pUi->m_listView_groupListView->selectionModel()->selectedRows().isEmpty();
     QModelIndexList indexList = m_pUi->m_tableView_eventTableView->selectionModel()->selectedRows();
 
     for(int i = 0; i<indexList.size(); i++) {
@@ -291,7 +293,7 @@ void AnnotationSettingsView::disconnectFromModel()
             this, &AnnotationSettingsView::addNewAnnotationType);
     disconnect(m_pAnnModel.data(), &ANSHAREDLIB::AnnotationModel::addNewAnnotation,
             this, &AnnotationSettingsView::addAnnotationToModel);
-    disconnect(m_pUi->listView->selectionModel(), &QItemSelectionModel::selectionChanged,
+    disconnect(m_pUi->m_listView_groupListView->selectionModel(), &QItemSelectionModel::selectionChanged,
             this, &AnnotationSettingsView::groupChanged);
     disconnect(m_pUi->m_checkBox_showAll, &QCheckBox::stateChanged,
             this, &AnnotationSettingsView::onShowAllChecked);
@@ -372,25 +374,20 @@ void AnnotationSettingsView::realTimeDataTime(double dValue)
 
 void AnnotationSettingsView::newUserGroup(QString sName, int iType)
 {
-    qDebug() << "AnnotationSettingsView::newUserCateogry";
-
     QStringList* list = new QStringList(m_pStrListModel->stringList());
     list->append(sName);
     m_pStrListModel->setStringList(*list);
 
     int iCat = m_pAnnModel->createGroup(sName, true, iType);
     //m_pAnnModel->swithCategories(iCat);
-    m_pUi->listView->selectionModel()->select(m_pStrListModel->index(iCat), QItemSelectionModel::ClearAndSelect);
+    m_pUi->m_listView_groupListView->selectionModel()->select(m_pStrListModel->index(iCat), QItemSelectionModel::ClearAndSelect);
 }
 
 //=============================================================================================================
 
 void AnnotationSettingsView::groupChanged()
 {
-    qDebug() << "AnnotationSettingsView::groupChanged";
-
-    if(!m_pUi->listView->selectionModel()->selectedRows().size()){
-        qDebug() << "Nothing selected, not switching.";
+    if(!m_pUi->m_listView_groupListView->selectionModel()->selectedRows().size()){
         return;
     }
 
@@ -398,8 +395,8 @@ void AnnotationSettingsView::groupChanged()
         m_pUi->m_checkBox_showAll->setCheckState(Qt::Unchecked);
     }
 
-    m_pAnnModel->switchGroup(m_pUi->listView->selectionModel()->selectedRows().at(0).row());
-    m_pUi->listView->repaint();
+    m_pAnnModel->switchGroup(m_pUi->m_listView_groupListView->selectionModel()->selectedRows().at(0).row());
+    m_pUi->m_listView_groupListView->repaint();
     m_pUi->m_tableView_eventTableView->reset();
     this->onDataChanged();
 }
@@ -409,7 +406,12 @@ void AnnotationSettingsView::groupChanged()
 void AnnotationSettingsView::onShowAllChecked(int iCheckBoxState)
 {
     if (iCheckBoxState){
-        m_pUi->listView->clearSelection();
+        m_pUi->m_listView_groupListView->clearSelection();
         m_pAnnModel->showAll(iCheckBoxState);
+        m_pUi->m_tableView_eventTableView->reset();
+        this->onDataChanged();
+    } else {
+        m_pAnnModel->hideAll();
+        this->onDataChanged();
     }
 }
