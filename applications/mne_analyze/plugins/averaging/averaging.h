@@ -32,8 +32,8 @@
  *
  */
 
-#ifndef AVERAGING_H
-#define AVERAGING_H
+#ifndef AVERAGING_RTPROCESSING_H
+#define AVERAGING_RTPROCESSING_H
 
 //=============================================================================================================
 // INCLUDES
@@ -286,4 +286,4 @@ private:
 
 } // NAMESPACE
 
-#endif // AVERAGING_H
+#endif // AVERAGING_RTPROCESSING_H
