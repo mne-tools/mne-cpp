@@ -165,6 +165,9 @@ void AnnotationSettingsView::initGUIFunctionality()
     m_pUi->m_tableView_eventTableView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(m_pUi->m_tableView_eventTableView, &QWidget::customContextMenuRequested,
             this, &AnnotationSettingsView::customContextMenuRequested, Qt::UniqueConnection);
+
+    m_pUi->m_tableView_eventTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    m_pUi->m_tableView_eventTableView->setEditTriggers(QAbstractItemView::DoubleClicked);
 }
 
 //=============================================================================================================
