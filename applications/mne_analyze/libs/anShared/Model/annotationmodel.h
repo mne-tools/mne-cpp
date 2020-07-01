@@ -307,11 +307,19 @@ public:
 
     //=========================================================================================================
     /**
-     * Switches to a group based on the index, triggers view to update
+     * Switches to a group based on the index (map key), triggers view to update
      *
-     * @param[in] iGroupIndex   index of desired group
+     * @param[in] iGroupIndex   index(map key) of desired group
      */
     void switchGroup(int iGroupIndex);
+
+    //=========================================================================================================
+    /**
+     * Removes a group based on the index (map key), triggers view to update
+     *
+     * @param[in] iGroupIndex   index(map key) of the group to be deleted
+     */
+    void removeGroup(int iGroupIndex);
 
     //=========================================================================================================
     /**
