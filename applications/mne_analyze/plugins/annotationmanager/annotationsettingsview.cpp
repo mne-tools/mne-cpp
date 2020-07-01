@@ -50,6 +50,7 @@
 #include <QColorDialog>
 #include <QFileDialog>
 #include <QKeyEvent>
+#include <QMenu>
 
 //=============================================================================================================
 // Eigen INCLUDES
@@ -161,13 +162,15 @@ void AnnotationSettingsView::initGUIFunctionality()
     connect(m_pUi->m_listView_groupListView->selectionModel(), &QItemSelectionModel::selectionChanged,
             this, &AnnotationSettingsView::groupChanged, Qt::UniqueConnection);
 
+    m_pUi->m_tableView_eventTableView->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(m_pUi->m_tableView_eventTableView, &QWidget::customContextMenuRequested,
+            this, &AnnotationSettingsView::customContextMenuRequested, Qt::UniqueConnection);
 }
 
 //=============================================================================================================
 
 void AnnotationSettingsView::onActiveEventsChecked(int iCheckBoxState)
 {
-    //qDebug() << "onActiveEventsChecked" << iCheckBoxState;
     m_iCheckState = iCheckBoxState;
     emit activeEventsChecked(m_iCheckState);
 }
@@ -243,11 +246,18 @@ void AnnotationSettingsView::passFiffParams(int iFirst,
 
 void AnnotationSettingsView::removeAnnotationfromModel()
 {
-    qDebug() << "m_pUi->listView->selectionModel()->selectedRows().isEmpty() --" << m_pUi->m_listView_groupListView->selectionModel()->selectedRows().isEmpty();
-    QModelIndexList indexList = m_pUi->m_tableView_eventTableView->selectionModel()->selectedRows();
+    QModelIndexList indexList = m_pUi->m_tableView_eventTableView->selectionModel()->selectedIndexes();
 
-    for(int i = 0; i<indexList.size(); i++) {
-        m_pAnnModel->removeRow(indexList.at(i).row() - i);
+    int iTracker = 9999;
+    for(int i = indexList.size() - 1; i >= 0; i--) {
+        qDebug() << "Removing Index" << indexList.at(i).row();
+
+        if (indexList.at(i).row() == iTracker){
+            continue;
+        }
+
+        m_pAnnModel->removeRow(indexList.at(i).row());
+        iTracker = indexList.at(i).row();
     }
 
     emit triggerRedraw();
@@ -257,9 +267,12 @@ void AnnotationSettingsView::removeAnnotationfromModel()
 
 void AnnotationSettingsView::addNewAnnotationType()
 {
-    m_pAnnModel->addNewAnnotationType(QString().number(m_pUi->m_spinBox_addEventType->value()), m_pColordialog->getColor(Qt::black, this));
-    //m_pAnnModel->setEventFilterType(QString().number(m_pUi->m_spinBox_addEventType->value()));
-    newUserGroup(m_pUi->lineEdit->text(), m_pUi->m_spinBox_addEventType->value());
+    m_pAnnModel->addNewAnnotationType(QString().number(m_pUi->m_spinBox_addEventType->value()),
+                                      m_pColordialog->getColor(Qt::black, this));
+
+    newUserGroup(m_pUi->lineEdit->text(),
+                 m_pUi->m_spinBox_addEventType->value());
+
     emit triggerRedraw();
 }
 
@@ -269,9 +282,7 @@ void AnnotationSettingsView::onSelectedEventsChecked(int iCheckBoxState)
 {
     m_iCheckSelectedState = iCheckBoxState;
     m_pAnnModel->setShowSelected(m_iCheckSelectedState);
-    //qDebug() << m_pUi->m_tableView_eventTableView->selectionModel()->currentIndex().row();
-    //m_pUi->m_tableView_eventTableView->selectionModel()->sle
-    //m_pAnnModel
+
     emit triggerRedraw();
 }
 
@@ -297,6 +308,8 @@ void AnnotationSettingsView::disconnectFromModel()
             this, &AnnotationSettingsView::groupChanged);
     disconnect(m_pUi->m_checkBox_showAll, &QCheckBox::stateChanged,
             this, &AnnotationSettingsView::onShowAllChecked);
+    disconnect(m_pUi->m_tableView_eventTableView, &QWidget::customContextMenuRequested,
+            this, &AnnotationSettingsView::customContextMenuRequested);
 
 }
 
@@ -305,14 +318,9 @@ void AnnotationSettingsView::disconnectFromModel()
 void AnnotationSettingsView::onCurrentSelectedChanged()
 {
     m_pAnnModel->clearSelected();
-    //qDebug() << "AnnotationSettingsView::onCurrentSelectedChanged";
-    //qDebug() << m_pUi->m_tableView_eventTableView->selectionModel()->currentIndex().row();
     m_pAnnModel->setSelectedAnn(m_pUi->m_tableView_eventTableView->selectionModel()->currentIndex().row());
-//    m_pAnnModel->setSelectedAnn(m_pUi->m_tableView_eventTableView
-//    qDebug() << m_pUi->m_tableView_eventTableView->selectionModel()->selectedIndexes();
 
     for (int i = 0;  i < m_pUi->m_tableView_eventTableView->selectionModel()->selectedRows().size(); i++) {
-//        qDebug() << m_pUi->m_tableView_eventTableView->selectionModel()->selectedRows().at(i).row();
         m_pAnnModel->appendSelected(m_pUi->m_tableView_eventTableView->selectionModel()->selectedRows().at(i).row());
     }
 }
@@ -342,7 +350,6 @@ void AnnotationSettingsView::onSaveButton()
 void AnnotationSettingsView::keyPressEvent(QKeyEvent* event)
 {
     if(event->key() == Qt::Key_Delete) {
-        //qDebug() << "[AnnotationSettingsView::keyPressEvent] -- Qt::Key_Delete";
         this->removeAnnotationfromModel();
     }
     if(event->key() == Qt::Key_J) {
@@ -372,14 +379,14 @@ void AnnotationSettingsView::realTimeDataTime(double dValue)
 
 //=============================================================================================================
 
-void AnnotationSettingsView::newUserGroup(QString sName, int iType)
+void AnnotationSettingsView::newUserGroup(const QString& sName, int iType)
 {
     QStringList* list = new QStringList(m_pStrListModel->stringList());
     list->append(sName);
     m_pStrListModel->setStringList(*list);
 
     int iCat = m_pAnnModel->createGroup(sName, true, iType);
-    //m_pAnnModel->swithCategories(iCat);
+
     m_pUi->m_listView_groupListView->selectionModel()->select(m_pStrListModel->index(iCat), QItemSelectionModel::ClearAndSelect);
 }
 
@@ -414,4 +421,17 @@ void AnnotationSettingsView::onShowAllChecked(int iCheckBoxState)
         m_pAnnModel->hideAll();
         this->onDataChanged();
     }
+}
+
+//=============================================================================================================
+
+void AnnotationSettingsView::customContextMenuRequested(const QPoint &pos)
+{
+    QMenu* menu = new QMenu(this);
+
+    QAction* markTime = menu->addAction(tr("Delete Event"));
+    connect(markTime, &QAction::triggered,
+            this, &AnnotationSettingsView::removeAnnotationfromModel, Qt::UniqueConnection);
+
+    menu->popup(m_pUi->m_tableView_eventTableView->viewport()->mapToGlobal(pos));
 }
