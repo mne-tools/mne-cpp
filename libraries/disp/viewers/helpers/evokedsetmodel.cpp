@@ -73,9 +73,7 @@ EvokedSetModel::EvokedSetModel(QObject *parent)
 , m_bIsFreezed(false)
 , m_bProjActivated(false)
 , m_bCompActivated(false)
-, m_bPerformFiltering(false)
 , m_bIsInit(false)
-, m_iMaxFilterLength(100)
 , m_qMapAverageColor(QSharedPointer<QMap<QString, QColor> >::create())
 , m_qMapAverageActivation(QSharedPointer<QMap<QString, bool> >::create())
 , m_qMapAverageColorOld(QSharedPointer<QMap<QString, QColor> >::create())
@@ -137,33 +135,17 @@ QVariant EvokedSetModel::data(const QModelIndex &index, int role) const
 
                     if(m_bIsFreezed) {
                         // data freeze
-                        if(!m_filterKernel.isEmpty() && m_bPerformFiltering) {
-                            for(int i = 0; i < m_matDataFilteredFreeze.size(); ++i) {
-                                pairItem.first = m_lAvrTypes.at(i);
-                                pairItem.second = m_matDataFilteredFreeze.at(i).row(row);
-                                lRowDataPerTrigType.append(pairItem);
-                            }
-                        } else {
-                            for(int i = 0; i < m_matDataFreeze.size(); ++i) {
-                                pairItem.first = m_lAvrTypes.at(i);
-                                pairItem.second = m_matDataFreeze.at(i).row(row);
-                                lRowDataPerTrigType.append(pairItem);
-                            }
+                        for(int i = 0; i < m_matDataFreeze.size(); ++i) {
+                            pairItem.first = m_lAvrTypes.at(i);
+                            pairItem.second = m_matDataFreeze.at(i).row(row);
+                            lRowDataPerTrigType.append(pairItem);
                         }
                     } else {
                         // data stream
-                        if(!m_filterKernel.isEmpty() && m_bPerformFiltering) {
-                            for(int i = 0; i < m_matDataFiltered.size(); ++i) {
-                                pairItem.first = m_lAvrTypes.at(i);
-                                pairItem.second = m_matDataFiltered.at(i).row(row);
-                                lRowDataPerTrigType.append(pairItem);
-                            }
-                        } else {
-                            for(int i = 0; i < m_matData.size(); ++i) {
-                                pairItem.first = m_lAvrTypes.at(i);
-                                pairItem.second = m_matData.at(i).row(row);
-                                lRowDataPerTrigType.append(pairItem);
-                            }
+                        for(int i = 0; i < m_matData.size(); ++i) {
+                            pairItem.first = m_lAvrTypes.at(i);
+                            pairItem.second = m_matData.at(i).row(row);
+                            lRowDataPerTrigType.append(pairItem);
                         }
                     }
 
@@ -198,41 +180,20 @@ QVariant EvokedSetModel::data(const QModelIndex &index, int role) const
                 case EvokedSetModelRoles::GetAverageData: {
                     if(m_bIsFreezed){
                         // data freeze
-                        if(!m_filterKernel.isEmpty() && m_bPerformFiltering) {
-                            for(int i = 0; i < m_matDataFilteredFreeze.size(); ++i) {
-                                averagedData.first = m_lAvrTypes.at(i);
-                                averagedData.second.first = m_matDataFilteredFreeze.at(i).data();
-                                averagedData.second.second = m_matDataFilteredFreeze.at(i).cols();
+                        for(int i = 0; i < m_matDataFreeze.size(); ++i) {
+                            averagedData.first = m_lAvrTypes.at(i);
+                            averagedData.second.first = m_matDataFreeze.at(i).data();
+                            averagedData.second.second = m_matDataFreeze.at(i).cols();
 
-                                lRowDataPerTrigType.append(averagedData);
-                            }
-                        } else {
-                            for(int i = 0; i < m_matDataFreeze.size(); ++i) {
-                                averagedData.first = m_lAvrTypes.at(i);
-                                averagedData.second.first = m_matDataFreeze.at(i).data();
-                                averagedData.second.second = m_matDataFreeze.at(i).cols();
-
-                                lRowDataPerTrigType.append(averagedData);
-                            }
+                            lRowDataPerTrigType.append(averagedData);
                         }
                     } else {
-                        // data
-                        if(!m_filterKernel.isEmpty() && m_bPerformFiltering) {
-                            for(int i = 0; i < m_matDataFiltered.size(); ++i) {
-                                averagedData.first = m_lAvrTypes.at(i);
-                                averagedData.second.first = m_matDataFiltered.at(i).data();
-                                averagedData.second.second = m_matDataFiltered.at(i).cols();
+                        for(int i = 0; i < m_matData.size(); ++i) {
+                            averagedData.first = m_lAvrTypes.at(i);
+                            averagedData.second.first = m_matData.at(i).data();
+                            averagedData.second.second = m_matData.at(i).cols();
 
-                                lRowDataPerTrigType.append(averagedData);
-                            }
-                        } else {
-                            for(int i = 0; i < m_matData.size(); ++i) {
-                                averagedData.first = m_lAvrTypes.at(i);
-                                averagedData.second.first = m_matData.at(i).data();
-                                averagedData.second.second = m_matData.at(i).cols();
-
-                                lRowDataPerTrigType.append(averagedData);
-                            }
+                            lRowDataPerTrigType.append(averagedData);
                         }
                     }
 
@@ -335,9 +296,6 @@ void EvokedSetModel::init()
     //Create the initial Compensator projector
     updateCompensator(0);
 
-    //Init list of channels which are to filtered
-    createFilterChannelList(m_pEvokedSet->info.ch_names);
-
     endResetModel();
 
     resetSelection();
@@ -354,7 +312,6 @@ void EvokedSetModel::updateData()
     }
 
     m_matData.clear();
-    m_matDataFiltered.clear();
     m_lAvrTypes.clear();
 
     for(int i = 0; i < m_pEvokedSet->evoked.size(); ++i) {
@@ -380,15 +337,9 @@ void EvokedSetModel::updateData()
             }
         }
 
-        m_matDataFiltered.append(MatrixXd::Zero(m_pEvokedSet->evoked.at(i).data.rows(), m_pEvokedSet->evoked.at(i).data.cols()));
-
         m_pairBaseline = m_pEvokedSet->evoked.at(i).baseline;
 
         m_lAvrTypes.append(m_pEvokedSet->evoked.at(i).comment);
-    }
-
-    if(!m_filterKernel.isEmpty() && m_bPerformFiltering) {
-        filterDataBlock();
     }
 
     // Update average selection information map. Use old colors if existing.
@@ -450,13 +401,6 @@ void EvokedSetModel::updateData()
     QVector<int> roles; roles << Qt::DisplayRole;
 
     emit dataChanged(topLeft, bottomRight, roles);
-}
-
-//=============================================================================================================
-
-void EvokedSetModel::setFilterActive(bool state)
-{
-    m_bPerformFiltering = state;
 }
 
 //=============================================================================================================
@@ -832,7 +776,6 @@ void EvokedSetModel::toggleFreeze()
     m_bIsFreezed = !m_bIsFreezed;
 
     if(m_bIsFreezed) {
-        m_matDataFilteredFreeze = m_matDataFiltered;
         m_matDataFreeze = m_matData;
     }
 
@@ -842,161 +785,3 @@ void EvokedSetModel::toggleFreeze()
     QVector<int> roles; roles << Qt::DisplayRole;
     emit dataChanged(topLeft, bottomRight, roles);
 }
-
-//=============================================================================================================
-
-void EvokedSetModel::setFilter(const FilterKernel& filterData)
-{
-    m_filterKernel.clear();
-    m_filterKernel << filterData;
-
-    m_iMaxFilterLength = 1;
-    for(int i=0; i<m_filterKernel.size(); i++) {
-        if(m_iMaxFilterLength < m_filterKernel.at(i).getFilterOrder()) {
-            m_iMaxFilterLength = m_filterKernel.at(i).getFilterOrder();
-        }
-    }
-
-    //Filter all visible data channels at once
-    filterDataBlock();
-}
-
-//=============================================================================================================
-
-void EvokedSetModel::setFilterChannelType(const QString& channelType)
-{
-    if(!m_pEvokedSet) {
-        return;
-    }
-
-    m_sFilterChannelType = channelType;
-    m_filterChannelList = m_visibleChannelList;
-
-    //This version is for when all channels of a type are to be filtered (not only the visible ones).
-    //Create channel filter list independent from channelNames
-    m_filterChannelList.clear();
-
-    for(int i = 0; i<m_pEvokedSet->info.chs.size(); i++) {
-        if((m_pEvokedSet->info.chs.at(i).kind == FIFFV_MEG_CH || m_pEvokedSet->info.chs.at(i).kind == FIFFV_EEG_CH ||
-            m_pEvokedSet->info.chs.at(i).kind == FIFFV_EOG_CH || m_pEvokedSet->info.chs.at(i).kind == FIFFV_ECG_CH ||
-            m_pEvokedSet->info.chs.at(i).kind == FIFFV_EMG_CH) && !m_pEvokedSet->info.bads.contains(m_pEvokedSet->info.chs.at(i).ch_name)) {
-            if(m_sFilterChannelType == "All") {
-                m_filterChannelList << m_pEvokedSet->info.chs.at(i).ch_name;
-            } else if(m_pEvokedSet->info.chs.at(i).ch_name.contains(m_sFilterChannelType)) {
-                m_filterChannelList << m_pEvokedSet->info.chs.at(i).ch_name;
-            }
-        }
-    }
-
-//    if(channelType != "All") {
-//        QMutableListIterator<QString> i(m_filterChannelList);
-//        while(i.hasNext()) {
-//            QString val = i.next();
-//            if(!val.contains(channelType, Qt::CaseInsensitive)) {
-//                i.remove();
-//            }
-//        }
-//    }
-
-//    m_bDrawFilterFront = false;
-
-    //Filter all visible data channels at once
-    //filterDataBlock();
-}
-
-//=============================================================================================================
-
-void EvokedSetModel::createFilterChannelList(QStringList channelNames)
-{
-    if(!m_pEvokedSet) {
-        return;
-    }
-
-    m_filterChannelList.clear();
-    m_visibleChannelList = channelNames;
-
-    //    //Create channel fiter list based on channelNames
-    //    for(int i = 0; i<m_pFiffInfo->chs.size(); i++) {
-    //        if((m_pFiffInfo->chs.at(i).kind == FIFFV_MEG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_EEG_CH ||
-    //            m_pFiffInfo->chs.at(i).kind == FIFFV_EOG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_ECG_CH ||
-    //            m_pFiffInfo->chs.at(i).kind == FIFFV_EMG_CH) && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)) {
-    //            if(m_sFilterChannelType == "All" && channelNames.contains(m_pFiffInfo->chs.at(i).ch_name))
-    //                m_filterChannelList << m_pFiffInfo->chs.at(i).ch_name;
-    //            else if(m_pFiffInfo->chs.at(i).ch_name.contains(m_sFilterChannelType) && channelNames.contains(m_pFiffInfo->chs.at(i).ch_name))
-    //                m_filterChannelList << m_pFiffInfo->chs.at(i).ch_name;
-    //        }
-    //    }
-
-    //Create channel filter list independent from channelNames
-    for(int i = 0; i<m_pEvokedSet->info.chs.size(); i++) {
-        if((m_pEvokedSet->info.chs.at(i).kind == FIFFV_MEG_CH || m_pEvokedSet->info.chs.at(i).kind == FIFFV_EEG_CH ||
-            m_pEvokedSet->info.chs.at(i).kind == FIFFV_EOG_CH || m_pEvokedSet->info.chs.at(i).kind == FIFFV_ECG_CH ||
-            m_pEvokedSet->info.chs.at(i).kind == FIFFV_EMG_CH) && !m_pEvokedSet->info.bads.contains(m_pEvokedSet->info.chs.at(i).ch_name)) {
-            if(m_sFilterChannelType == "All") {
-                m_filterChannelList << m_pEvokedSet->info.chs.at(i).ch_name;
-            } else if(m_pEvokedSet->info.chs.at(i).ch_name.contains(m_sFilterChannelType)) {
-                m_filterChannelList << m_pEvokedSet->info.chs.at(i).ch_name;
-            }
-        }
-    }
-
-//    for(int i = 0; i<m_filterChannelList.size(); i++)
-//        std::cout<<m_filterChannelList.at(i).toStdString()<<std::endl;
-
-    //Filter all visible data channels at once
-    //filterDataBlock();
-}
-
-//=============================================================================================================
-
-void doFilterPerChannelRTESet(QPair<QList<FilterKernel>,QPair<int,RowVectorXd> > &channelDataTime)
-{
-    for(int i=0; i < channelDataTime.first.size(); ++i) {
-        //channelDataTime.second.second = channelDataTime.first.at(i).applyConvFilter(channelDataTime.second.second, true, FilterKernel::ZeroPad);
-        channelDataTime.second.second = channelDataTime.first[i].applyFftFilter(channelDataTime.second.second, true); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
-    }
-}
-
-//=============================================================================================================
-
-void EvokedSetModel::filterDataBlock()
-{
-//    if(m_filterKernel.isEmpty() || !m_bPerformFiltering) {
-//        return;
-//    }
-
-//    //Generate QList structure which can be handled by the QConcurrent framework for each average in set
-//    for(int j = 0; j < m_matData.size(); ++j) {
-//        QList<QPair<QList<FilterKernel>,QPair<int,RowVectorXd> > > timeData;
-//        QList<int> notFilterChannelIndex;
-
-//        //Also append mirrored data in front and back to get rid of edge effects
-//        for(qint32 i = 0; i < m_matData.at(j).rows(); ++i) {
-//            if(m_filterChannelList.contains(m_pEvokedSet->info.chs.at(i).ch_name)) {
-//                RowVectorXd datTemp(m_matData.at(j).row(i).cols() + 2 * m_iMaxFilterLength);
-//                datTemp << m_matData.at(j).row(i).head(m_iMaxFilterLength).reverse(), m_matData.at(j).row(i), m_matData.at(j).row(i).tail(m_iMaxFilterLength).reverse();
-//                timeData.append(QPair<QList<FilterKernel>,QPair<int,RowVectorXd> >(m_filterKernel,QPair<int,RowVectorXd>(i,datTemp)));
-//            } else {
-//                notFilterChannelIndex.append(i);
-//            }
-//        }
-
-//        //Do the concurrent filtering
-//        if(!timeData.isEmpty()) {
-//            QFuture<void> future = QtConcurrent::map(timeData,
-//                                                     doFilterPerChannelRTESet);
-
-//            future.waitForFinished();
-
-//            for(int r = 0; r < timeData.size(); ++r) {
-//                m_matDataFiltered[j].row(timeData.at(r).second.first) = timeData.at(r).second.second.segment(m_iMaxFilterLength+m_iMaxFilterLength/2, m_matData.at(j).cols());
-//            }
-//        }
-
-//        //Fill filtered data with raw data if the channel was not filtered
-//        for(int i = 0; i<notFilterChannelIndex.size(); i++) {
-//            m_matDataFiltered[j].row(notFilterChannelIndex.at(i)) = m_matData.at(j).row(notFilterChannelIndex.at(i));
-//        }
-//    }
-}
-
