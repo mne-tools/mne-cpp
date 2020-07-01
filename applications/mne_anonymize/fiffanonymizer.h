@@ -461,7 +461,7 @@ public slots:
      * @param [in] sFilePathIn  String containing the input file name including its path. Can be a relative or
      * an absolute path.
      */
-    int setFileIn(const QString &sFilePathIn);
+    int setInFile(const QString &sFilePathIn);
 
     //=========================================================================================================
     /**
@@ -470,7 +470,7 @@ public slots:
      * @param [in] sFilePathOut String containing the output file name. Can be a relative or
      * an absolute path.
      */
-    int setFileOut(const QString &sFilePathOut);
+    int setOutFile(const QString &sFilePathOut);
 
     //=========================================================================================================
     /**
