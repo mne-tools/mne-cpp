@@ -328,7 +328,7 @@ void BrainFlowBoard::prepareSession(BrainFlowInputParams params,
                 m_pChannels = BoardShim::get_eda_channels(boardId, &m_iNumberChannels);
                 break;
             default:
-                throw BrainFlowException ("unsupported data type", UNSUPPORTED_BOARD_ERROR);
+                throw BrainFlowException ("unsupported data type", (int)BrainFlowExitCodes::UNSUPPORTED_BOARD_ERROR);
                 break;
         }
         m_iSamplingFreq = BoardShim::get_sampling_rate(boardId);
