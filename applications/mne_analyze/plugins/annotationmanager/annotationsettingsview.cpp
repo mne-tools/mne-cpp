@@ -101,7 +101,7 @@ void AnnotationSettingsView::initMSVCSettings()
     connect(m_pAnnModel.data(),&ANSHAREDLIB::AnnotationModel::dataChanged,
             this, &AnnotationSettingsView::onDataChanged, Qt::UniqueConnection);
 
-    m_pUi->m_listView_groupListView->setModel(m_pStrListModel.data());
+    //m_pUi->m_listView_groupListView->setModel(m_pStrListModel.data());
 
     //Delegate
     m_pAnnDelegate = QSharedPointer<AnnotationDelegate>(new AnnotationDelegate(this));
@@ -159,7 +159,7 @@ void AnnotationSettingsView::initGUIFunctionality()
             this, &AnnotationSettingsView::addAnnotationToModel, Qt::UniqueConnection);
 
     //Switching groups
-    connect(m_pUi->m_listView_groupListView->selectionModel(), &QItemSelectionModel::selectionChanged,
+    connect(m_pUi->m_listWidget_groupListWidget->selectionModel(), &QItemSelectionModel::selectionChanged,
             this, &AnnotationSettingsView::groupChanged, Qt::UniqueConnection);
 
     m_pUi->m_tableView_eventTableView->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -307,7 +307,7 @@ void AnnotationSettingsView::disconnectFromModel()
             this, &AnnotationSettingsView::addNewAnnotationType);
     disconnect(m_pAnnModel.data(), &ANSHAREDLIB::AnnotationModel::addNewAnnotation,
             this, &AnnotationSettingsView::addAnnotationToModel);
-    disconnect(m_pUi->m_listView_groupListView->selectionModel(), &QItemSelectionModel::selectionChanged,
+    disconnect(m_pUi->m_listWidget_groupListWidget->selectionModel(), &QItemSelectionModel::selectionChanged,
             this, &AnnotationSettingsView::groupChanged);
     disconnect(m_pUi->m_checkBox_showAll, &QCheckBox::stateChanged,
             this, &AnnotationSettingsView::onShowAllChecked);
@@ -326,6 +326,8 @@ void AnnotationSettingsView::onCurrentSelectedChanged()
     for (int i = 0;  i < m_pUi->m_tableView_eventTableView->selectionModel()->selectedRows().size(); i++) {
         m_pAnnModel->appendSelected(m_pUi->m_tableView_eventTableView->selectionModel()->selectedRows().at(i).row());
     }
+
+    onDataChanged();
 }
 
 //=============================================================================================================
@@ -390,14 +392,20 @@ void AnnotationSettingsView::newUserGroup(const QString& sName, int iType)
 
     int iCat = m_pAnnModel->createGroup(sName, true, iType);
 
-    m_pUi->m_listView_groupListView->selectionModel()->select(m_pStrListModel->index(iCat), QItemSelectionModel::ClearAndSelect);
+    QListWidgetItem* newItem = new QListWidgetItem(sName);
+    newItem->setData(Qt::UserRole, QVariant(iCat));
+
+    m_pUi->m_listWidget_groupListWidget->addItem(newItem);
+    emit m_pUi->m_listWidget_groupListWidget->setCurrentItem(newItem);
+
+    //m_pUi->m_listWidget_groupListWidget->selectionModel()->select(m_pStrListModel->index(iCat), QItemSelectionModel::ClearAndSelect);
 }
 
 //=============================================================================================================
 
 void AnnotationSettingsView::groupChanged()
 {
-    if(!m_pUi->m_listView_groupListView->selectionModel()->selectedRows().size()){
+    if(!m_pUi->m_listWidget_groupListWidget->selectionModel()->selectedRows().size()){
         return;
     }
 
@@ -405,8 +413,8 @@ void AnnotationSettingsView::groupChanged()
         m_pUi->m_checkBox_showAll->setCheckState(Qt::Unchecked);
     }
 
-    m_pAnnModel->switchGroup(m_pUi->m_listView_groupListView->selectionModel()->selectedRows().at(0).row());
-    m_pUi->m_listView_groupListView->repaint();
+    m_pAnnModel->switchGroup(m_pUi->m_listWidget_groupListWidget->selectedItems().first()->data(Qt::UserRole).toInt());
+    m_pUi->m_listWidget_groupListWidget->repaint();
     m_pUi->m_tableView_eventTableView->reset();
     this->onDataChanged();
 }
@@ -416,7 +424,7 @@ void AnnotationSettingsView::groupChanged()
 void AnnotationSettingsView::onShowAllChecked(int iCheckBoxState)
 {
     if (iCheckBoxState){
-        m_pUi->m_listView_groupListView->clearSelection();
+        m_pUi->m_listWidget_groupListWidget->clearSelection();
         m_pAnnModel->showAll(iCheckBoxState);
         m_pUi->m_tableView_eventTableView->reset();
         this->onDataChanged();
