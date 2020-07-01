@@ -224,14 +224,22 @@ QVariant AnnotationModel::data(const QModelIndex &index, int role) const
 
             case Qt::BackgroundRole:
                 //Paint different background if event was set by user
-                if(m_dataIsUserEventFiltered.at(index.row()) == 1) {
-                    QBrush brush;
-                    brush.setStyle(Qt::SolidPattern);
-                    QColor colorTemp(Qt::red);
-                    colorTemp.setAlpha(15);
-                    brush.setColor(colorTemp);
-                    return QVariant(brush);
-                }
+//                if(m_dataIsUserEventFiltered.at(index.row()) == 1) {
+//                    QBrush brush;
+//                    brush.setStyle(Qt::SolidPattern);
+//                    QColor colorTemp(Qt::red);
+//                    colorTemp.setAlpha(15);
+//                    brush.setColor(colorTemp);
+//                    return QVariant(brush);
+//                }
+                QBrush brush;
+                brush.setStyle(Qt::SolidPattern);
+                brush.setColor(Qt::white);
+
+                QColor colorTemp = brush.color();
+                colorTemp.setAlpha(110);
+                brush.setColor(colorTemp);
+                return QVariant(brush);
             }
         }
 
@@ -246,14 +254,22 @@ QVariant AnnotationModel::data(const QModelIndex &index, int role) const
 
             case Qt::BackgroundRole:
                 //Paint different background if event was set by user
-                if(m_dataIsUserEventFiltered.at(index.row()) == 1) {
-                    QBrush brush;
-                    brush.setStyle(Qt::SolidPattern);
-                    QColor colorTemp(Qt::red);
-                    colorTemp.setAlpha(15);
-                    brush.setColor(colorTemp);
-                    return QVariant(brush);
-                }
+//                if(m_dataIsUserEventFiltered.at(index.row()) == 1) {
+//                    QBrush brush;
+//                    brush.setStyle(Qt::SolidPattern);
+//                    QColor colorTemp(Qt::red);
+//                    colorTemp.setAlpha(15);
+//                    brush.setColor(colorTemp);
+//                    return QVariant(brush);
+//                }
+                QBrush brush;
+                brush.setStyle(Qt::SolidPattern);
+                brush.setColor(Qt::white);
+
+                QColor colorTemp = brush.color();
+                colorTemp.setAlpha(110);
+                brush.setColor(colorTemp);
+                return QVariant(brush);
             }
         }
 
