@@ -160,7 +160,7 @@ protected slots:
 
     //=========================================================================================================
     /**
-     * Transmits the checkbox state of the 'Activate annotations' checkbox
+     * Transmits the checkbox state of the 'Show events in Signal Viewer' checkbox
      *
      * @param [in] iCheckBoxState    0 for unchecked, 2 for checked
      */
@@ -168,12 +168,18 @@ protected slots:
 
     //=========================================================================================================
     /**
-     * Transmits the checkbox state of the 'Show selected only' checkbox
+     * Transmits the checkbox state of the 'Show selected events only' checkbox
      *
      * @param [in] iCheckBoxState    0 for unchecked, 2 for checked
      */
     void onSelectedEventsChecked(int iCheckBoxState);
 
+    //=========================================================================================================
+    /**
+     * Transmits the checkbox state ofthe 'Show events from all groups' checkbox
+     *
+     * @param [in] iCheckBoxState    0 for unchecked, 2 for checked
+     */
     void onShowAllChecked(int iCheckBoxState);
 
     //=========================================================================================================
@@ -239,13 +245,21 @@ private:
      * @param[in] sName     group name
      * @param[in] iType     group default type
      */
-    void newUserGroup(QString sName, int iType = 0);
+    void newUserGroup(const QString& sName,
+                      int iType = 0);
 
     //=========================================================================================================
     /**
      * Changes currently loaded group based on selection in the group list view
      */
     void groupChanged();
+
+    //=========================================================================================================
+    /**
+     * Brings up a menu for interacting with data annotations
+     * @param[in] pos   Position on screen where the menu will show up
+     */
+    void customContextMenuRequested(const QPoint &pos);
 
     Ui::EventWindowDockWidget*                      m_pUi;                          /** < Pointer to GUI elements */
 

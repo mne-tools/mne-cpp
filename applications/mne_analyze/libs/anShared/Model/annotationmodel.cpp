@@ -100,6 +100,17 @@ AnnotationModel::AnnotationModel(QObject* parent)
 
 //=============================================================================================================
 
+AnnotationModel::~AnnotationModel()
+{
+    for(EventGroup* eventGroup : m_mAnnotationHub){
+        if(eventGroup){
+            delete eventGroup;
+        }
+    }
+}
+
+//=============================================================================================================
+
 QStringList AnnotationModel::getEventTypeList() const
 {
     return m_eventTypeList;
@@ -121,9 +132,6 @@ bool AnnotationModel::insertRows(int position, int span, const QModelIndex & par
     if (m_iSelectedGroup == ALLGROUPS){
         return false;
     }
-
-    qDebug() << "AnnotationModel::insertRows here";
-    //qDebug() << "iSamplePos:" << m_iSamplePos;
 
     if(m_dataSamples.isEmpty()) {
         m_dataSamples.insert(0, m_iSamplePos);
@@ -174,7 +182,6 @@ bool AnnotationModel::insertRows(int position, int span, const QModelIndex & par
 
 void AnnotationModel::setSamplePos(int iSamplePos)
 {
-    //qDebug() << "iSamplePos:" << iSamplePos;
     m_iSamplePos = iSamplePos;
 }
 
@@ -183,7 +190,7 @@ void AnnotationModel::setSamplePos(int iSamplePos)
 int AnnotationModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
-    return m_dataSamples_Filtered.size();
+    return m_dataSamplesFiltered.size();
 }
 
 //=============================================================================================================
@@ -198,15 +205,13 @@ int AnnotationModel::columnCount(const QModelIndex &parent) const
 
 QVariant AnnotationModel::data(const QModelIndex &index, int role) const
 {
-    //qDebug() << "AnnotationModel::data";
-
     if(role == Qt::TextAlignmentRole)
         return QVariant(Qt::AlignCenter | Qt::AlignVCenter);
 
     if(role != Qt::DisplayRole && role != Qt::BackgroundRole)
         return QVariant();
 
-    if(index.row()>=m_dataSamples_Filtered.size())
+    if(index.row()>=m_dataSamplesFiltered.size())
         return QVariant();
 
     if (index.isValid()) {
@@ -214,11 +219,11 @@ QVariant AnnotationModel::data(const QModelIndex &index, int role) const
         if(index.column()==0) {
             switch(role) {
                 case Qt::DisplayRole:
-                    return QVariant(m_dataSamples_Filtered.at(index.row())-m_iFirstSample);
+                    return QVariant(m_dataSamplesFiltered.at(index.row())-m_iFirstSample);
 
             case Qt::BackgroundRole:
                 //Paint different background if event was set by user
-                if(m_dataIsUserEvent_Filtered.at(index.row()) == 1) {
+                if(m_dataIsUserEventFiltered.at(index.row()) == 1) {
                     QBrush brush;
                     brush.setStyle(Qt::SolidPattern);
                     QColor colorTemp(Qt::red);
@@ -233,14 +238,14 @@ QVariant AnnotationModel::data(const QModelIndex &index, int role) const
         if(index.column()==1){
             switch(role) {
                 case Qt::DisplayRole: {
-                    int time = ((m_dataSamples_Filtered.at(index.row()) - m_iFirstSample) / m_fFreq) * 1000;
+                    int time = ((m_dataSamplesFiltered.at(index.row()) - m_iFirstSample) / m_fFreq) * 1000;
 
                     return QVariant((double)time / 1000);
                 }
 
             case Qt::BackgroundRole:
                 //Paint different background if event was set by user
-                if(m_dataIsUserEvent_Filtered.at(index.row()) == 1) {
+                if(m_dataIsUserEventFiltered.at(index.row()) == 1) {
                     QBrush brush;
                     brush.setStyle(Qt::SolidPattern);
                     QColor colorTemp(Qt::red);
@@ -255,7 +260,7 @@ QVariant AnnotationModel::data(const QModelIndex &index, int role) const
         if(index.column()==2) {
             switch(role) {
                 case Qt::DisplayRole:
-                    return QVariant(m_dataTypes_Filtered.at(index.row()));
+                    return QVariant(m_dataTypesFiltered.at(index.row()));
 
                 case Qt::BackgroundRole: {
                     QBrush brush;
@@ -278,7 +283,6 @@ QVariant AnnotationModel::data(const QModelIndex &index, int role) const
 
 bool AnnotationModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    //qDebug() << "AnnotationModel::setData";
     if(index.row() >= m_dataSamples.size() || index.column() >= columnCount())
         return false;
 
@@ -310,36 +314,32 @@ bool AnnotationModel::setData(const QModelIndex &index, const QVariant &value, i
 
 void AnnotationModel::setEventFilterType(const QString eventType)
 {
-    //qDebug() << "AnnotationModel::setEventFilterType";
     m_sFilterEventType = eventType;
 
     //Clear filtered event data
-    m_dataSamples_Filtered.clear();
-    m_dataTypes_Filtered.clear();
-    m_dataIsUserEvent_Filtered.clear();
+    m_dataSamplesFiltered.clear();
+    m_dataTypesFiltered.clear();
+    m_dataIsUserEventFiltered.clear();
 
     //Fill filtered event data depending on the user defined event filter type
     if(eventType == "All") {
-        m_dataSamples_Filtered = m_dataSamples;
-        m_dataTypes_Filtered = m_dataTypes;
-        m_dataIsUserEvent_Filtered = m_dataIsUserEvent;
+        m_dataSamplesFiltered = m_dataSamples;
+        m_dataTypesFiltered = m_dataTypes;
+        m_dataIsUserEventFiltered = m_dataIsUserEvent;
     }
     else {
         for(int i = 0; i<m_dataSamples.size(); i++) {
             if(m_dataTypes[i] == eventType.toInt()) {
-                m_dataSamples_Filtered.append(m_dataSamples[i]);
-                m_dataTypes_Filtered.append(m_dataTypes[i]);
-                m_dataIsUserEvent_Filtered.append(m_dataIsUserEvent[i]);
+                m_dataSamplesFiltered.append(m_dataSamples[i]);
+                m_dataTypesFiltered.append(m_dataTypes[i]);
+                m_dataIsUserEventFiltered.append(m_dataIsUserEvent[i]);
             }
         }
         m_iLastTypeAdded = eventType.toInt();
     }
 
-    emit dataChanged(createIndex(0,0), createIndex(m_dataSamples_Filtered.size(), 0));
-    emit headerDataChanged(Qt::Vertical, 0, m_dataSamples_Filtered.size());
-
-    //qDebug() << "Samp:" << m_dataSamples;
-    //qDebug() << "Filt:" << m_dataSamples_Filtered;
+    emit dataChanged(createIndex(0,0), createIndex(m_dataSamplesFiltered.size(), 0));
+    emit headerDataChanged(Qt::Vertical, 0, m_dataSamplesFiltered.size());
 }
 
 //=============================================================================================================
@@ -347,7 +347,7 @@ void AnnotationModel::setEventFilterType(const QString eventType)
 Qt::ItemFlags AnnotationModel::flags(const QModelIndex &index) const
 {
     //Return editable mode only for user events an when event type filtering is deactivated
-    if(m_dataIsUserEvent_Filtered[index.row()] == 1 && m_sFilterEventType == "All")
+    if(m_dataIsUserEventFiltered[index.row()] == 1 && m_sFilterEventType == "All")
         return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
     else
         return Qt::ItemIsEnabled | Qt::ItemIsSelectable;}
@@ -385,6 +385,8 @@ bool AnnotationModel::removeRows(int position, int span, const QModelIndex &pare
 {
     Q_UNUSED(parent);
 
+    beginRemoveRows(QModelIndex(), position, position+span-1);
+
     for (int i = 0; i < span; ++i) {
         //Only user events can be deleted
         if(m_dataIsUserEvent[position] == 1) {
@@ -392,9 +394,7 @@ bool AnnotationModel::removeRows(int position, int span, const QModelIndex &pare
             m_dataTypes.removeAt(position);
             m_dataIsUserEvent.removeAt(position);
         }
-    }
-
-    beginRemoveRows(QModelIndex(), position, position+span-1);
+    } 
 
     endRemoveRows();
 
@@ -440,10 +440,9 @@ void AnnotationModel::setSampleFreq(float fFreq)
 int AnnotationModel::getNumberOfAnnotations() const
 {
     if (m_iSelectedCheckState){
-        //qDebug() << m_dataSelectedRows.size();
         return m_dataSelectedRows.size();
     } else {
-        return m_dataSamples_Filtered.size();
+        return m_dataSamplesFiltered.size();
     }
 }
 
@@ -452,10 +451,9 @@ int AnnotationModel::getNumberOfAnnotations() const
 int AnnotationModel::getAnnotation(int iIndex) const
 {
     if (m_iSelectedCheckState){
-        //qDebug() << m_dataSamples_Filtered.at(m_dataSelectedRows.at(iIndex));
-        return m_dataSamples_Filtered.at(m_dataSelectedRows.at(iIndex));
+        return m_dataSamplesFiltered.at(m_dataSelectedRows.at(iIndex));
     } else {
-        return m_dataSamples_Filtered.at(iIndex);
+        return m_dataSamplesFiltered.at(iIndex);
     }
 }
 
@@ -566,14 +564,14 @@ void AnnotationModel::setLastType(int iType)
 
 void AnnotationModel::updateFilteredSample(int iIndex, int iSample)
 {
-    m_dataSamples_Filtered[iIndex] = iSample + m_iFirstSample;
+    m_dataSamplesFiltered[iIndex] = iSample + m_iFirstSample;
 }
 
 //=============================================================================================================
 
 void AnnotationModel::updateFilteredSample(int iSample)
 {
-    m_dataSamples_Filtered[m_iSelectedAnn] = iSample + m_iFirstSample;
+    m_dataSamplesFiltered[m_iSelectedAnn] = iSample + m_iFirstSample;
 }
 
 //=============================================================================================================
@@ -588,7 +586,6 @@ void AnnotationModel::clearSelected()
 void AnnotationModel::appendSelected(int iSelectedIndex)
 {
     m_dataSelectedRows.append(iSelectedIndex);
-//    qDebug() << m_dataSelectedRows;
 }
 
 //=============================================================================================================
@@ -641,18 +638,18 @@ void AnnotationModel::switchGroup(int iGroupIndex)
         m_mAnnotationHub[m_iSelectedGroup]->dataTypes = m_dataTypes;
         m_mAnnotationHub[m_iSelectedGroup]->dataIsUserEvent = m_dataIsUserEvent;
 
-        m_mAnnotationHub[m_iSelectedGroup]->dataSamples_Filtered = m_dataSamples_Filtered;
-        m_mAnnotationHub[m_iSelectedGroup]->dataTypes_Filtered = m_dataTypes_Filtered;
-        m_mAnnotationHub[m_iSelectedGroup]->dataIsUserEvent_Filtered = m_dataIsUserEvent_Filtered;
+        m_mAnnotationHub[m_iSelectedGroup]->dataSamples_Filtered = m_dataSamplesFiltered;
+        m_mAnnotationHub[m_iSelectedGroup]->dataTypes_Filtered = m_dataTypesFiltered;
+        m_mAnnotationHub[m_iSelectedGroup]->dataIsUserEvent_Filtered = m_dataIsUserEventFiltered;
     }
 
     m_dataSamples = m_mAnnotationHub[iGroupIndex]->dataSamples;
     m_dataTypes = m_mAnnotationHub[iGroupIndex]->dataTypes;
     m_dataIsUserEvent = m_mAnnotationHub[iGroupIndex]->dataIsUserEvent;
 
-    m_dataSamples_Filtered = m_mAnnotationHub[iGroupIndex]->dataSamples_Filtered;
-    m_dataTypes_Filtered = m_mAnnotationHub[iGroupIndex]->dataTypes_Filtered;
-    m_dataIsUserEvent_Filtered = m_mAnnotationHub[iGroupIndex]->dataIsUserEvent_Filtered;
+    m_dataSamplesFiltered = m_mAnnotationHub[iGroupIndex]->dataSamples_Filtered;
+    m_dataTypesFiltered = m_mAnnotationHub[iGroupIndex]->dataTypes_Filtered;
+    m_dataIsUserEventFiltered = m_mAnnotationHub[iGroupIndex]->dataIsUserEvent_Filtered;
 
     m_iSelectedGroup = m_mAnnotationHub[iGroupIndex]->groupNumber;
     m_bIsUserMade = m_mAnnotationHub[iGroupIndex]->isUserMade;
@@ -694,9 +691,9 @@ void AnnotationModel::showAll(bool bSet)
             m_mAnnotationHub[m_iSelectedGroup]->dataTypes = m_dataTypes;
             m_mAnnotationHub[m_iSelectedGroup]->dataIsUserEvent = m_dataIsUserEvent;
 
-            m_mAnnotationHub[m_iSelectedGroup]->dataSamples_Filtered = m_dataSamples_Filtered;
-            m_mAnnotationHub[m_iSelectedGroup]->dataTypes_Filtered = m_dataTypes_Filtered;
-            m_mAnnotationHub[m_iSelectedGroup]->dataIsUserEvent_Filtered = m_dataIsUserEvent_Filtered;
+            m_mAnnotationHub[m_iSelectedGroup]->dataSamples_Filtered = m_dataSamplesFiltered;
+            m_mAnnotationHub[m_iSelectedGroup]->dataTypes_Filtered = m_dataTypesFiltered;
+            m_mAnnotationHub[m_iSelectedGroup]->dataIsUserEvent_Filtered = m_dataIsUserEventFiltered;
         }
 
         m_iSelectedGroup = ALLGROUPS;
@@ -717,9 +714,9 @@ void AnnotationModel::loadAllGroups()
         m_dataTypes.append(e->dataTypes);
         m_dataIsUserEvent.append(e->dataIsUserEvent);
 
-        m_dataSamples_Filtered.append(e->dataSamples_Filtered);
-        m_dataTypes_Filtered.append(e->dataTypes_Filtered);
-        m_dataIsUserEvent_Filtered = e->dataIsUserEvent_Filtered;
+        m_dataSamplesFiltered.append(e->dataSamples_Filtered);
+        m_dataTypesFiltered.append(e->dataTypes_Filtered);
+        m_dataIsUserEventFiltered = e->dataIsUserEvent_Filtered;
     }
 }
 
@@ -731,9 +728,9 @@ void AnnotationModel::resetSelection()
     m_dataTypes.clear();
     m_dataIsUserEvent.clear();
 
-    m_dataSamples_Filtered.clear();
-    m_dataTypes_Filtered.clear();
-    m_dataIsUserEvent_Filtered.clear();
+    m_dataSamplesFiltered.clear();
+    m_dataTypesFiltered.clear();
+    m_dataIsUserEventFiltered.clear();
 }
 
 //=============================================================================================================

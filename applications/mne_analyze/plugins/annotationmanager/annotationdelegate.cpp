@@ -103,7 +103,6 @@ QWidget* AnnotationDelegate::createEditor(QWidget *parent,
 
 void AnnotationDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
-    //qDebug() << "AnnotationDelegate::setEditorData";
     switch(index.column()) {
         case 0: {
             int value = index.model()->data(index, Qt::DisplayRole).toInt();
@@ -133,7 +132,6 @@ void AnnotationDelegate::setEditorData(QWidget *editor, const QModelIndex &index
 void AnnotationDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
                                     const QModelIndex &index) const
 {
-    qDebug() << "setModelData";
     switch(index.column()) {
         case 0: {
             QSpinBox *spinBox = static_cast<QSpinBox*>(editor);
@@ -168,7 +166,6 @@ void AnnotationDelegate::setModelData(QWidget *editor, QAbstractItemModel *model
 void AnnotationDelegate::updateEditorGeometry(QWidget *editor,
     const QStyleOptionViewItem &option, const QModelIndex &/* index */) const
 {
-    qDebug() << "updateEditorGeometry";
     editor->setGeometry(option.rect);
 }
 
@@ -176,7 +173,6 @@ void AnnotationDelegate::updateEditorGeometry(QWidget *editor,
 
 void AnnotationDelegate::onSampleValueChanged(int iValue)
 {
-//    qDebug() << "[AnnotationDelegate::onSampleValueChanged] -- " << iValue ;
     emit sampleValueChanged(iValue);
 }
 
@@ -184,7 +180,6 @@ void AnnotationDelegate::onSampleValueChanged(int iValue)
 
 void AnnotationDelegate::onTimeValueChanged(double dValue)
 {
-//    qDebug() << "[AnnotationDelegate::onTimeValueChanged] -- " << dValue ;
     emit timeValueChanged(dValue);
 }
 
