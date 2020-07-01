@@ -358,6 +358,8 @@ public:
      */
     void hideAll();
 
+    int getIndexCount();
+
     //=========================================================================================================
     /**
      * The type of this model (AnnotationModel)
@@ -413,6 +415,7 @@ private:
 
     int                                 m_iSelectedGroup;               /** <Index in m_mAnnotationHub of the current selected group */
     int                                 m_iType;                        /** <Type of the currently selected event group */
+    int                                 m_iIndexCount;
 
     QVector<int>                        m_dataSamples;                  /**< Vector of samples of events of the currently loded event group */
     QVector<int>                        m_dataTypes;                    /**< Types of the events of the currently loaded event group */

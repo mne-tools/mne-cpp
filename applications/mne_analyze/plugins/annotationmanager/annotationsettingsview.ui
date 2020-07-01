@@ -77,7 +77,7 @@
         <property name="handleWidth">
          <number>1</number>
         </property>
-        <widget class="QListView" name="m_listView_groupListView">
+        <widget class="QListWidget" name="m_listWidget_groupListWidget">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
            <horstretch>0</horstretch>

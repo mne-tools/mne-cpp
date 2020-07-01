@@ -75,6 +75,7 @@ using namespace ANSHAREDLIB;
 
 AnnotationModel::AnnotationModel(QObject* parent)
 : AbstractModel(parent)
+, m_iIndexCount(0)
 , m_iSamplePos(0)
 , m_iFirstSample(0)
 , m_iSelectedCheckState(0)
@@ -609,9 +610,8 @@ MatrixXi AnnotationModel::getAnnotationMatrix()
 int AnnotationModel::createGroup(QString sGroupName, bool bIsUserMade, int iType)
 {
     EventGroup* newEvent = new EventGroup();
-    int iSize = m_mAnnotationHub.size();
 
-    *newEvent = {iSize,                         //groupNumber
+    *newEvent = {m_iIndexCount,                 //groupNumber
                  iType,                         //groupType
                  sGroupName,                    //groupName
                  bIsUserMade,                   //isUserMade
@@ -622,9 +622,9 @@ int AnnotationModel::createGroup(QString sGroupName, bool bIsUserMade, int iType
                  QVector<int>(),                //dataTypes_Filtered
                  QVector<int>()};               //dataIsUserEvent_Filtered
 
-    m_mAnnotationHub.insert(iSize, newEvent);
+    m_mAnnotationHub.insert(m_iIndexCount, newEvent);
 
-    return iSize;
+    return m_iIndexCount++;
 }
 
 //=============================================================================================================
@@ -740,4 +740,10 @@ void AnnotationModel::hideAll()
     beginResetModel();
     resetSelection();
     endResetModel();
+}
+
+//=============================================================================================================
+
+int AnnotationModel::getIndexCount(){
+    return m_iIndexCount;
 }
