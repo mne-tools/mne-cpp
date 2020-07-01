@@ -638,7 +638,6 @@ void MainWindow::setLineEditMNECommand(QString s)
 
 void MainWindow::openInFileDialog()
 {
-#define WASMBUILD
 #ifdef WASMBUILD
     m_pUi->pushButtonReadData->setDisabled(true);
 
