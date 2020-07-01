@@ -245,7 +245,7 @@ private:
      * @param[in] sName     group name
      * @param[in] iType     group default type
      */
-    void newUserGroup(const QString& sName,
+    bool newUserGroup(const QString& sName,
                       int iType = 0);
 
     //=========================================================================================================
@@ -282,7 +282,6 @@ private:
 
     QSharedPointer<AnnotationDelegate>              m_pAnnDelegate;                 /** < Pointer to associated delegate */
     QSharedPointer<ANSHAREDLIB::AnnotationModel>    m_pAnnModel;                    /** < Pointer to associated model. Points to currently loaded. */
-    QSharedPointer<QStringListModel>                m_pStrListModel;                /** < */
 
     QColorDialog*                                   m_pColordialog;                 /** < USed for Prompting users for annotation type colors */
 };
