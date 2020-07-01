@@ -359,10 +359,10 @@ int SettingsControllerCl::parseInOutFiles()
 
     if(m_parser.isSet("in"))
     {
-        m_fiInFileInfo.setFile(m_parser.value("in"));
-        if(m_fiInFileInfo.isFile())
+        m_fiInFile.setFile(m_parser.value("in"));
+        if(m_fiInFile.isFile())
         {
-            if(m_pAnonymizer->setFileIn(m_fiInFileInfo.absoluteFilePath()))
+            if(m_pAnonymizer->setInFile(m_fiInFile.absoluteFilePath()))
             {
                 qCritical() << "Error while setting the input file.";
                 return 1;
@@ -381,24 +381,24 @@ int SettingsControllerCl::parseInOutFiles()
 
     if(m_parser.isSet("out"))
     {
-        m_fiOutFileInfo.setFile(m_parser.value("out"));
-        if(m_fiOutFileInfo.isDir())
+        m_fiOutFile.setFile(m_parser.value("out"));
+        if(m_fiOutFile.isDir())
         {
             qCritical() << "Error. Output file is infact a folder.";
             return 1;
         } else {
-            if((m_fiInFileInfo.absoluteFilePath() == m_fiOutFileInfo.absoluteFilePath()))
+            if((m_fiInFile.absoluteFilePath() == m_fiOutFile.absoluteFilePath()))
             {
                 m_bInOutFileNamesEqual = true;
-                QString fileOut(QDir(m_fiInFileInfo.absolutePath()).filePath(generateRandomFileName()));
-                m_fiOutFileInfo.setFile(fileOut);
-                if(m_pAnonymizer->setFileOut(m_fiOutFileInfo.absoluteFilePath()))
+                QString fileOut(QDir(m_fiInFile.absolutePath()).filePath(generateRandomFileName()));
+                m_fiOutFile.setFile(fileOut);
+                if(m_pAnonymizer->setOutFile(m_fiOutFile.absoluteFilePath()))
                 {
                     qCritical() << "Error while setting the output file.";
                     return 1;
                 }
             }
-            if(m_pAnonymizer->setFileOut(m_fiOutFileInfo.absoluteFilePath()))
+            if(m_pAnonymizer->setOutFile(m_fiOutFile.absoluteFilePath()))
             {
                 qCritical() << "Error while setting the output file.";
                 return 1;
@@ -408,7 +408,7 @@ int SettingsControllerCl::parseInOutFiles()
         if(!m_bGuiMode)
         {
             generateDefaultOutputFileName();
-            if(m_pAnonymizer->setFileOut(m_fiOutFileInfo.absoluteFilePath()))
+            if(m_pAnonymizer->setOutFile(m_fiOutFile.absoluteFilePath()))
             {
                 qCritical() << "Error while setting the output file.";
                 return 1;
@@ -440,7 +440,7 @@ int SettingsControllerCl::execute()
 
     if(!m_bSilentMode)
     {
-        std::printf("\n%s\n", QString("MNE Anonymize finished correctly: " + m_fiInFileInfo.fileName() + " -> " + m_fiOutFileInfo.fileName()).toUtf8().data());
+        std::printf("\n%s\n", QString("MNE Anonymize finished correctly: " + m_fiInFile.fileName() + " -> " + m_fiOutFile.fileName()).toUtf8().data());
     }
 
     printFooterIfVerbose();
@@ -456,7 +456,7 @@ bool SettingsControllerCl::checkDeleteInputFile()
     {
         if(!m_bSilentMode)
         {
-            std::printf("\n%s", QString("You have requested to delete the input file: " + m_fiInFileInfo.fileName()).toUtf8().data());
+            std::printf("\n%s", QString("You have requested to delete the input file: " + m_fiInFile.fileName()).toUtf8().data());
         }
 
         if(m_bDeleteInputFileConfirmation) //true by default
@@ -482,7 +482,7 @@ bool SettingsControllerCl::checkDeleteInputFile()
 
 void SettingsControllerCl::deleteInputFile()
 {
-    QFile inFile(m_fiInFileInfo.absoluteFilePath());
+    QFile inFile(m_fiInFile.absoluteFilePath());
     if((m_bInputFileDeleted = inFile.remove()))
     {
         printIfVerbose("Input file deleted.");
@@ -533,16 +533,16 @@ bool SettingsControllerCl::checkRenameOutputFile()
 
 void SettingsControllerCl::renameOutputFileAsInputFile()
 {
-    QFile auxFile(m_fiOutFileInfo.absoluteFilePath());
-    if((m_bOutFileRenamed = auxFile.rename(m_fiInFileInfo.absoluteFilePath())))
+    QFile auxFile(m_fiOutFile.absoluteFilePath());
+    if((m_bOutFileRenamed = auxFile.rename(m_fiInFile.absoluteFilePath())))
     {
         if(m_bVerboseMode)
         {
-            std::printf("\n%s",QString("Output file named: " + m_fiOutFileInfo.fileName() + " --> renamed as: " + m_fiInFileInfo.fileName()).toUtf8().data());
+            std::printf("\n%s",QString("Output file named: " + m_fiOutFile.fileName() + " --> renamed as: " + m_fiInFile.fileName()).toUtf8().data());
         }
-        m_fiOutFileInfo.setFile(m_fiInFileInfo.absoluteFilePath());
+        m_fiOutFile.setFile(m_fiInFile.absoluteFilePath());
     } else {
-        qCritical() << "Error while renaming the output file: " << auxFile.fileName() << " as " << m_fiInFileInfo.fileName();
+        qCritical() << "Error while renaming the output file: " << auxFile.fileName() << " as " << m_fiInFile.fileName();
     }
 }
 
@@ -588,22 +588,22 @@ QString SettingsControllerCl::generateRandomFileName()
 
 QString SettingsControllerCl::generateDefaultOutputFileName()
 {
-    QString fileOut(QDir(m_fiInFileInfo.absolutePath()).filePath(
-                m_fiInFileInfo.baseName() + "_anonymized." + m_fiInFileInfo.completeSuffix()));
-    m_fiOutFileInfo.setFile(fileOut);
-    return m_fiOutFileInfo.absoluteFilePath();
+    QString fileOut(QDir(m_fiInFile.absolutePath()).filePath(
+                m_fiInFile.baseName() + "_anonymized." + m_fiInFile.completeSuffix()));
+    m_fiOutFile.setFile(fileOut);
+    return m_fiOutFile.absoluteFilePath();
 }
 
 //=============================================================================================================
 
 QFileInfo SettingsControllerCl::getQFiInFile()
 {
-    return m_fiInFileInfo;
+    return m_fiInFile;
 }
 
 //=============================================================================================================
 
 QFileInfo SettingsControllerCl::getQFiOutFile()
 {
-    return m_fiOutFileInfo;
+    return m_fiOutFile;
 }

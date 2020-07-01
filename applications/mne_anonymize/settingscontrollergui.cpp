@@ -111,14 +111,14 @@ void SettingsControllerGui::readData()
         m_pWin->statusMsg("Reading input file information...",0);
         QString stringTempDir(QStandardPaths::writableLocation(QStandardPaths::TempLocation));
         QString fileOutStr(QDir(stringTempDir).filePath(generateRandomFileName()));
-        m_pAnonymizer->setFileOut(fileOutStr);
+        m_pAnonymizer->setOutFile(fileOutStr);
         m_pWin->setDefaultStateExtraInfo();
         bool verboseMode(m_pAnonymizer->getVerboseMode());
         m_pAnonymizer->setVerboseMode(false);
         m_pAnonymizer->anonymizeFile();
         QFile fileOut(fileOutStr);
         fileOut.remove();
-        m_pAnonymizer->setFileOut(m_fiOutFileInfo.absoluteFilePath());
+        m_pAnonymizer->setOutFile(m_fiOutFile.absoluteFilePath());
         m_pAnonymizer->setVerboseMode(verboseMode);
         QString msg2("Input file information read correctly.");
         m_pWin->statusMsg(msg2,2000);
@@ -136,32 +136,30 @@ void SettingsControllerGui::fileInChanged(const QString& strInFile)
     if(newfiInFile.isDir())
     {
         m_pWin->statusMsg("Invalid input file. That's a directory");
-        m_pWin->setInFile(m_fiInFileInfo.absoluteFilePath());
+        m_pWin->setInFile(m_fiInFile.absoluteFilePath());
         return;
     }
     if(QString::compare(newfiInFile.suffix(),QString("fif")) != 0)
     {
-        m_pWin->statusMsg("The input file extension must be \".fif\" 0.");
-        m_pWin->setOutFile(m_fiOutFileInfo.absoluteFilePath());
+        m_pWin->statusMsg("The input file extension must be \".fif\".");
+        m_pWin->setInFile(m_fiInFile.absoluteFilePath());
         return;
     }
-    QFileInfo inDir(newfiInFile.absolutePath());
-    if(!inDir.isReadable())
+
+    if(!newfiInFile.isReadable())
     {
         m_pWin->statusMsg("You might not have reading permissions to this folder");
-        m_pWin->setInFile(m_fiInFileInfo.absoluteFilePath());
+        m_pWin->setInFile(m_fiInFile.absoluteFilePath());
         return;
     }
 
-    if( m_fiInFileInfo != newfiInFile )
-    {
-        m_fiInFileInfo.setFile(newfiInFile.absoluteFilePath());
-        m_pAnonymizer->setFileIn(m_fiInFileInfo.absoluteFilePath());
 
-        generateDefaultOutputFileName();
-        m_pWin->setInFile(m_fiInFileInfo.absoluteFilePath());
-        m_pWin->setOutFile(m_fiOutFileInfo.absoluteFilePath());
-    }
+    m_fiInFile.setFile(newfiInFile.absoluteFilePath());
+    m_pAnonymizer->setInFile(m_fiInFile.absoluteFilePath());
+
+    generateDefaultOutputFileName();
+    m_pWin->setOutFile(m_fiOutFile.absoluteFilePath());
+    m_pAnonymizer->setOutFile(m_fiOutFile.absoluteFilePath());
 }
 
 //=============================================================================================================
