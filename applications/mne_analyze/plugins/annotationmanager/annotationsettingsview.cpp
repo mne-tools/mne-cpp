@@ -51,6 +51,7 @@
 #include <QFileDialog>
 #include <QKeyEvent>
 #include <QMenu>
+#include <QMessageBox>
 
 //=============================================================================================================
 // Eigen INCLUDES
@@ -66,7 +67,6 @@ AnnotationSettingsView::AnnotationSettingsView()
 , m_iCheckState(0)
 , m_iLastSampClicked(0)
 , m_pAnnModel(Q_NULLPTR)
-, m_pStrListModel(QSharedPointer<QStringListModel>::create())
 , m_pColordialog(new QColorDialog(this))
 {
     m_pUi->setupUi(this);
@@ -199,9 +199,7 @@ void AnnotationSettingsView::addAnnotationToModel()
 {
     qDebug() << "AnnotationSettingsView::addAnnotationToModel -- Here";
 
-    if (m_pStrListModel->stringList().isEmpty()) {
-        newUserGroup("User Made");
-    } /*else {
+     /*else {
         if(m_pAnnModel->isUserMade()){
             //Do nothing
         } else {
@@ -271,13 +269,11 @@ void AnnotationSettingsView::removeAnnotationfromModel()
 
 void AnnotationSettingsView::addNewAnnotationType()
 {
-    m_pAnnModel->addNewAnnotationType(QString().number(m_pUi->m_spinBox_addEventType->value()),
+    if(newUserGroup(m_pUi->lineEdit->text(), m_pUi->m_spinBox_addEventType->value())) {
+        m_pAnnModel->addNewAnnotationType(QString().number(m_pUi->m_spinBox_addEventType->value()),
                                       m_pColordialog->getColor(Qt::black, this));
-
-    newUserGroup(m_pUi->lineEdit->text(),
-                 m_pUi->m_spinBox_addEventType->value());
-
-    emit triggerRedraw();
+        emit triggerRedraw();
+    }
 }
 
 //=============================================================================================================
@@ -385,11 +381,20 @@ void AnnotationSettingsView::realTimeDataTime(double dValue)
 
 //=============================================================================================================
 
-void AnnotationSettingsView::newUserGroup(const QString& sName, int iType)
+bool AnnotationSettingsView::newUserGroup(const QString& sName, int iType)
 {
-    QStringList* list = new QStringList(m_pStrListModel->stringList());
-    list->append(sName);
-    m_pStrListModel->setStringList(*list);
+//    QStringList* list = new QStringList(m_pStrListModel->stringList());
+//    list->append(sName);
+//    m_pStrListModel->setStringList(*list);
+
+    if (!(m_pUi->m_listWidget_groupListWidget->findItems(sName, Qt::MatchExactly).isEmpty())){
+        //Name already in use
+        QMessageBox msgBox;
+        msgBox.setText("Group name already in use");
+        msgBox.setInformativeText("Please select a new name");
+        msgBox.exec();
+        return false;
+    }
 
     int iCat = m_pAnnModel->createGroup(sName, true, iType);
 
@@ -399,7 +404,10 @@ void AnnotationSettingsView::newUserGroup(const QString& sName, int iType)
     m_pUi->m_listWidget_groupListWidget->addItem(newItem);
     emit m_pUi->m_listWidget_groupListWidget->setCurrentItem(newItem);
 
+    m_pUi->lineEdit->setText("New Group " + QString::number(iCat + 1));
+
     //m_pUi->m_listWidget_groupListWidget->selectionModel()->select(m_pStrListModel->index(iCat), QItemSelectionModel::ClearAndSelect);
+    return true;
 }
 
 //=============================================================================================================
