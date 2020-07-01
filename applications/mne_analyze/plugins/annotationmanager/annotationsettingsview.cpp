@@ -150,10 +150,6 @@ void AnnotationSettingsView::initGUIFunctionality()
     connect(m_pUi->m_pushButtonSave, &QPushButton::clicked,
             this, &AnnotationSettingsView::onSaveButton, Qt::UniqueConnection);
 
-    //Delete button
-    connect(m_pUi->m_pushButtonDelete, &QPushButton::clicked,
-            this, &AnnotationSettingsView::removeAnnotationfromModel, Qt::UniqueConnection);
-
     //Adding Events
     connect(m_pAnnModel.data(), &ANSHAREDLIB::AnnotationModel::addNewAnnotation,
             this, &AnnotationSettingsView::addAnnotationToModel, Qt::UniqueConnection);
@@ -164,10 +160,15 @@ void AnnotationSettingsView::initGUIFunctionality()
 
     m_pUi->m_tableView_eventTableView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(m_pUi->m_tableView_eventTableView, &QWidget::customContextMenuRequested,
-            this, &AnnotationSettingsView::customContextMenuRequested, Qt::UniqueConnection);
+            this, &AnnotationSettingsView::customEventContextMenuRequested, Qt::UniqueConnection);
 
     m_pUi->m_tableView_eventTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     m_pUi->m_tableView_eventTableView->setEditTriggers(QAbstractItemView::DoubleClicked);
+
+    m_pUi->m_listWidget_groupListWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(m_pUi->m_listWidget_groupListWidget, &QWidget::customContextMenuRequested,
+            this, &AnnotationSettingsView::customGroupContextMenuRequested, Qt::UniqueConnection);
+
 }
 
 //=============================================================================================================
@@ -312,7 +313,7 @@ void AnnotationSettingsView::disconnectFromModel()
     disconnect(m_pUi->m_checkBox_showAll, &QCheckBox::stateChanged,
             this, &AnnotationSettingsView::onShowAllChecked);
     disconnect(m_pUi->m_tableView_eventTableView, &QWidget::customContextMenuRequested,
-            this, &AnnotationSettingsView::customContextMenuRequested);
+            this, &AnnotationSettingsView::customEventContextMenuRequested);
 
 }
 
@@ -436,13 +437,37 @@ void AnnotationSettingsView::onShowAllChecked(int iCheckBoxState)
 
 //=============================================================================================================
 
-void AnnotationSettingsView::customContextMenuRequested(const QPoint &pos)
+void AnnotationSettingsView::customEventContextMenuRequested(const QPoint &pos)
 {
     QMenu* menu = new QMenu(this);
 
-    QAction* markTime = menu->addAction(tr("Delete Event"));
+    QAction* markTime = menu->addAction(tr("Delete event"));
     connect(markTime, &QAction::triggered,
             this, &AnnotationSettingsView::removeAnnotationfromModel, Qt::UniqueConnection);
 
     menu->popup(m_pUi->m_tableView_eventTableView->viewport()->mapToGlobal(pos));
+}
+
+//=============================================================================================================
+
+void AnnotationSettingsView::customGroupContextMenuRequested(const QPoint &pos)
+{
+    QMenu* menu = new QMenu(this);
+
+    QAction* markTime = menu->addAction(tr("Delete group"));
+    connect(markTime, &QAction::triggered,
+            this, &AnnotationSettingsView::deleteGroup, Qt::UniqueConnection);
+
+    menu->popup(m_pUi->m_listWidget_groupListWidget->viewport()->mapToGlobal(pos));
+}
+
+//=============================================================================================================
+
+void AnnotationSettingsView::deleteGroup()
+{
+    int iSelected = m_pUi->m_listWidget_groupListWidget->selectionModel()->selectedRows().first().row();
+    QListWidgetItem* itemToDelete = m_pUi->m_listWidget_groupListWidget->takeItem(iSelected);
+    m_pAnnModel->removeGroup(itemToDelete->data(Qt::UserRole).toInt());
+    m_pUi->m_listWidget_groupListWidget->selectionModel()->clearSelection();
+    delete itemToDelete;
 }
