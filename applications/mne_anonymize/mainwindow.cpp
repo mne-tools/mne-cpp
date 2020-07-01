@@ -55,6 +55,7 @@
 #include <QDesktopServices>
 #include <QDateTime>
 #include <QFileDialog>
+#include <QFile>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -149,6 +150,8 @@ void MainWindow::setDefautlStateUi()
     } else {
         m_pUi->checkBoxShowOptions->setCheckState(Qt::Unchecked);
     }
+
+    m_pUi->tabWidget->setCurrentIndex(0);
 
     m_pUi->frameOptionsAndExtraInfo->setVisible(m_bOptionsVisibility);
     m_pUi->pushButtonReadData->setVisible(m_bOptionsVisibility);
