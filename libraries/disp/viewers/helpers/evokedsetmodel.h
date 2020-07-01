@@ -113,6 +113,7 @@ public:
      * @param[in] parent     parent of the table model
      */
     EvokedSetModel(QObject *parent = 0);
+
     ~EvokedSetModel();
 
     //=========================================================================================================
@@ -206,14 +207,6 @@ public:
      * Update stored data
      */
     void updateData();
-
-    //=========================================================================================================
-    /**
-     * Set filter activation
-     *
-     * @param[in] state    filter on/off flag
-     */
-    void setFilterActive(bool state);
 
     //=========================================================================================================
     /**
@@ -385,37 +378,7 @@ public:
      */
     void toggleFreeze();
 
-    //=========================================================================================================
-    /**
-     * Set filter
-     *
-     * @param[in] filterData    list of the currently active filter
-     */
-    void setFilter(const RTPROCESSINGLIB::FilterKernel &filterData);
-
-    //=========================================================================================================
-    /**
-     * Sets the type of channel which are to be filtered
-     *
-     * @param[in] channelType    the channel type which is to be filtered (EEG, MEG, All)
-     */
-    void setFilterChannelType(const QString &channelType);
-
-    //=========================================================================================================
-    /**
-     * Create list of channels which are to be filtered based on channel names
-     *
-     * @param[in] channelNames    the channel names which are to be filtered
-     */
-    void createFilterChannelList(QStringList channelNames);
-
 private:
-    //=========================================================================================================
-    /**
-     * Calculates the filtered version of the channels in m_matData
-     */
-    void filterDataBlock();
-
     QSharedPointer<FIFFLIB::FiffEvokedSet>  m_pEvokedSet;                   /**< The evoked set measurement. */
 
     QMap<qint32,qint32>                     m_qMapIdxRowSelection;          /**< Selection mapping.*/
@@ -426,8 +389,6 @@ private:
 
     QList<Eigen::MatrixXd>                  m_matData;                      /**< List that holds the data*/
     QList<Eigen::MatrixXd>                  m_matDataFreeze;                /**< List that holds the data when freezed*/
-    QList<Eigen::MatrixXd>                  m_matDataFiltered;              /**< The filtered data */
-    QList<Eigen::MatrixXd>                  m_matDataFilteredFreeze;        /**< The raw filtered data in freeze mode */
     QStringList                             m_lAvrTypes;                    /**< The average types */
 
     Eigen::MatrixXd                         m_matProj;                      /**< SSP projector */
@@ -444,14 +405,7 @@ private:
     bool                                    m_bIsFreezed;                   /**< Display is freezed */
     bool                                    m_bProjActivated;               /**< Doo projections flag */
     bool                                    m_bCompActivated;               /**< Compensator activated */
-    bool                                    m_bPerformFiltering;            /**< Flag whether to activate/deactivate filtering. */
     float                                   m_fSps;                         /**< Sampling rate */
-    qint32                                  m_iMaxFilterLength;             /**< Max order of the current filters */
-
-    QString                                 m_sFilterChannelType;           /**< Kind of channel which is to be filtered */
-    QList<RTPROCESSINGLIB::FilterKernel>             m_filterKernel;                   /**< List of currently active filters. */
-    QStringList                             m_filterChannelList;            /**< List of channels which are to be filtered.*/
-    QStringList                             m_visibleChannelList;           /**< List of currently visible channels in the view.*/
 
 signals:
     //=========================================================================================================
