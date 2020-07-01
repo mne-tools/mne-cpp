@@ -725,16 +725,29 @@ void MainWindow::openOutFileDialog()
 void MainWindow::outputFileReady()
 {
 #ifdef WASMBUILD
-    QFile::remove(m_sDefaultWasmInFile);
-    setInFile("");
-    QFile fileOut(m_sDefaultWasmOutFile);
-    if (!fileOut.open(QIODevice::ReadOnly)) return;
-    QByteArray  oufFileContent;
-    oufFileContent = fileOut.readAll();
+    //we need to give space to the output file to be copied.
+    QFile::remove(m_fiInFile.absoluteFilePath());
+
+    QFile fileOut(m_fiOutFile.absoluteFilePath());
+//    qDebug() << "file out:" << m_fiOutFile.absoluteFilePath();
+//    qDebug() << "fileout size: " << QString::number(fileOut.size());
+
+    fileOut.open(QIODevice::ReadWrite);
+    QByteArray  outFileContent;
+
+    outFileContent = fileOut.readAll();
+
+//    qDebug() << "fileout size (after read): " << QString::number(fileOut.size());
 
     QFileInfo fiInFile(m_pUi->lineEditInFile->text());
     QString fileOutName(fiInFile.baseName() + "_anonymized." + fiInFile.completeSuffix());
-    QFileDialog::saveFileContent(oufFileContent,fileOutName);
+
+    QFileDialog::saveFileContent(outFileContent,fileOutName);
+
+    //we reset the input file textbox (and the according member var) because we want to
+    //make explicit to the user that the input file has been deleted. Reading or anonymization
+    //will not work.
+    setInFile("");
 #else
     statusMsg("Your file is ready!");
 #endif
