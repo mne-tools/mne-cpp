@@ -638,37 +638,46 @@ void MainWindow::setLineEditMNECommand(QString s)
 
 void MainWindow::openInFileDialog()
 {
+#define WASMBUILD
 #ifdef WASMBUILD
+    m_pUi->pushButtonReadData->setDisabled(true);
+
+    auto fileContentReady = [&](const QString &filePath, const QByteArray &fileContent) {
+        if(!filePath.isNull()) {
+
+            QFile fileIn(m_sDefaultWasmInFile);
+            fileIn.open(QIODevice::WriteOnly);
+            fileIn.write(fileContent);
+            fileIn.close();
+
+            m_fiInFile.setFile(m_sDefaultWasmInFile);
+            m_pUi->lineEditInFile->setText(filePath);
+            emit fileInChanged(m_fiInFile.absoluteFilePath());
+
+            m_fiOutFile.setFile(m_sDefaultWasmOutFile);
+            emit fileOutChanged(m_fiOutFile.absoluteFilePath());
+
+            m_pUi->pushButtonReadData->setDisabled(false);
+        }
+    };
+
     if(m_bShowWraningMsgBoxInWasm)
     {
         m_bShowWraningMsgBoxInWasm = false;
-        m_pUi->labelInFile->setText(m_pUi->labelInFile->text() + " [Max. 450MB]. ");
+        m_pUi->labelInFile->setText(m_pUi->labelInFile->text() + " [Max. 500MB]. ");
         QMessageBox msgBox(this);
         msgBox.setWindowTitle("Warning on FIFF maximum size.");
         msgBox.setTextFormat(Qt::RichText);   //this is what makes the links clickable
-        msgBox.setText("Warning. Development version.\nBrowser-based MNE Anonymize is compatible with FIFF files up to 450MB.\n"
+        msgBox.setText("Warning. Development version.\nBrowser-based MNE Anonymize is compatible with FIFF files up to 500MB.\n"
                        "For bigger files, download MNE-CPP suite from <a href='https://mne-cpp.github.io/pages/install/binaries.html'>here</a>.\n"
                        "                Sincerely, the development team @ MNE-CPP.");
         msgBox.exec();
-    } else {
-        auto fileContentReady = [&](const QString &filePath, const QByteArray &fileContent) {
-            if(!filePath.isNull()) {
-
-                QFile fileIn(m_sDefaultWasmInFile);
-                fileIn.open(QIODevice::WriteOnly);
-                fileIn.write(fileContent);
-                fileIn.close();
-
-                m_fiInFile.setFile(m_sDefaultWasmInFile);
-                m_pUi->lineEditInFile->setText(filePath);
-                emit fileInChanged(m_sDefaultWasmInFile);
-
-                m_fiOutFile.setFile(m_sDefaultWasmOutFile);
-                emit fileOutChanged(m_sDefaultWasmOutFile);
-            }
-        };
-        QFileDialog::getOpenFileContent("Fiff File (*.fif *.fiff)",  fileContentReady);
     }
+
+    QFileDialog::getOpenFileContent("Fiff File (*.fif *.fiff)",  fileContentReady);
+
+
+
 #else
     QFileDialog dialog(this);
     dialog.setNameFilter(tr("Fiff file (*.fif *.fiff)"));
