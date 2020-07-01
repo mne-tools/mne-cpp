@@ -200,10 +200,13 @@ void SettingsControllerGui::setupCommunication()
 {
     //view to controller
     QObject::connect(m_pWin.data(),&MainWindow::fileInChanged,
-                     this,&SettingsControllerGui::fileInChanged);
+                     this,&SettingsControllerGui::fileInChanged,
+                     Qt::ConnectionType::DirectConnection);
 
     QObject::connect(m_pWin.data(),&MainWindow::fileOutChanged,
-                     this,&SettingsControllerGui::fileOutChanged);
+                     this,&SettingsControllerGui::fileOutChanged,
+                     Qt::ConnectionType::DirectConnection);
+
     QObject::connect(m_pWin.data(),&MainWindow::readInputDataButtonClicked,
                      this,&SettingsControllerGui::readData);
     QObject::connect(m_pWin.data(),&MainWindow::saveOutputFileClicked,
@@ -292,11 +295,11 @@ void SettingsControllerGui::initializeOptionsState()
 {
     if(m_pAnonymizer->isFileInSet())
     {
-        m_pWin->setInFile(m_fiInFileInfo.absoluteFilePath());
+        m_pWin->setInFile(m_fiInFile.absoluteFilePath());
     }
     if(m_pAnonymizer->isFileOutSet())
     {
-        m_pWin->setOutFile(m_fiOutFileInfo.absoluteFilePath());
+        m_pWin->setOutFile(m_fiOutFile.absoluteFilePath());
     }
 
     m_pWin->setCheckBoxBruteMode(m_pAnonymizer->getBruteMode());
