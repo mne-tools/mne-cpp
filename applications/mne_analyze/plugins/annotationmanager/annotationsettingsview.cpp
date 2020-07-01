@@ -400,6 +400,7 @@ bool AnnotationSettingsView::newUserGroup(const QString& sName, int iType)
 
     QListWidgetItem* newItem = new QListWidgetItem(sName);
     newItem->setData(Qt::UserRole, QVariant(iCat));
+    newItem->setFlags (newItem->flags () | Qt::ItemIsEditable);
 
     m_pUi->m_listWidget_groupListWidget->addItem(newItem);
     emit m_pUi->m_listWidget_groupListWidget->setCurrentItem(newItem);
