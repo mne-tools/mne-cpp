@@ -672,11 +672,12 @@ bool FiffAnonymizer::checkValidFiffFormatVersion()
 
 //=============================================================================================================
 
-int FiffAnonymizer::setFileIn(const QString &sFileIn)
+int FiffAnonymizer::setInFile(const QString &sFileIn)
 {
     QFileInfo fiIn(sFileIn);
     m_fFileIn.setFileName(fiIn.absoluteFilePath());
     m_bFileInSet = true;
+//    qDebug() << "Input file set: " << fiIn.absoluteFilePath();
     return 0;
 }
 
@@ -689,7 +690,7 @@ QString FiffAnonymizer::getFileNameIn() const
 
 //=============================================================================================================
 
-int FiffAnonymizer::setFileOut(const QString &sFileOut)
+int FiffAnonymizer::setOutFile(const QString &sFileOut)
 {
     QFileInfo fiIn(m_fFileIn);
     QFileInfo fiOut(sFileOut);
@@ -701,6 +702,7 @@ int FiffAnonymizer::setFileOut(const QString &sFileOut)
         m_fFileOut.setFileName(fiOut.absoluteFilePath());
     }
     m_bFileOutSet = true;
+//    qDebug() << "Output file set: " << fiOut.absoluteFilePath();
     return 0;
 }
 
@@ -779,7 +781,6 @@ QDateTime FiffAnonymizer::getMeasurementDate() const
 
 void FiffAnonymizer::setMeasurementDateOffset(const int iMeasDayOffset)
 {
-
     m_iMeasurementDateOffset = iMeasDayOffset;
 }
 
