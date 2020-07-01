@@ -747,3 +747,13 @@ void AnnotationModel::hideAll()
 int AnnotationModel::getIndexCount(){
     return m_iIndexCount;
 }
+
+//=============================================================================================================
+
+void AnnotationModel::removeGroup(int iGroupIndex)
+{
+    beginResetModel();
+    resetSelection();
+    m_mAnnotationHub.remove(iGroupIndex);
+    endResetModel();
+}

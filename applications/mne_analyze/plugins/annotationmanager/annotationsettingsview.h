@@ -250,16 +250,29 @@ private:
 
     //=========================================================================================================
     /**
+     * Deletes selected event group
+     */
+    void deleteGroup();
+
+    //=========================================================================================================
+    /**
      * Changes currently loaded group based on selection in the group list view
      */
     void groupChanged();
 
     //=========================================================================================================
     /**
-     * Brings up a menu for interacting with data annotations
+     * Brings up a menu for interacting with events
      * @param[in] pos   Position on screen where the menu will show up
      */
-    void customContextMenuRequested(const QPoint &pos);
+    void customEventContextMenuRequested(const QPoint &pos);
+
+    //=========================================================================================================
+    /**
+     * Brings up a menu for interacting with event groups
+     * @param[in] pos   Position on screen where the menu will show up
+     */
+    void customGroupContextMenuRequested(const QPoint &pos);
 
     Ui::EventWindowDockWidget*                      m_pUi;                          /** < Pointer to GUI elements */
 
