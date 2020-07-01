@@ -89,6 +89,8 @@ class ANSHAREDSHARED_EXPORT AnnotationModel : public AbstractModel
 public:
     AnnotationModel(QObject* parent = Q_NULLPTR);
 
+    ~AnnotationModel();
+
     //=========================================================================================================
     bool insertRows(int position, int span, const QModelIndex & parent) override;
     bool removeRows(int position, int span, const QModelIndex & parent = QModelIndex()) override;
@@ -313,7 +315,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Retruns how many groups are stored in m_mAnnotationHub
+     * Returns how many groups are stored in m_mAnnotationHub
      *
      * @return the amount of groups stored
      */
@@ -416,9 +418,9 @@ private:
     QVector<int>                        m_dataTypes;                    /**< Types of the events of the currently loaded event group */
     QVector<int>                        m_dataIsUserEvent;              /**< Whether the events in the currently loaded event group are user-made */
 
-    QVector<int>                        m_dataSamples_Filtered;         /**< Vector of samples of events to be displayed of the currently loded event group */
-    QVector<int>                        m_dataTypes_Filtered;           /**< Types of the events to be displayed of the currently loaded event group */
-    QVector<int>                        m_dataIsUserEvent_Filtered;     /**< Whether the events to be displayed in the currently loaded event group are user-made */
+    QVector<int>                        m_dataSamplesFiltered;         /**< Vector of samples of events to be displayed of the currently loded event group */
+    QVector<int>                        m_dataTypesFiltered;           /**< Types of the events to be displayed of the currently loaded event group */
+    QVector<int>                        m_dataIsUserEventFiltered;     /**< Whether the events to be displayed in the currently loaded event group are user-made */
 
     bool                                m_bIsUserMade;                  /**< Whether the current loaded group is user made */
 
