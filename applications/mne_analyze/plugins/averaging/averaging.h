@@ -43,6 +43,8 @@
 
 #include <anShared/Interfaces/IPlugin.h>
 
+#include <rtprocessing/helpers/filterkernel.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -281,6 +283,9 @@ private:
 
     QRadioButton*                                           m_pAnnCheck;                /**< Radio Buttons to control m_bUseAnn. True (1) if this is checked. */
     QRadioButton*                                           m_pStimCheck;               /**< Radio Buttons to control m_bUseAnn. False (0) if this is checked. */
+
+    bool                                                    m_bPerformFiltering;        /**< Flag whether to activate/deactivate filtering. */
+    RTPROCESSINGLIB::FilterKernel                           m_filterKernel;             /**< List of currently active filters. */
 
 };
 

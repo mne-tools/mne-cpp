@@ -38,8 +38,6 @@
 
 #include "averaging.h"
 
-#include <iostream>
-
 #include <anShared/Management/communicator.h>
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <anShared/Model/annotationmodel.h>
@@ -99,6 +97,7 @@ Averaging::Averaging()
 , m_bLoaded(0)
 , m_pAnnCheck(Q_NULLPTR)
 , m_pStimCheck(Q_NULLPTR)
+, m_bPerformFiltering(false)
 {
 }
 
@@ -256,20 +255,11 @@ void Averaging::handleEvent(QSharedPointer<Event> e)
         case EVENT_TYPE::SELECTED_MODEL_CHANGED:
             onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
             break;
-        case FILTER_CHANNEL_TYPE_CHANGED:
-            if(m_pEvokedModel) {
-                m_pEvokedModel->setFilterChannelType(e->getData().toString());
-            }
-            break;
         case FILTER_ACTIVE_CHANGED:
-            if(m_pEvokedModel) {
-                m_pEvokedModel->setFilterActive(e->getData().toBool());
-            }
+            m_bPerformFiltering = e->getData().toBool();
             break;
         case FILTER_DESIGN_CHANGED:
-            if(m_pEvokedModel) {
-                m_pEvokedModel->setFilter(e->getData().value<FilterKernel>());
-            }
+            m_filterKernel = e->getData().value<FilterKernel>();
             break;
         default:
             qWarning() << "[Averaging::handleEvent] Received an Event that is not handled by switch cases.";
@@ -282,7 +272,6 @@ QVector<EVENT_TYPE> Averaging::getEventSubscriptions(void) const
 {
     QVector<EVENT_TYPE> temp;
     temp.push_back(SELECTED_MODEL_CHANGED);
-    temp.push_back(FILTER_CHANNEL_TYPE_CHANGED);
     temp.push_back(FILTER_ACTIVE_CHANGED);
     temp.push_back(FILTER_DESIGN_CHANGED);
 
@@ -393,15 +382,28 @@ void Averaging::computeAverage()
         //NOT IMPLEMENTED
     }
 
-    *m_pFiffEvoked = RTPROCESSINGLIB::computeAverage(*pFiffRaw,
-                                                     matEvents,
-                                                     m_fPreStim,
-                                                     m_fPostStim,
-                                                     iType,
-                                                     m_bBasline,
-                                                     m_fBaselineFromS,
-                                                     m_fBaselineToS,
-                                                     mapReject);
+    if(m_bPerformFiltering) {
+        *m_pFiffEvoked = RTPROCESSINGLIB::computeFilteredAverage(*pFiffRaw,
+                                                                 matEvents,
+                                                                 m_fPreStim,
+                                                                 m_fPostStim,
+                                                                 iType,
+                                                                 m_bBasline,
+                                                                 m_fBaselineFromS,
+                                                                 m_fBaselineToS,
+                                                                 mapReject,
+                                                                 m_filterKernel);
+    } else {
+        *m_pFiffEvoked = RTPROCESSINGLIB::computeAverage(*pFiffRaw,
+                                                         matEvents,
+                                                         m_fPreStim,
+                                                         m_fPostStim,
+                                                         iType,
+                                                         m_bBasline,
+                                                         m_fBaselineFromS,
+                                                         m_fBaselineToS,
+                                                         mapReject);
+    }
 
     m_pFiffEvokedSet = QSharedPointer<FIFFLIB::FiffEvokedSet>(new FIFFLIB::FiffEvokedSet());
     m_pFiffEvokedSet->evoked.append(*(m_pFiffEvoked.data()));

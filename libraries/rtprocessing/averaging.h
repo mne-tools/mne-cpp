@@ -74,9 +74,11 @@ namespace RTPROCESSINGLIB
 // RTPROCESSINGLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
+class FilterKernel;
+
 //=============================================================================================================
 /**
- * Compute the average for given fiff raw data.
+ * Computes the average for given fiff raw data.
  *
  * @param[in] raw               The raw data.
  * @param[in] matEvents         The events provided in samples and event kinds.
@@ -86,6 +88,7 @@ namespace RTPROCESSINGLIB
  * @param[in] bApplyBaseline    Whether to use baseline correction (mode=mean).
  * @param[in] fTBaselineFromS   The start baseline correction time relative to the event in seconds.
  * @param[in] fTBaselineToS     The end baseline correction time relative to the event in seconds.
+ * @param[in] mapReject         The thresholds per channel type to reject epochs.
  * @param[in] lExcludeChs       List of channel names to exclude.
  * @param[in] vecPicks          Which channels to pick.
  */
@@ -100,6 +103,36 @@ RTPROCESINGSHARED_EXPORT FIFFLIB::FiffEvoked computeAverage(const FIFFLIB::FiffR
                                                             const QMap<QString,double>& mapReject,
                                                             const QStringList &lExcludeChs = QStringList(),
                                                             const Eigen::RowVectorXi& vecPicks = Eigen::RowVectorXi());
+
+//=============================================================================================================
+/**
+ * Computes the filtered average for given fiff raw data.
+ *
+ * @param[in] raw               The raw data.
+ * @param[in] matEvents         The events provided in samples and event kinds.
+ * @param[in] fTMinS            The start time relative to the event in seconds.
+ * @param[in] fTMaxS            The end time relative to the event in seconds.
+ * @param[in] eventType         The event type.
+ * @param[in] bApplyBaseline    Whether to use baseline correction (mode=mean).
+ * @param[in] fTBaselineFromS   The start baseline correction time relative to the event in seconds.
+ * @param[in] fTBaselineToS     The end baseline correction time relative to the event in seconds.
+ * @param[in] filterKernel      The filter kernel to use when reading the fiff raw data.
+ * @param[in] mapReject         The thresholds per channel type to reject epochs.
+ * @param[in] lExcludeChs       List of channel names to exclude.
+ * @param[in] vecPicks          Which channels to pick.
+ */
+RTPROCESINGSHARED_EXPORT FIFFLIB::FiffEvoked computeFilteredAverage(const FIFFLIB::FiffRawData& raw,
+                                                                    const Eigen::MatrixXi& matEvents,
+                                                                    float fTMinS,
+                                                                    float fTMaxS,
+                                                                    qint32 eventType,
+                                                                    bool bApplyBaseline,
+                                                                    float fTBaselineFromS,
+                                                                    float fTBaselineToS,
+                                                                    const QMap<QString,double>& mapReject,
+                                                                    const FilterKernel& filterKernel,
+                                                                    const QStringList &lExcludeChs = QStringList(),
+                                                                    const Eigen::RowVectorXi& vecPicks = Eigen::RowVectorXi());
 
 } // NAMESPACE
 

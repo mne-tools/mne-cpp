@@ -961,42 +961,42 @@ void doFilterPerChannelRTESet(QPair<QList<FilterKernel>,QPair<int,RowVectorXd> >
 
 void EvokedSetModel::filterDataBlock()
 {
-    if(m_filterKernel.isEmpty() || !m_bPerformFiltering) {
-        return;
-    }
+//    if(m_filterKernel.isEmpty() || !m_bPerformFiltering) {
+//        return;
+//    }
 
-    //Generate QList structure which can be handled by the QConcurrent framework for each average in set
-    for(int j = 0; j < m_matData.size(); ++j) {
-        QList<QPair<QList<FilterKernel>,QPair<int,RowVectorXd> > > timeData;
-        QList<int> notFilterChannelIndex;
+//    //Generate QList structure which can be handled by the QConcurrent framework for each average in set
+//    for(int j = 0; j < m_matData.size(); ++j) {
+//        QList<QPair<QList<FilterKernel>,QPair<int,RowVectorXd> > > timeData;
+//        QList<int> notFilterChannelIndex;
 
-        //Also append mirrored data in front and back to get rid of edge effects
-        for(qint32 i = 0; i < m_matData.at(j).rows(); ++i) {
-            if(m_filterChannelList.contains(m_pEvokedSet->info.chs.at(i).ch_name)) {
-                RowVectorXd datTemp(m_matData.at(j).row(i).cols() + 2 * m_iMaxFilterLength);
-                datTemp << m_matData.at(j).row(i).head(m_iMaxFilterLength).reverse(), m_matData.at(j).row(i), m_matData.at(j).row(i).tail(m_iMaxFilterLength).reverse();
-                timeData.append(QPair<QList<FilterKernel>,QPair<int,RowVectorXd> >(m_filterKernel,QPair<int,RowVectorXd>(i,datTemp)));
-            } else {
-                notFilterChannelIndex.append(i);
-            }
-        }
+//        //Also append mirrored data in front and back to get rid of edge effects
+//        for(qint32 i = 0; i < m_matData.at(j).rows(); ++i) {
+//            if(m_filterChannelList.contains(m_pEvokedSet->info.chs.at(i).ch_name)) {
+//                RowVectorXd datTemp(m_matData.at(j).row(i).cols() + 2 * m_iMaxFilterLength);
+//                datTemp << m_matData.at(j).row(i).head(m_iMaxFilterLength).reverse(), m_matData.at(j).row(i), m_matData.at(j).row(i).tail(m_iMaxFilterLength).reverse();
+//                timeData.append(QPair<QList<FilterKernel>,QPair<int,RowVectorXd> >(m_filterKernel,QPair<int,RowVectorXd>(i,datTemp)));
+//            } else {
+//                notFilterChannelIndex.append(i);
+//            }
+//        }
 
-        //Do the concurrent filtering
-        if(!timeData.isEmpty()) {
-            QFuture<void> future = QtConcurrent::map(timeData,
-                                                     doFilterPerChannelRTESet);
+//        //Do the concurrent filtering
+//        if(!timeData.isEmpty()) {
+//            QFuture<void> future = QtConcurrent::map(timeData,
+//                                                     doFilterPerChannelRTESet);
 
-            future.waitForFinished();
+//            future.waitForFinished();
 
-            for(int r = 0; r < timeData.size(); ++r) {
-                m_matDataFiltered[j].row(timeData.at(r).second.first) = timeData.at(r).second.second.segment(m_iMaxFilterLength+m_iMaxFilterLength/2, m_matData.at(j).cols());
-            }
-        }
+//            for(int r = 0; r < timeData.size(); ++r) {
+//                m_matDataFiltered[j].row(timeData.at(r).second.first) = timeData.at(r).second.second.segment(m_iMaxFilterLength+m_iMaxFilterLength/2, m_matData.at(j).cols());
+//            }
+//        }
 
-        //Fill filtered data with raw data if the channel was not filtered
-        for(int i = 0; i<notFilterChannelIndex.size(); i++) {
-            m_matDataFiltered[j].row(notFilterChannelIndex.at(i)) = m_matData.at(j).row(notFilterChannelIndex.at(i));
-        }
-    }
+//        //Fill filtered data with raw data if the channel was not filtered
+//        for(int i = 0; i<notFilterChannelIndex.size(); i++) {
+//            m_matDataFiltered[j].row(notFilterChannelIndex.at(i)) = m_matData.at(j).row(notFilterChannelIndex.at(i));
+//        }
+//    }
 }
 
