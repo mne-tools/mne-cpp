@@ -242,8 +242,8 @@ protected:
 
     QCommandLineParser m_parser;            /**< Parser object to work with member ptr to QCoreApp and parse input command line options.*/
 
-    QFileInfo m_fiInFileInfo;               /**< Input File info obj.*/
-    QFileInfo m_fiOutFileInfo;              /**< Output File info obj.*/
+    QFileInfo m_fiInFile;               /**< Input File info obj.*/
+    QFileInfo m_fiOutFile;              /**< Output File info obj.*/
 
 protected:
     bool m_bGuiMode;                        /**< Object running in GUI mode.*/
