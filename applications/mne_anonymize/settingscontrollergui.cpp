@@ -167,35 +167,31 @@ void SettingsControllerGui::fileInChanged(const QString& strInFile)
 void SettingsControllerGui::fileOutChanged(const QString& strOutFile)
 {
     QFileInfo newfiOutFile(strOutFile);
-    if(m_fiOutFileInfo.isDir())
+    if(newfiOutFile.isDir())
     {
-        QString fileOutDefaultName(newfiOutFile.absolutePath() + m_fiInFileInfo.baseName() +
-                        "_anonymized." + m_fiInFileInfo.completeSuffix());
-        m_fiOutFileInfo.setFile(fileOutDefaultName);
-        m_pWin->setOutFile(m_fiOutFileInfo.absoluteFilePath());
+        QString fileOutDefaultName(newfiOutFile.absolutePath() + m_fiInFile.baseName() +
+                        "_anonymized." + m_fiInFile.completeSuffix());
+        m_fiOutFile.setFile(fileOutDefaultName);
+        m_pWin->setOutFile(m_fiOutFile.absoluteFilePath());
         return;
     }
 
     if(QString::compare(newfiOutFile.suffix(),QString("fif")) != 0)
     {
-        m_pWin->statusMsg("The output file extension must be \".fif\" 0.");
-        m_pWin->setOutFile(m_fiOutFileInfo.absoluteFilePath());
+        m_pWin->statusMsg("The output file extension must be \".fif\".");
+        m_pWin->setOutFile(m_fiOutFile.absoluteFilePath());
         return;
     }
 
-    QFileInfo outDir(newfiOutFile.absolutePath());
-    if(!outDir.isWritable())
-    {
-        m_pWin->winPopup("You might not have writing permissions to this folder");
-        m_pWin->setOutFile(m_fiOutFileInfo.absoluteFilePath());
-        return;
-    }
+//    if(!newfiOutFile.isWritable())
+//    {
+//        m_pWin->winPopup("You might not have writing permissions to this folder");
+//        m_pWin->setOutFile(m_fiOutFile.absoluteFilePath());
+//        return;
+//    }
 
-    if(m_fiOutFileInfo != newfiOutFile)
-    {
-        m_fiOutFileInfo.setFile(strOutFile);
-        m_pAnonymizer->setFileOut(m_fiOutFileInfo.absoluteFilePath());
-    }
+    m_fiOutFile.setFile(newfiOutFile.absoluteFilePath());
+    m_pAnonymizer->setOutFile(m_fiOutFile.absoluteFilePath());
 }
 
 //=============================================================================================================
