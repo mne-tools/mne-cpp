@@ -456,8 +456,8 @@ void BabyMEG::showSqdCtrlDialog()
 void BabyMEG::createDigTrig(MatrixXf& data)
 {
     //Look for triggers in all trigger channels
-    //m_qMapDetectedTrigger = DetectTrigger::detectTriggerFlanksMax(data.at(b), m_lTriggerChannelIndices, m_iCurrentSample-nCol, m_dTriggerThreshold, true);
-    QMap<int,QList<QPair<int,double> > > qMapDetectedTrigger = DetectTrigger::detectTriggerFlanksGrad(data.cast<double>(),
+    //m_qMapDetectedTrigger = RTPROCESSINGLIB::detectTriggerFlanksMax(data.at(b), m_lTriggerChannelIndices, m_iCurrentSample-nCol, m_dTriggerThreshold, true);
+    QMap<int,QList<QPair<int,double> > > qMapDetectedTrigger = RTPROCESSINGLIB::detectTriggerFlanksGrad(data.cast<double>(),
                                                                                                       m_lTriggerChannelIndices,
                                                                                                       0,
                                                                                                       1.0,

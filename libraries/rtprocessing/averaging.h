@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     Averaging methods declarations.
+ * @brief     Averaging declarations.
  *
  */
 
