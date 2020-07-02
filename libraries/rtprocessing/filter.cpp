@@ -327,16 +327,16 @@ MatrixXd RTPROCESSINGLIB::filterDataBlock(const MatrixXd& mataData,
     FilterKernel::prepareFilter(filterKernelSetup,
                                 mataData.cols());
 
-    //Do the concurrent filtering
+    // Do the concurrent filtering
     RowVectorXi vecPicksNew = vecPicks;
     if(vecPicksNew.cols() == 0) {
         vecPicksNew = RowVectorXi::LinSpaced(mataData.rows(), 0, mataData.rows());
     }
 
-    //Generate QList structure which can be handled by the QConcurrent framework
+    // Generate QList structure which can be handled by the QConcurrent framework
     QList<FilterObject> timeData;
 
-    //Only select channels specified in vecPicksNew
+    // Only select channels specified in vecPicksNew
     FilterObject data;
     for(qint32 i = 0; i < vecPicksNew.cols(); ++i) {
         data.filterKernel = filterKernelSetup;
