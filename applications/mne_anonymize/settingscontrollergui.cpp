@@ -122,6 +122,7 @@ void SettingsControllerGui::readData()
         m_pAnonymizer->setVerboseMode(verboseMode);
         QString msg2("Input file information read correctly.");
         m_pWin->statusMsg(msg2,2000);
+        m_pWin->repaintTabWdiget();
     } else {
         m_pWin->winPopup("Cannot read data. Please select a valid input file first.");
     }
