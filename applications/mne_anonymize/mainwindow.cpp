@@ -947,3 +947,9 @@ void MainWindow::checkBoxShowOptionsChanged()
     m_pUi->pushButtonReadData->setVisible(m_bOptionsVisibility);
 }
 
+//=============================================================================================================
+
+void MainWindow::repaintTabWdiget()
+{
+    m_pUi->tabWidget->repaint();
+}
