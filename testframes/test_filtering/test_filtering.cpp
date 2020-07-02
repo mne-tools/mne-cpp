@@ -157,7 +157,6 @@ void TestFiltering::initTestCase()
     double dTransition = 1;
     iOrder = 1024;
 
-    Filter rtFilter;
     MatrixXd mDataFiltered;
 
     // Reading
@@ -167,15 +166,15 @@ void TestFiltering::initTestCase()
 
     // Filtering
     printf("Filtering...");
-    mFirstFiltered = rtFilter.filterData(mFirstInData,
-                                         type,
-                                         dCenterfreq,
-                                         dBandwidth,
-                                         dTransition,
-                                         dSFreq,
-                                         1024,
-                                         RTPROCESSINGLIB::FilterKernel::Cosine,
-                                         vPicks);
+    mFirstFiltered = RTPROCESSINGLIB::filterData(mFirstInData,
+                                                 type,
+                                                 dCenterfreq,
+                                                 dBandwidth,
+                                                 dTransition,
+                                                 dSFreq,
+                                                 1024,
+                                                 RTPROCESSINGLIB::FilterKernel::Cosine,
+                                                 vPicks);
     printf("[done]\n");
 
     // Writing

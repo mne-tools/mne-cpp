@@ -85,15 +85,12 @@ CONFIG(debug, debug|release) {
 
 SOURCES += \
     filtering.cpp \
-    FormFiles/filteringview.cpp
 
 HEADERS += \
     filtering_global.h \
     filtering.h    \
-    FormFiles/filteringview.h
 
 FORMS += \
-    FormFiles/filteringview.ui
 
 OTHER_FILES += filtering.json
 
