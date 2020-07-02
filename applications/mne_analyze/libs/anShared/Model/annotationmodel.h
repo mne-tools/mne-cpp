@@ -49,6 +49,8 @@
 //=============================================================================================================
 
 #include <QColor>
+#include <QListWidgetItem>
+#include <QStack>
 
 //=============================================================================================================
 // Eigen INCLUDES
@@ -378,6 +380,12 @@ public:
 
     int currentGroup(int iIndex);
 
+    void pushGroup(QListWidgetItem* item);
+
+    QListWidgetItem* popGroup();
+
+    int getGroupStackSize();
+
     //=========================================================================================================
     /**
      * The type of this model (AnnotationModel)
@@ -464,6 +472,7 @@ private:
     QMap<int, QColor>                   m_eventTypeColor;               /**< Stores colors to display for each event type */
     QMap<int, QColor>                   m_eventGroupColor;              /**< Stores colors to display for each event group */
 
+    QStack<QListWidgetItem*>            m_dataStoredGroups;             /**< Stores the groups for switching between files */
 };
 
 //=============================================================================================================

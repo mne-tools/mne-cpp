@@ -344,12 +344,14 @@ bool AnnotationModel::setData(const QModelIndex &index, const QVariant &value, i
 
 void AnnotationModel::setEventFilterType(const QString eventType)
 {
+    qDebug() << "setEventFilterType";
     m_sFilterEventType = eventType;
 
     //Clear filtered event data
     m_dataSamplesFiltered.clear();
     m_dataTypesFiltered.clear();
     m_dataIsUserEventFiltered.clear();
+    m_dataGroupFiltered.clear();
 
     //Fill filtered event data depending on the user defined event filter type
     if(eventType == "All") {
@@ -762,7 +764,6 @@ void AnnotationModel::loadAllGroups()
         m_dataTypesFiltered.append(e->dataTypes_Filtered);
         m_dataIsUserEventFiltered = e->dataIsUserEvent_Filtered;
 
-        m_dataGroup.clear();
         for(int i = 0; i < e->dataSamples.size(); i++){
             m_dataGroup.append(e->groupNumber);
         }
@@ -813,5 +814,35 @@ void AnnotationModel::removeGroup(int iGroupIndex)
 
 int AnnotationModel::currentGroup(int iIndex)
 {
-    return m_dataGroup[iIndex];
+    //return m_dataGroup[iIndex];
+    if (m_iSelectedCheckState){
+        return m_dataGroup[m_dataSelectedRows.at(iIndex)];
+    } else {
+        return m_dataGroup[iIndex];
+    }
+}
+
+//=============================================================================================================
+
+void AnnotationModel::pushGroup(QListWidgetItem *item)
+{
+    m_dataStoredGroups.push(item);
+}
+
+//=============================================================================================================
+
+QListWidgetItem* AnnotationModel::popGroup()
+{
+    if(!m_dataStoredGroups.isEmpty()){
+        return m_dataStoredGroups.pop();
+    } else {
+        return Q_NULLPTR;
+    }
+}
+
+//=============================================================================================================
+
+int AnnotationModel::getGroupStackSize()
+{
+    return m_dataStoredGroups.size();
 }
