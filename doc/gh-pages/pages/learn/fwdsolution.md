@@ -1,6 +1,5 @@
 ---
 title: MNE Forward Solution CLI
-has_children: true
 parent: Learn
 nav_order: 5
 ---

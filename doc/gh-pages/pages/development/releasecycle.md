@@ -1,11 +1,11 @@
 ---
-title: Release Cycle
+title: Release Guide
 parent: Continuous Integration
 grand_parent: Develop
 nav_order: 3
 ---
 
-# Release Cycle
+# Release Guide
 
 New development takes place on the `master` branch. Once the developers have rough consensus we create a new stable release on GitHub, following the `v0.x.y` tag syntax. The MNE-CPP stable release steps are:
 

@@ -1,6 +1,5 @@
 ---
 title: MNE Dipole Fit CLI
-has_children: true
 parent: Learn
 nav_order: 4
 ---
