@@ -235,6 +235,13 @@ public:
      */
     void statusMsg(const QString s, int to = 0);
 
+    //=========================================================================================================
+    /**
+     * @brief Update or repaint the tab widget with information from the inptu file.
+     *
+     */
+    void repaintTabWdiget();
+
 signals:
     //=========================================================================================================
     /**
