@@ -38,6 +38,7 @@
 //=============================================================================================================
 
 #include "averagesceneitem.h"
+#include "../scalingview.h"
 
 #include <fiff/fiff_types.h>
 
@@ -168,60 +169,12 @@ void AverageSceneItem::paintAveragePath(QPainter *painter)
         return;
 
     //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
-    float dMaxValue = 1e-9f;
 
-    switch(m_iChannelKind) {
-        case FIFFV_MEG_CH: {
-            if(m_iChannelUnit == FIFF_UNIT_T_M) { //gradiometers
-                dMaxValue = 1e-10f;
-                if(m_scaleMap.contains(FIFF_UNIT_T_M))
-                    dMaxValue = m_scaleMap[FIFF_UNIT_T_M];
-            }
-            else if(m_iChannelUnit == FIFF_UNIT_T) //magnitometers
-            {
-                dMaxValue = 1e-11f;
-
-                if(m_scaleMap.contains(FIFF_UNIT_T))
-                    dMaxValue = m_scaleMap[FIFF_UNIT_T];
-            }
-            break;
-        }
-
-        case FIFFV_REF_MEG_CH: {  /*11/04/14 Added by Limin: MEG reference channel */
-            dMaxValue = 1e-11f;
-            if(m_scaleMap.contains(FIFF_UNIT_T))
-                dMaxValue = m_scaleMap[FIFF_UNIT_T];
-            break;
-        }
-        case FIFFV_EEG_CH: {
-            dMaxValue = 1e-4f;
-            if(m_scaleMap.contains(FIFFV_EEG_CH))
-                dMaxValue = m_scaleMap[FIFFV_EEG_CH];
-            break;
-        }
-        case FIFFV_EOG_CH: {
-            dMaxValue = 1e-3f;
-            if(m_scaleMap.contains(FIFFV_EOG_CH))
-                dMaxValue = m_scaleMap[FIFFV_EOG_CH];
-            break;
-        }
-        case FIFFV_STIM_CH: {
-            dMaxValue = 5;
-            if(m_scaleMap.contains(FIFFV_STIM_CH))
-                dMaxValue = m_scaleMap[FIFFV_STIM_CH];
-            break;
-        }
-        case FIFFV_MISC_CH: {
-            dMaxValue = 1e-3f;
-            if(m_scaleMap.contains(FIFFV_MISC_CH))
-                dMaxValue = m_scaleMap[FIFFV_MISC_CH];
-            break;
-        }
-    }
+    float fMaxValue = ScalingView::getScalingValue(m_scaleMap, m_iChannelKind, m_iChannelUnit);
 
     //Plot averaged data
     QRectF boundingRect = this->boundingRect();
-    double dScaleY = (boundingRect.height())/(2*dMaxValue);
+    double dScaleY = (boundingRect.height())/(2*fMaxValue);
     QPointF qSamplePosition;
 
     //do for all currently stored evoked set data
