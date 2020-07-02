@@ -260,6 +260,10 @@ private:
      */
     void groupChanged();
 
+    void saveGroupSettings();
+
+    void loadGroupSettings();
+
     //=========================================================================================================
     /**
      * Brings up a menu for interacting with events
