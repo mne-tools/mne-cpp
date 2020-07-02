@@ -187,6 +187,14 @@ public:
 
     //=========================================================================================================
     /**
+     * Returns map of the colors assigned to each of the annotation groups
+     *
+     * @return Map of annotation colors
+     */
+    QMap<int, QColor>& getGroupColors();
+
+    //=========================================================================================================
+    /**
      * Adds a new annotation type with the input parameters as configuration parameters
      *
      * @param [in] eventType    type number (0-99)
@@ -303,7 +311,7 @@ public:
      *
      * @return the index of the newly added group
      */
-    int createGroup(QString sGroupName, bool bIsUserMade = false, int iType = 0);
+    int createGroup(QString sGroupName, bool bIsUserMade = false, int iType = 0, const QColor &typeColor = QColor(Qt::black));
 
     //=========================================================================================================
     /**
@@ -368,6 +376,8 @@ public:
 
     int getIndexCount();
 
+    int currentGroup(int iIndex);
+
     //=========================================================================================================
     /**
      * The type of this model (AnnotationModel)
@@ -428,10 +438,12 @@ private:
     QVector<int>                        m_dataSamples;                  /**< Vector of samples of events of the currently loded event group */
     QVector<int>                        m_dataTypes;                    /**< Types of the events of the currently loaded event group */
     QVector<int>                        m_dataIsUserEvent;              /**< Whether the events in the currently loaded event group are user-made */
+    QVector<int>                        m_dataGroup;
 
     QVector<int>                        m_dataSamplesFiltered;         /**< Vector of samples of events to be displayed of the currently loded event group */
     QVector<int>                        m_dataTypesFiltered;           /**< Types of the events to be displayed of the currently loaded event group */
     QVector<int>                        m_dataIsUserEventFiltered;     /**< Whether the events to be displayed in the currently loaded event group are user-made */
+    QVector<int>                        m_dataGroupFiltered;
 
     bool                                m_bIsUserMade;                  /**< Whether the current loaded group is user made */
 
@@ -450,6 +462,7 @@ private:
 
     QString                             m_sFilterEventType;             /**< String for diplaying event types */
     QMap<int, QColor>                   m_eventTypeColor;               /**< Stores colors to display for each event type */
+    QMap<int, QColor>                   m_eventGroupColor;              /**< Stores colors to display for each event group */
 
 };
 

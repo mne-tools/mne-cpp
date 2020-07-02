@@ -271,7 +271,8 @@ void AnnotationSettingsView::addNewAnnotationType()
 {
     if(newUserGroup(m_pUi->lineEdit->text(), m_pUi->m_spinBox_addEventType->value())) {
         m_pAnnModel->addNewAnnotationType(QString().number(m_pUi->m_spinBox_addEventType->value()),
-                                      m_pColordialog->getColor(Qt::black, this));
+                                      QColor(Qt::black));
+
         emit triggerRedraw();
     }
 }
@@ -396,10 +397,17 @@ bool AnnotationSettingsView::newUserGroup(const QString& sName, int iType)
         return false;
     }
 
-    int iCat = m_pAnnModel->createGroup(sName, true, iType);
+    QColor groupColor = m_pColordialog->getColor(Qt::black, this);
+
+    if(!groupColor.isValid()){
+        return false;
+    }
+
+    int iCat = m_pAnnModel->createGroup(sName, true, iType, groupColor);
 
     QListWidgetItem* newItem = new QListWidgetItem(sName);
     newItem->setData(Qt::UserRole, QVariant(iCat));
+    newItem->setData(Qt::DecorationRole, groupColor);
     newItem->setFlags (newItem->flags () | Qt::ItemIsEditable);
 
     m_pUi->m_listWidget_groupListWidget->addItem(newItem);
@@ -479,4 +487,5 @@ void AnnotationSettingsView::deleteGroup()
     m_pAnnModel->removeGroup(itemToDelete->data(Qt::UserRole).toInt());
     m_pUi->m_listWidget_groupListWidget->selectionModel()->clearSelection();
     delete itemToDelete;
+    onDataChanged();
 }
