@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     Filter class definition.
+ * @brief     Filter definitions.
  *
  */
 
@@ -383,30 +383,18 @@ void RTPROCESSINGLIB::filterChannel(RTPROCESSINGLIB::FilterObject& channelDataTi
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FilterOverlapAdd::FilterOverlapAdd()
-{
-}
-
-//=============================================================================================================
-
-FilterOverlapAdd::~FilterOverlapAdd()
-{
-}
-
-//=============================================================================================================
-
-MatrixXd FilterOverlapAdd::filterOverlapAddData(const MatrixXd& mataData,
-                                                FilterKernel::FilterType type,
-                                                double dCenterfreq,
-                                                double bandwidth,
-                                                double dTransition,
-                                                double dSFreq,
-                                                int iOrder,
-                                                FilterKernel::DesignMethod designMethod,
-                                                const RowVectorXi& vecPicks,
-                                                bool bFilterEnd,
-                                                bool bUseThreads,
-                                                bool bKeepOverhead)
+MatrixXd FilterOverlapAdd::calculate(const MatrixXd& mataData,
+                                     FilterKernel::FilterType type,
+                                     double dCenterfreq,
+                                     double bandwidth,
+                                     double dTransition,
+                                     double dSFreq,
+                                     int iOrder,
+                                     FilterKernel::DesignMethod designMethod,
+                                     const RowVectorXi& vecPicks,
+                                     bool bFilterEnd,
+                                     bool bUseThreads,
+                                     bool bKeepOverhead)
 {
     // Check for size of data
     if(mataData.cols() < iOrder){
@@ -429,7 +417,7 @@ MatrixXd FilterOverlapAdd::filterOverlapAddData(const MatrixXd& mataData,
                                        dSFreq,
                                        designMethod);
 
-    return filterOverlapAddData(mataData,
+    return calculate(mataData,
                                 filter,
                                 vecPicks,
                                 bFilterEnd,
@@ -439,12 +427,12 @@ MatrixXd FilterOverlapAdd::filterOverlapAddData(const MatrixXd& mataData,
 
 //=============================================================================================================
 
-MatrixXd FilterOverlapAdd::filterOverlapAddData(const MatrixXd& mataData,
-                                                const FilterKernel& filterKernel,
-                                                const RowVectorXi& vecPicks,
-                                                bool bFilterEnd,
-                                                bool bUseThreads,
-                                                bool bKeepOverhead)
+MatrixXd FilterOverlapAdd::calculate(const MatrixXd& mataData,
+                                     const FilterKernel& filterKernel,
+                                     const RowVectorXi& vecPicks,
+                                     bool bFilterEnd,
+                                     bool bUseThreads,
+                                     bool bKeepOverhead)
 {
     int iOrder = filterKernel.getFilterOrder();
 

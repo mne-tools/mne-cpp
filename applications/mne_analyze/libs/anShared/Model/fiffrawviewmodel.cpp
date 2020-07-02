@@ -694,7 +694,7 @@ void FiffRawViewModel::filterDataBlock(MatrixXd& matData,
     #endif
 
     // We keep the overhead because this excludes extra copying in the filterData function which leads to a smoother scrolling
-    matData = m_pRtFilter->filterOverlapAddData(matData,
+    matData = m_pRtFilter->calculate(matData,
                                                 m_filterKernel,
                                                 m_lFilterChannelList,
                                                 bFilterEnd,

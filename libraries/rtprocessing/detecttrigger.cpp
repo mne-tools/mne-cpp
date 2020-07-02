@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the DetectTrigger class.
+ * @brief    DetectTrigger definitions.
  *
  */
 
@@ -38,14 +38,11 @@
 
 #include "detecttrigger.h"
 
-#include <iostream>
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QMapIterator>
-#include <QTime>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -55,17 +52,10 @@ using namespace Eigen;
 using namespace RTPROCESSINGLIB;
 
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// DEFINE RTPROCESSINGLIB GLOBAL METHODS
 //=============================================================================================================
 
-DetectTrigger::DetectTrigger()
-{
-
-}
-
-//=============================================================================================================
-
-QList<MatrixXi> DetectTrigger::toEventMatrix(QMap<int,QList<QPair<int,double> > > mapTriggers)
+QList<MatrixXi> RTPROCESSINGLIB::toEventMatrix(QMap<int,QList<QPair<int,double> > > mapTriggers)
 {
     QList<MatrixXi> lMatDetectedTrigger;
 
@@ -89,12 +79,12 @@ QList<MatrixXi> DetectTrigger::toEventMatrix(QMap<int,QList<QPair<int,double> > 
 
 //=============================================================================================================
 
-QMap<int,QList<QPair<int,double> > > DetectTrigger::detectTriggerFlanksMax(const MatrixXd &data,
-                                                                           const QList<int>& lTriggerChannels,
-                                                                           int iOffsetIndex,
-                                                                           double dThreshold,
-                                                                           bool bRemoveOffset,
-                                                                           int iBurstLengthSamp)
+QMap<int,QList<QPair<int,double> > > RTPROCESSINGLIB::detectTriggerFlanksMax(const MatrixXd &data,
+                                                                             const QList<int>& lTriggerChannels,
+                                                                             int iOffsetIndex,
+                                                                             double dThreshold,
+                                                                             bool bRemoveOffset,
+                                                                             int iBurstLengthSamp)
 {
     QMap<int,QList<QPair<int,double> > > qMapDetectedTrigger;
 
@@ -132,12 +122,12 @@ QMap<int,QList<QPair<int,double> > > DetectTrigger::detectTriggerFlanksMax(const
 
 //=============================================================================================================
 
-QList<QPair<int,double> > DetectTrigger::detectTriggerFlanksMax(const MatrixXd &data,
-                                                                int iTriggerChannelIdx,
-                                                                int iOffsetIndex,
-                                                                double dThreshold,
-                                                                bool bRemoveOffset,
-                                                                int iBurstLengthSamp)
+QList<QPair<int,double> > RTPROCESSINGLIB::detectTriggerFlanksMax(const MatrixXd &data,
+                                                                  int iTriggerChannelIdx,
+                                                                  int iOffsetIndex,
+                                                                  double dThreshold,
+                                                                  bool bRemoveOffset,
+                                                                  int iBurstLengthSamp)
 {
     QList<QPair<int,double> > lDetectedTriggers;
 
@@ -167,13 +157,13 @@ QList<QPair<int,double> > DetectTrigger::detectTriggerFlanksMax(const MatrixXd &
 
 //=============================================================================================================
 
-QMap<int,QList<QPair<int,double> > > DetectTrigger::detectTriggerFlanksGrad(const MatrixXd& data,
-                                                                            const QList<int>& lTriggerChannels,
-                                                                            int iOffsetIndex,
-                                                                            double dThreshold,
-                                                                            bool bRemoveOffset,
-                                                                            const QString& type,
-                                                                            int iBurstLengthSamp)
+QMap<int,QList<QPair<int,double> > > RTPROCESSINGLIB::detectTriggerFlanksGrad(const MatrixXd& data,
+                                                                              const QList<int>& lTriggerChannels,
+                                                                              int iOffsetIndex,
+                                                                              double dThreshold,
+                                                                              bool bRemoveOffset,
+                                                                              const QString& type,
+                                                                              int iBurstLengthSamp)
 {
     QMap<int,QList<QPair<int,double> > > qMapDetectedTrigger;
     RowVectorXd tGradient = RowVectorXd::Zero(data.cols());
@@ -222,13 +212,13 @@ QMap<int,QList<QPair<int,double> > > DetectTrigger::detectTriggerFlanksGrad(cons
 
 //=============================================================================================================
 
-QList<QPair<int,double> > DetectTrigger::detectTriggerFlanksGrad(const MatrixXd &data,
-                                                                 int iTriggerChannelIdx,
-                                                                 int iOffsetIndex,
-                                                                 double dThreshold,
-                                                                 bool bRemoveOffset,
-                                                                 const QString& type,
-                                                                 int iBurstLengthSamp)
+QList<QPair<int,double> > RTPROCESSINGLIB::detectTriggerFlanksGrad(const MatrixXd &data,
+                                                                   int iTriggerChannelIdx,
+                                                                   int iOffsetIndex,
+                                                                   double dThreshold,
+                                                                   bool bRemoveOffset,
+                                                                   const QString& type,
+                                                                   int iBurstLengthSamp)
 {
     QList<QPair<int,double> > lDetectedTriggers;
 
@@ -266,5 +256,3 @@ QList<QPair<int,double> > DetectTrigger::detectTriggerFlanksGrad(const MatrixXd 
 
     return lDetectedTriggers;
 }
-
-
