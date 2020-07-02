@@ -45,7 +45,6 @@
 #include "helpers/evokedsetmodel.h"
 #include "helpers/channelinfomodel.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -479,7 +478,6 @@ void ButterflyView::createPlotPath(qint32 row, QPainter& painter) const
     //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
     qint32 kind = m_pEvokedSetModel->getKind(row);
     float fMaxValue = ScalingView::getScalingValue(m_scaleMap, kind, m_pEvokedSetModel->getUnit(row));
-
     bool bIsBad = m_pEvokedSetModel->getIsChannelBad(row);
 
     if(bIsBad) {
