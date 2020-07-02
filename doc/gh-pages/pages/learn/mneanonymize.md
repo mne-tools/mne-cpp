@@ -7,7 +7,7 @@ has_toc: false
 ---
 # MNE Anonymize GUI/CLI
 
-This page describes the application MNE Anonymize, i.e. `mne_anonymize`. This application substitutes **Personal Health Information** (PHI) and **Personal Identifiable Information** (PII) from a [FIFF (Functional Imaging File Format)](https://bids-specification.readthedocs.io/en/stable/99-appendices/06-meg-file-formats.html) file (*.fif*).
+This page describes the application MNE Anonymize, i.e. `mne_anonymize`. This application substitutes different **Personal Health Information** (PHI) and **Personal Identifiable Information** (PII) fields from a [FIFF (Functional Imaging File Format)](https://bids-specification.readthedocs.io/en/stable/99-appendices/06-meg-file-formats.html) file (*.fif*), with other values.
 
 ![](../../images/mn_anonymizer_gui.png)
 
@@ -45,31 +45,28 @@ Depending on the settings during acquisition the FIFF files may contain few or m
 
 ## How is the file modified
 
-An initial approach to deal with sensible information in a file would be to just delete it or maybe alter it "in-place". However, this is not a good idea. Firstly, some of these fields, like `Subject Name` or `Measuremenet date`, are needed and expected by other software packages, to simply delete them might cause some troubles later. Moreover, it doesn't seem to be a neat job to alter the actual information by *masking* it with a default character set, e.g., substituing the name `Peter` `C` `Smith` with `xxxxx` `x` `xxxxx`. Some of the fields of data in a FIFF file are quite long, and an individual subject might have a particularly long name. Therefore, a subject might not be properly de-identified or anonymized if we were to follow this route. But most importantly, we consider that the best way to modify the information in a FIFF file is to recompute completely the actual information and the structure it is stored in.
+An initial approach to deal with sensible information in a file would be to just delete it or maybe alter it "in-place", like other applications do. However, we think this is not a good idea. Firstly, some of these fields, like `Subject Name` or `Measuremenet date`, are needed and expected by other software packages, to simply delete them might cause some trouble later. Moreover, it doesn't seem to be a neat job to alter the actual information by *masking* it with a default character set, e.g., substituing the name `Peter` `C` `Smith` with `xxxxx` `x` `xxxxx`. Some of the fields of data in a FIFF file are quite long, and an individual subject might have a particularly long name. Therefore, a subject might not be properly de-identified or anonymized if we were to follow this route. But most importantly, we consider that the best way to modify the information in a FIFF file is to recompute completely the actual information and the structure it is stored in.
 
-Since the FIFF format implies a linked list of `tags` with information in them, MNE Anonymize will follow this list of tags from the begining until the end, while creating a new `tag` with *anonymized* or *de-identified* information wherever needed. This way, "hidden tags" or *unlinked* tags in the input file will not be copied to the output. The so-called `free list` of tags, will not be copied to the output anonymized file either. The tag directory will not be copied to the output file either.
+Since the FIFF format implies a linked list of `tags` with information in them, MNE Anonymize will follow this list of tags from the begining until the end, while creating a new `tag` with *anonymized* or *de-identified* information wherever needed. This way, "hidden tags" or *unlinked* tags in the input file will not be copied to the output. The so-called `free list` of tags, will not be copied to the output anonymized file either. The tag directory will not be copied to the output file either. This implies that the actual final size of the output file will slightly differ from the input file. 
 
-This implies that the actual final size of the output file will slightly differ from the input file.
+If a specific `tag` with PHI or PII infomation is not present in the FIFF file, `mne_anonymize` will not create it.
 
-MNE Anonymize does not modify the input file. This application can even read from write-protected folders. The new/altered output information will be stored in a newly created FIFF file.
+MNE Anonymize does not modify the input file. Moreover, this application can even read from write-protected folders. The new/altered output information will be stored in a newly created FIFF file. However, depending on the options, after MNE Anonymize has processed a FIFF file, there might be no way to recover the original information. Use this application with caution.
 
-Depending on the options, after MNE Anonymize has processed a FIFF file, there might be no way to recover the original information. Use this application with caution.
 ## GUI Mode
 
-MNE Anonymize binary file is named `mne_anonymize`. The application recognizes several command-line options. In order to execute in GUI mode, use: 
-`mne_anonymize --gui`.
+MNE Anonymize binary file is named `mne_anonymize`. By default, the application is executed in GUI mode. However, if you want to run `mne_anonymize` in GUI mode but you still want to initialize some of the options through a command-line call, you can allways do so through the actual command prompt. For example, if you execute `mne_anonymize --in example.fif -bdf` the GUI will start and the options in it will be already set accordingly. The application recognizes several command-line options, see bellow.
 
 ## Command-line Mode 
 
-MNE Anonymize can also be executed in command-line mode. The following table shows all valid command-line options. If you want to run `mne_anonymize` in Gui mode but you want to initially set some of the options through the command-line call, you can allways do so through the actual call. For example, if you execute `mne_anonymize --in example.fif -bdf --gui` the GUI will start and the options in it will be already set accordingly.
+MNE Anonymize can also be executed in command-line mode. This is intended for users that might want to anonymize a considerable number of files. The following table shows all valid command-line options. 
 
 ### Command-line Options
 
 | Option | Description | 
 |--------|-------------|
 |`-h --help`| Displays help on the command-line.|
-|`--help-all`| Displays help, including Qt specific options on the command line.|
-|`--gui`| GUI version of the application.|
+|`--no-gui`| Command-line version of the application.|
 |`--version`| Show the version of this appliation.|
 |`-i --in <infile>`| File to anonymize.|
 |`-o --out <outfile>` *optional*| Output file `<outfile>`. As default '_anonymized.fif' is attached to the file name.|
@@ -125,16 +122,30 @@ It is important to remark that tags will not be deleted. The information in the 
 
 For all examples we will use MNE-CPP's sample data which can be found inside the project folder in `bin/MNE-sample-data/MEG/sample` folder. If you find that folder empty, please read `README.md` file inside `MNE-sample-data` folder.
 
-The easiest way to run `mne_anonymize` is by just specifying an input file:
+The easiest way to run `mne_anonymize` is by just running the application and using the GUI. Remember you can pre-initialize the options of the GUI through the command-line call. If you want, you can allways use the command-line mode, without GUI. For instance:
+
+For specifying an input file to anonymize:
 
 ```
-mne_anonymize --in ./MNE-sample-data/MEG/sample/sample_audvis_raw.fif
+mne_anonymize --no-gui --in ./MNE-sample-data/MEG/sample/sample_audvis_raw.fif
 ```
 
-Inplace anonymization can be performed via (`--avoid_delete_confirmation` will result in an automatic overwriting/deletion of the input file):
+If you are concerned with the space in your drive, you can delete the input file immediately after anonymization through the option `--delete_input_file`. By default, before file deletion the user will be prompted to confirm the deletion of the input file:
 
 ```
-mne_anonymize --in ./MNE-sample-data/MEG/sample/sample_audvis_raw.fif --out ./MNE-sample-data/MEG/sample/sample_audvis_raw.fif --delete_input_file --avoid_delete_confirmation
+mne_anonymize --no-gui --in ./MNE-sample-data/MEG/sample/sample_audvis_raw.fif --delete_input_file
+```
+
+You can avoid confirming the deletion with the flag `--avoid_delete_confirmation`:
+
+```
+mne_anonymize --no-gui --in ./MNE-sample-data/MEG/sample/sample_audvis_raw.fif --delete_input_file --avoid_delete_confirmation
+```
+
+If you specify the input and the output files with the same name, by default the application will ask you to confirm deletion of the input file. You can also avoid the confirmation and force the deletion with the option `--avoid_delete_confirmation`.
+
+```
+mne_anonymize --no-gui --in ./MNE-sample-data/MEG/sample/sample_audvis_raw.fif --out ./MNE-sample-data/MEG/sample/sample_audvis_raw.fif --delete_input_file --avoid_delete_confirmation
 ```
 
 In order to **substract** 35 days from all measurement dates, both in the ID and `FIFF_MEAS_DATE` tags, use:
