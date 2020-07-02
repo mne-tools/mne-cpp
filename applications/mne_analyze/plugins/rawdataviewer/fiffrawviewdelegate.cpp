@@ -45,6 +45,8 @@
 #include <anShared/Model/annotationmodel.h>
 #include <anShared/Utils/metatypes.h>
 
+#include "disp/viewers/scalingview.h"
+
 #include <rtprocessing/helpers/filterkernel.h>
 
 //=============================================================================================================
@@ -229,56 +231,14 @@ void FiffRawViewDelegate::createPlotPath(const QStyleOptionViewItem &option,
 
     const FiffRawViewModel* t_pModel = static_cast<const FiffRawViewModel*>(index.model());
 
-    qint32 kind = t_pModel->getKind(index.row());
-    double dMaxValue = 1.0e-10;
-
-    switch(kind) {
-        case FIFFV_MEG_CH: {
-            qint32 unit = t_pModel->getUnit(index.row());
-            if(unit == FIFF_UNIT_T_M) { //gradiometers
-                dMaxValue = 1e-10f;
-                if(t_pModel->getScaling().contains(FIFF_UNIT_T_M))
-                    dMaxValue = t_pModel->getScaling()[FIFF_UNIT_T_M];
-            }
-            else if(unit == FIFF_UNIT_T) {//magnetometers
-                dMaxValue = 1e-11f;
-                if(t_pModel->getScaling().contains(FIFF_UNIT_T))
-                    dMaxValue = t_pModel->getScaling()[FIFF_UNIT_T];
-            }
-            break;
-        }
-        case FIFFV_REF_MEG_CH: {  /*11/04/14 Added by Limin: MEG reference channel */
-            dMaxValue = 1e-11f;
-            if(t_pModel->getScaling().contains(FIFF_UNIT_T))
-                dMaxValue = t_pModel->getScaling()[FIFF_UNIT_T];
-            break;
-        }
-        case FIFFV_EEG_CH: {
-            dMaxValue = 1e-4f;
-            if(t_pModel->getScaling().contains(FIFFV_EEG_CH))
-                dMaxValue = t_pModel->getScaling()[FIFFV_EEG_CH];
-            break;
-        }
-        case FIFFV_EOG_CH: {
-            dMaxValue = 1e-3f;
-            if(t_pModel->getScaling().contains(FIFFV_EOG_CH))
-                dMaxValue = t_pModel->getScaling()[FIFFV_EOG_CH];
-            break;
-        }
-        case FIFFV_STIM_CH: {
-            dMaxValue = 5;
-            if(t_pModel->getScaling().contains(FIFFV_STIM_CH))
-                dMaxValue = t_pModel->getScaling()[FIFFV_STIM_CH];
-            break;
-        }
-        case FIFFV_MISC_CH: {
-            dMaxValue = 1e-3f;
-            if(t_pModel->getScaling().contains(FIFFV_MISC_CH))
-                dMaxValue = t_pModel->getScaling()[FIFFV_MISC_CH];
-            break;
-        }
+    // Adjust for the temporal filter delay
+    int iStartIdx = 0;
+    if(t_pModel->isFilterActive()) {
+        iStartIdx = t_pModel->getFilterLength()/2;
     }
 
+    qint32 kind = t_pModel->getKind(index.row());
+    double dMaxValue = DISPLIB::ScalingView::getScalingValue(t_pModel->getScaling(), kind, t_pModel->getUnit(index.row()));
     double dScaleY = option.rect.height()/(2*dMaxValue);
     double y_base = path.currentPosition().y();
     double dValue, newY;
@@ -290,8 +250,8 @@ void FiffRawViewDelegate::createPlotPath(const QStyleOptionViewItem &option,
         iPaintStep = 1;
     }
 
-    for(unsigned int j = 0; j < data.size(); j = j + iPaintStep) {
-        dValue = data[j] * dScaleY;
+    for(unsigned int j = 0; j < data.size()-iStartIdx; j = j + iPaintStep) {
+        dValue = data[iStartIdx+j] * dScaleY;
 
         //Reverse direction -> plot the right way
         newY = y_base - dValue;
