@@ -65,7 +65,7 @@ using namespace MNEANONYMIZE;
 //=============================================================================================================
 
 AppHandler::AppHandler()
-: m_bGuiMode(false)
+: m_bGuiMode(true)
 {
 }
 
