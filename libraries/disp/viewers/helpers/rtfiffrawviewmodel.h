@@ -595,7 +595,7 @@ private:
     QMap<int,QList<QPair<int,double> > >m_qMapDetectedTriggerOld;                   /**< Old detected trigger for each trigger channel. */
     QMap<int,QList<QPair<int,double> > >m_qMapDetectedTriggerOldFreeze;             /**< Old detected trigger for each trigger channel while display is freezed. */
     QMap<qint32,float>                  m_qMapChScaling;                            /**< Channel scaling map. */
-    QList<RTPROCESSINGLIB::FilterKernel>  m_filterKernel;                             /**< List of currently active filters. */
+    QList<RTPROCESSINGLIB::FilterKernel>m_filterKernel;                             /**< List of currently active filters. */
     QStringList                         m_filterChannelList;                        /**< List of channels which are to be filtered.*/
     QStringList                         m_visibleChannelList;                       /**< List of currently visible channels in the view.*/
     QMap<qint32,qint32>                 m_qMapIdxRowSelection;                      /**< Selection mapping.*/
