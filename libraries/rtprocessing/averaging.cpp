@@ -148,7 +148,6 @@ FiffEvoked RTPROCESSINGLIB::computeFilteredAverage(const FiffRawData& raw,
     MatrixXd times;
 
     QScopedPointer<MNEEpochData> epoch(Q_NULLPTR);
-    Filter filter;
     int iFilterDelay = filterKernel.getFilterOrder()/2;
 
     for (p = 0; p < count; ++p) {
@@ -161,8 +160,7 @@ FiffEvoked RTPROCESSINGLIB::computeFilteredAverage(const FiffRawData& raw,
 
         if(raw.read_raw_segment(epoch->epoch, timesDummy, from - iFilterDelay, to + iFilterDelay, picksNew)) {
             // Filter the data
-            epoch->epoch = filter.filterData(epoch->epoch,filterKernel).block(0, iFilterDelay, epoch->epoch.rows(), to-from);
-            filter.reset();
+            epoch->epoch = RTPROCESSINGLIB::filterData(epoch->epoch,filterKernel).block(0, iFilterDelay, epoch->epoch.rows(), to-from);
 
             if (p == 0) {
                 times.resize(1, to-from+1);

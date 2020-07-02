@@ -75,85 +75,160 @@ namespace FIFFLIB {
 namespace RTPROCESSINGLIB
 {
 
+typedef struct {
+    RTPROCESSINGLIB::FilterKernel filterKernel;
+    int iRow;
+    Eigen::RowVectorXd vecData;
+} FilterObject;
+
+//=========================================================================================================
+/**
+ * Creates a user designed filter kernel, filters data from an input file and writes the filtered data to a pIODevice.
+ *
+ * @param [in] pIODevice            The IO device to write to.
+ * @param [in] pFiffRawData         The fiff raw data object to read from.
+ * @param [in] type                 The type of the filter: LPF, HPF, BPF, NOTCH (from enum FilterType).
+ * @param [in] dCenterfreq          The center of the frequency.
+ * @param [in] dBandwidth           The filter bandwidth. Ignored if FilterType is set to LPF,HPF. If NOTCH/BPF: bandwidth of stop-/passband
+ * @param [in] dTransition          The transistion band determines the width of the filter slopes (steepness)
+ * @param [in] dSFreq               The input data sampling frequency.
+ * @param [in] iOrder               Represents the order of the filter, the higher the higher is the stopband attenuation. Default is 4096 taps.
+ * @param [in] designMethod         The design method to use. Choose between Cosine and Tschebyscheff. Defaul is set to Cosine.
+ * @param [in] vecPicks             Channel indexes to filter. Default is filter all channels.
+ * @param [in] bUseThreads          hether to use multiple threads. Default is set to true.
+ *
+ * @return Returns true if successfull, false otherwise.
+ */
+RTPROCESINGSHARED_EXPORT bool filterFile(QIODevice& pIODevice,
+                                         QSharedPointer<FIFFLIB::FiffRawData> pFiffRawData,
+                                         RTPROCESSINGLIB::FilterKernel::FilterType type,
+                                         double dCenterfreq,
+                                         double dBandwidth,
+                                         double dTransition,
+                                         double dSFreq,
+                                         int iOrder = 4096,
+                                         RTPROCESSINGLIB::FilterKernel::DesignMethod designMethod = RTPROCESSINGLIB::FilterKernel::Cosine,
+                                         const Eigen::RowVectorXi &vecPicks = Eigen::RowVectorXi(),
+                                         bool bUseThreads = true);
+
+//=========================================================================================================
+/**
+ * Filters data from an input file based on an exisiting filter kernel and writes the filtered data to a
+ * pIODevice.
+ *
+ * @param [in] pIODevice            The IO device to write to.
+ * @param [in] pFiffRawData         The fiff raw data object to read from.
+ * @param [in] filterKernel         The list of filter kernels to use.
+ * @param [in] vecPicks             Channel indexes to filter. Default is filter all channels.
+ * @param [in] bUseThreads          hether to use multiple threads. Default is set to true.
+ *
+ * @return Returns true if successfull, false otherwise.
+ */
+RTPROCESINGSHARED_EXPORT bool filterFile(QIODevice& pIODevice,
+                                         QSharedPointer<FIFFLIB::FiffRawData> pFiffRawData,
+                                         const RTPROCESSINGLIB::FilterKernel& filterKernel,
+                                         const Eigen::RowVectorXi &vecPicks = Eigen::RowVectorXi(),
+                                         bool bUseThreads = false);
+
+//=========================================================================================================
+/**
+ * Creates a user designed filter kernel and filters the raw input data.
+ * The data needs to be present all at once. For continous filtering via overlap add use the FilterOverlapAdd class.
+ *
+ * @param [in] matData          The data which is to be filtered.
+ * @param [in] type             The type of the filter: LPF, HPF, BPF, NOTCH (from enum FilterType).
+ * @param [in] dCenterfreq      The center of the frequency.
+ * @param [in] dBandwidth       The filter bandwidth. Ignored if FilterType is set to LPF,HPF. If NOTCH/BPF: bandwidth of stop-/passband
+ * @param [in] dTransition      The transistion band determines the width of the filter slopes (steepness)
+ * @param [in] dSFreq           The input data sampling frequency.
+ * @param [in] iOrder           Represents the order of the filter, the higher the higher is the stopband attenuation. Default is 1024 taps.
+ * @param [in] designMethod     The design method to use. Choose between Cosine and Tschebyscheff. Defaul is set to Cosine.
+ * @param [in] vecPicks         Channel indexes to filter. Default is filter all channels.
+ * @param [in] bUseThreads      Whether to use multiple threads. Default is set to true.
+ * @param [in] bKeepOverhead    Whether to keep the delayed part of the data after filtering. Default is set to false .
+ *
+ * @return The filtered data in form of a matrix.
+ */
+RTPROCESINGSHARED_EXPORT Eigen::MatrixXd filterData(const Eigen::MatrixXd& matData,
+                                                    RTPROCESSINGLIB::FilterKernel::FilterType type,
+                                                    double dCenterfreq,
+                                                    double dBandwidth,
+                                                    double dTransition,
+                                                    double dSFreq,
+                                                    int iOrder = 1024,
+                                                    RTPROCESSINGLIB::FilterKernel::DesignMethod designMethod = RTPROCESSINGLIB::FilterKernel::Cosine,
+                                                    const Eigen::RowVectorXi &vecPicks = Eigen::RowVectorXi(),
+                                                    bool bUseThreads = true,
+                                                    bool bKeepOverhead = false);
+
+//=========================================================================================================
+/**
+ * Calculates the filtered version of the raw input data based on a given list filters
+ * The data needs to be present all at once. For continous filtering via overlap add use the FilterOverlapAdd class.
+ *
+ * @param [in] mataData         The data which is to be filtered.
+ * @param [in] filterKernel     The list of filter kernels to use.
+ * @param [in] vecPicks         Channel indexes to filter. Default is filter all channels.
+ * @param [in] bUseThreads      Whether to use multiple threads. Default is set to true.
+ * @param [in] bKeepOverhead    Whether to keep the delayed part of the data after filtering. Default is set to false .
+ *
+ * @return The filtered data in form of a matrix.
+ */
+RTPROCESINGSHARED_EXPORT Eigen::MatrixXd filterData(const Eigen::MatrixXd& mataData,
+                                                    const RTPROCESSINGLIB::FilterKernel& filterKernel,
+                                                    const Eigen::RowVectorXi& vecPicks = Eigen::RowVectorXi(),
+                                                    bool bUseThreads = true,
+                                                    bool bKeepOverhead = false);
+
+//=========================================================================================================
+/**
+ * Calculates the filtered version of the raw input data block.
+ * Always returns the data with half the filter length delay in the front and back.
+ *
+ * @param [in] mataData         The data which is to be filtered
+ * @param [in] vecPicks         The used channel as index in RowVector
+ * @param [in] filterKernel     The FilterKernel to to filter the data with
+ * @param [in] bUseThreads      Whether to use multiple threads
+ *
+ * @return The filtered data in form of a matrix with half the filter length delay in the front and back.
+ */
+RTPROCESINGSHARED_EXPORT Eigen::MatrixXd filterDataBlock(const Eigen::MatrixXd& mataData,
+                                                         const Eigen::RowVectorXi& vecPicks,
+                                                         const RTPROCESSINGLIB::FilterKernel& filterKernel,
+                                                         bool bUseThreads = true);
+
+//=========================================================================================================
+/**
+ * This function is used to filter row-wise in parallel threads
+ *
+ * @param [in] channelDataTime  The channel data to perform the filtering on
+ */
+RTPROCESINGSHARED_EXPORT void filterChannel(FilterObject &channelDataTime);
+
 //=============================================================================================================
 /**
- * Filtering with FFT convolution and the overlap add method
+ * Filtering with FFT convolution and the overlap add method for continous data streams. This class will hold
+ * all needed information about the last block in order to overlap it with the current one.
  *
  * @brief Filtering with FFT convolution and the overlap add method
  */
-class RTPROCESINGSHARED_EXPORT Filter
+class RTPROCESINGSHARED_EXPORT FilterOverlapAdd
 {
-
 public:
-    typedef QSharedPointer<Filter> SPtr;             /**< Shared pointer type for Filter. */
-    typedef QSharedPointer<const Filter> ConstSPtr;  /**< Const shared pointer type for Filter. */
-
-    typedef struct {
-        RTPROCESSINGLIB::FilterKernel filterKernel;
-        int iRow;
-        Eigen::RowVectorXd vecData;
-    } FilterObject;
+    typedef QSharedPointer<FilterOverlapAdd> SPtr;             /**< Shared pointer type for FilterOverlapAdd. */
+    typedef QSharedPointer<const FilterOverlapAdd> ConstSPtr;  /**< Const shared pointer type for FilterOverlapAdd. */
 
     //=========================================================================================================
     /**
-     * Creates the real-time covariance estimation object.
+     * Creates the FilterOverlapAdd object.
      */
-    explicit Filter();
+    explicit FilterOverlapAdd();
 
     //=========================================================================================================
     /**
-     * Destroys the Real-time noise estimation object.
+     * Destroys the FilterOverlapAdd object.
      */
-    ~Filter();
-
-    //=========================================================================================================
-    /**
-     * Creates a user designed filter kernel, filters data from an input file and writes the filtered data to a pIODevice.
-     *
-     * @param [in] pIODevice            The IO device to write to.
-     * @param [in] pFiffRawData         The fiff raw data object to read from.
-     * @param [in] type                 The type of the filter: LPF, HPF, BPF, NOTCH (from enum FilterType).
-     * @param [in] dCenterfreq          The center of the frequency.
-     * @param [in] dBandwidth           The filter bandwidth. Ignored if FilterType is set to LPF,HPF. If NOTCH/BPF: bandwidth of stop-/passband
-     * @param [in] dTransition          The transistion band determines the width of the filter slopes (steepness)
-     * @param [in] dSFreq               The input data sampling frequency.
-     * @param [in] iOrder               Represents the order of the filter, the higher the higher is the stopband attenuation. Default is 4096 taps.
-     * @param [in] designMethod         The design method to use. Choose between Cosine and Tschebyscheff. Defaul is set to Cosine.
-     * @param [in] vecPicks             Channel indexes to filter. Default is filter all channels.
-     * @param [in] bUseThreads          hether to use multiple threads. Default is set to true.
-     *
-     * @return Returns true if successfull, false otherwise.
-     */
-    bool filterFile(QIODevice& pIODevice,
-                    QSharedPointer<FIFFLIB::FiffRawData> pFiffRawData,
-                    RTPROCESSINGLIB::FilterKernel::FilterType type,
-                    double dCenterfreq,
-                    double dBandwidth,
-                    double dTransition,
-                    double dSFreq,
-                    int iOrder = 4096,
-                    RTPROCESSINGLIB::FilterKernel::DesignMethod designMethod = RTPROCESSINGLIB::FilterKernel::Cosine,
-                    const Eigen::RowVectorXi &vecPicks = Eigen::RowVectorXi(),
-                    bool bUseThreads = true);
-
-    //=========================================================================================================
-    /**
-     * Filters data from an input file based on an exisiting filter kernel and writes the filtered data to a
-     * pIODevice.
-     *
-     * @param [in] pIODevice            The IO device to write to.
-     * @param [in] pFiffRawData         The fiff raw data object to read from.
-     * @param [in] filterKernel         The list of filter kernels to use.
-     * @param [in] vecPicks             Channel indexes to filter. Default is filter all channels.
-     * @param [in] bUseThreads          hether to use multiple threads. Default is set to true.
-     *
-     * @return Returns true if successfull, false otherwise.
-     */
-    bool filterFile(QIODevice& pIODevice,
-                    QSharedPointer<FIFFLIB::FiffRawData> pFiffRawData,
-                    const RTPROCESSINGLIB::FilterKernel& filterKernel,
-                    const Eigen::RowVectorXi &vecPicks = Eigen::RowVectorXi(),
-                    bool bUseThreads = false);
+    ~FilterOverlapAdd();
 
     //=========================================================================================================
     /**
@@ -174,18 +249,18 @@ public:
      *
      * @return The filtered data in form of a matrix.
      */
-    Eigen::MatrixXd filterData(const Eigen::MatrixXd& matData,
-                               RTPROCESSINGLIB::FilterKernel::FilterType type,
-                               double dCenterfreq,
-                               double dBandwidth,
-                               double dTransition,
-                               double dSFreq,
-                               int iOrder = 1024,
-                               RTPROCESSINGLIB::FilterKernel::DesignMethod designMethod = RTPROCESSINGLIB::FilterKernel::Cosine,
-                               const Eigen::RowVectorXi &vecPicks = Eigen::RowVectorXi(),
-                               bool bFilterEnd = true,
-                               bool bUseThreads = true,
-                               bool bKeepOverhead = false);
+    Eigen::MatrixXd filterOverlapAddData(const Eigen::MatrixXd& matData,
+                                         RTPROCESSINGLIB::FilterKernel::FilterType type,
+                                         double dCenterfreq,
+                                         double dBandwidth,
+                                         double dTransition,
+                                         double dSFreq,
+                                         int iOrder = 1024,
+                                         RTPROCESSINGLIB::FilterKernel::DesignMethod designMethod = RTPROCESSINGLIB::FilterKernel::Cosine,
+                                         const Eigen::RowVectorXi &vecPicks = Eigen::RowVectorXi(),
+                                         bool bFilterEnd = true,
+                                         bool bUseThreads = true,
+                                         bool bKeepOverhead = false);
 
     //=========================================================================================================
     /**
@@ -200,50 +275,22 @@ public:
      *
      * @return The filtered data in form of a matrix.
      */
-    Eigen::MatrixXd filterData(const Eigen::MatrixXd& mataData,
-                               const RTPROCESSINGLIB::FilterKernel& filterKernel,
-                               const Eigen::RowVectorXi& vecPicks = Eigen::RowVectorXi(),
-                               bool bFilterEnd = true,
-                               bool bUseThreads = true,
-                               bool bKeepOverhead = false);
+    Eigen::MatrixXd filterOverlapAddData(const Eigen::MatrixXd& mataData,
+                                         const RTPROCESSINGLIB::FilterKernel& filterKernel,
+                                         const Eigen::RowVectorXi& vecPicks = Eigen::RowVectorXi(),
+                                         bool bFilterEnd = true,
+                                         bool bUseThreads = true,
+                                         bool bKeepOverhead = false);
 
     //=========================================================================================================
     /**
-     * Reset the stored overlap and delay matrices
+     * Reset the stored overlap matrices
      */
     void reset();
 
 private:
-    //=========================================================================================================
-    /**
-     * Calculates the filtered version of the raw input data
-     *
-     * @param [in] mataData         The data which is to be filtered
-     * @param [in] vecPicks         The used channel as index in RowVector
-     * @param [in] filterKernel     The FilterKernel to to filter the data with
-     * @param [in] bFilterEnd       Whether to perform the overlap add in the beginning or end of the data. Default is set to true.
-     * @param [in] bUseThreads      Whether to use multiple threads
-     *
-     * @return The filtered data in form of a matrix.
-     */
-    Eigen::MatrixXd filterDataBlock(const Eigen::MatrixXd& mataData,
-                                    const Eigen::RowVectorXi& vecPicks,
-                                    const RTPROCESSINGLIB::FilterKernel& filterKernel,
-                                    bool bFilterEnd = true,
-                                    bool bUseThreads = true);
-
-    //=========================================================================================================
-    /**
-     * This static function is used to filter row-wise in parallel threads
-     *
-     * @param [in] channelDataTime  The channel data to perform the filtering on
-     */
-    static void filterChannel(Filter::FilterObject &channelDataTime);
-
     Eigen::MatrixXd                 m_matOverlapBack;                   /**< Overlap block for the end of the data block */
-    Eigen::MatrixXd                 m_matDelayBack;                     /**< Delay block for the end of the data block */
     Eigen::MatrixXd                 m_matOverlapFront;                  /**< Overlap block for the beginning of the data block */
-    Eigen::MatrixXd                 m_matDelayFront;                    /**< Delay block for the beginning of the data block */
 };
 
 //=============================================================================================================

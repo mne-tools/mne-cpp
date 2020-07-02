@@ -112,7 +112,7 @@ FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
 , m_bDispAnnotation(true)
 , m_bPerformFiltering(false)
 , m_pAnnotationModel(QSharedPointer<AnnotationModel>::create())
-, m_pRtFilter(Filter::SPtr::create())
+, m_pRtFilter(FilterOverlapAdd::SPtr::create())
 {
     Q_UNUSED(sFilePath)
 
@@ -173,6 +173,19 @@ void FiffRawViewModel::initFiffData(QIODevice& p_IODevice)
     // for some reason the read_raw_segment function works with inclusive upper bound
     int end = start + (m_iSamplesPerBlock * m_iTotalBlockCount) - 1;
 
+    int iFilterDelay = m_filterKernel.getFilterOrder()/2;
+
+    if(start-iFilterDelay >= m_pFiffIO->m_qlistRaw[0]->first_samp) {
+        start -= iFilterDelay;
+    } else {
+        iFilterDelay = 0;
+    }
+    if(end+iFilterDelay <= m_pFiffIO->m_qlistRaw[0]->last_samp) {
+        end += iFilterDelay;
+    } else {
+        iFilterDelay = 0;
+    }
+
     // read in all blocks, use the already prepared list m_lData and m_lFilteredData
     if(m_pFiffIO->m_qlistRaw[0]->read_raw_segment(data,
                                                   times,
@@ -186,14 +199,14 @@ void FiffRawViewModel::initFiffData(QIODevice& p_IODevice)
 
     // append a matrix pair for each block
     for(int i = 0; i < m_iTotalBlockCount; ++i) {
-        m_lData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data.block(0, i*m_iSamplesPerBlock, data.rows(), m_iSamplesPerBlock),
-                                                                                       times.block(0, i*m_iSamplesPerBlock, times.rows(), m_iSamplesPerBlock))));
+        m_lData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data.block(0, i*m_iSamplesPerBlock+iFilterDelay, data.rows(), m_iSamplesPerBlock),
+                                                                                       times.block(0, i*m_iSamplesPerBlock+iFilterDelay, times.rows(), m_iSamplesPerBlock))));
     }
 
     filterDataBlock(data, true);
     for(int i = 0; i < m_iTotalBlockCount; ++i) {
-        m_lFilteredData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data.block(0, i*m_iSamplesPerBlock, data.rows(), m_iSamplesPerBlock),
-                                                                                               times.block(0, i*m_iSamplesPerBlock, times.rows(), m_iSamplesPerBlock))));
+        m_lFilteredData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data.block(0, i*m_iSamplesPerBlock+((2*iFilterDelay)), data.rows(), m_iSamplesPerBlock),
+                                                                                               times.block(0, i*m_iSamplesPerBlock+((2*iFilterDelay)), times.rows(), m_iSamplesPerBlock))));
     }
 
     qInfo() << "[FiffRawViewModel::initFiffData] Loaded" << m_lData.size() << "blocks with size"<<data.rows()<<"x"<<m_iSamplesPerBlock;
@@ -318,8 +331,7 @@ bool FiffRawViewModel::saveToFile(const QString& sPath)
                                                filterKernelNew.m_designMethod);
             }
 
-            Filter filter;
-            return filter.filterFile(fFileOut, m_pFiffIO->m_qlistRaw[0], filterKernelNew);
+            return RTPROCESSINGLIB::filterFile(fFileOut, m_pFiffIO->m_qlistRaw[0], filterKernelNew);
         } else {
             return m_pFiffIO->write_raw(fFileOut, 0);
         }
@@ -663,13 +675,6 @@ bool FiffRawViewModel::isFilterActive() const
 
 //=============================================================================================================
 
-int FiffRawViewModel::getFilterLength() const
-{    
-    return m_filterKernel.getFilterOrder();
-}
-
-//=============================================================================================================
-
 void FiffRawViewModel::filterDataBlock(MatrixXd& matData,
                                        bool bFilterEnd)
 {
@@ -683,21 +688,18 @@ void FiffRawViewModel::filterDataBlock(MatrixXd& matData,
     }
 
     // In WASM mode do not use multithreading for filtering
+    bool bUseThread = true;
     #ifdef WASMBUILD
-    matData = m_pRtFilter->filterData(matData,
-                                      m_filterKernel,
-                                      m_lFilterChannelList,
-                                      bFilterEnd,
-                                      false);
-    #else
-    // We keep the overhead becuase this excludes extra copying in the filterData function which leads to a smoother scrolling
-    matData = m_pRtFilter->filterData(matData,
-                                      m_filterKernel,
-                                      m_lFilterChannelList,
-                                      bFilterEnd,
-                                      true,
-                                      true);
+    bUseThread = false;
     #endif
+
+    // We keep the overhead because this excludes extra copying in the filterData function which leads to a smoother scrolling
+    matData = m_pRtFilter->filterOverlapAddData(matData,
+                                                m_filterKernel,
+                                                m_lFilterChannelList,
+                                                bFilterEnd,
+                                                bUseThread,
+                                                false);
 }
 
 //=============================================================================================================
@@ -718,27 +720,32 @@ void FiffRawViewModel::filterAllDataBlocks()
     QSharedPointer<QPair<MatrixXd, MatrixXd> > pPair;
     std::list<QSharedPointer<QPair<MatrixXd, MatrixXd> > >::const_iterator itr;
 
+    MatrixXd matData(0,0);
+    MatrixXd matTimes(0,0);
     for(int i = 0; i < m_lData.size(); ++i) {
         itr = std::next(m_lData.begin(), i);
 
-        #ifdef WASMBUILD
-        pPair = QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(m_pRtFilter->filterData((*itr)->first,
-                                                                                                     m_filterKernel,
-                                                                                                     m_lFilterChannelList,
-                                                                                                     false,
-                                                                                                     false),
-                                                                             (*itr)->second));
-        #else
-        pPair = QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(m_pRtFilter->filterData((*itr)->first,
-                                                                                                     m_filterKernel,
-                                                                                                     m_lFilterChannelList,
-                                                                                                     true,
-                                                                                                     true,
-                                                                                                     true),
-                                                                             (*itr)->second));
-        #endif
+        matData.conservativeResize((*itr)->first.rows(), matData.cols()+(*itr)->first.cols());
+        matData.block(0, matData.cols()-(*itr)->first.cols(), matData.rows(), (*itr)->first.cols()) = (*itr)->first;
+        matTimes.conservativeResize((*itr)->first.rows(), matTimes.cols()+(*itr)->second.cols());
+        matTimes.block(0, matTimes.cols()-(*itr)->first.cols(), matTimes.rows(), (*itr)->first.cols()) = (*itr)->second;
+    }
 
-        m_lFilteredData.push_back(pPair);
+    // In WASM mode do not use multithreading for filtering
+    bool bUseThread = true;
+    #ifdef WASMBUILD
+    bUseThread = false;
+    #endif
+
+    matData = RTPROCESSINGLIB::filterData(matData,
+                                          m_filterKernel,
+                                          m_lFilterChannelList,
+                                          bUseThread,
+                                          false);
+
+    for(int i = 0; i <  m_lData.size(); ++i) {
+        m_lFilteredData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(matData.block(0, i*m_iSamplesPerBlock, matData.rows(), m_iSamplesPerBlock),
+                                                                                               matTimes.block(0, i*m_iSamplesPerBlock, matTimes.rows(), m_iSamplesPerBlock))));
     }
 }
 
@@ -792,6 +799,18 @@ int FiffRawViewModel::loadEarlierBlocks(qint32 numBlocks)
     // initialize start and end indices
     int start = m_iFiffCursorBegin - (numBlocks * m_iSamplesPerBlock);
     int end = m_iFiffCursorBegin - 1;
+    int iFilterDelay = m_filterKernel.getFilterOrder()/2;
+
+    if(start-iFilterDelay >= m_pFiffIO->m_qlistRaw[0]->first_samp) {
+        start -= iFilterDelay;
+    } else {
+        iFilterDelay = 0;
+    }
+    if(end+iFilterDelay <= m_pFiffIO->m_qlistRaw[0]->last_samp) {
+        end += iFilterDelay;
+    } else {
+        iFilterDelay = 0;
+    }
 
     // read data, use the already prepared list m_lNewData
     if(m_pFiffIO->m_qlistRaw[0]->read_raw_segment(data, times, start, end)) {
@@ -802,15 +821,15 @@ int FiffRawViewModel::loadEarlierBlocks(qint32 numBlocks)
     }
 
     for(int i = 0; i < numBlocks; ++i) {
-        m_lNewData.push_front(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data.block(0, i*m_iSamplesPerBlock, data.rows(), m_iSamplesPerBlock),
-                                                                                           times.block(0, i*m_iSamplesPerBlock, times.rows(), m_iSamplesPerBlock))));
+        m_lNewData.push_front(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data.block(0, i*m_iSamplesPerBlock+iFilterDelay, data.rows(), m_iSamplesPerBlock),
+                                                                                           times.block(0, i*m_iSamplesPerBlock+iFilterDelay, times.rows(), m_iSamplesPerBlock))));
     }
 
     // Filter data
-    filterDataBlock(data, false);
+    filterDataBlock(data, true);
     for(int i = 0; i < numBlocks; ++i) {
-        m_lFilteredNewData.push_front(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data.block(0, i*m_iSamplesPerBlock, data.rows(), m_iSamplesPerBlock),
-                                                                                                   times.block(0, i*m_iSamplesPerBlock, times.rows(), m_iSamplesPerBlock))));
+        m_lFilteredNewData.push_front(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data.block(0, i*m_iSamplesPerBlock+((2*iFilterDelay)), data.rows(), m_iSamplesPerBlock),
+                                                                                                   times.block(0, i*m_iSamplesPerBlock+((2*iFilterDelay)), times.rows(), m_iSamplesPerBlock))));
     }
 
     // adjust fiff cursor
@@ -853,6 +872,18 @@ int FiffRawViewModel::loadLaterBlocks(qint32 numBlocks)
     // initialize start and end indices
     int start = m_iFiffCursorBegin + m_iTotalBlockCount * m_iSamplesPerBlock;
     int end = start + (m_iSamplesPerBlock * numBlocks) - 1;
+    int iFilterDelay = m_filterKernel.getFilterOrder()/2;
+
+    if(start-iFilterDelay >= m_pFiffIO->m_qlistRaw[0]->first_samp) {
+        start -= iFilterDelay;
+    } else {
+        iFilterDelay = 0;
+    }
+    if(end+iFilterDelay <= m_pFiffIO->m_qlistRaw[0]->last_samp) {
+        end += iFilterDelay;
+    } else {
+        iFilterDelay = 0;
+    }
 
     // read data, use the already prepaired list m_lNewData
     if(m_pFiffIO->m_qlistRaw[0]->read_raw_segment(data, times, start, end)) {
@@ -863,15 +894,15 @@ int FiffRawViewModel::loadLaterBlocks(qint32 numBlocks)
     }
 
     for(int i = 0; i < numBlocks; ++i) {
-        m_lNewData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data.block(0, i*m_iSamplesPerBlock, data.rows(), m_iSamplesPerBlock),
-                                                                                          times.block(0, i*m_iSamplesPerBlock, times.rows(), m_iSamplesPerBlock))));
+        m_lNewData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data.block(0, i*m_iSamplesPerBlock+iFilterDelay, data.rows(), m_iSamplesPerBlock),
+                                                                                          times.block(0, i*m_iSamplesPerBlock+iFilterDelay, times.rows(), m_iSamplesPerBlock))));
     }
 
     // Filter data
     filterDataBlock(data, true);
     for(int i = 0; i < numBlocks; ++i) {
-        m_lFilteredNewData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data.block(0, i*m_iSamplesPerBlock, data.rows(), m_iSamplesPerBlock),
-                                                                                                  times.block(0, i*m_iSamplesPerBlock, times.rows(), m_iSamplesPerBlock))));
+        m_lFilteredNewData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data.block(0, i*m_iSamplesPerBlock+(2*iFilterDelay), data.rows(), m_iSamplesPerBlock),
+                                                                                                  times.block(0, i*m_iSamplesPerBlock+(2*iFilterDelay), times.rows(), m_iSamplesPerBlock))));
     }
 
     // adjust fiff cursor
@@ -965,6 +996,19 @@ void FiffRawViewModel::updateDisplayData()
     // for some reason the read_raw_segment function works with inclusive upper bound
     int end = start + (m_iSamplesPerBlock * m_iTotalBlockCount) - 1;
 
+    int iFilterDelay = m_filterKernel.getFilterOrder()/2;
+
+    if(start-iFilterDelay >= m_pFiffIO->m_qlistRaw[0]->first_samp) {
+        start -= iFilterDelay;
+    } else {
+        iFilterDelay = 0;
+    }
+    if(end+iFilterDelay <= m_pFiffIO->m_qlistRaw[0]->last_samp) {
+        end += iFilterDelay;
+    } else {
+        iFilterDelay = 0;
+    }
+
     // read in all blocks, use the already prepared list m_lData
     if(m_pFiffIO->m_qlistRaw[0]->read_raw_segment(data,
                                                   times,
@@ -978,15 +1022,15 @@ void FiffRawViewModel::updateDisplayData()
 
     // append a matrix pair for each block
     for(int i = 0; i < m_iTotalBlockCount; ++i) {
-        m_lData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data.block(0, i*m_iSamplesPerBlock, data.rows(), m_iSamplesPerBlock),
-                                                                                       times.block(0, i*m_iSamplesPerBlock, times.rows(), m_iSamplesPerBlock))));
+        m_lData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data.block(0, i*m_iSamplesPerBlock+iFilterDelay, data.rows(), m_iSamplesPerBlock),
+                                                                                       times.block(0, i*m_iSamplesPerBlock+iFilterDelay, times.rows(), m_iSamplesPerBlock))));
     }
 
     // Filtered data
     filterDataBlock(data, true);
     for(int i = 0; i < m_iTotalBlockCount; ++i) {
-        m_lFilteredData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data.block(0, i*m_iSamplesPerBlock, data.rows(), m_iSamplesPerBlock),
-                                                                                               times.block(0, i*m_iSamplesPerBlock, times.rows(), m_iSamplesPerBlock))));
+        m_lFilteredData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data.block(0, i*m_iSamplesPerBlock+(2*iFilterDelay), data.rows(), m_iSamplesPerBlock),
+                                                                                               times.block(0, i*m_iSamplesPerBlock+(2*iFilterDelay), times.rows(), m_iSamplesPerBlock))));
     }
 }
 

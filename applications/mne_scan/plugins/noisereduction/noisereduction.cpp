@@ -343,7 +343,7 @@ void NoiseReduction::run()
 
     // Init
     MatrixXd matData;
-    QScopedPointer<RTPROCESSINGLIB::Filter> pRtFilter(new RTPROCESSINGLIB::Filter());
+    QScopedPointer<RTPROCESSINGLIB::FilterOverlapAdd> pRtFilter(new RTPROCESSINGLIB::FilterOverlapAdd());
 
     while(!isInterruptionRequested()) {
         // Get the current data
@@ -369,9 +369,9 @@ void NoiseReduction::run()
 
             //Do temporal filtering here
             if(m_bFilterActivated) {
-                matData = pRtFilter->filterData(matData,
-                                                m_filterKernel,
-                                                m_lFilterChannelList);
+                matData = pRtFilter->filterOverlapAddData(matData,
+                                                          m_filterKernel,
+                                                          m_lFilterChannelList);
             }
 
             //Do SPHARA here

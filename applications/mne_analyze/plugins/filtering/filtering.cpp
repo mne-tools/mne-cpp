@@ -37,7 +37,6 @@
 //=============================================================================================================
 
 #include "filtering.h"
-#include "FormFiles/filteringview.h"
 
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Management/communicator.h>
@@ -157,7 +156,7 @@ void Filtering::handleEvent(QSharedPointer<Event> e)
             if(m_pFilterSettingsView) {
                 setFilterActive(m_pFilterSettingsView->getFilterActive());
                 m_pFilterSettingsView->getFilterView()->setSamplingRate(pModel->getFiffInfo()->sfreq);
-                m_pFilterSettingsView->getFilterView()->setMaxAllowedFilterTaps(pModel->getFiffInfo()->sfreq);
+                //m_pFilterSettingsView->getFilterView()->setMaxAllowedFilterTaps(pModel->getFiffInfo()->sfreq);
                 setFilterChannelType(m_pFilterSettingsView->getFilterView()->getChannelType());
                 setFilter(m_pFilterSettingsView->getFilterView()->getCurrentFilter());
             }

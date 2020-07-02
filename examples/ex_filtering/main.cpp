@@ -106,18 +106,17 @@ int main(int argc, char *argv[])
     RowVectorXi picks = pRaw->info.pick_types(true, false, false);
 
     // Filtering
-    Filter rtFilter;
     printf("Filtering...");
-    if(rtFilter.filterFile(fileOut,
-                           pRaw,
-                           FilterKernel::BPF,
-                           10,
-                           10,
-                           0.1,
-                           pRaw->info.sfreq,
-                           1024,
-                           RTPROCESSINGLIB::FilterKernel::Cosine,
-                           picks)) {
+    if(RTPROCESSINGLIB::filterFile(fileOut,
+                                   pRaw,
+                                   FilterKernel::BPF,
+                                   10,
+                                   10,
+                                   0.1,
+                                   pRaw->info.sfreq,
+                                   1024,
+                                   RTPROCESSINGLIB::FilterKernel::Cosine,
+                                   picks)) {
         printf("[done]\n");
     } else {
         printf("[failed]\n");

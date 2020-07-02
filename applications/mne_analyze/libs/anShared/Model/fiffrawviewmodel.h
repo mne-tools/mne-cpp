@@ -75,7 +75,7 @@ namespace FIFFLIB {
 }
 
 namespace RTPROCESSINGLIB {
-    class Filter;
+    class FilterOverlapAdd;
 }
 
 //=============================================================================================================
@@ -490,14 +490,6 @@ public:
 
     //=========================================================================================================
     /**
-     * Returns the length/order of the currently set filter.
-     *
-     * @return    The length/order of the currently set filter.
-     */
-    int getFilterLength() const;
-
-    //=========================================================================================================
-    /**
      * Returns the member FiffIO, containing a list of FiffRawData and FiffEvoked
      *
      * @return m_pFiffIO, member varaible saving the FiffRawData and FiffEvoked parameters
@@ -598,7 +590,7 @@ private:
     // Filter stuff
     qint32                                      m_iMaxFilterLength;                         /**< Max order of the current filters */
     QString                                     m_sFilterChannelType;                       /**< Kind of channel which is to be filtered */
-    QSharedPointer<RTPROCESSINGLIB::Filter>     m_pRtFilter;                                /**< The filter object. */
+    QSharedPointer<RTPROCESSINGLIB::FilterOverlapAdd>     m_pRtFilter;                                /**< The filter object. */
     Eigen::RowVectorXi                          m_lFilterChannelList;                       /**< The indices of the channels to be filtered.*/
     bool                                        m_bPerformFiltering;                        /**< Flag whether to activate/deactivate filtering. */
     RTPROCESSINGLIB::FilterKernel               m_filterKernel;                             /**< List of currently active filters. */
