@@ -264,6 +264,8 @@ private:
 
     void loadGroupSettings();
 
+    void renameGroupCheck();
+
     //=========================================================================================================
     /**
      * Brings up a menu for interacting with events
