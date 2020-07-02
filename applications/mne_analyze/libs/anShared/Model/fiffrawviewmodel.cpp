@@ -283,22 +283,7 @@ bool FiffRawViewModel::saveToFile(const QString& sPath)
 
     if(m_pFiffIO->m_qlistRaw.size() > 0) {
         if(m_bPerformFiltering) {
-            // Write to file with a better filter kernel with 4096 filter taps
-            int iOrder = 4096;
-            FilterKernel filterKernelNew = m_filterKernel;
-            if(filterKernelNew.getFilterOrder() < iOrder) {
-                filterKernelNew = FilterKernel(filterKernelNew.getName(),
-                                               filterKernelNew.m_Type,
-                                               iOrder,
-                                               filterKernelNew.getCenterFrequency(),
-                                               filterKernelNew.getBandwidth(),
-                                               filterKernelNew.getParksWidth(),
-                                               filterKernelNew.getSamplingFrequency(),
-                                               filterKernelNew.m_designMethod);
-            }
-
-            Filter filter;
-            return filter.filterFile(*bufferOut, m_pFiffIO->m_qlistRaw[0], filterKernelNew);
+            return RTPROCESSINGLIB::filterFile(*bufferOut, m_pFiffIO->m_qlistRaw[0], m_filterKernel);
         } else {
             return m_pFiffIO->write_raw(*bufferOut, 0);
         }
@@ -317,21 +302,7 @@ bool FiffRawViewModel::saveToFile(const QString& sPath)
 
     if(m_pFiffIO->m_qlistRaw.size() > 0) {
         if(m_bPerformFiltering) {
-            // Write to file with a better filter kernel with 4096 filter taps
-            int iOrder = 4096;
-            FilterKernel filterKernelNew = m_filterKernel;
-            if(filterKernelNew.getFilterOrder() < iOrder) {
-                filterKernelNew = FilterKernel(filterKernelNew.getName(),
-                                               filterKernelNew.m_Type,
-                                               iOrder,
-                                               filterKernelNew.getCenterFrequency(),
-                                               filterKernelNew.getBandwidth(),
-                                               filterKernelNew.getParksWidth(),
-                                               filterKernelNew.getSamplingFrequency(),
-                                               filterKernelNew.m_designMethod);
-            }
-
-            return RTPROCESSINGLIB::filterFile(fFileOut, m_pFiffIO->m_qlistRaw[0], filterKernelNew);
+            return RTPROCESSINGLIB::filterFile(fFileOut, m_pFiffIO->m_qlistRaw[0], m_filterKernel);
         } else {
             return m_pFiffIO->write_raw(fFileOut, 0);
         }
