@@ -232,7 +232,7 @@ void RtAveragingWorker::setBaselineTo(int toSamp,
 void RtAveragingWorker::doAveraging(const MatrixXd& rawSegment)
 {
     //Detect trigger
-    QList<QPair<int,double> > lDetectedTriggers = DetectTrigger::detectTriggerFlanksMax(rawSegment, m_iTriggerChIndex, 0, m_fTriggerThreshold, true);
+    QList<QPair<int,double> > lDetectedTriggers = RTPROCESSINGLIB::detectTriggerFlanksMax(rawSegment, m_iTriggerChIndex, 0, m_fTriggerThreshold, true);
 
     //TODO: This does not permit the same trigger type twice in one data block
     for(int i = 0; i < lDetectedTriggers.size(); ++i) {

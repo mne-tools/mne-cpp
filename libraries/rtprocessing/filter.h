@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     Filter class declaration.
+ * @brief     Filter declarations.
  *
  */
 
@@ -61,7 +61,7 @@
 #include <unsupported/Eigen/FFT>
 
 //=============================================================================================================
-// FIFFLIB FORWARD DECLARATIONS
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
 namespace FIFFLIB {
@@ -210,25 +210,13 @@ RTPROCESINGSHARED_EXPORT void filterChannel(FilterObject &channelDataTime);
  * Filtering with FFT convolution and the overlap add method for continous data streams. This class will hold
  * all needed information about the last block in order to overlap it with the current one.
  *
- * @brief Filtering with FFT convolution and the overlap add method
+ * @brief Filtering with FFT convolution and the overlap add method for continous data streams.
  */
 class RTPROCESINGSHARED_EXPORT FilterOverlapAdd
 {
 public:
     typedef QSharedPointer<FilterOverlapAdd> SPtr;             /**< Shared pointer type for FilterOverlapAdd. */
     typedef QSharedPointer<const FilterOverlapAdd> ConstSPtr;  /**< Const shared pointer type for FilterOverlapAdd. */
-
-    //=========================================================================================================
-    /**
-     * Creates the FilterOverlapAdd object.
-     */
-    explicit FilterOverlapAdd();
-
-    //=========================================================================================================
-    /**
-     * Destroys the FilterOverlapAdd object.
-     */
-    ~FilterOverlapAdd();
 
     //=========================================================================================================
     /**
@@ -243,24 +231,24 @@ public:
      * @param [in] iOrder           Represents the order of the filter, the higher the higher is the stopband attenuation. Default is 1024 taps.
      * @param [in] designMethod     The design method to use. Choose between Cosine and Tschebyscheff. Defaul is set to Cosine.
      * @param [in] vecPicks         Channel indexes to filter. Default is filter all channels.
-     * @param [in] bFilterEnd       Whether to perform the overlap add in the beginning or end of the data. Default is set to true.
+     * @param [in] bFilterEnd       Whether to perform the overlap add in the beginning or end of the data. Default is set to true (end of data).
      * @param [in] bUseThreads      Whether to use multiple threads. Default is set to true.
      * @param [in] bKeepOverhead    Whether to keep the delayed part of the data after filtering. Default is set to false .
      *
      * @return The filtered data in form of a matrix.
      */
-    Eigen::MatrixXd filterOverlapAddData(const Eigen::MatrixXd& matData,
-                                         RTPROCESSINGLIB::FilterKernel::FilterType type,
-                                         double dCenterfreq,
-                                         double dBandwidth,
-                                         double dTransition,
-                                         double dSFreq,
-                                         int iOrder = 1024,
-                                         RTPROCESSINGLIB::FilterKernel::DesignMethod designMethod = RTPROCESSINGLIB::FilterKernel::Cosine,
-                                         const Eigen::RowVectorXi &vecPicks = Eigen::RowVectorXi(),
-                                         bool bFilterEnd = true,
-                                         bool bUseThreads = true,
-                                         bool bKeepOverhead = false);
+    Eigen::MatrixXd calculate(const Eigen::MatrixXd& matData,
+                              RTPROCESSINGLIB::FilterKernel::FilterType type,
+                              double dCenterfreq,
+                              double dBandwidth,
+                              double dTransition,
+                              double dSFreq,
+                              int iOrder = 1024,
+                              RTPROCESSINGLIB::FilterKernel::DesignMethod designMethod = RTPROCESSINGLIB::FilterKernel::Cosine,
+                              const Eigen::RowVectorXi &vecPicks = Eigen::RowVectorXi(),
+                              bool bFilterEnd = true,
+                              bool bUseThreads = true,
+                              bool bKeepOverhead = false);
 
     //=========================================================================================================
     /**
@@ -269,18 +257,18 @@ public:
      * @param [in] mataData         The data which is to be filtered.
      * @param [in] filterKernel     The list of filter kernels to use.
      * @param [in] vecPicks         Channel indexes to filter. Default is filter all channels.
-     * @param [in] bFilterEnd       Whether to perform the overlap add in the beginning or end of the data. Default is set to true.
+     * @param [in] bFilterEnd       Whether to perform the overlap add in the beginning or end of the data. Default is set to true (end of data).
      * @param [in] bUseThreads      Whether to use multiple threads. Default is set to true.
      * @param [in] bKeepOverhead    Whether to keep the delayed part of the data after filtering. Default is set to false .
      *
      * @return The filtered data in form of a matrix.
      */
-    Eigen::MatrixXd filterOverlapAddData(const Eigen::MatrixXd& mataData,
-                                         const RTPROCESSINGLIB::FilterKernel& filterKernel,
-                                         const Eigen::RowVectorXi& vecPicks = Eigen::RowVectorXi(),
-                                         bool bFilterEnd = true,
-                                         bool bUseThreads = true,
-                                         bool bKeepOverhead = false);
+    Eigen::MatrixXd calculate(const Eigen::MatrixXd& mataData,
+                              const RTPROCESSINGLIB::FilterKernel& filterKernel,
+                              const Eigen::RowVectorXi& vecPicks = Eigen::RowVectorXi(),
+                              bool bFilterEnd = true,
+                              bool bUseThreads = true,
+                              bool bKeepOverhead = false);
 
     //=========================================================================================================
     /**

@@ -369,7 +369,7 @@ void NoiseReduction::run()
 
             //Do temporal filtering here
             if(m_bFilterActivated) {
-                matData = pRtFilter->filterOverlapAddData(matData,
+                matData = pRtFilter->calculate(matData,
                                                           m_filterKernel,
                                                           m_lFilterChannelList);
             }
