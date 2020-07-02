@@ -40,8 +40,11 @@
 
 #include "butterflyview.h"
 
+#include "scalingview.h"
+
 #include "helpers/evokedsetmodel.h"
 #include "helpers/channelinfomodel.h"
+
 
 //=============================================================================================================
 // QT INCLUDES
@@ -475,66 +478,14 @@ void ButterflyView::createPlotPath(qint32 row, QPainter& painter) const
 {
     //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
     qint32 kind = m_pEvokedSetModel->getKind(row);
-    float fMaxValue = 1e-9f;
+    float fMaxValue = ScalingView::getScalingValue(m_scaleMap, kind, m_pEvokedSetModel->getUnit(row));
+
     bool bIsBad = m_pEvokedSetModel->getIsChannelBad(row);
 
     if(bIsBad) {
         painter.setOpacity(0.20);
     } else {
         painter.setOpacity(0.75);
-    }
-
-    switch(kind) {
-        case FIFFV_MEG_CH: {
-            qint32 unit = m_pEvokedSetModel->getUnit(row);
-            if(unit == FIFF_UNIT_T_M) { //gradiometers
-                fMaxValue = 1e-10f;
-                if(m_scaleMap.contains(FIFF_UNIT_T_M))
-                    fMaxValue = m_scaleMap[FIFF_UNIT_T_M];
-            }
-            else if(unit == FIFF_UNIT_T) //magnitometers
-            {
-//                if(m_pEvokedSetModel->getCoil(row) == FIFFV_COIL_BABY_MAG)
-//                    fMaxValue = 1e-11f;
-//                else
-                fMaxValue = 1e-11f;
-
-                if(m_scaleMap.contains(FIFF_UNIT_T))
-                    fMaxValue = m_scaleMap[FIFF_UNIT_T];
-            }
-            break;
-        }
-
-        case FIFFV_REF_MEG_CH: {  /*11/04/14 Added by Limin: MEG reference channel */
-            fMaxValue = 1e-11f;
-            if(m_scaleMap.contains(FIFF_UNIT_T))
-                fMaxValue = m_scaleMap[FIFF_UNIT_T];
-            break;
-        }
-        case FIFFV_EEG_CH: {
-            fMaxValue = 1e-4f;
-            if(m_scaleMap.contains(FIFFV_EEG_CH))
-                fMaxValue = m_scaleMap[FIFFV_EEG_CH];
-            break;
-        }
-        case FIFFV_EOG_CH: {
-            fMaxValue = 1e-3f;
-            if(m_scaleMap.contains(FIFFV_EOG_CH))
-                fMaxValue = m_scaleMap[FIFFV_EOG_CH];
-            break;
-        }
-        case FIFFV_STIM_CH: {
-            fMaxValue = 5;
-            if(m_scaleMap.contains(FIFFV_STIM_CH))
-                fMaxValue = m_scaleMap[FIFFV_STIM_CH];
-            break;
-        }
-        case FIFFV_MISC_CH: {
-            fMaxValue = 1e-3f;
-            if(m_scaleMap.contains(FIFFV_MISC_CH))
-                fMaxValue = m_scaleMap[FIFFV_MISC_CH];
-            break;
-        }
     }
 
     float fValue;

@@ -41,6 +41,8 @@
 
 #include "rtfiffrawviewmodel.h"
 
+#include "../scalingview.h"
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -117,63 +119,11 @@ void createPaths(const QModelIndex &index,
 
     //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
     qint32 kind = t_pModel->getKind(index.row());
-    float dMaxValue = 1e-9f;
 
-    switch(kind) {
-        case FIFFV_MEG_CH: {
-            qint32 unit =t_pModel->getUnit(index.row());
-            if(unit == FIFF_UNIT_T_M) { //gradiometers
-                dMaxValue = 1e-10f;
-                if(t_pModel->getScaling().contains(FIFF_UNIT_T_M))
-                    dMaxValue = t_pModel->getScaling()[FIFF_UNIT_T_M];
-            }
-            else if(unit == FIFF_UNIT_T) //magnitometers
-            {
-//                if(t_pModel->getCoil(index.row()) == FIFFV_COIL_BABY_MAG)
-//                    dMaxValue = 1e-11f;
-//                else
-                dMaxValue = 1e-11f;
-
-                if(t_pModel->getScaling().contains(FIFF_UNIT_T))
-                    dMaxValue = t_pModel->getScaling()[FIFF_UNIT_T];
-            }
-            break;
-        }
-
-        case FIFFV_REF_MEG_CH: {  /*11/04/14 Added by Limin: MEG reference channel */
-            dMaxValue = 1e-11f;
-            if(t_pModel->getScaling().contains(FIFF_UNIT_T))
-                dMaxValue = t_pModel->getScaling()[FIFF_UNIT_T];
-            break;
-        }
-        case FIFFV_EEG_CH: {
-            dMaxValue = 1e-4f;
-            if(t_pModel->getScaling().contains(FIFFV_EEG_CH))
-                dMaxValue = t_pModel->getScaling()[FIFFV_EEG_CH];
-            break;
-        }
-        case FIFFV_EOG_CH: {
-            dMaxValue = 1e-3f;
-            if(t_pModel->getScaling().contains(FIFFV_EOG_CH))
-                dMaxValue = t_pModel->getScaling()[FIFFV_EOG_CH];
-            break;
-        }
-        case FIFFV_STIM_CH: {
-            dMaxValue = 5;
-            if(t_pModel->getScaling().contains(FIFFV_STIM_CH))
-                dMaxValue = t_pModel->getScaling()[FIFFV_STIM_CH];
-            break;
-        }
-        case FIFFV_MISC_CH: {
-            dMaxValue = 1e-3f;
-            if(t_pModel->getScaling().contains(FIFFV_MISC_CH))
-                dMaxValue = t_pModel->getScaling()[FIFFV_MISC_CH];
-            break;
-        }
-    }
+    float fMaxValue = ScalingView::getScalingValue(t_pModel->getScaling(), kind, t_pModel->getUnit(index.row()));
 
     float dValue;
-    float dScaleY = option.rect.height()/(2*dMaxValue);
+    float dScaleY = option.rect.height()/(2*fMaxValue);
 
     float y_base = path.currentPosition().y();
     QPointF qSamplePosition;
