@@ -71,28 +71,22 @@ AppHandler::AppHandler()
 
 //=============================================================================================================
 
-QCoreApplication* AppHandler::createApplication(int& argc, char* argv[], bool forceGUI)
+QCoreApplication* AppHandler::createApplication(int& argc, char* argv[])
 {
-    if(forceGUI)
-    {
-        m_bGuiMode = true;
-        return new QApplication(argc, argv);
-    }
-
     for (int i = 1; i < argc; ++i)
     {
-        if (!qstrcmp(argv[i], "--gui"))
+        if (!qstrcmp(argv[i], "--no-gui"))
         {
-            m_bGuiMode = true;
-            return new QApplication(argc, argv);
+            m_bGuiMode = false;
+            return new QCoreApplication(argc, argv);
         }
     }
-    return new QCoreApplication(argc, argv);
+    return new QApplication(argc, argv);
 }
 
 //=============================================================================================================
 
-QObject* AppHandler::createController(const QStringList& args)
+SettingsControllerCl* AppHandler::createController(const QStringList& args)
 {
     if(m_bGuiMode)
     {
