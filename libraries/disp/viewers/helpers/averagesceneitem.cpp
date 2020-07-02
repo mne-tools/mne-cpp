@@ -205,6 +205,12 @@ void AverageSceneItem::paintAveragePath(QPainter *painter)
                 dMaxValue = m_scaleMap[FIFFV_EOG_CH];
             break;
         }
+         case FIFFV_ECG_CH: {
+            dMaxValue = 1e-6f;
+            if(m_scaleMap.contains(FIFFV_ECG_CH))
+                dMaxValue = m_scaleMap[FIFFV_ECG_CH];
+            break;
+        }
         case FIFFV_STIM_CH: {
             dMaxValue = 5;
             if(m_scaleMap.contains(FIFFV_STIM_CH))
