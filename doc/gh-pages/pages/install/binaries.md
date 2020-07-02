@@ -13,7 +13,7 @@ Stable Releases
 
 | Version | Release | Dynamic Build | Static Build |
 |-------|-------|-------|-------|
-| [0.1.3](changelog.md#version-013) | 2020-06-05 | <span class="fs-2"> [Windows](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.3/mne-cpp-windows-dynamic-x86_64.zip){: .btn .btn-blue } [Linux](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.3/mne-cpp-linux-dynamic-x86_64.tar.gz){: .btn .btn-blue } [MacOS](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.3/mne-cpp-macos-dynamic-x86_64.tar.gz){: .btn .btn-blue } </span> | <span class="fs-2"> [Windows](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.3/mne-cpp-windows-static-x86_64.zip){: .btn .btn-blue } [Linux](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.3/mne-cpp-linux-static-x86_64.tar.gz){: .btn .btn-blue } [MacOS](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.3/mne-cpp-macos-static-x86_64.tar.gz){: .btn .btn-blue } </span> |
+| [0.1.4](changelog.md#version-014) | 2020-07-07 | <span class="fs-2"> [Windows](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.4/mne-cpp-windows-dynamic-x86_64.zip){: .btn .btn-blue } [Linux](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.4/mne-cpp-linux-dynamic-x86_64.tar.gz){: .btn .btn-blue } [MacOS](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.4/mne-cpp-macos-dynamic-x86_64.tar.gz){: .btn .btn-blue } </span> | <span class="fs-2"> [Windows](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.4/mne-cpp-windows-static-x86_64.zip){: .btn .btn-blue } [Linux](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.4/mne-cpp-linux-static-x86_64.tar.gz){: .btn .btn-blue } [MacOS](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.4/mne-cpp-macos-static-x86_64.tar.gz){: .btn .btn-blue } </span> |
 
 Development Release
 {: .label .label-green }
@@ -27,4 +27,4 @@ Web Assembly Release
 
 | Version | Release | Link |
 |---------|------|------|
-| dev_build | [Latest commit](https://github.com/mne-tools/mne-cpp/commits/master){:target="_blank" rel="noopener"} | <span class="fs-2"> [MNE Analyze - WASM](https://mne-cpp.github.io/wasm/mne_analyze.html){: .btn .btn-purple } </span> <span class="fs-2"> [MNE Anonymize - WASM](https://mne-cpp.github.io/wasm/mne_anonymize.html){: .btn .btn-purple } </span>|
+| dev_build | [Latest commit](https://github.com/mne-tools/mne-cpp/commits/master){:target="_blank" rel="noopener"} | <span class="fs-2"> [MNE Analyze](https://mne-cpp.github.io/wasm/mne_analyze.html){: .btn .btn-purple } </span> <span class="fs-2"> [MNE Anonymize](https://mne-cpp.github.io/wasm/mne_anonymize.html){: .btn .btn-purple } </span>|

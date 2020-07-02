@@ -7,6 +7,86 @@ nav_order: 1
 
 # Changelog
 
+## Version 0.1.4 - 2020/07/07
+
+### Applications
+
+MNE Analyze
+* Add filter support. The user can now select/design a filter. If activated the filter is applied to the data as the user scrolls through the file. When activated the filtered data is also written to file and applied when computing an average.
+* Add dark mode support to WASM version
+* Corrected saving/loading views inbetween sessions
+* Adjusted minimum allowed window size
+* Add support for computing averages/evoked responses
+* Closing main window now calls destructors for views in dockwidgets
+* Add support to delete loaded files from the data manager
+* Speed up data browsing by decreasing the pre loading buffer size to two blocks
+* Fix vertically overlapping signal plotting
+* Move AnalyzeDataModel to anshared/model folder
+* Annotations have been renamed to Events
+* Added Event Group functionality and struct
+* Event Groups can be renamed or have their color changed through right click context menu
+* Events can now be deleted from selecting any of the columns, double click to edit columns
+* Fixed bug where check boxes changing annotation model state were not updating the view
+
+MNE Scan
+* Update inverse operator if new forward solution was calculated
+* Update brainflow submodule for the brainflowboard plugin
+
+Examples
+* Add a new example for averaging
+* Change ex_read_epochs to only read epochs without averaging afterwards
+
+MNE Anonymize
+* Add GUI mode
+* Add WASM version
+* Improve internal memory handling
+
+### API Libraries
+
+Utils
+* Move filter methods/classes to the RtProcessing library
+* Move DetectTrigger class to the RtProcessing library
+* Refactor baseline correction input from QPair<QVariant,QVariant> to QPair<float,float>
+
+RtProcessing
+* Refactor header guards of all RtProcessing classes
+* Add function to set updated forward solution in RtInv
+* Rename RtFilter to Filter and FilterData to FilterKernel
+* Improve automatic slicing of data when filtering
+* Separate continous and one time overlap add filtering methods. Make some functions global RTPROCESSINGLIB namespace functions and was therefore removed.
+* Remove processing of multiple filters at once. This feature was never really implemented.
+* Rename RtAve to RtAveraging in
+* Add new averaging functions in
+* Implement convenience function in DetectTrigger to transform between detect trigger QMaps and MNE event matrices
+* Move detect trigger functions to global RTPROCESSINGLIB namespace
+
+Disp
+* Refactor plotting of the filter's frequency response in the FilterPlotScene class
+* Fix saving/loading from FilterDesignView, FilterSettingsView and FiffRawView
+* Changed signal view control widget scaling to allow for window sizes
+* Remove filtering from EvokedSetModel in disp library. Filtering on short data lengths such as most epochs is difficult because of the edge effects. Filtering for epochs/evoked responses should happen before with appropriate filter lengths which is now supported by the RTPROCESSINGLIB::computeFilteredAverage() function.
+* Improve the ScalingView with new default scaling values and convenience functions to retrieve the scale value for a given scale map and channel kind/unit. Make use of the new functions throughout MNE-CPP libraries and applications.
+
+### Documentation
+
+* Add averaging plugin documentation page.
+* Update MNE Anonymize documentation page.
+
+### Other
+
+* Remove minimal version flag and corresponding CI build. This mode was needed to be able to build on the older Neuromag systems. Since we switched to the fieldtrip buffer, this mode is no longer needed.
+
+### Authors
+
+People who contributed to this release (preceded by number of commits):
+
+(156) Juan Garcia-Prieto,
+(110) Lorenz Esch,
+(76) Gabriel Motta,
+(6) Ruben Dörfel,
+(2) Wayne Mead,
+(2) Andrey Parfenov
+
 ## Version 0.1.3 - 2020/06/05
 
 ### Applications
