@@ -220,6 +220,7 @@ void AnnotationSettingsView::setModel(QSharedPointer<ANSHAREDLIB::AnnotationMode
 
     initMSVCSettings();
     initGUIFunctionality();
+    loadGroupSettings();
     onDataChanged();
 }
 
@@ -311,6 +312,8 @@ void AnnotationSettingsView::disconnectFromModel()
             this, &AnnotationSettingsView::onShowAllChecked);
     disconnect(m_pUi->m_tableView_eventTableView, &QWidget::customContextMenuRequested,
             this, &AnnotationSettingsView::customEventContextMenuRequested);
+
+    saveGroupSettings();
 
 }
 
@@ -488,4 +491,22 @@ void AnnotationSettingsView::deleteGroup()
     m_pUi->m_listWidget_groupListWidget->selectionModel()->clearSelection();
     delete itemToDelete;
     onDataChanged();
+}
+
+//=============================================================================================================
+
+void AnnotationSettingsView::saveGroupSettings()
+{
+    while(m_pUi->m_listWidget_groupListWidget->count()){
+        m_pAnnModel->pushGroup(m_pUi->m_listWidget_groupListWidget->takeItem(m_pUi->m_listWidget_groupListWidget->count() - 1));
+    }
+}
+
+//=============================================================================================================
+
+void AnnotationSettingsView::loadGroupSettings()
+{
+    while(m_pAnnModel->getGroupStackSize()){
+        m_pUi->m_listWidget_groupListWidget->addItem(m_pAnnModel->popGroup());
+    }
 }
