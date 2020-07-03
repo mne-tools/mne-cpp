@@ -134,13 +134,13 @@ bool MainWindow::confirmClose()
 void MainWindow::setDefautlStateUi()
 {
     this->setWindowTitle(qApp->organizationName() + " ~ " + qApp->applicationName() + " ~ " + qApp->applicationVersion());
-#ifdef WASMBUILD
+    #ifdef WASMBUILD
     m_pUi->lineEditInFile->setReadOnly(true);
     m_pUi->labelOutFile->setVisible(false);
     m_pUi->openOutFileWindowButton->setVisible(false);
     m_pUi->lineEditOutFile->setVisible(false);
     m_bOptionsVisibility = true;
-#endif
+    #endif
     resize(m_iDefaultWindowHeightLarge,m_iDefaultWindowHeight);
     setMaximumHeight(m_iDefaultWindowHeight);
 
@@ -638,7 +638,7 @@ void MainWindow::setLineEditMNECommand(QString s)
 
 void MainWindow::openInFileDialog()
 {
-#ifdef WASMBUILD
+    #ifdef WASMBUILD
     m_pUi->pushButtonReadData->setDisabled(true);
 
     auto fileContentReady = [&](const QString &filePath, const QByteArray &fileContent) {
@@ -674,10 +674,7 @@ void MainWindow::openInFileDialog()
     }
 
     QFileDialog::getOpenFileContent("Fiff File (*.fif *.fiff)",  fileContentReady);
-
-
-
-#else
+    #else
     QFileDialog dialog(this);
     dialog.setNameFilter(tr("Fiff file (*.fif *.fiff)"));
     dialog.setDirectory(QDir::currentPath());
@@ -691,7 +688,7 @@ void MainWindow::openInFileDialog()
         m_pUi->lineEditInFile->setText(m_fiInFile.absoluteFilePath());
         emit fileInChanged(m_fiInFile.absoluteFilePath());
     }
-#endif
+    #endif
 }
 
 //=============================================================================================================
@@ -723,7 +720,7 @@ void MainWindow::openOutFileDialog()
 
 void MainWindow::outputFileReady()
 {
-#ifdef WASMBUILD
+    #ifdef WASMBUILD
     //we need to give space to the output file to be copied.
     QFile::remove(m_fiInFile.absoluteFilePath());
 
@@ -747,9 +744,9 @@ void MainWindow::outputFileReady()
     //make explicit to the user that the input file has been deleted. Reading or anonymization
     //will not work.
     setInFile("");
-#else
+    #else
     statusMsg("Your file is ready!");
-#endif
+    #endif
 }
 
 //=============================================================================================================
@@ -766,7 +763,6 @@ void MainWindow::helpButtonClicked()
                    "<p style=""text-align:right"">Sincerely, the development team @ MNE-CPP.</p>");
     msgBox.exec();
 }
-
 
 //=============================================================================================================
 
