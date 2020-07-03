@@ -6,7 +6,7 @@
  *           Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           John C. Mosher <John.C.Mosher@uth.tmc.edu>
- * @since    0.1.3
+ * @since    0.1.0
  * @date     August, 2019
  *
  * @section  LICENSE
@@ -62,7 +62,7 @@
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-class fiffData;
+
 //=============================================================================================================
 // DEFINE NAMESPACE
 //=============================================================================================================
@@ -140,9 +140,7 @@ public:
      */
     int anonymizeFile();
 
-    //=========================================================================================================
 signals:
-
     //=========================================================================================================
     /**
      *  @brief Send the version of FIFF standard of the current file.
@@ -545,9 +543,9 @@ public slots:
     /**
      * If found in the fiff file, the specified number of days will be subtracted from the subject's birthday date information contained in each fif file.
      *
-     * @param [in] iSubjBirthdayOffset  Integer with the number of dates to subtract from the subject's birthday date.
+     * @param [in] b  Flag whether to use a birthday offset.
      */
-    void setUseSubjectBirthdayOffset(bool);
+    void setUseSubjectBirthdayOffset(bool b);
 
     //=========================================================================================================
     /**
@@ -706,27 +704,43 @@ private:
 
     //=========================================================================================================
     /**
-     * This transforms the data inside a subject sex tag (male, female or unknown) into a string object
-     * containing that information.
+     *
+     * @brief Transfrom the sex code of the subject into a string ["unknown", "male" or "female"].
+     *
+     * @details Fiff standard codes the sex of the subject as an integer value. This helper method allows to easily transform it into a
+     * more user friendly format.
+     *
+     * @param [in] sexCode the code with the sex of the subject.
+     *
      */
     inline QString subjectSexToString(int sexCode) const;
 
     //=========================================================================================================
     /**
-     * This transforms the data inside a subject handedness tag (right, left or unknown) into a string object
-     * containing that information.
+     *
+     * @brief Transfrom the handedness code of the subject into a string ["unknown", "right" or "left"], expressing the right or left-handness of the the
+     * subject.
+     *
+     * @details Fiff standard codes the handness (or handedness) of the subject as an integer value. This helper method allows to easily transform it into a
+     * more user friendly format.
+     *
+     * @param [in] handCode the code with the handedness of the subject.
+     *
      */
     inline QString subjectHandToString(int handCode) const;
 
     //=========================================================================================================
     /**
-     * Helper function that prints messages to the command line only if the object has been set to a verbose mode.
+     * @brief print string to console if the object is set to Verbose Mode on. Or if Silent Mode has not been set.
+     *
+     * @details Helper function that prints messages to the command line only if the object has been set to a verbose mode.
      * This wraps QDebug functionality inline. Specified here in header file. If the obj is not set to be in a
      * verbose mode, it does nothing. Messages can be printed to a single line (followed by an eol character) or
      * can be printed in the same line as previous one. Note that to achieve this, messages will be "retained" one
      * call, in order to check if next call requests to print in the same line.
      *
-     * @param [in] str  String to print.
+     * @param [in] str String to print.
+     *
      */
     inline void printIfVerbose(const QString &str) const;
 
@@ -761,7 +775,7 @@ private:
     //=========================================================================================================
     /**
      * Will overwrite the 'next' field in the tag stored in m_pInTag. It will store the output tag in the tag
-     * directory and will finally write the tag stored in m_pOutTag into the output file stream.
+     * directory and will finally write the tag into the output file stream.
      */
     void writeTag();
 
@@ -823,16 +837,6 @@ private:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-/**
- *
- * @brief Transfrom the sex code of the subject into a string ["unknown", "male" or "female"].
- *
- * @details Fiff standard codes the sex of the subject as an integer value. This helper method allows to easily transform it into a
- * more user friendly format.
- *
- * @param [in] sexCode the code with the sex of the subject.
- *
- */
 
 inline QString FiffAnonymizer::subjectSexToString(int sexCode) const
 {
@@ -853,17 +857,6 @@ inline QString FiffAnonymizer::subjectSexToString(int sexCode) const
 }
 
 //=============================================================================================================
-/**
- *
- * @brief Transfrom the handedness code of the subject into a string ["unknown", "right" or "left"], expressing the right or left-handness of the the
- * subject.
- *
- * @details Fiff standard codes the handness (or handedness) of the subject as an integer value. This helper method allows to easily transform it into a
- * more user friendly format.
- *
- * @param [in] handCode the code with the handedness of the subject.
- *
- */
 
 inline QString FiffAnonymizer::subjectHandToString(int handCode) const
 {
@@ -885,16 +878,7 @@ inline QString FiffAnonymizer::subjectHandToString(int handCode) const
 }
 
 //=============================================================================================================
-/**
- *
- * @brief print string to console if the object is set to Verbose Mode on. Or if Silent Mode has not been set.
- *
- * @details Many memeber functions require some text to be printed in the console. This member method allows to abstract from that call
- * the state of the object (Verbose Mode On/Off, Silent Mode On/Off) making it more easily readable.
- *
- * @param [in] str String to print.
- *
- */
+
 inline void FiffAnonymizer::printIfVerbose(const QString& str) const
 {
     if(m_bVerboseMode)
