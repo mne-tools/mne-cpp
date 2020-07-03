@@ -6,7 +6,7 @@
  *           Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           John C. Mosher <John.C.Mosher@uth.tmc.edu>
- * @since    0.1.3
+ * @since    0.1.0
  * @date     August, 2019
  *
  * @section  LICENSE
@@ -825,6 +825,7 @@ void FiffAnonymizer::setUseSubjectBirthdayOffset(bool b)
 {
     m_bUseSubjectBirthdayOffset = b;
 }
+
 //=============================================================================================================
 
 int  FiffAnonymizer::getSubjectBirthdayOffset()
@@ -916,10 +917,14 @@ bool FiffAnonymizer::getUseSubjectBirthdayOffset()
     return m_bUseSubjectBirthdayOffset;
 }
 
+//=============================================================================================================
+
 bool FiffAnonymizer::isFileInSet() const
 {
     return m_bFileInSet;
 }
+
+//=============================================================================================================
 
 bool FiffAnonymizer::isFileOutSet() const
 {
