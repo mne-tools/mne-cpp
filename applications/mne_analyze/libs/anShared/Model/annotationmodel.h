@@ -376,14 +376,46 @@ public:
      */
     void hideAll();
 
+    //=========================================================================================================
+    /**
+     * Returns counting index that gives each group a unique number
+     *
+     * @return m_iIndexCount
+     */
     int getIndexCount();
 
+    //=========================================================================================================
+    /**
+     * Retruns the group of the event pointed to by parameter iIndex
+     *
+     * @param[in] iIndex    Index for which we want to get the group
+     *
+     * @return the group event at iIndex belongs to
+     */
     int currentGroup(int iIndex);
 
+    //=========================================================================================================
+    /**
+     * Push widget item into member stack - used for storing groups when file is unloaded
+     *
+     * @param[in] item      stores item in the member stack
+     */
     void pushGroup(QListWidgetItem* item);
 
+    //=========================================================================================================
+    /**
+     * Pops widget item from member stack - used for restroing groups when file is loaded
+     *
+     * @return retruns widget item on top of the member stack
+     */
     QListWidgetItem* popGroup();
 
+    //=========================================================================================================
+    /**
+     * Returns how many item are currently stored in the member stack
+     *
+     * @return size of member stack m_dataStoredGroups
+     */
     int getGroupStackSize();
 
     //=========================================================================================================
