@@ -420,6 +420,16 @@ public:
 
     //=========================================================================================================
     /**
+     * Sets the color of group iGroupIndex to color groupColor
+     *
+     * @param[in] iGroupIndex   Index of the goup to be changed
+     * @param[in] groupColor    Color the group should be changed to
+     */
+    void setGroupColor(int iGroupIndex,
+                       QColor groupColor);
+
+    //=========================================================================================================
+    /**
      * The type of this model (AnnotationModel)
      *
      * @return The type of this model (AnnotationModel)

@@ -482,6 +482,10 @@ void AnnotationSettingsView::customGroupContextMenuRequested(const QPoint &pos)
 {
     QMenu* menu = new QMenu(this);
 
+    QAction* colorChange = menu->addAction(tr("Change color"));
+    connect(colorChange, &QAction::triggered,
+            this, &AnnotationSettingsView::changeGroupColor, Qt::UniqueConnection);
+
     QAction* markTime = menu->addAction(tr("Delete group"));
     connect(markTime, &QAction::triggered,
             this, &AnnotationSettingsView::deleteGroup, Qt::UniqueConnection);
@@ -541,4 +545,23 @@ void AnnotationSettingsView::renameGroupCheck()
 
     }
 
+}
+
+//=============================================================================================================
+
+void AnnotationSettingsView::changeGroupColor()
+{
+    QColor groupColor = m_pColordialog->getColor(Qt::black, this);
+
+    if(!groupColor.isValid()){
+        return;
+    }
+
+    int iSelected = m_pUi->m_listWidget_groupListWidget->selectionModel()->selectedRows().first().row();
+    QListWidgetItem* itemToChange = m_pUi->m_listWidget_groupListWidget->item(iSelected);
+
+    itemToChange->setData(Qt::DecorationRole, groupColor);
+    m_pAnnModel->setGroupColor(itemToChange->data(Qt::UserRole).toInt(),
+                               groupColor);
+    onDataChanged();
 }

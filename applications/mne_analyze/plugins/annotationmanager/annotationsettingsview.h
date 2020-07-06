@@ -280,6 +280,12 @@ private:
 
     //=========================================================================================================
     /**
+     * Gives user popup to select new color for selected group.
+     */
+    void changeGroupColor();
+
+    //=========================================================================================================
+    /**
      * Brings up a menu for interacting with events
      * @param[in] pos   Position on screen where the menu will show up
      */
