@@ -533,7 +533,7 @@ void AnnotationSettingsView::renameGroup()
         msgBox->setText("Group name already in use");
         msgBox->setInformativeText("Please select a new name");
         msgBox->open();
-    }else if(m_pUi->m_listWidget_groupListWidget->currentItem()->text() == ""){
+    }else if(text == ""){
         QMessageBox* msgBox = new QMessageBox();
         msgBox->setText("Group name not valid");
         msgBox->setInformativeText("Please select a new name");
