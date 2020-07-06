@@ -74,6 +74,50 @@ namespace DISPLIB
 // DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
+//=========================================================================================================
+/**
+ * Default scales for each channel by type.
+ */
+const float m_fScaleMAG = 1e-12f;      /**< Default scale for channel kind and unit of MAG */
+const float m_fScaleGRAD = 1e-15f;     /**< Default scale for channel kind and unit of GRAD */
+const float m_fScaleEEG = 1e-5f;       /**< Default scale for channel kind and unit of EEG */
+const float m_fScaleEOG = 1e-6f;       /**< Default scale for channel kind and unit of EOG */
+const float m_fScaleECG = 1e-2f;       /**< Default scale for channel kind and unit of ECG */
+const float m_fScaleSTIM = 1e-3f;      /**< Default scale for channel kind and unit of STIM */
+const float m_fScaleMISC = 1e-3f;      /**< Default scale for channel kind and unit of MISC */
+const float m_fScaleEMG = 1e-3f;       /**< Default scale for channel kind and unit of EMG */
+
+//=========================================================================================================
+/**
+ * Get the default scaling values by channel type
+ *
+ * @param [in] iChannelKind     The channel kind to return the default scaling value for.
+ * @param [in] iChannelUnit     The channel unit to return the default scaling value for.
+ *                              The unit is only important when dealing with MEG channels in order to
+ *                              distinguish between magnetometers and gradiometers.
+ *
+ * @return The defaults scaling value.
+ */
+DISPSHARED_EXPORT float getDefaultScalingValue(int iChannelKind,
+                                               int iChannelUnit);
+
+//=========================================================================================================
+/**
+ * Get the scaling value from suplied scale map, and check if there is a float asigned to the scale.
+ * Otherwise returns default scaling values for the channel type.
+ *
+ * @param [in] qMapChScaling    The map containing the scaling values for different channel types and units.
+ * @param [in] iChannelKind     The channel kind to return the default scaling value for.
+ * @param [in] iChannelUnit     The channel unit to return the default scaling value for.
+ *                              The unit is only important when dealing with MEG channels in order to
+ *                              distinguish between magnetometers and gradiometers.
+ *
+ * @return The scaling value as a float.
+ */
+DISPSHARED_EXPORT float getScalingValue(const QMap<qint32, float>& qMapChScaling,
+                                        int iChannelKind,
+                                        int iChannelUnit);
+
 //=============================================================================================================
 /**
  * DECLARE CLASS ScalingView
@@ -103,25 +147,6 @@ public:
      * Destroys the ScalingView.
      */
     ~ScalingView();
-
-    //=========================================================================================================
-    /**
-     * Get the default scaling values by channel type
-     *
-     * @return The static detfaults for scaling value.
-     */
-    static float getDefaultScalingValue(int m_iChannelKind,
-                                        int m_iChannelUnit);
-
-    //=========================================================================================================
-    /**
-     * Get the scaling value from suplied scale map, and check if there is a float asigned to the scale. Otherwise returns default
-     *
-     * @return Float for channel scale by qmap, channel kind and unit type.
-     */
-    static float getScalingValue(const QMap<qint32, float>& m_scaleMap,
-                                 int m_iChannelKind,
-                                 int m_iChannelUnit);
 
     //=========================================================================================================
     /**
@@ -191,19 +216,6 @@ protected:
     QString                             m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
 
     Ui::ScalingViewWidget*              m_pUi;
-
-    //=========================================================================================================
-    /**
-     * Default scales for each channel by type.
-     */
-    const static float                         m_dScaleMAG;         /**< Default scale for channel kind and unit of MAG */
-    const static float                         m_dScaleGRAD;        /**< Default scale for channel kind and unit of GRAD */
-    const static float                         m_dScaleEEG;         /**< Default scale for channel kind and unit of EEG */
-    const static float                         m_dScaleEOG;         /**< Default scale for channel kind and unit of EOG */
-    const static float                         m_dScaleECG;         /**< Default scale for channel kind and unit of ECG */
-    const static float                         m_dScaleSTIM;        /**< Default scale for channel kind and unit of STIM */
-    const static float                         m_dScaleMISC;        /**< Default scale for channel kind and unit of MISC */
-    const static float                         m_dScaleEMG;         /**< Default scale for channel kind and unit of EMG */
 
 signals:
     //=========================================================================================================

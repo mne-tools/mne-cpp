@@ -170,7 +170,7 @@ void AverageSceneItem::paintAveragePath(QPainter *painter)
 
     //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
 
-    float fMaxValue = ScalingView::getScalingValue(m_scaleMap, m_iChannelKind, m_iChannelUnit);
+    float fMaxValue = DISPLIB::getScalingValue(m_scaleMap, m_iChannelKind, m_iChannelUnit);
 
     //Plot averaged data
     QRectF boundingRect = this->boundingRect();

@@ -43,7 +43,6 @@
 
 #include "rawdataviewer_global.h"
 #include <anShared/Interfaces/IPlugin.h>
-#include "disp/viewers/scalingview.h"
 
 //=============================================================================================================
 // QT INCLUDES

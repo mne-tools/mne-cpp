@@ -53,7 +53,7 @@
 
 #include <rtprocessing/helpers/filterkernel.h>
 
-#include "disp/viewers/scalingview.h"
+#include <disp/viewers/scalingview.h>
 
 //=============================================================================================================
 // QT INCLUDES
