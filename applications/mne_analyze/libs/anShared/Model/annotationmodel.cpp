@@ -344,7 +344,6 @@ bool AnnotationModel::setData(const QModelIndex &index, const QVariant &value, i
 
 void AnnotationModel::setEventFilterType(const QString eventType)
 {
-    qDebug() << "setEventFilterType";
     m_sFilterEventType = eventType;
 
     //Clear filtered event data
