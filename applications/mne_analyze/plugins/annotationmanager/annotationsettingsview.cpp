@@ -52,6 +52,7 @@
 #include <QKeyEvent>
 #include <QMenu>
 #include <QMessageBox>
+#include <QInputDialog>
 
 //=============================================================================================================
 // Eigen INCLUDES
@@ -168,10 +169,6 @@ void AnnotationSettingsView::initGUIFunctionality()
     m_pUi->m_listWidget_groupListWidget->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(m_pUi->m_listWidget_groupListWidget, &QWidget::customContextMenuRequested,
             this, &AnnotationSettingsView::customGroupContextMenuRequested, Qt::UniqueConnection);
-
-    connect(m_pUi->m_listWidget_groupListWidget, &QListWidget::itemChanged,
-            this, &AnnotationSettingsView::renameGroupCheck);
-
 }
 
 //=============================================================================================================
@@ -200,8 +197,6 @@ void AnnotationSettingsView::updateComboBox(const QString &currentAnnotationType
 
 void AnnotationSettingsView::addAnnotationToModel()
 {
-    qDebug() << "AnnotationSettingsView::addAnnotationToModel -- Here";
-
      /*else {
         if(m_pAnnModel->isUserMade()){
             //Do nothing
@@ -256,7 +251,6 @@ void AnnotationSettingsView::removeAnnotationfromModel()
 
     int iTracker = 9999;
     for(int i = indexList.size() - 1; i >= 0; i--) {
-        qDebug() << "Removing Index" << indexList.at(i).row();
 
         if (indexList.at(i).row() == iTracker){
             continue;
@@ -318,7 +312,7 @@ void AnnotationSettingsView::disconnectFromModel()
     disconnect(m_pUi->m_listWidget_groupListWidget, &QWidget::customContextMenuRequested,
             this, &AnnotationSettingsView::customGroupContextMenuRequested);
     disconnect(m_pUi->m_listWidget_groupListWidget, &QListWidget::itemChanged,
-            this, &AnnotationSettingsView::renameGroupCheck);
+            this, &AnnotationSettingsView::renameGroup);
 
 
     saveGroupSettings();
@@ -419,7 +413,7 @@ bool AnnotationSettingsView::newUserGroup(const QString& sName, int iType)
     QListWidgetItem* newItem = new QListWidgetItem(sName);
     newItem->setData(Qt::UserRole, QVariant(iCat));
     newItem->setData(Qt::DecorationRole, groupColor);
-    newItem->setFlags (newItem->flags () | Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+    newItem->setFlags (newItem->flags () | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
 
     m_pUi->m_listWidget_groupListWidget->addItem(newItem);
     emit m_pUi->m_listWidget_groupListWidget->setCurrentItem(newItem);
@@ -482,6 +476,10 @@ void AnnotationSettingsView::customGroupContextMenuRequested(const QPoint &pos)
 {
     QMenu* menu = new QMenu(this);
 
+    QAction* renameGroup =  menu->addAction(tr("Rename"));
+    connect(renameGroup, &QAction::triggered,
+            this, &AnnotationSettingsView::renameGroup, Qt::UniqueConnection);
+
     QAction* colorChange = menu->addAction(tr("Change color"));
     connect(colorChange, &QAction::triggered,
             this, &AnnotationSettingsView::changeGroupColor, Qt::UniqueConnection);
@@ -525,26 +523,24 @@ void AnnotationSettingsView::loadGroupSettings()
 
 //=============================================================================================================
 
-void AnnotationSettingsView::renameGroupCheck()
+void AnnotationSettingsView::renameGroup()
 {
-    qDebug() << "AnnotationSettingsView::renameGroupCheck";
-    if (m_pUi->m_listWidget_groupListWidget->findItems(m_pUi->m_listWidget_groupListWidget->currentItem()->text(), Qt::MatchExactly).size() > 1){
-        qDebug() << "SIZE:" << m_pUi->m_listWidget_groupListWidget->findItems(m_pUi->m_listWidget_groupListWidget->currentItem()->text(), Qt::MatchExactly).size();
-        QMessageBox msgBox;
-        msgBox.setText("Group name already in use");
-        msgBox.setInformativeText("Please select a new name");
-        int ret = msgBox.exec();
+    QString text = QInputDialog::getText(this, tr("Event Viewer Group Settings"),
+                                             tr("Group Name:"), QLineEdit::Normal);
 
-        switch (ret){
-            default:
-            qDebug() << "SELECT";
-                //m_pUi->m_listWidget_groupListWidget->editItem(m_pUi->m_listWidget_groupListWidget->currentItem());
-                //emit m_pUi->m_listWidget_groupListWidget->itemDoubleClicked(m_pUi->m_listWidget_groupListWidget->currentItem());
-
-        }
-
+    if (m_pUi->m_listWidget_groupListWidget->findItems(text, Qt::MatchExactly).size() > 0){
+        QMessageBox* msgBox = new QMessageBox();
+        msgBox->setText("Group name already in use");
+        msgBox->setInformativeText("Please select a new name");
+        msgBox->open();
+    }else if(m_pUi->m_listWidget_groupListWidget->currentItem()->text() == ""){
+        QMessageBox* msgBox = new QMessageBox();
+        msgBox->setText("Group name not valid");
+        msgBox->setInformativeText("Please select a new name");
+        msgBox->open();
+    }else {
+        m_pUi->m_listWidget_groupListWidget->currentItem()->setText(text);
     }
-
 }
 
 //=============================================================================================================
