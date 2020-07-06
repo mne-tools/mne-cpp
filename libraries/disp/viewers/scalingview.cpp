@@ -65,17 +65,79 @@ using namespace DISPLIB;
 using namespace FIFFLIB;
 
 //=============================================================================================================
-// DEFINE STATIC VARIALBES FOR SCALING BY CHANNEL TYPE
+// DEFINE GLOBAL DISPLIB METHODS
 //=============================================================================================================
 
-const float ScalingView::m_dScaleMAG = 1e-12f;
-const float ScalingView::m_dScaleGRAD = 1e-15f;
-const float ScalingView::m_dScaleEEG = 1e-5f;
-const float ScalingView::m_dScaleEOG = 1e-6f;
-const float ScalingView::m_dScaleECG = 1e-2f;
-const float ScalingView::m_dScaleSTIM = 1e-3f;
-const float ScalingView::m_dScaleMISC = 1e-3f;
-const float ScalingView::m_dScaleEMG = 1e-3f;
+float DISPLIB::getDefaultScalingValue(int iChannelKind,
+                                      int iChannelUnit)
+{
+    float fMaxScale(1e-9f);
+
+    switch(iChannelKind) {
+        case FIFFV_MEG_CH: {
+            if( iChannelUnit == FIFF_UNIT_T_M ) { //gradiometers
+                    fMaxScale = m_fScaleGRAD;
+                }
+            else if( iChannelUnit == FIFF_UNIT_T ) { //magnitometers
+                    fMaxScale = m_fScaleMAG;
+                }
+            break;
+        }
+
+        case FIFFV_REF_MEG_CH: {  /*11/04/14 Added by Limin: MEG reference channel */
+            fMaxScale = m_fScaleMAG;
+            break;
+        }
+
+        case FIFFV_EEG_CH: { //EEG Channels
+            fMaxScale = m_fScaleEEG;
+            break;
+        }
+
+        case FIFFV_ECG_CH: { //ECG Channels
+            fMaxScale = m_fScaleECG;
+            break;
+        }
+        case FIFFV_EMG_CH: { //EMG Channels
+            fMaxScale = m_fScaleEMG;
+            break;
+        }
+        case FIFFV_EOG_CH: { //EOG Channels
+            fMaxScale = m_fScaleEOG;
+            break;
+        }
+
+        case FIFFV_STIM_CH: { //STIM Channels
+            fMaxScale = m_fScaleSTIM;
+            break;
+        }
+
+        case FIFFV_MISC_CH: { //MISC Channels
+            fMaxScale = m_fScaleMISC;
+            break;
+        }
+    }
+
+    return fMaxScale;
+}
+
+//=============================================================================================================
+
+float DISPLIB::getScalingValue(const QMap<qint32, float>& qMapChScaling,
+                                   int iChannelKind,
+                                   int iChannelUnit)
+{
+   float fMaxScale = qMapChScaling.value(iChannelKind);
+
+   if(iChannelKind == FIFFV_MEG_CH) {
+        fMaxScale = qMapChScaling.value(iChannelUnit);
+    }
+
+    if(qIsNaN(fMaxScale) || fMaxScale == 0) {
+        fMaxScale = DISPLIB::getDefaultScalingValue(iChannelKind, iChannelUnit);
+     }
+    return fMaxScale;
+}
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -96,8 +158,6 @@ ScalingView::ScalingView(const QString& sSettingsPath,
 
     loadSettings();
     redrawGUI();
-
-
 }
 
 //=============================================================================================================
@@ -106,77 +166,6 @@ ScalingView::~ScalingView()
 {
     saveSettings();
     delete m_pUi;
-}
-//=============================================================================================================
-
-float ScalingView::getDefaultScalingValue(int m_iChannelKind,
-                                          int m_iChannelUnit)
-{
-    float fMaxScale(1e-9f);
-
-    switch(m_iChannelKind) {
-        case FIFFV_MEG_CH: {
-            if( m_iChannelUnit == FIFF_UNIT_T_M ) { //gradiometers
-                    fMaxScale = m_dScaleGRAD;
-                }
-            else if( m_iChannelUnit == FIFF_UNIT_T ) { //magnitometers
-                    fMaxScale = m_dScaleMAG;
-                }
-            break;
-        }
-
-        case FIFFV_REF_MEG_CH: {  /*11/04/14 Added by Limin: MEG reference channel */
-            fMaxScale = m_dScaleMAG;
-            break;
-        }
-
-        case FIFFV_EEG_CH: { //EEG Channels
-            fMaxScale = m_dScaleEEG;
-            break;
-        }
-
-        case FIFFV_ECG_CH: { //ECG Channels
-            fMaxScale = m_dScaleECG;
-            break;
-        }
-        case FIFFV_EMG_CH: { //EMG Channels
-            fMaxScale = m_dScaleEMG;
-            break;
-        }
-        case FIFFV_EOG_CH: { //EOG Channels
-            fMaxScale = m_dScaleEOG;
-            break;
-        }
-
-        case FIFFV_STIM_CH: { //STIM Channels
-            fMaxScale = m_dScaleSTIM;
-            break;
-        }
-
-        case FIFFV_MISC_CH: { //MISC Channels
-            fMaxScale = m_dScaleMISC;
-            break;
-        }
-    }
-
-    return fMaxScale;
-}
-//=============================================================================================================
-
-float ScalingView::getScalingValue(const QMap<qint32, float>& m_scaleMap,
-                                   int m_iChannelKind,
-                                   int m_iChannelUnit)
-{
-   float fMaxScale = m_scaleMap.value(m_iChannelKind);
-
-   if(m_iChannelKind == FIFFV_MEG_CH) {
-        fMaxScale = m_scaleMap.value(m_iChannelUnit);
-    }
-
-    if(qIsNaN(fMaxScale) || fMaxScale == 0) {
-        fMaxScale = ScalingView::getDefaultScalingValue(m_iChannelKind, m_iChannelUnit);
-     }
-    return fMaxScale;
 }
 
 //=============================================================================================================
@@ -244,25 +233,25 @@ void ScalingView::loadSettings()
 
     QSettings settings("MNECPP");
 
-    float val = settings.value(m_sSettingsPath + QString("/ScalingView/scaleMAG"), m_dScaleMAG).toFloat();
+    float val = settings.value(m_sSettingsPath + QString("/ScalingView/scaleMAG"), m_fScaleMAG).toFloat();
     m_qMapChScaling.insert(FIFF_UNIT_T, val);
 
-    val = settings.value(m_sSettingsPath + QString("/ScalingView/scaleGRAD"), m_dScaleGRAD).toFloat();
+    val = settings.value(m_sSettingsPath + QString("/ScalingView/scaleGRAD"), m_fScaleGRAD).toFloat();
     m_qMapChScaling.insert(FIFF_UNIT_T_M, val);
 
-    val = settings.value(m_sSettingsPath + QString("/ScalingView/scaleEEG"), m_dScaleEEG).toFloat();
+    val = settings.value(m_sSettingsPath + QString("/ScalingView/scaleEEG"), m_fScaleEEG).toFloat();
     m_qMapChScaling.insert(FIFFV_EEG_CH, val);
 
-    val = settings.value(m_sSettingsPath + QString("/ScalingView/scaleEOG"), m_dScaleEOG).toFloat();
+    val = settings.value(m_sSettingsPath + QString("/ScalingView/scaleEOG"), m_fScaleEOG).toFloat();
     m_qMapChScaling.insert(FIFFV_EOG_CH, val);
 
-    val = settings.value(m_sSettingsPath + QString("/ScalingView/scaleECG"), m_dScaleECG).toFloat();
+    val = settings.value(m_sSettingsPath + QString("/ScalingView/scaleECG"), m_fScaleECG).toFloat();
     m_qMapChScaling.insert(FIFFV_ECG_CH, val);
 
-    val = settings.value(m_sSettingsPath + QString("/ScalingView/scaleSTIM"), m_dScaleSTIM).toFloat();
+    val = settings.value(m_sSettingsPath + QString("/ScalingView/scaleSTIM"), m_fScaleSTIM).toFloat();
     m_qMapChScaling.insert(FIFFV_STIM_CH, val);
 
-    val = settings.value(m_sSettingsPath + QString("/ScalingView/scaleMISC"), m_dScaleMISC).toFloat();
+    val = settings.value(m_sSettingsPath + QString("/ScalingView/scaleMISC"), m_fScaleMISC).toFloat();
     m_qMapChScaling.insert(FIFFV_MISC_CH, val);
 }
 
@@ -310,7 +299,7 @@ void ScalingView::redrawGUI()
         t_pDoubleSpinBoxScale->setSingleStep(0.01);
         t_pDoubleSpinBoxScale->setDecimals(3);
         t_pDoubleSpinBoxScale->setPrefix("+/- ");
-        t_pDoubleSpinBoxScale->setValue(m_qMapChScaling.value(FIFF_UNIT_T)/(m_dScaleMAG));
+        t_pDoubleSpinBoxScale->setValue(m_qMapChScaling.value(FIFF_UNIT_T)/(m_fScaleMAG));
         m_qMapScalingDoubleSpinBox.insert(FIFF_UNIT_T,t_pDoubleSpinBoxScale);
         connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
                 this,&ScalingView::onUpdateSpinBoxScaling);
@@ -322,7 +311,7 @@ void ScalingView::redrawGUI()
         t_pHorizontalSlider->setMaximum(500);
         t_pHorizontalSlider->setSingleStep(1);
         t_pHorizontalSlider->setPageStep(1);
-        t_pHorizontalSlider->setValue(m_qMapChScaling.value(FIFF_UNIT_T)/(m_dScaleMAG)*10);
+        t_pHorizontalSlider->setValue(m_qMapChScaling.value(FIFF_UNIT_T)/(m_fScaleMAG)*10);
         m_qMapScalingSlider.insert(FIFF_UNIT_T,t_pHorizontalSlider);
         connect(t_pHorizontalSlider,static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
                 this,&ScalingView::onUpdateSliderScaling);
@@ -346,7 +335,7 @@ void ScalingView::redrawGUI()
         t_pDoubleSpinBoxScale->setSingleStep(1);
         t_pDoubleSpinBoxScale->setDecimals(1);
         t_pDoubleSpinBoxScale->setPrefix("+/- ");
-        t_pDoubleSpinBoxScale->setValue(m_qMapChScaling.value(FIFF_UNIT_T_M)/(m_dScaleGRAD * 100));
+        t_pDoubleSpinBoxScale->setValue(m_qMapChScaling.value(FIFF_UNIT_T_M)/(m_fScaleGRAD * 100));
         m_qMapScalingDoubleSpinBox.insert(FIFF_UNIT_T_M,t_pDoubleSpinBoxScale);
         connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
                 this,&ScalingView::onUpdateSpinBoxScaling);
@@ -358,7 +347,7 @@ void ScalingView::redrawGUI()
         t_pHorizontalSlider->setMaximum(2000);
         t_pHorizontalSlider->setSingleStep(1);
         t_pHorizontalSlider->setPageStep(1);
-        t_pHorizontalSlider->setValue(m_qMapChScaling.value(FIFF_UNIT_T_M)/(m_dScaleGRAD * 100));
+        t_pHorizontalSlider->setValue(m_qMapChScaling.value(FIFF_UNIT_T_M)/(m_fScaleGRAD * 100));
         m_qMapScalingSlider.insert(FIFF_UNIT_T_M,t_pHorizontalSlider);
         connect(t_pHorizontalSlider,static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
                 this,&ScalingView::onUpdateSliderScaling);
@@ -382,7 +371,7 @@ void ScalingView::redrawGUI()
         t_pDoubleSpinBoxScale->setSingleStep(0.1);
         t_pDoubleSpinBoxScale->setDecimals(1);
         t_pDoubleSpinBoxScale->setPrefix("+/- ");
-        t_pDoubleSpinBoxScale->setValue(m_qMapChScaling.value(FIFFV_EEG_CH)/(m_dScaleEEG));
+        t_pDoubleSpinBoxScale->setValue(m_qMapChScaling.value(FIFFV_EEG_CH)/(m_fScaleEEG));
         m_qMapScalingDoubleSpinBox.insert(FIFFV_EEG_CH,t_pDoubleSpinBoxScale);
         connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
                 this,&ScalingView::onUpdateSpinBoxScaling);
@@ -394,7 +383,7 @@ void ScalingView::redrawGUI()
         t_pHorizontalSlider->setMaximum(1000);
         t_pHorizontalSlider->setSingleStep(1);
         t_pHorizontalSlider->setPageStep(1);
-        t_pHorizontalSlider->setValue(m_qMapChScaling.value(FIFFV_EEG_CH)/(m_dScaleEEG)*10);
+        t_pHorizontalSlider->setValue(m_qMapChScaling.value(FIFFV_EEG_CH)/(m_fScaleEEG)*10);
         m_qMapScalingSlider.insert(FIFFV_EEG_CH,t_pHorizontalSlider);
         connect(t_pHorizontalSlider,static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
                 this,&ScalingView::onUpdateSliderScaling);
@@ -418,7 +407,7 @@ void ScalingView::redrawGUI()
         t_pDoubleSpinBoxScale->setSingleStep(0.1);
         t_pDoubleSpinBoxScale->setDecimals(1);
         t_pDoubleSpinBoxScale->setPrefix("+/- ");
-        t_pDoubleSpinBoxScale->setValue(m_qMapChScaling.value(FIFFV_EOG_CH)/(m_dScaleEOG));
+        t_pDoubleSpinBoxScale->setValue(m_qMapChScaling.value(FIFFV_EOG_CH)/(m_fScaleEOG));
         m_qMapScalingDoubleSpinBox.insert(FIFFV_EOG_CH,t_pDoubleSpinBoxScale);
         connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
                 this,&ScalingView::onUpdateSpinBoxScaling);
@@ -430,7 +419,7 @@ void ScalingView::redrawGUI()
         t_pHorizontalSlider->setMaximum(1000);
         t_pHorizontalSlider->setSingleStep(1);
         t_pHorizontalSlider->setPageStep(1);
-        t_pHorizontalSlider->setValue(m_qMapChScaling.value(FIFFV_EOG_CH)/(m_dScaleEOG)*10);
+        t_pHorizontalSlider->setValue(m_qMapChScaling.value(FIFFV_EOG_CH)/(m_fScaleEOG)*10);
         m_qMapScalingSlider.insert(FIFFV_EOG_CH,t_pHorizontalSlider);
         connect(t_pHorizontalSlider,static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
                 this,&ScalingView::onUpdateSliderScaling);
@@ -454,7 +443,7 @@ void ScalingView::redrawGUI()
         t_pDoubleSpinBoxScale->setSingleStep(0.1);
         t_pDoubleSpinBoxScale->setDecimals(1);
         t_pDoubleSpinBoxScale->setPrefix("+/- ");
-        t_pDoubleSpinBoxScale->setValue(m_qMapChScaling.value(FIFFV_ECG_CH)/(m_dScaleECG));
+        t_pDoubleSpinBoxScale->setValue(m_qMapChScaling.value(FIFFV_ECG_CH)/(m_fScaleECG));
         m_qMapScalingDoubleSpinBox.insert(FIFFV_ECG_CH,t_pDoubleSpinBoxScale);
         connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
                 this,&ScalingView::onUpdateSpinBoxScaling);
@@ -466,7 +455,7 @@ void ScalingView::redrawGUI()
         t_pHorizontalSlider->setMaximum(1000);
         t_pHorizontalSlider->setSingleStep(1);
         t_pHorizontalSlider->setPageStep(1);
-        t_pHorizontalSlider->setValue(m_qMapChScaling.value(FIFFV_ECG_CH)/(m_dScaleECG)*10);
+        t_pHorizontalSlider->setValue(m_qMapChScaling.value(FIFFV_ECG_CH)/(m_fScaleECG)*10);
         m_qMapScalingSlider.insert(FIFFV_ECG_CH,t_pHorizontalSlider);
         connect(t_pHorizontalSlider,static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
                 this,&ScalingView::onUpdateSliderScaling);
@@ -563,42 +552,42 @@ void ScalingView::onUpdateSpinBoxScaling(double value)
         {
             case FIFF_UNIT_T:
                 //MAG
-                scaleValue = m_dScaleMAG;
+                scaleValue = m_fScaleMAG;
                 m_qMapScalingSlider[it.key()]->setValue(it.value()->value()*10);
                 break;
             case FIFF_UNIT_T_M:
                 //GRAD
-                scaleValue = m_dScaleGRAD * 100; //*100 because data in fiff files is stored as fT/m not fT/cm
+                scaleValue = m_fScaleGRAD * 100; //*100 because data in fiff files is stored as fT/m not fT/cm
                 m_qMapScalingSlider[it.key()]->setValue(it.value()->value()*1);
                 break;
             case FIFFV_EEG_CH:
                 //EEG
-                scaleValue = m_dScaleEEG;
+                scaleValue = m_fScaleEEG;
                 m_qMapScalingSlider[it.key()]->setValue(it.value()->value()*10);
                 break;
             case FIFFV_EOG_CH:
                 //EOG
-                scaleValue = m_dScaleEOG;
+                scaleValue = m_fScaleEOG;
                 m_qMapScalingSlider[it.key()]->setValue(it.value()->value()*10);
                 break;
             case FIFFV_EMG_CH:
                 //EMG
-                scaleValue = m_dScaleEMG;
+                scaleValue = m_fScaleEMG;
                 m_qMapScalingSlider[it.key()]->setValue(it.value()->value()*10);
                 break;
             case FIFFV_ECG_CH:
                 //ECG
-                scaleValue = m_dScaleECG;
+                scaleValue = m_fScaleECG;
                 m_qMapScalingSlider[it.key()]->setValue(it.value()->value()*10);
                 break;
             case FIFFV_MISC_CH:
                 //MISC
-                scaleValue = m_dScaleMISC;
+                scaleValue = m_fScaleMISC;
                 m_qMapScalingSlider[it.key()]->setValue(it.value()->value()*10);
                 break;
             case FIFFV_STIM_CH:
                 //STIM
-                scaleValue = m_dScaleSTIM;
+                scaleValue = m_fScaleSTIM;
                 m_qMapScalingSlider[it.key()]->setValue(it.value()->value()*10);
                 break;
             default:
@@ -630,42 +619,42 @@ void ScalingView::onUpdateSliderScaling(int value)
         {
             case FIFF_UNIT_T:
                 //MAG
-                scaleValue = m_dScaleMAG;
+                scaleValue = m_fScaleMAG;
                 it.value()->setValue((double)m_qMapScalingSlider[it.key()]->value()/10);
                 break;
             case FIFF_UNIT_T_M:
                 //GRAD
-                scaleValue = m_dScaleGRAD * 100; //*100 because data in fiff files is stored as fT/m not fT/cm
+                scaleValue = m_fScaleGRAD * 100; //*100 because data in fiff files is stored as fT/m not fT/cm
                 it.value()->setValue((double)m_qMapScalingSlider[it.key()]->value()/1);
                 break;
             case FIFFV_EEG_CH:
                 //EEG
-                scaleValue = m_dScaleEEG;
+                scaleValue = m_fScaleEEG;
                 it.value()->setValue((double)m_qMapScalingSlider[it.key()]->value()/10);
                 break;
             case FIFFV_EOG_CH:
                 //EOG
-                scaleValue = m_dScaleEOG;
+                scaleValue = m_fScaleEOG;
                 it.value()->setValue((double)m_qMapScalingSlider[it.key()]->value()/10);
                 break;
             case FIFFV_EMG_CH:
                 //EMG
-                scaleValue = m_dScaleEMG;
+                scaleValue = m_fScaleEMG;
                 it.value()->setValue((double)m_qMapScalingSlider[it.key()]->value()/10);
                 break;
             case FIFFV_ECG_CH:
                 //ECG
-                scaleValue = m_dScaleECG;
+                scaleValue = m_fScaleECG;
                 it.value()->setValue((double)m_qMapScalingSlider[it.key()]->value()/10);
                 break;
             case FIFFV_MISC_CH:
                 //MISC
-                scaleValue = m_dScaleMISC;
+                scaleValue = m_fScaleMISC;
                 it.value()->setValue((double)m_qMapScalingSlider[it.key()]->value()/10);
                 break;
             case FIFFV_STIM_CH:
                 //STIM
-                scaleValue = m_dScaleMISC;
+                scaleValue = m_fScaleMISC;
                 it.value()->setValue((double)m_qMapScalingSlider[it.key()]->value()/10);
                 break;
             default:
