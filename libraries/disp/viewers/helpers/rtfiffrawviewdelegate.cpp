@@ -120,7 +120,7 @@ void createPaths(const QModelIndex &index,
     //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
     qint32 kind = t_pModel->getKind(index.row());
 
-    float fMaxValue = ScalingView::getScalingValue(t_pModel->getScaling(), kind, t_pModel->getUnit(index.row()));
+    float fMaxValue = DISPLIB::getScalingValue(t_pModel->getScaling(), kind, t_pModel->getUnit(index.row()));
 
     float dValue;
     float dScaleY = option.rect.height()/(2*fMaxValue);

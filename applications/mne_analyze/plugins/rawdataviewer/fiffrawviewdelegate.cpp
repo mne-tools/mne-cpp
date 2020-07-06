@@ -45,7 +45,7 @@
 #include <anShared/Model/annotationmodel.h>
 #include <anShared/Utils/metatypes.h>
 
-#include "disp/viewers/scalingview.h"
+#include <disp/viewers/scalingview.h>
 
 #include <rtprocessing/helpers/filterkernel.h>
 
@@ -231,14 +231,7 @@ void FiffRawViewDelegate::createPlotPath(const QStyleOptionViewItem &option,
 
     const FiffRawViewModel* t_pModel = static_cast<const FiffRawViewModel*>(index.model());
 
-    // Adjust for the temporal filter delay
-    int iStartIdx = 0;
-    if(t_pModel->isFilterActive()) {
-        iStartIdx = t_pModel->getFilterLength()/2;
-    }
-
-    qint32 kind = t_pModel->getKind(index.row());
-    double dMaxValue = DISPLIB::ScalingView::getScalingValue(t_pModel->getScaling(), kind, t_pModel->getUnit(index.row()));
+    double dMaxValue = DISPLIB::getScalingValue(t_pModel->getScaling(), t_pModel->getKind(index.row()), t_pModel->getUnit(index.row()));
     double dScaleY = option.rect.height()/(2*dMaxValue);
     double y_base = path.currentPosition().y();
     double dValue, newY;
@@ -250,8 +243,8 @@ void FiffRawViewDelegate::createPlotPath(const QStyleOptionViewItem &option,
         iPaintStep = 1;
     }
 
-    for(unsigned int j = 0; j < data.size()-iStartIdx; j = j + iPaintStep) {
-        dValue = data[iStartIdx+j] * dScaleY;
+    for(unsigned int j = 0; j < data.size(); j = j + iPaintStep) {
+        dValue = data[j] * dScaleY;
 
         //Reverse direction -> plot the right way
         newY = y_base - dValue;
