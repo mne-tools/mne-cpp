@@ -846,3 +846,10 @@ int AnnotationModel::getGroupStackSize()
 {
     return m_dataStoredGroups.size();
 }
+
+//=============================================================================================================
+
+void AnnotationModel::setGroupColor(int iGroupIndex, QColor groupColor)
+{
+    m_eventGroupColor[iGroupIndex] = groupColor;
+}
