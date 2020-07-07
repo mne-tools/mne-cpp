@@ -638,7 +638,7 @@ MatrixXi AnnotationModel::getAnnotationMatrix()
 
 //=============================================================================================================
 
-int AnnotationModel::createGroup(QString sGroupName,
+int AnnotationModel::createGroup(const QString& sGroupName,
                                  bool bIsUserMade,
                                  int iType,
                                  const QColor &typeColor)
