@@ -202,6 +202,10 @@ public:
      */
     void loadSettings();
 
+public slots:
+
+    void updateViewHeight(int iViewHeight);
+
 protected:
     //=========================================================================================================
     /**
@@ -257,6 +261,7 @@ protected:
     QColor      m_colCurrentBackgroundColor;    /**< Current color of the background. */
     QString     m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
 
+    int         m_iViewHeight;
 signals:
     //=========================================================================================================
     /**
