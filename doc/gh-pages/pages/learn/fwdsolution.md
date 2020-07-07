@@ -6,9 +6,9 @@ nav_order: 5
 ---
 # MNE Forward Solution CLI
 
-## Command-line options 
+## command line options 
 
-`mne_forward_solution` recognizes the following command-line options:
+`mne_forward_solution` recognizes the following command line options:
 
 Input data:
 ```
