@@ -174,8 +174,8 @@ RowVectorXd FilterKernel::applyConvFilter(const RowVectorXd& vecData,
 
 //=============================================================================================================
 
-RowVectorXd FilterKernel::applyFftFilter(const RowVectorXd& vecData,
-                                         bool bKeepOverhead)
+void FilterKernel::applyFftFilter(RowVectorXd& vecData,
+                                  bool bKeepOverhead)
 {
     #ifdef EIGEN_FFTW_DEFAULT
     fftw_make_planner_thread_safe();
@@ -196,31 +196,26 @@ RowVectorXd FilterKernel::applyFftFilter(const RowVectorXd& vecData,
     fft.SetFlag(fft.HalfSpectrum);
 
     // Zero padd if necessary. Please note: The zero padding in Eigen's FFT is only working for column vectors -> We have to zero pad manually here
-    RowVectorXd vecInputFft;
     if (vecData.cols() < iFftLength) {
-        vecInputFft.setZero(iFftLength);
-        vecInputFft.block(0,0,1,vecData.cols()) = vecData;
-    } else {
-        vecInputFft = vecData;
+        int iResidual = iFftLength - vecData.cols();
+        vecData.conservativeResize(iFftLength);
+        vecData.tail(iResidual).setZero();
     }
 
     //fft-transform data sequence
     RowVectorXcd vecFreqData;
-    fft.fwd(vecFreqData, vecInputFft, iFftLength);
+    fft.fwd(vecFreqData, vecData, iFftLength);
 
     //perform frequency-domain filtering
-    RowVectorXcd vecFilteredFreq = m_vecFftCoeff.array() * vecFreqData.array();
+    vecFreqData = m_vecFftCoeff.array() * vecFreqData.array();
 
     //inverse-FFT
-    RowVectorXd vecFilteredTime;
-    fft.inv(vecFilteredTime, vecFilteredFreq);
+    fft.inv(vecData, vecFreqData);
 
     //Return filtered data
     if(!bKeepOverhead) {
-        return vecFilteredTime.segment(m_vecCoeff.cols()/2, vecData.cols());
+        vecData = vecData.segment(m_vecCoeff.cols()/2, vecData.cols()-m_vecCoeff.cols()/2);
     }
-
-    return vecFilteredTime.head(vecData.cols()+m_vecCoeff.cols());
 }
 
 //=============================================================================================================
