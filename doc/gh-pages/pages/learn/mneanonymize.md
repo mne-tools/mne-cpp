@@ -55,18 +55,18 @@ MNE Anonymize does not modify the input file. Moreover, this application can eve
 
 ## GUI Mode
 
-MNE Anonymize binary file is named `mne_anonymize`. By default, the application is executed in GUI mode. However, if you want to run `mne_anonymize` in GUI mode but you still want to initialize some of the options through a command-line call, you can allways do so through the actual command prompt. For example, if you execute `mne_anonymize --in example.fif -bdf` the GUI will start and the options in it will be already set accordingly. The application recognizes several command-line options, see bellow.
+MNE Anonymize binary file is named `mne_anonymize`. By default, the application is executed in GUI mode. However, if you want to run `mne_anonymize` in GUI mode but you still want to initialize some of the options through a command line call, you can allways do so through the actual command prompt. For example, if you execute `mne_anonymize --in example.fif -bdf` the GUI will start and the options in it will be already set accordingly. The application recognizes several command line options, see bellow.
 
-## Command-line Mode 
+## command line Mode 
 
-MNE Anonymize can also be executed in command-line mode. This is intended for users that might want to anonymize a considerable number of files. The following table shows all valid command-line options. 
+MNE Anonymize can also be executed in command line mode. This is intended for users that might want to anonymize a considerable number of files. The following table shows all valid command line options. 
 
-### Command-line Options
+### command line Options
 
 | Option | Description | 
 |--------|-------------|
-|`-h --help`| Displays help on the command-line.|
-|`--no-gui`| Command-line version of the application.|
+|`-h --help`| Displays help on the command line.|
+|`--no-gui`| command line version of the application.|
 |`--version`| Show the version of this appliation.|
 |`-i --in <infile>`| File to anonymize.|
 |`-o --out <outfile>` *optional*| Output file `<outfile>`. As default '_anonymized.fif' is attached to the file name.|
@@ -122,7 +122,7 @@ It is important to remark that tags will not be deleted. The information in the 
 
 For all examples we will use MNE-CPP's sample data which can be found inside the project folder in `bin/MNE-sample-data/MEG/sample` folder. If you find that folder empty, please read `README.md` file inside `MNE-sample-data` folder.
 
-The easiest way to run `mne_anonymize` is by just running the application and using the GUI. Remember you can pre-initialize the options of the GUI through the command-line call. If you want, you can allways use the command-line mode, without GUI. For instance:
+The easiest way to run `mne_anonymize` is by just running the application and using the GUI. Remember you can pre-initialize the options of the GUI through the command line call. If you want, you can allways use the command line mode, without GUI. For instance:
 
 For specifying an input file to anonymize:
 

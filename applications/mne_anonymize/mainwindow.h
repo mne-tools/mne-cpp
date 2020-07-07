@@ -125,7 +125,7 @@ public:
     /**
      * @brief Sets the state of the checkbox for selecting Brute Mode on.
      *
-     * @details Allows the controller to set state of the Brute Mode, according to the command-line arguments of the
+     * @details Allows the controller to set state of the Brute Mode, according to the command line arguments of the
      * call to MNE_Anonymize application.
      *
      * @param [in] b bool variable containing the desired state to set the checkbox to.
@@ -137,7 +137,7 @@ public:
     /**
      * @brief Sets the state of the Measuremenet date control in the user interface..
      *
-     * @details Allows the controller to set state of the measurement date control, according to the command-line arguments of the
+     * @details Allows the controller to set state of the measurement date control, according to the command line arguments of the
      * call to MNE_Anonymize application.
      *
      * @param [in] QDateTime dt reference variable containing the desired measurement date to be used when anonymizing the input fif file..
@@ -149,7 +149,7 @@ public:
     /**
      * @brief Sets the state of the checkbox for selecting measurement date offset on.
      *
-     * @details Allows the controller to set state of the use of the measurement date offset related checkbox, according to the command-line arguments of the
+     * @details Allows the controller to set state of the use of the measurement date offset related checkbox, according to the command line arguments of the
      * call to MNE_Anonymize application.
      *
      * @param [in] o bool variable representing the use or not of measurement offset when updating the mesasurement date of a file.
@@ -162,7 +162,7 @@ public:
      * @brief Sets the number of days to offset the measurement date with.
      *
      * @details Measurement date offset. Minimal, Maximum values [-10000, 10000]. This method will update the user interface, according according
-     * to the command-line arguments of the call to MNE_Anonymize application.
+     * to the command line arguments of the call to MNE_Anonymize application.
      *
      * @param [in] d Int. Number of days to offset the measurement date with.
      *
