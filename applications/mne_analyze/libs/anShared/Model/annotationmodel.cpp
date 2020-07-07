@@ -50,6 +50,7 @@
 #include <QFileInfo>
 #include <QFileDialog>
 #include <QBuffer>
+#include <QMessageBox>
 
 //=============================================================================================================
 // Eigen INCLUDES
@@ -66,6 +67,7 @@ using namespace ANSHAREDLIB;
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
+#define ALLGROUPS 9999
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -73,9 +75,9 @@ using namespace ANSHAREDLIB;
 
 AnnotationModel::AnnotationModel(QObject* parent)
 : AbstractModel(parent)
+, m_iIndexCount(0)
 , m_iSamplePos(0)
 , m_iFirstSample(0)
-, m_iActiveCheckState(2)
 , m_iSelectedCheckState(0)
 , m_iSelectedAnn(0)
 , m_iLastTypeAdded(0)
@@ -95,6 +97,27 @@ AnnotationModel::AnnotationModel(QObject* parent)
     m_eventTypeColor[32] = QColor(Qt::yellow);
     m_eventTypeColor[998] = QColor(Qt::darkBlue);
     m_eventTypeColor[999] = QColor(Qt::darkCyan);
+
+    m_eventGroupColor[0] = QColor(Qt::black);
+    m_eventGroupColor[1] = QColor(Qt::black);
+    m_eventGroupColor[2] = QColor(Qt::magenta);
+    m_eventGroupColor[3] = QColor(Qt::green);
+    m_eventGroupColor[4] = QColor(Qt::red);
+    m_eventGroupColor[5] = QColor(Qt::cyan);
+    m_eventGroupColor[32] = QColor(Qt::yellow);
+    m_eventGroupColor[998] = QColor(Qt::darkBlue);
+    m_eventGroupColor[999] = QColor(Qt::darkCyan);
+}
+
+//=============================================================================================================
+
+AnnotationModel::~AnnotationModel()
+{
+    for(EventGroup* eventGroup : m_mAnnotationHub){
+        if(eventGroup){
+            delete eventGroup;
+        }
+    }
 }
 
 //=============================================================================================================
@@ -110,13 +133,15 @@ bool AnnotationModel::insertRows(int position, int span, const QModelIndex & par
 {
     Q_UNUSED(parent);
 
-    //qDebug() << "AnnotationModel::insertRows here";
-    //qDebug() << "iSamplePos:" << m_iSamplePos;
+    if (m_iSelectedGroup == ALLGROUPS){
+        return false;
+    }
 
     if(m_dataSamples.isEmpty()) {
         m_dataSamples.insert(0, m_iSamplePos);
-        m_dataTypes.insert(0, m_iLastTypeAdded);
+        m_dataTypes.insert(0, m_iType);
         m_dataIsUserEvent.insert(0, 1);
+        m_dataGroup.insert(0, m_iSelectedGroup);
     }
     else {
         for (int i = 0; i < span; ++i) {
@@ -125,11 +150,12 @@ bool AnnotationModel::insertRows(int position, int span, const QModelIndex & par
                     m_dataSamples.insert(t, m_iSamplePos);
 
                     if(m_sFilterEventType == "All")
-                        m_dataTypes.insert(t, m_iLastTypeAdded);
+                        m_dataTypes.insert(t, m_iType);
                     else
                         m_dataTypes.insert(t, m_sFilterEventType.toInt());
 
                     m_dataIsUserEvent.insert(t, 1);
+                    m_dataGroup.insert(t, m_iSelectedGroup);
                     break;
                 }
 
@@ -137,11 +163,12 @@ bool AnnotationModel::insertRows(int position, int span, const QModelIndex & par
                     m_dataSamples.append(m_iSamplePos);
 
                     if(m_sFilterEventType == "All")
-                        m_dataTypes.append(m_iLastTypeAdded);
+                        m_dataTypes.append(m_iType);
                     else
                         m_dataTypes.append(m_sFilterEventType.toInt());
 
                     m_dataIsUserEvent.append(1);
+                    m_dataGroup.append(m_iSelectedGroup);
                     break;
                 }
             }
@@ -162,7 +189,6 @@ bool AnnotationModel::insertRows(int position, int span, const QModelIndex & par
 
 void AnnotationModel::setSamplePos(int iSamplePos)
 {
-    //qDebug() << "iSamplePos:" << iSamplePos;
     m_iSamplePos = iSamplePos;
 }
 
@@ -171,7 +197,7 @@ void AnnotationModel::setSamplePos(int iSamplePos)
 int AnnotationModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
-    return m_dataSamples_Filtered.size();
+    return m_dataSamplesFiltered.size();
 }
 
 //=============================================================================================================
@@ -186,15 +212,13 @@ int AnnotationModel::columnCount(const QModelIndex &parent) const
 
 QVariant AnnotationModel::data(const QModelIndex &index, int role) const
 {
-    //qDebug() << "AnnotationModel::data";
-
     if(role == Qt::TextAlignmentRole)
         return QVariant(Qt::AlignCenter | Qt::AlignVCenter);
 
     if(role != Qt::DisplayRole && role != Qt::BackgroundRole)
         return QVariant();
 
-    if(index.row()>=m_dataSamples_Filtered.size())
+    if(index.row()>=m_dataSamplesFiltered.size())
         return QVariant();
 
     if (index.isValid()) {
@@ -202,18 +226,26 @@ QVariant AnnotationModel::data(const QModelIndex &index, int role) const
         if(index.column()==0) {
             switch(role) {
                 case Qt::DisplayRole:
-                    return QVariant(m_dataSamples_Filtered.at(index.row())-m_iFirstSample);
+                    return QVariant(m_dataSamplesFiltered.at(index.row())-m_iFirstSample);
 
             case Qt::BackgroundRole:
                 //Paint different background if event was set by user
-                if(m_dataIsUserEvent_Filtered.at(index.row()) == 1) {
-                    QBrush brush;
-                    brush.setStyle(Qt::SolidPattern);
-                    QColor colorTemp(Qt::red);
-                    colorTemp.setAlpha(15);
-                    brush.setColor(colorTemp);
-                    return QVariant(brush);
-                }
+//                if(m_dataIsUserEventFiltered.at(index.row()) == 1) {
+//                    QBrush brush;
+//                    brush.setStyle(Qt::SolidPattern);
+//                    QColor colorTemp(Qt::red);
+//                    colorTemp.setAlpha(15);
+//                    brush.setColor(colorTemp);
+//                    return QVariant(brush);
+//                }
+                QBrush brush;
+                brush.setStyle(Qt::SolidPattern);
+                brush.setColor(Qt::white);
+
+                QColor colorTemp = brush.color();
+                colorTemp.setAlpha(110);
+                brush.setColor(colorTemp);
+                return QVariant(brush);
             }
         }
 
@@ -221,21 +253,29 @@ QVariant AnnotationModel::data(const QModelIndex &index, int role) const
         if(index.column()==1){
             switch(role) {
                 case Qt::DisplayRole: {
-                    int time = ((m_dataSamples_Filtered.at(index.row()) - m_iFirstSample) / m_fFreq) * 1000;
+                    int time = ((m_dataSamplesFiltered.at(index.row()) - m_iFirstSample) / m_fFreq) * 1000;
 
                     return QVariant((double)time / 1000);
                 }
 
             case Qt::BackgroundRole:
                 //Paint different background if event was set by user
-                if(m_dataIsUserEvent_Filtered.at(index.row()) == 1) {
-                    QBrush brush;
-                    brush.setStyle(Qt::SolidPattern);
-                    QColor colorTemp(Qt::red);
-                    colorTemp.setAlpha(15);
-                    brush.setColor(colorTemp);
-                    return QVariant(brush);
-                }
+//                if(m_dataIsUserEventFiltered.at(index.row()) == 1) {
+//                    QBrush brush;
+//                    brush.setStyle(Qt::SolidPattern);
+//                    QColor colorTemp(Qt::red);
+//                    colorTemp.setAlpha(15);
+//                    brush.setColor(colorTemp);
+//                    return QVariant(brush);
+//                }
+                QBrush brush;
+                brush.setStyle(Qt::SolidPattern);
+                brush.setColor(Qt::white);
+
+                QColor colorTemp = brush.color();
+                colorTemp.setAlpha(110);
+                brush.setColor(colorTemp);
+                return QVariant(brush);
             }
         }
 
@@ -243,7 +283,7 @@ QVariant AnnotationModel::data(const QModelIndex &index, int role) const
         if(index.column()==2) {
             switch(role) {
                 case Qt::DisplayRole:
-                    return QVariant(m_dataTypes_Filtered.at(index.row()));
+                    return QVariant(m_dataTypesFiltered.at(index.row()));
 
                 case Qt::BackgroundRole: {
                     QBrush brush;
@@ -266,7 +306,6 @@ QVariant AnnotationModel::data(const QModelIndex &index, int role) const
 
 bool AnnotationModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    //qDebug() << "AnnotationModel::setData";
     if(index.row() >= m_dataSamples.size() || index.column() >= columnCount())
         return false;
 
@@ -298,36 +337,35 @@ bool AnnotationModel::setData(const QModelIndex &index, const QVariant &value, i
 
 void AnnotationModel::setEventFilterType(const QString eventType)
 {
-    //qDebug() << "AnnotationModel::setEventFilterType";
     m_sFilterEventType = eventType;
 
     //Clear filtered event data
-    m_dataSamples_Filtered.clear();
-    m_dataTypes_Filtered.clear();
-    m_dataIsUserEvent_Filtered.clear();
+    m_dataSamplesFiltered.clear();
+    m_dataTypesFiltered.clear();
+    m_dataIsUserEventFiltered.clear();
+    m_dataGroupFiltered.clear();
 
     //Fill filtered event data depending on the user defined event filter type
     if(eventType == "All") {
-        m_dataSamples_Filtered = m_dataSamples;
-        m_dataTypes_Filtered = m_dataTypes;
-        m_dataIsUserEvent_Filtered = m_dataIsUserEvent;
+        m_dataSamplesFiltered = m_dataSamples;
+        m_dataTypesFiltered = m_dataTypes;
+        m_dataIsUserEventFiltered = m_dataIsUserEvent;
+        m_dataGroupFiltered = m_dataGroup;
     }
     else {
         for(int i = 0; i<m_dataSamples.size(); i++) {
             if(m_dataTypes[i] == eventType.toInt()) {
-                m_dataSamples_Filtered.append(m_dataSamples[i]);
-                m_dataTypes_Filtered.append(m_dataTypes[i]);
-                m_dataIsUserEvent_Filtered.append(m_dataIsUserEvent[i]);
+                m_dataSamplesFiltered.append(m_dataSamples[i]);
+                m_dataTypesFiltered.append(m_dataTypes[i]);
+                m_dataIsUserEventFiltered.append(m_dataIsUserEvent[i]);
+                m_dataGroupFiltered.append(m_dataGroup[i]);
             }
         }
         m_iLastTypeAdded = eventType.toInt();
     }
 
-    emit dataChanged(createIndex(0,0), createIndex(m_dataSamples_Filtered.size(), 0));
-    emit headerDataChanged(Qt::Vertical, 0, m_dataSamples_Filtered.size());
-
-    //qDebug() << "Samp:" << m_dataSamples;
-    //qDebug() << "Filt:" << m_dataSamples_Filtered;
+    emit dataChanged(createIndex(0,0), createIndex(m_dataSamplesFiltered.size(), 0));
+    emit headerDataChanged(Qt::Vertical, 0, m_dataSamplesFiltered.size());
 }
 
 //=============================================================================================================
@@ -335,7 +373,7 @@ void AnnotationModel::setEventFilterType(const QString eventType)
 Qt::ItemFlags AnnotationModel::flags(const QModelIndex &index) const
 {
     //Return editable mode only for user events an when event type filtering is deactivated
-    if(m_dataIsUserEvent_Filtered[index.row()] == 1 && m_sFilterEventType == "All")
+    if(m_dataIsUserEventFiltered[index.row()] == 1 && m_sFilterEventType == "All")
         return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
     else
         return Qt::ItemIsEnabled | Qt::ItemIsSelectable;}
@@ -373,6 +411,8 @@ bool AnnotationModel::removeRows(int position, int span, const QModelIndex &pare
 {
     Q_UNUSED(parent);
 
+    beginRemoveRows(QModelIndex(), position, position+span-1);
+
     for (int i = 0; i < span; ++i) {
         //Only user events can be deleted
         if(m_dataIsUserEvent[position] == 1) {
@@ -380,9 +420,7 @@ bool AnnotationModel::removeRows(int position, int span, const QModelIndex &pare
             m_dataTypes.removeAt(position);
             m_dataIsUserEvent.removeAt(position);
         }
-    }
-
-    beginRemoveRows(QModelIndex(), position, position+span-1);
+    } 
 
     endRemoveRows();
 
@@ -428,10 +466,9 @@ void AnnotationModel::setSampleFreq(float fFreq)
 int AnnotationModel::getNumberOfAnnotations() const
 {
     if (m_iSelectedCheckState){
-        //qDebug() << m_dataSelectedRows.size();
         return m_dataSelectedRows.size();
     } else {
-        return m_dataSamples_Filtered.size();
+        return m_dataSamplesFiltered.size();
     }
 }
 
@@ -440,10 +477,9 @@ int AnnotationModel::getNumberOfAnnotations() const
 int AnnotationModel::getAnnotation(int iIndex) const
 {
     if (m_iSelectedCheckState){
-        //qDebug() << m_dataSamples_Filtered.at(m_dataSelectedRows.at(iIndex));
-        return m_dataSamples_Filtered.at(m_dataSelectedRows.at(iIndex));
+        return m_dataSamplesFiltered.at(m_dataSelectedRows.at(iIndex));
     } else {
-        return m_dataSamples_Filtered.at(iIndex);
+        return m_dataSamplesFiltered.at(iIndex);
     }
 }
 
@@ -464,10 +500,16 @@ void AnnotationModel::addNewAnnotationType(const QString &eventType,
 
 //=============================================================================================================
 
-
 QMap<int, QColor>& AnnotationModel::getTypeColors()
 {
     return m_eventTypeColor;
+}
+
+//=============================================================================================================
+
+QMap<int, QColor>& AnnotationModel::getGroupColors()
+{
+    return m_eventGroupColor;
 }
 
 //=============================================================================================================
@@ -554,14 +596,14 @@ void AnnotationModel::setLastType(int iType)
 
 void AnnotationModel::updateFilteredSample(int iIndex, int iSample)
 {
-    m_dataSamples_Filtered[iIndex] = iSample + m_iFirstSample;
+    m_dataSamplesFiltered[iIndex] = iSample + m_iFirstSample;
 }
 
 //=============================================================================================================
 
 void AnnotationModel::updateFilteredSample(int iSample)
 {
-    m_dataSamples_Filtered[m_iSelectedAnn] = iSample + m_iFirstSample;
+    m_dataSamplesFiltered[m_iSelectedAnn] = iSample + m_iFirstSample;
 }
 
 //=============================================================================================================
@@ -576,7 +618,6 @@ void AnnotationModel::clearSelected()
 void AnnotationModel::appendSelected(int iSelectedIndex)
 {
     m_dataSelectedRows.append(iSelectedIndex);
-//    qDebug() << m_dataSelectedRows;
 }
 
 //=============================================================================================================
@@ -593,4 +634,219 @@ MatrixXi AnnotationModel::getAnnotationMatrix()
     }
 
     return matEventDataMatrix;
+}
+
+//=============================================================================================================
+
+int AnnotationModel::createGroup(const QString& sGroupName,
+                                 bool bIsUserMade,
+                                 int iType,
+                                 const QColor &typeColor)
+{
+    EventGroup* newEvent = new EventGroup();
+
+    *newEvent = {m_iIndexCount,                 //groupNumber
+                 iType,                         //groupType
+                 sGroupName,                    //groupName
+                 bIsUserMade,                   //isUserMade
+                 QVector<int>(),                //dataSamples
+                 QVector<int>(),                //dataTypes
+                 QVector<int>(),                //dataIsUserEvent
+                 QVector<int>(),                //dataSamples_Filtered
+                 QVector<int>(),                //dataTypes_Filtered
+                 QVector<int>()};               //dataIsUserEvent_Filtered
+
+    m_mAnnotationHub.insert(m_iIndexCount,
+                            newEvent);
+
+    m_eventGroupColor[m_iIndexCount] = typeColor;
+
+    return m_iIndexCount++;
+}
+
+//=============================================================================================================
+
+void AnnotationModel::switchGroup(int iGroupIndex)
+{
+    beginResetModel();
+
+    if ((!m_dataSamples.isEmpty()) && (m_iSelectedGroup != ALLGROUPS)){
+        m_mAnnotationHub[m_iSelectedGroup]->dataSamples = m_dataSamples;
+        m_mAnnotationHub[m_iSelectedGroup]->dataTypes = m_dataTypes;
+        m_mAnnotationHub[m_iSelectedGroup]->dataIsUserEvent = m_dataIsUserEvent;
+
+        m_mAnnotationHub[m_iSelectedGroup]->dataSamples_Filtered = m_dataSamplesFiltered;
+        m_mAnnotationHub[m_iSelectedGroup]->dataTypes_Filtered = m_dataTypesFiltered;
+        m_mAnnotationHub[m_iSelectedGroup]->dataIsUserEvent_Filtered = m_dataIsUserEventFiltered;
+    }
+
+    m_dataSamples = m_mAnnotationHub[iGroupIndex]->dataSamples;
+    m_dataTypes = m_mAnnotationHub[iGroupIndex]->dataTypes;
+    m_dataIsUserEvent = m_mAnnotationHub[iGroupIndex]->dataIsUserEvent;
+
+    m_dataSamplesFiltered = m_mAnnotationHub[iGroupIndex]->dataSamples_Filtered;
+    m_dataTypesFiltered = m_mAnnotationHub[iGroupIndex]->dataTypes_Filtered;
+    m_dataIsUserEventFiltered = m_mAnnotationHub[iGroupIndex]->dataIsUserEvent_Filtered;
+
+    m_iSelectedGroup = m_mAnnotationHub[iGroupIndex]->groupNumber;
+    m_bIsUserMade = m_mAnnotationHub[iGroupIndex]->isUserMade;
+    m_iType = m_mAnnotationHub[iGroupIndex]->groupType;
+
+    m_dataGroup.clear();
+    for(int i = 0; i < m_mAnnotationHub[iGroupIndex]->dataSamples.size(); i++){
+        m_dataGroup.append(m_iSelectedGroup);
+    }
+
+    endResetModel();
+}
+
+//=============================================================================================================
+
+bool AnnotationModel::isUserMade()
+{
+    return m_bIsUserMade;
+}
+
+//=============================================================================================================
+
+int AnnotationModel::getHubSize()
+{
+    return m_mAnnotationHub.size();
+}
+
+//=============================================================================================================
+
+bool AnnotationModel::getHubUserMade(int iIndex)
+{
+    return m_mAnnotationHub[iIndex]->isUserMade;
+}
+
+//=============================================================================================================
+
+void AnnotationModel::showAll(bool bSet)
+{
+    beginResetModel();
+
+    if (bSet) {
+        if ((!m_dataSamples.isEmpty()) && (m_iSelectedGroup != ALLGROUPS)){
+            m_mAnnotationHub[m_iSelectedGroup]->dataSamples = m_dataSamples;
+            m_mAnnotationHub[m_iSelectedGroup]->dataTypes = m_dataTypes;
+            m_mAnnotationHub[m_iSelectedGroup]->dataIsUserEvent = m_dataIsUserEvent;
+
+            m_mAnnotationHub[m_iSelectedGroup]->dataSamples_Filtered = m_dataSamplesFiltered;
+            m_mAnnotationHub[m_iSelectedGroup]->dataTypes_Filtered = m_dataTypesFiltered;
+            m_mAnnotationHub[m_iSelectedGroup]->dataIsUserEvent_Filtered = m_dataIsUserEventFiltered;
+        }
+
+        m_iSelectedGroup = ALLGROUPS;
+
+        resetSelection();
+        loadAllGroups();
+    }
+
+    endResetModel();
+}
+
+//=============================================================================================================
+
+void AnnotationModel::loadAllGroups()
+{
+    for (EventGroup* e : m_mAnnotationHub) {
+        m_dataSamples.append(e->dataSamples);
+        m_dataTypes.append(e->dataTypes);
+        m_dataIsUserEvent.append(e->dataIsUserEvent);
+
+        m_dataSamplesFiltered.append(e->dataSamples_Filtered);
+        m_dataTypesFiltered.append(e->dataTypes_Filtered);
+        m_dataIsUserEventFiltered = e->dataIsUserEvent_Filtered;
+
+        for(int i = 0; i < e->dataSamples.size(); i++){
+            m_dataGroup.append(e->groupNumber);
+        }
+    }
+}
+
+//=============================================================================================================
+
+void AnnotationModel::resetSelection()
+{
+    m_dataSamples.clear();
+    m_dataTypes.clear();
+    m_dataIsUserEvent.clear();
+
+    m_dataSamplesFiltered.clear();
+    m_dataTypesFiltered.clear();
+    m_dataIsUserEventFiltered.clear();
+
+    m_dataGroup.clear();
+}
+
+//=============================================================================================================
+
+void AnnotationModel::hideAll()
+{
+    beginResetModel();
+    resetSelection();
+    endResetModel();
+}
+
+//=============================================================================================================
+
+int AnnotationModel::getIndexCount(){
+    return m_iIndexCount;
+}
+
+//=============================================================================================================
+
+void AnnotationModel::removeGroup(int iGroupIndex)
+{
+    beginResetModel();
+    resetSelection();
+    m_mAnnotationHub.remove(iGroupIndex);
+    endResetModel();
+}
+
+//=============================================================================================================
+
+int AnnotationModel::currentGroup(int iIndex)
+{
+    //return m_dataGroup[iIndex];
+    if (m_iSelectedCheckState){
+        return m_dataGroup[m_dataSelectedRows.at(iIndex)];
+    } else {
+        return m_dataGroup[iIndex];
+    }
+}
+
+//=============================================================================================================
+
+void AnnotationModel::pushGroup(QListWidgetItem *item)
+{
+    m_dataStoredGroups.push(item);
+}
+
+//=============================================================================================================
+
+QListWidgetItem* AnnotationModel::popGroup()
+{
+    if(!m_dataStoredGroups.isEmpty()){
+        return m_dataStoredGroups.pop();
+    } else {
+        return Q_NULLPTR;
+    }
+}
+
+//=============================================================================================================
+
+int AnnotationModel::getGroupStackSize()
+{
+    return m_dataStoredGroups.size();
+}
+
+//=============================================================================================================
+
+void AnnotationModel::setGroupColor(int iGroupIndex,
+                                    const QColor& groupColor)
+{
+    m_eventGroupColor[iGroupIndex] = groupColor;
 }

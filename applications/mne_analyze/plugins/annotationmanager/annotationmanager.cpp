@@ -98,7 +98,7 @@ void AnnotationManager::unload()
 
 QString AnnotationManager::getName() const
 {
-    return "Annotations";
+    return "Events";
 }
 
 //=============================================================================================================
@@ -136,9 +136,6 @@ QDockWidget *AnnotationManager::getControl()
 
     connect(this, &AnnotationManager::newFiffParamsAvailable,
             pAnnotationSettingsView, &AnnotationSettingsView::passFiffParams, Qt::UniqueConnection);
-
-    connect(pAnnotationSettingsView, &AnnotationSettingsView::activeEventsChecked,
-            this, &AnnotationManager::toggleDisplayEvent);
 
     connect(m_pAnalyzeData.data(), &AnalyzeData::modelIsEmpty,
             pAnnotationSettingsView, &AnnotationSettingsView::reset);

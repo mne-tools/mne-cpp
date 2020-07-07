@@ -49,7 +49,8 @@
 //=============================================================================================================
 
 #include <QColor>
-//#include <QAbstractTableModel>
+#include <QListWidgetItem>
+#include <QStack>
 
 //=============================================================================================================
 // Eigen INCLUDES
@@ -62,6 +63,26 @@
 
 namespace ANSHAREDLIB {
 
+//=============================================================================================================
+// DEFINE STRUCTS
+//=============================================================================================================
+
+struct EventGroup{
+    int                 groupNumber;
+    int                 groupType;
+
+    QString             groupName;
+
+    bool                isUserMade;
+
+    QVector<int>        dataSamples;
+    QVector<int>        dataTypes;
+    QVector<int>        dataIsUserEvent;
+
+    QVector<int>        dataSamples_Filtered;
+    QVector<int>        dataTypes_Filtered;
+    QVector<int>        dataIsUserEvent_Filtered;
+};
 
 class ANSHAREDSHARED_EXPORT AnnotationModel : public AbstractModel
 {
@@ -69,6 +90,8 @@ class ANSHAREDSHARED_EXPORT AnnotationModel : public AbstractModel
 
 public:
     AnnotationModel(QObject* parent = Q_NULLPTR);
+
+    ~AnnotationModel();
 
     //=========================================================================================================
     bool insertRows(int position, int span, const QModelIndex & parent) override;
@@ -163,6 +186,14 @@ public:
      * @return Map of annotation colors
      */
     QMap<int, QColor>& getTypeColors();
+
+    //=========================================================================================================
+    /**
+     * Returns map of the colors assigned to each of the annotation groups
+     *
+     * @return Map of annotation colors
+     */
+    QMap<int, QColor>& getGroupColors();
 
     //=========================================================================================================
     /**
@@ -274,6 +305,134 @@ public:
 
     //=========================================================================================================
     /**
+     * Creates a new event group with the passed parameters
+     *
+     * @param[in] sGroupName        name of the group
+     * @param[in] bIsUserMade       whether the group is user made
+     * @param[in] iType             default group type when adding events
+     *
+     * @return the index of the newly added group
+     */
+    int createGroup(const QString& sGroupName,
+                    bool bIsUserMade = false,
+                    int iType = 0,
+                    const QColor &typeColor = QColor(Qt::black));
+
+    //=========================================================================================================
+    /**
+     * Switches to a group based on the index (map key), triggers view to update
+     *
+     * @param[in] iGroupIndex   index(map key) of desired group
+     */
+    void switchGroup(int iGroupIndex);
+
+    //=========================================================================================================
+    /**
+     * Removes a group based on the index (map key), triggers view to update
+     *
+     * @param[in] iGroupIndex   index(map key) of the group to be deleted
+     */
+    void removeGroup(int iGroupIndex);
+
+    //=========================================================================================================
+    /**
+     * Returns how many groups are stored in m_mAnnotationHub
+     *
+     * @return the amount of groups stored
+     */
+    int getHubSize();
+
+    //=========================================================================================================
+    /**
+     * Returns whether the group at a certain index is user made
+     *
+     * @param[in] iIndex    index of the stored group
+     *
+     * @return whether the group is user made
+     */
+    bool getHubUserMade(int iIndex);
+
+    //=========================================================================================================
+    /**
+     * Retruns whether current slected group is made by the user
+     *
+     * @return whether current group is use made
+     */
+    bool isUserMade();
+
+    /**
+     * Displays all events from all groups and triggers view updates
+     *
+     * @param[in] bSet      whether the checkbox is checked or not
+     */
+    void showAll(bool bSet);
+
+    //=========================================================================================================
+    /**
+     * Loads events from all groups
+     */
+    void loadAllGroups();
+
+    //=========================================================================================================
+    /**
+     * Clears events and triggers view to update
+     */
+    void hideAll();
+
+    //=========================================================================================================
+    /**
+     * Returns counting index that gives each group a unique number
+     *
+     * @return m_iIndexCount
+     */
+    int getIndexCount();
+
+    //=========================================================================================================
+    /**
+     * Retruns the group of the event pointed to by parameter iIndex
+     *
+     * @param[in] iIndex    Index for which we want to get the group
+     *
+     * @return the group event at iIndex belongs to
+     */
+    int currentGroup(int iIndex);
+
+    //=========================================================================================================
+    /**
+     * Push widget item into member stack - used for storing groups when file is unloaded
+     *
+     * @param[in] item      stores item in the member stack
+     */
+    void pushGroup(QListWidgetItem* item);
+
+    //=========================================================================================================
+    /**
+     * Pops widget item from member stack - used for restroing groups when file is loaded
+     *
+     * @return retruns widget item on top of the member stack
+     */
+    QListWidgetItem* popGroup();
+
+    //=========================================================================================================
+    /**
+     * Returns how many item are currently stored in the member stack
+     *
+     * @return size of member stack m_dataStoredGroups
+     */
+    int getGroupStackSize();
+
+    //=========================================================================================================
+    /**
+     * Sets the color of group iGroupIndex to color groupColor
+     *
+     * @param[in] iGroupIndex   Index of the goup to be changed
+     * @param[in] groupColor    Color the group should be changed to
+     */
+    void setGroupColor(int iGroupIndex,
+                       const QColor& groupColor);
+
+    //=========================================================================================================
+    /**
      * The type of this model (AnnotationModel)
      *
      * @return The type of this model (AnnotationModel)
@@ -299,7 +458,9 @@ public:
      * @param[in] column   The specified column.
      * @param[in] parent   The parent index.
      */
-    inline QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
+    inline QModelIndex index(int row,
+                             int column,
+                             const QModelIndex &parent = QModelIndex()) const override;
 
 signals:
 
@@ -311,35 +472,58 @@ signals:
      */
     void updateEventTypes(const QString& currentFilterType);
 
+    //=========================================================================================================
+    /**
+     * Signals for new event to be added to the model, based on current m_iSamplePos
+     */
+    void addNewAnnotation();
+
 private:
 
-    QStringList         m_eventTypeList;
+    //=========================================================================================================
+    /**
+     * Clears selected group of events
+     */
+    void resetSelection();
 
-    QVector<int>        m_dataSamples;
-    QVector<int>        m_dataTypes;
-    QVector<int>        m_dataIsUserEvent;
+    QStringList                         m_eventTypeList;                /** <List of the possible event types */
 
-    QVector<int>        m_dataSamples_Filtered;
-    QVector<int>        m_dataTypes_Filtered;
-    QVector<int>        m_dataIsUserEvent_Filtered;
+    QMap<int,EventGroup*>               m_mAnnotationHub;               /** <Map of the EventGroups, which holds groups of events */
 
-    int                 m_iSamplePos;
-    int                 m_iFirstSample;
-    int                 m_iLastSample;
+    int                                 m_iSelectedGroup;               /** <Index in m_mAnnotationHub of the current selected group */
+    int                                 m_iType;                        /** <Type of the currently selected event group */
+    int                                 m_iIndexCount;
 
-    int                 m_iActiveCheckState;
-    int                 m_iSelectedCheckState;
-    int                 m_iSelectedAnn;
+    QVector<int>                        m_dataSamples;                  /**< Vector of samples of events of the currently loded event group */
+    QVector<int>                        m_dataTypes;                    /**< Types of the events of the currently loaded event group */
+    QVector<int>                        m_dataIsUserEvent;              /**< Whether the events in the currently loaded event group are user-made */
+    QVector<int>                        m_dataGroup;
 
-    QList<int>          m_dataSelectedRows;
+    QVector<int>                        m_dataSamplesFiltered;         /**< Vector of samples of events to be displayed of the currently loded event group */
+    QVector<int>                        m_dataTypesFiltered;           /**< Types of the events to be displayed of the currently loaded event group */
+    QVector<int>                        m_dataIsUserEventFiltered;     /**< Whether the events to be displayed in the currently loaded event group are user-made */
+    QVector<int>                        m_dataGroupFiltered;
 
-    int                 m_iLastTypeAdded;
+    bool                                m_bIsUserMade;                  /**< Whether the current loaded group is user made */
 
-    float               m_fFreq;
+    int                                 m_iSamplePos;                   /**< Sample of event to be added */
+    int                                 m_iFirstSample;                 /**< First sample of file */
+    int                                 m_iLastSample;                  /**< Last sample of file */
 
-    QString             m_sFilterEventType;
-    QMap<int, QColor>   m_eventTypeColor;
+    int                                 m_iSelectedCheckState;          /**< State of checkbox of whether to show only selected events */
+    int                                 m_iSelectedAnn;                 /**< Index of selected events */
 
+    QList<int>                          m_dataSelectedRows;             /**< List of selected rows for multiple evnt selection */
+
+    int                                 m_iLastTypeAdded;               /**< Stores last created type */
+
+    float                               m_fFreq;                        /**< Frequency of data file */
+
+    QString                             m_sFilterEventType;             /**< String for diplaying event types */
+    QMap<int, QColor>                   m_eventTypeColor;               /**< Stores colors to display for each event type */
+    QMap<int, QColor>                   m_eventGroupColor;              /**< Stores colors to display for each event group */
+
+    QStack<QListWidgetItem*>            m_dataStoredGroups;             /**< Stores the groups for switching between files */
 };
 
 //=============================================================================================================

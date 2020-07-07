@@ -50,6 +50,7 @@
 
 #include <QWidget>
 #include <QColorDialog>
+#include <QStringListModel>
 
 //=============================================================================================================
 // Eigen INCLUDES
@@ -124,7 +125,7 @@ public slots:
      *
      * @param [in] iSample   Sample number to be added to annotation model
      */
-    void addAnnotationToModel(const int iSample);
+    void addAnnotationToModel();
 
 signals:
     //=========================================================================================================
@@ -159,7 +160,7 @@ protected slots:
 
     //=========================================================================================================
     /**
-     * Transmits the checkbox state of the 'Activate annotations' checkbox
+     * Transmits the checkbox state of the 'Show events in Signal Viewer' checkbox
      *
      * @param [in] iCheckBoxState    0 for unchecked, 2 for checked
      */
@@ -167,11 +168,19 @@ protected slots:
 
     //=========================================================================================================
     /**
-     * Transmits the checkbox state of the 'Show selected only' checkbox
+     * Transmits the checkbox state of the 'Show selected events only' checkbox
      *
      * @param [in] iCheckBoxState    0 for unchecked, 2 for checked
      */
     void onSelectedEventsChecked(int iCheckBoxState);
+
+    //=========================================================================================================
+    /**
+     * Transmits the checkbox state ofthe 'Show events from all groups' checkbox
+     *
+     * @param [in] iCheckBoxState    0 for unchecked, 2 for checked
+     */
+    void onShowAllChecked(int iCheckBoxState);
 
     //=========================================================================================================
     /**
@@ -228,6 +237,67 @@ private:
      * Links delegate, model and view.
      */
     void initMSVCSettings();
+
+    //=========================================================================================================
+    /**
+     * Creates a new user-made group of events
+     *
+     * @param[in] sName     group name
+     * @param[in] iType     group default type
+     */
+    bool newUserGroup(const QString& sName,
+                      int iType = 0,
+                      bool bDefaultColor = false);
+
+    //=========================================================================================================
+    /**
+     * Deletes selected event group
+     */
+    void deleteGroup();
+
+    //=========================================================================================================
+    /**
+     * Changes currently loaded group based on selection in the group list view
+     */
+    void groupChanged();
+
+    //=========================================================================================================
+    /**
+     * Saves stored group settings from group list view
+     */
+    void saveGroupSettings();
+
+    //=========================================================================================================
+    /**
+     * Saves stored group settings from group list view
+     */
+    void loadGroupSettings();
+
+    //=========================================================================================================
+    /**
+     * Prompts user to rename selected group
+     */
+    void renameGroup();
+
+    //=========================================================================================================
+    /**
+     * Gives user popup to select new color for selected group.
+     */
+    void changeGroupColor();
+
+    //=========================================================================================================
+    /**
+     * Brings up a menu for interacting with events
+     * @param[in] pos   Position on screen where the menu will show up
+     */
+    void customEventContextMenuRequested(const QPoint &pos);
+
+    //=========================================================================================================
+    /**
+     * Brings up a menu for interacting with event groups
+     * @param[in] pos   Position on screen where the menu will show up
+     */
+    void customGroupContextMenuRequested(const QPoint &pos);
 
     Ui::EventWindowDockWidget*                      m_pUi;                          /** < Pointer to GUI elements */
 
