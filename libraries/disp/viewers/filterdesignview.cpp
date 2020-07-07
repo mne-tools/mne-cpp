@@ -507,7 +507,7 @@ void FilterDesignView::onBtnExportFilterCoefficients()
     //Generate appropriate name for the filter to be saved
     QString filtername;
 
-    filtername = QString("%1_%2_%3_Fs%4").arg(FilterKernel::getStringForFilterType(m_filterKernel.m_Type)).arg((int)m_filterKernel.getHighpassFreq()).arg((int)m_filterKernel.getLowpassFreq()).arg((int)m_filterKernel.getSamplingFrequency());
+    filtername = QString("%1_%2_%3_Fs%4").arg(RTPROCESSINGLIB::getStringForFilterType(m_filterKernel.m_Type)).arg((int)m_filterKernel.getHighpassFreq()).arg((int)m_filterKernel.getLowpassFreq()).arg((int)m_filterKernel.getSamplingFrequency());
 
     //Do not pass m_filterKernel because this is most likely the User Defined filter which name should not change due to the filter model implementation. Hence use temporal copy of m_filterKernel.
     FilterKernel filterWriteTemp = m_filterKernel;

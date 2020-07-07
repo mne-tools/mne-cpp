@@ -127,6 +127,14 @@ public:
 
     //=========================================================================================================
     /**
+     * Transforms the calculated filter coefficients to frequency-domain
+     *
+     * @param [in] iFftLength                  The FFT length to use
+     */
+    bool fftTransformCoeffs(int iFftLength);
+
+    //=========================================================================================================
+    /**
      * Applies the current filter to the input data using convolution in time domain.
      *
      * @param [in] vecData          Holds the data to be filtered
@@ -150,44 +158,6 @@ public:
      */
     void applyFftFilter(Eigen::RowVectorXd& vecData,
                         bool bKeepOverhead = false);
-
-    //=========================================================================================================
-    /**
-     * Returns the current design method as a string
-     */
-    static QString getStringForDesignMethod(const FilterKernel::DesignMethod& designMethod);
-
-    //=========================================================================================================
-    /**
-     * Returns the current filter type as a string
-     */
-    static QString getStringForFilterType(const FilterKernel::FilterType& filterType);
-
-    //=========================================================================================================
-    /**
-     * Returns the current design dependent on an input string
-     */
-    static FilterKernel::DesignMethod getDesignMethodForString(const QString& designMethodString);
-
-    //=========================================================================================================
-    /**
-     * Returns the current filter type dependent on an input string
-     */
-    static FilterKernel::FilterType getFilterTypeForString(const QString& filerTypeString);
-
-    //=========================================================================================================
-    /**
-     * Prepares a filter kernel to be used wiht a specific data block length.
-     * This is favorable to call before filtering, in order to avoid transforming the
-     * filter coefficients anew during filtering. This functions was introduced since
-     * one does not always know the data length of the data blocks to be filtered when
-     * designing the filter.
-     *
-     * @param [in] filterKernel        The filter kernel to prepare
-     * @param [in] iDataSize           The data size to setup the filters to
-     */
-    static void prepareFilter(FilterKernel& filterKernel,
-                              int iDataSize);
 
     QString getName() const;
     void setName(const QString& sFilterName);
@@ -222,14 +192,6 @@ public:
 private:
     //=========================================================================================================
     /**
-     * Transforms the calculated filter coefficients to frequency-domain
-     *
-     * @param [in] iFftLength                  The FFT length to use
-     */
-    bool fftTransformCoeffs(int iFftLength);
-
-    //=========================================================================================================
-    /**
      * Designs the actual filter with the given parameters
      */
     void designFilter();
@@ -248,6 +210,44 @@ private:
     Eigen::RowVectorXd     m_vecCoeff;       /**< contains the forward filter coefficient set. */
     Eigen::RowVectorXcd    m_vecFftCoeff;    /**< the FFT-transformed forward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFftLength. */
 };
+
+//=========================================================================================================
+/**
+ * Returns the current design method as a string
+ */
+RTPROCESINGSHARED_EXPORT QString getStringForDesignMethod(const FilterKernel::DesignMethod& designMethod);
+
+//=========================================================================================================
+/**
+ * Returns the current filter type as a string
+ */
+RTPROCESINGSHARED_EXPORT QString getStringForFilterType(const FilterKernel::FilterType& filterType);
+
+//=========================================================================================================
+/**
+ * Returns the current design dependent on an input string
+ */
+RTPROCESINGSHARED_EXPORT FilterKernel::DesignMethod getDesignMethodForString(const QString& designMethodString);
+
+//=========================================================================================================
+/**
+ * Returns the current filter type dependent on an input string
+ */
+RTPROCESINGSHARED_EXPORT FilterKernel::FilterType getFilterTypeForString(const QString& filerTypeString);
+
+//=========================================================================================================
+/**
+ * Prepares a filter kernel to be used wiht a specific data block length.
+ * This is favorable to call before filtering, in order to avoid transforming the
+ * filter coefficients anew during filtering. This functions was introduced since
+ * one does not always know the data length of the data blocks to be filtered when
+ * designing the filter.
+ *
+ * @param [in] filterKernel        The filter kernel to prepare
+ * @param [in] iDataSize           The data size to setup the filters to
+ */
+RTPROCESINGSHARED_EXPORT void prepareFilter(FilterKernel& filterKernel,
+                          int iDataSize);
 
 //=============================================================================================================
 // INLINE DEFINITIONS
