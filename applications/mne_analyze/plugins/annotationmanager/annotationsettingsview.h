@@ -246,7 +246,8 @@ private:
      * @param[in] iType     group default type
      */
     bool newUserGroup(const QString& sName,
-                      int iType = 0);
+                      int iType = 0,
+                      bool bDefaultColor = false);
 
     //=========================================================================================================
     /**

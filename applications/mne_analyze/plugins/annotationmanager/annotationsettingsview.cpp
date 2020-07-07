@@ -197,14 +197,10 @@ void AnnotationSettingsView::updateComboBox(const QString &currentAnnotationType
 
 void AnnotationSettingsView::addAnnotationToModel()
 {
-     /*else {
-        if(m_pAnnModel->isUserMade()){
-            //Do nothing
-        } else {
-            for (int i = 0; i < m_pAnnModel->getHubSize(); i++){
-                if (
-        }
-    }*/
+    if(!(m_pAnnModel->getHubSize())){
+        newUserGroup("User Events", 0, true);
+        m_pUi->m_listWidget_groupListWidget->setCurrentRow(0);
+    }
 
     m_pAnnModel->insertRow(0, QModelIndex());
     emit triggerRedraw();
@@ -387,12 +383,8 @@ void AnnotationSettingsView::realTimeDataTime(double dValue)
 
 //=============================================================================================================
 
-bool AnnotationSettingsView::newUserGroup(const QString& sName, int iType)
+bool AnnotationSettingsView::newUserGroup(const QString& sName, int iType, bool bDefaultColor)
 {
-//    QStringList* list = new QStringList(m_pStrListModel->stringList());
-//    list->append(sName);
-//    m_pStrListModel->setStringList(*list);
-
     if (!(m_pUi->m_listWidget_groupListWidget->findItems(sName, Qt::MatchExactly).isEmpty())){
         //Name already in use
         QMessageBox msgBox;
@@ -402,13 +394,21 @@ bool AnnotationSettingsView::newUserGroup(const QString& sName, int iType)
         return false;
     }
 
-    QColor groupColor = m_pColordialog->getColor(Qt::black, this);
+    QColor groupColor;
 
-    if(!groupColor.isValid()){
-        return false;
+    if (!bDefaultColor) {
+        groupColor = m_pColordialog->getColor(Qt::black, this);
+        if(!groupColor.isValid()){
+            return false;
+        }
+    } else {
+        groupColor = QColor(Qt::blue);
     }
 
-    int iCat = m_pAnnModel->createGroup(sName, true, iType, groupColor);
+    int iCat = m_pAnnModel->createGroup(sName,
+                                        true,
+                                        iType,
+                                        groupColor);
 
     QListWidgetItem* newItem = new QListWidgetItem(sName);
     newItem->setData(Qt::UserRole, QVariant(iCat));
@@ -453,6 +453,7 @@ void AnnotationSettingsView::onShowAllChecked(int iCheckBoxState)
         this->onDataChanged();
     } else {
         m_pAnnModel->hideAll();
+        m_pUi->m_listWidget_groupListWidget->setCurrentRow(0);
         this->onDataChanged();
     }
 }
@@ -533,7 +534,7 @@ void AnnotationSettingsView::renameGroup()
         msgBox->setText("Group name already in use");
         msgBox->setInformativeText("Please select a new name");
         msgBox->open();
-    }else if(text == ""){
+    }else if(text.isEmpty()){
         QMessageBox* msgBox = new QMessageBox();
         msgBox->setText("Group name not valid");
         msgBox->setInformativeText("Please select a new name");
