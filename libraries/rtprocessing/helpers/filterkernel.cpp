@@ -72,6 +72,105 @@ using namespace Eigen;
 using namespace UTILSLIB;
 
 //=============================================================================================================
+// DEFINE GLOBAL RTPROCESSINGLIB METHODS
+//=============================================================================================================
+
+QString RTPROCESSINGLIB::getStringForDesignMethod(const FilterKernel::DesignMethod &designMethod)
+{
+    QString designMethodString = "External";
+
+    if(designMethod == FilterKernel::External)
+        designMethodString = "External";
+
+    if(designMethod == FilterKernel::Cosine)
+        designMethodString = "Cosine";
+
+    if(designMethod == FilterKernel::Tschebyscheff)
+        designMethodString = "Tschebyscheff";
+
+    return designMethodString;
+}
+
+//=============================================================================================================
+
+QString RTPROCESSINGLIB::getStringForFilterType(const FilterKernel::FilterType &filterType)
+{
+    QString filterTypeString = "LPF";
+
+    if(filterType == FilterKernel::LPF)
+        filterTypeString = "LPF";
+
+    if(filterType == FilterKernel::HPF)
+        filterTypeString = "HPF";
+
+    if(filterType == FilterKernel::BPF)
+        filterTypeString = "BPF";
+
+    if(filterType == FilterKernel::NOTCH)
+        filterTypeString = "NOTCH";
+
+    return filterTypeString;
+}
+
+//=============================================================================================================
+
+FilterKernel::DesignMethod RTPROCESSINGLIB::getDesignMethodForString(const QString &designMethodString)
+{
+    FilterKernel::DesignMethod designMethod = FilterKernel::External;
+
+    if(designMethodString == "External")
+        designMethod = FilterKernel::External;
+
+    if(designMethodString == "Tschebyscheff")
+        designMethod = FilterKernel::Tschebyscheff;
+
+    if(designMethodString == "Cosine")
+        designMethod = FilterKernel::Cosine;
+
+    return designMethod;
+}
+
+//=============================================================================================================
+
+FilterKernel::FilterType RTPROCESSINGLIB::getFilterTypeForString(const QString &filterTypeString)
+{
+    FilterKernel::FilterType filterType = FilterKernel::UNKNOWN;
+
+    if(filterTypeString == "LPF")
+        filterType = FilterKernel::LPF;
+
+    if(filterTypeString == "HPF")
+        filterType = FilterKernel::HPF;
+
+    if(filterTypeString == "BPF")
+        filterType = FilterKernel::BPF;
+
+    if(filterTypeString == "NOTCH")
+        filterType = FilterKernel::NOTCH;
+
+    return filterType;
+}
+
+//=============================================================================================================
+
+void RTPROCESSINGLIB::prepareFilter(FilterKernel& filterKernel,
+                                    int iDataSize)
+{
+    int iFftLength, exp;
+
+    iFftLength = iDataSize + filterKernel.getCoefficients().cols();
+    exp = ceil(MNEMath::log2(iFftLength));
+    iFftLength = pow(2, exp);
+
+    // Transform coefficients anew if needed
+    if(filterKernel.getFftCoefficients().cols() != (iFftLength/2+1)) {
+        filterKernel.fftTransformCoeffs(iFftLength);
+    }
+}
+
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
 
 FilterKernel::FilterKernel()
 : m_Type(UNKNOWN)
@@ -210,106 +309,12 @@ void FilterKernel::applyFftFilter(RowVectorXd& vecData,
     vecFreqData = m_vecFftCoeff.array() * vecFreqData.array();
 
     //inverse-FFT
+    vecData.resize(0);
     fft.inv(vecData, vecFreqData);
 
     //Return filtered data
     if(!bKeepOverhead) {
         vecData = vecData.segment(m_vecCoeff.cols()/2, vecData.cols()-m_vecCoeff.cols()/2);
-    }
-}
-
-//=============================================================================================================
-
-QString FilterKernel::getStringForDesignMethod(const FilterKernel::DesignMethod &designMethod)
-{
-    QString designMethodString = "External";
-
-    if(designMethod == FilterKernel::External)
-        designMethodString = "External";
-
-    if(designMethod == FilterKernel::Cosine)
-        designMethodString = "Cosine";
-
-    if(designMethod == FilterKernel::Tschebyscheff)
-        designMethodString = "Tschebyscheff";
-
-    return designMethodString;
-}
-
-//=============================================================================================================
-
-QString FilterKernel::getStringForFilterType(const FilterKernel::FilterType &filterType)
-{
-    QString filterTypeString = "LPF";
-
-    if(filterType == FilterKernel::LPF)
-        filterTypeString = "LPF";
-
-    if(filterType == FilterKernel::HPF)
-        filterTypeString = "HPF";
-
-    if(filterType == FilterKernel::BPF)
-        filterTypeString = "BPF";
-
-    if(filterType == FilterKernel::NOTCH)
-        filterTypeString = "NOTCH";
-
-    return filterTypeString;
-}
-
-//=============================================================================================================
-
-FilterKernel::DesignMethod FilterKernel::getDesignMethodForString(const QString &designMethodString)
-{
-    FilterKernel::DesignMethod designMethod = FilterKernel::External;
-
-    if(designMethodString == "External")
-        designMethod = FilterKernel::External;
-
-    if(designMethodString == "Tschebyscheff")
-        designMethod = FilterKernel::Tschebyscheff;
-
-    if(designMethodString == "Cosine")
-        designMethod = FilterKernel::Cosine;
-
-    return designMethod;
-}
-
-//=============================================================================================================
-
-FilterKernel::FilterType FilterKernel::getFilterTypeForString(const QString &filterTypeString)
-{
-    FilterKernel::FilterType filterType = FilterKernel::UNKNOWN;
-
-    if(filterTypeString == "LPF")
-        filterType = FilterKernel::LPF;
-
-    if(filterTypeString == "HPF")
-        filterType = FilterKernel::HPF;
-
-    if(filterTypeString == "BPF")
-        filterType = FilterKernel::BPF;
-
-    if(filterTypeString == "NOTCH")
-        filterType = FilterKernel::NOTCH;
-
-    return filterType;
-}
-
-//=============================================================================================================
-
-void FilterKernel::prepareFilter(FilterKernel& filterKernel,
-                                 int iDataSize)
-{
-    int iFftLength, exp;
-
-    iFftLength = iDataSize + filterKernel.getCoefficients().cols();
-    exp = ceil(MNEMath::log2(iFftLength));
-    iFftLength = pow(2, exp);
-
-    // Transform coefficients anew if needed
-    if(filterKernel.getFftCoefficients().cols() != (iFftLength/2+1)) {
-        filterKernel.fftTransformCoeffs(iFftLength);
     }
 }
 
