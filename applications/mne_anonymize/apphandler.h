@@ -111,7 +111,7 @@ public:
      * @brief Creates a controller object according tu user's preference for a command line or a
      *  GUI application.
      *
-     * @details Depending on the state of the bool member variable m_bGuiMode, the method creates a command-line or a
+     * @details Depending on the state of the bool member variable m_bGuiMode, the method creates a command line or a
      * GUI oriented controller object of the SettingsControllerCL or the SettingsControllerGui class.
      *
      * @see MNE-CPP Documentation
@@ -128,7 +128,7 @@ protected:
 
 private:
 
-bool m_bGuiMode;  /**< GUI based app, or a command-line one.*/
+bool m_bGuiMode;  /**< GUI based app, or a command line one.*/
 
 };
 
