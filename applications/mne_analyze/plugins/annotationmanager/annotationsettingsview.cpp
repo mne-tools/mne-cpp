@@ -102,8 +102,6 @@ void AnnotationSettingsView::initMSVCSettings()
     connect(m_pAnnModel.data(),&ANSHAREDLIB::AnnotationModel::dataChanged,
             this, &AnnotationSettingsView::onDataChanged, Qt::UniqueConnection);
 
-    //m_pUi->m_listView_groupListView->setModel(m_pStrListModel.data());
-
     //Delegate
     m_pAnnDelegate = QSharedPointer<AnnotationDelegate>(new AnnotationDelegate(this));
     m_pUi->m_tableView_eventTableView->setItemDelegate(m_pAnnDelegate.data());
@@ -198,7 +196,9 @@ void AnnotationSettingsView::updateComboBox(const QString &currentAnnotationType
 void AnnotationSettingsView::addAnnotationToModel()
 {
     if(!(m_pAnnModel->getHubSize())){
-        newUserGroup("User Events", 0, true);
+        newUserGroup("User Events",
+                     0,
+                     true);
         m_pUi->m_listWidget_groupListWidget->setCurrentRow(0);
     }
 
@@ -310,9 +310,7 @@ void AnnotationSettingsView::disconnectFromModel()
     disconnect(m_pUi->m_listWidget_groupListWidget, &QListWidget::itemChanged,
             this, &AnnotationSettingsView::renameGroup);
 
-
     saveGroupSettings();
-
 }
 
 //=============================================================================================================
@@ -383,7 +381,9 @@ void AnnotationSettingsView::realTimeDataTime(double dValue)
 
 //=============================================================================================================
 
-bool AnnotationSettingsView::newUserGroup(const QString& sName, int iType, bool bDefaultColor)
+bool AnnotationSettingsView::newUserGroup(const QString& sName,
+                                          int iType,
+                                          bool bDefaultColor)
 {
     if (!(m_pUi->m_listWidget_groupListWidget->findItems(sName, Qt::MatchExactly).isEmpty())){
         //Name already in use
@@ -420,7 +420,6 @@ bool AnnotationSettingsView::newUserGroup(const QString& sName, int iType, bool 
 
     m_pUi->lineEdit->setText("New Group " + QString::number(iCat + 1));
 
-    //m_pUi->m_listWidget_groupListWidget->selectionModel()->select(m_pStrListModel->index(iCat), QItemSelectionModel::ClearAndSelect);
     return true;
 }
 
@@ -453,7 +452,9 @@ void AnnotationSettingsView::onShowAllChecked(int iCheckBoxState)
         this->onDataChanged();
     } else {
         m_pAnnModel->hideAll();
-        m_pUi->m_listWidget_groupListWidget->setCurrentRow(0);
+        if(m_pUi->m_listWidget_groupListWidget->selectedItems().isEmpty()){
+            m_pUi->m_listWidget_groupListWidget->setCurrentRow(0);
+        }
         this->onDataChanged();
     }
 }

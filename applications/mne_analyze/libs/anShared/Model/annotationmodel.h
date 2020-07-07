@@ -313,7 +313,7 @@ public:
      *
      * @return the index of the newly added group
      */
-    int createGroup(QString sGroupName,
+    int createGroup(const QString& sGroupName,
                     bool bIsUserMade = false,
                     int iType = 0,
                     const QColor &typeColor = QColor(Qt::black));
@@ -472,6 +472,10 @@ signals:
      */
     void updateEventTypes(const QString& currentFilterType);
 
+    //=========================================================================================================
+    /**
+     * Signals for new event to be added to the model, based on current m_iSamplePos
+     */
     void addNewAnnotation();
 
 private:
