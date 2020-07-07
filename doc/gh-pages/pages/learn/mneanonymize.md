@@ -1,5 +1,5 @@
 ---
-title: MNE Anonymize CLI
+title: MNE Anonymize GUI/CLI
 has_children: false
 parent: Learn
 nav_order: 3
