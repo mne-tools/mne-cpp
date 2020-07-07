@@ -575,8 +575,8 @@ QSharedPointer<AnnotationModel> FiffRawViewModel::getAnnotationModel() const
 void FiffRawViewModel::addTimeMark(int iLastClicked)
 {
     m_pAnnotationModel->setSamplePos(iLastClicked);
-    //emit m_pAnnotationModel->addNewAnnotation();
-    m_pAnnotationModel->insertRow(0, QModelIndex());
+    emit m_pAnnotationModel->addNewAnnotation();
+    //m_pAnnotationModel->insertRow(0, QModelIndex());
 }
 
 //=============================================================================================================

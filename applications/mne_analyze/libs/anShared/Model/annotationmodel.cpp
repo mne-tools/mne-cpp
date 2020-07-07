@@ -133,13 +133,6 @@ bool AnnotationModel::insertRows(int position, int span, const QModelIndex & par
 {
     Q_UNUSED(parent);
 
-    if (m_mAnnotationHub.isEmpty()) {
-        QMessageBox msgBox;
-        msgBox.setText("Unable to add user Event.");
-        msgBox.setInformativeText("Please create an event group.");
-        msgBox.exec();
-        return false;
-    }
     if (m_iSelectedGroup == ALLGROUPS){
         return false;
     }
@@ -645,7 +638,10 @@ MatrixXi AnnotationModel::getAnnotationMatrix()
 
 //=============================================================================================================
 
-int AnnotationModel::createGroup(QString sGroupName, bool bIsUserMade, int iType, const QColor &typeColor)
+int AnnotationModel::createGroup(QString sGroupName,
+                                 bool bIsUserMade,
+                                 int iType,
+                                 const QColor &typeColor)
 {
     EventGroup* newEvent = new EventGroup();
 
@@ -660,7 +656,8 @@ int AnnotationModel::createGroup(QString sGroupName, bool bIsUserMade, int iType
                  QVector<int>(),                //dataTypes_Filtered
                  QVector<int>()};               //dataIsUserEvent_Filtered
 
-    m_mAnnotationHub.insert(m_iIndexCount, newEvent);
+    m_mAnnotationHub.insert(m_iIndexCount,
+                            newEvent);
 
     m_eventGroupColor[m_iIndexCount] = typeColor;
 
@@ -848,7 +845,8 @@ int AnnotationModel::getGroupStackSize()
 
 //=============================================================================================================
 
-void AnnotationModel::setGroupColor(int iGroupIndex, QColor groupColor)
+void AnnotationModel::setGroupColor(int iGroupIndex,
+                                    const QColor& groupColor)
 {
     m_eventGroupColor[iGroupIndex] = groupColor;
 }
