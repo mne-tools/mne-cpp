@@ -168,7 +168,7 @@ void SettingsControllerCl::initParser()
     m_parser.addHelpOption();
 
     //this breaks encapsulation. damn it. it has to be here in order to show in the help text.
-    QCommandLineOption commandLineOpt("no-gui",QCoreApplication::translate("main","command line version of this application."));
+    QCommandLineOption commandLineOpt("no-gui",QCoreApplication::translate("main","Command line version of this application."));
     m_parser.addOption(commandLineOpt);
 
     QCommandLineOption versionOpt("version",QCoreApplication::translate("main","Show the version of this application."));
