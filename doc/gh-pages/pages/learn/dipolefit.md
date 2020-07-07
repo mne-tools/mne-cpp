@@ -6,7 +6,7 @@ nav_order: 4
 ---
 # MNE Dipole Fit CLI
 
-## command line options 
+## Command line options 
 
 `mne_dipole_fit` recognizes the following command line options:
 
