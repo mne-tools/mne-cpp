@@ -313,7 +313,10 @@ public:
      *
      * @return the index of the newly added group
      */
-    int createGroup(QString sGroupName, bool bIsUserMade = false, int iType = 0, const QColor &typeColor = QColor(Qt::black));
+    int createGroup(QString sGroupName,
+                    bool bIsUserMade = false,
+                    int iType = 0,
+                    const QColor &typeColor = QColor(Qt::black));
 
     //=========================================================================================================
     /**
@@ -426,7 +429,7 @@ public:
      * @param[in] groupColor    Color the group should be changed to
      */
     void setGroupColor(int iGroupIndex,
-                       QColor groupColor);
+                       const QColor& groupColor);
 
     //=========================================================================================================
     /**
@@ -455,7 +458,9 @@ public:
      * @param[in] column   The specified column.
      * @param[in] parent   The parent index.
      */
-    inline QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
+    inline QModelIndex index(int row,
+                             int column,
+                             const QModelIndex &parent = QModelIndex()) const override;
 
 signals:
 
