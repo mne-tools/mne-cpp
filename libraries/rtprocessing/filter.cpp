@@ -324,8 +324,8 @@ MatrixXd RTPROCESSINGLIB::filterDataBlock(const MatrixXd& mataData,
 
     // Setup filters to the correct length, so we do not have to do this everytime we call the FFT filter function
     FilterKernel filterKernelSetup = filterKernel;
-    FilterKernel::prepareFilter(filterKernelSetup,
-                                mataData.cols());
+    RTPROCESSINGLIB::prepareFilter(filterKernelSetup,
+                                   mataData.cols());
 
     // Do the concurrent filtering
     RowVectorXi vecPicksNew = vecPicks;
