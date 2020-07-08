@@ -152,23 +152,6 @@ FilterKernel::FilterType RTPROCESSINGLIB::getFilterTypeForString(const QString &
 }
 
 //=============================================================================================================
-
-void RTPROCESSINGLIB::prepareFilter(FilterKernel& filterKernel,
-                                    int iDataSize)
-{
-    int iFftLength, exp;
-
-    iFftLength = iDataSize + filterKernel.getCoefficients().cols();
-    exp = ceil(MNEMath::log2(iFftLength));
-    iFftLength = pow(2, exp);
-
-    // Transform coefficients anew if needed
-    if(filterKernel.getFftCoefficients().cols() != (iFftLength/2+1)) {
-        filterKernel.fftTransformCoeffs(iFftLength);
-    }
-}
-
-//=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
@@ -215,36 +198,18 @@ FilterKernel::FilterKernel(const QString& sFilterName,
 
 //=============================================================================================================
 
-bool FilterKernel::fftTransformCoeffs(int iFftLength)
+void FilterKernel::prepareFilter(int iDataSize)
 {
-    #ifdef EIGEN_FFTW_DEFAULT
-        fftw_make_planner_thread_safe();
-    #endif
+    int iFftLength, exp;
 
-    if(m_vecCoeff.cols() > iFftLength) {
-        std::cout <<"[FilterKernel::fftTransformCoeffs] The number of filter taps is bigger than the FFT length."<< std::endl;
-        return false;
+    iFftLength = iDataSize + m_vecCoeff.cols();
+    exp = ceil(MNEMath::log2(iFftLength));
+    iFftLength = pow(2, exp);
+
+    // Transform coefficients anew if needed
+    if(m_vecCoeff.cols() != (iFftLength/2+1)) {
+        fftTransformCoeffs(iFftLength);
     }
-
-    //generate fft object
-    Eigen::FFT<double> fft;
-    fft.SetFlag(fft.HalfSpectrum);
-
-    // Zero padd if necessary. Please note: The zero padding in Eigen's FFT is only working for column vectors -> We have to zero pad manually here
-    RowVectorXd vecInputFft;
-    if (m_vecCoeff.cols() < iFftLength) {
-        vecInputFft.setZero(iFftLength);
-        vecInputFft.block(0,0,1,m_vecCoeff.cols()) = m_vecCoeff;
-    } else {
-        vecInputFft = m_vecCoeff;
-    }
-
-    //fft-transform filter coeffs
-    RowVectorXcd vecFreqData;
-    fft.fwd(vecFreqData, vecInputFft, iFftLength);
-    m_vecFftCoeff = vecFreqData;;
-
-    return true;
 }
 
 //=============================================================================================================
@@ -295,6 +260,7 @@ void FilterKernel::applyFftFilter(RowVectorXd& vecData,
     fft.SetFlag(fft.HalfSpectrum);
 
     // Zero padd if necessary. Please note: The zero padding in Eigen's FFT is only working for column vectors -> We have to zero pad manually here
+    int iOriginalSize = vecData.cols();
     if (vecData.cols() < iFftLength) {
         int iResidual = iFftLength - vecData.cols();
         vecData.conservativeResize(iFftLength);
@@ -309,12 +275,13 @@ void FilterKernel::applyFftFilter(RowVectorXd& vecData,
     vecFreqData = m_vecFftCoeff.array() * vecFreqData.array();
 
     //inverse-FFT
-    vecData.resize(0);
     fft.inv(vecData, vecFreqData);
 
     //Return filtered data
     if(!bKeepOverhead) {
-        vecData = vecData.segment(m_vecCoeff.cols()/2, vecData.cols()-m_vecCoeff.cols()/2);
+        vecData = vecData.segment(m_vecCoeff.cols()/2, iOriginalSize).eval();
+    } else {
+        vecData = vecData.head(iOriginalSize + m_vecCoeff.cols()).eval();
     }
 }
 
@@ -456,6 +423,40 @@ Eigen::RowVectorXcd FilterKernel::getFftCoefficients() const
 void FilterKernel::setFftCoefficients(const Eigen::RowVectorXcd& vecFftCoeff)
 {
     m_vecFftCoeff = vecFftCoeff;
+}
+
+//=============================================================================================================
+
+bool FilterKernel::fftTransformCoeffs(int iFftLength)
+{
+    #ifdef EIGEN_FFTW_DEFAULT
+        fftw_make_planner_thread_safe();
+    #endif
+
+    if(m_vecCoeff.cols() > iFftLength) {
+        std::cout <<"[FilterKernel::fftTransformCoeffs] The number of filter taps is bigger than the FFT length."<< std::endl;
+        return false;
+    }
+
+    //generate fft object
+    Eigen::FFT<double> fft;
+    fft.SetFlag(fft.HalfSpectrum);
+
+    // Zero padd if necessary. Please note: The zero padding in Eigen's FFT is only working for column vectors -> We have to zero pad manually here
+    RowVectorXd vecInputFft;
+    if (m_vecCoeff.cols() < iFftLength) {
+        vecInputFft.setZero(iFftLength);
+        vecInputFft.block(0,0,1,m_vecCoeff.cols()) = m_vecCoeff;
+    } else {
+        vecInputFft = m_vecCoeff;
+    }
+
+    //fft-transform filter coeffs
+    RowVectorXcd vecFreqData;
+    fft.fwd(vecFreqData, vecInputFft, iFftLength);
+    m_vecFftCoeff = vecFreqData;;
+
+    return true;
 }
 
 //=============================================================================================================

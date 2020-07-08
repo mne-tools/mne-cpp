@@ -81,8 +81,8 @@ Disp
 People who contributed to this release (preceded by number of commits):
 
 (156) Juan Garcia-Prieto,
-(110) Lorenz Esch,
 (76) Gabriel Motta,
+(60) Lorenz Esch,
 (6) Ruben Dörfel,
 (2) Wayne Mead,
 (2) Andrey Parfenov
