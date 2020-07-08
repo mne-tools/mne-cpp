@@ -72,7 +72,7 @@ namespace ANSHARED {
  *
  * @brief The DataManagerView class provides the plugin control.
  */
-class DataManagerView : public QWidget
+class DataManagerControlView : public QWidget
 {
     Q_OBJECT
 
@@ -83,13 +83,13 @@ public:
      *
      * @param[in] parent     If parent is not NULL the QWidget becomes a child of QWidget inside parent.
      */
-    explicit DataManagerView(QWidget *parent = 0);
+    explicit DataManagerControlView(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
      * Destroys the DataManagerView.
      */
-    virtual ~DataManagerView();
+    virtual ~DataManagerControlView();
 
     //=========================================================================================================
     /**
