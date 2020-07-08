@@ -53,9 +53,12 @@
 #include <QStringListModel>
 
 //=============================================================================================================
-// Eigen INCLUDES
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
+namespace DISPLIB {
+    class TriggerDetectionView;
+}
 
 namespace Ui {
     class EventWindowDockWidget;
@@ -299,6 +302,8 @@ private:
      */
     void customGroupContextMenuRequested(const QPoint &pos);
 
+    void onStimButtonClicked();
+
     Ui::EventWindowDockWidget*                      m_pUi;                          /** < Pointer to GUI elements */
 
     int                                             m_iCheckState;                  /** < State of show annotations checkbox (0 unchecked, 2 checked) */
@@ -307,6 +312,8 @@ private:
 
     QSharedPointer<AnnotationDelegate>              m_pAnnDelegate;                 /** < Pointer to associated delegate */
     QSharedPointer<ANSHAREDLIB::AnnotationModel>    m_pAnnModel;                    /** < Pointer to associated model. Points to currently loaded. */
+
+    QSharedPointer<DISPLIB::TriggerDetectionView>   m_pTriggerDetectView;
 
     QColorDialog*                                   m_pColordialog;                 /** < USed for Prompting users for annotation type colors */
 };
