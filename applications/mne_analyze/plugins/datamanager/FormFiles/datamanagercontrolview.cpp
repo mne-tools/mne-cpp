@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "datamanagerview.h"
+#include "datamanagercontrolview.h"
 #include "ui_datamanagerview.h"
 
 #include <anShared/Management/analyzedatamodel.h>
@@ -57,38 +57,38 @@
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DataManagerView::DataManagerView(QWidget *parent)
+DataManagerControlView::DataManagerControlView(QWidget *parent)
 : QWidget(parent)
 , m_pUi(new Ui::DataManagerView)
 {
     m_pUi->setupUi(this);
     m_pUi->m_pTreeView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(m_pUi->m_pTreeView, &QTreeView::customContextMenuRequested,
-            this, &DataManagerView::customMenuRequested, Qt::UniqueConnection);
+            this, &DataManagerControlView::customMenuRequested, Qt::UniqueConnection);
 }
 
 //=============================================================================================================
 
-DataManagerView::~DataManagerView()
+DataManagerControlView::~DataManagerControlView()
 {
     delete m_pUi;
 }
 
 //=============================================================================================================
 
-void DataManagerView::setModel(QAbstractItemModel *pModel)
+void DataManagerControlView::setModel(QAbstractItemModel *pModel)
 {
     m_pUi->m_pTreeView->setModel(pModel);
 
     connect(m_pUi->m_pTreeView->selectionModel(), &QItemSelectionModel::selectionChanged,
-            this, &DataManagerView::onCurrentItemChanged, Qt::UniqueConnection);
+            this, &DataManagerControlView::onCurrentItemChanged, Qt::UniqueConnection);
     connect(static_cast<ANSHAREDLIB::AnalyzeDataModel*>(pModel), &ANSHAREDLIB::AnalyzeDataModel::newFileAdded,
-            this, &DataManagerView::onNewFileLoaded);
+            this, &DataManagerControlView::onNewFileLoaded);
 }
 
 //=============================================================================================================
 
-void DataManagerView::customMenuRequested(QPoint pos)
+void DataManagerControlView::customMenuRequested(QPoint pos)
 {
     QString sToolTip = m_pUi->m_pTreeView->model()->data(m_pUi->m_pTreeView->indexAt(pos), Qt::ToolTipRole).toString();
 
@@ -107,7 +107,7 @@ void DataManagerView::customMenuRequested(QPoint pos)
 
 //=============================================================================================================
 
-void DataManagerView::onCurrentItemChanged(const QItemSelection &selected,
+void DataManagerControlView::onCurrentItemChanged(const QItemSelection &selected,
                                            const QItemSelection &deselected)
 {
     Q_UNUSED(deselected)
@@ -126,7 +126,7 @@ void DataManagerView::onCurrentItemChanged(const QItemSelection &selected,
 
 //=============================================================================================================
 
-void DataManagerView::onNewFileLoaded(int iSubject,
+void DataManagerControlView::onNewFileLoaded(int iSubject,
                                       int iModel)
 {
     m_pUi->m_pTreeView->selectionModel()->select(m_pUi->m_pTreeView->model()->index(iModel, 0, m_pUi->m_pTreeView->model()->index(iSubject, 0)),
@@ -135,7 +135,7 @@ void DataManagerView::onNewFileLoaded(int iSubject,
 
 //=============================================================================================================
 
-void DataManagerView::keyPressEvent(QKeyEvent *event)
+void DataManagerControlView::keyPressEvent(QKeyEvent *event)
 {
     switch (event->key()) {
         case Qt::Key_Delete:

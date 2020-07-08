@@ -72,13 +72,13 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES += \
-    datamanager.cpp \
-    FormFiles/datamanagerview.cpp
+    FormFiles/datamanagercontrolview.cpp \
+    datamanager.cpp
 
 HEADERS += \
+    FormFiles/datamanagercontrolview.h \
     datamanager_global.h \
-    datamanager.h    \
-    FormFiles/datamanagerview.h
+    datamanager.h
 
 FORMS += \
     FormFiles/datamanagerview.ui
