@@ -249,7 +249,7 @@ void FiffRawViewSettings::loadSettings()
 
     QSettings settings("MNECPP");
 
-    m_pUi->m_doubleSpinBox_numberVisibleChannels->setValue(settings.value(m_sSettingsPath + QString("/FiffRawViewSettings/viewZoomFactor"), 0.3).toDouble());
+    m_pUi->m_doubleSpinBox_numberVisibleChannels->setValue(settings.value(m_sSettingsPath + QString("/FiffRawViewSettings/viewZoomFactor"), 1).toDouble());
     m_pUi->m_spinBox_windowSize->setValue(settings.value(m_sSettingsPath + QString("/FiffRawViewSettings/viewWindowSize"), 10).toInt());
 
     QColor colorDefault = Qt::blue;
@@ -373,11 +373,4 @@ void FiffRawViewSettings::onZoomChanged(double value)
 void FiffRawViewSettings::onMakeScreenshot()
 {
     emit makeScreenshot(m_pUi->m_comboBox_imageType->currentText());
-}
-
-//=============================================================================================================
-
-void FiffRawViewSettings::updateViewHeight(int iViewHeight)
-{
-    m_iViewHeight = iViewHeight;
 }

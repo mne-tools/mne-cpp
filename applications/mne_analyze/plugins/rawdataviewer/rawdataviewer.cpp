@@ -286,8 +286,6 @@ void RawDataViewer::updateControls()
                 m_pFiffRawView.data(), &FiffRawView::setDistanceTimeSpacer, Qt::UniqueConnection);
         connect(m_pSettingsViewWidget.data(), &DISPLIB::FiffRawViewSettings::makeScreenshot,
                 m_pFiffRawView.data(), &FiffRawView::onMakeScreenshot, Qt::UniqueConnection);
-        connect(m_pFiffRawView.data(), &FiffRawView::viewHeight,
-                m_pSettingsViewWidget.data(), &FiffRawViewSettings::updateViewHeight, Qt::UniqueConnection);
 
         // Preserve settings between different file sessions
         m_pFiffRawView->setScalingMap(m_pScalingWidget->getScaleMap());
@@ -296,8 +294,6 @@ void RawDataViewer::updateControls()
         m_pFiffRawView->setBackgroundColor(m_pSettingsViewWidget->getBackgroundColor());
         m_pFiffRawView->setZoom(m_pSettingsViewWidget->getZoom());
         m_pFiffRawView->setDistanceTimeSpacer(m_pSettingsViewWidget->getDistanceTimeSpacer());
-
-        m_pSettingsViewWidget->updateViewHeight(m_pFiffRawView->getViewHeight());
 
         connect(m_pFiffRawView.data(), &FiffRawView::sendSamplePos,
                 this, &RawDataViewer::onSendSamplePos, Qt::UniqueConnection);

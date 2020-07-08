@@ -202,10 +202,6 @@ public:
      */
     void loadSettings();
 
-public slots:
-
-    void updateViewHeight(int iViewHeight);
-
 protected:
     //=========================================================================================================
     /**

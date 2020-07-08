@@ -284,7 +284,8 @@ void FiffRawView::setZoom(double zoomFac)
 {
     m_fZoomFactor = zoomFac;
 
-    m_pTableView->verticalHeader()->setDefaultSectionSize(m_fZoomFactor*m_fDefaultSectionSize);//Row Height
+    m_pTableView->verticalHeader()->setDefaultSectionSize(m_pTableView->height() / m_fZoomFactor/**m_fDefaultSectionSize*/);//Row Height
+    updateView();
 }
 
 //=============================================================================================================
@@ -305,7 +306,7 @@ void FiffRawView::setWindowSize(int iT)
     m_iT = iT;
 
     m_pModel->setWindowSize(iT,
-                            m_pTableView->width() - m_pTableView->verticalHeader()->width()/*- m_pTableView->columnWidth(0)*/,
+                            m_pTableView->width() - (m_pTableView->verticalHeader()->width()/* + m_pTableView->verticalScrollBar()->width()*/) /*- m_pTableView->columnWidth(0)*/,
                             iNewPos);
 
     m_pTableView->resizeRowsToContents();
