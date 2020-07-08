@@ -111,19 +111,19 @@ QMenu *DataManager::getMenu()
 
 QDockWidget *DataManager::getControl()
 {
-    DataManagerControlView* pDataManagerControlView = new DataManagerControlView;
+    DataManagerControlView* pDataManagerView = new DataManagerControlView;
 
-    pDataManagerControlView->setModel(m_pAnalyzeData->getDataModel());
+    pDataManagerView->setModel(m_pAnalyzeData->getDataModel());
 
-    connect(pDataManagerControlView, &DataManagerControlView::selectedModelChanged,
+    connect(pDataManagerView, &DataManagerControlView::selectedModelChanged,
             this, &DataManager::onCurrentlySelectedModelChanged);
 
-    connect(pDataManagerControlView, &DataManagerControlView::removeItem,
+    connect(pDataManagerView, &DataManagerControlView::removeItem,
             this, &DataManager::onRemoveItem);
 
     QDockWidget* pControlDock = new QDockWidget(getName());
     pControlDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    pControlDock->setWidget(pDataManagerControlView);
+    pControlDock->setWidget(pDataManagerView);
     pControlDock->setObjectName(getName());
 
     return pControlDock;
@@ -143,6 +143,7 @@ void DataManager::handleEvent(QSharedPointer<Event> e)
     switch (e->getType()) {
     default:
         qWarning() << "[DataManager::handleEvent] received an Event that is not handled by switch-cases";
+        break;
     }
 }
 
