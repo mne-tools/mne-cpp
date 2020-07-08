@@ -34,33 +34,51 @@
      <property name="topMargin">
       <number>0</number>
      </property>
-     <item row="0" column="0">
-      <widget class="QLabel" name="label_numberChannels">
+     <item row="2" column="0">
+      <widget class="QLabel" name="label_timeSpacers">
        <property name="text">
-        <string>Number of channels:</string>
+        <string>Time spacer every (ms):</string>
        </property>
       </widget>
      </item>
-     <item row="0" column="1">
-      <widget class="QDoubleSpinBox" name="m_doubleSpinBox_numberVisibleChannels">
-       <property name="suffix">
-        <string> x</string>
+     <item row="2" column="1">
+      <widget class="QComboBox" name="m_comboBox_distaceTimeSpacer">
+       <property name="currentIndex">
+        <number>0</number>
        </property>
-       <property name="minimum">
-        <double>0.100000000000000</double>
-       </property>
-       <property name="maximum">
-        <double>20.000000000000000</double>
-       </property>
-       <property name="singleStep">
-        <double>0.100000000000000</double>
+       <item>
+        <property name="text">
+         <string>100</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>200</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>500</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>1000</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="label_signalColor">
+       <property name="text">
+        <string>Change signal color:</string>
        </property>
       </widget>
      </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_windowSize">
+     <item row="4" column="1">
+      <widget class="QPushButton" name="m_pushButton_signalColor">
        <property name="text">
-        <string>Window size:</string>
+        <string/>
        </property>
       </widget>
      </item>
@@ -97,52 +115,18 @@
        </property>
       </widget>
      </item>
-     <item row="4" column="0">
-      <widget class="QLabel" name="label_signalColor">
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_numberChannels">
        <property name="text">
-        <string>Change signal color:</string>
+        <string>Number of channels:</string>
        </property>
       </widget>
      </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="label_timeSpacers">
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_windowSize">
        <property name="text">
-        <string>Time spacer every (ms):</string>
+        <string>Window size:</string>
        </property>
-      </widget>
-     </item>
-     <item row="4" column="1">
-      <widget class="QPushButton" name="m_pushButton_signalColor">
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="QComboBox" name="m_comboBox_distaceTimeSpacer">
-       <property name="currentIndex">
-        <number>0</number>
-       </property>
-       <item>
-        <property name="text">
-         <string>100</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>200</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>500</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>1000</string>
-        </property>
-       </item>
       </widget>
      </item>
      <item row="5" column="0">
@@ -163,6 +147,31 @@
       <widget class="QPushButton" name="m_pushButton_makeScreenshot">
        <property name="text">
         <string>Make screenshot</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QDoubleSpinBox" name="m_doubleSpinBox_numberVisibleChannels">
+       <property name="suffix">
+        <string/>
+       </property>
+       <property name="decimals">
+        <number>0</number>
+       </property>
+       <property name="minimum">
+        <double>1.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>30.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>1.000000000000000</double>
+       </property>
+       <property name="stepType">
+        <enum>QAbstractSpinBox::DefaultStepType</enum>
+       </property>
+       <property name="value">
+        <double>1.000000000000000</double>
        </property>
       </widget>
      </item>
