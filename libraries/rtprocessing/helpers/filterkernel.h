@@ -127,11 +127,15 @@ public:
 
     //=========================================================================================================
     /**
-     * Transforms the calculated filter coefficients to frequency-domain
+     * Prepares a filter kernel to be used wiht a specific data block length.
+     * This is favorable to call before filtering, in order to avoid transforming the
+     * filter coefficients anew during filtering. This functions was introduced since
+     * one does not always know the data length of the data blocks to be filtered when
+     * designing the filter.
      *
-     * @param [in] iFftLength                  The FFT length to use
+     * @param [in] iDataSize           The data size to setup the filters to
      */
-    bool fftTransformCoeffs(int iFftLength);
+    void prepareFilter(int iDataSize);
 
     //=========================================================================================================
     /**
@@ -192,6 +196,14 @@ public:
 private:
     //=========================================================================================================
     /**
+     * Transforms the calculated filter coefficients to frequency-domain
+     *
+     * @param [in] iFftLength                  The FFT length to use
+     */
+    bool fftTransformCoeffs(int iFftLength);
+
+    //=========================================================================================================
+    /**
      * Designs the actual filter with the given parameters
      */
     void designFilter();
@@ -234,20 +246,6 @@ RTPROCESINGSHARED_EXPORT FilterKernel::DesignMethod getDesignMethodForString(con
  * Returns the current filter type dependent on an input string
  */
 RTPROCESINGSHARED_EXPORT FilterKernel::FilterType getFilterTypeForString(const QString& filerTypeString);
-
-//=========================================================================================================
-/**
- * Prepares a filter kernel to be used wiht a specific data block length.
- * This is favorable to call before filtering, in order to avoid transforming the
- * filter coefficients anew during filtering. This functions was introduced since
- * one does not always know the data length of the data blocks to be filtered when
- * designing the filter.
- *
- * @param [in] filterKernel        The filter kernel to prepare
- * @param [in] iDataSize           The data size to setup the filters to
- */
-RTPROCESINGSHARED_EXPORT void prepareFilter(FilterKernel& filterKernel,
-                          int iDataSize);
 
 //=============================================================================================================
 // INLINE DEFINITIONS
