@@ -39,6 +39,7 @@
 
 #include "annotationsettingsview.h"
 #include "ui_annotationsettingsview.h"
+#include <disp/viewers/triggerdetectionview.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -84,6 +85,10 @@ AnnotationSettingsView::AnnotationSettingsView()
     m_pUi->m_label_filterEvents->hide();
 
     onDataChanged();
+
+    m_pTriggerDetectView = QSharedPointer<DISPLIB::TriggerDetectionView>(new DISPLIB::TriggerDetectionView("MNEANALYZE/EVENTS",
+                                                                                                           Q_NULLPTR,
+                                                                                                           Qt::Window));
 }
 
 //=============================================================================================================
@@ -167,6 +172,9 @@ void AnnotationSettingsView::initGUIFunctionality()
     m_pUi->m_listWidget_groupListWidget->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(m_pUi->m_listWidget_groupListWidget, &QWidget::customContextMenuRequested,
             this, &AnnotationSettingsView::customGroupContextMenuRequested, Qt::UniqueConnection);
+
+    connect(m_pUi->m_pushButtonStim, &QPushButton::clicked,
+            this, &AnnotationSettingsView::onStimButtonClicked, Qt::UniqueConnection);
 }
 
 //=============================================================================================================
@@ -309,6 +317,8 @@ void AnnotationSettingsView::disconnectFromModel()
             this, &AnnotationSettingsView::customGroupContextMenuRequested);
     disconnect(m_pUi->m_listWidget_groupListWidget, &QListWidget::itemChanged,
             this, &AnnotationSettingsView::renameGroup);
+    disconnect(m_pUi->m_pushButtonStim, &QPushButton::clicked,
+            this, &AnnotationSettingsView::onStimButtonClicked);
 
     saveGroupSettings();
 }
@@ -562,4 +572,14 @@ void AnnotationSettingsView::changeGroupColor()
     m_pAnnModel->setGroupColor(itemToChange->data(Qt::UserRole).toInt(),
                                groupColor);
     onDataChanged();
+}
+
+//=============================================================================================================
+
+void AnnotationSettingsView::onStimButtonClicked()
+{
+    if(m_pTriggerDetectView->isHidden()){
+        m_pTriggerDetectView->activateWindow();
+        m_pTriggerDetectView->show();
+    }
 }
