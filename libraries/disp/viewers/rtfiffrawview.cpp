@@ -347,7 +347,7 @@ void RtFiffRawView::setZoom(double zoomFac)
 {
     m_fZoomFactor = zoomFac;
 
-    m_pTableView->verticalHeader()->setDefaultSectionSize(m_fZoomFactor*m_fDefaultSectionSize);//Row Height
+    m_pTableView->verticalHeader()->setDefaultSectionSize(m_pTableView->height() / m_fZoomFactor/**m_fDefaultSectionSize*/);//Row Height
 }
 
 //=============================================================================================================
