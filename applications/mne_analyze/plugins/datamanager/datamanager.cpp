@@ -39,7 +39,7 @@
 //=============================================================================================================
 
 #include "datamanager.h"
-#include "FormFiles/datamanagerview.h"
+#include "FormFiles/datamanagercontrolview.h"
 
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Management/communicator.h>
@@ -111,19 +111,19 @@ QMenu *DataManager::getMenu()
 
 QDockWidget *DataManager::getControl()
 {
-    DataManagerView* pDataManagerView = new DataManagerView;
+    DataManagerControlView* pDataManagerControlView = new DataManagerControlView;
 
-    pDataManagerView->setModel(m_pAnalyzeData->getDataModel());
+    pDataManagerControlView->setModel(m_pAnalyzeData->getDataModel());
 
-    connect(pDataManagerView, &DataManagerView::selectedModelChanged,
+    connect(pDataManagerControlView, &DataManagerControlView::selectedModelChanged,
             this, &DataManager::onCurrentlySelectedModelChanged);
 
-    connect(pDataManagerView, &DataManagerView::removeItem,
+    connect(pDataManagerControlView, &DataManagerControlView::removeItem,
             this, &DataManager::onRemoveItem);
 
     QDockWidget* pControlDock = new QDockWidget(getName());
     pControlDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    pControlDock->setWidget(pDataManagerView);
+    pControlDock->setWidget(pDataManagerControlView);
     pControlDock->setObjectName(getName());
 
     return pControlDock;
