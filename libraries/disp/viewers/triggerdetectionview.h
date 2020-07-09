@@ -173,6 +173,9 @@ protected:
      */
     void onResetTriggerNumbers();
 
+    //=========================================================================================================
+    void onDetectTriggers();
+
     Ui::TriggerDetectionViewWidget*                     m_pUi;
 
     QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                    /**< Connected fiff info. */
@@ -193,6 +196,8 @@ signals:
      * Emit this signal whenever the trigger infomration changed.
      */
     void triggerInfoChanged(const QMap<double, QColor>& value, bool active, const QString& triggerCh, double threshold);
+
+    void detectTriggers(const QString& sChannelName, double iThreshold);
 };
 } // NAMESPACE
 
