@@ -89,6 +89,7 @@ AnnotationSettingsView::AnnotationSettingsView()
     m_pTriggerDetectView = QSharedPointer<DISPLIB::TriggerDetectionView>(new DISPLIB::TriggerDetectionView("MNEANALYZE/EVENTS",
                                                                                                            Q_NULLPTR,
                                                                                                            Qt::Window));
+    m_pTriggerDetectView->setProcessingMode(DISPLIB::AbstractView::ProcessingMode::Offline);
 }
 
 //=============================================================================================================
@@ -175,6 +176,9 @@ void AnnotationSettingsView::initGUIFunctionality()
 
     connect(m_pUi->m_pushButtonStim, &QPushButton::clicked,
             this, &AnnotationSettingsView::onStimButtonClicked, Qt::UniqueConnection);
+
+    connect(m_pTriggerDetectView.data(), &DISPLIB::TriggerDetectionView::detectTriggers,
+            this, &AnnotationSettingsView::onDetectTriggers, Qt::UniqueConnection);
 }
 
 //=============================================================================================================
@@ -581,6 +585,7 @@ void AnnotationSettingsView::onStimButtonClicked()
     if(m_pTriggerDetectView->isHidden()){
         m_pTriggerDetectView->activateWindow();
         m_pTriggerDetectView->show();
+        m_pTriggerDetectView->resize(m_pTriggerDetectView->minimumSizeHint());
     }
 }
 
@@ -589,4 +594,11 @@ void AnnotationSettingsView::onStimButtonClicked()
 void AnnotationSettingsView::onStimFiffInfo(const QSharedPointer<FIFFLIB::FiffInfo>info)
 {
     m_pTriggerDetectView->init(info);
+}
+
+//=============================================================================================================
+
+void AnnotationSettingsView::onDetectTriggers(const QString &sChannelName, double iThreshold)
+{
+    qDebug() << "[AnnotationSettingsView::onDetectTriggers] Channel:" << sChannelName << " Threshold:" << iThreshold;
 }

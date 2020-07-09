@@ -131,6 +131,8 @@ void TriggerDetectionView::init(const FiffInfo::SPtr pFiffInfo)
         connect(m_pUi->m_pushButton_resetNumberTriggers, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
                 this, &TriggerDetectionView::onResetTriggerNumbers);
 
+        connect(m_pUi->m_pushButton_DetectTriggers, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+                this, &TriggerDetectionView::onDetectTriggers);
         loadSettings();
     }
 }
@@ -224,6 +226,13 @@ void TriggerDetectionView::updateProcessingMode(ProcessingMode mode)
 {
     switch(mode) {
         case ProcessingMode::Offline:
+            m_pUi->label->hide();
+            m_pUi->label_9->hide();
+            m_pUi->m_pushButton_resetNumberTriggers->hide();
+            m_pUi->m_pushButton_triggerColor->hide();
+            m_pUi->m_checkBox_activateTriggerDetection->hide();
+            m_pUi->m_comboBox_triggerColorType->hide();
+            m_pUi->m_label_numberDetectedTriggers->hide();
             break;
         default: // default is realtime mode
             break;
@@ -282,4 +291,12 @@ void TriggerDetectionView::onResetTriggerNumbers()
     emit resetTriggerCounter();
 
     //emit updateConnectedView();
+}
+
+//=============================================================================================================
+
+void TriggerDetectionView::onDetectTriggers()
+{
+    emit detectTriggers(m_pUi->m_comboBox_triggerChannels->currentText(),
+                        m_pUi->m_doubleSpinBox_detectionThresholdFirst->value()*pow(10, m_pUi->m_spinBox_detectionThresholdSecond->value()));
 }
