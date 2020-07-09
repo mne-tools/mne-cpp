@@ -40,7 +40,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff.h>
 #include <fiff/fiff_ch_info.h>
 #include <anShared/Model/annotationmodel.h>
 #include "annotationdelegate.h"
@@ -61,8 +60,16 @@ namespace DISPLIB {
     class TriggerDetectionView;
 }
 
+namespace ANSHAREDLIB {
+    class FiffRawViewModel;
+}
+
 namespace Ui {
     class EventWindowDockWidget;
+}
+
+namespace FIFFLIB {
+    class FiffInfo;
 }
 
 //=============================================================================================================
@@ -133,6 +140,9 @@ public slots:
 
     //=========================================================================================================
     void onStimFiffInfo(const QSharedPointer<FIFFLIB::FiffInfo> info);
+
+    //=========================================================================================================
+    void onNewFiffRawViewModel(QSharedPointer<ANSHAREDLIB::FiffRawViewModel> pFiffRawModel);
 
 signals:
     //=========================================================================================================
@@ -320,10 +330,14 @@ private:
 
     QSharedPointer<AnnotationDelegate>              m_pAnnDelegate;                 /** < Pointer to associated delegate */
     QSharedPointer<ANSHAREDLIB::AnnotationModel>    m_pAnnModel;                    /** < Pointer to associated model. Points to currently loaded. */
+    QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo;
+    QSharedPointer<ANSHAREDLIB::FiffRawViewModel>   m_pFiffRawModel;
 
     QSharedPointer<DISPLIB::TriggerDetectionView>   m_pTriggerDetectView;
 
     QColorDialog*                                   m_pColordialog;                 /** < USed for Prompting users for annotation type colors */
+
+
 };
 
 #endif // ANNOTATIONSETTINGSVIEW_H

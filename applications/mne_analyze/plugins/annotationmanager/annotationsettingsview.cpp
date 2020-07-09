@@ -39,6 +39,10 @@
 
 #include "annotationsettingsview.h"
 #include "ui_annotationsettingsview.h"
+
+#include <fiff/fiff.h>
+#include <rtprocessing/detecttrigger.h>
+#include <anShared/Model/fiffrawviewmodel.h>
 #include <disp/viewers/triggerdetectionview.h>
 
 //=============================================================================================================
@@ -69,6 +73,8 @@ AnnotationSettingsView::AnnotationSettingsView()
 , m_iCheckState(0)
 , m_iLastSampClicked(0)
 , m_pAnnModel(Q_NULLPTR)
+, m_pFiffInfo(Q_NULLPTR)
+, m_pFiffRawModel(Q_NULLPTR)
 , m_pColordialog(new QColorDialog(this))
 {
     m_pUi->setupUi(this);
@@ -594,6 +600,7 @@ void AnnotationSettingsView::onStimButtonClicked()
 void AnnotationSettingsView::onStimFiffInfo(const QSharedPointer<FIFFLIB::FiffInfo>info)
 {
     m_pTriggerDetectView->init(info);
+    m_pFiffInfo = info;
 }
 
 //=============================================================================================================
@@ -601,4 +608,25 @@ void AnnotationSettingsView::onStimFiffInfo(const QSharedPointer<FIFFLIB::FiffIn
 void AnnotationSettingsView::onDetectTriggers(const QString &sChannelName, double iThreshold)
 {
     qDebug() << "[AnnotationSettingsView::onDetectTriggers] Channel:" << sChannelName << " Threshold:" << iThreshold;
+
+    int iCurrentTriggerChIndex = 9999;
+
+    for(int i = 0; i < m_pFiffInfo->chs.size(); ++i) {
+        if(m_pFiffInfo->chs[i].ch_name == sChannelName) {
+            iCurrentTriggerChIndex = i;
+            break;
+        }
+    }
+
+    qDebug() << "[AnnotationSettingsView::onDetectTriggers] iCurrentTriggerChIndex:" << iCurrentTriggerChIndex;
+
+    //RTPROCESSINGLIB::detectTriggerFlanksMax(
+
+}
+
+//=============================================================================================================
+
+void AnnotationSettingsView::onNewFiffRawViewModel(QSharedPointer<ANSHAREDLIB::FiffRawViewModel> pFiffRawModel)
+{
+    m_pFiffRawModel = pFiffRawModel;
 }
