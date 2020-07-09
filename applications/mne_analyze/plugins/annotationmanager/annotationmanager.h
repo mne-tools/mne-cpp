@@ -151,6 +151,7 @@ signals:
                                 qint32 iLastSample,
                                 float fSFreq);
     void stimFiffInfo(const QSharedPointer<FIFFLIB::FiffInfo> info);
+    void newFiffRawViewModel(QSharedPointer<ANSHAREDLIB::FiffRawViewModel> pFiffRawModel);
 };
 
 } // NAMESPACE
