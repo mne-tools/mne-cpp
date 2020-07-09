@@ -138,7 +138,10 @@ QDockWidget *AnnotationManager::getControl()
             pAnnotationSettingsView, &AnnotationSettingsView::passFiffParams, Qt::UniqueConnection);
 
     connect(m_pAnalyzeData.data(), &AnalyzeData::modelIsEmpty,
-            pAnnotationSettingsView, &AnnotationSettingsView::reset);
+            pAnnotationSettingsView, &AnnotationSettingsView::reset, Qt::UniqueConnection);
+
+    connect(this, &AnnotationManager::stimFiffInfo,
+            pAnnotationSettingsView, &AnnotationSettingsView::onStimFiffInfo, Qt::UniqueConnection);
 
     QDockWidget* pControl = new QDockWidget(getName());
     pControl->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
@@ -197,6 +200,8 @@ void AnnotationManager::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel
         emit newFiffParamsAvailable(pFiffRawModel->absoluteFirstSample(),
                                     pFiffRawModel->absoluteLastSample(),
                                     pFiffRawModel->getFiffInfo()->sfreq);
+        emit stimFiffInfo(pFiffRawModel->getFiffInfo());
+
     }
 }
 
