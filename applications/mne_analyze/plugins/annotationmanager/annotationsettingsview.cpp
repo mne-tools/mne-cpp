@@ -583,3 +583,10 @@ void AnnotationSettingsView::onStimButtonClicked()
         m_pTriggerDetectView->show();
     }
 }
+
+//=============================================================================================================
+
+void AnnotationSettingsView::onStimFiffInfo(const QSharedPointer<FIFFLIB::FiffInfo>info)
+{
+    m_pTriggerDetectView->init(info);
+}

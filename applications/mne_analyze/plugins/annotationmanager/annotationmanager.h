@@ -150,6 +150,7 @@ signals:
     void newFiffParamsAvailable(qint32 iFirstSample,
                                 qint32 iLastSample,
                                 float fSFreq);
+    void stimFiffInfo(const QSharedPointer<FIFFLIB::FiffInfo> info);
 };
 
 } // NAMESPACE

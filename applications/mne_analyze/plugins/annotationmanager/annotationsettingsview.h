@@ -40,6 +40,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <fiff/fiff.h>
 #include <fiff/fiff_ch_info.h>
 #include <anShared/Model/annotationmodel.h>
 #include "annotationdelegate.h"
@@ -129,6 +130,9 @@ public slots:
      * @param [in] iSample   Sample number to be added to annotation model
      */
     void addAnnotationToModel();
+
+    //=========================================================================================================
+    void onStimFiffInfo(const QSharedPointer<FIFFLIB::FiffInfo> info);
 
 signals:
     //=========================================================================================================
@@ -302,6 +306,7 @@ private:
      */
     void customGroupContextMenuRequested(const QPoint &pos);
 
+    //=========================================================================================================
     void onStimButtonClicked();
 
     Ui::EventWindowDockWidget*                      m_pUi;                          /** < Pointer to GUI elements */
