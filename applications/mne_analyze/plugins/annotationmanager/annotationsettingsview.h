@@ -266,6 +266,8 @@ private:
                       int iType = 0,
                       bool bDefaultColor = false);
 
+    bool newStimGroup(const QString& sName,
+                      int iType);
     //=========================================================================================================
     /**
      * Deletes selected event group
@@ -320,7 +322,7 @@ private:
     void onStimButtonClicked();
 
     void onDetectTriggers(const QString& sChannelName,
-                          double iThreshold);
+                          double dThreshold);
 
     Ui::EventWindowDockWidget*                      m_pUi;                          /** < Pointer to GUI elements */
 
