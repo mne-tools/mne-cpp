@@ -638,6 +638,17 @@ void AnnotationSettingsView::onDetectTriggers(const QString &sChannelName, doubl
         mEventsinTypes[pair.second].append(pair.first);
     }
 
+    QList<double> keyList = mEventsinTypes.keys();
+
+    for (int i = 0; i < keyList.size(); i++){
+        newStimGroup(sChannelName, keyList[i]);
+        for (int i : mEventsinTypes[keyList[i]]){
+            m_pAnnModel->setSamplePos(i);
+            m_pAnnModel->insertRow(0, QModelIndex());
+        }
+    }
+    emit triggerRedraw();
+
 }
 
 //=============================================================================================================
@@ -651,5 +662,20 @@ void AnnotationSettingsView::onNewFiffRawViewModel(QSharedPointer<ANSHAREDLIB::F
 
 bool AnnotationSettingsView::newStimGroup(const QString &sName, int iType)
 {
+    QColor groupColor = Qt::black;
 
+    int iCat = m_pAnnModel->createGroup(sName + "_" + QString(iType),
+                                        false,
+                                        iType,
+                                        groupColor);
+
+    QListWidgetItem* newItem = new QListWidgetItem(sName + "_" + QString(iType));
+    newItem->setData(Qt::UserRole, QVariant(iCat));
+    newItem->setData(Qt::DecorationRole, groupColor);
+    newItem->setFlags (newItem->flags () | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+
+    m_pUi->m_listWidget_groupListWidget->addItem(newItem);
+    emit m_pUi->m_listWidget_groupListWidget->setCurrentItem(newItem);
+
+    return true;
 }
