@@ -605,9 +605,9 @@ void AnnotationSettingsView::onStimFiffInfo(const QSharedPointer<FIFFLIB::FiffIn
 
 //=============================================================================================================
 
-void AnnotationSettingsView::onDetectTriggers(const QString &sChannelName, double iThreshold)
+void AnnotationSettingsView::onDetectTriggers(const QString &sChannelName, double dThreshold)
 {
-    qDebug() << "[AnnotationSettingsView::onDetectTriggers] Channel:" << sChannelName << " Threshold:" << iThreshold;
+    qDebug() << "[AnnotationSettingsView::onDetectTriggers] Channel:" << sChannelName << " Threshold:" << dThreshold;
 
     int iCurrentTriggerChIndex = 9999;
 
@@ -618,9 +618,25 @@ void AnnotationSettingsView::onDetectTriggers(const QString &sChannelName, doubl
         }
     }
 
+    if(iCurrentTriggerChIndex == 9999){
+        qWarning() << "[AnnotationSettingsView::onDetectTriggers] Channel Index not valid";
+        return;
+    }
+
+    Eigen::MatrixXd mSampleData, mSampleTimes;
+
+    FIFFLIB::FiffRawData* pFiffRaw = this->m_pFiffRawModel->getFiffIO()->m_qlistRaw.first().data();
+    pFiffRaw->read_raw_segment(mSampleData, mSampleTimes);
+
     qDebug() << "[AnnotationSettingsView::onDetectTriggers] iCurrentTriggerChIndex:" << iCurrentTriggerChIndex;
 
-    //RTPROCESSINGLIB::detectTriggerFlanksMax(
+    QList<QPair<int,double>> detectedTriggerSamples = RTPROCESSINGLIB::detectTriggerFlanksMax(mSampleTimes, iCurrentTriggerChIndex, 0, dThreshold, 0);
+
+    QMap<double,QList<int>> mEventsinTypes;
+
+    for(QPair<int,double> pair : detectedTriggerSamples){
+        mEventsinTypes[pair.second].append(pair.first);
+    }
 
 }
 
@@ -629,4 +645,11 @@ void AnnotationSettingsView::onDetectTriggers(const QString &sChannelName, doubl
 void AnnotationSettingsView::onNewFiffRawViewModel(QSharedPointer<ANSHAREDLIB::FiffRawViewModel> pFiffRawModel)
 {
     m_pFiffRawModel = pFiffRawModel;
+}
+
+//=============================================================================================================
+
+bool AnnotationSettingsView::newStimGroup(const QString &sName, int iType)
+{
+
 }

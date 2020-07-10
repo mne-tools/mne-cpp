@@ -78,6 +78,8 @@ TriggerDetectionView::TriggerDetectionView(const QString& sSettingsPath,
     this->setMinimumWidth(330);
     this->setMaximumWidth(330);
 
+    m_pUi->m_pushButton_DetectTriggers->hide();
+
     loadSettings();
 }
 
@@ -133,6 +135,7 @@ void TriggerDetectionView::init(const FiffInfo::SPtr pFiffInfo)
 
         connect(m_pUi->m_pushButton_DetectTriggers, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
                 this, &TriggerDetectionView::onDetectTriggers);
+
         loadSettings();
     }
 }
@@ -233,8 +236,17 @@ void TriggerDetectionView::updateProcessingMode(ProcessingMode mode)
             m_pUi->m_checkBox_activateTriggerDetection->hide();
             m_pUi->m_comboBox_triggerColorType->hide();
             m_pUi->m_label_numberDetectedTriggers->hide();
+            m_pUi->m_pushButton_DetectTriggers->show();
             break;
         default: // default is realtime mode
+        m_pUi->label->show();
+        m_pUi->label_9->show();
+        m_pUi->m_pushButton_resetNumberTriggers->show();
+        m_pUi->m_pushButton_triggerColor->show();
+        m_pUi->m_checkBox_activateTriggerDetection->show();
+        m_pUi->m_comboBox_triggerColorType->show();
+        m_pUi->m_label_numberDetectedTriggers->show();
+        m_pUi->m_pushButton_DetectTriggers->hide();
             break;
     }
 }
