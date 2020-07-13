@@ -226,6 +226,8 @@ void AveragingSettingsView::redrawGUI()
 
     m_pUi->m_pushButton_compute->hide();
     m_pUi->m_checkBox_reject->hide();
+    m_pUi->label_2_EventGroup->hide();
+    m_pUi->comboBox_EventGroup->hide();
 
     setWindowFlags(Qt::WindowStaysOnTopHint);
 
@@ -343,6 +345,8 @@ void AveragingSettingsView::updateProcessingMode(ProcessingMode mode)
             m_pUi->m_label_numberAverages->hide();
             m_pUi->m_pushButton_compute->show();
             m_pUi->m_checkBox_reject->show();
+            m_pUi->label_2_EventGroup->show();
+            m_pUi->comboBox_EventGroup->show();
             break;
         default: // default is realtime mode
             m_pUi->m_pSpinBoxNumAverages->show();
@@ -352,6 +356,8 @@ void AveragingSettingsView::updateProcessingMode(ProcessingMode mode)
             m_pUi->m_label_numberAverages->show();
             m_pUi->m_pushButton_compute->hide();
             m_pUi->m_checkBox_reject->hide();
+            m_pUi->label_2_EventGroup->hide();
+            m_pUi->comboBox_EventGroup->hide();
             break;
     }
 }

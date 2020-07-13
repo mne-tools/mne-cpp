@@ -440,6 +440,7 @@ bool AnnotationSettingsView::newUserGroup(const QString& sName,
 
     m_pUi->lineEdit->setText("New Group " + QString::number(iCat + 1));
 
+    emit groupsUpdated();
     return true;
 }
 
@@ -523,6 +524,7 @@ void AnnotationSettingsView::deleteGroup()
     m_pUi->m_listWidget_groupListWidget->selectionModel()->clearSelection();
     delete itemToDelete;
     onDataChanged();
+    emit groupsUpdated();
 }
 
 //=============================================================================================================
@@ -562,6 +564,8 @@ void AnnotationSettingsView::renameGroup()
         msgBox->open();
     }else {
         m_pUi->m_listWidget_groupListWidget->currentItem()->setText(text);
+        m_pAnnModel->setGroupName(m_pUi->m_listWidget_groupListWidget->currentItem()->data(Qt::UserRole).toInt(), text);
+        emit groupsUpdated();
     }
 }
 
@@ -652,8 +656,13 @@ void AnnotationSettingsView::onDetectTriggers(const QString &sChannelName, doubl
     QList<double> keyList = mEventsinTypes.keys();
     int iFirstSample = m_pFiffRawModel->absoluteFirstSample();
 
+    QColor colors[10] = {QColor("cyan"), QColor("magenta"), QColor("red"),
+                          QColor("darkRed"), QColor("darkCyan"), QColor("darkMagenta"),
+                          QColor("green"), QColor("darkGreen"), QColor("yellow"),
+                          QColor("blue")};
+
     for (int i = 0; i < keyList.size(); i++){
-        newStimGroup(sChannelName, keyList[i]);
+        newStimGroup(sChannelName, static_cast<int>(keyList[i]), colors[i % 10]);
         groupChanged();
         for (int j : mEventsinTypes[keyList[i]]){
             m_pAnnModel->setSamplePos(j + iFirstSample);
@@ -661,6 +670,7 @@ void AnnotationSettingsView::onDetectTriggers(const QString &sChannelName, doubl
         }
     }
     emit triggerRedraw();
+    emit groupsUpdated();
 
 }
 
@@ -673,17 +683,18 @@ void AnnotationSettingsView::onNewFiffRawViewModel(QSharedPointer<ANSHAREDLIB::F
 
 //=============================================================================================================
 
-bool AnnotationSettingsView::newStimGroup(const QString &sName, int iType)
+bool AnnotationSettingsView::newStimGroup(const QString &sName,
+                                          int iType,
+                                          const QColor &groupColor)
 {
     qDebug() << "[AnnotationSettingsView::newStimGroup]";
-    QColor groupColor = Qt::black;
 
     int iCat = m_pAnnModel->createGroup(sName + "_" + QString(iType),
                                         false,
                                         iType,
                                         groupColor);
 
-    QListWidgetItem* newItem = new QListWidgetItem(sName + "_" + QString(iType));
+    QListWidgetItem* newItem = new QListWidgetItem(sName + "_" + QString::number(iType));
     newItem->setData(Qt::UserRole, QVariant(iCat));
     newItem->setData(Qt::DecorationRole, groupColor);
     newItem->setFlags (newItem->flags () | Qt::ItemIsEnabled | Qt::ItemIsSelectable);

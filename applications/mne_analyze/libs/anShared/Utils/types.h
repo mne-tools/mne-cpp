@@ -95,6 +95,7 @@ namespace ANSHAREDLIB
         STATUS_BAR_MSG,             // sending a message to the status bar (part of gui)
         SELECTED_MODEL_CHANGED,     // event send whenever the user changes the selection in the datamanager plugin
         NEW_ANNOTATION_ADDED,       // event send whenever the user adds a new annotation in the rawdataviewer plugin
+        EVENT_GROUPS_UPDATED,       // send when plugins dependent on event groups need to be updated
         TRIGGER_REDRAW,             // send when viewer needs to be updated
         TRIGGER_ACTIVE_CHANGED,     // send when the trigger active state was toggled
         TRIGGER_VIEWER_MOVE,        // send when scroll position of viewer needs to be moved

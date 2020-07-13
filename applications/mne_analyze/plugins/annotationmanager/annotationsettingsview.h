@@ -159,6 +159,8 @@ signals:
      */
     void triggerRedraw();
 
+    void groupsUpdated();
+
     void jumpToSelected();
 
 protected slots:
@@ -267,7 +269,8 @@ private:
                       bool bDefaultColor = false);
 
     bool newStimGroup(const QString& sName,
-                      int iType);
+                      int iType,
+                      const QColor &groupColor = Qt::black);
     //=========================================================================================================
     /**
      * Deletes selected event group
