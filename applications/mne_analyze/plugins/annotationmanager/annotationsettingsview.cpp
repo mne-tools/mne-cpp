@@ -626,11 +626,22 @@ void AnnotationSettingsView::onDetectTriggers(const QString &sChannelName, doubl
     Eigen::MatrixXd mSampleData, mSampleTimes;
 
     FIFFLIB::FiffRawData* pFiffRaw = this->m_pFiffRawModel->getFiffIO()->m_qlistRaw.first().data();
-    pFiffRaw->read_raw_segment(mSampleData, mSampleTimes);
+    pFiffRaw->read_raw_segment(mSampleData,
+                               mSampleTimes);
 
     qDebug() << "[AnnotationSettingsView::onDetectTriggers] iCurrentTriggerChIndex:" << iCurrentTriggerChIndex;
 
-    QList<QPair<int,double>> detectedTriggerSamples = RTPROCESSINGLIB::detectTriggerFlanksMax(mSampleTimes, iCurrentTriggerChIndex, 0, dThreshold, 0);
+    QList<QPair<int,double>> detectedTriggerSamples = RTPROCESSINGLIB::detectTriggerFlanksMax(mSampleData,
+                                                                                              iCurrentTriggerChIndex,
+                                                                                              0,
+                                                                                              dThreshold,
+                                                                                              0);
+
+//    qDebug() << "[AnnotationSettingsView::onDetectTriggers] -- Sample Data";
+//    std::cout << mSampleData;
+
+//    qDebug() << "[AnnotationSettingsView::onDetectTriggers] -- Sample Times";
+//    std::cout << mSampleTimes;
 
     QMap<double,QList<int>> mEventsinTypes;
 
@@ -639,11 +650,13 @@ void AnnotationSettingsView::onDetectTriggers(const QString &sChannelName, doubl
     }
 
     QList<double> keyList = mEventsinTypes.keys();
+    int iFirstSample = m_pFiffRawModel->absoluteFirstSample();
 
     for (int i = 0; i < keyList.size(); i++){
         newStimGroup(sChannelName, keyList[i]);
-        for (int i : mEventsinTypes[keyList[i]]){
-            m_pAnnModel->setSamplePos(i);
+        groupChanged();
+        for (int j : mEventsinTypes[keyList[i]]){
+            m_pAnnModel->setSamplePos(j + iFirstSample);
             m_pAnnModel->insertRow(0, QModelIndex());
         }
     }
@@ -662,6 +675,7 @@ void AnnotationSettingsView::onNewFiffRawViewModel(QSharedPointer<ANSHAREDLIB::F
 
 bool AnnotationSettingsView::newStimGroup(const QString &sName, int iType)
 {
+    qDebug() << "[AnnotationSettingsView::newStimGroup]";
     QColor groupColor = Qt::black;
 
     int iCat = m_pAnnModel->createGroup(sName + "_" + QString(iType),
