@@ -135,6 +135,8 @@ private:
      */
     void onTriggerRedraw();
 
+    void onGroupsUpdated();
+
     //=============================================================================================================
     /**
      * Publishes event to force FiffRawView to jump to selected annoation

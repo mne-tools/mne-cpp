@@ -301,7 +301,7 @@ public:
      *
      * @return Returns a matrix of formatted annotation data
      */
-    MatrixXi getAnnotationMatrix();
+    MatrixXi getAnnotationMatrix(int iGroup = 9999);
 
     //=========================================================================================================
     /**
@@ -431,6 +431,10 @@ public:
     void setGroupColor(int iGroupIndex,
                        const QColor& groupColor);
 
+    void setGroupName(int iGroupIndex,
+                      const QString& groupName);
+
+    const QString& getGroupName(int iGroupIndex);
     //=========================================================================================================
     /**
      * The type of this model (AnnotationModel)

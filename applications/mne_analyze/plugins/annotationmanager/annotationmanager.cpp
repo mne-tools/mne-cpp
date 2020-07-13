@@ -119,6 +119,9 @@ QDockWidget *AnnotationManager::getControl()
     connect(pAnnotationSettingsView, &AnnotationSettingsView::triggerRedraw,
             this, &AnnotationManager::onTriggerRedraw, Qt::UniqueConnection);
 
+    connect(pAnnotationSettingsView, &AnnotationSettingsView::groupsUpdated,
+            this, &AnnotationManager::onGroupsUpdated, Qt::UniqueConnection);
+
     connect(pAnnotationSettingsView, &AnnotationSettingsView::activeEventsChecked,
             this, &AnnotationManager::toggleDisplayEvent, Qt::UniqueConnection);
 
@@ -229,4 +232,11 @@ void AnnotationManager::onTriggerRedraw()
 void AnnotationManager::onJumpToSelected()
 {
     m_pCommu->publishEvent(TRIGGER_VIEWER_MOVE);
+}
+
+//=============================================================================================================
+
+void AnnotationManager::onGroupsUpdated()
+{
+    m_pCommu->publishEvent(EVENT_GROUPS_UPDATED);
 }
