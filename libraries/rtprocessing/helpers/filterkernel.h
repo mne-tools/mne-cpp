@@ -227,13 +227,13 @@ private:
 /**
  * Returns the current design method as a string
  */
-RTPROCESINGSHARED_EXPORT QString getStringForDesignMethod(const FilterKernel::DesignMethod& designMethod);
+RTPROCESINGSHARED_EXPORT QString getStringForDesignMethod(FilterKernel::DesignMethod designMethod);
 
 //=========================================================================================================
 /**
  * Returns the current filter type as a string
  */
-RTPROCESINGSHARED_EXPORT QString getStringForFilterType(const FilterKernel::FilterType& filterType);
+RTPROCESINGSHARED_EXPORT QString getStringForFilterType(FilterKernel::FilterType filterType);
 
 //=========================================================================================================
 /**

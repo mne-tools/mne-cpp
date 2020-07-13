@@ -75,80 +75,84 @@ using namespace UTILSLIB;
 // DEFINE GLOBAL RTPROCESSINGLIB METHODS
 //=============================================================================================================
 
-QString RTPROCESSINGLIB::getStringForDesignMethod(const FilterKernel::DesignMethod &designMethod)
+QString RTPROCESSINGLIB::getStringForDesignMethod(FilterKernel::DesignMethod designMethod)
 {
-    QString designMethodString = "External";
+    switch(designMethod) {
+        case FilterKernel::External:
+            return "External";
+            break;
 
-    if(designMethod == FilterKernel::External)
-        designMethodString = "External";
+        case FilterKernel::Cosine:
+            return "Cosine";
+            break;
 
-    if(designMethod == FilterKernel::Cosine)
-        designMethodString = "Cosine";
+        case FilterKernel::Tschebyscheff:
+            return "Tschebyscheff";
+            break;
 
-    if(designMethod == FilterKernel::Tschebyscheff)
-        designMethodString = "Tschebyscheff";
-
-    return designMethodString;
+        default:
+            return "External";
+            break;
+    }
 }
 
 //=============================================================================================================
 
-QString RTPROCESSINGLIB::getStringForFilterType(const FilterKernel::FilterType &filterType)
+QString RTPROCESSINGLIB::getStringForFilterType(FilterKernel::FilterType filterType)
 {
-    QString filterTypeString = "LPF";
+    switch(filterType) {
+        case FilterKernel::LPF:
+            return "LPF";
+            break;
 
-    if(filterType == FilterKernel::LPF)
-        filterTypeString = "LPF";
+        case FilterKernel::HPF:
+            return "HPF";
+            break;
 
-    if(filterType == FilterKernel::HPF)
-        filterTypeString = "HPF";
+        case FilterKernel::BPF:
+            return "BPF";
+            break;
 
-    if(filterType == FilterKernel::BPF)
-        filterTypeString = "BPF";
+        case FilterKernel::NOTCH:
+            return "NOTCH";
+            break;
 
-    if(filterType == FilterKernel::NOTCH)
-        filterTypeString = "NOTCH";
-
-    return filterTypeString;
+        default:
+            return "LPF";
+            break;
+    }
 }
 
 //=============================================================================================================
 
 FilterKernel::DesignMethod RTPROCESSINGLIB::getDesignMethodForString(const QString &designMethodString)
 {
-    FilterKernel::DesignMethod designMethod = FilterKernel::External;
-
-    if(designMethodString == "External")
-        designMethod = FilterKernel::External;
-
-    if(designMethodString == "Tschebyscheff")
-        designMethod = FilterKernel::Tschebyscheff;
-
-    if(designMethodString == "Cosine")
-        designMethod = FilterKernel::Cosine;
-
-    return designMethod;
+    if(designMethodString == "External") {
+        return FilterKernel::External;
+    } else if(designMethodString == "Tschebyscheff") {
+        return FilterKernel::Tschebyscheff;
+    } else if(designMethodString == "Cosine") {
+        return FilterKernel::Cosine;
+    } else {
+        return FilterKernel::External;
+    }
 }
 
 //=============================================================================================================
 
 FilterKernel::FilterType RTPROCESSINGLIB::getFilterTypeForString(const QString &filterTypeString)
 {
-    FilterKernel::FilterType filterType = FilterKernel::UNKNOWN;
-
-    if(filterTypeString == "LPF")
-        filterType = FilterKernel::LPF;
-
-    if(filterTypeString == "HPF")
-        filterType = FilterKernel::HPF;
-
-    if(filterTypeString == "BPF")
-        filterType = FilterKernel::BPF;
-
-    if(filterTypeString == "NOTCH")
-        filterType = FilterKernel::NOTCH;
-
-    return filterType;
+    if(filterTypeString == "LPF") {
+        return FilterKernel::LPF;
+    } else if(filterTypeString == "HPF") {
+        return FilterKernel::HPF;
+    } else if(filterTypeString == "BPF") {
+        return FilterKernel::BPF;
+    } else if(filterTypeString == "NOTCH") {
+        return FilterKernel::NOTCH;
+    } else {
+        return FilterKernel::UNKNOWN;
+    }
 }
 
 //=============================================================================================================
