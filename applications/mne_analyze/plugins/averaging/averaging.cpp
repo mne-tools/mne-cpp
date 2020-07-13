@@ -261,6 +261,9 @@ void Averaging::handleEvent(QSharedPointer<Event> e)
         case FILTER_DESIGN_CHANGED:
             m_filterKernel = e->getData().value<FilterKernel>();
             break;
+        case EVENT_GROUPS_UPDATED:
+            updateGroups();
+        break;
         default:
             qWarning() << "[Averaging::handleEvent] Received an Event that is not handled by switch cases.";
     }
@@ -274,6 +277,7 @@ QVector<EVENT_TYPE> Averaging::getEventSubscriptions(void) const
     temp.push_back(SELECTED_MODEL_CHANGED);
     temp.push_back(FILTER_ACTIVE_CHANGED);
     temp.push_back(FILTER_DESIGN_CHANGED);
+    temp.push_back(EVENT_GROUPS_UPDATED);
 
     return temp;
 }
@@ -628,4 +632,11 @@ void Averaging::onMakeScreenshot(const QString& imageType)
     }
 
     m_pButterflyView->takeScreenshot(fileName);
+}
+
+//=============================================================================================================
+
+void Averaging::updateGroups()
+{
+
 }

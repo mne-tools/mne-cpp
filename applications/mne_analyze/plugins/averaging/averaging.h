@@ -245,6 +245,9 @@ private:
     void clearAveraging();
 
     //=========================================================================================================
+    void updateGroups();
+
+    //=========================================================================================================
     /**
      * Call this slot whenever you want to make a screenshot of the butterfly or layout view.
      *

@@ -622,15 +622,24 @@ void AnnotationModel::appendSelected(int iSelectedIndex)
 
 //=============================================================================================================
 
-MatrixXi AnnotationModel::getAnnotationMatrix()
+MatrixXi AnnotationModel::getAnnotationMatrix(int iGroup)
 {
     MatrixXi matEventDataMatrix;
     matEventDataMatrix.resize(getNumberOfAnnotations(), 3);
 
-    for (int i = 0; i < getNumberOfAnnotations(); i++){
-        matEventDataMatrix(i,0) = getAnnotation(i);
-        matEventDataMatrix(i,1) = 0;
-        matEventDataMatrix(i,2) = 1;
+    if(iGroup == 9999){
+        for (int i = 0; i < getNumberOfAnnotations(); i++){
+            matEventDataMatrix(i,0) = getAnnotation(i);
+            matEventDataMatrix(i,1) = 0;
+            matEventDataMatrix(i,2) = 1;
+        }
+    } else {
+        for (int i = 0; i < m_mAnnotationHub[iGroup]->dataSamples_Filtered.size(); i++){
+            matEventDataMatrix(i,0) = m_mAnnotationHub[iGroup]->dataSamples_Filtered[i];
+            matEventDataMatrix(i,1) = 0;
+            matEventDataMatrix(i,2) = 1;
+        }
+
     }
 
     return matEventDataMatrix;
@@ -849,4 +858,19 @@ void AnnotationModel::setGroupColor(int iGroupIndex,
                                     const QColor& groupColor)
 {
     m_eventGroupColor[iGroupIndex] = groupColor;
+}
+
+//=============================================================================================================
+
+void AnnotationModel::setGroupName(int iGroupIndex,
+                                   const QString &groupName)
+{
+    m_mAnnotationHub[iGroupIndex]->groupName = groupName;
+}
+
+//=============================================================================================================
+
+const QString& AnnotationModel::getGroupName(int iGroupIndex)
+{
+    return m_mAnnotationHub[iGroupIndex]->groupName;
 }
