@@ -22,8 +22,9 @@ Development Release
 |-------|-------|-------|-------|
 | dev_build | [Latest commit](https://github.com/mne-tools/mne-cpp/commits/master){:target="_blank" rel="noopener"} | <span class="fs-2"> [Windows](https://github.com/mne-tools/mne-cpp/releases/download/dev_build/mne-cpp-windows-dynamic-x86_64.zip){: .btn .btn-green } [Linux](https://github.com/mne-tools/mne-cpp/releases/download/dev_build/mne-cpp-linux-dynamic-x86_64.tar.gz){: .btn .btn-green } [MacOS](https://github.com/mne-tools/mne-cpp/releases/download/dev_build/mne-cpp-macos-dynamic-x86_64.tar.gz){: .btn .btn-green } </span> | <span class="fs-2"> [Windows](https://github.com/mne-tools/mne-cpp/releases/download/dev_build/mne-cpp-windows-static-x86_64.zip){: .btn .btn-green } [Linux](https://github.com/mne-tools/mne-cpp/releases/download/dev_build/mne-cpp-linux-static-x86_64.tar.gz){: .btn .btn-green } [MacOS](https://github.com/mne-tools/mne-cpp/releases/download/dev_build/mne-cpp-macos-static-x86_64.tar.gz){: .btn .btn-green } </span> |
 
-Web Assembly Release
+WebAssembly Releases
 {: .label .label-purple }
+MNE-CPP WebAssembly releases are in a technical preview state since WebAssembly itself is still fairly new and undergoing development. The following releases work best in Chromium based browsers (Google Chrome, Microsoft Edge).
 
 | Version | Release | Link |
 |---------|------|------|
