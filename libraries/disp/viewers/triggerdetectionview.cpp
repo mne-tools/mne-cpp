@@ -134,7 +134,7 @@ void TriggerDetectionView::init(const FiffInfo::SPtr pFiffInfo)
                 this, &TriggerDetectionView::onResetTriggerNumbers);
 
         connect(m_pUi->m_pushButton_DetectTriggers, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-                this, &TriggerDetectionView::onDetectTriggers);
+                this, &TriggerDetectionView::onDetectTriggers, Qt::UniqueConnection);
 
         loadSettings();
     }
