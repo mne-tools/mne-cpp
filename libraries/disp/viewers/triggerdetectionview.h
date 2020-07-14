@@ -174,6 +174,9 @@ protected:
     void onResetTriggerNumbers();
 
     //=========================================================================================================
+    /**
+     * Slot called when detect triggers is
+     */
     void onDetectTriggers();
 
     Ui::TriggerDetectionViewWidget*                     m_pUi;

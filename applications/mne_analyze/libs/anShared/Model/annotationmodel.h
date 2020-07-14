@@ -360,6 +360,7 @@ public:
      */
     bool isUserMade();
 
+    //=========================================================================================================
     /**
      * Displays all events from all groups and triggers view updates
      *
@@ -388,6 +389,13 @@ public:
     int getIndexCount();
 
     //=========================================================================================================
+    /**
+     * Retruns index of group with name groupName. Returns 9999 if no group present with that name
+     *
+     * @param[in] groupName     name of group of which we want the index
+     *
+     * @return index of group with name groupName
+     */
     int getIndexFromName(const QString& groupName);
 
     //=========================================================================================================
@@ -435,12 +443,31 @@ public:
                        const QColor& groupColor);
 
     //=========================================================================================================
+    /**
+     * Sets the name of group at index iGroup index to groupName
+     *
+     * @param[in] iGroupIndex   index of which group to change
+     * @param[in] groupName     new name for group
+     */
     void setGroupName(int iGroupIndex,
                       const QString& groupName);
 
+    //=========================================================================================================
+    /**
+     * Saves event group to m_mAnnotationHub
+     */
     void saveGroup();
 
+    //=========================================================================================================
+    /**
+     * Returns group name of the group with input parameter iGroupIndex
+     *
+     * @param[in] iGroupIndex   index of the group from which we are getting the name
+     *
+     * @return name of group at index iGroupIndex
+     */
     const QString& getGroupName(int iGroupIndex);
+
     //=========================================================================================================
     /**
      * The type of this model (AnnotationModel)

@@ -139,9 +139,19 @@ public slots:
     void addAnnotationToModel();
 
     //=========================================================================================================
+    /**
+     * Populates the trigger detect view with the correct channel info
+     *
+     * @param[in] info  data for the trigger view to get a list of the stim channels
+     */
     void onStimFiffInfo(const QSharedPointer<FIFFLIB::FiffInfo> info);
 
     //=========================================================================================================
+    /**
+     * Update pointer to currently loaded FiffRawViewModel
+     *
+     * @param[in] pFiffRawModel     saves pointer to ucurrently loaded FiffRawViewModel
+     */
     void onNewFiffRawViewModel(QSharedPointer<ANSHAREDLIB::FiffRawViewModel> pFiffRawModel);
 
 signals:
@@ -159,8 +169,16 @@ signals:
      */
     void triggerRedraw();
 
+    //=========================================================================================================
+    /**
+     * Notifies that the number/names of groups have changed
+     */
     void groupsUpdated();
 
+    //=========================================================================================================
+    /**
+     * Tells view to move to location of selected event
+     */
     void jumpToSelected();
 
 protected slots:
@@ -322,8 +340,19 @@ private:
     void customGroupContextMenuRequested(const QPoint &pos);
 
     //=========================================================================================================
+    /**
+     * Makes TriggerDetectView vidisble and active
+     */
     void onStimButtonClicked();
 
+    //=========================================================================================================
+    /**
+     * Detects triggers from stim channel sChannelName above threshold dThreshold and saves them
+     * as events in Event groups sroted by channel and type
+     *
+     * @param[in] sChannelName      name of stim channel from which we will be reading
+     * @param dThreshold            threshold for a spike to count as a trigger
+     */
     void onDetectTriggers(const QString& sChannelName,
                           double dThreshold);
 
@@ -335,10 +364,10 @@ private:
 
     QSharedPointer<AnnotationDelegate>              m_pAnnDelegate;                 /** < Pointer to associated delegate */
     QSharedPointer<ANSHAREDLIB::AnnotationModel>    m_pAnnModel;                    /** < Pointer to associated model. Points to currently loaded. */
-    QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo;
-    QSharedPointer<ANSHAREDLIB::FiffRawViewModel>   m_pFiffRawModel;
+    QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo;                    /** < Pointer to the FiffInfo of the currently loaded file */
+    QSharedPointer<ANSHAREDLIB::FiffRawViewModel>   m_pFiffRawModel;                /** < Pointer to currently loaded FIffRawViewModel */
 
-    QSharedPointer<DISPLIB::TriggerDetectionView>   m_pTriggerDetectView;
+    QSharedPointer<DISPLIB::TriggerDetectionView>   m_pTriggerDetectView;           /** < Pointer to viewer to control GUI for detecting triggers */
 
     QColorDialog*                                   m_pColordialog;                 /** < USed for Prompting users for annotation type colors */
 

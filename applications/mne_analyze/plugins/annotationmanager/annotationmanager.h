@@ -135,6 +135,10 @@ private:
      */
     void onTriggerRedraw();
 
+    //=============================================================================================================
+    /**
+     * Publishes event to force Averaging plugin to update their event group selector
+     */
     void onGroupsUpdated();
 
     //=============================================================================================================
