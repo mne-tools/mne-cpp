@@ -238,5 +238,6 @@ void AnnotationManager::onJumpToSelected()
 
 void AnnotationManager::onGroupsUpdated()
 {
+    qDebug() << "AnnotationManager::onGroupsUpdated";
     m_pCommu->publishEvent(EVENT_GROUPS_UPDATED);
 }

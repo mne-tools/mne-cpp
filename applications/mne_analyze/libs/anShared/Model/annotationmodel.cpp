@@ -634,6 +634,9 @@ MatrixXi AnnotationModel::getAnnotationMatrix(int iGroup)
             matEventDataMatrix(i,2) = 1;
         }
     } else {
+        if(iGroup == m_iSelectedGroup){
+            saveGroup();
+        }
         for (int i = 0; i < m_mAnnotationHub[iGroup]->dataSamples_Filtered.size(); i++){
             matEventDataMatrix(i,0) = m_mAnnotationHub[iGroup]->dataSamples_Filtered[i];
             matEventDataMatrix(i,1) = 0;
@@ -680,13 +683,7 @@ void AnnotationModel::switchGroup(int iGroupIndex)
     beginResetModel();
 
     if ((!m_dataSamples.isEmpty()) && (m_iSelectedGroup != ALLGROUPS)){
-        m_mAnnotationHub[m_iSelectedGroup]->dataSamples = m_dataSamples;
-        m_mAnnotationHub[m_iSelectedGroup]->dataTypes = m_dataTypes;
-        m_mAnnotationHub[m_iSelectedGroup]->dataIsUserEvent = m_dataIsUserEvent;
-
-        m_mAnnotationHub[m_iSelectedGroup]->dataSamples_Filtered = m_dataSamplesFiltered;
-        m_mAnnotationHub[m_iSelectedGroup]->dataTypes_Filtered = m_dataTypesFiltered;
-        m_mAnnotationHub[m_iSelectedGroup]->dataIsUserEvent_Filtered = m_dataIsUserEventFiltered;
+        saveGroup();
     }
 
     m_dataSamples = m_mAnnotationHub[iGroupIndex]->dataSamples;
@@ -738,13 +735,7 @@ void AnnotationModel::showAll(bool bSet)
 
     if (bSet) {
         if ((!m_dataSamples.isEmpty()) && (m_iSelectedGroup != ALLGROUPS)){
-            m_mAnnotationHub[m_iSelectedGroup]->dataSamples = m_dataSamples;
-            m_mAnnotationHub[m_iSelectedGroup]->dataTypes = m_dataTypes;
-            m_mAnnotationHub[m_iSelectedGroup]->dataIsUserEvent = m_dataIsUserEvent;
-
-            m_mAnnotationHub[m_iSelectedGroup]->dataSamples_Filtered = m_dataSamplesFiltered;
-            m_mAnnotationHub[m_iSelectedGroup]->dataTypes_Filtered = m_dataTypesFiltered;
-            m_mAnnotationHub[m_iSelectedGroup]->dataIsUserEvent_Filtered = m_dataIsUserEventFiltered;
+            saveGroup();
         }
 
         m_iSelectedGroup = ALLGROUPS;
@@ -873,4 +864,29 @@ void AnnotationModel::setGroupName(int iGroupIndex,
 const QString& AnnotationModel::getGroupName(int iGroupIndex)
 {
     return m_mAnnotationHub[iGroupIndex]->groupName;
+}
+
+//=============================================================================================================
+
+int AnnotationModel::getIndexFromName(const QString &groupName)
+{
+    for(EventGroup* group : m_mAnnotationHub){
+        if(group->groupName == groupName){
+            return group->groupNumber;
+        }
+    }
+    return 9999;
+}
+
+//=============================================================================================================
+
+void AnnotationModel::saveGroup()
+{
+    m_mAnnotationHub[m_iSelectedGroup]->dataSamples = m_dataSamples;
+    m_mAnnotationHub[m_iSelectedGroup]->dataTypes = m_dataTypes;
+    m_mAnnotationHub[m_iSelectedGroup]->dataIsUserEvent = m_dataIsUserEvent;
+
+    m_mAnnotationHub[m_iSelectedGroup]->dataSamples_Filtered = m_dataSamplesFiltered;
+    m_mAnnotationHub[m_iSelectedGroup]->dataTypes_Filtered = m_dataTypesFiltered;
+    m_mAnnotationHub[m_iSelectedGroup]->dataIsUserEvent_Filtered = m_dataIsUserEventFiltered;
 }
