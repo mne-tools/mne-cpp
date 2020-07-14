@@ -232,6 +232,12 @@ private:
      */
     void onChannelButtonClicked();
 
+    //=========================================================================================================
+    /**
+     * Connected to GUI dropdown to select group based on group name input.
+     *
+     * @param[in] text  name of group selected in the GUI
+     */
     void onChangeGroupSelect(const QString &text);
 
     //=========================================================================================================
@@ -247,6 +253,9 @@ private:
     void clearAveraging();
 
     //=========================================================================================================
+    /**
+     * Updates the dropdown display for selecting from which group to average
+     */
     void updateGroups();
 
     //=========================================================================================================
@@ -292,7 +301,7 @@ private:
     bool                                                    m_bPerformFiltering;        /**< Flag whether to activate/deactivate filtering. */
     RTPROCESSINGLIB::FilterKernel                           m_filterKernel;             /**< List of currently active filters. */
 
-    int                                                     m_iCurrentGroup;
+    int                                                     m_iCurrentGroup;            /**< Event group from which to compute average. 9999 for current selection */
 };
 
 } // NAMESPACE
