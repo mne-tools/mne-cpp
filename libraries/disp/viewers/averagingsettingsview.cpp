@@ -224,6 +224,9 @@ void AveragingSettingsView::redrawGUI()
     connect(m_pUi->m_checkBox_reject, &QCheckBox::clicked,
             this, &AveragingSettingsView::changeDropActive);
 
+    connect(m_pUi->comboBox_EventGroup, &QComboBox::currentTextChanged,
+            this, &AveragingSettingsView::changeGroupSelect, Qt::UniqueConnection);
+
     m_pUi->m_pushButton_compute->hide();
     m_pUi->m_checkBox_reject->hide();
     m_pUi->label_2_EventGroup->hide();
@@ -439,4 +442,28 @@ void AveragingSettingsView::onChangeStimChannel()
     emit changeStimChannel(m_sCurrentStimChan);
 
     saveSettings();
+}
+
+//=============================================================================================================
+
+void AveragingSettingsView::addSelectionGroup(const QString& sGroupName)
+{
+    qDebug() << "AveragingSettingsView::addSelectionGroup";
+    m_pUi->comboBox_EventGroup->addItem(sGroupName);
+}
+
+//=============================================================================================================
+
+void AveragingSettingsView::clearSelectionGroup()
+{
+    qDebug() << "AveragingSettingsView::clearSelectionGroup";
+    m_pUi->comboBox_EventGroup->clear();
+    m_pUi->comboBox_EventGroup->addItem("Current Selection");
+}
+
+//=============================================================================================================
+
+QString AveragingSettingsView::getCurrentSelectGroup()
+{
+    return m_pUi->comboBox_EventGroup->currentText();
 }
