@@ -117,7 +117,13 @@ public:
 
     int getPostStimMSeconds();
 
+    QString getCurrentSelectGroup();
+
     void setDetectedEpochs(const FIFFLIB::FiffEvokedSet& evokedSet);
+
+    void addSelectionGroup(const QString& sGroupName);
+
+    void clearSelectionGroup();
 
     //=========================================================================================================
     /**
@@ -186,6 +192,7 @@ signals:
     void changeAverageMode(qint32 index);
     void calculateAverage(bool state);
     void changeDropActive(bool state);
+    void changeGroupSelect(const QString &text);
 };
 } // NAMESPACE
 
