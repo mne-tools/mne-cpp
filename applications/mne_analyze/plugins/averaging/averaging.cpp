@@ -98,6 +98,7 @@ Averaging::Averaging()
 , m_pAnnCheck(Q_NULLPTR)
 , m_pStimCheck(Q_NULLPTR)
 , m_bPerformFiltering(false)
+, m_iCurrentGroup(9999)
 {
 }
 
@@ -381,7 +382,7 @@ void Averaging::computeAverage()
     FIFFLIB::FiffRawData* pFiffRaw = this->m_pFiffRawModel->getFiffIO()->m_qlistRaw.first().data();
 
     if (m_bUseAnn){
-        matEvents = m_pFiffRawModel->getAnnotationModel()->getAnnotationMatrix();
+        matEvents = m_pFiffRawModel->getAnnotationModel()->getAnnotationMatrix(m_iCurrentGroup);
     } else {
         //NOT IMPLEMENTED
     }
@@ -562,6 +563,10 @@ void Averaging::loadFullGui()
     connect(pChannelDataSettingsView, &DISPLIB::FiffRawViewSettings::makeScreenshot,
             this, &Averaging::onMakeScreenshot, Qt::UniqueConnection);
 
+    connect(m_pAveragingSettingsView, &DISPLIB::AveragingSettingsView::changeGroupSelect,
+            this, &Averaging::onChangeGroupSelect, Qt::UniqueConnection);
+
+    onChangeGroupSelect(m_pAveragingSettingsView->getCurrentSelectGroup());
     m_pAverageLayoutView->setBackgroundColor(pChannelDataSettingsView->getBackgroundColor());
     m_pButterflyView->setBackgroundColor(pChannelDataSettingsView->getBackgroundColor());
 
@@ -638,5 +643,18 @@ void Averaging::onMakeScreenshot(const QString& imageType)
 
 void Averaging::updateGroups()
 {
+    qDebug() << "Averaging::updateGroups";
+    m_pAveragingSettingsView->clearSelectionGroup();
+    for(int i = 0; i < m_pFiffRawModel->getAnnotationModel()->getHubSize(); i++){
+        m_pAveragingSettingsView->addSelectionGroup(m_pFiffRawModel->getAnnotationModel().get()->getGroupName(i));
+    }
+}
 
+//=============================================================================================================
+
+void Averaging::onChangeGroupSelect(const QString &text)
+{
+    qDebug() << "Averaging::onChangeGroupSelect -- " << text;
+    m_iCurrentGroup = m_pFiffRawModel->getAnnotationModel()->getIndexFromName(text);
+    qDebug() << "index" << m_iCurrentGroup;
 }
