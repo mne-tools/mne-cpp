@@ -691,7 +691,7 @@ bool AnnotationSettingsView::newStimGroup(const QString &sName,
 {
     qDebug() << "[AnnotationSettingsView::newStimGroup]";
 
-    int iCat = m_pAnnModel->createGroup(sName + "_" + QString(iType),
+    int iCat = m_pAnnModel->createGroup(sName + "_" + QString::number(iType),
                                         false,
                                         iType,
                                         groupColor);
