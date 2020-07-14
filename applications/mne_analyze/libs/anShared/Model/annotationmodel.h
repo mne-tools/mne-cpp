@@ -388,6 +388,9 @@ public:
     int getIndexCount();
 
     //=========================================================================================================
+    int getIndexFromName(const QString& groupName);
+
+    //=========================================================================================================
     /**
      * Retruns the group of the event pointed to by parameter iIndex
      *
@@ -431,8 +434,11 @@ public:
     void setGroupColor(int iGroupIndex,
                        const QColor& groupColor);
 
+    //=========================================================================================================
     void setGroupName(int iGroupIndex,
                       const QString& groupName);
+
+    void saveGroup();
 
     const QString& getGroupName(int iGroupIndex);
     //=========================================================================================================

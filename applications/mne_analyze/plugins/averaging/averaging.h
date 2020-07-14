@@ -232,6 +232,8 @@ private:
      */
     void onChannelButtonClicked();
 
+    void onChangeGroupSelect(const QString &text);
+
     //=========================================================================================================
     /**
      *  Loads averging GUI components that are dependent on FiffRawModel to be initialized
@@ -290,6 +292,7 @@ private:
     bool                                                    m_bPerformFiltering;        /**< Flag whether to activate/deactivate filtering. */
     RTPROCESSINGLIB::FilterKernel                           m_filterKernel;             /**< List of currently active filters. */
 
+    int                                                     m_iCurrentGroup;
 };
 
 } // NAMESPACE

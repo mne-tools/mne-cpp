@@ -329,6 +329,8 @@ void AnnotationSettingsView::disconnectFromModel()
             this, &AnnotationSettingsView::renameGroup);
     disconnect(m_pUi->m_pushButtonStim, &QPushButton::clicked,
             this, &AnnotationSettingsView::onStimButtonClicked);
+    disconnect(m_pTriggerDetectView.data(), &DISPLIB::TriggerDetectionView::detectTriggers,
+            this, &AnnotationSettingsView::onDetectTriggers);
 
     saveGroupSettings();
 }
