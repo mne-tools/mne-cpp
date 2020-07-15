@@ -239,14 +239,14 @@ void TriggerDetectionView::updateProcessingMode(ProcessingMode mode)
             m_pUi->m_pushButton_DetectTriggers->show();
             break;
         default: // default is realtime mode
-        m_pUi->label->show();
-        m_pUi->label_9->show();
-        m_pUi->m_pushButton_resetNumberTriggers->show();
-        m_pUi->m_pushButton_triggerColor->show();
-        m_pUi->m_checkBox_activateTriggerDetection->show();
-        m_pUi->m_comboBox_triggerColorType->show();
-        m_pUi->m_label_numberDetectedTriggers->show();
-        m_pUi->m_pushButton_DetectTriggers->hide();
+            m_pUi->label->show();
+            m_pUi->label_9->show();
+            m_pUi->m_pushButton_resetNumberTriggers->show();
+            m_pUi->m_pushButton_triggerColor->show();
+            m_pUi->m_checkBox_activateTriggerDetection->show();
+            m_pUi->m_comboBox_triggerColorType->show();
+            m_pUi->m_label_numberDetectedTriggers->show();
+            m_pUi->m_pushButton_DetectTriggers->hide();
             break;
     }
 }
@@ -309,6 +309,9 @@ void TriggerDetectionView::onResetTriggerNumbers()
 
 void TriggerDetectionView::onDetectTriggers()
 {
+    if(m_pUi->m_comboBox_triggerChannels->currentText() == ""){
+        return;
+    }
     emit detectTriggers(m_pUi->m_comboBox_triggerChannels->currentText(),
                         m_pUi->m_doubleSpinBox_detectionThresholdFirst->value()*pow(10, m_pUi->m_spinBox_detectionThresholdSecond->value()));
 }

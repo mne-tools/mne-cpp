@@ -286,9 +286,20 @@ private:
                       int iType = 0,
                       bool bDefaultColor = false);
 
+    //=========================================================================================================
+    /**
+     * Creates a new group based on Stim channel triggers
+     *
+     * @param[in] sName         group name
+     * @param[in] iType         group default type
+     * @param[in] groupColor    group color
+     *
+     * @return      returns whether group creation was succesful
+     */
     bool newStimGroup(const QString& sName,
                       int iType,
                       const QColor &groupColor = Qt::black);
+
     //=========================================================================================================
     /**
      * Deletes selected event group
@@ -328,6 +339,7 @@ private:
     //=========================================================================================================
     /**
      * Brings up a menu for interacting with events
+     *
      * @param[in] pos   Position on screen where the menu will show up
      */
     void customEventContextMenuRequested(const QPoint &pos);
@@ -335,6 +347,7 @@ private:
     //=========================================================================================================
     /**
      * Brings up a menu for interacting with event groups
+     *
      * @param[in] pos   Position on screen where the menu will show up
      */
     void customGroupContextMenuRequested(const QPoint &pos);
@@ -351,7 +364,7 @@ private:
      * as events in Event groups sroted by channel and type
      *
      * @param[in] sChannelName      name of stim channel from which we will be reading
-     * @param dThreshold            threshold for a spike to count as a trigger
+     * @param[in] dThreshold        threshold for a spike to count as a trigger
      */
     void onDetectTriggers(const QString& sChannelName,
                           double dThreshold);
