@@ -118,7 +118,8 @@ public:
      * @param [in] totalNumberDetections     The numger of detected triggers
      * @param [in] mapDetectedTriggers       The currently detected triggers
      */
-    void setNumberDetectedTriggersAndTypes(int totalNumberDetections, const QMap<int,QList<QPair<int,double> > >& mapDetectedTriggers);
+    void setNumberDetectedTriggersAndTypes(int totalNumberDetections,
+                                           const QMap<int,QList<QPair<int,double> > >& mapDetectedTriggers);
 
     //=========================================================================================================
     /**
@@ -175,7 +176,7 @@ protected:
 
     //=========================================================================================================
     /**
-     * Slot called when detect triggers is
+     * Slot called when detect triggers is pressed
      */
     void onDetectTriggers();
 
@@ -198,9 +199,18 @@ signals:
     /**
      * Emit this signal whenever the trigger infomration changed.
      */
-    void triggerInfoChanged(const QMap<double, QColor>& value, bool active, const QString& triggerCh, double threshold);
+    void triggerInfoChanged(const QMap<double,
+                            QColor>& value,
+                            bool active,
+                            const QString& triggerCh,
+                            double threshold);
 
-    void detectTriggers(const QString& sChannelName, double iThreshold);
+    //=========================================================================================================
+    /**
+     * Emit this signal when user clicks detect trigger button.
+     */
+    void detectTriggers(const QString& sChannelName,
+                        double iThreshold);
 };
 } // NAMESPACE
 

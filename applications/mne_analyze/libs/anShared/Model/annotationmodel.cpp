@@ -627,6 +627,7 @@ MatrixXi AnnotationModel::getAnnotationMatrix(int iGroup)
     MatrixXi matEventDataMatrix;
 
     if(iGroup == 9999){
+        //Current selecting in Event Plugin
         matEventDataMatrix.resize(getNumberOfAnnotations(), 3);
         for (int i = 0; i < getNumberOfAnnotations(); i++){
             matEventDataMatrix(i,0) = getAnnotation(i);
@@ -634,6 +635,7 @@ MatrixXi AnnotationModel::getAnnotationMatrix(int iGroup)
             matEventDataMatrix(i,2) = 1;
         }
     } else {
+        //User selection on dropdown
         if(iGroup == m_iSelectedGroup){
             saveGroup();
         }

@@ -60,8 +60,6 @@
 #include <fiff/fiff_evoked.h>
 #include <fiff/fiff_info.h>
 
-#include <iostream>
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -341,22 +339,12 @@ void Averaging::onComputeButtonClicked(bool bChecked)
 
 void Averaging::computeAverage()
 {
-    std::cout << "1";
     if(!m_pFiffRawModel){
         qWarning() << "No model loaded. Cannot calculate average";
         return;
     }
 
-    std::cout << "2";
-
-    if(m_pFiffRawModel->getAnnotationModel()->getNumberOfAnnotations() < 2){
-        qWarning() << "Not enough data points to calculate average.";
-        return;
-    }
-
     clearAveraging();
-
-    std::cout << "3";
 
     MatrixXi matEvents;
     QMap<QString,double> mapReject;
@@ -365,14 +353,14 @@ void Averaging::computeAverage()
     int iType = 1; //hardwired for now, change later to type
     mapReject.insert("eog", 300e-06);
 
-    std::cout << "4";
-
     FIFFLIB::FiffRawData* pFiffRaw = this->m_pFiffRawModel->getFiffIO()->m_qlistRaw.first().data();
 
     matEvents = m_pFiffRawModel->getAnnotationModel()->getAnnotationMatrix(m_iCurrentGroup);
 
-    std::cout << "5";
-    std::cout << matEvents;
+    if(matEvents.size() < 6){
+        qWarning() << "Not enough data points to calculate average.";
+        return;
+    }
 
     if(m_bPerformFiltering) {
         *m_pFiffEvoked = RTPROCESSINGLIB::computeFilteredAverage(*pFiffRaw,
@@ -397,8 +385,6 @@ void Averaging::computeAverage()
                                                          mapReject);
     }
 
-    std::cout << "6";
-
     m_pFiffEvokedSet = QSharedPointer<FIFFLIB::FiffEvokedSet>(new FIFFLIB::FiffEvokedSet());
     m_pFiffEvokedSet->evoked.append(*(m_pFiffEvoked.data()));
     m_pFiffEvokedSet->info = *(m_pFiffRawModel->getFiffInfo().data());
@@ -408,8 +394,6 @@ void Averaging::computeAverage()
         m_pFiffEvokedSet->evoked[0].baseline.second = m_fBaselineToS;
     }
 
-    std::cout << "7";
-
     m_pEvokedModel->setEvokedSet(m_pFiffEvokedSet);
 
     m_pButterflyView->setEvokedSetModel(m_pEvokedModel);
@@ -417,8 +401,6 @@ void Averaging::computeAverage()
 
     m_pButterflyView->setChannelInfoModel(m_pChannelInfoModel);
     m_pAverageLayoutView->setChannelInfoModel(m_pChannelInfoModel);
-
-    std::cout << "8";
 
     m_pButterflyView->dataUpdate();
     m_pButterflyView->updateView();
@@ -625,7 +607,6 @@ void Averaging::onMakeScreenshot(const QString& imageType)
 
 void Averaging::updateGroups()
 {
-    qDebug() << "Averaging::updateGroups";
     m_pAveragingSettingsView->clearSelectionGroup();
     for(int i = 0; i < m_pFiffRawModel->getAnnotationModel()->getHubSize(); i++){
         m_pAveragingSettingsView->addSelectionGroup(m_pFiffRawModel->getAnnotationModel().get()->getGroupName(i));
@@ -636,7 +617,5 @@ void Averaging::updateGroups()
 
 void Averaging::onChangeGroupSelect(const QString &text)
 {
-    qDebug() << "Averaging::onChangeGroupSelect -- " << text;
     m_iCurrentGroup = m_pFiffRawModel->getAnnotationModel()->getIndexFromName(text);
-    qDebug() << "index" << m_iCurrentGroup;
 }

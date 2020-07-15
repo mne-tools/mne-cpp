@@ -332,6 +332,7 @@ void AnnotationSettingsView::disconnectFromModel()
     disconnect(m_pTriggerDetectView.data(), &DISPLIB::TriggerDetectionView::detectTriggers,
             this, &AnnotationSettingsView::onDetectTriggers);
 
+
     saveGroupSettings();
 }
 
@@ -613,8 +614,6 @@ void AnnotationSettingsView::onStimFiffInfo(const QSharedPointer<FIFFLIB::FiffIn
 
 void AnnotationSettingsView::onDetectTriggers(const QString &sChannelName, double dThreshold)
 {
-    qDebug() << "[AnnotationSettingsView::onDetectTriggers] Channel:" << sChannelName << " Threshold:" << dThreshold;
-
     int iCurrentTriggerChIndex = 9999;
 
     for(int i = 0; i < m_pFiffInfo->chs.size(); ++i) {
@@ -635,19 +634,11 @@ void AnnotationSettingsView::onDetectTriggers(const QString &sChannelName, doubl
     pFiffRaw->read_raw_segment(mSampleData,
                                mSampleTimes);
 
-    qDebug() << "[AnnotationSettingsView::onDetectTriggers] iCurrentTriggerChIndex:" << iCurrentTriggerChIndex;
-
     QList<QPair<int,double>> detectedTriggerSamples = RTPROCESSINGLIB::detectTriggerFlanksMax(mSampleData,
                                                                                               iCurrentTriggerChIndex,
                                                                                               0,
                                                                                               dThreshold,
                                                                                               0);
-
-//    qDebug() << "[AnnotationSettingsView::onDetectTriggers] -- Sample Data";
-//    std::cout << mSampleData;
-
-//    qDebug() << "[AnnotationSettingsView::onDetectTriggers] -- Sample Times";
-//    std::cout << mSampleTimes;
 
     QMap<double,QList<int>> mEventsinTypes;
 
@@ -689,8 +680,6 @@ bool AnnotationSettingsView::newStimGroup(const QString &sName,
                                           int iType,
                                           const QColor &groupColor)
 {
-    qDebug() << "[AnnotationSettingsView::newStimGroup]";
-
     int iCat = m_pAnnModel->createGroup(sName + "_" + QString::number(iType),
                                         false,
                                         iType,

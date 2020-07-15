@@ -448,7 +448,6 @@ void AveragingSettingsView::onChangeStimChannel()
 
 void AveragingSettingsView::addSelectionGroup(const QString& sGroupName)
 {
-    qDebug() << "AveragingSettingsView::addSelectionGroup";
     m_pUi->comboBox_EventGroup->addItem(sGroupName);
 }
 
@@ -456,7 +455,6 @@ void AveragingSettingsView::addSelectionGroup(const QString& sGroupName)
 
 void AveragingSettingsView::clearSelectionGroup()
 {
-    qDebug() << "AveragingSettingsView::clearSelectionGroup";
     m_pUi->comboBox_EventGroup->clear();
     m_pUi->comboBox_EventGroup->addItem("Current Selection");
 }
