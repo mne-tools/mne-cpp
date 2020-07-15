@@ -60,6 +60,7 @@
 #include <fiff/fiff_evoked.h>
 #include <fiff/fiff_info.h>
 
+#include <iostream>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -91,12 +92,9 @@ Averaging::Averaging()
 , m_fPreStim(0)
 , m_fPostStim(0)
 , m_fTriggerThreshold(0.5)
-, m_bUseAnn(1)
 , m_bBasline(0)
 , m_bRejection(0)
 , m_bLoaded(0)
-, m_pAnnCheck(Q_NULLPTR)
-, m_pStimCheck(Q_NULLPTR)
 , m_bPerformFiltering(false)
 , m_iCurrentGroup(9999)
 {
@@ -209,32 +207,15 @@ QDockWidget* Averaging::getControl()
 
     m_pAveragingSettingsView->setProcessingMode(DISPLIB::AbstractView::ProcessingMode::Offline);
 
-    // Buttons
-    m_pAnnCheck = new QRadioButton("Average with annotations");
-    m_pStimCheck = new QRadioButton("Average with stim channels");
-
-    connect(m_pAnnCheck, &QRadioButton::toggled,
-            this, &Averaging::onCheckBoxStateChanged, Qt::UniqueConnection);
-    connect(m_pStimCheck, &QRadioButton::toggled,
-            this, &Averaging::onCheckBoxStateChanged, Qt::UniqueConnection);
-
-    //Sets Default state
-    m_pAnnCheck->click();
-    //m_pStimCheck->click();
-
     QGroupBox* pGBox = new QGroupBox();
     QVBoxLayout* pVBLayout = new QVBoxLayout();
 
     pGBox->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
-    pVBLayout->addWidget(m_pAnnCheck);
-    pVBLayout->addWidget(m_pStimCheck);
 
 
     pGBox->setLayout(pVBLayout);
 
     m_pLayout->addWidget(m_pAveragingSettingsView);
-//    m_pLayout->addWidget(m_pAnnCheck);
-//    m_pLayout->addWidget(m_pStimCheck);
 
     pWidget->setLayout(m_pLayout);
 
@@ -360,10 +341,13 @@ void Averaging::onComputeButtonClicked(bool bChecked)
 
 void Averaging::computeAverage()
 {
+    std::cout << "1";
     if(!m_pFiffRawModel){
         qWarning() << "No model loaded. Cannot calculate average";
         return;
     }
+
+    std::cout << "2";
 
     if(m_pFiffRawModel->getAnnotationModel()->getNumberOfAnnotations() < 2){
         qWarning() << "Not enough data points to calculate average.";
@@ -372,6 +356,8 @@ void Averaging::computeAverage()
 
     clearAveraging();
 
+    std::cout << "3";
+
     MatrixXi matEvents;
     QMap<QString,double> mapReject;
 
@@ -379,13 +365,14 @@ void Averaging::computeAverage()
     int iType = 1; //hardwired for now, change later to type
     mapReject.insert("eog", 300e-06);
 
+    std::cout << "4";
+
     FIFFLIB::FiffRawData* pFiffRaw = this->m_pFiffRawModel->getFiffIO()->m_qlistRaw.first().data();
 
-    if (m_bUseAnn){
-        matEvents = m_pFiffRawModel->getAnnotationModel()->getAnnotationMatrix(m_iCurrentGroup);
-    } else {
-        //NOT IMPLEMENTED
-    }
+    matEvents = m_pFiffRawModel->getAnnotationModel()->getAnnotationMatrix(m_iCurrentGroup);
+
+    std::cout << "5";
+    std::cout << matEvents;
 
     if(m_bPerformFiltering) {
         *m_pFiffEvoked = RTPROCESSINGLIB::computeFilteredAverage(*pFiffRaw,
@@ -410,6 +397,8 @@ void Averaging::computeAverage()
                                                          mapReject);
     }
 
+    std::cout << "6";
+
     m_pFiffEvokedSet = QSharedPointer<FIFFLIB::FiffEvokedSet>(new FIFFLIB::FiffEvokedSet());
     m_pFiffEvokedSet->evoked.append(*(m_pFiffEvoked.data()));
     m_pFiffEvokedSet->info = *(m_pFiffRawModel->getFiffInfo().data());
@@ -419,6 +408,8 @@ void Averaging::computeAverage()
         m_pFiffEvokedSet->evoked[0].baseline.second = m_fBaselineToS;
     }
 
+    std::cout << "7";
+
     m_pEvokedModel->setEvokedSet(m_pFiffEvokedSet);
 
     m_pButterflyView->setEvokedSetModel(m_pEvokedModel);
@@ -427,22 +418,13 @@ void Averaging::computeAverage()
     m_pButterflyView->setChannelInfoModel(m_pChannelInfoModel);
     m_pAverageLayoutView->setChannelInfoModel(m_pChannelInfoModel);
 
+    std::cout << "8";
+
     m_pButterflyView->dataUpdate();
     m_pButterflyView->updateView();
     m_pAverageLayoutView->updateData();
 
     qInfo() << "[Averaging::computeAverage] Average computed.";
-}
-
-//=============================================================================================================
-
-void Averaging::onCheckBoxStateChanged()
-{
-    if (m_pAnnCheck->isChecked()){
-        m_bUseAnn = true;
-    } else {
-        m_bUseAnn = false;
-    }
 }
 
 //=============================================================================================================
