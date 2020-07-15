@@ -204,12 +204,16 @@ QDockWidget* Averaging::getControl()
             this, &Averaging::onRejectionChecked, Qt::UniqueConnection);
 
     m_pAveragingSettingsView->setProcessingMode(DISPLIB::AbstractView::ProcessingMode::Offline);
+    m_pAveragingSettingsView->setSizePolicy(QSizePolicy::Expanding,
+                                            QSizePolicy::Minimum);
 
     QGroupBox* pGBox = new QGroupBox();
     QVBoxLayout* pVBLayout = new QVBoxLayout();
 
-    pGBox->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
-
+    pGBox->setSizePolicy(QSizePolicy::Expanding,
+                         QSizePolicy::Minimum);
+    pWidget->setSizePolicy(QSizePolicy::Expanding,
+                           QSizePolicy::Minimum);
 
     pGBox->setLayout(pVBLayout);
 

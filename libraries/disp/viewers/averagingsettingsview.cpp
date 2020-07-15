@@ -75,7 +75,7 @@ AveragingSettingsView::AveragingSettingsView(const QString& sSettingsPath,
 
     this->setWindowTitle("Averaging Settings");
     this->setMinimumWidth(330);
-    this->setMaximumWidth(330);
+    //this->setMaximumWidth(330);
 
     loadSettings();
     redrawGUI();
