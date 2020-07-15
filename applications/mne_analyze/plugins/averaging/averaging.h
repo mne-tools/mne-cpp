@@ -206,12 +206,6 @@ private:
      */
     void computeAverage();
 
-    //=========================================================================================================
-    /**
-     * Saves state of 'use averaging / use stim' checkboxes based on gui
-     */
-    void onCheckBoxStateChanged();
-
 //    //=========================================================================================================
 //    /**
 //     * Change the stim channel
@@ -290,15 +284,11 @@ private:
     QVBoxLayout*                                            m_pLayout;                  /**< Pointer to layout that holds parameter GUI tab elements */
     QTabWidget*                                             m_pTabView;                 /**< Pointer to object that stores multiple tabs of GUI items */
 
-    bool                                                    m_bUseAnn;                  /**< Whether to use annotations to compute average. Currently always set to true (1) */
     bool                                                    m_bBasline;                 /**< Whether to apply baseline correction */
     bool                                                    m_bRejection;               /**< Whether to drop data points marked fro rejection when calculating average */
     bool                                                    m_bLoaded;                  /**< Whether the full GUI has already been laoaded */
-
-    QRadioButton*                                           m_pAnnCheck;                /**< Radio Buttons to control m_bUseAnn. True (1) if this is checked. */
-    QRadioButton*                                           m_pStimCheck;               /**< Radio Buttons to control m_bUseAnn. False (0) if this is checked. */
-
     bool                                                    m_bPerformFiltering;        /**< Flag whether to activate/deactivate filtering. */
+
     RTPROCESSINGLIB::FilterKernel                           m_filterKernel;             /**< List of currently active filters. */
 
     int                                                     m_iCurrentGroup;            /**< Event group from which to compute average. 9999 for current selection */
