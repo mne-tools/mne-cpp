@@ -625,9 +625,9 @@ void AnnotationModel::appendSelected(int iSelectedIndex)
 MatrixXi AnnotationModel::getAnnotationMatrix(int iGroup)
 {
     MatrixXi matEventDataMatrix;
-    matEventDataMatrix.resize(getNumberOfAnnotations(), 3);
 
     if(iGroup == 9999){
+        matEventDataMatrix.resize(getNumberOfAnnotations(), 3);
         for (int i = 0; i < getNumberOfAnnotations(); i++){
             matEventDataMatrix(i,0) = getAnnotation(i);
             matEventDataMatrix(i,1) = 0;
@@ -637,6 +637,7 @@ MatrixXi AnnotationModel::getAnnotationMatrix(int iGroup)
         if(iGroup == m_iSelectedGroup){
             saveGroup();
         }
+        matEventDataMatrix.resize(m_mAnnotationHub[iGroup]->dataSamples_Filtered.size(), 3);
         for (int i = 0; i < m_mAnnotationHub[iGroup]->dataSamples_Filtered.size(); i++){
             matEventDataMatrix(i,0) = m_mAnnotationHub[iGroup]->dataSamples_Filtered[i];
             matEventDataMatrix(i,1) = 0;
