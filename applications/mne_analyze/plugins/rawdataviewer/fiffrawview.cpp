@@ -241,7 +241,6 @@ void FiffRawView::resizeEvent(QResizeEvent * event)
 {
     if(m_pTableView) {
         emit tableViewDataWidthChanged(m_pTableView->width()-m_pTableView->columnWidth(0));
-        emit viewHeight(m_pTableView->height());
         m_pTableView->resizeColumnsToContents();
     }
 
@@ -578,11 +577,4 @@ void FiffRawView::updateVerticalScrollPosition(qint32 newScrollPosition)
     if(FiffRawViewDelegate *pDelegate = qobject_cast<FiffRawViewDelegate *>(m_pTableView->itemDelegate())) {
         pDelegate->setUpperItemIndex(m_pTableView->rowAt(0));
     }
-}
-
-//=============================================================================================================
-
-int FiffRawView::getViewHeight()
-{
-    return m_pTableView->height();
 }

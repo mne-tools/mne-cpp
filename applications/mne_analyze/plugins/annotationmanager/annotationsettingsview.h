@@ -140,14 +140,6 @@ public slots:
 
     //=========================================================================================================
     /**
-     * Populates the trigger detect view with the correct channel info
-     *
-     * @param[in] info  data for the trigger view to get a list of the stim channels
-     */
-    void onStimFiffInfo(const QSharedPointer<FIFFLIB::FiffInfo> info);
-
-    //=========================================================================================================
-    /**
      * Update pointer to currently loaded FiffRawViewModel
      *
      * @param[in] pFiffRawModel     saves pointer to ucurrently loaded FiffRawViewModel
@@ -261,6 +253,14 @@ private slots:
      * @param [in] dValue   new time value for selected annotation
      */
     void realTimeDataTime(double dValue);
+
+    //=========================================================================================================
+    /**
+     * Populates the trigger detect view with the correct channel info
+     *
+     * @param[in] info  data for the trigger view to get a list of the stim channels
+     */
+    void initTriggerDetect(const QSharedPointer<FIFFLIB::FiffInfo> info);
 
 private:
     //=========================================================================================================
