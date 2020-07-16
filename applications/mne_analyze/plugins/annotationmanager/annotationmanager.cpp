@@ -203,7 +203,6 @@ void AnnotationManager::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel
         emit newFiffParamsAvailable(pFiffRawModel->absoluteFirstSample(),
                                     pFiffRawModel->absoluteLastSample(),
                                     pFiffRawModel->getFiffInfo()->sfreq);
-        emit stimFiffInfo(pFiffRawModel->getFiffInfo());
         emit newFiffRawViewModel(pFiffRawModel);
     }
 }
