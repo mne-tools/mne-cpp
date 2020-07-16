@@ -604,10 +604,9 @@ void AnnotationSettingsView::onStimButtonClicked()
 
 //=============================================================================================================
 
-void AnnotationSettingsView::onStimFiffInfo(const QSharedPointer<FIFFLIB::FiffInfo>info)
+void AnnotationSettingsView::initTriggerDetect(const QSharedPointer<FIFFLIB::FiffInfo>info)
 {
     m_pTriggerDetectView->init(info);
-    m_pFiffInfo = info;
 }
 
 //=============================================================================================================
@@ -672,6 +671,8 @@ void AnnotationSettingsView::onDetectTriggers(const QString &sChannelName, doubl
 void AnnotationSettingsView::onNewFiffRawViewModel(QSharedPointer<ANSHAREDLIB::FiffRawViewModel> pFiffRawModel)
 {
     m_pFiffRawModel = pFiffRawModel;
+    m_pFiffInfo = m_pFiffRawModel->getFiffInfo();
+    initTriggerDetect(m_pFiffInfo);
 }
 
 //=============================================================================================================

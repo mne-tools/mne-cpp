@@ -261,8 +261,6 @@ public:
      */
     void setFilterChannelType(const QString& channelType);
 
-    int getViewHeight();
-
 signals:
     //=========================================================================================================
     /**
@@ -339,8 +337,6 @@ private:
 
 signals:
     void tableViewDataWidthChanged(int iWidth);
-
-    void viewHeight(int iViewHeight);
 };
 
 //=============================================================================================================

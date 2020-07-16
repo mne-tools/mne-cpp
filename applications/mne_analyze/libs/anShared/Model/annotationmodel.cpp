@@ -857,9 +857,9 @@ void AnnotationModel::setGroupColor(int iGroupIndex,
 //=============================================================================================================
 
 void AnnotationModel::setGroupName(int iGroupIndex,
-                                   const QString &groupName)
+                                   const QString &sGroupName)
 {
-    m_mAnnotationHub[iGroupIndex]->groupName = groupName;
+    m_mAnnotationHub[iGroupIndex]->groupName = sGroupName;
 }
 
 //=============================================================================================================
@@ -871,10 +871,10 @@ const QString& AnnotationModel::getGroupName(int iGroupIndex)
 
 //=============================================================================================================
 
-int AnnotationModel::getIndexFromName(const QString &groupName)
+int AnnotationModel::getIndexFromName(const QString &sGroupName)
 {
     for(EventGroup* group : m_mAnnotationHub){
-        if(group->groupName == groupName){
+        if(group->groupName == sGroupName){
             return group->groupNumber;
         }
     }

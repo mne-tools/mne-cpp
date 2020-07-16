@@ -390,17 +390,17 @@ public:
 
     //=========================================================================================================
     /**
-     * Retruns index of group with name groupName. Returns 9999 if no group present with that name
+     * Retruns index of group with name sGroupName. Returns 9999 if no group present with that name
      *
-     * @param[in] groupName     name of group of which we want the index
+     * @param[in] sGroupName     name of group of which we want the index
      *
-     * @return index of group with name groupName
+     * @return index of group with name sGroupName
      */
-    int getIndexFromName(const QString& groupName);
+    int getIndexFromName(const QString& sGroupName);
 
     //=========================================================================================================
     /**
-     * Retruns the group of the event pointed to by parameter iIndex
+     * Returns the group of the event pointed to by parameter iIndex
      *
      * @param[in] iIndex    Index for which we want to get the group
      *
@@ -444,13 +444,13 @@ public:
 
     //=========================================================================================================
     /**
-     * Sets the name of group at index iGroup index to groupName
+     * Sets the name of group at index iGroup index to sGroupName
      *
      * @param[in] iGroupIndex   index of which group to change
-     * @param[in] groupName     new name for group
+     * @param[in] sGroupName     new name for group
      */
     void setGroupName(int iGroupIndex,
-                      const QString& groupName);
+                      const QString& sGroupName);
 
     //=========================================================================================================
     /**

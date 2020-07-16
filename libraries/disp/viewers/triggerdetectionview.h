@@ -197,13 +197,13 @@ signals:
 
     //=========================================================================================================
     /**
-     * Emit this signal whenever the trigger infomration changed.
+     * Emit this signal whenever the trigger information changed.
      */
     void triggerInfoChanged(const QMap<double,
                             QColor>& value,
-                            bool active,
-                            const QString& triggerCh,
-                            double threshold);
+                            bool bActive,
+                            const QString& sTriggerCh,
+                            double dThreshold);
 
     //=========================================================================================================
     /**
