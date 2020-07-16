@@ -137,7 +137,7 @@ private:
 
     //=============================================================================================================
     /**
-     * Publishes event to force Averaging plugin to update their event group selector
+     * Publishes event to notify that event groups have been changed
      */
     void onGroupsUpdated();
 
@@ -156,7 +156,6 @@ signals:
     void newFiffParamsAvailable(qint32 iFirstSample,
                                 qint32 iLastSample,
                                 float fSFreq);
-    void stimFiffInfo(const QSharedPointer<FIFFLIB::FiffInfo> info);
     void newFiffRawViewModel(QSharedPointer<ANSHAREDLIB::FiffRawViewModel> pFiffRawModel);
 };
 

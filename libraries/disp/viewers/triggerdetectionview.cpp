@@ -78,7 +78,7 @@ TriggerDetectionView::TriggerDetectionView(const QString& sSettingsPath,
     this->setMinimumWidth(330);
     this->setMaximumWidth(330);
 
-    m_pUi->m_pushButton_DetectTriggers->hide();
+    updateProcessingMode(RealTime);
 
     loadSettings();
 }
