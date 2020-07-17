@@ -9,7 +9,7 @@ jobs:
   QtDynamic:
     runs-on: ${{ matrix.os }}
 
-    strategy: 
+    strategy:
       fail-fast: false
       max-parallel: 6
       matrix:
@@ -46,7 +46,7 @@ jobs:
       run: |
         Invoke-WebRequest https://www.dropbox.com/s/dku543gtw7ik7hr/jom.zip?dl=1 -OutFile .\jom.zip
         expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
-        echo "::add-path::$HOME\jom"        
+        echo "::add-path::$HOME\jom"
     - name: Compile BrainFlow submodule (Windows)
       if: matrix.os == 'windows-2016'
       run: |
@@ -89,7 +89,7 @@ jobs:
     - name: Configure and compile MNE-CPP (Windows)
       if: matrix.os == 'windows-2016'
       run: |
-        # Setup VS compiler   
+        # Setup VS compiler
         cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow MNECPP_CONFIG+=withLsl
@@ -98,7 +98,7 @@ jobs:
   QtStatic:
     runs-on: ${{ matrix.os }}
 
-    strategy: 
+    strategy:
       fail-fast: false
       max-parallel: 3
       matrix:
@@ -145,21 +145,21 @@ jobs:
     - name: Configure and compile MNE-CPP (Linux|MacOS)
       if: (matrix.os == 'ubuntu-16.04') || (matrix.os == 'macos-latest')
       run: |
-        ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=static 
+        ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=static
         make -j4
     - name: Configure and compile MNE-CPP (Windows)
       if: matrix.os == 'windows-2016'
       run: |
-        # Setup VS compiler   
+        # Setup VS compiler
         cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         ..\Qt5_binaries\bin\qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=static
         jom -j4
-        
+
   Tests:
     runs-on: ${{ matrix.os }}
 
-    strategy: 
+    strategy:
       fail-fast: false
       max-parallel: 3
       matrix:
@@ -169,7 +169,7 @@ jobs:
     - name: Clone repository
       uses: actions/checkout@v2
     - name: Clone mne-cpp test data
-      run: git clone https://github.com/mne-tools/mne-cpp-test-data.git ./bin/mne-cpp-test-data      
+      run: git clone https://github.com/mne-tools/mne-cpp-test-data.git ./bin/mne-cpp-test-data
     - name: Install Python 3.7 version
       uses: actions/setup-python@v1
       with:
@@ -178,13 +178,13 @@ jobs:
     - name: Install Codecov
       if: matrix.os == 'ubuntu-16.04'
       run: |
-        sudo pip install codecov 
+        sudo pip install codecov
     - name: Install Qt (Linux|MacOS)
       if: (matrix.os == 'ubuntu-16.04') || (matrix.os == 'macos-latest')
       uses: jurplel/install-qt-action@v2
       with:
         version: 5.14.2
-        modules: qtcharts    
+        modules: qtcharts
     - name: Install Qt (Windows)
       if: matrix.os == 'windows-2016'
       uses: jurplel/install-qt-action@v2
@@ -192,7 +192,7 @@ jobs:
         version: 5.14.2
         arch: win64_msvc2017_64
         modules: qtcharts
-    - name: Install jom (Windows) 
+    - name: Install jom (Windows)
       if: matrix.os == 'windows-2016'
       run: |
         Invoke-WebRequest https://www.dropbox.com/s/dku543gtw7ik7hr/jom.zip?dl=1 -OutFile .\jom.zip
@@ -211,7 +211,7 @@ jobs:
     - name: Configure and compile MNE-CPP (Windows)
       if: matrix.os == 'windows-2016'
       run: |
-        # Setup VS compiler   
+        # Setup VS compiler
         cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         qmake -r MNECPP_CONFIG+=noApplications MNECPP_CONFIG+=noExamples
@@ -226,7 +226,7 @@ jobs:
         for test in ./bin/test_*;
         do
           # Run all tests and call gcov on all cpp files after each test run. Then upload to codecov for every test run.
-          # Codecov is able to process multiple uploads and merge them as soon as the CI job is done.            
+          # Codecov is able to process multiple uploads and merge them as soon as the CI job is done.
           echo ">> Starting $test"
           $test
           find ./libraries -type f -name "*.cpp" -execdir gcov {} \; > /dev/null
@@ -260,9 +260,9 @@ jobs:
       uses: actions/checkout@v2
     - name: Install Qt Dev Tools, Doxygen and Graphviz
       run: |
-        # sudo apt-get update -qq
+        sudo apt-get update -qq
         sudo apt-get install -qq qttools5-dev-tools doxygen graphviz
     - name: Run Doxygen and package result
-      run: |        
+      run: |
         cd doc/doxygen
         doxygen mne-cpp_doxyfile
