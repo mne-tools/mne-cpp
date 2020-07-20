@@ -414,7 +414,7 @@ public:
      *
      * @return number of blocks
      */
-    int getWindowSizeBlocks() const;
+    int getTotalBlockCount() const;
 
     //=========================================================================================================
     /**
