@@ -153,9 +153,6 @@ signals:
     void newAnnotationAvailable(int iAnnotation);
     void disconnectFromModel();
     void newAnnotationModelAvailable(QSharedPointer<ANSHAREDLIB::AnnotationModel> pAnnotModel);
-    void newFiffParamsAvailable(qint32 iFirstSample,
-                                qint32 iLastSample,
-                                float fSFreq);
     void newFiffRawViewModel(QSharedPointer<ANSHAREDLIB::FiffRawViewModel> pFiffRawModel);
 };
 

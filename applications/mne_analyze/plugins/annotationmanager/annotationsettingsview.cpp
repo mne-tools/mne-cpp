@@ -611,7 +611,8 @@ void AnnotationSettingsView::initTriggerDetect(const QSharedPointer<FIFFLIB::Fif
 
 //=============================================================================================================
 
-void AnnotationSettingsView::onDetectTriggers(const QString &sChannelName, double dThreshold)
+void AnnotationSettingsView::onDetectTriggers(const QString &sChannelName,
+                                              double dThreshold)
 {
     int iCurrentTriggerChIndex = 9999;
 
@@ -672,6 +673,11 @@ void AnnotationSettingsView::onNewFiffRawViewModel(QSharedPointer<ANSHAREDLIB::F
 {
     m_pFiffRawModel = pFiffRawModel;
     m_pFiffInfo = m_pFiffRawModel->getFiffInfo();
+
+    passFiffParams(pFiffRawModel->absoluteFirstSample(),
+                   pFiffRawModel->absoluteLastSample(),
+                   pFiffRawModel->getFiffInfo()->sfreq);
+
     initTriggerDetect(m_pFiffInfo);
 }
 

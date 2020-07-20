@@ -866,6 +866,10 @@ void AnnotationModel::setGroupName(int iGroupIndex,
 
 const QString& AnnotationModel::getGroupName(int iGroupIndex)
 {
+    if(!m_mAnnotationHub.contains(iGroupIndex)){
+        qWarning() << "[AnnotationModel::getGroupName] Attempting to get name of group with invalid key.";
+    }
+
     return m_mAnnotationHub[iGroupIndex]->groupName;
 }
 

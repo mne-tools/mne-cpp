@@ -113,18 +113,6 @@ public:
 
     //=========================================================================================================
     /**
-     * Used to pass parameters of the currently loaded fif file to the annotation model.
-     *
-     * @param [in] iFirst   Sample number of the first sample in the file
-     * @param [in] iLast    Sample number of the last sample in the file
-     * @param [in] fFreq    Sample frequency for the data in the file
-     */
-    void passFiffParams(int iFirst,
-                        int iLast,
-                        float fFreq);
-
-    //=========================================================================================================
-    /**
      * Disconnects from current model for switching between files
      */
     void disconnectFromModel();
@@ -357,6 +345,18 @@ private:
      * Makes TriggerDetectView vidisble and active
      */
     void onStimButtonClicked();
+
+    //=========================================================================================================
+    /**
+     * Used to pass parameters of the currently loaded fif file to the annotation model.
+     *
+     * @param [in] iFirst   Sample number of the first sample in the file
+     * @param [in] iLast    Sample number of the last sample in the file
+     * @param [in] fFreq    Sample frequency for the data in the file
+     */
+    void passFiffParams(int iFirst,
+                        int iLast,
+                        float fFreq);
 
     //=========================================================================================================
     /**

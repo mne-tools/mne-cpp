@@ -257,7 +257,6 @@ protected:
     QColor      m_colCurrentBackgroundColor;    /**< Current color of the background. */
     QString     m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
 
-    int         m_iViewHeight;
 signals:
     //=========================================================================================================
     /**

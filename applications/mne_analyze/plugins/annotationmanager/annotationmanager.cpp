@@ -137,9 +137,6 @@ QDockWidget *AnnotationManager::getControl()
     connect(this, &AnnotationManager::newAnnotationModelAvailable,
             pAnnotationSettingsView, &AnnotationSettingsView::setModel, Qt::UniqueConnection);
 
-    connect(this, &AnnotationManager::newFiffParamsAvailable,
-            pAnnotationSettingsView, &AnnotationSettingsView::passFiffParams, Qt::UniqueConnection);
-
     connect(m_pAnalyzeData.data(), &AnalyzeData::modelIsEmpty,
             pAnnotationSettingsView, &AnnotationSettingsView::reset, Qt::UniqueConnection);
 
@@ -200,9 +197,6 @@ void AnnotationManager::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel
         FiffRawViewModel::SPtr pFiffRawModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
 
         emit newAnnotationModelAvailable(pFiffRawModel->getAnnotationModel());
-        emit newFiffParamsAvailable(pFiffRawModel->absoluteFirstSample(),
-                                    pFiffRawModel->absoluteLastSample(),
-                                    pFiffRawModel->getFiffInfo()->sfreq);
         emit newFiffRawViewModel(pFiffRawModel);
     }
 }
@@ -234,6 +228,5 @@ void AnnotationManager::onJumpToSelected()
 
 void AnnotationManager::onGroupsUpdated()
 {
-    qDebug() << "AnnotationManager::onGroupsUpdated";
     m_pCommu->publishEvent(EVENT_GROUPS_UPDATED);
 }
