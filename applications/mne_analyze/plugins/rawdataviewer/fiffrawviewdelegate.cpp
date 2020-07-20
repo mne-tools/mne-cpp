@@ -132,6 +132,9 @@ void FiffRawViewDelegate::paint(QPainter *painter,
                 const FiffRawViewModel* pFiffRawModel = static_cast<const FiffRawViewModel*>(index.model());
 
                 int pos = pFiffRawModel->pixelDifference() * (pFiffRawModel->currentFirstSample() - pFiffRawModel->absoluteFirstSample());
+                qDebug() << "pos" << pos;
+                qDebug() << "pFiffRawModel->currentFirstSample()" << pFiffRawModel->currentFirstSample();
+                qDebug() << "pFiffRawModel->absoluteFirstSample()" << pFiffRawModel->absoluteFirstSample();
 
                 QPainterPath path = QPainterPath(QPointF(option.rect.x()+pos, option.rect.y()));
 //                QPainterPath path  = QPainterPath(QPointF(option.rect.x(),option.rect.y()));
@@ -242,6 +245,7 @@ void FiffRawViewDelegate::createPlotPath(const QStyleOptionViewItem &option,
     if (iPaintStep < 2){
         iPaintStep = 1;
     }
+    iPaintStep = 1;
 
     for(unsigned int j = 0; j < data.size(); j = j + iPaintStep) {
         dValue = data[j] * dScaleY;
@@ -250,7 +254,13 @@ void FiffRawViewDelegate::createPlotPath(const QStyleOptionViewItem &option,
         newY = y_base - dValue;
         //qDebug() << "data:" << dValue;
         qSamplePosition.setY(newY);
+
+        // Multiply by dDx because we need to take into account different visible window sizes specified by the user.
+        // The spacing we use to paint the samples is therefore dependent on how much data we plot (in samples) in
+        // the GUI view with user selected width (in pixels). This relationship is calculated in the FiffRawView
+        // and is reflected by dDx
         qSamplePosition.setX(path.currentPosition().x() + (dDx * (float)iPaintStep));
+
         path.lineTo(qSamplePosition);
     }
 //    for(int j = iPaintStep; j < data.size(); j = j + iPaintStep) {
@@ -291,7 +301,7 @@ void FiffRawViewDelegate::createTimeSpacersPath(const QModelIndex &index,
     float fTop = option.rect.topLeft().y();
     float fBottom = option.rect.bottomRight().y();
 
-    for(int j = 0; j < (1.5 * iSpacersPerSecond * t_pModel->getWindowSizeBlocks()); j++) {
+    for(int j = 0; j < (1.5 * iSpacersPerSecond * t_pModel->getTotalBlockCount()); j++) {
         //draw vertical line
         path.moveTo(path.currentPosition().x(), fTop);
         path.lineTo(path.currentPosition().x(), fBottom);

@@ -399,13 +399,27 @@ void FiffRawViewModel::updateHorizontalScrollPosition(qint32 newScrollPosition)
     }
 
     m_iScrollPos = newScrollPosition;
+
+    // Convert scroll position to fiff sample space via m_dDx
     qint32 targetCursor = (newScrollPosition / m_dDx) + absoluteFirstSample() ;
+
+
+    qDebug() << "";
+    qDebug() << "m_dDx" << m_dDx;
+    qDebug() << "newScrollPosition" << newScrollPosition;
+
+    qDebug() << "targetCursor" << targetCursor;
 
     if (targetCursor < m_iFiffCursorBegin + (m_iPreloadBufferSize - 1) * m_iSamplesPerBlock
         && m_bStartOfFileReached == false) {
-        // time to move the loaded window. Calculate distance in blocks
+        // Calculate the amount of data we need to load
         qint32 sampleDist = (m_iFiffCursorBegin + (m_iPreloadBufferSize - 1) * m_iSamplesPerBlock) - targetCursor;
+
+        // Calculate the needed blocks based on the amount of samples to load
         qint32 blockDist = (qint32) ceil(((double) sampleDist) / ((double) m_iSamplesPerBlock));
+
+        qDebug() << "sampleDist" << sampleDist;
+        qDebug() << "blockDist" << blockDist;
 
         if (blockDist >= m_iTotalBlockCount) {
             // we must "jump" to the new cursor ...
@@ -416,6 +430,8 @@ void FiffRawViewModel::updateHorizontalScrollPosition(qint32 newScrollPosition)
             postBlockLoad(loadEarlierBlocks(m_iTotalBlockCount));
             updateHorizontalScrollPosition(newScrollPosition);
         } else {
+            //m_iFiffCursorBegin = std::max(absoluteFirstSample(), m_iFiffCursorBegin - blockDist * m_iSamplesPerBlock);
+
             // there are some blocks in the intersection of the old and the new window that can stay in the buffer:
             // simply load earlier blocks
             //startBackgroundOperation(&FiffRawViewModel::loadEarlierBlocks, blockDist);
@@ -423,9 +439,15 @@ void FiffRawViewModel::updateHorizontalScrollPosition(qint32 newScrollPosition)
         }
     } else if (targetCursor + (m_iVisibleWindowSize * m_iSamplesPerBlock) >= m_iFiffCursorBegin + ((m_iPreloadBufferSize + 1) + m_iVisibleWindowSize) * m_iSamplesPerBlock
                && m_bEndOfFileReached == false) {
-        // time to move the loaded window. Calculate distance in blocks
+        // Calculate the amount of data we need to load
         qint32 sampleDist = targetCursor + (m_iVisibleWindowSize * m_iSamplesPerBlock) - (m_iFiffCursorBegin + ((m_iPreloadBufferSize + 1) + m_iVisibleWindowSize) * m_iSamplesPerBlock);
+
+        // Calculate the needed blocks based on the amount of samples to load
         qint32 blockDist = (qint32) ceil(((double) sampleDist) / ((double) m_iSamplesPerBlock));
+
+
+        qDebug() << "sampleDist later" << sampleDist;
+        qDebug() << "blockDist later" << blockDist;
 
         if (blockDist >= m_iTotalBlockCount) {
             // we must "jump" to the new cursor ...
@@ -544,7 +566,7 @@ int FiffRawViewModel::getSampleScrollPos() const
 
 //=============================================================================================================
 
-int FiffRawViewModel::getWindowSizeBlocks() const
+int FiffRawViewModel::getTotalBlockCount() const
 {
     return m_iVisibleWindowSize + m_iPreloadBufferSize;
 }
@@ -742,12 +764,15 @@ void FiffRawViewModel::startBackgroundOperation(int (FiffRawViewModel::*loadFunc
 
 int FiffRawViewModel::loadEarlierBlocks(qint32 numBlocks)
 {
+    qDebug() << "numBlocks" << numBlocks;
     // check if start of file was reached:
     int leftSamples = (m_iFiffCursorBegin - numBlocks * m_iSamplesPerBlock) - absoluteFirstSample();
+    qDebug() << "leftSamples" << leftSamples;
     if (leftSamples <= 0) {
-        //qInfo() << "[FiffRawViewModel::loadEarlierBlocks] Reached start of file !";
+        qInfo() << "[FiffRawViewModel::loadEarlierBlocks] Reached start of file !";
         // see how many blocks we still can load
         int maxNumBlocks = (m_iFiffCursorBegin - absoluteFirstSample()) / m_iSamplesPerBlock;
+        qDebug() << "maxNumBlocks" << maxNumBlocks;
         //qInfo() << "[FiffRawViewModel::loadEarlierBlocks] Loading " << maxNumBlocks << " earlier blocks instead of requested " << numBlocks;
         if (maxNumBlocks != 0) {
             numBlocks = maxNumBlocks;
@@ -757,6 +782,8 @@ int FiffRawViewModel::loadEarlierBlocks(qint32 numBlocks)
             return 0;
         }
     }
+
+    qDebug() << "numBlocks after if" << numBlocks;
 
     // we expect m_lNewData and m_lFilteredNewData to be empty:
     if (m_lNewData.empty() == false &&
