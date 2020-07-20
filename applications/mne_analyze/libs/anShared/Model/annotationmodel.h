@@ -390,7 +390,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Retruns index of group with name sGroupName. Returns 9999 if no group present with that name
+     * Returns index of group with name sGroupName. Returns 9999 if no group present with that name
      *
      * @param[in] sGroupName     name of group of which we want the index
      *
