@@ -206,14 +206,6 @@ private:
      */
     void computeAverage();
 
-//    //=========================================================================================================
-//    /**
-//     * Change the stim channel
-//     *
-//     * @param[in] sStimCh     the new stim channel name
-//     */
-//    void onChangeStimChannel(const QString &sStimCh);
-
     //=========================================================================================================
     /**
      * Toggles dropping rejected when computing average

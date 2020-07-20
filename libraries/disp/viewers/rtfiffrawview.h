@@ -449,7 +449,6 @@ protected:
     qint32                                      m_iT;                           /**< Display window size in seconds */
     QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;                    /**< FiffInfo, which is used insteadd of ListChInfo*/
     float                                       m_fSamplingRate;                /**< Sampling rate */
-    float                                       m_fDefaultSectionSize;          /**< Default row height */
     float                                       m_fZoomFactor;                  /**< Zoom factor */
     QList<qint32>                               m_qListBadChannels;             /**< Current list of bad channels  */
     QList<qint32>                               m_qListCurrentSelection;        /**< Current selection list -> hack around C++11 lambda  */

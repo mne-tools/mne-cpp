@@ -81,7 +81,6 @@ RtFiffRawView::RtFiffRawView(const QString& sSettingsPath,
 : AbstractView(parent, f)
 , m_iT(10)
 , m_fSamplingRate(1024)
-, m_fDefaultSectionSize(80.0f)
 , m_fZoomFactor(1.0f)
 , m_bHideBadChannels(false)
 , m_iDistanceTimeSpacer(1)
@@ -177,7 +176,7 @@ void RtFiffRawView::init(QSharedPointer<FIFFLIB::FiffInfo> &info)
     m_pTableView->setShowGrid(false);
     m_pTableView->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch); //Stretch 2 column to maximal width
     m_pTableView->horizontalHeader()->hide();
-    m_pTableView->verticalHeader()->setDefaultSectionSize(m_fZoomFactor*m_fDefaultSectionSize);//Row Height
+    m_pTableView->verticalHeader()->setDefaultSectionSize(m_pTableView->height() / m_fZoomFactor);//Row Height
     m_pTableView->setAutoScroll(false);
     m_pTableView->setColumnHidden(0,true); //because content is plotted jointly with column=1
     m_pTableView->setColumnHidden(2,true);
@@ -347,7 +346,7 @@ void RtFiffRawView::setZoom(double zoomFac)
 {
     m_fZoomFactor = zoomFac;
 
-    m_pTableView->verticalHeader()->setDefaultSectionSize(m_pTableView->height() / m_fZoomFactor/**m_fDefaultSectionSize*/);//Row Height
+    m_pTableView->verticalHeader()->setDefaultSectionSize(m_pTableView->height() / m_fZoomFactor);//Row Height
 }
 
 //=============================================================================================================
