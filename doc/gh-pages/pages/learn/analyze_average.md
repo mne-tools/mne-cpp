@@ -7,12 +7,13 @@ nav_order: 5
 ---
 #Averaging
 
-The averaging plugin lets you compute averages based on created annotations. To do this, first create annotations for the points which are to be averaged, like in the figure below:
+The averaging plugin lets you compute averages based on events.
 
 ![](../../images/analyze/mne_an_avg1.png)
 
-Next, using the `Parameters` tab of the Averaging plugin, input your desired settings and hit the `COMPUTE` button.
-Prestimulus, poststimulus, and baseline min/max are all relative to the set annotations. `Drop Rejected` will discard data points with artifacts"
+You can select from any of the existing event groups, or use your current event selection.
+
+Use the `Parameters` tab to input your desired settings and hit the `COMPUTE` button. Prestimulus, poststimulus, and baseline min/max are all relative to the events. `Drop Rejected` will discard data points with artifacts"
 
 ![](../../images/analyze/mne_an_avg2.png)
 
