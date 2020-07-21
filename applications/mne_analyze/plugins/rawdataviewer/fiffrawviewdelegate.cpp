@@ -132,9 +132,6 @@ void FiffRawViewDelegate::paint(QPainter *painter,
                 const FiffRawViewModel* pFiffRawModel = static_cast<const FiffRawViewModel*>(index.model());
 
                 int pos = pFiffRawModel->pixelDifference() * (pFiffRawModel->currentFirstSample() - pFiffRawModel->absoluteFirstSample());
-                qDebug() << "pos" << pos;
-                qDebug() << "pFiffRawModel->currentFirstSample()" << pFiffRawModel->currentFirstSample();
-                qDebug() << "pFiffRawModel->absoluteFirstSample()" << pFiffRawModel->absoluteFirstSample();
 
                 QPainterPath path = QPainterPath(QPointF(option.rect.x()+pos, option.rect.y()));
 
