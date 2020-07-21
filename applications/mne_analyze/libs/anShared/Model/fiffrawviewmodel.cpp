@@ -403,13 +403,6 @@ void FiffRawViewModel::updateHorizontalScrollPosition(qint32 newScrollPosition)
     // Convert scroll position to fiff sample space via m_dDx
     qint32 targetCursor = (newScrollPosition / m_dDx) + absoluteFirstSample() ;
 
-
-    qDebug() << "";
-    qDebug() << "m_dDx" << m_dDx;
-    qDebug() << "newScrollPosition" << newScrollPosition;
-
-    qDebug() << "targetCursor" << targetCursor;
-
     if (targetCursor < m_iFiffCursorBegin + (m_iPreloadBufferSize - 1) * m_iSamplesPerBlock
         && m_bStartOfFileReached == false) {
         // Calculate the amount of data we need to load
@@ -418,19 +411,21 @@ void FiffRawViewModel::updateHorizontalScrollPosition(qint32 newScrollPosition)
         // Calculate the needed blocks based on the amount of samples to load
         qint32 blockDist = (qint32) ceil(((double) sampleDist) / ((double) m_iSamplesPerBlock));
 
-        qDebug() << "sampleDist" << sampleDist;
-        qDebug() << "blockDist" << blockDist;
-
         if (blockDist >= m_iTotalBlockCount) {
             // we must "jump" to the new cursor ...
-            m_iFiffCursorBegin = std::max(absoluteFirstSample(), m_iFiffCursorBegin - blockDist * m_iSamplesPerBlock);
+            m_iFiffCursorBegin = std::max(absoluteFirstSample(), m_iFiffCursorBegin - (m_iTotalBlockCount * m_iSamplesPerBlock));
 
             // ... and load the whole model anew
             //startBackgroundOperation(&FiffRawViewModel::loadLaterBlocks, m_iTotalBlockCount);
             postBlockLoad(loadEarlierBlocks(m_iTotalBlockCount));
             updateHorizontalScrollPosition(newScrollPosition);
         } else {
-            //m_iFiffCursorBegin = std::max(absoluteFirstSample(), m_iFiffCursorBegin - blockDist * m_iSamplesPerBlock);
+            int iFiffCursorBegin = m_iFiffCursorBegin;
+            m_iFiffCursorBegin = std::max(absoluteFirstSample(), m_iFiffCursorBegin - (blockDist * m_iSamplesPerBlock));
+
+            if(m_iFiffCursorBegin != absoluteFirstSample()) {
+                m_iFiffCursorBegin = iFiffCursorBegin;
+            }
 
             // there are some blocks in the intersection of the old and the new window that can stay in the buffer:
             // simply load earlier blocks
@@ -445,10 +440,6 @@ void FiffRawViewModel::updateHorizontalScrollPosition(qint32 newScrollPosition)
         // Calculate the needed blocks based on the amount of samples to load
         qint32 blockDist = (qint32) ceil(((double) sampleDist) / ((double) m_iSamplesPerBlock));
 
-
-        qDebug() << "sampleDist later" << sampleDist;
-        qDebug() << "blockDist later" << blockDist;
-
         if (blockDist >= m_iTotalBlockCount) {
             // we must "jump" to the new cursor ...
             m_iFiffCursorBegin = std::min(absoluteLastSample() - m_iTotalBlockCount * m_iSamplesPerBlock, m_iFiffCursorBegin + blockDist * m_iSamplesPerBlock);
@@ -458,6 +449,13 @@ void FiffRawViewModel::updateHorizontalScrollPosition(qint32 newScrollPosition)
             postBlockLoad(loadLaterBlocks(m_iTotalBlockCount));
             updateHorizontalScrollPosition(newScrollPosition);
         } else {
+            int iFiffCursorBegin = m_iFiffCursorBegin;
+            m_iFiffCursorBegin = std::min(absoluteLastSample() - m_iTotalBlockCount * m_iSamplesPerBlock, m_iFiffCursorBegin + blockDist * m_iSamplesPerBlock);
+
+            if(m_iFiffCursorBegin != absoluteLastSample()) {
+                m_iFiffCursorBegin = iFiffCursorBegin;
+            }
+
             // there are some blocks in the intersection of the old and the new window that can stay in the buffer:
             // simply load later blocks
             //startBackgroundOperation(&FiffRawViewModel::loadLaterBlocks, blockDist);
@@ -747,8 +745,8 @@ void FiffRawViewModel::filterAllDataBlocks()
 
 void FiffRawViewModel::updateEndStartFlags()
 {
-    m_bStartOfFileReached = m_iFiffCursorBegin == absoluteFirstSample();
-    m_bEndOfFileReached = (m_iFiffCursorBegin + m_iTotalBlockCount * m_iSamplesPerBlock) == absoluteLastSample();
+    m_bStartOfFileReached = m_iFiffCursorBegin <= absoluteFirstSample();
+    m_bEndOfFileReached = (m_iFiffCursorBegin + m_iTotalBlockCount * m_iSamplesPerBlock) >= absoluteLastSample();
 }
 
 //=============================================================================================================
@@ -764,15 +762,13 @@ void FiffRawViewModel::startBackgroundOperation(int (FiffRawViewModel::*loadFunc
 
 int FiffRawViewModel::loadEarlierBlocks(qint32 numBlocks)
 {
-    qDebug() << "numBlocks" << numBlocks;
     // check if start of file was reached:
     int leftSamples = (m_iFiffCursorBegin - numBlocks * m_iSamplesPerBlock) - absoluteFirstSample();
-    qDebug() << "leftSamples" << leftSamples;
+
     if (leftSamples <= 0) {
         qInfo() << "[FiffRawViewModel::loadEarlierBlocks] Reached start of file !";
         // see how many blocks we still can load
         int maxNumBlocks = (m_iFiffCursorBegin - absoluteFirstSample()) / m_iSamplesPerBlock;
-        qDebug() << "maxNumBlocks" << maxNumBlocks;
         //qInfo() << "[FiffRawViewModel::loadEarlierBlocks] Loading " << maxNumBlocks << " earlier blocks instead of requested " << numBlocks;
         if (maxNumBlocks != 0) {
             numBlocks = maxNumBlocks;
@@ -783,10 +779,8 @@ int FiffRawViewModel::loadEarlierBlocks(qint32 numBlocks)
         }
     }
 
-    qDebug() << "numBlocks after if" << numBlocks;
-
     // we expect m_lNewData and m_lFilteredNewData to be empty:
-    if (m_lNewData.empty() == false &&
+    if (m_lNewData.empty() == false ||
         m_lFilteredNewData.empty() == false) {
         qInfo() << "[FiffRawViewModel::loadEarlierBlocks] FATAL, temporary data storage non empty !";
         return -1;
@@ -798,17 +792,28 @@ int FiffRawViewModel::loadEarlierBlocks(qint32 numBlocks)
     // initialize start and end indices
     int start = m_iFiffCursorBegin - (numBlocks * m_iSamplesPerBlock);
     int end = m_iFiffCursorBegin - 1;
-    int iFilterDelay = m_filterKernel.getFilterOrder()/2;
 
-    if(start-iFilterDelay >= m_pFiffIO->m_qlistRaw[0]->first_samp) {
-        start -= iFilterDelay;
-    } else {
-        iFilterDelay = 0;
-    }
-    if(end+iFilterDelay <= m_pFiffIO->m_qlistRaw[0]->last_samp) {
-        end += iFilterDelay;
-    } else {
-        iFilterDelay = 0;
+    // Update m_iFiffCursorBegin before we account for the filter delay
+    m_iFiffCursorBegin = start;
+
+    // Account for filter delay of current filter kernel
+    int iFilterDelay = 0;
+
+    if(m_bPerformFiltering) {
+        iFilterDelay = m_filterKernel.getFilterOrder()/2;
+
+        // Check if we have reached the beginning/end of the file
+        if(start-iFilterDelay >= m_pFiffIO->m_qlistRaw[0]->first_samp) {
+            start -= iFilterDelay;
+        } else {
+            iFilterDelay = 0;
+        }
+
+        if(end+iFilterDelay <= m_pFiffIO->m_qlistRaw[0]->last_samp) {
+            end += iFilterDelay;
+        } else {
+            iFilterDelay = 0;
+        }
     }
 
     // read data, use the already prepared list m_lNewData
@@ -819,6 +824,7 @@ int FiffRawViewModel::loadEarlierBlocks(qint32 numBlocks)
         return -1;
     }
 
+    MatrixXd dataTemp, timesTemp;
     for(int i = 0; i < numBlocks; ++i) {
         m_lNewData.push_front(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data.block(0, i*m_iSamplesPerBlock+iFilterDelay, data.rows(), m_iSamplesPerBlock),
                                                                                            times.block(0, i*m_iSamplesPerBlock+iFilterDelay, times.rows(), m_iSamplesPerBlock))));
@@ -827,12 +833,9 @@ int FiffRawViewModel::loadEarlierBlocks(qint32 numBlocks)
     // Filter data
     filterDataBlock(data, true);
     for(int i = 0; i < numBlocks; ++i) {
-        m_lFilteredNewData.push_front(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data.block(0, i*m_iSamplesPerBlock+((2*iFilterDelay)), data.rows(), m_iSamplesPerBlock),
-                                                                                                   times.block(0, i*m_iSamplesPerBlock+((2*iFilterDelay)), times.rows(), m_iSamplesPerBlock))));
+        m_lFilteredNewData.push_front(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data.block(0, i*m_iSamplesPerBlock+(2*iFilterDelay), data.rows(), m_iSamplesPerBlock),
+                                                                                                   times.block(0, i*m_iSamplesPerBlock+(2*iFilterDelay), times.rows(), m_iSamplesPerBlock))));
     }
-
-    // adjust fiff cursor
-    m_iFiffCursorBegin = start;
 
     // return 0, meaning that this was a loading of earlier blocks
     return 0;
@@ -859,7 +862,7 @@ int FiffRawViewModel::loadLaterBlocks(qint32 numBlocks)
     }
 
     // we expect m_lNewData and m_lFilteredNewData to be empty:
-    if (m_lNewData.empty() == false &&
+    if (m_lNewData.empty() == false ||
         m_lFilteredNewData.empty() == false) {
         qCritical() << "[FiffRawViewModel::loadLaterBlocks] FATAL, temporary data storage non empty !";
         return -1;
@@ -869,19 +872,30 @@ int FiffRawViewModel::loadLaterBlocks(qint32 numBlocks)
     MatrixXd data, times;
 
     // initialize start and end indices
-    int start = m_iFiffCursorBegin + m_iTotalBlockCount * m_iSamplesPerBlock;
+    int start = m_iFiffCursorBegin + (m_iTotalBlockCount * m_iSamplesPerBlock);
     int end = start + (m_iSamplesPerBlock * numBlocks) - 1;
-    int iFilterDelay = m_filterKernel.getFilterOrder()/2;
 
-    if(start-iFilterDelay >= m_pFiffIO->m_qlistRaw[0]->first_samp) {
-        start -= iFilterDelay;
-    } else {
-        iFilterDelay = 0;
-    }
-    if(end+iFilterDelay <= m_pFiffIO->m_qlistRaw[0]->last_samp) {
-        end += iFilterDelay;
-    } else {
-        iFilterDelay = 0;
+    // adjust fiff cursor
+    m_iFiffCursorBegin += numBlocks * m_iSamplesPerBlock;
+
+    // Account for filter delay of current filter kernel
+    int iFilterDelay = 0;
+
+    if(m_bPerformFiltering) {
+        iFilterDelay = m_filterKernel.getFilterOrder()/2;
+
+        // Check if we have reached the beginning/end of the file
+        if(start-iFilterDelay >= m_pFiffIO->m_qlistRaw[0]->first_samp) {
+            start -= iFilterDelay;
+        } else {
+            iFilterDelay = 0;
+        }
+
+        if(end+iFilterDelay <= m_pFiffIO->m_qlistRaw[0]->last_samp) {
+            end += iFilterDelay;
+        } else {
+            iFilterDelay = 0;
+        }
     }
 
     // read data, use the already prepaired list m_lNewData
@@ -892,6 +906,7 @@ int FiffRawViewModel::loadLaterBlocks(qint32 numBlocks)
         return -1;
     }
 
+    MatrixXd dataTemp, timesTemp;
     for(int i = 0; i < numBlocks; ++i) {
         m_lNewData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(data.block(0, i*m_iSamplesPerBlock+iFilterDelay, data.rows(), m_iSamplesPerBlock),
                                                                                           times.block(0, i*m_iSamplesPerBlock+iFilterDelay, times.rows(), m_iSamplesPerBlock))));
@@ -904,9 +919,6 @@ int FiffRawViewModel::loadLaterBlocks(qint32 numBlocks)
                                                                                                   times.block(0, i*m_iSamplesPerBlock+(2*iFilterDelay), times.rows(), m_iSamplesPerBlock))));
     }
 
-    // adjust fiff cursor
-    m_iFiffCursorBegin += numBlocks * m_iSamplesPerBlock;
-
     // return 1, meaning that this was a loading of later blocks
     return 1;
 }
@@ -916,61 +928,61 @@ int FiffRawViewModel::loadLaterBlocks(qint32 numBlocks)
 void FiffRawViewModel::postBlockLoad(int result)
 {
     switch(result){
-    case -1:
-        qWarning() << "[FiffRawViewModel::postBlockLoad] QFuture returned an error: " << result;
-        break;
-    case 0:
-    {
-        // insertion of earlier blocks
-        int iNewBlocks = m_lNewData.size();
+        case -1:
+            qWarning() << "[FiffRawViewModel::postBlockLoad] QFuture returned an error: " << result;
+            break;
+        case 0:
+        {
+            // insertion of earlier blocks
+            int iNewBlocks = m_lNewData.size();
 
-        m_dataMutex.lock();
-        for (int i = 0; i < iNewBlocks; ++i) {
-            //Raw data
-            m_lData.push_front(m_lNewData.front());            
-            m_lData.pop_back(); // @TODO check if this really frees the associated memory
+            m_dataMutex.lock();
+            for (int i = 0; i < iNewBlocks; ++i) {
+                //Raw data
+                m_lData.push_front(m_lNewData.front());
+                m_lData.pop_back(); // @TODO check if this really frees the associated memory
 
-            //Filtered data
-            m_lFilteredData.push_front(m_lFilteredNewData.front());
-            m_lFilteredData.pop_back();
+                //Filtered data
+                m_lFilteredData.push_front(m_lFilteredNewData.front());
+                m_lFilteredData.pop_back();
 
-            //Pop new data, which is now stored in m_lData and m_lFilteredData
-            m_lNewData.pop_front();
-            m_lFilteredNewData.pop_front();
+                //Pop new data, which is now stored in m_lData and m_lFilteredData
+                m_lNewData.pop_front();
+                m_lFilteredNewData.pop_front();
+            }
+            m_dataMutex.unlock();
+
+            emit newBlocksLoaded();
+
+            break;
         }
-        m_dataMutex.unlock();
+        case 1:
+        {
+            // insertion of later blocks
+            int iNewBlocks = m_lNewData.size();
 
-        emit newBlocksLoaded();
+            m_dataMutex.lock();
+            for (int i = 0; i < iNewBlocks; ++i) {
+                //Raw data
+                m_lData.push_back(m_lNewData.front());
+                m_lData.pop_front();
 
-        break;
-    }
-    case 1:
-    {
-        // insertion of later blocks
-        int iNewBlocks = m_lNewData.size();
+                //Filtered data
+                m_lFilteredData.push_back(m_lFilteredNewData.front());
+                m_lFilteredData.pop_front();
 
-        m_dataMutex.lock();
-        for (int i = 0; i < iNewBlocks; ++i) {
-            //Raw data
-            m_lData.push_back(m_lNewData.front());
-            m_lData.pop_front();
+                //Pop new data, which is now stored in m_lData and m_lFilteredData
+                m_lNewData.pop_front();
+                m_lFilteredNewData.pop_front();
+            }
+            m_dataMutex.unlock();
 
-            //Filtered data
-            m_lFilteredData.push_back(m_lFilteredNewData.front());
-            m_lFilteredData.pop_front();
+            emit newBlocksLoaded();
 
-            //Pop new data, which is now stored in m_lData and m_lFilteredData
-            m_lNewData.pop_front();
-            m_lFilteredNewData.pop_front();
+            break;
         }
-        m_dataMutex.unlock();
-
-        emit newBlocksLoaded();
-
-        break;
-    }
-    default:
-        qCritical() << "[FiffRawViewModel::postBlockLoad] FATAL Non-intended return value: " << result;
+        default:
+            qWarning() << "[FiffRawViewModel::postBlockLoad] FATAL Non-intended return value: " << result;
     }
 
     updateEndStartFlags();
