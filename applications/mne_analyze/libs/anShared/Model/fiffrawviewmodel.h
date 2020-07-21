@@ -418,14 +418,6 @@ public:
 
     //=========================================================================================================
     /**
-     * This tells the model where the view currently is horizontally.
-     *
-     * @param newScrollPosition Absolute sample number.
-     */
-    void updateHorizontalScrollPosition(qint32 newScrollPosition);
-
-    //=========================================================================================================
-    /**
      * Toggle whether to dipslay annotations
      *
      * @param[in] iToggleDisp   0 for no, 1+ for yes
@@ -495,6 +487,14 @@ public:
      * @return m_pFiffIO, member varaible saving the FiffRawData and FiffEvoked parameters
      */
     QSharedPointer<FIFFLIB::FiffIO> getFiffIO() const;
+
+    //=========================================================================================================
+    /**
+     * This tells the model where the view currently is horizontally.
+     *
+     * @param newScrollPosition Absolute sample number.
+     */
+    void updateHorizontalScrollPosition(qint32 newScrollPosition);
 
 private:
     //=========================================================================================================
