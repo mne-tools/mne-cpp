@@ -466,7 +466,17 @@ public:
      *
      * @return name of group at index iGroupIndex
      */
-    const QString& getGroupName(int iGroupIndex);
+    QString getGroupName(int iGroupIndex);
+
+    //=========================================================================================================
+    /**
+     * Returns the name of the event at index iGroup as if the map of groups were an array. Does not use Group Index.
+     *
+     * @param[in] iGroup    index of the group from which we are getting the name
+     *
+     * @return name of the iGroup-th event group
+     */
+    QString getGroupNameFromList(int iGroup);
 
     //=========================================================================================================
     /**

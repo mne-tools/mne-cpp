@@ -864,15 +864,27 @@ void AnnotationModel::setGroupName(int iGroupIndex,
 
 //=============================================================================================================
 
-const QString& AnnotationModel::getGroupName(int iGroupIndex)
+QString AnnotationModel::getGroupName(int iGroupIndex)
 {
     if(!m_mAnnotationHub.contains(iGroupIndex)){
         qWarning() << "[AnnotationModel::getGroupName] Attempting to get name of group with invalid key.";
+        return "NAME NOT FOUND";
     }
 
     return m_mAnnotationHub[iGroupIndex]->groupName;
 }
 
+//=============================================================================================================
+
+QString AnnotationModel::getGroupNameFromList(int iGroupIndex)
+{
+    if(m_mAnnotationHub.keys().size() <= iGroupIndex){
+        qWarning() << "[AnnotationModel::getGroupNameFromList] Attempting to get name of group with invalid key.";
+        return "NAME NOT FOUND";
+    }
+
+    return m_mAnnotationHub[m_mAnnotationHub.keys()[iGroupIndex]]->groupName;
+}
 //=============================================================================================================
 
 int AnnotationModel::getIndexFromName(const QString &sGroupName)
