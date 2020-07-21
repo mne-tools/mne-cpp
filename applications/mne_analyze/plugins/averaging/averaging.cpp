@@ -613,7 +613,7 @@ void Averaging::updateGroups()
 {
     m_pAveragingSettingsView->clearSelectionGroup();
     for(int i = 0; i < m_pFiffRawModel->getAnnotationModel()->getHubSize(); i++){
-        m_pAveragingSettingsView->addSelectionGroup(m_pFiffRawModel->getAnnotationModel()->getGroupName(i));
+        m_pAveragingSettingsView->addSelectionGroup(m_pFiffRawModel->getAnnotationModel()->getGroupNameFromList(i));
     }
 }
 
