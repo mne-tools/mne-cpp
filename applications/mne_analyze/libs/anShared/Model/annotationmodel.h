@@ -460,23 +460,23 @@ public:
 
     //=========================================================================================================
     /**
-     * Returns group name of the group with input parameter iGroupIndex
+     * Returns group name of the group with map key iMapKey
      *
-     * @param[in] iGroupIndex   index of the group from which we are getting the name
+     * @param[in] iMapKey       map key(group index) of the group from which we are getting the name
      *
-     * @return name of group at index iGroupIndex
+     * @return name of group at from m_mAnnotationHub at iMapKey
      */
-    QString getGroupName(int iGroupIndex);
+    QString getGroupName(int iMapKey);
 
     //=========================================================================================================
     /**
-     * Returns the name of the event at index iGroup as if the map of groups were an array. Does not use Group Index.
+     * Returns the name of the event at index iListIndex as if the map of groups were an array. Does not use Group Index.
      *
-     * @param[in] iGroup    index of the group from which we are getting the name
+     * @param[in] iListIndex    index of the group from which we are getting the name
      *
-     * @return name of the iGroup-th event group
+     * @return name of the iListIndex-th event group for m_mAnnotationHub
      */
-    QString getGroupNameFromList(int iGroup);
+    QString getGroupNameFromList(int iListIndex);
 
     //=========================================================================================================
     /**
