@@ -137,7 +137,6 @@ void FiffRawViewDelegate::paint(QPainter *painter,
                 qDebug() << "pFiffRawModel->absoluteFirstSample()" << pFiffRawModel->absoluteFirstSample();
 
                 QPainterPath path = QPainterPath(QPointF(option.rect.x()+pos, option.rect.y()));
-//                QPainterPath path  = QPainterPath(QPointF(option.rect.x(),option.rect.y()));
 
                 //Plot data
                 createPlotPath(option,
@@ -241,11 +240,12 @@ void FiffRawViewDelegate::createPlotPath(const QStyleOptionViewItem &option,
 
     QPointF qSamplePosition;
 
-    int iPaintStep = (int)(1.0/dDx) - 1;
-    if (iPaintStep < 2){
-        iPaintStep = 1;
-    }
-    iPaintStep = 1;
+    //Deactivate downsampling for now due to aliasing effects
+//    int iPaintStep = (int)(1.0/dDx) - 1;
+//    if (iPaintStep < 2){
+//        iPaintStep = 1;
+//    }
+    int iPaintStep = 1;
 
     for(unsigned int j = 0; j < data.size(); j = j + iPaintStep) {
         dValue = data[j] * dScaleY;
