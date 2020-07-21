@@ -44,7 +44,6 @@
 #include <rtprocessing/detecttrigger.h>
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <disp/viewers/triggerdetectionview.h>
-#include <iostream>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -524,16 +523,11 @@ void AnnotationSettingsView::deleteGroup()
 {
     int iSelected = m_pUi->m_listWidget_groupListWidget->selectionModel()->selectedRows().first().row();
     QListWidgetItem* itemToDelete = m_pUi->m_listWidget_groupListWidget->takeItem(iSelected);
-    std::cout << "1";
     m_pAnnModel->removeGroup(itemToDelete->data(Qt::UserRole).toInt());
-    std::cout << "2";
     m_pUi->m_listWidget_groupListWidget->selectionModel()->clearSelection();
     delete itemToDelete;
-    std::cout << "3";
     onDataChanged();
-    std::cout << "4";
     emit groupsUpdated();
-    std::cout << "5";
 }
 
 //=============================================================================================================
