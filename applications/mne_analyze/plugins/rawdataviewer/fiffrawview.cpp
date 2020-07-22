@@ -150,7 +150,7 @@ QSharedPointer<FiffRawViewModel> FiffRawView::getModel()
 //=============================================================================================================
 
 void FiffRawView::setModel(const QSharedPointer<FiffRawViewModel>& pModel)
-{   
+{
     if(!pModel) {
         qWarning() << "[FiffRawView::setModel] Passed model is NULL.";
         return;

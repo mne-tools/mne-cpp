@@ -372,13 +372,15 @@ void AnnotationSettingsView::onSaveButton()
 
 //=============================================================================================================
 
-void AnnotationSettingsView::keyPressEvent(QKeyEvent* event)
+void AnnotationSettingsView::keyReleaseEvent(QKeyEvent* event)
 {
-    if(event->key() == Qt::Key_Delete) {
-        this->removeAnnotationfromModel();
-    }
-    if(event->key() == Qt::Key_J) {
-        emit jumpToSelected();
+    switch (event->key()) {
+        case  Qt::Key_Delete:
+            this->removeAnnotationfromModel();
+            break;
+        case Qt::Key_J:
+            emit jumpToSelected();
+            break;
     }
 }
 
@@ -489,9 +491,13 @@ void AnnotationSettingsView::customEventContextMenuRequested(const QPoint &pos)
 {
     QMenu* menu = new QMenu(this);
 
-    QAction* markTime = menu->addAction(tr("Delete event"));
-    connect(markTime, &QAction::triggered,
+    QAction* deleteEvent = menu->addAction(tr("Delete event"));
+    connect(deleteEvent, &QAction::triggered,
             this, &AnnotationSettingsView::removeAnnotationfromModel, Qt::UniqueConnection);
+
+    QAction* jumpToEvent = menu->addAction(tr("Jump to event"));
+    connect(jumpToEvent, &QAction::triggered,
+            this, &AnnotationSettingsView::jumpToSelected, Qt::UniqueConnection);
 
     menu->popup(m_pUi->m_tableView_eventTableView->viewport()->mapToGlobal(pos));
 }

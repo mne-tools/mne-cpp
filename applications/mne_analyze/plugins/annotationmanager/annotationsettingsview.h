@@ -207,11 +207,11 @@ protected slots:
 
     //=========================================================================================================
     /**
-     * Used to handle delete key to remove annotations.
+     * Used to handle key presses to interact with events.
      *
      * @param [in] event    a key press event
      */
-    void keyPressEvent(QKeyEvent* event);
+    void keyReleaseEvent(QKeyEvent* event);
 
 private slots:
     //=========================================================================================================
