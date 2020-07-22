@@ -1,5 +1,5 @@
 ---
-title: Annotation Manager
+title: Event Manager
 has_children: false
 parent: MNE Analyze GUI
 grand_parent: Learn
