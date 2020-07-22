@@ -556,7 +556,7 @@ private:
     /**
      * Replicates the behavior of initFiffData to accomodate changes in number of samples shown
      */
-    void updateDisplayData();
+    void reloadAllData();
 
     std::list<QSharedPointer<QPair<MatrixXd, MatrixXd> > > m_lData;             /**< Data */
     std::list<QSharedPointer<QPair<MatrixXd, MatrixXd> > > m_lNewData;          /**< Data that is to be appended or prepended */
