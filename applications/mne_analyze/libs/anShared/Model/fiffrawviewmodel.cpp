@@ -446,7 +446,7 @@ void FiffRawViewModel::setWindowSize(int iNumSeconds,
     m_iTotalBlockCount = m_iVisibleWindowSize + 2 * m_iPreloadBufferSize;
 
     //reload data to accomodate new size
-    updateDisplayData();
+    reloadAllData();
 
     //Update m_dDx based on new size
     setDataColumnWidth(iColWidth);
@@ -630,7 +630,8 @@ void FiffRawViewModel::updateHorizontalScrollPosition(qint32 newScrollPosition)
             // we must "jump" to the new cursor ...
             m_iFiffCursorBegin = std::max(absoluteFirstSample(), m_iFiffCursorBegin - (blockDist * m_iSamplesPerBlock));
 
-            updateDisplayData();
+            // and load all the data anew
+            reloadAllData();
         } else {
             // there are some blocks in the intersection of the old and the new window that can stay in the buffer:
             // simply load earlier blocks
@@ -650,7 +651,8 @@ void FiffRawViewModel::updateHorizontalScrollPosition(qint32 newScrollPosition)
             int iResidual = absoluteLastSample() % m_iSamplesPerBlock;
             m_iFiffCursorBegin = std::min(absoluteLastSample() - (m_iTotalBlockCount * m_iSamplesPerBlock + iResidual), m_iFiffCursorBegin + (blockDist * m_iSamplesPerBlock));
 
-            updateDisplayData();
+            // and load all the data anew
+            reloadAllData();
         } else {
             // there are some blocks in the intersection of the old and the new window that can stay in the buffer:
             // simply load later blocks
@@ -727,13 +729,12 @@ void FiffRawViewModel::filterDataBlock(MatrixXd& matData,
     bUseThread = false;
     #endif
 
-    // We keep the overhead because this excludes extra copying in the filterData function which leads to a smoother scrolling
     matData = m_pRtFilter->calculate(matData,
-                                                m_filterKernel,
-                                                m_lFilterChannelList,
-                                                bFilterEnd,
-                                                bUseThread,
-                                                false);
+                                     m_filterKernel,
+                                     m_lFilterChannelList,
+                                     bFilterEnd,
+                                     bUseThread,
+                                     false);
 }
 
 //=============================================================================================================
@@ -764,7 +765,7 @@ int FiffRawViewModel::loadEarlierBlocks(qint32 numBlocks)
         qInfo() << "[FiffRawViewModel::loadEarlierBlocks] Reached start of file !";
         // see how many blocks we still can load
         int maxNumBlocks = (m_iFiffCursorBegin - absoluteFirstSample()) / m_iSamplesPerBlock;
-        //qInfo() << "[FiffRawViewModel::loadEarlierBlocks] Loading " << maxNumBlocks << " earlier blocks instead of requested " << numBlocks;
+        qInfo() << "[FiffRawViewModel::loadEarlierBlocks] Loading " << maxNumBlocks << " earlier blocks instead of requested " << numBlocks;
         if (maxNumBlocks != 0) {
             numBlocks = maxNumBlocks;
         } else {
@@ -797,21 +798,17 @@ int FiffRawViewModel::loadEarlierBlocks(qint32 numBlocks)
     if(m_bPerformFiltering) {
         iFilterDelay = m_filterKernel.getFilterOrder()/2;
 
-        // Check if we have reached the beginning/end of the file
+        // Check if we have reached the beginning of the file
         if(start-iFilterDelay >= m_pFiffIO->m_qlistRaw[0]->first_samp) {
             start -= iFilterDelay;
-        } else {
-            iFilterDelay = 0;
-        }
-
-        if(end+iFilterDelay <= m_pFiffIO->m_qlistRaw[0]->last_samp) {
             end += iFilterDelay;
         } else {
+            end += 2*iFilterDelay;
             iFilterDelay = 0;
         }
     }
 
-    // read data, use the already prepared list m_lNewData
+    // read data
     if(m_pFiffIO->m_qlistRaw[0]->read_raw_segment(data, times, start, end)) {
         // qDebug() << "[FiffRawViewModel::loadFiffData] Successfully read a block ";
     } else {
@@ -892,7 +889,7 @@ int FiffRawViewModel::loadLaterBlocks(qint32 numBlocks)
         }
     }
 
-    // read data, use the already prepaired list m_lNewData
+    // read data
     if(m_pFiffIO->m_qlistRaw[0]->read_raw_segment(data, times, start, end)) {
         // qDebug() << "[FiffRawViewModel::loadFiffData] Successfully read a block ";
     } else {
@@ -985,7 +982,7 @@ void FiffRawViewModel::postBlockLoad(int result)
 
 //=============================================================================================================
 
-void FiffRawViewModel::updateDisplayData()
+void FiffRawViewModel::reloadAllData()
 {
     m_lData.clear();
     m_lFilteredData.clear();
