@@ -5,17 +5,17 @@ parent: MNE Analyze GUI
 grand_parent: Learn
 nav_order: 5
 ---
-#Averaging
+# Averaging
 
 The averaging plugin lets you compute averages based on events.
 
-![](../../images/analyze/mne_an_avg1.png)
+![](../../images/analyze/mne_an_avg4.png)
 
 You can select from any of the existing event groups, or use your current event selection.
 
-Use the `Parameters` tab to input your desired settings and hit the `COMPUTE` button. Prestimulus, poststimulus, and baseline min/max are all relative to the events. `Drop Rejected` will discard data points with artifacts"
-
 ![](../../images/analyze/mne_an_avg2.png)
+
+Use the `Parameters` tab to input your desired settings and hit the `COMPUTE` button. Prestimulus, poststimulus, and baseline min/max are all relative to the events. `Drop Rejected` will discard data points with artifacts"
 
 You can control which channels to display using the Channel Selection tool, which lets you select from presets or choose your own selection.
 
