@@ -83,4 +83,5 @@ Here you can choose what elements you want to visualize in the monitoring sectio
 The HPI Fitting Plugin can be connected to following Plugins:
 
 * Input: [FiffSimulator plugin](/prerecordeddata.md), [FieldTripBuffer plugin](../development/ftbufferplugin.md).
-* Output: Forward Solution plugin
+* Output: [Forward Solution plugin](/scan_headmonitoring.md)
+
