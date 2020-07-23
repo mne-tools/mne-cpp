@@ -1586,11 +1586,13 @@ bool write_solution(const QString& name,         /* Destination file */
 
         meg_solution.transpose_named_matrix();
         t_pStream->write_named_matrix(FIFF_MNE_FORWARD_SOLUTION,meg_solution);
+        meg_solution.transpose_named_matrix();
 //        if (mne_write_named_matrix(t_pStream,FIFF_MNE_FORWARD_SOLUTION,meg_solution) == FIFF_FAIL)
 //            goto bad;
         if (bDoGrad) {
             meg_solution_grad.transpose_named_matrix();
             t_pStream->write_named_matrix(FIFF_MNE_FORWARD_SOLUTION_GRAD,meg_solution_grad);
+            meg_solution_grad.transpose_named_matrix();
         }
 
 //            if (mne_write_named_matrix(t_pStream,FIFF_MNE_FORWARD_SOLUTION_GRAD,meg_solution_grad) == FIFF_FAIL)
@@ -1614,9 +1616,12 @@ bool write_solution(const QString& name,         /* Destination file */
         eeg_solution.transpose_named_matrix();
         t_pStream->write_named_matrix(FIFF_MNE_FORWARD_SOLUTION,eeg_solution);
 //        if (mne_write_named_matrix(t_pStream,FIFF_MNE_FORWARD_SOLUTION,eeg_solution) == FIFF_FAIL)
+        eeg_solution.transpose_named_matrix();
 //            goto bad;
         if (bDoGrad) {
+            eeg_solution_grad.transpose_named_matrix();
             t_pStream->write_named_matrix(FIFF_MNE_FORWARD_SOLUTION_GRAD,eeg_solution_grad);
+            eeg_solution_grad.transpose_named_matrix();
         }
 //            if (mne_write_named_matrix(t_pStream,FIFF_MNE_FORWARD_SOLUTION_GRAD,eeg_solution_grad) == FIFF_FAIL)
 //                goto bad;
