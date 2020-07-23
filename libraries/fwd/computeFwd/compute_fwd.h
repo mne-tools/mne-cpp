@@ -132,8 +132,10 @@ public:
     //=========================================================================================================
     /**
      * store Forward solution
+     * @param [in] sSolName        The file name to store the currnt forward solution
+     *
      */
-    void storeFwd();
+    void storeFwd(QString sSolName = "default");
 
     // ToDo: make MNEForwardSolution the main output for the solution
     // QSharedPointer<MNELIB::MNEForwardSolution> fwdSolution;  /**< MNE Forward solution that contains all results */
