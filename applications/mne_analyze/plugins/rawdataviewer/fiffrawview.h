@@ -174,9 +174,9 @@ public:
     /**
      * Sets new zoom factor
      *
-     * @param [in] zoomFac  time window size;
+     * @param [in] dZoomFac  time window size;
      */
-    void setZoom(double zoomFac);
+    void setZoom(double dZoomFac);
 
     //=========================================================================================================
     /**

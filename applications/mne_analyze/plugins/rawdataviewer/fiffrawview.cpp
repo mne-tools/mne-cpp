@@ -242,6 +242,8 @@ void FiffRawView::resizeEvent(QResizeEvent * event)
     if(m_pTableView) {
         emit tableViewDataWidthChanged(m_pTableView->width()-m_pTableView->columnWidth(0));
         m_pTableView->resizeColumnsToContents();
+        setWindowSize(m_iT);
+        setZoom(m_fZoomFactor);
     }
 
     return QWidget::resizeEvent(event);
@@ -279,9 +281,9 @@ void FiffRawView::setBackgroundColor(const QColor& backgroundColor)
 
 //=============================================================================================================
 
-void FiffRawView::setZoom(double zoomFac)
+void FiffRawView::setZoom(double dZoomFac)
 {
-    m_fZoomFactor = zoomFac;
+    m_fZoomFactor = dZoomFac;
 
     m_pTableView->verticalHeader()->setDefaultSectionSize(m_pTableView->height() / m_fZoomFactor/**m_fDefaultSectionSize*/);//Row Height
     updateView();
