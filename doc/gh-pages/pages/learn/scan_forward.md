@@ -22,7 +22,7 @@ The computed forward solution can be passed to the [Source Localization plugin](
 
 1. Load the Forward Solution Plugin from the Algorithm Plugins available in MNE Scan
 
-<img src="../../images/mne_scan_fwdLoadPlugin.png" width="300" height="auto">
+<img src="../../images/mne_scan_fwdLoadPlugin.png" width="150" height="auto">
 
 2. To compute the forward solution within MNE Scan, some files and settings have to be loaded respectively set before the start of the measurement. The settings and files are the same as described in [MNE Forward Solution](/fwdsolution.md). They can be accessed by clicking on the Forward Solution plugin in the Plugin Scene. 
 
@@ -38,7 +38,7 @@ Once the settings are specified, and the aspired pipeline is designed, the measu
 
 3. Open the control widget.  
 
-<img src="../../images/hpi/mne_scan_open_quick.png" width="300" height="auto">
+<img src="../../images/hpi/mne_scan_open_quick.png" width="150" height="auto">
 
 4. Navigate to the `Forward Solution` tab. 
 
