@@ -43,6 +43,7 @@
 //=============================================================================================================
 
 #include "rawdataviewer_global.h"
+#include <disp/viewers/abstractview.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -90,7 +91,7 @@ class FiffRawViewDelegate;
 /**
  * TableView for Fiff data.
  */
-class RAWDATAVIEWERSHARED_EXPORT FiffRawView : public QWidget
+class RAWDATAVIEWERSHARED_EXPORT FiffRawView : public DISPLIB::AbstractView
 {
     Q_OBJECT
 
@@ -260,6 +261,34 @@ public:
      * @param[in] channelType    the channel type which is to be filtered (EEG, MEG, All)
      */
     void setFilterChannelType(const QString& channelType);
+
+    //=========================================================================================================
+    /**
+     * Saves all important settings of this view via QSettings.
+     */
+    void saveSettings();
+
+    //=========================================================================================================
+    /**
+     * Loads and inits all important settings of this view via QSettings.
+     */
+    void loadSettings();
+
+    //=========================================================================================================
+    /**
+     * Update the views GUI based on the set GuiMode (Clinical=0, Research=1).
+     *
+     * @param mode     The new mode (Clinical=0, Research=1).
+     */
+    void updateGuiMode(GuiMode mode);
+
+    //=========================================================================================================
+    /**
+     * Update the views GUI based on the set ProcessingMode (RealTime=0, Offline=1).
+     *
+     * @param mode     The new mode (RealTime=0, Offline=1).
+     */
+    void updateProcessingMode(ProcessingMode mode);
 
 signals:
     //=========================================================================================================
