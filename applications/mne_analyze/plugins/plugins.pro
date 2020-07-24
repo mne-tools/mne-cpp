@@ -44,3 +44,4 @@ SUBDIRS += \
     annotationmanager \
     filtering \
     averaging \
+    channelselection \
