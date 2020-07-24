@@ -81,7 +81,7 @@ using namespace RTPROCESSINGLIB;
 //=============================================================================================================
 
 FiffRawView::FiffRawView(QWidget *parent)
-: QWidget(parent)
+: DISPLIB::AbstractView(parent)
 , m_fDefaultSectionSize(80.0f)
 {
     m_pTableView = new QTableView;
@@ -578,5 +578,41 @@ void FiffRawView::updateVerticalScrollPosition(qint32 newScrollPosition)
     Q_UNUSED(newScrollPosition);
     if(FiffRawViewDelegate *pDelegate = qobject_cast<FiffRawViewDelegate *>(m_pTableView->itemDelegate())) {
         pDelegate->setUpperItemIndex(m_pTableView->rowAt(0));
+    }
+}
+
+//=============================================================================================================
+
+void FiffRawView::saveSettings()
+{
+}
+
+//=============================================================================================================
+
+void FiffRawView::loadSettings()
+{
+}
+
+//=============================================================================================================
+
+void FiffRawView::updateGuiMode(GuiMode mode)
+{
+    switch(mode) {
+        case GuiMode::Clinical:
+            break;
+        default: // default is research mode
+            break;
+    }
+}
+
+//=============================================================================================================
+
+void FiffRawView::updateProcessingMode(ProcessingMode mode)
+{
+    switch(mode) {
+        case ProcessingMode::Offline:
+            break;
+        default: // default is realtime mode
+            break;
     }
 }
