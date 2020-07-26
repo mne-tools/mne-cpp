@@ -131,11 +131,12 @@ public:
 
     //=========================================================================================================
     /**
-     * store Forward solution
+     * Store Forward solution with given name. It defaults the name specified in
+     * ComputeFwdSettings::settings->solname.
      * @param [in] sSolName        The file name to store the currnt forward solution
      *
      */
-    void storeFwd(QString sSolName = "default");
+    void storeFwd(const QString& sSolName = "default");
 
     // ToDo: make MNEForwardSolution the main output for the solution
     // QSharedPointer<MNELIB::MNEForwardSolution> fwdSolution;  /**< MNE Forward solution that contains all results */
