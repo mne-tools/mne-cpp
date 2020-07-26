@@ -2470,7 +2470,7 @@ void ComputeFwd::updateHeadPos(FiffCoordTransOld* transDevHeadOld)
 
 //=========================================================================================================
 
-void ComputeFwd::storeFwd(QString sSolName)
+void ComputeFwd::storeFwd(const QString& sSolName)
 {
     // We are ready to spill it out
     // Transform the source spaces back into MRI coordinates
@@ -2481,13 +2481,17 @@ void ComputeFwd::storeFwd(QString sSolName)
     int iNMeg = m_megcoils->ncoil;
     int iNEeg = m_eegels->ncoil;
 
+    QString sName;
+
     if(sSolName == "default") {
-        sSolName = m_pSettings->solname;
+        sName = m_pSettings->solname;
+    } else {
+        sName = sSolName;
     }
 
     printf("\nwriting %s...",sSolName.toUtf8().constData());
 
-    if (!write_solution(sSolName,                               /* Destination file */
+    if (!write_solution(sName,                                  /* Destination file */
                         m_spaces,                               /* The source spaces */
                         m_iNSpace,
                         m_pSettings->mriname,m_mri_id,          /* MRI file and data obtained from there */
