@@ -302,7 +302,7 @@ void ButterflyView::loadSettings()
 
     painter.save();
     painter.setBrush(QBrush(m_colCurrentBackgroundColor));
-    painter.drawRect(QRect(0,0,this->width()-1,this->height()-1));
+    painter.drawRect(QRect(-1,-1,this->width()+2,this->height()+2));
     painter.restore();
 
     painter.setRenderHint(QPainter::Antialiasing, true);

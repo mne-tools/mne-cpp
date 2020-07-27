@@ -92,7 +92,7 @@ AverageLayoutView::AverageLayoutView(const QString& sSettingsPath,
     m_pAverageLayoutView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     m_pAverageScene = AverageScene::SPtr(new AverageScene(m_pAverageLayoutView.data(), this));
-    m_pAverageScene->setBackgroundBrush(QBrush(Qt::black));
+    m_pAverageScene->setBackgroundBrush(QBrush(Qt::white));
 
     m_pAverageLayoutView->setScene(m_pAverageScene.data());
 
