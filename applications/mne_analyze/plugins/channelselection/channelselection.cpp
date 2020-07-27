@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     channelselection.h
+ * @file     channelselection.cpp
  * @author   Gabriel Motta <gbmotta@mgh.harvard.edu
  * @since    0.1.4
  * @date     July, 2020
@@ -61,6 +61,7 @@ using namespace ANSHAREDLIB;
 
 ChannelSelection::ChannelSelection()
 {
+    //m_pChannelSelectionView = QSharedPointer<DISPLIB::ChannelSelectionView>(new DISPLIB::ChannelSelectionView());
 }
 
 //=============================================================================================================
@@ -108,18 +109,25 @@ QMenu *ChannelSelection::getMenu()
 
 QDockWidget *ChannelSelection::getControl()
 {
-    QDockWidget* temp = new QDockWidget();
-    return temp;
+    QDockWidget* pControlWidget = new QDockWidget();
+    m_pControlLayout = new QHBoxLayout();
+    pControlWidget->setLayout(m_pControlLayout);
 
-    return Q_NULLPTR;
+//    m_pControlLayout->addWidget(m_pChannelSelectionView->getControlWidget());
+
+    return pControlWidget;
+
+    //return Q_NULLPTR;
 }
 
 //=============================================================================================================
 
 QWidget *ChannelSelection::getView()
 {
-    QWidget* temp = new QWidget();
-    return temp;
+    QWidget* pViewWidget = new QWidget();
+    m_pViewLayout = new QHBoxLayout();
+    pViewWidget->setLayout(m_pViewLayout);
+    return pViewWidget;
 
     //return Q_NULLPTR;
 }
@@ -129,6 +137,7 @@ QWidget *ChannelSelection::getView()
 void ChannelSelection::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
+    case EVENT_TYPE::SELECTED_MODEL_CHANGED:
     default:
         qWarning() << "[ChannelSelection::handleEvent] received an Event that is not handled by switch-cases";
         break;
@@ -140,6 +149,7 @@ void ChannelSelection::handleEvent(QSharedPointer<Event> e)
 QVector<EVENT_TYPE> ChannelSelection::getEventSubscriptions(void) const
 {
     QVector<EVENT_TYPE> temp;
+    temp.push_back(SELECTED_MODEL_CHANGED);
 
     return temp;
 }
