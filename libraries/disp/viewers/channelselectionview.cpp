@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
  * @file     channelselectionview.cpp
- * @author   Gabriel B Motta <gabrielbenmotta@gmail.com>;
- *           Lorenz Esch <lesch@mgh.harvard.edu>;
+ * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
+ *           Gabriel B Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
  * @date     September, 2014
  *
  * @section  LICENSE
  *
- * Copyright (C) 2014, Gabriel B Motta, Lorenz Esch, Christoph Dinh. All rights reserved.
+ * Copyright (C) 2014, Lorenz Esch, Christoph Dinh, Gabriel B Motta. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -793,4 +793,18 @@ bool ChannelSelectionView::eventFilter(QObject *obj, QEvent *event)
 
     // pass the event on to the parent class
     return QWidget::eventFilter(obj, event);
+}
+
+//=============================================================================================================
+
+QWidget* ChannelSelectionView::getViewWidget()
+{
+    return m_pUi->viewWidget;
+}
+
+//=============================================================================================================
+
+QWidget* ChannelSelectionView::getControlWidget()
+{
+    return m_pUi->controlWidget;
 }

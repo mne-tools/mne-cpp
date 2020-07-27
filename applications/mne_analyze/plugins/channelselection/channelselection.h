@@ -41,6 +41,7 @@
 
 #include "channelselection_global.h"
 #include <anShared/Interfaces/IPlugin.h>
+#include <disp/viewers/channelselectionview.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -50,6 +51,7 @@
 #include <QtCore/QtPlugin>
 #include <QDebug>
 #include <QPointer>
+#include <QHBoxLayout>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -104,7 +106,12 @@ public:
     virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
 
 private:
-    QPointer<ANSHAREDLIB::Communicator> m_pCommu;
+    QPointer<ANSHAREDLIB::Communicator>             m_pCommu;
+
+    QSharedPointer<DISPLIB::ChannelSelectionView>   m_pChannelSelectionView;
+
+    QHBoxLayout*                                    m_pViewLayout;
+    QHBoxLayout*                                    m_pControlLayout;
 };
 
 //=============================================================================================================
