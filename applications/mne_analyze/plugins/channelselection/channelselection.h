@@ -41,7 +41,6 @@
 
 #include "channelselection_global.h"
 #include <anShared/Interfaces/IPlugin.h>
-#include <disp/viewers/channelselectionview.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -59,6 +58,16 @@
 
 namespace ANSHAREDLIB {
     class Communicator;
+    class AbstractModel;
+}
+
+namespace DISPLIB {
+    class ChannelSelectionView;
+    class ChannelInfoModel;
+}
+
+namespace FIFFLIB {
+    class FiffInfo;
 }
 
 //=============================================================================================================
@@ -106,12 +115,21 @@ public:
     virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
 
 private:
-    QPointer<ANSHAREDLIB::Communicator>             m_pCommu;
 
-    QSharedPointer<DISPLIB::ChannelSelectionView>   m_pChannelSelectionView;
+    //=========================================================================================================
+    void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
 
-    QHBoxLayout*                                    m_pViewLayout;
-    QHBoxLayout*                                    m_pControlLayout;
+    //=========================================================================================================
+    void setFiffSettings(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
+
+    QPointer<ANSHAREDLIB::Communicator>                 m_pCommu;
+
+    QSharedPointer<DISPLIB::ChannelSelectionView>       m_pChannelSelectionView;
+    QSharedPointer<DISPLIB::ChannelInfoModel>           m_pChannelInfoModel;
+    QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;
+
+    QHBoxLayout*                                        m_pViewLayout;
+    QHBoxLayout*                                        m_pControlLayout;
 };
 
 //=============================================================================================================

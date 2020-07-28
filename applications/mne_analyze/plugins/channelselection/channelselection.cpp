@@ -38,8 +38,11 @@
 
 #include "channelselection.h"
 
-#include <anShared/Management/analyzedata.h>
+#include <disp/viewers/helpers/channelinfomodel.h>
+#include <disp/viewers/channelselectionview.h>
+
 #include <anShared/Management/communicator.h>
+#include <anShared/Management/analyzedata.h>
 #include <anShared/Utils/metatypes.h>
 
 //=============================================================================================================
@@ -61,7 +64,7 @@ using namespace ANSHAREDLIB;
 
 ChannelSelection::ChannelSelection()
 {
-    //m_pChannelSelectionView = QSharedPointer<DISPLIB::ChannelSelectionView>(new DISPLIB::ChannelSelectionView());
+//    m_pChannelSelectionView = QSharedPointer<DISPLIB::ChannelSelectionView>(new DISPLIB::ChannelSelectionView(QString("MNEANALYZE/CHANSELECT")));
 }
 
 //=============================================================================================================
@@ -113,7 +116,7 @@ QDockWidget *ChannelSelection::getControl()
     m_pControlLayout = new QHBoxLayout();
     pControlWidget->setLayout(m_pControlLayout);
 
-//    m_pControlLayout->addWidget(m_pChannelSelectionView->getControlWidget());
+    //m_pControlLayout->addWidget(m_pChannelSelectionView->getControlWidget());
 
     return pControlWidget;
 
@@ -127,6 +130,9 @@ QWidget *ChannelSelection::getView()
     QWidget* pViewWidget = new QWidget();
     m_pViewLayout = new QHBoxLayout();
     pViewWidget->setLayout(m_pViewLayout);
+
+    //m_pViewLayout->addWidget(m_pChannelSelectionView->getViewWidget());
+
     return pViewWidget;
 
     //return Q_NULLPTR;
@@ -137,10 +143,12 @@ QWidget *ChannelSelection::getView()
 void ChannelSelection::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
-    case EVENT_TYPE::SELECTED_MODEL_CHANGED:
-    default:
-        qWarning() << "[ChannelSelection::handleEvent] received an Event that is not handled by switch-cases";
-        break;
+        case EVENT_TYPE::SELECTED_MODEL_CHANGED:
+            onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
+            break;
+        default:
+            qWarning() << "[ChannelSelection::handleEvent] received an Event that is not handled by switch-cases";
+            break;
     }
 }
 
@@ -152,4 +160,32 @@ QVector<EVENT_TYPE> ChannelSelection::getEventSubscriptions(void) const
     temp.push_back(SELECTED_MODEL_CHANGED);
 
     return temp;
+}
+
+//=============================================================================================================
+
+void ChannelSelection::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel)
+{
+    if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
+        setFiffSettings(qSharedPointerCast<FiffRawViewModel>(pNewModel)->getFiffInfo());
+    }
+}
+
+//=============================================================================================================
+
+void ChannelSelection::setFiffSettings(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo)
+{
+    qDebug() << "ChannelSelection::setFiffSettings";
+
+    m_pFiffInfo = pFiffInfo;
+
+    m_pChannelInfoModel = QSharedPointer<DISPLIB::ChannelInfoModel>(new DISPLIB::ChannelInfoModel(m_pFiffInfo));
+
+//    m_pChannelSelectionView = QSharedPointer<DISPLIB::ChannelSelectionView>(new DISPLIB::ChannelSelectionView(QString("MNEANALYZE/CHANSELECT"),
+//                                                                           Q_NULLPTR,
+//                                                                           m_pChannelInfoModel,
+//                                                                           Qt::Window));
+
+//    m_pViewLayout->addWidget(m_pChannelSelectionView->getViewWidget());
+//    m_pControlLayout->addWidget(m_pChannelSelectionView->getControlWidget());
 }
