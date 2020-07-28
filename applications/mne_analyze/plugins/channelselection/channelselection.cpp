@@ -112,13 +112,24 @@ QMenu *ChannelSelection::getMenu()
 
 QDockWidget *ChannelSelection::getControl()
 {
-    QDockWidget* pControlWidget = new QDockWidget();
+    QDockWidget* pControlDockWidget = new QDockWidget(getName());
+    QWidget* pControlWidget = new QWidget(pControlDockWidget);
+
     m_pControlLayout = new QHBoxLayout();
     pControlWidget->setLayout(m_pControlLayout);
+    pControlDockWidget->setWidget(pControlWidget);
 
     //m_pControlLayout->addWidget(m_pChannelSelectionView->getControlWidget());
 
-    return pControlWidget;
+    pControlDockWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    pControlDockWidget->setObjectName("Channel Selection");
+    pControlDockWidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,
+                                        QSizePolicy::Preferred));
+
+//    QLabel* test = new QLabel("getControl");
+//    m_pControlLayout->addWidget(test);
+
+    return pControlDockWidget;
 
     //return Q_NULLPTR;
 }
@@ -181,11 +192,17 @@ void ChannelSelection::setFiffSettings(QSharedPointer<FIFFLIB::FiffInfo> pFiffIn
 
     m_pChannelInfoModel = QSharedPointer<DISPLIB::ChannelInfoModel>(new DISPLIB::ChannelInfoModel(m_pFiffInfo));
 
-//    m_pChannelSelectionView = QSharedPointer<DISPLIB::ChannelSelectionView>(new DISPLIB::ChannelSelectionView(QString("MNEANALYZE/CHANSELECT"),
-//                                                                           Q_NULLPTR,
-//                                                                           m_pChannelInfoModel,
-//                                                                           Qt::Window));
+    m_pChannelSelectionView = QSharedPointer<DISPLIB::ChannelSelectionView>(new DISPLIB::ChannelSelectionView(QString("MNEANALYZE/CHANSELECT"),
+                                                                           Q_NULLPTR,
+                                                                           m_pChannelInfoModel,
+                                                                           Qt::Window));
 
-//    m_pViewLayout->addWidget(m_pChannelSelectionView->getViewWidget());
-//    m_pControlLayout->addWidget(m_pChannelSelectionView->getControlWidget());
+    m_pViewLayout->addWidget(m_pChannelSelectionView->getViewWidget());
+    m_pControlLayout->addWidget(m_pChannelSelectionView->getControlWidget());
+
+    //QWidget* pChSelectControls = m_pChannelSelectionView->getControlWidget();
+//    QLabel* test = new QLabel("setFiffSettings");
+//    m_pControlLayout->addWidget(test);
+    //m_pControlLayout->addWidget(pChSelectControls);
+    //pChSelectControls->show();
 }
