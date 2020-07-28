@@ -101,7 +101,8 @@ namespace ANSHAREDLIB
         TRIGGER_VIEWER_MOVE,        // send when scroll position of viewer needs to be moved
         FILTER_CHANNEL_TYPE_CHANGED,// send when the channel type to be filtered changed
         FILTER_ACTIVE_CHANGED,      // send when the filter active state was toggled
-        FILTER_DESIGN_CHANGED       // send when the designed filter changed
+        FILTER_DESIGN_CHANGED,      // send when the designed filter changed
+        SET_CHANNEL_SELECTION
     };
 } //NAMESPACE
 
