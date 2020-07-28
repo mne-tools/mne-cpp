@@ -232,6 +232,8 @@ private:
      */
     void loadFullGui();
 
+    void setChannelSelection();
+
     //=========================================================================================================
     /**
      * Clears saved averaging data
