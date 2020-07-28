@@ -63,6 +63,12 @@ using namespace ANSHAREDLIB;
 //=============================================================================================================
 
 ChannelSelection::ChannelSelection()
+: m_pChannelSelectionView(Q_NULLPTR)
+, m_pChannelInfoModel(Q_NULLPTR)
+, m_pFiffInfo(Q_NULLPTR)
+, m_pViewLayout(Q_NULLPTR)
+, m_pControlLayout(Q_NULLPTR)
+, m_bIsInit(false)
 {
 //    m_pChannelSelectionView = QSharedPointer<DISPLIB::ChannelSelectionView>(new DISPLIB::ChannelSelectionView(QString("MNEANALYZE/CHANSELECT")));
 }
@@ -190,6 +196,10 @@ void ChannelSelection::setFiffSettings(QSharedPointer<FIFFLIB::FiffInfo> pFiffIn
 
     m_pFiffInfo = pFiffInfo;
 
+    if(m_bIsInit){
+        return;
+    }
+
     m_pChannelInfoModel = QSharedPointer<DISPLIB::ChannelInfoModel>(new DISPLIB::ChannelInfoModel(m_pFiffInfo));
 
     m_pChannelSelectionView = QSharedPointer<DISPLIB::ChannelSelectionView>(new DISPLIB::ChannelSelectionView(QString("MNEANALYZE/CHANSELECT"),
@@ -200,9 +210,16 @@ void ChannelSelection::setFiffSettings(QSharedPointer<FIFFLIB::FiffInfo> pFiffIn
     m_pViewLayout->addWidget(m_pChannelSelectionView->getViewWidget());
     m_pControlLayout->addWidget(m_pChannelSelectionView->getControlWidget());
 
-    //QWidget* pChSelectControls = m_pChannelSelectionView->getControlWidget();
-//    QLabel* test = new QLabel("setFiffSettings");
-//    m_pControlLayout->addWidget(test);
-    //m_pControlLayout->addWidget(pChSelectControls);
-    //pChSelectControls->show();
+    connect(m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::loadedLayoutMap,
+            m_pChannelInfoModel.data(), &DISPLIB::ChannelInfoModel::layoutChanged, Qt::UniqueConnection);
+
+    connect(m_pChannelInfoModel.data(), &DISPLIB::ChannelInfoModel::channelsMappedToLayout,
+            m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::setCurrentlyMappedFiffChannels, Qt::UniqueConnection);
+
+
+    QVariant data;
+    data.setValue(m_pChannelInfoModel);
+    m_pCommu->publishEvent(EVENT_TYPE::SET_CHANNEL_SELECTION, data);
+
+    m_bIsInit = true;
 }

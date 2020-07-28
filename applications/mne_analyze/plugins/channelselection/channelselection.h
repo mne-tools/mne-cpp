@@ -130,6 +130,8 @@ private:
 
     QHBoxLayout*                                        m_pViewLayout;
     QHBoxLayout*                                        m_pControlLayout;
+
+    bool                                                m_bIsInit;
 };
 
 //=============================================================================================================
