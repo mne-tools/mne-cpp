@@ -247,7 +247,12 @@ void Averaging::handleEvent(QSharedPointer<Event> e)
             break;
         case EVENT_GROUPS_UPDATED:
             updateGroups();
-        break;
+            break;
+        case SET_CHANNEL_SELECTION:
+            qDebug() << "Averaging::handleEvent -- SET_CHANNEL_SELECTION";
+            m_pChannelInfoModel = e->getData().value<QSharedPointer<DISPLIB::ChannelInfoModel>>();
+            setChannelSelection();
+            break;
         default:
             qWarning() << "[Averaging::handleEvent] Received an Event that is not handled by switch cases.";
     }
@@ -262,6 +267,7 @@ QVector<EVENT_TYPE> Averaging::getEventSubscriptions(void) const
     temp.push_back(FILTER_ACTIVE_CHANGED);
     temp.push_back(FILTER_DESIGN_CHANGED);
     temp.push_back(EVENT_GROUPS_UPDATED);
+    temp.push_back(SET_CHANNEL_SELECTION);
 
     return temp;
 }
@@ -425,39 +431,39 @@ void Averaging::loadFullGui()
     m_pFiffInfo = m_pFiffRawModel->getFiffInfo();
 
     //Init Models
-    m_pChannelInfoModel = DISPLIB::ChannelInfoModel::SPtr::create(m_pFiffInfo);
+//    m_pChannelInfoModel = DISPLIB::ChannelInfoModel::SPtr::create(m_pFiffInfo);
     m_pEvokedModel = QSharedPointer<DISPLIB::EvokedSetModel>(new DISPLIB::EvokedSetModel());
     m_pFiffEvokedSet = QSharedPointer<FIFFLIB::FiffEvokedSet>(new FIFFLIB::FiffEvokedSet());
 
     //Channel Selection View
-    m_pChannelSelectionView = QSharedPointer<DISPLIB::ChannelSelectionView>(new DISPLIB::ChannelSelectionView(QString("MNEANALYZE/AVERAGING"),
-                                                                           Q_NULLPTR,
-                                                                           m_pChannelInfoModel,
-                                                                           Qt::Window));
+//    m_pChannelSelectionView = QSharedPointer<DISPLIB::ChannelSelectionView>(new DISPLIB::ChannelSelectionView(QString("MNEANALYZE/AVERAGING"),
+//                                                                           Q_NULLPTR,
+//                                                                           m_pChannelInfoModel,
+//                                                                           Qt::Window));
 
-    connect(m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::loadedLayoutMap,
-            m_pChannelInfoModel.data(), &DISPLIB::ChannelInfoModel::layoutChanged, Qt::UniqueConnection);
+//    connect(m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::loadedLayoutMap,
+//            m_pChannelInfoModel.data(), &DISPLIB::ChannelInfoModel::layoutChanged, Qt::UniqueConnection);
 
-    connect(m_pChannelInfoModel.data(), &DISPLIB::ChannelInfoModel::channelsMappedToLayout,
-            m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::setCurrentlyMappedFiffChannels, Qt::UniqueConnection);
+//    connect(m_pChannelInfoModel.data(), &DISPLIB::ChannelInfoModel::channelsMappedToLayout,
+//            m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::setCurrentlyMappedFiffChannels, Qt::UniqueConnection);
 
-    connect(m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::showSelectedChannelsOnly,
-            m_pButterflyView.data(), &DISPLIB::ButterflyView::showSelectedChannelsOnly, Qt::UniqueConnection);
+//    connect(m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::showSelectedChannelsOnly,
+//            m_pButterflyView.data(), &DISPLIB::ButterflyView::showSelectedChannelsOnly, Qt::UniqueConnection);
 
-    connect(m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::selectionChanged,
-            m_pAverageLayoutView.data(), &DISPLIB::AverageLayoutView::channelSelectionManagerChanged, Qt::UniqueConnection);
+//    connect(m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::selectionChanged,
+//            m_pAverageLayoutView.data(), &DISPLIB::AverageLayoutView::channelSelectionManagerChanged, Qt::UniqueConnection);
 
-    QPushButton* pChanSelButton = new QPushButton();
-    pChanSelButton->setText("Channel Selection");
-    connect(pChanSelButton, &QPushButton::clicked,
-            this, &Averaging::onChannelButtonClicked);
+//    QPushButton* pChanSelButton = new QPushButton();
+//    pChanSelButton->setText("Channel Selection");
+//    connect(pChanSelButton, &QPushButton::clicked,
+//            this, &Averaging::onChannelButtonClicked);
 
     //Init View components
-    m_pButterflyView->setChannelInfoModel(m_pChannelInfoModel);
-    m_pChannelSelectionView->updateDataView();
+    //m_pButterflyView->setChannelInfoModel(m_pChannelInfoModel);
+    //m_pChannelSelectionView->updateDataView();
     m_pAverageLayoutView->setEvokedSetModel(m_pEvokedModel);
-    m_pAverageLayoutView->setChannelInfoModel(m_pChannelInfoModel);
-    m_pChannelInfoModel->layoutChanged(m_pChannelSelectionView->getLayoutMap());
+    //m_pAverageLayoutView->setChannelInfoModel(m_pChannelInfoModel);
+    //m_pChannelInfoModel->layoutChanged(m_pChannelSelectionView->getLayoutMap());
 
     //Scaling View
     DISPLIB::ScalingView* pScalingView = new DISPLIB::ScalingView(QString("MNEANALYZE/AVERAGING"));
@@ -539,7 +545,7 @@ void Averaging::loadFullGui()
     m_pButterflyView->setBackgroundColor(pChannelDataSettingsView->getBackgroundColor());
 
     //Add new widgets
-    m_pLayout->addWidget(pChanSelButton);
+    //m_pLayout->addWidget(pChanSelButton);
 
     m_pTabView->addTab(pScalingView, "Scaling");
     m_pTabView->addTab(pModalitySelectionView, "Modality");
@@ -622,4 +628,23 @@ void Averaging::updateGroups()
 void Averaging::onChangeGroupSelect(const QString &text)
 {
     m_iCurrentGroup = m_pFiffRawModel->getAnnotationModel()->getIndexFromName(text);
+}
+
+//=============================================================================================================
+
+void Averaging::setChannelSelection()
+{
+    connect(m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::showSelectedChannelsOnly,
+            m_pButterflyView.data(), &DISPLIB::ButterflyView::showSelectedChannelsOnly, Qt::UniqueConnection);
+
+    connect(m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::selectionChanged,
+            m_pAverageLayoutView.data(), &DISPLIB::AverageLayoutView::channelSelectionManagerChanged, Qt::UniqueConnection);
+
+    m_pButterflyView->setChannelInfoModel(m_pChannelInfoModel);
+    m_pChannelSelectionView->updateDataView();
+
+    m_pAverageLayoutView->setChannelInfoModel(m_pChannelInfoModel);
+    m_pChannelInfoModel->layoutChanged(m_pChannelSelectionView->getLayoutMap());
+
+
 }
