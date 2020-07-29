@@ -114,6 +114,10 @@ public:
     virtual void handleEvent(QSharedPointer<ANSHAREDLIB::Event> e) override;
     virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
 
+private slots:
+    //=========================================================================================================
+    void onShowSelectedChannelsOnly(QStringList selectedChannels);
+
 private:
 
     //=========================================================================================================
@@ -121,6 +125,7 @@ private:
 
     //=========================================================================================================
     void setFiffSettings(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
+
 
     QPointer<ANSHAREDLIB::Communicator>                 m_pCommu;
 
