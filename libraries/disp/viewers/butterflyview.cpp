@@ -268,6 +268,13 @@ void ButterflyView::showSelectedChannelsOnly(const QStringList& selectedChannels
 
 //=============================================================================================================
 
+void ButterflyView::showSelectedChannels(const QList<int> selectedChannelsIndexes)
+{
+    setSelectedChannels(selectedChannelsIndexes);
+}
+
+//=============================================================================================================
+
 void ButterflyView::saveSettings()
 {
     if(m_sSettingsPath.isEmpty()) {

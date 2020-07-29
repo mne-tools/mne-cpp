@@ -127,6 +127,10 @@ public:
     virtual void handleEvent(QSharedPointer<ANSHAREDLIB::Event> e) override;
     virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
 
+signals:
+    //=========================================================================================================
+    void showSelectedChannels(const QList<int> selectedChannelsIndexes);
+
 private:
     //=========================================================================================================
     /**
@@ -232,7 +236,7 @@ private:
      */
     void loadFullGui();
 
-    void setChannelSelection();
+    void setChannelSelection(const QList<int> selectedChannelsIndexes);
 
     //=========================================================================================================
     /**

@@ -210,6 +210,9 @@ void ChannelSelection::setFiffSettings(QSharedPointer<FIFFLIB::FiffInfo> pFiffIn
     m_pViewLayout->addWidget(m_pChannelSelectionView->getViewWidget());
     m_pControlLayout->addWidget(m_pChannelSelectionView->getControlWidget());
 
+    connect(m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::showSelectedChannelsOnly,
+            this, &ChannelSelection::onShowSelectedChannelsOnly, Qt::UniqueConnection);
+
     connect(m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::loadedLayoutMap,
             m_pChannelInfoModel.data(), &DISPLIB::ChannelInfoModel::layoutChanged, Qt::UniqueConnection);
 
@@ -217,9 +220,24 @@ void ChannelSelection::setFiffSettings(QSharedPointer<FIFFLIB::FiffInfo> pFiffIn
             m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::setCurrentlyMappedFiffChannels, Qt::UniqueConnection);
 
 
-    QVariant data;
-    data.setValue(m_pChannelInfoModel);
-    m_pCommu->publishEvent(EVENT_TYPE::SET_CHANNEL_SELECTION, data);
+//    QVariant data;
+//    data.setValue(m_pChannelInfoModel);
+//    m_pCommu->publishEvent(EVENT_TYPE::SET_CHANNEL_SELECTION, data);
 
     m_bIsInit = true;
+}
+
+//=============================================================================================================
+
+void ChannelSelection::onShowSelectedChannelsOnly(QStringList selectedChannels)
+{
+    QList<int> selectedChannelsIndexes;
+
+    for(int i = 0; i<selectedChannels.size(); i++)
+        selectedChannelsIndexes<<m_pChannelInfoModel->getIndexFromOrigChName(selectedChannels.at(i));
+
+    QVariant data;
+    data.setValue(selectedChannelsIndexes);
+    m_pCommu->publishEvent(EVENT_TYPE::SET_CHANNEL_SELECTION, data);
+
 }

@@ -237,6 +237,9 @@ public:
     void showSelectedChannelsOnly(const QStringList& selectedChannels);
 
     //=========================================================================================================
+    void showSelectedChannels(const QList<int> selectedChannelsIndexes);
+
+    //=========================================================================================================
     /**
      * Saves all important settings of this view via QSettings.
      */
