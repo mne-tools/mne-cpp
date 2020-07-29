@@ -219,6 +219,7 @@ void ChannelSelection::setFiffSettings(QSharedPointer<FIFFLIB::FiffInfo> pFiffIn
     connect(m_pChannelInfoModel.data(), &DISPLIB::ChannelInfoModel::channelsMappedToLayout,
             m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::setCurrentlyMappedFiffChannels, Qt::UniqueConnection);
 
+    m_pChannelSelectionView->updateDataView();
 
 //    QVariant data;
 //    data.setValue(m_pChannelInfoModel);
