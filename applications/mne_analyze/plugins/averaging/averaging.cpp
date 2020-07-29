@@ -152,6 +152,9 @@ QWidget *Averaging::getView()
     m_pButterflyView = new DISPLIB::ButterflyView("", pTabView);
     m_pAverageLayoutView = new DISPLIB::AverageLayoutView("", pTabView);
 
+    connect(this, &Averaging::showSelectedChannels,
+            m_pButterflyView.data(), &DISPLIB::ButterflyView::showSelectedChannels, Qt::UniqueConnection);
+
     m_pButterflyView->setObjectName("butterflyview");
     m_pAverageLayoutView->setObjectName("layoutview");
     pAveragingViewWidget->setObjectName("AvgView");
@@ -445,9 +448,6 @@ void Averaging::loadFullGui()
 //    connect(m_pChannelInfoModel.data(), &DISPLIB::ChannelInfoModel::channelsMappedToLayout,
 //            m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::setCurrentlyMappedFiffChannels, Qt::UniqueConnection);
 
-    connect(this, &Averaging::showSelectedChannels,
-            m_pButterflyView.data(), &DISPLIB::ButterflyView::showSelectedChannels, Qt::UniqueConnection);
-
 //    connect(m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::selectionChanged,
 //            m_pAverageLayoutView.data(), &DISPLIB::AverageLayoutView::channelSelectionManagerChanged, Qt::UniqueConnection);
 
@@ -457,7 +457,7 @@ void Averaging::loadFullGui()
             this, &Averaging::onChannelButtonClicked);
 
     //Init View components
-    m_pButterflyView->setChannelInfoModel(m_pChannelInfoModel);
+//    m_pButterflyView->setChannelInfoModel(m_pChannelInfoModel);
 //    m_pChannelSelectionView->updateDataView();
     m_pAverageLayoutView->setEvokedSetModel(m_pEvokedModel);
 //    m_pAverageLayoutView->setChannelInfoModel(m_pChannelInfoModel);
