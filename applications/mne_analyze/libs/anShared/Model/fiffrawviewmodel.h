@@ -499,19 +499,17 @@ public:
 private:
     //=========================================================================================================
     /**
-     * Calculates the filtered version of all loaded data blocks
-     */
-    void filterAllDataBlocks();
-
-    //=========================================================================================================
-    /**
      * Calculates the filtered version of one single datablock
      *
-     * @param[in]   matData         The data block to be filtered.
-     * @param [in]  bFilterEnd      Whether to perform the overlap add in the beginning or end of the data.
+     * @param [in]   matData         The data block to be filtered.
+     * @param [in]   bFilterEnd      Whether to perform the overlap add in the beginning or end of the data.
+     * @param [in]   bKeepOverhead   Whether to keep the overhead.
+     *
+     * @return Returns true if filtering was performed, otherwise returns false
      */
-    void filterDataBlock(MatrixXd& matData,
-                         bool bFilterEnd);
+    bool filterDataBlock(MatrixXd& matData,
+                         bool bFilterEnd,
+                         bool bKeepOverhead = false);
 
     //=========================================================================================================
     /**
