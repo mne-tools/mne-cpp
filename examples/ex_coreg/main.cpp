@@ -40,6 +40,8 @@
 
 #include "fiff/fiff_dig_point_set.h"
 #include "fiff/fiff_dig_point.h"
+#include "fiff/fiff_coord_trans.h"
+
 #include <utils/generics/applicationlogger.h>
 #include "utils/icp.h"
 
@@ -91,13 +93,24 @@ int main(int argc, char *argv[])
 
     QCommandLineOption srcOption("src", "The original point set", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/coreg/sample-fiducials.fif");
     QCommandLineOption dstOption("dst", "The destination point set", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption scaleOption("scale", "Weather to scale during the registration or not", "bool", "false");
+
     parser.addOption(srcOption);
     parser.addOption(dstOption);
+    parser.addOption(scaleOption);
     parser.process(a);
 
     // get cli parameters
     QFile t_fileSrc(parser.value(srcOption));
     QFile t_fileDst(parser.value(dstOption));
+
+    bool bscale = false;
+    if(parser.value(scaleOption) == "false" || parser.value(scaleOption) == "0") {
+        bscale = false;
+    } else if(parser.value(scaleOption) == "true" || parser.value(scaleOption) == "1") {
+        bscale = true;
+    }
+
 
     // read digitizer data
     QList<int> lPickFiducials({FIFFV_POINT_CARDINAL});
@@ -107,11 +120,13 @@ int main(int argc, char *argv[])
     qDebug() << "digSetSrc.size(): " << digSetSrc.size();
     qDebug() << "digSetDst.size(): " << digSetDst.size();
     // Declare variables
-    MatrixXd matSrc(digSetSrc.size(),3);
-    MatrixXd matDst(digSetDst.size(),3);
-    VectorXd vecTransParam;
-    VectorXd vecWeights;
-    bool bDoScale = false;
+    Matrix3f matSrc(digSetSrc.size(),3);
+    Matrix3f matDst(digSetDst.size(),3);
+    Vector3f vecTrans;
+    Matrix3f matRot;
+    Vector3f vecWeights(1.0,10.0,1.0); // LPA, Nasion, RPA
+    float fScale;
+    bool bScale = false;
 
     // get coordinates
     for(int i = 0; i< digSetSrc.size(); ++i) {
@@ -119,11 +134,27 @@ int main(int argc, char *argv[])
         matDst(i,0) = digSetDst[i].r[0]; matDst(i,1) = digSetDst[i].r[1]; matDst(i,2) = digSetDst[i].r[2];
     }
 
-    if(!fit_matched(matSrc,matDst,vecTransParam)) {
+    if(!fit_matched(matSrc,matDst,matRot,vecTrans,fScale,bScale,vecWeights)) {
         qWarning() << "point cloud registration not succesfull";
     }
 
-    std::cout << vecTransParam << std::endl;
+    qDebug() << "From: " << digSetSrc[0].coord_frame;
+    qDebug() << "To: " << digSetDst[0].coord_frame;
+    std::cout << matRot << std::endl;
+    std::cout << vecTrans << std::endl;
+
+    FiffCoordTrans transMriHead = FiffCoordTrans::make(digSetSrc[0].coord_frame, digSetDst[0].coord_frame,matRot,vecTrans);
+
+    qDebug() << "b";
+
+    Matrix3f matSrcTransposed = transMriHead.apply_trans(matSrc);
+
+    qDebug() << "c";
+
+    Matrix3f matDiff = matDst - matSrcTransposed;
+
+    qDebug() << "d";
+    std::cout << matDiff.rowwise().mean() << std::endl;
 
     return a.exec();
 }
