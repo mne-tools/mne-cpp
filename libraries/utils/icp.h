@@ -32,25 +32,24 @@
  *
  */
 
-#ifndef NAMESPACE_ICP_H
-#define NAMESPACE_ICP_H
+#ifndef ICP_H
+#define ICP_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
 //=============================================================================================================
-// EIGEN INCLUDES
-//=============================================================================================================
-
-#include <Eigen/Core>
-
-//=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QSharedPointer>
-#include <QStringList>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -60,12 +59,13 @@
 // DEFINE NAMESPACE NAMESPACE
 //=============================================================================================================
 
-namespace NAMESPACE {
-
+namespace UTILSLIB {
 
 //=============================================================================================================
 // NAMESPACE FORWARD DECLARATIONS
 //=============================================================================================================
+
+const Eigen::VectorXd vecDefaultWeigths;
 
 //=============================================================================================================
 /**
@@ -86,6 +86,24 @@ public:
     */
     ICP();
 
+    //=========================================================================================================
+    /**
+     * Corresponding point set registration using quaternions.
+     *
+     * @param [in]  matSrcPoint          The source point set.
+     * @param [in]  matDstPoint          The destination point set.
+     * @param [in]  vecWeitgths          The weitghts to apply.
+     * @param [in]  bScale               Wether to apply scaling or not.
+     * @param [out] vecTransParam        The quaternion and scale parameters (q1,q2,q3,t1,t2,t3,s).
+     *
+     * @return Wether the matching was succesfull.
+     */
+    bool fit_matched(const Eigen::MatrixXd& matSrcPoint,
+                     const Eigen::MatrixXd& matDstPoint,
+                     Eigen::VectorXd& vecTransParam,
+                     const Eigen::VectorXd& vecWeitgths = vecDefaultWeigths,
+                     const bool bScale=false);
+
 protected:
 
 private:
@@ -97,8 +115,6 @@ private:
 //=============================================================================================================
 
 
-} // namespace NAMESPACE
+} // namespace
 
-#endif // NAMESPACE_ICP_H
-ass}')}
-#endif // NAMESPACE_ICP_H
+#endif // ICP_H
