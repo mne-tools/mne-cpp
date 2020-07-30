@@ -213,11 +213,17 @@ void ChannelSelection::setFiffSettings(QSharedPointer<FIFFLIB::FiffInfo> pFiffIn
     connect(m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::showSelectedChannelsOnly,
             this, &ChannelSelection::onShowSelectedChannelsOnly, Qt::UniqueConnection);
 
+    connect(m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::selectionChanged,
+            this, &ChannelSelection::onSelectionChanged, Qt::UniqueConnection);
+
     connect(m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::loadedLayoutMap,
             m_pChannelInfoModel.data(), &DISPLIB::ChannelInfoModel::layoutChanged, Qt::UniqueConnection);
 
     connect(m_pChannelInfoModel.data(), &DISPLIB::ChannelInfoModel::channelsMappedToLayout,
             m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::setCurrentlyMappedFiffChannels, Qt::UniqueConnection);
+
+
+    m_pChannelInfoModel->layoutChanged(m_pChannelSelectionView->getLayoutMap());
 
     m_pChannelSelectionView->updateDataView();
 
@@ -230,7 +236,7 @@ void ChannelSelection::setFiffSettings(QSharedPointer<FIFFLIB::FiffInfo> pFiffIn
 
 //=============================================================================================================
 
-void ChannelSelection::onShowSelectedChannelsOnly(QStringList selectedChannels)
+void ChannelSelection::onShowSelectedChannelsOnly(const QStringList&  selectedChannels)
 {
     QList<int> selectedChannelsIndexes;
 
@@ -241,4 +247,13 @@ void ChannelSelection::onShowSelectedChannelsOnly(QStringList selectedChannels)
     data.setValue(selectedChannelsIndexes);
     m_pCommu->publishEvent(EVENT_TYPE::SET_CHANNEL_SELECTION, data);
 
+}
+
+//=============================================================================================================
+
+void ChannelSelection::onSelectionChanged(const QList<QGraphicsItem*> &selectedChannelItems)
+{
+    QVariant data;
+    data.setValue(selectedChannelItems);
+    m_pCommu->publishEvent(EVENT_TYPE::SET_CHANNEL_SELECTION_TEMP, data);
 }

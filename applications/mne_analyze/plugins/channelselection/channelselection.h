@@ -116,7 +116,9 @@ public:
 
 private slots:
     //=========================================================================================================
-    void onShowSelectedChannelsOnly(QStringList selectedChannels);
+    void onShowSelectedChannelsOnly(const QStringList&  selectedChannels);
+
+    void onSelectionChanged(const QList<QGraphicsItem*> &selectedChannelItems);
 
 private:
 
