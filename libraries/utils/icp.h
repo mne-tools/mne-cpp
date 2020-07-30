@@ -39,6 +39,8 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "utils_global.h"
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -65,7 +67,27 @@ namespace UTILSLIB {
 // NAMESPACE FORWARD DECLARATIONS
 //=============================================================================================================
 
-const Eigen::VectorXd vecDefaultWeigths;
+const Eigen::VectorXf vecDefaultWeigths;
+
+//=========================================================================================================
+/**
+ * Corresponding point set registration using quaternions.
+ *
+ * @param [in]  matSrcPoint          The source point set.
+ * @param [in]  matDstPoint          The destination point set.
+ * @param [in]  vecWeitgths          The weitghts to apply.
+ * @param [in]  bScale               Wether to apply scaling or not.
+ * @param [out] vecTransParam        The quaternion and scale parameters (q1,q2,q3,t1,t2,t3,s).
+ *
+ * @return Wether the matching was succesfull.
+ */
+UTILSSHARED_EXPORT bool fit_matched(const Eigen::Matrix3f& matSrcPoint,
+                                    const Eigen::Matrix3f& matDstPoint,
+                                    Eigen::Matrix3f& matRot,
+                                    Eigen::Vector3f& vecTrans,
+                                    float fScale = 1.0,
+                                    const bool bScale=false,
+                                    const Eigen::VectorXf& vecWeitgths = vecDefaultWeigths);
 
 //=============================================================================================================
 /**
@@ -73,7 +95,7 @@ const Eigen::VectorXd vecDefaultWeigths;
  *
  * @brief Brief description of this class.
  */
-class ICP
+class UTILSSHARED_EXPORT ICP
 {
 
 public:
@@ -86,23 +108,7 @@ public:
     */
     ICP();
 
-    //=========================================================================================================
-    /**
-     * Corresponding point set registration using quaternions.
-     *
-     * @param [in]  matSrcPoint          The source point set.
-     * @param [in]  matDstPoint          The destination point set.
-     * @param [in]  vecWeitgths          The weitghts to apply.
-     * @param [in]  bScale               Wether to apply scaling or not.
-     * @param [out] vecTransParam        The quaternion and scale parameters (q1,q2,q3,t1,t2,t3,s).
-     *
-     * @return Wether the matching was succesfull.
-     */
-    bool fit_matched(const Eigen::MatrixXd& matSrcPoint,
-                     const Eigen::MatrixXd& matDstPoint,
-                     Eigen::VectorXd& vecTransParam,
-                     const Eigen::VectorXd& vecWeitgths = vecDefaultWeigths,
-                     const bool bScale=false);
+
 
 protected:
 

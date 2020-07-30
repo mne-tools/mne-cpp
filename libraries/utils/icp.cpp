@@ -75,87 +75,103 @@ ICP::ICP()
 
 //=============================================================================================================
 
-bool fit_matched(const MatrixXd& matSrcPoint,
-                 const MatrixXd& matDstPoint,
-                 const VectorXd& vecWeitgths,
-                 VectorXd& vecTransParam,
-                 const bool bScale=false)
+bool UTILSLIB::fit_matched(const Matrix3f& matSrcPoint,
+                           const Matrix3f& matDstPoint,
+                           Matrix3f& matRot,
+                           Vector3f& vecTrans,
+                           float fScale,
+                           const bool bScale,
+                           const VectorXf& vecWeitgths)
 /**
  * Follow notation of P.J. Besl and N.D. McKay, A Method for
  * Registration of 3-D Shapes, IEEE Trans. Patt. Anal. Machine Intell., 14,
  * 239 - 255, 1992.
  *
- * The code is further adapted from MNE Python.
+ * The code is further adapted from MNE Python function _fit_matched_points(...).
  */
 {
     // init values
-    MatrixXd matP = matSrcPoint;
-    MatrixXd matX = matDstPoint;
-    VectorXd vecW = vecWeitgths;
-    VectorXd vecMuP;                // column wise mean - center of mass
-    VectorXd vecMuX;                // column wise mean - center of mass
-    MatrixXd matDot;
-    MatrixXd matSigmaPX;            // cross-covariance
-    MatrixXd matAij;                // Anti-Symmetric matrix
-    Vector3d vecDelta;              // column vector, elements of matAij
-    MatrixXd matQ = MatrixXd::Identity(4,4);
-    double dTrace;
-    double dScale = 1.0;
+    MatrixXf matP = matSrcPoint;
+    MatrixXf matX = matDstPoint;
+    VectorXf vecW = vecWeitgths;
+    VectorXf vecMuP;                // column wise mean - center of mass
+    VectorXf vecMuX;                // column wise mean - center of mass
+    MatrixXf matDot;
+    MatrixXf matSigmaPX;            // cross-covariance
+    MatrixXf matAij;                // Anti-Symmetric matrix
+    Vector3f vecDelta;              // column vector, elements of matAij
+    Matrix4f matQ = Matrix4f::Identity(4,4);
+    float fTrace;
+    fScale = 1.0;
     // test size of point clouds
     if(matSrcPoint.size() != matDstPoint.size()) {
         qWarning() << "UTILSLIB::ICP::fit_matched: Point clouds does not match.";
         return false;
     }
 
+    qDebug() << "matP.size(): " << matP.size();
+    qDebug() << "vecWeitgths.isZero(): " << vecWeitgths.isZero();
     // get center of mass
     if(vecWeitgths.isZero()) {
         vecMuP = matP.colwise().mean(); // eq 23
         vecMuX = matX.colwise().mean();
         matDot = matP.transpose() * matX;
+        qDebug() << "vecMuP.size(): " << vecMuP.size();
+        qDebug() << "vecMuX.size(): " << vecMuX.size();
+        qDebug() << "matDot.size(): " << matDot.size();
     } else {
         vecW = vecWeitgths / vecWeitgths.sum();
         vecMuP = vecW.transpose() * matP;
         vecMuX = vecW.transpose() * matX;
         matDot = matP.transpose() * (vecW * matX);
+        qDebug() << "vecW.size(): " << vecW.size();
+        qDebug() << "vecMuP.size(): " << vecMuP.size();
+        qDebug() << "vecMuX.size(): " << vecMuX.size();
+        qDebug() << "matDot.size(): " << matDot.size();
     }
 
     // get cross-covariance
     matSigmaPX = matDot - vecMuP * vecMuX;  // eq 24
+    qDebug() << "matSigmaPX.size(): " << matSigmaPX.size();
     matAij = matSigmaPX - matSigmaPX.transpose();
+    qDebug() << "matAij.size(): " << matAij.size();
     vecDelta(0) = matAij(1,2); vecDelta(1) = matAij(2,0); vecDelta(2) = matAij(0,1);
-    dTrace = matSigmaPX.trace();
-    matQ(0,0) = dTrace; // eq 25
+    qDebug() << "vecDelta.size(): " << vecDelta.size();
+    fTrace = matSigmaPX.trace();
+    matQ(0,0) = fTrace; // eq 25
     matQ.block(0,1,1,3) = vecDelta;
     matQ.block(1,0,3,1) = vecDelta;
-    matQ.block(1,1,3,3) = matSigmaPX + matSigmaPX.transpose() - dTrace * MatrixXd::Identity(3,3);
-
+    matQ.block(1,1,3,3) = matSigmaPX + matSigmaPX.transpose() - fTrace * MatrixXf::Identity(3,3);
+    qDebug() << "matQ.size(): " << matQ.size();
     // unit eigenvector coresponding to maximum eigenvalue of matQ is selected as optimal rotation
-    SelfAdjointEigenSolver<MatrixXd> es(matQ);
-    Vector4d vecEigVec = es.eigenvectors().col(matQ.cols()-1);  // only take last Eigen-Vector since this corresponds to the maximum Eigenvalue
+    SelfAdjointEigenSolver<MatrixXf> es(matQ);
+    Vector4f vecEigVec = es.eigenvectors().col(matQ.cols()-1);  // only take last Eigen-Vector since this corresponds to the maximum Eigenvalue
+    qDebug() << "vecEigVec.size(): " << vecEigVec.size();
 
-    vecTransParam.segment(0,3) = vecEigVec.segment(1,3);
+    Vector4f vecTransParam = vecEigVec;
     if(vecEigVec(0) != 0) {
-        vecTransParam = vecTransParam * std::copysign(1.0, vecEigVec(0));
+        vecTransParam.segment(1,3) = vecTransParam.segment(1,3) * std::copysign(1.0, vecEigVec(0));
     }
 
-    Quaterniond quatRot(vecEigVec);
-    Matrix3d matRot = quatRot.matrix();
-
+    Quaternionf quatRot(vecTransParam);
+    matRot = quatRot.matrix();
+    qDebug() << "matRot.size(): " << matRot.size();
     // apply scaling if requested
     if(bScale) {
-        MatrixXd matDevX = matX - vecMuX;
-        MatrixXd matDevP = matP - vecMuP;
+        MatrixXf matDevX = matX - vecMuX;
+        MatrixXf matDevP = matP - vecMuP;
         matDevP = matDevP.cwiseProduct(matDevP);
         matDevX = matDevX.cwiseProduct(matDevX);
         if(!vecWeitgths.isZero()) {
             matDevP = matDevP.cwiseProduct(vecW);
             matDevX = matDevX.cwiseProduct(vecW);
         }
-        dScale = std::sqrt(matDevX.sum() / matDevP.sum());
+        qDebug() << "matDevX.size(): " << matDevX.size();
+        fScale = std::sqrt(matDevX.sum() / matDevP.sum());
+        qDebug() << fScale;
     }
 
     // get translation
-    vecTransParam.segment(3,3) = vecMuX - dScale * matRot * vecMuP;
-
+    vecTrans = vecMuX - fScale * matRot * vecMuP;
     return true;
 }
