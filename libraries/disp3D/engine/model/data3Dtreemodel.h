@@ -207,8 +207,8 @@ public:
      * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
      */
     QList<SourceSpaceTreeItem*> addForwardSolution(const QString& sSubject,
-                                            const QString& sMeasurementSetName,
-                                            const MNELIB::MNEForwardSolution& forwardSolution);
+                                                   const QString& sMeasurementSetName,
+                                                   const MNELIB::MNEForwardSolution& forwardSolution);
 
     //=========================================================================================================
     /**
@@ -413,13 +413,13 @@ protected:
      * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
      */
     SensorDataTreeItem *addGpuSensorData(const QString& sSubject,
-                                            const QString& sMeasurementSetName,
-                                            const Eigen::MatrixXd& matSensorData,
-                                            const MNELIB::MNEBemSurface& tBemSurface,
-                                            const FIFFLIB::FiffInfo &fiffInfo,
-                                            const QString &sDataType,
-                                            const double dCancelDist,
-                                            const QString &sInterpolationFunction);
+                                         const QString& sMeasurementSetName,
+                                         const Eigen::MatrixXd& matSensorData,
+                                         const MNELIB::MNEBemSurface& tBemSurface,
+                                         const FIFFLIB::FiffInfo &fiffInfo,
+                                         const QString &sDataType,
+                                         const double dCancelDist,
+                                         const QString &sInterpolationFunction);
 
     //=========================================================================================================
     /**
