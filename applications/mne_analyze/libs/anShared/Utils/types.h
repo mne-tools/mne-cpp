@@ -102,7 +102,8 @@ namespace ANSHAREDLIB
         FILTER_CHANNEL_TYPE_CHANGED,// send when the channel type to be filtered changed
         FILTER_ACTIVE_CHANGED,      // send when the filter active state was toggled
         FILTER_DESIGN_CHANGED,      // send when the designed filter changed
-        SET_CHANNEL_SELECTION
+        SET_CHANNEL_SELECTION,
+        SET_CHANNEL_SELECTION_TEMP
     };
 } //NAMESPACE
 
