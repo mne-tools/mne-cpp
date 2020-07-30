@@ -210,6 +210,13 @@ void ChannelSelection::setFiffSettings(QSharedPointer<FIFFLIB::FiffInfo> pFiffIn
     m_pViewLayout->addWidget(m_pChannelSelectionView->getViewWidget());
     m_pControlLayout->addWidget(m_pChannelSelectionView->getControlWidget());
 
+    connect(m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::loadedLayoutMap,
+            m_pChannelInfoModel.data(), &DISPLIB::ChannelInfoModel::layoutChanged, Qt::UniqueConnection);
+
+    connect(m_pChannelInfoModel.data(), &DISPLIB::ChannelInfoModel::channelsMappedToLayout,
+            m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::setCurrentlyMappedFiffChannels, Qt::UniqueConnection);
+
+    //Slots for event loop
     connect(m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::showSelectedChannelsOnly,
             this, &ChannelSelection::onShowSelectedChannelsOnly, Qt::UniqueConnection);
 
@@ -217,10 +224,12 @@ void ChannelSelection::setFiffSettings(QSharedPointer<FIFFLIB::FiffInfo> pFiffIn
             this, &ChannelSelection::onSelectionChanged, Qt::UniqueConnection);
 
     connect(m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::loadedLayoutMap,
-            m_pChannelInfoModel.data(), &DISPLIB::ChannelInfoModel::layoutChanged, Qt::UniqueConnection);
+            this, &ChannelSelection::onLoadedLayoutMap, Qt::UniqueConnection);
 
     connect(m_pChannelInfoModel.data(), &DISPLIB::ChannelInfoModel::channelsMappedToLayout,
-            m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::setCurrentlyMappedFiffChannels, Qt::UniqueConnection);
+            this, &ChannelSelection::onChannelsMappedToLayout, Qt::UniqueConnection);
+
+
 
 
     m_pChannelInfoModel->layoutChanged(m_pChannelSelectionView->getLayoutMap());
@@ -245,7 +254,7 @@ void ChannelSelection::onShowSelectedChannelsOnly(const QStringList&  selectedCh
 
     QVariant data;
     data.setValue(selectedChannelsIndexes);
-    m_pCommu->publishEvent(EVENT_TYPE::SET_CHANNEL_SELECTION, data);
+    m_pCommu->publishEvent(EVENT_TYPE::CHANNEL_SELECTION_INDICES, data);
 
 }
 
@@ -255,5 +264,23 @@ void ChannelSelection::onSelectionChanged(const QList<QGraphicsItem*> &selectedC
 {
     QVariant data;
     data.setValue(selectedChannelItems);
-    m_pCommu->publishEvent(EVENT_TYPE::SET_CHANNEL_SELECTION_TEMP, data);
+    m_pCommu->publishEvent(EVENT_TYPE::CHANNEL_SELECTION_ITEMS, data);
+}
+
+//=============================================================================================================
+
+void ChannelSelection::onLoadedLayoutMap(const QMap<QString,QPointF> &layoutMap)
+{
+    QVariant data;
+    data.setValue(layoutMap);
+    m_pCommu->publishEvent(EVENT_TYPE::CHANNEL_SELECTION_MAP, data);
+}
+
+//=============================================================================================================
+
+void ChannelSelection::onChannelsMappedToLayout(const QStringList &mappedLayoutChNames)
+{
+    QVariant data;
+    data.setValue(mappedLayoutChNames);
+    m_pCommu->publishEvent(EVENT_TYPE::CHANNEL_SELECTION_CHANNELS, data);
 }
