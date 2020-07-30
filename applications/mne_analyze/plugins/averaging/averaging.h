@@ -130,6 +130,7 @@ public:
 signals:
     //=========================================================================================================
     void showSelectedChannels(const QList<int> selectedChannelsIndexes);
+    void channelSelectionManagerChanged(const QList<QGraphicsItem*> &selectedChannelItems);
 
 private:
     //=========================================================================================================
