@@ -56,15 +56,25 @@ contains(MNECPP_CONFIG, static) {
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
-            -lMNE$${MNE_LIB_VERSION}Fsd \
-            -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Mned \
+    LIBS += -lmnecppDispd \
+            -lmnecppRtProcessingd \
+	    -lmnecppConnectivityd \
+	    -lmnecppInversed \
+	    -lmnecppFwdd \
+	    -lmnecppMned \
+	    -lmnecppFiffd \
+	    -lmnecppFsd \
+	    -lmnecppUtilsd \
 } else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
-            -lMNE$${MNE_LIB_VERSION}Fs \
-            -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Mne \
+    LIBS += -lmnecppDisp \
+            -lmnecppRtProcessing \
+	    -lmnecppConnectivity \
+	    -lmnecppInverse \
+	    -lmnecppFwd \
+	    -lmnecppMne \
+	    -lmnecppFiff \
+	    -lmnecppFs \
+	    -lmnecppUtils \
 }
 
 SOURCES += main.cpp
@@ -76,9 +86,10 @@ FORMS    +=
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
+# Deploy dependencies
 win32:!contains(MNECPP_CONFIG, static) {
     EXTRA_ARGS =
-    DEPLOY_CMD = $$winDeployArgs($${TARGET},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
+    DEPLOY_CMD = $$winDeployAppArgs($${TARGET},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
     QMAKE_POST_LINK += $${DEPLOY_CMD}
 }
 unix:!macx {
@@ -94,9 +105,14 @@ contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
 
     win32 {
         # On Windows
-        LIBS += -llibfftw3-3                 -llibfftw3f-3                 -llibfftw3l-3     }
+	LIBS += -llibfftw3-3 \
+	        -llibfftw3f-3 \
+		-llibfftw3l-3 \
+    }
 
     unix:!macx {
         # On Linux
-        LIBS += -lfftw3                 -lfftw3_threads     }
+	LIBS += -lfftw3 \
+	        -lfftw3_threads \
+    }
 }

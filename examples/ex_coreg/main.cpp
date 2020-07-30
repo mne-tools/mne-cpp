@@ -36,7 +36,12 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <iostream>
+
+#include "fiff/fiff_dig_point_set.h"
+#include "fiff/fiff_dig_point.h"
 #include <utils/generics/applicationlogger.h>
+#include "utils/icp.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -44,14 +49,22 @@
 
 #include <QApplication>
 #include <QCommandLineParser>
+#include <QDebug>
+#include <QFile>
 
 //=============================================================================================================
 // Eigen
 //=============================================================================================================
 
+#include <Eigen/Core>
+
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
+
+using namespace Eigen;
+using namespace UTILSLIB;
+using namespace FIFFLIB;
 
 //=============================================================================================================
 // MAIN
@@ -73,16 +86,44 @@ int main(int argc, char *argv[])
 
     // Command Line Parser
     QCommandLineParser parser;
-    parser.setApplicationDescription("Example name");
+    parser.setApplicationDescription("Example Coregistration");
     parser.addHelpOption();
 
-    QCommandLineOption parameterOption("parameter", "The first parameter description.");
-
-    parser.addOption(parameterOption);
-
+    QCommandLineOption srcOption("src", "The original point set", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/coreg/sample-fiducials.fif");
+    QCommandLineOption dstOption("dst", "The destination point set", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    parser.addOption(srcOption);
+    parser.addOption(dstOption);
     parser.process(a);
 
-    // Add exampel code here
+    // get cli parameters
+    QFile t_fileSrc(parser.value(srcOption));
+    QFile t_fileDst(parser.value(dstOption));
+
+    // read digitizer data
+    QList<int> lPickFiducials({FIFFV_POINT_CARDINAL});
+    FiffDigPointSet digSetSrc = FiffDigPointSet(t_fileSrc).pickTypes(lPickFiducials);
+    FiffDigPointSet digSetDst = FiffDigPointSet(t_fileDst).pickTypes(lPickFiducials);
+
+    qDebug() << "digSetSrc.size(): " << digSetSrc.size();
+    qDebug() << "digSetDst.size(): " << digSetDst.size();
+    // Declare variables
+    MatrixXd matSrc(digSetSrc.size(),3);
+    MatrixXd matDst(digSetDst.size(),3);
+    VectorXd vecTransParam;
+    VectorXd vecWeights;
+    bool bDoScale = false;
+
+    // get coordinates
+    for(int i = 0; i< digSetSrc.size(); ++i) {
+        matSrc(i,0) = digSetSrc[i].r[0]; matSrc(i,1) = digSetSrc[i].r[1]; matSrc(i,2) = digSetSrc[i].r[2];
+        matDst(i,0) = digSetDst[i].r[0]; matDst(i,1) = digSetDst[i].r[1]; matDst(i,2) = digSetDst[i].r[2];
+    }
+
+    if(!fit_matched(matSrc,matDst,vecTransParam)) {
+        qWarning() << "point cloud registration not succesfull";
+    }
+
+    std::cout << vecTransParam << std::endl;
 
     return a.exec();
 }
