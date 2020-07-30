@@ -255,12 +255,16 @@ void Averaging::handleEvent(QSharedPointer<Event> e)
         case EVENT_GROUPS_UPDATED:
             updateGroups();
             break;
-        case SET_CHANNEL_SELECTION:
+        case CHANNEL_SELECTION_INDICES:
             qDebug() << "Averaging::handleEvent -- SET_CHANNEL_SELECTION";
             setChannelSelection(e->getData().value<QList<int>>());
             break;
-        case SET_CHANNEL_SELECTION_TEMP:
-            //emit channelSelectionManagerChanged(e->getData().value<QList<QGraphicsItem*>>());
+        case CHANNEL_SELECTION_ITEMS:
+            emit channelSelectionManagerChanged(e->getData().value<QList<QGraphicsItem*>>());
+            break;
+        case CHANNEL_SELECTION_MAP:
+            break;
+        case CHANNEL_SELECTION_CHANNELS:
             break;
         default:
             qWarning() << "[Averaging::handleEvent] Received an Event that is not handled by switch cases.";
@@ -276,8 +280,10 @@ QVector<EVENT_TYPE> Averaging::getEventSubscriptions(void) const
     temp.push_back(FILTER_ACTIVE_CHANGED);
     temp.push_back(FILTER_DESIGN_CHANGED);
     temp.push_back(EVENT_GROUPS_UPDATED);
-    temp.push_back(SET_CHANNEL_SELECTION);
-    temp.push_back(SET_CHANNEL_SELECTION_TEMP);
+    temp.push_back(CHANNEL_SELECTION_INDICES);
+    temp.push_back(CHANNEL_SELECTION_ITEMS);
+    temp.push_back(CHANNEL_SELECTION_MAP);
+    temp.push_back(CHANNEL_SELECTION_CHANNELS);
 
     return temp;
 }

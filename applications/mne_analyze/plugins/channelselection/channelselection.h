@@ -120,6 +120,11 @@ private slots:
 
     void onSelectionChanged(const QList<QGraphicsItem*> &selectedChannelItems);
 
+    void onLoadedLayoutMap(const QMap<QString,QPointF> &layoutMap);
+
+    void onChannelsMappedToLayout(const QStringList &mappedLayoutChNames);
+
+
 private:
 
     //=========================================================================================================
