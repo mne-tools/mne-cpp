@@ -42,15 +42,24 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QSharedPointer>
+#include <QDebug>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
+
+#include <Eigen/Core>
+#include <Eigen/Dense>
+#include <Eigen/Eigenvalues>
+#include <Eigen/Geometry>
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace NAMESPACE;
+using namespace UTILSLIB;
+using namespace Eigen;
 
 //=============================================================================================================
 // DEFINE GLOBAL METHODS
@@ -65,3 +74,88 @@ ICP::ICP()
 }
 
 //=============================================================================================================
+
+bool fit_matched(const MatrixXd& matSrcPoint,
+                 const MatrixXd& matDstPoint,
+                 const VectorXd& vecWeitgths,
+                 VectorXd& vecTransParam,
+                 const bool bScale=false)
+/**
+ * Follow notation of P.J. Besl and N.D. McKay, A Method for
+ * Registration of 3-D Shapes, IEEE Trans. Patt. Anal. Machine Intell., 14,
+ * 239 - 255, 1992.
+ *
+ * The code is further adapted from MNE Python.
+ */
+{
+    // init values
+    MatrixXd matP = matSrcPoint;
+    MatrixXd matX = matDstPoint;
+    VectorXd vecW = vecWeitgths;
+    VectorXd vecMuP;                // column wise mean - center of mass
+    VectorXd vecMuX;                // column wise mean - center of mass
+    MatrixXd matDot;
+    MatrixXd matSigmaPX;            // cross-covariance
+    MatrixXd matAij;                // Anti-Symmetric matrix
+    Vector3d vecDelta;              // column vector, elements of matAij
+    MatrixXd matQ = MatrixXd::Identity(4,4);
+    double dTrace;
+    double dScale = 1.0;
+    // test size of point clouds
+    if(matSrcPoint.size() != matDstPoint.size()) {
+        qWarning() << "UTILSLIB::ICP::fit_matched: Point clouds does not match.";
+        return false;
+    }
+
+    // get center of mass
+    if(vecWeitgths.isZero()) {
+        vecMuP = matP.colwise().mean(); // eq 23
+        vecMuX = matX.colwise().mean();
+        matDot = matP.transpose() * matX;
+    } else {
+        vecW = vecWeitgths / vecWeitgths.sum();
+        vecMuP = vecW.transpose() * matP;
+        vecMuX = vecW.transpose() * matX;
+        matDot = matP.transpose() * (vecW * matX);
+    }
+
+    // get cross-covariance
+    matSigmaPX = matDot - vecMuP * vecMuX;  // eq 24
+    matAij = matSigmaPX - matSigmaPX.transpose();
+    vecDelta(0) = matAij(1,2); vecDelta(1) = matAij(2,0); vecDelta(2) = matAij(0,1);
+    dTrace = matSigmaPX.trace();
+    matQ(0,0) = dTrace; // eq 25
+    matQ.block(0,1,1,3) = vecDelta;
+    matQ.block(1,0,3,1) = vecDelta;
+    matQ.block(1,1,3,3) = matSigmaPX + matSigmaPX.transpose() - dTrace * MatrixXd::Identity(3,3);
+
+    // unit eigenvector coresponding to maximum eigenvalue of matQ is selected as optimal rotation
+    SelfAdjointEigenSolver<MatrixXd> es(matQ);
+    Vector4d vecEigVec = es.eigenvectors().col(matQ.cols()-1);  // only take last Eigen-Vector since this corresponds to the maximum Eigenvalue
+
+    vecTransParam.segment(0,3) = vecEigVec.segment(1,3);
+    if(vecEigVec(0) != 0) {
+        vecTransParam = vecTransParam * std::copysign(1.0, vecEigVec(0));
+    }
+
+    Quaterniond quatRot(vecEigVec);
+    Matrix3d matRot = quatRot.matrix();
+
+    // apply scaling if requested
+    if(bScale) {
+        MatrixXd matDevX = matX - vecMuX;
+        MatrixXd matDevP = matP - vecMuP;
+        matDevP = matDevP.cwiseProduct(matDevP);
+        matDevX = matDevX.cwiseProduct(matDevX);
+        if(!vecWeitgths.isZero()) {
+            matDevP = matDevP.cwiseProduct(vecW);
+            matDevX = matDevX.cwiseProduct(vecW);
+        }
+        dScale = std::sqrt(matDevX.sum() / matDevP.sum());
+    }
+
+    // get translation
+    vecTransParam.segment(3,3) = vecMuX - dScale * matRot * vecMuP;
+
+    return true;
+}
