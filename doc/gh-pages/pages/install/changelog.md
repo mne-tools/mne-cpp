@@ -7,63 +7,108 @@ nav_order: 1
 
 # Changelog
 
+## Version 0.1.5 - 2020/07/30
+
+### Applications
+
+MNE Analyze
+ * Refactored DataManagerView to DataManagerControlView.
+ * Added a break case to switch statement in datamanager.cpp.
+ * Added triggerdetectview to Event plugin.
+ * Added functionality to Event plugin to create event groups by type and sort detected events.
+ * Tweaked/added get/set functions dealing with event groups.
+ * Added functionality to Averaging plugin to read events from user-selected event group.
+ * Added jump to event to right click menu.
+ * Changed key event to keyReleaseEvent in Event plugin to avoid event being accepted elsewhere.
+ * FiffRawView now inherits from AbstractView.
+ * Window size and number of channels preserved while resizing window.
+ * Fix data plotting when scrolling to the left (raw and filtering). Fixed a problem where the current fiff curser of the beginning data block was substracted by the filter delay even if filtering was disabled.
+ * Remove filterAllData function and replace usage by reloadAllData, which leads to an performance improvement.
+ * Rename updateDisplayData to reloadAllData.
+ * Comment out some qInfo outputs.
+ * Rename getWindowSizeBlocks to getTotalBlockCount in FiffRawViewModel.
+ * Disable downsampling when plotting since it introduced aliasing effects. Performance is not affected by this change.
+
+### API Libraries
+
+Disp
+ * Added offline mode functionality to triggerdetectview.
+ * Added event group selection to offline mode in averagingsettingsview.
+
+RtProcessing
+ * Remove data copies when filtering in order to speed up filtering.
+
+### Documentation
+
+ * Update MNE Analyze docu.
+ * Update MNE Scan HPI and forward plugin docu.
+
+### Authors
+
+People who contributed to this release (preceded by number of commits):
+
+(34) Gabriel Motta,
+(13) Ruben Dörfel,
+(11) Lorenz Esch,
+(2) Wayne Mead
+
 ## Version 0.1.4 - 2020/07/07
 
 ### Applications
 
 MNE Analyze
 * Add filter support. The user can now select/design a filter. If activated the filter is applied to the data as the user scrolls through the file. When activated the filtered data is also written to file and applied when computing an average.
-* Add dark mode support to WASM version
-* Corrected saving/loading views inbetween sessions
-* Adjusted minimum allowed window size
-* Add support for computing averages/evoked responses
-* Closing main window now calls destructors for views in dockwidgets
-* Add support to delete loaded files from the data manager
-* Speed up data browsing by decreasing the pre loading buffer size to two blocks
-* Fix vertically overlapping signal plotting
-* Move AnalyzeDataModel to anshared/model folder
-* Annotations have been renamed to Events
-* Added Event Group functionality and struct
-* Event Groups can be renamed or have their color changed through right click context menu
-* Events can now be deleted from selecting any of the columns, double click to edit columns
-* Fixed bug where check boxes changing annotation model state were not updating the view
+* Add dark mode support to WASM version.
+* Corrected saving/loading views inbetween sessions.
+* Adjusted minimum allowed window size.
+* Add support for computing averages/evoked responses.
+* Closing main window now calls destructors for views in dockwidgets.
+* Add support to delete loaded files from the data manager.
+* Speed up data browsing by decreasing the pre loading buffer size to two blocks.
+* Fix vertically overlapping signal plotting.
+* Move AnalyzeDataModel to anshared/model folder.
+* Annotations have been renamed to Events.
+* Added Event Group functionality and struct.
+* Event Groups can be renamed or have their color changed through right click context menu.
+* Events can now be deleted from selecting any of the columns, double click to edit columns.
+* Fixed bug where check boxes changing annotation model state were not updating the view.
 
 MNE Scan
-* Update inverse operator if new forward solution was calculated
-* Update brainflow submodule for the brainflowboard plugin
+* Update inverse operator if new forward solution was calculated.
+* Update brainflow submodule for the brainflowboard plugin.
 
 Examples
-* Add a new example for averaging
-* Change ex_read_epochs to only read epochs without averaging afterwards
+* Add a new example for averaging.
+* Change ex_read_epochs to only read epochs without averaging afterwards.
 
 MNE Anonymize
-* Add GUI mode
-* Add WASM version
-* Improve internal memory handling
+* Add GUI mode.
+* Add WASM version.
+* Improve internal memory handling.
 
 ### API Libraries
 
 Utils
-* Move filter methods/classes to the RtProcessing library
-* Move DetectTrigger class to the RtProcessing library
-* Refactor baseline correction input from QPair<QVariant,QVariant> to QPair<float,float>
+* Move filter methods/classes to the RtProcessing library.
+* Move DetectTrigger class to the RtProcessing library.
+* Refactor baseline correction input from QPair<QVariant,QVariant> to QPair<float,float>.
 
 RtProcessing
-* Refactor header guards of all RtProcessing classes
-* Add function to set updated forward solution in RtInv
-* Rename RtFilter to Filter and FilterData to FilterKernel
-* Improve automatic slicing of data when filtering
+* Refactor header guards of all RtProcessing classes.
+* Add function to set updated forward solution in RtInv.
+* Rename RtFilter to Filter and FilterData to FilterKernel.
+* Improve automatic slicing of data when filtering.
 * Separate continous and one time overlap add filtering methods. Make some functions global RTPROCESSINGLIB namespace functions and was therefore removed.
 * Remove processing of multiple filters at once. This feature was never really implemented.
-* Rename RtAve to RtAveraging in
-* Add new averaging functions in
-* Implement convenience function in DetectTrigger to transform between detect trigger QMaps and MNE event matrices
-* Move detect trigger functions to global RTPROCESSINGLIB namespace
+* Rename RtAve to RtAveraging.
+* Add new averaging functions.
+* Implement convenience function in DetectTrigger to transform between detect trigger QMaps and MNE event matrices.
+* Move detect trigger functions to global RTPROCESSINGLIB namespace.
 
 Disp
-* Refactor plotting of the filter's frequency response in the FilterPlotScene class
-* Fix saving/loading from FilterDesignView, FilterSettingsView and FiffRawView
-* Changed signal view control widget scaling to allow for window sizes
+* Refactor plotting of the filter's frequency response in the FilterPlotScene class.
+* Fix saving/loading from FilterDesignView, FilterSettingsView and FiffRawView.
+* Changed signal view control widget scaling to allow for window sizes.
 * Remove filtering from EvokedSetModel in disp library. Filtering on short data lengths such as most epochs is difficult because of the edge effects. Filtering for epochs/evoked responses should happen before with appropriate filter lengths which is now supported by the RTPROCESSINGLIB::computeFilteredAverage() function.
 * Improve the ScalingView with new default scaling values and convenience functions to retrieve the scale value for a given scale map and channel kind/unit. Make use of the new functions throughout MNE-CPP libraries and applications.
 
@@ -92,35 +137,35 @@ People who contributed to this release (preceded by number of commits):
 ### Applications
 
 MNE Analyze
-* Add new AnalyzeDataModel, which allows subject based data organization
-* Improve data loading from QByteArray in AnalyzeData
-* Log Window now has location preserved between sessions
-* Files once again get selected and displayed automatically when first loaded
+* Add new AnalyzeDataModel, which allows subject based data organization.
+* Improve data loading from QByteArray in AnalyzeData.
+* Log Window now has location preserved between sessions.
+* Files once again get selected and displayed automatically when first loaded.
 * Disconnect everything from old model before loading new one. This solves performance issues when loading multiple files.
-* Signal Viewer and Annotation settings scale depending on available size
-* Add different GUI modes (scientific and clinical) to appearance menu
-* Add dark and light mode to appearance menu
+* Signal Viewer and Annotation settings scale depending on available size.
+* Add different GUI modes (scientific and clinical) to appearance menu.
+* Add dark and light mode to appearance menu.
 * Include skeleton of new Filtering plugin in MNE Analyze. Please note that the actual filtering is still WIP and will follow in a future version.
 
 MNE Scan
-* Update Brainflow plugin
-* Separated real-time source localization and forward calculation into two plugins
-* Recalculate forward solution if large head movement occurred
-* Fix thread safety in real-time source localization plugin
-* Save plugin pipeline in MNE Scan more often and everytime we start the pipeline
-* Beautify HPI plugin control settings view
-* Add different GUI modes (scientific and clinical) to appearance menu
-* Add dark and light mode to appearance menu
+* Update Brainflow plugin.
+* Separated real-time source localization and forward calculation into two plugins.
+* Recalculate forward solution if large head movement occurred.
+* Fix thread safety in real-time source localization plugin.
+* Save plugin pipeline in MNE Scan more often and everytime we start the pipeline.
+* Beautify HPI plugin control settings view.
+* Add different GUI modes (scientific and clinical) to appearance menu.
+* Add dark and light mode to appearance menu.
 
 ### API Libraries
 
 Disp
-* Add new view for controlling the forward calculation
-* Make plugin tab bar show vertically in the Quick Control View
-* Create an abstract interface AbstractView for all Disp library viewers to enforce handling different GUI modes and the saving/loading of GUI settings
-* Refactor saving/settings of Disp viewers
+* Add new view for controlling the forward calculation.
+* Make plugin tab bar show vertically in the Quick Control View.
+* Create an abstract interface AbstractView for all Disp library viewers to enforce handling different GUI modes and the saving/loading of GUI settings.
+* Refactor saving/settings of Disp viewers.
 * Improve FilterSettingsView and add different GUI elements based on the currently set GUI mode. For example, scientific mode will enable advanced filter design tools, whereas in clinical mode only the lower and upper cut off frequencies can be defined.
-* Move CovarianceSettingsView from MNE Scan's Covariance plugin to Disp/viewers
+* Move CovarianceSettingsView from MNE Scan's Covariance plugin to Disp/viewers.
 
 Disp3D
 * Add temporary fix on Windows for the Disp3D library and Qt 5.15.0 where the renderers plugin is deployed manually. This will be reverted once Qt 5.15.1 is released.
@@ -140,34 +185,34 @@ People who contributed to this release (preceded by number of commits):
 ### Applications
 
 MNE Analyze:
-* Fix application icon on Linux
-* Add timing labels below the signal viewer
-* Fix deployment of internal MNE Analyze libraries on Windows
-* Change list data model to child/parent item data model in AnalyzeData
-* Rename AnnotationView to AnnotationSettingsView
-* Update splashcreen to show full application name
+* Fix application icon on Linux.
+* Add timing labels below the signal viewer.
+* Fix deployment of internal MNE Analyze libraries on Windows.
+* Change list data model to child/parent item data model in AnalyzeData.
+* Rename AnnotationView to AnnotationSettingsView.
+* Update splashcreen to show full application name.
 * Refactor RawDataViewer plugin. The controls are no longer destroyed when a different file is selected. This led to some visible glitches when switching between files.
 * Do not allow  floating or movable dock widgets in the WASM version. The QDockWidget behavior is a bit buggy in the current Qt WASM versions. 
 * Use QOpenGLWidget instead of QOGLWidget. The latter is marked as deprecated.
 * Remember dock states and sizes inbetween MNE Analyze sessions.
 
 MNE Scan:
-* Fix application icon on Linux 
-* Fix deployment of internal MNE Scan libraries on Windows 
-* Fix bug when receiving evoked data in source localization plugin 
-* Update splashcreen to show full application name 
+* Fix application icon on Linux.
+* Fix deployment of internal MNE Scan libraries on Windows.
+* Fix bug when receiving evoked data in source localization plugin.
+* Update splashcreen to show full application name.
 		
 ### API libraries
 
 Disp:
-* Remember dock states and sizes inbetween sessions in the MultiView
+* Remember dock states and sizes inbetween sessions in the MultiView.
 
 Inverse:
-* Fix versioning bug  
+* Fix versioning bug.
 	
 ### Documentation
 
-* Minor improvements and typo fixes
+* Minor improvements and typo fixes.
 
 ### Authors
 
@@ -183,43 +228,43 @@ People who contributed to this release (preceded by number of commits):
 ### Applications
 
 MNE Analyze:
-* Fix bug during deployment of dynamically linked MNE Analyze version on macOS
-* Renamed MNE Analyze extensions to plugins 
-* Fix issue with display width, now displays only full seconds as selected 
-* Jump viewer to selected annotation with 'J' key 
-* Removed seemingly unused timer debug outputs 
-* Documentations and variable name changes for readability 
-* Add plugin control views to menu bar 
-* Clean up command line output 
-* Add time information on the y-axis
+* Fix bug during deployment of dynamically linked MNE Analyze version on macOS.
+* Renamed MNE Analyze extensions to plugins.
+* Fix issue with display width, now displays only full seconds as selected.
+* Jump viewer to selected annotation with 'J' key.
+* Removed seemingly unused timer debug outputs.
+* Documentations and variable name changes for readability.
+* Add plugin control views to menu bar.
+* Clean up command line output.
+* Add time information on the y-axis.
 
 MNE Scan:
-* Fix problems with Source Localization and Connectivity plugins
-* Fix problems where the QuickControlView was not populated with plugin control GUI widgets correctly
+* Fix problems with Source Localization and Connectivity plugins.
+* Fix problems where the QuickControlView was not populated with plugin control GUI widgets correctly.
 
 MNE Anonymize:
-* Overall improvements and bug fixes to MNE Anonymize
+* Overall improvements and bug fixes to MNE Anonymize.
 
 ### API libraries
 
 All:
-* Rename libraries and fix versioning
+* Rename libraries and fix versioning.
 
 Fiff:
-* Fix bug when reading gantry_angle from Fiff file
+* Fix bug when reading gantry_angle from Fiff file.
 
 ### Tools
-* Fix template class in Qt Creator wizard for MNE-CPP classes
-* Update test and example Qt Creator wizards
+* Fix template class in Qt Creator wizard for MNE-CPP classes.
+* Update test and example Qt Creator wizards.
 	
 ### Continuous Integration
-* Only branch off when a minor or major version bump occurred
-* Remove folders which we do not want to ship from dynamic builds
+* Only branch off when a minor or major version bump occurred.
+* Remove folders which we do not want to ship from dynamic builds.
 
 ### Documentation
-* Updated information on continuous integration
-* Improved build from source guide
-* Updated guide on streaming pre-recorded data in MNE Scan
+* Updated information on continuous integration.
+* Improved build from source guide.
+* Updated guide on streaming pre-recorded data in MNE Scan.
 
 ### Authors
 
