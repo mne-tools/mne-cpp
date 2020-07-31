@@ -50,6 +50,7 @@
 #include <QObject>
 #include <QSharedPointer>
 #include <QPointer>
+#include <QCommandLineParser>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -126,17 +127,24 @@ public:
      */
     void initGlobalData();
 
-protected:
+private:
+    //=========================================================================================================
+    /**
+     * Init the command line parser
+     */
+    void initCmdLineParser();
 
-private slots:
+    //=========================================================================================================
+    /**
+     * Parse the cmd line arguments and pass them to the plugins
+     */
+    void parseCmdLineInputs();
 
     //=========================================================================================================
     /**
      * This is executed when the user presses "close" button (via QConnection from MainWindow)
      */
     void onMainWindowClosed();
-
-private:
 
     //=========================================================================================================
     /**
@@ -165,6 +173,8 @@ private:
     QSharedPointer<ANSHAREDLIB::PluginManager>      m_pPluginManager;       /**< Holds plugin manager. */
     QSharedPointer<ANSHAREDLIB::AnalyzeSettings>    m_analyzeSettings;      /**< The global settings. */
     QSharedPointer<ANSHAREDLIB::AnalyzeData>        m_analyzeData;          /**< The global data base. */
+
+    QCommandLineParser                              m_cmdLineParser;        /**< The command line parser. */
 };
 
 //=============================================================================================================

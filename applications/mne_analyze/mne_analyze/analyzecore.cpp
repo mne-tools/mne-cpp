@@ -46,8 +46,6 @@
 #include "../libs/anShared/Management/pluginmanager.h"
 #include "../libs/anShared/Management/eventmanager.h"
 
-#include<iostream>
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -99,6 +97,9 @@ void customMessageHandler(QtMsgType type, const
 AnalyzeCore::AnalyzeCore(QObject* parent)
 : QObject(parent)
 {    
+    // Initialize cmd line parser
+    initCmdLineParser();
+
     //show splash screen for 1 second
     QPixmap pixmap(":/images/splashscreen_mne_analyze.png");
     QSplashScreen splash(pixmap);
@@ -117,6 +118,9 @@ AnalyzeCore::AnalyzeCore(QObject* parent)
 
     // Setup log window
     qInstallMessageHandler(customMessageHandler);
+
+    // Initialize cmd line inputs if provided by the user
+    parseCmdLineInputs();
 }
 
 //=============================================================================================================
@@ -124,6 +128,39 @@ AnalyzeCore::AnalyzeCore(QObject* parent)
 AnalyzeCore::~AnalyzeCore()
 {
 
+}
+
+//=============================================================================================================
+
+void AnalyzeCore::initCmdLineParser()
+{
+    m_cmdLineParser.setApplicationDescription("MNE Analyze: Browse, Process & Visualize. For more information and documentation please visit www.mne-cpp.org.");
+    m_cmdLineParser.addHelpOption();
+
+    QCommandLineOption inFileOpt(QStringList() << "f" << "file",
+                                 QCoreApplication::translate("main","File to load."),
+                                 QCoreApplication::translate("main","filePath"));
+
+    m_cmdLineParser.addOption(inFileOpt);
+
+    m_cmdLineParser.process(QApplication::arguments());
+}
+
+//=============================================================================================================
+
+void AnalyzeCore::parseCmdLineInputs()
+{
+    if(!m_pPluginManager) {
+        return;
+    }
+
+    if(m_cmdLineParser.isSet("file")) {
+        for(int i = 0; i < m_pPluginManager->getPlugins().size(); i++) {
+            if(m_pPluginManager->getPlugins().at(i)->getName() == "Data Loader") {
+                m_pPluginManager->getPlugins().at(i)->cmdLineStartup(QStringList() << "file" << m_cmdLineParser.value("file"));
+            }
+        }
+    }
 }
 
 //=============================================================================================================
@@ -159,7 +196,7 @@ void AnalyzeCore::initEventSystem()
 void AnalyzeCore::initPluginManager()
 {
     m_pPluginManager = QSharedPointer<PluginManager>::create();
-    m_pPluginManager->loadPluginsFromDirectory(qApp->applicationDirPath() +  pluginsDir);
+    m_pPluginManager->loadPluginsFromDirectory(qApp->applicationDirPath() + pluginsDir);
     m_pPluginManager->initPlugins(m_analyzeSettings, m_analyzeData);
 }
 
@@ -177,7 +214,6 @@ void AnalyzeCore::initMainWindow()
 void AnalyzeCore::registerMetaTypes()
 {
     qRegisterMetaType<QSharedPointer<Event>>("QSharedPointer<Event>");
-    qRegisterMetaType<QSharedPointer<Event>>("ChannelData");
 }
 
 //=============================================================================================================
@@ -185,6 +221,7 @@ void AnalyzeCore::registerMetaTypes()
 void AnalyzeCore::onMainWindowClosed()
 {
     EventManager::getEventManager().shutdown();
+
     // shutdown every plugin, empty analzye data etc.
     m_pPluginManager->shutdown();
 }

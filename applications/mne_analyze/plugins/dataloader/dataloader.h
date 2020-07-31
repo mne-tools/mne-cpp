@@ -112,7 +112,23 @@ public:
     virtual void handleEvent(QSharedPointer<ANSHAREDLIB::Event> e) override;
     virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
 
+    //=========================================================================================================
+    /**
+     * Initializes the plugin based on cmd line inputs given by the user.
+     *
+     * @param[in] sArguments  the cmd line arguments
+     */
+    virtual void cmdLineStartup(const QStringList& sArguments) override;
+
 private:
+    //=========================================================================================================
+    /**
+     * Load file from given file path.
+     *
+     * @param[in] sFilePath  the file path to load data from.
+     */
+    void loadFilePath(const QString& sFilePath);
+
     //=========================================================================================================
     /**
      * This functions is called when the load from file button is pressed.
@@ -129,6 +145,10 @@ private:
 
     QSharedPointer<ANSHAREDLIB::AbstractModel>  m_pSelectedModel;
 };
+
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
 
 } // NAMESPACE
 

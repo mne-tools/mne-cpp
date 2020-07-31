@@ -114,7 +114,7 @@ void PluginManager::loadPluginsFromDirectory(const QString& dir)
 //=============================================================================================================
 
 void PluginManager::initPlugins(QSharedPointer<AnalyzeSettings> settings,
-                                      QSharedPointer<AnalyzeData> data)
+                                QSharedPointer<AnalyzeData> data)
 {
     for(IPlugin* plugin : m_qVecPlugins)
     {
