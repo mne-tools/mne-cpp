@@ -264,9 +264,9 @@ void Averaging::handleEvent(QSharedPointer<Event> e)
         case CHANNEL_SELECTION_ITEMS:
             emit channelSelectionManagerChanged(e->getData().value<QList<QGraphicsItem*>>());
             break;
-        case CHANNEL_SELECTION_MAP:
-            emit layoutChanged(e->getData().value<QMap<QString,QPointF>>());
-            break;
+//        case CHANNEL_SELECTION_MAP:
+//            emit layoutChanged(e->getData().value<QMap<QString,QPointF>>());
+//            break;
         case CHANNEL_SELECTION_CHANNELS:
             emit setCurrentlyMappedFiffChannels(e->getData().value<QStringList>());
             break;
@@ -445,9 +445,9 @@ void Averaging::loadFullGui()
 {
     m_pFiffInfo = m_pFiffRawModel->getFiffInfo();
 
-    m_pChannelInfoModel = DISPLIB::ChannelInfoModel::SPtr::create(m_pFiffInfo);
+//    m_pChannelInfoModel = DISPLIB::ChannelInfoModel::SPtr::create(m_pFiffInfo);
     m_pAverageLayoutView->setFiffInfo(m_pFiffInfo);
-    m_pAverageLayoutView->setChannelInfoModel(m_pChannelInfoModel);
+//    m_pAverageLayoutView->setChannelInfoModel(m_pChannelInfoModel);
 
     if(m_bLoaded) {
         return;
@@ -463,8 +463,8 @@ void Averaging::loadFullGui()
 //                                                                           m_pChannelInfoModel,
 //                                                                           Qt::Window));
 
-    connect(this, &Averaging::layoutChanged,
-            m_pChannelInfoModel.data(), &DISPLIB::ChannelInfoModel::layoutChanged, Qt::UniqueConnection);
+//    connect(this, &Averaging::layoutChanged,
+//            m_pChannelInfoModel.data(), &DISPLIB::ChannelInfoModel::layoutChanged, Qt::UniqueConnection);
 
 //    connect(m_pChannelInfoModel.data(), &DISPLIB::ChannelInfoModel::channelsMappedToLayout,
 //            m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::setCurrentlyMappedFiffChannels, Qt::UniqueConnection);
