@@ -153,6 +153,14 @@ public:
 
     //=========================================================================================================
     /**
+     * Initializes the plugin based on cmd line inputs given by the user.
+     *
+     * @param[in] sArguments  the cmd line arguments
+     */
+    virtual inline void cmdLineStartup(const QStringList& sArguments);
+
+    //=========================================================================================================
+    /**
      * Sets the global data, which provides the central database.
      *
      * @param[in] globalData  the global data
@@ -191,6 +199,13 @@ protected:
 
 //=============================================================================================================
 // INLINE DEFINITIONS
+//=============================================================================================================
+
+void IPlugin::cmdLineStartup(const QStringList& sArguments)
+{
+    Q_UNUSED(sArguments)
+}
+
 //=============================================================================================================
 
 void IPlugin::setGlobalData(QSharedPointer<AnalyzeData> globalData)

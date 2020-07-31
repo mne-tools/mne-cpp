@@ -38,9 +38,9 @@
 
 #include "dataloader.h"
 
-#include <anShared/Model/fiffrawviewmodel.h>
 #include <anShared/Management/communicator.h>
 #include <anShared/Management/analyzedata.h>
+#include <anShared/Model/fiffrawviewmodel.h>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -156,29 +156,45 @@ QVector<EVENT_TYPE> DataLoader::getEventSubscriptions(void) const
 
 //=============================================================================================================
 
+void DataLoader::cmdLineStartup(const QStringList& sArguments)
+{
+    if(sArguments.size() == 2 && (sArguments.first() == "file" || sArguments.first() == "f")) {
+        loadFilePath(sArguments.at(1));
+    }
+}
+
+//=============================================================================================================
+
+void DataLoader::loadFilePath(const QString& sFilePath)
+{
+    QFileInfo fileInfo(sFilePath);
+
+    if(fileInfo.exists() && (fileInfo.completeSuffix() == "fif")) {
+        m_pAnalyzeData->loadModel<ANSHAREDLIB::FiffRawViewModel>(sFilePath);
+    }
+}
+
+//=============================================================================================================
+
 void DataLoader::onLoadFilePressed()
 {
     #ifdef WASMBUILD
-    auto fileContentReady = [&](const QString &filePath, const QByteArray &fileContent) {
-        if(!filePath.isNull()) {
+    auto fileContentReady = [&](const QString &sFilePath, const QByteArray &fileContent) {
+        if(!sFilePath.isNull()) {
             // We need to prepend "wasm/" because QFileDialog::getOpenFileContent does not provide a full
             // path, which we need for organzing the different models in AnalyzeData
-            m_pAnalyzeData->loadModel<FiffRawViewModel>("wasm/"+filePath, fileContent);
+            m_pAnalyzeData->loadModel<FiffRawViewModel>("wasm/"+sFilePath, fileContent);
         }
     };
     QFileDialog::getOpenFileContent("Fiff File (*.fif *.fiff)",  fileContentReady);
     #else
     //Get the path
-    QString filePath = QFileDialog::getOpenFileName(Q_NULLPTR,
+    QString sFilePath = QFileDialog::getOpenFileName(Q_NULLPTR,
                                                     tr("Open File"),
                                                     QDir::currentPath()+"/MNE-sample-data",
                                                     tr("Fiff file(*.fif *.fiff)"));
 
-    QFileInfo fileInfo(filePath);
-
-    if(fileInfo.exists() && (fileInfo.completeSuffix() == "fif")) {
-        m_pAnalyzeData->loadModel<FiffRawViewModel>(filePath);
-    }
+    loadFilePath(sFilePath);
     #endif
 }
 
@@ -195,12 +211,12 @@ void DataLoader::onSaveFilePressed()
     m_pSelectedModel->saveToFile("");
     #else
     //Get the path
-    QString filePath = QFileDialog::getSaveFileName(Q_NULLPTR,
+    QString sFilePath = QFileDialog::getSaveFileName(Q_NULLPTR,
                                                     tr("Save File"),
                                                     QDir::currentPath()+"/MNE-sample-data",
                                                     tr("Fiff file(*.fif *.fiff)"));
 
-    QFileInfo fileInfo(filePath);
-    m_pSelectedModel->saveToFile(filePath);
+    QFileInfo fileInfo(sFilePath);
+    m_pSelectedModel->saveToFile(sFilePath);
     #endif
 }

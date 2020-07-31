@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
     fmt.setSamples(4);
     QSurfaceFormat::setDefaultFormat(fmt);
 
-    //New main window instance
+    //New AnalyzeCore instance
     QScopedPointer<AnalyzeCore> pAnalyzeCore (new AnalyzeCore);
     pAnalyzeCore->showMainWindow();
 
