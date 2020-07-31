@@ -36,7 +36,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = app
 
-QT += widgets 3dextras
+QT += widgets 3dextras charts opengl
 
 CONFIG   += console
 CONFIG   -= app_bundle
@@ -56,20 +56,18 @@ contains(MNECPP_CONFIG, static) {
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lmnecppDispd \
+    LIBS += -lmnecppDisp3Dd \
+            -lmnecppDispd \
             -lmnecppRtProcessingd \
-	    -lmnecppConnectivityd \
-	    -lmnecppInversed \
 	    -lmnecppFwdd \
 	    -lmnecppMned \
 	    -lmnecppFiffd \
 	    -lmnecppFsd \
 	    -lmnecppUtilsd \
 } else {
-    LIBS += -lmnecppDisp \
+    LIBS += -lmnecppDisp3Dd \
+            -lmnecppDisp \
             -lmnecppRtProcessing \
-	    -lmnecppConnectivity \
-	    -lmnecppInverse \
 	    -lmnecppFwd \
 	    -lmnecppMne \
 	    -lmnecppFiff \

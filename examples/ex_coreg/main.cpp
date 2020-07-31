@@ -38,6 +38,14 @@
 
 #include <iostream>
 
+#include <disp3D/viewers/abstractview.h>
+#include <disp3D/engine/model/items/digitizer/digitizersettreeitem.h>
+#include <disp3D/engine/model/data3Dtreemodel.h>
+#include <disp3D/engine/view/view3D.h>
+#include <disp3D/helpers/geometryinfo/geometryinfo.h>
+#include <disp3D/helpers/geometryinfo/geometryinfo.h>
+#include <disp3D/helpers/interpolation/interpolation.h>
+
 #include "fiff/fiff_dig_point_set.h"
 #include "fiff/fiff_dig_point.h"
 #include "fiff/fiff_coord_trans.h"
@@ -50,6 +58,7 @@
 //=============================================================================================================
 
 #include <QApplication>
+#include <QMainWindow>
 #include <QCommandLineParser>
 #include <QDebug>
 #include <QFile>
@@ -67,6 +76,7 @@
 using namespace Eigen;
 using namespace UTILSLIB;
 using namespace FIFFLIB;
+using namespace DISP3DLIB;
 
 //=============================================================================================================
 // MAIN
@@ -83,8 +93,12 @@ using namespace FIFFLIB;
  */
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
-    QCoreApplication a(argc, argv);
+    #ifdef STATICBUILD
+    Q_INIT_RESOURCE(disp3d);
+    #endif
+
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
+    QApplication a(argc, argv);
 
     // Command Line Parser
     QCommandLineParser parser;
@@ -104,11 +118,11 @@ int main(int argc, char *argv[])
     QFile t_fileSrc(parser.value(srcOption));
     QFile t_fileDst(parser.value(dstOption));
 
-    bool bscale = false;
+    bool bScale = false;
     if(parser.value(scaleOption) == "false" || parser.value(scaleOption) == "0") {
-        bscale = false;
+        bScale = false;
     } else if(parser.value(scaleOption) == "true" || parser.value(scaleOption) == "1") {
-        bscale = true;
+        bScale = true;
     }
 
 
@@ -117,44 +131,46 @@ int main(int argc, char *argv[])
     FiffDigPointSet digSetSrc = FiffDigPointSet(t_fileSrc).pickTypes(lPickFiducials);
     FiffDigPointSet digSetDst = FiffDigPointSet(t_fileDst).pickTypes(lPickFiducials);
 
-    qDebug() << "digSetSrc.size(): " << digSetSrc.size();
-    qDebug() << "digSetDst.size(): " << digSetDst.size();
     // Declare variables
     Matrix3f matSrc(digSetSrc.size(),3);
     Matrix3f matDst(digSetDst.size(),3);
     Vector3f vecTrans;
     Matrix3f matRot;
-    Vector3f vecWeights(1.0,10.0,1.0); // LPA, Nasion, RPA
+    Vector3f vecWeights(digSetSrc.size()); // LPA, Nasion, RPA
     float fScale;
-    bool bScale = false;
 
     // get coordinates
     for(int i = 0; i< digSetSrc.size(); ++i) {
         matSrc(i,0) = digSetSrc[i].r[0]; matSrc(i,1) = digSetSrc[i].r[1]; matSrc(i,2) = digSetSrc[i].r[2];
         matDst(i,0) = digSetDst[i].r[0]; matDst(i,1) = digSetDst[i].r[1]; matDst(i,2) = digSetDst[i].r[2];
+
+        // set standart weights
+        if(digSetSrc[i].ident == FIFFV_POINT_NASION) {
+            vecWeights(i) = 10.0;
+        } else {
+            vecWeights(i) = 1.0;
+        }
     }
 
     if(!fit_matched(matSrc,matDst,matRot,vecTrans,fScale,bScale,vecWeights)) {
         qWarning() << "point cloud registration not succesfull";
     }
 
-    qDebug() << "From: " << digSetSrc[0].coord_frame;
-    qDebug() << "To: " << digSetDst[0].coord_frame;
-    std::cout << matRot << std::endl;
-    std::cout << vecTrans << std::endl;
-
     FiffCoordTrans transMriHead = FiffCoordTrans::make(digSetSrc[0].coord_frame, digSetDst[0].coord_frame,matRot,vecTrans);
-
-    qDebug() << "b";
-
     Matrix3f matSrcTransposed = transMriHead.apply_trans(matSrc);
-
-    qDebug() << "c";
-
     Matrix3f matDiff = matDst - matSrcTransposed;
+    qInfo() << "Alignment Error: ";
+    std::cout << matDiff.colwise().mean() << std::endl;
 
-    qDebug() << "d";
-    std::cout << matDiff.rowwise().mean() << std::endl;
+
+//    // Abstract View
+//    AbstractView::SPtr p3DAbstractView = AbstractView::SPtr(new AbstractView());
+//    Data3DTreeModel::SPtr p3DDataModel = p3DAbstractView->getTreeModel();
+//    DigitizerSetTreeItem* pDigSrcSetTreeItem = p3DDataModel->addDigitizerData("Sample", "Source", digSetSrc);
+//    DigitizerSetTreeItem* pDigDstSetTreeItem = p3DDataModel->addDigitizerData("Sample", "Destination", digSetDst);
+//    pDigSrcSetTreeItem->setTransform(transMriHead,false);
+
+//    p3DAbstractView->show();
 
     return a.exec();
 }
