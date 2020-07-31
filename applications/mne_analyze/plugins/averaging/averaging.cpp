@@ -263,6 +263,7 @@ void Averaging::handleEvent(QSharedPointer<Event> e)
             emit channelSelectionManagerChanged(e->getData().value<QList<QGraphicsItem*>>());
             break;
         case CHANNEL_SELECTION_MAP:
+            emit layoutChanged(e->getData().value<QMap<QString,QPointF>>());
             break;
         case CHANNEL_SELECTION_CHANNELS:
             break;
@@ -458,8 +459,8 @@ void Averaging::loadFullGui()
 //                                                                           m_pChannelInfoModel,
 //                                                                           Qt::Window));
 
-//    connect(m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::loadedLayoutMap,
-//            m_pChannelInfoModel.data(), &DISPLIB::ChannelInfoModel::layoutChanged, Qt::UniqueConnection);
+    connect(this, &Averaging::layoutChanged,
+            m_pChannelInfoModel.data(), &DISPLIB::ChannelInfoModel::layoutChanged, Qt::UniqueConnection);
 
 //    connect(m_pChannelInfoModel.data(), &DISPLIB::ChannelInfoModel::channelsMappedToLayout,
 //            m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::setCurrentlyMappedFiffChannels, Qt::UniqueConnection);
