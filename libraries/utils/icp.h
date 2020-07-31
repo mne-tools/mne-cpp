@@ -73,11 +73,13 @@ const Eigen::VectorXf vecDefaultWeigths;
 /**
  * Corresponding point set registration using quaternions.
  *
- * @param [in]  matSrcPoint          The source point set.
- * @param [in]  matDstPoint          The destination point set.
- * @param [in]  vecWeitgths          The weitghts to apply.
- * @param [in]  bScale               Wether to apply scaling or not.
- * @param [out] vecTransParam        The quaternion and scale parameters (q1,q2,q3,t1,t2,t3,s).
+ * @param [in]  matSrcPoint         The source point set.
+ * @param [in]  matDstPoint         The destination point set.
+ * @param [in]  vecWeitgths         The weitghts to apply.
+ * @param [in]  bScale              Wether to apply scaling or not. Should be false for matching data sets.
+ * @param [out] fScale              The scaling parameter.
+ * @param [out] matRot              The resulting 3x3 rotation matrix .
+ * @param [out] vecTrans            The resulting translation vector (tx,ty,tz).
  *
  * @return Wether the matching was succesfull.
  */
