@@ -192,6 +192,10 @@ public:
      */
     void setAverageActivation(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation);
 
+    void setFiffInfo(const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
+
+    void setMappedChannelNames(const QStringList &mappedLayoutChNames);
+
     //=========================================================================================================
     /**
      * call this whenever the external channel selection manager changes
@@ -238,6 +242,10 @@ protected:
     QSharedPointer<AverageScene>                                m_pAverageScene;            /**< The pointer to the average scene. */
     QSharedPointer<DISPLIB::EvokedSetModel>                     m_pEvokedSetModel;          /**< The data model */
     QSharedPointer<DISPLIB::ChannelInfoModel>                   m_pChannelInfoModel;        /**< Channel info model. */
+
+    QSharedPointer<FIFFLIB::FiffInfo>                           m_pFiffInfo;
+
+    QStringList                                                 m_listMappedChannelNames;
 
     QPointer<QGraphicsView>                                     m_pAverageLayoutView;       /**< View for 2D average layout scene */
 
