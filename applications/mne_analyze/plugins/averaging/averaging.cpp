@@ -158,6 +158,8 @@ QWidget *Averaging::getView()
     connect(this, &Averaging::channelSelectionManagerChanged,
             m_pAverageLayoutView.data(), &DISPLIB::AverageLayoutView::channelSelectionManagerChanged, Qt::UniqueConnection);
 
+    connect(this, &Averaging::setCurrentlyMappedFiffChannels,
+            m_pAverageLayoutView.data(), &DISPLIB::AverageLayoutView::setMappedChannelNames, Qt::UniqueConnection);
 
     m_pButterflyView->setObjectName("butterflyview");
     m_pAverageLayoutView->setObjectName("layoutview");
@@ -266,6 +268,7 @@ void Averaging::handleEvent(QSharedPointer<Event> e)
             emit layoutChanged(e->getData().value<QMap<QString,QPointF>>());
             break;
         case CHANNEL_SELECTION_CHANNELS:
+            emit setCurrentlyMappedFiffChannels(e->getData().value<QStringList>());
             break;
         default:
             qWarning() << "[Averaging::handleEvent] Received an Event that is not handled by switch cases.";
@@ -443,6 +446,7 @@ void Averaging::loadFullGui()
     m_pFiffInfo = m_pFiffRawModel->getFiffInfo();
 
     m_pChannelInfoModel = DISPLIB::ChannelInfoModel::SPtr::create(m_pFiffInfo);
+    m_pAverageLayoutView->setFiffInfo(m_pFiffInfo);
     m_pAverageLayoutView->setChannelInfoModel(m_pChannelInfoModel);
 
     if(m_bLoaded) {
