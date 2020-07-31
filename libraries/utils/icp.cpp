@@ -37,6 +37,7 @@
 //=============================================================================================================
 
 #include "icp.h"
+#include <iostream>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -109,69 +110,61 @@ bool UTILSLIB::fit_matched(const Matrix3f& matSrcPoint,
         return false;
     }
 
-    qDebug() << "matP.size(): " << matP.size();
-    qDebug() << "vecWeitgths.isZero(): " << vecWeitgths.isZero();
     // get center of mass
     if(vecWeitgths.isZero()) {
         vecMuP = matP.colwise().mean(); // eq 23
         vecMuX = matX.colwise().mean();
         matDot = matP.transpose() * matX;
-        qDebug() << "vecMuP.size(): " << vecMuP.size();
-        qDebug() << "vecMuX.size(): " << vecMuX.size();
-        qDebug() << "matDot.size(): " << matDot.size();
+        matDot = matDot / matP.rows();
     } else {
         vecW = vecWeitgths / vecWeitgths.sum();
         vecMuP = vecW.transpose() * matP;
         vecMuX = vecW.transpose() * matX;
-        matDot = matP.transpose() * (vecW * matX);
-        qDebug() << "vecW.size(): " << vecW.size();
-        qDebug() << "vecMuP.size(): " << vecMuP.size();
-        qDebug() << "vecMuX.size(): " << vecMuX.size();
-        qDebug() << "matDot.size(): " << matDot.size();
+
+        Matrix3f matXWeighted = matX;
+        for(int i = 0; i < (vecW.size()); ++i) {
+            matXWeighted.row(i) = matXWeighted.row(i) * vecW(i);
+        }
+        matDot = matP.transpose() * (matXWeighted);
     }
 
     // get cross-covariance
-    matSigmaPX = matDot - vecMuP * vecMuX;  // eq 24
-    qDebug() << "matSigmaPX.size(): " << matSigmaPX.size();
+    matSigmaPX = matDot - (vecMuP * vecMuX.transpose());  // eq 24
     matAij = matSigmaPX - matSigmaPX.transpose();
-    qDebug() << "matAij.size(): " << matAij.size();
     vecDelta(0) = matAij(1,2); vecDelta(1) = matAij(2,0); vecDelta(2) = matAij(0,1);
-    qDebug() << "vecDelta.size(): " << vecDelta.size();
     fTrace = matSigmaPX.trace();
     matQ(0,0) = fTrace; // eq 25
-    matQ.block(0,1,1,3) = vecDelta;
+    matQ.block(0,1,1,3) = vecDelta.transpose();
     matQ.block(1,0,3,1) = vecDelta;
     matQ.block(1,1,3,3) = matSigmaPX + matSigmaPX.transpose() - fTrace * MatrixXf::Identity(3,3);
-    qDebug() << "matQ.size(): " << matQ.size();
-    // unit eigenvector coresponding to maximum eigenvalue of matQ is selected as optimal rotation
+
+    // unit eigenvector coresponding to maximum eigenvalue of matQ is selected as optimal rotation quaterions q0,q1,q2,q3
     SelfAdjointEigenSolver<MatrixXf> es(matQ);
     Vector4f vecEigVec = es.eigenvectors().col(matQ.cols()-1);  // only take last Eigen-Vector since this corresponds to the maximum Eigenvalue
-    qDebug() << "vecEigVec.size(): " << vecEigVec.size();
 
-    Vector4f vecTransParam = vecEigVec;
-    if(vecEigVec(0) != 0) {
-        vecTransParam.segment(1,3) = vecTransParam.segment(1,3) * std::copysign(1.0, vecEigVec(0));
-    }
-
-    Quaternionf quatRot(vecTransParam);
+    // quatRot(w,x,y,z)
+    Quaternionf quatRot(vecEigVec(0),vecEigVec(1),vecEigVec(2),vecEigVec(3));
+    quatRot.normalize();
     matRot = quatRot.matrix();
-    qDebug() << "matRot.size(): " << matRot.size();
+
     // apply scaling if requested
     if(bScale) {
-        MatrixXf matDevX = matX - vecMuX;
-        MatrixXf matDevP = matP - vecMuP;
-        matDevP = matDevP.cwiseProduct(matDevP);
+        MatrixXf matDevX = matX.rowwise() - vecMuX.transpose();
+        MatrixXf matDevP = matP.rowwise() - vecMuP.transpose();
         matDevX = matDevX.cwiseProduct(matDevX);
+        matDevP = matDevP.cwiseProduct(matDevP);
+
         if(!vecWeitgths.isZero()) {
-            matDevP = matDevP.cwiseProduct(vecW);
-            matDevX = matDevX.cwiseProduct(vecW);
+            for(int i = 0; i < (vecW.size()); ++i) {
+                matDevX.row(i) = matDevX.row(i) * vecW(i);
+                matDevP.row(i) = matDevP.row(i) * vecW(i);
+            }
         }
-        qDebug() << "matDevX.size(): " << matDevX.size();
         fScale = std::sqrt(matDevX.sum() / matDevP.sum());
-        qDebug() << fScale;
     }
 
     // get translation
     vecTrans = vecMuX - fScale * matRot * vecMuP;
+
     return true;
 }
