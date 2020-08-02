@@ -65,7 +65,7 @@ CONFIG(debug, debug|release) {
 	    -lmnecppFsd \
 	    -lmnecppUtilsd \
 } else {
-    LIBS += -lmnecppDisp3Dd \
+    LIBS += -lmnecppDisp3D \
             -lmnecppDisp \
             -lmnecppRtProcessing \
 	    -lmnecppFwd \
