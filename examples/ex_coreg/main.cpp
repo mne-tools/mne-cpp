@@ -163,14 +163,14 @@ int main(int argc, char *argv[])
     std::cout << matDiff.colwise().mean() << std::endl;
 
 
-//    // Abstract View
-//    AbstractView::SPtr p3DAbstractView = AbstractView::SPtr(new AbstractView());
-//    Data3DTreeModel::SPtr p3DDataModel = p3DAbstractView->getTreeModel();
-//    DigitizerSetTreeItem* pDigSrcSetTreeItem = p3DDataModel->addDigitizerData("Sample", "Source", digSetSrc);
-//    DigitizerSetTreeItem* pDigDstSetTreeItem = p3DDataModel->addDigitizerData("Sample", "Destination", digSetDst);
-//    pDigSrcSetTreeItem->setTransform(transMriHead,false);
+    // Abstract View
+    AbstractView::SPtr p3DAbstractView = AbstractView::SPtr(new AbstractView());
+    Data3DTreeModel::SPtr p3DDataModel = p3DAbstractView->getTreeModel();
+    DigitizerSetTreeItem* pDigSrcSetTreeItem = p3DDataModel->addDigitizerData("Sample", "Source", digSetSrc);
+    DigitizerSetTreeItem* pDigDstSetTreeItem = p3DDataModel->addDigitizerData("Sample", "Destination", digSetDst);
+    pDigSrcSetTreeItem->setTransform(transMriHead,false);
 
-//    p3DAbstractView->show();
+    p3DAbstractView->show();
 
     return a.exec();
 }
