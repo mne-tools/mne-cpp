@@ -159,6 +159,9 @@ int main(int argc, char *argv[])
     FiffCoordTrans transMriHead = FiffCoordTrans::make(digSetSrc[0].coord_frame, digSetDst[0].coord_frame,matRot,vecTrans);
     Matrix3f matSrcTransposed = transMriHead.apply_trans(matSrc);
     Matrix3f matDiff = matDst - matSrcTransposed;
+    qInfo() << "Transformation Matrix: ";
+    std::cout << transMriHead.trans << std::endl;
+
     qInfo() << "Alignment Error: ";
     std::cout << matDiff.colwise().mean() << std::endl;
 
