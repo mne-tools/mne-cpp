@@ -95,15 +95,18 @@ bool UTILSLIB::fit_matched(const Matrix3f& matSrcPoint,
     MatrixXf matP = matSrcPoint;
     MatrixXf matX = matDstPoint;
     VectorXf vecW = vecWeitgths;
-    VectorXf vecMuP;                // column wise mean - center of mass
-    VectorXf vecMuX;                // column wise mean - center of mass
+    VectorXf vecMuP;                                // column wise mean - center of mass
+    VectorXf vecMuX;                                // column wise mean - center of mass
     MatrixXf matDot;
-    MatrixXf matSigmaPX;            // cross-covariance
-    MatrixXf matAij;                // Anti-Symmetric matrix
-    Vector3f vecDelta;              // column vector, elements of matAij
+    MatrixXf matSigmaPX;                            // cross-covariance
+    MatrixXf matAij;                                // Anti-Symmetric matrix
+    Vector3f vecDelta;                              // column vector, elements of matAij
     Matrix4f matQ = Matrix4f::Identity(4,4);
+    Matrix3f matScale = Matrix3f::Identity(3,3);    // scaling matrix
+
     float fTrace;
     fScale = 1.0;
+
     // test size of point clouds
     if(matSrcPoint.size() != matDstPoint.size()) {
         qWarning() << "UTILSLIB::ICP::fit_matched: Point clouds does not match.";
@@ -147,7 +150,7 @@ bool UTILSLIB::fit_matched(const Matrix3f& matSrcPoint,
     quatRot.normalize();
     matRot = quatRot.matrix();
 
-    // apply scaling if requested
+    // get scaling factor and matrix
     if(bScale) {
         MatrixXf matDevX = matX.rowwise() - vecMuX.transpose();
         MatrixXf matDevP = matP.rowwise() - vecMuP.transpose();
@@ -160,11 +163,14 @@ bool UTILSLIB::fit_matched(const Matrix3f& matSrcPoint,
                 matDevP.row(i) = matDevP.row(i) * vecW(i);
             }
         }
+        // get scaling factor and set scaling matrix
         fScale = std::sqrt(matDevX.sum() / matDevP.sum());
+        matScale *= fScale;
     }
 
-    // get translation
+    // get translation and Rotation
     vecTrans = vecMuX - fScale * matRot * vecMuP;
+    matRot *= matScale;
 
     return true;
 }
