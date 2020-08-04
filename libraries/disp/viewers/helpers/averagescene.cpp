@@ -42,6 +42,8 @@
 #include "averagesceneitem.h"
 #include "selectionsceneitem.h"
 
+#include <iostream>
+
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -86,6 +88,8 @@ void AverageScene::setScaleMap(const QMap<qint32,float> &scaleMap)
 void AverageScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelItems)
 {
     this->clear();
+    std::cout<<"A1" << std::endl;
+    std::cout<<"List size" << selectedChannelItems.size() << std::endl;
 
     QListIterator<QGraphicsItem*> i(selectedChannelItems);
     while (i.hasNext()) {
@@ -102,6 +106,7 @@ void AverageScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelIte
 
         this->addItem(averageSceneItemTemp);
     }
+    std::cout<<"A2" << std::endl;
 }
 
 //=============================================================================================================
