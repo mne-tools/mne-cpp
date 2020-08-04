@@ -37,7 +37,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-CONFIG += skip_target_version_ext
+CONFIG += skip_target_version_ext console
 
 QT += core widgets svg concurrent opengl
 

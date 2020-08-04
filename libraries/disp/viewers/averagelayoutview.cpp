@@ -258,14 +258,18 @@ void AverageLayoutView::channelSelectionManagerChanged(const QList<QGraphicsItem
         qDebug() << "AverageLayoutView::channelSelectionManagerChanged - m_pAverageScene is NULL. Returning. ";
         return;
     }
-
+    std::cout<<"A" <<std::endl;
     //Repaint the average items in the average scene based on the input parameter selectedChannelItems and update them with current data
     m_pAverageScene->repaintItems(selectedChannelItems);
-
+    std::cout<<"B" <<std::endl;
     setAverageColor(m_qMapAverageColor);
+    std::cout<<"C" <<std::endl;
     setAverageActivation(m_qMapAverageActivation);
+    std::cout<<"D" <<std::endl;
     setScaleMap(m_scaleMap);
+    std::cout<<"E" <<std::endl;
     updateData();
+    std::cout<<"F" <<std::endl;
 }
 
 //=============================================================================================================
@@ -316,7 +320,7 @@ void AverageLayoutView::updateData()
             }
         }
 
-        //m_pAverageScene->updateScene();
+        m_pAverageScene->updateScene();
         std::cout <<"4" << std::endl;
         return;
     }
