@@ -90,6 +90,7 @@ void AverageScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelIte
     this->clear();
     std::cout<<"A1" << std::endl;
     std::cout<<"List size" << selectedChannelItems.size() << std::endl;
+    std::cout << "First sample:" << static_cast<SelectionSceneItem*>(selectedChannelItems.first())->m_sChannelName.toStdString() << std::endl;
 
     QListIterator<QGraphicsItem*> i(selectedChannelItems);
     while (i.hasNext()) {

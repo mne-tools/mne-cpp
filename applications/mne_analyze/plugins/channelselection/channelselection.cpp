@@ -44,6 +44,7 @@
 #include <anShared/Management/communicator.h>
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Utils/metatypes.h>
+#include <iostream>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -280,6 +281,7 @@ void ChannelSelection::onLoadedLayoutMap(const QMap<QString,QPointF> &layoutMap)
 
 void ChannelSelection::onChannelsMappedToLayout(const QStringList &mappedLayoutChNames)
 {
+    std::cout<<"CHAN NAMES:" << mappedLayoutChNames.first().toStdString() << std::endl;
     QVariant data;
     data.setValue(mappedLayoutChNames);
     m_pCommu->publishEvent(EVENT_TYPE::CHANNEL_SELECTION_CHANNELS, data);

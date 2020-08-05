@@ -257,7 +257,7 @@ void AverageLayoutView::channelSelectionManagerChanged(const QList<QGraphicsItem
     if(!m_pAverageScene) {
         qDebug() << "AverageLayoutView::channelSelectionManagerChanged - m_pAverageScene is NULL. Returning. ";
         return;
-    }
+
     std::cout<<"A" <<std::endl;
     //Repaint the average items in the average scene based on the input parameter selectedChannelItems and update them with current data
     m_pAverageScene->repaintItems(selectedChannelItems);
@@ -284,9 +284,9 @@ void AverageLayoutView::updateData()
         }
 //        GetChKind m_pFiffInfo->chs.at(index.row()).kind;
 //        GetChUnit m_pFiffInfo->chs.at(index.row()).unit;
-
+        std::cout << "name list size: " << m_listMappedChannelNames.size() << std::endl;
         QList<QGraphicsItem *> currentAverageSceneItems = m_pAverageScene->items();
-    std::cout <<"3" << std::endl;
+        std::cout <<"3" << std::endl;
         //Set new data for all averageSceneItems
         for(int i = 0; i < currentAverageSceneItems.size(); i++) {
             AverageSceneItem* averageSceneItemTemp = static_cast<AverageSceneItem*>(currentAverageSceneItems.at(i));
@@ -299,6 +299,9 @@ void AverageLayoutView::updateData()
             //Get the averageScenItem specific data row
             //int channelNumber = m_pChannelInfoModel->getIndexFromMappedChName(averageSceneItemTemp->m_sChannelName);
             int channelNumber = m_listMappedChannelNames.indexOf(averageSceneItemTemp->m_sChannelName);
+
+            std::cout << "chan number:" << channelNumber << " - name:" << averageSceneItemTemp->m_sChannelName.toStdString() << std::endl;
+            std::cout << "namelist" << m_listMappedChannelNames.first().toStdString() << std::endl;
 
             if(channelNumber != -1) {
                 //qDebug() << "Change data for" << channelNumber << "" << averageSceneItemTemp->m_sChannelName;
@@ -345,6 +348,7 @@ void AverageLayoutView::updateData()
 
         //Get the averageScenItem specific data row
         int channelNumber = m_pChannelInfoModel->getIndexFromMappedChName(averageSceneItemTemp->m_sChannelName);
+        std::cout << "chan number:" << channelNumber << " - name:" << averageSceneItemTemp->m_sChannelName.toStdString() << std::endl;
 
         if(channelNumber != -1) {
             //qDebug() << "Change data for" << channelNumber << "" << averageSceneItemTemp->m_sChannelName;
