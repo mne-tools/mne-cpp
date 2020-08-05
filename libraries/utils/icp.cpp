@@ -89,8 +89,11 @@ bool UTILSLIB::icp(const Eigen::Matrix3f& matSrcPoint,
  */
 {
     int iIter = 0;
-    Matrix3f matP = matSrcPoint;
+    Matrix3f matP = matSrcPoint;    // Points on the surface
     Matrix3f matX = matDstPoint;
+
+    VectorXi vecNearest;            // Triangle of the new point
+    VectorXf vecDist;               // The Distance between matX and matP
 
     // add an additional Row with ones to easily apply the transformaton matrix
     Matrix4f matP1 = Matrix4f::Ones(matP.rows(),4);
@@ -102,7 +105,11 @@ bool UTILSLIB::icp(const Eigen::Matrix3f& matSrcPoint,
     matP1 = matP1 * matTransInit.transpose();
 
     // Step a: compute the closest point on the surface
-
+    closestPointOnSurface(matX,
+                          matX.rows(),
+                          matP,
+                          vecNearest,
+                          vecDist);
 
 }
 
