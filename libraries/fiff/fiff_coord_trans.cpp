@@ -223,6 +223,20 @@ FiffCoordTrans FiffCoordTrans::make(int from, int to, const Matrix3f& rot, const
 
 //=============================================================================================================
 
+FiffCoordTrans FiffCoordTrans::make(int from, int to, const Matrix4f& matTrans)
+{
+    FiffCoordTrans t;
+    t.trans = matTrans;
+    t.from = from;
+    t.to   = to;
+
+    FiffCoordTrans::addInverse(t);
+
+    return t;
+}
+
+//=============================================================================================================
+
 bool FiffCoordTrans::addInverse(FiffCoordTrans &t)
 {
     t.invtrans = t.trans.inverse().eval();
