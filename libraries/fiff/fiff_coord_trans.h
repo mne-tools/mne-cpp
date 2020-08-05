@@ -202,6 +202,19 @@ public:
 
     //=========================================================================================================
     /**
+     * Compose the coordinate transformation structure
+     * from a known forward transform
+     *
+     * @param[in] from      Source coordinate system
+     * @param[in] to        Destination coordinate system
+     * @param[in] matTrans  The forward transform
+     *
+     * @return the composed transform
+     */
+    static FiffCoordTrans make(int from, int to, const Eigen::Matrix4f& matTrans);
+
+    //=========================================================================================================
+    /**
      * ### MNE C root function ###: Definition of the add_inverse function
      *
      * @param[in] t      Fiff coordinate transform to which the inverse should be added
