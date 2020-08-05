@@ -115,6 +115,25 @@ UTILSSHARED_EXPORT bool fitMatched(const Eigen::Matrix3f& matSrcPoint,
                                     const bool bScale=false,
                                     const Eigen::VectorXf& vecWeitgths = vecDefaultWeigths);
 
+//=========================================================================================================
+
+/**
+ * Get the closest points on a surface.
+ *
+ * @param[in]   matR                Set of pionts, which are to be projectied.
+ * @param[in]   iNP                 The number of points
+ * @param[out]  matRTri             The set of points on the surface
+ * @param[out]  vecNearest          Triangle of the new point
+ * @param[out]  vecDist             The Distance between matR and matRTri
+ *
+ * @return Wether the function was succesfull.
+ */
+
+UTILSSHARED_EXPORT bool closestPointOnSurface(const Eigen::Matrix3f& matR,
+                                              const int iNP,
+                                              Eigen::Matrix3f& matRTri,
+                                              Eigen::VectorXi& vecNearest,
+                                              Eigen::VectorXf &vecDist);
 
 //=============================================================================================================
 /**
