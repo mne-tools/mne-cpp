@@ -141,7 +141,7 @@ void TestCoregistration::initTestCase()
 
      bool bScale = true;
 
-    if(!fit_matched(matSrc,matDst,matTrans,fScale,bScale,vecWeights)) {
+    if(!fitMatched(matSrc,matDst,matTrans,fScale,bScale,vecWeights)) {
         qWarning() << "point cloud registration not succesfull";
     }
 
