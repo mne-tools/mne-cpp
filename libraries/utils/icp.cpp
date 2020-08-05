@@ -39,7 +39,6 @@
 #include "icp.h"
 #include <iostream>
 
-#include
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -79,8 +78,7 @@ ICP::ICP()
 
 bool UTILSLIB::icp(const Eigen::Matrix3f& matSrcPoint,
                    const Eigen::Matrix3f& matDstPoint,
-                   Eigen::Matrix3f& matRot,
-                   Eigen::Vector3f& vecTrans,
+                   Eigen::Matrix4f& matTrans,
                    const int iNumIter,
                    const float fTol)
 {
@@ -94,8 +92,7 @@ bool UTILSLIB::icp(const Eigen::Matrix3f& matSrcPoint,
 
 bool UTILSLIB::fit_matched(const Matrix3f& matSrcPoint,
                            const Matrix3f& matDstPoint,
-                           Matrix3f& matRot,
-                           Vector3f& vecTrans,
+                           Eigen::Matrix4f& matTrans,
                            float fScale,
                            const bool bScale,
                            const VectorXf& vecWeitgths)
@@ -119,8 +116,9 @@ bool UTILSLIB::fit_matched(const Matrix3f& matSrcPoint,
     Vector3f vecDelta;                              // column vector, elements of matAij
     Matrix4f matQ = Matrix4f::Identity(4,4);
     Matrix3f matScale = Matrix3f::Identity(3,3);    // scaling matrix
-
-    float fTrace;
+    Matrix3f matRot = Matrix3f::Identity(3,3);
+    Vector3f vecTrans;
+    float fTrace = 0.0;
     fScale = 1.0;
 
     // test size of point clouds
@@ -188,5 +186,8 @@ bool UTILSLIB::fit_matched(const Matrix3f& matSrcPoint,
     vecTrans = vecMuX - fScale * matRot * vecMuP;
     matRot *= matScale;
 
+    matTrans.block<3,3>(0,0) = matRot;
+    matTrans.block<3,1>(0,3) = vecTrans;
+    matTrans(3,3) = 1.0f;
     return true;
 }

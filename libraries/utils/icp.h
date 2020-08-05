@@ -78,8 +78,7 @@ const Eigen::VectorXf vecDefaultWeigths;
  *
  * @param [in]  matSrcPoint         The surface points.
  * @param [in]  matDstPoint         The destination point set to be reistrated.
- * @param [out] matRot              The resulting 3x3 rotation matrix .
- * @param [out] vecTrans            The resulting translation vector (tx,ty,tz).
+ * @param [out] matTrans            The forward transformation matrix.
  * @param [in]  iNumIter            The maximum number of iterations for the icp algorithms, defaults to 20.
  * @param [in]  fTol                The destination point set to be reistrated.
  *
@@ -88,8 +87,7 @@ const Eigen::VectorXf vecDefaultWeigths;
  */
 UTILSSHARED_EXPORT bool icp(const Eigen::Matrix3f& matSrcPoint,
                             const Eigen::Matrix3f& matDstPoint,
-                            Eigen::Matrix3f& matRot,
-                            Eigen::Vector3f& vecTrans,
+                            Eigen::Matrix4f& matTrans,
                             const int iNumIter = 20,
                             const float fTol = 0.001);
 
@@ -100,8 +98,7 @@ UTILSSHARED_EXPORT bool icp(const Eigen::Matrix3f& matSrcPoint,
  *
  * @param [in]  matSrcPoint         The source point set.
  * @param [in]  matDstPoint         The destination point set.
- * @param [out] matRot              The resulting 3x3 rotation matrix .
- * @param [out] vecTrans            The resulting translation vector (tx,ty,tz).
+ * @param [out] matTrans            The forward transformation matrix.
  * @param [out] fScale              The scaling parameter.
  * @param [in]  bScale              Wether to apply scaling or not. Should be false for matching data sets.
  * @param [in]  vecWeitgths         The weitghts to apply.
@@ -110,8 +107,7 @@ UTILSSHARED_EXPORT bool icp(const Eigen::Matrix3f& matSrcPoint,
  */
 UTILSSHARED_EXPORT bool fit_matched(const Eigen::Matrix3f& matSrcPoint,
                                     const Eigen::Matrix3f& matDstPoint,
-                                    Eigen::Matrix3f& matRot,
-                                    Eigen::Vector3f& vecTrans,
+                                    Eigen::Matrix4f& matTrans,
                                     float fScale = 1.0,
                                     const bool bScale=false,
                                     const Eigen::VectorXf& vecWeitgths = vecDefaultWeigths);
