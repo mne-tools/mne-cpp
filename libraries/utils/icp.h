@@ -75,8 +75,8 @@ const Eigen::VectorXf vecDefaultWeigths;
 /**
  * The ICP algorithm to register a point set with pointset coresponding to a surface.
  *
- * @param [in]  matSrcPoint         The surface points.
- * @param [in]  matDstPoint         The destination point set to be reistrated.
+ * @param [in]  matSrcPoint         The points on the surface.
+ * @param [in]  matDstPoint         The destination point set to be registrated.
  * @param [out] matTrans            The forward transformation matrix.
  * @param [in]  matTransInit        The initial forward transformation matrix.
  * @param [in]  iNumIter            The maximum number of iterations for the icp algorithms, defaults to 20.
@@ -133,7 +133,7 @@ UTILSSHARED_EXPORT bool closestPointOnSurface(const Eigen::Matrix3f& matR,
                                               const int iNP,
                                               Eigen::Matrix3f& matRTri,
                                               Eigen::VectorXi& vecNearest,
-                                              Eigen::VectorXf &vecDist);
+                                              Eigen::VectorXf& vecDist);
 
 //=============================================================================================================
 /**
