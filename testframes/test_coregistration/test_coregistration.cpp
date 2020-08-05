@@ -122,8 +122,7 @@ void TestCoregistration::initTestCase()
     // Declare variables
     Matrix3f matSrc(digSetSrc.size(),3);
     Matrix3f matDst(digSetDst.size(),3);
-    Vector3f vecTrans;
-    Matrix3f matRot;
+    Matrix4f matTrans;
     Vector3f vecWeights(digSetSrc.size()); // LPA, Nasion, RPA
     float fScale;
 
@@ -142,11 +141,11 @@ void TestCoregistration::initTestCase()
 
      bool bScale = true;
 
-    if(!fit_matched(matSrc,matDst,matRot,vecTrans,fScale,bScale,vecWeights)) {
+    if(!fit_matched(matSrc,matDst,matTrans,fScale,bScale,vecWeights)) {
         qWarning() << "point cloud registration not succesfull";
     }
 
-    transMriHead = FiffCoordTrans::make(digSetSrc[0].coord_frame, digSetDst[0].coord_frame,matRot,vecTrans);
+    transMriHead = FiffCoordTrans::make(digSetSrc[0].coord_frame, digSetDst[0].coord_frame,matTrans);
 
 }
 
