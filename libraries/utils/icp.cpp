@@ -81,16 +81,30 @@ bool UTILSLIB::icp(const Eigen::Matrix3f& matSrcPoint,
                    Eigen::Matrix4f& matTrans,
                    const int iNumIter,
                    const float fTol)
+/**
+ * Follow notation of P.J. Besl and N.D. McKay, A Method for
+ * Registration of 3-D Shapes, IEEE Trans. Patt. Anal. Machine Intell., 14,
+ * 239 - 255, 1992.
+ */
 {
     int iIter = 0;
-    MatrixXf matP = matSrcPoint;
-    MatrixXf matX = matDstPoint;
+    Matrix3f matP = matSrcPoint;
+    Matrix3f matX = matDstPoint;
+
+    // add an additional Row with ones to easily apply the transformaton matrix
+    Matrix4f matP1 = Matrix4f::Ones(matP.rows(),4);
+    Matrix4f matX1 = Matrix4f::Ones(matX.rows(),4);
+    matP1.block<0,0>(matP.rows(),4) = matP;
+    matX1.block<0,0>(matX.rows(),4) = matX;
+
+    // Step a: compute the closest point on the surface
+
 
 }
 
 //=============================================================================================================
 
-bool UTILSLIB::fit_matched(const Matrix3f& matSrcPoint,
+bool UTILSLIB::fitMatched(const Matrix3f& matSrcPoint,
                            const Matrix3f& matDstPoint,
                            Eigen::Matrix4f& matTrans,
                            float fScale,
@@ -101,7 +115,7 @@ bool UTILSLIB::fit_matched(const Matrix3f& matSrcPoint,
  * Registration of 3-D Shapes, IEEE Trans. Patt. Anal. Machine Intell., 14,
  * 239 - 255, 1992.
  *
- * The code is further adapted from MNE Python function _fit_matched_points(...).
+ * The code is further adapted from MNE Python function _fitMatched_points(...).
  */
 {
     // init values
@@ -123,7 +137,7 @@ bool UTILSLIB::fit_matched(const Matrix3f& matSrcPoint,
 
     // test size of point clouds
     if(matSrcPoint.size() != matDstPoint.size()) {
-        qWarning() << "UTILSLIB::ICP::fit_matched: Point clouds does not match.";
+        qWarning() << "UTILSLIB::ICP::fitMatched: Point clouds does not match.";
         return false;
     }
 

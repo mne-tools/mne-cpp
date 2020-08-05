@@ -151,7 +151,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    if(!fit_matched(matSrc,matDst,matTrans,fScale,bScale,vecWeights)) {
+    if(!fitMatched(matSrc,matDst,matTrans,fScale,bScale,vecWeights)) {
         qWarning() << "point cloud registration not succesfull";
     }
 
