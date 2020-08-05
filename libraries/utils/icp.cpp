@@ -79,6 +79,7 @@ ICP::ICP()
 bool UTILSLIB::icp(const Eigen::Matrix3f& matSrcPoint,
                    const Eigen::Matrix3f& matDstPoint,
                    Eigen::Matrix4f& matTrans,
+                   const Eigen::Matrix4f& matTransInit,
                    const int iNumIter,
                    const float fTol)
 /**
@@ -97,6 +98,9 @@ bool UTILSLIB::icp(const Eigen::Matrix3f& matSrcPoint,
     matP1.block<0,0>(matP.rows(),4) = matP;
     matX1.block<0,0>(matX.rows(),4) = matX;
 
+    // Apply initial transformation for good starting points
+    matP1 = matP1 * matTransInit.transpose();
+
     // Step a: compute the closest point on the surface
 
 
@@ -105,11 +109,11 @@ bool UTILSLIB::icp(const Eigen::Matrix3f& matSrcPoint,
 //=============================================================================================================
 
 bool UTILSLIB::fitMatched(const Matrix3f& matSrcPoint,
-                           const Matrix3f& matDstPoint,
-                           Eigen::Matrix4f& matTrans,
-                           float fScale,
-                           const bool bScale,
-                           const VectorXf& vecWeitgths)
+                          const Matrix3f& matDstPoint,
+                          Eigen::Matrix4f& matTrans,
+                          float fScale,
+                          const bool bScale,
+                          const VectorXf& vecWeitgths)
 /**
  * Follow notation of P.J. Besl and N.D. McKay, A Method for
  * Registration of 3-D Shapes, IEEE Trans. Patt. Anal. Machine Intell., 14,
@@ -204,4 +208,16 @@ bool UTILSLIB::fitMatched(const Matrix3f& matSrcPoint,
     matTrans.block<3,1>(0,3) = vecTrans;
     matTrans(3,3) = 1.0f;
     return true;
+}
+
+//=========================================================================================================
+
+bool UTILSLIB::closestPointOnSurface(const Eigen::Matrix3f& matR,
+                                     const int iNP,
+                                     Eigen::Matrix3f& matRTri,
+                                     Eigen::VectorXi& vecNearest,
+                                     Eigen::VectorXf &vecDist)
+
+{
+
 }
