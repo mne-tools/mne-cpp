@@ -39,6 +39,7 @@
 #include "icp.h"
 #include <iostream>
 
+#include
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -72,6 +73,21 @@ using namespace Eigen;
 
 ICP::ICP()
 {
+}
+
+//=============================================================================================================
+
+bool UTILSLIB::icp(const Eigen::Matrix3f& matSrcPoint,
+                   const Eigen::Matrix3f& matDstPoint,
+                   Eigen::Matrix3f& matRot,
+                   Eigen::Vector3f& vecTrans,
+                   const int iNumIter,
+                   const float fTol)
+{
+    int iIter = 0;
+    MatrixXf matP = matSrcPoint;
+    MatrixXf matX = matDstPoint;
+
 }
 
 //=============================================================================================================
