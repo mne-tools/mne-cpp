@@ -73,21 +73,23 @@ const Eigen::VectorXf vecDefaultWeigths;
 
 //=========================================================================================================
 /**
- * The ICP algorithm to register a point set with another one. Make sure to align the fiducials first and already apply the
- * initial transformation matrix.
+ * The ICP algorithm to register a point set with pointset coresponding to a surface.
  *
  * @param [in]  matSrcPoint         The surface points.
  * @param [in]  matDstPoint         The destination point set to be reistrated.
  * @param [out] matTrans            The forward transformation matrix.
+ * @param [in]  matTransInit        The initial forward transformation matrix.
  * @param [in]  iNumIter            The maximum number of iterations for the icp algorithms, defaults to 20.
  * @param [in]  fTol                The destination point set to be reistrated.
  *
  *
  * @return Wether the registration was succesfull.
  */
+
 UTILSSHARED_EXPORT bool icp(const Eigen::Matrix3f& matSrcPoint,
                             const Eigen::Matrix3f& matDstPoint,
                             Eigen::Matrix4f& matTrans,
+                            const Eigen::Matrix4f& matTransInit = Eigen::Matrix4f::Identity(4,4),
                             const int iNumIter = 20,
                             const float fTol = 0.001);
 
@@ -105,7 +107,8 @@ UTILSSHARED_EXPORT bool icp(const Eigen::Matrix3f& matSrcPoint,
  *
  * @return Wether the matching was succesfull.
  */
-UTILSSHARED_EXPORT bool fit_matched(const Eigen::Matrix3f& matSrcPoint,
+
+UTILSSHARED_EXPORT bool fitMatched(const Eigen::Matrix3f& matSrcPoint,
                                     const Eigen::Matrix3f& matDstPoint,
                                     Eigen::Matrix4f& matTrans,
                                     float fScale = 1.0,
