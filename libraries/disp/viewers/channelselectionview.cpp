@@ -395,8 +395,9 @@ void ChannelSelectionView::updateDataView()
         QList<QGraphicsItem*> visibleItemList =  m_pSelectionScene->items();
         QMutableListIterator<QGraphicsItem*> i(visibleItemList);
         while (i.hasNext()) {
-            if(!i.next()->isVisible())
+            if(!i.next()->isVisible()){
                 i.remove();
+            }
         }
         std::cout<<"E2" << std::endl;
         emit selectionChanged(visibleItemList);
