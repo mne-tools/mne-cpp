@@ -56,7 +56,9 @@
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
+namespace FIFFLIB{
+    class FiffCoordTrans;
+}
 //=============================================================================================================
 // DEFINE NAMESPACE NAMESPACE
 //=============================================================================================================
@@ -71,15 +73,38 @@ const Eigen::VectorXf vecDefaultWeigths;
 
 //=========================================================================================================
 /**
+ * The ICP algorithm to register a point set with another one. Make sure to align the fiducials first and already apply the
+ * initial transformation matrix.
+ *
+ * @param [in]  matSrcPoint         The surface points.
+ * @param [in]  matDstPoint         The destination point set to be reistrated.
+ * @param [out] matRot              The resulting 3x3 rotation matrix .
+ * @param [out] vecTrans            The resulting translation vector (tx,ty,tz).
+ * @param [in]  iNumIter            The maximum number of iterations for the icp algorithms, defaults to 20.
+ * @param [in]  fTol                The destination point set to be reistrated.
+ *
+ *
+ * @return Wether the registration was succesfull.
+ */
+UTILSSHARED_EXPORT bool icp(const Eigen::Matrix3f& matSrcPoint,
+                            const Eigen::Matrix3f& matDstPoint,
+                            Eigen::Matrix3f& matRot,
+                            Eigen::Vector3f& vecTrans,
+                            const int iNumIter = 20,
+                            const float fTol = 0.001);
+
+//=========================================================================================================
+
+/**
  * Corresponding point set registration using quaternions.
  *
  * @param [in]  matSrcPoint         The source point set.
  * @param [in]  matDstPoint         The destination point set.
- * @param [in]  vecWeitgths         The weitghts to apply.
- * @param [in]  bScale              Wether to apply scaling or not. Should be false for matching data sets.
- * @param [out] fScale              The scaling parameter.
  * @param [out] matRot              The resulting 3x3 rotation matrix .
  * @param [out] vecTrans            The resulting translation vector (tx,ty,tz).
+ * @param [out] fScale              The scaling parameter.
+ * @param [in]  bScale              Wether to apply scaling or not. Should be false for matching data sets.
+ * @param [in]  vecWeitgths         The weitghts to apply.
  *
  * @return Wether the matching was succesfull.
  */
@@ -90,6 +115,7 @@ UTILSSHARED_EXPORT bool fit_matched(const Eigen::Matrix3f& matSrcPoint,
                                     float fScale = 1.0,
                                     const bool bScale=false,
                                     const Eigen::VectorXf& vecWeitgths = vecDefaultWeigths);
+
 
 //=============================================================================================================
 /**
