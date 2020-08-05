@@ -134,8 +134,7 @@ int main(int argc, char *argv[])
     // Declare variables
     Matrix3f matSrc(digSetSrc.size(),3);
     Matrix3f matDst(digSetDst.size(),3);
-    Vector3f vecTrans;
-    Matrix3f matRot;
+    Matrix4f matTrans;
     Vector3f vecWeights(digSetSrc.size()); // LPA, Nasion, RPA
     float fScale;
 
@@ -152,11 +151,11 @@ int main(int argc, char *argv[])
         }
     }
 
-    if(!fit_matched(matSrc,matDst,matRot,vecTrans,fScale,bScale,vecWeights)) {
+    if(!fit_matched(matSrc,matDst,matTrans,fScale,bScale,vecWeights)) {
         qWarning() << "point cloud registration not succesfull";
     }
 
-    FiffCoordTrans transMriHead = FiffCoordTrans::make(digSetSrc[0].coord_frame, digSetDst[0].coord_frame,matRot,vecTrans);
+    FiffCoordTrans transMriHead = FiffCoordTrans::make(digSetSrc[0].coord_frame, digSetDst[0].coord_frame,matTrans);
     Matrix3f matSrcTransposed = transMriHead.apply_trans(matSrc);
     Matrix3f matDiff = matDst - matSrcTransposed;
     qInfo() << "Transformation Matrix: ";
