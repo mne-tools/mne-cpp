@@ -74,6 +74,7 @@ namespace DISPLIB
 class AverageScene;
 class EvokedSetModel;
 class ChannelInfoModel;
+class SelItem;
 
 //=============================================================================================================
 /**
@@ -203,6 +204,8 @@ public:
      * * @param [in] selectedChannelItems list of selected graphic items
      */
     void channelSelectionManagerChanged(const QList<QGraphicsItem *> &selectedChannelItems);
+
+    void channelSelectionChanged(const QList<QSharedPointer<DISPLIB::SelItem>> &selectedChannelItems);
 
     //=========================================================================================================
     /**

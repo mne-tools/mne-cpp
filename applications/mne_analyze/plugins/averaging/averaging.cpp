@@ -102,7 +102,9 @@ Averaging::Averaging()
 
 Averaging::~Averaging()
 {
-
+    qRegisterMetaType<DISPLIB::SelItem>();
+    qRegisterMetaType<QSharedPointer<DISPLIB::SelItem>>();
+    qRegisterMetaType<QList<QSharedPointer<DISPLIB::SelItem>>>();
 }
 
 //=============================================================================================================
@@ -156,7 +158,7 @@ QWidget *Averaging::getView()
             m_pButterflyView.data(), &DISPLIB::ButterflyView::showSelectedChannels, Qt::UniqueConnection);
 
     connect(this, &Averaging::channelSelectionManagerChanged,
-            m_pAverageLayoutView.data(), &DISPLIB::AverageLayoutView::channelSelectionManagerChanged, Qt::UniqueConnection);
+            m_pAverageLayoutView.data(), &DISPLIB::AverageLayoutView::channelSelectionChanged, Qt::UniqueConnection);
 
     connect(this, &Averaging::setCurrentlyMappedFiffChannels,
             m_pAverageLayoutView.data(), &DISPLIB::AverageLayoutView::setMappedChannelNames, Qt::UniqueConnection);
@@ -264,11 +266,8 @@ void Averaging::handleEvent(QSharedPointer<Event> e)
             setChannelSelection(e->getData().value<QList<int>>());
             break;
         case CHANNEL_SELECTION_ITEMS:
-    {
-            DISPLIB::SelectionSceneItem* test = static_cast<DISPLIB::SelectionSceneItem*>(e->getData().value<QList<QGraphicsItem*>>().first());
-            emit channelSelectionManagerChanged(e->getData().value<QList<QGraphicsItem*>>());
+            emit channelSelectionManagerChanged(e->getData().value<QList<QSharedPointer<DISPLIB::SelItem>>>());
             break;
-    }
 //        case CHANNEL_SELECTION_MAP:
 //            emit layoutChanged(e->getData().value<QMap<QString,QPointF>>());
 //            break;

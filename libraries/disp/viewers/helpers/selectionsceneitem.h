@@ -69,6 +69,20 @@ namespace DISPLIB
  *
  * @brief The SelectionSceneItem class provides a new data structure for visualizing channels in a 2D layout.
  */
+class DISPSHARED_EXPORT SelItem{
+public:
+    SelItem() = default;
+    ~SelItem() = default;
+    SelItem(const SelItem &) = default;
+    SelItem &operator=(const SelItem &) = default;
+
+    QString     m_sChannelName;             /**< The channel's name.*/
+    int         m_iChannelNumber;           /**< The channel number.*/
+    int         m_iChannelKind;             /**< The channel kind.*/
+    int         m_iChannelUnit;             /**< The channel unit.*/
+    QPointF     m_qpChannelPosition;        /**< The channel's 2D position in the scene.*/
+};
+
 class DISPSHARED_EXPORT SelectionSceneItem : public QGraphicsItem
 {
 
@@ -109,6 +123,9 @@ public:
     bool        m_bHighlightItem;           /**< Whether this item is to be highlighted.*/
     bool        m_bIsBadChannel;            /**< Whether this item is a bad channel.*/
 };
+
 } // NAMESPACE DISPLIB
+Q_DECLARE_METATYPE(DISPLIB::SelItem);
+Q_DECLARE_METATYPE(QSharedPointer<DISPLIB::SelItem>)
 
 #endif // SELECTIONSCENEITEM_H
