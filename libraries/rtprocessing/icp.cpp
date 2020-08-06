@@ -59,7 +59,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace UTILSLIB;
+using namespace RTPROCESSINGLIB;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -76,12 +76,12 @@ ICP::ICP()
 
 //=============================================================================================================
 
-bool UTILSLIB::icp(const Eigen::Matrix3f& matSrcPoint,
-                   const Eigen::Matrix3f& matDstPoint,
-                   Eigen::Matrix4f& matTrans,
-                   const Eigen::Matrix4f& matTransInit,
-                   const int iNumIter,
-                   const float fTol)
+bool RTPROCESSINGLIB::icp(const Eigen::Matrix3f& matSrcPoint,
+                          const Eigen::Matrix3f& matDstPoint,
+                          Eigen::Matrix4f& matTrans,
+                          const Eigen::Matrix4f& matTransInit,
+                          const int iNumIter,
+                          const float fTol)
 /**
  * Follow notation of P.J. Besl and N.D. McKay, A Method for
  * Registration of 3-D Shapes, IEEE Trans. Patt. Anal. Machine Intell., 14,
@@ -98,8 +98,8 @@ bool UTILSLIB::icp(const Eigen::Matrix3f& matSrcPoint,
     // add an additional Row with ones to easily apply the transformaton matrix
     Matrix4f matP1 = Matrix4f::Ones(matP.rows(),4);
     Matrix4f matX1 = Matrix4f::Ones(matX.rows(),4);
-    matP1.block<0,0>(matP.rows(),4) = matP;
-    matX1.block<0,0>(matX.rows(),4) = matX;
+//    matP1.block<0,0>(matP.rows(),3) = matP;
+//    matX1.block<0,0>(matX.rows(),3) = matX;
 
     // Apply initial transformation for good starting points
     matP1 = matP1 * matTransInit.transpose();
@@ -110,17 +110,17 @@ bool UTILSLIB::icp(const Eigen::Matrix3f& matSrcPoint,
                           matP,
                           vecNearest,
                           vecDist);
-
+    return true;
 }
 
 //=============================================================================================================
 
-bool UTILSLIB::fitMatched(const Matrix3f& matSrcPoint,
-                          const Matrix3f& matDstPoint,
-                          Eigen::Matrix4f& matTrans,
-                          float fScale,
-                          const bool bScale,
-                          const VectorXf& vecWeitgths)
+bool RTPROCESSINGLIB::fitMatched(const Matrix3f& matSrcPoint,
+                                 const Matrix3f& matDstPoint,
+                                 Eigen::Matrix4f& matTrans,
+                                 float fScale,
+                                 const bool bScale,
+                                 const VectorXf& vecWeitgths)
 /**
  * Follow notation of P.J. Besl and N.D. McKay, A Method for
  * Registration of 3-D Shapes, IEEE Trans. Patt. Anal. Machine Intell., 14,
@@ -219,12 +219,12 @@ bool UTILSLIB::fitMatched(const Matrix3f& matSrcPoint,
 
 //=========================================================================================================
 
-bool UTILSLIB::closestPointOnSurface(const Eigen::Matrix3f& matR,
-                                     const int iNP,
-                                     Eigen::Matrix3f& matRTri,
-                                     Eigen::VectorXi& vecNearest,
-                                     Eigen::VectorXf &vecDist)
+bool RTPROCESSINGLIB::closestPointOnSurface(const Eigen::Matrix3f& matR,
+                                            const int iNP,
+                                            Eigen::Matrix3f& matRTri,
+                                            Eigen::VectorXi& vecNearest,
+                                            Eigen::VectorXf &vecDist)
 
 {
-
+    return true;
 }

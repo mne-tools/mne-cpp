@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "utils_global.h"
+#include "rtprocessing_global.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -63,7 +63,7 @@ namespace FIFFLIB{
 // DEFINE NAMESPACE NAMESPACE
 //=============================================================================================================
 
-namespace UTILSLIB {
+namespace RTPROCESSINGLIB {
 
 //=============================================================================================================
 // NAMESPACE FORWARD DECLARATIONS
@@ -86,12 +86,12 @@ const Eigen::VectorXf vecDefaultWeigths;
  * @return Wether the registration was succesfull.
  */
 
-UTILSSHARED_EXPORT bool icp(const Eigen::Matrix3f& matSrcPoint,
-                            const Eigen::Matrix3f& matDstPoint,
-                            Eigen::Matrix4f& matTrans,
-                            const Eigen::Matrix4f& matTransInit = Eigen::Matrix4f::Identity(4,4),
-                            const int iNumIter = 20,
-                            const float fTol = 0.001);
+RTPROCESINGSHARED_EXPORT bool icp(const Eigen::Matrix3f& matSrcPoint,
+                                  const Eigen::Matrix3f& matDstPoint,
+                                  Eigen::Matrix4f& matTrans,
+                                  const Eigen::Matrix4f& matTransInit = Eigen::Matrix4f::Identity(4,4),
+                                  const int iNumIter = 20,
+                                  const float fTol = 0.001);
 
 //=========================================================================================================
 
@@ -108,12 +108,12 @@ UTILSSHARED_EXPORT bool icp(const Eigen::Matrix3f& matSrcPoint,
  * @return Wether the matching was succesfull.
  */
 
-UTILSSHARED_EXPORT bool fitMatched(const Eigen::Matrix3f& matSrcPoint,
-                                    const Eigen::Matrix3f& matDstPoint,
-                                    Eigen::Matrix4f& matTrans,
-                                    float fScale = 1.0,
-                                    const bool bScale=false,
-                                    const Eigen::VectorXf& vecWeitgths = vecDefaultWeigths);
+RTPROCESINGSHARED_EXPORT bool fitMatched(const Eigen::Matrix3f& matSrcPoint,
+                                         const Eigen::Matrix3f& matDstPoint,
+                                         Eigen::Matrix4f& matTrans,
+                                         float fScale = 1.0,
+                                         const bool bScale=false,
+                                         const Eigen::VectorXf& vecWeitgths = vecDefaultWeigths);
 
 //=========================================================================================================
 
@@ -129,11 +129,11 @@ UTILSSHARED_EXPORT bool fitMatched(const Eigen::Matrix3f& matSrcPoint,
  * @return Wether the function was succesfull.
  */
 
-UTILSSHARED_EXPORT bool closestPointOnSurface(const Eigen::Matrix3f& matR,
-                                              const int iNP,
-                                              Eigen::Matrix3f& matRTri,
-                                              Eigen::VectorXi& vecNearest,
-                                              Eigen::VectorXf& vecDist);
+RTPROCESINGSHARED_EXPORT bool closestPointOnSurface(const Eigen::Matrix3f& matR,
+                                                    const int iNP,
+                                                    Eigen::Matrix3f& matRTri,
+                                                    Eigen::VectorXi& vecNearest,
+                                                    Eigen::VectorXf& vecDist);
 
 //=============================================================================================================
 /**
@@ -141,7 +141,7 @@ UTILSSHARED_EXPORT bool closestPointOnSurface(const Eigen::Matrix3f& matR,
  *
  * @brief Brief description of this class.
  */
-class UTILSSHARED_EXPORT ICP
+class RTPROCESINGSHARED_EXPORT ICP
 {
 
 public:
