@@ -62,7 +62,6 @@ contains(MNECPP_CONFIG, static) {
 }
 
 SOURCES += \
-    icp.cpp \
     kmeans.cpp \
     mnemath.cpp \
     ioutils.cpp \
@@ -78,7 +77,6 @@ SOURCES += \
     spectral.cpp
 
 HEADERS += \
-    icp.h \
     kmeans.h\
     utils_global.h \
     mnemath.h \

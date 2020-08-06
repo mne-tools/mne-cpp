@@ -51,7 +51,7 @@
 #include "fiff/fiff_coord_trans.h"
 
 #include <utils/generics/applicationlogger.h>
-#include "utils/icp.h"
+#include "rtprocessing/icp.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -75,6 +75,7 @@
 
 using namespace Eigen;
 using namespace UTILSLIB;
+using namespace RTPROCESSINGLIB;
 using namespace FIFFLIB;
 using namespace DISP3DLIB;
 
