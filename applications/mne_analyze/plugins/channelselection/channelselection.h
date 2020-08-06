@@ -64,6 +64,7 @@ namespace ANSHAREDLIB {
 namespace DISPLIB {
     class ChannelSelectionView;
     class ChannelInfoModel;
+    class SelItem;
 }
 
 namespace FIFFLIB {
@@ -118,7 +119,7 @@ private slots:
     //=========================================================================================================
     void onShowSelectedChannelsOnly(const QStringList&  selectedChannels);
 
-    void onSelectionChanged( QList<QGraphicsItem*> selectedChannelItems);
+    void onSelectionChanged(const QList<QGraphicsItem*>& selectedChannelItems);
 
     void onLoadedLayoutMap(const QMap<QString,QPointF> &layoutMap);
 
@@ -135,6 +136,8 @@ private:
 
 
     QPointer<ANSHAREDLIB::Communicator>                 m_pCommu;
+
+    QList<QSharedPointer<DISPLIB::SelItem>>             m_listItemList;
 
     QSharedPointer<DISPLIB::ChannelSelectionView>       m_pChannelSelectionView;
     QSharedPointer<DISPLIB::ChannelInfoModel>           m_pChannelInfoModel;
