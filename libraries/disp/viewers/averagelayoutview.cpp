@@ -257,7 +257,7 @@ void AverageLayoutView::channelSelectionManagerChanged(const QList<QGraphicsItem
     if(!m_pAverageScene) {
         qDebug() << "AverageLayoutView::channelSelectionManagerChanged - m_pAverageScene is NULL. Returning. ";
         return;
-
+    }
     std::cout<<"A" <<std::endl;
     //Repaint the average items in the average scene based on the input parameter selectedChannelItems and update them with current data
     m_pAverageScene->repaintItems(selectedChannelItems);

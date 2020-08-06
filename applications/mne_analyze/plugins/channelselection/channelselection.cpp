@@ -231,7 +231,9 @@ void ChannelSelection::setFiffSettings(QSharedPointer<FIFFLIB::FiffInfo> pFiffIn
             this, &ChannelSelection::onChannelsMappedToLayout, Qt::UniqueConnection);
 
 
-
+//    QVariant data;
+//    data.setValue(m_pChannelSelectionView.data());
+//    m_pCommu->publishEvent(EVENT_TYPE::CHANNEL_SELECTION_INDICES, data);
 
     m_pChannelInfoModel->layoutChanged(m_pChannelSelectionView->getLayoutMap());
 
@@ -261,8 +263,10 @@ void ChannelSelection::onShowSelectedChannelsOnly(const QStringList&  selectedCh
 
 //=============================================================================================================
 
-void ChannelSelection::onSelectionChanged(const QList<QGraphicsItem*> &selectedChannelItems)
+#include <disp/viewers/helpers/selectionsceneitem.h>
+void ChannelSelection::onSelectionChanged( QList<QGraphicsItem*> selectedChannelItems)
 {
+    DISPLIB::SelectionSceneItem* test = static_cast<DISPLIB::SelectionSceneItem*>(selectedChannelItems.first());
     QVariant data;
     data.setValue(selectedChannelItems);
     m_pCommu->publishEvent(EVENT_TYPE::CHANNEL_SELECTION_ITEMS, data);
