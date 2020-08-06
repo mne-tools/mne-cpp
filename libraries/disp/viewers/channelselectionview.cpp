@@ -399,6 +399,7 @@ void ChannelSelectionView::updateDataView()
                 i.remove();
             }
         }
+        SelectionSceneItem* test = static_cast<SelectionSceneItem*>(visibleItemList.first());
         std::cout<<"E2" << std::endl;
         emit selectionChanged(visibleItemList);
     }
