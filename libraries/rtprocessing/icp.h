@@ -56,9 +56,15 @@
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+
 namespace FIFFLIB{
     class FiffCoordTrans;
 }
+
+namespace MNELIB{
+class MNEProjectToSurface;
+}
+
 //=============================================================================================================
 // DEFINE NAMESPACE NAMESPACE
 //=============================================================================================================
@@ -75,22 +81,20 @@ const Eigen::VectorXf vecDefaultWeigths;
 /**
  * The ICP algorithm to register a point set with pointset coresponding to a surface.
  *
- * @param [in]  matSrcPoint         The points on the surface.
+ * @param [in]  mneSurfacePoints    The MNEProjectToSurface object that contains the surface triangles etc..
  * @param [in]  matDstPoint         The destination point set to be registrated.
- * @param [out] matTrans            The forward transformation matrix.
- * @param [in]  matTransInit        The initial forward transformation matrix.
- * @param [in]  iNumIter            The maximum number of iterations for the icp algorithms, defaults to 20.
+ * @param [out] transFromTo         The forward transformation matrix.
+ * @param [in]  iMaxIter            The maximum number of iterations for the icp algorithms, defaults to 20.
  * @param [in]  fTol                The destination point set to be reistrated.
  *
  *
  * @return Wether the registration was succesfull.
  */
 
-RTPROCESINGSHARED_EXPORT bool icp(const Eigen::Matrix3f& matSrcPoint,
+RTPROCESINGSHARED_EXPORT bool icp(const QSharedPointer<MNELIB::MNEProjectToSurface> mneSurfacePoints,
                                   const Eigen::Matrix3f& matDstPoint,
-                                  Eigen::Matrix4f& matTrans,
-                                  const Eigen::Matrix4f& matTransInit = Eigen::Matrix4f::Identity(4,4),
-                                  const int iNumIter = 20,
+                                  FIFFLIB::FiffCoordTrans& transFromTo,
+                                  const int iMaxIter = 20,
                                   const float fTol = 0.001);
 
 //=========================================================================================================

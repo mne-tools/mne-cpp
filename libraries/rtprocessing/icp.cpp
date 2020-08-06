@@ -39,6 +39,9 @@
 #include "icp.h"
 #include <iostream>
 
+#include "fiff/fiff_coord_trans.h"
+#include "mne/mne_project_to_surface.h"
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -59,8 +62,10 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace MNELIB;
 using namespace RTPROCESSINGLIB;
 using namespace Eigen;
+using namespace FIFFLIB;
 
 //=============================================================================================================
 // DEFINE GLOBAL METHODS
@@ -76,11 +81,10 @@ ICP::ICP()
 
 //=============================================================================================================
 
-bool RTPROCESSINGLIB::icp(const Eigen::Matrix3f& matSrcPoint,
+bool RTPROCESSINGLIB::icp(const MNEProjectToSurface::SPtr mneSurfacePoints,
                           const Eigen::Matrix3f& matDstPoint,
-                          Eigen::Matrix4f& matTrans,
-                          const Eigen::Matrix4f& matTransInit,
-                          const int iNumIter,
+                          FiffCoordTrans& transFromTo,
+                          const int iMaxIter,
                           const float fTol)
 /**
  * Follow notation of P.J. Besl and N.D. McKay, A Method for
@@ -88,29 +92,51 @@ bool RTPROCESSINGLIB::icp(const Eigen::Matrix3f& matSrcPoint,
  * 239 - 255, 1992.
  */
 {
-    int iIter = 0;
-    Matrix3f matP = matSrcPoint;    // Points on the surface
-    Matrix3f matX = matDstPoint;
-
+    // Initialization
+    float fMSE = 0.0;               // The mean square error
+    MatrixXf matP0 = matDstPoint;   // Initial Set of points
+    MatrixXf matPk = matP0;         // Transformed Set of points
+    MatrixXf matYk;                 // Iterative losest points on the surface
+    Matrix4f matTrans;              // the transformation matrix
     VectorXi vecNearest;            // Triangle of the new point
     VectorXf vecDist;               // The Distance between matX and matP
 
-    // add an additional Row with ones to easily apply the transformaton matrix
-    Matrix4f matP1 = Matrix4f::Ones(matP.rows(),4);
-    Matrix4f matX1 = Matrix4f::Ones(matX.rows(),4);
-//    matP1.block<0,0>(matP.rows(),3) = matP;
-//    matX1.block<0,0>(matX.rows(),3) = matX;
+    // Initial transformation - apply inverse because we are computing in Model space
+    FiffCoordTrans transToFrom = transFromTo;
+    transToFrom.invert_transform();
 
-    // Apply initial transformation for good starting points
-    matP1 = matP1 * matTransInit.transpose();
+    matPk = transToFrom.apply_trans(matPk);
 
-    // Step a: compute the closest point on the surface
-    closestPointOnSurface(matX,
-                          matX.rows(),
-                          matP,
-                          vecNearest,
-                          vecDist);
-    return true;
+    // Icp algorithm:
+    for(int iIter = 0; iIter < iMaxIter; ++iIter) {
+
+        // Step a: compute the closest point on the surface; eq 29
+        if(!mneSurfacePoints->mne_find_closest_on_surface(matPk,matPk.rows(),matYk,vecNearest,vecDist)) {
+            qWarning() << "RTPROCESSINGLIB::icp: mne_find_closest_on_surface was not sucessfull.";
+            return false;
+        }
+
+        // Step b: compute the registration; eq 30
+        if(!fitMatched(matP0,matYk,matTrans)) {
+            qWarning() << "RTPROCESSINGLIB::icp: point cloud registration not succesfull";
+        }
+
+        // Step c: apply registration
+        transToFrom.trans = matTrans;
+        matPk = transToFrom.apply_trans(matP0);
+
+        // step d: compute mean-square-error and terminate if below fTol
+        fMSE = 1 / matPk.rows() * ((matYk - matPk).rowwise().norm()).sum();
+        if(fMSE < fTol) {
+            transToFrom.invert_transform();
+            transFromTo = transToFrom;
+            qInfo() << "RTPROCESSINGLIB::icp: ICP was succesfull and exceeded after " << iIter << " Iterations with MSE: " << fMSE << ".";
+            return true;
+        }
+    }
+
+    qWarning() << "RTPROCESSINGLIB::icp: ICP was not succesfull and exceeded after " << iMaxIter << " Iterations with MSE: " << fMSE << ".";
+    return false;
 }
 
 //=============================================================================================================
@@ -148,7 +174,7 @@ bool RTPROCESSINGLIB::fitMatched(const Matrix3f& matSrcPoint,
 
     // test size of point clouds
     if(matSrcPoint.size() != matDstPoint.size()) {
-        qWarning() << "UTILSLIB::ICP::fitMatched: Point clouds does not match.";
+        qWarning() << "RTPROCESSINGLIB::fitMatched: Point clouds does not match.";
         return false;
     }
 
@@ -218,13 +244,3 @@ bool RTPROCESSINGLIB::fitMatched(const Matrix3f& matSrcPoint,
 }
 
 //=========================================================================================================
-
-bool RTPROCESSINGLIB::closestPointOnSurface(const Eigen::Matrix3f& matR,
-                                            const int iNP,
-                                            Eigen::Matrix3f& matRTri,
-                                            Eigen::VectorXi& vecNearest,
-                                            Eigen::VectorXf &vecDist)
-
-{
-    return true;
-}
