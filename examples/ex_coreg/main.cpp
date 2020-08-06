@@ -41,14 +41,15 @@
 #include <disp3D/viewers/abstractview.h>
 #include <disp3D/engine/model/items/digitizer/digitizersettreeitem.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
-#include <disp3D/engine/view/view3D.h>
-#include <disp3D/helpers/geometryinfo/geometryinfo.h>
-#include <disp3D/helpers/geometryinfo/geometryinfo.h>
-#include <disp3D/helpers/interpolation/interpolation.h>
+#include <disp3D/engine/model/items/bem/bemsurfacetreeitem.h>
+#include <disp3D/engine/model/items/bem/bemtreeitem.h>
 
 #include "fiff/fiff_dig_point_set.h"
 #include "fiff/fiff_dig_point.h"
 #include "fiff/fiff_coord_trans.h"
+
+#include "mne/mne_bem_surface.h"
+#include "mne/mne_project_to_surface.h"
 
 #include <utils/generics/applicationlogger.h>
 #include "rtprocessing/icp.h"
@@ -78,6 +79,7 @@ using namespace UTILSLIB;
 using namespace RTPROCESSINGLIB;
 using namespace FIFFLIB;
 using namespace DISP3DLIB;
+using namespace MNELIB;
 
 //=============================================================================================================
 // MAIN
@@ -106,18 +108,25 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("Example Coregistration");
     parser.addHelpOption();
 
-    QCommandLineOption srcOption("src", "The original point set", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/coreg/sample-fiducials.fif");
-    QCommandLineOption dstOption("dst", "The destination point set", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption fidOption("fid", "The original point set", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/coreg/sample-fiducials.fif");
+    QCommandLineOption digOption("dig", "The destination point set", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption bemOption("bem", "The bem file", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-head.fif");
+    QCommandLineOption transOption("trans", "The MRI-Head transformation file", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/all-trans.fif");
     QCommandLineOption scaleOption("scale", "Weather to scale during the registration or not", "bool", "false");
 
-    parser.addOption(srcOption);
-    parser.addOption(dstOption);
+    parser.addOption(fidOption);
+    parser.addOption(digOption);
+    parser.addOption(bemOption);
     parser.addOption(scaleOption);
+    parser.addOption(transOption);
+
     parser.process(a);
 
     // get cli parameters
-    QFile t_fileSrc(parser.value(srcOption));
-    QFile t_fileDst(parser.value(dstOption));
+    QFile t_fileFid(parser.value(fidOption));
+    QFile t_fileDig(parser.value(digOption));
+    QFile t_fileBem(parser.value(bemOption));
+    QFile t_fileTrans(parser.value(transOption));
 
     bool bScale = false;
     if(parser.value(scaleOption) == "false" || parser.value(scaleOption) == "0") {
@@ -126,12 +135,21 @@ int main(int argc, char *argv[])
         bScale = true;
     }
 
+    // read Trans
+    FiffCoordTrans transTest(t_fileTrans);
+
+    // read Bem
+    MNEBem bemHead(t_fileBem);
+    MNEBemSurface::SPtr bemSurface = MNEBemSurface::SPtr::create(bemHead[0]);
+    MNEProjectToSurface::SPtr mneSurfacePoints = MNEProjectToSurface::SPtr::create(*bemSurface);
 
     // read digitizer data
     QList<int> lPickFiducials({FIFFV_POINT_CARDINAL});
-    FiffDigPointSet digSetSrc = FiffDigPointSet(t_fileSrc).pickTypes(lPickFiducials);
-    FiffDigPointSet digSetDst = FiffDigPointSet(t_fileDst).pickTypes(lPickFiducials);
+    FiffDigPointSet digSetSrc = FiffDigPointSet(t_fileFid).pickTypes(lPickFiducials);   // Fiducials MRI-Space
+    FiffDigPointSet digSetDst = FiffDigPointSet(t_fileDig).pickTypes(lPickFiducials);   // Fiducials Head-Space
+    FiffDigPointSet digSetHsp = FiffDigPointSet(t_fileDig);                             // Head shape points Head-Space
 
+    // Initial Fiducial Alignment
     // Declare variables
     Matrix3f matSrc(digSetSrc.size(),3);
     Matrix3f matDst(digSetDst.size(),3);
@@ -152,6 +170,7 @@ int main(int argc, char *argv[])
         }
     }
 
+    // align fiducials
     if(!fitMatched(matSrc,matDst,matTrans,fScale,bScale,vecWeights)) {
         qWarning() << "point cloud registration not succesfull";
     }
@@ -165,13 +184,32 @@ int main(int argc, char *argv[])
     qInfo() << "Alignment Error: ";
     std::cout << matDiff.colwise().mean() << std::endl;
 
+    // Icp:
+    // get coordinates
+    Matrix3f matHsp(digSetHsp.size(),3);
+    for(int i = 0; i< digSetHsp.size(); ++i) {
+        matHsp(i,0) = digSetHsp[i].r[0]; matHsp(i,1) = digSetHsp[i].r[1]; matHsp(i,2) = digSetHsp[i].r[2];
+    }
+//    if(!icp(mneSurfacePoints, matHsp, transMriHead)) {
+//        qWarning() << "icp was not succesfull";
+//    }
+    transMriHead.print();
 
     // Abstract View
     AbstractView::SPtr p3DAbstractView = AbstractView::SPtr(new AbstractView());
     Data3DTreeModel::SPtr p3DDataModel = p3DAbstractView->getTreeModel();
-    DigitizerSetTreeItem* pDigSrcSetTreeItem = p3DDataModel->addDigitizerData("Sample", "Source", digSetSrc);
-    DigitizerSetTreeItem* pDigDstSetTreeItem = p3DDataModel->addDigitizerData("Sample", "Destination", digSetDst);
+    DigitizerSetTreeItem* pDigSrcSetTreeItem = p3DDataModel->addDigitizerData("Sample", "Fiducials Transformed", digSetSrc);
+    DigitizerSetTreeItem* pDigDstSetTreeItem = p3DDataModel->addDigitizerData("Sample", "Fiducials", digSetDst);
+    DigitizerSetTreeItem* pDigHspSetTreeItem = p3DDataModel->addDigitizerData("Sample", "Digitizer", digSetHsp);
     pDigSrcSetTreeItem->setTransform(transMriHead,false);
+
+    BemTreeItem* pBemItem = p3DDataModel->addBemData("Sample", "Head", bemHead);
+    QList<QStandardItem*> itemList = pBemItem->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
+    for(int j = 0; j < itemList.size(); ++j) {
+        if(BemSurfaceTreeItem* pBemItem = dynamic_cast<BemSurfaceTreeItem*>(itemList.at(j))) {
+            pBemItem->setTransform(transMriHead,false);
+        }
+    }
 
     p3DAbstractView->show();
 
