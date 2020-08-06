@@ -90,9 +90,12 @@ void AverageScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelIte
     this->clear();
     std::cout<<"A1" << std::endl;
     std::cout<<"List size" << selectedChannelItems.size() << std::endl;
-    std::cout << "First sample:" << static_cast<SelectionSceneItem*>(selectedChannelItems.first())->m_sChannelName.toStdString() << std::endl;
+    SelectionSceneItem* test = static_cast<SelectionSceneItem*>(selectedChannelItems.first());
 
     QListIterator<QGraphicsItem*> i(selectedChannelItems);
+
+    int a = 0;
+
     while (i.hasNext()) {
         SelectionSceneItem* selectionSceneItemTemp = static_cast<SelectionSceneItem*>(i.next());
         AverageSceneItem* averageSceneItemTemp = new AverageSceneItem(selectionSceneItemTemp->m_sChannelName,
@@ -106,6 +109,7 @@ void AverageScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelIte
                     this, &AverageScene::updateScene);
 
         this->addItem(averageSceneItemTemp);
+        a++;
     }
     std::cout<<"A2" << std::endl;
 }

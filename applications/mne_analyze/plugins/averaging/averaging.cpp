@@ -242,6 +242,8 @@ QDockWidget* Averaging::getControl()
 
 //=============================================================================================================
 
+#include <disp/viewers/helpers/selectionsceneitem.h>
+
 void Averaging::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
@@ -262,8 +264,11 @@ void Averaging::handleEvent(QSharedPointer<Event> e)
             setChannelSelection(e->getData().value<QList<int>>());
             break;
         case CHANNEL_SELECTION_ITEMS:
+    {
+            DISPLIB::SelectionSceneItem* test = static_cast<DISPLIB::SelectionSceneItem*>(e->getData().value<QList<QGraphicsItem*>>().first());
             emit channelSelectionManagerChanged(e->getData().value<QList<QGraphicsItem*>>());
             break;
+    }
 //        case CHANNEL_SELECTION_MAP:
 //            emit layoutChanged(e->getData().value<QMap<QString,QPointF>>());
 //            break;

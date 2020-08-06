@@ -118,7 +118,7 @@ private slots:
     //=========================================================================================================
     void onShowSelectedChannelsOnly(const QStringList&  selectedChannels);
 
-    void onSelectionChanged(const QList<QGraphicsItem*> &selectedChannelItems);
+    void onSelectionChanged( QList<QGraphicsItem*> selectedChannelItems);
 
     void onLoadedLayoutMap(const QMap<QString,QPointF> &layoutMap);
 

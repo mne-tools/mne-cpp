@@ -387,7 +387,7 @@ signals:
      *
      * @param [in] selectedChannelItems currently user selected channels
      */
-    void selectionChanged(const QList<QGraphicsItem*> &selectedChannelItems);
+    void selectionChanged( QList<QGraphicsItem*> selectedChannelItems);
 
     //=========================================================================================================
     /**
