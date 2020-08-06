@@ -264,11 +264,28 @@ void ChannelSelection::onShowSelectedChannelsOnly(const QStringList&  selectedCh
 //=============================================================================================================
 
 #include <disp/viewers/helpers/selectionsceneitem.h>
-void ChannelSelection::onSelectionChanged( QList<QGraphicsItem*> selectedChannelItems)
+void ChannelSelection::onSelectionChanged(const QList<QGraphicsItem*>& selectedChannelItems)
 {
     DISPLIB::SelectionSceneItem* test = static_cast<DISPLIB::SelectionSceneItem*>(selectedChannelItems.first());
+    QListIterator<QGraphicsItem*> i(selectedChannelItems);
+
+    m_listItemList.clear();
+
+    while (i.hasNext()) {
+        DISPLIB::SelectionSceneItem* selectionSceneItemTemp = static_cast<DISPLIB::SelectionSceneItem*>(i.next());
+        QSharedPointer<DISPLIB::SelItem> newItem;
+        newItem.create();
+
+        newItem->m_sChannelName = selectionSceneItemTemp->m_sChannelName;
+        newItem->m_iChannelNumber = selectionSceneItemTemp->m_iChannelNumber;
+        newItem->m_iChannelKind = selectionSceneItemTemp->m_iChannelKind;
+        newItem->m_iChannelUnit = selectionSceneItemTemp->m_iChannelUnit;
+        newItem->m_qpChannelPosition = selectionSceneItemTemp->m_qpChannelPosition;
+
+        m_listItemList.append(newItem);
+    }
     QVariant data;
-    data.setValue(selectedChannelItems);
+    data.setValue(m_listItemList);
     m_pCommu->publishEvent(EVENT_TYPE::CHANNEL_SELECTION_ITEMS, data);
 }
 

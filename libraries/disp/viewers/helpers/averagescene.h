@@ -64,6 +64,7 @@ namespace DISPLIB
 //=============================================================================================================
 
 class SelectionSceneItem;
+struct SelItem;
 
 //=============================================================================================================
 /**
@@ -100,6 +101,8 @@ public:
      *  @param [in] selectedChannelItems items which are to painted to the average scene
      */
     void repaintItems(const QList<QGraphicsItem*> &selectedChannelItems);
+
+    void repaintSelItems(const QList<QSharedPointer<DISPLIB::SelItem>> &selectedChannelItems);
 
     //=========================================================================================================
     /**
