@@ -257,6 +257,9 @@ void ChannelSelection::onShowSelectedChannelsOnly(const QStringList&  selectedCh
     for(int i = 0; i<selectedChannels.size(); i++)
         selectedChannelsIndexes<<m_pChannelInfoModel->getIndexFromOrigChName(selectedChannels.at(i));
 
+    for (int i=0; i < 5; i++)
+    std::cout << selectedChannelsIndexes[i] << std::endl;
+
     QVariant data;
     data.setValue(selectedChannelsIndexes);
     m_pCommu->publishEvent(EVENT_TYPE::CHANNEL_SELECTION_INDICES, data);
