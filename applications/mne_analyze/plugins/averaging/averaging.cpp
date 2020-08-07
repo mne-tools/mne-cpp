@@ -448,10 +448,7 @@ void Averaging::computeAverage()
 void Averaging::loadFullGui()
 {
     m_pFiffInfo = m_pFiffRawModel->getFiffInfo();
-
-//    m_pChannelInfoModel = DISPLIB::ChannelInfoModel::SPtr::create(m_pFiffInfo);
     m_pAverageLayoutView->setFiffInfo(m_pFiffInfo);
-//    m_pAverageLayoutView->setChannelInfoModel(m_pChannelInfoModel);
 
     if(m_bLoaded) {
         return;
@@ -461,22 +458,7 @@ void Averaging::loadFullGui()
     m_pEvokedModel = QSharedPointer<DISPLIB::EvokedSetModel>(new DISPLIB::EvokedSetModel());
     m_pFiffEvokedSet = QSharedPointer<FIFFLIB::FiffEvokedSet>(new FIFFLIB::FiffEvokedSet());
 
-    //Channel Selection View
-//    m_pChannelSelectionView = QSharedPointer<DISPLIB::ChannelSelectionView>(new DISPLIB::ChannelSelectionView(QString("MNEANALYZE/AVERAGING"),
-//                                                                           Q_NULLPTR,
-//                                                                           m_pChannelInfoModel,
-//                                                                           Qt::Window));
-
-//    connect(this, &Averaging::layoutChanged,
-//            m_pChannelInfoModel.data(), &DISPLIB::ChannelInfoModel::layoutChanged, Qt::UniqueConnection);
-
-//    connect(m_pChannelInfoModel.data(), &DISPLIB::ChannelInfoModel::channelsMappedToLayout,
-//            m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::setCurrentlyMappedFiffChannels, Qt::UniqueConnection);
-
-
     m_pAverageLayoutView->setEvokedSetModel(m_pEvokedModel);
-
-//    m_pChannelInfoModel->layoutChanged(m_pChannelSelectionView->getLayoutMap());
 
     //Scaling View
     DISPLIB::ScalingView* pScalingView = new DISPLIB::ScalingView(QString("MNEANALYZE/AVERAGING"));
@@ -531,8 +513,10 @@ void Averaging::loadFullGui()
 
     m_pEvokedModel->setAverageActivation(pAverageSelectionView->getAverageActivation());
     m_pEvokedModel->setAverageColor(pAverageSelectionView->getAverageColor());
+
     m_pButterflyView->setAverageActivation(pAverageSelectionView->getAverageActivation());
     m_pButterflyView->setAverageColor(pAverageSelectionView->getAverageColor());
+
     m_pAverageLayoutView->setAverageActivation(pAverageSelectionView->getAverageActivation());
     m_pAverageLayoutView->setAverageColor(pAverageSelectionView->getAverageColor());
 
@@ -557,13 +541,8 @@ void Averaging::loadFullGui()
     m_pAverageLayoutView->setBackgroundColor(pChannelDataSettingsView->getBackgroundColor());
     m_pButterflyView->setBackgroundColor(pChannelDataSettingsView->getBackgroundColor());
 
-    //Add new widgets
-    //m_pLayout->addWidget(pChanSelButton);
-
     m_pTabView->addTab(pScalingView, "Scaling");
     m_pTabView->addTab(pModalitySelectionView, "Modality");
-//    m_pTabView->addTab(pChannelDataSettingsView, "View");
-//    m_pTabView->addTab(pAverageSelectionView, "Average Selection");
 
     //Update saved params
     m_fBaselineFromS = static_cast<float>(m_pAveragingSettingsView->getBaselineFromSeconds())/1000.f;
@@ -660,6 +639,5 @@ void Averaging::setChannelSelection(const QList<int> selectedChannelsIndexes)
 
 //    m_pAverageLayoutView->setChannelInfoModel(m_pChannelInfoModel);
 //    m_pChannelInfoModel->layoutChanged(m_pChannelSelectionView->getLayoutMap());
-
 
 }

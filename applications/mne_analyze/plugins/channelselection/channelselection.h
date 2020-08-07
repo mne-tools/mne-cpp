@@ -117,38 +117,59 @@ public:
 
 private slots:
     //=========================================================================================================
+    /**
+     * Receives as list of the names of the selected channels to be displayed and sends them to event manager
+     *
+     * @param [in] selectedChannels     List of name sof selected channels
+     */
     void onShowSelectedChannelsOnly(const QStringList&  selectedChannels);
 
+    //=========================================================================================================
+    /**
+     * Receives a list of graphic itemms, stores aparmeters locally and sends them to event manager
+     *
+     * @param [in] selectedChannelItems     List of parameters of graphics items
+     */
     void onSelectionChanged(const QList<QGraphicsItem*>& selectedChannelItems);
 
-    void onLoadedLayoutMap(const QMap<QString,QPointF> &layoutMap);
-
+    //=========================================================================================================
+    /**
+     * Receives a list of channel names present in the currently loaded file
+     *
+     * @param [in] mappedLayoutChNames      List of channels names in file
+     */
     void onChannelsMappedToLayout(const QStringList &mappedLayoutChNames);
-
 
 private:
 
     //=========================================================================================================
+    /**
+     * Receives new model and updates stored FiffInfo
+     *
+     * @param [in] pNewModel    new loaded model
+     */
     void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
 
     //=========================================================================================================
+    /**
+     * Sets up channel info model and Channel selection view / subsequently updates with new fiff info
+     *
+     * @param [in] pFiffInfo    FiffInfo for currently loaded file
+     */
     void setFiffSettings(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
+    QPointer<ANSHAREDLIB::Communicator>                 m_pCommu;                   /**< To broadcast signals */
 
-    QPointer<ANSHAREDLIB::Communicator>                 m_pCommu;
+    DISPLIB::SelItem*                                   m_pSelItem;                 /**< Stores parameters from list of QGraphicsItems received by channelselectionview */
 
-//    QList<QSharedPointer<DISPLIB::SelItem>>             m_listItemList;
+    QSharedPointer<DISPLIB::ChannelSelectionView>       m_pChannelSelectionView;    /**< View for selecting channels to be displayed */
+    QSharedPointer<DISPLIB::ChannelInfoModel>           m_pChannelInfoModel;        /**< Hold channel info - needed to initialize channelselectionview */
+    QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                /**< Hold Information baout currently loaded file */
 
-    DISPLIB::SelItem*                                   m_pSelItem;
+    QHBoxLayout*                                        m_pViewLayout;              /**< Holds the view portion of the channel selection to be displayed */
+    QHBoxLayout*                                        m_pControlLayout;           /**< Holds the control portion of the channel selection to be displayed */
 
-    QSharedPointer<DISPLIB::ChannelSelectionView>       m_pChannelSelectionView;
-    QSharedPointer<DISPLIB::ChannelInfoModel>           m_pChannelInfoModel;
-    QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;
-
-    QHBoxLayout*                                        m_pViewLayout;
-    QHBoxLayout*                                        m_pControlLayout;
-
-    bool                                                m_bIsInit;
+    bool                                                m_bIsInit;                  /**< Whether channelselectionview and channelinfomodel have been initialized */
 };
 
 //=============================================================================================================
