@@ -113,12 +113,14 @@ int main(int argc, char *argv[])
     QCommandLineOption bemOption("bem", "The bem file", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-head.fif");
     QCommandLineOption transOption("trans", "The MRI-Head transformation file", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/all-trans.fif");
     QCommandLineOption scaleOption("scale", "Weather to scale during the registration or not", "bool", "false");
+    QCommandLineOption tolOption("tol", "The convergence limit for the icp algorithm.", "int", "0.001");
 
     parser.addOption(fidOption);
     parser.addOption(digOption);
     parser.addOption(bemOption);
     parser.addOption(scaleOption);
     parser.addOption(transOption);
+    parser.addOption(tolOption);
 
     parser.process(a);
 
@@ -135,6 +137,7 @@ int main(int argc, char *argv[])
         bScale = true;
     }
 
+    float fTol = parser.value(tolOption).toFloat();
     // read Trans
     FiffCoordTrans transTest(t_fileTrans);
 
@@ -185,11 +188,12 @@ int main(int argc, char *argv[])
     std::cout << matDiff.colwise().mean() << std::endl;
 
     // Icp:
+    int iMaxIter = 20;
     MatrixXf matHsp(digSetHsp.size(),3);
     for(int i = 0; i < digSetHsp.size(); ++i) {
         matHsp(i,0) = digSetHsp[i].r[0]; matHsp(i,1) = digSetHsp[i].r[1]; matHsp(i,2) = digSetHsp[i].r[2];
     }
-    if(!icp(mneSurfacePoints, matHsp, transMriHead)) {
+    if(!icp(mneSurfacePoints, matHsp, transMriHead, iMaxIter, fTol)) {
         qWarning() << "icp was not succesfull";
     }
 
