@@ -88,13 +88,8 @@ void AverageScene::setScaleMap(const QMap<qint32,float> &scaleMap)
 void AverageScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelItems)
 {
     this->clear();
-    std::cout<<"A1" << std::endl;
-    std::cout<<"List size" << selectedChannelItems.size() << std::endl;
-    SelectionSceneItem* test = static_cast<SelectionSceneItem*>(selectedChannelItems.first());
 
     QListIterator<QGraphicsItem*> i(selectedChannelItems);
-
-    int a = 0;
 
     while (i.hasNext()) {
         SelectionSceneItem* selectionSceneItemTemp = static_cast<SelectionSceneItem*>(i.next());
@@ -109,9 +104,7 @@ void AverageScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelIte
                     this, &AverageScene::updateScene);
 
         this->addItem(averageSceneItemTemp);
-        a++;
     }
-    std::cout<<"A2" << std::endl;
 }
 
 //=============================================================================================================
@@ -119,24 +112,19 @@ void AverageScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelIte
 void AverageScene::repaintSelItems(const DISPLIB::SelItem &selectedChannelItems)
 {
     this->clear();
-    std::cout<<"A1" << std::endl;
-//    std::cout<<"List size" << selectedChannelItems.size() << std::endl;
 
-//    QListIterator<QSharedPointer<DISPLIB::SelItem>> i(selectedChannelItems);
+    for (int i = 0; i < selectedChannelItems.m_iChannelKind.size(); i++){
+        AverageSceneItem* averageSceneItemTemp = new AverageSceneItem(selectedChannelItems.m_sChannelName[i],
+                                                                      selectedChannelItems.m_iChannelNumber[i],
+                                                                      selectedChannelItems.m_qpChannelPosition[i],
+                                                                      selectedChannelItems.m_iChannelKind[i],
+                                                                      selectedChannelItems.m_iChannelUnit[i],
+                                                                      m_colGlobalItemSignalColor);
 
-//    while (i.hasNext()) {
-//        QSharedPointer<DISPLIB::SelItem> itemTemp = i.next();
-//        AverageSceneItem* averageSceneItemTemp = new AverageSceneItem(itemTemp->m_sChannelName,
-//                                                                      itemTemp->m_iChannelNumber,
-//                                                                      itemTemp->m_qpChannelPosition,
-//                                                                      itemTemp->m_iChannelKind,
-//                                                                      itemTemp->m_iChannelUnit,
-//                                                                      m_colGlobalItemSignalColor);
-
-//        connect(averageSceneItemTemp, &AverageSceneItem::sceneUpdateRequested,
-//                    this, &AverageScene::updateScene);
-//    }
-    std::cout<<"A2" << std::endl;
+        connect(averageSceneItemTemp, &AverageSceneItem::sceneUpdateRequested,
+                this, &AverageScene::updateScene);
+        this->addItem(averageSceneItemTemp);
+    }
 }
 
 //=============================================================================================================

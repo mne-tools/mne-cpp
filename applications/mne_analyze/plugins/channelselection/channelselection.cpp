@@ -271,7 +271,6 @@ void ChannelSelection::onSelectionChanged(const QList<QGraphicsItem*>& selectedC
 
     QListIterator<QGraphicsItem*> i(selectedChannelItems);
 
-    std::cout<<"WE ARE HERE";
 //    m_listItemList.clear();
 
 //    while (i.hasNext()) {
@@ -304,8 +303,7 @@ void ChannelSelection::onSelectionChanged(const QList<QGraphicsItem*>& selectedC
         m_pSelItem->m_qpChannelPosition.append(selectionSceneItemTemp->m_qpChannelPosition);
     }
 
-    m_pCommu->publishEvent(EVENT_TYPE::CHANNEL_SELECTION_ITEMS, QVariant::fromValue(m_pSelItem));
-    std::cout<<"event sent";
+    m_pCommu->publishEvent(EVENT_TYPE::CHANNEL_SELECTION_ITEMS, QVariant::fromValue(/*static_cast<void*>(*/m_pSelItem/*)*/));
 }
 
 //=============================================================================================================
@@ -321,7 +319,6 @@ void ChannelSelection::onLoadedLayoutMap(const QMap<QString,QPointF> &layoutMap)
 
 void ChannelSelection::onChannelsMappedToLayout(const QStringList &mappedLayoutChNames)
 {
-    std::cout<<"CHAN NAMES:" << mappedLayoutChNames.first().toStdString() << std::endl;
     QVariant data;
     data.setValue(mappedLayoutChNames);
     m_pCommu->publishEvent(EVENT_TYPE::CHANNEL_SELECTION_CHANNELS, data);
