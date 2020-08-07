@@ -290,6 +290,8 @@ public:
      */
     void updateProcessingMode(ProcessingMode mode);
 
+    void showSelectedChannelsOnly(const QList<int> selectedChannelsIndexes);
+
 signals:
     //=========================================================================================================
     /**

@@ -217,6 +217,8 @@ void RawDataViewer::handleEvent(QSharedPointer<Event> e)
     case FILTER_DESIGN_CHANGED:
         m_pFiffRawView->setFilter(e->getData().value<FilterKernel>());
         break;
+    case CHANNEL_SELECTION_INDICES:
+        m_pFiffRawView->showSelectedChannelsOnly(e->getData().value<QList<int>>());
     default:
         qWarning() << "[RawDataViewer::handleEvent] Received an Event that is not handled by switch cases.";
     }
@@ -234,6 +236,7 @@ QVector<EVENT_TYPE> RawDataViewer::getEventSubscriptions(void) const
     temp.push_back(FILTER_CHANNEL_TYPE_CHANGED);
     temp.push_back(FILTER_ACTIVE_CHANGED);
     temp.push_back(FILTER_DESIGN_CHANGED);
+    temp.push_back(CHANNEL_SELECTION_INDICES);
 
     return temp;
 }
