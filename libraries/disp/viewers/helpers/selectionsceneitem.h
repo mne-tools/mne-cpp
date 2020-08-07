@@ -71,16 +71,15 @@ namespace DISPLIB
  */
 class DISPSHARED_EXPORT SelItem{
 public:
-    SelItem() = default;
-    ~SelItem() = default;
-    SelItem(const SelItem &) = default;
-    SelItem &operator=(const SelItem &) = default;
+    SelItem() {}
+    ~SelItem() {}
+    SelItem(const SelItem &);
 
-    QString     m_sChannelName;             /**< The channel's name.*/
-    int         m_iChannelNumber;           /**< The channel number.*/
-    int         m_iChannelKind;             /**< The channel kind.*/
-    int         m_iChannelUnit;             /**< The channel unit.*/
-    QPointF     m_qpChannelPosition;        /**< The channel's 2D position in the scene.*/
+    QList<QString>     m_sChannelName;             /**< The channel's name.*/
+    QList<int>         m_iChannelNumber;           /**< The channel number.*/
+    QList<int>         m_iChannelKind;             /**< The channel kind.*/
+    QList<int>         m_iChannelUnit;             /**< The channel unit.*/
+    QList<QPointF>     m_qpChannelPosition;        /**< The channel's 2D position in the scene.*/
 };
 
 class DISPSHARED_EXPORT SelectionSceneItem : public QGraphicsItem
@@ -126,6 +125,7 @@ public:
 
 } // NAMESPACE DISPLIB
 Q_DECLARE_METATYPE(DISPLIB::SelItem);
-Q_DECLARE_METATYPE(QSharedPointer<DISPLIB::SelItem>)
+Q_DECLARE_METATYPE(DISPLIB::SelItem*);
+
 
 #endif // SELECTIONSCENEITEM_H

@@ -131,7 +131,7 @@ public:
 signals:
     //=========================================================================================================
     void showSelectedChannels(const QList<int> selectedChannelsIndexes);
-    void channelSelectionManagerChanged(const QList<QSharedPointer<DISPLIB::SelItem>> &selectedChannelItems);
+    void channelSelectionManagerChanged(const QVariant &data);
     void layoutChanged(const QMap<QString,QPointF> &layoutMap);
     void setCurrentlyMappedFiffChannels(const QStringList &mappedLayoutChNames);
 

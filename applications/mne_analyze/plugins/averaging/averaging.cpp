@@ -102,9 +102,9 @@ Averaging::Averaging()
 
 Averaging::~Averaging()
 {
-    qRegisterMetaType<DISPLIB::SelItem>();
-    qRegisterMetaType<QSharedPointer<DISPLIB::SelItem>>();
-    qRegisterMetaType<QList<QSharedPointer<DISPLIB::SelItem>>>();
+//    qRegisterMetaType<DISPLIB::SelItem>();
+//    qRegisterMetaType<QSharedPointer<DISPLIB::SelItem>>();
+//    qRegisterMetaType<QList<QSharedPointer<DISPLIB::SelItem>>>();
 }
 
 //=============================================================================================================
@@ -266,7 +266,7 @@ void Averaging::handleEvent(QSharedPointer<Event> e)
             setChannelSelection(e->getData().value<QList<int>>());
             break;
         case CHANNEL_SELECTION_ITEMS:
-            emit channelSelectionManagerChanged(e->getData().value<QList<QSharedPointer<DISPLIB::SelItem>>>());
+            emit channelSelectionManagerChanged(e->getData());
             break;
 //        case CHANNEL_SELECTION_MAP:
 //            emit layoutChanged(e->getData().value<QMap<QString,QPointF>>());

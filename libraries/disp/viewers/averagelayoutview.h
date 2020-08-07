@@ -205,7 +205,7 @@ public:
      */
     void channelSelectionManagerChanged(const QList<QGraphicsItem *> &selectedChannelItems);
 
-    void channelSelectionChanged(const QList<QSharedPointer<DISPLIB::SelItem>> &selectedChannelItems);
+    void channelSelectionChanged(const QVariant &data);
 
     //=========================================================================================================
     /**
