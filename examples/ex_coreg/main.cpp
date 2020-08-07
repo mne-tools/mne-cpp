@@ -185,14 +185,14 @@ int main(int argc, char *argv[])
     std::cout << matDiff.colwise().mean() << std::endl;
 
     // Icp:
-    // get coordinates
-    Matrix3f matHsp(digSetHsp.size(),3);
-    for(int i = 0; i< digSetHsp.size(); ++i) {
+    MatrixXf matHsp(digSetHsp.size(),3);
+    for(int i = 0; i < digSetHsp.size(); ++i) {
         matHsp(i,0) = digSetHsp[i].r[0]; matHsp(i,1) = digSetHsp[i].r[1]; matHsp(i,2) = digSetHsp[i].r[2];
     }
-//    if(!icp(mneSurfacePoints, matHsp, transMriHead)) {
-//        qWarning() << "icp was not succesfull";
-//    }
+    if(!icp(mneSurfacePoints, matHsp, transMriHead)) {
+        qWarning() << "icp was not succesfull";
+    }
+
     transMriHead.print();
 
     // Abstract View
