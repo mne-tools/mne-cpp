@@ -197,7 +197,6 @@ void ChannelSelectionView::initCheckBoxes()
 
 void ChannelSelectionView::setCurrentlyMappedFiffChannels(const QStringList &mappedLayoutChNames)
 {
-    //std::cout<<"ChannelSelectionView::setCurrentlyMappedFiffChannels"<<std::endl;
     m_currentlyLoadedFiffChannels = mappedLayoutChNames;
 
     //Clear the visible channel list
@@ -388,7 +387,6 @@ void ChannelSelectionView::updateDataView()
 
     //emit signal that selection was changed
     if(!m_pSelectionScene->selectedItems().empty()) {
-        std::cout<<"E1" << std::endl;
         emit selectionChanged(m_pSelectionScene->selectedItems());
     } else {
         //only return visible items (EEG or MEG channels)
@@ -400,7 +398,6 @@ void ChannelSelectionView::updateDataView()
             }
         }
         SelectionSceneItem* test = static_cast<SelectionSceneItem*>(visibleItemList.first());
-        std::cout<<"E2" << std::endl;
         emit selectionChanged(visibleItemList);
     }
 }
