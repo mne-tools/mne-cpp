@@ -143,3 +143,12 @@ void SelectionSceneItem::paint(QPainter *painter,
     painter->drawStaticText(-15+((30-sizeText.width())/2), -32, staticElectrodeName);
 }
 
+//=============================================================================================================
+
+SelItem::SelItem(const SelItem &other){
+    m_sChannelName = other.m_sChannelName;
+    m_iChannelNumber = other.m_iChannelNumber;
+    m_iChannelKind = other.m_iChannelKind;
+    m_iChannelUnit = other.m_iChannelUnit;
+    m_qpChannelPosition = other.m_qpChannelPosition;
+}

@@ -137,7 +137,9 @@ private:
 
     QPointer<ANSHAREDLIB::Communicator>                 m_pCommu;
 
-    QList<QSharedPointer<DISPLIB::SelItem>>             m_listItemList;
+//    QList<QSharedPointer<DISPLIB::SelItem>>             m_listItemList;
+
+    DISPLIB::SelItem*                                   m_pSelItem;
 
     QSharedPointer<DISPLIB::ChannelSelectionView>       m_pChannelSelectionView;
     QSharedPointer<DISPLIB::ChannelInfoModel>           m_pChannelInfoModel;
