@@ -43,6 +43,7 @@
 #include "helpers/evokedsetmodel.h"
 #include "helpers/channelinfomodel.h"
 #include "helpers/averagesceneitem.h"
+#include "helpers/selectionsceneitem.h"
 
 #include <fiff/fiff_info.h>
 
@@ -258,18 +259,12 @@ void AverageLayoutView::channelSelectionManagerChanged(const QList<QGraphicsItem
         qDebug() << "AverageLayoutView::channelSelectionManagerChanged - m_pAverageScene is NULL. Returning. ";
         return;
     }
-    std::cout<<"A" <<std::endl;
     //Repaint the average items in the average scene based on the input parameter selectedChannelItems and update them with current data
     m_pAverageScene->repaintItems(selectedChannelItems);
-    std::cout<<"B" <<std::endl;
     setAverageColor(m_qMapAverageColor);
-    std::cout<<"C" <<std::endl;
     setAverageActivation(m_qMapAverageActivation);
-    std::cout<<"D" <<std::endl;
     setScaleMap(m_scaleMap);
-    std::cout<<"E" <<std::endl;
     updateData();
-    std::cout<<"F" <<std::endl;
 }
 
 //=============================================================================================================
@@ -280,36 +275,27 @@ void AverageLayoutView::channelSelectionChanged(const QVariant &data)
         qDebug() << "AverageLayoutView::channelSelectionManagerChanged - m_pAverageScene is NULL. Returning. ";
         return;
     }
-    std::cout<<"A" <<std::endl;
+    m_pSelItem = data.value<DISPLIB::SelItem*>();
+
     //Repaint the average items in the average scene based on the input parameter selectedChannelItems and update them with current data
-    std::cout << "@@@@@@@@@@@@@@@@@@" << std::endl << "@@@@@@@@@@@@@@@@@@" << std::endl << "@@@@@@@@@@@@@@@@@@" << std::endl << "@@@@@@@@@@@@@@@@@@" << std::endl;
-    //m_pAverageScene->repaintSelItems(selectedChannelItems);
-    std::cout<<"B" <<std::endl;
-    //setAverageColor(m_qMapAverageColor);
-    std::cout<<"C" <<std::endl;
-    //setAverageActivation(m_qMapAverageActivation);
-    std::cout<<"D" <<std::endl;
-    //setScaleMap(m_scaleMap);
-    std::cout<<"E" <<std::endl;
-    //updateData();
-    std::cout<<"F" <<std::endl;
+    m_pAverageScene->repaintSelItems(*m_pSelItem);
+    setAverageColor(m_qMapAverageColor);
+    setAverageActivation(m_qMapAverageActivation);
+    setScaleMap(m_scaleMap);
+    updateData();
 }
 
 //=============================================================================================================
 
 void AverageLayoutView::updateData()
 {
-    std::cout <<"1" << std::endl;
     if(m_pFiffInfo) {
-    std::cout <<"2" << std::endl;
         if (m_listMappedChannelNames.isEmpty()){
             return;
         }
 //        GetChKind m_pFiffInfo->chs.at(index.row()).kind;
 //        GetChUnit m_pFiffInfo->chs.at(index.row()).unit;
-        std::cout << "name list size: " << m_listMappedChannelNames.size() << std::endl;
         QList<QGraphicsItem *> currentAverageSceneItems = m_pAverageScene->items();
-        std::cout <<"3" << std::endl;
         //Set new data for all averageSceneItems
         for(int i = 0; i < currentAverageSceneItems.size(); i++) {
             AverageSceneItem* averageSceneItemTemp = static_cast<AverageSceneItem*>(currentAverageSceneItems.at(i));
@@ -322,9 +308,6 @@ void AverageLayoutView::updateData()
             //Get the averageScenItem specific data row
             //int channelNumber = m_pChannelInfoModel->getIndexFromMappedChName(averageSceneItemTemp->m_sChannelName);
             int channelNumber = m_listMappedChannelNames.indexOf(averageSceneItemTemp->m_sChannelName);
-
-            std::cout << "chan number:" << channelNumber << " - name:" << averageSceneItemTemp->m_sChannelName.toStdString() << std::endl;
-            std::cout << "namelist" << m_listMappedChannelNames.first().toStdString() << std::endl;
 
             if(channelNumber != -1) {
                 //qDebug() << "Change data for" << channelNumber << "" << averageSceneItemTemp->m_sChannelName;
@@ -347,16 +330,13 @@ void AverageLayoutView::updateData()
         }
 
         m_pAverageScene->updateScene();
-        std::cout <<"4" << std::endl;
         return;
     }
 
     if(!m_pAverageScene || !m_pEvokedSetModel || !m_pChannelInfoModel) {
-        std::cout <<"5" << std::endl;
         qDebug() << "AverageLayoutView::updateData - m_pAverageScene, m_pEvokedSetModel or m_pChannelInfoModel are NULL. Returning. ";
         return;
     }
-    std::cout <<"6" << std::endl;
     //Get current items from the average scene
     QList<QGraphicsItem *> currentAverageSceneItems = m_pAverageScene->items();
 
@@ -371,7 +351,6 @@ void AverageLayoutView::updateData()
 
         //Get the averageScenItem specific data row
         int channelNumber = m_pChannelInfoModel->getIndexFromMappedChName(averageSceneItemTemp->m_sChannelName);
-        std::cout << "chan number:" << channelNumber << " - name:" << averageSceneItemTemp->m_sChannelName.toStdString() << std::endl;
 
         if(channelNumber != -1) {
             //qDebug() << "Change data for" << channelNumber << "" << averageSceneItemTemp->m_sChannelName;
@@ -451,6 +430,5 @@ void AverageLayoutView::setFiffInfo(const QSharedPointer<FIFFLIB::FiffInfo> pFif
 
 void AverageLayoutView::setMappedChannelNames(const QStringList &mappedLayoutChNames)
 {
-    std::cout << "AverageLayoutView::setMappedChannelNames";
     m_listMappedChannelNames = mappedLayoutChNames;
 }
