@@ -92,7 +92,7 @@ const Eigen::VectorXf vecDefaultWeigths;
  */
 
 RTPROCESINGSHARED_EXPORT bool icp(const QSharedPointer<MNELIB::MNEProjectToSurface> mneSurfacePoints,
-                                  const Eigen::Matrix3f& matDstPoint,
+                                  const Eigen::MatrixXf& matDstPoint,
                                   FIFFLIB::FiffCoordTrans& transFromTo,
                                   const int iMaxIter = 20,
                                   const float fTol = 0.001);
@@ -112,8 +112,8 @@ RTPROCESINGSHARED_EXPORT bool icp(const QSharedPointer<MNELIB::MNEProjectToSurfa
  * @return Wether the matching was succesfull.
  */
 
-RTPROCESINGSHARED_EXPORT bool fitMatched(const Eigen::Matrix3f& matSrcPoint,
-                                         const Eigen::Matrix3f& matDstPoint,
+RTPROCESINGSHARED_EXPORT bool fitMatched(const Eigen::MatrixXf& matSrcPoint,
+                                         const Eigen::MatrixXf& matDstPoint,
                                          Eigen::Matrix4f& matTrans,
                                          float fScale = 1.0,
                                          const bool bScale=false,
