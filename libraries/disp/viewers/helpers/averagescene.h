@@ -64,7 +64,7 @@ namespace DISPLIB
 //=============================================================================================================
 
 class SelectionSceneItem;
-struct SelItem;
+class SelItem;
 
 //=============================================================================================================
 /**
@@ -102,7 +102,7 @@ public:
      */
     void repaintItems(const QList<QGraphicsItem*> &selectedChannelItems);
 
-    void repaintSelItems(const QList<QSharedPointer<DISPLIB::SelItem>> &selectedChannelItems);
+    void repaintSelItems(const DISPLIB::SelItem &selectedChannelItems);
 
     //=========================================================================================================
     /**

@@ -116,26 +116,26 @@ void AverageScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelIte
 
 //=============================================================================================================
 
-void AverageScene::repaintSelItems(const QList<QSharedPointer<DISPLIB::SelItem>> &selectedChannelItems)
+void AverageScene::repaintSelItems(const DISPLIB::SelItem &selectedChannelItems)
 {
     this->clear();
     std::cout<<"A1" << std::endl;
-    std::cout<<"List size" << selectedChannelItems.size() << std::endl;
+//    std::cout<<"List size" << selectedChannelItems.size() << std::endl;
 
-    QListIterator<QSharedPointer<DISPLIB::SelItem>> i(selectedChannelItems);
+//    QListIterator<QSharedPointer<DISPLIB::SelItem>> i(selectedChannelItems);
 
-    while (i.hasNext()) {
-        QSharedPointer<DISPLIB::SelItem> itemTemp = i.next();
-        AverageSceneItem* averageSceneItemTemp = new AverageSceneItem(itemTemp->m_sChannelName,
-                                                                      itemTemp->m_iChannelNumber,
-                                                                      itemTemp->m_qpChannelPosition,
-                                                                      itemTemp->m_iChannelKind,
-                                                                      itemTemp->m_iChannelUnit,
-                                                                      m_colGlobalItemSignalColor);
+//    while (i.hasNext()) {
+//        QSharedPointer<DISPLIB::SelItem> itemTemp = i.next();
+//        AverageSceneItem* averageSceneItemTemp = new AverageSceneItem(itemTemp->m_sChannelName,
+//                                                                      itemTemp->m_iChannelNumber,
+//                                                                      itemTemp->m_qpChannelPosition,
+//                                                                      itemTemp->m_iChannelKind,
+//                                                                      itemTemp->m_iChannelUnit,
+//                                                                      m_colGlobalItemSignalColor);
 
-        connect(averageSceneItemTemp, &AverageSceneItem::sceneUpdateRequested,
-                    this, &AverageScene::updateScene);
-    }
+//        connect(averageSceneItemTemp, &AverageSceneItem::sceneUpdateRequested,
+//                    this, &AverageScene::updateScene);
+//    }
     std::cout<<"A2" << std::endl;
 }
 
