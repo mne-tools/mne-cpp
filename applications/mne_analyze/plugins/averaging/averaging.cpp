@@ -53,6 +53,8 @@
 #include <disp/viewers/butterflyview.h>
 #include <disp/viewers/scalingview.h>
 
+#include <disp/viewers/helpers/selectionsceneitem.h>
+
 #include <rtprocessing/helpers/filterkernel.h>
 #include <rtprocessing/averaging.h>
 
@@ -102,9 +104,6 @@ Averaging::Averaging()
 
 Averaging::~Averaging()
 {
-//    qRegisterMetaType<DISPLIB::SelItem>();
-//    qRegisterMetaType<QSharedPointer<DISPLIB::SelItem>>();
-//    qRegisterMetaType<QList<QSharedPointer<DISPLIB::SelItem>>>();
 }
 
 //=============================================================================================================
@@ -244,8 +243,6 @@ QDockWidget* Averaging::getControl()
 
 //=============================================================================================================
 
-#include <disp/viewers/helpers/selectionsceneitem.h>
-
 void Averaging::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
@@ -262,15 +259,11 @@ void Averaging::handleEvent(QSharedPointer<Event> e)
             updateGroups();
             break;
         case CHANNEL_SELECTION_INDICES:
-            qDebug() << "Averaging::handleEvent -- SET_CHANNEL_SELECTION";
             setChannelSelection(e->getData().value<QList<int>>());
             break;
         case CHANNEL_SELECTION_ITEMS:
             emit channelSelectionManagerChanged(e->getData());
             break;
-//        case CHANNEL_SELECTION_MAP:
-//            emit layoutChanged(e->getData().value<QMap<QString,QPointF>>());
-//            break;
         case CHANNEL_SELECTION_CHANNELS:
             emit setCurrentlyMappedFiffChannels(e->getData().value<QStringList>());
             break;
@@ -290,7 +283,6 @@ QVector<EVENT_TYPE> Averaging::getEventSubscriptions(void) const
     temp.push_back(EVENT_GROUPS_UPDATED);
     temp.push_back(CHANNEL_SELECTION_INDICES);
     temp.push_back(CHANNEL_SELECTION_ITEMS);
-    temp.push_back(CHANNEL_SELECTION_MAP);
     temp.push_back(CHANNEL_SELECTION_CHANNELS);
 
     return temp;
@@ -626,18 +618,5 @@ void Averaging::onChangeGroupSelect(const QString &text)
 
 void Averaging::setChannelSelection(const QList<int> selectedChannelsIndexes)
 {
-
     emit showSelectedChannels(selectedChannelsIndexes);
-//    connect(m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::showSelectedChannelsOnly,
-//            m_pButterflyView.data(), &DISPLIB::ButterflyView::showSelectedChannelsOnly, Qt::UniqueConnection);
-
-//    connect(m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::selectionChanged,
-//            m_pAverageLayoutView.data(), &DISPLIB::AverageLayoutView::channelSelectionManagerChanged, Qt::UniqueConnection);
-
-//    m_pButterflyView->setChannelInfoModel(m_pChannelInfoModel);
-//    m_pChannelSelectionView->updateDataView();
-
-//    m_pAverageLayoutView->setChannelInfoModel(m_pChannelInfoModel);
-//    m_pChannelInfoModel->layoutChanged(m_pChannelSelectionView->getLayoutMap());
-
 }

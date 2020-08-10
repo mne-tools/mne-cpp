@@ -47,8 +47,6 @@
 
 #include <fiff/fiff_info.h>
 
-#include <iostream>
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -293,9 +291,9 @@ void AverageLayoutView::updateData()
         if (m_listMappedChannelNames.isEmpty()){
             return;
         }
-//        GetChKind m_pFiffInfo->chs.at(index.row()).kind;
-//        GetChUnit m_pFiffInfo->chs.at(index.row()).unit;
+
         QList<QGraphicsItem *> currentAverageSceneItems = m_pAverageScene->items();
+
         //Set new data for all averageSceneItems
         for(int i = 0; i < currentAverageSceneItems.size(); i++) {
             AverageSceneItem* averageSceneItemTemp = static_cast<AverageSceneItem*>(currentAverageSceneItems.at(i));
@@ -306,15 +304,10 @@ void AverageLayoutView::updateData()
             QList<QPair<QString, DISPLIB::RowVectorPair> > averageData = m_pEvokedSetModel->data(0, 2, EvokedSetModelRoles::GetAverageData).value<QList<QPair<QString, DISPLIB::RowVectorPair> > >();
 
             //Get the averageScenItem specific data row
-            //int channelNumber = m_pChannelInfoModel->getIndexFromMappedChName(averageSceneItemTemp->m_sChannelName);
             int channelNumber = m_listMappedChannelNames.indexOf(averageSceneItemTemp->m_sChannelName);
 
             if(channelNumber != -1) {
-                //qDebug() << "Change data for" << channelNumber << "" << averageSceneItemTemp->m_sChannelName;
-
-                //averageSceneItemTemp->m_iChannelKind = m_pChannelInfoModel->data(m_pChannelInfoModel->index(channelNumber, 4), ChannelInfoModelRoles::GetChKind).toInt();
                 averageSceneItemTemp->m_iChannelKind = m_pFiffInfo->chs.at(channelNumber).kind;
-                //averageSceneItemTemp->m_iChannelUnit = m_pChannelInfoModel->data(m_pChannelInfoModel->index(channelNumber, 6), ChannelInfoModelRoles::GetChUnit).toInt();
                 averageSceneItemTemp->m_iChannelUnit = m_pFiffInfo->chs.at(channelNumber).unit;
                 averageSceneItemTemp->m_firstLastSample.first = (-1)*m_pEvokedSetModel->getNumPreStimSamples();
 
