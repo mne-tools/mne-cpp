@@ -2,7 +2,7 @@
 /**
  * @file     channelselection.cpp
  * @author   Gabriel Motta <gbmotta@mgh.harvard.edu
- * @since    0.1.4
+ * @since    0.1.5
  * @date     July, 2020
  *
  * @section  LICENSE
@@ -45,7 +45,6 @@
 #include <anShared/Management/communicator.h>
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Utils/metatypes.h>
-#include <iostream>
 
 //=============================================================================================================
 // QT INCLUDES

@@ -229,9 +229,19 @@ public:
     void updateProcessingMode(ProcessingMode mode);
 
     //=========================================================================================================
+    /**
+     * Returns pointer to the portion of the channel view with the graphics view
+     *
+     * @return pointer to the channelselectionview view
+     */
     QWidget* getViewWidget();
 
     //=========================================================================================================
+    /**
+     * Returns pointer to the portion of the channel view with the controls
+     *
+     * @return pointer to the channelselectionview controls
+     */
     QWidget* getControlWidget();
 
 private:
