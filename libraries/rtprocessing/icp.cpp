@@ -136,7 +136,7 @@ bool RTPROCESSINGLIB::icp(const MNEProjectToSurface::SPtr mneSurfacePoints,
         if(std::fabs(fMSE - fMSEPrev) < fTol) {
             transToFrom.invert_transform();
             transFromTo = transToFrom;
-            qInfo() << "RTPROCESSINGLIB::icp: ICP was succesfull and exceeded after " << iIter +1 << " Iterations with MSE dist: " << fMSE << " mm.";
+            qInfo() << "RTPROCESSINGLIB::icp: ICP was succesfull and exceeded after " << iIter +1 << " Iterations with MSE dist: " << fMSE * 1000 << " mm.";
             return true;
         }
         fMSEPrev = fMSE;
@@ -144,7 +144,7 @@ bool RTPROCESSINGLIB::icp(const MNEProjectToSurface::SPtr mneSurfacePoints,
 
     }
 
-    qWarning() << "RTPROCESSINGLIB::icp: ICP was not succesfull and exceeded after " << iMaxIter << " Iterations with MSE: " << fMSE << ".";
+    qWarning() << "RTPROCESSINGLIB::icp: ICP was not succesfull and exceeded after " << iMaxIter << " Iterations with MSE: " << fMSE *1000 << " mm.";
     return false;
 }
 
