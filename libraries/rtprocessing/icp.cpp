@@ -85,7 +85,8 @@ bool RTPROCESSINGLIB::icp(const MNEProjectToSurface::SPtr mneSurfacePoints,
                           const Eigen::MatrixXf& matDstPoint,
                           FiffCoordTrans& transFromTo,
                           const int iMaxIter,
-                          const float fTol)
+                          const float fTol,
+                          const VectorXf& vecWeitgths)
 /**
  * Follow notation of P.J. Besl and N.D. McKay, A Method for
  * Registration of 3-D Shapes, IEEE Trans. Patt. Anal. Machine Intell., 14,
@@ -95,6 +96,8 @@ bool RTPROCESSINGLIB::icp(const MNEProjectToSurface::SPtr mneSurfacePoints,
     // Initialization
     int iNP = matDstPoint.rows();               // The number of points
     float fMSEPrev,fMSE = 0.0;                  // The mean square error
+    float fScale = 1.0;
+    float bScale = true;
     MatrixXf matP0 = matDstPoint;               // Initial Set of points
     MatrixXf matPk = matP0;                     // Transformed Set of points
     MatrixXf matYk(matPk.rows(),matPk.cols());  // Iterative losest points on the surface
@@ -107,20 +110,19 @@ bool RTPROCESSINGLIB::icp(const MNEProjectToSurface::SPtr mneSurfacePoints,
     // Initial transformation - apply inverse because we are computing in Model space
     FiffCoordTrans transToFrom = transFromTo;
     transToFrom.invert_transform();
-
     matPk = transToFrom.apply_trans(matPk);
 
     // Icp algorithm:
     for(int iIter = 0; iIter < iMaxIter; ++iIter) {
 
         // Step a: compute the closest point on the surface; eq 29
-        if(!mneSurfacePoints->mne_find_closest_on_surface(matPk,iNP,matYk,vecNearest,vecDist)) {
+        if(!mneSurfacePoints->mne_find_closest_on_surface(matPk, iNP, matYk, vecNearest, vecDist)) {
             qWarning() << "RTPROCESSINGLIB::icp: mne_find_closest_on_surface was not sucessfull.";
             return false;
         }
 
         // Step b: compute the registration; eq 30
-        if(!fitMatched(matP0,matYk,matTrans)) {
+        if(!fitMatched(matP0, matYk, matTrans, fScale, bScale, vecWeitgths)) {
             qWarning() << "RTPROCESSINGLIB::icp: point cloud registration not succesfull";
         }
 
@@ -180,7 +182,7 @@ bool RTPROCESSINGLIB::fitMatched(const MatrixXf& matSrcPoint,
 
     // test size of point clouds
     if(matSrcPoint.size() != matDstPoint.size()) {
-        qWarning() << "RTPROCESSINGLIB::fitMatched: Point clouds does not match.";
+        qWarning() << "RTPROCESSINGLIB::fitMatched: Point clouds do not match.";
         return false;
     }
 
@@ -195,7 +197,7 @@ bool RTPROCESSINGLIB::fitMatched(const MatrixXf& matSrcPoint,
         vecMuP = vecW.transpose() * matP;
         vecMuX = vecW.transpose() * matX;
 
-        Matrix3f matXWeighted = matX;
+        MatrixXf matXWeighted = matX;
         for(int i = 0; i < (vecW.size()); ++i) {
             matXWeighted.row(i) = matXWeighted.row(i) * vecW(i);
         }
@@ -250,3 +252,45 @@ bool RTPROCESSINGLIB::fitMatched(const MatrixXf& matSrcPoint,
 }
 
 //=========================================================================================================
+
+bool RTPROCESSINGLIB::discardOutliers(const QSharedPointer<MNELIB::MNEProjectToSurface> mneSurfacePoints,
+                                      const MatrixXf& matDstPoint,
+                                      const FiffCoordTrans& transFromTo,
+                                      VectorXi& vecTake,
+                                      MatrixXf& matTakePoint,
+                                      const float fMaxDist)
+{
+    // Initialization
+    int iNP = matDstPoint.rows();               // The number of points
+    MatrixXf matP = matDstPoint;                // Initial Set of points
+    MatrixXf matYk(matDstPoint.rows(),matDstPoint.cols());  // Iterative losest points on the surface
+    VectorXi vecNearest;                        // Triangle of the new point
+    VectorXf vecDist;                           // The Distance between matX and matP
+
+    // Initial transformation - apply inverse because we are computing in Model space
+    FiffCoordTrans transToFrom = transFromTo;
+    transToFrom.invert_transform();
+    matP = transToFrom.apply_trans(matP);
+
+    int iDiscarded = 0;
+
+    // discard outliers if necessary
+    if(fMaxDist > 0.0) {
+        if(!mneSurfacePoints->mne_find_closest_on_surface(matP, iNP, matYk, vecNearest, vecDist)) {
+            qWarning() << "RTPROCESSINGLIB::icp: mne_find_closest_on_surface was not sucessfull.";
+            return false;
+        }
+
+        for(int i = 0; i < vecDist.size(); ++i) {
+            if(std::fabs(vecDist(i)) < fMaxDist) {
+                vecTake.conservativeResize(vecTake.size()+1);
+                vecTake(vecTake.size()-1) = i;
+                matTakePoint.conservativeResize(matTakePoint.rows()+1,3);
+                matTakePoint.row(matTakePoint.rows()-1) = matDstPoint.row(i);
+            } else {
+                iDiscarded++;
+            }
+        }
+    }
+    qInfo() << "RTPROCESSINGLIB::discardOutliers: " << iDiscarded << "digitizers discarded.";
+}

@@ -86,7 +86,7 @@ const Eigen::VectorXf vecDefaultWeigths;
  * @param [out] transFromTo         The forward transformation matrix.
  * @param [in]  iMaxIter            The maximum number of iterations for the icp algorithms, defaults to 20.
  * @param [in]  fTol                The destination point set to be reistrated.
- *
+ * @param [in]  vecWeitgths         The weitghts to apply.
  *
  * @return Wether the registration was succesfull.
  */
@@ -95,7 +95,8 @@ RTPROCESINGSHARED_EXPORT bool icp(const QSharedPointer<MNELIB::MNEProjectToSurfa
                                   const Eigen::MatrixXf& matDstPoint,
                                   FIFFLIB::FiffCoordTrans& transFromTo,
                                   const int iMaxIter = 20,
-                                  const float fTol = 0.001);
+                                  const float fTol = 0.001,
+                                  const Eigen::VectorXf& vecWeitgths = vecDefaultWeigths);
 
 //=========================================================================================================
 
@@ -122,22 +123,24 @@ RTPROCESINGSHARED_EXPORT bool fitMatched(const Eigen::MatrixXf& matSrcPoint,
 //=========================================================================================================
 
 /**
- * Get the closest points on a surface.
+ * Discard outliers from digitizer set.
  *
- * @param[in]   matR                Set of pionts, which are to be projectied.
- * @param[in]   iNP                 The number of points
- * @param[out]  matRTri             The set of points on the surface
- * @param[out]  vecNearest          Triangle of the new point
- * @param[out]  vecDist             The Distance between matR and matRTri
+ * @param [in]  mneSurfacePoints    The MNEProjectToSurface object that contains the surface triangles etc..
+ * @param [in]  matDstPoint         The destination point set to be registrated.
+ * @param [out] transFromTo         The forward transformation matrix.
+ * @param [in]  vecTake             The index of taken digitizers.
+ * @param [in]  matTakePoint        The the digitizer points to take.
+ * @param [in]  fMaxDist            The maximum distance to the surface in mm.
  *
- * @return Wether the function was succesfull.
+ * @return Wether the discarding was succesfull.
  */
 
-RTPROCESINGSHARED_EXPORT bool closestPointOnSurface(const Eigen::Matrix3f& matR,
-                                                    const int iNP,
-                                                    Eigen::Matrix3f& matRTri,
-                                                    Eigen::VectorXi& vecNearest,
-                                                    Eigen::VectorXf& vecDist);
+RTPROCESINGSHARED_EXPORT bool discardOutliers(const QSharedPointer<MNELIB::MNEProjectToSurface> mneSurfacePoints,
+                                              const Eigen::MatrixXf& matDstPoint,
+                                              const FIFFLIB::FiffCoordTrans& transFromTo,
+                                              Eigen::VectorXi& vecTake,
+                                              Eigen::MatrixXf& matTakePoint,
+                                              const float fMaxDist = 0.0);
 
 //=============================================================================================================
 /**
