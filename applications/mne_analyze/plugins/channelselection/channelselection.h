@@ -120,20 +120,15 @@ public:
 private slots:
     //=========================================================================================================
     /**
-     * Receives as list of the names of the selected channels to be displayed and sends them to event manager
-     *
-     * @param [in] selectedChannels     List of name sof selected channels
-     */
-    void onShowSelectedChannelsOnly(const QStringList&  selectedChannels);
-
-    //=========================================================================================================
-    /**
      * Receives a list of graphic itemms, stores aparmeters locally and sends them to event manager
      *
      * @param [in] selectedChannelItems     List of parameters of graphics items
      */
     void onSelectionChanged(const QList<QGraphicsItem*>& selectedChannelItems);
 
+    void selectAll(bool);
+
+    void selectClear(bool);
 private:
 
     //=========================================================================================================

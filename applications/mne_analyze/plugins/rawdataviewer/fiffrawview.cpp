@@ -621,11 +621,17 @@ void FiffRawView::updateProcessingMode(ProcessingMode mode)
 
 void FiffRawView::showSelectedChannelsOnly(const QList<int> selectedChannelsIndexes)
 {
-    for(int i = 0; i<m_pModel->rowCount(); i++) {
-        if (selectedChannelsIndexes.contains(i)){
+    if (selectedChannelsIndexes.contains(-1)){
+        for(int i = 0; i<m_pModel->rowCount(); i++) {
             m_pTableView->showRow(i);
-        } else {
-            m_pTableView->hideRow(i);
+        }
+    } else {
+        for(int i = 0; i<m_pModel->rowCount(); i++) {
+            if (selectedChannelsIndexes.contains(i)){
+                m_pTableView->showRow(i);
+            } else {
+                m_pTableView->hideRow(i);
+            }
         }
     }
 
