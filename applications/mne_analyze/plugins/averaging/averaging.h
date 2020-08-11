@@ -238,6 +238,12 @@ private:
      */
     void loadFullGui();
 
+    //=========================================================================================================
+    /**
+     * Sets channel selection for butterfly and 2D layout view based on QVariant with a SelectionItem object
+     *
+     * @param [in] data     QVariant with a SelectionItem object with channel selection information
+     */
     void setChannelSelection(const QVariant &data);
 
     //=========================================================================================================

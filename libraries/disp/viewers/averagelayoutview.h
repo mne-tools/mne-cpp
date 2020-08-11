@@ -193,6 +193,12 @@ public:
      */
     void setAverageActivation(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation);
 
+    //=========================================================================================================
+    /**
+     * Stores FiffInfo to local variable to be used for getting channel info
+     *
+     * @param [in] pFiffInfo    shared pointer to Fiff Info of currently loaded data
+     */
     void setFiffInfo(const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
     //=========================================================================================================
@@ -203,6 +209,12 @@ public:
      */
     void channelSelectionManagerChanged(const QList<QGraphicsItem *> &selectedChannelItems);
 
+    //=========================================================================================================
+    /**
+     * Sets the currently viewable channels using the corrent name and location parameters
+     *
+     * @param [in] data     QVariant containing a SelectionItem object with selected channel information
+     */
     void channelSelectionChanged(const QVariant &data);
 
     //=========================================================================================================
