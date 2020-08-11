@@ -111,9 +111,10 @@ int main(int argc, char *argv[])
     QCommandLineOption fidOption("fid", "The original point set", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/coreg/sample-fiducials.fif");
     QCommandLineOption digOption("dig", "The destination point set", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     QCommandLineOption bemOption("bem", "The bem file", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-head.fif");
-    QCommandLineOption transOption("trans", "The MRI-Head transformation file", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/all-trans.fif");
+    QCommandLineOption transOption("trans", "The MRI-Head transformation file", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw-trans.fif");
     QCommandLineOption scaleOption("scale", "Weather to scale during the registration or not", "bool", "false");
-    QCommandLineOption tolOption("tol", "The convergence limit for the icp algorithm.", "int", "0.001");
+    QCommandLineOption tolOption("tol", "The convergence limit for the icp algorithm.", "float", "0.001");
+    QCommandLineOption distOption("dist", "The maximum distance between digitizer and head shape in mm.", "float", "0.02");
 
     parser.addOption(fidOption);
     parser.addOption(digOption);
@@ -121,6 +122,7 @@ int main(int argc, char *argv[])
     parser.addOption(scaleOption);
     parser.addOption(transOption);
     parser.addOption(tolOption);
+    parser.addOption(distOption);
 
     parser.process(a);
 
@@ -138,8 +140,10 @@ int main(int argc, char *argv[])
     }
 
     float fTol = parser.value(tolOption).toFloat();
+    float fMaxDist = parser.value(distOption).toFloat();
+
     // read Trans
-    FiffCoordTrans transTest(t_fileTrans);
+    FiffCoordTrans transMriHeadRef(t_fileTrans);
 
     // read Bem
     MNEBem bemHead(t_fileBem);
@@ -148,7 +152,8 @@ int main(int argc, char *argv[])
 
     // read digitizer data
     QList<int> lPickFiducials({FIFFV_POINT_CARDINAL});
-    FiffDigPointSet digSetSrc = FiffDigPointSet(t_fileFid).pickTypes(lPickFiducials);   // Fiducials MRI-Space
+    FiffDigPointSet digSetSrc = FiffDigPointSet(t_fileDig).pickTypes(lPickFiducials);   // Fiducials MRI-Space
+    digSetSrc.applyTransform(transMriHeadRef, false);
     FiffDigPointSet digSetDst = FiffDigPointSet(t_fileDig).pickTypes(lPickFiducials);   // Fiducials Head-Space
     FiffDigPointSet digSetHsp = FiffDigPointSet(t_fileDig);                             // Head shape points Head-Space
 
@@ -175,35 +180,49 @@ int main(int argc, char *argv[])
 
     // align fiducials
     if(!fitMatched(matSrc,matDst,matTrans,fScale,bScale,vecWeights)) {
-        qWarning() << "point cloud registration not succesfull";
+        qWarning() << "Point cloud registration not succesfull.";
     }
 
-    FiffCoordTrans transMriHead = FiffCoordTrans::make(digSetSrc[0].coord_frame, digSetDst[0].coord_frame,matTrans);
-    Matrix3f matSrcTransposed = transMriHead.apply_trans(matSrc);
-    Matrix3f matDiff = matDst - matSrcTransposed;
-    qInfo() << "Transformation Matrix: ";
-    std::cout << transMriHead.trans << std::endl;
-
-    qInfo() << "Alignment Error: ";
-    std::cout << matDiff.colwise().mean() << std::endl;
+    FiffCoordTrans transMriHead = FiffCoordTrans::make(bemSurface.data()->coord_frame, digSetDst[0].coord_frame,matTrans);
 
     // Icp:
+    VectorXf vecWeightsICP(digSetHsp.size()); // Weigths vector
     int iMaxIter = 20;
     MatrixXf matHsp(digSetHsp.size(),3);
+
     for(int i = 0; i < digSetHsp.size(); ++i) {
         matHsp(i,0) = digSetHsp[i].r[0]; matHsp(i,1) = digSetHsp[i].r[1]; matHsp(i,2) = digSetHsp[i].r[2];
-    }
-    if(!icp(mneSurfacePoints, matHsp, transMriHead, iMaxIter, fTol)) {
-        qWarning() << "icp was not succesfull";
+        // set standart weights
+        if((digSetHsp[i].kind == FIFFV_POINT_CARDINAL) && (digSetHsp[i].ident == FIFFV_POINT_NASION)) {
+            vecWeightsICP(i) = 10.0;
+        } else {
+            vecWeightsICP(i) = 1.0;
+        }
     }
 
+    MatrixXf matHspClean;
+    VectorXi vecTake;
+
+    if(!discardOutliers(mneSurfacePoints, matHsp, transMriHead, vecTake, matHspClean, fMaxDist)) {
+        qWarning() << "Discard outliers was not succesfull.";
+    }
+    VectorXf vecWeightsICPClean(vecTake.size());
+
+    for(int i = 0; i < vecTake.size(); ++i) {
+        vecWeightsICPClean(i) = vecWeightsICP(vecTake(i));
+    }
+    if(!icp(mneSurfacePoints, matHspClean, transMriHead, iMaxIter, fTol, vecWeightsICPClean)) {
+        qWarning() << "ICP was not succesfull.";
+    }
+
+    qInfo() << "transMriHead:";
     transMriHead.print();
+    qInfo() << "transMriHeadRef:";
+    transMriHeadRef.print();
 
-    // Abstract View
     AbstractView::SPtr p3DAbstractView = AbstractView::SPtr(new AbstractView());
     Data3DTreeModel::SPtr p3DDataModel = p3DAbstractView->getTreeModel();
     DigitizerSetTreeItem* pDigSrcSetTreeItem = p3DDataModel->addDigitizerData("Sample", "Fiducials Transformed", digSetSrc);
-    DigitizerSetTreeItem* pDigDstSetTreeItem = p3DDataModel->addDigitizerData("Sample", "Fiducials", digSetDst);
     DigitizerSetTreeItem* pDigHspSetTreeItem = p3DDataModel->addDigitizerData("Sample", "Digitizer", digSetHsp);
     pDigSrcSetTreeItem->setTransform(transMriHead,false);
 
