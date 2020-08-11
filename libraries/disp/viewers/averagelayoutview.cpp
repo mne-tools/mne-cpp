@@ -273,7 +273,7 @@ void AverageLayoutView::channelSelectionChanged(const QVariant &data)
         qDebug() << "AverageLayoutView::channelSelectionManagerChanged - m_pAverageScene is NULL. Returning. ";
         return;
     }
-    m_pSelItem = data.value<DISPLIB::SelItem*>();
+    m_pSelItem = data.value<DISPLIB::SelectionItem*>();
 
     //Repaint the average items in the average scene based on the input parameter selectedChannelItems and update them with current data
     m_pAverageScene->repaintSelItems(*m_pSelItem);
@@ -284,13 +284,10 @@ void AverageLayoutView::channelSelectionChanged(const QVariant &data)
 }
 
 //=============================================================================================================
-
+#include <iostream>
 void AverageLayoutView::updateData()
 {
     if(m_pFiffInfo) {
-        if (m_listMappedChannelNames.isEmpty()){
-            return;
-        }
 
         QList<QGraphicsItem *> currentAverageSceneItems = m_pAverageScene->items();
 
@@ -304,7 +301,7 @@ void AverageLayoutView::updateData()
             QList<QPair<QString, DISPLIB::RowVectorPair> > averageData = m_pEvokedSetModel->data(0, 2, EvokedSetModelRoles::GetAverageData).value<QList<QPair<QString, DISPLIB::RowVectorPair> > >();
 
             //Get the averageScenItem specific data row
-            int channelNumber = m_listMappedChannelNames.indexOf(averageSceneItemTemp->m_sChannelName);
+            int channelNumber = averageSceneItemTemp->m_iChannelNumber;
 
             if(channelNumber != -1) {
                 averageSceneItemTemp->m_iChannelKind = m_pFiffInfo->chs.at(channelNumber).kind;
@@ -315,7 +312,6 @@ void AverageLayoutView::updateData()
                     averageSceneItemTemp->m_firstLastSample.second = averageData.first().second.second - m_pEvokedSetModel->getNumPreStimSamples();
                 }
 
-                averageSceneItemTemp->m_iChannelNumber = channelNumber;
                 averageSceneItemTemp->m_iTotalNumberChannels = m_pEvokedSetModel->rowCount();
                 averageSceneItemTemp->m_lAverageData = averageData;
                 averageSceneItemTemp->m_bIsBad = m_pEvokedSetModel->getIsChannelBad(channelNumber);
@@ -417,11 +413,4 @@ void AverageLayoutView::updateProcessingMode(ProcessingMode mode)
 void AverageLayoutView::setFiffInfo(const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo)
 {
     m_pFiffInfo = pFiffInfo;
-}
-
-//=============================================================================================================
-
-void AverageLayoutView::setMappedChannelNames(const QStringList &mappedLayoutChNames)
-{
-    m_listMappedChannelNames = mappedLayoutChNames;
 }

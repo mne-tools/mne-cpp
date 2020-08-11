@@ -40,6 +40,8 @@
 //=============================================================================================================
 
 #include "channelselection_global.h"
+#include "ui_channelselection.h"
+
 #include <anShared/Interfaces/IPlugin.h>
 
 //=============================================================================================================
@@ -64,7 +66,7 @@ namespace ANSHAREDLIB {
 namespace DISPLIB {
     class ChannelSelectionView;
     class ChannelInfoModel;
-    class SelItem;
+    class SelectionItem;
 }
 
 namespace FIFFLIB {
@@ -132,14 +134,6 @@ private slots:
      */
     void onSelectionChanged(const QList<QGraphicsItem*>& selectedChannelItems);
 
-    //=========================================================================================================
-    /**
-     * Receives a list of channel names present in the currently loaded file
-     *
-     * @param [in] mappedLayoutChNames      List of channels names in file
-     */
-    void onChannelsMappedToLayout(const QStringList &mappedLayoutChNames);
-
 private:
 
     //=========================================================================================================
@@ -158,16 +152,18 @@ private:
      */
     void setFiffSettings(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
+    Ui::ChannelSelectViewSelect*                        m_pUi;
+
     QPointer<ANSHAREDLIB::Communicator>                 m_pCommu;                   /**< To broadcast signals */
 
-    DISPLIB::SelItem*                                   m_pSelItem;                 /**< Stores parameters from list of QGraphicsItems received by channelselectionview */
+    DISPLIB::SelectionItem*                                   m_pSelItem;                 /**< Stores parameters from list of QGraphicsItems received by channelselectionview */
 
     QSharedPointer<DISPLIB::ChannelSelectionView>       m_pChannelSelectionView;    /**< View for selecting channels to be displayed */
     QSharedPointer<DISPLIB::ChannelInfoModel>           m_pChannelInfoModel;        /**< Hold channel info - needed to initialize channelselectionview */
     QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                /**< Hold Information baout currently loaded file */
 
     QHBoxLayout*                                        m_pViewLayout;              /**< Holds the view portion of the channel selection to be displayed */
-    QHBoxLayout*                                        m_pControlLayout;           /**< Holds the control portion of the channel selection to be displayed */
+    QVBoxLayout*                                        m_pControlLayout;           /**< Holds the control portion of the channel selection to be displayed */
 
     bool                                                m_bIsInit;                  /**< Whether channelselectionview and channelinfomodel have been initialized */
 };

@@ -104,7 +104,6 @@ namespace ANSHAREDLIB
         FILTER_DESIGN_CHANGED,      // send when the designed filter changed
         CHANNEL_SELECTION_INDICES,  // send when channel selection changes with indices of selected
         CHANNEL_SELECTION_ITEMS,    // send when channel selection changees with graphic items to draw
-        CHANNEL_SELECTION_CHANNELS  // send when channel data changes with list of channel names
     };
 } //NAMESPACE
 
