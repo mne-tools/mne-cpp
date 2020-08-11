@@ -50,10 +50,9 @@
 
 #include <disp/viewers/fiffrawviewsettings.h>
 #include <disp/viewers/scalingview.h>
+#include <disp/viewers/helpers/selectionsceneitem.h>
 
 #include <rtprocessing/helpers/filterkernel.h>
-
-#include <disp/viewers/scalingview.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -217,8 +216,11 @@ void RawDataViewer::handleEvent(QSharedPointer<Event> e)
     case FILTER_DESIGN_CHANGED:
         m_pFiffRawView->setFilter(e->getData().value<FilterKernel>());
         break;
-    case CHANNEL_SELECTION_INDICES:
-        m_pFiffRawView->showSelectedChannelsOnly(e->getData().value<QList<int>>());
+    case CHANNEL_SELECTION_ITEMS:
+        if (e->getData().value<DISPLIB::SelectionItem*>()->m_sViewsToApply.contains("signalview")){
+            m_pFiffRawView->showSelectedChannelsOnly(e->getData().value<DISPLIB::SelectionItem*>()->m_iChannelNumber);
+        }
+        break;
     default:
         qWarning() << "[RawDataViewer::handleEvent] Received an Event that is not handled by switch cases.";
     }
@@ -236,7 +238,7 @@ QVector<EVENT_TYPE> RawDataViewer::getEventSubscriptions(void) const
     temp.push_back(FILTER_CHANNEL_TYPE_CHANGED);
     temp.push_back(FILTER_ACTIVE_CHANGED);
     temp.push_back(FILTER_DESIGN_CHANGED);
-    temp.push_back(CHANNEL_SELECTION_INDICES);
+    temp.push_back(CHANNEL_SELECTION_ITEMS);
 
     return temp;
 }

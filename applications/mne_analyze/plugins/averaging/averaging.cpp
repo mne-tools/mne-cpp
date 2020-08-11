@@ -255,11 +255,9 @@ void Averaging::handleEvent(QSharedPointer<Event> e)
         case EVENT_GROUPS_UPDATED:
             updateGroups();
             break;
-        case CHANNEL_SELECTION_INDICES:
-            setChannelSelection(e->getData().value<QList<int>>());
-            break;
         case CHANNEL_SELECTION_ITEMS:
-            emit channelSelectionManagerChanged(e->getData());
+            setChannelSelection(e->getData());
+
             break;
         default:
             qWarning() << "[Averaging::handleEvent] Received an Event that is not handled by switch cases.";
@@ -275,7 +273,6 @@ QVector<EVENT_TYPE> Averaging::getEventSubscriptions(void) const
     temp.push_back(FILTER_ACTIVE_CHANGED);
     temp.push_back(FILTER_DESIGN_CHANGED);
     temp.push_back(EVENT_GROUPS_UPDATED);
-    temp.push_back(CHANNEL_SELECTION_INDICES);
     temp.push_back(CHANNEL_SELECTION_ITEMS);
 
     return temp;
@@ -609,7 +606,12 @@ void Averaging::onChangeGroupSelect(const QString &text)
 
 //=============================================================================================================
 
-void Averaging::setChannelSelection(const QList<int> selectedChannelsIndexes)
+void Averaging::setChannelSelection(const QVariant &data)
 {
-    emit showSelectedChannels(selectedChannelsIndexes);
+    if(data.value<DISPLIB::SelectionItem*>()->m_sViewsToApply.contains("layoutview")){
+        emit channelSelectionManagerChanged(data);
+    }
+    if(data.value<DISPLIB::SelectionItem*>()->m_sViewsToApply.contains("butterflyview")){
+        emit showSelectedChannels(data.value<DISPLIB::SelectionItem*>()->m_iChannelNumber);
+    }
 }

@@ -206,6 +206,16 @@ void ChannelSelection::setFiffSettings(QSharedPointer<FIFFLIB::FiffInfo> pFiffIn
     m_pViewLayout->addWidget(m_pChannelSelectionView->getViewWidget());
     m_pControlLayout->addWidget(m_pChannelSelectionView->getControlWidget());
 
+    QWidget* select = new QWidget();
+    m_pUi->setupUi(select);
+    m_pControlLayout->addWidget(select);
+
+    connect(m_pUi->m_pushButtonAll, &QPushButton::clicked,
+            this, &ChannelSelection::selectAll);
+
+    connect(m_pUi->m_pushButtonClear, &QPushButton::clicked,
+            this, &ChannelSelection::selectClear);
+
     connect(m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::loadedLayoutMap,
             m_pChannelInfoModel.data(), &DISPLIB::ChannelInfoModel::layoutChanged, Qt::UniqueConnection);
 
@@ -213,8 +223,6 @@ void ChannelSelection::setFiffSettings(QSharedPointer<FIFFLIB::FiffInfo> pFiffIn
             m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::setCurrentlyMappedFiffChannels, Qt::UniqueConnection);
 
     //Slots for event loop
-    connect(m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::showSelectedChannelsOnly,
-            this, &ChannelSelection::onShowSelectedChannelsOnly, Qt::UniqueConnection);
 
     connect(m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::selectionChanged,
             this, &ChannelSelection::onSelectionChanged, Qt::UniqueConnection);
@@ -223,34 +231,7 @@ void ChannelSelection::setFiffSettings(QSharedPointer<FIFFLIB::FiffInfo> pFiffIn
 
     m_pChannelSelectionView->updateDataView();
 
-//    QFrame* line = new QFrame();
-//    line->setFrameShape(QFrame::HLine);
-//    line->setFrameShadow(QFrame::Sunken);
-//    m_pControlLayout->addWidget(line);
-
-    QWidget* select = new QWidget();
-    m_pUi->setupUi(select);
-    m_pControlLayout->addWidget(select);
-
-//    connect(this)
-
     m_bIsInit = true;
-}
-
-//=============================================================================================================
-
-void ChannelSelection::onShowSelectedChannelsOnly(const QStringList&  selectedChannels)
-{
-    QList<int> selectedChannelsIndexes;
-
-    for(int i = 0; i<selectedChannels.size(); i++){
-        selectedChannelsIndexes<<m_pChannelInfoModel->getIndexFromOrigChName(selectedChannels.at(i));
-    }
-
-    QVariant data;
-    data.setValue(selectedChannelsIndexes);
-    m_pCommu->publishEvent(EVENT_TYPE::CHANNEL_SELECTION_INDICES, data);
-
 }
 
 //=============================================================================================================
@@ -264,6 +245,7 @@ void ChannelSelection::onSelectionChanged(const QList<QGraphicsItem*>& selectedC
     m_pSelItem->m_iChannelKind.clear();
     m_pSelItem->m_iChannelUnit.clear();
     m_pSelItem->m_qpChannelPosition.clear();
+    m_pSelItem->m_sViewsToApply.clear();
 
     while(i.hasNext()){
         DISPLIB::SelectionSceneItem* selectionSceneItemTemp = static_cast<DISPLIB::SelectionSceneItem*>(i.next());
@@ -275,7 +257,39 @@ void ChannelSelection::onSelectionChanged(const QList<QGraphicsItem*>& selectedC
         m_pSelItem->m_qpChannelPosition.append(selectionSceneItemTemp->m_qpChannelPosition);
     }
 
+    m_pSelItem->m_sViewsToApply.append("null");
 
+    if (m_pUi->m_checkBoxSignaViewer->isChecked()) {
+        m_pSelItem->m_sViewsToApply.append("signalview");
+    }
+    if (m_pUi->m_checkBoxButterfly->isChecked()) {
+        m_pSelItem->m_sViewsToApply.append("butterflyview");
+    }
+    if (m_pUi->m_checkBoxLayout->isChecked()){
+        m_pSelItem->m_sViewsToApply.append("layoutview");
+    }
 
     m_pCommu->publishEvent(EVENT_TYPE::CHANNEL_SELECTION_ITEMS, QVariant::fromValue(/*static_cast<void*>(*/m_pSelItem/*)*/));
+}
+
+//=============================================================================================================
+
+void ChannelSelection::selectAll(bool bChecked)
+{
+    Q_UNUSED(bChecked);
+
+    m_pUi->m_checkBoxSignaViewer->setChecked(true);
+    m_pUi->m_checkBoxButterfly->setChecked(true);
+    m_pUi->m_checkBoxLayout->setChecked(true);
+}
+
+//=============================================================================================================
+
+void ChannelSelection::selectClear(bool bChecked)
+{
+    Q_UNUSED(bChecked);
+
+    m_pUi->m_checkBoxSignaViewer->setChecked(false);
+    m_pUi->m_checkBoxButterfly->setChecked(false);
+    m_pUi->m_checkBoxLayout->setChecked(false);
 }

@@ -284,7 +284,7 @@ void AverageLayoutView::channelSelectionChanged(const QVariant &data)
 }
 
 //=============================================================================================================
-#include <iostream>
+
 void AverageLayoutView::updateData()
 {
     if(m_pFiffInfo) {

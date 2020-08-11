@@ -238,7 +238,7 @@ private:
      */
     void loadFullGui();
 
-    void setChannelSelection(const QList<int> selectedChannelsIndexes);
+    void setChannelSelection(const QVariant &data);
 
     //=========================================================================================================
     /**
