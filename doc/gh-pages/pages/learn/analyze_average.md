@@ -17,8 +17,4 @@ You can select from any of the existing event groups, or use your current event 
 
 Use the `Parameters` tab to input your desired settings and hit the `COMPUTE` button. Prestimulus, poststimulus, and baseline min/max are all relative to the events. `Drop Rejected` will discard data points with artifacts"
 
-You can control which channels to display using the Channel Selection tool, which lets you select from presets or choose your own selection.
-
-![](../../images/analyze/mne_an_avg3.png)
-
-Make sure to select the correct layout from the bottom left dropdown.
+You can control which channels to display using the Channel Selection plugin, which lets you select from presets or choose your own selection.
