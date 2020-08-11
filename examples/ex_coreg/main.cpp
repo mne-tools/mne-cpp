@@ -152,10 +152,11 @@ int main(int argc, char *argv[])
 
     // read digitizer data
     QList<int> lPickFiducials({FIFFV_POINT_CARDINAL});
+    QList<int> lPickHSP({FIFFV_POINT_CARDINAL,FIFFV_POINT_HPI,FIFFV_POINT_EXTRA,FIFFV_POINT_EEG});
     FiffDigPointSet digSetSrc = FiffDigPointSet(t_fileDig).pickTypes(lPickFiducials);   // Fiducials MRI-Space
     digSetSrc.applyTransform(transMriHeadRef, false);
     FiffDigPointSet digSetDst = FiffDigPointSet(t_fileDig).pickTypes(lPickFiducials);   // Fiducials Head-Space
-    FiffDigPointSet digSetHsp = FiffDigPointSet(t_fileDig);                             // Head shape points Head-Space
+    FiffDigPointSet digSetHsp = FiffDigPointSet(t_fileDig).pickTypes(lPickHSP);         // Head shape points Head-Space
 
     // Initial Fiducial Alignment
     // Declare variables
@@ -218,6 +219,7 @@ int main(int argc, char *argv[])
     qInfo() << "transMriHead:";
     transMriHead.print();
     qInfo() << "transMriHeadRef:";
+    transMriHeadRef.invert_transform();
     transMriHeadRef.print();
 
     AbstractView::SPtr p3DAbstractView = AbstractView::SPtr(new AbstractView());
