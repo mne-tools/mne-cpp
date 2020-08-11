@@ -74,7 +74,7 @@ namespace DISPLIB
 class AverageScene;
 class EvokedSetModel;
 class ChannelInfoModel;
-class SelItem;
+class SelectionItem;
 
 //=============================================================================================================
 /**
@@ -195,8 +195,6 @@ public:
 
     void setFiffInfo(const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
-    void setMappedChannelNames(const QStringList &mappedLayoutChNames);
-
     //=========================================================================================================
     /**
      * call this whenever the external channel selection manager changes
@@ -248,11 +246,9 @@ protected:
 
     QSharedPointer<FIFFLIB::FiffInfo>                           m_pFiffInfo;                /**< FiffInfo for currently loaded file */
 
-    QStringList                                                 m_listMappedChannelNames;   /**< List of channel names in currently loaded file */
-
     QPointer<QGraphicsView>                                     m_pAverageLayoutView;       /**< View for 2D average layout scene */
 
-    SelItem*                                                    m_pSelItem;
+    SelectionItem*                                                    m_pSelItem;
 
     QSharedPointer<QMap<QString, QColor> >                      m_qMapAverageColor;         /**< Average colors. */
     QSharedPointer<QMap<QString, bool> >                        m_qMapAverageActivation;    /**< Average activation status. */

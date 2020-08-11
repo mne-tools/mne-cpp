@@ -159,9 +159,6 @@ QWidget *Averaging::getView()
     connect(this, &Averaging::channelSelectionManagerChanged,
             m_pAverageLayoutView.data(), &DISPLIB::AverageLayoutView::channelSelectionChanged, Qt::UniqueConnection);
 
-    connect(this, &Averaging::setCurrentlyMappedFiffChannels,
-            m_pAverageLayoutView.data(), &DISPLIB::AverageLayoutView::setMappedChannelNames, Qt::UniqueConnection);
-
     m_pButterflyView->setObjectName("butterflyview");
     m_pAverageLayoutView->setObjectName("layoutview");
     pAveragingViewWidget->setObjectName("AvgView");
@@ -264,9 +261,6 @@ void Averaging::handleEvent(QSharedPointer<Event> e)
         case CHANNEL_SELECTION_ITEMS:
             emit channelSelectionManagerChanged(e->getData());
             break;
-        case CHANNEL_SELECTION_CHANNELS:
-            emit setCurrentlyMappedFiffChannels(e->getData().value<QStringList>());
-            break;
         default:
             qWarning() << "[Averaging::handleEvent] Received an Event that is not handled by switch cases.";
     }
@@ -283,7 +277,6 @@ QVector<EVENT_TYPE> Averaging::getEventSubscriptions(void) const
     temp.push_back(EVENT_GROUPS_UPDATED);
     temp.push_back(CHANNEL_SELECTION_INDICES);
     temp.push_back(CHANNEL_SELECTION_ITEMS);
-    temp.push_back(CHANNEL_SELECTION_CHANNELS);
 
     return temp;
 }

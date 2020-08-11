@@ -64,7 +64,7 @@ namespace DISPLIB
 //=============================================================================================================
 
 class SelectionSceneItem;
-class SelItem;
+class SelectionItem;
 
 //=============================================================================================================
 /**
@@ -102,7 +102,7 @@ public:
      */
     void repaintItems(const QList<QGraphicsItem*> &selectedChannelItems);
 
-    void repaintSelItems(const DISPLIB::SelItem &selectedChannelItems);
+    void repaintSelItems(const DISPLIB::SelectionItem &selectedChannelItems);
 
     //=========================================================================================================
     /**

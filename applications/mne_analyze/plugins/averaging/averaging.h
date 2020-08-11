@@ -69,7 +69,7 @@ namespace DISPLIB {
     class ChannelInfoModel;
     class EvokedSetModel;
     class ButterflyView;
-    class SelItem;
+    class SelectionItem;
 }
 
 namespace FIFFLIB {
@@ -133,8 +133,6 @@ signals:
     void showSelectedChannels(const QList<int> selectedChannelsIndexes);
     void channelSelectionManagerChanged(const QVariant &data);
     void layoutChanged(const QMap<QString,QPointF> &layoutMap);
-    void setCurrentlyMappedFiffChannels(const QStringList &mappedLayoutChNames);
-
 private:
     //=========================================================================================================
     /**
