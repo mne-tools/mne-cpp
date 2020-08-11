@@ -126,8 +126,16 @@ private slots:
      */
     void onSelectionChanged(const QList<QGraphicsItem*>& selectedChannelItems);
 
+    //=========================================================================================================
+    /**
+     * Selects all View Select checkboxes
+     */
     void selectAll(bool);
 
+    //=========================================================================================================
+    /**
+     * Clear all View Select checkboxes
+     */
     void selectClear(bool);
 private:
 

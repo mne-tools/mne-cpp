@@ -98,10 +98,16 @@ public:
     /**
      * Repaints all items from the layout data in the scene.
      *
-     *  @param [in] selectedChannelItems items which are to painted to the average scene
+     *  @param [in] selectedChannelItems    items which are to painted to the average scene
      */
     void repaintItems(const QList<QGraphicsItem*> &selectedChannelItems);
 
+    //=========================================================================================================
+    /**
+     * Repaints all items from the layout data in the scene from a SelectionItem object
+     *
+     * @param [in] selectedChannelItems     data about items which are to be painted
+     */
     void repaintSelItems(const DISPLIB::SelectionItem &selectedChannelItems);
 
     //=========================================================================================================
