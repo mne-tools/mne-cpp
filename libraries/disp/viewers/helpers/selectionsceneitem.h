@@ -69,12 +69,13 @@ namespace DISPLIB
  *
  * @brief The SelectionSceneItem class provides a new data structure for visualizing channels in a 2D layout.
  */
-class DISPSHARED_EXPORT SelItem{
+class DISPSHARED_EXPORT SelectionItem{
 public:
-    SelItem() {}
-    ~SelItem() {}
-    SelItem(const SelItem &);
+    SelectionItem() {}
+    ~SelectionItem() {}
+    SelectionItem(const SelectionItem &);
 
+    QList<QString>     m_sViewsToApply;
     QList<QString>     m_sChannelName;             /**< The channel's name.*/
     QList<int>         m_iChannelNumber;           /**< The channel number.*/
     QList<int>         m_iChannelKind;             /**< The channel kind.*/
@@ -124,8 +125,8 @@ public:
 };
 
 } // NAMESPACE DISPLIB
-Q_DECLARE_METATYPE(DISPLIB::SelItem);
-Q_DECLARE_METATYPE(DISPLIB::SelItem*);
+Q_DECLARE_METATYPE(DISPLIB::SelectionItem);
+Q_DECLARE_METATYPE(DISPLIB::SelectionItem*);
 
 
 #endif // SELECTIONSCENEITEM_H
