@@ -42,6 +42,10 @@
 #include "fiff/fiff_dig_point.h"
 #include "fiff/fiff_coord_trans.h"
 
+#include "mne/mne_bem.h"
+#include "mne/mne_bem_surface.h"
+#include "mne/mne_project_to_surface.h"
+
 #include <utils/generics/applicationlogger.h>
 #include "rtprocessing/icp.h"
 
@@ -66,9 +70,10 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace RTPROCESSINGLIB;
 using namespace UTILSLIB;
+using namespace RTPROCESSINGLIB;
 using namespace FIFFLIB;
+using namespace MNELIB;
 
 //=============================================================================================================
 /**
@@ -86,14 +91,14 @@ public:
 
 private slots:
     void initTestCase();
-    void compareTransformation();
-    // add other compareFunctions here
+    void compareCoreg();
+
     void cleanupTestCase();
 
 private:
     // declare your thresholds, variables and error values here
     double dEpsilon;
-    FiffCoordTrans transTestMriHead;
+    FiffCoordTrans transMriHeadRef;
     FiffCoordTrans transMriHead;
 };
 
@@ -109,23 +114,38 @@ TestCoregistration::TestCoregistration()
 void TestCoregistration::initTestCase()
 {
     // Create files
-    QFile t_fileTestTrans(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/test-sample-mri-head-trans.fif");
-    QFile t_fileSrcFid(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample-fiducials.fif");
-    QFile t_fileDstDig(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
+    QFile t_fileFid(QCoreApplication::applicationDirPath() + "/MNE-sample-data/coreg/sample-fiducials.fif");
+    QFile t_fileDig(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QFile t_fileBem(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-head.fif");
+    QFile t_fileTrans(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw-trans.fif");
 
-    // read test transformatiin
-    transTestMriHead = FiffCoordTrans(t_fileTestTrans);
+    float fTol = 0.000001;
+    float fMaxDist = 0.02;
+
+    // read Trans
+    FiffCoordTrans transMriHeadRef(t_fileTrans);
+
+    // read Bem
+    MNEBem bemHead(t_fileBem);
+    MNEBemSurface::SPtr bemSurface = MNEBemSurface::SPtr::create(bemHead[0]);
+    MNEProjectToSurface::SPtr mneSurfacePoints = MNEProjectToSurface::SPtr::create(*bemSurface);
+
     // read digitizer data
     QList<int> lPickFiducials({FIFFV_POINT_CARDINAL});
-    FiffDigPointSet digSetSrc = FiffDigPointSet(t_fileSrcFid).pickTypes(lPickFiducials);
-    FiffDigPointSet digSetDst = FiffDigPointSet(t_fileDstDig).pickTypes(lPickFiducials);
+    QList<int> lPickHSP({FIFFV_POINT_CARDINAL,FIFFV_POINT_HPI,FIFFV_POINT_EXTRA,FIFFV_POINT_EEG});
+    FiffDigPointSet digSetSrc = FiffDigPointSet(t_fileDig).pickTypes(lPickFiducials);   // Fiducials MRI-Space
+    digSetSrc.applyTransform(transMriHeadRef, false);
+    FiffDigPointSet digSetDst = FiffDigPointSet(t_fileDig).pickTypes(lPickFiducials);   // Fiducials Head-Space
+    FiffDigPointSet digSetHsp = FiffDigPointSet(t_fileDig).pickTypes(lPickHSP);         // Head shape points Head-Space
 
+    // Initial Fiducial Alignment
     // Declare variables
     Matrix3f matSrc(digSetSrc.size(),3);
     Matrix3f matDst(digSetDst.size(),3);
     Matrix4f matTrans;
     Vector3f vecWeights(digSetSrc.size()); // LPA, Nasion, RPA
     float fScale;
+    bool bScale = true;
 
     // get coordinates
     for(int i = 0; i< digSetSrc.size(); ++i) {
@@ -140,21 +160,49 @@ void TestCoregistration::initTestCase()
         }
     }
 
-     bool bScale = true;
-
+    // align fiducials
     if(!fitMatched(matSrc,matDst,matTrans,fScale,bScale,vecWeights)) {
-        qWarning() << "point cloud registration not succesfull";
+        qWarning() << "Point cloud registration not succesfull.";
     }
 
-    transMriHead = FiffCoordTrans::make(digSetSrc[0].coord_frame, digSetDst[0].coord_frame,matTrans);
+    FiffCoordTrans transMriHead = FiffCoordTrans::make(bemSurface.data()->coord_frame, digSetDst[0].coord_frame,matTrans);
 
+    // Icp:
+    VectorXf vecWeightsICP(digSetHsp.size()); // Weigths vector
+    int iMaxIter = 20;
+    MatrixXf matHsp(digSetHsp.size(),3);
+
+    for(int i = 0; i < digSetHsp.size(); ++i) {
+        matHsp(i,0) = digSetHsp[i].r[0]; matHsp(i,1) = digSetHsp[i].r[1]; matHsp(i,2) = digSetHsp[i].r[2];
+        // set standart weights
+        if((digSetHsp[i].kind == FIFFV_POINT_CARDINAL) && (digSetHsp[i].ident == FIFFV_POINT_NASION)) {
+            vecWeightsICP(i) = 10.0;
+        } else {
+            vecWeightsICP(i) = 1.0;
+        }
+    }
+
+    MatrixXf matHspClean;
+    VectorXi vecTake;
+
+    if(!discardOutliers(mneSurfacePoints, matHsp, transMriHead, vecTake, matHspClean, fMaxDist)) {
+        qWarning() << "Discard outliers was not succesfull.";
+    }
+    VectorXf vecWeightsICPClean(vecTake.size());
+
+    for(int i = 0; i < vecTake.size(); ++i) {
+        vecWeightsICPClean(i) = vecWeightsICP(vecTake(i));
+    }
+    if(!icp(mneSurfacePoints, matHspClean, transMriHead, iMaxIter, fTol, vecWeightsICPClean)) {
+        qWarning() << "ICP was not succesfull.";
+    }
 }
 
 //=============================================================================================================
 
-void TestCoregistration::compareTransformation()
+void TestCoregistration::compareCoreg()
 {
-    Matrix4f matDataDiff = transTestMriHead.trans - transMriHead.trans;
+    Matrix4f matDataDiff = transMriHeadRef.trans - transMriHead.trans;
     QVERIFY( matDataDiff.sum() < dEpsilon );
 }
 
