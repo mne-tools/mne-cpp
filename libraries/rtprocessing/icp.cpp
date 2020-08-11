@@ -131,15 +131,16 @@ bool RTPROCESSINGLIB::icp(const MNEProjectToSurface::SPtr mneSurfacePoints,
         matPk = transToFrom.apply_trans(matP0);
 
         // step d: compute mean-square-error and terminate if below fTol
+        vecDist = vecDist.cwiseProduct(vecDist);
         fMSE = vecDist.sum() / iNP;
         if(std::fabs(fMSE - fMSEPrev) < fTol) {
             transToFrom.invert_transform();
             transFromTo = transToFrom;
-            qInfo() << "RTPROCESSINGLIB::icp: ICP was succesfull and exceeded after " << iIter << " Iterations with MSE: " << fMSE << ".";
+            qInfo() << "RTPROCESSINGLIB::icp: ICP was succesfull and exceeded after " << iIter +1 << " Iterations with MSE dist: " << fMSE << " mm.";
             return true;
         }
         fMSEPrev = fMSE;
-        qInfo() << "RTPROCESSINGLIB::icp: ICP iteration " << iIter << " with MSE: " << fMSE << ".";
+        qInfo() << "RTPROCESSINGLIB::icp: ICP iteration " << iIter + 1 << " with MSE: " << fMSE << ".";
 
     }
 
@@ -248,6 +249,7 @@ bool RTPROCESSINGLIB::fitMatched(const MatrixXf& matSrcPoint,
     matTrans.block<3,3>(0,0) = matRot;
     matTrans.block<3,1>(0,3) = vecTrans;
     matTrans(3,3) = 1.0f;
+    matTrans.block<1,3>(3,0) = MatrixXf::Zero(1,3);
     return true;
 }
 
