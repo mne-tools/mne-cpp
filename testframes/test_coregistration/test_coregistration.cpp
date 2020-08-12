@@ -119,11 +119,12 @@ void TestCoregistration::initTestCase()
     QFile t_fileBem(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-head.fif");
     QFile t_fileTrans(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw-trans.fif");
 
-    float fTol = 0.000001;
+    float fTol = 0.00000001;
     float fMaxDist = 0.02;
 
     // read Trans
-    FiffCoordTrans transMriHeadRef(t_fileTrans);
+    transMriHeadRef = FiffCoordTrans(t_fileTrans);
+    transMriHeadRef.invert_transform();
 
     // read Bem
     MNEBem bemHead(t_fileBem);
@@ -132,9 +133,9 @@ void TestCoregistration::initTestCase()
 
     // read digitizer data
     QList<int> lPickFiducials({FIFFV_POINT_CARDINAL});
-    QList<int> lPickHSP({FIFFV_POINT_CARDINAL,FIFFV_POINT_HPI,FIFFV_POINT_EXTRA,FIFFV_POINT_EEG});
+    QList<int> lPickHSP({FIFFV_POINT_CARDINAL,FIFFV_POINT_HPI,FIFFV_POINT_EXTRA});
     FiffDigPointSet digSetSrc = FiffDigPointSet(t_fileDig).pickTypes(lPickFiducials);   // Fiducials MRI-Space
-    digSetSrc.applyTransform(transMriHeadRef, false);
+    digSetSrc.applyTransform(transMriHeadRef, true);
     FiffDigPointSet digSetDst = FiffDigPointSet(t_fileDig).pickTypes(lPickFiducials);   // Fiducials Head-Space
     FiffDigPointSet digSetHsp = FiffDigPointSet(t_fileDig).pickTypes(lPickHSP);         // Head shape points Head-Space
 
@@ -165,7 +166,7 @@ void TestCoregistration::initTestCase()
         qWarning() << "Point cloud registration not succesfull.";
     }
 
-    FiffCoordTrans transMriHead = FiffCoordTrans::make(bemSurface.data()->coord_frame, digSetDst[0].coord_frame,matTrans);
+    transMriHead = FiffCoordTrans::make(bemSurface.data()->coord_frame, digSetDst[0].coord_frame,matTrans);
 
     // Icp:
     VectorXf vecWeightsICP(digSetHsp.size()); // Weigths vector
@@ -203,7 +204,10 @@ void TestCoregistration::initTestCase()
 void TestCoregistration::compareCoreg()
 {
     Matrix4f matDataDiff = transMriHeadRef.trans - transMriHead.trans;
-    QVERIFY( matDataDiff.sum() < dEpsilon );
+    transMriHeadRef.print();
+    transMriHead.print();
+    qInfo() << matDataDiff.sum();
+    QVERIFY(std::fabs(matDataDiff.sum()) < dEpsilon);
 }
 
 //=============================================================================================================
