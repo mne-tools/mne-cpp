@@ -634,9 +634,9 @@ void ChannelSelectionView::updateSelectionGroupsList(QListWidgetItem* current, Q
 {
     Q_UNUSED(previous);
 
-    if(current == 0)
+    if(current == 0){
         return;
-
+    }
     if(current->text().contains("EEG"))
         m_pSelectionScene->m_iChannelTypeMode = FIFFV_EEG_CH;
     else
@@ -651,6 +651,8 @@ void ChannelSelectionView::updateSelectionGroupsList(QListWidgetItem* current, Q
 
     //update the channels plotted in the data view
     updateDataView();
+
+    updateBadChannels();
 }
 
 //=============================================================================================================
@@ -696,6 +698,7 @@ void ChannelSelectionView::onBtnLoadUserSelection()
         return;
 
     loadSelectionGroups(path);
+    m_pUi->m_lineEdit_loadedFile->setText(QFileInfo(path).fileName());
 }
 
 //=============================================================================================================
