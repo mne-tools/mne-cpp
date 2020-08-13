@@ -415,9 +415,6 @@ void Averaging::computeAverage()
     m_pButterflyView->setEvokedSetModel(m_pEvokedModel);
     m_pAverageLayoutView->setEvokedSetModel(m_pEvokedModel);
 
-    m_pButterflyView->setChannelInfoModel(m_pChannelInfoModel);
-    m_pAverageLayoutView->setChannelInfoModel(m_pChannelInfoModel);
-
     m_pButterflyView->dataUpdate();
     m_pButterflyView->updateView();
     m_pAverageLayoutView->updateData();
@@ -534,18 +531,6 @@ void Averaging::loadFullGui()
     m_fPostStim = static_cast<float>(m_pAveragingSettingsView->getPostStimMSeconds())/1000.f;
 
     m_bLoaded = true;
-}
-
-//=============================================================================================================
-
-void Averaging::onChannelButtonClicked()
-{
-    if(m_pChannelSelectionView->isActiveWindow()) {
-        m_pChannelSelectionView->hide();
-    } else {
-        m_pChannelSelectionView->activateWindow();
-        m_pChannelSelectionView->show();
-    }
 }
 
 //=============================================================================================================
