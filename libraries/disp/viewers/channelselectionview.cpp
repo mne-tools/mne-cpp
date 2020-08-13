@@ -353,6 +353,7 @@ void ChannelSelectionView::updateBadChannels()
     m_pSelectionScene->update();
 
     updateSceneItems();
+    updateDataView();
 }
 
 //=============================================================================================================
