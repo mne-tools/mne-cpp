@@ -161,6 +161,10 @@ signals:
      */
     void jumpToSelected();
 
+    void loadingStart();
+
+    void loadingEnd();
+
 protected slots:
 
     //=========================================================================================================
