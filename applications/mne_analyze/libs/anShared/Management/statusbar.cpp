@@ -49,6 +49,7 @@
 
 #include <QLabel>
 #include <QDebug>
+#include <QProgressBar>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -68,13 +69,23 @@ StatusBar::StatusBar(QWidget *pParent)
     : QStatusBar(pParent)
     , m_iMsgTimeout(20000)
 {
-    QVector<EVENT_TYPE> vSubs = {EVENT_TYPE::STATUS_BAR_MSG};
+    QVector<EVENT_TYPE> vSubs = {EVENT_TYPE::STATUS_BAR_MSG, EVENT_TYPE::LOADING_START, EVENT_TYPE::LOADING_END};
     m_pCommunicator = new Communicator(std::move(vSubs));
 
     this->setStyleSheet("QStatusBar { color: red}");
 
     connect(m_pCommunicator, &Communicator::receivedEvent,
             this, &StatusBar::onNewMessageReceived);
+
+    m_pProgressBar = new QProgressBar(this);
+
+    m_pProgressBar->setMinimum(0);
+    m_pProgressBar->setMaximum(0);
+    m_pProgressBar->setValue(0);
+    m_pProgressBar->setTextVisible(false);
+    m_pProgressBar->setMaximumWidth(200);
+    this->addWidget(m_pProgressBar);
+    m_pProgressBar->hide();
 }
 
 //=============================================================================================================
@@ -96,6 +107,12 @@ void StatusBar::onNewMessageReceived(const QSharedPointer<Event> pEvent)
             }
             qWarning() << "[StatusBar::onNewMessageReceived] Received a message/event that cannot be parsed";
             break;
+        }
+        case EVENT_TYPE::LOADING_START : {
+            m_pProgressBar->show();
+        }
+        case EVENT_TYPE::LOADING_END : {
+            m_pProgressBar->hide();
         }
         default:
             qWarning() << "[StatusBar::onNewMessageReceived] Received a message/event that is not handled by switch-cases";
