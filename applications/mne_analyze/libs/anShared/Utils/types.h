@@ -106,7 +106,9 @@ namespace ANSHAREDLIB
         FILTER_DESIGN_CHANGED,      // send when the designed filter changed
         CHANNEL_SELECTION_ITEMS,    // send when channel selection changes with channel info about graphic items to draw
         SCALING_MAP_CHANGED,
-        VIEW_SETTINGS_CHANGED
+        VIEW_SETTINGS_CHANGED,
+        LOADING_START,
+        LOADING_END
     };
 
     //=========================================================================================================

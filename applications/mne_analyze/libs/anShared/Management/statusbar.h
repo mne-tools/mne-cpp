@@ -56,6 +56,7 @@
 //=============================================================================================================
 
 class QLabel;
+class QProgressBar;
 
 //=============================================================================================================
 // DEFINE NAMESPACE ANSHAREDLIB
@@ -119,6 +120,8 @@ private:
     ANSHAREDLIB::Communicator *m_pCommunicator;         /**< Vector containing all plugins. */
 
     int m_iMsgTimeout;                                  /**< Timeout of one message in milliseconds. */
+
+    QProgressBar* m_pProgressBar;
 };
 
 //=============================================================================================================
