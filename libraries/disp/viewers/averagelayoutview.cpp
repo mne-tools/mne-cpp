@@ -204,6 +204,8 @@ void AverageLayoutView::setScaleMap(const QMap<qint32,float> &scaleMap)
         return;
     }
 
+    m_scaleMap = scaleMap;
+
     m_pAverageScene->setScaleMap(scaleMap);
 
     updateData();
