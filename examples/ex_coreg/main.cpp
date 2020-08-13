@@ -143,7 +143,7 @@ int main(int argc, char *argv[])
     float fMaxDist = parser.value(distOption).toFloat();
 
     // read Trans
-    FiffCoordTrans transMriHeadRef(t_fileTrans);
+    FiffCoordTrans transHeadMriRef(t_fileTrans);
 
     // read Bem
     MNEBem bemHead(t_fileBem);
@@ -153,9 +153,9 @@ int main(int argc, char *argv[])
     // read digitizer data
     QList<int> lPickFiducials({FIFFV_POINT_CARDINAL});
     QList<int> lPickHSP({FIFFV_POINT_CARDINAL,FIFFV_POINT_HPI,FIFFV_POINT_EXTRA,FIFFV_POINT_EEG});
-    FiffDigPointSet digSetSrc = FiffDigPointSet(t_fileDig).pickTypes(lPickFiducials);   // Fiducials MRI-Space
-    digSetSrc.applyTransform(transMriHeadRef, false);
-    FiffDigPointSet digSetDst = FiffDigPointSet(t_fileDig).pickTypes(lPickFiducials);   // Fiducials Head-Space
+    FiffDigPointSet digSetSrc = FiffDigPointSet(t_fileDig).pickTypes(lPickFiducials);   // Fiducials Head-Space
+    FiffDigPointSet digSetDst = FiffDigPointSet(t_fileDig).pickTypes(lPickFiducials);
+    digSetDst.applyTransform(transHeadMriRef, false);                                   // Fiducials MRI-Space
     FiffDigPointSet digSetHsp = FiffDigPointSet(t_fileDig).pickTypes(lPickHSP);         // Head shape points Head-Space
 
     // Initial Fiducial Alignment
@@ -184,9 +184,11 @@ int main(int argc, char *argv[])
         qWarning() << "Point cloud registration not succesfull.";
     }
 
-    FiffCoordTrans transMriHead = FiffCoordTrans::make(bemSurface.data()->coord_frame, digSetDst[0].coord_frame,matTrans);
+    fiff_int_t iFrom = digSetSrc[0].coord_frame;
+    fiff_int_t iTo = bemSurface.data()->coord_frame;
+    FiffCoordTrans transHeadMri = FiffCoordTrans::make(iFrom, iTo, matTrans);
 
-    // Icp:
+    // Prepare Icp:
     VectorXf vecWeightsICP(digSetHsp.size()); // Weigths vector
     int iMaxIter = 20;
     MatrixXf matHsp(digSetHsp.size(),3);
@@ -204,7 +206,8 @@ int main(int argc, char *argv[])
     MatrixXf matHspClean;
     VectorXi vecTake;
 
-    if(!discardOutliers(mneSurfacePoints, matHsp, transMriHead, vecTake, matHspClean, fMaxDist)) {
+    // discard outliers
+    if(!discardOutliers(mneSurfacePoints, matHsp, transHeadMri, vecTake, matHspClean, fMaxDist)) {
         qWarning() << "Discard outliers was not succesfull.";
     }
     VectorXf vecWeightsICPClean(vecTake.size());
@@ -212,27 +215,27 @@ int main(int argc, char *argv[])
     for(int i = 0; i < vecTake.size(); ++i) {
         vecWeightsICPClean(i) = vecWeightsICP(vecTake(i));
     }
-    if(!icp(mneSurfacePoints, matHspClean, transMriHead, iMaxIter, fTol, vecWeightsICPClean)) {
+
+    // icp
+    if(!icp(mneSurfacePoints, matHspClean, transHeadMri, iMaxIter, fTol, vecWeightsICPClean)) {
         qWarning() << "ICP was not succesfull.";
     }
-
-    qInfo() << "transMriHead:";
-    transMriHead.print();
-    qInfo() << "transMriHeadRef:";
-    transMriHeadRef.invert_transform();
-    transMriHeadRef.print();
+    qInfo() << "transHeadMri:";
+    transHeadMri.print();
+    qInfo() << "transHeadMriRef:";
+    transHeadMriRef.print();
 
     AbstractView::SPtr p3DAbstractView = AbstractView::SPtr(new AbstractView());
     Data3DTreeModel::SPtr p3DDataModel = p3DAbstractView->getTreeModel();
     DigitizerSetTreeItem* pDigSrcSetTreeItem = p3DDataModel->addDigitizerData("Sample", "Fiducials Transformed", digSetSrc);
     DigitizerSetTreeItem* pDigHspSetTreeItem = p3DDataModel->addDigitizerData("Sample", "Digitizer", digSetHsp);
-    pDigSrcSetTreeItem->setTransform(transMriHead,false);
+    pDigSrcSetTreeItem->setTransform(transHeadMri,true);
 
     BemTreeItem* pBemItem = p3DDataModel->addBemData("Sample", "Head", bemHead);
     QList<QStandardItem*> itemList = pBemItem->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
     for(int j = 0; j < itemList.size(); ++j) {
         if(BemSurfaceTreeItem* pBemItem = dynamic_cast<BemSurfaceTreeItem*>(itemList.at(j))) {
-            pBemItem->setTransform(transMriHead,false);
+            pBemItem->setTransform(transHeadMri,true);
         }
     }
 
