@@ -98,8 +98,8 @@ private slots:
 private:
     // declare your thresholds, variables and error values here
     double dEpsilon;
-    FiffCoordTrans transMriHeadRef;
-    FiffCoordTrans transMriHead;
+    FiffCoordTrans transHeadMriRef;
+    FiffCoordTrans transHeadMri;
 };
 
 //=============================================================================================================
@@ -123,8 +123,7 @@ void TestCoregistration::initTestCase()
     float fMaxDist = 0.02;
 
     // read Trans
-    transMriHeadRef = FiffCoordTrans(t_fileTrans);
-    transMriHeadRef.invert_transform();
+    transHeadMriRef = FiffCoordTrans(t_fileTrans);
 
     // read Bem
     MNEBem bemHead(t_fileBem);
@@ -134,9 +133,9 @@ void TestCoregistration::initTestCase()
     // read digitizer data
     QList<int> lPickFiducials({FIFFV_POINT_CARDINAL});
     QList<int> lPickHSP({FIFFV_POINT_CARDINAL,FIFFV_POINT_HPI,FIFFV_POINT_EXTRA});
-    FiffDigPointSet digSetSrc = FiffDigPointSet(t_fileDig).pickTypes(lPickFiducials);   // Fiducials MRI-Space
-    digSetSrc.applyTransform(transMriHeadRef, true);
-    FiffDigPointSet digSetDst = FiffDigPointSet(t_fileDig).pickTypes(lPickFiducials);   // Fiducials Head-Space
+    FiffDigPointSet digSetSrc = FiffDigPointSet(t_fileDig).pickTypes(lPickFiducials);   // Fiducials Head-Space
+    FiffDigPointSet digSetDst = FiffDigPointSet(t_fileDig).pickTypes(lPickFiducials);
+    digSetDst.applyTransform(transHeadMriRef, false);                                   // Fiducials MRI-Space
     FiffDigPointSet digSetHsp = FiffDigPointSet(t_fileDig).pickTypes(lPickHSP);         // Head shape points Head-Space
 
     // Initial Fiducial Alignment
@@ -166,9 +165,11 @@ void TestCoregistration::initTestCase()
         qWarning() << "Point cloud registration not succesfull.";
     }
 
-    transMriHead = FiffCoordTrans::make(bemSurface.data()->coord_frame, digSetDst[0].coord_frame,matTrans);
+    fiff_int_t iFrom = digSetSrc[0].coord_frame;
+    fiff_int_t iTo = bemSurface.data()->coord_frame;
+    transHeadMri = FiffCoordTrans::make(iFrom, iTo, matTrans);
 
-    // Icp:
+    // Prepare Icp:
     VectorXf vecWeightsICP(digSetHsp.size()); // Weigths vector
     int iMaxIter = 20;
     MatrixXf matHsp(digSetHsp.size(),3);
@@ -186,15 +187,17 @@ void TestCoregistration::initTestCase()
     MatrixXf matHspClean;
     VectorXi vecTake;
 
-    if(!discardOutliers(mneSurfacePoints, matHsp, transMriHead, vecTake, matHspClean, fMaxDist)) {
+    // discard outliers
+    if(!discardOutliers(mneSurfacePoints, matHsp, transHeadMri, vecTake, matHspClean, fMaxDist)) {
         qWarning() << "Discard outliers was not succesfull.";
     }
     VectorXf vecWeightsICPClean(vecTake.size());
-
     for(int i = 0; i < vecTake.size(); ++i) {
         vecWeightsICPClean(i) = vecWeightsICP(vecTake(i));
     }
-    if(!icp(mneSurfacePoints, matHspClean, transMriHead, iMaxIter, fTol, vecWeightsICPClean)) {
+
+    // icp
+    if(!icp(mneSurfacePoints, matHspClean, transHeadMri, iMaxIter, fTol, vecWeightsICPClean)) {
         qWarning() << "ICP was not succesfull.";
     }
 }
@@ -203,9 +206,9 @@ void TestCoregistration::initTestCase()
 
 void TestCoregistration::compareCoreg()
 {
-    Matrix4f matDataDiff = transMriHeadRef.trans - transMriHead.trans;
-    transMriHeadRef.print();
-    transMriHead.print();
+    Matrix4f matDataDiff = transHeadMriRef.trans - transHeadMri.trans;
+    transHeadMriRef.print();
+    transHeadMri.print();
     qInfo() << matDataDiff.sum();
     QVERIFY(std::fabs(matDataDiff.sum()) < dEpsilon);
 }
