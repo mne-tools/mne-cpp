@@ -147,6 +147,10 @@ private:
      */
     void onJumpToSelected();
 
+    void triggerLoadingStart();
+
+    void triggerLoadingEnd();
+
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals */
 
 signals:

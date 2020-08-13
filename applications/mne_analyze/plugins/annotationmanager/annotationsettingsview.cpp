@@ -620,6 +620,8 @@ void AnnotationSettingsView::initTriggerDetect(const QSharedPointer<FIFFLIB::Fif
 void AnnotationSettingsView::onDetectTriggers(const QString &sChannelName,
                                               double dThreshold)
 {
+    emit loadingStart();
+
     int iCurrentTriggerChIndex = 9999;
 
     for(int i = 0; i < m_pFiffInfo->chs.size(); ++i) {
@@ -670,7 +672,7 @@ void AnnotationSettingsView::onDetectTriggers(const QString &sChannelName,
     }
     emit triggerRedraw();
     emit groupsUpdated();
-
+    emit loadingEnd();
 }
 
 //=============================================================================================================

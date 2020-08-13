@@ -110,9 +110,11 @@ void StatusBar::onNewMessageReceived(const QSharedPointer<Event> pEvent)
         }
         case EVENT_TYPE::LOADING_START : {
             m_pProgressBar->show();
+            break;
         }
         case EVENT_TYPE::LOADING_END : {
             m_pProgressBar->hide();
+            break;
         }
         default:
             qWarning() << "[StatusBar::onNewMessageReceived] Received a message/event that is not handled by switch-cases";
