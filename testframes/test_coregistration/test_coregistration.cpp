@@ -114,7 +114,6 @@ TestCoregistration::TestCoregistration()
 void TestCoregistration::initTestCase()
 {
     // Create files
-    QFile t_fileFid(QCoreApplication::applicationDirPath() + "/MNE-sample-data/coreg/sample-fiducials.fif");
     QFile t_fileDig(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     QFile t_fileBem(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-head.fif");
     QFile t_fileTrans(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw-trans.fif");
