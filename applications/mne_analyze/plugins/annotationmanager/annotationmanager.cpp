@@ -143,6 +143,12 @@ QDockWidget *AnnotationManager::getControl()
     connect(this, &AnnotationManager::newFiffRawViewModel,
             pAnnotationSettingsView, &AnnotationSettingsView::onNewFiffRawViewModel, Qt::UniqueConnection);
 
+    connect(pAnnotationSettingsView, &AnnotationSettingsView::loadingStart,
+            this, &AnnotationManager::triggerLoadingStart, Qt::DirectConnection);
+
+    connect(pAnnotationSettingsView, & AnnotationSettingsView::loadingEnd,
+            this, &AnnotationManager::triggerLoadingEnd, Qt::DirectConnection);
+
     QDockWidget* pControl = new QDockWidget(getName());
     pControl->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
     pControl->setWidget(pAnnotationSettingsView);
@@ -229,4 +235,18 @@ void AnnotationManager::onJumpToSelected()
 void AnnotationManager::onGroupsUpdated()
 {
     m_pCommu->publishEvent(EVENT_GROUPS_UPDATED);
+}
+
+//=============================================================================================================
+
+void AnnotationManager::triggerLoadingStart()
+{
+    m_pCommu->publishEvent(LOADING_START);
+}
+
+//=============================================================================================================
+
+void AnnotationManager::triggerLoadingEnd()
+{
+    m_pCommu->publishEvent(LOADING_END);
 }
