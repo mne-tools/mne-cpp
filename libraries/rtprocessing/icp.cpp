@@ -94,23 +94,22 @@ bool RTPROCESSINGLIB::icp(const MNEProjectToSurface::SPtr mneSurfacePoints,
  */
 {
     // Initialization
-    int iNP = matPointCloud.rows();               // The number of points
+    int iNP = matPointCloud.rows();             // The number of points
     float fMSEPrev,fMSE = 0.0;                  // The mean square error
     float fScale = 1.0;
     float bScale = true;
-    MatrixXf matP0 = matPointCloud;               // Initial Set of points
+    MatrixXf matP0 = matPointCloud;             // Initial Set of points
     MatrixXf matPk = matP0;                     // Transformed Set of points
-    MatrixXf matYk(matPk.rows(),matPk.cols());  // Iterative losest points on the surface
+    MatrixXf matYk(matPk.rows(),matPk.cols());  // Iterative closest points on the surface
     MatrixXf matDiff = matYk;
     VectorXf vecSE(matDiff.rows());
     Matrix4f matTrans;                          // the transformation matrix
     VectorXi vecNearest;                        // Triangle of the new point
     VectorXf vecDist;                           // The Distance between matX and matP
 
-    // Initial transformation - apply inverse because we are computing in Model space
-    FiffCoordTrans transToFrom = transFromTo;
-    transToFrom.invert_transform();
-    matPk = transToFrom.apply_trans(matPk);
+    // Initial transformation - From point cloud To surface
+    FiffCoordTrans transICP = transFromTo;
+    matPk = transICP.apply_trans(matPk);
 
     // Icp algorithm:
     for(int iIter = 0; iIter < iMaxIter; ++iIter) {
@@ -127,15 +126,14 @@ bool RTPROCESSINGLIB::icp(const MNEProjectToSurface::SPtr mneSurfacePoints,
         }
 
         // Step c: apply registration
-        transToFrom.trans = matTrans;
-        matPk = transToFrom.apply_trans(matP0);
+        transICP.trans = matTrans;
+        matPk = transICP.apply_trans(matP0);
 
         // step d: compute mean-square-error and terminate if below fTol
         vecDist = vecDist.cwiseProduct(vecDist);
         fMSE = vecDist.sum() / iNP;
         if(std::fabs(fMSE - fMSEPrev) < fTol) {
-            transToFrom.invert_transform();
-            transFromTo = transToFrom;
+            transFromTo = transICP;
             qInfo() << "RTPROCESSINGLIB::icp: ICP was succesfull and exceeded after " << iIter +1 << " Iterations with MSE dist: " << fMSE * 1000 << " mm.";
             return true;
         }
@@ -269,10 +267,8 @@ bool RTPROCESSINGLIB::discardOutliers(const QSharedPointer<MNELIB::MNEProjectToS
     VectorXi vecNearest;                        // Triangle of the new point
     VectorXf vecDist;                           // The Distance between matX and matP
 
-    // Initial transformation - apply inverse because we are computing in Model space
-    FiffCoordTrans transToFrom = transFromTo;
-    transToFrom.invert_transform();
-    matP = transToFrom.apply_trans(matP);
+    // Initial transformation - From point cloud To surface
+    matP = transFromTo.apply_trans(matP);
 
     int iDiscarded = 0;
 
