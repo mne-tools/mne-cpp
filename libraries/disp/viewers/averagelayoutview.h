@@ -260,7 +260,7 @@ protected:
 
     QPointer<QGraphicsView>                                     m_pAverageLayoutView;       /**< View for 2D average layout scene */
 
-    SelectionItem*                                                    m_pSelItem;
+    SelectionItem*                                              m_pSelItem;
 
     QSharedPointer<QMap<QString, QColor> >                      m_qMapAverageColor;         /**< Average colors. */
     QSharedPointer<QMap<QString, bool> >                        m_qMapAverageActivation;    /**< Average activation status. */
