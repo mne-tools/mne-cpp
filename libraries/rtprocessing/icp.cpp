@@ -82,7 +82,7 @@ ICP::ICP()
 //=============================================================================================================
 
 bool RTPROCESSINGLIB::icp(const MNEProjectToSurface::SPtr mneSurfacePoints,
-                          const Eigen::MatrixXf& matDstPoint,
+                          const Eigen::MatrixXf& matPointCloud,
                           FiffCoordTrans& transFromTo,
                           const int iMaxIter,
                           const float fTol,
@@ -94,11 +94,11 @@ bool RTPROCESSINGLIB::icp(const MNEProjectToSurface::SPtr mneSurfacePoints,
  */
 {
     // Initialization
-    int iNP = matDstPoint.rows();               // The number of points
+    int iNP = matPointCloud.rows();               // The number of points
     float fMSEPrev,fMSE = 0.0;                  // The mean square error
     float fScale = 1.0;
     float bScale = true;
-    MatrixXf matP0 = matDstPoint;               // Initial Set of points
+    MatrixXf matP0 = matPointCloud;               // Initial Set of points
     MatrixXf matPk = matP0;                     // Transformed Set of points
     MatrixXf matYk(matPk.rows(),matPk.cols());  // Iterative losest points on the surface
     MatrixXf matDiff = matYk;
@@ -256,16 +256,16 @@ bool RTPROCESSINGLIB::fitMatched(const MatrixXf& matSrcPoint,
 //=========================================================================================================
 
 bool RTPROCESSINGLIB::discardOutliers(const QSharedPointer<MNELIB::MNEProjectToSurface> mneSurfacePoints,
-                                      const MatrixXf& matDstPoint,
+                                      const MatrixXf& matPointCloud,
                                       const FiffCoordTrans& transFromTo,
                                       VectorXi& vecTake,
                                       MatrixXf& matTakePoint,
                                       const float fMaxDist)
 {
     // Initialization
-    int iNP = matDstPoint.rows();               // The number of points
-    MatrixXf matP = matDstPoint;                // Initial Set of points
-    MatrixXf matYk(matDstPoint.rows(),matDstPoint.cols());  // Iterative losest points on the surface
+    int iNP = matPointCloud.rows();               // The number of points
+    MatrixXf matP = matPointCloud;                // Initial Set of points
+    MatrixXf matYk(matPointCloud.rows(),matPointCloud.cols());  // Iterative losest points on the surface
     VectorXi vecNearest;                        // Triangle of the new point
     VectorXf vecDist;                           // The Distance between matX and matP
 
@@ -288,7 +288,7 @@ bool RTPROCESSINGLIB::discardOutliers(const QSharedPointer<MNELIB::MNEProjectToS
                 vecTake.conservativeResize(vecTake.size()+1);
                 vecTake(vecTake.size()-1) = i;
                 matTakePoint.conservativeResize(matTakePoint.rows()+1,3);
-                matTakePoint.row(matTakePoint.rows()-1) = matDstPoint.row(i);
+                matTakePoint.row(matTakePoint.rows()-1) = matPointCloud.row(i);
             } else {
                 iDiscarded++;
             }
