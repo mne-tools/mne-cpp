@@ -220,12 +220,6 @@ private:
 
     //=========================================================================================================
     /**
-     * Toggles display of Channel Selection widget GUI
-     */
-    void onChannelButtonClicked();
-
-    //=========================================================================================================
-    /**
      * Connected to GUI dropdown to select group based on group name input.
      *
      * @param[in] text  name of group selected in the GUI
@@ -271,7 +265,6 @@ private:
     QSharedPointer<FIFFLIB::FiffEvoked>                     m_pFiffEvoked;              /**< Pointer to object to store averaging data */
     QSharedPointer<FIFFLIB::FiffEvokedSet>                  m_pFiffEvokedSet;           /**< Pointer to object that can store m_pFiffEvoked and be added to a model */
     QSharedPointer<DISPLIB::EvokedSetModel>                 m_pEvokedModel;             /**< Pointer to model used to display averaging data from m_pFiffEvokedSet and m_pFiffEvoked */
-    QSharedPointer<DISPLIB::ChannelSelectionView>           m_pChannelSelectionView;    /**< Pointer to Channel selection GUI */
     QSharedPointer<DISPLIB::ChannelInfoModel>               m_pChannelInfoModel;        /**< Pointer to model that holds channel info data */
     QSharedPointer<FIFFLIB::FiffInfo>                       m_pFiffInfo;                /**< Pointer to info about loaded fiff data */
 

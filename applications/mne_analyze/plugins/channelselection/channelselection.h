@@ -155,11 +155,11 @@ private:
      */
     void setFiffSettings(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
-    Ui::ChannelSelectViewSelect*                        m_pUi;
+    Ui::ChannelSelectViewSelect*                        m_pUi;                      /**< User interface for the 'Apply to View' GUI */
 
     QPointer<ANSHAREDLIB::Communicator>                 m_pCommu;                   /**< To broadcast signals */
 
-    DISPLIB::SelectionItem*                                   m_pSelItem;                 /**< Stores parameters from list of QGraphicsItems received by channelselectionview */
+    DISPLIB::SelectionItem*                             m_pSelItem;                 /**< Stores parameters from list of QGraphicsItems received by channelselectionview */
 
     QSharedPointer<DISPLIB::ChannelSelectionView>       m_pChannelSelectionView;    /**< View for selecting channels to be displayed */
     QSharedPointer<DISPLIB::ChannelInfoModel>           m_pChannelInfoModel;        /**< Hold channel info - needed to initialize channelselectionview */
