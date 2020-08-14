@@ -237,6 +237,11 @@ public:
     void showSelectedChannelsOnly(const QStringList& selectedChannels);
 
     //=========================================================================================================
+    /**
+     * Shows selected channels based on a list of selected channel indices
+     *
+     * @param [in] selectedChannelsIndexes  list of indices of channels channels to be displayed
+     */
     void showSelectedChannels(const QList<int> selectedChannelsIndexes);
 
     //=========================================================================================================

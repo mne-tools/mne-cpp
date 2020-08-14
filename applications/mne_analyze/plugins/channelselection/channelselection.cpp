@@ -67,7 +67,7 @@ using namespace ANSHAREDLIB;
 
 ChannelSelection::ChannelSelection()
 : m_pUi(new Ui::ChannelSelectViewSelect)
-, m_pSelItem(new DISPLIB::SelectionItem())
+, m_pSelectionItem(new DISPLIB::SelectionItem())
 , m_pChannelSelectionView(Q_NULLPTR)
 , m_pChannelInfoModel(Q_NULLPTR)
 , m_pFiffInfo(Q_NULLPTR)
@@ -81,6 +81,7 @@ ChannelSelection::ChannelSelection()
 
 ChannelSelection::~ChannelSelection()
 {
+    delete m_pSelectionItem;
 }
 
 //=============================================================================================================
@@ -185,8 +186,6 @@ void ChannelSelection::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel>
 
 void ChannelSelection::setFiffSettings(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo)
 {
-    qDebug() << "ChannelSelection::setFiffSettings";
-
     m_pFiffInfo = pFiffInfo;
 
     if(m_bIsInit){
@@ -195,7 +194,6 @@ void ChannelSelection::setFiffSettings(QSharedPointer<FIFFLIB::FiffInfo> pFiffIn
     }
 
     //First time set up only
-
     m_pChannelInfoModel = QSharedPointer<DISPLIB::ChannelInfoModel>(new DISPLIB::ChannelInfoModel(m_pFiffInfo));
 
     m_pChannelSelectionView = QSharedPointer<DISPLIB::ChannelSelectionView>(new DISPLIB::ChannelSelectionView(QString("MNEANALYZE/CHANSELECT"),
@@ -240,36 +238,36 @@ void ChannelSelection::onSelectionChanged(const QList<QGraphicsItem*>& selectedC
 {
     QListIterator<QGraphicsItem*> i(selectedChannelItems);
 
-    m_pSelItem->m_sChannelName.clear();
-    m_pSelItem->m_iChannelNumber.clear();
-    m_pSelItem->m_iChannelKind.clear();
-    m_pSelItem->m_iChannelUnit.clear();
-    m_pSelItem->m_qpChannelPosition.clear();
-    m_pSelItem->m_sViewsToApply.clear();
+    m_pSelectionItem->m_sChannelName.clear();
+    m_pSelectionItem->m_iChannelNumber.clear();
+    m_pSelectionItem->m_iChannelKind.clear();
+    m_pSelectionItem->m_iChannelUnit.clear();
+    m_pSelectionItem->m_qpChannelPosition.clear();
+    m_pSelectionItem->m_sViewsToApply.clear();
 
     while(i.hasNext()){
         DISPLIB::SelectionSceneItem* selectionSceneItemTemp = static_cast<DISPLIB::SelectionSceneItem*>(i.next());
 
-        m_pSelItem->m_sChannelName.append(selectionSceneItemTemp->m_sChannelName);
-        m_pSelItem->m_iChannelNumber.append(m_pChannelInfoModel->getIndexFromOrigChName(selectionSceneItemTemp->m_sChannelName.remove(' ')));
-        m_pSelItem->m_iChannelKind.append(selectionSceneItemTemp->m_iChannelKind);
-        m_pSelItem->m_iChannelUnit.append(selectionSceneItemTemp->m_iChannelUnit);
-        m_pSelItem->m_qpChannelPosition.append(selectionSceneItemTemp->m_qpChannelPosition);
+        m_pSelectionItem->m_sChannelName.append(selectionSceneItemTemp->m_sChannelName);
+        m_pSelectionItem->m_iChannelNumber.append(m_pChannelInfoModel->getIndexFromOrigChName(selectionSceneItemTemp->m_sChannelName.remove(' ')));
+        m_pSelectionItem->m_iChannelKind.append(selectionSceneItemTemp->m_iChannelKind);
+        m_pSelectionItem->m_iChannelUnit.append(selectionSceneItemTemp->m_iChannelUnit);
+        m_pSelectionItem->m_qpChannelPosition.append(selectionSceneItemTemp->m_qpChannelPosition);
     }
 
-    m_pSelItem->m_sViewsToApply.append("null");
+    m_pSelectionItem->m_sViewsToApply.append("null");
 
     if (m_pUi->m_checkBoxSignaViewer->isChecked()) {
-        m_pSelItem->m_sViewsToApply.append("signalview");
+        m_pSelectionItem->m_sViewsToApply.append("signalview");
     }
     if (m_pUi->m_checkBoxButterfly->isChecked()) {
-        m_pSelItem->m_sViewsToApply.append("butterflyview");
+        m_pSelectionItem->m_sViewsToApply.append("butterflyview");
     }
     if (m_pUi->m_checkBoxLayout->isChecked()){
-        m_pSelItem->m_sViewsToApply.append("layoutview");
+        m_pSelectionItem->m_sViewsToApply.append("layoutview");
     }
 
-    m_pCommu->publishEvent(EVENT_TYPE::CHANNEL_SELECTION_ITEMS, QVariant::fromValue(/*static_cast<void*>(*/m_pSelItem/*)*/));
+    m_pCommu->publishEvent(EVENT_TYPE::CHANNEL_SELECTION_ITEMS, QVariant::fromValue(/*static_cast<void*>(*/m_pSelectionItem/*)*/));
 }
 
 //=============================================================================================================

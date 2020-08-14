@@ -107,7 +107,7 @@ void AverageScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelIte
 
 //=============================================================================================================
 
-void AverageScene::repaintSelItems(const DISPLIB::SelectionItem &selectedChannelItems)
+void AverageScene::repaintSelectionItems(const DISPLIB::SelectionItem &selectedChannelItems)
 {
     this->clear();
 
