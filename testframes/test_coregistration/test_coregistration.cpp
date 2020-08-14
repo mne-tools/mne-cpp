@@ -114,16 +114,16 @@ TestCoregistration::TestCoregistration()
 void TestCoregistration::initTestCase()
 {
     // Create files
-    QFile t_fileDig(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-    QFile t_fileBem(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-head.fif");
-    QFile t_fileTrans(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw-trans.fif");
+    QFile t_fileDig(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif");
+    QFile t_fileBem(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/subjects/sample/bem/sample-1280-1280-1280-bem.fif");
+    QFile t_fileTrans(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/all-trans.fif");
 
     float fTol = 0.00000001;
     float fMaxDist = 0.02;
 
     // read Trans
     transHeadMriRef = FiffCoordTrans(t_fileTrans);
-
+    transHeadMriRef.invert_transform();
     // read Bem
     MNEBem bemHead(t_fileBem);
     MNEBemSurface::SPtr bemSurface = MNEBemSurface::SPtr::create(bemHead[0]);
