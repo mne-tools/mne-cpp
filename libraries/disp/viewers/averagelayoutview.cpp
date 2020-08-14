@@ -77,7 +77,6 @@ AverageLayoutView::AverageLayoutView(const QString& sSettingsPath,
                                      QWidget *parent,
                                      Qt::WindowFlags f)
 : AbstractView(parent, f)
-, m_pFiffInfo(Q_NULLPTR)
 , m_qMapAverageColor(QSharedPointer<QMap<QString, QColor> >::create())
 , m_qMapAverageActivation(QSharedPointer<QMap<QString, bool> >::create())
 {
@@ -275,10 +274,11 @@ void AverageLayoutView::channelSelectionChanged(const QVariant &data)
         qDebug() << "AverageLayoutView::channelSelectionManagerChanged - m_pAverageScene is NULL. Returning. ";
         return;
     }
-    m_pSelItem = data.value<DISPLIB::SelectionItem*>();
+
+    SelectionItem* pSelectionItem = data.value<DISPLIB::SelectionItem*>();
 
     //Repaint the average items in the average scene based on the input parameter selectedChannelItems and update them with current data
-    m_pAverageScene->repaintSelItems(*m_pSelItem);
+    m_pAverageScene->repaintSelectionItems(*pSelectionItem);
     setAverageColor(m_qMapAverageColor);
     setAverageActivation(m_qMapAverageActivation);
     setScaleMap(m_scaleMap);
@@ -290,7 +290,6 @@ void AverageLayoutView::channelSelectionChanged(const QVariant &data)
 void AverageLayoutView::updateData()
 {
     if(m_pFiffInfo) {
-
         QList<QGraphicsItem *> currentAverageSceneItems = m_pAverageScene->items();
 
         //Set new data for all averageSceneItems

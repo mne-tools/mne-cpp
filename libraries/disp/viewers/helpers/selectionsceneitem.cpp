@@ -145,7 +145,8 @@ void SelectionSceneItem::paint(QPainter *painter,
 
 //=============================================================================================================
 
-SelectionItem::SelectionItem(const SelectionItem &other){
+SelectionItem::SelectionItem(const SelectionItem &other)
+{
     m_sChannelName = other.m_sChannelName;
     m_iChannelNumber = other.m_iChannelNumber;
     m_iChannelKind = other.m_iChannelKind;
