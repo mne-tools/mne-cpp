@@ -50,28 +50,25 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
-LIBS += -L$${MNE_LIBRARY_DIR}
-CONFIG(debug, debug|release) {
-    LIBS += -lmnecppDisp3Dd \
-            -lmnecppDispd \
-	    -lmnecppRtProcessingd \
-	    -lmnecppFwdd \
-	    -lmnecppMned \
-	    -lmnecppFiffd \
-	    -lmnecppFsd \
-	    -lmnecppUtilsd \
-} else {
-    LIBS += -lmnecppDisp3D \
-            -lmnecppDisp \
-	    -lmnecppRtProcessing \
-	    -lmnecppFwd \
-	    -lmnecppMne \
-	    -lmnecppFiff \
-	    -lmnecppFs \
-	    -lmnecppUtils \
+DESTDIR =  $${MNE_BINARY_DIR}
+
+contains(MNECPP_CONFIG, static) {
+    CONFIG += static
+    DEFINES += STATICBUILD
 }
 
-DESTDIR = $${MNE_BINARY_DIR}
+LIBS += -L$${MNE_LIBRARY_DIR}
+CONFIG(debug, debug|release) {
+    LIBS += -lmnecppRtProcessingd \
+	    -lmnecppMned \
+	    -lmnecppFiffd \
+	    -lmnecppUtilsd \
+} else {
+    LIBS += -lmnecppRtProcessing \
+	    -lmnecppMne \
+	    -lmnecppFiff \
+	    -lmnecppUtils \
+}
 
 SOURCES += test_coregistration.cpp
 
@@ -91,7 +88,6 @@ win32:!contains(MNECPP_CONFIG, static) {
     QMAKE_POST_LINK += $${DEPLOY_CMD}
 }
 unix:!macx {
-    # Unix
     QMAKE_RPATHDIR += $ORIGIN/../lib
 }
 
