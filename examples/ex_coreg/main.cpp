@@ -114,6 +114,7 @@ int main(int argc, char *argv[])
     QCommandLineOption scaleOption("scale", "Weather to scale during the registration or not", "bool", "false");
     QCommandLineOption tolOption("tol", "The convergence limit for the icp algorithm.", "float", "0.001");
     QCommandLineOption distOption("dist", "The maximum distance between digitizer and head shape in mm.", "float", "0.02");
+    QCommandLineOption iterOption("iter", "The maximum number of icp iterations.", "int", "20");
 
     parser.addOption(digOption);
     parser.addOption(bemOption);
@@ -121,6 +122,7 @@ int main(int argc, char *argv[])
     parser.addOption(transOption);
     parser.addOption(tolOption);
     parser.addOption(distOption);
+    parser.addOption(iterOption);
 
     parser.process(a);
 
@@ -138,6 +140,7 @@ int main(int argc, char *argv[])
 
     float fTol = parser.value(tolOption).toFloat();
     float fMaxDist = parser.value(distOption).toFloat();
+    int iMaxIter = parser.value(iterOption).toInt();
 
     // read Trans
     FiffCoordTrans transHeadMriRef(t_fileTrans);
@@ -187,7 +190,6 @@ int main(int argc, char *argv[])
 
     // Prepare Icp:
     VectorXf vecWeightsICP(digSetHsp.size()); // Weigths vector
-    int iMaxIter = 20;
     MatrixXf matHsp(digSetHsp.size(),3);
 
     for(int i = 0; i < digSetHsp.size(); ++i) {
