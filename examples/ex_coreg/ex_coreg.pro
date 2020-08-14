@@ -2,7 +2,7 @@
 #
 # @file     ex_coreg.pro
 # @author   Ruben Dörfel <doerfelruben@aol.com>
-# @since    0.1.0
+# @since    0.1.5
 # @date     July, 2020
 #
 # @section  LICENSE
