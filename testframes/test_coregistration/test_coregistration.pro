@@ -60,15 +60,24 @@ contains(MNECPP_CONFIG, static) {
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lmnecppRtProcessingd \
+            -lmnecppConnectivityd \
+	    -lmnecppInversed \
+	    -lmnecppFwdd \
 	    -lmnecppMned \
 	    -lmnecppFiffd \
+	    -lmnecppFsd \
 	    -lmnecppUtilsd \
 } else {
-    LIBS += -lmnecppRtProcessing \
-	    -lmnecppMne \
-	    -lmnecppFiff \
-	    -lmnecppUtils \
+    LIBS += -lmnecppRtProcessingd \
+            -lmnecppConnectivityd \
+	    -lmnecppInversed \
+	    -lmnecppFwdd \
+	    -lmnecppMned \
+	    -lmnecppFiffd \
+	    -lmnecppFsd \
+	    -lmnecppUtilsd \
 }
+
 
 SOURCES += test_coregistration.cpp
 
