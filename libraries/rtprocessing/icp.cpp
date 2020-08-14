@@ -122,17 +122,17 @@ bool RTPROCESSINGLIB::icp(const MNEProjectToSurface::SPtr mneSurfacePoints,
         // step d: compute mean-square-error and terminate if below fTol
         vecDist = vecDist.cwiseProduct(vecDist);
         fMSE = vecDist.sum() / iNP;
-        if(std::fabs(fMSE - fMSEPrev) < fTol) {
+        if(std::sqrtf(std::fabs(fMSE - fMSEPrev)) < fTol) {
             transFromTo = transICP;
-            qInfo() << "RTPROCESSINGLIB::icp: ICP was succesfull and exceeded after " << iIter +1 << " Iterations with MSE dist: " << fMSE * 1000 << " mm.";
+            qInfo() << "RTPROCESSINGLIB::icp: ICP was succesfull and exceeded after " << iIter +1 << " Iterations with RMSE dist: " << std::sqrtf(fMSE) * 1000 << " mm.";
             return true;
         }
         fMSEPrev = fMSE;
-        qInfo() << "RTPROCESSINGLIB::icp: ICP iteration " << iIter + 1 << " with MSE: " << fMSE * 1000 << " mm.";
+        qInfo() << "RTPROCESSINGLIB::icp: ICP iteration " << iIter + 1 << " with RMSE: " << std::sqrtf(fMSE) * 1000 << " mm.";
 
     }
 
-    qWarning() << "RTPROCESSINGLIB::icp: ICP was not succesfull and exceeded after " << iMaxIter << " Iterations with MSE: " << fMSE * 1000 << " mm.";
+    qWarning() << "RTPROCESSINGLIB::icp: ICP was not succesfull and exceeded after " << iMaxIter << " Iterations with RMSE: " << std::sqrtf(fMSE) * 1000 << " mm.";
     return false;
 }
 
