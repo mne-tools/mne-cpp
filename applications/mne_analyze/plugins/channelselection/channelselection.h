@@ -137,8 +137,8 @@ private slots:
      * Clear all View Select checkboxes
      */
     void selectClear(bool);
-private:
 
+private:
     //=========================================================================================================
     /**
      * Receives new model and updates stored FiffInfo
@@ -159,7 +159,7 @@ private:
 
     QPointer<ANSHAREDLIB::Communicator>                 m_pCommu;                   /**< To broadcast signals */
 
-    DISPLIB::SelectionItem*                             m_pSelItem;                 /**< Stores parameters from list of QGraphicsItems received by channelselectionview */
+    DISPLIB::SelectionItem*                             m_pSelectionItem;           /**< Stores parameters from list of QGraphicsItems received by channelselectionview */
 
     QSharedPointer<DISPLIB::ChannelSelectionView>       m_pChannelSelectionView;    /**< View for selecting channels to be displayed */
     QSharedPointer<DISPLIB::ChannelInfoModel>           m_pChannelInfoModel;        /**< Hold channel info - needed to initialize channelselectionview */

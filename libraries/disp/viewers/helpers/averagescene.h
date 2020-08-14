@@ -108,7 +108,7 @@ public:
      *
      * @param [in] selectedChannelItems     data about items which are to be painted
      */
-    void repaintSelItems(const DISPLIB::SelectionItem &selectedChannelItems);
+    void repaintSelectionItems(const DISPLIB::SelectionItem &selectedChannelItems);
 
     //=========================================================================================================
     /**
