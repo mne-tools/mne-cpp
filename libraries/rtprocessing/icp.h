@@ -2,7 +2,7 @@
 /**
  * @file     icp.h
  * @author   Ruben Dörfel <doerfelruben@aol.com>
- * @since    0.1.0
+ * @since    0.1.5
  * @date     July, 2020
  *
  * @section  LICENSE
@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     ICP class declaration.
+ * @brief     ICP declarations.
  *
  */
 
@@ -141,31 +141,6 @@ RTPROCESINGSHARED_EXPORT bool discardOutliers(const QSharedPointer<MNELIB::MNEPr
                                               Eigen::VectorXi& vecTake,
                                               Eigen::MatrixXf& matTakePoint,
                                               const float fMaxDist = 0.0);
-
-//=============================================================================================================
-/**
- * Description of what this class is intended to do (in detail).
- *
- * @brief Brief description of this class.
- */
-class RTPROCESINGSHARED_EXPORT ICP
-{
-
-public:
-    typedef QSharedPointer<ICP> SPtr;            /**< Shared pointer type for ICP. */
-    typedef QSharedPointer<const ICP> ConstSPtr; /**< Const shared pointer type for ICP. */
-
-    //=========================================================================================================
-    /**
-    * Constructs a ICP object.
-    */
-    ICP();
-
-protected:
-
-private:
-
-};
 
 //=============================================================================================================
 // INLINE DEFINITIONS
