@@ -108,7 +108,6 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("Example Coregistration");
     parser.addHelpOption();
 
-    QCommandLineOption fidOption("fid", "The original point set", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/coreg/sample-fiducials.fif");
     QCommandLineOption digOption("dig", "The destination point set", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     QCommandLineOption bemOption("bem", "The bem file", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-head.fif");
     QCommandLineOption transOption("trans", "The MRI-Head transformation file", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw-trans.fif");
@@ -116,7 +115,6 @@ int main(int argc, char *argv[])
     QCommandLineOption tolOption("tol", "The convergence limit for the icp algorithm.", "float", "0.001");
     QCommandLineOption distOption("dist", "The maximum distance between digitizer and head shape in mm.", "float", "0.02");
 
-    parser.addOption(fidOption);
     parser.addOption(digOption);
     parser.addOption(bemOption);
     parser.addOption(scaleOption);
@@ -127,7 +125,6 @@ int main(int argc, char *argv[])
     parser.process(a);
 
     // get cli parameters
-    QFile t_fileFid(parser.value(fidOption));
     QFile t_fileDig(parser.value(digOption));
     QFile t_fileBem(parser.value(bemOption));
     QFile t_fileTrans(parser.value(transOption));
