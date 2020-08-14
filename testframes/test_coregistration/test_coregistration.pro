@@ -68,14 +68,14 @@ CONFIG(debug, debug|release) {
 	    -lmnecppFsd \
 	    -lmnecppUtilsd \
 } else {
-    LIBS += -lmnecppRtProcessingd \
-            -lmnecppConnectivityd \
-	    -lmnecppInversed \
-	    -lmnecppFwdd \
-	    -lmnecppMned \
-	    -lmnecppFiffd \
-	    -lmnecppFsd \
-	    -lmnecppUtilsd \
+    LIBS += -lmnecppRtProcessing \
+            -lmnecppConnectivity \
+	    -lmnecppInverse \
+	    -lmnecppFwd \
+	    -lmnecppMne \
+	    -lmnecppFiff \
+	    -lmnecppFs \
+	    -lmnecppUtils \
 }
 
 
