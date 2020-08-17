@@ -44,6 +44,8 @@
 #include <anShared/Management/communicator.h>
 #include <anShared/Utils/metatypes.h>
 
+#include <disp/viewers/scalingview.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -112,8 +114,16 @@ QDockWidget *ScalingManager::getControl()
 {
     QDockWidget* pControlDock = new QDockWidget(getName());
     pControlDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    //pControlDock->setWidget(pScalingManagerView);
     pControlDock->setObjectName(getName());
+
+    QScrollArea* wrappedScrollArea = new QScrollArea(pControlDock);
+    QVBoxLayout* pLayout = new QVBoxLayout;
+
+    DISPLIB::ScalingView* pScalingWidget = new DISPLIB::ScalingView("MNEANALYZE", wrappedScrollArea);
+
+    pLayout->addWidget(pScalingWidget);
+    wrappedScrollArea->setLayout(pLayout);
+    pControlDock->setWidget(wrappedScrollArea);
 
     return pControlDock;
 }
