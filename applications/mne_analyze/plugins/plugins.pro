@@ -45,3 +45,4 @@ SUBDIRS += \
     filtering \
     averaging \
     channelselection \
+    scalingmanager \
