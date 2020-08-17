@@ -621,18 +621,21 @@ void AnnotationSettingsView::onDetectTriggers(const QString &sChannelName,
                                               double dThreshold)
 {
     emit loadingStart();
+    QApplication::processEvents();
 
     int iCurrentTriggerChIndex = 9999;
 
     for(int i = 0; i < m_pFiffInfo->chs.size(); ++i) {
         if(m_pFiffInfo->chs[i].ch_name == sChannelName) {
             iCurrentTriggerChIndex = i;
+            QApplication::processEvents();
             break;
         }
     }
 
     if(iCurrentTriggerChIndex == 9999){
-        qWarning() << "[AnnotationSettingsView::onDetectTriggers] Channel Index not valid";
+        qWarning() << "[AnnotationSettingsView::onDetectTriggers] Channel Index not valid";\
+        emit loadingEnd();
         return;
     }
 
@@ -648,10 +651,13 @@ void AnnotationSettingsView::onDetectTriggers(const QString &sChannelName,
                                                                                               dThreshold,
                                                                                               0);
 
+    QApplication::processEvents();
+
     QMap<double,QList<int>> mEventsinTypes;
 
     for(QPair<int,double> pair : detectedTriggerSamples){
         mEventsinTypes[pair.second].append(pair.first);
+        QApplication::processEvents();
     }
 
     QList<double> keyList = mEventsinTypes.keys();
@@ -661,6 +667,8 @@ void AnnotationSettingsView::onDetectTriggers(const QString &sChannelName,
                           QColor("darkRed"), QColor("darkCyan"), QColor("darkMagenta"),
                           QColor("green"), QColor("darkGreen"), QColor("yellow"),
                           QColor("blue")};
+
+    QApplication::processEvents();
 
     for (int i = 0; i < keyList.size(); i++){
         newStimGroup(sChannelName, static_cast<int>(keyList[i]), colors[i % 10]);
