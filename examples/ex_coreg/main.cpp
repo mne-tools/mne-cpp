@@ -185,7 +185,7 @@ int main(int argc, char *argv[])
     }
 
     fiff_int_t iFrom = digSetSrc[0].coord_frame;
-    fiff_int_t iTo = bemSurface.data()->coord_frame;
+    fiff_int_t iTo = bemSurface->coord_frame;
     FiffCoordTrans transHeadMri = FiffCoordTrans::make(iFrom, iTo, matTrans);
 
     // Prepare Icp:

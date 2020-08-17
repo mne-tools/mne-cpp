@@ -74,8 +74,8 @@ using namespace FIFFLIB;
 bool RTPROCESSINGLIB::icp(const MNEProjectToSurface::SPtr mneSurfacePoints,
                           const Eigen::MatrixXf& matPointCloud,
                           FiffCoordTrans& transFromTo,
-                          const int iMaxIter,
-                          const float fTol,
+                          int iMaxIter,
+                          float fTol,
                           const VectorXf& vecWeitgths)
 /**
  * Follow notation of P.J. Besl and N.D. McKay, A Method for
@@ -106,13 +106,13 @@ bool RTPROCESSINGLIB::icp(const MNEProjectToSurface::SPtr mneSurfacePoints,
 
         // Step a: compute the closest point on the surface; eq 29
         if(!mneSurfacePoints->mne_find_closest_on_surface(matPk, iNP, matYk, vecNearest, vecDist)) {
-            qWarning() << "RTPROCESSINGLIB::icp: mne_find_closest_on_surface was not sucessfull.";
+            qWarning() << "[RTPROCESSINGLIB::icp] mne_find_closest_on_surface was not sucessfull.";
             return false;
         }
 
         // Step b: compute the registration; eq 30
         if(!fitMatched(matP0, matYk, matTrans, fScale, bScale, vecWeitgths)) {
-            qWarning() << "RTPROCESSINGLIB::icp: point cloud registration not succesfull";
+            qWarning() << "[RTPROCESSINGLIB::icp] point cloud registration not succesfull";
         }
 
         // Step c: apply registration
@@ -124,15 +124,15 @@ bool RTPROCESSINGLIB::icp(const MNEProjectToSurface::SPtr mneSurfacePoints,
         fMSE = vecDist.sum() / iNP;
         if(std::sqrt(std::fabs(fMSE - fMSEPrev)) < fTol) {
             transFromTo = transICP;
-            qInfo() << "RTPROCESSINGLIB::icp: ICP was succesfull and exceeded after " << iIter +1 << " Iterations with RMSE dist: " << std::sqrt(fMSE) * 1000 << " mm.";
+            qInfo() << "[RTPROCESSINGLIB::icp] ICP was succesfull and exceeded after " << iIter +1 << " Iterations with RMSE dist: " << std::sqrt(fMSE) * 1000 << " mm.";
             return true;
         }
         fMSEPrev = fMSE;
-        qInfo() << "RTPROCESSINGLIB::icp: ICP iteration " << iIter + 1 << " with RMSE: " << std::sqrt(fMSE) * 1000 << " mm.";
+        qInfo() << "[RTPROCESSINGLIB::icp] ICP iteration " << iIter + 1 << " with RMSE: " << std::sqrt(fMSE) * 1000 << " mm.";
 
     }
 
-    qWarning() << "RTPROCESSINGLIB::icp: ICP was not succesfull and exceeded after " << iMaxIter << " Iterations with RMSE: " << std::sqrt(fMSE) * 1000 << " mm.";
+    qWarning() << "[RTPROCESSINGLIB::icp] Maximum number of " << iMaxIter << " Iterations exceeded with RMSE: " << std::sqrt(fMSE) * 1000 << " mm.";
     return false;
 }
 
@@ -142,7 +142,7 @@ bool RTPROCESSINGLIB::fitMatched(const MatrixXf& matSrcPoint,
                                  const MatrixXf& matDstPoint,
                                  Eigen::Matrix4f& matTrans,
                                  float fScale,
-                                 const bool bScale,
+                                 bool bScale,
                                  const VectorXf& vecWeitgths)
 /**
  * Follow notation of P.J. Besl and N.D. McKay, A Method for
@@ -171,7 +171,7 @@ bool RTPROCESSINGLIB::fitMatched(const MatrixXf& matSrcPoint,
 
     // test size of point clouds
     if(matSrcPoint.size() != matDstPoint.size()) {
-        qWarning() << "RTPROCESSINGLIB::fitMatched: Point clouds do not match.";
+        qWarning() << "[RTPROCESSINGLIB::fitMatched] Point clouds do not match.";
         return false;
     }
 
@@ -248,7 +248,7 @@ bool RTPROCESSINGLIB::discardOutliers(const QSharedPointer<MNELIB::MNEProjectToS
                                       const FiffCoordTrans& transFromTo,
                                       VectorXi& vecTake,
                                       MatrixXf& matTakePoint,
-                                      const float fMaxDist)
+                                      float fMaxDist)
 {
     // Initialization
     int iNP = matPointCloud.rows();               // The number of points
@@ -265,7 +265,7 @@ bool RTPROCESSINGLIB::discardOutliers(const QSharedPointer<MNELIB::MNEProjectToS
     // discard outliers if necessary
     if(fMaxDist > 0.0) {
         if(!mneSurfacePoints->mne_find_closest_on_surface(matP, iNP, matYk, vecNearest, vecDist)) {
-            qWarning() << "RTPROCESSINGLIB::icp: mne_find_closest_on_surface was not sucessfull.";
+            qWarning() << "[RTPROCESSINGLIB::icp] mne_find_closest_on_surface was not sucessfull.";
             return false;
         }
 
@@ -280,7 +280,7 @@ bool RTPROCESSINGLIB::discardOutliers(const QSharedPointer<MNELIB::MNEProjectToS
             }
         }
     }
-    qInfo() << "RTPROCESSINGLIB::discardOutliers: " << iDiscarded << "digitizers discarded.";
+    qInfo() << "[RTPROCESSINGLIB::discardOutliers] " << iDiscarded << "digitizers discarded.";
 }
 
 //=============================================================================================================

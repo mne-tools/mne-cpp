@@ -62,11 +62,11 @@ namespace FIFFLIB{
 }
 
 namespace MNELIB{
-class MNEProjectToSurface;
+    class MNEProjectToSurface;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE NAMESPACE
+// DEFINE NAMESPACE RTPROCESSINGLIB
 //=============================================================================================================
 
 namespace RTPROCESSINGLIB {
@@ -94,8 +94,8 @@ const Eigen::VectorXf vecDefaultWeigths;
 RTPROCESINGSHARED_EXPORT bool icp(const QSharedPointer<MNELIB::MNEProjectToSurface> mneSurfacePoints,
                                   const Eigen::MatrixXf& matPointCloud,
                                   FIFFLIB::FiffCoordTrans& transFromTo,
-                                  const int iMaxIter = 20,
-                                  const float fTol = 0.001,
+                                  int iMaxIter = 20,
+                                  float fTol = 0.001,
                                   const Eigen::VectorXf& vecWeitgths = vecDefaultWeigths);
 
 //=========================================================================================================
@@ -117,7 +117,7 @@ RTPROCESINGSHARED_EXPORT bool fitMatched(const Eigen::MatrixXf& matSrcPoint,
                                          const Eigen::MatrixXf& matDstPoint,
                                          Eigen::Matrix4f& matTrans,
                                          float fScale = 1.0,
-                                         const bool bScale=false,
+                                         bool bScale=false,
                                          const Eigen::VectorXf& vecWeitgths = vecDefaultWeigths);
 
 //=========================================================================================================
@@ -140,7 +140,7 @@ RTPROCESINGSHARED_EXPORT bool discardOutliers(const QSharedPointer<MNELIB::MNEPr
                                               const FIFFLIB::FiffCoordTrans& transFromTo,
                                               Eigen::VectorXi& vecTake,
                                               Eigen::MatrixXf& matTakePoint,
-                                              const float fMaxDist = 0.0);
+                                              float fMaxDist = 0.0);
 
 //=============================================================================================================
 // INLINE DEFINITIONS
