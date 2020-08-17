@@ -532,7 +532,7 @@ jobs:
         done
         
   Doxygen:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-16.04
     needs: CreateRelease
 
     steps:
