@@ -84,6 +84,9 @@ public:
                 Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
+    ~ApplyToView();
+
+    //=========================================================================================================
     /**
      * Saves all important settings of this view via QSettings.
      */
@@ -107,6 +110,8 @@ public:
      */
     void selectClear(bool);
 
+    QList<QString> getSelectedViews();
+
 protected:
     //=========================================================================================================
     /**
@@ -125,6 +130,8 @@ protected:
     void updateProcessingMode(ProcessingMode mode);
 
     QString                     m_sSettingsPath;
+
+    QList<QString>              m_lViewList;
 
     Ui::ApplyToViewWidget*      m_pUi;
 
