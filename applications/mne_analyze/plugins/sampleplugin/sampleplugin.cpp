@@ -97,7 +97,7 @@ void SamplePlugin::unload()
 
 QString SamplePlugin::getName() const
 {
-    return "Scaling";
+    return "Sample Plugin";
 }
 
 //=============================================================================================================
