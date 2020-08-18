@@ -70,19 +70,6 @@ EEGoSportsSetupWidget::EEGoSportsSetupWidget(EEGoSports* pEEGoSports, QWidget* p
     //Connect debug file
     connect(ui.m_checkBox_WriteDriverDebugToFile, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &EEGoSportsSetupWidget::setWriteToFile);
-
-    //Fill info box
-    QFile file(m_pEEGoSports->m_qStringResourcePath+"readme.txt");
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-        return;
-
-    QTextStream in(&file);
-    while (!in.atEnd())
-    {
-        QString line = in.readLine();
-        ui.m_qTextBrowser_Information->insertHtml(line);
-        ui.m_qTextBrowser_Information->insertHtml("<br>");
-    }
 }
 
 //=============================================================================================================
