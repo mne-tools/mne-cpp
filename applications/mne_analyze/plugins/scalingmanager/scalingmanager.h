@@ -61,6 +61,10 @@ namespace ANSHAREDLIB {
     class Communicator;
 }
 
+namespace DISPLIB{
+    class ApplyToView;
+}
+
 //=============================================================================================================
 // DEFINE NAMESPACE SURFERPLUGIN
 //=============================================================================================================
@@ -106,8 +110,13 @@ public:
     virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
 
 private:
+    //=========================================================================================================
+    void onScalingChanged(const QMap<qint32, float>& scalingMap);
 
-    QPointer<ANSHAREDLIB::Communicator> m_pCommu;
+    QPointer<ANSHAREDLIB::Communicator>     m_pCommu;
+
+    DISPLIB::ApplyToView*                   m_pApplyToView;
+    ANSHAREDLIB::ScalingParameters*         m_pSelectionParameters;
 };
 
 //=============================================================================================================

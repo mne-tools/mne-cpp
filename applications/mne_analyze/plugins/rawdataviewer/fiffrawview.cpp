@@ -258,7 +258,8 @@ void FiffRawView::setScalingMap(const QMap<qint32, float>& scaleMap)
     }
 
     m_qMapChScaling = scaleMap;
-    m_pModel->setScaling(scaleMap);
+    m_qMapChScaling.detach();
+    m_pModel->setScaling(m_qMapChScaling);
 }
 
 //=============================================================================================================

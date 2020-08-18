@@ -46,3 +46,4 @@ SUBDIRS += \
     averaging \
     channelselection \
     scalingmanager \
+    sampleplugin \

@@ -221,6 +221,11 @@ void RawDataViewer::handleEvent(QSharedPointer<Event> e)
             m_pFiffRawView->showSelectedChannelsOnly(e->getData().value<DISPLIB::SelectionItem*>()->m_iChannelNumber);
         }
         break;
+    case SCALING_MAP_CHANGED:
+        if(e->getData().value<ANSHAREDLIB::ScalingParameters*>()->m_sViewsToApply.contains("signalview")){
+            m_pFiffRawView->setScalingMap(e->getData().value<ANSHAREDLIB::ScalingParameters*>()->m_mScalingMap);
+        }
+        break;
     default:
         qWarning() << "[RawDataViewer::handleEvent] Received an Event that is not handled by switch cases.";
     }
@@ -239,6 +244,7 @@ QVector<EVENT_TYPE> RawDataViewer::getEventSubscriptions(void) const
     temp.push_back(FILTER_ACTIVE_CHANGED);
     temp.push_back(FILTER_DESIGN_CHANGED);
     temp.push_back(CHANNEL_SELECTION_ITEMS);
+    temp.push_back(SCALING_MAP_CHANGED);
 
     return temp;
 }
@@ -275,8 +281,8 @@ void RawDataViewer::updateControls()
 {
     if(m_pScalingWidget && m_pSettingsViewWidget) {
         // Setup scaling widget
-        connect(m_pScalingWidget.data(), &DISPLIB::ScalingView::scalingChanged,
-                m_pFiffRawView.data(), &FiffRawView::setScalingMap, Qt::UniqueConnection);
+//        connect(m_pScalingWidget.data(), &DISPLIB::ScalingView::scalingChanged,
+//                m_pFiffRawView.data(), &FiffRawView::setScalingMap, Qt::UniqueConnection);
 
         // Setup view settings widget
         connect(m_pSettingsViewWidget.data(), &DISPLIB::FiffRawViewSettings::signalColorChanged,
