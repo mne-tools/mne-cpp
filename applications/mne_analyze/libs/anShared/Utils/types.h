@@ -102,8 +102,37 @@ namespace ANSHAREDLIB
         FILTER_CHANNEL_TYPE_CHANGED,// send when the channel type to be filtered changed
         FILTER_ACTIVE_CHANGED,      // send when the filter active state was toggled
         FILTER_DESIGN_CHANGED,      // send when the designed filter changed
-        CHANNEL_SELECTION_ITEMS     // send when channel selection changes with channel info about graphic items to draw
+        CHANNEL_SELECTION_ITEMS,    // send when channel selection changes with channel info about graphic items to draw
+        SCALING_MAP_CHANGED
+    };
+
+    //=========================================================================================================
+    /**
+     * Public struct for sending scaling parameters through the event manager
+     */
+    struct ScalingParameters{
+        QList<QString>      m_sViewsToApply;        /**< Which views should apply changes */
+        QMap<qint32, float> m_mScalingMap;          /**< Scaling map */
+    };
+
+    //=========================================================================================================
+    /**
+     * Public struct for sending channel selection parameters through the event manager
+     */
+    struct SelectionParameters{
+        QList<QString>     m_sViewsToApply;         /**< Which views should apply changes */
+        QList<QString>     m_sChannelName;          /**< The channel's name.*/
+        QList<int>         m_iChannelNumber;        /**< The channel number.*/
+        QList<int>         m_iChannelKind;          /**< The channel kind.*/
+        QList<int>         m_iChannelUnit;          /**< The channel unit.*/
+        QList<QPointF>     m_qpChannelPosition;     /**< The channel's 2D position in the scene.*/
     };
 } //NAMESPACE
+
+//Declare structs to be used in QVariant
+Q_DECLARE_METATYPE(ANSHAREDLIB::ScalingParameters);
+Q_DECLARE_METATYPE(ANSHAREDLIB::ScalingParameters*);
+Q_DECLARE_METATYPE(ANSHAREDLIB::SelectionParameters);
+Q_DECLARE_METATYPE(ANSHAREDLIB::SelectionParameters*);
 
 #endif // TYPES_H

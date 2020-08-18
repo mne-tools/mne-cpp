@@ -45,6 +45,7 @@
 #include <anShared/Utils/metatypes.h>
 
 #include <disp/viewers/scalingview.h>
+#include <disp/viewers/applytoview.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -64,6 +65,7 @@ using namespace ANSHAREDLIB;
 //=============================================================================================================
 
 ScalingManager::ScalingManager()
+: m_pSelectionParameters(new ANSHAREDLIB::ScalingParameters)
 {
 }
 
@@ -71,6 +73,9 @@ ScalingManager::ScalingManager()
 
 ScalingManager::~ScalingManager()
 {
+    if(m_pSelectionParameters){
+        delete m_pSelectionParameters;
+    }
 }
 
 //=============================================================================================================
@@ -120,10 +125,15 @@ QDockWidget *ScalingManager::getControl()
     QVBoxLayout* pLayout = new QVBoxLayout;
 
     DISPLIB::ScalingView* pScalingWidget = new DISPLIB::ScalingView("MNEANALYZE", wrappedScrollArea);
+    m_pApplyToView = new DISPLIB::ApplyToView();
 
     pLayout->addWidget(pScalingWidget);
+    pLayout->addWidget(m_pApplyToView);
     wrappedScrollArea->setLayout(pLayout);
     pControlDock->setWidget(wrappedScrollArea);
+
+    connect(pScalingWidget, &DISPLIB::ScalingView::scalingChanged,
+            this, &ScalingManager::onScalingChanged, Qt::UniqueConnection);
 
     return pControlDock;
 }
@@ -153,4 +163,18 @@ QVector<EVENT_TYPE> ScalingManager::getEventSubscriptions(void) const
     QVector<EVENT_TYPE> temp;
 
     return temp;
+}
+
+//=============================================================================================================
+
+void ScalingManager::onScalingChanged(const QMap<qint32, float> &scalingMap)
+{
+    qDebug() << "[ScalingManager::onScalingChanged]";
+
+    m_pSelectionParameters->m_sViewsToApply = m_pApplyToView->getSelectedViews();
+
+    m_pSelectionParameters->m_mScalingMap = scalingMap;
+    m_pSelectionParameters->m_mScalingMap.detach();
+
+    m_pCommu->publishEvent(EVENT_TYPE::SCALING_MAP_CHANGED, QVariant::fromValue(m_pSelectionParameters));
 }
