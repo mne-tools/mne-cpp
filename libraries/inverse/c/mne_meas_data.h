@@ -152,7 +152,7 @@ public:
     MneInverseOperator*     op;         /* Associated inverse operator */
     MNELIB::MneNamedMatrix*         fwd;        /* Forward operator for dipole fitting */
     MNELIB::MneRawData*             raw;        /* This will be non-null if the data stems from a raw data file */
-    mneChSelection          chsel;      /* Channel selection for raw data */
+    MNELIB::mneChSelection          chsel;      /* Channel selection for raw data */
     QStringList             badlist;  /* Bad channel names */
     int                     nbad;       /* How many? */
     int                     *bad;       /* Which channels are bad? */

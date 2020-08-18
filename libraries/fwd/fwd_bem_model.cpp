@@ -322,6 +322,9 @@ float **mne_mat_mat_mult_40 (float **m1,
 #endif
 }
 
+namespace FWDLIB
+{
+
 static struct {
     int  kind;
     const QString name;
@@ -336,6 +339,8 @@ static struct {
 } method_expl[] = { { FWD_BEM_CONSTANT_COLL , "constant collocation" },
 { FWD_BEM_LINEAR_COLL   , "linear collocation" },
 { -1                    , "unknown" } };
+
+}
 
 #define BEM_SUFFIX     "-bem.fif"
 #define BEM_SOL_SUFFIX "-bem-sol.fif"

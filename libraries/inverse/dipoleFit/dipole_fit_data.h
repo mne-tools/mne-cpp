@@ -67,6 +67,13 @@
 #define COLUMN_NORM_COMP 1	    /* Componentwise normalization */
 #define COLUMN_NORM_LOC  2	    /* Dipole locationwise normalization */
 
+//=============================================================================================================
+// DEFINE NAMESPACE INVERSELIB
+//=============================================================================================================
+
+namespace INVERSELIB
+{
+
 /*
  * These are the type definitions for dipole fitting
  */
@@ -85,13 +92,6 @@ typedef struct {
   void            *eeg_client;	    /* Client data for EEG field computations */
   mneUserFreeFunc eeg_client_free;
 } *dipoleFitFuncs,dipoleFitFuncsRec;
-
-//=============================================================================================================
-// DEFINE NAMESPACE INVERSELIB
-//=============================================================================================================
-
-namespace INVERSELIB
-{
 
 //=============================================================================================================
 // FORWARD DECLARATIONS

@@ -66,7 +66,7 @@ namespace COMMUNICATIONLIB
  *
  * @brief RawCommand
  */
-class COMMUNICATIONSHARED_EXPORT RawCommand : public QObject, public ICommand
+class COMMUNICATIONSHARED_EXPORT RawCommand : public QObject, public UTILSLIB::ICommand
 {
 Q_OBJECT
 

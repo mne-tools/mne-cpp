@@ -124,7 +124,14 @@
 
 #include <QStringList>
 
-#if defined(__cplusplus) 
+//=============================================================================================================
+// DEFINE NAMESPACE MNELIB
+//=============================================================================================================
+
+namespace MNELIB
+{
+
+#if defined(__cplusplus)
 extern "C" {
 #endif
 
@@ -887,7 +894,10 @@ typedef struct {
 //#define MNE_ENV_TRIGGER_CH_MASK     "MNE_TRIGGER_CH_MASK"
 #define MNE_ENV_ROOT                "MNE_ROOT"
 
-#if defined(__cplusplus) 
+#if defined(__cplusplus)
 }
 #endif
+
+} // Namespace
+
 #endif

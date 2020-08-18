@@ -1126,10 +1126,15 @@ static int c_dsvd(double **mat,		/* The matrix */
 //============================= fwd_fit_berg_scherg.c
 
 //============================= fwd_fit_berg_scherg.c
+namespace FWDLIB
+{
+
 typedef struct {
     double lambda;		/* Magnitude for the apparent dipole */
     double mu;			/* Distance multiplier for the apparent dipole */
 } *bergSchergPar,bergSchergParRec;
+
+} // Namepsace
 
 //============================= fwd_fit_berg_scherg.c
 static int comp_pars(const void *p1,const void *p2)

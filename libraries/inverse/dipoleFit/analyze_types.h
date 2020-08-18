@@ -67,6 +67,13 @@
 #include <mne/c/mne_msh_color_scale_def.h>
 #include <mne/c/mne_surface_patch.h>
 
+//=============================================================================================================
+// DEFINE NAMESPACE INVERSELIB
+//=============================================================================================================
+
+namespace INVERSELIB
+{
+
 typedef struct {
   float  megmin,megmax;             /* MEG gradiometer vertical scale [T/m] */
   float  megaxmult;                 /* Multiplier for the magnetometer scaling [m] */
@@ -307,7 +314,7 @@ typedef struct {
   int           *bads;		                     /* Which channels are bad */
   int           *sels;		                     /* Which channels have been selected for dipole fitting? */
   char          *selname;	                     /* Name of the current channel selection (if any) */
-  mneLayout     lout;				     /* This is the layout */
+  MNELIB::mneLayout     lout;				     /* This is the layout */
   mshScales     scales;				     /* Time and vertical scale and baseline */
 
   float         *custom_data;	                     /* Custom data to use instead of data picked from the responses */
@@ -473,5 +480,7 @@ typedef struct {
   float       max_coil_move;	/* Average coil movement scale */
   float       max_velocity;	/* Angular velocity scale */
 } *contHpiDataSet, contHpiDataSetRec;
+
+} // Namespace
 
 #endif

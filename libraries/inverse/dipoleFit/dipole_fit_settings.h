@@ -44,6 +44,8 @@
 #include "../inverse_global.h"
 #include "ecd_set.h"
 
+#include <mne/c/mne_types.h>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -58,23 +60,6 @@
 #include <QStringList>
 
 #define BIG_TIME 1e6
-
-#ifndef MNEFILTERDEF
-#define MNEFILTERDEF
-typedef struct {
-  bool  filter_on;          /* Is it on? */
-  int   size;               /* Length in samples (must be a power of 2) */
-  int   taper_size;         /* How long a taper in the beginning and end */
-  float highpass;           /* Highpass in Hz */
-  float highpass_width;     /* Highpass transition width in Hz */
-  float lowpass;            /* Lowpass in Hz */
-  float lowpass_width;      /* Lowpass transition width in Hz */
-  float eog_highpass;       /* EOG highpass in Hz */
-  float eog_highpass_width; /* EOG highpass transition width in Hz */
-  float eog_lowpass;        /* EOG lowpass in Hz */
-  float eog_lowpass_width;  /* EOG lowpass transition width in Hz */
-} *mneFilterDef,mneFilterDefRec;
-#endif
 
 //=============================================================================================================
 // DEFINE NAMESPACE INVERSELIB
@@ -159,18 +144,18 @@ float guess_rad;       			/**< Radius of spherical guess surface */
     bool  do_baseline;         		/**< Are both baseline limits set? */
     int   setno;             		/**< Which data set */
     bool  verbose;
-    mneFilterDefRec filter;
+    MNELIB::mneFilterDefRec filter;
     QStringList projnames;              /**< Projection file names */
     bool omit_data_proj;
 
     QString eeg_model_file;             /**< File of EEG sphere model specifications */
     QString eeg_model_name;             /**< Name of the EEG model to use */
-float  eeg_sphere_rad;      		/**< Scalp radius to use in EEG sphere model */
+    float  eeg_sphere_rad;      		/**< Scalp radius to use in EEG sphere model */
     bool    scale_eeg_pos;     		/**< Scale the electrode locations to scalp in the sphere model */
     float  mag_reg;         		/**< Noise-covariance matrix regularization for MEG (magnetometers and axial gradiometers)  */
     bool   fit_mag_dipoles;
 
-float  grad_reg;         		/**< Noise-covariance matrix regularization for EEG (planar gradiometers) */
+    float  grad_reg;         		/**< Noise-covariance matrix regularization for EEG (planar gradiometers) */
     float  eeg_reg;         		/**< Noise-covariance matrix regularization for EEG  */
     QString dipname;                    /**< Output file in dip format */
     QString bdipname;                   /**< Output file in bdip format */
