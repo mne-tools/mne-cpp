@@ -76,7 +76,6 @@
 
 using namespace Eigen;
 using namespace UTILSLIB;
-using namespace RTPROCESSINGLIB;
 using namespace FIFFLIB;
 using namespace DISP3DLIB;
 using namespace MNELIB;
@@ -180,7 +179,7 @@ int main(int argc, char *argv[])
     }
 
     // align fiducials
-    if(!fitMatched(matSrc,matDst,matTrans,fScale,bScale,vecWeights)) {
+    if(!RTPROCESSINGLIB::fitMatchedPoints(matSrc,matDst,matTrans,fScale,bScale,vecWeights)) {
         qWarning() << "Point cloud registration not succesfull.";
     }
 
@@ -206,7 +205,7 @@ int main(int argc, char *argv[])
     VectorXi vecTake;
 
     // discard outliers
-    if(!discardOutliers(mneSurfacePoints, matHsp, transHeadMri, vecTake, matHspClean, fMaxDist)) {
+    if(!RTPROCESSINGLIB::discard3DPointOutliers(mneSurfacePoints, matHsp, transHeadMri, vecTake, matHspClean, fMaxDist)) {
         qWarning() << "Discard outliers was not succesfull.";
     }
     VectorXf vecWeightsICPClean(vecTake.size());
@@ -216,7 +215,7 @@ int main(int argc, char *argv[])
     }
 
     // icp
-    if(!icp(mneSurfacePoints, matHspClean, transHeadMri, iMaxIter, fTol, vecWeightsICPClean)) {
+    if(!RTPROCESSINGLIB::performIcp(mneSurfacePoints, matHspClean, transHeadMri, iMaxIter, fTol, vecWeightsICPClean)) {
         qWarning() << "ICP was not succesfull.";
     }
     qInfo() << "transHeadMri:";
