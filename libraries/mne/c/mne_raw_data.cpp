@@ -129,6 +129,9 @@ void mne_free_cmatrix_36 (float **m)
     }
 }
 
+namespace MNELIB
+{
+
 typedef struct {
     int   size;		        /* Size of this buffer in floats */
     float *data;			/* The allocated buffer */
@@ -140,6 +143,8 @@ typedef struct {
     int        nbuf;
     int        next;
 } *ringBuf_36,ringBufRec_36;
+
+}
 
 void mne_free_ring_buffer_36(void *thisp)
 
@@ -262,6 +267,9 @@ void mne_channel_names_to_name_list(const QList<FIFFLIB::FiffChInfo>& chs,
 
 //============================= mne_apply_filter.c =============================
 
+namespace MNELIB
+{
+
 typedef struct {
     float *freq_resp;		/* Frequency response */
     float *eog_freq_resp;		/* Frequency response (EOG) */
@@ -269,6 +277,8 @@ typedef struct {
     int   np;			/* Length */
     float nprec;
 } *filterData,filterDataRec;
+
+}
 
 static void filter_data_free(void *datap)
 
@@ -555,6 +565,9 @@ void mne_create_filter_response(mneFilterDef    filter,
 
 //============================= mne_ringbuffer.c =============================
 
+namespace MNELIB
+{
+
 typedef struct {
     int   size;		        /* Size of this buffer in floats */
     float *data;			/* The allocated buffer */
@@ -566,6 +579,8 @@ typedef struct {
     int        nbuf;
     int        next;
 } *ringBuf,ringBufRec;
+
+}
 
 void mne_free_ring_buffer(void *thisp)
 

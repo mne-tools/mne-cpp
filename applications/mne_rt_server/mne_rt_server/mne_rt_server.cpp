@@ -165,7 +165,7 @@ void MNERTServer::comHelp(Command p_command)
     //
     // Generate help
     //
-    Subject::t_Observers::Iterator itObservers;
+    UTILSLIB::Subject::t_Observers::Iterator itObservers;
 
     //Map to store all commands & merging multi occurence
     QMap<QString, Command> t_qMapCommands;

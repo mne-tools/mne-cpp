@@ -561,10 +561,15 @@ void FiffCoordTransOld::fiff_coord_trans_inv(float r[], FiffCoordTransOld *t, in
 
 //=============================================================================================================
 
+namespace FIFFLIB
+{
+
 typedef struct {
     int frame;
     const char *name;
 } frameNameRec;
+
+}
 
 const char *FiffCoordTransOld::mne_coord_frame_name(int frame)
 {

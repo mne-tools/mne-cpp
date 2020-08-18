@@ -33,7 +33,7 @@ namespace COMMUNICATIONLIB
 /**
  *
  */
-class COMMUNICATIONSHARED_EXPORT CommandManager : public QObject, public IObserver
+class COMMUNICATIONSHARED_EXPORT CommandManager : public QObject, public UTILSLIB::IObserver
 {
     Q_OBJECT
 
@@ -119,7 +119,7 @@ public:
      *
      * @param[in] p_pSubject  pointer to the subject (CommandParser) to which observer (CommandManager) is attached to.
      */
-    virtual void update(Subject* p_pSubject);
+    virtual void update(UTILSLIB::Subject* p_pSubject);
 
     //=========================================================================================================
     /**

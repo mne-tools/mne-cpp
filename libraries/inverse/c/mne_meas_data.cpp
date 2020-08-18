@@ -43,6 +43,7 @@
 #include "mne_inverse_operator.h"
 
 #include <mne/c/mne_types.h>
+#include <mne/c/mne_named_matrix.h>
 
 #include <fiff/fiff_types.h>
 
@@ -148,6 +149,9 @@ float **mne_cmatrix_9(int nr,int nc)
     return m;
 }
 
+namespace INVERSELIB
+{
+
 typedef struct {
     int   size;		        /* Size of this buffer in floats */
     float *data;			/* The allocated buffer */
@@ -159,6 +163,8 @@ typedef struct {
     int        nbuf;
     int        next;
 } *ringBuf_9,ringBufRec_9;
+
+}
 
 void mne_free_ring_buffer_9(void *thisp)
 

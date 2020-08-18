@@ -92,7 +92,6 @@ HEADERS += \
     generics/circularbuffer.h \
     generics/commandpattern.h \
     generics/observerpattern.h \
-    generics/typename_old.h \
     generics/applicationlogger.h \
     spectral.h
 

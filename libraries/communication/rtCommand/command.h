@@ -74,7 +74,7 @@ static QVariant defaultVariant;
  *
  * @brief Command
  */
-class COMMUNICATIONSHARED_EXPORT Command: public QObject, public ICommand
+class COMMUNICATIONSHARED_EXPORT Command: public QObject, public UTILSLIB::ICommand
 {
 Q_OBJECT
 

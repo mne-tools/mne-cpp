@@ -110,6 +110,8 @@ static float swap_float (float source)
 
 //=============================================================================================================
 
+namespace INVERSELIB {
+
 typedef struct {
     int   dipole;               /* Which dipole in a multi-dipole set */
     float begin,end;            /* Fitting time range */
@@ -126,6 +128,8 @@ typedef struct {
     float prob;                 /* Probability to exceed khi^2 by chance */
     float noise_est;            /* Total noise estimate */
 } *bdipEcd,bdipEcdRec;
+
+} // Namespace
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
