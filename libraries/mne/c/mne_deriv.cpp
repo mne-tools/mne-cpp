@@ -60,7 +60,7 @@ void mne_free_name_list_15(char **list, int nlist)
     return;
 }
 
-void mne_free_sparse_named_matrix_15(mneSparseNamedMatrix mat)
+void mne_free_sparse_named_matrix_15(MNELIB::mneSparseNamedMatrix mat)
 /*
       * Free the matrix and all the data from within
       */

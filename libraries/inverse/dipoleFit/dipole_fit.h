@@ -137,7 +137,7 @@ public:
      *
      * @return true when successful
      */
-    static int fit_dipoles_raw(const QString& dataname, MNELIB::MneRawData* raw, mneChSelection sel, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, ECDSet& p_set);
+    static int fit_dipoles_raw(const QString& dataname, MNELIB::MneRawData* raw, MNELIB::mneChSelection sel, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, ECDSet& p_set);
 
     //=========================================================================================================
     /**
@@ -158,7 +158,7 @@ public:
      *
      * @return true when successful
      */
-    static int fit_dipoles_raw(const QString& dataname, MNELIB::MneRawData* raw, mneChSelection sel, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose);
+    static int fit_dipoles_raw(const QString& dataname, MNELIB::MneRawData* raw, MNELIB::mneChSelection sel, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose);
 
 private:
     DipoleFitSettings* settings;

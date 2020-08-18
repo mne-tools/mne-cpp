@@ -124,7 +124,7 @@ void CommandManager::insert(const QString &p_sKey, const Command &p_command)
 
 //=============================================================================================================
 
-void CommandManager::update(Subject* p_pSubject)
+void CommandManager::update(UTILSLIB::Subject* p_pSubject)
 {
     // If Manager is not active do not parse commands
     if(!m_bIsActive)

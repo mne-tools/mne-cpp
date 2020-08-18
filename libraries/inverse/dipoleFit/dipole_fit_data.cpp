@@ -456,6 +456,9 @@ FiffSparseMatrix* mne_convert_to_sparse_3(float **dense,        /* The dense mat
     return sparse;
 }
 
+namespace MNELIB
+{
+
 typedef struct {
     float          limit;
     int            report_dim;
@@ -463,6 +466,8 @@ typedef struct {
     double         B2;
     DipoleForward*  fwd;
 } *fitDipUser,fitDipUserRec;
+
+}
 
 int mne_is_diag_cov_3(MneCovMatrix* c)
 
@@ -1465,11 +1470,16 @@ int mne_simplex_minimize(float **p,		                              /* The initia
 
 //============================= fit_sphere.c =============================
 
+namespace MNELIB
+{
+
 typedef struct {
     float **rr;
     int   np;
     int   report;
 } *fitSphereUser,fitSphereUserRec;
+
+}
 
 static int report_func(int     loop,
                        float   *fitpar,
@@ -2699,10 +2709,15 @@ out : {
 
 //============================= mne_coord_transforms.c =============================
 
+namespace MNELIB
+{
+
 typedef struct {
     int frame;
     const char *name;
 } frameNameRec_3;
+
+}
 
 const char *mne_coord_frame_name_3(int frame)
 
