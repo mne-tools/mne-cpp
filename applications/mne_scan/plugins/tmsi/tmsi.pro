@@ -124,7 +124,6 @@ FORMS += \
         FormFiles/tmsisetupprojectwidget.ui
 
 RESOURCE_FILES +=\
-    $${ROOT_DIR}/resources/mne_scan/plugins/tmsi/readme.txt \
     $${ROOT_DIR}/resources/mne_scan/plugins/tmsi/loc_files/Lorenz-Duke128-28-11-2013.elc \
     $${ROOT_DIR}/resources/mne_scan/plugins/tmsi/loc_files/standard.elc \
     $${ROOT_DIR}/resources/mne_scan/plugins/tmsi/loc_files/standard_waveguard8.elc \
