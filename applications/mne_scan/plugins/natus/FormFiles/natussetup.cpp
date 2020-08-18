@@ -68,19 +68,6 @@ NatusSetup::NatusSetup(Natus* pNatus, QWidget* parent)
             this, &NatusSetup::setSamplesPerBlock);
     connect(ui.m_spinBox_numberChannels, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             this, &NatusSetup::setNumberChannels);
-
-    //Fill info box
-    QFile file(m_pNatus->m_qStringResourcePath+"readme.txt");
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-        return;
-
-    QTextStream in(&file);
-    while (!in.atEnd())
-    {
-        QString line = in.readLine();
-        ui.m_qTextBrowser_Information->insertHtml(line);
-        ui.m_qTextBrowser_Information->insertHtml("<br>");
-    }
 }
 
 //=============================================================================================================

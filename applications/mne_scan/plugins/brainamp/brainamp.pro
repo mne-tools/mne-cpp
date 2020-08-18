@@ -96,7 +96,6 @@ FORMS += \
         FormFiles/brainampsetupprojectwidget.ui \
 
 RESOURCE_FILES +=\
-    $${ROOT_DIR}/resources/mne_scan/plugins/brainamp/readme.txt \
 
 # Copy resource files to bin resource folder
 for(FILE, RESOURCE_FILES) {
