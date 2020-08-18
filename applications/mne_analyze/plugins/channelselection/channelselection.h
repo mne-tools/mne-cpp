@@ -40,7 +40,6 @@
 //=============================================================================================================
 
 #include "channelselection_global.h"
-#include "ui_channelselection.h"
 
 #include <anShared/Interfaces/IPlugin.h>
 
@@ -67,6 +66,7 @@ namespace DISPLIB {
     class ChannelSelectionView;
     class ChannelInfoModel;
     class SelectionItem;
+    class ApplyToView;
 }
 
 namespace FIFFLIB {
@@ -126,18 +126,6 @@ private slots:
      */
     void onSelectionChanged(const QList<QGraphicsItem*>& selectedChannelItems);
 
-    //=========================================================================================================
-    /**
-     * Selects all View Select checkboxes
-     */
-    void selectAll(bool);
-
-    //=========================================================================================================
-    /**
-     * Clear all View Select checkboxes
-     */
-    void selectClear(bool);
-
 private:
     //=========================================================================================================
     /**
@@ -155,13 +143,12 @@ private:
      */
     void setFiffSettings(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
-    Ui::ChannelSelectViewSelect*                        m_pUi;                      /**< User interface for the 'Apply to View' GUI */
-
     QPointer<ANSHAREDLIB::Communicator>                 m_pCommu;                   /**< To broadcast signals */
 
     DISPLIB::SelectionItem*                             m_pSelectionItem;           /**< Stores parameters from list of QGraphicsItems received by channelselectionview */
 
     QSharedPointer<DISPLIB::ChannelSelectionView>       m_pChannelSelectionView;    /**< View for selecting channels to be displayed */
+    QSharedPointer<DISPLIB::ApplyToView>                m_pApplyToView;
     QSharedPointer<DISPLIB::ChannelInfoModel>           m_pChannelInfoModel;        /**< Hold channel info - needed to initialize channelselectionview */
     QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                /**< Hold Information baout currently loaded file */
 

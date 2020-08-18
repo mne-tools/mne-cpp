@@ -69,6 +69,12 @@ ApplyToView::ApplyToView(const QString& sSettingsPath,
 
 //=============================================================================================================
 
+ApplyToView::~ApplyToView()
+{
+}
+
+//=============================================================================================================
+
 void ApplyToView::saveSettings()
 {
 
@@ -125,4 +131,25 @@ void ApplyToView::selectClear(bool bChecked)
     m_pUi->m_checkBoxSignaViewer->setChecked(false);
     m_pUi->m_checkBoxButterfly->setChecked(false);
     m_pUi->m_checkBoxLayout->setChecked(false);
+}
+
+//=============================================================================================================
+
+QList<QString> ApplyToView::getSelectedViews()
+{
+    m_lViewList.clear();
+
+    m_lViewList.append("null");
+
+    if (m_pUi->m_checkBoxSignaViewer->isChecked()) {
+        m_lViewList.append("signalview");
+    }
+    if (m_pUi->m_checkBoxButterfly->isChecked()) {
+        m_lViewList.append("butterflyview");
+    }
+    if (m_pUi->m_checkBoxLayout->isChecked()){
+        m_lViewList.append("layoutview");
+    }
+
+    return m_lViewList;
 }
