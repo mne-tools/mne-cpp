@@ -23,7 +23,7 @@ Applications, tests, and examples, link against MNE-CPP libraries (internal depe
 
 | Platform                    | Dependency solving                     |
 | --------------------------- | -------------------------------------- |
-| Windows | `windployqt` is called on all MNE-CPP libraries. Also, all MNe-CPP libraries are copied from `mne-cpp/lib` to `mne-cpp/bin` via the library's .pro file. This is needed since `windeployqt` only takes care of Qt related dependencies.| 
+| Windows | `windployqt` is called on all MNE-CPP libraries. Also, all MNE-CPP libraries are copied from `mne-cpp/lib` to `mne-cpp/bin` via the library's .pro file. This is needed since `windeployqt` only takes care of Qt related dependencies.| 
 | Linux | MNE-CPP libraries reside in `mne-cpp/lib`. `QMAKE_RPATHDIR` is specified in the executable's .pro file in order to link to the libraries in `mne-cpp/lib`. | 
 | MacOS | MNE-CPP libraries are copied to the .app `Frameworks` folder by `macdeployqt`. Tests and examples are created as normal executables and therefore need `DYLD_LIBRARY_PATH` to include the `mne-cpp/lib` folder. |
 

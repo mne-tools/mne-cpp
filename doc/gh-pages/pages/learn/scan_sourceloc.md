@@ -13,7 +13,7 @@ This tutorial will show how you can setup an acquisition and processing chain in
 The following steps will show you how to setup the online processing pipeline in MNE Scan:
 
 1. Make sure you downloaded and correctly extracted the MNE Sample data set. If not, check for a step by step guide here. On MacOS please make sure that you copied the MNE Sample data set to mne_scan.app/Contents/MacOS/ as well.
-2. Start mne_rt_server in your mne-cpp/bin folder. It is important that the mne_rt_server is started before the mne_scan executable.
+2. Start mne_rt_server in your mne-cpp/bin folder.
 3. Start mne_scan in your mne-cpp/bin folder.
 4. Navigate to the Sensor Plugins and Algorithm Plugins buttons in the plugin window. Select and position the following plugins onto the plugin scene:
  * Sensor Plugins - FiffSimulator

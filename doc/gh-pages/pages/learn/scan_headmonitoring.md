@@ -20,8 +20,8 @@ Before you can monitor head movements during a measurement, ensur eyou have the 
 Real-time head monitoring works in combination with sensor plugins, such as the `FiffSimulator` or `FieldTripBuffer`. The following steps guide you through setting up the real-time head monitoring in MNE Scan: 
 
 1. Setup the data stream. You can either:
-    * Stream pre-recorded data via the [FiffSimulator plugin](/prerecordeddata.md).
-    * Stream data from a MEG device connected via the [FieldTripBuffer plugin](../development/ftbufferplugin.md).
+    * Stream pre-recorded data via the [FiffSimulator plugin](/scan_prerecordeddata.md).
+    * Stream data from a MEG device connected via the [FieldTripBuffer plugin](../development/scan_ftbuffer.md).
 
 2. Add the HPI Fitting plugin to the plugin scene and connect your sensor plugin from step one to the HPI Plugin.
 
@@ -82,5 +82,5 @@ Here you can choose what elements you want to visualize in the monitoring sectio
 
 The HPI Fitting Plugin can be connected to following Plugins:
 
-* Input: [FiffSimulator plugin](/prerecordeddata.md), [FieldTripBuffer plugin](../development/ftbufferplugin.md).
+* Input: [FiffSimulator plugin](/scan_prerecordeddata.md), [FieldTripBuffer plugin](../development/scan_ftbuffer.md).
 * Output: [Forward Solution plugin](/scan_headmonitoring.md)

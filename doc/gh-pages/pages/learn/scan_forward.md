@@ -11,12 +11,12 @@ The forward solution plugin handles all forward computation tasks within MNE Sca
 ## Input
 
 The Forward Solution plugin takes data from following plugins:
-* Sensor Plugins: [FiffSimulator plugin](/prerecordeddata.md), [FieldTripBuffer plugin](../development/)
+* Sensor Plugins: [FiffSimulator plugin](/scan_prerecordeddata.md), [FieldTripBuffer plugin](../development/)
 * [HPI Fitting plugin](/scan_heamonitoring.md)
 
 ## Output
 
-The computed forward solution can be passed to the [Source Localization plugin](/source_loc_example.md).
+The computed forward solution can be passed to the [Source Localization plugin](/scan_sourceloc.md).
 
 ## Setup
 
@@ -63,4 +63,4 @@ In the following picture, some examples for processing pipelines, including the 
 The pipeline on the left represents an easy source localization pipeline, whereas the right one can be used to compensate head movements during the measurement. The current head position, estimated by the HPI Fitting plugin, is used to update and recompute the forward solution. For this pipeline, it is further necessary to filter out the cHPI data before averaging. For further guides on setting up the components see:
 
 * [HPI Fitting plugin](/scan_heamonitoring.md)
-* [Source Localization plugin](/source_loc_example.md).
+* [Source Localization plugin](/scan_sourceloc.md).

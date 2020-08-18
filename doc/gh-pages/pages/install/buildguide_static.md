@@ -1,9 +1,10 @@
 ---
-title: Static Build Guide
-parent: Develop
-nav_order: 4
+title: Static Linking
+parent: Build from Source
+grand_parent: Install
+nav_order: 2
 ---
-# Static Build Guide
+# Build from Source (Static Linking)
 
 This tutorial will show you how to build a static version of MNE-CPP. In order to build statically we need to perform two steps:
 

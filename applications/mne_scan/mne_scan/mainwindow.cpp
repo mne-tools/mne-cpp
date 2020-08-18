@@ -216,11 +216,15 @@ void MainWindow::loadSettings()
 
 void MainWindow::onStyleChanged(const QString& sStyle)
 {
+    qInfo() << "MainWindow::onStyleChanged";
+    qInfo() << "MainWindow::onStyleChanged sStyle" << sStyle;
     if(QApplication *pApp = qobject_cast<QApplication *>(QApplication::instance())) {
         if(sStyle == "default") {
+            qInfo() << "MainWindow::onStyleChanged 1";
             m_sCurrentStyle = "default";
             pApp->setStyleSheet("");
         } else if (sStyle == "dark") {
+            qInfo() << "MainWindow::onStyleChanged 2";
             m_sCurrentStyle = "dark";
             QFile file(":/dark.qss");
             file.open(QFile::ReadOnly);
@@ -492,7 +496,7 @@ void MainWindow::createActions()
     m_pActionStyleGroup->addAction(m_pActionDefaultMode);
     connect(m_pActionDefaultMode, &QAction::triggered,
         [=]() {
-        onStyleChanged(m_sCurrentStyle);
+        onStyleChanged("default");
     });
 
     m_pActionDarkMode = new QAction("Dark");
