@@ -91,12 +91,12 @@ const Eigen::VectorXf vecDefaultWeigths;
  * @return Wether the registration was succesfull.
  */
 
-RTPROCESINGSHARED_EXPORT bool icp(const QSharedPointer<MNELIB::MNEProjectToSurface> mneSurfacePoints,
-                                  const Eigen::MatrixXf& matPointCloud,
-                                  FIFFLIB::FiffCoordTrans& transFromTo,
-                                  int iMaxIter = 20,
-                                  float fTol = 0.001,
-                                  const Eigen::VectorXf& vecWeitgths = vecDefaultWeigths);
+RTPROCESINGSHARED_EXPORT bool performIcp(const QSharedPointer<MNELIB::MNEProjectToSurface> mneSurfacePoints,
+                                         const Eigen::MatrixXf& matPointCloud,
+                                         FIFFLIB::FiffCoordTrans& transFromTo,
+                                         int iMaxIter = 20,
+                                         float fTol = 0.001,
+                                         const Eigen::VectorXf& vecWeitgths = vecDefaultWeigths);
 
 //=========================================================================================================
 
@@ -113,17 +113,17 @@ RTPROCESINGSHARED_EXPORT bool icp(const QSharedPointer<MNELIB::MNEProjectToSurfa
  * @return Wether the matching was succesfull.
  */
 
-RTPROCESINGSHARED_EXPORT bool fitMatched(const Eigen::MatrixXf& matSrcPoint,
-                                         const Eigen::MatrixXf& matDstPoint,
-                                         Eigen::Matrix4f& matTrans,
-                                         float fScale = 1.0,
-                                         bool bScale=false,
-                                         const Eigen::VectorXf& vecWeitgths = vecDefaultWeigths);
+RTPROCESINGSHARED_EXPORT bool fitMatchedPoints(const Eigen::MatrixXf& matSrcPoint,
+                                               const Eigen::MatrixXf& matDstPoint,
+                                               Eigen::Matrix4f& matTrans,
+                                               float fScale = 1.0,
+                                               bool bScale=false,
+                                               const Eigen::VectorXf& vecWeitgths = vecDefaultWeigths);
 
 //=========================================================================================================
 
 /**
- * Discard outliers from digitizer set.
+ * Discard outliers compared to a given 3D surface
  *
  * @param [in]  mneSurfacePoints    The MNEProjectToSurface object that contains the surface triangles etc. (To).
  * @param [in]  matPointCloud       The destination point set to be registrated (From).
@@ -135,12 +135,12 @@ RTPROCESINGSHARED_EXPORT bool fitMatched(const Eigen::MatrixXf& matSrcPoint,
  * @return Wether the discarding was succesfull.
  */
 
-RTPROCESINGSHARED_EXPORT bool discardOutliers(const QSharedPointer<MNELIB::MNEProjectToSurface> mneSurfacePoints,
-                                              const Eigen::MatrixXf& matPointCloud,
-                                              const FIFFLIB::FiffCoordTrans& transFromTo,
-                                              Eigen::VectorXi& vecTake,
-                                              Eigen::MatrixXf& matTakePoint,
-                                              float fMaxDist = 0.0);
+RTPROCESINGSHARED_EXPORT bool discard3DPointOutliers(const QSharedPointer<MNELIB::MNEProjectToSurface> mneSurfacePoints,
+                                                     const Eigen::MatrixXf& matPointCloud,
+                                                     const FIFFLIB::FiffCoordTrans& transFromTo,
+                                                     Eigen::VectorXi& vecTake,
+                                                     Eigen::MatrixXf& matTakePoint,
+                                                     float fMaxDist = 0.0);
 
 //=============================================================================================================
 // INLINE DEFINITIONS
