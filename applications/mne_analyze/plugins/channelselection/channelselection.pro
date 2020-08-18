@@ -91,7 +91,6 @@ HEADERS += \
     channelselection.h
 
 FORMS += \
-    channelselection.ui \
 
 OTHER_FILES += channelselection.json
 
