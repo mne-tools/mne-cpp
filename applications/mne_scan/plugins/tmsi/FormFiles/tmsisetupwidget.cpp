@@ -93,19 +93,6 @@ TMSISetupWidget::TMSISetupWidget(TMSI* pTMSI, QWidget* parent)
             this, &TMSISetupWidget::setTriggerProperties);
     connect(m_pUi->m_checkBox_EnableKeyboardTrigger, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &TMSISetupWidget::setTriggerProperties);
-
-    //Fill info box
-    QFile file(m_pTMSI->m_qStringResourcePath+"readme.txt");
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        return;
-    }
-
-    QTextStream in(&file);
-    while (!in.atEnd()) {
-        QString line = in.readLine();
-        m_pUi->m_qTextBrowser_Information->insertHtml(line);
-        m_pUi->m_qTextBrowser_Information->insertHtml("<br>");
-    }
 }
 
 //=============================================================================================================

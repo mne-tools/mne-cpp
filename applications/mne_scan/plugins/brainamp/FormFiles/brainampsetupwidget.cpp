@@ -68,19 +68,6 @@ BrainAMPSetupWidget::BrainAMPSetupWidget(BrainAMP* pBrainAMP, QWidget* parent)
             this, &BrainAMPSetupWidget::setSamplingFreq);
     connect(ui.m_spinBox_BlockSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             this, &BrainAMPSetupWidget::setSamplesPerBlock);
-
-    //Fill info box
-    QFile file(m_pBrainAMP->m_qStringResourcePath+"readme.txt");
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-        return;
-
-    QTextStream in(&file);
-    while (!in.atEnd())
-    {
-        QString line = in.readLine();
-        ui.m_qTextBrowser_Information->insertHtml(line);
-        ui.m_qTextBrowser_Information->insertHtml("<br>");
-    }
 }
 
 //=============================================================================================================

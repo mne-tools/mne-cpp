@@ -106,7 +106,6 @@ FORMS += \
         FormFiles/natussetup.ui \
 
 RESOURCE_FILES +=\
-    $${ROOT_DIR}/resources/mne_scan/plugins/natus/readme.txt \
 
 # Copy resource files from repository to bin resource folder
 COPY_CMD = $$copyResources($${RESOURCE_FILES})
