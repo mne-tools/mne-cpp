@@ -71,12 +71,12 @@ using namespace FIFFLIB;
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-bool RTPROCESSINGLIB::icp(const MNEProjectToSurface::SPtr mneSurfacePoints,
-                          const Eigen::MatrixXf& matPointCloud,
-                          FiffCoordTrans& transFromTo,
-                          int iMaxIter,
-                          float fTol,
-                          const VectorXf& vecWeitgths)
+bool RTPROCESSINGLIB::performIcp(const MNEProjectToSurface::SPtr mneSurfacePoints,
+                                 const Eigen::MatrixXf& matPointCloud,
+                                 FiffCoordTrans& transFromTo,
+                                 int iMaxIter,
+                                 float fTol,
+                                 const VectorXf& vecWeitgths)
 /**
  * Follow notation of P.J. Besl and N.D. McKay, A Method for
  * Registration of 3-D Shapes, IEEE Trans. Patt. Anal. Machine Intell., 14,
@@ -111,7 +111,7 @@ bool RTPROCESSINGLIB::icp(const MNEProjectToSurface::SPtr mneSurfacePoints,
         }
 
         // Step b: compute the registration; eq 30
-        if(!fitMatched(matP0, matYk, matTrans, fScale, bScale, vecWeitgths)) {
+        if(!fitMatchedPoints(matP0, matYk, matTrans, fScale, bScale, vecWeitgths)) {
             qWarning() << "[RTPROCESSINGLIB::icp] point cloud registration not succesfull";
         }
 
@@ -138,12 +138,12 @@ bool RTPROCESSINGLIB::icp(const MNEProjectToSurface::SPtr mneSurfacePoints,
 
 //=============================================================================================================
 
-bool RTPROCESSINGLIB::fitMatched(const MatrixXf& matSrcPoint,
-                                 const MatrixXf& matDstPoint,
-                                 Eigen::Matrix4f& matTrans,
-                                 float fScale,
-                                 bool bScale,
-                                 const VectorXf& vecWeitgths)
+bool RTPROCESSINGLIB::fitMatchedPoints(const MatrixXf& matSrcPoint,
+                                       const MatrixXf& matDstPoint,
+                                       Eigen::Matrix4f& matTrans,
+                                       float fScale,
+                                       bool bScale,
+                                       const VectorXf& vecWeitgths)
 /**
  * Follow notation of P.J. Besl and N.D. McKay, A Method for
  * Registration of 3-D Shapes, IEEE Trans. Patt. Anal. Machine Intell., 14,
@@ -243,12 +243,12 @@ bool RTPROCESSINGLIB::fitMatched(const MatrixXf& matSrcPoint,
 
 //=========================================================================================================
 
-bool RTPROCESSINGLIB::discardOutliers(const QSharedPointer<MNELIB::MNEProjectToSurface> mneSurfacePoints,
-                                      const MatrixXf& matPointCloud,
-                                      const FiffCoordTrans& transFromTo,
-                                      VectorXi& vecTake,
-                                      MatrixXf& matTakePoint,
-                                      float fMaxDist)
+bool RTPROCESSINGLIB::discard3DPointOutliers(const QSharedPointer<MNELIB::MNEProjectToSurface> mneSurfacePoints,
+                                             const MatrixXf& matPointCloud,
+                                             const FiffCoordTrans& transFromTo,
+                                             VectorXi& vecTake,
+                                             MatrixXf& matTakePoint,
+                                             float fMaxDist)
 {
     // Initialization
     int iNP = matPointCloud.rows();               // The number of points

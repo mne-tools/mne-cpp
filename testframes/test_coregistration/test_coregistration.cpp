@@ -79,7 +79,7 @@ using namespace MNELIB;
 /**
  * DECLARE CLASS TestCoregistration
  *
- * @brief The TestFiffRWR class provides read write read fiff verification tests
+ * @brief The TestCoregistration class provides a coregistration verification tests
  *
  */
 class TestCoregistration: public QObject
@@ -124,6 +124,7 @@ void TestCoregistration::initTestCase()
     // read Trans
     transHeadMriRef = FiffCoordTrans(t_fileTrans);
     transHeadMriRef.invert_transform();
+
     // read Bem
     MNEBem bemHead(t_fileBem);
     MNEBemSurface::SPtr bemSurface = MNEBemSurface::SPtr::create(bemHead[0]);
@@ -160,7 +161,7 @@ void TestCoregistration::initTestCase()
     }
 
     // align fiducials
-    if(!fitMatched(matSrc,matDst,matTrans,fScale,bScale,vecWeights)) {
+    if(!RTPROCESSINGLIB::fitMatchedPoints(matSrc,matDst,matTrans,fScale,bScale,vecWeights)) {
         qWarning() << "Point cloud registration not succesfull.";
     }
 
@@ -187,7 +188,7 @@ void TestCoregistration::initTestCase()
     VectorXi vecTake;
 
     // discard outliers
-    if(!discardOutliers(mneSurfacePoints, matHsp, transHeadMri, vecTake, matHspClean, fMaxDist)) {
+    if(!RTPROCESSINGLIB::discard3DPointOutliers(mneSurfacePoints, matHsp, transHeadMri, vecTake, matHspClean, fMaxDist)) {
         qWarning() << "Discard outliers was not succesfull.";
     }
     VectorXf vecWeightsICPClean(vecTake.size());
@@ -196,7 +197,7 @@ void TestCoregistration::initTestCase()
     }
 
     // icp
-    if(!icp(mneSurfacePoints, matHspClean, transHeadMri, iMaxIter, fTol, vecWeightsICPClean)) {
+    if(!RTPROCESSINGLIB::performIcp(mneSurfacePoints, matHspClean, transHeadMri, iMaxIter, fTol, vecWeightsICPClean)) {
         qWarning() << "ICP was not succesfull.";
     }
 }
