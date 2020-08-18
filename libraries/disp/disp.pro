@@ -98,6 +98,7 @@ SOURCES += \
     plots/tfplot.cpp \
     plots/helpers/colormap.cpp \
     viewers/abstractview.cpp \
+    viewers/applytoview.cpp \
     viewers/filterdesignview.cpp \
     viewers/averagelayoutview.cpp \
     viewers/fwdsettingsview.cpp \
@@ -150,6 +151,7 @@ HEADERS += \
     plots/tfplot.h \
     plots/helpers/colormap.h \
     viewers/abstractview.h \
+    viewers/applytoview.h \
     viewers/filterdesignview.h \
     viewers/averagelayoutview.h \
     viewers/fwdsettingsview.h \
@@ -223,6 +225,7 @@ FORMS += \
     viewers/formfiles/hpisettingsview.ui \
     viewers/formfiles/scalingview.ui \
     viewers/formfiles/filtersettingsview.ui \
+    viewers/formfiles/applytoview.ui \
 
 RESOURCE_FILES +=\
     $${ROOT_DIR}/resources/general/default_filters/BP_1Hz_40Hz_Fs1kHz.txt \
