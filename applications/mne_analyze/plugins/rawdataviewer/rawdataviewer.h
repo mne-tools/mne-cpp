@@ -148,7 +148,6 @@ private:
     int                                             m_iVisibleBlocks;           /**< The amount of visible data blocks. Default is set to 10. */
     int                                             m_iBufferBlocks;            /**< The amount of buffered data blocks. Default is set to 10. */
 
-    QPointer<DISPLIB::ScalingView>                  m_pScalingWidget;           /**< The scaling view, which needs to be updated between file sessions. */
     QPointer<DISPLIB::FiffRawViewSettings>          m_pSettingsViewWidget;      /**< The fiff raw view settings, which needs to be updated between file sessions. */
 
     QPointer<FiffRawView>                           m_pFiffRawView;             /**< View for Fiff data. */

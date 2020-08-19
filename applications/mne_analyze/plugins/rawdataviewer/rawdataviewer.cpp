@@ -141,17 +141,6 @@ QDockWidget *RawDataViewer::getControl()
     QScrollArea* wrappedScrollArea = new QScrollArea(pControlDock);
     QVBoxLayout* pLayout = new QVBoxLayout;
 
-    //Scaling Widget
-    QLabel* title_scaling = new QLabel();
-    title_scaling->setTextFormat(Qt::RichText);
-    title_scaling->setText("<b>Channel Scaling</b>");
-
-    m_pScalingWidget = new ScalingView("MNEANALYZE", wrappedScrollArea);
-    connect(this, &RawDataViewer::guiModeChanged,
-            m_pScalingWidget.data(), &ScalingView::setGuiMode);
-    pLayout->addWidget(title_scaling);
-    pLayout->addWidget(m_pScalingWidget);
-
     //View Widget
     QLabel* title_viewsettings = new QLabel();
     title_viewsettings->setTextFormat(Qt::RichText);
@@ -279,11 +268,7 @@ void RawDataViewer::onModelChanged(QSharedPointer<AbstractModel> pNewModel)
 
 void RawDataViewer::updateControls()
 {
-    if(m_pScalingWidget && m_pSettingsViewWidget) {
-        // Setup scaling widget
-//        connect(m_pScalingWidget.data(), &DISPLIB::ScalingView::scalingChanged,
-//                m_pFiffRawView.data(), &FiffRawView::setScalingMap, Qt::UniqueConnection);
-
+    if(m_pSettingsViewWidget) {
         // Setup view settings widget
         connect(m_pSettingsViewWidget.data(), &DISPLIB::FiffRawViewSettings::signalColorChanged,
                 m_pFiffRawView.data(), &FiffRawView::setSignalColor, Qt::UniqueConnection);
@@ -299,7 +284,6 @@ void RawDataViewer::updateControls()
                 m_pFiffRawView.data(), &FiffRawView::onMakeScreenshot, Qt::UniqueConnection);
 
         // Preserve settings between different file sessions
-        m_pFiffRawView->setScalingMap(m_pScalingWidget->getScaleMap());
         m_pFiffRawView->setWindowSize(m_pSettingsViewWidget->getWindowSize());
         m_pFiffRawView->setSignalColor(m_pSettingsViewWidget->getSignalColor());
         m_pFiffRawView->setBackgroundColor(m_pSettingsViewWidget->getBackgroundColor());
