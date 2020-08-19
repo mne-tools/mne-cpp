@@ -1,6 +1,7 @@
 ---
 title: API Documentation
-parent: Develop
+parent: MNE Lib
+grand_parent: Develop
 nav_order: 1
 ---
 
