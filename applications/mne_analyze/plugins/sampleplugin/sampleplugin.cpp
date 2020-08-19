@@ -132,6 +132,15 @@ QDockWidget *SamplePlugin::getControl()
 
 QWidget *SamplePlugin::getView()
 {
+    //If the plugin has a view:
+    QWidget* pPluginView = new QWidget();
+    QVBoxLayout* pViewLayout = new QVBoxLayout();
+
+    pPluginView->setLayout(pViewLayout);
+
+    return pPluginView;
+
+    //If the plugin does not have a view:
     return Q_NULLPTR;
 }
 
