@@ -11,7 +11,7 @@ This plugin adds support for LSL data streams to MNE Scan. For more information 
 * [LSL on Github](https://github.com/sccn/labstreaminglayer){:target="_blank" rel="noopener"}
 * [Building the LSL library from source](https://labstreaminglayer.readthedocs.io/dev/lib_dev.html#building-liblsl){:target="_blank" rel="noopener"}
 
-## Compilation of the LSL submodule
+## Compilation of the LSL Submodule
 
 Make sure that you have the LSL git submodule by typing:
 
@@ -31,7 +31,7 @@ cmake --build . --config Release --target install
 
 For a MSVC 2017 build you need to use `Visual Studio 15 2017 Win64` instead.
 
-## LSL plugin setup
+## LSL Plugin Setup
 
 * After the steps above make sure that you use the `MNECPP_CONFIG` flag `withLsl`. You can also set the flag manually in the [mne-cpp.pri file](https://github.com/mne-tools/mne-cpp/blob/master/mne-cpp.pri#L135){:target="_blank" rel="noopener"}.
 * Build MNE Scan.

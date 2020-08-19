@@ -4,7 +4,7 @@ parent: MNE Scan
 grand_parent: Develop
 nav_order: 10
 ---
-# Creating a new plugin
+# Creating a New Plugin
 
 |**Please note:** The information provided on this page might be outdated and will be updated soon.|
 

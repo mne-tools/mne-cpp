@@ -4,9 +4,7 @@ parent: MNE Scan
 grand_parent: Develop
 nav_order: 1
 ---
-# Acquisition plugins in MNE Scan
-
-## Structure of an acquisition plugin
+# Acquisition Plugins in MNE Scan
 
 The acquisition plugins of MNE Scan have similiar structure and therefore can be explained on the basis of the gUSBamp EEG driver example. The following flow sheet describes the structure of this acquisition plugin.
 

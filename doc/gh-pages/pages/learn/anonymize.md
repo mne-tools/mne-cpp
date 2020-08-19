@@ -16,43 +16,6 @@ PHI or PII can be substituted with default or user-specified values. This way, i
 
 For instance, a field included as PHI could be the **measurment date and time** (see the following paragraph for more information). With MNE Anonymize application, the measurement date and time inside a FiFF file can be either substituted with a default date or it can be modified by a number of days offset. This way, you could de-identify this field in each file within a database of FIFF files and you could then distribute the files for research purposes. At any given time, knowing the number of days to offset the measurement date, a file can be **re-identified**. (Note. This is just an example, typically *.fif* files carry a lot more protected information apart from the measurement date).
 
-## Introduction to HIPAA law 
-
-Fiff files may include Personal Health Information and Personal Identifyable information. The consequences of openly distributing this kind of protected information can be dire. Typically, the regulatory bodies in charge of these issues in each state or country will describe methods for deidentify and anonymize data. In the United States of America, the law related to this problem is the well-known HIPAA, issued by the US Department of Health and Human Services (HHS). This law mentions two main ways  to know when it is OK to distribute a file with patient information in it ([more information](https://svdecomposer.github.io/mne-cpp/pages/learn/mneanonymize.html#introduction-on-HIPAA-law). 
-
-MNE Anonymize is designed to implement the "safe harbor" approach, by which if the data is stripped from the following info, it is then considered "safe":
-
-* Names
-* All geographic subdivisions smaller than a state, including street address, city, county, precinct, ZIP code, and their equivalent geocodes, except for the initial three digits of the ZIP code if, according to the current publicly available data from the Bureau of the Census:
-* All elements of dates (except year) for dates that are directly related to an individual, including birth date, admission date, discharge date, death date, and all ages over 89 and all elements of dates (including year) indicative of such age, except that such ages and elements may be aggregated into a single category of age 90 or older
-* Telephone numbers
-* Vehicle identifiers and serial numbers, including license plate numbers
-* Fax numbers
-* Device identifiers and serial numbers
-* Email addresses
-* Web Universal Resource Locators (URLs)
-* Social security numbers
-* Internet Protocol (IP) addresses
-* Medical record numbers
-* Biometric identifiers, including finger and voice prints
-* Health plan beneficiary numbers
-* Full-face photographs and any comparable images
-* Account numbers
-* Any other unique identifying number, characteristic, or code, except for specific  codes/names assigned to a certain file which could allow to *re-identify* the file. For instance, a new research-oriented id# asigned to a specific subject. There are two requirements for this exception: (1) this new code/number must not be derived from the actual data, and (2) the actual relational table between each code and the protected information cannot be disclosed.
-* Certificate/license numbers
-
-Depending on the settings during acquisition the FIFF files may contain few or many of the previous fields, stored in plain text, i.e., in unencrypted form.
-
-## How is the file modified
-
-An initial approach to deal with sensible information in a file would be to just delete it or maybe alter it "in-place", like other applications do. However, we think this is not a good idea. Firstly, some of these fields, like `Subject Name` or `Measuremenet date`, are needed and expected by other software packages, to simply delete them might cause some trouble later. Moreover, it doesn't seem to be a neat job to alter the actual information by *masking* it with a default character set, e.g., substituing the name `Peter` `C` `Smith` with `xxxxx` `x` `xxxxx`. Some of the fields of data in a FIFF file are quite long, and an individual subject might have a particularly long name. Therefore, a subject might not be properly de-identified or anonymized if we were to follow this route. But most importantly, we consider that the best way to modify the information in a FIFF file is to recompute completely the actual information and the structure it is stored in.
-
-Since the FIFF format implies a linked list of `tags` with information in them, MNE Anonymize will follow this list of tags from the begining until the end, while creating a new `tag` with *anonymized* or *de-identified* information wherever needed. This way, "hidden tags" or *unlinked* tags in the input file will not be copied to the output. The so-called `free list` of tags, will not be copied to the output anonymized file either. The tag directory will not be copied to the output file either. This implies that the actual final size of the output file will slightly differ from the input file. 
-
-If a specific `tag` with PHI or PII infomation is not present in the FIFF file, `mne_anonymize` will not create it.
-
-MNE Anonymize does not modify the input file. Moreover, this application can even read from write-protected folders. The new/altered output information will be stored in a newly created FIFF file. However, depending on the options, after MNE Anonymize has processed a FIFF file, there might be no way to recover the original information. Use this application with caution.
-
 ## GUI Mode
 
 MNE Anonymize binary file is named `mne_anonymize`. By default, the application is executed in GUI mode. However, if you want to run `mne_anonymize` in GUI mode but you still want to initialize some of the options through a command line call, you can allways do so through the actual command prompt. For example, if you execute `mne_anonymize --in example.fif -bdf` the GUI will start and the options in it will be already set accordingly. The application recognizes several command line options, see bellow.
@@ -81,7 +44,6 @@ MNE Anonymize can also be executed in command line mode. This is intended for us
 |`--sbo --subject_birthday_offset <value>` *optional*| Specify number of <days> to subtract to the subject's birthday. Only allowed when anonymizing a single file. Default: 0 |
 |`--his <value>` *optional*| Specify a Subject's ID within the Hospital system. Only allowed when anonymizing a single file. Default: 'mne_anonymize' |
 |`--mne_environment` *optional*| Also anonymize information added to the fif file through MNE Toolbox, like Working Directory or Command used. Default: false |
-
 
 ## Modified FIFF *tags*
 
@@ -159,3 +121,40 @@ Typical use with abbreviated options. This command will call `mne_anonymize`, sp
 ```
 mne_anonymize -i ./MNE-sample-data/MEG/sample/sample_audvis_raw.fif -vbdf --mdo 35
 ```
+
+## Introduction to HIPAA law 
+
+Fiff files may include Personal Health Information and Personal Identifyable information. The consequences of openly distributing this kind of protected information can be dire. Typically, the regulatory bodies in charge of these issues in each state or country will describe methods for deidentify and anonymize data. In the United States of America, the law related to this problem is the well-known HIPAA, issued by the US Department of Health and Human Services (HHS). This law mentions two main ways  to know when it is OK to distribute a file with patient information in it ([more information](https://svdecomposer.github.io/mne-cpp/pages/learn/mneanonymize.html#introduction-on-HIPAA-law). 
+
+MNE Anonymize is designed to implement the "safe harbor" approach, by which if the data is stripped from the following info, it is then considered "safe":
+
+* Names
+* All geographic subdivisions smaller than a state, including street address, city, county, precinct, ZIP code, and their equivalent geocodes, except for the initial three digits of the ZIP code if, according to the current publicly available data from the Bureau of the Census:
+* All elements of dates (except year) for dates that are directly related to an individual, including birth date, admission date, discharge date, death date, and all ages over 89 and all elements of dates (including year) indicative of such age, except that such ages and elements may be aggregated into a single category of age 90 or older
+* Telephone numbers
+* Vehicle identifiers and serial numbers, including license plate numbers
+* Fax numbers
+* Device identifiers and serial numbers
+* Email addresses
+* Web Universal Resource Locators (URLs)
+* Social security numbers
+* Internet Protocol (IP) addresses
+* Medical record numbers
+* Biometric identifiers, including finger and voice prints
+* Health plan beneficiary numbers
+* Full-face photographs and any comparable images
+* Account numbers
+* Any other unique identifying number, characteristic, or code, except for specific  codes/names assigned to a certain file which could allow to *re-identify* the file. For instance, a new research-oriented id# asigned to a specific subject. There are two requirements for this exception: (1) this new code/number must not be derived from the actual data, and (2) the actual relational table between each code and the protected information cannot be disclosed.
+* Certificate/license numbers
+
+Depending on the settings during acquisition the FIFF files may contain few or many of the previous fields, stored in plain text, i.e., in unencrypted form.
+
+## How is the File Modified
+
+An initial approach to deal with sensible information in a file would be to just delete it or maybe alter it "in-place", like other applications do. However, we think this is not a good idea. Firstly, some of these fields, like `Subject Name` or `Measuremenet date`, are needed and expected by other software packages, to simply delete them might cause some trouble later. Moreover, it doesn't seem to be a neat job to alter the actual information by *masking* it with a default character set, e.g., substituing the name `Peter` `C` `Smith` with `xxxxx` `x` `xxxxx`. Some of the fields of data in a FIFF file are quite long, and an individual subject might have a particularly long name. Therefore, a subject might not be properly de-identified or anonymized if we were to follow this route. But most importantly, we consider that the best way to modify the information in a FIFF file is to recompute completely the actual information and the structure it is stored in.
+
+Since the FIFF format implies a linked list of `tags` with information in them, MNE Anonymize will follow this list of tags from the begining until the end, while creating a new `tag` with *anonymized* or *de-identified* information wherever needed. This way, "hidden tags" or *unlinked* tags in the input file will not be copied to the output. The so-called `free list` of tags, will not be copied to the output anonymized file either. The tag directory will not be copied to the output file either. This implies that the actual final size of the output file will slightly differ from the input file. 
+
+If a specific `tag` with PHI or PII infomation is not present in the FIFF file, `mne_anonymize` will not create it.
+
+MNE Anonymize does not modify the input file. Moreover, this application can even read from write-protected folders. The new/altered output information will be stored in a newly created FIFF file. However, depending on the options, after MNE Anonymize has processed a FIFF file, there might be no way to recover the original information. Use this application with caution.

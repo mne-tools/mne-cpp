@@ -1,9 +1,9 @@
 <!-- ---
-title: MNE Forward Solution CLI
+title: MNE Forward Solution
 parent: Learn
 nav_order: 5
 ---
-# MNE Forward Solution CLI
+# MNE Forward Solution
 
 ## Command line options 
 
