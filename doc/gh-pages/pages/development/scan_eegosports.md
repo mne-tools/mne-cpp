@@ -8,7 +8,7 @@ nav_order: 4
 
 This page describes the installation and usage of the EEGoSports driver plugin for MNE Scan.
 
-## Building the EEGoSports plugin
+## Building the EEGoSports Plugin
 
 In order to build the EEGoSports driver plugin, the `eemagine` folder from the SDK has to be added to the EEGoSports folder in the mne-cpp repository in a first step. This location can be found in the mne-cpp repository under:
 
@@ -24,7 +24,7 @@ In order to reintegrate the eegosports subproject into mne-cpp, its comment stat
 
 Now, the whole EEGoSports plugin can be rebuilt. MNE Scan will then contain the EEGoSports plugin in its Sensor plugin section.
 
-## Running the EEGoSports plugin
+## Running the EEGoSports Plugin
 
 For a correct recognition of the EEGoSports device, the operating system compatible driver has to be installed with the delivered software. Furthermore the two files `eego-SDK.lib` and `eego-SDK.dll` from the driver's library have to be copied to the location:
 
@@ -46,7 +46,7 @@ The GUI of the EEGoSports EEG plugin allows the adjustment of sample frequency a
 
 Besides the electrode measurements, the FIFF-data-stream additionally contains one channel for the reference electrode, the trigger channel, and the sample count channel.
 
-## Impedance measurements
+## Impedance Measurements
 
 Selecting the <img src="../../images/impedances.png" alt="impedance widget symbol" width="32"/> symbol opens the widget for impedance measurements.
 

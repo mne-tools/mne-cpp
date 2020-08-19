@@ -23,7 +23,7 @@ git push origin gh-pages
 
 Make sure that `gh-pages` is activated in your forked MNE-CPP repository settigns. You can check: mne-cpp > Settings > Options > GitHub Pages > Source: gh-pages branch.
 
-## Make your changes to the documentation
+## Make your Changes to the Documentation
 
 Create a new branch named `docu` and do your changes locally in that branch. When ready, commit and push your changes to your remote repository forked from MNE-CPP's.
 

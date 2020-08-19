@@ -23,7 +23,7 @@ Git/
 └── mne-cpp_shadow/
 ```
 
-## Basic information on Qt Wasm with MNE-CPP 
+## Basic Information on Qt Wasm with MNE-CPP 
 
 According to the official [Qt Wasm guide](https://wiki.qt.io/Qt_for_WebAssembly){:target="_blank" rel="noopener"}, the preferred emscripten versions are:
 
@@ -36,7 +36,7 @@ Qt 5.15: 1.39.8
 
  | **Please note:** With the versions above some functions are not able to be linked and produce errors. It is possible that some MNE-CPP functions are not compatible with these emscripten versions. However, emscripten version 1.39.3 and 1.39.8 seem to be working with MNE-CPP code. The following setups should work: **Qt5.13.2 compiled with em++ 1.39.3 with thread support**, **Qt5.14.2 compiled with em++ 1.39.3 with thread support** and  **Qt5.15.0 compiled with em++ 1.39.8 with thread support**. | 
 
-## Setup the emscripten compiler
+## Setup the Emscripten Compiler
 
 Get the [emscripten](https://emscripten.org/){:target="_blank" rel="noopener"} compiler:
 
@@ -58,7 +58,7 @@ git pull
 source ./emsdk_env.sh
 ```
 
-## Build Qt from source with Wasm support
+## Build Qt from Source with Wasm Support
 
 This is needed since we want to have threading support which is deactivated for the pre-built QtWasm build. Also, the pre-built QtWasm binaries are build with emscripten version 1.38.30 which does not work with MNE-CPP code.
 
@@ -106,7 +106,7 @@ make install -j8
 
 A static Qt Wasm version should now be setup in the `qt5_wasm_binaries` folder.
 
-## Building MNE-CPP against QtWasm
+## Building MNE-CPP Against QtWasm
 
 MNE-CPP needs to be build statically. This is automatically done if the `wasm` flag is set. Create a shadow build folder, run `qmake` and build MNE-CPP:
 
@@ -119,7 +119,7 @@ make -j8
 
 This should build all Wasm enabled applications, e.g. MNE Analyze, to `mne-cpp/bin`.
 
-## Run an application
+## Run an Application
 
 Navigate to `mne-cpp/bin` and start a server:
 
@@ -133,13 +133,13 @@ Start to a suitable web browser (Chromium based browsers and Mozilla seem to wor
 http://localhost:8000/mne_analyze.html
 ```
 
-## Example builds
+## Example Builds
 
 Example builds can be found here (Chromium based and Mozilla browsers seem to work the best):
 
   [https://mne-cpp.github.io/wasm/mne_analyze.html](https://mne-cpp.github.io/wasm/mne_analyze.html){:target="_blank" rel="noopener"}
 
-## General notes and helpful information
+## General Notes and Helpful Information
 
  * CentOS7 at Martinos does not seem to have a high enough gcc version
      installed.
@@ -159,7 +159,7 @@ Example builds can be found here (Chromium based and Mozilla browsers seem to wo
 
  * For browser support information see [https://caniuse.com/#feat=wasm](https://caniuse.com/#feat=wasm){:target="_blank" rel="noopener"}.
 
-## Wasm references
+## Wasm References
 
 [https://www.qt.io/blog/2018/11/19/getting-started-qt-webassembly](https://www.qt.io/blog/2018/11/19/getting-started-qt-webassembly){:target="_blank" rel="noopener"}
 

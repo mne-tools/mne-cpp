@@ -11,7 +11,7 @@ The event manager is used to create, display, and save events. Events in MNE Ana
 
 ![](../../images/analyze/mne_an_annotationmanager_2.png)
 
-### Adding events manually
+### Adding Events Manually
 
 To add an event group, select a name and type for the group and press `Create`. Select a color when prompted.
 
@@ -21,7 +21,7 @@ To add an event, right click on the data plot in the spot you wish to add, and s
 
 ![](../../images/analyze/mne_an_annotationmanager_3.png)
 
-### Adding events from stim
+### Adding Events from Stim
 
 Click the `Load from Stim Channels` button to bring up the Trigger Detection widget.
 
@@ -31,7 +31,7 @@ Select the channel from which to load events, and a threshold for detecting trig
 
 Press `Detect Triggers` to load in events. This may take a few seconds depending on how many events are being loaded.
 
-### Managing and viewing events
+### Managing and Viewing Events
 
 Event groups will be added to the left side of the event table. The right side will display the events in the currently selected event group. Event groups can be renamed, recolored, or deleted by right clicking them and selecting the corresponding action.
 

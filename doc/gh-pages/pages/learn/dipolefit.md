@@ -1,9 +1,9 @@
 <!-- ---
-title: MNE Dipole Fit CLI
+title: MNE Dipole Fit
 parent: Learn
 nav_order: 4
 ---
-# MNE Dipole Fit CLI
+# MNE Dipole Fit
 
 ## Command line options 
 

@@ -29,7 +29,7 @@ Please note that Qt 5.10.0 or higher is needed in order to have full Qt3D suppor
 
 After the installation is finished make sure to add the Qt bin folder (e.g. `<QtFolder>\5.14.2\msvc2017_64\bin`) to your `PATH` variable. On Linux and MacOS you might also need to add the Qt lib folder (e.g. `<QtFolder>\5.14.2\msvc2017_64\lib`) to the `LD_LIBRARY_PATH` and `DYLD_LIBRARY_PATH`, respectivley.
 
-## Get the source code
+## Get the Source Code
 
 Fork [MNE-CPP's main repository](https://github.com/mne-tools/mne-cpp){:target="_blank" rel="noopener"} to your own GitHub account. For a detailed guide on how to fork a repository, we recommend checking out the [guide on the official GitHub website](https://help.github.com/en/github/getting-started-with-github/fork-a-repo){:target="_blank" rel="noopener"}. 
 
@@ -52,7 +52,7 @@ git fetch --all
 git rebase upstream/master
 ```
 
-## Compile the source code
+## Compile the Cource Code
 
 ### Via QtCreator (recommended)
 
@@ -65,7 +65,7 @@ git rebase upstream/master
 5. Right mouse click again and then hit Build (this step may take some time). Wait until progress bar in lower right corner turns green.
 6. After the build process is finished, go to the `mne-cpp/bin` folder. All applications and libraries should have been created throughout the build process.
 
-### Via command line
+### Via Command Line
 
 Create a shadow build folder, run `qmake` on `mne-cpp.pro` and build:
 
@@ -77,6 +77,6 @@ cd mne-cpp_shadow
 make -j8 # On Linux and MacOS
 ```
 
-## Test the build
+## Test the Build
 
 In order to run the examples you must download the MNE-Sample-Data-Set from [here](https://osf.io/86qa2/download){:target="_blank" rel="noopener"} and extract the files to `mne-cpp/bin/MNE-sample-data`. Once finished you can try to run one of the examples, e.g., ex_disp3D. If the build was successfull the example should start and display a window including a 3D brain as well as a source localization result.

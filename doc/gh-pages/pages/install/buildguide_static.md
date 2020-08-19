@@ -21,7 +21,7 @@ Git/
 └── mne-cpp_shadow/
 ```
 
-## Get a compiler
+## Get a Compiler
 
 Make sure you have one of the following compilers installed:
 
@@ -29,9 +29,9 @@ Make sure you have one of the following compilers installed:
 |---------|-------|-------|
 | min. MSVC 2015 (We recommend the [MSVC 2017 Community Version](https://visualstudio.microsoft.com/vs/older-downloads/){:target="_blank" rel="noopener"} compiler. During install exclude everything except for VC++, Win 10 SDK and ATL support) | min. [GCC 5.3.1](https://gcc.gnu.org/releases.html){:target="_blank" rel="noopener"} | min. [Clang 3.5](https://developer.apple.com/xcode/){:target="_blank" rel="noopener"}|
 
-## Build a static version of Qt
+## Build a Static Version of Qt
 
-### Get the Qt source code
+### Get the Qt Aource Code
 
 Clone the current Qt version. Currently, MNE-CPP uses four Qt modules: QtBase, QtCharts, QtSvg and Qt3D. QtBase subdivides in other modules reflecting most of the Qt functionality (core, gui, widgets, etc). In order to setup the sources for Qt 5.14.2 type:
 

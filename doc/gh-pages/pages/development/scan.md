@@ -2,7 +2,7 @@
 title: MNE Scan
 has_children: true
 parent: Develop
-nav_order: 3
+nav_order: 1
 ---
 # MNE Scan Development Resources
 
