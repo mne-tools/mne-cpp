@@ -1,6 +1,6 @@
----
+<!-- ---
 title: MNE Dipole Fit CLI
-# parent: Learn # Uncomment for now until refactoring of C code is complete
+parent: Learn
 nav_order: 4
 ---
 # MNE Dipole Fit CLI
@@ -103,4 +103,4 @@ General:
 ## Examples
 ```
 mne_dipole_fit --meas ./MNE-sample-data/MEG/sample/sample_audvis-ave.fif --noise ./MNE-sample-data/MEG/sample/sample_audvis-cov.fif --bem ./MNE-sample-data/subjects/sample/bem/sample-5120-bem.fif --mri ./MNE-sample-data/MEG/sample/sample_audvis_raw-trans.fif --set 1 --meg --tmin 32 --tmax 148 --bmin -100 --bmax 0 --gui --dip ./MNE-sample-data/Result/dip-result.dat
-```
+``` -->
