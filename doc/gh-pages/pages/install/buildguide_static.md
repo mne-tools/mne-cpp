@@ -21,6 +21,14 @@ Git/
 └── mne-cpp_shadow/
 ```
 
+## Get a compiler
+
+Make sure you have one of the following compilers installed:
+
+| Windows | Linux | MacOS |
+|---------|-------|-------|
+| min. MSVC 2015 (We recommend the [MSVC 2017 Community Version](https://visualstudio.microsoft.com/vs/older-downloads/){:target="_blank" rel="noopener"} compiler. During install exclude everything except for VC++, Win 10 SDK and ATL support) | min. [GCC 5.3.1](https://gcc.gnu.org/releases.html){:target="_blank" rel="noopener"} | min. [Clang 3.5](https://developer.apple.com/xcode/){:target="_blank" rel="noopener"}|
+
 ## Build a static version of Qt
 
 ### Get the Qt source code

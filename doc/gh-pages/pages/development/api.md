@@ -1,16 +1,9 @@
 ---
-title: API Documentation
+title: MNE Lib
+has_children: true
 parent: Develop
 nav_order: 1
 ---
+# MNE-CPP Libraries (API)
 
-<!DOCTYPE html>
-<html>
-   <head>
-      <title>HTML Meta Tag</title>
-      <meta http-equiv = "refresh" content = "0; url = https://mne-cpp.github.io/doxygen-api/annotated.html"/>
-   </head>
-   <body>
-      <p>Redirecting to another URL</p>
-   </body>
-</html>
+Below are some guides to get you started with using MNE-CPP's libraries and their API. 
