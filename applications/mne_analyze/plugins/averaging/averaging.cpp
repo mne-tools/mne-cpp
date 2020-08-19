@@ -257,7 +257,9 @@ void Averaging::handleEvent(QSharedPointer<Event> e)
             break;
         case CHANNEL_SELECTION_ITEMS:
             setChannelSelection(e->getData());
-
+            break;
+        case SCALING_MAP_CHANGED:
+            setScalingMap(e->getData());
             break;
         default:
             qWarning() << "[Averaging::handleEvent] Received an Event that is not handled by switch cases.";
@@ -274,6 +276,7 @@ QVector<EVENT_TYPE> Averaging::getEventSubscriptions(void) const
     temp.push_back(FILTER_DESIGN_CHANGED);
     temp.push_back(EVENT_GROUPS_UPDATED);
     temp.push_back(CHANNEL_SELECTION_ITEMS);
+    temp.push_back(SCALING_MAP_CHANGED);
 
     return temp;
 }
@@ -599,4 +602,17 @@ void Averaging::setChannelSelection(const QVariant &data)
     if(data.value<DISPLIB::SelectionItem*>()->m_sViewsToApply.contains("butterflyview")){
         emit showSelectedChannels(data.value<DISPLIB::SelectionItem*>()->m_iChannelNumber);
     }
+}
+
+//=============================================================================================================
+
+void Averaging::setScalingMap(const QVariant &data)
+{
+    if(data.value<ANSHAREDLIB::ScalingParameters*>()->m_sViewsToApply.contains("layoutview")){
+        m_pAverageLayoutView->setScaleMap(data.value<ANSHAREDLIB::ScalingParameters*>()->m_mScalingMap);
+    }
+    if(data.value<ANSHAREDLIB::ScalingParameters*>()->m_sViewsToApply.contains("butterflyview")){
+        m_pButterflyView->setScaleMap(data.value<ANSHAREDLIB::ScalingParameters*>()->m_mScalingMap);
+    }
+
 }
