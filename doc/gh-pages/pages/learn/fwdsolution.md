@@ -1,6 +1,6 @@
 ---
 title: MNE Forward Solution CLI
-parent: Learn
+# parent: Learn # Uncomment for now until refactoring of C code is complete
 nav_order: 5
 ---
 # MNE Forward Solution CLI

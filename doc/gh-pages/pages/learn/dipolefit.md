@@ -1,6 +1,6 @@
 ---
 title: MNE Dipole Fit CLI
-parent: Learn
+# parent: Learn # Uncomment for now until refactoring of C code is complete
 nav_order: 4
 ---
 # MNE Dipole Fit CLI
