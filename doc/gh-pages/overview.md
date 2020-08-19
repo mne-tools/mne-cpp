@@ -34,10 +34,10 @@ To that end, we aim to create software that allows users to do as much or as lit
 
 MNE-CPP is a community project. Contributions by new developers are always welcomed and greatly appreciated. If you are planning to contribute to MNE-CPP our [contributor page](pages/contribute/contribute.md) is a good point to start.
 
-Currently, MNE-CPP's development efforts can be divided into the following projects:
+Currently, MNE-CPP's main development efforts can be divided into the following projects:
 
 | ![MNEScan](images/icon_mne_scan_256x256.png) | **MNE Scan** is the real time component of MNE CPP. With its acquisition and algorithmic plugin architecture it is able to acquire and process data of several MEG/EEG systems (TMSI Refa, eegosports, gtec, brainamp, LSL, VectorView, BabyMEG) in real-time. It is in active clinical use at the Boston Children’s Hospital. |
 | ![MNEAnalyze](images/icon_mne-analyze_256x256.png) | **MNE Analyze** provides an easy to use GUI for sensor and source level analysis. |
-| ![MNELib](images/icon_mne-lib_256x256.png) | **MNE Lib** describes the core libraries provided by the MNE-CPP project. MNE Scan and MNE Analyze are solely based on these libraries. |
+| ![MNELib](images/icon_mne-lib_256x256.png) | **MNE Lib** describes the core libraries provided by the MNE-CPP project. All MNE-CPP applications, e.g., MNE Scan and MNE Analyze, are solely based on these libraries, Qt5 and Eigen. |
 
-Releases are versioned based on [semantic versioning](https://semver.org/). Currently all features are subject to change as we are still making broad changes to the libraries and applications of MNE CPP.
+Releases are versioned based on [semantic versioning](https://semver.org/). Currently all features are subject to change as we are still making broad changes to the libraries and applications of MNE-CPP.
