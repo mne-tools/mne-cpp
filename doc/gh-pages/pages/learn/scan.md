@@ -1,10 +1,10 @@
 ---
-title: MNE Scan GUI
+title: MNE Scan
 has_children: true
 parent: Learn
 nav_order: 1
 ---
-# MNE Scan GUI
+# MNE Scan
 
 ![](https://github.com/mne-cpp/media/blob/master/images/sourceloc.gif?raw=true)
 

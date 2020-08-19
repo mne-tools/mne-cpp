@@ -1,6 +1,6 @@
 ---
 title: Real-time Head Monitoring
-parent: MNE Scan GUI
+parent: MNE Scan
 grand_parent: Learn
 nav_order: 3
 ---

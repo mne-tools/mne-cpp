@@ -1,5 +1,5 @@
 ---
-title: MNE Analyze GUI
+title: MNE Analyze
 has_children: true
 parent: Learn
 nav_order: 2
