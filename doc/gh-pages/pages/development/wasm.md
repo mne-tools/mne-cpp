@@ -2,7 +2,7 @@
 title: WebAssembly
 has_children: true
 parent: Develop
-nav_order: 3
+nav_order: 4
 ---
 # WebAssembly Development Resources
 
