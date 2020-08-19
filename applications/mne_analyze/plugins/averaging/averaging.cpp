@@ -442,20 +442,6 @@ void Averaging::loadFullGui()
 
     m_pAverageLayoutView->setEvokedSetModel(m_pEvokedModel);
 
-    //Scaling View
-    DISPLIB::ScalingView* pScalingView = new DISPLIB::ScalingView(QString("MNEANALYZE/AVERAGING"));
-    pScalingView->setObjectName("group_tab_View_Scaling");
-
-    connect(pScalingView, &DISPLIB::ScalingView::scalingChanged,
-            m_pButterflyView.data(), &DISPLIB::ButterflyView::setScaleMap, Qt::UniqueConnection);
-
-    connect(pScalingView, &DISPLIB::ScalingView::scalingChanged,
-            m_pAverageLayoutView.data(), &DISPLIB::AverageLayoutView::setScaleMap, Qt::UniqueConnection);
-
-
-    m_pButterflyView->setScaleMap(pScalingView->getScaleMap());
-    m_pAverageLayoutView->setScaleMap(pScalingView->getScaleMap());
-
     //Modality selection
     DISPLIB::ModalitySelectionView* pModalitySelectionView = new DISPLIB::ModalitySelectionView(m_pFiffInfo->chs,
                                                                               QString("MNEANALYZE/AVERAGING"));
@@ -523,7 +509,6 @@ void Averaging::loadFullGui()
     m_pAverageLayoutView->setBackgroundColor(pChannelDataSettingsView->getBackgroundColor());
     m_pButterflyView->setBackgroundColor(pChannelDataSettingsView->getBackgroundColor());
 
-    m_pTabView->addTab(pScalingView, "Scaling");
     m_pTabView->addTab(pModalitySelectionView, "Modality");
 
     //Update saved params
@@ -608,6 +593,10 @@ void Averaging::setChannelSelection(const QVariant &data)
 
 void Averaging::setScalingMap(const QVariant &data)
 {
+    if(!m_bLoaded){
+        return;
+    }
+
     if(data.value<ANSHAREDLIB::ScalingParameters*>()->m_sViewsToApply.contains("layoutview")){
         m_pAverageLayoutView->setScaleMap(data.value<ANSHAREDLIB::ScalingParameters*>()->m_mScalingMap);
     }

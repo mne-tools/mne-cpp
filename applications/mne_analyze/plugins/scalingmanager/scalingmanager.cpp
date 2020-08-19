@@ -135,6 +135,9 @@ QDockWidget *ScalingManager::getControl()
     connect(pScalingWidget, &DISPLIB::ScalingView::scalingChanged,
             this, &ScalingManager::onScalingChanged, Qt::UniqueConnection);
 
+    m_pSelectionParameters->m_mScalingMap = pScalingWidget->getScaleMap();
+    m_pSelectionParameters->m_mScalingMap.detach();
+
     return pControlDock;
 }
 
@@ -150,6 +153,9 @@ QWidget *ScalingManager::getView()
 void ScalingManager::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
+    case SELECTED_MODEL_CHANGED:
+        onScalingChanged(m_pSelectionParameters->m_mScalingMap);
+        break;
     default:
         qWarning() << "[ScalingManager::handleEvent] received an Event that is not handled by switch-cases";
         break;
@@ -161,6 +167,7 @@ void ScalingManager::handleEvent(QSharedPointer<Event> e)
 QVector<EVENT_TYPE> ScalingManager::getEventSubscriptions(void) const
 {
     QVector<EVENT_TYPE> temp;
+    temp.push_back(SELECTED_MODEL_CHANGED);
 
     return temp;
 }
@@ -178,3 +185,6 @@ void ScalingManager::onScalingChanged(const QMap<qint32, float> &scalingMap)
 
     m_pCommu->publishEvent(EVENT_TYPE::SCALING_MAP_CHANGED, QVariant::fromValue(m_pSelectionParameters));
 }
+
+//=============================================================================================================
+
