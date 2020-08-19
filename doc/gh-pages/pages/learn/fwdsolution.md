@@ -1,6 +1,6 @@
----
+<!-- ---
 title: MNE Forward Solution CLI
-# parent: Learn # Uncomment for now until refactoring of C code is complete
+parent: Learn
 nav_order: 5
 ---
 # MNE Forward Solution CLI
@@ -36,4 +36,4 @@ Input data:
 --fwd  name       save the solution here
 --help            print this info.
 --version         print version info.
-```
+``` -->
