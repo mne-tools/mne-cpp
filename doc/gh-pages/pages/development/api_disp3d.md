@@ -7,7 +7,7 @@ nav_order: 2
 
 # Disp3D 
 
-All 3D visualization in MNE-CPP is realized within the Disp3D library, which is based on the Qt3D module. Qt3D is part of the Qt framework and actively developed by the KDAB group. The Qt3D module offers a layer on top of native OpenGL or Vulkan. It supports cross-platform compilation, is seamlessly integrated into the Qt framework and thus does not impose another external dependency on MNE-CPP. Qt3D utilizes a so called framegraph and scenegraph approach. The framegraph is a description of how to render. The scenegraph is a description of what to render and is represented by an Enitity-Relationship-Model (ECM). In an ECM, entities describe general purpose objects, which aggregate so called components. These components are highly versatile and describe what the object is actually made of. In case of Qt3D, a component can, e.g., be a surface mesh, material, 3D transformation, etc. The framegraph includes information about different render stages and specifies what each render run is composed of.
+All 3D visualization in MNE-CPP is realized within the Disp3D library, which is based on the Qt3D module. Qt3D is part of the Qt framework and actively developed by the KDAB group. The Qt3D module offers a layer on top of native OpenGL or Vulkan. It supports cross-platform compilation, is seamlessly integrated into the Qt framework and thus does not impose another external dependency on MNE-CPP. Qt3D utilizes a so called framegraph and scenegraph approach. The framegraph is a description of how to render. The scenegraph is a description of what to render and is represented by an Entity-Relationship-Model (ECM). In an ECM, entities describe general purpose objects, which aggregate so called components. These components are highly versatile and describe what the object is actually made of. In case of Qt3D, a component can, e.g., be a surface mesh, material, 3D transformation, etc. The framegraph includes information about different render stages and specifies what each render run is composed of.
 
 ![](../../images/lib/disp3d_architecture.png "The Disp3D architecture")
 
@@ -15,7 +15,7 @@ The above figure depicts a simplified version of the Disp3D architecture and com
 
 Disp3D is backboned by its own tree (graph) based model *Data3DTreeModel* to store and organize data. The renderable tree model items inherit from the *Renderable3DEntity* class which itself inherits from Qt3D's *QEntity* class. Hence, next to organizing Disp3D's data, the *Data3DTreeModel* also serves as the scenegraph needed to render a 3D scene with Qt3D. Each tree item specializes in the visualization of a specific data type and includes parameters to change the visualization options on the fly during run-time. 
 
-The *Data3DTreeDelegate* was implemented to create appropriate editors for the item's control parameters. These control parameters can be changed by the user during the visualization. *Data3DTreeModel* and *Data3DTreeDelegate* can be passed to a *Control3DView}, which uses a *QTreeView* to display the entire Disp3D data tree and the items' control parameters with corresponding editors. Please note that since the *Control3DView* class is a GUI widget it is not actually part of the Disp3D but the Disp library. 
+The *Data3DTreeDelegate* was implemented to create appropriate editors for the item's control parameters. These control parameters can be changed by the user during the visualization. *Data3DTreeModel* and *Data3DTreeDelegate* can be passed to a *Control3DView*, which uses a *QTreeView* to display the entire Disp3D data tree and the items' control parameters with corresponding editors. Please note that since the *Control3DView* class is a GUI widget it is not actually part of the Disp3D but the Disp library. 
 
 Materials ensure the correct displaying and interpolation of data. The materials internally rely on graphics shaders written in GLSL, which are executed on the GPU. Five materials and corresponding shaders were implemented in order to visualize and interpolate data in real-time. Two workers were implemented to stream sensor and source-level data sample-wise to the corresponding tree items. 
 
@@ -23,7 +23,7 @@ Materials ensure the correct displaying and interpolation of data. The materials
 
 The Disp3D API is designed to minimize the user's exposure to low level functionality. There are two ways the user can utilize Disp3D to visualize data. First, the user can work with viewers, which already include all necessary tools to visualize a specific data type. Viewers have the advantage that they are easier to setup and come with already implemented control parameters depending on the data type. Code snippet \ref{lst:methods:disp3d_viewers* presents how to visualize the connectivity results generated with Code Snippet \ref{lst:methods:connectivity}.
 
-```
+```cpp
 //Network data
 QList<Network> networks;
 
@@ -34,7 +34,7 @@ networkView.addData("sample", "audvis", networks);
 
 Second, the user can implement a *View3D* and simply add data to its tree model. In order to allow the changing of control parameters, the user can implement a *Control3DView* GUI widget and pass a *Data3DTreeModel* and a *Data3DTreeDelegate* to it. See the following code snippet for an example:
 
-```
+```cpp
 //Init 3D view and model
 View3D* p3DView = new View3D();
 Data3DTreeModel* pDataModel = new Data3DTreeModel();
@@ -78,7 +78,7 @@ The M/EEG sensors are visualized via the *GeometryMultiplier* class as described
 **M/EEG Data** 
 M/EEG sensor level data can be visualized topographically on the 3D helmet surface or scalp BEM compartment, respectively. The *SensorDataTreeItem* holds a *CustomMesh* object with the helmet surface or scalp BEM data. The color values of the *CustomMesh* object correspond to the interpolated MEG or EEG data per sample. The real-time interpolation and visualization are described in more detail in Section \ref{sec:methods:disp3d:rtvis}. M/EEG sensor level data items are grouped under the *MeasurementTreeItem* class.
 
-**BEM* Compartments** 
+**BEM Compartments** 
 The *BemSurfaceTreeItem* class visualizes BEM compartments. The internal rendering is done similar to the one described for 3D MRI reconstructions. BEM data items are grouped under the *BemTreeItem* class.
 
 **Source Space Model** 

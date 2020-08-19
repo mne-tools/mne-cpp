@@ -1,6 +1,6 @@
 ---
 title: Stream Pre-Recorded Data
-parent: MNE Scan GUI
+parent: MNE Scan
 grand_parent: Learn
 nav_order: 1
 ---

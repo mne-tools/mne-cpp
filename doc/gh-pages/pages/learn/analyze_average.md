@@ -1,7 +1,7 @@
 ---
 title: Averaging
 has_children: false
-parent: MNE Analyze GUI
+parent: MNE Analyze
 grand_parent: Learn
 nav_order: 5
 ---

@@ -1,11 +1,11 @@
 ---
-title: MNE Anonymize GUI/CLI
+title: MNE Anonymize
 has_children: false
 parent: Learn
 nav_order: 3
 has_toc: false
 ---
-# MNE Anonymize GUI/CLI
+# MNE Anonymize
 
 This page describes the application MNE Anonymize, i.e. `mne_anonymize`. This application substitutes different **Personal Health Information** (PHI) and **Personal Identifiable Information** (PII) fields from a [FIFF (Functional Imaging File Format)](https://bids-specification.readthedocs.io/en/stable/99-appendices/06-meg-file-formats.html) file (*.fif*), with other values.
 
