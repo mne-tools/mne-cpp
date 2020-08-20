@@ -119,20 +119,20 @@ namespace ANSHAREDLIB
     /**
      * Public struct for sending channel selection parameters through the event manager
      */
-    struct SelectionParameters{
-        QList<QString>     m_sViewsToApply;         /**< Which views should apply changes */
-        QList<QString>     m_sChannelName;          /**< The channel's name.*/
-        QList<int>         m_iChannelNumber;        /**< The channel number.*/
-        QList<int>         m_iChannelKind;          /**< The channel kind.*/
-        QList<int>         m_iChannelUnit;          /**< The channel unit.*/
-        QList<QPointF>     m_qpChannelPosition;     /**< The channel's 2D position in the scene.*/
-    };
+//    struct SelectionParameters{
+//        QList<QString>     m_sViewsToApply;         /**< Which views should apply changes */
+//        QList<QString>     m_sChannelName;          /**< The channel's name.*/
+//        QList<int>         m_iChannelNumber;        /**< The channel number.*/
+//        QList<int>         m_iChannelKind;          /**< The channel kind.*/
+//        QList<int>         m_iChannelUnit;          /**< The channel unit.*/
+//        QList<QPointF>     m_qpChannelPosition;     /**< The channel's 2D position in the scene.*/
+//    };
 } //NAMESPACE
 
 //Declare structs to be used in QVariant
 Q_DECLARE_METATYPE(ANSHAREDLIB::ScalingParameters);
 Q_DECLARE_METATYPE(ANSHAREDLIB::ScalingParameters*);
-Q_DECLARE_METATYPE(ANSHAREDLIB::SelectionParameters);
-Q_DECLARE_METATYPE(ANSHAREDLIB::SelectionParameters*);
+//Q_DECLARE_METATYPE(ANSHAREDLIB::SelectionParameters);
+//Q_DECLARE_METATYPE(ANSHAREDLIB::SelectionParameters*);
 
 #endif // TYPES_H
