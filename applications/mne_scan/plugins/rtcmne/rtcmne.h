@@ -228,8 +228,8 @@ protected:
     QSharedPointer<SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeEvokedSet> >             m_pRTESInput;               /**< The RealTimeEvoked input.*/
     QSharedPointer<SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeCov> >                   m_pRTCInput;                /**< The RealTimeCov input.*/
     QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeSourceEstimate> >       m_pRTSEOutput;              /**< The RealTimeSourceEstimate output.*/
-    QSharedPointer<IOBUFFER::CircularBuffer_Matrix_double >                                 m_pCircularMatrixBuffer;    /**< Holds incoming RealTimeMultiSampleArray data.*/
-    QSharedPointer<IOBUFFER::CircularBuffer<FIFFLIB::FiffEvoked> >                          m_pCircularEvokedBuffer;    /**< Holds incoming RealTimeMultiSampleArray data.*/
+    QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double >                                 m_pCircularMatrixBuffer;    /**< Holds incoming RealTimeMultiSampleArray data.*/
+    QSharedPointer<UTILSLIB::CircularBuffer<FIFFLIB::FiffEvoked> >                          m_pCircularEvokedBuffer;    /**< Holds incoming RealTimeMultiSampleArray data.*/
     QSharedPointer<RTPROCESSINGLIB::RtInvOp>                                                m_pRtInvOp;                 /**< Real-time inverse operator. */
     QSharedPointer<MNELIB::MNEForwardSolution>                                              m_pFwd;                     /**< Forward solution. */
     QSharedPointer<FIFFLIB::FiffCov>                                                        m_pNoiseCov;                     /**< Noise Covariance Matrix. */

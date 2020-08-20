@@ -71,7 +71,7 @@
 using namespace BABYMEGPLUGIN;
 using namespace UTILSLIB;
 using namespace SCSHAREDLIB;
-using namespace IOBUFFER;
+using namespace UTILSLIB;
 using namespace SCMEASLIB;
 using namespace DISPLIB;
 using namespace FIFFLIB;

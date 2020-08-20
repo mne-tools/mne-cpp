@@ -209,7 +209,7 @@ private:
 
     QPointer<QAction>                       m_pActionRecordFile;            /**< start recording action */
 
-    QSharedPointer<IOBUFFER::CircularBuffer_Matrix_double>                      m_pCircularBuffer;      /**< Holds incoming raw data. */
+    QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>                      m_pCircularBuffer;      /**< Holds incoming raw data. */
 
     SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr      m_pWriteToFileInput;   /**< The RealTimeMultiSampleArray of the WriteToFile input.*/
 };

@@ -176,7 +176,7 @@ protected:
 
     QThread                                                 m_pProducerThread;          /**< The thread used to host the producer.*/
     QSharedPointer<NATUSPLUGIN::NatusProducer>              m_pNatusProducer;           /**< The producer object.*/
-    QSharedPointer<IOBUFFER::CircularBuffer_Matrix_double>  m_pCircularBuffer;          /**< Holds incoming raw data. */
+    QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>  m_pCircularBuffer;          /**< Holds incoming raw data. */
 
     QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> >     m_pRMTSA_Natus;     /**< The RealTimeSampleArray to provide the EEG data.*/
     QSharedPointer<FIFFLIB::FiffInfo>                                                       m_pFiffInfo;        /**< Fiff measurement info.*/

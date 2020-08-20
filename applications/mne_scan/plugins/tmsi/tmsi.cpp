@@ -55,7 +55,7 @@
 using namespace TMSIPLUGIN;
 using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
-using namespace IOBUFFER;
+using namespace UTILSLIB;
 using namespace FIFFLIB;
 using namespace std;
 using namespace UTILSLIB;

@@ -227,7 +227,7 @@ private:
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr    m_pRMTSA_EEGoSports;                    /**< The RealTimeSampleArray to provide the EEG data.*/
     QSharedPointer<EEGoSportsImpedanceWidget>                                   m_pEEGoSportsImpedanceWidget;           /**< Widget for checking the impedances*/
     QSharedPointer<EEGoSportsSetupProjectWidget>                                m_pEEGoSportsSetupProjectWidget;        /**< Widget for checking the impedances*/
-    QSharedPointer<IOBUFFER::CircularBuffer_Matrix_double>                      m_pCircularBuffer;              /**< Holds incoming raw data. */
+    QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>                      m_pCircularBuffer;              /**< Holds incoming raw data. */
 
     QString                             m_qStringResourcePath;              /**< The path to the EEG resource directory.*/
 
