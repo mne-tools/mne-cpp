@@ -1,15 +1,13 @@
 //=============================================================================================================
 /**
  * @file     sampleplugin_global.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
- *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
- * @since    0.1.0
- * @date     August, 2018
+ * @author   Gabriel Motta <gbmotta@mgh.harvard.edu>
+ * @since    0.1.5
+ * @date     August, 2020
  *
  * @section  LICENSE
  *
- * Copyright (C) 2018, Lorenz Esch, Lars Debor, Simon Heinke. All rights reserved.
+ * Copyright (C) 2020, Gabriel Motta. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
