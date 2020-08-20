@@ -66,6 +66,12 @@
 #include <Qt3DExtras/QSphereMesh>
 #include <Qt3DRender/QRenderSettings>
 
+#include <QObjectPicker>
+#include <QPickingSettings>
+#include <QRenderSettings>
+#include <QPickEvent>
+#include <QPickTriangleEvent>
+
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -104,6 +110,7 @@ View3D::View3D()
     m_pCamera->setViewCenter(QVector3D(0.0f, 0.0f, 0.0f));
     m_pCamera->setUpVector(QVector3D(0.0f, 1.0f, 0.0f));
     m_pCamera->tiltAboutViewCenter(180);
+    m_pCamera->lens()->setPerspectiveProjection(45.0f, this->width()/this->height(), 0.01f, 5000.0f);
     m_pFrameGraph->setCamera(m_pCamera);
 
     OrbitalCameraController *pCamController = new OrbitalCameraController(m_pRootEntity);
@@ -111,6 +118,37 @@ View3D::View3D()
 
     createCoordSystem(m_pRootEntity);
     toggleCoordAxis(false);
+
+    //picking
+    Qt3DRender::QObjectPicker *picker = new Qt3DRender::QObjectPicker(m_pRootEntity);
+    m_pRootEntity->addComponent(picker);
+    connect(picker, &Qt3DRender::QObjectPicker::pressed,
+            this, &View3D::handlePickerPress);
+
+    Qt3DRender::QRenderSettings* renderSettings = new Qt3DRender::QRenderSettings(m_pRootEntity);
+    renderSettings->pickingSettings()->setPickMethod(Qt3DRender::QPickingSettings::PrimitivePicking);
+    renderSettings->pickingSettings()->setPickResultMode(Qt3DRender::QPickingSettings::NearestPick);
+    renderSettings->pickingSettings()->setWorldSpaceTolerance(0.00000001f);
+
+    m_pRootEntity->addComponent(renderSettings);
+}
+
+//=============================================================================================================
+
+int k = 0;
+void View3D::handlePickerPress(Qt3DRender::QPickEvent *event)
+{
+    qInfo() << "View3D::handlePickerPress" << k++ ;
+
+    // // "event" will give me clicked coordinates like this:
+    qDebug() << __func__ << ": global Coord: " << event->worldIntersection();
+
+    //    // // Also I can get picked/clicked triangle index and its vertices by casting event pointer type:
+    //    Qt3DRender::QPickTriangleEvent *eventTri = static_cast<Qt3DRender::QPickTriangleEvent *>(event);
+    //    qDebug() << __func__ << "Pick Triangle Index: " << eventTri->triangleIndex();
+    //    qDebug() << __func__ << "Pick Triangle Vertex 1: " << eventTri->vertex1Index();
+    //    qDebug() << __func__ << "Pick Triangle Vertex 2: " << eventTri->vertex2Index();
+    //    qDebug() << __func__ << "Pick Triangle Vertex 3: " << eventTri->vertex3Index();
 }
 
 //=============================================================================================================
