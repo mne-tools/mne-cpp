@@ -363,15 +363,20 @@ static QString strip_from(const QString& s, const QString& suffix)
 
 //============================= mne_coord_transforms.c =============================
 
+namespace FWDLIB
+{
+
 typedef struct {
     int frame;
     const QString name;
 } frameNameRec_40;
 
+}
+
 const QString mne_coord_frame_name_40(int frame)
 
 {
-    static frameNameRec_40 frames[] = {
+    static FWDLIB::frameNameRec_40 frames[] = {
         {FIFFV_COORD_UNKNOWN,"unknown"},
         {FIFFV_COORD_DEVICE,"MEG device"},
         {FIFFV_COORD_ISOTRAK,"isotrak"},
