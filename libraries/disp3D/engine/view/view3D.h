@@ -59,6 +59,7 @@ class QPropertyAnimation;
 namespace Qt3DRender {
     class QPointLight;
     class QRenderCaptureReply;
+    class QPickEvent;
 }
 
 //=============================================================================================================
@@ -186,6 +187,14 @@ protected:
      * @param[in] pObject         The parent of the children to be rotated.
      */
     void startModelRotationRecursive(QObject* pObject);
+
+    //=========================================================================================================
+    /**
+     * Handle Picking events.
+     *
+     * @param[in] event         The event that occured.
+     */
+    void handlePickerPress(Qt3DRender::QPickEvent *event);
 
     QPointer<Qt3DCore::QEntity>                 m_pRootEntity;                  /**< The root/most top level entity buffer. */
     QPointer<Qt3DCore::QEntity>                 m_p3DObjectsEntity;             /**< The root/most top level entity buffer. */
