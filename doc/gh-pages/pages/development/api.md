@@ -1,5 +1,5 @@
 ---
-title: MNE Lib
+title: Library API
 has_children: true
 parent: Develop
 nav_order: 2
