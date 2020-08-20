@@ -164,7 +164,7 @@ private:
 
     bool        m_bIsRunning;                       /**< Holds if real-time Covariance estimation is running.*/
 
-    QSharedPointer<IOBUFFER::CircularBuffer_Matrix_double>       m_pCircularBuffer;      /**< Holds incoming raw data. */
+    QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>       m_pCircularBuffer;      /**< Holds incoming raw data. */
 
     QVector <float> m_fWin;
 

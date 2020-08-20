@@ -71,7 +71,7 @@
 using namespace NOISEREDUCTIONPLUGIN;
 using namespace SCMEASLIB;
 using namespace UTILSLIB;
-using namespace IOBUFFER;
+using namespace UTILSLIB;
 using namespace DISPLIB;
 using namespace RTPROCESSINGLIB;
 using namespace FIFFLIB;
@@ -90,7 +90,7 @@ NoiseReduction::NoiseReduction()
 , m_iMaxFilterLength(1)
 , m_iMaxFilterTapSize(-1)
 , m_sCurrentSystem("VectorView")
-, m_pCircularBuffer(QSharedPointer<IOBUFFER::CircularBuffer_Matrix_double>::create(40))
+, m_pCircularBuffer(QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>::create(40))
 , m_pNoiseReductionInput(Q_NULLPTR)
 , m_pNoiseReductionOutput(Q_NULLPTR)
 {

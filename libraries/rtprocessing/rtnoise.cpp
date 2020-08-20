@@ -55,7 +55,7 @@
 using namespace RTPROCESSINGLIB;
 using namespace FIFFLIB;
 using namespace Eigen;
-using namespace IOBUFFER;
+using namespace UTILSLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

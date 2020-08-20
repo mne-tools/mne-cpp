@@ -76,7 +76,7 @@
 using namespace EEGOSPORTSPLUGIN;
 using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
-using namespace IOBUFFER;
+using namespace UTILSLIB;
 using namespace FIFFLIB;
 using namespace UTILSLIB;
 using namespace Eigen;

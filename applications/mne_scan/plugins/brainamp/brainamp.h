@@ -199,7 +199,7 @@ private:
     QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> >     m_pRMTSA_BrainAMP;              /**< The RealTimeSampleArray to provide the EEG data.*/
     QSharedPointer<BrainAMPSetupProjectWidget>                                              m_pBrainAMPSetupProjectWidget;  /**< Widget for checking the impedances*/
 
-    QSharedPointer<IOBUFFER::CircularBuffer_Matrix_double>                                  m_pCircularBuffer;              /**< Holds incoming raw data.*/
+    QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>                                  m_pCircularBuffer;              /**< Holds incoming raw data.*/
 
     QString                             m_qStringResourcePath;              /**< The path to the EEG resource directory.*/
 

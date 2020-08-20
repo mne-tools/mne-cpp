@@ -257,7 +257,7 @@ private:
 
     QSharedPointer<FIFFLIB::FiffInfo>                               m_pFiffInfo;            /**< Fiff measurement info.*/
 
-    QSharedPointer<IOBUFFER::CircularBuffer_Matrix_double>          m_pCircularBuffer;      /**< Holds incoming raw data. */
+    QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>          m_pCircularBuffer;      /**< Holds incoming raw data. */
 
     SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr      m_pNoiseReductionInput;      /**< The RealTimeMultiSampleArray of the NoiseReduction input.*/
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pNoiseReductionOutput;     /**< The RealTimeMultiSampleArray of the NoiseReduction output.*/

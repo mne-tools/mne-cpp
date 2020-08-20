@@ -56,7 +56,7 @@
 using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
 using namespace GUSBAMPPLUGIN;
-using namespace IOBUFFER;
+using namespace UTILSLIB;
 using namespace Eigen;
 using namespace FIFFLIB;
 
