@@ -71,7 +71,6 @@ SOURCES += \
     spectrogram.cpp \
     warp.cpp \
     sphere.cpp \
-    generics/circularbuffer.cpp \
     generics/observerpattern.cpp \
     generics/applicationlogger.cpp \
     spectral.cpp

@@ -193,7 +193,7 @@ protected:
     QSharedPointer<FiffSimulatorProducer>                       m_pFiffSimulatorProducer;   /**< Holds the FiffSimulatorProducer.*/
     QSharedPointer<FIFFLIB::FiffInfo>                           m_pFiffInfo;                /**< Fiff measurement info.*/
     QSharedPointer<COMMUNICATIONLIB::RtCmdClient>               m_pRtCmdClient;             /**< The command client.*/
-    QSharedPointer<IOBUFFER::CircularBuffer_Matrix_float>       m_pCircularBuffer;          /**< Holds incoming raw data. */
+    QSharedPointer<UTILSLIB::CircularBuffer_Matrix_float>       m_pCircularBuffer;          /**< Holds incoming raw data. */
 
     bool                    m_bCmdClientIsConnected;        /**< If the command client is connected.*/
     QString                 m_sFiffSimulatorIP;             /**< The IP Adress of mne_rt_server.*/

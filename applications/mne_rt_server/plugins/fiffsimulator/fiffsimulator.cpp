@@ -62,7 +62,7 @@
 using namespace FIFFSIMULATORRTSERVERPLUGIN;
 using namespace FIFFLIB;
 using namespace RTSERVER;
-using namespace IOBUFFER;
+using namespace UTILSLIB;
 using namespace COMMUNICATIONLIB;
 
 //=============================================================================================================

@@ -73,7 +73,7 @@
 using namespace RTFWDPLUGIN;
 using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
-using namespace IOBUFFER;
+using namespace UTILSLIB;
 using namespace FWDLIB;
 using namespace FSLIB;
 using namespace FIFFLIB;
