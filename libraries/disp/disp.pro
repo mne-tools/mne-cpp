@@ -98,6 +98,7 @@ SOURCES += \
     plots/helpers/colormap.cpp \
     viewers/abstractview.cpp \
     viewers/applytoview.cpp \
+    viewers/coregview.cpp \
     viewers/filterdesignview.cpp \
     viewers/averagelayoutview.cpp \
     viewers/fwdsettingsview.cpp \
@@ -152,6 +153,7 @@ HEADERS += \
     plots/helpers/colormap.h \
     viewers/abstractview.h \
     viewers/applytoview.h \
+    viewers/coregview.h \
     viewers/filterdesignview.h \
     viewers/averagelayoutview.h \
     viewers/fwdsettingsview.h \
