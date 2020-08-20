@@ -9,7 +9,7 @@ nav_order: 2
 
 All 3D visualization in MNE-CPP is realized within the Disp3D library, which is based on the Qt3D module. Qt3D is part of the Qt framework and actively developed by the KDAB group. The Qt3D module offers a layer on top of native OpenGL or Vulkan. It supports cross-platform compilation, is seamlessly integrated into the Qt framework and thus does not impose another external dependency on MNE-CPP. Qt3D utilizes a so called framegraph and scenegraph approach. The framegraph is a description of how to render. The scenegraph is a description of what to render and is represented by an Entity-Relationship-Model (ECM). In an ECM, entities describe general purpose objects, which aggregate so called components. These components are highly versatile and describe what the object is actually made of. In case of Qt3D, a component can, e.g., be a surface mesh, material, 3D transformation, etc. The framegraph includes information about different render stages and specifies what each render run is composed of.
 
-![](../../images/lib/disp3d_architecture.png "The Disp3D architecture")
+![](../../images/lib/disp3d_architecture.png "The Disp3D library architecture")
 
 The above figure depicts a simplified version of the Disp3D architecture and components. Disp3D consists out of two main components: Viewers and an engine. The latter hosts the data model, delegate and view. The *Framegraph* and *Camera* are included in Disp3D's view module and are both utilized by the *View3D* class. The *Camera* class provides the user to freely rotate the 3D scene. 
 
@@ -19,7 +19,7 @@ The *Data3DTreeDelegate* was implemented to create appropriate editors for the i
 
 Materials ensure the correct displaying and interpolation of data. The materials internally rely on graphics shaders written in GLSL, which are executed on the GPU. Five materials and corresponding shaders were implemented in order to visualize and interpolate data in real-time. Two workers were implemented to stream sensor and source-level data sample-wise to the corresponding tree items. 
 
-# Usage 
+## Usage 
 
 The Disp3D API is designed to minimize the user's exposure to low level functionality. There are two ways the user can utilize Disp3D to visualize data. First, the user can work with viewers, which already include all necessary tools to visualize a specific data type. Viewers have the advantage that they are easier to setup and come with already implemented control parameters depending on the data type. Code snippet \ref{lst:methods:disp3d_viewers* presents how to visualize the connectivity results generated with Code Snippet \ref{lst:methods:connectivity}.
 
@@ -58,7 +58,7 @@ SurfaceSet surfSet("sample", 0, "inflated", "./MNE-sample-data/subjects");
 pDataModel->addSourceData("sample", "audvis", sourceData, fwd, surfSet);
 ```
 
-# Supported Data Types and Items
+## Supported Data Types and Items
 
 The Disp3D library supports several data types as input to its model and render pipeline. Next to functional data, Disp3D is able to visualize anatomical and other measurement related information. Some of the *Data3DTreeModel* items are solely used for organizational purposes, e.g., to group subjects, measurements or MRI reconstructed hemispheres, to name a few. Organizational items inherit from the *AbstractTreeItem* class, which again inherit from *QStandardTreeItem}, see Figure \ref{fig:methods:disp3ditems}. They are therefore excluded from the scenegraph needed by Qt3D to render the 3D scene. All other items inherting from *Abstract3DTreeItem* or *AbstractMeshTreeItem* class are included in Qt3D's render process since they ultimately inherit, through the *RenderableEntity* class, from Qt3D's *QEntity* class. 
 
@@ -93,7 +93,7 @@ ECD data are visualized as 3D cones pointing in the dipole moment's direction. T
 **Functional Connectivity Networks** 
 Connectivity networks and their including nodes as well as edges are plotted via the *NetworkTreeItem* class. The edges can be colorized in respect to their weight and a prior defined color map. The diameters of the edges reflect the strength of their weights. The nodes can be colorized in respect to their degree and a prior defined color map. The diameter of the nodes is proportional to their degree, making it easy to spot hubs during visualization. The nodes are rendered as *QSphereGeometry* objects via instance rendering. The edges are rendered as *QCylinderGeometry* objects. In order to connect nodes with edges, a transformation matrix is computed which is passed to the edge instance rendering process in the *GeometryMultiplier* class. The transformation matrices translate, rotate and scale the cylinders (edges) to the position in between the two connecting nodes. The diameter of the cylinder is chosen to be small enough to not corrupt the visualization presented to the user. Network data items are grouped under the *MeasurementTreeItem* class.
 
-# User Interaction
+## User Interaction
 
 The user can rotate the camera either via the arrow keys or the right mouse button. The camera can be translated via the middle mouse button. The left mouse button is reserved for the upcoming support for vertex picking. Furthermore, the user is able to change multiple parameters affecting the visualization and interpolation of the data during run time. The *Control3DView* class together with its *QTreeView* serve as user input interface. Each item in the *Data3DTreeModel* is presented in the *QTreeView* via the *Data3DTreeDelegate}. Some items hold extra information about the data and are non interactive. Others can be used to change parameters on the fly. The delegate provides the user with the appropriate editor. The table below gives a summary of which parameters the user can see and change in each item.
 
