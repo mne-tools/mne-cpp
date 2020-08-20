@@ -1,6 +1,6 @@
 ---
 title: Disp3D
-parent: MNE Lib
+parent: Library API
 grand_parent: Develop
 nav_order: 2
 ---
