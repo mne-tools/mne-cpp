@@ -40,12 +40,13 @@
 //=============================================================================================================
 
 #include "../disp_global.h"
+#include "abstractview.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
+#include <QSharedPointer>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -54,6 +55,10 @@
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+
+namespace Ui {
+    class CoregViewWidget;
+}
 
 //=============================================================================================================
 // DEFINE NAMESPACE NAMESPACE
@@ -72,7 +77,7 @@ namespace DISPLIB
  *
  * @brief Brief description of this class.
  */
-class DISPSHARED_EXPORT CoregView : public QWidget
+class DISPSHARED_EXPORT CoregView : public AbstractView
 {
     Q_OBJECT
 
@@ -84,11 +89,20 @@ public:
     /**
     * Constructs a CoregView object.
     */
-    CoregView();
+    explicit CoregView(const QString& sSettingsPath = "",
+                             QWidget *parent = 0,
+                             Qt::WindowFlags f = Qt::Widget);
+
+    ~CoregView();
+
 
 protected:
 
 private:
+    Ui::CoregViewWidget*        m_pUi;                          /**< The rtFwd dialog. */
+    QString                     m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
+
+signals:
 
 };
 
