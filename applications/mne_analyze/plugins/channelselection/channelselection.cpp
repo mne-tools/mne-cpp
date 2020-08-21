@@ -196,27 +196,27 @@ void ChannelSelection::setFiffSettings(QSharedPointer<FIFFLIB::FiffInfo> pFiffIn
     //First time set up only
     m_pChannelInfoModel = QSharedPointer<DISPLIB::ChannelInfoModel>(new DISPLIB::ChannelInfoModel(m_pFiffInfo));
 
-    m_pChannelSelectionView = QSharedPointer<DISPLIB::ChannelSelectionView>(new DISPLIB::ChannelSelectionView(QString("MNEANALYZE/CHANSELECT"),
-                                                                           Q_NULLPTR,
-                                                                           m_pChannelInfoModel,
-                                                                           Qt::Window));
+    m_pChannelSelectionView = new DISPLIB::ChannelSelectionView(QString("MNEANALYZE/CHANSELECT"),
+                                                                Q_NULLPTR,
+                                                                m_pChannelInfoModel,
+                                                                Qt::Window);
 
     m_pViewLayout->addWidget(m_pChannelSelectionView->getViewWidget());
     m_pControlLayout->addWidget(m_pChannelSelectionView->getControlWidget());
 
-    m_pApplyToView = QSharedPointer<DISPLIB::ApplyToView>(new DISPLIB::ApplyToView);
+    m_pApplyToView = new DISPLIB::ApplyToView("",m_pControlLayout->widget());
 
-    m_pControlLayout->addWidget(m_pApplyToView.data());
+    m_pControlLayout->addWidget(m_pApplyToView);
 
-    connect(m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::loadedLayoutMap,
+    connect(m_pChannelSelectionView, &DISPLIB::ChannelSelectionView::loadedLayoutMap,
             m_pChannelInfoModel.data(), &DISPLIB::ChannelInfoModel::layoutChanged, Qt::UniqueConnection);
 
     connect(m_pChannelInfoModel.data(), &DISPLIB::ChannelInfoModel::channelsMappedToLayout,
-            m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::setCurrentlyMappedFiffChannels, Qt::UniqueConnection);
+            m_pChannelSelectionView, &DISPLIB::ChannelSelectionView::setCurrentlyMappedFiffChannels, Qt::UniqueConnection);
 
     //Slots for event loop
 
-    connect(m_pChannelSelectionView.data(), &DISPLIB::ChannelSelectionView::selectionChanged,
+    connect(m_pChannelSelectionView, &DISPLIB::ChannelSelectionView::selectionChanged,
             this, &ChannelSelection::onSelectionChanged, Qt::UniqueConnection);
 
     m_pChannelInfoModel->layoutChanged(m_pChannelSelectionView->getLayoutMap());

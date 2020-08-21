@@ -71,6 +71,7 @@ ApplyToView::ApplyToView(const QString& sSettingsPath,
 
 ApplyToView::~ApplyToView()
 {
+    delete m_pUi;
 }
 
 //=============================================================================================================
