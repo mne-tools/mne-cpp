@@ -98,6 +98,37 @@ public:
 
 protected:
 
+    //=========================================================================================================
+    /**
+     * Load bem from a file.
+     */
+    void onLoadBem();
+
+    //=========================================================================================================
+    /**
+     * Load fiducials from a file.
+     */
+    void onLoadFiducials();
+
+    //=========================================================================================================
+    /**
+     * Store fiucials to file.
+     */
+    void onStoreFiducials();
+
+    //=========================================================================================================
+    /**
+     * Load digitzers from a file.
+     */
+    void onLoadDigitizers();
+
+    //=========================================================================================================
+    /**
+     * Store Transformation to file.
+     */
+    void onStoreTrans();
+
+
 private:
     Ui::CoregViewWidget*        m_pUi;                          /**< The rtFwd dialog. */
     QString                     m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
