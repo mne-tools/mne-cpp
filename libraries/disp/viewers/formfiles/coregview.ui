@@ -6,24 +6,24 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>486</width>
-    <height>939</height>
+    <width>358</width>
+    <height>869</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>HPI Setup</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_8">
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QTabWidget" name="m_qTabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="m_qTab_LoadPrepare">
       <attribute name="title">
        <string>Load and Prepare</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout">
+      <layout class="QVBoxLayout" name="verticalLayout_6">
        <item>
         <widget class="QGroupBox" name="m_qGroupBox_MriSubject">
          <property name="title">
@@ -202,7 +202,7 @@
       <attribute name="title">
        <string>Fit and Process</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_6">
+      <layout class="QVBoxLayout" name="verticalLayout_8">
        <item>
         <widget class="QGroupBox" name="m_qGroupBox_FittingOptions">
          <property name="title">
@@ -266,9 +266,12 @@
                <property name="text">
                 <string>LPA: </string>
                </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
               </widget>
              </item>
-             <item row="0" column="4">
+             <item row="1" column="1">
               <widget class="QLineEdit" name="m_qLineEdit_LpaWeight">
                <property name="text">
                 <string>1.0</string>
@@ -278,21 +281,17 @@
                </property>
               </widget>
              </item>
-             <item row="0" column="7">
-              <widget class="QLabel" name="label_8">
-               <property name="text">
-                <string>RPA: </string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="5">
+             <item row="0" column="2">
               <widget class="QLabel" name="label_9">
                <property name="text">
                 <string>Nasion: </string>
                </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
               </widget>
              </item>
-             <item row="0" column="6">
+             <item row="1" column="2">
               <widget class="QLineEdit" name="m_qLineEdit_NasWeight">
                <property name="text">
                 <string>10.0</string>
@@ -302,10 +301,20 @@
                </property>
               </widget>
              </item>
-             <item row="0" column="8">
+             <item row="1" column="3">
               <widget class="QLineEdit" name="m_qLineEdit_RpaWeight">
                <property name="text">
                 <string>1.0</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="3">
+              <widget class="QLabel" name="label_8">
+               <property name="text">
+                <string>RPA: </string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignCenter</set>
@@ -525,7 +534,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton">
+           <widget class="QPushButton" name="m_qPushButton_TransFileStoreDialaog">
             <property name="text">
              <string>Store Transformation</string>
             </property>
