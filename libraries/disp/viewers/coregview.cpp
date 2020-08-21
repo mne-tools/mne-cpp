@@ -67,7 +67,47 @@ CoregView::CoregView(const QString& sSettingsPath,
 : AbstractView(parent, f)
 , m_pUi(new Ui::CoregViewWidget)
 {
+    m_sSettingsPath = sSettingsPath;
     m_pUi->setupUi(this);
+
+    // Connect Gui elemnts
+    QGroupBox *m_qGroupBox_MriSubject;
+    QPushButton *m_qPushButton_BemFileDialog;
+    QLineEdit *m_qLineEdit_BemFileName;
+    QPushButton *m_qPushButton_FidFileDialog;
+    QLineEdit *m_qLineEdit_FidFileName;
+    QPushButton *m_qPushButton_PickLPA;
+    QPushButton *m_qPushButton_PickNas;
+    QPushButton *m_qPushButton_PickRPA;
+    QPushButton *m_qPushButton_FidStoreFileDialog;
+    QLineEdit *m_qLineEdit_FidStoreFileName;
+    QPushButton *m_qPushButton_DigFileDialog;
+    QLineEdit *m_qLineEdit_DigFileName;
+    QSpinBox *m_qSpinBox_Discard;
+    QPushButton *m_qPushButton_Omit;
+    QLabel *m_qLabel_NOmitted;
+    QCheckBox *checkBox;
+    QWidget *m_qWidget_IcpIterations;
+    QSpinBox *spinBox;
+    QDoubleSpinBox *m_qDoubleSpinBox_Converge;
+    QLineEdit *m_qLineEdit_LpaWeight;
+    QLineEdit *m_qLineEdit_NasWeight;
+    QLineEdit *m_qLineEdit_RpaWeight;
+    QPushButton *m_qPushButton_FitFiducials;
+    QPushButton *m_qPushButton_FitICP;
+    QSpinBox *m_qSpinBox_X;
+    QSpinBox *m_qSpinBox_Y;
+    QSpinBox *m_qSpinBox_Z;
+    QComboBox *m_qComboBox_ScalingMode;
+    QPushButton *m_qPushButton_ApplyScaling;
+    QLineEdit *m_qLineEdit_TransX;
+    QLineEdit *m_qLineEdit_RotX;
+    QLineEdit *m_qLineEdit_TransY;
+    QLineEdit *m_qLineEdit_RotY;
+    QLineEdit *m_qLineEdit_TransZ;
+    QLineEdit *m_qLineEdit_RotZ;
+    QLineEdit *m_qLineEdit_TransFileStore;
+    QPushButton *m_qPushButton_TransFileStoreDialaog;
 
 }
 
