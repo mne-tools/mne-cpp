@@ -7,6 +7,57 @@ nav_order: 1
 
 # Changelog
 
+## Version 0.1.6 - 2020/08/21
+
+### Applications
+
+MNE Analyze
+ * Add cmd line argument support for file loading 
+ * Add channel selection plugin
+ * Remove channel selection in averaging plugin
+ * Add scaling plugin
+ * Add example plugin
+
+MNE Scan
+ * Remove no longer needed recording icons and move them to the write to file plugin instead 
+ * Remove no longer needed readme.txt in some of the plugins' resources 
+
+### API Libraries
+
+Disp
+ * Move *Apply to View* from channel selection to library layer to be used by both channel selection and scaling
+
+RtProcessing
+ * Add performIcp() namespace function to register a point cloud with a surface
+ * Add fitMatchedPoints() namespace function to register two point clouds of same size using ICP and quaternions
+ * Add discard3DPointOutliers() namespace function to discard outliers from digitizer set compared to a given 3D surface
+
+Utils
+ * Rename IOBUFFER to UTILSLIB namespace 
+ * Remove circularbuffer.cpp file since it was empty 
+
+### Documentation
+ * Add documentation for MNE Analyze channel selection plugin
+ * Add documentation for Disp3D library 
+ * Add documentation for connectivity library 
+ * Add documentation for MNE Analyze scaling plugin
+ * Add documentation for plugin creation in MNE Analyze
+ * Restructure static and dynamic build guides 
+ * Rename .md page files to better indicate what subject they belong to 
+ * Rename Learn pages for MNE Scan, MNE Analyze and MNE Anonymize 
+ * Rename MNE Lib to library API
+ * Improve DoxyGen docu by making use of namespaces for MNE-C types 
+ * Improve documentation for MNE Scan eeg amplifiers and fix some typos 
+ * Hide Learn pages for MNE Dipole Fit and MNE Forward Solution for now (until they have been completley refactored) 
+
+### Authors
+
+People who contributed to this release (preceded by number of commits):
+
+(47) Gabriel Motta,
+(47) Ruben Dörfel,
+(16) Lorenz Esch
+
 ## Version 0.1.5 - 2020/07/30
 
 ### Applications
