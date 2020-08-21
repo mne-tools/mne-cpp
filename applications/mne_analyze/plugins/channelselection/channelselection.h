@@ -147,10 +147,11 @@ private:
 
     DISPLIB::SelectionItem*                             m_pSelectionItem;           /**< Stores parameters from list of QGraphicsItems received by channelselectionview */
 
-    QSharedPointer<DISPLIB::ChannelSelectionView>       m_pChannelSelectionView;    /**< View for selecting channels to be displayed */
-    QSharedPointer<DISPLIB::ApplyToView>                m_pApplyToView;
+    DISPLIB::ChannelSelectionView*                      m_pChannelSelectionView;    /**< View for selecting channels to be displayed */
     QSharedPointer<DISPLIB::ChannelInfoModel>           m_pChannelInfoModel;        /**< Hold channel info - needed to initialize channelselectionview */
     QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                /**< Hold Information baout currently loaded file */
+
+    DISPLIB::ApplyToView*                               m_pApplyToView;
 
     QHBoxLayout*                                        m_pViewLayout;              /**< Holds the view portion of the channel selection to be displayed */
     QVBoxLayout*                                        m_pControlLayout;           /**< Holds the control portion of the channel selection to be displayed */

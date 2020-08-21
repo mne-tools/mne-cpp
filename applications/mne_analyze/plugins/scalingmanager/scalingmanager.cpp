@@ -174,8 +174,6 @@ QVector<EVENT_TYPE> ScalingManager::getEventSubscriptions(void) const
 
 void ScalingManager::onScalingChanged(const QMap<qint32, float> &scalingMap)
 {
-    qDebug() << "[ScalingManager::onScalingChanged]";
-
     m_pSelectionParameters->m_sViewsToApply = m_pApplyToView->getSelectedViews();
 
     m_pSelectionParameters->m_mScalingMap = scalingMap;
