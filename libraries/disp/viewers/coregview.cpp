@@ -37,6 +37,7 @@
 //=============================================================================================================
 
 #include "coregview.h"
+#include "ui_coregview.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -60,8 +61,19 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-CoregView::CoregView()
+CoregView::CoregView(const QString& sSettingsPath,
+                     QWidget *parent,
+                     Qt::WindowFlags f)
+: AbstractView(parent, f)
+, m_pUi(new Ui::CoregViewWidget)
 {
+    m_pUi->setupUi(this);
+
 }
 
 //=============================================================================================================
+
+CoregView::~CoregView()
+{
+    delete m_pUi;
+}
