@@ -212,8 +212,10 @@ qtHaveModule(charts) {
 }
 
 FORMS += \
+    viewers/formfiles/coregview.ui \
     viewers/formfiles/filterdesignview.ui \
     viewers/formfiles/channelselectionview.ui \
+    viewers/formfiles/coregview.ui \
     viewers/formfiles/fwdsettingsview.ui \
     viewers/formfiles/progressview.ui \
     viewers/formfiles/spharasettingsview.ui \
