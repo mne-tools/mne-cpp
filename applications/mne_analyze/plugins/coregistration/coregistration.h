@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     sampleplugin.h
+ * @file     coregistration.h
  * @author   Gabriel Motta <gbmotta@mgh.harvard.edu
  * @since    0.1.5
  * @date     August, 2020
@@ -28,18 +28,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains the declaration of the SamplePlugin class.
+ * @brief    Contains the declaration of the CoRegistration class.
  *
  */
 
-#ifndef SAMPLEPLUGIN_H
-#define SAMPLEPLUGIN_H
+#ifndef COREGISTRATION_H
+#define COREGISTRATION_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "sampleplugin_global.h"
+#include "coregistration_global.h"
 #include <anShared/Interfaces/IPlugin.h>
 
 //=============================================================================================================
@@ -63,34 +63,34 @@ namespace ANSHAREDLIB {
 // DEFINE NAMESPACE SURFERPLUGIN
 //=============================================================================================================
 
-namespace SAMPLEPLUGINPLUGIN
+namespace COREGISTRATIONPLUGIN
 {
 
 //=============================================================================================================
 /**
- * SamplePlugin Plugin
+ * CoRegistration Plugin
  *
- * @brief The SamplePlugin class provides a view with all currently loaded models.
+ * @brief The CoRegistration class provides a view with all currently loaded models.
  */
-class SAMPLEPLUGINSHARED_EXPORT SamplePlugin : public ANSHAREDLIB::IPlugin
+class COREGISTRATIONSHARED_EXPORT CoRegistration : public ANSHAREDLIB::IPlugin
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "sampleplugin.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "coregistration.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(ANSHAREDLIB::IPlugin)
 
 public:
     //=========================================================================================================
     /**
-     * Constructs a SamplePlugin.
+     * Constructs a CoRegistration.
      */
-    SamplePlugin();
+    CoRegistration();
 
     //=========================================================================================================
     /**
-     * Destroys the SamplePlugin.
+     * Destroys the CoRegistration.
      */
-    virtual ~SamplePlugin() override;
+    virtual ~CoRegistration() override;
 
     // IPlugin functions
     virtual QSharedPointer<IPlugin> clone() const override;
@@ -114,4 +114,4 @@ private:
 
 } // NAMESPACE
 
-#endif // SAMPLEPLUGIN_H
+#endif // COREGISTRATION_H
