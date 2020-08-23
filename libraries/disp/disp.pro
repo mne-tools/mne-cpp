@@ -98,7 +98,7 @@ SOURCES += \
     plots/helpers/colormap.cpp \
     viewers/abstractview.cpp \
     viewers/applytoview.cpp \
-    viewers/coregview.cpp \
+    viewers/coregsettingsview.cpp \
     viewers/filterdesignview.cpp \
     viewers/averagelayoutview.cpp \
     viewers/fwdsettingsview.cpp \
@@ -153,7 +153,7 @@ HEADERS += \
     plots/helpers/colormap.h \
     viewers/abstractview.h \
     viewers/applytoview.h \
-    viewers/coregview.h \
+    viewers/coregsettingsview.h \
     viewers/filterdesignview.h \
     viewers/averagelayoutview.h \
     viewers/fwdsettingsview.h \
@@ -212,10 +212,10 @@ qtHaveModule(charts) {
 }
 
 FORMS += \
-    viewers/formfiles/coregview.ui \
+    viewers/formfiles/coregsettingsview.ui \
     viewers/formfiles/filterdesignview.ui \
     viewers/formfiles/channelselectionview.ui \
-    viewers/formfiles/coregview.ui \
+    viewers/formfiles/coregsettingsview.ui \
     viewers/formfiles/fwdsettingsview.ui \
     viewers/formfiles/progressview.ui \
     viewers/formfiles/spharasettingsview.ui \

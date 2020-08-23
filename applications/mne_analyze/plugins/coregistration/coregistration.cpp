@@ -42,7 +42,7 @@
 #include <anShared/Management/communicator.h>
 #include <anShared/Utils/metatypes.h>
 
-#include "disp/viewers/coregview.h"
+#include "disp/viewers/coregsettingsview.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -62,7 +62,7 @@ using namespace ANSHAREDLIB;
 //=============================================================================================================
 
 CoRegistration::CoRegistration()
-    : m_pCoregView(Q_NULLPTR)
+    : m_pCoregSettingsView(Q_NULLPTR)
 {
 }
 
@@ -119,13 +119,13 @@ QDockWidget *CoRegistration::getControl()
     QVBoxLayout* pLayout = new QVBoxLayout;
 
     // Coregistration Settings
-    m_pCoregView = new DISPLIB::CoregView(QString("MNEANALYZE/%1").arg(this->getName()));
-    m_pCoregView->setSizePolicy(QSizePolicy::Expanding,
+    m_pCoregSettingsView = new DISPLIB::CoregSettingsView(QString("MNEANALYZE/%1").arg(this->getName()));
+    m_pCoregSettingsView->setSizePolicy(QSizePolicy::Expanding,
                                 QSizePolicy::Minimum);
 
-/*    pControlDock->setWidget(m_pCoregView);
+/*    pControlDock->setWidget(m_pCoregSettingsView);
 
-    pLayout->addWidget(m_pCoregView);
+    pLayout->addWidget(m_pCoregSettingsView);
 
     pWidget->setLayout(pLayout);    */
 
