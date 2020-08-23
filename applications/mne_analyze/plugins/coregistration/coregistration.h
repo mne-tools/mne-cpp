@@ -59,6 +59,10 @@ namespace ANSHAREDLIB {
     class Communicator;
 }
 
+namespace DISPLIB {
+    class CoregView;
+}
+
 //=============================================================================================================
 // DEFINE NAMESPACE SURFERPLUGIN
 //=============================================================================================================
@@ -105,6 +109,8 @@ public:
 
 private:
     QPointer<ANSHAREDLIB::Communicator>     m_pCommu;
+
+    DISPLIB::CoregView*                     m_pCoregView;   /**< Pointer to coreg GUI */
 
 };
 
