@@ -42,6 +42,7 @@
 #include <anShared/Management/communicator.h>
 #include <anShared/Utils/metatypes.h>
 
+#include "disp/viewers/coregview.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -61,6 +62,7 @@ using namespace ANSHAREDLIB;
 //=============================================================================================================
 
 CoRegistration::CoRegistration()
+    : m_pCoregView(Q_NULLPTR)
 {
 }
 
@@ -95,7 +97,7 @@ void CoRegistration::unload()
 
 QString CoRegistration::getName() const
 {
-    return "Sample Plugin";
+    return "Co-Registration";
 }
 
 //=============================================================================================================
@@ -113,17 +115,23 @@ QDockWidget *CoRegistration::getControl()
     QDockWidget* pControlDock = new QDockWidget(getName());
     pControlDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     pControlDock->setObjectName(getName());
-
     QWidget* pWidget = new QWidget;
     QVBoxLayout* pLayout = new QVBoxLayout;
 
-    pWidget->setLayout(pLayout);
+    // Coregistration Settings
+    m_pCoregView = new DISPLIB::CoregView(QString("MNEANALYZE/%1").arg(this->getName()));
+    m_pCoregView->setSizePolicy(QSizePolicy::Expanding,
+                                QSizePolicy::Minimum);
+
+/*    pControlDock->setWidget(m_pCoregView);
+
+    pLayout->addWidget(m_pCoregView);
+
+    pWidget->setLayout(pLayout);    */
+
     pControlDock->setWidget(pWidget);
 
     return pControlDock;
-
-    //If plugin does not have dock controls:
-    return Q_NULLPTR;
 }
 
 //=============================================================================================================
@@ -136,7 +144,7 @@ QWidget *CoRegistration::getView()
 
     pPluginView->setLayout(pViewLayout);
 
-    return pPluginView;
+    // return pPluginView;
 
     //If the plugin does not have a view:
     return Q_NULLPTR;
