@@ -2,7 +2,7 @@
 /**
  * @file     coregsettingsview.h
  * @author   Ruben Dörfel <doerfelruben@aol.com>
- * @since    0.1.0
+ * @since    0.1.6
  * @date     August, 2020
  *
  * @section  LICENSE
@@ -127,39 +127,85 @@ protected:
 
     //=========================================================================================================
     /**
-     * Load bem from a file.
-     */
-    void onLoadBem();
-
-    //=========================================================================================================
-    /**
-     * Load fiducials from a file.
-     */
-    void onLoadFiducials();
-
-    //=========================================================================================================
-    /**
-     * Store fiucials to file.
-     */
-    void onStoreFiducials();
-
-    //=========================================================================================================
-    /**
-     * Load digitzers from a file.
-     */
-    void onLoadDigitizers();
-
-    //=========================================================================================================
-    /**
      * Store Transformation to file.
      */
     void onStoreTrans();
 
 private:
+
+    //=========================================================================================================
+    /**
+     * Load Bem model from file
+     */
+    void onLoadBemFile();
+
+    //=========================================================================================================
+    /**
+     * Load fiducial from file
+     */
+    void onLoadFidFile();
+
+    //=========================================================================================================
+    /**
+     * Store fiducial to file.
+     */
+    void onStoreFidFile();
+
+    //=========================================================================================================
+    /**
+     * Load digitizer from file
+     */
+    void onLoadDigFile();
+
+    //=========================================================================================================
+    /**
+     * Discard Outliers
+     */
+    void onDiscardOutliers();
+
     Ui::CoregSettingsViewWidget*    m_pUi;                  /**< The CoregSettingsViewWidget.*/
     QString                         m_sSettingsPath;        /**< The settings path to store the GUI settings to. */
 
 signals:
+    //=========================================================================================================
+    /**
+     * Emit this signal whenever new bem model was loaded.
+     *
+     * @param[in] sFilePath    The file path to the bem-file.
+     */
+    void bemFileChanged(const QString& sFilePath);
+
+    //=========================================================================================================
+    /**
+     * Emit this signal whenever new fiducials were loaded.
+     *
+     * @param[in] sFilePath    The file path to the fiduical file.
+     */
+    void fidFileChanged(const QString& sFilePath);
+
+    //=========================================================================================================
+    /**
+     * Emit this signal whenever the file to store the fiducials changed
+     *
+     * @param[in] sFilePath    The file path to the stored fiducials.
+     */
+    void fidStoreFileChanged(const QString& sFilePath);
+
+    //=========================================================================================================
+    /**
+     * Emit this signal whenever new digitizers were loaded.
+     *
+     * @param[in] sFilePath    The file path to the digitizers.
+     */
+    void digFileChanged(const QString& sFilePath);
+
+    //=========================================================================================================
+    /**
+     * Emit this signal whenever the distance to omit digitizers changed.
+     *
+     * @param[in] fMaxDist    The maximum diesance to keep digitizers.
+     */
+    void omitDgitizer(const float fMaxDist);
 
 };
 

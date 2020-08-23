@@ -2,7 +2,7 @@
 /**
  * @file     coregsettingsview.cpp
  * @author   Ruben Dörfel <doerfelruben@aol.com>
- * @since    0.1.5
+ * @since    0.1.6
  * @date     August, 2020
  *
  * @section  LICENSE
@@ -39,11 +39,18 @@
 #include "coregsettingsview.h"
 #include "ui_coregsettingsview.h"
 
+#include <fiff/fiff_stream.h>
+
+#include <iostream>
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QSettings>
+#include <QDebug>
+#include <QFileInfo>
+#include <QFileDialog>
+#include <QMessageBox>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -75,20 +82,22 @@ CoregSettingsView::CoregSettingsView(const QString& sSettingsPath,
     loadSettings();
 
     // Connect Gui elemnts
-    QGroupBox *m_qGroupBox_MriSubject;
-    QPushButton *m_qPushButton_BemFileDialog;
-    QLineEdit *m_qLineEdit_BemFileName;
-    QPushButton *m_qPushButton_FidFileDialog;
-    QLineEdit *m_qLineEdit_FidFileName;
+    connect(m_pUi->m_qPushButton_BemFileDialog, &QPushButton::released,
+            this, &CoregSettingsView::onLoadBemFile);
+    connect(m_pUi->m_qPushButton_FidFileDialog, &QPushButton::released,
+            this, &CoregSettingsView::onLoadFidFile);
+    connect(m_pUi->m_qPushButton_FidStoreFileDialog, &QPushButton::released,
+            this, &CoregSettingsView::onStoreFidFile);
+    connect(m_pUi->m_qPushButton_DigFileDialog, &QPushButton::released,
+            this, &CoregSettingsView::onLoadDigFile);
+    connect(m_pUi->m_qPushButton_Omit, &QPushButton::released,
+            this, &CoregSettingsView::onDiscardOutliers);
+
+
+
     QPushButton *m_qPushButton_PickLPA;
     QPushButton *m_qPushButton_PickNas;
     QPushButton *m_qPushButton_PickRPA;
-    QPushButton *m_qPushButton_FidStoreFileDialog;
-    QLineEdit *m_qLineEdit_FidStoreFileName;
-    QPushButton *m_qPushButton_DigFileDialog;
-    QLineEdit *m_qLineEdit_DigFileName;
-    QSpinBox *m_qSpinBox_Discard;
-    QPushButton *m_qPushButton_Omit;
     QLabel *m_qLabel_NOmitted;
     QCheckBox *checkBox;
     QWidget *m_qWidget_IcpIterations;
@@ -112,7 +121,6 @@ CoregSettingsView::CoregSettingsView(const QString& sSettingsPath,
     QLineEdit *m_qLineEdit_RotZ;
     QLineEdit *m_qLineEdit_TransFileStore;
     QPushButton *m_qPushButton_TransFileStoreDialaog;
-
 }
 
 //=============================================================================================================
@@ -171,4 +179,89 @@ void CoregSettingsView::updateProcessingMode(ProcessingMode mode)
     default: // default is realtime mode
         break;
     }
+}
+
+//=============================================================================================================
+
+void CoregSettingsView::onLoadBemFile()
+{
+    QString t_sFileName = QFileDialog::getOpenFileName(this,
+                                                       tr("Select Bem Model"),
+                                                       QString(),
+                                                       tr("Fif Files (*.fif)"));
+
+    QFile t_fBem(t_sFileName);
+    if(t_fBem.open(QIODevice::ReadOnly)) {
+        m_pUi->m_qLineEdit_BemFileName->setText(t_sFileName);
+    } else {
+        qWarning() << "[disp::CoregSettingsView] Bem file cannot be opened";
+    }
+    t_fBem.close();
+
+    emit bemFileChanged(t_sFileName);
+}
+
+//=============================================================================================================
+
+void CoregSettingsView::onLoadFidFile()
+{
+    QString t_sFileName = QFileDialog::getOpenFileName(this,
+                                                       tr("Select fiducials"),
+                                                       QString(),
+                                                       tr("Fif Files (*.fif)"));
+
+    QFile t_fFid(t_sFileName);
+    if(t_fFid.open(QIODevice::ReadOnly)) {
+        m_pUi->m_qLineEdit_FidFileName->setText(t_sFileName);
+    } else {
+        qWarning() << "[disp::CoregSettingsView] Fiducial file cannot be opened";
+    }
+    t_fFid.close();
+
+    emit fidFileChanged(t_sFileName);
+}
+
+//=============================================================================================================
+
+void CoregSettingsView::onStoreFidFile()
+{
+    QString t_sDirName = QFileDialog::getExistingDirectory(this,
+                                                           tr("Open directory to store fiducials"),
+                                                           QString(),
+                                                           QFileDialog::ShowDirsOnly
+                                                           | QFileDialog::DontResolveSymlinks);
+
+    QString t_sFileName = m_pUi->m_qLineEdit_FidStoreFileName->text();
+    QString t_sFilePath(t_sDirName + '/' + t_sFileName);
+    m_pUi->m_qLineEdit_FidStoreFileName->setText(t_sFilePath);
+
+    emit fidStoreFileChanged(t_sFilePath);
+}
+
+//=============================================================================================================
+
+void CoregSettingsView::onLoadDigFile()
+{
+    QString t_sFileName = QFileDialog::getOpenFileName(this,
+                                                       tr("Select digitizer file"),
+                                                       QString(),
+                                                       tr("Fif Files (*.fif)"));
+
+    QFile t_fDigid(t_sFileName);
+    if(t_fDigid.open(QIODevice::ReadOnly)) {
+        m_pUi->m_qLineEdit_DigFileName->setText(t_sFileName);
+    } else {
+        qWarning() << "[disp::CoregSettingsView] Digitizer file cannot be opened";
+    }
+    t_fDigid.close();
+
+    emit digFileChanged(t_sFileName);
+}
+
+//=============================================================================================================
+
+void CoregSettingsView::onDiscardOutliers()
+{
+    float fMaxDist = m_pUi->m_qSpinBox_Discard->value()/1000;
+    emit omitDgitizer(fMaxDist);
 }
