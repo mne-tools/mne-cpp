@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     sampleplugin_global.h
+ * @file     coregistration_global.h
  * @author   Gabriel Motta <gbmotta@mgh.harvard.edu>
  * @since    0.1.5
  * @date     August, 2020
@@ -32,8 +32,8 @@
  *
  */
 
-#ifndef SAMPLEPLUGIN_GLOBAL_H
-#define SAMPLEPLUGIN_GLOBAL_H
+#ifndef COREGISTRATION_GLOBAL_H
+#define COREGISTRATION_GLOBAL_H
 
 //=============================================================================================================
 // QT INCLUDES
@@ -45,10 +45,10 @@
 // PREPROCESSOR DEFINES
 //=============================================================================================================
 
-#if defined(SAMPLEPLUGIN_PLUGIN)
-#  define SAMPLEPLUGINSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#if defined(COREGISTRATION_PLUGIN)
+#  define COREGISTRATIONSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define SAMPLEPLUGINSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#  define COREGISTRATIONSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
-#endif // SAMPLEPLUGIN_GLOBAL_H
+#endif // COREGISTRATION_GLOBAL_H

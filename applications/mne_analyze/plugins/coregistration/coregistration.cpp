@@ -1,7 +1,7 @@
 //=============================================================================================================
 /**
- * @file     sampleplugin.cpp
- * @author   Gabriel Motta <gbmotta@mgh.harvard.edu
+ * @file     coregistration.cpp
+ * @author   Ruben Dörfel <doerfelruben@aol.com>
  * @since    0.1.5
  * @date     August, 2020
  *
@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the SamplePlugin class.
+ * @brief    Definition of the CoRegistration class.
  *
  */
 
@@ -36,7 +36,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "sampleplugin.h"
+#include "coregistration.h"
 
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Management/communicator.h>
@@ -53,61 +53,61 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace SAMPLEPLUGINPLUGIN;
+using namespace COREGISTRATIONPLUGIN;
 using namespace ANSHAREDLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SamplePlugin::SamplePlugin()
+CoRegistration::CoRegistration()
 {
 }
 
 //=============================================================================================================
 
-SamplePlugin::~SamplePlugin()
+CoRegistration::~CoRegistration()
 {
 }
 
 //=============================================================================================================
 
-QSharedPointer<IPlugin> SamplePlugin::clone() const
+QSharedPointer<IPlugin> CoRegistration::clone() const
 {
-    QSharedPointer<SamplePlugin> pSamplePluginClone = QSharedPointer<SamplePlugin>::create();
-    return pSamplePluginClone;
+    QSharedPointer<CoRegistration> pCoRegistrationClone = QSharedPointer<CoRegistration>::create();
+    return pCoRegistrationClone;
 }
 
 //=============================================================================================================
 
-void SamplePlugin::init()
+void CoRegistration::init()
 {
     m_pCommu = new Communicator(this);
 }
 
 //=============================================================================================================
 
-void SamplePlugin::unload()
+void CoRegistration::unload()
 {
 }
 
 //=============================================================================================================
 
-QString SamplePlugin::getName() const
+QString CoRegistration::getName() const
 {
     return "Sample Plugin";
 }
 
 //=============================================================================================================
 
-QMenu *SamplePlugin::getMenu()
+QMenu *CoRegistration::getMenu()
 {
     return Q_NULLPTR;
 }
 
 //=============================================================================================================
 
-QDockWidget *SamplePlugin::getControl()
+QDockWidget *CoRegistration::getControl()
 {
     //If plugin has dock controls:
     QDockWidget* pControlDock = new QDockWidget(getName());
@@ -128,7 +128,7 @@ QDockWidget *SamplePlugin::getControl()
 
 //=============================================================================================================
 
-QWidget *SamplePlugin::getView()
+QWidget *CoRegistration::getView()
 {
     //If the plugin has a view:
     QWidget* pPluginView = new QWidget();
@@ -144,18 +144,18 @@ QWidget *SamplePlugin::getView()
 
 //=============================================================================================================
 
-void SamplePlugin::handleEvent(QSharedPointer<Event> e)
+void CoRegistration::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
     default:
-        qWarning() << "[SamplePlugin::handleEvent] received an Event that is not handled by switch-cases";
+        qWarning() << "[CoRegistration::handleEvent] received an Event that is not handled by switch-cases";
         break;
     }
 }
 
 //=============================================================================================================
 
-QVector<EVENT_TYPE> SamplePlugin::getEventSubscriptions(void) const
+QVector<EVENT_TYPE> CoRegistration::getEventSubscriptions(void) const
 {
     QVector<EVENT_TYPE> temp;
 

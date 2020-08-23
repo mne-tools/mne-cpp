@@ -1,6 +1,6 @@
 #==============================================================================================================
 #
-# @file     sampleplugin.pro
+# @file     coregistration.pro
 # @author   Gabriel Motta <gbmotta@mgh.harvard.edu>
 # @since    0.1.5
 # @date     August, 2020
@@ -28,7 +28,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile for the sampleplugin plugin.
+# @brief    This project file generates the makefile for the coregistration plugin.
 #
 #==============================================================================================================
 
@@ -40,7 +40,7 @@ CONFIG += skip_target_version_ext
 
 CONFIG += plugin
 
-DEFINES += SAMPLEPLUGIN_PLUGIN
+DEFINES += COREGISTRATION_PLUGIN
 
 QT += gui widgets
 
@@ -53,7 +53,7 @@ contains(MNECPP_CONFIG, static) {
     CONFIG += shared
 }
 
-TARGET = sampleplugin
+TARGET = coregistration
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -84,15 +84,15 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES += \
-    sampleplugin.cpp
+    coregistration.cpp
 
 HEADERS += \
-    sampleplugin_global.h \
-    sampleplugin.h
+    coregistration_global.h \
+    coregistration.h
 
 FORMS += \
 
-OTHER_FILES += sampleplugin.json
+OTHER_FILES += coregistration.json
 
 RESOURCES += \
 
