@@ -125,12 +125,6 @@ public:
 
 protected:
 
-    //=========================================================================================================
-    /**
-     * Store Transformation to file.
-     */
-    void onStoreTrans();
-
 private:
 
     //=========================================================================================================
@@ -159,9 +153,55 @@ private:
 
     //=========================================================================================================
     /**
-     * Discard Outliers
+     * Discard digitizers with maximum distance to surface
      */
-    void onDiscardOutliers();
+    void onMaxDistChanged();
+
+    //=========================================================================================================
+    /**
+     * Weights changed.
+     */
+    void onWeigthsChanged();
+
+    //=========================================================================================================
+    /**
+     * Store the transformation.
+     */
+    void onStoreTrans();
+
+    //=========================================================================================================
+    /**
+     * Get the maximum number of icp iterations.
+     *
+     * @return  The maximum nmber of iterations.
+     */
+    int getMaxIter();
+
+    //=========================================================================================================
+    /**
+     * Get the onvergence value.
+     *
+     * @return  The convergence value.
+     */
+    float getConvergence();
+
+    //=========================================================================================================
+    /**
+     * Get the auto scale state
+     *
+     * @return  The auto scale state.
+     */
+    bool getAutoScale();
+
+    //=========================================================================================================
+    /**
+     * Get the weights for LPA,RPA and NAsion
+     *
+     * @return  The weight.
+     */
+    float getWeightLPA();
+    float getWeightRPA();
+    float getWeightNas();
 
     Ui::CoregSettingsViewWidget*    m_pUi;                  /**< The CoregSettingsViewWidget.*/
     QString                         m_sSettingsPath;        /**< The settings path to store the GUI settings to. */
@@ -201,11 +241,69 @@ signals:
 
     //=========================================================================================================
     /**
-     * Emit this signal whenever the distance to omit digitizers changed.
+     * Emit this signal whenever the maximum distane from digitizer->surface changed.
      *
      * @param[in] fMaxDist    The maximum diesance to keep digitizers.
      */
-    void omitDgitizer(const float fMaxDist);
+    void maxDistChanged(const float fMaxDist);
+
+    //=========================================================================================================
+    /**
+     * Emit this signal whenever the maximum number of ICP iterations changed.
+     *
+     * @param[in] iMaxIter    The maximum number of iterations.
+     */
+    void maxIterChanged(const int iMaxIter);
+
+    //=========================================================================================================
+    /**
+     * Emit this signal whenever the convergence value changed.
+     *
+     * @param[in] fMaxDist    The convergence value.
+     */
+    void convergenceChanged(const float fConverge);
+
+    //=========================================================================================================
+    /**
+     * Emit this signal whenever the auto scale status changed.
+     *
+     * @param[in] bAutoScale    The auto scale state.
+     */
+    void autoScaleStatusChanged(const bool bAutoScale);
+
+    //=========================================================================================================
+    /**
+     * Emit this signal whenever weigths changed.
+     *
+     * @param[in] fWeitghtLPA    Weight LPA.
+     * @param[in] fWeitghtRPA    Weight RPA.
+     * @param[in] fWeitghtNas    Weight Nasion.
+     *
+     */
+    void weightsChanged(const float fWeitghtLPA, const float fWeitghtRPA, const float fWeitghtNas);
+
+    //=========================================================================================================
+    /**
+     * Emit this signal whenever fiducial alignment is rewuested.
+     *
+     */
+    void fitFiducials();
+
+    //=========================================================================================================
+    /**
+     * Emit this signal whenever icp alignment is requested.
+     *
+     */
+    void fitIcp();
+
+    //=========================================================================================================
+    /**
+     * Emit this signal whenever icp alignment is requested.
+     *
+     * @param[in] sFilePath    The file path to store the transformation.
+     *
+     */
+    void transStoreFileChanged(const QString& sFilePath);
 
 };
 
