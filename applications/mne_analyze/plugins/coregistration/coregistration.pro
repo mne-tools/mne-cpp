@@ -1,8 +1,8 @@
 #==============================================================================================================
 #
 # @file     coregistration.pro
-# @author   Gabriel Motta <gbmotta@mgh.harvard.edu>
-# @since    0.1.5
+# @author   Ruben Dörfel <doerfelruben@aol.com>
+# @since    0.1.6
 # @date     August, 2020
 #
 # @section  LICENSE

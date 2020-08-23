@@ -2,7 +2,7 @@
 /**
  * @file     coregistration.cpp
  * @author   Ruben Dörfel <doerfelruben@aol.com>
- * @since    0.1.5
+ * @since    0.1.6
  * @date     August, 2020
  *
  * @section  LICENSE
