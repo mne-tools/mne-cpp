@@ -60,7 +60,7 @@ namespace ANSHAREDLIB {
 }
 
 namespace DISPLIB {
-    class CoregView;
+    class CoregSettingsView;
 }
 
 //=============================================================================================================
@@ -110,7 +110,7 @@ public:
 private:
     QPointer<ANSHAREDLIB::Communicator>     m_pCommu;
 
-    DISPLIB::CoregView*                     m_pCoregView;   /**< Pointer to coreg GUI */
+    DISPLIB::CoregSettingsView*                     m_pCoregSettingsView;   /**< Pointer to coreg GUI */
 
 };
 
