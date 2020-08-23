@@ -95,6 +95,33 @@ public:
 
     ~CoregView();
 
+    //=========================================================================================================
+    /**
+     * Saves all important settings of this view via QSettings.
+     */
+    void saveSettings();
+
+    //=========================================================================================================
+    /**
+     * Loads and inits all important settings of this view via QSettings.
+     */
+    void loadSettings();
+
+    //=========================================================================================================
+    /**
+     * Update the views GUI based on the set GuiMode (Clinical=0, Research=1).
+     *
+     * @param mode     The new mode (Clinical=0, Research=1).
+     */
+    void updateGuiMode(GuiMode mode);
+
+    //=========================================================================================================
+    /**
+     * Update the views GUI based on the set ProcessingMode (RealTime=0, Offline=1).
+     *
+     * @param mode     The new mode (RealTime=0, Offline=1).
+     */
+    void updateProcessingMode(ProcessingMode mode);
 
 protected:
 
@@ -127,7 +154,6 @@ protected:
      * Store Transformation to file.
      */
     void onStoreTrans();
-
 
 private:
     Ui::CoregViewWidget*        m_pUi;                          /**< The rtFwd dialog. */
