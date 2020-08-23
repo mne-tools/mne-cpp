@@ -117,3 +117,49 @@ CoregView::~CoregView()
 {
     delete m_pUi;
 }
+
+//=============================================================================================================
+
+void CoregView::saveSettings()
+{
+    if(m_sSettingsPath.isEmpty()) {
+        return;
+    }
+
+    // Save Settings
+}
+
+//=============================================================================================================
+
+void CoregView::loadSettings()
+{
+    if(m_sSettingsPath.isEmpty()) {
+        return;
+    }
+
+    // Load Settings
+}
+
+//=============================================================================================================
+
+void CoregView::updateGuiMode(GuiMode mode)
+{
+    switch(mode) {
+    case GuiMode::Clinical:
+        break;
+    default: // default is research mode
+        break;
+    }
+}
+
+//=============================================================================================================
+
+void CoregView::updateProcessingMode(ProcessingMode mode)
+{
+    switch(mode) {
+    case ProcessingMode::Offline:
+        break;
+    default: // default is realtime mode
+        break;
+    }
+}
