@@ -111,25 +111,13 @@ QMenu *CoRegistration::getMenu()
 
 QDockWidget *CoRegistration::getControl()
 {
-    //If plugin has dock controls:
-    QDockWidget* pControlDock = new QDockWidget(getName());
-    pControlDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    pControlDock->setObjectName(getName());
-    QWidget* pWidget = new QWidget;
-    QVBoxLayout* pLayout = new QVBoxLayout;
-
     // Coregistration Settings
     m_pCoregSettingsView = new DISPLIB::CoregSettingsView(QString("MNEANALYZE/%1").arg(this->getName()));
-    m_pCoregSettingsView->setSizePolicy(QSizePolicy::Expanding,
-                                QSizePolicy::Minimum);
 
-/*    pControlDock->setWidget(m_pCoregSettingsView);
-
-    pLayout->addWidget(m_pCoregSettingsView);
-
-    pWidget->setLayout(pLayout);    */
-
-    pControlDock->setWidget(pWidget);
+    QDockWidget* pControlDock = new QDockWidget(getName());
+    pControlDock->setAllowedAreas(Qt::RightDockWidgetArea | Qt::LeftDockWidgetArea);
+    pControlDock->setWidget(m_pCoregSettingsView);
+    pControlDock->setObjectName(getName());
 
     return pControlDock;
 }
@@ -144,7 +132,7 @@ QWidget *CoRegistration::getView()
 
     pPluginView->setLayout(pViewLayout);
 
-    // return pPluginView;
+    return pPluginView;
 
     //If the plugin does not have a view:
     return Q_NULLPTR;
