@@ -72,6 +72,8 @@ CoregSettingsView::CoregSettingsView(const QString& sSettingsPath,
     m_sSettingsPath = sSettingsPath;
     m_pUi->setupUi(this);
 
+    loadSettings();
+
     // Connect Gui elemnts
     QGroupBox *m_qGroupBox_MriSubject;
     QPushButton *m_qPushButton_BemFileDialog;
@@ -117,6 +119,7 @@ CoregSettingsView::CoregSettingsView(const QString& sSettingsPath,
 
 CoregSettingsView::~CoregSettingsView()
 {
+    saveSettings();
     delete m_pUi;
 }
 
