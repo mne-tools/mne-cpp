@@ -90,24 +90,31 @@ CoregSettingsView::CoregSettingsView(const QString& sSettingsPath,
             this, &CoregSettingsView::onStoreFidFile);
     connect(m_pUi->m_qPushButton_DigFileDialog, &QPushButton::released,
             this, &CoregSettingsView::onLoadDigFile);
-    connect(m_pUi->m_qPushButton_Omit, &QPushButton::released,
-            this, &CoregSettingsView::onDiscardOutliers);
-
-
+    connect(m_pUi->m_qSpinBox_MaxDist, QOverload<int>::of(&QSpinBox::valueChanged),
+            this, &CoregSettingsView::onMaxDistChanged);
+    connect(m_pUi->m_qSpinBox_MaxIter, QOverload<int>::of(&QSpinBox::valueChanged),
+            this, &CoregSettingsView::maxIterChanged);
+    connect(m_pUi->m_qDoubleSpinBox_Converge, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this, &CoregSettingsView::convergenceChanged);
+    connect(m_pUi->m_qCheckBox_AutoScale, &QCheckBox::clicked,
+            this, &CoregSettingsView::autoScaleStatusChanged);
+    connect(m_pUi->m_qDoubleSpinBox_WeightLpa, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this, &CoregSettingsView::onWeigthsChanged);
+    connect(m_pUi->m_qDoubleSpinBox_WeightRpa, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this, &CoregSettingsView::onWeigthsChanged);
+    connect(m_pUi->m_qDoubleSpinBox_WeightNas, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this, &CoregSettingsView::onWeigthsChanged);
+    connect(m_pUi->m_qPushButton_FitFiducials, &QPushButton::released,
+            this, &CoregSettingsView::fitFiducials);
+    connect(m_pUi->m_qPushButton_FitFiducials, &QPushButton::released,
+            this, &CoregSettingsView::fitIcp);
+    connect(m_pUi->m_qPushButton_TransFileStoreDialaog, &QPushButton::released,
+            this, &CoregSettingsView::onStoreTrans);
 
     QPushButton *m_qPushButton_PickLPA;
     QPushButton *m_qPushButton_PickNas;
     QPushButton *m_qPushButton_PickRPA;
     QLabel *m_qLabel_NOmitted;
-    QCheckBox *checkBox;
-    QWidget *m_qWidget_IcpIterations;
-    QSpinBox *spinBox;
-    QDoubleSpinBox *m_qDoubleSpinBox_Converge;
-    QLineEdit *m_qLineEdit_LpaWeight;
-    QLineEdit *m_qLineEdit_NasWeight;
-    QLineEdit *m_qLineEdit_RpaWeight;
-    QPushButton *m_qPushButton_FitFiducials;
-    QPushButton *m_qPushButton_FitICP;
     QSpinBox *m_qSpinBox_X;
     QSpinBox *m_qSpinBox_Y;
     QSpinBox *m_qSpinBox_Z;
@@ -260,8 +267,78 @@ void CoregSettingsView::onLoadDigFile()
 
 //=============================================================================================================
 
-void CoregSettingsView::onDiscardOutliers()
+void CoregSettingsView::onMaxDistChanged()
 {
-    float fMaxDist = m_pUi->m_qSpinBox_Discard->value()/1000;
-    emit omitDgitizer(fMaxDist);
+    float fMaxDist = m_pUi->m_qSpinBox_MaxDist->value()/1000;
+    emit maxDistChanged(fMaxDist);
+}
+
+//=============================================================================================================
+
+void CoregSettingsView::onWeigthsChanged()
+{
+    float fWeitghtLPA = m_pUi->m_qDoubleSpinBox_WeightLpa->value();
+    float fWeitghtRPA = m_pUi->m_qDoubleSpinBox_WeightRpa->value();
+    float fWeitghtNas = m_pUi->m_qDoubleSpinBox_WeightNas->value();
+
+    emit weightsChanged(fWeitghtLPA,fWeitghtRPA,fWeitghtNas);
+}
+
+//=============================================================================================================
+
+void CoregSettingsView::onStoreTrans()
+{
+    QString t_sDirName = QFileDialog::getExistingDirectory(this,
+                                                           tr("Open directory to store the transformation"),
+                                                           QString(),
+                                                           QFileDialog::ShowDirsOnly
+                                                           | QFileDialog::DontResolveSymlinks);
+
+    QString t_sFileName = m_pUi->m_qLineEdit_TransFileStore->text();
+    QString t_sFilePath(t_sDirName + '/' + t_sFileName);
+    m_pUi->m_qLineEdit_FidStoreFileName->setText(t_sFilePath);
+
+    emit transStoreFileChanged(t_sFilePath);
+}
+
+//=============================================================================================================
+
+int CoregSettingsView::getMaxIter()
+{
+    return m_pUi->m_qSpinBox_MaxIter->value();
+}
+
+//=============================================================================================================
+
+float CoregSettingsView::getConvergence()
+{
+    return m_pUi->m_qDoubleSpinBox_Converge->value()/1000;
+}
+
+//=============================================================================================================
+
+bool CoregSettingsView::getAutoScale()
+{
+    return m_pUi->m_qCheckBox_AutoScale->isChecked();
+}
+
+//=============================================================================================================
+
+float CoregSettingsView::getWeightLPA()
+{
+    return m_pUi->m_qDoubleSpinBox_WeightLpa->text().toFloat();
+}
+
+//=============================================================================================================
+
+float CoregSettingsView::getWeightRPA()
+{
+    return m_pUi->m_qDoubleSpinBox_WeightRpa->text().toFloat();
+}
+
+//=============================================================================================================
+
+float CoregSettingsView::getWeightNas()
+{
+    return m_pUi->m_qDoubleSpinBox_WeightNas->text().toFloat();
 }
