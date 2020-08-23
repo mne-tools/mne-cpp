@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     coregview.cpp
+ * @file     coregsettingsview.cpp
  * @author   Ruben Dörfel <doerfelruben@aol.com>
  * @since    0.1.5
  * @date     August, 2020
@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    CoregView class definition.
+ * @brief    CoregSettingsView class definition.
  *
  */
 
@@ -36,12 +36,14 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "coregview.h"
-#include "ui_coregview.h"
+#include "coregsettingsview.h"
+#include "ui_coregsettingsview.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
+
+#include <QSettings>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -61,11 +63,11 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-CoregView::CoregView(const QString& sSettingsPath,
+CoregSettingsView::CoregSettingsView(const QString& sSettingsPath,
                      QWidget *parent,
                      Qt::WindowFlags f)
 : AbstractView(parent, f)
-, m_pUi(new Ui::CoregViewWidget)
+, m_pUi(new Ui::CoregSettingsViewWidget)
 {
     m_sSettingsPath = sSettingsPath;
     m_pUi->setupUi(this);
@@ -113,36 +115,40 @@ CoregView::CoregView(const QString& sSettingsPath,
 
 //=============================================================================================================
 
-CoregView::~CoregView()
+CoregSettingsView::~CoregSettingsView()
 {
     delete m_pUi;
 }
 
 //=============================================================================================================
 
-void CoregView::saveSettings()
+void CoregSettingsView::saveSettings()
 {
     if(m_sSettingsPath.isEmpty()) {
         return;
     }
 
     // Save Settings
+    QSettings settings("MNECPP");
+
 }
 
 //=============================================================================================================
 
-void CoregView::loadSettings()
+void CoregSettingsView::loadSettings()
 {
     if(m_sSettingsPath.isEmpty()) {
         return;
     }
 
     // Load Settings
+    QSettings settings("MNECPP");
+
 }
 
 //=============================================================================================================
 
-void CoregView::updateGuiMode(GuiMode mode)
+void CoregSettingsView::updateGuiMode(GuiMode mode)
 {
     switch(mode) {
     case GuiMode::Clinical:
@@ -154,7 +160,7 @@ void CoregView::updateGuiMode(GuiMode mode)
 
 //=============================================================================================================
 
-void CoregView::updateProcessingMode(ProcessingMode mode)
+void CoregSettingsView::updateProcessingMode(ProcessingMode mode)
 {
     switch(mode) {
     case ProcessingMode::Offline:

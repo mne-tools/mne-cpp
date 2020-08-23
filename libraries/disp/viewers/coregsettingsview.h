@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     coregview.h
+ * @file     coregsettingsview.h
  * @author   Ruben Dörfel <doerfelruben@aol.com>
  * @since    0.1.0
  * @date     August, 2020
@@ -28,12 +28,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     DISPLIB class declaration.
+ * @brief     CoregSettingsView class declaration.
  *
  */
 
-#ifndef COREGVIEW_H
-#define COREGVIEW_H
+#ifndef COREGSETTINGSVIEW_H
+#define COREGSETTINGSVIEW_H
 
 //=============================================================================================================
 // INCLUDES
@@ -57,7 +57,7 @@
 //=============================================================================================================
 
 namespace Ui {
-    class CoregViewWidget;
+    class CoregSettingsViewWidget;
 }
 
 //=============================================================================================================
@@ -73,27 +73,27 @@ namespace DISPLIB
 
 //=============================================================================================================
 /**
- * Description of what this class is intended to do (in detail).
+ * This classprovides the interface to the coregistration setting view.
  *
  * @brief Brief description of this class.
  */
-class DISPSHARED_EXPORT CoregView : public AbstractView
+class DISPSHARED_EXPORT CoregSettingsView : public AbstractView
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<CoregView> SPtr;            /**< Shared pointer type for DISPLIB. */
-    typedef QSharedPointer<const CoregView> ConstSPtr; /**< Const shared pointer type for DISPLIB. */
+    typedef QSharedPointer<CoregSettingsView> SPtr;            /**< Shared pointer type for DISPLIB. */
+    typedef QSharedPointer<const CoregSettingsView> ConstSPtr; /**< Const shared pointer type for DISPLIB. */
 
     //=========================================================================================================
     /**
-    * Constructs a CoregView object.
+    * Constructs a CoregSettingsView object.
     */
-    explicit CoregView(const QString& sSettingsPath = "",
+    explicit CoregSettingsView(const QString& sSettingsPath = "",
                              QWidget *parent = 0,
                              Qt::WindowFlags f = Qt::Widget);
 
-    ~CoregView();
+    ~CoregSettingsView();
 
     //=========================================================================================================
     /**
@@ -156,8 +156,8 @@ protected:
     void onStoreTrans();
 
 private:
-    Ui::CoregViewWidget*        m_pUi;                          /**< The rtFwd dialog. */
-    QString                     m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
+    Ui::CoregSettingsViewWidget*    m_pUi;                  /**< The CoregSettingsViewWidget.*/
+    QString                         m_sSettingsPath;        /**< The settings path to store the GUI settings to. */
 
 signals:
 
@@ -170,5 +170,5 @@ signals:
 
 } // NAMESPACE
 
-#endif // COREGVIEW_H
+#endif // COREGSETTINGSVIEW_H
 
