@@ -101,19 +101,22 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="m_qPushButton_FidStoreFileDialog">
-            <property name="text">
-             <string>Load Fiducials</string>
-            </property>
-           </widget>
-          </item>
-          <item>
            <widget class="QLineEdit" name="m_qLineEdit_FidStoreFileName">
             <property name="minimumSize">
              <size>
               <width>140</width>
               <height>0</height>
              </size>
+            </property>
+            <property name="text">
+             <string>*-fiducials.fif</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="m_qPushButton_FidStoreFileDialog">
+            <property name="text">
+             <string>Store Fiducials</string>
             </property>
            </widget>
           </item>
