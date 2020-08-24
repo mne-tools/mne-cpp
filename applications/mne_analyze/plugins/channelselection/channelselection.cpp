@@ -82,6 +82,7 @@ ChannelSelection::ChannelSelection()
 ChannelSelection::~ChannelSelection()
 {
     delete m_pSelectionItem;
+    delete m_pChannelSelectionView;
 }
 
 //=============================================================================================================
