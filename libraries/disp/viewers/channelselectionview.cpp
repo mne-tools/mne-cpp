@@ -163,11 +163,12 @@ void ChannelSelectionView::initComboBoxes()
                 this, &ChannelSelectionView::onComboBoxLayoutChanged);
 
     //Initialise layout as neuromag vectorview with all channels
-    QString selectionName("babymeg-mag-inner-layer.lout");
-    loadLayout(QCoreApplication::applicationDirPath() + selectionName.prepend("/resources/general/2DLayouts/"));
+    QString selectionName("Vectorview-all.lout");
+    //loadLayout(QCoreApplication::applicationDirPath() + selectionName.prepend("/resources/general/2DLayouts/"));
+    setCurrentLayoutFile(selectionName);
 
     //Load selection groups again because they need to be reinitialised every time a new layout hase been loaded
-    selectionName = QString("mne_browse_raw_babyMEG.sel");
+    selectionName = QString("mne_browse_raw_vv.sel");
     loadSelectionGroups(QCoreApplication::applicationDirPath() + selectionName.prepend("/resources/general/selectionGroups/"));
 }
 
@@ -431,7 +432,7 @@ void ChannelSelectionView::loadSettings()
 
     QSettings settings("MNECPP");
 
-    setCurrentLayoutFile(settings.value(m_sSettingsPath + QString("/ChannelSelectionView/selectedLayoutFile"), "babymeg-mag-inner-layer.lout").toString());
+    setCurrentLayoutFile(settings.value(m_sSettingsPath + QString("/ChannelSelectionView/selectedLayoutFile"), "Vectorview-all.lout").toString());
 
     std::cout << "loadSettings: " << getCurrentLayoutFile().toStdString();
 
