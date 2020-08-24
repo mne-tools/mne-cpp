@@ -323,6 +323,7 @@ QString ChannelSelectionView::getCurrentLayoutFile()
 
 void ChannelSelectionView::setCurrentLayoutFile(QString currentLayoutFile)
 {
+    qDebug() << "setCurrentLayoutFile:" << currentLayoutFile;
     m_pUi->m_comboBox_layoutFile->setCurrentText(currentLayoutFile);
 
     updateBadChannels();
@@ -413,8 +414,11 @@ void ChannelSelectionView::saveSettings()
 
     QSettings settings("MNECPP");
 
+    std::cout << "saveSettings: " << getCurrentLayoutFile().toStdString();
+
     settings.setValue(m_sSettingsPath + QString("/ChannelSelectionView/selectedLayoutFile"), getCurrentLayoutFile());
     settings.setValue(m_sSettingsPath + QString("/ChannelSelectionView/channelSelectionViewPos"), this->pos());
+    //settings.setValue(m_sSettingsPath + QString("/ChannelSelectionView/selectedGroupFile"),
 }
 
 //=============================================================================================================
@@ -428,6 +432,8 @@ void ChannelSelectionView::loadSettings()
     QSettings settings("MNECPP");
 
     setCurrentLayoutFile(settings.value(m_sSettingsPath + QString("/ChannelSelectionView/selectedLayoutFile"), "babymeg-mag-inner-layer.lout").toString());
+
+    std::cout << "loadSettings: " << getCurrentLayoutFile().toStdString();
 
     QPoint pos = settings.value(m_sSettingsPath + QString("/ChannelSelectionView/channelSelectionViewPos"), QPoint(100,100)).toPoint();
 
@@ -467,6 +473,7 @@ void ChannelSelectionView::updateProcessingMode(ProcessingMode mode)
 
 bool ChannelSelectionView::loadLayout(QString path)
 {
+    qDebug() << "loadLayout:" << path;
     bool state = LayoutLoader::readMNELoutFile(path, m_layoutMap);
 
     //if no layout for EEG is specified generate from digitizer points
@@ -599,6 +606,8 @@ bool ChannelSelectionView::loadSelectionGroups(QString path)
     //Delete all MEG channels from the selection groups which are not in the loaded layout
     //TODO: Is this needed anymore? Causes some trouble after a new selection file has been loaded
     //cleanUpMEGChannels();
+
+    m_pUi->m_lineEdit_loadedFile->setText(QFileInfo(path).fileName());
 
     return state;
 }
