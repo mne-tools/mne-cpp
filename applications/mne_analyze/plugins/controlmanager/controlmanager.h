@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     scalingmanager.h
+ * @file     controlmanager.h
  * @author   Gabriel Motta <gbmotta@mgh.harvard.edu>
  * @since    0.1.5
  * @date     August, 2020
@@ -28,18 +28,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains the declaration of the ScalingManager class.
+ * @brief    Contains the declaration of the ControlManager class.
  *
  */
 
-#ifndef SCALINGMANAGER_H
-#define SCALINGMANAGER_H
+#ifndef CONTROLMANAGER_H
+#define CONTROLMANAGER_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "scalingmanager_global.h"
+#include "controlmanager_global.h"
 #include <anShared/Interfaces/IPlugin.h>
 
 //=============================================================================================================
@@ -67,34 +67,34 @@ namespace DISPLIB{
 // DEFINE NAMESPACE SURFERPLUGIN
 //=============================================================================================================
 
-namespace SCALINGMANAGERPLUGIN
+namespace CONTROLMANAGERPLUGIN
 {
 
 //=============================================================================================================
 /**
- * ScalingManager Plugin
+ * ControlManager Plugin
  *
- * @brief The ScalingManager class provides a view with all currently loaded models.
+ * @brief The ControlManager class provides a view with all currently loaded models.
  */
-class SCALINGMANAGERSHARED_EXPORT ScalingManager : public ANSHAREDLIB::IPlugin
+class CONTROLMANAGERSHARED_EXPORT ControlManager : public ANSHAREDLIB::IPlugin
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "scalingmanager.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "controlmanager.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(ANSHAREDLIB::IPlugin)
 
 public:
     //=========================================================================================================
     /**
-     * Constructs a ScalingManager.
+     * Constructs a ControlManager.
      */
-    ScalingManager();
+    ControlManager();
 
     //=========================================================================================================
     /**
-     * Destroys the ScalingManager.
+     * Destroys the ControlManager.
      */
-    virtual ~ScalingManager() override;
+    virtual ~ControlManager() override;
 
     // IPlugin functions
     virtual QSharedPointer<IPlugin> clone() const override;
@@ -123,4 +123,4 @@ private:
 
 } // NAMESPACE
 
-#endif // SCALINGMANAGER_H
+#endif // CONTROLMANAGER_H

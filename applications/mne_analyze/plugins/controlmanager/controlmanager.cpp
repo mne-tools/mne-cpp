@@ -44,6 +44,7 @@
 
 #include <disp/viewers/scalingview.h>
 #include <disp/viewers/applytoview.h>
+#include <disp/viewers/fiffrawviewsettings.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -118,15 +119,21 @@ QDockWidget *ScalingManager::getControl()
     QDockWidget* pControlDock = new QDockWidget(getName());
     pControlDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     pControlDock->setObjectName(getName());
+    QTabWidget* pTabWidget = new QTabWidget();
 
     QScrollArea* wrappedScrollArea = new QScrollArea(pControlDock);
     QVBoxLayout* pLayout = new QVBoxLayout;
 
     DISPLIB::ScalingView* pScalingWidget = new DISPLIB::ScalingView("MNEANALYZE", wrappedScrollArea);
+    DISPLIB::FiffRawViewSettings* pFiffViewSettings = new DISPLIB::FiffRawViewSettings("MNEANALYZE", wrappedScrollArea);
     m_pApplyToView = new DISPLIB::ApplyToView();
 
-    pLayout->addWidget(pScalingWidget);
+    pTabWidget->addTab(pScalingWidget, "Scaling");
+    pTabWidget->addTab(pFiffViewSettings, "Controls");
+
+    pLayout->addWidget(pTabWidget);
     pLayout->addWidget(m_pApplyToView);
+    pLayout->addStretch();
     wrappedScrollArea->setLayout(pLayout);
     pControlDock->setWidget(wrappedScrollArea);
 

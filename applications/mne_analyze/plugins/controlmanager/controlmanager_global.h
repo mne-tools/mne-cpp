@@ -1,15 +1,13 @@
 //=============================================================================================================
 /**
- * @file     scalingmanager_global.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
- *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
- * @since    0.1.0
- * @date     August, 2018
+ * @file     controlmanager_global.h
+ * @author   Gabriel Motta <gbmotta@mgh.harvard.edu>
+ * @since    0.1.5
+ * @date     August, 2020
  *
  * @section  LICENSE
  *
- * Copyright (C) 2018, Lorenz Esch, Lars Debor, Simon Heinke. All rights reserved.
+ * Copyright (C) 2020, Gabriel Motta. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -34,8 +32,8 @@
  *
  */
 
-#ifndef SCALINGMANAGER_GLOBAL_H
-#define SCALINGMANAGER_GLOBAL_H
+#ifndef CONTROLMANAGER_GLOBAL_H
+#define CONTROLMANAGER_GLOBAL_H
 
 //=============================================================================================================
 // QT INCLUDES
@@ -47,10 +45,10 @@
 // PREPROCESSOR DEFINES
 //=============================================================================================================
 
-#if defined(SCALINGMANAGER_PLUGIN)
-#  define SCALINGMANAGERSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#if defined(CONTROLMANAGER_PLUGIN)
+#  define CONTROLMANAGERSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define SCALINGMANAGERSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#  define CONTROLMANAGERSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
-#endif // SCALINGMANAGER_GLOBAL_H
+#endif // CONTROLMANAGER_GLOBAL_H
