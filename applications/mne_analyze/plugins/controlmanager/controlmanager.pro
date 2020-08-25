@@ -1,6 +1,6 @@
 #==============================================================================================================
 #
-# @file     scalingmanager.pro
+# @file     controlmanager.pro
 # @author   Gabriel Motta <gbmotta@mgh.harvard.edu>
 # @since    0.1.5
 # @date     August, 2020
@@ -28,7 +28,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile for the scalingmanager plugin.
+# @brief    This project file generates the makefile for the controlmanager plugin.
 #
 #==============================================================================================================
 
@@ -40,7 +40,7 @@ CONFIG += skip_target_version_ext
 
 CONFIG += plugin
 
-DEFINES += SCALINGMANAGER_PLUGIN
+DEFINES += CONTROLMANAGER_PLUGIN
 
 QT += gui widgets
 
@@ -53,7 +53,7 @@ contains(MNECPP_CONFIG, static) {
     CONFIG += shared
 }
 
-TARGET = scalingmanager
+TARGET = controlmanager
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -84,15 +84,15 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES += \
-    scalingmanager.cpp
+    controlmanager.cpp
 
 HEADERS += \
-    scalingmanager_global.h \
-    scalingmanager.h
+    controlmanager_global.h \
+    controlmanager.h
 
 FORMS += \
 
-OTHER_FILES += scalingmanager.json
+OTHER_FILES += controlmanager.json
 
 RESOURCES += \
 
