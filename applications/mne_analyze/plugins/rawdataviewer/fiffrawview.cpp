@@ -287,6 +287,11 @@ void FiffRawView::setZoom(double dZoomFac)
     m_fZoomFactor = dZoomFac;
 
     m_pTableView->verticalHeader()->setDefaultSectionSize(m_pTableView->height() / m_fZoomFactor/**m_fDefaultSectionSize*/);//Row Height
+
+    QFont font = m_pTableView->font();
+    font.setPointSize(std::min((m_pTableView->height() / m_fZoomFactor) / 4.,  12.));
+    m_pTableView->setFont(font);
+
     updateView();
 }
 
