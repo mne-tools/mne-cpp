@@ -87,6 +87,7 @@ ChannelSelectionView::ChannelSelectionView(const QString& sSettingsPath,
 : AbstractView(parent, f)
 , m_pUi(new Ui::ChannelSelectionViewWidget)
 , m_pChannelInfoModel(pChannelInfoModel)
+, m_bSetup(false)
 {
     m_sSettingsPath = sSettingsPath;
     m_pUi->setupUi(this);
@@ -100,6 +101,8 @@ ChannelSelectionView::ChannelSelectionView(const QString& sSettingsPath,
 
     loadSettings();
 
+    m_bSetup = true;
+
     setCurrentlyMappedFiffChannels(m_pChannelInfoModel->getMappedChannelsList());
 }
 
@@ -107,7 +110,7 @@ ChannelSelectionView::ChannelSelectionView(const QString& sSettingsPath,
 
 ChannelSelectionView::~ChannelSelectionView()
 {
-    saveSettings();
+//    saveSettings();
 
     delete m_pUi;
 }
@@ -546,6 +549,10 @@ bool ChannelSelectionView::loadLayout(QString path)
 
     if(state)
         emit loadedLayoutMap(m_layoutMap);
+
+    if(m_bSetup){
+        saveSettings();
+    }
 
     return state;
 }
