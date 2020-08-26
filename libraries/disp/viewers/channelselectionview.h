@@ -382,6 +382,7 @@ private:
 
     QString                             m_sSettingsPath;                    /**< The settings path to store the GUI settings to. */
 
+    bool                                m_bSetup;
 signals:
     //=========================================================================================================
     /**
