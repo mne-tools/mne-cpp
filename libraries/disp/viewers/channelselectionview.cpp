@@ -325,6 +325,13 @@ QString ChannelSelectionView::getCurrentLayoutFile()
 
 //=============================================================================================================
 
+QString ChannelSelectionView::getCurrentGroupFile()
+{
+    return m_pUi->m_lineEdit_loadedFile->text();
+}
+
+//=============================================================================================================
+
 void ChannelSelectionView::setCurrentLayoutFile(QString currentLayoutFile)
 {
     qDebug() << "setCurrentLayoutFile:" << currentLayoutFile;
@@ -422,7 +429,7 @@ void ChannelSelectionView::saveSettings()
 
     settings.setValue(m_sSettingsPath + QString("/ChannelSelectionView/selectedLayoutFile"), getCurrentLayoutFile());
     settings.setValue(m_sSettingsPath + QString("/ChannelSelectionView/channelSelectionViewPos"), this->pos());
-    //settings.setValue(m_sSettingsPath + QString("/ChannelSelectionView/selectedGroupFile"),
+    settings.setValue(m_sSettingsPath + QString("/ChannelSelectionView/selectedGroupFile"), getCurrentGroupFile());
 }
 
 //=============================================================================================================
@@ -436,6 +443,7 @@ void ChannelSelectionView::loadSettings()
     QSettings settings("MNECPP");
 
     setCurrentLayoutFile(settings.value(m_sSettingsPath + QString("/ChannelSelectionView/selectedLayoutFile"), "Vectorview-all.lout").toString());
+    loadSelectionGroups(QCoreApplication::applicationDirPath() + settings.value(m_sSettingsPath + QString("/ChannelSelectionView/selectedGroupFile"), "mne_browse_raw_vv.sel").toString().prepend("/resources/general/selectionGroups/"));
 
     std::cout << "loadSettings: " << getCurrentLayoutFile().toStdString();
 
@@ -616,6 +624,11 @@ bool ChannelSelectionView::loadSelectionGroups(QString path)
     //cleanUpMEGChannels();
 
     m_pUi->m_lineEdit_loadedFile->setText(QFileInfo(path).fileName());
+
+
+    if(m_bSetup){
+        saveSettings();
+    }
 
     return state;
 }
