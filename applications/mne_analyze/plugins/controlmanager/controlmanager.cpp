@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     scalingmanager.cpp
+ * @file     controlmanager.cpp
  * @author   Gabriel Motta <gbmotta@mgh.harvard.edu>
  * @since    0.1.5
  * @date     August, 2020
@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the ScalingManager class.
+ * @brief    Definition of the ControlManager class.
  *
  */
 
@@ -36,7 +36,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "scalingmanager.h"
+#include "controlmanager.h"
 
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Management/communicator.h>
@@ -56,21 +56,21 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace SCALINGMANAGERPLUGIN;
+using namespace CONTROLMANAGERPLUGIN;
 using namespace ANSHAREDLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ScalingManager::ScalingManager()
+ControlManager::ControlManager()
 : m_pSelectionParameters(new ANSHAREDLIB::ScalingParameters)
 {
 }
 
 //=============================================================================================================
 
-ScalingManager::~ScalingManager()
+ControlManager::~ControlManager()
 {
     if(m_pSelectionParameters){
         delete m_pSelectionParameters;
@@ -79,42 +79,42 @@ ScalingManager::~ScalingManager()
 
 //=============================================================================================================
 
-QSharedPointer<IPlugin> ScalingManager::clone() const
+QSharedPointer<IPlugin> ControlManager::clone() const
 {
-    QSharedPointer<ScalingManager> pScalingManagerClone = QSharedPointer<ScalingManager>::create();
-    return pScalingManagerClone;
+    QSharedPointer<ControlManager> pControlManagerClone = QSharedPointer<ControlManager>::create();
+    return pControlManagerClone;
 }
 
 //=============================================================================================================
 
-void ScalingManager::init()
+void ControlManager::init()
 {
     m_pCommu = new Communicator(this);
 }
 
 //=============================================================================================================
 
-void ScalingManager::unload()
+void ControlManager::unload()
 {
 }
 
 //=============================================================================================================
 
-QString ScalingManager::getName() const
+QString ControlManager::getName() const
 {
     return "Scaling";
 }
 
 //=============================================================================================================
 
-QMenu *ScalingManager::getMenu()
+QMenu *ControlManager::getMenu()
 {
     return Q_NULLPTR;
 }
 
 //=============================================================================================================
 
-QDockWidget *ScalingManager::getControl()
+QDockWidget *ControlManager::getControl()
 {
     QDockWidget* pControlDock = new QDockWidget(getName());
     pControlDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
@@ -138,7 +138,21 @@ QDockWidget *ScalingManager::getControl()
     pControlDock->setWidget(wrappedScrollArea);
 
     connect(pScalingWidget, &DISPLIB::ScalingView::scalingChanged,
-            this, &ScalingManager::onScalingChanged, Qt::UniqueConnection);
+            this, &ControlManager::onScalingChanged, Qt::UniqueConnection);
+
+    connect(pFiffViewSettings, &DISPLIB::FiffRawViewSettings::signalColorChanged,
+            this, &ControlManager::onSignalColorChanged, Qt::UniqueConnection);
+    connect(pFiffViewSettings, &DISPLIB::FiffRawViewSettings::backgroundColorChanged,
+            this, &ControlManager::onBackgroundColorChanged, Qt::UniqueConnection);
+    connect(pFiffViewSettings, &DISPLIB::FiffRawViewSettings::zoomChanged,
+            this, &ControlManager::onZoomChanged, Qt::UniqueConnection);
+    connect(pFiffViewSettings, &DISPLIB::FiffRawViewSettings::timeWindowChanged,
+            this, &ControlManager::onTimeWindowChanged, Qt::UniqueConnection);
+    connect(pFiffViewSettings, &DISPLIB::FiffRawViewSettings::distanceTimeSpacerChanged,
+            this, &ControlManager::onDistanceTimeSpacerChanged, Qt::UniqueConnection);
+    connect(pFiffViewSettings, &DISPLIB::FiffRawViewSettings::makeScreenshot,
+            this, &ControlManager::onMakeScreenshot, Qt::UniqueConnection);
+
 
     m_pSelectionParameters->m_mScalingMap = pScalingWidget->getScaleMap();
     m_pSelectionParameters->m_mScalingMap.detach();
@@ -148,28 +162,28 @@ QDockWidget *ScalingManager::getControl()
 
 //=============================================================================================================
 
-QWidget *ScalingManager::getView()
+QWidget *ControlManager::getView()
 {
     return Q_NULLPTR;
 }
 
 //=============================================================================================================
 
-void ScalingManager::handleEvent(QSharedPointer<Event> e)
+void ControlManager::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
     case SELECTED_MODEL_CHANGED:
         onScalingChanged(m_pSelectionParameters->m_mScalingMap);
         break;
     default:
-        qWarning() << "[ScalingManager::handleEvent] received an Event that is not handled by switch-cases";
+        qWarning() << "[ControlManager::handleEvent] received an Event that is not handled by switch-cases";
         break;
     }
 }
 
 //=============================================================================================================
 
-QVector<EVENT_TYPE> ScalingManager::getEventSubscriptions(void) const
+QVector<EVENT_TYPE> ControlManager::getEventSubscriptions(void) const
 {
     QVector<EVENT_TYPE> temp;
     temp.push_back(SELECTED_MODEL_CHANGED);
@@ -179,7 +193,7 @@ QVector<EVENT_TYPE> ScalingManager::getEventSubscriptions(void) const
 
 //=============================================================================================================
 
-void ScalingManager::onScalingChanged(const QMap<qint32, float> &scalingMap)
+void ControlManager::onScalingChanged(const QMap<qint32, float> &scalingMap)
 {
     m_pSelectionParameters->m_sViewsToApply = m_pApplyToView->getSelectedViews();
 
