@@ -111,6 +111,24 @@ private:
     //=========================================================================================================
     void onScalingChanged(const QMap<qint32, float>& scalingMap);
 
+    //=========================================================================================================
+    void onSignalColorChanged(const QColor& signalColor);
+
+    //=========================================================================================================
+    void onBackgroundColorChanged(const QColor& backgroundColor);
+
+    //=========================================================================================================
+    void onZoomChanged(double value);
+
+    //=========================================================================================================
+    void onTimeWindowChanged(int value);
+
+    //=========================================================================================================
+    void onDistanceTimeSpacerChanged(int value);
+
+    //=========================================================================================================
+    void onMakeScreenshot(const QString& imageType);
+
     QPointer<ANSHAREDLIB::Communicator>     m_pCommu;
 
     DISPLIB::ApplyToView*                   m_pApplyToView;
