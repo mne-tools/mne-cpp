@@ -215,6 +215,10 @@ void RawDataViewer::handleEvent(QSharedPointer<Event> e)
             m_pFiffRawView->setScalingMap(e->getData().value<ANSHAREDLIB::ScalingParameters*>()->m_mScalingMap);
         }
         break;
+    case VIEW_SETTINGS_CHANGED:
+        if(e->getData().value<ANSHAREDLIB::ViewParameters*>()->m_sViewsToApply.contains("signalview")){
+            updateViewParameters(e->getData().value<ANSHAREDLIB::ViewParameters*>());
+        }
     default:
         qWarning() << "[RawDataViewer::handleEvent] Received an Event that is not handled by switch cases.";
     }
@@ -234,6 +238,7 @@ QVector<EVENT_TYPE> RawDataViewer::getEventSubscriptions(void) const
     temp.push_back(FILTER_DESIGN_CHANGED);
     temp.push_back(CHANNEL_SELECTION_ITEMS);
     temp.push_back(SCALING_MAP_CHANGED);
+    temp.push_back(VIEW_SETTINGS_CHANGED);
 
     return temp;
 }
@@ -303,4 +308,27 @@ void RawDataViewer::onSendSamplePos(int iSample)
     data.setValue(iSample);
 
     m_pCommu->publishEvent(EVENT_TYPE::NEW_ANNOTATION_ADDED, data);
+}
+
+//=============================================================================================================
+
+void RawDataViewer::updateViewParameters(ANSHAREDLIB::ViewParameters *pViewParameters)
+{
+    switch (pViewParameters->m_sSettingsToApply){
+        case ANSHAREDLIB::ViewParameters::ViewSetting::signal:
+            break;
+        case ANSHAREDLIB::ViewParameters::ViewSetting::background:
+            break;
+        case ANSHAREDLIB::ViewParameters::ViewSetting::zoom:
+            break;
+        case ANSHAREDLIB::ViewParameters::ViewSetting::window:
+            m_pFiffRawView->setWindowSize(pViewParameters->m_iTimeWindow);
+            break;
+        case ANSHAREDLIB::ViewParameters::ViewSetting::spacer:
+            m_pFiffRawView->setDistanceTimeSpacer(pViewParameters->m_iTimeSpacers);
+            break;
+        case ANSHAREDLIB::ViewParameters::ViewSetting::screenshot:
+            m_pFiffRawView->onMakeScreenshot(pViewParameters->m_sImageType);
+            break;
+    }
 }
