@@ -140,6 +140,9 @@ private:
      */
     void onSendSamplePos(int iSample);
 
+    //=========================================================================================================
+    void updateViewParameters(ANSHAREDLIB::ViewParameters* pViewParameters);
+
     // Control
     QPointer<ANSHAREDLIB::Communicator>             m_pCommu;                   /**< The communicator object to communicate with other plugins. */
 
