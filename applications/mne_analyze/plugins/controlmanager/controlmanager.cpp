@@ -64,7 +64,8 @@ using namespace ANSHAREDLIB;
 //=============================================================================================================
 
 ControlManager::ControlManager()
-: m_pSelectionParameters(new ANSHAREDLIB::ScalingParameters)
+: m_pScalingParameters(new ANSHAREDLIB::ScalingParameters)
+, m_pViewParmeters(new ANSHAREDLIB::ViewParameters)
 {
 }
 
@@ -72,8 +73,8 @@ ControlManager::ControlManager()
 
 ControlManager::~ControlManager()
 {
-    if(m_pSelectionParameters){
-        delete m_pSelectionParameters;
+    if(m_pScalingParameters){
+        delete m_pScalingParameters;
     }
 }
 
@@ -154,8 +155,15 @@ QDockWidget *ControlManager::getControl()
             this, &ControlManager::onMakeScreenshot, Qt::UniqueConnection);
 
 
-    m_pSelectionParameters->m_mScalingMap = pScalingWidget->getScaleMap();
-    m_pSelectionParameters->m_mScalingMap.detach();
+    m_pScalingParameters->m_mScalingMap = pScalingWidget->getScaleMap();
+    m_pScalingParameters->m_mScalingMap.detach();
+
+    m_pViewParmeters->m_colorSignal = pFiffViewSettings->getSignalColor();
+    m_pViewParmeters->m_colorBackground = pFiffViewSettings->getBackgroundColor();
+    m_pViewParmeters->m_dZoomValue = pFiffViewSettings->getZoom();
+    m_pViewParmeters->m_iTimeWindow = pFiffViewSettings->getWindowSize();
+    m_pViewParmeters->m_iTimeSpacers = pFiffViewSettings->getDistanceTimeSpacer();
+    m_pViewParmeters->m_sImageType = "";
 
     return pControlDock;
 }
@@ -173,7 +181,7 @@ void ControlManager::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
     case SELECTED_MODEL_CHANGED:
-        onScalingChanged(m_pSelectionParameters->m_mScalingMap);
+        onScalingChanged(m_pScalingParameters->m_mScalingMap);
         break;
     default:
         qWarning() << "[ControlManager::handleEvent] received an Event that is not handled by switch-cases";
@@ -195,13 +203,58 @@ QVector<EVENT_TYPE> ControlManager::getEventSubscriptions(void) const
 
 void ControlManager::onScalingChanged(const QMap<qint32, float> &scalingMap)
 {
-    m_pSelectionParameters->m_sViewsToApply = m_pApplyToView->getSelectedViews();
+    m_pScalingParameters->m_sViewsToApply = m_pApplyToView->getSelectedViews();
 
-    m_pSelectionParameters->m_mScalingMap = scalingMap;
-    m_pSelectionParameters->m_mScalingMap.detach();
+    m_pScalingParameters->m_mScalingMap = scalingMap;
+    m_pScalingParameters->m_mScalingMap.detach();
 
-    m_pCommu->publishEvent(EVENT_TYPE::SCALING_MAP_CHANGED, QVariant::fromValue(m_pSelectionParameters));
+    m_pCommu->publishEvent(EVENT_TYPE::SCALING_MAP_CHANGED, QVariant::fromValue(m_pScalingParameters));
 }
 
 //=============================================================================================================
+void ControlManager::onSignalColorChanged(const QColor& signalColor)
+{
+    m_pViewParmeters->m_sViewsToApply = m_pApplyToView->getSelectedViews();
 
+    m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_pViewParmeters));
+}
+
+//=============================================================================================================
+void ControlManager::onBackgroundColorChanged(const QColor& backgroundColor)
+{
+    m_pViewParmeters->m_sViewsToApply = m_pApplyToView->getSelectedViews();
+
+    m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_pViewParmeters));
+}
+
+//=============================================================================================================
+void ControlManager::onZoomChanged(double value)
+{
+    m_pViewParmeters->m_sViewsToApply = m_pApplyToView->getSelectedViews();
+
+    m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_pViewParmeters));
+}
+
+//=============================================================================================================
+void ControlManager::onTimeWindowChanged(int value)
+{
+    m_pViewParmeters->m_sViewsToApply = m_pApplyToView->getSelectedViews();
+
+    m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_pViewParmeters));
+}
+
+//=============================================================================================================
+void ControlManager::onDistanceTimeSpacerChanged(int value)
+{
+    m_pViewParmeters->m_sViewsToApply = m_pApplyToView->getSelectedViews();
+
+    m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_pViewParmeters));
+}
+
+//=============================================================================================================
+void ControlManager::onMakeScreenshot(const QString& imageType)
+{
+    m_pViewParmeters->m_sViewsToApply = m_pApplyToView->getSelectedViews();
+
+    m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_pViewParmeters));
+}

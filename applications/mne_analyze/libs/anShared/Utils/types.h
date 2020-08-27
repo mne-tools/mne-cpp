@@ -48,6 +48,7 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QColor>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -103,7 +104,8 @@ namespace ANSHAREDLIB
         FILTER_ACTIVE_CHANGED,      // send when the filter active state was toggled
         FILTER_DESIGN_CHANGED,      // send when the designed filter changed
         CHANNEL_SELECTION_ITEMS,    // send when channel selection changes with channel info about graphic items to draw
-        SCALING_MAP_CHANGED
+        SCALING_MAP_CHANGED,
+        VIEW_SETTINGS_CHANGED
     };
 
     //=========================================================================================================
@@ -113,6 +115,18 @@ namespace ANSHAREDLIB
     struct ScalingParameters{
         QList<QString>      m_sViewsToApply;        /**< Which views should apply changes */
         QMap<qint32, float> m_mScalingMap;          /**< Scaling map */
+    };
+
+    //=========================================================================================================
+    struct ViewParameters{
+        QList<QString>      m_sViewsToApply;
+        QList<QString>      m_sSettingsToApply;
+        QColor              m_colorSignal;
+        QColor              m_colorBackground;
+        double              m_dZoomValue;
+        int                 m_iTimeWindow;
+        int                 m_iTimeSpacers;
+        QString             m_sImageType;
     };
 
     //=========================================================================================================
@@ -132,6 +146,8 @@ namespace ANSHAREDLIB
 //Declare structs to be used in QVariant
 Q_DECLARE_METATYPE(ANSHAREDLIB::ScalingParameters);
 Q_DECLARE_METATYPE(ANSHAREDLIB::ScalingParameters*);
+Q_DECLARE_METATYPE(ANSHAREDLIB::ViewParameters);
+Q_DECLARE_METATYPE(ANSHAREDLIB::ViewParameters*);
 //Q_DECLARE_METATYPE(ANSHAREDLIB::SelectionParameters);
 //Q_DECLARE_METATYPE(ANSHAREDLIB::SelectionParameters*);
 
