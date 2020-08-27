@@ -119,14 +119,24 @@ namespace ANSHAREDLIB
 
     //=========================================================================================================
     struct ViewParameters{
+        enum ViewSetting{
+            signal,
+            background,
+            zoom,
+            window,
+            spacer,
+            screenshot
+        };
+
         QList<QString>      m_sViewsToApply;
-        QList<QString>      m_sSettingsToApply;
+        ViewSetting         m_sSettingsToApply;
         QColor              m_colorSignal;
         QColor              m_colorBackground;
         double              m_dZoomValue;
         int                 m_iTimeWindow;
         int                 m_iTimeSpacers;
         QString             m_sImageType;
+
     };
 
     //=========================================================================================================
