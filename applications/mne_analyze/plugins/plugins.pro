@@ -43,8 +43,13 @@ SUBDIRS += \
     rawdataviewer \
     annotationmanager \
     filtering \
-    #averaging \
+    averaging \
     channelselection \
     scalingmanager \
-    sourcelocalization \
+    sourcelocalization \    
 #    sampleplugin \
+
+# Exclude plugins which rely on the Qt3D module. Note: The Qt3D module is not yet supported by Wasm
+!contains(MNECPP_CONFIG, wasm) {
+    SUBDIRS += view3d
+}
