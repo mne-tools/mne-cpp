@@ -103,7 +103,7 @@ void ControlManager::unload()
 
 QString ControlManager::getName() const
 {
-    return "Scaling";
+    return "Settings";
 }
 
 //=============================================================================================================
@@ -182,6 +182,9 @@ void ControlManager::handleEvent(QSharedPointer<Event> e)
     switch (e->getType()) {
     case SELECTED_MODEL_CHANGED:
         onScalingChanged(m_pScalingParameters->m_mScalingMap);
+        m_pViewParmeters->m_sViewsToApply = m_pApplyToView->getSelectedViews();
+        m_pViewParmeters->m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::all;
+        m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_pViewParmeters));
         break;
     default:
         qWarning() << "[ControlManager::handleEvent] received an Event that is not handled by switch-cases";
@@ -215,7 +218,7 @@ void ControlManager::onScalingChanged(const QMap<qint32, float> &scalingMap)
 void ControlManager::onSignalColorChanged(const QColor& signalColor)
 {
     m_pViewParmeters->m_sViewsToApply = m_pApplyToView->getSelectedViews();
-    m_pViewParmeters->m_sSettingsToApply = "signal";
+    m_pViewParmeters->m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::signal;
     m_pViewParmeters->m_colorSignal = signalColor;
 
     m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_pViewParmeters));
@@ -225,7 +228,7 @@ void ControlManager::onSignalColorChanged(const QColor& signalColor)
 void ControlManager::onBackgroundColorChanged(const QColor& backgroundColor)
 {
     m_pViewParmeters->m_sViewsToApply = m_pApplyToView->getSelectedViews();
-    m_pViewParmeters->m_sSettingsToApply = "background";
+    m_pViewParmeters->m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::background;
     m_pViewParmeters->m_colorBackground = backgroundColor;
 
     m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_pViewParmeters));
@@ -235,7 +238,7 @@ void ControlManager::onBackgroundColorChanged(const QColor& backgroundColor)
 void ControlManager::onZoomChanged(double value)
 {
     m_pViewParmeters->m_sViewsToApply = m_pApplyToView->getSelectedViews();
-    m_pViewParmeters->m_sSettingsToApply = "zoom";
+    m_pViewParmeters->m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::zoom;
     m_pViewParmeters->m_dZoomValue = value;
 
     m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_pViewParmeters));
@@ -245,7 +248,7 @@ void ControlManager::onZoomChanged(double value)
 void ControlManager::onTimeWindowChanged(int value)
 {
     m_pViewParmeters->m_sViewsToApply = m_pApplyToView->getSelectedViews();
-    m_pViewParmeters->m_sSettingsToApply = "window";
+    m_pViewParmeters->m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::window;
     m_pViewParmeters->m_iTimeWindow = value;
 
     m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_pViewParmeters));
@@ -255,7 +258,7 @@ void ControlManager::onTimeWindowChanged(int value)
 void ControlManager::onDistanceTimeSpacerChanged(int value)
 {
     m_pViewParmeters->m_sViewsToApply = m_pApplyToView->getSelectedViews();
-    m_pViewParmeters->m_sSettingsToApply = "spacers";
+    m_pViewParmeters->m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::spacer;
     m_pViewParmeters->m_iTimeSpacers = value;
 
     m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_pViewParmeters));
@@ -265,7 +268,7 @@ void ControlManager::onDistanceTimeSpacerChanged(int value)
 void ControlManager::onMakeScreenshot(const QString& imageType)
 {
     m_pViewParmeters->m_sViewsToApply = m_pApplyToView->getSelectedViews();
-    m_pViewParmeters->m_sSettingsToApply = "screenshot";
+    m_pViewParmeters->m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::screenshot;
     m_pViewParmeters->m_sImageType = imageType;
 
     m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_pViewParmeters));

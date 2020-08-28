@@ -239,6 +239,18 @@ void AverageLayoutView::setAverageColor(const QSharedPointer<QMap<QString, QColo
 
 //=============================================================================================================
 
+void AverageLayoutView::setSingleAverageColor(const QColor& avgColor)
+{
+    for (QString mapKey : m_qMapAverageColor->keys()){
+        m_qMapAverageColor->insert(mapKey, avgColor);
+    }
+
+    m_pAverageScene->setColorPerAverage(m_qMapAverageColor);
+    m_pAverageScene->setSignalItemColor(avgColor);
+}
+
+//=============================================================================================================
+
 void AverageLayoutView::setAverageActivation(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation)
 {
     if(!m_pAverageScene) {

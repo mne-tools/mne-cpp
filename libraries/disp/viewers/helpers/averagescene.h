@@ -140,6 +140,8 @@ public:
      */
     const QColor& getSignalColorForAllItems();
 
+    void setSignalItemColor(const QColor &signalColor);
+
 private:
     QColor                          m_colGlobalItemSignalColor;     /**< The color used in all items to draw the signals.*/
 

@@ -236,6 +236,14 @@ void ButterflyView::setAverageColor(const QSharedPointer<QMap<QString, QColor> >
 
 //=============================================================================================================
 
+void ButterflyView::setSingleAverageColor(const QColor& avgColor)
+{
+    for (QString mapKey : m_qMapAverageColor->keys())
+        m_qMapAverageColor->insert(mapKey, avgColor);
+}
+
+//=============================================================================================================
+
 void ButterflyView::setAverageActivation(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation)
 {
     m_qMapAverageActivation = qMapAverageActivation;

@@ -125,7 +125,8 @@ namespace ANSHAREDLIB
             zoom,
             window,
             spacer,
-            screenshot
+            screenshot,
+            all
         };
 
         QList<QString>      m_sViewsToApply;
