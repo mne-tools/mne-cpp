@@ -1,14 +1,13 @@
 //=============================================================================================================
 /**
- * @file     main.cpp
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
- *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @since    0.1.0
- * @date     January, 2017
+ * @file     sourcelocalization.h
+ * @author   Lorenz Esch <lesch@mgh.harvard.edu>
+ * @since    0.1.6
+ * @date     August, 2020
  *
  * @section  LICENSE
  *
- * Copyright (C) 2017, Christoph Dinh, Lorenz Esch. All rights reserved.
+ * Copyright (C) 2020, Lorenz Esch. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -29,76 +28,92 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Implements the mne_analyze GUI application.
+ * @brief    SourceLocalization class declaration.
  *
  */
+
+#ifndef SOURCELOCALIZATION_H
+#define SOURCELOCALIZATION_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <stdio.h>
-#include <utils/generics/applicationlogger.h>
+#include "sourcelocalization_global.h"
 
-#include "info.h"
-#include "analyzecore.h"
+#include <anShared/Interfaces/IPlugin.h>
 
-//=============================================================================================================
-// Qt INCLUDES
-//=============================================================================================================
-
-#include <QApplication>
-#include <QFontDatabase>
-#include <QtPlugin>
-#include <QSurfaceFormat>
-#include <QScopedPointer>
+#include <rtprocessing/helpers/filterkernel.h>
 
 //=============================================================================================================
-// USED NAMESPACES
+// QT INCLUDES
 //=============================================================================================================
 
-using namespace MNEANALYZE;
+#include <QtWidgets>
+#include <QtCore/QtPlugin>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-//=============================================================================================================
-// MAIN
-//=============================================================================================================
-
-#ifdef STATICBUILD
-Q_IMPORT_PLUGIN(DataLoader)
-Q_IMPORT_PLUGIN(DataManager)
-Q_IMPORT_PLUGIN(RawDataViewer)
-Q_IMPORT_PLUGIN(AnnotationManager)
-Q_IMPORT_PLUGIN(Filtering)
-Q_IMPORT_PLUGIN(Averaging)
-#endif
-
-//=============================================================================================================
-
-int main(int argc, char *argv[])
-{
-    // When building a static version of MNE Analyze we have to init all resource (.qrc) files here manually
-    #ifdef STATICBUILD
-    Q_INIT_RESOURCE(disp3d);
-    #endif
-
-    QApplication app(argc, argv);
-
-    //set application settings
-    QCoreApplication::setOrganizationName(CInfo::OrganizationName());
-    QCoreApplication::setApplicationName(CInfo::AppNameShort());
-    QCoreApplication::setOrganizationDomain("www.mne-cpp.org");
-
-    QSurfaceFormat fmt;
-    fmt.setSamples(4);
-    QSurfaceFormat::setDefaultFormat(fmt);
-
-    //New AnalyzeCore instance
-    QScopedPointer<AnalyzeCore> pAnalyzeCore (new AnalyzeCore);
-    pAnalyzeCore->showMainWindow();
-
-    return app.exec();
+namespace ANSHAREDLIB {
+    class Communicator;
 }
+
+//=============================================================================================================
+// DEFINE NAMESPACE SOURCELOCALIZATIONPLUGIN
+//=============================================================================================================
+
+namespace SOURCELOCALIZATIONPLUGIN
+{
+
+//=============================================================================================================
+// SOURCELOCALIZATIONPLUGIN FORWARD DECLARATIONS
+//=============================================================================================================
+
+//=============================================================================================================
+/**
+ * SourceLocalization Plugin
+ *
+ * @brief The sourcelocalization class provides a plugin for computing averages.
+ */
+class SOURCELOCALIZATIONSHARED_EXPORT SourceLocalization : public ANSHAREDLIB::IPlugin
+{
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "sourcelocalization.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
+    Q_INTERFACES(ANSHAREDLIB::IPlugin)
+
+public:
+    //=========================================================================================================
+    /**
+     * Constructs an SourceLocalization object.
+     */
+    SourceLocalization();
+
+    //=========================================================================================================
+    /**
+     * Destroys the SourceLocalization object.
+     */
+    ~SourceLocalization() override;
+
+    // IPlugin functions
+    virtual QSharedPointer<IPlugin> clone() const override;
+    virtual void init() override;
+    virtual void unload() override;
+    virtual QString getName() const override;
+
+    virtual QMenu* getMenu() override;
+    virtual QDockWidget* getControl() override;
+    virtual QWidget* getView() override;
+
+    virtual void handleEvent(QSharedPointer<ANSHAREDLIB::Event> e) override;
+    virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
+
+private:    
+    QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals */
+};
+
+} // NAMESPACE
+
+#endif // SOURCELOCALIZATION_H
