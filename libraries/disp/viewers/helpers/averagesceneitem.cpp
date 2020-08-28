@@ -80,6 +80,7 @@ AverageSceneItem::AverageSceneItem(const QString& channelName,
 , m_iMaxHeigth(150)
 , m_bIsBad(false)
 , m_iTotalNumberChannels(0)
+, m_colorDefault(Qt::yellow)
 {
     m_rectBoundingRect = QRectF(-m_iMaxWidth/2, -m_iMaxHeigth/2, m_iMaxWidth, m_iMaxHeigth);
 }
@@ -203,7 +204,7 @@ void AverageSceneItem::paintAveragePath(QPainter *painter)
             QPainterPath path = QPainterPath(QPointF(boundingRect.x(), boundingRect.y() + boundingRect.height()/2));
             QPen pen;
             pen.setStyle(Qt::SolidLine);
-            pen.setColor(Qt::yellow);
+            pen.setColor(m_colorDefault);
 
             if(m_qMapAverageColor.contains(sAvrComment)) {
                 pen.setColor(m_qMapAverageColor[sAvrComment]);
@@ -268,3 +269,11 @@ void AverageSceneItem::paintStimLine(QPainter *painter)
     painter->drawPath(path);
 }
 
+//=============================================================================================================
+
+void AverageSceneItem::setDefaultColor(const QColor &viewColor)
+{
+    m_colorDefault = viewColor;
+}
+
+//=============================================================================================================

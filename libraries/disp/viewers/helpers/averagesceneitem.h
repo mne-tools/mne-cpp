@@ -101,6 +101,8 @@ public:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
+    void setDefaultColor(const QColor& viewColor);
+
     QString                                         m_sChannelName;             /**< The channel name.*/
     int                                             m_iChannelNumber;           /**< The channel number.*/
     int                                             m_iChannelKind;             /**< The channel kind.*/
@@ -122,6 +124,8 @@ public:
     QMap<QString, QColor>                           m_qMapAverageColor;         /**< The average color information.*/
 
     QRectF                                          m_rectBoundingRect;         /**< The bounding rect. */
+
+    QColor                                          m_colorDefault;
 
 protected:
     //=========================================================================================================

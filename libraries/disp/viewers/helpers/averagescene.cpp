@@ -168,3 +168,21 @@ void AverageScene::updateScene()
 {
     this->update();
 }
+
+//=============================================================================================================
+
+void AverageScene::setSignalItemColor(const QColor &signalColor)
+{
+    QList<QGraphicsItem*> items = this->items();
+    QListIterator<QGraphicsItem*> i(items);
+    while (i.hasNext()) {
+        if(AverageSceneItem* averageSceneItemTemp = dynamic_cast<AverageSceneItem*>(i.next())) {
+            averageSceneItemTemp->setDefaultColor(signalColor);
+            averageSceneItemTemp->update();
+        }
+    }
+
+    repaintItems(items);
+    updateScene();
+
+}
