@@ -66,6 +66,7 @@ contains(MNECPP_CONFIG, wasm) {
     INCLUDEPATH += /home/lorenz/Git/emsdk/usptream/emscripten/src
 
     DEFINES += WASMBUILD
+    DEFINES += WITHOUTDISP3D
 }
 
 DESTDIR = $${MNE_BINARY_DIR}
@@ -85,6 +86,15 @@ contains(MNECPP_CONFIG, static) {
 }
 
 LIBS += -L$${MNE_LIBRARY_DIR}
+
+!contains(DEFINES, WITHOUTDISP3D) {
+    CONFIG(debug, debug|release) {
+        LIBS += -lmnecppDispd3Dd \
+    } else {
+        LIBS += -lmnecppDispd3D \
+    }
+}
+
 CONFIG(debug, debug|release) {
     LIBS += -lanSharedd \
             -lmnecppDispd \
@@ -167,6 +177,14 @@ macx {
     plugins.path = Contents/MacOS/
     plugins.files = $${ROOT_DIR}/bin/mne_analyze_plugins
     QMAKE_BUNDLE_DATA += plugins
+
+    sgrc.path = Contents/MacOS/resources/general/
+    sgrc.files = $${ROOT_DIR}/resources/general/selectionGroups
+    QMAKE_BUNDLE_DATA += sgrc
+
+    loutrc.path = Contents/MacOS/resources/general/
+    loutrc.files = $${ROOT_DIR}/resources/general/2DLayouts
+    QMAKE_BUNDLE_DATA += loutrc
 
     !contains(MNECPP_CONFIG, static) {
         # 3 entries returned in DEPLOY_CMD

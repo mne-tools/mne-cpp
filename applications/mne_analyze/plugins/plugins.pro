@@ -43,7 +43,8 @@ SUBDIRS += \
     rawdataviewer \
     annotationmanager \
     filtering \
-    averaging \
+    #averaging \
     channelselection \
     scalingmanager \
+    sourcelocalization \
 #    sampleplugin \
