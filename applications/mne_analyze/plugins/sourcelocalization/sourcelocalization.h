@@ -32,8 +32,8 @@
  *
  */
 
-#ifndef SOURCELOCALIZATION_H
-#define SOURCELOCALIZATION_H
+#ifndef MNEANALYZE_SOURCELOCALIZATION_H
+#define MNEANALYZE_SOURCELOCALIZATION_H
 
 //=============================================================================================================
 // INCLUDES
@@ -42,8 +42,6 @@
 #include "sourcelocalization_global.h"
 
 #include <anShared/Interfaces/IPlugin.h>
-
-#include <rtprocessing/helpers/filterkernel.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -116,4 +114,4 @@ private:
 
 } // NAMESPACE
 
-#endif // SOURCELOCALIZATION_H
+#endif // MNEANALYZE_SOURCELOCALIZATION_H

@@ -1,14 +1,13 @@
 //=============================================================================================================
 /**
- * @file     main.cpp
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
- *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @since    0.1.0
- * @date     January, 2017
+ * @file     view3d.cpp
+ * @author   Lorenz Esch <lesch@mgh.harvard.edu>
+ * @since    0.1.6
+ * @date     August, 2020
  *
  * @section  LICENSE
  *
- * Copyright (C) 2017, Christoph Dinh, Lorenz Esch. All rights reserved.
+ * Copyright (C) 2020, Lorenz Esch. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -29,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Implements the mne_analyze GUI application.
+ * @brief    View3D class defintion.
  *
  */
 
@@ -37,74 +36,113 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <stdio.h>
-#include <utils/generics/applicationlogger.h>
+#include "view3d.h"
 
-#include "info.h"
-#include "analyzecore.h"
+#include <anShared/Management/communicator.h>
+
+#include <disp3D/viewers/sourceestimateview.h>
+#include <disp3D/engine/view/view3D.h>
+#include <disp3D/engine/model/data3Dtreemodel.h>
 
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
-#include <QApplication>
-#include <QFontDatabase>
-#include <QtPlugin>
-#include <QSurfaceFormat>
-#include <QScopedPointer>
+#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNEANALYZE;
+using namespace VIEW3DPLUGIN;
+using namespace ANSHAREDLIB;
 
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-//=============================================================================================================
-// MAIN
-//=============================================================================================================
-
-#ifdef STATICBUILD
-Q_IMPORT_PLUGIN(DataLoader)
-Q_IMPORT_PLUGIN(DataManager)
-Q_IMPORT_PLUGIN(RawDataViewer)
-Q_IMPORT_PLUGIN(AnnotationManager)
-Q_IMPORT_PLUGIN(Filtering)
-Q_IMPORT_PLUGIN(Averaging)
-Q_IMPORT_PLUGIN(SourceLocalization)
-#ifndef WASMBUILD
-    Q_IMPORT_PLUGIN(View3D)
-#endif
-#endif
-
-//=============================================================================================================
-
-int main(int argc, char *argv[])
+View3D::View3D()
+: m_pCommu(Q_NULLPTR)
 {
-    // When building a static version of MNE Analyze we have to init all resource (.qrc) files here manually
-    #ifdef STATICBUILD
-        #ifndef WASMBUILD
-            Q_INIT_RESOURCE(disp3d);
-        #endif
-    #endif
+}
 
-    QApplication app(argc, argv);
+//=============================================================================================================
 
-    //set application settings
-    QCoreApplication::setOrganizationName(CInfo::OrganizationName());
-    QCoreApplication::setApplicationName(CInfo::AppNameShort());
-    QCoreApplication::setOrganizationDomain("www.mne-cpp.org");
+View3D::~View3D()
+{
+}
 
-    QSurfaceFormat fmt;
-    fmt.setSamples(4);
-    QSurfaceFormat::setDefaultFormat(fmt);
+//=============================================================================================================
 
-    //New AnalyzeCore instance
-    QScopedPointer<AnalyzeCore> pAnalyzeCore (new AnalyzeCore);
-    pAnalyzeCore->showMainWindow();
+QSharedPointer<IPlugin> View3D::clone() const
+{
+    QSharedPointer<View3D> pView3DClone(new View3D);
+    return pView3DClone;
+}
 
-    return app.exec();
+//=============================================================================================================
+
+void View3D::init()
+{
+    m_pCommu = new Communicator(this);
+    m_p3DModel = QSharedPointer<DISP3DLIB::Data3DTreeModel>::create();
+}
+
+//=============================================================================================================
+
+void View3D::unload()
+{
+
+}
+
+//=============================================================================================================
+
+QString View3D::getName() const
+{
+    return "3D View";
+}
+
+//=============================================================================================================
+
+QMenu *View3D::getMenu()
+{
+    return Q_NULLPTR;
+}
+
+//=============================================================================================================
+
+QWidget *View3D::getView()
+{
+    DISP3DLIB::View3D* pView3D = new DISP3DLIB::View3D();
+    pView3D->setModel(m_p3DModel);
+    QWidget *pWidgetContainer = QWidget::createWindowContainer(pView3D, Q_NULLPTR, Qt::Widget);
+
+    return pWidgetContainer;
+}
+
+//=============================================================================================================
+
+QDockWidget* View3D::getControl()
+{
+    return Q_NULLPTR;
+}
+
+//=============================================================================================================
+
+void View3D::handleEvent(QSharedPointer<Event> e)
+{
+    switch (e->getType()) {
+        default:
+            qWarning() << "[View3D::handleEvent] Received an Event that is not handled by switch cases.";
+    }
+}
+
+//=============================================================================================================
+
+QVector<EVENT_TYPE> View3D::getEventSubscriptions(void) const
+{
+    QVector<EVENT_TYPE> temp;
+    //temp.push_back(SELECTED_MODEL_CHANGED);
+
+    return temp;
 }
