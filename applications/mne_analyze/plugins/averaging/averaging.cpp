@@ -261,6 +261,8 @@ void Averaging::handleEvent(QSharedPointer<Event> e)
         case SCALING_MAP_CHANGED:
             setScalingMap(e->getData());
             break;
+        case VIEW_SETTINGS_CHANGED:
+            setViewSettings(e->getData().value<ANSHAREDLIB::ViewParameters*>());
         default:
             qWarning() << "[Averaging::handleEvent] Received an Event that is not handled by switch cases.";
     }
@@ -277,6 +279,7 @@ QVector<EVENT_TYPE> Averaging::getEventSubscriptions(void) const
     temp.push_back(EVENT_GROUPS_UPDATED);
     temp.push_back(CHANNEL_SELECTION_ITEMS);
     temp.push_back(SCALING_MAP_CHANGED);
+    temp.push_back(VIEW_SETTINGS_CHANGED);
 
     return temp;
 }
@@ -604,4 +607,27 @@ void Averaging::setScalingMap(const QVariant &data)
         m_pButterflyView->setScaleMap(data.value<ANSHAREDLIB::ScalingParameters*>()->m_mScalingMap);
     }
 
+}
+
+//=============================================================================================================
+
+void Averaging::setViewSettings(ANSHAREDLIB::ViewParameters* pViewParams)
+{
+    if(pViewParams->m_sViewsToApply.contains("layoutview")){
+        if (pViewParams->m_sSettingsToApply == ANSHAREDLIB::ViewParameters::all || pViewParams->m_sSettingsToApply == ANSHAREDLIB::ViewParameters::background){
+            m_pAverageLayoutView->setBackgroundColor(pViewParams->m_colorBackground);
+            m_pAverageLayoutView->update();
+        }
+    }
+
+    if(pViewParams->m_sViewsToApply.contains("butterflyview")){
+        if (pViewParams->m_sSettingsToApply == ANSHAREDLIB::ViewParameters::all || pViewParams->m_sSettingsToApply == ANSHAREDLIB::ViewParameters::background){
+            m_pButterflyView->setBackgroundColor(pViewParams->m_colorBackground);
+            m_pButterflyView->update();
+        }
+        if (pViewParams->m_sSettingsToApply == ANSHAREDLIB::ViewParameters::all || pViewParams->m_sSettingsToApply == ANSHAREDLIB::ViewParameters::signal){
+            m_pButterflyView->setSingleAverageColor(pViewParams->m_colorSignal);
+            m_pButterflyView->update();
+        }
+    }
 }

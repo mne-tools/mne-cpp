@@ -213,6 +213,9 @@ public:
     void setAverageColor(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor);
 
     //=========================================================================================================
+    void setSingleAverageColor(const QColor& avgColor);
+
+    //=========================================================================================================
     /**
      * Set the average activations
      *

@@ -134,39 +134,7 @@ QMenu *RawDataViewer::getMenu()
 
 QDockWidget *RawDataViewer::getControl()
 {
-    QDockWidget* pControlDock = new QDockWidget(getName());
-    pControlDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    pControlDock->setObjectName(getName());
-
-    QScrollArea* wrappedScrollArea = new QScrollArea(pControlDock);
-    QVBoxLayout* pLayout = new QVBoxLayout;
-
-    //View Widget
-    QLabel* title_viewsettings = new QLabel();
-    title_viewsettings->setTextFormat(Qt::RichText);
-    title_viewsettings->setText("<b>View Settings</b>");
-
-    m_pSettingsViewWidget = new FiffRawViewSettings("MNEANALYZE", wrappedScrollArea);
-    connect(this, &RawDataViewer::guiModeChanged,
-            m_pSettingsViewWidget.data(), &FiffRawViewSettings::setGuiMode);
-    pLayout->addWidget(title_viewsettings);
-    pLayout->addWidget(m_pSettingsViewWidget);
-
-    QSpacerItem* endSpacer = new QSpacerItem(1,
-                                             1,
-                                             QSizePolicy::Preferred,
-                                             QSizePolicy::Expanding);
-    pLayout->addSpacerItem(endSpacer);
-    wrappedScrollArea->setSizePolicy(QSizePolicy(QSizePolicy::Preferred,
-                                                 QSizePolicy::Preferred));
-
-    wrappedScrollArea->setLayout(pLayout);
-
-    pControlDock->setWidget(wrappedScrollArea);
-    pControlDock->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,
-                                            QSizePolicy::Preferred));
-
-    return pControlDock;
+    return Q_NULLPTR;
 }
 
 //=============================================================================================================
@@ -316,10 +284,15 @@ void RawDataViewer::updateViewParameters(ANSHAREDLIB::ViewParameters *pViewParam
 {
     switch (pViewParameters->m_sSettingsToApply){
         case ANSHAREDLIB::ViewParameters::ViewSetting::signal:
+            m_pFiffRawView->setSignalColor(pViewParameters->m_colorSignal);
+            m_pFiffRawView->updateView();
             break;
         case ANSHAREDLIB::ViewParameters::ViewSetting::background:
+            m_pFiffRawView->setBackgroundColor(pViewParameters->m_colorBackground);
+            m_pFiffRawView->updateView();
             break;
         case ANSHAREDLIB::ViewParameters::ViewSetting::zoom:
+            m_pFiffRawView->setZoom(pViewParameters->m_dZoomValue);
             break;
         case ANSHAREDLIB::ViewParameters::ViewSetting::window:
             m_pFiffRawView->setWindowSize(pViewParameters->m_iTimeWindow);
@@ -330,5 +303,15 @@ void RawDataViewer::updateViewParameters(ANSHAREDLIB::ViewParameters *pViewParam
         case ANSHAREDLIB::ViewParameters::ViewSetting::screenshot:
             m_pFiffRawView->onMakeScreenshot(pViewParameters->m_sImageType);
             break;
+        case ANSHAREDLIB::ViewParameters::ViewSetting::all:
+            m_pFiffRawView->setSignalColor(pViewParameters->m_colorSignal);
+            m_pFiffRawView->setBackgroundColor(pViewParameters->m_colorBackground);
+            m_pFiffRawView->setZoom(pViewParameters->m_dZoomValue);
+            m_pFiffRawView->setWindowSize(pViewParameters->m_iTimeWindow);
+            m_pFiffRawView->setDistanceTimeSpacer(pViewParameters->m_iTimeSpacers);
+            m_pFiffRawView->onMakeScreenshot(pViewParameters->m_sImageType);
+        break;
+        default:
+            qDebug() << "Unknown setting";
     }
 }

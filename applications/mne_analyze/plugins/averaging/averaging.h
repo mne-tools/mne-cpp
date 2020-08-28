@@ -243,6 +243,8 @@ private:
     //=========================================================================================================
     void setScalingMap(const QVariant &data);
 
+    void setViewSettings(ANSHAREDLIB::ViewParameters* pViewParams);
+
     //=========================================================================================================
     /**
      * Clears saved averaging data
