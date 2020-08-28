@@ -241,8 +241,19 @@ private:
     void setChannelSelection(const QVariant &data);
 
     //=========================================================================================================
+    /**
+     * Sets scaling map for averaging views
+     *
+     * @param [in] data     QVariant with a ScalingParameters object with relevant scaling data
+     */
     void setScalingMap(const QVariant &data);
 
+    //=========================================================================================================
+    /**
+     * Sets the view settings for the averaging views
+     *
+     * @param pViewParams
+     */
     void setViewSettings(ANSHAREDLIB::ViewParameters* pViewParams);
 
     //=========================================================================================================

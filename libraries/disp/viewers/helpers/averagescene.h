@@ -140,6 +140,12 @@ public:
      */
     const QColor& getSignalColorForAllItems();
 
+    //=========================================================================================================
+    /**
+     * Sets the signal color for the items the scene holds
+     *
+     * @param signalColor
+     */
     void setSignalItemColor(const QColor &signalColor);
 
 private:
