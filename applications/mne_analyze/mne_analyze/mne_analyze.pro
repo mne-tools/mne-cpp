@@ -66,7 +66,6 @@ contains(MNECPP_CONFIG, wasm) {
     INCLUDEPATH += /home/lorenz/Git/emsdk/usptream/emscripten/src
 
     DEFINES += WASMBUILD
-    DEFINES += WITHOUTDISP3D
 }
 
 DESTDIR = $${MNE_BINARY_DIR}
@@ -83,16 +82,25 @@ contains(MNECPP_CONFIG, static) {
             -lannotationmanager \
             -lfiltering \
             -laveraging \
+            -lsourcelocalization \
+
+    # Add Qt3D/Disp3D based plugins only if not building against WASM, which does not support Qt3D
+    !contains(DEFINES, WASMBUILD) {
+        LIBS += -lview3d \
+    }
 }
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 
-!contains(DEFINES, WITHOUTDISP3D) {
-    CONFIG(debug, debug|release) {
-        LIBS += -lmnecppDispd3Dd \
-    } else {
-        LIBS += -lmnecppDispd3D \
-    }
+# Link Disp3D library only if not building against WASM, which does not support Qt3D
+!contains(DEFINES, WASMBUILD) {
+   QT += 3dextras
+
+   CONFIG(debug, debug|release) {
+       LIBS += -lmnecppDisp3Dd \
+   } else {
+       LIBS += -lmnecppDisp3D \
+   }
 }
 
 CONFIG(debug, debug|release) {

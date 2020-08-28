@@ -1,14 +1,13 @@
 //=============================================================================================================
 /**
- * @file     main.cpp
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
- *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @since    0.1.0
- * @date     January, 2017
+ * @file     view3d.h
+ * @author   Lorenz Esch <lesch@mgh.harvard.edu>
+ * @since    0.1.6
+ * @date     August, 2020
  *
  * @section  LICENSE
  *
- * Copyright (C) 2017, Christoph Dinh, Lorenz Esch. All rights reserved.
+ * Copyright (C) 2020, Lorenz Esch. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -29,82 +28,98 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Implements the mne_analyze GUI application.
+ * @brief    View3D class declaration.
  *
  */
+
+#ifndef MNEANALYZE_VIEW3D_H
+#define MNEANALYZE_VIEW3D_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <stdio.h>
-#include <utils/generics/applicationlogger.h>
+#include "view3d_global.h"
 
-#include "info.h"
-#include "analyzecore.h"
+#include <anShared/Interfaces/IPlugin.h>
 
-//=============================================================================================================
-// Qt INCLUDES
-//=============================================================================================================
-
-#include <QApplication>
-#include <QFontDatabase>
-#include <QtPlugin>
-#include <QSurfaceFormat>
-#include <QScopedPointer>
+#include <rtprocessing/helpers/filterkernel.h>
 
 //=============================================================================================================
-// USED NAMESPACES
+// QT INCLUDES
 //=============================================================================================================
 
-using namespace MNEANALYZE;
+#include <QtWidgets>
+#include <QtCore/QtPlugin>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-//=============================================================================================================
-// MAIN
-//=============================================================================================================
-
-#ifdef STATICBUILD
-Q_IMPORT_PLUGIN(DataLoader)
-Q_IMPORT_PLUGIN(DataManager)
-Q_IMPORT_PLUGIN(RawDataViewer)
-Q_IMPORT_PLUGIN(AnnotationManager)
-Q_IMPORT_PLUGIN(Filtering)
-Q_IMPORT_PLUGIN(Averaging)
-Q_IMPORT_PLUGIN(SourceLocalization)
-#ifndef WASMBUILD
-    Q_IMPORT_PLUGIN(View3D)
-#endif
-#endif
-
-//=============================================================================================================
-
-int main(int argc, char *argv[])
-{
-    // When building a static version of MNE Analyze we have to init all resource (.qrc) files here manually
-    #ifdef STATICBUILD
-        #ifndef WASMBUILD
-            Q_INIT_RESOURCE(disp3d);
-        #endif
-    #endif
-
-    QApplication app(argc, argv);
-
-    //set application settings
-    QCoreApplication::setOrganizationName(CInfo::OrganizationName());
-    QCoreApplication::setApplicationName(CInfo::AppNameShort());
-    QCoreApplication::setOrganizationDomain("www.mne-cpp.org");
-
-    QSurfaceFormat fmt;
-    fmt.setSamples(4);
-    QSurfaceFormat::setDefaultFormat(fmt);
-
-    //New AnalyzeCore instance
-    QScopedPointer<AnalyzeCore> pAnalyzeCore (new AnalyzeCore);
-    pAnalyzeCore->showMainWindow();
-
-    return app.exec();
+namespace ANSHAREDLIB {
+    class Communicator;
 }
+
+namespace DISP3DLIB {
+    class Data3DTreeModel;
+}
+
+//=============================================================================================================
+// DEFINE NAMESPACE VIEW3DPLUGIN
+//=============================================================================================================
+
+namespace VIEW3DPLUGIN
+{
+
+//=============================================================================================================
+// View3DPLUGIN FORWARD DECLARATIONS
+//=============================================================================================================
+
+//=============================================================================================================
+/**
+ * View3D Plugin
+ *
+ * @brief The View3D class provides a plugin for visualizing information in 3D.
+ */
+class VIEW3DSHARED_EXPORT View3D : public ANSHAREDLIB::IPlugin
+{
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "view3d.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
+    Q_INTERFACES(ANSHAREDLIB::IPlugin)
+
+public:
+    //=========================================================================================================
+    /**
+     * Constructs an View3D object.
+     */
+    View3D();
+
+    //=========================================================================================================
+    /**
+     * Destroys the View3D object.
+     */
+    ~View3D() override;
+
+    // IPlugin functions
+    virtual QSharedPointer<IPlugin> clone() const override;
+    virtual void init() override;
+    virtual void unload() override;
+    virtual QString getName() const override;
+
+    virtual QMenu* getMenu() override;
+    virtual QDockWidget* getControl() override;
+    virtual QWidget* getView() override;
+
+    virtual void handleEvent(QSharedPointer<ANSHAREDLIB::Event> e) override;
+    virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
+
+private:
+    QPointer<ANSHAREDLIB::Communicator>             m_pCommu;               /**< To broadcst signals */
+    QSharedPointer<DISP3DLIB::Data3DTreeModel>      m_p3DModel;             /**< The 3D model data */
+};
+
+} // NAMESPACE
+
+#endif // MNEANALYZE_VIEW3D_H
+

@@ -1,6 +1,6 @@
 #==============================================================================================================
 #
-# @file     sourcelocalization.pro
+# @file     view3d.pro
 # @author   Lorenz Esch <lesch@mgh.harvard.edu>
 # @since    0.1.6
 # @date     August, 2020
@@ -28,7 +28,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile for the sourcelocalization plugin.
+# @brief    This project file generates the makefile for the view3d plugin.
 #
 #==============================================================================================================
 
@@ -40,15 +40,15 @@ CONFIG += skip_target_version_ext
 
 CONFIG += plugin
 
-DEFINES += SOURCELOCALIZATION_PLUGIN
+DEFINES += VIEW3D_PLUGIN
 
-QT += gui widgets
+QT += gui widgets 3dextras
 
 contains(MNECPP_CONFIG, wasm) {
     DEFINES += WASMBUILD
 }
 
-TARGET = sourcelocalization
+TARGET = view3d
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -65,6 +65,7 @@ contains(MNECPP_CONFIG, static) {
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lanSharedd \
+            -lmnecppDisp3Dd \
             -lmnecppDispd \
             -lmnecppConnectivityd \
             -lmnecppRtProcessingd \
@@ -76,6 +77,7 @@ CONFIG(debug, debug|release) {
             -lmnecppUtilsd \
 } else {
     LIBS += -lanShared \
+            -lmnecppDisp3D \
             -lmnecppDisp \
             -lmnecppConnectivity \
             -lmnecppRtProcessing \
@@ -88,15 +90,15 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES += \
-    sourcelocalization.cpp \
+    view3d.cpp \
 
 HEADERS += \
-    sourcelocalization_global.h \
-    sourcelocalization.h \
+    view3d_global.h \
+    view3d.h \
 
 FORMS += \
 
-OTHER_FILES += sourcelocalization.json
+OTHER_FILES += view3d.json
 
 RESOURCES += \
 

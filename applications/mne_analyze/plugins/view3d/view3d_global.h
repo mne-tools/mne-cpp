@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     sourcelocalization_global.h
+ * @file     view3d_global.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>
  * @since    0.1.6
  * @date     August, 2020
@@ -28,12 +28,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MNE Analyze Source Localization Plugin
+ * @brief    MNE Analyze View 3D Plugin
  *
  */
 
-#ifndef MNEANALYZE_SOURCELOCALIZATION_GLOBAL_H
-#define MNEANALYZE_SOURCELOCALIZATION_GLOBAL_H
+#ifndef MNEANALYZE_VIEW3D_GLOBAL_H
+#define MNEANALYZE_VIEW3D_GLOBAL_H
 
 //=============================================================================================================
 // QT INCLUDES
@@ -45,10 +45,10 @@
 // PREPROCESSOR DEFINES
 //=============================================================================================================
 
-#if defined(SOURCELOCALIZATION_PLUGIN)
-#  define SOURCELOCALIZATIONSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#if defined(VIEW3D_PLUGIN)
+#  define VIEW3DSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define SOURCELOCALIZATIONSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#  define VIEW3DSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
-#endif // MNEANALYZE_SOURCELOCALIZATION_GLOBAL_H
+#endif // MNEANALYZE_VIEW3D_GLOBAL_H

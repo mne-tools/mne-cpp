@@ -108,18 +108,16 @@ QMenu *SourceLocalization::getMenu()
 
 QWidget *SourceLocalization::getView()
 {
-    QWidget* pView = new QWidget();
-    return pView;
+    return Q_NULLPTR;
 }
 
 //=============================================================================================================
 
 QDockWidget* SourceLocalization::getControl()
 {
-    QDockWidget* pControl = new QDockWidget(getName());
-    QWidget* pWidget = new QWidget();
+    //QDockWidget* pControl = new QDockWidget(getName());
 
-    return pControl;
+    return Q_NULLPTR;
 }
 
 //=============================================================================================================
