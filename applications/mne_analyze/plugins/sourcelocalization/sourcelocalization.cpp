@@ -1,14 +1,13 @@
 //=============================================================================================================
 /**
- * @file     main.cpp
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
- *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @since    0.1.0
- * @date     January, 2017
+ * @file     sourcelocalization.cpp
+ * @author   Lorenz Esch <lesch@mgh.harvard.edu>
+ * @since    0.1.6
+ * @date     August, 2020
  *
  * @section  LICENSE
  *
- * Copyright (C) 2017, Christoph Dinh, Lorenz Esch. All rights reserved.
+ * Copyright (C) 2020, Lorenz Esch. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -29,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Implements the mne_analyze GUI application.
+ * @brief    SourceLocalization class defintion.
  *
  */
 
@@ -37,68 +36,108 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <stdio.h>
-#include <utils/generics/applicationlogger.h>
+#include "sourcelocalization.h"
 
-#include "info.h"
-#include "analyzecore.h"
+#include <anShared/Management/communicator.h>
 
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
-#include <QApplication>
-#include <QFontDatabase>
-#include <QtPlugin>
-#include <QSurfaceFormat>
-#include <QScopedPointer>
+#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNEANALYZE;
+using namespace SOURCELOCALIZATIONPLUGIN;
+using namespace ANSHAREDLIB;
 
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-//=============================================================================================================
-// MAIN
-//=============================================================================================================
-
-#ifdef STATICBUILD
-Q_IMPORT_PLUGIN(DataLoader)
-Q_IMPORT_PLUGIN(DataManager)
-Q_IMPORT_PLUGIN(RawDataViewer)
-Q_IMPORT_PLUGIN(AnnotationManager)
-Q_IMPORT_PLUGIN(Filtering)
-Q_IMPORT_PLUGIN(Averaging)
-#endif
-
-//=============================================================================================================
-
-int main(int argc, char *argv[])
+SourceLocalization::SourceLocalization()
+: m_pCommu(Q_NULLPTR)
 {
-    // When building a static version of MNE Analyze we have to init all resource (.qrc) files here manually
-    #ifdef STATICBUILD
-    Q_INIT_RESOURCE(disp3d);
-    #endif
+}
 
-    QApplication app(argc, argv);
+//=============================================================================================================
 
-    //set application settings
-    QCoreApplication::setOrganizationName(CInfo::OrganizationName());
-    QCoreApplication::setApplicationName(CInfo::AppNameShort());
-    QCoreApplication::setOrganizationDomain("www.mne-cpp.org");
+SourceLocalization::~SourceLocalization()
+{
+}
 
-    QSurfaceFormat fmt;
-    fmt.setSamples(4);
-    QSurfaceFormat::setDefaultFormat(fmt);
+//=============================================================================================================
 
-    //New AnalyzeCore instance
-    QScopedPointer<AnalyzeCore> pAnalyzeCore (new AnalyzeCore);
-    pAnalyzeCore->showMainWindow();
+QSharedPointer<IPlugin> SourceLocalization::clone() const
+{
+    QSharedPointer<SourceLocalization> pSourceLocalizationClone(new SourceLocalization);
+    return pSourceLocalizationClone;
+}
 
-    return app.exec();
+//=============================================================================================================
+
+void SourceLocalization::init()
+{
+    m_pCommu = new Communicator(this);
+}
+
+//=============================================================================================================
+
+void SourceLocalization::unload()
+{
+
+}
+
+//=============================================================================================================
+
+QString SourceLocalization::getName() const
+{
+    return "Source Localization";
+}
+
+//=============================================================================================================
+
+QMenu *SourceLocalization::getMenu()
+{
+    return Q_NULLPTR;
+}
+
+//=============================================================================================================
+
+QWidget *SourceLocalization::getView()
+{
+    QWidget* pView = new QWidget();
+    return pView;
+}
+
+//=============================================================================================================
+
+QDockWidget* SourceLocalization::getControl()
+{
+    QDockWidget* pControl = new QDockWidget(getName());
+    QWidget* pWidget = new QWidget();
+
+    return pControl;
+}
+
+//=============================================================================================================
+
+void SourceLocalization::handleEvent(QSharedPointer<Event> e)
+{
+    switch (e->getType()) {
+        default:
+            qWarning() << "[SourceLocalization::handleEvent] Received an Event that is not handled by switch cases.";
+    }
+}
+
+//=============================================================================================================
+
+QVector<EVENT_TYPE> SourceLocalization::getEventSubscriptions(void) const
+{
+    QVector<EVENT_TYPE> temp;
+    //temp.push_back(SELECTED_MODEL_CHANGED);
+
+    return temp;
 }
