@@ -84,6 +84,7 @@ namespace ANSHAREDLIB
         ANSHAREDLIB_FIFFRAW_MODEL,
         ANSHAREDLIB_ANNOTATION_MODEL,
         ANSHAREDLIB_AVERAGING_MODEL
+        ANSHAREDLIB_BEMDATA_MODEL
     };
 
     //=========================================================================================================

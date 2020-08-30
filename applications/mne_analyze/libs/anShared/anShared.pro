@@ -89,12 +89,14 @@ SOURCES += \
     Management/communicator.cpp \
     Management/eventmanager.cpp \
     Management/statusbar.cpp \
+    Model/bemdatamodel.cpp \
     Model/fiffrawviewmodel.cpp \
     Model/annotationmodel.cpp \
     Model/analyzedatamodel.cpp \
     Model/averagingdatamodel.cpp \
 
 HEADERS += \
+    Model/bemdatamodel.h \
     anshared_global.h \
     Model/abstractmodel.h \
     Management/analyzedata.h \

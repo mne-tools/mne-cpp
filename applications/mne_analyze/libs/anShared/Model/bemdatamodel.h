@@ -1,13 +1,13 @@
 //=============================================================================================================
 /**
- * @file     coregistration.h
+ * @file     bemdatamodel.h
  * @author   Ruben Dörfel <doerfelruben@aol.com>
- * @since    0.1.6
+ * @since    0.1.0
  * @date     August, 2020
  *
  * @section  LICENSE
  *
- * Copyright (C) 2020, Gabriel Motta. All rights reserved.
+ * Copyright (C) 2020, Ruben Dörfel. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -28,98 +28,130 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains the declaration of the CoRegistration class.
+ * @brief     BemDataModel class declaration.
  *
  */
 
-#ifndef COREGISTRATION_H
-#define COREGISTRATION_H
+#ifndef ANSHAREDLIB_BEMDATAMODEL_H
+#define ANSHAREDLIB_BEMDATAMODEL_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "coregistration_global.h"
-#include <anShared/Interfaces/IPlugin.h>
+#include "../anshared_global.h"
+#include "../Utils/types.h"
+#include "abstractmodel.h"
+
+#include <fiff/fiff_io.h>
+
+#include <mne/mne_bem.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
-#include <QtCore/QtPlugin>
-#include <QDebug>
-#include <QPointer>
+#include <QObject>
+#include <QSharedPointer>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+namespace MNELIB {
+    class MNEBem;
+}
+//=============================================================================================================
+// DEFINE NAMESPACE ANSHAREDLIB
+//=============================================================================================================
+
+
 namespace ANSHAREDLIB {
-    class Communicator;
-}
 
-namespace DISPLIB {
-    class CoregSettingsView;
-}
 
 //=============================================================================================================
-// DEFINE NAMESPACE SURFERPLUGIN
+// ANSHAREDLIB FORWARD DECLARATIONS
 //=============================================================================================================
-
-namespace COREGISTRATIONPLUGIN
-{
 
 //=============================================================================================================
 /**
- * CoRegistration Plugin
  *
- * @brief The CoRegistration class provides a view with all currently loaded models.
+ * @brief Model that holds and manages bem data..
  */
-class COREGISTRATIONSHARED_EXPORT CoRegistration : public ANSHAREDLIB::IPlugin
+class BemDataModel : public AbstractModel
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "coregistration.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
-    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(ANSHAREDLIB::IPlugin)
 
 public:
-    //=========================================================================================================
-    /**
-     * Constructs a CoRegistration.
-     */
-    CoRegistration();
+    typedef QSharedPointer<BemDataModel> SPtr;            /**< Shared pointer type for BemDataModel. */
+    typedef QSharedPointer<const BemDataModel> ConstSPtr; /**< Const shared pointer type for BemDataModel. */
 
     //=========================================================================================================
     /**
-     * Destroys the CoRegistration.
-     */
-    virtual ~CoRegistration() override;
+    * Constructs a BemDataModel object.
+    */
+    explicit BemDataModel(QObject *parent = Q_NULLPTR);
 
-    // IPlugin functions
-    virtual QSharedPointer<IPlugin> clone() const override;
-    virtual void init() override;
-    virtual void unload() override;
-    virtual QString getName() const override;
-    virtual QMenu* getMenu() override;
-    virtual QDockWidget* getControl() override;
-    virtual QWidget* getView() override;
-    virtual void handleEvent(QSharedPointer<ANSHAREDLIB::Event> e) override;
-    virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
+    //=========================================================================================================
+    /**
+     * Constructs a FiffRawViewModel object.
+     *
+     * @param[in] sFilePath             The file path of the model. This is usually also the file path.
+     * @param[in] pParent               The parent model. Default is set to NULL.
+     */
+    BemDataModel(const QString &sFilePath,
+                 QObject *pParent = Q_NULLPTR);
+    //=========================================================================================================
+    /**
+     * Destructs a BemDataModel.
+     */
+    ~BemDataModel() override;
+
+    //=========================================================================================================
+    /**
+     * The type of this model (FiffRawViewModel)
+     *
+     * @return The type of this model (FiffRawViewModel)
+     */
+    inline MODEL_TYPE getType() const override;
+
+    //=========================================================================================================
+    /**
+     * Returns whether there is currently data stored in the model
+     *
+     * @return Returns false if model is empty
+     */
+    inline bool isEmpty() const;
+
+
+protected:
 
 private:
 
+    std::list<QSharedPointer<MNELIB::MNEBem>>   m_lBem;             /**< Data */
 
-    QPointer<ANSHAREDLIB::Communicator>     m_pCommu;
-
-    DISPLIB::CoregSettingsView*             m_pCoregSettingsView;   /**< Pointer to coreg GUI */
-
+signals:
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-} // NAMESPACE
+inline MODEL_TYPE BemDataModel::getType() const
+{
+    return MODEL_TYPE::ANSHAREDLIB_BEMDATA_MODEL;
+}
 
-#endif // COREGISTRATION_H
+inline bool BemDataModel::isEmpty() const
+{
+    return m_lBem.empty();
+}
+
+} // namespace ANSHAREDLIB
+
+#endif // ANSHAREDLIB_BEMDATAMODEL_H
+
