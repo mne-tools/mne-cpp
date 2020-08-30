@@ -1,13 +1,13 @@
 //=============================================================================================================
 /**
- * @file     coregistration.h
+ * @file     bemdatamodel.cpp
  * @author   Ruben Dörfel <doerfelruben@aol.com>
  * @since    0.1.6
  * @date     August, 2020
  *
  * @section  LICENSE
  *
- * Copyright (C) 2020, Gabriel Motta. All rights reserved.
+ * Copyright (C) 2020, Ruben Dörfel. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -28,98 +28,50 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains the declaration of the CoRegistration class.
+ * @brief    BemDataModel class definition.
  *
  */
-
-#ifndef COREGISTRATION_H
-#define COREGISTRATION_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "coregistration_global.h"
-#include <anShared/Interfaces/IPlugin.h>
+#include "bemdatamodel.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
-#include <QtCore/QtPlugin>
-#include <QDebug>
-#include <QPointer>
-
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// EIGEN INCLUDES
 //=============================================================================================================
 
-namespace ANSHAREDLIB {
-    class Communicator;
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace ANSHAREDLIB;
+
+//=============================================================================================================
+// DEFINE GLOBAL METHODS
+//=============================================================================================================
+
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+BemDataModel::BemDataModel(QObject *parent)
+    : AbstractModel(parent)
+{
+    qInfo() << "[BemDataModel::BemDataModel] Default constructor called !";
 }
 
-namespace DISPLIB {
-    class CoregSettingsView;
+BemDataModel::BemDataModel(const QString &sFilePath,
+                           QObject *pParent)
+    : AbstractModel(pParent)
+{
+    Q_UNUSED(sFilePath)
 }
 
-//=============================================================================================================
-// DEFINE NAMESPACE SURFERPLUGIN
-//=============================================================================================================
-
-namespace COREGISTRATIONPLUGIN
-{
 
 //=============================================================================================================
-/**
- * CoRegistration Plugin
- *
- * @brief The CoRegistration class provides a view with all currently loaded models.
- */
-class COREGISTRATIONSHARED_EXPORT CoRegistration : public ANSHAREDLIB::IPlugin
-{
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "coregistration.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
-    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(ANSHAREDLIB::IPlugin)
-
-public:
-    //=========================================================================================================
-    /**
-     * Constructs a CoRegistration.
-     */
-    CoRegistration();
-
-    //=========================================================================================================
-    /**
-     * Destroys the CoRegistration.
-     */
-    virtual ~CoRegistration() override;
-
-    // IPlugin functions
-    virtual QSharedPointer<IPlugin> clone() const override;
-    virtual void init() override;
-    virtual void unload() override;
-    virtual QString getName() const override;
-    virtual QMenu* getMenu() override;
-    virtual QDockWidget* getControl() override;
-    virtual QWidget* getView() override;
-    virtual void handleEvent(QSharedPointer<ANSHAREDLIB::Event> e) override;
-    virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
-
-private:
-
-
-    QPointer<ANSHAREDLIB::Communicator>     m_pCommu;
-
-    DISPLIB::CoregSettingsView*             m_pCoregSettingsView;   /**< Pointer to coreg GUI */
-
-};
-
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
-
-} // NAMESPACE
-
-#endif // COREGISTRATION_H
