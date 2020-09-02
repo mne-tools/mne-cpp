@@ -97,6 +97,8 @@ void ApplicationLogger::customLogWriter(QtMsgType type,
                                         const QMessageLogContext &context,
                                         const QString &msg)
 {
+    Q_UNUSED(context)
+
     // Comment in following line if you want to display the date and time of the message
     //sDate = QString(" %1] ").arg(QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss.z"));
 

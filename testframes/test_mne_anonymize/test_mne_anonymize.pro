@@ -90,6 +90,9 @@ win32:!contains(MNECPP_CONFIG, static) {
 unix:!macx {
     QMAKE_RPATHDIR += $ORIGIN/../lib
 }
+macx {
+    QMAKE_LFLAGS += -Wl,-rpath,../lib
+}
 
 # Activate FFTW backend in Eigen
 contains(MNECPP_CONFIG, useFFTW) {

@@ -288,21 +288,15 @@ inline int CircularBuffer<_Tp>::getFreeElementsWrite()
 // TYPEDEF
 //=============================================================================================================
 
-//ToDo Typedef -> warning visibility ignored -> dllexport/dllimport problem
+typedef CircularBuffer<int>                      CircularBuffer_int;                 /**< Defines CircularBuffer of integer type.*/
+typedef CircularBuffer<short>                    CircularBuffer_short;               /**< Defines CircularBuffer of short type.*/
+typedef CircularBuffer<char>                     CircularBuffer_char;                /**< Defines CircularBuffer of char type.*/
+typedef CircularBuffer<double>                   CircularBuffer_double;              /**< Defines CircularBuffer of double type.*/
+typedef CircularBuffer< QPair<int, int> >        CircularBuffer_pair_int_int;        /**< Defines CircularBuffer of integer Pair type.*/
+typedef CircularBuffer< QPair<double, double> >  CircularBuffer_pair_double_double;  /**< Defines CircularBuffer of double Pair type.*/
+typedef CircularBuffer< Eigen::MatrixXd >        CircularBuffer_Matrix_double;       /**< Defines CircularBuffer of Eigen::MatrixXd type.*/
+typedef CircularBuffer< Eigen::MatrixXf >        CircularBuffer_Matrix_float;        /**< Defines CircularBuffer of Eigen::MatrixXf type.*/
 
-typedef UTILSSHARED_EXPORT CircularBuffer<int>                      CircularBuffer_int;                 /**< Defines CircularBuffer of integer type.*/
-typedef UTILSSHARED_EXPORT CircularBuffer<short>                    CircularBuffer_short;               /**< Defines CircularBuffer of short type.*/
-typedef UTILSSHARED_EXPORT CircularBuffer<char>                     CircularBuffer_char;                /**< Defines CircularBuffer of char type.*/
-typedef UTILSSHARED_EXPORT CircularBuffer<double>                   CircularBuffer_double;              /**< Defines CircularBuffer of double type.*/
-typedef UTILSSHARED_EXPORT CircularBuffer< QPair<int, int> >        CircularBuffer_pair_int_int;        /**< Defines CircularBuffer of integer Pair type.*/
-typedef UTILSSHARED_EXPORT CircularBuffer< QPair<double, double> >  CircularBuffer_pair_double_double;  /**< Defines CircularBuffer of double Pair type.*/
-typedef UTILSSHARED_EXPORT CircularBuffer< Eigen::MatrixXd >        CircularBuffer_Matrix_double;       /**< Defines CircularBuffer of Eigen::MatrixXd type.*/
-typedef UTILSSHARED_EXPORT CircularBuffer< Eigen::MatrixXf >        CircularBuffer_Matrix_float;        /**< Defines CircularBuffer of Eigen::MatrixXf type.*/
-
-//typedef UTILSSHARED_EXPORT CircularBuffer_double                   dBuffer;             /**< Short for CircularBuffer_double.*/
-//typedef UTILSSHARED_EXPORT CircularBuffer_int                      iBuffer;             /**< Short for CircularBuffer_int.*/
-//typedef UTILSSHARED_EXPORT CircularBuffer_char                     cBuffer;             /**< Short for CircularBuffer_char.*/
-//typedef UTILSSHARED_EXPORT CircularBuffer_double                   MEGBuffer;           /**< Defines MEGBuffer of type CircularBuffer_double.*/
 } // NAMESPACE
 
 #endif // CIRCULARBUFFER_H
