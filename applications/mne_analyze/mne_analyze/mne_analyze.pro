@@ -83,11 +83,13 @@ contains(MNECPP_CONFIG, static) {
             -lfiltering \
             -laveraging \
             -lsourcelocalization \
+            -lcontrolmanager \
+            -lchannelselection \
 
     # Add Qt3D/Disp3D based plugins only if not building against WASM, which does not support Qt3D
     !contains(DEFINES, WASMBUILD) {
         LIBS += -lview3d \
-    }
+    }            
 }
 
 LIBS += -L$${MNE_LIBRARY_DIR}
