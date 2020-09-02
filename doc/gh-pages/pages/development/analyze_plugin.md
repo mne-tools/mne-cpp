@@ -133,7 +133,7 @@ switch (e->getType()) {
 
 ## Static Building
 
-MNE Analyze needs to be told about the plugins it will be including at build time when building statically. To do this, the plugins are included with `Q_IMPORT_PLUGIN` in `applications/mne_analyze/mne_analyze/main.cpp` under the `#ifdef STATICBUILD` macro, as well as in `applications/mne_analyze/mne_analyze/mne_analyze.pro` under the section that checks for static builds, `contains(MNECPP_CONFIG, static)`.
+When building statically, MNE Analyze needs to be told about the plugins at build time. To do this, the plugins are included with `Q_IMPORT_PLUGIN` in `applications/mne_analyze/mne_analyze/main.cpp` under the `#ifdef STATICBUILD` macro, as well as in `applications/mne_analyze/mne_analyze/mne_analyze.pro` under the section that checks for static builds, `contains(MNECPP_CONFIG, static)`.
 
 ## Getting the New Plugin Running
 
