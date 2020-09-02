@@ -173,13 +173,18 @@ public:
 
     //=========================================================================================================
     /**
-     * returns the currently selected layout file.
+     * Returns the currently selected layout file.
      *
      * @return the currently selected layout file
      */
     QString getCurrentLayoutFile();
 
     //=========================================================================================================
+    /**
+     * Returns the currently loaded group file
+     *
+     * @return currently loaded selection group file
+     */
     QString getCurrentGroupFile();
 
     //=========================================================================================================

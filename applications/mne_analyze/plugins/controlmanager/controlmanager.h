@@ -109,24 +109,59 @@ public:
 
 private:
     //=========================================================================================================
+    /**
+     * Receives scaling map scalingMap and sends an event to update views.
+     *
+     * @param [in] scalingMap   new scaling map to be sent out in an event
+     */
     void onScalingChanged(const QMap<qint32, float>& scalingMap);
 
     //=========================================================================================================
+    /**
+     * Sends new signal color via the event manager
+     *
+     * @param [in] signalColor   new signal color
+     */
     void onSignalColorChanged(const QColor& signalColor);
 
     //=========================================================================================================
+    /**
+     * Sends new backgroundColor via the event manager
+     *
+     * @param [in] backgroundColor  new background color
+     */
     void onBackgroundColorChanged(const QColor& backgroundColor);
 
     //=========================================================================================================
-    void onZoomChanged(double value);
+    /**
+     * Sends new channel zoom value (number channels shown) via the event manager
+     *
+     * @param [in] value    new zoom value
+     */
+    void onZoomChanged(double dZoomValue);
 
     //=========================================================================================================
-    void onTimeWindowChanged(int value);
+    /**
+     * Sends new time window value (number of seconds of data shown) via the event manager
+     *
+     * @param [in] value    new time window value
+     */
+    void onTimeWindowChanged(int iTimeWindow);
 
     //=========================================================================================================
-    void onDistanceTimeSpacerChanged(int value);
+    /**
+     * Sends new spacer distance parameters via the event manager
+     *
+     * @param [in] value    new time spacer distance value
+     */
+    void onDistanceTimeSpacerChanged(int iSpacerDistance);
 
     //=========================================================================================================
+    /**
+     * Sends the parameters to take screenshot via event manager
+     *
+     * @param [in] imageType    screenshot image type
+     */
     void onMakeScreenshot(const QString& imageType);
 
     QPointer<ANSHAREDLIB::Communicator>     m_pCommu;
