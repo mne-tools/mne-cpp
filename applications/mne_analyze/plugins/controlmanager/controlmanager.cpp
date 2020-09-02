@@ -235,31 +235,31 @@ void ControlManager::onBackgroundColorChanged(const QColor& backgroundColor)
 }
 
 //=============================================================================================================
-void ControlManager::onZoomChanged(double value)
+void ControlManager::onZoomChanged(double dZoomValue)
 {
     m_pViewParmeters->m_sViewsToApply = m_pApplyToView->getSelectedViews();
     m_pViewParmeters->m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::zoom;
-    m_pViewParmeters->m_dZoomValue = value;
+    m_pViewParmeters->m_dZoomValue = dZoomValue;
 
     m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_pViewParmeters));
 }
 
 //=============================================================================================================
-void ControlManager::onTimeWindowChanged(int value)
+void ControlManager::onTimeWindowChanged(int iTimeWindow)
 {
     m_pViewParmeters->m_sViewsToApply = m_pApplyToView->getSelectedViews();
     m_pViewParmeters->m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::window;
-    m_pViewParmeters->m_iTimeWindow = value;
+    m_pViewParmeters->m_iTimeWindow = iTimeWindow;
 
     m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_pViewParmeters));
 }
 
 //=============================================================================================================
-void ControlManager::onDistanceTimeSpacerChanged(int value)
+void ControlManager::onDistanceTimeSpacerChanged(int iSpacerDistance)
 {
     m_pViewParmeters->m_sViewsToApply = m_pApplyToView->getSelectedViews();
     m_pViewParmeters->m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::spacer;
-    m_pViewParmeters->m_iTimeSpacers = value;
+    m_pViewParmeters->m_iTimeSpacers = iSpacerDistance;
 
     m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_pViewParmeters));
 }

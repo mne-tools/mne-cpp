@@ -141,6 +141,11 @@ private:
     void onSendSamplePos(int iSample);
 
     //=========================================================================================================
+    /**
+     * Updates the signal view parameters based on incoming pViewParameters object
+     *
+     * @param [in] pViewParameters  container for singal viewer display settings with new desired settings
+     */
     void updateViewParameters(ANSHAREDLIB::ViewParameters* pViewParameters);
 
     // Control
