@@ -187,6 +187,7 @@ void RawDataViewer::handleEvent(QSharedPointer<Event> e)
         if(e->getData().value<ANSHAREDLIB::ViewParameters*>()->m_sViewsToApply.contains("signalview")){
             updateViewParameters(e->getData().value<ANSHAREDLIB::ViewParameters*>());
         }
+        break;
     default:
         qWarning() << "[RawDataViewer::handleEvent] Received an Event that is not handled by switch cases.";
     }

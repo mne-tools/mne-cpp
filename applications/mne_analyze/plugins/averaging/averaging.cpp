@@ -263,6 +263,7 @@ void Averaging::handleEvent(QSharedPointer<Event> e)
             break;
         case VIEW_SETTINGS_CHANGED:
             setViewSettings(e->getData().value<ANSHAREDLIB::ViewParameters*>());
+        break;
         default:
             qWarning() << "[Averaging::handleEvent] Received an Event that is not handled by switch cases.";
     }
