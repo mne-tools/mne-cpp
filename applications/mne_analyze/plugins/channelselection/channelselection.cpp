@@ -136,6 +136,9 @@ QDockWidget *ChannelSelection::getControl()
     pControlDockWidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,
                                         QSizePolicy::Preferred));
 
+    QLabel* pTempLabel = new QLabel("No File Loaded");
+    m_pControlLayout->addWidget(pTempLabel);
+
     return pControlDockWidget;
 }
 
@@ -195,6 +198,8 @@ void ChannelSelection::setFiffSettings(QSharedPointer<FIFFLIB::FiffInfo> pFiffIn
     }
 
     //First time set up only
+    m_pControlLayout->takeAt(0)->widget()->hide();
+
     m_pChannelInfoModel = QSharedPointer<DISPLIB::ChannelInfoModel>(new DISPLIB::ChannelInfoModel(m_pFiffInfo));
 
     m_pChannelSelectionView = new DISPLIB::ChannelSelectionView(QString("MNEANALYZE/CHANSELECT"),
