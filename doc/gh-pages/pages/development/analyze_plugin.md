@@ -6,7 +6,7 @@ nav_order: 1
 ---
 # Creating a New Plugin
 
-This guide covers thec reation of a new plugin
+This guide covers the creation of a new plugin
 
 ## Overview
 
@@ -130,6 +130,10 @@ switch (e->getType()) {
     default:
         qWarning() << "[Averaging::handleEvent] Received an Event that is not handled by switch cases.";
 ```
+
+## Static Building
+
+MNE Analyze needs to be told about the plugins it will be including at build time when building statically. To do this, the plugins are included with `Q_IMPORT_PLUGIN` in `applications/mne_analyze/mne_analyze/main.cpp` under the `#ifdef STATICBUILD` macro, as well as in `applications/mne_analyze/mne_analyze/mne_analyze.pro` under the section that checks for static builds, `contains(MNECPP_CONFIG, static)`.
 
 ## Getting the New Plugin Running
 
