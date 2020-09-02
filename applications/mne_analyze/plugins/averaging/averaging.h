@@ -254,7 +254,7 @@ private:
      *
      * @param pViewParams
      */
-    void setViewSettings(ANSHAREDLIB::ViewParameters* pViewParams);
+    void setViewSettings(ANSHAREDLIB::ViewParameters viewParams);
 
     //=========================================================================================================
     /**

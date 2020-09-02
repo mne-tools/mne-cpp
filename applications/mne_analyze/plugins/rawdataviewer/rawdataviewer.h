@@ -146,7 +146,7 @@ private:
      *
      * @param [in] pViewParameters  container for singal viewer display settings with new desired settings
      */
-    void updateViewParameters(ANSHAREDLIB::ViewParameters* pViewParameters);
+    void updateViewParameters(ANSHAREDLIB::ViewParameters viewParameters);
 
     // Control
     QPointer<ANSHAREDLIB::Communicator>             m_pCommu;                   /**< The communicator object to communicate with other plugins. */

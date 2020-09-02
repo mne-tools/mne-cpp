@@ -262,8 +262,8 @@ void Averaging::handleEvent(QSharedPointer<Event> e)
             setScalingMap(e->getData());
             break;
         case VIEW_SETTINGS_CHANGED:
-            setViewSettings(e->getData().value<ANSHAREDLIB::ViewParameters*>());
-        break;
+            setViewSettings(e->getData().value<ANSHAREDLIB::ViewParameters>());
+            break;
         default:
             qWarning() << "[Averaging::handleEvent] Received an Event that is not handled by switch cases.";
     }
@@ -601,33 +601,33 @@ void Averaging::setScalingMap(const QVariant &data)
         return;
     }
 
-    if(data.value<ANSHAREDLIB::ScalingParameters*>()->m_sViewsToApply.contains("layoutview")){
-        m_pAverageLayoutView->setScaleMap(data.value<ANSHAREDLIB::ScalingParameters*>()->m_mScalingMap);
+    if(data.value<ANSHAREDLIB::ScalingParameters>().m_sViewsToApply.contains("layoutview")){
+        m_pAverageLayoutView->setScaleMap(data.value<ANSHAREDLIB::ScalingParameters>().m_mScalingMap);
     }
-    if(data.value<ANSHAREDLIB::ScalingParameters*>()->m_sViewsToApply.contains("butterflyview")){
-        m_pButterflyView->setScaleMap(data.value<ANSHAREDLIB::ScalingParameters*>()->m_mScalingMap);
+    if(data.value<ANSHAREDLIB::ScalingParameters>().m_sViewsToApply.contains("butterflyview")){
+        m_pButterflyView->setScaleMap(data.value<ANSHAREDLIB::ScalingParameters>().m_mScalingMap);
     }
 
 }
 
 //=============================================================================================================
 
-void Averaging::setViewSettings(ANSHAREDLIB::ViewParameters* pViewParams)
+void Averaging::setViewSettings(ANSHAREDLIB::ViewParameters viewParams)
 {
-    if(pViewParams->m_sViewsToApply.contains("layoutview")){
-        if (pViewParams->m_sSettingsToApply == ANSHAREDLIB::ViewParameters::all || pViewParams->m_sSettingsToApply == ANSHAREDLIB::ViewParameters::background){
-            m_pAverageLayoutView->setBackgroundColor(pViewParams->m_colorBackground);
+    if(viewParams.m_sViewsToApply.contains("layoutview")){
+        if (viewParams.m_sSettingsToApply == ANSHAREDLIB::ViewParameters::all || viewParams.m_sSettingsToApply == ANSHAREDLIB::ViewParameters::background){
+            m_pAverageLayoutView->setBackgroundColor(viewParams.m_colorBackground);
             m_pAverageLayoutView->update();
         }
     }
 
-    if(pViewParams->m_sViewsToApply.contains("butterflyview")){
-        if (pViewParams->m_sSettingsToApply == ANSHAREDLIB::ViewParameters::all || pViewParams->m_sSettingsToApply == ANSHAREDLIB::ViewParameters::background){
-            m_pButterflyView->setBackgroundColor(pViewParams->m_colorBackground);
+    if(viewParams.m_sViewsToApply.contains("butterflyview")){
+        if (viewParams.m_sSettingsToApply == ANSHAREDLIB::ViewParameters::all || viewParams.m_sSettingsToApply == ANSHAREDLIB::ViewParameters::background){
+            m_pButterflyView->setBackgroundColor(viewParams.m_colorBackground);
             m_pButterflyView->update();
         }
-        if (pViewParams->m_sSettingsToApply == ANSHAREDLIB::ViewParameters::all || pViewParams->m_sSettingsToApply == ANSHAREDLIB::ViewParameters::signal){
-            m_pButterflyView->setSingleAverageColor(pViewParams->m_colorSignal);
+        if (viewParams.m_sSettingsToApply == ANSHAREDLIB::ViewParameters::all || viewParams.m_sSettingsToApply == ANSHAREDLIB::ViewParameters::signal){
+            m_pButterflyView->setSingleAverageColor(viewParams.m_colorSignal);
             m_pButterflyView->update();
         }
     }
