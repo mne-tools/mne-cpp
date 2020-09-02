@@ -101,6 +101,12 @@ public:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
+    //=========================================================================================================
+    /**
+     * Sets the item color to the input parameter viewColor
+     *
+     * @param [in] viewColor    desired item color
+     */
     void setDefaultColor(const QColor& viewColor);
 
     QString                                         m_sChannelName;             /**< The channel name.*/
