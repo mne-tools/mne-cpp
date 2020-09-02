@@ -84,6 +84,10 @@ unix:!macx {
     # Unix
     QMAKE_RPATHDIR += $ORIGIN/../lib
 }
+macx {
+    QMAKE_LFLAGS += -Wl,-rpath,../lib
+}
+
 
 # Activate FFTW backend in Eigen for non-static builds only
 contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {

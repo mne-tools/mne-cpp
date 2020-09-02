@@ -147,7 +147,6 @@ INCLUDEPATH += $${MNE_ANALYZE_INCLUDE_DIR}
 
 unix:!macx {
     QMAKE_CXXFLAGS += -std=c++0x
-    QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
 
     # suppress visibility warnings
     QMAKE_CXXFLAGS += -Wno-attributes
@@ -183,6 +182,8 @@ unix:!macx {
     QMAKE_RPATHDIR += $ORIGIN/../lib
 }
 macx {
+    QMAKE_LFLAGS += -Wl,-rpath,../lib
+
     # Copy Resource and plugins folder to app bundle
     plugins.path = Contents/MacOS/
     plugins.files = $${ROOT_DIR}/bin/mne_analyze_plugins

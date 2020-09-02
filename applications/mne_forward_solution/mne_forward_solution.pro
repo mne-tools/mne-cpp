@@ -81,8 +81,6 @@ HEADERS += \
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
-unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
-
 # Deploy dependencies
 win32:!contains(MNECPP_CONFIG, static) {
     EXTRA_ARGS =
@@ -99,6 +97,8 @@ macx {
         DEPLOY_CMD = $$macDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
         QMAKE_POST_LINK += $${DEPLOY_CMD}
     }
+
+    QMAKE_LFLAGS += -Wl,-rpath,../lib
 }
 
 # Activate FFTW backend in Eigen for non-static builds only

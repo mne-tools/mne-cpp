@@ -217,15 +217,13 @@ header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/disp3D
 
 INSTALLS += header_files
 
-unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
-
 contains(MNECPP_CONFIG, withCodeCov) {
     QMAKE_CXXFLAGS += --coverage
     QMAKE_LFLAGS += --coverage
 }
 
-# Deploy/Copy library to bin folder manually (windeployqt only takes care of qt and system libraries)
 win32:!contains(MNECPP_CONFIG, static) {
+    # Deploy/Copy library to bin folder manually (windeployqt only takes care of qt and system libraries)
     EXTRA_ARGS =
     DEPLOY_CMD = $$winDeployLibArgs($${TARGET},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
     QMAKE_POST_LINK += $${DEPLOY_CMD}
@@ -237,6 +235,11 @@ win32:!contains(MNECPP_CONFIG, static) {
         QMAKE_POST_LINK += $$sprintf($${QMAKE_MKDIR_CMD}, "$${TRGTDIR}") $$escape_expand(\n\t)
         QMAKE_POST_LINK += $${QMAKE_COPY_DIR} "$$shell_path($$[QT_INSTALL_PLUGINS]/renderers)" "$$shell_path($${MNE_BINARY_DIR}/renderers)" $$escape_expand(\\n\\t)
     }
+}
+
+macx {
+    # Change install name of the library so we can use the @rpath when linking executables against it
+    QMAKE_LFLAGS_SONAME = -Wl,-install_name,@rpath/
 }
 
 # Activate FFTW backend in Eigen for non-static builds only

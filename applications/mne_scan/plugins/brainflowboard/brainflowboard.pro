@@ -125,8 +125,6 @@ unix {
 }
 !isEmpty(target.path): INSTALLS += target
 
-unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
-
 unix:!macx {
     # Unix
     QMAKE_RPATHDIR += $ORIGIN/../../lib
