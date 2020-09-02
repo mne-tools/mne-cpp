@@ -126,20 +126,15 @@ header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/scShared
 
 INSTALLS += header_files
 
-unix:!macx {
-    QMAKE_CXXFLAGS += -std=c++0x
-    QMAKE_CXXFLAGS += -Wno-attributes
-}
-macx {
-    QMAKE_CXXFLAGS = -mmacosx-version-min=10.7 -std=gnu0x -stdlib=libc++
-    CONFIG +=c++11
-}
-
-# Deploy/Copy library to bin folder manually (windeployqt only takes care of qt and system libraries)
 win32:!contains(MNECPP_CONFIG, static) {
+    # Deploy/Copy library to bin folder manually (windeployqt only takes care of qt and system libraries)
     EXTRA_ARGS =
     DEPLOY_CMD = $$winDeployLibArgs($${TARGET},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
     QMAKE_POST_LINK += $${DEPLOY_CMD}
+}
+
+macx {
+    QMAKE_LFLAGS += -Wl,-rpath,../lib
 }
 
 # Activate FFTW backend in Eigen for non-static builds only

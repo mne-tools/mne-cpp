@@ -99,6 +99,10 @@ unix:!macx {
     # Unix
     QMAKE_RPATHDIR += $ORIGIN/../lib
 }
+macx {
+    QMAKE_LFLAGS += -Wl,-rpath,../lib
+}
+
 
 # Activate FFTW backend in Eigen
 contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {

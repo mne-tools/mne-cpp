@@ -119,8 +119,6 @@ header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/fwd
 
 INSTALLS += header_files
 
-unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
-
 DISTFILES += \
     dipoleFit/dipolefit_helpers_bak.txt
 
@@ -129,21 +127,26 @@ contains(MNECPP_CONFIG, withCodeCov) {
     QMAKE_LFLAGS += --coverage
 }
 
-# OpenMP
-win32:!contains(MNECPP_CONFIG, wasm):!contains(MNECPP_CONFIG, static) {
-    QMAKE_CXXFLAGS  +=  -openmp
-    #QMAKE_LFLAGS    +=  -openmp
+win32:!contains(MNECPP_CONFIG, static) {
+    !contains(MNECPP_CONFIG, wasm) {
+        QMAKE_CXXFLAGS  +=  -openmp
+        #QMAKE_LFLAGS    +=  -openmp
+    }
+
+    # Deploy/Copy library to bin folder manually (windeployqt only takes care of qt and system libraries)
+    EXTRA_ARGS =
+    DEPLOY_CMD = $$winDeployLibArgs($${TARGET},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
+    QMAKE_POST_LINK += $${DEPLOY_CMD}
 }
+
 unix:!macx:!contains(MNECPP_CONFIG, wasm):!contains(MNECPP_CONFIG, static) {
     QMAKE_CXXFLAGS  +=  -fopenmp
     QMAKE_LFLAGS    +=  -fopenmp
 }
 
-# Deploy/Copy library to bin folder manually (windeployqt only takes care of qt and system libraries)
-win32:!contains(MNECPP_CONFIG, static) {
-    EXTRA_ARGS =
-    DEPLOY_CMD = $$winDeployLibArgs($${TARGET},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
-    QMAKE_POST_LINK += $${DEPLOY_CMD}
+macx {
+    # Change install name of the library so we can use the @rpath when linking executables against it
+    QMAKE_LFLAGS_SONAME = -Wl,-install_name,@rpath/
 }
 
 # Activate FFTW backend in Eigen for non-static builds only

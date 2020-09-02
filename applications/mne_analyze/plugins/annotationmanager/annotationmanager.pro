@@ -123,8 +123,6 @@ INCLUDEPATH += $${MNE_ANALYZE_INCLUDE_DIR}
 header_files.files = $${HEADERS}
 header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/mne_analyze_plugins
 
-unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
-
 # suppress visibility warnings
 unix: QMAKE_CXXFLAGS += -Wno-attributes
 
