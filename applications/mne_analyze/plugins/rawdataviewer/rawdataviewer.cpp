@@ -179,13 +179,13 @@ void RawDataViewer::handleEvent(QSharedPointer<Event> e)
         }
         break;
     case SCALING_MAP_CHANGED:
-        if(e->getData().value<ANSHAREDLIB::ScalingParameters*>()->m_sViewsToApply.contains("signalview")){
-            m_pFiffRawView->setScalingMap(e->getData().value<ANSHAREDLIB::ScalingParameters*>()->m_mScalingMap);
+        if(e->getData().value<ANSHAREDLIB::ScalingParameters>().m_sViewsToApply.contains("signalview")){
+            m_pFiffRawView->setScalingMap(e->getData().value<ANSHAREDLIB::ScalingParameters>().m_mScalingMap);
         }
         break;
     case VIEW_SETTINGS_CHANGED:
-        if(e->getData().value<ANSHAREDLIB::ViewParameters*>()->m_sViewsToApply.contains("signalview")){
-            updateViewParameters(e->getData().value<ANSHAREDLIB::ViewParameters*>());
+        if(e->getData().value<ANSHAREDLIB::ViewParameters>().m_sViewsToApply.contains("signalview")){
+            updateViewParameters(e->getData().value<ANSHAREDLIB::ViewParameters>());
         }
         break;
     default:
@@ -281,36 +281,36 @@ void RawDataViewer::onSendSamplePos(int iSample)
 
 //=============================================================================================================
 
-void RawDataViewer::updateViewParameters(ANSHAREDLIB::ViewParameters *pViewParameters)
+void RawDataViewer::updateViewParameters(ANSHAREDLIB::ViewParameters viewParameters)
 {
-    switch (pViewParameters->m_sSettingsToApply){
+    switch (viewParameters.m_sSettingsToApply){
         case ANSHAREDLIB::ViewParameters::ViewSetting::signal:
-            m_pFiffRawView->setSignalColor(pViewParameters->m_colorSignal);
+            m_pFiffRawView->setSignalColor(viewParameters.m_colorSignal);
             m_pFiffRawView->updateView();
             break;
         case ANSHAREDLIB::ViewParameters::ViewSetting::background:
-            m_pFiffRawView->setBackgroundColor(pViewParameters->m_colorBackground);
+            m_pFiffRawView->setBackgroundColor(viewParameters.m_colorBackground);
             m_pFiffRawView->updateView();
             break;
         case ANSHAREDLIB::ViewParameters::ViewSetting::zoom:
-            m_pFiffRawView->setZoom(pViewParameters->m_dZoomValue);
+            m_pFiffRawView->setZoom(viewParameters.m_dZoomValue);
             break;
         case ANSHAREDLIB::ViewParameters::ViewSetting::window:
-            m_pFiffRawView->setWindowSize(pViewParameters->m_iTimeWindow);
+            m_pFiffRawView->setWindowSize(viewParameters.m_iTimeWindow);
             break;
         case ANSHAREDLIB::ViewParameters::ViewSetting::spacer:
-            m_pFiffRawView->setDistanceTimeSpacer(pViewParameters->m_iTimeSpacers);
+            m_pFiffRawView->setDistanceTimeSpacer(viewParameters.m_iTimeSpacers);
             break;
         case ANSHAREDLIB::ViewParameters::ViewSetting::screenshot:
-            m_pFiffRawView->onMakeScreenshot(pViewParameters->m_sImageType);
+            m_pFiffRawView->onMakeScreenshot(viewParameters.m_sImageType);
             break;
         case ANSHAREDLIB::ViewParameters::ViewSetting::all:
-            m_pFiffRawView->setSignalColor(pViewParameters->m_colorSignal);
-            m_pFiffRawView->setBackgroundColor(pViewParameters->m_colorBackground);
-            m_pFiffRawView->setZoom(pViewParameters->m_dZoomValue);
-            m_pFiffRawView->setWindowSize(pViewParameters->m_iTimeWindow);
-            m_pFiffRawView->setDistanceTimeSpacer(pViewParameters->m_iTimeSpacers);
-            m_pFiffRawView->onMakeScreenshot(pViewParameters->m_sImageType);
+            m_pFiffRawView->setSignalColor(viewParameters.m_colorSignal);
+            m_pFiffRawView->setBackgroundColor(viewParameters.m_colorBackground);
+            m_pFiffRawView->setZoom(viewParameters.m_dZoomValue);
+            m_pFiffRawView->setWindowSize(viewParameters.m_iTimeWindow);
+            m_pFiffRawView->setDistanceTimeSpacer(viewParameters.m_iTimeSpacers);
+            m_pFiffRawView->onMakeScreenshot(viewParameters.m_sImageType);
         break;
         default:
             qDebug() << "Unknown setting";

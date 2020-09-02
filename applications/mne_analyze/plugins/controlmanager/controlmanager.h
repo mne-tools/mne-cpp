@@ -167,8 +167,8 @@ private:
     QPointer<ANSHAREDLIB::Communicator>     m_pCommu;
 
     DISPLIB::ApplyToView*                   m_pApplyToView;
-    ANSHAREDLIB::ScalingParameters*         m_pScalingParameters;
-    ANSHAREDLIB::ViewParameters*            m_pViewParmeters;
+    ANSHAREDLIB::ScalingParameters          m_pScalingParameters;
+    ANSHAREDLIB::ViewParameters             m_pViewParmeters;
 };
 
 //=============================================================================================================

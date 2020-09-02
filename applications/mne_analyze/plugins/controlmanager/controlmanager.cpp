@@ -64,8 +64,8 @@ using namespace ANSHAREDLIB;
 //=============================================================================================================
 
 ControlManager::ControlManager()
-: m_pScalingParameters(new ANSHAREDLIB::ScalingParameters)
-, m_pViewParmeters(new ANSHAREDLIB::ViewParameters)
+//: m_pScalingParameters(new ANSHAREDLIB::ScalingParameters)
+//: m_pViewParmeters(new ANSHAREDLIB::ViewParameters)
 {
 }
 
@@ -73,9 +73,9 @@ ControlManager::ControlManager()
 
 ControlManager::~ControlManager()
 {
-    if(m_pScalingParameters){
-        delete m_pScalingParameters;
-    }
+//    if(m_pScalingParameters){
+//        delete m_pScalingParameters;
+//    }
 }
 
 //=============================================================================================================
@@ -155,15 +155,15 @@ QDockWidget *ControlManager::getControl()
             this, &ControlManager::onMakeScreenshot, Qt::UniqueConnection);
 
 
-    m_pScalingParameters->m_mScalingMap = pScalingWidget->getScaleMap();
-    m_pScalingParameters->m_mScalingMap.detach();
+    m_pScalingParameters.m_mScalingMap = pScalingWidget->getScaleMap();
+    m_pScalingParameters.m_mScalingMap.detach();
 
-    m_pViewParmeters->m_colorSignal = pFiffViewSettings->getSignalColor();
-    m_pViewParmeters->m_colorBackground = pFiffViewSettings->getBackgroundColor();
-    m_pViewParmeters->m_dZoomValue = pFiffViewSettings->getZoom();
-    m_pViewParmeters->m_iTimeWindow = pFiffViewSettings->getWindowSize();
-    m_pViewParmeters->m_iTimeSpacers = pFiffViewSettings->getDistanceTimeSpacer();
-    m_pViewParmeters->m_sImageType = "";
+    m_pViewParmeters.m_colorSignal = pFiffViewSettings->getSignalColor();
+    m_pViewParmeters.m_colorBackground = pFiffViewSettings->getBackgroundColor();
+    m_pViewParmeters.m_dZoomValue = pFiffViewSettings->getZoom();
+    m_pViewParmeters.m_iTimeWindow = pFiffViewSettings->getWindowSize();
+    m_pViewParmeters.m_iTimeSpacers = pFiffViewSettings->getDistanceTimeSpacer();
+    m_pViewParmeters.m_sImageType = "";
 
     return pControlDock;
 }
@@ -181,9 +181,9 @@ void ControlManager::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
     case SELECTED_MODEL_CHANGED:
-        onScalingChanged(m_pScalingParameters->m_mScalingMap);
-        m_pViewParmeters->m_sViewsToApply = m_pApplyToView->getSelectedViews();
-        m_pViewParmeters->m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::all;
+        onScalingChanged(m_pScalingParameters.m_mScalingMap);
+        m_pViewParmeters.m_sViewsToApply = m_pApplyToView->getSelectedViews();
+        m_pViewParmeters.m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::all;
         m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_pViewParmeters));
         break;
     default:
@@ -206,10 +206,10 @@ QVector<EVENT_TYPE> ControlManager::getEventSubscriptions(void) const
 
 void ControlManager::onScalingChanged(const QMap<qint32, float> &scalingMap)
 {
-    m_pScalingParameters->m_sViewsToApply = m_pApplyToView->getSelectedViews();
+    m_pScalingParameters.m_sViewsToApply = m_pApplyToView->getSelectedViews();
 
-    m_pScalingParameters->m_mScalingMap = scalingMap;
-    m_pScalingParameters->m_mScalingMap.detach();
+    m_pScalingParameters.m_mScalingMap = scalingMap;
+    m_pScalingParameters.m_mScalingMap.detach();
 
     m_pCommu->publishEvent(EVENT_TYPE::SCALING_MAP_CHANGED, QVariant::fromValue(m_pScalingParameters));
 }
@@ -217,9 +217,9 @@ void ControlManager::onScalingChanged(const QMap<qint32, float> &scalingMap)
 //=============================================================================================================
 void ControlManager::onSignalColorChanged(const QColor& signalColor)
 {
-    m_pViewParmeters->m_sViewsToApply = m_pApplyToView->getSelectedViews();
-    m_pViewParmeters->m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::signal;
-    m_pViewParmeters->m_colorSignal = signalColor;
+    m_pViewParmeters.m_sViewsToApply = m_pApplyToView->getSelectedViews();
+    m_pViewParmeters.m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::signal;
+    m_pViewParmeters.m_colorSignal = signalColor;
 
     m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_pViewParmeters));
 }
@@ -227,9 +227,9 @@ void ControlManager::onSignalColorChanged(const QColor& signalColor)
 //=============================================================================================================
 void ControlManager::onBackgroundColorChanged(const QColor& backgroundColor)
 {
-    m_pViewParmeters->m_sViewsToApply = m_pApplyToView->getSelectedViews();
-    m_pViewParmeters->m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::background;
-    m_pViewParmeters->m_colorBackground = backgroundColor;
+    m_pViewParmeters.m_sViewsToApply = m_pApplyToView->getSelectedViews();
+    m_pViewParmeters.m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::background;
+    m_pViewParmeters.m_colorBackground = backgroundColor;
 
     m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_pViewParmeters));
 }
@@ -237,9 +237,9 @@ void ControlManager::onBackgroundColorChanged(const QColor& backgroundColor)
 //=============================================================================================================
 void ControlManager::onZoomChanged(double dZoomValue)
 {
-    m_pViewParmeters->m_sViewsToApply = m_pApplyToView->getSelectedViews();
-    m_pViewParmeters->m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::zoom;
-    m_pViewParmeters->m_dZoomValue = dZoomValue;
+    m_pViewParmeters.m_sViewsToApply = m_pApplyToView->getSelectedViews();
+    m_pViewParmeters.m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::zoom;
+    m_pViewParmeters.m_dZoomValue = dZoomValue;
 
     m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_pViewParmeters));
 }
@@ -247,9 +247,9 @@ void ControlManager::onZoomChanged(double dZoomValue)
 //=============================================================================================================
 void ControlManager::onTimeWindowChanged(int iTimeWindow)
 {
-    m_pViewParmeters->m_sViewsToApply = m_pApplyToView->getSelectedViews();
-    m_pViewParmeters->m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::window;
-    m_pViewParmeters->m_iTimeWindow = iTimeWindow;
+    m_pViewParmeters.m_sViewsToApply = m_pApplyToView->getSelectedViews();
+    m_pViewParmeters.m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::window;
+    m_pViewParmeters.m_iTimeWindow = iTimeWindow;
 
     m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_pViewParmeters));
 }
@@ -257,9 +257,9 @@ void ControlManager::onTimeWindowChanged(int iTimeWindow)
 //=============================================================================================================
 void ControlManager::onDistanceTimeSpacerChanged(int iSpacerDistance)
 {
-    m_pViewParmeters->m_sViewsToApply = m_pApplyToView->getSelectedViews();
-    m_pViewParmeters->m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::spacer;
-    m_pViewParmeters->m_iTimeSpacers = iSpacerDistance;
+    m_pViewParmeters.m_sViewsToApply = m_pApplyToView->getSelectedViews();
+    m_pViewParmeters.m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::spacer;
+    m_pViewParmeters.m_iTimeSpacers = iSpacerDistance;
 
     m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_pViewParmeters));
 }
@@ -267,9 +267,9 @@ void ControlManager::onDistanceTimeSpacerChanged(int iSpacerDistance)
 //=============================================================================================================
 void ControlManager::onMakeScreenshot(const QString& imageType)
 {
-    m_pViewParmeters->m_sViewsToApply = m_pApplyToView->getSelectedViews();
-    m_pViewParmeters->m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::screenshot;
-    m_pViewParmeters->m_sImageType = imageType;
+    m_pViewParmeters.m_sViewsToApply = m_pApplyToView->getSelectedViews();
+    m_pViewParmeters.m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::screenshot;
+    m_pViewParmeters.m_sImageType = imageType;
 
     m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_pViewParmeters));
 }
