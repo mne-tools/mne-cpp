@@ -71,6 +71,7 @@ BemDataModel::BemDataModel(const QString &sFilePath,
     : AbstractModel(pParent)
 {
     Q_UNUSED(sFilePath)
+    initBemData(sFilePath);
 }
 
 
