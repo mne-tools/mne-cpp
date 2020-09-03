@@ -258,9 +258,6 @@ private:
     QSharedPointer<EEGoSportsProducer>  m_pEEGoSportsProducer;              /**< The EEGoSportsProducer.*/
 
     QMutex                              m_mutex;                            /**< Holds the threads mutex.*/
-
-    QAction*                            m_pActionImpedance;                 /**< shows impedance widget */
-    QAction*                            m_pActionSetupProject;              /**< Shows setup project dialog */
 };
 } // NAMESPACE
 

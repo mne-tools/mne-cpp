@@ -61,11 +61,24 @@ EEGoSportsSetupWidget::EEGoSportsSetupWidget(EEGoSports* pEEGoSports, QWidget* p
 {
     ui.setupUi(this);
 
+    QIcon impedanceIcon = QIcon(":/images/impedances.png");
+    ui.m_qLabel_Impedance->setPixmap(impedanceIcon.pixmap(QSize(32,32)));
+    QIcon filesIcon = QIcon(":/images/database.png");
+    ui.m_qLabel_Files->setPixmap(filesIcon.pixmap(QSize(32,32)));
+
     //Connect device sampling properties
     connect(ui.m_comboBox_SamplingFreq, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
             this, &EEGoSportsSetupWidget::setDeviceSamplingProperties);
     connect(ui.m_spinBox_BlockSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             this, &EEGoSportsSetupWidget::setDeviceSamplingProperties);
+
+    //Connect impedance test
+    connect(ui.m_qPushButton_Files, &QPushButton::clicked,
+            m_pEEGoSports, &EEGoSports::showSetupProjectDialog);
+
+    //Connect files dialog
+    connect(ui.m_qPushButton_Impedance, &QPushButton::clicked,
+            m_pEEGoSports, &EEGoSports::showImpedanceDialog);
 
     //Connect debug file
     connect(ui.m_checkBox_WriteDriverDebugToFile, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
