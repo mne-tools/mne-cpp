@@ -69,7 +69,58 @@ class ANSHAREDSHARED_EXPORT AveragingDataModel : public AbstractModel
     Q_OBJECT
 
 public:
+    //=========================================================================================================
     AveragingDataModel();
+
+    //=========================================================================================================
+    ~AveragingDataModel();
+
+    //=========================================================================================================
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+
+    //=========================================================================================================
+    Qt::ItemFlags flags(const QModelIndex &index) const override;
+
+    //=========================================================================================================
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+
+    //=========================================================================================================
+    int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+
+    //=========================================================================================================
+    inline MODEL_TYPE getType() const override;
+
+    //=========================================================================================================
+    inline QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
+
+    //=========================================================================================================
+    inline QModelIndex parent(const QModelIndex &index) const override;
 };
+
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline MODEL_TYPE AveragingDataModel::getType() const
+{
+    return MODEL_TYPE::ANSHAREDLIB_AVERAGING_MODEL;
+}
+
+//=============================================================================================================
+
+QModelIndex AveragingDataModel::parent(const QModelIndex &index) const
+{
+    Q_UNUSED(index);
+    return QModelIndex();
+}
+
+//=============================================================================================================
+
+QModelIndex AveragingDataModel::index(int row, int column, const QModelIndex &parent) const
+{
+    Q_UNUSED(parent);
+    return createIndex(row, column);
+}
+
 } //Namespace
 #endif // AVERAGINGDATAMODEL_H
