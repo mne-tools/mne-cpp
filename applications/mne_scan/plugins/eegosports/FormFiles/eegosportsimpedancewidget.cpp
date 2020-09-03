@@ -99,6 +99,9 @@ EEGoSportsImpedanceWidget::EEGoSportsImpedanceWidget(EEGoSports* pEEGoSports, QW
 
 EEGoSportsImpedanceWidget::~EEGoSportsImpedanceWidget()
 {
+    if (m_pEEGoSports->m_bCheckImpedances = true)
+        stopImpedanceMeasurement();
+
     delete m_pUi;
 }
 
