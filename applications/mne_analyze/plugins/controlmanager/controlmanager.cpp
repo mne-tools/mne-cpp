@@ -210,6 +210,7 @@ void ControlManager::onScalingChanged(const QMap<qint32, float> &scalingMap)
 }
 
 //=============================================================================================================
+
 void ControlManager::onSignalColorChanged(const QColor& signalColor)
 {
     m_ViewParmeters.m_sViewsToApply = m_pApplyToView->getSelectedViews();
@@ -220,6 +221,7 @@ void ControlManager::onSignalColorChanged(const QColor& signalColor)
 }
 
 //=============================================================================================================
+
 void ControlManager::onBackgroundColorChanged(const QColor& backgroundColor)
 {
     m_ViewParmeters.m_sViewsToApply = m_pApplyToView->getSelectedViews();
@@ -230,6 +232,7 @@ void ControlManager::onBackgroundColorChanged(const QColor& backgroundColor)
 }
 
 //=============================================================================================================
+
 void ControlManager::onZoomChanged(double dZoomValue)
 {
     m_ViewParmeters.m_sViewsToApply = m_pApplyToView->getSelectedViews();
@@ -240,6 +243,7 @@ void ControlManager::onZoomChanged(double dZoomValue)
 }
 
 //=============================================================================================================
+
 void ControlManager::onTimeWindowChanged(int iTimeWindow)
 {
     m_ViewParmeters.m_sViewsToApply = m_pApplyToView->getSelectedViews();
@@ -250,6 +254,7 @@ void ControlManager::onTimeWindowChanged(int iTimeWindow)
 }
 
 //=============================================================================================================
+
 void ControlManager::onDistanceTimeSpacerChanged(int iSpacerDistance)
 {
     m_ViewParmeters.m_sViewsToApply = m_pApplyToView->getSelectedViews();
@@ -260,6 +265,7 @@ void ControlManager::onDistanceTimeSpacerChanged(int iSpacerDistance)
 }
 
 //=============================================================================================================
+
 void ControlManager::onMakeScreenshot(const QString& imageType)
 {
     m_ViewParmeters.m_sViewsToApply = m_pApplyToView->getSelectedViews();
