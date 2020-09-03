@@ -82,7 +82,8 @@ namespace ANSHAREDLIB
         ANSHAREDLIB_QENTITYLIST_MODEL,
         ANSHAREDLIB_ECDSET_MODEL,
         ANSHAREDLIB_FIFFRAW_MODEL,
-        ANSHAREDLIB_ANNOTATION_MODEL
+        ANSHAREDLIB_ANNOTATION_MODEL,
+        ANSHAREDLIB_AVERAGING_MODEL
     };
 
     //=========================================================================================================
