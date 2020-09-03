@@ -92,6 +92,7 @@ SOURCES += \
     Model/fiffrawviewmodel.cpp \
     Model/annotationmodel.cpp \
     Model/analyzedatamodel.cpp \
+    Model/averagingdatamodel.cpp \
 
 HEADERS += \
     anshared_global.h \
@@ -110,6 +111,7 @@ HEADERS += \
     Model/fiffrawviewmodel.h \
     Model/annotationmodel.h \
     Model/analyzedatamodel.h \
+    Model/averagingdatamodel.h \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
