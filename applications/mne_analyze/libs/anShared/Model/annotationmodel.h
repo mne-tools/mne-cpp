@@ -89,18 +89,99 @@ class ANSHAREDSHARED_EXPORT AnnotationModel : public AbstractModel
     Q_OBJECT
 
 public:
+    //=========================================================================================================
+    /**
+     * Constructs an annotation model
+     *
+     * @param [in] parent   QObject parent of the model
+     */
     AnnotationModel(QObject* parent = Q_NULLPTR);
 
+    //=========================================================================================================
+    /**
+     * Destructs an annotation model.
+     */
     ~AnnotationModel();
 
     //=========================================================================================================
+    /**
+     * Inserts span rows at position
+     *
+     * @param [in] position     where to insert rows
+     * @param [in] span         how many rows to insert
+     * @param [in] parent       parent of inserted rows (unused)
+     *
+     * @return  returns true if successful
+     */
     bool insertRows(int position, int span, const QModelIndex & parent) override;
+
+    //=========================================================================================================
+    /**
+     * Removes span rows at position
+     *
+     * @param [in] position     where to remove rows
+     * @param [in] span         how many rows to remove
+     * @param [in] parent       parent of inserted rows (unused)
+     *
+     * @return  returns true if successful
+     */
     bool removeRows(int position, int span, const QModelIndex & parent = QModelIndex()) override;
+
+    //=========================================================================================================
+    /**
+     * Returns the number of rows in the model
+     *
+     * @param[in] parent     The parent index.
+     */
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+
+    //=========================================================================================================
+    /**
+     * Returns the number of columns in the model
+     *
+     * @param[in] parent     The parent index.
+     */
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+
+    //=========================================================================================================
+    /**
+     * Returns the data stored under the given role for the index.
+     *
+     * @param[in] index   The index that referres to the requested item.
+     * @param[in] role    The requested role.
+     */
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+
+    //=========================================================================================================
+    /**
+     * Returns the data for the given role and section in the header with the specified orientation.
+     *
+     * @param[in] section        For horizontal headers, the section number corresponds to the column number. Similarly, for vertical headers, the section number corresponds to the row number.
+     * @param[in] orientation    Qt::Horizontal or Qt::Vertical
+     * @param[in] role           role to show
+     *
+     * @return accessed eader data
+     */
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+
+    //=========================================================================================================
+    /**
+     * Sets index to value based on role
+     *
+     * @param [in] index    model index to which the data will be set
+     * @param [in] value    data to be set
+     * @param [in] role     Qt role
+     *
+     * @return returns true if successful
+     */
     bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole) override;
+
+    //=========================================================================================================
+    /**
+     * Returns the item flags for the given index.
+     *
+     * @param[in] index   The index that referres to the requested item.
+     */
     Qt::ItemFlags flags(const QModelIndex & index) const override;
 
     //=========================================================================================================
