@@ -54,6 +54,11 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
+contains(MNECPP_CONFIG, noOpenGL) {
+    DEFINES += NO_OPENGL
+    QT -= opengl
+}
+
 DESTDIR = $${MNE_BINARY_DIR}/mne_analyze_plugins
 
 contains(MNECPP_CONFIG, static) {
