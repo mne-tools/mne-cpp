@@ -6,7 +6,7 @@ nav_order: 1
 ---
 # Creating a New Plugin
 
-This guide covers the creation of a new plugin
+This guide covers the creation of a new plugin.
 
 ## Overview
 
