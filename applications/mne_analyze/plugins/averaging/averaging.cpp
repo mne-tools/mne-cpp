@@ -39,8 +39,11 @@
 #include "averaging.h"
 
 #include <anShared/Management/communicator.h>
+#include <anShared/Management/analyzedata.h>
+
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <anShared/Model/annotationmodel.h>
+#include <anShared/Model/averagingdatamodel.h>
 
 #include <disp/viewers/helpers/channelinfomodel.h>
 #include <disp/viewers/helpers/evokedsetmodel.h>
@@ -418,14 +421,9 @@ void Averaging::computeAverage()
         pFiffEvokedSet->evoked[0].baseline.second = m_fBaselineToS;
     }
 
-    m_pEvokedModel->setEvokedSet(pFiffEvokedSet);
+    QSharedPointer<ANSHAREDLIB::AveragingDataModel> pNewAvgModel = QSharedPointer<ANSHAREDLIB::AveragingDataModel>(new ANSHAREDLIB::AveragingDataModel(pFiffEvokedSet));
 
-    m_pButterflyView->setEvokedSetModel(m_pEvokedModel);
-    m_pAverageLayoutView->setEvokedSetModel(m_pEvokedModel);
-
-    m_pButterflyView->dataUpdate();
-    m_pButterflyView->updateView();
-    m_pAverageLayoutView->updateData();
+    m_pAnalyzeData->addModel<ANSHAREDLIB::AveragingDataModel>(pNewAvgModel);
 
     qInfo() << "[Averaging::computeAverage] Average computed.";
 }
@@ -629,4 +627,19 @@ void Averaging::setViewSettings(ANSHAREDLIB::ViewParameters viewParams)
             m_pButterflyView->update();
         }
     }
+}
+
+//=============================================================================================================
+
+
+void Averaging::onNewAveragingModel(QSharedPointer<ANSHAREDLIB::AveragingDataModel> pAveragingModel)
+{
+    m_pEvokedModel->setEvokedSet(pAveragingModel->data(QModelIndex()).value<QSharedPointer<FIFFLIB::FiffEvokedSet>>());
+
+    m_pButterflyView->setEvokedSetModel(m_pEvokedModel);
+    m_pAverageLayoutView->setEvokedSetModel(m_pEvokedModel);
+
+    m_pButterflyView->dataUpdate();
+    m_pButterflyView->updateView();
+    m_pAverageLayoutView->updateData();
 }

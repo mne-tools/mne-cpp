@@ -119,7 +119,7 @@ void ButterflyView::setEvokedSetModel(QSharedPointer<EvokedSetModel> model)
     m_pEvokedSetModel = model;
 
     connect(m_pEvokedSetModel.data(), &EvokedSetModel::dataChanged,
-            this, &ButterflyView::dataUpdate);
+            this, &ButterflyView::dataUpdate, Qt::UniqueConnection);
 }
 
 //=============================================================================================================
