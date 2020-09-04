@@ -78,41 +78,95 @@ class ANSHAREDSHARED_EXPORT AveragingDataModel : public AbstractModel
 
 public:
     //=========================================================================================================
+    /**
+     * @brief AveragingDataModel
+     * @param pEvokedSet
+     * @param parent
+     */
     AveragingDataModel(QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet = Q_NULLPTR, QObject* parent = Q_NULLPTR);
 
     //=========================================================================================================
+    /**
+     *
+     *
+     */
     ~AveragingDataModel();
 
     //=========================================================================================================
+    /**
+     * @brief data
+     * @param index
+     * @param role
+     * @return
+     */
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
     //=========================================================================================================
+    /**
+     * @brief flags
+     * @param index
+     * @return
+     */
     Qt::ItemFlags flags(const QModelIndex &index) const override;
 
     //=========================================================================================================
+    /**
+     * @brief rowCount
+     * @param parent
+     * @return
+     */
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 
     //=========================================================================================================
+    /**
+     * @brief columnCount
+     * @param parent
+     * @return
+     */
     int columnCount(const QModelIndex &parent = QModelIndex()) const override;
 
     //=========================================================================================================
+    /**
+     * @brief setEvokedSet
+     * @param pEvokedSet
+     */
     void setEvokedSet(QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet);
 
     //=========================================================================================================
+    /**
+     * @brief getEvokedSet
+     * @return
+     */
     QSharedPointer<FIFFLIB::FiffEvokedSet> getEvokedSet();
 
     //=========================================================================================================
+    /**
+     * @brief getType
+     * @return
+     */
     inline MODEL_TYPE getType() const override;
 
     //=========================================================================================================
+    /**
+     * @brief index
+     * @param row
+     * @param column
+     * @param parent
+     * @return
+     */
     inline QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
 
     //=========================================================================================================
+    /**
+     * @brief parent
+     * @param index
+     * @return
+     */
     inline QModelIndex parent(const QModelIndex &index) const override;
 
 
 private:
-    QSharedPointer<FIFFLIB::FiffEvokedSet> m_pFiffEvokedSet;
+    QSharedPointer<FIFFLIB::FiffEvokedSet> m_pFiffEvokedSet; /**<  Pointer to FiffEvokedData for the calculated average*/
 };
 
 //=============================================================================================================

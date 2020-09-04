@@ -76,7 +76,7 @@ AveragingDataModel::~AveragingDataModel()
 
 QVariant AveragingDataModel::data(const QModelIndex &index, int role) const
 {
-    return QVariant(m_pFiffEvokedSet);
+    return QVariant();
 }
 
 //=============================================================================================================

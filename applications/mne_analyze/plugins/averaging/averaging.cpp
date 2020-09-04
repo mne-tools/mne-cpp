@@ -634,7 +634,7 @@ void Averaging::setViewSettings(ANSHAREDLIB::ViewParameters viewParams)
 
 void Averaging::onNewAveragingModel(QSharedPointer<ANSHAREDLIB::AveragingDataModel> pAveragingModel)
 {
-    m_pEvokedModel->setEvokedSet(pAveragingModel->data(QModelIndex()).value<QSharedPointer<FIFFLIB::FiffEvokedSet>>());
+    m_pEvokedModel->setEvokedSet(pAveragingModel->getEvokedSet());
 
     m_pButterflyView->setEvokedSetModel(m_pEvokedModel);
     m_pAverageLayoutView->setEvokedSetModel(m_pEvokedModel);
