@@ -53,6 +53,7 @@
 
 #include <QObject>
 #include <QSharedPointer>
+#include <QBuffer>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -104,6 +105,7 @@ public:
      * @param[in] pParent               The parent model. Default is set to NULL.
      */
     BemDataModel(const QString &sFilePath,
+                 const QByteArray& byteLoadedData = QByteArray(),
                  QObject *pParent = Q_NULLPTR);
     //=========================================================================================================
     /**
@@ -140,10 +142,27 @@ protected:
 
 private:
 
-    std::list<QSharedPointer<MNELIB::MNEBem>>   m_lBem;             /**< Data */
+    //=========================================================================================================
+    /**
+     * Helper function for initialization
+     */
+    void initBemData(QIODevice& p_IODevice);
+
+    QFile                   m_file;                 /**< The IO file */
+    QByteArray              m_byteLoadedData;
+    QBuffer                 m_buffer;
+
+    bool                    m_bIsInit;              /**< Wheater the Bem is initialized or not */
+    MNELIB::MNEBem::SPtr    m_pBem;                 /**< Data */
 
 signals:
-
+    //=========================================================================================================
+    /**
+     * Emits new Bem Model
+     *
+     * @param [in] pBem    The new Bem model
+     */
+    void newBemAvailable(const MNELIB::MNEBem::SPtr pBem);
 };
 
 //=============================================================================================================
@@ -157,7 +176,7 @@ inline MODEL_TYPE BemDataModel::getType() const
 
 inline bool BemDataModel::isEmpty() const
 {
-    return m_lBem.empty();
+    return m_pBem.isNull();
 }
 
 } // namespace ANSHAREDLIB
