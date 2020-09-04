@@ -37,6 +37,7 @@
 //=============================================================================================================
 
 #include "bemdatamodel.h"
+#include "mne/mne_bem_surface.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -51,6 +52,7 @@
 //=============================================================================================================
 
 using namespace ANSHAREDLIB;
+using namespace MNELIB;
 
 //=============================================================================================================
 // DEFINE GLOBAL METHODS
@@ -60,19 +62,106 @@ using namespace ANSHAREDLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BemDataModel::BemDataModel(QObject *parent)
-    : AbstractModel(parent)
+BemDataModel::BemDataModel(QObject *pParent)
+    : AbstractModel(pParent)
+    , m_bIsInit(false)
+    , m_pBem(MNEBem::SPtr::create())
 {
     qInfo() << "[BemDataModel::BemDataModel] Default constructor called !";
 }
 
+//=============================================================================================================
+
 BemDataModel::BemDataModel(const QString &sFilePath,
+                           const QByteArray& byteLoadedData,
                            QObject *pParent)
     : AbstractModel(pParent)
+    , m_bIsInit(false)
+    , m_pBem(MNEBem::SPtr::create())
 {
     Q_UNUSED(sFilePath)
-    initBemData(sFilePath);
+    if(byteLoadedData.isEmpty()) {
+        m_file.setFileName(sFilePath);
+        initBemData(m_file);
+    } else {
+        m_byteLoadedData = byteLoadedData;
+        m_buffer.setData(m_byteLoadedData);
+        initBemData(m_buffer);
+    }
 }
 
+//=============================================================================================================
+
+BemDataModel::~BemDataModel()
+{
+}
 
 //=============================================================================================================
+
+void BemDataModel::initBemData(QIODevice& p_IODevice)
+{
+    // build Bem
+    m_pBem = MNEBem::SPtr::create(p_IODevice);
+
+    if(m_pBem->isEmpty()) {
+        qWarning() << "[BemDataModel::initBemData] File does not contain any Bem data";
+        return;
+    }
+
+    emit newBemAvailable(m_pBem);
+    // MNEBemSurface::SPtr bemSurface = MNEBemSurface::SPtr::create(m_pBem->operator[](0));
+
+    // need to close the file manually
+    p_IODevice.close();
+
+    m_bIsInit = true;
+}
+
+//=============================================================================================================
+
+QVariant BemDataModel::data(const QModelIndex &index,
+                            int role) const
+{
+    return QVariant();
+}
+
+//=============================================================================================================
+
+Qt::ItemFlags BemDataModel::flags(const QModelIndex &index) const
+{
+    return QAbstractItemModel::flags(index);
+}
+
+//=============================================================================================================
+
+QModelIndex BemDataModel::index(int row,
+                                int column,
+                                const QModelIndex &parent) const
+{
+    Q_UNUSED(parent);
+    return createIndex(row, column);
+}
+
+//=============================================================================================================
+
+QModelIndex BemDataModel::parent(const QModelIndex &index) const
+{
+    Q_UNUSED(index);
+    return QModelIndex();
+}
+
+//=============================================================================================================
+
+int BemDataModel::rowCount(const QModelIndex &parent) const
+{
+    Q_UNUSED(parent);
+    return 0;
+}
+
+//=============================================================================================================
+
+int BemDataModel::columnCount(const QModelIndex &parent) const
+{
+    Q_UNUSED(parent);
+    return 0;
+}
