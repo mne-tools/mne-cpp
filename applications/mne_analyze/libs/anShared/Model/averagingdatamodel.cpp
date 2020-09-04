@@ -63,7 +63,44 @@ AveragingDataModel::AveragingDataModel()
 
 }
 
+//=============================================================================================================
+
 AveragingDataModel::~AveragingDataModel()
 {
 
+}
+
+//=============================================================================================================
+
+QVariant AveragingDataModel::data(const QModelIndex &index, int role) const
+{
+    return QVariant();
+}
+
+//=============================================================================================================
+
+Qt::ItemFlags AveragingDataModel::flags(const QModelIndex &index) const
+{
+
+}
+
+//=============================================================================================================
+
+int AveragingDataModel::rowCount(const QModelIndex &parent) const
+{
+    return 0;
+}
+
+//=============================================================================================================
+
+int AveragingDataModel::columnCount(const QModelIndex &parent) const
+{
+    return 0;
+}
+
+//=============================================================================================================
+
+void AveragingDataModel::setEvokedSet(QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet)
+{
+    m_pFiffEvokedSet = pEvokedSet;
 }
