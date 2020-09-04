@@ -78,7 +78,7 @@ class ANSHAREDSHARED_EXPORT AveragingDataModel : public AbstractModel
 
 public:
     //=========================================================================================================
-    AveragingDataModel();
+    AveragingDataModel(QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet = Q_NULLPTR, QObject* parent = Q_NULLPTR);
 
     //=========================================================================================================
     ~AveragingDataModel();
@@ -97,6 +97,9 @@ public:
 
     //=========================================================================================================
     void setEvokedSet(QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet);
+
+    //=========================================================================================================
+    QSharedPointer<FIFFLIB::FiffEvokedSet> getEvokedSet();
 
     //=========================================================================================================
     inline MODEL_TYPE getType() const override;

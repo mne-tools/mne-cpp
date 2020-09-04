@@ -59,6 +59,7 @@
 namespace ANSHAREDLIB {
     class FiffRawViewModel;
     class AbstractModel;
+    class AveragingDataModel;
     class Communicator;
 }
 
@@ -141,6 +142,13 @@ private:
      * @param [in,out] pNewModel    pointer to currently loaded FiffRawView Model
      */
     void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
+
+    //=========================================================================================================
+    /**
+     * @brief onNewAveragingModel
+     * @param pAveragingModel
+     */
+    void onNewAveragingModel(QSharedPointer<ANSHAREDLIB::AveragingDataModel> pAveragingModel);
 
     //=========================================================================================================
     /**
