@@ -56,6 +56,7 @@
 #include <QPointer>
 #include <QFileInfo>
 #include <QStandardItemModel>
+#include <QDateTime>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -202,6 +203,26 @@ public:
             return Q_NULLPTR;
         }
     }
+
+    //=========================================================================================================
+    template<class T>
+    QSharedPointer<T> addModel(QSharedPointer<T> pNewModel){
+        QSharedPointer<AbstractModel> temp = qSharedPointerCast<AbstractModel>(pNewModel);
+        QStandardItem* pItem = new QStandardItem("Average " + QDateTime::currentDateTime().toString());
+        pItem->setEditable(false);
+        pItem->setDragEnabled(true);
+        pItem->setToolTip(temp->getModelPath());
+
+        QVariant data;
+        data.setValue(temp);
+        pItem->setData(data);
+        m_pData->addData("Sample Subject", pItem);
+
+        emit newModelAvailable(temp);
+        return pNewModel;
+    }
+
+
 
 private:
     QPointer<AnalyzeDataModel>            m_pData;         /**< The loaded models in form of a QStandardItemModel. */

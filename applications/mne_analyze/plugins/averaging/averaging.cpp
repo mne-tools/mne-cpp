@@ -367,7 +367,7 @@ void Averaging::computeAverage()
         return;
     }
 
-    clearAveraging();
+    //clearAveraging();
 
     MatrixXi matEvents;
     QMap<QString,double> mapReject;
@@ -408,16 +408,17 @@ void Averaging::computeAverage()
                                                          mapReject);
     }
 
-    m_pFiffEvokedSet = QSharedPointer<FIFFLIB::FiffEvokedSet>(new FIFFLIB::FiffEvokedSet());
-    m_pFiffEvokedSet->evoked.append(*(m_pFiffEvoked.data()));
-    m_pFiffEvokedSet->info = *(m_pFiffRawModel->getFiffInfo().data());
+    QSharedPointer<FIFFLIB::FiffEvokedSet> pFiffEvokedSet = QSharedPointer<FIFFLIB::FiffEvokedSet>(new FIFFLIB::FiffEvokedSet());
+
+    pFiffEvokedSet->evoked.append(*(m_pFiffEvoked.data()));
+    pFiffEvokedSet->info = *(m_pFiffRawModel->getFiffInfo().data());
 
     if(m_bBasline){
-        m_pFiffEvokedSet->evoked[0].baseline.first = m_fBaselineFromS;
-        m_pFiffEvokedSet->evoked[0].baseline.second = m_fBaselineToS;
+        pFiffEvokedSet->evoked[0].baseline.first = m_fBaselineFromS;
+        pFiffEvokedSet->evoked[0].baseline.second = m_fBaselineToS;
     }
 
-    m_pEvokedModel->setEvokedSet(m_pFiffEvokedSet);
+    m_pEvokedModel->setEvokedSet(pFiffEvokedSet);
 
     m_pButterflyView->setEvokedSetModel(m_pEvokedModel);
     m_pAverageLayoutView->setEvokedSetModel(m_pEvokedModel);
@@ -442,7 +443,6 @@ void Averaging::loadFullGui()
 
     //Init Models
     m_pEvokedModel = QSharedPointer<DISPLIB::EvokedSetModel>(new DISPLIB::EvokedSetModel());
-    m_pFiffEvokedSet = QSharedPointer<FIFFLIB::FiffEvokedSet>(new FIFFLIB::FiffEvokedSet());
 
     m_pAverageLayoutView->setEvokedSetModel(m_pEvokedModel);
 
@@ -529,8 +529,6 @@ void Averaging::loadFullGui()
 
 void Averaging::clearAveraging()
 {
-    m_pFiffEvokedSet->evoked.clear();
-    m_pFiffEvokedSet.clear();
     m_pFiffEvoked.clear();
 }
 
