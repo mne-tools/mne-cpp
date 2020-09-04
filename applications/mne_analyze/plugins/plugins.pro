@@ -45,10 +45,9 @@ SUBDIRS += \
     filtering \
     averaging \
     channelselection \
-    sourcelocalization \    
+    sourcelocalization \
     controlmanager \
-    scalingmanager \
-    coregistration \
+    coregistration\
 #    sampleplugin \
 
 # Exclude plugins which rely on the Qt3D module. Note: The Qt3D module is not yet supported by Wasm
