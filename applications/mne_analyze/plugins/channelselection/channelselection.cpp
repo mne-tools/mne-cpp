@@ -159,8 +159,9 @@ void ChannelSelection::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
         case EVENT_TYPE::SELECTED_MODEL_CHANGED:
-            onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
-            break;
+            if(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >()->getType() == ANSHAREDLIB_FIFFRAW_MODEL) {
+                onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
+            }            break;
         default:
             qWarning() << "[ChannelSelection::handleEvent] received an Event that is not handled by switch-cases";
             break;
