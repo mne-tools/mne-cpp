@@ -66,6 +66,7 @@ jobs:
       uses: actions/checkout@v2
     - name: Install OpenGL
       run: |
+        sudo apt-get update -q
         sudo apt-get install build-essential libgl1-mesa-dev
     - name: Install Qt
       run: |
