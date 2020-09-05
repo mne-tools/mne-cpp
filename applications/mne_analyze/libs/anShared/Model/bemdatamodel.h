@@ -150,7 +150,7 @@ private:
     QByteArray              m_byteLoadedData;
     QBuffer                 m_buffer;
 
-    bool                    m_bIsInit;              /**< Wheater the Bem is initialized or not */
+    // bool                    m_bIsInit;              /**< Wheater the Bem is initialized or not */
     MNELIB::MNEBem::SPtr    m_pBem;                 /**< Data */
 
 signals:

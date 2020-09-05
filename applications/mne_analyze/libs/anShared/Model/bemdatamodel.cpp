@@ -74,7 +74,6 @@ BemDataModel::BemDataModel(const QString &sFilePath,
                            const QByteArray& byteLoadedData,
                            QObject *pParent)
     : AbstractModel(pParent)
-    , m_bIsInit(false)
     , m_pBem(MNEBem::SPtr::create())
 {
     Q_UNUSED(sFilePath)

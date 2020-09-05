@@ -127,7 +127,7 @@ void DataManagerControlView::onCurrentItemChanged(const QItemSelection &selected
 //=============================================================================================================
 
 void DataManagerControlView::onNewFileLoaded(int iSubject,
-                                      int iModel)
+                                             int iModel)
 {
     m_pUi->m_pTreeView->selectionModel()->select(m_pUi->m_pTreeView->model()->index(iModel, 0, m_pUi->m_pTreeView->model()->index(iSubject, 0)),
                                                  QItemSelectionModel::ClearAndSelect);
