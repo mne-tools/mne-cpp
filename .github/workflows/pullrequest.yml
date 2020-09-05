@@ -116,6 +116,7 @@ jobs:
     - name: Install OpenGL (Linux)
       if: matrix.os == 'ubuntu-16.04'
       run: |
+        sudo apt-get update -q
         sudo apt-get install build-essential libgl1-mesa-dev
     - name: Install Qt (Linux)
       if: matrix.os == 'ubuntu-16.04'
