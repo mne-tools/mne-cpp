@@ -70,9 +70,7 @@ namespace MNELIB {
 // DEFINE NAMESPACE ANSHAREDLIB
 //=============================================================================================================
 
-
 namespace ANSHAREDLIB {
-
 
 //=============================================================================================================
 // ANSHAREDLIB FORWARD DECLARATIONS
@@ -81,9 +79,9 @@ namespace ANSHAREDLIB {
 //=============================================================================================================
 /**
  *
- * @brief Model that holds and manages bem data..
+ * @brief Model that holds and manages bem data.
  */
-class BemDataModel : public AbstractModel
+class ANSHAREDSHARED_EXPORT BemDataModel : public AbstractModel
 {
     Q_OBJECT
 
@@ -99,7 +97,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Constructs a FiffRawViewModel object.
+     * Constructs a BemDataModel object.
      *
      * @param[in] sFilePath             The file path of the model. This is usually also the file path.
      * @param[in] pParent               The parent model. Default is set to NULL.
@@ -115,9 +113,9 @@ public:
 
     //=========================================================================================================
     /**
-     * The type of this model (FiffRawViewModel)
+     * The type of this model (BemDataModel)
      *
-     * @return The type of this model (FiffRawViewModel)
+     * @return The type of this model (BemDataModel)
      */
     inline MODEL_TYPE getType() const override;
 
