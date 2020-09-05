@@ -64,8 +64,6 @@ using namespace MNELIB;
 
 BemDataModel::BemDataModel(QObject *pParent)
     : AbstractModel(pParent)
-    , m_bIsInit(false)
-    , m_pBem(MNEBem::SPtr::create())
 {
     qInfo() << "[BemDataModel::BemDataModel] Default constructor called !";
 }
@@ -94,6 +92,7 @@ BemDataModel::BemDataModel(const QString &sFilePath,
 
 BemDataModel::~BemDataModel()
 {
+
 }
 
 //=============================================================================================================

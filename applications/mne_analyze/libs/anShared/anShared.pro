@@ -96,7 +96,6 @@ SOURCES += \
     Model/averagingdatamodel.cpp \
 
 HEADERS += \
-    Model/bemdatamodel.h \
     anshared_global.h \
     Model/abstractmodel.h \
     Management/analyzedata.h \
@@ -110,6 +109,7 @@ HEADERS += \
     Interfaces/IPlugin.h \
     Utils/metatypes.h \
     Utils/types.h \
+    Model/bemdatamodel.h \
     Model/fiffrawviewmodel.h \
     Model/annotationmodel.h \
     Model/analyzedatamodel.h \
