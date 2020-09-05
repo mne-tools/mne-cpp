@@ -176,8 +176,9 @@ void AnnotationManager::handleEvent(QSharedPointer<Event> e)
             onTriggerRedraw();
             break;
         case EVENT_TYPE::SELECTED_MODEL_CHANGED:
-            onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
-            break;
+            if(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >()->getType() == ANSHAREDLIB_FIFFRAW_MODEL) {
+                onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
+            }            break;
         default:
             qWarning() << "[AnnotationManager::handleEvent] Received an Event that is not handled by switch cases.";
     }

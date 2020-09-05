@@ -162,7 +162,9 @@ void RawDataViewer::handleEvent(QSharedPointer<Event> e)
         m_pFiffRawView->updateView();
         break;
     case SELECTED_MODEL_CHANGED:
+        if(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >()->getType() == ANSHAREDLIB_FIFFRAW_MODEL) {
         onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
+        }
         break;
     case FILTER_CHANNEL_TYPE_CHANGED:
         m_pFiffRawView->setFilterChannelType(e->getData().toString());
