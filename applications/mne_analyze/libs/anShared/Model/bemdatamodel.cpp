@@ -111,7 +111,6 @@ void BemDataModel::initBemData(QIODevice& p_IODevice)
 
     // need to close the file manually
     p_IODevice.close();
-
     m_bIsInit = true;
 }
 
