@@ -123,6 +123,10 @@ public:
      */
     void updateProcessingMode(ProcessingMode mode);
 
+    void clearSelectionGroup();
+
+    void addSelectionGroup(const QString& sGroupName);
+
 protected:
 
 private:

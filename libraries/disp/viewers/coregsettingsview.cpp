@@ -82,8 +82,8 @@ CoregSettingsView::CoregSettingsView(const QString& sSettingsPath,
     loadSettings();
 
     // Connect Gui elemnts
-    connect(m_pUi->m_qPushButton_BemFileDialog, &QPushButton::released,
-            this, &CoregSettingsView::onLoadBemFile);
+//    connect(m_pUi->m_qPushButton_BemFileDialog, &QPushButton::released,
+//            this, &CoregSettingsView::onLoadBemFile);
     connect(m_pUi->m_qPushButton_FidFileDialog, &QPushButton::released,
             this, &CoregSettingsView::onLoadFidFile);
     connect(m_pUi->m_qPushButton_FidStoreFileDialog, &QPushButton::released,
@@ -199,7 +199,7 @@ void CoregSettingsView::onLoadBemFile()
 
     QFile t_fBem(t_sFileName);
     if(t_fBem.open(QIODevice::ReadOnly)) {
-        m_pUi->m_qLineEdit_BemFileName->setText(t_sFileName);
+        // m_pUi->m_qLineEdit_BemFileName->setText(t_sFileName);
     } else {
         qWarning() << "[disp::CoregSettingsView] Bem file cannot be opened";
     }
@@ -341,4 +341,19 @@ float CoregSettingsView::getWeightRPA()
 float CoregSettingsView::getWeightNas()
 {
     return m_pUi->m_qDoubleSpinBox_WeightNas->text().toFloat();
+}
+
+//=============================================================================================================
+
+void CoregSettingsView::clearSelectionGroup()
+{
+    m_pUi->m_qComboBox_BemItems->clear();
+    m_pUi->m_qComboBox_BemItems->addItem("Current Selection");
+}
+
+//=============================================================================================================
+
+void CoregSettingsView::addSelectionGroup(const QString& sGroupName)
+{
+    m_pUi->m_qComboBox_BemItems->addItem(sGroupName);
 }
