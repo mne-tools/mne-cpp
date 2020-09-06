@@ -109,10 +109,15 @@ public:
 
 private:
 
-
     QPointer<ANSHAREDLIB::Communicator>     m_pCommu;
 
     DISPLIB::CoregSettingsView*             m_pCoregSettingsView;   /**< Pointer to coreg GUI */
+
+    //=========================================================================================================
+    /**
+     * Updates the dropdown display for selecting from which group to average
+     */
+    void updateBemList();
 
 };
 
