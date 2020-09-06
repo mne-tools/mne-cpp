@@ -144,13 +144,13 @@ QWidget *DataLoader::getView()
 void DataLoader::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
-    case EVENT_TYPE::SELECTED_MODEL_CHANGED:
-        if(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >()) {
-            m_pSelectedModel = e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >();
-        }
-        break;
-    default:
-        qWarning() << "[DataLoader::handleEvent] Received an Event that is not handled by switch cases.";
+        case EVENT_TYPE::SELECTED_MODEL_CHANGED:
+            if(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >()) {
+                m_pSelectedModel = e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >();
+            }
+            break;
+        default:
+            qWarning() << "[DataLoader::handleEvent] Received an Event that is not handled by switch cases.";
     }
 }
 
@@ -200,6 +200,7 @@ void DataLoader::loadFilePath(const QString& sFilePath)
         m_pAnalyzeData->loadModel<ANSHAREDLIB::FiffRawViewModel>(sFilePath);
     } else if(fileInfo.completeBaseName().endsWith("bem")) {
         m_pAnalyzeData->loadModel<ANSHAREDLIB::BemDataModel>(sFilePath);
+        m_pCommu->publishEvent(NEW_BEM_ADDED);
     } else {
         qWarning() << "[DataLoader::loadFilePath] Make sure that your files agree with the MNE naming conventions, eg.: *bem.fif; *raw.fif.";
     }
