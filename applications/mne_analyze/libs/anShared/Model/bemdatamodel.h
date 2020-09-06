@@ -105,6 +105,7 @@ public:
     BemDataModel(const QString &sFilePath,
                  const QByteArray& byteLoadedData = QByteArray(),
                  QObject *pParent = Q_NULLPTR);
+
     //=========================================================================================================
     /**
      * Destructs a BemDataModel.
@@ -118,6 +119,14 @@ public:
      * @return The type of this model (BemDataModel)
      */
     inline MODEL_TYPE getType() const override;
+
+    //=========================================================================================================
+    /**
+     * Get the Bem model (BemDataModel)
+     *
+     * @return The MNEBem object
+     */
+    inline MNELIB::MNEBem::SPtr getBem();
 
     //=========================================================================================================
     /**
@@ -174,6 +183,11 @@ inline MODEL_TYPE BemDataModel::getType() const
 inline bool BemDataModel::isEmpty() const
 {
     return m_pBem.isNull();
+}
+
+inline MNELIB::MNEBem::SPtr BemDataModel::getBem()
+{
+    return m_pBem;
 }
 
 } // namespace ANSHAREDLIB
