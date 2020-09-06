@@ -57,6 +57,7 @@
 
 namespace ANSHAREDLIB {
     class Communicator;
+    class AbstractModel;
 }
 
 namespace DISPLIB {
@@ -109,15 +110,17 @@ public:
 
 private:
 
-    QPointer<ANSHAREDLIB::Communicator>     m_pCommu;
+    QVector<QSharedPointer<ANSHAREDLIB::AbstractModel>>     m_vecBemModels;         /** Vector with all available Bem Models */
 
-    DISPLIB::CoregSettingsView*             m_pCoregSettingsView;   /**< Pointer to coreg GUI */
+    QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;
+
+    DISPLIB::CoregSettingsView*                             m_pCoregSettingsView;   /**< Pointer to coreg GUI */
 
     //=========================================================================================================
     /**
      * Updates the dropdown display for selecting from which group to average
      */
-    void updateBemList();
+    void updateBemList(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
 
 };
 

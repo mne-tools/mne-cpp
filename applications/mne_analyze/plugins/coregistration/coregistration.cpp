@@ -135,8 +135,8 @@ QWidget *CoRegistration::getView()
 void CoRegistration::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
-        case NEW_BEM_ADDED:
-            updateBemList();
+        case SELECTED_MODEL_CHANGED:
+            updateBemList(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
             break;
         default:
             qWarning() << "[CoRegistration::handleEvent] received an Event that is not handled by switch-cases";
@@ -149,18 +149,22 @@ void CoRegistration::handleEvent(QSharedPointer<Event> e)
 QVector<EVENT_TYPE> CoRegistration::getEventSubscriptions(void) const
 {
     QVector<EVENT_TYPE> temp;
-    temp.push_back(NEW_BEM_ADDED);
+    temp.push_back(SELECTED_MODEL_CHANGED);
     return temp;
 }
 
 //=============================================================================================================
 
-void CoRegistration::updateBemList()
+void CoRegistration::updateBemList(ANSHAREDLIB::AbstractModel::SPtr pNewModel)
 {
-    m_pCoregSettingsView->clearSelectionGroup();
-    QVector<QSharedPointer<AbstractModel> > vecBemList = m_pAnalyzeData->getModelsByType(ANSHAREDLIB_BEMDATA_MODEL);
-    for(int i = 0; i < vecBemList.size(); i++){
-        m_pCoregSettingsView->addSelectionGroup(vecBemList.at(i)->getModelName());
+    if(pNewModel->getType() == ANSHAREDLIB_BEMDATA_MODEL) {
+        m_pCoregSettingsView->clearSelectionGroup();
+        m_vecBemModels.append(pNewModel);
+
+        for(int i = 0; i < m_vecBemModels.size(); i++){
+            m_pCoregSettingsView->addSelectionGroup(m_vecBemModels.at(i)->getModelName());
+        }
     }
+
 }
 
