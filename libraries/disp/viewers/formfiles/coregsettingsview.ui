@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="m_qTabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="m_qTab_LoadPrepare">
       <attribute name="title">
@@ -31,20 +31,15 @@
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_2">
           <item>
-           <widget class="QPushButton" name="m_qPushButton_BemFileDialog">
-            <property name="text">
-             <string>Load BEM</string>
+           <widget class="QComboBox" name="m_qComboBox_BemItems">
+            <property name="currentText">
+             <string>Select BEM</string>
             </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLineEdit" name="m_qLineEdit_BemFileName">
-            <property name="minimumSize">
-             <size>
-              <width>140</width>
-              <height>0</height>
-             </size>
-            </property>
+            <item>
+             <property name="text">
+              <string>Select BEM</string>
+             </property>
+            </item>
            </widget>
           </item>
          </layout>
