@@ -200,7 +200,7 @@ void DataLoader::loadFilePath(const QString& sFilePath)
         m_pAnalyzeData->loadModel<ANSHAREDLIB::FiffRawViewModel>(sFilePath);
     } else if(fileInfo.completeBaseName().endsWith("bem")) {
         m_pAnalyzeData->loadModel<ANSHAREDLIB::BemDataModel>(sFilePath);
-        m_pCommu->publishEvent(NEW_BEM_ADDED);
+        // m_pCommu->publishEvent(NEW_BEM_ADDED);
     } else {
         qWarning() << "[DataLoader::loadFilePath] Make sure that your files agree with the MNE naming conventions, eg.: *bem.fif; *raw.fif.";
     }
