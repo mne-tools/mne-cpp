@@ -255,7 +255,8 @@ void Averaging::handleEvent(QSharedPointer<Event> e)
         case EVENT_TYPE::SELECTED_MODEL_CHANGED:
             if(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >()->getType() == ANSHAREDLIB_FIFFRAW_MODEL) {
                 onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
-            }            break;
+            }
+            break;
         case FILTER_ACTIVE_CHANGED:
             m_bPerformFiltering = e->getData().toBool();
             break;
