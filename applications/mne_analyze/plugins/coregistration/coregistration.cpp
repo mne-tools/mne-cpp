@@ -126,14 +126,6 @@ QDockWidget *CoRegistration::getControl()
 
 QWidget *CoRegistration::getView()
 {
-    //If the plugin has a view:
-    QWidget* pPluginView = new QWidget();
-    QVBoxLayout* pViewLayout = new QVBoxLayout();
-
-    pPluginView->setLayout(pViewLayout);
-
-    return pPluginView;
-
     //If the plugin does not have a view:
     return Q_NULLPTR;
 }
@@ -143,9 +135,12 @@ QWidget *CoRegistration::getView()
 void CoRegistration::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
-    default:
-        qWarning() << "[CoRegistration::handleEvent] received an Event that is not handled by switch-cases";
-        break;
+        case NEW_BEM_ADDED:
+            updateBemList();
+            break;
+        default:
+            qWarning() << "[CoRegistration::handleEvent] received an Event that is not handled by switch-cases";
+            break;
     }
 }
 
@@ -154,6 +149,18 @@ void CoRegistration::handleEvent(QSharedPointer<Event> e)
 QVector<EVENT_TYPE> CoRegistration::getEventSubscriptions(void) const
 {
     QVector<EVENT_TYPE> temp;
-
+    temp.push_back(NEW_BEM_ADDED);
     return temp;
 }
+
+//=============================================================================================================
+
+void CoRegistration::updateBemList()
+{
+    m_pCoregSettingsView->clearSelectionGroup();
+    QVector<QSharedPointer<AbstractModel> > vecBemList = m_pAnalyzeData->getModelsByType(ANSHAREDLIB_BEMDATA_MODEL);
+    for(int i = 0; i < vecBemList.size(); i++){
+        m_pCoregSettingsView->addSelectionGroup(vecBemList.at(i)->getModelName());
+    }
+}
+
