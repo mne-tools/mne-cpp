@@ -109,7 +109,8 @@ namespace ANSHAREDLIB
         SCALING_MAP_CHANGED,
         VIEW_SETTINGS_CHANGED,
         LOADING_START,
-        LOADING_END
+        LOADING_END,
+        NEW_BEM_ADDED               // event send whenever the user adds a new Bem file
     };
 
     //=========================================================================================================
