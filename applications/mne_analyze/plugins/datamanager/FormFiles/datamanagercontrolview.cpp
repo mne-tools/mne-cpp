@@ -108,7 +108,7 @@ void DataManagerControlView::customMenuRequested(QPoint pos)
 //=============================================================================================================
 
 void DataManagerControlView::onCurrentItemChanged(const QItemSelection &selected,
-                                           const QItemSelection &deselected)
+                                                  const QItemSelection &deselected)
 {
     Q_UNUSED(deselected)
     if(selected.indexes().empty()) {
