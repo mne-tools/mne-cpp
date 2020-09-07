@@ -58,10 +58,18 @@
 
 namespace ANSHAREDLIB {
     class Communicator;
+    class AbstractModel;
 }
 
 namespace DISP3DLIB {
+    class View3D;
     class Data3DTreeModel;
+    class BemTreeItem;
+    class DigitizerSetTreeItem;
+}
+
+namespace DISPLIB {
+    class Control3DView;
 }
 
 //=============================================================================================================
@@ -115,8 +123,21 @@ public:
     virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
 
 private:
+    //=========================================================================================================
+    /**
+     * Updates the davailable Bem Models
+     */
+    void updateBemList(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
+
     QPointer<ANSHAREDLIB::Communicator>             m_pCommu;               /**< To broadcst signals */
+
     QSharedPointer<DISP3DLIB::Data3DTreeModel>      m_p3DModel;             /**< The 3D model data */
+    DISP3DLIB::BemTreeItem*                         m_pBemTreeCoreg;        /**< TThe BEM head model of the coregistration plugin. */
+    QPointer<DISP3DLIB::DigitizerSetTreeItem>       m_pDigitizerCoreg;      /**< The 3D item pointing to the tracked digitizers. */
+
+    DISP3DLIB::View3D*                              m_pView3D;              /**< The Disp3D view. */
+    DISPLIB::Control3DView*                         m_pControl3DView;       /**< The 3D Control view */
+
 };
 
 } // NAMESPACE
