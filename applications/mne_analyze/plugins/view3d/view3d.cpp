@@ -39,10 +39,14 @@
 #include "view3d.h"
 
 #include <anShared/Management/communicator.h>
-
+#include <anShared/Management/analyzedata.h>
+#include <anShared/Model/bemdatamodel.h>
 #include <disp3D/viewers/sourceestimateview.h>
 #include <disp3D/engine/view/view3D.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
+#include <disp3D/engine/delegate/data3Dtreedelegate.h>
+
+#include <disp/viewers/control3dview.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -56,6 +60,7 @@
 
 using namespace VIEW3DPLUGIN;
 using namespace ANSHAREDLIB;
+using namespace DISPLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -113,9 +118,9 @@ QMenu *View3D::getMenu()
 
 QWidget *View3D::getView()
 {
-    DISP3DLIB::View3D* pView3D = new DISP3DLIB::View3D();
-    pView3D->setModel(m_p3DModel);
-    QWidget *pWidgetContainer = QWidget::createWindowContainer(pView3D, Q_NULLPTR, Qt::Widget);
+    m_pView3D = new DISP3DLIB::View3D();
+    m_pView3D->setModel(m_p3DModel);
+    QWidget *pWidgetContainer = QWidget::createWindowContainer(m_pView3D, Q_NULLPTR, Qt::Widget);
 
     return pWidgetContainer;
 }
@@ -124,7 +129,19 @@ QWidget *View3D::getView()
 
 QDockWidget* View3D::getControl()
 {
-    return Q_NULLPTR;
+    // Coregistration Settings
+    DISP3DLIB::Data3DTreeDelegate* pData3DTreeDelegate = new DISP3DLIB::Data3DTreeDelegate(this);
+
+    m_pControl3DView = new DISPLIB::Control3DView(QString("MNEANALYZE/%1").arg(this->getName()));
+    m_pControl3DView->setDelegate(pData3DTreeDelegate);
+    m_pControl3DView->setModel(m_p3DModel.data());
+
+    QDockWidget* pControlDock = new QDockWidget(getName());
+    pControlDock->setAllowedAreas(Qt::RightDockWidgetArea | Qt::LeftDockWidgetArea);
+    pControlDock->setWidget(m_pControl3DView);
+    pControlDock->setObjectName(getName());
+
+    return pControlDock;
 }
 
 //=============================================================================================================
@@ -132,6 +149,9 @@ QDockWidget* View3D::getControl()
 void View3D::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
+    case SELECTED_MODEL_CHANGED:
+        updateBemList(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
+        break;
         default:
             qWarning() << "[View3D::handleEvent] Received an Event that is not handled by switch cases.";
     }
@@ -142,7 +162,17 @@ void View3D::handleEvent(QSharedPointer<Event> e)
 QVector<EVENT_TYPE> View3D::getEventSubscriptions(void) const
 {
     QVector<EVENT_TYPE> temp;
-    //temp.push_back(SELECTED_MODEL_CHANGED);
+    temp.push_back(SELECTED_MODEL_CHANGED);
 
     return temp;
+}
+
+//=============================================================================================================
+
+void View3D::updateBemList(ANSHAREDLIB::AbstractModel::SPtr pNewModel)
+{
+    if(pNewModel->getType() == ANSHAREDLIB_BEMDATA_MODEL) {
+        QSharedPointer<ANSHAREDLIB::BemDataModel> pBemDataModel = qSharedPointerCast<BemDataModel>(pNewModel);
+        m_pBemTreeCoreg = m_p3DModel->addBemData("Subject", "Average head", *pBemDataModel->getBem().data());
+    }
 }
