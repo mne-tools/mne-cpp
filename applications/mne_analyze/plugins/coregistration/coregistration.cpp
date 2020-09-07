@@ -187,6 +187,7 @@ void CoRegistration::onChangeSelectedBem(const QString &sText)
             pBemDataModel = qSharedPointerCast<BemDataModel>(i.next());
             m_pBem = QSharedPointer<MNEBem>(pBemDataModel->getBem());
             return;
+
         }
     }
 }
