@@ -115,7 +115,7 @@ private:
 
     //=========================================================================================================
     /**
-     * Updates the dropdown display for selecting from which group to average
+     * Updates the dropdown display for selecting the bem model
      */
     void updateBemList(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
 
