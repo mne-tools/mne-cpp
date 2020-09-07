@@ -110,7 +110,8 @@ namespace ANSHAREDLIB
         VIEW_SETTINGS_CHANGED,
         LOADING_START,
         LOADING_END,
-        NEW_BEM_ADDED               // event send whenever the user adds a new Bem file
+        NEW_BEM_ADDED,              // event send whenever the user adds a new Bem file
+        SELECTED_BEM_CHANGED        // event send whenever the Bem file within the coregistration changed
     };
 
     //=========================================================================================================
