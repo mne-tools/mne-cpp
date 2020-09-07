@@ -64,6 +64,9 @@ namespace DISPLIB {
     class CoregSettingsView;
 }
 
+namespace MNELIB {
+    class MNEBem;
+}
 //=============================================================================================================
 // DEFINE NAMESPACE SURFERPLUGIN
 //=============================================================================================================
@@ -110,17 +113,29 @@ public:
 
 private:
 
-    QVector<QSharedPointer<ANSHAREDLIB::AbstractModel>>     m_vecBemModels;         /** Vector with all available Bem Models */
-
-    QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;
-
-    DISPLIB::CoregSettingsView*                             m_pCoregSettingsView;   /**< Pointer to coreg GUI */
-
     //=========================================================================================================
     /**
      * Updates the dropdown display for selecting from which group to average
      */
     void updateBemList(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
+
+    //=========================================================================================================
+    /**
+     * Connected to GUI dropdown to select bem based on bem name input.
+     *
+     * @param[in] text  name of bem selected in the GUI
+     */
+    void onChangeSelectedBem(const QString &sText);
+
+    QVector<QSharedPointer<ANSHAREDLIB::AbstractModel>>     m_vecBemModels;         /** Vector with all available Bem Models */
+
+    int                                                     m_iCurrentBem;          /**< Bem index to use. 9999 for current selection */
+
+    QSharedPointer<MNELIB::MNEBem>                          m_pBem;                 /**< The currently selected Bem model */
+
+    QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;
+
+    DISPLIB::CoregSettingsView*                             m_pCoregSettingsView;   /**< Pointer to coreg GUI */
 
 };
 

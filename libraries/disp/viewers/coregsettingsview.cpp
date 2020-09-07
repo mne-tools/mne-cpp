@@ -111,6 +111,9 @@ CoregSettingsView::CoregSettingsView(const QString& sSettingsPath,
     connect(m_pUi->m_qPushButton_TransFileStoreDialaog, &QPushButton::released,
             this, &CoregSettingsView::onStoreTrans);
 
+    connect(m_pUi->m_qComboBox_BemItems, &QComboBox::currentTextChanged,
+            this, &CoregSettingsView::changeSelectedBem, Qt::UniqueConnection);
+
     QPushButton *m_qPushButton_PickLPA;
     QPushButton *m_qPushButton_PickNas;
     QPushButton *m_qPushButton_PickRPA;
@@ -345,7 +348,7 @@ float CoregSettingsView::getWeightNas()
 
 //=============================================================================================================
 
-void CoregSettingsView::clearSelectionGroup()
+void CoregSettingsView::clearSelectionBem()
 {
     m_pUi->m_qComboBox_BemItems->clear();
     m_pUi->m_qComboBox_BemItems->addItem("Current Selection");
@@ -353,7 +356,14 @@ void CoregSettingsView::clearSelectionGroup()
 
 //=============================================================================================================
 
-void CoregSettingsView::addSelectionGroup(const QString& sGroupName)
+void CoregSettingsView::addSelectionBem(const QString& sBemName)
 {
-    m_pUi->m_qComboBox_BemItems->addItem(sGroupName);
+    m_pUi->m_qComboBox_BemItems->addItem(sBemName);
+}
+
+//=============================================================================================================
+
+QString CoregSettingsView::getCurrentSelectedBem()
+{
+    return m_pUi->m_qComboBox_BemItems->currentText();
 }
