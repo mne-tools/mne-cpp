@@ -123,9 +123,11 @@ public:
      */
     void updateProcessingMode(ProcessingMode mode);
 
-    void clearSelectionGroup();
+    void clearSelectionBem();
 
-    void addSelectionGroup(const QString& sGroupName);
+    void addSelectionBem(const QString& sBemName);
+
+    QString getCurrentSelectedBem();
 
 protected:
 
@@ -308,6 +310,15 @@ signals:
      *
      */
     void transStoreFileChanged(const QString& sFilePath);
+
+    //=========================================================================================================
+    /**
+     * Emit this signal whenever the selected Bem changed.
+     *
+     * @param[in] sText    The file name of the currently selected Bem.
+     *
+     */
+    void changeSelectedBem(const QString &sText);
 
 };
 
