@@ -41,8 +41,10 @@
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Management/communicator.h>
 #include <anShared/Utils/metatypes.h>
+#include <anShared/Model/bemdatamodel.h>
 
 #include "disp/viewers/coregsettingsview.h"
+#include "mne/mne_bem.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -56,13 +58,14 @@
 
 using namespace COREGISTRATIONPLUGIN;
 using namespace ANSHAREDLIB;
-
+using namespace MNELIB;
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
 CoRegistration::CoRegistration()
     : m_pCoregSettingsView(Q_NULLPTR)
+    , m_pBem(Q_NULLPTR)
 {
 }
 
@@ -119,6 +122,12 @@ QDockWidget *CoRegistration::getControl()
     pControlDock->setWidget(m_pCoregSettingsView);
     pControlDock->setObjectName(getName());
 
+    // connect buttons
+    connect(m_pCoregSettingsView, &DISPLIB::CoregSettingsView::changeSelectedBem,
+            this, &CoRegistration::onChangeSelectedBem, Qt::UniqueConnection);
+
+    onChangeSelectedBem(m_pCoregSettingsView->getCurrentSelectedBem());
+
     return pControlDock;
 }
 
@@ -136,7 +145,7 @@ void CoRegistration::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
         case SELECTED_MODEL_CHANGED:
-            updateBemList(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
+            updateBemList(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
             break;
         default:
             qWarning() << "[CoRegistration::handleEvent] received an Event that is not handled by switch-cases";
@@ -158,13 +167,27 @@ QVector<EVENT_TYPE> CoRegistration::getEventSubscriptions(void) const
 void CoRegistration::updateBemList(ANSHAREDLIB::AbstractModel::SPtr pNewModel)
 {
     if(pNewModel->getType() == ANSHAREDLIB_BEMDATA_MODEL) {
-        m_pCoregSettingsView->clearSelectionGroup();
+        m_pCoregSettingsView->clearSelectionBem();
         m_vecBemModels.append(pNewModel);
 
         for(int i = 0; i < m_vecBemModels.size(); i++){
-            m_pCoregSettingsView->addSelectionGroup(m_vecBemModels.at(i)->getModelName());
+            m_pCoregSettingsView->addSelectionBem(m_vecBemModels.at(i)->getModelName());
         }
     }
+}
 
+//=============================================================================================================
+
+void CoRegistration::onChangeSelectedBem(const QString &sText)
+{
+    QVectorIterator<QSharedPointer<ANSHAREDLIB::AbstractModel>> i(m_vecBemModels);
+    QSharedPointer<ANSHAREDLIB::BemDataModel> pBemDataModel;
+    while (i.hasNext()) {
+        if(i.peekNext()->getModelName() == sText) {
+            pBemDataModel = qSharedPointerCast<BemDataModel>(i.next());
+            m_pBem = MNEBem::SPtr::create(pBemDataModel->getBem());
+            return;
+        }
+    }
 }
 
