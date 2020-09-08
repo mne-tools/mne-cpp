@@ -73,6 +73,7 @@ namespace DISPLIB {
 }
 
 namespace FIFFLIB {
+    class FiffCoordTrans;
     class FiffDigPointSet;
 }
 //=============================================================================================================
@@ -134,7 +135,7 @@ private:
 
     //=========================================================================================================
     /**
-     * Updates the digitizer set for the coregistration
+     * Updates the digitizer set for the coregistration u
      */
     void updateCoregDigitizer(FIFFLIB::FiffDigPointSet digSet);
 
@@ -143,6 +144,12 @@ private:
      * Updates the mri fiducials stored as digitizer set for the coregistration
      */
     void updateCoregMriFid(FIFFLIB::FiffDigPointSet digSetFid);
+
+    //=========================================================================================================
+    /**
+     * Updates the head position
+     */
+    void updateCoregTrans(FIFFLIB::FiffCoordTrans headMriTrans);
 
     QPointer<ANSHAREDLIB::Communicator>             m_pCommu;               /**< To broadcst signals */
 

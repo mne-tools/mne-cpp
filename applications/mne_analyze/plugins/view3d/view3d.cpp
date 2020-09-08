@@ -46,6 +46,10 @@
 #include <disp3D/engine/view/view3D.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
 #include <disp3D/engine/delegate/data3Dtreedelegate.h>
+#include <disp3D/engine/model/items/digitizer/digitizersettreeitem.h>
+#include <disp3D/engine/model/items/digitizer/digitizertreeitem.h>
+#include <disp3D/engine/model/items/bem/bemtreeitem.h>
+#include <disp3D/engine/model/items/bem/bemsurfacetreeitem.h>
 
 #include <disp/viewers/control3dview.h>
 
@@ -162,6 +166,9 @@ void View3D::handleEvent(QSharedPointer<Event> e)
         case NEW_FIDUCIALS_ADDED:
             updateCoregMriFid(e->getData().value<FiffDigPointSet>());
             break;
+        case NEW_TRANS_AVAILABE:
+            updateCoregTrans(e->getData().value<FiffCoordTrans>());
+            break;
         default:
             qWarning() << "[View3D::handleEvent] Received an Event that is not handled by switch cases.";
     }
@@ -175,7 +182,7 @@ QVector<EVENT_TYPE> View3D::getEventSubscriptions(void) const
     temp.push_back(SELECTED_BEM_CHANGED);
     temp.push_back(NEW_DIGITIZER_ADDED);
     temp.push_back(NEW_FIDUCIALS_ADDED);
-
+    temp.push_back(NEW_TRANS_AVAILABE);
     return temp;
 }
 
@@ -206,5 +213,29 @@ void View3D::updateCoregMriFid(FiffDigPointSet digSetFid)
     m_pMriFidCoreg = m_p3DModel->addDigitizerData("Co-Registration",
                                                   "MRI Fiducials",
                                                   digSetFid);
+    return;
+}
+
+//=========================================================================================================
+
+void View3D::updateCoregTrans(FiffCoordTrans headMriTrans)
+{
+    // update mri fiducials
+    QList<QStandardItem*> itemList = m_pMriFidCoreg->findChildren(DISP3DLIB::Data3DTreeModelItemTypes::DigitizerItem);
+    for(int j = 0; j < itemList.size(); ++j) {
+        if(DISP3DLIB::DigitizerTreeItem* pDigItem = dynamic_cast<DISP3DLIB::DigitizerTreeItem*>(itemList.at(j))) {
+            // apply inverse to get from mri to head space
+            pDigItem->setTransform(headMriTrans, true);
+        }
+    }
+
+    // Update head
+    itemList = m_pBemTreeCoreg->findChildren(DISP3DLIB::Data3DTreeModelItemTypes::BemSurfaceItem);
+    for(int j = 0; j < itemList.size(); ++j) {
+        if(DISP3DLIB::BemSurfaceTreeItem* pBemItem = dynamic_cast<DISP3DLIB::BemSurfaceTreeItem*>(itemList.at(j))) {
+            // apply inverse to get from mri to head space
+            pBemItem->setTransform(headMriTrans, true);
+        }
+    }
     return;
 }
