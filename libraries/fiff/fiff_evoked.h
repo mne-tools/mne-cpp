@@ -263,4 +263,14 @@ inline bool FiffEvoked::isEmpty()
 
 } // NAMESPACE
 
+#ifndef metatype_fiffevoked
+#define metatype_fiffevoked
+Q_DECLARE_METATYPE(FIFFLIB::FiffEvoked);/**< Provides QT META type declaration of the FIFFLIB::FiffEvoked type. For signal/slot and QVariant usage.*/
+#endif
+
+#ifndef metatype_fiffevokedsptr
+#define metatype_fiffevokedsptr
+Q_DECLARE_METATYPE(FIFFLIB::FiffEvoked::SPtr);/**< Provides QT META type declaration of the FIFFLIB::FiffEvoked type. For signal/slot and QVariant usage.*/
+#endif
+
 #endif // FIFF_EVOKED_H

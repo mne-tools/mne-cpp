@@ -44,8 +44,6 @@
 #include "../Utils/types.h"
 #include "abstractmodel.h"
 
-#include <fiff/fiff_evoked_set.h>
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -73,7 +71,10 @@ namespace FIFFLIB {
 
 namespace ANSHAREDLIB {
 
-
+//=============================================================================================================
+/**
+ * Model that holds averaging data in the form of a FiffEvokedSet
+ */
 class ANSHAREDSHARED_EXPORT AveragingDataModel : public AbstractModel
 {
     Q_OBJECT
