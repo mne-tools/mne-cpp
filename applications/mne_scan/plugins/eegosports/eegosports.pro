@@ -107,7 +107,7 @@ FORMS += \
         FormFiles/eegosportssetupprojectwidget.ui \
 
 RESOURCE_FILES +=\
-    $${ROOT_DIR}/resources/general/3DLayouts/standard_waveguard64_duke.elc
+    $${ROOT_DIR}/resources/general/3DLayouts/*
 
 # Copy resource files to bin resource folder
 for(FILE, RESOURCE_FILES) {
