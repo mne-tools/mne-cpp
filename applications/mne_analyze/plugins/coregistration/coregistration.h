@@ -42,6 +42,9 @@
 #include "coregistration_global.h"
 #include <anShared/Interfaces/IPlugin.h>
 
+#include <fiff/fiff_dig_point.h>
+#include <fiff/fiff_dig_point_set.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -66,6 +69,11 @@ namespace DISPLIB {
 
 namespace MNELIB {
     class MNEBem;
+}
+
+namespace FIFFLIB {
+    class FiffDigPoint;
+    class FiffDigPointSet;
 }
 //=============================================================================================================
 // DEFINE NAMESPACE SURFERPLUGIN
@@ -127,11 +135,31 @@ private:
      */
     void onChangeSelectedBem(const QString &sText);
 
+    //=========================================================================================================
+    /**
+     * Call this funciton whenever new digitzers were loaded.
+     *
+     * @param[in] lDigitzers    The new digitzers.
+     * @param[in] sFilePath     The file path to the new digitzers.
+     */
+    void onDigitizersChanged(const QString& sFilePath);
+
+    //=========================================================================================================
+    /**
+     * Call this funciton whenever new fiducials were loaded.
+     *
+     * @param[in] lDigitzers    The new fiducials.
+     * @param[in] sFilePath     The file path to the new digitzers.
+     */
+    void onFiducialsChanged(const QString& sFilePath);
+
     QVector<QSharedPointer<ANSHAREDLIB::AbstractModel>>     m_vecBemModels;         /** Vector with all available Bem Models */
 
     int                                                     m_iCurrentBem;          /**< Bem index to use. 9999 for current selection */
 
     QSharedPointer<MNELIB::MNEBem>                          m_pBem;                 /**< The currently selected Bem model */
+    FIFFLIB::FiffDigPointSet                                m_digSet;               /**< The currently selected digitizer set */
+    FIFFLIB::FiffDigPointSet                                m_digSetFid;            /**< The currently selected mri fiducials */
 
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;
 

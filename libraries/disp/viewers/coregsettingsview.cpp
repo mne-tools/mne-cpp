@@ -82,8 +82,6 @@ CoregSettingsView::CoregSettingsView(const QString& sSettingsPath,
     loadSettings();
 
     // Connect Gui elemnts
-//    connect(m_pUi->m_qPushButton_BemFileDialog, &QPushButton::released,
-//            this, &CoregSettingsView::onLoadBemFile);
     connect(m_pUi->m_qPushButton_FidFileDialog, &QPushButton::released,
             this, &CoregSettingsView::onLoadFidFile);
     connect(m_pUi->m_qPushButton_FidStoreFileDialog, &QPushButton::released,
@@ -113,24 +111,6 @@ CoregSettingsView::CoregSettingsView(const QString& sSettingsPath,
 
     connect(m_pUi->m_qComboBox_BemItems, &QComboBox::currentTextChanged,
             this, &CoregSettingsView::changeSelectedBem, Qt::UniqueConnection);
-
-    QPushButton *m_qPushButton_PickLPA;
-    QPushButton *m_qPushButton_PickNas;
-    QPushButton *m_qPushButton_PickRPA;
-    QLabel *m_qLabel_NOmitted;
-    QSpinBox *m_qSpinBox_X;
-    QSpinBox *m_qSpinBox_Y;
-    QSpinBox *m_qSpinBox_Z;
-    QComboBox *m_qComboBox_ScalingMode;
-    QPushButton *m_qPushButton_ApplyScaling;
-    QLineEdit *m_qLineEdit_TransX;
-    QLineEdit *m_qLineEdit_RotX;
-    QLineEdit *m_qLineEdit_TransY;
-    QLineEdit *m_qLineEdit_RotY;
-    QLineEdit *m_qLineEdit_TransZ;
-    QLineEdit *m_qLineEdit_RotZ;
-    QLineEdit *m_qLineEdit_TransFileStore;
-    QPushButton *m_qPushButton_TransFileStoreDialaog;
 }
 
 //=============================================================================================================
@@ -189,26 +169,6 @@ void CoregSettingsView::updateProcessingMode(ProcessingMode mode)
     default: // default is realtime mode
         break;
     }
-}
-
-//=============================================================================================================
-
-void CoregSettingsView::onLoadBemFile()
-{
-    QString t_sFileName = QFileDialog::getOpenFileName(this,
-                                                       tr("Select Bem Model"),
-                                                       QString(),
-                                                       tr("Fif Files (*.fif)"));
-
-    QFile t_fBem(t_sFileName);
-    if(t_fBem.open(QIODevice::ReadOnly)) {
-        // m_pUi->m_qLineEdit_BemFileName->setText(t_sFileName);
-    } else {
-        qWarning() << "[disp::CoregSettingsView] Bem file cannot be opened";
-    }
-    t_fBem.close();
-
-    emit bemFileChanged(t_sFileName);
 }
 
 //=============================================================================================================
