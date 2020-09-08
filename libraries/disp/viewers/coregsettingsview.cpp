@@ -105,7 +105,7 @@ CoregSettingsView::CoregSettingsView(const QString& sSettingsPath,
     connect(m_pUi->m_qPushButton_FitFiducials, &QPushButton::released,
             this, &CoregSettingsView::fitFiducials);
     connect(m_pUi->m_qPushButton_FitFiducials, &QPushButton::released,
-            this, &CoregSettingsView::fitIcp);
+            this, &CoregSettingsView::fitICP);
     connect(m_pUi->m_qPushButton_TransFileStoreDialaog, &QPushButton::released,
             this, &CoregSettingsView::onStoreTrans);
 
