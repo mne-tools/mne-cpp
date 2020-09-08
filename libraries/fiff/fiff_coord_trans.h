@@ -330,4 +330,14 @@ inline bool operator== (const FiffCoordTrans &a, const FiffCoordTrans &b)
 }
 } // NAMESPACE
 
+#ifndef metatype_fiffcoordtrans
+#define metatype_fiffcoordtrans
+Q_DECLARE_METATYPE(FIFFLIB::FiffCoordTrans); /**< Provides QT META type declaration of the FIFFLIB::FiffCoordTrans type. For signal/slot usage.*/
+#endif
+
+#ifndef metatype_fiffcoordtrans
+#define metatype_fiffcoordtrans
+Q_DECLARE_METATYPE(FIFFLIB::FiffCoordTrans::SPtr); /**< Provides QT META type declaration of the FIFFLIB::FiffCoordTrans type. For signal/slot usage.*/
+#endif
+
 #endif // FIFF_COORD_TRANS_H
