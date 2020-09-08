@@ -273,4 +273,14 @@ inline qint32 MNEBem::size() const
 }
 } // NAMESPACE
 
+#ifndef metatype_bem
+#define metatype_bem
+Q_DECLARE_METATYPE(MNELIB::MNEBem); /**< Provides QT META type declaration of the FMNELIB::MNEBem type. For signal/slot usage.*/
+#endif
+
+#ifndef metatype_bem
+#define metatype_bem
+Q_DECLARE_METATYPE(MNELIB::MNEBem::SPtr); /**< Provides QT META type declaration of the MNELIB::MNEBem type. For signal/slot usage.*/
+#endif
+
 #endif // MNE_BEM_H
