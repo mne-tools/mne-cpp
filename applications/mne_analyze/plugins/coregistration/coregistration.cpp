@@ -45,6 +45,7 @@
 
 #include "disp/viewers/coregsettingsview.h"
 #include "mne/mne_bem.h"
+#include "fiff/fiff_dig_point_set.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -59,6 +60,9 @@
 using namespace COREGISTRATIONPLUGIN;
 using namespace ANSHAREDLIB;
 using namespace MNELIB;
+using namespace DISPLIB;
+using namespace FIFFLIB;
+
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -115,7 +119,7 @@ QMenu *CoRegistration::getMenu()
 QDockWidget *CoRegistration::getControl()
 {
     // Coregistration Settings
-    m_pCoregSettingsView = new DISPLIB::CoregSettingsView(QString("MNEANALYZE/%1").arg(this->getName()));
+    m_pCoregSettingsView = new CoregSettingsView(QString("MNEANALYZE/%1").arg(this->getName()));
 
     QDockWidget* pControlDock = new QDockWidget(getName());
     pControlDock->setAllowedAreas(Qt::RightDockWidgetArea | Qt::LeftDockWidgetArea);
@@ -123,9 +127,12 @@ QDockWidget *CoRegistration::getControl()
     pControlDock->setObjectName(getName());
 
     // connect buttons
-    connect(m_pCoregSettingsView, &DISPLIB::CoregSettingsView::changeSelectedBem,
+    connect(m_pCoregSettingsView, &CoregSettingsView::changeSelectedBem,
             this, &CoRegistration::onChangeSelectedBem, Qt::UniqueConnection);
-
+    connect(m_pCoregSettingsView, &CoregSettingsView::digFileChanged,
+            this, &CoRegistration::onDigitizersChanged);
+    connect(m_pCoregSettingsView, &CoregSettingsView::fidFileChanged,
+            this, &CoRegistration::onFiducialsChanged);
     onChangeSelectedBem(m_pCoregSettingsView->getCurrentSelectedBem());
 
     return pControlDock;
@@ -194,3 +201,26 @@ void CoRegistration::onChangeSelectedBem(const QString &sText)
     }
 }
 
+//=============================================================================================================
+
+void CoRegistration::onDigitizersChanged(const QString& sFilePath)
+{
+    QFile fileDig(sFilePath);
+    FiffDigPointSet m_digSet(fileDig);
+
+    QVariant data = QVariant::fromValue(m_digSet);
+    m_pCommu->publishEvent(EVENT_TYPE::NEW_DIGITIZER_ADDED, data);
+    return;
+}
+
+//=============================================================================================================
+
+void CoRegistration::onFiducialsChanged(const QString& sFilePath)
+{
+    QFile fileDig(sFilePath);
+    FiffDigPointSet m_digSetFid(fileDig);
+
+    QVariant data = QVariant::fromValue(m_digSet);
+    m_pCommu->publishEvent(EVENT_TYPE::NEW_FIDUCIALS_ADDED, data);
+    return;
+}
