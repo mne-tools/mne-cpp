@@ -285,7 +285,7 @@ signals:
      * Emit this signal whenever icp alignment is requested.
      *
      */
-    void fitIcp();
+    void fitICP();
 
     //=========================================================================================================
     /**
