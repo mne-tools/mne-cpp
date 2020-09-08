@@ -258,4 +258,14 @@ inline qint32 FiffDigPointSet::size() const
 }
 } // namespace FIFFLIB
 
+#ifndef metatype_fiffdigpointset
+#define metatype_fiffdigpointset
+Q_DECLARE_METATYPE(FIFFLIB::FiffDigPointSet); /**< Provides QT META type declaration of the FIFFLIB::FiffDigPointSet type. For signal/slot usage.*/
+#endif
+
+#ifndef metatype_fiffdigpointset
+#define metatype_fiffdigpointset
+Q_DECLARE_METATYPE(FIFFLIB::FiffDigPointSet::SPtr); /**< Provides QT META type declaration of the FIFFLIB::FiffDigPointSet type. For signal/slot usage.*/
+#endif
+
 #endif // FIFFLIB_FIFF_DIG_POINT_SET_H
