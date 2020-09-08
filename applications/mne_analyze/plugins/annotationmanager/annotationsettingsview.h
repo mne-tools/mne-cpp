@@ -373,6 +373,9 @@ private:
     void onDetectTriggers(const QString& sChannelName,
                           double dThreshold);
 
+    void detectTriggerCalculations(const QString& sChannelName,
+                                   double dThreshold);
+
     Ui::EventWindowDockWidget*                      m_pUi;                          /** < Pointer to GUI elements */
 
     int                                             m_iCheckState;                  /** < State of show annotations checkbox (0 unchecked, 2 checked) */

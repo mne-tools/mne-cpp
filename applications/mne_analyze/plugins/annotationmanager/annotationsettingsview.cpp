@@ -58,6 +58,7 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QInputDialog>
+#include <QtConcurrent/QtConcurrent>
 
 //=============================================================================================================
 // Eigen INCLUDES
@@ -623,6 +624,71 @@ void AnnotationSettingsView::onDetectTriggers(const QString &sChannelName,
     emit loadingStart();
     QApplication::processEvents();
 
+    QFuture<void> future = QtConcurrent::run(this, &AnnotationSettingsView::detectTriggerCalculations, sChannelName, dThreshold);
+//    int iCurrentTriggerChIndex = 9999;
+
+//    for(int i = 0; i < m_pFiffInfo->chs.size(); ++i) {
+//        if(m_pFiffInfo->chs[i].ch_name == sChannelName) {
+//            iCurrentTriggerChIndex = i;
+//            QApplication::processEvents();
+//            break;
+//        }
+//    }
+
+//    if(iCurrentTriggerChIndex == 9999){
+//        qWarning() << "[AnnotationSettingsView::onDetectTriggers] Channel Index not valid";\
+//        emit loadingEnd();
+//        return;
+//    }
+
+//    Eigen::MatrixXd mSampleData, mSampleTimes;
+
+//    FIFFLIB::FiffRawData* pFiffRaw = this->m_pFiffRawModel->getFiffIO()->m_qlistRaw.first().data();
+//    pFiffRaw->read_raw_segment(mSampleData,
+//                               mSampleTimes);
+
+//    QList<QPair<int,double>> detectedTriggerSamples = RTPROCESSINGLIB::detectTriggerFlanksMax(mSampleData,
+//                                                                                              iCurrentTriggerChIndex,
+//                                                                                              0,
+//                                                                                              dThreshold,
+//                                                                                              0);
+
+//    QApplication::processEvents();
+
+//    QMap<double,QList<int>> mEventsinTypes;
+
+//    for(QPair<int,double> pair : detectedTriggerSamples){
+//        mEventsinTypes[pair.second].append(pair.first);
+//        QApplication::processEvents();
+//    }
+
+//    QList<double> keyList = mEventsinTypes.keys();
+//    int iFirstSample = m_pFiffRawModel->absoluteFirstSample();
+
+//    QColor colors[10] = {QColor("cyan"), QColor("magenta"), QColor("red"),
+//                          QColor("darkRed"), QColor("darkCyan"), QColor("darkMagenta"),
+//                          QColor("green"), QColor("darkGreen"), QColor("yellow"),
+//                          QColor("blue")};
+
+//    QApplication::processEvents();
+
+//    for (int i = 0; i < keyList.size(); i++){
+//        newStimGroup(sChannelName, static_cast<int>(keyList[i]), colors[i % 10]);
+//        groupChanged();
+//        for (int j : mEventsinTypes[keyList[i]]){
+//            m_pAnnModel->setSamplePos(j + iFirstSample);
+//            m_pAnnModel->insertRow(0, QModelIndex());
+//        }
+//    }
+//    emit triggerRedraw();
+//    emit groupsUpdated();
+//    emit loadingEnd();
+}
+
+//=============================================================================================================
+
+void AnnotationSettingsView::detectTriggerCalculations(const QString &sChannelName, double dThreshold)
+{
     int iCurrentTriggerChIndex = 9999;
 
     for(int i = 0; i < m_pFiffInfo->chs.size(); ++i) {
@@ -684,6 +750,7 @@ void AnnotationSettingsView::onDetectTriggers(const QString &sChannelName,
 }
 
 //=============================================================================================================
+
 
 void AnnotationSettingsView::onNewFiffRawViewModel(QSharedPointer<ANSHAREDLIB::FiffRawViewModel> pFiffRawModel)
 {
