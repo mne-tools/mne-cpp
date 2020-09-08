@@ -113,7 +113,8 @@ namespace ANSHAREDLIB
         NEW_BEM_ADDED,              // event send whenever the user adds a new Bem file
         SELECTED_BEM_CHANGED,       // event send whenever the Bem file within the coregistration changed
         NEW_DIGITIZER_ADDED,        // event send whenever new digitizers are loaded
-        NEW_FIDUCIALS_ADDED         // event send whenever new fiducials are loaded
+        NEW_FIDUCIALS_ADDED,        // event send whenever new fiducials are loaded
+        NEW_TRANS_AVAILABE          // event send whenever a new head-mri transformation is available
     };
 
     //=========================================================================================================
