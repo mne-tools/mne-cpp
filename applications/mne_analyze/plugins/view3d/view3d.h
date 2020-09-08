@@ -58,7 +58,7 @@
 
 namespace ANSHAREDLIB {
     class Communicator;
-    class AbstractModel;
+    class BemDataModel;
 }
 
 namespace DISP3DLIB {
@@ -127,7 +127,7 @@ private:
     /**
      * Updates the davailable Bem Models
      */
-    void updateBemList(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
+    void updateCoregBem(QSharedPointer<ANSHAREDLIB::BemDataModel> pNewModel);
 
     QPointer<ANSHAREDLIB::Communicator>             m_pCommu;               /**< To broadcst signals */
 
