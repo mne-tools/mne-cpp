@@ -149,8 +149,8 @@ QDockWidget* View3D::getControl()
 void View3D::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
-    case SELECTED_MODEL_CHANGED:
-        updateBemList(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
+    case SELECTED_BEM_CHANGED:
+        updateCoregBem(e->getData().value<QSharedPointer<ANSHAREDLIB::BemDataModel>>());
         break;
         default:
             qWarning() << "[View3D::handleEvent] Received an Event that is not handled by switch cases.";
@@ -162,17 +162,28 @@ void View3D::handleEvent(QSharedPointer<Event> e)
 QVector<EVENT_TYPE> View3D::getEventSubscriptions(void) const
 {
     QVector<EVENT_TYPE> temp;
-    temp.push_back(SELECTED_MODEL_CHANGED);
-
+    temp.push_back(SELECTED_BEM_CHANGED);
     return temp;
 }
 
 //=============================================================================================================
 
-void View3D::updateBemList(ANSHAREDLIB::AbstractModel::SPtr pNewModel)
+void View3D::updateCoregBem(ANSHAREDLIB::BemDataModel::SPtr pNewModel)
 {
     if(pNewModel->getType() == ANSHAREDLIB_BEMDATA_MODEL) {
-        QSharedPointer<ANSHAREDLIB::BemDataModel> pBemDataModel = qSharedPointerCast<BemDataModel>(pNewModel);
-        m_pBemTreeCoreg = m_p3DModel->addBemData("Subject", "Average head", *pBemDataModel->getBem().data());
+        m_pBemTreeCoreg = m_p3DModel->addBemData("Co-Registration", "Surface", *pNewModel->getBem().data());
     }
 }
+
+//=============================================================================================================
+
+//=============================================================================================================
+
+void View3D::updateBemList(ANSHAREDLIB::BemDataModel::SPtr pNewModel)
+{
+    if(pNewModel->getType() == ANSHAREDLIB_BEMDATA_MODEL) {
+        m_pBemTreeCoreg = m_p3DModel->addBemData("Co-Registration", "Surface", *pNewModel->getBem().data());
+    }
+}
+
+
