@@ -343,7 +343,6 @@ void FiffRawView::setDistanceTimeSpacer(int iValue)
 
 void FiffRawView::onMakeScreenshot(const QString& imageType)
 {
-    qInfo() << "[FiffRawView::onMakeScreenshot] Saving Screenshot";
     // Create file name
     QString fileName;
     QString sDate = QDate::currentDate().toString("yyyy_MM_dd");
@@ -362,11 +361,13 @@ void FiffRawView::onMakeScreenshot(const QString& imageType)
         svgGen.setViewBox(m_pTableView->rect());
 
         m_pTableView->render(&svgGen);
+        qInfo() << "[FiffRawView::onMakeScreenshot] Saving SVG Screenshot";
     } else if(imageType.contains("PNG")) {
         fileName = QString("./Screenshots/%1-%2-AnalyzeDataView.png").arg(sDate).arg(sTime);
 
         QPixmap pixMap = m_pTableView->grab();
         pixMap.save(fileName);
+        qInfo() << "[FiffRawView::onMakeScreenshot] Saving PNG Screenshot";
     }
 }
 
