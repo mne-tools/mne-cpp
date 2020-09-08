@@ -67,6 +67,10 @@ namespace ANSHAREDLIB {
 // DEFINE STRUCTS
 //=============================================================================================================
 
+//=============================================================================================================
+/**
+ * Data struture that stores a group of events and the parameters of the group and the events within
+ */
 struct EventGroup{
     int                 groupNumber;
     int                 groupType;
@@ -84,6 +88,10 @@ struct EventGroup{
     QVector<int>        dataIsUserEvent_Filtered;
 };
 
+//=============================================================================================================
+/**
+ * Model that holds the event information associated with a fiff file.
+ */
 class ANSHAREDSHARED_EXPORT AnnotationModel : public AbstractModel
 {
     Q_OBJECT
