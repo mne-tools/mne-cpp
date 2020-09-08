@@ -132,13 +132,6 @@ public:
 protected:
 
 private:
-
-    //=========================================================================================================
-    /**
-     * Load Bem model from file
-     */
-    void onLoadBemFile();
-
     //=========================================================================================================
     /**
      * Load fiducial from file
@@ -213,14 +206,6 @@ private:
     QString                         m_sSettingsPath;        /**< The settings path to store the GUI settings to. */
 
 signals:
-    //=========================================================================================================
-    /**
-     * Emit this signal whenever new bem model was loaded.
-     *
-     * @param[in] sFilePath    The file path to the bem-file.
-     */
-    void bemFileChanged(const QString& sFilePath);
-
     //=========================================================================================================
     /**
      * Emit this signal whenever new fiducials were loaded.

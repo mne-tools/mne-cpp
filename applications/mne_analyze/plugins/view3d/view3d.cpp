@@ -41,6 +41,7 @@
 #include <anShared/Management/communicator.h>
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Model/bemdatamodel.h>
+
 #include <disp3D/viewers/sourceestimateview.h>
 #include <disp3D/engine/view/view3D.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
@@ -48,6 +49,7 @@
 
 #include <disp/viewers/control3dview.h>
 
+#include <fiff/fiff_dig_point_set.h>
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -61,13 +63,15 @@
 using namespace VIEW3DPLUGIN;
 using namespace ANSHAREDLIB;
 using namespace DISPLIB;
-
+using namespace FIFFLIB;
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
 View3D::View3D()
-: m_pCommu(Q_NULLPTR)
+    : m_pCommu(Q_NULLPTR)
+    , m_pBemTreeCoreg(Q_NULLPTR)
+    , m_pDigitizerCoreg(Q_NULLPTR)
 {
 }
 
@@ -149,9 +153,15 @@ QDockWidget* View3D::getControl()
 void View3D::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
-    case SELECTED_BEM_CHANGED:
-        updateCoregBem(e->getData().value<QSharedPointer<ANSHAREDLIB::BemDataModel>>());
-        break;
+        case SELECTED_BEM_CHANGED:
+            updateCoregBem(e->getData().value<QSharedPointer<ANSHAREDLIB::BemDataModel>>());
+            break;
+        case NEW_DIGITIZER_ADDED:
+            updateCoregDigitizer(e->getData().value<FiffDigPointSet>());
+            break;
+        case NEW_FIDUCIALS_ADDED:
+            updateCoregMriFid(e->getData().value<FiffDigPointSet>());
+            break;
         default:
             qWarning() << "[View3D::handleEvent] Received an Event that is not handled by switch cases.";
     }
@@ -163,6 +173,9 @@ QVector<EVENT_TYPE> View3D::getEventSubscriptions(void) const
 {
     QVector<EVENT_TYPE> temp;
     temp.push_back(SELECTED_BEM_CHANGED);
+    temp.push_back(NEW_DIGITIZER_ADDED);
+    temp.push_back(NEW_FIDUCIALS_ADDED);
+
     return temp;
 }
 
@@ -173,17 +186,25 @@ void View3D::updateCoregBem(ANSHAREDLIB::BemDataModel::SPtr pNewModel)
     if(pNewModel->getType() == ANSHAREDLIB_BEMDATA_MODEL) {
         m_pBemTreeCoreg = m_p3DModel->addBemData("Co-Registration", "Surface", *pNewModel->getBem().data());
     }
+    return;
 }
 
 //=============================================================================================================
 
-//=============================================================================================================
-
-void View3D::updateBemList(ANSHAREDLIB::BemDataModel::SPtr pNewModel)
+void View3D::updateCoregDigitizer(FiffDigPointSet digSet)
 {
-    if(pNewModel->getType() == ANSHAREDLIB_BEMDATA_MODEL) {
-        m_pBemTreeCoreg = m_p3DModel->addBemData("Co-Registration", "Surface", *pNewModel->getBem().data());
-    }
+    m_pDigitizerCoreg = m_p3DModel->addDigitizerData("Co-Registration",
+                                                     "Digitizers",
+                                                     digSet);
+    return;
 }
 
+//=========================================================================================================
 
+void View3D::updateCoregMriFid(FiffDigPointSet digSetFid)
+{
+    m_pMriFidCoreg = m_p3DModel->addDigitizerData("Co-Registration",
+                                                  "MRI Fiducials",
+                                                  digSetFid);
+    return;
+}
