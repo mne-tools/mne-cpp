@@ -98,11 +98,10 @@ CoregSettingsView::CoregSettingsView(const QString& sSettingsPath,
             this, &CoregSettingsView::onWeigthsChanged);
     connect(m_pUi->m_qPushButton_FitFiducials, &QPushButton::released,
             this, &CoregSettingsView::fitFiducials);
-    connect(m_pUi->m_qPushButton_FitFiducials, &QPushButton::released,
+    connect(m_pUi->m_qPushButton_FitICP, &QPushButton::released,
             this, &CoregSettingsView::fitICP);
     connect(m_pUi->m_qPushButton_TransFileStoreDialaog, &QPushButton::released,
             this, &CoregSettingsView::onStoreTrans);
-
     connect(m_pUi->m_qComboBox_BemItems, &QComboBox::currentTextChanged,
             this, &CoregSettingsView::changeSelectedBem, Qt::UniqueConnection);
 }
@@ -304,7 +303,7 @@ float CoregSettingsView::getWeightNAS()
 
 float CoregSettingsView::getOmmitDistance()
 {
-    return m_pUi->m_qSpinBox_MaxDist->text().toFloat();
+    return static_cast<float>(m_pUi->m_qSpinBox_MaxDist->value())/1000.0;
 }
 
 //=============================================================================================================
@@ -327,4 +326,11 @@ void CoregSettingsView::addSelectionBem(const QString& sBemName)
 QString CoregSettingsView::getCurrentSelectedBem()
 {
     return m_pUi->m_qComboBox_BemItems->currentText();
+}
+
+//=============================================================================================================
+
+void CoregSettingsView::setOmittedPoints(const int iN)
+{
+    m_pUi->m_qLabel_NOmitted->setText(QString::number(iN));
 }
