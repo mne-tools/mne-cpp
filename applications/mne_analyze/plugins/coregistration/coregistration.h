@@ -42,6 +42,7 @@
 #include "coregistration_global.h"
 #include <anShared/Interfaces/IPlugin.h>
 
+#include <fiff/fiff_coord_trans.h>
 #include <fiff/fiff_dig_point.h>
 #include <fiff/fiff_dig_point_set.h>
 
@@ -74,6 +75,7 @@ namespace MNELIB {
 namespace FIFFLIB {
     class FiffDigPoint;
     class FiffDigPointSet;
+    class FiffCoordTrans;
 }
 //=============================================================================================================
 // DEFINE NAMESPACE SURFERPLUGIN
@@ -148,19 +150,31 @@ private:
     /**
      * Call this funciton whenever new fiducials were loaded.
      *
-     * @param[in] lDigitzers    The new fiducials.
-     * @param[in] sFilePath     The file path to the new digitzers.
      */
     void onFiducialsChanged(const QString& sFilePath);
+
+    //=========================================================================================================
+    /**
+     * Perform the actual Coregistration with the ICP algorithm
+     *
+     */
+    void onFitICP();
+
+    //=========================================================================================================
+    /**
+     * Fit fiducials as initial alignment for further coregistration with ICP algorithm
+     *
+     */
+    void onFitFiducials();
 
     QVector<QSharedPointer<ANSHAREDLIB::AbstractModel>>     m_vecBemModels;         /** Vector with all available Bem Models */
 
     int                                                     m_iCurrentBem;          /**< Bem index to use. 9999 for current selection */
 
     QSharedPointer<MNELIB::MNEBem>                          m_pBem;                 /**< The currently selected Bem model */
-    FIFFLIB::FiffDigPointSet                                m_digSet;               /**< The currently selected digitizer set */
-    FIFFLIB::FiffDigPointSet                                m_digSetFid;            /**< The currently selected mri fiducials */
-
+    FIFFLIB::FiffDigPointSet                                m_digFidHead;           /**< The currently selected digitizer set */
+    FIFFLIB::FiffDigPointSet                                m_digFidMri;            /**< The currently selected mri fiducials */
+    FIFFLIB::FiffCoordTrans                                 m_transHeadMri;         /**< The resulting head-mri transformation */
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;
 
     DISPLIB::CoregSettingsView*                             m_pCoregSettingsView;   /**< Pointer to coreg GUI */
