@@ -44,14 +44,19 @@
 #include <anShared/Model/bemdatamodel.h>
 
 #include "disp/viewers/coregsettingsview.h"
-#include "mne/mne_bem.h"
 #include "fiff/fiff_dig_point_set.h"
+#include "mne/mne_bem.h"
+#include "rtprocessing/icp.h"
 
+#include <Eigen/Core>
+
+#include <stdio.h>
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QListWidgetItem>
+#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -91,7 +96,7 @@ QSharedPointer<IPlugin> CoRegistration::clone() const
 
 void CoRegistration::init()
 {
-    m_pCommu = new Communicator(this);
+    m_pCommu = new Communicator(this);   
 }
 
 //=============================================================================================================
@@ -133,6 +138,11 @@ QDockWidget *CoRegistration::getControl()
             this, &CoRegistration::onDigitizersChanged);
     connect(m_pCoregSettingsView, &CoregSettingsView::fidFileChanged,
             this, &CoRegistration::onFiducialsChanged);
+    connect(m_pCoregSettingsView, &CoregSettingsView::fitFiducials,
+            this, &CoRegistration::onFitFiducials);
+    connect(m_pCoregSettingsView, &CoregSettingsView::fitICP,
+            this, &CoRegistration::onFitICP);
+
     onChangeSelectedBem(m_pCoregSettingsView->getCurrentSelectedBem());
 
     return pControlDock;
@@ -206,9 +216,9 @@ void CoRegistration::onChangeSelectedBem(const QString &sText)
 void CoRegistration::onDigitizersChanged(const QString& sFilePath)
 {
     QFile fileDig(sFilePath);
-    FiffDigPointSet m_digSet(fileDig);
+    m_digFidHead = FiffDigPointSet(fileDig);
 
-    QVariant data = QVariant::fromValue(m_digSet);
+    QVariant data = QVariant::fromValue(m_digFidHead);
     m_pCommu->publishEvent(EVENT_TYPE::NEW_DIGITIZER_ADDED, data);
     return;
 }
@@ -218,9 +228,64 @@ void CoRegistration::onDigitizersChanged(const QString& sFilePath)
 void CoRegistration::onFiducialsChanged(const QString& sFilePath)
 {
     QFile fileDig(sFilePath);
-    FiffDigPointSet m_digSetFid(fileDig);
+    m_digFidMri = FiffDigPointSet(fileDig);
 
-    QVariant data = QVariant::fromValue(m_digSet);
+    QVariant data = QVariant::fromValue(m_digFidMri);
     m_pCommu->publishEvent(EVENT_TYPE::NEW_FIDUCIALS_ADDED, data);
     return;
 }
+
+//=============================================================================================================
+
+void CoRegistration::onFitFiducials()
+{
+    bool bScale = true;
+
+    // Initial Fiducial Alignment
+    // Declare variables
+    FiffDigPointSet digSetFidHead = m_digFidHead.pickTypes({FIFFV_POINT_CARDINAL});
+    FiffDigPointSet digSetFidMRI = m_digFidMri.pickTypes({FIFFV_POINT_CARDINAL});
+
+    Matrix3f matHead(digSetFidHead.size(),3);
+    Matrix3f matMri(digSetFidMRI.size(),3);
+    Matrix4f matTrans;
+    Vector3f vecWeights; // LPA, Nasion, RPA
+    float fScale;
+
+    // get coordinates
+    for(int i = 0; i< digSetFidHead.size(); ++i) {
+        matHead(i,0) = digSetFidHead[i].r[0]; matHead(i,1) = digSetFidHead[i].r[1]; matHead(i,2) = digSetFidHead[i].r[2];
+        matMri(i,0) = digSetFidMRI[i].r[0]; matMri(i,1) = digSetFidMRI[i].r[1]; matMri(i,2) = digSetFidMRI[i].r[2];
+
+        // set standart weights
+        if(digSetFidHead[i].ident == FIFFV_POINT_NASION) {
+            vecWeights(i) = 10.0;
+        } else {
+            vecWeights(i) = 1.0;
+        }
+    }
+
+    // align fiducials
+    if(!RTPROCESSINGLIB::fitMatchedPoints(matHead,matMri,matTrans,fScale,bScale,vecWeights)) {
+        qWarning() << "Point cloud registration not succesfull.";
+    }
+
+    // make transform
+    fiff_int_t iFrom = FIFFV_COORD_HEAD;
+    fiff_int_t iTo = FIFFV_COORD_MRI;
+    m_transHeadMri = FiffCoordTrans::make(iFrom, iTo, matTrans);
+
+    // send event
+    QVariant data = QVariant::fromValue(m_transHeadMri);
+    m_pCommu->publishEvent(EVENT_TYPE::NEW_TRANS_AVAILABE, data);
+
+    return;
+}
+
+//=============================================================================================================
+
+void CoRegistration::onFitICP()
+{
+    return;
+}
+

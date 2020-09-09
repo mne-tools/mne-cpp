@@ -220,22 +220,9 @@ void View3D::updateCoregMriFid(FiffDigPointSet digSetFid)
 
 void View3D::updateCoregTrans(FiffCoordTrans headMriTrans)
 {
-    // update mri fiducials
-    QList<QStandardItem*> itemList = m_pMriFidCoreg->findChildren(DISP3DLIB::Data3DTreeModelItemTypes::DigitizerItem);
-    for(int j = 0; j < itemList.size(); ++j) {
-        if(DISP3DLIB::DigitizerTreeItem* pDigItem = dynamic_cast<DISP3DLIB::DigitizerTreeItem*>(itemList.at(j))) {
-            // apply inverse to get from mri to head space
-            pDigItem->setTransform(headMriTrans, true);
-        }
-    }
+    // apply inverse because we want to visualize in head space
+    m_pMriFidCoreg->setTransform(headMriTrans, true);
+    m_pBemTreeCoreg->setTransform(headMriTrans, true);
 
-    // Update head
-    itemList = m_pBemTreeCoreg->findChildren(DISP3DLIB::Data3DTreeModelItemTypes::BemSurfaceItem);
-    for(int j = 0; j < itemList.size(); ++j) {
-        if(DISP3DLIB::BemSurfaceTreeItem* pBemItem = dynamic_cast<DISP3DLIB::BemSurfaceTreeItem*>(itemList.at(j))) {
-            // apply inverse to get from mri to head space
-            pBemItem->setTransform(headMriTrans, true);
-        }
-    }
     return;
 }
