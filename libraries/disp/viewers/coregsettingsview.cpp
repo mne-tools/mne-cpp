@@ -90,12 +90,6 @@ CoregSettingsView::CoregSettingsView(const QString& sSettingsPath,
             this, &CoregSettingsView::onLoadDigFile);
     connect(m_pUi->m_qSpinBox_MaxDist, QOverload<int>::of(&QSpinBox::valueChanged),
             this, &CoregSettingsView::onMaxDistChanged);
-    connect(m_pUi->m_qSpinBox_MaxIter, QOverload<int>::of(&QSpinBox::valueChanged),
-            this, &CoregSettingsView::maxIterChanged);
-    connect(m_pUi->m_qDoubleSpinBox_Converge, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            this, &CoregSettingsView::convergenceChanged);
-    connect(m_pUi->m_qCheckBox_AutoScale, &QCheckBox::clicked,
-            this, &CoregSettingsView::autoScaleStatusChanged);
     connect(m_pUi->m_qDoubleSpinBox_WeightLpa, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
             this, &CoregSettingsView::onWeigthsChanged);
     connect(m_pUi->m_qDoubleSpinBox_WeightRpa, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
@@ -233,7 +227,7 @@ void CoregSettingsView::onLoadDigFile()
 void CoregSettingsView::onMaxDistChanged()
 {
     float fMaxDist = m_pUi->m_qSpinBox_MaxDist->value()/1000;
-    emit maxDistChanged(fMaxDist);
+    // emit maxDistChanged(fMaxDist);
 }
 
 //=============================================================================================================
@@ -244,7 +238,7 @@ void CoregSettingsView::onWeigthsChanged()
     float fWeitghtRPA = m_pUi->m_qDoubleSpinBox_WeightRpa->value();
     float fWeitghtNas = m_pUi->m_qDoubleSpinBox_WeightNas->value();
 
-    emit weightsChanged(fWeitghtLPA,fWeitghtRPA,fWeitghtNas);
+    // emit weightsChanged(fWeitghtLPA,fWeitghtRPA,fWeitghtNas);
 }
 
 //=============================================================================================================
@@ -301,9 +295,16 @@ float CoregSettingsView::getWeightRPA()
 
 //=============================================================================================================
 
-float CoregSettingsView::getWeightNas()
+float CoregSettingsView::getWeightNAS()
 {
     return m_pUi->m_qDoubleSpinBox_WeightNas->text().toFloat();
+}
+
+//=============================================================================================================
+
+float CoregSettingsView::getOmmitDistance()
+{
+    return m_pUi->m_qSpinBox_MaxDist->text().toFloat();
 }
 
 //=============================================================================================================
