@@ -694,7 +694,6 @@ void AnnotationSettingsView::detectTriggerCalculations(const QString &sChannelNa
     for(int i = 0; i < m_pFiffInfo->chs.size(); ++i) {
         if(m_pFiffInfo->chs[i].ch_name == sChannelName) {
             iCurrentTriggerChIndex = i;
-            QApplication::processEvents();
             break;
         }
     }
@@ -716,8 +715,6 @@ void AnnotationSettingsView::detectTriggerCalculations(const QString &sChannelNa
                                                                                               0,
                                                                                               dThreshold,
                                                                                               0);
-
-    QApplication::processEvents();
 
     QMap<double,QList<int>> mEventsinTypes;
 
