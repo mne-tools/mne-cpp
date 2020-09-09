@@ -87,7 +87,8 @@ public:
      * @param [in] pEvokedSet   sets saved evoked set to pEvokedSet. NULL if left empty
      * @param [in] parent       sets parent of the object. NULL if left empty
      */
-    AveragingDataModel(QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet = Q_NULLPTR, QObject* parent = Q_NULLPTR);
+    AveragingDataModel(QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet = Q_NULLPTR,
+                       QObject* parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
@@ -104,7 +105,8 @@ public:
      *
      * @return      returns saved FiffEvokedModel with averaging data
      */
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    QVariant data(const QModelIndex &index,
+                  int role = Qt::DisplayRole) const override;
 
     Qt::ItemFlags flags(const QModelIndex &index) const override;
 
@@ -120,17 +122,11 @@ public:
      */
     void setEvokedSet(QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet);
 
-    //=========================================================================================================
-    /**
-     * Returns the saved FiffEvokedSet. Consider using data() instead.
-     *
-     * @return  returns the saved FiffEvokedSet, m_pFiffEvokedSet
-     */
-    QSharedPointer<FIFFLIB::FiffEvokedSet> getEvokedSet();
-
     inline MODEL_TYPE getType() const override;
 
-    inline QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
+    inline QModelIndex index(int row,
+                             int column,
+                             const QModelIndex &parent = QModelIndex()) const override;
 
     inline QModelIndex parent(const QModelIndex &index) const override;
 

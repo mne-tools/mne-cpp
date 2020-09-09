@@ -121,7 +121,9 @@ public:
      *
      * @return  returns true if successful
      */
-    bool insertRows(int position, int span, const QModelIndex & parent) override;
+    bool insertRows(int position,
+                    int span,
+                    const QModelIndex & parent) override;
 
     //=========================================================================================================
     /**
@@ -133,7 +135,9 @@ public:
      *
      * @return  returns true if successful
      */
-    bool removeRows(int position, int span, const QModelIndex & parent = QModelIndex()) override;
+    bool removeRows(int position,
+                    int span,
+                    const QModelIndex & parent = QModelIndex()) override;
 
     //=========================================================================================================
     /**
@@ -158,7 +162,8 @@ public:
      * @param[in] index   The index that referres to the requested item.
      * @param[in] role    The requested role.
      */
-    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    virtual QVariant data(const QModelIndex &index,
+                          int role = Qt::DisplayRole) const override;
 
     //=========================================================================================================
     /**
@@ -170,7 +175,9 @@ public:
      *
      * @return accessed eader data
      */
-    QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+    QVariant headerData(int section,
+                        Qt::Orientation orientation,
+                        int role) const override;
 
     //=========================================================================================================
     /**
@@ -182,7 +189,9 @@ public:
      *
      * @return returns true if successful
      */
-    bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole) override;
+    bool setData(const QModelIndex & index,
+                 const QVariant & value,
+                 int role = Qt::EditRole) override;
 
     //=========================================================================================================
     /**
