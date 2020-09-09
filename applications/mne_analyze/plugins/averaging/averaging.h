@@ -132,6 +132,7 @@ public:
 signals:
     //=========================================================================================================
     void showSelectedChannels(const QList<int> selectedChannelsIndexes);
+    void showAllChannels();
     void channelSelectionManagerChanged(const QVariant &data);
     void layoutChanged(const QMap<QString,QPointF> &layoutMap);
 private:

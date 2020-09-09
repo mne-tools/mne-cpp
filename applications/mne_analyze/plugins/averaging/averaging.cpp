@@ -159,6 +159,9 @@ QWidget *Averaging::getView()
     connect(this, &Averaging::showSelectedChannels,
             m_pButterflyView.data(), &DISPLIB::ButterflyView::showSelectedChannels, Qt::UniqueConnection);
 
+    connect(this, &Averaging::showAllChannels,
+            m_pButterflyView.data(), &DISPLIB::ButterflyView::showAllChannels, Qt::UniqueConnection);
+
     connect(this, &Averaging::channelSelectionManagerChanged,
             m_pAverageLayoutView.data(), &DISPLIB::AverageLayoutView::channelSelectionChanged, Qt::UniqueConnection);
 
@@ -587,7 +590,11 @@ void Averaging::setChannelSelection(const QVariant &data)
         emit channelSelectionManagerChanged(data);
     }
     if(data.value<DISPLIB::SelectionItem*>()->m_sViewsToApply.contains("butterflyview")){
-        emit showSelectedChannels(data.value<DISPLIB::SelectionItem*>()->m_iChannelNumber);
+        if(data.value<DISPLIB::SelectionItem*>()->m_bShowAll){
+            emit showAllChannels();
+        } else {
+            emit showSelectedChannels(data.value<DISPLIB::SelectionItem*>()->m_iChannelNumber);
+        }
     }
 }
 
@@ -640,6 +647,7 @@ void Averaging::onNewAveragingModel(QSharedPointer<ANSHAREDLIB::AveragingDataMod
     m_pButterflyView->setEvokedSetModel(m_pEvokedModel);
     m_pAverageLayoutView->setEvokedSetModel(m_pEvokedModel);
 
+    m_pButterflyView->showAllChannels();
     m_pButterflyView->dataUpdate();
     m_pButterflyView->updateView();
     m_pAverageLayoutView->updateData();
