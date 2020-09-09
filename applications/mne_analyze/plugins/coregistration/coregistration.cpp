@@ -216,9 +216,9 @@ void CoRegistration::onChangeSelectedBem(const QString &sText)
 void CoRegistration::onDigitizersChanged(const QString& sFilePath)
 {
     QFile fileDig(sFilePath);
-    m_digFidHead = FiffDigPointSet(fileDig);
+    m_digSetHead = FiffDigPointSet(fileDig);
 
-    QVariant data = QVariant::fromValue(m_digFidHead);
+    QVariant data = QVariant::fromValue(m_digSetHead);
     m_pCommu->publishEvent(EVENT_TYPE::NEW_DIGITIZER_ADDED, data);
     return;
 }
@@ -240,14 +240,13 @@ void CoRegistration::onFiducialsChanged(const QString& sFilePath)
 void CoRegistration::onFitFiducials()
 {
     // get values from view
-
     bool bScale = m_pCoregSettingsView->getAutoScale();
     float fWeightLPA = m_pCoregSettingsView->getWeightLPA();
     float fWeightNAS = m_pCoregSettingsView->getWeightNAS();
     float fWeightRPA = m_pCoregSettingsView->getWeightRPA();
 
     // Declare variables
-    FiffDigPointSet digSetFidHead = m_digFidHead.pickTypes({FIFFV_POINT_CARDINAL});
+    FiffDigPointSet digSetFidHead = m_digSetHead.pickTypes({FIFFV_POINT_CARDINAL});
     FiffDigPointSet digSetFidMRI = m_digFidMri.pickTypes({FIFFV_POINT_CARDINAL});
 
     Matrix3f matHead(digSetFidHead.size(),3);
@@ -261,7 +260,7 @@ void CoRegistration::onFitFiducials()
         matHead(i,0) = digSetFidHead[i].r[0]; matHead(i,1) = digSetFidHead[i].r[1]; matHead(i,2) = digSetFidHead[i].r[2];
         matMri(i,0) = digSetFidMRI[i].r[0]; matMri(i,1) = digSetFidMRI[i].r[1]; matMri(i,2) = digSetFidMRI[i].r[2];
 
-        // set standart weights
+        // set weights
         switch (digSetFidHead[i].ident) {
         case FIFFV_POINT_NASION:
             vecWeights(i) = fWeightNAS;
@@ -296,6 +295,56 @@ void CoRegistration::onFitFiducials()
 
 void CoRegistration::onFitICP()
 {
+    // get values from view
+    bool bScale = m_pCoregSettingsView->getAutoScale();
+    float fWeightLPA = m_pCoregSettingsView->getWeightLPA();
+    float fWeightNAS = m_pCoregSettingsView->getWeightNAS();
+    float fWeightRPA = m_pCoregSettingsView->getWeightRPA();
+
+    // init variables
+    QList<int> lPickHSP({FIFFV_POINT_CARDINAL,FIFFV_POINT_HPI,FIFFV_POINT_EXTRA,FIFFV_POINT_EEG});
+    FiffDigPointSet digSetHSP = m_digSetHead.pickTypes(lPickHSP);
+
+    VectorXf vecWeightsICP(digSetHSP.size()); // Weigths vector
+    MatrixXf matHsp(digSetHSP.size(),3);
+
+    for(int i = 0; i < digSetHSP.size(); ++i) {
+        matHsp(i,0) = digSetHSP[i].r[0]; matHsp(i,1) = digSetHSP[i].r[1]; matHsp(i,2) = digSetHSP[i].r[2];
+        // set standart weights
+        if(digSetHSP[i].kind == FIFFV_POINT_CARDINAL) {
+            // set weights
+            switch (digSetHSP[i].ident) {
+            case FIFFV_POINT_NASION:
+                vecWeightsICP(i) = fWeightNAS;
+                break;
+            case FIFFV_POINT_LPA:
+                vecWeightsICP(i) = fWeightLPA;
+                break;
+            case FIFFV_POINT_RPA:
+                vecWeightsICP(i) = fWeightRPA;
+                break;
+            }
+        }
+    }
+
+    MatrixXf matHspClean;
+    VectorXi vecTake;
+
+    // discard outliers
+    if(!RTPROCESSINGLIB::discard3DPointOutliers(mneSurfacePoints, matHsp, transHeadMri, vecTake, matHspClean, fMaxDist)) {
+        qWarning() << "Discard outliers was not succesfull.";
+    }
+    VectorXf vecWeightsICPClean(vecTake.size());
+
+    for(int i = 0; i < vecTake.size(); ++i) {
+        vecWeightsICPClean(i) = vecWeightsICP(vecTake(i));
+    }
+
+    // icp
+    if(!RTPROCESSINGLIB::performIcp(mneSurfacePoints, matHspClean, transHeadMri, iMaxIter, fTol, vecWeightsICPClean)) {
+        qWarning() << "ICP was not succesfull.";
+    }
+
     return;
 }
 

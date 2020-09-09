@@ -163,7 +163,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Get the weights for LPA,RPA and NAsion
+     * Get the weights for LPA,RPA and Nasion
      *
      * @return  The weight.
      */
