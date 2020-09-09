@@ -256,6 +256,12 @@ private slots:
      */
     void initTriggerDetect(const QSharedPointer<FIFFLIB::FiffInfo> info);
 
+    //=========================================================================================================
+    /**
+     * Gets event map from QFuture and creates new groups baseed on it.
+     */
+    void createGroupsFromTriggers();
+
 private:
     //=========================================================================================================
     /**
@@ -366,19 +372,25 @@ private:
 
     //=========================================================================================================
     /**
-     * Detects triggers from stim channel sChannelName above threshold dThreshold and saves them
-     * as events in Event groups sroted by channel and type
+     * Starts trigger detection in separate thread
      *
-     * @param[in] sChannelName      name of stim channel from which we will be reading
-     * @param[in] dThreshold        threshold for a spike to count as a trigger
+     * @param [in] sChannelName      name of stim channel from which we will be reading
+     * @param [in] dThreshold        threshold for a spike to count as a trigger
      */
     void onDetectTriggers(const QString& sChannelName,
                           double dThreshold);
 
+    //=========================================================================================================
+    /**
+     * Perfroms trigger detection and sorts events into map of events by group based on detection threshold
+     *
+     * @param[in] sChannelName      name of stim channel from which we will be reading
+     * @param[in] dThreshold        threshold for a spike to count as a trigger
+     *
+     * @return      returns map of events sorted by groups based on threshold
+     */
     QMap<double,QList<int>> detectTriggerCalculations(const QString& sChannelName,
                                    double dThreshold);
-
-    void createGroupsFromTriggers();
 
     Ui::EventWindowDockWidget*                      m_pUi;                          /** < Pointer to GUI elements */
 
@@ -393,10 +405,10 @@ private:
 
     QSharedPointer<DISPLIB::TriggerDetectionView>   m_pTriggerDetectView;           /** < Pointer to viewer to control GUI for detecting triggers */
 
-    QColorDialog*                                   m_pColordialog;                 /** < USed for Prompting users for annotation type colors */
+    QColorDialog*                                   m_pColordialog;                 /** < Used for Prompting users for annotation type colors */
 
-    QFutureWatcher <QMap<double,QList<int>>> watcher;
-    QFuture<QMap<double,QList<int>>> future;
+    QFutureWatcher <QMap<double,QList<int>>>        m_FutureWatcher;                /** < Watches m_Future and signals when calculations are done */
+    QFuture<QMap<double,QList<int>>>                m_Future;                       /** < Used to perfom trigger detection on a separate thread */
 
 
 };

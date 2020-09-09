@@ -101,12 +101,9 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager
         qWarning() << "[MainWindow::MainWindow] Plugin manager is nullptr!";
     }
 
-    QThread* statusBarThread = new QThread();
     StatusBar* statusBar = new StatusBar();
 
     this->setStatusBar(statusBar);
-    //statusBar->moveToThread(statusBarThread);
-    //statusBarThread->start();
 
     //Load application icon for linux builds only, mac and win executables have built in icons from .pro file
 #ifdef __linux__
