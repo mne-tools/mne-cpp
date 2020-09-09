@@ -147,8 +147,16 @@ private:
      */
     void onJumpToSelected();
 
+    //=============================================================================================================
+    /**
+     * Sends event to trigger loading bar to appear
+     */
     void triggerLoadingStart();
 
+    //=============================================================================================================
+    /**
+     * Sends event to hide loading bar
+     */
     void triggerLoadingEnd();
 
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals */

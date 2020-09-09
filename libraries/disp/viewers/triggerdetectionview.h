@@ -121,6 +121,12 @@ public:
     void setNumberDetectedTriggersAndTypes(int totalNumberDetections,
                                            const QMap<int,QList<QPair<int,double> > >& mapDetectedTriggers);
 
+    //=========================================================================================================
+    /**
+     * Gets currently selected STIM channel in GUI
+     *
+     * @return currently selected STIM channel
+     */
     QString getChannelName();
 
     //=========================================================================================================

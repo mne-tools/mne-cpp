@@ -187,7 +187,7 @@ void AnnotationSettingsView::initGUIFunctionality()
     connect(m_pTriggerDetectView.data(), &DISPLIB::TriggerDetectionView::detectTriggers,
             this, &AnnotationSettingsView::onDetectTriggers, Qt::UniqueConnection);
 
-    connect(&watcher, &QFutureWatcher<QMap<double,QList<int>>>::finished,
+    connect(&m_FutureWatcher, &QFutureWatcher<QMap<double,QList<int>>>::finished,
             this, &AnnotationSettingsView::createGroupsFromTriggers, Qt::UniqueConnection);
 }
 
@@ -626,8 +626,8 @@ void AnnotationSettingsView::onDetectTriggers(const QString &sChannelName,
 {
     emit loadingStart();
 
-    future = QtConcurrent::run(this, &AnnotationSettingsView::detectTriggerCalculations, sChannelName, dThreshold);
-    watcher.setFuture(future);
+    m_Future = QtConcurrent::run(this, &AnnotationSettingsView::detectTriggerCalculations, sChannelName, dThreshold);
+    m_FutureWatcher.setFuture(m_Future);
 }
 
 //=============================================================================================================
@@ -715,7 +715,7 @@ bool AnnotationSettingsView::newStimGroup(const QString &sName,
 
 void AnnotationSettingsView::createGroupsFromTriggers()
 {
-    QMap<double,QList<int>> mEventGroupMap = future.result();
+    QMap<double,QList<int>> mEventGroupMap = m_Future.result();
 
     QList<double> keyList = mEventGroupMap.keys();
     int iFirstSample = m_pFiffRawModel->absoluteFirstSample();
