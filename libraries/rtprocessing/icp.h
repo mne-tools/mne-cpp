@@ -131,6 +131,7 @@ RTPROCESINGSHARED_EXPORT bool fitMatchedPoints(const Eigen::MatrixXf& matSrcPoin
  * @param [in]  vecTake             The index of taken digitizers.
  * @param [in]  matTakePoint        The the digitizer points to take.
  * @param [in]  fMaxDist            The maximum distance to the surface in mm, defaults to 0 mm.
+ * @param [out] iNDiscarded         The number of discarded points
  *
  * @return Wether the discarding was succesfull.
  */

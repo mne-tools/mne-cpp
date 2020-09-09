@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="m_qTabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="m_qTab_Load">
       <attribute name="title">
@@ -199,6 +199,9 @@
             <property name="suffix">
              <string> mm</string>
             </property>
+            <property name="value">
+             <number>10</number>
+            </property>
            </widget>
           </item>
          </layout>
@@ -214,6 +217,9 @@
            <widget class="QCheckBox" name="m_qCheckBox_AutoScale">
             <property name="text">
              <string>Apply automatic scaling</string>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
             </property>
             <property name="tristate">
              <bool>false</bool>
@@ -231,7 +237,11 @@
               </widget>
              </item>
              <item row="0" column="1">
-              <widget class="QSpinBox" name="m_qSpinBox_MaxIter"/>
+              <widget class="QSpinBox" name="m_qSpinBox_MaxIter">
+               <property name="value">
+                <number>20</number>
+               </property>
+              </widget>
              </item>
              <item row="1" column="0">
               <widget class="QLabel" name="label_6">
@@ -383,7 +393,7 @@
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_7">
           <item>
-           <widget class="QWidget" name="m_qWidgetScling" native="true">
+           <widget class="QWidget" name="m_qWidgetScaling" native="true">
             <layout class="QFormLayout" name="formLayout_2">
              <item row="1" column="0">
               <widget class="QLabel" name="label_2">
@@ -494,63 +504,102 @@
         </widget>
        </item>
        <item>
-        <widget class="QGroupBox" name="m_qGroupBox_Results">
+        <widget class="QGroupBox" name="m_qGroupBox_Adjustment">
          <property name="title">
-          <string>Results and Adjustment</string>
+          <string>Adjustment</string>
          </property>
-         <layout class="QGridLayout" name="gridLayout_2">
-          <item row="0" column="1">
-           <widget class="QLabel" name="label_13">
-            <property name="text">
-             <string>Translation [mm]</string>
-            </property>
+         <layout class="QVBoxLayout" name="verticalLayout_10">
+          <item>
+           <widget class="QWidget" name="m_qWidget_Adjustment" native="true">
+            <layout class="QGridLayout" name="gridLayout_2">
+             <item row="1" column="2">
+              <widget class="QDoubleSpinBox" name="doubleSpinBox_2"/>
+             </item>
+             <item row="3" column="2">
+              <widget class="QDoubleSpinBox" name="doubleSpinBox_6"/>
+             </item>
+             <item row="0" column="1">
+              <widget class="QLabel" name="label_13">
+               <property name="text">
+                <string>Translation [mm]</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="QDoubleSpinBox" name="doubleSpinBox_4"/>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="label_11">
+               <property name="text">
+                <string>Y: </string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_10">
+               <property name="text">
+                <string>X: </string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QDoubleSpinBox" name="doubleSpinBox"/>
+             </item>
+             <item row="2" column="1">
+              <widget class="QDoubleSpinBox" name="doubleSpinBox_3"/>
+             </item>
+             <item row="0" column="2">
+              <widget class="QLabel" name="label_14">
+               <property name="text">
+                <string>Rotation  [°]</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QLabel" name="label_12">
+               <property name="text">
+                <string>Z: </string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="2">
+              <widget class="QDoubleSpinBox" name="doubleSpinBox_5"/>
+             </item>
+             <item row="4" column="1">
+              <spacer name="horizontalSpacer">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>0</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item row="4" column="2">
+              <spacer name="horizontalSpacer_2">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>0</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
            </widget>
           </item>
-          <item row="0" column="2">
-           <widget class="QLabel" name="label_14">
+          <item>
+           <widget class="QPushButton" name="m_qPushButton_ApplyAdjustment">
             <property name="text">
-             <string>Rotation  [°]</string>
+             <string>Apply Adjustment</string>
             </property>
            </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_10">
-            <property name="text">
-             <string>X: </string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="m_qLineEdit_TransX"/>
-          </item>
-          <item row="1" column="2">
-           <widget class="QLineEdit" name="m_qLineEdit_RotX"/>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_11">
-            <property name="text">
-             <string>Y: </string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QLineEdit" name="m_qLineEdit_TransY"/>
-          </item>
-          <item row="2" column="2">
-           <widget class="QLineEdit" name="m_qLineEdit_RotY"/>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label_12">
-            <property name="text">
-             <string>Z: </string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QLineEdit" name="m_qLineEdit_TransZ"/>
-          </item>
-          <item row="3" column="2">
-           <widget class="QLineEdit" name="m_qLineEdit_RotZ"/>
           </item>
          </layout>
         </widget>
