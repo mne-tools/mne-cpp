@@ -88,6 +88,7 @@ namespace MNELIB
  */
 class MNESHARED_EXPORT MNEBem
 {
+
 public:
     typedef QSharedPointer<MNEBem> SPtr;            /**< Shared pointer type for MNEBem. */
     typedef QSharedPointer<const MNEBem> ConstSPtr; /**< Const shared pointer type for MNEBem. */
