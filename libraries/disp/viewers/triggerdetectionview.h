@@ -121,6 +121,8 @@ public:
     void setNumberDetectedTriggersAndTypes(int totalNumberDetections,
                                            const QMap<int,QList<QPair<int,double> > >& mapDetectedTriggers);
 
+    QString getChannelName();
+
     //=========================================================================================================
     /**
      * Saves all important settings of this view via QSettings.

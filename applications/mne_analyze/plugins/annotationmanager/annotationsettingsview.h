@@ -51,6 +51,8 @@
 #include <QWidget>
 #include <QColorDialog>
 #include <QStringListModel>
+#include <QFuture>
+#include <QFutureWatcher>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -373,8 +375,10 @@ private:
     void onDetectTriggers(const QString& sChannelName,
                           double dThreshold);
 
-    void detectTriggerCalculations(const QString& sChannelName,
+    QMap<double,QList<int>> detectTriggerCalculations(const QString& sChannelName,
                                    double dThreshold);
+
+    void createGroupsFromTriggers();
 
     Ui::EventWindowDockWidget*                      m_pUi;                          /** < Pointer to GUI elements */
 
@@ -390,6 +394,9 @@ private:
     QSharedPointer<DISPLIB::TriggerDetectionView>   m_pTriggerDetectView;           /** < Pointer to viewer to control GUI for detecting triggers */
 
     QColorDialog*                                   m_pColordialog;                 /** < USed for Prompting users for annotation type colors */
+
+    QFutureWatcher <QMap<double,QList<int>>> watcher;
+    QFuture<QMap<double,QList<int>>> future;
 
 
 };
