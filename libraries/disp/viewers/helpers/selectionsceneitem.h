@@ -81,6 +81,7 @@ public:
     QList<int>         m_iChannelKind;             /**< The channel kind.*/
     QList<int>         m_iChannelUnit;             /**< The channel unit.*/
     QList<QPointF>     m_qpChannelPosition;        /**< The channel's 2D position in the scene.*/
+    bool               m_bShowAll;                 /**< Whether to show all channels */
 };
 
 class DISPSHARED_EXPORT SelectionSceneItem : public QGraphicsItem

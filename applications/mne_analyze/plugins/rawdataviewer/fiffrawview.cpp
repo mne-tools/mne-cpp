@@ -646,3 +646,16 @@ void FiffRawView::showSelectedChannelsOnly(const QList<int> selectedChannelsInde
         pDelegate->setUpperItemIndex(m_pTableView->rowAt(0));
     }
 }
+
+//=============================================================================================================
+
+void FiffRawView::showAllChannels()
+{
+    for(int i = 0; i<m_pModel->rowCount(); i++) {
+        m_pTableView->showRow(i);
+    }
+
+    if(FiffRawViewDelegate *pDelegate = qobject_cast<FiffRawViewDelegate *>(m_pTableView->itemDelegate())) {
+        pDelegate->setUpperItemIndex(m_pTableView->rowAt(0));
+    }
+}

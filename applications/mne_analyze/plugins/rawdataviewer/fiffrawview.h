@@ -290,7 +290,19 @@ public:
      */
     void updateProcessingMode(ProcessingMode mode);
 
+    //=========================================================================================================
+    /**
+     * Shows channels based on input selectedChannelsIndexes
+     *
+     * @param [in] selectedChannelsIndexes      list of channels to be shown
+     */
     void showSelectedChannelsOnly(const QList<int> selectedChannelsIndexes);
+
+    //=========================================================================================================
+    /**
+     * Shows all channels in the view
+     */
+    void showAllChannels();
 
 signals:
     //=========================================================================================================

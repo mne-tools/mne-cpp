@@ -163,6 +163,7 @@ void ButterflyView::setScaleMap(const QMap<qint32,float> &scaleMap)
 void ButterflyView::setSelectedChannels(const QList<int> &selectedChannels)
 {
     m_lSelectedChannels = selectedChannels;
+    qDebug() << "LIST SIZE:" << selectedChannels.size();
     update();
 }
 
@@ -279,6 +280,19 @@ void ButterflyView::showSelectedChannelsOnly(const QStringList& selectedChannels
 void ButterflyView::showSelectedChannels(const QList<int> selectedChannelsIndexes)
 {
     setSelectedChannels(selectedChannelsIndexes);
+}
+
+//=============================================================================================================
+
+void ButterflyView::showAllChannels()
+{
+    if (m_pEvokedSetModel) {
+        QList<int> lAllChannels;
+        for(int i = 0; i < m_pEvokedSetModel->rowCount(); i++) {
+            lAllChannels.append(i);
+        }
+        setSelectedChannels(lAllChannels);
+    }
 }
 
 //=============================================================================================================
