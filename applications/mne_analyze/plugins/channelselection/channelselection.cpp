@@ -255,8 +255,9 @@ void ChannelSelection::onSelectionChanged(const QList<QGraphicsItem*>& selectedC
         m_pSelectionItem->m_qpChannelPosition.append(selectionSceneItemTemp->m_qpChannelPosition);
     }
 
+    m_pSelectionItem->m_bShowAll = m_pChannelSelectionView->isSelectionEmpty();
+
     m_pSelectionItem->m_sViewsToApply = m_pApplyToView->getSelectedViews();
 
     m_pCommu->publishEvent(EVENT_TYPE::CHANNEL_SELECTION_ITEMS, QVariant::fromValue(/*static_cast<void*>(*/m_pSelectionItem/*)*/));
 }
-

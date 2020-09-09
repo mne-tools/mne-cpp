@@ -175,7 +175,11 @@ void RawDataViewer::handleEvent(QSharedPointer<Event> e)
         break;
     case CHANNEL_SELECTION_ITEMS:
         if (e->getData().value<DISPLIB::SelectionItem*>()->m_sViewsToApply.contains("signalview")){
-            m_pFiffRawView->showSelectedChannelsOnly(e->getData().value<DISPLIB::SelectionItem*>()->m_iChannelNumber);
+            if(e->getData().value<DISPLIB::SelectionItem*>()->m_bShowAll){
+                m_pFiffRawView->showAllChannels();
+            } else {
+                m_pFiffRawView->showSelectedChannelsOnly(e->getData().value<DISPLIB::SelectionItem*>()->m_iChannelNumber);
+            }
         }
         break;
     case SCALING_MAP_CHANGED:

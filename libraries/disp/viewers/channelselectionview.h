@@ -252,6 +252,14 @@ public:
      */
     QWidget* getControlWidget();
 
+    //=========================================================================================================
+    /**
+     * Returns whether there is a user selection
+     *
+     * @return true if there is a user selection, false if not
+     */
+    bool isSelectionEmpty();
+
 private:
     //=========================================================================================================
     /**
