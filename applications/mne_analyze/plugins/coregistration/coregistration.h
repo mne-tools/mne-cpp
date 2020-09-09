@@ -172,7 +172,7 @@ private:
     int                                                     m_iCurrentBem;          /**< Bem index to use. 9999 for current selection */
 
     QSharedPointer<MNELIB::MNEBem>                          m_pBem;                 /**< The currently selected Bem model */
-    FIFFLIB::FiffDigPointSet                                m_digFidHead;           /**< The currently selected digitizer set */
+    FIFFLIB::FiffDigPointSet                                m_digSetHead;           /**< The currently selected digitizer set */
     FIFFLIB::FiffDigPointSet                                m_digFidMri;            /**< The currently selected mri fiducials */
     FIFFLIB::FiffCoordTrans                                 m_transHeadMri;         /**< The resulting head-mri transformation */
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;

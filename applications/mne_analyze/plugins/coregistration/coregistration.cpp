@@ -46,10 +46,10 @@
 #include "disp/viewers/coregsettingsview.h"
 #include "fiff/fiff_dig_point_set.h"
 #include "mne/mne_bem.h"
+#include "mne/mne_project_to_surface.h"
 #include "rtprocessing/icp.h"
 
 #include <Eigen/Core>
-
 #include <stdio.h>
 //=============================================================================================================
 // QT INCLUDES
@@ -296,12 +296,19 @@ void CoRegistration::onFitFiducials()
 void CoRegistration::onFitICP()
 {
     // get values from view
-    bool bScale = m_pCoregSettingsView->getAutoScale();
     float fWeightLPA = m_pCoregSettingsView->getWeightLPA();
     float fWeightNAS = m_pCoregSettingsView->getWeightNAS();
     float fWeightRPA = m_pCoregSettingsView->getWeightRPA();
+    float fMaxDist = m_pCoregSettingsView->getOmmitDistance();
+    float fTol = m_pCoregSettingsView->getConvergence();
+    int iMaxIter = m_pCoregSettingsView->getMaxIter();
 
-    // init variables
+    // init surface points
+    MNEBem bemHead = *m_pBem.data();
+    MNEBemSurface::SPtr bemSurface = MNEBemSurface::SPtr::create(bemHead[0]);
+    MNEProjectToSurface::SPtr mneSurfacePoints = MNEProjectToSurface::SPtr::create(*bemSurface);
+
+    // init point cloud
     QList<int> lPickHSP({FIFFV_POINT_CARDINAL,FIFFV_POINT_HPI,FIFFV_POINT_EXTRA,FIFFV_POINT_EEG});
     FiffDigPointSet digSetHSP = m_digSetHead.pickTypes(lPickHSP);
 
@@ -329,11 +336,13 @@ void CoRegistration::onFitICP()
 
     MatrixXf matHspClean;
     VectorXi vecTake;
-
     // discard outliers
-    if(!RTPROCESSINGLIB::discard3DPointOutliers(mneSurfacePoints, matHsp, transHeadMri, vecTake, matHspClean, fMaxDist)) {
+    if(!RTPROCESSINGLIB::discard3DPointOutliers(mneSurfacePoints, matHsp, m_transHeadMri, vecTake, matHspClean, fMaxDist)) {
         qWarning() << "Discard outliers was not succesfull.";
     }
+    int iNDiscarded = vecWeightsICP.size() - vecTake.size();
+    m_pCoregSettingsView->setOmittedPoints(iNDiscarded);
+
     VectorXf vecWeightsICPClean(vecTake.size());
 
     for(int i = 0; i < vecTake.size(); ++i) {
@@ -341,9 +350,13 @@ void CoRegistration::onFitICP()
     }
 
     // icp
-    if(!RTPROCESSINGLIB::performIcp(mneSurfacePoints, matHspClean, transHeadMri, iMaxIter, fTol, vecWeightsICPClean)) {
+    if(!RTPROCESSINGLIB::performIcp(mneSurfacePoints, matHspClean, m_transHeadMri, iMaxIter, fTol, vecWeightsICPClean)) {
         qWarning() << "ICP was not succesfull.";
     }
+
+    // send event
+    QVariant data = QVariant::fromValue(m_transHeadMri);
+    m_pCommu->publishEvent(EVENT_TYPE::NEW_TRANS_AVAILABE, data);
 
     return;
 }
