@@ -129,6 +129,48 @@ public:
 
     QString getCurrentSelectedBem();
 
+    //=========================================================================================================
+    /**
+     * Get the maximum number of icp iterations.
+     *
+     * @return  The maximum nmber of iterations.
+     */
+    int getMaxIter();
+
+    //=========================================================================================================
+    /**
+     * Get the onvergence value.
+     *
+     * @return  The convergence value.
+     */
+    float getConvergence();
+
+    //=========================================================================================================
+    /**
+     * Get the auto scale state
+     *
+     * @return  The auto scale state.
+     */
+    bool getAutoScale();
+
+    //=========================================================================================================
+    /**
+     * Get the the maximum distance for digitizers from the surface
+     *
+     * @return  The maximum distance in m.
+     */
+    float getOmmitDistance();
+
+    //=========================================================================================================
+    /**
+     * Get the weights for LPA,RPA and NAsion
+     *
+     * @return  The weight.
+     */
+    float getWeightLPA();
+    float getWeightRPA();
+    float getWeightNAS();
+
 protected:
 
 private:
@@ -168,40 +210,6 @@ private:
      */
     void onStoreTrans();
 
-    //=========================================================================================================
-    /**
-     * Get the maximum number of icp iterations.
-     *
-     * @return  The maximum nmber of iterations.
-     */
-    int getMaxIter();
-
-    //=========================================================================================================
-    /**
-     * Get the onvergence value.
-     *
-     * @return  The convergence value.
-     */
-    float getConvergence();
-
-    //=========================================================================================================
-    /**
-     * Get the auto scale state
-     *
-     * @return  The auto scale state.
-     */
-    bool getAutoScale();
-
-    //=========================================================================================================
-    /**
-     * Get the weights for LPA,RPA and NAsion
-     *
-     * @return  The weight.
-     */
-    float getWeightLPA();
-    float getWeightRPA();
-    float getWeightNas();
-
     Ui::CoregSettingsViewWidget*    m_pUi;                  /**< The CoregSettingsViewWidget.*/
     QString                         m_sSettingsPath;        /**< The settings path to store the GUI settings to. */
 
@@ -229,49 +237,6 @@ signals:
      * @param[in] sFilePath    The file path to the digitizers.
      */
     void digFileChanged(const QString& sFilePath);
-
-    //=========================================================================================================
-    /**
-     * Emit this signal whenever the maximum distane from digitizer->surface changed.
-     *
-     * @param[in] fMaxDist    The maximum diesance to keep digitizers.
-     */
-    void maxDistChanged(const float fMaxDist);
-
-    //=========================================================================================================
-    /**
-     * Emit this signal whenever the maximum number of ICP iterations changed.
-     *
-     * @param[in] iMaxIter    The maximum number of iterations.
-     */
-    void maxIterChanged(const int iMaxIter);
-
-    //=========================================================================================================
-    /**
-     * Emit this signal whenever the convergence value changed.
-     *
-     * @param[in] fMaxDist    The convergence value.
-     */
-    void convergenceChanged(const float fConverge);
-
-    //=========================================================================================================
-    /**
-     * Emit this signal whenever the auto scale status changed.
-     *
-     * @param[in] bAutoScale    The auto scale state.
-     */
-    void autoScaleStatusChanged(const bool bAutoScale);
-
-    //=========================================================================================================
-    /**
-     * Emit this signal whenever weigths changed.
-     *
-     * @param[in] fWeitghtLPA    Weight LPA.
-     * @param[in] fWeitghtRPA    Weight RPA.
-     * @param[in] fWeitghtNas    Weight Nasion.
-     *
-     */
-    void weightsChanged(const float fWeitghtLPA, const float fWeitghtRPA, const float fWeitghtNas);
 
     //=========================================================================================================
     /**
