@@ -154,7 +154,7 @@ int main(int argc, char *argv[])
     QList<int> lPickHSP({FIFFV_POINT_CARDINAL,FIFFV_POINT_HPI,FIFFV_POINT_EXTRA,FIFFV_POINT_EEG});
     FiffDigPointSet digSetSrc = FiffDigPointSet(t_fileDig).pickTypes(lPickFiducials);   // Fiducials Head-Space
     FiffDigPointSet digSetDst = FiffDigPointSet(t_fileDig).pickTypes(lPickFiducials);
-    digSetDst.applyTransform(transHeadMriRef, false);                                   // Fiducials MRI-Space
+    digSetDst.applyTransform(transHeadMriRef, false);
     FiffDigPointSet digSetHsp = FiffDigPointSet(t_fileDig).pickTypes(lPickHSP);         // Head shape points Head-Space
 
     // Initial Fiducial Alignment
