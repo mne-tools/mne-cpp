@@ -315,3 +315,10 @@ void TriggerDetectionView::onDetectTriggers()
     emit detectTriggers(m_pUi->m_comboBox_triggerChannels->currentText(),
                         m_pUi->m_doubleSpinBox_detectionThresholdFirst->value()*pow(10, m_pUi->m_spinBox_detectionThresholdSecond->value()));
 }
+
+//=============================================================================================================
+
+QString TriggerDetectionView::getChannelName()
+{
+    return m_pUi->m_comboBox_triggerChannels->currentText();
+}
