@@ -74,7 +74,6 @@ using namespace FIFFLIB;
 
 CoRegistration::CoRegistration()
     : m_pCoregSettingsView(Q_NULLPTR)
-    , m_pBem(Q_NULLPTR)
 {
 }
 
@@ -239,6 +238,10 @@ void CoRegistration::onFiducialsChanged(const QString& sFilePath)
 
 void CoRegistration::onFitFiducials()
 {
+    if(m_digSetHead.isEmpty() || m_digFidMri.isEmpty()) {
+        return;
+    }
+
     // get values from view
     bool bScale = m_pCoregSettingsView->getAutoScale();
     float fWeightLPA = m_pCoregSettingsView->getWeightLPA();
@@ -295,6 +298,10 @@ void CoRegistration::onFitFiducials()
 
 void CoRegistration::onFitICP()
 {
+    if(m_digSetHead.isEmpty() || m_digFidMri.isEmpty() || m_pBem->isEmpty()) {
+        return;
+    }
+
     // get values from view
     float fWeightLPA = m_pCoregSettingsView->getWeightLPA();
     float fWeightNAS = m_pCoregSettingsView->getWeightNAS();

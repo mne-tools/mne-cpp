@@ -83,6 +83,11 @@ bool RTPROCESSINGLIB::performIcp(const MNEProjectToSurface::SPtr mneSurfacePoint
  * 239 - 255, 1992.
  */
 {
+    if(matPointCloud.rows() == 0){
+        qWarning() << "[RTPROCESSINGLIB::icp] Passed point cloud is empty.";
+        return false;
+    }
+
     // Initialization
     int iNP = matPointCloud.rows();             // The number of points
     float fMSEPrev,fMSE = 0.0;                  // The mean square error
