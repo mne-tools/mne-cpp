@@ -60,7 +60,8 @@ using namespace ANSHAREDLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-AveragingDataModel::AveragingDataModel(QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet, QObject* parent)
+AveragingDataModel::AveragingDataModel(QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet,
+                                       QObject* parent)
 : AbstractModel(parent)
 , m_pFiffEvokedSet(pEvokedSet)
 {
@@ -76,8 +77,12 @@ AveragingDataModel::~AveragingDataModel()
 
 //=============================================================================================================
 
-QVariant AveragingDataModel::data(const QModelIndex &index, int role) const
+QVariant AveragingDataModel::data(const QModelIndex &index,
+                                  int role) const
 {
+    Q_UNUSED(index);
+    Q_UNUSED(role);
+
     return QVariant::fromValue(m_pFiffEvokedSet);
 }
 
@@ -92,14 +97,16 @@ Qt::ItemFlags AveragingDataModel::flags(const QModelIndex &index) const
 
 int AveragingDataModel::rowCount(const QModelIndex &parent) const
 {
-    return 0;
+    Q_UNUSED(parent);
+    return 1;
 }
 
 //=============================================================================================================
 
 int AveragingDataModel::columnCount(const QModelIndex &parent) const
 {
-    return 0;
+    Q_UNUSED(parent);
+    return 1;
 }
 
 //=============================================================================================================
@@ -109,9 +116,3 @@ void AveragingDataModel::setEvokedSet(QSharedPointer<FIFFLIB::FiffEvokedSet> pEv
     m_pFiffEvokedSet = pEvokedSet;
 }
 
-//=============================================================================================================
-
-QSharedPointer<FIFFLIB::FiffEvokedSet> AveragingDataModel::getEvokedSet()
-{
-    return m_pFiffEvokedSet;
-}

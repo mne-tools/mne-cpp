@@ -129,7 +129,9 @@ QStringList AnnotationModel::getEventTypeList() const
 
 //=============================================================================================================
 
-bool AnnotationModel::insertRows(int position, int span, const QModelIndex & parent)
+bool AnnotationModel::insertRows(int position,
+                                 int span,
+                                 const QModelIndex & parent)
 {
     Q_UNUSED(parent);
 
@@ -210,7 +212,8 @@ int AnnotationModel::columnCount(const QModelIndex &parent) const
 
 //=============================================================================================================
 
-QVariant AnnotationModel::data(const QModelIndex &index, int role) const
+QVariant AnnotationModel::data(const QModelIndex &index,
+                               int role) const
 {
     if(role == Qt::TextAlignmentRole)
         return QVariant(Qt::AlignCenter | Qt::AlignVCenter);
@@ -304,7 +307,9 @@ QVariant AnnotationModel::data(const QModelIndex &index, int role) const
 
 //=============================================================================================================
 
-bool AnnotationModel::setData(const QModelIndex &index, const QVariant &value, int role)
+bool AnnotationModel::setData(const QModelIndex &index,
+                              const QVariant &value,
+                              int role)
 {
     if(index.row() >= m_dataSamples.size() || index.column() >= columnCount())
         return false;
@@ -380,7 +385,9 @@ Qt::ItemFlags AnnotationModel::flags(const QModelIndex &index) const
 
 //=============================================================================================================
 
-QVariant AnnotationModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant AnnotationModel::headerData(int section,
+                                     Qt::Orientation orientation,
+                                     int role) const
 {
     if(role != Qt::DisplayRole && role != Qt::TextAlignmentRole)
         return QVariant();
@@ -407,7 +414,9 @@ QVariant AnnotationModel::headerData(int section, Qt::Orientation orientation, i
 
 //=============================================================================================================
 
-bool AnnotationModel::removeRows(int position, int span, const QModelIndex &parent)
+bool AnnotationModel::removeRows(int position,
+                                 int span,
+                                 const QModelIndex &parent)
 {
     Q_UNUSED(parent);
 
@@ -433,7 +442,8 @@ bool AnnotationModel::removeRows(int position, int span, const QModelIndex &pare
 
 //=============================================================================================================
 
-void AnnotationModel::setFirstLastSample(int firstSample, int lastSample)
+void AnnotationModel::setFirstLastSample(int firstSample,
+                                         int lastSample)
 {
     m_iFirstSample = firstSample;
     m_iLastSample = lastSample;
@@ -594,7 +604,8 @@ void AnnotationModel::setLastType(int iType)
 
 //=============================================================================================================
 
-void AnnotationModel::updateFilteredSample(int iIndex, int iSample)
+void AnnotationModel::updateFilteredSample(int iIndex,
+                                           int iSample)
 {
     m_dataSamplesFiltered[iIndex] = iSample + m_iFirstSample;
 }
