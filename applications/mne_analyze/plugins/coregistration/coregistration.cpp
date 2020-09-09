@@ -239,9 +239,13 @@ void CoRegistration::onFiducialsChanged(const QString& sFilePath)
 
 void CoRegistration::onFitFiducials()
 {
-    bool bScale = true;
+    // get values from view
 
-    // Initial Fiducial Alignment
+    bool bScale = m_pCoregSettingsView->getAutoScale();
+    float fWeightLPA = m_pCoregSettingsView->getWeightLPA();
+    float fWeightNAS = m_pCoregSettingsView->getWeightNAS();
+    float fWeightRPA = m_pCoregSettingsView->getWeightRPA();
+
     // Declare variables
     FiffDigPointSet digSetFidHead = m_digFidHead.pickTypes({FIFFV_POINT_CARDINAL});
     FiffDigPointSet digSetFidMRI = m_digFidMri.pickTypes({FIFFV_POINT_CARDINAL});
@@ -258,10 +262,16 @@ void CoRegistration::onFitFiducials()
         matMri(i,0) = digSetFidMRI[i].r[0]; matMri(i,1) = digSetFidMRI[i].r[1]; matMri(i,2) = digSetFidMRI[i].r[2];
 
         // set standart weights
-        if(digSetFidHead[i].ident == FIFFV_POINT_NASION) {
-            vecWeights(i) = 10.0;
-        } else {
-            vecWeights(i) = 1.0;
+        switch (digSetFidHead[i].ident) {
+        case FIFFV_POINT_NASION:
+            vecWeights(i) = fWeightNAS;
+            break;
+        case FIFFV_POINT_LPA:
+            vecWeights(i) = fWeightLPA;
+            break;
+        case FIFFV_POINT_RPA:
+            vecWeights(i) = fWeightRPA;
+            break;
         }
     }
 
