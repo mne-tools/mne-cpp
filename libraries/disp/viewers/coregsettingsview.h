@@ -163,6 +163,14 @@ public:
 
     //=========================================================================================================
     /**
+     * Set the the number of omitted points
+     *
+     * @param[in] iN  The maximum distance in m.
+     */
+    void setOmittedPoints(const int iN);
+
+    //=========================================================================================================
+    /**
      * Get the weights for LPA,RPA and Nasion
      *
      * @return  The weight.
