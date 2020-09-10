@@ -1,10 +1,12 @@
 ---
-title: Event Manager
+title: Event System
 parent: MNE Analyze
 grand_parent: Develop
 nav_order: 2
 ---
-# Event Manager
+# Event System
+
+This guide covers the event system used in MNE Analyze, not to be confused with the [Event Manager plugin](../learn/analyze_annotationmanager).
 
 ## Overview
 
@@ -42,6 +44,25 @@ QVector<EVENT_TYPE> Averaging::getEventSubscriptions(void) const
     temp.push_back(VIEW_SETTINGS_CHANGED);
 
     return temp;
+}
+```
+
+Once subscribed, plugins can handle incoming events with `handleEvent()`. Below is how the Events plugin handles its events.
+
+```
+void AnnotationManager::handleEvent(QSharedPointer<Event> e)
+{
+    switch (e->getType()) {
+        case EVENT_TYPE::NEW_ANNOTATION_ADDED:
+            emit newAnnotationAvailable(e->getData().toInt());
+            onTriggerRedraw();
+            break;
+        case EVENT_TYPE::SELECTED_MODEL_CHANGED:
+            onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
+            break;
+        default:
+            qWarning() << "[AnnotationManager::handleEvent] Received an Event that is not handled by switch cases.";
+    }
 }
 ```
 
