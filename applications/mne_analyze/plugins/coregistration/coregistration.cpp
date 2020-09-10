@@ -141,6 +141,10 @@ QDockWidget *CoRegistration::getControl()
             this, &CoRegistration::onFitFiducials);
     connect(m_pCoregSettingsView, &CoregSettingsView::fitICP,
             this, &CoRegistration::onFitICP);
+    connect(m_pCoregSettingsView, &CoregSettingsView::fidStoreFileChanged,
+            this, &CoRegistration::onStoreFiducials);
+//    connect(m_pCoregSettingsView, &CoregSettingsView::transStoreFileChanged,
+//            this, &CoRegistration::onStoreTrans);
 
     onChangeSelectedBem(m_pCoregSettingsView->getCurrentSelectedBem());
 
@@ -368,3 +372,20 @@ void CoRegistration::onFitICP()
     return;
 }
 
+//=============================================================================================================
+
+void CoRegistration::onStoreFiducials(const QString& sFilePath)
+{
+    QFile fileDig(sFilePath);
+    m_digFidMri.write(fileDig);
+    return;
+}
+
+//=============================================================================================================
+
+//void CoRegistration::onStoreTrans(const QString& sFilePath)
+//{
+//    QFile fileDig(sFilePath);
+
+//    return;
+//}
