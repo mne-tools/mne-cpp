@@ -104,6 +104,7 @@ CoregSettingsView::CoregSettingsView(const QString& sSettingsPath,
             this, &CoregSettingsView::onStoreTrans);
     connect(m_pUi->m_qComboBox_BemItems, &QComboBox::currentTextChanged,
             this, &CoregSettingsView::changeSelectedBem, Qt::UniqueConnection);
+    m_pUi->m_qGroupBox_StoreTrans->hide();
 }
 
 //=============================================================================================================
@@ -188,17 +189,15 @@ void CoregSettingsView::onLoadFidFile()
 
 void CoregSettingsView::onStoreFidFile()
 {
-    QString t_sDirName = QFileDialog::getExistingDirectory(this,
-                                                           tr("Open directory to store fiducials"),
-                                                           QString(),
-                                                           QFileDialog::ShowDirsOnly
-                                                           | QFileDialog::DontResolveSymlinks);
+    QString sFileName = QFileDialog::getSaveFileName(Q_NULLPTR,
+                                                     tr("Save Fiducials"), "",
+                                                     tr("Fif file (*fiducials.fif)"));
 
-    QString t_sFileName = m_pUi->m_qLineEdit_FidStoreFileName->text();
-    QString t_sFilePath(t_sDirName + '/' + t_sFileName);
-    m_pUi->m_qLineEdit_FidStoreFileName->setText(t_sFilePath);
+    if (sFileName.isEmpty()) {
+        return;
+    }
 
-    emit fidStoreFileChanged(t_sFilePath);
+    emit fidStoreFileChanged(sFileName);
 }
 
 //=============================================================================================================
@@ -252,7 +251,6 @@ void CoregSettingsView::onStoreTrans()
 
     QString t_sFileName = m_pUi->m_qLineEdit_TransFileStore->text();
     QString t_sFilePath(t_sDirName + '/' + t_sFileName);
-    m_pUi->m_qLineEdit_FidStoreFileName->setText(t_sFilePath);
 
     emit transStoreFileChanged(t_sFilePath);
 }
@@ -334,3 +332,4 @@ void CoregSettingsView::setOmittedPoints(const int iN)
 {
     m_pUi->m_qLabel_NOmitted->setText(QString::number(iN));
 }
+
