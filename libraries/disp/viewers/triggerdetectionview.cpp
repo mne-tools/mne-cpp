@@ -318,7 +318,7 @@ void TriggerDetectionView::onDetectTriggers()
 
 //=============================================================================================================
 
-QString TriggerDetectionView::getChannelName()
+QString TriggerDetectionView::getSelectedStimChannel()
 {
     return m_pUi->m_comboBox_triggerChannels->currentText();
 }
