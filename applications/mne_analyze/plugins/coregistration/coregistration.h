@@ -150,6 +150,8 @@ private:
     /**
      * Call this funciton whenever new fiducials were loaded.
      *
+     *  @param[in] sFilePath     The file path to the new digitzers.
+     *
      */
     void onFiducialsChanged(const QString& sFilePath);
 
@@ -166,6 +168,24 @@ private:
      *
      */
     void onFitFiducials();
+
+//    //=========================================================================================================
+//    /**
+//     * Store the transformation to the given file path
+//     *
+//     * @param[in] sFilePath     The file path to store the transformation.
+//     *
+//     */
+//    void onStoreTrans(const QString& sFilePath);
+
+    //=========================================================================================================
+    /**
+     * Store the fiducials to the given file path
+     *
+     * @param[in] sFilePath     The file path to store the fiducials
+     *
+     */
+    void onStoreFiducials(const QString& sFilePath);
 
     QVector<QSharedPointer<ANSHAREDLIB::AbstractModel>>     m_vecBemModels;         /** Vector with all available Bem Models */
 
