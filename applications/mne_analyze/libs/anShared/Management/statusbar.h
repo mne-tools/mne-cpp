@@ -121,7 +121,7 @@ private:
 
     int m_iMsgTimeout;                                  /**< Timeout of one message in milliseconds. */
 
-    QProgressBar* m_pProgressBar;
+    QProgressBar* m_pProgressBar;                       /**< Loading bar that shows in the status bar when approporate vent is received */
 };
 
 //=============================================================================================================

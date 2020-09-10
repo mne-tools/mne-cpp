@@ -83,8 +83,8 @@ StatusBar::StatusBar(QWidget *pParent)
     m_pProgressBar->setMaximum(0);
     m_pProgressBar->setValue(0);
     m_pProgressBar->setTextVisible(false);
-    m_pProgressBar->setMaximumWidth(200);
-    this->addWidget(m_pProgressBar);
+    m_pProgressBar->setMaximumWidth(300);
+    this->addPermanentWidget(m_pProgressBar);
     m_pProgressBar->hide();
 }
 
@@ -109,11 +109,15 @@ void StatusBar::onNewMessageReceived(const QSharedPointer<Event> pEvent)
             break;
         }
         case EVENT_TYPE::LOADING_START : {
+            if(pEvent->getData().canConvert<QString>()) {
+                showMessage(pEvent->getData().toString(), m_iMsgTimeout);
+            }
             m_pProgressBar->show();
             break;
         }
         case EVENT_TYPE::LOADING_END : {
             m_pProgressBar->hide();
+            clearMessage();
             break;
         }
         default:

@@ -624,7 +624,7 @@ void AnnotationSettingsView::initTriggerDetect(const QSharedPointer<FIFFLIB::Fif
 void AnnotationSettingsView::onDetectTriggers(const QString &sChannelName,
                                               double dThreshold)
 {
-    emit loadingStart();
+    emit loadingStart("Detecting triggers...");
 
     m_Future = QtConcurrent::run(this, &AnnotationSettingsView::detectTriggerCalculations, sChannelName, dThreshold);
     m_FutureWatcher.setFuture(m_Future);
@@ -632,11 +632,10 @@ void AnnotationSettingsView::onDetectTriggers(const QString &sChannelName,
 
 //=============================================================================================================
 
-QMap<double,QList<int>> AnnotationSettingsView::detectTriggerCalculations(const QString &sChannelName, double dThreshold)
+QMap<double,QList<int>> AnnotationSettingsView::detectTriggerCalculations(const QString &sChannelName,
+                                                                          double dThreshold)
 {
     int iCurrentTriggerChIndex = 9999;
-
-    std::cout<< "2" << std::endl;
 
     for(int i = 0; i < m_pFiffInfo->chs.size(); ++i) {
         if(m_pFiffInfo->chs[i].ch_name == sChannelName) {
@@ -647,7 +646,6 @@ QMap<double,QList<int>> AnnotationSettingsView::detectTriggerCalculations(const 
 
     if(iCurrentTriggerChIndex == 9999){
         qWarning() << "[AnnotationSettingsView::onDetectTriggers] Channel Index not valid";\
-        emit loadingEnd();
         QMap<double,QList<int>> map;
         return map;
     }
@@ -668,7 +666,6 @@ QMap<double,QList<int>> AnnotationSettingsView::detectTriggerCalculations(const 
 
     for(QPair<int,double> pair : detectedTriggerSamples){
         mEventsinTypes[pair.second].append(pair.first);
-        QApplication::processEvents();
     }
 
     return mEventsinTypes;
@@ -726,7 +723,7 @@ void AnnotationSettingsView::createGroupsFromTriggers()
                           QColor("blue")};
 
     for (int i = 0; i < keyList.size(); i++){
-        newStimGroup(m_pTriggerDetectView->getChannelName(), static_cast<int>(keyList[i]), colors[i % 10]);
+        newStimGroup(m_pTriggerDetectView->getSelectedStimChannel(), static_cast<int>(keyList[i]), colors[i % 10]);
         groupChanged();
         for (int j : mEventGroupMap[keyList[i]]){
             m_pAnnModel->setSamplePos(j + iFirstSample);

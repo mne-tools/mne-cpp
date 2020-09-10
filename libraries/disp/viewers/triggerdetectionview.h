@@ -127,7 +127,7 @@ public:
      *
      * @return currently selected STIM channel
      */
-    QString getChannelName();
+    QString getSelectedStimChannel();
 
     //=========================================================================================================
     /**
