@@ -239,9 +239,9 @@ void AnnotationManager::onGroupsUpdated()
 
 //=============================================================================================================
 
-void AnnotationManager::triggerLoadingStart()
+void AnnotationManager::triggerLoadingStart(QString sMessage)
 {
-    m_pCommu->publishEvent(LOADING_START);
+    m_pCommu->publishEvent(LOADING_START, QVariant::fromValue(sMessage));
 }
 
 //=============================================================================================================

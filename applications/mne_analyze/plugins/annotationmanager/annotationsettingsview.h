@@ -163,8 +163,18 @@ signals:
      */
     void jumpToSelected();
 
-    void loadingStart();
+    //=========================================================================================================
+    /**
+     * ends event to trigger progress bar to appear
+     *
+     * @param [in] sMessage     message to appear
+     */
+    void loadingStart(QString sMessage = "");
 
+    //=========================================================================================================
+    /**
+     * Sends event to trigger progress bar to be hidden
+     */
     void loadingEnd();
 
 protected slots:
@@ -390,7 +400,7 @@ private:
      * @return      returns map of events sorted by groups based on threshold
      */
     QMap<double,QList<int>> detectTriggerCalculations(const QString& sChannelName,
-                                   double dThreshold);
+                                                      double dThreshold);
 
     Ui::EventWindowDockWidget*                      m_pUi;                          /** < Pointer to GUI elements */
 

@@ -149,9 +149,11 @@ private:
 
     //=============================================================================================================
     /**
-     * Sends event to trigger loading bar to appear
+     * Sends event to trigger loading bar to appear and sMessage to show
+     *
+     * @param [in] sMessage     loading bar message
      */
-    void triggerLoadingStart();
+    void triggerLoadingStart(QString sMessage);
 
     //=============================================================================================================
     /**
