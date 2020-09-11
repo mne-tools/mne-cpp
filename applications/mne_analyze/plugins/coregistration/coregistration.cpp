@@ -242,7 +242,7 @@ void CoRegistration::onFiducialsChanged(const QString& sFilePath)
 
 void CoRegistration::onFitFiducials()
 {
-    if(m_digSetHead.isEmpty() || m_digFidMri.isEmpty()) {
+    if(m_digSetHead.isEmpty() || m_digFidMri.isEmpty() || m_pBem->isEmpty()) {
         return;
     }
 
@@ -291,6 +291,14 @@ void CoRegistration::onFitFiducials()
     fiff_int_t iTo = FIFFV_COORD_MRI;
     m_transHeadMri = FiffCoordTrans::make(iFrom, iTo, matTrans);
 
+    // update GUI
+    Vector3f vecAngles;
+    Vector3f vecTrans = m_transHeadMri.trans.block(0,3,3,1);
+
+    getRotationAngles(m_transHeadMri.trans,vecAngles);
+    //m_pCoregSettingsView->setTransformation(vecTrans,vecAngles);
+    m_pCoregSettingsView->setTransformation(m_transHeadMri.trans);
+
     // send event
     QVariant data = QVariant::fromValue(m_transHeadMri);
     m_pCommu->publishEvent(EVENT_TYPE::NEW_TRANS_AVAILABE, data);
@@ -310,6 +318,9 @@ void CoRegistration::onFitICP()
     float fWeightLPA = m_pCoregSettingsView->getWeightLPA();
     float fWeightNAS = m_pCoregSettingsView->getWeightNAS();
     float fWeightRPA = m_pCoregSettingsView->getWeightRPA();
+    float fWeightHPI = m_pCoregSettingsView->getWeightHPI();
+    float fWeightHSP = m_pCoregSettingsView->getWeightHSP();
+    float fWeightEEG = m_pCoregSettingsView->getWeightEEG();
     float fMaxDist = m_pCoregSettingsView->getOmmitDistance();
     float fTol = m_pCoregSettingsView->getConvergence();
     int iMaxIter = m_pCoregSettingsView->getMaxIter();
@@ -320,7 +331,7 @@ void CoRegistration::onFitICP()
     MNEProjectToSurface::SPtr mneSurfacePoints = MNEProjectToSurface::SPtr::create(*bemSurface);
 
     // init point cloud
-    QList<int> lPickHSP({FIFFV_POINT_CARDINAL,FIFFV_POINT_HPI,FIFFV_POINT_EXTRA,FIFFV_POINT_EEG});
+    QList<int> lPickHSP = m_pCoregSettingsView->getDigitizerCheckState();
     FiffDigPointSet digSetHSP = m_digSetHead.pickTypes(lPickHSP);
 
     VectorXf vecWeightsICP(digSetHSP.size()); // Weigths vector
@@ -329,7 +340,8 @@ void CoRegistration::onFitICP()
     for(int i = 0; i < digSetHSP.size(); ++i) {
         matHsp(i,0) = digSetHSP[i].r[0]; matHsp(i,1) = digSetHSP[i].r[1]; matHsp(i,2) = digSetHSP[i].r[2];
         // set standart weights
-        if(digSetHSP[i].kind == FIFFV_POINT_CARDINAL) {
+        switch (digSetHSP[i].kind){
+        case FIFFV_POINT_CARDINAL:
             // set weights
             switch (digSetHSP[i].ident) {
             case FIFFV_POINT_NASION:
@@ -342,6 +354,16 @@ void CoRegistration::onFitICP()
                 vecWeightsICP(i) = fWeightRPA;
                 break;
             }
+            break;
+        case FIFFV_POINT_EEG:
+            vecWeightsICP(i) = fWeightEEG;
+            break;
+        case FIFFV_POINT_HPI:
+            vecWeightsICP(i) = fWeightHPI;
+            break;
+        case FIFFV_POINT_EXTRA:
+            vecWeightsICP(i) = fWeightHSP;
+            break;
         }
     }
 
@@ -365,12 +387,37 @@ void CoRegistration::onFitICP()
         qWarning() << "ICP was not succesfull.";
     }
 
+    // update GUI
+    Vector3f vecAngles;
+    Vector3f vecTrans = m_transHeadMri.trans.block(0,3,3,1);
+    getRotationAngles(m_transHeadMri.trans,vecAngles);
+
+    // m_pCoregSettingsView->setTransformation(vecTrans,vecAngles);
+    m_pCoregSettingsView->setTransformation(m_transHeadMri.trans);
     // send event
     QVariant data = QVariant::fromValue(m_transHeadMri);
     m_pCommu->publishEvent(EVENT_TYPE::NEW_TRANS_AVAILABE, data);
 
     return;
 }
+
+//=============================================================================================================
+
+void CoRegistration::getRotationAngles(const Matrix4f& matTrans, Vector3f& vecAngles)
+{
+    float fS1,fC1,fC2;
+
+    vecAngles(0) = std::atan2(matTrans(2, 1), matTrans(2, 2));  // x
+    fC2 = std::sqrt(std::pow(matTrans(0, 0),2) + std::pow(matTrans(1, 0),2));
+    vecAngles(1) = std::atan2(-matTrans(2, 0), fC2);            // y
+    fS1 = std::sin(vecAngles(0));
+    fC1 = std::cos(vecAngles(0));
+    vecAngles(2) = std::atan2(fS1 * matTrans(0, 2) - fC1 * matTrans(0, 1), fC1 * matTrans(1, 1) - fS1 * matTrans(1, 2));    // z
+
+    return;
+}
+
+
 
 //=============================================================================================================
 
