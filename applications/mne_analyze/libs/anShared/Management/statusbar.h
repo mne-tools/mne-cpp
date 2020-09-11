@@ -51,6 +51,7 @@
 #include <QStatusBar>
 #include <QLabel>
 #include <QStack>
+#include <QPointer>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -130,7 +131,7 @@ private:
 
     QStack<QString>             m_LoadingStack;             /** Keeps the currently loading messages */
 
-    QWidget* m_pHoverWidget;
+    QPointer<QWidget>           m_pHoverWidget;
 };
 
 //=============================================================================================================
