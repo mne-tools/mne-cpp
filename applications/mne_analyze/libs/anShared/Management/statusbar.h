@@ -118,6 +118,10 @@ private:
      */
     void onNewMessageReceived(const QSharedPointer<ANSHAREDLIB::Event> pEvent);
 
+    void enterEvent(QEvent* event);
+
+    void leaveEvent(QEvent* event);
+
     ANSHAREDLIB::Communicator*  m_pCommunicator;            /**< Vector containing all plugins. */
 
     int                         m_iMsgTimeout;              /**< Timeout of one message in milliseconds. */
@@ -126,6 +130,7 @@ private:
 
     QStack<QString>             m_LoadingStack;             /** Keeps the currently loading messages */
 
+    QWidget* m_pHoverWidget;
 };
 
 //=============================================================================================================

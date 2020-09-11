@@ -50,6 +50,9 @@
 #include <QLabel>
 #include <QDebug>
 #include <QProgressBar>
+#include <QMenu>
+#include <QHoverEvent>
+#include <QVBoxLayout>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -143,6 +146,35 @@ void StatusBar::onNewMessageReceived(const QSharedPointer<Event> pEvent)
             qWarning() << "[StatusBar::onNewMessageReceived] Received a message/event that is not handled by switch-cases";
             break;
     }
+}
+
+//=============================================================================================================
+
+void StatusBar::enterEvent(QEvent *event){
+    qDebug() << "StatusBar::enterEvent";
+
+    m_pHoverWidget = new QWidget();
+    m_pHoverWidget->setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
+
+    QVBoxLayout* layout = new QVBoxLayout(m_pHoverWidget);
+    m_pHoverWidget->setLayout(layout);
+
+    for (QString message: m_LoadingStack){
+        layout->addWidget(new QLabel(message));
+    }
+    m_pHoverWidget->move(this->mapToGlobal(static_cast<QHoverEvent*>(event)->pos()));
+    m_pHoverWidget->show();
+
+    QWidget::enterEvent(event);
+}
+
+//=============================================================================================================
+
+void StatusBar::leaveEvent(QEvent *event){
+    qDebug() << "StatusBar::leaveEvent";
+    m_pHoverWidget->hide();
+    delete  m_pHoverWidget;
+    QWidget::leaveEvent(event);
 }
 
 //=============================================================================================================
