@@ -140,9 +140,32 @@ QDockWidget* View3D::getControl()
     // Coregistration Settings
     DISP3DLIB::Data3DTreeDelegate* pData3DTreeDelegate = new DISP3DLIB::Data3DTreeDelegate(this);
 
-    m_pControl3DView = new DISPLIB::Control3DView(QString("MNEANALYZE/%1").arg(this->getName()));
+    QStringList slControlFlags;
+    slControlFlags << "Data" << "View" << "Light";
+    m_pControl3DView = new DISPLIB::Control3DView(QString("MNEANALYZE/%1").arg(this->getName()), Q_NULLPTR, slControlFlags);
     m_pControl3DView->setDelegate(pData3DTreeDelegate);
     m_pControl3DView->setModel(m_p3DModel.data());
+
+//    connect(m_pControl3DView, &Control3DView::sceneColorChanged,
+//            m_pView3D, &DISP3DLIB::View3D::setSceneColor);
+
+//    connect(m_pControl3DView, &Control3DView::rotationChanged,
+//            m_pView3D, &DISP3DLIB::View3D::startStopModelRotation);
+
+//    connect(m_pControl3DView, &Control3DView::showCoordAxis,
+//            m_pView3D, &DISP3DLIB::View3D::toggleCoordAxis);
+
+//    connect(m_pControl3DView, &Control3DView::showFullScreen,
+//            m_pView3D, &DISP3DLIB::View3D::showFullScreen);
+
+//    connect(m_pControl3DView, &Control3DView::lightColorChanged,
+//            m_pView3D, &DISP3DLIB::View3D::setLightColor);
+
+//    connect(m_pControl3DView, &Control3DView::lightIntensityChanged,
+//            m_pView3D, &DISP3DLIB::View3D::setLightIntensity);
+
+//    connect(m_pControl3DView, &Control3DView::takeScreenshotChanged,
+//            m_pView3D, &DISP3DLIB::View3D::takeScreenshot);
 
     QDockWidget* pControlDock = new QDockWidget(getName());
     pControlDock->setAllowedAreas(Qt::RightDockWidgetArea | Qt::LeftDockWidgetArea);
