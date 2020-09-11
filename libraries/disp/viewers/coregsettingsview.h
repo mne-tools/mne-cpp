@@ -200,7 +200,7 @@ public:
      * Set the transformation received from the ICP  algorithm
      *
      * @param[in] vecTrans    The traslation vector.
-     * @param[in] vecAngles   The rotation angle vector.
+     * @param[in] vecAngles   The rotation angle vector in rad.
      */
     void setTransformation(const Eigen::Vector3f& vecTrans, const Eigen::Vector3f& vecAngles);
     void setTransformation(const Eigen::Matrix4f matTrans);
@@ -228,15 +228,9 @@ private:
 
     //=========================================================================================================
     /**
-     * Discard digitizers with maximum distance to surface
+     * Load the transformation.
      */
-    void onMaxDistChanged();
-
-    //=========================================================================================================
-    /**
-     * Weights changed.
-     */
-    void onWeigthsChanged();
+    void onLoadTrans();
 
     //=========================================================================================================
     /**
@@ -288,12 +282,21 @@ signals:
 
     //=========================================================================================================
     /**
-     * Emit this signal whenever icp alignment is requested.
+     * Emit this signal whenever ithe transformation should be stored.
      *
      * @param[in] sFilePath    The file path to store the transformation.
      *
      */
-    void transStoreFileChanged(const QString& sFilePath);
+    void storeTrans(const QString& sFilePath);
+
+    //=========================================================================================================
+    /**
+     * Emit this signal whenever ithe transformation should be loaded.
+     *
+     * @param[in] sFilePath    The file path to load the transformation.
+     *
+     */
+    void loadTrans(const QString& sFilePath);
 
     //=========================================================================================================
     /**

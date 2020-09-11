@@ -150,10 +150,19 @@ private:
     /**
      * Call this funciton whenever new fiducials were loaded.
      *
-     *  @param[in] sFilePath     The file path to the new digitzers.
+     * @param[in] sFilePath     The file path to the new digitzers.
      *
      */
     void onFiducialsChanged(const QString& sFilePath);
+
+    //=========================================================================================================
+    /**
+     * Load existing transformation from file
+     *
+     * @param[in] sFilePath     The file path to the transformation.
+     *
+     */
+    void onLoadTrans(const QString& sFilePath);
 
     //=========================================================================================================
     /**

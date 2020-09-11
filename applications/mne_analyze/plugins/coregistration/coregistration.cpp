@@ -143,7 +143,7 @@ QDockWidget *CoRegistration::getControl()
             this, &CoRegistration::onFitICP);
     connect(m_pCoregSettingsView, &CoregSettingsView::fidStoreFileChanged,
             this, &CoRegistration::onStoreFiducials);
-//    connect(m_pCoregSettingsView, &CoregSettingsView::transStoreFileChanged,
+//    connect(m_pCoregSettingsView, &CoregSettingsView::storeTrans,
 //            this, &CoRegistration::onStoreTrans);
 
     onChangeSelectedBem(m_pCoregSettingsView->getCurrentSelectedBem());
@@ -243,6 +243,8 @@ void CoRegistration::onFiducialsChanged(const QString& sFilePath)
 void CoRegistration::onFitFiducials()
 {
     if(m_digSetHead.isEmpty() || m_digFidMri.isEmpty() || m_pBem->isEmpty()) {
+        qWarning() << "[CoRegistration::onFitFiducials] Make sure to load all the data necessary data.";
+
         return;
     }
 
@@ -252,9 +254,14 @@ void CoRegistration::onFitFiducials()
     float fWeightNAS = m_pCoregSettingsView->getWeightNAS();
     float fWeightRPA = m_pCoregSettingsView->getWeightRPA();
 
+    std::cout << fWeightLPA << " " << fWeightNAS<< " " << fWeightRPA << std::endl;
+
+
     // Declare variables
     FiffDigPointSet digSetFidHead = m_digSetHead.pickTypes({FIFFV_POINT_CARDINAL});
     FiffDigPointSet digSetFidMRI = m_digFidMri.pickTypes({FIFFV_POINT_CARDINAL});
+
+    std::cout << digSetFidHead.size() << " " << digSetFidMRI.size() << std::endl;
 
     Matrix3f matHead(digSetFidHead.size(),3);
     Matrix3f matMri(digSetFidMRI.size(),3);
@@ -291,6 +298,8 @@ void CoRegistration::onFitFiducials()
     fiff_int_t iTo = FIFFV_COORD_MRI;
     m_transHeadMri = FiffCoordTrans::make(iFrom, iTo, matTrans);
 
+    m_transHeadMri.print();
+
     // update GUI
     Vector3f vecAngles;
     Vector3f vecTrans = m_transHeadMri.trans.block(0,3,3,1);
@@ -311,6 +320,7 @@ void CoRegistration::onFitFiducials()
 void CoRegistration::onFitICP()
 {
     if(m_digSetHead.isEmpty() || m_digFidMri.isEmpty() || m_pBem->isEmpty()) {
+        qWarning() << "[CoRegistration::onFitICP] Make sure to load all the data necessary data.";
         return;
     }
 
@@ -341,29 +351,29 @@ void CoRegistration::onFitICP()
         matHsp(i,0) = digSetHSP[i].r[0]; matHsp(i,1) = digSetHSP[i].r[1]; matHsp(i,2) = digSetHSP[i].r[2];
         // set standart weights
         switch (digSetHSP[i].kind){
-        case FIFFV_POINT_CARDINAL:
-            // set weights
-            switch (digSetHSP[i].ident) {
-            case FIFFV_POINT_NASION:
-                vecWeightsICP(i) = fWeightNAS;
+            case FIFFV_POINT_CARDINAL:
+                // set weights
+                switch (digSetHSP[i].ident) {
+                    case FIFFV_POINT_NASION:
+                        vecWeightsICP(i) = fWeightNAS;
+                        break;
+                    case FIFFV_POINT_LPA:
+                        vecWeightsICP(i) = fWeightLPA;
+                        break;
+                    case FIFFV_POINT_RPA:
+                        vecWeightsICP(i) = fWeightRPA;
+                        break;
+                }
                 break;
-            case FIFFV_POINT_LPA:
-                vecWeightsICP(i) = fWeightLPA;
+            case FIFFV_POINT_EEG:
+                vecWeightsICP(i) = fWeightEEG;
                 break;
-            case FIFFV_POINT_RPA:
-                vecWeightsICP(i) = fWeightRPA;
+            case FIFFV_POINT_HPI:
+                vecWeightsICP(i) = fWeightHPI;
                 break;
-            }
-            break;
-        case FIFFV_POINT_EEG:
-            vecWeightsICP(i) = fWeightEEG;
-            break;
-        case FIFFV_POINT_HPI:
-            vecWeightsICP(i) = fWeightHPI;
-            break;
-        case FIFFV_POINT_EXTRA:
-            vecWeightsICP(i) = fWeightHSP;
-            break;
+            case FIFFV_POINT_EXTRA:
+                vecWeightsICP(i) = fWeightHSP;
+                break;
         }
     }
 
@@ -425,6 +435,32 @@ void CoRegistration::onStoreFiducials(const QString& sFilePath)
 {
     QFile fileDig(sFilePath);
     m_digFidMri.write(fileDig);
+    return;
+}
+
+//=============================================================================================================
+
+void CoRegistration::onLoadTrans(const QString& sFilePath)
+{
+    QFile fileTrans(sFilePath);
+    FiffCoordTrans transTemp = FiffCoordTrans(fileTrans);
+    if(transTemp.from == FIFFV_COORD_HEAD && transTemp.to == FIFFV_COORD_MRI) {
+        m_transHeadMri = FiffCoordTrans(transTemp);
+
+        // send event
+        QVariant data = QVariant::fromValue(m_transHeadMri);
+        m_pCommu->publishEvent(EVENT_TYPE::NEW_TRANS_AVAILABE, data);
+
+    } else if (transTemp.from == FIFFV_COORD_MRI && transTemp.to == FIFFV_COORD_HEAD) {
+        transTemp.invert_transform();
+        m_transHeadMri = FiffCoordTrans(transTemp);
+
+        // send event
+        QVariant data = QVariant::fromValue(m_transHeadMri);
+        m_pCommu->publishEvent(EVENT_TYPE::NEW_TRANS_AVAILABE, data);
+    } else {
+        qDebug() << "[CoRegistration::onLoadTrans] Loaded Transformation from:" << FiffCoordTrans::frame_name(transTemp.from) << "to:" << FiffCoordTrans::frame_name(transTemp.to) << "is not suitable for co-registration.";
+    }
     return;
 }
 
