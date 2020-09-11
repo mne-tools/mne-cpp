@@ -27,16 +27,16 @@ Make sure you have one of the following compilers installed:
 
 | Windows | Linux | MacOS |
 |---------|-------|-------|
-| min. MSVC 2015 (We recommend the [MSVC 2017 Community Version](https://visualstudio.microsoft.com/vs/older-downloads/){:target="_blank" rel="noopener"} compiler. During install exclude everything except for VC++, Win 10 SDK and ATL support) | min. [GCC 5.3.1](https://gcc.gnu.org/releases.html){:target="_blank" rel="noopener"} | min. [Clang 3.5](https://developer.apple.com/xcode/){:target="_blank" rel="noopener"}|
+| min. MSVC 2015 (We recommend the [MSVC 2019 Community Version](https://visualstudio.microsoft.com/vs/older-downloads/){:target="_blank" rel="noopener"} compiler. During install exclude everything except for VC++, Win 10 SDK and ATL support) | min. [GCC 5.3.1](https://gcc.gnu.org/releases.html){:target="_blank" rel="noopener"} | min. [Clang 3.5](https://developer.apple.com/xcode/){:target="_blank" rel="noopener"}|
 
 ## Build a Static Version of Qt
 
 ### Get the Qt Aource Code
 
-Clone the current Qt version. Currently, MNE-CPP uses four Qt modules: QtBase, QtCharts, QtSvg and Qt3D. QtBase subdivides in other modules reflecting most of the Qt functionality (core, gui, widgets, etc). In order to setup the sources for Qt 5.14.2 type:
+Clone the current Qt version. Currently, MNE-CPP uses four Qt modules: QtBase, QtCharts, QtSvg and Qt3D. QtBase subdivides in other modules reflecting most of the Qt functionality (core, gui, widgets, etc). In order to setup the sources for Qt 5.15.1 type:
 
 ```
-git clone https://code.qt.io/qt/qt5.git -b 5.14.2  
+git clone https://code.qt.io/qt/qt5.git -b 5.15.1  
 cd qt5
 ```
 
@@ -101,10 +101,10 @@ mkdir qt5_shadow
 cd qt5_shadow
 ```
 
-Setup the visual studio compiler by starting the `VS2017 x64 Native Tools Command Prompt` or by typing (assuming you are using MSVC 2017):
+Setup the visual studio compiler by starting the `VS2019 x64 Native Tools Command Prompt` or by typing (assuming you are using MSVC 2017):
     
 ```
-cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 15.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
+cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
 Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
 ```
 
