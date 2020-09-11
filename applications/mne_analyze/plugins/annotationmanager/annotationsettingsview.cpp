@@ -624,6 +624,9 @@ void AnnotationSettingsView::initTriggerDetect(const QSharedPointer<FIFFLIB::Fif
 void AnnotationSettingsView::onDetectTriggers(const QString &sChannelName,
                                               double dThreshold)
 {
+    if(m_FutureWatcher.isRunning()){
+        return;
+    }
     emit loadingStart("Detecting triggers...");
 
     m_Future = QtConcurrent::run(this, &AnnotationSettingsView::detectTriggerCalculations, sChannelName, dThreshold);
@@ -733,5 +736,5 @@ void AnnotationSettingsView::createGroupsFromTriggers()
 
     emit triggerRedraw();
     emit groupsUpdated();
-    //emit loadingEnd("Detecting triggers...");
+    emit loadingEnd("Detecting triggers...");
 }

@@ -101,7 +101,7 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager
         qWarning() << "[MainWindow::MainWindow] Plugin manager is nullptr!";
     }
 
-    StatusBar* statusBar = new StatusBar();
+    StatusBar* statusBar = new StatusBar(this);
 
     this->setStatusBar(statusBar);
 
