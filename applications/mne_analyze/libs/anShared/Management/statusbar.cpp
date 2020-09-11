@@ -78,6 +78,7 @@ StatusBar::StatusBar(QWidget *pParent)
             this, &StatusBar::onNewMessageReceived);
 
     m_pProgressBar = new QProgressBar(this);
+    m_pProgressBar->setAttribute(Qt::WA_Hover);
 
     m_pProgressBar->setMinimum(0);
     m_pProgressBar->setMaximum(0);
@@ -110,14 +111,32 @@ void StatusBar::onNewMessageReceived(const QSharedPointer<Event> pEvent)
         }
         case EVENT_TYPE::LOADING_START : {
             if(pEvent->getData().canConvert<QString>()) {
-                showMessage(pEvent->getData().toString(), m_iMsgTimeout);
+                m_LoadingStack.push(pEvent->getData().toString());
+                //showMessage(pEvent->getData().toString(), m_iMsgTimeout);
+                showMessage(m_LoadingStack.top(), m_iMsgTimeout);
             }
             m_pProgressBar->show();
             break;
         }
         case EVENT_TYPE::LOADING_END : {
-            m_pProgressBar->hide();
-            clearMessage();
+            if(pEvent->getData().canConvert<QString>()){
+                if(m_LoadingStack.contains(pEvent->getData().toString())){
+                    m_LoadingStack[m_LoadingStack.indexOf(pEvent->getData().toString())] = "";
+                }
+            }
+            if(!m_LoadingStack.isEmpty()){
+                while(m_LoadingStack.top() == ""){
+                    m_LoadingStack.pop();
+                    if(m_LoadingStack.isEmpty()){
+                        m_pProgressBar->hide();
+                        clearMessage();
+                        break;
+                    }
+                }
+            }
+            if(!m_LoadingStack.isEmpty()){
+                showMessage(m_LoadingStack.top(), m_iMsgTimeout);
+            }
             break;
         }
         default:

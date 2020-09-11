@@ -246,7 +246,7 @@ void AnnotationManager::triggerLoadingStart(QString sMessage)
 
 //=============================================================================================================
 
-void AnnotationManager::triggerLoadingEnd()
+void AnnotationManager::triggerLoadingEnd(QString sMessage)
 {
-    m_pCommu->publishEvent(LOADING_END);
+    m_pCommu->publishEvent(LOADING_END, QVariant::fromValue(sMessage));
 }

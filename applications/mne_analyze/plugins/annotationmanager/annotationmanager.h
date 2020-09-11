@@ -159,7 +159,7 @@ private:
     /**
      * Sends event to hide loading bar
      */
-    void triggerLoadingEnd();
+    void triggerLoadingEnd(QString sMessage);
 
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals */
 

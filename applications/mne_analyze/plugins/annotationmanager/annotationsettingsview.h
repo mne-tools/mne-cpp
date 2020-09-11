@@ -169,13 +169,13 @@ signals:
      *
      * @param [in] sMessage     message to appear
      */
-    void loadingStart(QString sMessage = "");
+    void loadingStart(QString sMessage = "Loading Events...");
 
     //=========================================================================================================
     /**
      * Sends event to trigger progress bar to be hidden
      */
-    void loadingEnd();
+    void loadingEnd(QString sMessage = "Loading Events...");
 
 protected slots:
 
