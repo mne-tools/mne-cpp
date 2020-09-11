@@ -134,7 +134,6 @@ bool RTPROCESSINGLIB::performIcp(const MNEProjectToSurface::SPtr mneSurfacePoint
         }
         fMSEPrev = fMSE;
         qInfo() << "[RTPROCESSINGLIB::icp] ICP iteration " << iIter + 1 << " with RMSE: " << std::sqrt(std::fabs(fMSE)) * 1000 << " mm.";
-        std::cout << "[RTPROCESSINGLIB::icp] ICP iteration " << iIter + 1 << " with RMSE: " << std::sqrt(std::fabs(fMSE)) * 1000 << " mm." << std::endl;
     }
     transFromTo = transICP;
 
