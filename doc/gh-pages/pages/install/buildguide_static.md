@@ -83,7 +83,7 @@ Setup the following dependencies:
 
 * Install [Perl](https://www.activestate.com/products/perl/downloads/){:target="_blank" rel="noopener"} and add it to `PATH`
 * Install [Python](https://www.python.org/downloads/){:target="_blank" rel="noopener"} and add it to `PATH`
-* Install MSVC 2015 or higher (We recommend the [MSVC 2017 Community Version](https://visualstudio.microsoft.com/vs/older-downloads/){:target="_blank" rel="noopener"})
+* Install MSVC 2015 or higher (We recommend the [MSVC 2019 Community Version](https://visualstudio.microsoft.com/vs/older-downloads/){:target="_blank" rel="noopener"})
 * Install the [Windows 10 SDK](https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk/){:target="_blank" rel="noopener"} (can also be installed via the MSVC community edition installer)
 * If you want to use multiple cores (MSVC's `nmake` does not support multicore usage), install the [jom compiler](http://download.qt.io/official_releases/jom/jom.zip){:target="_blank" rel="noopener"} and add it to `PATH`
 
