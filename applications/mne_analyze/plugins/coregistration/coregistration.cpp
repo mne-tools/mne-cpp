@@ -49,8 +49,14 @@
 #include "mne/mne_project_to_surface.h"
 #include "rtprocessing/icp.h"
 
-#include <Eigen/Core>
 #include <stdio.h>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+#include <Eigen/Core>
+#include <Eigen/Geometry>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -143,6 +149,8 @@ QDockWidget *CoRegistration::getControl()
             this, &CoRegistration::onFitICP);
     connect(m_pCoregSettingsView, &CoregSettingsView::fidStoreFileChanged,
             this, &CoRegistration::onStoreFiducials);
+    connect(m_pCoregSettingsView, &CoregSettingsView::transParamChanged,
+            this, &CoRegistration::onUpdateTrans);
 //    connect(m_pCoregSettingsView, &CoregSettingsView::storeTrans,
 //            this, &CoRegistration::onStoreTrans);
 
@@ -301,12 +309,11 @@ void CoRegistration::onFitFiducials()
     m_transHeadMri.print();
 
     // update GUI
-    Vector3f vecAngles;
-    Vector3f vecTrans = m_transHeadMri.trans.block(0,3,3,1);
-
-    getRotationAngles(m_transHeadMri.trans,vecAngles);
-    //m_pCoregSettingsView->setTransformation(vecTrans,vecAngles);
-    m_pCoregSettingsView->setTransformation(m_transHeadMri.trans);
+    Vector3f vecRot;
+    Vector3f vecScale;
+    Vector3f vecTrans;
+    getParamFromTrans(m_transHeadMri.trans,vecRot,vecTrans,vecScale);
+    m_pCoregSettingsView->setTransParams(vecTrans,vecRot,vecScale);
 
     // send event
     QVariant data = QVariant::fromValue(m_transHeadMri);
@@ -398,12 +405,12 @@ void CoRegistration::onFitICP()
     }
 
     // update GUI
-    Vector3f vecAngles;
-    Vector3f vecTrans = m_transHeadMri.trans.block(0,3,3,1);
-    getRotationAngles(m_transHeadMri.trans,vecAngles);
+    Vector3f vecRot;
+    Vector3f vecScale;
+    Vector3f vecTrans;
+    getParamFromTrans(m_transHeadMri.trans,vecRot,vecTrans,vecScale);
+    m_pCoregSettingsView->setTransParams(vecTrans,vecRot,vecScale);
 
-    // m_pCoregSettingsView->setTransformation(vecTrans,vecAngles);
-    m_pCoregSettingsView->setTransformation(m_transHeadMri.trans);
     // send event
     QVariant data = QVariant::fromValue(m_transHeadMri);
     m_pCommu->publishEvent(EVENT_TYPE::NEW_TRANS_AVAILABE, data);
@@ -413,21 +420,75 @@ void CoRegistration::onFitICP()
 
 //=============================================================================================================
 
-void CoRegistration::getRotationAngles(const Matrix4f& matTrans, Vector3f& vecAngles)
+void CoRegistration::onUpdateTrans()
 {
-    float fS1,fC1,fC2;
+    Vector3f vecRot;
+    Vector3f vecScale;
+    Vector3f vecTrans;
+    Matrix4f matTrans;
 
-    vecAngles(0) = std::atan2(matTrans(2, 1), matTrans(2, 2));  // x
-    fC2 = std::sqrt(std::pow(matTrans(0, 0),2) + std::pow(matTrans(1, 0),2));
-    vecAngles(1) = std::atan2(-matTrans(2, 0), fC2);            // y
-    fS1 = std::sin(vecAngles(0));
-    fC1 = std::cos(vecAngles(0));
-    vecAngles(2) = std::atan2(fS1 * matTrans(0, 2) - fC1 * matTrans(0, 1), fC1 * matTrans(1, 1) - fS1 * matTrans(1, 2));    // z
+    m_pCoregSettingsView->getTransParams(vecRot,vecTrans,vecScale);
+
+    getTransFromParam(matTrans,vecRot,vecTrans,vecScale);
+
+    // update transformation
+    // send event
+    m_transHeadMri.trans = matTrans;
+    QVariant data = QVariant::fromValue(m_transHeadMri);
+    m_pCommu->publishEvent(EVENT_TYPE::NEW_TRANS_AVAILABE, data);
 
     return;
 }
 
+//=============================================================================================================
 
+void CoRegistration::getParamFromTrans(const Matrix4f& matTrans,
+                                       Vector3f& vecRot,
+                                       Vector3f& vecTrans,
+                                       Vector3f& vecScale)
+{
+    // get rotation in rad
+    Matrix3f matRot = matTrans.block(0,0,3,3);
+    vecRot = matRot.eulerAngles(0,1,2);
+
+    // get scaling parameters
+    vecScale(0) = matRot(0,0);
+    vecScale(1) = matRot(1,1);
+    vecScale(2) = matRot(2,2);
+
+    // get scaling parameters
+    vecTrans = m_transHeadMri.trans.block(0,3,3,1);
+
+    return;
+}
+
+//=============================================================================================================
+
+void CoRegistration::getTransFromParam(Matrix4f& matTrans,
+                                       const Vector3f& vecRot,
+                                       const Vector3f& vecTrans,
+                                       const Vector3f& vecScale)
+{
+    // get rotation matrix
+    Eigen::AngleAxisf rollAngle(vecRot(2), Eigen::Vector3f::UnitZ());
+    Eigen::AngleAxisf yawAngle(vecRot(1), Eigen::Vector3f::UnitY());
+    Eigen::AngleAxisf pitchAngle(vecRot(0), Eigen::Vector3f::UnitX());
+
+    Eigen::Quaternion<float> quat = rollAngle * yawAngle * pitchAngle;
+
+    matTrans.block(0,0,3,3) = quat.matrix();
+
+    // get translation part
+    matTrans.block(0,3,3,1) = vecTrans;
+
+    // apply scaling
+    Matrix4f matScale = Matrix4f::Identity();
+    matScale(0,0) = vecScale(0);
+    matScale(1,1) = vecScale(1);
+    matScale(2,2) = vecScale(2);
+
+    matTrans = matTrans * matScale;
+}
 
 //=============================================================================================================
 
