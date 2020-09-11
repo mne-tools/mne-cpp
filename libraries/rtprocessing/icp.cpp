@@ -133,11 +133,12 @@ bool RTPROCESSINGLIB::performIcp(const MNEProjectToSurface::SPtr mneSurfacePoint
             return true;
         }
         fMSEPrev = fMSE;
-        qInfo() << "[RTPROCESSINGLIB::icp] ICP iteration " << iIter + 1 << " with RMSE: " << std::sqrt(fMSE) * 1000 << " mm.";
-
+        qInfo() << "[RTPROCESSINGLIB::icp] ICP iteration " << iIter + 1 << " with RMSE: " << std::sqrt(std::fabs(fMSE)) * 1000 << " mm.";
+        std::cout << "[RTPROCESSINGLIB::icp] ICP iteration " << iIter + 1 << " with RMSE: " << std::sqrt(std::fabs(fMSE)) * 1000 << " mm." << std::endl;
     }
+    transFromTo = transICP;
 
-    qWarning() << "[RTPROCESSINGLIB::icp] Maximum number of " << iMaxIter << " Iterations exceeded with RMSE: " << std::sqrt(fMSE) * 1000 << " mm.";
+    qWarning() << "[RTPROCESSINGLIB::icp] Maximum number of " << iMaxIter << " Iterations exceeded with RMSE: " << std::sqrt(std::fabs(fMSE)) * 1000 << " mm.";
     return false;
 }
 
