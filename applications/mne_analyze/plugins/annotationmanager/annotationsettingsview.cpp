@@ -733,5 +733,5 @@ void AnnotationSettingsView::createGroupsFromTriggers()
 
     emit triggerRedraw();
     emit groupsUpdated();
-    emit loadingEnd("Detecting triggers...");
+    //emit loadingEnd("Detecting triggers...");
 }
