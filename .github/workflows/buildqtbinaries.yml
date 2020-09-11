@@ -71,7 +71,7 @@ jobs:
         path: qt5_5151_static_binaries_macos.tar.gz
 
   GenerateWinStaticBinaries:
-    runs-on: windows-2016
+    runs-on: windows-2019
 
     steps:
     - name: Clone repository
