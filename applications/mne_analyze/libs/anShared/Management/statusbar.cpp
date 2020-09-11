@@ -168,7 +168,9 @@ void StatusBar::enterEvent(QEvent *event){
     QLabel* pMessageHeader = new QLabel("<u><b>Current Processes:</b></u>");
     layout->addWidget(pMessageHeader);
     for (QString message: m_LoadingStack){
-        layout->addWidget(new QLabel(message));
+        if(message != ""){
+            layout->addWidget(new QLabel(message));
+        }
     }
 
     m_pHoverWidget->move(this->mapToGlobal(QPoint(static_cast<QHoverEvent*>(event)->pos().y(), static_cast<QHoverEvent*>(event)->pos().x())).x(), this->parentWidget()->mapToGlobal(this->pos()).y() - this->height() - m_pHoverWidget->height() - 5);

@@ -119,8 +119,20 @@ private:
      */
     void onNewMessageReceived(const QSharedPointer<ANSHAREDLIB::Event> pEvent);
 
+    //=========================================================================================================
+    /**
+     * Receives event when status bar is hovered over, shows hover widget if there are background processes
+     *
+     * @param [in] event    event of type QHoverEvent that holds mouse position
+     */
     void enterEvent(QEvent* event);
 
+    //=========================================================================================================
+    /**
+     * Receives event when status bar is no longer hovered over, hides hover widget
+     *
+     * @param [in] event    event of type QHoverEvent that holds mouse position
+     */
     void leaveEvent(QEvent* event);
 
     ANSHAREDLIB::Communicator*  m_pCommunicator;            /**< Vector containing all plugins. */
