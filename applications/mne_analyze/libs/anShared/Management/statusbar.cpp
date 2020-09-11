@@ -133,6 +133,10 @@ void StatusBar::onNewMessageReceived(const QSharedPointer<Event> pEvent)
                     if(m_LoadingStack.isEmpty()){
                         m_pProgressBar->hide();
                         clearMessage();
+                        if (m_pHoverWidget){
+                            m_pHoverWidget->hide();
+                            delete  m_pHoverWidget;
+                        }
                         break;
                     }
                 }
@@ -151,18 +155,23 @@ void StatusBar::onNewMessageReceived(const QSharedPointer<Event> pEvent)
 //=============================================================================================================
 
 void StatusBar::enterEvent(QEvent *event){
-    qDebug() << "StatusBar::enterEvent";
+    if(m_LoadingStack.isEmpty()){
+        return;
+    }
 
-    m_pHoverWidget = new QWidget();
-    m_pHoverWidget->setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
+    m_pHoverWidget = new QWidget(this);
+    m_pHoverWidget->setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint | Qt::FramelessWindowHint);
 
     QVBoxLayout* layout = new QVBoxLayout(m_pHoverWidget);
     m_pHoverWidget->setLayout(layout);
 
+    QLabel* pMessageHeader = new QLabel("<u><b>Current Processes:</b></u>");
+    layout->addWidget(pMessageHeader);
     for (QString message: m_LoadingStack){
         layout->addWidget(new QLabel(message));
     }
-    m_pHoverWidget->move(this->mapToGlobal(static_cast<QHoverEvent*>(event)->pos()));
+
+    m_pHoverWidget->move(this->mapToGlobal(QPoint(static_cast<QHoverEvent*>(event)->pos().y(), static_cast<QHoverEvent*>(event)->pos().x())).x(), this->parentWidget()->mapToGlobal(this->pos()).y() - this->height() - m_pHoverWidget->height() - 5);
     m_pHoverWidget->show();
 
     QWidget::enterEvent(event);
@@ -171,7 +180,10 @@ void StatusBar::enterEvent(QEvent *event){
 //=============================================================================================================
 
 void StatusBar::leaveEvent(QEvent *event){
-    qDebug() << "StatusBar::leaveEvent";
+    if (!m_pHoverWidget){
+        return;
+    }
+
     m_pHoverWidget->hide();
     delete  m_pHoverWidget;
     QWidget::leaveEvent(event);
