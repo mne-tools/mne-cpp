@@ -89,26 +89,23 @@ CoregSettingsView::CoregSettingsView(const QString& sSettingsPath,
     loadSettings();
 
     // Connect Gui elemnts
-    connect(m_pUi->m_qPushButton_FidFileDialog, &QPushButton::released,
+    connect(m_pUi->m_qPushButton_LoadFid, &QPushButton::released,
             this, &CoregSettingsView::onLoadFidFile);
-    connect(m_pUi->m_qPushButton_FidStoreFileDialog, &QPushButton::released,
+    connect(m_pUi->m_qPushButton_StoreFid, &QPushButton::released,
             this, &CoregSettingsView::onStoreFidFile);
-    connect(m_pUi->m_qPushButton_DigFileDialog, &QPushButton::released,
+    connect(m_pUi->m_qPushButton_LoadDig, &QPushButton::released,
             this, &CoregSettingsView::onLoadDigFile);
-    connect(m_pUi->m_qSpinBox_MaxDist, QOverload<int>::of(&QSpinBox::valueChanged),
-            this, &CoregSettingsView::onMaxDistChanged);
-    connect(m_pUi->m_qDoubleSpinBox_WeightLpa, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            this, &CoregSettingsView::onWeigthsChanged);
-    connect(m_pUi->m_qDoubleSpinBox_WeightRpa, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            this, &CoregSettingsView::onWeigthsChanged);
-    connect(m_pUi->m_qDoubleSpinBox_WeightNas, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            this, &CoregSettingsView::onWeigthsChanged);
+//    connect(m_pUi->m_qPushButton_LoadTrans &QPushButton::released,
+//            this, &CoregSettingsView::onLoadTrans);
+//    connect(m_pUi->m_qPushButton_StoreTrans &QPushButton::released,
+//            this, &CoregSettingsView::onStoreTrans);
+
+
     connect(m_pUi->m_qPushButton_FitFiducials, &QPushButton::released,
             this, &CoregSettingsView::fitFiducials);
     connect(m_pUi->m_qPushButton_FitICP, &QPushButton::released,
             this, &CoregSettingsView::fitICP);
-    connect(m_pUi->m_qPushButton_TransFileStoreDialaog, &QPushButton::released,
-            this, &CoregSettingsView::onStoreTrans);
+
     connect(m_pUi->m_qComboBox_BemItems, &QComboBox::currentTextChanged,
             this, &CoregSettingsView::changeSelectedBem, Qt::UniqueConnection);
     m_pUi->m_qGroupBox_StoreTrans->hide();
@@ -176,20 +173,17 @@ void CoregSettingsView::updateProcessingMode(ProcessingMode mode)
 
 void CoregSettingsView::onLoadFidFile()
 {
-    QString t_sFileName = QFileDialog::getOpenFileName(this,
+    QString sFileName = QFileDialog::getOpenFileName(this,
                                                        tr("Select fiducials"),
                                                        QString(),
                                                        tr("Fif Files (*.fif)"));
 
-    QFile t_fFid(t_sFileName);
-    if(t_fFid.open(QIODevice::ReadOnly)) {
-        m_pUi->m_qLineEdit_FidFileName->setText(t_sFileName);
+    if (sFileName.isEmpty()) {
+        return;
     } else {
-        qWarning() << "[disp::CoregSettingsView] Fiducial file cannot be opened";
+        std::cout << sFileName.toUtf8().constData() << std::endl;
+        emit fidFileChanged(sFileName);
     }
-    t_fFid.close();
-
-    emit fidFileChanged(t_sFileName);
 }
 
 //=============================================================================================================
@@ -202,64 +196,56 @@ void CoregSettingsView::onStoreFidFile()
 
     if (sFileName.isEmpty()) {
         return;
+    } else {
+        emit fidStoreFileChanged(sFileName);
     }
-
-    emit fidStoreFileChanged(sFileName);
 }
 
 //=============================================================================================================
 
 void CoregSettingsView::onLoadDigFile()
 {
-    QString t_sFileName = QFileDialog::getOpenFileName(this,
+    QString sFileName = QFileDialog::getOpenFileName(this,
                                                        tr("Select digitizer file"),
                                                        QString(),
                                                        tr("Fif Files (*.fif)"));
 
-    QFile t_fDigid(t_sFileName);
-    if(t_fDigid.open(QIODevice::ReadOnly)) {
-        m_pUi->m_qLineEdit_DigFileName->setText(t_sFileName);
+    if (sFileName.isEmpty()) {
+        return;
     } else {
-        qWarning() << "[disp::CoregSettingsView] Digitizer file cannot be opened";
+        emit digFileChanged(sFileName);
     }
-    t_fDigid.close();
-
-    emit digFileChanged(t_sFileName);
 }
 
 //=============================================================================================================
 
-void CoregSettingsView::onMaxDistChanged()
+void CoregSettingsView::onLoadTrans()
 {
-    float fMaxDist = m_pUi->m_qSpinBox_MaxDist->value()/1000;
-    // emit maxDistChanged(fMaxDist);
-}
+    QString sFileName = QFileDialog::getOpenFileName(this,
+                                                       tr("Select Transformation file"),
+                                                       QString(),
+                                                       tr("Fif Files (*.fif)"));
 
-//=============================================================================================================
-
-void CoregSettingsView::onWeigthsChanged()
-{
-    float fWeitghtLPA = m_pUi->m_qDoubleSpinBox_WeightLpa->value();
-    float fWeitghtRPA = m_pUi->m_qDoubleSpinBox_WeightRpa->value();
-    float fWeitghtNas = m_pUi->m_qDoubleSpinBox_WeightNas->value();
-
-    // emit weightsChanged(fWeitghtLPA,fWeitghtRPA,fWeitghtNas);
+    if (sFileName.isEmpty()) {
+        return;
+    } else {
+        emit loadTrans(sFileName);
+    }
 }
 
 //=============================================================================================================
 
 void CoregSettingsView::onStoreTrans()
 {
-    QString t_sDirName = QFileDialog::getExistingDirectory(this,
-                                                           tr("Open directory to store the transformation"),
-                                                           QString(),
-                                                           QFileDialog::ShowDirsOnly
-                                                           | QFileDialog::DontResolveSymlinks);
+    QString sFileName = QFileDialog::getSaveFileName(Q_NULLPTR,
+                                                     tr("Save Transformation"), "",
+                                                     tr("Fif file (*-trans.fif)"));
 
-    QString t_sFileName = m_pUi->m_qLineEdit_TransFileStore->text();
-    QString t_sFilePath(t_sDirName + '/' + t_sFileName);
-
-    emit transStoreFileChanged(t_sFilePath);
+    if (sFileName.isEmpty()) {
+        return;
+    } else{
+        emit storeTrans(sFileName);
+    }
 }
 
 //=============================================================================================================
@@ -354,7 +340,6 @@ QList<int> CoregSettingsView::getDigitizerCheckState()
 void CoregSettingsView::clearSelectionBem()
 {
     m_pUi->m_qComboBox_BemItems->clear();
-    m_pUi->m_qComboBox_BemItems->addItem("Current Selection");
 }
 
 //=============================================================================================================
@@ -390,6 +375,8 @@ void CoregSettingsView::setTransformation(const Vector3f& vecTrans, const Vector
     m_pUi->m_qDoubleSpinBox_RotY->setValue(vecAngles(1)*180/M_PI);
     m_pUi->m_qDoubleSpinBox_RotZ->setValue(vecAngles(2)*180/M_PI);
 }
+
+//=============================================================================================================
 
 void CoregSettingsView::setTransformation(const Matrix4f matTrans)
 {
