@@ -52,6 +52,7 @@
 // EIGEN INCLUDES
 //=============================================================================================================
 
+#include <Eigen/Core>
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
@@ -60,6 +61,9 @@ namespace Ui {
     class CoregSettingsViewWidget;
 }
 
+namespace FIFFLIB {
+    class FiffCoordTrans;
+}
 //=============================================================================================================
 // DEFINE NAMESPACE NAMESPACE
 //=============================================================================================================
@@ -171,13 +175,35 @@ public:
 
     //=========================================================================================================
     /**
-     * Get the weights for LPA,RPA and Nasion
+     * Get the weights for the digitizer types
      *
      * @return  The weight.
      */
     float getWeightLPA();
     float getWeightRPA();
     float getWeightNAS();
+    float getWeightEEG();
+    float getWeightHSP();
+    float getWeightHPI();
+
+    //=========================================================================================================
+    /**
+     * Get the types of digitizers to use for coregistration.
+     *
+     * @return  The list containing the digitizer types to use for coregistration.
+     */
+    QList<int> getDigitizerCheckState();
+
+
+    //=========================================================================================================
+    /**
+     * Set the transformation received from the ICP  algorithm
+     *
+     * @param[in] vecTrans    The traslation vector.
+     * @param[in] vecAngles   The rotation angle vector.
+     */
+    void setTransformation(const Eigen::Vector3f& vecTrans, const Eigen::Vector3f& vecAngles);
+    void setTransformation(const Eigen::Matrix4f matTrans);
 
 protected:
 

@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>HPI Setup</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QHBoxLayout" name="horizontalLayout_3">
    <item>
     <widget class="QTabWidget" name="m_qTabWidget">
      <property name="currentIndex">
@@ -150,45 +150,192 @@
       <attribute name="title">
        <string>Fit</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_8">
+      <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="QGroupBox" name="m_qGroupBox_Discard">
+        <widget class="QGroupBox" name="groupBox">
          <property name="title">
-          <string>Omit Digitizer</string>
+          <string>Digitizer Options</string>
          </property>
-         <layout class="QFormLayout" name="formLayout">
-          <item row="1" column="0">
-           <widget class="QLabel" name="m_qLabel_Text">
-            <property name="text">
-             <string>Points Omitted:</string>
-            </property>
+         <layout class="QVBoxLayout" name="verticalLayout_8">
+          <item>
+           <widget class="QWidget" name="m_qWidget_SelectDigitizer" native="true">
+            <layout class="QHBoxLayout" name="horizontalLayout_4">
+             <item>
+              <widget class="QCheckBox" name="m_qCheckBox_EEG">
+               <property name="text">
+                <string>EEG</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="m_qCheckBox_HSP">
+               <property name="text">
+                <string>HSP</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="m_qCheckBox_HPI">
+               <property name="text">
+                <string>HPI</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </item>
-          <item row="1" column="1">
-           <widget class="QLabel" name="m_qLabel_NOmitted">
-            <property name="text">
-             <string>0</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
+          <item>
+           <widget class="QWidget" name="m_qWidget_Weigths" native="true">
+            <layout class="QGridLayout" name="gridLayout">
+             <item row="1" column="2">
+              <widget class="QLabel" name="label_8">
+               <property name="text">
+                <string>RPA: </string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="1">
+              <widget class="QLabel" name="label_17">
+               <property name="text">
+                <string>HPI:</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="2">
+              <widget class="QDoubleSpinBox" name="m_qDoubleSpinBox_WeightRpa">
+               <property name="value">
+                <double>1.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QDoubleSpinBox" name="m_qDoubleSpinBox_WeightLpa">
+               <property name="value">
+                <double>1.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="2">
+              <widget class="QLabel" name="label_18">
+               <property name="text">
+                <string>HSP:</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="2">
+              <widget class="QDoubleSpinBox" name="m_qDoubleSpinBox_WeightHSP">
+               <property name="value">
+                <double>1.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="0">
+              <widget class="QLabel" name="label_16">
+               <property name="text">
+                <string>EEG:</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="1">
+              <widget class="QDoubleSpinBox" name="m_qDoubleSpinBox_WeightHPI">
+               <property name="value">
+                <double>1.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_7">
+               <property name="text">
+                <string>LPA: </string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QLabel" name="label_9">
+               <property name="text">
+                <string>Nasion: </string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="0">
+              <widget class="QDoubleSpinBox" name="m_qDoubleSpinBox_WeightEEG">
+               <property name="value">
+                <double>1.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="QDoubleSpinBox" name="m_qDoubleSpinBox_WeightNas">
+               <property name="value">
+                <double>10.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_15">
-            <property name="text">
-             <string>Max. distance to surface: </string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QSpinBox" name="m_qSpinBox_MaxDist">
-            <property name="suffix">
-             <string> mm</string>
-            </property>
-            <property name="value">
-             <number>10</number>
-            </property>
+          <item>
+           <widget class="QWidget" name="m_qWidget_Discard" native="true">
+            <layout class="QFormLayout" name="formLayout_4">
+             <item row="2" column="0">
+              <widget class="QLabel" name="m_qLabel_Text">
+               <property name="text">
+                <string>Points Omitted:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QLabel" name="m_qLabel_NOmitted">
+               <property name="text">
+                <string>0</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_15">
+               <property name="text">
+                <string>Max. distance to surface: </string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QSpinBox" name="m_qSpinBox_MaxDist">
+               <property name="suffix">
+                <string> mm</string>
+               </property>
+               <property name="value">
+                <number>10</number>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </item>
          </layout>
@@ -206,7 +353,7 @@
              <string>Apply automatic scaling</string>
             </property>
             <property name="checked">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="tristate">
              <bool>false</bool>
@@ -230,83 +377,26 @@
                </property>
               </widget>
              </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="label_6">
-               <property name="text">
-                <string>Convergence Limit:</string>
-               </property>
-              </widget>
-             </item>
              <item row="1" column="1">
               <widget class="QDoubleSpinBox" name="m_qDoubleSpinBox_Converge">
                <property name="suffix">
                 <string> mm</string>
                </property>
                <property name="decimals">
-                <number>4</number>
+                <number>3</number>
                </property>
                <property name="singleStep">
-                <double>0.000100000000000</double>
+                <double>0.010000000000000</double>
                </property>
                <property name="value">
-                <double>0.000100000000000</double>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
-           <widget class="QWidget" name="m_qWidget_Weigths" native="true">
-            <layout class="QGridLayout" name="gridLayout">
-             <item row="1" column="1">
-              <widget class="QDoubleSpinBox" name="m_qDoubleSpinBox_WeightNas">
-               <property name="value">
-                <double>10.000000000000000</double>
+                <double>0.010000000000000</double>
                </property>
               </widget>
              </item>
              <item row="1" column="0">
-              <widget class="QDoubleSpinBox" name="m_qDoubleSpinBox_WeightLpa">
-               <property name="value">
-                <double>1.000000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="2">
-              <widget class="QDoubleSpinBox" name="m_qDoubleSpinBox_WeightRpa">
-               <property name="value">
-                <double>1.000000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="0">
-              <widget class="QLabel" name="label_7">
+              <widget class="QLabel" name="label_6">
                <property name="text">
-                <string>LPA: </string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QLabel" name="label_9">
-               <property name="text">
-                <string>Nasion: </string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="2">
-              <widget class="QLabel" name="label_8">
-               <property name="text">
-                <string>RPA: </string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
+                <string>Convergence Limit:</string>
                </property>
               </widget>
              </item>
@@ -500,10 +590,18 @@
            <widget class="QWidget" name="m_qWidget_Adjustment" native="true">
             <layout class="QGridLayout" name="gridLayout_2">
              <item row="1" column="2">
-              <widget class="QDoubleSpinBox" name="doubleSpinBox_2"/>
+              <widget class="QDoubleSpinBox" name="m_qDoubleSpinBox_RotX">
+               <property name="minimum">
+                <double>-99.989999999999995</double>
+               </property>
+              </widget>
              </item>
              <item row="3" column="2">
-              <widget class="QDoubleSpinBox" name="doubleSpinBox_6"/>
+              <widget class="QDoubleSpinBox" name="m_qDoubleSpinBox_RotZ">
+               <property name="minimum">
+                <double>-99.989999999999995</double>
+               </property>
+              </widget>
              </item>
              <item row="0" column="1">
               <widget class="QLabel" name="label_13">
@@ -513,7 +611,11 @@
               </widget>
              </item>
              <item row="3" column="1">
-              <widget class="QDoubleSpinBox" name="doubleSpinBox_4"/>
+              <widget class="QDoubleSpinBox" name="m_qDoubleSpinBox_TransZ">
+               <property name="minimum">
+                <double>-99.989999999999995</double>
+               </property>
+              </widget>
              </item>
              <item row="2" column="0">
               <widget class="QLabel" name="label_11">
@@ -530,10 +632,18 @@
               </widget>
              </item>
              <item row="1" column="1">
-              <widget class="QDoubleSpinBox" name="doubleSpinBox"/>
+              <widget class="QDoubleSpinBox" name="m_qDoubleSpinBox_TransX">
+               <property name="minimum">
+                <double>-99.989999999999995</double>
+               </property>
+              </widget>
              </item>
              <item row="2" column="1">
-              <widget class="QDoubleSpinBox" name="doubleSpinBox_3"/>
+              <widget class="QDoubleSpinBox" name="m_qDoubleSpinBox_TransY">
+               <property name="minimum">
+                <double>-99.989999999999995</double>
+               </property>
+              </widget>
              </item>
              <item row="0" column="2">
               <widget class="QLabel" name="label_14">
@@ -550,7 +660,11 @@
               </widget>
              </item>
              <item row="2" column="2">
-              <widget class="QDoubleSpinBox" name="doubleSpinBox_5"/>
+              <widget class="QDoubleSpinBox" name="m_qDoubleSpinBox_RotY">
+               <property name="minimum">
+                <double>-99.989999999999995</double>
+               </property>
+              </widget>
              </item>
              <item row="4" column="1">
               <spacer name="horizontalSpacer">
