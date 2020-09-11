@@ -180,13 +180,40 @@ private:
 
     //=========================================================================================================
     /**
-     * get the rotation angles arround x,y,z in rad
+     * Update the transformation with new rotation, translation and scaling parameters
+     *
+     */
+    void onUpdateTrans();
+
+    //=========================================================================================================
+    /**
+     * get the transformation parameters from the matrix (rotation euler angle, translation, scale)
      *
      * @param[in] matTrans      The transformation matrix to obtain the angles from.
-     * @param[out] vecAngles    The vector containing the rotation angles arround x,y,z in rad.
+     * @param[out] vecTrans     The translation vector.
+     * @param[out] vecRot       The rotation angle vector in rad.
+     * @param[out] vecScale     The vector with the scaling parameters.
+     *
      */
-    void getRotationAngles(const Matrix4f& matTrans, Vector3f& vecAngles);
+    void getParamFromTrans(const Matrix4f& matTrans,
+                           Vector3f& vecRot,
+                           Vector3f& vecTrans,
+                           Vector3f& vecScale);
 
+    //=========================================================================================================
+    /**
+     * Get the transformation matrix from the parameters (rotation euler angle, translation, scale)
+     *
+     * @param[out] matTrans    The transformation matrix to obtain the angles from.
+     * @param[in] vecTrans     The translation vector.
+     * @param[in] vecRot       The rotation angle vector in rad.
+     * @param[in] vecScale     The vector with the scaling parameters.
+     *
+     */
+    void getTransFromParam(Matrix4f& matTrans,
+                           const Vector3f& vecRot,
+                           const Vector3f& vecTrans,
+                           const Vector3f& vecScale);
 
 //    //=========================================================================================================
 //    /**
