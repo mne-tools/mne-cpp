@@ -32,6 +32,8 @@
  *
  */
 
+# define M_PI           3.14159265358979323846  /* pi */
+
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -40,8 +42,10 @@
 #include "ui_coregsettingsview.h"
 
 #include <fiff/fiff_stream.h>
+#include <fiff/fiff_coord_trans.h>
 
 #include <iostream>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -55,12 +59,15 @@
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
+#include <Eigen/Core>
+#include <Eigen/Geometry>
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace DISPLIB;
+using namespace Eigen;
 
 //=============================================================================================================
 // DEFINE GLOBAL METHODS
@@ -299,9 +306,47 @@ float CoregSettingsView::getWeightNAS()
 
 //=============================================================================================================
 
+float CoregSettingsView::getWeightEEG()
+{
+    return m_pUi->m_qDoubleSpinBox_WeightEEG->text().toFloat();
+}
+
+//=============================================================================================================
+
+float CoregSettingsView::getWeightHPI()
+{
+    return m_pUi->m_qDoubleSpinBox_WeightHPI->text().toFloat();
+}
+
+//=============================================================================================================
+
+float CoregSettingsView::getWeightHSP()
+{
+    return m_pUi->m_qDoubleSpinBox_WeightHSP->text().toFloat();
+}
+
+//=============================================================================================================
+
 float CoregSettingsView::getOmmitDistance()
 {
     return static_cast<float>(m_pUi->m_qSpinBox_MaxDist->value())/1000.0;
+}
+
+//=============================================================================================================
+
+QList<int> CoregSettingsView::getDigitizerCheckState()
+{
+    QList<int> lPicks({FIFFV_POINT_CARDINAL});
+    if(m_pUi->m_qCheckBox_EEG) {
+        lPicks << FIFFV_POINT_EEG;
+    }
+    if(m_pUi->m_qCheckBox_HPI) {
+        lPicks << FIFFV_POINT_HPI;
+    }
+    if(m_pUi->m_qCheckBox_HSP) {
+        lPicks << FIFFV_POINT_EXTRA;
+    }
+    return lPicks;
 }
 
 //=============================================================================================================
@@ -333,3 +378,28 @@ void CoregSettingsView::setOmittedPoints(const int iN)
     m_pUi->m_qLabel_NOmitted->setText(QString::number(iN));
 }
 
+//=============================================================================================================
+
+void CoregSettingsView::setTransformation(const Vector3f& vecTrans, const Vector3f& vecAngles)
+{
+    m_pUi->m_qDoubleSpinBox_TransX->setValue(vecTrans(0)*1000);
+    m_pUi->m_qDoubleSpinBox_TransY->setValue(vecTrans(1)*1000);
+    m_pUi->m_qDoubleSpinBox_TransZ->setValue(vecTrans(2)*1000);
+
+    m_pUi->m_qDoubleSpinBox_RotX->setValue(vecAngles(0)*180/M_PI);
+    m_pUi->m_qDoubleSpinBox_RotY->setValue(vecAngles(1)*180/M_PI);
+    m_pUi->m_qDoubleSpinBox_RotZ->setValue(vecAngles(2)*180/M_PI);
+}
+
+void CoregSettingsView::setTransformation(const Matrix4f matTrans)
+{
+    m_pUi->m_qDoubleSpinBox_TransX->setValue(matTrans(0,3)*1000);
+    m_pUi->m_qDoubleSpinBox_TransY->setValue(matTrans(1,3)*1000);
+    m_pUi->m_qDoubleSpinBox_TransZ->setValue(matTrans(2,3)*1000);
+
+    Matrix3f matRot = matTrans.block(0,0,3,3);
+    Vector3f vecAngles = matRot.eulerAngles(0,1,2);
+    m_pUi->m_qDoubleSpinBox_RotX->setValue(vecAngles(0)*180/M_PI);
+    m_pUi->m_qDoubleSpinBox_RotY->setValue(vecAngles(1)*180/M_PI);
+    m_pUi->m_qDoubleSpinBox_RotZ->setValue(vecAngles(2)*180/M_PI);
+}
