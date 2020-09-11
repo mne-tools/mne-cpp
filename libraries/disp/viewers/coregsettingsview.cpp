@@ -88,7 +88,7 @@ CoregSettingsView::CoregSettingsView(const QString& sSettingsPath,
 
     loadSettings();
 
-    // Connect Gui elemnts
+    // Connect File loading and saving
     connect(m_pUi->m_qPushButton_LoadFid, &QPushButton::released,
             this, &CoregSettingsView::onLoadFidFile);
     connect(m_pUi->m_qPushButton_StoreFid, &QPushButton::released,
@@ -99,16 +99,37 @@ CoregSettingsView::CoregSettingsView(const QString& sSettingsPath,
 //            this, &CoregSettingsView::onLoadTrans);
 //    connect(m_pUi->m_qPushButton_StoreTrans &QPushButton::released,
 //            this, &CoregSettingsView::onStoreTrans);
+    connect(m_pUi->m_qComboBox_BemItems, &QComboBox::currentTextChanged,
+            this, &CoregSettingsView::changeSelectedBem, Qt::UniqueConnection);
+
+    m_pUi->m_qGroupBox_StoreTrans->hide();
 
 
+    // connect icp settings
     connect(m_pUi->m_qPushButton_FitFiducials, &QPushButton::released,
             this, &CoregSettingsView::fitFiducials);
     connect(m_pUi->m_qPushButton_FitICP, &QPushButton::released,
             this, &CoregSettingsView::fitICP);
 
-    connect(m_pUi->m_qComboBox_BemItems, &QComboBox::currentTextChanged,
-            this, &CoregSettingsView::changeSelectedBem, Qt::UniqueConnection);
-    m_pUi->m_qGroupBox_StoreTrans->hide();
+    // connect adjustment settings
+    connect(m_pUi->m_qDoubleSpinBox_X, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this, &CoregSettingsView::transParamChanged);
+    connect(m_pUi->m_qDoubleSpinBox_Y, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this, &CoregSettingsView::transParamChanged);
+    connect(m_pUi->m_qDoubleSpinBox_Z, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this, &CoregSettingsView::transParamChanged);
+    connect(m_pUi->m_qDoubleSpinBox_RotX, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this, &CoregSettingsView::transParamChanged);
+    connect(m_pUi->m_qDoubleSpinBox_RotY, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this, &CoregSettingsView::transParamChanged);
+    connect(m_pUi->m_qDoubleSpinBox_RotZ, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this, &CoregSettingsView::transParamChanged);
+    connect(m_pUi->m_qDoubleSpinBox_TransX, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this, &CoregSettingsView::transParamChanged);
+    connect(m_pUi->m_qDoubleSpinBox_TransY, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this, &CoregSettingsView::transParamChanged);
+    connect(m_pUi->m_qDoubleSpinBox_TransZ, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this, &CoregSettingsView::transParamChanged);
 }
 
 //=============================================================================================================
@@ -365,28 +386,51 @@ void CoregSettingsView::setOmittedPoints(const int iN)
 
 //=============================================================================================================
 
-void CoregSettingsView::setTransformation(const Vector3f& vecTrans, const Vector3f& vecAngles)
+void CoregSettingsView::setTransParams(const Vector3f& vecTrans,
+                                       const Vector3f& vecRot,
+                                       const Vector3f& vecScale)
 {
+    QSignalBlocker blockerTransX(m_pUi->m_qDoubleSpinBox_TransX);
+    QSignalBlocker blockerTransY(m_pUi->m_qDoubleSpinBox_TransY);
+    QSignalBlocker blockerTransZ(m_pUi->m_qDoubleSpinBox_TransZ);
+    QSignalBlocker blockerRotX(m_pUi->m_qDoubleSpinBox_RotX);
+    QSignalBlocker blockerRotY(m_pUi->m_qDoubleSpinBox_RotY);
+    QSignalBlocker blockerRotZ(m_pUi->m_qDoubleSpinBox_RotZ);
+    QSignalBlocker blockerScaleX(m_pUi->m_qDoubleSpinBox_X);
+    QSignalBlocker blockerScaleY(m_pUi->m_qDoubleSpinBox_Y);
+    QSignalBlocker blockerScaleZ(m_pUi->m_qDoubleSpinBox_Z);
+
     m_pUi->m_qDoubleSpinBox_TransX->setValue(vecTrans(0)*1000);
     m_pUi->m_qDoubleSpinBox_TransY->setValue(vecTrans(1)*1000);
     m_pUi->m_qDoubleSpinBox_TransZ->setValue(vecTrans(2)*1000);
 
-    m_pUi->m_qDoubleSpinBox_RotX->setValue(vecAngles(0)*180/M_PI);
-    m_pUi->m_qDoubleSpinBox_RotY->setValue(vecAngles(1)*180/M_PI);
-    m_pUi->m_qDoubleSpinBox_RotZ->setValue(vecAngles(2)*180/M_PI);
+    m_pUi->m_qDoubleSpinBox_RotX->setValue(vecRot(0)*180/M_PI);
+    m_pUi->m_qDoubleSpinBox_RotY->setValue(vecRot(1)*180/M_PI);
+    m_pUi->m_qDoubleSpinBox_RotZ->setValue(vecRot(2)*180/M_PI);
+
+    m_pUi->m_qDoubleSpinBox_X->setValue(vecScale(0));
+    m_pUi->m_qDoubleSpinBox_Y->setValue(vecScale(1));
+    m_pUi->m_qDoubleSpinBox_Z->setValue(vecScale(2));
 }
 
 //=============================================================================================================
 
-void CoregSettingsView::setTransformation(const Matrix4f matTrans)
+void CoregSettingsView::getTransParams(Vector3f& vecRot,
+                                       Vector3f& vecTrans,
+                                       Vector3f& vecScale)
 {
-    m_pUi->m_qDoubleSpinBox_TransX->setValue(matTrans(0,3)*1000);
-    m_pUi->m_qDoubleSpinBox_TransY->setValue(matTrans(1,3)*1000);
-    m_pUi->m_qDoubleSpinBox_TransZ->setValue(matTrans(2,3)*1000);
+    vecTrans(0) = m_pUi->m_qDoubleSpinBox_TransX->value()/1000.0;
+    vecTrans(1) = m_pUi->m_qDoubleSpinBox_TransY->value()/1000.0;
+    vecTrans(2) = m_pUi->m_qDoubleSpinBox_TransZ->value()/1000.0;
 
-    Matrix3f matRot = matTrans.block(0,0,3,3);
-    Vector3f vecAngles = matRot.eulerAngles(0,1,2);
-    m_pUi->m_qDoubleSpinBox_RotX->setValue(vecAngles(0)*180/M_PI);
-    m_pUi->m_qDoubleSpinBox_RotY->setValue(vecAngles(1)*180/M_PI);
-    m_pUi->m_qDoubleSpinBox_RotZ->setValue(vecAngles(2)*180/M_PI);
+    vecRot(0) = m_pUi->m_qDoubleSpinBox_RotX->value() * M_PI/180.0;
+    vecRot(1) = m_pUi->m_qDoubleSpinBox_RotY->value() * M_PI/180.0;
+    vecRot(2) = m_pUi->m_qDoubleSpinBox_RotZ->value() * M_PI/180.0;
+
+    // ToDo implement scaling modes
+    vecScale(0) = m_pUi->m_qDoubleSpinBox_X->value();
+    vecScale(1) = m_pUi->m_qDoubleSpinBox_Y->value();
+    vecScale(2) = m_pUi->m_qDoubleSpinBox_Z->value();
+    qDebug() << "it is happenig";
+    return;
 }

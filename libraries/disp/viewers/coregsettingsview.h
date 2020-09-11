@@ -94,8 +94,8 @@ public:
     * Constructs a CoregSettingsView object.
     */
     explicit CoregSettingsView(const QString& sSettingsPath = "",
-                             QWidget *parent = 0,
-                             Qt::WindowFlags f = Qt::Widget);
+                               QWidget *parent = 0,
+                               Qt::WindowFlags f = Qt::Widget);
 
     ~CoregSettingsView();
 
@@ -194,16 +194,31 @@ public:
      */
     QList<int> getDigitizerCheckState();
 
+    //=========================================================================================================
+    /**
+     * Get the types of digitizers to use for coregistration.
+     *
+     * @param[out] vecRot       The rotation angle vector in rad.
+     * @param[out] vecTrans     The traslation vector.
+     * @param[out] vecScale     The vector with the scaling parameters.
+     *
+     */
+    void getTransParams(Eigen::Vector3f& vecRot,
+                        Eigen::Vector3f& vecTrans,
+                        Eigen::Vector3f& vecScale);
 
     //=========================================================================================================
     /**
      * Set the transformation received from the ICP  algorithm
      *
-     * @param[in] vecTrans    The traslation vector.
-     * @param[in] vecAngles   The rotation angle vector in rad.
+     * @param[in] vecTrans      The translation vector.
+     * @param[in] vecRot        The rotation angle vector in rad.
+     * @param[out] vecScale     The vector with the scaling parameters.
+     *
      */
-    void setTransformation(const Eigen::Vector3f& vecTrans, const Eigen::Vector3f& vecAngles);
-    void setTransformation(const Eigen::Matrix4f matTrans);
+    void setTransParams(const Eigen::Vector3f& vecTrans,
+                        const Eigen::Vector3f& vecRot,
+                        const Eigen::Vector3f& vecScale);
 
 protected:
 
@@ -306,6 +321,13 @@ signals:
      *
      */
     void changeSelectedBem(const QString &sText);
+
+    //=========================================================================================================
+    /**
+     * Emit this signal whenever the scaling, translation or rotation parmeters are changed.
+     *
+     */
+    void transParamChanged();
 
 };
 
