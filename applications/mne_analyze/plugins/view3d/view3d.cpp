@@ -146,6 +146,7 @@ QDockWidget* View3D::getControl()
     m_pControl3DView->setDelegate(pData3DTreeDelegate);
     m_pControl3DView->setModel(m_p3DModel.data());
 
+    // TODO getControl() called before getView() -> dangling pointer m_pView3D
 //    connect(m_pControl3DView, &Control3DView::sceneColorChanged,
 //            m_pView3D, &DISP3DLIB::View3D::setSceneColor);
 
@@ -243,9 +244,6 @@ void View3D::updateCoregMriFid(FiffDigPointSet digSetFid)
 
 void View3D::updateCoregTrans(FiffCoordTrans headMriTrans)
 {
-    // apply inverse because we want to visualize in head space
-    m_pMriFidCoreg->setTransform(headMriTrans, true);
-    m_pBemTreeCoreg->setTransform(headMriTrans, true);
-
+    m_pDigitizerCoreg->setTransform(headMriTrans,false);
     return;
 }
