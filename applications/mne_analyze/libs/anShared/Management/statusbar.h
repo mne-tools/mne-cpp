@@ -50,6 +50,7 @@
 #include <QSharedPointer>
 #include <QStatusBar>
 #include <QLabel>
+#include <QStack>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -117,11 +118,14 @@ private:
      */
     void onNewMessageReceived(const QSharedPointer<ANSHAREDLIB::Event> pEvent);
 
-    ANSHAREDLIB::Communicator *m_pCommunicator;         /**< Vector containing all plugins. */
+    ANSHAREDLIB::Communicator*  m_pCommunicator;            /**< Vector containing all plugins. */
 
-    int m_iMsgTimeout;                                  /**< Timeout of one message in milliseconds. */
+    int                         m_iMsgTimeout;              /**< Timeout of one message in milliseconds. */
 
-    QProgressBar* m_pProgressBar;                       /**< Loading bar that shows in the status bar when approporate vent is received */
+    QProgressBar*               m_pProgressBar;             /**< Loading bar that shows in the status bar when approporate vent is received */
+
+    QStack<QString>             m_LoadingStack;             /** Keeps the currently loading messages */
+
 };
 
 //=============================================================================================================
