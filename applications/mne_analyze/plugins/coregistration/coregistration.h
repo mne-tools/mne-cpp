@@ -169,6 +169,16 @@ private:
      */
     void onFitFiducials();
 
+    //=========================================================================================================
+    /**
+     * get the rotation angles arround x,y,z in rad
+     *
+     * @param[in] matTrans      The transformation matrix to obtain the angles from.
+     * @param[out] vecAngles    The vector containing the rotation angles arround x,y,z in rad.
+     */
+    void getRotationAngles(const Matrix4f& matTrans, Vector3f& vecAngles);
+
+
 //    //=========================================================================================================
 //    /**
 //     * Store the transformation to the given file path
