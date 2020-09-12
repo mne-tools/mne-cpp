@@ -101,7 +101,6 @@ CoregSettingsView::CoregSettingsView(const QString& sSettingsPath,
 //            this, &CoregSettingsView::onStoreTrans);
     connect(m_pUi->m_qComboBox_BemItems, &QComboBox::currentTextChanged,
             this, &CoregSettingsView::changeSelectedBem, Qt::UniqueConnection);
-
     m_pUi->m_qGroupBox_StoreTrans->hide();
 
 
@@ -112,11 +111,11 @@ CoregSettingsView::CoregSettingsView(const QString& sSettingsPath,
             this, &CoregSettingsView::fitICP);
 
     // connect adjustment settings
-    connect(m_pUi->m_qDoubleSpinBox_X, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+    connect(m_pUi->m_qDoubleSpinBox_ScalingX, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
             this, &CoregSettingsView::transParamChanged);
-    connect(m_pUi->m_qDoubleSpinBox_Y, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+    connect(m_pUi->m_qDoubleSpinBox_ScalingY, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
             this, &CoregSettingsView::transParamChanged);
-    connect(m_pUi->m_qDoubleSpinBox_Z, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+    connect(m_pUi->m_qDoubleSpinBox_ScalingZ, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
             this, &CoregSettingsView::transParamChanged);
     connect(m_pUi->m_qDoubleSpinBox_RotX, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
             this, &CoregSettingsView::transParamChanged);
@@ -130,6 +129,9 @@ CoregSettingsView::CoregSettingsView(const QString& sSettingsPath,
             this, &CoregSettingsView::transParamChanged);
     connect(m_pUi->m_qDoubleSpinBox_TransZ, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
             this, &CoregSettingsView::transParamChanged);
+    connect(m_pUi->m_qComboBox_ScalingMode, &QComboBox::currentTextChanged,
+            this, &CoregSettingsView::onScalingModeChanges, Qt::UniqueConnection);
+    onScalingModeChanges();
 }
 
 //=============================================================================================================
@@ -396,21 +398,22 @@ void CoregSettingsView::setTransParams(const Vector3f& vecTrans,
     QSignalBlocker blockerRotX(m_pUi->m_qDoubleSpinBox_RotX);
     QSignalBlocker blockerRotY(m_pUi->m_qDoubleSpinBox_RotY);
     QSignalBlocker blockerRotZ(m_pUi->m_qDoubleSpinBox_RotZ);
-    QSignalBlocker blockerScaleX(m_pUi->m_qDoubleSpinBox_X);
-    QSignalBlocker blockerScaleY(m_pUi->m_qDoubleSpinBox_Y);
-    QSignalBlocker blockerScaleZ(m_pUi->m_qDoubleSpinBox_Z);
+    QSignalBlocker blockerScaleX(m_pUi->m_qDoubleSpinBox_ScalingX);
+    QSignalBlocker blockerScaleY(m_pUi->m_qDoubleSpinBox_ScalingY);
+    QSignalBlocker blockerScaleZ(m_pUi->m_qDoubleSpinBox_ScalingZ);
 
     m_pUi->m_qDoubleSpinBox_TransX->setValue(vecTrans(0)*1000);
     m_pUi->m_qDoubleSpinBox_TransY->setValue(vecTrans(1)*1000);
     m_pUi->m_qDoubleSpinBox_TransZ->setValue(vecTrans(2)*1000);
 
-    m_pUi->m_qDoubleSpinBox_RotX->setValue(vecRot(0)*180/M_PI);
+    // Inverted order due to euler rotation
+    m_pUi->m_qDoubleSpinBox_RotX->setValue(vecRot(2)*180/M_PI);
     m_pUi->m_qDoubleSpinBox_RotY->setValue(vecRot(1)*180/M_PI);
-    m_pUi->m_qDoubleSpinBox_RotZ->setValue(vecRot(2)*180/M_PI);
+    m_pUi->m_qDoubleSpinBox_RotZ->setValue(vecRot(0)*180/M_PI);
 
-    m_pUi->m_qDoubleSpinBox_X->setValue(vecScale(0));
-    m_pUi->m_qDoubleSpinBox_Y->setValue(vecScale(1));
-    m_pUi->m_qDoubleSpinBox_Z->setValue(vecScale(2));
+    m_pUi->m_qDoubleSpinBox_ScalingX->setValue(vecScale(2));
+    m_pUi->m_qDoubleSpinBox_ScalingY->setValue(vecScale(1));
+    m_pUi->m_qDoubleSpinBox_ScalingZ->setValue(vecScale(0));
 }
 
 //=============================================================================================================
@@ -423,14 +426,43 @@ void CoregSettingsView::getTransParams(Vector3f& vecRot,
     vecTrans(1) = m_pUi->m_qDoubleSpinBox_TransY->value()/1000.0;
     vecTrans(2) = m_pUi->m_qDoubleSpinBox_TransZ->value()/1000.0;
 
-    vecRot(0) = m_pUi->m_qDoubleSpinBox_RotX->value() * M_PI/180.0;
+    // Inverted order due to euler rotation
+    vecRot(2) = m_pUi->m_qDoubleSpinBox_RotX->value() * M_PI/180.0;
     vecRot(1) = m_pUi->m_qDoubleSpinBox_RotY->value() * M_PI/180.0;
-    vecRot(2) = m_pUi->m_qDoubleSpinBox_RotZ->value() * M_PI/180.0;
+    vecRot(0) = m_pUi->m_qDoubleSpinBox_RotZ->value() * M_PI/180.0;
 
-    // ToDo implement scaling modes
-    vecScale(0) = m_pUi->m_qDoubleSpinBox_X->value();
-    vecScale(1) = m_pUi->m_qDoubleSpinBox_Y->value();
-    vecScale(2) = m_pUi->m_qDoubleSpinBox_Z->value();
-    qDebug() << "it is happenig";
+    // apply different scaling modes
+    if (m_pUi->m_qComboBox_ScalingMode->currentText() == "Uniform") {
+        vecScale.fill(m_pUi->m_qDoubleSpinBox_ScalingX->value());
+    } else if (m_pUi->m_qComboBox_ScalingMode->currentText() == "3-Axis") {
+        vecScale(0) = m_pUi->m_qDoubleSpinBox_ScalingX->value();
+        vecScale(1) = m_pUi->m_qDoubleSpinBox_ScalingY->value();
+        vecScale(2) = m_pUi->m_qDoubleSpinBox_ScalingZ->value();
+    } else {
+        vecScale.fill(1);
+    }
+
+    return;
+}
+
+//=============================================================================================================
+
+void CoregSettingsView::onScalingModeChanges()
+{
+    // apply different scaling modes
+    if (m_pUi->m_qComboBox_ScalingMode->currentText() == "Uniform") {
+        m_pUi->m_qDoubleSpinBox_ScalingX->setEnabled(true);
+        m_pUi->m_qDoubleSpinBox_ScalingY->setEnabled(false);
+        m_pUi->m_qDoubleSpinBox_ScalingZ->setEnabled(false);
+    } else if (m_pUi->m_qComboBox_ScalingMode->currentText() == "3-Axis") {
+        m_pUi->m_qDoubleSpinBox_ScalingX->setEnabled(true);
+        m_pUi->m_qDoubleSpinBox_ScalingY->setEnabled(true);
+        m_pUi->m_qDoubleSpinBox_ScalingZ->setEnabled(true);
+    } else {
+        m_pUi->m_qDoubleSpinBox_ScalingX->setEnabled(false);
+        m_pUi->m_qDoubleSpinBox_ScalingY->setEnabled(false);
+        m_pUi->m_qDoubleSpinBox_ScalingZ->setEnabled(false);
+    }
+
     return;
 }
