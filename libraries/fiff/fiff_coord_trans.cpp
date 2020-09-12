@@ -162,6 +162,34 @@ bool FiffCoordTrans::read(QIODevice& p_IODevice, FiffCoordTrans& p_Trans)
 
 //=============================================================================================================
 
+void FiffCoordTrans::write(QIODevice &p_IODevice)
+{
+    //
+    //   Open the file, create directory
+    //
+
+    // Create the file and save the essentials
+    FiffStream::SPtr t_pStream = FiffStream::start_file(p_IODevice);
+    printf("Write coordinate transform in %s...\n", t_pStream->streamName().toUtf8().constData());
+    this->writeToStream(t_pStream.data());
+}
+
+//=============================================================================================================
+
+void FiffCoordTrans::writeToStream(FiffStream* p_pStream)
+{
+    p_pStream->start_block(FIFFB_MEAS);
+    p_pStream->start_block(FIFFB_MEAS_INFO);
+
+    p_pStream->write_coord_trans(*this);
+
+    p_pStream->end_block(FIFFB_MEAS_INFO);
+    p_pStream->end_block(FIFFB_MEAS);
+    p_pStream->end_file();
+}
+
+//=============================================================================================================
+
 MatrixX3f FiffCoordTrans::apply_trans(const MatrixX3f& rr, bool do_move) const
 {
     MatrixX4f rr_ones = do_move ? MatrixX4f::Ones(rr.rows(),4) : MatrixX4f::Zero(rr.rows(),4);

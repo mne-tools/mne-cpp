@@ -232,6 +232,22 @@ public:
 
     //=========================================================================================================
     /**
+     * @brief Writes the transformation to file
+     *
+     * @param p_IODevice
+     */
+    void write(QIODevice &p_IODevice);
+
+    //=========================================================================================================
+    /**
+     * @brief Writes the transformation to stream
+     *
+     * @param p_pStream
+     */
+    void writeToStream(FiffStream* p_pStream);
+
+    //=========================================================================================================
+    /**
      * Size of the old struct (fiffCoordTransRec) 26*int = 26*4 = 104
      *
      * @return the size of the old struct fiffCoordTransRec.
