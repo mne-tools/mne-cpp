@@ -42,9 +42,8 @@ TEMPLATE = app
 QT += gui widgets network opengl svg concurrent
 qtHaveModule(printsupport): QT += printsupport
 
-contains(MNECPP_CONFIG, noOpenGL) {
-    DEFINES += NO_OPENGL
-    QT -= opengl
+contains(MNECPP_CONFIG, noQOpenGLWidget) {
+    DEFINES += NO_QOPENGLWIDGET
 }
 
 TARGET = mne_analyze

@@ -64,7 +64,7 @@
 #include <QKeyEvent>
 #include <QLabel>
 
-#if !defined(NO_OPENGL)
+#if !defined(NO_QOPENGLWIDGET)
     #include <QOpenGLWidget>
 #endif
 
@@ -161,7 +161,7 @@ void FiffRawView::setModel(const QSharedPointer<FiffRawViewModel>& pModel)
 
     m_pTableView->setModel(m_pModel.data());
 
-    #if !defined(NO_OPENGL)
+    #if !defined(NO_QOPENGLWIDGET)
     m_pTableView->setViewport(new QOpenGLWidget);
     #endif
 

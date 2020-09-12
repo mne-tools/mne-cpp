@@ -114,7 +114,7 @@ QMAKE_TARGET_COPYRIGHT = Copyright (C) 2020 Authors of MNE-CPP. All rights reser
 ## To disable applications run: qmake MNECPP_CONFIG+=noApplications
 ## To build MNE-CPP libraries and executables statically run: qmake MNECPP_CONFIG+=static
 ## To build MNE-CPP with FFTW support in Eigen (make sure to specify FFTW_DIRs below): qmake MNECPP_CONFIG+=useFFTW
-## To build MNE-CPP Disp library without OpenGL support (default is with OpenGL support): qmake MNECPP_CONFIG+=noOpenGL
+## To build MNE-CPP without QOpenGLWidget support: qmake MNECPP_CONFIG+=noQOpenGLWidget
 ## To build MNE-CPP against WebAssembly (Wasm): qmake MNECPP_CONFIG+=wasm
 ## To build MNE Scan with BrainFlow support: qmake MNECPP_CONFIG+=withBrainFlow
 ## To build MNE Scan with LSL support: qmake MNECPP_CONFIG+=withLsl
@@ -126,27 +126,8 @@ QMAKE_TARGET_COPYRIGHT = Copyright (C) 2020 Authors of MNE-CPP. All rights reser
 # Default flags
 MNECPP_CONFIG +=
 
-# Check versions
-!minQtVersion(5, 10, 0) {
-    error("You are trying to build with Qt version $${QT_VERSION}. However, the minimal Qt version to build MNE-CPP is 5.10.0.")
-}
-
-# Build static version if wasm flag was defined
-contains(MNECPP_CONFIG, wasm) {
-    message("The wasm flag was detected. Building static version of MNE-CPP. Disable OpenGL support for Disp library.")
-    MNECPP_CONFIG += static noOpenGL
-}
-
-contains(MNECPP_CONFIG, static) {
-    message("The static flag was detected. Building static version of MNE-CPP.")
-}
-
-# Some MacOS specific setups
+# Suppress untested SDK version checks on MacOS
 macx {
-    # Do not support OpenGL support on macx because signal backgrounds are not plotted correctly (tested on Qt 5.15.0 and Qt 5.15.1)
-    MNECPP_CONFIG += noOpenGL
-
-    # Suppress untested SDK version checks
     CONFIG += sdk_no_version_check
 }
 

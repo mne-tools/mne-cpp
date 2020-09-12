@@ -50,11 +50,6 @@ CONFIG(debug,debug|release) {
     }
 }
 
-contains(MNECPP_CONFIG, noOpenGL) {
-    DEFINES += NO_OPENGL
-    QT -= opengl
-}
-
 contains(MNECPP_CONFIG, static) {
     CONFIG += static
     DEFINES += STATICBUILD
