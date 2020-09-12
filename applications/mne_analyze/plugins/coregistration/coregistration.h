@@ -187,12 +187,12 @@ private:
 
     //=========================================================================================================
     /**
-     * get the transformation parameters from the matrix (rotation euler angle, translation, scale)
+     * Get the transformation parameters from the matrix (rotation euler angle, translation, scale)
      *
      * @param[in] matTrans      The transformation matrix to obtain the angles from.
-     * @param[out] vecTrans     The translation vector.
-     * @param[out] vecRot       The rotation angle vector in rad.
-     * @param[out] vecScale     The vector with the scaling parameters.
+     * @param[out] vecTrans     The translation vector (x,y,z).
+     * @param[out] vecRot       The rotation angle vector in rad (due to euler transformation: z,y,x) .
+     * @param[out] vecScale     The vector with the scaling parameters (x,y,z).
      *
      */
     void getParamFromTrans(const Matrix4f& matTrans,
@@ -205,9 +205,9 @@ private:
      * Get the transformation matrix from the parameters (rotation euler angle, translation, scale)
      *
      * @param[out] matTrans    The transformation matrix to obtain the angles from.
-     * @param[in] vecTrans     The translation vector.
-     * @param[in] vecRot       The rotation angle vector in rad.
-     * @param[in] vecScale     The vector with the scaling parameters.
+     * @param[in] vecTrans     The translation vector (x,y,z).
+     * @param[in] vecRot       The rotation angle vector in rad (due to euler transformation: z,y,x).
+     * @param[in] vecScale     The vector with the scaling parameters (x,y,z).
      *
      */
     void getTransFromParam(Matrix4f& matTrans,
