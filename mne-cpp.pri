@@ -141,6 +141,15 @@ contains(MNECPP_CONFIG, static) {
     message("The static flag was detected. Building static version of MNE-CPP.")
 }
 
+# Some MacOS specific setups
+macx {
+    # Do not support OpenGL support on macx because signal backgrounds are not plotted correctly (tested on Qt 5.15.0 and Qt 5.15.1)
+    MNECPP_CONFIG += noOpenGL
+
+    # Suppress untested SDK version checks
+    CONFIG += sdk_no_version_check
+}
+
 ########################################### DIRECTORY DEFINITIONS #############################################
 
 # Eigen dir
