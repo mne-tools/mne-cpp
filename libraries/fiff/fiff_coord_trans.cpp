@@ -186,6 +186,7 @@ void FiffCoordTrans::writeToStream(FiffStream* p_pStream)
     p_pStream->end_block(FIFFB_MEAS_INFO);
     p_pStream->end_block(FIFFB_MEAS);
     p_pStream->end_file();
+    p_pStream->close();
 }
 
 //=============================================================================================================
