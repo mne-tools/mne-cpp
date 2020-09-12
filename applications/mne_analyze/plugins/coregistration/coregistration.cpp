@@ -427,11 +427,11 @@ void CoRegistration::onUpdateTrans()
     Vector3f vecTrans;
     Matrix4f matTrans;
 
+    // update transformation
     m_pCoregSettingsView->getTransParams(vecRot,vecTrans,vecScale);
-
     getTransFromParam(matTrans,vecRot,vecTrans,vecScale);
 
-    // update transformation
+
     // send event
     m_transHeadMri.trans = matTrans;
     QVariant data = QVariant::fromValue(m_transHeadMri);
@@ -446,17 +446,22 @@ void CoRegistration::getParamFromTrans(const Matrix4f& matTrans,
                                        Vector3f& vecRot,
                                        Vector3f& vecTrans,
                                        Vector3f& vecScale)
+/**
+ * Following https://math.stackexchange.com/a/1463487
+ *
+ */
 {
-    // get rotation in rad
     Matrix3f matRot = matTrans.block(0,0,3,3);
-    vecRot = matRot.eulerAngles(0,1,2);
 
-    // get scaling parameters
-    vecScale(0) = matRot(0,0);
-    vecScale(1) = matRot(1,1);
-    vecScale(2) = matRot(2,2);
+    // get scaling factor and normalize rotation
+    for(int i = 0; i < 3; i++) {
+        vecScale(i) = matRot.col(i).norm();
+        matRot.col(i) = matRot.col(i) / vecScale(i);
+    }
+    // get rotation in rad - z,y,x
+    vecRot = matRot.eulerAngles(2,1,0);
 
-    // get scaling parameters
+    // get translation vector
     vecTrans = m_transHeadMri.trans.block(0,3,3,1);
 
     return;
@@ -469,16 +474,20 @@ void CoRegistration::getTransFromParam(Matrix4f& matTrans,
                                        const Vector3f& vecTrans,
                                        const Vector3f& vecScale)
 {
+    // init trans
+    matTrans.fill(0);
+
     // get rotation matrix
-    Eigen::AngleAxisf rollAngle(vecRot(2), Eigen::Vector3f::UnitZ());
-    Eigen::AngleAxisf yawAngle(vecRot(1), Eigen::Vector3f::UnitY());
-    Eigen::AngleAxisf pitchAngle(vecRot(0), Eigen::Vector3f::UnitX());
+    // ZYX euler angle rotation is equivalent to XYZ fixed axis rotation
+    Eigen::AngleAxisf zAngle(vecRot(0), Eigen::Vector3f::UnitZ());
+    Eigen::AngleAxisf yAngle(vecRot(1), Eigen::Vector3f::UnitY());
+    Eigen::AngleAxisf xAngle(vecRot(2), Eigen::Vector3f::UnitX());
 
-    Eigen::Quaternion<float> quat = rollAngle * yawAngle * pitchAngle;
-
+    Eigen::Quaternion<float> quat = zAngle * yAngle * xAngle;
+    quat.normalize();
     matTrans.block(0,0,3,3) = quat.matrix();
 
-    // get translation part
+    // apply translation part
     matTrans.block(0,3,3,1) = vecTrans;
 
     // apply scaling
@@ -486,8 +495,8 @@ void CoRegistration::getTransFromParam(Matrix4f& matTrans,
     matScale(0,0) = vecScale(0);
     matScale(1,1) = vecScale(1);
     matScale(2,2) = vecScale(2);
-
     matTrans = matTrans * matScale;
+    return;
 }
 
 //=============================================================================================================
