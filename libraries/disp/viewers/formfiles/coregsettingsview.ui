@@ -437,6 +437,9 @@
              </item>
              <item row="0" column="1">
               <widget class="QComboBox" name="m_qComboBox_ScalingMode">
+               <property name="currentText">
+                <string>None</string>
+               </property>
                <item>
                 <property name="text">
                  <string>None</string>
@@ -455,7 +458,7 @@
               </widget>
              </item>
              <item row="1" column="1">
-              <widget class="QDoubleSpinBox" name="m_qDoubleSpinBox_X">
+              <widget class="QDoubleSpinBox" name="m_qDoubleSpinBox_ScalingX">
                <property name="decimals">
                 <number>3</number>
                </property>
@@ -468,7 +471,7 @@
               </widget>
              </item>
              <item row="2" column="1">
-              <widget class="QDoubleSpinBox" name="m_qDoubleSpinBox_Y">
+              <widget class="QDoubleSpinBox" name="m_qDoubleSpinBox_ScalingY">
                <property name="decimals">
                 <number>3</number>
                </property>
@@ -481,7 +484,7 @@
               </widget>
              </item>
              <item row="3" column="1">
-              <widget class="QDoubleSpinBox" name="m_qDoubleSpinBox_Z">
+              <widget class="QDoubleSpinBox" name="m_qDoubleSpinBox_ScalingZ">
                <property name="decimals">
                 <number>3</number>
                </property>
