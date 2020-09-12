@@ -253,7 +253,7 @@ jobs:
       fail-fast: false
       max-parallel: 3
       matrix:
-        os: [ubuntu-16.04, macos-latest, windows-2019]
+        os: [ubuntu-16.04, macos-latest, windows-2016]
 
     steps:
     - name: Clone repository
@@ -273,17 +273,17 @@ jobs:
       if: (matrix.os == 'ubuntu-16.04') || (matrix.os == 'macos-latest')
       uses: jurplel/install-qt-action@v2
       with:
-        version: 5.15.1
+        version: 5.15.0
         modules: qtcharts
     - name: Install Qt (Windows)
       if: matrix.os == 'windows-2019'
       uses: jurplel/install-qt-action@v2
       with:
-        version: 5.15.1
-        arch: win64_msvc2019_64
+        version: 5.15.0
+        arch: win64_msvc2017_64
         modules: qtcharts
     - name: Install jom (Windows)
-      if: matrix.os == 'windows-2019'
+      if: matrix.os == 'windows-2016'
       run: |
         Invoke-WebRequest https://www.dropbox.com/s/dku543gtw7ik7hr/jom.zip?dl=1 -OutFile .\jom.zip
         expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
@@ -302,7 +302,7 @@ jobs:
       if: matrix.os == 'windows-2019'
       run: |
         # Setup VS compiler
-        cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
+        cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         qmake -r MNECPP_CONFIG+=noApplications MNECPP_CONFIG+=noExamples
         jom -j4
