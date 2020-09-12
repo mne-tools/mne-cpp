@@ -151,8 +151,8 @@ QDockWidget *CoRegistration::getControl()
             this, &CoRegistration::onStoreFiducials);
     connect(m_pCoregSettingsView, &CoregSettingsView::transParamChanged,
             this, &CoRegistration::onUpdateTrans);
-//    connect(m_pCoregSettingsView, &CoregSettingsView::storeTrans,
-//            this, &CoRegistration::onStoreTrans);
+    connect(m_pCoregSettingsView, &CoregSettingsView::loadTrans,
+            this, &CoRegistration::onLoadTrans);
 
     onChangeSelectedBem(m_pCoregSettingsView->getCurrentSelectedBem());
 
@@ -229,8 +229,16 @@ void CoRegistration::onDigitizersChanged(const QString& sFilePath)
     QFile fileDig(sFilePath);
     m_digSetHead = FiffDigPointSet(fileDig);
 
+    // send digitizer to 3DView
     QVariant data = QVariant::fromValue(m_digSetHead);
     m_pCommu->publishEvent(EVENT_TYPE::NEW_DIGITIZER_ADDED, data);
+
+    // set transformation if not empty
+    if(!m_transHeadMri.isEmpty()) {
+        QVariant data = QVariant::fromValue(m_transHeadMri);
+        m_pCommu->publishEvent(EVENT_TYPE::NEW_TRANS_AVAILABE, data);
+    }
+
     return;
 }
 
@@ -246,6 +254,63 @@ void CoRegistration::onFiducialsChanged(const QString& sFilePath)
     return;
 }
 
+//=============================================================================================================
+
+void CoRegistration::onStoreFiducials(const QString& sFilePath)
+{
+    QFile fileDig(sFilePath);
+    m_digFidMri.write(fileDig);
+    return;
+}
+
+//=============================================================================================================
+
+void CoRegistration::onLoadTrans(const QString& sFilePath)
+{
+    QFile fileTrans(sFilePath);
+    FiffCoordTrans transTemp = FiffCoordTrans(fileTrans);
+
+    // Transformation parameters
+    Vector3f vecRot;
+    Vector3f vecScale;
+    Vector3f vecTrans;
+
+    if(transTemp.from == FIFFV_COORD_HEAD && transTemp.to == FIFFV_COORD_MRI) {
+        m_transHeadMri = FiffCoordTrans(transTemp);
+
+        // Update Widget
+        getParamFromTrans(m_transHeadMri.trans,vecRot,vecTrans,vecScale);
+        m_pCoregSettingsView->setTransParams(vecTrans,vecRot,vecScale);
+
+        // send event
+        QVariant data = QVariant::fromValue(m_transHeadMri);
+        m_pCommu->publishEvent(EVENT_TYPE::NEW_TRANS_AVAILABE, data);
+
+    } else if (transTemp.from == FIFFV_COORD_MRI && transTemp.to == FIFFV_COORD_HEAD) {
+        transTemp.invert_transform();
+        m_transHeadMri = FiffCoordTrans(transTemp);
+
+        // Update Widget
+        getParamFromTrans(m_transHeadMri.trans,vecRot,vecTrans,vecScale);
+        m_pCoregSettingsView->setTransParams(vecTrans,vecRot,vecScale);
+
+        // send event
+        QVariant data = QVariant::fromValue(m_transHeadMri);
+        m_pCommu->publishEvent(EVENT_TYPE::NEW_TRANS_AVAILABE, data);
+    } else {
+        qDebug() << "[CoRegistration::onLoadTrans] Loaded Transformation from:" << FiffCoordTrans::frame_name(transTemp.from) << "to:" << FiffCoordTrans::frame_name(transTemp.to) << "is not suitable for co-registration.";
+    }
+    return;
+}
+
+//=============================================================================================================
+
+void CoRegistration::onStoreTrans(const QString& sFilePath)
+{
+    QFile fileDig(sFilePath);
+
+    return;
+}
 //=============================================================================================================
 
 void CoRegistration::onFitFiducials()
@@ -431,7 +496,6 @@ void CoRegistration::onUpdateTrans()
     m_pCoregSettingsView->getTransParams(vecRot,vecTrans,vecScale);
     getTransFromParam(matTrans,vecRot,vecTrans,vecScale);
 
-
     // send event
     m_transHeadMri.trans = matTrans;
     QVariant data = QVariant::fromValue(m_transHeadMri);
@@ -499,46 +563,3 @@ void CoRegistration::getTransFromParam(Matrix4f& matTrans,
     return;
 }
 
-//=============================================================================================================
-
-void CoRegistration::onStoreFiducials(const QString& sFilePath)
-{
-    QFile fileDig(sFilePath);
-    m_digFidMri.write(fileDig);
-    return;
-}
-
-//=============================================================================================================
-
-void CoRegistration::onLoadTrans(const QString& sFilePath)
-{
-    QFile fileTrans(sFilePath);
-    FiffCoordTrans transTemp = FiffCoordTrans(fileTrans);
-    if(transTemp.from == FIFFV_COORD_HEAD && transTemp.to == FIFFV_COORD_MRI) {
-        m_transHeadMri = FiffCoordTrans(transTemp);
-
-        // send event
-        QVariant data = QVariant::fromValue(m_transHeadMri);
-        m_pCommu->publishEvent(EVENT_TYPE::NEW_TRANS_AVAILABE, data);
-
-    } else if (transTemp.from == FIFFV_COORD_MRI && transTemp.to == FIFFV_COORD_HEAD) {
-        transTemp.invert_transform();
-        m_transHeadMri = FiffCoordTrans(transTemp);
-
-        // send event
-        QVariant data = QVariant::fromValue(m_transHeadMri);
-        m_pCommu->publishEvent(EVENT_TYPE::NEW_TRANS_AVAILABE, data);
-    } else {
-        qDebug() << "[CoRegistration::onLoadTrans] Loaded Transformation from:" << FiffCoordTrans::frame_name(transTemp.from) << "to:" << FiffCoordTrans::frame_name(transTemp.to) << "is not suitable for co-registration.";
-    }
-    return;
-}
-
-//=============================================================================================================
-
-//void CoRegistration::onStoreTrans(const QString& sFilePath)
-//{
-//    QFile fileDig(sFilePath);
-
-//    return;
-//}

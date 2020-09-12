@@ -166,6 +166,15 @@ private:
 
     //=========================================================================================================
     /**
+     * Store the transformation to the given file path
+     *
+     * @param[in] sFilePath     The file path to store the transformation.
+     *
+     */
+    void onStoreTrans(const QString& sFilePath);
+
+    //=========================================================================================================
+    /**
      * Perform the actual Coregistration with the ICP algorithm
      *
      */
@@ -214,15 +223,6 @@ private:
                            const Vector3f& vecRot,
                            const Vector3f& vecTrans,
                            const Vector3f& vecScale);
-
-//    //=========================================================================================================
-//    /**
-//     * Store the transformation to the given file path
-//     *
-//     * @param[in] sFilePath     The file path to store the transformation.
-//     *
-//     */
-//    void onStoreTrans(const QString& sFilePath);
 
     //=========================================================================================================
     /**
