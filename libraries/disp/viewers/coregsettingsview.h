@@ -198,9 +198,9 @@ public:
     /**
      * Get the types of digitizers to use for coregistration.
      *
-     * @param[out] vecRot       The rotation angle vector in rad.
-     * @param[out] vecTrans     The traslation vector.
-     * @param[out] vecScale     The vector with the scaling parameters.
+     * @param[out] vecRot       The rotation angle vector in rad (x,y,z).
+     * @param[out] vecTrans     The traslation vector (x,y,z).
+     * @param[out] vecScale     The vector with the scaling parameters (due to euler transformation: z,y,x).
      *
      */
     void getTransParams(Eigen::Vector3f& vecRot,
@@ -211,9 +211,9 @@ public:
     /**
      * Set the transformation received from the ICP  algorithm
      *
-     * @param[in] vecTrans      The translation vector.
-     * @param[in] vecRot        The rotation angle vector in rad.
-     * @param[out] vecScale     The vector with the scaling parameters.
+     * @param[in] vecRot        The rotation angle vector in rad (x,y,z).
+     * @param[in] vecTrans      The traslation vector (x,y,z).
+     * @param[in] vecScale      The vector with the scaling parameters (due to euler transformation: z,y,x).
      *
      */
     void setTransParams(const Eigen::Vector3f& vecTrans,
@@ -252,6 +252,12 @@ private:
      * Store the transformation.
      */
     void onStoreTrans();
+
+    //=========================================================================================================
+    /**
+     * Change the scaling mode.
+     */
+    void onScalingModeChanges();
 
     Ui::CoregSettingsViewWidget*    m_pUi;                  /**< The CoregSettingsViewWidget.*/
     QString                         m_sSettingsPath;        /**< The settings path to store the GUI settings to. */
