@@ -95,13 +95,13 @@ CoregSettingsView::CoregSettingsView(const QString& sSettingsPath,
             this, &CoregSettingsView::onStoreFidFile);
     connect(m_pUi->m_qPushButton_LoadDig, &QPushButton::released,
             this, &CoregSettingsView::onLoadDigFile);
-//    connect(m_pUi->m_qPushButton_LoadTrans &QPushButton::released,
-//            this, &CoregSettingsView::onLoadTrans);
-//    connect(m_pUi->m_qPushButton_StoreTrans &QPushButton::released,
-//            this, &CoregSettingsView::onStoreTrans);
+    connect(m_pUi->m_qPushButton_LoadTrans, &QPushButton::released,
+            this, &CoregSettingsView::onLoadTrans);
+    connect(m_pUi->m_qPushButton_StoreTrans, &QPushButton::released,
+            this, &CoregSettingsView::onStoreTrans);
     connect(m_pUi->m_qComboBox_BemItems, &QComboBox::currentTextChanged,
             this, &CoregSettingsView::changeSelectedBem, Qt::UniqueConnection);
-    m_pUi->m_qGroupBox_StoreTrans->hide();
+//    m_pUi->m_qGroupBox_StoreTrans->hide();
 
 
     // connect icp settings
@@ -245,9 +245,9 @@ void CoregSettingsView::onLoadDigFile()
 void CoregSettingsView::onLoadTrans()
 {
     QString sFileName = QFileDialog::getOpenFileName(this,
-                                                       tr("Select Transformation file"),
+                                                       tr("Select Transformation"),
                                                        QString(),
-                                                       tr("Fif Files (*.fif)"));
+                                                       tr("Fif Files (*-trans.fif)"));
 
     if (sFileName.isEmpty()) {
         return;
@@ -392,6 +392,7 @@ void CoregSettingsView::setTransParams(const Vector3f& vecTrans,
                                        const Vector3f& vecRot,
                                        const Vector3f& vecScale)
 {
+    // block signals to avoid loop
     QSignalBlocker blockerTransX(m_pUi->m_qDoubleSpinBox_TransX);
     QSignalBlocker blockerTransY(m_pUi->m_qDoubleSpinBox_TransY);
     QSignalBlocker blockerTransZ(m_pUi->m_qDoubleSpinBox_TransZ);
