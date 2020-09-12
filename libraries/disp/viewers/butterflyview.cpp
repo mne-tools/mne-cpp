@@ -70,7 +70,7 @@ ButterflyView::ButterflyView(const QString& sSettingsPath,
                              QWidget *parent,
                              Qt::WindowFlags f)
 :
-#if !defined(NO_OPENGL)
+#if !defined(NO_QOPENGLWIDGET)
   QOpenGLWidget(parent, f)
 #else
   QWidget(parent, f)
@@ -106,7 +106,7 @@ ButterflyView::~ButterflyView()
 
 void ButterflyView::updateOpenGLViewport()
 {
-#if !defined(NO_OPENGL)
+#if !defined(NO_QOPENGLWIDGET)
     // Activate anti aliasing
     initializeGL();
 #endif
@@ -320,7 +320,7 @@ void ButterflyView::loadSettings()
 
 //=============================================================================================================
 
-#if !defined(NO_OPENGL)
+#if !defined(NO_QOPENGLWIDGET)
     void ButterflyView::paintGL()
 #else
     void ButterflyView::paintEvent(QPaintEvent *event)
@@ -492,7 +492,7 @@ void ButterflyView::loadSettings()
         }
     }
 
-#if !defined(NO_OPENGL)
+#if !defined(NO_QOPENGLWIDGET)
     return QOpenGLWidget::paintGL();
 #else
     return QWidget::paintEvent(event);

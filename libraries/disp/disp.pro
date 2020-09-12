@@ -56,9 +56,8 @@ contains(MNECPP_CONFIG, wasm) {
     DEFINES += WASMBUILD
 }
 
-contains(MNECPP_CONFIG, noOpenGL) {
-    DEFINES += NO_OPENGL
-    QT -= opengl
+contains(MNECPP_CONFIG, noQOpenGLWidget) {
+    DEFINES += NO_QOPENGLWIDGET
 }
 
 DESTDIR = $${MNE_LIBRARY_DIR}
