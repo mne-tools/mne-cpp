@@ -132,6 +132,9 @@ CoregSettingsView::CoregSettingsView(const QString& sSettingsPath,
     connect(m_pUi->m_qComboBox_ScalingMode, &QComboBox::currentTextChanged,
             this, &CoregSettingsView::onScalingModeChanges, Qt::UniqueConnection);
     onScalingModeChanges();
+
+    // set button infos
+    setToolTipInfo();
 }
 
 //=============================================================================================================
@@ -190,6 +193,49 @@ void CoregSettingsView::updateProcessingMode(ProcessingMode mode)
     default: // default is realtime mode
         break;
     }
+}
+
+//=============================================================================================================
+
+void CoregSettingsView::setToolTipInfo()
+{
+    m_pUi->m_qComboBox_BemItems->setToolTip("Select the Bem to use for coregistration. Load the Bem via: File->Open");
+    m_pUi->m_qPushButton_LoadFid->setToolTip("Optional. Load the fiducials from file.");
+    m_pUi->m_qPushButton_StoreFid->setToolTip("Store the fiducials to file.");
+    m_pUi->m_qPushButton_LoadDig->setToolTip("Load the digitizers from file.");
+    m_pUi->m_qPushButton_LoadTrans->setToolTip("Optional. Load the coordinate transformation from file.");
+    m_pUi->m_qPushButton_StoreTrans->setToolTip("Store the coordinate transformation to file.");
+
+    m_pUi->m_qDoubleSpinBox_WeightRpa->setToolTip("The weight for the RPA.");
+    m_pUi->m_qDoubleSpinBox_WeightLpa->setToolTip("The weight for the LPA.");
+    m_pUi->m_qDoubleSpinBox_WeightNas->setToolTip("The weight for the Nasion.");
+    m_pUi->m_qDoubleSpinBox_WeightEEG->setToolTip("The weight for the EEG points.");
+    m_pUi->m_qDoubleSpinBox_WeightHPI->setToolTip("The weight for the HPI points.");
+    m_pUi->m_qDoubleSpinBox_WeightHSP->setToolTip("The weight for the HSP points. HSP = Head Shape Points");
+    m_pUi->m_qCheckBox_HSP->setToolTip("Wheater to use the HSP points for the Coregistration. HSP = Head Shape Points");
+    m_pUi->m_qCheckBox_EEG->setToolTip("Wheater to use the EEG points for the Coregistration.");
+    m_pUi->m_qCheckBox_HPI->setToolTip("Wheater to use the HPI points for the Coregistration.");
+    m_pUi->m_qSpinBox_MaxDist->setToolTip("The maximum allowed distace between head surface and digitizer cloud. This is used to discard outliers.");
+
+    m_pUi->m_qCheckBox_AutoScale->setToolTip("Wheater to use automatic scaling for the fiducial alignment.");
+    m_pUi->m_qDoubleSpinBox_Converge->setToolTip("The convergence limit for the ICP algorithm.");
+    m_pUi->m_qSpinBox_MaxIter->setToolTip("The maximum number of iterations for the ICP algorithm.");
+    m_pUi->m_qPushButton_FitFiducials->setToolTip("Fiducial alignment. Apply this step before using the ICP algorithm to get a better first guess.");
+    m_pUi->m_qPushButton_FitICP->setToolTip("Co-Registration with the ICP algorithm.");
+
+    m_pUi->m_qComboBox_ScalingMode->setToolTip("The scaling Mode. None - No scaling is applied; Uniform - same scaling for x,y,z-axis; 3-Axis - scaling on each axis.");
+    m_pUi->m_qDoubleSpinBox_ScalingX->setToolTip("Scaling to apply in x-direction.");
+    m_pUi->m_qDoubleSpinBox_ScalingY->setToolTip("Scaling to apply in y-direction.");
+    m_pUi->m_qDoubleSpinBox_ScalingZ->setToolTip("Scaling to apply in z-direction.");
+
+    m_pUi->m_qDoubleSpinBox_RotX->setToolTip("Rotation arround x-axis.");
+    m_pUi->m_qDoubleSpinBox_RotY->setToolTip("Rotation arround in y-axis.");
+    m_pUi->m_qDoubleSpinBox_RotZ->setToolTip("Rotation arround in z-axis.");
+
+    m_pUi->m_qDoubleSpinBox_TransX->setToolTip("Translation to apply in x-direction.");
+    m_pUi->m_qDoubleSpinBox_TransY->setToolTip("Translation to apply in y-direction.");
+    m_pUi->m_qDoubleSpinBox_TransZ->setToolTip("Translation to apply in z-direction.");
+
 }
 
 //=============================================================================================================

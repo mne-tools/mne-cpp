@@ -259,6 +259,12 @@ private:
      */
     void onScalingModeChanges();
 
+    //=========================================================================================================
+    /**
+     * Set the toolTip information for all buttons.
+     */
+    void setToolTipInfo();
+
     Ui::CoregSettingsViewWidget*    m_pUi;                  /**< The CoregSettingsViewWidget.*/
     QString                         m_sSettingsPath;        /**< The settings path to store the GUI settings to. */
 
