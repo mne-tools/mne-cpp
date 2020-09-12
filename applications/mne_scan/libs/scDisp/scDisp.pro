@@ -43,9 +43,8 @@ QT += widgets concurrent xml svg 3dextras opengl
 
 DEFINES += SCDISP_LIBRARY
 
-contains(MNECPP_CONFIG, noOpenGL) {
-    DEFINES += NO_OPENGL
-    QT -= opengl
+contains(MNECPP_CONFIG, noQOpenGLWidget) {
+    DEFINES += NO_QOPENGLWIDGET
 }
 
 TARGET = scDisp

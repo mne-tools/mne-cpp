@@ -46,9 +46,8 @@ DEFINES += RAWDATAVIEWER_PLUGIN
 
 QT += gui widgets charts svg opengl
 
-contains(MNECPP_CONFIG, noOpenGL) {
-    DEFINES += NO_OPENGL
-    QT -= opengl
+contains(MNECPP_CONFIG, noQOpenGLWidget) {
+    DEFINES += NO_QOPENGLWIDGET
 }
 
 TARGET = rawdataviewer
