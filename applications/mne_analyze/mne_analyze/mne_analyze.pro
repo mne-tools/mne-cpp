@@ -197,6 +197,14 @@ macx {
     loutrc.files = $${ROOT_DIR}/resources/general/2DLayouts
     QMAKE_BUNDLE_DATA += loutrc
 
+    # If Qt3D plugins/renderers folder exisits, create and copy renderers folder to mne-cpp/bin manually.
+    # macdeployqt does not deploy them. This will be fixed in Qt 5.15.2.
+    exists($$shell_path($$[QT_INSTALL_PLUGINS]/renderers)) {
+        qt3drenderers.path = Contents/PlugIns/
+        qt3drenderers.files = $$[QT_INSTALL_PLUGINS]/renderers
+        QMAKE_BUNDLE_DATA += qt3drenderers
+    }
+
     !contains(MNECPP_CONFIG, static) {
         # 3 entries returned in DEPLOY_CMD
         EXTRA_ARGS =

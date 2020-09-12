@@ -39,11 +39,7 @@ include(../../../mne-cpp.pri)
 
 TEMPLATE = app
 
-QT += network core widgets xml svg charts concurrent opengl
-
-qtHaveModule(3dextras) {
-    QT += 3dextras
-}
+QT += network core widgets xml svg charts concurrent opengl 3dextras
 
 CONFIG += console
 
@@ -221,6 +217,14 @@ macx {
     plugins.path = Contents/MacOS/
     plugins.files = $${ROOT_DIR}/bin/mne_scan_plugins
     QMAKE_BUNDLE_DATA += plugins
+
+    # If Qt3D plugins/renderers folder exisits, create and copy renderers folder to mne-cpp/bin manually.
+    # macdeployqt does not deploy them. This will be fixed in Qt 5.15.2.
+    exists($$shell_path($$[QT_INSTALL_PLUGINS]/renderers)) {
+        qt3drenderers.path = Contents/PlugIns/
+        qt3drenderers.files = $$[QT_INSTALL_PLUGINS]/renderers
+        QMAKE_BUNDLE_DATA += qt3drenderers
+    }
 
     !contains(MNECPP_CONFIG, static) {
         # 3 entries returned in DEPLOY_CMD
