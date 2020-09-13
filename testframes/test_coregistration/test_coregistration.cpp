@@ -197,7 +197,8 @@ void TestCoregistration::initTestCase()
     }
 
     // icp
-    if(!RTPROCESSINGLIB::performIcp(mneSurfacePoints, matHspClean, transHeadMri, iMaxIter, fTol, vecWeightsICPClean)) {
+    float fRMSE = 0.0;
+    if(!RTPROCESSINGLIB::performIcp(mneSurfacePoints, matHspClean, transHeadMri, fRMSE, iMaxIter, fTol, vecWeightsICPClean)) {
         qWarning() << "ICP was not succesfull.";
     }
 }

@@ -74,6 +74,7 @@ using namespace FIFFLIB;
 bool RTPROCESSINGLIB::performIcp(const MNEProjectToSurface::SPtr mneSurfacePoints,
                                  const Eigen::MatrixXf& matPointCloud,
                                  FiffCoordTrans& transFromTo,
+                                 float& fRMSE,
                                  int iMaxIter,
                                  float fTol,
                                  const VectorXf& vecWeitgths)
@@ -92,7 +93,7 @@ bool RTPROCESSINGLIB::performIcp(const MNEProjectToSurface::SPtr mneSurfacePoint
     int iNP = matPointCloud.rows();             // The number of points
     float fMSEPrev,fMSE = 0.0;                  // The mean square error
     float fScale = 1.0;
-    float bScale = true;
+    float bScale = false;
     MatrixXf matP0 = matPointCloud;             // Initial Set of points
     MatrixXf matPk = matP0;                     // Transformed Set of points
     MatrixXf matYk(matPk.rows(),matPk.cols());  // Iterative closest points on the surface
@@ -127,18 +128,20 @@ bool RTPROCESSINGLIB::performIcp(const MNEProjectToSurface::SPtr mneSurfacePoint
         // step d: compute mean-square-error and terminate if below fTol
         vecDist = vecDist.cwiseProduct(vecDist);
         fMSE = vecDist.sum() / iNP;
+        fRMSE = std::sqrt(fMSE);
+
         if(std::sqrt(std::fabs(fMSE - fMSEPrev)) < fTol) {
             transFromTo = transICP;
-            qInfo() << "[RTPROCESSINGLIB::icp] ICP was succesfull and exceeded after " << iIter +1 << " Iterations with RMSE dist: " << std::sqrt(fMSE) * 1000 << " mm.";
+            qInfo() << "[RTPROCESSINGLIB::icp] ICP was succesfull and exceeded after " << iIter +1 << " Iterations with RMSE dist: " << fRMSE * 1000 << " mm.";
             return true;
         }
         fMSEPrev = fMSE;
-        qInfo() << "[RTPROCESSINGLIB::icp] ICP iteration " << iIter + 1 << " with RMSE: " << std::sqrt(std::fabs(fMSE)) * 1000 << " mm.";
+        qInfo() << "[RTPROCESSINGLIB::icp] ICP iteration " << iIter + 1 << " with RMSE: " << fRMSE * 1000 << " mm.";
     }
     transFromTo = transICP;
 
-    qWarning() << "[RTPROCESSINGLIB::icp] Maximum number of " << iMaxIter << " Iterations exceeded with RMSE: " << std::sqrt(std::fabs(fMSE)) * 1000 << " mm.";
-    return false;
+    qWarning() << "[RTPROCESSINGLIB::icp] Maximum number of " << iMaxIter << " Iterations exceeded with RMSE: " << fRMSE * 1000 << " mm.";
+    return true;
 }
 
 //=============================================================================================================
@@ -286,6 +289,7 @@ bool RTPROCESSINGLIB::discard3DPointOutliers(const QSharedPointer<MNELIB::MNEPro
         }
     }
     qInfo() << "[RTPROCESSINGLIB::discardOutliers] " << iDiscarded << "digitizers discarded.";
+    return true;
 }
 
 //=============================================================================================================

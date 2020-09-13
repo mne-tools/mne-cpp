@@ -175,6 +175,14 @@ public:
 
     //=========================================================================================================
     /**
+     * Set the the number of omitted points
+     *
+     * @param[in] fRMSE  The RMSE m.
+     */
+    void setRMSE(const float fRMSE);
+
+    //=========================================================================================================
+    /**
      * Get the weights for the digitizer types
      *
      * @return  The weight.

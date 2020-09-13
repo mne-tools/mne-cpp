@@ -84,6 +84,7 @@ const Eigen::VectorXf vecDefaultWeigths;
  * @param [in]  mneSurfacePoints    The MNEProjectToSurface object that contains the surface triangles etc. (To).
  * @param [in]  matPointCloud       The point cloud to be registrated (From).
  * @param [out] transFromTo         The forward transformation matrix. It can contain an initial transformatin (e.g. from fiducial alignment).
+ * @param [out] fRMSE               The resulting Root-Mean-Square-Error in m.
  * @param [in]  iMaxIter            The maximum number of iterations for the icp algorithms, defaults to 20.
  * @param [in]  fTol                The destination point set to be reistrated, defaults to 0.001.
  * @param [in]  vecWeitgths         The weitghts to apply, defaults to zeros.
@@ -94,6 +95,7 @@ const Eigen::VectorXf vecDefaultWeigths;
 RTPROCESINGSHARED_EXPORT bool performIcp(const QSharedPointer<MNELIB::MNEProjectToSurface> mneSurfacePoints,
                                          const Eigen::MatrixXf& matPointCloud,
                                          FIFFLIB::FiffCoordTrans& transFromTo,
+                                         float& fRMSE,
                                          int iMaxIter = 20,
                                          float fTol = 0.001,
                                          const Eigen::VectorXf& vecWeitgths = vecDefaultWeigths);
@@ -131,7 +133,6 @@ RTPROCESINGSHARED_EXPORT bool fitMatchedPoints(const Eigen::MatrixXf& matSrcPoin
  * @param [in]  vecTake             The index of taken digitizers.
  * @param [in]  matTakePoint        The the digitizer points to take.
  * @param [in]  fMaxDist            The maximum distance to the surface in mm, defaults to 0 mm.
- * @param [out] iNDiscarded         The number of discarded points
  *
  * @return Wether the discarding was succesfull.
  */

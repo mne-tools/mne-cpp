@@ -101,8 +101,6 @@ CoregSettingsView::CoregSettingsView(const QString& sSettingsPath,
             this, &CoregSettingsView::onStoreTrans);
     connect(m_pUi->m_qComboBox_BemItems, &QComboBox::currentTextChanged,
             this, &CoregSettingsView::changeSelectedBem, Qt::UniqueConnection);
-//    m_pUi->m_qGroupBox_StoreTrans->hide();
-
 
     // connect icp settings
     connect(m_pUi->m_qPushButton_FitFiducials, &QPushButton::released,
@@ -222,7 +220,7 @@ void CoregSettingsView::setToolTipInfo()
     m_pUi->m_qSpinBox_MaxIter->setToolTip("The maximum number of iterations for the ICP algorithm.");
     m_pUi->m_qPushButton_FitFiducials->setToolTip("Fiducial alignment. Apply this step before using the ICP algorithm to get a better first guess.");
     m_pUi->m_qPushButton_FitICP->setToolTip("Co-Registration with the ICP algorithm.");
-
+    m_pUi->m_qLabel_RMSE->setToolTip("The Root-Mean-Square-Error of the distance between closest pont and digigizer in mm");
     m_pUi->m_qComboBox_ScalingMode->setToolTip("The scaling Mode. None - No scaling is applied; Uniform - same scaling for x,y,z-axis; 3-Axis - scaling on each axis.");
     m_pUi->m_qDoubleSpinBox_ScalingX->setToolTip("Scaling to apply in x-direction.");
     m_pUi->m_qDoubleSpinBox_ScalingY->setToolTip("Scaling to apply in y-direction.");
@@ -430,6 +428,13 @@ QString CoregSettingsView::getCurrentSelectedBem()
 void CoregSettingsView::setOmittedPoints(const int iN)
 {
     m_pUi->m_qLabel_NOmitted->setText(QString::number(iN));
+}
+
+//=============================================================================================================
+
+void CoregSettingsView::setRMSE(const float fRMSE)
+{
+    m_pUi->m_qLabel_RMSE->setText(QString::number(fRMSE*1000) + " mm");
 }
 
 //=============================================================================================================
