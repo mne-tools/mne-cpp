@@ -203,6 +203,7 @@ int main(int argc, char *argv[])
 
     MatrixXf matHspClean;
     VectorXi vecTake;
+    float fRMSE = 0.0;
 
     // discard outliers
     if(!RTPROCESSINGLIB::discard3DPointOutliers(mneSurfacePoints, matHsp, transHeadMri, vecTake, matHspClean, fMaxDist)) {
@@ -215,7 +216,7 @@ int main(int argc, char *argv[])
     }
 
     // icp
-    if(!RTPROCESSINGLIB::performIcp(mneSurfacePoints, matHspClean, transHeadMri, iMaxIter, fTol, vecWeightsICPClean)) {
+    if(!RTPROCESSINGLIB::performIcp(mneSurfacePoints, matHspClean, transHeadMri, fRMSE, iMaxIter, fTol, vecWeightsICPClean)) {
         qWarning() << "ICP was not succesfull.";
     }
     qInfo() << "transHeadMri:";

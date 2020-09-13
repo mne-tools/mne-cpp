@@ -327,20 +327,15 @@ void CoRegistration::onFitFiducials()
     float fWeightNAS = m_pCoregSettingsView->getWeightNAS();
     float fWeightRPA = m_pCoregSettingsView->getWeightRPA();
 
-    std::cout << fWeightLPA << " " << fWeightNAS<< " " << fWeightRPA << std::endl;
-
-
     // Declare variables
     FiffDigPointSet digSetFidHead = m_digSetHead.pickTypes({FIFFV_POINT_CARDINAL});
     FiffDigPointSet digSetFidMRI = m_digFidMri.pickTypes({FIFFV_POINT_CARDINAL});
-
-    std::cout << digSetFidHead.size() << " " << digSetFidMRI.size() << std::endl;
 
     Matrix3f matHead(digSetFidHead.size(),3);
     Matrix3f matMri(digSetFidMRI.size(),3);
     Matrix4f matTrans;
     Vector3f vecWeights; // LPA, Nasion, RPA
-    float fScale;
+    float fScale = 0.0;
 
     // get coordinates
     for(int i = 0; i< digSetFidHead.size(); ++i) {
@@ -370,8 +365,6 @@ void CoRegistration::onFitFiducials()
     fiff_int_t iFrom = FIFFV_COORD_HEAD;
     fiff_int_t iTo = FIFFV_COORD_MRI;
     m_transHeadMri = FiffCoordTrans::make(iFrom, iTo, matTrans);
-
-    m_transHeadMri.print();
 
     // update GUI
     Vector3f vecRot;
@@ -406,6 +399,7 @@ void CoRegistration::onFitICP()
     float fMaxDist = m_pCoregSettingsView->getOmmitDistance();
     float fTol = m_pCoregSettingsView->getConvergence();
     int iMaxIter = m_pCoregSettingsView->getMaxIter();
+    float fRMSE = 0.0;
 
     // init surface points
     MNEBem bemHead = *m_pBem.data();
@@ -452,22 +446,30 @@ void CoRegistration::onFitICP()
     MatrixXf matHspClean;
     VectorXi vecTake;
     // discard outliers
-    if(!RTPROCESSINGLIB::discard3DPointOutliers(mneSurfacePoints, matHsp, m_transHeadMri, vecTake, matHspClean, fMaxDist)) {
+    if(!RTPROCESSINGLIB::discard3DPointOutliers(mneSurfacePoints,
+                                                matHsp,
+                                                m_transHeadMri,
+                                                vecTake,
+                                                matHspClean,
+                                                fMaxDist)) {
         qWarning() << "Discard outliers was not succesfull.";
     }
     int iNDiscarded = vecWeightsICP.size() - vecTake.size();
     m_pCoregSettingsView->setOmittedPoints(iNDiscarded);
 
     VectorXf vecWeightsICPClean(vecTake.size());
-
     for(int i = 0; i < vecTake.size(); ++i) {
         vecWeightsICPClean(i) = vecWeightsICP(vecTake(i));
     }
 
     // icp
-    if(!RTPROCESSINGLIB::performIcp(mneSurfacePoints, matHspClean, m_transHeadMri, iMaxIter, fTol, vecWeightsICPClean)) {
-        qWarning() << "ICP was not succesfull.";
-    }
+    RTPROCESSINGLIB::performIcp(mneSurfacePoints,
+                                matHspClean,
+                                m_transHeadMri,
+                                fRMSE,
+                                iMaxIter,
+                                fTol,
+                                vecWeightsICPClean);
 
     // update GUI
     Vector3f vecRot;
@@ -475,6 +477,7 @@ void CoRegistration::onFitICP()
     Vector3f vecTrans;
     getParamFromTrans(m_transHeadMri.trans,vecRot,vecTrans,vecScale);
     m_pCoregSettingsView->setTransParams(vecTrans,vecRot,vecScale);
+    m_pCoregSettingsView->setRMSE(fRMSE);
 
     // send event
     QVariant data = QVariant::fromValue(m_transHeadMri);
