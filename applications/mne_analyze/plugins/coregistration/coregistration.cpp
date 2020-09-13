@@ -81,6 +81,7 @@ using namespace FIFFLIB;
 CoRegistration::CoRegistration()
     : m_pCoregSettingsView(Q_NULLPTR)
 {
+    m_vecBemModels = QVector<QSharedPointer<ANSHAREDLIB::AbstractModel>>();
 }
 
 //=============================================================================================================
@@ -197,7 +198,6 @@ void CoRegistration::updateBemList(ANSHAREDLIB::AbstractModel::SPtr pNewModel)
     if(pNewModel->getType() == ANSHAREDLIB_BEMDATA_MODEL) {
         m_pCoregSettingsView->clearSelectionBem();
         m_vecBemModels.append(pNewModel);
-
         for(int i = 0; i < m_vecBemModels.size(); i++){
             m_pCoregSettingsView->addSelectionBem(m_vecBemModels.at(i)->getModelName());
         }
@@ -210,9 +210,10 @@ void CoRegistration::onChangeSelectedBem(const QString &sText)
 {
     QVectorIterator<QSharedPointer<ANSHAREDLIB::AbstractModel>> i(m_vecBemModels);
     QSharedPointer<ANSHAREDLIB::BemDataModel> pBemDataModel;
-    while (i.hasNext()) {
-        if(i.peekNext()->getModelName() == sText) {
-            pBemDataModel = qSharedPointerCast<BemDataModel>(i.next());
+
+    for (auto bemDataModel : m_vecBemModels) {
+        if(bemDataModel->getModelName() == sText){
+            pBemDataModel = qSharedPointerCast<BemDataModel>(bemDataModel);
             m_pBem = QSharedPointer<MNEBem>(pBemDataModel->getBem());
 
             QVariant data = QVariant::fromValue(pBemDataModel);
@@ -220,6 +221,7 @@ void CoRegistration::onChangeSelectedBem(const QString &sText)
             return;
         }
     }
+
 }
 
 //=============================================================================================================
@@ -311,6 +313,7 @@ void CoRegistration::onStoreTrans(const QString& sFilePath)
 
     return;
 }
+
 //=============================================================================================================
 
 void CoRegistration::onFitFiducials()

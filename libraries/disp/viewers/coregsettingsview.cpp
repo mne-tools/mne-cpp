@@ -241,9 +241,9 @@ void CoregSettingsView::setToolTipInfo()
 void CoregSettingsView::onLoadFidFile()
 {
     QString sFileName = QFileDialog::getOpenFileName(this,
-                                                       tr("Select fiducials"),
-                                                       QString(),
-                                                       tr("Fif Files (*.fif)"));
+                                                     tr("Select fiducials"),
+                                                     QString(),
+                                                     tr("Fif Files (*.fif)"));
 
     if (sFileName.isEmpty()) {
         return;
@@ -273,9 +273,9 @@ void CoregSettingsView::onStoreFidFile()
 void CoregSettingsView::onLoadDigFile()
 {
     QString sFileName = QFileDialog::getOpenFileName(this,
-                                                       tr("Select digitizer file"),
-                                                       QString(),
-                                                       tr("Fif Files (*.fif)"));
+                                                     tr("Select digitizer file"),
+                                                     QString(),
+                                                     tr("Fif Files (*.fif)"));
 
     if (sFileName.isEmpty()) {
         return;
@@ -289,9 +289,9 @@ void CoregSettingsView::onLoadDigFile()
 void CoregSettingsView::onLoadTrans()
 {
     QString sFileName = QFileDialog::getOpenFileName(this,
-                                                       tr("Select Transformation"),
-                                                       QString(),
-                                                       tr("Fif Files (*-trans.fif)"));
+                                                     tr("Select Transformation"),
+                                                     QString(),
+                                                     tr("Fif Files (*-trans.fif)"));
 
     if (sFileName.isEmpty()) {
         return;
@@ -406,7 +406,9 @@ QList<int> CoregSettingsView::getDigitizerCheckState()
 
 void CoregSettingsView::clearSelectionBem()
 {
+    QSignalBlocker blockerComboBox(m_pUi->m_qComboBox_BemItems);
     m_pUi->m_qComboBox_BemItems->clear();
+
 }
 
 //=============================================================================================================
