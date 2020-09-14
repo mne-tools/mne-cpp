@@ -287,7 +287,6 @@ private:
 
     QSharedPointer<ANSHAREDLIB::FiffRawViewModel>           m_pFiffRawModel;            /**< Pointer to currently loaded FiffRawView Model */
     QSharedPointer<QList<QPair<int,double>>>                m_pTriggerList;             /**< Pointer to list of stim triggers */
-    QSharedPointer<FIFFLIB::FiffEvoked>                     m_pFiffEvoked;              /**< Pointer to object to store averaging data */
     QSharedPointer<DISPLIB::EvokedSetModel>                 m_pEvokedModel;             /**< Pointer to model used to display averaging data from m_pFiffEvokedSet and m_pFiffEvoked */
     QSharedPointer<DISPLIB::ChannelInfoModel>               m_pChannelInfoModel;        /**< Pointer to model that holds channel info data */
     QSharedPointer<FIFFLIB::FiffInfo>                       m_pFiffInfo;                /**< Pointer to info about loaded fiff data */
