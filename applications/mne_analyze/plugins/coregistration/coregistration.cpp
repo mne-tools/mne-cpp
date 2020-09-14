@@ -81,7 +81,7 @@ using namespace FIFFLIB;
 CoRegistration::CoRegistration()
     : m_pCoregSettingsView(Q_NULLPTR)
 {
-    m_vecBemModels = QVector<QSharedPointer<ANSHAREDLIB::AbstractModel>>();
+    m_vecBemDataModels = QVector<QSharedPointer<ANSHAREDLIB::AbstractModel>>();
 }
 
 //=============================================================================================================
@@ -195,11 +195,12 @@ QVector<EVENT_TYPE> CoRegistration::getEventSubscriptions(void) const
 
 void CoRegistration::updateBemList(ANSHAREDLIB::AbstractModel::SPtr pNewModel)
 {
-    if(pNewModel->getType() == ANSHAREDLIB_BEMDATA_MODEL) {
+    // check first if model was already added and if the passed model is actually a BemDataModel
+    if(!m_vecBemDataModels.contains(pNewModel) && pNewModel->getType() == ANSHAREDLIB_BEMDATA_MODEL) {
         m_pCoregSettingsView->clearSelectionBem();
-        m_vecBemModels.append(pNewModel);
-        for(int i = 0; i < m_vecBemModels.size(); i++){
-            m_pCoregSettingsView->addSelectionBem(m_vecBemModels.at(i)->getModelName());
+        m_vecBemDataModels.append(pNewModel);
+        for(int i = 0; i < m_vecBemDataModels.size(); i++) {
+            m_pCoregSettingsView->addSelectionBem(m_vecBemDataModels.at(i)->getModelName());
         }
     }
 }
@@ -208,10 +209,10 @@ void CoRegistration::updateBemList(ANSHAREDLIB::AbstractModel::SPtr pNewModel)
 
 void CoRegistration::onChangeSelectedBem(const QString &sText)
 {
-    QVectorIterator<QSharedPointer<ANSHAREDLIB::AbstractModel>> i(m_vecBemModels);
+    QVectorIterator<QSharedPointer<ANSHAREDLIB::AbstractModel>> i(m_vecBemDataModels);
     QSharedPointer<ANSHAREDLIB::BemDataModel> pBemDataModel;
 
-    for (auto bemDataModel : m_vecBemModels) {
+    for (auto bemDataModel : m_vecBemDataModels) {
         if(bemDataModel->getModelName() == sText){
             pBemDataModel = qSharedPointerCast<BemDataModel>(bemDataModel);
             m_pBem = QSharedPointer<MNEBem>(pBemDataModel->getBem());
