@@ -71,6 +71,7 @@
 
 #include <QDebug>
 #include <QTabWidget>
+#include <QtConcurrent/QtConcurrent>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -215,6 +216,8 @@ QDockWidget* Averaging::getControl()
             this, &Averaging::onComputeButtonClicked, Qt::UniqueConnection);
     connect(m_pAveragingSettingsView, &DISPLIB::AveragingSettingsView::changeDropActive,
             this, &Averaging::onRejectionChecked, Qt::UniqueConnection);
+    connect(&m_FutureWatcher, &QFutureWatcher<QMap<double,QList<int>>>::finished,
+            this, &Averaging::createNewAverage, Qt::UniqueConnection);
 
     m_pAveragingSettingsView->setProcessingMode(DISPLIB::AbstractView::ProcessingMode::Offline);
     m_pAveragingSettingsView->setSizePolicy(QSizePolicy::Expanding,
@@ -371,24 +374,16 @@ void Averaging::onComputeButtonClicked(bool bChecked)
 void Averaging::computeAverage()
 {
     if(!m_pFiffRawModel){
-        qWarning() << "No model loaded. Cannot calculate average";
+        qWarning() << "No model loaded. Cannot calculate average.";
         return;
     }
 
-    MatrixXi matEvents;
-    QMap<QString,double> mapReject;
-
-    int iType = 1; //hardwired for now, change later to type
-    mapReject.insert("eog", 300e-06);
-
-    FIFFLIB::FiffRawData* pFiffRaw = this->m_pFiffRawModel->getFiffIO()->m_qlistRaw.first().data();
-
-    matEvents = m_pFiffRawModel->getAnnotationModel()->getAnnotationMatrix(m_iCurrentGroup);
-
-    if(matEvents.size() < 6){
-        qWarning() << "Not enough data points to calculate average.";
-        return;
+    if (m_FutureWatcher.isRunning()){
+        qWarning() << "Averaging computation already taking place.";
     }
+
+    m_Future = QtConcurrent::run(this, &Averaging::averageCalacualtion);
+    m_FutureWatcher.setFuture(m_Future);
 
 //    QSharedPointer<FIFFLIB::FiffEvoked> pFiffEvoked = QSharedPointer<FIFFLIB::FiffEvoked>(new FIFFLIB::FiffEvoked());
 
@@ -428,34 +423,39 @@ void Averaging::computeAverage()
 
 //=============================================================================================================
 
-QSharedPointer<FIFFLIB::FiffEvokedSet> Averaging::averageCalacualtion(FIFFLIB::FiffRawData pFiffRaw,
-                                                                      MatrixXi matEvents,
-                                                                      float fPreStim,
-                                                                      float fPostStim,
-                                                                      int iType,
-                                                                      bool bBaseline,
-                                                                      float fBaselineFromS,
-                                                                      float fBaselineToS,
-                                                                      QMap<QString,
-                                                                      double> mapReject,
-                                                                      RTPROCESSINGLIB::FilterKernel filterKernel,
-                                                                      bool bPerformFiltering)
+QSharedPointer<FIFFLIB::FiffEvokedSet> Averaging::averageCalacualtion()
 {
+
+    MatrixXi matEvents;
+    QMap<QString,double> mapReject;
+
+    int iType = 1; //hardwired for now, change later to type
+    mapReject.insert("eog", 300e-06);
+
+    FIFFLIB::FiffRawData* pFiffRaw = this->m_pFiffRawModel->getFiffIO()->m_qlistRaw.first().data();
+
+    matEvents = m_pFiffRawModel->getAnnotationModel()->getAnnotationMatrix(m_iCurrentGroup);
+
+    if(matEvents.size() < 6){
+        qWarning() << "[Averaging::averageCalacualtion] Not enough data points to calculate average.";
+        return Q_NULLPTR;
+    }
+
     QSharedPointer<FIFFLIB::FiffEvoked> pFiffEvoked = QSharedPointer<FIFFLIB::FiffEvoked>(new FIFFLIB::FiffEvoked());
 
-    if(bPerformFiltering) {
-        *pFiffEvoked = RTPROCESSINGLIB::computeFilteredAverage(pFiffRaw,
+    if(m_bPerformFiltering) {
+        *pFiffEvoked = RTPROCESSINGLIB::computeFilteredAverage(*pFiffRaw,
                                                                matEvents,
-                                                               fPreStim,
-                                                               fPostStim,
+                                                               m_fPreStim,
+                                                               m_fPostStim,
                                                                iType,
-                                                               bBaseline,
-                                                               fBaselineFromS,
-                                                               fBaselineToS,
+                                                               m_bBasline,
+                                                               m_fBaselineFromS,
+                                                               m_fBaselineToS,
                                                                mapReject,
-                                                               filterKernel);
+                                                               m_filterKernel);
     } else {
-        *pFiffEvoked = RTPROCESSINGLIB::computeAverage(pFiffRaw,
+        *pFiffEvoked = RTPROCESSINGLIB::computeAverage(*pFiffRaw,
                                                        matEvents,
                                                        m_fPreStim,
                                                        m_fPostStim,
@@ -483,11 +483,17 @@ QSharedPointer<FIFFLIB::FiffEvokedSet> Averaging::averageCalacualtion(FIFFLIB::F
 
 void Averaging::createNewAverage()
 {
-    QSharedPointer<ANSHAREDLIB::AveragingDataModel> pNewAvgModel = QSharedPointer<ANSHAREDLIB::AveragingDataModel>(new ANSHAREDLIB::AveragingDataModel(pFiffEvokedSet));
+    QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet = m_Future.result();
 
-    m_pAnalyzeData->addModel<ANSHAREDLIB::AveragingDataModel>(pNewAvgModel, "Average - " + m_pAveragingSettingsView->getCurrentSelectGroup() + " - " + QDateTime::currentDateTime().toString());
+    if(pEvokedSet){
+        QSharedPointer<ANSHAREDLIB::AveragingDataModel> pNewAvgModel = QSharedPointer<ANSHAREDLIB::AveragingDataModel>(new ANSHAREDLIB::AveragingDataModel());
 
-    qInfo() << "[Averaging::computeAverage] Average computed.";
+        m_pAnalyzeData->addModel<ANSHAREDLIB::AveragingDataModel>(pNewAvgModel, "Average - " + m_pAveragingSettingsView->getCurrentSelectGroup() + " - " + QDateTime::currentDateTime().toString());
+
+        qInfo() << "[Averaging::createNewAverage] Average computed.";
+    } else {
+        qInfo() << "[Averaging::createNewAverage] Unable to cumpute average.";
+    }
 }
 
 //=============================================================================================================
