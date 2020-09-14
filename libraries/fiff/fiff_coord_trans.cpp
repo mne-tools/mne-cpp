@@ -162,30 +162,20 @@ bool FiffCoordTrans::read(QIODevice& p_IODevice, FiffCoordTrans& p_Trans)
 
 //=============================================================================================================
 
-void FiffCoordTrans::write(QIODevice &p_IODevice)
+void FiffCoordTrans::write(QIODevice &qIODevice)
 {
-    //
-    //   Open the file, create directory
-    //
-
     // Create the file and save the essentials
-    FiffStream::SPtr pStream = FiffStream::start_file(p_IODevice);
+    FiffStream::SPtr pStream = FiffStream::start_file(qIODevice);
     printf("Write coordinate transform in %s...\n", pStream->streamName().toUtf8().constData());
     this->writeToStream(pStream.data());
-    pStream->close();
+    qIODevice.close();
 }
 
 //=============================================================================================================
 
 void FiffCoordTrans::writeToStream(FiffStream* pStream)
 {
-    pStream->start_block(FIFFB_MEAS);
-    pStream->start_block(FIFFB_MEAS_INFO);
-
     pStream->write_coord_trans(*this);
-
-    pStream->end_block(FIFFB_MEAS_INFO);
-    pStream->end_block(FIFFB_MEAS);
     pStream->end_file();
 }
 
