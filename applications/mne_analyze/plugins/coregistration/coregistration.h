@@ -233,7 +233,7 @@ private:
      */
     void onStoreFiducials(const QString& sFilePath);
 
-    QVector<QSharedPointer<ANSHAREDLIB::AbstractModel>>     m_vecBemModels;         /** Vector with all available Bem Models */
+    QVector<QSharedPointer<ANSHAREDLIB::AbstractModel>>     m_vecBemDataModels;         /** Vector with all available Bem Models */
 
     int                                                     m_iCurrentBem;          /**< Bem index to use. 9999 for current selection */
 
