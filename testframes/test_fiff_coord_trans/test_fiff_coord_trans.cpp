@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     test_fiff_coord_frame.cpp
+ * @file     test_fiff_coord_trans.cpp
  * @author   Ruben Dörfel <doerfelruben@aol.com>
  * @since    0.1.6
  * @date     September, 2020
@@ -94,6 +94,8 @@ TestFiffCoordTrans::TestFiffCoordTrans()
 
 void TestFiffCoordTrans::initTestCase()
 {
+    qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
+
     // Reference file (Read) and test file (Write)
     QFile fileTransRef(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/all-trans.fif");
     QFile fileTransTest(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/test-trans.fif");
@@ -127,5 +129,5 @@ void TestFiffCoordTrans::cleanupTestCase()
 //=============================================================================================================
 
 QTEST_GUILESS_MAIN(TestFiffCoordTrans)
-#include "test_fiff_coord_frame.moc"
+#include "test_fiff_coord_trans.moc"
 
