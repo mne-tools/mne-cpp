@@ -239,14 +239,14 @@ void AnnotationManager::onGroupsUpdated()
 
 //=============================================================================================================
 
-void AnnotationManager::triggerLoadingStart(QString sMessage)
+void AnnotationManager::triggerLoadingStart(const QString& sMessage)
 {
     m_pCommu->publishEvent(LOADING_START, QVariant::fromValue(sMessage));
 }
 
 //=============================================================================================================
 
-void AnnotationManager::triggerLoadingEnd(QString sMessage)
+void AnnotationManager::triggerLoadingEnd(const QString& sMessage)
 {
     m_pCommu->publishEvent(LOADING_END, QVariant::fromValue(sMessage));
 }

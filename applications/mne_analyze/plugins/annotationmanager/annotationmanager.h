@@ -153,13 +153,13 @@ private:
      *
      * @param [in] sMessage     loading bar message
      */
-    void triggerLoadingStart(QString sMessage);
+    void triggerLoadingStart(const QString& sMessage);
 
     //=============================================================================================================
     /**
      * Sends event to hide loading bar
      */
-    void triggerLoadingEnd(QString sMessage);
+    void triggerLoadingEnd(const QString& sMessage);
 
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals */
 

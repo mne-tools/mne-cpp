@@ -154,7 +154,8 @@ void StatusBar::onNewMessageReceived(const QSharedPointer<Event> pEvent)
 
 //=============================================================================================================
 
-void StatusBar::enterEvent(QEvent *event){
+void StatusBar::enterEvent(QEvent *event)
+{
     if(m_LoadingStack.isEmpty()){
         return;
     }
@@ -181,7 +182,8 @@ void StatusBar::enterEvent(QEvent *event){
 
 //=============================================================================================================
 
-void StatusBar::leaveEvent(QEvent *event){
+void StatusBar::leaveEvent(QEvent *event)
+{
     if (!m_pHoverWidget){
         return;
     }
