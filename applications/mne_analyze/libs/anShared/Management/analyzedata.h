@@ -206,9 +206,9 @@ public:
 
     //=========================================================================================================
     template<class T>
-    QSharedPointer<T> addModel(QSharedPointer<T> pNewModel){
+    QSharedPointer<T> addModel(QSharedPointer<T> pNewModel, const QString& sModelName){
         QSharedPointer<AbstractModel> temp = qSharedPointerCast<AbstractModel>(pNewModel);
-        QStandardItem* pItem = new QStandardItem("Average " + QDateTime::currentDateTime().toString());
+        QStandardItem* pItem = new QStandardItem(sModelName);
         pItem->setEditable(false);
         pItem->setDragEnabled(true);
         pItem->setToolTip(temp->getModelPath());
