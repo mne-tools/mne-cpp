@@ -144,6 +144,10 @@ private:
     QStack<QString>             m_LoadingStack;             /** Keeps the currently loading messages */
 
     QPointer<QWidget>           m_pHoverWidget;
+
+    QPointer<QWidget>           m_pLoadingWidget;
+
+    QPointer<QLabel>            m_pLoadingMessage;
 };
 
 //=============================================================================================================
