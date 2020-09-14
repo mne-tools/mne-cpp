@@ -1,6 +1,6 @@
 #==============================================================================================================
 #
-# @file     test_fiff_coord_frame.pro
+# @file     test_fiff_coord_trans.pro
 # @author   Ruben Dörfel <doerfelruben@aol.com>
 # @since    0.1.6
 # @date     September, 2020
@@ -28,7 +28,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile to build the test_fiff_coord_frame test.
+# @brief    This project file generates the makefile to build the test_fiff_coord_trans test.
 #
 #==============================================================================================================
 
@@ -44,7 +44,7 @@ QT += gui
 CONFIG   += console
 CONFIG   -= app_bundle
 
-TARGET = test_fiff_coord_frame
+TARGET = test_fiff_coord_trans
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
@@ -82,6 +82,9 @@ win32:!contains(MNECPP_CONFIG, static) {
 unix:!macx {
     QMAKE_RPATHDIR += $ORIGIN/../lib
 }
+macx {
+    QMAKE_LFLAGS += -Wl,-rpath,../lib
+}
 
 # Activate FFTW backend in Eigen for non-static builds only
 contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
@@ -91,9 +94,13 @@ contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
 
     win32 {
         # On Windows
-        LIBS += -llibfftw3-3                 -llibfftw3f-3                 -llibfftw3l-3     }
+	LIBS += -llibfftw3-3
+	        -llibfftw3f-3
+		-llibfftw3l-3     }
 
     unix:!macx {
         # On Linux
-        LIBS += -lfftw3                 -lfftw3_threads     }
+	LIBS += -lfftw3
+	-lfftw3_threads
+    }
 }
