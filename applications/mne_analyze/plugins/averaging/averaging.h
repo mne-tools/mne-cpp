@@ -218,24 +218,22 @@ private:
 
     //=========================================================================================================
     /**
-     * Computes average and updates butterfly and 2D layout views
+     * Triggers averageCalculations to be run with QFuture.
      */
     void computeAverage();
 
     //=========================================================================================================
-    QSharedPointer<FIFFLIB::FiffEvokedSet> averageCalacualtion(FIFFLIB::FiffRawData pFiffRaw,
-                                                               MatrixXi matEvents,
-                                                               float fPreStim,
-                                                               float fPostStim,
-                                                               int iType,
-                                                               bool bBaseline,
-                                                               float fBaselineFromS,
-                                                               float fBaselineToS,
-                                                               QMap<QString,double> mapReject,
-                                                               RTPROCESSINGLIB::FilterKernel filterKernel,
-                                                               bool bPerformFiltering);
+    /**
+     * Calculates average and returns FiffEvoked Set. (Run in separate thread with QFuture)
+     *
+     * @return Retruns FiffEvoked setwith averaged data
+     */
+    QSharedPointer<FIFFLIB::FiffEvokedSet> averageCalacualtion();
 
     //=========================================================================================================
+    /**
+     * Receives FiffEvoked set from QFuture and created new averaging model
+     */
     void createNewAverage();
 
     //=========================================================================================================
@@ -281,12 +279,6 @@ private:
      * @param pViewParams
      */
     void setViewSettings(ANSHAREDLIB::ViewParameters viewParams);
-
-    //=========================================================================================================
-    /**
-     * Clears saved averaging data
-     */
-    void clearAveraging();
 
     //=========================================================================================================
     /**
