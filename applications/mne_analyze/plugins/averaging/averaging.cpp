@@ -380,7 +380,7 @@ void Averaging::computeAverage()
     MatrixXi matEvents;
     QMap<QString,double> mapReject;
 
-    m_pFiffEvoked = QSharedPointer<FIFFLIB::FiffEvoked>(new FIFFLIB::FiffEvoked());
+    QSharedPointer<FIFFLIB::FiffEvoked> pFiffEvoked = QSharedPointer<FIFFLIB::FiffEvoked>(new FIFFLIB::FiffEvoked());
     int iType = 1; //hardwired for now, change later to type
     mapReject.insert("eog", 300e-06);
 
@@ -394,7 +394,7 @@ void Averaging::computeAverage()
     }
 
     if(m_bPerformFiltering) {
-        *m_pFiffEvoked = RTPROCESSINGLIB::computeFilteredAverage(*pFiffRaw,
+        *pFiffEvoked = RTPROCESSINGLIB::computeFilteredAverage(*pFiffRaw,
                                                                  matEvents,
                                                                  m_fPreStim,
                                                                  m_fPostStim,
@@ -405,7 +405,7 @@ void Averaging::computeAverage()
                                                                  mapReject,
                                                                  m_filterKernel);
     } else {
-        *m_pFiffEvoked = RTPROCESSINGLIB::computeAverage(*pFiffRaw,
+        *pFiffEvoked = RTPROCESSINGLIB::computeAverage(*pFiffRaw,
                                                          matEvents,
                                                          m_fPreStim,
                                                          m_fPostStim,
@@ -418,7 +418,7 @@ void Averaging::computeAverage()
 
     QSharedPointer<FIFFLIB::FiffEvokedSet> pFiffEvokedSet = QSharedPointer<FIFFLIB::FiffEvokedSet>(new FIFFLIB::FiffEvokedSet());
 
-    pFiffEvokedSet->evoked.append(*(m_pFiffEvoked.data()));
+    pFiffEvokedSet->evoked.append(*(pFiffEvoked.data()));
     pFiffEvokedSet->info = *(m_pFiffRawModel->getFiffInfo().data());
 
     if(m_bBasline){
@@ -532,7 +532,7 @@ void Averaging::loadFullGui()
 
 void Averaging::clearAveraging()
 {
-    m_pFiffEvoked.clear();
+//    m_pFiffEvoked.clear();
 }
 
 //=============================================================================================================
