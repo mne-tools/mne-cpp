@@ -375,12 +375,9 @@ void Averaging::computeAverage()
         return;
     }
 
-    //clearAveraging();
-
     MatrixXi matEvents;
     QMap<QString,double> mapReject;
 
-    QSharedPointer<FIFFLIB::FiffEvoked> pFiffEvoked = QSharedPointer<FIFFLIB::FiffEvoked>(new FIFFLIB::FiffEvoked());
     int iType = 1; //hardwired for now, change later to type
     mapReject.insert("eog", 300e-06);
 
@@ -393,27 +390,80 @@ void Averaging::computeAverage()
         return;
     }
 
-    if(m_bPerformFiltering) {
-        *pFiffEvoked = RTPROCESSINGLIB::computeFilteredAverage(*pFiffRaw,
-                                                                 matEvents,
-                                                                 m_fPreStim,
-                                                                 m_fPostStim,
-                                                                 iType,
-                                                                 m_bBasline,
-                                                                 m_fBaselineFromS,
-                                                                 m_fBaselineToS,
-                                                                 mapReject,
-                                                                 m_filterKernel);
+//    QSharedPointer<FIFFLIB::FiffEvoked> pFiffEvoked = QSharedPointer<FIFFLIB::FiffEvoked>(new FIFFLIB::FiffEvoked());
+
+//    if(m_bPerformFiltering) {
+//        *pFiffEvoked = RTPROCESSINGLIB::computeFilteredAverage(*pFiffRaw,
+//                                                                 matEvents,
+//                                                                 m_fPreStim,
+//                                                                 m_fPostStim,
+//                                                                 iType,
+//                                                                 m_bBasline,
+//                                                                 m_fBaselineFromS,
+//                                                                 m_fBaselineToS,
+//                                                                 mapReject,
+//                                                                 m_filterKernel);
+//    } else {
+//        *pFiffEvoked = RTPROCESSINGLIB::computeAverage(*pFiffRaw,
+//                                                         matEvents,
+//                                                         m_fPreStim,
+//                                                         m_fPostStim,
+//                                                         iType,
+//                                                         m_bBasline,
+//                                                         m_fBaselineFromS,
+//                                                         m_fBaselineToS,
+//                                                         mapReject);
+//    }
+
+//    QSharedPointer<FIFFLIB::FiffEvokedSet> pFiffEvokedSet = QSharedPointer<FIFFLIB::FiffEvokedSet>(new FIFFLIB::FiffEvokedSet());
+
+//    pFiffEvokedSet->evoked.append(*(pFiffEvoked.data()));
+//    pFiffEvokedSet->info = *(m_pFiffRawModel->getFiffInfo().data());
+
+//    if(m_bBasline){
+//        pFiffEvokedSet->evoked[0].baseline.first = m_fBaselineFromS;
+//        pFiffEvokedSet->evoked[0].baseline.second = m_fBaselineToS;
+//    }
+}
+
+//=============================================================================================================
+
+QSharedPointer<FIFFLIB::FiffEvokedSet> Averaging::averageCalacualtion(FIFFLIB::FiffRawData pFiffRaw,
+                                                                      MatrixXi matEvents,
+                                                                      float fPreStim,
+                                                                      float fPostStim,
+                                                                      int iType,
+                                                                      bool bBaseline,
+                                                                      float fBaselineFromS,
+                                                                      float fBaselineToS,
+                                                                      QMap<QString,
+                                                                      double> mapReject,
+                                                                      RTPROCESSINGLIB::FilterKernel filterKernel,
+                                                                      bool bPerformFiltering)
+{
+    QSharedPointer<FIFFLIB::FiffEvoked> pFiffEvoked = QSharedPointer<FIFFLIB::FiffEvoked>(new FIFFLIB::FiffEvoked());
+
+    if(bPerformFiltering) {
+        *pFiffEvoked = RTPROCESSINGLIB::computeFilteredAverage(pFiffRaw,
+                                                               matEvents,
+                                                               fPreStim,
+                                                               fPostStim,
+                                                               iType,
+                                                               bBaseline,
+                                                               fBaselineFromS,
+                                                               fBaselineToS,
+                                                               mapReject,
+                                                               filterKernel);
     } else {
-        *pFiffEvoked = RTPROCESSINGLIB::computeAverage(*pFiffRaw,
-                                                         matEvents,
-                                                         m_fPreStim,
-                                                         m_fPostStim,
-                                                         iType,
-                                                         m_bBasline,
-                                                         m_fBaselineFromS,
-                                                         m_fBaselineToS,
-                                                         mapReject);
+        *pFiffEvoked = RTPROCESSINGLIB::computeAverage(pFiffRaw,
+                                                       matEvents,
+                                                       m_fPreStim,
+                                                       m_fPostStim,
+                                                       iType,
+                                                       m_bBasline,
+                                                       m_fBaselineFromS,
+                                                       m_fBaselineToS,
+                                                       mapReject);
     }
 
     QSharedPointer<FIFFLIB::FiffEvokedSet> pFiffEvokedSet = QSharedPointer<FIFFLIB::FiffEvokedSet>(new FIFFLIB::FiffEvokedSet());
@@ -426,6 +476,13 @@ void Averaging::computeAverage()
         pFiffEvokedSet->evoked[0].baseline.second = m_fBaselineToS;
     }
 
+    return pFiffEvokedSet;
+}
+
+//=============================================================================================================
+
+void Averaging::createNewAverage()
+{
     QSharedPointer<ANSHAREDLIB::AveragingDataModel> pNewAvgModel = QSharedPointer<ANSHAREDLIB::AveragingDataModel>(new ANSHAREDLIB::AveragingDataModel(pFiffEvokedSet));
 
     m_pAnalyzeData->addModel<ANSHAREDLIB::AveragingDataModel>(pNewAvgModel, "Average - " + m_pAveragingSettingsView->getCurrentSelectGroup() + " - " + QDateTime::currentDateTime().toString());
@@ -526,13 +583,6 @@ void Averaging::loadFullGui()
     m_fPostStim = static_cast<float>(m_pAveragingSettingsView->getPostStimMSeconds())/1000.f;
 
     m_bLoaded = true;
-}
-
-//=============================================================================================================
-
-void Averaging::clearAveraging()
-{
-//    m_pFiffEvoked.clear();
 }
 
 //=============================================================================================================
