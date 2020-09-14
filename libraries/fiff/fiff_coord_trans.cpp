@@ -132,10 +132,10 @@ bool FiffCoordTrans::invert_transform()
 
 bool FiffCoordTrans::read(QIODevice& p_IODevice, FiffCoordTrans& p_Trans)
 {
-    FiffStream::SPtr t_pStream(new FiffStream(&p_IODevice));
+    FiffStream::SPtr pStream(new FiffStream(&p_IODevice));
 
-    printf("Reading coordinate transform from %s...\n", t_pStream->streamName().toUtf8().constData());
-    if(!t_pStream->open())
+    printf("Reading coordinate transform from %s...\n", pStream->streamName().toUtf8().constData());
+    if(!pStream->open())
         return false;
 
     //
@@ -147,11 +147,11 @@ bool FiffCoordTrans::read(QIODevice& p_IODevice, FiffCoordTrans& p_Trans)
     //
     //   Get the MRI <-> head coordinate transformation
     //
-    for ( qint32 k = 0; k < t_pStream->dir().size(); ++k )
+    for ( qint32 k = 0; k < pStream->dir().size(); ++k )
     {
-        if ( t_pStream->dir()[k]->kind == FIFF_COORD_TRANS )
+        if ( pStream->dir()[k]->kind == FIFF_COORD_TRANS )
         {
-            t_pStream->read_tag(t_pTag,t_pStream->dir()[k]->pos);
+            pStream->read_tag(t_pTag,pStream->dir()[k]->pos);
             p_Trans = t_pTag->toCoordTrans();
             success = true;
         }
@@ -169,24 +169,24 @@ void FiffCoordTrans::write(QIODevice &p_IODevice)
     //
 
     // Create the file and save the essentials
-    FiffStream::SPtr t_pStream = FiffStream::start_file(p_IODevice);
-    printf("Write coordinate transform in %s...\n", t_pStream->streamName().toUtf8().constData());
-    this->writeToStream(t_pStream.data());
+    FiffStream::SPtr pStream = FiffStream::start_file(p_IODevice);
+    printf("Write coordinate transform in %s...\n", pStream->streamName().toUtf8().constData());
+    this->writeToStream(pStream.data());
+    pStream->close();
 }
 
 //=============================================================================================================
 
-void FiffCoordTrans::writeToStream(FiffStream* p_pStream)
+void FiffCoordTrans::writeToStream(FiffStream* pStream)
 {
-    p_pStream->start_block(FIFFB_MEAS);
-    p_pStream->start_block(FIFFB_MEAS_INFO);
+    pStream->start_block(FIFFB_MEAS);
+    pStream->start_block(FIFFB_MEAS_INFO);
 
-    p_pStream->write_coord_trans(*this);
+    pStream->write_coord_trans(*this);
 
-    p_pStream->end_block(FIFFB_MEAS_INFO);
-    p_pStream->end_block(FIFFB_MEAS);
-    p_pStream->end_file();
-    p_pStream->close();
+    pStream->end_block(FIFFB_MEAS_INFO);
+    pStream->end_block(FIFFB_MEAS);
+    pStream->end_file();
 }
 
 //=============================================================================================================
