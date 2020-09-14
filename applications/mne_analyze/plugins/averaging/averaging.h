@@ -77,6 +77,7 @@ namespace FIFFLIB {
     class FiffEvokedSet;
     class FiffEvoked;
     class FiffInfo;
+    class FiffRawData;
 }
 
 //=============================================================================================================
@@ -222,6 +223,22 @@ private:
     void computeAverage();
 
     //=========================================================================================================
+    QSharedPointer<FIFFLIB::FiffEvokedSet> averageCalacualtion(FIFFLIB::FiffRawData pFiffRaw,
+                                                               MatrixXi matEvents,
+                                                               float fPreStim,
+                                                               float fPostStim,
+                                                               int iType,
+                                                               bool bBaseline,
+                                                               float fBaselineFromS,
+                                                               float fBaselineToS,
+                                                               QMap<QString,double> mapReject,
+                                                               RTPROCESSINGLIB::FilterKernel filterKernel,
+                                                               bool bPerformFiltering);
+
+    //=========================================================================================================
+    void createNewAverage();
+
+    //=========================================================================================================
     /**
      * Toggles dropping rejected when computing average
      */
@@ -314,6 +331,10 @@ private:
     RTPROCESSINGLIB::FilterKernel                           m_filterKernel;             /**< List of currently active filters. */
 
     int                                                     m_iCurrentGroup;            /**< Event group from which to compute average. 9999 for current selection */
+
+    QFutureWatcher<QSharedPointer<FIFFLIB::FiffEvokedSet>>  m_FutureWatcher;
+    QFuture<QSharedPointer<FIFFLIB::FiffEvokedSet>>         m_Future;
+
 };
 
 } // NAMESPACE
