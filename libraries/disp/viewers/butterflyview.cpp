@@ -163,7 +163,6 @@ void ButterflyView::setScaleMap(const QMap<qint32,float> &scaleMap)
 void ButterflyView::setSelectedChannels(const QList<int> &selectedChannels)
 {
     m_lSelectedChannels = selectedChannels;
-    qDebug() << "LIST SIZE:" << selectedChannels.size();
     update();
 }
 
