@@ -233,11 +233,14 @@ private:
      */
     void onStoreFiducials(const QString& sFilePath);
 
+    void reset();
+
     QVector<QSharedPointer<ANSHAREDLIB::AbstractModel>>     m_vecBemDataModels;         /** Vector with all available Bem Models */
 
     int                                                     m_iCurrentBem;          /**< Bem index to use. 9999 for current selection */
 
     QSharedPointer<MNELIB::MNEBem>                          m_pBem;                 /**< The currently selected Bem model */
+    QString                                                 m_sCurrentSelectedBem;  /**< The name of the currently selected Bem */
     FIFFLIB::FiffDigPointSet                                m_digSetHead;           /**< The currently selected digitizer set */
     FIFFLIB::FiffDigPointSet                                m_digFidMri;            /**< The currently selected mri fiducials */
     FIFFLIB::FiffCoordTrans                                 m_transHeadMri;         /**< The resulting head-mri transformation */

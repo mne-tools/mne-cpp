@@ -155,6 +155,9 @@ QDockWidget *CoRegistration::getControl()
     connect(m_pCoregSettingsView, &CoregSettingsView::loadTrans,
             this, &CoRegistration::onLoadTrans);
 
+    connect(m_pAnalyzeData.data(), &AnalyzeData::newModelAvailable,
+            this, &CoRegistration::updateBemList, Qt::UniqueConnection);
+
     onChangeSelectedBem(m_pCoregSettingsView->getCurrentSelectedBem());
 
     return pControlDock;
@@ -199,8 +202,8 @@ void CoRegistration::updateBemList(ANSHAREDLIB::AbstractModel::SPtr pNewModel)
     if(!m_vecBemDataModels.contains(pNewModel) && pNewModel->getType() == ANSHAREDLIB_BEMDATA_MODEL) {
         m_pCoregSettingsView->clearSelectionBem();
         m_vecBemDataModels.append(pNewModel);
-        for(int i = 0; i < m_vecBemDataModels.size(); i++) {
-            m_pCoregSettingsView->addSelectionBem(m_vecBemDataModels.at(i)->getModelName());
+        for(auto pBemDataModel : m_vecBemDataModels) {
+            m_pCoregSettingsView->addSelectionBem(pBemDataModel->getModelName());
         }
     }
 }
@@ -213,16 +216,19 @@ void CoRegistration::onChangeSelectedBem(const QString &sText)
     QSharedPointer<ANSHAREDLIB::BemDataModel> pBemDataModel;
 
     for (auto bemDataModel : m_vecBemDataModels) {
-        if(bemDataModel->getModelName() == sText){
+        if(bemDataModel->getModelName() == sText && sText != m_sCurrentSelectedBem){
+
+            // update current selected Bem
             pBemDataModel = qSharedPointerCast<BemDataModel>(bemDataModel);
             m_pBem = QSharedPointer<MNEBem>(pBemDataModel->getBem());
+            m_sCurrentSelectedBem = sText;
 
+            // send event to 3DView etc.
             QVariant data = QVariant::fromValue(pBemDataModel);
             m_pCommu->publishEvent(EVENT_TYPE::SELECTED_BEM_CHANGED, data);
             return;
         }
     }
-
 }
 
 //=============================================================================================================
@@ -570,3 +576,11 @@ void CoRegistration::getTransFromParam(Matrix4f& matTrans,
     return;
 }
 
+//=============================================================================================================
+
+void CoRegistration::reset()
+{
+    qDebug() << "Model Deleted";
+    QVector<QSharedPointer<AbstractModel>> vecModels = m_pAnalyzeData->getModelsByType(ANSHAREDLIB_BEMDATA_MODEL);
+    qDebug() << vecModels.size();
+}
