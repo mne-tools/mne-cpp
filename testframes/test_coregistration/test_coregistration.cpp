@@ -121,7 +121,7 @@ void TestCoregistration::initTestCase()
     QFile t_fileTransRefFit(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/all-trans.fif");
     QFile t_fileTransRefIcp(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/icp-trans.fif");
 
-    float fTol = 0.00000001;
+    float fTol = 0.01/1000;
     float fMaxDist = 0.02;
 
     // read reference Transformation
@@ -207,21 +207,21 @@ void TestCoregistration::initTestCase()
     if(!RTPROCESSINGLIB::performIcp(mneSurfacePoints, matHspClean, transPerformICP, fRMSE, bScale, iMaxIter, fTol, vecWeightsICPClean)) {
         qWarning() << "ICP was not succesfull.";
     }
-    // transPerformICP.write(t_fileTransRefIcp);
+    transPerformICPRef = FiffCoordTrans(t_fileTransRefIcp);
 }
 
 //=============================================================================================================
 
 void TestCoregistration::compareFitMatchedPoints()
 {
-    QVERIFY(transFitMatched == transFitMatched);
+    QVERIFY(transFitMatchedRef == transFitMatched);
 }
 
 //=============================================================================================================
 
 void TestCoregistration::comparePerformIcp()
 {
-    QVERIFY(transPerformICP == transPerformICPRef);
+    QVERIFY(transPerformICPRef == transPerformICP);
 }
 
 //=============================================================================================================
