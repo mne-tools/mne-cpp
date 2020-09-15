@@ -216,7 +216,7 @@ int main(int argc, char *argv[])
     }
 
     // icp
-    if(!RTPROCESSINGLIB::performIcp(mneSurfacePoints, matHspClean, transHeadMri, fRMSE, iMaxIter, fTol, vecWeightsICPClean)) {
+    if(!RTPROCESSINGLIB::performIcp(mneSurfacePoints, matHspClean, transHeadMri, fRMSE, bScale, iMaxIter, fTol, vecWeightsICPClean)) {
         qWarning() << "ICP was not succesfull.";
     }
     qInfo() << "transHeadMri:";

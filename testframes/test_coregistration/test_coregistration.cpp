@@ -204,7 +204,7 @@ void TestCoregistration::initTestCase()
 
     // icp
     float fRMSE = 0.0;
-    if(!RTPROCESSINGLIB::performIcp(mneSurfacePoints, matHspClean, transPerformICP, fRMSE, iMaxIter, fTol, vecWeightsICPClean)) {
+    if(!RTPROCESSINGLIB::performIcp(mneSurfacePoints, matHspClean, transPerformICP, fRMSE, bScale, iMaxIter, fTol, vecWeightsICPClean)) {
         qWarning() << "ICP was not succesfull.";
     }
     // transPerformICP.write(t_fileTransRefIcp);
