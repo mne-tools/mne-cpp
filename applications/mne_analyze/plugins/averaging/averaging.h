@@ -294,6 +294,20 @@ private:
      */
     void onMakeScreenshot(const QString& imageType);
 
+    //=============================================================================================================
+    /**
+     * Sends event to trigger loading bar to appear and sMessage to show
+     *
+     * @param [in] sMessage     loading bar message
+     */
+    void triggerLoadingStart(QString sMessage);
+
+    //=============================================================================================================
+    /**
+     * Sends event to hide loading bar
+     */
+    void triggerLoadingEnd(QString sMessage);
+
     QSharedPointer<ANSHAREDLIB::FiffRawViewModel>           m_pFiffRawModel;            /**< Pointer to currently loaded FiffRawView Model */
     QSharedPointer<QList<QPair<int,double>>>                m_pTriggerList;             /**< Pointer to list of stim triggers */
     QSharedPointer<DISPLIB::EvokedSetModel>                 m_pEvokedModel;             /**< Pointer to model used to display averaging data from m_pFiffEvokedSet and m_pFiffEvoked */
