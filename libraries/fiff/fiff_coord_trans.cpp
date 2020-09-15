@@ -168,6 +168,7 @@ void FiffCoordTrans::write(QIODevice &qIODevice)
     FiffStream::SPtr pStream = FiffStream::start_file(qIODevice);
     printf("Write coordinate transform in %s...\n", pStream->streamName().toUtf8().constData());
     this->writeToStream(pStream.data());
+    pStream->end_file();
     qIODevice.close();
 }
 
@@ -176,7 +177,6 @@ void FiffCoordTrans::write(QIODevice &qIODevice)
 void FiffCoordTrans::writeToStream(FiffStream* pStream)
 {
     pStream->write_coord_trans(*this);
-    pStream->end_file();
 }
 
 //=============================================================================================================

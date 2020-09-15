@@ -198,6 +198,7 @@ void FiffDigPointSet::write(QIODevice &p_IODevice)
     FiffStream::SPtr t_pStream = FiffStream::start_file(p_IODevice);
     printf("Write Digitizer Points in %s...\n", t_pStream->streamName().toUtf8().constData());
     this->writeToStream(t_pStream.data());
+    t_pStream->end_file();
 }
 
 //=============================================================================================================
@@ -217,7 +218,6 @@ void FiffDigPointSet::writeToStream(FiffStream* p_pStream)
     p_pStream->end_block(FIFFB_ISOTRAK);
     p_pStream->end_block(FIFFB_MEAS_INFO);
     p_pStream->end_block(FIFFB_MEAS);
-    p_pStream->end_file();
 }
 
 //=============================================================================================================
