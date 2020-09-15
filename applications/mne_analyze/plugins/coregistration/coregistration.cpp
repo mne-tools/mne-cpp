@@ -154,7 +154,8 @@ QDockWidget *CoRegistration::getControl()
             this, &CoRegistration::onUpdateTrans);
     connect(m_pCoregSettingsView, &CoregSettingsView::loadTrans,
             this, &CoRegistration::onLoadTrans);
-
+    connect(m_pCoregSettingsView, &CoregSettingsView::storeTrans,
+            this, &CoRegistration::onStoreTrans);
     connect(m_pAnalyzeData.data(), &AnalyzeData::newModelAvailable,
             this, &CoRegistration::updateBemList, Qt::UniqueConnection);
     connect(m_pAnalyzeData.data(), &AnalyzeData::modelIsEmpty,
@@ -320,8 +321,11 @@ void CoRegistration::onLoadTrans(const QString& sFilePath)
 
 void CoRegistration::onStoreTrans(const QString& sFilePath)
 {
-    QFile fileDig(sFilePath);
+    QFile fileTrans(sFilePath);
 
+    if(!m_transHeadMri.isEmpty()){
+        m_transHeadMri.write(fileTrans);
+    }
     return;
 }
 
