@@ -157,6 +157,8 @@ QDockWidget *CoRegistration::getControl()
 
     connect(m_pAnalyzeData.data(), &AnalyzeData::newModelAvailable,
             this, &CoRegistration::updateBemList, Qt::UniqueConnection);
+    connect(m_pAnalyzeData.data(), &AnalyzeData::modelIsEmpty,
+            this, &CoRegistration::deleteModels, Qt::UniqueConnection);
 
     onChangeSelectedBem(m_pCoregSettingsView->getCurrentSelectedBem());
 
@@ -212,7 +214,6 @@ void CoRegistration::updateBemList(ANSHAREDLIB::AbstractModel::SPtr pNewModel)
 
 void CoRegistration::onChangeSelectedBem(const QString &sText)
 {
-    QVectorIterator<QSharedPointer<ANSHAREDLIB::AbstractModel>> i(m_vecBemDataModels);
     QSharedPointer<ANSHAREDLIB::BemDataModel> pBemDataModel;
 
     for (auto bemDataModel : m_vecBemDataModels) {
@@ -291,7 +292,7 @@ void CoRegistration::onLoadTrans(const QString& sFilePath)
         getParamFromTrans(m_transHeadMri.trans,vecRot,vecTrans,vecScale);
         m_pCoregSettingsView->setTransParams(vecTrans,vecRot,vecScale);
 
-        // send event
+        // Send event
         QVariant data = QVariant::fromValue(m_transHeadMri);
         m_pCommu->publishEvent(EVENT_TYPE::NEW_TRANS_AVAILABE, data);
 
@@ -327,7 +328,6 @@ void CoRegistration::onFitFiducials()
 {
     if(m_digSetHead.isEmpty() || m_digFidMri.isEmpty() || m_pBem->isEmpty()) {
         qWarning() << "[CoRegistration::onFitFiducials] Make sure to load all the data necessary data.";
-
         return;
     }
 
@@ -574,13 +574,24 @@ void CoRegistration::getTransFromParam(Matrix4f& matTrans,
     matScale(2,2) = vecScale(2);
     matTrans = matTrans * matScale;
     return;
+
 }
 
 //=============================================================================================================
 
-void CoRegistration::reset()
+void CoRegistration::deleteModels()
 {
-    qDebug() << "Model Deleted";
     QVector<QSharedPointer<AbstractModel>> vecModels = m_pAnalyzeData->getModelsByType(ANSHAREDLIB_BEMDATA_MODEL);
-    qDebug() << vecModels.size();
+    m_pCoregSettingsView->clearSelectionBem();
+
+    if(m_vecBemDataModels != vecModels) {
+        m_vecBemDataModels = vecModels;
+        for(auto pBemDataModel : m_vecBemDataModels) {
+            m_pCoregSettingsView->addSelectionBem(pBemDataModel->getModelName());
+        }
+        if (m_vecBemDataModels.isEmpty()) {
+            m_pCoregSettingsView->addSelectionBem("Select Bem");
+            m_pBem->clear();
+        }
+    }
 }
