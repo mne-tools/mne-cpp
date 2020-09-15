@@ -486,13 +486,13 @@ void Averaging::createNewAverage()
     QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet = m_Future.result();
 
     if(pEvokedSet){
-        QSharedPointer<ANSHAREDLIB::AveragingDataModel> pNewAvgModel = QSharedPointer<ANSHAREDLIB::AveragingDataModel>(new ANSHAREDLIB::AveragingDataModel());
+        QSharedPointer<ANSHAREDLIB::AveragingDataModel> pNewAvgModel = QSharedPointer<ANSHAREDLIB::AveragingDataModel>(new ANSHAREDLIB::AveragingDataModel(pEvokedSet));
 
         m_pAnalyzeData->addModel<ANSHAREDLIB::AveragingDataModel>(pNewAvgModel, "Average - " + m_pAveragingSettingsView->getCurrentSelectGroup() + " - " + QDateTime::currentDateTime().toString());
 
         qInfo() << "[Averaging::createNewAverage] Average computed.";
     } else {
-        qInfo() << "[Averaging::createNewAverage] Unable to cumpute average.";
+        qInfo() << "[Averaging::createNewAverage] Unable to compute average.";
     }
 }
 
