@@ -582,8 +582,8 @@ void CoRegistration::getTransFromParam(Matrix4f& matTrans,
     matScale(1,1) = vecScale(1);
     matScale(2,2) = vecScale(2);
     matTrans = matTrans * matScale;
-    return;
 
+    return;
 }
 
 //=============================================================================================================
