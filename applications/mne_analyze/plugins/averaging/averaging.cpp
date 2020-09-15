@@ -382,43 +382,10 @@ void Averaging::computeAverage()
         qWarning() << "Averaging computation already taking place.";
     }
 
+    triggerLoadingStart("Calculating average...");
+
     m_Future = QtConcurrent::run(this, &Averaging::averageCalacualtion);
     m_FutureWatcher.setFuture(m_Future);
-
-//    QSharedPointer<FIFFLIB::FiffEvoked> pFiffEvoked = QSharedPointer<FIFFLIB::FiffEvoked>(new FIFFLIB::FiffEvoked());
-
-//    if(m_bPerformFiltering) {
-//        *pFiffEvoked = RTPROCESSINGLIB::computeFilteredAverage(*pFiffRaw,
-//                                                                 matEvents,
-//                                                                 m_fPreStim,
-//                                                                 m_fPostStim,
-//                                                                 iType,
-//                                                                 m_bBasline,
-//                                                                 m_fBaselineFromS,
-//                                                                 m_fBaselineToS,
-//                                                                 mapReject,
-//                                                                 m_filterKernel);
-//    } else {
-//        *pFiffEvoked = RTPROCESSINGLIB::computeAverage(*pFiffRaw,
-//                                                         matEvents,
-//                                                         m_fPreStim,
-//                                                         m_fPostStim,
-//                                                         iType,
-//                                                         m_bBasline,
-//                                                         m_fBaselineFromS,
-//                                                         m_fBaselineToS,
-//                                                         mapReject);
-//    }
-
-//    QSharedPointer<FIFFLIB::FiffEvokedSet> pFiffEvokedSet = QSharedPointer<FIFFLIB::FiffEvokedSet>(new FIFFLIB::FiffEvokedSet());
-
-//    pFiffEvokedSet->evoked.append(*(pFiffEvoked.data()));
-//    pFiffEvokedSet->info = *(m_pFiffRawModel->getFiffInfo().data());
-
-//    if(m_bBasline){
-//        pFiffEvokedSet->evoked[0].baseline.first = m_fBaselineFromS;
-//        pFiffEvokedSet->evoked[0].baseline.second = m_fBaselineToS;
-//    }
 }
 
 //=============================================================================================================
@@ -494,6 +461,8 @@ void Averaging::createNewAverage()
     } else {
         qInfo() << "[Averaging::createNewAverage] Unable to compute average.";
     }
+
+    triggerLoadingEnd("Calculating average...");
 }
 
 //=============================================================================================================
@@ -707,4 +676,18 @@ void Averaging::onNewAveragingModel(QSharedPointer<ANSHAREDLIB::AveragingDataMod
     m_pButterflyView->dataUpdate();
     m_pButterflyView->updateView();
     m_pAverageLayoutView->updateData();
+}
+
+//=============================================================================================================
+
+void Averaging::triggerLoadingStart(QString sMessage)
+{
+    m_pCommu->publishEvent(LOADING_START, QVariant::fromValue(sMessage));
+}
+
+//=============================================================================================================
+
+void Averaging::triggerLoadingEnd(QString sMessage)
+{
+    m_pCommu->publishEvent(LOADING_END, QVariant::fromValue(sMessage));
 }
