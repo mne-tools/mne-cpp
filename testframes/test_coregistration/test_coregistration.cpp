@@ -91,15 +91,17 @@ public:
 
 private slots:
     void initTestCase();
-    void compareCoreg();
-
+    void compareFitMatchedPoints();
+    void comparePerformIcp();
     void cleanupTestCase();
 
 private:
     // declare your thresholds, variables and error values here
     double dEpsilon;
-    FiffCoordTrans transHeadMriRef;
-    FiffCoordTrans transHeadMri;
+    FiffCoordTrans transFitMatched;
+    FiffCoordTrans transPerformICP;
+    FiffCoordTrans transFitMatchedRef;
+    FiffCoordTrans transPerformICPRef;
 };
 
 //=============================================================================================================
@@ -116,14 +118,17 @@ void TestCoregistration::initTestCase()
     // Create files
     QFile t_fileDig(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif");
     QFile t_fileBem(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/subjects/sample/bem/sample-1280-1280-1280-bem.fif");
-    QFile t_fileTrans(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/all-trans.fif");
+    QFile t_fileTransRefFit(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/all-trans.fif");
+    QFile t_fileTransRefIcp(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/icp-trans.fif");
 
     float fTol = 0.00000001;
     float fMaxDist = 0.02;
 
-    // read Trans
-    transHeadMriRef = FiffCoordTrans(t_fileTrans);
-    transHeadMriRef.invert_transform();
+    // read reference Transformation
+    transFitMatchedRef = FiffCoordTrans(t_fileTransRefFit);
+    transFitMatchedRef.invert_transform();
+
+    // transPerformICPRef = FiffCoordTrans(t_fileTransRefIcp);
 
     // read Bem
     MNEBem bemHead(t_fileBem);
@@ -135,7 +140,7 @@ void TestCoregistration::initTestCase()
     QList<int> lPickHSP({FIFFV_POINT_CARDINAL,FIFFV_POINT_HPI,FIFFV_POINT_EXTRA});
     FiffDigPointSet digSetSrc = FiffDigPointSet(t_fileDig).pickTypes(lPickFiducials);   // Fiducials Head-Space
     FiffDigPointSet digSetDst = FiffDigPointSet(t_fileDig).pickTypes(lPickFiducials);
-    digSetDst.applyTransform(transHeadMriRef, false);                                   // Fiducials MRI-Space
+    digSetDst.applyTransform(transFitMatchedRef, false);                                   // Fiducials MRI-Space
     FiffDigPointSet digSetHsp = FiffDigPointSet(t_fileDig).pickTypes(lPickHSP);         // Head shape points Head-Space
 
     // Initial Fiducial Alignment
@@ -167,7 +172,8 @@ void TestCoregistration::initTestCase()
 
     fiff_int_t iFrom = digSetSrc[0].coord_frame;
     fiff_int_t iTo = bemSurface.data()->coord_frame;
-    transHeadMri = FiffCoordTrans::make(iFrom, iTo, matTrans);
+    transFitMatched = FiffCoordTrans::make(iFrom, iTo, matTrans);
+    transPerformICP = *new FiffCoordTrans(transFitMatched);
 
     // Prepare Icp:
     VectorXf vecWeightsICP(digSetHsp.size()); // Weigths vector
@@ -188,7 +194,7 @@ void TestCoregistration::initTestCase()
     VectorXi vecTake;
 
     // discard outliers
-    if(!RTPROCESSINGLIB::discard3DPointOutliers(mneSurfacePoints, matHsp, transHeadMri, vecTake, matHspClean, fMaxDist)) {
+    if(!RTPROCESSINGLIB::discard3DPointOutliers(mneSurfacePoints, matHsp, transPerformICP, vecTake, matHspClean, fMaxDist)) {
         qWarning() << "Discard outliers was not succesfull.";
     }
     VectorXf vecWeightsICPClean(vecTake.size());
@@ -198,20 +204,24 @@ void TestCoregistration::initTestCase()
 
     // icp
     float fRMSE = 0.0;
-    if(!RTPROCESSINGLIB::performIcp(mneSurfacePoints, matHspClean, transHeadMri, fRMSE, iMaxIter, fTol, vecWeightsICPClean)) {
+    if(!RTPROCESSINGLIB::performIcp(mneSurfacePoints, matHspClean, transPerformICP, fRMSE, iMaxIter, fTol, vecWeightsICPClean)) {
         qWarning() << "ICP was not succesfull.";
     }
+    // transPerformICP.write(t_fileTransRefIcp);
 }
 
 //=============================================================================================================
 
-void TestCoregistration::compareCoreg()
+void TestCoregistration::compareFitMatchedPoints()
 {
-    Matrix4f matDataDiff = transHeadMriRef.trans - transHeadMri.trans;
-    transHeadMriRef.print();
-    transHeadMri.print();
-    qInfo() << matDataDiff.sum();
-    QVERIFY(std::fabs(matDataDiff.sum()) < dEpsilon);
+    QVERIFY(transFitMatched == transFitMatched);
+}
+
+//=============================================================================================================
+
+void TestCoregistration::comparePerformIcp()
+{
+    QVERIFY(transPerformICP == transPerformICPRef);
 }
 
 //=============================================================================================================
