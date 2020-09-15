@@ -1350,6 +1350,7 @@ void MNEInverseOperator::write(QIODevice &p_IODevice)
     FiffStream::SPtr t_pStream = FiffStream::start_file(p_IODevice);
     printf("Write inverse operator decomposition in %s...", t_pStream->streamName().toUtf8().constData());
     this->writeToStream(t_pStream.data());
+    t_pStream->end_file();
 }
 
 //=============================================================================================================
@@ -1432,5 +1433,4 @@ void MNEInverseOperator::writeToStream(FiffStream* p_pStream)
     //   Done!
     //
     p_pStream->end_block(FIFFB_MNE_INVERSE_SOLUTION);
-    p_pStream->end_file();
 }
