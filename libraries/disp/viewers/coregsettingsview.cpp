@@ -415,7 +415,7 @@ void CoregSettingsView::clearSelectionBem()
 void CoregSettingsView::addSelectionBem(const QString& sBemName)
 {
     // Only block the signal if we have more or then one bem model loaded
-    QSignalBlocker blockerComboBox(m_pUi->m_qComboBox_BemItems);
+    // QSignalBlocker blockerComboBox(m_pUi->m_qComboBox_BemItems);
     m_pUi->m_qComboBox_BemItems->addItem(sBemName);
 }
 
