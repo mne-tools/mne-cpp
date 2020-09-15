@@ -726,11 +726,13 @@ void AnnotationSettingsView::createGroupsFromTriggers()
                           QColor("blue")};
 
     for (int i = 0; i < keyList.size(); i++){
-        newStimGroup(m_pTriggerDetectView->getSelectedStimChannel(), static_cast<int>(keyList[i]), colors[i % 10]);
-        groupChanged();
-        for (int j : mEventGroupMap[keyList[i]]){
-            m_pAnnModel->setSamplePos(j + iFirstSample);
-            m_pAnnModel->insertRow(0, QModelIndex());
+        if ((m_pUi->m_listWidget_groupListWidget->findItems(m_pTriggerDetectView->getSelectedStimChannel()+ "_" + QString::number(static_cast<int>(keyList[i])), Qt::MatchExactly).isEmpty())){
+            newStimGroup(m_pTriggerDetectView->getSelectedStimChannel(), static_cast<int>(keyList[i]), colors[i % 10]);
+            groupChanged();
+            for (int j : mEventGroupMap[keyList[i]]){
+                m_pAnnModel->setSamplePos(j + iFirstSample);
+                m_pAnnModel->insertRow(0, QModelIndex());
+            }
         }
     }
 
