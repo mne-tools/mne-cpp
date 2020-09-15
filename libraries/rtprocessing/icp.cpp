@@ -75,6 +75,7 @@ bool RTPROCESSINGLIB::performIcp(const MNEProjectToSurface::SPtr mneSurfacePoint
                                  const Eigen::MatrixXf& matPointCloud,
                                  FiffCoordTrans& transFromTo,
                                  float& fRMSE,
+                                 bool bScale,
                                  int iMaxIter,
                                  float fTol,
                                  const VectorXf& vecWeitgths)
@@ -93,7 +94,6 @@ bool RTPROCESSINGLIB::performIcp(const MNEProjectToSurface::SPtr mneSurfacePoint
     int iNP = matPointCloud.rows();             // The number of points
     float fMSEPrev,fMSE = 0.0;                  // The mean square error
     float fScale = 1.0;
-    float bScale = false;
     MatrixXf matP0 = matPointCloud;             // Initial Set of points
     MatrixXf matPk = matP0;                     // Transformed Set of points
     MatrixXf matYk(matPk.rows(),matPk.cols());  // Iterative closest points on the surface
