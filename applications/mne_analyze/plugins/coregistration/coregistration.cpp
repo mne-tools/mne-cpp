@@ -400,6 +400,7 @@ void CoRegistration::onFitICP()
     }
 
     // get values from view
+    bool bScale = m_pCoregSettingsView->getAutoScale();
     float fWeightLPA = m_pCoregSettingsView->getWeightLPA();
     float fWeightNAS = m_pCoregSettingsView->getWeightNAS();
     float fWeightRPA = m_pCoregSettingsView->getWeightRPA();
@@ -477,6 +478,7 @@ void CoRegistration::onFitICP()
                                 matHspClean,
                                 m_transHeadMri,
                                 fRMSE,
+                                bScale,
                                 iMaxIter,
                                 fTol,
                                 vecWeightsICPClean);

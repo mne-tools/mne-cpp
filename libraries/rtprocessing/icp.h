@@ -85,6 +85,7 @@ const Eigen::VectorXf vecDefaultWeigths;
  * @param [in]  matPointCloud       The point cloud to be registrated (From).
  * @param [out] transFromTo         The forward transformation matrix. It can contain an initial transformatin (e.g. from fiducial alignment).
  * @param [out] fRMSE               The resulting Root-Mean-Square-Error in m.
+ * @param [in]  bScale              Wether to apply scaling or not. Should be false for matching data sets, defaults to false.
  * @param [in]  iMaxIter            The maximum number of iterations for the icp algorithms, defaults to 20.
  * @param [in]  fTol                The destination point set to be reistrated, defaults to 0.001.
  * @param [in]  vecWeitgths         The weitghts to apply, defaults to zeros.
@@ -96,6 +97,7 @@ RTPROCESINGSHARED_EXPORT bool performIcp(const QSharedPointer<MNELIB::MNEProject
                                          const Eigen::MatrixXf& matPointCloud,
                                          FIFFLIB::FiffCoordTrans& transFromTo,
                                          float& fRMSE,
+                                         bool bScale = false,
                                          int iMaxIter = 20,
                                          float fTol = 0.001,
                                          const Eigen::VectorXf& vecWeitgths = vecDefaultWeigths);
