@@ -368,6 +368,7 @@ void MNEBem::write(QIODevice &p_IODevice)
     FiffStream::SPtr t_pStream = FiffStream::start_file(p_IODevice);
     printf("Write BEM surface in %s...\n", t_pStream->streamName().toUtf8().constData());
     this->writeToStream(t_pStream.data());
+    t_pStream->end_file();
 }
 
 //=============================================================================================================
@@ -385,7 +386,6 @@ void MNEBem::writeToStream(FiffStream* p_pStream)
     }
     printf("\t%d bem surfaces written\n", m_qListBemSurface.size());
     p_pStream->end_block(FIFFB_BEM);
-    p_pStream->end_file();
 }
 
 //=============================================================================================================
