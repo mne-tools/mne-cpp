@@ -71,9 +71,11 @@ CONFIG(debug, debug|release) {
 }
 
 
-SOURCES += test_mne_project_to_surface.cpp
+SOURCES += \
+    test_mne_project_to_surface.cpp
 
 HEADERS  += \
+
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
@@ -95,6 +97,7 @@ macx {
     QMAKE_LFLAGS += -Wl,-rpath,../lib
 }
 
+# Activate FFTW backend in Eigen for non-static builds only
 contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
     DEFINES += EIGEN_FFTW_DEFAULT
     INCLUDEPATH += $$shell_path($${FFTW_DIR_INCLUDE})
