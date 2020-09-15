@@ -308,8 +308,14 @@ jobs:
         # Copy additional LSL libs
         cp -a applications/mne_scan/plugins/lsladapter/liblsl/build/install/lib/. lib/
         # Install libxkbcommon and libbluetooth3 so linuxdeployqt can find it
+        sudo apt-get update
         sudo apt-get install libxkbcommon-x11-0
+        sudo apt-get install libxcb-icccm4
+        sudo apt-get install libxcb-image0
+        sudo apt-get install libxcb-keysyms1
+        sudo apt-get install libxcb-render-util0
         sudo apt-get install libbluetooth3
+        sudo apt-get install libxcb-xinerama0 
         # Downloading linuxdeployqt from continious release
         wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
         sudo chmod a+x linuxdeployqt-continuous-x86_64.AppImage
@@ -433,7 +439,7 @@ jobs:
       uses: jurplel/install-qt-action@v2
       with:
         version: 5.15.1
-        arch: win64_msvc2017_64
+        arch: win64_msvc2019_64
         modules: qtcharts
     - name: Install jom
       run: |
@@ -636,12 +642,12 @@ jobs:
         cd emsdk
         git pull
         # Download and install the latest SDK tools.
-        ./emsdk install 1.39.3        
+        ./emsdk install 1.39.8       
     - name: Compile wasm Qt version
       run: |
         cd ..
         # Make the "latest" emscripten SDK "active" for the current user.
-        ./emsdk/emsdk activate 1.39.3
+        ./emsdk/emsdk activate 1.39.8
         # Activate PATH and other environment variables in the current terminal
         source ./emsdk/emsdk_env.sh
         # Clone Qt5 repo
@@ -656,7 +662,7 @@ jobs:
       run: |
         cd ..
         # Make the "latest" emscripten SDK "active" for the current user.
-        ./emsdk/emsdk activate 1.39.3
+        ./emsdk/emsdk activate 1.39.8
         # Activate PATH and other environment variables in the current terminal
         source ./emsdk/emsdk_env.sh
         # Compile MNE-CPP        
