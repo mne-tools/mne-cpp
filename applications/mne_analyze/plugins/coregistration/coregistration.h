@@ -131,6 +131,13 @@ private:
 
     //=========================================================================================================
     /**
+     * Handle in data manager deleted models.
+     */
+
+    void deleteModels();
+
+    //=========================================================================================================
+    /**
      * Connected to GUI dropdown to select bem based on bem name input.
      *
      * @param[in] text  name of bem selected in the GUI
@@ -232,8 +239,6 @@ private:
      *
      */
     void onStoreFiducials(const QString& sFilePath);
-
-    void reset();
 
     QVector<QSharedPointer<ANSHAREDLIB::AbstractModel>>     m_vecBemDataModels;         /** Vector with all available Bem Models */
 
