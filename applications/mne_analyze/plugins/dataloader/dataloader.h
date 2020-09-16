@@ -136,6 +136,9 @@ private:
     void onLoadFilePressed();
 
     //=========================================================================================================
+    /**
+     * Triggers after file is done loading. Calls triggerLoadingEnd.
+     */
     void loadFileEnd();
 
     //=========================================================================================================
@@ -144,11 +147,21 @@ private:
      */
     void onSaveFilePressed();
 
+    //=========================================================================================================
+    /**
+     * Saves selected model (m_pSelectedModel) to file. To be run in separate thread with QFuture.
+     *
+     * @param sFilePath
+     */
     void saveFile(const QString sFilePath);
 
+    //=========================================================================================================
+    /**
+     * Triggers after file is done saving. Calls triggerLoadingEnd.
+     */
     void saveFileEnd();
 
-    //=============================================================================================================
+    //=========================================================================================================
     /**
      * Sends event to trigger loading bar to appear and sMessage to show
      *
@@ -156,7 +169,7 @@ private:
      */
     void triggerLoadingStart(const QString& sMessage);
 
-    //=============================================================================================================
+    //=========================================================================================================
     /**
      * Sends event to hide loading bar
      */
