@@ -136,14 +136,39 @@ private:
     void onLoadFilePressed();
 
     //=========================================================================================================
+    void loadFileEnd();
+
+    //=========================================================================================================
     /**
      * This functions is called when the save to file button is pressed.
      */
     void onSaveFilePressed();
 
-    QPointer<ANSHAREDLIB::Communicator>         m_pCommu;
+    void saveFile(const QString sFilePath);
 
-    QSharedPointer<ANSHAREDLIB::AbstractModel>  m_pSelectedModel;
+    void saveFileEnd();
+
+    //=============================================================================================================
+    /**
+     * Sends event to trigger loading bar to appear and sMessage to show
+     *
+     * @param [in] sMessage     loading bar message
+     */
+    void triggerLoadingStart(const QString& sMessage);
+
+    //=============================================================================================================
+    /**
+     * Sends event to hide loading bar
+     */
+    void triggerLoadingEnd(const QString& sMessage);
+
+    QPointer<ANSHAREDLIB::Communicator>         m_pCommu;               /** < Communicator used to send events via the event system */
+
+    QSharedPointer<ANSHAREDLIB::AbstractModel>  m_pSelectedModel;       /** < Pointer to currently selected model */
+
+    QFutureWatcher <void>                       m_FutureWatcher;        /** < Watches m_Future and signals when done */
+    QFuture<void>                               m_Future;               /** < Used to perfom operations in a separate thread */
+
 };
 
 //=============================================================================================================
