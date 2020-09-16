@@ -40,6 +40,7 @@
 #include <mne/mne_project_to_surface.h>
 #include <mne/mne_bem.h>
 #include <mne/mne_bem_surface.h>
+#include <utils/ioutils.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -86,7 +87,7 @@ private:
     // declare your thresholds, variables and error values here
     double dEpsilon;
     MatrixXf matResult;
-    MatrixXf matRef;
+    MatrixXd matRef;
 
 };
 
@@ -102,6 +103,8 @@ TestMNEProjectToSurface::TestMNEProjectToSurface()
 void TestMNEProjectToSurface::initTestCase()
 {
     QFile t_fileBem(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/subjects/sample/bem/sample-1280-1280-1280-bem.fif");
+    QString sRef(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/mne_project_to_surface.txt");
+
     MNEBem bemHead(t_fileBem);
     MNEBemSurface::SPtr bemSurface = MNEBemSurface::SPtr::create(bemHead[0]);
     MNEProjectToSurface::SPtr mneSurfacePoints = MNEProjectToSurface::SPtr::create(*bemSurface);
@@ -109,10 +112,14 @@ void TestMNEProjectToSurface::initTestCase()
     VectorXi vecNearest;                        // Triangle of the new point
     VectorXf vecDist;                           // The Distance between matX and matP
 
-    matRef = bemSurface->tri_cent.cast<float>();
-    MatrixXf matTriCent = matRef * 1.5;         // Move all points with same amout from surface
-    int iNP = matTriCent.rows();
-    mneSurfacePoints->mne_find_closest_on_surface(matTriCent, iNP, matResult, vecNearest, vecDist);
+    MatrixXf matPointsShifted = bemSurface->rr.cast<float>() * 1.1;         // Move all points with same amout from surface
+    int iNP = matPointsShifted.rows();
+
+    mneSurfacePoints->mne_find_closest_on_surface(matPointsShifted, iNP, matResult, vecNearest, vecDist);
+
+    // read reference
+    // UTILSLIB::IOUtils::write_eigen_matrix(matResult,sRef);
+    UTILSLIB::IOUtils::read_eigen_matrix(matRef,sRef);
 }
 
 //=============================================================================================================
@@ -120,8 +127,9 @@ void TestMNEProjectToSurface::initTestCase()
 void TestMNEProjectToSurface::compareValue()
 {
     // check if MNEProjectToSurface was able to get original points on surface
-    MatrixXf matDiff = matRef - matResult;
-    QVERIFY( matDiff.sum() < dEpsilon );
+    MatrixXf matDiff = matRef.cast<float>() - matResult;
+    qDebug() << "Summed Difference: " << std::abs(matDiff.sum());
+    QVERIFY(std::abs(matDiff.sum()) < dEpsilon);
 }
 
 //=============================================================================================================
