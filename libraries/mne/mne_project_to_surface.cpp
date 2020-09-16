@@ -150,8 +150,11 @@ MNEProjectToSurface::MNEProjectToSurface(const MNESurface &p_MNESurf)
 bool MNEProjectToSurface::mne_find_closest_on_surface(const MatrixXf &r, const int np, MatrixXf &rTri,
                                                       VectorXi &nearest, VectorXf &dist)
 {
+    // resize output
     nearest.resize(np);
     dist.resize(np);
+    rTri.resize(np,3);
+
     if (this->r1.isZero(0))
     {
         qDebug() << "No surface loaded to make the projection./n";
