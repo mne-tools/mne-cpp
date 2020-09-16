@@ -199,9 +199,8 @@ void DataLoader::onLoadFilePressed()
         return;
     }
 
-    triggerLoadingStart("Loading file...");
-
     #ifdef WASMBUILD   
+    triggerLoadingStart("Loading file...");
     connect(&m_FutureWatcher, &QFutureWatcher<void>::finished,
             this, &DataLoader::loadFileEnd, Qt::UniqueConnection);
 
@@ -213,6 +212,8 @@ void DataLoader::onLoadFilePressed()
                                                     tr("Open File"),
                                                     QDir::currentPath()+"/MNE-sample-data",
                                                     tr("Fiff file(*.fif *.fiff)"));
+
+    triggerLoadingStart("Loading file...");
 
     connect(&m_FutureWatcher, &QFutureWatcher<void>::finished,
             this, &DataLoader::loadFileEnd, Qt::UniqueConnection);
