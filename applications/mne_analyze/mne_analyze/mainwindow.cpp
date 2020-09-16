@@ -308,6 +308,9 @@ void MainWindow::createPluginMenus(QSharedPointer<ANSHAREDLIB::PluginManager> pP
     // View menu
     m_pMenuView = menuBar()->addMenu(tr("View"));
 
+    // Control menu
+    m_pMenuControl = menuBar()->addMenu(tr("Control"));
+
     //Appearance QMenu
     // Styles
     QActionGroup* pActionStyleGroup = new QActionGroup(this);
@@ -402,7 +405,7 @@ void MainWindow::createPluginControls(QSharedPointer<ANSHAREDLIB::PluginManager>
             qInfo() << "[MainWindow::createPluginControls] Found and added dock widget for " << pPlugin->getName();
             QAction* pAction = pControl->toggleViewAction();
             pAction->setText(pPlugin->getName()+" Controls");
-            m_pMenuView->addAction(pAction);
+            m_pMenuControl->addAction(pAction);
             qInfo() << "[MainWindow::createPluginControls] Added" << pPlugin->getName() << "controls to View menu";
 
             // Connect plugin controls to GUI mode toggling
