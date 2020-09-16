@@ -171,11 +171,22 @@ void DataLoader::cmdLineStartup(const QStringList& sArguments)
 //=============================================================================================================
 
 void DataLoader::loadFilePath(const QString& sFilePath)
-{
-    QFileInfo fileInfo(sFilePath);
+{   
+    if (sFilePath != ""){
+        QFileInfo fileInfo(sFilePath);
 
-    if(fileInfo.exists() && (fileInfo.completeSuffix() == "fif")) {
-        m_pAnalyzeData->loadModel<ANSHAREDLIB::FiffRawViewModel>(sFilePath);
+        if(fileInfo.exists() && (fileInfo.completeSuffix() == "fif")) {
+            m_pAnalyzeData->loadModel<ANSHAREDLIB::FiffRawViewModel>(sFilePath);
+        }
+    } else {
+        auto fileContentReady = [&](const QString &sFilePath, const QByteArray &fileContent) {
+            if(!sFilePath.isNull()) {
+                // We need to prepend "wasm/" because QFileDialog::getOpenFileContent does not provide a full
+                // path, which we need for organzing the different models in AnalyzeData
+                m_pAnalyzeData->loadModel<FiffRawViewModel>("wasm/"+sFilePath, fileContent);
+            }
+        };
+        QFileDialog::getOpenFileContent("Fiff File (*.fif *.fiff)",  fileContentReady);
     }
 }
 
@@ -188,15 +199,14 @@ void DataLoader::onLoadFilePressed()
         return;
     }
 
-    #ifdef WASMBUILD
-    auto fileContentReady = [&](const QString &sFilePath, const QByteArray &fileContent) {
-        if(!sFilePath.isNull()) {
-            // We need to prepend "wasm/" because QFileDialog::getOpenFileContent does not provide a full
-            // path, which we need for organzing the different models in AnalyzeData
-            m_pAnalyzeData->loadModel<FiffRawViewModel>("wasm/"+sFilePath, fileContent);
-        }
-    };
-    QFileDialog::getOpenFileContent("Fiff File (*.fif *.fiff)",  fileContentReady);
+    triggerLoadingStart("Loading file...");
+
+    #ifdef WASMBUILD   
+    connect(&m_FutureWatcher, &QFutureWatcher<void>::finished,
+            this, &DataLoader::loadFileEnd, Qt::UniqueConnection);
+
+    m_Future = QtConcurrent::run(this, &DataLoader::loadFilePath, "");
+    m_FutureWatcher.setFuture(m_Future);
     #else
     //Get the path
     QString sFilePath = QFileDialog::getOpenFileName(Q_NULLPTR,
@@ -204,15 +214,11 @@ void DataLoader::onLoadFilePressed()
                                                     QDir::currentPath()+"/MNE-sample-data",
                                                     tr("Fiff file(*.fif *.fiff)"));
 
-    triggerLoadingStart("Loading file...");
-
-
     connect(&m_FutureWatcher, &QFutureWatcher<void>::finished,
             this, &DataLoader::loadFileEnd, Qt::UniqueConnection);
 
     m_Future = QtConcurrent::run(this, &DataLoader::loadFilePath, sFilePath);
     m_FutureWatcher.setFuture(m_Future);
-    //loadFilePath(sFilePath);
     #endif
 }
 
@@ -238,7 +244,6 @@ void DataLoader::onSaveFilePressed()
 
     m_Future = QtConcurrent::run(this, &DataLoader::saveFile, "");
     m_FutureWatcher.setFuture(m_Future);
-//    m_pSelectedModel->saveToFile("");
     #else
     //Get the path
     QString sFilePath = QFileDialog::getSaveFileName(Q_NULLPTR,
