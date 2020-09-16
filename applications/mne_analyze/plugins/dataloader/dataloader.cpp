@@ -172,22 +172,21 @@ void DataLoader::cmdLineStartup(const QStringList& sArguments)
 
 void DataLoader::loadFilePath(const QString& sFilePath)
 {   
-    if (sFilePath != ""){
-        QFileInfo fileInfo(sFilePath);
-
-        if(fileInfo.exists() && (fileInfo.completeSuffix() == "fif")) {
-            m_pAnalyzeData->loadModel<ANSHAREDLIB::FiffRawViewModel>(sFilePath);
+    #ifdef WASMBUILD
+    auto fileContentReady = [&](const QString &sFilePath, const QByteArray &fileContent) {
+        if(!sFilePath.isNull()) {
+            // We need to prepend "wasm/" because QFileDialog::getOpenFileContent does not provide a full
+            // path, which we need for organzing the different models in AnalyzeData
+            m_pAnalyzeData->loadModel<FiffRawViewModel>("wasm/"+sFilePath, fileContent);
         }
-    } else {
-        auto fileContentReady = [&](const QString &sFilePath, const QByteArray &fileContent) {
-            if(!sFilePath.isNull()) {
-                // We need to prepend "wasm/" because QFileDialog::getOpenFileContent does not provide a full
-                // path, which we need for organzing the different models in AnalyzeData
-                m_pAnalyzeData->loadModel<FiffRawViewModel>("wasm/"+sFilePath, fileContent);
-            }
-        };
-        QFileDialog::getOpenFileContent("Fiff File (*.fif *.fiff)",  fileContentReady);
+    };
+    QFileDialog::getOpenFileContent("Fiff File (*.fif *.fiff)",  fileContentReady);
+    #else
+    QFileInfo fileInfo(sFilePath);
+    if(fileInfo.exists() && (fileInfo.completeSuffix() == "fif")) {
+        m_pAnalyzeData->loadModel<ANSHAREDLIB::FiffRawViewModel>(sFilePath);
     }
+    #endif
 }
 
 //=============================================================================================================
