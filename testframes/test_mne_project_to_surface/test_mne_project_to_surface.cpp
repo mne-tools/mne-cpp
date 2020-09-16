@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     Test the MNEProjectToSurface class..
+ * @brief     Test the MNEProjectToSurface class.
  *
  */
 
@@ -67,7 +67,7 @@ using namespace Eigen;
 /**
  * DECLARE CLASS TestMNEProjectToSurface
  *
- * @brief The TestMNEProjectToSurface class provides read write read fiff verification tests
+ * @brief The TestMNEProjectToSurface class provides MNEProjectToSurface verification tests
  *
  */
 class TestMNEProjectToSurface: public QObject
@@ -80,11 +80,10 @@ public:
 private slots:
     void initTestCase();
     void compareValue();
-    // add other compareFunctions here
     void cleanupTestCase();
 
 private:
-    // declare your thresholds, variables and error values here
+    // declare thresholds, and variables
     double dEpsilon;
     MatrixXf matResult;
     MatrixXd matRef;
@@ -109,16 +108,15 @@ void TestMNEProjectToSurface::initTestCase()
     MNEBemSurface::SPtr bemSurface = MNEBemSurface::SPtr::create(bemHead[0]);
     MNEProjectToSurface::SPtr mneSurfacePoints = MNEProjectToSurface::SPtr::create(*bemSurface);
 
-    VectorXi vecNearest;                        // Triangle of the new point
-    VectorXf vecDist;                           // The Distance between matX and matP
+    VectorXi vecNearest;    // Triangle of the new point
+    VectorXf vecDist;       // The Distance between matX and matP
 
-    MatrixXf matPointsShifted = bemSurface->rr.cast<float>() * 1.1;         // Move all points with same amout from surface
+    MatrixXf matPointsShifted = bemSurface->rr.cast<float>() * 1.1;     // Move all points with same amout from surface
     int iNP = matPointsShifted.rows();
 
     mneSurfacePoints->mne_find_closest_on_surface(matPointsShifted, iNP, matResult, vecNearest, vecDist);
 
     // read reference
-    // UTILSLIB::IOUtils::write_eigen_matrix(matResult,sRef);
     UTILSLIB::IOUtils::read_eigen_matrix(matRef,sRef);
 }
 
