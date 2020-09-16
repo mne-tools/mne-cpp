@@ -231,7 +231,14 @@ void DataLoader::onSaveFilePressed()
     }
 
     #ifdef WASMBUILD
-    m_pSelectedModel->saveToFile("");
+    triggerLoadingStart("Saving file...");
+
+    connect(&m_FutureWatcher, &QFutureWatcher<void>::finished,
+            this, &DataLoader::saveFileEnd, Qt::UniqueConnection);
+
+    m_Future = QtConcurrent::run(this, &DataLoader::saveFile, "");
+    m_FutureWatcher.setFuture(m_Future);
+//    m_pSelectedModel->saveToFile("");
     #else
     //Get the path
     QString sFilePath = QFileDialog::getSaveFileName(Q_NULLPTR,
