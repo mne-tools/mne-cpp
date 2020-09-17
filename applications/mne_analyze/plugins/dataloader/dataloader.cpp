@@ -269,7 +269,10 @@ void DataLoader::onSaveFilePressed()
 
 void DataLoader::saveFile(const QString sFilePath)
 {
-    m_pSelectedModel->saveToFile(sFilePath);
+    QMutexLocker locker(&(m_pAnalyzeData->m_Mutex));
+    if(m_pSelectedModel){
+        m_pSelectedModel->saveToFile(sFilePath);
+    }
 }
 
 //=============================================================================================================
