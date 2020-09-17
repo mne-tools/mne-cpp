@@ -131,6 +131,31 @@ macx {
     CONFIG += sdk_no_version_check
 }
 
+# Check versions
+!minQtVersion(5, 10, 0) {
+    error("You are trying to build with Qt version $${QT_VERSION}. However, the minimal Qt version to build MNE-CPP is 5.10.0.")
+}
+
+# Build static version if wasm flag was defined
+contains(MNECPP_CONFIG, wasm) {
+    message("The wasm flag was detected. Building static version of MNE-CPP. Disabling QOpenGLWidget support.")
+    MNECPP_CONFIG += static noQOpenGLWidget
+    QMAKE_LFLAGS       += --shared-memory
+    QMAKE_LFLAGS_DEBUG += --shared-memory
+    QMAKE_CFLAGS += --shared-memory
+    QMAKE_CXXFLAGS += --shared-memory
+}
+
+contains(MNECPP_CONFIG, static) {
+    message("The static flag was detected. Building static version of MNE-CPP.")
+}
+
+# Do not support QOpenGLWidget support on macx because signal backgrounds are not plotted correctly (tested on Qt 5.15.0 and Qt 5.15.1)
+macx:minQtVersion(5, 15, 0) {
+    message("Excluding QOpenGLWidget on MacOS for Qt version greater than 5.15.0")
+    MNECPP_CONFIG += noQOpenGLWidget
+}
+
 ########################################### DIRECTORY DEFINITIONS #############################################
 
 # Eigen dir
