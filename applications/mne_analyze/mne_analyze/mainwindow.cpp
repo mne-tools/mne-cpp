@@ -404,7 +404,7 @@ void MainWindow::createPluginControls(QSharedPointer<ANSHAREDLIB::PluginManager>
             addDockWidget(Qt::LeftDockWidgetArea, pControl);
             qInfo() << "[MainWindow::createPluginControls] Found and added dock widget for " << pPlugin->getName();
             QAction* pAction = pControl->toggleViewAction();
-            pAction->setText(pPlugin->getName()+" Controls");
+            pAction->setText(pPlugin->getName());
             m_pMenuControl->addAction(pAction);
             qInfo() << "[MainWindow::createPluginControls] Added" << pPlugin->getName() << "controls to View menu";
 
