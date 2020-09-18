@@ -157,6 +157,7 @@ bool EventManager::stopEventHandling()
     if (m_running)
     {
         m_running = false;
+        m_eventSemaphore.release();
         requestInterruption();
         wait();
         return true;
@@ -191,7 +192,6 @@ void EventManager::run()
     // main loop
     while (true)
     {
-        qDebug() << "EventManager::run -- m_eventSemaphore:" << m_eventSemaphore.available();
         m_eventSemaphore.acquire();
         auto before = std::chrono::high_resolution_clock::now();
         // go through all buffered events:
