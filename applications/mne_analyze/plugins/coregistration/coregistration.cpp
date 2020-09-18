@@ -49,11 +49,10 @@
 #include "mne/mne_project_to_surface.h"
 #include "rtprocessing/icp.h"
 
-#include <stdio.h>
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
+
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
@@ -156,6 +155,8 @@ QDockWidget *CoRegistration::getControl()
             this, &CoRegistration::onLoadTrans);
     connect(m_pCoregSettingsView, &CoregSettingsView::storeTrans,
             this, &CoRegistration::onStoreTrans);
+
+    // Connect events for new and deleted model
     connect(m_pAnalyzeData.data(), &AnalyzeData::newModelAvailable,
             this, &CoRegistration::updateBemList, Qt::UniqueConnection);
     connect(m_pAnalyzeData.data(), &AnalyzeData::modelIsEmpty,
@@ -179,9 +180,6 @@ QWidget *CoRegistration::getView()
 void CoRegistration::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
-        case SELECTED_MODEL_CHANGED:
-            updateBemList(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
-            break;
         default:
             qWarning() << "[CoRegistration::handleEvent] received an Event that is not handled by switch-cases";
             break;
@@ -193,7 +191,6 @@ void CoRegistration::handleEvent(QSharedPointer<Event> e)
 QVector<EVENT_TYPE> CoRegistration::getEventSubscriptions(void) const
 {
     QVector<EVENT_TYPE> temp;
-    temp.push_back(SELECTED_MODEL_CHANGED);
     return temp;
 }
 
@@ -595,12 +592,16 @@ void CoRegistration::deleteModels()
 
     if(m_vecBemDataModels != vecModels) {
         m_vecBemDataModels = vecModels;
-        for(auto pBemDataModel : m_vecBemDataModels) {
-            m_pCoregSettingsView->addSelectionBem(pBemDataModel->getModelName());
-        }
         if (m_vecBemDataModels.isEmpty()) {
+            // empty bem and string
             m_pCoregSettingsView->addSelectionBem("Select Bem");
             m_pBem->clear();
+            m_sCurrentSelectedBem = "";
+        } else {
+            // update new bem list
+            for(auto pBemDataModel : m_vecBemDataModels) {
+                m_pCoregSettingsView->addSelectionBem(pBemDataModel->getModelName());
+            }
         }
     }
 }
