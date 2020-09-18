@@ -207,6 +207,14 @@ protected:
 
     QList<QPointer<QPropertyAnimation> >  m_lPropertyAnimations;         /**< The animations for each 3D object. */
     QList<QPointer<Qt3DRender::QPointLight> >  m_lLightSources;          /**< The light sources. */
+
+signals:
+    /*
+     * Send whenever a pick event occured
+     *
+     */
+    void pickEvent(Qt3DRender::QPickEvent *event);
+
 };
 } // NAMESPACE
 

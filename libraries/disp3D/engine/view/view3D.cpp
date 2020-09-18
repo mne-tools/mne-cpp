@@ -125,12 +125,13 @@ View3D::View3D()
     connect(picker, &Qt3DRender::QObjectPicker::pressed,
             this, &View3D::handlePickerPress);
 
-    Qt3DRender::QRenderSettings* renderSettings = new Qt3DRender::QRenderSettings(m_pRootEntity);
-    renderSettings->pickingSettings()->setPickMethod(Qt3DRender::QPickingSettings::PrimitivePicking);
-    renderSettings->pickingSettings()->setPickResultMode(Qt3DRender::QPickingSettings::NearestPick);
-    renderSettings->pickingSettings()->setWorldSpaceTolerance(0.00000001f);
-
-    m_pRootEntity->addComponent(renderSettings);
+    // Qt3DRender::QRenderSettings* renderSettings = new Qt3DRender::QRenderSettings(m_pRootEntity);
+    this->renderSettings()->setActiveFrameGraph(m_pFrameGraph);
+    this->renderSettings()->pickingSettings()->setPickMethod(Qt3DRender::QPickingSettings::PrimitivePicking);
+    this->renderSettings()->pickingSettings()->setPickResultMode(Qt3DRender::QPickingSettings::NearestPick);
+    this->renderSettings()->pickingSettings()->setWorldSpaceTolerance(0.00000001f);
+    // renderSettings->setRenderPolicy(Qt3DRender::QRenderSettings::OnDemand);
+    // m_pRootEntity->addComponent(renderSettings);
 }
 
 //=============================================================================================================
@@ -142,6 +143,7 @@ void View3D::handlePickerPress(Qt3DRender::QPickEvent *event)
 
     // // "event" will give me clicked coordinates like this:
     qDebug() << __func__ << ": global Coord: " << event->worldIntersection();
+    qDebug() << __func__ << ": local Coord: " <<event->localIntersection();
 
     //    // // Also I can get picked/clicked triangle index and its vertices by casting event pointer type:
     //    Qt3DRender::QPickTriangleEvent *eventTri = static_cast<Qt3DRender::QPickTriangleEvent *>(event);
