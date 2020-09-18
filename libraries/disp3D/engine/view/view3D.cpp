@@ -91,6 +91,7 @@ View3D::View3D()
 , m_p3DObjectsEntity(new Qt3DCore::QEntity(m_pRootEntity))
 , m_pLightEntity(new Qt3DCore::QEntity(m_pRootEntity))
 , m_pCamera(this->camera())
+, m_pPicker(new Qt3DRender::QObjectPicker(m_pRootEntity))
 {
     //Root entity
     this->setRootEntity(m_pRootEntity);
@@ -127,12 +128,11 @@ View3D::View3D()
 
 void View3D::initObjectPicking()
 {
-    // create Object picker and add to root entity
-    Qt3DRender::QObjectPicker *picker = new Qt3DRender::QObjectPicker(m_pRootEntity);
-    m_pRootEntity->addComponent(picker);
+    // add object picker to root entity
+    m_pRootEntity->addComponent(m_pPicker);
 
     // emit signal whenever pick event occured
-    connect(picker, &Qt3DRender::QObjectPicker::pressed,
+    connect(m_pPicker, &Qt3DRender::QObjectPicker::pressed,
             this, &View3D::handlePickerPress);
 
     // define renderSettings
@@ -146,17 +146,17 @@ void View3D::initObjectPicking()
 
 void View3D::activatePicker(const bool bActivatePicker)
 {
-    this->renderSettings()->setEnabled(bActivatePicker)
+    m_pPicker->setEnabled(bActivatePicker);
 }
 
 //=============================================================================================================
 
-void View3D::handlePickerPress(Qt3DRender::QPickEvent *event)
+void View3D::handlePickerPress(Qt3DRender::QPickEvent *qPickEvent)
 {
     // only catch click events for left mouse button
-    if(event->button() == event->LeftButton) {
-        emit pickEventOccured(event);
-        qInfo() << __func__ << ": global Coord: " << event->worldIntersection();
+    if(qPickEvent->button() == qPickEvent->LeftButton) {
+        emit pickEventOccured(qPickEvent);
+        qInfo() << __func__ << ": global Coord: " << qPickEvent->worldIntersection();
     }
 }
 
