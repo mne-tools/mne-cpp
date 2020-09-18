@@ -59,6 +59,7 @@
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
+
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
@@ -78,8 +79,8 @@ using namespace Eigen;
 //=============================================================================================================
 
 CoregSettingsView::CoregSettingsView(const QString& sSettingsPath,
-                     QWidget *parent,
-                     Qt::WindowFlags f)
+                                     QWidget *parent,
+                                     Qt::WindowFlags f)
 : AbstractView(parent, f)
 , m_pUi(new Ui::CoregSettingsViewWidget)
 {
@@ -101,6 +102,11 @@ CoregSettingsView::CoregSettingsView(const QString& sSettingsPath,
             this, &CoregSettingsView::onStoreTrans);
     connect(m_pUi->m_qComboBox_BemItems, &QComboBox::currentTextChanged,
             this, &CoregSettingsView::changeSelectedBem, Qt::UniqueConnection);
+
+    // hide fiducial picking buttons until picking is implemented
+    m_pUi->m_qPushButton_PickLPA->hide();
+    m_pUi->m_qPushButton_PickNas->hide();
+    m_pUi->m_qPushButton_PickRPA->hide();
 
     // connect icp settings
     connect(m_pUi->m_qPushButton_FitFiducials, &QPushButton::released,
@@ -220,15 +226,15 @@ void CoregSettingsView::setToolTipInfo()
     m_pUi->m_qSpinBox_MaxIter->setToolTip("The maximum number of iterations for the ICP algorithm.");
     m_pUi->m_qPushButton_FitFiducials->setToolTip("Fiducial alignment. Apply this step before using the ICP algorithm to get a better first guess.");
     m_pUi->m_qPushButton_FitICP->setToolTip("Co-Registration with the ICP algorithm.");
-    m_pUi->m_qLabel_RMSE->setToolTip("The Root-Mean-Square-Error of the distance between closest pont and digigizer in mm");
+    m_pUi->m_qLabel_RMSE->setToolTip("The Root-Mean-Square-Error of the distance between closest point and digigizer in mm");
     m_pUi->m_qComboBox_ScalingMode->setToolTip("The scaling Mode. None - No scaling is applied; Uniform - same scaling for x,y,z-axis; 3-Axis - scaling on each axis.");
     m_pUi->m_qDoubleSpinBox_ScalingX->setToolTip("Scaling to apply in x-direction.");
     m_pUi->m_qDoubleSpinBox_ScalingY->setToolTip("Scaling to apply in y-direction.");
     m_pUi->m_qDoubleSpinBox_ScalingZ->setToolTip("Scaling to apply in z-direction.");
 
     m_pUi->m_qDoubleSpinBox_RotX->setToolTip("Rotation arround x-axis.");
-    m_pUi->m_qDoubleSpinBox_RotY->setToolTip("Rotation arround in y-axis.");
-    m_pUi->m_qDoubleSpinBox_RotZ->setToolTip("Rotation arround in z-axis.");
+    m_pUi->m_qDoubleSpinBox_RotY->setToolTip("Rotation arround y-axis.");
+    m_pUi->m_qDoubleSpinBox_RotZ->setToolTip("Rotation arround z-axis.");
 
     m_pUi->m_qDoubleSpinBox_TransX->setToolTip("Translation to apply in x-direction.");
     m_pUi->m_qDoubleSpinBox_TransY->setToolTip("Translation to apply in y-direction.");
@@ -389,7 +395,10 @@ float CoregSettingsView::getOmmitDistance()
 
 QList<int> CoregSettingsView::getDigitizerCheckState()
 {
+    // always use cardinal points
     QList<int> lPicks({FIFFV_POINT_CARDINAL});
+
+    // choose to use other points as well
     if(m_pUi->m_qCheckBox_EEG) {
         lPicks << FIFFV_POINT_EEG;
     }
@@ -406,6 +415,7 @@ QList<int> CoregSettingsView::getDigitizerCheckState()
 
 void CoregSettingsView::clearSelectionBem()
 {
+    // block to avoid action loop
     QSignalBlocker blockerComboBox(m_pUi->m_qComboBox_BemItems);
     m_pUi->m_qComboBox_BemItems->clear();
 }
@@ -444,7 +454,7 @@ void CoregSettingsView::setTransParams(const Vector3f& vecTrans,
                                        const Vector3f& vecRot,
                                        const Vector3f& vecScale)
 {
-    // block signals to avoid loop
+    // block signals to avoid action loop
     QSignalBlocker blockerTransX(m_pUi->m_qDoubleSpinBox_TransX);
     QSignalBlocker blockerTransY(m_pUi->m_qDoubleSpinBox_TransY);
     QSignalBlocker blockerTransZ(m_pUi->m_qDoubleSpinBox_TransZ);
