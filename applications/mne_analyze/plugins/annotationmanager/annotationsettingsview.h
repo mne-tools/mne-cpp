@@ -270,7 +270,7 @@ private slots:
     /**
      * Gets event map from QFuture and creates new groups baseed on it.
      */
-    void createGroupsFromTriggers();
+    void createGroupsFromTriggers(QMap<double,QList<int>> mEventGroupMap);
 
 private:
     //=========================================================================================================
