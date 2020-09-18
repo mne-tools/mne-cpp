@@ -88,6 +88,7 @@ void EventManager::issueEvent(QSharedPointer<Event> e)
 {
     QMutexLocker temp(&m_eventQMutex);
     m_eventQ.enqueue(e);
+    m_eventSemaphore.release();
 }
 
 //=============================================================================================================
@@ -190,6 +191,8 @@ void EventManager::run()
     // main loop
     while (true)
     {
+        qDebug() << "EventManager::run -- m_eventSemaphore:" << m_eventSemaphore.available();
+        m_eventSemaphore.acquire();
         auto before = std::chrono::high_resolution_clock::now();
         // go through all buffered events:
         while (hasBufferedEvents() == true)
