@@ -125,13 +125,13 @@ private:
 
     //=========================================================================================================
     /**
-     * Updates the dropdown display for selecting the bem model
+     * Updates the dropdown display for selecting the bem model.
      */
     void updateBemList(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
 
     //=========================================================================================================
     /**
-     * Handle in data manager deleted models.
+     * Handle the deletion of models.
      */
 
     void deleteModels();
@@ -140,7 +140,7 @@ private:
     /**
      * Connected to GUI dropdown to select bem based on bem name input.
      *
-     * @param[in] text  name of bem selected in the GUI
+     * @param[in] text  name of bem selected in the GUI.
      */
     void onChangeSelectedBem(const QString &sText);
 
@@ -148,7 +148,6 @@ private:
     /**
      * Call this funciton whenever new digitzers were loaded.
      *
-     * @param[in] lDigitzers    The new digitzers.
      * @param[in] sFilePath     The file path to the new digitzers.
      */
     void onDigitizersChanged(const QString& sFilePath);
@@ -158,46 +157,40 @@ private:
      * Call this funciton whenever new fiducials were loaded.
      *
      * @param[in] sFilePath     The file path to the new digitzers.
-     *
      */
     void onFiducialsChanged(const QString& sFilePath);
 
     //=========================================================================================================
     /**
-     * Load existing transformation from file
+     * Load existing transformation from file.
      *
      * @param[in] sFilePath     The file path to the transformation.
-     *
      */
     void onLoadTrans(const QString& sFilePath);
 
     //=========================================================================================================
     /**
-     * Store the transformation to the given file path
+     * Store the transformation to the given file path.
      *
      * @param[in] sFilePath     The file path to store the transformation.
-     *
      */
     void onStoreTrans(const QString& sFilePath);
 
     //=========================================================================================================
     /**
-     * Perform the actual Coregistration with the ICP algorithm
-     *
+     * Perform the actual Coregistration with the ICP algorithm.
      */
     void onFitICP();
 
     //=========================================================================================================
     /**
-     * Fit fiducials as initial alignment for further coregistration with ICP algorithm
-     *
+     * Fit fiducials as initial alignment for further coregistration with ICP algorithm.
      */
     void onFitFiducials();
 
     //=========================================================================================================
     /**
-     * Update the transformation with new rotation, translation and scaling parameters
-     *
+     * Update the transformation with new rotation, translation and scaling parameters from widget.
      */
     void onUpdateTrans();
 
@@ -205,11 +198,10 @@ private:
     /**
      * Get the transformation parameters from the matrix (rotation euler angle, translation, scale)
      *
-     * @param[in] matTrans      The transformation matrix to obtain the angles from.
+     * @param[in] matTrans      The transformation matrix to obtain the parametrs from.
      * @param[out] vecTrans     The translation vector (x,y,z).
      * @param[out] vecRot       The rotation angle vector in rad (due to euler transformation: z,y,x) .
      * @param[out] vecScale     The vector with the scaling parameters (x,y,z).
-     *
      */
     void getParamFromTrans(const Matrix4f& matTrans,
                            Vector3f& vecRot,
@@ -220,11 +212,10 @@ private:
     /**
      * Get the transformation matrix from the parameters (rotation euler angle, translation, scale)
      *
-     * @param[out] matTrans    The transformation matrix to obtain the angles from.
+     * @param[out] matTrans    The transformation matrix to store the parameters in.
      * @param[in] vecTrans     The translation vector (x,y,z).
      * @param[in] vecRot       The rotation angle vector in rad (due to euler transformation: z,y,x).
      * @param[in] vecScale     The vector with the scaling parameters (x,y,z).
-     *
      */
     void getTransFromParam(Matrix4f& matTrans,
                            const Vector3f& vecRot,
@@ -236,11 +227,10 @@ private:
      * Store the fiducials to the given file path
      *
      * @param[in] sFilePath     The file path to store the fiducials
-     *
      */
     void onStoreFiducials(const QString& sFilePath);
 
-    QVector<QSharedPointer<ANSHAREDLIB::AbstractModel>>     m_vecBemDataModels;     /** Vector with all available Bem Models */
+    QVector<QSharedPointer<ANSHAREDLIB::AbstractModel>>     m_vecBemDataModels;     /**< Vector with all available Bem Models */
     QSharedPointer<MNELIB::MNEBem>                          m_pBem;                 /**< The currently selected Bem model */
     QString                                                 m_sCurrentSelectedBem;  /**< The name of the currently selected Bem */
     FIFFLIB::FiffDigPointSet                                m_digSetHead;           /**< The currently selected digitizer set */

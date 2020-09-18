@@ -129,25 +129,25 @@ public:
 private:
     //=========================================================================================================
     /**
-     * Updates the davailable Bem Models for the coregistration
+     * Updates the available Bem Models for the coregistration.
      */
     void updateCoregBem(QSharedPointer<ANSHAREDLIB::BemDataModel> pNewModel);
 
     //=========================================================================================================
     /**
-     * Updates the digitizer set for the coregistration u
+     * Updates the digitizer set for the coregistration.
      */
     void updateCoregDigitizer(FIFFLIB::FiffDigPointSet digSet);
 
     //=========================================================================================================
     /**
-     * Updates the mri fiducials stored as digitizer set for the coregistration
+     * Updates the mri fiducials stored as digitizer set for the coregistration.
      */
     void updateCoregMriFid(FIFFLIB::FiffDigPointSet digSetFid);
 
     //=========================================================================================================
     /**
-     * Updates the head position
+     * Transforms the digitizers to mri space with the new transformation.
      */
     void updateCoregTrans(FIFFLIB::FiffCoordTrans headMriTrans);
 

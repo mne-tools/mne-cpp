@@ -37,7 +37,6 @@
 //=============================================================================================================
 
 #include "bemdatamodel.h"
-#include "mne/mne_bem_surface.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -96,10 +95,10 @@ BemDataModel::~BemDataModel()
 
 //=============================================================================================================
 
-void BemDataModel::initBemData(QIODevice& p_IODevice)
+void BemDataModel::initBemData(QIODevice& qIODevice)
 {
     // build Bem
-    m_pBem = MNEBem::SPtr::create(p_IODevice);
+    m_pBem = MNEBem::SPtr::create(qIODevice);
 
     if(m_pBem->isEmpty()) {
         qWarning() << "[BemDataModel::initBemData] File does not contain any Bem data";
@@ -107,10 +106,9 @@ void BemDataModel::initBemData(QIODevice& p_IODevice)
     }
 
     emit newBemAvailable(m_pBem);
-    // MNEBemSurface::SPtr bemSurface = MNEBemSurface::SPtr::create(m_pBem->operator[](0));
 
     // need to close the file manually
-    p_IODevice.close();
+    qIODevice.close();
     m_bIsInit = true;
 }
 
