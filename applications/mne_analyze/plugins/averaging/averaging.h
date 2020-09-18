@@ -234,7 +234,7 @@ private:
     /**
      * Receives FiffEvoked set from QFuture and created new averaging model
      */
-    void createNewAverage();
+    void createNewAverage(QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet);
 
     //=========================================================================================================
     /**
