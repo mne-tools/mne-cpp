@@ -216,8 +216,8 @@ QDockWidget* Averaging::getControl()
             this, &Averaging::onComputeButtonClicked, Qt::UniqueConnection);
     connect(m_pAveragingSettingsView, &DISPLIB::AveragingSettingsView::changeDropActive,
             this, &Averaging::onRejectionChecked, Qt::UniqueConnection);
-    connect(&m_FutureWatcher, &QFutureWatcher<QMap<double,QList<int>>>::finished,
-            this, &Averaging::createNewAverage, Qt::UniqueConnection);
+//    connect(&m_FutureWatcher, &QFutureWatcher<QMap<double,QList<int>>>::finished,
+//            this, &Averaging::createNewAverage, Qt::UniqueConnection);
 
     m_pAveragingSettingsView->setProcessingMode(DISPLIB::AbstractView::ProcessingMode::Offline);
     m_pAveragingSettingsView->setSizePolicy(QSizePolicy::Expanding,
@@ -384,8 +384,10 @@ void Averaging::computeAverage()
 
     triggerLoadingStart("Calculating average...");
 
-    m_Future = QtConcurrent::run(this, &Averaging::averageCalacualtion);
-    m_FutureWatcher.setFuture(m_Future);
+//    m_Future = QtConcurrent::run(this, &Averaging::averageCalacualtion);
+//    m_FutureWatcher.setFuture(m_Future);
+    createNewAverage(averageCalacualtion());
+
 }
 
 //=============================================================================================================
@@ -448,9 +450,9 @@ QSharedPointer<FIFFLIB::FiffEvokedSet> Averaging::averageCalacualtion()
 
 //=============================================================================================================
 
-void Averaging::createNewAverage()
+void Averaging::createNewAverage(QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet)
 {
-    QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet = m_Future.result();
+    //QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet = m_Future.result();
 
     if(pEvokedSet){
         QSharedPointer<ANSHAREDLIB::AveragingDataModel> pNewAvgModel = QSharedPointer<ANSHAREDLIB::AveragingDataModel>(new ANSHAREDLIB::AveragingDataModel(pEvokedSet));
