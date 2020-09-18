@@ -163,7 +163,7 @@ QStandardItemModel* AnalyzeData::getDataModel()
 
 bool AnalyzeData::removeModel(const QModelIndex& index)
 {
-    QMutexLocker locker(&m_Mutex);
+//    QMutexLocker locker(&m_Mutex);
     if(QStandardItem* pItem = m_pData->itemFromIndex(index)) {
         QString sModelPath = pItem->toolTip();
         QFileInfo info (sModelPath);
