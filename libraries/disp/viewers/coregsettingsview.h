@@ -77,9 +77,8 @@ namespace DISPLIB
 
 //=============================================================================================================
 /**
- * This classprovides the interface to the coregistration setting view.
+ * This class provides the interface to the coregistration setting view.
  *
- * @brief Brief description of this class.
  */
 class DISPSHARED_EXPORT CoregSettingsView : public AbstractView
 {
@@ -137,7 +136,7 @@ public:
     /**
      * Get the maximum number of icp iterations.
      *
-     * @return  The maximum nmber of iterations.
+     * @return  The maximum number of iterations.
      */
     int getMaxIter();
 
@@ -151,7 +150,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Get the auto scale state
+     * Get the auto scale state. If activated, unform scaling is applied for any icp iteration.
      *
      * @return  The auto scale state.
      */
@@ -159,7 +158,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Get the the maximum distance for digitizers from the surface
+     * Get the the maximum distance for digitizers from the surface.
      *
      * @return  The maximum distance in m.
      */
@@ -167,23 +166,23 @@ public:
 
     //=========================================================================================================
     /**
-     * Set the the number of omitted points
+     * Set the the number of omitted points.
      *
-     * @param[in] iN  The maximum distance in m.
+     * @param[in] iN  The number of omitted digitizer points.
      */
     void setOmittedPoints(const int iN);
 
     //=========================================================================================================
     /**
-     * Set the the number of omitted points
+     * Set the the Root-Mean-Square-Error (Digitizer-Surface) after icp.
      *
-     * @param[in] fRMSE  The RMSE m.
+     * @param[in] fRMSE     The RMSE in m.
      */
     void setRMSE(const float fRMSE);
 
     //=========================================================================================================
     /**
-     * Get the weights for the digitizer types
+     * Get the weights for the digitizer types.
      *
      * @return  The weight.
      */
@@ -204,7 +203,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Get the types of digitizers to use for coregistration.
+     * Get the parameters for the new transformation to build from the adjustment values.
      *
      * @param[out] vecRot       The rotation angle vector in rad (x,y,z).
      * @param[out] vecTrans     The traslation vector (x,y,z).
@@ -217,7 +216,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Set the transformation received from the ICP  algorithm
+     * Set the transformation received from the ICP  algorithm.
      *
      * @param[in] vecRot        The rotation angle vector in rad (x,y,z).
      * @param[in] vecTrans      The traslation vector (x,y,z).
@@ -287,7 +286,7 @@ signals:
 
     //=========================================================================================================
     /**
-     * Emit this signal whenever the file to store the fiducials changed
+     * Emit this signal whenever the file to store the fiducials changed.
      *
      * @param[in] sFilePath    The file path to the stored fiducials.
      */
@@ -303,33 +302,29 @@ signals:
 
     //=========================================================================================================
     /**
-     * Emit this signal whenever fiducial alignment is rewuested.
-     *
+     * Emit this signal whenever fiducial alignment is requested.
      */
     void fitFiducials();
 
     //=========================================================================================================
     /**
      * Emit this signal whenever icp alignment is requested.
-     *
      */
     void fitICP();
 
     //=========================================================================================================
     /**
-     * Emit this signal whenever ithe transformation should be stored.
+     * Emit this signal whenever the transformation should be stored.
      *
      * @param[in] sFilePath    The file path to store the transformation.
-     *
      */
     void storeTrans(const QString& sFilePath);
 
     //=========================================================================================================
     /**
-     * Emit this signal whenever ithe transformation should be loaded.
+     * Emit this signal whenever the transformation should be loaded.
      *
      * @param[in] sFilePath    The file path to load the transformation.
-     *
      */
     void loadTrans(const QString& sFilePath);
 
@@ -338,14 +333,12 @@ signals:
      * Emit this signal whenever the selected Bem changed.
      *
      * @param[in] sText    The file name of the currently selected Bem.
-     *
      */
     void changeSelectedBem(const QString &sText);
 
     //=========================================================================================================
     /**
-     * Emit this signal whenever the scaling, translation or rotation parmeters are changed.
-     *
+     * Emit this signal whenever the scaling, translation or rotation parmeters have changed.
      */
     void transParamChanged();
 

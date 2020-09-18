@@ -162,6 +162,7 @@ QDockWidget *CoRegistration::getControl()
     connect(m_pAnalyzeData.data(), &AnalyzeData::modelIsEmpty,
             this, &CoRegistration::deleteModels, Qt::UniqueConnection);
 
+    // automaticly load Bem if available
     onChangeSelectedBem(m_pCoregSettingsView->getCurrentSelectedBem());
 
     return pControlDock;
@@ -171,7 +172,6 @@ QDockWidget *CoRegistration::getControl()
 
 QWidget *CoRegistration::getView()
 {
-    //If the plugin does not have a view:
     return Q_NULLPTR;
 }
 
@@ -285,6 +285,7 @@ void CoRegistration::onLoadTrans(const QString& sFilePath)
     Vector3f vecScale;
     Vector3f vecTrans;
 
+    // check for type of transformation
     if(transTemp.from == FIFFV_COORD_HEAD && transTemp.to == FIFFV_COORD_MRI) {
         m_transHeadMri.clear();
         m_transHeadMri = *new FiffCoordTrans(transTemp);
@@ -331,7 +332,7 @@ void CoRegistration::onStoreTrans(const QString& sFilePath)
 void CoRegistration::onFitFiducials()
 {
     if(m_digSetHead.isEmpty() || m_digFidMri.isEmpty() || m_pBem->isEmpty()) {
-        qWarning() << "[CoRegistration::onFitFiducials] Make sure to load all the data necessary data.";
+        qWarning() << "[CoRegistration::onFitFiducials] Make sure to load all the necessary data.";
         return;
     }
 
@@ -399,7 +400,7 @@ void CoRegistration::onFitFiducials()
 void CoRegistration::onFitICP()
 {
     if(m_digSetHead.isEmpty() || m_digFidMri.isEmpty() || m_pBem->isEmpty()) {
-        qWarning() << "[CoRegistration::onFitICP] Make sure to load all the data necessary data.";
+        qWarning() << "[CoRegistration::onFitICP] Make sure to load all the necessary data.";
         return;
     }
 
@@ -421,7 +422,7 @@ void CoRegistration::onFitICP()
     MNEBemSurface::SPtr bemSurface = MNEBemSurface::SPtr::create(bemHead[0]);
     MNEProjectToSurface::SPtr mneSurfacePoints = MNEProjectToSurface::SPtr::create(*bemSurface);
 
-    // init point cloud
+    // get selected digitizers
     QList<int> lPickHSP = m_pCoregSettingsView->getDigitizerCheckState();
     FiffDigPointSet digSetHSP = m_digSetHead.pickTypes(lPickHSP);
 
@@ -430,10 +431,9 @@ void CoRegistration::onFitICP()
 
     for(int i = 0; i < digSetHSP.size(); ++i) {
         matHsp(i,0) = digSetHSP[i].r[0]; matHsp(i,1) = digSetHSP[i].r[1]; matHsp(i,2) = digSetHSP[i].r[2];
-        // set standart weights
+        // set weights
         switch (digSetHSP[i].kind){
             case FIFFV_POINT_CARDINAL:
-                // set weights
                 switch (digSetHSP[i].ident) {
                     case FIFFV_POINT_NASION:
                         vecWeightsICP(i) = fWeightNAS;
@@ -458,9 +458,10 @@ void CoRegistration::onFitICP()
         }
     }
 
+    // discard outliers
     MatrixXf matHspClean;
     VectorXi vecTake;
-    // discard outliers
+
     if(!RTPROCESSINGLIB::discard3DPointOutliers(mneSurfacePoints,
                                                 matHsp,
                                                 m_transHeadMri,
@@ -531,7 +532,6 @@ void CoRegistration::getParamFromTrans(const Matrix4f& matTrans,
                                        Vector3f& vecScale)
 /**
  * Following https://math.stackexchange.com/a/1463487
- *
  */
 {
     Matrix3f matRot = matTrans.block(0,0,3,3);
