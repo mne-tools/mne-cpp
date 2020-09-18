@@ -43,12 +43,6 @@
 #include <anShared/Model/fiffrawviewmodel.h>
 
 //=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QtConcurrent/QtConcurrent>
-
-//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -61,6 +55,7 @@ using namespace ANSHAREDLIB;
 
 DataLoader::DataLoader()
 {
+
 }
 
 //=============================================================================================================
@@ -171,7 +166,18 @@ void DataLoader::cmdLineStartup(const QStringList& sArguments)
 //=============================================================================================================
 
 void DataLoader::loadFilePath(const QString& sFilePath)
-{   
+{
+    QFileInfo fileInfo(sFilePath);
+
+    if(fileInfo.exists() && (fileInfo.completeSuffix() == "fif")) {
+        m_pAnalyzeData->loadModel<ANSHAREDLIB::FiffRawViewModel>(sFilePath);
+    }
+}
+
+//=============================================================================================================
+
+void DataLoader::onLoadFilePressed()
+{
     #ifdef WASMBUILD
     auto fileContentReady = [&](const QString &sFilePath, const QByteArray &fileContent) {
         if(!sFilePath.isNull()) {
@@ -182,43 +188,13 @@ void DataLoader::loadFilePath(const QString& sFilePath)
     };
     QFileDialog::getOpenFileContent("Fiff File (*.fif *.fiff)",  fileContentReady);
     #else
-    QFileInfo fileInfo(sFilePath);
-    if(fileInfo.exists() && (fileInfo.completeSuffix() == "fif")) {
-        m_pAnalyzeData->loadModel<ANSHAREDLIB::FiffRawViewModel>(sFilePath);
-    }
-    #endif
-}
-
-//=============================================================================================================
-
-void DataLoader::onLoadFilePressed()
-{
-    if(m_FutureWatcher.isRunning()){
-        qInfo() << "Load/Save operation already running.";
-        return;
-    }
-
-    #ifdef WASMBUILD   
-    triggerLoadingStart("Loading file...");
-    connect(&m_FutureWatcher, &QFutureWatcher<void>::finished,
-            this, &DataLoader::loadFileEnd, Qt::UniqueConnection);
-
-    m_Future = QtConcurrent::run(this, &DataLoader::loadFilePath, "");
-    m_FutureWatcher.setFuture(m_Future);
-    #else
     //Get the path
     QString sFilePath = QFileDialog::getOpenFileName(Q_NULLPTR,
                                                     tr("Open File"),
                                                     QDir::currentPath()+"/MNE-sample-data",
                                                     tr("Fiff file(*.fif *.fiff)"));
 
-    triggerLoadingStart("Loading file...");
-
-    connect(&m_FutureWatcher, &QFutureWatcher<void>::finished,
-            this, &DataLoader::loadFileEnd, Qt::UniqueConnection);
-
-    m_Future = QtConcurrent::run(this, &DataLoader::loadFilePath, sFilePath);
-    m_FutureWatcher.setFuture(m_Future);
+    loadFilePath(sFilePath);
     #endif
 }
 
@@ -226,24 +202,13 @@ void DataLoader::onLoadFilePressed()
 
 void DataLoader::onSaveFilePressed()
 {
-    if(m_FutureWatcher.isRunning()){
-        qInfo() << "Load/Save operation already running.";
-        return;
-    }
-
     if(!m_pSelectedModel) {
         qWarning() << "[DataLoader::onSaveFilePressed] No model selected.";
         return;
     }
 
     #ifdef WASMBUILD
-    triggerLoadingStart("Saving file...");
-
-    connect(&m_FutureWatcher, &QFutureWatcher<void>::finished,
-            this, &DataLoader::saveFileEnd, Qt::UniqueConnection);
-
-    m_Future = QtConcurrent::run(this, &DataLoader::saveFile, "");
-    m_FutureWatcher.setFuture(m_Future);
+    m_pSelectedModel->saveToFile("");
     #else
     //Get the path
     QString sFilePath = QFileDialog::getSaveFileName(Q_NULLPTR,
@@ -252,59 +217,6 @@ void DataLoader::onSaveFilePressed()
                                                     tr("Fiff file(*.fif *.fiff)"));
 
     QFileInfo fileInfo(sFilePath);
-
-    triggerLoadingStart("Saving file...");
-
-    connect(&m_FutureWatcher, &QFutureWatcher<void>::finished,
-            this, &DataLoader::saveFileEnd, Qt::UniqueConnection);
-
-    m_Future = QtConcurrent::run(this, &DataLoader::saveFile, sFilePath);
-    m_FutureWatcher.setFuture(m_Future);
-
-    //m_pSelectedModel->saveToFile(sFilePath);
+    m_pSelectedModel->saveToFile(sFilePath);
     #endif
-}
-
-//=============================================================================================================
-
-void DataLoader::saveFile(const QString sFilePath)
-{
-    QMutexLocker locker(&(m_pAnalyzeData->m_Mutex));
-    if(m_pSelectedModel){
-        m_pSelectedModel->saveToFile(sFilePath);
-    }
-}
-
-//=============================================================================================================
-
-void DataLoader::loadFileEnd()
-{
-    disconnect(&m_FutureWatcher, &QFutureWatcher<void>::finished,
-            this, &DataLoader::loadFileEnd);
-
-    triggerLoadingEnd("Loading file...");
-}
-
-//=============================================================================================================
-
-void DataLoader::saveFileEnd()
-{
-    disconnect(&m_FutureWatcher, &QFutureWatcher<void>::finished,
-            this, &DataLoader::saveFileEnd);
-
-    triggerLoadingEnd("Saving file...");
-}
-
-//=============================================================================================================
-
-void DataLoader::triggerLoadingStart(const QString& sMessage)
-{
-    m_pCommu->publishEvent(LOADING_START, QVariant::fromValue(sMessage));
-}
-
-//=============================================================================================================
-
-void DataLoader::triggerLoadingEnd(const QString& sMessage)
-{
-    m_pCommu->publishEvent(LOADING_END, QVariant::fromValue(sMessage));
 }

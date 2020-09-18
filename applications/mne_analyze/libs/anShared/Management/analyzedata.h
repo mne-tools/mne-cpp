@@ -175,7 +175,7 @@ public:
     QSharedPointer<T> loadModel(const QString& sPath,
                                 const QByteArray& byteLoadedData = QByteArray())
     {
-        QMutexLocker locker(&m_Mutex);
+//        QMutexLocker locker(&m_Mutex);
         // check if model was already loaded
         if(QSharedPointer<AbstractModel> pModel = getModelByPath(sPath)) {
             qInfo() << "[AnalyzeData::loadModel] Data has been loaded already.";
@@ -209,7 +209,7 @@ public:
     //=========================================================================================================
     template<class T>
     QSharedPointer<T> addModel(QSharedPointer<T> pNewModel, const QString& sModelName){
-        QMutexLocker locker(&m_Mutex);
+//        QMutexLocker locker(&m_Mutex);
         QSharedPointer<AbstractModel> temp = qSharedPointerCast<AbstractModel>(pNewModel);
         QStandardItem* pItem = new QStandardItem(sModelName);
         pItem->setEditable(false);
@@ -224,8 +224,6 @@ public:
         emit newModelAvailable(temp);
         return pNewModel;
     }
-
-    QMutex                              m_Mutex;        /**< Mutex for thread-safing loading and deleting models */
 
 private:
     QPointer<AnalyzeDataModel>          m_pData;        /**< The loaded models in form of a QStandardItemModel. */

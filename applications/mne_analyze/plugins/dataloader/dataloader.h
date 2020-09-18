@@ -137,51 +137,13 @@ private:
 
     //=========================================================================================================
     /**
-     * Triggers after file is done loading. Calls triggerLoadingEnd.
-     */
-    void loadFileEnd();
-
-    //=========================================================================================================
-    /**
      * This functions is called when the save to file button is pressed.
      */
     void onSaveFilePressed();
 
-    //=========================================================================================================
-    /**
-     * Saves selected model (m_pSelectedModel) to file. To be run in separate thread with QFuture.
-     *
-     * @param sFilePath
-     */
-    void saveFile(const QString sFilePath);
+    QPointer<ANSHAREDLIB::Communicator>         m_pCommu;
 
-    //=========================================================================================================
-    /**
-     * Triggers after file is done saving. Calls triggerLoadingEnd.
-     */
-    void saveFileEnd();
-
-    //=========================================================================================================
-    /**
-     * Sends event to trigger loading bar to appear and sMessage to show
-     *
-     * @param [in] sMessage     loading bar message
-     */
-    void triggerLoadingStart(const QString& sMessage);
-
-    //=========================================================================================================
-    /**
-     * Sends event to hide loading bar
-     */
-    void triggerLoadingEnd(const QString& sMessage);
-
-    QPointer<ANSHAREDLIB::Communicator>         m_pCommu;               /** < Communicator used to send events via the event system */
-
-    QSharedPointer<ANSHAREDLIB::AbstractModel>  m_pSelectedModel;       /** < Pointer to currently selected model */
-
-    QFutureWatcher <void>                       m_FutureWatcher;        /** < Watches m_Future and signals when done */
-    QFuture<void>                               m_Future;               /** < Used to perfom operations in a separate thread */
-
+    QSharedPointer<ANSHAREDLIB::AbstractModel>  m_pSelectedModel;
 };
 
 //=============================================================================================================
