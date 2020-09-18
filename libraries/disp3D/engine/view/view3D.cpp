@@ -119,38 +119,45 @@ View3D::View3D()
     createCoordSystem(m_pRootEntity);
     toggleCoordAxis(false);
 
-    //picking
+    initObjectPicking();
+}
+
+
+//=============================================================================================================
+
+void View3D::initObjectPicking()
+{
+    // create Object picker and add to root entity
     Qt3DRender::QObjectPicker *picker = new Qt3DRender::QObjectPicker(m_pRootEntity);
     m_pRootEntity->addComponent(picker);
+
+    // emit signal whenever pick event occured
     connect(picker, &Qt3DRender::QObjectPicker::pressed,
             this, &View3D::handlePickerPress);
 
-    // Qt3DRender::QRenderSettings* renderSettings = new Qt3DRender::QRenderSettings(m_pRootEntity);
+    // define renderSettings
     this->renderSettings()->setActiveFrameGraph(m_pFrameGraph);
     this->renderSettings()->pickingSettings()->setPickMethod(Qt3DRender::QPickingSettings::PrimitivePicking);
     this->renderSettings()->pickingSettings()->setPickResultMode(Qt3DRender::QPickingSettings::NearestPick);
     this->renderSettings()->pickingSettings()->setWorldSpaceTolerance(0.00000001f);
-    // renderSettings->setRenderPolicy(Qt3DRender::QRenderSettings::OnDemand);
-    // m_pRootEntity->addComponent(renderSettings);
 }
 
 //=============================================================================================================
 
-int k = 0;
+void View3D::activatePicker(const bool bActivatePicker)
+{
+    this->renderSettings()->setEnabled(bActivatePicker)
+}
+
+//=============================================================================================================
+
 void View3D::handlePickerPress(Qt3DRender::QPickEvent *event)
 {
-    qInfo() << "View3D::handlePickerPress" << k++ ;
-
-    // // "event" will give me clicked coordinates like this:
-    qDebug() << __func__ << ": global Coord: " << event->worldIntersection();
-    qDebug() << __func__ << ": local Coord: " <<event->localIntersection();
-
-    //    // // Also I can get picked/clicked triangle index and its vertices by casting event pointer type:
-    //    Qt3DRender::QPickTriangleEvent *eventTri = static_cast<Qt3DRender::QPickTriangleEvent *>(event);
-    //    qDebug() << __func__ << "Pick Triangle Index: " << eventTri->triangleIndex();
-    //    qDebug() << __func__ << "Pick Triangle Vertex 1: " << eventTri->vertex1Index();
-    //    qDebug() << __func__ << "Pick Triangle Vertex 2: " << eventTri->vertex2Index();
-    //    qDebug() << __func__ << "Pick Triangle Vertex 3: " << eventTri->vertex3Index();
+    // only catch click events for left mouse button
+    if(event->button() == event->LeftButton) {
+        emit pickEventOccured(event);
+        qInfo() << __func__ << ": global Coord: " << event->worldIntersection();
+    }
 }
 
 //=============================================================================================================
