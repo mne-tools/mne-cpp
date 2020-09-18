@@ -50,6 +50,7 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QSemaphore>
 #include <QPointer>
 #include <QMultiMap>
 #include <QThread>
@@ -190,13 +191,16 @@ private:
      */
     void run() override;
 
-    QMultiMap<EVENT_TYPE, Communicator*> m_routingTable;    /**< Map that holds routing information */
-    QQueue<QSharedPointer<Event> > m_eventQ;                /**< Queue that buffers all published events */
+    QMultiMap<EVENT_TYPE, Communicator*>    m_routingTable;         /**< Map that holds routing information */
+    QQueue<QSharedPointer<Event> >          m_eventQ;               /**< Queue that buffers all published events */
 
-    QMutex m_eventQMutex;                                   /**< Guarding mutex for the event queue */
-    QMutex m_routingTableMutex;                             /**< Guarding mutex for the routing table */
-    volatile long m_sleepTime;                              /**< Controlling execution frequency of main loop */
-    volatile bool m_running;                                /**< Flag for remembering whether the EventManager is currently started or stopped */
+    QMutex                                  m_eventQMutex;          /**< Guarding mutex for the event queue */
+    QMutex                                  m_routingTableMutex;    /**< Guarding mutex for the routing table */
+
+    volatile long                           m_sleepTime;            /**< Controlling execution frequency of main loop */
+    volatile bool                           m_running;              /**< Flag for remembering whether the EventManager is currently started or stopped */
+
+    QSemaphore                              m_eventSemaphore;       /**< Keeps track of events and blocks */
 };
 
 } // namespace
