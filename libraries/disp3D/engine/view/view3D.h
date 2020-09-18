@@ -208,9 +208,9 @@ protected:
     /**
      * Handle Picking events.
      *
-     * @param[in] event         The event that occured.
+     * @param[in] qPickEvent         The picking event that occured.
      */
-    void handlePickerPress(Qt3DRender::QPickEvent *event);
+    void handlePickerPress(Qt3DRender::QPickEvent *qPickEvent);
 
     QPointer<Qt3DCore::QEntity>                 m_pRootEntity;                  /**< The root/most top level entity buffer. */
     QPointer<Qt3DCore::QEntity>                 m_p3DObjectsEntity;             /**< The root/most top level entity buffer. */
@@ -220,6 +220,7 @@ protected:
     QPointer<CustomFrameGraph>                  m_pFrameGraph;                  /**< The frameGraph entity. */
     QPointer<Qt3DRender::QCamera>               m_pCamera;                      /**< The camera entity. */
     QPointer<Qt3DRender::QRenderCaptureReply>   m_pScreenCaptureReply;          /**< The capture reply object to save screenshots. */
+    QPointer<Qt3DRender::QObjectPicker>         m_pPicker;                      /**< The Picker entity. */
 
     QList<QPointer<QPropertyAnimation> >        m_lPropertyAnimations;          /**< The animations for each 3D object. */
     QList<QPointer<Qt3DRender::QPointLight> >   m_lLightSources;                /**< The light sources. */
@@ -228,7 +229,7 @@ signals:
     /*
      * Send whenever a pick event occured
      */
-    void pickEventOccured(Qt3DRender::QPickEvent *event);
+    void pickEventOccured(Qt3DRender::QPickEvent *qPickEvent);
 
 };
 } // NAMESPACE
