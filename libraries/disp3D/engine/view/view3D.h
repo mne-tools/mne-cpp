@@ -49,6 +49,7 @@
 #include <Qt3DExtras/Qt3DWindow>
 #include <QVector3D>
 #include <QPointer>
+#include <QObjectPicker>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -156,6 +157,15 @@ public:
      */
     void takeScreenshot();
 
+
+    //=========================================================================================================
+    /**
+     * Initilize the object picking.
+     *
+     * @param [in] bActivatePicker     Wheater to activate the object picker.
+     */
+    void activatePicker(const bool bActivatePicker);
+
 protected:
 
     void saveScreenshot();
@@ -165,6 +175,12 @@ protected:
      * Init the light for the 3D view
      */
     void initLight();
+
+    //=========================================================================================================
+    /**
+     * Initilize the object picking.
+     */
+    void initObjectPicking();
 
     //=========================================================================================================
     /**
@@ -205,15 +221,14 @@ protected:
     QPointer<Qt3DRender::QCamera>               m_pCamera;                      /**< The camera entity. */
     QPointer<Qt3DRender::QRenderCaptureReply>   m_pScreenCaptureReply;          /**< The capture reply object to save screenshots. */
 
-    QList<QPointer<QPropertyAnimation> >  m_lPropertyAnimations;         /**< The animations for each 3D object. */
-    QList<QPointer<Qt3DRender::QPointLight> >  m_lLightSources;          /**< The light sources. */
+    QList<QPointer<QPropertyAnimation> >        m_lPropertyAnimations;          /**< The animations for each 3D object. */
+    QList<QPointer<Qt3DRender::QPointLight> >   m_lLightSources;                /**< The light sources. */
 
 signals:
     /*
      * Send whenever a pick event occured
-     *
      */
-    void pickEvent(Qt3DRender::QPickEvent *event);
+    void pickEventOccured(Qt3DRender::QPickEvent *event);
 
 };
 } // NAMESPACE
