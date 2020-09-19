@@ -7,7 +7,7 @@
  *
  * @section  LICENSE
  *
- * Copyright (C) 2020, Gabriel Motta. All rights reserved.
+ * Copyright (C) 2020, Ruben Dörfel. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -62,6 +62,7 @@
 
 #include <QListWidgetItem>
 #include <QDebug>
+#include <QVector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -81,6 +82,24 @@ CoRegistration::CoRegistration()
     : m_pCoregSettingsView(Q_NULLPTR)
 {
     m_vecBemDataModels = QVector<QSharedPointer<ANSHAREDLIB::AbstractModel>>();
+
+    // init fiducial dig point set with three FiffDigPoints
+    m_digFidMri = FiffDigPointSet();
+    FiffDigPoint digLPA = FiffDigPoint();
+    FiffDigPoint digNAS = FiffDigPoint();
+    FiffDigPoint digRPA = FiffDigPoint();
+
+    digLPA.kind = FIFFV_POINT_CARDINAL;
+    digNAS.kind = FIFFV_POINT_CARDINAL;
+    digRPA.kind = FIFFV_POINT_CARDINAL;
+    digLPA.ident = FIFFV_POINT_LPA;
+    digNAS.ident = FIFFV_POINT_NASION;
+    digRPA.ident = FIFFV_POINT_RPA;
+    digLPA.coord_frame = FIFFV_COORD_MRI;
+    digNAS.coord_frame = FIFFV_COORD_MRI;
+    digRPA.coord_frame = FIFFV_COORD_MRI;
+
+    m_digFidMri << digLPA << digNAS << digRPA;
 }
 
 //=============================================================================================================
@@ -156,6 +175,10 @@ QDockWidget *CoRegistration::getControl()
     connect(m_pCoregSettingsView, &CoregSettingsView::storeTrans,
             this, &CoRegistration::onStoreTrans);
 
+    // connect fiducial selection
+    connect(m_pCoregSettingsView, &CoregSettingsView::pickFiducials,
+            this, &CoRegistration::onPickFiducials);
+
     // Connect events for new and deleted model
     connect(m_pAnalyzeData.data(), &AnalyzeData::newModelAvailable,
             this, &CoRegistration::updateBemList, Qt::UniqueConnection);
@@ -228,6 +251,52 @@ void CoRegistration::onChangeSelectedBem(const QString &sText)
             return;
         }
     }
+}
+
+//=============================================================================================================
+
+void CoRegistration::onPickFiducials()
+{
+    // Connect to 3DView and activate ObjectPicking
+
+}
+
+//=============================================================================================================
+
+void CoRegistration::onSetFiducial()
+{
+    // Connect to 3DView and activate ObjectPicking
+    QVector<float> result;
+    fiff_float_t    r[3];           /**< Point location */
+    for(int i = 0; i < 3; i++) {
+        r[i] = result.at(i);
+    }
+    fiff_int_t iFiducial = m_pCoregSettingsView->getCurrentFiducial();
+    switch(iFiducial) {
+    case FIFFV_POINT_LPA:
+        m_digFidMri[0].r[0] = r[0];
+        m_digFidMri[0].r[1] = r[1];
+        m_digFidMri[0].r[2] = r[2];
+        m_pCoregSettingsView->setFiducials(result);
+        break;
+    case FIFFV_POINT_NASION:
+        m_digFidMri[1].r[0] = r[0];
+        m_digFidMri[1].r[1] = r[1];
+        m_digFidMri[1].r[2] = r[2];
+        m_pCoregSettingsView->setFiducials(result);
+        break;
+    case FIFFV_POINT_RPA:
+        m_digFidMri[2].r[0] = r[0];
+        m_digFidMri[2].r[1] = r[1];
+        m_digFidMri[2].r[2] = r[2];
+        m_pCoregSettingsView->setFiducials(result);
+        break;
+    }
+
+    QVariant data = QVariant::fromValue(m_digFidMri);
+    m_pCommu->publishEvent(EVENT_TYPE::NEW_FIDUCIALS_ADDED, data);
+
+    return;
 }
 
 //=============================================================================================================
