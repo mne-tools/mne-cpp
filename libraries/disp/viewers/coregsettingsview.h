@@ -134,6 +134,22 @@ public:
 
     //=========================================================================================================
     /**
+     * Get the checked radio box for fiducial picking.
+     *
+     * @return  The currently selected fiducial.
+     */
+    int getCurrentFiducial();
+
+    //=========================================================================================================
+    /**
+     * Set the position of the fiducials.
+     *
+     * @param[in] vecAxialPosition     The vector containig x-,y- and x- Position for LPA, Nasion and RPA.
+     */
+    void setFiducials(QVector<float> vecAxialPosition);
+
+    //=========================================================================================================
+    /**
      * Get the maximum number of icp iterations.
      *
      * @return  The maximum number of iterations.
@@ -235,6 +251,12 @@ private:
      * Load fiducial from file
      */
     void onLoadFidFile();
+
+    //=========================================================================================================
+    /**
+     * Pick fiducials is activated
+     */
+    void onPickFiducialsChanged();
 
     //=========================================================================================================
     /**
@@ -342,6 +364,11 @@ signals:
      */
     void transParamChanged();
 
+    //=========================================================================================================
+    /**
+     * Emit this signal whenever fiducial picking from 3DView should be activated.
+     */
+    void pickFiducials();
 };
 
 //=============================================================================================================
