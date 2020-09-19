@@ -52,9 +52,12 @@
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_4">
           <item>
-           <widget class="QPushButton" name="m_qPushButton_LoadFid">
+           <widget class="QCheckBox" name="m_qCheckBox_PickFiducials">
             <property name="text">
-             <string>Load Fiducials</string>
+             <string>Pick Fiducials from View</string>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -62,27 +65,64 @@
            <widget class="QWidget" name="m_qWidget_PickFiducials" native="true">
             <layout class="QHBoxLayout" name="horizontalLayout">
              <item>
-              <widget class="QPushButton" name="m_qPushButton_PickLPA">
+              <widget class="QRadioButton" name="m_qRadioButton_LPA">
                <property name="text">
                 <string>LPA</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="m_qPushButton_PickNas">
+              <widget class="QRadioButton" name="m_qRadioButton_NAS">
                <property name="text">
                 <string>Nasion</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="m_qPushButton_PickRPA">
+              <widget class="QRadioButton" name="m_qRadioButton_RPA">
                <property name="text">
                 <string>RPA</string>
                </property>
               </widget>
              </item>
             </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QWidget" name="m_qWidget_ResultFiducials" native="true">
+            <layout class="QHBoxLayout" name="horizontalLayout_2">
+             <item>
+              <widget class="QLineEdit" name="m_qLineEdit_LPA">
+               <property name="text">
+                <string>x: 0 mm</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="m_qLineEdit_NAS">
+               <property name="text">
+                <string>y: 0 mm</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="m_qLineEdit_RPA">
+               <property name="text">
+                <string>x: 0 mm</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="m_qPushButton_LoadFid">
+            <property name="text">
+             <string>Load Fiducials</string>
+            </property>
            </widget>
           </item>
           <item>

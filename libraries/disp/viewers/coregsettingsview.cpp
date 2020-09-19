@@ -103,10 +103,15 @@ CoregSettingsView::CoregSettingsView(const QString& sSettingsPath,
     connect(m_pUi->m_qComboBox_BemItems, &QComboBox::currentTextChanged,
             this, &CoregSettingsView::changeSelectedBem, Qt::UniqueConnection);
 
-    // hide fiducial picking buttons until picking is implemented
-    m_pUi->m_qPushButton_PickLPA->hide();
-    m_pUi->m_qPushButton_PickNas->hide();
-    m_pUi->m_qPushButton_PickRPA->hide();
+    // Connect Fiducial Pickings
+
+    connect(m_pUi->m_qCheckBox_PickFiducials, &QCheckBox::stateChanged,
+            this, &CoregSettingsView::onPickFiducialsChanged);
+    onPickFiducialsChanged();
+    connect(m_pUi->m_qComboBox_BemItems, &QComboBox::currentTextChanged,
+            this, &CoregSettingsView::changeSelectedBem, Qt::UniqueConnection);
+    connect(m_pUi->m_qComboBox_BemItems, &QComboBox::currentTextChanged,
+            this, &CoregSettingsView::changeSelectedBem, Qt::UniqueConnection);
 
     // connect icp settings
     connect(m_pUi->m_qPushButton_FitFiducials, &QPushButton::released,
@@ -254,9 +259,39 @@ void CoregSettingsView::onLoadFidFile()
     if (sFileName.isEmpty()) {
         return;
     } else {
-        std::cout << sFileName.toUtf8().constData() << std::endl;
         emit fidFileChanged(sFileName);
     }
+}
+
+//=============================================================================================================
+
+void CoregSettingsView::onPickFiducialsChanged()
+{
+    bool bState = m_pUi->m_qCheckBox_PickFiducials->isChecked();
+    if(bState) {
+        m_pUi->m_qWidget_PickFiducials->setEnabled(true);
+        m_pUi->m_qWidget_ResultFiducials->setEnabled(true);
+        emit pickFiducials();
+    } else {
+        m_pUi->m_qWidget_PickFiducials->setEnabled(false);
+        m_pUi->m_qWidget_ResultFiducials->setEnabled(false);
+        return;
+    }
+}
+
+//=============================================================================================================
+
+void CoregSettingsView::setFiducials(QVector<float> vecAxialPosition)
+{
+    if(m_pUi->m_qRadioButton_LPA->isChecked()) {
+        m_pUi->m_qLineEdit_LPA->setText("x: " + QString::number(vecAxialPosition.at(0) * 1000) + " mm" );
+    } else if (m_pUi->m_qRadioButton_NAS->isChecked()) {
+        m_pUi->m_qLineEdit_NAS->setText("y: " + QString::number(vecAxialPosition.at(1) * 1000) + " mm" );
+    } else {
+        m_pUi->m_qLineEdit_RPA->setText("x: " + QString::number(vecAxialPosition.at(0) * 1000) + " mm" );
+    }
+
+    return;
 }
 
 //=============================================================================================================
@@ -319,6 +354,21 @@ void CoregSettingsView::onStoreTrans()
     } else{
         emit storeTrans(sFileName);
     }
+}
+
+//=============================================================================================================
+
+int CoregSettingsView::getCurrentFiducial()
+{
+    // choose to use other points as well
+    if(m_pUi->m_qRadioButton_LPA->isChecked()) {
+        return FIFFV_POINT_LPA;
+    } else if(m_pUi->m_qRadioButton_NAS->isChecked()) {
+        return FIFFV_POINT_NASION;
+    } else if(m_pUi->m_qRadioButton_RPA->isChecked()) {
+        return FIFFV_POINT_RPA;
+    };
+    return -1;
 }
 
 //=============================================================================================================

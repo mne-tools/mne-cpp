@@ -7,7 +7,7 @@
  *
  * @section  LICENSE
  *
- * Copyright (C) 2020, Gabriel Motta. All rights reserved.
+ * Copyright (C) 2020, Ruben Dörfel. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -133,7 +133,6 @@ private:
     /**
      * Handle the deletion of models.
      */
-
     void deleteModels();
 
     //=========================================================================================================
@@ -143,6 +142,18 @@ private:
      * @param[in] text  name of bem selected in the GUI.
      */
     void onChangeSelectedBem(const QString &sText);
+
+    //=========================================================================================================
+    /**
+     * Fiducial picking is activated.
+     */
+    void onPickFiducials();
+
+    //=========================================================================================================
+    /**
+     * Create new fiducial from ObjectPicking input.
+     */
+    void onSetFiducial();
 
     //=========================================================================================================
     /**
