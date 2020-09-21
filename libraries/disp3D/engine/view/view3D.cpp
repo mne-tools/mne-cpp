@@ -122,7 +122,7 @@ View3D::View3D()
 
     // initialize object picking and disable it by default to save resources
     initObjectPicking();
-    activatePicker(false);
+    activatePicker(true);
 }
 
 
@@ -158,7 +158,6 @@ void View3D::handlePickerPress(Qt3DRender::QPickEvent *qPickEvent)
     // only catch click events for left mouse button
     if(qPickEvent->button() == qPickEvent->LeftButton) {
         emit pickEventOccured(qPickEvent);
-        qInfo() << __func__ << ": global Coord: " << qPickEvent->worldIntersection();
     }
 }
 
