@@ -368,7 +368,7 @@ signals:
     /**
      * Emit this signal whenever fiducial picking from 3DView should be activated.
      */
-    void pickFiducials();
+    void pickFiducials(bool bActivatePicking);
 };
 
 //=============================================================================================================

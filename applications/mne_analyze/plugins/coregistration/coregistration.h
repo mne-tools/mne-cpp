@@ -145,9 +145,9 @@ private:
 
     //=========================================================================================================
     /**
-     * Fiducial picking is activated.
+     * Activate/Deactivate Fiducial Picking.
      */
-    void onPickFiducials();
+    void onPickFiducials(const bool bActivatePicking);
 
     //=========================================================================================================
     /**
@@ -251,7 +251,6 @@ private:
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;
 
     DISPLIB::CoregSettingsView*                             m_pCoregSettingsView;   /**< Pointer to coreg GUI */
-
 };
 
 //=============================================================================================================

@@ -255,10 +255,10 @@ void CoRegistration::onChangeSelectedBem(const QString &sText)
 
 //=============================================================================================================
 
-void CoRegistration::onPickFiducials()
+void CoRegistration::onPickFiducials(const bool bActivatePicking)
 {
-    // Connect to 3DView and activate ObjectPicking
-
+    QVariant data = QVariant::fromValue(bActivatePicking);
+    m_pCommu->publishEvent(EVENT_TYPE::FID_PICKING_STATUS, data);
 }
 
 //=============================================================================================================
