@@ -120,7 +120,9 @@ View3D::View3D()
     createCoordSystem(m_pRootEntity);
     toggleCoordAxis(false);
 
+    // initialize object picking and disable it by default to save resources
     initObjectPicking();
+    activatePicker(false);
 }
 
 
