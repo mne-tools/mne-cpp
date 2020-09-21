@@ -103,21 +103,22 @@ CoregSettingsView::CoregSettingsView(const QString& sSettingsPath,
     connect(m_pUi->m_qComboBox_BemItems, &QComboBox::currentTextChanged,
             this, &CoregSettingsView::changeSelectedBem, Qt::UniqueConnection);
 
+    connect(m_pUi->m_qComboBox_BemItems, &QComboBox::currentTextChanged,
+            this, &CoregSettingsView::changeSelectedBem, Qt::UniqueConnection);
+    connect(m_pUi->m_qComboBox_BemItems, &QComboBox::currentTextChanged,
+            this, &CoregSettingsView::changeSelectedBem, Qt::UniqueConnection);
+
+
     // Connect Fiducial Pickings
     connect(m_pUi->m_qCheckBox_PickFiducials, &QCheckBox::stateChanged,
             this, &CoregSettingsView::onPickFiducialsChanged);
     onPickFiducialsChanged();
 
-    connect(m_pUi->m_qComboBox_BemItems, &QComboBox::currentTextChanged,
-            this, &CoregSettingsView::changeSelectedBem, Qt::UniqueConnection);
-    connect(m_pUi->m_qComboBox_BemItems, &QComboBox::currentTextChanged,
-            this, &CoregSettingsView::changeSelectedBem, Qt::UniqueConnection);
-
     // connect icp settings
     connect(m_pUi->m_qPushButton_FitFiducials, &QPushButton::released,
-            this, &CoregSettingsView::fitFiducials);
+            this, &CoregSettingsView::onFitFiducials);
     connect(m_pUi->m_qPushButton_FitICP, &QPushButton::released,
-            this, &CoregSettingsView::fitICP);
+            this, &CoregSettingsView::onFitICP);
 
     // connect adjustment settings
     connect(m_pUi->m_qDoubleSpinBox_ScalingX, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
@@ -577,6 +578,21 @@ void CoregSettingsView::onScalingModeChanges()
         m_pUi->m_qDoubleSpinBox_ScalingY->setEnabled(false);
         m_pUi->m_qDoubleSpinBox_ScalingZ->setEnabled(false);
     }
-
     return;
+}
+
+//=============================================================================================================
+
+void CoregSettingsView::onFitFiducials()
+{
+    m_pUi->m_qCheckBox_PickFiducials->setChecked(false);
+    emit fitFiducials();
+}
+
+//=============================================================================================================
+
+void CoregSettingsView::onFitICP()
+{
+    m_pUi->m_qCheckBox_PickFiducials->setChecked(false);
+    emit fitICP();
 }
