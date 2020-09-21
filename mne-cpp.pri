@@ -140,10 +140,6 @@ macx {
 contains(MNECPP_CONFIG, wasm) {
     message("The wasm flag was detected. Building static version of MNE-CPP. Disabling QOpenGLWidget support.")
     MNECPP_CONFIG += static noQOpenGLWidget
-    QMAKE_LFLAGS       += --shared-memory
-    QMAKE_LFLAGS_DEBUG += --shared-memory
-    QMAKE_CFLAGS += --shared-memory
-    QMAKE_CXXFLAGS += --shared-memory
 }
 
 contains(MNECPP_CONFIG, static) {
