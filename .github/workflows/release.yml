@@ -642,12 +642,12 @@ jobs:
         cd emsdk
         git pull
         # Download and install the latest SDK tools.
-        ./emsdk install 1.39.8       
+        ./emsdk install 1.39.7       
     - name: Compile wasm Qt version
       run: |
         cd ..
         # Make the "latest" emscripten SDK "active" for the current user.
-        ./emsdk/emsdk activate 1.39.8
+        ./emsdk/emsdk activate 1.39.7
         # Activate PATH and other environment variables in the current terminal
         source ./emsdk/emsdk_env.sh
         # Clone Qt5 repo
@@ -662,7 +662,7 @@ jobs:
       run: |
         cd ..
         # Make the "latest" emscripten SDK "active" for the current user.
-        ./emsdk/emsdk activate 1.39.8
+        ./emsdk/emsdk activate 1.39.7
         # Activate PATH and other environment variables in the current terminal
         source ./emsdk/emsdk_env.sh
         # Compile MNE-CPP        
