@@ -104,10 +104,10 @@ CoregSettingsView::CoregSettingsView(const QString& sSettingsPath,
             this, &CoregSettingsView::changeSelectedBem, Qt::UniqueConnection);
 
     // Connect Fiducial Pickings
-
     connect(m_pUi->m_qCheckBox_PickFiducials, &QCheckBox::stateChanged,
             this, &CoregSettingsView::onPickFiducialsChanged);
     onPickFiducialsChanged();
+
     connect(m_pUi->m_qComboBox_BemItems, &QComboBox::currentTextChanged,
             this, &CoregSettingsView::changeSelectedBem, Qt::UniqueConnection);
     connect(m_pUi->m_qComboBox_BemItems, &QComboBox::currentTextChanged,
@@ -271,12 +271,13 @@ void CoregSettingsView::onPickFiducialsChanged()
     if(bState) {
         m_pUi->m_qWidget_PickFiducials->setEnabled(true);
         m_pUi->m_qWidget_ResultFiducials->setEnabled(true);
-        emit pickFiducials();
+        emit pickFiducials(true);
     } else {
         m_pUi->m_qWidget_PickFiducials->setEnabled(false);
         m_pUi->m_qWidget_ResultFiducials->setEnabled(false);
-        return;
+        emit pickFiducials(false);
     }
+    return;
 }
 
 //=============================================================================================================

@@ -60,6 +60,7 @@
 //=============================================================================================================
 
 #include <QDebug>
+#include <Qt3DRender>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -77,6 +78,7 @@ View3D::View3D()
     : m_pCommu(Q_NULLPTR)
     , m_pBemTreeCoreg(Q_NULLPTR)
     , m_pDigitizerCoreg(Q_NULLPTR)
+    , m_bPickingActivated(false)
 {
 }
 
@@ -129,8 +131,11 @@ QWidget *View3D::getView()
 {
     m_pView3D = new DISP3DLIB::View3D();
     m_pView3D->setModel(m_p3DModel);
-    QWidget *pWidgetContainer = QWidget::createWindowContainer(m_pView3D, Q_NULLPTR, Qt::Widget);
 
+    connect(m_pView3D, &DISP3DLIB::View3D::pickEventOccured,
+            this, &View3D::newPickingEvent);
+
+    QWidget *pWidgetContainer = QWidget::createWindowContainer(m_pView3D, Q_NULLPTR, Qt::Widget);
     return pWidgetContainer;
 }
 
@@ -194,6 +199,9 @@ void View3D::handleEvent(QSharedPointer<Event> e)
         case NEW_TRANS_AVAILABE:
             updateCoregTrans(e->getData().value<FiffCoordTrans>());
             break;
+        case FID_PICKING_STATUS:
+            fiducialPicking(e->getData().value<bool>());
+            break;
         default:
             qWarning() << "[View3D::handleEvent] Received an Event that is not handled by switch cases.";
     }
@@ -208,6 +216,7 @@ QVector<EVENT_TYPE> View3D::getEventSubscriptions(void) const
     temp.push_back(NEW_DIGITIZER_ADDED);
     temp.push_back(NEW_FIDUCIALS_ADDED);
     temp.push_back(NEW_TRANS_AVAILABE);
+    temp.push_back(FID_PICKING_STATUS);
     return temp;
 }
 
@@ -216,7 +225,10 @@ QVector<EVENT_TYPE> View3D::getEventSubscriptions(void) const
 void View3D::updateCoregBem(ANSHAREDLIB::BemDataModel::SPtr pNewModel)
 {
     if(pNewModel->getType() == ANSHAREDLIB_BEMDATA_MODEL) {
+        m_pView3D->activatePicker(true);
         m_pBemTreeCoreg = m_p3DModel->addBemData("Co-Registration", "Surface", *pNewModel->getBem().data());
+        m_pView3D->activatePicker(m_bPickingActivated);
+        qDebug() << __func__;
     }
     return;
 }
@@ -247,4 +259,19 @@ void View3D::updateCoregTrans(FiffCoordTrans headMriTrans)
 {
     m_pDigitizerCoreg->setTransform(headMriTrans,false);
     return;
+}
+
+//=========================================================================================================
+
+void View3D::fiducialPicking(const bool bActivatePicking)
+{
+    m_pView3D->activatePicker(bActivatePicking);
+    m_bPickingActivated = bActivatePicking;
+}
+
+//=========================================================================================================
+
+void View3D::newPickingEvent(Qt3DRender::QPickEvent *qPickEvent)
+{
+    qDebug() << __func__ << ": global Coord: " << qPickEvent->worldIntersection();
 }

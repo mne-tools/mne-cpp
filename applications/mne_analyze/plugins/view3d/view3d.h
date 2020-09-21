@@ -51,6 +51,7 @@
 
 #include <QtWidgets>
 #include <QtCore/QtPlugin>
+#include <Qt3DRender>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -151,6 +152,18 @@ private:
      */
     void updateCoregTrans(FIFFLIB::FiffCoordTrans headMriTrans);
 
+    //=========================================================================================================
+    /**
+     * Activate/deactivate fiducial picking.
+     */
+    void fiducialPicking(const bool bActivatePicking);
+
+    //=========================================================================================================
+    /**
+     * Handle incoming picking event from DISP3DLIB::3DView.
+     */
+    void newPickingEvent(Qt3DRender::QPickEvent *qPickEvent);
+
     QPointer<ANSHAREDLIB::Communicator>             m_pCommu;               /**< To broadcst signals */
 
     QSharedPointer<DISP3DLIB::Data3DTreeModel>      m_p3DModel;             /**< The 3D model data */
@@ -161,6 +174,7 @@ private:
     DISP3DLIB::View3D*                              m_pView3D;              /**< The Disp3D view. */
     DISPLIB::Control3DView*                         m_pControl3DView;       /**< The 3D Control view */
 
+    bool                                            m_bPickingActivated;    /**< If Picking is activated*/
 };
 
 } // NAMESPACE
