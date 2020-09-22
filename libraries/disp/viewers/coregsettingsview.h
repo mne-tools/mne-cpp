@@ -146,7 +146,7 @@ public:
      *
      * @param[in] vecAxialPosition     The vector containig x-,y- and x- Position for LPA, Nasion and RPA.
      */
-    void setFiducials(QVector<float> vecAxialPosition);
+    void setFiducials(QVector3D vecAxialPosition);
 
     //=========================================================================================================
     /**
