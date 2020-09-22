@@ -55,6 +55,7 @@
 #include <QFileInfo>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QVector3D>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -283,14 +284,15 @@ void CoregSettingsView::onPickFiducialsChanged()
 
 //=============================================================================================================
 
-void CoregSettingsView::setFiducials(QVector<float> vecAxialPosition)
+void CoregSettingsView::setFiducials(QVector3D vecAxialPosition)
 {
+    // floor(vecAxialPosition[0]*100)/100 makes sure to only take 2 decimal positions
     if(m_pUi->m_qRadioButton_LPA->isChecked()) {
-        m_pUi->m_qLineEdit_LPA->setText("x: " + QString::number(vecAxialPosition.at(0) * 1000) + " mm" );
+        m_pUi->m_qLineEdit_LPA->setText("x: " + QString::number(floor(vecAxialPosition[0]*100)/100 * 1000) + " mm" );
     } else if (m_pUi->m_qRadioButton_NAS->isChecked()) {
-        m_pUi->m_qLineEdit_NAS->setText("y: " + QString::number(vecAxialPosition.at(1) * 1000) + " mm" );
+        m_pUi->m_qLineEdit_NAS->setText("y: " + QString::number(floor(vecAxialPosition[1]*100)/100 * 1000) + " mm" );
     } else {
-        m_pUi->m_qLineEdit_RPA->setText("x: " + QString::number(vecAxialPosition.at(0) * 1000) + " mm" );
+        m_pUi->m_qLineEdit_RPA->setText("x: " + QString::number(floor(vecAxialPosition[0]*100)/100 * 1000) + " mm" );
     }
 
     return;

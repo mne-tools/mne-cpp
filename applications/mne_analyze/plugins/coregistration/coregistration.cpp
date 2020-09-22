@@ -203,6 +203,10 @@ QWidget *CoRegistration::getView()
 void CoRegistration::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
+        case NEW_FIDUCIAL_PICKED:
+            onSetFiducial(e->getData().value<QVector3D>());
+            qDebug() << e->getData();
+            break;
         default:
             qWarning() << "[CoRegistration::handleEvent] received an Event that is not handled by switch-cases";
             break;
@@ -214,6 +218,7 @@ void CoRegistration::handleEvent(QSharedPointer<Event> e)
 QVector<EVENT_TYPE> CoRegistration::getEventSubscriptions(void) const
 {
     QVector<EVENT_TYPE> temp;
+    temp.push_back(NEW_FIDUCIAL_PICKED);
     return temp;
 }
 
@@ -263,34 +268,33 @@ void CoRegistration::onPickFiducials(const bool bActivatePicking)
 
 //=============================================================================================================
 
-void CoRegistration::onSetFiducial()
+void CoRegistration::onSetFiducial(QVector3D vecResult)
 {
     // Connect to 3DView and activate ObjectPicking
-    QVector<float> result;
     fiff_float_t    r[3];           /**< Point location */
     for(int i = 0; i < 3; i++) {
-        r[i] = result.at(i);
+        r[i] = vecResult[i];
     }
     fiff_int_t iFiducial = m_pCoregSettingsView->getCurrentFiducial();
     switch(iFiducial) {
-    case FIFFV_POINT_LPA:
-        m_digFidMri[0].r[0] = r[0];
-        m_digFidMri[0].r[1] = r[1];
-        m_digFidMri[0].r[2] = r[2];
-        m_pCoregSettingsView->setFiducials(result);
-        break;
-    case FIFFV_POINT_NASION:
-        m_digFidMri[1].r[0] = r[0];
-        m_digFidMri[1].r[1] = r[1];
-        m_digFidMri[1].r[2] = r[2];
-        m_pCoregSettingsView->setFiducials(result);
-        break;
-    case FIFFV_POINT_RPA:
-        m_digFidMri[2].r[0] = r[0];
-        m_digFidMri[2].r[1] = r[1];
-        m_digFidMri[2].r[2] = r[2];
-        m_pCoregSettingsView->setFiducials(result);
-        break;
+        case FIFFV_POINT_LPA:
+            m_digFidMri[0].r[0] = r[0];
+            m_digFidMri[0].r[1] = r[1];
+            m_digFidMri[0].r[2] = r[2];
+            m_pCoregSettingsView->setFiducials(vecResult);
+            break;
+        case FIFFV_POINT_NASION:
+            m_digFidMri[1].r[0] = r[0];
+            m_digFidMri[1].r[1] = r[1];
+            m_digFidMri[1].r[2] = r[2];
+            m_pCoregSettingsView->setFiducials(vecResult);
+            break;
+        case FIFFV_POINT_RPA:
+            m_digFidMri[2].r[0] = r[0];
+            m_digFidMri[2].r[1] = r[1];
+            m_digFidMri[2].r[2] = r[2];
+            m_pCoregSettingsView->setFiducials(vecResult);
+            break;
     }
 
     QVariant data = QVariant::fromValue(m_digFidMri);

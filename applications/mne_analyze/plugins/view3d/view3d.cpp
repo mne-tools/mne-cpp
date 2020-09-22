@@ -228,7 +228,6 @@ void View3D::updateCoregBem(ANSHAREDLIB::BemDataModel::SPtr pNewModel)
         m_pView3D->activatePicker(true);
         m_pBemTreeCoreg = m_p3DModel->addBemData("Co-Registration", "Surface", *pNewModel->getBem().data());
         m_pView3D->activatePicker(m_bPickingActivated);
-        qDebug() << __func__;
     }
     return;
 }
@@ -274,4 +273,6 @@ void View3D::fiducialPicking(const bool bActivatePicking)
 void View3D::newPickingEvent(Qt3DRender::QPickEvent *qPickEvent)
 {
     qDebug() << __func__ << ": global Coord: " << qPickEvent->worldIntersection();
+    QVariant data = QVariant::fromValue(qPickEvent->worldIntersection());
+    m_pCommu->publishEvent(EVENT_TYPE::NEW_FIDUCIAL_PICKED, data);
 }
