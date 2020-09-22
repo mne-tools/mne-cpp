@@ -186,8 +186,8 @@ void AnnotationSettingsView::initGUIFunctionality()
     connect(m_pTriggerDetectView.data(), &DISPLIB::TriggerDetectionView::detectTriggers,
             this, &AnnotationSettingsView::onDetectTriggers, Qt::UniqueConnection);
 
-//    connect(&m_FutureWatcher, &QFutureWatcher<QMap<double,QList<int>>>::finished,
-//            this, &AnnotationSettingsView::createGroupsFromTriggers, Qt::UniqueConnection);
+    connect(&m_FutureWatcher, &QFutureWatcher<QMap<double,QList<int>>>::finished,
+            this, &AnnotationSettingsView::createGroupsFromTriggers, Qt::UniqueConnection);
 }
 
 //=============================================================================================================
@@ -626,23 +626,30 @@ void AnnotationSettingsView::onDetectTriggers(const QString &sChannelName,
     if(m_FutureWatcher.isRunning()){
         return;
     }
+
     emit loadingStart("Detecting triggers...");
 
-//    m_Future = QtConcurrent::run(this, &AnnotationSettingsView::detectTriggerCalculations, sChannelName, dThreshold);
-//    m_FutureWatcher.setFuture(m_Future);
+    m_Future = QtConcurrent::run(this,
+                                 &AnnotationSettingsView::detectTriggerCalculations,
+                                 sChannelName,
+                                 dThreshold,
+                                 *m_pFiffRawModel->getFiffInfo(),
+                                 *this->m_pFiffRawModel->getFiffIO()->m_qlistRaw.first().data());
+    m_FutureWatcher.setFuture(m_Future);
 
-    createGroupsFromTriggers(detectTriggerCalculations(sChannelName,dThreshold));
 }
 
 //=============================================================================================================
 
-QMap<double,QList<int>> AnnotationSettingsView::detectTriggerCalculations(const QString &sChannelName,
-                                                                          double dThreshold)
+QMap<double,QList<int>> AnnotationSettingsView::detectTriggerCalculations(const QString& sChannelName,
+                                                                          double dThreshold,
+                                                                          FIFFLIB::FiffInfo fiffInfo,
+                                                                          FIFFLIB::FiffRawData fiffRaw)
 {
     int iCurrentTriggerChIndex = 9999;
 
-    for(int i = 0; i < m_pFiffRawModel->getFiffInfo()->chs.size(); ++i) {
-        if(m_pFiffRawModel->getFiffInfo()->chs[i].ch_name == sChannelName) {
+    for(int i = 0; i < fiffInfo.chs.size(); ++i) {
+        if(fiffInfo.chs[i].ch_name == sChannelName) {
             iCurrentTriggerChIndex = i;
             break;
         }
@@ -656,8 +663,7 @@ QMap<double,QList<int>> AnnotationSettingsView::detectTriggerCalculations(const 
 
     Eigen::MatrixXd mSampleData, mSampleTimes;
 
-    FIFFLIB::FiffRawData* pFiffRaw = this->m_pFiffRawModel->getFiffIO()->m_qlistRaw.first().data();
-    pFiffRaw->read_raw_segment(mSampleData,
+    fiffRaw.read_raw_segment(mSampleData,
                                mSampleTimes);
 
     QList<QPair<int,double>> detectedTriggerSamples = RTPROCESSINGLIB::detectTriggerFlanksMax(mSampleData,
@@ -713,9 +719,9 @@ bool AnnotationSettingsView::newStimGroup(const QString &sName,
 
 //=============================================================================================================
 
-void AnnotationSettingsView::createGroupsFromTriggers(QMap<double,QList<int>> mEventGroupMap)
+void AnnotationSettingsView::createGroupsFromTriggers()
 {
-    //QMap<double,QList<int>> mEventGroupMap = m_Future.result();
+    QMap<double,QList<int>> mEventGroupMap = m_Future.result();
 
     QList<double> keyList = mEventGroupMap.keys();
     int iFirstSample = m_pFiffRawModel->absoluteFirstSample();

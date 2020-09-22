@@ -72,6 +72,7 @@ namespace Ui {
 
 namespace FIFFLIB {
     class FiffInfo;
+    class FiffRawData;
 }
 
 //=============================================================================================================
@@ -270,7 +271,7 @@ private slots:
     /**
      * Gets event map from QFuture and creates new groups baseed on it.
      */
-    void createGroupsFromTriggers(QMap<double,QList<int>> mEventGroupMap);
+    void createGroupsFromTriggers();
 
 private:
     //=========================================================================================================
@@ -400,7 +401,9 @@ private:
      * @return      returns map of events sorted by groups based on threshold
      */
     QMap<double,QList<int>> detectTriggerCalculations(const QString& sChannelName,
-                                                      double dThreshold);
+                                                      double dThreshold,
+                                                      FIFFLIB::FiffInfo fiffInfo,
+                                                      FIFFLIB::FiffRawData fiffRaw);
 
     Ui::EventWindowDockWidget*                      m_pUi;                          /** < Pointer to GUI elements */
 

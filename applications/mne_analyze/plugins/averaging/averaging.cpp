@@ -385,6 +385,7 @@ void Averaging::computeAverage()
 
     if (m_FutureWatcher.isRunning()){
         qWarning() << "Averaging computation already taking place.";
+        return;
     }
 
     triggerLoadingStart("Calculating average...");
