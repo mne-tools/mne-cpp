@@ -228,13 +228,16 @@ private:
      *
      * @return Retruns FiffEvoked setwith averaged data
      */
-    QSharedPointer<FIFFLIB::FiffEvokedSet> averageCalculation();
+    QSharedPointer<FIFFLIB::FiffEvokedSet> averageCalculation(FIFFLIB::FiffRawData pFiffRaw,
+                                                              MatrixXi matEvents,
+                                                              RTPROCESSINGLIB::FilterKernel filterKernel,
+                                                              FIFFLIB::FiffInfo fiffInfo);
 
     //=========================================================================================================
     /**
      * Receives FiffEvoked set from QFuture and created new averaging model
      */
-    void createNewAverage(QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet);
+    void createNewAverage();
 
     //=========================================================================================================
     /**
@@ -340,6 +343,8 @@ private:
 
     QFutureWatcher<QSharedPointer<FIFFLIB::FiffEvokedSet>>  m_FutureWatcher;
     QFuture<QSharedPointer<FIFFLIB::FiffEvokedSet>>         m_Future;
+
+    QMutex                                                  m_ParameterMutex;
 
 };
 
