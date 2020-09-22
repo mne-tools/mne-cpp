@@ -410,7 +410,6 @@ private:
 
     QSharedPointer<AnnotationDelegate>              m_pAnnDelegate;                 /** < Pointer to associated delegate */
     QSharedPointer<ANSHAREDLIB::AnnotationModel>    m_pAnnModel;                    /** < Pointer to associated model. Points to currently loaded. */
-    QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo;                    /** < Pointer to the FiffInfo of the currently loaded file */
     QSharedPointer<ANSHAREDLIB::FiffRawViewModel>   m_pFiffRawModel;                /** < Pointer to currently loaded FIffRawViewModel */
 
     QSharedPointer<DISPLIB::TriggerDetectionView>   m_pTriggerDetectView;           /** < Pointer to viewer to control GUI for detecting triggers */

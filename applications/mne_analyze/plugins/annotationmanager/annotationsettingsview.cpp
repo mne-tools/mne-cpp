@@ -74,7 +74,6 @@ AnnotationSettingsView::AnnotationSettingsView()
 , m_iCheckState(0)
 , m_iLastSampClicked(0)
 , m_pAnnModel(Q_NULLPTR)
-, m_pFiffInfo(Q_NULLPTR)
 , m_pFiffRawModel(Q_NULLPTR)
 , m_pColordialog(new QColorDialog(this))
 {
@@ -642,8 +641,8 @@ QMap<double,QList<int>> AnnotationSettingsView::detectTriggerCalculations(const 
 {
     int iCurrentTriggerChIndex = 9999;
 
-    for(int i = 0; i < m_pFiffInfo->chs.size(); ++i) {
-        if(m_pFiffInfo->chs[i].ch_name == sChannelName) {
+    for(int i = 0; i < m_pFiffRawModel->getFiffInfo()->chs.size(); ++i) {
+        if(m_pFiffRawModel->getFiffInfo()->chs[i].ch_name == sChannelName) {
             iCurrentTriggerChIndex = i;
             break;
         }
@@ -682,13 +681,12 @@ QMap<double,QList<int>> AnnotationSettingsView::detectTriggerCalculations(const 
 void AnnotationSettingsView::onNewFiffRawViewModel(QSharedPointer<ANSHAREDLIB::FiffRawViewModel> pFiffRawModel)
 {
     m_pFiffRawModel = pFiffRawModel;
-    m_pFiffInfo = m_pFiffRawModel->getFiffInfo();
 
     passFiffParams(pFiffRawModel->absoluteFirstSample(),
                    pFiffRawModel->absoluteLastSample(),
                    pFiffRawModel->getFiffInfo()->sfreq);
 
-    initTriggerDetect(m_pFiffInfo);
+    initTriggerDetect(m_pFiffRawModel->getFiffInfo());
 }
 
 //=============================================================================================================
