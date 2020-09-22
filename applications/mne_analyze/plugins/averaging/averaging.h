@@ -228,7 +228,7 @@ private:
      *
      * @return Retruns FiffEvoked setwith averaged data
      */
-    QSharedPointer<FIFFLIB::FiffEvokedSet> averageCalacualtion();
+    QSharedPointer<FIFFLIB::FiffEvokedSet> averageCalculation();
 
     //=========================================================================================================
     /**
