@@ -216,8 +216,8 @@ QDockWidget* Averaging::getControl()
             this, &Averaging::onComputeButtonClicked, Qt::UniqueConnection);
     connect(m_pAveragingSettingsView, &DISPLIB::AveragingSettingsView::changeDropActive,
             this, &Averaging::onRejectionChecked, Qt::UniqueConnection);
-//    connect(&m_FutureWatcher, &QFutureWatcher<QMap<double,QList<int>>>::finished,
-//            this, &Averaging::createNewAverage, Qt::UniqueConnection);
+    connect(&m_FutureWatcher, &QFutureWatcher<QMap<double,QList<int>>>::finished,
+            this, &Averaging::createNewAverage, Qt::UniqueConnection);
 
     m_pAveragingSettingsView->setProcessingMode(DISPLIB::AbstractView::ProcessingMode::Offline);
     m_pAveragingSettingsView->setSizePolicy(QSizePolicy::Expanding,
@@ -323,6 +323,7 @@ void Averaging::onChangeNumAverages(qint32 numAve)
 
 void Averaging::onChangeBaselineFrom(qint32 fromMS)
 {
+    QMutexLocker lock(&m_ParameterMutex);
     m_fBaselineFromS = static_cast<float>(fromMS) / 1000.f;
 }
 
@@ -330,6 +331,7 @@ void Averaging::onChangeBaselineFrom(qint32 fromMS)
 
 void Averaging::onChangeBaselineTo(qint32 toMS)
 {
+    QMutexLocker lock(&m_ParameterMutex);
     m_fBaselineToS = static_cast<float>(toMS) / 1000.f;
 }
 
@@ -337,6 +339,7 @@ void Averaging::onChangeBaselineTo(qint32 toMS)
 
 void Averaging::onChangePreStim(qint32 mseconds)
 {
+    QMutexLocker lock(&m_ParameterMutex);
     m_fPreStim =  -(static_cast<float>(mseconds)/1000);
 }
 
@@ -344,6 +347,7 @@ void Averaging::onChangePreStim(qint32 mseconds)
 
 void Averaging::onChangePostStim(qint32 mseconds)
 {
+    QMutexLocker lock(&m_ParameterMutex);
     m_fPostStim = (static_cast<float>(mseconds)/1000);
 }
 
@@ -351,6 +355,7 @@ void Averaging::onChangePostStim(qint32 mseconds)
 
 void Averaging::onChangeBaselineActive(bool state)
 {
+    QMutexLocker lock(&m_ParameterMutex);
     m_bBasline = state;
 }
 
@@ -384,26 +389,28 @@ void Averaging::computeAverage()
 
     triggerLoadingStart("Calculating average...");
 
-//    m_Future = QtConcurrent::run(this, &Averaging::averageCalculation);
-//    m_FutureWatcher.setFuture(m_Future);
-    createNewAverage(averageCalculation());
+    m_Future = QtConcurrent::run(this,
+                                 &Averaging::averageCalculation,
+                                 *this->m_pFiffRawModel->getFiffIO()->m_qlistRaw.first().data(),
+                                 m_pFiffRawModel->getAnnotationModel()->getAnnotationMatrix(m_iCurrentGroup),
+                                 m_filterKernel,
+                                 *m_pFiffRawModel->getFiffInfo());
+    m_FutureWatcher.setFuture(m_Future);
 
 }
 
 //=============================================================================================================
 
-QSharedPointer<FIFFLIB::FiffEvokedSet> Averaging::averageCalculation()
+QSharedPointer<FIFFLIB::FiffEvokedSet> Averaging::averageCalculation(FIFFLIB::FiffRawData FiffRaw,
+                                                                     MatrixXi matEvents,
+                                                                     RTPROCESSINGLIB::FilterKernel filterKernel,
+                                                                     FIFFLIB::FiffInfo fiffInfo)
 {
 
-    MatrixXi matEvents;
     QMap<QString,double> mapReject;
 
     int iType = 1; //hardwired for now, change later to type
     mapReject.insert("eog", 300e-06);
-
-    FIFFLIB::FiffRawData* pFiffRaw = this->m_pFiffRawModel->getFiffIO()->m_qlistRaw.first().data();
-
-    matEvents = m_pFiffRawModel->getAnnotationModel()->getAnnotationMatrix(m_iCurrentGroup);
 
     if(matEvents.size() < 6){
         qWarning() << "[Averaging::averageCalacualtion] Not enough data points to calculate average.";
@@ -413,7 +420,8 @@ QSharedPointer<FIFFLIB::FiffEvokedSet> Averaging::averageCalculation()
     QSharedPointer<FIFFLIB::FiffEvoked> pFiffEvoked = QSharedPointer<FIFFLIB::FiffEvoked>(new FIFFLIB::FiffEvoked());
 
     if(m_bPerformFiltering) {
-        *pFiffEvoked = RTPROCESSINGLIB::computeFilteredAverage(*pFiffRaw,
+        QMutexLocker lock(&m_ParameterMutex);
+        *pFiffEvoked = RTPROCESSINGLIB::computeFilteredAverage(FiffRaw,
                                                                matEvents,
                                                                m_fPreStim,
                                                                m_fPostStim,
@@ -422,9 +430,10 @@ QSharedPointer<FIFFLIB::FiffEvokedSet> Averaging::averageCalculation()
                                                                m_fBaselineFromS,
                                                                m_fBaselineToS,
                                                                mapReject,
-                                                               m_filterKernel);
+                                                               filterKernel);
     } else {
-        *pFiffEvoked = RTPROCESSINGLIB::computeAverage(*pFiffRaw,
+        QMutexLocker lock(&m_ParameterMutex);
+        *pFiffEvoked = RTPROCESSINGLIB::computeAverage(FiffRaw,
                                                        matEvents,
                                                        m_fPreStim,
                                                        m_fPostStim,
@@ -438,7 +447,9 @@ QSharedPointer<FIFFLIB::FiffEvokedSet> Averaging::averageCalculation()
     QSharedPointer<FIFFLIB::FiffEvokedSet> pFiffEvokedSet = QSharedPointer<FIFFLIB::FiffEvokedSet>(new FIFFLIB::FiffEvokedSet());
 
     pFiffEvokedSet->evoked.append(*(pFiffEvoked.data()));
-    pFiffEvokedSet->info = *(m_pFiffRawModel->getFiffInfo().data());
+    pFiffEvokedSet->info = fiffInfo;
+
+    QMutexLocker lock(&m_ParameterMutex);
 
     if(m_bBasline){
         pFiffEvokedSet->evoked[0].baseline.first = m_fBaselineFromS;
@@ -450,9 +461,9 @@ QSharedPointer<FIFFLIB::FiffEvokedSet> Averaging::averageCalculation()
 
 //=============================================================================================================
 
-void Averaging::createNewAverage(QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet)
+void Averaging::createNewAverage()
 {
-    //QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet = m_Future.result();
+    QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet = m_Future.result();
 
     if(pEvokedSet){
         QSharedPointer<ANSHAREDLIB::AveragingDataModel> pNewAvgModel = QSharedPointer<ANSHAREDLIB::AveragingDataModel>(new ANSHAREDLIB::AveragingDataModel(pEvokedSet));
@@ -606,6 +617,7 @@ void Averaging::updateGroups()
 
 void Averaging::onChangeGroupSelect(const QString &text)
 {
+    QMutexLocker lock(&m_ParameterMutex);
     m_iCurrentGroup = m_pFiffRawModel->getAnnotationModel()->getIndexFromName(text);
 }
 
