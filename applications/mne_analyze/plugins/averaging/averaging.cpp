@@ -384,15 +384,15 @@ void Averaging::computeAverage()
 
     triggerLoadingStart("Calculating average...");
 
-//    m_Future = QtConcurrent::run(this, &Averaging::averageCalacualtion);
+//    m_Future = QtConcurrent::run(this, &Averaging::averageCalculation);
 //    m_FutureWatcher.setFuture(m_Future);
-    createNewAverage(averageCalacualtion());
+    createNewAverage(averageCalculation());
 
 }
 
 //=============================================================================================================
 
-QSharedPointer<FIFFLIB::FiffEvokedSet> Averaging::averageCalacualtion()
+QSharedPointer<FIFFLIB::FiffEvokedSet> Averaging::averageCalculation()
 {
 
     MatrixXi matEvents;
