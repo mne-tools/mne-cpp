@@ -42,6 +42,8 @@
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Model/fiffrawviewmodel.h>
 
+#include <disp/viewers/progressview.h>
+
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -55,7 +57,7 @@ using namespace ANSHAREDLIB;
 
 DataLoader::DataLoader()
 {
-
+    m_pProgressView = new DISPLIB::ProgressView(false);
 }
 
 //=============================================================================================================
@@ -169,9 +171,24 @@ void DataLoader::loadFilePath(const QString& sFilePath)
 {
     QFileInfo fileInfo(sFilePath);
 
+    QScopedPointer<QDialog> pDialog (new QDialog());
+    pDialog->setModal(true);
+    pDialog->setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint | Qt::FramelessWindowHint);
+
+    QVBoxLayout* layout = new QVBoxLayout(pDialog.data());
+    layout->addWidget(m_pProgressView);
+    pDialog->setLayout(layout);
+
+    //DISPLIB::ProgressView pProgressview = new DISPLIB::ProgressView()
+    m_pProgressView->setMessage("Loading " + fileInfo.fileName());
+    pDialog->exec();
+    qDebug() << "After exec";
+
     if(fileInfo.exists() && (fileInfo.completeSuffix() == "fif")) {
         m_pAnalyzeData->loadModel<ANSHAREDLIB::FiffRawViewModel>(sFilePath);
     }
+
+    pDialog->done(1);
 }
 
 //=============================================================================================================
