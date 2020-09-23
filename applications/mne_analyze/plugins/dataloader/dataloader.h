@@ -60,6 +60,10 @@ namespace ANSHAREDLIB {
     class AbstractModel;
 }
 
+namespace DISPLIB {
+    class ProgressView;
+}
+
 //=============================================================================================================
 // DEFINE NAMESPACE DATALOADERPLUGIN
 //=============================================================================================================
@@ -142,6 +146,7 @@ private:
     void onSaveFilePressed();
 
     QPointer<ANSHAREDLIB::Communicator>         m_pCommu;
+    QPointer<DISPLIB::ProgressView>             m_pProgressView;
 
     QSharedPointer<ANSHAREDLIB::AbstractModel>  m_pSelectedModel;
 };
