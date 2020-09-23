@@ -284,7 +284,7 @@ void CoregSettingsView::onPickFiducialsChanged()
 
 //=============================================================================================================
 
-void CoregSettingsView::setFiducials(QVector3D vecAxialPosition)
+void CoregSettingsView::setFiducials(const QVector3D vecAxialPosition)
 {
     // floor(vecAxialPosition[0]*100)/100 makes sure to only take 2 decimal positions
     if(m_pUi->m_qRadioButton_LPA->isChecked()) {

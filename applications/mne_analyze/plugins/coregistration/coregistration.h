@@ -153,7 +153,7 @@ private:
     /**
      * Create new fiducial from ObjectPicking input.
      */
-    void onSetFiducial(QVector3D vecResult);
+    void onSetFiducial(const QVector3D vecResult);
 
     //=========================================================================================================
     /**
