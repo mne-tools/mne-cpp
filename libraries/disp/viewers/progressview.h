@@ -101,6 +101,18 @@ public:
      */
     virtual void updateProcessingMode(ProcessingMode mode);
 
+    //=========================================================================================================
+    /**
+     * Sets message to appear next to loading bar
+     */
+    void setHorizontal();
+
+    //=========================================================================================================
+    /**
+     * Sets message to appear under the loading bar
+     */
+    void setVertical();
+
 public slots:
     //=========================================================================================================
     /**
@@ -108,6 +120,15 @@ public slots:
      * @param sMessage
      */
     void setMessage(const QString& sMessage);
+
+    //=========================================================================================================
+    /**
+     * @brief updateProgress
+     *
+     * @param iPercentage
+     * @param sMessage
+     */
+    void updateProgress(int iPercentage, const QString& sMessage);
 
 private:
 
