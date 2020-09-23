@@ -101,6 +101,7 @@ SOURCES += \
     viewers/filterdesignview.cpp \
     viewers/averagelayoutview.cpp \
     viewers/fwdsettingsview.cpp \
+    viewers/progressview.cpp \
     viewers/spectrumview.cpp \
     viewers/modalityselectionview.cpp \
     viewers/butterflyview.cpp \
@@ -154,6 +155,7 @@ HEADERS += \
     viewers/filterdesignview.h \
     viewers/averagelayoutview.h \
     viewers/fwdsettingsview.h \
+    viewers/progressview.h \
     viewers/spectrumview.h \
     viewers/modalityselectionview.h \
     viewers/butterflyview.h \
@@ -211,6 +213,7 @@ FORMS += \
     viewers/formfiles/filterdesignview.ui \
     viewers/formfiles/channelselectionview.ui \
     viewers/formfiles/fwdsettingsview.ui \
+    viewers/formfiles/progressview.ui \
     viewers/formfiles/spharasettingsview.ui \
     viewers/formfiles/fiffrawviewsettings.ui \
     viewers/formfiles/triggerdetectionview.ui \
