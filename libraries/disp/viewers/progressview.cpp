@@ -50,7 +50,11 @@ using namespace DISPLIB;
 //=============================================================================================================
 
 ProgressView::ProgressView(bool bHorizontalMessage)
+: AbstractView()
+, m_pUi(new Ui::ProgressViewWidget)
 {
+    m_pUi->setupUi(this);
+
     (bHorizontalMessage) ? setHorizontal() : setVertical();
 
     m_pUi->m_progressBar->setMinimum(0);
@@ -64,7 +68,7 @@ ProgressView::ProgressView(bool bHorizontalMessage)
 
 ProgressView::~ProgressView()
 {
-
+    delete m_pUi;
 }
 
 //=============================================================================================================
