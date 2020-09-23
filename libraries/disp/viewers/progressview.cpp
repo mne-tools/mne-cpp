@@ -51,11 +51,13 @@ using namespace DISPLIB;
 
 ProgressView::ProgressView(bool bHorizontalMessage)
 {
-    if(bHorizontalMessage){
-        m_pUi->m_VerticalLabel->hide();
-    } else {
-        m_pUi->m_HorizonatlLabel->hide();
-    }
+    (bHorizontalMessage) ? setHorizontal() : setVertical();
+
+    m_pUi->m_progressBar->setMinimum(0);
+    m_pUi->m_progressBar->setMaximum(0);
+    m_pUi->m_progressBar->setValue(0);
+    m_pUi->m_progressBar->setTextVisible(false);
+    m_pUi->m_progressBar->setMaximumWidth(300);
 }
 
 //=============================================================================================================
@@ -93,8 +95,37 @@ void ProgressView::updateProcessingMode(ProcessingMode mode)
 
 //=============================================================================================================
 
+void ProgressView::setHorizontal()
+{
+    m_pUi->m_VerticalLabel->hide();
+    m_pUi->m_HorizonatlLabel->show();
+}
+
+//=============================================================================================================
+
+void ProgressView::setVertical()
+{
+    m_pUi->m_VerticalLabel->show();
+    m_pUi->m_HorizonatlLabel->hide();
+}
+
+//=============================================================================================================
+
 void ProgressView::setMessage(const QString &sMessage)
 {
     m_pUi->m_VerticalLabel->setText(sMessage);
     m_pUi->m_HorizonatlLabel->setText(sMessage);
+}
+
+//=============================================================================================================
+
+void ProgressView::updateProgress(int iPercentage, const QString& sMessage)
+{
+    if (m_pUi->m_progressBar->maximum() == 0){
+        m_pUi->m_progressBar->setMaximum(100);
+    }
+
+    m_pUi->m_progressBar->setValue(iPercentage);
+
+    setMessage(sMessage);
 }
