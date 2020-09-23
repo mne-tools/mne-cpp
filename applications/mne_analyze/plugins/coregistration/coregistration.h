@@ -189,9 +189,29 @@ private:
 
     //=========================================================================================================
     /**
-     * Perform the actual Coregistration with the ICP algorithm.
+     * Triggers computeICP to be run with QFuture.
      */
     void onFitICP();
+
+    //=========================================================================================================
+    /**
+     * Perform the actual Coregistration with the ICP algorithm.
+     *
+     * @param[in] transInit     The finitial coordinate transformation matrix.
+     * @param[in] digSetHSP     The digitizer set containing the Head Shap Points, HPI coils, etc..
+     * @param[in] bemHead       The head surface.
+     *
+     * @return The resulting coordinate transformation from head to mri space.
+     */
+    FIFFLIB::FiffCoordTrans computeICP(FIFFLIB::FiffCoordTrans transInit,
+                                       FIFFLIB::FiffDigPointSet digSetHSP,
+                                       MNELIB::MNEBem bemHead);
+
+    //=========================================================================================================
+    /**
+     * Receives FiffCoordTrans set from QFuture and create respectively update transformation
+     */
+    void createNewTrans();
 
     //=========================================================================================================
     /**
@@ -241,6 +261,20 @@ private:
      */
     void onStoreFiducials(const QString& sFilePath);
 
+    //=============================================================================================================
+    /**
+     * Sends event to trigger loading bar to appear and sMessage to show
+     *
+     * @param [in] sMessage     loading bar message
+     */
+    void triggerLoadingStart(QString sMessage);
+
+    //=============================================================================================================
+    /**
+     * Sends event to hide loading bar
+     */
+    void triggerLoadingEnd(QString sMessage);
+
     QVector<QSharedPointer<ANSHAREDLIB::AbstractModel>>     m_vecBemDataModels;     /**< Vector with all available Bem Models */
     QSharedPointer<MNELIB::MNEBem>                          m_pBem;                 /**< The currently selected Bem model */
     QString                                                 m_sCurrentSelectedBem;  /**< The name of the currently selected Bem */
@@ -251,6 +285,10 @@ private:
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;
 
     DISPLIB::CoregSettingsView*                             m_pCoregSettingsView;   /**< Pointer to coreg GUI */
+
+    QFutureWatcher<FIFFLIB::FiffCoordTrans>                 m_FutureWatcher;
+    QFuture<FIFFLIB::FiffCoordTrans>                        m_Future;
+    QMutex                                                  m_ParameterMutex;
 };
 
 //=============================================================================================================

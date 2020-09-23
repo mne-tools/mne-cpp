@@ -63,6 +63,7 @@
 #include <QListWidgetItem>
 #include <QDebug>
 #include <QVector>
+#include <QtConcurrent/QtConcurrent>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -188,6 +189,10 @@ QDockWidget *CoRegistration::getControl()
     // automaticly load Bem if available
     onChangeSelectedBem(m_pCoregSettingsView->getCurrentSelectedBem());
 
+    // Thread handling
+    connect(&m_FutureWatcher, &QFutureWatcher<QMap<double,QList<int>>>::finished,
+            this, &CoRegistration::createNewTrans, Qt::UniqueConnection);
+
     return pControlDock;
 }
 
@@ -205,7 +210,6 @@ void CoRegistration::handleEvent(QSharedPointer<Event> e)
     switch (e->getType()) {
         case NEW_FIDUCIAL_PICKED:
             onSetFiducial(e->getData().value<QVector3D>());
-            qDebug() << e->getData();
             break;
         default:
             qWarning() << "[CoRegistration::handleEvent] received an Event that is not handled by switch-cases";
@@ -470,12 +474,49 @@ void CoRegistration::onFitFiducials()
 
 //=============================================================================================================
 
+void CoRegistration::triggerLoadingStart(QString sMessage)
+{
+    m_pCommu->publishEvent(LOADING_START, QVariant::fromValue(sMessage));
+}
+
+//=============================================================================================================
+
+void CoRegistration::triggerLoadingEnd(QString sMessage)
+{
+    m_pCommu->publishEvent(LOADING_END, QVariant::fromValue(sMessage));
+}
+//=============================================================================================================
+
 void CoRegistration::onFitICP()
 {
     if(m_digSetHead.isEmpty() || m_digFidMri.isEmpty() || m_pBem->isEmpty()) {
         qWarning() << "[CoRegistration::onFitICP] Make sure to load all the necessary data.";
         return;
     }
+
+    if (m_FutureWatcher.isRunning()){
+        qWarning() << "ICP computation already taking place.";
+    }
+
+    triggerLoadingStart("Performing ICP ...");
+
+    m_Future = QtConcurrent::run(this,
+                                 &CoRegistration::computeICP,
+                                 m_transHeadMri,
+                                 m_digSetHead,
+                                 *m_pBem.data());
+
+    m_FutureWatcher.setFuture(m_Future);
+
+    return;
+}
+
+//=============================================================================================================
+
+FiffCoordTrans CoRegistration::computeICP(FiffCoordTrans transInit,
+                                          FiffDigPointSet digSetHead,
+                                          MNEBem bemHead)
+{
 
     // get values from view
     bool bScale = m_pCoregSettingsView->getAutoScale();
@@ -491,13 +532,12 @@ void CoRegistration::onFitICP()
     float fRMSE = 0.0;
 
     // init surface points
-    MNEBem bemHead = *m_pBem.data();
     MNEBemSurface::SPtr bemSurface = MNEBemSurface::SPtr::create(bemHead[0]);
     MNEProjectToSurface::SPtr mneSurfacePoints = MNEProjectToSurface::SPtr::create(*bemSurface);
 
     // get selected digitizers
     QList<int> lPickHSP = m_pCoregSettingsView->getDigitizerCheckState();
-    FiffDigPointSet digSetHSP = m_digSetHead.pickTypes(lPickHSP);
+    FiffDigPointSet digSetHSP = digSetHead.pickTypes(lPickHSP);
 
     VectorXf vecWeightsICP(digSetHSP.size()); // Weigths vector
     MatrixXf matHsp(digSetHSP.size(),3);
@@ -506,28 +546,28 @@ void CoRegistration::onFitICP()
         matHsp(i,0) = digSetHSP[i].r[0]; matHsp(i,1) = digSetHSP[i].r[1]; matHsp(i,2) = digSetHSP[i].r[2];
         // set weights
         switch (digSetHSP[i].kind){
-            case FIFFV_POINT_CARDINAL:
-                switch (digSetHSP[i].ident) {
-                    case FIFFV_POINT_NASION:
-                        vecWeightsICP(i) = fWeightNAS;
-                        break;
-                    case FIFFV_POINT_LPA:
-                        vecWeightsICP(i) = fWeightLPA;
-                        break;
-                    case FIFFV_POINT_RPA:
-                        vecWeightsICP(i) = fWeightRPA;
-                        break;
-                }
+        case FIFFV_POINT_CARDINAL:
+            switch (digSetHSP[i].ident) {
+            case FIFFV_POINT_NASION:
+                vecWeightsICP(i) = fWeightNAS;
                 break;
-            case FIFFV_POINT_EEG:
-                vecWeightsICP(i) = fWeightEEG;
+            case FIFFV_POINT_LPA:
+                vecWeightsICP(i) = fWeightLPA;
                 break;
-            case FIFFV_POINT_HPI:
-                vecWeightsICP(i) = fWeightHPI;
+            case FIFFV_POINT_RPA:
+                vecWeightsICP(i) = fWeightRPA;
                 break;
-            case FIFFV_POINT_EXTRA:
-                vecWeightsICP(i) = fWeightHSP;
-                break;
+            }
+            break;
+        case FIFFV_POINT_EEG:
+            vecWeightsICP(i) = fWeightEEG;
+            break;
+        case FIFFV_POINT_HPI:
+            vecWeightsICP(i) = fWeightHPI;
+            break;
+        case FIFFV_POINT_EXTRA:
+            vecWeightsICP(i) = fWeightHSP;
+            break;
         }
     }
 
@@ -537,7 +577,7 @@ void CoRegistration::onFitICP()
 
     if(!RTPROCESSINGLIB::discard3DPointOutliers(mneSurfacePoints,
                                                 matHsp,
-                                                m_transHeadMri,
+                                                transInit,
                                                 vecTake,
                                                 matHspClean,
                                                 fMaxDist)) {
@@ -554,26 +594,37 @@ void CoRegistration::onFitICP()
     // icp
     RTPROCESSINGLIB::performIcp(mneSurfacePoints,
                                 matHspClean,
-                                m_transHeadMri,
+                                transInit,
                                 fRMSE,
                                 bScale,
                                 iMaxIter,
                                 fTol,
                                 vecWeightsICPClean);
 
+    FiffCoordTrans transHeadMri = transInit;
+
     // update GUI
     Vector3f vecRot;
     Vector3f vecScale;
     Vector3f vecTrans;
-    getParamFromTrans(m_transHeadMri.trans,vecRot,vecTrans,vecScale);
+    getParamFromTrans(transHeadMri.trans,vecRot,vecTrans,vecScale);
     m_pCoregSettingsView->setTransParams(vecTrans,vecRot,vecScale);
     m_pCoregSettingsView->setRMSE(fRMSE);
+
+    return transHeadMri;
+}
+
+//=============================================================================================================
+
+void CoRegistration::createNewTrans()
+{
+    m_transHeadMri = m_Future.result();
 
     // send event
     QVariant data = QVariant::fromValue(m_transHeadMri);
     m_pCommu->publishEvent(EVENT_TYPE::NEW_TRANS_AVAILABE, data);
 
-    return;
+    triggerLoadingEnd("Performing ICP ...");
 }
 
 //=============================================================================================================
