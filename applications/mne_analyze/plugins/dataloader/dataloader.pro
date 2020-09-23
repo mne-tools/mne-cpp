@@ -66,10 +66,12 @@ contains(MNECPP_CONFIG, static) {
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lanSharedd \
+            -lmnecppDispd \
             -lmnecppFiffd \
             -lmnecppUtilsd \
 } else {
     LIBS += -lanShared \
+            -lmnecppDisp \
             -lmnecppFiff \
             -lmnecppUtils \
 }
