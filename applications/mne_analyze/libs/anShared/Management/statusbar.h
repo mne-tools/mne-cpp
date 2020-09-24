@@ -60,6 +60,10 @@
 class QLabel;
 class QProgressBar;
 
+namespace DISPLIB {
+    class ProgressView;
+}
+
 //=============================================================================================================
 // DEFINE NAMESPACE ANSHAREDLIB
 //=============================================================================================================
@@ -135,19 +139,18 @@ private:
      */
     void leaveEvent(QEvent* event);
 
-    ANSHAREDLIB::Communicator*  m_pCommunicator;            /**< Vector containing all plugins. */
+    ANSHAREDLIB::Communicator*          m_pCommunicator;            /**< Vector containing all plugins. */
 
-    int                         m_iMsgTimeout;              /**< Timeout of one message in milliseconds. */
+    int                                 m_iMsgTimeout;              /**< Timeout of one message in milliseconds. */
 
-    QProgressBar*               m_pProgressBar;             /**< Loading bar that shows in the status bar when approporate vent is received */
+    QProgressBar*                       m_pProgressBar;             /**< Loading bar that shows in the status bar when approporate vent is received */
 
-    QStack<QString>             m_LoadingStack;             /** Keeps the currently loading messages */
+    QStack<QString>                     m_LoadingStack;             /** Keeps the currently loading messages */
 
-    QPointer<QWidget>           m_pHoverWidget;
-
-    QPointer<QWidget>           m_pLoadingWidget;
-
-    QPointer<QLabel>            m_pLoadingMessage;
+    QPointer<QWidget>                   m_pHoverWidget;
+    QPointer<QWidget>                   m_pLoadingWidget;
+    QPointer<QLabel>                    m_pLoadingMessage;
+    QPointer<DISPLIB::ProgressView>     m_pProgressView;
 };
 
 //=============================================================================================================
