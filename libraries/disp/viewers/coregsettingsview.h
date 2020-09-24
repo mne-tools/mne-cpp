@@ -47,6 +47,7 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QVector3D>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -260,6 +261,11 @@ private:
 
     //=========================================================================================================
     /**
+     * Display the location of the current selected Fiducial
+     */
+    void onFiducialChanged();
+    //=========================================================================================================
+    /**
      * Fit the fiducials
      */
     void onFitFiducials();
@@ -308,6 +314,11 @@ private:
 
     Ui::CoregSettingsViewWidget*    m_pUi;                  /**< The CoregSettingsViewWidget.*/
     QString                         m_sSettingsPath;        /**< The settings path to store the GUI settings to. */
+
+    QVector3D                       m_vecLPA;               /**< contains LPA position. */
+    QVector3D                       m_vecNAS;               /**< contains Nasion position. */
+    QVector3D                       m_vecRPA;               /**< contains RPA position. */
+
 
 signals:
     //=========================================================================================================
