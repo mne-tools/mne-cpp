@@ -65,7 +65,7 @@ public:
     /**
      * Creates an instance of a ProgressView object
      */
-    ProgressView(bool bHorizontalMessage);
+    ProgressView(bool bHorizontalMessage = false);
 
     //=========================================================================================================
     /**
@@ -116,19 +116,21 @@ public:
 public slots:
     //=========================================================================================================
     /**
-     * @brief setMessage
-     * @param sMessage
+     * Dsiplays a new message below/beside the loading bar
+     *
+     * @param [in] sMessage     message to be displayed
      */
     void setMessage(const QString& sMessage);
 
     //=========================================================================================================
     /**
-     * @brief updateProgress
+     * Sets new completion percentage and updates message
      *
-     * @param iPercentage
-     * @param sMessage
+     * @param [in] iPercentage      percentage to show on the loading bar
+     * @param [in] sMessage         message to be displayed
      */
-    void updateProgress(int iPercentage, const QString& sMessage);
+    void updateProgress(int iPercentage,
+                        const QString& sMessage = "");
 
 private:
 
