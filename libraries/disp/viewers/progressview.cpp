@@ -49,7 +49,8 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ProgressView::ProgressView(bool bHorizontalMessage)
+ProgressView::ProgressView(bool bHorizontalMessage,
+                           const QString& sStyleSheet)
 : AbstractView()
 , m_pUi(new Ui::ProgressViewWidget)
 {
@@ -57,11 +58,18 @@ ProgressView::ProgressView(bool bHorizontalMessage)
 
     (bHorizontalMessage) ? setHorizontal() : setVertical();
 
+    if(sStyleSheet != ""){
+        m_pUi->m_VerticalLabel->setStyleSheet(sStyleSheet);
+        m_pUi->m_HorizonatlLabel->setStyleSheet(sStyleSheet);
+    }
+
     m_pUi->m_progressBar->setMinimum(0);
     m_pUi->m_progressBar->setMaximum(0);
     m_pUi->m_progressBar->setValue(0);
     m_pUi->m_progressBar->setTextVisible(false);
     m_pUi->m_progressBar->setMaximumWidth(300);
+
+    m_pUi->m_progressBar->setAttribute(Qt::WA_Hover);
 }
 
 //=============================================================================================================

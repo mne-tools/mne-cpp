@@ -64,8 +64,12 @@ public:
     //=========================================================================================================
     /**
      * Creates an instance of a ProgressView object
+     *
+     * @param [in] bHorizontalMessage   Whether message id beside(true) or under(false) the loading bar
+     * @param [in] sStyleSheet          Set the stylesheet of the QLabels that display the loading message
      */
-    ProgressView(bool bHorizontalMessage = false);
+    ProgressView(bool bHorizontalMessage = false,
+                 const QString& sStyleSheet = "");
 
     //=========================================================================================================
     /**
@@ -112,6 +116,14 @@ public:
      * Sets message to appear under the loading bar
      */
     void setVertical();
+
+    //=========================================================================================================
+    /**
+     * Sets stylesheet parameters for the QLabels that display loading message
+     *
+     * @param [in] styleSheet   string with parameters for the QLabels
+     */
+    void setTextStyleSheet(const QString& styleSheet);
 
 public slots:
     //=========================================================================================================

@@ -43,6 +43,8 @@
 #include "event.h"
 #include "../Utils/metatypes.h"
 
+#include <disp/viewers/progressview.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -80,23 +82,29 @@ StatusBar::StatusBar(QWidget *pParent)
     connect(m_pCommunicator, &Communicator::receivedEvent,
             this, &StatusBar::onNewMessageReceived);
 
-    m_pLoadingMessage = new QLabel("", m_pLoadingWidget);
-    m_pLoadingMessage->setStyleSheet("QLabel { color : red; }");
+//    m_pLoadingMessage = new QLabel("", m_pLoadingWidget);
+//    m_pLoadingMessage->setStyleSheet("QLabel { color : red; }");
 
-    m_pProgressBar = new QProgressBar(this);
-    m_pProgressBar->setAttribute(Qt::WA_Hover);
+//    m_pProgressBar = new QProgressBar(this);
+//    m_pProgressBar->setAttribute(Qt::WA_Hover);
 
-    m_pProgressBar->setMinimum(0);
-    m_pProgressBar->setMaximum(0);
-    m_pProgressBar->setValue(0);
-    m_pProgressBar->setTextVisible(false);
-    m_pProgressBar->setMaximumWidth(300);
+    m_pProgressView = new DISPLIB::ProgressView(true,
+                                                "QLabel { color : red; }");
 
-    this->addPermanentWidget(m_pLoadingMessage);
-    this->addPermanentWidget(m_pProgressBar);
+    this->addPermanentWidget(m_pProgressView);
+    m_pProgressView->hide();
 
-    m_pProgressBar->hide();
-    m_pLoadingMessage->hide();
+//    m_pProgressBar->setMinimum(0);
+//    m_pProgressBar->setMaximum(0);
+//    m_pProgressBar->setValue(0);
+//    m_pProgressBar->setTextVisible(false);
+//    m_pProgressBar->setMaximumWidth(300);
+
+//    this->addPermanentWidget(m_pLoadingMessage);
+//    this->addPermanentWidget(m_pProgressBar);
+
+//    m_pProgressBar->hide();
+//    m_pLoadingMessage->hide();
 }
 
 //=============================================================================================================
@@ -123,10 +131,12 @@ void StatusBar::onNewMessageReceived(const QSharedPointer<Event> pEvent)
             if(pEvent->getData().canConvert<QString>()) {
                 m_LoadingStack.push(pEvent->getData().toString());
                 //showMessage(pEvent->getData().toString(), m_iMsgTimeout);
-                m_pLoadingMessage->setText(m_LoadingStack.top());
-                m_pLoadingMessage->show();
+//                m_pLoadingMessage->setText(m_LoadingStack.top());
+//                m_pLoadingMessage->show();
+                m_pProgressView->setMessage(m_LoadingStack.top());
             }
-            m_pProgressBar->show();
+            m_pProgressView->show();
+//            m_pProgressBar->show();
             break;
         }
         case EVENT_TYPE::LOADING_END : {
@@ -139,9 +149,11 @@ void StatusBar::onNewMessageReceived(const QSharedPointer<Event> pEvent)
                 while(m_LoadingStack.top() == ""){
                     m_LoadingStack.pop();
                     if(m_LoadingStack.isEmpty()){
-                        m_pProgressBar->hide();
-                        m_pLoadingMessage->setText("");
-                        m_pLoadingMessage->hide();
+//                        m_pProgressBar->hide();
+                        m_pProgressView->hide();
+                        m_pProgressView->setMessage("");
+//                        m_pLoadingMessage->setText("");
+//                        m_pLoadingMessage->hide();
                         if (m_pHoverWidget){
                             m_pHoverWidget->hide();
                             delete  m_pHoverWidget;
@@ -151,7 +163,8 @@ void StatusBar::onNewMessageReceived(const QSharedPointer<Event> pEvent)
                 }
             }
             if(!m_LoadingStack.isEmpty()){
-                m_pLoadingMessage->setText(m_LoadingStack.top());
+//                m_pLoadingMessage->setText(m_LoadingStack.top());
+                m_pProgressView->setMessage(m_LoadingStack.top());
             }
             break;
         }
