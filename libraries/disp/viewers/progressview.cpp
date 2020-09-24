@@ -123,7 +123,8 @@ void ProgressView::setMessage(const QString &sMessage)
 
 //=============================================================================================================
 
-void ProgressView::updateProgress(int iPercentage, const QString& sMessage)
+void ProgressView::updateProgress(int iPercentage,
+                                  const QString& sMessage)
 {
     if (m_pUi->m_progressBar->maximum() == 0){
         m_pUi->m_progressBar->setMaximum(100);
@@ -131,5 +132,7 @@ void ProgressView::updateProgress(int iPercentage, const QString& sMessage)
 
     m_pUi->m_progressBar->setValue(iPercentage);
 
-    setMessage(sMessage);
+    if(sMessage != ""){
+        setMessage(sMessage);
+    }
 }

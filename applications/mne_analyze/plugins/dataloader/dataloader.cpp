@@ -178,18 +178,7 @@ void DataLoader::loadFilePath(const QString& sFilePath)
 {
     QFileInfo fileInfo(sFilePath);
 
-//    QScopedPointer<QDialog> pDialog (new QDialog());
-//    pDialog->setModal(true);
-//    pDialog->setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint | Qt::FramelessWindowHint);
-
-//    QVBoxLayout* layout = new QVBoxLayout(pDialog.data());
-//    layout->addWidget(m_pProgressView);
-//    pDialog->setLayout(layout);
-
-    //DISPLIB::ProgressView pProgressview = new DISPLIB::ProgressView()
     m_pProgressView->setMessage("Loading " + fileInfo.fileName());
-//    pDialog->exec();
-//    qDebug() << "After exec";
 
     m_pProgressViewWidget->show();
     QApplication::processEvents();
@@ -199,7 +188,6 @@ void DataLoader::loadFilePath(const QString& sFilePath)
     }
 
     m_pProgressViewWidget->hide();
-//    pDialog->done(1);
 }
 
 //=============================================================================================================
