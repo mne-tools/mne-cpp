@@ -80,6 +80,8 @@ BrainFlowSetupWidget::BrainFlowSetupWidget(BrainFlowBoard *board, QWidget *paren
     ui->boardId->addItem("Callibri EEG");
     ui->boardId->addItem("Callibri EMG");
     ui->boardId->addItem("Callibri ECG");
+    ui->boardId->addItem("Notion 1");
+    ui->boardId->addItem("Notion 2");
     ui->boardId->setCurrentIndex(1); // Synthetic board is default
 
     connect(ui->prepareSession, &QPushButton::clicked, this, &BrainFlowSetupWidget::prepareSession);
@@ -158,6 +160,12 @@ void BrainFlowSetupWidget::prepareSession()
             break;
         case 12:
             boardId = (int)BoardIds::CALLIBRI_ECG_BOARD;
+            break;
+        case 13:
+            boardId = (int)BoardIds::NOTION_1_BOARD;
+            break;
+        case 14:
+            boardId = (int)BoardIds::NOTION_2_BOARD;
             break;
     }
 
