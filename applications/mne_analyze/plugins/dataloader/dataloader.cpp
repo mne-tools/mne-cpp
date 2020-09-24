@@ -56,8 +56,15 @@ using namespace ANSHAREDLIB;
 //=============================================================================================================
 
 DataLoader::DataLoader()
+: m_pProgressView(new DISPLIB::ProgressView(false))
+, m_pProgressViewWidget(new QWidget())
 {
-    m_pProgressView = new DISPLIB::ProgressView(false);
+    m_pProgressViewWidget->setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint | Qt::FramelessWindowHint);
+
+    QVBoxLayout* layout = new QVBoxLayout(m_pProgressViewWidget.data());
+    layout->addWidget(m_pProgressView);
+    m_pProgressViewWidget->setLayout(layout);
+    m_pProgressViewWidget->hide();
 }
 
 //=============================================================================================================
@@ -171,24 +178,28 @@ void DataLoader::loadFilePath(const QString& sFilePath)
 {
     QFileInfo fileInfo(sFilePath);
 
-    QScopedPointer<QDialog> pDialog (new QDialog());
-    pDialog->setModal(true);
-    pDialog->setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint | Qt::FramelessWindowHint);
+//    QScopedPointer<QDialog> pDialog (new QDialog());
+//    pDialog->setModal(true);
+//    pDialog->setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint | Qt::FramelessWindowHint);
 
-    QVBoxLayout* layout = new QVBoxLayout(pDialog.data());
-    layout->addWidget(m_pProgressView);
-    pDialog->setLayout(layout);
+//    QVBoxLayout* layout = new QVBoxLayout(pDialog.data());
+//    layout->addWidget(m_pProgressView);
+//    pDialog->setLayout(layout);
 
     //DISPLIB::ProgressView pProgressview = new DISPLIB::ProgressView()
     m_pProgressView->setMessage("Loading " + fileInfo.fileName());
-    pDialog->exec();
-    qDebug() << "After exec";
+//    pDialog->exec();
+//    qDebug() << "After exec";
+
+    m_pProgressViewWidget->show();
+    QApplication::processEvents();
 
     if(fileInfo.exists() && (fileInfo.completeSuffix() == "fif")) {
         m_pAnalyzeData->loadModel<ANSHAREDLIB::FiffRawViewModel>(sFilePath);
     }
 
-    pDialog->done(1);
+    m_pProgressViewWidget->hide();
+//    pDialog->done(1);
 }
 
 //=============================================================================================================
@@ -234,6 +245,14 @@ void DataLoader::onSaveFilePressed()
                                                     tr("Fiff file(*.fif *.fiff)"));
 
     QFileInfo fileInfo(sFilePath);
+
+    m_pProgressView->setMessage("Saving " + fileInfo.fileName());
+    m_pProgressViewWidget->show();
+    QApplication::processEvents();
+
     m_pSelectedModel->saveToFile(sFilePath);
+
+    m_pProgressViewWidget->hide();
+
     #endif
 }

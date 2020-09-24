@@ -147,6 +147,7 @@ private:
 
     QPointer<ANSHAREDLIB::Communicator>         m_pCommu;
     QPointer<DISPLIB::ProgressView>             m_pProgressView;
+    QPointer<QWidget>                           m_pProgressViewWidget;
 
     QSharedPointer<ANSHAREDLIB::AbstractModel>  m_pSelectedModel;
 };
