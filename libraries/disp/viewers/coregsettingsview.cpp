@@ -113,6 +113,12 @@ CoregSettingsView::CoregSettingsView(const QString& sSettingsPath,
     // Connect Fiducial Pickings
     connect(m_pUi->m_qCheckBox_PickFiducials, &QCheckBox::stateChanged,
             this, &CoregSettingsView::onPickFiducialsChanged);
+    connect(m_pUi->m_qRadioButton_LPA, &QCheckBox::toggled,
+            this, &CoregSettingsView::onFiducialChanged);
+    connect(m_pUi->m_qRadioButton_NAS, &QCheckBox::toggled,
+            this, &CoregSettingsView::onFiducialChanged);
+    connect(m_pUi->m_qRadioButton_RPA, &QCheckBox::toggled,
+            this, &CoregSettingsView::onFiducialChanged);
     onPickFiducialsChanged();
 
     // connect icp settings
@@ -271,11 +277,11 @@ void CoregSettingsView::onPickFiducialsChanged()
 {
     bool bState = m_pUi->m_qCheckBox_PickFiducials->isChecked();
     if(bState) {
-        m_pUi->m_qWidget_PickFiducials->setEnabled(true);
+        //m_pUi->m_qWidget_PickFiducials->setEnabled(true);
         m_pUi->m_qWidget_ResultFiducials->setEnabled(true);
         emit pickFiducials(true);
     } else {
-        m_pUi->m_qWidget_PickFiducials->setEnabled(false);
+        //m_pUi->m_qWidget_PickFiducials->setEnabled(false);
         m_pUi->m_qWidget_ResultFiducials->setEnabled(false);
         emit pickFiducials(false);
     }
@@ -286,15 +292,40 @@ void CoregSettingsView::onPickFiducialsChanged()
 
 void CoregSettingsView::setFiducials(const QVector3D vecAxialPosition)
 {
-    // floor(vecAxialPosition[0]*100)/100 makes sure to only take 2 decimal positions
+    // store incoming vector
     if(m_pUi->m_qRadioButton_LPA->isChecked()) {
-        m_pUi->m_qLineEdit_LPA->setText("x: " + QString::number(floor(vecAxialPosition[0]*100)/100 * 1000) + " mm" );
+        m_vecLPA = vecAxialPosition;
     } else if (m_pUi->m_qRadioButton_NAS->isChecked()) {
-        m_pUi->m_qLineEdit_NAS->setText("y: " + QString::number(floor(vecAxialPosition[1]*100)/100 * 1000) + " mm" );
+        m_vecNAS = vecAxialPosition;
     } else {
-        m_pUi->m_qLineEdit_RPA->setText("x: " + QString::number(floor(vecAxialPosition[0]*100)/100 * 1000) + " mm" );
+        m_vecRPA = vecAxialPosition;
     }
 
+    // floor(vecAxialPosition[0]*100)/100 makes sure to only take 2 decimal positions
+    m_pUi->m_qLineEdit_FidX->setText(QString::number(floor(vecAxialPosition[0]*100)/100 * 1000) + " mm" );
+    m_pUi->m_qLineEdit_FidY->setText(QString::number(floor(vecAxialPosition[1]*100)/100 * 1000) + " mm" );
+    m_pUi->m_qLineEdit_FidZ->setText(QString::number(floor(vecAxialPosition[2]*100)/100 * 1000) + " mm" );
+    return;
+}
+
+//=============================================================================================================
+
+void CoregSettingsView::onFiducialChanged()
+{
+    QVector3D vecTemp;
+    // store incoming vector
+    if(m_pUi->m_qRadioButton_LPA->isChecked()) {
+        vecTemp = m_vecLPA;
+    } else if (m_pUi->m_qRadioButton_NAS->isChecked()) {
+        vecTemp = m_vecNAS;
+    } else {
+        vecTemp = m_vecRPA;
+    }
+
+    // floor(vecAxialPosition[0]*100)/100 makes sure to only take 2 decimal positions
+    m_pUi->m_qLineEdit_FidX->setText(QString::number(floor(vecTemp[0]*100)/100 * 1000) + " mm" );
+    m_pUi->m_qLineEdit_FidY->setText(QString::number(floor(vecTemp[1]*100)/100 * 1000) + " mm" );
+    m_pUi->m_qLineEdit_FidZ->setText(QString::number(floor(vecTemp[2]*100)/100 * 1000) + " mm" );
     return;
 }
 

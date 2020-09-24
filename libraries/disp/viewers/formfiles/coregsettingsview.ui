@@ -62,9 +62,75 @@
            </widget>
           </item>
           <item>
-           <widget class="QWidget" name="m_qWidget_PickFiducials" native="true">
-            <layout class="QHBoxLayout" name="horizontalLayout">
-             <item>
+           <widget class="QWidget" name="m_qWidget_ResultFiducials" native="true">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_3">
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_17">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>x:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QLabel" name="label_18">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>y:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="2">
+              <widget class="QLabel" name="label_19">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>z:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="2">
+              <widget class="QLineEdit" name="m_qLineEdit_FidZ">
+               <property name="text">
+                <string>0 mm</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLineEdit" name="m_qLineEdit_FidX">
+               <property name="text">
+                <string>0 mm</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QLineEdit" name="m_qLineEdit_FidY">
+               <property name="text">
+                <string>0 mm</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
               <widget class="QRadioButton" name="m_qRadioButton_LPA">
                <property name="text">
                 <string>LPA</string>
@@ -74,44 +140,17 @@
                </property>
               </widget>
              </item>
-             <item>
+             <item row="0" column="1">
               <widget class="QRadioButton" name="m_qRadioButton_NAS">
                <property name="text">
                 <string>Nasion</string>
                </property>
               </widget>
              </item>
-             <item>
+             <item row="0" column="2">
               <widget class="QRadioButton" name="m_qRadioButton_RPA">
                <property name="text">
                 <string>RPA</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
-           <widget class="QWidget" name="m_qWidget_ResultFiducials" native="true">
-            <layout class="QHBoxLayout" name="horizontalLayout_2">
-             <item>
-              <widget class="QLineEdit" name="m_qLineEdit_LPA">
-               <property name="text">
-                <string>x: 0 mm</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLineEdit" name="m_qLineEdit_NAS">
-               <property name="text">
-                <string>y: 0 mm</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLineEdit" name="m_qLineEdit_RPA">
-               <property name="text">
-                <string>x: 0 mm</string>
                </property>
               </widget>
              </item>
