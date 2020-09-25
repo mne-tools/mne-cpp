@@ -397,7 +397,6 @@ void Averaging::computeAverage()
                                  m_filterKernel,
                                  *m_pFiffRawModel->getFiffInfo());
     m_FutureWatcher.setFuture(m_Future);
-
 }
 
 //=============================================================================================================
@@ -407,7 +406,6 @@ QSharedPointer<FIFFLIB::FiffEvokedSet> Averaging::averageCalculation(FIFFLIB::Fi
                                                                      RTPROCESSINGLIB::FilterKernel filterKernel,
                                                                      FIFFLIB::FiffInfo fiffInfo)
 {
-
     QMap<QString,double> mapReject;
 
     int iType = 1; //hardwired for now, change later to type
