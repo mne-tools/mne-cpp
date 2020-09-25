@@ -77,6 +77,7 @@ Q_IMPORT_PLUGIN(Averaging)
 Q_IMPORT_PLUGIN(SourceLocalization)
 Q_IMPORT_PLUGIN(ControlManager)
 Q_IMPORT_PLUGIN(ChannelSelection)
+Q_IMPORT_PLUGIN(CoRegistration)
 #ifndef WASMBUILD
     Q_IMPORT_PLUGIN(View3D)
 #endif
