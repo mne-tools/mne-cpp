@@ -96,6 +96,7 @@ AnnotationSettingsView::AnnotationSettingsView()
                                                                                                            Q_NULLPTR,
                                                                                                            Qt::Window));
     m_pTriggerDetectView->setProcessingMode(DISPLIB::AbstractView::ProcessingMode::Offline);
+    m_pTriggerDetectView->setWindowFlag(Qt::WindowStaysOnTopHint);
 }
 
 //=============================================================================================================
