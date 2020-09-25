@@ -111,10 +111,7 @@ public:
      */
     void setMsgTimeout(int iTimeout);
 
-protected:
-
 private:
-
     //=========================================================================================================
     /**
      * This functions gets called when a new message is received from the event system.
@@ -143,14 +140,10 @@ private:
 
     int                                 m_iMsgTimeout;              /**< Timeout of one message in milliseconds. */
 
-    QProgressBar*                       m_pProgressBar;             /**< Loading bar that shows in the status bar when approporate vent is received */
-
     QStack<QString>                     m_LoadingStack;             /** Keeps the currently loading messages */
 
-    QPointer<QWidget>                   m_pHoverWidget;
-    QPointer<QWidget>                   m_pLoadingWidget;
-    QPointer<QLabel>                    m_pLoadingMessage;
-    QPointer<DISPLIB::ProgressView>     m_pProgressView;
+    QPointer<QWidget>                   m_pHoverWidget;             /** Widget for showing all current loading messageswhen hovering over the loading bar */
+    QPointer<DISPLIB::ProgressView>     m_pProgressView;            /** Widget for showiung loading bar and loadoing message */
 };
 
 //=============================================================================================================
