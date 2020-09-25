@@ -33,21 +33,19 @@ Optional:
 ## Co-Registration Plugin
 
 ### Load and Store
-
-![](../../images/analyze/mne_an_coreg_load.png)
+<img src="../../images/analyze/mne_an_coreg_load.png" width="300" height="auto">
 
 First, you should select the BEM you want to use for co-registration in `MRI Subject`. Once done, the head surface should be visualized within the 3DView. Further, you can choose if you want to
 
 1. load or
 2. pick fiducials.
 
-If you enable `Pick Fiducials from View`, you can choose the cardinal points for co-registration. Make sure that the location fits with the location you digitized on your subject. To pick the fiducials, make sure to open the 3DView (Toolbar: `View`->`3D View`). You can now pick the fiducials by clicking on the surface within the 3D View. The coordinates for the current selected Fiducial will be displayed. For further information and conventions on fiducials, refer to this [guide](https://neuroimage.usc.edu/brainstorm/CoordinateSystems?highlight=%28auricular%29). Once picked, you can store the fiducials to avoid picking in future sessions.
+If you enable `Pick Fiducials from View`, you can choose the cardinal points for co-registration. Make sure that the location fits with the location you digitized on your subject. To pick the fiducials, make sure to open the 3DView (Toolbar: `View`->`3D View`). You can now pick the fiducials by clicking on the surface within the 3D View. The coordinates for the current selected Fiducial will be displayed. For further information and conventions on fiducials, refer to this [guide](https://neuroimage.usc.edu/brainstorm/CoordinateSystems?highlight=%28auricular%29){:target="_blank" rel="noopener"}. Once picked, you can store the fiducials to avoid picking in future sessions.
 
 You can also use `Load Transformation` to load a previously observed transformation to avoid performing Co-Registration again. With `Store Transformation`, you can also store the observed transformation to file for future sessions.
 
 ### Fit
-
-![](../../images/analyze/mne_an_coreg_fit.png)
+<img src="../../images/analyze/mne_an_coreg_fit.png" width="300" height="auto">
 
 On this tab, you can change the settings for the actual co-registration. In `Digitizer Options`, you can select the weights for different kinds of digitized points, which type (EEG, HPI and HSP) you want to use, and the maximum allowed distance from a point to the surface should be. 
 
@@ -55,7 +53,7 @@ In `Fitting Options`, you can specify the maximum number of iterations for the I
 
 ### Adjustment
 
-![](../../images/analyze/mne_an_coreg_adjust.png)
+<img src="../../images/analyze/mne_an_coreg_adjust.png" width="300" height="auto">
 
 Here you can further adjust the results. You have three options for additional scaling
 
