@@ -241,7 +241,7 @@ void DataLoader::onSaveFilePressed()
 
     m_pSelectedModel->saveToFile(sFilePath);
 
-    //m_pProgressViewWidget->hide();
+    m_pProgressViewWidget->hide();
 
     #endif
 }
