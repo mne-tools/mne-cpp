@@ -144,6 +144,14 @@ public slots:
     void updateProgress(int iPercentage,
                         const QString& sMessage = "");
 
+    //=========================================================================================================
+    /**
+     * Sets whether loading bar is visible
+     *
+     * @param [in] bVisible     whether the bar visible - True = visible, False = hidden
+     */
+    void setLoadingBarVisible(bool bVisible);
+
 private:
 
     Ui::ProgressViewWidget*     m_pUi;
