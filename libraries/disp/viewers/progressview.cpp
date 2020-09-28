@@ -134,6 +134,8 @@ void ProgressView::setMessage(const QString &sMessage)
 void ProgressView::updateProgress(int iPercentage,
                                   const QString& sMessage)
 {
+    m_pUi->m_progressBar->show();
+
     if (m_pUi->m_progressBar->maximum() == 0){
         m_pUi->m_progressBar->setMaximum(100);
     }
@@ -142,5 +144,16 @@ void ProgressView::updateProgress(int iPercentage,
 
     if(sMessage != ""){
         setMessage(sMessage);
+    }
+}
+
+//=============================================================================================================
+
+void ProgressView::setLoadingBarVisible(bool bVisible)
+{
+    if (bVisible){
+        m_pUi->m_progressBar->show();
+    } else {
+        m_pUi->m_progressBar->hide();
     }
 }

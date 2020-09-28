@@ -179,7 +179,7 @@ void DataLoader::loadFilePath(const QString& sFilePath)
     QFileInfo fileInfo(sFilePath);
 
     m_pProgressView->setMessage("Loading " + fileInfo.fileName());
-
+    m_pProgressView->setLoadingBarVisible(false);
     m_pProgressViewWidget->show();
     QApplication::processEvents();
 
@@ -235,12 +235,13 @@ void DataLoader::onSaveFilePressed()
     QFileInfo fileInfo(sFilePath);
 
     m_pProgressView->setMessage("Saving " + fileInfo.fileName());
+    m_pProgressView->setLoadingBarVisible(false);
     m_pProgressViewWidget->show();
     QApplication::processEvents();
 
     m_pSelectedModel->saveToFile(sFilePath);
 
-    m_pProgressViewWidget->hide();
+    //m_pProgressViewWidget->hide();
 
     #endif
 }
