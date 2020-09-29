@@ -45,7 +45,7 @@
 #include "../anshared_global.h"
 #include "../Model/abstractmodel.h"
 #include "../Utils/types.h"
-#include "analyzedatamodel.h"
+#include "../Model/analyzedatamodel.h"
 
 //=============================================================================================================
 // QT INCLUDES

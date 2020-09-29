@@ -74,9 +74,14 @@ void AnalyzeDataModel::addData(const QString &sSubjectName,
     int iChildModelIndex = 0;
 
     if(pItemList.isEmpty()) {
-        QStandardItem* pSubjectItem = new QStandardItem(sSubjectName);
-        pSubjectItem->setToolTip("Subject item");
-        pSubjectItem->setChild(pSubjectItem->rowCount(), pNewItem);
+        QStandardItem* pSubjectItem = new QStandardItem("sub-01");
+        QStandardItem* pSessionItem = new QStandardItem("ses-01");
+        QStandardItem* pMEGItem = new QStandardItem("meg");
+
+        pSubjectItem->setChild(pSubjectItem->rowCount(), pSessionItem);
+        pSessionItem->setChild(pSessionItem->rowCount(), pMEGItem);
+        pMEGItem->setChild(pMEGItem->rowCount(), pNewItem);
+
         iSubjectIndex = this->rowCount();
         this->appendRow(pSubjectItem);
     } else {
@@ -84,7 +89,6 @@ void AnalyzeDataModel::addData(const QString &sSubjectName,
             iChildModelIndex = pItem->rowCount();
             iSubjectIndex = pItem->row();
             pItem->setChild(pItem->rowCount(), pNewItem);
-
         }
     }
     emit newFileAdded(iSubjectIndex, iChildModelIndex);
