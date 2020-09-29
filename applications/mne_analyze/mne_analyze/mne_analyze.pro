@@ -39,7 +39,7 @@ include(../../../mne-cpp.pri)
 
 TEMPLATE = app
 
-QT += gui widgets network opengl svg concurrent
+QT += gui widgets network opengl svg concurrent charts
 qtHaveModule(printsupport): QT += printsupport
 
 contains(MNECPP_CONFIG, noQOpenGLWidget) {
