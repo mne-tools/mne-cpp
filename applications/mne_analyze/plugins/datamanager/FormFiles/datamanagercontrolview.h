@@ -124,6 +124,8 @@ private:
     void onNewFileLoaded(int iSubject,
                          int iModel);
 
+    void onNewFileIndex(QModelIndex itemIndex);
+
     void keyPressEvent(QKeyEvent *event);
 
     Ui::DataManagerView *m_pUi;   /**< The user interface */

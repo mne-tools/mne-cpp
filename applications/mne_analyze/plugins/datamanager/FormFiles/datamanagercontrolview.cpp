@@ -82,8 +82,10 @@ void DataManagerControlView::setModel(QAbstractItemModel *pModel)
 
     connect(m_pUi->m_pTreeView->selectionModel(), &QItemSelectionModel::selectionChanged,
             this, &DataManagerControlView::onCurrentItemChanged, Qt::UniqueConnection);
-    connect(static_cast<ANSHAREDLIB::AnalyzeDataModel*>(pModel), &ANSHAREDLIB::AnalyzeDataModel::newFileAdded,
-            this, &DataManagerControlView::onNewFileLoaded);
+//    connect(static_cast<ANSHAREDLIB::AnalyzeDataModel*>(pModel), &ANSHAREDLIB::AnalyzeDataModel::newFileAdded,
+//            this, &DataManagerControlView::onNewFileLoaded);
+    connect(static_cast<ANSHAREDLIB::AnalyzeDataModel*>(pModel), &ANSHAREDLIB::AnalyzeDataModel::newFileIndex,
+            this, &DataManagerControlView::onNewFileIndex);
 }
 
 //=============================================================================================================
@@ -147,4 +149,12 @@ void DataManagerControlView::keyPressEvent(QKeyEvent *event)
         default:
             QWidget::keyPressEvent(event);
     }
+}
+
+//=============================================================================================================
+
+void DataManagerControlView::onNewFileIndex(QModelIndex itemIndex)
+{
+    m_pUi->m_pTreeView->selectionModel()->select(itemIndex, QItemSelectionModel::ClearAndSelect);
+    m_pUi->m_pTreeView->expandAll();
 }
