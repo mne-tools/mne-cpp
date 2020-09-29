@@ -41,7 +41,7 @@
 #include "datamanagercontrolview.h"
 #include "ui_datamanagerview.h"
 
-#include <anShared/Management/analyzedatamodel.h>
+#include <anShared/Model/analyzedatamodel.h>
 
 //=============================================================================================================
 // QT INCLUDES
