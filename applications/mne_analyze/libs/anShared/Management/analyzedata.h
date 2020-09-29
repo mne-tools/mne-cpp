@@ -195,7 +195,7 @@ public:
             QVariant data;
             data.setValue(temp);
             pItem->setData(data);
-            m_pData->addData("Sample Subject", pItem);
+            m_pData->addData("sub-01", pItem);
 
             emit newModelAvailable(temp);
             return sm;

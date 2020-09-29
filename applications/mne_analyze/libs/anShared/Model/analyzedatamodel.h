@@ -102,6 +102,9 @@ public:
     void addData(const QString &sSubjectName,
                  QStandardItem *pNewItem);
 
+    void addItemToData(QStandardItem *pNewItem,
+                    QModelIndex itemIndex);
+
 signals:
     //=========================================================================================================
     /**
@@ -111,6 +114,9 @@ signals:
      * @param [in] iChildModelIndex     index of new model
      */
     void newFileAdded(int iSubjectIndex, int iChildModelIndex);
+
+    //=========================================================================================================
+    void newFileIndex(QModelIndex itemIndex);
 
 };
 

@@ -70,26 +70,42 @@ void AnalyzeDataModel::addData(const QString &sSubjectName,
                                QStandardItem* pNewItem)
 {    
     QList<QStandardItem*> pItemList = this->findItems(sSubjectName);
-    int iSubjectIndex = 0;
-    int iChildModelIndex = 0;
+//    int iSubjectIndex = 0;
+//    int iChildModelIndex = 0;
 
     if(pItemList.isEmpty()) {
-        QStandardItem* pSubjectItem = new QStandardItem("sub-01");
+        QStandardItem* pSubjectItem = new QStandardItem(sSubjectName);
         QStandardItem* pSessionItem = new QStandardItem("ses-01");
         QStandardItem* pMEGItem = new QStandardItem("meg");
 
-        pSubjectItem->setChild(pSubjectItem->rowCount(), pSessionItem);
-        pSessionItem->setChild(pSessionItem->rowCount(), pMEGItem);
-        pMEGItem->setChild(pMEGItem->rowCount(), pNewItem);
+        pSubjectItem->setChild(pSubjectItem->rowCount(),
+                               pSessionItem);
+        pSessionItem->setChild(pSessionItem->rowCount(),
+                               pMEGItem);
+        pMEGItem->setChild(pMEGItem->rowCount(),
+                           pNewItem);
 
-        iSubjectIndex = this->rowCount();
+//        iSubjectIndex = this->rowCount();
         this->appendRow(pSubjectItem);
+        emit newFileIndex(pNewItem->index());
     } else {
         for(QStandardItem* pItem: pItemList) {
-            iChildModelIndex = pItem->rowCount();
-            iSubjectIndex = pItem->row();
-            pItem->setChild(pItem->rowCount(), pNewItem);
+            pItem->takeChild(0)->takeChild(0)->setChild(pItem->takeChild(0)->takeChild(0)->rowCount(),
+                                                        pNewItem);
+            emit newFileIndex(pNewItem->index());
+//            iChildModelIndex = pItem->rowCount();
+//            iSubjectIndex = pItem->row();
+//            pItem->setChild(pItem->rowCount(),
+//                            pNewItem);
         }
     }
-    emit newFileAdded(iSubjectIndex, iChildModelIndex);
+//    emit newFileAdded(iSubjectIndex, iChildModelIndex);
+}
+
+//=============================================================================================================
+
+void AnalyzeDataModel::addItemToData(QStandardItem *pNewItem,
+                                     QModelIndex itemIndex)
+{
+
 }
