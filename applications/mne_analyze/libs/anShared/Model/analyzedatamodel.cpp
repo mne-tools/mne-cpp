@@ -105,7 +105,8 @@ void AnalyzeDataModel::addData(const QString &sSubjectName,
 //=============================================================================================================
 
 void AnalyzeDataModel::addItemToData(QStandardItem *pNewItem,
-                                     QModelIndex itemIndex)
+                                     QModelIndex parentItemIndex,
+                                     const QString& sItemName)
 {
-
+    parentItemIndex;
 }

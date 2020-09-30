@@ -206,7 +206,7 @@ public:
 
     //=========================================================================================================
     template<class T>
-    QSharedPointer<T> addModel(QSharedPointer<T> pNewModel, const QString& sModelName){
+    QSharedPointer<T> addModel(QSharedPointer<T> pNewModel, const QString& sModelName, QModelIndex itemIndex){
         QSharedPointer<AbstractModel> temp = qSharedPointerCast<AbstractModel>(pNewModel);
         QStandardItem* pItem = new QStandardItem(sModelName);
         pItem->setEditable(false);
@@ -215,8 +215,20 @@ public:
 
         QVariant data;
         data.setValue(temp);
-        pItem->setData(data);
-        m_pData->addData("Sample Subject", pItem);
+
+        switch(temp->getType()){
+            case ANSHAREDLIB_AVERAGING_MODEL:
+                pItem->setData(data);
+                m_pData->addItemToData(pItem,
+                                       itemIndex);
+                break;
+            default:
+                qWarning() << "[AnalyzeData::addModel] Model type not supported";
+                break;
+        }
+
+//        pItem->setData(data);
+//        m_pData->addData("Sample Subject", pItem);
 
         emit newModelAvailable(temp);
         return pNewModel;
