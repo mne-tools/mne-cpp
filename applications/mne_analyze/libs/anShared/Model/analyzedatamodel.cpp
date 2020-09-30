@@ -68,7 +68,7 @@ AnalyzeDataModel::~AnalyzeDataModel()
 
 void AnalyzeDataModel::addData(const QString &sSubjectName,
                                QStandardItem* pNewItem)
-{    
+{
     QList<QStandardItem*> pItemList = this->findItems(sSubjectName);
 //    int iSubjectIndex = 0;
 //    int iChildModelIndex = 0;
@@ -90,7 +90,7 @@ void AnalyzeDataModel::addData(const QString &sSubjectName,
         emit newFileIndex(pNewItem->index());
     } else {
         for(QStandardItem* pItem: pItemList) {
-            pItem->takeChild(0)->takeChild(0)->setChild(pItem->takeChild(0)->takeChild(0)->rowCount(),
+            pItem->child(0)->child(0)->setChild(pItem->child(0)->child(0)->rowCount(),
                                                         pNewItem);
             emit newFileIndex(pNewItem->index());
 //            iChildModelIndex = pItem->rowCount();
@@ -105,8 +105,9 @@ void AnalyzeDataModel::addData(const QString &sSubjectName,
 //=============================================================================================================
 
 void AnalyzeDataModel::addItemToData(QStandardItem *pNewItem,
-                                     QModelIndex parentItemIndex,
-                                     const QString& sItemName)
+                                     QModelIndex parentIndex)
 {
-    parentItemIndex;
+    itemFromIndex(parentIndex)->setChild(itemFromIndex(parentIndex)->rowCount(),
+                                             pNewItem);
+    emit newFileIndex(pNewItem->index());
 }
