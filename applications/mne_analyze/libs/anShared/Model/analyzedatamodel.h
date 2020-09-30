@@ -103,7 +103,7 @@ public:
                  QStandardItem *pNewItem);
 
     void addItemToData(QStandardItem *pNewItem,
-                    QModelIndex itemIndex);
+                       QModelIndex parentItemIndex);
 
 signals:
     //=========================================================================================================
