@@ -182,7 +182,13 @@ void DataLoader::loadFilePath(const QString& sFilePath)
     m_pProgressViewWidget->show();
     m_pProgressViewWidget->move(qApp->topLevelWindows().first()->screen()->geometry().center() - m_pProgressViewWidget->rect().center());
 
-    qDebug() << qApp->topLevelWidgets().first();
+    for (QWindow* window : qApp->topLevelWindows()){
+        window->setOpacity(0.8);
+        for (QWidget* widget : window->findChildren<QWidget*>()){
+         widget->setEnabled(false);
+        }
+    }
+
     QApplication::processEvents();
 
     if(fileInfo.exists() && (fileInfo.completeSuffix() == "fif")) {
@@ -190,6 +196,13 @@ void DataLoader::loadFilePath(const QString& sFilePath)
     }
 
     m_pProgressViewWidget->hide();
+
+    for (QWindow* window : qApp->topLevelWindows()){
+        window->setOpacity(1.0);
+        for (QWidget* widget : window->findChildren<QWidget*>()){
+         widget->setEnabled(true);
+        }
+    }
 }
 
 //=============================================================================================================
@@ -241,11 +254,27 @@ void DataLoader::onSaveFilePressed()
     m_pProgressViewWidget->show();
     m_pProgressViewWidget->move(qApp->topLevelWindows().first()->screen()->geometry().center() - m_pProgressViewWidget->rect().center());
 
+    for (QWindow* window : qApp->topLevelWindows()){
+        window->setOpacity(0.8);
+        for (QWidget* widget : window->findChildren<QWidget*>()){
+         widget->setEnabled(false);
+        }
+    }
+
+    m_pProgressViewWidget->setWindowOpacity(1.0);
+
     QApplication::processEvents();
 
     m_pSelectedModel->saveToFile(sFilePath);
 
     m_pProgressViewWidget->hide();
+
+    for (QWindow* window : qApp->topLevelWindows()){
+        window->setOpacity(1.0);
+        for (QWidget* widget : window->findChildren<QWidget*>()){
+         widget->setEnabled(true);
+        }
+    }
 
     #endif
 }
