@@ -145,6 +145,12 @@ private:
      */
     void onSaveFilePressed();
 
+    //=========================================================================================================
+    /**
+     * This function is called when the load from folder button is pressed
+     */
+    void onLoadFolderPressed();
+
     QPointer<ANSHAREDLIB::Communicator>         m_pCommu;
     QPointer<DISPLIB::ProgressView>             m_pProgressView;
     QPointer<QWidget>                           m_pProgressViewWidget;

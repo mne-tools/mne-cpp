@@ -109,17 +109,23 @@ QMenu *DataLoader::getMenu()
 {
     QMenu* pMenuFile = new QMenu(tr("File"));
 
-    QAction* pActionLoad = new QAction(tr("Open"));
-    pActionLoad->setStatusTip(tr("Load a data file"));
-    connect(pActionLoad, &QAction::triggered,
+    QAction* pActionLoadFile = new QAction(tr("Open File"));
+    pActionLoadFile->setStatusTip(tr("Load a data file"));
+    connect(pActionLoadFile, &QAction::triggered,
             this, &DataLoader::onLoadFilePressed);
 
+    QAction* pActionLoadFolder = new QAction(tr("Open Folder"));
+    pActionLoadFolder->setStatusTip(tr("Load a data folder"));
+    connect(pActionLoadFolder, &QAction::triggered,
+            this, &DataLoader::onLoadFolderPressed);
+
     QAction* pActionSave = new QAction(tr("Save"));
-    pActionLoad->setStatusTip(tr("Save the selected data file"));
+    pActionLoadFile->setStatusTip(tr("Save the selected data file"));
     connect(pActionSave, &QAction::triggered,
             this, &DataLoader::onSaveFilePressed);
 
-    pMenuFile->addAction(pActionLoad);
+    pMenuFile->addAction(pActionLoadFile);
+    pMenuFile->addAction(pActionLoadFolder);
     pMenuFile->addAction(pActionSave);
 
     return pMenuFile;
@@ -286,4 +292,11 @@ void DataLoader::onSaveFilePressed()
     }
 
     #endif
+}
+
+//=============================================================================================================
+
+void DataLoader::onLoadFolderPressed()
+{
+    qDebug() << "[DataLoader::onLoadFolderPressed]";
 }
