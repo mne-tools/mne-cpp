@@ -59,12 +59,11 @@ DataLoader::DataLoader()
 : m_pProgressView(new DISPLIB::ProgressView(false))
 , m_pProgressViewWidget(new QWidget())
 {
-    m_pProgressViewWidget->setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint | Qt::FramelessWindowHint);
+    m_pProgressViewWidget->setWindowFlags(Qt::Window);
 
     QVBoxLayout* layout = new QVBoxLayout(m_pProgressViewWidget.data());
     layout->addWidget(m_pProgressView);
     m_pProgressViewWidget->setLayout(layout);
-    m_pProgressViewWidget->hide();
 }
 
 //=============================================================================================================
@@ -181,6 +180,9 @@ void DataLoader::loadFilePath(const QString& sFilePath)
     m_pProgressView->setMessage("Loading " + fileInfo.fileName());
     m_pProgressView->setLoadingBarVisible(false);
     m_pProgressViewWidget->show();
+    m_pProgressViewWidget->move(qApp->topLevelWindows().first()->screen()->geometry().center() - m_pProgressViewWidget->rect().center());
+
+    qDebug() << qApp->topLevelWidgets().first();
     QApplication::processEvents();
 
     if(fileInfo.exists() && (fileInfo.completeSuffix() == "fif")) {
@@ -237,6 +239,8 @@ void DataLoader::onSaveFilePressed()
     m_pProgressView->setMessage("Saving " + fileInfo.fileName());
     m_pProgressView->setLoadingBarVisible(false);
     m_pProgressViewWidget->show();
+    m_pProgressViewWidget->move(qApp->topLevelWindows().first()->screen()->geometry().center() - m_pProgressViewWidget->rect().center());
+
     QApplication::processEvents();
 
     m_pSelectedModel->saveToFile(sFilePath);
