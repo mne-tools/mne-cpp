@@ -73,14 +73,14 @@ void AnalyzeDataModel::addData(const QString &sSubjectName,
 
     if(pItemList.isEmpty()) {
         QStandardItem* pSubjectItem = new QStandardItem(sSubjectName);
-        pSubjectItem->setData(SUBJECT, ITEM_TYPE);
+        pSubjectItem->setData(QVariant::fromValue(SUBJECT), ITEM_TYPE);
 
         QStandardItem* pSessionItem = new QStandardItem("ses-01");
-        pSessionItem->setData(SESSION, ITEM_TYPE);
+        pSessionItem->setData(QVariant::fromValue(SESSION), ITEM_TYPE);
 
         QStandardItem* pMEGItem = new QStandardItem("meg");
 
-        pNewItem->setData(DATA, ITEM_TYPE);
+        pNewItem->setData(QVariant::fromValue(DATA), ITEM_TYPE);
 
         pSubjectItem->setChild(pSubjectItem->rowCount(),
                                pSessionItem);

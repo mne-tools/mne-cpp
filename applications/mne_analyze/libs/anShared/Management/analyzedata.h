@@ -173,6 +173,18 @@ public:
                     const QString &sSessionName);
 
     //=========================================================================================================
+    void newSelection(const QModelIndex &index);
+
+    //=========================================================================================================
+    QModelIndex getSelectedSubject();
+
+    //=========================================================================================================
+    QModelIndex getSelectedSession();
+
+    //=========================================================================================================
+    QModelIndex getSelectedData();
+
+    //=========================================================================================================
     /**
      * This is the main function for instanciating models. It simply calls the models constructor with the
      * provided path and inserts the model to the central item model. NO ERROR CHECKING IS PERFORMED !
@@ -251,6 +263,7 @@ private:
     QModelIndex                         m_SelectedSubject;
     QModelIndex                         m_SelectedSession;
     QModelIndex                         m_SelectedData;
+
 signals:
     //=========================================================================================================
     /**

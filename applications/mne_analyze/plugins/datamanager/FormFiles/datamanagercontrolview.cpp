@@ -117,6 +117,8 @@ void DataManagerControlView::onCurrentItemChanged(const QItemSelection &selected
         return;
     }
 
+    emit selectedItemChanged(selected.indexes().first());
+
     if(QStandardItemModel *pModel = qobject_cast<QStandardItemModel *>(m_pUi->m_pTreeView->model())) {        
         if(QStandardItem* pItem = pModel->itemFromIndex(selected.indexes().first())) {
             if(!pItem->data().isNull()) {

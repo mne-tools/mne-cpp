@@ -36,10 +36,10 @@
 #define ANALYZEDATAMODEL_H
 
 #define ITEM_TYPE Qt::UserRole+2
-#define SUBJECT QVariant::fromValue(1)
-#define SESSION QVariant::fromValue(2)
-#define DATA QVariant::fromValue(3)
-#define AVG QVariant::fromValue(4)
+#define SUBJECT 1
+#define SESSION 2
+#define DATA 3
+#define AVG 4
 
 //=============================================================================================================
 // INCLUDES
