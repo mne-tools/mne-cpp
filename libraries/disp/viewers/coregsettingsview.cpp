@@ -277,11 +277,9 @@ void CoregSettingsView::onPickFiducialsChanged()
 {
     bool bState = m_pUi->m_qCheckBox_PickFiducials->isChecked();
     if(bState) {
-        //m_pUi->m_qWidget_PickFiducials->setEnabled(true);
         m_pUi->m_qWidget_ResultFiducials->setEnabled(true);
         emit pickFiducials(true);
     } else {
-        //m_pUi->m_qWidget_PickFiducials->setEnabled(false);
         m_pUi->m_qWidget_ResultFiducials->setEnabled(false);
         emit pickFiducials(false);
     }
@@ -295,10 +293,13 @@ void CoregSettingsView::setFiducials(const QVector3D vecAxialPosition)
     // store incoming vector
     if(m_pUi->m_qRadioButton_LPA->isChecked()) {
         m_vecLPA = vecAxialPosition;
+        m_pUi->m_qRadioButton_NAS->setChecked(true);
     } else if (m_pUi->m_qRadioButton_NAS->isChecked()) {
         m_vecNAS = vecAxialPosition;
+        m_pUi->m_qRadioButton_RPA->setChecked(true);
     } else {
         m_vecRPA = vecAxialPosition;
+        m_pUi->m_qRadioButton_LPA->setChecked(true);
     }
 
     // floor(vecAxialPosition[0]*100)/100 makes sure to only take 2 decimal positions
