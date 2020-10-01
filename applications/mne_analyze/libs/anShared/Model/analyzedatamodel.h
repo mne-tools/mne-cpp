@@ -35,6 +35,12 @@
 #ifndef ANALYZEDATAMODEL_H
 #define ANALYZEDATAMODEL_H
 
+#define ITEM_TYPE Qt::UserRole+2
+#define SUBJECT QVariant::fromValue(1)
+#define SESSION QVariant::fromValue(2)
+#define DATA QVariant::fromValue(3)
+#define AVG QVariant::fromValue(4)
+
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -103,7 +109,7 @@ public:
                  QStandardItem *pNewItem);
 
     void addItemToData(QStandardItem *pNewItem,
-                       QModelIndex parentIndex);
+                       const QModelIndex &parentIndex);
 
 signals:
     //=========================================================================================================
@@ -116,7 +122,7 @@ signals:
     void newFileAdded(int iSubjectIndex, int iChildModelIndex);
 
     //=========================================================================================================
-    void newFileIndex(QModelIndex itemIndex);
+    void newItemIndex(QModelIndex itemIndex);
 
 };
 

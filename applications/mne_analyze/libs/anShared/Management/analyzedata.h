@@ -166,6 +166,13 @@ public:
     bool removeModel(const QModelIndex &index);
 
     //=========================================================================================================
+    QStandardItem* addSubject(const QString &sSubjectName);
+
+    //=========================================================================================================
+    void addSession(const QModelIndex &index,
+                    const QString &sSessionName);
+
+    //=========================================================================================================
     /**
      * This is the main function for instanciating models. It simply calls the models constructor with the
      * provided path and inserts the model to the central item model. NO ERROR CHECKING IS PERFORMED !
@@ -207,7 +214,9 @@ public:
 
     //=========================================================================================================
     template<class T>
-    QSharedPointer<T> addModel(QSharedPointer<T> pNewModel, const QString& sModelName, QModelIndex parentIndex){
+    QSharedPointer<T> addModel(QSharedPointer<T> pNewModel,
+                               const QString& sModelName,
+                               const QModelIndex &parentIndex){
         QSharedPointer<AbstractModel> temp = qSharedPointerCast<AbstractModel>(pNewModel);
         QStandardItem* pItem = new QStandardItem(sModelName);
         pItem->setEditable(false);
@@ -239,6 +248,9 @@ public:
 private:
     QPointer<AnalyzeDataModel>          m_pData;        /**< The loaded models in form of a QStandardItemModel. */
 
+    QModelIndex                         m_SelectedSubject;
+    QModelIndex                         m_SelectedSession;
+    QModelIndex                         m_SelectedData;
 signals:
     //=========================================================================================================
     /**

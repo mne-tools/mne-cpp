@@ -114,7 +114,7 @@ QMenu *DataLoader::getMenu()
     connect(pActionLoadFile, &QAction::triggered,
             this, &DataLoader::onLoadFilePressed);
 
-    QAction* pActionLoadFolder = new QAction(tr("Open Folder"));
+    QAction* pActionLoadFolder = new QAction(tr("Open MEG-BIDS Folder"));
     pActionLoadFolder->setStatusTip(tr("Load a data folder"));
     connect(pActionLoadFolder, &QAction::triggered,
             this, &DataLoader::onLoadFolderPressed);
@@ -123,6 +123,8 @@ QMenu *DataLoader::getMenu()
     pActionLoadFile->setStatusTip(tr("Save the selected data file"));
     connect(pActionSave, &QAction::triggered,
             this, &DataLoader::onSaveFilePressed);
+
+    QMenu* pBIDSMenu = new QMenu(tr("Load BIDS Folder"));
 
     pMenuFile->addAction(pActionLoadFile);
     pMenuFile->addAction(pActionLoadFolder);
@@ -310,7 +312,21 @@ void DataLoader::onLoadFolderPressed()
 {
     qDebug() << "[DataLoader::onLoadFolderPressed]";
 
-    QDir directory = QFileDialog::getExistingDirectory(Q_NULLPTR,
+    QString dir = QFileDialog::getExistingDirectory(Q_NULLPTR,
                                                        tr("select directory"),
                                                        QDir::currentPath()+"/MNE-sample-data");
+
+    qDebug() << "DataLoader::onLoadFolderPressed -- " << dir;
+
+    if(dir.isEmpty()){
+        qDebug() << "Empty input";
+        return;
+    }
+
+    QDir directory = dir;
+
+    qDebug() <<"Dir:" << directory.dirName() << "Items:" << directory.entryList(QDir::Dirs);
+
+    m_pAnalyzeData->addSubject(directory.dirName());
+
 }
