@@ -116,10 +116,13 @@ QDockWidget *DataManager::getControl()
     pDataManagerView->setModel(m_pAnalyzeData->getDataModel());
 
     connect(pDataManagerView, &DataManagerControlView::selectedModelChanged,
-            this, &DataManager::onCurrentlySelectedModelChanged);
+            this, &DataManager::onCurrentlySelectedModelChanged, Qt::UniqueConnection);
+
+    connect(pDataManagerView, &DataManagerControlView::selectedItemChanged,
+            this, &DataManager::onCurrentItemChanged, Qt::UniqueConnection);
 
     connect(pDataManagerView, &DataManagerControlView::removeItem,
-            this, &DataManager::onRemoveItem);
+            this, &DataManager::onRemoveItem, Qt::UniqueConnection);
 
     QDockWidget* pControlDock = new QDockWidget(getName());
     pControlDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
@@ -168,4 +171,11 @@ void DataManager::onCurrentlySelectedModelChanged(const QVariant& data)
 void DataManager::onRemoveItem(const QModelIndex& index)
 {    
     m_pAnalyzeData->removeModel(index);
+}
+
+//=============================================================================================================
+
+void DataManager::onCurrentItemChanged(const QModelIndex &pIndex)
+{
+
 }

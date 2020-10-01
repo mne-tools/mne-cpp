@@ -224,3 +224,47 @@ void AnalyzeData::addSession(const QModelIndex &index,
     m_pData->itemFromIndex(index)->setChild(m_pData->itemFromIndex(index)->rowCount(),
                                             pSessionItem);
 }
+
+//=============================================================================================================
+
+void AnalyzeData::newSelection(const QModelIndex &index)
+{
+    switch(m_pData->itemFromIndex(index)->data(ITEM_TYPE).value<int>()){
+        case SUBJECT:
+            qDebug() << "AnalyzeData::newSelection - Updating Subject";
+            m_SelectedSubject = index;
+            break;
+        case SESSION:
+            qDebug() << "AnalyzeData::newSelection - Updating Session";
+            m_SelectedSession = index;
+            break;
+        case DATA:
+            qDebug() << "AnalyzeData::newSelection - Updating Data";
+            m_SelectedData = index;
+            break;
+        default:
+            qDebug() << "AnalyzeData::newSelection - Updating nothing";
+            break;
+    }
+}
+
+//=============================================================================================================
+
+QModelIndex AnalyzeData::getSelectedSubject()
+{
+    return m_SelectedSubject;
+}
+
+//=============================================================================================================
+
+QModelIndex AnalyzeData::getSelectedSession()
+{
+    return m_SelectedSession;
+}
+
+//=============================================================================================================
+
+QModelIndex AnalyzeData::getSelectedData()
+{
+    return m_SelectedData;
+}

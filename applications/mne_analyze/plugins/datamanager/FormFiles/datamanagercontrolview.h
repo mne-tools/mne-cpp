@@ -133,6 +133,7 @@ private:
 signals:
     void removeItem(const QModelIndex& pIndex);
     void selectedModelChanged(const QVariant& data);
+    void selectedItemChanged(const QModelIndex& pIndex);
 };
 
 #endif // DATAMANAGERVIEW_H
