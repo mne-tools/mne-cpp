@@ -240,6 +240,12 @@ void DataLoader::onLoadFilePressed()
                                                     QDir::currentPath()+"/MNE-sample-data",
                                                     tr("Fiff file(*.fif *.fiff)"));
 
+    QFileInfo fileInfo(sFilePath);
+
+    if(fileInfo.fileName().isEmpty()){
+        return;
+    }
+
     loadFilePath(sFilePath);
     #endif
 }
@@ -263,6 +269,10 @@ void DataLoader::onSaveFilePressed()
                                                     tr("Fiff file(*.fif *.fiff)"));
 
     QFileInfo fileInfo(sFilePath);
+
+    if(fileInfo.fileName().isEmpty()){
+        return;
+    }
 
     m_pProgressView->setMessage("Saving " + fileInfo.fileName());
     m_pProgressView->setLoadingBarVisible(false);
@@ -299,4 +309,8 @@ void DataLoader::onSaveFilePressed()
 void DataLoader::onLoadFolderPressed()
 {
     qDebug() << "[DataLoader::onLoadFolderPressed]";
+
+    QDir directory = QFileDialog::getExistingDirectory(Q_NULLPTR,
+                                                       tr("select directory"),
+                                                       QDir::currentPath()+"/MNE-sample-data");
 }

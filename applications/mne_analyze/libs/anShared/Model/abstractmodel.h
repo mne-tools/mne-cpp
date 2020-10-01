@@ -207,7 +207,7 @@ public:
 protected:
     ModelPath                   m_modelPath;                /**< Path to model data in file structure */
 
-    QPointer<QStandardItem>     m_pModelItem;               /**< Hold pointer to item in AnalyzeDataModel cooresponding to this model */
+    QStandardItem*              m_pModelItem;               /**< Hold pointer to item in AnalyzeDataModel cooresponding to this model */
 
     bool                        m_bIsInit = false;          /**< Whether the model has been initialized. */
 };
