@@ -70,13 +70,17 @@ void AnalyzeDataModel::addData(const QString &sSubjectName,
                                QStandardItem* pNewItem)
 {
     QList<QStandardItem*> pItemList = this->findItems(sSubjectName);
-//    int iSubjectIndex = 0;
-//    int iChildModelIndex = 0;
 
     if(pItemList.isEmpty()) {
         QStandardItem* pSubjectItem = new QStandardItem(sSubjectName);
+        pSubjectItem->setData(SUBJECT, ITEM_TYPE);
+
         QStandardItem* pSessionItem = new QStandardItem("ses-01");
+        pSessionItem->setData(SESSION, ITEM_TYPE);
+
         QStandardItem* pMEGItem = new QStandardItem("meg");
+
+        pNewItem->setData(DATA, ITEM_TYPE);
 
         pSubjectItem->setChild(pSubjectItem->rowCount(),
                                pSessionItem);
@@ -85,29 +89,28 @@ void AnalyzeDataModel::addData(const QString &sSubjectName,
         pMEGItem->setChild(pMEGItem->rowCount(),
                            pNewItem);
 
-//        iSubjectIndex = this->rowCount();
         this->appendRow(pSubjectItem);
-        emit newFileIndex(pNewItem->index());
+
+        emit newItemIndex(pSubjectItem->index());
+        emit newItemIndex(pSessionItem->index());
+        emit newItemIndex(pMEGItem->index());
+        emit newItemIndex(pNewItem->index());
+
     } else {
         for(QStandardItem* pItem: pItemList) {
             pItem->child(0)->child(0)->setChild(pItem->child(0)->child(0)->rowCount(),
                                                         pNewItem);
-            emit newFileIndex(pNewItem->index());
-//            iChildModelIndex = pItem->rowCount();
-//            iSubjectIndex = pItem->row();
-//            pItem->setChild(pItem->rowCount(),
-//                            pNewItem);
+            emit newItemIndex(pNewItem->index());
         }
     }
-//    emit newFileAdded(iSubjectIndex, iChildModelIndex);
 }
 
 //=============================================================================================================
 
 void AnalyzeDataModel::addItemToData(QStandardItem *pNewItem,
-                                     QModelIndex parentIndex)
+                                     const QModelIndex &parentIndex)
 {
     itemFromIndex(parentIndex)->setChild(itemFromIndex(parentIndex)->rowCount(),
                                              pNewItem);
-    emit newFileIndex(pNewItem->index());
+    emit newItemIndex(pNewItem->index());
 }

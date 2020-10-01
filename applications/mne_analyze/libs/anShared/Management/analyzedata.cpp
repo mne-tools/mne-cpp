@@ -205,3 +205,22 @@ bool AnalyzeData::removeModel(const QModelIndex& index)
 
     return false;
 }
+
+//=============================================================================================================
+
+QStandardItem* AnalyzeData::addSubject(const QString &sSubjectName)
+{
+    QStandardItem* pSubjectItem = new QStandardItem(sSubjectName);
+    m_pData->appendRow(pSubjectItem);
+    return pSubjectItem;
+}
+
+//=============================================================================================================
+
+void AnalyzeData::addSession(const QModelIndex &index,
+                             const QString &sSessionName)
+{
+    QStandardItem* pSessionItem = new QStandardItem(sSessionName);
+    m_pData->itemFromIndex(index)->setChild(m_pData->itemFromIndex(index)->rowCount(),
+                                            pSessionItem);
+}
