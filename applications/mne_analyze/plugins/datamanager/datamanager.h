@@ -114,6 +114,10 @@ private:
      */
     void onCurrentlySelectedModelChanged(const QVariant& data);
 
+    //=========================================================================================================
+    void onCurrentItemChanged(const QModelIndex& pIndex);
+
+    //=========================================================================================================
     void onRemoveItem(const QModelIndex &index);
 
     QPointer<ANSHAREDLIB::Communicator> m_pCommu;
