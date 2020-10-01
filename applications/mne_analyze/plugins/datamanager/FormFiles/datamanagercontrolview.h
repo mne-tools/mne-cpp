@@ -124,7 +124,7 @@ private:
     void onNewFileLoaded(int iSubject,
                          int iModel);
 
-    void onNewFileIndex(QModelIndex itemIndex);
+    void onNewItemIndex(QModelIndex itemIndex);
 
     void keyPressEvent(QKeyEvent *event);
 
