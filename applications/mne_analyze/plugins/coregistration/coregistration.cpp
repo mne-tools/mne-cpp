@@ -620,6 +620,13 @@ void CoRegistration::createNewTrans()
 {
     m_transHeadMri = m_Future.result();
 
+    // update GUI
+    Vector3f vecRot;
+    Vector3f vecScale;
+    Vector3f vecTrans;
+    getParamFromTrans(m_transHeadMri.trans,vecRot,vecTrans,vecScale);
+    m_pCoregSettingsView->setTransParams(vecTrans,vecRot,vecScale);
+
     // send event
     QVariant data = QVariant::fromValue(m_transHeadMri);
     m_pCommu->publishEvent(EVENT_TYPE::NEW_TRANS_AVAILABE, data);
