@@ -169,8 +169,7 @@ public:
     QStandardItem* addSubject(const QString &sSubjectName);
 
     //=========================================================================================================
-    void addSession(const QModelIndex &index,
-                    const QString &sSessionName);
+    void addSession(const QString &sSessionName);
 
     //=========================================================================================================
     void newSelection(const QModelIndex &index);
