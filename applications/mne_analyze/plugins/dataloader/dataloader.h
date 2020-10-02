@@ -149,7 +149,9 @@ private:
     /**
      * This function is called when the load from folder button is pressed
      */
-    void onLoadFolderPressed();
+    void onLoadSubjectPressed();
+
+    void onLoadSessionPressed();
 
     QPointer<ANSHAREDLIB::Communicator>         m_pCommu;
     QPointer<DISPLIB::ProgressView>             m_pProgressView;

@@ -217,12 +217,12 @@ QStandardItem* AnalyzeData::addSubject(const QString &sSubjectName)
 
 //=============================================================================================================
 
-void AnalyzeData::addSession(const QModelIndex &index,
-                             const QString &sSessionName)
+void AnalyzeData::addSession(const QString &sSessionName)
 {
     QStandardItem* pSessionItem = new QStandardItem(sSessionName);
-    m_pData->itemFromIndex(index)->setChild(m_pData->itemFromIndex(index)->rowCount(),
-                                            pSessionItem);
+    QStandardItem *pSubjectItem = m_pData->itemFromIndex(m_SelectedSubject);
+    pSubjectItem->setChild(pSubjectItem->rowCount(),
+                           pSessionItem);
 }
 
 //=============================================================================================================
