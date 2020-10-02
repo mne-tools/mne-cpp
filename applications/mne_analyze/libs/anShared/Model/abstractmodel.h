@@ -180,22 +180,6 @@ public:
     virtual inline bool isInit();
 
     //=========================================================================================================
-    /**
-     * Returns pointert to this model's item AnalyzeDataModel heirarchy
-     *
-     * @return pointert to this model's item
-     */
-    virtual inline QStandardItem* getItem();
-
-    //=========================================================================================================
-    /**
-     * Stores pointer to this model's item in AnalyzeDataModel's item heriarchy to member variable m_pModelItem
-     *
-     * @param [in] pItem    pointer to this model's item
-     */
-    virtual inline void setItem(QStandardItem* pItem);
-
-    //=========================================================================================================
     // Inherited by QAbstractItemModel:
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override = 0;
     virtual Qt::ItemFlags flags(const QModelIndex &index) const override = 0;
@@ -206,8 +190,6 @@ public:
 
 protected:
     ModelPath                   m_modelPath;                /**< Path to model data in file structure */
-
-    QStandardItem*              m_pModelItem;               /**< Hold pointer to item in AnalyzeDataModel cooresponding to this model */
 
     bool                        m_bIsInit = false;          /**< Whether the model has been initialized. */
 };
@@ -248,20 +230,6 @@ bool AbstractModel::saveToFile(const QString& sPath)
 bool AbstractModel::isInit()
 {
     return m_bIsInit;
-}
-
-//=============================================================================================================
-
-QStandardItem* AbstractModel::getItem()
-{
-    return m_pModelItem;
-}
-
-//=============================================================================================================
-
-void AbstractModel::setItem(QStandardItem* pItem)
-{
-    m_pModelItem = pItem;
 }
 
 } // namespace ANSHAREDLIB

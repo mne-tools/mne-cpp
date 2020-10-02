@@ -470,8 +470,7 @@ void Averaging::createNewAverage()
         QSharedPointer<ANSHAREDLIB::AveragingDataModel> pNewAvgModel = QSharedPointer<ANSHAREDLIB::AveragingDataModel>(new ANSHAREDLIB::AveragingDataModel(pEvokedSet));
 
         m_pAnalyzeData->addModel<ANSHAREDLIB::AveragingDataModel>(pNewAvgModel,
-                                                                  "Average - " + m_pAveragingSettingsView->getCurrentSelectGroup() + " - " + QDateTime::currentDateTime().toString(),
-                                                                  m_pFiffRawModel->getItem()->index());
+                                                                  "Average - " + m_pAveragingSettingsView->getCurrentSelectGroup() + " - " + QDateTime::currentDateTime().toString());
 
         qInfo() << "[Averaging::createNewAverage] Average computed.";
     } else {
