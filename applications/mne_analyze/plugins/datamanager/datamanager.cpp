@@ -177,5 +177,5 @@ void DataManager::onRemoveItem(const QModelIndex& index)
 
 void DataManager::onCurrentItemChanged(const QModelIndex &pIndex)
 {
-
+    m_pAnalyzeData->newSelection(pIndex);
 }
