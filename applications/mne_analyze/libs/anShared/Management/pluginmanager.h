@@ -63,7 +63,6 @@ namespace ANSHAREDLIB
 //=============================================================================================================
 
 class IPlugin;
-class AnalyzeSettings;
 class AnalyzeData;
 
 //=============================================================================================================
@@ -106,10 +105,9 @@ public:
     /**
      * Initializes the plugins.
      *
-     * @param [in] settings      the global mne analyze settings
      * @param [in] data          the global mne analyze data
      */
-    void initPlugins(QSharedPointer<AnalyzeSettings> settings, QSharedPointer<AnalyzeData> data);
+    void initPlugins(QSharedPointer<AnalyzeData> data);
 
     //=========================================================================================================
     /**
