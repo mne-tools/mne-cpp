@@ -69,7 +69,6 @@ namespace ANSHAREDLIB
 
 class AnalyzeData;
 class Event;
-class AnalyzeSettings;
 
 //=========================================================================================================
 /**
@@ -169,14 +168,6 @@ public:
 
     //=========================================================================================================
     /**
-     * Sets the global settings, which provides the mne analyze settings.
-     *
-     * @param[in] globalSettings  the global settings
-     */
-    virtual inline void setGlobalSettings(QSharedPointer<AnalyzeSettings> globalSettings);
-
-    //=========================================================================================================
-    /**
      * Called by the EventManager in case a subscribed-for Event has happened.
      *
      * @param e The Event that has taken place
@@ -194,7 +185,6 @@ signals:
 
 protected:
     QSharedPointer<AnalyzeData>     m_pAnalyzeData;         /**< Pointer to the global data base */
-    QSharedPointer<AnalyzeSettings> m_pAnalyzeSettings;     /**< Pointer to the global analyze settings */
 };
 
 //=============================================================================================================
@@ -211,13 +201,6 @@ void IPlugin::cmdLineStartup(const QStringList& sArguments)
 void IPlugin::setGlobalData(QSharedPointer<AnalyzeData> globalData)
 {
     m_pAnalyzeData = globalData;
-}
-
-//=============================================================================================================
-
-void IPlugin::setGlobalSettings(QSharedPointer<AnalyzeSettings> globalSettings)
-{
-    m_pAnalyzeSettings = globalSettings;
 }
 
 } //Namespace
