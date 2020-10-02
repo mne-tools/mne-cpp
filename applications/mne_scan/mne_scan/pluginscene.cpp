@@ -80,7 +80,7 @@ PluginScene::~PluginScene()
 void PluginScene::insertItem(const QPointF& pos)
 {
     PluginItem *item;
-    SCSHAREDLIB::IPlugin::SPtr pPlugin;
+    SCSHAREDLIB::AbstractPlugin::SPtr pPlugin;
     QString name;
     switch (m_mode) {
         case InsertPluginItem:
@@ -110,7 +110,7 @@ void PluginScene::insertItem(const QPointF& pos)
 
 //=============================================================================================================
 
-bool PluginScene::insertPlugin(QAction* pActionPluginItem, SCSHAREDLIB::IPlugin::SPtr &pAddedPlugin)
+bool PluginScene::insertPlugin(QAction* pActionPluginItem, SCSHAREDLIB::AbstractPlugin::SPtr &pAddedPlugin)
 {
     if(pActionPluginItem->isEnabled())
     {
@@ -120,7 +120,7 @@ bool PluginScene::insertPlugin(QAction* pActionPluginItem, SCSHAREDLIB::IPlugin:
             qDebug() << "Unable to find index";
             return false;
         }
-        SCSHAREDLIB::IPlugin* pPlugin = m_pPluginGui->m_pPluginManager->getPlugins()[idx];
+        SCSHAREDLIB::AbstractPlugin* pPlugin = m_pPluginGui->m_pPluginManager->getPlugins()[idx];
 
         if(m_pPluginGui->m_pPluginSceneManager->addPlugin(pPlugin, pAddedPlugin))
         {

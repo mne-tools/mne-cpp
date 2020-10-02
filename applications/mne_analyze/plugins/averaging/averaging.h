@@ -41,7 +41,7 @@
 
 #include "averaging_global.h"
 
-#include <anShared/Interfaces/IPlugin.h>
+#include <anShared/Plugins/abstractplugin.h>
 
 #include <rtprocessing/helpers/filterkernel.h>
 
@@ -97,12 +97,12 @@ namespace AVERAGINGPLUGIN
  *
  * @brief The averaging class provides a plugin for computing averages.
  */
-class AVERAGINGSHARED_EXPORT Averaging : public ANSHAREDLIB::IPlugin
+class AVERAGINGSHARED_EXPORT Averaging : public ANSHAREDLIB::AbstractPlugin
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "averaging.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(ANSHAREDLIB::IPlugin)
+    Q_INTERFACES(ANSHAREDLIB::AbstractPlugin)
 
 public:
     //=========================================================================================================
@@ -117,8 +117,8 @@ public:
      */
     ~Averaging() override;
 
-    // IPlugin functions
-    virtual QSharedPointer<IPlugin> clone() const override;
+    // AbstractPlugin functions
+    virtual QSharedPointer<AbstractPlugin> clone() const override;
     virtual void init() override;
     virtual void unload() override;
     virtual QString getName() const override;

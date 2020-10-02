@@ -76,7 +76,7 @@ Q_DECLARE_METATYPE(QVector<lsl::stream_info>);
 //=============================================================================================================
 
 LSLAdapter::LSLAdapter()
-: ISensor()
+: AbstractSensor()
 , m_fSamplingFrequency(-1.0f)
 , m_iNumberChannels(-1)
 , m_iOutputBlockSize(100)
@@ -106,9 +106,9 @@ LSLAdapter::~LSLAdapter()
 
 //=============================================================================================================
 
-QSharedPointer<IPlugin> LSLAdapter::clone() const
+QSharedPointer<AbstractPlugin> LSLAdapter::clone() const
 {
-    return qSharedPointerCast<IPlugin>(QSharedPointer<LSLAdapter>(new LSLAdapter()));
+    return qSharedPointerCast<AbstractPlugin>(QSharedPointer<LSLAdapter>(new LSLAdapter()));
 }
 
 //=============================================================================================================

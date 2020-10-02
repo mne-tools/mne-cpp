@@ -120,7 +120,7 @@ BabyMEG::~BabyMEG()
 
 //=============================================================================================================
 
-QSharedPointer<IPlugin> BabyMEG::clone() const
+QSharedPointer<AbstractPlugin> BabyMEG::clone() const
 {
     QSharedPointer<BabyMEG> pBabyMEGClone(new BabyMEG());
     return std::move(pBabyMEGClone);
@@ -237,7 +237,7 @@ bool BabyMEG::stop()
 
 //=============================================================================================================
 
-IPlugin::PluginType BabyMEG::getType() const
+AbstractPlugin::PluginType BabyMEG::getType() const
 {
     return _ISensor;
 }

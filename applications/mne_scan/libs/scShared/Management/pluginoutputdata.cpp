@@ -63,7 +63,7 @@ namespace SCSHAREDLIB
 //=============================================================================================================
 
 template <class T>
-PluginOutputData<T>::PluginOutputData(IPlugin *parent,
+PluginOutputData<T>::PluginOutputData(AbstractPlugin *parent,
                                       const QString &name,
                                       const QString &descr)
 : PluginOutputConnector(parent, name, descr)

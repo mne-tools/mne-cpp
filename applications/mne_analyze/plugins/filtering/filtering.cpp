@@ -78,7 +78,7 @@ Filtering::~Filtering()
 
 //=============================================================================================================
 
-QSharedPointer<IPlugin> Filtering::clone() const
+QSharedPointer<AbstractPlugin> Filtering::clone() const
 {
     QSharedPointer<Filtering> pFilteringClone = QSharedPointer<Filtering>::create();
     return pFilteringClone;

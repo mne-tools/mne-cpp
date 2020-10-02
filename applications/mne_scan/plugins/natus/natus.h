@@ -41,7 +41,7 @@
 
 #include "natus_global.h"
 
-#include <scShared/Interfaces/ISensor.h>
+#include <scShared/Plugins/abstractsensor.h>
 #include <utils/generics/circularbuffer.h>
 
 //=============================================================================================================
@@ -89,12 +89,12 @@ class NatusSetup;
  *
  * @brief The Natus class provides a EEG connector for receiving data from Natus UDP SDK.
  */
-class NATUSSHARED_EXPORT Natus : public SCSHAREDLIB::ISensor
+class NATUSSHARED_EXPORT Natus : public SCSHAREDLIB::AbstractSensor
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "natus.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(SCSHAREDLIB::ISensor)
+    Q_INTERFACES(SCSHAREDLIB::AbstractSensor)
 
     friend class NatusSetup;
 
@@ -115,7 +115,7 @@ public:
     /**
      * Clone the plugin
      */
-    virtual QSharedPointer<SCSHAREDLIB::IPlugin> clone() const;
+    virtual QSharedPointer<SCSHAREDLIB::AbstractPlugin> clone() const;
 
     //=========================================================================================================
     /**
@@ -147,7 +147,7 @@ public:
      */
     virtual bool stop();
 
-    virtual IPlugin::PluginType getType() const;
+    virtual AbstractPlugin::PluginType getType() const;
     virtual QString getName() const;
     virtual QWidget* setupWidget();
 

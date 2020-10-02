@@ -40,7 +40,7 @@
 //=============================================================================================================
 
 #include "controlmanager_global.h"
-#include <anShared/Interfaces/IPlugin.h>
+#include <anShared/Plugins/abstractplugin.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -76,12 +76,12 @@ namespace CONTROLMANAGERPLUGIN
  *
  * @brief The ControlManager class provides a view with all currently loaded models.
  */
-class CONTROLMANAGERSHARED_EXPORT ControlManager : public ANSHAREDLIB::IPlugin
+class CONTROLMANAGERSHARED_EXPORT ControlManager : public ANSHAREDLIB::AbstractPlugin
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "controlmanager.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(ANSHAREDLIB::IPlugin)
+    Q_INTERFACES(ANSHAREDLIB::AbstractPlugin)
 
 public:
     //=========================================================================================================
@@ -96,8 +96,8 @@ public:
      */
     virtual ~ControlManager() override;
 
-    // IPlugin functions
-    virtual QSharedPointer<IPlugin> clone() const override;
+    // AbstractPlugin functions
+    virtual QSharedPointer<AbstractPlugin> clone() const override;
     virtual void init() override;
     virtual void unload() override;
     virtual QString getName() const override;

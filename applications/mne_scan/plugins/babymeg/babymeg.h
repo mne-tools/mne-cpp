@@ -47,7 +47,7 @@
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_stream.h>
 
-#include <scShared/Interfaces/ISensor.h>
+#include <scShared/Plugins/abstractsensor.h>
 #include <utils/generics/circularbuffer.h>
 
 //=============================================================================================================
@@ -104,12 +104,12 @@ class BabyMEGSQUIDControlDgl;
  *
  * @brief The BabyMEG class provides a connection to the babyMEG system.
  */
-class BABYMEGSHARED_EXPORT BabyMEG : public SCSHAREDLIB::ISensor
+class BABYMEGSHARED_EXPORT BabyMEG : public SCSHAREDLIB::AbstractSensor
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "babymeg.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(SCSHAREDLIB::ISensor)
+    Q_INTERFACES(SCSHAREDLIB::AbstractSensor)
 
     friend class BabyMEGSetupWidget;
     friend class BabyMEGSQUIDControlDgl;
@@ -133,7 +133,7 @@ public:
      *
      * @return Returns the cloned widget.
      */
-    virtual QSharedPointer<SCSHAREDLIB::IPlugin> clone() const;
+    virtual QSharedPointer<SCSHAREDLIB::AbstractPlugin> clone() const;
 
     //=========================================================================================================
     /**
@@ -169,9 +169,9 @@ public:
     /**
      * Get plugin type.
      *
-     * @return the plugin type in form of a IPlugin::PluginType
+     * @return the plugin type in form of a AbstractPlugin::PluginType
      */
-    virtual SCSHAREDLIB::IPlugin::PluginType getType() const;
+    virtual SCSHAREDLIB::AbstractPlugin::PluginType getType() const;
 
     //=========================================================================================================
     /**

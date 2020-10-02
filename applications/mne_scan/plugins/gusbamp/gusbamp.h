@@ -42,7 +42,7 @@
 //=============================================================================================================
 
 #include "gusbamp_global.h"
-#include <scShared/Interfaces/ISensor.h>
+#include <scShared/Plugins/abstractsensor.h>
 #include <utils/generics/circularbuffer.h>
 #include <scMeas/realtimemultisamplearray.h>
 #include <fiff/fiff.h>
@@ -75,12 +75,12 @@ class GUSBAmpProducer;
  *
  * @brief The GUSBAmp class provides an EEG connector for the gTec USBAmp device.
  */
-class GUSBAMPSHARED_EXPORT GUSBAmp : public SCSHAREDLIB::ISensor
+class GUSBAMPSHARED_EXPORT GUSBAmp : public SCSHAREDLIB::AbstractSensor
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "gusbamp.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(SCSHAREDLIB::ISensor)
+    Q_INTERFACES(SCSHAREDLIB::AbstractSensor)
 
     friend class GUSBAmpProducer;
     friend class GUSBAmpSetupWidget;
@@ -109,7 +109,7 @@ public:
     /**
      * Clone the plugin
      */
-    virtual QSharedPointer<SCSHAREDLIB::IPlugin> clone() const;
+    virtual QSharedPointer<SCSHAREDLIB::AbstractPlugin> clone() const;
 
     //=========================================================================================================
     /**
@@ -163,7 +163,7 @@ public:
     /**
      * returns the type of the plug in
      */
-    virtual SCSHAREDLIB::IPlugin::PluginType getType() const;
+    virtual SCSHAREDLIB::AbstractPlugin::PluginType getType() const;
 
     //=========================================================================================================
     /**

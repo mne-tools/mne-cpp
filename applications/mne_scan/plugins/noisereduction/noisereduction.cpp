@@ -118,7 +118,7 @@ NoiseReduction::~NoiseReduction()
 
 //=============================================================================================================
 
-QSharedPointer<IPlugin> NoiseReduction::clone() const
+QSharedPointer<AbstractPlugin> NoiseReduction::clone() const
 {
     QSharedPointer<NoiseReduction> pNoiseReductionClone(new NoiseReduction);
     return pNoiseReductionClone;
@@ -171,7 +171,7 @@ bool NoiseReduction::stop()
 
 //=============================================================================================================
 
-IPlugin::PluginType NoiseReduction::getType() const
+AbstractPlugin::PluginType NoiseReduction::getType() const
 {
     return _IAlgorithm;
 }

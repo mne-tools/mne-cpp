@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     ISensor.h
+ * @file     AbstractAlgorithm.h
  * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
  * @since    0.1.0
  * @date     February, 2013
@@ -28,18 +28,24 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains declaration of ISensor interface class.
+ * @brief    Contains declaration of AbstractAlgorithm class.
  *
  */
 
-#ifndef ISENSOR_H
-#define ISENSOR_H
+#ifndef MNESCAN_ABSTRACTALGORITHM_H
+#define MNESCAN_ABSTRACTALGORITHM_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "IPlugin.h"
+#include "abstractplugin.h"
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QSharedPointer>
 
 //=============================================================================================================
 // DEFINE NAMESPACE SCSHAREDLIB
@@ -50,26 +56,27 @@ namespace SCSHAREDLIB
 
 //=============================================================================================================
 /**
- * DECLARE CLASS IRTAlgorithm
+ * DECLARE CLASS AbstractAlgorithm
  *
- * @brief The ISensor class provides an interface for a sensor plugin.
+ * @brief The AbstractAlgorithm class provides an interface for plugin.
  */
-class ISensor : public IPlugin
+class AbstractAlgorithm : public AbstractPlugin
 {
-//ToDo virtual methods of IMeasurementSource
 public:
+    typedef QSharedPointer<AbstractAlgorithm> SPtr;               /**< Shared pointer type for AbstractAlgorithm. */
+    typedef QSharedPointer<const AbstractAlgorithm> ConstSPtr;    /**< Const shared pointer type for AbstractAlgorithm. */
 
     //=========================================================================================================
     /**
-     * Destroys the ISensor.
+     * Destroys the AbstractAlgorithm.
      */
-    virtual ~ISensor() {}
+    virtual ~AbstractAlgorithm() {}
 
     //=========================================================================================================
     /**
      * Clone the plugin
      */
-    virtual QSharedPointer<IPlugin> clone() const = 0;
+    virtual QSharedPointer<AbstractPlugin> clone() const = 0;
 
     //=========================================================================================================
     /**
@@ -85,8 +92,8 @@ public:
 
     //=========================================================================================================
     /**
-     * Starts the ISensor.
-     * Pure virtual method inherited by IModule.
+     * Starts the AbstractAlgorithm.
+     * Pure virtual method inherited by AbstractPlugin.
      *
      * @return true if success, false otherwise
      */
@@ -94,8 +101,8 @@ public:
 
     //=========================================================================================================
     /**
-     * Stops the ISensor.
-     * Pure virtual method inherited by IModule.
+     * Stops the AbstractAlgorithm.
+     * Pure virtual method inherited by AbstractPlugin.
      *
      * @return true if success, false otherwise
      */
@@ -104,18 +111,18 @@ public:
     //=========================================================================================================
     /**
      * Returns the plugin type.
-     * Pure virtual method inherited by IModule.
+     * Pure virtual method inherited by AbstractPlugin.
      *
-     * @return type of the ISensor
+     * @return type of the AbstractAlgorithm
      */
     virtual PluginType getType() const = 0;
 
     //=========================================================================================================
     /**
      * Returns the plugin name.
-     * Pure virtual method inherited by IModule.
+     * Pure virtual method inherited by AbstractPlugin.
      *
-     * @return the name of the ISensor.
+     * @return the name of the AbstractAlgorithm.
      */
     virtual QString getName() const = 0;
 
@@ -129,20 +136,19 @@ public:
 
     //=========================================================================================================
     /**
-     * Returns the set up widget for configuration of ISensor.
-     * Pure virtual method inherited by IModule.
+     * Returns the set up widget for configuration of AbstractAlgorithm.
+     * Pure virtual method inherited by AbstractPlugin.
      *
      * @return the setup widget.
      */
-    virtual QWidget* setupWidget() = 0;
+    virtual QWidget* setupWidget() = 0; //setup();
 
 protected:
-
     //=========================================================================================================
     /**
      * The starting point for the thread. After calling start(), the newly created thread calls this function.
      * Returning from this method will end the execution of the thread.
-     * Pure virtual method inherited by QThread.
+     * Pure virtual method inherited by QThread
      */
     virtual void run() = 0;
 };
@@ -151,12 +157,12 @@ protected:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool ISensor::multiInstanceAllowed() const
+inline bool AbstractAlgorithm::multiInstanceAllowed() const
 {
-    return false;
+    return true;
 }
-} //NAMESPACE
+} // NAMESPACE
 
-Q_DECLARE_INTERFACE(SCSHAREDLIB::ISensor, "scsharedlib/1.0")
+Q_DECLARE_INTERFACE(SCSHAREDLIB::AbstractAlgorithm, "scsharedlib/1.0")
 
-#endif // ISENSOR_H
+#endif // MNESCAN_ABSTRACTALGORITHM_H

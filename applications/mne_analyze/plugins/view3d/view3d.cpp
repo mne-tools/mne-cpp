@@ -92,7 +92,7 @@ View3D::~View3D()
 
 //=============================================================================================================
 
-QSharedPointer<IPlugin> View3D::clone() const
+QSharedPointer<AbstractPlugin> View3D::clone() const
 {
     QSharedPointer<View3D> pView3DClone(new View3D);
     return pView3DClone;

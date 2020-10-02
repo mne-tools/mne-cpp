@@ -41,7 +41,7 @@
 #include <scShared/Management/pluginscenemanager.h>
 #include <scShared/Management/displaymanager.h>
 
-#include <scShared/Interfaces/IPlugin.h>
+#include <scShared/Plugins/abstractplugin.h>
 
 #include <scDisp/measurementwidget.h>
 #include <scDisp/realtimemultisamplearraywidget.h>
@@ -709,7 +709,7 @@ void MainWindow::createLogDockWindow()
 
 //=============================================================================================================
 
-void MainWindow::updatePluginSetupWidget(SCSHAREDLIB::IPlugin::SPtr pPlugin)
+void MainWindow::updatePluginSetupWidget(SCSHAREDLIB::AbstractPlugin::SPtr pPlugin)
 {
     m_qListDynamicPluginActions.clear();
 
@@ -733,7 +733,7 @@ void MainWindow::updatePluginSetupWidget(SCSHAREDLIB::IPlugin::SPtr pPlugin)
 
 //=============================================================================================================
 
-void MainWindow::initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::IPlugin> > lPlugins)
+void MainWindow::initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::AbstractPlugin> > lPlugins)
 {
     for(int i = 0; i < lPlugins.size(); ++i) {
         if(!lPlugins.at(i).isNull()) {
@@ -754,10 +754,10 @@ void MainWindow::initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::IPlugin> 
             } else {                
                 // Connect plugin controls to GUI mode toggling
                 connect(this, &MainWindow::guiModeChanged,
-                        lPlugins.at(i).data(), &IPlugin::guiModeChanged);
+                        lPlugins.at(i).data(), &AbstractPlugin::guiModeChanged);
 
                 // Connect plugin controls to be added to the QuickControlView once available
-                connect(lPlugins.at(i).data(), &IPlugin::pluginControlWidgetsChanged,
+                connect(lPlugins.at(i).data(), &AbstractPlugin::pluginControlWidgetsChanged,
                         this, &MainWindow::onPluginControlWidgetsChanged);
 
                 // If a view is avialble for the plugin's output data, setup it up here

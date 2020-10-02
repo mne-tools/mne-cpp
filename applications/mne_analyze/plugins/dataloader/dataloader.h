@@ -42,7 +42,7 @@
 
 #include "dataloader_global.h"
 
-#include <anShared/Interfaces/IPlugin.h>
+#include <anShared/Plugins/abstractplugin.h>
 #include <anShared/Model/fiffrawviewmodel.h>
 
 //=============================================================================================================
@@ -85,12 +85,12 @@ class DataLoaderControl;
  *
  * @brief The DataLoader class provides input and output capabilities for the fiff file format.
  */
-class DATALOADERSHARED_EXPORT DataLoader : public ANSHAREDLIB::IPlugin
+class DATALOADERSHARED_EXPORT DataLoader : public ANSHAREDLIB::AbstractPlugin
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "dataloader.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(ANSHAREDLIB::IPlugin)
+    Q_INTERFACES(ANSHAREDLIB::AbstractPlugin)
 
     enum FileType {DATA_FILE, AVERAGE_FILE, ANNOTATION_FILE};
 public:
@@ -106,8 +106,8 @@ public:
      */
     ~DataLoader() override;
 
-    // IPlugin functions
-    virtual QSharedPointer<IPlugin> clone() const override;
+    // AbstractPlugin functions
+    virtual QSharedPointer<AbstractPlugin> clone() const override;
     virtual void init() override;
     virtual void unload() override;
     virtual QString getName() const override;
