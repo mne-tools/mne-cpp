@@ -83,7 +83,6 @@ CONFIG(debug, debug|release) {
 
 SOURCES += \
     Management/analyzedata.cpp \
-    Management/analyzesettings.cpp \
     Management/pluginmanager.cpp \
     Management/event.cpp \
     Management/communicator.cpp \
@@ -98,13 +97,11 @@ HEADERS += \
     anshared_global.h \
     Model/abstractmodel.h \
     Management/analyzedata.h \
-    Management/analyzesettings.h \
     Management/pluginmanager.h \
     Management/event.h \
     Management/communicator.h \
     Management/eventmanager.h \
     Management/statusbar.h \
-    Interfaces/IStandardView.h \
     Interfaces/IPlugin.h \
     Utils/metatypes.h \
     Utils/types.h \
