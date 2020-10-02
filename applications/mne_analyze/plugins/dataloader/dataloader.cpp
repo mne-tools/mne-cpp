@@ -114,10 +114,15 @@ QMenu *DataLoader::getMenu()
     connect(pActionLoadFile, &QAction::triggered,
             this, &DataLoader::onLoadFilePressed);
 
-    QAction* pActionLoadFolder = new QAction(tr("Open MEG-BIDS Folder"));
-    pActionLoadFolder->setStatusTip(tr("Load a data folder"));
-    connect(pActionLoadFolder, &QAction::triggered,
-            this, &DataLoader::onLoadFolderPressed);
+    QAction* pActionLoadSubject = new QAction(tr("Open Subject"));
+    pActionLoadSubject->setStatusTip(tr("Load a subject folder"));
+    connect(pActionLoadSubject, &QAction::triggered,
+            this, &DataLoader::onLoadSubjectPressed);
+
+    QAction* pActionLoadSession = new QAction(tr("Open Session"));
+    pActionLoadSession->setStatusTip(tr("Load a session folder"));
+    connect(pActionLoadSession, &QAction::triggered,
+            this, &DataLoader::onLoadSessionPressed);
 
     QAction* pActionSave = new QAction(tr("Save"));
     pActionLoadFile->setStatusTip(tr("Save the selected data file"));
@@ -126,8 +131,11 @@ QMenu *DataLoader::getMenu()
 
     QMenu* pBIDSMenu = new QMenu(tr("Load BIDS Folder"));
 
+    pBIDSMenu->addAction(pActionLoadSubject);
+    pBIDSMenu->addAction(pActionLoadSession);
+
     pMenuFile->addAction(pActionLoadFile);
-    pMenuFile->addAction(pActionLoadFolder);
+    pMenuFile->addMenu(pBIDSMenu);
     pMenuFile->addAction(pActionSave);
 
     return pMenuFile;
@@ -308,7 +316,7 @@ void DataLoader::onSaveFilePressed()
 
 //=============================================================================================================
 
-void DataLoader::onLoadFolderPressed()
+void DataLoader::onLoadSubjectPressed()
 {
     qDebug() << "[DataLoader::onLoadFolderPressed]";
 
@@ -328,5 +336,12 @@ void DataLoader::onLoadFolderPressed()
     qDebug() <<"Dir:" << directory.dirName() << "Items:" << directory.entryList(QDir::Dirs);
 
     m_pAnalyzeData->addSubject(directory.dirName());
+
+}
+
+//=============================================================================================================
+
+void DataLoader::onLoadSessionPressed()
+{
 
 }
