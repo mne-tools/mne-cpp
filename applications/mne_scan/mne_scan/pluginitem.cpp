@@ -54,7 +54,7 @@ using namespace MNESCAN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PluginItem::PluginItem(SCSHAREDLIB::IPlugin::SPtr pPlugin, QMenu *contextMenu, QGraphicsItem *parent)
+PluginItem::PluginItem(SCSHAREDLIB::AbstractPlugin::SPtr pPlugin, QMenu *contextMenu, QGraphicsItem *parent)
 : QGraphicsPolygonItem(parent)
 , m_pPlugin(pPlugin)
 , m_iWidth(60)
@@ -72,11 +72,11 @@ PluginItem::PluginItem(SCSHAREDLIB::IPlugin::SPtr pPlugin, QMenu *contextMenu, Q
 //            m_qColorContour = QColor(79, 136, 187);
 //            m_qLinearGradientFace.setColorAt(0, QColor(234, 239, 247));
 //            break;
-        case SCSHAREDLIB::IPlugin::_IAlgorithm:
+        case SCSHAREDLIB::AbstractPlugin::_IAlgorithm:
             m_qColorContour = QColor(98, 152, 61);
             m_qLinearGradientFace.setColorAt(0, QColor(235, 241, 233));
             break;
-        case SCSHAREDLIB::IPlugin::_ISensor:
+        case SCSHAREDLIB::AbstractPlugin::_ISensor:
             m_qColorContour = QColor(79, 136, 187);
             m_qLinearGradientFace.setColorAt(0, QColor(234, 239, 247));
             break;

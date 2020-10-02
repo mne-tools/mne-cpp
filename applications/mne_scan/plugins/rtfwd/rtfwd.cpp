@@ -122,7 +122,7 @@ RtFwd::~RtFwd()
 
 //=============================================================================================================
 
-QSharedPointer<IPlugin> RtFwd::clone() const
+QSharedPointer<AbstractPlugin> RtFwd::clone() const
 {
     QSharedPointer<RtFwd> pRtFwdClone(new RtFwd);
     return pRtFwdClone;
@@ -241,7 +241,7 @@ bool RtFwd::stop()
 
 //=============================================================================================================
 
-IPlugin::PluginType RtFwd::getType() const
+AbstractPlugin::PluginType RtFwd::getType() const
 {
     return _IAlgorithm;
 }

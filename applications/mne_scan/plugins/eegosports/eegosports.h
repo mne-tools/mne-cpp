@@ -49,7 +49,7 @@
 #include "FormFiles/eegosportssetupwidget.h"
 #include "FormFiles/eegosportssetupprojectwidget.h"
 
-#include <scShared/Interfaces/ISensor.h>
+#include <scShared/Plugins/abstractsensor.h>
 #include <utils/generics/circularbuffer.h>
 #include <fstream>
 
@@ -101,12 +101,12 @@ typedef unsigned long DWORD;
  *
  * @brief The EEGoSports class provides an EEG connector.
  */
-class EEGOSPORTSSHARED_EXPORT EEGoSports : public SCSHAREDLIB::ISensor
+class EEGOSPORTSSHARED_EXPORT EEGoSports : public SCSHAREDLIB::AbstractSensor
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "eegosports.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(SCSHAREDLIB::ISensor)
+    Q_INTERFACES(SCSHAREDLIB::AbstractSensor)
 
     friend class EEGoSportsProducer;
     friend class EEGoSportsImpedanceWidget;
@@ -130,7 +130,7 @@ public:
     /**
      * Clone the plugin
      */
-    virtual QSharedPointer<IPlugin> clone() const;
+    virtual QSharedPointer<AbstractPlugin> clone() const;
 
     //=========================================================================================================
     /**
@@ -178,7 +178,7 @@ public:
 
     //=========================================================================================================
 
-    virtual IPlugin::PluginType getType() const;
+    virtual AbstractPlugin::PluginType getType() const;
     virtual QString getName() const;
 
     virtual QWidget* setupWidget();

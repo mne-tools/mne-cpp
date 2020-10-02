@@ -108,9 +108,9 @@ WriteToFile::~WriteToFile()
 
 //=============================================================================================================
 
-QSharedPointer<IPlugin> WriteToFile::clone() const
+QSharedPointer<AbstractPlugin> WriteToFile::clone() const
 {
-    QSharedPointer<IPlugin> pWriteToFileClone(new WriteToFile);
+    QSharedPointer<AbstractPlugin> pWriteToFileClone(new WriteToFile);
     return pWriteToFileClone;
 }
 
@@ -154,7 +154,7 @@ bool WriteToFile::stop()
 
 //=============================================================================================================
 
-IPlugin::PluginType WriteToFile::getType() const
+AbstractPlugin::PluginType WriteToFile::getType() const
 {
     return _IAlgorithm;
 }

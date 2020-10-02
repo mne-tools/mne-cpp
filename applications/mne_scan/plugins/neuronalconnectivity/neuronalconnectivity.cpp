@@ -116,7 +116,7 @@ NeuronalConnectivity::~NeuronalConnectivity()
 
 //=============================================================================================================
 
-QSharedPointer<IPlugin> NeuronalConnectivity::clone() const
+QSharedPointer<AbstractPlugin> NeuronalConnectivity::clone() const
 {
     QSharedPointer<NeuronalConnectivity> pNeuronalConnectivityClone(new NeuronalConnectivity);
     return pNeuronalConnectivityClone;
@@ -216,7 +216,7 @@ bool NeuronalConnectivity::stop()
 
 //=============================================================================================================
 
-IPlugin::PluginType NeuronalConnectivity::getType() const
+AbstractPlugin::PluginType NeuronalConnectivity::getType() const
 {
     return _IAlgorithm;
 }

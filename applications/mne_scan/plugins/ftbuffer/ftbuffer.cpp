@@ -82,7 +82,7 @@ FtBuffer::~FtBuffer()
 
 //=============================================================================================================
 
-QSharedPointer<IPlugin> FtBuffer::clone() const
+QSharedPointer<AbstractPlugin> FtBuffer::clone() const
 {
     QSharedPointer<FtBuffer> pFtBufferClone(new FtBuffer);
     return pFtBufferClone;
@@ -166,7 +166,7 @@ bool FtBuffer::stop()
 
 //=============================================================================================================
 
-IPlugin::PluginType FtBuffer::getType() const
+AbstractPlugin::PluginType FtBuffer::getType() const
 {
     return _ISensor;
 }

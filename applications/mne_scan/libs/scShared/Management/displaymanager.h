@@ -40,7 +40,7 @@
 //=============================================================================================================
 
 #include "../scshared_global.h"
-#include "../Interfaces/IPlugin.h"
+#include "../Plugins/abstractplugin.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -108,7 +108,7 @@ public:
      *
      * @return a pointer to the widget containing all measurement widgets.
      */
-    QWidget* show(IPlugin::OutputConnectorList &outputConnectorList,
+    QWidget* show(AbstractPlugin::OutputConnectorList &outputConnectorList,
                   QSharedPointer<QTime>& pT,
                   QList<QAction*>& qListActions);
 

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     IAlgorithm.h
+ * @file     AbstractSensor.h
  * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
  * @since    0.1.0
  * @date     February, 2013
@@ -28,24 +28,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains declaration of IAlgorithm interface class.
+ * @brief    Contains declaration of AbstractSensor class.
  *
  */
 
-#ifndef IALGORITHM_H
-#define IALGORITHM_H
+#ifndef MNESCAN_ABSTRACTSENSOR_H
+#define MNESCAN_ABSTRACTSENSOR_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "IPlugin.h"
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QSharedPointer>
+#include "abstractplugin.h"
 
 //=============================================================================================================
 // DEFINE NAMESPACE SCSHAREDLIB
@@ -56,27 +50,25 @@ namespace SCSHAREDLIB
 
 //=============================================================================================================
 /**
- * DECLARE CLASS IAlgorithm
+ * DECLARE CLASS IRTAlgorithm
  *
- * @brief The IAlgorithm class provides an interface for a real-time algorithm plugin.
+ * @brief The AbstractSensor class provides an interface for a sensor plugin.
  */
-class IAlgorithm : public IPlugin
+class AbstractSensor : public AbstractPlugin
 {
 public:
-    typedef QSharedPointer<IAlgorithm> SPtr;               /**< Shared pointer type for IAlgorithm. */
-    typedef QSharedPointer<const IAlgorithm> ConstSPtr;    /**< Const shared pointer type for IAlgorithm. */
 
     //=========================================================================================================
     /**
-     * Destroys the IAlgorithm.
+     * Destroys the AbstractSensor.
      */
-    virtual ~IAlgorithm() {}
+    virtual ~AbstractSensor() {}
 
     //=========================================================================================================
     /**
      * Clone the plugin
      */
-    virtual QSharedPointer<IPlugin> clone() const = 0;
+    virtual QSharedPointer<AbstractPlugin> clone() const = 0;
 
     //=========================================================================================================
     /**
@@ -92,8 +84,8 @@ public:
 
     //=========================================================================================================
     /**
-     * Starts the IAlgorithm.
-     * Pure virtual method inherited by IPlugin.
+     * Starts the AbstractSensor.
+     * Pure virtual method inherited by IModule.
      *
      * @return true if success, false otherwise
      */
@@ -101,8 +93,8 @@ public:
 
     //=========================================================================================================
     /**
-     * Stops the IAlgorithm.
-     * Pure virtual method inherited by IPlugin.
+     * Stops the AbstractSensor.
+     * Pure virtual method inherited by IModule.
      *
      * @return true if success, false otherwise
      */
@@ -111,18 +103,18 @@ public:
     //=========================================================================================================
     /**
      * Returns the plugin type.
-     * Pure virtual method inherited by IPlugin.
+     * Pure virtual method inherited by IModule.
      *
-     * @return type of the IAlgorithm
+     * @return type of the AbstractSensor
      */
     virtual PluginType getType() const = 0;
 
     //=========================================================================================================
     /**
      * Returns the plugin name.
-     * Pure virtual method inherited by IPlugin.
+     * Pure virtual method inherited by IModule.
      *
-     * @return the name of the IAlgorithm.
+     * @return the name of the AbstractSensor.
      */
     virtual QString getName() const = 0;
 
@@ -136,19 +128,20 @@ public:
 
     //=========================================================================================================
     /**
-     * Returns the set up widget for configuration of IAlgorithm.
-     * Pure virtual method inherited by IPlugin.
+     * Returns the set up widget for configuration of AbstractSensor.
+     * Pure virtual method inherited by IModule.
      *
      * @return the setup widget.
      */
-    virtual QWidget* setupWidget() = 0; //setup();
+    virtual QWidget* setupWidget() = 0;
 
 protected:
+
     //=========================================================================================================
     /**
      * The starting point for the thread. After calling start(), the newly created thread calls this function.
      * Returning from this method will end the execution of the thread.
-     * Pure virtual method inherited by QThread
+     * Pure virtual method inherited by QThread.
      */
     virtual void run() = 0;
 };
@@ -157,12 +150,12 @@ protected:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool IAlgorithm::multiInstanceAllowed() const
+inline bool AbstractSensor::multiInstanceAllowed() const
 {
-    return true;
+    return false;
 }
-} // NAMESPACE
+} //NAMESPACE
 
-Q_DECLARE_INTERFACE(SCSHAREDLIB::IAlgorithm, "scsharedlib/1.0")
+Q_DECLARE_INTERFACE(SCSHAREDLIB::AbstractSensor, "scsharedlib/1.0")
 
-#endif // IALGORITHM_H
+#endif // MNESCAN_ABSTRACTSENSOR_H

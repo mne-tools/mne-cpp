@@ -87,7 +87,7 @@ DisplayManager::~DisplayManager()
 
 //=============================================================================================================
 
-QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
+QWidget* DisplayManager::show(AbstractPlugin::OutputConnectorList &outputConnectorList,
                               QSharedPointer<QTime>& pT,
                               QList< QAction* >& qListActions)
 {

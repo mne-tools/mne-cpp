@@ -69,7 +69,7 @@ public:
      * @param[in] name       connection name
      * @param[in] descr      connection description
      */
-    PluginInputData(IPlugin *parent, const QString &name, const QString &descr);
+    PluginInputData(AbstractPlugin *parent, const QString &name, const QString &descr);
 
     //=========================================================================================================
     /**
@@ -87,7 +87,7 @@ public:
      *
      * @return the created PluginInputData
      */
-    static inline QSharedPointer< PluginInputData<T> > create(IPlugin *parent, const QString &name, const QString &descr);
+    static inline QSharedPointer< PluginInputData<T> > create(AbstractPlugin *parent, const QString &name, const QString &descr);
 
     //=========================================================================================================
     /**
@@ -116,7 +116,7 @@ private:
 //=============================================================================================================
 
 template <class T>
-inline QSharedPointer< PluginInputData<T> > PluginInputData<T>::create(IPlugin *parent, const QString &name, const QString &descr)
+inline QSharedPointer< PluginInputData<T> > PluginInputData<T>::create(AbstractPlugin *parent, const QString &name, const QString &descr)
 {
     QSharedPointer< PluginInputData<T> > pPluginInputData(new PluginInputData<T>(parent, name, descr));
     return pPluginInputData;

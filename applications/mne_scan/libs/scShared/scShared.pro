@@ -101,10 +101,9 @@ SOURCES += \
 
 HEADERS += \
     scshared_global.h \
-    Interfaces/IPlugin.h \
-    Interfaces/ISensor.h \
-    Interfaces/IAlgorithm.h \
-    Interfaces/IIO.h \
+    Plugins/abstractplugin.h \
+    Plugins/abstractsensor.h \
+    Plugins/abstractalgorithm.h \
     Management/pluginmanager.h \
     Management/pluginconnector.h \
     Management/plugininputconnector.h \

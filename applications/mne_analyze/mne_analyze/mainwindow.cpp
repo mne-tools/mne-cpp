@@ -41,7 +41,7 @@
 #include "info.h"
 #include "mainwindow.h"
 
-#include <anShared/Interfaces/IPlugin.h>
+#include <anShared/Plugins/abstractplugin.h>
 #include <anShared/Management/pluginmanager.h>
 #include <anShared/Management/statusbar.h>
 
@@ -365,7 +365,7 @@ void MainWindow::createPluginMenus(QSharedPointer<ANSHAREDLIB::PluginManager> pP
     m_pMenuHelp->addAction(m_pActionAbout);
 
     // add plugins menus
-    for(IPlugin* pPlugin : pPluginManager->getPlugins()) {
+    for(AbstractPlugin* pPlugin : pPluginManager->getPlugins()) {
         pPlugin->setObjectName(pPlugin->getName());
         if(pPlugin) {
             if (QMenu* pMenu = pPlugin->getMenu()) {
@@ -399,7 +399,7 @@ void MainWindow::createPluginControls(QSharedPointer<ANSHAREDLIB::PluginManager>
     setDockOptions(QMainWindow::ForceTabbedDocks);
 
     //Add Plugin controls to the MainWindow
-    for(IPlugin* pPlugin : pPluginManager->getPlugins()) {
+    for(AbstractPlugin* pPlugin : pPluginManager->getPlugins()) {
         if(QDockWidget* pControl = pPlugin->getControl()) {
             addDockWidget(Qt::LeftDockWidgetArea, pControl);
             qInfo() << "[MainWindow::createPluginControls] Found and added dock widget for " << pPlugin->getName();
@@ -410,7 +410,7 @@ void MainWindow::createPluginControls(QSharedPointer<ANSHAREDLIB::PluginManager>
 
             // Connect plugin controls to GUI mode toggling
             connect(this, &MainWindow::guiModeChanged,
-                    pPlugin, &IPlugin::guiModeChanged);
+                    pPlugin, &AbstractPlugin::guiModeChanged);
 
             // Disable floating and editable dock widgets, since the wasm QDockWidget version is buggy
             #ifdef WASMBUILD
@@ -436,7 +436,7 @@ void MainWindow::createPluginViews(QSharedPointer<PluginManager> pPluginManager)
     QString sCurPluginName;
 
     //Add Plugin views to the MultiView, which is the central widget
-    for(IPlugin* pPlugin : pPluginManager->getPlugins()) {
+    for(AbstractPlugin* pPlugin : pPluginManager->getPlugins()) {
         QWidget* pView = pPlugin->getView();
         if(pView) {
             sCurPluginName = pPlugin->getName();

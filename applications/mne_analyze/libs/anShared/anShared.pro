@@ -94,6 +94,7 @@ SOURCES += \
     Model/averagingdatamodel.cpp \
 
 HEADERS += \
+    Plugins/abstractplugin.h \
     anshared_global.h \
     Model/abstractmodel.h \
     Management/analyzedata.h \
@@ -102,7 +103,6 @@ HEADERS += \
     Management/communicator.h \
     Management/eventmanager.h \
     Management/statusbar.h \
-    Interfaces/IPlugin.h \
     Utils/metatypes.h \
     Utils/types.h \
     Model/bemdatamodel.h \

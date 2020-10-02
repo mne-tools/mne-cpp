@@ -111,12 +111,12 @@ public:
     void saveConfig(const QString& sPath,
                     const QString& sFileName);
 
-    inline SCSHAREDLIB::IPlugin::SPtr getCurrentPlugin();
+    inline SCSHAREDLIB::AbstractPlugin::SPtr getCurrentPlugin();
 
     void uiSetupRunningState(bool state);
 
 signals:
-   void selectedPluginChanged(SCSHAREDLIB::IPlugin::SPtr pPlugin);
+   void selectedPluginChanged(SCSHAREDLIB::AbstractPlugin::SPtr pPlugin);
 
    void selectedConnectionChanged(SCSHAREDLIB::PluginConnectorConnection::SPtr pConnection);
 
@@ -125,7 +125,7 @@ private:
     void pointerGroupClicked(int id);
     void actionGroupTriggered(QAction* action);
 
-    bool removePlugin(SCSHAREDLIB::IPlugin::SPtr pPlugin);
+    bool removePlugin(SCSHAREDLIB::AbstractPlugin::SPtr pPlugin);
 
     void itemInserted(PluginItem *item);
     void newItemSelected();
@@ -143,7 +143,7 @@ private:
     SCSHAREDLIB::PluginManager*          m_pPluginManager;       /**< Corresponding plugin manager. */
     SCSHAREDLIB::PluginSceneManager*     m_pPluginSceneManager;  /**< Corresponding plugin scene manager. */
 
-    SCSHAREDLIB::IPlugin::SPtr                   m_pCurrentPlugin;
+    SCSHAREDLIB::AbstractPlugin::SPtr                   m_pCurrentPlugin;
     SCSHAREDLIB::PluginConnectorConnection::SPtr m_pCurrentConnection;
 
     PluginScene*    m_pPluginScene;         /**< Plugin graph */
@@ -170,7 +170,7 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline SCSHAREDLIB::IPlugin::SPtr PluginGui::getCurrentPlugin()
+inline SCSHAREDLIB::AbstractPlugin::SPtr PluginGui::getCurrentPlugin()
 {
     return m_pCurrentPlugin;
 }

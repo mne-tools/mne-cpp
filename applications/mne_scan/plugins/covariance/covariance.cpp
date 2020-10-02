@@ -95,7 +95,7 @@ Covariance::~Covariance()
 
 //=============================================================================================================
 
-QSharedPointer<IPlugin> Covariance::clone() const
+QSharedPointer<AbstractPlugin> Covariance::clone() const
 {
     QSharedPointer<Covariance> pCovarianceClone(new Covariance);
     return pCovarianceClone;
@@ -177,7 +177,7 @@ bool Covariance::stop()
 
 //=============================================================================================================
 
-IPlugin::PluginType Covariance::getType() const
+AbstractPlugin::PluginType Covariance::getType() const
 {
     return _IAlgorithm;
 }

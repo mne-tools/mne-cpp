@@ -88,7 +88,7 @@ RawDataViewer::~RawDataViewer()
 
 //=============================================================================================================
 
-QSharedPointer<IPlugin> RawDataViewer::clone() const
+QSharedPointer<AbstractPlugin> RawDataViewer::clone() const
 {
     QSharedPointer<RawDataViewer> pRawDataViewerClone = QSharedPointer<RawDataViewer>::create();
     return pRawDataViewerClone;

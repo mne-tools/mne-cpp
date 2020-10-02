@@ -1,14 +1,16 @@
 //=============================================================================================================
 /**
- * @file     IIO.h
+ * @file     abstractplugin.h
  * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
- *           Gabriel B Motta <gabrielbenmotta@gmail.com>
- * @since    0.1.0
- * @date     February, 2013
+ *           Lorenz Esch <lesch@mgh.harvard.edu>;
+ *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
+ *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
+ * @since    0.1.6
+ * @date     October, 2020
  *
  * @section  LICENSE
  *
- * Copyright (C) 2013, Christoph Dinh, Gabriel B Motta. All rights reserved.
+ * Copyright (C) 2020, Christoph Dinh, Lorenz Esch, Lars Debor, Simon Heinke. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -29,60 +31,70 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains declaration of IIO interface class.
+ * @brief    Contains declaration of AbstractPlugin class.
  *
  */
 
-#ifndef IIO_H
-#define IIO_H
+#ifndef ABSTRACTPLUGIN_H
+#define ABSTRACTPLUGIN_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "IPlugin.h"
+#include "../anshared_global.h"
+#include "../Utils/types.h"
 
-#include <QMap>
-
-#include <QSharedPointer>
+#include <disp/viewers/abstractview.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QFile>
+#include <QObject>
+#include <QMenu>
+#include <QDockWidget>
+#include <QSharedPointer>
 
 //=============================================================================================================
-// DEFINE NAMESPACE SCSHAREDLIB
+// DEFINE NAMESPACE ANSHAREDLIB
 //=============================================================================================================
 
-namespace SCSHAREDLIB
+namespace ANSHAREDLIB
 {
 
 //=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+class AnalyzeData;
+class Event;
+
+//=========================================================================================================
 /**
- * DECLARE CLASS IIO
+ * DECLARE CLASS AbstractPlugin
  *
- * @brief The IIO class provides an interface for a real-time record plugin.
+ * @brief The AbstractPlugin class is the base interface class for all plugins.
  */
-class IIO : public IPlugin
+class ANSHAREDSHARED_EXPORT AbstractPlugin : public QObject
 {
-//ToDo virtual methods of IMeasurementSink
+    Q_OBJECT
+
 public:
-    typedef QSharedPointer<IIO> SPtr;               /**< Shared pointer type for IIO. */
-    typedef QSharedPointer<const IIO> ConstSPtr;    /**< Const shared pointer type for IIO. */
+    typedef QSharedPointer<AbstractPlugin> SPtr;               /**< Shared pointer type for AbstractPlugin. */
+    typedef QSharedPointer<const AbstractPlugin> ConstSPtr;    /**< Const shared pointer type for AbstractPlugin. */
 
     //=========================================================================================================
     /**
-     * Destroys the IIO.
+     * Destroys the plugin.
      */
-    virtual ~IIO() {}
+    virtual ~AbstractPlugin() {}
 
     //=========================================================================================================
     /**
      * Clone the plugin
      */
-    virtual QSharedPointer<IPlugin> clone() const = 0;
+    virtual QSharedPointer<AbstractPlugin> clone() const = 0;
 
     //=========================================================================================================
     /**
@@ -92,88 +104,107 @@ public:
 
     //=========================================================================================================
     /**
-     * Is called when plugin is detached of the stage. Can be used to safe settings.
+     * Is called when plugin unloaded.
      */
     virtual void unload() = 0;
 
     //=========================================================================================================
     /**
-     * Starts the IIO.
-     * Pure virtual method inherited by IPlugin.
-     *
-     * @return true if success, false otherwise
-     */
-    virtual bool start() = 0;
-
-    //=========================================================================================================
-    /**
-     * Stops the IIO.
-     * Pure virtual method inherited by IPlugin.
-     *
-     * @return true if success, false otherwise
-     */
-    virtual bool stop() = 0;
-
-    //=========================================================================================================
-    /**
-     * Returns the plugin type.
-     * Pure virtual method inherited by IPlugin.
-     *
-     * @return type of the IIO
-     */
-    virtual PluginType getType() const = 0;
-
-    //=========================================================================================================
-    /**
      * Returns the plugin name.
-     * Pure virtual method inherited by IPlugin.
+     * Pure virtual method.
      *
-     * @return the name of the IIO.
+     * @return the name of plugin.
      */
     virtual QString getName() const = 0;
 
     //=========================================================================================================
     /**
-     * Returns the set up widget for configuration of IIO.
-     * Pure virtual method inherited by IPlugin.
+     * Provides the menu, in case no menu is provided it returns a Q_NULLPTR
      *
-     * @return the setup widget.
+     * @return the menu
      */
-    virtual QWidget* setupWidget() = 0; //setup();
+    virtual QMenu* getMenu() = 0;
 
     //=========================================================================================================
     /**
-     * Sets the name of the RTRecord directory.
+     * Provides the control, in case no control is provided it returns a Q_NULLPTR
      *
-     * @param [in] dirName name of the RTRecord directory
+     * @return the control
      */
-    inline void setRTRecordDirName(const QString& dirName);
+    virtual QDockWidget* getControl() = 0;
+
+    //=========================================================================================================
+    /**
+     * Provides the view, in case no view is provided it returns a Q_NULLPTR
+     *
+     * @return the view
+     */
+    virtual QWidget* getView() = 0;
+
+    //=========================================================================================================
+    /**
+     * Informs the EventManager about all Events that the Plugin wants to know about. Can return an empty
+     * vector in case no Events need to be seen by the Plugin.
+     *
+     * @return The vector of relevant Events
+     */
+    virtual QVector<EVENT_TYPE> getEventSubscriptions(void) const = 0;
+
+    //=========================================================================================================
+    /**
+     * Initializes the plugin based on cmd line inputs given by the user.
+     *
+     * @param[in] sArguments  the cmd line arguments
+     */
+    virtual inline void cmdLineStartup(const QStringList& sArguments);
+
+    //=========================================================================================================
+    /**
+     * Sets the global data, which provides the central database.
+     *
+     * @param[in] globalData  the global data
+     */
+    virtual inline void setGlobalData(QSharedPointer<AnalyzeData> globalData);
+
+    //=========================================================================================================
+    /**
+     * Called by the EventManager in case a subscribed-for Event has happened.
+     *
+     * @param e The Event that has taken place
+     */
+    virtual void handleEvent(QSharedPointer<Event> e) = 0;
+
+signals:
+    //=========================================================================================================
+    /**
+     * Signal emmited whenever the gui modes changed
+     *
+     * @param [in] mode       the new gui mode
+     */
+    void guiModeChanged(DISPLIB::AbstractView::GuiMode mode);
 
 protected:
-
-    //=========================================================================================================
-    /**
-     * The starting point for the thread. After calling start(), the newly created thread calls this function.
-     * Returning from this method will end the execution of the thread.
-     * Pure virtual method inherited by QThread
-     */
-    virtual void run() = 0;
-
-    QString                                 m_RTRecordDirName;  /**< the real-time record sub directory name. */
-    typedef QMap<unsigned short, QFile*>    t_FileMap;          /**< Defines a new file mapping type. */
-    t_FileMap                               m_mapFiles;         /**< the file map. */
+    QSharedPointer<AnalyzeData>     m_pAnalyzeData;         /**< Pointer to the global data base */
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline void IIO::setRTRecordDirName(const QString& dirName)
+void AbstractPlugin::cmdLineStartup(const QStringList& sArguments)
 {
-    m_RTRecordDirName = dirName;
+    Q_UNUSED(sArguments)
 }
-} // NAMESPACE
 
-Q_DECLARE_INTERFACE(SCSHAREDLIB::IIO, "scsharedlib/1.0")
+//=============================================================================================================
 
-#endif // IIO_H
+void AbstractPlugin::setGlobalData(QSharedPointer<AnalyzeData> globalData)
+{
+    m_pAnalyzeData = globalData;
+}
+
+} //Namespace
+
+Q_DECLARE_INTERFACE(ANSHAREDLIB::AbstractPlugin, "ansharedlib/1.0")
+
+#endif //ABSTRACTPLUGIN_H

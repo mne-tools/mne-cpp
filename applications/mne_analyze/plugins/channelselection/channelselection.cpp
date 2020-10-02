@@ -87,7 +87,7 @@ ChannelSelection::~ChannelSelection()
 
 //=============================================================================================================
 
-QSharedPointer<IPlugin> ChannelSelection::clone() const
+QSharedPointer<AbstractPlugin> ChannelSelection::clone() const
 {
     QSharedPointer<ChannelSelection> pChannelSelectionClone = QSharedPointer<ChannelSelection>::create();
     return pChannelSelectionClone;

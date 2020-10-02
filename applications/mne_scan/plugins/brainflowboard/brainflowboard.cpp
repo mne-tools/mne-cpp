@@ -95,7 +95,7 @@ void BrainFlowBoard::showSettings()
 
 //=============================================================================================================
 
-QSharedPointer<IPlugin> BrainFlowBoard::clone() const
+QSharedPointer<AbstractPlugin> BrainFlowBoard::clone() const
 {
     QSharedPointer<BrainFlowBoard> pClone(new BrainFlowBoard());
     return pClone;
@@ -270,7 +270,7 @@ bool BrainFlowBoard::stop()
 
 //=============================================================================================================
 
-IPlugin::PluginType BrainFlowBoard::getType() const
+AbstractPlugin::PluginType BrainFlowBoard::getType() const
 {
     return _ISensor;
 }

@@ -91,9 +91,9 @@ Natus::~Natus()
 
 //=============================================================================================================
 
-QSharedPointer<IPlugin> Natus::clone() const
+QSharedPointer<AbstractPlugin> Natus::clone() const
 {
-    QSharedPointer<IPlugin> pNatusClone(new Natus());
+    QSharedPointer<AbstractPlugin> pNatusClone(new Natus());
     return pNatusClone;
 }
 
@@ -260,7 +260,7 @@ bool Natus::stop()
 
 //=============================================================================================================
 
-IPlugin::PluginType Natus::getType() const
+AbstractPlugin::PluginType Natus::getType() const
 {
     return _ISensor;
 }

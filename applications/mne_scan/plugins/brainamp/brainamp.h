@@ -44,7 +44,7 @@
 
 #include <fstream>
 
-#include <scShared/Interfaces/ISensor.h>
+#include <scShared/Plugins/abstractsensor.h>
 #include <utils/generics/circularbuffer.h>
 
 //=============================================================================================================
@@ -94,12 +94,12 @@ class BrainAMPSetupProjectWidget;
  *
  * @brief The BrainAMP class provides a EEG connector. In order for this plugin to work properly the driver dll "RTINST.dll" must be installed in the system directory. This dll is automatically copied in the system directory during the driver installtion of the TMSi Refa device.
  */
-class BRAINAMPSHARED_EXPORT BrainAMP : public SCSHAREDLIB::ISensor
+class BRAINAMPSHARED_EXPORT BrainAMP : public SCSHAREDLIB::AbstractSensor
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "brainamp.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(SCSHAREDLIB::ISensor)
+    Q_INTERFACES(SCSHAREDLIB::AbstractSensor)
 
     friend class BrainAMPProducer;
     friend class BrainAMPSetupWidget;
@@ -123,7 +123,7 @@ public:
     /**
      * Clone the plugin
      */
-    virtual QSharedPointer<SCSHAREDLIB::IPlugin> clone() const;
+    virtual QSharedPointer<SCSHAREDLIB::AbstractPlugin> clone() const;
 
     //=========================================================================================================
     /**
@@ -161,7 +161,7 @@ public:
      */
     void setSampleData(Eigen::MatrixXd &matData);
 
-    virtual IPlugin::PluginType getType() const;
+    virtual AbstractPlugin::PluginType getType() const;
     virtual QString getName() const;
 
     virtual QWidget* setupWidget();

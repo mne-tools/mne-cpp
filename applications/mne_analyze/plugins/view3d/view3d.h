@@ -41,7 +41,7 @@
 
 #include "view3d_global.h"
 
-#include <anShared/Interfaces/IPlugin.h>
+#include <anShared/Plugins/abstractplugin.h>
 
 #include <rtprocessing/helpers/filterkernel.h>
 
@@ -94,12 +94,12 @@ namespace VIEW3DPLUGIN
  *
  * @brief The View3D class provides a plugin for visualizing information in 3D.
  */
-class VIEW3DSHARED_EXPORT View3D : public ANSHAREDLIB::IPlugin
+class VIEW3DSHARED_EXPORT View3D : public ANSHAREDLIB::AbstractPlugin
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "view3d.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(ANSHAREDLIB::IPlugin)
+    Q_INTERFACES(ANSHAREDLIB::AbstractPlugin)
 
 public:
     //=========================================================================================================
@@ -114,8 +114,8 @@ public:
      */
     ~View3D() override;
 
-    // IPlugin functions
-    virtual QSharedPointer<IPlugin> clone() const override;
+    // AbstractPlugin functions
+    virtual QSharedPointer<AbstractPlugin> clone() const override;
     virtual void init() override;
     virtual void unload() override;
     virtual QString getName() const override;

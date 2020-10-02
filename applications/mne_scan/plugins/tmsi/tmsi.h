@@ -52,7 +52,7 @@
 #include <fstream>
 #include <direct.h>
 
-#include <scShared/Interfaces/ISensor.h>
+#include <scShared/Plugins/abstractsensor.h>
 #include <utils/generics/circularbuffer.h>
 #include <scMeas/realtimemultisamplearray.h>
 
@@ -104,12 +104,12 @@ class TMSIProducer;
  *
  * @brief The TMSI class provides a EEG connector. In order for this plugin to work properly the driver dll "RTINST.dll" must be installed in the system directory. This dll is automatically copied in the system directory during the driver installtion of the TMSi Refa device.
  */
-class TMSISHARED_EXPORT TMSI : public SCSHAREDLIB::ISensor
+class TMSISHARED_EXPORT TMSI : public SCSHAREDLIB::AbstractSensor
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "tmsi.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(SCSHAREDLIB::ISensor)
+    Q_INTERFACES(SCSHAREDLIB::AbstractSensor)
 
     friend class TMSIProducer;
     friend class TMSISetupWidget;
@@ -133,7 +133,7 @@ public:
     /**
      * Clone the plugin
      */
-    virtual QSharedPointer<IPlugin> clone() const;
+    virtual QSharedPointer<AbstractPlugin> clone() const;
 
     //=========================================================================================================
     /**
@@ -165,7 +165,7 @@ public:
      */
     virtual bool stop();
 
-    virtual IPlugin::PluginType getType() const;
+    virtual AbstractPlugin::PluginType getType() const;
     virtual QString getName() const;
 
     virtual QWidget* setupWidget();

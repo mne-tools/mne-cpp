@@ -106,7 +106,7 @@ BrainAMP::~BrainAMP()
 
 //=============================================================================================================
 
-QSharedPointer<IPlugin> BrainAMP::clone() const
+QSharedPointer<AbstractPlugin> BrainAMP::clone() const
 {
     QSharedPointer<BrainAMP> pBrainAMPClone(new BrainAMP());
     return pBrainAMPClone;
@@ -329,7 +329,7 @@ void BrainAMP::setSampleData(MatrixXd &matData)
 
 //=============================================================================================================
 
-IPlugin::PluginType BrainAMP::getType() const
+AbstractPlugin::PluginType BrainAMP::getType() const
 {
     return _ISensor;
 }

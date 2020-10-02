@@ -43,10 +43,9 @@
 #include "pluginitem.h"
 #include "pluginscene.h"
 
-#include <scShared/Interfaces/IPlugin.h>
-#include <scShared/Interfaces/ISensor.h>
-#include <scShared/Interfaces/IAlgorithm.h>
-#include <scShared/Interfaces/IIO.h>
+#include <scShared/Plugins/abstractplugin.h>
+#include <scShared/Plugins/abstractsensor.h>
+#include <scShared/Plugins/abstractalgorithm.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -297,7 +296,7 @@ void PluginGui::saveConfig(const QString& sPath, const QString& sFileName)
     //
     QDomElement plugins = doc.createElement("Plugins");
     root.appendChild(plugins);
-    SCSHAREDLIB::IPlugin::SPtr pPlugin;
+    SCSHAREDLIB::AbstractPlugin::SPtr pPlugin;
     foreach (QGraphicsItem *item, m_pPluginScene->items())
     {
         if(item->type() == PluginItem::Type)
@@ -366,7 +365,7 @@ void PluginGui::uiSetupRunningState(bool state)
 
 //=============================================================================================================
 
-bool PluginGui::removePlugin(SCSHAREDLIB::IPlugin::SPtr pPlugin)
+bool PluginGui::removePlugin(SCSHAREDLIB::AbstractPlugin::SPtr pPlugin)
 {
     bool bRemoved = m_pPluginSceneManager->removePlugin(pPlugin);
 
@@ -428,7 +427,7 @@ void PluginGui::itemInserted(PluginItem *item)
 
 void PluginGui::newItemSelected()
 {
-    SCSHAREDLIB::IPlugin::SPtr pPlugin;
+    SCSHAREDLIB::AbstractPlugin::SPtr pPlugin;
     SCSHAREDLIB::PluginConnectorConnection::SPtr pConnection;
 
     foreach (QGraphicsItem *item, m_pPluginScene->selectedItems())
@@ -449,7 +448,7 @@ void PluginGui::newItemSelected()
     else if(!pConnection.isNull() && pConnection != m_pCurrentConnection)
     {
         m_pCurrentConnection = pConnection;
-        m_pCurrentPlugin = SCSHAREDLIB::IPlugin::SPtr();
+        m_pCurrentPlugin = SCSHAREDLIB::AbstractPlugin::SPtr();
         emit selectedConnectionChanged(m_pCurrentConnection);
     }
 }

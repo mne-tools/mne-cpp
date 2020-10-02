@@ -42,7 +42,7 @@
 
 #include "fiffsimulator_global.h"
 
-#include <scShared/Interfaces/ISensor.h>
+#include <scShared/Plugins/abstractsensor.h>
 #include <communication/rtClient/rtcmdclient.h>
 #include <utils/generics/circularbuffer.h>
 
@@ -91,12 +91,12 @@ class FiffSimulatorProducer;
  *
  * @brief The FiffSimulator class provides a RT server connection.
  */
-class FIFFSIMULATORSHARED_EXPORT FiffSimulator : public SCSHAREDLIB::ISensor
+class FIFFSIMULATORSHARED_EXPORT FiffSimulator : public SCSHAREDLIB::AbstractSensor
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "fiffsimulator.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(SCSHAREDLIB::ISensor)
+    Q_INTERFACES(SCSHAREDLIB::AbstractSensor)
 
     friend class FiffSimulatorProducer;
     friend class FiffSimulatorSetupWidget;
@@ -125,7 +125,7 @@ public:
     /**
      * Clone the plugin
      */
-    virtual QSharedPointer<IPlugin> clone() const;
+    virtual QSharedPointer<AbstractPlugin> clone() const;
 
     //=========================================================================================================
     /**
@@ -142,7 +142,7 @@ public:
     virtual bool start();
     virtual bool stop();
 
-    virtual IPlugin::PluginType getType() const;
+    virtual AbstractPlugin::PluginType getType() const;
     virtual QString getName() const;
 
     //=========================================================================================================

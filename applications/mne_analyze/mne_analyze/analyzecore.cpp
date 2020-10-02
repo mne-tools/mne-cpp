@@ -40,7 +40,7 @@
 
 #include "analyzecore.h"
 #include "mainwindow.h"
-#include "../libs/anShared/Interfaces/IPlugin.h"
+#include "../libs/anShared/Plugins/abstractplugin.h"
 #include "../libs/anShared/Management/analyzedata.h"
 #include "../libs/anShared/Management/pluginmanager.h"
 #include "../libs/anShared/Management/eventmanager.h"

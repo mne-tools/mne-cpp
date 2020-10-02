@@ -90,7 +90,7 @@ Averaging::~Averaging()
 
 //=============================================================================================================
 
-QSharedPointer<IPlugin> Averaging::clone() const
+QSharedPointer<AbstractPlugin> Averaging::clone() const
 {
     QSharedPointer<Averaging> pAveragingClone(new Averaging);
     return pAveragingClone;
@@ -125,7 +125,7 @@ bool Averaging::stop()
 
 //=============================================================================================================
 
-IPlugin::PluginType Averaging::getType() const
+AbstractPlugin::PluginType Averaging::getType() const
 {
     return _IAlgorithm;
 }

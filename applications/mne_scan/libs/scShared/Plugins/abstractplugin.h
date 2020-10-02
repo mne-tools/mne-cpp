@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     IPlugin.h
+ * @file     abstractplugin.h
  * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
  * @since    0.1.0
  * @date     February, 2013
@@ -28,12 +28,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains declaration of IPlugin interface class.
+ * @brief    Contains declaration of AbstractPlugin class.
  *
  */
 
-#ifndef IPLUGIN_H
-#define IPLUGIN_H
+#ifndef MNESCAN_ABSTRACTPLUGIN_H
+#define MNESCAN_ABSTRACTPLUGIN_H
 
 //=============================================================================================================
 // INCLUDES
@@ -72,11 +72,11 @@ namespace SCSHAREDLIB
 
 //=============================================================================================================
 /**
- * DECLARE CLASS IPlugin
+ * DECLARE CLASS AbstractPlugin
  *
- * @brief The IPlugin class is the base interface class of all plugins.
+ * @brief The AbstractPlugin class is the base interface class of all plugins.
  */
-class SCSHAREDSHARED_EXPORT IPlugin : public QThread
+class SCSHAREDSHARED_EXPORT AbstractPlugin : public QThread
 {
     Q_OBJECT
 
@@ -92,23 +92,23 @@ public:
         _PluginSet      /**< Type for a plugin set which holds different types of plugins. */
     };
 
-    typedef QSharedPointer<IPlugin> SPtr;               /**< Shared pointer type for IPlugin. */
-    typedef QSharedPointer<const IPlugin> ConstSPtr;    /**< Const shared pointer type for IPlugin. */
+    typedef QSharedPointer<AbstractPlugin> SPtr;               /**< Shared pointer type for AbstractPlugin. */
+    typedef QSharedPointer<const AbstractPlugin> ConstSPtr;    /**< Const shared pointer type for AbstractPlugin. */
 
     typedef QVector< QSharedPointer< PluginInputConnector > > InputConnectorList;  /**< List of input connectors. */
     typedef QVector< QSharedPointer< PluginOutputConnector > > OutputConnectorList; /**< List of output connectors. */
 
     //=========================================================================================================
     /**
-     * Destroys the IPlugin.
+     * Destroys the AbstractPlugin.
      */
-    virtual ~IPlugin() {}
+    virtual ~AbstractPlugin() {}
 
     //=========================================================================================================
     /**
      * Clone the plugin
      */
-    virtual QSharedPointer<IPlugin> clone() const = 0;
+    virtual QSharedPointer<AbstractPlugin> clone() const = 0;
 
     //=========================================================================================================
     /**
@@ -124,7 +124,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Starts the IPlugin.
+     * Starts the AbstractPlugin.
      * Pure virtual method.
      *
      * @return true if success, false otherwise
@@ -133,7 +133,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Stops the IPlugin.
+     * Stops the AbstractPlugin.
      * Pure virtual method.
      *
      * @return true if success, false otherwise
@@ -153,7 +153,7 @@ public:
      * Returns the plugin type.
      * Pure virtual method.
      *
-     * @return type of the IPlugin
+     * @return type of the AbstractPlugin
      */
     virtual PluginType getType() const = 0;
 
@@ -176,7 +176,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Returns the set up widget for configuration of the IPlugin.
+     * Returns the set up widget for configuration of the AbstractPlugin.
      * Pure virtual method.
      *
      * @return the setup widget.
@@ -236,33 +236,33 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool IPlugin::multiInstanceAllowed() const
+inline bool AbstractPlugin::multiInstanceAllowed() const
 {
     return true;
 }
 
 //=============================================================================================================
 
-inline QList< QAction* > IPlugin::getPluginActions()
+inline QList< QAction* > AbstractPlugin::getPluginActions()
 {
     return m_qListPluginActions;
 }
 
 //=============================================================================================================
 
-inline void IPlugin::addPluginAction(QAction* pAction)
+inline void AbstractPlugin::addPluginAction(QAction* pAction)
 {
     m_qListPluginActions.append(pAction);
 }
 
 //=============================================================================================================
 
-//inline void IPlugin::addPluginWidget(QWidget* pWidget)
+//inline void AbstractPlugin::addPluginWidget(QWidget* pWidget)
 //{
 //    m_qListPluginWidgets.append(pWidget);
 //}
 } //Namespace
 
-Q_DECLARE_INTERFACE(SCSHAREDLIB::IPlugin, "scsharedlib/1.0")
+Q_DECLARE_INTERFACE(SCSHAREDLIB::AbstractPlugin, "scsharedlib/1.0")
 
-#endif //IPLUGIN_H
+#endif //MNESCAN_ABSTRACTPLUGIN_H

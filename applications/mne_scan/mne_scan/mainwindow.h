@@ -77,7 +77,7 @@ QT_END_NAMESPACE
 
 namespace SCSHAREDLIB
 {
-    class IPlugin;
+    class AbstractPlugin;
     class PluginManager;
     class PluginSceneManager;
     class PluginConnectorConnection;
@@ -265,13 +265,13 @@ private:
      * Sets the plugin setup widget to central widget of MainWindow class depending on the current plugin
      * selected in m_pDockWidgetPlugins.
      */
-    void updatePluginSetupWidget(QSharedPointer<SCSHAREDLIB::IPlugin> pPlugin);
+    void updatePluginSetupWidget(QSharedPointer<SCSHAREDLIB::AbstractPlugin> pPlugin);
 
     //=========================================================================================================
     /**
      * Adds the plugin visualization widget to central widget of MainWindow class if the pipeline was started.
      */
-    void initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::IPlugin> > lPlugins);
+    void initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::AbstractPlugin> > lPlugins);
 
     void onDockLocationChanged(QWidget* pWidget);
 

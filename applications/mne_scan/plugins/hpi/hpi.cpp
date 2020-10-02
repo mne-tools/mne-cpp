@@ -97,7 +97,7 @@ Hpi::~Hpi()
 
 //=============================================================================================================
 
-QSharedPointer<IPlugin> Hpi::clone() const
+QSharedPointer<AbstractPlugin> Hpi::clone() const
 {
     QSharedPointer<Hpi> pHpiClone(new Hpi);
     return pHpiClone;
@@ -150,7 +150,7 @@ bool Hpi::stop()
 
 //=============================================================================================================
 
-IPlugin::PluginType Hpi::getType() const
+AbstractPlugin::PluginType Hpi::getType() const
 {
     return _IAlgorithm;
 }

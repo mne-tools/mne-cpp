@@ -79,7 +79,7 @@ DataLoader::~DataLoader()
 
 //=============================================================================================================
 
-QSharedPointer<IPlugin> DataLoader::clone() const
+QSharedPointer<AbstractPlugin> DataLoader::clone() const
 {
     QSharedPointer<DataLoader> pDataLoaderClone(new DataLoader);
     return pDataLoaderClone;

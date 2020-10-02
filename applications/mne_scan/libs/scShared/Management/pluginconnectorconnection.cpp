@@ -59,7 +59,7 @@ using namespace SCMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PluginConnectorConnection::PluginConnectorConnection(IPlugin::SPtr sender, IPlugin::SPtr receiver, QObject *parent)
+PluginConnectorConnection::PluginConnectorConnection(AbstractPlugin::SPtr sender, AbstractPlugin::SPtr receiver, QObject *parent)
 : QObject(parent)
 , m_pSender(sender)
 , m_pReceiver(receiver)
