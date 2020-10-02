@@ -110,7 +110,7 @@ void FiffSimulator::clear()
 
 //=============================================================================================================
 
-QSharedPointer<IPlugin> FiffSimulator::clone() const
+QSharedPointer<AbstractPlugin> FiffSimulator::clone() const
 {
     QSharedPointer<FiffSimulator> pFiffSimulatorClone(new FiffSimulator());
     return std::move(pFiffSimulatorClone);
@@ -186,7 +186,7 @@ bool FiffSimulator::stop()
 
 //=============================================================================================================
 
-IPlugin::PluginType FiffSimulator::getType() const
+AbstractPlugin::PluginType FiffSimulator::getType() const
 {
     return _ISensor;
 }

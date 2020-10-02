@@ -43,7 +43,7 @@
 
 #include "board_shim.h"
 
-#include <scShared/Interfaces/ISensor.h>
+#include <scShared/Plugins/abstractsensor.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -82,24 +82,24 @@ namespace BRAINFLOWBOARDPLUGIN
  *
  * @brief The BrainFlowBoard class provides a plugin for connecting to BrainFlow devices.
  */
-class BRAINFLOWBOARD_EXPORT BrainFlowBoard : public SCSHAREDLIB::ISensor
+class BRAINFLOWBOARD_EXPORT BrainFlowBoard : public SCSHAREDLIB::AbstractSensor
 {
     Q_OBJECT
 
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "brainflowboard.json")
-    Q_INTERFACES(SCSHAREDLIB::ISensor)
+    Q_INTERFACES(SCSHAREDLIB::AbstractSensor)
 
 public:
     BrainFlowBoard();
     virtual ~BrainFlowBoard();
 
-    virtual QSharedPointer<IPlugin> clone() const;
+    virtual QSharedPointer<AbstractPlugin> clone() const;
     virtual void init();
     virtual void unload();
     void setUpFiffInfo();
     virtual bool start();
     virtual bool stop();
-    virtual IPlugin::PluginType getType() const;
+    virtual AbstractPlugin::PluginType getType() const;
     virtual QString getName() const;
     virtual QWidget* setupWidget();
 

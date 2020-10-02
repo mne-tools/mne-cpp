@@ -351,7 +351,7 @@ void ConnectorManager::loadConnectors(const QString& dir)
     QString sJSONFile;
 
     for(QStaticPlugin plugin : staticInstances) {
-        // IPlugin
+        // AbstractPlugin
         if(plugin.instance()) {
             if(IConnector* t_pIConnector = qobject_cast<IConnector*>(plugin.instance())) {
                 t_pIConnector->setStatus(false);

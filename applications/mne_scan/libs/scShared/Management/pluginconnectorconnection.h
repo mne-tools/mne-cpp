@@ -40,7 +40,7 @@
 
 #include "../scshared_global.h"
 
-#include "../Interfaces/IPlugin.h"
+#include "../Plugins/abstractplugin.h"
 
 #include "plugininputconnector.h"
 #include "pluginoutputconnector.h"
@@ -92,7 +92,7 @@ public:
     typedef QSharedPointer<PluginConnectorConnection> SPtr;             /**< Shared pointer type for PluginConnectorConnection. */
     typedef QSharedPointer<const PluginConnectorConnection> ConstSPtr;  /**< Const shared pointer type for PluginConnectorConnection. */
 
-    explicit PluginConnectorConnection(IPlugin::SPtr sender, IPlugin::SPtr receiver, QObject *parent = 0);
+    explicit PluginConnectorConnection(AbstractPlugin::SPtr sender, AbstractPlugin::SPtr receiver, QObject *parent = 0);
     
     //=========================================================================================================
     /**
@@ -110,13 +110,13 @@ public:
     /**
      * Create connection
      */
-    static inline QSharedPointer<PluginConnectorConnection> create(IPlugin::SPtr sender, IPlugin::SPtr receiver, QObject *parent = 0);
+    static inline QSharedPointer<PluginConnectorConnection> create(AbstractPlugin::SPtr sender, AbstractPlugin::SPtr receiver, QObject *parent = 0);
 
     static ConnectorDataType getDataType(QSharedPointer<PluginConnector> pPluginConnector);
 
-    inline IPlugin::SPtr& getSender();
+    inline AbstractPlugin::SPtr& getSender();
 
-    inline IPlugin::SPtr& getReceiver();
+    inline AbstractPlugin::SPtr& getReceiver();
 
     inline bool isConnected();
 
@@ -137,8 +137,8 @@ private:
      */
     bool createConnection();
 
-    IPlugin::SPtr m_pSender;
-    IPlugin::SPtr m_pReceiver;
+    AbstractPlugin::SPtr m_pSender;
+    AbstractPlugin::SPtr m_pReceiver;
 
     QHash<QPair<QString, QString>, QMetaObject::Connection> m_qHashConnections; /**< QHash which holds the connections between sender and receiver QHash<QPair<Sender,Receiver>, Connection>. */
 };
@@ -147,7 +147,7 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline QSharedPointer<PluginConnectorConnection> PluginConnectorConnection::create(IPlugin::SPtr sender, IPlugin::SPtr receiver, QObject *parent)
+inline QSharedPointer<PluginConnectorConnection> PluginConnectorConnection::create(AbstractPlugin::SPtr sender, AbstractPlugin::SPtr receiver, QObject *parent)
 {
     QSharedPointer<PluginConnectorConnection> pPluginConnectorConnection(new PluginConnectorConnection(sender, receiver, parent));
     return pPluginConnectorConnection;
@@ -155,14 +155,14 @@ inline QSharedPointer<PluginConnectorConnection> PluginConnectorConnection::crea
 
 //=============================================================================================================
 
-inline IPlugin::SPtr& PluginConnectorConnection::getSender()
+inline AbstractPlugin::SPtr& PluginConnectorConnection::getSender()
 {
     return m_pSender;
 }
 
 //=============================================================================================================
 
-inline IPlugin::SPtr& PluginConnectorConnection::getReceiver()
+inline AbstractPlugin::SPtr& PluginConnectorConnection::getReceiver()
 {
     return m_pReceiver;
 }

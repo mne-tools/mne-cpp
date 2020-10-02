@@ -58,7 +58,7 @@
 
 namespace ANSHAREDLIB
 {
-    class IPlugin;
+    class AbstractPlugin;
     class PluginManager;
     class AnalyzeData;
 }

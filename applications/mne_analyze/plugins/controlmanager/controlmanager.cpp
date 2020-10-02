@@ -75,7 +75,7 @@ ControlManager::~ControlManager()
 
 //=============================================================================================================
 
-QSharedPointer<IPlugin> ControlManager::clone() const
+QSharedPointer<AbstractPlugin> ControlManager::clone() const
 {
     QSharedPointer<ControlManager> pControlManagerClone = QSharedPointer<ControlManager>::create();
     return pControlManagerClone;

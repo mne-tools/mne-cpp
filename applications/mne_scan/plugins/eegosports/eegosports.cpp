@@ -113,7 +113,7 @@ EEGoSports::~EEGoSports()
 
 //=============================================================================================================
 
-QSharedPointer<IPlugin> EEGoSports::clone() const
+QSharedPointer<AbstractPlugin> EEGoSports::clone() const
 {
     QSharedPointer<EEGoSports> pEEGoSportsClone(new EEGoSports());
     return pEEGoSportsClone;
@@ -618,7 +618,7 @@ void EEGoSports::setSampleData(MatrixXd &matData)
 
 //=============================================================================================================
 
-IPlugin::PluginType EEGoSports::getType() const
+AbstractPlugin::PluginType EEGoSports::getType() const
 {
     return _ISensor;
 }

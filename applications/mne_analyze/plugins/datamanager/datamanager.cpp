@@ -75,7 +75,7 @@ DataManager::~DataManager()
 
 //=============================================================================================================
 
-QSharedPointer<IPlugin> DataManager::clone() const
+QSharedPointer<AbstractPlugin> DataManager::clone() const
 {
     QSharedPointer<DataManager> pDataManagerClone = QSharedPointer<DataManager>::create();
     return pDataManagerClone;

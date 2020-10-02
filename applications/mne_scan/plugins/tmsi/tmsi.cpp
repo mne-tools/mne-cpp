@@ -96,7 +96,7 @@ TMSI::~TMSI()
 
 //=============================================================================================================
 
-QSharedPointer<IPlugin> TMSI::clone() const
+QSharedPointer<AbstractPlugin> TMSI::clone() const
 {
     QSharedPointer<TMSI> pTMSIClone(new TMSI());
     return pTMSIClone;
@@ -528,7 +528,7 @@ bool TMSI::stop()
 
 //=============================================================================================================
 
-IPlugin::PluginType TMSI::getType() const
+AbstractPlugin::PluginType TMSI::getType() const
 {
     return _ISensor;
 }

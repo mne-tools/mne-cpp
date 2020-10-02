@@ -35,7 +35,7 @@
 #ifndef PLUGINITEM_H
 #define PLUGINITEM_H
 
-#include <scShared/Interfaces/IPlugin.h>
+#include <scShared/Plugins/abstractplugin.h>
 
 #include <QGraphicsPixmapItem>
 #include <QLinearGradient>
@@ -65,14 +65,14 @@ class PluginItem : public QGraphicsPolygonItem
 {
 public:
     enum { Type = UserType + 15 };
-    PluginItem(SCSHAREDLIB::IPlugin::SPtr pPlugin, QMenu *contextMenu, QGraphicsItem *parent = 0);
+    PluginItem(SCSHAREDLIB::AbstractPlugin::SPtr pPlugin, QMenu *contextMenu, QGraphicsItem *parent = 0);
 
     ~PluginItem();
 
     void removeArrow(Arrow *arrow);
     void removeArrows();
-    SCSHAREDLIB::IPlugin::PluginType diagramType() const { return m_pPlugin->getType(); }
-    SCSHAREDLIB::IPlugin::SPtr plugin() { return m_pPlugin; }
+    SCSHAREDLIB::AbstractPlugin::PluginType diagramType() const { return m_pPlugin->getType(); }
+    SCSHAREDLIB::AbstractPlugin::SPtr plugin() { return m_pPlugin; }
 
     QPolygonF polygon() const { return m_qPolygon; }
     void addArrow(Arrow *arrow);
@@ -87,7 +87,7 @@ protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 
 private:
-    SCSHAREDLIB::IPlugin::SPtr m_pPlugin;
+    SCSHAREDLIB::AbstractPlugin::SPtr m_pPlugin;
 
     qint32 m_iWidth;
     qint32 m_iHeight;

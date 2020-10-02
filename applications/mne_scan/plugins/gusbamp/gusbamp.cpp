@@ -166,7 +166,7 @@ void GUSBAmp::setUpFiffInfo()
 
 //=============================================================================================================
 
-QSharedPointer<IPlugin> GUSBAmp::clone() const
+QSharedPointer<AbstractPlugin> GUSBAmp::clone() const
 {
     QSharedPointer<GUSBAmp> pGUSBAmpClone(new GUSBAmp());
     return pGUSBAmpClone;
@@ -240,7 +240,7 @@ bool GUSBAmp::stop()
 
 //=============================================================================================================
 
-IPlugin::PluginType GUSBAmp::getType() const
+AbstractPlugin::PluginType GUSBAmp::getType() const
 {
     return _ISensor;
 }

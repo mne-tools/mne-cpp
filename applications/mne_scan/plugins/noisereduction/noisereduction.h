@@ -48,7 +48,7 @@
 
 #include <rtprocessing/helpers/filterkernel.h>
 
-#include <scShared/Interfaces/IAlgorithm.h>
+#include <scShared/Plugins/abstractalgorithm.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -93,12 +93,12 @@ namespace NOISEREDUCTIONPLUGIN
  *
  * @brief The NoiseReduction class provides a tools to reduce noise of an incoming data stream. It then forwards the processed data to subsequent plugins.
  */
-class NOISEREDUCTIONSHARED_EXPORT NoiseReduction : public SCSHAREDLIB::IAlgorithm
+class NOISEREDUCTIONSHARED_EXPORT NoiseReduction : public SCSHAREDLIB::AbstractAlgorithm
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "noisereduction.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(SCSHAREDLIB::IAlgorithm)
+    Q_INTERFACES(SCSHAREDLIB::AbstractAlgorithm)
 
 public:
     //=========================================================================================================
@@ -115,14 +115,14 @@ public:
 
     //=========================================================================================================
     /**
-     * IAlgorithm functions
+     * AbstractAlgorithm functions
      */
-    virtual QSharedPointer<SCSHAREDLIB::IPlugin> clone() const;
+    virtual QSharedPointer<SCSHAREDLIB::AbstractPlugin> clone() const;
     virtual void init();
     virtual void unload();
     virtual bool start();
     virtual bool stop();
-    virtual IPlugin::PluginType getType() const;
+    virtual AbstractPlugin::PluginType getType() const;
     virtual QString getName() const;
     virtual QWidget* setupWidget();
 
@@ -163,7 +163,7 @@ public:
 protected:    
     //=========================================================================================================
     /**
-     * IAlgorithm function
+     * AbstractAlgorithm function
      */
     virtual void run();
 

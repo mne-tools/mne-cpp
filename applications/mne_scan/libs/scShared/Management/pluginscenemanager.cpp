@@ -63,7 +63,7 @@ PluginSceneManager::~PluginSceneManager()
 
 //=============================================================================================================
 
-bool PluginSceneManager::addPlugin(const IPlugin* pPlugin, IPlugin::SPtr &pAddedPlugin)
+bool PluginSceneManager::addPlugin(const AbstractPlugin* pPlugin, AbstractPlugin::SPtr &pAddedPlugin)
 {
     if(pPlugin->multiInstanceAllowed())
     {
@@ -102,7 +102,7 @@ bool PluginSceneManager::addPlugin(const IPlugin* pPlugin, IPlugin::SPtr &pAdded
 
 //=============================================================================================================
 
-bool PluginSceneManager::removePlugin(const IPlugin::SPtr pPlugin)
+bool PluginSceneManager::removePlugin(const AbstractPlugin::SPtr pPlugin)
 {
     qint32 pos = -1;
     for(qint32 i = 0; i < m_pluginList.size(); ++i)
@@ -126,7 +126,7 @@ bool PluginSceneManager::removePlugin(const IPlugin::SPtr pPlugin)
 
 bool PluginSceneManager::startPlugins()
 {
-    // Start ISensor and IRTAlgorithm plugins first!
+    // Start AbstractSensor and IRTAlgorithm plugins first!
     bool bFlag = startSensorPlugins();
 
     if(bFlag) {
@@ -142,13 +142,13 @@ bool PluginSceneManager::startSensorPlugins()
 {
     bool bFlag = false;
 
-    QList<IPlugin::SPtr>::iterator it = m_pluginList.begin();
+    QList<AbstractPlugin::SPtr>::iterator it = m_pluginList.begin();
     for( ; it != m_pluginList.end(); ++it)
     {
-        if((*it)->getType() == IPlugin::_ISensor)
+        if((*it)->getType() == AbstractPlugin::_ISensor)
         {
             if(!(*it)->start())
-                qWarning() << "Could not start ISensor: " << (*it)->getName();
+                qWarning() << "Could not start AbstractSensor: " << (*it)->getName();
             else
                 bFlag = true; //At least one sensor has to be started
         }
@@ -163,12 +163,12 @@ bool PluginSceneManager::startAlgorithmPlugins()
 {
     bool bFlag = true;
 
-    QList<IPlugin::SPtr>::iterator it = m_pluginList.begin();
+    QList<AbstractPlugin::SPtr>::iterator it = m_pluginList.begin();
     for( ; it != m_pluginList.end(); ++it) {
-        if((*it)->getType() == IPlugin::_IAlgorithm) {
+        if((*it)->getType() == AbstractPlugin::_IAlgorithm) {
             if(!(*it)->start()) {
                 bFlag = false;
-                qWarning() << "Could not start IAlgorithm: " << (*it)->getName();
+                qWarning() << "Could not start AbstractAlgorithm: " << (*it)->getName();
             }
         }
     }
@@ -180,19 +180,19 @@ bool PluginSceneManager::startAlgorithmPlugins()
 
 void PluginSceneManager::stopPlugins()
 {
-    // Stop ISensor plugins first!
-    QList<IPlugin::SPtr>::iterator it = m_pluginList.begin();
+    // Stop AbstractSensor plugins first!
+    QList<AbstractPlugin::SPtr>::iterator it = m_pluginList.begin();
     for( ; it != m_pluginList.end(); ++it)
-        if((*it)->getType() == IPlugin::_ISensor)
+        if((*it)->getType() == AbstractPlugin::_ISensor)
             if(!(*it)->stop())
-                qWarning() << "Could not stop IPlugin: " << (*it)->getName();
+                qWarning() << "Could not stop AbstractPlugin: " << (*it)->getName();
 
     // Stop all other plugins!
     it = m_pluginList.begin();
     for( ; it != m_pluginList.end(); ++it)
-        if((*it)->getType() != IPlugin::_ISensor)
+        if((*it)->getType() != AbstractPlugin::_ISensor)
             if(!(*it)->stop())
-                qWarning() << "Could not stop IPlugin: " << (*it)->getName();
+                qWarning() << "Could not stop AbstractPlugin: " << (*it)->getName();
 }
 
 //=============================================================================================================

@@ -41,7 +41,7 @@
 
 #include "lsladapter_global.h"
 
-#include <scShared/Interfaces/ISensor.h>
+#include <scShared/Plugins/abstractsensor.h>
 
 #include <lsl_cpp.h>
 
@@ -89,12 +89,12 @@ class LSLAdapterProducer;
 /**
  * The LSL class deals with the LSL library (labstreaminglayer)
  */
-class LSLADAPTERSHARED_EXPORT LSLAdapter : public SCSHAREDLIB::ISensor
+class LSLADAPTERSHARED_EXPORT LSLAdapter : public SCSHAREDLIB::AbstractSensor
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "lsladapter.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(SCSHAREDLIB::ISensor)
+    Q_INTERFACES(SCSHAREDLIB::AbstractSensor)
 
 public:
     //=========================================================================================================
@@ -113,7 +113,7 @@ public:
     /**
      * Clone the plugin
      */
-    virtual QSharedPointer<SCSHAREDLIB::IPlugin> clone() const;
+    virtual QSharedPointer<SCSHAREDLIB::AbstractPlugin> clone() const;
 
     virtual void init();
 
@@ -129,7 +129,7 @@ public:
 
     virtual QWidget* setupWidget();
 
-    virtual inline IPlugin::PluginType getType() const;
+    virtual inline AbstractPlugin::PluginType getType() const;
 
     virtual inline QString getName() const;
 
@@ -226,7 +226,7 @@ signals:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline SCSHAREDLIB::IPlugin::PluginType LSLAdapter::getType() const
+inline SCSHAREDLIB::AbstractPlugin::PluginType LSLAdapter::getType() const
 {
     return _ISensor;
 }

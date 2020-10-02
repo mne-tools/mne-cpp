@@ -122,7 +122,7 @@ RtcMne::~RtcMne()
 
 //=============================================================================================================
 
-QSharedPointer<IPlugin> RtcMne::clone() const
+QSharedPointer<AbstractPlugin> RtcMne::clone() const
 {
     QSharedPointer<RtcMne> pRtcMneClone(new RtcMne());
     return pRtcMneClone;
@@ -334,7 +334,7 @@ bool RtcMne::stop()
 
 //=============================================================================================================
 
-IPlugin::PluginType RtcMne::getType() const
+AbstractPlugin::PluginType RtcMne::getType() const
 {
     return _IAlgorithm;
 }
