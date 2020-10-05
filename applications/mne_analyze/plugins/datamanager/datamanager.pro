@@ -72,16 +72,16 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES += \
-    FormFiles/datamanagercontrolview.cpp \
+    FormFiles/bidsview.cpp \
     datamanager.cpp
 
 HEADERS += \
-    FormFiles/datamanagercontrolview.h \
+    FormFiles/bidsview.h \
     datamanager_global.h \
     datamanager.h
 
 FORMS += \
-    FormFiles/datamanagerview.ui
+    FormFiles/bidsview.ui
 
 OTHER_FILES += datamanager.json
 
