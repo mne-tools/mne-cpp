@@ -41,7 +41,7 @@
 #include "bidsview.h"
 #include "ui_bidsview.h"
 
-#include <anShared/Model/analyzedatamodel.h>
+#include <anShared/Model/bidsviewmodel.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -84,7 +84,7 @@ void BidsView::setModel(QAbstractItemModel *pModel)
             this, &BidsView::onCurrentItemChanged, Qt::UniqueConnection);
 //    connect(static_cast<ANSHAREDLIB::AnalyzeDataModel*>(pModel), &ANSHAREDLIB::AnalyzeDataModel::newFileAdded,
 //            this, &DataManagerControlView::onNewFileLoaded);
-    connect(static_cast<ANSHAREDLIB::AnalyzeDataModel*>(pModel), &ANSHAREDLIB::AnalyzeDataModel::newItemIndex,
+    connect(static_cast<ANSHAREDLIB::BidsViewModel*>(pModel), &ANSHAREDLIB::BidsViewModel::newItemIndex,
             this, &BidsView::onNewItemIndex);
 }
 
@@ -106,7 +106,7 @@ void BidsView::customMenuRequested(QPoint pos)
 //        menu->popup(m_pUi->m_pTreeView->viewport()->mapToGlobal(pos));
 //    }
 
-    ANSHAREDLIB::AnalyzeDataModel *pModel = qobject_cast<ANSHAREDLIB::AnalyzeDataModel *>(m_pUi->m_pTreeView->model());
+    ANSHAREDLIB::BidsViewModel *pModel = qobject_cast<ANSHAREDLIB::BidsViewModel *>(m_pUi->m_pTreeView->model());
     QStandardItem* pItem = pModel->itemFromIndex(m_pUi->m_pTreeView->indexAt(pos));
 
     switch (pItem->data(ITEM_TYPE).value<int>()){
