@@ -90,12 +90,13 @@ SOURCES += \
     Management/eventmanager.cpp \
     Management/statusbar.cpp \
     Model/bemdatamodel.cpp \
+    Model/bidsviewmodel.cpp \
     Model/fiffrawviewmodel.cpp \
     Model/annotationmodel.cpp \
-    Model/analyzedatamodel.cpp \
     Model/averagingdatamodel.cpp \
 
 HEADERS += \
+    Model/bidsviewmodel.h \
     anshared_global.h \
     Model/abstractmodel.h \
     Management/analyzedata.h \
@@ -112,7 +113,6 @@ HEADERS += \
     Model/bemdatamodel.h \
     Model/fiffrawviewmodel.h \
     Model/annotationmodel.h \
-    Model/analyzedatamodel.h \
     Model/averagingdatamodel.h \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
