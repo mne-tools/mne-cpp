@@ -1,13 +1,15 @@
 //=============================================================================================================
 /**
- * @file     analyzedatamodel.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>
- * @since    0.1.2
- * @date     May, 2019
+ * @file     datamanagerview.h
+ * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
+ *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
+ *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
+ * @since    0.1.0
+ * @date     August, 2018
  *
  * @section  LICENSE
  *
- * Copyright (C) 2019, Lorenz Esch. All rights reserved.
+ * Copyright (C) 2018, Lorenz Esch, Lars Debor, Simon Heinke. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -28,104 +30,117 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains declaration of AnalyzeDataModel Container class.
+ * @brief    Contains the declaration of the DataManagerView class.
  *
  */
 
-#ifndef ANALYZEDATAMODEL_H
-#define ANALYZEDATAMODEL_H
-
-#define ITEM_TYPE Qt::UserRole+2
-#define SUBJECT 1
-#define SESSION 2
-#define DATA 3
-#define AVG 4
+#ifndef DATAMANAGERVIEW_H
+#define DATAMANAGERVIEW_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../anshared_global.h"
+#include "../disp_global.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QStandardItemModel>
+#include <QWidget>
+#include <QAbstractItemModel>
+#include <QItemSelectionModel>
+#include <QStandardItem>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+namespace Ui {
+    class BidsViewWidget;
+}
+
+
 //=============================================================================================================
-// DEFINE NAMESPACE ANSHAREDLIB
+// DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
-namespace ANSHAREDLIB
+namespace DISPLIB
 {
 
-//=============================================================================================================
-// ANSHAREDLIB FORWARD DECLARATIONS
-//=============================================================================================================
 
 //=============================================================================================================
-// ENUMERATIONS
-//=============================================================================================================
-
-//=========================================================================================================
 /**
- * DECLARE CLASS AnalyzeDataModel
+ * DataManagerView Plugin Control
  *
- * @brief The AnalyzeDataModel class is the base data container.
+ * @brief The DataManagerView class provides the plugin control.
  */
-class ANSHAREDSHARED_EXPORT BidsViewModel : public QStandardItemModel
+class DISPSHARED_EXPORT BidsView : public QWidget
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<BidsViewModel> SPtr;               /**< Shared pointer type for AnalyzeDataModel. */
-    typedef QSharedPointer<const BidsViewModel> ConstSPtr;    /**< Const shared pointer type for AnalyzeDataModel. */
-
     //=========================================================================================================
     /**
-     * Constructs the Analyze Data Model.
-     */
-    BidsViewModel(QObject* pParent = Q_NULLPTR);
-
-    //=========================================================================================================
-    /**
-     * Destroys the Analyze Data Model.
-     */
-    ~BidsViewModel();
-
-    //=========================================================================================================
-    /**
-     * Adds data to the item model.
+     * Constructs the DataManagerView
      *
-     * @param[in] sSubjectName          The subject name to store the data under.
-     * @param[in] pItem                 The item to be added.
+     * @param[in] parent     If parent is not NULL the QWidget becomes a child of QWidget inside parent.
      */
-    void addData(const QString &sSubjectName,
-                 QStandardItem *pNewItem);
+    explicit BidsView(QWidget *parent = 0);
 
-    void addItemToData(QStandardItem *pNewItem,
-                       const QModelIndex &parentIndex);
+    //=========================================================================================================
+    /**
+     * Destroys the DataManagerView.
+     */
+    virtual ~BidsView();
+
+    //=========================================================================================================
+    /**
+     * Sets the model to the tree view.
+     *
+     * @param[in] pModel       The new model.
+     */
+    void setModel(QAbstractItemModel *pModel);
+
+private:
+
+    //=========================================================================================================
+    void customMenuRequested(QPoint pos);
+
+    //=========================================================================================================
+    /**
+     * Sends signal to trigger model change when a new model is selcted
+     *
+     * @param [in] selected     New item being selected
+     * @param [in] deselected   UNUSED - previously selected item
+     */
+    void onCurrentItemChanged(const QItemSelection &selected,
+                              const QItemSelection &deselected);
+
+    //=========================================================================================================
+    /**
+     * Uses the indeces of newly added subject and file to select it in the GUI view
+     *
+     * @param [in] iSubject     index of the subject the new file was added to
+     * @param [in] iModel       index of the new model file relative to the subject
+     */
+    void onNewFileLoaded(int iSubject,
+                         int iModel);
+
+    void onNewItemIndex(QModelIndex itemIndex);
+
+    void keyPressEvent(QKeyEvent *event);
+
+    Ui::BidsViewWidget *m_pUi;   /**< The user interface */
 
 signals:
-    //=========================================================================================================
-    /**
-     * Send index of newly added file model and index of subject it was added to
-     *
-     * @param [in] iSubjectIndex        index of subject that the new model was added to
-     * @param [in] iChildModelIndex     index of new model
-     */
-    void newFileAdded(int iSubjectIndex, int iChildModelIndex);
-
-    //=========================================================================================================
-    void newItemIndex(QModelIndex itemIndex);
-
+    void removeItem(const QModelIndex& pIndex);
+    void selectedModelChanged(const QVariant& data);
+    void selectedItemChanged(const QModelIndex& pIndex);
 };
-
-} //Namespace
-
-#endif //ANALYZEDATAMODEL_H
+} // NAMESPACE DISPLIB
+#endif // DATAMANAGERVIEW_H

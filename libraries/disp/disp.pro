@@ -129,6 +129,7 @@ SOURCES += \
     viewers/multiview.cpp \
     viewers/hpisettingsview.cpp \
     viewers/covariancesettingsview.cpp \
+    viewers/bidsview.cpp \
     viewers/helpers/rtfiffrawviewmodel.cpp \
     viewers/helpers/rtfiffrawviewdelegate.cpp \
     viewers/helpers/evokedsetmodel.cpp \
@@ -143,6 +144,7 @@ SOURCES += \
     viewers/helpers/draggableframelesswidget.cpp \
     viewers/helpers/frequencyspectrumdelegate.cpp \
     viewers/helpers/frequencyspectrummodel.cpp \
+    viewers/helpers/bidsviewmodel.cpp \
 
 HEADERS += \
     disp_global.h \
@@ -184,6 +186,7 @@ HEADERS += \
     viewers/multiview.h \
     viewers/hpisettingsview.h \
     viewers/covariancesettingsview.h \
+    viewers/bidsview.h \
     viewers/helpers/rtfiffrawviewdelegate.h \
     viewers/helpers/rtfiffrawviewmodel.h \
     viewers/helpers/evokedsetmodel.h \
@@ -198,6 +201,7 @@ HEADERS += \
     viewers/helpers/draggableframelesswidget.h \
     viewers/helpers/frequencyspectrumdelegate.h \
     viewers/helpers/frequencyspectrummodel.h \
+    viewers/helpers/bidsviewmodel.h \
 
 qtHaveModule(charts) {
     SOURCES += \
@@ -231,6 +235,7 @@ FORMS += \
     viewers/formfiles/scalingview.ui \
     viewers/formfiles/filtersettingsview.ui \
     viewers/formfiles/applytoview.ui \
+    viewers/formfiles/bidsview.ui \
 
 RESOURCE_FILES +=\
     $${ROOT_DIR}/resources/general/default_filters/BP_1Hz_40Hz_Fs1kHz.txt \

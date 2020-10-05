@@ -45,7 +45,7 @@
 #include "../anshared_global.h"
 #include "../Model/abstractmodel.h"
 #include "../Utils/types.h"
-#include "../Model/bidsviewmodel.h"
+#include <disp/viewers/helpers/bidsviewmodel.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -254,7 +254,7 @@ public:
     }
 
 private:
-    QPointer<BidsViewModel>          m_pData;        /**< The loaded models in form of a QStandardItemModel. */
+    QPointer<DISPLIB::BidsViewModel>          m_pData;        /**< The loaded models in form of a QStandardItemModel. */
 
     QModelIndex                         m_SelectedSubject;
     QModelIndex                         m_SelectedSession;
