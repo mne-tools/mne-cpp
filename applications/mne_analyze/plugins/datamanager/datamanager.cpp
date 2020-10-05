@@ -39,7 +39,7 @@
 //=============================================================================================================
 
 #include "datamanager.h"
-#include "FormFiles/datamanagercontrolview.h"
+#include "FormFiles/bidsview.h"
 
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Management/communicator.h>
@@ -111,17 +111,17 @@ QMenu *DataManager::getMenu()
 
 QDockWidget *DataManager::getControl()
 {
-    DataManagerControlView* pDataManagerView = new DataManagerControlView;
+    BidsView* pDataManagerView = new BidsView;
 
     pDataManagerView->setModel(m_pAnalyzeData->getDataModel());
 
-    connect(pDataManagerView, &DataManagerControlView::selectedModelChanged,
+    connect(pDataManagerView, &BidsView::selectedModelChanged,
             this, &DataManager::onCurrentlySelectedModelChanged, Qt::UniqueConnection);
 
-    connect(pDataManagerView, &DataManagerControlView::selectedItemChanged,
+    connect(pDataManagerView, &BidsView::selectedItemChanged,
             this, &DataManager::onCurrentItemChanged, Qt::UniqueConnection);
 
-    connect(pDataManagerView, &DataManagerControlView::removeItem,
+    connect(pDataManagerView, &BidsView::removeItem,
             this, &DataManager::onRemoveItem, Qt::UniqueConnection);
 
     QDockWidget* pControlDock = new QDockWidget(getName());

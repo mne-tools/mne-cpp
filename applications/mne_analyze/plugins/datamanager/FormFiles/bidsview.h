@@ -59,7 +59,7 @@
 //=============================================================================================================
 
 namespace Ui {
-    class DataManagerView;
+    class BidsViewWidget;
 }
 
 namespace ANSHARED {
@@ -72,7 +72,7 @@ namespace ANSHARED {
  *
  * @brief The DataManagerView class provides the plugin control.
  */
-class DataManagerControlView : public QWidget
+class BidsView : public QWidget
 {
     Q_OBJECT
 
@@ -83,13 +83,13 @@ public:
      *
      * @param[in] parent     If parent is not NULL the QWidget becomes a child of QWidget inside parent.
      */
-    explicit DataManagerControlView(QWidget *parent = 0);
+    explicit BidsView(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
      * Destroys the DataManagerView.
      */
-    virtual ~DataManagerControlView();
+    virtual ~BidsView();
 
     //=========================================================================================================
     /**
@@ -128,7 +128,7 @@ private:
 
     void keyPressEvent(QKeyEvent *event);
 
-    Ui::DataManagerView *m_pUi;   /**< The user interface */
+    Ui::BidsViewWidget *m_pUi;   /**< The user interface */
 
 signals:
     void removeItem(const QModelIndex& pIndex);

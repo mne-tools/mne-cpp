@@ -38,8 +38,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "datamanagercontrolview.h"
-#include "ui_datamanagerview.h"
+#include "bidsview.h"
+#include "ui_bidsview.h"
 
 #include <anShared/Model/analyzedatamodel.h>
 
@@ -57,40 +57,40 @@
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DataManagerControlView::DataManagerControlView(QWidget *parent)
+BidsView::BidsView(QWidget *parent)
 : QWidget(parent)
-, m_pUi(new Ui::DataManagerView)
+, m_pUi(new Ui::BidsViewWidget)
 {
     m_pUi->setupUi(this);
     m_pUi->m_pTreeView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(m_pUi->m_pTreeView, &QTreeView::customContextMenuRequested,
-            this, &DataManagerControlView::customMenuRequested, Qt::UniqueConnection);
+            this, &BidsView::customMenuRequested, Qt::UniqueConnection);
 }
 
 //=============================================================================================================
 
-DataManagerControlView::~DataManagerControlView()
+BidsView::~BidsView()
 {
     delete m_pUi;
 }
 
 //=============================================================================================================
 
-void DataManagerControlView::setModel(QAbstractItemModel *pModel)
+void BidsView::setModel(QAbstractItemModel *pModel)
 {
     m_pUi->m_pTreeView->setModel(pModel);
 
     connect(m_pUi->m_pTreeView->selectionModel(), &QItemSelectionModel::selectionChanged,
-            this, &DataManagerControlView::onCurrentItemChanged, Qt::UniqueConnection);
+            this, &BidsView::onCurrentItemChanged, Qt::UniqueConnection);
 //    connect(static_cast<ANSHAREDLIB::AnalyzeDataModel*>(pModel), &ANSHAREDLIB::AnalyzeDataModel::newFileAdded,
 //            this, &DataManagerControlView::onNewFileLoaded);
     connect(static_cast<ANSHAREDLIB::AnalyzeDataModel*>(pModel), &ANSHAREDLIB::AnalyzeDataModel::newItemIndex,
-            this, &DataManagerControlView::onNewItemIndex);
+            this, &BidsView::onNewItemIndex);
 }
 
 //=============================================================================================================
 
-void DataManagerControlView::customMenuRequested(QPoint pos)
+void BidsView::customMenuRequested(QPoint pos)
 {
     QString sToolTip = m_pUi->m_pTreeView->model()->data(m_pUi->m_pTreeView->indexAt(pos), Qt::ToolTipRole).toString();
 
@@ -164,8 +164,8 @@ void DataManagerControlView::customMenuRequested(QPoint pos)
 
 //=============================================================================================================
 
-void DataManagerControlView::onCurrentItemChanged(const QItemSelection &selected,
-                                                  const QItemSelection &deselected)
+void BidsView::onCurrentItemChanged(const QItemSelection &selected,
+                                           const QItemSelection &deselected)
 {
     Q_UNUSED(deselected)
     if(selected.indexes().empty()) {
@@ -185,8 +185,8 @@ void DataManagerControlView::onCurrentItemChanged(const QItemSelection &selected
 
 //=============================================================================================================
 
-void DataManagerControlView::onNewFileLoaded(int iSubject,
-                                             int iModel)
+void BidsView::onNewFileLoaded(int iSubject,
+                                      int iModel)
 {
     m_pUi->m_pTreeView->selectionModel()->select(m_pUi->m_pTreeView->model()->index(iModel, 0, m_pUi->m_pTreeView->model()->index(iSubject, 0)),
                                                  QItemSelectionModel::ClearAndSelect);
@@ -194,7 +194,7 @@ void DataManagerControlView::onNewFileLoaded(int iSubject,
 
 //=============================================================================================================
 
-void DataManagerControlView::keyPressEvent(QKeyEvent *event)
+void BidsView::keyPressEvent(QKeyEvent *event)
 {
     switch (event->key()) {
         case Qt::Key_Delete:
@@ -210,7 +210,7 @@ void DataManagerControlView::keyPressEvent(QKeyEvent *event)
 
 //=============================================================================================================
 
-void DataManagerControlView::onNewItemIndex(QModelIndex itemIndex)
+void BidsView::onNewItemIndex(QModelIndex itemIndex)
 {
     m_pUi->m_pTreeView->selectionModel()->select(itemIndex, QItemSelectionModel::ClearAndSelect);
     m_pUi->m_pTreeView->expandAll();
