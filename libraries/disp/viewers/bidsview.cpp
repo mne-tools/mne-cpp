@@ -41,7 +41,7 @@
 #include "bidsview.h"
 #include "ui_bidsview.h"
 
-#include <anShared/Model/bidsviewmodel.h>
+#include "helpers/bidsviewmodel.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -52,6 +52,12 @@
 #include <QDebug>
 #include <QMenu>
 #include <QKeyEvent>
+
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace DISPLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -84,7 +90,7 @@ void BidsView::setModel(QAbstractItemModel *pModel)
             this, &BidsView::onCurrentItemChanged, Qt::UniqueConnection);
 //    connect(static_cast<ANSHAREDLIB::AnalyzeDataModel*>(pModel), &ANSHAREDLIB::AnalyzeDataModel::newFileAdded,
 //            this, &DataManagerControlView::onNewFileLoaded);
-    connect(static_cast<ANSHAREDLIB::BidsViewModel*>(pModel), &ANSHAREDLIB::BidsViewModel::newItemIndex,
+    connect(static_cast<DISPLIB::BidsViewModel*>(pModel), &DISPLIB::BidsViewModel::newItemIndex,
             this, &BidsView::onNewItemIndex);
 }
 
@@ -106,7 +112,7 @@ void BidsView::customMenuRequested(QPoint pos)
 //        menu->popup(m_pUi->m_pTreeView->viewport()->mapToGlobal(pos));
 //    }
 
-    ANSHAREDLIB::BidsViewModel *pModel = qobject_cast<ANSHAREDLIB::BidsViewModel *>(m_pUi->m_pTreeView->model());
+    DISPLIB::BidsViewModel *pModel = qobject_cast<DISPLIB::BidsViewModel *>(m_pUi->m_pTreeView->model());
     QStandardItem* pItem = pModel->itemFromIndex(m_pUi->m_pTreeView->indexAt(pos));
 
     switch (pItem->data(ITEM_TYPE).value<int>()){

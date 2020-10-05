@@ -64,24 +64,23 @@ LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lmnecppUtilsd \
             -lmnecppFiffd \
-            -lanSharedd
+            -lanSharedd \
+            -lmnecppDispd \
 } else {
     LIBS += -lmnecppUtils \
             -lmnecppFiff \
-            -lanShared
+            -lanShared \
+            -lmnecppDisp \
 }
 
 SOURCES += \
-    FormFiles/bidsview.cpp \
     datamanager.cpp
 
 HEADERS += \
-    FormFiles/bidsview.h \
     datamanager_global.h \
     datamanager.h
 
 FORMS += \
-    FormFiles/bidsview.ui
 
 OTHER_FILES += datamanager.json
 
