@@ -90,13 +90,11 @@ SOURCES += \
     Management/eventmanager.cpp \
     Management/statusbar.cpp \
     Model/bemdatamodel.cpp \
-    Model/bidsviewmodel.cpp \
     Model/fiffrawviewmodel.cpp \
     Model/annotationmodel.cpp \
     Model/averagingdatamodel.cpp \
 
 HEADERS += \
-    Model/bidsviewmodel.h \
     anshared_global.h \
     Model/abstractmodel.h \
     Management/analyzedata.h \

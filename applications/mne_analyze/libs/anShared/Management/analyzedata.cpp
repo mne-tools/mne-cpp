@@ -64,7 +64,7 @@ using namespace ANSHAREDLIB;
 
 AnalyzeData::AnalyzeData(QObject *pParent)
 : QObject(pParent)
-, m_pData(new BidsViewModel(this))
+, m_pData(new DISPLIB::BidsViewModel(this))
 {
 
 }
