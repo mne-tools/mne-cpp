@@ -94,17 +94,72 @@ void DataManagerControlView::customMenuRequested(QPoint pos)
 {
     QString sToolTip = m_pUi->m_pTreeView->model()->data(m_pUi->m_pTreeView->indexAt(pos), Qt::ToolTipRole).toString();
 
-    if(sToolTip != "Subject item") {
-        QMenu *menu = new QMenu(this);
+//    if(sToolTip != "Subject item") {
+//        QMenu *menu = new QMenu(this);
 
-        QAction* pAction = new QAction("Remove", this);
-        connect(pAction, &QAction::triggered, [=]() {
-            emit removeItem(m_pUi->m_pTreeView->indexAt(pos));
-        });
+//        QAction* pAction = new QAction("Remove", this);
+//        connect(pAction, &QAction::triggered, [=]() {
+//            emit removeItem(m_pUi->m_pTreeView->indexAt(pos));
+//        });
 
-        menu->addAction(pAction);
-        menu->popup(m_pUi->m_pTreeView->viewport()->mapToGlobal(pos));
+//        menu->addAction(pAction);
+//        menu->popup(m_pUi->m_pTreeView->viewport()->mapToGlobal(pos));
+//    }
+
+    ANSHAREDLIB::AnalyzeDataModel *pModel = qobject_cast<ANSHAREDLIB::AnalyzeDataModel *>(m_pUi->m_pTreeView->model());
+    QStandardItem* pItem = pModel->itemFromIndex(m_pUi->m_pTreeView->indexAt(pos));
+
+    switch (pItem->data(ITEM_TYPE).value<int>()){
+        case SUBJECT: {
+            QMenu *menu = new QMenu(this);
+
+            QAction* pRemoveAction = new QAction("Remove Subject", this);
+            connect(pRemoveAction, &QAction::triggered, [=]() {
+                emit removeItem(m_pUi->m_pTreeView->indexAt(pos));
+            });
+
+            menu->addAction(pRemoveAction);
+            menu->popup(m_pUi->m_pTreeView->viewport()->mapToGlobal(pos));
+            break;
+        }
+        case SESSION: {
+            QMenu *menu = new QMenu(this);
+
+            QAction* pRemoveAction = new QAction("Remove Session", this);
+            connect(pRemoveAction, &QAction::triggered, [=]() {
+                emit removeItem(m_pUi->m_pTreeView->indexAt(pos));
+            });
+
+            QMenu* pMoveMenu = new QMenu("Move Session to ...");
+
+            menu->addMenu(pMoveMenu);
+            menu->addAction(pRemoveAction);
+            menu->popup(m_pUi->m_pTreeView->viewport()->mapToGlobal(pos));
+            break;
+        }
+        case DATA: {
+            QMenu *menu = new QMenu(this);
+
+            QAction* pRemoveAction = new QAction("Remove Data", this);
+            connect(pRemoveAction, &QAction::triggered, [=]() {
+                emit removeItem(m_pUi->m_pTreeView->indexAt(pos));
+            });
+
+            QMenu* pMoveMenu = new QMenu("Move Data to ...");
+
+            menu->addMenu(pMoveMenu);
+            menu->addAction(pRemoveAction);
+            menu->popup(m_pUi->m_pTreeView->viewport()->mapToGlobal(pos));
+            break;
+        }
+        default:{
+            qDebug() << "DataManagerControlView::customMenuRequested - default";
+        }
     }
+
+//    for(QStandardItem* item : pModel->takeColumn(0)){
+//        qDebug() << item;
+//    }
 }
 
 //=============================================================================================================
