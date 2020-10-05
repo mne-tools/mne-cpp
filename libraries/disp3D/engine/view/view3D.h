@@ -50,6 +50,7 @@
 #include <QVector3D>
 #include <QPointer>
 #include <QObjectPicker>
+#include <Qt3DCore>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -124,6 +125,24 @@ public:
      * Starts or stops to rotate all loaded 3D models.
      */
     void startStopModelRotation(bool checked);
+
+    //=========================================================================================================
+    /**
+     * Rotate camera arround given angle.
+     *
+     * @param[in] iAngle          The to rotate the camera.
+     *
+     */
+    void setCameraRotation(float fAngle);
+
+    //=========================================================================================================
+    /**
+     * Returns the camera's position via transform.
+     *
+     * @return The transform.
+     *
+     */
+    Qt3DCore::QTransform getCameraTransform();
 
     //=========================================================================================================
     /**
