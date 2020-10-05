@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     analyzedatamodel.h
+ * @file     analyzedatamodel.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>
  * @since    0.1.2
  * @date     May, 2019
@@ -28,104 +28,89 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains declaration of AnalyzeDataModel Container class.
+ * @brief    Definition of the Analyze Data Model Class.
  *
  */
-
-#ifndef ANALYZEDATAMODEL_H
-#define ANALYZEDATAMODEL_H
-
-#define ITEM_TYPE Qt::UserRole+2
-#define SUBJECT 1
-#define SESSION 2
-#define DATA 3
-#define AVG 4
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../anshared_global.h"
+#include "bidsviewmodel.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QStandardItemModel>
-
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// USED NAMESPACES
 //=============================================================================================================
 
+using namespace ANSHAREDLIB;
+
 //=============================================================================================================
-// DEFINE NAMESPACE ANSHAREDLIB
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-namespace ANSHAREDLIB
+BidsViewModel::BidsViewModel(QObject *pParent)
+: QStandardItemModel(pParent)
 {
 
-//=============================================================================================================
-// ANSHAREDLIB FORWARD DECLARATIONS
-//=============================================================================================================
+}
 
 //=============================================================================================================
-// ENUMERATIONS
-//=============================================================================================================
 
-//=========================================================================================================
-/**
- * DECLARE CLASS AnalyzeDataModel
- *
- * @brief The AnalyzeDataModel class is the base data container.
- */
-class ANSHAREDSHARED_EXPORT AnalyzeDataModel : public QStandardItemModel
+BidsViewModel::~BidsViewModel()
 {
-    Q_OBJECT
+}
 
-public:
-    typedef QSharedPointer<AnalyzeDataModel> SPtr;               /**< Shared pointer type for AnalyzeDataModel. */
-    typedef QSharedPointer<const AnalyzeDataModel> ConstSPtr;    /**< Const shared pointer type for AnalyzeDataModel. */
+//=============================================================================================================
 
-    //=========================================================================================================
-    /**
-     * Constructs the Analyze Data Model.
-     */
-    AnalyzeDataModel(QObject* pParent = Q_NULLPTR);
+void BidsViewModel::addData(const QString &sSubjectName,
+                               QStandardItem* pNewItem)
+{
+    QList<QStandardItem*> pItemList = this->findItems(sSubjectName);
 
-    //=========================================================================================================
-    /**
-     * Destroys the Analyze Data Model.
-     */
-    ~AnalyzeDataModel();
+    if(pItemList.isEmpty()) {
+        QStandardItem* pSubjectItem = new QStandardItem(sSubjectName);
+        pSubjectItem->setData(QVariant::fromValue(SUBJECT), ITEM_TYPE);
 
-    //=========================================================================================================
-    /**
-     * Adds data to the item model.
-     *
-     * @param[in] sSubjectName          The subject name to store the data under.
-     * @param[in] pItem                 The item to be added.
-     */
-    void addData(const QString &sSubjectName,
-                 QStandardItem *pNewItem);
+        QStandardItem* pSessionItem = new QStandardItem("ses-01");
+        pSessionItem->setData(QVariant::fromValue(SESSION), ITEM_TYPE);
 
-    void addItemToData(QStandardItem *pNewItem,
-                       const QModelIndex &parentIndex);
+        QStandardItem* pMEGItem = new QStandardItem("meg");
 
-signals:
-    //=========================================================================================================
-    /**
-     * Send index of newly added file model and index of subject it was added to
-     *
-     * @param [in] iSubjectIndex        index of subject that the new model was added to
-     * @param [in] iChildModelIndex     index of new model
-     */
-    void newFileAdded(int iSubjectIndex, int iChildModelIndex);
+        pNewItem->setData(QVariant::fromValue(DATA), ITEM_TYPE);
 
-    //=========================================================================================================
-    void newItemIndex(QModelIndex itemIndex);
+        pSubjectItem->setChild(pSubjectItem->rowCount(),
+                               pSessionItem);
+        pSessionItem->setChild(pSessionItem->rowCount(),
+                               pMEGItem);
+        pMEGItem->setChild(pMEGItem->rowCount(),
+                           pNewItem);
 
-};
+        this->appendRow(pSubjectItem);
 
-} //Namespace
+        emit newItemIndex(pSubjectItem->index());
+        emit newItemIndex(pSessionItem->index());
+        emit newItemIndex(pMEGItem->index());
+        emit newItemIndex(pNewItem->index());
 
-#endif //ANALYZEDATAMODEL_H
+    } else {
+        for(QStandardItem* pItem: pItemList) {
+            pItem->child(0)->child(0)->setChild(pItem->child(0)->child(0)->rowCount(),
+                                                        pNewItem);
+            emit newItemIndex(pNewItem->index());
+        }
+    }
+}
+
+//=============================================================================================================
+
+void BidsViewModel::addItemToData(QStandardItem *pNewItem,
+                                     const QModelIndex &parentIndex)
+{
+    itemFromIndex(parentIndex)->setChild(itemFromIndex(parentIndex)->rowCount(),
+                                             pNewItem);
+    emit newItemIndex(pNewItem->index());
+}
