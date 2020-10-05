@@ -378,6 +378,24 @@ void View3D::startModelRotationRecursive(QObject* pObject)
 
 //=============================================================================================================
 
+void View3D::setCameraRotation(float fAngle) {
+    m_pCamera->setPosition(QVector3D(0.0f, -0.4f, -0.25f));
+    m_pCamera->setViewCenter(QVector3D(0.0f, 0.0f, 0.0f));
+    m_pCamera->setUpVector(QVector3D(0.0f, 1.0f, 0.0f));
+    m_pCamera->tiltAboutViewCenter(180);
+    QQuaternion quat = QQuaternion::QQuaternion::fromEulerAngles(0,0,fAngle);
+    m_pCamera->rotateAboutViewCenter(quat);
+}
+
+//=============================================================================================================
+
+//Qt3DCore::QTransform View3D::getCameraTransform() {
+//    Qt3DCore::QTransform trans = *new Qt3DCore::QTransform(m_pCamera->transform());
+//    return trans;
+//}
+
+//=============================================================================================================
+
 void View3D::startStopModelRotation(bool checked)
 {
     if(checked) {
