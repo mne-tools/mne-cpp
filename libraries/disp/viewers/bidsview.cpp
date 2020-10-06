@@ -143,7 +143,7 @@ void BidsView::customMenuRequested(QPoint pos)
             menu->popup(m_pUi->m_pTreeView->viewport()->mapToGlobal(pos));
             break;
         }
-        case DATA: {
+        case MEGDATA: {
             QMenu *menu = new QMenu(this);
 
             QAction* pRemoveAction = new QAction("Remove Data", this);
@@ -220,4 +220,6 @@ void BidsView::onNewItemIndex(QModelIndex itemIndex)
 {
     m_pUi->m_pTreeView->selectionModel()->select(itemIndex, QItemSelectionModel::ClearAndSelect);
     m_pUi->m_pTreeView->expand(itemIndex.parent());
+    m_pUi->m_pTreeView->expand(itemIndex);
+//    m_pUi->m_pTreeView->expandAll();
 }
