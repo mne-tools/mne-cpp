@@ -37,6 +37,7 @@
 //=============================================================================================================
 
 #include "bidsviewmodel.h"
+#include <iostream>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -74,30 +75,7 @@ void BidsViewModel::addData(const QString &sSubjectName,
     QList<QStandardItem*> pItemList = this->findItems(sSubjectName);
 
     if(pItemList.isEmpty()) {
-        QStandardItem* pSubjectItem = new QStandardItem(sSubjectName);
-        pSubjectItem->setData(QVariant::fromValue(SUBJECT), ITEM_TYPE);
-
-        QStandardItem* pSessionItem = new QStandardItem("ses-01");
-        pSessionItem->setData(QVariant::fromValue(SESSION), ITEM_TYPE);
-
-        QStandardItem* pMEGItem = new QStandardItem("meg");
-
-        pNewItem->setData(QVariant::fromValue(DATA), ITEM_TYPE);
-
-        pSubjectItem->setChild(pSubjectItem->rowCount(),
-                               pSessionItem);
-        pSessionItem->setChild(pSessionItem->rowCount(),
-                               pMEGItem);
-        pMEGItem->setChild(pMEGItem->rowCount(),
-                           pNewItem);
-
-        this->appendRow(pSubjectItem);
-
-        emit newItemIndex(pSubjectItem->index());
-        emit newItemIndex(pSessionItem->index());
-        emit newItemIndex(pMEGItem->index());
-        emit newItemIndex(pNewItem->index());
-
+        addMegDataToSession(addSessionToSubject(addSubject(sSubjectName), "ses-01"), pNewItem);
     } else {
         for(QStandardItem* pItem: pItemList) {
             pItem->child(0)->child(0)->setChild(pItem->child(0)->child(0)->rowCount(),
@@ -118,7 +96,7 @@ void BidsViewModel::addItemToData(QStandardItem *pNewItem,
 }
 //=============================================================================================================
 
-bool BidsViewModel::addSubject(const QString &sSubjectName)
+QModelIndex BidsViewModel::addSubject(const QString &sSubjectName)
 {
     //Ensure subject name follow BIDS format
     QString sNewSubjectName;
@@ -138,12 +116,14 @@ bool BidsViewModel::addSubject(const QString &sSubjectName)
     pSubjectItem->setData(QVariant::fromValue(SUBJECT), ITEM_TYPE);
     pSubjectItem->setData(QVariant::fromValue(pSubjectItem->index()), ITEM_SUBJECT);
 
-    return true;
+    emit newItemIndex(pSubjectItem->index());
+
+    return pSubjectItem->index();
 }
 
 //=============================================================================================================
 
-bool BidsViewModel::addSessionToSubject(const QString &sSubjectName,
+QModelIndex BidsViewModel::addSessionToSubject(const QString &sSubjectName,
                                         const QString &sSessionName)
 {
     //Ensure session name follow BIDS format
@@ -166,8 +146,10 @@ bool BidsViewModel::addSessionToSubject(const QString &sSubjectName,
         bRepeat = true;
     } else if (listItems.size() == 0) {
         qWarning() << "[BidsViewModel::addSessionToSubject] No Subject found with name:" << sSubjectName;
-        return false;
+        return QModelIndex();
     }
+
+    QStandardItem* pNewSessionItem;
 
     //Add session to subjects with mathcing names. Renames them if multiple.
     for (int i = 0; i < listItems.size(); i++){
@@ -177,21 +159,23 @@ bool BidsViewModel::addSessionToSubject(const QString &sSubjectName,
             pSubjectItem->setText(pSubjectItem->text() + QString::number(i + 1));
         }
 
-        QStandardItem* pNewSessionItem = new QStandardItem(sNewSessionName);
+        pNewSessionItem = new QStandardItem(sNewSessionName);
         pSubjectItem->setChild(pSubjectItem->rowCount(),
                                pNewSessionItem);
 
         pNewSessionItem->setData(QVariant::fromValue(SESSION), ITEM_TYPE);
         pNewSessionItem->setData(QVariant::fromValue(pSubjectItem->index()), ITEM_SUBJECT);
         pNewSessionItem->setData(QVariant::fromValue(pNewSessionItem->index()), ITEM_SESSION);
+
+        emit newItemIndex(pNewSessionItem->index());
     }
 
-    return true;
+    return pNewSessionItem->index();
 }
 
 //=============================================================================================================
 
-bool BidsViewModel::addSessionToSubject(QModelIndex subjectIndex,
+QModelIndex BidsViewModel::addSessionToSubject(QModelIndex subjectIndex,
                                         const QString &sSessionName)
 {
     //Ensure session name follow BIDS format
@@ -211,8 +195,54 @@ bool BidsViewModel::addSessionToSubject(QModelIndex subjectIndex,
                            pNewSessionItem);
 
     pNewSessionItem->setData(QVariant::fromValue(SESSION), ITEM_TYPE);
-    pNewSessionItem->setData(QVariant::fromValue(pSubjectItem->index()), ITEM_SUBJECT);
+    pNewSessionItem->setData(QVariant::fromValue(subjectIndex), ITEM_SUBJECT);
     pNewSessionItem->setData(QVariant::fromValue(pNewSessionItem->index()), ITEM_SESSION);
 
-    return true;
+    emit newItemIndex(pNewSessionItem->index());
+
+    return pNewSessionItem->index();
+}
+
+//=============================================================================================================
+
+QModelIndex BidsViewModel::addMegDataToSession(QModelIndex sessionIndex,
+                                               QStandardItem *pNewItem)
+{
+    QStandardItem* pSessionItem = itemFromIndex(sessionIndex);
+    bool bMegFolder = false;
+    int iMegFolder = 0;
+
+    std::cout << "1";
+
+    for(iMegFolder; iMegFolder < pSessionItem->rowCount(); iMegFolder++){
+        if (pSessionItem->child(iMegFolder)->text() == "meg"){
+            bMegFolder = true;
+            break;
+        }
+    }
+
+    std::cout << "2";
+
+    if(!bMegFolder) {
+        QStandardItem* pMEGItem = new QStandardItem("meg");
+        pSessionItem->setChild(pSessionItem->rowCount(),
+                               pMEGItem);
+        pMEGItem->setChild(pMEGItem->rowCount(),
+                           pNewItem);
+    } else {
+        pSessionItem->child(iMegFolder)->setChild(pSessionItem->child(iMegFolder)->rowCount(),
+                                                  pNewItem);
+    }
+
+    std::cout << "3";
+
+    pNewItem->setData(QVariant::fromValue(MEGDATA), ITEM_TYPE);
+    pNewItem->setData(QVariant::fromValue(sessionIndex), ITEM_SESSION);
+    pNewItem->setData(itemFromIndex(sessionIndex)->data(ITEM_SUBJECT), ITEM_SUBJECT);
+
+    emit newItemIndex(pNewItem->index());
+
+    std::cout << "4";
+
+    return pNewItem->index();
 }
