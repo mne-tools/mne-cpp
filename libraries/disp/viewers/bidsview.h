@@ -131,8 +131,20 @@ private:
     void onNewFileLoaded(int iSubject,
                          int iModel);
 
+    //=========================================================================================================
+    /**
+     * Select new item and expands parent's tree view heirarchy
+     *
+     * @param [in] itemIndex    new item to be selected
+     */
     void onNewItemIndex(QModelIndex itemIndex);
 
+    //=========================================================================================================
+    /**
+     * Procss keyobard input. Currently only delete.
+     *
+     * @param [in] event    Key event for delete key to delete selected item
+     */
     void keyPressEvent(QKeyEvent *event);
 
     Ui::BidsViewWidget *m_pUi;   /**< The user interface */

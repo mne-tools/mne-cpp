@@ -219,5 +219,5 @@ void BidsView::keyPressEvent(QKeyEvent *event)
 void BidsView::onNewItemIndex(QModelIndex itemIndex)
 {
     m_pUi->m_pTreeView->selectionModel()->select(itemIndex, QItemSelectionModel::ClearAndSelect);
-    m_pUi->m_pTreeView->expandAll();
+    m_pUi->m_pTreeView->expand(itemIndex.parent());
 }
