@@ -42,6 +42,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QtDebug>
+
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -113,4 +115,104 @@ void BidsViewModel::addItemToData(QStandardItem *pNewItem,
     itemFromIndex(parentIndex)->setChild(itemFromIndex(parentIndex)->rowCount(),
                                              pNewItem);
     emit newItemIndex(pNewItem->index());
+}
+//=============================================================================================================
+
+bool BidsViewModel::addSubject(const QString &sSubjectName)
+{
+    //Ensure subject name follow BIDS format
+    QString sNewSubjectName;
+
+    if(!sSubjectName.startsWith("sub-")){
+        sNewSubjectName = "sub-" + sSubjectName;
+    } else {
+        sNewSubjectName = sSubjectName;
+    }
+
+    sNewSubjectName.remove(" ");
+
+    //Add subject to model
+    QStandardItem* pSubjectItem = new QStandardItem(sNewSubjectName);
+    appendRow(pSubjectItem);
+
+    pSubjectItem->setData(QVariant::fromValue(SUBJECT), ITEM_TYPE);
+    pSubjectItem->setData(QVariant::fromValue(pSubjectItem->index()), ITEM_SUBJECT);
+
+    return true;
+}
+
+//=============================================================================================================
+
+bool BidsViewModel::addSessionToSubject(const QString &sSubjectName,
+                                        const QString &sSessionName)
+{
+    //Ensure session name follow BIDS format
+    QString sNewSessionName;
+
+    if(!sSessionName.startsWith("ses-")){
+        sNewSessionName = "ses-" + sSessionName;
+    } else {
+        sNewSessionName = sSessionName;
+    }
+
+    sNewSessionName.remove(" ");
+
+    QList<QStandardItem*> listItems = findItems(sSubjectName);
+    bool bRepeat = false;
+
+    //Check for repeated names, no names
+    if (listItems.size() > 1) {
+        qWarning() << "[BidsViewModel::addSessionToSubject] Multiple subjects with same name";
+        bRepeat = true;
+    } else if (listItems.size() == 0) {
+        qWarning() << "[BidsViewModel::addSessionToSubject] No Subject found with name:" << sSubjectName;
+        return false;
+    }
+
+    //Add session to subjects with mathcing names. Renames them if multiple.
+    for (int i = 0; i < listItems.size(); i++){
+        QStandardItem* pSubjectItem = listItems.at(i);
+
+        if(bRepeat){
+            pSubjectItem->setText(pSubjectItem->text() + QString::number(i + 1));
+        }
+
+        QStandardItem* pNewSessionItem = new QStandardItem(sNewSessionName);
+        pSubjectItem->setChild(pSubjectItem->rowCount(),
+                               pNewSessionItem);
+
+        pNewSessionItem->setData(QVariant::fromValue(SESSION), ITEM_TYPE);
+        pNewSessionItem->setData(QVariant::fromValue(pSubjectItem->index()), ITEM_SUBJECT);
+        pNewSessionItem->setData(QVariant::fromValue(pNewSessionItem->index()), ITEM_SESSION);
+    }
+
+    return true;
+}
+
+//=============================================================================================================
+
+bool BidsViewModel::addSessionToSubject(QModelIndex subjectIndex,
+                                        const QString &sSessionName)
+{
+    //Ensure session name follow BIDS format
+    QString sNewSessionName;
+
+    if(!sSessionName.startsWith("ses-")){
+        sNewSessionName = "ses-" + sSessionName;
+    } else {
+        sNewSessionName = sSessionName;
+    }
+
+    sNewSessionName.remove(" ");
+
+    QStandardItem* pSubjectItem = itemFromIndex(subjectIndex);
+    QStandardItem* pNewSessionItem = new QStandardItem(sNewSessionName);
+    pSubjectItem->setChild(pSubjectItem->rowCount(),
+                           pNewSessionItem);
+
+    pNewSessionItem->setData(QVariant::fromValue(SESSION), ITEM_TYPE);
+    pNewSessionItem->setData(QVariant::fromValue(pSubjectItem->index()), ITEM_SUBJECT);
+    pNewSessionItem->setData(QVariant::fromValue(pNewSessionItem->index()), ITEM_SESSION);
+
+    return true;
 }

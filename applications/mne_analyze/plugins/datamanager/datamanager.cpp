@@ -111,22 +111,22 @@ QMenu *DataManager::getMenu()
 
 QDockWidget *DataManager::getControl()
 {
-    DISPLIB::BidsView* pDataManagerView = new DISPLIB::BidsView;
+    DISPLIB::BidsView* pDataManagerBidsView = new DISPLIB::BidsView;
 
-    pDataManagerView->setModel(m_pAnalyzeData->getDataModel());
+    pDataManagerBidsView->setModel(m_pAnalyzeData->getDataModel());
 
-    connect(pDataManagerView, &DISPLIB::BidsView::selectedModelChanged,
+    connect(pDataManagerBidsView, &DISPLIB::BidsView::selectedModelChanged,
             this, &DataManager::onCurrentlySelectedModelChanged, Qt::UniqueConnection);
 
-    connect(pDataManagerView, &DISPLIB::BidsView::selectedItemChanged,
+    connect(pDataManagerBidsView, &DISPLIB::BidsView::selectedItemChanged,
             this, &DataManager::onCurrentItemChanged, Qt::UniqueConnection);
 
-    connect(pDataManagerView, &DISPLIB::BidsView::removeItem,
+    connect(pDataManagerBidsView, &DISPLIB::BidsView::removeItem,
             this, &DataManager::onRemoveItem, Qt::UniqueConnection);
 
     QDockWidget* pControlDock = new QDockWidget(getName());
     pControlDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    pControlDock->setWidget(pDataManagerView);
+    pControlDock->setWidget(pDataManagerBidsView);
     pControlDock->setObjectName(getName());
 
     return pControlDock;

@@ -36,10 +36,14 @@
 #define ANALYZEDATAMODEL_H
 
 #define ITEM_TYPE Qt::UserRole+2
+#define ITEM_SUBJECT Qt::UserRole+3
+#define ITEM_SESSION Qt::UserRole+4
+
 #define SUBJECT 1
 #define SESSION 2
 #define DATA 3
 #define AVG 4
+
 
 //=============================================================================================================
 // INCLUDES
@@ -108,20 +112,58 @@ public:
     void addData(const QString &sSubjectName,
                  QStandardItem *pNewItem);
 
+    //=========================================================================================================
+    /**
+     * Adds a sub-item to a data item (ex. an average)
+     *
+     * @param [in] pNewItem     item to be added
+     * @param [in] parentIndex  index of where the nitem should be added
+     */
     void addItemToData(QStandardItem *pNewItem,
                        const QModelIndex &parentIndex);
 
-signals:
     //=========================================================================================================
     /**
-     * Send index of newly added file model and index of subject it was added to
+     * Adds subject with given input name
      *
-     * @param [in] iSubjectIndex        index of subject that the new model was added to
-     * @param [in] iChildModelIndex     index of new model
+     * @param [in] sSubjectName     name of subject name
+     *
+     * @return  returns true if successful, false if not
      */
-    void newFileAdded(int iSubjectIndex, int iChildModelIndex);
+    bool addSubject(const QString &sSubjectName);
 
     //=========================================================================================================
+    /**
+     * Adds session named after sSessionName to subjects names sSubjectName
+     *
+     * @param [in] sSubjectName     Name of subject to which session will be added
+     * @param [in] sSessionName     Name of session to add
+     *
+     * @return  returns true if successful, false if not
+     */
+    bool addSessionToSubject(const QString &sSubjectName,
+                             const QString &sSessionName);
+
+    //=========================================================================================================
+    /**
+     * Adds session named after sSessionName to subject at subjectIndex
+     *
+     * @param [in] subjectIndex     Index of subject tow which session will be added
+     * @param [in] sSessionName     Name of session to add
+     *
+     * @return  returns true if successful, false if not
+     */
+    bool addSessionToSubject(QModelIndex subjectIndex,
+                             const QString &sSessionName);
+
+signals:
+
+    //=========================================================================================================
+    /**
+     * Emit index of newly added items to be selected
+     *
+     * @param [in] itemIndex    index of new item
+     */
     void newItemIndex(QModelIndex itemIndex);
 
 };
