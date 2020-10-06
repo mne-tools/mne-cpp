@@ -238,7 +238,7 @@ void AnalyzeData::newSelection(const QModelIndex &index)
             qDebug() << "AnalyzeData::newSelection - Updating Session";
             m_SelectedSession = index;
             break;
-        case DATA:
+        case MEGDATA:
             qDebug() << "AnalyzeData::newSelection - Updating Data";
             m_SelectedData = index;
             break;

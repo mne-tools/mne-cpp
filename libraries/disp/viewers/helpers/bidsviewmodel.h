@@ -35,15 +35,21 @@
 #ifndef ANALYZEDATAMODEL_H
 #define ANALYZEDATAMODEL_H
 
-#define ITEM_TYPE Qt::UserRole+2
-#define ITEM_SUBJECT Qt::UserRole+3
-#define ITEM_SESSION Qt::UserRole+4
+//=============================================================================================================
+// DEFINE MACROS
+//=============================================================================================================
 
-#define SUBJECT 1
-#define SESSION 2
-#define DATA 3
-#define AVG 4
+//USER ROLES
+#define ITEM_TYPE       Qt::UserRole+2
+#define ITEM_SUBJECT    Qt::UserRole+3
+#define ITEM_SESSION    Qt::UserRole+4
 
+//ITEM TYPES
+#define SUBJECT     1
+#define SESSION     2
+#define MEGDATA     3
+#define AVG         4
+#define ANATDATA    5
 
 //=============================================================================================================
 // INCLUDES
@@ -128,9 +134,9 @@ public:
      *
      * @param [in] sSubjectName     name of subject name
      *
-     * @return  returns true if successful, false if not
+     * @return  index of newly added item
      */
-    bool addSubject(const QString &sSubjectName);
+    QModelIndex addSubject(const QString &sSubjectName);
 
     //=========================================================================================================
     /**
@@ -139,22 +145,34 @@ public:
      * @param [in] sSubjectName     Name of subject to which session will be added
      * @param [in] sSessionName     Name of session to add
      *
-     * @return  returns true if successful, false if not
+     * @return  index of newly added item
      */
-    bool addSessionToSubject(const QString &sSubjectName,
-                             const QString &sSessionName);
+    QModelIndex addSessionToSubject(const QString &sSubjectName,
+                                    const QString &sSessionName);
 
     //=========================================================================================================
     /**
      * Adds session named after sSessionName to subject at subjectIndex
      *
-     * @param [in] subjectIndex     Index of subject tow which session will be added
+     * @param [in] subjectIndex     Index of subject to which session will be added
      * @param [in] sSessionName     Name of session to add
      *
-     * @return  returns true if successful, false if not
+     * @return  index of newly added item
      */
-    bool addSessionToSubject(QModelIndex subjectIndex,
-                             const QString &sSessionName);
+    QModelIndex addSessionToSubject(QModelIndex subjectIndex,
+                                    const QString &sSessionName);
+
+    //=========================================================================================================
+    /**
+     * @brief addMegDataToSession
+     *
+     * @param [in] sessionIndex     Index of session to which meg data will be added
+     * @param [in] pNewItem         New item to be added.
+     *
+     * @return index of newly added item
+     */
+    QModelIndex addMegDataToSession(QModelIndex sessionIndex,
+                                    QStandardItem* pNewItem);
 
 signals:
 
