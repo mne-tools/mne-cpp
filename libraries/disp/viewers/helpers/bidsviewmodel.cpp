@@ -287,6 +287,16 @@ QModelIndex BidsViewModel::moveSessionToSubject(QModelIndex subjectIndex,
 QModelIndex BidsViewModel::moveDataToSession(QModelIndex sessionIndex,
                                              QModelIndex dataIndex)
 {
-    qDebug() << "BidsViewModel::moveDataToSession -- not yet implemented";
-    return QModelIndex();
+    beginResetModel();
+
+    QStandardItem* sessionItem = itemFromIndex(sessionIndex);
+    QStandardItem* dataItem = itemFromIndex(dataIndex);
+
+    dataItem->parent()->takeRow(dataItem->row()).first();
+
+    QModelIndex newIndex = addMegDataToSession(sessionIndex,
+                                               dataItem->parent()->takeRow(dataItem->row()).first());
+
+    endResetModel();
+    return newIndex();
 }
