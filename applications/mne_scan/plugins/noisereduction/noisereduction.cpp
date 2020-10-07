@@ -180,7 +180,7 @@ IPlugin::PluginType NoiseReduction::getType() const
 
 QString NoiseReduction::getName() const
 {
-    return "Filter";
+    return "Noise";
 }
 
 //=============================================================================================================
