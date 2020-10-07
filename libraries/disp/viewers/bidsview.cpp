@@ -92,6 +92,14 @@ void BidsView::setModel(QAbstractItemModel *pModel)
 //            this, &DataManagerControlView::onNewFileLoaded);
     connect(static_cast<DISPLIB::BidsViewModel*>(pModel), &DISPLIB::BidsViewModel::newItemIndex,
             this, &BidsView::onNewItemIndex);
+
+    //Connect BIDS Model Functions
+    DISPLIB::BidsViewModel *pBidsModel = qobject_cast<DISPLIB::BidsViewModel *>(pModel);
+
+    connect(this, &BidsView::onAddSubject,
+            pBidsModel, &BidsViewModel::addSubject);
+    connect(this, SIGNAL(onAddSession(QModelIndex, const QString&)),
+            pBidsModel, SLOT(addSessionToSubject(QModelIndex, const QString&)));
 }
 
 //=============================================================================================================
@@ -100,72 +108,76 @@ void BidsView::customMenuRequested(QPoint pos)
 {
     QString sToolTip = m_pUi->m_pTreeView->model()->data(m_pUi->m_pTreeView->indexAt(pos), Qt::ToolTipRole).toString();
 
-//    if(sToolTip != "Subject item") {
-//        QMenu *menu = new QMenu(this);
-
-//        QAction* pAction = new QAction("Remove", this);
-//        connect(pAction, &QAction::triggered, [=]() {
-//            emit removeItem(m_pUi->m_pTreeView->indexAt(pos));
-//        });
-
-//        menu->addAction(pAction);
-//        menu->popup(m_pUi->m_pTreeView->viewport()->mapToGlobal(pos));
-//    }
-
     DISPLIB::BidsViewModel *pModel = qobject_cast<DISPLIB::BidsViewModel *>(m_pUi->m_pTreeView->model());
-    QStandardItem* pItem = pModel->itemFromIndex(m_pUi->m_pTreeView->indexAt(pos));
 
-    switch (pItem->data(ITEM_TYPE).value<int>()){
-        case SUBJECT: {
-            QMenu *menu = new QMenu(this);
+    if(m_pUi->m_pTreeView->indexAt(pos).isValid()){
+        QStandardItem* pItem = pModel->itemFromIndex(m_pUi->m_pTreeView->indexAt(pos));
 
-            QAction* pRemoveAction = new QAction("Remove Subject", this);
-            connect(pRemoveAction, &QAction::triggered, [=]() {
-                emit removeItem(m_pUi->m_pTreeView->indexAt(pos));
-            });
+        switch (pItem->data(ITEM_TYPE).value<int>()){
+            case SUBJECT: {
+                QMenu *menu = new QMenu(this);
 
-            menu->addAction(pRemoveAction);
-            menu->popup(m_pUi->m_pTreeView->viewport()->mapToGlobal(pos));
-            break;
+                QAction* pAddSessionAction = new QAction("Add Session", this);
+                connect(pAddSessionAction, &QAction::triggered, [=]() {
+                    qDebug() << "Hello";
+                    emit onAddSession(pItem->index(), "test");
+                });
+
+                QAction* pRemoveAction = new QAction("Remove Subject", this);
+                connect(pRemoveAction, &QAction::triggered, [=]() {
+                    emit removeItem(m_pUi->m_pTreeView->indexAt(pos));
+                });
+
+                menu->addAction(pAddSessionAction);
+                menu->addAction(pRemoveAction);
+                menu->popup(m_pUi->m_pTreeView->viewport()->mapToGlobal(pos));
+                break;
+            }
+            case SESSION: {
+                QMenu *menu = new QMenu(this);
+
+                QAction* pRemoveAction = new QAction("Remove Session", this);
+                connect(pRemoveAction, &QAction::triggered, [=]() {
+                    emit removeItem(m_pUi->m_pTreeView->indexAt(pos));
+                });
+
+                QMenu* pMoveMenu = new QMenu("Move Session to ...");
+
+                menu->addMenu(pMoveMenu);
+                menu->addAction(pRemoveAction);
+                menu->popup(m_pUi->m_pTreeView->viewport()->mapToGlobal(pos));
+                break;
+            }
+            case MEGDATA: {
+                QMenu *menu = new QMenu(this);
+
+                QAction* pRemoveAction = new QAction("Remove Data", this);
+                connect(pRemoveAction, &QAction::triggered, [=]() {
+                    emit removeItem(m_pUi->m_pTreeView->indexAt(pos));
+                });
+
+                QMenu* pMoveMenu = new QMenu("Move Data to ...");
+
+                menu->addMenu(pMoveMenu);
+                menu->addAction(pRemoveAction);
+                menu->popup(m_pUi->m_pTreeView->viewport()->mapToGlobal(pos));
+                break;
+            }
+            default:{
+                qDebug() << "DataManagerControlView::customMenuRequested - default";
+            }
         }
-        case SESSION: {
-            QMenu *menu = new QMenu(this);
+    } else {
+        QMenu *menu = new QMenu(this);
 
-            QAction* pRemoveAction = new QAction("Remove Session", this);
-            connect(pRemoveAction, &QAction::triggered, [=]() {
-                emit removeItem(m_pUi->m_pTreeView->indexAt(pos));
-            });
+        QAction* pAddSubjectAction = new QAction("Add Subject", this);
+        connect(pAddSubjectAction, &QAction::triggered, [=]() {
+            emit onAddSubject("test");
+        });
 
-            QMenu* pMoveMenu = new QMenu("Move Session to ...");
-
-            menu->addMenu(pMoveMenu);
-            menu->addAction(pRemoveAction);
-            menu->popup(m_pUi->m_pTreeView->viewport()->mapToGlobal(pos));
-            break;
-        }
-        case MEGDATA: {
-            QMenu *menu = new QMenu(this);
-
-            QAction* pRemoveAction = new QAction("Remove Data", this);
-            connect(pRemoveAction, &QAction::triggered, [=]() {
-                emit removeItem(m_pUi->m_pTreeView->indexAt(pos));
-            });
-
-            QMenu* pMoveMenu = new QMenu("Move Data to ...");
-
-            menu->addMenu(pMoveMenu);
-            menu->addAction(pRemoveAction);
-            menu->popup(m_pUi->m_pTreeView->viewport()->mapToGlobal(pos));
-            break;
-        }
-        default:{
-            qDebug() << "DataManagerControlView::customMenuRequested - default";
-        }
+        menu->addAction(pAddSubjectAction);
+        menu->popup(m_pUi->m_pTreeView->viewport()->mapToGlobal(pos));
     }
-
-//    for(QStandardItem* item : pModel->takeColumn(0)){
-//        qDebug() << item;
-//    }
 }
 
 //=============================================================================================================
