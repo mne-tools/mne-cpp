@@ -105,6 +105,8 @@ void BidsView::setModel(QAbstractItemModel *pModel)
     //Moving
     connect(this, &BidsView::onMoveSession,
             pBidsModel, &BidsViewModel::moveSessionToSubject);
+    connect(this, &BidsView::onMoveData,
+            pBidsModel, &BidsViewModel::moveDataToSession);
 }
 
 //=============================================================================================================
@@ -149,8 +151,11 @@ void BidsView::customMenuRequested(QPoint pos)
 
                 QMenu* pMoveMenu = new QMenu("Move Session to ...");
 
+                //Find all available subjects
                 for(int i = 0; i < pModel->rowCount(); i++){
-                    if(pModel->item(i)->index() != pItem->data(SUBJECT).value<QModelIndex>()){
+                    if(pModel->item(i)->index() != pItem->data(ITEM_SUBJECT).value<QModelIndex>()){
+                        qDebug() << "Relative model index" << pModel->item(i)->index();
+                        qDebug() << "Relative item index" << pItem->data(ITEM_SUBJECT).value<QModelIndex>();
                         QAction* pTargetAction = new QAction(pModel->item(i)->text());
                         connect(pTargetAction, &QAction::triggered, [=] () {
                             emit onMoveSession(pModel->item(i)->index(), pItem->index());
@@ -176,7 +181,23 @@ void BidsView::customMenuRequested(QPoint pos)
 
                 QMenu* pMoveMenu = new QMenu("Move Data to ...");
 
-                menu->addMenu(pMoveMenu);
+                //Find all available sessions
+                for(int i = 0; i < pModel->rowCount(); i++){
+                    QMenu* pSubjectMenu = new QMenu(pModel->item(i)->text());
+                    for (int j = 0; j < pModel->item(i)->rowCount(); j++){
+                        QAction* pTargetAction = new QAction(pModel->item(i)->child(j)->text());
+                        connect(pTargetAction, &QAction::triggered, [=] {
+                            emit onMoveData(pModel->item(i)->child(j)->index(), pItem->index());
+                        });
+                    }
+                    if(!pSubjectMenu->isEmpty()){
+                        pMoveMenu->addMenu(pSubjectMenu);
+                    }
+                }
+
+                if (!pMoveMenu->isEmpty()){
+                    menu->addMenu(pMoveMenu);
+                }
                 menu->addAction(pRemoveAction);
                 menu->popup(m_pUi->m_pTreeView->viewport()->mapToGlobal(pos));
                 break;
