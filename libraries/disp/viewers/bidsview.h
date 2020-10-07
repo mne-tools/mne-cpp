@@ -64,14 +64,12 @@ namespace Ui {
     class BidsViewWidget;
 }
 
-
 //=============================================================================================================
 // DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
 namespace DISPLIB
 {
-
 
 //=============================================================================================================
 /**
@@ -153,6 +151,9 @@ signals:
     void removeItem(const QModelIndex& pIndex);
     void selectedModelChanged(const QVariant& data);
     void selectedItemChanged(const QModelIndex& pIndex);
+    void onAddSubject(const QString &sSubjectName);
+    void onAddSession(QModelIndex subjectIndex,
+                      const QString &sSessionName);
 };
 } // NAMESPACE DISPLIB
 #endif // DATAMANAGERVIEW_H

@@ -77,6 +77,7 @@ void BidsViewModel::addData(const QString &sSubjectName,
     if(pItemList.isEmpty()) {
         addMegDataToSession(addSessionToSubject(addSubject(sSubjectName), "ses-01"), pNewItem);
     } else {
+
         for(QStandardItem* pItem: pItemList) {
             pItem->child(0)->child(0)->setChild(pItem->child(0)->child(0)->rowCount(),
                                                         pNewItem);
@@ -212,8 +213,6 @@ QModelIndex BidsViewModel::addMegDataToSession(QModelIndex sessionIndex,
     bool bMegFolder = false;
     int iMegFolder = 0;
 
-    std::cout << "1";
-
     for(iMegFolder; iMegFolder < pSessionItem->rowCount(); iMegFolder++){
         if (pSessionItem->child(iMegFolder)->text() == "meg"){
             bMegFolder = true;
@@ -221,10 +220,10 @@ QModelIndex BidsViewModel::addMegDataToSession(QModelIndex sessionIndex,
         }
     }
 
-    std::cout << "2";
-
     if(!bMegFolder) {
         QStandardItem* pMEGItem = new QStandardItem("meg");
+        pMEGItem->setData(QVariant::fromValue(FOLDER), ITEM_TYPE);
+
         pSessionItem->setChild(pSessionItem->rowCount(),
                                pMEGItem);
         pMEGItem->setChild(pMEGItem->rowCount(),
@@ -234,15 +233,11 @@ QModelIndex BidsViewModel::addMegDataToSession(QModelIndex sessionIndex,
                                                   pNewItem);
     }
 
-    std::cout << "3";
-
     pNewItem->setData(QVariant::fromValue(MEGDATA), ITEM_TYPE);
     pNewItem->setData(QVariant::fromValue(sessionIndex), ITEM_SESSION);
     pNewItem->setData(itemFromIndex(sessionIndex)->data(ITEM_SUBJECT), ITEM_SUBJECT);
 
     emit newItemIndex(pNewItem->index());
-
-    std::cout << "4";
 
     return pNewItem->index();
 }

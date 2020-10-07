@@ -208,25 +208,6 @@ bool AnalyzeData::removeModel(const QModelIndex& index)
 
 //=============================================================================================================
 
-QStandardItem* AnalyzeData::addSubject(const QString &sSubjectName)
-{
-    QStandardItem* pSubjectItem = new QStandardItem(sSubjectName);
-    m_pData->appendRow(pSubjectItem);
-    return pSubjectItem;
-}
-
-//=============================================================================================================
-
-void AnalyzeData::addSession(const QString &sSessionName)
-{
-    QStandardItem* pSessionItem = new QStandardItem(sSessionName);
-    QStandardItem *pSubjectItem = m_pData->itemFromIndex(m_SelectedSubject);
-    pSubjectItem->setChild(pSubjectItem->rowCount(),
-                           pSessionItem);
-}
-
-//=============================================================================================================
-
 void AnalyzeData::newSelection(const QModelIndex &index)
 {
     switch(m_pData->itemFromIndex(index)->data(ITEM_TYPE).value<int>()){
@@ -246,25 +227,4 @@ void AnalyzeData::newSelection(const QModelIndex &index)
             qDebug() << "AnalyzeData::newSelection - Updating nothing";
             break;
     }
-}
-
-//=============================================================================================================
-
-QModelIndex AnalyzeData::getSelectedSubject()
-{
-    return m_SelectedSubject;
-}
-
-//=============================================================================================================
-
-QModelIndex AnalyzeData::getSelectedSession()
-{
-    return m_SelectedSession;
-}
-
-//=============================================================================================================
-
-QModelIndex AnalyzeData::getSelectedData()
-{
-    return m_SelectedData;
 }
