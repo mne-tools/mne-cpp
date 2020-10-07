@@ -96,10 +96,15 @@ void BidsView::setModel(QAbstractItemModel *pModel)
     //Connect BIDS Model Functions
     DISPLIB::BidsViewModel *pBidsModel = qobject_cast<DISPLIB::BidsViewModel *>(pModel);
 
+    //Adding
     connect(this, &BidsView::onAddSubject,
             pBidsModel, &BidsViewModel::addSubject);
     connect(this, SIGNAL(onAddSession(QModelIndex, const QString&)),
             pBidsModel, SLOT(addSessionToSubject(QModelIndex, const QString&)));
+
+    //Moving
+    connect(this, &BidsView::onMoveSession,
+            pBidsModel, &BidsViewModel::moveSessionToSubject);
 }
 
 //=============================================================================================================
@@ -109,6 +114,7 @@ void BidsView::customMenuRequested(QPoint pos)
     QString sToolTip = m_pUi->m_pTreeView->model()->data(m_pUi->m_pTreeView->indexAt(pos), Qt::ToolTipRole).toString();
 
     DISPLIB::BidsViewModel *pModel = qobject_cast<DISPLIB::BidsViewModel *>(m_pUi->m_pTreeView->model());
+    qDebug() << "ROW COUNT" << pModel->rowCount();
 
     if(m_pUi->m_pTreeView->indexAt(pos).isValid()){
         QStandardItem* pItem = pModel->itemFromIndex(m_pUi->m_pTreeView->indexAt(pos));
@@ -143,7 +149,19 @@ void BidsView::customMenuRequested(QPoint pos)
 
                 QMenu* pMoveMenu = new QMenu("Move Session to ...");
 
-                menu->addMenu(pMoveMenu);
+                for(int i = 0; i < pModel->rowCount(); i++){
+                    if(pModel->item(i)->index() != pItem->data(SUBJECT).value<QModelIndex>()){
+                        QAction* pTargetAction = new QAction(pModel->item(i)->text());
+                        connect(pTargetAction, &QAction::triggered, [=] () {
+                            emit onMoveSession(pModel->item(i)->index(), pItem->index());
+                        });
+                        pMoveMenu->addAction(pTargetAction);
+                    }
+                }
+
+                if (!pMoveMenu->isEmpty()){
+                    menu->addMenu(pMoveMenu);
+                }
                 menu->addAction(pRemoveAction);
                 menu->popup(m_pUi->m_pTreeView->viewport()->mapToGlobal(pos));
                 break;
@@ -232,6 +250,6 @@ void BidsView::onNewItemIndex(QModelIndex itemIndex)
 {
     m_pUi->m_pTreeView->selectionModel()->select(itemIndex, QItemSelectionModel::ClearAndSelect);
     m_pUi->m_pTreeView->expand(itemIndex.parent());
-    m_pUi->m_pTreeView->expand(itemIndex);
+    m_pUi->m_pTreeView->expandRecursively(itemIndex);
 //    m_pUi->m_pTreeView->expandAll();
 }

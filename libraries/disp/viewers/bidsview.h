@@ -148,12 +148,29 @@ private:
     Ui::BidsViewWidget *m_pUi;   /**< The user interface */
 
 signals:
+    //=========================================================================================================
     void removeItem(const QModelIndex& pIndex);
+
+    //=========================================================================================================
     void selectedModelChanged(const QVariant& data);
+
+    //=========================================================================================================
     void selectedItemChanged(const QModelIndex& pIndex);
+
+    //=========================================================================================================
     void onAddSubject(const QString &sSubjectName);
+
+    //=========================================================================================================
     void onAddSession(QModelIndex subjectIndex,
                       const QString &sSessionName);
+
+    //=========================================================================================================
+    void onMoveSession(QModelIndex subjectIndex,
+                       QModelIndex sessionIndex);
+
+    //=========================================================================================================
+    void onMoveData(QModelIndex sessionIndex,
+                    QModelIndex dataIndex);
 };
 } // NAMESPACE DISPLIB
 #endif // DATAMANAGERVIEW_H
