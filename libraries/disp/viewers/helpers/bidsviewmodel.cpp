@@ -73,16 +73,10 @@ void BidsViewModel::addData(QModelIndex selectedItem,
                             QStandardItem* pNewItem)
 {
     qDebug() << selectedItem;
-    //QList<QStandardItem*> pItemList = this->findItems(sSubjectName);
 
     if(!selectedItem.isValid()) {
         addMegDataToSession(addSessionToSubject(addSubject("sub-01"), "ses-01"), pNewItem);
     } else {
-//        for(QStandardItem* pItem: pItemList) {
-//            pItem->child(0)->child(0)->setChild(pItem->child(0)->child(0)->rowCount(),
-//                                                        pNewItem);
-//            emit newItemIndex(pNewItem->index());
-//        }
         switch(itemFromIndex(selectedItem)->data(ITEM_TYPE).value<int>()){
             case SUBJECT:
                 qDebug() << "[BidsViewModel::addData] Prompt user to select a session";
@@ -256,4 +250,43 @@ QModelIndex BidsViewModel::addMegDataToSession(QModelIndex sessionIndex,
     emit newItemIndex(pNewItem->index());
 
     return pNewItem->index();
+}
+
+//=============================================================================================================
+
+QModelIndex BidsViewModel::moveSessionToSubject(QModelIndex subjectIndex,
+                                                QModelIndex sessionIndex)
+{
+    beginResetModel();
+
+    QStandardItem* subjectItem = itemFromIndex(subjectIndex);
+    QStandardItem* sessionItem = itemFromIndex(sessionIndex);
+
+    sessionItem->parent()->takeRow(sessionItem->row());
+
+
+    subjectItem->setChild(subjectItem->rowCount(), sessionItem);
+    subjectItem->setData(subjectIndex, ITEM_SUBJECT);
+
+    for (int i = 0; i < sessionItem->rowCount(); i++){
+        sessionItem->child(i)->setData(subjectIndex, ITEM_SUBJECT);
+        for (int j = 0; j < sessionItem->child(i)->rowCount(); j++) {
+            sessionItem->child(i)->child(j)->setData(subjectIndex, ITEM_SUBJECT);
+        }
+    }
+
+    endResetModel();
+
+    emit newItemIndex(sessionItem->index());
+
+    return sessionItem->index();
+}
+
+//=============================================================================================================
+
+QModelIndex BidsViewModel::moveDataToSession(QModelIndex sessionIndex,
+                                             QModelIndex dataIndex)
+{
+    qDebug() << "BidsViewModel::moveDataToSession -- not yet implemented";
+    return QModelIndex();
 }

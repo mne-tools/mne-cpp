@@ -176,6 +176,14 @@ public slots:
     QModelIndex addMegDataToSession(QModelIndex sessionIndex,
                                     QStandardItem* pNewItem);
 
+    //=========================================================================================================
+    QModelIndex moveSessionToSubject(QModelIndex subjectIndex,
+                                     QModelIndex sessionIndex);
+
+    //=========================================================================================================
+    QModelIndex moveDataToSession(QModelIndex sessionIndex,
+                                  QModelIndex dataIndex);
+
 signals:
 
     //=========================================================================================================
