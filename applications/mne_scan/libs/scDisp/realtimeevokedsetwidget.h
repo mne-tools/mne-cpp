@@ -180,8 +180,6 @@ private:
     bool                                m_bHideBadChannels;         /**< hide bad channels flag. */
     qint32                              m_iMaxFilterTapSize;        /**< maximum number of allowed filter taps. This number depends on the size of the receiving blocks. */
 
-    QPointer<QAction>                   m_pActionSelectSensors;     /**< show roi select widget */
-
     QPointer<QVBoxLayout>               m_pRTESetLayout;            /**< RTE Widget layout */
     QPointer<QLabel>                    m_pLabelInit;               /**< Initialization Label */
     QPointer<QToolBox>                  m_pToolBox;                 /**< The toolbox which holds the butterfly and 2D layout plot */
