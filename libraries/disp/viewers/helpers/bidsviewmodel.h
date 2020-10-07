@@ -117,7 +117,7 @@ public slots:
      * @param[in] sSubjectName          The subject name to store the data under.
      * @param[in] pItem                 The item to be added.
      */
-    void addData(const QString &sSubjectName,
+    void addData(QModelIndex selectedItem,
                  QStandardItem *pNewItem);
 
     //=========================================================================================================
@@ -127,7 +127,7 @@ public slots:
      * @param [in] pNewItem     item to be added
      * @param [in] parentIndex  index of where the nitem should be added
      */
-    void addItemToData(QStandardItem *pNewItem,
+    void addAvgToData(QStandardItem *pNewItem,
                        const QModelIndex &parentIndex);
 
     //=========================================================================================================

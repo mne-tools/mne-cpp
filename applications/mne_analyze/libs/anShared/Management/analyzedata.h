@@ -166,6 +166,12 @@ public:
     bool removeModel(const QModelIndex &index);
 
     //=========================================================================================================
+    QStandardItem* addSubject(const QString &sSubjectName);
+
+    //=========================================================================================================
+    void addSession(const QString &sSessionName);
+
+    //=========================================================================================================
     void newSelection(const QModelIndex &index);
 
     //=========================================================================================================
@@ -198,7 +204,7 @@ public:
             QVariant data;
             data.setValue(temp);
             pItem->setData(data);
-            m_pData->addData("sub-01", pItem);
+            m_pData->addData(m_SelectedItem, pItem);
 
             emit newModelAvailable(temp);
             return sm;
@@ -223,7 +229,7 @@ public:
         switch(temp->getType()){
             case ANSHAREDLIB_AVERAGING_MODEL:
                 pItem->setData(data);
-                m_pData->addItemToData(pItem,
+                m_pData->addAvgToData(pItem,
                                        m_SelectedData);
                 break;
             default:
@@ -241,8 +247,7 @@ public:
 private:
     QPointer<DISPLIB::BidsViewModel>          m_pData;        /**< The loaded models in form of a QStandardItemModel. */
 
-    QModelIndex                         m_SelectedSubject;
-    QModelIndex                         m_SelectedSession;
+    QModelIndex                         m_SelectedItem;
     QModelIndex                         m_SelectedData;
 
 signals:
