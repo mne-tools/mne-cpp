@@ -172,7 +172,6 @@ private:
 
     QSharedPointer<FIFFLIB::FiffInfo>                       m_pFiffInfo;                    /**< FiffInfo, which is used insteadd of ListChInfo*/
 
-    QPointer<QAction>                                       m_pActionSelectSensors;         /**< show roi select widget */
     QPointer<QAction>                                       m_pActionHideBad;               /**< Hide bad channels. */
 
     qint32                                                  m_iMaxFilterTapSize;            /**< Maximum number of allowed filter taps. This number depends on the size of the receiving blocks. */
