@@ -66,6 +66,7 @@
 #include <QCheckBox>
 #include <QDir>
 #include <QSettings>
+#include <QToolBar>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -86,20 +87,6 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<QT
 , m_iMaxFilterTapSize(-1)
 {
     Q_UNUSED(pTime)
-
-    m_pActionSelectSensors = new QAction(QIcon(":/images/selectSensors.png"), tr("Show the channel selection view"),this);
-    m_pActionSelectSensors->setToolTip(tr("Show the channel selection view"));
-    connect(m_pActionSelectSensors.data(), &QAction::triggered,
-            this, &RealTimeMultiSampleArrayWidget::showSensorSelectionWidget);
-    addDisplayAction(m_pActionSelectSensors);
-    m_pActionSelectSensors->setVisible(true);
-
-    m_pActionHideBad = new QAction(QIcon(":/images/hideBad.png"), tr("Toggle bad channel visibility"),this);
-    m_pActionHideBad->setStatusTip(tr("Toggle bad channel visibility"));
-    connect(m_pActionHideBad.data(), &QAction::triggered,
-            this, &RealTimeMultiSampleArrayWidget::onHideBadChannels);
-    addDisplayAction(m_pActionHideBad);
-    m_pActionHideBad->setVisible(true);
 
     qRegisterMetaType<QMap<int,QList<QPair<int,double> > > >();
 }
@@ -150,9 +137,29 @@ void RealTimeMultiSampleArrayWidget::initDisplayControllWidgets()
 
         QVBoxLayout *rtmsaLayout = new QVBoxLayout(this);
         rtmsaLayout->setContentsMargins(0,0,0,0);
-        rtmsaLayout->addWidget(m_pChannelDataView);
         this->setLayout(rtmsaLayout);
         this->setMinimumSize(300,50);
+
+        // Prepare actions
+        QToolBar* pToolBar = new QToolBar;
+
+        QAction* pActionSelectSensors = new QAction(QIcon(":/images/selectSensors.png"), tr("Show the channel selection view"),this);
+        pActionSelectSensors->setToolTip(tr("Show the channel selection view"));
+        connect(pActionSelectSensors, &QAction::triggered,
+                this, &RealTimeMultiSampleArrayWidget::showSensorSelectionWidget);
+        pActionSelectSensors->setVisible(true);
+        pToolBar->addAction(pActionSelectSensors);
+
+        m_pActionHideBad = new QAction(QIcon(":/images/hideBad.png"), tr("Toggle bad channel visibility"),this);
+        m_pActionHideBad->setStatusTip(tr("Toggle bad channel visibility"));
+        connect(m_pActionHideBad.data(), &QAction::triggered,
+                this, &RealTimeMultiSampleArrayWidget::onHideBadChannels);
+        m_pActionHideBad->setVisible(true);
+        pToolBar->addAction(m_pActionHideBad);
+
+        // Add toolbar and channel data view
+        rtmsaLayout->addWidget(pToolBar);
+        rtmsaLayout->addWidget(m_pChannelDataView);
 
         // Init channel view
         QSettings settings("MNECPP");
