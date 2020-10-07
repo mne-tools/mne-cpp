@@ -112,6 +112,7 @@ FORMS += \
 
 RESOURCE_FILES +=\
     $${ROOT_DIR}/resources/mne_scan/plugins/babymeg/both.bad \
+    $${ROOT_DIR}/resources/mne_scan/plugins/babymeg/compensator.fif \
     $${ROOT_DIR}/resources/mne_scan/plugins/babymeg/header.fif \
 
 # Copy resource files from repository to bin resource folder
