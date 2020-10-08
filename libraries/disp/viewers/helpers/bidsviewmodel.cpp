@@ -310,3 +310,13 @@ QModelIndex BidsViewModel::moveDataToSession(QModelIndex sessionIndex,
 
     return newIndex;
 }
+
+//=============================================================================================================
+
+void BidsViewModel::addAnntoData(QStandardItem *pNewItem,
+                                        const QModelIndex &parentIndex)
+{
+    QStandardItem* selectedData = itemFromIndex(parentIndex);
+    selectedData->setChild(selectedData->rowCount(),
+                           pNewItem);
+}
