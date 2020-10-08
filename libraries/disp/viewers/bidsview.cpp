@@ -64,7 +64,7 @@ using namespace DISPLIB;
 //=============================================================================================================
 
 BidsView::BidsView(QWidget *parent)
-: QWidget(parent)
+: AbstractView(parent)
 , m_pUi(new Ui::BidsViewWidget)
 {
     m_pUi->setupUi(this);
@@ -276,4 +276,42 @@ void BidsView::onNewItemIndex(QModelIndex itemIndex)
     m_pUi->m_pTreeView->expand(itemIndex.parent());
     m_pUi->m_pTreeView->expandRecursively(itemIndex);
 //    m_pUi->m_pTreeView->expandAll();
+}
+
+//=============================================================================================================
+
+void BidsView::saveSettings()
+{
+
+}
+
+//=============================================================================================================
+
+void BidsView::loadSettings()
+{
+
+}
+
+//=============================================================================================================
+
+void BidsView::updateGuiMode(GuiMode mode)
+{
+    switch(mode) {
+        case GuiMode::Clinical:
+            break;
+        default: // default is research mode
+            break;
+    }
+}
+
+//=============================================================================================================
+
+void BidsView::updateProcessingMode(ProcessingMode mode)
+{
+    switch(mode) {
+        case ProcessingMode::Offline:
+            break;
+        default: // default is realtime mode
+            break;
+    }
 }
