@@ -185,10 +185,13 @@ void BidsView::customMenuRequested(QPoint pos)
                 for(int i = 0; i < pModel->rowCount(); i++){
                     QMenu* pSubjectMenu = new QMenu(pModel->item(i)->text());
                     for (int j = 0; j < pModel->item(i)->rowCount(); j++){
-                        QAction* pTargetAction = new QAction(pModel->item(i)->child(j)->text());
-                        connect(pTargetAction, &QAction::triggered, [=] {
-                            emit onMoveData(pModel->item(i)->child(j)->index(), pItem->index());
-                        });
+                        if(pModel->item(i)->child(j)->index() != pItem->data(ITEM_SESSION).value<QModelIndex>()){
+                            QAction* pTargetAction = new QAction(pModel->item(i)->child(j)->text());
+                            connect(pTargetAction, &QAction::triggered, [=] {
+                                emit onMoveData(pModel->item(i)->child(j)->index(), pItem->index());
+                            });
+                            pSubjectMenu->addAction(pTargetAction);
+                        }
                     }
                     if(!pSubjectMenu->isEmpty()){
                         pMoveMenu->addMenu(pSubjectMenu);

@@ -289,14 +289,24 @@ QModelIndex BidsViewModel::moveDataToSession(QModelIndex sessionIndex,
 {
     beginResetModel();
 
-    QStandardItem* sessionItem = itemFromIndex(sessionIndex);
     QStandardItem* dataItem = itemFromIndex(dataIndex);
 
-    dataItem->parent()->takeRow(dataItem->row()).first();
+    if(dataItem->parent()->rowCount() < 2){
+        QStandardItem* parent = dataItem->parent();
+
+        dataItem->parent()->takeRow(dataItem->row()).first();
+        parent->parent()->takeRow(parent->row()).first();
+    } else {
+        dataItem->parent()->takeRow(dataItem->row()).first();
+    }
 
     QModelIndex newIndex = addMegDataToSession(sessionIndex,
-                                               dataItem->parent()->takeRow(dataItem->row()).first());
+                                               dataItem);
 
     endResetModel();
-    return newIndex();
+
+    emit newItemIndex(sessionIndex);
+    emit newItemIndex(newIndex);
+
+    return newIndex;
 }
