@@ -230,8 +230,13 @@ public:
             case ANSHAREDLIB_AVERAGING_MODEL:
                 pItem->setData(data);
                 m_pData->addAvgToData(pItem,
-                                       m_SelectedData);
+                                      m_SelectedData);
                 break;
+            case ANSHAREDLIB_ANNOTATION_MODEL:
+                pItem->setData(data);
+                m_pData->addAnntoData(pItem,
+                                      m_SelectedData);
+
             default:
                 qWarning() << "[AnalyzeData::addModel] Model type not supported";
                 break;

@@ -128,7 +128,11 @@ public slots:
      * @param [in] parentIndex  index of where the nitem should be added
      */
     void addAvgToData(QStandardItem *pNewItem,
-                       const QModelIndex &parentIndex);
+                      const QModelIndex &parentIndex);
+
+    //=========================================================================================================
+    void addAnntoData(QStandardItem *pNewItem,
+                      const QModelIndex &parentIndex);
 
     //=========================================================================================================
     /**
