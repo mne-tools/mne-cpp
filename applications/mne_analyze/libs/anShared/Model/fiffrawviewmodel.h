@@ -442,14 +442,6 @@ public:
 
     //=========================================================================================================
     /**
-     * Adds a new annotation at the sample location the user clicked
-     *
-     * @param [in] iLastClicked     position of the last clicked sample
-     */
-    void addTimeMark(int iLastClicked);
-
-    //=========================================================================================================
-    /**
      * Set new filter parameters
      *
      * @param[in] filterData    list of the new filter
