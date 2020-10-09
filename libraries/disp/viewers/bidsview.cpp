@@ -52,6 +52,7 @@
 #include <QDebug>
 #include <QMenu>
 #include <QKeyEvent>
+#include <QMessageBox>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -118,6 +119,8 @@ void BidsView::customMenuRequested(QPoint pos)
     DISPLIB::BidsViewModel *pModel = qobject_cast<DISPLIB::BidsViewModel *>(m_pUi->m_pTreeView->model());
     qDebug() << "ROW COUNT" << pModel->rowCount();
 
+    QAction* pRemoveAction;
+
     if(m_pUi->m_pTreeView->indexAt(pos).isValid()){
         QStandardItem* pItem = pModel->itemFromIndex(m_pUi->m_pTreeView->indexAt(pos));
 
@@ -127,14 +130,10 @@ void BidsView::customMenuRequested(QPoint pos)
 
                 QAction* pAddSessionAction = new QAction("Add Session", this);
                 connect(pAddSessionAction, &QAction::triggered, [=]() {
-                    qDebug() << "Hello";
                     emit onAddSession(pItem->index(), "test");
                 });
 
-                QAction* pRemoveAction = new QAction("Remove Subject", this);
-                connect(pRemoveAction, &QAction::triggered, [=]() {
-                    emit removeItem(m_pUi->m_pTreeView->indexAt(pos));
-                });
+                pRemoveAction = new QAction("Remove Subject", this);
 
                 menu->addAction(pAddSessionAction);
                 menu->addAction(pRemoveAction);
@@ -144,10 +143,7 @@ void BidsView::customMenuRequested(QPoint pos)
             case SESSION: {
                 QMenu *menu = new QMenu(this);
 
-                QAction* pRemoveAction = new QAction("Remove Session", this);
-                connect(pRemoveAction, &QAction::triggered, [=]() {
-                    emit removeItem(m_pUi->m_pTreeView->indexAt(pos));
-                });
+                pRemoveAction = new QAction("Remove Session", this);
 
                 QMenu* pMoveMenu = new QMenu("Move Session to ...");
 
@@ -174,10 +170,7 @@ void BidsView::customMenuRequested(QPoint pos)
             case MEGDATA: {
                 QMenu *menu = new QMenu(this);
 
-                QAction* pRemoveAction = new QAction("Remove Data", this);
-                connect(pRemoveAction, &QAction::triggered, [=]() {
-                    emit removeItem(m_pUi->m_pTreeView->indexAt(pos));
-                });
+                pRemoveAction = new QAction("Remove Data", this);
 
                 QMenu* pMoveMenu = new QMenu("Move Data to ...");
 
@@ -209,6 +202,19 @@ void BidsView::customMenuRequested(QPoint pos)
                 qDebug() << "DataManagerControlView::customMenuRequested - default";
             }
         }
+        connect(pRemoveAction, &QAction::triggered, [=]() {
+            QMessageBox msgBox;
+
+            msgBox.setText("Are you sure you want to remove " + pItem->text() + "?");
+            msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+            msgBox.setDefaultButton(QMessageBox::No);
+
+            int ret = msgBox.exec();
+
+            if(ret == QMessageBox::Yes) {
+            emit removeItem(m_pUi->m_pTreeView->indexAt(pos));
+            }
+        });
     } else {
         QMenu *menu = new QMenu(this);
 

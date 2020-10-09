@@ -135,6 +135,11 @@ public:
 private:
 
     //=========================================================================================================
+    /**
+     * Brings up contextual menu for user to interact with data manager
+     *
+     * @param [in] pos position on screen where the user right clicked
+     */
     void customMenuRequested(QPoint pos);
 
     //=========================================================================================================
@@ -199,6 +204,7 @@ signals:
     //=========================================================================================================
     void onMoveData(QModelIndex sessionIndex,
                     QModelIndex dataIndex);
+
 };
 } // NAMESPACE DISPLIB
 #endif // DATAMANAGERVIEW_H
