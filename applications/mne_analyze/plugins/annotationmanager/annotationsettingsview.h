@@ -127,7 +127,7 @@ public slots:
      *
      * @param [in] iSample   Sample number to be added to annotation model
      */
-    void addAnnotationToModel();
+    void addAnnotationToModel(int iSamplePos);
 
     //=========================================================================================================
     /**
