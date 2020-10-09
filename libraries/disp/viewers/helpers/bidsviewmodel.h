@@ -181,13 +181,30 @@ public slots:
                                     QStandardItem* pNewItem);
 
     //=========================================================================================================
+    /**
+     * Moves a session to a new subject
+     * @param [in] subjectIndex     Target subject
+     * @param [in] sessionIndex     Session to be moved
+     *
+     * @return
+     */
     QModelIndex moveSessionToSubject(QModelIndex subjectIndex,
                                      QModelIndex sessionIndex);
 
     //=========================================================================================================
+    /**
+     * @brief moveDataToSession
+     *
+     * @param [in] sessionIndex     Target session
+     * @param [in] dataIndex        Data to be moved
+     *
+     * @return
+     */
     QModelIndex moveDataToSession(QModelIndex sessionIndex,
                                   QModelIndex dataIndex);
 
+    //=========================================================================================================
+    void removeItem(QModelIndex itemIndex);
 signals:
 
     //=========================================================================================================
