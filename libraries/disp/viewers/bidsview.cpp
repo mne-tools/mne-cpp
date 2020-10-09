@@ -274,8 +274,8 @@ void BidsView::onNewItemIndex(QModelIndex itemIndex)
 {
     m_pUi->m_pTreeView->selectionModel()->select(itemIndex, QItemSelectionModel::ClearAndSelect);
     m_pUi->m_pTreeView->expand(itemIndex.parent());
-    m_pUi->m_pTreeView->expandRecursively(itemIndex);
-//    m_pUi->m_pTreeView->expandAll();
+//    m_pUi->m_pTreeView->expandRecursively(itemIndex);
+    m_pUi->m_pTreeView->expandAll();
 }
 
 //=============================================================================================================
