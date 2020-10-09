@@ -300,9 +300,17 @@ QModelIndex BidsViewModel::moveDataToSession(QModelIndex sessionIndex,
         dataItem->parent()->takeRow(dataItem->row()).first();
     }
 
-    QModelIndex newIndex = addMegDataToSession(sessionIndex,
-                                               dataItem);
-
+    QModelIndex newIndex;
+    switch(dataItem->data(ITEM_TYPE).value<int>()){
+        case MEGDATA:{
+            newIndex = addMegDataToSession(sessionIndex,
+                                           dataItem);
+            break;
+        }
+        default:{
+            qWarning() << "[BidsViewModel::moveDataToSession] Move not supported for this type of data";
+        }
+    }
     endResetModel();
 
     emit newItemIndex(sessionIndex);
@@ -319,4 +327,30 @@ void BidsViewModel::addAnntoData(QStandardItem *pNewItem,
     QStandardItem* selectedData = itemFromIndex(parentIndex);
     selectedData->setChild(selectedData->rowCount(),
                            pNewItem);
+}
+
+//=============================================================================================================
+
+void BidsViewModel::removeItem(QModelIndex itemIndex)
+{
+    QStandardItem* pItem = itemFromIndex(itemIndex);
+
+    qInfo() << "Deleting" << pItem->text();
+
+    switch(pItem->data(ITEM_TYPE).value<int>()){
+        case SUBJECT:
+            break;
+        case SESSION:
+
+            break;
+        case MEGDATA:
+
+            break;
+        case AVG:
+
+            break;
+        default:
+
+            break;
+    }
 }
