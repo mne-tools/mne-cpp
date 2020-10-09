@@ -415,6 +415,7 @@ QList<FiffDigPoint> HpiSettingsView::readPolhemusDig(const QString& fileName)
     qint16 numHPI = 0;
     qint16 numFiducials = 0;
     qint16 numEEG = 0;
+    qint16 numAdditional = 0;
 
     for(int i = 0; i < t_digSet.size(); ++i) {
         switch(t_digSet[i].kind) {
@@ -468,6 +469,11 @@ QList<FiffDigPoint> HpiSettingsView::readPolhemusDig(const QString& fileName)
                 lDigPoints.append(t_digSet[i]);
                 numEEG++;
                 break;
+
+            case FIFFV_POINT_EXTRA:
+                lDigPoints.append(t_digSet[i]);
+                numAdditional++;
+                break;
         }
     }
 
@@ -475,6 +481,7 @@ QList<FiffDigPoint> HpiSettingsView::readPolhemusDig(const QString& fileName)
     m_pUi->m_label_numberLoadedCoils->setNum(numHPI);
     m_pUi->m_label_numberLoadedFiducials->setNum(numFiducials);
     m_pUi->m_label_numberLoadedEEG->setNum(numEEG);
+    m_pUi->m_label_numberLoadedAdditional->setNum(numAdditional);
 
     // Make sure that the stored coil freqs always match the number of loaded ones
     m_vCoilFreqs.resize(numHPI);
