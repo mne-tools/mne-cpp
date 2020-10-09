@@ -316,7 +316,7 @@ void RealTimeEvokedSetWidget::initDisplayControllWidgets()
 //        }
 
         // Scaling
-        ScalingView* pScalingView = new ScalingView(QString("MNESCAN/RTESW"));
+        ScalingView* pScalingView = new ScalingView(QString("MNESCAN/RTESW"),0, Qt::Widget, m_pFiffInfo->get_channel_types());
         pScalingView->setObjectName("group_tab_View_Scaling");
         lControlWidgets.append(pScalingView);
 

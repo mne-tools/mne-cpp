@@ -75,16 +75,16 @@ float DISPLIB::getDefaultScalingValue(int iChannelKind,
 
     switch(iChannelKind) {
         case FIFFV_MEG_CH: {
-            if( iChannelUnit == FIFF_UNIT_T_M ) { //gradiometers
+            if( iChannelUnit == FIFF_UNIT_T_M ) { //Gradiometers
                     fMaxScale = m_fScaleGRAD;
                 }
-            else if( iChannelUnit == FIFF_UNIT_T ) { //magnitometers
+            else if( iChannelUnit == FIFF_UNIT_T ) { //Magnetometers
                     fMaxScale = m_fScaleMAG;
                 }
             break;
         }
 
-        case FIFFV_REF_MEG_CH: {  /*11/04/14 Added by Limin: MEG reference channel */
+        case FIFFV_REF_MEG_CH: {
             fMaxScale = m_fScaleMAG;
             break;
         }
@@ -145,9 +145,11 @@ float DISPLIB::getScalingValue(const QMap<qint32, float>& qMapChScaling,
 
 ScalingView::ScalingView(const QString& sSettingsPath,
                          QWidget *parent,
-                         Qt::WindowFlags f)
+                         Qt::WindowFlags f,
+                         const QStringList& lChannelsToShow)
 : AbstractView(parent, f)
 , m_pUi(new Ui::ScalingViewWidget)
+, m_lChannelTypesToShow(lChannelsToShow)
 {
     m_sSettingsPath = sSettingsPath;
     m_pUi->setupUi(this);
@@ -286,7 +288,7 @@ void ScalingView::redrawGUI()
     qint32 i = 0;
 
     //MAG
-    if(m_qMapChScaling.contains(FIFF_UNIT_T))
+    if(m_qMapChScaling.contains(FIFF_UNIT_T) && (m_lChannelTypesToShow.contains("mag") || m_lChannelTypesToShow.contains("all")))
     {
         QLabel* t_pLabelModality = new QLabel("MAG (pT)");
         m_pUi->m_formLayout_Scaling->addWidget(t_pLabelModality,i,0,1,1);
@@ -321,7 +323,7 @@ void ScalingView::redrawGUI()
     }
 
     //GRAD
-    if(m_qMapChScaling.contains(FIFF_UNIT_T_M))
+    if(m_qMapChScaling.contains(FIFF_UNIT_T_M) && (m_lChannelTypesToShow.contains("grad") || m_lChannelTypesToShow.contains("all")))
     {
         QLabel* t_pLabelModality = new QLabel;
         t_pLabelModality->setText("GRAD (fT/cm)");
@@ -357,7 +359,7 @@ void ScalingView::redrawGUI()
     }
 
     //EEG
-    if(m_qMapChScaling.contains(FIFFV_EEG_CH))
+    if(m_qMapChScaling.contains(FIFFV_EEG_CH) && (m_lChannelTypesToShow.contains("eeg") || m_lChannelTypesToShow.contains("all")))
     {
         QLabel* t_pLabelModality = new QLabel;
         t_pLabelModality->setText("EEG (uV)");
@@ -393,7 +395,7 @@ void ScalingView::redrawGUI()
     }
 
     //EOG
-    if(m_qMapChScaling.contains(FIFFV_EOG_CH))
+    if(m_qMapChScaling.contains(FIFFV_EOG_CH) && (m_lChannelTypesToShow.contains("eog") || m_lChannelTypesToShow.contains("all")))
     {
         QLabel* t_pLabelModality = new QLabel;
         t_pLabelModality->setText("EOG (uV)");
@@ -429,7 +431,7 @@ void ScalingView::redrawGUI()
     }
 
     //ECG
-    if(m_qMapChScaling.contains(FIFFV_ECG_CH))
+    if(m_qMapChScaling.contains(FIFFV_ECG_CH) && (m_lChannelTypesToShow.contains("ecg") || m_lChannelTypesToShow.contains("all")))
     {
         QLabel* t_pLabelModality = new QLabel;
         t_pLabelModality->setText("ECG (uV)");
@@ -465,7 +467,7 @@ void ScalingView::redrawGUI()
     }
 
     //STIM
-    if(m_qMapChScaling.contains(FIFFV_STIM_CH))
+    if(m_qMapChScaling.contains(FIFFV_STIM_CH) && (m_lChannelTypesToShow.contains("stim") || m_lChannelTypesToShow.contains("all")))
     {
         QLabel* t_pLabelModality = new QLabel;
         t_pLabelModality->setText("STIM");
@@ -501,7 +503,7 @@ void ScalingView::redrawGUI()
     }
 
     //MISC
-    if(m_qMapChScaling.contains(FIFFV_MISC_CH))
+    if(m_qMapChScaling.contains(FIFFV_MISC_CH) && (m_lChannelTypesToShow.contains("misc") || m_lChannelTypesToShow.contains("all")))
     {
         QLabel* t_pLabelModality = new QLabel;
         t_pLabelModality->setText("MISC");

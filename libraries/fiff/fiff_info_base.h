@@ -208,6 +208,13 @@ public:
      */
     friend bool operator== (const FiffInfoBase &a, const FiffInfoBase &b);
 
+    /**
+     * Parses the channel info information and returns a string list of channel types.
+     *
+     * @return The channel types present in this fiff info (grad,mag,eeg,ecg,emg,misc,stim)
+     */
+    QStringList get_channel_types();
+
 public:
     QString filename;           /**< Filename when the info is read of a fiff file. */
     QStringList bads;           /**< List of bad channels. */

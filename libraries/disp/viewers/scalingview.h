@@ -140,7 +140,8 @@ public:
      */
     ScalingView(const QString& sSettingsPath = "",
                 QWidget *parent = 0,
-                Qt::WindowFlags f = Qt::Widget);
+                Qt::WindowFlags f = Qt::Widget,
+                const QStringList& lChannelsToShow = QStringList() << "all");
 
     //=========================================================================================================
     /**
@@ -214,6 +215,8 @@ protected:
     QMap<qint32, QSlider*>              m_qMapScalingSlider;            /**< Map of types and channel scaling line edits. */
 
     QString                             m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
+
+    QStringList                         m_lChannelTypesToShow;          /**< The channel types as strings to show the sliders for. */
 
     Ui::ScalingViewWidget*              m_pUi;
 
