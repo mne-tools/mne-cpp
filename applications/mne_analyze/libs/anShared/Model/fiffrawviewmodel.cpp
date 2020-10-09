@@ -107,12 +107,12 @@ FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
 , m_bEndOfFileReached(false)
 , m_blockLoadFutureWatcher()
 , m_bCurrentlyLoading(false)
+, m_pRtFilter(FilterOverlapAdd::SPtr::create())
+, m_bPerformFiltering(false)
 , m_iDistanceTimerSpacer(1000)
 , m_iScrollPos(0)
 , m_bDispAnnotation(true)
-, m_bPerformFiltering(false)
 , m_pAnnotationModel(QSharedPointer<AnnotationModel>::create())
-, m_pRtFilter(FilterOverlapAdd::SPtr::create())
 {
     Q_UNUSED(sFilePath)
 
@@ -436,7 +436,11 @@ int FiffRawViewModel::getTimeMarks(int iIndex) const
 
 int FiffRawViewModel::getTimeListSize() const
 {
-    return m_pAnnotationModel->getNumberOfAnnotations();
+    if(m_pAnnotationModel){
+        return m_pAnnotationModel->getNumberOfAnnotations();
+    } else {
+        return 0;
+    }
 }
 
 //=============================================================================================================
@@ -472,15 +476,6 @@ bool FiffRawViewModel::shouldDisplayAnnotation() const
 QSharedPointer<AnnotationModel> FiffRawViewModel::getAnnotationModel() const
 {
     return m_pAnnotationModel;
-}
-
-//=============================================================================================================
-
-void FiffRawViewModel::addTimeMark(int iLastClicked)
-{
-    m_pAnnotationModel->setSamplePos(iLastClicked);
-    emit m_pAnnotationModel->addNewAnnotation();
-    //m_pAnnotationModel->insertRow(0, QModelIndex());
 }
 
 //=============================================================================================================
