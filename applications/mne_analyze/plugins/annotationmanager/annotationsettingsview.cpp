@@ -162,10 +162,6 @@ void AnnotationSettingsView::initGUIFunctionality()
     connect(m_pUi->m_pushButtonSave, &QPushButton::clicked,
             this, &AnnotationSettingsView::onSaveButton, Qt::UniqueConnection);
 
-    //Adding Events
-    connect(m_pAnnModel.data(), &ANSHAREDLIB::AnnotationModel::addNewAnnotation,
-            this, &AnnotationSettingsView::addAnnotationToModel, Qt::UniqueConnection);
-
     //Switching groups
     connect(m_pUi->m_listWidget_groupListWidget->selectionModel(), &QItemSelectionModel::selectionChanged,
             this, &AnnotationSettingsView::groupChanged, Qt::UniqueConnection);
@@ -215,7 +211,7 @@ void AnnotationSettingsView::updateComboBox(const QString &currentAnnotationType
 
 //=============================================================================================================
 
-void AnnotationSettingsView::addAnnotationToModel()
+void AnnotationSettingsView::addAnnotationToModel(int iSamplePos)
 {
     if(!(m_pAnnModel->getHubSize())){
         newUserGroup("User Events",
@@ -223,6 +219,8 @@ void AnnotationSettingsView::addAnnotationToModel()
                      true);
         m_pUi->m_listWidget_groupListWidget->setCurrentRow(0);
     }
+
+    m_pAnnModel->setSamplePos(iSamplePos);
 
     m_pAnnModel->insertRow(0, QModelIndex());
     emit triggerRedraw();
@@ -319,8 +317,6 @@ void AnnotationSettingsView::disconnectFromModel()
             this, &AnnotationSettingsView::updateComboBox);
     disconnect(m_pUi->m_pushButton_addEventType, &QPushButton::clicked,
             this, &AnnotationSettingsView::addNewAnnotationType);
-    disconnect(m_pAnnModel.data(), &ANSHAREDLIB::AnnotationModel::addNewAnnotation,
-            this, &AnnotationSettingsView::addAnnotationToModel);
     disconnect(m_pUi->m_listWidget_groupListWidget->selectionModel(), &QItemSelectionModel::selectionChanged,
             this, &AnnotationSettingsView::groupChanged);
     disconnect(m_pUi->m_checkBox_showAll, &QCheckBox::stateChanged,

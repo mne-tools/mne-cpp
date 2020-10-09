@@ -108,6 +108,8 @@ void RawDataViewer::init()
 
     connect(m_pAnalyzeData.data(), &AnalyzeData::modelIsEmpty,
             this, &RawDataViewer::onModelIsEmpty);
+    connect(m_pFiffRawView.data(), &FiffRawView::sendSamplePos,
+            this, &RawDataViewer::onSendSamplePos, Qt::UniqueConnection);
 }
 
 //=============================================================================================================
@@ -269,9 +271,6 @@ void RawDataViewer::updateControls()
         m_pFiffRawView->setBackgroundColor(m_pSettingsViewWidget->getBackgroundColor());
         m_pFiffRawView->setZoom(m_pSettingsViewWidget->getZoom());
         m_pFiffRawView->setDistanceTimeSpacer(m_pSettingsViewWidget->getDistanceTimeSpacer());
-
-        connect(m_pFiffRawView.data(), &FiffRawView::sendSamplePos,
-                this, &RawDataViewer::onSendSamplePos, Qt::UniqueConnection);
     }
 }
 
