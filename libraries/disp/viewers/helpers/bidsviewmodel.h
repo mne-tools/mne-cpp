@@ -204,7 +204,7 @@ public slots:
                                   QModelIndex dataIndex);
 
     //=========================================================================================================
-    void removeItem(QModelIndex itemIndex);
+    bool removeItem(QModelIndex itemIndex);
 signals:
 
     //=========================================================================================================
