@@ -38,6 +38,7 @@
 //=============================================================================================================
 
 #include "annotationmodel.h"
+#include "fiffrawviewmodel.h"
 #include <iomanip>
 
 //=============================================================================================================
@@ -86,6 +87,44 @@ AnnotationModel::AnnotationModel(QObject* parent)
 {
     qInfo() << "[AnnotationModel::AnnotationModel] CONSTRUCTOR";
 
+    m_eventTypeList<<"0";
+
+    m_eventTypeColor[0] = QColor(Qt::black);
+    m_eventTypeColor[1] = QColor(Qt::black);
+    m_eventTypeColor[2] = QColor(Qt::magenta);
+    m_eventTypeColor[3] = QColor(Qt::green);
+    m_eventTypeColor[4] = QColor(Qt::red);
+    m_eventTypeColor[5] = QColor(Qt::cyan);
+    m_eventTypeColor[32] = QColor(Qt::yellow);
+    m_eventTypeColor[998] = QColor(Qt::darkBlue);
+    m_eventTypeColor[999] = QColor(Qt::darkCyan);
+
+    m_eventGroupColor[0] = QColor(Qt::black);
+    m_eventGroupColor[1] = QColor(Qt::black);
+    m_eventGroupColor[2] = QColor(Qt::magenta);
+    m_eventGroupColor[3] = QColor(Qt::green);
+    m_eventGroupColor[4] = QColor(Qt::red);
+    m_eventGroupColor[5] = QColor(Qt::cyan);
+    m_eventGroupColor[32] = QColor(Qt::yellow);
+    m_eventGroupColor[998] = QColor(Qt::darkBlue);
+    m_eventGroupColor[999] = QColor(Qt::darkCyan);
+}
+
+//=============================================================================================================
+
+AnnotationModel::AnnotationModel(QSharedPointer<FiffRawViewModel> pFiffModel,
+                QObject* parent)
+: AbstractModel(parent)
+, m_iIndexCount(0)
+, m_iSamplePos(0)
+, m_iFirstSample(0)
+, m_iSelectedCheckState(0)
+, m_iSelectedAnn(0)
+, m_iLastTypeAdded(0)
+, m_fFreq(600)
+, m_sFilterEventType("All")
+, m_pFiffModel(pFiffModel)
+{
     m_eventTypeList<<"0";
 
     m_eventTypeColor[0] = QColor(Qt::black);

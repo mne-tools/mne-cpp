@@ -112,7 +112,7 @@ FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
 , m_iDistanceTimerSpacer(1000)
 , m_iScrollPos(0)
 , m_bDispAnnotation(true)
-, m_pAnnotationModel(QSharedPointer<AnnotationModel>::create())
+//, m_pAnnotationModel(QSharedPointer<AnnotationModel>::create())
 {
     Q_UNUSED(sFilePath)
 
@@ -429,7 +429,11 @@ float FiffRawViewModel::getNumberOfTimeSpacers() const
 
 int FiffRawViewModel::getTimeMarks(int iIndex) const
 {
-    return m_pAnnotationModel->getAnnotation(iIndex);
+    if (m_pAnnotationModel){
+        return m_pAnnotationModel->getAnnotation(iIndex);
+    } else {
+        return 0;
+    }
 }
 
 //=============================================================================================================
@@ -475,7 +479,12 @@ bool FiffRawViewModel::shouldDisplayAnnotation() const
 
 QSharedPointer<AnnotationModel> FiffRawViewModel::getAnnotationModel() const
 {
-    return m_pAnnotationModel;
+    if(m_pAnnotationModel){
+        return m_pAnnotationModel;
+    } else {
+        return QSharedPointer<AnnotationModel>::create();
+    }
+
 }
 
 //=============================================================================================================
@@ -985,4 +994,11 @@ void FiffRawViewModel::reloadAllData()
     }
 
     emit dataChanged(createIndex(0,0), createIndex(rowCount(), columnCount()));
+}
+
+//=============================================================================================================
+
+bool FiffRawViewModel::hasSavedEvents()
+{
+    return m_pAnnotationModel;
 }
