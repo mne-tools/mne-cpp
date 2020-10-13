@@ -162,6 +162,7 @@ private:
     void triggerLoadingEnd(const QString& sMessage);
 
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals */
+    QSharedPointer<ANSHAREDLIB::FiffRawViewModel>           m_pFiffRawModel;
 
 signals:
     void newAnnotationAvailable(int iAnnotation);

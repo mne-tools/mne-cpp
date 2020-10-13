@@ -204,8 +204,19 @@ void AnnotationManager::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel
         emit disconnectFromModel();
         FiffRawViewModel::SPtr pFiffRawModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
 
-        emit newAnnotationModelAvailable(pFiffRawModel->getAnnotationModel());
+        if(pFiffRawModel->hasSavedEvents()){
+            emit newAnnotationModelAvailable(pFiffRawModel->getAnnotationModel());
+        } else {
+            QSharedPointer<AnnotationModel> pAnnModel = QSharedPointer<AnnotationModel>::create(pFiffRawModel);
+            emit newAnnotationModelAvailable(pAnnModel);
+            m_pAnalyzeData->addModel<ANSHAREDLIB::AnnotationModel>(pAnnModel,
+                                                                   "Events");
+        }
         emit newFiffRawViewModel(pFiffRawModel);
+    } else if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_ANNOTATION_MODEL) {
+        emit disconnectFromModel();
+        AnnotationModel::SPtr pAnnModel = qSharedPointerCast<AnnotationModel>(pNewModel);
+        emit newAnnotationModelAvailable(pAnnModel);
     }
 }
 
