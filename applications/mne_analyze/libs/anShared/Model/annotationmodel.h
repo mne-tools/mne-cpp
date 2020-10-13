@@ -64,8 +64,10 @@
 namespace ANSHAREDLIB {
 
 //=============================================================================================================
-// DEFINE STRUCTS
+// FORWARD DECLARATIONS
 //=============================================================================================================
+
+class FiffRawViewModel;
 
 //=============================================================================================================
 /**
@@ -97,6 +99,9 @@ class ANSHAREDSHARED_EXPORT AnnotationModel : public AbstractModel
     Q_OBJECT
 
 public:
+    typedef QSharedPointer<AnnotationModel> SPtr;              /**< Shared pointer type for AnnotationModel. */
+    typedef QSharedPointer<const AnnotationModel> ConstSPtr;   /**< Const shared pointer type for AnnotationModel. */
+
     //=========================================================================================================
     /**
      * Constructs an annotation model
@@ -104,6 +109,11 @@ public:
      * @param [in] parent   QObject parent of the model
      */
     AnnotationModel(QObject* parent = Q_NULLPTR);
+
+    //=========================================================================================================
+
+    AnnotationModel(QSharedPointer<FiffRawViewModel> pFiffModel,
+                                     QObject* parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
@@ -607,6 +617,8 @@ public:
                              int column,
                              const QModelIndex &parent = QModelIndex()) const override;
 
+    void setParent();
+
 signals:
 
     //=========================================================================================================
@@ -669,6 +681,8 @@ private:
     QMap<int, QColor>                   m_eventGroupColor;              /**< Stores colors to display for each event group */
 
     QStack<QListWidgetItem*>            m_dataStoredGroups;             /**< Stores the groups for switching between files */
+
+    QSharedPointer<FiffRawViewModel>    m_pFiffModel;
 };
 
 //=============================================================================================================
