@@ -51,6 +51,7 @@
 #define AVG         4
 #define ANATDATA    5
 #define FOLDER      6
+#define ANNOTATION  7
 
 //=============================================================================================================
 // INCLUDES
@@ -127,11 +128,7 @@ public slots:
      * @param [in] pNewItem     item to be added
      * @param [in] parentIndex  index of where the nitem should be added
      */
-    void addAvgToData(QStandardItem *pNewItem,
-                      const QModelIndex &parentIndex);
-
-    //=========================================================================================================
-    void addAnntoData(QStandardItem *pNewItem,
+    void addToData(QStandardItem *pNewItem,
                       const QModelIndex &parentIndex);
 
     //=========================================================================================================
