@@ -108,6 +108,10 @@ void BidsView::setModel(QAbstractItemModel *pModel)
             pBidsModel, &BidsViewModel::moveSessionToSubject);
     connect(this, &BidsView::onMoveData,
             pBidsModel, &BidsViewModel::moveDataToSession);
+
+    //Updating
+    connect(pBidsModel, &BidsViewModel::modelReset,
+            this, &BidsView::onModelReset);
 }
 
 //=============================================================================================================
@@ -320,4 +324,11 @@ void BidsView::updateProcessingMode(ProcessingMode mode)
         default: // default is realtime mode
             break;
     }
+}
+
+//=============================================================================================================
+
+void BidsView::onModelReset()
+{
+    m_pUi->m_pTreeView->expandAll();
 }

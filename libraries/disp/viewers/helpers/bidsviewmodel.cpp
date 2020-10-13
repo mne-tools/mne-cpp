@@ -331,26 +331,37 @@ void BidsViewModel::addAnntoData(QStandardItem *pNewItem,
 
 //=============================================================================================================
 
-void BidsViewModel::removeItem(QModelIndex itemIndex)
+bool BidsViewModel::removeItem(QModelIndex itemIndex)
 {
+    beginResetModel();
+
     QStandardItem* pItem = itemFromIndex(itemIndex);
 
     qInfo() << "Deleting" << pItem->text();
 
     switch(pItem->data(ITEM_TYPE).value<int>()){
         case SUBJECT:
-            break;
+            if(removeRows(itemIndex.row(), 1, itemIndex.parent())){
+                endResetModel();
+            }
+            return true;
         case SESSION:
-
-            break;
+            if(removeRows(itemIndex.row(), 1, itemIndex.parent())){
+                endResetModel();
+            }
+            return true;
         case MEGDATA:
-
-            break;
+            if(removeRows(itemIndex.row(), 1, itemIndex.parent())){
+                endResetModel();
+            }
+            return true;
         case AVG:
-
-            break;
+            if(removeRows(itemIndex.row(), 1, itemIndex.parent())){
+                endResetModel();
+            }
+            return true;
         default:
-
-            break;
+            endResetModel();
+            return false;
     }
 }

@@ -163,47 +163,41 @@ QStandardItemModel* AnalyzeData::getDataModel()
 
 bool AnalyzeData::removeModel(const QModelIndex& index)
 {
-    if(QStandardItem* pItem = m_pData->itemFromIndex(index)) {
-        QString sModelPath = pItem->toolTip();
-        QFileInfo info (sModelPath);
+    return m_pData->removeItem(index);
 
-        QMessageBox msgBox;
-        msgBox.setText("Are you sure you want to remove "+info.fileName()+"?");
-        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-        msgBox.setDefaultButton(QMessageBox::No);
-        int ret = msgBox.exec();
+//    if(QStandardItem* pItem = m_pData->itemFromIndex(index)) {
+//        QString sModelPath = pItem->toolTip();
+//        QFileInfo info (sModelPath);
 
-        if(ret == QMessageBox::Yes) {
-            // Check if the parent of the deleted item holds any other data. If not delete it as well.
-            if(QStandardItem* pItemParent = m_pData->itemFromIndex(index.parent())) {
-                if(pItemParent->rowCount() <= 1) {
-                    if(m_pData->removeRows(index.parent().row(), 1)) {
-                        if(m_pData->rowCount() == 0) {
-                            emit modelIsEmpty();
-                        }
-                        qInfo() << "[AnalyzeData::removeModel] Removed model and parent at index" << index;
-                        return true;
-                    } else {
-                        qInfo() << "[AnalyzeData::removeModel] Could not remove model and parent at index" << index;
-                        return false;
-                    }
-                } else {
-                    if(m_pData->removeRows(index.row(), 1, index.parent())) {
-                        if(m_pData->rowCount() == 0) {
-                            emit modelIsEmpty();
-                        }
-                        qInfo() << "[AnalyzeData::removeModel] Removed model at index" << index;
-                        return true;
-                    } else {
-                        qInfo() << "[AnalyzeData::removeModel] Could not remove model at index" << index;
-                        return false;
-                    }
-                }
-            }
-        }
-    }
+//        // Check if the parent of the deleted item holds any other data. If not delete it as well.
+//        if(QStandardItem* pItemParent = m_pData->itemFromIndex(index.parent())) {
+//            if(pItemParent->rowCount() <= 1) {
+//                if(m_pData->removeRows(index.parent().row(), 1)) {
+//                    if(m_pData->rowCount() == 0) {
+//                        emit modelIsEmpty();
+//                    }
+//                    qInfo() << "[AnalyzeData::removeModel] Removed model and parent at index" << index;
+//                    return true;
+//                } else {
+//                    qInfo() << "[AnalyzeData::removeModel] Could not remove model and parent at index" << index;
+//                    return false;
+//                }
+//            } else {
+//                if(m_pData->removeRows(index.row(), 1, index.parent())) {
+//                    if(m_pData->rowCount() == 0) {
+//                        emit modelIsEmpty();
+//                    }
+//                    qInfo() << "[AnalyzeData::removeModel] Removed model at index" << index;
+//                    return true;
+//                } else {
+//                    qInfo() << "[AnalyzeData::removeModel] Could not remove model at index" << index;
+//                    return false;
+//                }
+//            }
+//        }
+//    }
 
-    return false;
+//    return false;
 }
 
 //=============================================================================================================
