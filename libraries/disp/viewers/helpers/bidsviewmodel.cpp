@@ -90,14 +90,13 @@ void BidsViewModel::addData(QModelIndex selectedItem,
 
 //=============================================================================================================
 
-void BidsViewModel::addAvgToData(QStandardItem *pNewAvgItem,
+void BidsViewModel::addToData(QStandardItem *pNewAvgItem,
                                   const QModelIndex &parentIndex)
 {
     QStandardItem* selectedData = itemFromIndex(parentIndex);
     selectedData->setChild(selectedData->rowCount(),
                            pNewAvgItem);
 
-    pNewAvgItem->setData(QVariant::fromValue(AVG), ITEM_TYPE);
     pNewAvgItem->setData(itemFromIndex(parentIndex)->data(ITEM_SUBJECT), ITEM_SUBJECT);
     pNewAvgItem->setData(itemFromIndex(parentIndex)->data(ITEM_SESSION), ITEM_SESSION);
 
@@ -317,16 +316,6 @@ QModelIndex BidsViewModel::moveDataToSession(QModelIndex sessionIndex,
     emit newItemIndex(newIndex);
 
     return newIndex;
-}
-
-//=============================================================================================================
-
-void BidsViewModel::addAnntoData(QStandardItem *pNewItem,
-                                        const QModelIndex &parentIndex)
-{
-    QStandardItem* selectedData = itemFromIndex(parentIndex);
-    selectedData->setChild(selectedData->rowCount(),
-                           pNewItem);
 }
 
 //=============================================================================================================
