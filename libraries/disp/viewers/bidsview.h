@@ -170,6 +170,8 @@ private:
      */
     void onNewItemIndex(QModelIndex itemIndex);
 
+    void onModelReset();
+
     //=========================================================================================================
     /**
      * Procss keyobard input. Currently only delete.
