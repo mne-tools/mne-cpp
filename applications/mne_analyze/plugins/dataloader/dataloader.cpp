@@ -248,7 +248,7 @@ void DataLoader::onLoadFilePressed()
     QString sFilePath = QFileDialog::getOpenFileName(Q_NULLPTR,
                                                     tr("Open File"),
                                                     QDir::currentPath()+"/MNE-sample-data",
-                                                    tr("Fiff file(*.fif *.fiff)"));
+                                                    tr("Fiff file (*.fif *.fiff);;Event file (*.eve)"));
 
     QFileInfo fileInfo(sFilePath);
 

@@ -114,8 +114,6 @@ FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
 , m_bDispAnnotation(true)
 //, m_pAnnotationModel(QSharedPointer<AnnotationModel>::create())
 {
-    Q_UNUSED(sFilePath)
-
     // connect data reloading: this will be run concurrently
     connect(&m_blockLoadFutureWatcher, &QFutureWatcher<int>::finished,
             [this]() {
