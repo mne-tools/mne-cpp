@@ -1002,3 +1002,10 @@ bool FiffRawViewModel::hasSavedEvents()
 {
     return m_pAnnotationModel;
 }
+
+//=============================================================================================================
+
+void FiffRawViewModel::setAnnotationModel(QSharedPointer<ANSHAREDLIB::AnnotationModel> pModel)
+{
+    m_pAnnotationModel = pModel;
+}
