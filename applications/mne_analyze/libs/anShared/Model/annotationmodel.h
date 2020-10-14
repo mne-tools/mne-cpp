@@ -113,7 +113,13 @@ public:
     //=========================================================================================================
 
     AnnotationModel(QSharedPointer<FiffRawViewModel> pFiffModel,
-                                     QObject* parent = Q_NULLPTR);
+                    QObject* parent = Q_NULLPTR);
+
+    //=========================================================================================================
+
+    AnnotationModel(const QString &sFilePath,
+                    const QByteArray& byteLoadedData = QByteArray(),
+                    QObject* parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
@@ -644,6 +650,12 @@ private:
      * Clears selected group of events
      */
     void resetSelection();
+
+    //=========================================================================================================
+    void initModel();
+
+    //=========================================================================================================
+    void initFromFile(const QString& sFilePath);
 
     QStringList                         m_eventTypeList;                /** <List of the possible event types */
 

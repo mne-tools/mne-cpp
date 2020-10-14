@@ -208,16 +208,16 @@ void DataLoader::loadFilePath(const QString& sFilePath)
 
     QApplication::processEvents();
 
-    if(!fileInfo.exists() || (fileInfo.completeSuffix() != "fif")) {
-        qWarning() << "[DataLoader::loadFilePath] The file does not exists or is not a .fif file.";
-        return;
-    }
-    if(fileInfo.completeBaseName().endsWith("raw")) {
-        m_pAnalyzeData->loadModel<ANSHAREDLIB::FiffRawViewModel>(sFilePath);
-    } else if(fileInfo.completeBaseName().endsWith("bem")) {
-        m_pAnalyzeData->loadModel<ANSHAREDLIB::BemDataModel>(sFilePath);
-    } else {
-        qWarning() << "[DataLoader::loadFilePath] Make sure that your files agree with the MNE naming conventions, eg.: *bem.fif; *raw.fif.";
+    if(fileInfo.exists() && (fileInfo.completeSuffix() == "eve")){
+        m_pAnalyzeData->loadModel<ANSHAREDLIB::AnnotationModel>(sFilePath);
+    } else if(fileInfo.exists() && (fileInfo.completeSuffix() == "fif")) {
+        if(fileInfo.completeBaseName().endsWith("eve")){
+            m_pAnalyzeData->loadModel<ANSHAREDLIB::AnnotationModel>(sFilePath);
+        } else if(fileInfo.completeBaseName().endsWith("bem")) {
+            m_pAnalyzeData->loadModel<ANSHAREDLIB::BemDataModel>(sFilePath);
+        } else if(fileInfo.completeBaseName().endsWith("raw")){
+            m_pAnalyzeData->loadModel<ANSHAREDLIB::FiffRawViewModel>(sFilePath);
+        }
     }
 
     m_pProgressViewWidget->hide();

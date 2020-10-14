@@ -214,6 +214,17 @@ public:
                     return Q_NULLPTR;
                 }
             }
+            case ANSHAREDLIB_ANNOTATION_MODEL: {
+                QStandardItem* pItem = new QStandardItem("Events - " + temp->getModelName());
+                pItem->setEditable(false);
+                pItem->setDragEnabled(true);
+                pItem->setToolTip(temp->getModelPath());
+
+                QVariant data;
+                data.setValue(temp);
+                pItem->setData(data);
+
+            }
             default: {
                 qDebug() << "[AnalyzData::loadModel] Model Type not supported";
             }
