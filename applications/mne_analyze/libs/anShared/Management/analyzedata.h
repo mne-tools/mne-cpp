@@ -194,22 +194,29 @@ public:
         QSharedPointer<AbstractModel> temp = qSharedPointerCast<AbstractModel>(sm);
         temp->setModelPath(sPath);
 
-        if(temp->isInit()) {
-            // add to record, and tell others about the new model
-            QStandardItem* pItem = new QStandardItem(temp->getModelName());
-            pItem->setEditable(false);
-            pItem->setDragEnabled(true);
-            pItem->setToolTip(temp->getModelPath());
+        switch(temp->getType()){
+            case ANSHAREDLIB_FIFFRAW_MODEL: {
+                if(temp->isInit()) {
+                    // add to record, and tell others about the new model
+                    QStandardItem* pItem = new QStandardItem(temp->getModelName());
+                    pItem->setEditable(false);
+                    pItem->setDragEnabled(true);
+                    pItem->setToolTip(temp->getModelPath());
 
-            QVariant data;
-            data.setValue(temp);
-            pItem->setData(data);
-            m_pData->addData(m_SelectedItem, pItem);
+                    QVariant data;
+                    data.setValue(temp);
+                    pItem->setData(data);
+                    m_pData->addData(m_SelectedItem, pItem);
 
-            emit newModelAvailable(temp);
-            return sm;
-        } else {
-            return Q_NULLPTR;
+                    emit newModelAvailable(temp);
+                    return sm;
+                } else {
+                    return Q_NULLPTR;
+                }
+            }
+            default: {
+                qDebug() << "[AnalyzData::loadModel] Model Type not supported";
+            }
         }
     }
 
