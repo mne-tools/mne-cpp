@@ -959,3 +959,17 @@ void AnnotationModel::saveGroup()
     m_mAnnotationHub[m_iSelectedGroup]->dataTypes_Filtered = m_dataTypesFiltered;
     m_mAnnotationHub[m_iSelectedGroup]->dataIsUserEvent_Filtered = m_dataIsUserEventFiltered;
 }
+
+//=============================================================================================================
+
+void AnnotationModel::setFiffModel(QSharedPointer<FiffRawViewModel> pModel)
+{
+    m_pFiffModel = pModel;
+}
+
+//=============================================================================================================
+
+QSharedPointer<FiffRawViewModel> AnnotationModel::getFiffModel()
+{
+    return m_pFiffModel;
+}
