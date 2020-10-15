@@ -70,6 +70,16 @@ AveragingDataModel::AveragingDataModel(QSharedPointer<FIFFLIB::FiffEvokedSet> pE
 
 //=============================================================================================================
 
+AveragingDataModel::AveragingDataModel(const QString &sFilePath,
+                                       const QByteArray& byteLoadedData,
+                                       QObject* parent)
+: AbstractModel(parent)
+{
+
+}
+
+//=============================================================================================================
+
 AveragingDataModel::~AveragingDataModel()
 {
 
