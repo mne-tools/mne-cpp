@@ -91,6 +91,11 @@ public:
                        QObject* parent = Q_NULLPTR);
 
     //=========================================================================================================
+    AveragingDataModel(const QString &sFilePath,
+                       const QByteArray& byteLoadedData = QByteArray(),
+                       QObject* parent = Q_NULLPTR);
+
+    //=========================================================================================================
     /**
      *  Destructs the AveragingDataModel object
      */

@@ -1006,6 +1006,8 @@ void AnnotationModel::initFromFile(const QString& sFilePath)
         while(!textStream.atEnd()){
             int iSample;
             textStream >> iSample;
+            setSamplePos(iSample);
+            insertRow(0, QModelIndex());
             textStream.readLine();
         }
     } else if(fileInfo.exists() && (fileInfo.completeSuffix() == "fif")){

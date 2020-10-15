@@ -41,7 +41,12 @@
 #include <anShared/Management/communicator.h>
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Model/fiffrawviewmodel.h>
+<<<<<<< HEAD
 #include <anShared/Model/bemdatamodel.h>
+=======
+#include <anShared/Model/annotationmodel.h>
+#include <anShared/Model/averagingdatamodel.h>
+>>>>>>> ENH: Adding avg models
 
 #include <disp/viewers/progressview.h>
 
@@ -217,6 +222,8 @@ void DataLoader::loadFilePath(const QString& sFilePath)
             m_pAnalyzeData->loadModel<ANSHAREDLIB::BemDataModel>(sFilePath);
         } else if(fileInfo.completeBaseName().endsWith("raw")){
             m_pAnalyzeData->loadModel<ANSHAREDLIB::FiffRawViewModel>(sFilePath);
+        } else if (fileInfo.completeBaseName().endsWith("ave")){
+            m_pAnalyzeData->loadModel<ANSHAREDLIB::AveragingDataModel>(sFilePath);
         }
     }
 
