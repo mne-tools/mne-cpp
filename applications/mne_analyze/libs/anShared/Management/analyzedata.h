@@ -166,12 +166,21 @@ public:
     bool removeModel(const QModelIndex &index);
 
     //=========================================================================================================
+    /**
+     * Add subject with name sSubjectName to BidsViewModel singleton
+     *
+     * @param [in] sSubjectName     Name of the new subject item
+     *
+     * @return returns pointer to new subject item
+     */
     QStandardItem* addSubject(const QString &sSubjectName);
 
     //=========================================================================================================
-    void addSession(const QString &sSessionName);
-
-    //=========================================================================================================
+    /**
+     * Updates stored indexes of currently selected data and item
+     *
+     * @param [in] index    index of the new selected item
+     */
     void newSelection(const QModelIndex &index);
 
     //=========================================================================================================
