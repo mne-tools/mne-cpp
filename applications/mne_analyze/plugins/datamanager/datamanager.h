@@ -115,9 +115,19 @@ private:
     void onCurrentlySelectedModelChanged(const QVariant& data);
 
     //=========================================================================================================
+    /**
+     * Triggers update to saved items in AnalyzeData
+     *
+     * @param [in] pIndex   index of newly selected item to be stored in AnalyzeData
+     */
     void onCurrentItemChanged(const QModelIndex& pIndex);
 
     //=========================================================================================================
+    /**
+     * Triggers removeal of item at index
+     *
+     * @param [in] index    model index of item to be removed
+     */
     void onRemoveItem(const QModelIndex &index);
 
     QPointer<ANSHAREDLIB::Communicator> m_pCommu;
