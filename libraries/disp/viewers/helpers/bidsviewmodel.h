@@ -201,7 +201,15 @@ public slots:
                                   QModelIndex dataIndex);
 
     //=========================================================================================================
+    /**
+     * Removes item at index itemIndex
+     *
+     * @param [in] itemIndex    index of item to be removed
+     *
+     * @return true if succefully removed, false if not
+     */
     bool removeItem(QModelIndex itemIndex);
+
 signals:
 
     //=========================================================================================================
