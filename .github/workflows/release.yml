@@ -316,6 +316,7 @@ jobs:
         sudo apt-get install libxcb-render-util0
         sudo apt-get install libbluetooth3
         sudo apt-get install libxcb-xinerama0 
+        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu/
         # Downloading linuxdeployqt from continious release
         wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
         sudo chmod a+x linuxdeployqt-continuous-x86_64.AppImage
@@ -372,8 +373,8 @@ jobs:
       run: |
         mkdir applications/mne_scan/plugins/brainflowboard/brainflow/build
         cd applications/mne_scan/plugins/brainflowboard/brainflow/build
-        cmake -DCMAKE_INSTALL_PREFIX=../installed ..
-        make
+        cmake -DCMAKE_INSTALL_PREFIX=../installed -DCMAKE_BUILD_TYPE=Release ..
+        make -j
         make install
     - name: Compile LSL submodule
       run: |
