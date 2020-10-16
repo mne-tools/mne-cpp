@@ -41,12 +41,9 @@
 #include <anShared/Management/communicator.h>
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Model/fiffrawviewmodel.h>
-<<<<<<< HEAD
 #include <anShared/Model/bemdatamodel.h>
-=======
 #include <anShared/Model/annotationmodel.h>
 #include <anShared/Model/averagingdatamodel.h>
->>>>>>> ENH: Adding avg models
 
 #include <disp/viewers/progressview.h>
 
@@ -129,19 +126,37 @@ QMenu *DataLoader::getMenu()
     connect(pActionLoadSession, &QAction::triggered,
             this, &DataLoader::onLoadSessionPressed);
 
-    QAction* pActionSave = new QAction(tr("Save"));
+    QAction* pActionSaveData = new QAction(tr("Save data"));
     pActionLoadFile->setStatusTip(tr("Save the selected data file"));
-    connect(pActionSave, &QAction::triggered,
-            this, &DataLoader::onSaveFilePressed);
+    connect(pActionSaveData, &QAction::triggered,[=] {
+                onSaveFilePressed(DATA_FILE);
+            });
+
+    QAction* pActionSaveAvg = new QAction(tr("Save average"));
+    pActionLoadFile->setStatusTip(tr("Save the selected data file"));
+    connect(pActionSaveAvg, &QAction::triggered,[=] {
+                onSaveFilePressed(AVERAGE_FILE);
+            });
+
+    QAction* pActionSaveAnn = new QAction(tr("Save annotation"));
+    pActionLoadFile->setStatusTip(tr("Save the selected data file"));
+    connect(pActionSaveAnn, &QAction::triggered,[=] {
+                onSaveFilePressed(ANNOTATION_FILE);
+            });
 
     QMenu* pBIDSMenu = new QMenu(tr("Load BIDS Folder"));
-
     pBIDSMenu->addAction(pActionLoadSubject);
     pBIDSMenu->addAction(pActionLoadSession);
 
+    QMenu* pSaveMenu = new QMenu(tr("Save"));
+    pSaveMenu->addAction(pActionSaveData);
+    pSaveMenu->addAction(pActionSaveAnn);
+    pSaveMenu->addAction(pActionSaveAvg);
+
     pMenuFile->addAction(pActionLoadFile);
     pMenuFile->addMenu(pBIDSMenu);
-    pMenuFile->addAction(pActionSave);
+    pMenuFile->addMenu(pSaveMenu);
+    //pMenuFile->addAction(pActionSave);
 
     return pMenuFile;
 }
@@ -165,13 +180,15 @@ QWidget *DataLoader::getView()
 void DataLoader::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
-        case EVENT_TYPE::SELECTED_MODEL_CHANGED:
-            if(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >()) {
+    case EVENT_TYPE::SELECTED_MODEL_CHANGED:
+        if(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >()) {
+            if(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >()->getType() == ANSHAREDLIB_FIFFRAW_MODEL){
                 m_pSelectedModel = e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >();
             }
-            break;
-        default:
-            qWarning() << "[DataLoader::handleEvent] Received an Event that is not handled by switch cases.";
+        }
+        break;
+    default:
+        qWarning() << "[DataLoader::handleEvent] Received an Event that is not handled by switch cases.";
     }
 }
 
@@ -199,19 +216,7 @@ void DataLoader::loadFilePath(const QString& sFilePath)
 {
     QFileInfo fileInfo(sFilePath);
 
-    m_pProgressView->setMessage("Loading " + fileInfo.fileName());
-    m_pProgressView->setLoadingBarVisible(false);
-    m_pProgressViewWidget->show();
-    m_pProgressViewWidget->move(qApp->topLevelWindows().first()->screen()->geometry().center() - m_pProgressViewWidget->rect().center());
-
-    for (QWindow* window : qApp->topLevelWindows()){
-        window->setOpacity(0.8);
-        for (QWidget* widget : window->findChildren<QWidget*>()){
-         widget->setEnabled(false);
-        }
-    }
-
-    QApplication::processEvents();
+    startProgress("Loading " + fileInfo.fileName());
 
     if(fileInfo.exists() && (fileInfo.completeSuffix() == "eve")){
         m_pAnalyzeData->loadModel<ANSHAREDLIB::AnnotationModel>(sFilePath);
@@ -227,14 +232,7 @@ void DataLoader::loadFilePath(const QString& sFilePath)
         }
     }
 
-    m_pProgressViewWidget->hide();
-
-    for (QWindow* window : qApp->topLevelWindows()){
-        window->setOpacity(1.0);
-        for (QWidget* widget : window->findChildren<QWidget*>()){
-         widget->setEnabled(true);
-        }
-    }
+    endProgress();
 }
 
 //=============================================================================================================
@@ -269,7 +267,7 @@ void DataLoader::onLoadFilePressed()
 
 //=============================================================================================================
 
-void DataLoader::onSaveFilePressed()
+void DataLoader::onSaveFilePressed(FileType type)
 {
     if(!m_pSelectedModel) {
         qWarning() << "[DataLoader::onSaveFilePressed] No model selected.";
@@ -277,46 +275,82 @@ void DataLoader::onSaveFilePressed()
     }
 
     #ifdef WASMBUILD
-    m_pSelectedModel->saveToFile("");
+    switch (type){
+        case DATA_FILE:{
+            m_pSelectedModel->saveToFile("");
+            break;
+        }
+        case ANNOTATION_FILE: {
+            qDebug() << "[DataLoader::onSaveFilePressed] ANNOTATION_FILE Not yet implemented";
+            break;
+        }
+        case AVERAGE_FILE: {
+            qDebug() << "[DataLoader::onSaveFilePressed] AVERAGE_FILE Not yet implemented";
+            break;
+        }
+        default: {
+            qWarning() << "[DataLoader::onSaveFilePressed] Saving operation not supported.";
+        }
+    }
     #else
+
+    QString sFile, sFileType, sDir;
+
+    switch (type){
+        case DATA_FILE:{
+            sFile = tr("Save File");
+            sFileType = tr("Fiff file(*.fif *.fiff)");
+            sDir = "/MNE-sample-data";
+            break;
+        }
+        case ANNOTATION_FILE: {
+            sFile = tr("Save Events");
+            sFileType = tr("Event file(*.eve)");
+            sDir = "/MNE-sample-data";
+            break;
+        }
+        case AVERAGE_FILE: {
+            qDebug() << "[DataLoader::onSaveFilePressed] Not yet implemented";
+            return;
+            break;
+        }
+        default: {
+            qWarning() << "[DataLoader::onSaveFilePressed] Saving operation not supported.";
+        }
+    }
+
     //Get the path
     QString sFilePath = QFileDialog::getSaveFileName(Q_NULLPTR,
-                                                    tr("Save File"),
-                                                    QDir::currentPath()+"/MNE-sample-data",
-                                                    tr("Fiff file(*.fif *.fiff)"));
-
+                                                    sFile,
+                                                    QDir::currentPath()+sDir,
+                                                    sFileType);
     QFileInfo fileInfo(sFilePath);
 
     if(fileInfo.fileName().isEmpty()){
         return;
     }
 
-    m_pProgressView->setMessage("Saving " + fileInfo.fileName());
-    m_pProgressView->setLoadingBarVisible(false);
-    m_pProgressViewWidget->show();
-    m_pProgressViewWidget->move(qApp->topLevelWindows().first()->screen()->geometry().center() - m_pProgressViewWidget->rect().center());
+    startProgress("Saving " + fileInfo.fileName());
 
-    for (QWindow* window : qApp->topLevelWindows()){
-        window->setOpacity(0.8);
-        for (QWidget* widget : window->findChildren<QWidget*>()){
-         widget->setEnabled(false);
+    switch (type){
+        case DATA_FILE:{
+            m_pSelectedModel->saveToFile(sFilePath);
+            break;
+        }
+        case ANNOTATION_FILE: {
+            qDebug() << "[DataLoader::onSaveFilePressed] ANNOTATION_FILE Not yet implemented";
+            break;
+        }
+        case AVERAGE_FILE: {
+            qDebug() << "[DataLoader::onSaveFilePressed] AVERAGE_FILE Not yet implemented";
+            break;
+        }
+        default: {
+            qWarning() << "[DataLoader::onSaveFilePressed] Saving operation not supported.";
         }
     }
 
-    m_pProgressViewWidget->setWindowOpacity(1.0);
-
-    QApplication::processEvents();
-
-    m_pSelectedModel->saveToFile(sFilePath);
-
-    m_pProgressViewWidget->hide();
-
-    for (QWindow* window : qApp->topLevelWindows()){
-        window->setOpacity(1.0);
-        for (QWidget* widget : window->findChildren<QWidget*>()){
-         widget->setEnabled(true);
-        }
-    }
+    endProgress();
 
     #endif
 }
@@ -352,3 +386,44 @@ void DataLoader::onLoadSessionPressed()
 {
 
 }
+
+//=============================================================================================================
+
+void DataLoader::startProgress(QString sMessage)
+{
+    if (!m_pProgressViewWidget->isHidden()){
+        return;
+    }
+
+    m_pProgressView->setMessage(sMessage);
+    m_pProgressView->setLoadingBarVisible(false);
+    m_pProgressViewWidget->show();
+    m_pProgressViewWidget->move(qApp->topLevelWindows().first()->screen()->geometry().center() - m_pProgressViewWidget->rect().center());
+
+    for (QWindow* window : qApp->topLevelWindows()){
+        window->setOpacity(0.8);
+        for (QWidget* widget : window->findChildren<QWidget*>()){
+         widget->setEnabled(false);
+        }
+    }
+
+    m_pProgressViewWidget->setWindowOpacity(1.0);
+
+    QApplication::processEvents();
+
+}
+
+//=============================================================================================================
+
+void DataLoader::endProgress()
+{
+    m_pProgressViewWidget->hide();
+
+    for (QWindow* window : qApp->topLevelWindows()){
+        window->setOpacity(1.0);
+        for (QWidget* widget : window->findChildren<QWidget*>()){
+         widget->setEnabled(true);
+        }
+    }
+}
+

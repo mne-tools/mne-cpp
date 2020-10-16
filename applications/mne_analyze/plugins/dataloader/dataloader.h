@@ -90,6 +90,7 @@ class DATALOADERSHARED_EXPORT DataLoader : public ANSHAREDLIB::IPlugin
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(ANSHAREDLIB::IPlugin)
 
+    enum FileType {DATA_FILE, AVERAGE_FILE, ANNOTATION_FILE};
 public:
     //=========================================================================================================
     /**
@@ -143,7 +144,7 @@ private:
     /**
      * This functions is called when the save to file button is pressed.
      */
-    void onSaveFilePressed();
+    void onSaveFilePressed(FileType type = DATA_FILE);
 
     //=========================================================================================================
     /**
@@ -152,6 +153,12 @@ private:
     void onLoadSubjectPressed();
 
     void onLoadSessionPressed();
+
+    //=========================================================================================================
+    void startProgress(QString sMessage);
+
+    //=========================================================================================================
+    void endProgress();
 
     QPointer<ANSHAREDLIB::Communicator>         m_pCommu;
     QPointer<DISPLIB::ProgressView>             m_pProgressView;
