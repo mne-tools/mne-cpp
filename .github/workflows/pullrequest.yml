@@ -61,8 +61,8 @@ jobs:
         cd applications/mne_scan/plugins/brainflowboard/brainflow
         mkdir build
         cd build
-        cmake -DCMAKE_INSTALL_PREFIX=../installed ..
-        make
+        cmake -DCMAKE_INSTALL_PREFIX=../installed -DCMAKE_BUILD_TYPE=Release ..
+        make -j
         make install
     - name: Compile LSL submodule (Windows)
       if: matrix.os == 'windows-2016'
@@ -107,6 +107,7 @@ jobs:
         sudo apt-get install libxkbcommon-x11-0
         sudo apt-get install libxcb-icccm4
         sudo apt-get install libbluetooth3
+        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu/
         # Downloading linuxdeployqt from continious release
         wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
         sudo chmod a+x linuxdeployqt-continuous-x86_64.AppImage
@@ -199,8 +200,8 @@ jobs:
         cd applications/mne_scan/plugins/brainflowboard/brainflow
         mkdir build
         cd build
-        cmake -DCMAKE_INSTALL_PREFIX=../installed ..
-        make
+        cmake -DCMAKE_INSTALL_PREFIX=../installed -DCMAKE_BUILD_TYPE=Release ..
+        make -j
         make install
     - name: Compile LSL submodule (Windows)
       if: matrix.os == 'windows-2019'
@@ -250,6 +251,7 @@ jobs:
         sudo apt-get install libxcb-render-util0
         sudo apt-get install libbluetooth3
         sudo apt-get install libxcb-xinerama0 
+        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu/
         # Downloading linuxdeployqt from continious release
         wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
         sudo chmod a+x linuxdeployqt-continuous-x86_64.AppImage
