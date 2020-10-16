@@ -44,6 +44,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QFile>
 
 //=============================================================================================================
 // Eigen INCLUDES
@@ -74,8 +75,15 @@ AveragingDataModel::AveragingDataModel(const QString &sFilePath,
                                        const QByteArray& byteLoadedData,
                                        QObject* parent)
 : AbstractModel(parent)
-{
 
+{
+    Q_UNUSED(byteLoadedData);
+
+    QFile file(sFilePath);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+        return;
+    }
+    m_pFiffEvokedSet = QSharedPointer<FIFFLIB::FiffEvokedSet>::create(file);
 }
 
 //=============================================================================================================
