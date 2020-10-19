@@ -119,6 +119,8 @@ public:
 
     AnnotationModel(const QString &sFilePath,
                     const QByteArray& byteLoadedData = QByteArray(),
+                    float fSampFreq = 600,
+                    int iFirstSampOffst = 0,
                     QObject* parent = Q_NULLPTR);
 
     //=========================================================================================================

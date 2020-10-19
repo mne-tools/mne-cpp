@@ -366,6 +366,7 @@ void AnnotationSettingsView::onSaveButton()
     }
     qInfo() << "AnnotationSettingsView::onSaveButton";
 
+    std::cout << m_pFiffRawModel->absoluteFirstSample();
     m_pAnnModel->saveToFile(fileName);
     #endif
 }
