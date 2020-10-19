@@ -273,9 +273,6 @@ private slots:
      */
     void createGroupsFromTriggers();
 
-    //=========================================================================================================
-    void applyOffset(int iFisrtSampleOffset);
-
 private:
     //=========================================================================================================
     /**
@@ -424,7 +421,6 @@ private:
 
     QFutureWatcher <QMap<double,QList<int>>>        m_FutureWatcher;                /** < Watches m_Future and signals when calculations are done */
     QFuture<QMap<double,QList<int>>>                m_Future;                       /** < Used to perfom trigger detection on a separate thread */
-
 
 };
 

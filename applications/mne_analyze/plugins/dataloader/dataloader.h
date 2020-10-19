@@ -42,6 +42,7 @@
 #include "dataloader_global.h"
 
 #include <anShared/Interfaces/IPlugin.h>
+#include <anShared/Model/fiffrawviewmodel.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -152,6 +153,7 @@ private:
      */
     void onLoadSubjectPressed();
 
+    //=========================================================================================================
     void onLoadSessionPressed();
 
     //=========================================================================================================
@@ -160,11 +162,19 @@ private:
     //=========================================================================================================
     void endProgress();
 
+    //=========================================================================================================
+    /**
+     * Loads new Fiff model whan current loaded model is changed
+     *
+     * @param [in,out] pNewModel    pointer to currently loaded FiffRawView Model
+     */
+    void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
+
     QPointer<ANSHAREDLIB::Communicator>         m_pCommu;
     QPointer<DISPLIB::ProgressView>             m_pProgressView;
     QPointer<QWidget>                           m_pProgressViewWidget;
 
-    QSharedPointer<ANSHAREDLIB::AbstractModel>  m_pSelectedModel;
+    QSharedPointer<ANSHAREDLIB::FiffRawViewModel>  m_pSelectedModel;
 };
 
 //=============================================================================================================
