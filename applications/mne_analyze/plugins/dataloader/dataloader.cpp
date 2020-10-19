@@ -181,11 +181,7 @@ void DataLoader::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
     case EVENT_TYPE::SELECTED_MODEL_CHANGED:
-        if(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >()) {
-            if(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >()->getType() == ANSHAREDLIB_FIFFRAW_MODEL){
-                m_pSelectedModel = e->getData().value<QSharedPointer<ANSHAREDLIB::FiffRawViewModel>>();
-            }
-        }
+        onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
         break;
     default:
         qWarning() << "[DataLoader::handleEvent] Received an Event that is not handled by switch cases.";
@@ -219,7 +215,10 @@ void DataLoader::loadFilePath(const QString& sFilePath)
     startProgress("Loading " + fileInfo.fileName());
 
     if(fileInfo.exists() && (fileInfo.completeSuffix() == "eve")){
-        m_pAnalyzeData->loadModel<ANSHAREDLIB::AnnotationModel>(sFilePath);
+        QSharedPointer<ANSHAREDLIB::AnnotationModel> pModel = m_pAnalyzeData->loadModel<ANSHAREDLIB::AnnotationModel>(sFilePath);
+        pModel->applyOffset(m_pSelectedModel->absoluteFirstSample());
+        pModel->setFiffModel(m_pSelectedModel);
+        qDebug() << "OFFSET:" << m_pSelectedModel->absoluteFirstSample();
     } else if(fileInfo.exists() && (fileInfo.completeSuffix() == "fif")) {
         if(fileInfo.completeBaseName().endsWith("eve")){
             m_pAnalyzeData->loadModel<ANSHAREDLIB::AnnotationModel>(sFilePath);
@@ -428,3 +427,17 @@ void DataLoader::endProgress()
     }
 }
 
+//=============================================================================================================
+
+void DataLoader::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel)
+{
+    if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
+        if(m_pSelectedModel) {
+            if(m_pSelectedModel == pNewModel) {
+                qInfo() << "[Averaging::onModelChanged] New model is the same as old model";
+                return;
+            }
+        }
+        m_pSelectedModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
+    }
+}

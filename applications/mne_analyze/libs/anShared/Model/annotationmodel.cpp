@@ -1001,10 +1001,12 @@ void AnnotationModel::initFromFile(const QString& sFilePath)
         }
         QTextStream textStream(&file);
 
-        createGroup(fileInfo.baseName(),
+        int iGroupIndex = createGroup(fileInfo.baseName(),
                     false,
                     1,
                     QColor("red"));
+
+        switchGroup(iGroupIndex);
 
         while(!textStream.atEnd()){
             int iSample;
@@ -1028,5 +1030,14 @@ void AnnotationModel::initFromFile(const QString& sFilePath)
 
 void AnnotationModel::applyOffset(int iFirstSampleOffset)
 {
+    for (int i = 0; i < m_dataSamples.size(); i++){
+        if (iFirstSampleOffset <= m_dataSamples[i]){
+            m_dataSamples[i] -= iFirstSampleOffset;
+        } else {
+            qWarning() << "[AnnotationModel::applyOffset] Offset greater than event sample";
+        }
+    }
 
+    //Update data to be diplayed
+    setEventFilterType(m_sFilterEventType);
 }
