@@ -158,9 +158,9 @@ void AnnotationSettingsView::initGUIFunctionality()
     connect(m_pUi->m_pushButton_addEventType, &QPushButton::clicked,
             this, &AnnotationSettingsView::addNewAnnotationType, Qt::UniqueConnection);
 
-    //Save button
-    connect(m_pUi->m_pushButtonSave, &QPushButton::clicked,
-            this, &AnnotationSettingsView::onSaveButton, Qt::UniqueConnection);
+//    //Save button
+//    connect(m_pUi->m_pushButtonSave, &QPushButton::clicked,
+//            this, &AnnotationSettingsView::onSaveButton, Qt::UniqueConnection);
 
     //Switching groups
     connect(m_pUi->m_listWidget_groupListWidget->selectionModel(), &QItemSelectionModel::selectionChanged,

@@ -183,7 +183,7 @@ void DataLoader::handleEvent(QSharedPointer<Event> e)
     case EVENT_TYPE::SELECTED_MODEL_CHANGED:
         if(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >()) {
             if(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >()->getType() == ANSHAREDLIB_FIFFRAW_MODEL){
-                m_pSelectedModel = e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >();
+                m_pSelectedModel = e->getData().value<QSharedPointer<ANSHAREDLIB::FiffRawViewModel>>();
             }
         }
         break;
@@ -338,6 +338,7 @@ void DataLoader::onSaveFilePressed(FileType type)
             break;
         }
         case ANNOTATION_FILE: {
+            m_pSelectedModel->getAnnotationModel()->saveToFile(sFilePath);
             qDebug() << "[DataLoader::onSaveFilePressed] ANNOTATION_FILE Not yet implemented";
             break;
         }
