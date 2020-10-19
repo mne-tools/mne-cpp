@@ -234,6 +234,7 @@ public:
                 pItem->setData(data);
                 m_pData->addToData(pItem, m_SelectedData);
 
+                return sm;
             }
             case ANSHAREDLIB_AVERAGING_MODEL: {
                 QStandardItem* pItem = new QStandardItem("Average - " + temp->getModelName());
@@ -245,6 +246,8 @@ public:
                 data.setValue(temp);
                 pItem->setData(data);
                 m_pData->addToData(pItem, m_SelectedData);
+
+                return sm;
             }
             default: {
                 qDebug() << "[AnalyzData::loadModel] Model Type not supported";

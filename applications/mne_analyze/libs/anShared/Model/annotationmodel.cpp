@@ -41,6 +41,7 @@
 #include "fiffrawviewmodel.h"
 #include <mne/mne.h>
 #include <iomanip>
+#include <iostream>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -113,6 +114,8 @@ AnnotationModel::AnnotationModel(QSharedPointer<FiffRawViewModel> pFiffModel,
 
 AnnotationModel::AnnotationModel(const QString &sFilePath,
                                  const QByteArray& byteLoadedData,
+                                 float fSampFreq,
+                                 int iFirstSampOffst,
                                  QObject* parent)
 : AbstractModel(parent)
 , m_iIndexCount(0)
@@ -127,7 +130,6 @@ AnnotationModel::AnnotationModel(const QString &sFilePath,
 {
     initModel();
     initFromFile(sFilePath);
-
 }
 
 //=============================================================================================================
@@ -609,8 +611,9 @@ bool AnnotationModel::saveToFile(const QString& sPath)
 
     QTextStream out(&file);
     for(int i = 0; i < this->getNumberOfAnnotations(); i++) {
-        out << "  " << this->getAnnotation(i) << "   " << QString::number(static_cast<float>(this->getAnnotation(i)) / this->getFreq(), 'f', 4) << "          0         1" << endl;
-        out << "  " << this->getAnnotation(i) << "   " << QString::number(static_cast<float>(this->getAnnotation(i)) / this->getFreq(), 'f', 4) << "          1         0" << endl;
+        int iAnnotation = this->getAnnotation(i);
+        out << "  " << iAnnotation << "   " << QString::number(static_cast<float>(iAnnotation - m_pFiffModel->absoluteFirstSample()) / this->getFreq(), 'f', 4) << "          0         1" << endl;
+        out << "  " << iAnnotation << "   " << QString::number(static_cast<float>(iAnnotation - m_pFiffModel->absoluteFirstSample()) / this->getFreq(), 'f', 4) << "          1         0" << endl;
     }
     return true;
     #endif
@@ -1009,6 +1012,7 @@ void AnnotationModel::initFromFile(const QString& sFilePath)
             setSamplePos(iSample);
             insertRow(0, QModelIndex());
             textStream.readLine();
+            qDebug() << "Added event:" << iSample;
         }
     } else if(fileInfo.exists() && (fileInfo.completeSuffix() == "fif")){
         QFile file(sFilePath);
