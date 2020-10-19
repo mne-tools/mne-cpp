@@ -625,7 +625,13 @@ public:
                              int column,
                              const QModelIndex &parent = QModelIndex()) const override;
 
+    //=========================================================================================================
     void setFiffModel(QSharedPointer<FiffRawViewModel> pModel);
+
+    //=========================================================================================================
+    void applyOffset(int iFirstSampleOffset);
+
+
 
     QSharedPointer<FiffRawViewModel> getFiffModel();
 

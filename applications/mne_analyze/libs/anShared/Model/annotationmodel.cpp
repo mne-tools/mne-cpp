@@ -1023,3 +1023,10 @@ void AnnotationModel::initFromFile(const QString& sFilePath)
         MNELIB::MNE::read_events(file, eventlist);
     }
 }
+
+//=============================================================================================================
+
+void AnnotationModel::applyOffset(int iFirstSampleOffset)
+{
+
+}
