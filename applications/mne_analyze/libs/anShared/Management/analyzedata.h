@@ -238,20 +238,20 @@ public:
 
                 return sm;
             }
-//            case ANSHAREDLIB_AVERAGING_MODEL: {
-//                QStandardItem* pItem = new QStandardItem("Average - " + temp->getModelName());
-//                pItem->setEditable(false);
-//                pItem->setDragEnabled(true);
-//                pItem->setToolTip(temp->getModelPath());
+            case ANSHAREDLIB_AVERAGING_MODEL: {
+                QStandardItem* pItem = new QStandardItem("Average - " + temp->getModelName());
+                pItem->setEditable(false);
+                pItem->setDragEnabled(true);
+                pItem->setToolTip(temp->getModelPath());
 
-//                QVariant data;
-//                data.setValue(temp);
-//                pItem->setData(data);
-//                m_pData->addToData(pItem,
-//                                   m_SelectedData);
+                QVariant data;
+                data.setValue(temp);
+                pItem->setData(data);
+                m_pData->addToData(pItem,
+                                   m_SelectedData);
 
-//                return sm;
-//            }
+                return sm;
+            }
             default: {
                 qDebug() << "[AnalyzData::loadModel] Model Type not supported";
             }

@@ -80,9 +80,9 @@ AveragingDataModel::AveragingDataModel(const QString &sFilePath,
     Q_UNUSED(byteLoadedData);
 
     QFile file(sFilePath);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
-        return;
-    }
+//    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+//        return;
+//    }
     m_pFiffEvokedSet = QSharedPointer<FIFFLIB::FiffEvokedSet>::create(file);
 }
 
