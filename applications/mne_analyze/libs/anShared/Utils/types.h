@@ -115,7 +115,8 @@ namespace ANSHAREDLIB
         NEW_FIDUCIALS_ADDED,        // event send whenever new fiducials are loaded
         NEW_TRANS_AVAILABE,         // event send whenever a new head-mri transformation is available
         FID_PICKING_STATUS,         // event send whenever status of fiducial picking has changed
-        NEW_FIDUCIAL_PICKED         // event send whenever a new fiducial was picked
+        NEW_FIDUCIAL_PICKED,        // event send whenever a new fiducial was picked
+        FIDUCIAL_CHANGED
     };
 
     //=========================================================================================================

@@ -176,7 +176,7 @@ void ControlManager::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
     case SELECTED_MODEL_CHANGED:
-        if(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >()->getType() == ANSHAREDLIB_FIFFRAW_MODEL) {
+        if(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >()->getType() != ANSHAREDLIB_BEMDATA_MODEL) {
             onScalingChanged(m_ScalingParameters.m_mScalingMap);
             m_ViewParmeters.m_sViewsToApply = m_pApplyToView->getSelectedViews();
             m_ViewParmeters.m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::all;

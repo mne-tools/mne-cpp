@@ -127,10 +127,27 @@ public:
      */
     void updateProcessingMode(ProcessingMode mode);
 
+    //=========================================================================================================
+    /**
+     * Clear/Emüpty the selection menu for bem models.
+     *
+     */
     void clearSelectionBem();
 
+    //=========================================================================================================
+    /**
+     * Add a new Bem to the drop down menu.
+     *
+     * @param sBemName     The name of the bem.
+     */
     void addSelectionBem(const QString& sBemName);
 
+    //=========================================================================================================
+    /**
+     * Return the currently selected bem.
+     *
+     * @return The name of the currently selected bem.
+     */
     QString getCurrentSelectedBem();
 
     //=========================================================================================================
@@ -244,8 +261,6 @@ public:
                         const Eigen::Vector3f& vecRot,
                         const Eigen::Vector3f& vecScale);
 
-protected:
-
 private:
     //=========================================================================================================
     /**
@@ -257,7 +272,7 @@ private:
     /**
      * Pick fiducials is activated
      */
-    void onPickFiducialsChanged();
+    void onPickingStatus();
 
     //=========================================================================================================
     /**
@@ -328,6 +343,14 @@ signals:
      * @param[in] sFilePath    The file path to the fiduical file.
      */
     void fidFileChanged(const QString& sFilePath);
+
+    //=========================================================================================================
+    /**
+     * Emit this signal whenever the picked fiducial changed.
+     *
+     * @param[in] iFiducial    The picked fiducial.
+     */
+    void fiducialChanged(const int iFiducial);
 
     //=========================================================================================================
     /**
