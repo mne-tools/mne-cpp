@@ -139,7 +139,8 @@ bool MNE::read_events(QString t_sEventName,
 
 //=============================================================================================================
 
-bool MNE::read_events(QIODevice &p_IODevice, MatrixXi& eventlist)
+bool MNE::read_events(QIODevice &p_IODevice,
+                      MatrixXi& eventlist)
 {
     //
     // Open file
@@ -273,4 +274,24 @@ void MNE::setup_compensators(FiffRawData& raw,
             return;
         }
     }
+}
+
+//=============================================================================================================
+
+bool MNE::read_events(QIODevice &p_IODevice,
+                      QList<int> &eventList)
+{
+    if (!p_IODevice.open(QIODevice::ReadOnly | QIODevice::Text)){
+        return false;
+    }
+    QTextStream textStream(&p_IODevice);
+
+    while(!textStream.atEnd()){
+        int iSample;
+        textStream >> iSample;
+        eventList.append(iSample);
+        textStream.readLine();
+        qDebug() << "Added event:" << iSample;
+    }
+    return true;
 }

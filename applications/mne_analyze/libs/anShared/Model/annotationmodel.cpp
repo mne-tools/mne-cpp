@@ -996,10 +996,10 @@ void AnnotationModel::initFromFile(const QString& sFilePath)
 
     if(fileInfo.exists() && (fileInfo.completeSuffix() == "eve")){
         QFile file(sFilePath);
-        if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
-            return;
-        }
-        QTextStream textStream(&file);
+//        if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+//            return;
+//        }
+//        QTextStream textStream(&file);
 
         int iGroupIndex = createGroup(fileInfo.baseName(),
                     false,
@@ -1014,14 +1014,22 @@ void AnnotationModel::initFromFile(const QString& sFilePath)
         newItem->setFlags (newItem->flags () | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
         pushGroup(newItem);
 
-        while(!textStream.atEnd()){
-            int iSample;
-            textStream >> iSample;
-            setSamplePos(iSample);
+//        while(!textStream.atEnd()){
+//            int iSample;
+//            textStream >> iSample;
+//            setSamplePos(iSample);
+//            insertRow(0, QModelIndex());
+//            textStream.readLine();
+//            qDebug() << "Added event:" << iSample;
+//        }
+        QList<int> eventList;
+        MNELIB::MNE::read_events(file, eventList);
+
+        for(int i = 0; i < eventList.size(); i++){
+            setSamplePos(eventList[i]);
             insertRow(0, QModelIndex());
-            textStream.readLine();
-            qDebug() << "Added event:" << iSample;
         }
+
     } else if(fileInfo.exists() && (fileInfo.completeSuffix() == "fif")){
         QFile file(sFilePath);
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
