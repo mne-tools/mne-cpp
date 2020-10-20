@@ -78,8 +78,10 @@ View3D::View3D()
     : m_pCommu(Q_NULLPTR)
     , m_pBemTreeCoreg(Q_NULLPTR)
     , m_pDigitizerCoreg(Q_NULLPTR)
+    , m_pView3D(Q_NULLPTR)
     , m_bPickingActivated(false)
 {
+    m_iFiducial = 1;
 }
 
 //=============================================================================================================
@@ -129,7 +131,10 @@ QMenu *View3D::getMenu()
 
 QWidget *View3D::getView()
 {
-    m_pView3D = new DISP3DLIB::View3D();
+    if(!m_pView3D) {
+        m_pView3D = new DISP3DLIB::View3D();
+    }
+
     m_pView3D->setModel(m_p3DModel);
 
     connect(m_pView3D, &DISP3DLIB::View3D::pickEventOccured,
@@ -144,6 +149,10 @@ QWidget *View3D::getView()
 QDockWidget* View3D::getControl()
 {
     // Coregistration Settings
+    if(!m_pView3D) {
+        m_pView3D = new DISP3DLIB::View3D();
+    }
+
     DISP3DLIB::Data3DTreeDelegate* pData3DTreeDelegate = new DISP3DLIB::Data3DTreeDelegate(this);
 
     QStringList slControlFlags;
@@ -153,26 +162,26 @@ QDockWidget* View3D::getControl()
     m_pControl3DView->setModel(m_p3DModel.data());
 
     // TODO getControl() called before getView() -> dangling pointer m_pView3D
-//    connect(m_pControl3DView, &Control3DView::sceneColorChanged,
-//            m_pView3D, &DISP3DLIB::View3D::setSceneColor);
+    connect(m_pControl3DView, &Control3DView::sceneColorChanged,
+            m_pView3D, &DISP3DLIB::View3D::setSceneColor);
 
-//    connect(m_pControl3DView, &Control3DView::rotationChanged,
-//            m_pView3D, &DISP3DLIB::View3D::startStopModelRotation);
+    connect(m_pControl3DView, &Control3DView::rotationChanged,
+            m_pView3D, &DISP3DLIB::View3D::startStopModelRotation);
 
-//    connect(m_pControl3DView, &Control3DView::showCoordAxis,
-//            m_pView3D, &DISP3DLIB::View3D::toggleCoordAxis);
+    connect(m_pControl3DView, &Control3DView::showCoordAxis,
+            m_pView3D, &DISP3DLIB::View3D::toggleCoordAxis);
 
-//    connect(m_pControl3DView, &Control3DView::showFullScreen,
-//            m_pView3D, &DISP3DLIB::View3D::showFullScreen);
+    connect(m_pControl3DView, &Control3DView::showFullScreen,
+            m_pView3D, &DISP3DLIB::View3D::showFullScreen);
 
-//    connect(m_pControl3DView, &Control3DView::lightColorChanged,
-//            m_pView3D, &DISP3DLIB::View3D::setLightColor);
+    connect(m_pControl3DView, &Control3DView::lightColorChanged,
+            m_pView3D, &DISP3DLIB::View3D::setLightColor);
 
-//    connect(m_pControl3DView, &Control3DView::lightIntensityChanged,
-//            m_pView3D, &DISP3DLIB::View3D::setLightIntensity);
+    connect(m_pControl3DView, &Control3DView::lightIntensityChanged,
+            m_pView3D, &DISP3DLIB::View3D::setLightIntensity);
 
-//    connect(m_pControl3DView, &Control3DView::takeScreenshotChanged,
-//            m_pView3D, &DISP3DLIB::View3D::takeScreenshot);
+    connect(m_pControl3DView, &Control3DView::takeScreenshotChanged,
+            m_pView3D, &DISP3DLIB::View3D::takeScreenshot);
 
     QDockWidget* pControlDock = new QDockWidget(getName());
     pControlDock->setAllowedAreas(Qt::RightDockWidgetArea | Qt::LeftDockWidgetArea);
@@ -202,6 +211,9 @@ void View3D::handleEvent(QSharedPointer<Event> e)
         case FID_PICKING_STATUS:
             fiducialPicking(e->getData().value<bool>());
             break;
+        case FIDUCIAL_CHANGED:
+            onFiducialChanged(e->getData().value<int>());
+            break;
         default:
             qWarning() << "[View3D::handleEvent] Received an Event that is not handled by switch cases.";
     }
@@ -217,6 +229,7 @@ QVector<EVENT_TYPE> View3D::getEventSubscriptions(void) const
     temp.push_back(NEW_FIDUCIALS_ADDED);
     temp.push_back(NEW_TRANS_AVAILABE);
     temp.push_back(FID_PICKING_STATUS);
+    temp.push_back(FIDUCIAL_CHANGED);
     return temp;
 }
 
@@ -266,13 +279,36 @@ void View3D::fiducialPicking(const bool bActivatePicking)
 {
     m_pView3D->activatePicker(bActivatePicking);
     m_bPickingActivated = bActivatePicking;
+
+    if(bActivatePicking) {
+        onFiducialChanged(m_iFiducial);
+    }
 }
 
 //=========================================================================================================
 
 void View3D::newPickingEvent(Qt3DRender::QPickEvent *qPickEvent)
 {
-    qDebug() << __func__ << ": global Coord: " << qPickEvent->worldIntersection();
     QVariant data = QVariant::fromValue(qPickEvent->worldIntersection());
     m_pCommu->publishEvent(EVENT_TYPE::NEW_FIDUCIAL_PICKED, data);
+}
+
+//=========================================================================================================
+
+void View3D::onFiducialChanged(const int iFiducial)
+{
+    switch(iFiducial) {
+        case FIFFV_POINT_LPA:
+            m_pView3D->setCameraRotation(90);
+            m_iFiducial = FIFFV_POINT_LPA;
+            return;
+        case FIFFV_POINT_NASION:
+            m_pView3D->setCameraRotation(0);
+            m_iFiducial = FIFFV_POINT_NASION;
+            return;
+        case FIFFV_POINT_RPA:
+            m_pView3D->setCameraRotation(270);
+            m_iFiducial = FIFFV_POINT_RPA;
+            return;
+    }
 }

@@ -122,7 +122,6 @@ public:
     virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
 
 private:
-
     //=========================================================================================================
     /**
      * Updates the dropdown display for selecting the bem model.
@@ -154,6 +153,12 @@ private:
      * Create new fiducial from ObjectPicking input.
      */
     void onSetFiducial(const QVector3D vecResult);
+
+    //=========================================================================================================
+    /**
+     * Updates selected fiducial.
+     */
+    void onPickedFiducialChanged(const int iFiducial);
 
     //=========================================================================================================
     /**
@@ -229,6 +234,8 @@ private:
     /**
      * Get the transformation parameters from the matrix (rotation euler angle, translation, scale)
      *
+     * Following https://math.stackexchange.com/a/1463487
+     *
      * @param[in] matTrans      The transformation matrix to obtain the parametrs from.
      * @param[out] vecTrans     The translation vector (x,y,z).
      * @param[out] vecRot       The rotation angle vector in rad (due to euler transformation: z,y,x) .
@@ -261,6 +268,12 @@ private:
      */
     void onStoreFiducials(const QString& sFilePath);
 
+    //=========================================================================================================
+    /**
+     * Get ICP properties from cpregsettingsview and store to member variables
+     */
+    void setIcpProperties();
+
     //=============================================================================================================
     /**
      * Sends event to trigger loading bar to appear and sMessage to show
@@ -281,6 +294,18 @@ private:
     FIFFLIB::FiffDigPointSet                                m_digSetHead;           /**< The currently selected digitizer set */
     FIFFLIB::FiffDigPointSet                                m_digFidMri;            /**< The currently selected mri fiducials */
     FIFFLIB::FiffCoordTrans                                 m_transHeadMri;         /**< The resulting head-mri transformation */
+
+    int m_iFiducial;                                        /**< Currently selected fiducial */
+    bool m_bScale;                                            /**< Wether to apply automatic scaling */
+    float m_fWeightLPA;                                       /**< Weight LPA */
+    float m_fWeightNAS;                                       /**< Weight NAS */
+    float m_fWeightRPA;                                       /**< Weight RPA */
+    float m_fWeightHPI;                                       /**< Weight HPI */
+    float m_fWeightHSP;                                       /**< Weight HSP (Head Shape Point) */
+    float m_fWeightEEG;                                       /**< Weight EEG  */
+    float m_fMaxDist;                                         /**< Maximum distace - electrode surface */
+    float m_fTol;                                             /**< Divergence Tolerance  */
+    int m_iMaxIter;                                           /**< Maximum ammount of iterations */
 
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;
 

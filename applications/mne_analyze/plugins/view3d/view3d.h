@@ -160,11 +160,19 @@ private:
 
     //=========================================================================================================
     /**
+     * Activate/deactivate fiducial picking.
+     */
+    void onFiducialChanged(const int iFiducial);
+
+    //=========================================================================================================
+    /**
      * Handle incoming picking event from DISP3DLIB::3DView.
      */
     void newPickingEvent(Qt3DRender::QPickEvent *qPickEvent);
 
     QPointer<ANSHAREDLIB::Communicator>             m_pCommu;               /**< To broadcst signals */
+
+    int                                             m_iFiducial;            /**< Currently selected fiducial */
 
     QSharedPointer<DISP3DLIB::Data3DTreeModel>      m_p3DModel;             /**< The 3D model data */
     DISP3DLIB::BemTreeItem*                         m_pBemTreeCoreg;        /**< TThe BEM head model of the coregistration plugin. */
