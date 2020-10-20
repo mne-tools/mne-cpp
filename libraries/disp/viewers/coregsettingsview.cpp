@@ -112,14 +112,14 @@ CoregSettingsView::CoregSettingsView(const QString& sSettingsPath,
 
     // Connect Fiducial Pickings
     connect(m_pUi->m_qCheckBox_PickFiducials, &QCheckBox::stateChanged,
-            this, &CoregSettingsView::onPickFiducialsChanged);
+            this, &CoregSettingsView::onPickingStatus);
     connect(m_pUi->m_qRadioButton_LPA, &QCheckBox::toggled,
             this, &CoregSettingsView::onFiducialChanged);
     connect(m_pUi->m_qRadioButton_NAS, &QCheckBox::toggled,
             this, &CoregSettingsView::onFiducialChanged);
     connect(m_pUi->m_qRadioButton_RPA, &QCheckBox::toggled,
             this, &CoregSettingsView::onFiducialChanged);
-    onPickFiducialsChanged();
+    onPickingStatus();
 
     // connect icp settings
     connect(m_pUi->m_qPushButton_FitFiducials, &QPushButton::released,
@@ -273,7 +273,7 @@ void CoregSettingsView::onLoadFidFile()
 
 //=============================================================================================================
 
-void CoregSettingsView::onPickFiducialsChanged()
+void CoregSettingsView::onPickingStatus()
 {
     bool bState = m_pUi->m_qCheckBox_PickFiducials->isChecked();
     if(bState) {
@@ -288,24 +288,37 @@ void CoregSettingsView::onPickFiducialsChanged()
 
 //=============================================================================================================
 
-void CoregSettingsView::setFiducials(const QVector3D vecAxialPosition)
+void CoregSettingsView::setFiducials(const QVector3D vecPosition)
 {
+    QVector3D vecTemp;
     // store incoming vector
     if(m_pUi->m_qRadioButton_LPA->isChecked()) {
-        m_vecLPA = vecAxialPosition;
+        m_vecLPA = vecPosition;
+
+        // step to next fiducial
         m_pUi->m_qRadioButton_NAS->setChecked(true);
+        vecTemp = m_vecNAS;
+        onFiducialChanged();
     } else if (m_pUi->m_qRadioButton_NAS->isChecked()) {
-        m_vecNAS = vecAxialPosition;
+        m_vecNAS = vecPosition;
+
+        // step to next fiducial
         m_pUi->m_qRadioButton_RPA->setChecked(true);
+        vecTemp = m_vecRPA;
+        onFiducialChanged();
     } else {
-        m_vecRPA = vecAxialPosition;
+        m_vecRPA = vecPosition;
+
+        // step to next fiducial
         m_pUi->m_qRadioButton_LPA->setChecked(true);
+        vecTemp = m_vecLPA;
+        onFiducialChanged();
     }
 
     // floor(vecAxialPosition[0]*100)/100 makes sure to only take 2 decimal positions
-    m_pUi->m_qLineEdit_FidX->setText(QString::number(floor(vecAxialPosition[0]*100)/100 * 1000) + " mm" );
-    m_pUi->m_qLineEdit_FidY->setText(QString::number(floor(vecAxialPosition[1]*100)/100 * 1000) + " mm" );
-    m_pUi->m_qLineEdit_FidZ->setText(QString::number(floor(vecAxialPosition[2]*100)/100 * 1000) + " mm" );
+    m_pUi->m_qLineEdit_FidX->setText(QString::number(floor(vecTemp[0]*100)/100 * 1000) + " mm" );
+    m_pUi->m_qLineEdit_FidY->setText(QString::number(floor(vecTemp[1]*100)/100 * 1000) + " mm" );
+    m_pUi->m_qLineEdit_FidZ->setText(QString::number(floor(vecTemp[2]*100)/100 * 1000) + " mm" );
     return;
 }
 
@@ -314,13 +327,15 @@ void CoregSettingsView::setFiducials(const QVector3D vecAxialPosition)
 void CoregSettingsView::onFiducialChanged()
 {
     QVector3D vecTemp;
-    // store incoming vector
     if(m_pUi->m_qRadioButton_LPA->isChecked()) {
         vecTemp = m_vecLPA;
+        emit fiducialChanged(FIFFV_POINT_LPA);
     } else if (m_pUi->m_qRadioButton_NAS->isChecked()) {
         vecTemp = m_vecNAS;
+        emit fiducialChanged(FIFFV_POINT_NASION);
     } else {
         vecTemp = m_vecRPA;
+        emit fiducialChanged(FIFFV_POINT_RPA);
     }
 
     // floor(vecAxialPosition[0]*100)/100 makes sure to only take 2 decimal positions

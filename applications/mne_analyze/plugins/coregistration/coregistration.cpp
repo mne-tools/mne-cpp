@@ -43,11 +43,11 @@
 #include <anShared/Utils/metatypes.h>
 #include <anShared/Model/bemdatamodel.h>
 
-#include "disp/viewers/coregsettingsview.h"
-#include "fiff/fiff_dig_point_set.h"
-#include "mne/mne_bem.h"
-#include "mne/mne_project_to_surface.h"
-#include "rtprocessing/icp.h"
+#include <disp/viewers/coregsettingsview.h>
+#include <fiff/fiff_dig_point_set.h>
+#include <mne/mne_bem.h>
+#include <mne/mne_project_to_surface.h>
+#include <rtprocessing/icp.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -101,6 +101,7 @@ CoRegistration::CoRegistration()
     digRPA.coord_frame = FIFFV_COORD_MRI;
 
     m_digFidMri << digLPA << digNAS << digRPA;
+    m_iFiducial = 0;
 }
 
 //=============================================================================================================
@@ -121,7 +122,7 @@ QSharedPointer<IPlugin> CoRegistration::clone() const
 
 void CoRegistration::init()
 {
-    m_pCommu = new Communicator(this);   
+    m_pCommu = new Communicator(this);
 }
 
 //=============================================================================================================
@@ -179,6 +180,8 @@ QDockWidget *CoRegistration::getControl()
     // connect fiducial selection
     connect(m_pCoregSettingsView, &CoregSettingsView::pickFiducials,
             this, &CoRegistration::onPickFiducials);
+    connect(m_pCoregSettingsView, &CoregSettingsView::fiducialChanged,
+            this, &CoRegistration::onPickedFiducialChanged);
 
     // Connect events for new and deleted model
     connect(m_pAnalyzeData.data(), &AnalyzeData::newModelAvailable,
@@ -248,7 +251,6 @@ void CoRegistration::onChangeSelectedBem(const QString &sText)
 
     for (auto bemDataModel : m_vecBemDataModels) {
         if(bemDataModel->getModelName() == sText && sText != m_sCurrentSelectedBem){
-
             // update current selected Bem
             pBemDataModel = qSharedPointerCast<BemDataModel>(bemDataModel);
             m_pBem = QSharedPointer<MNEBem>(pBemDataModel->getBem());
@@ -266,6 +268,11 @@ void CoRegistration::onChangeSelectedBem(const QString &sText)
 
 void CoRegistration::onPickFiducials(const bool bActivatePicking)
 {
+    // rotate camera to recently selected fiducial in 3DView
+    if(bActivatePicking) {
+        onPickedFiducialChanged(m_pCoregSettingsView->getCurrentFiducial());
+    }
+
     QVariant data = QVariant::fromValue(bActivatePicking);
     m_pCommu->publishEvent(EVENT_TYPE::FID_PICKING_STATUS, data);
 }
@@ -305,6 +312,15 @@ void CoRegistration::onSetFiducial(const QVector3D vecResult)
     m_pCommu->publishEvent(EVENT_TYPE::NEW_FIDUCIALS_ADDED, data);
 
     return;
+}
+
+//=============================================================================================================
+
+void CoRegistration::onPickedFiducialChanged(const int iFiducial)
+{
+    m_iFiducial = iFiducial;
+    QVariant data = QVariant::fromValue(iFiducial);
+    m_pCommu->publishEvent(EVENT_TYPE::FIDUCIAL_CHANGED, data);
 }
 
 //=============================================================================================================
@@ -485,6 +501,7 @@ void CoRegistration::triggerLoadingEnd(QString sMessage)
 {
     m_pCommu->publishEvent(LOADING_END, QVariant::fromValue(sMessage));
 }
+
 //=============================================================================================================
 
 void CoRegistration::onFitICP()
@@ -496,10 +513,15 @@ void CoRegistration::onFitICP()
 
     if (m_FutureWatcher.isRunning()){
         qWarning() << "ICP computation already taking place.";
+        return;
     }
+
+    // get icp settings from view
+    setIcpProperties();
 
     triggerLoadingStart("Performing ICP ...");
 
+    // start icp
     m_Future = QtConcurrent::run(this,
                                  &CoRegistration::computeICP,
                                  m_transHeadMri,
@@ -513,22 +535,41 @@ void CoRegistration::onFitICP()
 
 //=============================================================================================================
 
+void CoRegistration::setIcpProperties()
+{
+    // get values from view
+    m_bScale = m_pCoregSettingsView->getAutoScale();
+    m_fWeightLPA = m_pCoregSettingsView->getWeightLPA();
+    m_fWeightNAS = m_pCoregSettingsView->getWeightNAS();
+    m_fWeightRPA = m_pCoregSettingsView->getWeightRPA();
+    m_fWeightHPI = m_pCoregSettingsView->getWeightHPI();
+    m_fWeightHSP = m_pCoregSettingsView->getWeightHSP();
+    m_fWeightEEG = m_pCoregSettingsView->getWeightEEG();
+    m_fMaxDist = m_pCoregSettingsView->getOmmitDistance();
+    m_fTol = m_pCoregSettingsView->getConvergence();
+    m_iMaxIter = m_pCoregSettingsView->getMaxIter();
+}
+
+//=============================================================================================================
+
 FiffCoordTrans CoRegistration::computeICP(FiffCoordTrans transInit,
                                           FiffDigPointSet digSetHead,
                                           MNEBem bemHead)
 {
+    // get values from members
+    m_ParameterMutex.lock();
+    bool bScale = m_bScale;
+    float fWeightLPA = m_fWeightLPA;
+    float fWeightNAS = m_fWeightNAS;
+    float fWeightRPA = m_fWeightRPA;
+    float fWeightHPI = m_fWeightHPI;
+    float fWeightHSP = m_fWeightHSP;
+    float fWeightEEG = m_fWeightEEG;
+    float fMaxDist = m_fMaxDist;
+    float fTol = m_fTol;
+    int iMaxIter = m_iMaxIter;
+    m_ParameterMutex.unlock();
 
-    // get values from view
-    bool bScale = m_pCoregSettingsView->getAutoScale();
-    float fWeightLPA = m_pCoregSettingsView->getWeightLPA();
-    float fWeightNAS = m_pCoregSettingsView->getWeightNAS();
-    float fWeightRPA = m_pCoregSettingsView->getWeightRPA();
-    float fWeightHPI = m_pCoregSettingsView->getWeightHPI();
-    float fWeightHSP = m_pCoregSettingsView->getWeightHSP();
-    float fWeightEEG = m_pCoregSettingsView->getWeightEEG();
-    float fMaxDist = m_pCoregSettingsView->getOmmitDistance();
-    float fTol = m_pCoregSettingsView->getConvergence();
-    int iMaxIter = m_pCoregSettingsView->getMaxIter();
     float fRMSE = 0.0;
 
     // init surface points
@@ -661,9 +702,6 @@ void CoRegistration::getParamFromTrans(const Matrix4f& matTrans,
                                        Vector3f& vecRot,
                                        Vector3f& vecTrans,
                                        Vector3f& vecScale)
-/**
- * Following https://math.stackexchange.com/a/1463487
- */
 {
     Matrix3f matRot = matTrans.block(0,0,3,3);
 
