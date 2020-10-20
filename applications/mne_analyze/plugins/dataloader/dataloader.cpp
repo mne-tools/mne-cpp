@@ -216,7 +216,7 @@ void DataLoader::loadFilePath(const QString& sFilePath)
 
     if(fileInfo.exists() && (fileInfo.completeSuffix() == "eve")){
         QSharedPointer<ANSHAREDLIB::AnnotationModel> pModel = m_pAnalyzeData->loadModel<ANSHAREDLIB::AnnotationModel>(sFilePath);
-        pModel->applyOffset(m_pSelectedModel->absoluteFirstSample());
+        //pModel->applyOffset(m_pSelectedModel->absoluteFirstSample());
         pModel->setFiffModel(m_pSelectedModel);
         qDebug() << "OFFSET:" << m_pSelectedModel->absoluteFirstSample();
     } else if(fileInfo.exists() && (fileInfo.completeSuffix() == "fif")) {
