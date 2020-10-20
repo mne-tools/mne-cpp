@@ -1008,6 +1008,12 @@ void AnnotationModel::initFromFile(const QString& sFilePath)
 
         switchGroup(iGroupIndex);
 
+        QListWidgetItem* newItem = new QListWidgetItem(fileInfo.baseName());
+        newItem->setData(Qt::UserRole, QVariant(iGroupIndex));
+        newItem->setData(Qt::DecorationRole, QColor("red"));
+        newItem->setFlags (newItem->flags () | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+        pushGroup(newItem);
+
         while(!textStream.atEnd()){
             int iSample;
             textStream >> iSample;
