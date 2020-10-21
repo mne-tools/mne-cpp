@@ -1,13 +1,14 @@
 //=============================================================================================================
 /**
- * @file     analyzedatamodel.cpp
+ * @file     bidsviewmodel.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>
+ *           Gabriel Motta <gbmotta@mgh.harvard.edu>
  * @since    0.1.2
  * @date     May, 2019
  *
  * @section  LICENSE
  *
- * Copyright (C) 2019, Lorenz Esch. All rights reserved.
+ * Copyright (C) 2019, Lorenz Esch, Gabriel Motta. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -28,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the Analyze Data Model Class.
+ * @brief    Definition of the BidsViewModel Class.
  *
  */
 
