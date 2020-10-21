@@ -54,6 +54,7 @@
 #include <QMenu>
 #include <QKeyEvent>
 #include <QMessageBox>
+#include <QInputDialog>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -135,7 +136,13 @@ void BidsView::customMenuRequested(QPoint pos)
 
                 QAction* pAddSessionAction = new QAction("Add Session", this);
                 connect(pAddSessionAction, &QAction::triggered, [=]() {
-                    emit onAddSession(pItem->index(), "test");
+                    bool ok;
+                    QString text = QInputDialog::getText(this, tr("Adding Session"),
+                                                         tr("Please name new session:"), QLineEdit::Normal,
+                                                         "", &ok);
+                    if (ok && !text.isEmpty()){
+                        emit onAddSession(pItem->index(), text);
+                    }
                 });
 
                 pRemoveAction = new QAction("Remove Subject", this);
@@ -225,7 +232,13 @@ void BidsView::customMenuRequested(QPoint pos)
 
         QAction* pAddSubjectAction = new QAction("Add Subject", this);
         connect(pAddSubjectAction, &QAction::triggered, [=]() {
-            emit onAddSubject("test");
+            bool ok;
+            QString text = QInputDialog::getText(this, tr("Adding Subject"),
+                                                 tr("Please name new subject:"), QLineEdit::Normal,
+                                                 "", &ok);
+            if (ok && !text.isEmpty()){
+                emit onAddSubject(text);
+            }
         });
 
         menu->addAction(pAddSubjectAction);
