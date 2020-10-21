@@ -151,10 +151,10 @@ QMenu *DataLoader::getMenu()
     QMenu* pSaveMenu = new QMenu(tr("Save"));
     pSaveMenu->addAction(pActionSaveData);
     pSaveMenu->addAction(pActionSaveAnn);
-    pSaveMenu->addAction(pActionSaveAvg);
+    //pSaveMenu->addAction(pActionSaveAvg);
 
     pMenuFile->addAction(pActionLoadFile);
-    pMenuFile->addMenu(pBIDSMenu);
+    //pMenuFile->addMenu(pBIDSMenu);
     pMenuFile->addMenu(pSaveMenu);
     //pMenuFile->addAction(pActionSave);
 
