@@ -1,15 +1,16 @@
 //=============================================================================================================
 /**
- * @file     datamanagerview.h
+ * @file     bidsview.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
  *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
+ *           Gabriel Motta <gbmotta@mgh.harvard.edu>
  * @since    0.1.0
  * @date     August, 2018
  *
  * @section  LICENSE
  *
- * Copyright (C) 2018, Lorenz Esch, Lars Debor, Simon Heinke. All rights reserved.
+ * Copyright (C) 2018, Lorenz Esch, Lars Debor, Simon Heinke, Gabriel Motta. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -30,7 +31,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains the declaration of the DataManagerView class.
+ * @brief    Contains the declaration of the BidsView class.
  *
  */
 
@@ -188,26 +189,64 @@ private:
 
 signals:
     //=========================================================================================================
+    /**
+     * Sends index of item to be removed from model
+     *
+     * @param [in] pIndex   index of item to be removed
+     */
     void removeItem(const QModelIndex& pIndex);
 
     //=========================================================================================================
+    /**
+     * Sends model in 'data' to be send via the event manager
+     *
+     * @param [in] data     new selected model in a QVariant
+     */
     void selectedModelChanged(const QVariant& data);
 
     //=========================================================================================================
+    /**
+     * Sends the index of currently selected item to update saved current items
+     *
+     * @param [in] pIndex   index of new item
+     */
     void selectedItemChanged(const QModelIndex& pIndex);
 
     //=========================================================================================================
+    /**
+     * Triggers a subject to be added with name sSubjectName
+     *
+     * @param [in] sSubjectName     name of new subject
+     */
     void onAddSubject(const QString &sSubjectName);
 
     //=========================================================================================================
+    /**
+     * Triggers a session  to be added with name sSessionName to subject at index subjectIndex
+     *
+     * @param [in] subjectIndex     index of subject to which the session will be added
+     * @param [in] sSessionName     name of new session
+     */
     void onAddSession(QModelIndex subjectIndex,
                       const QString &sSessionName);
 
     //=========================================================================================================
+    /**
+     * Triggers session at sessionIndex to be moved to subject at subjectIndex
+     *
+     * @param [in] subjectIndex     index of destination subject
+     * @param [in] sessionIndex     index of session to be moved
+     */
     void onMoveSession(QModelIndex subjectIndex,
                        QModelIndex sessionIndex);
 
     //=========================================================================================================
+    /**
+     * Triggers data at dataIndex to be moved to session at sessionIndex
+     *
+     * @param [in] sessionIndex     index of destination session
+     * @param [in] dataIndex        index of data to me moved
+     */
     void onMoveData(QModelIndex sessionIndex,
                     QModelIndex dataIndex);
 
