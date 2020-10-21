@@ -144,6 +144,8 @@ private:
     //=========================================================================================================
     /**
      * This functions is called when the save to file button is pressed.
+     *
+     * @param [in] type     type of file being saved
      */
     void onSaveFilePressed(FileType type = DATA_FILE);
 
@@ -154,12 +156,23 @@ private:
     void onLoadSubjectPressed();
 
     //=========================================================================================================
+    /**
+     * This function is called when the load from session button is pressed
+     */
     void onLoadSessionPressed();
 
     //=========================================================================================================
+    /**
+     * Shows loading bar with sMessage, dims therest of the window
+     *
+     * @param [in] sMessage     message to be shown alongside loading bar
+     */
     void startProgress(QString sMessage);
 
     //=========================================================================================================
+    /**
+     * Hides loading and loading message, undims the window
+     */
     void endProgress();
 
     //=========================================================================================================
@@ -170,11 +183,11 @@ private:
      */
     void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
 
-    QPointer<ANSHAREDLIB::Communicator>         m_pCommu;
-    QPointer<DISPLIB::ProgressView>             m_pProgressView;
-    QPointer<QWidget>                           m_pProgressViewWidget;
+    QPointer<ANSHAREDLIB::Communicator>             m_pCommu;                   /**< Used for sending events */
+    QPointer<DISPLIB::ProgressView>                 m_pProgressView;            /**< Holds loading bar and loading message */
+    QPointer<QWidget>                               m_pProgressViewWidget;      /**< Window for ProgressView */
 
-    QSharedPointer<ANSHAREDLIB::FiffRawViewModel>  m_pSelectedModel;
+    QSharedPointer<ANSHAREDLIB::FiffRawViewModel>   m_pSelectedModel;           /**< Pointer to currently selected Fiff model */
 };
 
 //=============================================================================================================
