@@ -220,7 +220,6 @@ void DataLoader::loadFilePath(const QString& sFilePath)
         pModel->setFiffModel(m_pSelectedModel);
         pModel->setFirstLastSample(m_pSelectedModel->absoluteFirstSample(), m_pSelectedModel->absoluteLastSample());
         pModel->setSampleFreq(m_pSelectedModel->getFiffInfo()->sfreq);
-        qDebug() << "OFFSET:" << m_pSelectedModel->absoluteFirstSample();
     } else if(fileInfo.exists() && (fileInfo.completeSuffix() == "fif")) {
         if(fileInfo.completeBaseName().endsWith("eve")){
             m_pAnalyzeData->loadModel<ANSHAREDLIB::AnnotationModel>(sFilePath);
@@ -282,7 +281,8 @@ void DataLoader::onSaveFilePressed(FileType type)
             break;
         }
         case ANNOTATION_FILE: {
-            qDebug() << "[DataLoader::onSaveFilePressed] ANNOTATION_FILE Not yet implemented";
+            m_pSelectedModel->getAnnotationModel()->saveToFile("");
+
             break;
         }
         case AVERAGE_FILE: {
@@ -340,7 +340,6 @@ void DataLoader::onSaveFilePressed(FileType type)
         }
         case ANNOTATION_FILE: {
             m_pSelectedModel->getAnnotationModel()->saveToFile(sFilePath);
-            qDebug() << "[DataLoader::onSaveFilePressed] ANNOTATION_FILE Not yet implemented";
             break;
         }
         case AVERAGE_FILE: {
@@ -361,13 +360,9 @@ void DataLoader::onSaveFilePressed(FileType type)
 
 void DataLoader::onLoadSubjectPressed()
 {
-    qDebug() << "[DataLoader::onLoadFolderPressed]";
-
     QString dir = QFileDialog::getExistingDirectory(Q_NULLPTR,
                                                        tr("select directory"),
                                                        QDir::currentPath()+"/MNE-sample-data");
-
-    qDebug() << "DataLoader::onLoadFolderPressed -- " << dir;
 
     if(dir.isEmpty()){
         qDebug() << "Empty input";
@@ -376,10 +371,7 @@ void DataLoader::onLoadSubjectPressed()
 
     QDir directory = dir;
 
-    qDebug() <<"Dir:" << directory.dirName() << "Items:" << directory.entryList(QDir::Dirs);
-
     m_pAnalyzeData->addSubject(directory.dirName());
-
 }
 
 //=============================================================================================================

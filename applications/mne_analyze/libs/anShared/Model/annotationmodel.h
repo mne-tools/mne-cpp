@@ -64,7 +64,7 @@
 namespace ANSHAREDLIB {
 
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// ANSHAREDLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
 class FiffRawViewModel;
@@ -626,13 +626,27 @@ public:
                              const QModelIndex &parent = QModelIndex()) const override;
 
     //=========================================================================================================
+    /**
+     * Sets the FiffViewModel to whitch this event model cooresponds
+     *
+     * @param [in] pModel   pointer to FiffRawViewModel
+     */
     void setFiffModel(QSharedPointer<FiffRawViewModel> pModel);
 
     //=========================================================================================================
+    /**
+     * Shift saved smaples based on offset iFirstSampleOffset
+     *
+     * @param [in] iFirstSampleOffset   offset due to sample index of first sample
+     */
     void applyOffset(int iFirstSampleOffset);
 
-
-
+    //=========================================================================================================
+    /**
+     * Returns FiffRawViewModel associated with this annotation model
+     *
+     * @return pointer to cooresponding FiffRawViewModel
+     */
     QSharedPointer<FiffRawViewModel> getFiffModel();
 
 signals:
@@ -660,9 +674,17 @@ private:
     void resetSelection();
 
     //=========================================================================================================
+    /**
+     * Sets up default paramaters ofr new model
+     */
     void initModel();
 
     //=========================================================================================================
+    /**
+     * Instantiates model from data in file pointed to by sFilePath
+     *
+     * @param [in] sFilePath    path to file with event data
+     */
     void initFromFile(const QString& sFilePath);
 
     QStringList                         m_eventTypeList;                /** <List of the possible event types */
@@ -704,7 +726,7 @@ private:
 
     QStack<QListWidgetItem*>            m_dataStoredGroups;             /**< Stores the groups for switching between files */
 
-    QSharedPointer<FiffRawViewModel>    m_pFiffModel;
+    QSharedPointer<FiffRawViewModel>    m_pFiffModel;                   /**< Pointer to FiffRawViewModel associated with the events stored in this model */
 };
 
 //=============================================================================================================

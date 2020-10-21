@@ -331,6 +331,17 @@ public:
     static bool read_events(QIODevice &p_IODevice,
                             Eigen::MatrixXi& eventlist);
 
+    //=========================================================================================================
+    /**
+     * read_events
+     *
+     * Read a list of events from an eve file
+     *
+     * @param [in] p_IODevice   The I/O device to read from
+     * @param [out] eventList   List of events
+     *
+     * @return true if succeeded, false otherwise
+     */
     static bool read_events(QIODevice &p_IODevice,
                             QList<int>& eventList);
 

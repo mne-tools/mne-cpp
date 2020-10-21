@@ -158,10 +158,6 @@ void AnnotationSettingsView::initGUIFunctionality()
     connect(m_pUi->m_pushButton_addEventType, &QPushButton::clicked,
             this, &AnnotationSettingsView::addNewAnnotationType, Qt::UniqueConnection);
 
-//    //Save button
-//    connect(m_pUi->m_pushButtonSave, &QPushButton::clicked,
-//            this, &AnnotationSettingsView::onSaveButton, Qt::UniqueConnection);
-
     //Switching groups
     connect(m_pUi->m_listWidget_groupListWidget->selectionModel(), &QItemSelectionModel::selectionChanged,
             this, &AnnotationSettingsView::groupChanged, Qt::UniqueConnection);
@@ -364,9 +360,7 @@ void AnnotationSettingsView::onSaveButton()
     if (fileName.isEmpty()) {
         return;
     }
-    qInfo() << "AnnotationSettingsView::onSaveButton";
 
-    std::cout << m_pFiffRawModel->absoluteFirstSample();
     m_pAnnModel->saveToFile(fileName);
     #endif
 }
