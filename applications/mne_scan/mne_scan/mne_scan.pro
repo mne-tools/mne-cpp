@@ -42,6 +42,7 @@ TEMPLATE = app
 QT += network core widgets xml svg charts concurrent opengl 3dextras
 
 CONFIG += console
+#CONFIG -= app_bundle
 
 TARGET = mne_scan
 CONFIG(debug, debug|release) {

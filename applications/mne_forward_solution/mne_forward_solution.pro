@@ -42,6 +42,7 @@ TEMPLATE = app
 QT += widgets network concurrent
 
 CONFIG   += console
+CONFIG -= app_bundle
 
 contains(MNECPP_CONFIG, static) {
     CONFIG += static
