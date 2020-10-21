@@ -5,12 +5,12 @@
  *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
  *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
  *           Gabriel Motta <gbmotta@mgh.harvard.edu>
- * @since    0.1.0
- * @date     August, 2018
+ * @since    0.1.6
+ * @date     October, 2020
  *
  * @section  LICENSE
  *
- * Copyright (C) 2018, Lorenz Esch, Lars Debor, Simon Heinke, Gabriel Motta. All rights reserved.
+ * Copyright (C) 2020, Lorenz Esch, Lars Debor, Simon Heinke, Gabriel Motta. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -35,8 +35,8 @@
  *
  */
 
-#ifndef DATAMANAGERVIEW_H
-#define DATAMANAGERVIEW_H
+#ifndef BIDSVIEW_H
+#define BIDSVIEW_H
 
 //=============================================================================================================
 // INCLUDES
@@ -44,6 +44,7 @@
 
 #include "../disp_global.h"
 #include "abstractview.h"
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -252,4 +253,4 @@ signals:
 
 };
 } // NAMESPACE DISPLIB
-#endif // DATAMANAGERVIEW_H
+#endif // BIDSVIEW_H

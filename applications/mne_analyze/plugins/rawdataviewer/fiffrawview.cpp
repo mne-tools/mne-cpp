@@ -404,9 +404,6 @@ void FiffRawView::addTimeMark(bool con)
     }
 
     emit sendSamplePos(static_cast<int>(m_fLastClickedSample));
-
-//    m_pModel->addTimeMark(static_cast<int>(m_fLastClickedSample));
-//    emit sendSamplePos(m_fLastClickedPoint);
 }
 
 //=============================================================================================================

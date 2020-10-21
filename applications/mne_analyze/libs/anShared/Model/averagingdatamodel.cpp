@@ -75,7 +75,6 @@ AveragingDataModel::AveragingDataModel(const QString &sFilePath,
                                        const QByteArray& byteLoadedData,
                                        QObject* parent)
 : AbstractModel(parent)
-
 {
     Q_UNUSED(byteLoadedData);
 

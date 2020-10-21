@@ -3,12 +3,12 @@
  * @file     bidsviewmodel.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>
  *           Gabriel Motta <gbmotta@mgh.harvard.edu>
- * @since    0.1.2
- * @date     May, 2019
+ * @since    0.1.6
+ * @date     October, 2020
  *
  * @section  LICENSE
  *
- * Copyright (C) 2019, Lorenz Esch, Gabriel Motta. All rights reserved.
+ * Copyright (C) 2020, Lorenz Esch, Gabriel Motta. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -33,8 +33,8 @@
  *
  */
 
-#ifndef ANALYZEDATAMODEL_H
-#define ANALYZEDATAMODEL_H
+#ifndef BIDSVIEWMODEL_H
+#define BIDSVIEWMODEL_H
 
 //=============================================================================================================
 // DEFINE MACROS
@@ -46,13 +46,13 @@
 #define ITEM_SESSION    Qt::UserRole+4
 
 //ITEM TYPES
-#define SUBJECT     1
-#define SESSION     2
-#define MEGDATA     3
-#define AVG         4
-#define ANATDATA    5
-#define FOLDER      6
-#define ANNOTATION  7
+#define SUBJECT             1
+#define SESSION             2
+#define FUNCTIONALDATA      3
+#define AVG                 4
+#define ANATDATA            5
+#define FOLDER              6
+#define ANNOTATION          7
 
 //=============================================================================================================
 // INCLUDES
@@ -87,17 +87,17 @@ namespace DISPLIB
 
 //=========================================================================================================
 /**
- * DECLARE CLASS AnalyzeDataModel
+ * DECLARE CLASS BidsViewModel
  *
- * @brief The AnalyzeDataModel class is the base data container.
+ * @brief The BidsViewModel class is the base data container.
  */
 class DISPSHARED_EXPORT BidsViewModel : public QStandardItemModel
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<BidsViewModel> SPtr;               /**< Shared pointer type for AnalyzeDataModel. */
-    typedef QSharedPointer<const BidsViewModel> ConstSPtr;    /**< Const shared pointer type for AnalyzeDataModel. */
+    typedef QSharedPointer<BidsViewModel> SPtr;               /**< Shared pointer type for BidsViewModel. */
+    typedef QSharedPointer<const BidsViewModel> ConstSPtr;    /**< Const shared pointer type for BidsViewModel. */
 
     //=========================================================================================================
     /**
@@ -130,7 +130,7 @@ public slots:
      * @param [in] parentIndex  index of where the nitem should be added
      */
     void addToData(QStandardItem *pNewItem,
-                      const QModelIndex &parentIndex);
+                   const QModelIndex &parentIndex);
 
     //=========================================================================================================
     /**
@@ -170,13 +170,13 @@ public slots:
     /**
      * @brief addMegDataToSession
      *
-     * @param [in] sessionIndex     Index of session to which meg data will be added
+     * @param [in] sessionIndex     Index of session to which data will be added
      * @param [in] pNewItem         New item to be added.
      *
      * @return index of newly added item
      */
-    QModelIndex addMegDataToSession(QModelIndex sessionIndex,
-                                    QStandardItem* pNewItem);
+    QModelIndex addDataToSession(QModelIndex sessionIndex,
+                                 QStandardItem* pNewItem);
 
     //=========================================================================================================
     /**
@@ -225,4 +225,4 @@ signals:
 
 } //Namespace
 
-#endif //ANALYZEDATAMODEL_H
+#endif //BIDSVIEWMODEL_H

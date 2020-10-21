@@ -5,12 +5,12 @@
  *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
  *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
  *           Gabriel Motta <gbmotta@mgh.harvard.edu>
- * @since    0.1.0
- * @date     August, 2018
+ * @since    0.1.6
+ * @date     October, 2020
  *
  * @section  LICENSE
  *
- * Copyright (C) 2018, Lorenz Esch, Lars Debor, Simon Heinke, Gabriel Motta. All rights reserved.
+ * Copyright (C) 2020, Lorenz Esch, Lars Debor, Simon Heinke, Gabriel Motta. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -179,7 +179,7 @@ void BidsView::customMenuRequested(QPoint pos)
                 menu->popup(m_pUi->m_pTreeView->viewport()->mapToGlobal(pos));
                 break;
             }
-            case MEGDATA: {
+            case FUNCTIONALDATA: {
                 QMenu *menu = new QMenu(this);
 
                 pRemoveAction = new QAction("Remove Data", this);
@@ -249,7 +249,7 @@ void BidsView::customMenuRequested(QPoint pos)
 //=============================================================================================================
 
 void BidsView::onCurrentItemChanged(const QItemSelection &selected,
-                                           const QItemSelection &deselected)
+                                    const QItemSelection &deselected)
 {
     Q_UNUSED(deselected)
     if(selected.indexes().empty()) {
@@ -270,7 +270,7 @@ void BidsView::onCurrentItemChanged(const QItemSelection &selected,
 //=============================================================================================================
 
 void BidsView::onNewFileLoaded(int iSubject,
-                                      int iModel)
+                               int iModel)
 {
     m_pUi->m_pTreeView->selectionModel()->select(m_pUi->m_pTreeView->model()->index(iModel, 0, m_pUi->m_pTreeView->model()->index(iSubject, 0)),
                                                  QItemSelectionModel::ClearAndSelect);

@@ -289,18 +289,15 @@ public:
                 break;
         }
 
-//        pItem->setData(data);
-//        m_pData->addData("Sample Subject", pItem);
-
         emit newModelAvailable(temp);
         return pNewModel;
     }
 
 private:
-    QPointer<DISPLIB::BidsViewModel>          m_pData;        /**< The loaded models in form of a QStandardItemModel. */
+    QPointer<DISPLIB::BidsViewModel>        m_pData;            /**< The loaded models in form of a QStandardItemModel. */
 
-    QModelIndex                         m_SelectedItem;
-    QModelIndex                         m_SelectedData;
+    QModelIndex                             m_SelectedItem;     /**< Index of currently selected item */
+    QModelIndex                             m_SelectedData;     /**< Index of currently selected data item */
 
 signals:
     //=========================================================================================================
