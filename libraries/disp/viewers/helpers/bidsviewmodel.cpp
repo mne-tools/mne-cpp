@@ -3,12 +3,12 @@
  * @file     bidsviewmodel.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>
  *           Gabriel Motta <gbmotta@mgh.harvard.edu>
- * @since    0.1.2
- * @date     May, 2019
+ * @since    0.1.6
+ * @date     October, 2020
  *
  * @section  LICENSE
  *
- * Copyright (C) 2019, Lorenz Esch, Gabriel Motta. All rights reserved.
+ * Copyright (C) 2020, Lorenz Esch, Gabriel Motta. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -73,17 +73,16 @@ BidsViewModel::~BidsViewModel()
 void BidsViewModel::addData(QModelIndex selectedItem,
                             QStandardItem* pNewItem)
 {
-    qDebug() << selectedItem;
-
     if(!selectedItem.isValid()) {
-        addMegDataToSession(addSessionToSubject(addSubject("sub-01"), "ses-01"), pNewItem);
+        addDataToSession(addSessionToSubject(addSubject("sub-01"), "ses-01"), pNewItem);
     } else {
         switch(itemFromIndex(selectedItem)->data(ITEM_TYPE).value<int>()){
             case SUBJECT:
                 qDebug() << "[BidsViewModel::addData] Prompt user to select a session";
                 break;
             default:
-                addMegDataToSession(itemFromIndex(selectedItem)->data(ITEM_SESSION).value<QModelIndex>(), pNewItem);
+                addDataToSession(itemFromIndex(selectedItem)->data(ITEM_SESSION).value<QModelIndex>(),
+                                 pNewItem);
                 break;
         }
     }
@@ -92,7 +91,7 @@ void BidsViewModel::addData(QModelIndex selectedItem,
 //=============================================================================================================
 
 void BidsViewModel::addToData(QStandardItem *pNewAvgItem,
-                                  const QModelIndex &parentIndex)
+                              const QModelIndex &parentIndex)
 {
     QStandardItem* selectedData = itemFromIndex(parentIndex);
     selectedData->setChild(selectedData->rowCount(),
@@ -103,6 +102,7 @@ void BidsViewModel::addToData(QStandardItem *pNewAvgItem,
 
     emit newItemIndex(pNewAvgItem->index());
 }
+
 //=============================================================================================================
 
 QModelIndex BidsViewModel::addSubject(const QString &sSubjectName)
@@ -133,7 +133,7 @@ QModelIndex BidsViewModel::addSubject(const QString &sSubjectName)
 //=============================================================================================================
 
 QModelIndex BidsViewModel::addSessionToSubject(const QString &sSubjectName,
-                                        const QString &sSessionName)
+                                               const QString &sSessionName)
 {
     //Ensure session name follow BIDS format
     QString sNewSessionName;
@@ -185,7 +185,7 @@ QModelIndex BidsViewModel::addSessionToSubject(const QString &sSubjectName,
 //=============================================================================================================
 
 QModelIndex BidsViewModel::addSessionToSubject(QModelIndex subjectIndex,
-                                        const QString &sSessionName)
+                                               const QString &sSessionName)
 {
     //Ensure session name follow BIDS format
     QString sNewSessionName;
@@ -214,7 +214,7 @@ QModelIndex BidsViewModel::addSessionToSubject(QModelIndex subjectIndex,
 
 //=============================================================================================================
 
-QModelIndex BidsViewModel::addMegDataToSession(QModelIndex sessionIndex,
+QModelIndex BidsViewModel::addDataToSession(QModelIndex sessionIndex,
                                                QStandardItem *pNewItem)
 {
     QStandardItem* pSessionItem = itemFromIndex(sessionIndex);
@@ -243,7 +243,7 @@ QModelIndex BidsViewModel::addMegDataToSession(QModelIndex sessionIndex,
                                                   pNewItem);
     }
 
-    pNewItem->setData(QVariant::fromValue(MEGDATA), ITEM_TYPE);
+    pNewItem->setData(QVariant::fromValue(FUNCTIONALDATA), ITEM_TYPE);
     pNewItem->setData(QVariant::fromValue(sessionIndex), ITEM_SESSION);
     pNewItem->setData(itemFromIndex(sessionIndex)->data(ITEM_SUBJECT), ITEM_SUBJECT);
 
@@ -302,9 +302,9 @@ QModelIndex BidsViewModel::moveDataToSession(QModelIndex sessionIndex,
 
     QModelIndex newIndex;
     switch(dataItem->data(ITEM_TYPE).value<int>()){
-        case MEGDATA:{
-            newIndex = addMegDataToSession(sessionIndex,
-                                           dataItem);
+        case FUNCTIONALDATA:{
+            newIndex = addDataToSession(sessionIndex,
+                                        dataItem);
             break;
         }
         default:{
@@ -340,7 +340,7 @@ bool BidsViewModel::removeItem(QModelIndex itemIndex)
                 endResetModel();
             }
             return true;
-        case MEGDATA:
+        case FUNCTIONALDATA:
             if(removeRows(itemIndex.row(), 1, itemIndex.parent())){
                 endResetModel();
             }

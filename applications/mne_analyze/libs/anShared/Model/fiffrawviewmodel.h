@@ -489,9 +489,19 @@ public:
     void updateHorizontalScrollPosition(qint32 newScrollPosition);
 
     //=========================================================================================================
+    /**
+     * Returns whether the model has an associated AnnotationModel
+     *
+     * @return true if there is an AnnotationModel, false if not
+     */
     bool hasSavedEvents();
 
     //=========================================================================================================
+    /**
+     * Sets the associated AnnotationModel to pModel
+     *
+     * @param [in] pModel   associated annotation model
+     */
     void setAnnotationModel(QSharedPointer<ANSHAREDLIB::AnnotationModel> pModel);
 
 private:
