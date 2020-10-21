@@ -119,7 +119,8 @@ win32:!contains(MNECPP_CONFIG, static) {
 }
 
 macx {
-    QMAKE_LFLAGS += -Wl,-rpath,../lib
+    # Change install name of the library so we can use the @rpath when linking executables against it
+    QMAKE_LFLAGS_SONAME = -Wl,-install_name,@rpath/
 }
 
 # Activate FFTW backend in Eigen for non-static builds only

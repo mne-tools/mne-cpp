@@ -53,6 +53,7 @@ CONFIG(debug, debug|release) {
 }
 
 CONFIG += console
+CONFIG -= app_bundle
 
 contains(MNECPP_CONFIG, wasm) {
 #    QMAKE_LFLAGS += -s ERROR_ON_UNDEFINED_SYMBOLS=1
