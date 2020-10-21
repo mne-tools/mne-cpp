@@ -83,7 +83,6 @@ HEADERS += \
     layoutloader.h \
     layoutmaker.h \
     selectionio.h \
-    layoutmaker.h \
     spectrogram.h \
     warp.h \
     sphere.h \
