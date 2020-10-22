@@ -126,8 +126,11 @@ public:
 };
 
 } // NAMESPACE DISPLIB
+#ifndef metatype_DISPLIB_selectionitem
+#define metatype_DISPLIB_selectionitem
 Q_DECLARE_METATYPE(DISPLIB::SelectionItem);
 Q_DECLARE_METATYPE(DISPLIB::SelectionItem*);
+#endif
 
 
 #endif // SELECTIONSCENEITEM_H
