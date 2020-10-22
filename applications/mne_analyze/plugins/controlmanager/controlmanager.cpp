@@ -129,14 +129,14 @@ QDockWidget *ControlManager::getControl()
 
     DISPLIB::ScalingView* pScalingWidget = new DISPLIB::ScalingView("MNEANALYZE", wrappedScrollArea);
     DISPLIB::FiffRawViewSettings* pFiffViewSettings = new DISPLIB::FiffRawViewSettings("MNEANALYZE", wrappedScrollArea);
-//    DISPLIB::Control3DView* pControl3DView = new DISPLIB::Control3DView(QString("MNEANALYZE/%1").arg(this->getName()), Q_NULLPTR, slControlFlags);
-//    DISP3DLIB::Data3DTreeDelegate* pData3DTreeDelegate = new DISP3DLIB::Data3DTreeDelegate(this);
+    DISPLIB::Control3DView* pControl3DView = new DISPLIB::Control3DView(QString("MNEANALYZE/%1").arg(this->getName()), Q_NULLPTR, slControlFlags);
+    DISP3DLIB::Data3DTreeDelegate* pData3DTreeDelegate = new DISP3DLIB::Data3DTreeDelegate(this);
 
     m_pApplyToView = new DISPLIB::ApplyToView();
 
     pTabWidget->addTab(pScalingWidget, "Scaling");
     pTabWidget->addTab(pFiffViewSettings, "Controls");
-    //pTabWidget->addTab(pControlDock, "3D");
+    pTabWidget->addTab(pControl3DView, "3D");
 
     pLayout->addWidget(pTabWidget);
     pLayout->addWidget(m_pApplyToView);
@@ -171,8 +171,10 @@ QDockWidget *ControlManager::getControl()
     m_ViewParmeters.m_iTimeSpacers = pFiffViewSettings->getDistanceTimeSpacer();
     m_ViewParmeters.m_sImageType = "";
 
-    //pControl3DView->setDelegate(pData3DTreeDelegate);
-    //m_pControl3DView->setModel(m_p3DModel.data());
+    m_p3DModel = new DISP3DLIB::Data3DTreeModel();
+
+//    pControl3DView->setDelegate(pData3DTreeDelegate);
+//    pControl3DView->setModel(m_p3DModel.data());
 
     return pControlDock;
 }

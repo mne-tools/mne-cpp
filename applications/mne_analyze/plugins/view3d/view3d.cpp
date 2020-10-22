@@ -35,7 +35,7 @@
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
-
+#include <iostream>
 #include "view3d.h"
 
 #include <anShared/Management/communicator.h>
@@ -197,21 +197,27 @@ void View3D::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
         case SELECTED_BEM_CHANGED:
+            std::cout << std::endl << "SELECTED_BEM_CHANGED" << std::endl;
             updateCoregBem(e->getData().value<QSharedPointer<ANSHAREDLIB::BemDataModel>>());
             break;
         case NEW_DIGITIZER_ADDED:
+            std::cout << std::endl << "NEW_DIGITIZER_ADDED" << std::endl;
             updateCoregDigitizer(e->getData().value<FiffDigPointSet>());
             break;
         case NEW_FIDUCIALS_ADDED:
+            std::cout << std::endl << "NEW_FIDUCIALS_ADDED" << std::endl;
             updateCoregMriFid(e->getData().value<FiffDigPointSet>());
             break;
         case NEW_TRANS_AVAILABE:
+            std::cout << std::endl << "NEW_TRANS_AVAILABE" << std::endl;
             updateCoregTrans(e->getData().value<FiffCoordTrans>());
             break;
         case FID_PICKING_STATUS:
+            std::cout << std::endl << "FID_PICKING_STATUS" << std::endl;
             fiducialPicking(e->getData().value<bool>());
             break;
         case FIDUCIAL_CHANGED:
+            std::cout << std::endl << "FIDUCIAL_CHANGED" << std::endl;
             onFiducialChanged(e->getData().value<int>());
             break;
         default:

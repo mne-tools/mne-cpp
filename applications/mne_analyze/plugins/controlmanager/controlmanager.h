@@ -63,6 +63,10 @@ namespace DISPLIB{
     class ApplyToView;
 }
 
+namespace DISP3DLIB {
+    class Data3DTreeModel;
+}
+
 //=============================================================================================================
 // DEFINE NAMESPACE SURFERPLUGIN
 //=============================================================================================================
@@ -165,6 +169,7 @@ private:
     void onMakeScreenshot(const QString& imageType);
 
     QPointer<ANSHAREDLIB::Communicator>     m_pCommu;
+    QPointer<DISP3DLIB::Data3DTreeModel>    m_p3DModel;
 
     DISPLIB::ApplyToView*                   m_pApplyToView;
     ANSHAREDLIB::ScalingParameters          m_ScalingParameters;
