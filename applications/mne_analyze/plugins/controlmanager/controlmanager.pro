@@ -61,6 +61,7 @@ CONFIG(debug, debug|release) {
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lanSharedd \
+            -lmnecppDisp3Dd \
             -lmnecppDispd \
             -lmnecppConnectivityd \
             -lmnecppRtProcessingd \
@@ -72,6 +73,7 @@ CONFIG(debug, debug|release) {
             -lmnecppUtilsd \
 } else {
     LIBS += -lanShared \
+            -lmnecppDisp3D \
             -lmnecppDisp \
             -lmnecppConnectivity \
             -lmnecppRtProcessing \

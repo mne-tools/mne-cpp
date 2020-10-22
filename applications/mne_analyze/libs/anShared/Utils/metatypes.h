@@ -43,10 +43,29 @@
 #include "../Model/fiffrawviewmodel.h"
 
 // IMPORTANT: You must also use qRegisterMetaTypes in AnalyzeCore::registerMetatypes to use custom types in QObject::connect() calls.
+#ifndef metatype_vector3f
+#define metatype_vector3f
 Q_DECLARE_METATYPE(Eigen::Vector3f);
+#endif
+
+#ifndef metatype_vector3i
+#define metatype_vector3i
 Q_DECLARE_METATYPE(Eigen::Vector3i);
+#endif
+
+#ifndef metatype_inverselibecd
+#define metatype_inverselibecd
 Q_DECLARE_METATYPE(INVERSELIB::ECD);
+#endif
+
+#ifndef metatype_ANSHAREDLIB_events
+#define metatype_ANSHAREDLIB_events
 Q_DECLARE_METATYPE(QSharedPointer<ANSHAREDLIB::Event>);
+#endif
+
+#ifndef metatype_ANSHAREDLIB_chandata
+#define metatype_ANSHAREDLIB_chandata
 Q_DECLARE_METATYPE(ANSHAREDLIB::ChannelData);
+#endif
 
 #endif // ENUMS_H
