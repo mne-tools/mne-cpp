@@ -184,8 +184,6 @@ QDockWidget *CoRegistration::getControl()
             this, &CoRegistration::onPickedFiducialChanged);
 
     // Connect events for new and deleted model
-    connect(m_pAnalyzeData.data(), &AnalyzeData::newModelAvailable,
-            this, &CoRegistration::updateBemList, Qt::UniqueConnection);
     connect(m_pAnalyzeData.data(), &AnalyzeData::modelIsEmpty,
             this, &CoRegistration::deleteModels, Qt::UniqueConnection);
 
@@ -214,6 +212,8 @@ void CoRegistration::handleEvent(QSharedPointer<Event> e)
         case NEW_FIDUCIAL_PICKED:
             onSetFiducial(e->getData().value<QVector3D>());
             break;
+        case SELECTED_MODEL_CHANGED:
+            onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
         default:
             qWarning() << "[CoRegistration::handleEvent] received an Event that is not handled by switch-cases";
             break;
@@ -226,12 +226,13 @@ QVector<EVENT_TYPE> CoRegistration::getEventSubscriptions(void) const
 {
     QVector<EVENT_TYPE> temp;
     temp.push_back(NEW_FIDUCIAL_PICKED);
+    temp.push_back(SELECTED_MODEL_CHANGED);
     return temp;
 }
 
 //=============================================================================================================
 
-void CoRegistration::updateBemList(ANSHAREDLIB::AbstractModel::SPtr pNewModel)
+void CoRegistration::updateBemList(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel)
 {
     // check first if model was already added and if the passed model is actually a BemDataModel
     if(!m_vecBemDataModels.contains(pNewModel) && pNewModel->getType() == ANSHAREDLIB_BEMDATA_MODEL) {
@@ -772,5 +773,14 @@ void CoRegistration::deleteModels()
                 m_pCoregSettingsView->addSelectionBem(pBemDataModel->getModelName());
             }
         }
+    }
+}
+
+//=============================================================================================================
+
+void CoRegistration::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel)
+{
+    if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_BEMDATA_MODEL){
+        updateBemList(pNewModel);
     }
 }

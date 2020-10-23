@@ -216,10 +216,9 @@ public:
                     QVariant data;
                     data.setValue(temp);
                     pItem->setData(data);
-                    m_pData->addFunctionalData(m_SelectedItem,
-                                     pItem);
-
-                    emit newModelAvailable(temp);
+                    m_pData->addData(m_SelectedItem,
+                                     pItem,
+                                     FUNCTIONALDATA);
                     return sm;
                 } else {
                     return Q_NULLPTR;
@@ -234,8 +233,9 @@ public:
                 QVariant data;
                 data.setValue(temp);
                 pItem->setData(data);
-                m_pData->addToData(pItem,
-                                   m_SelectedData);
+                m_pData->addData(m_SelectedItem,
+                                 pItem,
+                                 ANNOTATION);
 
                 return sm;
             }
@@ -248,8 +248,9 @@ public:
                 QVariant data;
                 data.setValue(temp);
                 pItem->setData(data);
-                m_pData->addToData(pItem,
-                                   m_SelectedData);
+                m_pData->addData(m_SelectedItem,
+                                 pItem,
+                                 AVERAGE);
 
                 return sm;
             }
@@ -258,10 +259,15 @@ public:
                 pItem->setEditable(false);
                 pItem->setDragEnabled(true);
                 pItem->setToolTip(temp->getModelPath());
+
                 QVariant data;
                 data.setValue(temp);
                 pItem->setData(data);
 
+                m_pData->addData(m_SelectedItem,
+                                 pItem,
+                                 ANATOMYDATA);
+                return sm;
             }
             default: {
                 qDebug() << "[AnalyzData::loadModel] Model Type not supported";
@@ -285,22 +291,22 @@ public:
         switch(temp->getType()){
             case ANSHAREDLIB_AVERAGING_MODEL:
                 pItem->setData(data);
-                pItem->setData(QVariant::fromValue(AVG), ITEM_TYPE);
+                pItem->setData(QVariant::fromValue(AVERAGE), ITEM_TYPE);
                 m_pData->addToData(pItem,
-                                   m_SelectedData);
+                                   m_SelectedData,
+                                   AVERAGE);
                 break;
             case ANSHAREDLIB_ANNOTATION_MODEL:
                 pItem->setData(data);
                 pItem->setData(QVariant::fromValue(ANNOTATION), ITEM_TYPE);
                 m_pData->addToData(pItem,
-                                   m_SelectedData);
-
+                                   m_SelectedData,
+                                   ANNOTATION);
+                break;
             default:
                 qWarning() << "[AnalyzeData::addModel] Model type not supported";
                 break;
         }
-
-        emit newModelAvailable(temp);
         return pNewModel;
     }
 
@@ -311,14 +317,6 @@ private:
     QModelIndex                             m_SelectedData;     /**< Index of currently selected data item */
 
 signals:
-    //=========================================================================================================
-    /**
-     * This is emitted whenever a new model is loaded.
-     *
-     * @param[in] pModel      The newly available model
-     */
-    void newModelAvailable(QSharedPointer<AbstractModel> pModel);
-
     //=========================================================================================================
     /**
      * This is emitted whenever the model is completely.

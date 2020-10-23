@@ -288,6 +288,9 @@ private:
      */
     void triggerLoadingEnd(QString sMessage);
 
+    //=============================================================================================================
+    void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
+
     QVector<QSharedPointer<ANSHAREDLIB::AbstractModel>>     m_vecBemDataModels;     /**< Vector with all available Bem Models */
     QSharedPointer<MNELIB::MNEBem>                          m_pBem;                 /**< The currently selected Bem model */
     QString                                                 m_sCurrentSelectedBem;  /**< The name of the currently selected Bem */
