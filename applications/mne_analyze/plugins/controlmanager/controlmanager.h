@@ -61,6 +61,7 @@ namespace ANSHAREDLIB {
 
 namespace DISPLIB{
     class ApplyToView;
+    class Control3DView;
 }
 
 namespace DISP3DLIB {
@@ -168,12 +169,21 @@ private:
      */
     void onMakeScreenshot(const QString& imageType);
 
-    QPointer<ANSHAREDLIB::Communicator>     m_pCommu;
-    QPointer<DISP3DLIB::Data3DTreeModel>    m_p3DModel;
+    //=========================================================================================================
+    /**
+     *
+     *
+     * @param pModel
+     */
+    void init3DGui(QSharedPointer<DISP3DLIB::Data3DTreeModel> pModel);
 
-    DISPLIB::ApplyToView*                   m_pApplyToView;
-    ANSHAREDLIB::ScalingParameters          m_ScalingParameters;
-    ANSHAREDLIB::ViewParameters             m_ViewParmeters;
+    QPointer<ANSHAREDLIB::Communicator>         m_pCommu;
+    QSharedPointer<DISP3DLIB::Data3DTreeModel>  m_p3DModel;
+
+    DISPLIB::Control3DView*                     m_pControl3DView;
+    DISPLIB::ApplyToView*                       m_pApplyToView;
+    ANSHAREDLIB::ScalingParameters              m_ScalingParameters;
+    ANSHAREDLIB::ViewParameters                 m_ViewParmeters;
 };
 
 //=============================================================================================================

@@ -161,6 +161,8 @@ QDockWidget* View3D::getControl()
     m_pControl3DView->setDelegate(pData3DTreeDelegate);
     m_pControl3DView->setModel(m_p3DModel.data());
 
+    new3DModel(m_p3DModel);
+
     // TODO getControl() called before getView() -> dangling pointer m_pView3D
     connect(m_pControl3DView, &Control3DView::sceneColorChanged,
             m_pView3D, &DISP3DLIB::View3D::setSceneColor);
@@ -317,4 +319,11 @@ void View3D::onFiducialChanged(const int iFiducial)
             m_iFiducial = FIFFV_POINT_RPA;
             return;
     }
+}
+
+//=========================================================================================================
+
+void View3D::new3DModel(QSharedPointer<DISP3DLIB::Data3DTreeModel> pModel)
+{
+    m_pCommu->publishEvent(EVENT_TYPE::SET_DATA3D_TREE_MODEL, QVariant::fromValue(pModel));
 }
