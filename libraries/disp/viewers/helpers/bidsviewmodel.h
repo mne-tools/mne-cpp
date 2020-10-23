@@ -168,7 +168,7 @@ public slots:
 
     //=========================================================================================================
     /**
-     * @brief addMegDataToSession
+     * Adds data item pNewItem to session at sessionIndex
      *
      * @param [in] sessionIndex     Index of session to which data will be added
      * @param [in] pNewItem         New item to be added.
@@ -191,7 +191,7 @@ public slots:
 
     //=========================================================================================================
     /**
-     * @brief moveDataToSession
+     * Moves data at dataIndex to session at sessionIndex
      *
      * @param [in] sessionIndex     Target session
      * @param [in] dataIndex        Data to be moved

@@ -1010,11 +1010,11 @@ void AnnotationModel::initFromFile(const QString& sFilePath)
         newItem->setFlags (newItem->flags () | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
         pushGroup(newItem);
 
-        QList<int> eventList;
-        MNELIB::MNE::read_events(file, eventList);
+        Eigen::MatrixXi eventList;
+        MNELIB::MNE::read_events_from_ascii(file, eventList);
 
         for(int i = 0; i < eventList.size(); i++){
-            setSamplePos(eventList[i]);
+            setSamplePos(eventList(i,0));
             insertRow(0, QModelIndex());
         }
 
@@ -1024,7 +1024,7 @@ void AnnotationModel::initFromFile(const QString& sFilePath)
             return;
         }
         Eigen::MatrixXi eventlist;
-        MNELIB::MNE::read_events(file, eventlist);
+        MNELIB::MNE::read_events_from_fif(file, eventlist);
     }
 }
 

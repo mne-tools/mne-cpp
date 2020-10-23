@@ -329,8 +329,8 @@ public:
      *
      * @return true if succeeded, false otherwise
      */
-    static bool read_events(QIODevice &p_IODevice,
-                            Eigen::MatrixXi& eventlist);
+    static bool read_events_from_fif(QIODevice &p_IODevice,
+                                     Eigen::MatrixXi& eventlist);
 
     //=========================================================================================================
     /**
@@ -343,8 +343,8 @@ public:
      *
      * @return true if succeeded, false otherwise
      */
-    static bool read_events(QIODevice &p_IODevice,
-                            QList<int>& eventList);
+    static bool read_events_from_ascii(QIODevice &p_IODevice,
+                                       Eigen::MatrixXi& eventlist);
 
     static void setup_compensators(FIFFLIB::FiffRawData& raw,
                                    FIFFLIB::fiff_int_t dest_comp,

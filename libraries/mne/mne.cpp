@@ -80,7 +80,7 @@ bool MNE::read_events(QString t_sEventName,
         }
 
         t_EventFile.setFileName(t_sEventName);
-        if(!MNE::read_events(t_EventFile, events)) {
+        if(!MNE::read_events_from_fif(t_EventFile, events)) {
             printf("Error while read events.\n");
             return false;
         }
@@ -89,11 +89,13 @@ bool MNE::read_events(QString t_sEventName,
         // Binary file
         if (t_sEventName.contains(".fif")) {
             t_EventFile.setFileName(t_sEventName);
-            if(!MNE::read_events(t_EventFile, events)) {
+            if(!MNE::read_events_from_fif(t_EventFile, events)) {
                 printf("Error while read events.\n");
                 return false;
             }
             printf("Binary event file %s read\n",t_sEventName.toUtf8().constData());
+        } else if(t_sEventName.contains(".eve")){
+
         } else {
             // Text file
             printf("Text file %s is not supported jet.\n",t_sEventName.toUtf8().constData());
@@ -140,8 +142,8 @@ bool MNE::read_events(QString t_sEventName,
 
 //=============================================================================================================
 
-bool MNE::read_events(QIODevice &p_IODevice,
-                      MatrixXi& eventlist)
+bool MNE::read_events_from_fif(QIODevice &p_IODevice,
+                               MatrixXi& eventlist)
 {
     //
     // Open file
@@ -279,20 +281,28 @@ void MNE::setup_compensators(FiffRawData& raw,
 
 //=============================================================================================================
 
-bool MNE::read_events(QIODevice &p_IODevice,
-                      QList<int> &eventList)
+bool MNE::read_events_from_ascii(QIODevice &p_IODevice,
+                                 Eigen::MatrixXi& eventlist)
 {
     if (!p_IODevice.open(QIODevice::ReadOnly | QIODevice::Text)){
         return false;
     }
     QTextStream textStream(&p_IODevice);
 
+    QList<int> simpleList;
+
     while(!textStream.atEnd()){
         int iSample;
         textStream >> iSample;
-        eventList.append(iSample);
+        simpleList.append(iSample);
         textStream.readLine();
         qDebug() << "Added event:" << iSample;
+    }
+
+    eventlist.resize(simpleList.size(), 1);
+
+    for(int i = 0; i < simpleList.size(); i++){
+        eventlist(i,0) = simpleList[i];
     }
     return true;
 }

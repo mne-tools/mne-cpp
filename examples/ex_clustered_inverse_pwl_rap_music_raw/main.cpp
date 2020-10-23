@@ -304,7 +304,7 @@ int main(int argc, char *argv[])
 //        events = mne_read_events(t_sEventName);
 
         t_EventFile.setFileName(t_sEventName);
-        MNE::read_events(t_EventFile, events);
+        MNE::read_events_from_fif(t_EventFile, events);
         printf("Events read from %s\n",t_sEventName.toUtf8().constData());
     }
     else
@@ -316,7 +316,7 @@ int main(int argc, char *argv[])
         if (p > 0)
         {
             t_EventFile.setFileName(t_sEventName);
-            if(!MNE::read_events(t_EventFile, events))
+            if(!MNE::read_events_from_fif(t_EventFile, events))
             {
                 printf("Error while read events.\n");
                 return 0;
