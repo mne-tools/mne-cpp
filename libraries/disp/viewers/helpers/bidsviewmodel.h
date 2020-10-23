@@ -41,21 +41,27 @@
 //=============================================================================================================
 
 //USER ROLES
-#define ITEM_TYPE       Qt::UserRole+2
-#define ITEM_SUBJECT    Qt::UserRole+3
-#define ITEM_SESSION    Qt::UserRole+4
+#define BIDS_ITEM_TYPE              Qt::UserRole+2
+#define BIDS_ITEM_SUBJECT           Qt::UserRole+3
+#define BIDS_ITEM_SESSION           Qt::UserRole+4
 
 //ITEM TYPES
-#define SUBJECT             1
-#define SESSION             2
-#define FOLDER              3
 
-#define FUNCTIONALDATA      10
-#define ANATOMYDATA         11
-#define BEHAVIORALDATA      12
+//CONTAINERS
+#define BIDS_SUBJECT                01
+#define BIDS_SESSION                02
+#define BIDS_FOLDER                 03
 
-#define AVERAGE             20
-#define ANNOTATION          21
+//DATA TYPES
+#define BIDS_FUNCTIONALDATA         10
+#define BIDS_ANATOMICALDATA         11
+#define BIDS_BEHAVIORALDATA         12
+
+//SUB-ITEMS
+#define BIDS_AVERAGE                20
+#define BIDS_ANNOTATION             21
+
+#define BIDS_UNKNOWN                99
 
 //=============================================================================================================
 // INCLUDES

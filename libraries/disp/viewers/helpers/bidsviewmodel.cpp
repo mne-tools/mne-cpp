@@ -75,14 +75,14 @@ void BidsViewModel::addData(QModelIndex selectedItem,
                             int iDataType)
 {
     switch(iDataType){
-    case FUNCTIONALDATA:
-    case ANATOMYDATA:
-    case BEHAVIORALDATA: {
+    case BIDS_FUNCTIONALDATA:
+    case BIDS_ANATOMICALDATA:
+    case BIDS_BEHAVIORALDATA: {
         if(!selectedItem.isValid()) {
             addDataToSession(addSessionToSubject(addSubject("sub-01"), "ses-01"), pNewItem, iDataType);
         } else {
-            if (itemFromIndex(selectedItem)->data(ITEM_TYPE).value<int>() != SUBJECT){
-                addDataToSession(itemFromIndex(selectedItem)->data(ITEM_SESSION).value<QModelIndex>(),
+            if (itemFromIndex(selectedItem)->data(BIDS_ITEM_TYPE).value<int>() != BIDS_SUBJECT){
+                addDataToSession(itemFromIndex(selectedItem)->data(BIDS_ITEM_SESSION).value<QModelIndex>(),
                                  pNewItem,
                                  iDataType);
             } else {
@@ -91,8 +91,8 @@ void BidsViewModel::addData(QModelIndex selectedItem,
         }
         break;
     }
-    case ANNOTATION:
-    case AVERAGE: {
+    case BIDS_ANNOTATION:
+    case BIDS_AVERAGE: {
         addToData(pNewItem,
                   selectedItem,
                   iDataType);
@@ -111,9 +111,9 @@ void BidsViewModel::addToData(QStandardItem *pNewAvgItem,
     selectedData->setChild(selectedData->rowCount(),
                            pNewAvgItem);
 
-    pNewAvgItem->setData(itemFromIndex(parentIndex)->data(ITEM_SUBJECT), ITEM_SUBJECT);
-    pNewAvgItem->setData(itemFromIndex(parentIndex)->data(ITEM_SESSION), ITEM_SESSION);
-    pNewAvgItem->setData(QVariant::fromValue(iDataType), ITEM_TYPE);
+    pNewAvgItem->setData(itemFromIndex(parentIndex)->data(BIDS_ITEM_SUBJECT), BIDS_ITEM_SUBJECT);
+    pNewAvgItem->setData(itemFromIndex(parentIndex)->data(BIDS_ITEM_SESSION), BIDS_ITEM_SESSION);
+    pNewAvgItem->setData(QVariant::fromValue(iDataType), BIDS_ITEM_TYPE);
 
     emit newItemIndex(pNewAvgItem->index());
 }
@@ -137,8 +137,8 @@ QModelIndex BidsViewModel::addSubject(const QString &sSubjectName)
     QStandardItem* pSubjectItem = new QStandardItem(sNewSubjectName);
     appendRow(pSubjectItem);
 
-    pSubjectItem->setData(QVariant::fromValue(SUBJECT), ITEM_TYPE);
-    pSubjectItem->setData(QVariant::fromValue(pSubjectItem->index()), ITEM_SUBJECT);
+    pSubjectItem->setData(QVariant::fromValue(BIDS_SUBJECT), BIDS_ITEM_TYPE);
+    pSubjectItem->setData(QVariant::fromValue(pSubjectItem->index()), BIDS_ITEM_SUBJECT);
 
     emit newItemIndex(pSubjectItem->index());
 
@@ -187,9 +187,9 @@ QModelIndex BidsViewModel::addSessionToSubject(const QString &sSubjectName,
         pSubjectItem->setChild(pSubjectItem->rowCount(),
                                pNewSessionItem);
 
-        pNewSessionItem->setData(QVariant::fromValue(SESSION), ITEM_TYPE);
-        pNewSessionItem->setData(QVariant::fromValue(pSubjectItem->index()), ITEM_SUBJECT);
-        pNewSessionItem->setData(QVariant::fromValue(pNewSessionItem->index()), ITEM_SESSION);
+        pNewSessionItem->setData(QVariant::fromValue(BIDS_SESSION), BIDS_ITEM_TYPE);
+        pNewSessionItem->setData(QVariant::fromValue(pSubjectItem->index()), BIDS_ITEM_SUBJECT);
+        pNewSessionItem->setData(QVariant::fromValue(pNewSessionItem->index()), BIDS_ITEM_SESSION);
 
         emit newItemIndex(pNewSessionItem->index());
     }
@@ -218,9 +218,9 @@ QModelIndex BidsViewModel::addSessionToSubject(QModelIndex subjectIndex,
     pSubjectItem->setChild(pSubjectItem->rowCount(),
                            pNewSessionItem);
 
-    pNewSessionItem->setData(QVariant::fromValue(SESSION), ITEM_TYPE);
-    pNewSessionItem->setData(QVariant::fromValue(subjectIndex), ITEM_SUBJECT);
-    pNewSessionItem->setData(QVariant::fromValue(pNewSessionItem->index()), ITEM_SESSION);
+    pNewSessionItem->setData(QVariant::fromValue(BIDS_SESSION), BIDS_ITEM_TYPE);
+    pNewSessionItem->setData(QVariant::fromValue(subjectIndex), BIDS_ITEM_SUBJECT);
+    pNewSessionItem->setData(QVariant::fromValue(pNewSessionItem->index()), BIDS_ITEM_SESSION);
 
     emit newItemIndex(pNewSessionItem->index());
 
@@ -240,13 +240,13 @@ QModelIndex BidsViewModel::addDataToSession(QModelIndex sessionIndex,
     QString sFolderName;
 
     switch (iDataType){
-        case FUNCTIONALDATA:
+        case BIDS_FUNCTIONALDATA:
             sFolderName = "func";
             break;
-        case ANATOMYDATA:
+        case BIDS_ANATOMICALDATA:
             sFolderName = "anat";
             break;
-        case BEHAVIORALDATA:
+        case BIDS_BEHAVIORALDATA:
             sFolderName = "beh";
         default:
             sFolderName = "unknown";
@@ -261,9 +261,9 @@ QModelIndex BidsViewModel::addDataToSession(QModelIndex sessionIndex,
 
     if(!bFolder) {
         QStandardItem* pFunctionalItem = new QStandardItem(sFolderName);
-        pFunctionalItem->setData(QVariant::fromValue(FOLDER), ITEM_TYPE);
-        pFunctionalItem->setData(QVariant::fromValue(sessionIndex), ITEM_SESSION);
-        pFunctionalItem->setData(itemFromIndex(sessionIndex)->data(ITEM_SUBJECT), ITEM_SUBJECT);
+        pFunctionalItem->setData(QVariant::fromValue(BIDS_FOLDER), BIDS_ITEM_TYPE);
+        pFunctionalItem->setData(QVariant::fromValue(sessionIndex), BIDS_ITEM_SESSION);
+        pFunctionalItem->setData(itemFromIndex(sessionIndex)->data(BIDS_ITEM_SUBJECT), BIDS_ITEM_SUBJECT);
 
         pSessionItem->setChild(pSessionItem->rowCount(),
                                pFunctionalItem);
@@ -274,9 +274,9 @@ QModelIndex BidsViewModel::addDataToSession(QModelIndex sessionIndex,
                                                   pNewItem);
     }
 
-    pNewItem->setData(QVariant::fromValue(iDataType), ITEM_TYPE);
-    pNewItem->setData(QVariant::fromValue(sessionIndex), ITEM_SESSION);
-    pNewItem->setData(itemFromIndex(sessionIndex)->data(ITEM_SUBJECT), ITEM_SUBJECT);
+    pNewItem->setData(QVariant::fromValue(iDataType), BIDS_ITEM_TYPE);
+    pNewItem->setData(QVariant::fromValue(sessionIndex), BIDS_ITEM_SESSION);
+    pNewItem->setData(itemFromIndex(sessionIndex)->data(BIDS_ITEM_SUBJECT), BIDS_ITEM_SUBJECT);
 
     emit newItemIndex(pNewItem->index());
 
@@ -297,12 +297,12 @@ QModelIndex BidsViewModel::moveSessionToSubject(QModelIndex subjectIndex,
 
 
     subjectItem->setChild(subjectItem->rowCount(), sessionItem);
-    subjectItem->setData(subjectIndex, ITEM_SUBJECT);
+    subjectItem->setData(subjectIndex, BIDS_ITEM_SUBJECT);
 
     for (int i = 0; i < sessionItem->rowCount(); i++){
-        sessionItem->child(i)->setData(subjectIndex, ITEM_SUBJECT);
+        sessionItem->child(i)->setData(subjectIndex, BIDS_ITEM_SUBJECT);
         for (int j = 0; j < sessionItem->child(i)->rowCount(); j++) {
-            sessionItem->child(i)->child(j)->setData(subjectIndex, ITEM_SUBJECT);
+            sessionItem->child(i)->child(j)->setData(subjectIndex, BIDS_ITEM_SUBJECT);
         }
     }
 
@@ -346,7 +346,7 @@ QModelIndex BidsViewModel::moveDataToSession(QModelIndex sessionIndex,
 
     newIndex = addDataToSession(sessionIndex,
                                 dataItem,
-                                dataItem->data(ITEM_TYPE).value<int>());
+                                dataItem->data(BIDS_ITEM_TYPE).value<int>());
 
     endResetModel();
 
@@ -366,25 +366,25 @@ bool BidsViewModel::removeItem(QModelIndex itemIndex)
 
     qInfo() << "Deleting" << pItem->text();
 
-    switch(pItem->data(ITEM_TYPE).value<int>()){
-        case SUBJECT:
+    switch(pItem->data(BIDS_ITEM_TYPE).value<int>()){
+        case BIDS_SUBJECT:
             if(removeRows(itemIndex.row(), 1, itemIndex.parent())){
                 endResetModel();
             }
             return true;
-        case SESSION:
+        case BIDS_SESSION:
             if(removeRows(itemIndex.row(), 1, itemIndex.parent())){
                 endResetModel();
             }
             return true;
-        case BEHAVIORALDATA:
-        case ANATOMYDATA:
-        case FUNCTIONALDATA:
+        case BIDS_BEHAVIORALDATA:
+        case BIDS_ANATOMICALDATA:
+        case BIDS_FUNCTIONALDATA:
             if(removeRows(itemIndex.row(), 1, itemIndex.parent())){
                 endResetModel();
             }
             return true;
-        case AVERAGE:
+        case BIDS_AVERAGE:
             if(removeRows(itemIndex.row(), 1, itemIndex.parent())){
                 endResetModel();
             }

@@ -214,6 +214,7 @@ void CoRegistration::handleEvent(QSharedPointer<Event> e)
             break;
         case SELECTED_MODEL_CHANGED:
             onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
+            break;
         default:
             qWarning() << "[CoRegistration::handleEvent] received an Event that is not handled by switch-cases";
             break;
