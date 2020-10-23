@@ -170,6 +170,8 @@ private:
      */
     void newPickingEvent(Qt3DRender::QPickEvent *qPickEvent);
 
+    void new3DModel(QSharedPointer<DISP3DLIB::Data3DTreeModel> pModel);
+
     QPointer<ANSHAREDLIB::Communicator>             m_pCommu;               /**< To broadcst signals */
 
     int                                             m_iFiducial;            /**< Currently selected fiducial */

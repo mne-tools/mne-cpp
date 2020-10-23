@@ -129,14 +129,14 @@ QDockWidget *ControlManager::getControl()
 
     DISPLIB::ScalingView* pScalingWidget = new DISPLIB::ScalingView("MNEANALYZE", wrappedScrollArea);
     DISPLIB::FiffRawViewSettings* pFiffViewSettings = new DISPLIB::FiffRawViewSettings("MNEANALYZE", wrappedScrollArea);
-    DISPLIB::Control3DView* pControl3DView = new DISPLIB::Control3DView(QString("MNEANALYZE/%1").arg(this->getName()), Q_NULLPTR, slControlFlags);
+    m_pControl3DView = new DISPLIB::Control3DView(QString("MNEANALYZE/%1").arg(this->getName()), Q_NULLPTR, slControlFlags);
     DISP3DLIB::Data3DTreeDelegate* pData3DTreeDelegate = new DISP3DLIB::Data3DTreeDelegate(this);
 
     m_pApplyToView = new DISPLIB::ApplyToView();
 
     pTabWidget->addTab(pScalingWidget, "Scaling");
     pTabWidget->addTab(pFiffViewSettings, "Controls");
-    pTabWidget->addTab(pControl3DView, "3D");
+    pTabWidget->addTab(m_pControl3DView, "3D");
 
     pLayout->addWidget(pTabWidget);
     pLayout->addWidget(m_pApplyToView);
@@ -171,10 +171,7 @@ QDockWidget *ControlManager::getControl()
     m_ViewParmeters.m_iTimeSpacers = pFiffViewSettings->getDistanceTimeSpacer();
     m_ViewParmeters.m_sImageType = "";
 
-    m_p3DModel = new DISP3DLIB::Data3DTreeModel();
-
-//    pControl3DView->setDelegate(pData3DTreeDelegate);
-//    pControl3DView->setModel(m_p3DModel.data());
+    m_pControl3DView->setDelegate(pData3DTreeDelegate);
 
     return pControlDock;
 }
@@ -199,6 +196,9 @@ void ControlManager::handleEvent(QSharedPointer<Event> e)
             m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_ViewParmeters));
         }
         break;
+    case SET_DATA3D_TREE_MODEL:
+        init3DGui(e->getData().value<QSharedPointer<DISP3DLIB::Data3DTreeModel>>());
+
     default:
         qWarning() << "[ControlManager::handleEvent] received an Event that is not handled by switch-cases";
         break;
@@ -211,6 +211,7 @@ QVector<EVENT_TYPE> ControlManager::getEventSubscriptions(void) const
 {
     QVector<EVENT_TYPE> temp;
     temp.push_back(SELECTED_MODEL_CHANGED);
+    temp.push_back(SET_DATA3D_TREE_MODEL);
 
     return temp;
 }
@@ -291,4 +292,11 @@ void ControlManager::onMakeScreenshot(const QString& imageType)
     m_ViewParmeters.m_sImageType = imageType;
 
     m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_ViewParmeters));
+}
+
+//=============================================================================================================
+
+void ControlManager::init3DGui(QSharedPointer<DISP3DLIB::Data3DTreeModel> pModel)
+{
+    m_pControl3DView->setModel(pModel.data());
 }

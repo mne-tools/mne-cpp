@@ -106,17 +106,18 @@ namespace ANSHAREDLIB
         FILTER_ACTIVE_CHANGED,      // send when the filter active state was toggled
         FILTER_DESIGN_CHANGED,      // send when the designed filter changed
         CHANNEL_SELECTION_ITEMS,    // send when channel selection changes with channel info about graphic items to draw
-        SCALING_MAP_CHANGED,
-        VIEW_SETTINGS_CHANGED,
-        LOADING_START,
-        LOADING_END,
+        SCALING_MAP_CHANGED,        // send when view scaling controls are updated
+        VIEW_SETTINGS_CHANGED,      // send to trigger view settings update
+        LOADING_START,              // send to start status bar loaidng bar and message
+        LOADING_END,                // send to end status bar loading bar and message
         SELECTED_BEM_CHANGED,       // event send whenever the Bem file within the coregistration changed
         NEW_DIGITIZER_ADDED,        // event send whenever new digitizers are loaded
         NEW_FIDUCIALS_ADDED,        // event send whenever new fiducials are loaded
         NEW_TRANS_AVAILABE,         // event send whenever a new head-mri transformation is available
         FID_PICKING_STATUS,         // event send whenever status of fiducial picking has changed
         NEW_FIDUCIAL_PICKED,        // event send whenever a new fiducial was picked
-        FIDUCIAL_CHANGED
+        FIDUCIAL_CHANGED,
+        SET_DATA3D_TREE_MODEL
     };
 
     //=========================================================================================================
@@ -149,6 +150,27 @@ namespace ANSHAREDLIB
         int                 m_iTimeSpacers;
         QString             m_sImageType;
 
+    };
+
+    struct View3DParameters{
+        enum View3DSetting{
+            sceneColor,
+            rotation,
+            coordAxis,
+            fullscreen,
+            lightColor,
+            lightIntensity,
+            screenshot,
+            all
+        };
+
+        View3DSetting       m_settingsToApply;
+        QColor              m_sceneColor;
+        bool                m_bToggleRotation;
+        bool                m_bToogleCoordAxis;
+        bool                m_bToggleFullscreen;
+        QColor              m_lightColor;
+        double              m_dLightIntensity;
     };
 
     //=========================================================================================================
