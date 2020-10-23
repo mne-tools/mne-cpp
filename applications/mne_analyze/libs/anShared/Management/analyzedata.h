@@ -281,7 +281,7 @@ public:
                 break;
             case ANSHAREDLIB_ANNOTATION_MODEL:
                 pItem->setData(data);
-                pItem->setData(QVariant::fromValue(AVG), ITEM_TYPE);
+                pItem->setData(QVariant::fromValue(ANNOTATION), ITEM_TYPE);
                 m_pData->addToData(pItem,
                                    m_SelectedData);
 
@@ -295,7 +295,7 @@ public:
     }
 
 private:
-    QPointer<DISPLIB::BidsViewModel>        m_pData;            /**< The loaded models in form of a QStandardItemModel. */
+    QPointer<DISPLIB::BidsViewModel>        m_pData;            /**< The BidsViewModel that holds all the subject, session, and data items. */
 
     QModelIndex                             m_SelectedItem;     /**< Index of currently selected item */
     QModelIndex                             m_SelectedData;     /**< Index of currently selected data item */
