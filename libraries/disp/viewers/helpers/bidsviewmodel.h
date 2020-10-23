@@ -48,11 +48,14 @@
 //ITEM TYPES
 #define SUBJECT             1
 #define SESSION             2
-#define FUNCTIONALDATA      3
-#define AVG                 4
-#define ANATDATA            5
-#define FOLDER              6
-#define ANNOTATION          7
+#define FOLDER              3
+
+#define FUNCTIONALDATA      10
+#define ANATOMYDATA         11
+#define BEHAVIORALDATA      12
+
+#define AVERAGE             20
+#define ANNOTATION          21
 
 //=============================================================================================================
 // INCLUDES
@@ -121,7 +124,7 @@ public slots:
      */
     void addData(QModelIndex selectedItem,
                  QStandardItem *pNewItem,
-                 int iDataType = FUNCTIONALDATA);
+                 int iDataType);
 
     //=========================================================================================================
     /**
@@ -131,7 +134,8 @@ public slots:
      * @param [in] parentIndex  index of where the nitem should be added
      */
     void addToData(QStandardItem *pNewItem,
-                   const QModelIndex &parentIndex);
+                   const QModelIndex &parentIndex,
+                   int iDataType);
 
     //=========================================================================================================
     /**
@@ -177,7 +181,8 @@ public slots:
      * @return index of newly added item
      */
     QModelIndex addDataToSession(QModelIndex sessionIndex,
-                                 QStandardItem* pNewItem);
+                                 QStandardItem* pNewItem,
+                                 int iDataType);
 
     //=========================================================================================================
     /**
