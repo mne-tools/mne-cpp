@@ -130,8 +130,8 @@ void BidsView::customMenuRequested(QPoint pos)
     if(m_pUi->m_pTreeView->indexAt(pos).isValid()){
         QStandardItem* pItem = pModel->itemFromIndex(m_pUi->m_pTreeView->indexAt(pos));
 
-        switch (pItem->data(ITEM_TYPE).value<int>()){
-            case SUBJECT: {
+        switch (pItem->data(BIDS_ITEM_TYPE).value<int>()){
+            case BIDS_SUBJECT: {
                 QMenu *menu = new QMenu(this);
 
                 QAction* pAddSessionAction = new QAction("Add Session", this);
@@ -152,7 +152,7 @@ void BidsView::customMenuRequested(QPoint pos)
                 menu->popup(m_pUi->m_pTreeView->viewport()->mapToGlobal(pos));
                 break;
             }
-            case SESSION: {
+            case BIDS_SESSION: {
                 QMenu *menu = new QMenu(this);
 
                 pRemoveAction = new QAction("Remove Session", this);
@@ -161,9 +161,9 @@ void BidsView::customMenuRequested(QPoint pos)
 
                 //Find all available subjects
                 for(int i = 0; i < pModel->rowCount(); i++){
-                    if(pModel->item(i)->index() != pItem->data(ITEM_SUBJECT).value<QModelIndex>()){
+                    if(pModel->item(i)->index() != pItem->data(BIDS_ITEM_SUBJECT).value<QModelIndex>()){
                         qDebug() << "Relative model index" << pModel->item(i)->index();
-                        qDebug() << "Relative item index" << pItem->data(ITEM_SUBJECT).value<QModelIndex>();
+                        qDebug() << "Relative item index" << pItem->data(BIDS_ITEM_SUBJECT).value<QModelIndex>();
                         QAction* pTargetAction = new QAction(pModel->item(i)->text());
                         connect(pTargetAction, &QAction::triggered, [=] () {
                             emit onMoveSession(pModel->item(i)->index(), pItem->index());
@@ -179,9 +179,9 @@ void BidsView::customMenuRequested(QPoint pos)
                 menu->popup(m_pUi->m_pTreeView->viewport()->mapToGlobal(pos));
                 break;
             }
-            case BEHAVIORALDATA:
-            case ANATOMYDATA:
-            case FUNCTIONALDATA: {
+            case BIDS_BEHAVIORALDATA:
+            case BIDS_ANATOMICALDATA:
+            case BIDS_FUNCTIONALDATA: {
                 QMenu *menu = new QMenu(this);
 
                 pRemoveAction = new QAction("Remove Data", this);
@@ -192,7 +192,7 @@ void BidsView::customMenuRequested(QPoint pos)
                 for(int i = 0; i < pModel->rowCount(); i++){
                     QMenu* pSubjectMenu = new QMenu(pModel->item(i)->text());
                     for (int j = 0; j < pModel->item(i)->rowCount(); j++){
-                        if(pModel->item(i)->child(j)->index() != pItem->data(ITEM_SESSION).value<QModelIndex>()){
+                        if(pModel->item(i)->child(j)->index() != pItem->data(BIDS_ITEM_SESSION).value<QModelIndex>()){
                             QAction* pTargetAction = new QAction(pModel->item(i)->child(j)->text());
                             connect(pTargetAction, &QAction::triggered, [=] {
                                 emit onMoveData(pModel->item(i)->child(j)->index(), pItem->index());

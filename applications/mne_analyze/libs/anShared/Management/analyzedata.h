@@ -204,75 +204,44 @@ public:
         QSharedPointer<AbstractModel> temp = qSharedPointerCast<AbstractModel>(sm);
         temp->setModelPath(sPath);
 
+        int iType;
+        QModelIndex index;
+
         switch(temp->getType()){
-            case ANSHAREDLIB_FIFFRAW_MODEL: {
-                if(temp->isInit()) {
-                    // add to record, and tell others about the new model
-                    QStandardItem* pItem = new QStandardItem(temp->getModelName());
-                    pItem->setEditable(false);
-                    pItem->setDragEnabled(true);
-                    pItem->setToolTip(temp->getModelPath());
-
-                    QVariant data;
-                    data.setValue(temp);
-                    pItem->setData(data);
-                    m_pData->addData(m_SelectedItem,
-                                     pItem,
-                                     FUNCTIONALDATA);
-                    return sm;
-                } else {
-                    return Q_NULLPTR;
-                }
-            }
-            case ANSHAREDLIB_ANNOTATION_MODEL: {
-                QStandardItem* pItem = new QStandardItem("Events - " + temp->getModelName());
-                pItem->setEditable(false);
-                pItem->setDragEnabled(true);
-                pItem->setToolTip(temp->getModelPath());
-
-                QVariant data;
-                data.setValue(temp);
-                pItem->setData(data);
-                m_pData->addData(m_SelectedItem,
-                                 pItem,
-                                 ANNOTATION);
-
-                return sm;
-            }
-            case ANSHAREDLIB_AVERAGING_MODEL: {
-                QStandardItem* pItem = new QStandardItem("Average - " + temp->getModelName());
-                pItem->setEditable(false);
-                pItem->setDragEnabled(true);
-                pItem->setToolTip(temp->getModelPath());
-
-                QVariant data;
-                data.setValue(temp);
-                pItem->setData(data);
-                m_pData->addData(m_SelectedItem,
-                                 pItem,
-                                 AVERAGE);
-
-                return sm;
-            }
-            case ANSHAREDLIB_BEMDATA_MODEL: {
-                QStandardItem* pItem = new QStandardItem(temp->getModelName());
-                pItem->setEditable(false);
-                pItem->setDragEnabled(true);
-                pItem->setToolTip(temp->getModelPath());
-
-                QVariant data;
-                data.setValue(temp);
-                pItem->setData(data);
-
-                m_pData->addData(m_SelectedItem,
-                                 pItem,
-                                 ANATOMYDATA);
-                return sm;
-            }
-            default: {
-                qDebug() << "[AnalyzData::loadModel] Model Type not supported";
-            }
+        case ANSHAREDLIB_FIFFRAW_MODEL:
+            iType = BIDS_FUNCTIONALDATA;
+            index = m_SelectedItem;
+            break;
+        case ANSHAREDLIB_BEMDATA_MODEL:
+            iType = BIDS_ANATOMICALDATA;
+            index = m_SelectedItem;
+            break;
+        case ANSHAREDLIB_ANNOTATION_MODEL:
+            iType = BIDS_ANNOTATION;
+            index = m_SelectedFunctionalData;
+            break;
+        case ANSHAREDLIB_AVERAGING_MODEL:
+            iType = BIDS_AVERAGE;
+            index = m_SelectedFunctionalData;
+            break;
+        default:
+            iType = BIDS_UNKNOWN;
+            index = m_SelectedItem;
         }
+
+        QStandardItem* pItem = new QStandardItem(temp->getModelName());
+        pItem->setEditable(false);
+        pItem->setDragEnabled(true);
+        pItem->setToolTip(temp->getModelPath());
+
+        QVariant data;
+        data.setValue(temp);
+        pItem->setData(data);
+        m_pData->addData(index,
+                         pItem,
+                         iType);
+        return sm;
+
     }
 
     //=========================================================================================================
@@ -291,17 +260,17 @@ public:
         switch(temp->getType()){
             case ANSHAREDLIB_AVERAGING_MODEL:
                 pItem->setData(data);
-                pItem->setData(QVariant::fromValue(AVERAGE), ITEM_TYPE);
+                pItem->setData(QVariant::fromValue(BIDS_AVERAGE), BIDS_ITEM_TYPE);
                 m_pData->addToData(pItem,
-                                   m_SelectedData,
-                                   AVERAGE);
+                                   m_SelectedFunctionalData,
+                                   BIDS_AVERAGE);
                 break;
             case ANSHAREDLIB_ANNOTATION_MODEL:
                 pItem->setData(data);
-                pItem->setData(QVariant::fromValue(ANNOTATION), ITEM_TYPE);
+                pItem->setData(QVariant::fromValue(BIDS_ANNOTATION), BIDS_ITEM_TYPE);
                 m_pData->addToData(pItem,
-                                   m_SelectedData,
-                                   ANNOTATION);
+                                   m_SelectedFunctionalData,
+                                   BIDS_ANNOTATION);
                 break;
             default:
                 qWarning() << "[AnalyzeData::addModel] Model type not supported";
@@ -311,10 +280,10 @@ public:
     }
 
 private:
-    QPointer<DISPLIB::BidsViewModel>        m_pData;            /**< The BidsViewModel that holds all the subject, session, and data items. */
+    QPointer<DISPLIB::BidsViewModel>        m_pData;                    /**< The BidsViewModel that holds all the subject, session, and data items. */
 
-    QModelIndex                             m_SelectedItem;     /**< Index of currently selected item */
-    QModelIndex                             m_SelectedData;     /**< Index of currently selected data item */
+    QModelIndex                             m_SelectedItem;             /**< Index of currently selected item */
+    QModelIndex                             m_SelectedFunctionalData;   /**< Index of currently selected data item */
 
 signals:
     //=========================================================================================================

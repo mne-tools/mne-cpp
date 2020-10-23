@@ -44,3 +44,9 @@ Return an appropriate value depending on how you are organizing or representing 
 ### columnCount()
 
 Return an appropriate value depending on how you are organizing or representing your data. The Annotation Model, for example, returns the number of columns of data it has to display.
+
+## Loading/Adding to Data Loader and Data Manager
+
+If your data model will be loading data from a file, make sure that file type is included in DataLoader::loadFilePath() so the user can load in that file type. To save to a file, implement the function saveToFile() from the AbstractModel, and ensure that your file type is included in DataLoader::onSaveFilePressed().
+
+To add your model to the data manager, add it to either addModel or loadModel in AnalyzeData.h, depending on whether you will be loading data from inside the application or from a file. You need to define the type of data your model corresponds to, bidsviewmodel.h for possible types, or add a new one.
