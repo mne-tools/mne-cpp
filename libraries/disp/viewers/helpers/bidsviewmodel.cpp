@@ -74,34 +74,29 @@ void BidsViewModel::addData(QModelIndex selectedItem,
                             QStandardItem* pNewItem,
                             int iDataType)
 {
-    switch (iDataType){
-    case FUNCTIONALDATA: {
+    switch(iDataType){
+    case FUNCTIONALDATA:
+    case ANATOMYDATA:
+    case BEHAVIORALDATA: {
         if(!selectedItem.isValid()) {
-            addDataToSession(addSessionToSubject(addSubject("sub-01"), "ses-01"), pNewItem);
+            addDataToSession(addSessionToSubject(addSubject("sub-01"), "ses-01"), pNewItem, iDataType);
         } else {
             if (itemFromIndex(selectedItem)->data(ITEM_TYPE).value<int>() != SUBJECT){
                 addDataToSession(itemFromIndex(selectedItem)->data(ITEM_SESSION).value<QModelIndex>(),
-                                           pNewItem);
+                                 pNewItem,
+                                 iDataType);
             } else {
                 qDebug() << "[BidsViewModel::addData] Prompt user to select a session";
             }
         }
         break;
     }
-    case ANATDATA: {
-        if(!selectedItem.isValid()) {
-            addDataToSession(addSessionToSubject(addSubject("sub-01"), "ses-01"), pNewItem);
-        } else {
-            if (itemFromIndex(selectedItem)->data(ITEM_TYPE).value<int>() != SUBJECT){
-
-            } else {
-                qDebug() << "[BidsViewModel::addData] Prompt user to select a session";
-            }
-        }
+    case ANNOTATION:
+    case AVERAGE: {
+        addToData(pNewItem,
+                  selectedItem,
+                  iDataType);
         break;
-    }
-    default: {
-        qDebug() << "[BidsViewModel::addData] Data type not supported";
     }
     }
 }
@@ -109,7 +104,8 @@ void BidsViewModel::addData(QModelIndex selectedItem,
 //=============================================================================================================
 
 void BidsViewModel::addToData(QStandardItem *pNewAvgItem,
-                              const QModelIndex &parentIndex)
+                              const QModelIndex &parentIndex,
+                              int iDataType)
 {
     QStandardItem* selectedData = itemFromIndex(parentIndex);
     selectedData->setChild(selectedData->rowCount(),
@@ -117,6 +113,7 @@ void BidsViewModel::addToData(QStandardItem *pNewAvgItem,
 
     pNewAvgItem->setData(itemFromIndex(parentIndex)->data(ITEM_SUBJECT), ITEM_SUBJECT);
     pNewAvgItem->setData(itemFromIndex(parentIndex)->data(ITEM_SESSION), ITEM_SESSION);
+    pNewAvgItem->setData(QVariant::fromValue(iDataType), ITEM_TYPE);
 
     emit newItemIndex(pNewAvgItem->index());
 }
@@ -233,21 +230,37 @@ QModelIndex BidsViewModel::addSessionToSubject(QModelIndex subjectIndex,
 //=============================================================================================================
 
 QModelIndex BidsViewModel::addDataToSession(QModelIndex sessionIndex,
-                                               QStandardItem *pNewItem)
+                                            QStandardItem *pNewItem,
+                                            int iDataType)
 {
     QStandardItem* pSessionItem = itemFromIndex(sessionIndex);
-    bool bFunctionalFolder = false;
-    int iFunctionalFolder = 0;
+    bool bFolder = false;
+    int iFolder = 0;
 
-    for(iFunctionalFolder; iFunctionalFolder < pSessionItem->rowCount(); iFunctionalFolder++){
-        if (pSessionItem->child(iFunctionalFolder)->text() == "func"){
-            bFunctionalFolder = true;
+    QString sFolderName;
+
+    switch (iDataType){
+        case FUNCTIONALDATA:
+            sFolderName = "func";
+            break;
+        case ANATOMYDATA:
+            sFolderName = "anat";
+            break;
+        case BEHAVIORALDATA:
+            sFolderName = "beh";
+        default:
+            sFolderName = "unknown";
+    }
+
+    for(iFolder; iFolder < pSessionItem->rowCount(); iFolder++){
+        if (pSessionItem->child(iFolder)->text() == sFolderName){
+            bFolder = true;
             break;
         }
     }
 
-    if(!bFunctionalFolder) {
-        QStandardItem* pFunctionalItem = new QStandardItem("func");
+    if(!bFolder) {
+        QStandardItem* pFunctionalItem = new QStandardItem(sFolderName);
         pFunctionalItem->setData(QVariant::fromValue(FOLDER), ITEM_TYPE);
         pFunctionalItem->setData(QVariant::fromValue(sessionIndex), ITEM_SESSION);
         pFunctionalItem->setData(itemFromIndex(sessionIndex)->data(ITEM_SUBJECT), ITEM_SUBJECT);
@@ -257,11 +270,11 @@ QModelIndex BidsViewModel::addDataToSession(QModelIndex sessionIndex,
         pFunctionalItem->setChild(pFunctionalItem->rowCount(),
                            pNewItem);
     } else {
-        pSessionItem->child(iFunctionalFolder)->setChild(pSessionItem->child(iFunctionalFolder)->rowCount(),
+        pSessionItem->child(iFolder)->setChild(pSessionItem->child(iFolder)->rowCount(),
                                                   pNewItem);
     }
 
-    pNewItem->setData(QVariant::fromValue(FUNCTIONALDATA), ITEM_TYPE);
+    pNewItem->setData(QVariant::fromValue(iDataType), ITEM_TYPE);
     pNewItem->setData(QVariant::fromValue(sessionIndex), ITEM_SESSION);
     pNewItem->setData(itemFromIndex(sessionIndex)->data(ITEM_SUBJECT), ITEM_SUBJECT);
 
@@ -319,16 +332,22 @@ QModelIndex BidsViewModel::moveDataToSession(QModelIndex sessionIndex,
     }
 
     QModelIndex newIndex;
-    switch(dataItem->data(ITEM_TYPE).value<int>()){
-        case FUNCTIONALDATA:{
-            newIndex = addDataToSession(sessionIndex,
-                                        dataItem);
-            break;
-        }
-        default:{
-            qWarning() << "[BidsViewModel::moveDataToSession] Move not supported for this type of data";
-        }
-    }
+//    switch(dataItem->data(ITEM_TYPE).value<int>()){
+//        case FUNCTIONALDATA:{
+//            newIndex = addDataToSession(sessionIndex,
+//                                        dataItem,
+//                                        FUNCTIONALDATA);
+//            break;
+//        }
+//        default:{
+//            qWarning() << "[BidsViewModel::moveDataToSession] Move not supported for this type of data";
+//        }
+//    }
+
+    newIndex = addDataToSession(sessionIndex,
+                                dataItem,
+                                dataItem->data(ITEM_TYPE).value<int>());
+
     endResetModel();
 
     emit newItemIndex(sessionIndex);
@@ -358,12 +377,14 @@ bool BidsViewModel::removeItem(QModelIndex itemIndex)
                 endResetModel();
             }
             return true;
+        case BEHAVIORALDATA:
+        case ANATOMYDATA:
         case FUNCTIONALDATA:
             if(removeRows(itemIndex.row(), 1, itemIndex.parent())){
                 endResetModel();
             }
             return true;
-        case AVG:
+        case AVERAGE:
             if(removeRows(itemIndex.row(), 1, itemIndex.parent())){
                 endResetModel();
             }

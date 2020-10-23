@@ -179,6 +179,7 @@ void BidsView::customMenuRequested(QPoint pos)
                 menu->popup(m_pUi->m_pTreeView->viewport()->mapToGlobal(pos));
                 break;
             }
+            case BEHAVIORALDATA:
             case ANATOMYDATA:
             case FUNCTIONALDATA: {
                 QMenu *menu = new QMenu(this);
