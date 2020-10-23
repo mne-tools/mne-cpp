@@ -120,7 +120,8 @@ public slots:
      * @param[in] pItem                 The item to be added.
      */
     void addData(QModelIndex selectedItem,
-                 QStandardItem *pNewItem);
+                 QStandardItem *pNewItem,
+                 int iDataType = FUNCTIONALDATA);
 
     //=========================================================================================================
     /**

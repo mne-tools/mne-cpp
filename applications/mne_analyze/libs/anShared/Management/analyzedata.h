@@ -216,7 +216,7 @@ public:
                     QVariant data;
                     data.setValue(temp);
                     pItem->setData(data);
-                    m_pData->addData(m_SelectedItem,
+                    m_pData->addFunctionalData(m_SelectedItem,
                                      pItem);
 
                     emit newModelAvailable(temp);
@@ -252,6 +252,16 @@ public:
                                    m_SelectedData);
 
                 return sm;
+            }
+            case ANSHAREDLIB_BEMDATA_MODEL: {
+                QStandardItem* pItem = new QStandardItem(temp->getModelName());
+                pItem->setEditable(false);
+                pItem->setDragEnabled(true);
+                pItem->setToolTip(temp->getModelPath());
+                QVariant data;
+                data.setValue(temp);
+                pItem->setData(data);
+
             }
             default: {
                 qDebug() << "[AnalyzData::loadModel] Model Type not supported";

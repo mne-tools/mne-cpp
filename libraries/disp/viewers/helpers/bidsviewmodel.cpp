@@ -71,20 +71,38 @@ BidsViewModel::~BidsViewModel()
 //=============================================================================================================
 
 void BidsViewModel::addData(QModelIndex selectedItem,
-                            QStandardItem* pNewItem)
+                            QStandardItem* pNewItem,
+                            int iDataType)
 {
-    if(!selectedItem.isValid()) {
-        addDataToSession(addSessionToSubject(addSubject("sub-01"), "ses-01"), pNewItem);
-    } else {
-        switch(itemFromIndex(selectedItem)->data(ITEM_TYPE).value<int>()){
-            case SUBJECT:
-                qDebug() << "[BidsViewModel::addData] Prompt user to select a session";
-                break;
-            default:
+    switch (iDataType){
+    case FUNCTIONALDATA: {
+        if(!selectedItem.isValid()) {
+            addDataToSession(addSessionToSubject(addSubject("sub-01"), "ses-01"), pNewItem);
+        } else {
+            if (itemFromIndex(selectedItem)->data(ITEM_TYPE).value<int>() != SUBJECT){
                 addDataToSession(itemFromIndex(selectedItem)->data(ITEM_SESSION).value<QModelIndex>(),
-                                 pNewItem);
-                break;
+                                           pNewItem);
+            } else {
+                qDebug() << "[BidsViewModel::addData] Prompt user to select a session";
+            }
         }
+        break;
+    }
+    case ANATDATA: {
+        if(!selectedItem.isValid()) {
+            addDataToSession(addSessionToSubject(addSubject("sub-01"), "ses-01"), pNewItem);
+        } else {
+            if (itemFromIndex(selectedItem)->data(ITEM_TYPE).value<int>() != SUBJECT){
+
+            } else {
+                qDebug() << "[BidsViewModel::addData] Prompt user to select a session";
+            }
+        }
+        break;
+    }
+    default: {
+        qDebug() << "[BidsViewModel::addData] Data type not supported";
+    }
     }
 }
 
@@ -218,28 +236,28 @@ QModelIndex BidsViewModel::addDataToSession(QModelIndex sessionIndex,
                                                QStandardItem *pNewItem)
 {
     QStandardItem* pSessionItem = itemFromIndex(sessionIndex);
-    bool bMegFolder = false;
-    int iMegFolder = 0;
+    bool bFunctionalFolder = false;
+    int iFunctionalFolder = 0;
 
-    for(iMegFolder; iMegFolder < pSessionItem->rowCount(); iMegFolder++){
-        if (pSessionItem->child(iMegFolder)->text() == "meg"){
-            bMegFolder = true;
+    for(iFunctionalFolder; iFunctionalFolder < pSessionItem->rowCount(); iFunctionalFolder++){
+        if (pSessionItem->child(iFunctionalFolder)->text() == "func"){
+            bFunctionalFolder = true;
             break;
         }
     }
 
-    if(!bMegFolder) {
-        QStandardItem* pMEGItem = new QStandardItem("meg");
-        pMEGItem->setData(QVariant::fromValue(FOLDER), ITEM_TYPE);
-        pMEGItem->setData(QVariant::fromValue(sessionIndex), ITEM_SESSION);
-        pMEGItem->setData(itemFromIndex(sessionIndex)->data(ITEM_SUBJECT), ITEM_SUBJECT);
+    if(!bFunctionalFolder) {
+        QStandardItem* pFunctionalItem = new QStandardItem("func");
+        pFunctionalItem->setData(QVariant::fromValue(FOLDER), ITEM_TYPE);
+        pFunctionalItem->setData(QVariant::fromValue(sessionIndex), ITEM_SESSION);
+        pFunctionalItem->setData(itemFromIndex(sessionIndex)->data(ITEM_SUBJECT), ITEM_SUBJECT);
 
         pSessionItem->setChild(pSessionItem->rowCount(),
-                               pMEGItem);
-        pMEGItem->setChild(pMEGItem->rowCount(),
+                               pFunctionalItem);
+        pFunctionalItem->setChild(pFunctionalItem->rowCount(),
                            pNewItem);
     } else {
-        pSessionItem->child(iMegFolder)->setChild(pSessionItem->child(iMegFolder)->rowCount(),
+        pSessionItem->child(iFunctionalFolder)->setChild(pSessionItem->child(iFunctionalFolder)->rowCount(),
                                                   pNewItem);
     }
 
