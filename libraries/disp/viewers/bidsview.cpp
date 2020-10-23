@@ -179,6 +179,7 @@ void BidsView::customMenuRequested(QPoint pos)
                 menu->popup(m_pUi->m_pTreeView->viewport()->mapToGlobal(pos));
                 break;
             }
+            case ANATOMYDATA:
             case FUNCTIONALDATA: {
                 QMenu *menu = new QMenu(this);
 
@@ -212,6 +213,12 @@ void BidsView::customMenuRequested(QPoint pos)
             }
             default:{
                 qDebug() << "DataManagerControlView::customMenuRequested - default";
+                QMenu *menu = new QMenu(this);
+
+                pRemoveAction = new QAction("Remove", this);
+                menu->addAction(pRemoveAction);
+                menu->popup(m_pUi->m_pTreeView->viewport()->mapToGlobal(pos));
+                break;
             }
         }
         connect(pRemoveAction, &QAction::triggered, [=]() {
