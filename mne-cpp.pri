@@ -23,29 +23,6 @@ defineTest(minQtVersion) {
     return(false)
 }
 
-defineReplace(macDeployArgs) {
-    target = $$1
-    target_ext = $$2
-    mne_binary_dir = $$3
-    mne_library_dir = $$4
-    extra_args = $$5
-
-    isEmpty(target_ext) {
-        target_ext = .app
-    }
-
-    # Deploy qt dependencies
-    deploy_cmd = macdeployqt
-
-    deploy_target = $$shell_quote($$shell_path($${mne_binary_dir}/$${target}$${target_ext}))
-
-    deploy_libs_to_copy = -libpath=$${mne_library_dir}
-    !isEmpty(extra_args) {
-        deploy_libs_to_copy += $${extra_args}
-    }
-    return($$deploy_cmd $$deploy_target $$deploy_libs_to_copy)
-}
-
 defineReplace(winDeployLibArgs) {
     # Copy library to bin folder
     target = $$1
@@ -122,6 +99,7 @@ QMAKE_TARGET_COPYRIGHT = Copyright (C) 2020 Authors of MNE-CPP. All rights reser
 ## To build MNE Scan with EegoSports support: qmake MNECPP_CONFIG+=withEego
 ## To build MNE Scan with GUSBAmp support: qmake MNECPP_CONFIG+=withGUSBAmp
 ## To build MNE Scan with TMSI support: qmake MNECPP_CONFIG+=withTmsi
+## To build app bundles on MacOS: qmake MNECPP_CONFIG+=withAppBundles
 
 # Default flags
 MNECPP_CONFIG +=
