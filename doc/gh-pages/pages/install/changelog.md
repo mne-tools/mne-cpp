@@ -7,20 +7,105 @@ nav_order: 1
 
 # Changelog
 
+## Version 0.1.7 - 2020/10/26
+
+### Applications
+
+MNE Analyze
+ * Add new plugin to perform source localization in MNE Analyze. This is just the skeleton of the plugin and is not functional yet.
+ * Add new plugin to perform 3D visualization. This plugin provides a Disp3D View3D window in a QWidget container The data can be passed to the plugin via MNE Analyze's event subscription system.
+ * Fixes to Channel Select plugin (preserve state in-between sessions, change default layouts)
+ * Create control plugin and merge functionality with scaling plugin
+ * Increased max visible channels in Signal Viewer plugin to 100
+ * Added AveragingDataModel which stores averaging data
+ * Ability to add and switch between averaging data using the Data Manager
+ * Add loading bar with corresponding message
+ * Move trigger detection to a new thread in order to not block the application
+ * Split View menu into new View and Control menus
+ * Block EventManager run() with semaphore
+ * UsedProgressView class which displays loading bar and message when loading/saving models to files
+ * Mutithreaded Averaging + Trigger detect calculations
+ * Co-Registration plugin
+ * AnalyzeDataModel, DataManagerControlView are now BidsViewModel, BidsView
+ * Reworked hierarchy of stored items in model to fit bids. Items now hold their own place in structure
+ * Added session, and data type folders to view
+ * Move sessions between subjects, move data between sessions
+ * Loading .eve files
+ * Loading -ave.fif files
+ * Add item for annotation model in bidsviewmodel
+ * reworked instantiation and handling of annotationmodel (no longer crated in fiffrawviewmodel)
+
+MNE Scan
+ * Improved impedance measurement in Eegosports plugin
+ * Use a toolbar for each view using the same control mechanism actions (channel slection view, hide/show bad channels)
+ * Rename Filter plugin to Noise plugin
+
+### API Libraries
+
+All
+ * Remove some no longer needed compiler flags in library .pro files
+
+Disp
+ * Added ProgressView class which displays loading bar and message
+ * Make 2D layout scene in ChannelSelectionView fill free GUI space
+ * Make ScalingView hide scaling sliders of chnnel types which are not present in the actual data
+
+Disp3D
+ * Add support for vertex picking
+
+Fiff
+ * Add write functionality to FiffCoordTrans
+ * Add convenience function to FiffInfoBase to return present channel types as QStringList
+
+Utils
+ * Remove dll export/import for circular buffer typenames
+
+### Tests
+
+ * Add read write read test for FiffCoordTrans
+ * Add MNEProjectToSurface test
+
+### Continuous Integration
+
+ * Bump CI Qt version to Qt 5.15.1
+
+### Documentation
+
+ * Add guide on how to install the MNE Sample Data Set
+ * Added page on the event system
+ * Added page on creating data models
+
+### Other
+
+ * Fix rpath on macos builds
+ * Fix Qt3D renderer plugin deployment on macos
+ * Rename noOpenGL flag to noQOpenGLWidget flag
+
+### Authors
+
+People who contributed to this release (preceded by number of commits):
+
+(141) Gabriel Motta,
+(119) Ruben Dörfel,
+(27) Lorenz Esch,
+(2) Johannes Vorwerk,
+(1) Andrey Parfenov
+
+
 ## Version 0.1.6 - 2020/08/21
 
 ### Applications
 
 MNE Analyze
- * Add cmd line argument support for file loading 
+ * Add cmd line argument support for file loading
  * Add channel selection plugin
  * Remove channel selection in averaging plugin
  * Add scaling plugin
  * Add example plugin
 
 MNE Scan
- * Remove no longer needed recording icons and move them to the write to file plugin instead 
- * Remove no longer needed readme.txt in some of the plugins' resources 
+ * Remove no longer needed recording icons and move them to the write to file plugin instead
+ * Remove no longer needed readme.txt in some of the plugins' resources
 
 ### API Libraries
 
@@ -33,22 +118,22 @@ RtProcessing
  * Add discard3DPointOutliers() namespace function to discard outliers from digitizer set compared to a given 3D surface
 
 Utils
- * Rename IOBUFFER to UTILSLIB namespace 
- * Remove circularbuffer.cpp file since it was empty 
+ * Rename IOBUFFER to UTILSLIB namespace
+ * Remove circularbuffer.cpp file since it was empty
 
 ### Documentation
  * Add documentation for MNE Analyze channel selection plugin
- * Add documentation for Disp3D library 
- * Add documentation for connectivity library 
+ * Add documentation for Disp3D library
+ * Add documentation for connectivity library
  * Add documentation for MNE Analyze scaling plugin
  * Add documentation for plugin creation in MNE Analyze
- * Restructure static and dynamic build guides 
- * Rename .md page files to better indicate what subject they belong to 
- * Rename Learn pages for MNE Scan, MNE Analyze and MNE Anonymize 
+ * Restructure static and dynamic build guides
+ * Rename .md page files to better indicate what subject they belong to
+ * Rename Learn pages for MNE Scan, MNE Analyze and MNE Anonymize
  * Rename MNE Lib to library API
- * Improve DoxyGen docu by making use of namespaces for MNE-C types 
- * Improve documentation for MNE Scan eeg amplifiers and fix some typos 
- * Hide Learn pages for MNE Dipole Fit and MNE Forward Solution for now (until they have been completley refactored) 
+ * Improve DoxyGen docu by making use of namespaces for MNE-C types
+ * Improve documentation for MNE Scan eeg amplifiers and fix some typos
+ * Hide Learn pages for MNE Dipole Fit and MNE Forward Solution for now (until they have been completley refactored)
 
 ### Authors
 
@@ -243,7 +328,7 @@ MNE Analyze:
 * Rename AnnotationView to AnnotationSettingsView.
 * Update splashcreen to show full application name.
 * Refactor RawDataViewer plugin. The controls are no longer destroyed when a different file is selected. This led to some visible glitches when switching between files.
-* Do not allow  floating or movable dock widgets in the WASM version. The QDockWidget behavior is a bit buggy in the current Qt WASM versions. 
+* Do not allow  floating or movable dock widgets in the WASM version. The QDockWidget behavior is a bit buggy in the current Qt WASM versions.
 * Use QOpenGLWidget instead of QOGLWidget. The latter is marked as deprecated.
 * Remember dock states and sizes inbetween MNE Analyze sessions.
 
@@ -252,7 +337,7 @@ MNE Scan:
 * Fix deployment of internal MNE Scan libraries on Windows.
 * Fix bug when receiving evoked data in source localization plugin.
 * Update splashcreen to show full application name.
-		
+
 ### API libraries
 
 Disp:
@@ -260,7 +345,7 @@ Disp:
 
 Inverse:
 * Fix versioning bug.
-	
+
 ### Documentation
 
 * Minor improvements and typo fixes.
@@ -307,7 +392,7 @@ Fiff:
 ### Tools
 * Fix template class in Qt Creator wizard for MNE-CPP classes.
 * Update test and example Qt Creator wizards.
-	
+
 ### Continuous Integration
 * Only branch off when a minor or major version bump occurred.
 * Remove folders which we do not want to ship from dynamic builds.
@@ -343,7 +428,7 @@ New API libraries:
 * **utils** - Design patterns, generlaized classes, mathematical routines, I/O helpers
 * **fs** - FreeSurfer I/O routines
 * **fiff** - Fiff I/O routines
-* **mne** - I/O routines for MNE objects 
+* **mne** - I/O routines for MNE objects
 * **fwd** - Forward modeling
 * **inverse** - Inverse modeling
 * **communication** - Tools for real-time communication
