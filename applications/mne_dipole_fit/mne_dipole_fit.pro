@@ -42,7 +42,10 @@ TEMPLATE = app
 QT += widgets 3dextras network charts opengl
 
 CONFIG   += console
-CONFIG -= app_bundle
+
+!contains(MNECPP_CONFIG, withAppBundles) {
+    CONFIG -= app_bundle
+}
 
 contains(MNECPP_CONFIG, static) {
     CONFIG += static

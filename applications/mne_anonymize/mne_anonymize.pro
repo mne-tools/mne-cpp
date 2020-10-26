@@ -51,9 +51,8 @@ CONFIG(debug,debug|release) {
     }
 }
 
-contains(MNECPP_CONFIG, static) {
-    CONFIG += static
-    DEFINES += STATICBUILD
+!contains(MNECPP_CONFIG, withAppBundles) {
+    CONFIG -= app_bundle
 }
 
 contains(MNECPP_CONFIG, wasm) {
