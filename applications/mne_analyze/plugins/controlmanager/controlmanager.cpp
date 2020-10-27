@@ -127,25 +127,20 @@ QDockWidget *ControlManager::getControl()
     QStringList slControlFlags;
     slControlFlags << "Data" << "View" << "Light";
 
+    //Scaling
     DISPLIB::ScalingView* pScalingWidget = new DISPLIB::ScalingView("MNEANALYZE", wrappedScrollArea);
-    DISPLIB::FiffRawViewSettings* pFiffViewSettings = new DISPLIB::FiffRawViewSettings("MNEANALYZE", wrappedScrollArea);
-    m_pControl3DView = new DISPLIB::Control3DView(QString("MNEANALYZE/%1").arg(this->getName()), Q_NULLPTR, slControlFlags);
-    DISP3DLIB::Data3DTreeDelegate* pData3DTreeDelegate = new DISP3DLIB::Data3DTreeDelegate(this);
-
-    m_pApplyToView = new DISPLIB::ApplyToView();
-
     pTabWidget->addTab(pScalingWidget, "Scaling");
-    pTabWidget->addTab(pFiffViewSettings, "Controls");
-    pTabWidget->addTab(m_pControl3DView, "3D");
-
-    pLayout->addWidget(pTabWidget);
-    pLayout->addWidget(m_pApplyToView);
-    pLayout->addStretch();
-    wrappedScrollArea->setLayout(pLayout);
-    pControlDock->setWidget(wrappedScrollArea);
 
     connect(pScalingWidget, &DISPLIB::ScalingView::scalingChanged,
             this, &ControlManager::onScalingChanged, Qt::UniqueConnection);
+
+    m_ScalingParameters.m_mScalingMap = pScalingWidget->getScaleMap();
+    m_ScalingParameters.m_mScalingMap.detach();
+
+    //View Settings
+    DISPLIB::FiffRawViewSettings* pFiffViewSettings = new DISPLIB::FiffRawViewSettings("MNEANALYZE", wrappedScrollArea);
+
+    pTabWidget->addTab(pFiffViewSettings, "Controls");
 
     connect(pFiffViewSettings, &DISPLIB::FiffRawViewSettings::signalColorChanged,
             this, &ControlManager::onSignalColorChanged, Qt::UniqueConnection);
@@ -160,18 +155,42 @@ QDockWidget *ControlManager::getControl()
     connect(pFiffViewSettings, &DISPLIB::FiffRawViewSettings::makeScreenshot,
             this, &ControlManager::onMakeScreenshot, Qt::UniqueConnection);
 
+    m_ViewParameters.m_colorSignal = pFiffViewSettings->getSignalColor();
+    m_ViewParameters.m_colorBackground = pFiffViewSettings->getBackgroundColor();
+    m_ViewParameters.m_dZoomValue = pFiffViewSettings->getZoom();
+    m_ViewParameters.m_iTimeWindow = pFiffViewSettings->getWindowSize();
+    m_ViewParameters.m_iTimeSpacers = pFiffViewSettings->getDistanceTimeSpacer();
+    m_ViewParameters.m_sImageType = "";
 
-    m_ScalingParameters.m_mScalingMap = pScalingWidget->getScaleMap();
-    m_ScalingParameters.m_mScalingMap.detach();
+    //View3D Settings
+    m_pControl3DView = new DISPLIB::Control3DView(QString("MNEANALYZE/%1").arg(this->getName()), Q_NULLPTR, slControlFlags);
+    DISP3DLIB::Data3DTreeDelegate* pData3DTreeDelegate = new DISP3DLIB::Data3DTreeDelegate(this);
 
-    m_ViewParmeters.m_colorSignal = pFiffViewSettings->getSignalColor();
-    m_ViewParmeters.m_colorBackground = pFiffViewSettings->getBackgroundColor();
-    m_ViewParmeters.m_dZoomValue = pFiffViewSettings->getZoom();
-    m_ViewParmeters.m_iTimeWindow = pFiffViewSettings->getWindowSize();
-    m_ViewParmeters.m_iTimeSpacers = pFiffViewSettings->getDistanceTimeSpacer();
-    m_ViewParmeters.m_sImageType = "";
+    pTabWidget->addTab(m_pControl3DView, "3D");
 
     m_pControl3DView->setDelegate(pData3DTreeDelegate);
+
+    connect(m_pControl3DView, &DISPLIB::Control3DView::sceneColorChanged,
+            this, &ControlManager::onSceneColorChange);
+    connect(m_pControl3DView, &DISPLIB::Control3DView::rotationChanged,
+            this, &ControlManager::onRotationChanged);
+    connect(m_pControl3DView, &DISPLIB::Control3DView::showCoordAxis,
+            this, &ControlManager::onShowCoordAxis);
+    connect(m_pControl3DView, &DISPLIB::Control3DView::showFullScreen,
+            this, &ControlManager::onShowFullScreen);
+    connect(m_pControl3DView, &DISPLIB::Control3DView::lightColorChanged,
+            this, &ControlManager::onLightColorChanged);
+    connect(m_pControl3DView, &DISPLIB::Control3DView::lightIntensityChanged,
+            this, &ControlManager::onLightIntensityChanged);
+    connect(m_pControl3DView, &DISPLIB::Control3DView::takeScreenshotChanged,
+            this, &ControlManager::onTakeScreenshotChanged);
+
+    m_pApplyToView = new DISPLIB::ApplyToView();
+    pLayout->addWidget(pTabWidget);
+    pLayout->addWidget(m_pApplyToView);
+    pLayout->addStretch();
+    wrappedScrollArea->setLayout(pLayout);
+    pControlDock->setWidget(wrappedScrollArea);
 
     return pControlDock;
 }
@@ -191,9 +210,9 @@ void ControlManager::handleEvent(QSharedPointer<Event> e)
     case SELECTED_MODEL_CHANGED:
         if(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >()->getType() != ANSHAREDLIB_BEMDATA_MODEL) {
             onScalingChanged(m_ScalingParameters.m_mScalingMap);
-            m_ViewParmeters.m_sViewsToApply = m_pApplyToView->getSelectedViews();
-            m_ViewParmeters.m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::all;
-            m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_ViewParmeters));
+            m_ViewParameters.m_sViewsToApply = m_pApplyToView->getSelectedViews();
+            m_ViewParameters.m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::all;
+            m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_ViewParameters));
         }
         break;
     case SET_DATA3D_TREE_MODEL:
@@ -232,66 +251,66 @@ void ControlManager::onScalingChanged(const QMap<qint32, float> &scalingMap)
 
 void ControlManager::onSignalColorChanged(const QColor& signalColor)
 {
-    m_ViewParmeters.m_sViewsToApply = m_pApplyToView->getSelectedViews();
-    m_ViewParmeters.m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::signal;
-    m_ViewParmeters.m_colorSignal = signalColor;
+    m_ViewParameters.m_sViewsToApply = m_pApplyToView->getSelectedViews();
+    m_ViewParameters.m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::signal;
+    m_ViewParameters.m_colorSignal = signalColor;
 
-    m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_ViewParmeters));
+    m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_ViewParameters));
 }
 
 //=============================================================================================================
 
 void ControlManager::onBackgroundColorChanged(const QColor& backgroundColor)
 {
-    m_ViewParmeters.m_sViewsToApply = m_pApplyToView->getSelectedViews();
-    m_ViewParmeters.m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::background;
-    m_ViewParmeters.m_colorBackground = backgroundColor;
+    m_ViewParameters.m_sViewsToApply = m_pApplyToView->getSelectedViews();
+    m_ViewParameters.m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::background;
+    m_ViewParameters.m_colorBackground = backgroundColor;
 
-    m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_ViewParmeters));
+    m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_ViewParameters));
 }
 
 //=============================================================================================================
 
 void ControlManager::onZoomChanged(double dZoomValue)
 {
-    m_ViewParmeters.m_sViewsToApply = m_pApplyToView->getSelectedViews();
-    m_ViewParmeters.m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::zoom;
-    m_ViewParmeters.m_dZoomValue = dZoomValue;
+    m_ViewParameters.m_sViewsToApply = m_pApplyToView->getSelectedViews();
+    m_ViewParameters.m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::zoom;
+    m_ViewParameters.m_dZoomValue = dZoomValue;
 
-    m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_ViewParmeters));
+    m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_ViewParameters));
 }
 
 //=============================================================================================================
 
 void ControlManager::onTimeWindowChanged(int iTimeWindow)
 {
-    m_ViewParmeters.m_sViewsToApply = m_pApplyToView->getSelectedViews();
-    m_ViewParmeters.m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::window;
-    m_ViewParmeters.m_iTimeWindow = iTimeWindow;
+    m_ViewParameters.m_sViewsToApply = m_pApplyToView->getSelectedViews();
+    m_ViewParameters.m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::window;
+    m_ViewParameters.m_iTimeWindow = iTimeWindow;
 
-    m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_ViewParmeters));
+    m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_ViewParameters));
 }
 
 //=============================================================================================================
 
 void ControlManager::onDistanceTimeSpacerChanged(int iSpacerDistance)
 {
-    m_ViewParmeters.m_sViewsToApply = m_pApplyToView->getSelectedViews();
-    m_ViewParmeters.m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::spacer;
-    m_ViewParmeters.m_iTimeSpacers = iSpacerDistance;
+    m_ViewParameters.m_sViewsToApply = m_pApplyToView->getSelectedViews();
+    m_ViewParameters.m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::spacer;
+    m_ViewParameters.m_iTimeSpacers = iSpacerDistance;
 
-    m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_ViewParmeters));
+    m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_ViewParameters));
 }
 
 //=============================================================================================================
 
 void ControlManager::onMakeScreenshot(const QString& imageType)
 {
-    m_ViewParmeters.m_sViewsToApply = m_pApplyToView->getSelectedViews();
-    m_ViewParmeters.m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::screenshot;
-    m_ViewParmeters.m_sImageType = imageType;
+    m_ViewParameters.m_sViewsToApply = m_pApplyToView->getSelectedViews();
+    m_ViewParameters.m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::screenshot;
+    m_ViewParameters.m_sImageType = imageType;
 
-    m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_ViewParmeters));
+    m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_ViewParameters));
 }
 
 //=============================================================================================================
@@ -306,6 +325,9 @@ void ControlManager::init3DGui(QSharedPointer<DISP3DLIB::Data3DTreeModel> pModel
 void ControlManager::onSceneColorChange(const QColor &color)
 {
     m_View3DParameters.m_settingsToApply = ANSHAREDLIB::View3DParameters::View3DSetting::sceneColor;
+    m_View3DParameters.m_sceneColor = color;
+
+    m_pCommu->publishEvent(EVENT_TYPE::VIEW3D_SETTINGS_CHANGED, QVariant::fromValue(m_View3DParameters));
 }
 
 //=============================================================================================================
@@ -313,7 +335,9 @@ void ControlManager::onSceneColorChange(const QColor &color)
 void ControlManager::onRotationChanged(bool bRotationChanged)
 {
     m_View3DParameters.m_settingsToApply = ANSHAREDLIB::View3DParameters::View3DSetting::rotation;
+    m_View3DParameters.m_bToggleRotation = bRotationChanged;
 
+    m_pCommu->publishEvent(EVENT_TYPE::VIEW3D_SETTINGS_CHANGED, QVariant::fromValue(m_View3DParameters));
 }
 
 //=============================================================================================================
@@ -321,7 +345,9 @@ void ControlManager::onRotationChanged(bool bRotationChanged)
 void ControlManager::onShowCoordAxis(bool bShowCoordAxis)
 {
     m_View3DParameters.m_settingsToApply = ANSHAREDLIB::View3DParameters::View3DSetting::coordAxis;
+    m_View3DParameters.m_bToogleCoordAxis = bShowCoordAxis;
 
+    m_pCommu->publishEvent(EVENT_TYPE::VIEW3D_SETTINGS_CHANGED, QVariant::fromValue(m_View3DParameters));
 }
 
 //=============================================================================================================
@@ -329,7 +355,9 @@ void ControlManager::onShowCoordAxis(bool bShowCoordAxis)
 void ControlManager::onShowFullScreen(bool bShowFullScreen)
 {
     m_View3DParameters.m_settingsToApply = ANSHAREDLIB::View3DParameters::View3DSetting::fullscreen;
+    m_View3DParameters.m_bToggleFullscreen = bShowFullScreen;
 
+    m_pCommu->publishEvent(EVENT_TYPE::VIEW3D_SETTINGS_CHANGED, QVariant::fromValue(m_View3DParameters));
 }
 
 //=============================================================================================================
@@ -337,7 +365,9 @@ void ControlManager::onShowFullScreen(bool bShowFullScreen)
 void ControlManager::onLightColorChanged(const QColor &color)
 {
     m_View3DParameters.m_settingsToApply = ANSHAREDLIB::View3DParameters::View3DSetting::lightColor;
+    m_View3DParameters.m_lightColor = color;
 
+    m_pCommu->publishEvent(EVENT_TYPE::VIEW3D_SETTINGS_CHANGED, QVariant::fromValue(m_View3DParameters));
 }
 
 //=============================================================================================================
@@ -345,7 +375,9 @@ void ControlManager::onLightColorChanged(const QColor &color)
 void ControlManager::onLightIntensityChanged(double value)
 {
     m_View3DParameters.m_settingsToApply = ANSHAREDLIB::View3DParameters::View3DSetting::lightIntensity;
+    m_View3DParameters.m_dLightIntensity = value;
 
+    m_pCommu->publishEvent(EVENT_TYPE::VIEW3D_SETTINGS_CHANGED, QVariant::fromValue(m_View3DParameters));
 }
 
 //=============================================================================================================
@@ -354,4 +386,5 @@ void ControlManager::onTakeScreenshotChanged()
 {
     m_View3DParameters.m_settingsToApply = ANSHAREDLIB::View3DParameters::View3DSetting::screenshot;
 
+    m_pCommu->publishEvent(EVENT_TYPE::VIEW3D_SETTINGS_CHANGED, QVariant::fromValue(m_View3DParameters));
 }
