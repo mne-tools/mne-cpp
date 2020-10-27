@@ -300,3 +300,58 @@ void ControlManager::init3DGui(QSharedPointer<DISP3DLIB::Data3DTreeModel> pModel
 {
     m_pControl3DView->setModel(pModel.data());
 }
+
+//=============================================================================================================
+
+void ControlManager::onSceneColorChange(const QColor &color)
+{
+    m_View3DParameters.m_settingsToApply = ANSHAREDLIB::View3DParameters::View3DSetting::sceneColor;
+}
+
+//=============================================================================================================
+
+void ControlManager::onRotationChanged(bool bRotationChanged)
+{
+    m_View3DParameters.m_settingsToApply = ANSHAREDLIB::View3DParameters::View3DSetting::rotation;
+
+}
+
+//=============================================================================================================
+
+void ControlManager::onShowCoordAxis(bool bShowCoordAxis)
+{
+    m_View3DParameters.m_settingsToApply = ANSHAREDLIB::View3DParameters::View3DSetting::coordAxis;
+
+}
+
+//=============================================================================================================
+
+void ControlManager::onShowFullScreen(bool bShowFullScreen)
+{
+    m_View3DParameters.m_settingsToApply = ANSHAREDLIB::View3DParameters::View3DSetting::fullscreen;
+
+}
+
+//=============================================================================================================
+
+void ControlManager::onLightColorChanged(const QColor &color)
+{
+    m_View3DParameters.m_settingsToApply = ANSHAREDLIB::View3DParameters::View3DSetting::lightColor;
+
+}
+
+//=============================================================================================================
+
+void ControlManager::onLightIntensityChanged(double value)
+{
+    m_View3DParameters.m_settingsToApply = ANSHAREDLIB::View3DParameters::View3DSetting::lightIntensity;
+
+}
+
+//=============================================================================================================
+
+void ControlManager::onTakeScreenshotChanged()
+{
+    m_View3DParameters.m_settingsToApply = ANSHAREDLIB::View3DParameters::View3DSetting::screenshot;
+
+}

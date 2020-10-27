@@ -160,8 +160,7 @@ namespace ANSHAREDLIB
             fullscreen,
             lightColor,
             lightIntensity,
-            screenshot,
-            all
+            screenshot
         };
 
         View3DSetting       m_settingsToApply;
