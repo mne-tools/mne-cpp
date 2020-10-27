@@ -136,9 +136,25 @@ QWidget *View3D::getView()
     }
 
     m_pView3D->setModel(m_p3DModel);
+    new3DModel(m_p3DModel);
 
     connect(m_pView3D, &DISP3DLIB::View3D::pickEventOccured,
             this, &View3D::newPickingEvent);
+
+    connect(this, &View3D::sceneColorChanged,
+            m_pView3D, &DISP3DLIB::View3D::setSceneColor);
+    connect(this, &View3D::rotationChanged,
+            m_pView3D, &DISP3DLIB::View3D::startStopModelRotation);
+    connect(this, &View3D::showCoordAxis,
+            m_pView3D, &DISP3DLIB::View3D::toggleCoordAxis);
+    connect(this, &View3D::showFullScreen,
+            m_pView3D, &DISP3DLIB::View3D::showFullScreen);
+    connect(this, &View3D::lightColorChanged,
+            m_pView3D, &DISP3DLIB::View3D::setLightColor);
+    connect(this, &View3D::lightIntensityChanged,
+            m_pView3D, &DISP3DLIB::View3D::setLightIntensity);
+    connect(this, &View3D::takeScreenshotChanged,
+            m_pView3D, &DISP3DLIB::View3D::takeScreenshot);
 
     QWidget *pWidgetContainer = QWidget::createWindowContainer(m_pView3D, Q_NULLPTR, Qt::Widget);
     return pWidgetContainer;
@@ -148,49 +164,7 @@ QWidget *View3D::getView()
 
 QDockWidget* View3D::getControl()
 {
-    // Coregistration Settings
-    if(!m_pView3D) {
-        m_pView3D = new DISP3DLIB::View3D();
-    }
-
-    DISP3DLIB::Data3DTreeDelegate* pData3DTreeDelegate = new DISP3DLIB::Data3DTreeDelegate(this);
-
-    QStringList slControlFlags;
-    slControlFlags << "Data" << "View" << "Light";
-    m_pControl3DView = new DISPLIB::Control3DView(QString("MNEANALYZE/%1").arg(this->getName()), Q_NULLPTR, slControlFlags);
-    m_pControl3DView->setDelegate(pData3DTreeDelegate);
-    m_pControl3DView->setModel(m_p3DModel.data());
-
-    new3DModel(m_p3DModel);
-
-    // TODO getControl() called before getView() -> dangling pointer m_pView3D
-    connect(m_pControl3DView, &Control3DView::sceneColorChanged,
-            m_pView3D, &DISP3DLIB::View3D::setSceneColor);
-
-    connect(m_pControl3DView, &Control3DView::rotationChanged,
-            m_pView3D, &DISP3DLIB::View3D::startStopModelRotation);
-
-    connect(m_pControl3DView, &Control3DView::showCoordAxis,
-            m_pView3D, &DISP3DLIB::View3D::toggleCoordAxis);
-
-    connect(m_pControl3DView, &Control3DView::showFullScreen,
-            m_pView3D, &DISP3DLIB::View3D::showFullScreen);
-
-    connect(m_pControl3DView, &Control3DView::lightColorChanged,
-            m_pView3D, &DISP3DLIB::View3D::setLightColor);
-
-    connect(m_pControl3DView, &Control3DView::lightIntensityChanged,
-            m_pView3D, &DISP3DLIB::View3D::setLightIntensity);
-
-    connect(m_pControl3DView, &Control3DView::takeScreenshotChanged,
-            m_pView3D, &DISP3DLIB::View3D::takeScreenshot);
-
-    QDockWidget* pControlDock = new QDockWidget(getName());
-    pControlDock->setAllowedAreas(Qt::RightDockWidgetArea | Qt::LeftDockWidgetArea);
-    pControlDock->setWidget(m_pControl3DView);
-    pControlDock->setObjectName(getName());
-
-    return pControlDock;
+    return Q_NULLPTR;
 }
 
 //=============================================================================================================
@@ -222,6 +196,9 @@ void View3D::handleEvent(QSharedPointer<Event> e)
             std::cout << std::endl << "FIDUCIAL_CHANGED" << std::endl;
             onFiducialChanged(e->getData().value<int>());
             break;
+        case VIEW3D_SETTINGS_CHANGED:
+            settingsChanged(e->getData().value<ANSHAREDLIB::View3DParameters>());
+            break;
         default:
             qWarning() << "[View3D::handleEvent] Received an Event that is not handled by switch cases.";
     }
@@ -238,6 +215,7 @@ QVector<EVENT_TYPE> View3D::getEventSubscriptions(void) const
     temp.push_back(NEW_TRANS_AVAILABE);
     temp.push_back(FID_PICKING_STATUS);
     temp.push_back(FIDUCIAL_CHANGED);
+    temp.push_back(VIEW3D_SETTINGS_CHANGED);
     return temp;
 }
 
@@ -326,4 +304,35 @@ void View3D::onFiducialChanged(const int iFiducial)
 void View3D::new3DModel(QSharedPointer<DISP3DLIB::Data3DTreeModel> pModel)
 {
     m_pCommu->publishEvent(EVENT_TYPE::SET_DATA3D_TREE_MODEL, QVariant::fromValue(pModel));
+}
+
+//=========================================================================================================
+
+void View3D::settingsChanged(ANSHAREDLIB::View3DParameters viewParameters)
+{
+    switch (viewParameters.m_settingsToApply){
+    case ANSHAREDLIB::View3DParameters::View3DSetting::sceneColor:
+        emit sceneColorChanged(viewParameters.m_sceneColor);
+        break;
+    case ANSHAREDLIB::View3DParameters::View3DSetting::rotation:
+        emit rotationChanged(viewParameters.m_bToggleRotation);
+        break;
+    case ANSHAREDLIB::View3DParameters::View3DSetting::coordAxis:
+        emit showCoordAxis(viewParameters.m_bToogleCoordAxis);
+        break;
+    case ANSHAREDLIB::View3DParameters::View3DSetting::fullscreen:
+        emit showFullScreen(viewParameters.m_bToggleFullscreen);
+        break;
+    case ANSHAREDLIB::View3DParameters::View3DSetting::lightColor:
+        emit lightColorChanged(viewParameters.m_lightColor);
+        break;
+    case ANSHAREDLIB::View3DParameters::View3DSetting::lightIntensity:
+        emit lightIntensityChanged(viewParameters.m_dLightIntensity);
+        break;
+    case ANSHAREDLIB::View3DParameters::View3DSetting::screenshot:
+        emit takeScreenshotChanged();
+        break;
+    default:
+        qDebug() << "[View3D::settingsChanged] Unknown setting";
+    }
 }

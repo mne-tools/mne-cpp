@@ -204,7 +204,7 @@ private:
     DISPLIB::Control3DView*                     m_pControl3DView;
     DISPLIB::ApplyToView*                       m_pApplyToView;
     ANSHAREDLIB::ScalingParameters              m_ScalingParameters;
-    ANSHAREDLIB::ViewParameters                 m_ViewParmeters;
+    ANSHAREDLIB::ViewParameters                 m_ViewParameters;
     ANSHAREDLIB::View3DParameters               m_View3DParameters;
 };
 

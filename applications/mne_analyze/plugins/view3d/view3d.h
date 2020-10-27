@@ -170,7 +170,11 @@ private:
      */
     void newPickingEvent(Qt3DRender::QPickEvent *qPickEvent);
 
+    //=========================================================================================================
     void new3DModel(QSharedPointer<DISP3DLIB::Data3DTreeModel> pModel);
+
+    //=========================================================================================================
+    void settingsChanged(ANSHAREDLIB::View3DParameters viewParameters);
 
     QPointer<ANSHAREDLIB::Communicator>             m_pCommu;               /**< To broadcst signals */
 
@@ -185,6 +189,15 @@ private:
     DISPLIB::Control3DView*                         m_pControl3DView;       /**< The 3D Control view */
 
     bool                                            m_bPickingActivated;    /**< If Picking is activated*/
+
+signals:
+    void setSceneColor(const QColor& colSceneColor);
+    void rotationChanged(bool bRotationChanged);
+    void showCoordAxis(bool bShowCoordAxis);
+    void showFullScreen(bool bShowFullScreen);
+    void lightColorChanged(const QColor& color);
+    void lightIntensityChanged(double value);
+    void takeScreenshotChanged();
 };
 
 } // NAMESPACE

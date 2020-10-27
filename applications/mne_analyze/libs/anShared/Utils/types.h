@@ -117,7 +117,8 @@ namespace ANSHAREDLIB
         FID_PICKING_STATUS,         // event send whenever status of fiducial picking has changed
         NEW_FIDUCIAL_PICKED,        // event send whenever a new fiducial was picked
         FIDUCIAL_CHANGED,
-        SET_DATA3D_TREE_MODEL
+        SET_DATA3D_TREE_MODEL,
+        VIEW3D_SETTINGS_CHANGED
     };
 
     //=========================================================================================================
