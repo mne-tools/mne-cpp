@@ -177,6 +177,27 @@ private:
      */
     void init3DGui(QSharedPointer<DISP3DLIB::Data3DTreeModel> pModel);
 
+    //=========================================================================================================
+    void onSceneColorChange(const QColor& color);
+
+    //=========================================================================================================
+    void onRotationChanged(bool bRotationChanged);
+
+    //=========================================================================================================
+    void onShowCoordAxis(bool bShowCoordAxis);
+
+    //=========================================================================================================
+    void onShowFullScreen(bool bShowFullScreen);
+
+    //=========================================================================================================
+    void onLightColorChanged(const QColor& color);
+
+    //=========================================================================================================
+    void onLightIntensityChanged(double value);
+
+    //=========================================================================================================
+    void onTakeScreenshotChanged();
+
     QPointer<ANSHAREDLIB::Communicator>         m_pCommu;
     QSharedPointer<DISP3DLIB::Data3DTreeModel>  m_p3DModel;
 
@@ -184,6 +205,7 @@ private:
     DISPLIB::ApplyToView*                       m_pApplyToView;
     ANSHAREDLIB::ScalingParameters              m_ScalingParameters;
     ANSHAREDLIB::ViewParameters                 m_ViewParmeters;
+    ANSHAREDLIB::View3DParameters               m_View3DParameters;
 };
 
 //=============================================================================================================
