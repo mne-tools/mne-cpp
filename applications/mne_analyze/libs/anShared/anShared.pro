@@ -37,17 +37,18 @@ include(../../../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-CONFIG += skip_target_version_ext
-
 QT += widgets svg
 
+CONFIG += skip_target_version_ext
+
 DEFINES += ANSHARED_LIBRARY
+
+DESTDIR = $${MNE_LIBRARY_DIR}
 
 TARGET = anShared
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
-DESTDIR = $${MNE_LIBRARY_DIR}
 
 contains(MNECPP_CONFIG, wasm) {
     DEFINES += WASMBUILD
@@ -120,20 +121,8 @@ header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/anShared
 
 INSTALLS += header_files
 
-
-
-DISTFILES += \
-    Model/fiffrawmodel
-
-win32:!contains(MNECPP_CONFIG, static) {
-# Deploy/Copy library to bin folder manually (windeployqt only takes care of qt and system libraries)
-    EXTRA_ARGS =
-    DEPLOY_CMD = $$winDeployLibArgs($${TARGET},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
-    QMAKE_POST_LINK += $${DEPLOY_CMD}
-}
-
 macx {
-    QMAKE_LFLAGS += -Wl,-rpath,../lib
+    QMAKE_LFLAGS_SONAME = -Wl,-install_name,@rpath/
 }
 
 # Activate FFTW backend in Eigen for non-static builds only

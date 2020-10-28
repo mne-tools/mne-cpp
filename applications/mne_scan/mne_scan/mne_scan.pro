@@ -43,16 +43,16 @@ QT += network core widgets xml svg charts concurrent opengl 3dextras
 
 CONFIG += console
 
-!contains(MNECPP_CONFIG, withAppBundles) {
-    CONFIG -= app_bundle
-}
+DESTDIR = $${MNE_BINARY_DIR}
 
 TARGET = mne_scan
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
-DESTDIR = $${MNE_BINARY_DIR}
+!contains(MNECPP_CONFIG, withAppBundles) {
+    CONFIG -= app_bundle
+}
 
 contains(MNECPP_CONFIG, noQOpenGLWidget) {
     DEFINES += NO_QOPENGLWIDGET
@@ -61,6 +61,7 @@ contains(MNECPP_CONFIG, noQOpenGLWidget) {
 contains(MNECPP_CONFIG, static) {
     CONFIG += static
     DEFINES += STATICBUILD
+
     # For static builds we need to link against the plugins
     # because we cannot load them dynamically during runtime
     LIBS += -L$${MNE_BINARY_DIR}/mne_scan_plugins
@@ -157,8 +158,6 @@ HEADERS += \
     arrow.h \
     mainwindow.h
 
-FORMS +=
-
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
@@ -168,73 +167,16 @@ RESOURCES += \
     $${ROOT_DIR}/resources/general/styles/styles.qrc \
     $${ROOT_DIR}/resources/general/fonts/fonts.qrc
 
-unix: QMAKE_CXXFLAGS += -Wno-attributes
-
-# Icon
 win32 {
     RC_FILE = images/appIcons/mne_scan.rc
 }
-macx {
-    ICON = images/appIcons/mne_scan.icns
-}
 
-# Deploy dependencies
-win32:!contains(MNECPP_CONFIG, static) {
-    EXTRA_ARGS =
-    DEPLOY_CMD = $$winDeployAppArgs($${TARGET},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
-    QMAKE_POST_LINK += $${DEPLOY_CMD}
-}
 unix:!macx {
     QMAKE_RPATHDIR += $ORIGIN/../lib
 }
+
 macx {
-    # Copy Resource and plugins folder to app bundle
-    filtrc.path = Contents/MacOS/resources/general/
-    filtrc.files = $${ROOT_DIR}/resources/general/default_filters
-    QMAKE_BUNDLE_DATA += filtrc
-
-    sgrc.path = Contents/MacOS/resources/general/
-    sgrc.files = $${ROOT_DIR}/resources/general/selectionGroups
-    QMAKE_BUNDLE_DATA += sgrc
-
-    loutrc.path = Contents/MacOS/resources/general/
-    loutrc.files = $${ROOT_DIR}/resources/general/2DLayouts
-    QMAKE_BUNDLE_DATA += loutrc
-
-    hpirc.path = Contents/MacOS/resources/general/
-    hpirc.files = $${ROOT_DIR}/resources/general/hpiAlignment
-    QMAKE_BUNDLE_DATA += hpirc
-
-    ssrc.path = Contents/MacOS/resources/general/
-    ssrc.files = $${ROOT_DIR}/resources/general/sensorSurfaces
-    QMAKE_BUNDLE_DATA += ssrc
-
-    lout3rc.path = Contents/MacOS/resources/general/
-    lout3rc.files = $${ROOT_DIR}/resources/general/3DLayouts
-    QMAKE_BUNDLE_DATA += lout3rc
-
-    rcplugins.path = Contents/MacOS/resources/mne_scan/
-    rcplugins.files = $${ROOT_DIR}/resources/mne_scan/plugins
-    QMAKE_BUNDLE_DATA += rcplugins
-
-    plugins.path = Contents/MacOS/
-    plugins.files = $${ROOT_DIR}/bin/mne_scan_plugins
-    QMAKE_BUNDLE_DATA += plugins
-
-    # If Qt3D plugins/renderers folder exisits, create and copy renderers folder to mne-cpp/bin manually.
-    # macdeployqt does not deploy them. This will be fixed in Qt 5.15.2.
-    exists($$shell_path($$[QT_INSTALL_PLUGINS]/renderers)) {
-        qt3drenderers.path = Contents/PlugIns/
-        qt3drenderers.files = $$[QT_INSTALL_PLUGINS]/renderers
-        QMAKE_BUNDLE_DATA += qt3drenderers
-    }
-
-    !contains(MNECPP_CONFIG, static) {
-        # 3 entries returned in DEPLOY_CMD
-        EXTRA_ARGS =
-        DEPLOY_CMD = $$macDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
-        QMAKE_POST_LINK += $${DEPLOY_CMD}
-    }
+    ICON = images/appIcons/mne_scan.icns
 
     QMAKE_LFLAGS += -Wl,-rpath,../lib
 }
