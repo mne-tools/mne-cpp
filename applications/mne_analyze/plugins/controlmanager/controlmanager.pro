@@ -44,6 +44,11 @@ DEFINES += CONTROLMANAGER_PLUGIN
 
 DESTDIR = $${MNE_BINARY_DIR}/mne_analyze_plugins
 
+TARGET = controlmanager
+CONFIG(debug, debug|release) {
+    TARGET = $$join(TARGET,,,d)
+}
+
 contains(MNECPP_CONFIG, static) {
     CONFIG += staticlib
     DEFINES += STATICBUILD
@@ -51,15 +56,26 @@ contains(MNECPP_CONFIG, static) {
     CONFIG += shared
 }
 
-TARGET = controlmanager
-CONFIG(debug, debug|release) {
-    TARGET = $$join(TARGET,,,d)
+contains(MNECPP_CONFIG, wasm) {
+    DEFINES += WASMBUILD
+}
+
+LIBS += -L$${MNE_LIBRARY_DIR}
+
+# Link Disp3D library only if not building against WASM, which does not support Qt3D
+!contains(DEFINES, WASMBUILD) {
+   QT += 3dextras
+
+   CONFIG(debug, debug|release) {
+       LIBS += -lmnecppDisp3Dd \
+   } else {
+       LIBS += -lmnecppDisp3D \
+   }
 }
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lanSharedd \
-            -lmnecppDisp3Dd \
             -lmnecppDispd \
             -lmnecppConnectivityd \
             -lmnecppRtProcessingd \
@@ -71,7 +87,6 @@ CONFIG(debug, debug|release) {
             -lmnecppUtilsd \
 } else {
     LIBS += -lanShared \
-            -lmnecppDisp3D \
             -lmnecppDisp \
             -lmnecppConnectivity \
             -lmnecppRtProcessing \
