@@ -161,7 +161,7 @@ unix:!macx {
 }
 
 macx {
-    QMAKE_LFLAGS += -Wl,-rpath,../lib
+    QMAKE_LFLAGS += -Wl,-rpath,@executable_path/../lib
 
     ICON = resources/images/appIcons/mne_analyze.icns
 }
