@@ -134,6 +134,8 @@ win32:!contains(MNECPP_CONFIG, static) {
         QMAKE_CXXFLAGS  +=  -openmp
         #QMAKE_LFLAGS    +=  -openmp
     }
+
+    QMAKE_POST_LINK += $$QMAKE_COPY $$shell_path($${MNE_LIBRARY_DIR}/$${TARGET}.dll) $${MNE_BINARY_DIR}
 }
 
 unix:!macx:!contains(MNECPP_CONFIG, wasm):!contains(MNECPP_CONFIG, static) {

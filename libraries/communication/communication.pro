@@ -102,6 +102,10 @@ contains(MNECPP_CONFIG, withCodeCov) {
     QMAKE_LFLAGS += --coverage
 }
 
+win32 {
+    QMAKE_POST_LINK += $$QMAKE_COPY $$shell_path($${MNE_LIBRARY_DIR}/$${TARGET}.dll) $${MNE_BINARY_DIR}
+}
+
 macx {
     QMAKE_LFLAGS_SONAME = -Wl,-install_name,@rpath/
 }
