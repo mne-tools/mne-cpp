@@ -47,8 +47,10 @@
 #include <disp/viewers/control3dview.h>
 #include <disp/viewers/fiffrawviewsettings.h>
 
+#ifndef WASMBUILD
 #include <disp3D/engine/model/data3Dtreemodel.h>
 #include <disp3D/engine/delegate/data3Dtreedelegate.h>
+#endif
 
 //=============================================================================================================
 // QT INCLUDES
@@ -162,6 +164,7 @@ QDockWidget *ControlManager::getControl()
     m_ViewParameters.m_iTimeSpacers = pFiffViewSettings->getDistanceTimeSpacer();
     m_ViewParameters.m_sImageType = "";
 
+    #ifndef WASMBUILD
     //View3D Settings
     m_pControl3DView = new DISPLIB::Control3DView(QString("MNEANALYZE/%1").arg(this->getName()), Q_NULLPTR, slControlFlags);
     DISP3DLIB::Data3DTreeDelegate* pData3DTreeDelegate = new DISP3DLIB::Data3DTreeDelegate(this);
@@ -184,6 +187,7 @@ QDockWidget *ControlManager::getControl()
             this, &ControlManager::onLightIntensityChanged);
     connect(m_pControl3DView, &DISPLIB::Control3DView::takeScreenshotChanged,
             this, &ControlManager::onTakeScreenshotChanged);
+    #endif
 
     m_pApplyToView = new DISPLIB::ApplyToView();
     pLayout->addWidget(pTabWidget);

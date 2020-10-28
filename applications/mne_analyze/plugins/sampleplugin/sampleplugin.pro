@@ -44,16 +44,16 @@ DEFINES += SAMPLEPLUGIN_PLUGIN
 
 DESTDIR = $${MNE_BINARY_DIR}/mne_analyze_plugins
 
+TARGET = sampleplugin
+CONFIG(debug, debug|release) {
+    TARGET = $$join(TARGET,,,d)
+}
+
 contains(MNECPP_CONFIG, static) {
     CONFIG += staticlib
     DEFINES += STATICBUILD
 } else {
     CONFIG += shared
-}
-
-TARGET = sampleplugin
-CONFIG(debug, debug|release) {
-    TARGET = $$join(TARGET,,,d)
 }
 
 LIBS += -L$${MNE_LIBRARY_DIR}
