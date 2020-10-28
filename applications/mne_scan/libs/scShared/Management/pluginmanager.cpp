@@ -82,23 +82,23 @@ void PluginManager::loadPlugins(const QString& dir)
     for(QObject *plugin : staticInstances) {
         // AbstractPlugin
         if(plugin) {
-            if(AbstractPlugin* pIPlugin = qobject_cast<AbstractPlugin*>(plugin)) {
+            if(AbstractPlugin* pPlugin = qobject_cast<AbstractPlugin*>(plugin)) {
                 // plugins are always disabled when they are first loaded
-                m_qVecPlugins.push_back(pIPlugin);
+                m_qVecPlugins.push_back(pPlugin);
 
-                AbstractPlugin::PluginType pluginType = pIPlugin->getType();
-                QString msg = "Plugin " + pIPlugin->getName() + " loaded.";
+                AbstractPlugin::PluginType pluginType = pPlugin->getType();
+                QString msg = "Plugin " + pPlugin->getName() + " loaded.";
 
                 // AbstractSensor
                 if(pluginType == AbstractPlugin::_ISensor) {
-                    if(AbstractSensor* pSensor = qobject_cast<AbstractSensor*>(pIPlugin)) {
+                    if(AbstractSensor* pSensor = qobject_cast<AbstractSensor*>(pPlugin)) {
                         m_qVecSensorPlugins.push_back(pSensor);
                         qDebug() << "Sensor" << pSensor->getName() << "loaded.";
                     }
                 }
                 // AbstractAlgorithm
                 else if(pluginType == AbstractPlugin::_IAlgorithm) {
-                    if(AbstractAlgorithm* pAlgorithm = qobject_cast<AbstractAlgorithm*>(pIPlugin)) {
+                    if(AbstractAlgorithm* pAlgorithm = qobject_cast<AbstractAlgorithm*>(pPlugin)) {
                         m_qVecAlgorithmPlugins.push_back(pAlgorithm);
                         qDebug() << "RTAlgorithm" << pAlgorithm->getName() << "loaded.";
                     }

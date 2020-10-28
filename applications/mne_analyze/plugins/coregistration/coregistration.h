@@ -40,7 +40,7 @@
 //=============================================================================================================
 
 #include "coregistration_global.h"
-#include <anShared/Interfaces/IPlugin.h>
+#include <anShared/Plugins/abstractplugin.h>
 
 #include <fiff/fiff_coord_trans.h>
 #include <fiff/fiff_dig_point.h>
@@ -90,12 +90,12 @@ namespace COREGISTRATIONPLUGIN
  *
  * @brief The CoRegistration class provides a view with all currently loaded models.
  */
-class COREGISTRATIONSHARED_EXPORT CoRegistration : public ANSHAREDLIB::IPlugin
+class COREGISTRATIONSHARED_EXPORT CoRegistration : public ANSHAREDLIB::AbstractPlugin
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "coregistration.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(ANSHAREDLIB::IPlugin)
+    Q_INTERFACES(ANSHAREDLIB::AbstractPlugin)
 
 public:
     //=========================================================================================================
@@ -110,8 +110,8 @@ public:
      */
     virtual ~CoRegistration() override;
 
-    // IPlugin functions
-    virtual QSharedPointer<IPlugin> clone() const override;
+    // AbstractPlugin functions
+    virtual QSharedPointer<AbstractPlugin> clone() const override;
     virtual void init() override;
     virtual void unload() override;
     virtual QString getName() const override;
