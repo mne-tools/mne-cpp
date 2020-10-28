@@ -171,41 +171,74 @@ private:
 
     //=========================================================================================================
     /**
+     * Sets 3D model for the 3D controls
      *
-     *
-     * @param pModel
+     * @param [in] pModel   new 3D Model
      */
     void init3DGui(QSharedPointer<DISP3DLIB::Data3DTreeModel> pModel);
 
     //=========================================================================================================
+    /**
+     * Sends scene color via the event manager
+     *
+     * @param [in] color    new scene color
+     */
     void onSceneColorChange(const QColor& color);
 
     //=========================================================================================================
+    /**
+     * Send rotation toggle via event manager
+     *
+     * @param [in] bRotationChanged     rotation toggle
+     */
     void onRotationChanged(bool bRotationChanged);
 
     //=========================================================================================================
+    /**
+     * Send coordinate axis toggle via event manager
+     *
+     * @param [in] bShowCoordAxis   toggle coord axis
+     */
     void onShowCoordAxis(bool bShowCoordAxis);
 
     //=========================================================================================================
+    /**
+     * Send fullscreen toggle via event manager
+     *
+     * @param [in] bShowFullScreen      toggle fullscreen
+     */
     void onShowFullScreen(bool bShowFullScreen);
 
     //=========================================================================================================
+    /**
+     * Send light color via the event manager
+     *
+     * @param [in] color    new light color
+     */
     void onLightColorChanged(const QColor& color);
 
     //=========================================================================================================
+    /**
+     * Send light intensity via the event manager
+     *
+     * @param [in] value    new light intensity
+     */
     void onLightIntensityChanged(double value);
 
     //=========================================================================================================
+    /**
+     * Send screenshot toggle via event manager
+     */
     void onTakeScreenshotChanged();
 
-    QPointer<ANSHAREDLIB::Communicator>         m_pCommu;
-    QSharedPointer<DISP3DLIB::Data3DTreeModel>  m_p3DModel;
+    QPointer<ANSHAREDLIB::Communicator>         m_pCommu;                   /**< Communicator to send events trhoug hevent manager */
+    QSharedPointer<DISP3DLIB::Data3DTreeModel>  m_p3DModel;                 /**< Model for 3D controls */
 
-    DISPLIB::Control3DView*                     m_pControl3DView;
-    DISPLIB::ApplyToView*                       m_pApplyToView;
-    ANSHAREDLIB::ScalingParameters              m_ScalingParameters;
-    ANSHAREDLIB::ViewParameters                 m_ViewParameters;
-    ANSHAREDLIB::View3DParameters               m_View3DParameters;
+    DISPLIB::Control3DView*                     m_pControl3DView;           /**< Controls for 3d View */
+    DISPLIB::ApplyToView*                       m_pApplyToView;             /**< Controls for selecting views to apply settings */
+    ANSHAREDLIB::ScalingParameters              m_ScalingParameters;        /**< Controls for scaling */
+    ANSHAREDLIB::ViewParameters                 m_ViewParameters;           /**< Struct for 2D view settings */
+    ANSHAREDLIB::View3DParameters               m_View3DParameters;         /**< Struct for 3D view settings */
 };
 
 //=============================================================================================================

@@ -171,9 +171,19 @@ private:
     void newPickingEvent(Qt3DRender::QPickEvent *qPickEvent);
 
     //=========================================================================================================
+    /**
+     * Emits new model as an event
+     *
+     * @param [in] pModel   new 3D model to be emitted
+     */
     void new3DModel(QSharedPointer<DISP3DLIB::Data3DTreeModel> pModel);
 
     //=========================================================================================================
+    /**
+     * Update view parameters based on input viewParameters
+     *
+     * @param [in] viewParameters   parameters with changes to bw appied to view
+     */
     void settingsChanged(ANSHAREDLIB::View3DParameters viewParameters);
 
     QPointer<ANSHAREDLIB::Communicator>             m_pCommu;               /**< To broadcst signals */
@@ -191,12 +201,58 @@ private:
     bool                                            m_bPickingActivated;    /**< If Picking is activated*/
 
 signals:
+    //=========================================================================================================
+    /**
+     * Emit new scene color
+     *
+     * @param [in] colSceneColor    new scene color
+     */
     void sceneColorChanged(const QColor& colSceneColor);
+
+    //=========================================================================================================
+    /**
+     * Emit toggle rotation
+     *
+     * @param [in] bRotationChanged     rotation toggle
+     */
     void rotationChanged(bool bRotationChanged);
+
+    //=========================================================================================================
+    /**
+     * Emit toggle coord axis
+     *
+     * @param [in] bShowCoordAxis   coord axis toggle
+     */
     void showCoordAxis(bool bShowCoordAxis);
+
+    //=========================================================================================================
+    /**
+     * Emit toggle fullscreen
+     *
+     * @param [in] bShowFullScreen      fullscreen toggle
+     */
     void showFullScreen(bool bShowFullScreen);
+
+    //=========================================================================================================
+    /**
+     * Emit new light color
+     *
+     * @param [in] color    new light color
+     */
     void lightColorChanged(const QColor& color);
+
+    //=========================================================================================================
+    /**
+     * Emit new light intensity value
+     *
+     * @param [in] value    new light intenisty
+     */
     void lightIntensityChanged(double value);
+
+    //=========================================================================================================
+    /**
+     * Emit trigger for taking screenshot
+     */
     void takeScreenshotChanged();
 };
 
