@@ -112,7 +112,7 @@ CoRegistration::~CoRegistration()
 
 //=============================================================================================================
 
-QSharedPointer<IPlugin> CoRegistration::clone() const
+QSharedPointer<AbstractPlugin> CoRegistration::clone() const
 {
     QSharedPointer<CoRegistration> pCoRegistrationClone = QSharedPointer<CoRegistration>::create();
     return pCoRegistrationClone;
