@@ -200,6 +200,12 @@ Q_DECLARE_METATYPE(ANSHAREDLIB::ViewParameters);
 Q_DECLARE_METATYPE(ANSHAREDLIB::ViewParameters*);
 #endif
 
+#ifndef metatype_ANSHAREDLIB_view3Dparam
+#define metatype_ANSHAREDLIB_view3Dparam
+Q_DECLARE_METATYPE(ANSHAREDLIB::View3DParameters);
+Q_DECLARE_METATYPE(ANSHAREDLIB::View3DParameters*);
+#endif
+
 //Q_DECLARE_METATYPE(ANSHAREDLIB::SelectionParameters);
 //Q_DECLARE_METATYPE(ANSHAREDLIB::SelectionParameters*);
 
