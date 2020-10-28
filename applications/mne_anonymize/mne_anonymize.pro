@@ -51,10 +51,6 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
-!contains(MNECPP_CONFIG, withAppBundles) {
-    CONFIG -= app_bundle
-}
-
 contains(MNECPP_CONFIG, wasm) {
 #    QMAKE_LFLAGS += -s ERROR_ON_UNDEFINED_SYMBOLS=1
 #    QMAKE_LFLAGS += -s ASSERTIONS=1

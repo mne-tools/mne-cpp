@@ -45,9 +45,7 @@ CONFIG += console
 
 DESTDIR =  $${MNE_BINARY_DIR}
 
-!contains(MNECPP_CONFIG, withAppBundles) {
-    CONFIG -= app_bundle
-}
+CONFIG -= app_bundle
 
 contains(MNECPP_CONFIG, static) {
     CONFIG += static
