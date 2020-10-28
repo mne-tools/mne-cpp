@@ -215,6 +215,8 @@ win32:!contains(MNECPP_CONFIG, static) {
         QMAKE_POST_LINK += $$sprintf($${QMAKE_MKDIR_CMD}, "$${TRGTDIR}") $$escape_expand(\n\t)
         QMAKE_POST_LINK += $${QMAKE_COPY_DIR} "$$shell_path($$[QT_INSTALL_PLUGINS]/renderers)" "$$shell_path($${MNE_BINARY_DIR}/renderers)" $$escape_expand(\\n\\t)
     }
+
+    QMAKE_POST_LINK += $$QMAKE_COPY $$shell_path($${MNE_LIBRARY_DIR}/$${TARGET}.dll) $${MNE_BINARY_DIR}
 }
 
 macx {
