@@ -105,6 +105,9 @@ HEADERS += \
     realtimespectrumwidget.h \
     realtime3dwidget.h \
 
+RESOURCES += \
+    scDisp.qrc
+
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}

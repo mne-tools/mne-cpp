@@ -84,7 +84,7 @@ jobs:
     - name: Configure and compile MNE-CPP (Linux|MacOS)
       if: (matrix.os == 'ubuntu-16.04') || (matrix.os == 'macos-latest')
       run: |
-        qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow MNECPP_CONFIG+=withLsl
+        qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow MNECPP_CONFIG+=withLsl MNECPP_CONFIG+=withAppBundles
         make -j4
     - name: Configure and compile MNE-CPP (Windows)
       if: matrix.os == 'windows-2016'
@@ -223,7 +223,7 @@ jobs:
     - name: Configure and compile MNE-CPP (Linux|MacOS)
       if: (matrix.os == 'ubuntu-16.04') || (matrix.os == 'macos-latest')
       run: |
-        qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow MNECPP_CONFIG+=withLsl
+        qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow MNECPP_CONFIG+=withLsl MNECPP_CONFIG+=withAppBundles
         make -j4
     - name: Configure and compile MNE-CPP (Windows)
       if: matrix.os == 'windows-2019'
@@ -340,7 +340,7 @@ jobs:
     - name: Configure and compile MNE-CPP (Linux|MacOS)
       if: (matrix.os == 'ubuntu-16.04') || (matrix.os == 'macos-latest')
       run: |
-        ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=static
+        ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=static MNECPP_CONFIG+=withAppBundles
         make -j4
     - name: Configure and compile MNE-CPP (Windows)
       if: matrix.os == 'windows-2019'

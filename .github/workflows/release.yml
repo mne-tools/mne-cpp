@@ -153,7 +153,7 @@ jobs:
     #     make install -j4
     - name: Configure and compile MNE-CPP
       run: |
-        ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples MNECPP_CONFIG+=static
+        ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples MNECPP_CONFIG+=static MNECPP_CONFIG+=withAppBundles
         make -j4
         make install -j4
     - name: Package binaries
@@ -386,7 +386,7 @@ jobs:
         make install
     - name: Configure and compile MNE-CPP
       run: |
-        qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow MNECPP_CONFIG+=withLsl
+        qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow MNECPP_CONFIG+=withLsl MNECPP_CONFIG+=withAppBundles
         make -j4
     - name: Package binaries
       run: |
