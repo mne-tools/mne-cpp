@@ -124,16 +124,14 @@ jobs:
       if: matrix.os == 'macos-latest'
       run: |
         # Solve for dependencies for .app bundles
-        macdeployqt ./bin/mne_scan.app
+        macdeployqt ./bin/mne_scan.app -libpath=./lib
         cp -a bin/mne_scan_plugins/. bin/mne_scan.app/Contents/MacOS/mne_scan_plugins
         cp -a bin/resources/. bin/mne_scan.app/Contents/MacOS/resources
-        cp -a lib/. bin/mne_scan.app/Contents/Frameworks
         cp -a applications/mne_scan/plugins/brainflowboard/brainflow/installed/lib/. bin/mne_scan.app/Contents/Frameworks
         cp -a applications/mne_scan/plugins/lsladapter/liblsl/build/install/lib/. bin/mne_scan.app/Contents/Frameworks
-        macdeployqt ./bin/mne_analyze.app
+        macdeployqt ./bin/mne_analyze.app -libpath=./lib
         cp -a bin/mne_analyze_plugins/. bin/mne_analyze.app/Contents/MacOS/mne_analyze_plugins
         cp -a bin/resources/. bin/mne_analyze.app/Contents/MacOS/resources
-        cp -a lib/. bin/mne_analyze.app/Contents/Frameworks
         # Delete folders which we do not want to ship
         rm -r bin/mne-cpp-test-data
         rm -r bin/mne_scan_plugins
@@ -279,14 +277,12 @@ jobs:
         macdeployqt ./bin/mne_scan.app
         cp -a bin/mne_scan_plugins/. bin/mne_scan.app/Contents/MacOS/mne_scan_plugins
         cp -a bin/resources/. bin/mne_scan.app/Contents/MacOS/resources
-        cp -a lib/. bin/mne_scan.app/Contents/Frameworks
         cp -a $Qt5_DIR/plugins/renderers/. bin/mne_scan.app/Contents/PlugIns/renderers
         cp -a applications/mne_scan/plugins/brainflowboard/brainflow/installed/lib/. bin/mne_scan.app/Contents/Frameworks
         cp -a applications/mne_scan/plugins/lsladapter/liblsl/build/install/lib/. bin/mne_scan.app/Contents/Frameworks
         macdeployqt ./bin/mne_analyze.app
         cp -a bin/mne_analyze_plugins/. bin/mne_analyze.app/Contents/MacOS/mne_analyze_plugins
         cp -a bin/resources/. bin/mne_analyze.app/Contents/MacOS/resources
-        cp -a lib/. bin/mne_analyze.app/Contents/Frameworks
         cp -a $Qt5_DIR/plugins/renderers/. bin/mne_scan.app/Contents/PlugIns/renderers
         # Delete folders which we do not want to ship
         rm -r bin/mne-cpp-test-data
