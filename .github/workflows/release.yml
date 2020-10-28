@@ -479,8 +479,9 @@ jobs:
     - name: Package binaries (Windows)
       if: matrix.os == 'windows-2016'
       run: |
-        # Solve for dependencies only mne_scan since it links all needed qt and mne-cpp libs
+        # Solve for dependencies only mne_scan.exe and mnecppDisp3D.dll since it links all needed qt and mne-cpp libs
         windeployqt .\bin\mne_scan.exe
+        windeployqt .\bin\mnecppDisp3D.dll
         mkdir .\bin\renderers
         xcopy $Env:Qt5_DIR\5.15.1\msvc2019_64\plugins\renderers\* .\bin\renderers /s /i
         xcopy .\applications\mne_scan\plugins\brainflowboard\brainflow\installed\lib\* .\bin\ /s /i
