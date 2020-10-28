@@ -171,6 +171,7 @@ private:
      */
     void onMakeScreenshot(const QString& imageType);
 
+    #ifndef WASMBUILD
     //=========================================================================================================
     /**
      * Sets 3D model for the 3D controls
@@ -178,6 +179,7 @@ private:
      * @param [in] pModel   new 3D Model
      */
     void init3DGui(QSharedPointer<DISP3DLIB::Data3DTreeModel> pModel);
+    #endif
 
     //=========================================================================================================
     /**
@@ -234,7 +236,6 @@ private:
     void onTakeScreenshotChanged();
 
     QPointer<ANSHAREDLIB::Communicator>         m_pCommu;                   /**< Communicator to send events trhoug hevent manager */
-    QSharedPointer<DISP3DLIB::Data3DTreeModel>  m_p3DModel;                 /**< Model for 3D controls */
 
     #ifndef WASMBUILD
     DISPLIB::Control3DView*                     m_pControl3DView;           /**< Controls for 3d View */
