@@ -145,7 +145,7 @@ contains(MNECPP_CONFIG, withCodeCov) {
     QMAKE_LFLAGS += --coverage
 }
 
-win32 {
+win32:!contains(MNECPP_CONFIG, static) {
     QMAKE_POST_LINK += $$QMAKE_COPY $$shell_path($${MNE_LIBRARY_DIR}/$${TARGET}.dll) $${MNE_BINARY_DIR}
 }
 
