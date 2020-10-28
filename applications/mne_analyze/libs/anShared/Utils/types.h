@@ -116,9 +116,9 @@ namespace ANSHAREDLIB
         NEW_TRANS_AVAILABE,         // event send whenever a new head-mri transformation is available
         FID_PICKING_STATUS,         // event send whenever status of fiducial picking has changed
         NEW_FIDUCIAL_PICKED,        // event send whenever a new fiducial was picked
-        FIDUCIAL_CHANGED,
-        SET_DATA3D_TREE_MODEL,
-        VIEW3D_SETTINGS_CHANGED
+        FIDUCIAL_CHANGED,           // event send when fiducial was changed
+        SET_DATA3D_TREE_MODEL,      // send when a new 3D Model is set
+        VIEW3D_SETTINGS_CHANGED     // send to trigger view 3D settings update
     };
 
     //=========================================================================================================
@@ -131,6 +131,9 @@ namespace ANSHAREDLIB
     };
 
     //=========================================================================================================
+    /**
+     * Public struct for sending 2D view parameters though the event manager
+     */
     struct ViewParameters{
         enum ViewSetting{
             signal,
@@ -153,6 +156,10 @@ namespace ANSHAREDLIB
 
     };
 
+    //=========================================================================================================
+    /**
+     * Public struct for sending 3D view parameters throug hthe event manager
+     */
     struct View3DParameters{
         enum View3DSetting{
             sceneColor,
