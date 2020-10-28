@@ -45,6 +45,8 @@ QT -= gui
 
 CONFIG += console
 
+DESTDIR = $${MNE_BINARY_DIR}
+
 !contains(MNECPP_CONFIG, withAppBundles) {
     CONFIG -= app_bundle
 }
@@ -53,8 +55,6 @@ TARGET = mne_rt_server
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
-
-DESTDIR = $${MNE_BINARY_DIR}
 
 contains(MNECPP_CONFIG, static) {
     CONFIG += static
@@ -93,41 +93,14 @@ HEADERS += \
     commandthread.h \
     mne_rt_commands.h
 
-RESOURCE_FILES += \
-    $${ROOT_DIR}/resources/mne_rt_server_plugins/plugin.cfg \
-
-# Copy resource files from repository to bin resource folder
-COPY_CMD = $$copyResources($${RESOURCE_FILES})
-QMAKE_POST_LINK += $${COPY_CMD}
-
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
-# Deploy dependencies
-win32:!contains(MNECPP_CONFIG, static) {
-    EXTRA_ARGS =
-    DEPLOY_CMD = $$winDeployAppArgs($${TARGET},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
-    QMAKE_POST_LINK += $${DEPLOY_CMD}
-}
 unix:!macx {
     QMAKE_RPATHDIR += $ORIGIN/../lib
 }
+
 macx {
-    rcplugins.path = Contents/MacOS/resources/
-    rcplugins.files = $${ROOT_DIR}/resources/mne_rt_server_plugins
-    QMAKE_BUNDLE_DATA += rcplugins
-
-    plugins.path = Contents/MacOS/
-    plugins.files = $${ROOT_DIR}/bin/mne_rt_server_plugins
-    QMAKE_BUNDLE_DATA += plugins
-
-    !contains(MNECPP_CONFIG, static) {
-        # 3 entries returned in DEPLOY_CMD
-        EXTRA_ARGS =
-        DEPLOY_CMD = $$macDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
-        QMAKE_POST_LINK += $${DEPLOY_CMD}
-    }
-
     QMAKE_LFLAGS += -Wl,-rpath,../lib
 }
 

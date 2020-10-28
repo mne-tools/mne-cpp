@@ -42,13 +42,13 @@ TEMPLATE = app
 
 QT += widgets network
 
-#CONFIG += console
 CONFIG -= app_bundle
 
-CONFIG(debug,debug|release) {
-    macx {
-        CONFIG -= app_bundle
-    }
+DESTDIR = $${MNE_BINARY_DIR}
+
+TARGET = mne_anonymize
+CONFIG(debug, debug|release) {
+    TARGET = $$join(TARGET,,,d)
 }
 
 !contains(MNECPP_CONFIG, withAppBundles) {
@@ -70,12 +70,6 @@ contains(MNECPP_CONFIG, wasm) {
     DEFINES += WASMBUILD
 }
 
-TARGET = mne_anonymize
-
-CONFIG(debug, debug|release) {
-    TARGET = $$join(TARGET,,,d)
-}
-
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lmnecppFiffd \
@@ -84,8 +78,6 @@ CONFIG(debug, debug|release) {
     LIBS += -lmnecppFiff \
             -lmnecppUtils \
 }
-
-DESTDIR = $${MNE_BINARY_DIR}
 
 SOURCES += main.cpp \
     apphandler.cpp \
@@ -108,23 +100,11 @@ INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_FIFF_ANONYMIZER_DIR}
 
-# Deploy dependencies
-win32:!contains(MNECPP_CONFIG, static) {
-    EXTRA_ARGS =
-    DEPLOY_CMD = $$winDeployAppArgs($${TARGET},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
-    QMAKE_POST_LINK += $${DEPLOY_CMD}
-}
 unix:!macx {
     QMAKE_RPATHDIR += $ORIGIN/../lib
 }
-macx {
-    !contains(MNECPP_CONFIG, static) {
-        # 3 entries returned in DEPLOY_CMD
-        EXTRA_ARGS = -always-overwrite
-        DEPLOY_CMD = $$macDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
-        QMAKE_POST_LINK += $${DEPLOY_CMD}
-    }
 
+macx {
     QMAKE_LFLAGS += -Wl,-rpath,../lib
 }
 

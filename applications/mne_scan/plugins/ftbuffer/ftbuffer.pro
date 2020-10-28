@@ -37,13 +37,13 @@ include(../../../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-CONFIG += skip_target_version_ext
+QT += core widgets network
 
-CONFIG += plugin
+CONFIG += skip_target_version_ext plugin
 
 DEFINES += FTBUFFER_LIBRARY
 
-QT += core widgets network
+DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
 
 TARGET = ftbuffer
 CONFIG(debug, debug|release) {
@@ -56,8 +56,6 @@ contains(MNECPP_CONFIG, static) {
 } else {
     CONFIG += shared
 }
-
-DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
@@ -100,18 +98,9 @@ INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
 
 OTHER_FILES += ftbuffer.json
 
-UI_DIR = $$PWD
-
 unix:!macx {
-    # === Unix ===
     QMAKE_RPATHDIR += $ORIGIN/../../lib
 }
-
-# Put generated form headers into the origin --> cause other src is pointing at them
-UI_DIR = $${PWD}
-
-# suppress visibility warnings
-unix: QMAKE_CXXFLAGS += -Wno-attributes
 
 # Activate FFTW backend in Eigen for non-static builds only
 contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {

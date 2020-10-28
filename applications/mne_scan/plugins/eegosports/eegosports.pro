@@ -39,13 +39,15 @@ include(../../../../mne-cpp.pri)
 
 TEMPLATE = lib
 
+QT += core widgets svg
+
 CONFIG += skip_target_version_ext
 
 CONFIG += plugin
 
 DEFINES += EEGOSPORTS_LIBRARY
 
-QT += core widgets svg
+DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
 
 TARGET = eegosports
 CONFIG(debug, debug|release) {
@@ -58,8 +60,6 @@ contains(MNECPP_CONFIG, static) {
 } else {
     CONFIG += shared
 }
-
-DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
@@ -79,7 +79,7 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES += \
-    FormFiles/eegosportsimpedancewidget.cpp \
+        FormFiles/eegosportsimpedancewidget.cpp \
         eegosports.cpp \
         eegosportselectrodeitem.cpp \
         eegosportsimpedancescene.cpp \
@@ -90,7 +90,7 @@ SOURCES += \
         FormFiles/eegosportssetupprojectwidget.cpp \
 
 HEADERS += \
-    FormFiles/eegosportsimpedancewidget.h \
+        FormFiles/eegosportsimpedancewidget.h \
         eegosports.h\
         eegosports_global.h \
         eegosportselectrodeitem.h \
@@ -102,25 +102,9 @@ HEADERS += \
         FormFiles/eegosportssetupprojectwidget.h \
 
 FORMS += \
-    FormFiles/eegosportsimpedancewidget.ui \
+        FormFiles/eegosportsimpedancewidget.ui \
         FormFiles/eegosportssetup.ui \
         FormFiles/eegosportssetupprojectwidget.ui \
-
-RESOURCE_FILES +=\
-    $${ROOT_DIR}/resources/general/3DLayouts/*
-
-# Copy resource files to bin resource folder
-for(FILE, RESOURCE_FILES) {
-    FILEDIR = $$dirname(FILE)
-    FILEDIR ~= s,/resources,/bin/resources,g
-    FILEDIR = $$shell_path($${FILEDIR})
-    TRGTDIR = $${FILEDIR}
-
-    QMAKE_POST_LINK += $$sprintf($${QMAKE_MKDIR_CMD}, "$${TRGTDIR}") $$escape_expand(\n\t)
-
-    FILE = $$shell_path($${FILE})
-    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${TRGTDIR}) $$escape_expand(\\n\\t)
-}
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
@@ -128,16 +112,8 @@ INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
 
 OTHER_FILES += eegosports.json
 
-# Put generated form headers into the origin --> cause other src is pointing at them
-UI_DIR = $${PWD}
-
-# suppress visibility warnings
-unix: QMAKE_CXXFLAGS += -Wno-attributes
-
 RESOURCES += \
     eegosports.qrc
-
-DISTFILES +=
 
 # Activate FFTW backend in Eigen for non-static builds only
 contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
