@@ -219,9 +219,12 @@ void ControlManager::handleEvent(QSharedPointer<Event> e)
             m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_ViewParameters));
         }
         break;
-    case SET_DATA3D_TREE_MODEL:
-        init3DGui(e->getData().value<QSharedPointer<DISP3DLIB::Data3DTreeModel>>());
 
+    case SET_DATA3D_TREE_MODEL:
+        #ifndef WASMBUILD
+        init3DGui(e->getData().value<QSharedPointer<DISP3DLIB::Data3DTreeModel>>());
+        #endif
+        break;
     default:
         qWarning() << "[ControlManager::handleEvent] received an Event that is not handled by switch-cases";
         break;
@@ -319,10 +322,12 @@ void ControlManager::onMakeScreenshot(const QString& imageType)
 
 //=============================================================================================================
 
+#ifndef WASMBUILD
 void ControlManager::init3DGui(QSharedPointer<DISP3DLIB::Data3DTreeModel> pModel)
 {
     m_pControl3DView->setModel(pModel.data());
 }
+#endif
 
 //=============================================================================================================
 
