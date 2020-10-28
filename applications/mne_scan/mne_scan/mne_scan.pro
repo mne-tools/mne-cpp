@@ -60,6 +60,7 @@ contains(MNECPP_CONFIG, noQOpenGLWidget) {
 
 contains(MNECPP_CONFIG, static) {
     CONFIG += static
+    CONFIG -= app_bundle
     DEFINES += STATICBUILD
 
     # For static builds we need to link against the plugins
