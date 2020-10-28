@@ -143,14 +143,14 @@ jobs:
     - name: Package binaries (Windows)
       if: matrix.os == 'windows-2016'
       run: |
-        # Solve for dependencies only mne_scan since it links all needed qt and mne-cpp libs
+        # Solve for dependencies only mne_scan.exe and mnecppDisp3D.dll since it links all needed qt and mne-cpp libs
         windeployqt .\bin\mne_scan.exe
+        windeployqt .\bin\mnecppDisp3D.dll
+        xcopy .\applications\mne_scan\plugins\brainflowboard\brainflow\installed\lib\* .\bin\ /s /i
+        xcopy .\applications\mne_scan\plugins\lsladapter\liblsl\build\install\bin\lsl.dll .\bin\ /i
         # Delete folders which we do not want to ship
         Remove-Item 'bin/mne-cpp-test-data' -Recurse
-        # Copy additional brainflow libs
-        xcopy .\applications\mne_scan\plugins\brainflowboard\brainflow\installed\lib\* .\bin\ /s /i
-        # Copy additional LSL libs
-        xcopy .\applications\mne_scan\plugins\lsladapter\liblsl\build\install\bin\lsl.dll .\bin\ /i
+        # Creating archive of everything in current directory
         7z a mne-cpp-windows-dynamic-x86_64.zip ./bin
 
   MaxQtDynamic:
@@ -297,8 +297,9 @@ jobs:
     - name: Package binaries (Windows)
       if: matrix.os == 'windows-2016'
       run: |
-        # Solve for dependencies only mne_scan since it links all needed qt and mne-cpp libs
+        # Solve for dependencies only mne_scan.exe and mnecppDisp3D.dll since it links all needed qt and mne-cpp libs
         windeployqt .\bin\mne_scan.exe
+        windeployqt .\bin\mnecppDisp3D.dll
         mkdir .\bin\renderers
         xcopy $Env:Qt5_DIR\5.15.1\msvc2019_64\plugins\renderers\* .\bin\renderers /s /i
         xcopy .\applications\mne_scan\plugins\brainflowboard\brainflow\installed\lib\* .\bin\ /s /i
