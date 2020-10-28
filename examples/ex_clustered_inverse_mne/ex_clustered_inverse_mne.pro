@@ -92,7 +92,7 @@ unix:!macx {
 }
 
 macx {
-    QMAKE_LFLAGS += -Wl,-rpath,../lib
+    QMAKE_LFLAGS += -Wl,-rpath,@executable_path/../lib
 }
 
 # Activate FFTW backend in Eigen for non-static builds only
