@@ -191,7 +191,7 @@ private:
     bool                                            m_bPickingActivated;    /**< If Picking is activated*/
 
 signals:
-    void setSceneColor(const QColor& colSceneColor);
+    void sceneColorChanged(const QColor& colSceneColor);
     void rotationChanged(bool bRotationChanged);
     void showCoordAxis(bool bShowCoordAxis);
     void showFullScreen(bool bShowFullScreen);
