@@ -37,13 +37,13 @@ include(../../../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-CONFIG += skip_target_version_ext
+QT += core widgets
 
-CONFIG += plugin
+CONFIG += skip_target_version_ext plugin
 
 DEFINES += BRAINAMP_LIBRARY
 
-QT += core widgets
+DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
 
 TARGET = brainamp
 CONFIG(debug, debug|release) {
@@ -56,8 +56,6 @@ contains(MNECPP_CONFIG, static) {
 } else {
     CONFIG += shared
 }
-
-DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
@@ -95,37 +93,14 @@ FORMS += \
         FormFiles/brainampsetup.ui \
         FormFiles/brainampsetupprojectwidget.ui \
 
-RESOURCE_FILES +=\
-
-# Copy resource files to bin resource folder
-for(FILE, RESOURCE_FILES) {
-    FILEDIR = $$dirname(FILE)
-    FILEDIR ~= s,/resources,/bin/resources,g
-    FILEDIR = $$shell_path($${FILEDIR})
-    TRGTDIR = $${FILEDIR}
-
-    QMAKE_POST_LINK += $$sprintf($${QMAKE_MKDIR_CMD}, "$${TRGTDIR}") $$escape_expand(\n\t)
-
-    FILE = $$shell_path($${FILE})
-    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${TRGTDIR}) $$escape_expand(\\n\\t)
-}
-
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
 
 OTHER_FILES += brainamp.json
 
-# Put generated form headers into the origin --> cause other src is pointing at them
-UI_DIR = $${PWD}
-
-# suppress visibility warnings
-unix: QMAKE_CXXFLAGS += -Wno-attributes
-
 RESOURCES += \
     brainamp.qrc
-
-DISTFILES +=
 
 # Activate FFTW backend in Eigen for non-static builds only
 contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {

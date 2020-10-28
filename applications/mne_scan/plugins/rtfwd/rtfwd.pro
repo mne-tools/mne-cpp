@@ -36,19 +36,18 @@ include(../../../../mne-cpp.pri)
 
 TEMPLATE = lib
 
+QT += core widgets
+
 CONFIG += plugin
-CONFIG += c++11
 
 DEFINES += RTFWD_PLUGIN
 
-QT += core widgets
+DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
 
 TARGET = rtfwd
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
-
-DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
 
 contains(MNECPP_CONFIG, static) {
     CONFIG += staticlib
@@ -62,32 +61,32 @@ CONFIG(debug, debug|release) {
     LIBS += -lscSharedd \
             -lscDispd \
             -lscMeasd \
-	    -lmnecppDispd \
-	    -lmnecppFwdd \
-	    -lmnecppMned \
-	    -lmnecppFiffd \
-	    -lmnecppFsd \
-	    -lmnecppUtilsd \
+            -lmnecppDispd \
+            -lmnecppFwdd \
+            -lmnecppMned \
+            -lmnecppFiffd \
+            -lmnecppFsd \
+            -lmnecppUtilsd \
 } else {
     LIBS += -lscShared \
             -lscDisp \
             -lscMeas \
-	    -lmnecppDisp \
-	    -lmnecppFwd \
-	    -lmnecppMne \
-	    -lmnecppFiff \
-	    -lmnecppFs \
-	    -lmnecppUtils \
+            -lmnecppDisp \
+            -lmnecppFwd \
+            -lmnecppMne \
+            -lmnecppFiff \
+            -lmnecppFs \
+            -lmnecppUtils \
 }
 
 SOURCES += \
         rtfwd.cpp \
-	FormFiles/rtfwdsetupwidget.cpp \
+	    FormFiles/rtfwdsetupwidget.cpp \
 
 HEADERS += \
         rtfwd.h\
-	rtfwd_global.h \
-	FormFiles/rtfwdsetupwidget.h \
+        rtfwd_global.h \
+        FormFiles/rtfwdsetupwidget.h \
 
 FORMS += \
         FormFiles/rtfwdsetupwidget.ui \
@@ -98,14 +97,7 @@ INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
 
 OTHER_FILES += rtfwd.json
 
-# Put generated form headers into the origin --> cause other src is pointing at them
-UI_DIR = $$PWD
-
-# suppress visibility warnings
-unix: QMAKE_CXXFLAGS += -Wno-attributes
-
 unix:!macx {
-    # Unix
     QMAKE_RPATHDIR += $ORIGIN/../../lib
 }
 

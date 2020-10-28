@@ -37,20 +37,18 @@ include(../../../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-CONFIG += skip_target_version_ext
+QT += widgets 3dextras network
 
-CONFIG += plugin
+CONFIG += skip_target_version_ext plugin
 
 DEFINES += BABYMEG_PLUGIN
 
-QT += widgets 3dextras network
+DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
 
 TARGET = babymeg
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
-
-DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
 
 contains(MNECPP_CONFIG, static) {
     CONFIG += staticlib
@@ -103,32 +101,16 @@ FORMS += \
     FormFiles/babymegsetup.ui \
     FormFiles/babymegsquidcontroldgl.ui \
 
-RESOURCE_FILES +=\
-    $${ROOT_DIR}/resources/mne_scan/plugins/babymeg/both.bad \
-    $${ROOT_DIR}/resources/mne_scan/plugins/babymeg/compensator.fif \
-    $${ROOT_DIR}/resources/mne_scan/plugins/babymeg/header.fif \
-
-# Copy resource files from repository to bin resource folder
-COPY_CMD = $$copyResources($${RESOURCE_FILES})
-QMAKE_POST_LINK += $${COPY_CMD}
-
-INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
-INCLUDEPATH += $${MNE_INCLUDE_DIR}
-INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
-
 RESOURCES += \
     babymeg.qrc
 
 OTHER_FILES += babymeg.json
 
-# Put generated form headers into the origin --> cause other src is pointing at them
-UI_DIR = $${PWD}
-
-# suppress visibility warnings
-unix: QMAKE_CXXFLAGS += -Wno-attributes
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
 
 unix:!macx {
-    # Unix
     QMAKE_RPATHDIR += $ORIGIN/../../lib
 }
 

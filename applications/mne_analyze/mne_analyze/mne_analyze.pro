@@ -42,17 +42,18 @@ TEMPLATE = app
 QT += gui widgets network opengl svg concurrent charts
 qtHaveModule(printsupport): QT += printsupport
 
-contains(MNECPP_CONFIG, noQOpenGLWidget) {
-    DEFINES += NO_QOPENGLWIDGET
-}
+CONFIG += console
+
+DESTDIR = $${MNE_BINARY_DIR}
 
 TARGET = mne_analyze
-
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
-CONFIG += console
+contains(MNECPP_CONFIG, noQOpenGLWidget) {
+    DEFINES += NO_QOPENGLWIDGET
+}
 
 !contains(MNECPP_CONFIG, withAppBundles) {
     CONFIG -= app_bundle
@@ -70,8 +71,6 @@ contains(MNECPP_CONFIG, wasm) {
 
     DEFINES += WASMBUILD
 }
-
-DESTDIR = $${MNE_BINARY_DIR}
 
 contains(MNECPP_CONFIG, static) {
     CONFIG += static
@@ -143,78 +142,27 @@ HEADERS += \
     mainwindow.h \
     analyzecore.h \
 
-FORMS += \
-
-INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
-INCLUDEPATH += $${MNE_INCLUDE_DIR}
-INCLUDEPATH += $${MNE_ANALYZE_INCLUDE_DIR}
-
-unix:!macx {
-    QMAKE_CXXFLAGS += -std=c++0x
-
-    # suppress visibility warnings
-    QMAKE_CXXFLAGS += -Wno-attributes
-}
-macx {
-    QMAKE_CXXFLAGS = -mmacosx-version-min=10.7 -std=gnu0x -stdlib=libc++
-    CONFIG +=c++11
-}
-
 RESOURCES += \
         mne_analyze.qrc \
         $${ROOT_DIR}/resources/general/styles/styles.qrc \
         $${ROOT_DIR}/resources/general/fonts/fonts.qrc
 
-# Icon
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_ANALYZE_INCLUDE_DIR}
+
 win32 {
     RC_FILE = resources/images/appIcons/mne_analyze.rc
 }
-macx {
-    ICON = resources/images/appIcons/mne_analyze.icns
-}
 
-# Put generated form headers into the origin --> cause other src is pointing at them
-UI_DIR = $$PWD/formfiles
-
-# Deploy dependencies
-win32:!contains(MNECPP_CONFIG, static) {
-    EXTRA_ARGS =
-    DEPLOY_CMD = $$winDeployAppArgs($${TARGET},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
-    QMAKE_POST_LINK += $${DEPLOY_CMD}
-}
 unix:!macx {
     QMAKE_RPATHDIR += $ORIGIN/../lib
 }
+
 macx {
     QMAKE_LFLAGS += -Wl,-rpath,../lib
 
-    # Copy Resource and plugins folder to app bundle
-    plugins.path = Contents/MacOS/
-    plugins.files = $${ROOT_DIR}/bin/mne_analyze_plugins
-    QMAKE_BUNDLE_DATA += plugins
-
-    sgrc.path = Contents/MacOS/resources/general/
-    sgrc.files = $${ROOT_DIR}/resources/general/selectionGroups
-    QMAKE_BUNDLE_DATA += sgrc
-
-    loutrc.path = Contents/MacOS/resources/general/
-    loutrc.files = $${ROOT_DIR}/resources/general/2DLayouts
-    QMAKE_BUNDLE_DATA += loutrc
-
-    # If Qt3D plugins/renderers folder exisits, create and copy renderers folder to mne-cpp/bin manually.
-    # macdeployqt does not deploy them. This will be fixed in Qt 5.15.2.
-    exists($$shell_path($$[QT_INSTALL_PLUGINS]/renderers)) {
-        qt3drenderers.path = Contents/PlugIns/
-        qt3drenderers.files = $$[QT_INSTALL_PLUGINS]/renderers
-        QMAKE_BUNDLE_DATA += qt3drenderers
-    }
-
-    !contains(MNECPP_CONFIG, static) {
-        # 3 entries returned in DEPLOY_CMD
-        EXTRA_ARGS =
-        DEPLOY_CMD = $$macDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
-        QMAKE_POST_LINK += $${DEPLOY_CMD}
-    }
+    ICON = resources/images/appIcons/mne_analyze.icns
 }
 
 # Activate FFTW backend in Eigen for non-static builds only

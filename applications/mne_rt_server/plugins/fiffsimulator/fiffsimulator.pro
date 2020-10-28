@@ -38,21 +38,19 @@ include(../../../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-CONFIG += skip_target_version_ext
-
 QT += network
 QT -= gui
 
-CONFIG += plugin
+CONFIG += skip_target_version_ext plugin
 
 DEFINES += MNERTSERVER_FIFFSIMULATOR_PLUGIN
+
+DESTDIR = $${MNE_BINARY_DIR}/mne_rt_server_plugins
 
 TARGET = fiffsimulator
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
-
-DESTDIR = $${MNE_BINARY_DIR}/mne_rt_server_plugins
 
 contains(MNECPP_CONFIG, static) {
     CONFIG += staticlib
@@ -80,26 +78,14 @@ HEADERS += \
         fiffsimulator.h\
         fiffsimulator_global.h \
         fiffproducer.h \
-        ../../mne_rt_server/IConnector.h #IConnector is a Q_OBJECT and the resulting moc file needs to be known -> that's why inclution is important!
+        ../../mne_rt_server/IConnector.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 OTHER_FILES += fiffsimulator.json \
 
-RESOURCE_FILES += $${ROOT_DIR}/resources/mne_rt_server_plugins/FiffSimulation.cfg \
-
-# Copy resource files from repository to bin resource folder
-COPY_CMD = $$copyResources($${RESOURCE_FILES})
-QMAKE_POST_LINK += $${COPY_CMD}
-
-# Put generated form headers into the origin --> cause other src is pointing at them
-UI_DIR = $${PWD}
-
-unix: QMAKE_CXXFLAGS += -Wno-attributes
-
 unix:!macx {
-    # Unix
     QMAKE_RPATHDIR += $ORIGIN/../../lib
 }
 
@@ -122,32 +108,3 @@ contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
                 -lfftw3_threads \
     }
 }
-
-#  The QML_INFRA_FILES and QML_MESHES_FILES are both about QML based
-# applications, so we'll install them into QT_INSTALL_DATA instead of
-# QT_INSTALL_BINS
-# QML_INFRA_FILES is used by our quick3d demos and examples to indicate files
-# that are part of the application and should be installed (e.g. qml files,
-# images, meshes etc).
-# This conditional serves two purposes:
-# 1) Set up a qmake extra compiler to copy relevant QML files at build time
-#    to allow for a normal "change, make, test" developement cycle
-# 2) Set up appropriate install paths on the same files to use "make install"
-#    for building packages
-#!isEmpty(QML_INFRA_FILES) {
-
-#    # rules to copy files from the *base level* of $$PWD/qml into the right place
-#    copyqmlinfra_install.files = $$QML_INFRA_FILES
-#    copyqmlinfra_install.path = $$target.path/$$resource_dir/qml
-#    INSTALLS += copyqmlinfra_install
-
-#    # put all our demos/examples and supporting files into $BUILD_DIR/bin
-#    target_dir = $$DESTDIR/$$resource_dir/qml
-#    # create extra qmake compiler to copy files across during build step
-#    copyqmlinfra.input = QML_INFRA_FILES
-#    copyqmlinfra.output = $$target_dir/${QMAKE_FILE_IN_BASE}${QMAKE_FILE_EXT}
-#    copyqmlinfra.commands = $$QMAKE_COPY ${QMAKE_FILE_IN} ${QMAKE_FILE_OUT}
-#    copyqmlinfra.CONFIG += no_link no_clean
-#    copyqmlinfra.variable_out = POST_TARGETDEPS
-#    QMAKE_EXTRA_COMPILERS += copyqmlinfra
-#}

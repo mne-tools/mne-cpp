@@ -44,13 +44,13 @@ QT += widgets 3dcore 3drender 3dinput 3dextras charts concurrent opengl
 
 DEFINES += DISP3D_LIBRARY
 
+DESTDIR = $${MNE_LIBRARY_DIR}
+
 TARGET = Disp3D
 TARGET = $$join(TARGET,,mnecpp,)
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
-
-DESTDIR = $${MNE_LIBRARY_DIR}
 
 contains(MNECPP_CONFIG, static) {
     CONFIG += staticlib
@@ -193,21 +193,6 @@ FORMS += \
 
 RESOURCES += $$PWD/disp3d.qrc \
 
-RESOURCE_FILES +=\
-    $${ROOT_DIR}/resources/general/sensorSurfaces/306m.fif \
-    $${ROOT_DIR}/resources/general/sensorSurfaces/306m_rt.fif \
-    $${ROOT_DIR}/resources/general/sensorSurfaces/BabyMEG.fif \
-    $${ROOT_DIR}/resources/general/sensorSurfaces/BabySQUID.fif \
-    $${ROOT_DIR}/resources/general/sensorSurfaces/BabySQUID.fif \
-    $${ROOT_DIR}/resources/general/hpiAlignment/fsaverage-fiducials.fif \
-    $${ROOT_DIR}/resources/general/hpiAlignment/fsaverage-head.fif \
-    $${ROOT_DIR}/resources/general/hpiAlignment/fsaverage-inner_skull-bem.fif \
-    $${ROOT_DIR}/resources/general/hpiAlignment/fsaverage-trans.fif \
-
-# Copy resource files from repository to bin resource folder
-COPY_CMD = $$copyResources($${RESOURCE_FILES})
-QMAKE_POST_LINK += $${COPY_CMD}
-
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
@@ -223,11 +208,6 @@ contains(MNECPP_CONFIG, withCodeCov) {
 }
 
 win32:!contains(MNECPP_CONFIG, static) {
-    # Deploy/Copy library to bin folder manually (windeployqt only takes care of qt and system libraries)
-    EXTRA_ARGS =
-    DEPLOY_CMD = $$winDeployLibArgs($${TARGET},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
-    QMAKE_POST_LINK += $${DEPLOY_CMD}
-
     # If Qt3D plugins/renderers folder exisits, create and copy renderers folder to mne-cpp/bin manually.
     # windeployqt does not deploy them. This will be fixed in Qt 5.15.1.
     exists($$shell_path($$[QT_INSTALL_PLUGINS]/renderers)) {
@@ -238,7 +218,6 @@ win32:!contains(MNECPP_CONFIG, static) {
 }
 
 macx {
-    # Change install name of the library so we can use the @rpath when linking executables against it
     QMAKE_LFLAGS_SONAME = -Wl,-install_name,@rpath/
 }
 

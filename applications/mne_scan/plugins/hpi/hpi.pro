@@ -37,14 +37,13 @@ include(../../../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-CONFIG += skip_target_version_ext
-
-CONFIG += plugin
-CONFIG += c++11
-
-DEFINES += HPI_PLUGIN
+DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
 
 QT += core widgets svg 3dcore
+
+CONFIG += skip_target_version_ext plugin
+
+DEFINES += HPI_PLUGIN
 
 TARGET = hpi
 CONFIG(debug, debug|release) {
@@ -57,8 +56,6 @@ contains(MNECPP_CONFIG, static) {
 } else {
     CONFIG += shared
 }
-
-DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
@@ -101,29 +98,16 @@ HEADERS += \
 FORMS += \
         FormFiles/hpisetup.ui \
 
-RESOURCE_FILES +=\
-
-# Copy resource files from repository to bin resource folder
-COPY_CMD = $$copyResources($${RESOURCE_FILES})
-QMAKE_POST_LINK += $${COPY_CMD}
-
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
 
 OTHER_FILES += hpi.json
 
-# Put generated form headers into the origin --> cause other src is pointing at them
-UI_DIR = $$PWD
-
-# suppress visibility warnings
-unix: QMAKE_CXXFLAGS += -Wno-attributes
-
 RESOURCES += \
     hpi.qrc
 
 unix:!macx {
-    # Unix
     QMAKE_RPATHDIR += $ORIGIN/../../lib
 }
 

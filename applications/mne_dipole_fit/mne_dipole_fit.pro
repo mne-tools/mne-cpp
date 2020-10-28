@@ -41,7 +41,7 @@ TEMPLATE = app
 
 QT += widgets 3dextras network charts opengl
 
-CONFIG   += console
+CONFIG += console
 
 !contains(MNECPP_CONFIG, withAppBundles) {
     CONFIG -= app_bundle
@@ -53,7 +53,6 @@ contains(MNECPP_CONFIG, static) {
 }
 
 TARGET = mne_dipole_fit
-
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -93,23 +92,11 @@ HEADERS += \
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
-# Deploy dependencies
-win32:!contains(MNECPP_CONFIG, static) {
-    EXTRA_ARGS =
-    DEPLOY_CMD = $$winDeployAppArgs($${TARGET},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
-    QMAKE_POST_LINK += $${DEPLOY_CMD}
-}
 unix:!macx {
     QMAKE_RPATHDIR += $ORIGIN/../lib
 }
-macx {
-    !contains(MNECPP_CONFIG, static) {
-        EXTRA_ARGS =
-        # 3 entries returned in DEPLOY_CMD
-        DEPLOY_CMD = $$macDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
-        QMAKE_POST_LINK += $${DEPLOY_CMD}
-    }
 
+macx {
     QMAKE_LFLAGS += -Wl,-rpath,../lib
 }
 

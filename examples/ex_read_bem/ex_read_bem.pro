@@ -44,13 +44,12 @@ QT -= gui
 CONFIG   += console
 CONFIG   -= app_bundle
 
-TARGET = ex_read_bem
+DESTDIR =  $${MNE_BINARY_DIR}
 
+TARGET = ex_read_bem
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
-
-DESTDIR =  $${MNE_BINARY_DIR}
 
 contains(MNECPP_CONFIG, static) {
     CONFIG += static
@@ -73,25 +72,16 @@ CONFIG(debug, debug|release) {
 SOURCES += \
         main.cpp \
 
-HEADERS += \
-
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
-# Deploy dependencies
-win32:!contains(MNECPP_CONFIG, static) {
-    EXTRA_ARGS =
-    DEPLOY_CMD = $$winDeployAppArgs($${TARGET},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
-    QMAKE_POST_LINK += $${DEPLOY_CMD}
-}
 unix:!macx {
-    # Unix
     QMAKE_RPATHDIR += $ORIGIN/../lib
 }
+
 macx {
     QMAKE_LFLAGS += -Wl,-rpath,../lib
 }
-
 
 # Activate FFTW backend in Eigen for non-static builds only
 contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {

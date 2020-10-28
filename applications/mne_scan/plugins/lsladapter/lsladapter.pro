@@ -37,13 +37,13 @@ include(../../../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-CONFIG += skip_target_version_ext
+QT += core widgets network concurrent
 
-CONFIG += plugin
+CONFIG += skip_target_version_ext plugin
 
 DEFINES += LSLADAPTER_PLUGIN
 
-QT += core widgets network concurrent
+DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
 
 TARGET = lsladapter
 CONFIG(debug, debug|release) {
@@ -56,8 +56,6 @@ contains(MNECPP_CONFIG, static) {
 } else {
     CONFIG += shared
 }
-
-DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
@@ -107,19 +105,9 @@ INCLUDEPATH += $$PWD/liblsl/build/install/include
 
 OTHER_FILES += lsladapter.json
 
-# Put generated form headers into the origin --> cause other src is pointing at them
-UI_DIR = $${PWD}
-
-# suppress visibility warnings
-unix: QMAKE_CXXFLAGS += -Wno-attributes
-
 unix:!macx {
-    # Unix
     QMAKE_RPATHDIR += $ORIGIN/../../lib
 }
-
-DISTFILES += \
-    lsladapter.json
 
 # Activate FFTW backend in Eigen for non-static builds only
 contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {

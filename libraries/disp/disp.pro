@@ -46,6 +46,8 @@ qtHaveModule(charts): QT += charts
 
 DEFINES += DISP_LIBRARY
 
+DESTDIR = $${MNE_LIBRARY_DIR}
+
 TARGET = Disp
 TARGET = $$join(TARGET,,mnecpp,)
 CONFIG(debug, debug|release) {
@@ -59,8 +61,6 @@ contains(MNECPP_CONFIG, wasm) {
 contains(MNECPP_CONFIG, noQOpenGLWidget) {
     DEFINES += NO_QOPENGLWIDGET
 }
-
-DESTDIR = $${MNE_LIBRARY_DIR}
 
 contains(MNECPP_CONFIG, static) {
     CONFIG += staticlib
@@ -237,32 +237,6 @@ FORMS += \
     viewers/formfiles/applytoview.ui \
     viewers/formfiles/bidsview.ui \
 
-RESOURCE_FILES +=\
-    $${ROOT_DIR}/resources/general/default_filters/BP_1Hz_40Hz_Fs1kHz.txt \
-    $${ROOT_DIR}/resources/general/default_filters/BP_1Hz_70Hz_Fs1kHz.txt \
-    $${ROOT_DIR}/resources/general/default_filters/filter_default_template.txt \
-    $${ROOT_DIR}/resources/general/default_filters/NOTCH_50Hz_Fs1kHz.txt \
-    $${ROOT_DIR}/resources/general/default_filters/NOTCH_60Hz_Fs1kHz.txt \
-    $${ROOT_DIR}/resources/general/2DLayouts/babymeg-mag-inner-layer.lout \
-    $${ROOT_DIR}/resources/general/2DLayouts/babymeg-mag-outer-layer.lout \
-    $${ROOT_DIR}/resources/general/2DLayouts/babymeg-mag-ref.lout \
-    $${ROOT_DIR}/resources/general/2DLayouts/CTF-275.lout \
-    $${ROOT_DIR}/resources/general/2DLayouts/magnesWH3600.lout \
-    $${ROOT_DIR}/resources/general/2DLayouts/standard_waveguard64_duke.lout \
-    $${ROOT_DIR}/resources/general/2DLayouts/Vectorview-all.lout \
-    $${ROOT_DIR}/resources/general/2DLayouts/Vectorview-grad.lout \
-    $${ROOT_DIR}/resources/general/2DLayouts/Vectorview-mag.lout \
-    $${ROOT_DIR}/resources/general/selectionGroups/mne_browse_raw.sel \
-    $${ROOT_DIR}/resources/general/selectionGroups/mne_browse_raw_babyMEG.sel \
-    $${ROOT_DIR}/resources/general/selectionGroups/mne_browse_raw_CTF_275.sel \
-    $${ROOT_DIR}/resources/general/selectionGroups/mne_browse_raw_Magnes_3600WH.sel \
-    $${ROOT_DIR}/resources/general/selectionGroups/mne_browse_raw_vv.sel \
-    $${ROOT_DIR}/resources/general/selectionGroups/mne_browse_raw_vv_new.sel \
-
-# Copy resource files from repository to bin resource folder
-COPY_CMD = $$copyResources($${RESOURCE_FILES})
-QMAKE_POST_LINK += $${COPY_CMD}
-
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
@@ -277,15 +251,7 @@ contains(MNECPP_CONFIG, withCodeCov) {
     QMAKE_LFLAGS += --coverage
 }
 
-win32:!contains(MNECPP_CONFIG, static) {
-    # Deploy/Copy library to bin folder manually (windeployqt only takes care of qt and system libraries)
-    EXTRA_ARGS =
-    DEPLOY_CMD = $$winDeployLibArgs($${TARGET},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
-    QMAKE_POST_LINK += $${DEPLOY_CMD}
-}
-
 macx {
-    # Change install name of the library so we can use the @rpath when linking executables against it
     QMAKE_LFLAGS_SONAME = -Wl,-install_name,@rpath/
 }
 
