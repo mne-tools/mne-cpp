@@ -164,8 +164,8 @@ INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
 
 RESOURCES += \
     mne_scan.qrc \
-    $${ROOT_DIR}/resources/general/styles/styles.qrc \
-    $${ROOT_DIR}/resources/general/fonts/fonts.qrc
+    $${ROOT_DIR}/bin/resources/general/styles/styles.qrc \
+    $${ROOT_DIR}/bin/resources/general/fonts/fonts.qrc
 
 win32 {
     RC_FILE = images/appIcons/mne_scan.rc

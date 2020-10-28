@@ -144,8 +144,8 @@ HEADERS += \
 
 RESOURCES += \
         mne_analyze.qrc \
-        $${ROOT_DIR}/resources/general/styles/styles.qrc \
-        $${ROOT_DIR}/resources/general/fonts/fonts.qrc
+        $${ROOT_DIR}/bin/resources/general/styles/styles.qrc \
+        $${ROOT_DIR}/bin/resources/general/fonts/fonts.qrc
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
