@@ -123,20 +123,28 @@ jobs:
     - name: Package binaries (MacOS)
       if: matrix.os == 'macos-latest'
       run: |
+        # Solve for dependencies for .app bundles
+        macdeployqt ./bin/mne_scan.app
+        cp -a bin/mne_scan_plugins/. bin/mne_scan.app/Contents/MacOS/mne_scan_plugins
+        cp -a bin/resources/. bin/mne_scan.app/Contents/MacOS/resources
+        cp -a lib/. bin/mne_scan.app/Contents/Frameworks
+        cp -a applications/mne_scan/plugins/brainflowboard/brainflow/installed/lib/. bin/mne_scan.app/Contents/Frameworks
+        cp -a applications/mne_scan/plugins/lsladapter/liblsl/build/install/lib/. bin/mne_scan.app/Contents/Frameworks
+        macdeployqt ./bin/mne_analyze.app
+        cp -a bin/mne_analyze_plugins/. bin/mne_analyze.app/Contents/MacOS/mne_analyze_plugins
+        cp -a bin/resources/. bin/mne_analyze.app/Contents/MacOS/resources
+        cp -a lib/. bin/mne_analyze.app/Contents/Frameworks
         # Delete folders which we do not want to ship
-        rm -r bin/mne_rt_server_plugins
         rm -r bin/mne-cpp-test-data
         rm -r bin/mne_scan_plugins
         rm -r bin/mne_analyze_plugins
-        # Copy additional brainflow libs
-        cp -a applications/mne_scan/plugins/brainflowboard/brainflow/installed/lib/. bin/mne_scan.app/Contents/Frameworks
-        # Copy additional LSL libs
-        cp -a applications/mne_scan/plugins/lsladapter/liblsl/build/install/lib/. bin/mne_scan.app/Contents/Frameworks
         # Creating archive of all macos deployed applications
         tar cfvz mne-cpp-macos-dynamic-x86_64.tar.gz bin/. lib/.
     - name: Package binaries (Windows)
       if: matrix.os == 'windows-2016'
       run: |
+        # Solve for dependencies only mne_scan since it links all needed qt and mne-cpp libs
+        windeployqt .\bin\mne_scan.exe
         # Delete folders which we do not want to ship
         Remove-Item 'bin/mne-cpp-test-data' -Recurse
         # Copy additional brainflow libs
@@ -267,26 +275,37 @@ jobs:
     - name: Package binaries (MacOS)
       if: matrix.os == 'macos-latest'
       run: |
+        # Solve for dependencies for .app bundles
+        macdeployqt ./bin/mne_scan.app
+        cp -a bin/mne_scan_plugins/. bin/mne_scan.app/Contents/MacOS/mne_scan_plugins
+        cp -a bin/resources/. bin/mne_scan.app/Contents/MacOS/resources
+        cp -a lib/. bin/mne_scan.app/Contents/Frameworks
+        cp -a $Qt5_DIR/5.15.1/clang_64/plugins/renderers/. bin/mne_scan.app/Contents/PlugIns/renderers
+        cp -a applications/mne_scan/plugins/brainflowboard/brainflow/installed/lib/. bin/mne_scan.app/Contents/Frameworks
+        cp -a applications/mne_scan/plugins/lsladapter/liblsl/build/install/lib/. bin/mne_scan.app/Contents/Frameworks
+        macdeployqt ./bin/mne_analyze.app
+        cp -a bin/mne_analyze_plugins/. bin/mne_analyze.app/Contents/MacOS/mne_analyze_plugins
+        cp -a bin/resources/. bin/mne_analyze.app/Contents/MacOS/resources
+        cp -a lib/. bin/mne_analyze.app/Contents/Frameworks
+        cp -a $Qt5_DIR/5.15.1/clang_64/plugins/renderers/. bin/mne_scan.app/Contents/PlugIns/renderers
         # Delete folders which we do not want to ship
-        rm -r bin/mne_rt_server_plugins
         rm -r bin/mne-cpp-test-data
         rm -r bin/mne_scan_plugins
         rm -r bin/mne_analyze_plugins
-        # Copy additional brainflow libs
-        cp -a applications/mne_scan/plugins/brainflowboard/brainflow/installed/lib/. bin/mne_scan.app/Contents/Frameworks
-        # Copy additional LSL libs
-        cp -a applications/mne_scan/plugins/lsladapter/liblsl/build/install/lib/. bin/mne_scan.app/Contents/Frameworks
         # Creating archive of all macos deployed applications
         tar cfvz mne-cpp-macos-dynamic-x86_64.tar.gz bin/. lib/.
     - name: Package binaries (Windows)
-      if: matrix.os == 'windows-2019'
+      if: matrix.os == 'windows-2016'
       run: |
+        # Solve for dependencies only mne_scan since it links all needed qt and mne-cpp libs
+        windeployqt .\bin\mne_scan.exe
+        mkdir .\bin\renderers
+        xcopy $Env:Qt5_DIR\5.15.1\msvc2019_64\plugins\renderers\* .\bin\renderers /s /i
+        xcopy .\applications\mne_scan\plugins\brainflowboard\brainflow\installed\lib\* .\bin\ /s /i
+        xcopy .\applications\mne_scan\plugins\lsladapter\liblsl\build\install\bin\lsl.dll .\bin\ /i
         # Delete folders which we do not want to ship
         Remove-Item 'bin/mne-cpp-test-data' -Recurse
-        # Copy additional brainflow libs
-        xcopy .\applications\mne_scan\plugins\brainflowboard\brainflow\installed\lib\* .\bin\ /s /i
-        # Copy additional LSL libs
-        xcopy .\applications\mne_scan\plugins\lsladapter\liblsl\build\install\bin\lsl.dll .\bin\ /i
+        # Creating archive of all win deployed applications
         7z a mne-cpp-windows-dynamic-x86_64.zip ./bin
 
   QtStatic:

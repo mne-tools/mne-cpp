@@ -44,12 +44,9 @@ QT += network concurrent
 QT -= gui
 
 CONFIG += console
+CONFIG -= app_bundle
 
 DESTDIR = $${MNE_BINARY_DIR}
-
-!contains(MNECPP_CONFIG, withAppBundles) {
-    CONFIG -= app_bundle
-}
 
 TARGET = mne_rt_server
 CONFIG(debug, debug|release) {
