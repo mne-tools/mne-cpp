@@ -51,6 +51,11 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
+contains(MNECPP_CONFIG, static) {
+    CONFIG += static
+    DEFINES += STATICBUILD
+}
+
 contains(MNECPP_CONFIG, wasm) {
 #    QMAKE_LFLAGS += -s ERROR_ON_UNDEFINED_SYMBOLS=1
 #    QMAKE_LFLAGS += -s ASSERTIONS=1
@@ -75,14 +80,15 @@ CONFIG(debug, debug|release) {
             -lmnecppUtils \
 }
 
-SOURCES += main.cpp \
+SOURCES += \
+    main.cpp \
     apphandler.cpp \
     fiffanonymizer.cpp \
     mainwindow.cpp \
     settingscontrollercl.cpp \
     settingscontrollergui.cpp
 
-HEADERS  += \
+HEADERS += \
     apphandler.h \
     fiffanonymizer.h \
     mainwindow.h \
