@@ -188,7 +188,7 @@ QWidget *Averaging::getView()
 QDockWidget* Averaging::getControl()
 {
     QDockWidget* pControl = new QDockWidget(getName());
-    QWidget* pWidget = new QWidget();
+    QScrollArea* pWidget = new QScrollArea();
 
     m_pLayout = new QVBoxLayout;
     m_pTabView = new QTabWidget();
@@ -221,25 +221,20 @@ QDockWidget* Averaging::getControl()
 
     m_pAveragingSettingsView->setProcessingMode(DISPLIB::AbstractView::ProcessingMode::Offline);
     m_pAveragingSettingsView->setSizePolicy(QSizePolicy::Expanding,
-                                            QSizePolicy::Minimum);
+                                            QSizePolicy::Fixed);
 
-    QGroupBox* pGBox = new QGroupBox();
-    QVBoxLayout* pVBLayout = new QVBoxLayout();
-
-    pGBox->setSizePolicy(QSizePolicy::Expanding,
-                         QSizePolicy::Minimum);
     pWidget->setSizePolicy(QSizePolicy::Expanding,
-                           QSizePolicy::Minimum);
+                           QSizePolicy::Preferred);
+    m_pTabView->setSizePolicy(QSizePolicy::Expanding,
+                              QSizePolicy::Preferred);
 
-    pGBox->setLayout(pVBLayout);
+    m_pTabView->addTab(m_pAveragingSettingsView, "Parameters");
 
-    m_pLayout->addWidget(m_pAveragingSettingsView);
-
+    m_pLayout->addWidget(m_pTabView);
+    m_pLayout->addStretch();
     pWidget->setLayout(m_pLayout);
 
-    m_pTabView->addTab(pWidget, "Parameters");
-
-    pControl->setWidget(m_pTabView);
+    pControl->setWidget(pWidget);
     pControl->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     pControl->setObjectName("Averaging");
     pControl->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,
