@@ -79,4 +79,4 @@ make -j8 # On Linux and MacOS
 
 ## Test the Build
 
-In order to run the examples you must download the MNE-Sample-Data-Set from [here](https://osf.io/86qa2/download){:target="_blank" rel="noopener"} and extract the files to `mne-cpp/bin/MNE-sample-data`. Once finished you can try to run one of the examples, e.g., ex_disp3D. If the build was successfull the example should start and display a window including a 3D brain as well as a source localization result.
+You might have to add the folders inclduing the Qt libraries to your OS's corresponding environment variables. In order to run the examples you must download the MNE-Sample-Data-Set from [here](https://osf.io/86qa2/download){:target="_blank" rel="noopener"} and extract the files to `mne-cpp/bin/MNE-sample-data`. Once finished you can try to run one of the examples, e.g., ex_disp3D. If the build was successfull the example should start and display a window including a 3D brain as well as a source localization result.
