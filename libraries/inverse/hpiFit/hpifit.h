@@ -148,7 +148,7 @@ public:
      * @param[in] bDoFastFit       Do the fast fit by fitting to the more basic Model
      */
     explicit HPIFit(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
-                    bool bDoFastFit = true);
+                    bool bDoFastFit = false);
 
     //=========================================================================================================
     /**

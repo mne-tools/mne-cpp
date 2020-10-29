@@ -113,7 +113,7 @@ BabyMEG::~BabyMEG()
 
     if(m_pMyClient) {
         if(m_pMyClient->isConnected()) {
-            m_pMyClient->DisConnectBabyMEG();
+            m_pMyClient->DisconnectBabyMEG();
         }
     }
 }
@@ -151,6 +151,7 @@ void BabyMEG::init()
 
     //BabyMEG Inits
     m_pInfo = QSharedPointer<BabyMEGInfo>(new BabyMEGInfo());
+
     connect(m_pInfo.data(), &BabyMEGInfo::fiffInfoAvailable,
             this, &BabyMEG::setFiffInfo);
     connect(m_pInfo.data(), &BabyMEGInfo::SendDataPackage,
@@ -205,11 +206,13 @@ bool BabyMEG::start()
         return false;
     }
 
-    initConnector();
-
     if(!m_pMyClient->isConnected()) {
-        m_pMyClient->ConnectToBabyMEG();
+        qInfo() << "BabyMEG::start - Not connected to BabyMEG device. Try connecting manually via the Connection tab.";
+
+        return false;
     }
+
+    initConnector();
 
     // Start thread
     QThread::start();
@@ -221,12 +224,8 @@ bool BabyMEG::start()
 
 bool BabyMEG::stop()
 {
-    if(m_pMyClient->isConnected()) {
-        m_pMyClient->DisConnectBabyMEG();
-    }
-
     requestInterruption();
-    wait(500);
+    wait(2000);
 
     // Clear all data in the buffer connected to displays and other plugins
     m_pRTMSABabyMEG->data()->clear();
@@ -253,11 +252,17 @@ QString BabyMEG::getName() const
 
 QWidget* BabyMEG::setupWidget()
 {
-    if(!m_pMyClient->isConnected()) {
-        m_pMyClient->ConnectToBabyMEG();
+    BabyMEGSetupWidget* widget = new BabyMEGSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
+
+    if(m_pFiffInfo) {
+        widget->setSamplingFrequency();
     }
 
-    BabyMEGSetupWidget* widget = new BabyMEGSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
+    if(m_pMyClient->isConnected()) {
+        widget->setConnectionStatus(true);
+    } else {
+        widget->setConnectionStatus(false);
+    }
 
     return widget;
 }
