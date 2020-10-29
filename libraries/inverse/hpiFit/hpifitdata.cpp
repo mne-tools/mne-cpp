@@ -83,7 +83,7 @@ void HPIFitData::doDipfitConcurrent()
     SensorSet currentSensors = this->sensors;
 
     int iDisplay = 0;
-    int iMaxiter = 200;
+    int iMaxiter = 500;
     int iSimplexNumitr = 0;
 
     this->coilPos = fminsearch(vecCurrentCoil,
@@ -234,9 +234,9 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& matPos,
 
     DipFitError tempdip, fxr, fxe, fxc, fxcc;
 
-    tolx = tolf = 1e-5;
+    //tolx = tolf = 1e-6;
     // Seok
-    // tolx = tolf = 1e-9;
+    tolx = tolf = 1e-9;
 
     switch(iDisplay) {
         case 0:
