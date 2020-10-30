@@ -1,7 +1,7 @@
 ---
 title: Dynamic Linking
 parent: Build from Source
-grand_parent: Install
+grand_parent: Download
 nav_order: 1
 ---
 # Build from Source (Dynamic Linking)
@@ -18,7 +18,7 @@ Make sure you have one of the following compilers installed:
 
 ### Download the Qt installer
 
-Qt is the only dependency you will need to install. Go to the Qt download section and download the [Qt installer](https://www.qt.io/download-qt-installer?hsCtaTracking=9f6a2170-a938-42df-a8e2-a9f0b1d6cdce%7C6cb0de4f-9bb5-4778-ab02-bfb62735f3e5){:target="_blank" rel="noopener"}. 
+Qt is the only dependency you will need to install. Go to the Qt download section and download the [Qt installer](https://www.qt.io/download-qt-installer?hsCtaTracking=9f6a2170-a938-42df-a8e2-a9f0b1d6cdce%7C6cb0de4f-9bb5-4778-ab02-bfb62735f3e5){:target="_blank" rel="noopener"}.
 
 ### Install Qt
 
@@ -31,7 +31,7 @@ After the installation is finished make sure to add the Qt bin folder (e.g. `<Qt
 
 ## Get the Source Code
 
-Fork [MNE-CPP's main repository](https://github.com/mne-tools/mne-cpp){:target="_blank" rel="noopener"} to your own GitHub account. For a detailed guide on how to fork a repository, we recommend checking out the [guide on the official GitHub website](https://help.github.com/en/github/getting-started-with-github/fork-a-repo){:target="_blank" rel="noopener"}. 
+Fork [MNE-CPP's main repository](https://github.com/mne-tools/mne-cpp){:target="_blank" rel="noopener"} to your own GitHub account. For a detailed guide on how to fork a repository, we recommend checking out the [guide on the official GitHub website](https://help.github.com/en/github/getting-started-with-github/fork-a-repo){:target="_blank" rel="noopener"}.
 
 Clone the fork to your local machine:
 

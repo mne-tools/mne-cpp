@@ -1,7 +1,7 @@
 ---
 title: Static Linking
 parent: Build from Source
-grand_parent: Install
+grand_parent: Download
 nav_order: 2
 ---
 # Build from Source (Static Linking)
@@ -102,7 +102,7 @@ cd qt5_shadow
 ```
 
 Setup the visual studio compiler by starting the `VS2019 x64 Native Tools Command Prompt` or by typing (assuming you are using MSVC 2017):
-    
+
 ```
 cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
 Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
@@ -113,7 +113,7 @@ Call configure from the new working directory in order to setup a shadow build.
 ```
 ../qt5/configure.bat -release -static -no-pch -optimize-size -opengl desktop -platform win32-msvc -skip webengine -nomake tools -nomake tests -nomake examples -opensource -confirm-license -prefix "..\qt5_wasm_binaries"
 ```
-    
+
 Build Qt and install to target (prefix) location afterwards. You can change the `-j8` flag to the number of cores you want to use during compilation:
 
 ```

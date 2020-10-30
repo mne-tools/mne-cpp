@@ -1,5 +1,5 @@
 ---
-title: Install
+title: Download
 has_children: true
 nav_order: 3
 ---
