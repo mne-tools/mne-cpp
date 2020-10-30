@@ -1,7 +1,7 @@
 ---
 title: Publications
 parent: Home
-nav_order: 5
+nav_order: 6
 ---
 # Publications
 
