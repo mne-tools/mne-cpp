@@ -153,7 +153,7 @@ jobs:
     #     make install -j4
     - name: Configure and compile MNE-CPP
       run: |
-        ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples MNECPP_CONFIG+=static MNECPP_CONFIG+=withAppBundles
+        ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples MNECPP_CONFIG+=static
         make -j4
         make install -j4
     - name: Package binaries
@@ -389,7 +389,6 @@ jobs:
         qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow MNECPP_CONFIG+=withLsl MNECPP_CONFIG+=withAppBundles
         make -j4
     - name: Package binaries (MacOS)
-      if: matrix.os == 'macos-latest'
       run: |
         # Solve for dependencies for .app bundles
         macdeployqt ./bin/mne_scan.app -libpath=./lib
@@ -475,7 +474,6 @@ jobs:
         qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow MNECPP_CONFIG+=withLsl
         jom -j4
     - name: Package binaries (Windows)
-      if: matrix.os == 'windows-2016'
       run: |
         # Solve for dependencies only mne_scan.exe and mnecppDisp3D.dll since it links all needed qt and mne-cpp libs
         windeployqt .\bin\mne_scan.exe
