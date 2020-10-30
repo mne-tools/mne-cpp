@@ -1,7 +1,7 @@
 ---
 title: Changelog
 parent: Releases
-grand_parent: Install
+grand_parent: Download
 nav_order: 1
 ---
 

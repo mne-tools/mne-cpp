@@ -1,6 +1,6 @@
 ---
 title: Releases
-parent: Install
+parent: Download
 has_children: true
 nav_order: 1
 ---
