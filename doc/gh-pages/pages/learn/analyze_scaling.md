@@ -20,3 +20,7 @@ Use the Controls tab to select view settings.
 ![](../../images/analyze/mne_an_scaling2.png)
 
 Use the checkboxes to control which views to control with the sliders.
+
+![](../../images/analyze/mne_an_scaling2.png)
+
+Use the controls in the 3D tab to control the parameters of the 3D View.
