@@ -1,6 +1,7 @@
 ---
 title: Contributing to the Website
 parent: Contribute
+grand_parent: Develop
 nav_order: 2
 ---
 # Contributing to the Website
@@ -29,9 +30,6 @@ Create a new branch named `docu` and do your changes locally in that branch. Whe
 
 If everything was setup correctly, the push should trigger a GitHub action to build your changes to the `gh-pages` branch (the one you created in the previous step). Once the GitHub action finishes, you will be able to take a look at your changes by visiting `http://$username.github.io/mne-cpp/`. Please note that it can take some time or multiple refreshes for the changes to show.
 
-If you decide to use a different branch name, instead of `docu`, to make changes to this website,  make sure to change the branch parameter in the `docutest.yml` file accordingly (this file is stored in `.github/workflows/docutest.yml`). 
+If you decide to use a different branch name, instead of `docu`, to make changes to this website,  make sure to change the branch parameter in the `docutest.yml` file accordingly (this file is stored in `.github/workflows/docutest.yml`).
 
 The website is maintained via markdown language in `.md` files, which can be found in `mne-cpp/doc/gh-pages`.
-
-
-

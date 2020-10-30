@@ -1,6 +1,7 @@
 ---
 title: Coding Conventions
 parent: Contribute
+grand_parent: Develop
 nav_order: 3
 ---
 # Coding Conventions
@@ -34,9 +35,9 @@ In general, try to make your code match the one around it, e.g., indentations, u
 /**
  * Constructs a FileLoader object.
  *
- * @param[in]  iOpenMode            The open mode. 0=ReadWrite, 1=WriteOnly, 1=ReadOnly 
+ * @param[in]  iOpenMode            The open mode. 0=ReadWrite, 1=WriteOnly, 1=ReadOnly
  * @param[in]  bSkipEmptyLines      Whether to skip empty lines.
- * @param[in]  sCommentIdentifier   String to identify comments. Default is empty which 
+ * @param[in]  sCommentIdentifier   String to identify comments. Default is empty which
  *                                  results in comments being read as normal lines.
  * @since 0.1.1
  */
@@ -80,7 +81,7 @@ void FileLoader::loadTxtFile(const QString& sPath)
 
 ## Commit Policy
 
-A good commit should follow: 
+A good commit should follow:
 
  * If you add new functions/classes, ensure everything is documented properly.
  * All code should follow the Coding Conventions & Style.
@@ -100,7 +101,7 @@ For better readability, we introduced conventions for PR naming and commit messa
 
 The following examples show how such commit messages could look like:
 ```
-FIX: fix namespace error 
+FIX: fix namespace error
 ENH: add cHPI in Neuromag Plugin
 MAINT: improved GitHubAction workflow for Linux deployment
 DOC: add documentation for new amplifier in MNE Scan
