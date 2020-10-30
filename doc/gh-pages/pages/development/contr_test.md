@@ -1,6 +1,7 @@
 ---
 title: Writing a Unit Test
 parent: Contribute
+grand_parent: Develop
 nav_order: 5
 ---
 # Writing a Unit Test
@@ -17,11 +18,11 @@ As part of the MNE-CPP wizards for QtCreator, we provide a template for a new te
 
 ![](../../images/test_new.png)
 
-After this, a new window should open and allow you to choose from a variety of templates. Under `Projects` choose MNE-CPP and then `MNE-CPP Test`. After you completed all wizard steps you have created a new test project. 
+After this, a new window should open and allow you to choose from a variety of templates. Under `Projects` choose MNE-CPP and then `MNE-CPP Test`. After you completed all wizard steps you have created a new test project.
 
 ## Structuring the Test
 
-Always keep our [Coding Conventions](conv_style.md) in mind. Consider taking a look at already available tests to get started. First, you create a class named after your test: `TestName`. The following code snippet shows an example for a test. The `slots` are defining the functions to execute your function `initTestCase()` and compare the output to reference values, e.g. `compareValue()`. Further, you can declare threshold values as private variables that indicate the difference which should not be exceeded when comapring. An example for a test can be found [here](https://github.com/mne-tools/mne-cpp/blob/master/testframes/test_fiff_rwr/test_fiff_rwr.cpp){:target="_blank" rel="noopener"}.
+Always keep our [Coding Conventions](contr_style.md) in mind. Consider taking a look at already available tests to get started. First, you create a class named after your test: `TestName`. The following code snippet shows an example for a test. The `slots` are defining the functions to execute your function `initTestCase()` and compare the output to reference values, e.g. `compareValue()`. Further, you can declare threshold values as private variables that indicate the difference which should not be exceeded when comapring. An example for a test can be found [here](https://github.com/mne-tools/mne-cpp/blob/master/testframes/test_fiff_rwr/test_fiff_rwr.cpp){:target="_blank" rel="noopener"}.
 
 ```cpp
 class TestFiffRWR: public QObject
@@ -39,21 +40,21 @@ private slots:
 private:
     // some variables and error thresholds
     double dEpsilon;
-    Eigen::MatrixXd mFirstInData; 
+    Eigen::MatrixXd mFirstInData;
     Eigen::MatrixXd mSecondInData;
 };
 ```
 
 ### initTestCase()
 
-Here you execute and declare everything that is necessary for setting up your test. You generate and load all values in a variable that can be compared to later. If you want to load external calculated data in e.g. `.txt` files you can use: 
+Here you execute and declare everything that is necessary for setting up your test. You generate and load all values in a variable that can be compared to later. If you want to load external calculated data in e.g. `.txt` files you can use:
 
 ```cpp
 Eigen::MatrixXd mDataFromFile;
 UTILSLIB::IOUtils::read_eigen_matrix(mDataFromFile, QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/<yourFile>.txt");
 ```
 
-All files you use, have to be added to [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data){:target="_blank" rel="noopener"}. In case you need to add new data open a Pull Request to this repository. The files you use should be as small as possible. If you need a .fif file, have a look at the already existing data first. 
+All files you use, have to be added to [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data){:target="_blank" rel="noopener"}. In case you need to add new data open a Pull Request to this repository. The files you use should be as small as possible. If you need a .fif file, have a look at the already existing data first.
 
 ### compareValue()
 
@@ -84,4 +85,3 @@ Please follow the following naming conventions when naming your test project and
 | --------------- | ------------------- |
 | Project name 	  |`test_something_meaningful`|
 | Class name 	  |`TestSomethingMeaningful`  |
-
