@@ -3,7 +3,7 @@ title: Download
 has_children: true
 nav_order: 3
 ---
-# Install
+# Download
 
 MNE-CPP can be used via the provided [releases](binaries.md) which include pre-built binaries. Using the latest sable release is recommended for users who wish to use MNE-CPP's command line tools and GUIs.
 
