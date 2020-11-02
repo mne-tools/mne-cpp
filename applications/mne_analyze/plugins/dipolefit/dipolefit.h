@@ -50,6 +50,9 @@
 #include <QtCore/QtPlugin>
 #include <QDebug>
 #include <QPointer>
+#include <inverse/dipoleFit/dipole_fit_settings.h>
+#include <inverse/dipoleFit/dipole_fit_data.h>
+#include <inverse/dipoleFit/dipole_fit.h>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -105,7 +108,9 @@ public:
 
 private:
 
-    QPointer<ANSHAREDLIB::Communicator> m_pCommu;
+    QPointer<ANSHAREDLIB::Communicator>         m_pCommu;
+    QPointer<INVERSELIB::DipoleFitSettings>     m_pDipoleSettings;
+
 };
 
 //=============================================================================================================
