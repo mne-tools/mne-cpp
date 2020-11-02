@@ -1,9 +1,9 @@
 //=============================================================================================================
 /**
- * @file     applytoview.h
+ * @file     dipolefitview.cpp
  * @author   Gabriel Motta <gbmotta@mgh.harvard.edu>
  * @since    0.1.5
- * @date     August, 2020
+ * @date     Novemeber, 2020
  *
  * @section  LICENSE
  *
@@ -28,113 +28,68 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Declaration of the ApplyToView Class.
+ * @brief    Definition of the DipoleFitView Class.
  *
  */
-
-
-#ifndef APPLYTOVIEW_H
-#define APPLYTOVIEW_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../disp_global.h"
-#include "abstractview.h"
+#include "dipolefitview.h"
+#include "ui_dipolefitview.h"
 
 //=============================================================================================================
-// QT INCLUDES
+// USED NAMESPACES
 //=============================================================================================================
 
-//=============================================================================================================
-// EIGEN INCLUDES
-//=============================================================================================================
+using namespace DISPLIB;
 
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-namespace Ui {
-    class ApplyToViewWidget;
+DipoleFitView::DipoleFitView(const QString& sSettingsPath,
+                             QWidget *parent,
+                             Qt::WindowFlags)
+{
+
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
-//=============================================================================================================
 
-namespace DISPLIB
+void DipoleFitView::saveSettings()
 {
 
+}
+
 //=============================================================================================================
-class DISPSHARED_EXPORT ApplyToView : public AbstractView
+
+void DipoleFitView::loadSettings()
 {
-public:
-    //=========================================================================================================
-    /**
-     * @brief ApplyToView
-     *
-     * @param [in] sSettingsPath    path for saving view settings
-     * @param [in] parent           parent of widget
-     * @param [in] f                flag to denote window porperties of the widget
-     */
-    ApplyToView(const QString& sSettingsPath = "",
-                QWidget *parent = 0,
-                Qt::WindowFlags f = Qt::Widget);
 
-    //=========================================================================================================
-    ~ApplyToView();
+}
 
-    //=========================================================================================================
-    /**
-     * Saves all important settings of this view via QSettings.
-     */
-    void saveSettings();
+//=============================================================================================================
 
-    //=========================================================================================================
-    /**
-     * Loads and inits all important settings of this view via QSettings.
-     */
-    void loadSettings();
+void DipoleFitView::updateGuiMode(GuiMode mode)
+{
+    switch(mode) {
+        case GuiMode::Clinical:
+            break;
+        default: // default is research mode
+            break;
+    }
+}
 
-    //=========================================================================================================
-    /**
-     * Selects all View Select checkboxes
-     */
-    void selectAll(bool);
+//=============================================================================================================
 
-    //=========================================================================================================
-    /**
-     * Clear all View Select checkboxes
-     */
-    void selectClear(bool);
-
-    QList<QString> getSelectedViews();
-
-protected:
-    //=========================================================================================================
-    /**
-     * Update the views GUI based on the set GuiMode (Clinical=0, Research=1).
-     *
-     * @param mode     The new mode (Clinical=0, Research=1).
-     */
-    void updateGuiMode(GuiMode mode);
-
-    //=========================================================================================================
-    /**
-     * Update the views GUI based on the set ProcessingMode (RealTime=0, Offline=1).
-     *
-     * @param mode     The new mode (RealTime=0, Offline=1).
-     */
-    void updateProcessingMode(ProcessingMode mode);
-
-    QString                     m_sSettingsPath;
-
-    QList<QString>              m_lViewList;
-
-    Ui::ApplyToViewWidget*      m_pUi;
-
-};
-} //NAMESPACE
-
-#endif // APPLYTOVIEW_H
+void DipoleFitView::updateProcessingMode(ProcessingMode mode)
+{
+    switch(mode) {
+        case ProcessingMode::Offline:
+            break;
+        default: // default is realtime mode
+            break;
+    }
+}
