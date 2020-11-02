@@ -99,6 +99,7 @@ SOURCES += \
     viewers/abstractview.cpp \
     viewers/applytoview.cpp \
     viewers/coregsettingsview.cpp \
+    viewers/dipolefitview.cpp \
     viewers/filterdesignview.cpp \
     viewers/averagelayoutview.cpp \
     viewers/fwdsettingsview.cpp \
@@ -156,6 +157,7 @@ HEADERS += \
     viewers/abstractview.h \
     viewers/applytoview.h \
     viewers/coregsettingsview.h \
+    viewers/dipolefitview.h \
     viewers/filterdesignview.h \
     viewers/averagelayoutview.h \
     viewers/fwdsettingsview.h \
@@ -216,6 +218,7 @@ qtHaveModule(charts) {
 }
 
 FORMS += \
+    viewers/formfiles/dipolefitview.ui \
     viewers/formfiles/filterdesignview.ui \
     viewers/formfiles/channelselectionview.ui \
     viewers/formfiles/coregsettingsview.ui \

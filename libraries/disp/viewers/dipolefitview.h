@@ -1,9 +1,9 @@
 //=============================================================================================================
 /**
- * @file     applytoview.h
+ * @file     dipolefitview.h
  * @author   Gabriel Motta <gbmotta@mgh.harvard.edu>
  * @since    0.1.5
- * @date     August, 2020
+ * @date     Novemeber, 2020
  *
  * @section  LICENSE
  *
@@ -28,13 +28,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Declaration of the ApplyToView Class.
+ * @brief    Declaration of the DipoleFitView Class.
  *
  */
 
 
-#ifndef APPLYTOVIEW_H
-#define APPLYTOVIEW_H
+#ifndef DIPOLEFITVIEW_H
+#define DIPOLEFITVIEW_H
 
 //=============================================================================================================
 // INCLUDES
@@ -56,7 +56,7 @@
 //=============================================================================================================
 
 namespace Ui {
-    class ApplyToViewWidget;
+    class DipoleFitViewWidget;
 }
 
 //=============================================================================================================
@@ -67,23 +67,12 @@ namespace DISPLIB
 {
 
 //=============================================================================================================
-class DISPSHARED_EXPORT ApplyToView : public AbstractView
+class DISPSHARED_EXPORT DipoleFitView : public AbstractView
 {
 public:
-    //=========================================================================================================
-    /**
-     * @brief ApplyToView
-     *
-     * @param [in] sSettingsPath    path for saving view settings
-     * @param [in] parent           parent of widget
-     * @param [in] f                flag to denote window porperties of the widget
-     */
-    ApplyToView(const QString& sSettingsPath = "",
-                QWidget *parent = 0,
-                Qt::WindowFlags f = Qt::Widget);
-
-    //=========================================================================================================
-    ~ApplyToView();
+    DipoleFitView(const QString& sSettingsPath = "",
+                  QWidget *parent = 0,
+                  Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**
@@ -96,20 +85,6 @@ public:
      * Loads and inits all important settings of this view via QSettings.
      */
     void loadSettings();
-
-    //=========================================================================================================
-    /**
-     * Selects all View Select checkboxes
-     */
-    void selectAll(bool);
-
-    //=========================================================================================================
-    /**
-     * Clear all View Select checkboxes
-     */
-    void selectClear(bool);
-
-    QList<QString> getSelectedViews();
 
 protected:
     //=========================================================================================================
@@ -127,14 +102,7 @@ protected:
      * @param mode     The new mode (RealTime=0, Offline=1).
      */
     void updateProcessingMode(ProcessingMode mode);
-
-    QString                     m_sSettingsPath;
-
-    QList<QString>              m_lViewList;
-
-    Ui::ApplyToViewWidget*      m_pUi;
-
 };
-} //NAMESPACE
+}//namespace
 
-#endif // APPLYTOVIEW_H
+#endif // DIPOLEFITVIEW_H
