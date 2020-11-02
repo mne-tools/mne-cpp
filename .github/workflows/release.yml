@@ -159,10 +159,7 @@ jobs:
     - name: Package binaries
       run: |
         # Delete folders which we do not want to ship
-        rm -r bin/mne_rt_server_plugins
         rm -r bin/mne-cpp-test-data
-        rm -r bin/mne_scan_plugins
-        rm -r bin/mne_analyze_plugins
         # Creating archive of all macos deployed applications
         tar cfvz mne-cpp-macos-static-x86_64.tar.gz bin/.
     - name: Deploy binaries with stable release on Github
@@ -391,16 +388,18 @@ jobs:
     - name: Package binaries (MacOS)
       run: |
         # Solve for dependencies for .app bundles
-        macdeployqt ./bin/mne_scan.app -libpath=./lib
+        macdeployqt ./bin/mne_scan.app
         cp -a bin/mne_scan_plugins/. bin/mne_scan.app/Contents/MacOS/mne_scan_plugins
         cp -a bin/resources/. bin/mne_scan.app/Contents/MacOS/resources
         cp -a $Qt5_DIR/plugins/renderers/. bin/mne_scan.app/Contents/PlugIns/renderers
         cp -a applications/mne_scan/plugins/brainflowboard/brainflow/installed/lib/. bin/mne_scan.app/Contents/Frameworks
         cp -a applications/mne_scan/plugins/lsladapter/liblsl/build/install/lib/. bin/mne_scan.app/Contents/Frameworks
-        macdeployqt ./bin/mne_analyze.app -libpath=./lib
+        cp -a lib/. bin/mne_scan.app/Contents/Frameworks
+        macdeployqt ./bin/mne_analyze.app
         cp -a bin/mne_analyze_plugins/. bin/mne_analyze.app/Contents/MacOS/mne_analyze_plugins
         cp -a bin/resources/. bin/mne_analyze.app/Contents/MacOS/resources
         cp -a $Qt5_DIR/plugins/renderers/. bin/mne_scan.app/Contents/PlugIns/renderers
+        cp -a lib/. bin/mne_analyze.app/Contents/Frameworks
         # Delete folders which we do not want to ship
         rm -r bin/mne-cpp-test-data
         rm -r bin/mne_scan_plugins
@@ -478,7 +477,6 @@ jobs:
         # Solve for dependencies only mne_scan.exe and mnecppDisp3D.dll since it links all needed qt and mne-cpp libs
         windeployqt .\bin\mne_scan.exe
         windeployqt .\bin\mnecppDisp3D.dll
-        mkdir .\bin\renderers
         xcopy $Env:Qt5_DIR\plugins\renderers\* .\bin\renderers /s /i
         xcopy .\applications\mne_scan\plugins\brainflowboard\brainflow\installed\lib\* .\bin\ /s /i
         xcopy .\applications\mne_scan\plugins\lsladapter\liblsl\build\install\bin\lsl.dll .\bin\ /i
