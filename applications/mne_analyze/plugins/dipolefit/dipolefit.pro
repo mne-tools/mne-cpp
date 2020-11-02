@@ -64,11 +64,13 @@ CONFIG(debug, debug|release) {
             -lmnecppFiffd \
             -lanSharedd \
             -lmnecppDispd \
+            -lmnecppInversed \
 } else {
     LIBS += -lmnecppUtils \
             -lmnecppFiff \
             -lanShared \
             -lmnecppDisp \
+            -lmnecppInverse \
 }
 
 SOURCES += \
