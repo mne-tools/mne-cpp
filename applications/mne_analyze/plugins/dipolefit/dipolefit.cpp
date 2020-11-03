@@ -141,3 +141,34 @@ QVector<EVENT_TYPE> DipoleFit::getEventSubscriptions(void) const
     temp.push_back(SELECTED_MODEL_CHANGED);
     return temp;
 }
+
+//=============================================================================================================
+
+void DipoleFit::onPerformDipoleFit()
+{
+
+}
+
+//=============================================================================================================
+
+void DipoleFit::onModalityChanged(int iModality)
+{
+
+}
+
+//=============================================================================================================
+
+void DipoleFit::onTimeChanged(int iMin,
+                              int iMax,
+                              int iStep)
+{
+
+}
+
+//=============================================================================================================
+
+void DipoleFit::onFittingChanged(int iMinDistance,
+                                 int iGridSize)
+{
+
+}

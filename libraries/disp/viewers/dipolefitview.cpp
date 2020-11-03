@@ -57,6 +57,27 @@ DipoleFitView::DipoleFitView(QWidget *parent,
     m_pUi->setupUi(this);
     this->setMinimumWidth(330);
 
+    connect(m_pUi->pushButton_fit, &QPushButton::clicked,
+            this, &DipoleFitView::performDipoleFit);
+    connect(m_pUi->spinBox_tmin, QOverload<int>::of(&QSpinBox::valueChanged), [=](int iValue){
+                emit timeChanged(iValue,
+                                 m_pUi->spinBox_tmax->value(),
+                                 m_pUi->spinBox_tstep->value());
+            });
+    connect(m_pUi->spinBox_tmax, QOverload<int>::of(&QSpinBox::valueChanged), [=](int iValue){
+                emit timeChanged(m_pUi->spinBox_tmin->value(),
+                                 iValue,
+                                 m_pUi->spinBox_tstep->value());
+            });
+    connect(m_pUi->spinBox_tstep, QOverload<int>::of(&QSpinBox::valueChanged), [=](int iValue){
+                emit timeChanged(m_pUi->spinBox_tmin->value(),
+                                 m_pUi->spinBox_tmax->value(),
+                                 iValue);
+            });
+    connect(m_pUi->radioButton_EEG, &QRadioButton::toggled, [=](bool bChecked){
+                emit modalityChanged(bChecked ? 1 : 0);
+            });
+
 }
 
 //=============================================================================================================
