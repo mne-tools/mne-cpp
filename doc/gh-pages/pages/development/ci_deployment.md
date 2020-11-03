@@ -7,6 +7,8 @@ nav_order: 2
 
 # Deployment
 
+|**Please note:** The information below only hold for dynamically linked builds of MNE-CPP. When building statically, no dependency solving is necessary. Due to their larger file size our CI excludes statically pre-built examples and tests from the satic release binaries.|
+
 This page explains how MNE-CPP handles build setups, solves for exernal as well as internal dependencies, prepares resources, and does packaging.
 
 ## Build Rules
@@ -35,7 +37,7 @@ MNE-CPP depends on [Qt](https://www.qt.io/){:target="_blank" rel="noopener"} and
 | --------------------------- | -------------------------------------- |
 | Windows | Call `windeployqt` on MNE Scan and the Disp3D library DLL. Disp3D is the most top level library and links against all needed Qt modules. MNE Scan links against all relevant Qt modules. Subsequently, Qt and all needed system libraries reside in `mne-cpp/bin`. |
 | Linux | Call `linuxdeployqt` on MNE Scan only, see the [release.yml](https://github.com/mne-tools/mne-cpp/blob/master/.github/workflows/release.yml){:target="_blank" rel="noopener"} workflow file. This will copy Qt libraries to `mne-cpp/lib` and Qt plugins to `mne-cpp/plugins`. The `RPATH` is specified in the executable's .pro file in order to link to the libraries in `mne-cpp/lib`. |
-| MacOS | MNE Scan and MNE Analyze can be created as .app bundles using the `withAppBundles` compilation flag. In this case `macdeployqt` is used to solve for Qt dependencies, see the [release.yml](https://github.com/mne-tools/mne-cpp/blob/master/.github/workflows/release.yml){:target="_blank" rel="noopener"} workflow file. Please note, `macdeployqt` only works on .app bundles. For none .app bundles the `RPATH` is specified in the executable's .pro file in order to link to the libraries in `mne-cpp/lib`. |
+| MacOS | All applications, examples and tests can be created as .app bundles (via the `withAppBundles` flag). In this case `macdeployqt` is used to solve for Qt dependencies, see the [release.yml](https://github.com/mne-tools/mne-cpp/blob/master/.github/workflows/release.yml){:target="_blank" rel="noopener"} workflow file. Please note, `macdeployqt` only works on .app bundles. In the non .app bundle case you need to specify `export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:<Qt_path>/lib` in orer to find the Qt dependencies. |
 
 ## Resource Handling
 
@@ -48,7 +50,3 @@ Files which are needed by applications (layout files, selection groups, etc.) ar
 | Windows | Folder `mne-cpp/bin` is compressed to a zip file and uploaded as release asset to the corresponding GitHub release. |
 | Linux | Folders `mne-cpp/bin`, `mne-cpp/lib`, `mne-cpp/plugins`, `mne-cpp/translations` are compressed to a tar.gz file and uploaded as release assets to the corresponding GitHub release. |
 | MacOS | Folders `mne-cpp/bin`, `mne-cpp/lib` are compressed to a tar.gz file and uploaded as release assets to the corresponding GitHub release.  |
-
-## Static Builds
-
-The above information only holds for dynamically linked builds of MNE-CPP. When building statically, no dependency solving is necessary. Please note that our CI excludes examples and tests from static release binaries, since they would consume too much space.

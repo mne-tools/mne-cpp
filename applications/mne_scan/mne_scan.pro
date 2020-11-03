@@ -43,7 +43,6 @@ SUBDIRS += \
     plugins \
     mne_scan \
 
-# Specify dependencies because of packaging on MacOS and when building a static version of MNE-CPP
 libs.depends =
 plugins.depends = libs
-mne_scan.depends = libs plugins
+mne_scan.depends = libs
