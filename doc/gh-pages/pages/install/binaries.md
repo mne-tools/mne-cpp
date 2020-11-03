@@ -6,21 +6,21 @@ nav_order: 1
 ---
 # Releases
 
-Please select the version and platform you'd like to download. We recommend the dynamic builds of our releases. Due to size limitations the static builds do not include tests and example binaries. For older releases please visit our [Github release page](https://github.com/mne-tools/mne-cpp/releases){:target="_blank" rel="noopener"}.
+Please select the version and platform you'd like to download. For older releases please visit our [Github release page](https://github.com/mne-tools/mne-cpp/releases){:target="_blank" rel="noopener"}.
 
 Stable Releases
 {: .label .label-blue }
 
-| Version | Release | Dynamic Build | Static Build |
-|-------|-------|-------|-------|
-| [0.1.7](changelog.md#version-017) | 2020-10-26 | <span class="fs-2"> [Windows](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.7/mne-cpp-windows-dynamic-x86_64.zip){: .btn .btn-blue } [Linux](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.7/mne-cpp-linux-dynamic-x86_64.tar.gz){: .btn .btn-blue } [MacOS](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.7/mne-cpp-macos-dynamic-x86_64.tar.gz){: .btn .btn-blue } </span> | <span class="fs-2"> [Windows](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.7/mne-cpp-windows-static-x86_64.zip){: .btn .btn-blue } [Linux](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.7/mne-cpp-linux-static-x86_64.tar.gz){: .btn .btn-blue } [MacOS](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.7/mne-cpp-macos-static-x86_64.tar.gz){: .btn .btn-blue } </span> |
+| Version | Release | Download link |
+|-------|-------|-------|
+| [0.1.7](changelog.md#version-017) | 2020-10-26 | <span class="fs-2"> [Windows](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.7/mne-cpp-windows-static-x86_64.zip){: .btn .btn-blue } [Linux](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.7/mne-cpp-linux-static-x86_64.tar.gz){: .btn .btn-blue } [MacOS](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.7/mne-cpp-macos-static-x86_64.tar.gz){: .btn .btn-blue } </span> |
 
 Development Release
 {: .label .label-green }
 
-| Version | Release | Dynamic Build | Static Build |
-|-------|-------|-------|-------|
-| dev_build | [Latest commit](https://github.com/mne-tools/mne-cpp/commits/master){:target="_blank" rel="noopener"} | <span class="fs-2"> [Windows](https://github.com/mne-tools/mne-cpp/releases/download/dev_build/mne-cpp-windows-dynamic-x86_64.zip){: .btn .btn-green } [Linux](https://github.com/mne-tools/mne-cpp/releases/download/dev_build/mne-cpp-linux-dynamic-x86_64.tar.gz){: .btn .btn-green } [MacOS](https://github.com/mne-tools/mne-cpp/releases/download/dev_build/mne-cpp-macos-dynamic-x86_64.tar.gz){: .btn .btn-green } </span> | <span class="fs-2"> [Windows](https://github.com/mne-tools/mne-cpp/releases/download/dev_build/mne-cpp-windows-static-x86_64.zip){: .btn .btn-green } [Linux](https://github.com/mne-tools/mne-cpp/releases/download/dev_build/mne-cpp-linux-static-x86_64.tar.gz){: .btn .btn-green } [MacOS](https://github.com/mne-tools/mne-cpp/releases/download/dev_build/mne-cpp-macos-static-x86_64.tar.gz){: .btn .btn-green } </span> |
+| Version | Release | Download link |
+|-------|-------|-------|
+| dev_build | [Latest commit](https://github.com/mne-tools/mne-cpp/commits/master){:target="_blank" rel="noopener"} | <span class="fs-2"> [Windows](https://github.com/mne-tools/mne-cpp/releases/download/dev_build/mne-cpp-windows-static-x86_64.zip){: .btn .btn-green } [Linux](https://github.com/mne-tools/mne-cpp/releases/download/dev_build/mne-cpp-linux-static-x86_64.tar.gz){: .btn .btn-green } [MacOS](https://github.com/mne-tools/mne-cpp/releases/download/dev_build/mne-cpp-macos-static-x86_64.tar.gz){: .btn .btn-green } </span> |
 
 WebAssembly Releases
 {: .label .label-purple }
