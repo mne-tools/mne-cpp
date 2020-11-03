@@ -108,8 +108,22 @@ public:
 
 private:
 
+    //=========================================================================================================
+    void onPerformDipoleFit();
+
+    //=========================================================================================================
+    void onModalityChanged(int iModality);
+
+    //=========================================================================================================
+    void onTimeChanged(int iMin, int iMax, int iStep);
+
+    //=========================================================================================================
+    void onFittingChanged(int iMinDistance, int iGridSize);
+
+
     QPointer<ANSHAREDLIB::Communicator>         m_pCommu;
-    QPointer<INVERSELIB::DipoleFitSettings>     m_pDipoleSettings;
+    QPointer<INVERSELIB::DipoleFitSettings>     m_pDipoleSettings; 
+    QMutex                                      m_FitMutex;
 
 };
 

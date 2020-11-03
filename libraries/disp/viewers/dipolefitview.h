@@ -70,8 +70,7 @@ namespace DISPLIB
 class DISPSHARED_EXPORT DipoleFitView : public AbstractView
 {
 public:
-    DipoleFitView(const QString& sSettingsPath = "",
-                  QWidget *parent = 0,
+    DipoleFitView(QWidget *parent = 0,
                   Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
@@ -85,6 +84,23 @@ public:
      * Loads and inits all important settings of this view via QSettings.
      */
     void loadSettings();
+
+    //=========================================================================================================
+    void setBEM(const QString& sFileName);
+
+    //=========================================================================================================
+    void setMRI(const QString& sFileName);
+
+    //=========================================================================================================
+    void setNoise(const QString& sFileName);
+
+    void setModality(int iModality);
+
+    void setTime(int iMin, int iMax, int iStep);
+
+    void setFitting(int iMinDistance, int iGridSize);
+
+    void requestParams();
 
 protected:
     //=========================================================================================================
@@ -102,6 +118,25 @@ protected:
      * @param mode     The new mode (RealTime=0, Offline=1).
      */
     void updateProcessingMode(ProcessingMode mode);
+
+private:
+    Ui::DipoleFitViewWidget*    m_pUi;
+
+signals:
+    //=========================================================================================================
+    void performDipoleFit();
+
+    //=========================================================================================================
+    void modalityChanged(int iModality);
+
+    //=========================================================================================================
+    void timeChanged(int iMin, int iMax, int iStep);
+
+    //=========================================================================================================
+    void fittingChanged(int iMinDistance, int iGridSize);
+
+
+
 };
 }//namespace
 
