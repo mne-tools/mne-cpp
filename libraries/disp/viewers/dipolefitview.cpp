@@ -49,10 +49,13 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DipoleFitView::DipoleFitView(const QString& sSettingsPath,
-                             QWidget *parent,
+DipoleFitView::DipoleFitView(QWidget *parent,
                              Qt::WindowFlags)
+: AbstractView(parent)
+, m_pUi(new Ui::DipoleFitViewWidget)
 {
+    m_pUi->setupUi(this);
+    this->setMinimumWidth(330);
 
 }
 
