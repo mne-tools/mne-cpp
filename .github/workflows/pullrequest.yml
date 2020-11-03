@@ -216,7 +216,7 @@ jobs:
       max-parallel: 3
       matrix:
         qt: [5.15.1]
-        os: [ubuntu-16.04, macos-latest, windows-2019]
+        os: [ubuntu-18.04, macos-latest, windows-2019]
 
     steps:
     - name: Clone repository
@@ -235,20 +235,20 @@ jobs:
       if: matrix.os == 'ubuntu-16.04'
       run: |
         # Download the pre-built static version of Qt, which was created with the generateBinaries.yml workflow
-        wget -O qt5_5151_static_binaries_linux.tar.gz https://www.dropbox.com/s/k245dalpw02ok1q/qt5_5151_static_binaries_linux.tar.gz?dl=1
+        wget -O qt5_5151_static_binaries_linux.tar.gz https://www.dropbox.com/s/bfu2pfnmzy9hu2a/qt5_5151_static_binaries_linux.tar?dl=1
         mkdir ../Qt5_binaries
         tar xvzf qt5_5151_static_binaries_linux.tar.gz -C ../ -P
     - name: Install Qt (MacOS)
       if: matrix.os == 'macos-latest'
       run: |
         # Download the pre-built static version of Qt, which was created with the generateBinaries.yml workflow
-        wget -O qt5_5151_static_binaries_macos.tar.gz https://www.dropbox.com/s/bnlec4qpl7c22rp/qt5_5151_static_binaries_macos.tar.gz?dl=1
+        wget -O qt5_5151_static_binaries_macos.tar.gz https://www.dropbox.com/s/0nab4qlxc3nu0bj/qt5_5151_static_binaries_macos.tar?dl=1
         tar xvzf qt5_5151_static_binaries_macos.tar.gz -P
     - name: Install Qt (Windows)
       if: matrix.os == 'windows-2019'
       run: |
         # Download the pre-built static version of Qt, which was created with the generateBinaries.yml workflow
-        Invoke-WebRequest https://www.dropbox.com/s/r1z7jjit23si9rp/qt5_5151_static_binaries_win.zip?dl=1 -OutFile .\qt5_5151_static_binaries_win.zip
+        Invoke-WebRequest https://www.dropbox.com/s/z745z290s9pknih/qt5_5151_static_binaries_win.zip?dl=1 -OutFile .\qt5_5151_static_binaries_win.zip
         expand-archive -path "qt5_5151_static_binaries_win.zip" -destinationpath "..\"
     - name: Install jom (Windows)
       if: matrix.os == 'windows-2019'
@@ -257,7 +257,7 @@ jobs:
         expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
         echo "::add-path::$HOME\jom"
     - name: Configure and compile MNE-CPP (Linux|MacOS)
-      if: (matrix.os == 'ubuntu-16.04') || (matrix.os == 'macos-latest')
+      if: (matrix.os == 'ubuntu-18.04') || (matrix.os == 'macos-latest')
       run: |
         ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=static
         make -j4
@@ -320,7 +320,7 @@ jobs:
     - name: Configure and compile MNE-CPP (MacOS)
       if: matrix.os == 'macos-latest'
       run: |
-        qmake -r MNECPP_CONFIG+=noApplications MNECPP_CONFIG+=noExamples MNECPP_CONFIG+=withAppBundles
+        qmake -r MNECPP_CONFIG+=noApplications MNECPP_CONFIG+=noExamples
         make -j4
     - name: Configure and compile MNE-CPP (Windows)
       if: matrix.os == 'windows-2019'
