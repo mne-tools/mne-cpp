@@ -39,7 +39,9 @@ TEMPLATE = app
 QT += widgets concurrent network
 
 CONFIG   += console
-CONFIG   -= app_bundle
+!contains(MNECPP_CONFIG, withAppBundles) {
+    CONFIG -= app_bundle
+}
 
 DESTDIR =  $${MNE_BINARY_DIR}
 

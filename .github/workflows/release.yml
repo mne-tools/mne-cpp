@@ -95,7 +95,7 @@ jobs:
         ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples MNECPP_CONFIG+=static
         make -j4
         make install -j4
-    - name: Package binaries
+    - name: Deploy binaries
       run: |
         # Delete folders which we do not want to ship
         rm -r bin/mne_rt_server_plugins
@@ -149,14 +149,14 @@ jobs:
     #     cd qt5_shadow
     #     # Configure Qt5
     #     ../qt5/configure -static -release -prefix "../Qt5_binaries" -skip webengine -nomake tools -nomake tests -nomake examples -no-dbus -no-ssl -no-pch -opensource -confirm-license
-    #     make module-qtbase module-qtsvg module-qtcharts module-qt3d -j4
-    #     make install -j4
+    #     make module-qtbase module-qtsvg module-qtcharts module-qt3d -j
+    #     make install -j
     - name: Configure and compile MNE-CPP
       run: |
-        ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples MNECPP_CONFIG+=static
+        ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples MNECPP_CONFIG+=static MNECPP_CONFIG+=withAppBundles
         make -j4
         make install -j4
-    - name: Package binaries
+    - name: Deploy binaries
       run: |
         # Delete folders which we do not want to ship
         rm -r bin/mne-cpp-test-data
@@ -228,7 +228,7 @@ jobs:
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         ..\Qt5_binaries\bin\qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples MNECPP_CONFIG+=static
         jom -j4
-    - name: Package binaries
+    - name: Deploy binaries
       run: |
         # Delete folders which we do not want to ship
         Remove-Item 'bin/mne_rt_server_plugins' -Recurse
@@ -296,36 +296,9 @@ jobs:
       run: |
         qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow MNECPP_CONFIG+=withLsl
         make -j4
-    - name: Package binaries
+    - name: Deploy binaries
       run: |
-        # Delete folders which we do not want to ship
-        rm -r bin/mne-cpp-test-data
-        # Copy additional brainflow libs
-        cp -a applications/mne_scan/plugins/brainflowboard/brainflow/installed/lib/. lib/
-        # Copy additional LSL libs
-        cp -a applications/mne_scan/plugins/lsladapter/liblsl/build/install/lib/. lib/
-        # Install libxkbcommon and libbluetooth3 so linuxdeployqt can find it
-        sudo apt-get update
-        sudo apt-get install libxkbcommon-x11-0
-        sudo apt-get install libxcb-icccm4
-        sudo apt-get install libxcb-image0
-        sudo apt-get install libxcb-keysyms1
-        sudo apt-get install libxcb-render-util0
-        sudo apt-get install libbluetooth3
-        sudo apt-get install libxcb-xinerama0 
-        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu/
-        # Downloading linuxdeployqt from continious release
-        wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
-        sudo chmod a+x linuxdeployqt-continuous-x86_64.AppImage
-        # Creating a directory for linuxdeployqt to create results 
-        sudo mkdir -p -m777 mne-cpp
-        # Copying built data to folder for easy packaging   
-        cp -r ./bin ./lib mne-cpp/
-        # linuxdeployqt uses mne_scan binary to resolve dependencies in current directory. 
-        cd mne-cpp
-        ../linuxdeployqt-continuous-x86_64.AppImage bin/mne_scan -verbose2 -extra-plugins=renderers
-        # Creating archive of everything in current directory
-        tar cfvz ../mne-cpp-linux-dynamic-x86_64.tar.gz ./*
+        ./tools/deployment/deploy_linux
     - name: Deploy binaries with stable release on Github
       if: endsWith(github.ref, 'master') == false
       uses: svenstaro/upload-release-action@v1-release
@@ -385,27 +358,9 @@ jobs:
       run: |
         qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow MNECPP_CONFIG+=withLsl MNECPP_CONFIG+=withAppBundles
         make -j4
-    - name: Package binaries (MacOS)
+    - name: Deploy binaries (MacOS)
       run: |
-        # Solve for dependencies for .app bundles
-        macdeployqt ./bin/mne_scan.app
-        cp -a bin/mne_scan_plugins/. bin/mne_scan.app/Contents/MacOS/mne_scan_plugins
-        cp -a bin/resources/. bin/mne_scan.app/Contents/MacOS/resources
-        cp -a $Qt5_DIR/plugins/renderers/. bin/mne_scan.app/Contents/PlugIns/renderers
-        cp -a applications/mne_scan/plugins/brainflowboard/brainflow/installed/lib/. bin/mne_scan.app/Contents/Frameworks
-        cp -a applications/mne_scan/plugins/lsladapter/liblsl/build/install/lib/. bin/mne_scan.app/Contents/Frameworks
-        cp -a lib/. bin/mne_scan.app/Contents/Frameworks
-        macdeployqt ./bin/mne_analyze.app
-        cp -a bin/mne_analyze_plugins/. bin/mne_analyze.app/Contents/MacOS/mne_analyze_plugins
-        cp -a bin/resources/. bin/mne_analyze.app/Contents/MacOS/resources
-        cp -a $Qt5_DIR/plugins/renderers/. bin/mne_scan.app/Contents/PlugIns/renderers
-        cp -a lib/. bin/mne_analyze.app/Contents/Frameworks
-        # Delete folders which we do not want to ship
-        rm -r bin/mne-cpp-test-data
-        rm -r bin/mne_scan_plugins
-        rm -r bin/mne_analyze_plugins
-        # Creating archive of all macos deployed applications
-        tar cfvz mne-cpp-macos-dynamic-x86_64.tar.gz bin/. lib/.
+        ./tools/deployment/deploy_macos
     - name: Deploy binaries with stable release on Github
       if: endsWith(github.ref, 'master') == false
       uses: svenstaro/upload-release-action@v1-release
@@ -472,18 +427,9 @@ jobs:
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow MNECPP_CONFIG+=withLsl
         jom -j4
-    - name: Package binaries (Windows)
+    - name: Deploy binaries (Windows)
       run: |
-        # Solve for dependencies only mne_scan.exe and mnecppDisp3D.dll since it links all needed qt and mne-cpp libs
-        windeployqt .\bin\mne_scan.exe
-        windeployqt .\bin\mnecppDisp3D.dll
-        xcopy $Env:Qt5_DIR\plugins\renderers\* .\bin\renderers /s /i
-        xcopy .\applications\mne_scan\plugins\brainflowboard\brainflow\installed\lib\* .\bin\ /s /i
-        xcopy .\applications\mne_scan\plugins\lsladapter\liblsl\build\install\bin\lsl.dll .\bin\ /i
-        # Delete folders which we do not want to ship
-        Remove-Item 'bin/mne-cpp-test-data' -Recurse
-        # Creating archive of all win deployed applications
-        7z a mne-cpp-windows-dynamic-x86_64.zip ./bin
+        ./tools/deployment/deploy_win.bat
     - name: Deploy binaries with stable release on Github
       if: endsWith(github.ref, 'master') == false
       uses: svenstaro/upload-release-action@v1-release

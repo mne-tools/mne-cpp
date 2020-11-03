@@ -40,7 +40,9 @@ TEMPLATE = app
 QT += core gui charts opengl widgets concurrent network
 
 CONFIG   += console
-CONFIG   -= app_bundle
+!contains(MNECPP_CONFIG, withAppBundles) {
+    CONFIG -= app_bundle
+}
 
 DESTDIR = $${MNE_BINARY_DIR}
 

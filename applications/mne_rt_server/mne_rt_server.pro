@@ -42,7 +42,3 @@ TEMPLATE = subdirs
 SUBDIRS += \
     plugins \
     mne_rt_server \
-
-# Specify dependencies because of packaging on MacOS and when building a static version of MNE-CPP
-plugins.depends =
-mne_rt_server.depends = plugins

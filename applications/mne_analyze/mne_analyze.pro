@@ -43,7 +43,6 @@ SUBDIRS += \
     plugins \
     mne_analyze \
 
-# Specify dependencies because of packaging on MacOS
 libs.depends =
 plugins.depends = libs
-mne_analyze.depends = libs plugins
+mne_analyze.depends = libs

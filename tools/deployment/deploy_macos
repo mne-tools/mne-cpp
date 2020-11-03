@@ -1,0 +1,24 @@
+# This script needs to be run from the top level mne-cpp repo folder
+# Solve for dependencies for mne_scan.app bundle
+$Qt5_DIR/bin/macdeployqt ./bin/mne_scan.app
+cp -a bin/mne_scan_plugins/. bin/mne_scan.app/Contents/MacOS/mne_scan_plugins
+cp -a bin/resources/. bin/mne_scan.app/Contents/MacOS/resources
+cp -a applications/mne_scan/plugins/brainflowboard/brainflow/installed/lib/. bin/mne_scan.app/Contents/Frameworks
+cp -a applications/mne_scan/plugins/lsladapter/liblsl/build/install/lib/. bin/mne_scan.app/Contents/Frameworks
+cp -a lib/. bin/mne_scan.app/Contents/Frameworks
+cp -a $Qt5_DIR/plugins/renderers/. bin/mne_scan.app/Contents/PlugIns/renderers
+
+# Solve for dependencies for mne_analyze.app bundle
+$Qt5_DIR/bin/macdeployqt ./bin/mne_analyze.app
+cp -a bin/mne_analyze_plugins/. bin/mne_analyze.app/Contents/MacOS/mne_analyze_plugins
+cp -a bin/resources/. bin/mne_analyze.app/Contents/MacOS/resources
+cp -a lib/. bin/mne_analyze.app/Contents/Frameworks
+cp -a $Qt5_DIR/plugins/renderers/. bin/mne_analyze.app/Contents/PlugIns/renderers
+
+# Delete folders which we do not want to ship
+rm -r bin/mne-cpp-test-data
+rm -r bin/mne_scan_plugins
+rm -r bin/mne_analyze_plugins
+
+# Creating archive of all macos deployed applications
+tar cfvz mne-cpp-macos-dynamic-x86_64.tar.gz bin/. lib/.
