@@ -26,7 +26,7 @@ jobs:
     # - name: Install Qt
     #   run: |
     #     # Download the pre-built static version of Qt, which was created with the generateBinaries.yml workflow
-    #     wget -O qt5_5151_static_binaries_wasm.tar.gz https://www.dropbox.com/s/k245dalpw02ok1q/qt5_5151_static_binaries_wasm.tar.tar.gz?dl=1
+    #     wget -O qt5_5151_static_binaries_wasm.tar.gz https://www.dropbox.com/s/6uxny1ruajf3q91/qt5_5151_static_binaries_wasm.tar.gz?dl=1
     #     mkdir ../Qt5_binaries
     #     tar xvzf qt5_5151_static_binaries_wasm.tar.gz -C ../ -P  
     # Uncomment this if you want to build Qt statically in this workflow         
