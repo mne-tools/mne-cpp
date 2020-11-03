@@ -42,6 +42,8 @@
 #include <anShared/Management/communicator.h>
 #include <anShared/Utils/metatypes.h>
 
+#include <disp/viewers/dipolefitview.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -106,7 +108,11 @@ QMenu *DipoleFit::getMenu()
 
 QDockWidget *DipoleFit::getControl()
 {
-    return Q_NULLPTR;
+    QDockWidget* pDockWidgt = new QDockWidget();
+    DISPLIB::DipoleFitView* pDipoleView = new DISPLIB::DipoleFitView();
+    pDockWidgt->setWidget(pDipoleView);
+
+    return pDockWidgt;
 }
 
 //=============================================================================================================
@@ -132,6 +138,6 @@ void DipoleFit::handleEvent(QSharedPointer<Event> e)
 QVector<EVENT_TYPE> DipoleFit::getEventSubscriptions(void) const
 {
     QVector<EVENT_TYPE> temp;
-
+    temp.push_back(SELECTED_MODEL_CHANGED);
     return temp;
 }
