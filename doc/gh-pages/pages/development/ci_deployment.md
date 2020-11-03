@@ -17,7 +17,7 @@ All MNE-CPP libraries are built to the `mne-cpp/lib` folder. All applications, t
 
 ## Dependency Solving
 
-On Windows and MacOS, dependency solving for libraries and executables is done via the `windeployqt` and `macdeployqt` tools, which are officially developed and maintained by Qt. For Linux we use the unoffical [linuxdeployqt](https://github.com/probonopd/linuxdeployqt){:target="_blank" rel="noopener"} tool. Calling these tools is performed in our workflow [release.yml](https://github.com/mne-tools/mne-cpp/blob/master/.github/workflows/release.yml){:target="_blank" rel="noopener"} file.
+On Windows and MacOS, dependency solving for libraries and executables is done via the `windeployqt` and `macdeployqt` tools, which are officially developed and maintained by Qt. For Linux we use the unoffical [linuxdeployqt](https://github.com/probonopd/linuxdeployqt){:target="_blank" rel="noopener"} tool. Calling these tools is performed in our workflow [release.yml](https://github.com/mne-tools/mne-cpp/blob/master/.github/workflows/release.yml){:target="_blank" rel="noopener"} file which again calls the deployment scripts in `tools/deployment`.
 
 ### Internal Dependencies (MNE-CPP libraries) 
 
