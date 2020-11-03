@@ -42,3 +42,6 @@ TEMPLATE = subdirs
 SUBDIRS += \
     plugins \
     mne_rt_server \
+
+plugins.depends = 
+mne_rt_server.depends = plugins
