@@ -41,7 +41,9 @@ TEMPLATE = app
 QT += widgets 3dextras charts opengl
 
 CONFIG   += console
-CONFIG   -= app_bundle
+!contains(MNECPP_CONFIG, withAppBundles) {
+    CONFIG -= app_bundle
+}
 
 TARGET = ex_clustered_inverse_mne
 

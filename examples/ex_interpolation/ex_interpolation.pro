@@ -43,7 +43,9 @@ QT += 3dextras charts opengl
 QT -= gui
 
 CONFIG   += console
-CONFIG   -= app_bundle
+!contains(MNECPP_CONFIG, withAppBundles) {
+    CONFIG -= app_bundle
+}
 
 DESTDIR =  $${MNE_BINARY_DIR}
 

@@ -42,7 +42,9 @@ QT += testlib network
 QT -= gui
 
 CONFIG   += console
-CONFIG   -= app_bundle
+!contains(MNECPP_CONFIG, withAppBundles) {
+    CONFIG -= app_bundle
+}
 
 DESTDIR =  $${MNE_BINARY_DIR}
 
@@ -50,7 +52,6 @@ TARGET = test_coregistration
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
-
 
 contains(MNECPP_CONFIG, static) {
     CONFIG += static
