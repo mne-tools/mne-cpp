@@ -45,4 +45,4 @@ SUBDIRS += \
 
 libs.depends =
 plugins.depends = libs
-mne_analyze.depends = libs
+mne_analyze.depends = libs plugins

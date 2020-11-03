@@ -1,6 +1,8 @@
 # This script needs to be run from the top level mne-cpp repo folder
+# Call macdeployqt on all .app bundles in the bin folder
+for f in ./bin/*.app; do $Qt5_DIR/bin/macdeployqt $f ; done
+
 # Solve for dependencies for mne_scan.app bundle
-$Qt5_DIR/bin/macdeployqt ./bin/mne_scan.app
 cp -a bin/mne_scan_plugins/. bin/mne_scan.app/Contents/MacOS/mne_scan_plugins
 cp -a bin/resources/. bin/mne_scan.app/Contents/MacOS/resources
 cp -a applications/mne_scan/plugins/brainflowboard/brainflow/installed/lib/. bin/mne_scan.app/Contents/Frameworks
@@ -9,16 +11,33 @@ cp -a lib/. bin/mne_scan.app/Contents/Frameworks
 cp -a $Qt5_DIR/plugins/renderers/. bin/mne_scan.app/Contents/PlugIns/renderers
 
 # Solve for dependencies for mne_analyze.app bundle
-$Qt5_DIR/bin/macdeployqt ./bin/mne_analyze.app
 cp -a bin/mne_analyze_plugins/. bin/mne_analyze.app/Contents/MacOS/mne_analyze_plugins
 cp -a bin/resources/. bin/mne_analyze.app/Contents/MacOS/resources
 cp -a lib/. bin/mne_analyze.app/Contents/Frameworks
 cp -a $Qt5_DIR/plugins/renderers/. bin/mne_analyze.app/Contents/PlugIns/renderers
 
+# Solve for dependencies for mne_rt_server.app bundle
+cp -a bin/mne_rt_server_plugins/. bin/mne_rt_server.app/Contents/MacOS/mne_rt_server_plugins
+cp -a bin/resources/. bin/mne_rt_server.app/Contents/MacOS/resources
+cp -a lib/. bin/mne_rt_server.app/Contents/Frameworks
+
+# Solve for dependencies for mne_forward_solution.app bundle
+cp -a bin/resources/. bin/mne_forward_solution.app/Contents/MacOS/resources
+cp -a lib/. bin/mne_forward_solution.app/Contents/Frameworks
+
+# Solve for dependencies for mne_dipole_fit.app bundle
+cp -a bin/resources/. bin/mne_dipole_fit.app/Contents/MacOS/resources
+cp -a lib/. bin/mne_dipole_fit.app/Contents/Frameworks
+
+# Solve for dependencies for mne_anonymize.app bundle
+cp -a bin/resources/. bin/mne_anonymize.app/Contents/MacOS/resources
+cp -a lib/. bin/mne_anonymize.app/Contents/Frameworks
+
 # Delete folders which we do not want to ship
 rm -r bin/mne-cpp-test-data
 rm -r bin/mne_scan_plugins
 rm -r bin/mne_analyze_plugins
+rm -r bin/mne_rt_server_plugins
 
 # Creating archive of all macos deployed applications
 tar cfvz mne-cpp-macos-dynamic-x86_64.tar.gz bin/. lib/.
