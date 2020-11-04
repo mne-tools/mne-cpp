@@ -93,9 +93,11 @@ SOURCES += \
     Model/fiffrawviewmodel.cpp \
     Model/annotationmodel.cpp \
     Model/averagingdatamodel.cpp \ \
+    Model/mricoordmodel.cpp \
     Model/noisemodel.cpp
 
 HEADERS += \
+    Model/mricoordmodel.h \
     Model/noisemodel.h \
     Plugins/abstractplugin.h \
     anshared_global.h \
