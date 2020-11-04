@@ -77,7 +77,14 @@ DipoleFitView::DipoleFitView(QWidget *parent,
     connect(m_pUi->radioButton_EEG, &QRadioButton::toggled, [=](bool bChecked){
                 emit modalityChanged(bChecked ? 1 : 0);
             });
-
+    connect(m_pUi->doubleSpinBox_dist,  QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double dValue){
+                emit fittingChanged(dValue,
+                                    m_pUi->doubleSpinBox_grid->value());
+            });
+    connect(m_pUi->doubleSpinBox_grid, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double dValue){
+                emit fittingChanged(m_pUi->doubleSpinBox_dist->value(),
+                                    dValue);
+            });
 }
 
 //=============================================================================================================
@@ -116,4 +123,32 @@ void DipoleFitView::updateProcessingMode(ProcessingMode mode)
         default: // default is realtime mode
             break;
     }
+}
+
+//=============================================================================================================
+
+void DipoleFitView::setBEM(const QString &sFileName)
+{
+
+}
+
+//=============================================================================================================
+
+void DipoleFitView::setMRI(const QString &sFileName)
+{
+
+}
+
+//=============================================================================================================
+
+void DipoleFitView::setNoise(const QString &sFileName)
+{
+
+}
+
+//=============================================================================================================
+
+void DipoleFitView::requestParams()
+{
+
 }
