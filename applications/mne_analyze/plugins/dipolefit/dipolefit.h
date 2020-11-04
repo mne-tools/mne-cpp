@@ -32,8 +32,8 @@
  *
  */
 
-#ifndef DIPOLEFIT_H
-#define DIPOLEFIT_H
+#ifndef DIPOLEFITMANAGER_H
+#define DIPOLEFITMANAGER_H
 
 //=============================================================================================================
 // INCLUDES
@@ -41,6 +41,10 @@
 
 #include "dipolefit_global.h"
 #include <anShared/Plugins/abstractplugin.h>
+
+#include <inverse/dipoleFit/dipole_fit_settings.h>
+#include <inverse/dipoleFit/dipole_fit_data.h>
+#include <inverse/dipoleFit/dipole_fit.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -50,9 +54,6 @@
 #include <QtCore/QtPlugin>
 #include <QDebug>
 #include <QPointer>
-#include <inverse/dipoleFit/dipole_fit_settings.h>
-#include <inverse/dipoleFit/dipole_fit_data.h>
-#include <inverse/dipoleFit/dipole_fit.h>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -60,6 +61,10 @@
 
 namespace ANSHAREDLIB {
     class Communicator;
+}
+
+namespace INVERSELIB{
+    class DipoleFitSettings;
 }
 
 //=============================================================================================================
@@ -118,11 +123,11 @@ private:
     void onTimeChanged(int iMin, int iMax, int iStep);
 
     //=========================================================================================================
-    void onFittingChanged(int iMinDistance, int iGridSize);
+    void onFittingChanged(float fMinDistance, float fGridSize);
 
 
     QPointer<ANSHAREDLIB::Communicator>         m_pCommu;
-    QPointer<INVERSELIB::DipoleFitSettings>     m_pDipoleSettings; 
+    INVERSELIB::DipoleFitSettings               m_DipoleSettings;
     QMutex                                      m_FitMutex;
 
 };

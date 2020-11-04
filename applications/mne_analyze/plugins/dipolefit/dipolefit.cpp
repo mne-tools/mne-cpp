@@ -108,7 +108,7 @@ QMenu *DipoleFit::getMenu()
 
 QDockWidget *DipoleFit::getControl()
 {
-    QDockWidget* pDockWidgt = new QDockWidget();
+    QDockWidget* pDockWidgt = new QDockWidget(getName());
     DISPLIB::DipoleFitView* pDipoleView = new DISPLIB::DipoleFitView();
     pDockWidgt->setWidget(pDipoleView);
 
@@ -146,14 +146,22 @@ QVector<EVENT_TYPE> DipoleFit::getEventSubscriptions(void) const
 
 void DipoleFit::onPerformDipoleFit()
 {
-
+    INVERSELIB::DipoleFit dipFit(&m_DipoleSettings);
 }
 
 //=============================================================================================================
 
 void DipoleFit::onModalityChanged(int iModality)
 {
+    QMutexLocker lock(&m_FitMutex);
 
+    if (iModality == 0) {
+        m_DipoleSettings.include_meg = true;
+        m_DipoleSettings.include_eeg = false;
+    } else if(iModality == 1) {
+        m_DipoleSettings.include_meg = false;
+        m_DipoleSettings.include_eeg = true;
+    }
 }
 
 //=============================================================================================================
@@ -162,13 +170,20 @@ void DipoleFit::onTimeChanged(int iMin,
                               int iMax,
                               int iStep)
 {
+    QMutexLocker lock(&m_FitMutex);
 
+    m_DipoleSettings.tmin = static_cast<float>(iMin)/1000.f;
+    m_DipoleSettings.tmax = static_cast<float>(iMax)/1000.f;
+    m_DipoleSettings.tstep = static_cast<float>(iStep)/1000.f;
 }
 
 //=============================================================================================================
 
-void DipoleFit::onFittingChanged(int iMinDistance,
-                                 int iGridSize)
+void DipoleFit::onFittingChanged(float fMinDistance,
+                                 float fGridSize)
 {
+    QMutexLocker lock(&m_FitMutex);
 
+    m_DipoleSettings.guess_mindist = static_cast<float>(fMinDistance)/1000.f;
+    m_DipoleSettings.guess_rad = static_cast<float>(fGridSize)/1000.f;
 }
