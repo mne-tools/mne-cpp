@@ -38,6 +38,7 @@ rm -r bin/mne-cpp-test-data
 rm -r bin/mne_scan_plugins
 rm -r bin/mne_analyze_plugins
 rm -r bin/mne_rt_server_plugins
+rm -r bin/resources
 
 # Creating archive of all macos deployed applications
-tar cfvz mne-cpp-macos-dynamic-x86_64.tar.gz bin/. lib/.
+tar cfvz mne-cpp-macos-dynamic-x86_64.tar.gz bin/.
