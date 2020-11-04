@@ -1,0 +1,28 @@
+# This script needs to be run from the top level mne-cpp repo folder
+# Solve for dependencies for mne_scan.app bundle
+cp -a bin/resources/. bin/mne_scan.app/Contents/MacOS/resources
+
+# Solve for dependencies for mne_analyze.app bundle
+cp -a bin/resources/. bin/mne_analyze.app/Contents/MacOS/resources
+
+# Solve for dependencies for mne_rt_server.app bundle
+cp -a bin/resources/. bin/mne_rt_server.app/Contents/MacOS/resources
+
+# Solve for dependencies for mne_forward_solution.app bundle
+cp -a bin/resources/. bin/mne_forward_solution.app/Contents/MacOS/resources
+
+# Solve for dependencies for mne_dipole_fit.app bundle
+cp -a bin/resources/. bin/mne_dipole_fit.app/Contents/MacOS/resources
+
+# Solve for dependencies for mne_anonymize.app bundle
+cp -a bin/resources/. bin/mne_anonymize.app/Contents/MacOS/resources
+
+# Delete folders which we do not want to ship
+rm -r bin/mne-cpp-test-data
+rm -r bin/mne_scan_plugins
+rm -r bin/mne_analyze_plugins
+rm -r bin/mne_rt_server_plugins
+rm -r bin/resources
+
+# Creating archive of all macos deployed applications
+tar cfvz mne-cpp-macos-static-x86_64.tar.gz bin/.
