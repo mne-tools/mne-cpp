@@ -269,6 +269,18 @@ jobs:
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         ..\Qt5_binaries\bin\qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=static
         jom -j4
+    - name: Deploy binaries (Linux)
+      if: matrix.os == 'ubuntu-18.04'
+      run: |
+        ./tools/deployment/deploy_linux_static
+    - name: Deploy binaries (MacOS)
+      if: matrix.os == 'macos-latest'
+      run: |
+        ./tools/deployment/deploy_macos_static
+    - name: Deploy binaries (Windows)
+      if: matrix.os == 'windows-2019'
+      run: |
+        ./tools/deployment/deploy_win_static.bat
 
   Tests:
     runs-on: ${{ matrix.os }}
