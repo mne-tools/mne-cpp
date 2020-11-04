@@ -69,6 +69,8 @@ namespace DISPLIB
 //=============================================================================================================
 class DISPSHARED_EXPORT DipoleFitView : public AbstractView
 {
+    Q_OBJECT
+
 public:
     DipoleFitView(QWidget *parent = 0,
                   Qt::WindowFlags f = Qt::Widget);
@@ -93,12 +95,6 @@ public:
 
     //=========================================================================================================
     void setNoise(const QString& sFileName);
-
-    void setModality(int iModality);
-
-    void setTime(int iMin, int iMax, int iStep);
-
-    void setFitting(int iMinDistance, int iGridSize);
 
     void requestParams();
 
