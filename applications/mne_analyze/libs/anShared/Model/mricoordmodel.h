@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     noisemodel.h
+ * @file     mricoordmodel.h
  * @author   Gabriel Motta <gbmotta@mgh.harvard.edu>
  * @since    0.1.7
  * @date     November, 2020
@@ -28,12 +28,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Declaration of the NoiseModel Class.
+ * @brief    Declaration of the MriCoordModel Class.
  *
  */
 
-#ifndef NOISEMODEL_H
-#define NOISEMODEL_H
+#ifndef MRICOORDMODEL_H
+#define MRICOORDMODEL_H
 
 //=============================================================================================================
 // INCLUDES
@@ -58,15 +58,15 @@
 namespace ANSHAREDLIB {
 
 //=============================================================================================================
-class ANSHAREDSHARED_EXPORT NoiseModel : public AbstractModel
+class MriCoordModel : public AbstractModel
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<NoiseModel> SPtr;              /**< Shared pointer type for AnnotationModel. */
-    typedef QSharedPointer<const NoiseModel> ConstSPtr;   /**< Const shared pointer type for AnnotationModel. */
+    typedef QSharedPointer<MriCoordModel> SPtr;              /**< Shared pointer type for AnnotationModel. */
+    typedef QSharedPointer<const MriCoordModel> ConstSPtr;   /**< Const shared pointer type for AnnotationModel. */
 
-    NoiseModel(const QString &sPath,
-               QObject *pParent = nullptr);
+    MriCoordModel(const QString &sPath,
+                  QObject *pParent = nullptr);
 
     //=========================================================================================================
     /**
@@ -111,21 +111,20 @@ public:
                              const QModelIndex &parent = QModelIndex()) const override;
 
     inline QModelIndex parent(const QModelIndex &index) const override;
-
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline MODEL_TYPE NoiseModel::getType() const
+inline MODEL_TYPE MriCoordModel::getType() const
 {
-    return MODEL_TYPE::ANSHAREDLIB_NOISE_MODEL;
+    return MODEL_TYPE::ANSHAREDLIB_MRICOORD_MODEL;
 }
 
 //=============================================================================================================
 
-QModelIndex NoiseModel::parent(const QModelIndex &index) const
+QModelIndex MriCoordModel::parent(const QModelIndex &index) const
 {
     Q_UNUSED(index);
     return QModelIndex();
@@ -133,11 +132,11 @@ QModelIndex NoiseModel::parent(const QModelIndex &index) const
 
 //=============================================================================================================
 
-QModelIndex NoiseModel::index(int row, int column, const QModelIndex &parent) const
+QModelIndex MriCoordModel::index(int row, int column, const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
     return createIndex(row, column);
 }
 
 }//namespace
-#endif // NOISEMODEL_H
+#endif // MRICOORDMODEL_H
