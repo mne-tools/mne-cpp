@@ -92,9 +92,11 @@ SOURCES += \
     Model/bemdatamodel.cpp \
     Model/fiffrawviewmodel.cpp \
     Model/annotationmodel.cpp \
-    Model/averagingdatamodel.cpp \
+    Model/averagingdatamodel.cpp \ \
+    Model/noisemodel.cpp
 
 HEADERS += \
+    Model/noisemodel.h \
     Plugins/abstractplugin.h \
     anshared_global.h \
     Model/abstractmodel.h \
