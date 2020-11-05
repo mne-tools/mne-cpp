@@ -88,10 +88,10 @@ public:
     void loadSettings();
 
     //=========================================================================================================
-    void setBEM(const QString& sFileName);
+    void setBem(const QString& sFileName);
 
     //=========================================================================================================
-    void setMRI(const QString& sFileName);
+    void setMri(const QString& sFileName);
 
     //=========================================================================================================
     void setNoise(const QString& sFileName);

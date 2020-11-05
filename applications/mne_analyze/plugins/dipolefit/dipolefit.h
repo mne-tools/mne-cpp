@@ -43,8 +43,6 @@
 #include <anShared/Plugins/abstractplugin.h>
 
 #include <inverse/dipoleFit/dipole_fit_settings.h>
-#include <inverse/dipoleFit/dipole_fit_data.h>
-#include <inverse/dipoleFit/dipole_fit.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -66,10 +64,6 @@ namespace ANSHAREDLIB {
     class MriCoordModel;
     class NoiseModel;
     class Communicator;
-}
-
-namespace INVERSELIB{
-    class DipoleFitSettings;
 }
 
 //=============================================================================================================
