@@ -8,7 +8,7 @@ on:
 
 jobs:
   GenerateLinuxStaticBinaries:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-16.04
     
     steps:
     - name: Clone repository
@@ -28,7 +28,7 @@ jobs:
         mkdir qt5_shadow
         cd qt5_shadow
         # Configure Qt5
-        ../qt5/configure -static -release -prefix "../Qt5_binaries" -skip webengine -nomake tools -nomake tests -nomake examples -no-dbus -no-ssl -no-pch -opensource -confirm-license
+        ../qt5/configure -static -release -prefix "../Qt5_binaries" -skip webengine -nomake tools -nomake tests -nomake examples -no-dbus -no-ssl -no-pch -opensource -confirm-license -bundled-xcb-xinput -qt-libpng -qt-pcre
         make module-qtbase module-qtsvg module-qtcharts module-qt3d -j4
         make install -j4
     - name: Package binaries

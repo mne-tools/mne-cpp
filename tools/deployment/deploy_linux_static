@@ -31,5 +31,9 @@ cd mne-cpp
 ../linuxdeployqt-continuous-x86_64.AppImage bin/mne_scan -verbose2 -extra-plugins=renderers
 ../linuxdeployqt-continuous-x86_64.AppImage bin/mne_analyze -verbose2 -extra-plugins=renderers
 
+echo
+echo ldd ./bin/mne_scan
+ldd ./bin/mne_scan
+
 # Creating archive of everything in the bin directory
-tar cfvz mne-cpp-linux-static-x86_64.tar.gz bin/. lib/.
+tar cfvz ../mne-cpp-linux-static-x86_64.tar.gz bin/. lib/.
