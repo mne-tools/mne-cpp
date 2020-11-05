@@ -8,7 +8,7 @@ cp -a applications/mne_scan/plugins/brainflowboard/brainflow/installed/lib/. lib
 # Copy additional LSL libs
 cp -a applications/mne_scan/plugins/lsladapter/liblsl/build/install/lib/. lib/
 
-# Install libxkbcommon and libbluetooth3 so linuxdeployqt can find it
+# Install some additional packages so linuxdeployqt can find them
 sudo apt-get update
 sudo apt-get install libxkbcommon-x11-0
 sudo apt-get install libxcb-icccm4
@@ -29,9 +29,10 @@ sudo mkdir -p -m777 mne-cpp
 # Copying built data to folder for easy packaging   
 cp -r ./bin ./lib mne-cpp/
 
-# linuxdeployqt uses mne_scan binary to resolve dependencies in current directory. 
+# linuxdeployqt uses mne_scan and mne_analyze binary to resolve dependencies
 cd mne-cpp
 ../linuxdeployqt-continuous-x86_64.AppImage bin/mne_scan -verbose2 -extra-plugins=renderers
+../linuxdeployqt-continuous-x86_64.AppImage bin/mne_analyze -verbose2 -extra-plugins=renderers
 
 # Creating archive of everything in current directory
 tar cfvz ../mne-cpp-linux-dynamic-x86_64.tar.gz ./*

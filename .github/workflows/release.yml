@@ -5,7 +5,7 @@ on:
     tags:        
     - v0.*
     branches:
-    - master
+    - mac
 
 jobs:
   CreateRelease:
@@ -58,7 +58,7 @@ jobs:
         hub release create -m "Development Builds" dev_build --prerelease
         
   LinuxStatic:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-16.04
     needs: CreateRelease
     
     steps:
