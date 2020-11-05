@@ -127,23 +127,23 @@ void DipoleFitView::updateProcessingMode(ProcessingMode mode)
 
 //=============================================================================================================
 
-void DipoleFitView::setBEM(const QString &sFileName)
+void DipoleFitView::setBem(const QString &sFileName)
 {
-
+    m_pUi->lineEdit_bem->setText(sFileName);
 }
 
 //=============================================================================================================
 
-void DipoleFitView::setMRI(const QString &sFileName)
+void DipoleFitView::setMri(const QString &sFileName)
 {
-
+    m_pUi->lineEdit_mri->setText(sFileName);
 }
 
 //=============================================================================================================
 
 void DipoleFitView::setNoise(const QString &sFileName)
 {
-
+    m_pUi->lineEdit_noise->setText(sFileName);
 }
 
 //=============================================================================================================

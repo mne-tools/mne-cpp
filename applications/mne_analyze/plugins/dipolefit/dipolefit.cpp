@@ -40,9 +40,22 @@
 
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Management/communicator.h>
+
 #include <anShared/Utils/metatypes.h>
 
+#include <anShared/Model/abstractmodel.h>
+#include <anShared/Model/fiffrawviewmodel.h>
+#include <anShared/Model/bemdatamodel.h>
+#include <anShared/Model/mricoordmodel.h>
+#include <anShared/Model/noisemodel.h>
+
 #include <disp/viewers/dipolefitview.h>
+
+#include <inverse/dipoleFit/dipole_fit_data.h>
+#include <inverse/dipoleFit/dipole_fit.h>
+#include <inverse/dipoleFit/ecd_set.h>
+
+#include <fiff/fiff_coord_trans.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -112,6 +125,13 @@ QDockWidget *DipoleFit::getControl()
     DISPLIB::DipoleFitView* pDipoleView = new DISPLIB::DipoleFitView();
     pDockWidgt->setWidget(pDipoleView);
 
+    connect(this, &DipoleFit::newBemModel,
+            pDipoleView, &DISPLIB::DipoleFitView::setBem, Qt::UniqueConnection);
+    connect(this, &DipoleFit::newNoiseModel,
+            pDipoleView, &DISPLIB::DipoleFitView::setNoise, Qt::UniqueConnection);
+    connect(this, &DipoleFit::newMriModel,
+            pDipoleView, &DISPLIB::DipoleFitView::setMri, Qt::UniqueConnection);
+
     return pDockWidgt;
 }
 
@@ -150,6 +170,41 @@ QVector<EVENT_TYPE> DipoleFit::getEventSubscriptions(void) const
 void DipoleFit::onPerformDipoleFit()
 {
     INVERSELIB::DipoleFit dipFit(&m_DipoleSettings);
+    INVERSELIB::ECDSet ecdSet = dipFit.calculateFit();
+    INVERSELIB::ECDSet ecdSetTrans = ecdSet;
+
+    QFile file(m_DipoleSettings.mriname);
+
+    if(file.exists()) {
+        FIFFLIB::FiffCoordTrans coordTrans(file);
+
+        for(int i = 0; i < ecdSet.size() ; ++i) {
+            MatrixX3f dipoles(1, 3);
+            //transform location
+            dipoles(0,0) = ecdSet[i].rd(0);
+            dipoles(0,1) = ecdSet[i].rd(1);
+            dipoles(0,2) = ecdSet[i].rd(2);
+
+            dipoles = coordTrans.apply_trans(dipoles);
+
+            ecdSetTrans[i].rd(0) = dipoles(0,0);
+            ecdSetTrans[i].rd(1) = dipoles(0,1);
+            ecdSetTrans[i].rd(2) = dipoles(0,2);
+
+            //transform orientation
+            dipoles(0,0) = ecdSet[i].Q(0);
+            dipoles(0,1) = ecdSet[i].Q(1);
+            dipoles(0,2) = ecdSet[i].Q(2);
+
+            dipoles = coordTrans.apply_trans(dipoles, false);
+
+            ecdSetTrans[i].Q(0) = dipoles(0,0);
+            ecdSetTrans[i].Q(1) = dipoles(0,1);
+            ecdSetTrans[i].Q(2) = dipoles(0,2);
+        }
+    } else {
+        qWarning("[DipoleFit::onPerformDipoleFit] Cannot open FiffCoordTrans file");
+    }
 }
 
 //=============================================================================================================
@@ -198,37 +253,37 @@ void DipoleFit::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewMo
     if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
         if(m_pFiffRawModel) {
             if(m_pFiffRawModel == pNewModel) {
-                qInfo() << "[Averaging::onModelChanged] New model is the same as old model";
+                qInfo() << "[DipoleFit::onModelChanged] New model is the same as old model";
                 return;
             }
         }
         m_pFiffRawModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
-
     } else if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_BEMDATA_MODEL) {
         if(m_pBemModel) {
             if(m_pBemModel == pNewModel) {
-                qInfo() << "[Averaging::onModelChanged] New model is the same as old model";
+                qInfo() << "[DipoleFit::onModelChanged] New model is the same as old model";
                 return;
             }
         }
         m_pBemModel = qSharedPointerCast<BemDataModel>(pNewModel);
-
+        emit newBemModel(QFileInfo(pNewModel->getModelPath()).fileName());
     } else if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_NOISE_MODEL) {
         if(m_pNoiseModel) {
             if(m_pNoiseModel == pNewModel) {
-                qInfo() << "[Averaging::onModelChanged] New model is the same as old model";
+                qInfo() << "[DipoleFit::onModelChanged] New model is the same as old model";
                 return;
             }
         }
         m_pNoiseModel = qSharedPointerCast<NoiseModel>(pNewModel);
-
+        emit newNoiseModel(QFileInfo(pNewModel->getModelPath()).fileName());
     } else if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_MRICOORD_MODEL) {
         if(m_pMriModel) {
             if(m_pMriModel == pNewModel) {
-                qInfo() << "[Averaging::onModelChanged] New model is the same as old model";
+                qInfo() << "[DipoleFit::onModelChanged] New model is the same as old model";
                 return;
             }
         }
         m_pMriModel = qSharedPointerCast<MriCoordModel>(pNewModel);
+        emit newMriModel(QFileInfo(pNewModel->getModelPath()).fileName());
     }
 }
