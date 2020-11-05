@@ -92,7 +92,7 @@ SOURCES += \
     Model/bemdatamodel.cpp \
     Model/fiffrawviewmodel.cpp \
     Model/annotationmodel.cpp \
-    Model/averagingdatamodel.cpp \ \
+    Model/averagingdatamodel.cpp \
     Model/mricoordmodel.cpp \
     Model/noisemodel.cpp
 
