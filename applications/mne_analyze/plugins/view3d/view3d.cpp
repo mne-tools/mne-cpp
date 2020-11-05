@@ -193,6 +193,9 @@ void View3D::handleEvent(QSharedPointer<Event> e)
         case VIEW3D_SETTINGS_CHANGED:
             settingsChanged(e->getData().value<ANSHAREDLIB::View3DParameters>());
             break;
+        case NEW_DIPOLE_FIT_DATA:
+            qDebug() << "do something here";
+            break;
         default:
             qWarning() << "[View3D::handleEvent] Received an Event that is not handled by switch cases.";
     }

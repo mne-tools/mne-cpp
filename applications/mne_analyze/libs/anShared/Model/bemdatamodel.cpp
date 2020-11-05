@@ -62,7 +62,7 @@ using namespace MNELIB;
 //=============================================================================================================
 
 BemDataModel::BemDataModel(QObject *pParent)
-    : AbstractModel(pParent)
+: AbstractModel(pParent)
 {
     qInfo() << "[BemDataModel::BemDataModel] Default constructor called !";
 }
@@ -72,10 +72,9 @@ BemDataModel::BemDataModel(QObject *pParent)
 BemDataModel::BemDataModel(const QString &sFilePath,
                            const QByteArray& byteLoadedData,
                            QObject *pParent)
-    : AbstractModel(pParent)
-    , m_pBem(MNEBem::SPtr::create())
+: AbstractModel(sFilePath, pParent)
+, m_pBem(MNEBem::SPtr::create())
 {
-    Q_UNUSED(sFilePath)
     if(byteLoadedData.isEmpty()) {
         m_file.setFileName(sFilePath);
         initBemData(m_file);
