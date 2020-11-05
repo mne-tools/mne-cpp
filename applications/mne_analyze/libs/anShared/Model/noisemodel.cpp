@@ -59,10 +59,38 @@ using namespace ANSHAREDLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-
 NoiseModel::NoiseModel(const QString &sPath,
                        QObject *pParent)
 :AbstractModel(sPath,pParent)
+{
+
+}
+
+//=============================================================================================================
+
+int NoiseModel::rowCount(const QModelIndex &parent) const
+{
+    return 1;
+}
+
+//=============================================================================================================
+
+int NoiseModel::columnCount(const QModelIndex &parent) const
+{
+    return 1;
+}
+
+//=============================================================================================================
+
+QVariant NoiseModel::data(const QModelIndex &index,
+                             int role) const
+{
+    return QVariant();
+}
+
+//=============================================================================================================
+
+Qt::ItemFlags NoiseModel::flags(const QModelIndex &index) const
 {
 
 }

@@ -100,16 +100,37 @@ public:
      *
      * @param[in] index   The index that referres to the requested item.
      */
-
-
-    inline MODEL_TYPE getType() const override;
-
     Qt::ItemFlags flags(const QModelIndex & index) const override;
 
+    //=========================================================================================================
+    /**
+     * The type of this model (MriCoordModel)
+     *
+     * @return The type of this model (MriCoordModel)
+     */
+    inline MODEL_TYPE getType() const override;
+
+    //=========================================================================================================
+    /**
+     * Returns the index for the item in the model specified by the given row, column and parent index.
+     * Currently only Qt::DisplayRole is supported.
+     * Index rows reflect channels, first column is channel names, second is raw data.
+     *
+     * @param[in] row      The specified row.
+     * @param[in] column   The specified column.
+     * @param[in] parent   The parent index.
+     */
     inline QModelIndex index(int row,
                              int column,
                              const QModelIndex &parent = QModelIndex()) const override;
 
+    //=========================================================================================================
+    /**
+     * Returns the parent index of the given index.
+     * In this Model the parent index in always QModelIndex().
+     *
+     * @param[in] index   The index that referres to the child.
+     */
     inline QModelIndex parent(const QModelIndex &index) const override;
 };
 
