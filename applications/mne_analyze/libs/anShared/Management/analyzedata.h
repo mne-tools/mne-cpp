@@ -209,10 +209,12 @@ public:
 
         switch(temp->getType()){
         case ANSHAREDLIB_FIFFRAW_MODEL:
+        case ANSHAREDLIB_NOISE_MODEL:
             iType = BIDS_FUNCTIONALDATA;
             index = m_SelectedItem;
             break;
         case ANSHAREDLIB_BEMDATA_MODEL:
+        case ANSHAREDLIB_MRICOORD_MODEL:
             iType = BIDS_ANATOMICALDATA;
             index = m_SelectedItem;
             break;
