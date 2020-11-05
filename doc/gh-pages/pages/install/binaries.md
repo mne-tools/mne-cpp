@@ -13,14 +13,14 @@ Stable Releases
 
 | Version | Release | Download link |
 |-------|-------|-------|
-| [0.1.7](changelog.md#version-017) | 2020-10-26 | <span class="fs-2"> [Windows](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.7/mne-cpp-windows-static-x86_64.zip){: .btn .btn-blue } [Linux](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.7/mne-cpp-linux-static-x86_64.tar.gz){: .btn .btn-blue } [MacOS](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.7/mne-cpp-macos-static-x86_64.tar.gz){: .btn .btn-blue } </span> |
+| [0.1.7](changelog.md#version-017) | 2020-10-26 | <span class="fs-2"> [Windows](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.7/mne-cpp-windows-static-x86_64.zip){: .btn .btn-blue } [Linux](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.7/mne-cpp-linux-static-x86_64.tar.gz){: .btn .btn-blue } [MacOS](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.7/mne-cpp-macos-dynamic-x86_64.tar.gz){: .btn .btn-blue } </span> |
 
 Development Release
 {: .label .label-green }
 
 | Version | Release | Download link |
 |-------|-------|-------|
-| dev_build | [Latest commit](https://github.com/mne-tools/mne-cpp/commits/master){:target="_blank" rel="noopener"} | <span class="fs-2"> [Windows](https://github.com/mne-tools/mne-cpp/releases/download/dev_build/mne-cpp-windows-static-x86_64.zip){: .btn .btn-green } [Linux](https://github.com/mne-tools/mne-cpp/releases/download/dev_build/mne-cpp-linux-static-x86_64.tar.gz){: .btn .btn-green } [MacOS](https://github.com/mne-tools/mne-cpp/releases/download/dev_build/mne-cpp-macos-static-x86_64.tar.gz){: .btn .btn-green } </span> |
+| dev_build | [Latest commit](https://github.com/mne-tools/mne-cpp/commits/master){:target="_blank" rel="noopener"} | <span class="fs-2"> [Windows](https://github.com/mne-tools/mne-cpp/releases/download/dev_build/mne-cpp-windows-static-x86_64.zip){: .btn .btn-green } [Linux](https://github.com/mne-tools/mne-cpp/releases/download/dev_build/mne-cpp-linux-static-x86_64.tar.gz){: .btn .btn-green } [MacOS](https://github.com/mne-tools/mne-cpp/releases/download/dev_build/mne-cpp-macos-dynamic-x86_64.tar.gz){: .btn .btn-green } </span> |
 
 WebAssembly Releases
 {: .label .label-purple }
