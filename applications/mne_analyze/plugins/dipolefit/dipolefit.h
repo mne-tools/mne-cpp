@@ -60,6 +60,11 @@
 //=============================================================================================================
 
 namespace ANSHAREDLIB {
+    class AbstractModel;
+    class FiffRawViewModel;
+    class BemDataModel;
+    class MriCoordModel;
+    class NoiseModel;
     class Communicator;
 }
 
@@ -125,11 +130,34 @@ private:
     //=========================================================================================================
     void onFittingChanged(float fMinDistance, float fGridSize);
 
+    //=========================================================================================================
+    /**
+     * Loads new model whan current model is changed
+     *
+     * @param [in,out] pNewModel    pointer to newly selected model
+     */
+    void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
 
-    QPointer<ANSHAREDLIB::Communicator>         m_pCommu;
-    INVERSELIB::DipoleFitSettings               m_DipoleSettings;
-    QMutex                                      m_FitMutex;
+    QSharedPointer<ANSHAREDLIB::FiffRawViewModel>           m_pFiffRawModel;
+    QSharedPointer<ANSHAREDLIB::BemDataModel>               m_pBemModel;
+    QSharedPointer<ANSHAREDLIB::NoiseModel>                 m_pNoiseModel;
+    QSharedPointer<ANSHAREDLIB::MriCoordModel>              m_pMriModel;
 
+    QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;
+    INVERSELIB::DipoleFitSettings                           m_DipoleSettings;
+    QMutex                                                  m_FitMutex;
+
+
+signals:
+
+    //=========================================================================================================
+    void newBemModel(const QString& sModelName);
+
+    //=========================================================================================================
+    void newNoiseModel(const QString& sModelName);
+
+    //=========================================================================================================
+    void newMriModel(const QString& sModelName);
 };
 
 //=============================================================================================================

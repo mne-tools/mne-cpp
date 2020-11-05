@@ -58,9 +58,10 @@ using namespace ANSHAREDLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MriCoordModel::MriCoordModel(const QString &sPath,
-                             QObject *pParent)
-:AbstractModel(sPath,pParent)
+MriCoordModel::MriCoordModel(const QString &sFilePath,
+                             const QByteArray& byteLoadedData,
+                             QObject* parent)
+:AbstractModel(sFilePath, parent)
 {
 
 }
@@ -91,5 +92,5 @@ QVariant MriCoordModel::data(const QModelIndex &index,
 
 Qt::ItemFlags MriCoordModel::flags(const QModelIndex &index) const
 {
-
+    return QAbstractItemModel::flags(index);
 }

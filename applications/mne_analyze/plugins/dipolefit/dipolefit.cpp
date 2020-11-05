@@ -127,6 +127,9 @@ QWidget *DipoleFit::getView()
 void DipoleFit::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
+    case EVENT_TYPE::SELECTED_MODEL_CHANGED:
+        onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
+        break;
     default:
         qWarning() << "[DipoleFit::handleEvent] received an Event that is not handled by switch-cases";
         break;
@@ -186,4 +189,46 @@ void DipoleFit::onFittingChanged(float fMinDistance,
 
     m_DipoleSettings.guess_mindist = static_cast<float>(fMinDistance)/1000.f;
     m_DipoleSettings.guess_rad = static_cast<float>(fGridSize)/1000.f;
+}
+
+//=============================================================================================================
+
+void DipoleFit::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel)
+{
+    if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
+        if(m_pFiffRawModel) {
+            if(m_pFiffRawModel == pNewModel) {
+                qInfo() << "[Averaging::onModelChanged] New model is the same as old model";
+                return;
+            }
+        }
+        m_pFiffRawModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
+
+    } else if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_BEMDATA_MODEL) {
+        if(m_pBemModel) {
+            if(m_pBemModel == pNewModel) {
+                qInfo() << "[Averaging::onModelChanged] New model is the same as old model";
+                return;
+            }
+        }
+        m_pBemModel = qSharedPointerCast<BemDataModel>(pNewModel);
+
+    } else if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_NOISE_MODEL) {
+        if(m_pNoiseModel) {
+            if(m_pNoiseModel == pNewModel) {
+                qInfo() << "[Averaging::onModelChanged] New model is the same as old model";
+                return;
+            }
+        }
+        m_pNoiseModel = qSharedPointerCast<NoiseModel>(pNewModel);
+
+    } else if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_MRICOORD_MODEL) {
+        if(m_pMriModel) {
+            if(m_pMriModel == pNewModel) {
+                qInfo() << "[Averaging::onModelChanged] New model is the same as old model";
+                return;
+            }
+        }
+        m_pMriModel = qSharedPointerCast<MriCoordModel>(pNewModel);
+    }
 }
