@@ -65,8 +65,9 @@ public:
     typedef QSharedPointer<NoiseModel> SPtr;              /**< Shared pointer type for AnnotationModel. */
     typedef QSharedPointer<const NoiseModel> ConstSPtr;   /**< Const shared pointer type for AnnotationModel. */
 
-    NoiseModel(const QString &sPath,
-               QObject *pParent = nullptr);
+    NoiseModel(const QString &sFilePath,
+               const QByteArray& byteLoadedData = QByteArray(),
+               QObject* parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
