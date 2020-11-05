@@ -34,5 +34,16 @@ cd mne-cpp
 ../linuxdeployqt-continuous-x86_64.AppImage bin/mne_scan -verbose2 -extra-plugins=renderers
 ../linuxdeployqt-continuous-x86_64.AppImage bin/mne_analyze -verbose2 -extra-plugins=renderers
 
+# Manually copy in the libxcb-xinerama library which is needed by plugins/platforms/libxcb.so
+cp /usr/lib/x86_64-linux-gnu/libxcb-xinerama.so.0 ./lib/
+
+echo 
+echo ldd ./bin/mne_scan
+ldd ./bin/mne_scan
+
+echo 
+echo ldd ./plugins/platforms/libqxcb.so
+ldd ./plugins/platforms/libqxcb.so
+
 # Creating archive of everything in current directory
 tar cfvz ../mne-cpp-linux-dynamic-x86_64.tar.gz ./*
