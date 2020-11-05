@@ -58,15 +58,17 @@
 namespace ANSHAREDLIB {
 
 //=============================================================================================================
-class MriCoordModel : public AbstractModel
+class ANSHAREDSHARED_EXPORT MriCoordModel : public AbstractModel
 {
     Q_OBJECT
+
 public:
     typedef QSharedPointer<MriCoordModel> SPtr;              /**< Shared pointer type for AnnotationModel. */
     typedef QSharedPointer<const MriCoordModel> ConstSPtr;   /**< Const shared pointer type for AnnotationModel. */
 
-    MriCoordModel(const QString &sPath,
-                  QObject *pParent = nullptr);
+    MriCoordModel(const QString &sFilePath,
+                  const QByteArray& byteLoadedData = QByteArray(),
+                  QObject* parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
