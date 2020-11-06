@@ -113,15 +113,36 @@ public:
 private:
 
     //=========================================================================================================
+    /**
+     * @brief onPerformDipoleFit
+     */
     void onPerformDipoleFit();
 
     //=========================================================================================================
+    /**
+     * @brief onModalityChanged
+     *
+     * @param iModality
+     */
     void onModalityChanged(int iModality);
 
     //=========================================================================================================
+    /**
+     * @brief onTimeChanged
+     *
+     * @param iMin
+     * @param iMax
+     * @param iStep
+     */
     void onTimeChanged(int iMin, int iMax, int iStep);
 
     //=========================================================================================================
+    /**
+     * @brief onFittingChanged
+     *
+     * @param fMinDistance
+     * @param fGridSize
+     */
     void onFittingChanged(float fMinDistance, float fGridSize);
 
     //=========================================================================================================
@@ -139,19 +160,35 @@ private:
 
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;
     INVERSELIB::DipoleFitSettings                           m_DipoleSettings;
+
     QMutex                                                  m_FitMutex;
 
 
 signals:
 
     //=========================================================================================================
+    /**
+     * @brief newBemModel
+     * @param sModelName
+     */
     void newBemModel(const QString& sModelName);
 
     //=========================================================================================================
+    /**
+     * @brief newNoiseModel
+     * @param sModelName
+     */
     void newNoiseModel(const QString& sModelName);
 
     //=========================================================================================================
+    /**
+     * @brief newMriModel
+     * @param sModelName
+     */
     void newMriModel(const QString& sModelName);
+
+
+   void getUpdate();
 };
 
 //=============================================================================================================

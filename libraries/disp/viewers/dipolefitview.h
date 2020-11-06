@@ -88,14 +88,33 @@ public:
     void loadSettings();
 
     //=========================================================================================================
+    /**
+     * @brief setBem
+     *
+     * @param sFileName
+     */
     void setBem(const QString& sFileName);
 
     //=========================================================================================================
+    /**
+     * @brief setMri
+     *
+     * @param sFileName
+     */
     void setMri(const QString& sFileName);
 
     //=========================================================================================================
+    /**
+     * @brief setNoise
+     *
+     * @param sFileName
+     */
     void setNoise(const QString& sFileName);
 
+    //=========================================================================================================
+    /**
+     * @brief requestParams
+     */
     void requestParams();
 
 protected:
@@ -120,15 +139,36 @@ private:
 
 signals:
     //=========================================================================================================
+    /**
+     * @brief performDipoleFit
+     */
     void performDipoleFit();
 
     //=========================================================================================================
+    /**
+     * @brief modalityChanged
+     *
+     * @param iModality
+     */
     void modalityChanged(int iModality);
 
     //=========================================================================================================
+    /**
+     * @brief timeChanged
+     *
+     * @param iMin
+     * @param iMax
+     * @param iStep
+     */
     void timeChanged(int iMin, int iMax, int iStep);
 
     //=========================================================================================================
+    /**
+     * @brief fittingChanged
+     *
+     * @param iMinDistance
+     * @param iGridSize
+     */
     void fittingChanged(int iMinDistance, int iGridSize);
 
 

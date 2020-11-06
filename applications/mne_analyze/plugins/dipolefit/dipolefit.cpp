@@ -131,6 +131,15 @@ QDockWidget *DipoleFit::getControl()
             pDipoleView, &DISPLIB::DipoleFitView::setNoise, Qt::UniqueConnection);
     connect(this, &DipoleFit::newMriModel,
             pDipoleView, &DISPLIB::DipoleFitView::setMri, Qt::UniqueConnection);
+    connect(this, &DipoleFit::getUpdate,
+            pDipoleView, &DISPLIB::DipoleFitView::requestParams, Qt::UniqueConnection);
+
+    connect(pDipoleView, &DISPLIB::DipoleFitView::modalityChanged,
+            this, &DipoleFit::onModalityChanged, Qt::UniqueConnection);
+    connect(pDipoleView, &DISPLIB::DipoleFitView::timeChanged,
+            this, &DipoleFit::onTimeChanged, Qt::UniqueConnection);
+    connect(pDipoleView, &DISPLIB::DipoleFitView::fittingChanged,
+            this, &DipoleFit::onFittingChanged, Qt::UniqueConnection);
 
     return pDockWidgt;
 }
