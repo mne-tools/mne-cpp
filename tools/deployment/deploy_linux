@@ -1,7 +1,4 @@
 # This script needs to be run from the top level mne-cpp repo folder
-# Delete folders which we do not want to ship
-rm -r bin/mne-cpp-test-data
-
 # Copy additional brainflow libs
 cp -a applications/mne_scan/plugins/brainflowboard/brainflow/installed/lib/. lib/
 
@@ -44,6 +41,9 @@ ldd ./bin/mne_scan
 echo 
 echo ldd ./plugins/platforms/libqxcb.so
 ldd ./plugins/platforms/libqxcb.so
+
+# Delete folders which we do not want to ship
+rm -r bin/mne-cpp-test-data
 
 # Creating archive of everything in current directory
 tar cfvz ../mne-cpp-linux-dynamic-x86_64.tar.gz ./*

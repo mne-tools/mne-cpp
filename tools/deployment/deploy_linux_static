@@ -1,10 +1,4 @@
 # This script needs to be run from the top level mne-cpp repo folder
-# Delete folders which we do not want to ship
-rm -r bin/mne_rt_server_plugins
-rm -r bin/mne-cpp-test-data
-rm -r bin/mne_scan_plugins
-rm -r bin/mne_analyze_plugins
-
 # Install some additional packages so linuxdeployqt can find them
 sudo apt-get update
 sudo apt-get install libxkbcommon-x11-0
@@ -34,6 +28,12 @@ cd mne-cpp
 echo
 echo ldd ./bin/mne_scan
 ldd ./bin/mne_scan
+
+# Delete folders which we do not want to ship
+rm -r bin/mne_rt_server_plugins
+rm -r bin/mne-cpp-test-data
+rm -r bin/mne_scan_plugins
+rm -r bin/mne_analyze_plugins
 
 # Creating archive of everything in the bin directory
 tar cfvz ../mne-cpp-linux-static-x86_64.tar.gz bin/. lib/.
