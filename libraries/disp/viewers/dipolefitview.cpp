@@ -74,8 +74,11 @@ DipoleFitView::DipoleFitView(QWidget *parent,
                                  m_pUi->spinBox_tmax->value(),
                                  iValue);
             });
-    connect(m_pUi->radioButton_EEG, &QRadioButton::toggled, [=](bool bChecked){
-                emit modalityChanged(bChecked ? 1 : 0);
+    connect(m_pUi->checkBox_EEG, &QCheckBox::toggled, [=](bool bChecked){
+                emit modalityChanged(bChecked, m_pUi->checkBox_MEG->isChecked());
+            });
+    connect(m_pUi->checkBox_MEG, &QCheckBox::toggled, [=](bool bChecked){
+                emit modalityChanged(m_pUi->checkBox_EEG->isChecked(), bChecked);
             });
     connect(m_pUi->doubleSpinBox_dist,  QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double dValue){
                 emit fittingChanged(dValue,
@@ -150,5 +153,12 @@ void DipoleFitView::setNoise(const QString &sFileName)
 
 void DipoleFitView::requestParams()
 {
+    emit timeChanged(m_pUi->spinBox_tmin->value(),
+                     m_pUi->spinBox_tmax->value(),
+                     m_pUi->spinBox_tstep->value());
 
+    emit modalityChanged(m_pUi->checkBox_EEG->isChecked(), m_pUi->checkBox_MEG->isChecked());
+
+    emit fittingChanged(m_pUi->doubleSpinBox_dist->value(),
+                        m_pUi->doubleSpinBox_grid->value());
 }
