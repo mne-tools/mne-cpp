@@ -63,7 +63,7 @@ namespace ANSHAREDLIB {
     class BemDataModel;
     class MriCoordModel;
     class NoiseModel;
-    class AveragingDataModel
+    class AveragingDataModel;
     class Communicator;
 }
 
@@ -152,7 +152,9 @@ private:
      *
      * @param [in,out] pNewModel    pointer to newly selected model
      */
-    void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
+    void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);\
+
+    void newDipoleFit(INVERSELIB::ECDSet set);
 
     QSharedPointer<ANSHAREDLIB::FiffRawViewModel>           m_pFiffRawModel;
     QSharedPointer<ANSHAREDLIB::AveragingDataModel>         m_pAverageModel;

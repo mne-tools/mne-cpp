@@ -88,6 +88,27 @@ DipoleFitView::DipoleFitView(QWidget *parent,
                 emit fittingChanged(m_pUi->doubleSpinBox_dist->value(),
                                     dValue);
             });
+
+    connect(m_pUi->pushButton_clearmri, &QPushButton::clicked, [=]{
+            m_pUi->pushButton_clearmri->hide();
+            emit clearMri();
+            });
+
+    connect(m_pUi->pushButton_clearbem, &QPushButton::clicked, [=]{
+            emit clearBem();
+            m_pUi->pushButton_clearbem->hide();
+            });
+
+    connect(m_pUi->pushButton_clearnoise, &QPushButton::clicked, [=]{
+            emit clearNoise();
+            m_pUi->pushButton_clearnoise->hide();
+            });
+
+
+    m_pUi->pushButton_clearbem->hide();
+    m_pUi->pushButton_clearmri->hide();
+    m_pUi->pushButton_clearnoise->hide();
+
 }
 
 //=============================================================================================================
@@ -133,6 +154,7 @@ void DipoleFitView::updateProcessingMode(ProcessingMode mode)
 void DipoleFitView::setBem(const QString &sFileName)
 {
     m_pUi->lineEdit_bem->setText(sFileName);
+    m_pUi->pushButton_clearbem->show();
 }
 
 //=============================================================================================================
@@ -140,6 +162,7 @@ void DipoleFitView::setBem(const QString &sFileName)
 void DipoleFitView::setMri(const QString &sFileName)
 {
     m_pUi->lineEdit_mri->setText(sFileName);
+    m_pUi->pushButton_clearmri->show();
 }
 
 //=============================================================================================================
@@ -147,6 +170,7 @@ void DipoleFitView::setMri(const QString &sFileName)
 void DipoleFitView::setNoise(const QString &sFileName)
 {
     m_pUi->lineEdit_noise->setText(sFileName);
+    m_pUi->pushButton_clearnoise->show();
 }
 
 //=============================================================================================================
