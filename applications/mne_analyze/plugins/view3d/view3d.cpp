@@ -195,6 +195,7 @@ void View3D::handleEvent(QSharedPointer<Event> e)
             break;
         case NEW_DIPOLE_FIT_DATA:
             qDebug() << "do something here";
+            newDipoleFit(e->getData().value<INVERSELIB::ECDSet>());
             break;
         default:
             qWarning() << "[View3D::handleEvent] Received an Event that is not handled by switch cases.";
@@ -238,8 +239,7 @@ void View3D::updateCoregDigitizer(FiffDigPointSet digSet)
     return;
 }
 
-//=========================================================================================================
-
+//=============================================================================================================
 void View3D::updateCoregMriFid(FiffDigPointSet digSetFid)
 {
     m_pMriFidCoreg = m_p3DModel->addDigitizerData("Co-Registration",
@@ -248,7 +248,7 @@ void View3D::updateCoregMriFid(FiffDigPointSet digSetFid)
     return;
 }
 
-//=========================================================================================================
+//=============================================================================================================
 
 void View3D::updateCoregTrans(FiffCoordTrans headMriTrans)
 {
@@ -256,7 +256,7 @@ void View3D::updateCoregTrans(FiffCoordTrans headMriTrans)
     return;
 }
 
-//=========================================================================================================
+//=============================================================================================================
 
 void View3D::fiducialPicking(const bool bActivatePicking)
 {
@@ -268,7 +268,7 @@ void View3D::fiducialPicking(const bool bActivatePicking)
     }
 }
 
-//=========================================================================================================
+//=============================================================================================================
 
 void View3D::newPickingEvent(Qt3DRender::QPickEvent *qPickEvent)
 {
@@ -276,7 +276,7 @@ void View3D::newPickingEvent(Qt3DRender::QPickEvent *qPickEvent)
     m_pCommu->publishEvent(EVENT_TYPE::NEW_FIDUCIAL_PICKED, data);
 }
 
-//=========================================================================================================
+//=============================================================================================================
 
 void View3D::onFiducialChanged(const int iFiducial)
 {
@@ -296,14 +296,14 @@ void View3D::onFiducialChanged(const int iFiducial)
     }
 }
 
-//=========================================================================================================
+//=============================================================================================================
 
 void View3D::new3DModel(QSharedPointer<DISP3DLIB::Data3DTreeModel> pModel)
 {
     m_pCommu->publishEvent(EVENT_TYPE::SET_DATA3D_TREE_MODEL, QVariant::fromValue(pModel));
 }
 
-//=========================================================================================================
+//=============================================================================================================
 
 void View3D::settingsChanged(ANSHAREDLIB::View3DParameters viewParameters)
 {
@@ -332,4 +332,11 @@ void View3D::settingsChanged(ANSHAREDLIB::View3DParameters viewParameters)
     default:
         qDebug() << "[View3D::settingsChanged] Unknown setting";
     }
+}
+
+//=============================================================================================================
+
+void View3D::newDipoleFit(const INVERSELIB::ECDSet &ecdSet)
+{
+    m_p3DModel->addDipoleFitData("subject", "set", ecdSet);
 }

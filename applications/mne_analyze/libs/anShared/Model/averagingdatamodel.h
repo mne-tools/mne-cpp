@@ -179,6 +179,8 @@ public:
 
 private:
     QSharedPointer<FIFFLIB::FiffEvokedSet> m_pFiffEvokedSet; /**<  Pointer to FiffEvokedData for the calculated average*/
+
+    bool bFromFile;
 };
 
 //=============================================================================================================

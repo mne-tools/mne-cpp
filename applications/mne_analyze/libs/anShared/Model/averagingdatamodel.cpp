@@ -65,6 +65,7 @@ AveragingDataModel::AveragingDataModel(QSharedPointer<FIFFLIB::FiffEvokedSet> pE
                                        QObject* parent)
 : AbstractModel(parent)
 , m_pFiffEvokedSet(pEvokedSet)
+, bFromFile(false)
 {
 
 }
@@ -75,6 +76,7 @@ AveragingDataModel::AveragingDataModel(const QString &sFilePath,
                                        const QByteArray& byteLoadedData,
                                        QObject* parent)
 : AbstractModel(parent)
+, bFromFile(true)
 {
     Q_UNUSED(byteLoadedData);
 

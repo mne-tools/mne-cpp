@@ -141,6 +141,8 @@ QDockWidget *DipoleFit::getControl()
     connect(pDipoleView, &DISPLIB::DipoleFitView::fittingChanged,
             this, &DipoleFit::onFittingChanged, Qt::UniqueConnection);
 
+    emit getUpdate();
+
     return pDockWidgt;
 }
 
@@ -218,17 +220,12 @@ void DipoleFit::onPerformDipoleFit()
 
 //=============================================================================================================
 
-void DipoleFit::onModalityChanged(int iModality)
+void DipoleFit::onModalityChanged(bool bEEG, bool bMEG)
 {
     QMutexLocker lock(&m_FitMutex);
 
-    if (iModality == 0) {
-        m_DipoleSettings.include_meg = true;
-        m_DipoleSettings.include_eeg = false;
-    } else if(iModality == 1) {
-        m_DipoleSettings.include_meg = false;
-        m_DipoleSettings.include_eeg = true;
-    }
+    m_DipoleSettings.include_meg = bMEG;
+    m_DipoleSettings.include_eeg = bEEG;
 }
 
 //=============================================================================================================
@@ -267,6 +264,9 @@ void DipoleFit::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewMo
             }
         }
         m_pFiffRawModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
+        m_DipoleSettings.measname = pNewModel->getModelPath();
+        emit newMeasurment(QFileInfo(pNewModel->getModelPath()).fileName());
+
     } else if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_BEMDATA_MODEL) {
         if(m_pBemModel) {
             if(m_pBemModel == pNewModel) {
@@ -275,7 +275,9 @@ void DipoleFit::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewMo
             }
         }
         m_pBemModel = qSharedPointerCast<BemDataModel>(pNewModel);
+        m_DipoleSettings.bemname = pNewModel->getModelPath();
         emit newBemModel(QFileInfo(pNewModel->getModelPath()).fileName());
+
     } else if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_NOISE_MODEL) {
         if(m_pNoiseModel) {
             if(m_pNoiseModel == pNewModel) {
@@ -284,7 +286,9 @@ void DipoleFit::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewMo
             }
         }
         m_pNoiseModel = qSharedPointerCast<NoiseModel>(pNewModel);
+        m_DipoleSettings.noisename = pNewModel->getModelPath();
         emit newNoiseModel(QFileInfo(pNewModel->getModelPath()).fileName());
+
     } else if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_MRICOORD_MODEL) {
         if(m_pMriModel) {
             if(m_pMriModel == pNewModel) {
@@ -293,6 +297,19 @@ void DipoleFit::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewMo
             }
         }
         m_pMriModel = qSharedPointerCast<MriCoordModel>(pNewModel);
+        m_DipoleSettings.mriname = pNewModel->getModelPath();
         emit newMriModel(QFileInfo(pNewModel->getModelPath()).fileName());
+
+    } else if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_AVERAGING_MODEL) {
+        if(m_pAverageModel) {
+            if(m_pAverageModel == pNewModel) {
+                qInfo() << "[DipoleFit::onModelChanged] New model is the same as old model";
+                return;
+            }
+        }
+        m_pAverageModel = qSharedPointerCast<AveragingDataModel>(pNewModel);
+        m_DipoleSettings.measname = pNewModel->getModelPath();
+        emit newMeasurment(QFileInfo(pNewModel->getModelPath()).fileName());
+
     }
 }
