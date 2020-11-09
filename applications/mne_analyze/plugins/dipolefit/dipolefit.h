@@ -115,34 +115,35 @@ private:
 
     //=========================================================================================================
     /**
-     * @brief onPerformDipoleFit
+     * Performs dipole fit calculations
      */
     void onPerformDipoleFit();
 
     //=========================================================================================================
     /**
-     * @brief onModalityChanged
+     * Updates modalities in dipole settings
      *
-     * @param iModality
+     * @param [in] bEEG     whether to use EEG (true = yes, false = no)
+     * @param [in] bMEG     whether to use MEG (true = yes, false = no)
      */
     void onModalityChanged(bool bEEG, bool bMEG);
 
     //=========================================================================================================
     /**
-     * @brief onTimeChanged
+     * Set new time parameters in dipole settings
      *
-     * @param iMin
-     * @param iMax
-     * @param iStep
+     * @param [in] iMin     new minimum in milliseconds
+     * @param [in] iMax     new maximum in milliseconds
+     * @param [in] iStep    new step value in milliseconds
      */
     void onTimeChanged(int iMin, int iMax, int iStep);
 
     //=========================================================================================================
     /**
-     * @brief onFittingChanged
+     * Set new fitting values in dipole settings
      *
-     * @param fMinDistance
-     * @param fGridSize
+     * @param [in] iMinDistance     distance to inner skull in millimeters
+     * @param [in] iGridSize        grid pacing in millimeters
      */
     void onFittingChanged(float fMinDistance, float fGridSize);
 
@@ -152,15 +153,29 @@ private:
      *
      * @param [in,out] pNewModel    pointer to newly selected model
      */
-    void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);\
+    void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
 
+    //=========================================================================================================
+    /**
+     * @brief onBaselineChanged
+     * @param iBMin
+     * @param iBMax
+     */
+    void onBaselineChanged(int iBMin, int iBMax);
+
+    //=========================================================================================================
+    /**
+     * Sends new edc set to be added to 3dView
+     *
+     * @param [in] set      new EDCSet to be sent
+     */
     void newDipoleFit(INVERSELIB::ECDSet set);
 
-    QSharedPointer<ANSHAREDLIB::FiffRawViewModel>           m_pFiffRawModel;
-    QSharedPointer<ANSHAREDLIB::AveragingDataModel>         m_pAverageModel;
-    QSharedPointer<ANSHAREDLIB::BemDataModel>               m_pBemModel;
-    QSharedPointer<ANSHAREDLIB::NoiseModel>                 m_pNoiseModel;
-    QSharedPointer<ANSHAREDLIB::MriCoordModel>              m_pMriModel;
+    QSharedPointer<ANSHAREDLIB::FiffRawViewModel>           m_pFiffRawModel;            /**< Currently selected FiffRawViewModel model */
+    QSharedPointer<ANSHAREDLIB::AveragingDataModel>         m_pAverageModel;            /**< Currently selected AveragingDataModel model */
+    QSharedPointer<ANSHAREDLIB::BemDataModel>               m_pBemModel;                /**< Currently selected BemDataModel model */
+    QSharedPointer<ANSHAREDLIB::NoiseModel>                 m_pNoiseModel;              /**< Currently selected NoiseModel model */
+    QSharedPointer<ANSHAREDLIB::MriCoordModel>              m_pMriModel;                /**< Currently selected MriCoordModel model */
 
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;
     INVERSELIB::DipoleFitSettings                           m_DipoleSettings;

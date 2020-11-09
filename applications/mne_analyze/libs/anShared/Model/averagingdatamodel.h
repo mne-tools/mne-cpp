@@ -176,11 +176,19 @@ public:
      */
     inline QModelIndex parent(const QModelIndex &index) const override;
 
+    //=========================================================================================================
+    /**
+     * Returns whether averaging model was loaded from a file
+     *
+     * @return
+     */
+    bool isFromFile();
+
 
 private:
     QSharedPointer<FIFFLIB::FiffEvokedSet> m_pFiffEvokedSet; /**<  Pointer to FiffEvokedData for the calculated average*/
 
-    bool bFromFile;
+    bool m_bFromFile;
 };
 
 //=============================================================================================================

@@ -75,6 +75,7 @@ using namespace ANSHAREDLIB;
 
 DipoleFit::DipoleFit()
 {
+    m_DipoleSettings.dipname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/dip-5120-bem_fit.dat";
 }
 
 //=============================================================================================================
@@ -132,6 +133,8 @@ QDockWidget *DipoleFit::getControl()
             pDipoleView, &DISPLIB::DipoleFitView::setNoise, Qt::UniqueConnection);
     connect(this, &DipoleFit::newMriModel,
             pDipoleView, &DISPLIB::DipoleFitView::setMri, Qt::UniqueConnection);
+    connect(this, &DipoleFit::newMeasurment,
+            pDipoleView, &DISPLIB::DipoleFitView::setMeas, Qt::UniqueConnection);
     connect(this, &DipoleFit::getUpdate,
             pDipoleView, &DISPLIB::DipoleFitView::requestParams, Qt::UniqueConnection);
 
@@ -325,6 +328,7 @@ void DipoleFit::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewMo
             }
         }
         m_pAverageModel = qSharedPointerCast<AveragingDataModel>(pNewModel);
+        if m_pAverageModel.IS
         m_DipoleSettings.measname = pNewModel->getModelPath();
         m_DipoleSettings.is_raw = false;
         emit newMeasurment(QFileInfo(pNewModel->getModelPath()).fileName());
@@ -337,4 +341,15 @@ void DipoleFit::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewMo
 void DipoleFit::newDipoleFit(INVERSELIB::ECDSet set)
 {
     m_pCommu->publishEvent(EVENT_TYPE::NEW_DIPOLE_FIT_DATA, QVariant::fromValue(set));
+}
+
+//=============================================================================================================
+
+void DipoleFit::onBaselineChanged(int iBMin,
+                                  int iBMax)
+{
+    QMutexLocker lock(&m_FitMutex);
+
+    m_DipoleSettings.bmin = static_cast<float>(iBMin)/1000.f;
+    m_DipoleSettings.bmax = static_cast<float>(iBMax)/1000.f;
 }

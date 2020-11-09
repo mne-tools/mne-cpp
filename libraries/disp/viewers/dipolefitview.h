@@ -89,7 +89,7 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief setBem
+     * Updates GUI to show selected BEM file
      *
      * @param sFileName
      */
@@ -97,7 +97,7 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief setMri
+     * Updates GUI to show selected MRI file
      *
      * @param sFileName
      */
@@ -105,11 +105,19 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief setNoise
+     * Updates GUI to show selecte Noise file
      *
      * @param sFileName
      */
     void setNoise(const QString& sFileName);
+
+    //=========================================================================================================
+    /**
+     * Updates GUI to show selected measurement file
+     *
+     * @param sFileName
+     */
+    void setMeas(const QString& sFileName);
 
     //=========================================================================================================
     /**
@@ -135,49 +143,78 @@ protected:
     void updateProcessingMode(ProcessingMode mode);
 
 private:
-    Ui::DipoleFitViewWidget*    m_pUi;
+
+    //=========================================================================================================
+    void initGui();
+
+
+    Ui::DipoleFitViewWidget*    m_pUi;              /**< Holds GUI for view */
 
 signals:
     //=========================================================================================================
     /**
-     * @brief performDipoleFit
+     * Triggers dipole fit calculation
      */
     void performDipoleFit();
 
     //=========================================================================================================
     /**
-     * @brief modalityChanged
+     * Send new modality selection
      *
-     * @param iModality
+     * @param [in] bEEG     whether to use EEG (true = yes, false = no)
+     * @param [in] bMEG     whether to use MEG (true = yes, false = no)
      */
-    void modalityChanged(bool bEEG, bool bMEG);
+    void modalityChanged(bool bEEG,
+                         bool bMEG);
 
     //=========================================================================================================
     /**
-     * @brief timeChanged
+     * Send new time values
      *
-     * @param iMin
-     * @param iMax
-     * @param iStep
+     * @param [in] iMin     new minimum in milliseconds
+     * @param [in] iMax     new maximum in milliseconds
+     * @param [in] iStep    new step value in milliseconds
      */
-    void timeChanged(int iMin, int iMax, int iStep);
+    void timeChanged(int iMin,
+                     int iMax,
+                     int iStep);
 
     //=========================================================================================================
     /**
-     * @brief fittingChanged
+     * Send new fitting values
      *
-     * @param iMinDistance
-     * @param iGridSize
+     * @param [in] iMinDistance     distance to inner skull in millimeters
+     * @param [in] iGridSize        grid pacing in millimeters
      */
-    void fittingChanged(int iMinDistance, int iGridSize);
+    void fittingChanged(int iMinDistance,
+                        int iGridSize);
 
     //=========================================================================================================
+    /**
+     * Send new basline values
+     *
+     * @param [in] iBMin    new minimum in milliseconds
+     * @param [in] iBMax    new maximum in milliseconds
+     */
+    void baselineChanged(int iBMin,
+                         int iBMax);
+
+    //=========================================================================================================
+    /**
+     * Triggers clearing of noise model (ignored in dipole fit until reselected)
+     */
     void clearNoise();
 
     //=========================================================================================================
+    /**
+     * Triggers clearing of BEM model (ignored in dipole fit until reselected)
+     */
     void clearBem();
 
     //=========================================================================================================
+    /**
+     * Triggers clearing of MRI model (ignored in dipole fit until reselected)
+     */
     void clearMri();
 
 };
