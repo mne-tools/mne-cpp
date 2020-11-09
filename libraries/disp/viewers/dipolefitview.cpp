@@ -57,58 +57,7 @@ DipoleFitView::DipoleFitView(QWidget *parent,
     m_pUi->setupUi(this);
     this->setMinimumWidth(330);
 
-    connect(m_pUi->pushButton_fit, &QPushButton::clicked,
-            this, &DipoleFitView::performDipoleFit);
-    connect(m_pUi->spinBox_tmin, QOverload<int>::of(&QSpinBox::valueChanged), [=](int iValue){
-                emit timeChanged(iValue,
-                                 m_pUi->spinBox_tmax->value(),
-                                 m_pUi->spinBox_tstep->value());
-            });
-    connect(m_pUi->spinBox_tmax, QOverload<int>::of(&QSpinBox::valueChanged), [=](int iValue){
-                emit timeChanged(m_pUi->spinBox_tmin->value(),
-                                 iValue,
-                                 m_pUi->spinBox_tstep->value());
-            });
-    connect(m_pUi->spinBox_tstep, QOverload<int>::of(&QSpinBox::valueChanged), [=](int iValue){
-                emit timeChanged(m_pUi->spinBox_tmin->value(),
-                                 m_pUi->spinBox_tmax->value(),
-                                 iValue);
-            });
-    connect(m_pUi->checkBox_EEG, &QCheckBox::toggled, [=](bool bChecked){
-                emit modalityChanged(bChecked, m_pUi->checkBox_MEG->isChecked());
-            });
-    connect(m_pUi->checkBox_MEG, &QCheckBox::toggled, [=](bool bChecked){
-                emit modalityChanged(m_pUi->checkBox_EEG->isChecked(), bChecked);
-            });
-    connect(m_pUi->doubleSpinBox_dist,  QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double dValue){
-                emit fittingChanged(dValue,
-                                    m_pUi->doubleSpinBox_grid->value());
-            });
-    connect(m_pUi->doubleSpinBox_grid, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double dValue){
-                emit fittingChanged(m_pUi->doubleSpinBox_dist->value(),
-                                    dValue);
-            });
-
-    connect(m_pUi->pushButton_clearmri, &QPushButton::clicked, [=]{
-            m_pUi->pushButton_clearmri->hide();
-            emit clearMri();
-            });
-
-    connect(m_pUi->pushButton_clearbem, &QPushButton::clicked, [=]{
-            emit clearBem();
-            m_pUi->pushButton_clearbem->hide();
-            });
-
-    connect(m_pUi->pushButton_clearnoise, &QPushButton::clicked, [=]{
-            emit clearNoise();
-            m_pUi->pushButton_clearnoise->hide();
-            });
-
-
-    m_pUi->pushButton_clearbem->hide();
-    m_pUi->pushButton_clearmri->hide();
-    m_pUi->pushButton_clearnoise->hide();
-
+    initGui();
 }
 
 //=============================================================================================================
@@ -185,4 +134,84 @@ void DipoleFitView::requestParams()
 
     emit fittingChanged(m_pUi->doubleSpinBox_dist->value(),
                         m_pUi->doubleSpinBox_grid->value());
+}
+
+//=============================================================================================================
+
+void DipoleFitView::initGui()
+{
+    //Perform Fit
+    connect(m_pUi->pushButton_fit, &QPushButton::clicked,
+            this, &DipoleFitView::performDipoleFit);
+
+    //Time settings
+    connect(m_pUi->spinBox_tmin, QOverload<int>::of(&QSpinBox::valueChanged), [=](int iValue){
+                emit timeChanged(iValue,
+                                 m_pUi->spinBox_tmax->value(),
+                                 m_pUi->spinBox_tstep->value());
+            });
+    connect(m_pUi->spinBox_tmax, QOverload<int>::of(&QSpinBox::valueChanged), [=](int iValue){
+                emit timeChanged(m_pUi->spinBox_tmin->value(),
+                                 iValue,
+                                 m_pUi->spinBox_tstep->value());
+            });
+    connect(m_pUi->spinBox_tstep, QOverload<int>::of(&QSpinBox::valueChanged), [=](int iValue){
+                emit timeChanged(m_pUi->spinBox_tmin->value(),
+                                 m_pUi->spinBox_tmax->value(),
+                                 iValue);
+            });
+
+    //Baseline
+    connect(m_pUi->spinBox_bmin, QOverload<int>::of(&QSpinBox::valueChanged), [=](int iValue){
+                emit baselineChanged(iValue,
+                                     m_pUi->spinBox_bmax->value());
+            });
+    connect(m_pUi->spinBox_bmax, QOverload<int>::of(&QSpinBox::valueChanged), [=](int iValue){
+                emit baselineChanged(m_pUi->spinBox_bmax->value(),
+                                     iValue);
+            });
+
+    //Modality
+    connect(m_pUi->checkBox_EEG, &QCheckBox::toggled, [=](bool bChecked){
+                emit modalityChanged(bChecked, m_pUi->checkBox_MEG->isChecked());
+            });
+    connect(m_pUi->checkBox_MEG, &QCheckBox::toggled, [=](bool bChecked){
+                emit modalityChanged(m_pUi->checkBox_EEG->isChecked(), bChecked);
+            });
+
+    //Fittings
+    connect(m_pUi->doubleSpinBox_dist,  QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double dValue){
+                emit fittingChanged(dValue,
+                                    m_pUi->doubleSpinBox_grid->value());
+            });
+    connect(m_pUi->doubleSpinBox_grid, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double dValue){
+                emit fittingChanged(m_pUi->doubleSpinBox_dist->value(),
+                                    dValue);
+            });
+
+    connect(m_pUi->pushButton_clearmri, &QPushButton::clicked, [=]{
+            m_pUi->pushButton_clearmri->hide();
+            emit clearMri();
+            });
+
+    connect(m_pUi->pushButton_clearbem, &QPushButton::clicked, [=]{
+            emit clearBem();
+            m_pUi->pushButton_clearbem->hide();
+            });
+
+    connect(m_pUi->pushButton_clearnoise, &QPushButton::clicked, [=]{
+            emit clearNoise();
+            m_pUi->pushButton_clearnoise->hide();
+            });
+
+    m_pUi->pushButton_clearbem->hide();
+    m_pUi->pushButton_clearmri->hide();
+    m_pUi->pushButton_clearnoise->hide();
+}
+
+//=============================================================================================================
+
+void DipoleFitView::setMeas(const QString &sFileName)
+{
+    m_pUi->lineEdit_meas->setText(sFileName);
 }
