@@ -77,6 +77,10 @@ namespace FIFFLIB {
     class FiffCoordTrans;
     class FiffDigPointSet;
 }
+
+namespace INVERSELIB {
+    class ECDSet;
+}
 //=============================================================================================================
 // DEFINE NAMESPACE VIEW3DPLUGIN
 //=============================================================================================================
@@ -185,6 +189,13 @@ private:
      * @param [in] viewParameters   parameters with changes to bw appied to view
      */
     void settingsChanged(ANSHAREDLIB::View3DParameters viewParameters);
+
+    //=========================================================================================================
+    /**
+     * @brief newDipoleFit
+     * @param ecdSet
+     */
+    void newDipoleFit(const INVERSELIB::ECDSet& ecdSet);
 
     QPointer<ANSHAREDLIB::Communicator>             m_pCommu;               /**< To broadcst signals */
 

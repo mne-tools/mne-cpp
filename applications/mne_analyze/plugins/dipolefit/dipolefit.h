@@ -63,6 +63,7 @@ namespace ANSHAREDLIB {
     class BemDataModel;
     class MriCoordModel;
     class NoiseModel;
+    class AveragingDataModel
     class Communicator;
 }
 
@@ -124,7 +125,7 @@ private:
      *
      * @param iModality
      */
-    void onModalityChanged(int iModality);
+    void onModalityChanged(bool bEEG, bool bMEG);
 
     //=========================================================================================================
     /**
@@ -154,6 +155,7 @@ private:
     void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
 
     QSharedPointer<ANSHAREDLIB::FiffRawViewModel>           m_pFiffRawModel;
+    QSharedPointer<ANSHAREDLIB::AveragingDataModel>         m_pAverageModel;
     QSharedPointer<ANSHAREDLIB::BemDataModel>               m_pBemModel;
     QSharedPointer<ANSHAREDLIB::NoiseModel>                 m_pNoiseModel;
     QSharedPointer<ANSHAREDLIB::MriCoordModel>              m_pMriModel;
@@ -187,8 +189,11 @@ signals:
      */
     void newMriModel(const QString& sModelName);
 
+    //=========================================================================================================
+    void newMeasurment(const QString& sModelName);
 
-   void getUpdate();
+    //=========================================================================================================
+    void getUpdate();
 };
 
 //=============================================================================================================

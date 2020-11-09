@@ -150,7 +150,7 @@ signals:
      *
      * @param iModality
      */
-    void modalityChanged(int iModality);
+    void modalityChanged(bool bEEG, bool bMEG);
 
     //=========================================================================================================
     /**
