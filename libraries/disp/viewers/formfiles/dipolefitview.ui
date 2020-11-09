@@ -134,6 +134,13 @@
       <string>Noise</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_4">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_8">
+        <property name="text">
+         <string>Noise matrix</string>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="1">
        <widget class="QLineEdit" name="lineEdit_noise">
         <property name="readOnly">
@@ -141,10 +148,10 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_8">
+      <item row="0" column="2">
+       <widget class="QPushButton" name="pushButton_clearnoise">
         <property name="text">
-         <string>Noise matrix</string>
+         <string>Clear</string>
         </property>
        </widget>
       </item>
@@ -164,6 +171,13 @@
         </property>
        </widget>
       </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_7">
+        <property name="text">
+         <string>MRI coords</string>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="1">
        <widget class="QLineEdit" name="lineEdit_bem">
         <property name="readOnly">
@@ -178,10 +192,17 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_7">
+      <item row="0" column="2">
+       <widget class="QPushButton" name="pushButton_clearbem">
         <property name="text">
-         <string>MRI coords</string>
+         <string>Clear</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QPushButton" name="pushButton_clearmri">
+        <property name="text">
+         <string>Clear</string>
         </property>
        </widget>
       </item>

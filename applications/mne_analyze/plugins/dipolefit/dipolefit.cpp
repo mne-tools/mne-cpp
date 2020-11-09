@@ -48,6 +48,7 @@
 #include <anShared/Model/bemdatamodel.h>
 #include <anShared/Model/mricoordmodel.h>
 #include <anShared/Model/noisemodel.h>
+#include <anShared/Model/averagingdatamodel.h>
 
 #include <disp/viewers/dipolefitview.h>
 
@@ -141,6 +142,19 @@ QDockWidget *DipoleFit::getControl()
     connect(pDipoleView, &DISPLIB::DipoleFitView::fittingChanged,
             this, &DipoleFit::onFittingChanged, Qt::UniqueConnection);
 
+    connect(pDipoleView, &DISPLIB::DipoleFitView::clearBem, [=]{
+            QMutexLocker lock(&m_FitMutex);
+            m_DipoleSettings.bemname = "";
+            });
+    connect(pDipoleView, &DISPLIB::DipoleFitView::clearMri, [=]{
+            QMutexLocker lock(&m_FitMutex);
+            m_DipoleSettings.mriname = "";
+            });
+    connect(pDipoleView, &DISPLIB::DipoleFitView::clearBem, [=]{
+            QMutexLocker lock(&m_FitMutex);
+            m_DipoleSettings.noisename = "";
+            });
+
     emit getUpdate();
 
     return pDockWidgt;
@@ -216,6 +230,8 @@ void DipoleFit::onPerformDipoleFit()
     } else {
         qWarning("[DipoleFit::onPerformDipoleFit] Cannot open FiffCoordTrans file");
     }
+
+    newDipoleFit(ecdSetTrans);
 }
 
 //=============================================================================================================
@@ -265,6 +281,7 @@ void DipoleFit::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewMo
         }
         m_pFiffRawModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
         m_DipoleSettings.measname = pNewModel->getModelPath();
+        m_DipoleSettings.is_raw = true;
         emit newMeasurment(QFileInfo(pNewModel->getModelPath()).fileName());
 
     } else if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_BEMDATA_MODEL) {
@@ -309,7 +326,15 @@ void DipoleFit::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewMo
         }
         m_pAverageModel = qSharedPointerCast<AveragingDataModel>(pNewModel);
         m_DipoleSettings.measname = pNewModel->getModelPath();
+        m_DipoleSettings.is_raw = false;
         emit newMeasurment(QFileInfo(pNewModel->getModelPath()).fileName());
 
     }
+}
+
+//=============================================================================================================
+
+void DipoleFit::newDipoleFit(INVERSELIB::ECDSet set)
+{
+    m_pCommu->publishEvent(EVENT_TYPE::NEW_DIPOLE_FIT_DATA, QVariant::fromValue(set));
 }

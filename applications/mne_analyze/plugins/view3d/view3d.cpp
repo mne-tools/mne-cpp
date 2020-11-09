@@ -214,6 +214,7 @@ QVector<EVENT_TYPE> View3D::getEventSubscriptions(void) const
     temp.push_back(FID_PICKING_STATUS);
     temp.push_back(FIDUCIAL_CHANGED);
     temp.push_back(VIEW3D_SETTINGS_CHANGED);
+    temp.push_back(NEW_DIPOLE_FIT_DATA);
     return temp;
 }
 
