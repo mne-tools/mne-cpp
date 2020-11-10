@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>295</width>
-    <height>553</height>
+    <height>482</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -234,6 +234,9 @@
       <string>Drop Rejected</string>
      </property>
     </widget>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="lineEdit"/>
    </item>
    <item>
     <widget class="QPushButton" name="m_pushButton_compute">

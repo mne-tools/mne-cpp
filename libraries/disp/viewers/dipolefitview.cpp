@@ -203,17 +203,20 @@ void DipoleFitView::initGui()
     //Clearing models
     connect(m_pUi->pushButton_clearmri, &QPushButton::clicked, [=]{
             m_pUi->pushButton_clearmri->hide();
+            m_pUi->lineEdit_mri->setText("");
             emit clearMri();
             });
 
     connect(m_pUi->pushButton_clearbem, &QPushButton::clicked, [=]{
             emit clearBem();
             m_pUi->pushButton_clearbem->hide();
+            m_pUi->lineEdit_bem->setText("");
             });
 
     connect(m_pUi->pushButton_clearnoise, &QPushButton::clicked, [=]{
             emit clearNoise();
             m_pUi->pushButton_clearnoise->hide();
+            m_pUi->lineEdit_noise->setText("");
             });
 
     m_pUi->pushButton_clearbem->hide();
