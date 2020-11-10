@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     mricoordmodel.cpp
+ * @file     dipolefitmodel.cpp
  * @author   Gabriel Motta <gbmotta@mgh.harvard.edu>
  * @since    0.1.7
  * @date     November, 2020
@@ -28,15 +28,16 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the MriCoordModel Class.
+ * @brief    Definition of the DipoleFitModel Class.
  *
  */
+
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "mricoordmodel.h"
+#include "dipolefitmodel.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -58,17 +59,18 @@ using namespace ANSHAREDLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MriCoordModel::MriCoordModel(const QString &sFilePath,
-                             const QByteArray& byteLoadedData,
-                             QObject* parent)
+DipoleFitModel::DipoleFitModel(const QString &sFilePath,
+                               const QByteArray& byteLoadedData,
+                               QObject* parent)
 :AbstractModel(sFilePath, parent)
 {
+    Q_UNUSED(byteLoadedData);
 
 }
 
 //=============================================================================================================
 
-int MriCoordModel::rowCount(const QModelIndex &parent) const
+int DipoleFitModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
 
@@ -77,7 +79,7 @@ int MriCoordModel::rowCount(const QModelIndex &parent) const
 
 //=============================================================================================================
 
-int MriCoordModel::columnCount(const QModelIndex &parent) const
+int DipoleFitModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
 
@@ -86,7 +88,7 @@ int MriCoordModel::columnCount(const QModelIndex &parent) const
 
 //=============================================================================================================
 
-QVariant MriCoordModel::data(const QModelIndex &index,
+QVariant DipoleFitModel::data(const QModelIndex &index,
                              int role) const
 {
     Q_UNUSED(index);
@@ -97,7 +99,7 @@ QVariant MriCoordModel::data(const QModelIndex &index,
 
 //=============================================================================================================
 
-Qt::ItemFlags MriCoordModel::flags(const QModelIndex &index) const
+Qt::ItemFlags DipoleFitModel::flags(const QModelIndex &index) const
 {
     return QAbstractItemModel::flags(index);
 }
