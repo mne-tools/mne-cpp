@@ -93,9 +93,14 @@ void BidsViewModel::addData(QModelIndex selectedItem,
     }
     case BIDS_ANNOTATION:
     case BIDS_AVERAGE: {
+        if(!selectedItem.isValid()) {
+            QStandardItem* pItem = new QStandardItem("Unknown");
+            addDataToSession(addSessionToSubject(addSubject("sub-01"), "ses-01"), pItem, iDataType);
+        } else {
         addToData(pNewItem,
                   selectedItem,
                   iDataType);
+        }
         break;
     }
     }
