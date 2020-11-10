@@ -127,6 +127,7 @@ QDockWidget *DipoleFit::getControl()
     DISPLIB::DipoleFitView* pDipoleView = new DISPLIB::DipoleFitView();
     pDockWidgt->setWidget(pDipoleView);
 
+    //Send Gui updates
     connect(this, &DipoleFit::newBemModel,
             pDipoleView, &DISPLIB::DipoleFitView::setBem, Qt::UniqueConnection);
     connect(this, &DipoleFit::newNoiseModel,
@@ -135,9 +136,8 @@ QDockWidget *DipoleFit::getControl()
             pDipoleView, &DISPLIB::DipoleFitView::setMri, Qt::UniqueConnection);
     connect(this, &DipoleFit::newMeasurment,
             pDipoleView, &DISPLIB::DipoleFitView::setMeas, Qt::UniqueConnection);
-    connect(this, &DipoleFit::getUpdate,
-            pDipoleView, &DISPLIB::DipoleFitView::requestParams, Qt::UniqueConnection);
 
+    //Receive Gui updates
     connect(pDipoleView, &DISPLIB::DipoleFitView::modalityChanged,
             this, &DipoleFit::onModalityChanged, Qt::UniqueConnection);
     connect(pDipoleView, &DISPLIB::DipoleFitView::timeChanged,
@@ -146,7 +146,14 @@ QDockWidget *DipoleFit::getControl()
             this, &DipoleFit::onFittingChanged, Qt::UniqueConnection);
     connect(pDipoleView, &DISPLIB::DipoleFitView::baselineChanged,
             this, &DipoleFit::onBaselineChanged, Qt::UniqueConnection);
+    connect(this, &DipoleFit::getUpdate,
+            pDipoleView, &DISPLIB::DipoleFitView::requestParams, Qt::UniqueConnection);
 
+    //Fit
+    connect(pDipoleView, &DISPLIB::DipoleFitView::performDipoleFit,
+            this, &DipoleFit::onPerformDipoleFit, Qt::UniqueConnection);
+
+    //Clear models
     connect(pDipoleView, &DISPLIB::DipoleFitView::clearBem, [=]{
             QMutexLocker lock(&m_FitMutex);
             m_DipoleSettings.bemname = "";
@@ -199,11 +206,19 @@ QVector<EVENT_TYPE> DipoleFit::getEventSubscriptions(void) const
 
 void DipoleFit::onPerformDipoleFit()
 {
+    qDebug() << "Checking integrity...";
     m_DipoleSettings.checkIntegrity();
+
+    qDebug() << "Init settings...";
 
     INVERSELIB::DipoleFit dipFit(&m_DipoleSettings);
 
+    qDebug() << "Calculate fit...";
+
     INVERSELIB::ECDSet ecdSet = dipFit.calculateFit();
+
+    qDebug() << "Done!";
+
     INVERSELIB::ECDSet ecdSetTrans = ecdSet;
 
     QFile file(m_DipoleSettings.mriname);
