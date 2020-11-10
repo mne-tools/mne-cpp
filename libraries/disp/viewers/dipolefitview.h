@@ -184,10 +184,10 @@ signals:
      * Send new fitting values
      *
      * @param [in] iMinDistance     distance to inner skull in millimeters
-     * @param [in] iGridSize        grid pacing in millimeters
+     * @param [in] iSize        radisu size guess in millimeters
      */
     void fittingChanged(int iMinDistance,
-                        int iGridSize);
+                        int iSize);
 
     //=========================================================================================================
     /**
