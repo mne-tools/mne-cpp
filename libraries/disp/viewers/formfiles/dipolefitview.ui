@@ -88,13 +88,31 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QSpinBox" name="spinBox_tmin"/>
+       <widget class="QSpinBox" name="spinBox_tmin">
+        <property name="maximum">
+         <number>99999999</number>
+        </property>
+       </widget>
       </item>
       <item row="2" column="1">
-       <widget class="QSpinBox" name="spinBox_tstep"/>
+       <widget class="QSpinBox" name="spinBox_tstep">
+        <property name="minimum">
+         <number>-1</number>
+        </property>
+        <property name="maximum">
+         <number>99999999</number>
+        </property>
+        <property name="value">
+         <number>-1</number>
+        </property>
+       </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QSpinBox" name="spinBox_tmax"/>
+       <widget class="QSpinBox" name="spinBox_tmax">
+        <property name="maximum">
+         <number>99999999</number>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -120,10 +138,30 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QSpinBox" name="spinBox_bmin"/>
+       <widget class="QSpinBox" name="spinBox_bmin">
+        <property name="minimum">
+         <number>-99999999</number>
+        </property>
+        <property name="maximum">
+         <number>99999999</number>
+        </property>
+        <property name="value">
+         <number>1000000</number>
+        </property>
+       </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QSpinBox" name="spinBox_bmax"/>
+       <widget class="QSpinBox" name="spinBox_bmax">
+        <property name="minimum">
+         <number>-99999999</number>
+        </property>
+        <property name="maximum">
+         <number>99999999</number>
+        </property>
+        <property name="value">
+         <number>1000000</number>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -224,6 +262,12 @@
       </item>
       <item row="0" column="1">
        <widget class="QDoubleSpinBox" name="doubleSpinBox_dist">
+        <property name="minimum">
+         <double>0.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>999.990000000000009</double>
+        </property>
         <property name="value">
          <double>10.000000000000000</double>
         </property>
@@ -232,14 +276,17 @@
       <item row="1" column="0">
        <widget class="QLabel" name="label_5">
         <property name="text">
-         <string>Source space grid size(mm)</string>
+         <string>Spherical volume radius guess (mm)</string>
         </property>
        </widget>
       </item>
       <item row="1" column="1">
        <widget class="QDoubleSpinBox" name="doubleSpinBox_grid">
+        <property name="maximum">
+         <double>999.990000000000009</double>
+        </property>
         <property name="value">
-         <double>10.000000000000000</double>
+         <double>80.000000000000000</double>
         </property>
        </widget>
       </item>

@@ -96,7 +96,7 @@ FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
                                    qint32 iVisibleWindowSize,
                                    qint32 iPreloadBufferSize,
                                    QObject *pParent)
-: AbstractModel(pParent)
+: AbstractModel(sFilePath, pParent)
 , m_dDx(1.0)
 , m_iSamplesPerBlock(1024)
 , m_iVisibleWindowSize(iVisibleWindowSize)

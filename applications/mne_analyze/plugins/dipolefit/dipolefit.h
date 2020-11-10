@@ -143,9 +143,9 @@ private:
      * Set new fitting values in dipole settings
      *
      * @param [in] iMinDistance     distance to inner skull in millimeters
-     * @param [in] iGridSize        grid pacing in millimeters
+     * @param [in] iSize        radius guess in millimeters
      */
-    void onFittingChanged(float fMinDistance, float fGridSize);
+    void onFittingChanged(float fMinDistance, float fSize);
 
     //=========================================================================================================
     /**
@@ -171,11 +171,11 @@ private:
      */
     void newDipoleFit(INVERSELIB::ECDSet set);
 
-    QSharedPointer<ANSHAREDLIB::FiffRawViewModel>           m_pFiffRawModel;            /**< Currently selected FiffRawViewModel model */
-    QSharedPointer<ANSHAREDLIB::AveragingDataModel>         m_pAverageModel;            /**< Currently selected AveragingDataModel model */
-    QSharedPointer<ANSHAREDLIB::BemDataModel>               m_pBemModel;                /**< Currently selected BemDataModel model */
-    QSharedPointer<ANSHAREDLIB::NoiseModel>                 m_pNoiseModel;              /**< Currently selected NoiseModel model */
-    QSharedPointer<ANSHAREDLIB::MriCoordModel>              m_pMriModel;                /**< Currently selected MriCoordModel model */
+//    QSharedPointer<ANSHAREDLIB::FiffRawViewModel>           m_pFiffRawModel;            /**< Currently selected FiffRawViewModel model */
+//    QSharedPointer<ANSHAREDLIB::AveragingDataModel>         m_pAverageModel;            /**< Currently selected AveragingDataModel model */
+//    QSharedPointer<ANSHAREDLIB::BemDataModel>               m_pBemModel;                /**< Currently selected BemDataModel model */
+//    QSharedPointer<ANSHAREDLIB::NoiseModel>                 m_pNoiseModel;              /**< Currently selected NoiseModel model */
+//    QSharedPointer<ANSHAREDLIB::MriCoordModel>              m_pMriModel;                /**< Currently selected MriCoordModel model */
 
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;
     INVERSELIB::DipoleFitSettings                           m_DipoleSettings;

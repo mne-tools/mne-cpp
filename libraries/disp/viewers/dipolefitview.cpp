@@ -134,6 +134,9 @@ void DipoleFitView::requestParams()
 
     emit fittingChanged(m_pUi->doubleSpinBox_dist->value(),
                         m_pUi->doubleSpinBox_grid->value());
+
+    emit baselineChanged(m_pUi->spinBox_bmax->value(),
+                         m_pUi->spinBox_bmax->value());
 }
 
 //=============================================================================================================
@@ -189,6 +192,7 @@ void DipoleFitView::initGui()
                                     dValue);
             });
 
+    //Clearing models
     connect(m_pUi->pushButton_clearmri, &QPushButton::clicked, [=]{
             m_pUi->pushButton_clearmri->hide();
             emit clearMri();
