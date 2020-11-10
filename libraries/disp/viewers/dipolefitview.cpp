@@ -166,12 +166,20 @@ void DipoleFitView::initGui()
 
     //Baseline
     connect(m_pUi->spinBox_bmin, QOverload<int>::of(&QSpinBox::valueChanged), [=](int iValue){
-                emit baselineChanged(iValue,
-                                     m_pUi->spinBox_bmax->value());
+                if (iValue != m_pUi->spinBox_bmax->value()){
+                    emit baselineChanged(iValue,
+                                         m_pUi->spinBox_bmax->value());
+                } else {
+                    emit baselineChanged(1e6, 1e6);
+                }
             });
     connect(m_pUi->spinBox_bmax, QOverload<int>::of(&QSpinBox::valueChanged), [=](int iValue){
-                emit baselineChanged(m_pUi->spinBox_bmax->value(),
-                                     iValue);
+                if (iValue != m_pUi->spinBox_bmin->value()){
+                    emit baselineChanged(m_pUi->spinBox_bmin->value(),
+                                         iValue);
+                } else {
+                    emit baselineChanged(1e6, 1e6);
+                }
             });
 
     //Modality

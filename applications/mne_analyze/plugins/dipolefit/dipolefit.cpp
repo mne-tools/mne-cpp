@@ -123,9 +123,7 @@ QMenu *DipoleFit::getMenu()
 
 QDockWidget *DipoleFit::getControl()
 {
-    QDockWidget* pDockWidgt = new QDockWidget(getName());
     DISPLIB::DipoleFitView* pDipoleView = new DISPLIB::DipoleFitView();
-    pDockWidgt->setWidget(pDipoleView);
 
     //Send Gui updates
     connect(this, &DipoleFit::newBemModel,
@@ -166,6 +164,11 @@ QDockWidget *DipoleFit::getControl()
             QMutexLocker lock(&m_FitMutex);
             m_DipoleSettings.noisename = "";
             });
+
+    QDockWidget* pDockWidgt = new QDockWidget(getName());
+    pDockWidgt->setWidget(pDipoleView);
+    pDockWidgt->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    pDockWidgt->setObjectName(getName());
 
     emit getUpdate();
 

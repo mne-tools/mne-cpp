@@ -64,13 +64,15 @@ NoiseModel::NoiseModel(const QString &sFilePath,
                        QObject* parent)
 :AbstractModel(sFilePath, parent)
 {
-
+    Q_UNUSED(byteLoadedData);
 }
 
 //=============================================================================================================
 
 int NoiseModel::rowCount(const QModelIndex &parent) const
 {
+    Q_UNUSED(parent);
+
     return 1;
 }
 
@@ -78,6 +80,8 @@ int NoiseModel::rowCount(const QModelIndex &parent) const
 
 int NoiseModel::columnCount(const QModelIndex &parent) const
 {
+    Q_UNUSED(parent);
+
     return 1;
 }
 
@@ -86,6 +90,9 @@ int NoiseModel::columnCount(const QModelIndex &parent) const
 QVariant NoiseModel::data(const QModelIndex &index,
                              int role) const
 {
+    Q_UNUSED(index);
+    Q_UNUSED(role);
+
     return QVariant();
 }
 

@@ -90,6 +90,7 @@ SOURCES += \
     Management/eventmanager.cpp \
     Management/statusbar.cpp \
     Model/bemdatamodel.cpp \
+    Model/dipolefitmodel.cpp \
     Model/fiffrawviewmodel.cpp \
     Model/annotationmodel.cpp \
     Model/averagingdatamodel.cpp \
@@ -97,6 +98,7 @@ SOURCES += \
     Model/noisemodel.cpp
 
 HEADERS += \
+    Model/dipolefitmodel.h \
     Model/mricoordmodel.h \
     Model/noisemodel.h \
     Plugins/abstractplugin.h \
