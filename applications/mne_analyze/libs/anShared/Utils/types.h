@@ -86,7 +86,8 @@ namespace ANSHAREDLIB
         ANSHAREDLIB_AVERAGING_MODEL,
         ANSHAREDLIB_BEMDATA_MODEL,
         ANSHAREDLIB_NOISE_MODEL,
-        ANSHAREDLIB_MRICOORD_MODEL
+        ANSHAREDLIB_MRICOORD_MODEL,
+        ANSHAREDLIB_DIPOLEFIT_MODEL
     };
 
     //=========================================================================================================
@@ -121,7 +122,6 @@ namespace ANSHAREDLIB
         FIDUCIAL_CHANGED,           // event send when fiducial was changed
         SET_DATA3D_TREE_MODEL,      // send when a new 3D Model is set
         VIEW3D_SETTINGS_CHANGED,    // send to trigger view 3D settings update
-        NEW_DIPOLE_FIT_DATA
     };
 
     //=========================================================================================================
