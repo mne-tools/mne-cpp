@@ -134,6 +134,8 @@ QDockWidget *DipoleFit::getControl()
             pDipoleView, &DISPLIB::DipoleFitView::setMri, Qt::UniqueConnection);
     connect(this, &DipoleFit::newMeasurment,
             pDipoleView, &DISPLIB::DipoleFitView::setMeas, Qt::UniqueConnection);
+    connect(this, &DipoleFit::getUpdate,
+            pDipoleView, &DISPLIB::DipoleFitView::requestParams, Qt::UniqueConnection);
 
     //Receive Gui updates
     connect(pDipoleView, &DISPLIB::DipoleFitView::modalityChanged,
@@ -144,8 +146,12 @@ QDockWidget *DipoleFit::getControl()
             this, &DipoleFit::onFittingChanged, Qt::UniqueConnection);
     connect(pDipoleView, &DISPLIB::DipoleFitView::baselineChanged,
             this, &DipoleFit::onBaselineChanged, Qt::UniqueConnection);
-    connect(this, &DipoleFit::getUpdate,
-            pDipoleView, &DISPLIB::DipoleFitView::requestParams, Qt::UniqueConnection);
+    connect(pDipoleView, &DISPLIB::DipoleFitView::noiseChanged,
+            this, &DipoleFit::onNoiseChanged, Qt::UniqueConnection);
+    connect(pDipoleView, &DISPLIB::DipoleFitView::regChanged,
+            this, &DipoleFit::onRegChanged, Qt::UniqueConnection);
+    connect(pDipoleView, &DISPLIB::DipoleFitView::setChanged,
+            this, &DipoleFit::onSetChanged, Qt::UniqueConnection);
 
     //Fit
     connect(pDipoleView, &DISPLIB::DipoleFitView::performDipoleFit,
@@ -274,13 +280,15 @@ void DipoleFit::onModalityChanged(bool bEEG, bool bMEG)
 
 void DipoleFit::onTimeChanged(int iMin,
                               int iMax,
-                              int iStep)
+                              int iStep,
+                              int iInt)
 {
     QMutexLocker lock(&m_FitMutex);
 
     m_DipoleSettings.tmin = static_cast<float>(iMin)/1000.f;
     m_DipoleSettings.tmax = static_cast<float>(iMax)/1000.f;
     m_DipoleSettings.tstep = static_cast<float>(iStep)/1000.f;
+    m_DipoleSettings.integ = static_cast<float>(iInt)/1000.f;
 }
 
 //=============================================================================================================
@@ -343,4 +351,39 @@ void DipoleFit::onBaselineChanged(int iBMin,
 
     m_DipoleSettings.bmin = static_cast<float>(iBMin)/1000.f;
     m_DipoleSettings.bmax = static_cast<float>(iBMax)/1000.f;
+}
+
+//=============================================================================================================
+
+void DipoleFit::onNoiseChanged(double dGrad,
+                               double dMag,
+                               double dEeg)
+{
+    QMutexLocker lock(&m_FitMutex);
+
+    m_DipoleSettings.grad_std = 1e-13*dGrad;
+    m_DipoleSettings.mag_std = 1e-15*dMag;
+    m_DipoleSettings.eeg_std = 1e-6*dEeg;
+
+}
+
+//=============================================================================================================
+
+void DipoleFit::onRegChanged(double dRegGrad,
+                             double dRegMag,
+                             double dRegEeg)
+{
+    QMutexLocker lock(&m_FitMutex);
+
+    m_DipoleSettings.grad_reg = dRegGrad;
+    m_DipoleSettings.mag_reg = dRegMag;
+    m_DipoleSettings.eeg_reg = dRegEeg;
+}
+
+//=============================================================================================================
+
+void DipoleFit::onSetChanged(int iSet)
+{
+    QMutexLocker lock(&m_FitMutex);
+
 }

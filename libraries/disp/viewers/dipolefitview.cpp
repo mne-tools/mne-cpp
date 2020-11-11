@@ -128,7 +128,8 @@ void DipoleFitView::requestParams()
 {
     emit timeChanged(m_pUi->spinBox_tmin->value(),
                      m_pUi->spinBox_tmax->value(),
-                     m_pUi->spinBox_tstep->value());
+                     m_pUi->spinBox_tstep->value(),
+                     m_pUi->spinBox_tint->value());
 
     emit modalityChanged(m_pUi->checkBox_EEG->isChecked(), m_pUi->checkBox_MEG->isChecked());
 
@@ -137,6 +138,14 @@ void DipoleFitView::requestParams()
 
     emit baselineChanged(m_pUi->spinBox_bmax->value(),
                          m_pUi->spinBox_bmax->value());
+
+    emit noiseChanged(m_pUi->doubleSpinBox_gradnoise->value(),
+                      m_pUi->doubleSpinBox_magnoise->value(),
+                      m_pUi->doubleSpinBox_eegnoise->value());
+
+    emit regChanged(m_pUi->doubleSpinBox_gradreg->value(),
+                    m_pUi->doubleSpinBox_magreg->value(),
+                    m_pUi->doubleSpinBox_eegreg->value());
 }
 
 //=============================================================================================================
@@ -145,22 +154,34 @@ void DipoleFitView::initGui()
 {
     //Perform Fit
     connect(m_pUi->pushButton_fit, &QPushButton::clicked,
-            this, &DipoleFitView::performDipoleFit);
+            this, &DipoleFitView::performDipoleFit, Qt::UniqueConnection);
+
+    connect(m_pUi->spinBox_set, QOverload<int>::of(&QSpinBox::valueChanged),
+            this, &DipoleFitView::setChanged, Qt::UniqueConnection);
 
     //Time settings
     connect(m_pUi->spinBox_tmin, QOverload<int>::of(&QSpinBox::valueChanged), [=](int iValue){
                 emit timeChanged(iValue,
                                  m_pUi->spinBox_tmax->value(),
-                                 m_pUi->spinBox_tstep->value());
+                                 m_pUi->spinBox_tstep->value(),
+                                 m_pUi->spinBox_tint->value());
             });
     connect(m_pUi->spinBox_tmax, QOverload<int>::of(&QSpinBox::valueChanged), [=](int iValue){
                 emit timeChanged(m_pUi->spinBox_tmin->value(),
                                  iValue,
-                                 m_pUi->spinBox_tstep->value());
+                                 m_pUi->spinBox_tstep->value(),
+                                 m_pUi->spinBox_tint->value());
             });
     connect(m_pUi->spinBox_tstep, QOverload<int>::of(&QSpinBox::valueChanged), [=](int iValue){
                 emit timeChanged(m_pUi->spinBox_tmin->value(),
                                  m_pUi->spinBox_tmax->value(),
+                                 iValue,
+                                 m_pUi->spinBox_tint->value());
+            });
+    connect(m_pUi->spinBox_tint, QOverload<int>::of(&QSpinBox::valueChanged), [=](int iValue){
+                emit timeChanged(m_pUi->spinBox_tmin->value(),
+                                 m_pUi->spinBox_tmax->value(),
+                                 m_pUi->spinBox_tstep->value(),
                                  iValue);
             });
 
@@ -191,13 +212,48 @@ void DipoleFitView::initGui()
             });
 
     //Fittings
-    connect(m_pUi->doubleSpinBox_dist,  QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double dValue){
+    connect(m_pUi->doubleSpinBox_dist, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double dValue){
                 emit fittingChanged(dValue,
                                     m_pUi->doubleSpinBox_grid->value());
             });
     connect(m_pUi->doubleSpinBox_grid, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double dValue){
                 emit fittingChanged(m_pUi->doubleSpinBox_dist->value(),
                                     dValue);
+            });
+
+    //Noise
+
+    connect(m_pUi->doubleSpinBox_gradnoise, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double dValue){
+                emit noiseChanged(dValue,
+                                  m_pUi->doubleSpinBox_magnoise->value(),
+                                  m_pUi->doubleSpinBox_eegnoise->value());
+            });
+    connect(m_pUi->doubleSpinBox_magnoise, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double dValue){
+                emit noiseChanged(m_pUi->doubleSpinBox_gradnoise->value(),
+                                  dValue,
+                                  m_pUi->doubleSpinBox_eegnoise->value());
+            });
+    connect(m_pUi->doubleSpinBox_eegnoise, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double dValue){
+                emit noiseChanged(m_pUi->doubleSpinBox_gradnoise->value(),
+                                  m_pUi->doubleSpinBox_magnoise->value(),
+                                  dValue);
+            });
+
+    //Reg
+    connect(m_pUi->doubleSpinBox_gradreg, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double dValue){
+                emit regChanged(dValue,
+                                m_pUi->doubleSpinBox_magreg->value(),
+                                m_pUi->doubleSpinBox_eegreg->value());
+            });
+    connect(m_pUi->doubleSpinBox_magreg, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double dValue){
+                emit regChanged(m_pUi->doubleSpinBox_gradreg->value(),
+                                dValue,
+                                m_pUi->doubleSpinBox_eegreg->value());
+            });
+    connect(m_pUi->doubleSpinBox_eegreg, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double dValue){
+                emit regChanged(m_pUi->doubleSpinBox_gradreg->value(),
+                                m_pUi->doubleSpinBox_magreg->value(),
+                                dValue);
             });
 
     //Clearing models
