@@ -135,8 +135,9 @@ private:
      * @param [in] iMin     new minimum in milliseconds
      * @param [in] iMax     new maximum in milliseconds
      * @param [in] iStep    new step value in milliseconds
+     * @param [in] iInt     new integration value in milliseconds
      */
-    void onTimeChanged(int iMin, int iMax, int iStep);
+    void onTimeChanged(int iMin, int iMax, int iStep, int iInt);
 
     //=========================================================================================================
     /**
@@ -162,6 +163,39 @@ private:
      * @param iBMax
      */
     void onBaselineChanged(int iBMin, int iBMax);
+
+    //=========================================================================================================
+    /**
+     * @brief onNoiseChanged
+     *
+     * @param dGrad
+     * @param dMag
+     * @param dEeg
+     */
+    void onNoiseChanged(double dGrad,
+                        double dMag,
+                        double dEeg);
+
+    //=========================================================================================================
+    /**
+     * @brief onRegChanged
+     *
+     * @param iReg
+     * @param iRegGrad
+     * @param iRegMag
+     * @param iRegEeg
+     */
+    void onRegChanged(double dRegGrad,
+                      double dRegMag,
+                      double dRegEeg);
+
+    //=========================================================================================================
+    /**
+     * @brief onSetChanged
+     *
+     * @param iSet
+     */
+    void onSetChanged(int iSet);
 
     //=========================================================================================================
     /**
