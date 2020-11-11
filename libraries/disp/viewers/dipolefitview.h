@@ -179,10 +179,12 @@ signals:
      * @param [in] iMin     new minimum in milliseconds
      * @param [in] iMax     new maximum in milliseconds
      * @param [in] iStep    new step value in milliseconds
+     * @param [in] iInt     new integration value in milliseconds
      */
     void timeChanged(int iMin,
                      int iMax,
-                     int iStep);
+                     int iStep,
+                     int iInt);
 
     //=========================================================================================================
     /**
@@ -203,6 +205,39 @@ signals:
      */
     void baselineChanged(int iBMin,
                          int iBMax);
+
+    //=========================================================================================================
+    /**
+     * @brief noiseChanged
+     *
+     * @param dGrad
+     * @param dMag
+     * @param dEeg
+     */
+    void noiseChanged(double dGrad,
+                      double dMag,
+                      double dEeg);
+
+    //=========================================================================================================
+    /**
+     * @brief regChanged
+     *
+     * @param iReg
+     * @param iRegGrad
+     * @param iRegMag
+     * @param iRegEeg
+     */
+    void regChanged(double dRegGrad,
+                    double dRegMag,
+                    double dRegEeg);
+
+    //=========================================================================================================
+    /**
+     * @brief setChanged
+     *
+     * @param iSet
+     */
+    void setChanged(int iSet);
 
     //=========================================================================================================
     /**
