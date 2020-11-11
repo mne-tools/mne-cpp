@@ -96,6 +96,9 @@ void BidsViewModel::addData(QModelIndex selectedItem,
         if(!selectedItem.isValid()) {
             QStandardItem* pItem = new QStandardItem("Unknown");
             addDataToSession(addSessionToSubject(addSubject("sub-01"), "ses-01"), pItem, iDataType);
+            addToData(pNewItem,
+                      indexFromItem(pItem),
+                      iDataType);
         } else {
         addToData(pNewItem,
                   selectedItem,

@@ -68,7 +68,14 @@ public:
     typedef QSharedPointer<const DipoleFitModel> ConstSPtr;   /**< Const shared pointer type for AnnotationModel. */
 
 public:
+    //=========================================================================================================
     DipoleFitModel(const QString &sFilePath,
+                   const QByteArray& byteLoadedData = QByteArray(),
+                   QObject* parent = Q_NULLPTR);
+
+    //=========================================================================================================
+    DipoleFitModel(INVERSELIB::ECDSet ECDSet,
+                   const QString &sFilePath = "",
                    const QByteArray& byteLoadedData = QByteArray(),
                    QObject* parent = Q_NULLPTR);
 

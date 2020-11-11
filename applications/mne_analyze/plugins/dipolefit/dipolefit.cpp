@@ -49,6 +49,7 @@
 #include <anShared/Model/mricoordmodel.h>
 #include <anShared/Model/noisemodel.h>
 #include <anShared/Model/averagingdatamodel.h>
+#include <anShared/Model/dipolefitmodel.h>
 
 #include <disp/viewers/dipolefitview.h>
 
@@ -339,7 +340,10 @@ void DipoleFit::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewMo
 
 void DipoleFit::newDipoleFit(INVERSELIB::ECDSet set)
 {
-    m_pCommu->publishEvent(EVENT_TYPE::NEW_DIPOLE_FIT_DATA, QVariant::fromValue(set));
+    QSharedPointer<ANSHAREDLIB::DipoleFitModel> pModel = QSharedPointer<ANSHAREDLIB::DipoleFitModel>(new ANSHAREDLIB::DipoleFitModel(set));
+    m_pAnalyzeData->addModel<ANSHAREDLIB::DipoleFitModel>(pModel,
+                                                          "DipoleFit");
+
 }
 
 //=============================================================================================================
