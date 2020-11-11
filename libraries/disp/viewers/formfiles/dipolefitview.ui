@@ -260,7 +260,14 @@
          </property>
          <layout class="QGridLayout" name="gridLayout_8">
           <item row="2" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_eegreg"/>
+           <widget class="QDoubleSpinBox" name="doubleSpinBox_eegreg">
+            <property name="minimum">
+             <double>-99.000000000000000</double>
+            </property>
+            <property name="value">
+             <double>0.100000000000000</double>
+            </property>
+           </widget>
           </item>
           <item row="2" column="0">
            <widget class="QLabel" name="label_17">
@@ -270,7 +277,14 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_magreg"/>
+           <widget class="QDoubleSpinBox" name="doubleSpinBox_magreg">
+            <property name="minimum">
+             <double>-99.000000000000000</double>
+            </property>
+            <property name="value">
+             <double>0.100000000000000</double>
+            </property>
+           </widget>
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="label_19">
@@ -280,7 +294,14 @@
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_gradreg"/>
+           <widget class="QDoubleSpinBox" name="doubleSpinBox_gradreg">
+            <property name="minimum">
+             <double>-99.000000000000000</double>
+            </property>
+            <property name="value">
+             <double>0.100000000000000</double>
+            </property>
+           </widget>
           </item>
           <item row="0" column="0">
            <widget class="QLabel" name="label_18">
@@ -299,7 +320,14 @@
          </property>
          <layout class="QGridLayout" name="gridLayout_3">
           <item row="1" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_magnoise"/>
+           <widget class="QDoubleSpinBox" name="doubleSpinBox_magnoise">
+            <property name="minimum">
+             <double>-99.000000000000000</double>
+            </property>
+            <property name="value">
+             <double>20.000000000000000</double>
+            </property>
+           </widget>
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="label_16">
@@ -309,7 +337,14 @@
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_eegnoise"/>
+           <widget class="QDoubleSpinBox" name="doubleSpinBox_eegnoise">
+            <property name="minimum">
+             <double>-99.000000000000000</double>
+            </property>
+            <property name="value">
+             <double>0.200000000000000</double>
+            </property>
+           </widget>
           </item>
           <item row="0" column="0">
            <widget class="QLabel" name="label_15">
@@ -319,7 +354,14 @@
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_gradnoise"/>
+           <widget class="QDoubleSpinBox" name="doubleSpinBox_gradnoise">
+            <property name="minimum">
+             <double>-99.000000000000000</double>
+            </property>
+            <property name="value">
+             <double>5.000000000000000</double>
+            </property>
+           </widget>
           </item>
           <item row="2" column="0">
            <widget class="QLabel" name="label_14">

@@ -386,4 +386,6 @@ void DipoleFit::onSetChanged(int iSet)
 {
     QMutexLocker lock(&m_FitMutex);
 
+    m_DipoleSettings.setno = iSet;
+
 }
