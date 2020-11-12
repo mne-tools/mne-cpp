@@ -39,7 +39,7 @@
 
 #include "tmsisetupwidget.h"
 #include "../tmsi.h"
-#include "../ui_tmsisetup.h"
+#include "ui_tmsisetup.h"
 
 //=============================================================================================================
 // QT INCLUDES
