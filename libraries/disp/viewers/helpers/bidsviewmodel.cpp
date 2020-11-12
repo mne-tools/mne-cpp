@@ -95,7 +95,10 @@ void BidsViewModel::addData(QModelIndex selectedItem,
     case BIDS_AVERAGE: {
         if(!selectedItem.isValid()) {
             QStandardItem* pItem = new QStandardItem("Unknown");
-            addDataToSession(addSessionToSubject(addSubject("sub-01"), "ses-01"), pItem, iDataType);
+            pItem->setEditable(false);
+            pItem->setDragEnabled(true);
+
+            addDataToSession(addSessionToSubject(addSubject("sub-01"), "ses-01"), pItem, BIDS_UNKNOWN);
             addToData(pNewItem,
                       indexFromItem(pItem),
                       iDataType);

@@ -241,6 +241,20 @@ signals:
 
     //=========================================================================================================
     /**
+     * @brief sphereChnaged
+     *
+     * @param dX
+     * @param dY
+     * @param dZ
+     * @param dRadius
+     */
+    void sphereChanged(double dX,
+                       double dY,
+                       double dZ,
+                       double dRadius);
+
+    //=========================================================================================================
+    /**
      * Triggers clearing of noise model (ignored in dipole fit until reselected)
      */
     void clearNoise();

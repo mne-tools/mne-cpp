@@ -252,7 +252,7 @@ public:
                                const QString& sModelName){
         QSharedPointer<AbstractModel> temp = qSharedPointerCast<AbstractModel>(pNewModel);
         QStandardItem* pItem = new QStandardItem(sModelName);
-        pItem->setEditable(false);
+        pItem->setEditable(true);
         pItem->setDragEnabled(true);
         pItem->setToolTip(temp->getModelPath());
 
@@ -262,17 +262,21 @@ public:
         switch(temp->getType()){
             case ANSHAREDLIB_AVERAGING_MODEL:
                 pItem->setData(data);
-                pItem->setData(QVariant::fromValue(BIDS_AVERAGE), BIDS_ITEM_TYPE);
                 m_pData->addToData(pItem,
                                    m_SelectedFunctionalData,
                                    BIDS_AVERAGE);
                 break;
             case ANSHAREDLIB_ANNOTATION_MODEL:
                 pItem->setData(data);
-                pItem->setData(QVariant::fromValue(BIDS_ANNOTATION), BIDS_ITEM_TYPE);
                 m_pData->addToData(pItem,
                                    m_SelectedFunctionalData,
                                    BIDS_ANNOTATION);
+                break;
+            case ANSHAREDLIB_DIPOLEFIT_MODEL:
+                pItem->setData(data);
+                m_pData->addToData(pItem,
+                                   m_SelectedFunctionalData,
+                                   BIDS_DIPOLE);
                 break;
             default:
                 qWarning() << "[AnalyzeData::addModel] Model type not supported";

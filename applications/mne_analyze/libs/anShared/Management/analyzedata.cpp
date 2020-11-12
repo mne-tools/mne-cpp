@@ -179,6 +179,7 @@ QStandardItem* AnalyzeData::addSubject(const QString &sSubjectName)
 void AnalyzeData::newSelection(const QModelIndex &index)
 {
     switch(m_pData->itemFromIndex(index)->data(BIDS_ITEM_TYPE).value<int>()){
+        case BIDS_UNKNOWN:
         case BIDS_FUNCTIONALDATA:
             m_SelectedFunctionalData = index;
             m_SelectedItem = index;
