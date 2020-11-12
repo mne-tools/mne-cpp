@@ -153,8 +153,9 @@ void DipoleFitView::requestParams()
 void DipoleFitView::initGui()
 {
     //Perform Fit
-    connect(m_pUi->pushButton_fit, &QPushButton::clicked,
-            this, &DipoleFitView::performDipoleFit, Qt::UniqueConnection);
+    connect(m_pUi->pushButton_fit, &QPushButton::clicked, [=] {
+            emit performDipoleFit(m_pUi->lineEdit_name->text());
+            });
 
     connect(m_pUi->spinBox_set, QOverload<int>::of(&QSpinBox::valueChanged),
             this, &DipoleFitView::setChanged, Qt::UniqueConnection);

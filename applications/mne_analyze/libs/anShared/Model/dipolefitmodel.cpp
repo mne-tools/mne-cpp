@@ -108,7 +108,7 @@ QVariant DipoleFitModel::data(const QModelIndex &index,
     Q_UNUSED(index);
     Q_UNUSED(role);
 
-    return QVariant();
+    return QVariant::fromValue(m_ECD_Set);
 }
 
 //=============================================================================================================
