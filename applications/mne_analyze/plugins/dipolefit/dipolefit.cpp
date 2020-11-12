@@ -214,7 +214,7 @@ QVector<EVENT_TYPE> DipoleFit::getEventSubscriptions(void) const
 
 //=============================================================================================================
 
-void DipoleFit::onPerformDipoleFit()
+void DipoleFit::onPerformDipoleFit(const QString& sFitName)
 {
     qDebug() << "Checking integrity...";
     m_DipoleSettings.checkIntegrity();
@@ -338,11 +338,11 @@ void DipoleFit::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewMo
 
 //=============================================================================================================
 
-void DipoleFit::newDipoleFit(INVERSELIB::ECDSet set)
+void DipoleFit::newDipoleFit(INVERSELIB::ECDSet set, const QString& sFitName)
 {
     QSharedPointer<ANSHAREDLIB::DipoleFitModel> pModel = QSharedPointer<ANSHAREDLIB::DipoleFitModel>(new ANSHAREDLIB::DipoleFitModel(set));
     m_pAnalyzeData->addModel<ANSHAREDLIB::DipoleFitModel>(pModel,
-                                                          "DipoleFit");
+                                                          sFitName);
 
 }
 

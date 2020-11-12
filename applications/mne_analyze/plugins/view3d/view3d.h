@@ -60,6 +60,8 @@
 namespace ANSHAREDLIB {
     class Communicator;
     class BemDataModel;
+    class AbstractModel;
+    class DipoleFitModel;
 }
 
 namespace DISP3DLIB {
@@ -197,19 +199,29 @@ private:
      */
     void newDipoleFit(const INVERSELIB::ECDSet& ecdSet);
 
-    QPointer<ANSHAREDLIB::Communicator>             m_pCommu;               /**< To broadcst signals */
+    //=========================================================================================================
+    /**
+     * Loads new  model when current loaded model is changed
+     *
+     * @param [in,out] pNewModel    pointer to currently loaded FiffRawView Model
+     */
+    void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
 
-    int                                             m_iFiducial;            /**< Currently selected fiducial */
+    QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;               /**< To broadcst signals */
 
-    QSharedPointer<DISP3DLIB::Data3DTreeModel>      m_p3DModel;             /**< The 3D model data */
-    DISP3DLIB::BemTreeItem*                         m_pBemTreeCoreg;        /**< TThe BEM head model of the coregistration plugin. */
-    DISP3DLIB::DigitizerSetTreeItem*                m_pDigitizerCoreg;      /**< The 3D item pointing to the tracked digitizers. */
-    DISP3DLIB::DigitizerSetTreeItem*                m_pMriFidCoreg;         /**< The 3D item pointing to the mri fiducials. */
+    int                                                     m_iFiducial;            /**< Currently selected fiducial */
 
-    DISP3DLIB::View3D*                              m_pView3D;              /**< The Disp3D view. */
-    DISPLIB::Control3DView*                         m_pControl3DView;       /**< The 3D Control view */
+    QSharedPointer<DISP3DLIB::Data3DTreeModel>              m_p3DModel;             /**< The 3D model data */
+    DISP3DLIB::BemTreeItem*                                 m_pBemTreeCoreg;        /**< TThe BEM head model of the coregistration plugin. */
+    DISP3DLIB::DigitizerSetTreeItem*                        m_pDigitizerCoreg;      /**< The 3D item pointing to the tracked digitizers. */
+    DISP3DLIB::DigitizerSetTreeItem*                        m_pMriFidCoreg;         /**< The 3D item pointing to the mri fiducials. */
 
-    bool                                            m_bPickingActivated;    /**< If Picking is activated*/
+    DISP3DLIB::View3D*                                      m_pView3D;              /**< The Disp3D view. */
+    DISPLIB::Control3DView*                                 m_pControl3DView;       /**< The 3D Control view */
+
+    bool                                                    m_bPickingActivated;    /**< If Picking is activated*/
+
+    QList<QSharedPointer<ANSHAREDLIB::DipoleFitModel>>      m_DipoleList;
 
 signals:
     //=========================================================================================================

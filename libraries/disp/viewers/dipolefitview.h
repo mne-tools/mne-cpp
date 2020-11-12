@@ -160,7 +160,7 @@ signals:
     /**
      * Triggers dipole fit calculation
      */
-    void performDipoleFit();
+    void performDipoleFit(const QString& sFitName);
 
     //=========================================================================================================
     /**
