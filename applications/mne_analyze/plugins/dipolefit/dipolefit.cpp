@@ -153,6 +153,8 @@ QDockWidget *DipoleFit::getControl()
             this, &DipoleFit::onRegChanged, Qt::UniqueConnection);
     connect(pDipoleView, &DISPLIB::DipoleFitView::setChanged,
             this, &DipoleFit::onSetChanged, Qt::UniqueConnection);
+    connect(pDipoleView, &DISPLIB::DipoleFitView::sphereChanged,
+            this, &DipoleFit::onSphereChanged, Qt::UniqueConnection);
 
     //Fit
     connect(pDipoleView, &DISPLIB::DipoleFitView::performDipoleFit,
@@ -264,7 +266,7 @@ void DipoleFit::onPerformDipoleFit(const QString& sFitName)
         qWarning("[DipoleFit::onPerformDipoleFit] Cannot open FiffCoordTrans file");
     }
 
-    newDipoleFit(ecdSetTrans);
+    newDipoleFit(ecdSetTrans, sFitName);
 }
 
 //=============================================================================================================
@@ -392,4 +394,20 @@ void DipoleFit::onSetChanged(int iSet)
 
     m_DipoleSettings.setno = iSet;
 
+}
+
+//=============================================================================================================
+
+void DipoleFit::onSphereChanged(double dX,
+                                double dY,
+                                double dZ,
+                                double dRadius)
+{
+    QMutexLocker lock(&m_FitMutex);
+
+    m_DipoleSettings.r0[0] = dX/1000.0;
+    m_DipoleSettings.r0[1] = dY/1000.0;
+    m_DipoleSettings.r0[2] = dZ/1000.0;
+
+    m_DipoleSettings.eeg_sphere_rad = dRadius/1000.0;
 }

@@ -146,6 +146,11 @@ void DipoleFitView::requestParams()
     emit regChanged(m_pUi->doubleSpinBox_gradreg->value(),
                     m_pUi->doubleSpinBox_magreg->value(),
                     m_pUi->doubleSpinBox_eegreg->value());
+
+    emit sphereChanged(m_pUi->doubleSpinBox_orgx->value(),
+                       m_pUi->doubleSpinBox_orgy->value(),
+                       m_pUi->doubleSpinBox_orgz->value(),
+                       m_pUi->doubleSpinBox_rad->value());
 }
 
 //=============================================================================================================
@@ -223,7 +228,6 @@ void DipoleFitView::initGui()
             });
 
     //Noise
-
     connect(m_pUi->doubleSpinBox_gradnoise, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double dValue){
                 emit noiseChanged(dValue,
                                   m_pUi->doubleSpinBox_magnoise->value(),
@@ -255,6 +259,32 @@ void DipoleFitView::initGui()
                 emit regChanged(m_pUi->doubleSpinBox_gradreg->value(),
                                 m_pUi->doubleSpinBox_magreg->value(),
                                 dValue);
+            });
+
+    //Sphere model
+    connect(m_pUi->doubleSpinBox_orgx, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double dValue){
+                emit sphereChanged(dValue,
+                                   m_pUi->doubleSpinBox_orgy->value(),
+                                   m_pUi->doubleSpinBox_orgz->value(),
+                                   m_pUi->doubleSpinBox_rad->value());
+            });
+    connect(m_pUi->doubleSpinBox_orgy, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double dValue){
+                emit sphereChanged(m_pUi->doubleSpinBox_orgx->value(),
+                                   dValue,
+                                   m_pUi->doubleSpinBox_orgz->value(),
+                                   m_pUi->doubleSpinBox_rad->value());
+            });
+    connect(m_pUi->doubleSpinBox_orgz, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double dValue){
+                emit sphereChanged(m_pUi->doubleSpinBox_orgx->value(),
+                                   m_pUi->doubleSpinBox_orgy->value(),
+                                   dValue,
+                                   m_pUi->doubleSpinBox_rad->value());
+            });
+    connect(m_pUi->doubleSpinBox_rad, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double dValue){
+                emit sphereChanged(m_pUi->doubleSpinBox_orgx->value(),
+                                   m_pUi->doubleSpinBox_orgy->value(),
+                                   m_pUi->doubleSpinBox_orgz->value(),
+                                   dValue);
             });
 
     //Clearing models
