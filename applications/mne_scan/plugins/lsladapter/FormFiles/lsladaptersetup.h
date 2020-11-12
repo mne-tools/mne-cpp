@@ -40,7 +40,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_lsladaptersetup.h"
+#include "ui_lsladaptersetup.h"
 
 #include <lsl_cpp.h>
 
