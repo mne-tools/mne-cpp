@@ -117,7 +117,7 @@ private:
     /**
      * Performs dipole fit calculations
      */
-    void onPerformDipoleFit();
+    void onPerformDipoleFit(const QString& sFitName);
 
     //=========================================================================================================
     /**
@@ -203,7 +203,7 @@ private:
      *
      * @param [in] set      new EDCSet to be sent
      */
-    void newDipoleFit(INVERSELIB::ECDSet set);
+    void newDipoleFit(INVERSELIB::ECDSet set, const QString& sFitName);
 
 //    QSharedPointer<ANSHAREDLIB::FiffRawViewModel>           m_pFiffRawModel;            /**< Currently selected FiffRawViewModel model */
 //    QSharedPointer<ANSHAREDLIB::AveragingDataModel>         m_pAverageModel;            /**< Currently selected AveragingDataModel model */

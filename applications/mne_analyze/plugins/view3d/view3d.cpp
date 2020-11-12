@@ -41,6 +41,10 @@
 #include <anShared/Management/communicator.h>
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Model/bemdatamodel.h>
+#include <anShared/Model/dipolefitmodel.h>
+#include <anShared/Model/abstractmodel.h>
+
+
 
 #include <disp3D/viewers/sourceestimateview.h>
 #include <disp3D/engine/view/view3D.h>
@@ -193,9 +197,8 @@ void View3D::handleEvent(QSharedPointer<Event> e)
         case VIEW3D_SETTINGS_CHANGED:
             settingsChanged(e->getData().value<ANSHAREDLIB::View3DParameters>());
             break;
-        case NEW_DIPOLE_FIT_DATA:
-            qDebug() << "do something here";
-            newDipoleFit(e->getData().value<INVERSELIB::ECDSet>());
+        case SELECTED_MODEL_CHANGED:
+            onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
             break;
         default:
             qWarning() << "[View3D::handleEvent] Received an Event that is not handled by switch cases.";
@@ -214,7 +217,7 @@ QVector<EVENT_TYPE> View3D::getEventSubscriptions(void) const
     temp.push_back(FID_PICKING_STATUS);
     temp.push_back(FIDUCIAL_CHANGED);
     temp.push_back(VIEW3D_SETTINGS_CHANGED);
-    temp.push_back(NEW_DIPOLE_FIT_DATA);
+    temp.push_back(SELECTED_MODEL_CHANGED);
     return temp;
 }
 
@@ -340,4 +343,19 @@ void View3D::settingsChanged(ANSHAREDLIB::View3DParameters viewParameters)
 void View3D::newDipoleFit(const INVERSELIB::ECDSet &ecdSet)
 {
     m_p3DModel->addDipoleFitData("subject", "set", ecdSet);
+}
+
+//=============================================================================================================
+
+void View3D::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel)
+{
+    if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_DIPOLEFIT_MODEL) {
+        for (QSharedPointer<DipoleFitModel> pModel : m_DipoleList){
+            if (pNewModel == pModel){
+                return;
+            }
+        }
+        m_DipoleList.append(qSharedPointerCast<DipoleFitModel>(pNewModel));
+        newDipoleFit(m_DipoleList.last()->data(QModelIndex()).value<INVERSELIB::ECDSet>());
+    }
 }
