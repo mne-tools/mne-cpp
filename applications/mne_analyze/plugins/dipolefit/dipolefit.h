@@ -199,6 +199,20 @@ private:
 
     //=========================================================================================================
     /**
+     * @brief onSphereChanged
+     *
+     * @param dX
+     * @param dY
+     * @param dZ
+     * @param dRadius
+     */
+    void onSphereChanged(double dX,
+                         double dY,
+                         double dZ,
+                         double dRadius);
+
+    //=========================================================================================================
+    /**
      * Sends new edc set to be added to 3dView
      *
      * @param [in] set      new EDCSet to be sent

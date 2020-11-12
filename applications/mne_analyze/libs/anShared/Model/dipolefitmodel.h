@@ -156,7 +156,7 @@ private:
 
 inline MODEL_TYPE DipoleFitModel::getType() const
 {
-    return MODEL_TYPE::ANSHAREDLIB_NOISE_MODEL;
+    return MODEL_TYPE::ANSHAREDLIB_DIPOLEFIT_MODEL;
 }
 
 //=============================================================================================================
