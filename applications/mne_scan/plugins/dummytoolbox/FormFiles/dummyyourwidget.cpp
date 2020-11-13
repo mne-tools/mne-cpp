@@ -39,7 +39,7 @@
 //=============================================================================================================
 
 #include "dummyyourwidget.h"
-#include "../ui_dummyyourwidget.h"
+#include "ui_dummyyourwidget.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -66,17 +66,17 @@ DummyYourWidget::DummyYourWidget(const QString& sSettingsPath,
 : QWidget(parent)
 , m_pUi(new Ui::DummyYourWidgetGui)
 {
-m_sSettingsPath = sSettingsPath;
+    m_sSettingsPath = sSettingsPath;
     m_pUi->setupUi(this);
 
-    loadSettings(m_sSettingsPath);
+    loadSettings();
 }
 
 //=============================================================================================================
 
 DummyYourWidget::~DummyYourWidget()
 {
-    saveSettings(m_sSettingsPath);
+    saveSettings();
 
     delete m_pUi;
 }

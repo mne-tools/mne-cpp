@@ -39,7 +39,7 @@ TEMPLATE = lib
 
 QT += core widgets
 
-CONFIG += plugin
+CONFIG += skip_target_version_ext plugin
 
 DEFINES += DUMMYTOOLBOX_PLUGIN
 
@@ -55,12 +55,14 @@ CONFIG(debug, debug|release) {
     LIBS += -lscSharedd \
             -lscDispd \
             -lscMeasd \
-            -lMNE$${MNE_LIB_VERSION}Utilsd \
+            -lmnecppFiffd \
+            -lmnecppUtilsd \
 } else {
     LIBS += -lscShared \
             -lscDisp \
             -lscMeas \
-            -lMNE$${MNE_LIB_VERSION}Utils \
+            -lmnecppFiff \
+            -lmnecppUtils \
 }
 
 SOURCES += \
