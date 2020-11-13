@@ -40,6 +40,12 @@
 #include "ui_dipolefitview.h"
 
 //=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QDateTime>
+
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -316,4 +322,11 @@ void DipoleFitView::initGui()
 void DipoleFitView::setMeas(const QString &sFileName)
 {
     m_pUi->lineEdit_meas->setText(sFileName);
+
+    QString sName = sFileName.split(".",QString::SkipEmptyParts).at(0);
+    if(sName.endsWith("-ave") || sName.endsWith("_ave") || sName.endsWith("-raw") || sName.endsWith("_raw")){
+        sName.chop(4);
+    }
+
+    m_pUi->lineEdit_name->setText("Dipole Fit - " + sName + " - " + QDateTime::currentDateTime().toString("MMMM d yyyy hh:mm:ss"));
 }
