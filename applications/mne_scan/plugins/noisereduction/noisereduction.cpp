@@ -219,7 +219,7 @@ void NoiseReduction::update(SCMEASLIB::Measurement::SPtr pMeasurement)
         }
 
         // Check if data is present
-        if(pRTMSA->getMultiSampleArray().size() > 0 && m_pFiffInfo) {
+        if(pRTMSA->getMultiSampleArray().size() > 0) {
             //Init widgets
             if(m_iMaxFilterTapSize == -1) {
                 m_iMaxFilterTapSize = pRTMSA->getMultiSampleArray().first().cols();
