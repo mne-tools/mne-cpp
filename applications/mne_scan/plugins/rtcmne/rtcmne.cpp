@@ -161,19 +161,19 @@ void RtcMne::init()
     // Output
     m_pRTSEOutput = PluginOutputData<RealTimeSourceEstimate>::create(this, "MNE Out", "MNE output data");
     m_outputConnectors.append(m_pRTSEOutput);
-    m_pRTSEOutput->data()->setName(this->getName());//Provide name to auto store widget settings
+    m_pRTSEOutput->measurementData()->setName(this->getName());//Provide name to auto store widget settings
 
     // Set the annotation and surface data and mri-head transformation
     if(m_pAnnotationSet->size() != 0) {
-        m_pRTSEOutput->data()->setAnnotSet(m_pAnnotationSet);
+        m_pRTSEOutput->measurementData()->setAnnotSet(m_pAnnotationSet);
     }
 
     if(m_pSurfaceSet->size() != 0) {
-        m_pRTSEOutput->data()->setSurfSet(m_pSurfaceSet);
+        m_pRTSEOutput->measurementData()->setSurfSet(m_pSurfaceSet);
     }
 
     if(!m_mriHeadTrans.isEmpty()) {
-        m_pRTSEOutput->data()->setMriHeadTrans(m_mriHeadTrans);
+        m_pRTSEOutput->measurementData()->setMriHeadTrans(m_mriHeadTrans);
     }
 }
 
@@ -299,7 +299,7 @@ bool RtcMne::calcFiffInfo()
 
         m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(m_pFiffInfoInput->pick_info(sel)));
 
-        m_pRTSEOutput->data()->setFiffInfo(m_pFiffInfo);
+        m_pRTSEOutput->measurementData()->setFiffInfo(m_pFiffInfo);
 
         // qDebug() << "RtcMne::calcFiffInfo - m_pFiffInfo" << m_pFiffInfo->ch_names;
 
@@ -362,7 +362,7 @@ void RtcMne::updateRTFS(SCMEASLIB::Measurement::SPtr pMeasurement)
     if(QSharedPointer<RealTimeFwdSolution> pRTFS = pMeasurement.dynamicCast<RealTimeFwdSolution>()) {
         if(pRTFS->isClustered()) {
             m_pFwd = pRTFS->getValue();
-            m_pRTSEOutput->data()->setFwdSolution(m_pFwd);
+            m_pRTSEOutput->measurementData()->setFwdSolution(m_pFwd);
 
             m_qMutex.lock();
             m_pFiffInfoForward = QSharedPointer<FiffInfoBase>(new FiffInfoBase(m_pFwd->info));
@@ -633,9 +633,9 @@ void RtcMne::run()
                     if(!sourceEstimate.isEmpty()) {
                         if(iTimePointSps < sourceEstimate.data.cols() && iTimePointSps >= 0) {
                             sourceEstimate = sourceEstimate.reduce(iTimePointSps,1);
-                            m_pRTSEOutput->data()->setValue(sourceEstimate);
+                            m_pRTSEOutput->measurementData()->setValue(sourceEstimate);
                         } else {
-                            m_pRTSEOutput->data()->setValue(sourceEstimate);
+                            m_pRTSEOutput->measurementData()->setValue(sourceEstimate);
                         }
                     }
                 }
@@ -654,9 +654,9 @@ void RtcMne::run()
                     if(!sourceEstimate.isEmpty()) {
                         if(iTimePointSps < sourceEstimate.data.cols() && iTimePointSps >= 0) {
                             sourceEstimate = sourceEstimate.reduce(iTimePointSps,1);
-                            m_pRTSEOutput->data()->setValue(sourceEstimate);
+                            m_pRTSEOutput->measurementData()->setValue(sourceEstimate);
                         } else {
-                            m_pRTSEOutput->data()->setValue(sourceEstimate);
+                            m_pRTSEOutput->measurementData()->setValue(sourceEstimate);
                         }
                     }
                 } else {

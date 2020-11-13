@@ -107,7 +107,7 @@ QSharedPointer<AbstractPlugin> TMSI::clone() const
 void TMSI::init()
 {
     m_pRMTSA_TMSI = PluginOutputData<RealTimeMultiSampleArray>::create(this, "TMSI", "EEG output data");
-    m_pRMTSA_TMSI->data()->setName(this->getName());//Provide name to auto store widget settings
+    m_pRMTSA_TMSI->measurementData()->setName(this->getName());//Provide name to auto store widget settings
 
     m_outputConnectors.append(m_pRMTSA_TMSI);
 
@@ -472,9 +472,9 @@ bool TMSI::start()
     setUpFiffInfo();
 
     //Set the channel size of the RMTSA - this needs to be done here and NOT in the init() function because the user can change the number of channels during runtime
-    m_pRMTSA_TMSI->data()->initFromFiffInfo(m_pFiffInfo);
-    m_pRMTSA_TMSI->data()->setMultiArraySize(m_iSamplesPerBlock);
-    m_pRMTSA_TMSI->data()->setSamplingRate(m_iSamplingFreq);
+    m_pRMTSA_TMSI->measurementData()->initFromFiffInfo(m_pFiffInfo);
+    m_pRMTSA_TMSI->measurementData()->setMultiArraySize(m_iSamplesPerBlock);
+    m_pRMTSA_TMSI->measurementData()->setSamplingRate(m_iSamplingFreq);
 
     m_pTMSIProducer->start(m_iNumberOfChannels,
                            m_iSamplingFreq,
@@ -516,7 +516,7 @@ bool TMSI::stop()
     wait(500);
 
     // Clear all data in the buffer connected to displays and other plugins
-    m_pRMTSA_TMSI->data()->clear();
+    m_pRMTSA_TMSI->measurementData()->clear();
     m_pCircularBuffer->clear();
 
     if(m_pTmsiManualAnnotationWidget) {
@@ -615,7 +615,7 @@ void TMSI::run()
                 }
 
                 //emit values to real time multi sample array
-                m_pRMTSA_TMSI->data()->setValue(matData.cast<double>());
+                m_pRMTSA_TMSI->measurementData()->setValue(matData.cast<double>());
 
                 // Reset keyboard trigger
                 m_iTriggerType = 0;

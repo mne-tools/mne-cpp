@@ -117,7 +117,7 @@ QSharedPointer<AbstractPlugin> BrainAMP::clone() const
 void BrainAMP::init()
 {
     m_pRMTSA_BrainAMP = PluginOutputData<RealTimeMultiSampleArray>::create(this, "BrainAMP", "EEG output data");
-    m_pRMTSA_BrainAMP->data()->setName(this->getName());//Provide name to auto store widget settings
+    m_pRMTSA_BrainAMP->measurementData()->setName(this->getName());//Provide name to auto store widget settings
 
     m_outputConnectors.append(m_pRMTSA_BrainAMP);
 
@@ -270,9 +270,9 @@ bool BrainAMP::start()
     setUpFiffInfo();
 
     //Set the channel size of the RMTSA - this needs to be done here and NOT in the init() function because the user can change the number of channels during runtime
-    m_pRMTSA_BrainAMP->data()->initFromFiffInfo(m_pFiffInfo);
-    m_pRMTSA_BrainAMP->data()->setMultiArraySize(1);
-    m_pRMTSA_BrainAMP->data()->setSamplingRate(m_iSamplingFreq);
+    m_pRMTSA_BrainAMP->measurementData()->initFromFiffInfo(m_pFiffInfo);
+    m_pRMTSA_BrainAMP->measurementData()->setMultiArraySize(1);
+    m_pRMTSA_BrainAMP->measurementData()->setSamplingRate(m_iSamplingFreq);
 
     m_pBrainAMPProducer->start(m_iSamplesPerBlock,
                                m_iSamplingFreq);
@@ -297,7 +297,7 @@ bool BrainAMP::stop()
     m_pBrainAMPProducer->stop();
 
     // Clear all data in the buffer connected to displays and other plugins
-    m_pRMTSA_BrainAMP->data()->clear();
+    m_pRMTSA_BrainAMP->measurementData()->clear();
     m_pCircularBuffer->clear();
 
     //Store settings for next use
@@ -377,7 +377,7 @@ void BrainAMP::run()
             //pop matrix
             if(m_pCircularBuffer->pop(matData)) {
                 //emit values to real time multi sample array
-                m_pRMTSA_BrainAMP->data()->setValue(matData);
+                m_pRMTSA_BrainAMP->measurementData()->setValue(matData);
             }       
         }
     }

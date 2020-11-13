@@ -195,7 +195,7 @@ void Averaging::init()
 
     // Output
     m_pAveragingOutput = PluginOutputData<RealTimeEvokedSet>::create(this, "AveragingOut", "Averaging Output Data");
-    m_pAveragingOutput->data()->setName(this->getName());//Provide name to auto store widget settings
+    m_pAveragingOutput->measurementData()->setName(this->getName());//Provide name to auto store widget settings
     m_outputConnectors.append(m_pAveragingOutput);
 }
 
@@ -321,7 +321,7 @@ void Averaging::onChangePreStim(qint32 mseconds)
     int iPreStimSamples = ((float)(mseconds)/1000)*m_pFiffInfo->sfreq;
 
     if(m_pAveragingOutput) {
-        m_pAveragingOutput->data()->setNumPreStimSamples(iPreStimSamples);
+        m_pAveragingOutput->measurementData()->setNumPreStimSamples(iPreStimSamples);
     }
 
     if(m_pRtAve) {
@@ -445,7 +445,7 @@ void Averaging::run()
             lResponsibleTriggerTypes = m_lResponsibleTriggerTypes;
             m_qMutex.unlock();
 
-            m_pAveragingOutput->data()->setValue(evokedSet,
+            m_pAveragingOutput->measurementData()->setValue(evokedSet,
                                                  m_pFiffInfo,
                                                  lResponsibleTriggerTypes);
         }

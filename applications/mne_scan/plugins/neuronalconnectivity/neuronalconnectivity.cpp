@@ -145,7 +145,7 @@ void NeuronalConnectivity::init()
     // Output
     m_pRTCEOutput = PluginOutputData<RealTimeConnectivityEstimate>::create(this, "NeuronalConnectivityOut", "NeuronalConnectivity output data");
     m_outputConnectors.append(m_pRTCEOutput);
-    m_pRTCEOutput->data()->setName(this->getName());
+    m_pRTCEOutput->measurementData()->setName(this->getName());
 }
 
 //=============================================================================================================
@@ -248,10 +248,10 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasuremen
             m_connectivitySettings.setSamplingFrequency(m_pFiffInfo->sfreq);
 
             //Init output - Unocmment this if you also uncommented the m_pRTCEOutput in the constructor above
-            m_pRTCEOutput->data()->setAnnotSet(pRTSE->getAnnotSet());
-            m_pRTCEOutput->data()->setSurfSet(pRTSE->getSurfSet());
-            m_pRTCEOutput->data()->setFwdSolution(pRTSE->getFwdSolution());
-            m_pRTCEOutput->data()->setFiffInfo(m_pFiffInfo);
+            m_pRTCEOutput->measurementData()->setAnnotSet(pRTSE->getAnnotSet());
+            m_pRTCEOutput->measurementData()->setSurfSet(pRTSE->getSurfSet());
+            m_pRTCEOutput->measurementData()->setFwdSolution(pRTSE->getFwdSolution());
+            m_pRTCEOutput->measurementData()->setFiffInfo(m_pFiffInfo);
 
             // Generate network nodes
             m_connectivitySettings.setNodePositions(*pRTSE->getFwdSolution(), *pRTSE->getSurfSet());
@@ -315,8 +315,8 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
             //Set 3D sensor surface for visualization
             QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/306m_rt.fif");
             MNEBem::SPtr pSensorSurfaceVV = MNEBem::SPtr::create(t_filesensorSurfaceVV);
-            m_pRTCEOutput->data()->setSensorSurface(pSensorSurfaceVV);
-            m_pRTCEOutput->data()->setFiffInfo(m_pFiffInfo);
+            m_pRTCEOutput->measurementData()->setSensorSurface(pSensorSurfaceVV);
+            m_pRTCEOutput->measurementData()->setFiffInfo(m_pFiffInfo);
 
             //Generate node vertices
             generateNodeVertices();
@@ -398,8 +398,8 @@ void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
                     //Set 3D sensor surface for visualization
                     QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/306m_rt.fif");
                     MNEBem::SPtr pSensorSurfaceVV = MNEBem::SPtr::create(t_filesensorSurfaceVV);
-                    m_pRTCEOutput->data()->setSensorSurface(pSensorSurfaceVV);
-                    m_pRTCEOutput->data()->setFiffInfo(m_pFiffInfo);
+                    m_pRTCEOutput->measurementData()->setSensorSurface(pSensorSurfaceVV);
+                    m_pRTCEOutput->measurementData()->setFiffInfo(m_pFiffInfo);
 
                     //Generate node vertices
                     generateNodeVertices();
@@ -528,7 +528,7 @@ void NeuronalConnectivity::run()
                     m_mutex.unlock();
                     network.normalize();
 
-                    m_pRTCEOutput->data()->setValue(network);
+                    m_pRTCEOutput->measurementData()->setValue(network);
                 } else {
                     qDebug()<<"NeuronalConnectivity::run - Network is empty";
                 }
