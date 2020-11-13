@@ -325,4 +325,4 @@ inline const QList<Eigen::MatrixXd>& RealTimeMultiSampleArray::getMultiSampleArr
 
 Q_DECLARE_METATYPE(SCMEASLIB::RealTimeMultiSampleArray::SPtr)
 
-#endif // RealTimeMultiSampleArray_H
+#endif // REALTIMEMULTISAMPLEARRAY_H
