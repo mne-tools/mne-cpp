@@ -177,7 +177,7 @@ void BabyMEG::init()
             this, &BabyMEG::initConnector);    
 
     m_pRTMSABabyMEG = PluginOutputData<RealTimeMultiSampleArray>::create(this, "BabyMEG Output", "BabyMEG");
-    m_pRTMSABabyMEG->data()->setName(this->getName());//Provide name to auto store widget settings
+    m_pRTMSABabyMEG->measurementData()->setName(this->getName());//Provide name to auto store widget settings
     m_outputConnectors.append(m_pRTMSABabyMEG);
 }
 
@@ -228,7 +228,7 @@ bool BabyMEG::stop()
     wait(2000);
 
     // Clear all data in the buffer connected to displays and other plugins
-    m_pRTMSABabyMEG->data()->clear();
+    m_pRTMSABabyMEG->measurementData()->clear();
     m_pCircularBuffer->clear();
 
     return true;
@@ -280,7 +280,7 @@ void BabyMEG::run()
             createDigTrig(matValue);
 
             if(!isInterruptionRequested()) {
-                m_pRTMSABabyMEG->data()->setValue(this->calibrate(matValue));
+                m_pRTMSABabyMEG->measurementData()->setValue(this->calibrate(matValue));
             }
         }
     }
@@ -291,8 +291,8 @@ void BabyMEG::run()
 void BabyMEG::initConnector()
 {
     if(m_pFiffInfo) {
-        m_pRTMSABabyMEG->data()->initFromFiffInfo(m_pFiffInfo);
-        m_pRTMSABabyMEG->data()->setMultiArraySize(1);
+        m_pRTMSABabyMEG->measurementData()->initFromFiffInfo(m_pFiffInfo);
+        m_pRTMSABabyMEG->measurementData()->setMultiArraySize(1);
 
         //Look for trigger channels and initialise detected trigger map
         m_lTriggerChannelIndices.append(m_pFiffInfo->ch_names.indexOf("TRG001"));

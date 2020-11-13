@@ -121,7 +121,7 @@ QSharedPointer<AbstractPlugin> FiffSimulator::clone() const
 void FiffSimulator::init()
 {
     m_pRTMSA_FiffSimulator = PluginOutputData<RealTimeMultiSampleArray>::create(this, "FiffSimulator", "Fiff Simulator Output");
-    m_pRTMSA_FiffSimulator->data()->setName(this->getName());//Provide name to auto store widget settings
+    m_pRTMSA_FiffSimulator->measurementData()->setName(this->getName());//Provide name to auto store widget settings
     m_outputConnectors.append(m_pRTMSA_FiffSimulator);
 
     //Try to connect the cmd client on start up using localhost connection
@@ -178,7 +178,7 @@ bool FiffSimulator::stop()
     }
 
     // Clear all data in the buffer connected to displays and other plugins
-    m_pRTMSA_FiffSimulator->data()->clear();
+    m_pRTMSA_FiffSimulator->measurementData()->clear();
     m_pCircularBuffer->clear();
 
     return true;
@@ -218,7 +218,7 @@ void FiffSimulator::run()
         if(m_pCircularBuffer->pop(matValue)) {
             //emit values
             if(!isInterruptionRequested()) {
-                m_pRTMSA_FiffSimulator->data()->setValue(matValue.cast<double>());
+                m_pRTMSA_FiffSimulator->measurementData()->setValue(matValue.cast<double>());
             }
         }
     }
@@ -230,10 +230,10 @@ void FiffSimulator::initConnector()
 {
     QMutexLocker locker (&m_qMutex);
     if(m_pFiffInfo) {
-        m_pRTMSA_FiffSimulator->data()->initFromFiffInfo(m_pFiffInfo);
-        m_pRTMSA_FiffSimulator->data()->setMultiArraySize(1);
-        m_pRTMSA_FiffSimulator->data()->setVisibility(true);
-        m_pRTMSA_FiffSimulator->data()->setXMLLayoutFile(QCoreApplication::applicationDirPath() + "/resources/mne_scan/plugins/FiffSimulator/VectorViewSimLayout.xml");
+        m_pRTMSA_FiffSimulator->measurementData()->initFromFiffInfo(m_pFiffInfo);
+        m_pRTMSA_FiffSimulator->measurementData()->setMultiArraySize(1);
+        m_pRTMSA_FiffSimulator->measurementData()->setVisibility(true);
+        m_pRTMSA_FiffSimulator->measurementData()->setXMLLayoutFile(QCoreApplication::applicationDirPath() + "/resources/mne_scan/plugins/FiffSimulator/VectorViewSimLayout.xml");
     }
 }
 

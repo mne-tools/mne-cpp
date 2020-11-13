@@ -106,7 +106,7 @@ QSharedPointer<AbstractPlugin> BrainFlowBoard::clone() const
 void BrainFlowBoard::init()
 {    
     m_pOutput = PluginOutputData<RealTimeMultiSampleArray>::create(this, "BrainFlowBoard", "BrainFlow Board Output");
-    m_pOutput->data()->setName(this->getName());//Provide name to auto store widget settings
+    m_pOutput->measurementData()->setName(this->getName());//Provide name to auto store widget settings
     m_outputConnectors.append(m_pOutput);
 
     BoardShim::set_log_file((char *)"brainflow_log.txt");
@@ -260,7 +260,7 @@ bool BrainFlowBoard::stop()
         }
         requestInterruption();
         wait(500);
-        m_pOutput->data()->clear();
+        m_pOutput->measurementData()->clear();
     } catch (const BrainFlowException &err) {
         BoardShim::log_message((int)LogLevels::LEVEL_ERROR, err.what());
         return false;
@@ -337,8 +337,8 @@ void BrainFlowBoard::prepareSession(BrainFlowInputParams params,
 
         setUpFiffInfo();
 
-        m_pOutput->data()->initFromFiffInfo(m_pFiffInfo);
-        m_pOutput->data()->setMultiArraySize(1);
+        m_pOutput->measurementData()->initFromFiffInfo(m_pFiffInfo);
+        m_pOutput->measurementData()->setMultiArraySize(1);
 
         msgBox.setText("Streaming session is ready");
     } catch (const BrainFlowException &err) {
@@ -433,7 +433,7 @@ void BrainFlowBoard::run()
             delete[] data;
         }
 
-        m_pOutput->data()->setValue(matrix);
+        m_pOutput->measurementData()->setValue(matrix);
     }
 }
 

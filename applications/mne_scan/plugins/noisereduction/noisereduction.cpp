@@ -136,7 +136,7 @@ void NoiseReduction::init()
 
     // Output
     m_pNoiseReductionOutput = PluginOutputData<RealTimeMultiSampleArray>::create(this, "NoiseReductionOut", "NoiseReduction output data");
-    m_pNoiseReductionOutput->data()->setName(this->getName());//Provide name to auto store widget settings
+    m_pNoiseReductionOutput->measurementData()->setName(this->getName());//Provide name to auto store widget settings
     m_outputConnectors.append(m_pNoiseReductionOutput);
 }
 
@@ -164,7 +164,7 @@ bool NoiseReduction::stop()
 
     m_iMaxFilterTapSize = -1;
 
-    m_pNoiseReductionOutput->data()->clear();
+    m_pNoiseReductionOutput->measurementData()->clear();
 
     return true;
 }
@@ -214,12 +214,12 @@ void NoiseReduction::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             m_matSparseFull.setIdentity();
 
             //Init output
-            m_pNoiseReductionOutput->data()->initFromFiffInfo(m_pFiffInfo);
-            m_pNoiseReductionOutput->data()->setMultiArraySize(1);
+            m_pNoiseReductionOutput->measurementData()->initFromFiffInfo(m_pFiffInfo);
+            m_pNoiseReductionOutput->measurementData()->setMultiArraySize(1);
         }
 
         // Check if data is present
-        if(pRTMSA->getMultiSampleArray().size() > 0) {
+        if(pRTMSA->getMultiSampleArray().size() > 0 && m_pFiffInfo) {
             //Init widgets
             if(m_iMaxFilterTapSize == -1) {
                 m_iMaxFilterTapSize = pRTMSA->getMultiSampleArray().first().cols();
@@ -370,8 +370,8 @@ void NoiseReduction::run()
             //Do temporal filtering here
             if(m_bFilterActivated) {
                 matData = pRtFilter->calculate(matData,
-                                                          m_filterKernel,
-                                                          m_lFilterChannelList);
+                                               m_filterKernel,
+                                               m_lFilterChannelList);
             }
 
             //Do SPHARA here
@@ -410,7 +410,7 @@ void NoiseReduction::run()
 
             //Send the data to the connected plugins and the display
             if(!isInterruptionRequested()) {
-                m_pNoiseReductionOutput->data()->setValue(matData);
+                m_pNoiseReductionOutput->measurementData()->setValue(matData);
             }
         }
     }
@@ -478,8 +478,7 @@ void NoiseReduction::updateProjection(const QList<FIFFLIB::FiffProj>& projs)
 void NoiseReduction::updateCompensator(int to)
 {
     // Update the compensator
-    if(m_pFiffInfo)
-    {
+    if(m_pFiffInfo) {
         if(to == 0) {
             m_bCompActivated = false;
         } else {
@@ -493,7 +492,7 @@ void NoiseReduction::updateCompensator(int to)
         FiffCtfComp newComp;
         this->m_pFiffInfo->make_compensator(0, to, newComp);//Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
 
-        this->m_pFiffInfo->set_current_comp(to);
+        //this->m_pFiffInfo->set_current_comp(to);
         MatrixXd matComp = newComp.data->data;
 
         //

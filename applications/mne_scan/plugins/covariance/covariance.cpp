@@ -117,7 +117,7 @@ void Covariance::init()
 
     // Output
     m_pCovarianceOutput = PluginOutputData<RealTimeCov>::create(this, "CovarianceOut", "Covariance output data");
-    m_pCovarianceOutput->data()->setName(this->getName());//Provide name to auto store widget settings
+    m_pCovarianceOutput->measurementData()->setName(this->getName());//Provide name to auto store widget settings
     m_outputConnectors.append(m_pCovarianceOutput);
 }
 
@@ -212,7 +212,7 @@ void Covariance::update(SCMEASLIB::Measurement::SPtr pMeasurement)
         if(!m_pFiffInfo) {
             m_pFiffInfo = pRTMSA->info();
 
-            m_pCovarianceOutput->data()->setFiffInfo(m_pFiffInfo);
+            m_pCovarianceOutput->measurementData()->setFiffInfo(m_pFiffInfo);
         }
 
         if(!m_bPluginControlWidgetsInit) {
@@ -269,7 +269,7 @@ void Covariance::run()
 
             fiffCov = rtCov.estimateCovariance(matData, iEstimationSamples);
             if(!fiffCov.names.isEmpty()) {
-                m_pCovarianceOutput->data()->setValue(fiffCov);
+                m_pCovarianceOutput->measurementData()->setValue(fiffCov);
             }
         }
     }

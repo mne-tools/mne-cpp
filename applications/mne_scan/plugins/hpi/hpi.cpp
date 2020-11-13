@@ -115,7 +115,7 @@ void Hpi::init()
 
     // Output
     m_pHpiOutput = PluginOutputData<RealTimeHpiResult>::create(this, "HpiOut", "Hpi output data");
-    m_pHpiOutput->data()->setName(this->getName());//Provide name to auto store widget settings
+    m_pHpiOutput->measurementData()->setName(this->getName());//Provide name to auto store widget settings
     m_outputConnectors.append(m_pHpiOutput);
 }
 
@@ -179,7 +179,7 @@ void Hpi::update(SCMEASLIB::Measurement::SPtr pMeasurement)
         if(!m_pFiffInfo) {
             m_mutex.lock();
             m_pFiffInfo = pRTMSA->info();
-            m_pHpiOutput->data()->setFiffInfo(m_pFiffInfo);
+            m_pHpiOutput->measurementData()->setFiffInfo(m_pFiffInfo);
             m_mutex.unlock();
             updateProjections();
         }
@@ -519,7 +519,6 @@ void Hpi::run()
                 matDataMerged.block(0, iDataIndexCounter, matData.rows(), matDataMerged.cols()-iDataIndexCounter) = matData.block(0, 0, matData.rows(), matDataMerged.cols()-iDataIndexCounter);
 
                 // Perform HPI fit
-
                 m_mutex.lock();
                 if(m_bDoFreqOrder) {
                     // find correct frequencie order if requested
@@ -578,7 +577,8 @@ void Hpi::run()
                             fitResult.bIsLargeHeadMovement = true;
                             transDevHeadRef = fitResult.devHeadTrans;
                         }
-                        m_pHpiOutput->data()->setValue(fitResult);
+
+                        m_pHpiOutput->measurementData()->setValue(fitResult);
                     }
                 }
 

@@ -106,7 +106,7 @@ public:
      *
      * @return the measurement
      */
-    inline QSharedPointer<T> &data();
+    inline QSharedPointer<T> measurementData();
 
     void update();
 
@@ -128,7 +128,7 @@ inline QSharedPointer< PluginOutputData<T> > PluginOutputData<T>::create(Abstrac
 //=============================================================================================================
 
 template <class T>
-inline QSharedPointer<T> &PluginOutputData<T>::data()
+inline QSharedPointer<T> PluginOutputData<T>::measurementData()
 {
     return m_pMeasurement;
 }

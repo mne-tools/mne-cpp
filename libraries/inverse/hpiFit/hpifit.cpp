@@ -135,6 +135,11 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
         bUpdateModel = true;
     }
 
+    if(m_lChannels.isEmpty()) {
+        qWarning() << "HPIFit::fitHPI - Channel list is empty. Returning.";
+        return;
+    }
+
     // check if we have to update the model
     if(bUpdateModel || (m_matModel.rows() == 0) || (m_vecFreqs != vecFreqs) || (t_mat.cols() != m_matModel.cols())) {
         updateModel(pFiffInfo->sfreq, t_mat.cols(), pFiffInfo->linefreq, vecFreqs);
@@ -651,7 +656,6 @@ void HPIFit::updateChannels(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo)
            pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T1 ||
            pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T2 ||
            pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T3) {
-            std::cout << "pFiffInfo->chs[i].ch_name" << pFiffInfo->chs[i].ch_name.toStdString() << std::endl;
             // Check if the sensor is bad, if not append to innerind
             if(!(pFiffInfo->bads.contains(pFiffInfo->ch_names.at(i)))) {
                 m_vecInnerind.append(i);
