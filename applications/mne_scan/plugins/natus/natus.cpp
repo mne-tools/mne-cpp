@@ -76,7 +76,7 @@ Natus::Natus()
 , m_pRMTSA_Natus(PluginOutputData<RealTimeMultiSampleArray>::create(this, "Natus", "EEG output data"))
 , m_pFiffInfo(QSharedPointer<FiffInfo>::create())
 {
-    m_pRMTSA_Natus->data()->setName(this->getName());//Provide name to auto store widget settings
+    m_pRMTSA_Natus->measurementData()->setName(this->getName());//Provide name to auto store widget settings
 }
 
 //=============================================================================================================
@@ -226,8 +226,8 @@ bool Natus::start()
     setUpFiffInfo();
 
     //Set the channel size of the RMTSA - this needs to be done here and NOT in the init() function because the user can change the number of channels during runtime
-    m_pRMTSA_Natus->data()->initFromFiffInfo(m_pFiffInfo);
-    m_pRMTSA_Natus->data()->setMultiArraySize(1);
+    m_pRMTSA_Natus->measurementData()->initFromFiffInfo(m_pFiffInfo);
+    m_pRMTSA_Natus->measurementData()->setMultiArraySize(1);
 
     QThread::start();
 
@@ -249,7 +249,7 @@ bool Natus::stop()
     wait(500);
 
     // Clear all data in the buffer connected to displays and other plugins
-    m_pRMTSA_Natus->data()->clear();
+    m_pRMTSA_Natus->measurementData()->clear();
     m_pCircularBuffer->clear();
 
     m_pProducerThread.quit();
@@ -303,7 +303,7 @@ void Natus::run()
         if(m_pCircularBuffer->pop(matData)) {
             //emit values
             if(!isInterruptionRequested()) {
-                m_pRMTSA_Natus->data()->setValue(matData);
+                m_pRMTSA_Natus->measurementData()->setValue(matData);
             }
         }
     }

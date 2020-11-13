@@ -148,7 +148,7 @@ void RtFwd::init()
 
     // Output
     m_pRTFSOutput = PluginOutputData<RealTimeFwdSolution>::create(this, "rtFwdOut", "rtFwd real-time forward solution output data");
-    m_pRTFSOutput->data()->setName(this->getName());//Provide name to auto store widget settings
+    m_pRTFSOutput->measurementData()->setName(this->getName());//Provide name to auto store widget settings
     m_outputConnectors.append(m_pRTFSOutput);
 }
 
@@ -405,7 +405,7 @@ void RtFwd::run()
 
     m_mutex.lock();
     m_pFwdSettings->pFiffInfo = m_pFiffInfo;
-    m_pRTFSOutput->data()->setFiffInfo(m_pFiffInfo);
+    m_pRTFSOutput->measurementData()->setFiffInfo(m_pFiffInfo);
     FiffCoordTransOld transMegHeadOld = m_transDevHead.toOld();
     m_mutex.unlock();
 
@@ -456,7 +456,7 @@ void RtFwd::run()
 
             m_mutex.lock();
             if(!m_bDoClustering) {
-                m_pRTFSOutput->data()->setValue(pFwdSolution);
+                m_pRTFSOutput->measurementData()->setValue(pFwdSolution);
                 bFwdReady = false;                  // make sure to not cluster
                 emit statusInformationChanged(5);   //finished
             }
@@ -499,7 +499,7 @@ void RtFwd::run()
                 bFwdReady = true;
 
                 if(!bDoClustering) {
-                    m_pRTFSOutput->data()->setValue(pFwdSolution);
+                    m_pRTFSOutput->measurementData()->setValue(pFwdSolution);
                     bFwdReady = false;
                     emit statusInformationChanged(5);       //finished
                 }
@@ -516,7 +516,7 @@ void RtFwd::run()
             pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(pFwdSolution->cluster_forward_solution(*m_pAnnotationSet.data(), 200)));
             emit clusteringAvailable(pClusteredFwd->nsource);
 
-            m_pRTFSOutput->data()->setValue(pClusteredFwd);
+            m_pRTFSOutput->measurementData()->setValue(pClusteredFwd);
 
             bFwdReady = false;
 
