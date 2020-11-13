@@ -106,26 +106,23 @@ void DipoleFitView::updateProcessingMode(ProcessingMode mode)
 
 //=============================================================================================================
 
-void DipoleFitView::setBem(const QString &sFileName)
+void DipoleFitView::addBem(const QString &sFileName)
 {
-    m_pUi->lineEdit_bem->setText(sFileName);
-    m_pUi->pushButton_clearbem->show();
+    m_pUi->comboBox_bem->addItem(sFileName);
 }
 
 //=============================================================================================================
 
-void DipoleFitView::setMri(const QString &sFileName)
+void DipoleFitView::addMri(const QString &sFileName)
 {
-    m_pUi->lineEdit_mri->setText(sFileName);
-    m_pUi->pushButton_clearmri->show();
+    m_pUi->comboBox_mri->addItem(sFileName);
 }
 
 //=============================================================================================================
 
-void DipoleFitView::setNoise(const QString &sFileName)
+void DipoleFitView::addNoise(const QString &sFileName)
 {
-    m_pUi->lineEdit_noise->setText(sFileName);
-    m_pUi->pushButton_clearnoise->show();
+    m_pUi->comboBox_noise->addItem(sFileName);
 }
 
 //=============================================================================================================
@@ -163,6 +160,11 @@ void DipoleFitView::requestParams()
 
 void DipoleFitView::initGui()
 {
+    //Init Combo boxes
+    m_pUi->comboBox_bem->addItem("None");
+    m_pUi->comboBox_noise->addItem("None");
+    m_pUi->comboBox_mri->addItem("None");
+
     //Perform Fit
     connect(m_pUi->pushButton_fit, &QPushButton::clicked, [=] {
             emit performDipoleFit(m_pUi->lineEdit_name->text());
@@ -293,35 +295,23 @@ void DipoleFitView::initGui()
                                    dValue);
             });
 
-    //Clearing models
-    connect(m_pUi->pushButton_clearmri, &QPushButton::clicked, [=]{
-            m_pUi->pushButton_clearmri->hide();
-            m_pUi->lineEdit_mri->setText("");
-            emit clearMri();
-            });
+    //Models
+    connect(m_pUi->comboBox_bem, &QComboBox::currentTextChanged,
+            this, &DipoleFitView::selectedBem, Qt::UniqueConnection);
+    connect(m_pUi->comboBox_noise, &QComboBox::currentTextChanged,
+            this, &DipoleFitView::selectedNoise, Qt::UniqueConnection);
+    connect(m_pUi->comboBox_mri, &QComboBox::currentTextChanged,
+            this, &DipoleFitView::selectedMri, Qt::UniqueConnection);
+    connect(m_pUi->comboBox_meas, &QComboBox::currentTextChanged,
+            this, &DipoleFitView::selectedMeas, Qt::UniqueConnection);
 
-    connect(m_pUi->pushButton_clearbem, &QPushButton::clicked, [=]{
-            emit clearBem();
-            m_pUi->pushButton_clearbem->hide();
-            m_pUi->lineEdit_bem->setText("");
-            });
-
-    connect(m_pUi->pushButton_clearnoise, &QPushButton::clicked, [=]{
-            emit clearNoise();
-            m_pUi->pushButton_clearnoise->hide();
-            m_pUi->lineEdit_noise->setText("");
-            });
-
-    m_pUi->pushButton_clearbem->hide();
-    m_pUi->pushButton_clearmri->hide();
-    m_pUi->pushButton_clearnoise->hide();
 }
 
 //=============================================================================================================
 
-void DipoleFitView::setMeas(const QString &sFileName)
+void DipoleFitView::addMeas(const QString &sFileName)
 {
-    m_pUi->lineEdit_meas->setText(sFileName);
+    m_pUi->comboBox_meas->addItem(sFileName);
 
     QString sName = sFileName.split(".",QString::SkipEmptyParts).at(0);
     if(sName.endsWith("-ave") || sName.endsWith("_ave") || sName.endsWith("-raw") || sName.endsWith("_raw")){

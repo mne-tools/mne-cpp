@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -30,13 +30,6 @@
           <string>Input</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_6">
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_11">
-            <property name="text">
-             <string>Measurement file</string>
-            </property>
-           </widget>
-          </item>
           <item row="1" column="1">
            <widget class="QSpinBox" name="spinBox_set">
             <property name="value">
@@ -44,10 +37,10 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="lineEdit_meas">
-            <property name="readOnly">
-             <bool>true</bool>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_11">
+            <property name="text">
+             <string>Measurement file</string>
             </property>
            </widget>
           </item>
@@ -57,6 +50,9 @@
              <string>Set</string>
             </property>
            </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="comboBox_meas"/>
           </item>
          </layout>
         </widget>
@@ -379,24 +375,13 @@
           <string>From file</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_10">
+          <item row="0" column="1" colspan="2">
+           <widget class="QComboBox" name="comboBox_noise"/>
+          </item>
           <item row="0" column="0">
            <widget class="QLabel" name="label_8">
             <property name="text">
              <string>Noise matrix</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="2">
-           <widget class="QPushButton" name="pushButton_clearnoise">
-            <property name="text">
-             <string>Clear</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="lineEdit_noise">
-            <property name="readOnly">
-             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -410,38 +395,10 @@
        <string>Forward Model</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_7">
-       <item row="2" column="2">
-        <widget class="QPushButton" name="pushButton_clearbem">
-         <property name="text">
-          <string>Clear</string>
-         </property>
-        </widget>
-       </item>
        <item row="2" column="0">
         <widget class="QLabel" name="label_6">
          <property name="text">
           <string>BEM model</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QLineEdit" name="lineEdit_bem">
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QLineEdit" name="lineEdit_mri">
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="2">
-        <widget class="QPushButton" name="pushButton_clearmri">
-         <property name="text">
-          <string>Clear</string>
          </property>
         </widget>
        </item>
@@ -504,6 +461,16 @@
           </item>
          </layout>
         </widget>
+       </item>
+       <item row="1" column="1" colspan="2">
+        <widget class="QComboBox" name="comboBox_mri">
+         <property name="currentText">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1" colspan="2">
+        <widget class="QComboBox" name="comboBox_bem"/>
        </item>
       </layout>
      </widget>

@@ -219,17 +219,44 @@ private:
      */
     void newDipoleFit(INVERSELIB::ECDSet set, const QString& sFitName);
 
-//    QSharedPointer<ANSHAREDLIB::FiffRawViewModel>           m_pFiffRawModel;            /**< Currently selected FiffRawViewModel model */
-//    QSharedPointer<ANSHAREDLIB::AveragingDataModel>         m_pAverageModel;            /**< Currently selected AveragingDataModel model */
-//    QSharedPointer<ANSHAREDLIB::BemDataModel>               m_pBemModel;                /**< Currently selected BemDataModel model */
-//    QSharedPointer<ANSHAREDLIB::NoiseModel>                 m_pNoiseModel;              /**< Currently selected NoiseModel model */
-//    QSharedPointer<ANSHAREDLIB::MriCoordModel>              m_pMriModel;                /**< Currently selected MriCoordModel model */
+    //=========================================================================================================
+    /**
+     * @brief onNewBemSelected
+     *
+     * @param sName
+     */
+    void onNewBemSelected(const QString& sName);
+
+    //=========================================================================================================
+    /**
+     * @brief onNewMriSelected
+     *
+     * @param sName
+     */
+    void onNewMriSelected(const QString& sName);
+
+    //=========================================================================================================
+    /**
+     * @brief onNewNoiseSelected
+     *
+     * @param sName
+     */
+    void onNewNoiseSelected(const QString& sName);
+
+    //=========================================================================================================
+    /**
+     * @brief onNewMeasSelected
+     *
+     * @param sName
+     */
+    void onNewMeasSelected(const QString& sName);
+
+    QList<QSharedPointer<ANSHAREDLIB::AbstractModel>>       m_ModelList;
 
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;
     INVERSELIB::DipoleFitSettings                           m_DipoleSettings;
 
     QMutex                                                  m_FitMutex;
-
 
 signals:
 

@@ -128,13 +128,13 @@ QDockWidget *DipoleFit::getControl()
 
     //Send Gui updates
     connect(this, &DipoleFit::newBemModel,
-            pDipoleView, &DISPLIB::DipoleFitView::setBem, Qt::UniqueConnection);
+            pDipoleView, &DISPLIB::DipoleFitView::addBem, Qt::UniqueConnection);
     connect(this, &DipoleFit::newNoiseModel,
-            pDipoleView, &DISPLIB::DipoleFitView::setNoise, Qt::UniqueConnection);
+            pDipoleView, &DISPLIB::DipoleFitView::addNoise, Qt::UniqueConnection);
     connect(this, &DipoleFit::newMriModel,
-            pDipoleView, &DISPLIB::DipoleFitView::setMri, Qt::UniqueConnection);
+            pDipoleView, &DISPLIB::DipoleFitView::addMri, Qt::UniqueConnection);
     connect(this, &DipoleFit::newMeasurment,
-            pDipoleView, &DISPLIB::DipoleFitView::setMeas, Qt::UniqueConnection);
+            pDipoleView, &DISPLIB::DipoleFitView::addMeas, Qt::UniqueConnection);
     connect(this, &DipoleFit::getUpdate,
             pDipoleView, &DISPLIB::DipoleFitView::requestParams, Qt::UniqueConnection);
 
@@ -156,23 +156,18 @@ QDockWidget *DipoleFit::getControl()
     connect(pDipoleView, &DISPLIB::DipoleFitView::sphereChanged,
             this, &DipoleFit::onSphereChanged, Qt::UniqueConnection);
 
+    connect(pDipoleView, &DISPLIB::DipoleFitView::selectedBem,
+            this, &DipoleFit::onNewBemSelected, Qt::UniqueConnection);
+    connect(pDipoleView, &DISPLIB::DipoleFitView::selectedMri,
+            this, &DipoleFit::onNewMriSelected, Qt::UniqueConnection);
+    connect(pDipoleView, &DISPLIB::DipoleFitView::selectedNoise,
+            this, &DipoleFit::onNewNoiseSelected, Qt::UniqueConnection);
+    connect(pDipoleView, &DISPLIB::DipoleFitView::selectedMeas,
+            this, &DipoleFit::onNewMeasSelected, Qt::UniqueConnection);
+
     //Fit
     connect(pDipoleView, &DISPLIB::DipoleFitView::performDipoleFit,
             this, &DipoleFit::onPerformDipoleFit, Qt::UniqueConnection);
-
-    //Clear models
-    connect(pDipoleView, &DISPLIB::DipoleFitView::clearBem, [=]{
-            QMutexLocker lock(&m_FitMutex);
-            m_DipoleSettings.bemname = "";
-            });
-    connect(pDipoleView, &DISPLIB::DipoleFitView::clearMri, [=]{
-            QMutexLocker lock(&m_FitMutex);
-            m_DipoleSettings.mriname = "";
-            });
-    connect(pDipoleView, &DISPLIB::DipoleFitView::clearBem, [=]{
-            QMutexLocker lock(&m_FitMutex);
-            m_DipoleSettings.noisename = "";
-            });
 
     QDockWidget* pDockWidgt = new QDockWidget(getName());
     pDockWidgt->setWidget(pDipoleView);
@@ -311,29 +306,29 @@ void DipoleFit::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewMo
 {
     QMutexLocker lock(&m_FitMutex);
 
+    for(QSharedPointer<ANSHAREDLIB::AbstractModel> pModel : m_ModelList){
+        if (pModel == pNewModel){
+            return;
+        }
+    }
+
     if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
-        m_DipoleSettings.measname = pNewModel->getModelPath();
-        m_DipoleSettings.is_raw = true;
         emit newMeasurment(QFileInfo(pNewModel->getModelPath()).fileName());
-
+        m_ModelList.append(pNewModel);
     } else if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_BEMDATA_MODEL) {
-        m_DipoleSettings.bemname = pNewModel->getModelPath();
         emit newBemModel(QFileInfo(pNewModel->getModelPath()).fileName());
-
+        m_ModelList.append(pNewModel);
     } else if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_NOISE_MODEL) {
-        m_DipoleSettings.noisename = pNewModel->getModelPath();
         emit newNoiseModel(QFileInfo(pNewModel->getModelPath()).fileName());
-
+        m_ModelList.append(pNewModel);
     } else if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_MRICOORD_MODEL) {
-        m_DipoleSettings.mriname = pNewModel->getModelPath();
         emit newMriModel(QFileInfo(pNewModel->getModelPath()).fileName());
-
+        m_ModelList.append(pNewModel);
     } else if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_AVERAGING_MODEL) {
         QSharedPointer<ANSHAREDLIB::AveragingDataModel> pAverageModel = qSharedPointerCast<AveragingDataModel>(pNewModel);
         if (pAverageModel->isFromFile()){
-            m_DipoleSettings.measname = pNewModel->getModelPath();
-            m_DipoleSettings.is_raw = false;
             emit newMeasurment(QFileInfo(pNewModel->getModelPath()).fileName());
+            m_ModelList.append(pNewModel);
         }
     }
 }
@@ -410,4 +405,66 @@ void DipoleFit::onSphereChanged(double dX,
     m_DipoleSettings.r0[2] = dZ/1000.0;
 
     m_DipoleSettings.eeg_sphere_rad = dRadius/1000.0;
+}
+
+//=============================================================================================================
+
+void DipoleFit::onNewBemSelected(const QString &sName)
+{
+    if(sName == "None"){
+        return;
+    }
+    for(QSharedPointer<ANSHAREDLIB::AbstractModel> pModel : m_ModelList){
+        if (QFileInfo(pModel->getModelPath()).fileName() == sName){
+            m_DipoleSettings.bemname = pModel->getModelPath();
+            return;
+        }
+    }
+}
+
+//=============================================================================================================
+
+void DipoleFit::onNewMriSelected(const QString &sName)
+{
+    if(sName == "None"){
+        return;
+    }
+    for(QSharedPointer<ANSHAREDLIB::AbstractModel> pModel : m_ModelList){
+        if (QFileInfo(pModel->getModelPath()).fileName() == sName){
+            m_DipoleSettings.mriname = pModel->getModelPath();
+            return;
+        }
+    }
+}
+
+//=============================================================================================================
+
+void DipoleFit::onNewNoiseSelected(const QString &sName)
+{
+    if(sName == "None"){
+        return;
+    }
+    for(QSharedPointer<ANSHAREDLIB::AbstractModel> pModel : m_ModelList){
+        if (QFileInfo(pModel->getModelPath()).fileName() == sName){
+            m_DipoleSettings.noisename = pModel->getModelPath();
+            return;
+        }
+    }
+}
+
+//=============================================================================================================
+
+void DipoleFit::onNewMeasSelected(const QString &sName)
+{
+    for(QSharedPointer<ANSHAREDLIB::AbstractModel> pModel : m_ModelList){
+        if (QFileInfo(pModel->getModelPath()).fileName() == sName){
+            if(pModel->getType() == MODEL_TYPE::ANSHAREDLIB_AVERAGING_MODEL){
+                m_DipoleSettings.measname = pModel->getModelPath();
+                m_DipoleSettings.is_raw = false;
+            } else if(pModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
+                m_DipoleSettings.measname = pModel->getModelPath();
+                m_DipoleSettings.is_raw = true;
+            }
+        }
+    }
 }
