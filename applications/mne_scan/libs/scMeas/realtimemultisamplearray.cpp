@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the RealTimeMultiSampleArrayNew class.
+ * @brief    Definition of the RealTimeMultiSampleArray class.
  *
  */
 
@@ -235,7 +235,7 @@ void RealTimeMultiSampleArray::setValue(const MatrixXd& mat)
     m_qMutex.lock();
     //check vector size
     if(mat.rows() != m_qListChInfo.size())
-        qCritical() << "Error Occured in RealTimeMultiSampleArrayNew::setVector: Vector size does not match the number of channels! ";
+        qCritical() << "Error Occured in RealTimeMultiSampleArray::setVector: Vector size does not match the number of channels! ";
 
     //ToDo
 //    //Check if maximum exceeded //ToDo speed this up

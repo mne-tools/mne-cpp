@@ -67,7 +67,7 @@ namespace SCMEASLIB
 /**
  * DECLARE CLASS RealTimeMultiSampleArray -> ToDo check feasibilty of QAbstractTableModel
  *
- * @brief The RealTimeMultiSampleArrayNew class is the base class of every RealTimeMultiSampleArrayNew Measurement.
+ * @brief The RealTimeMultiSampleArray class is the base class of every RealTimeMultiSampleArray Measurement.
  */
 class SCMEASSHARED_EXPORT RealTimeMultiSampleArray : public Measurement
 {
@@ -79,13 +79,13 @@ public:
 
     //=========================================================================================================
     /**
-     * Constructs a RealTimeMultiSampleArrayNew.
+     * Constructs a RealTimeMultiSampleArray.
      */
     explicit RealTimeMultiSampleArray(QObject *parent = 0);
 
     //=========================================================================================================
     /**
-     * Destroys the RealTimeMultiSampleArrayNew.
+     * Destroys the RealTimeMultiSampleArray.
      */
     virtual ~RealTimeMultiSampleArray();
 
@@ -97,7 +97,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Inits RealTimeMultiSampleArrayNew and adds uiNumChannels empty channel information
+     * Inits RealTimeMultiSampleArray and adds uiNumChannels empty channel information
      *
      * @param [in] uiNumChannels     the number of channels to init.
      */
@@ -137,19 +137,19 @@ public:
 
     //=========================================================================================================
     /**
-     * Sets the sampling rate of the RealTimeMultiSampleArrayNew Measurement.
+     * Sets the sampling rate of the RealTimeMultiSampleArray Measurement.
      *
-     * @param[in] fSamplingRate the sampling rate of the RealTimeMultiSampleArrayNew.
+     * @param[in] fSamplingRate the sampling rate of the RealTimeMultiSampleArray.
      */
     inline void setSamplingRate(float fSamplingRate);
 
     //=========================================================================================================
     /**
-     * Returns the sampling rate of the RealTimeMultiSampleArrayNew Measurement.
+     * Returns the sampling rate of the RealTimeMultiSampleArray Measurement.
      *
-     * @return the sampling rate of the RealTimeMultiSampleArrayNew.
+     * @return the sampling rate of the RealTimeMultiSampleArray.
      */
-    inline double getSamplingRate() const;
+    inline float getSamplingRate() const;
 
     //=========================================================================================================
     /**
@@ -265,7 +265,7 @@ inline void RealTimeMultiSampleArray::setSamplingRate(float fSamplingRate)
 
 //=============================================================================================================
 
-inline double RealTimeMultiSampleArray::getSamplingRate() const
+inline float RealTimeMultiSampleArray::getSamplingRate() const
 {
     QMutexLocker locker(&m_qMutex);
     return m_fSamplingRate;
@@ -325,4 +325,4 @@ inline const QList<Eigen::MatrixXd>& RealTimeMultiSampleArray::getMultiSampleArr
 
 Q_DECLARE_METATYPE(SCMEASLIB::RealTimeMultiSampleArray::SPtr)
 
-#endif // REALTIMEMULTISAMPLEARRAYNEW_H
+#endif // RealTimeMultiSampleArray_H

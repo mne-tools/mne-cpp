@@ -57,7 +57,7 @@
 using namespace DUMMYTOOLBOXPLUGIN;
 using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
-using namespace IOBUFFER;
+using namespace UTILSLIB;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -65,7 +65,7 @@ using namespace Eigen;
 //=============================================================================================================
 
 DummyToolbox::DummyToolbox()
-: m_pCircularBuffer(CircularBuffer_Matrix_double::SPtr::create(40))
+: m_pCircularBuffer(QSharedPointer<CircularBuffer_Matrix_double>(new CircularBuffer_Matrix_double(40)))
 {
 }
 
@@ -80,7 +80,7 @@ DummyToolbox::~DummyToolbox()
 
 //=============================================================================================================
 
-QSharedPointer<IPlugin> DummyToolbox::clone() const
+QSharedPointer<AbstractPlugin> DummyToolbox::clone() const
 {
     QSharedPointer<DummyToolbox> pClone(new DummyToolbox);
     return pClone;
@@ -99,7 +99,7 @@ void DummyToolbox::init()
     // Output - Uncomment this if you don't want to send processed data (in form of a matrix) to other plugins.
     // Also, this output stream will generate an online display in your plugin
     m_pOutput = PluginOutputData<RealTimeMultiSampleArray>::create(this, "DummyOut", "Dummy output data");
-    m_pOutput->data()->setName(this->getName());
+    m_pOutput->measurementData()->setName(this->getName());
     m_outputConnectors.append(m_pOutput);
 }
 
@@ -127,7 +127,7 @@ bool DummyToolbox::stop()
     wait(500);
 
     // Clear all data in the buffer connected to displays and other plugins
-    m_pOutput->data()->clear();
+    m_pOutput->measurementData()->clear();
     m_pCircularBuffer->clear();
 
     m_bPluginControlWidgetsInit = false;
@@ -137,7 +137,7 @@ bool DummyToolbox::stop()
 
 //=============================================================================================================
 
-IPlugin::PluginType DummyToolbox::getType() const
+AbstractPlugin::PluginType DummyToolbox::getType() const
 {
     return _IAlgorithm;
 }
@@ -166,15 +166,13 @@ void DummyToolbox::update(SCMEASLIB::Measurement::SPtr pMeasurement)
         if(!m_pFiffInfo) {
             m_pFiffInfo = pRTMSA->info();
 
-            m_pOutput->data()->initFromFiffInfo(m_pFiffInfo);
-            m_pOutput->data()->setMultiArraySize(1);
+            m_pOutput->measurementData()->initFromFiffInfo(m_pFiffInfo);
+            m_pOutput->measurementData()->setMultiArraySize(1);
         }
 
         if(!m_bPluginControlWidgetsInit) {
             initPluginControlWidgets();
         }
-
-        MatrixXd matData;
 
         for(unsigned char i = 0; i < pRTMSA->getMultiArraySize(); ++i) {
             // Please note that we do not need a copy here since this function will block until
@@ -225,7 +223,7 @@ void DummyToolbox::run()
             //Send the data to the connected plugins and the online display
             //Unocmment this if you also uncommented the m_pOutput in the constructor above
             if(!isInterruptionRequested()) {
-                m_pOutput->data()->setValue(matData);
+                m_pOutput->measurementData()->setValue(matData);
             }
         }
     }

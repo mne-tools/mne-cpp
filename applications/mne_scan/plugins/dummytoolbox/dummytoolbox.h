@@ -46,7 +46,7 @@
 #include "FormFiles/dummysetupwidget.h"
 #include "FormFiles/dummyyourwidget.h"
 
-#include <scShared/Interfaces/IAlgorithm.h>
+#include <scShared/Plugins/abstractalgorithm.h>
 #include <utils/generics/circularbuffer.h>
 #include <scMeas/realtimemultisamplearray.h>
 
@@ -83,12 +83,12 @@ namespace DUMMYTOOLBOXPLUGIN
  *
  * @brief The DummyToolbox class provides a dummy algorithm structure.
  */
-class DUMMYTOOLBOXSHARED_EXPORT DummyToolbox : public SCSHAREDLIB::IAlgorithm
+class DUMMYTOOLBOXSHARED_EXPORT DummyToolbox : public SCSHAREDLIB::AbstractAlgorithm
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "dummytoolbox.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(SCSHAREDLIB::IAlgorithm)
+    Q_INTERFACES(SCSHAREDLIB::AbstractAlgorithm)
 
 public:
     //=========================================================================================================
@@ -107,12 +107,12 @@ public:
     /**
      * IAlgorithm functions
      */
-    virtual QSharedPointer<SCSHAREDLIB::IPlugin> clone() const;
+    virtual QSharedPointer<SCSHAREDLIB::AbstractPlugin> clone() const;
     virtual void init();
     virtual void unload();
     virtual bool start();
     virtual bool stop();
-    virtual SCSHAREDLIB::IPlugin::PluginType getType() const;
+    virtual SCSHAREDLIB::AbstractPlugin::PluginType getType() const;
     virtual QString getName() const;
     virtual QWidget* setupWidget();
 
@@ -142,7 +142,7 @@ private:
 
     QSharedPointer<DummyYourWidget>                 m_pYourWidget;              /**< The widget used to control this plugin by the user.*/
 
-    IOBUFFER::CircularBuffer_Matrix_double::SPtr    m_pCircularBuffer;          /**< Holds incoming data.*/
+    QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>       m_pCircularBuffer;          /**< Holds incoming raw data. */
 
     SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr      m_pInput;      /**< The incoming data.*/
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pOutput;     /**< The outgoing data.*/

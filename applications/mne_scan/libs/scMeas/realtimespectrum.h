@@ -66,7 +66,7 @@ namespace SCMEASLIB
 /**
  * DECLARE CLASS RealTimeSpectrum
  *
- * @brief The RealTimeMultiSampleArrayNew class is the base class of every RealTimeMultiSampleArrayNew Measurement.
+ * @brief The RealTimeSpectrum class is the base class of every RealTimeSpectrum Measurement.
  */
 class SCMEASSHARED_EXPORT RealTimeSpectrum : public Measurement
 {
@@ -78,13 +78,13 @@ public:
 
     //=========================================================================================================
     /**
-     * Constructs a RealTimeMultiSampleArrayNew.
+     * Constructs a RealTimeSpectrum.
      */
     explicit RealTimeSpectrum(QObject *parent = 0);
 
     //=========================================================================================================
     /**
-     * Destroys the RealTimeMultiSampleArrayNew.
+     * Destroys the RealTimeSpectrum.
      */
     virtual ~RealTimeSpectrum();
 
