@@ -96,7 +96,7 @@ public:
      *
      * @param sFileName
      */
-    void setBem(const QString& sFileName);
+    void addBem(const QString& sFileName);
 
     //=========================================================================================================
     /**
@@ -104,7 +104,7 @@ public:
      *
      * @param sFileName
      */
-    void setMri(const QString& sFileName);
+    void addMri(const QString& sFileName);
 
     //=========================================================================================================
     /**
@@ -112,7 +112,7 @@ public:
      *
      * @param sFileName
      */
-    void setNoise(const QString& sFileName);
+    void addNoise(const QString& sFileName);
 
     //=========================================================================================================
     /**
@@ -120,7 +120,7 @@ public:
      *
      * @param sFileName
      */
-    void setMeas(const QString& sFileName);
+    void addMeas(const QString& sFileName);
 
     //=========================================================================================================
     /**
@@ -253,23 +253,13 @@ signals:
                        double dZ,
                        double dRadius);
 
-    //=========================================================================================================
-    /**
-     * Triggers clearing of noise model (ignored in dipole fit until reselected)
-     */
-    void clearNoise();
+    void selectedBem(const QString& sName);
 
-    //=========================================================================================================
-    /**
-     * Triggers clearing of BEM model (ignored in dipole fit until reselected)
-     */
-    void clearBem();
+    void selectedMri(const QString& sName);
 
-    //=========================================================================================================
-    /**
-     * Triggers clearing of MRI model (ignored in dipole fit until reselected)
-     */
-    void clearMri();
+    void selectedNoise(const QString& sName);
+
+    void selectedMeas(const QString& sName);
 
 };
 }//namespace
