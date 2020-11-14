@@ -624,7 +624,7 @@ void HPIFit::storeHeadPosition(float fTime,
 void HPIFit::updateSensor()
 {
     // Create MEG-Coils and read data
-    int iAcc = 0;
+    int iAcc = 2;
     int iNch = m_lChannels.size();
 
     if(iNch == 0) {
