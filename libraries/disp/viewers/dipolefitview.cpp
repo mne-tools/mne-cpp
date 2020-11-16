@@ -164,6 +164,7 @@ void DipoleFitView::initGui()
     m_pUi->comboBox_bem->addItem("None");
     m_pUi->comboBox_noise->addItem("None");
     m_pUi->comboBox_mri->addItem("None");
+    m_pUi->comboBox_meas->addItem("None");
 
     //Perform Fit
     connect(m_pUi->pushButton_fit, &QPushButton::clicked, [=] {
@@ -302,8 +303,14 @@ void DipoleFitView::initGui()
             this, &DipoleFitView::selectedNoise, Qt::UniqueConnection);
     connect(m_pUi->comboBox_mri, &QComboBox::currentTextChanged,
             this, &DipoleFitView::selectedMri, Qt::UniqueConnection);
-    connect(m_pUi->comboBox_meas, &QComboBox::currentTextChanged,
-            this, &DipoleFitView::selectedMeas, Qt::UniqueConnection);
+    connect(m_pUi->comboBox_meas, &QComboBox::currentTextChanged, [=](const QString& sFileName){
+            QString sName = sFileName.split(".",QString::SkipEmptyParts).at(0);
+            if(sName.endsWith("-ave") || sName.endsWith("_ave") || sName.endsWith("-raw") || sName.endsWith("_raw")){
+                sName.chop(4);
+            }
+            m_pUi->lineEdit_name->setText("Dipole Fit - " + sName + " - " + QDateTime::currentDateTime().toString("MMMM d yyyy hh:mm:ss"));
+            emit selectedMeas(sFileName);
+    });
 
 }
 
@@ -313,10 +320,10 @@ void DipoleFitView::addMeas(const QString &sFileName)
 {
     m_pUi->comboBox_meas->addItem(sFileName);
 
-    QString sName = sFileName.split(".",QString::SkipEmptyParts).at(0);
-    if(sName.endsWith("-ave") || sName.endsWith("_ave") || sName.endsWith("-raw") || sName.endsWith("_raw")){
-        sName.chop(4);
-    }
+//    QString sName = sFileName.split(".",QString::SkipEmptyParts).at(0);
+//    if(sName.endsWith("-ave") || sName.endsWith("_ave") || sName.endsWith("-raw") || sName.endsWith("_raw")){
+//        sName.chop(4);
+//    }
 
-    m_pUi->lineEdit_name->setText("Dipole Fit - " + sName + " - " + QDateTime::currentDateTime().toString("MMMM d yyyy hh:mm:ss"));
+//    m_pUi->lineEdit_name->setText("Dipole Fit - " + sName + " - " + QDateTime::currentDateTime().toString("MMMM d yyyy hh:mm:ss"));
 }
