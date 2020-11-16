@@ -216,7 +216,9 @@ void TestHpiFit::initTestCase()
                    fittedPointSet,
                    pFiffInfo,
                    bDoDebug = 0,
-                   sHPIResourceDir);
+                   sHPIResourceDir,
+                   200,
+                   1e-5);
         qInfo() << "[done]\n";
 
         if(MNEMath::compareTransformation(devHeadT.trans, pFiffInfo->dev_head_t.trans, threshRot, threshTrans)) {

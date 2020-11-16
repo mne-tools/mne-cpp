@@ -1,0 +1,394 @@
+name: TestCI
+
+on:
+  push:
+    branches:
+    - testci
+
+jobs:
+  MinQtDynamic:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        qt: [5.10.1]
+        os: [ubuntu-16.04, macos-latest, windows-2016]
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v2
+    - name: Install Python 3.7 version
+      uses: actions/setup-python@v1
+      with:
+        python-version: '3.7'
+        architecture: 'x64'
+    - name: Install BrainFlow and LSL submodules
+      run: |
+        git submodule update --init applications/mne_scan/plugins/brainflowboard/brainflow
+        git submodule update --init applications/mne_scan/plugins/lsladapter/liblsl
+    - name: Install Qt (Linux|MacOS)
+      if: (matrix.os == 'ubuntu-16.04') || (matrix.os == 'macos-latest')
+      uses: jurplel/install-qt-action@v2
+      with:
+        version: ${{ matrix.qt }}
+        modules: qtcharts
+    - name: Install Qt (Windows)
+      if: matrix.os == 'windows-2016'
+      uses: jurplel/install-qt-action@v2
+      with:
+        version: ${{ matrix.qt }}
+        arch: win64_msvc2017_64
+        modules: qtcharts
+    - name: Install jom (Windows)
+      if: matrix.os == 'windows-2016'
+      run: |
+        Invoke-WebRequest https://www.dropbox.com/s/dku543gtw7ik7hr/jom.zip?dl=1 -OutFile .\jom.zip
+        expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
+        echo "::add-path::$HOME\jom"
+    - name: Compile BrainFlow submodule (Windows)
+      if: matrix.os == 'windows-2016'
+      run: |
+        cd applications\mne_scan\plugins\brainflowboard\brainflow
+        mkdir build
+        cd build
+        cmake -G "Visual Studio 15 2017" -A x64 -DMSVC_RUNTIME=dynamic -DCMAKE_SYSTEM_VERSION=8.1 -DCMAKE_INSTALL_PREFIX="$env:GITHUB_WORKSPACE\applications\mne_scan\plugins\brainflowboard\brainflow\installed" ..
+        cmake --build . --target install --config Release
+    - name: Compile BrainFlow submodule (Linux|MacOS)
+      if: (matrix.os == 'ubuntu-16.04') || (matrix.os == 'macos-latest')
+      run: |
+        cd applications/mne_scan/plugins/brainflowboard/brainflow
+        mkdir build
+        cd build
+        cmake -DCMAKE_INSTALL_PREFIX=../installed -DCMAKE_BUILD_TYPE=Release ..
+        make -j
+        make install
+    - name: Compile LSL submodule (Windows)
+      if: matrix.os == 'windows-2016'
+      run: |
+        cd applications\mne_scan\plugins\lsladapter\liblsl
+        mkdir build
+        cd build
+        cmake .. -G "Visual Studio 15 2017" -A x64
+        cmake --build . --config Release --target install
+    - name: Compile LSL submodule (Linux|MacOS)
+      if: (matrix.os == 'ubuntu-16.04') || (matrix.os == 'macos-latest')
+      run: |
+        cd applications/mne_scan/plugins/lsladapter/liblsl
+        mkdir build
+        cd build
+        cmake ..
+        make
+        make install
+    - name: Configure and compile MNE-CPP (Linux|MacOS)
+      if: (matrix.os == 'ubuntu-16.04') || (matrix.os == 'macos-latest')
+      run: |
+        qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow MNECPP_CONFIG+=withLsl MNECPP_CONFIG+=withAppBundles
+        make -j4
+    - name: Configure and compile MNE-CPP (Windows)
+      if: matrix.os == 'windows-2016'
+      run: |
+        # Setup VS compiler
+        cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
+        Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
+        qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow MNECPP_CONFIG+=withLsl
+        jom -j4
+    - name: Deploy binaries (Linux)
+      if: matrix.os == 'ubuntu-16.04'
+      run: |
+        ./tools/deployment/deploy_linux
+    - name: Deploy binaries (MacOS)
+      if: matrix.os == 'macos-latest'
+      run: |
+        ./tools/deployment/deploy_macos
+    - name: Deploy binaries (Windows)
+      if: matrix.os == 'windows-2016'
+      run: |
+        ./tools/deployment/deploy_win.bat
+
+  MaxQtDynamic:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        qt: [5.15.1]
+        os: [ubuntu-16.04, macos-latest, windows-2019]
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v2
+    - name: Install Python 3.7 version
+      uses: actions/setup-python@v1
+      with:
+        python-version: '3.7'
+        architecture: 'x64'
+    - name: Install BrainFlow and LSL submodules
+      run: |
+        git submodule update --init applications/mne_scan/plugins/brainflowboard/brainflow
+        git submodule update --init applications/mne_scan/plugins/lsladapter/liblsl
+    - name: Install Qt (Linux|MacOS)
+      if: (matrix.os == 'ubuntu-16.04') || (matrix.os == 'macos-latest')
+      uses: jurplel/install-qt-action@v2
+      with:
+        version: ${{ matrix.qt }}
+        modules: qtcharts
+    - name: Install Qt (Windows)
+      if: matrix.os == 'windows-2019'
+      uses: jurplel/install-qt-action@v2
+      with:
+        version: ${{ matrix.qt }}
+        arch: win64_msvc2019_64
+        modules: qtcharts
+    - name: Install jom (Windows)
+      if: matrix.os == 'windows-2019'
+      run: |
+        Invoke-WebRequest https://www.dropbox.com/s/dku543gtw7ik7hr/jom.zip?dl=1 -OutFile .\jom.zip
+        expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
+        echo "::add-path::$HOME\jom"
+    - name: Compile BrainFlow submodule (Windows)
+      if: matrix.os == 'windows-2019'
+      run: |
+        cd applications\mne_scan\plugins\brainflowboard\brainflow
+        mkdir build
+        cd build
+        cmake -G "Visual Studio 16 2019" -A x64 -DMSVC_RUNTIME=dynamic -DCMAKE_SYSTEM_VERSION=8.1 -DCMAKE_INSTALL_PREFIX="$env:GITHUB_WORKSPACE\applications\mne_scan\plugins\brainflowboard\brainflow\installed" ..
+        cmake --build . --target install --config Release
+    - name: Compile BrainFlow submodule (Linux|MacOS)
+      if: (matrix.os == 'ubuntu-16.04') || (matrix.os == 'macos-latest')
+      run: |
+        cd applications/mne_scan/plugins/brainflowboard/brainflow
+        mkdir build
+        cd build
+        cmake -DCMAKE_INSTALL_PREFIX=../installed -DCMAKE_BUILD_TYPE=Release ..
+        make -j
+        make install
+    - name: Compile LSL submodule (Windows)
+      if: matrix.os == 'windows-2019'
+      run: |
+        cd applications\mne_scan\plugins\lsladapter\liblsl
+        mkdir build
+        cd build
+        cmake .. -G "Visual Studio 16 2019" -A x64
+        cmake --build . --config Release --target install
+    - name: Compile LSL submodule (Linux|MacOS)
+      if: (matrix.os == 'ubuntu-16.04') || (matrix.os == 'macos-latest')
+      run: |
+        cd applications/mne_scan/plugins/lsladapter/liblsl
+        mkdir build
+        cd build
+        cmake ..
+        make
+        make install
+    - name: Configure and compile MNE-CPP (Linux|MacOS)
+      if: (matrix.os == 'ubuntu-16.04') || (matrix.os == 'macos-latest')
+      run: |
+        qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow MNECPP_CONFIG+=withLsl MNECPP_CONFIG+=withAppBundles
+        make -j4
+    - name: Configure and compile MNE-CPP (Windows)
+      if: matrix.os == 'windows-2019'
+      run: |
+        # Setup VS compiler
+        cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
+        Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
+        qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow MNECPP_CONFIG+=withLsl
+        jom -j4
+    - name: Deploy binaries (Linux)
+      if: matrix.os == 'ubuntu-16.04'
+      run: |
+        ./tools/deployment/deploy_linux
+    - name: Deploy binaries (MacOS)
+      if: matrix.os == 'macos-latest'
+      run: |
+        ./tools/deployment/deploy_macos
+    - name: Deploy binaries (Windows)
+      if: matrix.os == 'windows-2019'
+      run: |
+        ./tools/deployment/deploy_win.bat
+        
+  QtStatic:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        qt: [5.15.1]
+        os: [ubuntu-16.04, macos-latest, windows-2019]
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v2
+    - name: Install Python 3.7 version
+      uses: actions/setup-python@v1
+      with:
+        python-version: '3.7'
+        architecture: 'x64'
+    - name: Install OpenGL (Linux)
+      if: matrix.os == 'ubuntu-16.04'
+      run: |
+        sudo apt-get update -q
+        sudo apt-get install build-essential libgl1-mesa-dev
+    - name: Install Qt (Linux)
+      if: matrix.os == 'ubuntu-16.04'
+      run: |
+        # Download the pre-built static version of Qt, which was created with the generateBinaries.yml workflow
+        wget -O qt5_5151_static_binaries_linux.tar.gz https://www.dropbox.com/s/ilwo7mu9muk48mf/qt5_5151_static_binaries_linux.tar.gz?dl=1
+        mkdir ../Qt5_binaries
+        tar xvzf qt5_5151_static_binaries_linux.tar.gz -C ../ -P
+    - name: Install Qt (MacOS)
+      if: matrix.os == 'macos-latest'
+      run: |
+        # Download the pre-built static version of Qt, which was created with the generateBinaries.yml workflow
+        wget -O qt5_5151_static_binaries_macos.tar.gz https://www.dropbox.com/s/2hfv7q38k528tfz/qt5_5151_static_binaries_macos.tar.gz?dl=1
+        tar xvzf qt5_5151_static_binaries_macos.tar.gz -P
+    - name: Install Qt (Windows)
+      if: matrix.os == 'windows-2019'
+      run: |
+        # Download the pre-built static version of Qt, which was created with the generateBinaries.yml workflow
+        Invoke-WebRequest https://www.dropbox.com/s/z745z290s9pknih/qt5_5151_static_binaries_win.zip?dl=1 -OutFile .\qt5_5151_static_binaries_win.zip
+        expand-archive -path "qt5_5151_static_binaries_win.zip" -destinationpath "..\"
+    - name: Install jom (Windows)
+      if: matrix.os == 'windows-2019'
+      run: |
+        Invoke-WebRequest https://www.dropbox.com/s/dku543gtw7ik7hr/jom.zip?dl=1 -OutFile .\jom.zip
+        expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
+        echo "::add-path::$HOME\jom"
+    - name: Configure and compile MNE-CPP (Linux|MacOS)
+      if: (matrix.os == 'ubuntu-16.04') || (matrix.os == 'macos-latest')
+      run: |
+        ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=static
+        make -j4
+    - name: Configure and compile MNE-CPP (Windows)
+      if: matrix.os == 'windows-2019'
+      run: |
+        # Setup VS compiler
+        cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
+        Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
+        ..\Qt5_binaries\bin\qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=static
+        jom -j4
+    - name: Deploy binaries (Linux)
+      if: matrix.os == 'ubuntu-16.04'
+      run: |
+        ./tools/deployment/deploy_linux_static
+    - name: Deploy binaries (MacOS)
+      if: matrix.os == 'macos-latest'
+      run: |
+        ./tools/deployment/deploy_macos_static
+    - name: Deploy binaries (Windows)
+      if: matrix.os == 'windows-2019'
+      run: |
+        ./tools/deployment/deploy_win_static.bat
+
+  Tests:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        os: [ubuntu-16.04, macos-latest, windows-2019]
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v2
+    - name: Clone mne-cpp test data
+      run: git clone https://github.com/mne-tools/mne-cpp-test-data.git ./bin/mne-cpp-test-data
+    - name: Install Python 3.7 version
+      uses: actions/setup-python@v1
+      with:
+        python-version: '3.7'
+        architecture: 'x64'
+    - name: Install Codecov
+      if: matrix.os == 'ubuntu-16.04'
+      run: |
+        sudo pip install codecov
+    - name: Install Qt (Linux|MacOS)
+      if: (matrix.os == 'ubuntu-16.04') || (matrix.os == 'macos-latest')
+      uses: jurplel/install-qt-action@v2
+      with:
+        version: 5.15.0
+        modules: qtcharts
+    - name: Install Qt (Windows)
+      if: matrix.os == 'windows-2019'
+      uses: jurplel/install-qt-action@v2
+      with:
+        version: 5.15.1
+        arch: win64_msvc2019_64
+        modules: qtcharts
+    - name: Install jom (Windows)
+      if: matrix.os == 'windows-2019'
+      run: |
+        Invoke-WebRequest https://www.dropbox.com/s/dku543gtw7ik7hr/jom.zip?dl=1 -OutFile .\jom.zip
+        expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
+        echo "::add-path::$HOME\jom"
+    - name: Configure and compile MNE-CPP (Linux)
+      if: matrix.os == 'ubuntu-16.04'
+      run: |
+        qmake -r MNECPP_CONFIG+=withCodeCov MNECPP_CONFIG+=noApplications MNECPP_CONFIG+=noExamples
+        make -j4
+    - name: Configure and compile MNE-CPP (MacOS)
+      if: matrix.os == 'macos-latest'
+      run: |
+        qmake -r MNECPP_CONFIG+=noApplications MNECPP_CONFIG+=noExamples
+        make -j4
+    - name: Configure and compile MNE-CPP (Windows)
+      if: matrix.os == 'windows-2019'
+      run: |
+        # Setup VS compiler
+        cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
+        Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
+        qmake -r MNECPP_CONFIG+=noApplications MNECPP_CONFIG+=noExamples
+        jom -j4
+    - name: Run tests (Linux)
+      if: matrix.os == 'ubuntu-16.04'
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        QTEST_FUNCTION_TIMEOUT: 900000
+      run: |
+        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)/lib
+        for test in ./bin/test_*;
+        do
+          # Run all tests and call gcov on all cpp files after each test run. Then upload to codecov for every test run.
+          # Codecov is able to process multiple uploads and merge them as soon as the CI job is done.
+          echo ">> Starting $test"
+          $test
+          find ./libraries -type f -name "*.cpp" -execdir gcov {} \; > /dev/null
+          # Hide codecov output since it corrupts the log too much
+          codecov > /dev/null
+        done
+    - name: Run tests (MacOS)
+      if: matrix.os == 'macos-latest'
+      env:
+        QTEST_FUNCTION_TIMEOUT: 900000
+      run: |
+        export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$PWD/lib
+        for test in ./bin/test_*;
+        do
+          echo ">> Starting $test"
+          $test
+        done
+    - name: Run tests (Windows)
+      if: matrix.os == 'windows-2019'
+      env:
+        QTEST_FUNCTION_TIMEOUT: 900000
+      run: |
+        cd bin
+        Get-ChildItem -Filter test_*.exe | ForEach {Write-Output "" "" Starting $_.Fullname; &$_.Fullname}
+
+  Doxygen:
+    runs-on: ubuntu-16.04
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v2
+    - name: Install Qt Dev Tools, Doxygen and Graphviz
+      run: |
+        sudo apt-get update -q
+        sudo apt-get install -q qttools5-dev-tools doxygen graphviz
+    - name: Run Doxygen and package result
+      run: |
+        cd doc/doxygen
+        doxygen mne-cpp_doxyfile

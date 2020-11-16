@@ -85,8 +85,6 @@ struct DipFitError {
     int numIterations;
 };
 
-
-
 //=========================================================================================================
 /**
  * The strucut specifing the sorting parameters.
@@ -125,11 +123,14 @@ public:
      */
     void doDipfitConcurrent();
 
-    Eigen::MatrixXd         coilPos;
-    Eigen::RowVectorXd      sensorData;
-    DipFitError             errorInfo;
-    struct SensorSet        sensors;
-    Eigen::MatrixXd         matProjector;
+    Eigen::MatrixXd         m_coilPos;
+    Eigen::RowVectorXd      m_sensorData;
+    DipFitError             m_errorInfo;
+    struct SensorSet        m_sensors;
+    Eigen::MatrixXd         m_matProjector;
+
+    int                     m_iMaxIterations;
+    float                   m_fAbortError;
 
 protected:
     //=========================================================================================================
