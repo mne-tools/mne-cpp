@@ -67,6 +67,7 @@ BrainFlowSetupWidget::BrainFlowSetupWidget(BrainFlowBoard *board, QWidget *paren
     ui->dataType->addItem("EDA");
     ui->dataType->setCurrentIndex(0);
     // board Id
+    ui->boardId->addItem("PlayBack Board");
     ui->boardId->addItem("Streaming Board");
     ui->boardId->addItem("Synthetic Board");
     ui->boardId->addItem("Cyton");
@@ -82,7 +83,9 @@ BrainFlowSetupWidget::BrainFlowSetupWidget(BrainFlowBoard *board, QWidget *paren
     ui->boardId->addItem("Callibri ECG");
     ui->boardId->addItem("Notion 1");
     ui->boardId->addItem("Notion 2");
-    ui->boardId->setCurrentIndex(1); // Synthetic board is default
+    ui->boardId->addItem("IronBCI");
+    ui->boardId->addItem("FreeEEG32");
+    ui->boardId->setCurrentIndex(2); // Synthetic board is default
 
     connect(ui->prepareSession, &QPushButton::clicked, this, &BrainFlowSetupWidget::prepareSession);
     connect(ui->releaseSession, &QPushButton::clicked, this, &BrainFlowSetupWidget::releaseSession);
@@ -113,6 +116,7 @@ void BrainFlowSetupWidget::prepareSession()
     params.other_info = ui->otherInfo->text().toStdString();
     params.serial_port = ui->serialPort->text().toStdString();
     params.serial_number = ui->serialNumber->text().toStdString();
+    params.file = ui->file->text().toStdString();
 
     std::string streamerParams = ui->streamerParams->text().toStdString();
 
@@ -123,49 +127,58 @@ void BrainFlowSetupWidget::prepareSession()
     switch (boardIndex)
     {
         case 0:
-            boardId = (int)BoardIds::STREAMING_BOARD;
+            boardId = (int)BoardIds::PLAYBACK_FILE_BOARD;
             break;
         case 1:
-            boardId = (int)BoardIds::SYNTHETIC_BOARD;
+            boardId = (int)BoardIds::STREAMING_BOARD;
             break;
         case 2:
-            boardId = (int)BoardIds::CYTON_BOARD;
+            boardId = (int)BoardIds::SYNTHETIC_BOARD;
             break;
         case 3:
-            boardId = (int)BoardIds::GANGLION_BOARD;
+            boardId = (int)BoardIds::CYTON_BOARD;
             break;
         case 4:
-            boardId = (int)BoardIds::CYTON_DAISY_BOARD;
+            boardId = (int)BoardIds::GANGLION_BOARD;
             break;
         case 5:
-            boardId = (int)BoardIds::GANGLION_WIFI_BOARD;
+            boardId = (int)BoardIds::CYTON_DAISY_BOARD;
             break;
         case 6:
-            boardId = (int)BoardIds::CYTON_WIFI_BOARD;
+            boardId = (int)BoardIds::GANGLION_WIFI_BOARD;
             break;
         case 7:
-            boardId = (int)BoardIds::CYTON_DAISY_WIFI_BOARD;
+            boardId = (int)BoardIds::CYTON_WIFI_BOARD;
             break;
         case 8:
-            boardId = (int)BoardIds::BRAINBIT_BOARD;
+            boardId = (int)BoardIds::CYTON_DAISY_WIFI_BOARD;
             break;
         case 9:
-            boardId = (int)BoardIds::UNICORN_BOARD;
+            boardId = (int)BoardIds::BRAINBIT_BOARD;
             break;
         case 10:
-            boardId = (int)BoardIds::CALLIBRI_EEG_BOARD;
+            boardId = (int)BoardIds::UNICORN_BOARD;
             break;
         case 11:
-            boardId = (int)BoardIds::CALLIBRI_EMG_BOARD;
+            boardId = (int)BoardIds::CALLIBRI_EEG_BOARD;
             break;
         case 12:
-            boardId = (int)BoardIds::CALLIBRI_ECG_BOARD;
+            boardId = (int)BoardIds::CALLIBRI_EMG_BOARD;
             break;
         case 13:
-            boardId = (int)BoardIds::NOTION_1_BOARD;
+            boardId = (int)BoardIds::CALLIBRI_ECG_BOARD;
             break;
         case 14:
+            boardId = (int)BoardIds::NOTION_1_BOARD;
+            break;
+        case 15:
             boardId = (int)BoardIds::NOTION_2_BOARD;
+            break;
+        case 16:
+            boardId = (int)BoardIds::IRONBCI_BOARD;
+            break;
+        case 17:
+            boardId = (int)BoardIds::FREEEEG32_BOARD;
             break;
     }
 
