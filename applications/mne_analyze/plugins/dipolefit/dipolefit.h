@@ -251,12 +251,31 @@ private:
      */
     void onNewMeasSelected(const QString& sName);
 
+    //=========================================================================================================
+    /**
+     * @brief dipoleFitCalculation
+     *
+     * @return
+     */
+    INVERSELIB::ECDSet dipoleFitCalculation();
+
+    //=========================================================================================================
+    /**
+     * @brief dipoleFitResults
+     */
+    void dipoleFitResults();
+
     QList<QSharedPointer<ANSHAREDLIB::AbstractModel>>       m_ModelList;
 
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;
     INVERSELIB::DipoleFitSettings                           m_DipoleSettings;
 
     QMutex                                                  m_FitMutex;
+
+    QFutureWatcher<INVERSELIB::ECDSet>                      m_FutureWatcher;
+    QFuture<INVERSELIB::ECDSet>                             m_Future;
+
+    QString                                                 m_sFitName;
 
 signals:
 
@@ -282,9 +301,16 @@ signals:
     void newMriModel(const QString& sModelName);
 
     //=========================================================================================================
+    /**
+     * @brief newMeasurment
+     * @param sModelName
+     */
     void newMeasurment(const QString& sModelName);
 
     //=========================================================================================================
+    /**
+     * @brief getUpdate
+     */
     void getUpdate();
 };
 

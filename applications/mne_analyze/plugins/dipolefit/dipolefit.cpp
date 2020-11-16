@@ -63,6 +63,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QtConcurrent/QtConcurrent>
+
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -168,6 +170,8 @@ QDockWidget *DipoleFit::getControl()
     //Fit
     connect(pDipoleView, &DISPLIB::DipoleFitView::performDipoleFit,
             this, &DipoleFit::onPerformDipoleFit, Qt::UniqueConnection);
+    connect(&m_FutureWatcher, &QFutureWatcher<INVERSELIB::ECDSet>::finished,
+            this, &DipoleFit::dipoleFitResults, Qt::UniqueConnection);
 
     QDockWidget* pDockWidgt = new QDockWidget(getName());
     pDockWidgt->setWidget(pDipoleView);
@@ -213,55 +217,12 @@ QVector<EVENT_TYPE> DipoleFit::getEventSubscriptions(void) const
 
 void DipoleFit::onPerformDipoleFit(const QString& sFitName)
 {
-    qDebug() << "Checking integrity...";
-    m_DipoleSettings.checkIntegrity();
+    m_sFitName = sFitName;
 
-    qDebug() << "Init settings...";
+    m_Future = QtConcurrent::run(this,
+                                 &DipoleFit::dipoleFitCalculation);
 
-    INVERSELIB::DipoleFit dipFit(&m_DipoleSettings);
-
-    qDebug() << "Calculate fit...";
-
-    INVERSELIB::ECDSet ecdSet = dipFit.calculateFit();
-
-    qDebug() << "Done!";
-
-    INVERSELIB::ECDSet ecdSetTrans = ecdSet;
-
-    QFile file(m_DipoleSettings.mriname);
-
-    if(file.exists()) {
-        FIFFLIB::FiffCoordTrans coordTrans(file);
-
-        for(int i = 0; i < ecdSet.size() ; ++i) {
-            MatrixX3f dipoles(1, 3);
-            //transform location
-            dipoles(0,0) = ecdSet[i].rd(0);
-            dipoles(0,1) = ecdSet[i].rd(1);
-            dipoles(0,2) = ecdSet[i].rd(2);
-
-            dipoles = coordTrans.apply_trans(dipoles);
-
-            ecdSetTrans[i].rd(0) = dipoles(0,0);
-            ecdSetTrans[i].rd(1) = dipoles(0,1);
-            ecdSetTrans[i].rd(2) = dipoles(0,2);
-
-            //transform orientation
-            dipoles(0,0) = ecdSet[i].Q(0);
-            dipoles(0,1) = ecdSet[i].Q(1);
-            dipoles(0,2) = ecdSet[i].Q(2);
-
-            dipoles = coordTrans.apply_trans(dipoles, false);
-
-            ecdSetTrans[i].Q(0) = dipoles(0,0);
-            ecdSetTrans[i].Q(1) = dipoles(0,1);
-            ecdSetTrans[i].Q(2) = dipoles(0,2);
-        }
-    } else {
-        qWarning("[DipoleFit::onPerformDipoleFit] Cannot open FiffCoordTrans file");
-    }
-
-    newDipoleFit(ecdSetTrans, sFitName);
+    m_FutureWatcher.setFuture(m_Future);
 }
 
 //=============================================================================================================
@@ -456,7 +417,7 @@ void DipoleFit::onNewNoiseSelected(const QString &sName)
 
 void DipoleFit::onNewMeasSelected(const QString &sName)
 {
-    qDebug() << "DipoleFit::onNewMeasSelected";
+    //qDebug() << "DipoleFit::onNewMeasSelected";
     for(QSharedPointer<ANSHAREDLIB::AbstractModel> pModel : m_ModelList){
         if (QFileInfo(pModel->getModelPath()).fileName() == sName){
             if(pModel->getType() == MODEL_TYPE::ANSHAREDLIB_AVERAGING_MODEL){
@@ -468,4 +429,65 @@ void DipoleFit::onNewMeasSelected(const QString &sName)
             }
         }
     }
+}
+
+//=============================================================================================================
+
+INVERSELIB::ECDSet DipoleFit::dipoleFitCalculation()
+{
+    QMutexLocker lock(&m_FitMutex);
+
+    qInfo() << "Checking integrity...";
+    m_DipoleSettings.checkIntegrity();
+
+    qInfo() << "Initializing settings...";
+    INVERSELIB::DipoleFit dipFit(&m_DipoleSettings);
+
+    qInfo() << "Calculating fit...";
+    INVERSELIB::ECDSet ecdSet = dipFit.calculateFit();
+
+    qInfo() << "Done!";
+    INVERSELIB::ECDSet ecdSetTrans = ecdSet;
+
+    QFile file(m_DipoleSettings.mriname);
+
+    if(file.exists()) {
+        FIFFLIB::FiffCoordTrans coordTrans(file);
+
+        for(int i = 0; i < ecdSet.size() ; ++i) {
+            MatrixX3f dipoles(1, 3);
+            //transform location
+            dipoles(0,0) = ecdSet[i].rd(0);
+            dipoles(0,1) = ecdSet[i].rd(1);
+            dipoles(0,2) = ecdSet[i].rd(2);
+
+            dipoles = coordTrans.apply_trans(dipoles);
+
+            ecdSetTrans[i].rd(0) = dipoles(0,0);
+            ecdSetTrans[i].rd(1) = dipoles(0,1);
+            ecdSetTrans[i].rd(2) = dipoles(0,2);
+
+            //transform orientation
+            dipoles(0,0) = ecdSet[i].Q(0);
+            dipoles(0,1) = ecdSet[i].Q(1);
+            dipoles(0,2) = ecdSet[i].Q(2);
+
+            dipoles = coordTrans.apply_trans(dipoles, false);
+
+            ecdSetTrans[i].Q(0) = dipoles(0,0);
+            ecdSetTrans[i].Q(1) = dipoles(0,1);
+            ecdSetTrans[i].Q(2) = dipoles(0,2);
+        }
+    } else {
+        qWarning("[DipoleFit::onPerformDipoleFit] Cannot open FiffCoordTrans file");
+    }
+
+    return ecdSet;
+}
+
+//=============================================================================================================
+
+void DipoleFit::dipoleFitResults()
+{
+    newDipoleFit(m_Future.result(), m_sFitName);
 }
