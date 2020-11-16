@@ -158,19 +158,20 @@ private:
 
     //=========================================================================================================
     /**
-     * @brief onBaselineChanged
-     * @param iBMin
-     * @param iBMax
+     * Set new baseline parameters
+     *
+     * @param [in] iBMin    baseline start time in milliseconds
+     * @param [in] iBMax    baseline end time in milliseconds
      */
     void onBaselineChanged(int iBMin, int iBMax);
 
     //=========================================================================================================
     /**
-     * @brief onNoiseChanged
+     * Set new manual noise parameters
      *
-     * @param dGrad
-     * @param dMag
-     * @param dEeg
+     * @param [in] dGrad    gradiometer value
+     * @param [in] dMag     magnetometer value
+     * @param [in] dEeg     eeg value
      */
     void onNoiseChanged(double dGrad,
                         double dMag,
@@ -178,12 +179,12 @@ private:
 
     //=========================================================================================================
     /**
-     * @brief onRegChanged
+     * Set new regularization parameters
      *
-     * @param iReg
-     * @param iRegGrad
-     * @param iRegMag
-     * @param iRegEeg
+     * @param [in] iReg         overall regularization parameter
+     * @param [in] iRegGrad     gradiatometer regularizaation parameter
+     * @param [in] iRegMag      magnetometer regularization parameter
+     * @param [in] iRegEeg      eeg regularization parameter
      */
     void onRegChanged(double dRegGrad,
                       double dRegMag,
@@ -191,20 +192,20 @@ private:
 
     //=========================================================================================================
     /**
-     * @brief onSetChanged
+     * Select set from measurement to use
      *
-     * @param iSet
+     * @param [in] iSet
      */
     void onSetChanged(int iSet);
 
     //=========================================================================================================
     /**
-     * @brief onSphereChanged
+     * Set new spherer model parameters
      *
-     * @param dX
-     * @param dY
-     * @param dZ
-     * @param dRadius
+     * @param [in] dX           x position in millimeters
+     * @param [in] dY           y position in millimeters
+     * @param [in] dZ           z position in millimeters
+     * @param [in] dRadius      radius in millimeters
      */
     void onSphereChanged(double dX,
                          double dY,
@@ -221,41 +222,41 @@ private:
 
     //=========================================================================================================
     /**
-     * @brief onNewBemSelected
+     * Set new Bem model
      *
-     * @param sName
+     * @param [in] sName    file name
      */
     void onNewBemSelected(const QString& sName);
 
     //=========================================================================================================
     /**
-     * @brief onNewMriSelected
+     * Set new Mri model
      *
-     * @param sName
+     * @param [in] sName    file name
      */
     void onNewMriSelected(const QString& sName);
 
     //=========================================================================================================
     /**
-     * @brief onNewNoiseSelected
+     * Set new Noise model
      *
-     * @param sName
+     * @param [in] sName    file name
      */
     void onNewNoiseSelected(const QString& sName);
 
     //=========================================================================================================
     /**
-     * @brief onNewMeasSelected
+     * Set new measurement model
      *
-     * @param sName
+     * @param [in] sName    file name
      */
     void onNewMeasSelected(const QString& sName);
 
     //=========================================================================================================
     /**
-     * @brief dipoleFitCalculation
+     * Performs dipole fit calculation. Meant to be run on separate thread.
      *
-     * @return
+     * @return returs ECD set resulting from dipole fit
      */
     INVERSELIB::ECDSet dipoleFitCalculation();
 
@@ -265,17 +266,17 @@ private:
      */
     void dipoleFitResults();
 
-    QList<QSharedPointer<ANSHAREDLIB::AbstractModel>>       m_ModelList;
+    QList<QSharedPointer<ANSHAREDLIB::AbstractModel>>       m_ModelList;            /**< List of models used in dipole fitting. Usded for storing for later selection */
+    INVERSELIB::DipoleFitSettings                           m_DipoleSettings;       /**< Settings for dipole fit */
+    QString                                                 m_sFitName;             /**< Fit name for dipole fit */
 
-    QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;
-    INVERSELIB::DipoleFitSettings                           m_DipoleSettings;
+    QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;               /**< Communicator for sending events */
 
-    QMutex                                                  m_FitMutex;
+    QMutex                                                  m_FitMutex;             /**< Mutex for thread-safing */
 
-    QFutureWatcher<INVERSELIB::ECDSet>                      m_FutureWatcher;
-    QFuture<INVERSELIB::ECDSet>                             m_Future;
+    QFutureWatcher<INVERSELIB::ECDSet>                      m_FutureWatcher;        /**< Future watcher for notifing of completed fit calculations */
+    QFuture<INVERSELIB::ECDSet>                             m_Future;               /**< Future for performing fit calculations of separate thread */
 
-    QString                                                 m_sFitName;
 
 signals:
 
