@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -434,7 +434,7 @@
           <item row="2" column="0">
            <widget class="QLabel" name="label_22">
             <property name="text">
-             <string>Origin z (mm</string>
+             <string>Origin z (mm)</string>
             </property>
            </widget>
           </item>
@@ -448,7 +448,7 @@
           <item row="3" column="0">
            <widget class="QLabel" name="label_23">
             <property name="text">
-             <string>EEG sphere radius</string>
+             <string>EEG sphere radius (mm)</string>
             </property>
            </widget>
           </item>

@@ -124,7 +124,7 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief requestParams
+     * Sends updated signals for parameters (excluding selected models)
      */
     void requestParams();
 
@@ -148,12 +148,13 @@ protected:
 private:
 
     //=========================================================================================================
+    /**
+     * Sets up Gui slot/signal connections and initializes item group box selections
+     */
     void initGui();
 
 
     Ui::DipoleFitViewWidget*        m_pUi;              /**< Holds GUI for view */
-
-    QPointer<QWidget>               m_pNoiseWidget;
 
 signals:
     //=========================================================================================================
@@ -208,11 +209,11 @@ signals:
 
     //=========================================================================================================
     /**
-     * @brief noiseChanged
+     * Set new manual noise parameters
      *
-     * @param dGrad
-     * @param dMag
-     * @param dEeg
+     * @param [in] dGrad    gradiometer value
+     * @param [in] dMag     magnetometer value
+     * @param [in] dEeg     eeg value
      */
     void noiseChanged(double dGrad,
                       double dMag,
@@ -220,12 +221,12 @@ signals:
 
     //=========================================================================================================
     /**
-     * @brief regChanged
+     * Set new regularization parameters
      *
-     * @param iReg
-     * @param iRegGrad
-     * @param iRegMag
-     * @param iRegEeg
+     * @param [in] iReg         overall regularization parameter
+     * @param [in] iRegGrad     gradiatometer regularizaation parameter
+     * @param [in] iRegMag      magnetometer regularization parameter
+     * @param [in] iRegEeg      eeg regularization parameter
      */
     void regChanged(double dRegGrad,
                     double dRegMag,
@@ -233,32 +234,56 @@ signals:
 
     //=========================================================================================================
     /**
-     * @brief setChanged
+     * Select set from measurement to use
      *
-     * @param iSet
+     * @param [in] iSet
      */
     void setChanged(int iSet);
 
     //=========================================================================================================
     /**
-     * @brief sphereChnaged
+     * Set new spherer model parameters
      *
-     * @param dX
-     * @param dY
-     * @param dZ
-     * @param dRadius
+     * @param [in] dX           x position in millimeters
+     * @param [in] dY           y position in millimeters
+     * @param [in] dZ           z position in millimeters
+     * @param [in] dRadius      radius in millimeters
      */
     void sphereChanged(double dX,
                        double dY,
                        double dZ,
                        double dRadius);
 
+    //=========================================================================================================
+    /**
+     * Set new Bem model
+     *
+     * @param [in] sName    file name
+     */
     void selectedBem(const QString& sName);
 
+    //=========================================================================================================
+    /**
+     * Set new Mri model
+     *
+     * @param [in] sName    file name
+     */
     void selectedMri(const QString& sName);
 
+    //=========================================================================================================
+    /**
+     * Set new Noise model
+     *
+     * @param [in] sName    file name
+     */
     void selectedNoise(const QString& sName);
 
+    //=========================================================================================================
+    /**
+     * Set new measurement model
+     *
+     * @param [in] sName    file name
+     */
     void selectedMeas(const QString& sName);
 
 };
