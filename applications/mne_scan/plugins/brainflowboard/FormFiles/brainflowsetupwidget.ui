@@ -91,7 +91,17 @@
      <item row="5" column="1">
       <widget class="QLineEdit" name="otherInfo"/>
      </item>
-     <item row="7" column="0" colspan="2">
+     <item row="6" column="0">
+      <widget class="QLineEdit" name="lineEdit_4">
+       <property name="text">
+        <string>Serial Number</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="1">
+      <widget class="QLineEdit" name="serialNumber"/>
+     </item>
+     <item row="8" column="0" colspan="2">
       <spacer name="horizontalSpacer_3">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -104,7 +114,7 @@
        </property>
       </spacer>
      </item>
-     <item row="8" column="0">
+     <item row="9" column="0">
       <widget class="QLineEdit" name="lineEdit_15">
        <property name="text">
         <string>Streamer Params</string>
@@ -114,14 +124,14 @@
        </property>
       </widget>
      </item>
-     <item row="8" column="1">
+     <item row="9" column="1">
       <widget class="QLineEdit" name="streamerParams">
        <property name="text">
         <string>file://results.csv:w</string>
        </property>
       </widget>
      </item>
-     <item row="9" column="0" colspan="2">
+     <item row="10" column="0" colspan="2">
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -134,7 +144,7 @@
        </property>
       </spacer>
      </item>
-     <item row="10" column="0">
+     <item row="11" column="0">
       <widget class="QLineEdit" name="lineEdit_13">
        <property name="text">
         <string>Board Id</string>
@@ -144,10 +154,10 @@
        </property>
       </widget>
      </item>
-     <item row="10" column="1">
+     <item row="11" column="1">
       <widget class="QComboBox" name="boardId"/>
      </item>
-     <item row="11" column="0" colspan="2">
+     <item row="12" column="0" colspan="2">
       <spacer name="horizontalSpacer_2">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -160,7 +170,7 @@
        </property>
       </spacer>
      </item>
-     <item row="12" column="0">
+     <item row="13" column="0">
       <widget class="QLineEdit" name="lineEdit_2">
        <property name="text">
         <string>Data to Display</string>
@@ -170,10 +180,34 @@
        </property>
       </widget>
      </item>
-     <item row="12" column="1">
+     <item row="13" column="1">
       <widget class="QComboBox" name="dataType"/>
      </item>
-     <item row="13" column="0" colspan="2">
+     <item row="17" column="0" colspan="2">
+      <widget class="QPushButton" name="prepareSession">
+       <property name="text">
+        <string>Submit Params and Prepare Session</string>
+       </property>
+      </widget>
+     </item>
+     <item row="18" column="0" colspan="2">
+      <widget class="QPushButton" name="releaseSession">
+       <property name="text">
+        <string>Release Session</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="0">
+      <widget class="QLineEdit" name="lineEdit_6">
+       <property name="text">
+        <string>File</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="1">
+      <widget class="QLineEdit" name="file"/>
+     </item>
+     <item row="16" column="0" colspan="2">
       <spacer name="horizontalSpacer_4">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -186,30 +220,6 @@
        </property>
       </spacer>
      </item>
-     <item row="15" column="0" colspan="2">
-      <widget class="QPushButton" name="prepareSession">
-       <property name="text">
-        <string>Submit Params and Prepare Session</string>
-       </property>
-      </widget>
-     </item>
-     <item row="16" column="0" colspan="2">
-      <widget class="QPushButton" name="releaseSession">
-       <property name="text">
-        <string>Release Session</string>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="0">
-      <widget class="QLineEdit" name="lineEdit_4">
-       <property name="text">
-        <string>Serial Number</string>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="1">
-      <widget class="QLineEdit" name="serialNumber"/>
-     </item>
     </layout>
    </item>
    <item row="0" column="1">
@@ -219,8 +229,8 @@
      </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>337</width>
-       <height>421</height>
+       <width>40</width>
+       <height>20</height>
       </size>
      </property>
     </spacer>
@@ -233,7 +243,7 @@
      <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
-       <height>147</height>
+       <height>40</height>
       </size>
      </property>
     </spacer>
