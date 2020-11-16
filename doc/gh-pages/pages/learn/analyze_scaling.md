@@ -3,7 +3,7 @@ title: Settings
 has_children: false
 parent: MNE Analyze
 grand_parent: Learn
-nav_order: 8
+nav_order: 9
 ---
 #Settings
 

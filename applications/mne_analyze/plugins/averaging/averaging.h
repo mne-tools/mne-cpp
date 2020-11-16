@@ -341,10 +341,10 @@ private:
 
     int                                                     m_iCurrentGroup;            /**< Event group from which to compute average. 9999 for current selection */
 
-    QFutureWatcher<QSharedPointer<FIFFLIB::FiffEvokedSet>>  m_FutureWatcher;
-    QFuture<QSharedPointer<FIFFLIB::FiffEvokedSet>>         m_Future;
+    QFutureWatcher<QSharedPointer<FIFFLIB::FiffEvokedSet>>  m_FutureWatcher;            /**< Future watcher for notifing of completed average calculations */
+    QFuture<QSharedPointer<FIFFLIB::FiffEvokedSet>>         m_Future;                   /**< Future for performing average calculations of separate thread */
 
-    QMutex                                                  m_ParameterMutex;
+    QMutex                                                  m_ParameterMutex;           /**< Mutex for thread-safing */
 
 };
 
