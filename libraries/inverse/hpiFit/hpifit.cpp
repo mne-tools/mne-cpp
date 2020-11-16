@@ -112,7 +112,9 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
                     FiffDigPointSet& fittedPointSet,
                     FiffInfo::SPtr pFiffInfo,
                     bool bDoDebug,
-                    const QString& sHPIResourceDir)
+                    const QString& sHPIResourceDir,
+                    int iMaxIterations,
+                    float fAbortError)
 {
     //Check if data was passed
     if(t_mat.rows() == 0 || t_mat.cols() == 0 ) {
@@ -280,7 +282,13 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
     coil.pos = matCoilPos;
 
     // Perform actual localization
-    coil = dipfit(coil, m_sensors, matAmp, iNumCoils, matProjectorsInnerind);
+    coil = dipfit(coil,
+                  m_sensors,
+                  matAmp,
+                  iNumCoils,
+                  matProjectorsInnerind,
+                  iMaxIterations,
+                  fAbortError);
 
     Matrix4d matTrans = computeTransformation(matHeadHPI, coil.pos);
     //Eigen::Matrix4d matTrans = computeTransformation(coil.pos, matHeadHPI);
@@ -439,7 +447,9 @@ CoilParam HPIFit::dipfit(struct CoilParam coil,
                          const SensorSet& sensors,
                          const MatrixXd& matData,
                          int iNumCoils,
-                         const MatrixXd& t_matProjectors)
+                         const MatrixXd& t_matProjectors,
+                         int iMaxIterations,
+                         float fAbortError)
 {
     //Do this in conncurrent mode
     //Generate QList structure which can be handled by the QConcurrent framework
@@ -447,10 +457,12 @@ CoilParam HPIFit::dipfit(struct CoilParam coil,
 
     for(qint32 i = 0; i < iNumCoils; ++i) {
         HPIFitData coilData;
-        coilData.coilPos = coil.pos.row(i);
-        coilData.sensorData = matData.col(i);
-        coilData.sensors = sensors;
-        coilData.matProjector = t_matProjectors;
+        coilData.m_coilPos = coil.pos.row(i);
+        coilData.m_sensorData = matData.col(i);
+        coilData.m_sensors = sensors;
+        coilData.m_matProjector = t_matProjectors;
+        coilData.m_iMaxIterations = iMaxIterations;
+        coilData.m_fAbortError = fAbortError;
 
         lCoilData.append(coilData);
     }
@@ -468,10 +480,10 @@ CoilParam HPIFit::dipfit(struct CoilParam coil,
 
         //Transform results to final coil information
         for(qint32 i = 0; i < lCoilData.size(); ++i) {
-            coil.pos.row(i) = lCoilData.at(i).coilPos;
-            coil.mom = lCoilData.at(i).errorInfo.moment.transpose();
-            coil.dpfiterror(i) = lCoilData.at(i).errorInfo.error;
-            coil.dpfitnumitr(i) = lCoilData.at(i).errorInfo.numIterations;
+            coil.pos.row(i) = lCoilData.at(i).m_coilPos;
+            coil.mom = lCoilData.at(i).m_errorInfo.moment.transpose();
+            coil.dpfiterror(i) = lCoilData.at(i).m_errorInfo.error;
+            coil.dpfitnumitr(i) = lCoilData.at(i).m_errorInfo.numIterations;
 
             //std::cout<<std::endl<< "HPIFit::dipfit - Itr steps for coil " << i << " =" <<coil.dpfitnumitr(i);
         }
