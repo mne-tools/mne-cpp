@@ -456,6 +456,7 @@ void DipoleFit::onNewNoiseSelected(const QString &sName)
 
 void DipoleFit::onNewMeasSelected(const QString &sName)
 {
+    qDebug() << "DipoleFit::onNewMeasSelected";
     for(QSharedPointer<ANSHAREDLIB::AbstractModel> pModel : m_ModelList){
         if (QFileInfo(pModel->getModelPath()).fileName() == sName){
             if(pModel->getType() == MODEL_TYPE::ANSHAREDLIB_AVERAGING_MODEL){
