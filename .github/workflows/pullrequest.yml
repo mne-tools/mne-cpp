@@ -46,7 +46,7 @@ jobs:
       run: |
         Invoke-WebRequest https://www.dropbox.com/s/dku543gtw7ik7hr/jom.zip?dl=1 -OutFile .\jom.zip
         expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
-        echo "::add-path::$HOME\jom"
+        echo "$HOME\jom" >> $GITHUB_PATH
     - name: Compile BrainFlow submodule (Windows)
       if: matrix.os == 'windows-2016'
       run: |
@@ -147,7 +147,7 @@ jobs:
       run: |
         Invoke-WebRequest https://www.dropbox.com/s/dku543gtw7ik7hr/jom.zip?dl=1 -OutFile .\jom.zip
         expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
-        echo "::add-path::$HOME\jom"
+        echo "$HOME\jom" >> $GITHUB_PATH
     - name: Compile BrainFlow submodule (Windows)
       if: matrix.os == 'windows-2019'
       run: |
@@ -255,7 +255,7 @@ jobs:
       run: |
         Invoke-WebRequest https://www.dropbox.com/s/dku543gtw7ik7hr/jom.zip?dl=1 -OutFile .\jom.zip
         expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
-        echo "::add-path::$HOME\jom"
+        echo "$HOME\jom" >> $GITHUB_PATH
     - name: Configure and compile MNE-CPP (Linux|MacOS)
       if: (matrix.os == 'ubuntu-16.04') || (matrix.os == 'macos-latest')
       run: |
@@ -323,7 +323,7 @@ jobs:
       run: |
         Invoke-WebRequest https://www.dropbox.com/s/dku543gtw7ik7hr/jom.zip?dl=1 -OutFile .\jom.zip
         expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
-        echo "::add-path::$HOME\jom"
+        echo "$HOME\jom" >> $GITHUB_PATH
     - name: Configure and compile MNE-CPP (Linux)
       if: matrix.os == 'ubuntu-16.04'
       run: |

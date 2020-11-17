@@ -188,7 +188,7 @@ jobs:
       run: |
         Invoke-WebRequest https://www.dropbox.com/s/dku543gtw7ik7hr/jom.zip?dl=1 -OutFile .\jom.zip
         expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
-        echo "::add-path::$HOME\jom"  
+        echo "$HOME\jom" >> $GITHUB_PATH  
     - name: Install Qt
       run: |
         # Download the pre-built static version of Qt, which was created with the buildqtbinaries.yml workflow
@@ -392,7 +392,7 @@ jobs:
       run: |
         Invoke-WebRequest https://www.dropbox.com/s/dku543gtw7ik7hr/jom.zip?dl=1 -OutFile .\jom.zip
         expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
-        echo "::add-path::$HOME\jom"
+        echo "$HOME\jom" >> $GITHUB_PATH
     - name: Compile BrainFlow submodule
       run: |
         cd applications\mne_scan\plugins\brainflowboard\brainflow
