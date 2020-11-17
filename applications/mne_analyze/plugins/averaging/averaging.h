@@ -257,7 +257,7 @@ private:
     /**
      *  Loads averging GUI components that are dependent on FiffRawModel to be initialized
      */
-    void loadFullGui();
+    void loadFullGui(QSharedPointer<FIFFLIB::FiffInfo> pInfo);
 
     //=========================================================================================================
     /**
