@@ -163,7 +163,8 @@ private:
      * @param [in] iBMin    baseline start time in milliseconds
      * @param [in] iBMax    baseline end time in milliseconds
      */
-    void onBaselineChanged(int iBMin, int iBMax);
+    void onBaselineChanged(int iBMin,
+                           int iBMax);
 
     //=========================================================================================================
     /**
@@ -282,35 +283,39 @@ signals:
 
     //=========================================================================================================
     /**
-     * @brief newBemModel
-     * @param sModelName
+     * New BEM file available (add to gui)
+     *
+     * @param [in] sModelName
      */
     void newBemModel(const QString& sModelName);
 
     //=========================================================================================================
     /**
-     * @brief newNoiseModel
-     * @param sModelName
+     * New noise file available (add to gui)
+     *
+     * @param [in] sModelName
      */
     void newNoiseModel(const QString& sModelName);
 
     //=========================================================================================================
     /**
-     * @brief newMriModel
-     * @param sModelName
+     * New MRI file available (add to gui)
+     *
+     * @param [in] sModelName
      */
     void newMriModel(const QString& sModelName);
 
     //=========================================================================================================
     /**
-     * @brief newMeasurment
-     * @param sModelName
+     * New measurement file available (add to gui)
+     *
+     * @param [in] sModelName
      */
     void newMeasurment(const QString& sModelName);
 
     //=========================================================================================================
     /**
-     * @brief getUpdate
+     * Request update of view parameter settings
      */
     void getUpdate();
 };
