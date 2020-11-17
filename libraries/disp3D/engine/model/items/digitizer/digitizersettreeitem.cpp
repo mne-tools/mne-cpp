@@ -118,13 +118,16 @@ void DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Q
             switch (tDigitizer[i].ident) {
                 case FIFFV_POINT_LPA:
                     tLAP.append(tDigitizer[i]);
+                    tLAP.append(tDigitizer[i]);
                 break;
 
                 case FIFFV_POINT_NASION:
                     tNasion.append(tDigitizer[i]);
+                    tNasion.append(tDigitizer[i]);
                 break;
 
                 case FIFFV_POINT_RPA:
+                    tRAP.append(tDigitizer[i]);
                     tRAP.append(tDigitizer[i]);
                 break;
 
@@ -232,22 +235,22 @@ void DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Q
         }
 
         if(item->text() == "Nasion" && !tNasion.empty()) {
-            item->addData(tNasion, 0.002f, Qt::yellow);
+            item->addData(tNasion, 0.002f, Qt::green);
             bFoundNasionlItem = true;
         }
 
         if(item->text() == "LAP" && !tLAP.empty()) {
-            item->addData(tLAP, 0.002f, Qt::green);
+            item->addData(tLAP, 0.002f, Qt::red);
             bFoundLAPItem = true;
         }
 
         if(item->text() == "RAP" && !tRAP.empty()) {
-            item->addData(tRAP, 0.002f, Qt::magenta);
+            item->addData(tRAP, 0.002f, Qt::blue);
             bFoundRAPItem = true;
         }
 
         if(item->text() == "HPI" && !tHpi.empty()) {
-            item->addData(tHpi, 0.001f, Qt::red);
+            item->addData(tHpi, 0.001f, Qt::darkRed);
             bFoundHPIItem = true;
         }
 
@@ -267,7 +270,7 @@ void DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Q
         //Create a cardinal digitizer item
         QList<QStandardItem*> itemListCardinal;
         DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(m_pRenderable3DEntity, Data3DTreeModelItemTypes::DigitizerItem,"Nasion");
-        digitizerItem->addData(tNasion, 0.002f, Qt::yellow);
+        digitizerItem->addData(tNasion, 0.002f, Qt::green);
         itemListCardinal << digitizerItem;
         itemListCardinal << new QStandardItem(digitizerItem->toolTip());
         this->appendRow(itemListCardinal);
@@ -277,7 +280,7 @@ void DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Q
         //Create a cardinal digitizer item
         QList<QStandardItem*> itemListCardinal;
         DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(m_pRenderable3DEntity, Data3DTreeModelItemTypes::DigitizerItem,"LAP");
-        digitizerItem->addData(tLAP, 0.002f, Qt::green);
+        digitizerItem->addData(tLAP, 0.002f, Qt::red);
         itemListCardinal << digitizerItem;
         itemListCardinal << new QStandardItem(digitizerItem->toolTip());
         this->appendRow(itemListCardinal);
@@ -287,7 +290,7 @@ void DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Q
         //Create a cardinal digitizer item
         QList<QStandardItem*> itemListCardinal;
         DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(m_pRenderable3DEntity, Data3DTreeModelItemTypes::DigitizerItem,"RAP");
-        digitizerItem->addData(tRAP, 0.002f, Qt::magenta);
+        digitizerItem->addData(tRAP, 0.002f, Qt::blue);
         itemListCardinal << digitizerItem;
         itemListCardinal << new QStandardItem(digitizerItem->toolTip());
         this->appendRow(itemListCardinal);
@@ -297,7 +300,7 @@ void DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Q
         //Create a hpi digitizer item
         QList<QStandardItem*> itemListHPI;
         DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(m_pRenderable3DEntity, Data3DTreeModelItemTypes::DigitizerItem,"HPI");
-        digitizerItem->addData(tHpi, 0.001f, Qt::red);
+        digitizerItem->addData(tHpi, 0.001f, Qt::darkRed);
         itemListHPI << digitizerItem;
         itemListHPI << new QStandardItem(digitizerItem->toolTip());
         this->appendRow(itemListHPI);
