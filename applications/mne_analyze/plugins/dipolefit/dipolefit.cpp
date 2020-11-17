@@ -373,6 +373,7 @@ void DipoleFit::onSphereChanged(double dX,
 void DipoleFit::onNewBemSelected(const QString &sName)
 {
     if(sName == "None"){
+        m_DipoleSettings.bemname = "";
         return;
     }
     for(QSharedPointer<ANSHAREDLIB::AbstractModel> pModel : m_ModelList){
@@ -388,6 +389,7 @@ void DipoleFit::onNewBemSelected(const QString &sName)
 void DipoleFit::onNewMriSelected(const QString &sName)
 {
     if(sName == "None"){
+        m_DipoleSettings.mriname = "";
         return;
     }
     for(QSharedPointer<ANSHAREDLIB::AbstractModel> pModel : m_ModelList){
@@ -403,6 +405,7 @@ void DipoleFit::onNewMriSelected(const QString &sName)
 void DipoleFit::onNewNoiseSelected(const QString &sName)
 {
     if(sName == "None"){
+        m_DipoleSettings.noisename = "";
         return;
     }
     for(QSharedPointer<ANSHAREDLIB::AbstractModel> pModel : m_ModelList){
@@ -417,6 +420,11 @@ void DipoleFit::onNewNoiseSelected(const QString &sName)
 
 void DipoleFit::onNewMeasSelected(const QString &sName)
 {
+    if(sName == "None"){
+        m_DipoleSettings.measname = "";
+        return;
+    }
+
     //qDebug() << "DipoleFit::onNewMeasSelected";
     for(QSharedPointer<ANSHAREDLIB::AbstractModel> pModel : m_ModelList){
         if (QFileInfo(pModel->getModelPath()).fileName() == sName){
