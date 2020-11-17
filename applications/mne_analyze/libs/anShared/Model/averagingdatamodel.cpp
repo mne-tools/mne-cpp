@@ -138,3 +138,11 @@ bool AveragingDataModel::isFromFile()
 {
     return m_bFromFile;
 }
+
+//=============================================================================================================
+
+QSharedPointer<FIFFLIB::FiffInfo> AveragingDataModel::getFiffInfo()
+{
+    QSharedPointer<FIFFLIB::FiffInfo> pInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FIFFLIB::FiffInfo(m_pFiffEvokedSet->info));
+    return pInfo;
+}

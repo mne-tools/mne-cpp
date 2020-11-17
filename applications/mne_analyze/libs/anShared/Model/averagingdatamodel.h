@@ -42,6 +42,9 @@
 
 #include "../anshared_global.h"
 #include "../Utils/types.h"
+
+#include <fiff/fiff_info.h>
+
 #include "abstractmodel.h"
 
 //=============================================================================================================
@@ -184,6 +187,13 @@ public:
      */
     bool isFromFile();
 
+    //=========================================================================================================
+    /**
+     * Gets FiffInfo of the evoked model. To be used if loading avg from file without raw file present
+     *
+     * @return  Shared pointer to FiffInfo of m_pFiffEvokedSet
+     */
+    QSharedPointer<FIFFLIB::FiffInfo> getFiffInfo();
 
 private:
     QSharedPointer<FIFFLIB::FiffEvokedSet> m_pFiffEvokedSet; /**<  Pointer to FiffEvokedData for the calculated average*/

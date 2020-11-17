@@ -177,6 +177,9 @@ void RawDataViewer::handleEvent(QSharedPointer<Event> e)
         break;
     case CHANNEL_SELECTION_ITEMS:
         if (e->getData().value<DISPLIB::SelectionItem*>()->m_sViewsToApply.contains("signalview")){
+            if(m_pFiffRawView->getModel().isNull()){
+                return;
+            }
             if(e->getData().value<DISPLIB::SelectionItem*>()->m_bShowAll){
                 m_pFiffRawView->showAllChannels();
             } else {
@@ -290,6 +293,10 @@ void RawDataViewer::onSendSamplePos(int iSample)
 
 void RawDataViewer::updateViewParameters(ANSHAREDLIB::ViewParameters viewParameters)
 {
+    if(m_pFiffRawView->getModel().isNull()){
+        return;
+    }
+
     switch (viewParameters.m_sSettingsToApply){
         case ANSHAREDLIB::ViewParameters::ViewSetting::signal:
             m_pFiffRawView->setSignalColor(viewParameters.m_colorSignal);
