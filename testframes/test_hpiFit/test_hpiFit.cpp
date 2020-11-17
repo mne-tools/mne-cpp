@@ -174,7 +174,7 @@ void TestHpiFit::initTestCase()
     QString sHPIResourceDir = QCoreApplication::applicationDirPath() + "/HPIFittingDebug";
     bool bDoDebug = true;
 
-    HPIFit HPI = HPIFit(pFiffInfo);
+    HPIFit HPI = HPIFit(pFiffInfo, true);
 
     // bring frequencies into right order
     from = first + mRefPos(0,0)*pFiffInfo->sfreq;
