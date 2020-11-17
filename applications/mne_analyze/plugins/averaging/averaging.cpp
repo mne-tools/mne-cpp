@@ -102,6 +102,7 @@ Averaging::Averaging()
 , m_bPerformFiltering(false)
 , m_iCurrentGroup(9999)
 {
+    m_pEvokedModel = QSharedPointer<DISPLIB::EvokedSetModel>(new DISPLIB::EvokedSetModel());
 }
 
 //=============================================================================================================
@@ -301,8 +302,9 @@ void Averaging::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewMo
             }
         }
         m_pFiffRawModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
-        loadFullGui();
+        loadFullGui(m_pFiffRawModel->getFiffInfo());
     } else if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_AVERAGING_MODEL) {
+        loadFullGui(qSharedPointerCast<AveragingDataModel>(pNewModel)->getFiffInfo());
         onNewAveragingModel(qSharedPointerCast<AveragingDataModel>(pNewModel));
     }
 }
@@ -475,9 +477,9 @@ void Averaging::createNewAverage()
 
 //=============================================================================================================
 
-void Averaging::loadFullGui()
+void Averaging::loadFullGui(QSharedPointer<FIFFLIB::FiffInfo> pInfo)
 {
-    m_pFiffInfo = m_pFiffRawModel->getFiffInfo();
+    m_pFiffInfo = pInfo;
     m_pAverageLayoutView->setFiffInfo(m_pFiffInfo);
 
     if(m_bLoaded) {
@@ -485,7 +487,6 @@ void Averaging::loadFullGui()
     }
 
     //Init Models
-    m_pEvokedModel = QSharedPointer<DISPLIB::EvokedSetModel>(new DISPLIB::EvokedSetModel());
 
     m_pAverageLayoutView->setEvokedSetModel(m_pEvokedModel);
 
@@ -552,7 +553,6 @@ void Averaging::loadFullGui()
     connect(m_pAveragingSettingsView, &DISPLIB::AveragingSettingsView::changeGroupSelect,
             this, &Averaging::onChangeGroupSelect, Qt::UniqueConnection);
 
-    onChangeGroupSelect(m_pAveragingSettingsView->getCurrentSelectGroup());
     m_pAverageLayoutView->setBackgroundColor(pChannelDataSettingsView->getBackgroundColor());
     m_pButterflyView->setBackgroundColor(pChannelDataSettingsView->getBackgroundColor());
 
