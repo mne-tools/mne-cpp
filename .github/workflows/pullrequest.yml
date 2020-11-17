@@ -45,8 +45,8 @@ jobs:
       if: matrix.os == 'windows-2016'
       run: |
         Invoke-WebRequest https://www.dropbox.com/s/dku543gtw7ik7hr/jom.zip?dl=1 -OutFile .\jom.zip
-        expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
-        echo "$HOME\jom" >> $GITHUB_PATH
+        expand-archive -path "jom.zip"
+        echo "D:\a\mne-cpp\mne-cpp\jom" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
     - name: Compile BrainFlow submodule (Windows)
       if: matrix.os == 'windows-2016'
       run: |
@@ -146,8 +146,8 @@ jobs:
       if: matrix.os == 'windows-2019'
       run: |
         Invoke-WebRequest https://www.dropbox.com/s/dku543gtw7ik7hr/jom.zip?dl=1 -OutFile .\jom.zip
-        expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
-        echo "$HOME\jom" >> $GITHUB_PATH
+        expand-archive -path "jom.zip"
+        echo "D:\a\mne-cpp\mne-cpp\jom" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
     - name: Compile BrainFlow submodule (Windows)
       if: matrix.os == 'windows-2019'
       run: |
@@ -254,8 +254,8 @@ jobs:
       if: matrix.os == 'windows-2019'
       run: |
         Invoke-WebRequest https://www.dropbox.com/s/dku543gtw7ik7hr/jom.zip?dl=1 -OutFile .\jom.zip
-        expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
-        echo "$HOME\jom" >> $GITHUB_PATH
+        expand-archive -path "jom.zip"
+        echo "D:\a\mne-cpp\mne-cpp\jom" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
     - name: Configure and compile MNE-CPP (Linux|MacOS)
       if: (matrix.os == 'ubuntu-16.04') || (matrix.os == 'macos-latest')
       run: |
@@ -322,8 +322,8 @@ jobs:
       if: matrix.os == 'windows-2019'
       run: |
         Invoke-WebRequest https://www.dropbox.com/s/dku543gtw7ik7hr/jom.zip?dl=1 -OutFile .\jom.zip
-        expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
-        echo "$HOME\jom" >> $GITHUB_PATH
+        expand-archive -path "jom.zip"
+        echo "D:\a\mne-cpp\mne-cpp\jom" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
     - name: Configure and compile MNE-CPP (Linux)
       if: matrix.os == 'ubuntu-16.04'
       run: |

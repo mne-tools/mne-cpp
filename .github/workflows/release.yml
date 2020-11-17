@@ -187,8 +187,8 @@ jobs:
     - name: Install jom
       run: |
         Invoke-WebRequest https://www.dropbox.com/s/dku543gtw7ik7hr/jom.zip?dl=1 -OutFile .\jom.zip
-        expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
-        echo "$HOME\jom" >> $GITHUB_PATH  
+        expand-archive -path "jom.zip"
+        echo "D:\a\mne-cpp\mne-cpp\jom" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append  
     - name: Install Qt
       run: |
         # Download the pre-built static version of Qt, which was created with the buildqtbinaries.yml workflow
@@ -391,8 +391,8 @@ jobs:
     - name: Install jom
       run: |
         Invoke-WebRequest https://www.dropbox.com/s/dku543gtw7ik7hr/jom.zip?dl=1 -OutFile .\jom.zip
-        expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
-        echo "$HOME\jom" >> $GITHUB_PATH
+        expand-archive -path "jom.zip"
+        echo "D:\a\mne-cpp\mne-cpp\jom" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
     - name: Compile BrainFlow submodule
       run: |
         cd applications\mne_scan\plugins\brainflowboard\brainflow
