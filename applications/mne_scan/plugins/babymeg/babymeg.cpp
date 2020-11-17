@@ -113,7 +113,7 @@ BabyMEG::~BabyMEG()
 
     if(m_pMyClient) {
         if(m_pMyClient->isConnected()) {
-            m_pMyClient->DisConnectBabyMEG();
+            m_pMyClient->DisconnectBabyMEG();
         }
     }
 }
@@ -151,6 +151,7 @@ void BabyMEG::init()
 
     //BabyMEG Inits
     m_pInfo = QSharedPointer<BabyMEGInfo>(new BabyMEGInfo());
+
     connect(m_pInfo.data(), &BabyMEGInfo::fiffInfoAvailable,
             this, &BabyMEG::setFiffInfo);
     connect(m_pInfo.data(), &BabyMEGInfo::SendDataPackage,
@@ -167,16 +168,12 @@ void BabyMEG::init()
     m_pMyClientComm->SetInfo(m_pInfo);
     m_pMyClientComm->start();
 
-    m_pMyClientComm->SendCommandToBabyMEGShortConnection("INFO");
-
-    m_pMyClient->ConnectToBabyMEG();
-
     //init channels when fiff info is available
     connect(this, &BabyMEG::fiffInfoAvailable,
             this, &BabyMEG::initConnector);    
 
     m_pRTMSABabyMEG = PluginOutputData<RealTimeMultiSampleArray>::create(this, "BabyMEG Output", "BabyMEG");
-    m_pRTMSABabyMEG->data()->setName(this->getName());//Provide name to auto store widget settings
+    m_pRTMSABabyMEG->measurementData()->setName(this->getName());//Provide name to auto store widget settings
     m_outputConnectors.append(m_pRTMSABabyMEG);
 }
 
@@ -198,6 +195,10 @@ void BabyMEG::clear()
 
 bool BabyMEG::start()
 {
+    m_pMyClientComm->SendCommandToBabyMEGShortConnection("INFO");
+
+    m_pMyClient->ConnectToBabyMEG();
+
     if(!m_pFiffInfo) {
         QMessageBox msgBox;
         msgBox.setText("FiffInfo is missing!");
@@ -205,11 +206,13 @@ bool BabyMEG::start()
         return false;
     }
 
-    initConnector();
-
     if(!m_pMyClient->isConnected()) {
-        m_pMyClient->ConnectToBabyMEG();
+        qInfo() << "BabyMEG::start - Not connected to BabyMEG device. Try connecting manually via the Connection tab.";
+
+        return false;
     }
+
+    initConnector();
 
     // Start thread
     QThread::start();
@@ -221,15 +224,11 @@ bool BabyMEG::start()
 
 bool BabyMEG::stop()
 {
-    if(m_pMyClient->isConnected()) {
-        m_pMyClient->DisConnectBabyMEG();
-    }
-
     requestInterruption();
-    wait(500);
+    wait(2000);
 
     // Clear all data in the buffer connected to displays and other plugins
-    m_pRTMSABabyMEG->data()->clear();
+    m_pRTMSABabyMEG->measurementData()->clear();
     m_pCircularBuffer->clear();
 
     return true;
@@ -253,11 +252,17 @@ QString BabyMEG::getName() const
 
 QWidget* BabyMEG::setupWidget()
 {
-    if(!m_pMyClient->isConnected()) {
-        m_pMyClient->ConnectToBabyMEG();
+    BabyMEGSetupWidget* widget = new BabyMEGSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
+
+    if(m_pFiffInfo) {
+        widget->setSamplingFrequency();
     }
 
-    BabyMEGSetupWidget* widget = new BabyMEGSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
+    if(m_pMyClient->isConnected()) {
+        widget->setConnectionStatus(true);
+    } else {
+        widget->setConnectionStatus(false);
+    }
 
     return widget;
 }
@@ -275,7 +280,7 @@ void BabyMEG::run()
             createDigTrig(matValue);
 
             if(!isInterruptionRequested()) {
-                m_pRTMSABabyMEG->data()->setValue(this->calibrate(matValue));
+                m_pRTMSABabyMEG->measurementData()->setValue(this->calibrate(matValue));
             }
         }
     }
@@ -286,8 +291,8 @@ void BabyMEG::run()
 void BabyMEG::initConnector()
 {
     if(m_pFiffInfo) {
-        m_pRTMSABabyMEG->data()->initFromFiffInfo(m_pFiffInfo);
-        m_pRTMSABabyMEG->data()->setMultiArraySize(1);
+        m_pRTMSABabyMEG->measurementData()->initFromFiffInfo(m_pFiffInfo);
+        m_pRTMSABabyMEG->measurementData()->setMultiArraySize(1);
 
         //Look for trigger channels and initialise detected trigger map
         m_lTriggerChannelIndices.append(m_pFiffInfo->ch_names.indexOf("TRG001"));

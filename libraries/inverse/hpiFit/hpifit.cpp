@@ -88,7 +88,7 @@ HPIFit::HPIFit(FiffInfo::SPtr pFiffInfo,
     // init member variables
     m_lChannels = QList<FIFFLIB::FiffChInfo>();
     m_vecInnerind = QVector<int>();
-    m_sensors = SensorSet ();
+    m_sensors = SensorSet();
     m_lBads = pFiffInfo->bads;
     m_matModel = MatrixXd(0,0);
     m_vecFreqs = QVector<int>();
@@ -112,7 +112,9 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
                     FiffDigPointSet& fittedPointSet,
                     FiffInfo::SPtr pFiffInfo,
                     bool bDoDebug,
-                    const QString& sHPIResourceDir)
+                    const QString& sHPIResourceDir,
+                    int iMaxIterations,
+                    float fAbortError)
 {
     //Check if data was passed
     if(t_mat.rows() == 0 || t_mat.cols() == 0 ) {
@@ -128,16 +130,21 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
     bool bUpdateModel = false;
 
     // check if bads have changed and update coils/channellist if so
-    if(!(m_lBads == pFiffInfo->bads)) {
+    if(!(m_lBads == pFiffInfo->bads) || m_lChannels.isEmpty()) {
         m_lBads = pFiffInfo->bads;
         updateChannels(pFiffInfo);
         updateSensor();
         bUpdateModel = true;
     }
 
+    if(m_lChannels.isEmpty()) {
+        qWarning() << "HPIFit::fitHPI - Channel list is empty. Returning.";
+        return;
+    }
+
     // check if we have to update the model
     if(bUpdateModel || (m_matModel.rows() == 0) || (m_vecFreqs != vecFreqs) || (t_mat.cols() != m_matModel.cols())) {
-        updateModel(pFiffInfo->sfreq,t_mat.cols(),pFiffInfo->linefreq,vecFreqs);
+        updateModel(pFiffInfo->sfreq, t_mat.cols(), pFiffInfo->linefreq, vecFreqs);
         m_vecFreqs = vecFreqs;
         bUpdateModel = false;
     }
@@ -147,7 +154,6 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
 
     // init coil parameters
     struct CoilParam coil;
-
 
     //Get HPI coils from digitizers and set number of coils
     int iNumCoils = 0;
@@ -270,13 +276,19 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
             }
         }
     } else {
-            matCoilPos = transDevHead.apply_inverse_trans(matHeadHPI.cast<float>()).cast<double>();
+        matCoilPos = transDevHead.apply_inverse_trans(matHeadHPI.cast<float>()).cast<double>();
     }
 
     coil.pos = matCoilPos;
 
     // Perform actual localization
-    coil = dipfit(coil, m_sensors, matAmp, iNumCoils, matProjectorsInnerind);
+    coil = dipfit(coil,
+                  m_sensors,
+                  matAmp,
+                  iNumCoils,
+                  matProjectorsInnerind,
+                  iMaxIterations,
+                  fAbortError);
 
     Matrix4d matTrans = computeTransformation(matHeadHPI, coil.pos);
     //Eigen::Matrix4d matTrans = computeTransformation(coil.pos, matHeadHPI);
@@ -435,7 +447,9 @@ CoilParam HPIFit::dipfit(struct CoilParam coil,
                          const SensorSet& sensors,
                          const MatrixXd& matData,
                          int iNumCoils,
-                         const MatrixXd& t_matProjectors)
+                         const MatrixXd& t_matProjectors,
+                         int iMaxIterations,
+                         float fAbortError)
 {
     //Do this in conncurrent mode
     //Generate QList structure which can be handled by the QConcurrent framework
@@ -443,10 +457,12 @@ CoilParam HPIFit::dipfit(struct CoilParam coil,
 
     for(qint32 i = 0; i < iNumCoils; ++i) {
         HPIFitData coilData;
-        coilData.coilPos = coil.pos.row(i);
-        coilData.sensorData = matData.col(i);
-        coilData.sensors = sensors;
-        coilData.matProjector = t_matProjectors;
+        coilData.m_coilPos = coil.pos.row(i);
+        coilData.m_sensorData = matData.col(i);
+        coilData.m_sensors = sensors;
+        coilData.m_matProjector = t_matProjectors;
+        coilData.m_iMaxIterations = iMaxIterations;
+        coilData.m_fAbortError = fAbortError;
 
         lCoilData.append(coilData);
     }
@@ -464,10 +480,10 @@ CoilParam HPIFit::dipfit(struct CoilParam coil,
 
         //Transform results to final coil information
         for(qint32 i = 0; i < lCoilData.size(); ++i) {
-            coil.pos.row(i) = lCoilData.at(i).coilPos;
-            coil.mom = lCoilData.at(i).errorInfo.moment.transpose();
-            coil.dpfiterror(i) = lCoilData.at(i).errorInfo.error;
-            coil.dpfitnumitr(i) = lCoilData.at(i).errorInfo.numIterations;
+            coil.pos.row(i) = lCoilData.at(i).m_coilPos;
+            coil.mom = lCoilData.at(i).m_errorInfo.moment.transpose();
+            coil.dpfiterror(i) = lCoilData.at(i).m_errorInfo.error;
+            coil.dpfitnumitr(i) = lCoilData.at(i).m_errorInfo.numIterations;
 
             //std::cout<<std::endl<< "HPIFit::dipfit - Itr steps for coil " << i << " =" <<coil.dpfitnumitr(i);
         }
@@ -546,9 +562,11 @@ Eigen::Matrix4d HPIFit::computeTransformation(Eigen::MatrixXd matNH, MatrixXd ma
 
 //=============================================================================================================
 
-void HPIFit::createSensorSet(SensorSet& sensors, FwdCoilSet* coils)
+void HPIFit::createSensorSet(SensorSet& sensors,
+                             FwdCoilSet* coils)
 {
     int iNchan = coils->ncoil;
+
     // init sensor struct
     int iNp = coils->coils[0]->np;
     sensors.w = RowVectorXd(iNchan*iNp);
@@ -576,6 +594,7 @@ void HPIFit::createSensorSet(SensorSet& sensors, FwdCoilSet* coils)
                 matCosmag(p,c) = coil->cosmag[p][c];
             }
         }
+
         sensors.cosmag.block(i*iNp,0,iNp,3) = matCosmag;
         sensors.rmag.block(i*iNp,0,iNp,3) = matRmag;
     }
@@ -619,6 +638,11 @@ void HPIFit::updateSensor()
     // Create MEG-Coils and read data
     int iAcc = 2;
     int iNch = m_lChannels.size();
+
+    if(iNch == 0) {
+        return;
+    }
+
     FiffCoordTransOld* t = NULL;
 
     if(!m_coilTemplate) {
@@ -626,9 +650,10 @@ void HPIFit::updateSensor()
         QString qPath = QString(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
         m_coilTemplate = FwdCoilSet::read_coil_defs(qPath);
     }
+
     // create sensor set
-    m_coilMeg = m_coilTemplate->create_meg_coils(m_lChannels,iNch,iAcc,t);
-    createSensorSet(m_sensors,m_coilMeg);
+    m_coilMeg = m_coilTemplate->create_meg_coils(m_lChannels, iNch, iAcc, t);
+    createSensorSet(m_sensors, m_coilMeg);
 }
 
 //=============================================================================================================
@@ -637,11 +662,12 @@ void HPIFit::updateChannels(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo)
 {
     // Get the indices of inner layer channels and exclude bad channels and create channellist
     int iNumCh = pFiffInfo->nchan;
+
     for (int i = 0; i < iNumCh; ++i) {
         if(pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_BABY_MAG ||
-                pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T1 ||
-                pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T2 ||
-                pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T3) {
+           pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T1 ||
+           pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T2 ||
+           pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T3) {
             // Check if the sensor is bad, if not append to innerind
             if(!(pFiffInfo->bads.contains(pFiffInfo->ch_names.at(i)))) {
                 m_vecInnerind.append(i);
@@ -649,6 +675,7 @@ void HPIFit::updateChannels(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo)
             }
         }
     }
+
     m_lBads = pFiffInfo->bads;
 }
 

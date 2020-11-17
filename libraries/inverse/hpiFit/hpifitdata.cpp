@@ -78,29 +78,29 @@ HPIFitData::HPIFitData()
 void HPIFitData::doDipfitConcurrent()
 {
     // Initialize variables
-    Eigen::RowVectorXd vecCurrentCoil = this->coilPos;
-    Eigen::VectorXd vecCurrentData = this->sensorData;
-    SensorSet currentSensors = this->sensors;
+    Eigen::RowVectorXd vecCurrentCoil = this->m_coilPos;
+    Eigen::VectorXd vecCurrentData = this->m_sensorData;
+    SensorSet currentSensors = this->m_sensors;
 
     int iDisplay = 0;
-    int iMaxiter = 200;
+    int iMaxiter = m_iMaxIterations;
     int iSimplexNumitr = 0;
 
-    this->coilPos = fminsearch(vecCurrentCoil,
+    this->m_coilPos = fminsearch(vecCurrentCoil,
                                iMaxiter,
                                2 * iMaxiter * vecCurrentCoil.cols(),
                                iDisplay,
                                vecCurrentData,
-                               this->matProjector,
+                               this->m_matProjector,
                                currentSensors,
                                iSimplexNumitr);
 
-    this->errorInfo = dipfitError(vecCurrentCoil,
+    this->m_errorInfo = dipfitError(vecCurrentCoil,
                                   vecCurrentData,
                                   currentSensors,
-                                  this->matProjector);
+                                  this->m_matProjector);
 
-    this->errorInfo.numIterations = iSimplexNumitr;
+    this->m_errorInfo.numIterations = iSimplexNumitr;
 }
 
 //=============================================================================================================
@@ -234,9 +234,7 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& matPos,
 
     DipFitError tempdip, fxr, fxe, fxc, fxcc;
 
-    tolx = tolf = 1e-5;
-    // Seok
-    // tolx = tolf = 1e-9;
+    tolx = tolf = m_fAbortError;
 
     switch(iDisplay) {
         case 0:
@@ -248,7 +246,7 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& matPos,
 
     header = " Iteration   Func-count     min f(x) Procedure";
 
-    posCopy =matPos;
+    posCopy = matPos;
 
     n = posCopy.cols();
 

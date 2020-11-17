@@ -148,22 +148,24 @@ public:
      * @param[in] bDoFastFit       Do the fast fit by fitting to the more basic Model
      */
     explicit HPIFit(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
-                    bool bDoFastFit = true);
+                    bool bDoFastFit = false);
 
     //=========================================================================================================
     /**
      * Perform one single HPI fit.
      *
-     * @param[in]    t_mat              Data to estimate the HPI positions from
-     * @param[in]    t_matProjectors    The projectors to apply. Bad channels are still included.
-     * @param[out]   transDevHead       The final dev head transformation matrix
-     * @param[in]    vecFreqs           The frequencies for each coil.
-     * @param[out]   vecError           The HPI estimation Error in mm for each fitted HPI coil.
-     * @param[out]   vecGoF             The goodness of fit for each fitted HPI coil
-     * @param[out]   fittedPointSet     The final fitted positions in form of a digitizer set.
-     * @param[in]    pFiffInfo          Associated Fiff Information.
-     * @param[in]    bDoDebug           Print debug info to cmd line and write debug info to file.
-     * @param[in]    sHPIResourceDir    The path to the debug file which is to be written.
+     * @param[in]    t_mat                      Data to estimate the HPI positions from
+     * @param[in]    t_matProjectors            The projectors to apply. Bad channels are still included.
+     * @param[out]   transDevHead               The final dev head transformation matrix
+     * @param[in]    vecFreqs                   The frequencies for each coil.
+     * @param[out]   vecError                   The HPI estimation Error in mm for each fitted HPI coil.
+     * @param[out]   vecGoF                     The goodness of fit for each fitted HPI coil
+     * @param[out]   fittedPointSet             The final fitted positions in form of a digitizer set.
+     * @param[in]    pFiffInfo                  Associated Fiff Information.
+     * @param[in]    bDoDebug                   Print debug info to cmd line and write debug info to file.
+     * @param[in]    sHPIResourceDir            The path to the debug file which is to be written.
+     * @param[in]    iMaxIterations             The maximum allowed number of iterations used to fit the dipoles. Default is 500.
+     * @param[in]    fAbortError                The error which will lead to aborting the dipole fitting process. Default is 1e-9.
      */
     void fitHPI(const Eigen::MatrixXd& t_mat,
                 const Eigen::MatrixXd& t_matProjectors,
@@ -174,7 +176,9 @@ public:
                 FIFFLIB::FiffDigPointSet& fittedPointSet,
                 QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
                 bool bDoDebug = false,
-                const QString& sHPIResourceDir = QString("./HPIFittingDebug"));
+                const QString& sHPIResourceDir = QString("./HPIFittingDebug"),
+                int iMaxIterations = 500,
+                float fAbortError = 1e-9);
 
     //=========================================================================================================
     /**
@@ -228,6 +232,8 @@ protected:
      * @param[in] matData           The data which used to fit the coils.
      * @param[in] iNumCoils         The number of coils.
      * @param[in] t_matProjectors   The projectors to apply. Bad channels are still included.
+     * @param[in] iMaxIterations    The maximum allowed number of iterations used to fit the dipoles. Default is 500.
+     * @param[in] fAbortError       The error which will lead to aborting the dipole fitting process. Default is 1e-9.
      *
      * @return Returns the coil parameters.
      */
@@ -235,7 +241,9 @@ protected:
                      const SensorSet& sensors,
                      const Eigen::MatrixXd &matData,
                      int iNumCoils,
-                     const Eigen::MatrixXd &t_matProjectors);
+                     const Eigen::MatrixXd &t_matProjectors,
+                     int iMaxIterations,
+                     float fAbortError);
 
     //=========================================================================================================
     /**

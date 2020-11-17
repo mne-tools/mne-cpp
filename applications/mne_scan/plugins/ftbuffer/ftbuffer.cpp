@@ -94,7 +94,7 @@ void FtBuffer::init()
 {
     qInfo() << "[FtBuffer::init] Initializing FtBuffer plugin...";
     m_pRTMSA_BufferOutput = PluginOutputData<RealTimeMultiSampleArray>::create(this, "FtBuffer", "FtBuffer Output");
-    m_pRTMSA_BufferOutput->data()->setName(this->getName());//Provide name to auto store widget settings
+    m_pRTMSA_BufferOutput->measurementData()->setName(this->getName());//Provide name to auto store widget settings
     m_outputConnectors.append(m_pRTMSA_BufferOutput);
 }
 
@@ -157,7 +157,7 @@ bool FtBuffer::stop()
     m_pFtBuffProducer = QSharedPointer<FtBuffProducer>::create(this);
 
     // Clear all data in the buffer connected to displays and other plugins
-    m_pRTMSA_BufferOutput->data()->clear();
+    m_pRTMSA_BufferOutput->measurementData()->clear();
     m_pCircularBuffer->clear();
 
     qInfo() << "[FtBuffer::stop] Stopped.";
@@ -198,7 +198,7 @@ void FtBuffer::run()
         if(m_pCircularBuffer->pop(matData)) {
             //emit values
             if(!isInterruptionRequested()) {
-                m_pRTMSA_BufferOutput->data()->setValue(matData);
+                m_pRTMSA_BufferOutput->measurementData()->setValue(matData);
             }
         }
     }
@@ -233,9 +233,9 @@ bool FtBuffer::setupRTMSA()
         m_pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FiffInfo (m_pNeuromagHeadChunkData->info));
 
         //Set the RMTSA parameters
-        m_pRTMSA_BufferOutput->data()->initFromFiffInfo(m_pFiffInfo);
-        m_pRTMSA_BufferOutput->data()->setMultiArraySize(1);
-        m_pRTMSA_BufferOutput->data()->setVisibility(true);
+        m_pRTMSA_BufferOutput->measurementData()->initFromFiffInfo(m_pFiffInfo);
+        m_pRTMSA_BufferOutput->measurementData()->setMultiArraySize(1);
+        m_pRTMSA_BufferOutput->measurementData()->setVisibility(true);
 
         qInfo() << "[FtBuffer::setupRTMSA] Successfully acquired fif info from file.";
         return m_bIsConfigured = true;
@@ -256,9 +256,9 @@ bool FtBuffer::setupRTMSA(FIFFLIB::FiffInfo FiffInfo)
     m_pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FIFFLIB::FiffInfo (FiffInfo));
 
     //Set the RMTSA parameters
-    m_pRTMSA_BufferOutput->data()->initFromFiffInfo(m_pFiffInfo);
-    m_pRTMSA_BufferOutput->data()->setMultiArraySize(1);
-    m_pRTMSA_BufferOutput->data()->setVisibility(true);
+    m_pRTMSA_BufferOutput->measurementData()->initFromFiffInfo(m_pFiffInfo);
+    m_pRTMSA_BufferOutput->measurementData()->setMultiArraySize(1);
+    m_pRTMSA_BufferOutput->measurementData()->setVisibility(true);
 
     qInfo() << "[FtBuffer::setupRTMSA] Successfully acquired fif info from buffer.";
     return m_bIsConfigured = true;

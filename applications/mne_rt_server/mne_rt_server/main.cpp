@@ -51,6 +51,10 @@
 
 #include <QtCore/QCoreApplication>
 #include <QObject>
+#include <QCommandLineParser>
+#include <QFile>
+#include <QFileInfo>
+#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -79,6 +83,46 @@ int main(int argc, char *argv[])
 {
     qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
+
+    // Command Line Parser
+    QCommandLineParser parser;
+    parser.setApplicationDescription("MNE Rt Server");
+    parser.addHelpOption();
+
+    QCommandLineOption inFileOpt(QStringList() << "f" << "file",
+                                 QCoreApplication::translate("main","File to stream."),
+                                 QCoreApplication::translate("main","filePath"));
+
+    parser.addOption(inFileOpt);
+
+    parser.process(app);
+
+    // Parse input file for mne_rt_server's FiffSimulator
+    if(parser.isSet("file")) {
+        QFile file(QCoreApplication::applicationDirPath() + "/resources/mne_rt_server/plugins/fiffsimulator/FiffSimulation.cfg");
+
+        if (QFileInfo(parser.value(inFileOpt)).exists()) {
+            if (file.open(QIODevice::Truncate | QIODevice::Text | QIODevice::WriteOnly)) {
+                QTextStream stream(&file);
+                stream << QString("simFile = %1").arg(parser.value(inFileOpt));;
+                file.close();
+
+                qInfo() << QString("[MneRtServer::main] Streaming file %1").arg(parser.value(inFileOpt));
+            } else {
+                qWarning() << QString("[MneRtServer::main] Could not open %1").arg(QCoreApplication::applicationDirPath() + "/resources/mne_rt_server/plugins/fiffsimulator/FiffSimulation.cfg");
+            }
+        } else {
+            qWarning("[MneRtServer::main] Provided file does not exist. Falling back to default one.");
+
+            if (file.open(QIODevice::Truncate | QIODevice::Text | QIODevice::WriteOnly)) {
+                QTextStream stream(&file);
+                stream << QString("simFile = <pathTo>/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+                file.close();
+            } else {
+                qWarning() << QString("[MneRtServer::main] Could not open %1").arg(QCoreApplication::applicationDirPath() + "/resources/mne_rt_server/plugins/fiffsimulator/FiffSimulation.cfg");
+            }
+        }
+    }
 
     MNERTServer t_MneRtServer;
     QObject::connect(&t_MneRtServer, SIGNAL(closeServer()), &app, SLOT(quit()));

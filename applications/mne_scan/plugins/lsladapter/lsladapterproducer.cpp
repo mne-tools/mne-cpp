@@ -131,7 +131,7 @@ void LSLAdapterProducer::readStream()
                 }
 
                 // publish new block
-                m_pRTMSA->data()->setValue(matOutput);
+                m_pRTMSA->measurementData()->setValue(matOutput);
             }
         }
         catch (std::exception& e) {

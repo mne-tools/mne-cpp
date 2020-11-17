@@ -41,7 +41,7 @@
 //=============================================================================================================
 
 #include "babymeg_global.h"
-#include "../ui_babymegsetup.h"
+#include "ui_babymegsetup.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -100,33 +100,28 @@ public:
 
     //=========================================================================================================
     /**
-     * Inits the setup widget
+     * Set command connection status
+     *
+     * @param[in] bConnectionStatus    the connection status
      */
-    void init();
+    void setConnectionStatus(bool bConnectionStatus);
 
-    void fiffInfoReceived();        /**< Triggered when new fiff info is recieved by producer and stored intor rt_server */
+    //=========================================================================================================
+    /**
+     * Asks the new sampling frequency from the BabyMEG plugin and updates the text field.
+     */
+    void setSamplingFrequency();
 
 private:
     //=========================================================================================================
     /**
-     * Set command connection status
-     *
-     * @param[in] p_bConnectionStatus    the connection status
+     * Whenever the connect button was pressed.
      */
-    void cmdConnectionChanged(bool p_bConnectionStatus);
-
-    //=========================================================================================================
-    /**
-     * Shows the SQUID Control Dialog
-     *
-     */
-    void showSqdCtrlDialog();
+    void onConnectionPressed();
 
     BabyMEG*                    m_pBabyMEG;         /**< a pointer to corresponding mne rt client.*/
 
     Ui::BabyMEGSetupWidgetClass ui;                 /**< the user interface for the BabyMEGSetupWidget.*/
-
-    bool                        m_bIsInit;          /**< false when gui is not initialized jet. Prevents gui from already interacting when not initialized */
 };
 } // NAMESPACE
 

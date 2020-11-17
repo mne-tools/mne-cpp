@@ -124,7 +124,7 @@ QSharedPointer<AbstractPlugin> EEGoSports::clone() const
 void EEGoSports::init()
 {
     m_pRMTSA_EEGoSports = PluginOutputData<RealTimeMultiSampleArray>::create(this, "EEGoSports", "EEG output data");
-    m_pRMTSA_EEGoSports->data()->setName(this->getName());//Provide name to auto store widget settings
+    m_pRMTSA_EEGoSports->measurementData()->setName(this->getName());//Provide name to auto store widget settings
 
     m_outputConnectors.append(m_pRMTSA_EEGoSports);
 
@@ -554,9 +554,9 @@ bool EEGoSports::start()
         setUpFiffInfo();
 
         //Set the channel size of the RMTSA - this needs to be done here and NOT in the init() function because the user can change the number of channels during runtime
-        m_pRMTSA_EEGoSports->data()->initFromFiffInfo(m_pFiffInfo);
-        m_pRMTSA_EEGoSports->data()->setMultiArraySize(1);
-        m_pRMTSA_EEGoSports->data()->setSamplingRate(m_iSamplingFreq);
+        m_pRMTSA_EEGoSports->measurementData()->initFromFiffInfo(m_pFiffInfo);
+        m_pRMTSA_EEGoSports->measurementData()->setMultiArraySize(1);
+        m_pRMTSA_EEGoSports->measurementData()->setSamplingRate(m_iSamplingFreq);
     }
 
     m_pEEGoSportsProducer->start(m_iSamplesPerBlock,
@@ -585,7 +585,7 @@ bool EEGoSports::stop()
 
     if(!m_bCheckImpedances){
         // Clear all data in the buffer connected to displays and other plugins
-        m_pRMTSA_EEGoSports->data()->clear();
+        m_pRMTSA_EEGoSports->measurementData()->clear();
         m_pCircularBuffer->clear();
 
         //Store settings for next use. Do this in stop() since it will crash if we do it in the destructor.
@@ -712,7 +712,7 @@ void EEGoSports::run()
                 if(m_pCircularBuffer->pop(matData)) {
                     //emit values to real time multi sample array
                     //qDebug()<<"EEGoSports::run - mat size"<<matValue.rows()<<"x"<<matValue.cols();
-                    m_pRMTSA_EEGoSports->data()->setValue(matData);
+                    m_pRMTSA_EEGoSports->measurementData()->setValue(matData);
                 }
             }      
         }

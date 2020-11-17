@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the RealTimeMultiSampleArrayNew class.
+ * @brief    Definition of the RealTimeMultiSampleArray class.
  *
  */
 
@@ -61,7 +61,7 @@ using namespace Eigen;
 
 RealTimeMultiSampleArray::RealTimeMultiSampleArray(QObject *parent)
 : Measurement(QMetaType::type("RealTimeMultiSampleArray::SPtr"), parent)
-, m_dSamplingRate(0)
+, m_fSamplingRate(0)
 , m_iMultiArraySize(10)
 , m_bChInfoIsInit(false)
 {
@@ -94,7 +94,7 @@ void RealTimeMultiSampleArray::init(QList<RealTimeSampleArrayChInfo> &chInfo)
 
 //=============================================================================================================
 
-void RealTimeMultiSampleArray::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
+void RealTimeMultiSampleArray::initFromFiffInfo(FiffInfo::SPtr pFiffInfo)
 {
     QMutexLocker locker(&m_qMutex);
     m_qListChInfo.clear();
@@ -102,19 +102,19 @@ void RealTimeMultiSampleArray::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
 
     bool t_bIsBabyMEG = false;
 
-    if(p_pFiffInfo->acq_pars == "BabyMEG")
+    if(pFiffInfo->acq_pars == "BabyMEG")
         t_bIsBabyMEG = true;
 
-    for(qint32 i = 0; i < p_pFiffInfo->nchan; ++i)
+    for(qint32 i = 0; i < pFiffInfo->nchan; ++i)
     {
         RealTimeSampleArrayChInfo initChInfo;
-        initChInfo.setChannelName(p_pFiffInfo->chs[i].ch_name);
+        initChInfo.setChannelName(pFiffInfo->chs[i].ch_name);
 
         // set channel Unit
-        initChInfo.setUnit(p_pFiffInfo->chs[i].unit);
+        initChInfo.setUnit(pFiffInfo->chs[i].unit);
 
         //Treat stimulus channels different
-        if(p_pFiffInfo->chs[i].kind == FIFFV_STIM_CH)
+        if(pFiffInfo->chs[i].kind == FIFFV_STIM_CH)
         {
 //            initChInfo.setUnit("");
             initChInfo.setMinValue(0);
@@ -122,10 +122,10 @@ void RealTimeMultiSampleArray::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
         }
 //        else
 //        {
-////            qDebug() << "kind" << p_pFiffInfo->chs[i].kind << "unit" << p_pFiffInfo->chs[i].unit;
+////            qDebug() << "kind" << pFiffInfo->chs[i].kind << "unit" << pFiffInfo->chs[i].unit;
 
 //            //Unit
-//            switch(p_pFiffInfo->chs[i].unit)
+//            switch(pFiffInfo->chs[i].unit)
 //            {
 //                case 101:
 //                    initChInfo.setUnit("Hz");
@@ -209,18 +209,18 @@ void RealTimeMultiSampleArray::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
 //        }
 
         // set channel Kind
-        initChInfo.setKind(p_pFiffInfo->chs[i].kind);
+        initChInfo.setKind(pFiffInfo->chs[i].kind);
 
         // set channel coil
-        initChInfo.setCoil(p_pFiffInfo->chs[i].chpos.coil_type);
+        initChInfo.setCoil(pFiffInfo->chs[i].chpos.coil_type);
 
         m_qListChInfo.append(initChInfo);
     }
 
     //Sampling rate
-    m_dSamplingRate = p_pFiffInfo->sfreq;
+    m_fSamplingRate = pFiffInfo->sfreq;
 
-    m_pFiffInfo_orig = p_pFiffInfo;
+    m_pFiffInfo_orig = pFiffInfo;
 
     m_bChInfoIsInit = true;
 }
@@ -235,7 +235,7 @@ void RealTimeMultiSampleArray::setValue(const MatrixXd& mat)
     m_qMutex.lock();
     //check vector size
     if(mat.rows() != m_qListChInfo.size())
-        qCritical() << "Error Occured in RealTimeMultiSampleArrayNew::setVector: Vector size does not match the number of channels! ";
+        qCritical() << "Error Occured in RealTimeMultiSampleArray::setVector: Vector size does not match the number of channels! ";
 
     //ToDo
 //    //Check if maximum exceeded //ToDo speed this up

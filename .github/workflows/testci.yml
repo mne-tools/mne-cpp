@@ -1,9 +1,9 @@
-name: PullRequest
+name: TestCI
 
 on:
-  pull_request:
+  push:
     branches:
-    - master
+    - testci
 
 jobs:
   MinQtDynamic:

@@ -177,7 +177,7 @@ QSharedPointer<AbstractPlugin> GUSBAmp::clone() const
 void GUSBAmp::init()
 {
     m_pRTMSA_GUSBAmp = PluginOutputData<RealTimeMultiSampleArray>::create(this, "GUSBAmp", "EEG output data");
-    m_pRTMSA_GUSBAmp->data()->setName(this->getName());//Provide name to auto store widget settings
+    m_pRTMSA_GUSBAmp->measurementData()->setName(this->getName());//Provide name to auto store widget settings
 
     m_outputConnectors.append(m_pRTMSA_GUSBAmp);
 }
@@ -206,9 +206,9 @@ bool GUSBAmp::start()
     setUpFiffInfo();
 
     //Set the channel size of the RTMSA - this needs to be done here and NOT in the init() function because the user can change the number of channels during runtime
-    m_pRTMSA_GUSBAmp->data()->initFromFiffInfo(m_pFiffInfo);
-    m_pRTMSA_GUSBAmp->data()->setMultiArraySize(1);
-    m_pRTMSA_GUSBAmp->data()->setSamplingRate(m_iSampleRate);
+    m_pRTMSA_GUSBAmp->measurementData()->initFromFiffInfo(m_pFiffInfo);
+    m_pRTMSA_GUSBAmp->measurementData()->setMultiArraySize(1);
+    m_pRTMSA_GUSBAmp->measurementData()->setSamplingRate(m_iSampleRate);
 
     //start the thread for ring buffer
     if(m_pGUSBAmpProducer->isRunning())  {
@@ -232,7 +232,7 @@ bool GUSBAmp::stop()
     m_pGUSBAmpProducer->stop();
 
     // Clear all data in the buffer connected to displays and other plugins
-    m_pRTMSA_GUSBAmp->data()->clear();
+    m_pRTMSA_GUSBAmp->measurementData()->clear();
     m_pCircularBuffer->clear();
 
     return true;
@@ -281,7 +281,7 @@ void GUSBAmp::run()
                 }
 
                 //emit values to real time multi sample array
-                m_pRTMSA_GUSBAmp->data()->setValue(matValue.cast<double>()/1000000);
+                m_pRTMSA_GUSBAmp->measurementData()->setValue(matValue.cast<double>()/1000000);
             }
         }
     }
