@@ -28,9 +28,6 @@ jobs:
           git checkout -b ${GITHUB_REF#refs/tags/}
           git push origin refs/heads/${GITHUB_REF#refs/tags/}
         fi
-    - name: Install hub (dev release only)
-      if: endsWith(github.ref, 'master') == true
-      uses: geertvdc/setup-hub@master
     - name: Setup Github credentials (dev release only)
       if: endsWith(github.ref, 'master') == true
       uses: fusion-engineering/setup-git-credentials@v2
