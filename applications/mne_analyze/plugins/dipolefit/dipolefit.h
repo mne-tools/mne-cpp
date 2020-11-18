@@ -32,8 +32,8 @@
  *
  */
 
-#ifndef DIPOLEFITMANAGER_H
-#define DIPOLEFITMANAGER_H
+#ifndef MNEANALYZE_DIPOLEFIT_H
+#define MNEANALYZE_DIPOLEFIT_H
 
 //=============================================================================================================
 // INCLUDES
@@ -62,7 +62,7 @@ namespace ANSHAREDLIB {
     class FiffRawViewModel;
     class BemDataModel;
     class MriCoordModel;
-    class NoiseModel;
+    class CovarianceModel;
     class AveragingDataModel;
     class Communicator;
 }
@@ -295,7 +295,7 @@ signals:
      *
      * @param [in] sModelName
      */
-    void newNoiseModel(const QString& sModelName);
+    void newCovarianceModel(const QString& sModelName);
 
     //=========================================================================================================
     /**

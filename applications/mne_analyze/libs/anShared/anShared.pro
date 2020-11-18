@@ -95,12 +95,12 @@ SOURCES += \
     Model/annotationmodel.cpp \
     Model/averagingdatamodel.cpp \
     Model/mricoordmodel.cpp \
-    Model/noisemodel.cpp
+    Model/covariancemodel.cpp
 
 HEADERS += \
     Model/dipolefitmodel.h \
     Model/mricoordmodel.h \
-    Model/noisemodel.h \
+    Model/covariancemodel.h \
     Plugins/abstractplugin.h \
     anshared_global.h \
     Model/abstractmodel.h \
