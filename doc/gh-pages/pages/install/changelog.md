@@ -7,6 +7,90 @@ nav_order: 1
 
 # Changelog
 
+## Version 0.1.8 - 2020/11/19
+
+### Applications
+
+MNE Analyze
+ * Moved View3D controls to settings view
+ * New event and struct for sending settings
+ * Fix GUI spacing in averaging plugin
+ * New Dipole Fit plugin for MNE Analyze
+ * Loading new files: *trans.fif, *cov-fif
+ * New data models for dipole fit, mri transform, noise
+ * Website documentation for new plugin
+ * loading *ave.fif without raw file parent
+
+MNE Scan
+ * Remove no longer needed applications/mne_analyze/libs/anShared/Interfaces/IStandardView.h
+ * Remove no longer needed applications/mne_analyze/libs/anShared/Management/analyzesettings.cpp
+ * Rename interfaces to abstract classes, since they are described better as abstract classes
+ * Improve Babymeg plugin to feature connection GUI elements. Also fix some bugs which led to crashing when 
+   connecting to the acquisition boards.
+ * Update include path of ui_ files
+ * Rename data function in measurement classes to measurementData() since QSharedPointer already has a data() function.
+ * Comment out set_current_comp function in noise plugin since this lead to multiple calls and errors when bit wise shifting the coil type.
+ * Add error catching when channels are empty in HPIFit's fitHPI function
+ * Update dummy toolbox pro and source/header files
+ * Bump up BrainFlow version
+ * Make clustering in the MNE Scan forward solution plugin the default
+
+MNE RtServer
+ * Add file command line argument
+
+### API librariers
+
+## Disp3D
+ * Fix fiducial coloring problem in Disp3D
+ * Change fiducial colors to match the ones of mne-python
+ * Add remove option to context menu (right click) in the Control3DView. Subsequently, the 3D data is removed from the 3D data model and view
+
+## Disp
+ * New Dipole Fit View.
+
+### Continuous Integration 
+
+ * Cleanup qmake files for transition to cmake (Qt6 only supports cmake)
+ * Move deployment to CI
+ * Outsource deployment commands to scripts
+ * Update ubuntu runners
+ * Update dropbox links
+ * Update mne-cpp-test-data submodule to newest commit
+ * Create new static deployment scripts
+ * Use linuxdeployqt for linux static builds as well
+ * Fix mnecpp library copying on macos.
+ * Fix mkdir in windows workflow.
+ * Add testci workflow script which allows convenient CI testing without actually creating a GH PR
+ * Fix setting PATH variable via the now deprecated add-path in GH Actions scripts
+ * Remove hub install action in release.yml since HUB CLI is already a part of all runners.
+ * Release macOS dynamic build based on Qt 5.14.2. This should fix QOpenGlWidget problems.
+
+### Documentation
+
+ * Update resource and dependency documentation
+ * Update settings plugin documentation to include 3D controls
+ * Update deployment documentation
+ * Renamed website section Install to Download
+ * Website section Contribute is now a subsection of Develop
+ * Link download links on our website to always point to dynamic versions
+ * Update documentation for the real-time source localization pipeline
+
+### Other
+
+ * Make building without app bundles on macOS the default (can be reverted by using the new flag withAppBundles)
+ * Fix Wasm problems introduced by PR #713 (View3D controls in control manager plugin)
+ * Cleanup mne-cpp.pri file
+ * Move resources folder back to bin folder to reduce complexity in the qmake/cmake files
+ * Add @executable_path to rpath setup when building for macOS. (can start the executable from the explorer)
+
+### Authors
+
+People who contributed to this release (preceded by number of commits):
+
+(52) Lorenz Esch,
+(48) Gabriel Motta,
+(1) Andrey Parfenov
+
 ## Version 0.1.7 - 2020/10/26
 
 ### Applications
@@ -90,7 +174,6 @@ People who contributed to this release (preceded by number of commits):
 (27) Lorenz Esch,
 (2) Johannes Vorwerk,
 (1) Andrey Parfenov
-
 
 ## Version 0.1.6 - 2020/08/21
 

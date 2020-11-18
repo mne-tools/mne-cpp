@@ -13,7 +13,7 @@ Stable Releases
 
 | Version | Release | Download link |
 |-------|-------|-------|
-| [0.1.7](changelog.md#version-017) | 2020-10-26 | <span class="fs-2"> [Windows](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.7/mne-cpp-windows-dynamic-x86_64.zip){: .btn .btn-blue } [Linux](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.7/mne-cpp-linux-dynamic-x86_64.tar.gz){: .btn .btn-blue } [MacOS](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.7/mne-cpp-macos-dynamic-x86_64.tar.gz){: .btn .btn-blue } </span> |
+| [0.1.8](changelog.md#version-018) | 2020-11-19 | <span class="fs-2"> [Windows](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.8/mne-cpp-windows-dynamic-x86_64.zip){: .btn .btn-blue } [Linux](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.8/mne-cpp-linux-dynamic-x86_64.tar.gz){: .btn .btn-blue } [MacOS](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.8/mne-cpp-macos-dynamic-x86_64.tar.gz){: .btn .btn-blue } </span> |
 
 Development Release
 {: .label .label-green }
