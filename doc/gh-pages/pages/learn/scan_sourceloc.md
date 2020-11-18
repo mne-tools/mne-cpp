@@ -6,42 +6,46 @@ nav_order: 2
 ---
 # Setup real-time source localization example
 
-|**Please note:** The information provided on this page might be outdated and will be updated soon.|
+This tutorial will show how you can setup an acquisition and real-time source localization pipeline in MNE Scan.
 
-This tutorial will show how you can setup an acquisition and processing chain in MNE Scan, which makes use of the real-time source localization method RTC-MNE.
-
-The following steps will show you how to setup the online processing pipeline in MNE Scan:
-
-1. Make sure you downloaded and correctly extracted the MNE Sample data set. If not, check for a step by step guide here. On MacOS please make sure that you copied the MNE Sample data set to mne_scan.app/Contents/MacOS/ as well.
+1. Make sure you correctly [setup the MNE Sample Data Set](sample_data.md). On MacOS please make sure that you copied the MNE-Sample-data-set to mne_scan.app/Contents/MacOS/ as well.
 2. Start mne_rt_server in your mne-cpp/bin folder.
 3. Start mne_scan in your mne-cpp/bin folder.
-4. Navigate to the Sensor Plugins and Algorithm Plugins buttons in the plugin window. Select and position the following plugins onto the plugin scene:
+4. Navigate to the "Sensor Plugins" and "Algorithm Plugins" buttons in the plugin window. Select and position the following plugins onto the plugin scene:
  * Sensor Plugins - FiffSimulator
  * Algorithm Plugins - Averaging
+ * Algorithm Plugins - Forward Solution
  * Algorithm Plugins - Covariance
  * Algorithm Plugins - MNE
-5. Select the Connection tool in the plugin window. Connect the plugins as follows by left clicking on the start, holding and releasing above the target plugin.
+5. Select the "Connection tool" in the plugin window. Connect the plugins as follows by left clicking on the start, holding and releasing above the target plugin.
 
-![](../../images/source_loc_example1.PNG)
+![](../../images/mne_scan_source_loc_plugins.png)
 
-6. Click on the MNE plugin and wait until the Start Clustering button is clickable again.
-7. Click on the Fiff Simulator plugin.
-8. Start the pipeline by clicking on the green play button in the left upper corner.
+6. Click on the Fiff Simulator plugin and press the "Connect" button.
+7. Start the pipeline via the green "Play" button in the top left corner.
 
-Now that you setup and are running the data acquisition/processing pipeline, we can start to configure some parameters for the online processing:
+Now that you should see the different views for each plugin displaying the incoming data, averages and so on. 
 
 1. Click on the Averaging plugin.
- * Click on the Averaging Adjustments button in the toolbar.
- * Choose the correct trigger channel. Since we are making use of the MNE-Sample-Data-Set choose STI014.
+ * Choose the correct trigger channel. For example STI014 when streaming the default file sample_audvis_raw.fif.
  * Once the averages are starting to come in you can take a look at the averaged data in form of a butterfly and 2D layout plot.
 
-![](../../images/source_loc_example2.PNG)
+![](../../images/mne_scan_source_loc_averaging.png)
 
-2. Click on the MNE plugin.
- * Select the 3D Control from the toolbar.
- * Navigate to the Data item.
- * Now click on the item with the description "The value to normalize the source localization result".
- * You should be prompted with the histogram based thresholding window. Use the right, middle and left mouse button to set the thresholds.
- *  The 3D view can be rotated using the middle and translated using the right mouse button.
+2. Click on the Forward Solution plugin.
+ * Make sure that the "Cluster forward solution" box is checked.
+ * Press the "Compute Forward Solution" button. 
+ * Wait until the "Status computation" label shows a green Finished. Computing the forward solution may take some time. However, this only has to be done once.
 
-![](../../images/source_loc_example3.PNG)
+![](../../images/mne_scan_source_loc_forward.png)
+
+3. Once the forward solution was calculated, the source localization plugin controls should appear in the QuickControlView. Select the plugin.
+ * Choose the source localization method, trigger type and time point you want to visualize. If you set the time point outside the range of the computed average (e.g. 1000ms), the data will be streamed sample by sample.
+
+![](../../images/mne_scan_source_loc_settings.png)
+
+ * You can change the 3D visualization setting by selecting the "3D View" plugin controls in the QuickControlView. 
+ * If you prefer cortically constrained interpolation you can switch from "Annotation based" to "Interpolation based".
+ * The threshold of the plotted activation can be changed by clicking on the field with the three floating values. This will open a histogram based thresholding widget. Use the left, middle and right mouse buttons to set the threshold values.
+
+![](../../images/mne_scan_source_loc_3dview.png)
