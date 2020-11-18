@@ -89,7 +89,7 @@ using namespace Eigen;
 RtFwd::RtFwd()
 : m_bBusy(false)
 , m_bDoRecomputation(false)
-, m_bDoClustering(false)
+, m_bDoClustering(true)
 , m_bDoFwdComputation(false)
 , m_pFwdSettings(new ComputeFwdSettings)
 {
