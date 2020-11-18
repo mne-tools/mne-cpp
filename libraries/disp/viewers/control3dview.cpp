@@ -45,6 +45,7 @@
 
 #include <QMenu>
 #include <QSettings>
+#include <QMessageBox>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -181,6 +182,15 @@ void Control3DView::onTreeViewHeaderHide()
 
 //=============================================================================================================
 
+void Control3DView::onTreeViewRemoveItem(const QModelIndex& index)
+{
+    if(index.isValid()) {
+        m_pUi->m_treeView_loadedData->model()->removeRow(index.row(), index.parent());
+    }
+}
+
+//=============================================================================================================
+
 void Control3DView::onTreeViewDescriptionHide()
 {
     if(m_pUi->m_treeView_loadedData->isColumnHidden(1)) {
@@ -270,10 +280,20 @@ void Control3DView::onCustomContextMenuRequested(QPoint pos)
     //create custom context menu and actions
     QMenu *menu = new QMenu(this);
 
-    //**************** Hide header ****************
+    // Hide header
     QAction* pHideHeader = menu->addAction(tr("Toggle header"));
     connect(pHideHeader, &QAction::triggered,
             this, &Control3DView::onTreeViewHeaderHide);
+
+    // Remove item
+    QAction* pRemoveItem = menu->addAction(tr("Remove"));
+    connect(pRemoveItem, &QAction::triggered, [=]() {
+        if (QMessageBox::question(this,
+                                  tr("Remove item"),
+                                  tr("Are you sure you want to delete the item?")) == QMessageBox::Yes) {
+            onTreeViewRemoveItem(m_pUi->m_treeView_loadedData->indexAt(pos));
+        }
+    });
 
 //    QAction* pHideDesc = menu->addAction(tr("Toggle description"));
 //    connect(pHideDesc, &QAction::triggered,
