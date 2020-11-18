@@ -138,6 +138,12 @@ public:
 
     //=========================================================================================================
     /**
+     * Slot called when an item should be removed.
+     */
+    void onTreeViewRemoveItem(const QModelIndex &index);
+
+    //=========================================================================================================
+    /**
      * Slot called when tree view description visibilty changed.
      */
     void onTreeViewDescriptionHide();
