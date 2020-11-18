@@ -2,7 +2,7 @@
 /**
  * @file     dipolefitview.h
  * @author   Gabriel Motta <gbmotta@mgh.harvard.edu>
- * @since    0.1.5
+ * @since    0.1.7
  * @date     Novemeber, 2020
  *
  * @section  LICENSE
@@ -31,7 +31,6 @@
  * @brief    Declaration of the DipoleFitView Class.
  *
  */
-
 
 #ifndef DIPOLEFITVIEW_H
 #define DIPOLEFITVIEW_H

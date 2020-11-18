@@ -115,9 +115,9 @@ public:
 
     //=========================================================================================================
     /**
-     * The type of this model (NoiseModel)
+     * The type of this model (CovarianceModel)
      *
-     * @return The type of this model (NoiseModel)
+     * @return The type of this model (CovarianceModel)
      */
     inline MODEL_TYPE getType() const override;
 

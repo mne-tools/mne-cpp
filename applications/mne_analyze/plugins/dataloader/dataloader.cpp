@@ -45,7 +45,7 @@
 #include <anShared/Model/bemdatamodel.h>
 #include <anShared/Model/annotationmodel.h>
 #include <anShared/Model/averagingdatamodel.h>
-#include <anShared/Model/noisemodel.h>
+#include <anShared/Model/covariancemodel.h>
 #include <anShared/Model/mricoordmodel.h>
 
 #include <disp/viewers/progressview.h>
@@ -233,7 +233,7 @@ void DataLoader::loadFilePath(const QString& sFilePath)
         } else if (fileInfo.completeBaseName().endsWith("ave")){
             m_pAnalyzeData->loadModel<ANSHAREDLIB::AveragingDataModel>(sFilePath);
         } else if(fileInfo.completeBaseName().endsWith("cov")){
-            m_pAnalyzeData->loadModel<ANSHAREDLIB::NoiseModel>(sFilePath);
+            m_pAnalyzeData->loadModel<ANSHAREDLIB::CovarianceModel>(sFilePath);
         } else if(fileInfo.completeBaseName().endsWith("trans")){
             m_pAnalyzeData->loadModel<ANSHAREDLIB::MriCoordModel>(sFilePath);
         }
