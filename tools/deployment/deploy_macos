@@ -8,13 +8,13 @@ cp -a bin/resources/. bin/mne_scan.app/Contents/MacOS/resources
 cp -a applications/mne_scan/plugins/brainflowboard/brainflow/installed/lib/. bin/mne_scan.app/Contents/Frameworks
 cp -a applications/mne_scan/plugins/lsladapter/liblsl/build/install/lib/. bin/mne_scan.app/Contents/Frameworks
 cp -a lib/. bin/mne_scan.app/Contents/Frameworks
-cp -a $Qt5_DIR/plugins/renderers/. bin/mne_scan.app/Contents/PlugIns/renderers
+# cp -a $Qt5_DIR/plugins/renderers/. bin/mne_scan.app/Contents/PlugIns/renderers
 
 # Solve for dependencies for mne_analyze.app bundle
 cp -a bin/mne_analyze_plugins/. bin/mne_analyze.app/Contents/MacOS/mne_analyze_plugins
 cp -a bin/resources/. bin/mne_analyze.app/Contents/MacOS/resources
 cp -a lib/. bin/mne_analyze.app/Contents/Frameworks
-cp -a $Qt5_DIR/plugins/renderers/. bin/mne_analyze.app/Contents/PlugIns/renderers
+# cp -a $Qt5_DIR/plugins/renderers/. bin/mne_analyze.app/Contents/PlugIns/renderers
 
 # Solve for dependencies for mne_rt_server.app bundle
 cp -a bin/mne_rt_server_plugins/. bin/mne_rt_server.app/Contents/MacOS/mne_rt_server_plugins
