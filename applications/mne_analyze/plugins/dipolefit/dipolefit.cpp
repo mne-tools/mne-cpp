@@ -47,7 +47,7 @@
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <anShared/Model/bemdatamodel.h>
 #include <anShared/Model/mricoordmodel.h>
-#include <anShared/Model/noisemodel.h>
+#include <anShared/Model/covariancemodel.h>
 #include <anShared/Model/averagingdatamodel.h>
 #include <anShared/Model/dipolefitmodel.h>
 
@@ -131,7 +131,7 @@ QDockWidget *DipoleFit::getControl()
     //Send Gui updates
     connect(this, &DipoleFit::newBemModel,
             pDipoleView, &DISPLIB::DipoleFitView::addBem, Qt::UniqueConnection);
-    connect(this, &DipoleFit::newNoiseModel,
+    connect(this, &DipoleFit::newCovarianceModel,
             pDipoleView, &DISPLIB::DipoleFitView::addNoise, Qt::UniqueConnection);
     connect(this, &DipoleFit::newMriModel,
             pDipoleView, &DISPLIB::DipoleFitView::addMri, Qt::UniqueConnection);
@@ -280,7 +280,7 @@ void DipoleFit::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewMo
         emit newBemModel(QFileInfo(pNewModel->getModelPath()).fileName());
         m_ModelList.append(pNewModel);
     } else if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_NOISE_MODEL) {
-        emit newNoiseModel(QFileInfo(pNewModel->getModelPath()).fileName());
+        emit newCovarianceModel(QFileInfo(pNewModel->getModelPath()).fileName());
         m_ModelList.append(pNewModel);
     } else if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_MRICOORD_MODEL) {
         emit newMriModel(QFileInfo(pNewModel->getModelPath()).fileName());

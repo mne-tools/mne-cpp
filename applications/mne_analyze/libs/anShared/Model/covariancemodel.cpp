@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     noisemodel.cpp
+ * @file     covariancemodel.cpp
  * @author   Gabriel Motta <gbmotta@mgh.harvard.edu>
  * @since    0.1.7
  * @date     November, 2020
@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the NoiseModel Class.
+ * @brief    Definition of the CovarianceModel Class.
  *
  */
 
@@ -37,7 +37,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "noisemodel.h"
+#include "covariancemodel.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -59,7 +59,7 @@ using namespace ANSHAREDLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-NoiseModel::NoiseModel(const QString &sFilePath,
+CovarianceModel::CovarianceModel(const QString &sFilePath,
                        const QByteArray& byteLoadedData,
                        QObject* parent)
 :AbstractModel(sFilePath, parent)
@@ -69,7 +69,7 @@ NoiseModel::NoiseModel(const QString &sFilePath,
 
 //=============================================================================================================
 
-int NoiseModel::rowCount(const QModelIndex &parent) const
+int CovarianceModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
 
@@ -78,7 +78,7 @@ int NoiseModel::rowCount(const QModelIndex &parent) const
 
 //=============================================================================================================
 
-int NoiseModel::columnCount(const QModelIndex &parent) const
+int CovarianceModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
 
@@ -87,7 +87,7 @@ int NoiseModel::columnCount(const QModelIndex &parent) const
 
 //=============================================================================================================
 
-QVariant NoiseModel::data(const QModelIndex &index,
+QVariant CovarianceModel::data(const QModelIndex &index,
                              int role) const
 {
     Q_UNUSED(index);
@@ -98,7 +98,7 @@ QVariant NoiseModel::data(const QModelIndex &index,
 
 //=============================================================================================================
 
-Qt::ItemFlags NoiseModel::flags(const QModelIndex &index) const
+Qt::ItemFlags CovarianceModel::flags(const QModelIndex &index) const
 {
     return QAbstractItemModel::flags(index);
 }

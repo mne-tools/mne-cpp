@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     noisemodel.h
+ * @file     covariancemodel.h
  * @author   Gabriel Motta <gbmotta@mgh.harvard.edu>
  * @since    0.1.7
  * @date     November, 2020
@@ -28,12 +28,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Declaration of the NoiseModel Class.
+ * @brief    Declaration of the CovarianceModel Class.
  *
  */
 
-#ifndef NOISEMODEL_H
-#define NOISEMODEL_H
+#ifndef COVARIANCEMODEL_H
+#define COVARIANCEMODEL_H
 
 //=============================================================================================================
 // INCLUDES
@@ -58,14 +58,14 @@
 namespace ANSHAREDLIB {
 
 //=============================================================================================================
-class ANSHAREDSHARED_EXPORT NoiseModel : public AbstractModel
+class ANSHAREDSHARED_EXPORT CovarianceModel : public AbstractModel
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<NoiseModel> SPtr;              /**< Shared pointer type for AnnotationModel. */
-    typedef QSharedPointer<const NoiseModel> ConstSPtr;   /**< Const shared pointer type for AnnotationModel. */
+    typedef QSharedPointer<CovarianceModel> SPtr;              /**< Shared pointer type for AnnotationModel. */
+    typedef QSharedPointer<const CovarianceModel> ConstSPtr;   /**< Const shared pointer type for AnnotationModel. */
 
-    NoiseModel(const QString &sFilePath,
+    CovarianceModel(const QString &sFilePath,
                const QByteArray& byteLoadedData = QByteArray(),
                QObject* parent = Q_NULLPTR);
 
@@ -105,9 +105,9 @@ public:
 
     //=========================================================================================================
     /**
-     * The type of this model (NoiseModel)
+     * The type of this model (CovarianceModel)
      *
-     * @return The type of this model (NoiseModel)
+     * @return The type of this model (CovarianceModel)
      */
     inline MODEL_TYPE getType() const override;
 
@@ -140,14 +140,14 @@ public:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline MODEL_TYPE NoiseModel::getType() const
+inline MODEL_TYPE CovarianceModel::getType() const
 {
     return MODEL_TYPE::ANSHAREDLIB_NOISE_MODEL;
 }
 
 //=============================================================================================================
 
-QModelIndex NoiseModel::parent(const QModelIndex &index) const
+QModelIndex CovarianceModel::parent(const QModelIndex &index) const
 {
     Q_UNUSED(index);
     return QModelIndex();
@@ -155,11 +155,11 @@ QModelIndex NoiseModel::parent(const QModelIndex &index) const
 
 //=============================================================================================================
 
-QModelIndex NoiseModel::index(int row, int column, const QModelIndex &parent) const
+QModelIndex CovarianceModel::index(int row, int column, const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
     return createIndex(row, column);
 }
 
 }//namespace
-#endif // NOISEMODEL_H
+#endif // COVARIANCEMODEL_H

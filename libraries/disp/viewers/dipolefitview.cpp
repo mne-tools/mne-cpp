@@ -2,7 +2,7 @@
 /**
  * @file     dipolefitview.cpp
  * @author   Gabriel Motta <gbmotta@mgh.harvard.edu>
- * @since    0.1.5
+ * @since    0.1.7
  * @date     Novemeber, 2020
  *
  * @section  LICENSE
