@@ -41,6 +41,7 @@
 //=============================================================================================================
 
 #include "analyzedata.h"
+#include <anShared/Management/communicator.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -164,6 +165,20 @@ QStandardItemModel* AnalyzeData::getDataModel()
 
 bool AnalyzeData::removeModel(const QModelIndex& index)
 {
+    QStandardItem* pItem = m_pData->itemFromIndex(index);
+    switch(pItem->data(BIDS_ITEM_TYPE).value<int>()){
+    case BIDS_FUNCTIONALDATA:
+    case BIDS_ANATOMICALDATA:
+    case BIDS_BEHAVIORALDATA:
+    case BIDS_AVERAGE:
+    case BIDS_ANNOTATION:
+        m_pCommu->publishEvent(EVENT_TYPE::MODEL_REMOVED, QVariant::fromValue(pItem->data().value<QSharedPointer<AbstractModel>>()));
+        break;
+    default:
+        //No model associated with item
+        break;
+    }
+
     return m_pData->removeItem(index);
 }
 
