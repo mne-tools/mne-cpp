@@ -127,6 +127,9 @@ private:
     void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
 
     //=========================================================================================================
+    void onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel);
+
+    //=========================================================================================================
     /**
      * Sets up control widgets, connects all relevant signals and slots, and diplays controls to user
      */
