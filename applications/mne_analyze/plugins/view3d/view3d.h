@@ -221,8 +221,6 @@ private:
 
     bool                                                    m_bPickingActivated;    /**< If Picking is activated*/
 
-    QList<QSharedPointer<ANSHAREDLIB::DipoleFitModel>>      m_DipoleList;
-
 signals:
     //=========================================================================================================
     /**
