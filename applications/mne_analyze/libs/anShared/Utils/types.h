@@ -122,6 +122,7 @@ namespace ANSHAREDLIB
         FIDUCIAL_CHANGED,           // event send when fiducial was changed
         SET_DATA3D_TREE_MODEL,      // send when a new 3D Model is set
         VIEW3D_SETTINGS_CHANGED,    // send to trigger view 3D settings update
+        MODEL_REMOVED
     };
 
     //=========================================================================================================

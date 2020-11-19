@@ -197,6 +197,9 @@ void RawDataViewer::handleEvent(QSharedPointer<Event> e)
             updateViewParameters(e->getData().value<ANSHAREDLIB::ViewParameters>());
         }
         break;
+    case MODEL_REMOVED:
+        onModelRemoved(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
+        break;
     default:
         qWarning() << "[RawDataViewer::handleEvent] Received an Event that is not handled by switch cases.";
     }
@@ -217,6 +220,7 @@ QVector<EVENT_TYPE> RawDataViewer::getEventSubscriptions(void) const
     temp.push_back(CHANNEL_SELECTION_ITEMS);
     temp.push_back(SCALING_MAP_CHANGED);
     temp.push_back(VIEW_SETTINGS_CHANGED);
+    temp.push_back(MODEL_REMOVED);
 
     return temp;
 }
@@ -328,5 +332,17 @@ void RawDataViewer::updateViewParameters(ANSHAREDLIB::ViewParameters viewParamet
         break;
         default:
             qDebug() << "Unknown setting";
+    }
+}
+
+//=============================================================================================================
+
+void RawDataViewer::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel)
+{
+    if(pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
+        if(m_pFiffRawView->getModel() == pRemovedModel) {
+            m_pFiffRawView->reset();
+            return;
+        }
     }
 }
