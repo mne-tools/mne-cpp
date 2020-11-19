@@ -100,15 +100,18 @@ void EcdDataTreeItem::initItem()
 
 void EcdDataTreeItem::addData(const ECDSet& pECDSet)
 {
-    //Add further infos as children
-    QList<QStandardItem*> list;
-    MetaTreeItem *pItemNumDipoles = new MetaTreeItem(MetaTreeItemTypes::NumberDipoles, QString::number(pECDSet.size()));
-    pItemNumDipoles->setEditable(false);
-    list.clear();
-    list << pItemNumDipoles;
-    list << new QStandardItem(pItemNumDipoles->toolTip());
-    this->appendRow(list);
-
+    if(!m_pItemNumDipoles){
+        //Add further infos as children
+        QList<QStandardItem*> list;
+        m_pItemNumDipoles = new MetaTreeItem(MetaTreeItemTypes::NumberDipoles, QString::number(pECDSet.size()));
+        m_pItemNumDipoles->setEditable(false);
+        list.clear();
+        list << m_pItemNumDipoles;
+        list << new QStandardItem(m_pItemNumDipoles->toolTip());
+        this->appendRow(list);
+    } else {
+        m_pItemNumDipoles->setText(QString::number(pECDSet.size()));
+    }
     //Plot dipole moment
     plotDipoles(pECDSet);
 }
@@ -118,13 +121,6 @@ void EcdDataTreeItem::addData(const ECDSet& pECDSet)
 void EcdDataTreeItem::plotDipoles(const ECDSet& tECDSet)
 {
     //Plot dipoles
-
-    //create geometry
-    QSharedPointer<Qt3DExtras::QConeGeometry> pDipolGeometry = QSharedPointer<Qt3DExtras::QConeGeometry>::create();
-    pDipolGeometry->setBottomRadius(0.001f);
-    pDipolGeometry->setLength(0.003f);
-    //create instanced renderer
-    GeometryMultiplier *pDipolMesh = new GeometryMultiplier(pDipolGeometry);
 
     QVector3D pos, to, from;
 
@@ -164,17 +160,32 @@ void EcdDataTreeItem::plotDipoles(const ECDSet& tECDSet)
                                  QRandomGenerator::global()->bounded(0 , 255),
                                  QRandomGenerator::global()->bounded(0 , 255)));
     }
-    //Set instance Transform
-    pDipolMesh->setTransforms(vTransforms);
-    //Set instance colors
-    pDipolMesh->setColors(vColors);
 
-    this->addComponent(pDipolMesh);
+    //create geometry
+    if(!m_pDipolMesh){
+        QSharedPointer<Qt3DExtras::QConeGeometry> pDipolGeometry = QSharedPointer<Qt3DExtras::QConeGeometry>::create();
+        pDipolGeometry->setBottomRadius(0.001f);
+        pDipolGeometry->setLength(0.003f);
+        //create instanced renderer
+        m_pDipolMesh = new GeometryMultiplier(pDipolGeometry);
 
-    //Add material
-    GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial;
-    pMaterial->setAmbient(QColor(0,0,0));
-    pMaterial->setAlpha(1.0f);
-    this->addComponent(pMaterial);
+        //Set instance Transform
+        m_pDipolMesh->setTransforms(vTransforms);
+        //Set instance colors
+        m_pDipolMesh->setColors(vColors);
+
+        this->addComponent(m_pDipolMesh);
+
+        //Add material
+        GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial;
+        pMaterial->setAmbient(QColor(0,0,0));
+        pMaterial->setAlpha(1.0f);
+        this->addComponent(pMaterial);
+    } else {
+        //Set instance Transform
+        m_pDipolMesh->setTransforms(vTransforms);
+        //Set instance colors
+        m_pDipolMesh->setColors(vColors);
+    }
 }
 
