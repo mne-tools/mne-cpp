@@ -292,7 +292,7 @@ public:
 private:
     QPointer<DISPLIB::BidsViewModel>        m_pData;                    /**< The BidsViewModel that holds all the subject, session, and data items. */
 
-    QPointer<ANSHAREDLIB::Communicator> m_pCommu;
+    QPointer<ANSHAREDLIB::Communicator>     m_pCommu;
 
     QModelIndex                             m_SelectedItem;             /**< Index of currently selected item */
     QModelIndex                             m_SelectedFunctionalData;   /**< Index of currently selected data item */
