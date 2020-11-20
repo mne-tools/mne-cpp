@@ -73,12 +73,6 @@ contains(MNECPP_CONFIG, static) {
     message("The static flag was detected. Building static version of MNE-CPP.")
 }
 
-# Do not support QOpenGLWidget support on macx because signal backgrounds are not plotted correctly (tested on Qt 5.15.0 and Qt 5.15.1)
-macx:minQtVersion(5, 15, 0) {
-    message("Excluding QOpenGLWidget on MacOS for Qt version greater than 5.15.0")
-    MNECPP_CONFIG += noQOpenGLWidget
-}
-
 ########################################### DIRECTORY DEFINITIONS #############################################
 
 # Repository directory
