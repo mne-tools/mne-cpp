@@ -20,7 +20,7 @@ jobs:
       run: |
         # Clone Qt5 repo
         cd ..
-        git clone https://code.qt.io/qt/qt5.git -b 5.15.1
+        git clone https://code.qt.io/qt/qt5.git -b 5.15.2
         cd qt5
         ./init-repository -f --module-subset=qtbase,qtcharts,qtsvg,qt3d
         # Create shadow build folder
@@ -34,11 +34,11 @@ jobs:
     - name: Package binaries
       run: |
         # Create archive of the pre-built Qt binaries
-        tar cfvz qt5_5151_static_binaries_linux.tar.gz ../Qt5_binaries/.
+        tar cfvz qt5_5152_static_binaries_linux.tar.gz ../Qt5_binaries/.
     - uses: actions/upload-artifact@v1
       with:
-        name: qt5_5151_static_binaries_linux.tar.gz
-        path: qt5_5151_static_binaries_linux.tar.gz
+        name: qt5_5152_static_binaries_linux.tar.gz
+        path: qt5_5152_static_binaries_linux.tar.gz
 
   GenerateMacOSStaticBinaries:
     runs-on: macos-latest
@@ -50,7 +50,7 @@ jobs:
       run: |
         # Clone Qt5 repo
         cd ..
-        git clone https://code.qt.io/qt/qt5.git -b 5.15.1
+        git clone https://code.qt.io/qt/qt5.git -b 5.15.2
         cd qt5
         ./init-repository -f --module-subset=qtbase,qtcharts,qtsvg,qt3d
         # Create shadow build folder
@@ -64,11 +64,11 @@ jobs:
     - name: Package binaries
       run: |
         # Create archive of the pre-built Qt binaries
-        tar cfvz qt5_5151_static_binaries_macos.tar.gz ../Qt5_binaries/.
+        tar cfvz qt5_5152_static_binaries_macos.tar.gz ../Qt5_binaries/.
     - uses: actions/upload-artifact@v1
       with:
-        name: qt5_5151_static_binaries_macos.tar.gz
-        path: qt5_5151_static_binaries_macos.tar.gz
+        name: qt5_5152_static_binaries_macos.tar.gz
+        path: qt5_5152_static_binaries_macos.tar.gz
 
   GenerateWinStaticBinaries:
     runs-on: windows-2019
@@ -90,7 +90,7 @@ jobs:
       run: |
         # Clone Qt5 repo
         cd ..
-        git clone https://code.qt.io/qt/qt5.git -b 5.15.1
+        git clone https://code.qt.io/qt/qt5.git -b 5.15.2
         cd qt5
         perl init-repository -f --module-subset=qtbase,qtcharts,qtsvg,qt3d
         # Create shadow build folder
@@ -107,11 +107,11 @@ jobs:
     - name: Package binaries
       run: |
         # Create archive of the pre-built Qt binaries
-        7z a qt5_5151_static_binaries_win.zip ..\Qt5_binaries
+        7z a qt5_5152_static_binaries_win.zip ..\Qt5_binaries
     - uses: actions/upload-artifact@v1
       with:
-        name: qt5_5151_static_binaries_win.zip
-        path: qt5_5151_static_binaries_win.zip
+        name: qt5_5152_static_binaries_win.zip
+        path: qt5_5152_static_binaries_win.zip
 
   GenerateWasmBinaries:
     runs-on: ubuntu-latest
@@ -137,7 +137,7 @@ jobs:
         # Activate PATH and other environment variables in the current terminal
         source ./emsdk/emsdk_env.sh
         # Clone Qt5 repo
-        git clone https://code.qt.io/qt/qt5.git -b 5.15.1
+        git clone https://code.qt.io/qt/qt5.git -b 5.15.2
         cd qt5
         ./init-repository -f --module-subset=qtbase,qtcharts,qtsvg
         # Configure Qt5
@@ -147,8 +147,8 @@ jobs:
     - name: Package binaries
       run: |
         # Create archive of the pre-built Qt binaries
-        tar cfvz qt5_5151_static_binaries_wasm.tar.gz ../Qt5_binaries/.
+        tar cfvz qt5_5152_static_binaries_wasm.tar.gz ../Qt5_binaries/.
     - uses: actions/upload-artifact@v1
       with:
-        name: qt5_5151_static_binaries_wasm.tar.gz
-        path: qt5_5151_static_binaries_wasm.tar.gz
+        name: qt5_5152_static_binaries_wasm.tar.gz
+        path: qt5_5152_static_binaries_wasm.tar.gz
