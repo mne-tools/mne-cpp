@@ -68,7 +68,7 @@ AnalyzeData::AnalyzeData(QObject *pParent)
 : QObject(pParent)
 , m_pData(new DISPLIB::BidsViewModel(this))
 {
-
+    m_pCommu = new Communicator();
 }
 
 //=============================================================================================================

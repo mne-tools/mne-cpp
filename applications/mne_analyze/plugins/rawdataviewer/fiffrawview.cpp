@@ -116,8 +116,12 @@ FiffRawView::~FiffRawView()
 
 void FiffRawView::reset()
 {
-    disconnectModel();
-    setModel(QSharedPointer<ANSHAREDLIB::FiffRawViewModel>::create());
+    if(m_pModel){
+        disconnectModel();
+
+        m_pTableView->setModel(Q_NULLPTR);
+        m_pModel = Q_NULLPTR;
+    }
 }
 
 //=============================================================================================================
