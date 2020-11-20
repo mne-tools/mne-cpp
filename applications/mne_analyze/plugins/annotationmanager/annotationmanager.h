@@ -122,6 +122,9 @@ private:
     void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
 
     //=========================================================================================================
+    void onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel);
+
+    //=========================================================================================================
     /**
      * Toggles whether to show annotations
      *

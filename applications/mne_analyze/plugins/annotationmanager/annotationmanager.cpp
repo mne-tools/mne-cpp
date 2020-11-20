@@ -175,6 +175,9 @@ void AnnotationManager::handleEvent(QSharedPointer<Event> e)
         case EVENT_TYPE::SELECTED_MODEL_CHANGED:
             onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
             break;
+        case MODEL_REMOVED:
+            onModelRemoved(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
+            break;
         default:
             qWarning() << "[AnnotationManager::handleEvent] Received an Event that is not handled by switch cases.";
     }
@@ -187,6 +190,7 @@ QVector<EVENT_TYPE> AnnotationManager::getEventSubscriptions(void) const
     QVector<EVENT_TYPE> temp;
     temp.push_back(NEW_ANNOTATION_ADDED);
     temp.push_back(SELECTED_MODEL_CHANGED);
+    temp.push_back(MODEL_REMOVED);
 
     return temp;
 }
@@ -257,4 +261,11 @@ void AnnotationManager::triggerLoadingStart(const QString& sMessage)
 void AnnotationManager::triggerLoadingEnd(const QString& sMessage)
 {
     m_pCommu->publishEvent(LOADING_END, QVariant::fromValue(sMessage));
+}
+
+//=============================================================================================================
+
+void AnnotationManager::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel)
+{
+
 }
