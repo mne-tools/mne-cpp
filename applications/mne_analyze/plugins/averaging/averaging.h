@@ -146,6 +146,9 @@ private:
     void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
 
     //=========================================================================================================
+    void onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel);
+
+    //=========================================================================================================
     /**
      * @brief onNewAveragingModel
      * @param pAveragingModel

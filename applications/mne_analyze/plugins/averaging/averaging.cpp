@@ -269,6 +269,9 @@ void Averaging::handleEvent(QSharedPointer<Event> e)
         case VIEW_SETTINGS_CHANGED:
             setViewSettings(e->getData().value<ANSHAREDLIB::ViewParameters>());
             break;
+        case MODEL_REMOVED:
+            onModelRemoved(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
+            break;
         default:
             qWarning() << "[Averaging::handleEvent] Received an Event that is not handled by switch cases.";
     }
@@ -286,6 +289,7 @@ QVector<EVENT_TYPE> Averaging::getEventSubscriptions(void) const
     temp.push_back(CHANNEL_SELECTION_ITEMS);
     temp.push_back(SCALING_MAP_CHANGED);
     temp.push_back(VIEW_SETTINGS_CHANGED);
+    temp.push_back(MODEL_REMOVED);
 
     return temp;
 }
@@ -699,4 +703,11 @@ void Averaging::triggerLoadingStart(QString sMessage)
 void Averaging::triggerLoadingEnd(QString sMessage)
 {
     m_pCommu->publishEvent(LOADING_END, QVariant::fromValue(sMessage));
+}
+
+//=============================================================================================================
+
+void Averaging::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel)
+{
+
 }
