@@ -183,10 +183,6 @@ QDockWidget *CoRegistration::getControl()
     connect(m_pCoregSettingsView, &CoregSettingsView::fiducialChanged,
             this, &CoRegistration::onPickedFiducialChanged);
 
-    // Connect events for new and deleted model
-    connect(m_pAnalyzeData.data(), &AnalyzeData::modelIsEmpty,
-            this, &CoRegistration::deleteModels, Qt::UniqueConnection);
-
     // automaticly load Bem if available
     onChangeSelectedBem(m_pCoregSettingsView->getCurrentSelectedBem());
 

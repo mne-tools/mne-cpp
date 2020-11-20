@@ -106,8 +106,6 @@ void RawDataViewer::init()
     m_pFiffRawView->setFocusPolicy(Qt::TabFocus);
     m_pFiffRawView->setAttribute(Qt::WA_DeleteOnClose, false);
 
-    connect(m_pAnalyzeData.data(), &AnalyzeData::modelIsEmpty,
-            this, &RawDataViewer::onModelIsEmpty);
     connect(m_pFiffRawView.data(), &FiffRawView::sendSamplePos,
             this, &RawDataViewer::onSendSamplePos, Qt::UniqueConnection);
 }
