@@ -298,11 +298,6 @@ private:
     QModelIndex                             m_SelectedFunctionalData;   /**< Index of currently selected data item */
 
 signals:
-    //=========================================================================================================
-    /**
-     * This is emitted whenever the model is completely.
-     */
-    void modelIsEmpty();
 
     //=========================================================================================================
     /**

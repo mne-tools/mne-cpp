@@ -137,9 +137,6 @@ QDockWidget *AnnotationManager::getControl()
     connect(this, &AnnotationManager::newAnnotationModelAvailable,
             pAnnotationSettingsView, &AnnotationSettingsView::setModel, Qt::UniqueConnection);
 
-    connect(m_pAnalyzeData.data(), &AnalyzeData::modelIsEmpty,
-            pAnnotationSettingsView, &AnnotationSettingsView::reset, Qt::UniqueConnection);
-
     connect(this, &AnnotationManager::newFiffRawViewModel,
             pAnnotationSettingsView, &AnnotationSettingsView::onNewFiffRawViewModel, Qt::UniqueConnection);
 
