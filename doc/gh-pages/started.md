@@ -18,7 +18,7 @@ This is the quickest way to get MNE-CPP up and running on your machine:
 
 **3 Select the tool you wish to use from the `bin` folder**
 
-  Currently we offer a real-time application: [MNE-Scan](../pages/learn/scan.md); a visualization/analysis application: [MNE Analyze](../learn/analyze.md); and a data anonymization tool: [MNE Anonymize](../pages/learn/anonymize).
+  Currently we offer a real-time application: [MNE-Scan](../pages/learn/scan.md); a visualization/analysis application: [MNE Analyze](../pages/learn/analyze.md); and a data anonymization tool: [MNE Anonymize](../pages/learn/anonymize).
 
 **4 Follow the [guides](../pages/learn/learn.md) on how to use MNE-CPP tools**
 
