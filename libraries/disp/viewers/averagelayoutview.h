@@ -127,7 +127,7 @@ public:
      *
      * @param [in] pEvokedSetModel     The new evoked set model.
      */
-    void setEvokedSetModel(QSharedPointer<EvokedSetModel> &pEvokedSetModel);
+    void setEvokedSetModel(QSharedPointer<EvokedSetModel> pEvokedSetModel);
 
     //=========================================================================================================
     QSharedPointer<EvokedSetModel> getEvokedSetModel();
