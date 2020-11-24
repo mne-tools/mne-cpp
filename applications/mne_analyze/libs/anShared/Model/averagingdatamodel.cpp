@@ -146,3 +146,14 @@ QSharedPointer<FIFFLIB::FiffInfo> AveragingDataModel::getFiffInfo()
     QSharedPointer<FIFFLIB::FiffInfo> pInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FIFFLIB::FiffInfo(m_pFiffEvokedSet->info));
     return pInfo;
 }
+
+//=============================================================================================================
+
+QSharedPointer<FIFFLIB::FiffEvokedSet> AveragingDataModel::getEvokedSet()
+{
+    if (!m_pFiffEvokedSet){
+        return Q_NULLPTR;
+    } else {
+        return m_pFiffEvokedSet;
+    }
+}
