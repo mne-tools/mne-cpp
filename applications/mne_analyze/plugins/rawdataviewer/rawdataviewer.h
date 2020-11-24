@@ -131,12 +131,6 @@ private:
 
     //=========================================================================================================
     /**
-     * Sets up control widgets, connects all relevant signals and slots, and diplays controls to user
-     */
-    void updateControls();
-
-    //=========================================================================================================
-    /**
      * Handles if a new sample position should be dispatched
      *
      * @param [in] iSample    The sample to be send.
@@ -158,8 +152,6 @@ private:
     int                                             m_iSamplesPerBlock;         /**< The samples per data block. Default is set to sampling frequency. */
     int                                             m_iVisibleBlocks;           /**< The amount of visible data blocks. Default is set to 10. */
     int                                             m_iBufferBlocks;            /**< The amount of buffered data blocks. Default is set to 10. */
-
-    QPointer<DISPLIB::FiffRawViewSettings>          m_pSettingsViewWidget;      /**< The fiff raw view settings, which needs to be updated between file sessions. */
 
     QPointer<FiffRawView>                           m_pFiffRawView;             /**< View for Fiff data. */
 };

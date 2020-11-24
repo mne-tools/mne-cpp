@@ -132,7 +132,7 @@ void AverageLayoutView::setChannelInfoModel(QSharedPointer<ChannelInfoModel> &pC
 
 //=============================================================================================================
 
-void AverageLayoutView::setEvokedSetModel(QSharedPointer<EvokedSetModel> &pEvokedSetModel)
+void AverageLayoutView::setEvokedSetModel(QSharedPointer<EvokedSetModel> pEvokedSetModel)
 {
     connect(pEvokedSetModel.data(), &EvokedSetModel::dataChanged,
             this, &AverageLayoutView::updateData, Qt::UniqueConnection);
