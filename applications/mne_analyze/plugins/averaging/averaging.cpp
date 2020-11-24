@@ -710,16 +710,12 @@ void Averaging::triggerLoadingEnd(QString sMessage)
 void Averaging::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel)
 {
     //Butterfly view
-    if(pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
+    if(pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_AVERAGING_MODEL) {
         if(m_pButterflyView->getEvokedSetModel()->getEvokedSet() == qSharedPointerCast<AveragingDataModel>(pRemovedModel)->getEvokedSet()) {
-
+            m_pButterflyView->setEvokedSetModel(Q_NULLPTR);
         }
-    }
-
-    //Avg Layout View
-    if(pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
         if(m_pAverageLayoutView->getEvokedSetModel()->getEvokedSet() == qSharedPointerCast<AveragingDataModel>(pRemovedModel)->getEvokedSet()) {
-
+            m_pAverageLayoutView->setEvokedSetModel(Q_NULLPTR);
         }
     }
 }

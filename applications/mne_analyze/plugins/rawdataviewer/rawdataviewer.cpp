@@ -255,34 +255,6 @@ void RawDataViewer::onModelChanged(QSharedPointer<AbstractModel> pNewModel)
 
 //=============================================================================================================
 
-void RawDataViewer::updateControls()
-{
-    if(m_pSettingsViewWidget) {
-        // Setup view settings widget
-        connect(m_pSettingsViewWidget.data(), &DISPLIB::FiffRawViewSettings::signalColorChanged,
-                m_pFiffRawView.data(), &FiffRawView::setSignalColor, Qt::UniqueConnection);
-        connect(m_pSettingsViewWidget.data(), &DISPLIB::FiffRawViewSettings::backgroundColorChanged,
-                m_pFiffRawView.data(), &FiffRawView::setBackgroundColor, Qt::UniqueConnection);
-        connect(m_pSettingsViewWidget.data(), &DISPLIB::FiffRawViewSettings::zoomChanged,
-                m_pFiffRawView.data(), &FiffRawView::setZoom, Qt::UniqueConnection);
-        connect(m_pSettingsViewWidget.data(), &DISPLIB::FiffRawViewSettings::timeWindowChanged,
-                m_pFiffRawView.data(), &FiffRawView::setWindowSize, Qt::UniqueConnection);
-        connect(m_pSettingsViewWidget.data(), &DISPLIB::FiffRawViewSettings::distanceTimeSpacerChanged,
-                m_pFiffRawView.data(), &FiffRawView::setDistanceTimeSpacer, Qt::UniqueConnection);
-        connect(m_pSettingsViewWidget.data(), &DISPLIB::FiffRawViewSettings::makeScreenshot,
-                m_pFiffRawView.data(), &FiffRawView::onMakeScreenshot, Qt::UniqueConnection);
-
-        // Preserve settings between different file sessions
-        m_pFiffRawView->setWindowSize(m_pSettingsViewWidget->getWindowSize());
-        m_pFiffRawView->setSignalColor(m_pSettingsViewWidget->getSignalColor());
-        m_pFiffRawView->setBackgroundColor(m_pSettingsViewWidget->getBackgroundColor());
-        m_pFiffRawView->setZoom(m_pSettingsViewWidget->getZoom());
-        m_pFiffRawView->setDistanceTimeSpacer(m_pSettingsViewWidget->getDistanceTimeSpacer());
-    }
-}
-
-//=============================================================================================================
-
 void RawDataViewer::onSendSamplePos(int iSample)
 {
     QVariant data;
