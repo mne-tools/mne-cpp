@@ -318,7 +318,7 @@ void Renderable3DEntity::setRotY(float rotY)
         return;
     }
 
-    // Revert X rotation translation because we are in the set (not apply) function
+    // Revert Y rotation translation because we are in the set (not apply) function
     QMatrix4x4 m = m_pTransform->matrix();
     m.rotate(-m_fRotY + rotY, QVector3D(0.0f, 1.0f, 0.0f));
     m_pTransform->setMatrix(m);
@@ -351,7 +351,7 @@ void Renderable3DEntity::setRotZ(float rotZ)
         return;
     }
 
-    // Revert X rotation translation because we are in the set (not apply) function
+    // Revert Z rotation translation because we are in the set (not apply) function
     QMatrix4x4 m = m_pTransform->matrix();
     m.rotate(-m_fRotZ + rotZ, QVector3D(0.0f, 0.0f, 1.0f));
     m_pTransform->setMatrix(m);
