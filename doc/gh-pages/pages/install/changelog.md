@@ -40,12 +40,12 @@ MNE RtServer
 
 ### API librariers
 
-## Disp3D
+Disp3D
  * Fix fiducial coloring problem in Disp3D
  * Change fiducial colors to match the ones of mne-python
  * Add remove option to context menu (right click) in the Control3DView. Subsequently, the 3D data is removed from the 3D data model and view
 
-## Disp
+Disp
  * New Dipole Fit View.
 
 ### Continuous Integration 
