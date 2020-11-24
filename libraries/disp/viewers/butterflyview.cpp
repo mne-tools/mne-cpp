@@ -607,3 +607,14 @@ void ButterflyView::createPlotPath(qint32 row, QPainter& painter) const
         }
     }
 }
+
+//=============================================================================================================
+
+QSharedPointer<EvokedSetModel> ButterflyView::getEvokedSetModel()
+{
+    if(!m_pEvokedSetModel){
+        return Q_NULLPTR;
+    } else {
+        return m_pEvokedSetModel;
+    }
+}

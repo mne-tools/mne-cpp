@@ -149,6 +149,9 @@ public:
     void setEvokedSet(QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet);
 
     //=========================================================================================================
+    QSharedPointer<FIFFLIB::FiffEvokedSet> getEvokedSet();
+
+    //=========================================================================================================
     /**
      * The type of this model (MriCoordModel)
      *
