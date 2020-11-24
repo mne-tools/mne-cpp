@@ -716,6 +716,7 @@ void Averaging::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemov
         }
         if(m_pAverageLayoutView->getEvokedSetModel()->getEvokedSet() == qSharedPointerCast<AveragingDataModel>(pRemovedModel)->getEvokedSet()) {
             m_pAverageLayoutView->setEvokedSetModel(Q_NULLPTR);
+            m_pAverageLayoutView->updateData();
         }
     }
 }
