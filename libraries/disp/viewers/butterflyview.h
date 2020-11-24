@@ -121,6 +121,9 @@ public:
     void setEvokedSetModel(QSharedPointer<EvokedSetModel> model);
 
     //=========================================================================================================
+    QSharedPointer<EvokedSetModel> getEvokedSetModel();
+
+    //=========================================================================================================
     /**
      * Perform a data update.
      */

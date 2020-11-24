@@ -785,3 +785,14 @@ void EvokedSetModel::toggleFreeze()
     QVector<int> roles; roles << Qt::DisplayRole;
     emit dataChanged(topLeft, bottomRight, roles);
 }
+
+//=============================================================================================================
+
+QSharedPointer<FIFFLIB::FiffEvokedSet> EvokedSetModel::getEvokedSet()
+{
+    if (!m_pEvokedSet){
+        return Q_NULLPTR;
+    } else {
+        return m_pEvokedSet;
+    }
+}

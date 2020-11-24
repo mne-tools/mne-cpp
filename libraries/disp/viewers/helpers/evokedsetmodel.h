@@ -203,6 +203,9 @@ public:
     void setEvokedSet(QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet);
 
     //=========================================================================================================
+    QSharedPointer<FIFFLIB::FiffEvokedSet> getEvokedSet();
+
+    //=========================================================================================================
     /**
      * Update stored data
      */

@@ -130,6 +130,9 @@ public:
     void setEvokedSetModel(QSharedPointer<EvokedSetModel> &pEvokedSetModel);
 
     //=========================================================================================================
+    QSharedPointer<EvokedSetModel> getEvokedSetModel();
+
+    //=========================================================================================================
     /**
      * Sets the background color of the scene.
      *

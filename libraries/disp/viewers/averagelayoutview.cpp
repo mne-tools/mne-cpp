@@ -427,3 +427,14 @@ void AverageLayoutView::setFiffInfo(const QSharedPointer<FIFFLIB::FiffInfo> pFif
 {
     m_pFiffInfo = pFiffInfo;
 }
+
+//=============================================================================================================
+
+QSharedPointer<EvokedSetModel> AverageLayoutView::getEvokedSetModel()
+{
+    if(!m_pEvokedSetModel){
+        return Q_NULLPTR;
+    } else {
+        return m_pEvokedSetModel;
+    }
+}
