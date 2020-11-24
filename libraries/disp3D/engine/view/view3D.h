@@ -241,7 +241,8 @@ protected:
     QPointer<Qt3DRender::QRenderCaptureReply>   m_pScreenCaptureReply;          /**< The capture reply object to save screenshots. */
     QPointer<Qt3DRender::QObjectPicker>         m_pPicker;                      /**< The Picker entity. */
 
-    QList<QPointer<QPropertyAnimation> >        m_lPropertyAnimations;          /**< The animations for each 3D object. */
+    QSharedPointer<QParallelAnimationGroup>     m_pParallelAnimationGroup;      /**< The animations for each 3D object. */
+
     QList<QPointer<Qt3DRender::QPointLight> >   m_lLightSources;                /**< The light sources. */
 
 signals:

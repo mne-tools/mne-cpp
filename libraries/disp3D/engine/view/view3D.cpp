@@ -362,13 +362,14 @@ void View3D::startModelRotationRecursive(QObject* pObject)
 {
     //TODO this won't work with QEntities
     if(Renderable3DEntity* pItem = dynamic_cast<Renderable3DEntity*>(pObject)) {
-        QPropertyAnimation *anim = new QPropertyAnimation(pItem, QByteArrayLiteral("rotZ"));
-        anim->setDuration(30000);
-        anim->setStartValue(QVariant::fromValue(pItem->rotZ()));
-        anim->setEndValue(QVariant::fromValue(pItem->rotZ() + 360.0f));
-        anim->setLoopCount(-1);
-        anim->start();
-        m_lPropertyAnimations << anim;
+        if(!dynamic_cast<Renderable3DEntity*>(pItem->parent())) {
+            QPropertyAnimation *anim = new QPropertyAnimation(pItem, QByteArrayLiteral("rotZ"));
+            anim->setDuration(30000);
+            anim->setStartValue(QVariant::fromValue(pItem->rotZ()));
+            anim->setEndValue(QVariant::fromValue(pItem->rotZ() + 360.0f));
+            anim->setLoopCount(-1);
+            m_pParallelAnimationGroup->addAnimation(anim);
+        }
     }
 
     for(int i = 0; i < pObject->children().size(); ++i) {
@@ -378,7 +379,8 @@ void View3D::startModelRotationRecursive(QObject* pObject)
 
 //=============================================================================================================
 
-void View3D::setCameraRotation(float fAngle) {
+void View3D::setCameraRotation(float fAngle)
+{
     m_pCamera->setPosition(QVector3D(0.0f, -0.4f, -0.25f));
     m_pCamera->setViewCenter(QVector3D(0.0f, 0.0f, 0.0f));
     m_pCamera->setUpVector(QVector3D(0.0f, 1.0f, 0.0f));
@@ -398,17 +400,21 @@ void View3D::setCameraRotation(float fAngle) {
 
 void View3D::startStopModelRotation(bool checked)
 {
+    if(!m_pParallelAnimationGroup) {
+        m_pParallelAnimationGroup = QSharedPointer<QParallelAnimationGroup>::create();
+    }
+
     if(checked) {
         //Start animation
-        m_lPropertyAnimations.clear();
+        m_pParallelAnimationGroup->clear();
 
         for(int i = 0; i < m_p3DObjectsEntity->children().size(); ++i) {
             startModelRotationRecursive(m_p3DObjectsEntity->children().at(i));
         }
+
+        m_pParallelAnimationGroup->start();
     }
     else {
-        for(int i = 0; i < m_lPropertyAnimations.size(); ++i) {
-            m_lPropertyAnimations.at(i)->stop();
-        }
+        m_pParallelAnimationGroup->stop();
     }
 }
