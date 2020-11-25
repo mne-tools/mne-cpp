@@ -300,3 +300,10 @@ void FwdSettingsView::showAtlasDirDialog()
         m_pUi->m_qLabel_atlasStat->setText("not loaded");
     }
 }
+
+//=============================================================================================================
+
+void FwdSettingsView::clearView()
+{
+
+}

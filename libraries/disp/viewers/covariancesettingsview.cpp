@@ -156,3 +156,10 @@ void CovarianceSettingsView::updateProcessingMode(ProcessingMode mode)
             break;
     }
 }
+
+//=============================================================================================================
+
+void CovarianceSettingsView::clearView()
+{
+
+}

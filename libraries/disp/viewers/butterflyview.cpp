@@ -618,3 +618,10 @@ QSharedPointer<EvokedSetModel> ButterflyView::getEvokedSetModel()
         return m_pEvokedSetModel;
     }
 }
+
+//=============================================================================================================
+
+void ButterflyView::clearView()
+{
+
+}

@@ -440,3 +440,10 @@ QSharedPointer<EvokedSetModel> AverageLayoutView::getEvokedSetModel()
         return m_pEvokedSetModel;
     }
 }
+
+//=============================================================================================================
+
+void AverageLayoutView::clearView()
+{
+
+}
