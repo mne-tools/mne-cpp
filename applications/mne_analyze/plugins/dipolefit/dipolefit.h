@@ -158,6 +158,14 @@ private:
 
     //=========================================================================================================
     /**
+     * Handles clearing view if currently used model is being removed
+     *
+     * @param [in] pRemovedModel    Pointer to model being removed
+     */
+    void onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel);
+
+    //=========================================================================================================
+    /**
      * Set new baseline parameters
      *
      * @param [in] iBMin    baseline start time in milliseconds
@@ -312,6 +320,15 @@ signals:
      * @param [in] sModelName
      */
     void newMeasurment(const QString& sModelName);
+
+    //=========================================================================================================
+    /**
+     * Removes model from view
+     *
+     * @param [in] sModelName   name of model to be removed
+     * @param [in] iType        type of model (1-measurement, 2-BEM, 3-MRI, 4-Cov)
+     */
+    void removeModel(const QString& sModelName, int iType);
 
     //=========================================================================================================
     /**

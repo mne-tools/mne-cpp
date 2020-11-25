@@ -123,9 +123,24 @@ public:
 
     //=========================================================================================================
     /**
+     * Removes model from view
+     *
+     * @param [in] sModelName   name of model to be removed
+     * @param [in] iType        type of model (1-measurement, 2-BEM, 3-MRI, 4-Cov)
+     */
+    void removeModel(const QString& sModelName, int iType);
+
+    //=========================================================================================================
+    /**
      * Sends updated signals for parameters (excluding selected models)
      */
     void requestParams();
+
+    //=========================================================================================================
+    /**
+     * Clears the view
+     */
+    void clearView();
 
 protected:
     //=========================================================================================================
@@ -284,12 +299,6 @@ signals:
      * @param [in] sName    file name
      */
     void selectedMeas(const QString& sName);
-
-    //=========================================================================================================
-    /**
-     * Clears the view
-     */
-    void clearView();
 
 };
 }//namespace

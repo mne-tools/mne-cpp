@@ -662,3 +662,11 @@ void FiffRawView::showAllChannels()
         pDelegate->setUpperItemIndex(m_pTableView->rowAt(0));
     }
 }
+
+//=============================================================================================================
+
+void FiffRawView::clearView()
+{
+    reset();
+}
+

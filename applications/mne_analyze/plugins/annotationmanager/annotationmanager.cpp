@@ -168,18 +168,18 @@ QWidget *AnnotationManager::getView()
 void AnnotationManager::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
-        case EVENT_TYPE::NEW_ANNOTATION_ADDED:
-            emit newAnnotationAvailable(e->getData().toInt());
-            onTriggerRedraw();
-            break;
-        case EVENT_TYPE::SELECTED_MODEL_CHANGED:
-            onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
-            break;
-        case MODEL_REMOVED:
-            onModelRemoved(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
-            break;
-        default:
-            qWarning() << "[AnnotationManager::handleEvent] Received an Event that is not handled by switch cases.";
+    case EVENT_TYPE::NEW_ANNOTATION_ADDED:
+        emit newAnnotationAvailable(e->getData().toInt());
+        onTriggerRedraw();
+        break;
+    case EVENT_TYPE::SELECTED_MODEL_CHANGED:
+        onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
+        break;
+    case MODEL_REMOVED:
+        onModelRemoved(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
+        break;
+    default:
+        qWarning() << "[AnnotationManager::handleEvent] Received an Event that is not handled by switch cases.";
     }
 }
 
