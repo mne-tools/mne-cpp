@@ -158,14 +158,17 @@ QWidget *ChannelSelection::getView()
 void ChannelSelection::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
-        case EVENT_TYPE::SELECTED_MODEL_CHANGED:
-            if(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >()->getType() != ANSHAREDLIB_BEMDATA_MODEL) {
-                onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
-            }
-            break;
-        default:
-            qWarning() << "[ChannelSelection::handleEvent] received an Event that is not handled by switch-cases";
-            break;
+    case EVENT_TYPE::SELECTED_MODEL_CHANGED:
+        if(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >()->getType() != ANSHAREDLIB_BEMDATA_MODEL) {
+            onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
+        }
+        break;
+    case MODEL_REMOVED:
+        onModelRemoved(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
+        break;
+    default:
+        qWarning() << "[ChannelSelection::handleEvent] received an Event that is not handled by switch-cases";
+        break;
     }
 }
 
@@ -175,6 +178,7 @@ QVector<EVENT_TYPE> ChannelSelection::getEventSubscriptions(void) const
 {
     QVector<EVENT_TYPE> temp;
     temp.push_back(SELECTED_MODEL_CHANGED);
+    temp.push_back(MODEL_REMOVED);
 
     return temp;
 }
@@ -262,4 +266,11 @@ void ChannelSelection::onSelectionChanged(const QList<QGraphicsItem*>& selectedC
     m_pSelectionItem->m_sViewsToApply = m_pApplyToView->getSelectedViews();
 
     m_pCommu->publishEvent(EVENT_TYPE::CHANNEL_SELECTION_ITEMS, QVariant::fromValue(/*static_cast<void*>(*/m_pSelectionItem/*)*/));
+}
+
+//=============================================================================================================
+
+void ChannelSelection::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel)
+{
+
 }

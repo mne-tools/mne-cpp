@@ -137,6 +137,14 @@ private:
 
     //=========================================================================================================
     /**
+     * Handles clearing view if currently used model is being removed
+     *
+     * @param [in] pRemovedModel    Pointer to model being removed
+     */
+    void onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel);
+
+    //=========================================================================================================
+    /**
      * Sets up channel info model and Channel selection view / subsequently updates with new fiff info
      *
      * @param [in] pFiffInfo    FiffInfo for currently loaded file
