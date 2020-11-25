@@ -309,7 +309,7 @@ void RawDataViewer::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pR
 {
     if(pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
         if(m_pFiffRawView->getModel() == pRemovedModel) {
-            m_pFiffRawView->reset();
+            m_pFiffRawView->clearView();
             return;
         }
     }

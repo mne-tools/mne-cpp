@@ -122,6 +122,11 @@ private:
     void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
 
     //=========================================================================================================
+    /**
+     * Handles clearing view if currently used model is being removed
+     *
+     * @param [in] pRemovedModel    Pointer to model being removed
+     */
     void onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel);
 
     //=========================================================================================================

@@ -44,6 +44,7 @@
 //=============================================================================================================
 
 #include <QDateTime>
+#include <QtDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -332,5 +333,48 @@ void DipoleFitView::addMeas(const QString &sFileName)
 
 void DipoleFitView::clearView()
 {
+    m_pUi->comboBox_meas->clear();
+    m_pUi->comboBox_bem->clear();
+    m_pUi->comboBox_mri->clear();
+    m_pUi->comboBox_noise->clear();
+}
 
+//=============================================================================================================
+
+void DipoleFitView::removeModel(const QString &sModelName, int iType)
+{
+    switch (iType){
+    case 1: {
+        int iIndex = m_pUi->comboBox_meas->findText(sModelName);
+        if(iIndex != -1){
+            m_pUi->comboBox_meas->removeItem(iIndex);
+        }
+        break;
+    }
+    case 2: {
+        int iIndex = m_pUi->comboBox_bem->findText(sModelName);
+        if(iIndex != -1){
+            m_pUi->comboBox_bem->removeItem(iIndex);
+        }
+        break;
+    }
+    case 3: {
+        int iIndex = m_pUi->comboBox_mri->findText(sModelName);
+        if(iIndex != -1){
+            m_pUi->comboBox_mri->removeItem(iIndex);
+        }
+        break;
+    }
+    case 4: {
+        int iIndex = m_pUi->comboBox_noise->findText(sModelName);
+        if(iIndex != -1){
+            m_pUi->comboBox_noise->removeItem(iIndex);
+        }
+        break;
+    }
+    default:{
+        qWarning() << "[DipoleFitView::removeModel] Model type not recognized";
+        break;
+    }
+    }
 }

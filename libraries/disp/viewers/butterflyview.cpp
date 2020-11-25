@@ -623,5 +623,5 @@ QSharedPointer<EvokedSetModel> ButterflyView::getEvokedSetModel()
 
 void ButterflyView::clearView()
 {
-
+    setEvokedSetModel(Q_NULLPTR);
 }

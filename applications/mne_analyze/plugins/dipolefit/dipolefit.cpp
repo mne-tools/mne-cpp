@@ -139,6 +139,8 @@ QDockWidget *DipoleFit::getControl()
             pDipoleView, &DISPLIB::DipoleFitView::addMeas, Qt::UniqueConnection);
     connect(this, &DipoleFit::getUpdate,
             pDipoleView, &DISPLIB::DipoleFitView::requestParams, Qt::UniqueConnection);
+    connect(this, &DipoleFit::removeModel,
+            pDipoleView, &DISPLIB::DipoleFitView::removeModel, Qt::UniqueConnection);
 
     //Receive Gui updates
     connect(pDipoleView, &DISPLIB::DipoleFitView::modalityChanged,
@@ -198,6 +200,9 @@ void DipoleFit::handleEvent(QSharedPointer<Event> e)
     case EVENT_TYPE::SELECTED_MODEL_CHANGED:
         onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
         break;
+    case MODEL_REMOVED:
+        onModelRemoved(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
+        break;
     default:
         qWarning() << "[DipoleFit::handleEvent] received an Event that is not handled by switch-cases";
         break;
@@ -210,6 +215,7 @@ QVector<EVENT_TYPE> DipoleFit::getEventSubscriptions(void) const
 {
     QVector<EVENT_TYPE> temp;
     temp.push_back(SELECTED_MODEL_CHANGED);
+    temp.push_back(MODEL_REMOVED);
     return temp;
 }
 
@@ -498,4 +504,28 @@ INVERSELIB::ECDSet DipoleFit::dipoleFitCalculation()
 void DipoleFit::dipoleFitResults()
 {
     newDipoleFit(m_Future.result(), m_sFitName);
+}
+
+//=============================================================================================================
+
+void DipoleFit::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel)
+{
+    for(QSharedPointer<ANSHAREDLIB::AbstractModel> pModel : m_ModelList){
+        if (pModel == pRemovedModel){
+            m_ModelList.removeAt(m_ModelList.indexOf(pModel));
+
+            if(pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
+                emit removeModel(QFileInfo(pRemovedModel->getModelPath()).fileName(), 1);
+            } else if(pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_AVERAGING_MODEL) {
+                emit removeModel(QFileInfo(pRemovedModel->getModelPath()).fileName(), 1);
+            } else if(pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_BEMDATA_MODEL) {
+                emit removeModel(QFileInfo(pRemovedModel->getModelPath()).fileName(), 2);
+            } else if(pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_NOISE_MODEL) {
+                emit removeModel(QFileInfo(pRemovedModel->getModelPath()).fileName(), 4);
+            } else if(pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_MRICOORD_MODEL) {
+                emit removeModel(QFileInfo(pRemovedModel->getModelPath()).fileName(), 3);
+            }
+            return;
+        }
+    }
 }
