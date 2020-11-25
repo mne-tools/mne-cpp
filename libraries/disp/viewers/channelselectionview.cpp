@@ -854,5 +854,5 @@ bool ChannelSelectionView::isSelectionEmpty()
 
 void ChannelSelectionView::clearView()
 {
-
+    m_pSelectionScene->clear();
 }

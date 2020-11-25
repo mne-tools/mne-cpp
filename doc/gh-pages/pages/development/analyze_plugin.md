@@ -131,6 +131,10 @@ switch (e->getType()) {
         qWarning() << "[Averaging::handleEvent] Received an Event that is not handled by switch cases.";
 ```
 
+## Using the event system
+
+Events are how the plugins in MNE Analyze communicate with each other. If your plugin needs to know about any new data that was loaded, any new item being selected, or wants to make use of any of the scaling or channel selection controls already provided by other plugins, you can subscribe to the relevant events. If you plugin needs to instead send out data, you can send the relevant events or create new ones to suit you needs. See the page on the [event system](analyze_events.md).
+
 ## Static Building
 
 When building statically, MNE Analyze needs to be told about the plugins at build time. To do this, the plugins are included with `Q_IMPORT_PLUGIN` in `applications/mne_analyze/mne_analyze/main.cpp` under the `#ifdef STATICBUILD` macro, as well as in `applications/mne_analyze/mne_analyze/mne_analyze.pro` under the section that checks for static builds, `contains(MNECPP_CONFIG, static)`.
