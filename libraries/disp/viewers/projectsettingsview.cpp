@@ -482,3 +482,9 @@ void ProjectSettingsView::onRecordingTimerStateChanged(bool state)
     emit recordingTimerStateChanged(state);
 }
 
+//=============================================================================================================
+
+void ProjectSettingsView::clearView()
+{
+
+}

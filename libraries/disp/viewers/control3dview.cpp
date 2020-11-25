@@ -376,3 +376,9 @@ void Control3DView::onLightIntensityChanged(double value)
     emit lightIntensityChanged(value);
 }
 
+//=============================================================================================================
+
+void Control3DView::clearView()
+{
+
+}

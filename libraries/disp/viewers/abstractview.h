@@ -143,6 +143,12 @@ public:
      */
     virtual void updateProcessingMode(ProcessingMode mode) = 0;
 
+    //=========================================================================================================
+    /**
+     * Clears the view
+     */
+    virtual void clearView() = 0;
+
 protected:
 
     bool            m_bResearchModeIsActive;  /**< The flag describing whether the research mode of the view is active or not. */

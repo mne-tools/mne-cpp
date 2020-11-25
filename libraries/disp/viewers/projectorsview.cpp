@@ -273,3 +273,10 @@ void ProjectorsView::onCheckProjStatusChanged()
 
     saveSettings();
 }
+
+//=============================================================================================================
+
+void ProjectorsView::clearView()
+{
+
+}

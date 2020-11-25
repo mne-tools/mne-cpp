@@ -547,3 +547,10 @@ void FilterDesignView::onBtnLoadFilter()
         qDebug()<<"Could not load filter.";
     }
 }
+
+//=============================================================================================================
+
+void FilterDesignView::clearView()
+{
+
+}

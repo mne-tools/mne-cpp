@@ -109,6 +109,12 @@ public:
      */
     void selectClear(bool);
 
+    //=========================================================================================================
+    /**
+     * Clears the view
+     */
+    void clearView();
+
     QList<QString> getSelectedViews();
 
 protected:

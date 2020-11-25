@@ -249,3 +249,10 @@ void FilterSettingsView::onFilterChannelTypeChanged(const QString& sType)
 
     saveSettings();
 }
+
+//=============================================================================================================
+
+void FilterSettingsView::clearView()
+{
+
+}

@@ -260,6 +260,12 @@ protected:
      */
     void onLightIntensityChanged(double value);
 
+    //=========================================================================================================
+    /**
+     * Clears the view
+     */
+    void clearView();
+
     Ui::Control3DViewWidget*    m_pUi;                      /**< The pointer to the QtDesigner ui class. */
 
     QColor                      m_colCurrentSceneColor;     /**< Current color of the scene in all View3D's. */
