@@ -280,3 +280,10 @@ void ConnectivitySettingsView::onFrequencyBandChanged()
                          m_pUi->m_spinBox_freqHigh->value());
     saveSettings();
 }
+
+//=============================================================================================================
+
+void ConnectivitySettingsView::clearView()
+{
+
+}

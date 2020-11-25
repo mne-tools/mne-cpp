@@ -670,3 +670,10 @@ void ScalingView::onUpdateSliderScaling(int value)
 
     saveSettings();
 }
+
+//=============================================================================================================
+
+void ScalingView::clearView()
+{
+
+}

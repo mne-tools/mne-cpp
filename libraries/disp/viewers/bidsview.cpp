@@ -354,3 +354,10 @@ void BidsView::onModelReset()
 {
     m_pUi->m_pTreeView->expandAll();
 }
+
+//=============================================================================================================
+
+void BidsView::clearView()
+{
+
+}

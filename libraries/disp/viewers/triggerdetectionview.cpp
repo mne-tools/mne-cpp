@@ -322,3 +322,10 @@ QString TriggerDetectionView::getSelectedStimChannel()
 {
     return m_pUi->m_comboBox_triggerChannels->currentText();
 }
+
+//=============================================================================================================
+
+void TriggerDetectionView::clearView()
+{
+
+}

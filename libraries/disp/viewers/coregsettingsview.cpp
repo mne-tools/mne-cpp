@@ -645,3 +645,10 @@ void CoregSettingsView::onFitICP()
     m_pUi->m_qCheckBox_PickFiducials->setChecked(false);
     emit fitICP();
 }
+
+//=============================================================================================================
+
+void CoregSettingsView::clearView()
+{
+
+}

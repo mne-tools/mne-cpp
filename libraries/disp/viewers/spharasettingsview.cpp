@@ -190,3 +190,10 @@ void SpharaSettingsView::onSpharaOptionsChanged()
                               m_pUi->m_spinBox_spharaFirst->value(),
                               m_pUi->m_spinBox_spharaSecond->value());
 }
+
+//=============================================================================================================
+
+void SpharaSettingsView::clearView()
+{
+
+}

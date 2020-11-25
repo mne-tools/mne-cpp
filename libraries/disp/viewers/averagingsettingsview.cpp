@@ -465,3 +465,10 @@ QString AveragingSettingsView::getCurrentSelectGroup()
 {
     return m_pUi->comboBox_EventGroup->currentText();
 }
+
+//=============================================================================================================
+
+void AveragingSettingsView::clearView()
+{
+
+}

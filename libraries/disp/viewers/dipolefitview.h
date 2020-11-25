@@ -285,6 +285,12 @@ signals:
      */
     void selectedMeas(const QString& sName);
 
+    //=========================================================================================================
+    /**
+     * Clears the view
+     */
+    void clearView();
+
 };
 }//namespace
 

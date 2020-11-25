@@ -172,3 +172,10 @@ void MinimumNormSettingsView::onTimePointValueChanged()
 {
     emit timePointChanged(m_pUi->m_spinBox_timepoint->value());
 }
+
+//=============================================================================================================
+
+void MinimumNormSettingsView::clearView()
+{
+
+}

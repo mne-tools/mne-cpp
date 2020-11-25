@@ -683,3 +683,10 @@ void RtFiffRawView::markChBad()
 
     emit channelMarkingChanged();
 }
+
+//=============================================================================================================
+
+void RtFiffRawView::clearView()
+{
+
+}

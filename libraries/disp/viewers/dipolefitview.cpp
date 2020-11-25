@@ -327,3 +327,10 @@ void DipoleFitView::addMeas(const QString &sFileName)
 
 //    m_pUi->lineEdit_name->setText("Dipole Fit - " + sName + " - " + QDateTime::currentDateTime().toString("MMMM d yyyy hh:mm:ss"));
 }
+
+//=============================================================================================================
+
+void DipoleFitView::clearView()
+{
+
+}

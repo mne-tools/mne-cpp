@@ -849,3 +849,10 @@ bool ChannelSelectionView::isSelectionEmpty()
 {
     return ((m_pUi->m_listWidget_selectionGroups->currentItem()->text() == "All") && (m_pUi->m_listWidget_userDefined->count() == 0));
 }
+
+//=============================================================================================================
+
+void ChannelSelectionView::clearView()
+{
+
+}

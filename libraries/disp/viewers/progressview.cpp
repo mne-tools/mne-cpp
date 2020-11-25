@@ -157,3 +157,10 @@ void ProgressView::setLoadingBarVisible(bool bVisible)
         m_pUi->m_progressBar->hide();
     }
 }
+
+//=============================================================================================================
+
+void ProgressView::clearView()
+{
+
+}

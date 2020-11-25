@@ -374,3 +374,10 @@ void FiffRawViewSettings::onMakeScreenshot()
 {
     emit makeScreenshot(m_pUi->m_comboBox_imageType->currentText());
 }
+
+//=============================================================================================================
+
+void FiffRawViewSettings::clearView()
+{
+
+}

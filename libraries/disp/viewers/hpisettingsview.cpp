@@ -489,3 +489,10 @@ QList<FiffDigPoint> HpiSettingsView::readPolhemusDig(const QString& fileName)
 
     return lDigPoints;
 }
+
+//=============================================================================================================
+
+void HpiSettingsView::clearView()
+{
+
+}
