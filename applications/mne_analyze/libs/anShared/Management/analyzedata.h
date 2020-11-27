@@ -290,6 +290,18 @@ public:
     }
 
 private:
+
+    //=========================================================================================================
+    /**
+     * Returns a list of all items (including child items) in the BidsViewModel;
+     *
+     * @param [in] parent   index of parent to search under. QModelIndex() by default
+     *
+     * @return list of all items in BidsViewModel
+     */
+    QList<QStandardItem*> getAllItems(QModelIndex parent = QModelIndex()) const;
+
+
     QPointer<DISPLIB::BidsViewModel>        m_pData;                    /**< The BidsViewModel that holds all the subject, session, and data items. */
 
     QPointer<ANSHAREDLIB::Communicator>     m_pCommu;
