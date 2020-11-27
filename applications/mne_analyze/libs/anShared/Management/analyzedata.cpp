@@ -81,19 +81,17 @@ AnalyzeData::~AnalyzeData()
 
 QVector<QSharedPointer<AbstractModel> > AnalyzeData::getAllModels(QModelIndex parent) const
 {
-    QVector<QSharedPointer<AbstractModel> > lItems;
+    QVector<QSharedPointer<AbstractModel> > lModels;
+    QList<QStandardItem*> lItemList;
 
-    for(int r = 0; r < m_pData->rowCount(parent); ++r) {
-        QModelIndex index = m_pData->index(r, 0, parent);
-        if(QSharedPointer<AbstractModel> pModel = m_pData->data(index).value<QSharedPointer<AbstractModel> >()) {
-            lItems.append(pModel);
-        }
+    lItemList.append(getAllItems(parent));
 
-        if( m_pData->hasChildren(index) ) {
-            lItems.append(getAllModels(index));
-            return lItems;
+    for(QStandardItem* pItem : lItemList) {
+        if(QSharedPointer<AbstractModel> pModel = pItem->data().value<QSharedPointer<AbstractModel>>()) {
+            lModels.append(pModel);
         }
     }
+    return lModels;
 }
 
 //=============================================================================================================
@@ -101,21 +99,19 @@ QVector<QSharedPointer<AbstractModel> > AnalyzeData::getAllModels(QModelIndex pa
 QVector<QSharedPointer<AbstractModel> > AnalyzeData::getModelsByType(MODEL_TYPE mtype,
                                                                      QModelIndex parent) const
 {
-    QVector<QSharedPointer<AbstractModel> > lItems;
+    QVector<QSharedPointer<AbstractModel> > lModels;
+    QList<QStandardItem*> lItemList;
 
-    for(int r = 0; r < m_pData->rowCount(parent); ++r) {
-        QModelIndex index = m_pData->index(r, 0, parent);
-        if(QSharedPointer<AbstractModel> pModel = m_pData->data(index).value<QSharedPointer<AbstractModel> >()) {
-            if (pModel->getType() == mtype) {
-                lItems.append(pModel);
+    lItemList.append(getAllItems(parent));
+
+    for(QStandardItem* pItem : lItemList) {
+        if(QSharedPointer<AbstractModel> pModel = pItem->data().value<QSharedPointer<AbstractModel>>()) {
+            if (pModel->getType() == mtype){
+                lModels.append(pModel);
             }
         }
-
-        if( m_pData->hasChildren(index) ) {
-            lItems.append(getModelsByType(mtype, index));
-            return lItems;
-        }
     }
+    return lModels;
 }
 
 //=============================================================================================================
@@ -136,18 +132,15 @@ QSharedPointer<AbstractModel> AnalyzeData::getModelByName(const QString &sName) 
 QSharedPointer<AbstractModel> AnalyzeData::getModelByPath(const QString& sPath,
                                                           QModelIndex parent) const
 {
-    for(int r = 0; r < m_pData->rowCount(parent); ++r) {
-        QModelIndex index = m_pData->index(r, 0, parent);
-        if(QStandardItem* pItem = m_pData->itemFromIndex(index)) {
-            if (pItem->toolTip() == sPath) {
-                if(QSharedPointer<AbstractModel> pModel = pItem->data().value<QSharedPointer<AbstractModel> >()) {
-                    return pModel;
-                }
-            }
-        }
+    QList<QStandardItem*> lItemList;
 
-        if(m_pData->hasChildren(index)) {
-            return getModelByPath(sPath, index);
+    lItemList.append(getAllItems(parent));
+
+    for(QStandardItem* pItem : lItemList) {
+        if(QSharedPointer<AbstractModel> pModel = pItem->data().value<QSharedPointer<AbstractModel>>()) {
+            if(pItem->toolTip() == sPath){
+                return pModel;
+            }
         }
     }
 
@@ -209,3 +202,19 @@ void AnalyzeData::newSelection(const QModelIndex &index)
     }
 }
 
+//=============================================================================================================
+
+QList<QStandardItem*> AnalyzeData::getAllItems(QModelIndex parent) const
+{
+    QList<QStandardItem*> lItemList;
+
+    for(int iRow = 0; iRow < m_pData->rowCount(parent); ++iRow) {
+        QModelIndex index = m_pData->index(iRow, 0, parent);
+        lItemList.append(m_pData->itemFromIndex(index));
+        if( m_pData->hasChildren(index) ) {
+            lItemList.append(getAllItems(index));
+        }
+    }
+
+    return lItemList;
+}
