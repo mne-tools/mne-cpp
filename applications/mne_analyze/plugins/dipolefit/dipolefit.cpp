@@ -225,6 +225,8 @@ void DipoleFit::onPerformDipoleFit(const QString& sFitName)
 {
     m_sFitName = sFitName;
 
+    triggerLoadingStart("Performing Dipole Fit...");
+
     m_Future = QtConcurrent::run(this,
                                  &DipoleFit::dipoleFitCalculation);
 
@@ -504,6 +506,8 @@ INVERSELIB::ECDSet DipoleFit::dipoleFitCalculation()
 void DipoleFit::dipoleFitResults()
 {
     newDipoleFit(m_Future.result(), m_sFitName);
+
+    triggerLoadingEnd("Performing Dipole Fit...");
 }
 
 //=============================================================================================================
@@ -528,4 +532,18 @@ void DipoleFit::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemov
             return;
         }
     }
+}
+
+//=============================================================================================================
+
+void DipoleFit::triggerLoadingStart(QString sMessage)
+{
+    m_pCommu->publishEvent(LOADING_START, QVariant::fromValue(sMessage));
+}
+
+//=============================================================================================================
+
+void DipoleFit::triggerLoadingEnd(QString sMessage)
+{
+    m_pCommu->publishEvent(LOADING_END, QVariant::fromValue(sMessage));
 }

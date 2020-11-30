@@ -100,29 +100,29 @@ namespace ANSHAREDLIB
         PLUGIN_INIT_FINISHED,       ///< [NO DATA] Send when all plugins finished initializing
         STATUS_BAR_MSG,             ///< [QString] Send a message to the status bar (part of gui)
         SELECTED_MODEL_CHANGED,     ///< [QSharedPointer<ANSHAREDLIB::AbstractModel>>] Send whenever the selection changes in the datamanager plugin
-        NEW_ANNOTATION_ADDED,       ///< event send whenever the user adds a new annotation in the rawdataviewer plugin
-        EVENT_GROUPS_UPDATED,       ///< send when plugins dependent on event groups need to be updated
-        TRIGGER_REDRAW,             ///< send when viewer needs to be updated
-        TRIGGER_ACTIVE_CHANGED,     ///< send when the trigger active state was toggled
-        TRIGGER_VIEWER_MOVE,        ///< send when scroll position of viewer needs to be moved
-        FILTER_CHANNEL_TYPE_CHANGED,///< send when the channel type to be filtered changed
-        FILTER_ACTIVE_CHANGED,      ///< send when the filter active state was toggled
-        FILTER_DESIGN_CHANGED,      ///< send when the designed filter changed
-        CHANNEL_SELECTION_ITEMS,    ///< send when channel selection changes with channel info about graphic items to draw
-        SCALING_MAP_CHANGED,        ///< send when view scaling controls are updated
-        VIEW_SETTINGS_CHANGED,      ///< send to trigger view settings update
-        LOADING_START,              ///< send to start status bar loaidng bar and message
-        LOADING_END,                ///< send to end status bar loading bar and message
-        SELECTED_BEM_CHANGED,       ///< event send whenever the Bem file within the coregistration changed
-        NEW_DIGITIZER_ADDED,        ///< event send whenever new digitizers are loaded
-        NEW_FIDUCIALS_ADDED,        ///< event send whenever new fiducials are loaded
-        NEW_TRANS_AVAILABE,         ///< event send whenever a new head-mri transformation is available
-        FID_PICKING_STATUS,         ///< event send whenever status of fiducial picking has changed
-        NEW_FIDUCIAL_PICKED,        ///< event send whenever a new fiducial was picked
-        FIDUCIAL_CHANGED,           ///< event send when fiducial was changed
-        SET_DATA3D_TREE_MODEL,      ///< send when a new 3D Model is set
-        VIEW3D_SETTINGS_CHANGED,    ///< send to trigger view 3D settings update
-        MODEL_REMOVED               ///< send to alert plugins when model is being removed
+        NEW_ANNOTATION_ADDED,       ///< [int] event send whenever the user adds a new annotation in the rawdataviewer plugin
+        EVENT_GROUPS_UPDATED,       ///< [NO DATA] send when plugins dependent on event groups need to be updated
+        TRIGGER_REDRAW,             ///< [NO DATA] send when viewer needs to be updated
+        TRIGGER_ACTIVE_CHANGED,     ///< [int] send when the trigger active state was toggled
+        TRIGGER_VIEWER_MOVE,        ///< [NO DATA] send when scroll position of viewer needs to be moved
+        FILTER_CHANNEL_TYPE_CHANGED,///< [QString] send when the channel type to be filtered changed
+        FILTER_ACTIVE_CHANGED,      ///< [bool] send when the filter active state was toggled
+        FILTER_DESIGN_CHANGED,      ///< [FilterKernel] send when the designed filter changed
+        CHANNEL_SELECTION_ITEMS,    ///< [send when channel selection changes with channel info about graphic items to draw
+        SCALING_MAP_CHANGED,        ///< [DISPLIB::SelectionItem*] send when view scaling controls are updated
+        VIEW_SETTINGS_CHANGED,      ///< [ANSHAREDLIB::ViewParameters] send to trigger view settings update
+        LOADING_START,              ///< [QString] send to start status bar loaidng bar and message
+        LOADING_END,                ///< [QString] send to end status bar loading bar and message
+        SELECTED_BEM_CHANGED,       ///< [QSharedPointer<ANSHAREDLIB::BemDataModel>] event send whenever the Bem file within the coregistration changed
+        NEW_DIGITIZER_ADDED,        ///< [FIFFLIB::FiffDigPointSet] event send whenever new digitizers are loaded
+        NEW_FIDUCIALS_ADDED,        ///< [FIFFLIB::FiffDigPointSet] event send whenever new fiducials are loaded
+        NEW_TRANS_AVAILABE,         ///< [FIFFLIB::FiffCoordTrans] event send whenever a new head-mri transformation is available
+        FID_PICKING_STATUS,         ///< [bool] event send whenever status of fiducial picking has changed
+        NEW_FIDUCIAL_PICKED,        ///< [QVector3D] event send whenever a new fiducial was picked
+        FIDUCIAL_CHANGED,           ///< [int] event send when fiducial was changed
+        SET_DATA3D_TREE_MODEL,      ///< [QSharedPointer<DISP3DLIB::Data3DTreeModel>] send when a new 3D Model is set
+        VIEW3D_SETTINGS_CHANGED,    ///< [ANSHAREDLIB::View3DParameters] send to trigger view 3D settings update
+        MODEL_REMOVED               ///< [QSharedPointer<ANSHAREDLIB::AbstractModel>>] send to alert plugins when model is being removed
     };
 
     //=========================================================================================================

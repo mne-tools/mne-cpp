@@ -275,6 +275,20 @@ private:
      */
     void dipoleFitResults();
 
+    //=============================================================================================================
+    /**
+     * Sends event to trigger loading bar to appear and sMessage to show
+     *
+     * @param [in] sMessage     loading bar message
+     */
+    void triggerLoadingStart(QString sMessage);
+
+    //=============================================================================================================
+    /**
+     * Sends event to hide loading bar
+     */
+    void triggerLoadingEnd(QString sMessage);
+
     QList<QSharedPointer<ANSHAREDLIB::AbstractModel>>       m_ModelList;            /**< List of models used in dipole fitting. Usded for storing for later selection */
     INVERSELIB::DipoleFitSettings                           m_DipoleSettings;       /**< Settings for dipole fit */
     QString                                                 m_sFitName;             /**< Fit name for dipole fit */
