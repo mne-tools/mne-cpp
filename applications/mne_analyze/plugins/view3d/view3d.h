@@ -224,13 +224,12 @@ private:
     DISP3DLIB::BemTreeItem*                                 m_pBemTreeCoreg;        /**< TThe BEM head model of the coregistration plugin. */
     DISP3DLIB::DigitizerSetTreeItem*                        m_pDigitizerCoreg;      /**< The 3D item pointing to the tracked digitizers. */
     DISP3DLIB::DigitizerSetTreeItem*                        m_pMriFidCoreg;         /**< The 3D item pointing to the mri fiducials. */
+    DISP3DLIB::EcdDataTreeItem*                             m_pDipoleFit;           /**< The 3D item pointing to the dipole fit */
 
     DISP3DLIB::View3D*                                      m_pView3D;              /**< The Disp3D view. */
     DISPLIB::Control3DView*                                 m_pControl3DView;       /**< The 3D Control view */
 
     bool                                                    m_bPickingActivated;    /**< If Picking is activated*/
-
-    QList<DISP3DLIB::EcdDataTreeItem*>                      m_DipoleFitList;
 
 signals:
     //=========================================================================================================
