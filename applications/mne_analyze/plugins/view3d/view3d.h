@@ -69,6 +69,7 @@ namespace DISP3DLIB {
     class Data3DTreeModel;
     class BemTreeItem;
     class DigitizerSetTreeItem;
+    class EcdDataTreeItem;
 }
 
 namespace DISPLIB {
@@ -207,6 +208,14 @@ private:
      */
     void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
 
+    //=========================================================================================================
+    /**
+     * Handles clearing view if currently used model is being removed
+     *
+     * @param [in] pRemovedModel    Pointer to model being removed
+     */
+    void onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel);
+
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;               /**< To broadcst signals */
 
     int                                                     m_iFiducial;            /**< Currently selected fiducial */
@@ -220,6 +229,8 @@ private:
     DISPLIB::Control3DView*                                 m_pControl3DView;       /**< The 3D Control view */
 
     bool                                                    m_bPickingActivated;    /**< If Picking is activated*/
+
+    QList<DISP3DLIB::EcdDataTreeItem*>                      m_DipoleFitList;
 
 signals:
     //=========================================================================================================

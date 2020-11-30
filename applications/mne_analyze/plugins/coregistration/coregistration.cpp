@@ -781,3 +781,29 @@ void CoRegistration::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> p
         updateBemList(pNewModel);
     }
 }
+
+//=============================================================================================================
+
+void CoRegistration::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel)
+{
+    if(pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_BEMDATA_MODEL){
+        removeFromBemList(pRemovedModel);
+    }
+}
+
+//=============================================================================================================
+
+bool CoRegistration::removeFromBemList(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel)
+{
+    if(m_vecBemDataModels.contains(pNewModel)){
+        int iIndex = m_vecBemDataModels.indexOf(pNewModel);
+        m_vecBemDataModels.remove(iIndex);
+
+        m_pCoregSettingsView->clearSelectionBem();
+        for(auto pBemDataModel : m_vecBemDataModels) {
+            m_pCoregSettingsView->addSelectionBem(pBemDataModel->getModelName());
+        }
+        return true;
+    }
+    return false;
+}
