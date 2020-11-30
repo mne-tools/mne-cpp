@@ -223,9 +223,15 @@ QVector<EVENT_TYPE> View3D::getEventSubscriptions(void) const
 
 //=============================================================================================================
 
-void View3D::updateCoregBem(ANSHAREDLIB::BemDataModel::SPtr pNewModel)
+void View3D::updateCoregBem(QSharedPointer<ANSHAREDLIB::BemDataModel> pNewModel)
 {
-    if(pNewModel->getType() == ANSHAREDLIB_BEMDATA_MODEL) {
+    if(!pNewModel){
+        std::cout << "Empty pointer";
+        return;
+    } else if(!m_p3DModel){
+        std::cout << "Empty model";
+        return;
+    } else if(pNewModel->getType() == ANSHAREDLIB_BEMDATA_MODEL) {
         m_pView3D->activatePicker(true);
         m_pBemTreeCoreg = m_p3DModel->addBemData("Co-Registration", "Surface", *pNewModel->getBem().data());
         m_pView3D->activatePicker(m_bPickingActivated);
@@ -351,5 +357,16 @@ void View3D::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel
 {
     if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_DIPOLEFIT_MODEL) {
         newDipoleFit(qSharedPointerCast<DipoleFitModel>(pNewModel)->data(QModelIndex()).value<INVERSELIB::ECDSet>());
+    }
+}
+
+//=============================================================================================================
+
+void View3D::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel)
+{
+    if(pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_DIPOLEFIT_MODEL) {
+
+    } else if(pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_BEMDATA_MODEL){
+
     }
 }
