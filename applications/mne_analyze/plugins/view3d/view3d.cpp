@@ -54,6 +54,7 @@
 #include <disp3D/engine/model/items/digitizer/digitizertreeitem.h>
 #include <disp3D/engine/model/items/bem/bemtreeitem.h>
 #include <disp3D/engine/model/items/bem/bemsurfacetreeitem.h>
+#include <disp3D/engine/model/items/sourcedata/ecddatatreeitem.h>
 
 #include <disp/viewers/control3dview.h>
 
@@ -233,7 +234,10 @@ void View3D::updateCoregBem(QSharedPointer<ANSHAREDLIB::BemDataModel> pNewModel)
         return;
     } else if(pNewModel->getType() == ANSHAREDLIB_BEMDATA_MODEL) {
         m_pView3D->activatePicker(true);
-        m_pBemTreeCoreg = m_p3DModel->addBemData("Co-Registration", "Surface", *pNewModel->getBem().data());
+        m_pBemTreeCoreg = m_p3DModel->addBemData("Co-Registration",
+                                                 QFileInfo(pNewModel->getModelPath()).fileName(),
+                                                 *pNewModel->getBem().data());
+
         m_pView3D->activatePicker(m_bPickingActivated);
     }
     return;
@@ -348,7 +352,7 @@ void View3D::settingsChanged(ANSHAREDLIB::View3DParameters viewParameters)
 
 void View3D::newDipoleFit(const INVERSELIB::ECDSet &ecdSet)
 {
-    m_p3DModel->addDipoleFitData("subject", "set", ecdSet);
+    m_pDipoleFit = m_p3DModel->addDipoleFitData("subject", "set", ecdSet);
 }
 
 //=============================================================================================================
@@ -365,8 +369,21 @@ void View3D::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel
 void View3D::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel)
 {
     if(pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_DIPOLEFIT_MODEL) {
-
+        QModelIndex index = m_p3DModel->indexFromItem(m_pDipoleFit);
+        m_p3DModel->removeRow(index.row(),
+                              index.parent());
     } else if(pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_BEMDATA_MODEL){
+//        QList<QStandardItem *> lItemList = m_p3DModel->findItems(QFileInfo(pRemovedModel->getModelPath()).fileName());
+//        if(!lItemList.isEmpty()){
+//            for(QStandardItem * pItem : lItemList){
+//                QModelIndex index = m_p3DModel->indexFromItem(pItem);
+//                m_p3DModel->removeRow(index.row(),
+//                                      index.parent());
+//            }
+//        }
+        QModelIndex index = m_p3DModel->indexFromItem(m_pBemTreeCoreg);
+        m_p3DModel->removeRow(index.row(),
+                              index.parent());
 
     }
 }
