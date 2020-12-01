@@ -243,8 +243,6 @@ void CoRegistration::updateBemList(QSharedPointer<ANSHAREDLIB::AbstractModel> pN
             m_pCoregSettingsView->addSelectionBem(pBemDataModel->getModelName());
         }
     }
-
-    qDebug() << "CONTAINS BEM";
 }
 
 //=============================================================================================================
@@ -801,9 +799,12 @@ void CoRegistration::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> p
 
 bool CoRegistration::removeFromBemList(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel)
 {
-    if(m_vecBemDataModels.contains(pNewModel)){
+    while(m_vecBemDataModels.contains(pNewModel)){
         int iIndex = m_vecBemDataModels.indexOf(pNewModel);
         m_vecBemDataModels.remove(iIndex);
+        if(m_sCurrentSelectedBem == QFileInfo(pNewModel->getModelPath()).fileName()){
+            m_sCurrentSelectedBem = "";
+        }
 
         m_pCoregSettingsView->clearSelectionBem();
         for(auto pBemDataModel : m_vecBemDataModels) {

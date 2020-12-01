@@ -123,7 +123,6 @@ void BidsView::customMenuRequested(QPoint pos)
     QString sToolTip = m_pUi->m_pTreeView->model()->data(m_pUi->m_pTreeView->indexAt(pos), Qt::ToolTipRole).toString();
 
     DISPLIB::BidsViewModel *pModel = qobject_cast<DISPLIB::BidsViewModel *>(m_pUi->m_pTreeView->model());
-    qDebug() << "ROW COUNT" << pModel->rowCount();
 
     QAction* pRemoveAction;
 
