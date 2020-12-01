@@ -243,6 +243,8 @@ void CoRegistration::updateBemList(QSharedPointer<ANSHAREDLIB::AbstractModel> pN
             m_pCoregSettingsView->addSelectionBem(pBemDataModel->getModelName());
         }
     }
+
+    qDebug() << "CONTAINS BEM";
 }
 
 //=============================================================================================================

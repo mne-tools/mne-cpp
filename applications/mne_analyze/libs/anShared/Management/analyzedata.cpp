@@ -158,23 +158,32 @@ QStandardItemModel* AnalyzeData::getDataModel()
 
 bool AnalyzeData::removeModel(const QModelIndex& index)
 {
-    QStandardItem* pItem = m_pData->itemFromIndex(index);
-    switch(pItem->data(BIDS_ITEM_TYPE).value<int>()){
-    case BIDS_UNKNOWN:
-    case BIDS_FUNCTIONALDATA:
-        for(QStandardItem* child : pItem->takeColumn(0)){
-            m_pCommu->publishEvent(EVENT_TYPE::MODEL_REMOVED, QVariant::fromValue(child->data().value<QSharedPointer<AbstractModel>>()));
-        }
-    case BIDS_ANATOMICALDATA:
-    case BIDS_BEHAVIORALDATA:
-    case BIDS_AVERAGE:
-    case BIDS_ANNOTATION:
-        m_pCommu->publishEvent(EVENT_TYPE::MODEL_REMOVED, QVariant::fromValue(pItem->data().value<QSharedPointer<AbstractModel>>()));
-        break;
-    default:
-        //No model associated with item
-        break;
+//    QStandardItem* pItem = m_pData->itemFromIndex(index);
+//    switch(pItem->data(BIDS_ITEM_TYPE).value<int>()){
+//    case BIDS_UNKNOWN:
+//    case BIDS_FUNCTIONALDATA:
+//        for(QStandardItem* child : pItem->takeColumn(0)){
+//            m_pCommu->publishEvent(EVENT_TYPE::MODEL_REMOVED, QVariant::fromValue(child->data().value<QSharedPointer<AbstractModel>>()));
+//        }
+//    case BIDS_ANATOMICALDATA:
+//    case BIDS_BEHAVIORALDATA:
+//    case BIDS_AVERAGE:
+//    case BIDS_ANNOTATION:
+//        m_pCommu->publishEvent(EVENT_TYPE::MODEL_REMOVED, QVariant::fromValue(pItem->data().value<QSharedPointer<AbstractModel>>()));
+//        break;
+//    default:
+//        //No model associated with item
+//        break;
+//    }
+
+    QVector<QSharedPointer<AbstractModel>> lModels = getAllModels(index);
+
+    for (QSharedPointer<AbstractModel> pModel : lModels){
+        m_pCommu->publishEvent(EVENT_TYPE::MODEL_REMOVED, QVariant::fromValue(pModel));
     }
+
+    QStandardItem* pItem = m_pData->itemFromIndex(index);
+    m_pCommu->publishEvent(EVENT_TYPE::MODEL_REMOVED, QVariant::fromValue(pItem->data().value<QSharedPointer<AbstractModel>>()));
 
     return m_pData->removeItem(index);
 }
