@@ -201,6 +201,9 @@ void View3D::handleEvent(QSharedPointer<Event> e)
         case SELECTED_MODEL_CHANGED:
             onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
             break;
+        case MODEL_REMOVED:
+            onModelRemoved(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
+            break;
         default:
             qWarning() << "[View3D::handleEvent] Received an Event that is not handled by switch cases.";
     }
@@ -219,6 +222,7 @@ QVector<EVENT_TYPE> View3D::getEventSubscriptions(void) const
     temp.push_back(FIDUCIAL_CHANGED);
     temp.push_back(VIEW3D_SETTINGS_CHANGED);
     temp.push_back(SELECTED_MODEL_CHANGED);
+    temp.push_back(MODEL_REMOVED);
     return temp;
 }
 
@@ -382,8 +386,9 @@ void View3D::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedM
 //            }
 //        }
         QModelIndex index = m_p3DModel->indexFromItem(m_pBemTreeCoreg);
-        m_p3DModel->removeRow(index.row(),
-                              index.parent());
+        m_p3DModel->removeRows(index.row(),
+                               1,
+                               index.parent());
 
     }
 }
