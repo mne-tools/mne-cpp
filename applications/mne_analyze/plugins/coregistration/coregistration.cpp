@@ -211,6 +211,9 @@ void CoRegistration::handleEvent(QSharedPointer<Event> e)
         case SELECTED_MODEL_CHANGED:
             onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
             break;
+        case MODEL_REMOVED:
+            onModelRemoved(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
+            break;
         default:
             qWarning() << "[CoRegistration::handleEvent] received an Event that is not handled by switch-cases";
             break;
@@ -224,6 +227,7 @@ QVector<EVENT_TYPE> CoRegistration::getEventSubscriptions(void) const
     QVector<EVENT_TYPE> temp;
     temp.push_back(NEW_FIDUCIAL_PICKED);
     temp.push_back(SELECTED_MODEL_CHANGED);
+    temp.push_back(MODEL_REMOVED);
     return temp;
 }
 
