@@ -246,7 +246,7 @@ QModelIndex BidsViewModel::addDataToSession(QModelIndex sessionIndex,
 {
     QStandardItem* pSessionItem = itemFromIndex(sessionIndex);
     bool bFolder = false;
-    int iFolder = 0;
+    int iFolder;
 
     QString sFolderName;
 
@@ -263,7 +263,7 @@ QModelIndex BidsViewModel::addDataToSession(QModelIndex sessionIndex,
             sFolderName = "unknown";
     }
 
-    for(iFolder; iFolder < pSessionItem->rowCount(); iFolder++){
+    for(iFolder = 0; iFolder < pSessionItem->rowCount(); iFolder++){
         if (pSessionItem->child(iFolder)->text() == sFolderName){
             bFolder = true;
             break;
@@ -371,6 +371,10 @@ QModelIndex BidsViewModel::moveDataToSession(QModelIndex sessionIndex,
 
 bool BidsViewModel::removeItem(QModelIndex itemIndex)
 {
+    if(!itemIndex.isValid()){
+        return false;
+    }
+
     beginResetModel();
 
     QStandardItem* pItem = itemFromIndex(itemIndex);
@@ -396,12 +400,16 @@ bool BidsViewModel::removeItem(QModelIndex itemIndex)
             }
             return true;
         case BIDS_AVERAGE:
+        case BIDS_ANNOTATION:
+        case BIDS_DIPOLE:
             if(removeRows(itemIndex.row(), 1, itemIndex.parent())){
                 endResetModel();
             }
             return true;
         default:
-            endResetModel();
-            return false;
+            if(removeRows(itemIndex.row(), 1, itemIndex.parent())){
+                endResetModel();
+            }
+            return true;
     }
 }

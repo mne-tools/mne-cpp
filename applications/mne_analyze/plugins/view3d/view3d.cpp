@@ -356,7 +356,7 @@ void View3D::settingsChanged(ANSHAREDLIB::View3DParameters viewParameters)
 
 void View3D::newDipoleFit(const INVERSELIB::ECDSet &ecdSet)
 {
-    m_pDipoleFit = m_p3DModel->addDipoleFitData("subject", "set", ecdSet);
+    m_pDipoleFit = m_p3DModel->addDipoleFitData("Dipole Fit", "Data", ecdSet);
 }
 
 //=============================================================================================================
@@ -373,22 +373,47 @@ void View3D::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel
 void View3D::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel)
 {
     if(pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_DIPOLEFIT_MODEL) {
-        QModelIndex index = m_p3DModel->indexFromItem(m_pDipoleFit);
-        m_p3DModel->removeRow(index.row(),
-                              index.parent());
+        if(!m_pDipoleFit){
+            return;
+        }
+
+        QList<QStandardItem *> lItemList = m_p3DModel->findItems("Dipole Fit");
+        if(!lItemList.isEmpty()){
+            for(QStandardItem * pItem : lItemList){
+                QModelIndex index = m_p3DModel->indexFromItem(pItem);
+                m_p3DModel->removeRows(index.row(),
+                                       1,
+                                       index.parent());
+            }
+        }
+
+        m_pBemTreeCoreg = Q_NULLPTR;
+
+        m_pView3D->hide();
+        m_pView3D->show();
+
     } else if(pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_BEMDATA_MODEL){
-//        QList<QStandardItem *> lItemList = m_p3DModel->findItems(QFileInfo(pRemovedModel->getModelPath()).fileName());
-//        if(!lItemList.isEmpty()){
-//            for(QStandardItem * pItem : lItemList){
-//                QModelIndex index = m_p3DModel->indexFromItem(pItem);
-//                m_p3DModel->removeRow(index.row(),
-//                                      index.parent());
-//            }
-//        }
+        if(!m_pBemTreeCoreg){
+            return;
+        }
+
         QModelIndex index = m_p3DModel->indexFromItem(m_pBemTreeCoreg);
+
         m_p3DModel->removeRows(index.row(),
                                1,
                                index.parent());
 
+        m_p3DModel->removeRows(index.parent().row(),
+                               1,
+                               index.parent().parent());
+
+        m_p3DModel->removeRows(index.parent().parent().row(),
+                               1,
+                               index.parent().parent().parent());
+
+        m_pBemTreeCoreg = Q_NULLPTR;
+
+        m_pView3D->hide();
+        m_pView3D->show();
     }
 }
