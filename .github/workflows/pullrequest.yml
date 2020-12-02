@@ -347,35 +347,19 @@ jobs:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         QTEST_FUNCTION_TIMEOUT: 900000
       run: |
-        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)/lib
-        for test in ./bin/test_*;
-        do
-          # Run all tests and call gcov on all cpp files after each test run. Then upload to codecov for every test run.
-          # Codecov is able to process multiple uploads and merge them as soon as the CI job is done.
-          echo ">> Starting $test"
-          $test
-          find ./libraries -type f -name "*.cpp" -execdir gcov {} \; > /dev/null
-          # Hide codecov output since it corrupts the log too much
-          codecov > /dev/null
-        done
+        ./tools/testing/test_linux_codecov
     - name: Run tests (MacOS)
       if: matrix.os == 'macos-latest'
       env:
         QTEST_FUNCTION_TIMEOUT: 900000
       run: |
-        export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$PWD/lib
-        for test in ./bin/test_*;
-        do
-          echo ">> Starting $test"
-          $test
-        done
+        ./tools/testing/test_macos
     - name: Run tests (Windows)
       if: matrix.os == 'windows-2019'
       env:
         QTEST_FUNCTION_TIMEOUT: 900000
       run: |
-        cd bin
-        Get-ChildItem -Filter test_*.exe | ForEach {Write-Output "" "" Starting $_.Fullname; &$_.Fullname}
+        ./tools/testing/test_win.bat
 
   Doxygen:
     runs-on: ubuntu-16.04
