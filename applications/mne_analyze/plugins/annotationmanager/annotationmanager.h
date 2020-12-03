@@ -170,13 +170,13 @@ private:
     void triggerLoadingEnd(const QString& sMessage);
 
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals */
-    QSharedPointer<ANSHAREDLIB::FiffRawViewModel>           m_pFiffRawModel;
 
 signals:
     void newAnnotationAvailable(int iAnnotation);
     void disconnectFromModel();
     void newAnnotationModelAvailable(QSharedPointer<ANSHAREDLIB::AnnotationModel> pAnnotModel);
     void newFiffRawViewModel(QSharedPointer<ANSHAREDLIB::FiffRawViewModel> pFiffRawModel);
+    void clearView(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel);
 };
 
 } // NAMESPACE

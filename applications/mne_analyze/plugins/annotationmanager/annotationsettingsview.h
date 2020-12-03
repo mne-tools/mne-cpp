@@ -120,6 +120,12 @@ public:
      */
     void disconnectFromModel();
 
+    //=========================================================================================================
+    /**
+     * Clears the view
+     */
+    void clearView(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel);
+
 public slots:
     //=========================================================================================================
     /**

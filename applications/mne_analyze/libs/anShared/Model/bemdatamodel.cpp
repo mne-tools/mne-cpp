@@ -96,7 +96,6 @@ BemDataModel::~BemDataModel()
 
 void BemDataModel::initBemData(QIODevice& qIODevice)
 {
-    std::cout << "InitBemData";
     // build Bem
     m_pBem = MNEBem::SPtr::create(qIODevice);
 
