@@ -163,7 +163,7 @@ void ChannelSelection::handleEvent(QSharedPointer<Event> e)
             onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
         }
         break;
-    case MODEL_REMOVED:
+    case EVENT_TYPE::MODEL_REMOVED:
         onModelRemoved(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
         break;
     default:
