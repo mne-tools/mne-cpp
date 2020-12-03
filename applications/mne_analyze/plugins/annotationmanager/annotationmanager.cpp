@@ -178,7 +178,7 @@ void AnnotationManager::handleEvent(QSharedPointer<Event> e)
     case EVENT_TYPE::SELECTED_MODEL_CHANGED:
         onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
         break;
-    case MODEL_REMOVED:
+    case EVENT_TYPE::MODEL_REMOVED:
         onModelRemoved(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
         break;
     default:

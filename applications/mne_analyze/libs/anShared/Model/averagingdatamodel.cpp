@@ -151,9 +151,5 @@ QSharedPointer<FIFFLIB::FiffInfo> AveragingDataModel::getFiffInfo()
 
 QSharedPointer<FIFFLIB::FiffEvokedSet> AveragingDataModel::getEvokedSet()
 {
-    if (!m_pFiffEvokedSet){
-        return Q_NULLPTR;
-    } else {
-        return m_pFiffEvokedSet;
-    }
+    return Q_NULLPTR;
 }
