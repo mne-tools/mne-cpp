@@ -359,7 +359,7 @@ jobs:
       env:
         QTEST_FUNCTION_TIMEOUT: 900000
       run: |
-        ./tools/testing/test_win.bat
+        ./tools/testing/test_win.ps1
 
   Doxygen:
     runs-on: ubuntu-16.04
