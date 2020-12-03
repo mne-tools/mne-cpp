@@ -16,11 +16,7 @@ In order to build the EEGoSports driver plugin, the `eemagine` folder from the S
 
 The `eemagine` folder includes another folder called `sdk` which holds the necessary header and source files like: `amplifier.h, buffer.h, channel.h, exceptions.h, factory.h, stream.h, version.h, wrapper.cpp` and `wrapper.h`.
 
-In a second step, the eegosports subproject has to be reintegrated into the mne-cpp project. This can be achieved by removing its comment status in the `plugins.pro` file. This file can be found in:
-
-`\mne-cpp\applications\mne_scan\plugins.pro`
-
-In order to reintegrate the eegosports subproject into mne-cpp, its comment status has to be removed in this file. This can be achieved by removing the # sign in front of the eegosports project in the Sensors category.
+In a second step, the eegosports subproject has to be reintegrated into the mne-cpp project. This can be achieved by adding `MNECPP_CONFIG += withEego` in the `mne-cpp.pri` file.
 
 Now, the whole EEGoSports plugin can be rebuilt. MNE Scan will then contain the EEGoSports plugin in its Sensor plugin section.
 
