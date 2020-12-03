@@ -130,6 +130,11 @@ public:
     void setEvokedSetModel(QSharedPointer<EvokedSetModel> pEvokedSetModel);
 
     //=========================================================================================================
+    /**
+     * Returns the currently set EvokedSetModel
+     *
+     * @return the currently set EvokedSetModel
+     */
     QSharedPointer<EvokedSetModel> getEvokedSetModel();
 
     //=========================================================================================================
