@@ -177,31 +177,31 @@ QDockWidget* View3D::getControl()
 void View3D::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
-        case SELECTED_BEM_CHANGED:
+        case EVENT_TYPE::SELECTED_BEM_CHANGED:
             updateCoregBem(e->getData().value<QSharedPointer<ANSHAREDLIB::BemDataModel>>());
             break;
-        case NEW_DIGITIZER_ADDED:
+        case EVENT_TYPE::NEW_DIGITIZER_ADDED:
             updateCoregDigitizer(e->getData().value<FiffDigPointSet>());
             break;
-        case NEW_FIDUCIALS_ADDED:
+        case EVENT_TYPE::NEW_FIDUCIALS_ADDED:
             updateCoregMriFid(e->getData().value<FiffDigPointSet>());
             break;
-        case NEW_TRANS_AVAILABE:
+        case EVENT_TYPE::NEW_TRANS_AVAILABE:
             updateCoregTrans(e->getData().value<FiffCoordTrans>());
             break;
-        case FID_PICKING_STATUS:
+        case EVENT_TYPE::FID_PICKING_STATUS:
             fiducialPicking(e->getData().value<bool>());
             break;
-        case FIDUCIAL_CHANGED:
+        case EVENT_TYPE::FIDUCIAL_CHANGED:
             onFiducialChanged(e->getData().value<int>());
             break;
-        case VIEW3D_SETTINGS_CHANGED:
+        case EVENT_TYPE::VIEW3D_SETTINGS_CHANGED:
             settingsChanged(e->getData().value<ANSHAREDLIB::View3DParameters>());
             break;
-        case SELECTED_MODEL_CHANGED:
+        case EVENT_TYPE::SELECTED_MODEL_CHANGED:
             onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
             break;
-        case MODEL_REMOVED:
+        case EVENT_TYPE::MODEL_REMOVED:
             onModelRemoved(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
             break;
         default:

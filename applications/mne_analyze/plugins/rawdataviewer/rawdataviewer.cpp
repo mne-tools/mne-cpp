@@ -149,31 +149,31 @@ QWidget *RawDataViewer::getView()
 void RawDataViewer::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
-    case TRIGGER_REDRAW:
+    case EVENT_TYPE::TRIGGER_REDRAW:
         if(m_pFiffRawView) {
             m_pFiffRawView->updateView();
         }
         break;
-    case TRIGGER_VIEWER_MOVE:
+    case EVENT_TYPE::TRIGGER_VIEWER_MOVE:
         m_pFiffRawView->updateScrollPositionToAnnotation();
         break;
-    case TRIGGER_ACTIVE_CHANGED:
+    case EVENT_TYPE::TRIGGER_ACTIVE_CHANGED:
         m_pFiffRawView->getModel()->toggleDispAnnotation(e->getData().toInt());
         m_pFiffRawView->updateView();
         break;
-    case SELECTED_MODEL_CHANGED:
+    case EVENT_TYPE::SELECTED_MODEL_CHANGED:
         onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
         break;
-    case FILTER_CHANNEL_TYPE_CHANGED:
+    case EVENT_TYPE::FILTER_CHANNEL_TYPE_CHANGED:
         m_pFiffRawView->setFilterChannelType(e->getData().toString());
         break;
-    case FILTER_ACTIVE_CHANGED:
+    case EVENT_TYPE::FILTER_ACTIVE_CHANGED:
         m_pFiffRawView->setFilterActive(e->getData().toBool());
         break;
-    case FILTER_DESIGN_CHANGED:
+    case EVENT_TYPE::FILTER_DESIGN_CHANGED:
         m_pFiffRawView->setFilter(e->getData().value<FilterKernel>());
         break;
-    case CHANNEL_SELECTION_ITEMS:
+    case EVENT_TYPE::CHANNEL_SELECTION_ITEMS:
         if (e->getData().value<DISPLIB::SelectionItem*>()->m_sViewsToApply.contains("signalview")){
             if(m_pFiffRawView->getModel().isNull()){
                 return;
@@ -185,17 +185,17 @@ void RawDataViewer::handleEvent(QSharedPointer<Event> e)
             }
         }
         break;
-    case SCALING_MAP_CHANGED:
+    case EVENT_TYPE::SCALING_MAP_CHANGED:
         if(e->getData().value<ANSHAREDLIB::ScalingParameters>().m_sViewsToApply.contains("signalview")){
             m_pFiffRawView->setScalingMap(e->getData().value<ANSHAREDLIB::ScalingParameters>().m_mScalingMap);
         }
         break;
-    case VIEW_SETTINGS_CHANGED:
+    case EVENT_TYPE::VIEW_SETTINGS_CHANGED:
         if(e->getData().value<ANSHAREDLIB::ViewParameters>().m_sViewsToApply.contains("signalview")){
             updateViewParameters(e->getData().value<ANSHAREDLIB::ViewParameters>());
         }
         break;
-    case MODEL_REMOVED:
+    case EVENT_TYPE::MODEL_REMOVED:
         onModelRemoved(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
         break;
     default:

@@ -251,25 +251,25 @@ void Averaging::handleEvent(QSharedPointer<Event> e)
         case EVENT_TYPE::SELECTED_MODEL_CHANGED:
             onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
             break;
-        case FILTER_ACTIVE_CHANGED:
+        case EVENT_TYPE::FILTER_ACTIVE_CHANGED:
             m_bPerformFiltering = e->getData().toBool();
             break;
-        case FILTER_DESIGN_CHANGED:
+        case EVENT_TYPE::FILTER_DESIGN_CHANGED:
             m_filterKernel = e->getData().value<FilterKernel>();
             break;
-        case EVENT_GROUPS_UPDATED:
+        case EVENT_TYPE::EVENT_GROUPS_UPDATED:
             updateGroups();
             break;
-        case CHANNEL_SELECTION_ITEMS:
+        case EVENT_TYPE::CHANNEL_SELECTION_ITEMS:
             setChannelSelection(e->getData());
             break;
-        case SCALING_MAP_CHANGED:
+        case EVENT_TYPE::SCALING_MAP_CHANGED:
             setScalingMap(e->getData());
             break;
-        case VIEW_SETTINGS_CHANGED:
+        case EVENT_TYPE::VIEW_SETTINGS_CHANGED:
             setViewSettings(e->getData().value<ANSHAREDLIB::ViewParameters>());
             break;
-        case MODEL_REMOVED:
+        case EVENT_TYPE::MODEL_REMOVED:
             onModelRemoved(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
             break;
         default:

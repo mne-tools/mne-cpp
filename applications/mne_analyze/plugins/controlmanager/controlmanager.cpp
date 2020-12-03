@@ -211,7 +211,7 @@ QWidget *ControlManager::getView()
 void ControlManager::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
-    case SELECTED_MODEL_CHANGED:
+    case EVENT_TYPE::SELECTED_MODEL_CHANGED:
         if(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >()->getType() != ANSHAREDLIB_BEMDATA_MODEL) {
             onScalingChanged(m_ScalingParameters.m_mScalingMap);
             m_ViewParameters.m_sViewsToApply = m_pApplyToView->getSelectedViews();
@@ -220,7 +220,7 @@ void ControlManager::handleEvent(QSharedPointer<Event> e)
         }
         break;
 
-    case SET_DATA3D_TREE_MODEL:
+    case EVENT_TYPE::SET_DATA3D_TREE_MODEL:
         #ifndef WASMBUILD
         init3DGui(e->getData().value<QSharedPointer<DISP3DLIB::Data3DTreeModel>>());
         #endif
