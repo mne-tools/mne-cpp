@@ -149,6 +149,11 @@ public:
     void setEvokedSet(QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet);
 
     //=========================================================================================================
+    /**
+     * Returns the stored FiffEvokedSet
+     *
+     * @return the stored FiffEvokedSet
+     */
     QSharedPointer<FIFFLIB::FiffEvokedSet> getEvokedSet();
 
     //=========================================================================================================

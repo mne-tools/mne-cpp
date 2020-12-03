@@ -615,6 +615,9 @@ void AnnotationSettingsView::initTriggerDetect(const QSharedPointer<FIFFLIB::Fif
 void AnnotationSettingsView::onDetectTriggers(const QString &sChannelName,
                                               double dThreshold)
 {
+    if (!m_pFiffRawModel)
+        qWarning() << "[AnnotationSettingsView::onDetectTriggers] No Fiff Raw Model selected for trigger detection.";
+
     if(m_FutureWatcher.isRunning()){
         return;
     }
@@ -725,7 +728,9 @@ void AnnotationSettingsView::createGroupsFromTriggers()
 
     for (int i = 0; i < keyList.size(); i++){
         if ((m_pUi->m_listWidget_groupListWidget->findItems(m_pTriggerDetectView->getSelectedStimChannel()+ "_" + QString::number(static_cast<int>(keyList[i])), Qt::MatchExactly).isEmpty())){
-            newStimGroup(m_pTriggerDetectView->getSelectedStimChannel(), static_cast<int>(keyList[i]), colors[i % 10]);
+            newStimGroup(m_pTriggerDetectView->getSelectedStimChannel(),
+                         static_cast<int>(keyList[i]),
+                         colors[i % 10]);
             groupChanged();
             for (int j : mEventGroupMap[keyList[i]]){
                 m_pAnnModel->setSamplePos(j + iFirstSample);
@@ -737,4 +742,16 @@ void AnnotationSettingsView::createGroupsFromTriggers()
     emit triggerRedraw();
     emit groupsUpdated();
     emit loadingEnd("Detecting triggers...");
+}
+
+//=============================================================================================================
+
+void AnnotationSettingsView::clearView(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel)
+{
+    if (qSharedPointerCast<ANSHAREDLIB::AbstractModel>(m_pAnnModel) == pRemovedModel){
+        disconnectFromModel();
+        reset();
+    } else if (qSharedPointerCast<ANSHAREDLIB::AbstractModel>(m_pFiffRawModel) == pRemovedModel){
+        m_pFiffRawModel = Q_NULLPTR;
+    }
 }

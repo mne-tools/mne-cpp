@@ -143,8 +143,11 @@ QDockWidget *AnnotationManager::getControl()
     connect(pAnnotationSettingsView, &AnnotationSettingsView::loadingStart,
             this, &AnnotationManager::triggerLoadingStart, Qt::DirectConnection);
 
-    connect(pAnnotationSettingsView, & AnnotationSettingsView::loadingEnd,
+    connect(pAnnotationSettingsView, &AnnotationSettingsView::loadingEnd,
             this, &AnnotationManager::triggerLoadingEnd, Qt::DirectConnection);
+
+    connect(this, &AnnotationManager::clearView,
+            pAnnotationSettingsView, &AnnotationSettingsView::clearView, Qt::UniqueConnection);
 
     QDockWidget* pControl = new QDockWidget(getName());
     pControl->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
@@ -267,5 +270,7 @@ void AnnotationManager::triggerLoadingEnd(const QString& sMessage)
 
 void AnnotationManager::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel)
 {
-
+    if(pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_ANNOTATION_MODEL || pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
+        emit clearView(pRemovedModel);
+    }
 }

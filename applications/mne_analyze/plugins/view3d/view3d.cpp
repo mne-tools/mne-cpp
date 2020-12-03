@@ -231,10 +231,10 @@ QVector<EVENT_TYPE> View3D::getEventSubscriptions(void) const
 void View3D::updateCoregBem(QSharedPointer<ANSHAREDLIB::BemDataModel> pNewModel)
 {
     if(!pNewModel){
-        std::cout << "Empty pointer";
+        qWarning() << "[View3D::updateCoregBem] Null Bem Model pointer.";
         return;
     } else if(!m_p3DModel){
-        std::cout << "Empty model";
+        std::cout << "[View3D::updateCoregBem] Null Data3DTreeModel";
         return;
     } else if(pNewModel->getType() == ANSHAREDLIB_BEMDATA_MODEL) {
         m_pView3D->activatePicker(true);
@@ -348,7 +348,7 @@ void View3D::settingsChanged(ANSHAREDLIB::View3DParameters viewParameters)
         emit takeScreenshotChanged();
         break;
     default:
-        qDebug() << "[View3D::settingsChanged] Unknown setting";
+        qInfo() << "[View3D::settingsChanged] Unknown setting";
     }
 }
 
