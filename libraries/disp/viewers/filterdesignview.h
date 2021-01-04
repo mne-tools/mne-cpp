@@ -134,8 +134,37 @@ public:
      */
     void setSamplingRate(double dSamplingRate);
 
+    //=========================================================================================================
+    /**
+     * Sets filter 'From' value
+     *
+     * @param [in] dFrom    set filter 'From' value
+     */
     void setFrom(double dFrom);
+
+    //=========================================================================================================
+    /**
+     * Sets filter 'To' value
+     *
+     * @param [in] dTo      set filter 'To' value
+     */
     void setTo(double dTo);
+
+    //=========================================================================================================
+    /**
+     * Get filter 'From' value
+     *
+     * @return filter 'From' value
+     */
+    double getFrom();
+
+    //=========================================================================================================
+    /**
+     * Get filter 'To' value
+     *
+     * @return filter 'To' value
+     */
+    double getTo();
 
     //=========================================================================================================
     /**
@@ -305,6 +334,22 @@ signals:
      * @param channelType  The channel type on which the filter should be performed on.
      */
     void filterChannelTypeChanged(const QString& channelType);
+
+    //=========================================================================================================
+    /**
+     * Update to simple filter control 'From'
+     *
+     * @param dFrom     chanage in filter 'From' value
+     */
+    void updateFilterFrom(double dFrom);
+
+    //=========================================================================================================
+    /**
+     * Update to simple filter control 'To'
+     *
+     * @param dTo       chanage in filter 'To' value
+     */
+    void updateFilterTo(double dTo);
 };
 } // NAMESPACE DISPLIB
 
