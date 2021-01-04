@@ -339,7 +339,7 @@ signals:
     /**
      * Update to simple filter control 'From'
      *
-     * @param dFrom     chanage in filter 'From' value
+     * @param dFrom     change in filter 'From' value
      */
     void updateFilterFrom(double dFrom);
 
@@ -347,7 +347,7 @@ signals:
     /**
      * Update to simple filter control 'To'
      *
-     * @param dTo       chanage in filter 'To' value
+     * @param dTo       change in filter 'To' value
      */
     void updateFilterTo(double dTo);
 };
