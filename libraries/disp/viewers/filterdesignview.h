@@ -307,6 +307,14 @@ protected:
      */
     void onBtnLoadFilter();
 
+    //=========================================================================================================
+    /**
+     * Update Gui and filter based on an input filter parameters
+     *
+     * @param [in] filter   filter which parameters will be used to update gui and stored filter
+     */
+    void updateGuiFromFilter(const RTPROCESSINGLIB::FilterKernel& filter);
+
     Ui::FilterDesignViewWidget*         m_pUi;                      /**< Pointer to the qt designer generated ui class.*/
 
     QPointer<FilterPlotScene>           m_pFilterPlotScene;         /**< Pointer to the QGraphicsScene which holds the filter plotting.*/
