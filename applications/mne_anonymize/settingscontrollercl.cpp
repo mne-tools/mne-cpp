@@ -217,7 +217,7 @@ void SettingsControllerCl::initParser()
     m_parser.addOption(measDateOffsetOpt);
 
     QCommandLineOption birthdayOpt(QStringList() << "sb" << "subject_birthday",
-                                   QCoreApplication::translate("main","Specify the subject’s birthday. Default: 01012000"),
+                                   QCoreApplication::translate("main","Specify the subject’s birthday. Format: DDMMYYYY. Default: 01012000"),
                                    QCoreApplication::translate("main","date"));
     m_parser.addOption(birthdayOpt);
 
