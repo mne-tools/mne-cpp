@@ -398,6 +398,9 @@ void FilterDesignView::changeStateSpinBoxes(int currentIndex)
 
 void FilterDesignView::filterParametersChanged()
 {
+    emit updateFilterFrom(m_pUi->m_doubleSpinBox_from->value());
+    emit updateFilterTo(m_pUi->m_doubleSpinBox_to->value());
+
     //User defined filter parameters
     double from = m_pUi->m_doubleSpinBox_from->value();
     double to = m_pUi->m_doubleSpinBox_to->value();
@@ -553,4 +556,18 @@ void FilterDesignView::onBtnLoadFilter()
 void FilterDesignView::clearView()
 {
 
+}
+
+//=============================================================================================================
+
+double FilterDesignView::getFrom()
+{
+    return m_pUi->m_doubleSpinBox_from->value();
+}
+
+//=============================================================================================================
+
+double FilterDesignView::getTo()
+{
+    return m_pUi->m_doubleSpinBox_to->value();
 }
