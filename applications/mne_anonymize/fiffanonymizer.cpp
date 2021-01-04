@@ -373,7 +373,7 @@ void FiffAnonymizer::censorTag()
     case FIFF_SUBJ_LAST_NAME:
     {
         QString inStr(m_pTag->data());
-        readingSubjectLastName(inStr);
+        emit readingSubjectLastName(inStr);
         QString outStr(m_sSubjectLastName);
         m_pTag->resize(outStr.size());
         memcpy(m_pTag->data(),outStr.toUtf8(),static_cast<size_t>(outStr.size()));
@@ -383,7 +383,7 @@ void FiffAnonymizer::censorTag()
     case FIFF_SUBJ_BIRTH_DAY:
     {
         QDateTime inBirthday(QDate::fromJulianDay(*m_pTag->toJulian()));
-        readingSubjectBirthday(inBirthday);
+        emit readingSubjectBirthday(inBirthday);
         QDateTime outBirthday;
 
         if(m_bUseSubjectBirthdayOffset)
