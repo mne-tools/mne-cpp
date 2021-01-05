@@ -1,0 +1,36 @@
+name: Test MD to PDF
+
+on:
+  push:
+    branches:
+      - pdf
+jobs:
+  Conversion:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Install components
+      run: |
+        apt-get -y install pandoc
+        apt-get -y install texlive-latex-base
+        apt-get -y install texlive-fonts-recommended
+    - name: Clone repository
+      uses: actions/checkout@v2
+    - name: Convert
+      run: |
+      pwd
+      mkdir pdf
+      find . -name '*.md' > filelist.dat
+
+      while read file
+      do
+        base_name=$( echo "${file}" | basename "${file}" | sed -e 's/\.md//g')
+        pandoc -f markdown ${file} -o pdf/${base_name}.pdf
+        git status
+        git diff
+      done < filelist.dat
+    - name: Upload:
+      uses: actions/upload-artifact@v2
+      with:
+        name: PDFs
+        path: pdf/
