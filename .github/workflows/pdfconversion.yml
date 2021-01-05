@@ -11,9 +11,9 @@ jobs:
     steps:
     - name: Install components
       run: |
-        apt-get -y install pandoc
-        apt-get -y install texlive-latex-base
-        apt-get -y install texlive-fonts-recommended
+        sudo apt-get -y install pandoc
+        sudo apt-get -y install texlive-latex-base
+        sudo apt-get -y install texlive-fonts-recommended
     - name: Clone repository
       uses: actions/checkout@v2
     - name: Convert
