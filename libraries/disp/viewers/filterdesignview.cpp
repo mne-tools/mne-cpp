@@ -579,18 +579,7 @@ void FilterDesignView::updateGuiFromFilter(const RTPROCESSINGLIB::FilterKernel& 
     m_pUi->m_spinBox_filterTaps->setValue(filter.getFilterOrder());
     m_pUi->m_doubleSpinBox_transitionband->setValue(filter.getParksWidth()*(filter.getSamplingFrequency()/2));
 
-    switch(filter.m_designMethod){
-    case FilterKernel::Tschebyscheff:{
-        m_pUi->m_comboBox_designMethod->setCurrentIndex(1);
-        break;
-    }
-    case FilterKernel::Cosine: {
-        m_pUi->m_comboBox_designMethod->setCurrentIndex(0);
-        break;
-    }
-    default:
-        qWarning() << "[FilterDesignView::updateGuiFromFilter] Filter method not handled";
-    }
+    m_pUi->m_comboBox_designMethod->setCurrentIndex(filter.m_designMethod);
 
     filterParametersChanged();
 }
