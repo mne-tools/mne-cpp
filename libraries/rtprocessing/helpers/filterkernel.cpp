@@ -558,6 +558,20 @@ void FilterKernel::designFilter()
 
 //=============================================================================================================
 
+RTPROCESSINGLIB::FilterParameter FilterKernel::getDesignMethod() const
+{
+    return m_designMethods[m_iDesignMethod];
+}
+
+//=============================================================================================================
+
+RTPROCESSINGLIB::FilterParameter FilterKernel::getFilterType() const
+{
+    return m_filterTypes[m_iFilterType];
+}
+
+//=============================================================================================================
+
 FilterParameter::FilterParameter(QString sName)
 {
     FilterParameter(sName,
@@ -574,3 +588,9 @@ FilterParameter::FilterParameter(QString sName,
 
 }
 
+//=============================================================================================================
+
+QString FilterParameter::getName() const
+{
+    return m_sName;
+}

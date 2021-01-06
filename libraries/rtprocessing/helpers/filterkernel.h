@@ -85,6 +85,8 @@ public:
     explicit FilterParameter(QString);
     explicit FilterParameter(QString, QString);
 
+    QString getName() const;
+
     friend bool operator == (const FilterParameter& in1, const FilterParameter& in2){
         return (in1.m_sName == in2.m_sName);
     }
@@ -218,6 +220,9 @@ public:
 
     static const QVector<RTPROCESSINGLIB::FilterParameter>  m_designMethods;  /**< Vector of possible filter design methods */
     static const QVector<RTPROCESSINGLIB::FilterParameter>  m_filterTypes;    /**< Vector of possible filter design types */
+
+    RTPROCESSINGLIB::FilterParameter getDesignMethod() const;
+    RTPROCESSINGLIB::FilterParameter getFilterType() const;
 
 private:
     //=========================================================================================================
