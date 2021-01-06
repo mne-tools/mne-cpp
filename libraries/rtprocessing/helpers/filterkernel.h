@@ -65,6 +65,7 @@
 
 #include <QString>
 #include <QMetaType>
+#include <QVector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE RTPROCESSINGLIB
@@ -72,6 +73,25 @@
 
 namespace RTPROCESSINGLIB
 {
+
+//=============================================================================================================
+/**
+ * @brief The FilterParameter class
+ */
+class RTPROCESINGSHARED_EXPORT FilterParameter{
+friend class FilterKernel;
+
+public:
+    explicit FilterParameter(QString);
+    explicit FilterParameter(QString, QString);
+
+    friend bool operator == (const FilterParameter& in1, const FilterParameter& in2){
+        return (in1.m_sName == in2.m_sName);
+    }
+protected:
+    QString m_sName;            /**< Item name */
+    QString m_sDescription;     /**< Item description */
+};
 
 //=============================================================================================================
 /**
@@ -83,19 +103,19 @@ class RTPROCESINGSHARED_EXPORT FilterKernel
 {
 
 public:
-    enum DesignMethod {
-        Cosine,
-        Tschebyscheff,
-        External
-    } m_designMethod;
+//    enum DesignMethod {
+//        Cosine,
+//        Tschebyscheff,
+//        External
+//    } m_designMethod;
 
-    enum FilterType {
-        LPF,
-        HPF,
-        BPF,
-        NOTCH,
-        UNKNOWN
-    } m_Type;
+//    enum FilterType {
+//        LPF,
+//        HPF,
+//        BPF,
+//        NOTCH,
+//        UNKNOWN
+//    } m_Type;
 
     //=========================================================================================================
     /**
@@ -117,13 +137,13 @@ public:
      * @param [in] designMethod     Specifies the design method to use. Choose between Cosind and Tschebyscheff
      **/
     FilterKernel(const QString &sFilterName,
-                 FilterType type,
+                 int  iFilterType,
                  int iOrder,
                  double dCenterfreq,
                  double dBandwidth,
                  double dParkswidth,
                  double dSFreq,
-                 DesignMethod designMethod = Cosine);
+                 int iDesignMethod);
 
     //=========================================================================================================
     /**
@@ -193,6 +213,12 @@ public:
     Eigen::RowVectorXcd getFftCoefficients() const;
     void setFftCoefficients(const Eigen::RowVectorXcd& vecFftCoeff);
 
+    inline static const QVector<RTPROCESSINGLIB::FilterParameter> initDesignMethods();
+    inline static const QVector<RTPROCESSINGLIB::FilterParameter> initFilterTypes();
+
+    static const QVector<RTPROCESSINGLIB::FilterParameter>  m_designMethods;  /**< Vector of possible filter design methods */
+    static const QVector<RTPROCESSINGLIB::FilterParameter>  m_filterTypes;    /**< Vector of possible filter design types */
+
 private:
     //=========================================================================================================
     /**
@@ -221,7 +247,14 @@ private:
 
     Eigen::RowVectorXd     m_vecCoeff;       /**< contains the forward filter coefficient set. */
     Eigen::RowVectorXcd    m_vecFftCoeff;    /**< the FFT-transformed forward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFftLength. */
+
+    int m_iDesignMethod;
+    int m_iFilterType;
 };
+
+const QVector<RTPROCESSINGLIB::FilterParameter> FilterKernel::m_designMethods = FilterKernel::initDesignMethods();
+const QVector<RTPROCESSINGLIB::FilterParameter> FilterKernel::m_filterTypes = FilterKernel::initFilterTypes();
+
 
 //=========================================================================================================
 /**
@@ -250,17 +283,40 @@ RTPROCESINGSHARED_EXPORT FilterKernel::FilterType getFilterTypeForString(const Q
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+
+inline const QVector<RTPROCESSINGLIB::FilterParameter> FilterKernel::initDesignMethods()
+{
+    QVector<RTPROCESSINGLIB::FilterParameter> designMethods;
+    designMethods.append(FilterParameter(QString("Cosine"), QString("A cosine filter")));
+    designMethods.append(FilterParameter(QString("Tschebyscheff"), QString("A tschebyscheff filter")));
+    designMethods.append(FilterParameter(QString("External"), QString("An external filter")));
+
+    return designMethods;
+}
+
+//=========================================================================================================
+
+inline const QVector<RTPROCESSINGLIB::FilterParameter> FilterKernel::initFilterTypes()
+{
+    QVector<RTPROCESSINGLIB::FilterParameter> filterTypes;
+    filterTypes.append(FilterParameter(QString("LPF"), QString("An LPF filter")));
+    filterTypes.append(FilterParameter(QString("HPF"), QString("An HPF filter")));
+    filterTypes.append(FilterParameter(QString("BPF"), QString("A BPF filter")));
+    filterTypes.append(FilterParameter(QString("NOTCH"), QString("A NOTCH filter")));
+    filterTypes.append(FilterParameter(QString("UNKNOWN"), QString("An UNKNOWN filter")));
+}
+
 } // NAMESPACE RTPROCESSINGLIB
 
-#ifndef metatype_filtertype
-#define metatype_filtertype
-Q_DECLARE_METATYPE(RTPROCESSINGLIB::FilterKernel::FilterType)
-#endif
+//#ifndef metatype_filtertype
+//#define metatype_filtertype
+//Q_DECLARE_METATYPE(RTPROCESSINGLIB::FilterKernel::FilterType)
+//#endif
 
-#ifndef metatype_filterdesign
-#define metatype_filterdesign
-Q_DECLARE_METATYPE(RTPROCESSINGLIB::FilterKernel::DesignMethod)
-#endif
+//#ifndef metatype_filterdesign
+//#define metatype_filterdesign
+//Q_DECLARE_METATYPE(RTPROCESSINGLIB::FilterKernel::DesignMethod)
+//#endif
 
 #ifndef metatype_filterkernel
 #define metatype_filterkernel

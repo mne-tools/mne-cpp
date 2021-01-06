@@ -160,11 +160,11 @@ FilterKernel::FilterType RTPROCESSINGLIB::getFilterTypeForString(const QString &
 //=============================================================================================================
 
 FilterKernel::FilterKernel()
-: m_Type(UNKNOWN)
+: m_iFilterType(m_filterTypes.indexOf(FilterParameter("UNKNOWN")))
 , m_iFilterOrder(80)
 , m_sFilterName("Unknown")
 , m_dParksWidth(0.1)
-, m_designMethod(External)
+, m_iDesignMethod(m_designMethods.indexOf(FilterParameter("External")))
 , m_dCenterFreq(0.5)
 , m_dBandwidth(0.1)
 , m_sFreq(1000)
@@ -177,15 +177,15 @@ FilterKernel::FilterKernel()
 //=============================================================================================================
 
 FilterKernel::FilterKernel(const QString& sFilterName,
-                           FilterType type,
+                           int iFilterType,
                            int iOrder,
                            double dCenterfreq,
                            double dBandwidth,
                            double dParkswidth,
                            double dSFreq,
-                           DesignMethod designMethod)
-: m_designMethod(designMethod)
-, m_Type(type)
+                           int iDesignMethod)
+: m_iDesignMethod(iDesignMethod)
+, m_iFilterType(iFilterType)
 , m_sFreq(dSFreq)
 , m_dCenterFreq(dCenterfreq)
 , m_dBandwidth(dBandwidth)
@@ -555,3 +555,22 @@ void FilterKernel::designFilter()
         break;
     }
 }
+
+//=============================================================================================================
+
+FilterParameter::FilterParameter(QString sName)
+{
+    FilterParameter(sName,
+                 "");
+}
+
+//=============================================================================================================
+
+FilterParameter::FilterParameter(QString sName,
+                           QString sDescription)
+: m_sName(sName)
+, m_sDescription(sDescription)
+{
+
+}
+
