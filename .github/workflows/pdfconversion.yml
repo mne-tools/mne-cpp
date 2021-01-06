@@ -30,8 +30,13 @@ jobs:
           git status
           git diff
         done < filelist.dat
-    - name: Upload
+    - name: Upload PDFs
       uses: actions/upload-artifact@v2
       with:
         name: PDFs
         path: pdf/
+    - name: Upload file data
+      uses: actions/upload-artifact@v2
+      with:
+        name: Files
+        path: filelist.dat
