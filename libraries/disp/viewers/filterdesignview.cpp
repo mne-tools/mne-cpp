@@ -91,6 +91,10 @@ FilterDesignView::FilterDesignView(const QString& sSettingsPath,
     m_sSettingsPath = sSettingsPath;
     m_pUi->setupUi(this);
 
+    for(FilterParameter filterMethod : FilterKernel::m_designMethods){
+        m_pUi->m_comboBox_designMethod->addItem(filterMethod.getName());
+    }
+
     loadSettings();
 
     initSpinBoxes();
