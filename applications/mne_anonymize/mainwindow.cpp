@@ -759,7 +759,7 @@ void MainWindow::helpButtonClicked()
     msgBox.setText("<p>June 2020<br>mne_anonymize <br>version: " + qApp->applicationVersion() + "</p>"
                    "<p>This applcation allows to anonymize and deidentify FIFF files.</p>"
                    "<p>For more information please visit "
-                   "<a href='https://mne-cpp.github.io/pages/learn/mneanonymize.html'>mne_anonymize's documentation web</a>.</p>"
+                   "<a href='https://mne-cpp.github.io/pages/learn/anonymize.html'>mne_anonymize's documentation web</a>.</p>"
                    "<p style=""text-align:right"">Sincerely, the development team @ MNE-CPP.</p>");
     msgBox.exec();
 }
