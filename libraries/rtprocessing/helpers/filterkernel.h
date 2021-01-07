@@ -82,6 +82,7 @@ namespace RTPROCESSINGLIB
 class RTPROCESINGSHARED_EXPORT FilterParameter{
 
 public:
+    explicit FilterParameter();
     explicit FilterParameter(QString);
     explicit FilterParameter(QString, QString);
 
@@ -328,6 +329,11 @@ private:
 #ifndef metatype_filterkernel
 #define metatype_filterkernel
 Q_DECLARE_METATYPE(RTPROCESSINGLIB::FilterKernel)
+#endif
+
+#ifndef metatype_filterparameter
+#define metatype_filterkernel
+Q_DECLARE_METATYPE(RTPROCESSINGLIB::FilterParameter)
 #endif
 
 #endif // FILTERKERNEL_H
