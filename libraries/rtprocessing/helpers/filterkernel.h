@@ -52,6 +52,7 @@
 //=============================================================================================================
 
 #include "../rtprocessing_global.h"
+#include "filter.h"
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -74,26 +75,26 @@
 namespace RTPROCESSINGLIB
 {
 
-//=============================================================================================================
-/**
- * @brief The FilterParameter class
- */
-class RTPROCESINGSHARED_EXPORT FilterParameter{
-friend class FilterKernel;
+////=============================================================================================================
+///**
+// * @brief The FilterParameter class
+// */
+//class RTPROCESINGSHARED_EXPORT FilterParameter{
+//friend class FilterKernel;
 
-public:
-    explicit FilterParameter(QString);
-    explicit FilterParameter(QString, QString);
+//public:
+//    explicit FilterParameter(QString);
+//    explicit FilterParameter(QString, QString);
 
-    QString getName() const;
+//    QString getName() const;
 
-    friend bool operator == (const FilterParameter& in1, const FilterParameter& in2){
-        return (in1.m_sName == in2.m_sName);
-    }
-protected:
-    QString m_sName;            /**< Item name */
-    QString m_sDescription;     /**< Item description */
-};
+//    friend bool operator == (const FilterParameter& in1, const FilterParameter& in2){
+//        return (in1.m_sName == in2.m_sName);
+//    }
+//protected:
+//    QString m_sName;            /**< Item name */
+//    QString m_sDescription;     /**< Item description */
+//};
 
 //=============================================================================================================
 /**
