@@ -309,6 +309,8 @@ inline const QVector<RTPROCESSINGLIB::FilterParameter> FilterKernel::initFilterT
     filterTypes.append(FilterParameter(QString("BPF"), QString("A BPF filter")));
     filterTypes.append(FilterParameter(QString("NOTCH"), QString("A NOTCH filter")));
     filterTypes.append(FilterParameter(QString("UNKNOWN"), QString("An UNKNOWN filter")));
+
+    return filterTypes;
 }
 
 } // NAMESPACE RTPROCESSINGLIB

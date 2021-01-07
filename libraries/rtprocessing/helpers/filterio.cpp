@@ -165,12 +165,12 @@ bool FilterIO::writeFilter(const QString &path, const FilterKernel &filter)
 
         out << "#sFreq " << filter.getSamplingFrequency() << "\n";
         out << "#name " << filter.getName() << "\n";
-        out << "#type " << RTPROCESSINGLIB::getStringForFilterType(filter.m_Type) << "\n";
+        out << "#type " << RTPROCESSINGLIB::getStringForFilterType(filter.getFilterType().getName()) << "\n";
         out << "#order " << filter.getFilterOrder() << "\n";
         out << "#HPFreq " << filter.getHighpassFreq() << "\n";
         out << "#LPFreq " << filter.getLowpassFreq() << "\n";
         out << "#CenterFreq " << filter.getCenterFrequency() << "\n";
-        out << "#DesignMethod " << RTPROCESSINGLIB::getStringForDesignMethod(filter.m_designMethod) << "\n";
+        out << "#DesignMethod " << filter.getDesignMethod().getName() << "\n";
 
         for(int i = 0 ; i<filter.getCoefficients().cols() ;i++)
             out << filter.getCoefficients()(i) << "\n";
