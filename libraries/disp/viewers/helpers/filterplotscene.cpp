@@ -170,7 +170,7 @@ void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq,
 
     //Plot lower higher cut off frequency
     double pos = 0;
-    switch(m_pCurrentFilter.m_Type) {
+    switch(FilterKernel::m_filterTypes.indexOf(m_pCurrentFilter.getFilterType())) {
         case 0://LPF
             pos = ((double)m_iCutOffLow / (double)fMax) * numberCoeff;
             addLine(pos - m_iDiagramMarginsHoriz,
