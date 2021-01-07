@@ -79,7 +79,6 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES += \
-    helpers/filter.cpp \
     icp.cpp \
     rtcov.cpp \
     rtinvop.cpp \
@@ -97,7 +96,6 @@ SOURCES += \
     helpers/filterio.cpp \
 
 HEADERS +=  \
-    helpers/filter.h \
     icp.h \
     rtprocessing_global.h \
     rtcov.h \

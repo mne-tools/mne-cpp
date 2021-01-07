@@ -155,6 +155,19 @@ using namespace UTILSLIB;
 //    }
 //}
 
+//const QVector<RTPROCESSINGLIB::FilterParameter> FilterKernel::m_designMethods ({
+//    FilterParameter(QString("Cosine"), QString("A cosine filter")),
+//    FilterParameter(QString("Tschebyscheff"), QString("A tschebyscheff filter")),
+//    FilterParameter(QString("External"), QString("An external filter"))
+//});
+//const QVector<RTPROCESSINGLIB::FilterParameter> FilterKernel::m_filterTypes ({
+//    FilterParameter(QString("LPF"), QString("An LPF filter")),
+//    FilterParameter(QString("HPF"), QString("An HPF filter")),
+//    FilterParameter(QString("BPF"), QString("A BPF filter")),
+//    FilterParameter(QString("NOTCH"), QString("A NOTCH filter")),
+//    FilterParameter(QString("UNKNOWN"), QString("An UNKNOWN filter"))
+//});
+
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -568,6 +581,16 @@ RTPROCESSINGLIB::FilterParameter FilterKernel::getDesignMethod() const
 RTPROCESSINGLIB::FilterParameter FilterKernel::getFilterType() const
 {
     return m_filterTypes[m_iFilterType];
+}
+
+void FilterKernel::setDesignMethod(int iDesignMethod)
+{
+    m_iDesignMethod = iDesignMethod;
+}
+
+void FilterKernel::setFilterType(int iFilterType)
+{
+    m_iFilterType = iFilterType;
 }
 
 //=============================================================================================================
