@@ -70,13 +70,13 @@ using namespace UTILSLIB;
 
 bool RTPROCESSINGLIB::filterFile(QIODevice &pIODevice,
                                  QSharedPointer<FiffRawData> pFiffRawData,
-                                 FilterKernel::FilterType type,
+                                 int type,
                                  double dCenterfreq,
                                  double bandwidth,
                                  double dTransition,
                                  double dSFreq,
                                  int iOrder,
-                                 FilterKernel::DesignMethod designMethod,
+                                 int designMethod,
                                  const RowVectorXi& vecPicks,
                                  bool bUseThreads)
 {

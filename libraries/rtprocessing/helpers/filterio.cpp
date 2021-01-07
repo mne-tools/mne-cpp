@@ -110,7 +110,7 @@ bool FilterIO::readFilter(QString path, FilterKernel &filter)
 
             //Read the filter type
             if(line.contains("type") && fields.size()==2)
-                filter.m_Type = RTPROCESSINGLIB::getFilterTypeForString(fields.at(1));
+                filter.setFilterType(FilterKernel::m_filterTypes.indexOf(FilterParameter(fields.at(1))));
 
             //Read the filter LPFreq
             if(line.contains("LPFreq") && fields.size()==2)
@@ -126,7 +126,7 @@ bool FilterIO::readFilter(QString path, FilterKernel &filter)
 
             //Read the filter DesignMethod
             if(line.contains("DesignMethod") && fields.size()==2)
-                filter.m_designMethod = RTPROCESSINGLIB::getDesignMethodForString(fields.at(1));
+                filter.setDesignMethod(FilterKernel::m_designMethods.indexOf(FilterParameter(fields.at(1))));
 
         } else // Read filter coefficients
             coefficientsTemp.push_back(fields.join("").toDouble());
@@ -165,7 +165,7 @@ bool FilterIO::writeFilter(const QString &path, const FilterKernel &filter)
 
         out << "#sFreq " << filter.getSamplingFrequency() << "\n";
         out << "#name " << filter.getName() << "\n";
-        out << "#type " << RTPROCESSINGLIB::getStringForFilterType(filter.getFilterType().getName()) << "\n";
+        out << "#type " << filter.getFilterType().getName() << "\n";
         out << "#order " << filter.getFilterOrder() << "\n";
         out << "#HPFreq " << filter.getHighpassFreq() << "\n";
         out << "#LPFreq " << filter.getLowpassFreq() << "\n";
