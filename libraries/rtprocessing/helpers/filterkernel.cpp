@@ -75,85 +75,85 @@ using namespace UTILSLIB;
 // DEFINE GLOBAL RTPROCESSINGLIB METHODS
 //=============================================================================================================
 
-QString RTPROCESSINGLIB::getStringForDesignMethod(FilterKernel::DesignMethod designMethod)
-{
-    switch(designMethod) {
-        case FilterKernel::External:
-            return "External";
-            break;
+//QString RTPROCESSINGLIB::getStringForDesignMethod(FilterKernel::DesignMethod designMethod)
+//{
+//    switch(designMethod) {
+//        case FilterKernel::External:
+//            return "External";
+//            break;
 
-        case FilterKernel::Cosine:
-            return "Cosine";
-            break;
+//        case FilterKernel::Cosine:
+//            return "Cosine";
+//            break;
 
-        case FilterKernel::Tschebyscheff:
-            return "Tschebyscheff";
-            break;
+//        case FilterKernel::Tschebyscheff:
+//            return "Tschebyscheff";
+//            break;
 
-        default:
-            return "External";
-            break;
-    }
-}
+//        default:
+//            return "External";
+//            break;
+//    }
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-QString RTPROCESSINGLIB::getStringForFilterType(FilterKernel::FilterType filterType)
-{
-    switch(filterType) {
-        case FilterKernel::LPF:
-            return "LPF";
-            break;
+//QString RTPROCESSINGLIB::getStringForFilterType(FilterKernel::FilterType filterType)
+//{
+//    switch(filterType) {
+//        case FilterKernel::LPF:
+//            return "LPF";
+//            break;
 
-        case FilterKernel::HPF:
-            return "HPF";
-            break;
+//        case FilterKernel::HPF:
+//            return "HPF";
+//            break;
 
-        case FilterKernel::BPF:
-            return "BPF";
-            break;
+//        case FilterKernel::BPF:
+//            return "BPF";
+//            break;
 
-        case FilterKernel::NOTCH:
-            return "NOTCH";
-            break;
+//        case FilterKernel::NOTCH:
+//            return "NOTCH";
+//            break;
 
-        default:
-            return "LPF";
-            break;
-    }
-}
+//        default:
+//            return "LPF";
+//            break;
+//    }
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-FilterKernel::DesignMethod RTPROCESSINGLIB::getDesignMethodForString(const QString &designMethodString)
-{
-    if(designMethodString == "External") {
-        return FilterKernel::External;
-    } else if(designMethodString == "Tschebyscheff") {
-        return FilterKernel::Tschebyscheff;
-    } else if(designMethodString == "Cosine") {
-        return FilterKernel::Cosine;
-    } else {
-        return FilterKernel::External;
-    }
-}
+//FilterKernel::DesignMethod RTPROCESSINGLIB::getDesignMethodForString(const QString &designMethodString)
+//{
+//    if(designMethodString == "External") {
+//        return FilterKernel::External;
+//    } else if(designMethodString == "Tschebyscheff") {
+//        return FilterKernel::Tschebyscheff;
+//    } else if(designMethodString == "Cosine") {
+//        return FilterKernel::Cosine;
+//    } else {
+//        return FilterKernel::External;
+//    }
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-FilterKernel::FilterType RTPROCESSINGLIB::getFilterTypeForString(const QString &filterTypeString)
-{
-    if(filterTypeString == "LPF") {
-        return FilterKernel::LPF;
-    } else if(filterTypeString == "HPF") {
-        return FilterKernel::HPF;
-    } else if(filterTypeString == "BPF") {
-        return FilterKernel::BPF;
-    } else if(filterTypeString == "NOTCH") {
-        return FilterKernel::NOTCH;
-    } else {
-        return FilterKernel::UNKNOWN;
-    }
-}
+//FilterKernel::FilterType RTPROCESSINGLIB::getFilterTypeForString(const QString &filterTypeString)
+//{
+//    if(filterTypeString == "LPF") {
+//        return FilterKernel::LPF;
+//    } else if(filterTypeString == "HPF") {
+//        return FilterKernel::HPF;
+//    } else if(filterTypeString == "BPF") {
+//        return FilterKernel::BPF;
+//    } else if(filterTypeString == "NOTCH") {
+//        return FilterKernel::NOTCH;
+//    } else {
+//        return FilterKernel::UNKNOWN;
+//    }
+//}
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -472,13 +472,13 @@ void FilterKernel::designFilter()
     int exp = ceil(MNEMath::log2(iFftLength));
     iFftLength = pow(2, exp);
 
-    switch(m_designMethod) {
-        case Tschebyscheff: {
+    switch(m_iDesignMethod) {
+        case 1: {
             ParksMcClellan filter(m_iFilterOrder,
                                   m_dCenterFreq,
                                   m_dBandwidth,
                                   m_dParksWidth,
-                                  static_cast<ParksMcClellan::TPassType>(m_Type));
+                                  static_cast<ParksMcClellan::TPassType>(m_iFilterType));
             m_vecCoeff = filter.FirCoeff;
 
             //fft-transform m_vecCoeff in order to be able to perform frequency-domain filtering
@@ -487,40 +487,40 @@ void FilterKernel::designFilter()
             break;
         }
 
-        case Cosine: {
+        case 0: {
             CosineFilter filtercos;
 
-            switch(m_Type) {
-                case LPF:
+            switch(m_iFilterType) {
+                case 0:
                     filtercos = CosineFilter(iFftLength,
                                              (m_dCenterFreq)*(m_sFreq/2.),
                                              m_dParksWidth*(m_sFreq/2),
                                              (m_dCenterFreq)*(m_sFreq/2),
                                              m_dParksWidth*(m_sFreq/2),
                                              m_sFreq,
-                                             (CosineFilter::TPassType)m_Type);
+                                             static_cast<CosineFilter::TPassType>(m_iFilterType));
 
                     break;
 
-                case HPF:
+                case 1:
                     filtercos = CosineFilter(iFftLength,
                                              (m_dCenterFreq)*(m_sFreq/2),
                                              m_dParksWidth*(m_sFreq/2),
                                              (m_dCenterFreq)*(m_sFreq/2),
                                              m_dParksWidth*(m_sFreq/2),
                                              m_sFreq,
-                                             (CosineFilter::TPassType)m_Type);
+                                             static_cast<CosineFilter::TPassType>(m_iFilterType));
 
                     break;
 
-                case BPF:
+                case 2:
                     filtercos = CosineFilter(iFftLength,
                                              (m_dCenterFreq + m_dBandwidth/2)*(m_sFreq/2),
                                              m_dParksWidth*(m_sFreq/2),
                                              (m_dCenterFreq - m_dBandwidth/2)*(m_sFreq/2),
                                              m_dParksWidth*(m_sFreq/2),
                                              m_sFreq,
-                                             (CosineFilter::TPassType)m_Type);
+                                             static_cast<CosineFilter::TPassType>(m_iFilterType));
 
                     break;
             }
@@ -538,18 +538,18 @@ void FilterKernel::designFilter()
         }
     }
 
-    switch(m_Type) {
-        case LPF:
+    switch(m_iFilterType) {
+        case 0:
             m_dLowpassFreq = 0;
             m_dHighpassFreq = m_dCenterFreq*(m_sFreq/2);
         break;
 
-        case HPF:
+        case 1:
             m_dLowpassFreq = m_dCenterFreq*(m_sFreq/2);
             m_dHighpassFreq = 0;
         break;
 
-        case BPF:
+        case 2:
             m_dLowpassFreq = (m_dCenterFreq + m_dBandwidth/2)*(m_sFreq/2);
             m_dHighpassFreq = (m_dCenterFreq - m_dBandwidth/2)*(m_sFreq/2);
         break;
