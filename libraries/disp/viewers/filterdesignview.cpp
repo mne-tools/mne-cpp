@@ -211,7 +211,7 @@ void FilterDesignView::saveSettings()
     settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterFrom"), m_filterKernel.getHighpassFreq());
     settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterTo"), m_filterKernel.getLowpassFreq());
     settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterOrder"), m_filterKernel.getFilterOrder());
-    settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterDesignMethod"), FilterKernel::m_designMethods.getIndexof(m_filterKernel.getDesignMethod()));
+    settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterDesignMethod"), FilterKernel::m_designMethods.indexOf(m_filterKernel.getDesignMethod()));
     settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterTransition"), m_filterKernel.getParksWidth()*(m_filterKernel.getSamplingFrequency()/2));
     settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterChannelType"), getChannelType());
     settings.setValue(m_sSettingsPath + QString("/FilterDesignView/Position"), this->pos());
@@ -231,7 +231,7 @@ void FilterDesignView::loadSettings()
     m_pUi->m_doubleSpinBox_to->setValue(settings.value(m_sSettingsPath + QString("/FilterDesignView/filterTo"), 40.0).toDouble());
     m_pUi->m_doubleSpinBox_from->setValue(settings.value(m_sSettingsPath + QString("/FilterDesignView/filterFrom"), 1.0).toDouble());
     m_pUi->m_spinBox_filterTaps->setValue(settings.value(m_sSettingsPath + QString("/FilterDesignView/filterOrder"), 128).toInt());
-    m_pUi->m_comboBox_designMethod->setCurrentIndex(settings.value(m_sSettingsPath + QString("/FilterDesignView/filterDesignMethod"), FilterKernel::m_designMethods.indexof(FilterParameter("Cosine"))).toInt());
+    m_pUi->m_comboBox_designMethod->setCurrentIndex(settings.value(m_sSettingsPath + QString("/FilterDesignView/filterDesignMethod"), FilterKernel::m_designMethods.indexOf(FilterParameter("Cosine"))).toInt());
     m_pUi->m_doubleSpinBox_transitionband->setValue(settings.value(m_sSettingsPath + QString("/FilterDesignView/filterTransition"), 0.1).toDouble());
     m_pUi->m_comboBox_filterApplyTo->setCurrentText(settings.value(m_sSettingsPath + QString("/FilterDesignView/filterChannelType"), "All").toString());
 
@@ -442,11 +442,11 @@ void FilterDesignView::filterParametersChanged()
 //        dMethod = FilterKernel::Cosine;
 //    }
 
-    int iMethod = FilterKernel::m_designMethods.indexof(FilterParameter(m_pUi->m_comboBox_designMethod->currentText());
+    int iMethod = FilterKernel::m_designMethods.indexOf(FilterParameter(m_pUi->m_comboBox_designMethod->currentText()));
 
     //Generate filters
     m_filterKernel = FilterKernel("Designed Filter",
-                                  FilterKernel::m_filterTypes.indexof(FilterParameter("BPF")),
+                                  FilterKernel::m_filterTypes.indexOf(FilterParameter("BPF")),
                                   m_iFilterTaps,
                                   (double)center/nyquistFrequency,
                                   (double)bw/nyquistFrequency,
@@ -581,7 +581,7 @@ void FilterDesignView::updateGuiFromFilter(const RTPROCESSINGLIB::FilterKernel& 
     m_pUi->m_spinBox_filterTaps->setValue(filter.getFilterOrder());
     m_pUi->m_doubleSpinBox_transitionband->setValue(filter.getParksWidth()*(filter.getSamplingFrequency()/2));
 
-    m_pUi->m_comboBox_designMethod->setCurrentIndex(FilterKernel::m_designMethods.indexof(filter.getDesignMethod()));
+    m_pUi->m_comboBox_designMethod->setCurrentIndex(FilterKernel::m_designMethods.indexOf(filter.getDesignMethod()));
 
     filterParametersChanged();
 }
