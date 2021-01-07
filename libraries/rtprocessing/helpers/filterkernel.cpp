@@ -573,14 +573,22 @@ void FilterKernel::designFilter()
 
 RTPROCESSINGLIB::FilterParameter FilterKernel::getDesignMethod() const
 {
-    return m_designMethods[m_iDesignMethod];
+    std::cout<< "METHOD: " << m_iDesignMethod;
+    if(m_iDesignMethod < 0){
+        return m_designMethods.at(0);
+    }
+    return m_designMethods.at(m_iDesignMethod);
 }
 
 //=============================================================================================================
 
 RTPROCESSINGLIB::FilterParameter FilterKernel::getFilterType() const
 {
-    return m_filterTypes[m_iFilterType];
+    std::cout<< "TYPE: " << m_iDesignMethod;
+    if(m_iFilterType < 0){
+        return m_filterTypes.at(0);
+    }
+    return m_filterTypes.at(m_iFilterType);
 }
 
 void FilterKernel::setDesignMethod(int iDesignMethod)
@@ -595,10 +603,18 @@ void FilterKernel::setFilterType(int iFilterType)
 
 //=============================================================================================================
 
+FilterParameter::FilterParameter()
+{
+    FilterParameter("Unknown Method",
+                    "");
+}
+
+//=============================================================================================================
+
 FilterParameter::FilterParameter(QString sName)
 {
     FilterParameter(sName,
-                 "");
+                    "");
 }
 
 //=============================================================================================================
