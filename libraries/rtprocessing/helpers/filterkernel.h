@@ -52,7 +52,7 @@
 //=============================================================================================================
 
 #include "../rtprocessing_global.h"
-#include "filter.h"
+//#include "filter.h"
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -80,7 +80,6 @@ namespace RTPROCESSINGLIB
  * @brief The FilterParameter class
  */
 class RTPROCESINGSHARED_EXPORT FilterParameter{
-friend class FilterKernel;
 
 public:
     explicit FilterParameter(QString);

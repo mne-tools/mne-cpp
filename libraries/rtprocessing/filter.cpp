@@ -193,13 +193,13 @@ bool RTPROCESSINGLIB::filterFile(QIODevice &pIODevice,
 //=============================================================================================================
 
 MatrixXd RTPROCESSINGLIB::filterData(const MatrixXd& mataData,
-                                     FilterKernel::FilterType type,
+                                     int type,
                                      double dCenterfreq,
                                      double bandwidth,
                                      double dTransition,
                                      double dSFreq,
                                      int iOrder,
-                                     FilterKernel::DesignMethod designMethod,
+                                     int designMethod,
                                      const RowVectorXi& vecPicks,
                                      bool bUseThreads,
                                      bool bKeepOverhead)
@@ -383,13 +383,13 @@ void RTPROCESSINGLIB::filterChannel(RTPROCESSINGLIB::FilterObject& channelDataTi
 //=============================================================================================================
 
 MatrixXd FilterOverlapAdd::calculate(const MatrixXd& mataData,
-                                     FilterKernel::FilterType type,
+                                     int type,
                                      double dCenterfreq,
                                      double bandwidth,
                                      double dTransition,
                                      double dSFreq,
                                      int iOrder,
-                                     FilterKernel::DesignMethod designMethod,
+                                     int designMethod,
                                      const RowVectorXi& vecPicks,
                                      bool bFilterEnd,
                                      bool bUseThreads,
