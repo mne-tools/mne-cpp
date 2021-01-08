@@ -67,6 +67,7 @@
 #include <QString>
 #include <QMetaType>
 #include <QVector>
+#include <QDebug>
 
 //=============================================================================================================
 // DEFINE NAMESPACE RTPROCESSINGLIB
@@ -89,7 +90,8 @@ public:
     QString getName() const;
 
     friend bool operator == (const FilterParameter& in1, const FilterParameter& in2){
-        return (in1.m_sName == in2.m_sName);
+        //qDebug() << in1.getName() << in2.getName();
+        return (in1.getName() == in2.getName());
     }
 protected:
     QString m_sName;            /**< Item name */
