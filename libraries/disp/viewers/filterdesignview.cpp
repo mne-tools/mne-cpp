@@ -101,7 +101,7 @@ FilterDesignView::FilterDesignView(const QString& sSettingsPath,
     initButtons();
     initComboBoxes();
     initFilterPlot();
-    filterParametersChanged();
+//    filterParametersChanged();
 }
 
 //=============================================================================================================
@@ -446,7 +446,13 @@ void FilterDesignView::filterParametersChanged()
 //        dMethod = FilterKernel::Cosine;
 //    }
 
+    FilterParameter a = FilterParameter(m_pUi->m_comboBox_designMethod->currentText());
+
+    qDebug() << a.getName();
+
     int iMethod = FilterKernel::m_designMethods.indexOf(FilterParameter(m_pUi->m_comboBox_designMethod->currentText()));
+    qDebug() << "iMethod =" << iMethod << " Text:" << m_pUi->m_comboBox_designMethod->currentText();
+    //qDebug() << "Vector:" << FilterKernel::m_designMethods.at(0).getName();
 
     //Generate filters
     m_filterKernel = FilterKernel("Designed Filter",
@@ -549,6 +555,10 @@ void FilterDesignView::onBtnLoadFilter()
         }
         updateGuiFromFilter(filterLoadTemp);
 
+        updateFilterPlot();
+
+        filterParametersChanged();
+
     } else {
         qDebug()<<"Could not load filter.";
     }
@@ -586,6 +596,4 @@ void FilterDesignView::updateGuiFromFilter(const RTPROCESSINGLIB::FilterKernel& 
     m_pUi->m_doubleSpinBox_transitionband->setValue(filter.getParksWidth()*(filter.getSamplingFrequency()/2));
 
     m_pUi->m_comboBox_designMethod->setCurrentIndex(FilterKernel::m_designMethods.indexOf(filter.getDesignMethod()));
-
-    filterParametersChanged();
 }

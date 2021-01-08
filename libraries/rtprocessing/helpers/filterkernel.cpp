@@ -593,28 +593,34 @@ RTPROCESSINGLIB::FilterParameter FilterKernel::getFilterType() const
 
 void FilterKernel::setDesignMethod(int iDesignMethod)
 {
-    m_iDesignMethod = iDesignMethod;
+    if(iDesignMethod < 0){
+        m_iDesignMethod = 0;
+    } else {
+        m_iDesignMethod = iDesignMethod;
+    }
 }
 
 void FilterKernel::setFilterType(int iFilterType)
 {
-    m_iFilterType = iFilterType;
+    if(iFilterType < 0){
+        m_iFilterType = 0;
+    } else {
+        m_iFilterType = iFilterType;
+    }
 }
 
 //=============================================================================================================
 
 FilterParameter::FilterParameter()
+:FilterParameter("Unknown Method", "")
 {
-    FilterParameter("Unknown Method",
-                    "");
 }
 
 //=============================================================================================================
 
 FilterParameter::FilterParameter(QString sName)
-{
-    FilterParameter(sName,
-                    "");
+:FilterParameter(sName,"")
+{  
 }
 
 //=============================================================================================================
