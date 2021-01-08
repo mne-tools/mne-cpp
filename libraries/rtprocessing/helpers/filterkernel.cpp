@@ -71,89 +71,11 @@ using namespace RTPROCESSINGLIB;
 using namespace Eigen;
 using namespace UTILSLIB;
 
+
+
 //=============================================================================================================
-// DEFINE GLOBAL RTPROCESSINGLIB METHODS
+// INIT STATIC MEMBERS
 //=============================================================================================================
-
-//QString RTPROCESSINGLIB::getStringForDesignMethod(FilterKernel::DesignMethod designMethod)
-//{
-//    switch(designMethod) {
-//        case FilterKernel::External:
-//            return "External";
-//            break;
-
-//        case FilterKernel::Cosine:
-//            return "Cosine";
-//            break;
-
-//        case FilterKernel::Tschebyscheff:
-//            return "Tschebyscheff";
-//            break;
-
-//        default:
-//            return "External";
-//            break;
-//    }
-//}
-
-////=============================================================================================================
-
-//QString RTPROCESSINGLIB::getStringForFilterType(FilterKernel::FilterType filterType)
-//{
-//    switch(filterType) {
-//        case FilterKernel::LPF:
-//            return "LPF";
-//            break;
-
-//        case FilterKernel::HPF:
-//            return "HPF";
-//            break;
-
-//        case FilterKernel::BPF:
-//            return "BPF";
-//            break;
-
-//        case FilterKernel::NOTCH:
-//            return "NOTCH";
-//            break;
-
-//        default:
-//            return "LPF";
-//            break;
-//    }
-//}
-
-////=============================================================================================================
-
-//FilterKernel::DesignMethod RTPROCESSINGLIB::getDesignMethodForString(const QString &designMethodString)
-//{
-//    if(designMethodString == "External") {
-//        return FilterKernel::External;
-//    } else if(designMethodString == "Tschebyscheff") {
-//        return FilterKernel::Tschebyscheff;
-//    } else if(designMethodString == "Cosine") {
-//        return FilterKernel::Cosine;
-//    } else {
-//        return FilterKernel::External;
-//    }
-//}
-
-////=============================================================================================================
-
-//FilterKernel::FilterType RTPROCESSINGLIB::getFilterTypeForString(const QString &filterTypeString)
-//{
-//    if(filterTypeString == "LPF") {
-//        return FilterKernel::LPF;
-//    } else if(filterTypeString == "HPF") {
-//        return FilterKernel::HPF;
-//    } else if(filterTypeString == "BPF") {
-//        return FilterKernel::BPF;
-//    } else if(filterTypeString == "NOTCH") {
-//        return FilterKernel::NOTCH;
-//    } else {
-//        return FilterKernel::UNKNOWN;
-//    }
-//}
 
 QVector<RTPROCESSINGLIB::FilterParameter> FilterKernel::m_designMethods ({
     FilterParameter(QString("Cosine"), QString("A cosine filter")),
@@ -573,7 +495,6 @@ void FilterKernel::designFilter()
 
 RTPROCESSINGLIB::FilterParameter FilterKernel::getDesignMethod() const
 {
-    std::cout<< "METHOD: " << m_iDesignMethod;
     if(m_iDesignMethod < 0){
         return m_designMethods.at(0);
     }
@@ -584,12 +505,13 @@ RTPROCESSINGLIB::FilterParameter FilterKernel::getDesignMethod() const
 
 RTPROCESSINGLIB::FilterParameter FilterKernel::getFilterType() const
 {
-    std::cout<< "TYPE: " << m_iDesignMethod;
     if(m_iFilterType < 0){
         return m_filterTypes.at(0);
     }
     return m_filterTypes.at(m_iFilterType);
 }
+
+//=============================================================================================================
 
 void FilterKernel::setDesignMethod(int iDesignMethod)
 {
@@ -599,6 +521,8 @@ void FilterKernel::setDesignMethod(int iDesignMethod)
         m_iDesignMethod = iDesignMethod;
     }
 }
+
+//=============================================================================================================
 
 void FilterKernel::setFilterType(int iFilterType)
 {
@@ -612,7 +536,7 @@ void FilterKernel::setFilterType(int iFilterType)
 //=============================================================================================================
 
 FilterParameter::FilterParameter()
-:FilterParameter("Unknown Method", "")
+:FilterParameter("Unknown", "")
 {
 }
 
