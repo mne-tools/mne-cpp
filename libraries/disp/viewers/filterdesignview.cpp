@@ -91,17 +91,12 @@ FilterDesignView::FilterDesignView(const QString& sSettingsPath,
     m_sSettingsPath = sSettingsPath;
     m_pUi->setupUi(this);
 
-    for(FilterParameter filterMethod : FilterKernel::m_designMethods){
-        m_pUi->m_comboBox_designMethod->addItem(filterMethod.getName());
-    }
-
-    loadSettings();
-
     initSpinBoxes();
     initButtons();
     initComboBoxes();
     initFilterPlot();
-//    filterParametersChanged();
+
+    loadSettings();
 }
 
 //=============================================================================================================
@@ -313,6 +308,10 @@ void FilterDesignView::initButtons()
 
 void FilterDesignView::initComboBoxes()
 {
+    for(FilterParameter filterMethod : FilterKernel::m_designMethods){
+        m_pUi->m_comboBox_designMethod->addItem(filterMethod.getName());
+    }
+
     connect(m_pUi->m_comboBox_designMethod,static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
                 this,&FilterDesignView::changeStateSpinBoxes);
 
@@ -436,23 +435,7 @@ void FilterDesignView::filterParametersChanged()
     m_pUi->m_doubleSpinBox_to->setMinimum(m_pUi->m_doubleSpinBox_from->value());
     m_pUi->m_doubleSpinBox_from->setMaximum(m_pUi->m_doubleSpinBox_to->value());
 
-    //set filter design method
-//    FilterKernel::DesignMethod dMethod = FilterKernel::Tschebyscheff;
-//    if(m_pUi->m_comboBox_designMethod->currentText() == "Tschebyscheff") {
-//        dMethod = FilterKernel::Tschebyscheff;
-//    }
-
-//    if(m_pUi->m_comboBox_designMethod->currentText() == "Cosine") {
-//        dMethod = FilterKernel::Cosine;
-//    }
-
-    FilterParameter a = FilterParameter(m_pUi->m_comboBox_designMethod->currentText());
-
-    qDebug() << a.getName();
-
     int iMethod = FilterKernel::m_designMethods.indexOf(FilterParameter(m_pUi->m_comboBox_designMethod->currentText()));
-    qDebug() << "iMethod =" << iMethod << " Text:" << m_pUi->m_comboBox_designMethod->currentText();
-    //qDebug() << "Vector:" << FilterKernel::m_designMethods.at(0).getName();
 
     //Generate filters
     m_filterKernel = FilterKernel("Designed Filter",
@@ -589,7 +572,6 @@ double FilterDesignView::getTo()
 
 void FilterDesignView::updateGuiFromFilter(const RTPROCESSINGLIB::FilterKernel& filter)
 {
-
     m_pUi->m_doubleSpinBox_from->setValue(filter.getHighpassFreq());
     m_pUi->m_doubleSpinBox_to->setValue(filter.getLowpassFreq());
     m_pUi->m_spinBox_filterTaps->setValue(filter.getFilterOrder());
