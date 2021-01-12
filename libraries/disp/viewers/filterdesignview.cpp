@@ -97,6 +97,7 @@ FilterDesignView::FilterDesignView(const QString& sSettingsPath,
     initFilterPlot();
 
     loadSettings();
+    filterParametersChanged();
 }
 
 //=============================================================================================================
@@ -429,7 +430,7 @@ void FilterDesignView::filterParametersChanged()
     m_pUi->m_doubleSpinBox_from->setMinimum(0);
 
     if((m_pUi->m_doubleSpinBox_to->value() < m_pUi->m_doubleSpinBox_from->value())) {
-        m_pUi->m_doubleSpinBox_to->setValue(m_pUi->m_doubleSpinBox_from->value());
+        m_pUi->m_doubleSpinBox_to->setValue(m_pUi->m_doubleSpinBox_from->value() + 1);
     }
 
     m_pUi->m_doubleSpinBox_to->setMinimum(m_pUi->m_doubleSpinBox_from->value());
