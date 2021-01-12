@@ -258,7 +258,7 @@ private:
     double          m_dBandwidth;           /**< contains bandwidth of the filter. */
     double          m_dParksWidth;          /**< contains the parksmcallen width. */
     double          m_dLowpassFreq;         /**< lowpass freq (higher cut off) of the filter. */
-    double          m_dHighpassFreq;        /**< lowpass freq (lower cut off) of the filter. */
+    double          m_dHighpassFreq;        /**< highpass freq (lower cut off) of the filter. */
 
     int             m_iFilterOrder;         /**< represents the order of the filter instance. */
     int             m_iDesignMethod;        /**< represents the design method of the filter instance.*/

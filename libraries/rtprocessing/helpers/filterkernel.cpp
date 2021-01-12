@@ -79,8 +79,8 @@ using namespace UTILSLIB;
 
 QVector<RTPROCESSINGLIB::FilterParameter> FilterKernel::m_designMethods ({
     FilterParameter(QString("Cosine"), QString("A cosine filter")),
-    FilterParameter(QString("Tschebyscheff"), QString("A tschebyscheff filter")),
-    FilterParameter(QString("External"), QString("An external filter"))
+    FilterParameter(QString("Tschebyscheff"), QString("A tschebyscheff filter"))
+//    FilterParameter(QString("External"), QString("An external filter"))
 });
 QVector<RTPROCESSINGLIB::FilterParameter> FilterKernel::m_filterTypes ({
     FilterParameter(QString("LPF"), QString("An LPF filter")),
@@ -95,16 +95,16 @@ QVector<RTPROCESSINGLIB::FilterParameter> FilterKernel::m_filterTypes ({
 //=============================================================================================================
 
 FilterKernel::FilterKernel()
-: m_iFilterType(m_filterTypes.indexOf(FilterParameter("UNKNOWN")))
+: m_iFilterType(m_filterTypes.indexOf(FilterParameter("BPF")))
 , m_iFilterOrder(80)
 , m_sFilterName("Unknown")
 , m_dParksWidth(0.1)
-, m_iDesignMethod(m_designMethods.indexOf(FilterParameter("External")))
+, m_iDesignMethod(m_designMethods.indexOf(FilterParameter("Cosine")))
 , m_dCenterFreq(0.5)
 , m_dBandwidth(0.1)
 , m_sFreq(1000)
-, m_dLowpassFreq(4)
-, m_dHighpassFreq(40)
+, m_dLowpassFreq(40)
+, m_dHighpassFreq(4)
 {
     designFilter();
 }
