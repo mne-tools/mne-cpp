@@ -235,13 +235,13 @@ void ScalingView::loadSettings()
 
     QSettings settings("MNECPP");
 
-    float val = settings.value(m_sSettingsPath + QString("/ScalingView/scaleMAG"), m_fScaleMAG).toFloat();
+    float val = settings.value(m_sSettingsPath + QString("/ScalingView/scaleMAG"), m_fScaleMAG * 3).toFloat();
     m_qMapChScaling.insert(FIFF_UNIT_T, val);
 
-    val = settings.value(m_sSettingsPath + QString("/ScalingView/scaleGRAD"), m_fScaleGRAD).toFloat();
+    val = settings.value(m_sSettingsPath + QString("/ScalingView/scaleGRAD"), m_fScaleGRAD * 300 * 100/*convert cm to m*/).toFloat();
     m_qMapChScaling.insert(FIFF_UNIT_T_M, val);
 
-    val = settings.value(m_sSettingsPath + QString("/ScalingView/scaleEEG"), m_fScaleEEG).toFloat();
+    val = settings.value(m_sSettingsPath + QString("/ScalingView/scaleEEG"), m_fScaleEEG * 10).toFloat();
     m_qMapChScaling.insert(FIFFV_EEG_CH, val);
 
     val = settings.value(m_sSettingsPath + QString("/ScalingView/scaleEOG"), m_fScaleEOG).toFloat();
