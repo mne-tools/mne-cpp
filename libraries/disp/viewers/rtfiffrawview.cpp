@@ -227,7 +227,13 @@ MatrixXd RtFiffRawView::getLastBlock()
 
 bool RtFiffRawView::eventFilter(QObject *object, QEvent *event)
 {
-    if (object == m_pTableView->viewport() && event->type() == QEvent::MouseMove) {
+//    if (object == m_pTableView->viewport() && event->type() == QEvent::MouseMove) {
+//        QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+//        emit markerMoved(mouseEvent->pos(), m_pTableView->rowAt(mouseEvent->pos().y()));
+//        return true;
+//    }
+
+    if (object == m_pTableView->viewport() && event->type() == QEvent::MouseButtonDblClick) {
         QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
         emit markerMoved(mouseEvent->pos(), m_pTableView->rowAt(mouseEvent->pos().y()));
         return true;
