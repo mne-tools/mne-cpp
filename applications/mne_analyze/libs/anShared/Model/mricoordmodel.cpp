@@ -59,7 +59,7 @@ using namespace ANSHAREDLIB;
 //=============================================================================================================
 
 MriCoordModel::MriCoordModel(const QString &sFilePath,
-                             const QByteArray& byteLoadedData,
+                             const QByteArray& ,//byteLoadedData,
                              QObject* parent)
 :AbstractModel(sFilePath, parent)
 {

@@ -864,7 +864,7 @@ void FiffRawViewModel::postBlockLoad(int result)
         case 0:
         {
             // insertion of earlier blocks
-            int iNewBlocks = m_lNewData.size();
+            int iNewBlocks = static_cast<int>(m_lNewData.size());
 
             m_dataMutex.lock();
             for (int i = 0; i < iNewBlocks; ++i) {
@@ -889,7 +889,7 @@ void FiffRawViewModel::postBlockLoad(int result)
         case 1:
         {
             // insertion of later blocks
-            int iNewBlocks = m_lNewData.size();
+            int iNewBlocks = static_cast<int>(m_lNewData.size());
 
             m_dataMutex.lock();
             for (int i = 0; i < iNewBlocks; ++i) {
