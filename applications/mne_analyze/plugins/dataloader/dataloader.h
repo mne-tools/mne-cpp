@@ -190,7 +190,6 @@ private:
      */
     void saveSettings();
 
-
     //=========================================================================================================
     /**
      * Update the value of m_sLastDir member variable, both in the in-memory object and also in the storage system.
