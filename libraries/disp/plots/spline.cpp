@@ -64,7 +64,7 @@ using namespace QtCharts;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Spline::Spline(QWidget* parent, const QString& title)
+Spline::Spline(QWidget* parent, const QString& /*title*/)
 : QWidget(parent)
 , m_dMinAxisX(0)
 , m_dMaxAxisX(0)
