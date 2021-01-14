@@ -366,6 +366,14 @@ void RtFiffRawViewDelegate::paint(QPainter *painter,
                 painter->setPen(m_penMarker);
                 painter->drawPath(path);
                 painter->restore();
+
+                path = QPainterPath(QPointF(option.rect.x(),option.rect.y()));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor(),option.rect.y()));
+                createMarkerPath(option, path);
+
+                painter->save();
+                painter->setPen(m_penMarker);
+                painter->drawPath(path);
+                painter->restore();
             }
             break;
         }
