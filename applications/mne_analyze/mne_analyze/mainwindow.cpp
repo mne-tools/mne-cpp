@@ -251,14 +251,18 @@ void MainWindow::createActions()
 
 //=============================================================================================================
 
-void MainWindow::onStyleChanged(const QString& sStyle)
+void MainWindow::onStyleChanged()
 {
+    if(m_sCurrentStyle == "dark") {
+        m_pActionDarkMode->setChecked(true);
+    } else {
+        m_pActionDarkMode->setChecked(false);
+    }
+
     if(QApplication *pApp = qobject_cast<QApplication *>(QApplication::instance())) {
-        if(sStyle == "default") {
-            m_sCurrentStyle = "default";
+        if(m_sCurrentStyle == "default") {
             pApp->setStyleSheet("");
-        } else if (sStyle == "dark") {
-            m_sCurrentStyle = "dark";
+        } else if (m_sCurrentStyle == "dark") {
             QFile file(":/dark.qss");
             file.open(QFile::ReadOnly);
             QTextStream stream(&file);
@@ -332,7 +336,7 @@ void MainWindow::createPluginMenus(QSharedPointer<ANSHAREDLIB::PluginManager> pP
     pActionStyleGroup->addAction(pActionDefaultStyle);
     connect(pActionDefaultStyle, &QAction::triggered,
         [=]() {
-        onStyleChanged("default");
+        setCurrentStyle("default");
     });
 
     m_pActionDarkMode = new QAction("Dark");
@@ -342,7 +346,7 @@ void MainWindow::createPluginMenus(QSharedPointer<ANSHAREDLIB::PluginManager> pP
     pActionStyleGroup->addAction(m_pActionDarkMode);
     connect(m_pActionDarkMode.data(), &QAction::triggered,
         [=]() {
-        onStyleChanged("dark");
+        setCurrentStyle("dark");
     });
 
     // Modes

@@ -177,7 +177,7 @@ private:
      *
      * @param [in] sStyle   The new qss style.
      */
-    void onStyleChanged(const QString& sStyle);
+    void onStyleChanged();
 
     //=========================================================================================================
     /**
@@ -190,6 +190,14 @@ private:
      * Creates log dock widget.
      */
     void createLogDockWindow();
+
+    //=========================================================================================================
+    /**
+     * Setter method for CurrentStyle member variable.
+     */
+    void setCurrentStyle(const QString& style);
+
+
 
     /**< Creates all actions for user interface of MainWindow class. */
     void createPluginMenus(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager);          /**< Creates all menus for user interface of MainWindow class. */
