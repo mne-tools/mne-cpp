@@ -209,19 +209,29 @@ void MainWindow::loadSettings()
 
     QSettings settings("MNECPP");
 
-    settings.beginGroup(m_sSettingsPath + "/layout");
-    restoreGeometry(settings.value("geometry").toByteArray());
-    restoreState(settings.value("state").toByteArray());
-    settings.endGroup();
+    settings.beginGroup(m_sSettingsPath);
 
-    m_sCurrentStyle = settings.value(m_sSettingsPath + QString("/styleMode"), "default").toString();
-    if(m_sCurrentStyle == "dark") {
-        m_pActionDarkMode->setChecked(true);
+    if(settings.contains("already_run"))
+    {
+        settings.beginGroup("layout");
+        restoreGeometry(settings.value("geometry").toByteArray());
+        restoreState(settings.value("state").toByteArray());
+        settings.endGroup();
+        setCurrentStyle(settings.value("styleMode","default").toString());
     } else {
-        m_pActionDarkMode->setChecked(false);
+        settings.setValue("already_run","yes");
+        setCurrentStyle(m_sCurrentStyle);
     }
+    settings.endGroup();
+}
 
-    onStyleChanged(m_sCurrentStyle);
+//=============================================================================================================
+
+void MainWindow::setCurrentStyle(const QString& sStyle)
+{
+    m_sCurrentStyle = sStyle;
+
+    onStyleChanged();
 }
 
 //=============================================================================================================
