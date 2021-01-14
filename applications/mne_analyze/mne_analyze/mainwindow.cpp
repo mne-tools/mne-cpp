@@ -217,7 +217,7 @@ void MainWindow::loadSettings()
         restoreGeometry(settings.value("geometry").toByteArray());
         restoreState(settings.value("state").toByteArray());
         settings.endGroup();
-        setCurrentStyle(settings.value("styleMode",m_sCurrentStyle).toString());
+        setCurrentStyle(settings.value("styleMode", m_sCurrentStyle).toString());
     } else {
         setCurrentStyle(m_sCurrentStyle);
     }
