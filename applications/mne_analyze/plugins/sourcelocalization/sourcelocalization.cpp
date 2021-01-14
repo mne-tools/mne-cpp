@@ -124,10 +124,11 @@ QDockWidget* SourceLocalization::getControl()
 
 void SourceLocalization::handleEvent(QSharedPointer<Event> e)
 {
-    switch (e->getType()) {
-        default:
-            qWarning() << "[SourceLocalization::handleEvent] Received an Event that is not handled by switch cases.";
-    }
+    Q_UNUSED(e)
+//    switch (e->getType()) {
+//        default:
+//            qWarning() << "[SourceLocalization::handleEvent] Received an Event that is not handled by switch cases.";
+//    }
 }
 
 //=============================================================================================================
