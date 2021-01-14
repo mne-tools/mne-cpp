@@ -64,12 +64,15 @@ using namespace ANSHAREDLIB;
 DataLoader::DataLoader()
 : m_pProgressView(new DISPLIB::ProgressView(false))
 , m_pProgressViewWidget(new QWidget())
+, m_sSettingsPath("MNEANALYZE/DataLoader")
+, m_sLastDir(QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation))
 {
     m_pProgressViewWidget->setWindowFlags(Qt::Window);
 
     QVBoxLayout* layout = new QVBoxLayout(m_pProgressViewWidget.data());
     layout->addWidget(m_pProgressView);
     m_pProgressViewWidget->setLayout(layout);
+    loadSettings();
 }
 
 //=============================================================================================================
@@ -259,17 +262,51 @@ void DataLoader::onLoadFilePressed()
     //Get the path
     QString sFilePath = QFileDialog::getOpenFileName(Q_NULLPTR,
                                                     tr("Open File"),
-                                                    QDir::currentPath()+"/MNE-sample-data",
+                                                    m_sLastDir,
                                                     tr("Fiff file (*.fif *.fiff);;Event file (*.eve)"));
 
     QFileInfo fileInfo(sFilePath);
 
-    if(fileInfo.fileName().isEmpty()){
+    if(fileInfo.fileName().isEmpty() || !fileInfo.isFile()){
+
         return;
     }
 
+    updateLastDir(fileInfo.absolutePath());
+
     loadFilePath(sFilePath);
     #endif
+}
+
+//=============================================================================================================
+
+void DataLoader::updateLastDir(const QString& lastDir)
+{
+    m_sLastDir = lastDir;
+    saveSettings();
+}
+
+//=============================================================================================================
+
+void DataLoader::saveSettings()
+{
+    QSettings settings("MNECPP");
+    settings.beginGroup(m_sSettingsPath);
+    settings.setValue("lastDirectory", m_sLastDir);
+}
+
+//=============================================================================================================
+
+void DataLoader::loadSettings()
+{
+    QSettings settings("MNECPP");
+    settings.beginGroup(m_sSettingsPath);
+    if(settings.contains("lastDirectory"))
+    {
+        m_sLastDir = settings.value("lastDirectory").toString();
+    } else {
+        saveSettings();
+    }
 }
 
 //=============================================================================================================
