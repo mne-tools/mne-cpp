@@ -52,6 +52,8 @@
 #include <QtWidgets>
 #include <QtCore/QtPlugin>
 #include <QDebug>
+#include <QFileInfo>
+#include <QStandardPaths>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -178,6 +180,25 @@ private:
 
     //=========================================================================================================
     /**
+     * Loads settings from the system.
+     */
+    void loadSettings();
+
+    //=========================================================================================================
+    /**
+     * Save the settings in the register/file/mechanism for lon-term storage.
+     */
+    void saveSettings();
+
+
+    //=========================================================================================================
+    /**
+     * Update the value of m_sLastDir member variable, both in the in-memory object and also in the storage system.
+     */
+    void updateLastDir(const QString& lastDir);
+
+    //=========================================================================================================
+    /**
      * Loads new Fiff model whan current loaded model is changed
      *
      * @param [in,out] pNewModel    pointer to currently loaded FiffRawView Model
@@ -189,6 +210,8 @@ private:
     QPointer<QWidget>                               m_pProgressViewWidget;      /**< Window for ProgressView */
 
     QSharedPointer<ANSHAREDLIB::FiffRawViewModel>   m_pSelectedModel;           /**< Pointer to currently selected Fiff model */
+    QString                                         m_sSettingsPath;            /**< Variable that stores the key where to store settings for this plugin.*/
+    QString                                         m_sLastDir;                 /**< Variable to store the last directory from where data were loaded.*/
 };
 
 //=============================================================================================================
