@@ -113,9 +113,9 @@ AnnotationModel::AnnotationModel(QSharedPointer<FiffRawViewModel> pFiffModel,
 //=============================================================================================================
 
 AnnotationModel::AnnotationModel(const QString &sFilePath,
-                                 const QByteArray& ,//byteLoadedData,
-                                 float ,//fSampFreq,
-                                 int ,//iFirstSampOffst,
+                                 const QByteArray& byteLoadedData,
+                                 float fSampFreq,
+                                 int iFirstSampOffst,
                                  QObject* parent)
 : AbstractModel(parent)
 , m_iIndexCount(0)
@@ -128,6 +128,10 @@ AnnotationModel::AnnotationModel(const QString &sFilePath,
 , m_sFilterEventType("All")
 
 {
+    Q_UNUSED(byteLoadedData)
+    Q_UNUSED(fSampFreq)
+    Q_UNUSED(iFirstSampOffst)
+
     initModel();
     initFromFile(sFilePath);
 }
