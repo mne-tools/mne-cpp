@@ -808,12 +808,12 @@ public:
 
     ChannelData(std::list<QSharedPointer<QPair<MatrixXd, MatrixXd>>>::const_iterator it,
                 qint32 numBlocks,
-                qint32 rowNumber)
+                quint32 rowNumber)
     : m_lData()
     , m_iRowNumber(rowNumber)
     , m_iNumSamples(0)
     {
-        for (int i = 0; i < numBlocks; ++i) {
+        for (qint32 i = 0; i < numBlocks; ++i) {
             m_lData.push_back(*it);
             it++;
         }
@@ -825,7 +825,7 @@ public:
 
     ChannelData(const std::list<QSharedPointer<QPair<MatrixXd, MatrixXd>>> data,
                 unsigned long rowNumber)
-    : ChannelData(data.begin(), data.size(), rowNumber)
+    : ChannelData(data.begin(), static_cast<qint32>(data.size()), rowNumber)
     {
 
     }
@@ -840,7 +840,7 @@ public:
     // we need a public default constructor in order to register this as QMetaType
     ChannelData()
     : m_lData()
-    , m_iRowNumber(-1)
+    , m_iRowNumber(0)
     , m_iNumSamples(0)
     {
         qWarning() << "[FiffRawViewModel::ChannelData::ChannelData] WARNING: default constructor called, this is probably wrong ...";
@@ -898,7 +898,7 @@ private:
     // hold a list of smartpointers to the data that was in the model when the respective instance of ChannelData was created.
     // This prevents that pointers into the Eigen-matrices will become invalid when the background thread returns and changes the matrices.
     std::list<QSharedPointer<QPair<MatrixXd, MatrixXd> > > m_lData;
-    qint32 m_iRowNumber;
+    quint32 m_iRowNumber;
     qint64 m_iNumSamples;
 };
 
@@ -911,7 +911,7 @@ public:
 private:
 
     int m_iSample;
-    int m_iEventType;
+    //int m_iEventType;
 
 
 };
