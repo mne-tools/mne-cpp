@@ -190,13 +190,13 @@ void MainWindow::saveSettings()
     }
 
     QSettings settings("MNECPP");
-
-    settings.beginGroup(m_sSettingsPath + "/layout");
+    settings.beginGroup(m_sSettingsPath);
+    settings.setValue("already_run","yes");
+    settings.setValue("styleMode", m_sCurrentStyle);
+    settings.beginGroup("layout");
     settings.setValue("geometry", saveGeometry());
     settings.setValue("state", saveState());
     settings.endGroup();
-
-    settings.setValue(m_sSettingsPath + QString("/styleMode"), m_sCurrentStyle);
 }
 
 //=============================================================================================================
@@ -217,9 +217,8 @@ void MainWindow::loadSettings()
         restoreGeometry(settings.value("geometry").toByteArray());
         restoreState(settings.value("state").toByteArray());
         settings.endGroup();
-        setCurrentStyle(settings.value("styleMode","default").toString());
+        setCurrentStyle(settings.value("styleMode",m_sCurrentStyle).toString());
     } else {
-        settings.setValue("already_run","yes");
         setCurrentStyle(m_sCurrentStyle);
     }
     settings.endGroup();
