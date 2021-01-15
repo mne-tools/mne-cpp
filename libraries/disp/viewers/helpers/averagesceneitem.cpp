@@ -69,7 +69,7 @@ AverageSceneItem::AverageSceneItem(const QString& channelName,
                                    const QPointF &channelPosition,
                                    int channelKind,
                                    int channelUnit,
-                                   const QColor & /*color*/)
+                                   const QColor &color)
 : m_sChannelName(channelName)
 , m_iChannelNumber(channelNumber)
 , m_iChannelKind(channelKind)
