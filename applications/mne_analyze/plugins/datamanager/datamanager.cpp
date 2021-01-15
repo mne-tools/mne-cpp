@@ -144,12 +144,11 @@ QWidget *DataManager::getView()
 
 void DataManager::handleEvent(QSharedPointer<Event> e)
 {
-    Q_UNUSED(e)
-//    switch (e->getType()) {
-//    default:
-//        qWarning() << "[DataManager::handleEvent] received an Event that is not handled by switch-cases";
-//        break;
-//    }
+    switch (e->getType()) {
+    default:
+        qWarning() << "[DataManager::handleEvent] received an Event that is not handled by switch-cases";
+        break;
+    }
 }
 
 //=============================================================================================================
