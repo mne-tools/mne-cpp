@@ -48,6 +48,13 @@
 
 #include <QSharedPointer>
 #include <QVector3D>
+#include <QObject>
+#include <QMatrix4x4>
+
+namespace Qt3DCore {
+class QTransform;
+}
+
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -82,6 +89,9 @@ namespace DISP3DLIB {
 class DISP3DSHARED_EXPORT OrbitalCameraController : public Qt3DExtras::QAbstractCameraController
 {
    Q_OBJECT
+   Q_PROPERTY(Qt3DCore::QTransform* target READ target WRITE setTarget)
+   Q_PROPERTY(float radius READ radius WRITE setRadius)
+   Q_PROPERTY(float angle READ angle WRITE setAngle)
 
 public:
     typedef QSharedPointer<OrbitalCameraController> SPtr;            /**< Shared pointer type for OrbitalCameraController. */
@@ -106,6 +116,18 @@ public:
      * @param[in] newStatusFlag      The new status of the inversion
      */
     void invertCameraRotation(bool newStatusFlag);
+
+    void setTarget(Qt3DCore::QTransform *target);
+    Qt3DCore::QTransform *target() const;
+
+    void setRadius(float radius);
+    float radius() const;
+
+    void setAngle(float angle);
+    float angle() const;
+
+protected:
+    void updateMatrix();
 
 private:
     //=========================================================================================================
@@ -136,6 +158,10 @@ private:
 
     float m_rotationInversFactor = 1.0f;             /**< The factor used to invers the camera rotation. */
     const float m_fZoomInLimit = 0.04f;         /**< The minimum distance of the camera to the the view center. */
+    Qt3DCore::QTransform *m_target;
+    QMatrix4x4 m_matrix;
+    float m_radius;
+    float m_angle;
 };
 
 //=============================================================================================================
