@@ -911,7 +911,7 @@ public:
 private:
 
     int m_iSample;
-    //int m_iEventType;
+    int m_iEventType;
 
 
 };
