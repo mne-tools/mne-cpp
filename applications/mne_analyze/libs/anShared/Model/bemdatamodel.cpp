@@ -113,8 +113,8 @@ void BemDataModel::initBemData(QIODevice& qIODevice)
 
 //=============================================================================================================
 
-QVariant BemDataModel::data(const QModelIndex &,//index,
-                            int )//role)
+QVariant BemDataModel::data(const QModelIndex &index,
+                            int role)
                             const
 {
     return QVariant();
