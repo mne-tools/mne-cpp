@@ -43,6 +43,7 @@
 //=============================================================================================================
 
 #include <Qt3DRender/QCamera>
+#include <Qt3DCore/qtransform.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -64,6 +65,10 @@ using namespace DISP3DLIB;
 
 OrbitalCameraController::OrbitalCameraController(Qt3DCore::QNode *pParent)
     :QAbstractCameraController(pParent)
+    , m_target(nullptr)
+    , m_matrix()
+    , m_radius(1.0f)
+    , m_angle(0.0f)
 {
     initController();
 }
@@ -138,3 +143,49 @@ void OrbitalCameraController::initController()
 }
 
 //=============================================================================================================
+
+void OrbitalCameraController::setTarget(Qt3DCore::QTransform *target)
+{
+    if (m_target != target) {
+        m_target = target;
+    }
+}
+
+Qt3DCore::QTransform *OrbitalCameraController::target() const
+{
+    return m_target;
+}
+
+void OrbitalCameraController::setRadius(float radius)
+{
+    if (!qFuzzyCompare(radius, m_radius)) {
+        m_radius = radius;
+        updateMatrix();
+    }
+}
+
+float OrbitalCameraController::radius() const
+{
+    return m_radius;
+}
+
+void OrbitalCameraController::setAngle(float angle)
+{
+    if (!qFuzzyCompare(angle, m_angle)) {
+        m_angle = angle;
+        updateMatrix();
+    }
+}
+
+float OrbitalCameraController::angle() const
+{
+    return m_angle;
+}
+
+void OrbitalCameraController::updateMatrix()
+{
+    m_matrix.setToIdentity();
+    m_matrix.rotate(m_angle, QVector3D(0.0f, 1.0f, 0.0f));
+    m_matrix.translate(m_radius, 0.0f, 0.0f);
+    m_target->setMatrix(m_matrix);
+}
