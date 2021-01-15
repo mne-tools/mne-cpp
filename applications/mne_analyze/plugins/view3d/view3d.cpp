@@ -149,7 +149,7 @@ QWidget *View3D::getView()
     connect(this, &View3D::sceneColorChanged,
             m_pView3D, &DISP3DLIB::View3D::setSceneColor);
     connect(this, &View3D::rotationChanged,
-            m_pView3D, &DISP3DLIB::View3D::startStopModelRotation);
+            m_pView3D, &DISP3DLIB::View3D::startStopCameraRotation);
     connect(this, &View3D::showCoordAxis,
             m_pView3D, &DISP3DLIB::View3D::toggleCoordAxis);
     connect(this, &View3D::showFullScreen,

@@ -374,7 +374,7 @@ void RealTime3DWidget::initDisplayControllWidgets()
             m_p3DView.data(), &View3D::setSceneColor);
 
     connect(pControl3DView, &Control3DView::rotationChanged,
-            m_p3DView.data(), &View3D::startStopModelRotation);
+            m_p3DView.data(), &View3D::startStopCameraRotation);
 
     connect(pControl3DView, &Control3DView::showCoordAxis,
             m_p3DView.data(), &View3D::toggleCoordAxis);

@@ -88,7 +88,7 @@ AbstractView::AbstractView(QWidget* parent,
             m_p3DView.data(), &View3D::setSceneColor);
 
     connect(m_pControl3DView.data(), &DISPLIB::Control3DView::rotationChanged,
-            m_p3DView.data(), &View3D::startStopModelRotation);
+            m_p3DView.data(), &View3D::startStopCameraRotation);
 
     connect(m_pControl3DView.data(), &DISPLIB::Control3DView::showCoordAxis,
             m_p3DView.data(), &View3D::toggleCoordAxis);
