@@ -410,7 +410,7 @@ void ChannelSelectionView::updateDataView()
                 i.remove();
             }
         }
-        //SelectionSceneItem* test = static_cast<SelectionSceneItem*>(visibleItemList.first());
+        SelectionSceneItem* test = static_cast<SelectionSceneItem*>(visibleItemList.first());
         emit selectionChanged(visibleItemList);
     }
 }
