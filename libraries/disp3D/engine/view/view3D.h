@@ -51,6 +51,7 @@
 #include <QPointer>
 #include <QObjectPicker>
 #include <Qt3DCore>
+#include "orbitalcameracontroller.h"
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -122,9 +123,9 @@ public:
 
     //=========================================================================================================
     /**
-     * Starts or stops to rotate all loaded 3D models.
+     * Starts or stops to rotate camera around 3D models.
      */
-    void startStopModelRotation(bool checked);
+    void startStopCameraRotation(bool checked);
 
     //=========================================================================================================
     /**
@@ -217,14 +218,6 @@ protected:
 
     //=========================================================================================================
     /**
-     * Starts the automated rotation animation for all 3D models being childern.
-     *
-     * @param[in] pObject         The parent of the children to be rotated.
-     */
-    void startModelRotationRecursive(QObject* pObject);
-
-    //=========================================================================================================
-    /**
      * Handle Picking events.
      *
      * @param[in] qPickEvent         The picking event that occured.
@@ -241,7 +234,8 @@ protected:
     QPointer<Qt3DRender::QRenderCaptureReply>   m_pScreenCaptureReply;          /**< The capture reply object to save screenshots. */
     QPointer<Qt3DRender::QObjectPicker>         m_pPicker;                      /**< The Picker entity. */
 
-    QSharedPointer<QParallelAnimationGroup>     m_pParallelAnimationGroup;      /**< The animations for each 3D object. */
+    QPointer<OrbitalCameraController>           m_pCamController;               /**< The controller for camera position */
+    QPointer<QPropertyAnimation>                m_pCameraAnimation;             /**< The animations to rotate the camera. */
 
     QList<QPointer<Qt3DRender::QPointLight> >   m_lLightSources;                /**< The light sources. */
 
