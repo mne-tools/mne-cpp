@@ -216,6 +216,7 @@ void FilterSettingsView::onShowFilterView()
     } else {
         m_pFilterView->activateWindow();
         m_pFilterView->show();
+        m_pFilterView->updateFilterPlot();
     }
 }
 
