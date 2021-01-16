@@ -65,7 +65,7 @@ using namespace DISP3DLIB;
 
 OrbitalCameraController::OrbitalCameraController(Qt3DCore::QNode *pParent)
     :QAbstractCameraController(pParent)
-    , m_angle(0.0f)
+    , m_rotating(0.0f)
 {
     initController();
 }
@@ -141,22 +141,16 @@ void OrbitalCameraController::initController()
 
 //=============================================================================================================
 
-void OrbitalCameraController::setAngle(float angle)
+void OrbitalCameraController::setRotating(int count)
 {
     Qt3DRender::QCamera *pCamera = this->camera();
 
-    if (!qFuzzyCompare(angle, m_angle)) {
-        m_angle = angle;
-        pCamera->setPosition(QVector3D(0.0f, -0.4f, -0.25f));
-        pCamera->setViewCenter(QVector3D(0.0f, 0.0f, 0.0f));
-        pCamera->setUpVector(QVector3D(0.0f, 1.0f, 0.0f));
-        pCamera->tiltAboutViewCenter(180);
-        QQuaternion quat = QQuaternion::QQuaternion::fromEulerAngles(0,0,angle);
-        pCamera->rotateAboutViewCenter(quat);
-    }
+    m_rotating = count;
+    QQuaternion quat = QQuaternion::QQuaternion::fromEulerAngles(0,0,0.5);
+    pCamera->rotateAboutViewCenter(quat);
 }
 
-float OrbitalCameraController::angle() const
+int OrbitalCameraController::rotating() const
 {
-    return m_angle;
+    return m_rotating;
 }

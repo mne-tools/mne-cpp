@@ -380,9 +380,9 @@ void View3D::setCameraRotation(float fAngle)
 void View3D::startStopCameraRotation(bool checked)
 {
     if(!m_pCameraAnimation) {
-        m_pCameraAnimation = new QPropertyAnimation(m_pCamController, "angle");
-        m_pCameraAnimation->setStartValue(QVariant::fromValue(m_pCamController->angle()));
-        m_pCameraAnimation->setEndValue(QVariant::fromValue(m_pCamController->angle() + 360));
+        m_pCameraAnimation = new QPropertyAnimation(m_pCamController, "rotating");
+        m_pCameraAnimation->setStartValue(QVariant::fromValue(1));
+        m_pCameraAnimation->setEndValue(QVariant::fromValue(10000));
         m_pCameraAnimation->setDuration(10000);
         m_pCameraAnimation->setLoopCount(-1);
     }
