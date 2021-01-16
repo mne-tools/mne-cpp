@@ -89,7 +89,7 @@ namespace DISP3DLIB {
 class DISP3DSHARED_EXPORT OrbitalCameraController : public Qt3DExtras::QAbstractCameraController
 {
    Q_OBJECT
-   Q_PROPERTY(float angle READ angle WRITE setAngle)                 /**< Access for QPropertyAnimation */
+   Q_PROPERTY(int rotating READ rotating WRITE setRotating)                 /**< Access for QPropertyAnimation */
 
 public:
     typedef QSharedPointer<OrbitalCameraController> SPtr;            /**< Shared pointer type for OrbitalCameraController. */
@@ -119,8 +119,8 @@ public:
     /**
      * Sets the angle of the camera for rotating around
      */
-    void setAngle(float angle);
-    float angle() const;
+    void setRotating(int count);     /* The counter for how long the rotation has been happening. */
+    int rotating() const;
 
 private:
     //=========================================================================================================
@@ -151,7 +151,7 @@ private:
 
     float m_rotationInversFactor = 1.0f;             /**< The factor used to invers the camera rotation. */
     const float m_fZoomInLimit = 0.04f;         /**< The minimum distance of the camera to the the view center. */
-    float m_angle;                             /**< The angle of the camera with regards to the the view center. */
+    int m_rotating;                      /**< How long the camera has been rotating with regards to the view center. */
 };
 
 //=============================================================================================================
