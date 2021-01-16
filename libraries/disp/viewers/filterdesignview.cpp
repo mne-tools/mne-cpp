@@ -337,6 +337,8 @@ void FilterDesignView::initFilterPlot()
     m_pFilterPlotScene = new FilterPlotScene(m_pUi->m_graphicsView_filterPlot, this);
 
     m_pUi->m_graphicsView_filterPlot->setScene(m_pFilterPlotScene);
+    m_pUi->m_graphicsView_filterPlot->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    m_pUi->m_graphicsView_filterPlot->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     updateFilterPlot();
 }
