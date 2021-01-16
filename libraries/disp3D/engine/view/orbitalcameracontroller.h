@@ -151,6 +151,7 @@ private:
 
     float m_rotationInversFactor = 1.0f;             /**< The factor used to invers the camera rotation. */
     const float m_fZoomInLimit = 0.04f;         /**< The minimum distance of the camera to the the view center. */
+    const float m_fAutoRotationSpeed = 1.0f;         /**< The speed that automatic rotation rotates */
     int m_rotating;                      /**< How long the camera has been rotating with regards to the view center. */
 };
 

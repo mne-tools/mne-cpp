@@ -146,7 +146,7 @@ void OrbitalCameraController::setRotating(int count)
     Qt3DRender::QCamera *pCamera = this->camera();
 
     m_rotating = count;
-    QQuaternion quat = QQuaternion::QQuaternion::fromEulerAngles(0,0,0.5);
+    QQuaternion quat = QQuaternion::QQuaternion::fromEulerAngles(0,0,m_fAutoRotationSpeed);
     pCamera->rotateAboutViewCenter(quat);
 }
 
