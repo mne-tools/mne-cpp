@@ -171,9 +171,16 @@ float OrbitalCameraController::radius() const
 
 void OrbitalCameraController::setAngle(float angle)
 {
+    Qt3DRender::QCamera *pCamera = this->camera();
+
     if (!qFuzzyCompare(angle, m_angle)) {
         m_angle = angle;
-        updateMatrix();
+        pCamera->setPosition(QVector3D(0.0f, -0.4f, -0.25f));
+        pCamera->setViewCenter(QVector3D(0.0f, 0.0f, 0.0f));
+        pCamera->setUpVector(QVector3D(0.0f, 1.0f, 0.0f));
+        pCamera->tiltAboutViewCenter(180);
+        QQuaternion quat = QQuaternion::QQuaternion::fromEulerAngles(0,0,angle);
+        pCamera->rotateAboutViewCenter(quat);
     }
 }
 

@@ -92,6 +92,7 @@ View3D::View3D()
 , m_pLightEntity(new Qt3DCore::QEntity(m_pRootEntity))
 , m_pCamera(this->camera())
 , m_pPicker(new Qt3DRender::QObjectPicker(m_pRootEntity))
+, m_pCamController(new OrbitalCameraController(m_pRootEntity))
 {
     //Root entity
     this->setRootEntity(m_pRootEntity);
@@ -114,7 +115,6 @@ View3D::View3D()
     m_pCamera->lens()->setPerspectiveProjection(45.0f, this->width()/this->height(), 0.01f, 5000.0f);
     m_pFrameGraph->setCamera(m_pCamera);
 
-    OrbitalCameraController *m_pCamController = new OrbitalCameraController(m_pRootEntity);
     m_pCamController->setCamera(m_pCamera);
 
     createCoordSystem(m_pRootEntity);
@@ -380,20 +380,22 @@ void View3D::setCameraRotation(float fAngle)
 void View3D::startStopCameraRotation(bool checked)
 {
     if(!m_pCameraAnimation) {
-        Qt3DCore::QTransform *pCameraTransform = new Qt3DCore::QTransform;
-        m_pCameraAnimation = new QPropertyAnimation(pCameraTransform);
-        m_pCameraAnimation->setTargetObject(m_pCamController);
-        m_pCamController->setTarget(pCameraTransform);
-        m_pCamController->setRadius(m_pCamera->position().length());
-        m_pCameraAnimation->setPropertyName("angle");
+        //Qt3DCore::QTransform *pCameraTransform = new Qt3DCore::QTransform;
+        m_pCameraAnimation = new QPropertyAnimation(m_pCamController, "angle");
+        //m_pCameraAnimation->setTargetObject(m_pCamController);
+        //m_pCamController->setTarget(pCameraTransform);
+        //m_pCamController->setRadius(m_pCamera->position().length());
+        //m_pCameraAnimation->setPropertyName("angle");
         m_pCameraAnimation->setStartValue(QVariant::fromValue(0));
         m_pCameraAnimation->setEndValue(QVariant::fromValue(360));
         m_pCameraAnimation->setDuration(10000);
         m_pCameraAnimation->setLoopCount(-1);
+        //m_pCamera->addComponent(pCameraTransform);
     }
 
     if(checked) {
         //Start animation
+        //m_pCamera->panAboutViewCenter(0.5, QVector3D(0.0f, 0.0f, 1.0f));
         m_pCameraAnimation->start();
     }
     else {
