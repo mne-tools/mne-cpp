@@ -177,7 +177,7 @@ public:
 signals:
     //=========================================================================================================
     /**
-     * Signal emmited whenever the gui modes change
+     * Signal emmited whenever the gui modes changes
      *
      * @param [in] mode       the new gui mode
      */
@@ -185,7 +185,7 @@ signals:
 
     //=========================================================================================================
     /**
-     * Signal emmited whenever the gui styles change
+     * Signal emmited whenever the gui styles changes
      *
      * @param [in] style       the new gui style
      */
