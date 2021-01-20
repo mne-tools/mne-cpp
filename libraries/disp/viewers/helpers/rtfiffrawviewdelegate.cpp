@@ -368,7 +368,7 @@ void RtFiffRawViewDelegate::paint(QPainter *painter,
                 painter->restore();
 
                 path = QPainterPath(QPointF(option.rect.x(),option.rect.y()));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor(),option.rect.y()));
-                createMarkerPath(option, path);
+                createMarkerPath(index, option, path);
 
                 painter->save();
                 painter->setPen(m_penMarker);
@@ -729,9 +729,19 @@ void RtFiffRawViewDelegate::createTriggerThresholdPath(const QModelIndex &index,
 
 //=============================================================================================================
 
-void RtFiffRawViewDelegate::createMarkerPath(const QStyleOptionViewItem &option,
+void RtFiffRawViewDelegate::createMarkerPath(const QModelIndex &index,
+                                             const QStyleOptionViewItem &option,
                                              QPainterPath& path) const
 {
+    const RtFiffRawViewModel* t_pModel = static_cast<const RtFiffRawViewModel*>(index.model());
+
+    double dDx = static_cast<double>(option.rect.width()) / static_cast<double>(t_pModel->getMaxSamples());
+    qDebug() << "Marker Position:" << m_markerPosition;
+    qDebug() << "dDx:" << dDx;
+
+    double dSamplePosition = static_cast<double>(m_markerPosition.x()) / dDx;
+    qDebug() << "dSamplePosition:" << dSamplePosition;
+
     //horizontal lines
     float distance = m_markerPosition.x();
 

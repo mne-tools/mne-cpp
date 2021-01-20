@@ -84,6 +84,7 @@ RtFiffRawView::RtFiffRawView(const QString& sSettingsPath,
 , m_fZoomFactor(1.0f)
 , m_bHideBadChannels(false)
 , m_iDistanceTimeSpacer(1)
+, m_dDx(0)
 {
     m_sSettingsPath = sSettingsPath;
     m_pTableView = new QTableView;
@@ -160,6 +161,9 @@ void RtFiffRawView::init(QSharedPointer<FIFFLIB::FiffInfo> &info)
     connect(this, &RtFiffRawView::markerMoved,
             m_pDelegate.data(), &RtFiffRawViewDelegate::markerMoved);
 
+    connect(m_pDelegate.data(), &RtFiffRawViewDelegate::updateDx,
+            this, &RtFiffRawView::updateDx);
+
     //Init the view
     m_pTableView->setModel(m_pModel);
     m_pTableView->setItemDelegate(m_pDelegate);
@@ -233,11 +237,11 @@ bool RtFiffRawView::eventFilter(QObject *object, QEvent *event)
 //        return true;
 //    }
 
-    if (object == m_pTableView->viewport() && event->type() == QEvent::MouseButtonDblClick) {
-        QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
-        emit markerMoved(mouseEvent->pos(), m_pTableView->rowAt(mouseEvent->pos().y()));
-        return true;
-    }
+//    if (object == m_pTableView->viewport() && event->type() == QEvent::MouseButtonDblClick) {
+//        QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+//        emit markerMoved(mouseEvent->pos(), m_pTableView->rowAt(mouseEvent->pos().y()));
+//        return true;
+//    }
 
     return QWidget::eventFilter(object, event);
 }
@@ -571,6 +575,12 @@ void RtFiffRawView::channelContextMenu(QPoint pos)
     connect(resetAppliedSelection, &QAction::triggered,
             this, &RtFiffRawView::resetSelection);
 
+    QAction* addEventMarker = menu->addAction(tr("Add Event Marker"));
+    connect(addEventMarker, &QAction::triggered, [=]{
+            double dSample = static_cast<double>(pos.x()) / m_dDx;
+            emit eventMarkerPlaced(static_cast<int>(dSample));
+            });
+
     //show context menu
     menu->popup(m_pTableView->viewport()->mapToGlobal(pos));
 }
@@ -695,4 +705,13 @@ void RtFiffRawView::markChBad()
 void RtFiffRawView::clearView()
 {
 
+}
+
+//=============================================================================================================
+
+void RtFiffRawView::updateDx(double dDx)
+{
+    if (m_dDx > 0){
+        m_dDx = dDx;
+    }
 }

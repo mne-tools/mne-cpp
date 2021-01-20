@@ -315,6 +315,14 @@ public:
 
     //=========================================================================================================
     /**
+     * @brief updateDx
+     *
+     * @param dDx
+     */
+    void updateDx(double dDx);
+
+    //=========================================================================================================
+    /**
      * Filter parameters changed
      *
      * @param[in] filterData   the currently active filter.
@@ -464,6 +472,7 @@ protected:
     int                                         m_iDistanceTimeSpacer;          /**< Current distance between time spacer. */
 
     QString                                     m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
+    double                                      m_dDx;                          /**< Ratio of pixels per sample */
 
 signals:    
     //=========================================================================================================
@@ -484,6 +493,8 @@ signals:
                          const QMap<int,QList<QPair<int,double> > >& mapDetectedTriggers);
 
     void channelMarkingChanged();
+
+    void eventMarkerPlaced(int iSelectedSample);
 };
 } // NAMESPACE
 

@@ -406,6 +406,8 @@ public:
      */
     void resetTriggerCounter();
 
+
+
     //=========================================================================================================
     /**
      * Returns the number of vertical lines (one per second)
@@ -601,6 +603,9 @@ private:
     QMap<qint32,qint32>                 m_qMapIdxRowSelection;                      /**< Selection mapping.*/
 
     QColor                              m_colBackground;                            /**< The background color.*/
+
+    int                                 m_iMarkedEvent;
+    static QList<int>                   m_markedEvent;
 
 signals:
     //=========================================================================================================

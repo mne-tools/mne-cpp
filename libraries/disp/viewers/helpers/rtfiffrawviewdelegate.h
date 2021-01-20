@@ -161,6 +161,9 @@ public:
      */
     void setUpperItemIndex(int iUpperItemIndex);
 
+signals:
+    void updateDx(double dDx);
+
 private:
     //=========================================================================================================
     /**
@@ -243,7 +246,7 @@ private:
      * @param[in] option     Describes the parameters used to draw an item in a view widget.
      * @param[in, out] path   The QPointerPath to create for the data plot.
      */
-    void createMarkerPath(const QStyleOptionViewItem &option, QPainterPath& path) const;
+    void createMarkerPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path) const;
 
     QPoint              m_markerPosition;   /**< Current mouse position used to draw the marker in the plot. */
     QList<QPainterPath> m_painterPaths;     /**< List of all current painter paths for each row. */
