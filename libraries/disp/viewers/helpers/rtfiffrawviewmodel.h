@@ -54,6 +54,7 @@
 #include <QAbstractTableModel>
 #include <QSharedPointer>
 #include <QColor>
+#include <QMutex>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -611,6 +612,7 @@ private:
 
     int                                 m_iMarkedEvent;
     static QList<int>                   m_markedEvent;
+    static QMutex                       m_eventMutex;
 
 signals:
     //=========================================================================================================

@@ -647,8 +647,8 @@ void RtFiffRawView::visibleRowsChanged()
     }
 
     int from = m_pTableView->rowAt(0);
-    if(from != 0)
-        from--;
+//    if(from != 0){
+//        from--;
 
     int to = m_pTableView->rowAt(m_pTableView->height()-1);
     if(to != m_pModel->rowCount()-1)
@@ -666,7 +666,7 @@ void RtFiffRawView::visibleRowsChanged()
 
 //    m_pModel->createFilterChannelList(channelNames);
 
-    m_pDelegate->setUpperItemIndex(from+1);
+    m_pDelegate->setUpperItemIndex(from/*+1*/);
 
     //qDebug() <<"RtFiffRawView::visibleRowsChanged - from "<< from << " to" << to;
 }
