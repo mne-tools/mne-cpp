@@ -214,6 +214,12 @@ public:
      */
     void updateFilterPlot();
 
+    //=========================================================================================================
+    /**
+     * Process the event of style mode change in an upper class.
+     */
+    void guiStyleChanged(DISPLIB::AbstractView::StyleMode style);
+
 protected:
     //=========================================================================================================
     /**

@@ -158,11 +158,19 @@ signals:
 
     //=========================================================================================================
     /**
-     * Signal emmited whenever the gui modes changed
+     * Signal emmited whenever the gui modes changes
      *
      * @param [in] mode       the new gui mode
      */
     void guiModeChanged(DISPLIB::AbstractView::GuiMode mode);
+
+    //=========================================================================================================
+    /**
+     * Signal emmited whenever the gui style changes
+     *
+     * @param [in] style       the new gui style
+     */
+    void guiStyleChanged(DISPLIB::AbstractView::StyleMode style);
 
 private:
     //=========================================================================================================

@@ -90,6 +90,9 @@ FilterSettingsView::FilterSettingsView(const QString& sSettingsPath,
                 m_pUi->m_pDoubleSpinBoxTo->setValue(dTo);
             });
 
+    connect(this, &FilterSettingsView::guiStyleChanged,
+            m_pFilterView.data(), &FilterDesignView::guiStyleChanged);
+
     m_pUi->m_pDoubleSpinBoxFrom->setValue(m_pFilterView->getFrom());
     m_pUi->m_pDoubleSpinBoxTo->setValue(m_pFilterView->getTo());
 
