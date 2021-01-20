@@ -177,11 +177,19 @@ public:
 signals:
     //=========================================================================================================
     /**
-     * Signal emmited whenever the gui modes changed
+     * Signal emmited whenever the gui modes change
      *
      * @param [in] mode       the new gui mode
      */
     void guiModeChanged(DISPLIB::AbstractView::GuiMode mode);
+
+    //=========================================================================================================
+    /**
+     * Signal emmited whenever the gui styles change
+     *
+     * @param [in] style       the new gui style
+     */
+    void guiStyleChanged(DISPLIB::AbstractView::StyleMode style);
 
 protected:
     QSharedPointer<AnalyzeData>     m_pAnalyzeData;         /**< Pointer to the global data base */

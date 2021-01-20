@@ -261,11 +261,13 @@ void MainWindow::onStyleChanged()
     if(QApplication *pApp = qobject_cast<QApplication *>(QApplication::instance())) {
         if(m_sCurrentStyle == "default") {
             pApp->setStyleSheet("");
+            emit guiStyleChanged(DISPLIB::AbstractView::StyleMode::Default);
         } else if (m_sCurrentStyle == "dark") {
             QFile file(":/dark.qss");
             file.open(QFile::ReadOnly);
             QTextStream stream(&file);
             pApp->setStyleSheet(stream.readAll());
+            emit guiStyleChanged(DISPLIB::AbstractView::StyleMode::Dark);
         }
 
         // Set default font
@@ -424,6 +426,9 @@ void MainWindow::createPluginControls(QSharedPointer<ANSHAREDLIB::PluginManager>
             // Connect plugin controls to GUI mode toggling
             connect(this, &MainWindow::guiModeChanged,
                     pPlugin, &AbstractPlugin::guiModeChanged);
+
+            connect(this, &MainWindow::guiStyleChanged,
+                    pPlugin, &AbstractPlugin::guiStyleChanged);
 
             // Disable floating and editable dock widgets, since the wasm QDockWidget version is buggy
             #ifdef WASMBUILD
