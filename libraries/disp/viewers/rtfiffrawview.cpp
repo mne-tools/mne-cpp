@@ -84,7 +84,6 @@ RtFiffRawView::RtFiffRawView(const QString& sSettingsPath,
 , m_fZoomFactor(1.0f)
 , m_bHideBadChannels(false)
 , m_iDistanceTimeSpacer(1)
-, m_dDx(0)
 {
     m_sSettingsPath = sSettingsPath;
     m_pTableView = new QTableView;
@@ -160,9 +159,6 @@ void RtFiffRawView::init(QSharedPointer<FIFFLIB::FiffInfo> &info)
 
     connect(this, &RtFiffRawView::markerMoved,
             m_pDelegate.data(), &RtFiffRawViewDelegate::markerMoved);
-
-    connect(m_pDelegate.data(), &RtFiffRawViewDelegate::updateDx,
-            this, &RtFiffRawView::updateDx);
 
     //Init the view
     m_pTableView->setModel(m_pModel);
@@ -577,7 +573,10 @@ void RtFiffRawView::channelContextMenu(QPoint pos)
 
     QAction* addEventMarker = menu->addAction(tr("Add Event Marker"));
     connect(addEventMarker, &QAction::triggered, [=]{
-            double dSample = static_cast<double>(pos.x()) / m_dDx;
+            double dDx = static_cast<double>(m_pTableView->columnWidth(1)) / static_cast<double>(m_pModel->getMaxSamples());
+            qDebug() << "View dDx:" << dDx;
+            double dSample = static_cast<double>(pos.x()) / dDx;
+            qDebug() << "View Sample:" << dSample;
             emit eventMarkerPlaced(static_cast<int>(dSample));
             });
 
@@ -705,13 +704,4 @@ void RtFiffRawView::markChBad()
 void RtFiffRawView::clearView()
 {
 
-}
-
-//=============================================================================================================
-
-void RtFiffRawView::updateDx(double dDx)
-{
-    if (m_dDx > 0){
-        m_dDx = dDx;
-    }
 }
