@@ -168,6 +168,9 @@ void RtFiffRawView::init(QSharedPointer<FIFFLIB::FiffInfo> &info)
     connect(m_pTableView.data(), &QTableView::doubleClicked,
             m_pModel.data(), &RtFiffRawViewModel::toggleFreeze);
 
+    connect(this, &RtFiffRawView::eventMarkerPlaced,
+            m_pModel.data(), &RtFiffRawViewModel::newEvent);
+
     connect(m_pTableView.data(), &QTableView::customContextMenuRequested,
             this, &RtFiffRawView::channelContextMenu);
 

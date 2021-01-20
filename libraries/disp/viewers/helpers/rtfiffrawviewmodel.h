@@ -406,7 +406,7 @@ public:
      */
     void resetTriggerCounter();
 
-
+    void newEvent(int SelectedSample);
 
     //=========================================================================================================
     /**
@@ -503,6 +503,11 @@ public:
      * @return the current overlap add delay.
      */
     inline int getCurrentOverlapAddDelay() const;
+
+    inline int getEvent(int iIndex) const;
+
+    inline int getNumberOfEvents() const;
+
 
 private:
     //=========================================================================================================
@@ -784,6 +789,20 @@ inline int RtFiffRawViewModel::getCurrentOverlapAddDelay() const
         return m_iMaxFilterLength/2;
     else
         return 0;
+}
+
+//=============================================================================================================
+
+inline int RtFiffRawViewModel::getEvent(int iIndex) const
+{
+    return m_markedEvent.at(iIndex);
+}
+
+//=============================================================================================================
+
+inline int RtFiffRawViewModel::getNumberOfEvents() const
+{
+    return m_markedEvent.size();
 }
 } // NAMESPACE
 
