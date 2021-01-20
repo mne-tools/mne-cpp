@@ -84,7 +84,7 @@ QSharedPointer<AbstractPlugin> AnnotationManager::clone() const
 
 void AnnotationManager::init()
 {
-    m_pCommu = new Communicator(this);
+    m_pCommu = QSharedPointer<ANSHAREDLIB::Communicator>(new ANSHAREDLIB::Communicator(this));
 }
 
 //=============================================================================================================
