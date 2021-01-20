@@ -139,6 +139,7 @@ protected:
     int             m_iCutOffHigh;                  /**< cut off frequqency highpass or higher cut off when filter is a bandpass. */
     int             m_iCutOffMarkerWidth;           /**< cut off marker width. */
     int             m_iPlotLength;                  /**< Length of current filter impulse response plot. */
+    QColor          m_cPenColor;                    /**< Color of the text and plot of the filter freq response plot. */
 };
 } // NAMESPACE DISPLIB
 
