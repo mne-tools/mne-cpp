@@ -99,6 +99,9 @@ void FilterPlotScene::updateFilter(const FilterKernel& operatorFilter,
     //Clear the scene
     this->clear();
 
+    QWidget * pQwidgetty(dynamic_cast<QWidget*>(parent()));
+    m_cPenColor = pQwidgetty->palette().text().color();
+
     //Plot newly set filter. Needs to be called before plotMagnitudeDiagram() because m_iPlotLength is set in plotFilterFrequencyResponse()
     plotFilterFrequencyResponse();
 
