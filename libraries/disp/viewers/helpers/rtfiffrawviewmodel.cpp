@@ -72,6 +72,12 @@ using namespace Eigen;
 using namespace RTPROCESSINGLIB;
 
 //=============================================================================================================
+// DEFINE STATIC MEMBER METHODS
+//=============================================================================================================
+
+QList<int> RtFiffRawViewModel::m_markedEvent;
+
+//=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
@@ -1307,5 +1313,5 @@ void RtFiffRawViewModel::clearModel()
 
 void RtFiffRawViewModel::newEvent(int SelectedSample)
 {
-    m_iMarkedEvent = SelectedSample;
+    m_markedEvent.append(SelectedSample);
 }

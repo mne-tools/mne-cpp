@@ -739,15 +739,19 @@ void RtFiffRawViewDelegate::createMarkerPath(const QModelIndex &index,
 //    qDebug() << "Marker Position:" << m_markerPosition;
 //    qDebug() << "Delegate dDx:" << dDx;
 
-    double dSamplePosition = static_cast<double>(m_markerPosition.x()) / dDx;
+//    double dSamplePosition = static_cast<double>(m_markerPosition.x()) / dDx;
 //    qDebug() << "dSamplePosition:" << dSamplePosition;
 
     //horizontal lines
-    float distance = m_markerPosition.x();
 
     float yStart = option.rect.topLeft().y();
     float yEnd = option.rect.bottomRight().y();
 
-    path.moveTo(distance,yStart);
-    path.lineTo(distance,yEnd);
+    for(int i = 0; i < t_pModel->getNumberOfEvents(); i++)
+    {
+        float position = static_cast<double>(t_pModel->getEvent(i)) * dDx;
+
+        path.moveTo(position,yStart);
+        path.lineTo(position,yEnd);
+    }
 }
