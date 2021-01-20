@@ -134,16 +134,20 @@ void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq,
 
     //Plot filter name on top
     QGraphicsTextItem * text = addText(filtername, QFont("Times", m_iAxisTextSize));
-    text->setPos((numberCoeff+(m_iDiagramMarginsHoriz*2))/2.4,-70);
+    text->setPos((numberCoeff+(m_iDiagramMarginsHoriz*2))/3.2,-70);
+    text->setDefaultTextColor(m_cPenColor);
+
 
     //HORIZONTAL
     //Draw horizontal lines
+    QPen pen(Qt::DotLine);
+    pen.setColor(m_cPenColor);
     for(int i = 1; i <= m_iNumberHorizontalLines; i++)
         addLine(-m_iDiagramMarginsHoriz,
                 (i * (m_iMaxMagnitude/(m_iNumberHorizontalLines+1))) - m_iDiagramMarginsVert,
                 numberCoeff + m_iDiagramMarginsHoriz,
                 (i * (m_iMaxMagnitude/(m_iNumberHorizontalLines+1))) - m_iDiagramMarginsVert,
-                QPen(Qt::DotLine));
+                pen);
 
     //Draw vertical axis texts - db magnitude
     for(int i = 0; i <= m_iNumberHorizontalLines+1; i++) {
@@ -151,6 +155,7 @@ void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq,
                                            QFont("Times", m_iAxisTextSize));
         text->setPos(-text->boundingRect().width() - m_iAxisTextSize/2,
                      (i * (m_iMaxMagnitude/(m_iNumberHorizontalLines+1))) - (text->boundingRect().height()/2) - m_iDiagramMarginsVert);
+        text->setDefaultTextColor(m_cPenColor);
     }
 
     //VERTICAL
@@ -161,7 +166,7 @@ void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq,
                 -m_iDiagramMarginsVert,
                 i*length - m_iDiagramMarginsHoriz,
                 m_iMaxMagnitude + m_iDiagramMarginsVert,
-                QPen(Qt::DotLine));
+                pen);
 
     //Draw horizontal axis texts - Hz frequency
     for(int i = 0; i <= m_iNumberVerticalLines+1; i++) {
@@ -169,6 +174,7 @@ void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq,
                                            QFont("Times", m_iAxisTextSize));
         text->setPos(i * length - m_iDiagramMarginsHoriz - (text->boundingRect().width()/2),
                      m_iMaxMagnitude + (text->boundingRect().height()/2));
+        text->setDefaultTextColor(m_cPenColor);
     }
 
     //Plot lower higher cut off frequency
@@ -180,7 +186,7 @@ void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq,
                     -m_iDiagramMarginsVert + m_iCutOffMarkerWidth/2,
                     pos - m_iDiagramMarginsHoriz,
                     m_iMaxMagnitude + m_iDiagramMarginsVert - m_iCutOffMarkerWidth/2,
-                    QPen(Qt::red,m_iCutOffMarkerWidth));
+                    QPen(Qt::red, m_iCutOffMarkerWidth));
         break;
 
         case 1://HPF
@@ -189,7 +195,7 @@ void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq,
                     -m_iDiagramMarginsVert + m_iCutOffMarkerWidth/2,
                     pos - m_iDiagramMarginsHoriz,
                     m_iMaxMagnitude + m_iDiagramMarginsVert - m_iCutOffMarkerWidth/2,
-                    QPen(Qt::red,m_iCutOffMarkerWidth));
+                    QPen(Qt::red, m_iCutOffMarkerWidth));
         break;
 
         case 2://BPF
@@ -198,14 +204,14 @@ void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq,
                     -m_iDiagramMarginsVert + m_iCutOffMarkerWidth/2,
                     pos - m_iDiagramMarginsHoriz,
                     m_iMaxMagnitude + m_iDiagramMarginsVert - m_iCutOffMarkerWidth/2,
-                    QPen(Qt::red,m_iCutOffMarkerWidth));
+                    QPen(Qt::red, m_iCutOffMarkerWidth));
 
             pos = ((double)m_iCutOffHigh / (double)fMax) * numberCoeff;
             addLine(pos - m_iDiagramMarginsHoriz,
                     -m_iDiagramMarginsVert + m_iCutOffMarkerWidth/2,
                     pos - m_iDiagramMarginsHoriz,
                     m_iMaxMagnitude + m_iDiagramMarginsVert - m_iCutOffMarkerWidth/2,
-                    QPen(Qt::red,m_iCutOffMarkerWidth));
+                    QPen(Qt::red, m_iCutOffMarkerWidth));
         break;
     }
 }
@@ -256,7 +262,7 @@ void FilterPlotScene::plotFilterFrequencyResponse()
     m_iPlotLength = path.currentPosition().x();
 
     QPen pen;
-    pen.setColor(Qt::black);
+    pen.setColor(m_cPenColor);
     pen.setWidth(2);
 
     //Clear old and plot new filter path
