@@ -1302,3 +1302,10 @@ void RtFiffRawViewModel::clearModel()
 
     endResetModel();
 }
+
+//=============================================================================================================
+
+void RtFiffRawViewModel::newEvent(int SelectedSample)
+{
+    m_iMarkedEvent = SelectedSample;
+}
