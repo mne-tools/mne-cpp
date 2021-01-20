@@ -120,6 +120,9 @@ QDockWidget *Filtering::getControl()
     connect(this, &Filtering::guiModeChanged,
             m_pFilterSettingsView.data(), &FilterSettingsView::setGuiMode, Qt::UniqueConnection);
 
+    connect(this, &Filtering::guiStyleChanged,
+            m_pFilterSettingsView.data(), &FilterSettingsView::guiStyleChanged, Qt::UniqueConnection);
+
     connect(m_pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChannelTypeChanged,
             this, &Filtering::setFilterChannelType, Qt::UniqueConnection);
 

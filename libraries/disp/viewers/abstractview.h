@@ -80,6 +80,12 @@ public:
     typedef QSharedPointer<AbstractView> SPtr;              /**< Shared pointer type for AbstractView. */
     typedef QSharedPointer<const AbstractView> ConstSPtr;   /**< Const shared pointer type for AbstractView. */
 
+
+    enum StyleMode {
+        Default,
+        Dark
+    };
+
     enum GuiMode {
         Clinical,
         Research
@@ -148,6 +154,13 @@ public:
      * Clears the view
      */
     virtual void clearView() = 0;
+
+signals:
+    //=========================================================================================================
+    /**
+     * Signal emited whenever the gui style mode changes.
+     */
+    void guiStyleChanged(DISPLIB::AbstractView::StyleMode style);
 
 protected:
 

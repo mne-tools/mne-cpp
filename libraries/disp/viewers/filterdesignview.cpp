@@ -582,3 +582,11 @@ void FilterDesignView::updateGuiFromFilter(const RTPROCESSINGLIB::FilterKernel& 
 
     m_pUi->m_comboBox_designMethod->setCurrentIndex(FilterKernel::m_designMethods.indexOf(filter.getDesignMethod()));
 }
+
+//=============================================================================================================
+
+void FilterDesignView::guiStyleChanged(DISPLIB::AbstractView::StyleMode style)
+{
+    Q_UNUSED(style)
+    updateFilterPlot();
+}
