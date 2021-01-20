@@ -161,9 +161,6 @@ public:
      */
     void setUpperItemIndex(int iUpperItemIndex);
 
-signals:
-    void updateDx(double dDx);
-
 private:
     //=========================================================================================================
     /**
