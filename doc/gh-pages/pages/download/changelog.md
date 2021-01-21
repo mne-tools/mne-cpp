@@ -1,8 +1,7 @@
 ---
 title: Changelog
-parent: Releases
-grand_parent: Download
-nav_order: 1
+parent: Download
+nav_exclude: true
 ---
 
 # Changelog
