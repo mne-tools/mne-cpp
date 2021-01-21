@@ -9,9 +9,9 @@ MNE-CPP is part of MNE, a tool suite for neurophysiology encompassing various pr
 
 Other projects include:
 
- - [MNE-Python](https://mne.tools/stable/index.html) - a python reimplementation of MNE-C, also extended with new visualization and analysis capabilities.
- - [MNE-MATLAB](https://mne.tools/stable/overview/matlab.html#mne-matlab) - a MATLAB interface for MNE structures and functions.
- - [MNE-C](http://www.nmr.mgh.harvard.edu/martinos/userInfo/data/MNE_register/index.php) - the original implementation of the MNE toolset in C.
+ - [MNE-Python](https://mne.tools/stable/index.html){:target="_blank" rel="noopener"} - a python reimplementation of MNE-C, also extended with new visualization and analysis capabilities.
+ - [MNE-MATLAB](https://mne.tools/stable/overview/matlab.html#mne-matlab){:target="_blank" rel="noopener"} - a MATLAB interface for MNE structures and functions.
+ - [MNE-C](http://www.nmr.mgh.harvard.edu/martinos/userInfo/data/MNE_register/index.php){:target="_blank" rel="noopener"} - the original implementation of the MNE toolset in C.
 
 ## What is MNE-CPP?
 
@@ -31,7 +31,7 @@ To that end, we aim to create software that allows users to do as much or as lit
 
 ## What's next?
 
-MNE-CPP is a community project. Contributions by new developers are always welcomed and greatly appreciated. If you are planning to contribute to MNE-CPP our [contributor page](pages/contribute/contribute.md) is a good point to start.
+MNE-CPP is a community project. Contributions by new developers are always welcomed and greatly appreciated. If you are planning to contribute to MNE-CPP our [contributor page](pages/develop/contribute.md) is a good point to start.
 
 Currently, MNE-CPP's main development efforts can be divided into the following projects:
 
