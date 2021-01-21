@@ -75,7 +75,7 @@ using namespace RTPROCESSINGLIB;
 // DEFINE STATIC MEMBER METHODS
 //=============================================================================================================
 
-QList<QPair<int,int>> RtFiffRawViewModel::m_lEventList;
+QList<Event> EventHandler::m_lAllEvents;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -92,6 +92,7 @@ RtFiffRawViewModel::RtFiffRawViewModel(QObject *parent)
 , m_iDownsampling(10)
 , m_iMaxSamples(1024)
 , m_iCurrentSample(0)
+, m_iCurrentStartingSample(0)
 , m_bIsFreezed(false)
 , m_sFilterChannelType("MEG")
 , m_iMaxFilterLength(128)
@@ -106,6 +107,7 @@ RtFiffRawViewModel::RtFiffRawViewModel(QObject *parent)
 , m_iCurrentTriggerChIndex(0)
 , m_pFiffInfo(FiffInfo::SPtr::create())
 , m_colBackground(Qt::white)
+, m_pEventHandler(QSharedPointer<EventHandler>(new EventHandler))
 {
 }
 
@@ -391,6 +393,7 @@ void RtFiffRawViewModel::setSamplingInfo(float sps, int T, bool bSetZero)
     }
 
     if(m_iCurrentSample>m_iMaxSamples) {
+        m_iCurrentStartingSample += m_iCurrentSample;
         m_iCurrentSample = 0;
     }
 
@@ -463,6 +466,10 @@ void RtFiffRawViewModel::addData(const QList<MatrixXd> &data)
                 }
             }
 
+            qDebug() << "Current Sample:" << m_iCurrentSample;
+            qDebug() << "Starting Sample:" << m_iCurrentStartingSample;
+
+            m_iCurrentStartingSample += m_iCurrentSample;
             m_iCurrentSample = 0;
 
             if(!m_bIsFreezed) {
@@ -1311,9 +1318,9 @@ void RtFiffRawViewModel::clearModel()
 
 //=============================================================================================================
 
-void RtFiffRawViewModel::newEvent(Event event)
+void RtFiffRawViewModel::newEvent(int iSample)
 {
-    m_lEventList.append(event);
+    m_pEventHandler->addEvent(Event(iSample));
 }
 
 //=============================================================================================================
@@ -1330,4 +1337,64 @@ Event::Event(int iSample)
 : m_iSample(iSample)
 {
 
+}
+
+//=============================================================================================================
+
+Event::Event(const Event &event)
+: Event(event.getSample())
+{
+
+}
+
+//=============================================================================================================
+
+Event::~Event()
+{
+
+}
+
+//=============================================================================================================
+
+int Event::getSample() const
+{
+    return m_iSample;
+}
+
+//=============================================================================================================
+
+void EventHandler::addEvent(Event event)
+{
+    m_lAllEvents.append(event);
+    m_lEventsToDraw.append(event);
+    m_EventsToDraw.insert(event);
+}
+
+//=============================================================================================================
+
+
+int EventHandler::getTotalNumberOfEvents() const
+{
+    return m_lAllEvents.size();
+}
+
+//=============================================================================================================
+
+int EventHandler::getNumberOfEventsToDraw() const
+{
+    return m_lEventsToDraw.size();
+}
+
+//=============================================================================================================
+
+Event EventHandler::getFromEventsToDrawAt(int iIndex) const
+{
+    return m_lEventsToDraw.at(iIndex);
+}
+
+//=============================================================================================================
+
+Event EventHandler::getFromAllEvents(int iIndex) const
+{
+    return m_lAllEvents.at(iIndex);
 }
