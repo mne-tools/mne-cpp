@@ -46,6 +46,7 @@
 #include <fiff/fiff_proj.h>
 
 #include <rtprocessing/helpers/filterkernel.h>
+#include <set>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -83,6 +84,7 @@ namespace DISPLIB
 //=============================================================================================================
 
 class Event;
+class EventHandler;
 
 //=============================================================================================================
 // DEFINE TYPEDEFS
@@ -410,7 +412,7 @@ public:
     void resetTriggerCounter();
 
     //=========================================================================================================
-    void newEvent(Event event);
+    void newEvent(int iSample);
 
     //=========================================================================================================
     /**
@@ -508,9 +510,9 @@ public:
      */
     inline int getCurrentOverlapAddDelay() const;
 
-    inline int getEvent(int iIndex) const;
+    inline Event getEvent(int iIndex) const;
 
-    inline int getNumberOfEvents() const;
+    inline int getNumberOfEventsToDraw() const;
 
 
 private:
@@ -556,6 +558,7 @@ private:
     qint32                              m_iDownsampling;                            /**< Down sampling factor. */
     qint32                              m_iMaxSamples;                              /**< Max samples per window. */
     qint32                              m_iCurrentSample;                           /**< Current sample which holds the current position in the data matrix. */
+    qint32                              m_iCurrentStartingSample;
     qint32                              m_iCurrentSampleFreeze;                     /**< Current sample which holds the current position in the data matrix when freezing tool is active. */
     qint32                              m_iMaxFilterLength;                         /**< Max order of the current filters. */
     qint32                              m_iCurrentBlockSize;                        /**< Current block size. */
@@ -613,7 +616,7 @@ private:
 
     QColor                              m_colBackground;                            /**< The background color.*/
 
-    static QList<Event>                 m_lEventList;
+    QSharedPointer<EventHandler>        m_pEventHandler;
 
 signals:
     //=========================================================================================================
@@ -639,16 +642,42 @@ signals:
     void triggerDetected(int numberDetectedTriggers, const QMap<int,QList<QPair<int,double> > >& mapDetectedTriggers);
 };
 
-class DISPSHARED_EXPORT Event {
+class DISPSHARED_EXPORT Event : public QObject {
     Q_OBJECT
-    friend class RtFiffRawViewModel;
 public:
     Event (int iSample);
+    Event (const Event &event);
     Event();
     ~Event();
 
+    int getSample() const;
+
+    bool operator<(const Event& rhs) const
+    {
+       return getSample() < rhs.getSample();  //assume that you compare the record based on a
+    }
 private:
     int m_iSample;
+};
+
+class DISPSHARED_EXPORT EventHandler : public QObject {
+    Q_OBJECT
+public:
+    EventHandler(){};
+    ~EventHandler(){};
+
+    void addEvent(Event event);
+
+    int getTotalNumberOfEvents() const;
+    int getNumberOfEventsToDraw() const;
+
+    Event getFromEventsToDrawAt(int iIndex) const;
+    Event getFromAllEvents(int iIndex) const;
+
+private:
+    static QList<Event> m_lAllEvents;
+    QList<Event>        m_lEventsToDraw;
+    std::set<Event>     m_EventsToDraw;
 };
 
 //=============================================================================================================
@@ -808,16 +837,16 @@ inline int RtFiffRawViewModel::getCurrentOverlapAddDelay() const
 
 //=============================================================================================================
 
-inline int RtFiffRawViewModel::getEvent(int iIndex) const
+inline Event RtFiffRawViewModel::getEvent(int iIndex) const
 {
-    return m_lEventList.at(iIndex);
+    return m_pEventHandler->getFromEventsToDrawAt(iIndex);
 }
 
 //=============================================================================================================
 
-inline int RtFiffRawViewModel::getNumberOfEvents() const
+inline int RtFiffRawViewModel::getNumberOfEventsToDraw() const
 {
-    return m_lEventList.size();
+    return m_pEventHandler->getNumberOfEventsToDraw();
 }
 } // NAMESPACE
 

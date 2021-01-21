@@ -447,7 +447,7 @@ protected:
      */
     void markChBad();
 
-    void onAddEventMarker(bool checked);
+    void onAddEventMarker(int iPosition);
 
     QPointer<QTableView>                        m_pTableView;                   /**< The QTableView being part of the model/view framework of Qt. */
     QPointer<DISPLIB::RtFiffRawViewDelegate>    m_pDelegate;                    /**< The channel data delegate. */
@@ -488,7 +488,7 @@ signals:
 
     void channelMarkingChanged();
 
-    void newEvent(DISPLIB::Event event);
+    void createNewEvent(int iSample);
 };
 } // NAMESPACE
 

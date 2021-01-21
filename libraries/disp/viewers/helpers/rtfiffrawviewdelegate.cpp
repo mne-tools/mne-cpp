@@ -520,6 +520,9 @@ void RtFiffRawViewDelegate::createPlotPath(const QModelIndex &index,
     int currentSampleIndex = t_pModel->getCurrentSampleIndex();
     double lastFirstValue = t_pModel->getLastBlockFirstValue(index.row());
 
+    qDebug() << "Curernt Sample:" << t_pModel->getCurrentSampleIndex();
+    qDebug() << "lastFirstValue:" << t_pModel->getLastBlockFirstValue(index.row());
+
     //Move to initial starting point
     if(data.second > 0) {
         dValue = 0;
@@ -747,9 +750,9 @@ void RtFiffRawViewDelegate::createMarkerPath(const QModelIndex &index,
     float yStart = option.rect.topLeft().y();
     float yEnd = option.rect.bottomRight().y();
 
-    for(int i = 0; i < t_pModel->getNumberOfEvents(); i++)
+    for(int i = 0; i < t_pModel->getNumberOfEventsToDraw(); i++)
     {
-        float position = static_cast<double>(t_pModel->getEvent(i)) * dDx;
+        float position = static_cast<double>(t_pModel->getEvent(i).getSample()) * dDx;
 
         path.moveTo(position,yStart);
         path.lineTo(position,yEnd);
