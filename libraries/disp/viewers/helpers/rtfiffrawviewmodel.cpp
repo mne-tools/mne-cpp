@@ -75,7 +75,7 @@ using namespace RTPROCESSINGLIB;
 // DEFINE STATIC MEMBER METHODS
 //=============================================================================================================
 
-QList<int> RtFiffRawViewModel::m_markedEvent;
+QList<QPair<int,int>> RtFiffRawViewModel::m_lEventList;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -1311,7 +1311,23 @@ void RtFiffRawViewModel::clearModel()
 
 //=============================================================================================================
 
-void RtFiffRawViewModel::newEvent(int SelectedSample)
+void RtFiffRawViewModel::newEvent(Event event)
 {
-    m_markedEvent.append(SelectedSample);
+    m_lEventList.append(event);
+}
+
+//=============================================================================================================
+
+Event::Event()
+: m_iSample(-1)
+{
+
+}
+
+//=============================================================================================================
+
+Event::Event(int iSample)
+: m_iSample(iSample)
+{
+
 }

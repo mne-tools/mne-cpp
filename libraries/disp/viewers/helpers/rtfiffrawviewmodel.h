@@ -82,6 +82,8 @@ namespace DISPLIB
 // DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
+class Event;
+
 //=============================================================================================================
 // DEFINE TYPEDEFS
 //=============================================================================================================
@@ -407,7 +409,8 @@ public:
      */
     void resetTriggerCounter();
 
-    void newEvent(int SelectedSample);
+    //=========================================================================================================
+    void newEvent(Event event);
 
     //=========================================================================================================
     /**
@@ -610,9 +613,7 @@ private:
 
     QColor                              m_colBackground;                            /**< The background color.*/
 
-    int                                 m_iMarkedEvent;
-    static QList<int>                   m_markedEvent;
-    static QMutex                       m_eventMutex;
+    static QList<Event>                 m_lEventList;
 
 signals:
     //=========================================================================================================
@@ -636,6 +637,18 @@ signals:
      * Emmited when trigger detection was performed
      */
     void triggerDetected(int numberDetectedTriggers, const QMap<int,QList<QPair<int,double> > >& mapDetectedTriggers);
+};
+
+class DISPSHARED_EXPORT Event {
+    Q_OBJECT
+    friend class RtFiffRawViewModel;
+public:
+    Event (int iSample);
+    Event();
+    ~Event();
+
+private:
+    int m_iSample;
 };
 
 //=============================================================================================================
@@ -797,20 +810,25 @@ inline int RtFiffRawViewModel::getCurrentOverlapAddDelay() const
 
 inline int RtFiffRawViewModel::getEvent(int iIndex) const
 {
-    return m_markedEvent.at(iIndex);
+    return m_lEventList.at(iIndex);
 }
 
 //=============================================================================================================
 
 inline int RtFiffRawViewModel::getNumberOfEvents() const
 {
-    return m_markedEvent.size();
+    return m_lEventList.size();
 }
 } // NAMESPACE
 
 #ifndef metatype_rowvectorpair
 #define metatype_rowvectorpair
 Q_DECLARE_METATYPE(DISPLIB::RowVectorPair);
+#endif
+
+#ifndef metatype_rtevent
+#define metatype_rtevent
+Q_DECLARE_METATYPE(DISPLIB::Event);
 #endif
 
 #endif // RTFIFFRAWVIEWMODEL_H
