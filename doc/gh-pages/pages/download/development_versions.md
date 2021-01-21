@@ -2,6 +2,7 @@
 title: Development Versions
 parent: Download
 nav_order: 2
+---
 
 For older releases please visit our [Github release page](https://github.com/mne-tools/mne-cpp/releases){:target="_blank" rel="noopener"}. If you want to checkout more recently added features, you can download the development versions of the application.
 

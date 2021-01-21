@@ -30,8 +30,8 @@ Stable Releases
 |-------|-------|-------|
 | [0.1.8](changelog.md#version-018) | 2020-11-19 | <span class="fs-2"> [Windows](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.8/mne-cpp-windows-dynamic-x86_64.zip){: .btn .btn-blue } [Linux](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.8/mne-cpp-linux-dynamic-x86_64.tar.gz){: .btn .btn-blue } [MacOS](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.8/mne-cpp-macos-dynamic-x86_64.tar.gz){: .btn .btn-blue } </span> |
 
-See the [changelog](changelog.md) to see what features where added in each release version.
 ---
+See the [changelog](changelog.md) to see what features where added in each release version.
 
 Using the latest stable release is recommended for users who wish to use MNE-CPP's command line tools and GUIs. But if you want to checkout the latest features, try downloading the [development versions](development.md).
 
