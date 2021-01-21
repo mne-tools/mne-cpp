@@ -3,7 +3,7 @@ title: How to Cite
 parent: Home
 nav_order: 4
 ---
-# How to Cite
+# How to Cite MNE-CPP
 
 If you use any tools provided by the MNE-CPP project in your research, you should cite:
 
