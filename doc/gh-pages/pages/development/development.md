@@ -29,5 +29,11 @@ MNE-CPP is designed as a two-layer framework. The [library API](api.md) provides
 
 Below are some resources to get you started developing within MNE-CPP. Depending on which application you intend to develop for, you will find specific resources in this section. You can use use our [API documentation](https://mne-cpp.github.io/doxygen-api/annotated.html){:target="_blank" rel="noopener"} to guide you while understanding the responsabilities of each class.
 
-## Try to Build from Source
+## Contribute
+
+It is a good idea to go through the contribution tutorial and make sure that you can build from source. Understand the continious integration pipeline we have in place and how to write a unit test. Make sure that your changes don't break the project compilation before submitting your contribution to the project itself.
+
+
+
+
 
