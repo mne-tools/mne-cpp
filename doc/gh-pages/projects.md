@@ -3,7 +3,7 @@ title: Projects and Funding
 parent: Home
 nav_order: 2
 ---
-## Projects and Funding
+# Projects and Funding
 At present, there are several projects funded by NIH and and European funding agencies, which capitalize on MNE-CPP. While these projects benefit from the existing resources in MNE-CPP, they all also contribute to MNE-CPP, making the framework more comprehensive.
 
 | Acronym | Duration | Description |

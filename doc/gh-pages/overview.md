@@ -3,6 +3,9 @@ title: The Project
 parent: Home
 nav_order: 1
 ---
+
+# The MNE-CPP Project
+
 ## What is MNE?
 
 MNE-CPP is part of MNE, a tool suite for neurophysiology encompassing various projects that draw from MNE-C, originally written by Matti Hämäläinen (documented [here](https://mne.tools/mne-c-manual/MNE-manual-2.7.3.pdf))
