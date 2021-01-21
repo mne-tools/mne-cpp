@@ -1,5 +1,5 @@
 ---
-title: The project
+title: The Project
 parent: Home
 nav_order: 1
 ---

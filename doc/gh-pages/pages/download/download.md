@@ -3,25 +3,27 @@ title: Download
 has_children: true
 nav_order: 2
 ---
-# Get Started
+
+## Download MNE-CPP 
 
 This is the quickest way to get MNE-CPP up and running on your machine.
 
 ## Download MNE-CPP
 
-  Select your version and platform. Download the latest stable release for the best stability.
+Select your version and platform. Download the latest stable release for the best stability.
 
 ## Unzip the downloaded file**
 
-  Extract the downloaded build into a folder on your machine
+Extract the downloaded build into a folder on your machine
 
-## Select the tool you wish to use from the `bin` folder**
+## Select the tool you wish to use from the `bin` folder
 
-  Currently we offer a real-time application: [MNE-Scan haha](../documentation/scan.md); a visualization/analysis application: [MNE Analyze](pages/learn/analyze.md); and a data anonymization tool: [MNE Anonymize](pages/documentation/anonymize.md).
+You will find:
+  - A real-time analysis application: [MNE-Scan](../documentation/scan.md).
+  - An offline visualization/analysis application: [MNE Analyze](../documentation/analyze.md).
+  - An anonymization/deidentification tool for FIF files: [MNE Anonymize](../documentation/anonymize.md).
 
-Follow the [guides](pages/documentation/documentation.md) on how to use MNE-CPP tools
-
-  All the tools in the MNE-CPP project have a user manual. See the [documentation](pages/)
+Follow the [guides](../documentation/documentation.md) on how to use MNE-CPP tools.
 
 ---
 
@@ -32,9 +34,10 @@ Stable Releases
 |-------|-------|-------|
 | [0.1.8](changelog.md#version-018) | 2020-11-19 | <span class="fs-2"> [Windows](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.8/mne-cpp-windows-dynamic-x86_64.zip){: .btn .btn-blue } [Linux](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.8/mne-cpp-linux-dynamic-x86_64.tar.gz){: .btn .btn-blue } [MacOS](https://github.com/mne-tools/mne-cpp/releases/download/v0.1.8/mne-cpp-macos-dynamic-x86_64.tar.gz){: .btn .btn-blue } </span> |
 
----
 See the [changelog](changelog.md) to see what features where added in each release version.
 
-Using the latest stable release is recommended for users who wish to use MNE-CPP's command line tools and GUIs. But if you want to checkout the latest features, try downloading the [development versions](development.md).
+---
 
-We are also developing some of our aplications to run on the browser. See [On the browser](webasm.md).
+Using the latest stable release is recommended for users who wish to use MNE-CPP's command line tools and GUIs. But if you want to checkout the latest features, try downloading the [development versions](../development/development.md).
+
+We are also developing some of our aplications so that they can run directly on the browser. No need to install anything! See [On the browser](webasm.md).

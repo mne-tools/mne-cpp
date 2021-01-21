@@ -1,5 +1,5 @@
 ---
-title: On the Browser
+title: MNE On the Browser
 parent: Download
 nav_order: 2
 ---

@@ -1,7 +1,7 @@
 ---
 title: Contribution Guide
 parent: Contribute
-grand_parent: Develop
+grand_parent: Development
 nav_order: 1
 ---
 # Contribution Guide

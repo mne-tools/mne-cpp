@@ -1,7 +1,7 @@
 ---
 title: Release Guide
 parent: Continuous Integration
-grand_parent: Develop
+grand_parent: Development
 nav_order: 3
 ---
 

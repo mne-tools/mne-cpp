@@ -1,7 +1,7 @@
 ---
 title: Contributing to the Website
 parent: Contribute
-grand_parent: Develop
+grand_parent: Development
 nav_order: 2
 ---
 # Contributing to the Website

@@ -1,7 +1,7 @@
 ---
 title: Git Workflow
 parent: Contribute
-grand_parent: Develop
+grand_parent: Development
 nav_order: 4
 ---
 # Git Workflow
