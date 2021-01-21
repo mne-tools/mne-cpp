@@ -5,7 +5,7 @@ parent: MNE Analyze
 grand_parent: Documentation
 nav_order: 4
 ---
-# Event Manager
+## Event Manager
 
 The event manager is used to create, display, and save events. Events in MNE Analyze are sorted into event groups, each with an associated name, type, and color. Events and event groups can either be manually added or detected from stim channels of the currently loaded file.
 

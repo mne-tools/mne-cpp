@@ -1,7 +1,7 @@
 ---
 title: Build Guide
 parent: WebAssembly
-grand_parent: Develop
+grand_parent: Development
 nav_order: 1
 ---
 # WebAssembly Build Guide

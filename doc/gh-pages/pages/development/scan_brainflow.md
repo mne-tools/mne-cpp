@@ -1,7 +1,7 @@
 ---
 title: BrainFlow
 parent: MNE Scan
-grand_parent: Develop
+grand_parent: Development
 nav_order: 6
 ---
 # BrainFlow

@@ -1,7 +1,7 @@
 ---
 title: TMSI
 parent: MNE Scan
-grand_parent: Develop
+grand_parent: Development
 nav_order: 9
 ---
 # TMSI

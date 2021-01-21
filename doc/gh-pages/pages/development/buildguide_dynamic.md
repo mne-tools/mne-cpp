@@ -1,7 +1,7 @@
 ---
 title: Dynamic Linking
 parent: Build from Source
-grand_parent: Develop
+grand_parent: Development
 nav_order: 1
 ---
 # Build from Source (Dynamic Linking)

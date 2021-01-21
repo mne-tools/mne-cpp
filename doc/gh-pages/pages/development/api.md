@@ -1,7 +1,7 @@
 ---
 title: Library API
 has_children: true
-parent: Develop
+parent: Development
 nav_order: 1
 ---
 # MNE CPP's Library API Development Resources

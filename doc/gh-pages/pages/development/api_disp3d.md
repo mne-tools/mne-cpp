@@ -1,7 +1,7 @@
 ---
 title: Disp3D
 parent: Library API
-grand_parent: Develop
+grand_parent: Development
 nav_order: 2
 ---
 

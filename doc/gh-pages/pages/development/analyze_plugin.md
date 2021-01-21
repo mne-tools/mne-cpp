@@ -1,7 +1,7 @@
 ---
 title: Creating a new plugin
 parent: MNE Analyze
-grand_parent: Develop
+grand_parent: Development
 nav_order: 1
 ---
 # Creating a New Plugin

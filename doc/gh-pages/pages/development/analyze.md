@@ -1,7 +1,7 @@
 ---
 title: MNE Analyze
 has_children: true
-parent: Develop
+parent: Development
 nav_order: 3
 ---
 # MNE Analyze Development Resources
