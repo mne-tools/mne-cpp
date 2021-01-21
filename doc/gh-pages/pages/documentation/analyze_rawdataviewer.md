@@ -2,7 +2,7 @@
 title: Signal Viewer
 has_children: false
 parent: MNE Analyze
-grand_parent: Learn
+grand_parent: Documentation
 nav_order: 3
 ---
 # Signal Viewer

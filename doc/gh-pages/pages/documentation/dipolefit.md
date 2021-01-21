@@ -1,6 +1,6 @@
 <!-- ---
 title: MNE Dipole Fit
-parent: Learn
+parent: Documentation
 nav_order: 4
 ---
 # MNE Dipole Fit

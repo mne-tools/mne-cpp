@@ -1,7 +1,7 @@
 ---
 title: Forward Solution Plugin
 parent: MNE Scan
-grand_parent: Learn
+grand_parent: Documentation
 nav_order: 3
 ---
 # Forward Solution Plugin

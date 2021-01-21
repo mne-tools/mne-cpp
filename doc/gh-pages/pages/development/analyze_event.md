@@ -6,7 +6,7 @@ nav_order: 2
 ---
 # Event System
 
-This guide covers the event system used in MNE Analyze, not to be confused with the [Event Manager plugin](../learn/analyze_annotationmanager).
+This guide covers the event system used in MNE Analyze, not to be confused with the [Event Manager plugin](../documentation/analyze_annotationmanager).
 
 ## Overview
 

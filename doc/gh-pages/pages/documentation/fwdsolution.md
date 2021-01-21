@@ -1,6 +1,6 @@
 <!-- ---
 title: MNE Forward Solution
-parent: Learn
+parent: Documentation
 nav_order: 5
 ---
 # MNE Forward Solution
