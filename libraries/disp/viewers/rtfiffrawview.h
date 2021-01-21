@@ -84,6 +84,7 @@ namespace DISPLIB
 
 class RtFiffRawViewModel;
 class RtFiffRawViewDelegate;
+class Event;
 
 //=============================================================================================================
 /**
@@ -446,6 +447,8 @@ protected:
      */
     void markChBad();
 
+    void onAddEventMarker(bool checked);
+
     QPointer<QTableView>                        m_pTableView;                   /**< The QTableView being part of the model/view framework of Qt. */
     QPointer<DISPLIB::RtFiffRawViewDelegate>    m_pDelegate;                    /**< The channel data delegate. */
     QPointer<DISPLIB::RtFiffRawViewModel>       m_pModel;                       /**< The channel data model. */
@@ -485,7 +488,7 @@ signals:
 
     void channelMarkingChanged();
 
-    void eventMarkerPlaced(int iSelectedSample);
+    void newEvent(DISPLIB::Event event);
 };
 } // NAMESPACE
 
