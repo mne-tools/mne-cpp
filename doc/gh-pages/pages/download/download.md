@@ -22,14 +22,14 @@ See the [changelog](changelog.md) to see what features where added in each relea
 
 This is the quickest way to get MNE-CPP up and running on your machine.
 
-#### Download MNE-CPP.
+### 1. Download MNE-CPP.
 
 Select your version and platform. Download the latest stable release for the best stability.
 
-#### Unzip the downloaded file.
+### 2. Unzip the downloaded file.
 Extract the downloaded build into a folder on your machine
 
-#### Select the tool you wish to use from the `bin` folder.
+### 3. Select the tool you wish to use from the `bin` folder.
 
 In the `bin` folder,  you will find:
   - A real-time analysis application: [MNE-Scan](../documentation/scan.md).
