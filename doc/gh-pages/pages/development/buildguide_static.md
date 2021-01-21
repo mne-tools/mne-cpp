@@ -1,7 +1,7 @@
 ---
 title: Static Linking
 parent: Build from Source
-grand_parent: Download
+grand_parent: Develop
 nav_order: 2
 ---
 # Build from Source (Static Linking)
