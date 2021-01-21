@@ -7,19 +7,19 @@ nav_order: 2
 
 This is the quickest way to get MNE-CPP up and running on your machine.
 
-##**1** Download MNE-CPP
+## Download MNE-CPP
 
   Select your version and platform. Download the latest stable release for the best stability.
 
-##**2** Unzip the downloaded file**
+## Unzip the downloaded file**
 
   Extract the downloaded build into a folder on your machine
 
-##**3** Select the tool you wish to use from the `bin` folder**
+## Select the tool you wish to use from the `bin` folder**
 
   Currently we offer a real-time application: [MNE-Scan](pages/learn/scan.md); a visualization/analysis application: [MNE Analyze](pages/learn/analyze.md); and a data anonymization tool: [MNE Anonymize](pages/learn/anonymize.md).
 
-##**4** Follow the [guides](pages/learn/learn.md) on how to use MNE-CPP tools
+## Follow the [guides](pages/learn/learn.md) on how to use MNE-CPP tools
 
 ---
 
