@@ -1,7 +1,7 @@
 ---
 title: Real-time Head Monitoring
 parent: MNE Scan
-grand_parent: Learn
+grand_parent: Documentation
 nav_order: 3
 ---
 # Real-time Head Monitoring

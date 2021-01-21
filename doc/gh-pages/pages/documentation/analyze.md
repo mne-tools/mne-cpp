@@ -1,7 +1,7 @@
 ---
 title: MNE Analyze
 has_children: true
-parent: Learn
+parent: Documentation
 nav_order: 2
 ---
 # MNE Analyze

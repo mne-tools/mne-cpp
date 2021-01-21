@@ -1,7 +1,7 @@
 ---
 title: MNE Anonymize
 has_children: false
-parent: Learn
+parent: Documentation
 nav_order: 3
 has_toc: false
 ---
@@ -124,7 +124,7 @@ mne_anonymize -i ./MNE-sample-data/MEG/sample/sample_audvis_raw.fif -vbdf --mdo 
 
 ## Introduction to HIPAA law 
 
-Fiff files may include Personal Health Information and Personal Identifyable information. The consequences of openly distributing this kind of protected information can be dire. Typically, the regulatory bodies in charge of these issues in each state or country will describe methods for deidentify and anonymize data. In the United States of America, the law related to this problem is the well-known HIPAA, issued by the US Department of Health and Human Services (HHS). This law mentions two main ways  to know when it is OK to distribute a file with patient information in it ([more information](https://svdecomposer.github.io/mne-cpp/pages/learn/mneanonymize.html#introduction-on-HIPAA-law). 
+Fiff files may include Personal Health Information and Personal Identifyable information. The consequences of openly distributing this kind of protected information can be dire. Typically, the regulatory bodies in charge of these issues in each state or country will describe methods for deidentify and anonymize data. In the United States of America, the law related to this problem is the well-known HIPAA, issued by the US Department of Health and Human Services (HHS). This law mentions two main ways  to know when it is OK to distribute a file with patient information in it ([more information](https://svdecomposer.github.io/mne-cpp/pages/documentation/mneanonymize.html#introduction-on-HIPAA-law). 
 
 MNE Anonymize is designed to implement the "safe harbor" approach, by which if the data is stripped from the following info, it is then considered "safe":
 

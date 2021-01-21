@@ -1,7 +1,7 @@
 ---
 title: MNE Scan
 has_children: true
-parent: Learn
+parent: Documentation
 nav_order: 1
 ---
 # MNE Scan

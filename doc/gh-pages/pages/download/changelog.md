@@ -211,7 +211,7 @@ Utils
  * Add documentation for plugin creation in MNE Analyze
  * Restructure static and dynamic build guides
  * Rename .md page files to better indicate what subject they belong to
- * Rename Learn pages for MNE Scan, MNE Analyze and MNE Anonymize
+ * Rename documentation pages for MNE Scan, MNE Analyze and MNE Anonymize
  * Rename MNE Lib to library API
  * Improve DoxyGen docu by making use of namespaces for MNE-C types
  * Improve documentation for MNE Scan eeg amplifiers and fix some typos

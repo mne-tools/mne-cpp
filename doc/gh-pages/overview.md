@@ -24,7 +24,7 @@ MNE-CPP is open-source licensed under BSD (clause 3). MNE-CPP has two external d
 ## Why use MNE-CPP?
 
 We are targeting two user groups:
-* Front-End users with little or no coding background. These users are interested in straight-forward setups and applications with an easy to use GUI, such as MNE Scan and MNE Analyze. For more information see our [Learn section](pages/learn/learn.md).
+* Front-End users with little or no coding background. These users are interested in straight-forward setups and applications with an easy to use GUI, such as MNE Scan and MNE Analyze. For more information see our [documentation section](pages/documentation/documentation.md).
 * Back-End users who are experienced with programming in C++ and want to use MNE-CPP functionalities to build their own applications. For more information see our [Development section](pages/development/development.md).
 
 To that end, we aim to create software that allows users to do as much or as little coding as they are comfortable with, by making components of our software modular and making the process of adding functionality as straight-forward as possible.

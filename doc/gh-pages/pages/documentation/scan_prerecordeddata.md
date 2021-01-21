@@ -1,7 +1,7 @@
 ---
 title: Stream Pre-Recorded Data
 parent: MNE Scan
-grand_parent: Learn
+grand_parent: Documentation
 nav_order: 1
 ---
 # Stream Pre-Recorded Data

@@ -2,7 +2,7 @@
 title: Channel Selection
 has_children: false
 parent: MNE Analyze
-grand_parent: Learn
+grand_parent: Documentation
 nav_order: 7
 ---
 # Channel Selection
