@@ -1,6 +1,6 @@
 ---
 title: The Sample Data Set
-parent: Learn
+parent: Download
 nav_order: 4
 ---
 # Setting Up the Sample Data Set
