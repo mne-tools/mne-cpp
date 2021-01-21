@@ -4,7 +4,7 @@ parent: Download
 nav_order: 2
 ---
 
-## MNE-CPP On the Browser
+# MNE-CPP On the Browser
 
 MNE-CPP WebAssembly releases are in a technical preview state since WebAssembly itself is still fairly new and undergoing development. The following releases work best in Chromium based browsers (Google Chrome, Microsoft Edge).
 

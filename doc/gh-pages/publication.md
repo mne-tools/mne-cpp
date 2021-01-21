@@ -3,7 +3,7 @@ title: Publications
 parent: Home
 nav_order: 3
 ---
-## List of Publications
+# List of Publications
 
 | Dinh, C.; Samuelson, J.G.W.; Hunold, A.; Hämäläinen, M.S.; Khan, S.: Contextual Minimum-Norm Estimates (CMNE): A Deep documentationing Method for Source Estimation in Neuronal Networks. arXiv (2019), [ArXiv ID: 1909.02636](http://arxiv.org/abs/1909.02636) |
 
