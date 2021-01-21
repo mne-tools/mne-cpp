@@ -5,7 +5,6 @@ nav_order: 2
 ---
 # Download MNE-CPP
 
-<!DOCTYPE html>
 <html>
 <div style="height:13px"></div>
 </html>
