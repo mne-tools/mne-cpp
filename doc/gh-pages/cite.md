@@ -1,7 +1,7 @@
 ---
 title: How to Cite
 parent: Home
-nav_order: 5
+nav_order: 4
 ---
 # How to Cite
 

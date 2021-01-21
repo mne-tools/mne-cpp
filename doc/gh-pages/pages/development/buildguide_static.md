@@ -31,7 +31,7 @@ Make sure you have one of the following compilers installed:
 
 ## Build a Static Version of Qt
 
-### Get the Qt Aource Code
+### Get the Qt Source Code
 
 Clone the current Qt version. Currently, MNE-CPP uses four Qt modules: QtBase, QtCharts, QtSvg and Qt3D. QtBase subdivides in other modules reflecting most of the Qt functionality (core, gui, widgets, etc). In order to setup the sources for Qt 5.15.1 type:
 
