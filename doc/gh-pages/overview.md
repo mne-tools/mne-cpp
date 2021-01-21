@@ -3,7 +3,7 @@ title: The project
 parent: Home
 nav_order: 1
 ---
-# What is MNE?
+## What is MNE?
 
 MNE-CPP is part of MNE, a tool suite for neurophysiology encompassing various projects that draw from MNE-C, originally written by Matti Hämäläinen (documented [here](https://mne.tools/mne-c-manual/MNE-manual-2.7.3.pdf))
 
@@ -13,7 +13,7 @@ Other projects include:
  - [MNE-MATLAB](https://mne.tools/stable/overview/matlab.html#mne-matlab) - a MATLAB interface for MNE structures and functions.
  - [MNE-C](http://www.nmr.mgh.harvard.edu/martinos/userInfo/data/MNE_register/index.php) - the original implementation of the MNE toolset in C.
 
-# What is MNE-CPP?
+## What is MNE-CPP?
 
 MNE-CPP is both an open-source collection of cross-platform software tools and a framework for development. We provide two main GUI applications, MNE Scan and MNE Analyze, as well as several command line tools. MNE Scan is used for acquisition and real-time processing, while MNE Analyze is used for visualization and analysis of pre-recorded data.
 
@@ -21,7 +21,7 @@ MNE-CPP provides a cross-platform library which allows the processing of MEG/EEG
 
 MNE-CPP is open-source licensed under BSD (clause 3). MNE-CPP has two external dependencies, namely [Qt](https://www.qt.io/){:target="_blank" rel="noopener"} and [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page){:target="_blank" rel="noopener"}.
 
-# Why use MNE-CPP?
+## Why use MNE-CPP?
 
 We are targeting two user groups:
 * Front-End users with little or no coding background. These users are interested in straight-forward setups and applications with an easy to use GUI, such as MNE Scan and MNE Analyze. For more information see our [Learn section](pages/learn/learn.md).
@@ -29,7 +29,7 @@ We are targeting two user groups:
 
 To that end, we aim to create software that allows users to do as much or as little coding as they are comfortable with, by making components of our software modular and making the process of adding functionality as straight-forward as possible.
 
-# What's next?
+## What's next?
 
 MNE-CPP is a community project. Contributions by new developers are always welcomed and greatly appreciated. If you are planning to contribute to MNE-CPP our [contributor page](pages/contribute/contribute.md) is a good point to start.
 
