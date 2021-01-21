@@ -168,7 +168,7 @@ void RtFiffRawView::init(QSharedPointer<FIFFLIB::FiffInfo> &info)
     connect(m_pTableView.data(), &QTableView::doubleClicked,
             m_pModel.data(), &RtFiffRawViewModel::toggleFreeze);
 
-    connect(this, &RtFiffRawView::newEvent,
+    connect(this, &RtFiffRawView::createNewEvent,
             m_pModel.data(), &RtFiffRawViewModel::newEvent);
 
     connect(m_pTableView.data(), &QTableView::customContextMenuRequested,
@@ -575,8 +575,9 @@ void RtFiffRawView::channelContextMenu(QPoint pos)
             this, &RtFiffRawView::resetSelection);
 
     QAction* addEventMarker = menu->addAction(tr("Add Event Marker"));
-    connect(addEventMarker, &QAction::triggered,
-            this, &RtFiffRawView::onAddEventMarker);
+    connect(addEventMarker, &QAction::triggered, [=]{
+                onAddEventMarker(pos.x());
+            });
 
     //show context menu
     menu->popup(m_pTableView->viewport()->mapToGlobal(pos));
@@ -706,13 +707,12 @@ void RtFiffRawView::clearView()
 
 //=============================================================================================================
 
-void RtFiffRawView::onAddEventMarker(bool checked)
+void RtFiffRawView::onAddEventMarker(int iPosition)
 {
-    Q_UNUSED(checked)
 
     double dDx = static_cast<double>(m_pTableView->columnWidth(1)) / static_cast<double>(m_pModel->getMaxSamples());
     qDebug() << "View dDx:" << dDx;
-    double dSample = static_cast<double>(pos.x()) / dDx;
+    double dSample = static_cast<double>(iPosition) / dDx;
     qDebug() << "View Sample:" << dSample;
-    emit newEvent(static_cast<int>(dSample), );
+    emit createNewEvent(static_cast<int>(dSample));
 }
