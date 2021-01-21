@@ -1,6 +1,6 @@
 ---
 title: Build from Source
-parent: Download
+parent: Develop
 has_children: true
 nav_order: 2
 ---
