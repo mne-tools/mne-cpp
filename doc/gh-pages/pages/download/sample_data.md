@@ -1,7 +1,7 @@
 ---
 title: The Sample Data Set
 parent: Download
-nav_order: 4
+nav_order: 3
 ---
 # Setting Up the Sample Data Set
 
