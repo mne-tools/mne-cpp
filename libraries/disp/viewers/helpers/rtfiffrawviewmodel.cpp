@@ -467,9 +467,10 @@ void RtFiffRawViewModel::addData(const QList<MatrixXd> &data)
             }
 
             qDebug() << "Current Sample:" << m_iCurrentSample;
-            qDebug() << "Starting Sample:" << m_iCurrentStartingSample;
 
             m_iCurrentStartingSample += m_iCurrentSample;
+
+            qDebug() << "Starting Sample:" << m_iCurrentStartingSample;
             m_iCurrentSample = 0;
 
             if(!m_bIsFreezed) {
