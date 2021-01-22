@@ -137,7 +137,7 @@ Existing views and controls are in the library layer, in the disp library. These
 
 ### Using the event system
 
-Events are how the plugins in MNE Analyze communicate with each other. If your plugin needs to know about any new data that was loaded, any new item being selected, or wants to make use of any of the scaling or channel selection controls already provided by other plugins, you can subscribe to the relevant events. If you plugin needs to instead send out data, you can send the relevant events or create new ones to suit you needs. See the page on the [event system](analyze_events.md).
+Events are how the plugins in MNE Analyze communicate with each other. If your plugin needs to know about any new data that was loaded, any new item being selected, or wants to make use of any of the scaling or channel selection controls already provided by other plugins, you can subscribe to the relevant events. If you plugin needs to instead send out data, you can send the relevant events or create new ones to suit you needs. See the page on the [event system](analyze_event.md).
 
 ### Setting/Clearing Data
 
