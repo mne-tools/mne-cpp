@@ -1,1 +1,2 @@
-download the MNE sample data from https://osf.io/86qa2/download and extract them into this folder.
+
+## Follow the [instructions](https://juangpc.github.io/mne-cpp/pages/download/sample_data.html) in our website in order to download the sample dataset.
