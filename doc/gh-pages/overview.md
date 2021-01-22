@@ -34,7 +34,7 @@ To that end, we aim to create software that allows users to do as much or as lit
 
 ## What's next?
 
-MNE-CPP is a community project. Contributions by new developers are always welcomed and greatly appreciated. If you are planning to contribute to MNE-CPP our [contributor page](pages/develop/contribute.md) is a good point to start.
+MNE-CPP is a community project. Contributions by new developers are always welcomed and greatly appreciated. If you are planning to contribute to MNE-CPP our [contributor page](pages/development/contribute.md) is a good point to start.
 
 Currently, MNE-CPP's main development efforts can be divided into the following projects:
 

@@ -6,12 +6,12 @@ nav_order: 3
 ---
 # Forward Solution Plugin
 
-The forward solution plugin handles all forward computation tasks within MNE Scan. It can be used to compute the EEG and MEG forward solution, based on a BEM and source model. The functionality is consistent to [MNE Forward Solution](/fwdsolution.md). Further, it is possible to update the MEG forward solution to a new head position provided by the [HPI Fitting plugin](/scan_heamonitoring.md).
+The forward solution plugin handles all forward computation tasks within MNE Scan. It can be used to compute the EEG and MEG forward solution, based on a BEM and source model. The functionality is consistent to [MNE Forward Solution](/fwdsolution.md). Further, it is possible to update the MEG forward solution to a new head position provided by the [HPI Fitting plugin](/scan_headmonitoring.md).
 
 ## Input
 
 The Forward Solution plugin takes data from following plugins:
-* Sensor Plugins: [FiffSimulator plugin](/scan_prerecordeddata.md), [FieldTripBuffer plugin](../development/)
+* Sensor Plugins: [FiffSimulator plugin](/scan_prerecordeddata.md), [FieldTripBuffer plugin](../development/scan_ftbuffer.md)
 * [HPI Fitting plugin](/scan_heamonitoring.md)
 
 ## Output
