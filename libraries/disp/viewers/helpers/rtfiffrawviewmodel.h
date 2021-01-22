@@ -514,6 +514,8 @@ public:
 
     inline int getNumberOfEventsToDraw() const;
 
+    inline int getFirstSampleOffset() const;
+
 
 private:
     //=========================================================================================================
@@ -558,7 +560,7 @@ private:
     qint32                              m_iDownsampling;                            /**< Down sampling factor. */
     qint32                              m_iMaxSamples;                              /**< Max samples per window. */
     qint32                              m_iCurrentSample;                           /**< Current sample which holds the current position in the data matrix. */
-    qint32                              m_iCurrentStartingSample;
+    qint32                              m_iCurrentStartingSample;                   /**< Accumulates cumulative starting sample position when m_iCurrentSample resets to 0 */
     qint32                              m_iCurrentSampleFreeze;                     /**< Current sample which holds the current position in the data matrix when freezing tool is active. */
     qint32                              m_iMaxFilterLength;                         /**< Max order of the current filters. */
     qint32                              m_iCurrentBlockSize;                        /**< Current block size. */
@@ -847,6 +849,13 @@ inline Event RtFiffRawViewModel::getEvent(int iIndex) const
 inline int RtFiffRawViewModel::getNumberOfEventsToDraw() const
 {
     return m_pEventHandler->getNumberOfEventsToDraw();
+}
+
+//=============================================================================================================
+
+inline int RtFiffRawViewModel::getFirstSampleOffset() const
+{
+    return m_iCurrentStartingSample;
 }
 } // NAMESPACE
 
