@@ -217,16 +217,16 @@ void View3D::setSceneColor(const QColor& colSceneColor)
 
 //=============================================================================================================
 
-void View3D::toggleCoordAxis(bool checked)
+void View3D::toggleCoordAxis(bool bChecked)
 {
-    m_pCoordSysEntity->setEnabled(checked);
+    m_pCoordSysEntity->setEnabled(bChecked);
 }
 
 //=============================================================================================================
 
-void View3D::showFullScreen(bool checked)
+void View3D::showFullScreen(bool bChecked)
 {
-    if(checked) {
+    if(bChecked) {
         this->Qt3DWindow::showFullScreen();
     }
     else {
@@ -377,7 +377,7 @@ void View3D::setCameraRotation(float fAngle)
 
 //=============================================================================================================
 
-void View3D::startStopCameraRotation(bool checked)
+void View3D::startStopCameraRotation(bool bChecked)
 {
     if(!m_pCameraAnimation) {
         m_pCameraAnimation = new QPropertyAnimation(m_pCamController, "rotating");
@@ -387,7 +387,7 @@ void View3D::startStopCameraRotation(bool checked)
         m_pCameraAnimation->setLoopCount(-1);
     }
 
-    if(checked) {
+    if(bChecked) {
         //Start animation
         m_pCameraAnimation->start();
     }
