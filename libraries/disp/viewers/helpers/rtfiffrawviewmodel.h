@@ -654,6 +654,15 @@ public:
 
     int getSample() const;
 
+    bool shouldBeDrawn(int iFirstSampleOffset,
+                       int iCurrentSample,
+                       int iMaxSample) const;
+
+    float getDrawPosition(int iFirstSampleOffset,
+                          int iCurrentSample,
+                          int iMaxSample,
+                          double dDx) const;
+
     bool operator<(const Event& rhs) const
     {
        return getSample() < rhs.getSample();  //assume that you compare the record based on a
