@@ -19,6 +19,6 @@ Development Release
 
 ---
 
-If your platform is not supported by default or you would like to join and help the development effort, you can read the development section to learn how to build from source and contribute to MNE-CPP, we also have the option to [build the project from source](buildguide.md).
+If your platform is not supported you can build the code yourself. We have a specific guide on how to do that ([build the project from source](../development/buildguide.md)).
 
-If you'd like to develop with and contribute to MNE-CPP you can check out our guide on how to [build from source](pages/install/buildguide.md).
+If you would like to join and help the development effort, we have a whole section oriented towards guiding through the development process. See [Development](../development/development.md). 
