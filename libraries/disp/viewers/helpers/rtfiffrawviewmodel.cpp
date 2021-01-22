@@ -1364,6 +1364,32 @@ int Event::getSample() const
 
 //=============================================================================================================
 
+bool Event::shouldBeDrawn(int iFirstSampleOffset,
+                          int iCurrentSample,
+                          int iMaxSample) const
+{
+    int iEarliestDrawnSample = iFirstSampleOffset - iMaxSample + iCurrentSample;
+    int iLatestDrawnSample = iFirstSampleOffset + iMaxSample;
+
+    return (this->m_iSample >= iEarliestDrawnSample && this->m_iSample <= iLatestDrawnSample);
+}
+
+
+//=============================================================================================================
+
+float Event::getDrawPosition(int iFirstSampleOffset,
+                             int iCurrentSample,
+                             int iMaxSample,
+                             double dDx) const
+{
+    int iLastStartingSample = iFirstSampleOffset - iMaxSample;
+    int iDrawPositionInSamples = (m_iSample - iLastStartingSample) % iMaxSample;
+
+    return static_cast<float>(iDrawPositionInSamples) * dDx;
+}
+
+//=============================================================================================================
+
 void EventHandler::addEvent(Event event)
 {
     m_lAllEvents.append(event);
@@ -1399,3 +1425,6 @@ Event EventHandler::getFromAllEvents(int iIndex) const
 {
     return m_lAllEvents.at(iIndex);
 }
+
+//=============================================================================================================
+

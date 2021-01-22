@@ -738,23 +738,34 @@ void RtFiffRawViewDelegate::createMarkerPath(const QModelIndex &index,
 {
     const RtFiffRawViewModel* t_pModel = static_cast<const RtFiffRawViewModel*>(index.model());
 
-    double dDx = static_cast<double>(option.rect.width()) / static_cast<double>(t_pModel->getMaxSamples());
 //    qDebug() << "Marker Position:" << m_markerPosition;
 //    qDebug() << "Delegate dDx:" << dDx;
 
 //    double dSamplePosition = static_cast<double>(m_markerPosition.x()) / dDx;
 //    qDebug() << "dSamplePosition:" << dSamplePosition;
 
-    //horizontal lines
+    int iOffset = t_pModel->getFirstSampleOffset();
+    int iCurrentSample = t_pModel->getCurrentSampleIndex();
+    int iMaxSample = t_pModel->getMaxSamples();
+
+    double dDx = static_cast<double>(option.rect.width()) / static_cast<double>(iMaxSample);
 
     float yStart = option.rect.topLeft().y();
     float yEnd = option.rect.bottomRight().y();
 
     for(int i = 0; i < t_pModel->getNumberOfEventsToDraw(); i++)
     {
-        float position = static_cast<double>(t_pModel->getEvent(i).getSample()) * dDx;
+        Event e = t_pModel->getEvent(i);
+        if(e.shouldBeDrawn(iOffset,iCurrentSample,iMaxSample)){
 
-        path.moveTo(position,yStart);
-        path.lineTo(position,yEnd);
+            float iPositionInPixels = e.getDrawPosition(iOffset,
+                                                        iCurrentSample,
+                                                        iMaxSample,
+                                                        dDx);
+            path.moveTo(iPositionInPixels,yStart);
+            path.lineTo(iPositionInPixels,yEnd);
+        }
     }
 }
+
+
