@@ -8,7 +8,7 @@ nav_order: 4
 
 This part is focused on giving a short overview of git commands that should cover the general git workflow in MNE-CPP. For further information you can check out this [Git tutorial video](https://www.youtube.com/watch?v=DtLrWCFaG0A&feature=youtu.be){:target="_blank" rel="noopener"}.
 
-The first steps to get started, as described in the [build guide](../install/buildguide.md), are:
+The first steps to get started, as described in the [build guide](buildguide.md), are:
 ```
 git clone https://github.com/<YourGitUserName>/mne-cpp.git
 git remote add upstream https://github.com/mne-tools/mne-cpp.git
@@ -47,7 +47,7 @@ git add <changedFileName>
 git add --all
 ```
 
-- Commit the added files (colored in green in status report) and add a meaningful message about what changed and why (have a look at our [commit policy](conv_style.md)):
+- Commit the added files (colored in green in status report) and add a meaningful message about what changed and why (have a look at our [commit policy](contr_style.md)):
 
 ```
 git commit -m "Fix: meaningful commit message"

@@ -6,17 +6,17 @@ nav_order: 3
 ---
 # Forward Solution Plugin
 
-The forward solution plugin handles all forward computation tasks within MNE Scan. It can be used to compute the EEG and MEG forward solution, based on a BEM and source model. The functionality is consistent to [MNE Forward Solution](/fwdsolution.md). Further, it is possible to update the MEG forward solution to a new head position provided by the [HPI Fitting plugin](/scan_headmonitoring.md).
+The forward solution plugin handles all forward computation tasks within MNE Scan. It can be used to compute the EEG and MEG forward solution, based on a BEM and source model. The functionality is consistent to [MNE Forward Solution](fwdsolution.md). Further, it is possible to update the MEG forward solution to a new head position provided by the [HPI Fitting plugin](scan_headmonitoring.md).
 
 ## Input
 
 The Forward Solution plugin takes data from following plugins:
-* Sensor Plugins: [FiffSimulator plugin](/scan_prerecordeddata.md), [FieldTripBuffer plugin](../development/scan_ftbuffer.md)
-* [HPI Fitting plugin](/scan_heamonitoring.md)
+* Sensor Plugins: [FiffSimulator plugin](scan_prerecordeddata.md), [FieldTripBuffer plugin](../development/scan_ftbuffer.md)
+* [HPI Fitting plugin](scan_headmonitoring.md)
 
 ## Output
 
-The computed forward solution can be passed to the [Source Localization plugin](/scan_sourceloc.md).
+The computed forward solution can be passed to the [Source Localization plugin](scan_sourceloc.md).
 
 ## Setup
 
@@ -24,7 +24,7 @@ The computed forward solution can be passed to the [Source Localization plugin](
 
 <img src="../../images/mne_scan_fwdLoadPlugin.png" width="200" height="auto">
 
-2. To compute the forward solution within MNE Scan, some files and settings have to be loaded respectively set before the start of the measurement. The settings and files are the same as described in [MNE Forward Solution](/fwdsolution.md). They can be accessed by clicking on the Forward Solution plugin in the Plugin Scene. 
+2. To compute the forward solution within MNE Scan, some files and settings have to be loaded respectively set before the start of the measurement. The settings and files are the same as described in [MNE Forward Solution](fwdsolution.md). They can be accessed by clicking on the Forward Solution plugin in the Plugin Scene. 
 
 <img src="../../images/mne_scan_fwdSettings.png" width="auto" height="auto">
 
@@ -62,5 +62,5 @@ In the following picture, some examples for processing pipelines, including the 
 
 The pipeline on the left represents an easy source localization pipeline, whereas the right one can be used to compensate head movements during the measurement. The current head position, estimated by the HPI Fitting plugin, is used to update and recompute the forward solution. For this pipeline, it is further necessary to filter out the cHPI data before averaging. For further guides on setting up the components see:
 
-* [HPI Fitting plugin](/scan_heamonitoring.md)
-* [Source Localization plugin](/scan_sourceloc.md).
+* [HPI Fitting plugin](scan_headmonitoring.md)
+* [Source Localization plugin](scan_sourceloc.md).
