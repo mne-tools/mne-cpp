@@ -3,6 +3,6 @@ aux_links:
   "MNE-CPP on GitHub":
     - "https://github.com/mne-tools/mne-cpp"
 title: "MNE-CPP"
-logo: "images/parnters.png"
+logo: "images/partners.png"
 exclude:
   README.md
