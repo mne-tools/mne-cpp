@@ -709,10 +709,15 @@ void RtFiffRawView::clearView()
 
 void RtFiffRawView::onAddEventMarker(int iPosition)
 {
-
+    //Convert from pixels to samples
     double dDx = static_cast<double>(m_pTableView->columnWidth(1)) / static_cast<double>(m_pModel->getMaxSamples());
-    qDebug() << "View dDx:" << dDx;
     double dSample = static_cast<double>(iPosition) / dDx;
+
+    //Add offset
+    int iAbsoluteSample = static_cast<int>(dSample) + m_pModel->getFirstSampleOffset();
+
+    emit createNewEvent(iAbsoluteSample);
+
+    qDebug() << "View dDx:" << dDx;
     qDebug() << "View Sample:" << dSample;
-    emit createNewEvent(static_cast<int>(dSample));
 }

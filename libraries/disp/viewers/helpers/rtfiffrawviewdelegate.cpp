@@ -520,8 +520,8 @@ void RtFiffRawViewDelegate::createPlotPath(const QModelIndex &index,
     int currentSampleIndex = t_pModel->getCurrentSampleIndex();
     double lastFirstValue = t_pModel->getLastBlockFirstValue(index.row());
 
-    qDebug() << "Curernt Sample:" << t_pModel->getCurrentSampleIndex();
-    qDebug() << "lastFirstValue:" << t_pModel->getLastBlockFirstValue(index.row());
+//    qDebug() << "Curernt Sample:" << t_pModel->getCurrentSampleIndex();
+//    qDebug() << "lastFirstValue:" << t_pModel->getLastBlockFirstValue(index.row());
 
     //Move to initial starting point
     if(data.second > 0) {
