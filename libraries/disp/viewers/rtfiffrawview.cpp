@@ -713,8 +713,18 @@ void RtFiffRawView::onAddEventMarker(int iPosition)
     double dDx = static_cast<double>(m_pTableView->columnWidth(1)) / static_cast<double>(m_pModel->getMaxSamples());
     double dSample = static_cast<double>(iPosition) / dDx;
 
+    int iFirstSampleOffset = m_pModel->getFirstSampleOffset();
+
+    if (dSample > m_pModel->getCurrentSampleIndex() && iFirstSampleOffset == 0){
+        return;
+    }
+
     //Add offset
-    int iAbsoluteSample = static_cast<int>(dSample) + m_pModel->getFirstSampleOffset();
+    int iAbsoluteSample = static_cast<int>(dSample) + iFirstSampleOffset;
+
+    if (dSample > m_pModel->getCurrentSampleIndex()){
+        iAbsoluteSample -= m_pModel->getMaxSamples();
+    }
 
     emit createNewEvent(iAbsoluteSample);
 
