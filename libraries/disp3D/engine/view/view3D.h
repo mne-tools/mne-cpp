@@ -41,6 +41,7 @@
 //=============================================================================================================
 
 #include "../../disp3D_global.h"
+#include "orbitalcameracontroller.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -51,7 +52,6 @@
 #include <QPointer>
 #include <QObjectPicker>
 #include <Qt3DCore>
-#include "orbitalcameracontroller.h"
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -125,7 +125,7 @@ public:
     /**
      * Starts or stops to rotate camera around 3D models.
      */
-    void startStopCameraRotation(bool checked);
+    void startStopCameraRotation(bool bChecked);
 
     //=========================================================================================================
     /**
@@ -149,13 +149,13 @@ public:
     /**
      * Toggle the coord axis visibility.
      */
-    void toggleCoordAxis(bool checked);
+    void toggleCoordAxis(bool bChecked);
 
     //=========================================================================================================
     /**
      * Show fullscreen.
      */
-    void showFullScreen(bool checked);
+    void showFullScreen(bool bChecked);
 
     //=========================================================================================================
     /**
