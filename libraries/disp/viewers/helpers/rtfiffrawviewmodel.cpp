@@ -1431,3 +1431,15 @@ Event EventHandler::getFromAllEvents(int iIndex) const
 
 //=============================================================================================================
 
+void EventHandler::clear()
+{
+    m_lEventsToDraw.clear();
+}
+
+//=============================================================================================================
+
+void EventHandler::clearAll()
+{
+    m_lEventsToDraw.clear();
+    m_lAllEvents.clear();
+}
