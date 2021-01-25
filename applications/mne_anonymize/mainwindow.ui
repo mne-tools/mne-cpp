@@ -76,8 +76,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>638</width>
-         <height>611</height>
+         <width>644</width>
+         <height>622</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -304,53 +304,14 @@
               <enum>QFrame::Raised</enum>
              </property>
              <layout class="QGridLayout" name="gridLayout_3">
-              <item row="12" column="0">
-               <widget class="QCheckBox" name="checkBoxMNEEnvironment">
-                <property name="text">
-                 <string>MNE Environment</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="0">
-               <widget class="QDateTimeEdit" name="dateTimeMeasurementDate">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="time">
-                 <time>
-                  <hour>0</hour>
-                  <minute>0</minute>
-                  <second>0</second>
-                 </time>
-                </property>
-                <property name="calendarPopup">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="0">
-               <widget class="QLabel" name="labelMeasDate_2">
-                <property name="maximumSize">
-                 <size>
-                  <width>16777215</width>
-                  <height>20</height>
-                 </size>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true">font:14pt;</string>
-                </property>
-                <property name="text">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Options Menu&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignCenter</set>
-                </property>
-               </widget>
-              </item>
               <item row="9" column="0">
+               <widget class="QCheckBox" name="checkBoxBirthdayDateOffset">
+                <property name="text">
+                 <string>Subject birthday offset</string>
+                </property>
+               </widget>
+              </item>
+              <item row="10" column="0">
                <widget class="QSpinBox" name="spinBoxBirthdayDateOffset">
                 <property name="maximumSize">
                  <size>
@@ -366,20 +327,10 @@
                 </property>
                </widget>
               </item>
-              <item row="8" column="0">
-               <widget class="QCheckBox" name="checkBoxBirthdayDateOffset">
+              <item row="13" column="0">
+               <widget class="QCheckBox" name="checkBoxMNEEnvironment">
                 <property name="text">
-                 <string>Subject birthday offset</string>
-                </property>
-               </widget>
-              </item>
-              <item row="11" column="0">
-               <widget class="QLineEdit" name="lineEditSubjectHisId"/>
-              </item>
-              <item row="4" column="0">
-               <widget class="QCheckBox" name="checkBoxMeasurementDateOffset">
-                <property name="text">
-                 <string>Measurement date offset</string>
+                 <string>MNE Environment</string>
                 </property>
                </widget>
               </item>
@@ -405,7 +356,69 @@
                 </property>
                </widget>
               </item>
-              <item row="10" column="0">
+              <item row="6" column="0">
+               <widget class="QLabel" name="labelSubjectBirthday">
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>20</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Subject birthday&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QLabel" name="labelMeasDate_2">
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>20</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">font:14pt;</string>
+                </property>
+                <property name="text">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Options Menu&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="12" column="0">
+               <widget class="QLineEdit" name="lineEditSubjectHisId"/>
+              </item>
+              <item row="3" column="0">
+               <widget class="QDateTimeEdit" name="dateTimeMeasurementDate">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="time">
+                 <time>
+                  <hour>0</hour>
+                  <minute>0</minute>
+                  <second>0</second>
+                 </time>
+                </property>
+                <property name="calendarPopup">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0">
+               <widget class="QCheckBox" name="checkBoxMeasurementDateOffset">
+                <property name="text">
+                 <string>Measurement date offset</string>
+                </property>
+               </widget>
+              </item>
+              <item row="11" column="0">
                <widget class="QLabel" name="labelSubjectHisId">
                 <property name="maximumSize">
                  <size>
@@ -438,26 +451,10 @@
                 </property>
                </widget>
               </item>
-              <item row="6" column="0">
-               <widget class="QLabel" name="labelSubjectBirthday">
-                <property name="maximumSize">
-                 <size>
-                  <width>16777215</width>
-                  <height>20</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Subject birthday&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-               </widget>
-              </item>
               <item row="7" column="0">
-               <widget class="QDateTimeEdit" name="dateTimeBirthdayDate">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
+               <widget class="QDateEdit" name="dateEditBirthdayDate">
+                <property name="showGroupSeparator" stdset="0">
+                 <bool>false</bool>
                 </property>
                 <property name="calendarPopup">
                  <bool>true</bool>
@@ -468,7 +465,6 @@
              <zorder>checkBoxBirthdayDateOffset</zorder>
              <zorder>labelSubjectHisId</zorder>
              <zorder>checkBoxMeasurementDateOffset</zorder>
-             <zorder>dateTimeBirthdayDate</zorder>
              <zorder>labelMeasDate</zorder>
              <zorder>spinBoxMeasurementDateOffset</zorder>
              <zorder>dateTimeMeasurementDate</zorder>
@@ -478,6 +474,7 @@
              <zorder>checkBoxBruteMode</zorder>
              <zorder>labelMeasDate_2</zorder>
              <zorder>checkBoxMNEEnvironment</zorder>
+             <zorder>dateEditBirthdayDate</zorder>
             </widget>
            </item>
            <item>
@@ -526,7 +523,7 @@
                  <bool>true</bool>
                 </property>
                 <property name="currentIndex">
-                 <number>0</number>
+                 <number>1</number>
                 </property>
                 <widget class="QWidget" name="tab">
                  <attribute name="title">
@@ -956,7 +953,6 @@
   <tabstop>dateTimeMeasurementDate</tabstop>
   <tabstop>checkBoxMeasurementDateOffset</tabstop>
   <tabstop>spinBoxMeasurementDateOffset</tabstop>
-  <tabstop>dateTimeBirthdayDate</tabstop>
   <tabstop>checkBoxBirthdayDateOffset</tabstop>
   <tabstop>spinBoxBirthdayDateOffset</tabstop>
   <tabstop>lineEditSubjectHisId</tabstop>

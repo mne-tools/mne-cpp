@@ -223,7 +223,7 @@ void SettingsControllerGui::setupCommunication()
     QObject::connect(m_pWin.data(),&MainWindow::measurementDateOffsetChanged,
                      m_pAnonymizer.data(),&FiffAnonymizer::setMeasurementDateOffset);
     QObject::connect(m_pWin.data(),&MainWindow::birthdayDateChanged,
-                     m_pAnonymizer.data(),QOverload<const QDateTime&>::of(&FiffAnonymizer::setSubjectBirthday));
+                     m_pAnonymizer.data(),QOverload<const QDate&>::of(&FiffAnonymizer::setSubjectBirthday));
     QObject::connect(m_pWin.data(),&MainWindow::useBirthdayOffset,
                      m_pAnonymizer.data(),&FiffAnonymizer::setUseSubjectBirthdayOffset);
     QObject::connect(m_pWin.data(),&MainWindow::birthdayOffsetChanged,
@@ -308,6 +308,7 @@ void SettingsControllerGui::initializeOptionsState()
     m_pWin->setCheckBoxMeasurementDateOffset(m_pAnonymizer->getUseMeasurementDayOffset());
     m_pWin->setMeasurementDateOffset(m_pAnonymizer->getMeasurementDayOffset());
     m_pWin->setCheckBoxSubjectBirthdayOffset(m_pAnonymizer->getUseSubjectBirthdayOffset());
+    m_pWin->setSubjectBirthday(m_pAnonymizer->getSubjectBirthday());
     m_pWin->setSubjectBirthdayOffset(m_pAnonymizer->getSubjectBirthdayOffset());
     if(m_bHisIdSpecified)
     {
