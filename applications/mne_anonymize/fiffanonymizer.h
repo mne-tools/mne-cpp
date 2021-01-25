@@ -273,7 +273,7 @@ signals:
      * @param [in] b Subject birthday, in the current file.
      *
      */
-    void readingSubjectBirthday(QDateTime b);
+    void readingSubjectBirthday(QDate b);
 
     //=========================================================================================================
     /**
@@ -529,7 +529,7 @@ public slots:
      *
      * @param [in] sSubjBirtday String containing the desired subject birthday date.
      */
-    void setSubjectBirthday(const QDateTime& sSubjBirthday);
+    void setSubjectBirthday(const QDate& sSubjBirthday);
 
     //=========================================================================================================
     /**
@@ -631,7 +631,7 @@ public:
     /**
      * Get value of Subject's birthday.
      */
-    QDateTime getSubjectBirthday();
+    QDate getSubjectBirthday();
 
     //=========================================================================================================
     /**
@@ -815,7 +815,7 @@ private:
     QString m_sSubjectFirstName;        /**< Subject's first name substitutor.*/
     QString m_sSubjectMidName;          /**< Subject's middle name substitutor.*/
     QString m_sSubjectLastName;         /**< Subject's last name substitutor.*/
-    QDateTime m_dSubjectBirthday;       /**< Subject's birthday substitutor.*/
+    QDate m_dSubjectBirthday;       /**< Subject's birthday substitutor.*/
     int m_iSubjectBirthdayOffset;       /**< Subjects's birthday offset.*/
     bool m_bUseSubjectBirthdayOffset;   /**< Flags use of Subject's birthday offset.*/
     QString m_sSubjectComment;          /**< Subject's comment substitutor.*/
