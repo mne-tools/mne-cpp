@@ -371,7 +371,7 @@ void RtFiffRawViewDelegate::paint(QPainter *painter,
                 createMarkerPath(index, option, path);
 
                 painter->save();
-                painter->setPen(m_penMarker);
+                painter->setPen(QPen(Qt::green, 1, Qt::SolidLine));
                 painter->drawPath(path);
                 painter->restore();
             }
