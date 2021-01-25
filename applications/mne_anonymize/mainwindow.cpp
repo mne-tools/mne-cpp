@@ -588,7 +588,7 @@ void MainWindow::setLineEditProjectId(int id)
 
 //=============================================================================================================
 
-void MainWindow::setLineEditProjectName(QString p)
+void MainWindow::setLineEditProjectName(const QString& p)
 {
     m_pUi->lineEditProjectNameExtra->setEnabled(true);
     m_pUi->lineEditProjectNameExtra->setText(p);
@@ -596,7 +596,7 @@ void MainWindow::setLineEditProjectName(QString p)
 
 //=============================================================================================================
 
-void MainWindow::setLineEditProjectAim(QString p)
+void MainWindow::setLineEditProjectAim(const QString& p)
 {
     m_pUi->lineEditProjectAimExtra->setEnabled(true);
     m_pUi->lineEditProjectAimExtra->setText(p);
@@ -604,7 +604,7 @@ void MainWindow::setLineEditProjectAim(QString p)
 
 //=============================================================================================================
 
-void MainWindow::setLineEditProjectPersons(QString p)
+void MainWindow::setLineEditProjectPersons(const QString& p)
 {
     m_pUi->lineEditProjectPersonsExtra->setEnabled(true);
     m_pUi->lineEditProjectPersonsExtra->setText(p);
@@ -612,7 +612,7 @@ void MainWindow::setLineEditProjectPersons(QString p)
 
 //=============================================================================================================
 
-void MainWindow::setLineEditProjectComment(QString c)
+void MainWindow::setLineEditProjectComment(const QString& c)
 {
     m_pUi->plainTextEditProjectCommentExtra->setEnabled(true);
     m_pUi->plainTextEditProjectCommentExtra->setPlainText(c);
@@ -627,7 +627,7 @@ void MainWindow::setLabelMriDataFoundVisible(bool b)
 
 //=============================================================================================================
 
-void MainWindow::setLineEditMNEWorkingDir(QString s)
+void MainWindow::setLineEditMNEWorkingDir(const QString& s)
 {
     m_pUi->lineEditMNEEnvironmentWorkingDirExtra->setEnabled(true);
     m_pUi->lineEditMNEEnvironmentWorkingDirExtra->setText(s);
@@ -635,7 +635,7 @@ void MainWindow::setLineEditMNEWorkingDir(QString s)
 
 //=============================================================================================================
 
-void MainWindow::setLineEditMNECommand(QString s)
+void MainWindow::setLineEditMNECommand(const QString& s)
 {
     m_pUi->lineEditMNEEnvironmentCommandExtra->setEnabled(true);
     m_pUi->lineEditMNEEnvironmentCommandExtra->setText(s);
