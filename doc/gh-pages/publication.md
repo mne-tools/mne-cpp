@@ -24,10 +24,10 @@ nav_order: 3
 | Dinh, C.; Luessi, M.; Sun, L.; Haueisen, J.; Hämäläinen, M.S.: MNE-X: MEG/EEG Real-Time Acquisition, Real-Time Processing, and Real-Time Source Localization Framework. Biomedizinische Technik (Berl.) (2013), 58, [DOI: 10.1515/bmt-2013-4184](https://www.degruyter.com/view/journals/bmte/58/SI-1-Track-G/article-000010151520134184.xml){:target="_blank" rel="noopener"} |
 
 
-| Dinh, C.; Rühle, J.; Bollmann, S.; Haueisen, J.; Güllmar, D.: A GPU-accelerated Performance Optimized RAP-MUSIC Algorithm for Real-Time Source Localization. Biomedizinische Technik (Berl.) (2012), 57 |
+| Dinh, C.; Rühle, J.; Bollmann, S.; Haueisen, J.; Güllmar, D.: A GPU-accelerated Performance Optimized RAP-MUSIC Algorithm for Real-Time Source Localization. Biomedizinische Technik (Berl.) (2012), 57 [DOI: 10.1515/bmt-2012-4260 ](https://www.degruyter.com/view/journals/bmte/57/SI-1-Track-O/article-p808.xml){:target="_blank" rel="noopener"} |
 
 | Dinh, C.; Strohmeier, D.; Haueisen, J.; Güllmar, D.: Brain Atlas based Region of Interest Selection for Real-Time Source Localization using K-Means Lead Field Clustering and RAP-MUSIC. Biomedizinische Technik (Berl.) (2012), 57 |
 
-| Dinh, C.; Bollmann, S.; Eichardt, R.; Baumgarten, D.; Haueisen, J.: A Performance-Optimized RAP-MUSIC-Algorithm for Online Source Localizations. OIPE (2010){:target="_blank" rel="noopener"} |
+| Dinh, C.; Bollmann, S.; Eichardt, R.; Baumgarten, D.; Haueisen, J.: A Performance-Optimized RAP-MUSIC-Algorithm for Online Source Localizations. OIPE (2010) |
 
 | Dinh, C.; Esch, L.; Sun, L.; Schlembach, F.; Lew, S.; Kunze, T.; Knobl, D.; Henfling, M; Pieloth, C.; Doshi, C.; Polo, F.; Strohmeier, D.; Luessi, M.; Okada, Y.; Haueisen, J.; Hämäläinen, M. S.: MNE-CPP v1.0.0-beta 3.0 Zenodo (2017). [DOI 10.5281/zenodo.439390](https://zenodo.org/record/439390){:target="_blank" rel="noopener"} |
