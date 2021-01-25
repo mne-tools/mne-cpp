@@ -88,7 +88,7 @@ FiffAnonymizer::FiffAnonymizer()
 , m_sSubjectFirstName(m_sDefaultString)
 , m_sSubjectMidName("mne")
 , m_sSubjectLastName(m_sDefaultString)
-, m_dSubjectBirthday(m_dDefaultDate)
+, m_dSubjectBirthday(QDate(2000,1,1))
 , m_iSubjectBirthdayOffset(0)
 , m_bUseSubjectBirthdayOffset(false)
 , m_sSubjectComment(m_sDefaultString)
@@ -382,9 +382,9 @@ void FiffAnonymizer::censorTag()
     }
     case FIFF_SUBJ_BIRTH_DAY:
     {
-        QDateTime inBirthday(QDate::fromJulianDay(*m_pTag->toJulian()));
+        QDate inBirthday(QDate::fromJulianDay(*m_pTag->toJulian()));
         emit readingSubjectBirthday(inBirthday);
-        QDateTime outBirthday;
+        QDate outBirthday;
 
         if(m_bUseSubjectBirthdayOffset)
         {
@@ -394,7 +394,7 @@ void FiffAnonymizer::censorTag()
         }
 
         FIFFLIB::fiff_int_t outData[1];
-        outData[0] = static_cast<int32_t> (outBirthday.date().toJulianDay());
+        outData[0] = static_cast<int32_t> (outBirthday.toJulianDay());
         memcpy(m_pTag->data(),reinterpret_cast<char*>(outData),sizeof(FIFFLIB::fiff_int_t));
         printIfVerbose("Subject birthday date changed: " + inBirthday.toString("dd.MM.yyyy hh:mm:ss.zzz t") + " -> " + outBirthday.toString("dd.MM.yyyy hh:mm:ss.zzz t"));
         break;
@@ -795,19 +795,19 @@ void FiffAnonymizer::setUseMeasurementDateOffset(bool b)
 
 void FiffAnonymizer::setSubjectBirthday(const QString& sSubjBirthday)
 {
-    m_dSubjectBirthday = QDateTime(QDate::fromString(sSubjBirthday,"ddMMyyyy"),QTime(1, 1, 0));
+    m_dSubjectBirthday = QDate::fromString(sSubjBirthday,"ddMMyyyy");
 }
 
 //=============================================================================================================
 
-void FiffAnonymizer::setSubjectBirthday(const QDateTime& sSubjBirthday)
+void FiffAnonymizer::setSubjectBirthday(const QDate& dSubjBirthday)
 {
-    m_dSubjectBirthday = QDateTime(sSubjBirthday);
+    m_dSubjectBirthday = QDate(dSubjBirthday);
 }
 
 //=============================================================================================================
 
-QDateTime FiffAnonymizer::getSubjectBirthday()
+QDate FiffAnonymizer::getSubjectBirthday()
 {
     return m_dSubjectBirthday;
 }
