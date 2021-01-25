@@ -647,17 +647,67 @@ signals:
 class DISPSHARED_EXPORT Event : public QObject {
     Q_OBJECT
 public:
+    //=========================================================================================================
+    /**
+     * Create an event at sample iSample
+     *
+     * @param [in] iSample  sample coorespondiong to this event
+     */
     Event (int iSample);
+
+    //=========================================================================================================
+    /**
+     * Create and event with the same parameters as parameter event
+     *
+     * @param [in] event    event to be copied
+     */
     Event (const Event &event);
+
+    //=========================================================================================================
+    /**
+     * Creates an blank event with sample set to -1
+     */
     Event();
+
+    //=========================================================================================================
+    /**
+     * Deletes event
+     */
     ~Event();
 
+    //=========================================================================================================
+    /**
+     * Returns event sample
+     *
+     * @return event sample
+     */
     int getSample() const;
 
+    //=========================================================================================================
+    /**
+     * Whether the event should be drawn given the window parameters
+     *
+     * @param [in] iFirstSampleOffset   offset of the first sample in the draw window
+     * @param [in] iCurrentSample       sample in window currently being drawn
+     * @param [in] iMaxSample           max window size in samples
+     *
+     * @return whether event should be drawn
+     */
     bool shouldBeDrawn(int iFirstSampleOffset,
                        int iCurrentSample,
                        int iMaxSample) const;
 
+    //=========================================================================================================
+    /**
+     * Returns position to draw event given the window parameters (only valid if event should be drawn)
+     *
+     * @param [in] iFirstSampleOffset   offset of the first sample in the draw window
+     * @param [in] iCurrentSample       sample in window currently being drawn
+     * @param [in] iMaxSample           max window size in samples
+     * @param [in] dDx                  ratio of pixels per samples
+     *
+     * @return position on screen to draw event
+     */
     float getDrawPosition(int iFirstSampleOffset,
                           int iCurrentSample,
                           int iMaxSample,
@@ -668,21 +718,78 @@ public:
        return getSample() < rhs.getSample();  //assume that you compare the record based on a
     }
 private:
-    int m_iSample;
+    int m_iSample;              /**< Sample ccorespodning to this event*/
 };
 
 class DISPSHARED_EXPORT EventHandler : public QObject {
     Q_OBJECT
 public:
+    //=========================================================================================================
+    /**
+     * @brief EventHandler
+     */
     EventHandler(){};
+
+    //=========================================================================================================
+    /**
+     * @brief Event
+     */
     ~EventHandler(){};
 
+    //=========================================================================================================
+    /**
+     * @brief clear
+     */
+    void clear();
+
+    //=========================================================================================================
+    /**
+     * @brief clearAll
+     */
+    void clearAll();
+
+    //=========================================================================================================
+    /**
+     * @brief addEvent
+     *
+     * @param event
+     */
     void addEvent(Event event);
 
+    //=========================================================================================================
+    /**
+     * @brief getTotalNumberOfEvents
+     *
+     * @return
+     */
     int getTotalNumberOfEvents() const;
+
+    //=========================================================================================================
+    /**
+     * @brief getNumberOfEventsToDraw
+     *
+     * @return
+     */
     int getNumberOfEventsToDraw() const;
 
+    //=========================================================================================================
+    /**
+     * @brief getFromEventsToDrawAt
+     *
+     * @param iIndex
+     *
+     * @return
+     */
     Event getFromEventsToDrawAt(int iIndex) const;
+
+    //=========================================================================================================
+    /**
+     * @brief getFromAllEvents
+     *
+     * @param iIndex
+     *
+     * @return
+     */
     Event getFromAllEvents(int iIndex) const;
 
 private:
