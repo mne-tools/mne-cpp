@@ -92,6 +92,7 @@ View3D::View3D()
 , m_pLightEntity(new Qt3DCore::QEntity(m_pRootEntity))
 , m_pCamera(this->camera())
 , m_pPicker(new Qt3DRender::QObjectPicker(m_pRootEntity))
+, m_pCamController(new OrbitalCameraController(m_pRootEntity))
 {
     //Root entity
     this->setRootEntity(m_pRootEntity);
@@ -114,8 +115,7 @@ View3D::View3D()
     m_pCamera->lens()->setPerspectiveProjection(45.0f, this->width()/this->height(), 0.01f, 5000.0f);
     m_pFrameGraph->setCamera(m_pCamera);
 
-    OrbitalCameraController *pCamController = new OrbitalCameraController(m_pRootEntity);
-    pCamController->setCamera(m_pCamera);
+    m_pCamController->setCamera(m_pCamera);
 
     createCoordSystem(m_pRootEntity);
     toggleCoordAxis(false);
@@ -217,16 +217,16 @@ void View3D::setSceneColor(const QColor& colSceneColor)
 
 //=============================================================================================================
 
-void View3D::toggleCoordAxis(bool checked)
+void View3D::toggleCoordAxis(bool bChecked)
 {
-    m_pCoordSysEntity->setEnabled(checked);
+    m_pCoordSysEntity->setEnabled(bChecked);
 }
 
 //=============================================================================================================
 
-void View3D::showFullScreen(bool checked)
+void View3D::showFullScreen(bool bChecked)
 {
-    if(checked) {
+    if(bChecked) {
         this->Qt3DWindow::showFullScreen();
     }
     else {
@@ -358,27 +358,6 @@ void View3D::createCoordSystem(Qt3DCore::QEntity* parent)
 
 //=============================================================================================================
 
-void View3D::startModelRotationRecursive(QObject* pObject)
-{
-    //TODO this won't work with QEntities
-    if(Renderable3DEntity* pItem = dynamic_cast<Renderable3DEntity*>(pObject)) {
-        if(!dynamic_cast<Renderable3DEntity*>(pItem->parent())) {
-            QPropertyAnimation *anim = new QPropertyAnimation(pItem, QByteArrayLiteral("rotZ"));
-            anim->setDuration(30000);
-            anim->setStartValue(QVariant::fromValue(pItem->rotZ()));
-            anim->setEndValue(QVariant::fromValue(pItem->rotZ() + 360.0f));
-            anim->setLoopCount(-1);
-            m_pParallelAnimationGroup->addAnimation(anim);
-        }
-    }
-
-    for(int i = 0; i < pObject->children().size(); ++i) {
-        startModelRotationRecursive(pObject->children().at(i));
-    }
-}
-
-//=============================================================================================================
-
 void View3D::setCameraRotation(float fAngle)
 {
     m_pCamera->setPosition(QVector3D(0.0f, -0.4f, -0.25f));
@@ -398,23 +377,21 @@ void View3D::setCameraRotation(float fAngle)
 
 //=============================================================================================================
 
-void View3D::startStopModelRotation(bool checked)
+void View3D::startStopCameraRotation(bool bChecked)
 {
-    if(!m_pParallelAnimationGroup) {
-        m_pParallelAnimationGroup = QSharedPointer<QParallelAnimationGroup>::create();
+    if(!m_pCameraAnimation) {
+        m_pCameraAnimation = new QPropertyAnimation(m_pCamController, "rotating");
+        m_pCameraAnimation->setStartValue(QVariant::fromValue(1));
+        m_pCameraAnimation->setEndValue(QVariant::fromValue(10000));
+        m_pCameraAnimation->setDuration(10000);
+        m_pCameraAnimation->setLoopCount(-1);
     }
 
-    if(checked) {
+    if(bChecked) {
         //Start animation
-        m_pParallelAnimationGroup->clear();
-
-        for(int i = 0; i < m_p3DObjectsEntity->children().size(); ++i) {
-            startModelRotationRecursive(m_p3DObjectsEntity->children().at(i));
-        }
-
-        m_pParallelAnimationGroup->start();
+        m_pCameraAnimation->start();
     }
     else {
-        m_pParallelAnimationGroup->stop();
+        m_pCameraAnimation->stop();
     }
 }

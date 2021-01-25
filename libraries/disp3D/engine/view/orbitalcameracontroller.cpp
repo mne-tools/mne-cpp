@@ -43,6 +43,7 @@
 //=============================================================================================================
 
 #include <Qt3DRender/QCamera>
+#include <Qt3DCore/qtransform.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -64,6 +65,7 @@ using namespace DISP3DLIB;
 
 OrbitalCameraController::OrbitalCameraController(Qt3DCore::QNode *pParent)
     :QAbstractCameraController(pParent)
+    , m_iRotating(0.0f)
 {
     initController();
 }
@@ -73,10 +75,10 @@ OrbitalCameraController::OrbitalCameraController(Qt3DCore::QNode *pParent)
 void OrbitalCameraController::invertCameraRotation(bool newStatusFlag)
 {
     if(newStatusFlag == true) {
-        m_rotationInversFactor = -1.0f;
+        m_fRotationInverseFactor = -1.0f;
     }
     else {
-        m_rotationInversFactor = 1.0f;
+        m_fRotationInverseFactor = 1.0f;
     }
 }
 
@@ -100,9 +102,9 @@ void OrbitalCameraController::moveCamera(const Qt3DExtras::QAbstractCameraContro
         }
         else {
             // orbit around view center
-            pCamera->panAboutViewCenter(state.rxAxisValue * this->lookSpeed() * dt * m_rotationInversFactor,
+            pCamera->panAboutViewCenter(state.rxAxisValue * this->lookSpeed() * dt * m_fRotationInverseFactor,
                                         QVector3D(0.0f, 0.0f, 1.0f));
-            pCamera->tiltAboutViewCenter(state.ryAxisValue * this->lookSpeed() * dt * m_rotationInversFactor);
+            pCamera->tiltAboutViewCenter(state.ryAxisValue * this->lookSpeed() * dt * m_fRotationInverseFactor);
         }
     }
 
@@ -123,9 +125,9 @@ void OrbitalCameraController::moveCamera(const Qt3DExtras::QAbstractCameraContro
     }
 
     //Keyboard input: orbit around view center
-    pCamera->panAboutViewCenter(state.txAxisValue * this->lookSpeed() * dt * 0.8f  * m_rotationInversFactor,
+    pCamera->panAboutViewCenter(state.txAxisValue * this->lookSpeed() * dt * 0.8f  * m_fRotationInverseFactor,
                                 QVector3D(0.0f, 0.0f, 1.0f));
-    pCamera->tiltAboutViewCenter(state.tyAxisValue * this->lookSpeed()* dt * 0.8f * m_rotationInversFactor);
+    pCamera->tiltAboutViewCenter(state.tyAxisValue * this->lookSpeed()* dt * 0.8f * m_fRotationInverseFactor);
 }
 
 //=============================================================================================================
@@ -138,3 +140,19 @@ void OrbitalCameraController::initController()
 }
 
 //=============================================================================================================
+
+void OrbitalCameraController::setRotating(int count)
+{
+    Qt3DRender::QCamera *pCamera = this->camera();
+
+    m_iRotating = count;
+    QQuaternion quat = QQuaternion::QQuaternion::fromEulerAngles(0,0,m_fAutoRotationSpeed);
+    pCamera->rotateAboutViewCenter(quat);
+}
+
+//=============================================================================================================
+
+int OrbitalCameraController::rotating() const
+{
+    return m_iRotating;
+}
