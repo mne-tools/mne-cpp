@@ -826,7 +826,7 @@ void MainWindow::checkBoxBirthdayDateOffsetStateChanged(int arg)
     bool state(m_pUi->checkBoxBirthdayDateOffset->isChecked());
     m_pUi->spinBoxBirthdayDateOffset->setEnabled(state);
     emit useBirthdayOffset(state);
-    m_pUi->dateTimeBirthdayDate->setEnabled(!state);
+    m_pUi->dateEditBirthdayDate->setEnabled(!state);
     if(state)
     {
         statusMsg("Specify a subject's birthday offset.",2000);
@@ -837,7 +837,7 @@ void MainWindow::checkBoxBirthdayDateOffsetStateChanged(int arg)
 
 //=============================================================================================================
 
-void MainWindow::dateTimeMeasurementDateDateTimeChanged(const QDateTime &dateTime)
+void MainWindow::dateTimeMeasurementDateDateTimeChanged(const QDateTime& dateTime)
 {
     emit measurementDateChanged(dateTime);
 }
@@ -851,9 +851,9 @@ void MainWindow::spinBoxMeasurementDateOffsetValueChanged(int offset)
 
 //=============================================================================================================
 
-void MainWindow::dateTimeBirthdayDateDateTimeChanged(const QDateTime &dateTime)
+void MainWindow::dateEditBirthdayDateDateChanged(const QDate& date)
 {
-    emit birthdayDateChanged(dateTime);
+    emit birthdayDateChanged(date);
 }
 
 //=============================================================================================================
@@ -872,7 +872,7 @@ void MainWindow::lineEditSubjectHisIdEditingFinished()
 
 //=============================================================================================================
 
-void MainWindow::winPopup(QString s)
+void MainWindow::winPopup(const QString& s)
 {
     QMessageBox msgBox;
     msgBox.setText(s);
@@ -882,7 +882,7 @@ void MainWindow::winPopup(QString s)
 
 //=============================================================================================================
 
-void MainWindow::statusMsg(const QString s,int to)
+void MainWindow::statusMsg(const QString& s,int to)
 {
     m_pUi->statusbar->clearMessage();
     m_pUi->statusbar->showMessage(s,to);

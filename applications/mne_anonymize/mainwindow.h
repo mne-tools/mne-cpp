@@ -119,7 +119,7 @@ public:
      * @param [in] s QString containing the complete absolute path of the output file.
      *
      */
-    void setOutFile(const QString &s);
+    void setOutFile(const QString& s);
 
     //=========================================================================================================
     /**
@@ -178,7 +178,7 @@ public:
      * @param [in] d Birthday of the subject.
      *
      */
-    void setSubjectBirthday(const QDateTime& d);
+    void setSubjectBirthday(const QDate& d);
 
     //=========================================================================================================
     /**
@@ -232,7 +232,7 @@ public:
      * @param [in] to time to show the message for.
      *
      */
-    void statusMsg(const QString s, int to = 0);
+    void statusMsg(const QString& s, int to = 0);
 
     //=========================================================================================================
     /**
@@ -304,7 +304,7 @@ signals:
      * @param [in] o Number of days to offset the measurement.
      *
      */
-    void birthdayDateChanged(const QDateTime& d) const;
+    void birthdayDateChanged(const QDate& d) const;
 
     //=========================================================================================================
     /**
@@ -365,7 +365,7 @@ public slots:
      * @param [in] s Text to show in the popup window.
      *
      */
-    void winPopup(QString s);
+    void winPopup(const QString& s);
 
     //=========================================================================================================
     /**
@@ -387,7 +387,7 @@ public slots:
      * @param [in] d Measurement date.
      *
      */
-    void setLineEditIdMeasurementDate(QDateTime d);
+    void setLineEditIdMeasurementDate(const QDateTime& d);
 
     //=========================================================================================================
     /**
@@ -396,7 +396,7 @@ public slots:
      * @param [in] mac MAC address as text.
      *
      */
-    void setLineEditIdMacAddress(QString mac);
+    void setLineEditIdMacAddress(const QString& mac);
 
     //=========================================================================================================
     /**
@@ -408,7 +408,7 @@ public slots:
      * @param [in] d Date and time to show.
      *
      */
-    void setLineEditFileMeasurementDate(QDateTime d);
+    void setLineEditFileMeasurementDate(const QDateTime& d);
 
     //=========================================================================================================
     /**
@@ -417,7 +417,7 @@ public slots:
      * @param [in] s File comment.
      *
      */
-    void setLineEditFileComment(QString c);
+    void setLineEditFileComment(const QString& c);
 
     //=========================================================================================================
     /**
@@ -426,7 +426,7 @@ public slots:
      * @param [in] e Experimenter text.
      *
      */
-    void setLineEditFileExperimenter(QString e);
+    void setLineEditFileExperimenter(const QString& e);
 
     //=========================================================================================================
     /**
@@ -444,7 +444,7 @@ public slots:
      * @param [in] fn First name of the subject.
      *
      */
-    void setLineEditSubjectFirstName(QString fn);
+    void setLineEditSubjectFirstName(const QString& fn);
 
     //=========================================================================================================
     /**
@@ -453,7 +453,7 @@ public slots:
      * @param [in] mn Subject's middle name.
      *
      */
-    void setLineEditSubjectMiddleName(QString mn);
+    void setLineEditSubjectMiddleName(const QString& mn);
 
     //=========================================================================================================
     /**
@@ -462,7 +462,7 @@ public slots:
      * @param [in] ln Subject's last name.
      *
      */
-    void setLineEditSubjectLastName(QString ln);
+    void setLineEditSubjectLastName(const QString& ln);
 
     //=========================================================================================================
     /**
@@ -471,7 +471,7 @@ public slots:
      * @param [in] b Date and time for the birthday of the subject.
      *
      */
-    void setLineEditSubjectBirthday(QDateTime b);
+    void setLineEditSubjectBirthday(QDate b);
 
     //=========================================================================================================
     /**
@@ -524,7 +524,7 @@ public slots:
      * @param [in] c String to show.
      *
      */
-    void setLineEditSubjectComment(QString c);
+    void setLineEditSubjectComment(const QString& c);
 
     //=========================================================================================================
     /**
@@ -533,7 +533,7 @@ public slots:
      * @param [in] his String to show.
      *
      */
-    void setLineEditSubjectHisId(QString his);
+    void setLineEditSubjectHisId(const QString& his);
 
     //=========================================================================================================
     /**
@@ -551,7 +551,7 @@ public slots:
      * @param [in] pname Text with the name of the project.
      *
      */
-    void setLineEditProjectName(QString pname);
+    void setLineEditProjectName(const QString& pname);
 
     //=========================================================================================================
     /**
@@ -560,7 +560,7 @@ public slots:
      * @param [in] pAim Text containing the project aim.
      *
      */
-    void setLineEditProjectAim(QString pAim);
+    void setLineEditProjectAim(const QString& pAim);
 
     //=========================================================================================================
     /**
@@ -569,7 +569,7 @@ public slots:
      * @param [in] pPersons String text containing the persons involved in the project.
      *
      */
-    void setLineEditProjectPersons(QString pPersons);
+    void setLineEditProjectPersons(const QString& pPersons);
 
     //=========================================================================================================
     /**
@@ -578,7 +578,7 @@ public slots:
      * @param [in] pComment Text containing the project comment.
      *
      */
-    void setLineEditProjectComment(QString pComment);
+    void setLineEditProjectComment(const QString& pComment);
 
     //=========================================================================================================
     /**
@@ -596,7 +596,7 @@ public slots:
      * @param [in] s Text containing the working directory.
      *
      */
-    void setLineEditMNEWorkingDir(QString s);
+    void setLineEditMNEWorkingDir(const QString& s);
 
     //=========================================================================================================
     /**
@@ -605,7 +605,7 @@ public slots:
      * @param [in] s Text containing the command shown.
      *
      */
-    void setLineEditMNECommand(QString s);
+    void setLineEditMNECommand(const QString& s);
 
     //=========================================================================================================
     /**
@@ -676,7 +676,7 @@ private slots:
      * @brief Allows to manage the event of the measurement date control being changed.
      *
      */
-    void dateTimeMeasurementDateDateTimeChanged(const QDateTime &dateTime);
+    void dateTimeMeasurementDateDateTimeChanged(const QDateTime& dateTime);
 
     //=========================================================================================================
     /**
@@ -690,7 +690,7 @@ private slots:
      * @brief Allows to manage the event of the birthday date control being changed.
      *
      */
-    void dateTimeBirthdayDateDateTimeChanged(const QDateTime &dateTime);
+    void dateEditBirthdayDateDateChanged(const QDate& dateTime);
 
     //=========================================================================================================
     /**
