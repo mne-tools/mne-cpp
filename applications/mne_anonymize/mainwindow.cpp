@@ -207,7 +207,6 @@ void MainWindow::setDefautlStateUi()
     m_pUi->spinBoxMeasurementDateOffset->setToolTip("Specify number of days to subtract to the measurement.");
 
     m_pUi->labelSubjectBirthday->setToolTip("Specify the subject’s birthday.");
-    m_pUi->dateTimeBirthdayDate->setToolTip("Specify the subject’s birthday.");
     m_pUi->checkBoxBirthdayDateOffset->setToolTip("Specify a number of to subtract from the subject's birthday.");
     m_pUi->spinBoxBirthdayDateOffset->setToolTip("Specify a number of to subtract from the subject's birthday.");
 
@@ -234,7 +233,7 @@ void MainWindow::setDefautlStateUi()
     m_pUi->lineEditSubjectFirstNameExtra->setToolTip("Default substitution value: mne_anonymize");
     m_pUi->lineEditSubjectMiddleNameExtra->setToolTip("Default substitution value: mne-cpp");
     m_pUi->lineEditSubjectLastNameExtra->setToolTip("Default substitution value: mne_anonyze");
-    m_pUi->dateTimeBirthdayDate->setToolTip("Default substitution value: 01/01/2000 00:01:01");
+    m_pUi->dateEditBirthdayDate->setToolTip("Default substitution value: 01/01/2000");
     m_pUi->spinBoxBirthdayDateOffset->setToolTip("Default substitution value: 0");
     m_pUi->lineEditSubjectCommentExtra->setToolTip("Default substitution value: mne_anonymize");
     m_pUi->comboBoxSubjectSexExtra->setToolTip("Default substitution value: unknown");
@@ -359,8 +358,9 @@ void MainWindow::setupConnections()
 
     QObject::connect(m_pUi->checkBoxBirthdayDateOffset,&QCheckBox::stateChanged,
                      this,&MainWindow::checkBoxBirthdayDateOffsetStateChanged);
-    QObject::connect(m_pUi->dateTimeBirthdayDate,&QDateTimeEdit::dateTimeChanged,
-                     this,&MainWindow::dateTimeBirthdayDateDateTimeChanged);
+    QObject::connect(m_pUi->dateEditBirthdayDate,&QDateEdit::dateChanged,
+                     this,&MainWindow::dateEditBirthdayDateDateChanged);
+
     QObject::connect(m_pUi->spinBoxBirthdayDateOffset,QOverload<int>::of(&QSpinBox::valueChanged),
                      this,&MainWindow::spinBoxBirthdayDateOffsetValueChanged);
 
@@ -414,6 +414,13 @@ void MainWindow::setMeasurementDateOffset(int d)
 
 //=============================================================================================================
 
+void MainWindow::setSubjectBirthday(const QDate &d)
+{
+    m_pUi->dateEditBirthdayDate->setDate(d);
+}
+
+//=============================================================================================================
+
 void MainWindow::setCheckBoxSubjectBirthdayOffset(bool b)
 {
     m_pUi->checkBoxBirthdayDateOffset->setChecked(b);
@@ -443,7 +450,7 @@ void MainWindow::setLineEditIdFileVersion(double v)
 
 //=============================================================================================================
 
-void MainWindow::setLineEditIdMeasurementDate(QDateTime d)
+void MainWindow::setLineEditIdMeasurementDate(const QDateTime& d)
 {
     m_pUi->dateTimeIdMeasurementDateExtra->setEnabled(true);
     m_pUi->dateTimeIdMeasurementDateExtra->setDateTime(d);
@@ -451,7 +458,7 @@ void MainWindow::setLineEditIdMeasurementDate(QDateTime d)
 
 //=============================================================================================================
 
-void MainWindow::setLineEditIdMacAddress(QString mac)
+void MainWindow::setLineEditIdMacAddress(const QString& mac)
 {
     m_pUi->lineEditIdMACAddressExtra->setEnabled(true);
     m_pUi->lineEditIdMACAddressExtra->setText(mac);
@@ -459,7 +466,7 @@ void MainWindow::setLineEditIdMacAddress(QString mac)
 
 //=============================================================================================================
 
-void MainWindow::setLineEditFileMeasurementDate(QDateTime d)
+void MainWindow::setLineEditFileMeasurementDate(const QDateTime& d)
 {
     m_pUi->dateTimeFileMeasurementDateExtra->setEnabled(true);
     m_pUi->dateTimeFileMeasurementDateExtra->setDateTime(d);
@@ -467,7 +474,7 @@ void MainWindow::setLineEditFileMeasurementDate(QDateTime d)
 
 //=============================================================================================================
 
-void MainWindow::setLineEditFileComment(QString c)
+void MainWindow::setLineEditFileComment(const QString& c)
 {
     m_pUi->plainTextFileCommentExtra->setEnabled(true);
     m_pUi->plainTextFileCommentExtra->setPlainText(c);
@@ -475,7 +482,7 @@ void MainWindow::setLineEditFileComment(QString c)
 
 //=============================================================================================================
 
-void MainWindow::setLineEditFileExperimenter(QString e)
+void MainWindow::setLineEditFileExperimenter(const QString& e)
 {
     m_pUi->lineEditFileExperimenterExtra->setEnabled(true);
     m_pUi->lineEditFileExperimenterExtra->setText(e);
@@ -491,7 +498,7 @@ void MainWindow::setLineEditSubjectId(int i)
 
 //=============================================================================================================
 
-void MainWindow::setLineEditSubjectFirstName(QString fn)
+void MainWindow::setLineEditSubjectFirstName(const QString& fn)
 {
     m_pUi->lineEditSubjectFirstNameExtra->setEnabled(true);
     m_pUi->lineEditSubjectFirstNameExtra->setText(fn);
@@ -499,7 +506,7 @@ void MainWindow::setLineEditSubjectFirstName(QString fn)
 
 //=============================================================================================================
 
-void MainWindow::setLineEditSubjectMiddleName(QString mn)
+void MainWindow::setLineEditSubjectMiddleName(const QString& mn)
 {
     m_pUi->lineEditSubjectMiddleNameExtra->setEnabled(true);
     m_pUi->lineEditSubjectMiddleNameExtra->setText(mn);
@@ -507,7 +514,7 @@ void MainWindow::setLineEditSubjectMiddleName(QString mn)
 
 //=============================================================================================================
 
-void MainWindow::setLineEditSubjectLastName(QString ln)
+void MainWindow::setLineEditSubjectLastName(const QString& ln)
 {
     m_pUi->lineEditSubjectLastNameExtra->setEnabled(true);
     m_pUi->lineEditSubjectLastNameExtra->setText(ln);
@@ -515,10 +522,10 @@ void MainWindow::setLineEditSubjectLastName(QString ln)
 
 //=============================================================================================================
 
-void MainWindow::setLineEditSubjectBirthday(QDateTime b)
+void MainWindow::setLineEditSubjectBirthday(QDate b)
 {
-    m_pUi->dateTimeBirthdayDate->setEnabled(true);
-    m_pUi->dateTimeBirthdayDate->setDateTime(b);
+    m_pUi->dateEditBirthdayDate->setEnabled(true);
+    m_pUi->dateEditBirthdayDate->setDate(b);
 }
 
 //=============================================================================================================
@@ -557,7 +564,7 @@ void MainWindow::setLineEditSubjectHeight(float h)
 
 //=============================================================================================================
 
-void MainWindow::setLineEditSubjectComment(QString c)
+void MainWindow::setLineEditSubjectComment(const QString& c)
 {
     m_pUi->lineEditSubjectCommentExtra->setEnabled(true);
     m_pUi->lineEditSubjectCommentExtra->setText(c);
@@ -565,7 +572,7 @@ void MainWindow::setLineEditSubjectComment(QString c)
 
 //=============================================================================================================
 
-void MainWindow::setLineEditSubjectHisId(QString his)
+void MainWindow::setLineEditSubjectHisId(const QString& his)
 {
     m_pUi->lineEditSubjectHisIdExtra->setEnabled(true);
     m_pUi->lineEditSubjectHisIdExtra->setText(his);
