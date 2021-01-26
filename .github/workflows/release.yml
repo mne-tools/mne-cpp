@@ -219,6 +219,9 @@ jobs:
     - name: Deploy binaries
       run: |
         ./tools/deployment/deploy_win_static.bat
+    - name: Generate zip file from bin folder contents
+      run: |
+        ./tools/deployment/save_bin_folder_content_as_zip_file.bat        
     - name: Deploy binaries with stable release on Github
       if: endsWith(github.ref, 'master') == false
       uses: svenstaro/upload-release-action@v1-release
