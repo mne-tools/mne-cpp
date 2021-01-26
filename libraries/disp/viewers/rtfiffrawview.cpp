@@ -240,12 +240,6 @@ bool RtFiffRawView::eventFilter(QObject *object, QEvent *event)
 //        return true;
 //    }
 
-//    if (object == m_pTableView->viewport() && event->type() == QEvent::MouseButtonDblClick) {
-//        QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
-//        emit markerMoved(mouseEvent->pos(), m_pTableView->rowAt(mouseEvent->pos().y()));
-//        return true;
-//    }
-
     return QWidget::eventFilter(object, event);
 }
 
@@ -547,7 +541,16 @@ void RtFiffRawView::channelContextMenu(QPoint pos)
     //create custom context menu and actions
     QMenu *menu = new QMenu(this);
 
+    menu->addSection("Events");
+
+    QAction* addEventMarker = menu->addAction(tr("Add event"));
+    connect(addEventMarker, &QAction::triggered,
+            this, &RtFiffRawView::onAddEventMarker);
+
     //**************** Marking ****************
+
+    menu->addSection("Channel Marking");
+
     if(!m_qListBadChannels.contains(index.row())) {
         QAction* doMarkChBad = menu->addAction(tr("Mark as bad"));
         connect(doMarkChBad, &QAction::triggered,
@@ -564,7 +567,9 @@ void RtFiffRawView::channelContextMenu(QPoint pos)
         if(selected[i].column() == 1)
             m_qListCurrentSelection.append(m_pModel->getIdxSelMap()[selected[i].row()]);
 
-    QAction* doSelection = menu->addAction(tr("Apply selection"));
+    menu->addSection("Selection");
+
+    QAction* doSelection = menu->addAction(tr("Only show selection"));
     connect(doSelection, &QAction::triggered,
             this, &RtFiffRawView::applySelection);
 
@@ -579,10 +584,6 @@ void RtFiffRawView::channelContextMenu(QPoint pos)
             m_pModel.data(), &RtFiffRawViewModel::resetSelection);
     connect(resetAppliedSelection, &QAction::triggered,
             this, &RtFiffRawView::resetSelection);
-
-    QAction* addEventMarker = menu->addAction(tr("Add Event Marker"));
-    connect(addEventMarker, &QAction::triggered,
-            this, &RtFiffRawView::onAddEventMarker);
 
     //show context menu
     menu->popup(m_pTableView->viewport()->mapToGlobal(pos));
@@ -734,7 +735,4 @@ void RtFiffRawView::onAddEventMarker()
     }
 
     m_pEventList->addEvent(Event(iAbsoluteSample));
-
-    qDebug() << "View dDx:" << dDx;
-    qDebug() << "View Sample:" << dSample;
 }

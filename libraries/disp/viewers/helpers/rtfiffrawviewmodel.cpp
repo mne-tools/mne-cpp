@@ -72,11 +72,6 @@ using namespace Eigen;
 using namespace RTPROCESSINGLIB;
 
 //=============================================================================================================
-// DEFINE STATIC MEMBER METHODS
-//=============================================================================================================
-
-
-//=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
@@ -464,15 +459,10 @@ void RtFiffRawViewModel::addData(const QList<MatrixXd> &data)
                 }
             }
 
-            qDebug() << "Current Sample:" << m_iCurrentSample;
-
             m_iCurrentStartingSample += m_iCurrentSample;
             m_iCurrentStartingSample += m_iResidual;
 
-            qDebug() << "Starting Sample:" << m_iCurrentStartingSample;
             m_iCurrentSample = 0;
-
-            qDebug() << "Residuals:" << m_iResidual;
 
             if(!m_bIsFreezed) {
                 m_vecLastBlockFirstValuesFiltered = m_matDataFiltered.col(0);
