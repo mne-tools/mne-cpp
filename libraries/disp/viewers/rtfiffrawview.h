@@ -447,6 +447,10 @@ protected:
      */
     void markChBad();
 
+    //=========================================================================================================
+    /**
+     * Adds event to event list based on last clicked position
+     */
     void onAddEventMarker();
 
     QPointer<QTableView>                        m_pTableView;                   /**< The QTableView being part of the model/view framework of Qt. */
@@ -489,9 +493,11 @@ signals:
     void triggerDetected(int numberDetectedTriggers,
                          const QMap<int,QList<QPair<int,double> > >& mapDetectedTriggers);
 
+    //=========================================================================================================
+    /**
+     * Emmited when marking of bad channels is changed
+     */
     void channelMarkingChanged();
-
-    void createNewEvent(int iSample);
 };
 } // NAMESPACE
 

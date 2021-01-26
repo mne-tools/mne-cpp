@@ -46,7 +46,6 @@
 #include <fiff/fiff_proj.h>
 
 #include <rtprocessing/helpers/filterkernel.h>
-#include <set>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -55,7 +54,6 @@
 #include <QAbstractTableModel>
 #include <QSharedPointer>
 #include <QColor>
-#include <QMutex>
 
 //=============================================================================================================
 // EIGEN INCLUDES

@@ -52,11 +52,9 @@
 // EIGEN INCLUDES
 //=============================================================================================================
 
-
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
 
 //=============================================================================================================
 // DEFINE NAMESPACE RTPROCESSINGLIB
@@ -65,7 +63,9 @@
 namespace RTPROCESSINGLIB
 {
 
-
+/**
+ * Class contaning infomation about an event
+ */
 class RTPROCESINGSHARED_EXPORT Event
 {
 public:
@@ -116,12 +116,14 @@ public:
        return getSample() < rhs.getSample();
     }
 private:
-    int m_iSample;              /**< Sample coorespodning to this event */
-    int m_iType;                /**< Type of the event */
-    int m_iGroup;               /**< Group the event belongs to */
+    int         m_iSample;              /**< Sample coorespodning to this event */
+    int         m_iType;                /**< Type of the event */
+    int         m_iGroup;               /**< Group the event belongs to */
 };
 
-
+/**
+ * Class containing a list of events
+ */
 class RTPROCESINGSHARED_EXPORT EventList
 {
 public:
