@@ -85,7 +85,6 @@ namespace DISPLIB
 
 class RtFiffRawViewModel;
 class RtFiffRawViewDelegate;
-class Event;
 
 //=============================================================================================================
 /**

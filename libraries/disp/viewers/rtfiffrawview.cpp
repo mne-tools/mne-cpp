@@ -111,6 +111,7 @@ RtFiffRawView::RtFiffRawView(const QString& sSettingsPath,
 RtFiffRawView::~RtFiffRawView()
 {
     saveSettings();
+    m_pEventList->clear();
 }
 
 //=============================================================================================================
@@ -189,6 +190,7 @@ void RtFiffRawView::init(QSharedPointer<FIFFLIB::FiffInfo> &info)
 
     //init events
     m_pEventList = QSharedPointer<RTPROCESSINGLIB::EventList>(new EventList);
+    m_pDelegate->setEventList(m_pEventList);
 
 }
 
@@ -731,6 +733,7 @@ void RtFiffRawView::onAddEventMarker()
         iAbsoluteSample -= m_pModel->getMaxSamples();
     }
 
+    m_pEventList->addEvent(Event(iAbsoluteSample));
 
     qDebug() << "View dDx:" << dDx;
     qDebug() << "View Sample:" << dSample;
