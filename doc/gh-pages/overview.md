@@ -8,13 +8,13 @@ nav_order: 1
 
 ## What is MNE?
 
-MNE-CPP is part of MNE, a tool suite for neurophysiology encompassing various projects that draw from MNE-C, originally written by Matti Hämäläinen (documented [here](https://mne.tools/mne-c-manual/MNE-manual-2.7.3.pdf))
+MNE-CPP is part of [MNE Project](https://mne.tools/stable/index.html){:target="_blank" rel="noopener"}, a set of tools for neurophysiology analysis encompassing various projects that sprawn from MNE-C, originally written by Matti Hämäläinen.
 
 Other projects include:
 
  - [MNE-Python](https://mne.tools/stable/index.html){:target="_blank" rel="noopener"} - a python reimplementation of MNE-C, also extended with new visualization and analysis capabilities.
  - [MNE-MATLAB](https://mne.tools/stable/overview/matlab.html#mne-matlab){:target="_blank" rel="noopener"} - a MATLAB interface for MNE structures and functions.
- - [MNE-C](http://www.nmr.mgh.harvard.edu/martinos/userInfo/data/MNE_register/index.php){:target="_blank" rel="noopener"} - the original implementation of the MNE toolset in C.
+ - [MNE-C](http://www.nmr.mgh.harvard.edu/martinos/userInfo/data/MNE_register/index.php){:target="_blank" rel="noopener"} - the original implementation of the MNE toolset in C ([Manual](https://mne.tools/mne-c-manual/MNE-manual-2.7.3.pdf)).
 
 ## What is MNE-CPP?
 
