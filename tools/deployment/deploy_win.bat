@@ -9,6 +9,3 @@ xcopy %scriptPath%..\..\applications\mne_scan\plugins\lsladapter\liblsl\build\in
 
 Rem Delete folders which we do not want to ship
 Remove-Item '%scriptPath%..\..\bin/mne-cpp-test-data' -Recurse
-
-Rem Creating archive of all win deployed applications
-7z a mne-cpp-windows-dynamic-x86_64.zip %scriptPath%..\../bin
