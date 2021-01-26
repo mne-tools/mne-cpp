@@ -83,9 +83,6 @@ namespace DISPLIB
 // DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-class Event;
-class EventHandler;
-
 //=============================================================================================================
 // DEFINE TYPEDEFS
 //=============================================================================================================
@@ -412,9 +409,6 @@ public:
     void resetTriggerCounter();
 
     //=========================================================================================================
-    void newEvent(int iSample);
-
-    //=========================================================================================================
     /**
      * Returns the number of vertical lines (one per second)
      *
@@ -510,10 +504,12 @@ public:
      */
     inline int getCurrentOverlapAddDelay() const;
 
-    inline Event getEvent(int iIndex) const;
-
-    inline int getNumberOfEventsToDraw() const;
-
+    //=========================================================================================================
+    /**
+     * Get offset of first drawn sample in the window
+     *
+     * @return sample offset of window
+     */
     inline int getFirstSampleOffset() const;
 
 
@@ -618,8 +614,6 @@ private:
 
     QColor                              m_colBackground;                            /**< The background color.*/
 
-    QSharedPointer<EventHandler>        m_pEventHandler;
-
 signals:
     //=========================================================================================================
     /**
@@ -642,160 +636,6 @@ signals:
      * Emmited when trigger detection was performed
      */
     void triggerDetected(int numberDetectedTriggers, const QMap<int,QList<QPair<int,double> > >& mapDetectedTriggers);
-};
-
-class DISPSHARED_EXPORT Event : public QObject {
-    Q_OBJECT
-public:
-    //=========================================================================================================
-    /**
-     * Create an event at sample iSample
-     *
-     * @param [in] iSample  sample coorespondiong to this event
-     */
-    Event (int iSample);
-
-    //=========================================================================================================
-    /**
-     * Create and event with the same parameters as parameter event
-     *
-     * @param [in] event    event to be copied
-     */
-    Event (const Event &event);
-
-    //=========================================================================================================
-    /**
-     * Creates an blank event with sample set to -1
-     */
-    Event();
-
-    //=========================================================================================================
-    /**
-     * Deletes event
-     */
-    ~Event();
-
-    //=========================================================================================================
-    /**
-     * Returns event sample
-     *
-     * @return event sample
-     */
-    int getSample() const;
-
-    //=========================================================================================================
-    /**
-     * Whether the event should be drawn given the window parameters
-     *
-     * @param [in] iFirstSampleOffset   offset of the first sample in the draw window
-     * @param [in] iCurrentSample       sample in window currently being drawn
-     * @param [in] iMaxSample           max window size in samples
-     *
-     * @return whether event should be drawn
-     */
-    bool shouldBeDrawn(int iFirstSampleOffset,
-                       int iCurrentSample,
-                       int iMaxSample) const;
-
-    //=========================================================================================================
-    /**
-     * Returns position to draw event given the window parameters (only valid if event should be drawn)
-     *
-     * @param [in] iFirstSampleOffset   offset of the first sample in the draw window
-     * @param [in] iCurrentSample       sample in window currently being drawn
-     * @param [in] iMaxSample           max window size in samples
-     * @param [in] dDx                  ratio of pixels per samples
-     *
-     * @return position on screen to draw event
-     */
-    float getDrawPosition(int iFirstSampleOffset,
-                          int iCurrentSample,
-                          int iMaxSample,
-                          double dDx) const;
-
-    bool operator<(const Event& rhs) const
-    {
-       return getSample() < rhs.getSample();  //assume that you compare the record based on a
-    }
-private:
-    int m_iSample;              /**< Sample ccorespodning to this event*/
-};
-
-class DISPSHARED_EXPORT EventHandler : public QObject {
-    Q_OBJECT
-public:
-    //=========================================================================================================
-    /**
-     * @brief EventHandler
-     */
-    EventHandler(){};
-
-    //=========================================================================================================
-    /**
-     * @brief Event
-     */
-    ~EventHandler(){};
-
-    //=========================================================================================================
-    /**
-     * @brief clear
-     */
-    void clear();
-
-    //=========================================================================================================
-    /**
-     * @brief clearAll
-     */
-    void clearAll();
-
-    //=========================================================================================================
-    /**
-     * @brief addEvent
-     *
-     * @param event
-     */
-    void addEvent(Event event);
-
-    //=========================================================================================================
-    /**
-     * @brief getTotalNumberOfEvents
-     *
-     * @return
-     */
-    int getTotalNumberOfEvents() const;
-
-    //=========================================================================================================
-    /**
-     * @brief getNumberOfEventsToDraw
-     *
-     * @return
-     */
-    int getNumberOfEventsToDraw() const;
-
-    //=========================================================================================================
-    /**
-     * @brief getFromEventsToDrawAt
-     *
-     * @param iIndex
-     *
-     * @return
-     */
-    Event getFromEventsToDrawAt(int iIndex) const;
-
-    //=========================================================================================================
-    /**
-     * @brief getFromAllEvents
-     *
-     * @param iIndex
-     *
-     * @return
-     */
-    Event getFromAllEvents(int iIndex) const;
-
-private:
-    static QList<Event> m_lAllEvents;
-    QList<Event>        m_lEventsToDraw;
-    std::set<Event>     m_EventsToDraw;
 };
 
 //=============================================================================================================
@@ -955,20 +795,6 @@ inline int RtFiffRawViewModel::getCurrentOverlapAddDelay() const
 
 //=============================================================================================================
 
-inline Event RtFiffRawViewModel::getEvent(int iIndex) const
-{
-    return m_pEventHandler->getFromEventsToDrawAt(iIndex);
-}
-
-//=============================================================================================================
-
-inline int RtFiffRawViewModel::getNumberOfEventsToDraw() const
-{
-    return m_pEventHandler->getNumberOfEventsToDraw();
-}
-
-//=============================================================================================================
-
 inline int RtFiffRawViewModel::getFirstSampleOffset() const
 {
     return m_iCurrentStartingSample;
@@ -978,11 +804,6 @@ inline int RtFiffRawViewModel::getFirstSampleOffset() const
 #ifndef metatype_rowvectorpair
 #define metatype_rowvectorpair
 Q_DECLARE_METATYPE(DISPLIB::RowVectorPair);
-#endif
-
-#ifndef metatype_rtevent
-#define metatype_rtevent
-Q_DECLARE_METATYPE(DISPLIB::Event);
 #endif
 
 #endif // RTFIFFRAWVIEWMODEL_H
