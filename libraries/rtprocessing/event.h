@@ -75,7 +75,9 @@ public:
      *
      * @param [in] iSample  sample coorespondiong to this event
      */
-    Event (int iSample);
+    Event(int iSample,
+          int iType = 0,
+          int iGroup = 0);
 
     //=========================================================================================================
     /**
@@ -83,7 +85,7 @@ public:
      *
      * @param [in] event    event to be copied
      */
-    Event (const Event &event);
+    Event(const Event &event);
 
     //=========================================================================================================
     /**
@@ -93,9 +95,25 @@ public:
      */
     int getSample() const;
 
+    //=========================================================================================================
+    /**
+     * Returns event type
+     *
+     * @return event type
+     */
+    int getType() const;
+
+    //=========================================================================================================
+    /**
+     * Returns event group
+     *
+     * @return event group
+     */
+    int getGroup() const;
+
     bool operator<(const Event& rhs) const
     {
-       return getSample() < rhs.getSample();  //assume that you compare the record based on a
+       return getSample() < rhs.getSample();
     }
 private:
     int m_iSample;              /**< Sample coorespodning to this event */
@@ -140,10 +158,8 @@ public:
     Event getEvent(int iIndex) const;
 
 private:
-    static QList<Event> m_lEvents;
+    static QList<Event>     m_lEvents;          /**< List of events */
 };
-
-
 }//namespace
 
 #endif // EVENT_RTPROCESSING_H
