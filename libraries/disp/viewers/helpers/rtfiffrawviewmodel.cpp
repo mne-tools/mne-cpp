@@ -75,7 +75,6 @@ using namespace RTPROCESSINGLIB;
 // DEFINE STATIC MEMBER METHODS
 //=============================================================================================================
 
-QList<Event> EventHandler::m_lAllEvents;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -107,7 +106,6 @@ RtFiffRawViewModel::RtFiffRawViewModel(QObject *parent)
 , m_iCurrentTriggerChIndex(0)
 , m_pFiffInfo(FiffInfo::SPtr::create())
 , m_colBackground(Qt::white)
-, m_pEventHandler(QSharedPointer<EventHandler>(new EventHandler))
 {
 }
 
@@ -304,7 +302,7 @@ void RtFiffRawViewModel::setFiffInfo(QSharedPointer<FIFFLIB::FiffInfo> &p_pFiffI
             sel = FiffInfoBase::pick_channels(p_pFiffInfo->ch_names, p_pFiffInfo->bads, emptyExclude);
         }
 
-        m_vecBadIdcs = sel;       
+        m_vecBadIdcs = sel;
 
         m_pFiffInfo = p_pFiffInfo;
 
@@ -1042,7 +1040,7 @@ void RtFiffRawViewModel::markChBad(QModelIndex ch, bool status)
 void RtFiffRawViewModel::triggerInfoChanged(const QMap<double, QColor>& colorMap, bool active, QString triggerCh, double threshold)
 {
     m_qMapTriggerColor = colorMap;
-    m_bTriggerDetectionActive = active;    
+    m_bTriggerDetectionActive = active;
     m_dTriggerThreshold = threshold;
 
     //Find channel index and initialise detected trigger map if channel name changed
@@ -1318,128 +1316,4 @@ void RtFiffRawViewModel::clearModel()
     m_matOverlap.setZero();
 
     endResetModel();
-}
-
-//=============================================================================================================
-
-void RtFiffRawViewModel::newEvent(int iSample)
-{
-    m_pEventHandler->addEvent(Event(iSample));
-}
-
-//=============================================================================================================
-
-Event::Event()
-: m_iSample(-1)
-{
-
-}
-
-//=============================================================================================================
-
-Event::Event(int iSample)
-: m_iSample(iSample)
-{
-
-}
-
-//=============================================================================================================
-
-Event::Event(const Event &event)
-: Event(event.getSample())
-{
-
-}
-
-//=============================================================================================================
-
-Event::~Event()
-{
-
-}
-
-//=============================================================================================================
-
-int Event::getSample() const
-{
-    return m_iSample;
-}
-
-//=============================================================================================================
-
-bool Event::shouldBeDrawn(int iFirstSampleOffset,
-                          int iCurrentSample,
-                          int iMaxSample) const
-{
-    int iEarliestDrawnSample = iFirstSampleOffset - iMaxSample + iCurrentSample;
-    int iLatestDrawnSample = iFirstSampleOffset + iMaxSample;
-
-    return (this->m_iSample >= iEarliestDrawnSample && this->m_iSample <= iLatestDrawnSample);
-}
-
-
-//=============================================================================================================
-
-float Event::getDrawPosition(int iFirstSampleOffset,
-                             int iCurrentSample,
-                             int iMaxSample,
-                             double dDx) const
-{
-    int iLastStartingSample = iFirstSampleOffset - iMaxSample;
-    int iDrawPositionInSamples = (m_iSample - iLastStartingSample) % iMaxSample;
-
-    return static_cast<float>(iDrawPositionInSamples) * dDx;
-}
-
-//=============================================================================================================
-
-void EventHandler::addEvent(Event event)
-{
-    m_lAllEvents.append(event);
-    m_lEventsToDraw.append(event);
-    m_EventsToDraw.insert(event);
-}
-
-//=============================================================================================================
-
-
-int EventHandler::getTotalNumberOfEvents() const
-{
-    return m_lAllEvents.size();
-}
-
-//=============================================================================================================
-
-int EventHandler::getNumberOfEventsToDraw() const
-{
-    return m_lEventsToDraw.size();
-}
-
-//=============================================================================================================
-
-Event EventHandler::getFromEventsToDrawAt(int iIndex) const
-{
-    return m_lEventsToDraw.at(iIndex);
-}
-
-//=============================================================================================================
-
-Event EventHandler::getFromAllEvents(int iIndex) const
-{
-    return m_lAllEvents.at(iIndex);
-}
-
-//=============================================================================================================
-
-void EventHandler::clear()
-{
-    m_lEventsToDraw.clear();
-}
-
-//=============================================================================================================
-
-void EventHandler::clearAll()
-{
-    m_lEventsToDraw.clear();
-    m_lAllEvents.clear();
 }
