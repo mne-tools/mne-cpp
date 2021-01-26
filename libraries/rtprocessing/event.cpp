@@ -63,8 +63,12 @@ QList<Event> EventList::m_lEvents;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Event::Event(int iSample)
+Event::Event(int iSample,
+             int iType,
+             int iGroup)
 : m_iSample(iSample)
+, m_iType(iType)
+, m_iGroup(iGroup)
 {
 
 }
@@ -72,7 +76,7 @@ Event::Event(int iSample)
 //=============================================================================================================
 
 Event::Event(const Event &event)
-: Event(event.getSample())
+: Event(event.m_iSample, event.m_iType, event.m_iGroup)
 {
 
 }
@@ -82,6 +86,20 @@ Event::Event(const Event &event)
 int Event::getSample() const
 {
     return m_iSample;
+}
+
+//=============================================================================================================
+
+int Event::getType() const
+{
+    return m_iType;
+}
+
+//=============================================================================================================
+
+int Event::getGroup() const
+{
+    return m_iGroup;
 }
 
 //=============================================================================================================
