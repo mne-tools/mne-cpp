@@ -1,6 +1,5 @@
-Rem This script needs to be run from the top level mne-cpp repo folder
-Rem Solve for dependencies only mne_scan.exe and mnecppDisp3D.dll since it links all needed qt and mne-cpp libs
 SET scriptPath=%~dp0
+Rem Solve for dependencies only mne_scan.exe and mnecppDisp3D.dll since it links all needed qt and mne-cpp libs
 windeployqt %scriptPath%..\..\bin\mne_scan.exe
 windeployqt %scriptPath%..\..\bin\mnecppDisp3D.dll
 
