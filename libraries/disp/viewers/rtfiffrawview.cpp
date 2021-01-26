@@ -43,6 +43,7 @@
 #include "helpers/rtfiffrawviewmodel.h"
 
 #include <rtprocessing/helpers/filterkernel.h>
+#include <rtprocessing/event.h>
 #include <fiff/fiff_info.h>
 
 //=============================================================================================================
@@ -168,9 +169,6 @@ void RtFiffRawView::init(QSharedPointer<FIFFLIB::FiffInfo> &info)
     connect(m_pTableView.data(), &QTableView::doubleClicked,
             m_pModel.data(), &RtFiffRawViewModel::toggleFreeze);
 
-    connect(this, &RtFiffRawView::createNewEvent,
-            m_pModel.data(), &RtFiffRawViewModel::newEvent);
-
     connect(m_pTableView.data(), &QTableView::customContextMenuRequested,
             this, &RtFiffRawView::channelContextMenu);
 
@@ -188,6 +186,10 @@ void RtFiffRawView::init(QSharedPointer<FIFFLIB::FiffInfo> &info)
 
     connect(m_pTableView->verticalScrollBar(), &QScrollBar::valueChanged,
             this, &RtFiffRawView::visibleRowsChanged);
+
+    //init events
+    m_pEventList = QSharedPointer<RTPROCESSINGLIB::EventList>(new EventList);
+
 }
 
 //=============================================================================================================
@@ -532,6 +534,8 @@ void RtFiffRawView::updateProcessingMode(ProcessingMode mode)
 
 void RtFiffRawView::channelContextMenu(QPoint pos)
 {
+    m_iClickPosX = pos.x();
+
     //obtain index where index was clicked
     QModelIndex index = m_pTableView->indexAt(pos);
 
@@ -575,9 +579,8 @@ void RtFiffRawView::channelContextMenu(QPoint pos)
             this, &RtFiffRawView::resetSelection);
 
     QAction* addEventMarker = menu->addAction(tr("Add Event Marker"));
-    connect(addEventMarker, &QAction::triggered, [=]{
-                onAddEventMarker(pos.x());
-            });
+    connect(addEventMarker, &QAction::triggered,
+            this, &RtFiffRawView::onAddEventMarker);
 
     //show context menu
     menu->popup(m_pTableView->viewport()->mapToGlobal(pos));
@@ -707,14 +710,15 @@ void RtFiffRawView::clearView()
 
 //=============================================================================================================
 
-void RtFiffRawView::onAddEventMarker(int iPosition)
+void RtFiffRawView::onAddEventMarker()
 {
     //Convert from pixels to samples
     double dDx = static_cast<double>(m_pTableView->columnWidth(1)) / static_cast<double>(m_pModel->getMaxSamples());
-    double dSample = static_cast<double>(iPosition) / dDx;
+    double dSample = static_cast<double>(m_iClickPosX) / dDx;
 
     int iFirstSampleOffset = m_pModel->getFirstSampleOffset();
 
+    // Dont allow adding events to blank space in the beggining
     if (dSample > m_pModel->getCurrentSampleIndex() && iFirstSampleOffset == 0){
         return;
     }
@@ -722,11 +726,11 @@ void RtFiffRawView::onAddEventMarker(int iPosition)
     //Add offset
     int iAbsoluteSample = static_cast<int>(dSample) + iFirstSampleOffset;
 
+    //Account for whether adding before or after draw point
     if (dSample > m_pModel->getCurrentSampleIndex()){
         iAbsoluteSample -= m_pModel->getMaxSamples();
     }
 
-    emit createNewEvent(iAbsoluteSample);
 
     qDebug() << "View dDx:" << dDx;
     qDebug() << "View Sample:" << dSample;
