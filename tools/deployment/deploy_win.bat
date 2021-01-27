@@ -7,5 +7,4 @@ Rem Copy LSL and Brainflowlibraries manually
 xcopy %scriptPath%..\..\applications\mne_scan\plugins\brainflowboard\brainflow\installed\lib\* %scriptPath%..\..\bin\ /s /i
 xcopy %scriptPath%..\..\applications\mne_scan\plugins\lsladapter\liblsl\build\install\bin\lsl.dll %scriptPath%..\..\bin\ /i
 
-Rem Delete folders which we do not want to ship
-Remove-Item '%scriptPath%..\..\bin/mne-cpp-test-data' -Recurse
+
