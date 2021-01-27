@@ -8,7 +8,7 @@ nav_order: 1
 
 ## What is MNE?
 
-The MNE-CPP is part of [MNE Project](https://mne.tools/stable/index.html){:target="_blank" rel="noopener"}, a set of tools for neurophysiology analysis encompassing various projects that spawn from MNE-C, originally written by Matti Hämäläinen.
+MNE-CPP is part of [The MNE Project](https://mne.tools/stable/index.html){:target="_blank" rel="noopener"}, a set of tools for neurophysiology analysis encompassing various projects that spawn from MNE-C, originally written by Matti Hämäläinen.
 
 Other projects include:
 
