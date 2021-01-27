@@ -29,10 +29,13 @@ jobs:
     #       pandoc -f markdown ${file} -o pdf/${base_name}.pdf --latex-engine=xelatex
     #     done < filelist.dat
     - name: Convert
-      uses: mkrakowitzer/actions-makepdfs@v1.3
+      uses: BaileyJM02/markdown-to-pdf@v1.0.1
       with:
-        markdown_dir: doc/gh-pages
+        input_dir: doc/gh-pages
         output_dir: pdf
+        images_dir: doc/gh-pages/images
+        image_import: doc/gh-pages/images
+        build_html: false
     - name: Upload PDFs
       uses: actions/upload-artifact@v2
       with:
