@@ -16,15 +16,15 @@
         ECHO Linkage option not defined. 
         ECHO Use: static or dynamic.
     ) ELSE (
-        Rem Delete folders which we do not want to ship
-        Remove-Item '%BASE_PATH%\bin\mne-cpp-test-data' -Recurse
-        Remove-Item '%BASE_PATH%\bin\mne_scan_plugins' -Recurse
-        Remove-Item '%BASE_PATH%\bin\mne_analyze_plugins' -Recurse
-        Remove-Item '%BASE_PATH%\bin\mne_rt_server_plugins' -Recurse
-        Remove-Item '%BASE_PATH%\bin\resources' -Recurse
+        IF "%LINK_OPTION%"=="dynamic" (
+            Rem Solve for dependencies only mne_scan.exe and mnecppDisp3D.dll since it links all needed qt and mne-cpp libs
+            windeployqt %BASE_PATH%\bin\mne_scan.exe
+            windeployqt %BASE_PATH%\bin\mnecppDisp3D.dll
 
-        Rem Creating archive of all win deployed applications
-        7z a %BASE_PATH%\mne-cpp-windows-%LINK_OPTION%-x86_64.zip %BASE_PATH%\bin
+            Rem Copy LSL and Brainflowlibraries manually
+            xcopy %BASE_PATH%\applications\mne_scan\plugins\brainflowboard\brainflow\installed\lib\* %BASE_PATH%\bin\ /s /i
+            xcopy %BASE_PATH%\applications\mne_scan\plugins\lsladapter\liblsl\build\install\bin\lsl.dll %BASE_PATH%\bin\ /i
+        )
     )
     :; # ########## WINDOWS SECTION ENDS ####################
     :; # ####################################################
@@ -46,7 +46,6 @@ if [ "$(uname)" == "Darwin" ]; then
         echo "Variable ${LINK_OPTION} is not set."
         echo "Use: static or dynamic"
     else
-
         if [ ${LINK_OPTION} == "dynamic" ]; then
             # Call macdeployqt on all .app bundles in the bin folder
             for f in ./bin/*.app; do $Qt5_DIR/bin/macdeployqt $f ; done
@@ -75,8 +74,9 @@ if [ "$(uname)" == "Darwin" ]; then
 
             # Solve for dependencies for mne_anonymize.app bundle
             cp -a ${SCRIPT_PATH}/lib/. ${SCRIPT_PATH}/bin/mne_anonymize.app/Contents/Frameworks
-
         fi
+
+        # These commands run both in dynamic and static deployments
 
         # Solve for dependencies for mne_scan.app bundle
         cp -a ${SCRIPT_PATH}/bin/resources/. ${SCRIPT_PATH}/bin/mne_scan.app/Contents/MacOS/resources
@@ -98,45 +98,6 @@ if [ "$(uname)" == "Darwin" ]; then
 
     fi
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-    
     # ############## MAC SECTION ENDS ######################
     # ######################################################
 
