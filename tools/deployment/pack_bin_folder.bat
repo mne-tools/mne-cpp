@@ -64,7 +64,7 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
         echo "Use: static or dynamic"
     else
         # Creating archive of everything in current directory
-        tar cfvz ${BASE_PATH}/mne-cpp-linux-${LINK_OPTION}-x86_64.tar.gz ${BASE_PATH}/*
+        tar cfvz ${BASE_PATH}/mne-cpp-linux-${LINK_OPTION}-x86_64.tar.gz ${BASE_PATH}/bin/*
     fi
 
     # ############## LINUX SECTION ENDS ####################
