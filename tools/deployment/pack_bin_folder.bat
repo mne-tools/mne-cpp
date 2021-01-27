@@ -9,16 +9,15 @@
     @echo off
     :; # ########## WINDOWS SECTION #########################
 
-    SET linkOption=%1
-    IF "%linkOption%"=="" (
-        ECHO Variable is NOT defined
-    ) ELSE (
-        ECHO VAR DEFINED TO %linkOption%
-    )
     SET scriptPath=%~dp0
     SET basePath=%scriptPath%..\..
-    Rem Creating archive of all win deployed applications
-    :; 7z a %basePath%\mne-cpp-windows-%linkOption%-x86_64.zip %basePath%\bin
+    SET linkOption=%1
+    IF "%linkOption%"=="" (
+        ECHO Linkage option not defined. Use static or dynamic.
+    ) ELSE (
+        Rem Creating archive of all win deployed applications
+        echo "7z a %basePath%\mne-cpp-windows-%linkOption%-x86_64.zip %basePath%\bin"
+    )
     :; # ########## WINDOWS SECTION ENDS ####################
     :; # ####################################################
     exit /b
