@@ -13,7 +13,8 @@
     SET BASE_PATH=%SCRIPT_PATH%..\..
     SET LINK_OPTION=%1
     IF "%LINK_OPTION%"=="" (
-        ECHO Linkage option not defined. Use static or dynamic.
+        ECHO Linkage option not defined. 
+        ECHO Use: static or dynamic.
     ) ELSE (
         Rem Creating archive of all win deployed applications
         echo "7z a %BASE_PATH%\mne-cpp-windows-%LINK_OPTION%-x86_64.zip %BASE_PATH%\bin"
@@ -27,8 +28,22 @@ if [ "$(uname)" == "Darwin" ]; then
     
     # ############## MAC SECTION ###########################
 
+    LINK_OPTION=$1
+    SCRIPT_PATH="$(
+        cd "$(dirname "$0")" >/dev/null 2>&1
+        pwd -P
+    )"
+    BASE_PATH=${SCRIPT_PATH}/../..
+    if [ -z ${LINK_OPTION} ]; then
+        echo "Variable ${LINK_OPTION} is not set."
+        echo "Use: static or dynamic"
+    else
+        # Creating archive of everything in current directory
+        tar cfvz ${BASE_PATH}/mne-cpp-linux-${LINK_OPTION}-x86_64.tar.gz ${BASE_PATH}/bin/.
+        tar cfvz mne-cpp-macos-${1}-x86_64.tar.gz bin/.
+    fi
     # Creating archive of all macos deployed applications
-    echo tar cfvz mne-cpp-macos-${1}-x86_64.tar.gz bin/.
+    echo 
     
     # ############## MAC SECTION ENDS ######################
     # ######################################################
