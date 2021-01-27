@@ -63,6 +63,9 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
         echo "Variable ${LINK_OPTION} is not set."
         echo "Use: static or dynamic"
     else
+        # Delete folders which we do not want to ship
+        rm -r bin/mne-cpp-test-data
+
         # Creating archive of everything in current directory
         tar cfvz ${BASE_PATH}/mne-cpp-linux-${LINK_OPTION}-x86_64.tar.gz ${BASE_PATH}/bin/*
     fi
