@@ -9,14 +9,14 @@
     @echo off
     :; # ########## WINDOWS SECTION #########################
 
-    SET scriptPath=%~dp0
-    SET basePath=%scriptPath%..\..
-    SET linkOption=%1
-    IF "%linkOption%"=="" (
+    SET SCRIPT_PATH=%~dp0
+    SET BASE_PATH=%SCRIPT_PATH%..\..
+    SET LINK_OPTION=%1
+    IF "%LINK_OPTION%"=="" (
         ECHO Linkage option not defined. Use static or dynamic.
     ) ELSE (
         Rem Creating archive of all win deployed applications
-        echo "7z a %basePath%\mne-cpp-windows-%linkOption%-x86_64.zip %basePath%\bin"
+        echo "7z a %BASE_PATH%\mne-cpp-windows-%LINK_OPTION%-x86_64.zip %BASE_PATH%\bin"
     )
     :; # ########## WINDOWS SECTION ENDS ####################
     :; # ####################################################
@@ -37,8 +37,20 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
     
     # ############## LINUX SECTION #########################
 
-    # Creating archive of everything in current directory
-    echo tar cfvz ../mne-cpp-linux-${1}-x86_64.tar.gz ./*
+
+    LINK_OPTION=$1
+    SCRIPT_PATH="$(
+        cd "$(dirname "$0")" >/dev/null 2>&1
+        pwd -P
+    )"
+    BASE_PATH=${SCRIPT_PATH}/../..
+    if [ -z ${LINK_OPTION} ]; then
+        echo "Variable ${LINK_OPTION} is not set."
+        echo "Use: static or dynamic"
+    else
+        # Creating archive of everything in current directory
+        tar cfvz ${BASE_PATH}/mne-cpp-linux-${LINK_OPTION}-x86_64.tar.gz ${BASE_PATH}/*
+    fi
 
     # ############## LINUX SECTION ENDS ####################
     # ######################################################
