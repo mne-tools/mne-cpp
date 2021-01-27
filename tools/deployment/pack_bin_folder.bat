@@ -16,8 +16,15 @@
         ECHO Linkage option not defined. 
         ECHO Use: static or dynamic.
     ) ELSE (
+        Rem Delete folders which we do not want to ship
+        Remove-Item '%BASE_PATH%\bin\mne-cpp-test-data' -Recurse
+        Remove-Item '%BASE_PATH%\bin\mne_scan_plugins' -Recurse
+        Remove-Item '%BASE_PATH%\bin\mne_analyze_plugins' -Recurse
+        Remove-Item '%BASE_PATH%\bin\mne_rt_server_plugins' -Recurse
+        Remove-Item '%BASE_PATH%\bin\resources' -Recurse
+
         Rem Creating archive of all win deployed applications
-        echo "7z a %BASE_PATH%\mne-cpp-windows-%LINK_OPTION%-x86_64.zip %BASE_PATH%\bin"
+        7z a %BASE_PATH%\mne-cpp-windows-%LINK_OPTION%-x86_64.zip %BASE_PATH%\bin
     )
     :; # ########## WINDOWS SECTION ENDS ####################
     :; # ####################################################
@@ -38,12 +45,16 @@ if [ "$(uname)" == "Darwin" ]; then
         echo "Variable ${LINK_OPTION} is not set."
         echo "Use: static or dynamic"
     else
+        # Delete folders which we do not want to ship
+        rm -r ${BASE_PATH}/bin/mne-cpp-test-data
+        rm -r ${BASE_PATH}/bin/mne_scan_plugins
+        rm -r ${BASE_PATH}/bin/mne_analyze_plugins
+        rm -r ${BASE_PATH}/bin/mne_rt_server_plugins
+        rm -r ${BASE_PATH}/bin/resources
+
         # Creating archive of everything in current directory
-        tar cfvz ${BASE_PATH}/mne-cpp-linux-${LINK_OPTION}-x86_64.tar.gz ${BASE_PATH}/bin/.
-        tar cfvz mne-cpp-macos-${1}-x86_64.tar.gz bin/.
+        tar cfvz ${BASE_PATH}/mne-cpp-macos-${LINK_OPTION}-x86_64.tar.gz ${BASE_PATH}/bin/.
     fi
-    # Creating archive of all macos deployed applications
-    echo 
     
     # ############## MAC SECTION ENDS ######################
     # ######################################################
@@ -64,10 +75,14 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
         echo "Use: static or dynamic"
     else
         # Delete folders which we do not want to ship
-        rm -r bin/mne-cpp-test-data
+        rm -r ${BASE_PATH}/bin/mne-cpp-test-data
+        rm -r ${BASE_PATH}/bin/mne_scan_plugins
+        rm -r ${BASE_PATH}/bin/mne_analyze_plugins
+        rm -r ${BASE_PATH}/bin/mne_rt_server_plugins
+        rm -r ${BASE_PATH}/bin/resources
 
         # Creating archive of everything in current directory
-        tar cfvz ${BASE_PATH}/mne-cpp-linux-${LINK_OPTION}-x86_64.tar.gz ${BASE_PATH}/bin/*
+        tar cfvz ${BASE_PATH}/mne-cpp-linux-${LINK_OPTION}-x86_64.tar.gz ${BASE_PATH}/bin/. ${BASE_PATH}/lib/.
     fi
 
     # ############## LINUX SECTION ENDS ####################
