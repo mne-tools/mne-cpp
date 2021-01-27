@@ -31,7 +31,7 @@ jobs:
     - name: Convert
       uses: BaileyJM02/markdown-to-pdf@v1.0.1
       with:
-        input_dir: doc/gh-pages
+        input_dir: doc/gh-pages/pages/development
         output_dir: pdf
         images_dir: doc/gh-pages/images
         image_import: doc/gh-pages/images
