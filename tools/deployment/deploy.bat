@@ -41,20 +41,101 @@ if [ "$(uname)" == "Darwin" ]; then
         pwd -P
     )"
     BASE_PATH=${SCRIPT_PATH}/../..
+
     if [ -z ${LINK_OPTION} ]; then
         echo "Variable ${LINK_OPTION} is not set."
         echo "Use: static or dynamic"
     else
-        # Delete folders which we do not want to ship
-        rm -r ${BASE_PATH}/bin/mne-cpp-test-data
-        rm -r ${BASE_PATH}/bin/mne_scan_plugins
-        rm -r ${BASE_PATH}/bin/mne_analyze_plugins
-        rm -r ${BASE_PATH}/bin/mne_rt_server_plugins
-        rm -r ${BASE_PATH}/bin/resources
 
-        # Creating archive of everything in current directory
-        tar cfvz ${BASE_PATH}/mne-cpp-macos-${LINK_OPTION}-x86_64.tar.gz ${BASE_PATH}/bin/.
+        if [ ${LINK_OPTION} == "dynamic" ]; then
+            # Call macdeployqt on all .app bundles in the bin folder
+            for f in ./bin/*.app; do $Qt5_DIR/bin/macdeployqt $f ; done
+
+            # Solve for dependencies for mne_scan.app bundle
+            cp -a ${SCRIPT_PATH}/bin/mne_scan_plugins/. ${SCRIPT_PATH}/bin/mne_scan.app/Contents/MacOS/mne_scan_plugins
+            cp -a ${SCRIPT_PATH}/applications/mne_scan/plugins/brainflowboard/brainflow/installed/lib/. ${SCRIPT_PATH}/bin/mne_scan.app/Contents/Frameworks
+            cp -a ${SCRIPT_PATH}/applications/mne_scan/plugins/lsladapter/liblsl/build/install/lib/. ${SCRIPT_PATH}/bin/mne_scan.app/Contents/Frameworks
+            cp -a ${SCRIPT_PATH}/lib/. ${SCRIPT_PATH}/bin/mne_scan.app/Contents/Frameworks
+            # cp -a $Qt5_DIR/plugins/renderers/. bin/mne_scan.app/Contents/PlugIns/renderers
+
+            # Solve for dependencies for mne_analyze.app bundle
+            cp -a ${SCRIPT_PATH}/bin/mne_analyze_plugins/. ${SCRIPT_PATH}/bin/mne_analyze.app/Contents/MacOS/mne_analyze_plugins
+            cp -a ${SCRIPT_PATH}/lib/. bin/mne_analyze.app/Contents/Frameworks
+            # cp -a $Qt5_DIR/plugins/renderers/. ${SCRIPT_PATH}/bin/mne_analyze.app/Contents/PlugIns/renderers
+
+            # Solve for dependencies for mne_rt_server.app bundle
+            cp -a ${SCRIPT_PATH}/bin/mne_rt_server_plugins/. ${SCRIPT_PATH}/bin/mne_rt_server.app/Contents/MacOS/mne_rt_server_plugins
+            cp -a ${SCRIPT_PATH}/lib/. ${SCRIPT_PATH}/bin/mne_rt_server.app/Contents/Frameworks
+
+            # Solve for dependencies for mne_forward_solution.app bundle
+            cp -a ${SCRIPT_PATH}/lib/. ${SCRIPT_PATH}/bin/mne_forward_solution.app/Contents/Frameworks
+
+            # Solve for dependencies for mne_dipole_fit.app bundle
+            cp -a ${SCRIPT_PATH}/lib/. ${SCRIPT_PATH}/bin/mne_dipole_fit.app/Contents/Frameworks
+
+            # Solve for dependencies for mne_anonymize.app bundle
+            cp -a ${SCRIPT_PATH}/lib/. ${SCRIPT_PATH}/bin/mne_anonymize.app/Contents/Frameworks
+
+        fi
+
+        # Solve for dependencies for mne_scan.app bundle
+        cp -a ${SCRIPT_PATH}/bin/resources/. ${SCRIPT_PATH}/bin/mne_scan.app/Contents/MacOS/resources
+
+        # Solve for dependencies for mne_analyze.app bundle
+        cp -a ${SCRIPT_PATH}/bin/resources/. ${SCRIPT_PATH}/bin/mne_analyze.app/Contents/MacOS/resources
+
+        # Solve for dependencies for mne_rt_server.app bundle
+        cp -a ${SCRIPT_PATH}/bin/resources/. ${SCRIPT_PATH}/bin/mne_rt_server.app/Contents/MacOS/resources
+
+        # Solve for dependencies for mne_forward_solution.app bundle
+        cp -a ${SCRIPT_PATH}/bin/resources/. ${SCRIPT_PATH}/bin/mne_forward_solution.app/Contents/MacOS/resources
+
+        # Solve for dependencies for mne_dipole_fit.app bundle
+        cp -a ${SCRIPT_PATH}/bin/resources/. ${SCRIPT_PATH}/bin/mne_dipole_fit.app/Contents/MacOS/resources
+
+        # Solve for dependencies for mne_anonymize.app bundle
+        cp -a ${SCRIPT_PATH}/bin/resources/. ${SCRIPT_PATH}/bin/mne_anonymize.app/Contents/MacOS/resources
+
     fi
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
     
     # ############## MAC SECTION ENDS ######################
     # ######################################################
