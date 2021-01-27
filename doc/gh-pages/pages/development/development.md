@@ -7,11 +7,11 @@ nav_order: 4
 
 ## Welcome aboard!
 
-Before you start, there is a few basic concepts that should be understood. We use a variety of different tools to develop and maintain MNE-CPP.
+Before you start, there are a few basic concepts that should be understood. We use a variety of different tools to develop and maintain MNE-CPP.
 
 ## Before you start
 
-Learn C++ and the [Qt](https://www.qt.io/){:target="_blank" rel="noopener"}. 
+Learn C++ and the [Qt Framework](https://www.qt.io/){:target="_blank" rel="noopener"}. 
 
 We mainly use C++ programming language and Qt, for development purposes. We are very happy with the choice, but these technologies can be quite tricky. There are plenty of fantastic resources out there to be able to learn both, but if you feel stuck, go ahead and ask us. Since you intend to become a contributor, we recommend you to start using Github and open an issue in the MNE-CPP project, in order to communicate with the development team.
 
@@ -31,7 +31,7 @@ Below are some resources to get you started developing within MNE-CPP. Depending
 
 ## Contribute
 
-It is a good idea to go through the contribution tutorial and make sure that you can build from source. Understand the continious integration pipeline we have in place and how to write a unit test. Make sure that your changes don't break the project compilation before submitting your contribution to the project itself.
+It is a good idea to go through the [contribution tutorial](contribute.md) and make sure that you can build from source. Understand the continious integration pipeline we have in place and how to write a unit test. Make sure that your changes don't break the project compilation before submitting your contribution to the project itself.
 
 
 

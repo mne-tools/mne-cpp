@@ -38,6 +38,6 @@ In the `bin` folder,  you will find:
 
 ---
 
-Using the latest stable release is recommended for users who wish to use MNE-CPP's command line tools and GUIs. But if you want to checkout the latest features, try downloading the [development versions](../development/development.md).
+Using the latest stable release is recommended for users who wish to use MNE-CPP's command line tools and GUIs. But if you want to check out the latest features, try downloading the [development versions](../development/development.md).
 
 We are also developing some of our aplications so that they can run directly on the browser. No need to install anything! See [On the browser](webasm.md).
