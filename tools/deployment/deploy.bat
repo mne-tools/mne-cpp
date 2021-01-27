@@ -95,27 +95,31 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
         wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
         sudo chmod a+x linuxdeployqt-continuous-x86_64.AppImage
 
-        # Creating a directory for linuxdeployqt to create results 
-        sudo mkdir -p -m777 mne-cpp
+        ## Creating a directory for linuxdeployqt to create results         
+        ## If there is already such directory, delete it and start over.
+        #if [ -d "mne-cpp_deploy" ]; then
+        #    rm -r mne-cpp_deploy
+        #fi
+        #sudo mkdir -p -m777 mne-cpp_deploy
 
-        # Copying built data to folder for easy packaging   
-        cp -r ${BASE_PATH}/bin ${BASE_PATH}/lib mne-cpp/
+        ## Copying built data to folder for easy packaging   
+        #cp -r ${BASE_PATH}/bin ${BASE_PATH}/lib mne-cpp_deploy/
+        #cd mne-cpp_deploy
 
-        # linuxdeployqt uses mne_scan and mne_analyze binary to resolve dependencies
-        cd mne-cpp
-        ../linuxdeployqt-continuous-x86_64.AppImage bin/mne_scan -verbose2 -extra-plugins=renderers
-        ../linuxdeployqt-continuous-x86_64.AppImage bin/mne_analyze -verbose2 -extra-plugins=renderers
+        ## linuxdeployqt uses mne_scan and mne_analyze binary to resolve dependencies
+        linuxdeployqt-continuous-x86_64.AppImage ${BASE_PATH}/bin/mne_scan -verbose2 -extra-plugins=renderers
+        ../linuxdeployqt-continuous-x86_64.AppImage ${BASE_PATH}/bin/mne_analyze -verbose2 -extra-plugins=renderers
 
         # Manually copy in the libxcb-xinerama library which is needed by plugins/platforms/libxcb.so
-        cp /usr/lib/x86_64-linux-gnu/libxcb-xinerama.so.0 ./lib/
+        cp /usr/lib/x86_64-linux-gnu/libxcb-xinerama.so.0 ${BASE_PATH}/lib/
 
         echo 
         echo ldd ./bin/mne_scan
-        ldd ./bin/mne_scan
+        ldd ${BASE_PATH}/bin/mne_scan
 
         echo 
         echo ldd ./plugins/platforms/libqxcb.so
-        ldd ./plugins/platforms/libqxcb.so
+        ldd ${BASE_PATH}/plugins/platforms/libqxcb.so
     fi
 
     # ############## LINUX SECTION ENDS ####################
