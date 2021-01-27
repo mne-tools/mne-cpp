@@ -9,32 +9,37 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Install components
-      run: |
-        sudo apt-get update
-        sudo apt-get -y install pandoc
-        sudo apt-get -y install texlive-full
+    # - name: Install components
+    #   run: |
+    #     sudo apt-get update
+    #     sudo apt-get -y install pandoc
+    #     sudo apt-get -y install texlive-full
     - name: Clone repository
       uses: actions/checkout@v2
+    # - name: Convert
+    #   run: |
+    #     pwd
+    #     mkdir pdf
+    #     find . -name '*.md' > filelist.dat
+    #
+    #     while read file
+    #     do
+    #       base_name=$( echo "${file}" | basename "${file}" | sed -e 's/\.md//g')
+    #       echo "$base_name"
+    #       pandoc -f markdown ${file} -o pdf/${base_name}.pdf --latex-engine=xelatex
+    #     done < filelist.dat
     - name: Convert
-      run: |
-        pwd
-        mkdir pdf
-        find . -name '*.md' > filelist.dat
-
-        while read file
-        do
-          base_name=$( echo "${file}" | basename "${file}" | sed -e 's/\.md//g')
-          echo "$base_name"
-          pandoc -f markdown ${file} -o pdf/${base_name}.pdf --latex-engine=xelatex
-        done < filelist.dat
+      uses: mkrakowitzer/actions-makepdfs@master
+        with:
+          markdown_dir: doc/gh-pages
+          output_dir: pdf
     - name: Upload PDFs
       uses: actions/upload-artifact@v2
       with:
         name: PDFs
         path: pdf/
-    - name: Upload file data
-      uses: actions/upload-artifact@v2
-      with:
-        name: Files
-        path: filelist.dat
+    # - name: Upload file data
+    #   uses: actions/upload-artifact@v2
+    #   with:
+    #     name: Files
+    #     path: filelist.dat
