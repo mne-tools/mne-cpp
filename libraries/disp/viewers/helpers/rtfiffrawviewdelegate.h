@@ -183,16 +183,12 @@ private:
      * @param[in] index      Used to locate data in a data model.
      * @param[in] option     Describes the parameters used to draw an item in a view widget.
      * @param[in, out] path   The QPointerPath to create for the data plot.
-     * @param[in] ellipsePos Position of the ellipse which is plotted at the current channel signal value.
-     * @param[in] amplitude  String which is to be plotted.
      * @param[in] data       Current data for the given row.
      */
     void createPlotPath(const QModelIndex &index,
                         const QStyleOptionViewItem &option,
                         QPainterPath& path,
-                        QPointF &ellipsePos,
-                        QString &amplitude,
-                        DISPLIB::RowVectorPair &data) const;
+                        const DISPLIB::RowVectorPair &data) const;
 
     //=========================================================================================================
     /**
