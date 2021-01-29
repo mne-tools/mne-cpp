@@ -116,9 +116,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     setUnifiedTitleAndToolBarOnMac(false);
 
-    QPixmap splashPixMap(":/images/splashscreen.png");
-    MainSplashScreen::SPtr pSplashScreen = MainSplashScreen::SPtr::create(splashPixMap);
-    setSplashScreen(pSplashScreen, true);
+    setSplashScreen();
 
     setupPlugins();
     setupUI();
@@ -251,10 +249,15 @@ void MainWindow::onGuiModeChanged()
 
 //=============================================================================================================
 
-void MainWindow::setSplashScreen(MainSplashScreen::SPtr& pSplashScreen,
-                                 bool bShowSplashScreen)
+void MainWindow::hideSplashScreen()
 {
-    m_pSplashScreen = pSplashScreen;
+    m_pSplashScreen->hide();
+}
+
+void MainWindow::setSplashScreen(bool bShowSplashScreen)
+{
+    QPixmap splashPixMap(":/images/splashscreen.png");
+    m_pSplashScreen = MainSplashScreen::SPtr::create(splashPixMap);
 
     if(m_pSplashScreen && m_pPluginManager) {
         QObject::connect(m_pPluginManager.data(), &PluginManager::pluginLoaded,
