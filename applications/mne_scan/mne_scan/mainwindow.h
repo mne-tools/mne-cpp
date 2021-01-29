@@ -171,11 +171,15 @@ public:
     /**
      * Set the splash screen.
      *
-     * @param[in] pSplashScreen        The pointer to the splash screen.
      * @param[in] bShowSplashScreen    Whether to show the splash screen until this widget is shown. Default is true.
      */
-    void setSplashScreen(MainSplashScreen::SPtr& pSplashScreen,
-                         bool bShowSplashScreen = true);
+    void setSplashScreen(bool bShowSplashScreen = true);
+
+    //=========================================================================================================
+    /**
+     * Public function to hide Main applications splash screen.
+     */
+    void hideSplashScreen();
 
     //=========================================================================================================
     /**
@@ -273,6 +277,10 @@ private:
      */
     void initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::AbstractPlugin> > lPlugins);
 
+    //=========================================================================================================
+    /**
+     * Process the event of a widget changing its location.
+     */
     void onDockLocationChanged(QWidget* pWidget);
 
     //=========================================================================================================
