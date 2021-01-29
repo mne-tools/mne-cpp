@@ -370,7 +370,7 @@ void RtFiffRawViewModel::setSamplingInfo(float sps, int T, bool bSetZero)
 
     m_iT = T;
 
-    m_iMaxSamples = (qint32)ceil(sps * T);
+    m_iMaxSamples = (qint32) ceil(sps * T);
 
     //Resize data matrix without touching the stored values
     m_matDataRaw.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxSamples);
@@ -1306,4 +1306,67 @@ void RtFiffRawViewModel::clearModel()
     m_matOverlap.setZero();
 
     endResetModel();
+}
+
+//=============================================================================================================
+
+double RtFiffRawViewModel::getMaxValueFromRawViewModel(int row) const
+{
+    double dMaxValue;
+    qint32 kind = getKind(row);
+
+    switch(kind) {
+        case FIFFV_MEG_CH: {
+            dMaxValue = 1e-11f;
+            qint32 unit = getUnit(row);
+            if(unit == FIFF_UNIT_T_M) { //gradiometers
+                dMaxValue = 1e-10f;
+                if(getScaling().contains(FIFF_UNIT_T_M))
+                    dMaxValue = getScaling()[FIFF_UNIT_T_M];
+            }
+            else if(unit == FIFF_UNIT_T) //magnetometers
+            {
+                dMaxValue = 1e-11f;
+                if(getScaling().contains(FIFF_UNIT_T))
+                    dMaxValue = getScaling()[FIFF_UNIT_T];
+            }
+            break;
+        }
+
+        case FIFFV_REF_MEG_CH: {
+            dMaxValue = 1e-11f;
+            if( getScaling().contains(FIFF_UNIT_T))
+                dMaxValue = getScaling()[FIFF_UNIT_T];
+            break;
+        }
+        case FIFFV_EEG_CH: {
+            dMaxValue = 1e-4f;
+            if( getScaling().contains(FIFFV_EEG_CH))
+                dMaxValue = getScaling()[FIFFV_EEG_CH];
+            break;
+        }
+        case FIFFV_EOG_CH: {
+            dMaxValue = 1e-3f;
+            if( getScaling().contains(FIFFV_EOG_CH))
+                dMaxValue = getScaling()[FIFFV_EOG_CH];
+            break;
+        }
+        case FIFFV_STIM_CH: {
+            dMaxValue = 5;
+            if( getScaling().contains(FIFFV_STIM_CH))
+                dMaxValue = getScaling()[FIFFV_STIM_CH];
+            break;
+        }
+        case FIFFV_MISC_CH: {
+            dMaxValue = 1e-3f;
+            if( getScaling().contains(FIFFV_MISC_CH))
+                dMaxValue = getScaling()[FIFFV_MISC_CH];
+            break;
+        }
+        default :
+        dMaxValue = 1e-9f;
+        break;
+    }
+
+    return dMaxValue;
 }
