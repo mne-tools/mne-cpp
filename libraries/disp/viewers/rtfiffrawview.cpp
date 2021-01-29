@@ -315,7 +315,7 @@ void RtFiffRawView::hideBadChannels()
     }
 
     //Update the visible channel list which are to be filtered
-    //visibleRowsChanged();
+    visibleRowsChanged();
 }
 
 //=============================================================================================================
@@ -344,7 +344,7 @@ void RtFiffRawView::showSelectedChannelsOnly(const QStringList &selectedChannels
     }
 
     //Update the visible channel list which are to be filtered
-    //visibleRowsChanged();
+    visibleRowsChanged();
 }
 
 //=============================================================================================================
@@ -381,6 +381,13 @@ int RtFiffRawView::getWindowSize()
 
 //=============================================================================================================
 
+float RtFiffRawView::getSamplingFreq() const
+{
+    return m_fSamplingRate;
+}
+
+//=============================================================================================================
+
 void RtFiffRawView::takeScreenshot(const QString& fileName)
 {
     if(fileName.contains(".svg", Qt::CaseInsensitive)) {
@@ -394,7 +401,7 @@ void RtFiffRawView::takeScreenshot(const QString& fileName)
     }
 
     if(fileName.contains(".png", Qt::CaseInsensitive)) {
-        QPixmap pixMap = QPixmap::grabWidget(m_pTableView);
+        QPixmap pixMap(m_pTableView->grab());
         pixMap.save(fileName);
     }
 }
