@@ -39,7 +39,7 @@
 
 #include "rtfiffrawviewdelegate.h"
 #include "rtfiffrawviewmodel.h"
-
+#include "../rtfiffrawview.h"
 #include <rtprocessing/event.h>
 
 #include "../scalingview.h"
@@ -66,8 +66,9 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtFiffRawViewDelegate::RtFiffRawViewDelegate(QObject *parent)
+RtFiffRawViewDelegate::RtFiffRawViewDelegate(RtFiffRawView* parent)
 : QAbstractItemDelegate(parent)
+, m_pParent(parent)
 , m_dMaxValue(0.0)
 , m_dScaleY(0.0)
 , m_iActiveRow(0)

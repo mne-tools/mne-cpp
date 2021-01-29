@@ -74,6 +74,8 @@ namespace DISPLIB
 // DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
+class RtFiffRawView;
+
 //=============================================================================================================
 // DEFINE TYPEDEFS
 //=============================================================================================================
@@ -100,7 +102,7 @@ public:
      *
      * @param[in] parent     Parent of the delegate.
      */
-    RtFiffRawViewDelegate(QObject *parent = 0);
+    RtFiffRawViewDelegate(RtFiffRawView* parent = 0);
 
     //=========================================================================================================
     /**
@@ -257,6 +259,27 @@ private:
      */
     void createMarkerPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path) const;
 
+    //=========================================================================================================
+    /**
+     * Calc Point to plot given current path y values and x increments.
+     *
+     * @param[in] path  The QPointerPath to retrieve current position of plot.
+     * @param[in] dx    The X increment.
+     * @param[in] y     The new y value to plot.
+     * @param[in] ybase   The y offset to apply.
+     * @param[in] yscale   The y scaling factor to apply.
+     */
+    inline QPointF calcPoint(QPainterPath& path, const double dx, const double y, const double ybase, const double yScale) const;
+
+    //=========================================================================================================
+    /**
+     * Allows to access the parent Object (FiffRawView) sampling frequency member and returns the sampling period.
+     *
+     */
+    inline double retrieveSamplingPeriod() const;
+
+
+    RtFiffRawView*      m_pParent;          /**< Pointer to parent class. **/
     QPoint              m_markerPosition;   /**< Current mouse position used to draw the marker in the plot. */
     QList<QPainterPath> m_painterPaths;     /**< List of all current painter paths for each row. */
 
