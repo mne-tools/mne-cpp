@@ -510,6 +510,14 @@ public:
      */
     inline int getFirstSampleOffset() const;
 
+    //=========================================================================================================
+    /**
+     * Get maximum range of respective channel type. range value in FiffChInfo does not seem to contain a reasonable value
+     *
+     * @param [in] Row of the model
+     * @return the max value of the y axis for the channel
+     */
+    double getMaxValueFromRawViewModel(int row) const;
 
 private:
     //=========================================================================================================
