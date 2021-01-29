@@ -307,13 +307,10 @@ void RtFiffRawViewDelegate::paint(QPainter *painter,
                     painter->restore();
                 }
 
-                //Plot data path
-                QPointF ellipsePos;
-                QString amplitude;
-
                 path = QPainterPath(QPointF(option.rect.x(),option.rect.y()));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor(),option.rect.y()));
 
-                createPlotPath(index, option, path, ellipsePos, amplitude, data);
+                //Plot data path
+                createPlotPath(index, option, path, data);
 
                 painter->setRenderHint(QPainter::Antialiasing, true);
                 painter->save();
@@ -347,18 +344,6 @@ void RtFiffRawViewDelegate::paint(QPainter *painter,
 
                 painter->drawPath(path);
                 painter->restore();
-
-//                //Plot ellipse and amplitude next to marker mouse position
-//                if(m_iActiveRow == index.row()) {
-//                    painter->save();
-//                    painter->drawEllipse(ellipsePos,2,2);
-//                    painter->restore();
-
-//                    painter->save();
-//                    painter->drawText(m_markerPosition, amplitude);
-//                    painter->drawEllipse(ellipsePos,2,2);
-//                    painter->restore();
-//                }
 
                 //Plot current position marker
                 path = QPainterPath(QPointF(option.rect.x(),option.rect.y()));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor(),option.rect.y()));
@@ -440,123 +425,51 @@ void RtFiffRawViewDelegate::setUpperItemIndex(int iUpperItemIndex)
 void RtFiffRawViewDelegate::createPlotPath(const QModelIndex &index,
                                            const QStyleOptionViewItem &option,
                                            QPainterPath& path,
-                                           QPointF &ellipsePos,
-                                           QString &amplitude,
-                                           RowVectorPair &data) const
+                                           const RowVectorPair &data) const
 {
     const RtFiffRawViewModel* t_pModel = static_cast<const RtFiffRawViewModel*>(index.model());
+    int iPlotSizePx = option.rect.width();
+    int iNumSamples = t_pModel->getMaxSamples();
+    double dPixelsPerSample = static_cast<double>(iPlotSizePx) / static_cast<double>(iNumSamples);
+
+    // locate time-cursor
+    int iTimeCursorSample = t_pModel->getCurrentSampleIndex();
+    double firstValuePreviousPlot = t_pModel->getLastBlockFirstValue(index.row());
 
     //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
-    qint32 kind = t_pModel->getKind(index.row());
-    double dMaxValue = 1e-9f;
+    double dMaxYValueEstimate = t_pModel->getMaxValueFromRawViewModel(index.row());
+    double dScaleY = option.rect.height()/(2 * dMaxYValueEstimate);
+    double dChannelOffset = path.currentPosition().y();
 
-    switch(kind) {
-        case FIFFV_MEG_CH: {
-            qint32 unit =t_pModel->getUnit(index.row());
-            if(unit == FIFF_UNIT_T_M) { //gradiometers
-                dMaxValue = 1e-10f;
-                if(t_pModel->getScaling().contains(FIFF_UNIT_T_M))
-                    dMaxValue = t_pModel->getScaling()[FIFF_UNIT_T_M];
-            }
-            else if(unit == FIFF_UNIT_T) //magnetometers
-            {
-                dMaxValue = 1e-11f;
-                if(t_pModel->getScaling().contains(FIFF_UNIT_T))
-                    dMaxValue = t_pModel->getScaling()[FIFF_UNIT_T];
-            }
-            break;
-        }
+//    qDebug() << " - - - - - - - - - - - - - - - - - - - - - ";
+//    qDebug() << " iPlotSizePx = " <<      iPlotSizePx;
+//    qDebug() << " iNumSamples = " <<      iNumSamples;
+//    qDebug() << " dPixelsPerSample = " << dPixelsPerSample;
+//    qDebug() << " iTimeCursorSample = " << iTimeCursorSample;
+//    qDebug() << " firstValuePreviousPlot = " << firstValuePreviousPlot;
 
-        case FIFFV_REF_MEG_CH: {
-            dMaxValue = 1e-11f;
-            if(t_pModel->getScaling().contains(FIFF_UNIT_T))
-                dMaxValue = t_pModel->getScaling()[FIFF_UNIT_T];
-            break;
-        }
-        case FIFFV_EEG_CH: {
-            dMaxValue = 1e-4f;
-            if(t_pModel->getScaling().contains(FIFFV_EEG_CH))
-                dMaxValue = t_pModel->getScaling()[FIFFV_EEG_CH];
-            break;
-        }
-        case FIFFV_EOG_CH: {
-            dMaxValue = 1e-3f;
-            if(t_pModel->getScaling().contains(FIFFV_EOG_CH))
-                dMaxValue = t_pModel->getScaling()[FIFFV_EOG_CH];
-            break;
-        }
-        case FIFFV_STIM_CH: {
-            dMaxValue = 5;
-            if(t_pModel->getScaling().contains(FIFFV_STIM_CH))
-                dMaxValue = t_pModel->getScaling()[FIFFV_STIM_CH];
-            break;
-        }
-        case FIFFV_MISC_CH: {
-            dMaxValue = 1e-3f;
-            if(t_pModel->getScaling().contains(FIFFV_MISC_CH))
-                dMaxValue = t_pModel->getScaling()[FIFFV_MISC_CH];
-            break;
-        }
-    }
-
-    QPointF qSamplePosition;
-
-    double dValueScaled, dValue;
-    double dScaleY = option.rect.height()/(2*dMaxValue);
-    double y_base = path.currentPosition().y();
-
-    // Calculate the smallest possible width for one sample data point
-    int iSkip = t_pModel->getMaxSamples() / option.rect.width();
-    if(iSkip <= 0) {
-        iSkip = 1;
-    }
-    double dRatio = t_pModel->getMaxSamples() / iSkip;
-    double dDx = option.rect.width() / dRatio;
-
-//    qDebug() << "t_pModel->getMaxSamples()" << t_pModel->getMaxSamples();
-//    qDebug() << "dRatio" << dRatio;
-//    qDebug() << "iSkip" << iSkip;
-//    qDebug() << "dDx" << dDx;
-
-    // Init indices
-    int currentSampleIndex = t_pModel->getCurrentSampleIndex();
-    double lastFirstValue = t_pModel->getLastBlockFirstValue(index.row());
+//    qDebug() << " dMaxYValueEstimate = " << dMaxYValueEstimate;
+//    qDebug() << " dScaleY = " << dScaleY;
+//    qDebug() << " dChannelOffset = " << dChannelOffset;
 
     //Move to initial starting point
-    if(data.second > 0) {
-        dValue = 0;
+    path.moveTo(calcPoint(path, 0., 0., dChannelOffset, dScaleY));
+    double dY(0);
 
-        //Reverse direction -> plot the right way
-        dValue = y_base-dValue;
-
-        qSamplePosition.setY(dValue);
-        qSamplePosition.setX(path.currentPosition().x());
-
-        path.moveTo(qSamplePosition);
-    }
-
-    for(qint32 j = 0; j < data.second; j += iSkip) {
-        if(j < currentSampleIndex) {
-            dValue = *(data.first+j) - *(data.first); //remove first sample data[0] as offset
+    //The plot works as a rolling time-cursor, ploting data on top of previous runs.
+    //You always plot one whole window of data, between first sample and numSamplesToPlot (or data.second)
+    //Even if the only change is a new block of samples to the left of the time-cursor.
+    //At any time, to the left of the time-cursor you have the most recent data (A part) corresponding to the current roll
+    //To the right of the time-cursor, you have data corresponding to the previous roll.
+    for(int j = 0; j < data.second; ++j) {
+        if(j < iTimeCursorSample) {
+            //A part
+            dY = data.first[j] - data.first[0];
         } else {
-            dValue = *(data.first+j) - lastFirstValue; //do not remove first sample data[0] as offset because this is the last data part
+            //B part
+            dY = data.first[j] - firstValuePreviousPlot;
         }
-
-        dValueScaled = dValue * dScaleY;
-
-        dValueScaled = y_base-dValueScaled;//Reverse direction -> plot the right way
-
-        qSamplePosition.setY(dValueScaled);
-        qSamplePosition.setX(path.currentPosition().x()+dDx);
-        path.lineTo(qSamplePosition);
-
-        //Create ellipse position
-        if(j == (qint32)(m_markerPosition.x() / dDx)) {
-            ellipsePos.setX(path.currentPosition().x()+dDx);
-            ellipsePos.setY(dValueScaled/*+(option.rect.height()/2)*/);
-
-            amplitude = QString::number(*(data.first+j));
-        }
+        path.lineTo(calcPoint(path, dPixelsPerSample, dY, dChannelOffset, dScaleY));
     }
 }
 
@@ -770,3 +683,22 @@ void RtFiffRawViewDelegate::setEventList(QSharedPointer<RTPROCESSINGLIB::EventLi
 {
     m_pEventList = pEventList;
 }
+
+//=============================================================================================================
+
+QPointF RtFiffRawViewDelegate::calcPoint(QPainterPath& path,
+                                      const double dx,
+                                      const double y,
+                                      const double yBase,
+                                      const double yScale) const
+{
+    double x = path.currentPosition().x() + dx;
+    double yScaled = -((yScale * y) - yBase);//- because y pixels grow downwards.
+
+//    qDebug() << " x = " << x;
+//    qDebug() << " y = " << yScaled;
+
+    return QPointF(x, yScaled);
+}
+
+//=============================================================================================================
