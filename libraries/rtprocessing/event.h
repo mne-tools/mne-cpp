@@ -139,7 +139,7 @@ public:
      *
      * @param event
      */
-    void addEvent(Event event);
+    void addEvent(const Event& event);
 
     //=========================================================================================================
     /**

@@ -104,7 +104,7 @@ int Event::getGroup() const
 
 //=============================================================================================================
 
-void EventList::addEvent(Event event)
+void EventList::addEvent(const Event& event)
 {
     m_lEvents.append(event);
 }
