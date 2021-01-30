@@ -9,6 +9,10 @@ has_toc: false
 
 This page describes the application MNE Anonymize, i.e. `mne_anonymize`. This application substitutes different **Personal Health Information** (PHI) and **Personal Identifiable Information** (PII) fields from a [FIFF (Functional Imaging File Format)](https://bids-specification.readthedocs.io/en/stable/99-appendices/06-meg-file-formats.html) file (*.fif*), with other values.
 
+<html>
+<div style="height:13px"><h1 style="font-size:150%">HIPAA SAFE. YOUR DATA <b>NEVER</b> leaves your computer.</h1><h2>You download the application and it runs from inside the browser's sandbox. Your data is safe.</h2></div>
+</html>
+
 ![](../../images/mn_anonymizer_gui.png)
 
 ##### De-identifying vs Anonymizing
