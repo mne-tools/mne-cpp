@@ -8,6 +8,7 @@ nav_order: 2
 
 MNE-CPP WebAssembly releases are in a technical preview state since WebAssembly itself is still fairly new and undergoing development. The following releases work best in Chromium based browsers (Google Chrome, Microsoft Edge).
 
+| Regarding MNE Anonimize: Your data is safe. This technology allows you to seamlessly downlaod, install and run the anonymizer application program in your own computer, through the browser. Your FIFF file <b>never</b> leaves your computer.|
 ---
 
 WebAssembly Release

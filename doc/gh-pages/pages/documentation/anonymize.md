@@ -9,8 +9,6 @@ has_toc: false
 
 This page describes the application MNE Anonymize, i.e. `mne_anonymize`. This application substitutes different **Personal Health Information** (PHI) and **Personal Identifiable Information** (PII) fields from a [FIFF (Functional Imaging File Format)](https://bids-specification.readthedocs.io/en/stable/99-appendices/06-meg-file-formats.html) file (*.fif*), with other values.
 
-|**Attention:** Your data is safe. This technology allows you to seamlessly downlaod and run the anonymizer program in your own computer, through the browser. Your FIFF file <b>NEVER</b> leaves your computer.|
-
 ![](../../images/mn_anonymizer_gui.png)
 
 ##### De-identifying vs Anonymizing
