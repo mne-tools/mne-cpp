@@ -60,6 +60,7 @@
 
 using namespace FIFFLIB;
 using namespace EDF2FIFF;
+using namespace Eigen;
 
 //=============================================================================================================
 /**

@@ -53,12 +53,12 @@ CONFIG(debug, debug|release) {
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
-            -lMNE$${MNE_LIB_VERSION}Fiffd
+    LIBS += -lmnecppFiffd \
+            -lmnecppUtilsd \
 }
 else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
-            -lMNE$${MNE_LIB_VERSION}Fiff
+    LIBS += -lmnecppFiff \
+            -lmnecppUtils \
 }
 
 DESTDIR =  $${MNE_BINARY_DIR}
@@ -83,11 +83,11 @@ contains(MNECPP_CONFIG, withCodeCov) {
     QMAKE_CXXFLAGS += -fprofile-arcs -ftest-coverage
 }
 
-win32 {
-    EXTRA_ARGS =
-    DEPLOY_CMD = $$winDeployAppArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${LIBS},$${EXTRA_ARGS})
-    QMAKE_POST_LINK += $${DEPLOY_CMD}
-}
+#win32 {
+#    EXTRA_ARGS =
+#    DEPLOY_CMD = $$winDeployAppArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${LIBS},$${EXTRA_ARGS})
+#    QMAKE_POST_LINK += $${DEPLOY_CMD}
+#}
 
 unix:!macx {
     # === Unix ===
