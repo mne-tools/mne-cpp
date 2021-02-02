@@ -42,6 +42,11 @@ VERSION = $${MNE_CPP_VERSION}
 CONFIG   += console
 CONFIG   -= app_bundle
 
+contains(MNECPP_CONFIG, static) {
+    CONFIG += static
+    DEFINES += STATICBUILD
+}
+
 TARGET = mne_edf2fiff
 
 CONFIG(debug, debug|release) {
