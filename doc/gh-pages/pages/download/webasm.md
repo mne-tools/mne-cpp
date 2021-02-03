@@ -8,7 +8,7 @@ nav_order: 2
 
 MNE-CPP WebAssembly releases are in a technical preview state since WebAssembly itself is still fairly new and undergoing development. The following releases work best in Chromium based browsers (Google Chrome, Microsoft Edge).
 
-| Your data is safe. This seamlessly downlaods, installs and runs the MNE-CPP software in your browser. Your FIFF file <b>never</b> leaves your computer. |
+| Your data is safe. This seamlessly downlaods, installs and runs the MNE-CPP software in your browser. <br><b>Your FIFF file never leaves your computer.</b> |
 
 ---
 
