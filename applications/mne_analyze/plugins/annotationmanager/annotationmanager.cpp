@@ -76,8 +76,7 @@ AnnotationManager::~AnnotationManager()
 
 QSharedPointer<AbstractPlugin> AnnotationManager::clone() const
 {
-    QSharedPointer<AnnotationManager> pAnnotationManagerClone(new AnnotationManager);
-    return pAnnotationManagerClone;
+    return QSharedPointer<AnnotationManager> (new AnnotationManager);
 }
 
 //=============================================================================================================
