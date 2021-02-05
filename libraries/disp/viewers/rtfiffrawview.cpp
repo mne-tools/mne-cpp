@@ -740,6 +740,14 @@ void RtFiffRawView::onAddEventMarker()
     if (dSample > m_pModel->getCurrentSampleIndex()){
         iAbsoluteSample -= m_pModel->getMaxSamples();
     }
+<<<<<<< HEAD
 
     m_pEventList->addEvent(Event(iAbsoluteSample));
+=======
+    std::vector<EventGroup> eventGroups;
+    eventGroups.push_back(EventGroup("DefaultGroup"));
+
+    m_EventList.addEvent(Event(iAbsoluteSample));
+//    m_pEventList->addEvent(Event(iAbsoluteSample));
+>>>>>>> 302acaa22 (update-not-finished)
 }
