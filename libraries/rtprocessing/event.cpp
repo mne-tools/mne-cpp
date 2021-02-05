@@ -120,8 +120,6 @@ int Event::getGroup() const
 
 //=============================================================================================================
 
-<<<<<<< HEAD
-=======
 bool Event::operator<(const Event& rhs) const
 {
    return m_iSample < rhs.getSample();
@@ -136,7 +134,13 @@ EventList::EventList()
 
 //=============================================================================================================
 
->>>>>>> 28f49175c (use delegating constructors in event class)
+void EventList::addEvent(const Event& event)
+{
+
+}
+
+//=============================================================================================================
+
 void EventList::addEvent(const Event& event)
 {
     m_lEvents.append(event);
