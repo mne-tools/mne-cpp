@@ -41,12 +41,17 @@
 //=============================================================================================================
 
 #include "rtprocessing_global.h"
+#include <set>
+#include <vector>
+
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QSharedMemory>
+
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -63,6 +68,38 @@
 namespace RTPROCESSINGLIB
 {
 
+class EventManager
+{
+    //make my boss happy.
+};
+
+}
+class EventGroup
+{
+public:
+    EventGroup(const char* name);
+
+    void setColor(const char* color);
+    std::string getName() const;
+
+private:
+
+    void setRandomColor();
+    void setRandomId();
+
+    std::string     m_sName;
+    char            m_Color[4];
+    int             m_Id;
+};
+
+
+class EventGroupList
+{
+
+public:
+  std::vector<EventGroup> list;
+};
+
 // **Event Class** So far, only instanteous events. In the future suport for segment-events
 // will need to be added.
 /**
@@ -78,8 +115,11 @@ public:
      * @param [in] iSample  sample coorespondiong to this event
      */
     Event(int iSample);
-    Event(int iSample, int iType);
-    Event(int iSample, int iType, int iGroup);
+    Event(int iSample, const EventGroup& group);
+    Event(int iSample, const EventGroup& group, int iType);
+//    Event(int iSampleStart, int iSampleEnd);
+//    Event(int iSampleStart, int iSampleEnd, const EventGroup& group);
+//    Event(int iSampleStart, int iSampleEnd, const EventGroup& group, int iType);
 
     //=========================================================================================================
     /**
@@ -118,9 +158,12 @@ public:
        return getSample() < rhs.getSample();
     }
 private:
-    int         m_iSample;              /**< Sample coorespodning to this event */
+    int         m_iSample;                  /**< Sample coorespodning to the instantaneous event */
+    int         m_iSampleStart;             /**< Sample coorespodning to the start of the event */
+    int         m_iSampleEnd;               /**< Sample coorespodning to the end of the event */
     int         m_iType;                /**< Type of the event */
     int         m_iGroup;               /**< Group the event belongs to */
+    int         m_iId;
 };
 
 /**
@@ -168,7 +211,8 @@ public:
     Event getEvent(int iIndex) const;
 
 private:
-    static QList<Event>     m_lEvents;          /**< List of events */
+    std::set<Event>     m_lEvents;          /**< List of events */
+    QSharedMemory       m_SharedMemoryHandler;
 };
 }//namespace
 
