@@ -63,6 +63,8 @@
 namespace RTPROCESSINGLIB
 {
 
+// **Event Class** So far, only instanteous events. In the future suport for segment-events
+// will need to be added.
 /**
  * Class contaning infomation about an event
  */
@@ -75,9 +77,9 @@ public:
      *
      * @param [in] iSample  sample coorespondiong to this event
      */
-    Event(int iSample,
-          int iType = 0,
-          int iGroup = 0);
+    Event(int iSample);
+    Event(int iSample, int iType);
+    Event(int iSample, int iType, int iGroup);
 
     //=========================================================================================================
     /**
@@ -127,6 +129,12 @@ private:
 class RTPROCESINGSHARED_EXPORT EventList
 {
 public:
+    //=========================================================================================================
+    /**
+     * EventList Constructor
+     */
+    EventList();
+
     //=========================================================================================================
     /**
      * clears events in this instance of the event handler
