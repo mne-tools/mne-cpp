@@ -728,7 +728,7 @@ void RtFiffRawView::onAddEventMarker()
 
     int iFirstSampleOffset = m_pModel->getFirstSampleOffset();
 
-    // Dont allow adding events to blank space in the beggining
+    // Dont allow adding events to blank space in the beginning
     if (dSample > m_pModel->getCurrentSampleIndex() && iFirstSampleOffset == 0){
         return;
     }
