@@ -40,6 +40,7 @@ include(../mne-cpp.pri)
 TEMPLATE = subdirs
 
 SUBDIRS += \
+    events \
     utils \
     fs \
     fiff \
