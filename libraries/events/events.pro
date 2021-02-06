@@ -35,13 +35,13 @@ CONFIG(debug, debug|release) {
 SOURCES += \
     event.cpp \
     eventgroup.cpp \
-    events.cpp
+    eventmanager.cpp
 
 HEADERS += \
     event.h \
     eventgroup.h \
     events_global.h \
-    events.h
+    eventmanager.h
 
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
