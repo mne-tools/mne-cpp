@@ -35,6 +35,8 @@ nav_order: 7
 
 ### MNE Analyze
 
+### MNE Anonymize
+
 ## Libraries
 
 ### Utils
