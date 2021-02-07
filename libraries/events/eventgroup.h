@@ -36,9 +36,38 @@
 #ifndef EVENTGROUP_EVENTS_H
 #define EVENTGROUP_EVENTS_H
 
+#include "events_global.h"
 #include <string>
-#include <set>
-#include <array>
+
+namespace EVENTSINTERNAL {
+class EventGroup;
+}
+
+namespace EVENTSLIB {
+
+struct EVENTS_EXPORT RgbColor
+{
+    RgbColor();
+    RgbColor(const uchar rRhs, const uchar gRhs, const uchar bRhs);
+    RgbColor(const uchar rRhs, const uchar gRhs,
+             const uchar bRhs, const uchar aRhs);
+
+    uchar r;
+    uchar g;
+    uchar b;
+    uchar a;
+};
+
+struct EVENTS_EXPORT Group
+{
+    Group(int idRhs, const char* nameRhs, const RgbColor& cRhs );
+    Group(const EVENTSINTERNAL::EventGroup& gRhs);
+    unsigned int    id;
+    std::string     name;
+    RgbColor        color;
+};
+
+}
 
 namespace EVENTSINTERNAL {
 
@@ -49,13 +78,14 @@ public:
     EventGroup(const char* name);
 
     //=========================================================================================================
-    EventGroup(const char* name, const char* color);
+    EventGroup(const char* name, const EVENTSLIB::RgbColor& color);
 
     //=========================================================================================================
-    void setColor(const char* color);
-    RgbColor getColor() const;
-    //=========================================================================================================
+    void setColor(const EVENTSLIB::RgbColor& color);
+
     void setRandomColor();
+
+    EVENTSLIB::RgbColor getColor() const;
 
     //=========================================================================================================
     const std::string& getName() const;
@@ -64,16 +94,16 @@ public:
     void setName(const std::string& sName);
 
     //=========================================================================================================
-    int getId() const;
+    unsigned int getId() const;
 
 private:
 
 
     std::string         m_sName;
-    std::array<char,4>  m_Color;
-    int                 m_Id;
+    EVENTSLIB::RgbColor m_Color;
+    unsigned int        m_Id;
 
-    static int eventGroupIdCounter;
+    static unsigned int eventGroupIdCounter;
 };
 
 } //namespace

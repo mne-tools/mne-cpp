@@ -65,51 +65,52 @@ QList<Event> EventList::m_lEvents;
 //=============================================================================================================
 
 
-//EventGroupList eventGroups;
+EventGroupList eventGroups;
 
-//eventGroups.list.push_back()
+eventGroups.list.push_back()
 
-//Event::Event(int iSampleStart)
-//: Event(iSampleStart, defaultGroup, 0)
-//{
+Event::Event(int iSampleStart)
+: Event(iSampleStart, defaultGroup, 0)
+{
 
-//}
-
-//=============================================================================================================
-
-//Event::Event(int iSampleStart, const EventGroup& group)
-//: Event(iSampleStart, group, 0)
-//{
-
-//}
+}
 
 //=============================================================================================================
 
-//Event::Event(int iSample, const EventGroup& group, int iType)
-//: m_iSample(iSample)
-//, m_iGroup(group)
-//, m_iType(iType)
-//{
+Event::Event(int iSampleStart, const EventGroup& group)
+: Event(iSampleStart, group, 0)
+{
 
-//}
+}
 
 //=============================================================================================================
 
-//Event::Event(const Event &event)
-//: Event(event.m_iSample, event.m_iType, event.m_iGroup)
-//{
+Event::Event(int iSample, const EventGroup& group, int iType)
+: m_iSample(iSample)
+, m_iGroup(group)
+, m_iType(iType)
+{
 
-//}
-
-//=============================================================================================================
-
-//int Event::getSample() const
-//{
-//    return m_iSample;
-//}
+}
 
 //=============================================================================================================
 
+Event::Event(const Event &event)
+: Event(event.m_iSample, event.m_iType, event.m_iGroup)
+{
+
+}
+
+//=============================================================================================================
+
+int Event::getSample() const
+{
+    return m_iSample;
+}
+
+//=============================================================================================================
+
+<<<<<<< HEAD
 <<<<<<< HEAD
 int Event::getType() const
 {
@@ -127,46 +128,58 @@ int Event::getGroup() const
 //{
 //    m_iSample = iSample;
 //}
+=======
+void Event::setSample(int iSample)
+{
+    m_iSample = iSample;
+}
+>>>>>>> b18fc7cd3 (api defined)
 
 //=============================================================================================================
 
-//int Event::getType() const
-//{
-//    return m_iType;
-//}
+int Event::getType() const
+{
+    return m_iType;
+}
 
 //=============================================================================================================
 
-//void Event::setType(int iType)
-//{
-//    m_iType = iType;
-//}
+void Event::setType(int iType)
+{
+    m_iType = iType;
+}
 
 //=============================================================================================================
 
+<<<<<<< HEAD
 //int Event::getGroup() const
 //{
 //    return m_iGroup;
 //}
 >>>>>>> 4da8c53ef (frontend api started)
+=======
+int Event::getGroup() const
+{
+    return m_iGroup;
+}
+>>>>>>> b18fc7cd3 (api defined)
 
 //=============================================================================================================
 
-//bool Event::operator<(const Event& rhs) const
-//{
-//   return m_iSample < rhs.getSample();
-//}
+bool Event::operator<(const Event& rhs) const
+{
+   return m_iSample < rhs.getSample();
+}
 
 //=============================================================================================================
 
-//EventList::EventList()
-//{
+EventList::EventList()
+{
 
-//}
+}
 
 //=============================================================================================================
 
-<<<<<<< HEAD
 void EventList::addEvent(const Event& event)
 {
 
@@ -192,122 +205,121 @@ Event EventList::getEvent(int iIndex) const
 {
     return m_lEvents.at(iIndex);
 }
-=======
-//void EventList::addEvent(const Event& event)
-//{
-//    //m_lEvents.append(event);
 
-//    std::sort(m_lEvents.begin(), m_lEvents.end());
-//}
-
-//=============================================================================================================
-
-//void EventList::append(const Event &event)
-//{
-//    //m_lEvents.append(event);
-//}
+void EventList::addEvent(const Event& event)
+{
+    m_lEvents.append(event);
+    std::sort(m_lEvents.begin(), m_lEvents.end());
+}
 
 //=============================================================================================================
 
-//int EventList::size() const
-//{
-//    return m_lEvents.size();
-//}
+void EventList::append(const Event &event)
+{
+    m_lEvents.append(event);
+}
 
 //=============================================================================================================
 
-//const Event& EventList::at(int iIndex) const
-//{
-//    return m_lEvents.at(iIndex);
-//}
->>>>>>> 4da8c53ef (frontend api started)
+int EventList::size() const
+{
+    return m_lEvents.size();
+}
 
 //=============================================================================================================
 
-//void EventList::clear()
-//{
-//    m_lEvents.clear();
-//}
-
-//=============================================================================================================
-
-//bool EventList::isEmpty() const
-//{
-//    return m_lEvents.isEmpty();
-//}
-
-//=============================================================================================================
-
-//void EventList::insert(int iIndex,
-//                       const Event &event)
-//{
-//    m_lEvents.insert(iIndex, event);
-//}
-
-//=============================================================================================================
-
-//void EventList::remove(int iIndex,
-//                       int iSpan)
-//{
-//    for(int i = 0; i < iSpan; i++){
-//        m_lEvents.removeAt(iIndex);
-//    }
-//}
-
-//=============================================================================================================
-
-//Event& EventList::operator[](int i)
-//{
-//    return m_lEvents[i];
-//}
-
-//=============================================================================================================
-
-//const Event& EventList::operator[](int i) const
-//{
-//    return m_lEvents.at(i);
-//}
+const Event& EventList::at(int iIndex) const
+{
+    return m_lEvents.at(iIndex);
+}
 
 
 //=============================================================================================================
 
-//EventGroup::EventGroup(const char* name)
-//: m_sName(name)
-//{
-//    setRandomColor();
-//    setRandomId();
-
-//}
+void EventList::clear()
+{
+    m_lEvents.clear();
+}
 
 //=============================================================================================================
 
-//void EventGroup::setColor(const char* color)
-//{
-//    m_Color[0] = color[0];
-//    m_Color[1] = color[1];
-//    m_Color[2] = color[2];
-//    m_Color[3] = color[3];
-//}
+bool EventList::isEmpty() const
+{
+    return m_lEvents.isEmpty();
+}
+
+//=============================================================================================================
+
+void EventList::insert(int iIndex,
+                       const Event &event)
+{
+    m_lEvents.insert(iIndex, event);
+}
+
+//=============================================================================================================
+
+void EventList::remove(int iIndex,
+                       int iSpan)
+{
+    for(int i = 0; i < iSpan; i++){
+        m_lEvents.removeAt(iIndex);
+    }
+}
+
+//=============================================================================================================
+
+Event& EventList::operator[](int i)
+{
+    return m_lEvents[i];
+}
+
+//=============================================================================================================
+
+const Event& EventList::operator[](int i) const
+{
+    return m_lEvents.at(i);
+}
 
 
 //=============================================================================================================
 
-//void EventGroup::setRandomId()
-//{
-//    m_Id = rand();
-//}
+EventGroup::EventGroup(const char* name)
+: m_sName(name)
+{
+    setRandomColor();
+    setRandomId();
+
+}
 
 //=============================================================================================================
 
-//void EventGroup::setRandomColor()
-//{
-//    m_Color[0] = rand() % 256;
-//    m_Color[1] = rand() % 256;
-//    m_Color[2] = rand() % 256;
-//    m_Color[3] = 0xFF;
-//}
+void EventGroup::setColor(const char* color)
+{
+    m_Color[0] = color[0];
+    m_Color[1] = color[1];
+    m_Color[2] = color[2];
+    m_Color[3] = color[3];
+}
 
-//std::string EventGroup::getName() const
-//{
-//    return m_sName;
-//}
+
+//=============================================================================================================
+
+void EventGroup::setRandomId()
+{
+    m_Id = rand();
+}
+
+//=============================================================================================================
+
+void EventGroup::setRandomColor()
+{
+    m_Color[0] = rand() % 256;
+    m_Color[1] = rand() % 256;
+    m_Color[2] = rand() % 256;
+    m_Color[3] = 0xFF;
+}
+
+std::string EventGroup::getName() const
+{
+    return m_sName;
+}
