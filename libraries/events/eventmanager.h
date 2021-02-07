@@ -4,6 +4,9 @@
 #include "events_global.h"
 #include "event.h"
 #include "eventgroup.h"
+#include "eventsharedmemmanager.h"
+
+#include <string>
 #include <set>
 #include <unordered_map>
 #include <vector>
@@ -11,51 +14,50 @@
 
 namespace EVENTSLIB {
 
-struct EVENTS_EXPORT Event
-{
-   Event(const int, const int, const int);
-   Event(const EVENTSINTERNAL::Event&);
-
-   int  id;
-   int  sample;
-   int  groupId;
-};
-
-struct EVENTS_EXPORT RgbColor
-{
-    RgbColor(const char rRhs, const char gRhs, const char bRhs);
-    RgbColor(const char rRhs, const char gRhs, const char bRhs, const char aRhs);
-    char r;
-    char g;
-    char b;
-    char a;
-};
-
-struct EVENTS_EXPORT Group
-{
-    Group(int idRhs, const char* nameRhs, const RgbColor& cRhs );
-    Group(const EVENTSINTERNAL::EventGroup& gRhs);
-    int         id;
-    std::string name;
-    RgbColor    color;
-};
+enum SharedMemoryMode { READ, WRITE, BYDIRECTIONAL };
 
 class EVENTS_EXPORT EventManager
 {
 public:
     EventManager();
 
-    std::unique_ptr< std::vector<Event> > getAllEvents();
+    //event getters
+    Event getEvent(uint eventId) const;
+    std::unique_ptr< std::vector<Event> > getEvents(const std::vector<uint> eventIds) const;
+    std::unique_ptr< std::vector<Event> > getAllEvents() const;
+    std::unique_ptr< std::vector<Event> > getEventsInSample(int sample) const;
+    std::unique_ptr< std::vector<Event> > getEventsBetween(int sampleStart, int sampleEnd) const;
+    std::unique_ptr< std::vector<Event> > getEventsInGroups(const std::vector<uint>& groupIds) const;
+    //event setters
+    void addEvent(int sample);
+    void addEvents(const std::vector<int>& samples);
+    void deleteEvent(uint eventId);
+    void deleteEvents(const std::vector<uint>& eventIds);
 
-    std::unique_ptr<std::vector<Group> > getAllGroups();
+    //group getters
+    std::unique_ptr<std::vector<Group> > getAllGroups() const;
+    Group getGroup(const uint groupId) const;
+    std::unique_ptr<std::vector<Group> > getGroups(const std::vector<uint>& groupIds) const;
 
-    void addEvent(int iSample);
+    //group setters
+    void addGroup(const std::string& sGroupName);
+    void addGroup(const std::string& sGroupName, const RgbColor& color);
+    void deleteGroup(const uint groupId);
+    void renameGroup(const uint groupId, const std::string& newName);
+    void setGroupColor(const uint groupId, const RgbColor& color);
+    void mergeGroups(const std::vector<uint>& groupIds);
+    void duplicateGroup(const uint groupId, const std::string& newName);
 
-    void addGroup(const char* sGroupName);
+    //shared memory api. it should be that simple
+    void initSharedMemory() const;
+    void initSharedMemory(SharedMemoryMode mode) const;
+    void stopSharedMemory() const;
+    bool isSharedMemoryInit() const;
 
 private:
-    std::set<EVENTSINTERNAL::Event>             m_eventList;
-    std::unordered_map<int, EVENTSINTERNAL::EventGroup>   m_eventGroupList;
+    std::set<EVENTSINTERNAL::Event>                         m_eventList;
+    std::unordered_map<int, EVENTSINTERNAL::EventGroup>     m_eventGroupList;
+    std::shared_ptr<EVENTSINTERNAL::EventSharedMemManager>  m_pSharedMemManager;
 };
 
 }//namespace

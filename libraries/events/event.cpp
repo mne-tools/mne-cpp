@@ -18,35 +18,49 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace EVENTSINTERNAL;
-
 //=============================================================================================================
 // INIT STATIC MEMBERS
 //=============================================================================================================
 
-int Event::eventIdCounter(0);
+int EVENTSINTERNAL::Event::eventIdCounter(0);
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Event::Event(int iSample, const EventGroup& group)
-: m_iSample(iSample)
-, m_iGroup(group.getId())
+EVENTSLIB::Event::Event()
+:EVENTSLIB::Event(0,0,0)
+{ }
+
+EVENTSLIB::Event::Event(const uint i,const  int s, const uint gid)
+: id(i)
+, groupId(gid)
+, sample(s)
+{ }
+
+EVENTSLIB::Event::Event(const EVENTSINTERNAL::Event& e)
+: Event(e.getId(), e.getSample(), e.getGroup())
+{ }
+
+//=============================================================================================================
+
+EVENTSINTERNAL::Event::Event(int iSample, const EventGroup& group)
+: m_iGroup(group.getId())
+, m_iSample(iSample)
 {
     m_iId = eventIdCounter++;
 }
 
 //=============================================================================================================
 
-int Event::getSample() const
+int EVENTSINTERNAL::Event::getSample() const
 {
     return m_iSample;
 }
 
 //=============================================================================================================
 
-void Event::setSample(int iSample)
+void EVENTSINTERNAL::Event::setSample(int iSample)
 {
     m_iSample = iSample;
 }
@@ -54,27 +68,27 @@ void Event::setSample(int iSample)
 
 //=============================================================================================================
 
-int Event::getGroup() const
+uint EVENTSINTERNAL::Event::getGroup() const
 {
     return m_iGroup;
 }
 
 //=============================================================================================================
 
-void Event::setGroup(int iGroup)
+void EVENTSINTERNAL::Event::setGroup(uint iGroup)
 {
     m_iGroup = iGroup;
 }
 
 //=============================================================================================================
 
-int Event::getId() const
+uint EVENTSINTERNAL::Event::getId() const
 {
     return m_iId;
 }
 
 //=============================================================================================================
-bool Event::operator<(const Event& rhs) const
+bool EVENTSINTERNAL::Event::operator<(const Event& rhs) const
 {
     bool isLessThan;
     if (m_iSample == rhs.getSample()){
