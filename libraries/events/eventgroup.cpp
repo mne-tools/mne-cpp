@@ -61,11 +61,33 @@ using namespace EVENTSINTERNAL;
 // INIT STATIC MEMBERS
 //=============================================================================================================
 
-int EventGroup::eventGroupIdCounter(0);
+static const unsigned char defaultGroupColor[] = { 0xC0, 0xFF, 0xEE };
+static const unsigned char defaultGroupTransparency = 0xFF;
+
+unsigned int EventGroup::eventGroupIdCounter(0);
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
+
+
+
+EVENTSLIB::RgbColor::RgbColor()
+: RgbColor(defaultGroupColor[0], defaultGroupColor[1], defaultGroupColor[2])
+{ };
+
+EVENTSLIB::RgbColor::RgbColor(const uchar rRhs, const uchar gRhs, const uchar bRhs)
+: RgbColor(rRhs, gRhs, bRhs, defaultGroupTransparency)
+{ };
+
+EVENTSLIB::RgbColor::RgbColor(const uchar rRhs, const uchar gRhs,
+                              const uchar bRhs, const uchar aRhs)
+: r(rRhs)
+, g(gRhs)
+, b(bRhs)
+, a(aRhs)
+{ };
+
 
 EventGroup::EventGroup(const char* name)
 : m_sName(name)
@@ -79,7 +101,7 @@ EventGroup::EventGroup(const char* name)
 //=============================================================================================================
 
 EventGroup::EventGroup(const char* name,
-                       const char* color)
+                       const EVENTSLIB::RgbColor& color)
 : m_sName(name)
 , m_Id(eventGroupIdCounter++)
 {
@@ -90,22 +112,18 @@ EventGroup::EventGroup(const char* name,
 
 //=============================================================================================================
 
-void EventGroup::setColor(const char* color)
+void EventGroup::setColor(const EVENTSLIB::RgbColor& color)
 {
-    m_Color[0] = color[0];
-    m_Color[1] = color[1];
-    m_Color[2] = color[2];
-    m_Color[3] = color[3];
+    m_Color = color;
 }
 
 //=============================================================================================================
 
 void EventGroup::setRandomColor()
 {
-    m_Color[0] = rand() % 256;
-    m_Color[1] = rand() % 256;
-    m_Color[2] = rand() % 256;
-    m_Color[3] = 0xFF;
+    m_Color.r = rand() % 256;
+    m_Color.g = rand() % 256;
+    m_Color.b = rand() % 256;
 }
 
 //=============================================================================================================
@@ -124,7 +142,7 @@ void EventGroup::setName(const std::string &sName)
 
 //=============================================================================================================
 
-int EventGroup::getId() const
+unsigned int EventGroup::getId() const
 {
     return m_Id;
 }

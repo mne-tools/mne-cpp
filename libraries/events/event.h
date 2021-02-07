@@ -1,6 +1,29 @@
 #ifndef EVENT_EVENTSINTERNAL_H
 #define EVENT_EVENTSINTERNAL_H
 
+#include "events_global.h"
+
+using uint = unsigned int;
+
+namespace EVENTSINTERNAL {
+class Event;
+}
+
+namespace EVENTSLIB {
+
+struct EVENTS_EXPORT Event
+{
+    Event();
+    Event(const uint i,const  int s, const uint gid);
+    Event(const EVENTSINTERNAL::Event&);
+
+    uint  id;
+    uint  groupId;
+    int  sample;
+};
+
+}
+
 namespace EVENTSINTERNAL {
 
 class EventGroup;
@@ -14,7 +37,6 @@ public:
      *
      * @param iSample
      * @param group
-     * @param iType
      */
     Event(int iSample, const EventGroup& group);
 
@@ -35,19 +57,19 @@ public:
      *
      * @return event group
      */
-    int getGroup() const;
+    uint getGroup() const;
 
     //=========================================================================================================
-    void setGroup(int iGroup);
+    void setGroup(uint iGroup);
 
-    int getId() const;
+    uint getId() const;
 
     bool operator<(const Event& rhs) const;
 
 private:
+    uint        m_iId;                      /**< Sample Id */
+    uint        m_iGroup;                   /**< Group the event belongs to */
     int         m_iSample;                  /**< Sample coorespodning to the instantaneous event */
-    int         m_iGroup;                   /**< Group the event belongs to */
-    int         m_iId;                      /**< Sample Id */
 
     static int eventIdCounter;
 };
