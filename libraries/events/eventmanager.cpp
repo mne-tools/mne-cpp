@@ -29,6 +29,7 @@ std::unique_ptr< std::vector<Event> > EventManager::getAllEvents() const
     {
         eventsList->emplace_back(e);
     }
+    eventsList->shrink_to_fit();
     return eventsList;
 }
 
