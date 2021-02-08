@@ -39,7 +39,7 @@ TEMPLATE = app
 
 VERSION = $${MNE_CPP_VERSION}
 
-CONFIG   += console
+CONFIG   += console network
 CONFIG   -= app_bundle
 
 contains(MNECPP_CONFIG, static) {
