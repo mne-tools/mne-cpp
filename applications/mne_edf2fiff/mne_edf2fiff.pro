@@ -37,9 +37,9 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = app
 
-VERSION = $${MNE_CPP_VERSION}
+#VERSION = $${MNE_CPP_VERSION}
 
-CONFIG   += console network
+CONFIG   += console network concurrent
 
 !contains(MNECPP_CONFIG, withAppBundles) {
     CONFIG -= app_bundle

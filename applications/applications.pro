@@ -55,7 +55,7 @@ SUBDIRS += \
             mne_dipole_fit \
             mne_scan \
             mne_analyze \
-            mne_edf2fiff
+            mne_edf2fiff \
     } else {
         message("applications.pro - The Qt Charts module is missing. Please install to build the complete set of MNE-CPP features.")
     }
@@ -63,7 +63,7 @@ SUBDIRS += \
 # Overwrite SUBDIRS if wasm flag was defined
 contains(MNECPP_CONFIG, wasm) {
     SUBDIRS = mne_analyze \
-              mne_anonymize
+              mne_anonymize \
 
     qtHaveModule(charts) {
         #SUBDIRS += # needs qt3D which is not yet wasm supported
