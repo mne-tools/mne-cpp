@@ -40,7 +40,10 @@ TEMPLATE = app
 VERSION = $${MNE_CPP_VERSION}
 
 CONFIG   += console network
-CONFIG   -= app_bundle
+
+!contains(MNECPP_CONFIG, withAppBundles) {
+    CONFIG -= app_bundle
+}
 
 contains(MNECPP_CONFIG, static) {
     CONFIG += static
@@ -48,7 +51,6 @@ contains(MNECPP_CONFIG, static) {
 }
 
 TARGET = mne_edf2fiff
-
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -83,27 +85,25 @@ DESTDIR =  $${MNE_BINARY_DIR}
 SOURCES +=  main.cpp \
             edf_info.cpp \
             edf_raw_data.cpp \
-            edf_ch_info.cpp
+            edf_ch_info.cpp \
 
 HEADERS +=  edf_info.h \
             edf_raw_data.h \
-            edf_ch_info.h
+            edf_ch_info.h \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
-#win32 {
-#    EXTRA_ARGS =
-#    DEPLOY_CMD = $$winDeployAppArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${LIBS},$${EXTRA_ARGS})
-#    QMAKE_POST_LINK += $${DEPLOY_CMD}
-#}
 unix:!macx {
-    # === Unix ===
     QMAKE_RPATHDIR += $ORIGIN/../lib
 }
 
+macx {
+    QMAKE_LFLAGS += -Wl,-rpath,@executable_path/../lib
+}
+
 # Activate FFTW backend in Eigen
-contains(MNECPP_CONFIG, useFFTW) {
+contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
     DEFINES += EIGEN_FFTW_DEFAULT
     INCLUDEPATH += $$shell_path($${FFTW_DIR_INCLUDE})
     LIBS += -L$$shell_path($${FFTW_DIR_LIBS})
