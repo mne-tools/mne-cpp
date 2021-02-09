@@ -61,10 +61,8 @@ using namespace EVENTSINTERNAL;
 // INIT STATIC MEMBERS
 //=============================================================================================================
 
-static const unsigned char defaultGroupColor[] = { 0xC0, 0xFF, 0xEE };
-static const unsigned char defaultGroupTransparency = 0xFF;
-
-unsigned int EventGroup::eventGroupIdCounter(0);
+constexpr static const unsigned char defaultGroupColor[] = { 0xC0, 0xFF, 0xEE };
+constexpr static const unsigned char defaultGroupTransparency = 0xFF;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -145,4 +143,11 @@ void EventGroup::setName(const std::string &sName)
 unsigned int EventGroup::getId() const
 {
     return m_Id;
+}
+
+//=============================================================================================================
+
+bool EventGroup::operator<(const EventGroup &groupRHS) const
+{
+    return m_Id < groupRHS.getId();
 }
