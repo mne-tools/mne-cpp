@@ -37,8 +37,6 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = app
 
-#VERSION = $${MNE_CPP_VERSION}
-
 CONFIG   += console network concurrent
 
 !contains(MNECPP_CONFIG, withAppBundles) {
@@ -50,7 +48,7 @@ contains(MNECPP_CONFIG, static) {
     DEFINES += STATICBUILD
 }
 
-TARGET = mne_edf2fiff
+#TARGET = mne_edf2fiff
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
