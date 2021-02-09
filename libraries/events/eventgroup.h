@@ -39,6 +39,8 @@
 #include "events_global.h"
 #include <string>
 
+using idNum = unsigned int;
+
 namespace EVENTSINTERNAL {
 class EventGroup;
 }
@@ -62,7 +64,7 @@ struct EVENTS_EXPORT Group
 {
     Group(int idRhs, const char* nameRhs, const RgbColor& cRhs );
     Group(const EVENTSINTERNAL::EventGroup& gRhs);
-    unsigned int    id;
+    idNum           id;
     std::string     name;
     RgbColor        color;
 };
@@ -96,14 +98,13 @@ public:
     //=========================================================================================================
     unsigned int getId() const;
 
+    bool operator<(const EventGroup& groupRHS) const;
+
 private:
-
-
     std::string         m_sName;
     EVENTSLIB::RgbColor m_Color;
-    unsigned int        m_Id;
-
-    static unsigned int eventGroupIdCounter;
+    idNum               m_Id;
+    std::string         m_description;
 };
 
 } //namespace

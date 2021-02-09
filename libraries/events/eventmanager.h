@@ -8,6 +8,7 @@
 
 #include <string>
 #include <set>
+#include <map>
 #include <unordered_map>
 #include <vector>
 #include <memory>
@@ -22,31 +23,38 @@ public:
     EventManager();
 
     //event getters
-    Event getEvent(uint eventId) const;
-    std::unique_ptr< std::vector<Event> > getEvents(const std::vector<uint> eventIds) const;
-    std::unique_ptr< std::vector<Event> > getAllEvents() const;
-    std::unique_ptr< std::vector<Event> > getEventsInSample(int sample) const;
-    std::unique_ptr< std::vector<Event> > getEventsBetween(int sampleStart, int sampleEnd) const;
-    std::unique_ptr< std::vector<Event> > getEventsInGroups(const std::vector<uint>& groupIds) const;
+    int getNumEvents() const;
+    Event getEvent(idNum eventId) const;
+    std::unique_ptr<std::vector<Event> > getEvents(const std::vector<idNum> eventIds) const noexcept;
+    std::unique_ptr<std::vector<Event> > getAllEvents() const noexcept;
+    std::unique_ptr<std::vector<Event> > getEventsInSample(int sample) const noexcept;
+    std::unique_ptr<std::vector<Event> > getEventsBetween(int sampleStart, int sampleEnd) const noexcept;
+    std::unique_ptr<std::vector<Event> > getEventsBetween(int sampleStart, int sampleEnd, const Group& group) const noexcept;
+    std::unique_ptr<std::vector<Event> > getEventsBetween(int sampleStart, int sampleEnd, const std::vector<Group>& group) const noexcept;
+    std::unique_ptr<std::vector<Event> > getEventsInGroup(const idNum groupId) const noexcept;
+    std::unique_ptr<std::vector<Event> > getEventsInGroup(const Group& group) const noexcept;
+
     //event setters
-    void addEvent(int sample);
-    void addEvents(const std::vector<int>& samples);
-    void deleteEvent(uint eventId);
-    void deleteEvents(const std::vector<uint>& eventIds);
+    Event addEvent(int sample, idNum groupId);
+    Event moveEvent(idNum eventId, int newSample);
+    void deleteEvent(idNum eventId);
+    void deleteEvents(const std::vector<idNum>& eventIds);
+    void deleteEventsInGroup(idNum groupId);
 
     //group getters
-    std::unique_ptr<std::vector<Group> > getAllGroups() const;
-    Group getGroup(const uint groupId) const;
-    std::unique_ptr<std::vector<Group> > getGroups(const std::vector<uint>& groupIds) const;
+    int getNumGroups() const;
+    std::unique_ptr<std::vector<Group> > getAllGroups() const noexcept;
+    Group getGroup(const idNum groupId) const;
+    std::unique_ptr<std::vector<Group> > getGroups(const std::vector<idNum>& groupIds) const noexcept;
 
     //group setters
-    void addGroup(const std::string& sGroupName);
-    void addGroup(const std::string& sGroupName, const RgbColor& color);
-    void deleteGroup(const uint groupId);
-    void renameGroup(const uint groupId, const std::string& newName);
-    void setGroupColor(const uint groupId, const RgbColor& color);
-    void mergeGroups(const std::vector<uint>& groupIds);
-    void duplicateGroup(const uint groupId, const std::string& newName);
+    Group addGroup(const std::string& sGroupName);
+    Group addGroup(const std::string& sGroupName, const RgbColor& color);
+    void deleteGroup(const idNum groupId);
+    Group renameGroup(const idNum groupId, const std::string& newName);
+    Group setGroupColor(const idNum groupId, const RgbColor& color);
+    Group mergeGroups(const std::vector<idNum>& groupIds, const std::string& newName, const RgbColor& color);
+    Group duplicateGroup(const idNum groupId, const std::string& newName);
 
     //shared memory api. it should be that simple
     void initSharedMemory() const;
@@ -55,9 +63,17 @@ public:
     bool isSharedMemoryInit() const;
 
 private:
-    std::set<EVENTSINTERNAL::Event>                         m_eventList;
-    std::unordered_map<int, EVENTSINTERNAL::EventGroup>     m_eventGroupList;
-    std::shared_ptr<EVENTSINTERNAL::EventSharedMemManager>  m_pSharedMemManager;
+    idNum generateNewEventId() const;
+    idNum generateNewGroupId() const;
+
+//    std::multiset<EVENTSINTERNAL::Event>::iterator findEventById() const;
+//    std::multiset<EVENTSINTERNAL::EventGroup>::iterator findGroupById() const;
+
+    std::multiset<EVENTSINTERNAL::Event>        m_EventList;
+    std::multiset<EVENTSINTERNAL::EventGroup>   m_pGroupList;
+    EVENTSINTERNAL::EventSharedMemManager       m_sharedMemManager;
+    static idNum                                eventIdCounter;
+    static idNum                                groupIdCounter;
 };
 
 }//namespace

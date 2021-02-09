@@ -22,8 +22,6 @@
 // INIT STATIC MEMBERS
 //=============================================================================================================
 
-int EVENTSINTERNAL::Event::eventIdCounter(0);
-
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -32,10 +30,10 @@ EVENTSLIB::Event::Event()
 :EVENTSLIB::Event(0,0,0)
 { }
 
-EVENTSLIB::Event::Event(const uint i,const  int s, const uint gid)
-: id(i)
-, groupId(gid)
-, sample(s)
+EVENTSLIB::Event::Event(const idNum idRHS,const  int sampleRHS, const idNum groupIdRHS)
+: id(idRHS)
+, groupId(groupIdRHS)
+, sample(sampleRHS)
 { }
 
 EVENTSLIB::Event::Event(const EVENTSINTERNAL::Event& e)
@@ -44,12 +42,13 @@ EVENTSLIB::Event::Event(const EVENTSINTERNAL::Event& e)
 
 //=============================================================================================================
 
-EVENTSINTERNAL::Event::Event(int iSample, const EventGroup& group)
-: m_iGroup(group.getId())
+EVENTSINTERNAL::Event::Event(idNum id, int iSample, idNum groupId)
+: m_iId(id)
+, m_iGroup(groupId)
 , m_iSample(iSample)
-{
-    m_iId = eventIdCounter++;
-}
+, m_description("")
+, m_aux(0)
+{ }
 
 //=============================================================================================================
 
@@ -68,21 +67,21 @@ void EVENTSINTERNAL::Event::setSample(int iSample)
 
 //=============================================================================================================
 
-uint EVENTSINTERNAL::Event::getGroup() const
+idNum EVENTSINTERNAL::Event::getGroup() const
 {
     return m_iGroup;
 }
 
 //=============================================================================================================
 
-void EVENTSINTERNAL::Event::setGroup(uint iGroup)
+void EVENTSINTERNAL::Event::setGroup(idNum iGroup)
 {
     m_iGroup = iGroup;
 }
 
 //=============================================================================================================
 
-uint EVENTSINTERNAL::Event::getId() const
+idNum EVENTSINTERNAL::Event::getId() const
 {
     return m_iId;
 }
