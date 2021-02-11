@@ -1,8 +1,8 @@
 ---
 title: FieldTrip Buffer
 parent: MNE Scan
-grand_parent: Development
-nav_order: 7
+grand_parent: Documentation
+nav_order: 11
 ---
 
 # FieldTrip Buffer

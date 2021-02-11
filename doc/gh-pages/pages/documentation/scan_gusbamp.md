@@ -1,8 +1,8 @@
 ---
 title: GUSBAmp
 parent: MNE Scan
-grand_parent: Development
-nav_order: 3
+grand_parent: Documentation
+nav_order: 7
 ---
 # GUSBAmp
 

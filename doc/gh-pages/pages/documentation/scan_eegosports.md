@@ -1,8 +1,8 @@
 ---
 title: EEGoSports
 parent: MNE Scan
-grand_parent: Development
-nav_order: 4
+grand_parent: Documentation
+nav_order: 8
 ---
 # EEGoSports
 
