@@ -1,8 +1,8 @@
 ---
 title: LSL
 parent: MNE Scan
-grand_parent: Develop
-nav_order: 8
+grand_parent: Documentation
+nav_order: 12
 ---
 # Lab Streaming Layer (LSL)
 

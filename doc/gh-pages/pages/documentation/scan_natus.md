@@ -1,8 +1,8 @@
 ---
 title: Natus
 parent: MNE Scan
-grand_parent: Development
-nav_order: 5
+grand_parent: Documentation
+nav_order: 9
 ---
 # Natus
 

@@ -1,8 +1,8 @@
 ---
 title: BrainAmp
 parent: MNE Scan
-grand_parent: Development
-nav_order: 2
+grand_parent: Documentation
+nav_order: 6
 ---
 # BrainAmp
 
