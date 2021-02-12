@@ -40,9 +40,10 @@
 #include <string>
 
 using idNum = unsigned int;
+using uchar = unsigned char;
 
 namespace EVENTSINTERNAL {
-class EventGroup;
+class EventGroupINT;
 }
 
 namespace EVENTSLIB {
@@ -60,33 +61,44 @@ struct EVENTS_EXPORT RgbColor
     uchar a;
 };
 
-struct EVENTS_EXPORT Group
+struct EVENTS_EXPORT EventGroup
 {
-    Group(int idRhs, const char* nameRhs, const RgbColor& cRhs );
-    Group(const EVENTSINTERNAL::EventGroup& gRhs);
+    EventGroup() = default;
+    EventGroup(const EVENTSLIB::EventGroup& g);
+    EventGroup(const EVENTSINTERNAL::EventGroupINT& g);
     idNum           id;
     std::string     name;
     RgbColor        color;
+    int             order;
 };
 
 }
 
 namespace EVENTSINTERNAL {
 
-class EventGroup
+class EventGroupINT
 {
 public:
-    //=========================================================================================================
-    EventGroup(const char* name);
 
     //=========================================================================================================
-    EventGroup(const char* name, const EVENTSLIB::RgbColor& color);
+    EventGroupINT(const char* name);
+
+    //=========================================================================================================
+    EventGroupINT(std::string&& name);
+
+    //=========================================================================================================
+    EventGroupINT(idNum id, const std::string& name);
+
+    //=========================================================================================================
+    EventGroupINT(idNum id, const std::string& name, const EVENTSLIB::RgbColor& color);
 
     //=========================================================================================================
     void setColor(const EVENTSLIB::RgbColor& color);
 
+    //=========================================================================================================
     void setRandomColor();
 
+    //=========================================================================================================
     EVENTSLIB::RgbColor getColor() const;
 
     //=========================================================================================================
@@ -96,15 +108,25 @@ public:
     void setName(const std::string& sName);
 
     //=========================================================================================================
-    unsigned int getId() const;
+    idNum getId() const;
 
-    bool operator<(const EventGroup& groupRHS) const;
+    //=========================================================================================================
+    std::string getDescription() const;
+
+    //=========================================================================================================
+    int getOrder() const;
+
+    //=========================================================================================================
+    void setOrder(int order);
+
+    bool operator<(const EventGroupINT& groupRHS) const;
 
 private:
     std::string         m_sName;
     EVENTSLIB::RgbColor m_Color;
     idNum               m_Id;
-    std::string         m_description;
+    std::string         m_sDescription;
+    int                 m_order;
 };
 
 } //namespace

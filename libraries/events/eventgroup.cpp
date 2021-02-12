@@ -68,15 +68,17 @@ constexpr static const unsigned char defaultGroupTransparency = 0xFF;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-
-
 EVENTSLIB::RgbColor::RgbColor()
 : RgbColor(defaultGroupColor[0], defaultGroupColor[1], defaultGroupColor[2])
 { };
 
+//=============================================================================================================
+
 EVENTSLIB::RgbColor::RgbColor(const uchar rRhs, const uchar gRhs, const uchar bRhs)
 : RgbColor(rRhs, gRhs, bRhs, defaultGroupTransparency)
 { };
+
+//=============================================================================================================
 
 EVENTSLIB::RgbColor::RgbColor(const uchar rRhs, const uchar gRhs,
                               const uchar bRhs, const uchar aRhs)
@@ -86,10 +88,42 @@ EVENTSLIB::RgbColor::RgbColor(const uchar rRhs, const uchar gRhs,
 , a(aRhs)
 { };
 
+//=============================================================================================================
 
-EventGroup::EventGroup(const char* name)
-: m_sName(name)
-, m_Id(eventGroupIdCounter++)
+EVENTSLIB::EventGroup::EventGroup(const EVENTSLIB::EventGroup& g)
+: id(g.id)
+, name(g.name)
+, color(g.color)
+, order(g.order)
+{
+
+}
+
+//=============================================================================================================
+
+EVENTSLIB::EventGroup::EventGroup(const EVENTSINTERNAL::EventGroupINT& g)
+: id(g.getId())
+, name(g.getName())
+, color(g.getColor())
+, order(g.getOrder())
+{
+
+}
+
+//=============================================================================================================
+
+EventGroupINT::EventGroupINT(const char* name)
+: EventGroupINT(std::string(name))
+{
+
+}
+
+//=============================================================================================================
+
+EventGroupINT::EventGroupINT(std::string&& name)
+: m_sName(std::move(name))
+, m_Id(0)
+, m_order(0)
 {
     std::srand(std::time(NULL));
 
@@ -98,10 +132,23 @@ EventGroup::EventGroup(const char* name)
 
 //=============================================================================================================
 
-EventGroup::EventGroup(const char* name,
+EventGroupINT::EventGroupINT(idNum id, const std::string& name)
+: m_sName(name)
+, m_Id(id)
+, m_order(0)
+{
+    std::srand(std::time(NULL));
+
+    setRandomColor();
+}
+
+//=============================================================================================================
+
+EventGroupINT::EventGroupINT(idNum id, const std::string& name,
                        const EVENTSLIB::RgbColor& color)
 : m_sName(name)
-, m_Id(eventGroupIdCounter++)
+, m_Id(id)
+, m_order(0)
 {
     std::srand(std::time(NULL));
 
@@ -110,14 +157,14 @@ EventGroup::EventGroup(const char* name,
 
 //=============================================================================================================
 
-void EventGroup::setColor(const EVENTSLIB::RgbColor& color)
+void EventGroupINT::setColor(const EVENTSLIB::RgbColor& color)
 {
     m_Color = color;
 }
 
 //=============================================================================================================
 
-void EventGroup::setRandomColor()
+void EventGroupINT::setRandomColor()
 {
     m_Color.r = rand() % 256;
     m_Color.g = rand() % 256;
@@ -126,28 +173,50 @@ void EventGroup::setRandomColor()
 
 //=============================================================================================================
 
-const std::string& EventGroup::getName() const
+const std::string& EventGroupINT::getName() const
 {
     return m_sName;
 }
 
 //=============================================================================================================
 
-void EventGroup::setName(const std::string &sName)
+void EventGroupINT::setName(const std::string &sName)
 {
     m_sName = sName;
 }
 
 //=============================================================================================================
 
-unsigned int EventGroup::getId() const
+idNum EventGroupINT::getId() const
 {
     return m_Id;
 }
 
 //=============================================================================================================
 
-bool EventGroup::operator<(const EventGroup &groupRHS) const
+std::string EventGroupINT::getDescription() const
+{
+    return m_sDescription;
+}
+
+//=============================================================================================================
+
+int EventGroupINT::getOrder() const
+{
+    return m_order;
+}
+
+//=============================================================================================================
+
+void EventGroupINT::setOrder(int order)
+{
+    m_order = order;
+}
+
+//=============================================================================================================
+
+bool EventGroupINT::operator<(const EventGroupINT &groupRHS) const
 {
     return m_Id < groupRHS.getId();
 }
+
