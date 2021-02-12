@@ -7,7 +7,6 @@
 #include "eventsharedmemmanager.h"
 
 #include <string>
-#include <set>
 #include <map>
 #include <unordered_map>
 #include <vector>
@@ -25,36 +24,40 @@ public:
     //event getters
     int getNumEvents() const;
     Event getEvent(idNum eventId) const;
-    std::unique_ptr<std::vector<Event> > getEvents(const std::vector<idNum> eventIds) const noexcept;
-    std::unique_ptr<std::vector<Event> > getAllEvents() const noexcept;
-    std::unique_ptr<std::vector<Event> > getEventsInSample(int sample) const noexcept;
-    std::unique_ptr<std::vector<Event> > getEventsBetween(int sampleStart, int sampleEnd) const noexcept;
-    std::unique_ptr<std::vector<Event> > getEventsBetween(int sampleStart, int sampleEnd, const Group& group) const noexcept;
-    std::unique_ptr<std::vector<Event> > getEventsBetween(int sampleStart, int sampleEnd, const std::vector<Group>& group) const noexcept;
-    std::unique_ptr<std::vector<Event> > getEventsInGroup(const idNum groupId) const noexcept;
-    std::unique_ptr<std::vector<Event> > getEventsInGroup(const Group& group) const noexcept;
+    std::unique_ptr<std::vector<Event> > getEvents(const std::vector<idNum> eventIds) const ;
+    std::unique_ptr<std::vector<Event> > getAllEvents() const ;
+    std::unique_ptr<std::vector<Event> > getEventsInSample(int sample) const ;
+    std::unique_ptr<std::vector<Event> > getEventsBetween(int sampleStart, int sampleEnd) const ;
+    std::unique_ptr<std::vector<Event> > getEventsBetween(int sampleStart, int sampleEnd, idNum groupid) const ;
+    std::unique_ptr<std::vector<Event> > getEventsBetween(int sampleStart, int sampleEnd, const std::vector<idNum>& groupIdsList) const ;
+    std::unique_ptr<std::vector<Event> > getEventsInGroup(const idNum groupId) const ;
 
     //event setters
     Event addEvent(int sample, idNum groupId);
     Event moveEvent(idNum eventId, int newSample);
-    void deleteEvent(idNum eventId);
+    void deleteEvent(idNum eventId) noexcept;
     void deleteEvents(const std::vector<idNum>& eventIds);
     void deleteEventsInGroup(idNum groupId);
 
     //group getters
     int getNumGroups() const;
-    std::unique_ptr<std::vector<Group> > getAllGroups() const noexcept;
-    Group getGroup(const idNum groupId) const;
-    std::unique_ptr<std::vector<Group> > getGroups(const std::vector<idNum>& groupIds) const noexcept;
+    EventGroup getGroup(idNum groupId) const;
+    std::unique_ptr<std::vector<EventGroup> > getAllGroups() const ;
+    std::unique_ptr<std::vector<EventGroup> > getGroups(const std::vector<idNum>& groupIds) const ;
 
     //group setters
-    Group addGroup(const std::string& sGroupName);
-    Group addGroup(const std::string& sGroupName, const RgbColor& color);
+    EventGroup addGroup(const std::string& sGroupName);
+    EventGroup addGroup(const std::string& sGroupName, const RgbColor& color);
     void deleteGroup(const idNum groupId);
-    Group renameGroup(const idNum groupId, const std::string& newName);
-    Group setGroupColor(const idNum groupId, const RgbColor& color);
-    Group mergeGroups(const std::vector<idNum>& groupIds, const std::string& newName, const RgbColor& color);
-    Group duplicateGroup(const idNum groupId, const std::string& newName);
+    void deleteGroups(const std::vector<idNum>& groupIds);
+
+    EventGroup renameGroup(const idNum groupId, const std::string& newName);
+    EventGroup setGroupColor(const idNum groupId, const RgbColor& color);
+    EventGroup mergeGroups(const std::vector<idNum>& groupIds, const std::string& newName);
+    EventGroup duplicateGroup(const idNum groupId, const std::string& newName);
+
+    void addEventToGroup(const idNum eventId, const idNum groupId);
+    void addEventsToGroup(const std::vector<idNum>& eventIds, const idNum groupId);
 
     //shared memory api. it should be that simple
     void initSharedMemory() const;
@@ -66,14 +69,34 @@ private:
     idNum generateNewEventId() const;
     idNum generateNewGroupId() const;
 
-//    std::multiset<EVENTSINTERNAL::Event>::iterator findEventById() const;
-//    std::multiset<EVENTSINTERNAL::EventGroup>::iterator findGroupById() const;
+    void insertEvent(const EVENTSINTERNAL::EventINT& e);
+    auto findEventINT(idNum id) const;
 
-    std::multiset<EVENTSINTERNAL::Event>        m_EventList;
-    std::multiset<EVENTSINTERNAL::EventGroup>   m_pGroupList;
-    EVENTSINTERNAL::EventSharedMemManager       m_sharedMemManager;
-    static idNum                                eventIdCounter;
-    static idNum                                groupIdCounter;
+    std::multimap<int, EVENTSINTERNAL::EventINT>    m_EventsListBySample;
+    std::unordered_map<idNum, int>                  m_MapIdToSample;
+    std::map<idNum, EVENTSINTERNAL::EventGroupINT>  m_GroupsList;
+
+    EVENTSINTERNAL::EventSharedMemManager           m_sharedMemManager;
+
+    static idNum                                    eventIdCounter;
+    static idNum                                    groupIdCounter;
+};
+
+template<typename T>
+inline std::unique_ptr<std::vector<T> > allocateOutputContainer() noexcept
+{
+    return std::make_unique<std::vector<T> >();
+};
+
+template<typename T>
+inline std::unique_ptr<std::vector<T> > allocateOutputContainer(int size) noexcept
+{
+    auto v = std::make_unique<std::vector<T> >();
+    if(size > 0)
+    {
+        v->reserve(size);
+    }
+    return v;
 };
 
 }//namespace

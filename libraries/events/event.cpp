@@ -30,70 +30,110 @@ EVENTSLIB::Event::Event()
 :EVENTSLIB::Event(0,0,0)
 { }
 
+//=============================================================================================================
+
 EVENTSLIB::Event::Event(const idNum idRHS,const  int sampleRHS, const idNum groupIdRHS)
 : id(idRHS)
 , groupId(groupIdRHS)
 , sample(sampleRHS)
 { }
 
-EVENTSLIB::Event::Event(const EVENTSINTERNAL::Event& e)
-: Event(e.getId(), e.getSample(), e.getGroup())
+//=============================================================================================================
+
+EVENTSLIB::Event::Event(const EVENTSINTERNAL::EventINT& e)
+: Event(e.getId(), e.getSample(), e.getGroupId())
 { }
 
 //=============================================================================================================
 
-EVENTSINTERNAL::Event::Event(idNum id, int iSample, idNum groupId)
+EVENTSINTERNAL::EventINT::EventINT(idNum id)
+: EventINT(id, 0, 0)
+{ }
+
+//=============================================================================================================
+
+EVENTSINTERNAL::EventINT::EventINT(idNum id, int iSample, idNum groupId)
 : m_iId(id)
-, m_iGroup(groupId)
 , m_iSample(iSample)
-, m_description("")
-, m_aux(0)
+, m_iGroup(groupId)
+, m_sDescription("")
 { }
 
 //=============================================================================================================
 
-int EVENTSINTERNAL::Event::getSample() const
+EVENTSINTERNAL::EventINT::EventINT(const EventINT& rhs)
+: m_iId(rhs.getId())
+, m_iSample(rhs.getSample())
+, m_iGroup(rhs.getGroupId())
+, m_sDescription(getDescription())
+{ }
+
+//=============================================================================================================
+
+EVENTSINTERNAL::EventINT::EventINT(EventINT&& other)
+: m_iId(other.getId())
+, m_iSample(other.getSample())
+, m_iGroup(other.getGroupId())
+, m_sDescription(getDescription())
+{ }
+
+//=============================================================================================================
+
+int EVENTSINTERNAL::EventINT::getSample() const
 {
     return m_iSample;
 }
 
 //=============================================================================================================
 
-void EVENTSINTERNAL::Event::setSample(int iSample)
+void EVENTSINTERNAL::EventINT::setSample(int iSample)
 {
     m_iSample = iSample;
 }
 
-
 //=============================================================================================================
 
-idNum EVENTSINTERNAL::Event::getGroup() const
+idNum EVENTSINTERNAL::EventINT::getGroupId() const
 {
     return m_iGroup;
 }
 
 //=============================================================================================================
 
-void EVENTSINTERNAL::Event::setGroup(idNum iGroup)
+void EVENTSINTERNAL::EventINT::setGroupId(idNum iGroup)
 {
     m_iGroup = iGroup;
 }
 
 //=============================================================================================================
 
-idNum EVENTSINTERNAL::Event::getId() const
+idNum EVENTSINTERNAL::EventINT::getId() const
 {
     return m_iId;
 }
 
 //=============================================================================================================
-bool EVENTSINTERNAL::Event::operator<(const Event& rhs) const
+
+std::string EVENTSINTERNAL::EventINT::getDescription() const
 {
-    bool isLessThan;
-    if (m_iSample == rhs.getSample()){
-        isLessThan = m_iId < rhs.getId();
-    } else {
-        isLessThan = m_iSample < rhs.getSample();
-    }
-    return isLessThan;
+    return m_sDescription;
+}
+
+//=============================================================================================================
+
+bool EVENTSINTERNAL::EventINT::operator<(const EventINT& rhs) const
+{
+    return m_iSample < rhs.getSample();
+}
+
+//=============================================================================================================
+
+bool EVENTSINTERNAL::EventINT::operator==(const EventINT& rhs) const
+{
+    return (m_iId == rhs.getId());
+}
+
+EVENTSINTERNAL::EventINT EVENTSINTERNAL::EventINT::operator=(const EventINT& rhs)
+{
+    return EVENTSINTERNAL::EventINT(rhs);
 }
