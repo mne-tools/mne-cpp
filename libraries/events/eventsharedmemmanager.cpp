@@ -1,4 +1,5 @@
 #include "eventsharedmemmanager.h"
+#include "eventmanager.h"
 
 #include <QString>
 #include <utility>
@@ -21,7 +22,7 @@ EventSharedMemManager::EventSharedMemManager(EVENTSLIB::EventManager* parent)
 , m_SharedMemory(QString::fromStdString(defaultSharedMemoryKey))
 , m_bIsInit(false)
 , m_sGroupName(defaultGroupName)
-, m_bGroupNotCreated(true)
+, m_bGroupCreated(false)
 , m_GroupId(0)
 , m_iLastUpdateIndex(0)
 , m_Buffer(nullptr)
@@ -92,18 +93,18 @@ bool EventSharedMemManager::isInit() const
     return m_bIsInit;
 }
 
-void EventSharedMemManager::addEvent(int sample)
+void EventSharedMemManager::addEvent(int sample, idNum id)
 {
     if(m_bIsInit)
     {
-        std::unique_ptr<EventUpdate> newUpdate(std::make_unique<NewEventUpdate>(sample, m_Id));
+        std::unique_ptr<EventUpdate> newUpdate(std::make_unique<NewEventUpdate>(sample, id, m_Id));
         storeUpdateEventInBuffer(std::move(newUpdate));
     }
 }
 
-void EventSharedMemManager::deleteEvent(int sample)
+void EventSharedMemManager::deleteEvent(int sample, idNum id)
 {
-    std::unique_ptr<EventUpdate> newUpdate(std::make_unique<DeleteEventUpdate>(sample, m_Id));
+    std::unique_ptr<EventUpdate> newUpdate(std::make_unique<DeleteEventUpdate>(sample, id, m_Id));
     storeUpdateEventInBuffer(std::move(newUpdate));
 }
 
@@ -129,7 +130,7 @@ void EventSharedMemManager::bufferWatcher()
             if(data[i].get()->creationTime() > m_lastCheckTime &&
                data[i].get()->getCreatorId() != m_Id)
             {
-                if(m_bGroupNotCreated)
+                if(m_bGroupCreated)
                 {
                     createEventGroup();
                 }
@@ -145,13 +146,12 @@ void EventSharedMemManager::bufferWatcher()
 
 void EventSharedMemManager::processEvent(NewEventUpdate* ne)
 {
-
-
+    m_parent->addEvent(ne->getSample(), m_GroupId);
 }
 
 void EventSharedMemManager::processEvent(DeleteEventUpdate* de)
 {
-
+    m_parent->deleteEvent(de->getId());
 }
 
 long long EventSharedMemManager::getTimeNow()
@@ -163,5 +163,7 @@ long long EventSharedMemManager::getTimeNow()
 
 void EventSharedMemManager::createEventGroup()
 {
-    m_GroupId = m_parent->
+    EVENTSLIB::EventGroup g = m_parent->addGroup(m_sGroupName);
+    m_GroupId = g.id;
+    m_bGroupCreated = true;
 }

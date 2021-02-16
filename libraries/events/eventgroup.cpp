@@ -164,6 +164,13 @@ void EventGroupINT::setColor(const EVENTSLIB::RgbColor& color)
 
 //=============================================================================================================
 
+EVENTSLIB::RgbColor EventGroupINT::getColor() const
+{
+    return m_Color;
+}
+
+//=============================================================================================================
+
 void EventGroupINT::setRandomColor()
 {
     m_Color.r = rand() % 256;

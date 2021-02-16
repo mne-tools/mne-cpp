@@ -70,7 +70,7 @@ public:
     EventINT(const EventINT& rhs);
     EventINT(EventINT&& other);
 
-    static EventINT fromSample(int iSample);
+    static inline EventINT fromSample(int iSample);
 
     //=========================================================================================================
     /**
@@ -161,7 +161,7 @@ private:
  * @param sample
  * @return
  */
-EventINT EventINT::fromSample(int sample)
+inline EventINT EventINT::fromSample(int sample)
 {
     return EventINT(0, sample, 0);
 }
