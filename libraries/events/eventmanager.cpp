@@ -2,6 +2,7 @@
 
 using namespace EVENTSLIB;
 
+constexpr static int invalidID(0);
 idNum EventManager::m_iEventIdCounter(0);
 idNum EventManager::m_iGroupIdCounter(0);
 
@@ -15,20 +16,19 @@ EventManager::EventManager()
 
 //=============================================================================================================
 
-std::optional<Event> EventManager::getEvent(idNum eventId) const
+Event EventManager::getEvent(idNum eventId) const
 {
     auto eventInt = findEventINT(eventId);
-    if(eventInt.has_value())
+    if(eventInt != m_EventsListBySample.end())
     {
-        return Event(eventInt.value()->second);
+        return Event(eventInt->second);
     }
     return {};
 }
 
 //=============================================================================================================
 
-std::optional<std::multimap<const int, EVENTSINTERNAL::EventINT>::const_iterator>
-EventManager::findEventINT(idNum eventId) const
+std::multimap<const int, EVENTSINTERNAL::EventINT>::const_iterator EventManager::findEventINT(idNum eventId) const
 {
     int sample = m_MapIdToSample.at(eventId);
     auto eventsRange = m_EventsListBySample.equal_range(sample);
@@ -39,7 +39,7 @@ EventManager::findEventINT(idNum eventId) const
             return e;
         }
     }
-    return {};
+    return m_EventsListBySample.end();
 }
 
 //=============================================================================================================
@@ -51,9 +51,9 @@ EventManager::getEvents(const std::vector<idNum> eventIds) const
     for (const auto& id: eventIds)
     {
         auto event = getEvent(id);
-        if(event.has_value())
+        if(event.id != invalidID)
         {
-            pEventsList->push_back(event.value());
+            pEventsList->push_back(event);
         }
     }
     return pEventsList;
@@ -75,7 +75,7 @@ std::unique_ptr<std::vector<Event> > EventManager::getAllEvents() const
 
 std::unique_ptr<std::vector<Event> > EventManager::getEventsInSample(int sample) const
 {
-    int numEventsInSample = m_EventsListBySample.count(sample);
+    size_t numEventsInSample = m_EventsListBySample.count(sample);
     auto pEventsList(allocateOutputContainer<Event>(numEventsInSample));
 
     auto eventsRange = m_EventsListBySample.equal_range(sample);
@@ -209,9 +209,9 @@ bool EventManager::moveEvent(idNum eventId, int newSample)
 {
     bool status(false);
     auto event = findEventINT(eventId);
-    if(event.has_value())
+    if(event != m_EventsListBySample.end())
     {
-        EVENTSINTERNAL::EventINT newEvent(event.value()->second);
+        EVENTSINTERNAL::EventINT newEvent(event->second);
         newEvent.setSample(newSample);
         deleteEvent(eventId);
         insertEvent(newEvent);
@@ -226,16 +226,16 @@ bool EventManager::deleteEvent(idNum eventId) noexcept
 {
     bool status(false);
     auto event = findEventINT(eventId);
-    if(event.has_value())
+    if(event != m_EventsListBySample.end())
     {
-        m_EventsListBySample.erase(event.value());
+        m_EventsListBySample.erase(event);
         m_MapIdToSample.erase(eventId);
 
         if(m_pSharedMemManager->isInit())
         {
             m_pSharedMemManager->deleteEvent(
-                        event.value()->second.getSample() ,
-                        event.value()->second.getId());
+                        event->second.getSample() ,
+                        event->second.getId());
         }
 
         status = true;
@@ -293,12 +293,12 @@ void EventManager::insertEvent(const EVENTSINTERNAL::EventINT& e)
 
 int EventManager::getNumGroups() const
 {
-    return m_GroupsList.size();
+    return (int)(m_GroupsList.size());
 }
 
 //=============================================================================================================
 
-std::optional<EventGroup> EventManager::getGroup(const idNum groupId) const
+EventGroup EventManager::getGroup(const idNum groupId) const
 {
     auto groupFound = m_GroupsList.find(groupId);
     if(groupFound != m_GroupsList.end())
@@ -332,9 +332,9 @@ EventManager::getGroups(const std::vector<idNum>& groupIds) const
     for(const auto& id: groupIds)
     {
         auto group = getGroup(id);
-        if (group.has_value())
+        if (group.id != invalidID)
         {
-            pGroupList->push_back(group.value());
+            pGroupList->push_back(group);
         }
     }
     return pGroupList;
@@ -450,9 +450,9 @@ bool EventManager::addEventToGroup(const idNum eventId, const idNum groupId)
 {
     bool state(false);
     int sample(0);
-    sample = m_MapIdToSample.at(eventId); //if not found throws but not sure excp are used.
-    if(sample != 0)
+    if(m_MapIdToSample.count(eventId))
     {
+        sample = m_MapIdToSample.at(eventId);
         auto eventsRange = m_EventsListBySample.equal_range(sample);
         std::multimap<int, EVENTSINTERNAL::EventINT>::iterator e = eventsRange.first;
         for(; e != eventsRange.second; ++e)
