@@ -34,8 +34,8 @@ public:
     void stop();
     bool isInit() const;
 
-    void addEvent(int sample);
-    void deleteEvent(int sample);
+    void addEvent(int sample, idNum);
+    void deleteEvent(int sample, idNum id);
 
     static long long getTimeNow();
 
@@ -53,7 +53,7 @@ private:
     QSharedMemory                   m_SharedMemory;
     bool                            m_bIsInit;
     std::string                     m_sGroupName;
-    bool                            m_bGroupNotCreated;
+    bool                            m_bGroupCreated;
     idNum                           m_GroupId;
     int                             m_iLastUpdateIndex;
     float                           m_fTimerCheckBuffer;
@@ -66,13 +66,15 @@ private:
 class EventUpdate
 {
 public:
-    EventUpdate(int sample, int creator)
-        : mSample(sample)
+    EventUpdate(int sample, idNum id, int creator)
+        : mEventSample(sample)
+        , mEventId(id)
         , mCreatorId(creator)
     {
         mCreationTime = EventSharedMemManager::getTimeNow();
-    };
-    virtual ~EventUpdate();
+    }
+
+    virtual ~EventUpdate() = default;
 
     virtual void processUpdate(EventSharedMemManager* e) = 0;
 
@@ -81,20 +83,32 @@ public:
         return mCreationTime;
     }
 
+    int getSample() const
+    {
+        return mEventSample;
+    }
+
+    idNum getId() const
+    {
+        return mEventId;
+    }
+
     int getCreatorId() const
     {
         return mCreatorId;
     }
 protected:
-    int             mSample;
+    int             mEventSample;
+    idNum           mEventId;
     int             mCreatorId;
     long long       mCreationTime;
 };
 
 class NewEventUpdate : public EventUpdate
 {
-    NewEventUpdate(int sample, int creator)
-        : EventUpdate(sample, creator)
+public:
+    NewEventUpdate(int sample, idNum id, int creator)
+        : EventUpdate(sample, id, creator)
     {
 
     }
@@ -107,8 +121,9 @@ class NewEventUpdate : public EventUpdate
 
 class DeleteEventUpdate : public EventUpdate
 {
-    DeleteEventUpdate(int sample, int creator)
-        : EventUpdate(sample, creator)
+public:
+    DeleteEventUpdate(int sample, idNum id, int creator)
+        : EventUpdate(sample, id, creator)
     {
 
     }
