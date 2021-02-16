@@ -7,7 +7,6 @@
 #include "eventsharedmemmanager.h"
 
 #include <string>
-#include <optional>
 #include <map>
 #include <unordered_map>
 #include <vector>
@@ -27,7 +26,7 @@ public:
 
     //event getters
     size_t getNumEvents() const;
-    std::optional<Event> getEvent(idNum eventId) const;
+    Event getEvent(idNum eventId) const;
     std::unique_ptr<std::vector<Event> > getEvents(const std::vector<idNum> eventIds) const ;
     std::unique_ptr<std::vector<Event> > getAllEvents() const ;
     std::unique_ptr<std::vector<Event> > getEventsInSample(int sample) const ;
@@ -46,7 +45,7 @@ public:
 
     //group getters
     int getNumGroups() const;
-    std::optional<EventGroup> getGroup(idNum groupId) const;
+    EventGroup getGroup(idNum groupId) const;
     std::unique_ptr<std::vector<EventGroup> > getAllGroups() const ;
     std::unique_ptr<std::vector<EventGroup> > getGroups(const std::vector<idNum>& groupIds) const ;
 
@@ -75,8 +74,7 @@ private:
     idNum generateNewGroupId() const;
 
     void insertEvent(const EVENTSINTERNAL::EventINT& e);
-    std::optional<std::multimap<const int, EVENTSINTERNAL::EventINT>::const_iterator>
-    findEventINT(idNum id) const;
+    std::multimap<const int, EVENTSINTERNAL::EventINT>::const_iterator findEventINT(idNum id) const;
 
     std::multimap<int, EVENTSINTERNAL::EventINT>    m_EventsListBySample;
     std::unordered_map<idNum, int>                  m_MapIdToSample;
