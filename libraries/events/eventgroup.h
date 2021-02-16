@@ -38,6 +38,7 @@
 
 #include "events_global.h"
 #include <string>
+#include <cstdint>
 
 using idNum = unsigned int;
 using uchar = unsigned char;

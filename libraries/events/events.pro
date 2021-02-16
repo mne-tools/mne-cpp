@@ -33,12 +33,14 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES += \
+    bufferwatcher.cpp \
     event.cpp \
     eventgroup.cpp \
     eventmanager.cpp \
     eventsharedmemmanager.cpp
 
 HEADERS += \
+    bufferwatcher.h \
     event.h \
     eventgroup.h \
     events_global.h \

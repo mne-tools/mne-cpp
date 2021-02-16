@@ -52,6 +52,8 @@ class EventGroupINT;
 // Yes not a big limitation... if we keep using 1kHz...
 // If we were to go for long longs for sample... with that same 1kHz, we could go
 // recording, single file... for about 300 million years. That's that...
+// at some point we can substitute int and idNum with std::int64_t. That will take that limitation away.
+// I don't see how I should ever think of this again.
 
 class EventINT
 {

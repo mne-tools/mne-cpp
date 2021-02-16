@@ -2,14 +2,13 @@
 
 using namespace EVENTSLIB;
 
-idNum EventManager::eventIdCounter(0);
-idNum EventManager::groupIdCounter(0);
+idNum EventManager::m_iEventIdCounter(0);
+idNum EventManager::m_iGroupIdCounter(0);
 
 //=============================================================================================================
 
 EventManager::EventManager()
-: m_sharedMemManager(this)
-, useSharedMemory(false)
+    : m_pSharedMemManager(std::make_unique<EVENTSINTERNAL::EventSharedMemManager>(this))
 {
 
 }
@@ -172,19 +171,19 @@ EventManager::getEventsInGroup(const idNum groupId) const
 
 idNum EventManager::generateNewEventId() const
 {
-    return ++eventIdCounter;
+    return ++m_iEventIdCounter;
 }
 
 //=============================================================================================================
 
 idNum EventManager::generateNewGroupId() const
 {
-    return ++groupIdCounter;
+    return ++m_iGroupIdCounter;
 }
 
 //=============================================================================================================
 
-int EventManager::getNumEvents() const
+size_t EventManager::getNumEvents() const
 {
     return m_EventsListBySample.size();
 }
@@ -196,10 +195,9 @@ Event EventManager::addEvent(int sample, idNum groupId)
     EVENTSINTERNAL::EventINT newEvent(generateNewEventId(), sample, groupId);
     insertEvent(newEvent);
 
-    if(useSharedMemory)
+    if(m_pSharedMemManager->isInit())
     {
-//        add new update to the buffer
-//        update buffer
+        m_pSharedMemManager->addEvent(sample);
     }
 
     return Event(newEvent);
@@ -232,6 +230,12 @@ bool EventManager::deleteEvent(idNum eventId) noexcept
     {
         m_EventsListBySample.erase(event.value());
         m_MapIdToSample.erase(eventId);
+
+        if(m_pSharedMemManager->isInit())
+        {
+            m_pSharedMemManager->deleteEvent(event.value()->second.getSample());
+        }
+
         status = true;
     }
     return status;
@@ -478,30 +482,26 @@ bool EventManager::addEventsToGroup(const std::vector<idNum>& eventIds, const id
 
 void EventManager::initSharedMemory()
 {
-    m_sharedMemManager.init(SharedMemoryMode::READ);
-    useSharedMemory = m_sharedMemManager.isInit();
+    initSharedMemory(SharedMemoryMode::READ);
 }
 
 //=============================================================================================================
 
 void EventManager::initSharedMemory(SharedMemoryMode mode)
 {
-    m_sharedMemManager.init(mode);
-    useSharedMemory = m_sharedMemManager.isInit();
+    m_pSharedMemManager->init(mode);
 }
 
 //=============================================================================================================
 
 void EventManager::stopSharedMemory()
 {
-    m_sharedMemManager.stop();
-    useSharedMemory = false;
+    m_pSharedMemManager->stop();
 }
 
 //=============================================================================================================
 
 bool EventManager::isSharedMemoryInit()
 {
-    useSharedMemory = m_sharedMemManager.isInit();
-    return useSharedMemory;
+    return m_pSharedMemManager->isInit();
 }
