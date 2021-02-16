@@ -4,7 +4,7 @@
 #include "events_global.h"
 #include "event.h"
 #include "eventgroup.h"
-#include "eventsharedmemmanager.h"
+//#include "eventsharedmemmanager.h"
 
 #include <string>
 #include <optional>
@@ -12,6 +12,11 @@
 #include <unordered_map>
 #include <vector>
 #include <memory>
+
+
+namespace EVENTSINTERNAL {
+    class EventSharedMemManager;
+}
 
 namespace EVENTSLIB {
 
@@ -21,7 +26,7 @@ public:
     EventManager();
 
     //event getters
-    int getNumEvents() const;
+    size_t getNumEvents() const;
     std::optional<Event> getEvent(idNum eventId) const;
     std::unique_ptr<std::vector<Event> > getEvents(const std::vector<idNum> eventIds) const ;
     std::unique_ptr<std::vector<Event> > getAllEvents() const ;
@@ -57,7 +62,7 @@ public:
     EventGroup duplicateGroup(const idNum groupId, const std::string& newName);
 
     bool addEventToGroup(const idNum eventId, const idNum groupId);
-    void addEventsToGroup(const std::vector<idNum>& eventIds, const idNum groupId);
+    bool addEventsToGroup(const std::vector<idNum>& eventIds, const idNum groupId);
 
     //shared memory api. it should be that simple
     void initSharedMemory();
@@ -77,11 +82,10 @@ private:
     std::unordered_map<idNum, int>                  m_MapIdToSample;
     std::map<idNum, EVENTSINTERNAL::EventGroupINT>  m_GroupsList;
 
-    EVENTSINTERNAL::EventSharedMemManager           m_sharedMemManager;
-    bool                                            useSharedMemory;
+    std::unique_ptr<EVENTSINTERNAL::EventSharedMemManager>  m_pSharedMemManager;
 
-    static idNum                                    eventIdCounter;
-    static idNum                                    groupIdCounter;
+    static idNum                                    m_iEventIdCounter;
+    static idNum                                    m_iGroupIdCounter;
 };
 
 template<typename T>
@@ -91,7 +95,7 @@ inline std::unique_ptr<std::vector<T> > allocateOutputContainer() noexcept
 };
 
 template<typename T>
-inline std::unique_ptr<std::vector<T> > allocateOutputContainer(int size) noexcept
+inline std::unique_ptr<std::vector<T> > allocateOutputContainer(size_t size) noexcept
 {
     auto v = std::make_unique<std::vector<T> >();
     if(size > 0)
