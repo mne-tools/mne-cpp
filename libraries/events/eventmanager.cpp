@@ -197,7 +197,7 @@ Event EventManager::addEvent(int sample, idNum groupId)
 
     if(m_pSharedMemManager->isInit())
     {
-        m_pSharedMemManager->addEvent(sample);
+        m_pSharedMemManager->addEvent(newEvent.getSample(), newEvent.getId());
     }
 
     return Event(newEvent);
@@ -233,7 +233,9 @@ bool EventManager::deleteEvent(idNum eventId) noexcept
 
         if(m_pSharedMemManager->isInit())
         {
-            m_pSharedMemManager->deleteEvent(event.value()->second.getSample());
+            m_pSharedMemManager->deleteEvent(
+                        event.value()->second.getSample() ,
+                        event.value()->second.getId());
         }
 
         status = true;

@@ -4,7 +4,7 @@
 #include "events_global.h"
 #include "event.h"
 #include "eventgroup.h"
-//#include "eventsharedmemmanager.h"
+#include "eventsharedmemmanager.h"
 
 #include <string>
 #include <optional>
