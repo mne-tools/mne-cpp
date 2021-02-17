@@ -184,6 +184,8 @@ signals:
      */
     void loadingEnd(QString sMessage = "Loading Events...");
 
+    void addEvent(int iSample);
+
 protected slots:
 
     //=========================================================================================================
@@ -290,7 +292,7 @@ private:
     /**
      * Links delegate, model and view.
      */
-    void initMSVCSettings();
+    void initMVCSettings();
 
     //=========================================================================================================
     /**

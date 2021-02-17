@@ -255,19 +255,12 @@ QVariant AnnotationModel::data(const QModelIndex &index,
         //******** first column (sample index) ********
         if(index.column()==0) {
             switch(role) {
-                case Qt::DisplayRole:
-                    return QVariant(m_dataSamplesFiltered.at(index.row())-m_iFirstSample);
-
-            case Qt::BackgroundRole:
-                //Paint different background if event was set by user
-//                if(m_dataIsUserEventFiltered.at(index.row()) == 1) {
-//                    QBrush brush;
-//                    brush.setStyle(Qt::SolidPattern);
-//                    QColor colorTemp(Qt::red);
-//                    colorTemp.setAlpha(15);
-//                    brush.setColor(colorTemp);
-//                    return QVariant(brush);
-//                }
+            case Qt::DisplayRole:{
+                auto pEvents = m_EventManager.getAllEvents();
+                return QVariant((*pEvents)[index.row()].sample - m_iFirstSample);
+//                    return QVariant(m_dataSamplesFiltered.at(index.row())-m_iFirstSample);
+            }
+            case Qt::BackgroundRole:{
                 QBrush brush;
                 brush.setStyle(Qt::SolidPattern);
                 brush.setColor(Qt::white);
@@ -277,27 +270,21 @@ QVariant AnnotationModel::data(const QModelIndex &index,
                 brush.setColor(colorTemp);
                 return QVariant(brush);
             }
+            }
         }
 
         //******** second column (event time plot) ********
         if(index.column()==1){
             switch(role) {
-                case Qt::DisplayRole: {
-                    int time = ((m_dataSamplesFiltered.at(index.row()) - m_iFirstSample) / m_fFreq) * 1000;
-
-                    return QVariant((double)time / 1000);
-                }
-
+            case Qt::DisplayRole: {
+                auto pEvents = m_EventManager.getAllEvents();
+                int iSample = (*pEvents)[index.row()].sample - m_iFirstSample;
+                float fTime = static_cast<float>(iSample) / m_fFreq;
+                return QVariant(fTime);
+//                    int time = ((m_dataSamplesFiltered.at(index.row()) - m_iFirstSample) / m_fFreq) * 1000;
+//                    return QVariant((double)time / 1000);
+            }
             case Qt::BackgroundRole:
-                //Paint different background if event was set by user
-//                if(m_dataIsUserEventFiltered.at(index.row()) == 1) {
-//                    QBrush brush;
-//                    brush.setStyle(Qt::SolidPattern);
-//                    QColor colorTemp(Qt::red);
-//                    colorTemp.setAlpha(15);
-//                    brush.setColor(colorTemp);
-//                    return QVariant(brush);
-//                }
                 QBrush brush;
                 brush.setStyle(Qt::SolidPattern);
                 brush.setColor(Qt::white);
@@ -313,7 +300,7 @@ QVariant AnnotationModel::data(const QModelIndex &index,
         if(index.column()==2) {
             switch(role) {
                 case Qt::DisplayRole:
-                    return QVariant(m_dataTypesFiltered.at(index.row()));
+                    return QVariant(0); //hardcoded for testing, CHANGE ASAP
 
                 case Qt::BackgroundRole: {
                     QBrush brush;
@@ -1047,3 +1034,18 @@ void AnnotationModel::applyOffset(int iFirstSampleOffset)
     //Update data to be diplayed
     setEventFilterType(m_sFilterEventType);
 }
+
+//=============================================================================================================
+
+void AnnotationModel::onAddEvent(int iSample)
+{
+    m_EventManager.addEvent(iSample);
+}
+
+//=============================================================================================================
+
+void AnnotationModel::onAddGroup(int iGroup)
+{
+
+}
+

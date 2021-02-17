@@ -108,12 +108,15 @@ void AnnotationSettingsView::reset()
 
 //=============================================================================================================
 
-void AnnotationSettingsView::initMSVCSettings()
+void AnnotationSettingsView::initMVCSettings()
 {
     //Model
     m_pUi->m_tableView_eventTableView->setModel(m_pAnnModel.data());
     connect(m_pAnnModel.data(),&ANSHAREDLIB::AnnotationModel::dataChanged,
             this, &AnnotationSettingsView::onDataChanged, Qt::UniqueConnection);
+
+    connect(this, &AnnotationSettingsView::addEvent,
+            m_pAnnModel.data(), &ANSHAREDLIB::AnnotationModel::onAddEvent, Qt::UniqueConnection);
 
     //Delegate
     m_pAnnDelegate = QSharedPointer<AnnotationDelegate>(new AnnotationDelegate(this));
@@ -219,6 +222,9 @@ void AnnotationSettingsView::addAnnotationToModel(int iSamplePos)
     m_pAnnModel->setSamplePos(iSamplePos);
 
     m_pAnnModel->insertRow(0, QModelIndex());
+
+    emit addEvent(iSamplePos);
+
     emit triggerRedraw();
 }
 
@@ -228,7 +234,7 @@ void AnnotationSettingsView::setModel(QSharedPointer<ANSHAREDLIB::AnnotationMode
 {
     m_pAnnModel = pAnnModel;
 
-    initMSVCSettings();
+    initMVCSettings();
     initGUIFunctionality();
     loadGroupSettings();
     onDataChanged();
@@ -327,6 +333,8 @@ void AnnotationSettingsView::disconnectFromModel()
             this, &AnnotationSettingsView::onStimButtonClicked);
     disconnect(m_pTriggerDetectView.data(), &DISPLIB::TriggerDetectionView::detectTriggers,
             this, &AnnotationSettingsView::onDetectTriggers);
+    disconnect(this, &AnnotationSettingsView::addEvent,
+            m_pAnnModel.data(), &ANSHAREDLIB::AnnotationModel::onAddEvent);
 
 
     saveGroupSettings();

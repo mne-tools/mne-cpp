@@ -44,6 +44,8 @@
 #include "../Utils/types.h"
 #include "abstractmodel.h"
 
+#include <events/eventmanager.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -649,6 +651,10 @@ public:
      */
     QSharedPointer<FiffRawViewModel> getFiffModel();
 
+    void onAddEvent(int iSample);
+
+    void onAddGroup(int iGroup);
+
 signals:
 
     //=========================================================================================================
@@ -686,6 +692,8 @@ private:
      * @param[in] sFilePath    path to file with event data.
      */
     void initFromFile(const QString& sFilePath);
+
+
 
     QStringList                         m_eventTypeList;                /** <List of the possible event types */
 
@@ -727,6 +735,8 @@ private:
     QStack<QListWidgetItem*>            m_dataStoredGroups;             /**< Stores the groups for switching between files. */
 
     QSharedPointer<FiffRawViewModel>    m_pFiffModel;                   /**< Pointer to FiffRawViewModel associated with the events stored in this model. */
+
+    EVENTSLIB::EventManager             m_EventManager;
 };
 
 //=============================================================================================================
