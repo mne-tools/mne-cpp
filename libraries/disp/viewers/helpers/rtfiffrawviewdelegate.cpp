@@ -353,13 +353,13 @@ void RtFiffRawViewDelegate::paint(QPainter *painter,
                 painter->drawPath(path);
                 painter->restore();
 
-//                path = QPainterPath(QPointF(option.rect.x(),option.rect.y()));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor(),option.rect.y()));
-//                createMarkerPath(index, option, path);
+                path = QPainterPath(QPointF(option.rect.x(),option.rect.y()));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor(),option.rect.y()));
+                createMarkerPath(index, option, path);
 
-//                painter->save();
-//                painter->setPen(QPen(Qt::green, 1, Qt::SolidLine));
-//                painter->drawPath(path);
-//                painter->restore();
+                painter->save();
+                painter->setPen(QPen(Qt::green, 1, Qt::SolidLine));
+                painter->drawPath(path);
+                painter->restore();
             }
             break;
         }
@@ -658,22 +658,27 @@ void RtFiffRawViewDelegate::createMarkerPath(const QModelIndex &index,
     float yStart = option.rect.topLeft().y();
     float yEnd = option.rect.bottomRight().y();
 
-//    for(int i = 0; i < m_pEventList->getNumberOfEvents(); i++)
-//    {
-//        int iEventSample = m_pEventList->getEvent(i).getSample();
-//        int iEarliestDrawnSample = iOffset - iMaxSample + iCurrentSample;
-//        int iLatestDrawnSample = iOffset + iMaxSample;
+    int iEarliestDrawnSample = iOffset - iMaxSample + iCurrentSample;
+    int iLatestDrawnSample = iOffset + iMaxSample;
 
-//        if(iEventSample >= iEarliestDrawnSample && iEventSample <= iLatestDrawnSample){
-//            int iLastStartingSample = iOffset - iMaxSample;
-//            int iDrawPositionInSamples = (iEventSample - iLastStartingSample) % iMaxSample;
+    auto events = t_pModel->getEventsToDraw(iEarliestDrawnSample, iLatestDrawnSample);
 
-//            float iPositionInPixels = static_cast<float>(iDrawPositionInSamples) * dDx;
+    for(int i = 0; i < events->size(); i++)
+    {
+        int iEventSample = (*events)[i].sample;
+        int iEarliestDrawnSample = iOffset - iMaxSample + iCurrentSample;
+        int iLatestDrawnSample = iOffset + iMaxSample;
 
-//            path.moveTo(iPositionInPixels,yStart);
-//            path.lineTo(iPositionInPixels,yEnd);
-//        }
-//    }
+        if(iEventSample >= iEarliestDrawnSample && iEventSample <= iLatestDrawnSample){
+            int iLastStartingSample = iOffset - iMaxSample;
+            int iDrawPositionInSamples = (iEventSample - iLastStartingSample) % iMaxSample;
+
+            float iPositionInPixels = static_cast<float>(iDrawPositionInSamples) * dDx;
+
+            path.moveTo(iPositionInPixels,yStart);
+            path.lineTo(iPositionInPixels,yEnd);
+        }
+    }
 }
 
 //=============================================================================================================

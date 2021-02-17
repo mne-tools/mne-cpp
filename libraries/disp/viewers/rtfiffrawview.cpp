@@ -144,6 +144,8 @@ void RtFiffRawView::init(QSharedPointer<FIFFLIB::FiffInfo> &info)
     m_pModel->setSamplingInfo(m_fSamplingRate, m_iT, true);
     connect(m_pModel.data(), &RtFiffRawViewModel::triggerDetected,
             this, &RtFiffRawView::triggerDetected);
+    connect(this, &RtFiffRawView::addSampleAsEvent,
+            m_pModel, &RtFiffRawViewModel::addEvent, Qt::UniqueConnection);
 
     //Init bad channel list
     m_qListBadChannels.clear();
@@ -545,7 +547,7 @@ void RtFiffRawView::channelContextMenu(QPoint pos)
 
     QAction* addEventMarker = menu->addAction(tr("Add event"));
     connect(addEventMarker, &QAction::triggered,
-            this, &RtFiffRawView::onAddEventMarker);
+            this, &RtFiffRawView::onAddEvent);
 
     //**************** Marking ****************
 
@@ -713,7 +715,7 @@ void RtFiffRawView::clearView()
 
 //=============================================================================================================
 
-void RtFiffRawView::onAddEventMarker(bool checked)
+void RtFiffRawView::onAddEvent(bool checked)
 {
     double dDx = static_cast<double>(m_pTableView->columnWidth(1)) / static_cast<double>(m_pModel->getMaxSamples());
     double dSample = static_cast<double>(m_iClickPosX) / dDx;
