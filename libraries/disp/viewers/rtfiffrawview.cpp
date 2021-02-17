@@ -544,8 +544,8 @@ void RtFiffRawView::channelContextMenu(QPoint pos)
     menu->addSection("Events");
 
     QAction* addEventMarker = menu->addAction(tr("Add event"));
-//    connect(addEventMarker, &QAction::triggered,
-//            this, &RtFiffRawView::onAddEventMarker);
+    connect(addEventMarker, &QAction::triggered,
+            this, &RtFiffRawView::onAddEventMarker);
 
     //**************** Marking ****************
 
@@ -709,4 +709,29 @@ void RtFiffRawView::markChBad()
 void RtFiffRawView::clearView()
 {
 
+}
+
+//=============================================================================================================
+
+void RtFiffRawView::onAddEventMarker(bool checked)
+{
+    double dDx = static_cast<double>(m_pTableView->columnWidth(1)) / static_cast<double>(m_pModel->getMaxSamples());
+    double dSample = static_cast<double>(m_iClickPosX) / dDx;
+
+    int iFirstSampleOffset = m_pModel->getFirstSampleOffset();
+
+    // Dont allow adding events to blank space in the beginning
+    if (dSample > m_pModel->getCurrentSampleIndex() && iFirstSampleOffset == 0){
+        return;
+    }
+
+    //Add offset
+    int iAbsoluteSample = static_cast<int>(dSample) + iFirstSampleOffset;
+
+    //Account for whether adding before or after draw point
+    if (dSample > m_pModel->getCurrentSampleIndex()){
+        iAbsoluteSample -= m_pModel->getMaxSamples();
+    }
+
+    emit addSampleAsEvent(iAbsoluteSample);
 }
