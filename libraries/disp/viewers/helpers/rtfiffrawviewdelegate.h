@@ -167,14 +167,6 @@ public:
      */
     void setUpperItemIndex(int iUpperItemIndex);
 
-    //=========================================================================================================
-    /**
-     * @brief setEventList
-     *
-     * @param pEventList
-     */
-    void setEventList(QSharedPointer<RTPROCESSINGLIB::EventList> pEventList);
-
 private:
     //=========================================================================================================
     /**
@@ -297,8 +289,6 @@ private:
     QPen        m_penNormalSelectedBad;     /**< Pen for drawing the data when bad data is plotted normally without freeze on and channel is selected. */
 
     QMap<double,QColor> m_mapTriggerColors; /**< Colors per trigger. */
-
-    QSharedPointer<RTPROCESSINGLIB::EventList>  m_pEventList;                   /**< List of events */
 };
 } // NAMESPACE
 

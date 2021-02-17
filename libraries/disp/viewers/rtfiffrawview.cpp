@@ -43,7 +43,6 @@
 #include "helpers/rtfiffrawviewmodel.h"
 
 #include <rtprocessing/helpers/filterkernel.h>
-#include <rtprocessing/event.h>
 #include <fiff/fiff_info.h>
 
 //=============================================================================================================
@@ -111,7 +110,6 @@ RtFiffRawView::RtFiffRawView(const QString& sSettingsPath,
 RtFiffRawView::~RtFiffRawView()
 {
     saveSettings();
-    m_pEventList->clear();
 }
 
 //=============================================================================================================
@@ -187,11 +185,6 @@ void RtFiffRawView::init(QSharedPointer<FIFFLIB::FiffInfo> &info)
 
     connect(m_pTableView->verticalScrollBar(), &QScrollBar::valueChanged,
             this, &RtFiffRawView::visibleRowsChanged);
-
-    //init events
-    m_pEventList = QSharedPointer<RTPROCESSINGLIB::EventList>(new EventList);
-    m_pDelegate->setEventList(m_pEventList);
-
 }
 
 //=============================================================================================================
@@ -551,8 +544,8 @@ void RtFiffRawView::channelContextMenu(QPoint pos)
     menu->addSection("Events");
 
     QAction* addEventMarker = menu->addAction(tr("Add event"));
-    connect(addEventMarker, &QAction::triggered,
-            this, &RtFiffRawView::onAddEventMarker);
+//    connect(addEventMarker, &QAction::triggered,
+//            this, &RtFiffRawView::onAddEventMarker);
 
     //**************** Marking ****************
 
@@ -716,38 +709,4 @@ void RtFiffRawView::markChBad()
 void RtFiffRawView::clearView()
 {
 
-}
-
-//=============================================================================================================
-
-void RtFiffRawView::onAddEventMarker()
-{
-    //Convert from pixels to samples
-    double dDx = static_cast<double>(m_pTableView->columnWidth(1)) / static_cast<double>(m_pModel->getMaxSamples());
-    double dSample = static_cast<double>(m_iClickPosX) / dDx;
-
-    int iFirstSampleOffset = m_pModel->getFirstSampleOffset();
-
-    // Dont allow adding events to blank space in the beginning
-    if (dSample > m_pModel->getCurrentSampleIndex() && iFirstSampleOffset == 0){
-        return;
-    }
-
-    //Add offset
-    int iAbsoluteSample = static_cast<int>(dSample) + iFirstSampleOffset;
-
-    //Account for whether adding before or after draw point
-    if (dSample > m_pModel->getCurrentSampleIndex()){
-        iAbsoluteSample -= m_pModel->getMaxSamples();
-    }
-<<<<<<< HEAD
-
-    m_pEventList->addEvent(Event(iAbsoluteSample));
-=======
-    std::vector<EventGroup> eventGroups;
-    eventGroups.push_back(EventGroup("DefaultGroup"));
-
-    m_EventList.addEvent(Event(iAbsoluteSample));
-//    m_pEventList->addEvent(Event(iAbsoluteSample));
->>>>>>> 302acaa22 (update-not-finished)
 }
