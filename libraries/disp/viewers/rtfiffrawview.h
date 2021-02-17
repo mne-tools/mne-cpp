@@ -453,7 +453,7 @@ protected:
      */
     void markChBad();
 
-    void onAddEventMarker(bool);
+    void onAddEvent(bool);
 
     QPointer<QTableView>                        m_pTableView;                   /**< The QTableView being part of the model/view framework of Qt. */
     QPointer<DISPLIB::RtFiffRawViewDelegate>    m_pDelegate;                    /**< The channel data delegate. */
@@ -474,6 +474,7 @@ protected:
     int                                         m_iClickPosX;
 
     QString                                     m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
+
 
 signals:    
     //=========================================================================================================

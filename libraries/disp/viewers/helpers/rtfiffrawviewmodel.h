@@ -47,6 +47,8 @@
 
 #include <rtprocessing/helpers/filterkernel.h>
 
+#include <events/eventmanager.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -519,6 +521,12 @@ public:
      */
     double getMaxValueFromRawViewModel(int row) const;
 
+    //=========================================================================================================
+    void addEvent(int iSample);
+
+    //=========================================================================================================
+    std::unique_ptr<std::vector<EVENTSLIB::Event> > getEventsToDraw(int iBegin, int iEnd) const;
+
 private:
     //=========================================================================================================
     /**
@@ -619,6 +627,8 @@ private:
     QMap<qint32,qint32>                 m_qMapIdxRowSelection;                      /**< Selection mapping.*/
 
     QColor                              m_colBackground;                            /**< The background color.*/
+
+    mutable EVENTSLIB::EventManager                     m_EventManager;
 
 signals:
     //=========================================================================================================
