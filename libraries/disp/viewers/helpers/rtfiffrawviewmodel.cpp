@@ -102,6 +102,7 @@ RtFiffRawViewModel::RtFiffRawViewModel(QObject *parent)
 , m_pFiffInfo(FiffInfo::SPtr::create())
 , m_colBackground(Qt::white)
 {
+    m_EventManager.addGroup("Default");
 }
 
 //=============================================================================================================
@@ -1369,4 +1370,31 @@ double RtFiffRawViewModel::getMaxValueFromRawViewModel(int row) const
     }
 
     return dMaxValue;
+}
+
+//=============================================================================================================
+
+void RtFiffRawViewModel::addEvent(int iSample)
+{
+    int groupId = (m_EventManager.getAllGroups())->data()->id;
+
+    auto groups = *(m_EventManager.getAllGroups());
+    for(auto g : groups){
+        qDebug() << "Group" << g.name.c_str() << "Id" << g.id;
+    }
+
+    m_EventManager.addEvent(iSample, groupId);
+
+    auto events = *(m_EventManager.getEventsInGroup(groupId));
+
+    for(auto e : events){
+        qDebug() << "Event" << e.sample << "Id" << e.id;
+    }
+}
+
+//=============================================================================================================
+
+std::unique_ptr<std::vector<EVENTSLIB::Event> > RtFiffRawViewModel::getEventsToDraw(int iBegin, int iEnd) const
+{
+    return m_EventManager.getEventsBetween(iBegin, iEnd);
 }
