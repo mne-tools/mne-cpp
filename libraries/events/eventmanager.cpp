@@ -5,11 +5,13 @@ using namespace EVENTSLIB;
 constexpr static int invalidID(0);
 idNum EventManager::m_iEventIdCounter(0);
 idNum EventManager::m_iGroupIdCounter(0);
+static std::string defaultGroupName("Default");
 
 //=============================================================================================================
 
 EventManager::EventManager()
-    : m_pSharedMemManager(std::make_unique<EVENTSINTERNAL::EventSharedMemManager>(this))
+: m_pSharedMemManager(std::make_unique<EVENTSINTERNAL::EventSharedMemManager>(this))
+, m_bDefaultGroupNotCreated(true)
 {
 
 }
@@ -201,6 +203,17 @@ Event EventManager::addEvent(int sample, idNum groupId)
     }
 
     return Event(newEvent);
+}
+
+//=============================================================================================================
+
+Event EventManager::addEvent(int sample)
+{
+    if(m_bDefaultGroupNotCreated)
+    {
+        m_DefaultGroup = addGroup(defaultGroupName);
+    }
+    return addEvent(sample, m_DefaultGroup.id);
 }
 
 //=============================================================================================================
