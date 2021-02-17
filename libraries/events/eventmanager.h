@@ -36,6 +36,7 @@ public:
     std::unique_ptr<std::vector<Event> > getEventsInGroup(const idNum groupId) const;
 
     //event setters
+    Event addEvent(int sample);
     Event addEvent(int sample, idNum groupId);
     bool moveEvent(idNum eventId, int newSample);
     bool deleteEvent(idNum eventId) noexcept;
@@ -84,6 +85,9 @@ private:
 
     static idNum                                    m_iEventIdCounter;
     static idNum                                    m_iGroupIdCounter;
+    bool                                            m_bDefaultGroupNotCreated;
+    EventGroup                                      m_DefaultGroup;
+
 };
 
 template<typename T>
