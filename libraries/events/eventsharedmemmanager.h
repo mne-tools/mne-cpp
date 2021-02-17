@@ -28,8 +28,6 @@ public:
 
     EventSharedMemManager(EVENTSLIB::EventManager* parent = nullptr);
 
-    ~EventSharedMemManager();
-
     void init(EVENTSLIB::SharedMemoryMode mode);
     void stop();
     bool isInit() const;
@@ -45,7 +43,7 @@ public:
 
 private:
 
-    void storeUpdateEventInBuffer(std::unique_ptr<EventUpdate> nu);
+    void storeUpdateEventInBuffer(EventUpdate* nu);
     void bufferWatcher();
     void createEventGroup();
 
@@ -59,19 +57,20 @@ private:
     float                           m_fTimerCheckBuffer;
     std::thread                     m_BufferWatcherThread;
     long long                       m_lastCheckTime;
-    std::unique_ptr<EventUpdate>*   m_Buffer;
+    EventUpdate*                    m_Buffer;
     int                             m_Id;
+    enum EVENTSLIB::SharedMemoryMode m_Mode;
 };
 
 class EventUpdate
 {
 public:
     EventUpdate(int sample, idNum id, int creator)
-        : mEventSample(sample)
-        , mEventId(id)
-        , mCreatorId(creator)
+    : m_EventSample(sample)
+    , m_EventId(id)
+    , m_CreatorId(creator)
     {
-        mCreationTime = EventSharedMemManager::getTimeNow();
+        m_CreationTime = EventSharedMemManager::getTimeNow();
     }
 
     virtual ~EventUpdate() = default;
@@ -80,28 +79,28 @@ public:
 
     long long creationTime() const
     {
-        return mCreationTime;
+        return m_CreationTime;
     }
 
     int getSample() const
     {
-        return mEventSample;
+        return m_EventSample;
     }
 
     idNum getId() const
     {
-        return mEventId;
+        return m_EventId;
     }
 
     int getCreatorId() const
     {
-        return mCreatorId;
+        return m_CreatorId;
     }
 protected:
-    int             mEventSample;
-    idNum           mEventId;
-    int             mCreatorId;
-    long long       mCreationTime;
+    int             m_EventSample;
+    idNum           m_EventId;
+    int             m_CreatorId;
+    long long       m_CreationTime;
 };
 
 class NewEventUpdate : public EventUpdate

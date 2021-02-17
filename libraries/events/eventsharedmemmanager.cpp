@@ -27,54 +27,50 @@ EventSharedMemManager::EventSharedMemManager(EVENTSLIB::EventManager* parent)
 , m_iLastUpdateIndex(0)
 , m_Buffer(nullptr)
 , m_Id(rand())
+, m_Mode(EVENTSLIB::SharedMemoryMode::READ)
 {
 
-}
-
-EventSharedMemManager::~EventSharedMemManager()
-{
-    m_bIsInit = false;
-    m_BufferWatcherThread.join();
 }
 
 void EventSharedMemManager::init(EVENTSLIB::SharedMemoryMode mode)
 {
+    m_Mode = mode;
     m_bIsInit = false;
 
-    if(mode == EVENTSLIB::SharedMemoryMode::READ)
+    if(m_Mode == EVENTSLIB::SharedMemoryMode::READ)
     {
         if(!m_SharedMemory.isAttached())
         {
             m_bIsInit = m_SharedMemory.attach(QSharedMemory::ReadOnly);
             if(m_bIsInit)
             {
-                m_Buffer = static_cast<std::unique_ptr<EventUpdate>*>(m_SharedMemory.data());
+                m_Buffer = static_cast<EventUpdate*>(m_SharedMemory.data());
             }
             m_BufferWatcherThread = std::thread(&EventSharedMemManager::bufferWatcher, this);
         }
-    } else if(mode == EVENTSLIB::SharedMemoryMode::WRITE)
+    } else if(m_Mode == EVENTSLIB::SharedMemoryMode::WRITE)
     {
         if(m_SharedMemory.isAttached())
         {
             stop();
         }
         m_bIsInit = m_SharedMemory.create(
-                    sharedMemBufferLength * sizeof(std::unique_ptr<EventUpdate>));
+                    sharedMemBufferLength * sizeof(EventUpdate));
         if(m_bIsInit)
         {
-            m_Buffer = static_cast<std::unique_ptr<EventUpdate>*>(m_SharedMemory.data());
+            m_Buffer = static_cast<EventUpdate*>(m_SharedMemory.data());
         }
-    } else if(mode == EVENTSLIB::SharedMemoryMode::BYDIRECTIONAL)
+    } else if(m_Mode == EVENTSLIB::SharedMemoryMode::BYDIRECTIONAL)
     {
         if(m_SharedMemory.isAttached())
         {
             stop();
         }
         m_bIsInit = m_SharedMemory.create(
-                    sharedMemBufferLength * sizeof(std::unique_ptr<EventUpdate>));
+                    sharedMemBufferLength * sizeof(EventUpdate));
         if(m_bIsInit)
         {
-            m_Buffer = static_cast<std::unique_ptr<EventUpdate>*>(m_SharedMemory.data());
+            m_Buffer = static_cast<EventUpdate*>(m_SharedMemory.data());
         }
         m_BufferWatcherThread = std::thread(&EventSharedMemManager::bufferWatcher, this);
     }
@@ -83,9 +79,8 @@ void EventSharedMemManager::init(EVENTSLIB::SharedMemoryMode mode)
 void EventSharedMemManager::stop()
 {
     m_SharedMemory.detach();
-    m_bIsInit = false;
     m_Buffer = nullptr;
-    std::terminate();
+    m_bIsInit = false;
 }
 
 bool EventSharedMemManager::isInit() const
@@ -95,25 +90,32 @@ bool EventSharedMemManager::isInit() const
 
 void EventSharedMemManager::addEvent(int sample, idNum id)
 {
-    if(m_bIsInit)
+    if(m_bIsInit &&
+      (m_Mode == EVENTSLIB::SharedMemoryMode::WRITE  ||
+       m_Mode == EVENTSLIB::SharedMemoryMode::BYDIRECTIONAL  )  )
     {
-        std::unique_ptr<EventUpdate> newUpdate(std::make_unique<NewEventUpdate>(sample, id, m_Id));
-        storeUpdateEventInBuffer(std::move(newUpdate));
+        NewEventUpdate newUpdate(sample, id, m_Id);
+        storeUpdateEventInBuffer(&newUpdate);
     }
 }
 
 void EventSharedMemManager::deleteEvent(int sample, idNum id)
 {
-    std::unique_ptr<EventUpdate> newUpdate(std::make_unique<DeleteEventUpdate>(sample, id, m_Id));
-    storeUpdateEventInBuffer(std::move(newUpdate));
+    if(m_bIsInit &&
+          (m_Mode == EVENTSLIB::SharedMemoryMode::WRITE  ||
+           m_Mode == EVENTSLIB::SharedMemoryMode::BYDIRECTIONAL  )  )
+    {
+        DeleteEventUpdate newUpdate(sample, id, m_Id);
+        storeUpdateEventInBuffer(&newUpdate);
+    }
 }
 
-void EventSharedMemManager::storeUpdateEventInBuffer(std::unique_ptr<EventUpdate> newUpdate)
+void EventSharedMemManager::storeUpdateEventInBuffer(EventUpdate* newUpdate)
 {
     if(m_Buffer)
     {
         m_SharedMemory.lock();
-        m_Buffer[m_iLastUpdateIndex%sharedMemBufferLength] = std::move(newUpdate);
+        m_Buffer[m_iLastUpdateIndex%sharedMemBufferLength] = *newUpdate;
         m_SharedMemory.unlock();
         m_iLastUpdateIndex++;
     }
@@ -123,18 +125,17 @@ void EventSharedMemManager::bufferWatcher()
 {
     while(m_bIsInit)
     {
-        std::unique_ptr<EventUpdate>* data = static_cast<std::unique_ptr<EventUpdate>*>(m_SharedMemory.data());
         m_SharedMemory.lock();
         for(int i = 0; i < sharedMemBufferLength; ++i)
         {
-            if(data[i].get()->creationTime() > m_lastCheckTime &&
-               data[i].get()->getCreatorId() != m_Id)
+            if(m_Buffer[i].creationTime() > m_lastCheckTime &&
+               m_Buffer[i].getCreatorId() != m_Id)
             {
-                if(m_bGroupCreated)
+                if(!m_bGroupCreated)
                 {
                     createEventGroup();
                 }
-                data[i].get()->processUpdate(this);
+                m_Buffer[i].processUpdate(this);
             }
         }
         m_lastCheckTime = getTimeNow();
