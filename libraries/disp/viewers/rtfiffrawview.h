@@ -453,6 +453,8 @@ protected:
      */
     void markChBad();
 
+    void onAddEventMarker(bool);
+
     QPointer<QTableView>                        m_pTableView;                   /**< The QTableView being part of the model/view framework of Qt. */
     QPointer<DISPLIB::RtFiffRawViewDelegate>    m_pDelegate;                    /**< The channel data delegate. */
     QPointer<DISPLIB::RtFiffRawViewModel>       m_pModel;                       /**< The channel data model. */
@@ -496,6 +498,9 @@ signals:
      * Emmited when marking of bad channels is changed
      */
     void channelMarkingChanged();
+
+    //=========================================================================================================
+    void addSampleAsEvent(int iSample);
 };
 } // NAMESPACE
 

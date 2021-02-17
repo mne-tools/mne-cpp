@@ -67,6 +67,7 @@
 #include <QDir>
 #include <QSettings>
 #include <QToolBar>
+#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -89,6 +90,8 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<QT
     Q_UNUSED(pTime)
 
     qRegisterMetaType<QMap<int,QList<QPair<int,double> > > >();
+
+    m_EventManager.addGroup("Default");
 }
 
 //=============================================================================================================
@@ -167,6 +170,9 @@ void RealTimeMultiSampleArrayWidget::initDisplayControllWidgets()
 
         m_pChannelDataView->show();
         m_pChannelDataView->init(m_pFiffInfo);
+
+        connect(m_pChannelDataView, &RtFiffRawView::addSampleAsEvent,
+                this, &RealTimeMultiSampleArrayWidget::onAddEvent, Qt::UniqueConnection);
 
         if(settings.value(QString("RTMSAW/showHideBad"), false).toBool()) {
             this->onHideBadChannels();
@@ -370,5 +376,16 @@ void RealTimeMultiSampleArrayWidget::updateOpenGLViewport()
 {
     if(m_pChannelDataView) {
         m_pChannelDataView->updateOpenGLViewport();
+    }
+}
+
+//=============================================================================================================
+
+void RealTimeMultiSampleArrayWidget::onAddEvent(int iSample)
+{
+    auto groups = *(m_EventManager.getAllGroups());
+
+    for(auto g : groups){
+        qDebug() << "Group" << g.name.c_str();
     }
 }
