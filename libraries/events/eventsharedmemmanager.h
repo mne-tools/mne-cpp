@@ -49,7 +49,7 @@ private:
     void bufferWatcher();
     void createEventGroup();
 
-    EVENTSLIB::EventManager*        m_parent;
+    EVENTSLIB::EventManager*        m_pEventManager;
     QSharedMemory                   m_SharedMemory;
     bool                            m_bIsInit;
     std::string                     m_sGroupName;

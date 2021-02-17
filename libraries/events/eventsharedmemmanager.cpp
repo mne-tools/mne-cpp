@@ -18,7 +18,7 @@ constexpr static int sharedMemBufferLength(5);
 static long long timerBufferWatch(200);
 
 EventSharedMemManager::EventSharedMemManager(EVENTSLIB::EventManager* parent)
-: m_parent(parent)
+: m_pEventManager(parent)
 , m_SharedMemory(QString::fromStdString(defaultSharedMemoryKey))
 , m_bIsInit(false)
 , m_sGroupName(defaultGroupName)
@@ -146,12 +146,12 @@ void EventSharedMemManager::bufferWatcher()
 
 void EventSharedMemManager::processEvent(NewEventUpdate* ne)
 {
-    m_parent->addEvent(ne->getSample(), m_GroupId);
+    m_pEventManager->addEvent(ne->getSample(), m_GroupId);
 }
 
 void EventSharedMemManager::processEvent(DeleteEventUpdate* de)
 {
-    m_parent->deleteEvent(de->getId());
+    m_pEventManager->deleteEvent(de->getId());
 }
 
 long long EventSharedMemManager::getTimeNow()
@@ -163,7 +163,7 @@ long long EventSharedMemManager::getTimeNow()
 
 void EventSharedMemManager::createEventGroup()
 {
-    EVENTSLIB::EventGroup g = m_parent->addGroup(m_sGroupName);
+    EVENTSLIB::EventGroup g = m_pEventManager->addGroup(m_sGroupName);
     m_GroupId = g.id;
     m_bGroupCreated = true;
 }
