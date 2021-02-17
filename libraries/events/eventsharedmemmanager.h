@@ -116,6 +116,7 @@ public:
     {
         e->processEvent(this);
     }
+    //DO NOT ADD MEMBER VARIABLES HERE
 };
 
 class DeleteEventUpdate : public EventUpdate
@@ -131,6 +132,7 @@ public:
     {
         e->processEvent(this);
     }
+    //DO NOT ADD MEMBER VARIABLES HERE
 };
 
 
