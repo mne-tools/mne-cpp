@@ -1049,3 +1049,9 @@ void AnnotationModel::onAddGroup(int iGroup)
 
 }
 
+//=============================================================================================================
+
+std::unique_ptr<std::vector<EVENTSLIB::Event> > AnnotationModel::getEventsToDraw(int iBegin, int iEnd) const
+{
+    return m_EventManager.getEventsBetween(iBegin, iEnd);
+}
