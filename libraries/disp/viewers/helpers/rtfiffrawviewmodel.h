@@ -628,7 +628,7 @@ private:
 
     QColor                              m_colBackground;                            /**< The background color.*/
 
-    mutable EVENTSLIB::EventManager                     m_EventManager;
+    static EVENTSLIB::EventManager                     m_EventManager;
 
 signals:
     //=========================================================================================================

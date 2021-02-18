@@ -56,6 +56,7 @@
 #include <QCoreApplication>
 #include <QtConcurrent>
 #include <QFuture>
+#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -74,6 +75,8 @@ using namespace RTPROCESSINGLIB;
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
+
+EVENTSLIB::EventManager RtFiffRawViewModel::m_EventManager;
 
 RtFiffRawViewModel::RtFiffRawViewModel(QObject *parent)
 : QAbstractTableModel(parent)
@@ -102,6 +105,8 @@ RtFiffRawViewModel::RtFiffRawViewModel(QObject *parent)
 , m_pFiffInfo(FiffInfo::SPtr::create())
 , m_colBackground(Qt::white)
 {
+
+    m_EventManager.initSharedMemory(EVENTSLIB::SharedMemoryMode::BYDIRECTIONAL);
 }
 
 //=============================================================================================================
@@ -1377,7 +1382,7 @@ void RtFiffRawViewModel::addEvent(int iSample)
 {
     auto pGroups = m_EventManager.getAllGroups();
     for(auto g : *pGroups){
-        qDebug() << "Group" << g.name.c_str() << "Id" << g.id;
+        qDebug() << "Group: " << g.name.c_str() << "- Id: " << g.id;
     }
 
     m_EventManager.addEvent(iSample);
@@ -1385,7 +1390,7 @@ void RtFiffRawViewModel::addEvent(int iSample)
     auto pEvents = m_EventManager.getAllEvents();
 
     for(auto e : *pEvents){
-        qDebug() << "Event" << e.sample << "Id" << e.id;
+        qDebug() << "Event> Sample: " << e.sample << "- Id: " << e.id;
     }
 }
 
