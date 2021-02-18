@@ -174,7 +174,7 @@ private:
 signals:
     void newAnnotationAvailable(int iAnnotation);
     void disconnectFromModel();
-    void newAnnotationModelAvailable(QSharedPointer<ANSHAREDLIB::AnnotationModel> pAnnotModel);
+    void newAnnotationModelAvailable(QSharedPointer<ANSHAREDLIB::EventModel> pAnnotModel);
     void newFiffRawViewModel(QSharedPointer<ANSHAREDLIB::FiffRawViewModel> pFiffRawModel);
     void clearView(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel);
 };

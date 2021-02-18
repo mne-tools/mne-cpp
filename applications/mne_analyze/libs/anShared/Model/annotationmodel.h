@@ -96,13 +96,13 @@ struct EventGroup{
 /**
  * Model that holds the event information associated with a fiff file.
  */
-class ANSHAREDSHARED_EXPORT AnnotationModel : public AbstractModel
+class ANSHAREDSHARED_EXPORT EventModel : public AbstractModel
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<AnnotationModel> SPtr;              /**< Shared pointer type for AnnotationModel. */
-    typedef QSharedPointer<const AnnotationModel> ConstSPtr;   /**< Const shared pointer type for AnnotationModel. */
+    typedef QSharedPointer<EventModel> SPtr;              /**< Shared pointer type for AnnotationModel. */
+    typedef QSharedPointer<const EventModel> ConstSPtr;   /**< Const shared pointer type for AnnotationModel. */
 
     //=========================================================================================================
     /**
@@ -110,16 +110,16 @@ public:
      *
      * @param[in] parent   QObject parent of the model.
      */
-    AnnotationModel(QObject* parent = Q_NULLPTR);
+    EventModel(QObject* parent = Q_NULLPTR);
 
     //=========================================================================================================
 
-    AnnotationModel(QSharedPointer<FiffRawViewModel> pFiffModel,
+    EventModel(QSharedPointer<FiffRawViewModel> pFiffModel,
                     QObject* parent = Q_NULLPTR);
 
     //=========================================================================================================
 
-    AnnotationModel(const QString &sFilePath,
+    EventModel(const QString &sFilePath,
                     const QByteArray& byteLoadedData = QByteArray(),
                     float fSampFreq = 600,
                     int iFirstSampOffst = 0,
@@ -129,7 +129,7 @@ public:
     /**
      * Destructs an annotation model.
      */
-    ~AnnotationModel();
+    ~EventModel();
 
     //=========================================================================================================
     /**
@@ -653,7 +653,7 @@ public:
 
     void onAddEvent(int iSample);
 
-    void onAddGroup(int iGroup);
+    void onAddGroup(QString sName, QColor color);
 
     std::unique_ptr<std::vector<EVENTSLIB::Event> > getEventsToDraw(int iBegin, int iEnd) const;
 
@@ -745,14 +745,14 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline MODEL_TYPE AnnotationModel::getType() const
+inline MODEL_TYPE EventModel::getType() const
 {
     return MODEL_TYPE::ANSHAREDLIB_ANNOTATION_MODEL;
 }
 
 //=============================================================================================================
 
-QModelIndex AnnotationModel::parent(const QModelIndex &index) const
+QModelIndex EventModel::parent(const QModelIndex &index) const
 {
     Q_UNUSED(index);
     return QModelIndex();
@@ -760,7 +760,7 @@ QModelIndex AnnotationModel::parent(const QModelIndex &index) const
 
 //=============================================================================================================
 
-QModelIndex AnnotationModel::index(int row, int column, const QModelIndex &parent) const
+QModelIndex EventModel::index(int row, int column, const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
     return createIndex(row, column);
