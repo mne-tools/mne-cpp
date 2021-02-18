@@ -330,17 +330,26 @@ void FiffRawViewDelegate::createMarksPath(const QModelIndex &index,
     //QMap<int, QColor> typeColor = t_pAnnModel->getTypeColors();
     QMap<int, QColor> groupColor = t_pAnnModel->getGroupColors();
 
-    for(int i = 0; i < t_pModel->getTimeListSize(); i++) {
-        unsigned int uiTime = t_pModel->getTimeMarks(i);
-        if ((t_pModel->getTimeMarks(i) > iStart) && (uiTime < (iStart + data.size()))) {
-//            int type = t_pAnnModel->data(t_pAnnModel->index(i,2)).toInt();
-//            painter->setPen(QPen(typeColor.value(type), Qt::black));
-            int group = t_pAnnModel->currentGroup(i);
-            painter->setPen(QPen(groupColor.value(group), 1, Qt::SolidLine));
-            painter->drawLine(fInitX + static_cast<float>(t_pModel->getTimeMarks(i) - iStart) * dDx,
-                              fTop,
-                              fInitX + static_cast<float>(t_pModel->getTimeMarks(i) - iStart) * dDx,
-                              fBottom);
-        }
+    auto events = t_pAnnModel->getEventsToDraw(iStart, iStart + data.size());
+
+    for(int i = 0; i < events->size(); i++) {
+//        unsigned int uiTime = t_pModel->getTimeMarks(i);
+//        if ((t_pModel->getTimeMarks(i) > iStart) && (uiTime < (iStart + data.size()))) {
+////            int type = t_pAnnModel->data(t_pAnnModel->index(i,2)).toInt();
+////            painter->setPen(QPen(typeColor.value(type), Qt::black));
+//            int group = t_pAnnModel->currentGroup(i);
+//            painter->setPen(QPen(groupColor.value(group), 1, Qt::SolidLine));
+//            painter->drawLine(fInitX + static_cast<float>(t_pModel->getTimeMarks(i) - iStart) * dDx,
+//                              fTop,
+//                              fInitX + static_cast<float>(t_pModel->getTimeMarks(i) - iStart) * dDx,
+//                              fBottom);
+//        }
+
+        painter->setPen(QPen(Qt::red, 1, Qt::SolidLine));
+        int eventSample = (*events)[i].sample;
+        painter->drawLine(fInitX + static_cast<float>(eventSample - iStart) * dDx,
+                          fTop,
+                          fInitX + static_cast<float>(eventSample - iStart) * dDx,
+                          fBottom);
     }
 }

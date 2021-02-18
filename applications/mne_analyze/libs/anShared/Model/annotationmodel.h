@@ -655,6 +655,8 @@ public:
 
     void onAddGroup(int iGroup);
 
+    std::unique_ptr<std::vector<EVENTSLIB::Event> > getEventsToDraw(int iBegin, int iEnd) const;
+
 signals:
 
     //=========================================================================================================
