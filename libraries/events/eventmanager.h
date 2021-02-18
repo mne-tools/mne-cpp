@@ -71,11 +71,14 @@ public:
     bool isSharedMemoryInit();
 
 private:
-    idNum generateNewEventId() const;
-    idNum generateNewGroupId() const;
+    idNum generateNewEventId();
+    idNum generateNewGroupId();
 
     void insertEvent(const EVENTSINTERNAL::EventINT& e);
+    bool eraseEvent(idNum eventId);
+
     std::multimap<const int, EVENTSINTERNAL::EventINT>::const_iterator findEventINT(idNum id) const;
+    void createDefaultGroupIfNeeded();
 
     std::multimap<int, EVENTSINTERNAL::EventINT>    m_EventsListBySample;
     std::unordered_map<idNum, int>                  m_MapIdToSample;
@@ -83,11 +86,12 @@ private:
 
     std::unique_ptr<EVENTSINTERNAL::EventSharedMemManager>  m_pSharedMemManager;
 
-    static idNum                                    m_iEventIdCounter;
-    static idNum                                    m_iGroupIdCounter;
+    idNum                                           m_iEventIdCounter;
+    idNum                                           m_iGroupIdCounter;
     bool                                            m_bDefaultGroupNotCreated;
-    EventGroup                                      m_DefaultGroup;
+    idNum                                           m_DefaultGroupId;
 
+    friend class EVENTSINTERNAL::EventSharedMemManager;
 };
 
 template<typename T>

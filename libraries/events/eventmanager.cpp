@@ -1,17 +1,20 @@
 #include "eventmanager.h"
 
+#include <QDebug>
+
 using namespace EVENTSLIB;
 
 constexpr static int invalidID(0);
-idNum EventManager::m_iEventIdCounter(0);
-idNum EventManager::m_iGroupIdCounter(0);
 static std::string defaultGroupName("Default");
 
 //=============================================================================================================
 
 EventManager::EventManager()
 : m_pSharedMemManager(std::make_unique<EVENTSINTERNAL::EventSharedMemManager>(this))
+, m_iEventIdCounter(invalidID)
+, m_iGroupIdCounter(invalidID)
 , m_bDefaultGroupNotCreated(true)
+, m_DefaultGroupId(invalidID)
 {
 
 }
@@ -171,14 +174,14 @@ EventManager::getEventsInGroup(const idNum groupId) const
 
 //=============================================================================================================
 
-idNum EventManager::generateNewEventId() const
+idNum EventManager::generateNewEventId()
 {
     return ++m_iEventIdCounter;
 }
 
 //=============================================================================================================
 
-idNum EventManager::generateNewGroupId() const
+idNum EventManager::generateNewGroupId()
 {
     return ++m_iGroupIdCounter;
 }
@@ -199,7 +202,8 @@ Event EventManager::addEvent(int sample, idNum groupId)
 
     if(m_pSharedMemManager->isInit())
     {
-        m_pSharedMemManager->addEvent(newEvent.getSample(), newEvent.getId());
+        qDebug() << "Sending event to SM: Sample: " << sample;
+        m_pSharedMemManager->addEvent(newEvent.getSample());
     }
 
     return Event(newEvent);
@@ -209,11 +213,8 @@ Event EventManager::addEvent(int sample, idNum groupId)
 
 Event EventManager::addEvent(int sample)
 {
-    if(m_bDefaultGroupNotCreated)
-    {
-        m_DefaultGroup = addGroup(defaultGroupName);
-    }
-    return addEvent(sample, m_DefaultGroup.id);
+    createDefaultGroupIfNeeded();
+    return addEvent(sample, m_DefaultGroupId);
 }
 
 //=============================================================================================================
@@ -237,26 +238,29 @@ bool EventManager::moveEvent(idNum eventId, int newSample)
 
 bool EventManager::deleteEvent(idNum eventId) noexcept
 {
-    bool status(false);
+    bool eventFound(false);
+    eventFound = eraseEvent(eventId);
+    if(eventFound)
+    {
+        m_pSharedMemManager->deleteEvent(m_MapIdToSample.at(eventId));
+    }
+    return eventFound;
+}
+
+//=============================================================================================================
+
+bool EventManager::eraseEvent(idNum eventId)
+{
     auto event = findEventINT(eventId);
     if(event != m_EventsListBySample.end())
     {
         m_EventsListBySample.erase(event);
         m_MapIdToSample.erase(eventId);
-
-        if(m_pSharedMemManager->isInit())
-        {
-            m_pSharedMemManager->deleteEvent(
-                        event->second.getSample() ,
-                        event->second.getId());
-        }
-
-        status = true;
+        return true;
     }
-    return status;
+    return false;
 }
 
-//=============================================================================================================
 
 bool EventManager::deleteEvents(const std::vector<idNum>& eventIds)
 {
@@ -375,7 +379,7 @@ EventGroup EventManager::addGroup(const std::string& sGroupName, const RgbColor&
 
 bool EventManager::deleteGroup(const idNum groupId)
 {
-    bool state(false);
+    bool out(false);
     auto events = getEventsInGroup(groupId);
     if(events->empty())
     {
@@ -383,22 +387,27 @@ bool EventManager::deleteGroup(const idNum groupId)
         if(groupToDeleteIter != m_GroupsList.end())
         {
             m_GroupsList.erase(groupToDeleteIter);
-            state = true;
+            out = true;
+            if(!m_bDefaultGroupNotCreated && (groupId == m_DefaultGroupId))
+            {
+                m_bDefaultGroupNotCreated = true;
+                m_DefaultGroupId = invalidID;
+            }
         }
     }
-    return state;
+    return out;
 }
 
 //=============================================================================================================
 
 bool EventManager::deleteGroups(const std::vector<idNum>& groupIds)
 {
-    bool state(groupIds.size());
+    bool out(groupIds.size());
     for(auto g: groupIds)
     {
-        state = state && deleteGroup(g);
+        out = out && deleteGroup(g);
     }
-    return state;
+    return out;
 }
 
 //=============================================================================================================
@@ -519,4 +528,14 @@ void EventManager::stopSharedMemory()
 bool EventManager::isSharedMemoryInit()
 {
     return m_pSharedMemManager->isInit();
+}
+
+void EventManager::createDefaultGroupIfNeeded()
+{
+    if(m_bDefaultGroupNotCreated)
+    {
+        EventGroup defaultGroup(addGroup(defaultGroupName));
+        m_bDefaultGroupNotCreated = false;
+        m_DefaultGroupId = defaultGroup.id;
+    }
 }
