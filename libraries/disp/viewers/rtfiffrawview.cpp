@@ -717,6 +717,7 @@ void RtFiffRawView::clearView()
 
 void RtFiffRawView::onAddEvent(bool checked)
 {
+    Q_UNUSED(checked)
     double dDx = static_cast<double>(m_pTableView->columnWidth(1)) / static_cast<double>(m_pModel->getMaxSamples());
     double dSample = static_cast<double>(m_iClickPosX) / dDx;
 
