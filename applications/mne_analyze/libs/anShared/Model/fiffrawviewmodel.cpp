@@ -475,12 +475,12 @@ bool FiffRawViewModel::shouldDisplayAnnotation() const
 
 //=============================================================================================================
 
-QSharedPointer<AnnotationModel> FiffRawViewModel::getAnnotationModel() const
+QSharedPointer<EventModel> FiffRawViewModel::getAnnotationModel() const
 {
     if(m_pAnnotationModel){
         return m_pAnnotationModel;
     } else {
-        return QSharedPointer<AnnotationModel>::create();
+        return QSharedPointer<EventModel>::create();
     }
 
 }
@@ -1009,7 +1009,7 @@ bool FiffRawViewModel::hasSavedEvents()
 
 //=============================================================================================================
 
-void FiffRawViewModel::setAnnotationModel(QSharedPointer<ANSHAREDLIB::AnnotationModel> pModel)
+void FiffRawViewModel::setAnnotationModel(QSharedPointer<ANSHAREDLIB::EventModel> pModel)
 {
     m_pAnnotationModel = pModel;
 }

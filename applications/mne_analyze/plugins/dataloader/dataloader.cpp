@@ -221,14 +221,14 @@ void DataLoader::loadFilePath(const QString& sFilePath)
     startProgress("Loading " + fileInfo.fileName());
 
     if(fileInfo.exists() && (fileInfo.completeSuffix() == "eve")){
-        QSharedPointer<ANSHAREDLIB::AnnotationModel> pModel = m_pAnalyzeData->loadModel<ANSHAREDLIB::AnnotationModel>(sFilePath);
+        QSharedPointer<ANSHAREDLIB::EventModel> pModel = m_pAnalyzeData->loadModel<ANSHAREDLIB::EventModel>(sFilePath);
         //pModel->applyOffset(m_pSelectedModel->absoluteFirstSample());
         pModel->setFiffModel(m_pSelectedModel);
         pModel->setFirstLastSample(m_pSelectedModel->absoluteFirstSample(), m_pSelectedModel->absoluteLastSample());
         pModel->setSampleFreq(m_pSelectedModel->getFiffInfo()->sfreq);
     } else if(fileInfo.exists() && (fileInfo.completeSuffix() == "fif")) {
         if(fileInfo.completeBaseName().endsWith("eve")){
-            m_pAnalyzeData->loadModel<ANSHAREDLIB::AnnotationModel>(sFilePath);
+            m_pAnalyzeData->loadModel<ANSHAREDLIB::EventModel>(sFilePath);
         } else if(fileInfo.completeBaseName().endsWith("bem")) {
             m_pAnalyzeData->loadModel<ANSHAREDLIB::BemDataModel>(sFilePath);
         } else if(fileInfo.completeBaseName().endsWith("raw")){

@@ -69,7 +69,7 @@
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-AnnotationSettingsView::AnnotationSettingsView()
+EventView::EventView()
 : m_pUi(new Ui::EventWindowDockWidget)
 , m_iCheckState(0)
 , m_iLastSampClicked(0)
@@ -101,32 +101,32 @@ AnnotationSettingsView::AnnotationSettingsView()
 
 //=============================================================================================================
 
-void AnnotationSettingsView::reset()
+void EventView::reset()
 {
-    setModel(QSharedPointer<ANSHAREDLIB::AnnotationModel>::create());
+    setModel(QSharedPointer<ANSHAREDLIB::EventModel>::create());
 }
 
 //=============================================================================================================
 
-void AnnotationSettingsView::initMVCSettings()
+void EventView::initMVCSettings()
 {
     //Model
     m_pUi->m_tableView_eventTableView->setModel(m_pAnnModel.data());
-    connect(m_pAnnModel.data(),&ANSHAREDLIB::AnnotationModel::dataChanged,
-            this, &AnnotationSettingsView::onDataChanged, Qt::UniqueConnection);
+    connect(m_pAnnModel.data(),&ANSHAREDLIB::EventModel::dataChanged,
+            this, &EventView::onDataChanged, Qt::UniqueConnection);
 
-    connect(this, &AnnotationSettingsView::addEvent,
-            m_pAnnModel.data(), &ANSHAREDLIB::AnnotationModel::onAddEvent, Qt::UniqueConnection);
+    connect(this, &EventView::addEvent,
+            m_pAnnModel.data(), &ANSHAREDLIB::EventModel::onAddEvent, Qt::UniqueConnection);
 
     //Delegate
-    m_pAnnDelegate = QSharedPointer<AnnotationDelegate>(new AnnotationDelegate(this));
+    m_pAnnDelegate = QSharedPointer<EventDelegate>(new EventDelegate(this));
     m_pUi->m_tableView_eventTableView->setItemDelegate(m_pAnnDelegate.data());
 
-    connect(m_pAnnDelegate.data(), &AnnotationDelegate::sampleValueChanged,
-            this, &AnnotationSettingsView::realTimeDataSample, Qt::UniqueConnection);
+    connect(m_pAnnDelegate.data(), &EventDelegate::sampleValueChanged,
+            this, &EventView::realTimeDataSample, Qt::UniqueConnection);
 
-    connect(m_pAnnDelegate.data(), &AnnotationDelegate::timeValueChanged,
-            this, &AnnotationSettingsView::realTimeDataTime, Qt::UniqueConnection);
+    connect(m_pAnnDelegate.data(), &EventDelegate::timeValueChanged,
+            this, &EventView::realTimeDataTime, Qt::UniqueConnection);
 
     m_pUi->m_tableView_eventTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     m_pUi->m_tableView_eventTableView->setSelectionMode(QAbstractItemView::ExtendedSelection);
@@ -134,61 +134,61 @@ void AnnotationSettingsView::initMVCSettings()
 
 //=============================================================================================================
 
-void AnnotationSettingsView::initGUIFunctionality()
+void EventView::initGUIFunctionality()
 {
 
     //'Activate annotations' checkbox
     connect(m_pUi->m_checkBox_activateEvents, &QCheckBox::stateChanged,
-            this, &AnnotationSettingsView::onActiveEventsChecked, Qt::UniqueConnection);
+            this, &EventView::onActiveEventsChecked, Qt::UniqueConnection);
 
     //'Show selected annotation' checkbox
     connect(m_pUi->m_checkBox_showSelectedEventsOnly,&QCheckBox::stateChanged,
-            this, &AnnotationSettingsView::onSelectedEventsChecked, Qt::UniqueConnection);
+            this, &EventView::onSelectedEventsChecked, Qt::UniqueConnection);
     connect(m_pUi->m_tableView_eventTableView->selectionModel(), &QItemSelectionModel::selectionChanged,
-            this, &AnnotationSettingsView::onCurrentSelectedChanged, Qt::UniqueConnection);
+            this, &EventView::onCurrentSelectedChanged, Qt::UniqueConnection);
 
     //'Show all' checkbox
     connect(m_pUi->m_checkBox_showAll, &QCheckBox::stateChanged,
-            this, &AnnotationSettingsView::onShowAllChecked, Qt::UniqueConnection);
+            this, &EventView::onShowAllChecked, Qt::UniqueConnection);
 
     //Annotation types combo box
     connect(m_pUi->m_comboBox_filterTypes, &QComboBox::currentTextChanged,
-            m_pAnnModel.data(), &ANSHAREDLIB::AnnotationModel::setEventFilterType, Qt::UniqueConnection);
-    connect(m_pAnnModel.data(), &ANSHAREDLIB::AnnotationModel::updateEventTypes,
-            this, &AnnotationSettingsView::updateComboBox, Qt::UniqueConnection);
+            m_pAnnModel.data(), &ANSHAREDLIB::EventModel::setEventFilterType, Qt::UniqueConnection);
+    connect(m_pAnnModel.data(), &ANSHAREDLIB::EventModel::updateEventTypes,
+            this, &EventView::updateComboBox, Qt::UniqueConnection);
 
     //Add type button
     connect(m_pUi->m_pushButton_addEventType, &QPushButton::clicked,
-            this, &AnnotationSettingsView::addNewAnnotationType, Qt::UniqueConnection);
+            this, &EventView::addNewAnnotationType, Qt::UniqueConnection);
 
     //Switching groups
     connect(m_pUi->m_listWidget_groupListWidget->selectionModel(), &QItemSelectionModel::selectionChanged,
-            this, &AnnotationSettingsView::groupChanged, Qt::UniqueConnection);
+            this, &EventView::groupChanged, Qt::UniqueConnection);
 
     m_pUi->m_tableView_eventTableView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(m_pUi->m_tableView_eventTableView, &QWidget::customContextMenuRequested,
-            this, &AnnotationSettingsView::customEventContextMenuRequested, Qt::UniqueConnection);
+            this, &EventView::customEventContextMenuRequested, Qt::UniqueConnection);
 
     m_pUi->m_tableView_eventTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     m_pUi->m_tableView_eventTableView->setEditTriggers(QAbstractItemView::DoubleClicked);
 
     m_pUi->m_listWidget_groupListWidget->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(m_pUi->m_listWidget_groupListWidget, &QWidget::customContextMenuRequested,
-            this, &AnnotationSettingsView::customGroupContextMenuRequested, Qt::UniqueConnection);
+            this, &EventView::customGroupContextMenuRequested, Qt::UniqueConnection);
 
     connect(m_pUi->m_pushButtonStim, &QPushButton::clicked,
-            this, &AnnotationSettingsView::onStimButtonClicked, Qt::UniqueConnection);
+            this, &EventView::onStimButtonClicked, Qt::UniqueConnection);
 
     connect(m_pTriggerDetectView.data(), &DISPLIB::TriggerDetectionView::detectTriggers,
-            this, &AnnotationSettingsView::onDetectTriggers, Qt::UniqueConnection);
+            this, &EventView::onDetectTriggers, Qt::UniqueConnection);
 
     connect(&m_FutureWatcher, &QFutureWatcher<QMap<double,QList<int>>>::finished,
-            this, &AnnotationSettingsView::createGroupsFromTriggers, Qt::UniqueConnection);
+            this, &EventView::createGroupsFromTriggers, Qt::UniqueConnection);
 }
 
 //=============================================================================================================
 
-void AnnotationSettingsView::onActiveEventsChecked(int iCheckBoxState)
+void EventView::onActiveEventsChecked(int iCheckBoxState)
 {
     m_iCheckState = iCheckBoxState;
     emit activeEventsChecked(m_iCheckState);
@@ -196,7 +196,7 @@ void AnnotationSettingsView::onActiveEventsChecked(int iCheckBoxState)
 
 //=============================================================================================================
 
-void AnnotationSettingsView::updateComboBox(const QString &currentAnnotationType)
+void EventView::updateComboBox(const QString &currentAnnotationType)
 {
     m_pUi->m_comboBox_filterTypes->clear();
     m_pUi->m_comboBox_filterTypes->addItem("All");
@@ -210,7 +210,7 @@ void AnnotationSettingsView::updateComboBox(const QString &currentAnnotationType
 
 //=============================================================================================================
 
-void AnnotationSettingsView::addAnnotationToModel(int iSamplePos)
+void EventView::addAnnotationToModel(int iSamplePos)
 {
     if(!(m_pAnnModel->getHubSize())){
         newUserGroup("User Events",
@@ -230,7 +230,7 @@ void AnnotationSettingsView::addAnnotationToModel(int iSamplePos)
 
 //=============================================================================================================
 
-void AnnotationSettingsView::setModel(QSharedPointer<ANSHAREDLIB::AnnotationModel> pAnnModel)
+void EventView::setModel(QSharedPointer<ANSHAREDLIB::EventModel> pAnnModel)
 {
     m_pAnnModel = pAnnModel;
 
@@ -242,7 +242,7 @@ void AnnotationSettingsView::setModel(QSharedPointer<ANSHAREDLIB::AnnotationMode
 
 //=============================================================================================================
 
-void AnnotationSettingsView::onDataChanged()
+void EventView::onDataChanged()
 {
     m_pUi->m_tableView_eventTableView->update();
     m_pUi->m_tableView_eventTableView->repaint();
@@ -253,7 +253,7 @@ void AnnotationSettingsView::onDataChanged()
 
 //=============================================================================================================
 
-void AnnotationSettingsView::passFiffParams(int iFirst,
+void EventView::passFiffParams(int iFirst,
                                             int iLast,
                                             float fFreq)
 {
@@ -263,7 +263,7 @@ void AnnotationSettingsView::passFiffParams(int iFirst,
 
 //=============================================================================================================
 
-void AnnotationSettingsView::removeAnnotationfromModel()
+void EventView::removeEvent()
 {
     QModelIndexList indexList = m_pUi->m_tableView_eventTableView->selectionModel()->selectedIndexes();
 
@@ -283,7 +283,7 @@ void AnnotationSettingsView::removeAnnotationfromModel()
 
 //=============================================================================================================
 
-void AnnotationSettingsView::addNewAnnotationType()
+void EventView::addNewAnnotationType()
 {
     if(newUserGroup(m_pUi->lineEdit->text(), m_pUi->m_spinBox_addEventType->value())) {
         m_pAnnModel->addNewAnnotationType(QString().number(m_pUi->m_spinBox_addEventType->value()),
@@ -295,7 +295,7 @@ void AnnotationSettingsView::addNewAnnotationType()
 
 //=============================================================================================================
 
-void AnnotationSettingsView::onSelectedEventsChecked(int iCheckBoxState)
+void EventView::onSelectedEventsChecked(int iCheckBoxState)
 {
     m_iCheckSelectedState = iCheckBoxState;
     m_pAnnModel->setShowSelected(m_iCheckSelectedState);
@@ -305,36 +305,36 @@ void AnnotationSettingsView::onSelectedEventsChecked(int iCheckBoxState)
 
 //=============================================================================================================
 
-void AnnotationSettingsView::disconnectFromModel()
+void EventView::disconnectFromModel()
 {
-    disconnect(m_pAnnModel.data(),&ANSHAREDLIB::AnnotationModel::dataChanged,
-            this, &AnnotationSettingsView::onDataChanged);
+    disconnect(m_pAnnModel.data(),&ANSHAREDLIB::EventModel::dataChanged,
+            this, &EventView::onDataChanged);
     disconnect(m_pUi->m_checkBox_activateEvents, &QCheckBox::stateChanged,
-            this, &AnnotationSettingsView::onActiveEventsChecked);
+            this, &EventView::onActiveEventsChecked);
     disconnect(m_pUi->m_checkBox_showSelectedEventsOnly,&QCheckBox::stateChanged,
-            this, &AnnotationSettingsView::onSelectedEventsChecked);
+            this, &EventView::onSelectedEventsChecked);
     disconnect(m_pUi->m_comboBox_filterTypes, &QComboBox::currentTextChanged,
-            m_pAnnModel.data(), &ANSHAREDLIB::AnnotationModel::setEventFilterType);
-    disconnect(m_pAnnModel.data(), &ANSHAREDLIB::AnnotationModel::updateEventTypes,
-            this, &AnnotationSettingsView::updateComboBox);
+            m_pAnnModel.data(), &ANSHAREDLIB::EventModel::setEventFilterType);
+    disconnect(m_pAnnModel.data(), &ANSHAREDLIB::EventModel::updateEventTypes,
+            this, &EventView::updateComboBox);
     disconnect(m_pUi->m_pushButton_addEventType, &QPushButton::clicked,
-            this, &AnnotationSettingsView::addNewAnnotationType);
+            this, &EventView::addNewAnnotationType);
     disconnect(m_pUi->m_listWidget_groupListWidget->selectionModel(), &QItemSelectionModel::selectionChanged,
-            this, &AnnotationSettingsView::groupChanged);
+            this, &EventView::groupChanged);
     disconnect(m_pUi->m_checkBox_showAll, &QCheckBox::stateChanged,
-            this, &AnnotationSettingsView::onShowAllChecked);
+            this, &EventView::onShowAllChecked);
     disconnect(m_pUi->m_tableView_eventTableView, &QWidget::customContextMenuRequested,
-            this, &AnnotationSettingsView::customEventContextMenuRequested);
+            this, &EventView::customEventContextMenuRequested);
     disconnect(m_pUi->m_listWidget_groupListWidget, &QWidget::customContextMenuRequested,
-            this, &AnnotationSettingsView::customGroupContextMenuRequested);
+            this, &EventView::customGroupContextMenuRequested);
     disconnect(m_pUi->m_listWidget_groupListWidget, &QListWidget::itemChanged,
-            this, &AnnotationSettingsView::renameGroup);
+            this, &EventView::renameGroup);
     disconnect(m_pUi->m_pushButtonStim, &QPushButton::clicked,
-            this, &AnnotationSettingsView::onStimButtonClicked);
+            this, &EventView::onStimButtonClicked);
     disconnect(m_pTriggerDetectView.data(), &DISPLIB::TriggerDetectionView::detectTriggers,
-            this, &AnnotationSettingsView::onDetectTriggers);
-    disconnect(this, &AnnotationSettingsView::addEvent,
-            m_pAnnModel.data(), &ANSHAREDLIB::AnnotationModel::onAddEvent);
+            this, &EventView::onDetectTriggers);
+    disconnect(this, &EventView::addEvent,
+            m_pAnnModel.data(), &ANSHAREDLIB::EventModel::onAddEvent);
 
 
     saveGroupSettings();
@@ -342,7 +342,7 @@ void AnnotationSettingsView::disconnectFromModel()
 
 //=============================================================================================================
 
-void AnnotationSettingsView::onCurrentSelectedChanged()
+void EventView::onCurrentSelectedChanged()
 {
     m_pAnnModel->clearSelected();
     m_pAnnModel->setSelectedAnn(m_pUi->m_tableView_eventTableView->selectionModel()->currentIndex().row());
@@ -356,7 +356,7 @@ void AnnotationSettingsView::onCurrentSelectedChanged()
 
 //=============================================================================================================
 
-void AnnotationSettingsView::onSaveButton()
+void EventView::onSaveButton()
 {
     #ifdef WASMBUILD
     m_pAnnModel->saveToFile("");
@@ -375,11 +375,11 @@ void AnnotationSettingsView::onSaveButton()
 
 //=============================================================================================================
 
-void AnnotationSettingsView::keyReleaseEvent(QKeyEvent* event)
+void EventView::keyReleaseEvent(QKeyEvent* event)
 {
     switch (event->key()) {
         case  Qt::Key_Delete:
-            this->removeAnnotationfromModel();
+            this->removeEvent();
             break;
         case Qt::Key_J:
             emit jumpToSelected();
@@ -389,7 +389,7 @@ void AnnotationSettingsView::keyReleaseEvent(QKeyEvent* event)
 
 //=============================================================================================================
 
-void AnnotationSettingsView::realTimeDataSample(int iValue)
+void EventView::realTimeDataSample(int iValue)
 {
     m_pAnnModel->setSelectedAnn(m_pUi->m_tableView_eventTableView->selectionModel()->currentIndex().row());
     m_pAnnModel->updateFilteredSample(iValue);
@@ -398,7 +398,7 @@ void AnnotationSettingsView::realTimeDataSample(int iValue)
 
 //=============================================================================================================
 
-void AnnotationSettingsView::realTimeDataTime(double dValue)
+void EventView::realTimeDataTime(double dValue)
 {
     m_pAnnModel->setSelectedAnn(m_pUi->m_tableView_eventTableView->selectionModel()->currentIndex().row());
     dValue *= m_pAnnModel->getFreq();
@@ -409,7 +409,7 @@ void AnnotationSettingsView::realTimeDataTime(double dValue)
 
 //=============================================================================================================
 
-bool AnnotationSettingsView::newUserGroup(const QString& sName,
+bool EventView::newUserGroup(const QString& sName,
                                           int iType,
                                           bool bDefaultColor)
 {
@@ -454,7 +454,7 @@ bool AnnotationSettingsView::newUserGroup(const QString& sName,
 
 //=============================================================================================================
 
-void AnnotationSettingsView::groupChanged()
+void EventView::groupChanged()
 {
     if(!m_pUi->m_listWidget_groupListWidget->selectionModel()->selectedRows().size()){
         return;
@@ -472,7 +472,7 @@ void AnnotationSettingsView::groupChanged()
 
 //=============================================================================================================
 
-void AnnotationSettingsView::onShowAllChecked(int iCheckBoxState)
+void EventView::onShowAllChecked(int iCheckBoxState)
 {
     if (iCheckBoxState){
         m_pUi->m_listWidget_groupListWidget->clearSelection();
@@ -490,45 +490,45 @@ void AnnotationSettingsView::onShowAllChecked(int iCheckBoxState)
 
 //=============================================================================================================
 
-void AnnotationSettingsView::customEventContextMenuRequested(const QPoint &pos)
+void EventView::customEventContextMenuRequested(const QPoint &pos)
 {
     QMenu* menu = new QMenu(this);
 
     QAction* deleteEvent = menu->addAction(tr("Delete event"));
     connect(deleteEvent, &QAction::triggered,
-            this, &AnnotationSettingsView::removeAnnotationfromModel, Qt::UniqueConnection);
+            this, &EventView::removeEvent, Qt::UniqueConnection);
 
     QAction* jumpToEvent = menu->addAction(tr("Jump to event"));
     connect(jumpToEvent, &QAction::triggered,
-            this, &AnnotationSettingsView::jumpToSelected, Qt::UniqueConnection);
+            this, &EventView::jumpToSelected, Qt::UniqueConnection);
 
     menu->popup(m_pUi->m_tableView_eventTableView->viewport()->mapToGlobal(pos));
 }
 
 //=============================================================================================================
 
-void AnnotationSettingsView::customGroupContextMenuRequested(const QPoint &pos)
+void EventView::customGroupContextMenuRequested(const QPoint &pos)
 {
     QMenu* menu = new QMenu(this);
 
     QAction* renameGroup =  menu->addAction(tr("Rename"));
     connect(renameGroup, &QAction::triggered,
-            this, &AnnotationSettingsView::renameGroup, Qt::UniqueConnection);
+            this, &EventView::renameGroup, Qt::UniqueConnection);
 
     QAction* colorChange = menu->addAction(tr("Change color"));
     connect(colorChange, &QAction::triggered,
-            this, &AnnotationSettingsView::changeGroupColor, Qt::UniqueConnection);
+            this, &EventView::changeGroupColor, Qt::UniqueConnection);
 
     QAction* markTime = menu->addAction(tr("Delete group"));
     connect(markTime, &QAction::triggered,
-            this, &AnnotationSettingsView::deleteGroup, Qt::UniqueConnection);
+            this, &EventView::deleteGroup, Qt::UniqueConnection);
 
     menu->popup(m_pUi->m_listWidget_groupListWidget->viewport()->mapToGlobal(pos));
 }
 
 //=============================================================================================================
 
-void AnnotationSettingsView::deleteGroup()
+void EventView::deleteGroup()
 {
     int iSelected = m_pUi->m_listWidget_groupListWidget->selectionModel()->selectedRows().first().row();
     QListWidgetItem* itemToDelete = m_pUi->m_listWidget_groupListWidget->takeItem(iSelected);
@@ -541,7 +541,7 @@ void AnnotationSettingsView::deleteGroup()
 
 //=============================================================================================================
 
-void AnnotationSettingsView::saveGroupSettings()
+void EventView::saveGroupSettings()
 {
     while(m_pUi->m_listWidget_groupListWidget->count()){
         m_pAnnModel->pushGroup(m_pUi->m_listWidget_groupListWidget->takeItem(m_pUi->m_listWidget_groupListWidget->count() - 1));
@@ -550,7 +550,7 @@ void AnnotationSettingsView::saveGroupSettings()
 
 //=============================================================================================================
 
-void AnnotationSettingsView::loadGroupSettings()
+void EventView::loadGroupSettings()
 {
     while(m_pAnnModel->getGroupStackSize()){
         m_pUi->m_listWidget_groupListWidget->addItem(m_pAnnModel->popGroup());
@@ -559,7 +559,7 @@ void AnnotationSettingsView::loadGroupSettings()
 
 //=============================================================================================================
 
-void AnnotationSettingsView::renameGroup()
+void EventView::renameGroup()
 {
     QString text = QInputDialog::getText(this, tr("Event Viewer Group Settings"),
                                              tr("Group Name:"), QLineEdit::Normal);
@@ -583,7 +583,7 @@ void AnnotationSettingsView::renameGroup()
 
 //=============================================================================================================
 
-void AnnotationSettingsView::changeGroupColor()
+void EventView::changeGroupColor()
 {
     QColor groupColor = m_pColordialog->getColor(Qt::black, this);
 
@@ -602,7 +602,7 @@ void AnnotationSettingsView::changeGroupColor()
 
 //=============================================================================================================
 
-void AnnotationSettingsView::onStimButtonClicked()
+void EventView::onStimButtonClicked()
 {
     if(m_pTriggerDetectView->isHidden()){
         m_pTriggerDetectView->activateWindow();
@@ -613,14 +613,14 @@ void AnnotationSettingsView::onStimButtonClicked()
 
 //=============================================================================================================
 
-void AnnotationSettingsView::initTriggerDetect(const QSharedPointer<FIFFLIB::FiffInfo>info)
+void EventView::initTriggerDetect(const QSharedPointer<FIFFLIB::FiffInfo>info)
 {
     m_pTriggerDetectView->init(info);
 }
 
 //=============================================================================================================
 
-void AnnotationSettingsView::onDetectTriggers(const QString &sChannelName,
+void EventView::onDetectTriggers(const QString &sChannelName,
                                               double dThreshold)
 {
     if (!m_pFiffRawModel)
@@ -633,7 +633,7 @@ void AnnotationSettingsView::onDetectTriggers(const QString &sChannelName,
     emit loadingStart("Detecting triggers...");
 
     m_Future = QtConcurrent::run(this,
-                                 &AnnotationSettingsView::detectTriggerCalculations,
+                                 &EventView::detectTriggerCalculations,
                                  sChannelName,
                                  dThreshold,
                                  *m_pFiffRawModel->getFiffInfo(),
@@ -644,7 +644,7 @@ void AnnotationSettingsView::onDetectTriggers(const QString &sChannelName,
 
 //=============================================================================================================
 
-QMap<double,QList<int>> AnnotationSettingsView::detectTriggerCalculations(const QString& sChannelName,
+QMap<double,QList<int>> EventView::detectTriggerCalculations(const QString& sChannelName,
                                                                           double dThreshold,
                                                                           FIFFLIB::FiffInfo fiffInfo,
                                                                           FIFFLIB::FiffRawData fiffRaw)
@@ -687,7 +687,7 @@ QMap<double,QList<int>> AnnotationSettingsView::detectTriggerCalculations(const 
 //=============================================================================================================
 
 
-void AnnotationSettingsView::onNewFiffRawViewModel(QSharedPointer<ANSHAREDLIB::FiffRawViewModel> pFiffRawModel)
+void EventView::onNewFiffRawViewModel(QSharedPointer<ANSHAREDLIB::FiffRawViewModel> pFiffRawModel)
 {
     m_pFiffRawModel = pFiffRawModel;
 
@@ -700,7 +700,7 @@ void AnnotationSettingsView::onNewFiffRawViewModel(QSharedPointer<ANSHAREDLIB::F
 
 //=============================================================================================================
 
-bool AnnotationSettingsView::newStimGroup(const QString &sName,
+bool EventView::newStimGroup(const QString &sName,
                                           int iType,
                                           const QColor &groupColor)
 {
@@ -722,7 +722,7 @@ bool AnnotationSettingsView::newStimGroup(const QString &sName,
 
 //=============================================================================================================
 
-void AnnotationSettingsView::createGroupsFromTriggers()
+void EventView::createGroupsFromTriggers()
 {
     QMap<double,QList<int>> mEventGroupMap = m_Future.result();
 
@@ -754,7 +754,7 @@ void AnnotationSettingsView::createGroupsFromTriggers()
 
 //=============================================================================================================
 
-void AnnotationSettingsView::clearView(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel)
+void EventView::clearView(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel)
 {
     if (qSharedPointerCast<ANSHAREDLIB::AbstractModel>(m_pAnnModel) == pRemovedModel){
         disconnectFromModel();

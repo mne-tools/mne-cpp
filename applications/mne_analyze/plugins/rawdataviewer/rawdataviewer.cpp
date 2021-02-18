@@ -245,8 +245,8 @@ void RawDataViewer::onModelChanged(QSharedPointer<AbstractModel> pNewModel)
 
         m_pFiffRawView->setModel(qSharedPointerCast<FiffRawViewModel>(pNewModel));
     } else if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_ANNOTATION_MODEL) {
-        if (qSharedPointerCast<AnnotationModel>(pNewModel)->getFiffModel() == m_pFiffRawView->getModel()){
-            m_pFiffRawView->getModel()->setAnnotationModel(qSharedPointerCast<AnnotationModel>(pNewModel));
+        if (qSharedPointerCast<EventModel>(pNewModel)->getFiffModel() == m_pFiffRawView->getModel()){
+            m_pFiffRawView->getModel()->setAnnotationModel(qSharedPointerCast<EventModel>(pNewModel));
         }
     }
 }

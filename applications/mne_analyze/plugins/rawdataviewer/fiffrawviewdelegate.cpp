@@ -317,7 +317,7 @@ void FiffRawViewDelegate::createMarksPath(const QModelIndex &index,
                                           QPainter* painter) const
 {
     const FiffRawViewModel* t_pModel = static_cast<const FiffRawViewModel*>(index.model());
-    QSharedPointer<AnnotationModel> t_pAnnModel = t_pModel->getAnnotationModel();
+    QSharedPointer<EventModel> t_pAnnModel = t_pModel->getAnnotationModel();
 
     double dDx = t_pModel->pixelDifference();
 

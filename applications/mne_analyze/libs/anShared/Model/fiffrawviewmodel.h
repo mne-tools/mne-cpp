@@ -88,7 +88,7 @@ namespace ANSHAREDLIB {
 // ANSHAREDLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-class AnnotationModel;
+class EventModel;
 
 //=============================================================================================================
 /**
@@ -446,7 +446,7 @@ public:
      *
      * @return shared pointer to the annotation model.
      */
-    QSharedPointer<AnnotationModel> getAnnotationModel() const;
+    QSharedPointer<EventModel> getAnnotationModel() const;
 
     //=========================================================================================================
     /**
@@ -518,7 +518,7 @@ public:
      *
      * @param[in] pModel   associated annotation model.
      */
-    void setAnnotationModel(QSharedPointer<ANSHAREDLIB::AnnotationModel> pModel);
+    void setAnnotationModel(QSharedPointer<ANSHAREDLIB::EventModel> pModel);
 
 private:
     //=========================================================================================================
@@ -632,7 +632,7 @@ private:
 
     bool                                        m_bDispAnnotation;                          /**< Whether annotations wil be shown. */
 
-    QSharedPointer<AnnotationModel>             m_pAnnotationModel;                         /**< Model to stored annotations to be displayed. */
+    QSharedPointer<EventModel>             m_pAnnotationModel;                         /**< Model to stored annotations to be displayed. */
 
 signals:
     //=========================================================================================================

@@ -76,7 +76,7 @@ using namespace ANSHAREDLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-AnnotationModel::AnnotationModel(QObject* parent)
+EventModel::EventModel(QObject* parent)
 : AbstractModel(parent)
 , m_iIndexCount(0)
 , m_iSamplePos(0)
@@ -94,7 +94,7 @@ AnnotationModel::AnnotationModel(QObject* parent)
 
 //=============================================================================================================
 
-AnnotationModel::AnnotationModel(QSharedPointer<FiffRawViewModel> pFiffModel,
+EventModel::EventModel(QSharedPointer<FiffRawViewModel> pFiffModel,
                 QObject* parent)
 : AbstractModel(parent)
 , m_iIndexCount(0)
@@ -112,7 +112,7 @@ AnnotationModel::AnnotationModel(QSharedPointer<FiffRawViewModel> pFiffModel,
 
 //=============================================================================================================
 
-AnnotationModel::AnnotationModel(const QString &sFilePath,
+EventModel::EventModel(const QString &sFilePath,
                                  const QByteArray& byteLoadedData,
                                  float fSampFreq,
                                  int iFirstSampOffst,
@@ -138,7 +138,7 @@ AnnotationModel::AnnotationModel(const QString &sFilePath,
 
 //=============================================================================================================
 
-AnnotationModel::~AnnotationModel()
+EventModel::~EventModel()
 {
     for(EventGroup* eventGroup : m_mAnnotationHub){
         if(eventGroup){
@@ -149,14 +149,14 @@ AnnotationModel::~AnnotationModel()
 
 //=============================================================================================================
 
-QStringList AnnotationModel::getEventTypeList() const
+QStringList EventModel::getEventTypeList() const
 {
     return m_eventTypeList;
 }
 
 //=============================================================================================================
 
-bool AnnotationModel::insertRows(int position,
+bool EventModel::insertRows(int position,
                                  int span,
                                  const QModelIndex & parent)
 {
@@ -216,14 +216,14 @@ bool AnnotationModel::insertRows(int position,
 
 //=============================================================================================================
 
-void AnnotationModel::setSamplePos(int iSamplePos)
+void EventModel::setSamplePos(int iSamplePos)
 {
     m_iSamplePos = iSamplePos;
 }
 
 //=============================================================================================================
 
-int AnnotationModel::rowCount(const QModelIndex &parent) const
+int EventModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
     return m_dataSamplesFiltered.size();
@@ -231,7 +231,7 @@ int AnnotationModel::rowCount(const QModelIndex &parent) const
 
 //=============================================================================================================
 
-int AnnotationModel::columnCount(const QModelIndex &parent) const
+int EventModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
     return 3;
@@ -239,7 +239,7 @@ int AnnotationModel::columnCount(const QModelIndex &parent) const
 
 //=============================================================================================================
 
-QVariant AnnotationModel::data(const QModelIndex &index,
+QVariant EventModel::data(const QModelIndex &index,
                                int role) const
 {
     if(role == Qt::TextAlignmentRole)
@@ -321,7 +321,7 @@ QVariant AnnotationModel::data(const QModelIndex &index,
 
 //=============================================================================================================
 
-bool AnnotationModel::setData(const QModelIndex &index,
+bool EventModel::setData(const QModelIndex &index,
                               const QVariant &value,
                               int role)
 {
@@ -354,7 +354,7 @@ bool AnnotationModel::setData(const QModelIndex &index,
 
 //=============================================================================================================
 
-void AnnotationModel::setEventFilterType(const QString eventType)
+void EventModel::setEventFilterType(const QString eventType)
 {
     m_sFilterEventType = eventType;
 
@@ -389,7 +389,7 @@ void AnnotationModel::setEventFilterType(const QString eventType)
 
 //=============================================================================================================
 
-Qt::ItemFlags AnnotationModel::flags(const QModelIndex &index) const
+Qt::ItemFlags EventModel::flags(const QModelIndex &index) const
 {
     //Return editable mode only for user events an when event type filtering is deactivated
     if(m_dataIsUserEventFiltered[index.row()] == 1 && m_sFilterEventType == "All")
@@ -399,7 +399,7 @@ Qt::ItemFlags AnnotationModel::flags(const QModelIndex &index) const
 
 //=============================================================================================================
 
-QVariant AnnotationModel::headerData(int section,
+QVariant EventModel::headerData(int section,
                                      Qt::Orientation orientation,
                                      int role) const
 {
@@ -428,7 +428,7 @@ QVariant AnnotationModel::headerData(int section,
 
 //=============================================================================================================
 
-bool AnnotationModel::removeRows(int position,
+bool EventModel::removeRows(int position,
                                  int span,
                                  const QModelIndex &parent)
 {
@@ -456,7 +456,7 @@ bool AnnotationModel::removeRows(int position,
 
 //=============================================================================================================
 
-void AnnotationModel::setFirstLastSample(int firstSample,
+void EventModel::setFirstLastSample(int firstSample,
                                          int lastSample)
 {
     m_iFirstSample = firstSample;
@@ -465,7 +465,7 @@ void AnnotationModel::setFirstLastSample(int firstSample,
 
 //=============================================================================================================
 
-QPair<int,int> AnnotationModel::getFirstLastSample() const
+QPair<int,int> EventModel::getFirstLastSample() const
 {
     QPair<int, int> pair(m_iFirstSample, m_iLastSample);
     return pair;
@@ -473,21 +473,21 @@ QPair<int,int> AnnotationModel::getFirstLastSample() const
 
 //=============================================================================================================
 
-float AnnotationModel::getSampleFreq() const
+float EventModel::getSampleFreq() const
 {
     return m_fFreq;
 }
 
 //=============================================================================================================
 
-void AnnotationModel::setSampleFreq(float fFreq)
+void EventModel::setSampleFreq(float fFreq)
 {
     m_fFreq = fFreq;
 }
 
 //=============================================================================================================
 
-int AnnotationModel::getNumberOfAnnotations() const
+int EventModel::getNumberOfAnnotations() const
 {
     if (m_iSelectedCheckState){
         return m_dataSelectedRows.size();
@@ -498,7 +498,7 @@ int AnnotationModel::getNumberOfAnnotations() const
 
 //=============================================================================================================
 
-int AnnotationModel::getAnnotation(int iIndex) const
+int EventModel::getAnnotation(int iIndex) const
 {
     if (m_iSelectedCheckState){
         return m_dataSamplesFiltered.at(m_dataSelectedRows.at(iIndex));
@@ -509,7 +509,7 @@ int AnnotationModel::getAnnotation(int iIndex) const
 
 //=============================================================================================================
 
-void AnnotationModel::addNewAnnotationType(const QString &eventType,
+void EventModel::addNewAnnotationType(const QString &eventType,
                                            const QColor &typeColor)
 {
     m_eventTypeColor[eventType.toInt()] = typeColor;
@@ -524,56 +524,56 @@ void AnnotationModel::addNewAnnotationType(const QString &eventType,
 
 //=============================================================================================================
 
-QMap<int, QColor>& AnnotationModel::getTypeColors()
+QMap<int, QColor>& EventModel::getTypeColors()
 {
     return m_eventTypeColor;
 }
 
 //=============================================================================================================
 
-QMap<int, QColor>& AnnotationModel::getGroupColors()
+QMap<int, QColor>& EventModel::getGroupColors()
 {
     return m_eventGroupColor;
 }
 
 //=============================================================================================================
 
-void AnnotationModel::setSelectedAnn(int iSelected)
+void EventModel::setSelectedAnn(int iSelected)
 {
     m_iSelectedAnn = iSelected;
 }
 
 //=============================================================================================================
 
-void AnnotationModel::setShowSelected(int iSelectedState)
+void EventModel::setShowSelected(int iSelectedState)
 {
     m_iSelectedCheckState = iSelectedState;
 }
 
 //=============================================================================================================
 
-int AnnotationModel::getShowSelected()
+int EventModel::getShowSelected()
 {
     return m_iSelectedCheckState;
 }
 
 //=============================================================================================================
 
-int AnnotationModel::getSelectedAnn()
+int EventModel::getSelectedAnn()
 {
     return m_iSelectedAnn;
 }
 
 //=============================================================================================================
 
-float AnnotationModel::getFreq()
+float EventModel::getFreq()
 {
     return m_fFreq;
 }
 
 //=============================================================================================================
 
-bool AnnotationModel::saveToFile(const QString& sPath)
+bool EventModel::saveToFile(const QString& sPath)
 {
     #ifdef WASMBUILD
     //QBuffer* bufferOut = new QBuffer;
@@ -612,14 +612,14 @@ bool AnnotationModel::saveToFile(const QString& sPath)
 
 //=============================================================================================================
 
-void AnnotationModel::setLastType(int iType)
+void EventModel::setLastType(int iType)
 {
     m_iLastTypeAdded = iType;
 }
 
 //=============================================================================================================
 
-void AnnotationModel::updateFilteredSample(int iIndex,
+void EventModel::updateFilteredSample(int iIndex,
                                            int iSample)
 {
     m_dataSamplesFiltered[iIndex] = iSample + m_iFirstSample;
@@ -627,28 +627,28 @@ void AnnotationModel::updateFilteredSample(int iIndex,
 
 //=============================================================================================================
 
-void AnnotationModel::updateFilteredSample(int iSample)
+void EventModel::updateFilteredSample(int iSample)
 {
     m_dataSamplesFiltered[m_iSelectedAnn] = iSample + m_iFirstSample;
 }
 
 //=============================================================================================================
 
-void AnnotationModel::clearSelected()
+void EventModel::clearSelected()
 {
     m_dataSelectedRows.clear();
 }
 
 //=============================================================================================================
 
-void AnnotationModel::appendSelected(int iSelectedIndex)
+void EventModel::appendSelected(int iSelectedIndex)
 {
     m_dataSelectedRows.append(iSelectedIndex);
 }
 
 //=============================================================================================================
 
-MatrixXi AnnotationModel::getAnnotationMatrix(int iGroup)
+MatrixXi EventModel::getAnnotationMatrix(int iGroup)
 {
     MatrixXi matEventDataMatrix;
 
@@ -679,7 +679,7 @@ MatrixXi AnnotationModel::getAnnotationMatrix(int iGroup)
 
 //=============================================================================================================
 
-int AnnotationModel::createGroup(const QString& sGroupName,
+int EventModel::createGroup(const QString& sGroupName,
                                  bool bIsUserMade,
                                  int iType,
                                  const QColor &typeColor)
@@ -707,7 +707,7 @@ int AnnotationModel::createGroup(const QString& sGroupName,
 
 //=============================================================================================================
 
-void AnnotationModel::switchGroup(int iGroupIndex)
+void EventModel::switchGroup(int iGroupIndex)
 {
     beginResetModel();
 
@@ -737,28 +737,28 @@ void AnnotationModel::switchGroup(int iGroupIndex)
 
 //=============================================================================================================
 
-bool AnnotationModel::isUserMade()
+bool EventModel::isUserMade()
 {
     return m_bIsUserMade;
 }
 
 //=============================================================================================================
 
-int AnnotationModel::getHubSize()
+int EventModel::getHubSize()
 {
     return m_mAnnotationHub.size();
 }
 
 //=============================================================================================================
 
-bool AnnotationModel::getHubUserMade(int iIndex)
+bool EventModel::getHubUserMade(int iIndex)
 {
     return m_mAnnotationHub[iIndex]->isUserMade;
 }
 
 //=============================================================================================================
 
-void AnnotationModel::showAll(bool bSet)
+void EventModel::showAll(bool bSet)
 {
     beginResetModel();
 
@@ -778,7 +778,7 @@ void AnnotationModel::showAll(bool bSet)
 
 //=============================================================================================================
 
-void AnnotationModel::loadAllGroups()
+void EventModel::loadAllGroups()
 {
     for (EventGroup* e : m_mAnnotationHub) {
         m_dataSamples.append(e->dataSamples);
@@ -797,7 +797,7 @@ void AnnotationModel::loadAllGroups()
 
 //=============================================================================================================
 
-void AnnotationModel::resetSelection()
+void EventModel::resetSelection()
 {
     m_dataSamples.clear();
     m_dataTypes.clear();
@@ -812,7 +812,7 @@ void AnnotationModel::resetSelection()
 
 //=============================================================================================================
 
-void AnnotationModel::hideAll()
+void EventModel::hideAll()
 {
     beginResetModel();
     resetSelection();
@@ -821,13 +821,13 @@ void AnnotationModel::hideAll()
 
 //=============================================================================================================
 
-int AnnotationModel::getIndexCount(){
+int EventModel::getIndexCount(){
     return m_iIndexCount;
 }
 
 //=============================================================================================================
 
-void AnnotationModel::removeGroup(int iGroupIndex)
+void EventModel::removeGroup(int iGroupIndex)
 {
     beginResetModel();
     resetSelection();
@@ -837,7 +837,7 @@ void AnnotationModel::removeGroup(int iGroupIndex)
 
 //=============================================================================================================
 
-int AnnotationModel::currentGroup(int iIndex)
+int EventModel::currentGroup(int iIndex)
 {
     //return m_dataGroup[iIndex];
     if (m_iSelectedCheckState){
@@ -849,14 +849,14 @@ int AnnotationModel::currentGroup(int iIndex)
 
 //=============================================================================================================
 
-void AnnotationModel::pushGroup(QListWidgetItem *item)
+void EventModel::pushGroup(QListWidgetItem *item)
 {
     m_dataStoredGroups.push(item);
 }
 
 //=============================================================================================================
 
-QListWidgetItem* AnnotationModel::popGroup()
+QListWidgetItem* EventModel::popGroup()
 {
     if(!m_dataStoredGroups.isEmpty()){
         return m_dataStoredGroups.pop();
@@ -867,14 +867,14 @@ QListWidgetItem* AnnotationModel::popGroup()
 
 //=============================================================================================================
 
-int AnnotationModel::getGroupStackSize()
+int EventModel::getGroupStackSize()
 {
     return m_dataStoredGroups.size();
 }
 
 //=============================================================================================================
 
-void AnnotationModel::setGroupColor(int iGroupIndex,
+void EventModel::setGroupColor(int iGroupIndex,
                                     const QColor& groupColor)
 {
     m_eventGroupColor[iGroupIndex] = groupColor;
@@ -882,7 +882,7 @@ void AnnotationModel::setGroupColor(int iGroupIndex,
 
 //=============================================================================================================
 
-void AnnotationModel::setGroupName(int iGroupIndex,
+void EventModel::setGroupName(int iGroupIndex,
                                    const QString &sGroupName)
 {
     m_mAnnotationHub[iGroupIndex]->groupName = sGroupName;
@@ -890,7 +890,7 @@ void AnnotationModel::setGroupName(int iGroupIndex,
 
 //=============================================================================================================
 
-QString AnnotationModel::getGroupName(int iMapKey)
+QString EventModel::getGroupName(int iMapKey)
 {
     if(!m_mAnnotationHub.contains(iMapKey)){
         qWarning() << "[AnnotationModel::getGroupName] Attempting to get name of group with invalid key.";
@@ -902,7 +902,7 @@ QString AnnotationModel::getGroupName(int iMapKey)
 
 //=============================================================================================================
 
-QString AnnotationModel::getGroupNameFromList(int iListIndex)
+QString EventModel::getGroupNameFromList(int iListIndex)
 {
     if(m_mAnnotationHub.keys().size() <= iListIndex){
         qWarning() << "[AnnotationModel::getGroupNameFromList] Attempting to get name of group with invalid key.";
@@ -913,7 +913,7 @@ QString AnnotationModel::getGroupNameFromList(int iListIndex)
 }
 //=============================================================================================================
 
-int AnnotationModel::getIndexFromName(const QString &sGroupName)
+int EventModel::getIndexFromName(const QString &sGroupName)
 {
     for(EventGroup* group : m_mAnnotationHub){
         if(group->groupName == sGroupName){
@@ -925,7 +925,7 @@ int AnnotationModel::getIndexFromName(const QString &sGroupName)
 
 //=============================================================================================================
 
-void AnnotationModel::saveGroup()
+void EventModel::saveGroup()
 {
     m_mAnnotationHub[m_iSelectedGroup]->dataSamples = m_dataSamples;
     m_mAnnotationHub[m_iSelectedGroup]->dataTypes = m_dataTypes;
@@ -938,21 +938,21 @@ void AnnotationModel::saveGroup()
 
 //=============================================================================================================
 
-void AnnotationModel::setFiffModel(QSharedPointer<FiffRawViewModel> pModel)
+void EventModel::setFiffModel(QSharedPointer<FiffRawViewModel> pModel)
 {
     m_pFiffModel = pModel;
 }
 
 //=============================================================================================================
 
-QSharedPointer<FiffRawViewModel> AnnotationModel::getFiffModel()
+QSharedPointer<FiffRawViewModel> EventModel::getFiffModel()
 {
     return m_pFiffModel;
 }
 
 //=============================================================================================================
 
-void AnnotationModel::initModel()
+void EventModel::initModel()
 {
     m_eventTypeList<<"0";
 
@@ -981,7 +981,7 @@ void AnnotationModel::initModel()
 
 //=============================================================================================================
 
-void AnnotationModel::initFromFile(const QString& sFilePath)
+void EventModel::initFromFile(const QString& sFilePath)
 {
     QFileInfo fileInfo(sFilePath);
 
@@ -1021,7 +1021,7 @@ void AnnotationModel::initFromFile(const QString& sFilePath)
 
 //=============================================================================================================
 
-void AnnotationModel::applyOffset(int iFirstSampleOffset)
+void EventModel::applyOffset(int iFirstSampleOffset)
 {
     for (int i = 0; i < m_dataSamples.size(); i++){
         if (iFirstSampleOffset <= m_dataSamples[i]){
@@ -1037,21 +1037,24 @@ void AnnotationModel::applyOffset(int iFirstSampleOffset)
 
 //=============================================================================================================
 
-void AnnotationModel::onAddEvent(int iSample)
+void EventModel::onAddEvent(int iSample)
 {
     m_EventManager.addEvent(iSample);
 }
 
 //=============================================================================================================
 
-void AnnotationModel::onAddGroup(int iGroup)
+void EventModel::onAddGroup(QString sName, QColor color)
 {
+    int red, green, blue;
+    color.getRgb(&red, &green, &blue);
 
+    m_EventManager.addGroup(sName.toStdString(), EVENTSLIB::RgbColor(red, green, blue));
 }
 
 //=============================================================================================================
 
-std::unique_ptr<std::vector<EVENTSLIB::Event> > AnnotationModel::getEventsToDraw(int iBegin, int iEnd) const
+std::unique_ptr<std::vector<EVENTSLIB::Event> > EventModel::getEventsToDraw(int iBegin, int iEnd) const
 {
     return m_EventManager.getEventsBetween(iBegin, iEnd);
 }

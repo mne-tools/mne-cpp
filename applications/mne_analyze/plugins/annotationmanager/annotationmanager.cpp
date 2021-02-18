@@ -113,42 +113,42 @@ QMenu *AnnotationManager::getMenu()
 
 QDockWidget *AnnotationManager::getControl()
 {
-    AnnotationSettingsView* pAnnotationSettingsView = new AnnotationSettingsView();
+    EventView* pAnnotationSettingsView = new EventView();
     pAnnotationSettingsView->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,
                                                        QSizePolicy::Preferred));
 
-    connect(pAnnotationSettingsView, &AnnotationSettingsView::triggerRedraw,
+    connect(pAnnotationSettingsView, &EventView::triggerRedraw,
             this, &AnnotationManager::onTriggerRedraw, Qt::UniqueConnection);
 
-    connect(pAnnotationSettingsView, &AnnotationSettingsView::groupsUpdated,
+    connect(pAnnotationSettingsView, &EventView::groupsUpdated,
             this, &AnnotationManager::onGroupsUpdated, Qt::UniqueConnection);
 
-    connect(pAnnotationSettingsView, &AnnotationSettingsView::activeEventsChecked,
+    connect(pAnnotationSettingsView, &EventView::activeEventsChecked,
             this, &AnnotationManager::toggleDisplayEvent, Qt::UniqueConnection);
 
-    connect(pAnnotationSettingsView, &AnnotationSettingsView::jumpToSelected,
+    connect(pAnnotationSettingsView, &EventView::jumpToSelected,
             this, &AnnotationManager::onJumpToSelected, Qt::UniqueConnection);
 
     connect(this, &AnnotationManager::newAnnotationAvailable,
-            pAnnotationSettingsView, &AnnotationSettingsView::addAnnotationToModel, Qt::UniqueConnection);
+            pAnnotationSettingsView, &EventView::addAnnotationToModel, Qt::UniqueConnection);
 
     connect(this, &AnnotationManager::disconnectFromModel,
-            pAnnotationSettingsView, &AnnotationSettingsView::disconnectFromModel, Qt::UniqueConnection);
+            pAnnotationSettingsView, &EventView::disconnectFromModel, Qt::UniqueConnection);
 
     connect(this, &AnnotationManager::newAnnotationModelAvailable,
-            pAnnotationSettingsView, &AnnotationSettingsView::setModel, Qt::UniqueConnection);
+            pAnnotationSettingsView, &EventView::setModel, Qt::UniqueConnection);
 
     connect(this, &AnnotationManager::newFiffRawViewModel,
-            pAnnotationSettingsView, &AnnotationSettingsView::onNewFiffRawViewModel, Qt::UniqueConnection);
+            pAnnotationSettingsView, &EventView::onNewFiffRawViewModel, Qt::UniqueConnection);
 
-    connect(pAnnotationSettingsView, &AnnotationSettingsView::loadingStart,
+    connect(pAnnotationSettingsView, &EventView::loadingStart,
             this, &AnnotationManager::triggerLoadingStart, Qt::DirectConnection);
 
-    connect(pAnnotationSettingsView, &AnnotationSettingsView::loadingEnd,
+    connect(pAnnotationSettingsView, &EventView::loadingEnd,
             this, &AnnotationManager::triggerLoadingEnd, Qt::DirectConnection);
 
     connect(this, &AnnotationManager::clearView,
-            pAnnotationSettingsView, &AnnotationSettingsView::clearView, Qt::UniqueConnection);
+            pAnnotationSettingsView, &EventView::clearView, Qt::UniqueConnection);
 
     QDockWidget* pControl = new QDockWidget(getName());
     pControl->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
@@ -210,15 +210,15 @@ void AnnotationManager::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel
         if(pFiffRawModel->hasSavedEvents()){
             emit newAnnotationModelAvailable(pFiffRawModel->getAnnotationModel());
         } else {
-            QSharedPointer<AnnotationModel> pAnnModel = QSharedPointer<AnnotationModel>::create(pFiffRawModel);
+            QSharedPointer<EventModel> pAnnModel = QSharedPointer<EventModel>::create(pFiffRawModel);
             emit newAnnotationModelAvailable(pAnnModel);
-            m_pAnalyzeData->addModel<ANSHAREDLIB::AnnotationModel>(pAnnModel,
+            m_pAnalyzeData->addModel<ANSHAREDLIB::EventModel>(pAnnModel,
                                                                    "Events");
         }
         emit newFiffRawViewModel(pFiffRawModel);
     } else if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_ANNOTATION_MODEL) {
         emit disconnectFromModel();
-        AnnotationModel::SPtr pAnnModel = qSharedPointerCast<AnnotationModel>(pNewModel);
+        EventModel::SPtr pAnnModel = qSharedPointerCast<EventModel>(pNewModel);
         emit newAnnotationModelAvailable(pAnnModel);
     }
 }
