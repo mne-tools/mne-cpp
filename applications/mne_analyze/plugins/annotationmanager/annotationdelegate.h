@@ -52,11 +52,11 @@
 /**
  * Delegate for the annotations and annotation manager
  */
-class AnnotationDelegate : public QItemDelegate
+class EventDelegate : public QItemDelegate
 {
     Q_OBJECT
 public:
-    AnnotationDelegate(QObject *parent = 0);
+    EventDelegate(QObject *parent = 0);
 
     QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
     void setEditorData(QWidget *editor, const QModelIndex &index) const;

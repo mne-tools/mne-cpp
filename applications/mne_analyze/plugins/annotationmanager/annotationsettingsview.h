@@ -81,7 +81,7 @@ namespace FIFFLIB {
  *
  * @brief The AnnotationSettingsView class provides the GUI for adding and removing annotation.
  */
-class AnnotationSettingsView : public QWidget
+class EventView : public QWidget
 {
     Q_OBJECT
 
@@ -90,7 +90,7 @@ public:
     /**
      * Constructor
      */
-    AnnotationSettingsView();
+    EventView();
 
     //=========================================================================================================
     /**
@@ -112,7 +112,7 @@ public:
      *
      * @param[in] pAnnModel    Pointer to the annotation model of the current loaded file.
      */
-    void setModel(QSharedPointer<ANSHAREDLIB::AnnotationModel> pAnnModel);
+    void setModel(QSharedPointer<ANSHAREDLIB::EventModel> pAnnModel);
 
     //=========================================================================================================
     /**
@@ -186,13 +186,15 @@ signals:
 
     void addEvent(int iSample);
 
+    void addGroup(QString sName, QColor color);
+
 protected slots:
 
     //=========================================================================================================
     /**
      * Removes currently selected annotation from model.
      */
-    void removeAnnotationfromModel();
+    void removeEvent();
 
     //=========================================================================================================
     /**
@@ -419,8 +421,8 @@ private:
     int                                             m_iCheckSelectedState;          /** < State of the show selected checkbox (0 unchecked, 2 checked) */
     int                                             m_iLastSampClicked;             /** < Number of the last sample clicked */
 
-    QSharedPointer<AnnotationDelegate>              m_pAnnDelegate;                 /** < Pointer to associated delegate */
-    QSharedPointer<ANSHAREDLIB::AnnotationModel>    m_pAnnModel;                    /** < Pointer to associated model. Points to currently loaded. */
+    QSharedPointer<EventDelegate>              m_pAnnDelegate;                 /** < Pointer to associated delegate */
+    QSharedPointer<ANSHAREDLIB::EventModel>    m_pAnnModel;                    /** < Pointer to associated model. Points to currently loaded. */
     QSharedPointer<ANSHAREDLIB::FiffRawViewModel>   m_pFiffRawModel;                /** < Pointer to currently loaded FIffRawViewModel */
 
     QSharedPointer<DISPLIB::TriggerDetectionView>   m_pTriggerDetectView;           /** < Pointer to viewer to control GUI for detecting triggers */

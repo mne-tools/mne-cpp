@@ -54,7 +54,7 @@
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-AnnotationDelegate::AnnotationDelegate(QObject *parent)
+EventDelegate::EventDelegate(QObject *parent)
 : QItemDelegate(parent)
 {
 
@@ -62,11 +62,11 @@ AnnotationDelegate::AnnotationDelegate(QObject *parent)
 
 //=============================================================================================================
 
-QWidget* AnnotationDelegate::createEditor(QWidget *parent,
+QWidget* EventDelegate::createEditor(QWidget *parent,
      const QStyleOptionViewItem &/* option */,
      const QModelIndex & index) const
 {
-    const ANSHAREDLIB::AnnotationModel* pAnnotationModel = static_cast<const ANSHAREDLIB::AnnotationModel*>(index.model());
+    const ANSHAREDLIB::EventModel* pAnnotationModel = static_cast<const ANSHAREDLIB::EventModel*>(index.model());
 
     switch(index.column()) {
         case 0: {
@@ -74,7 +74,7 @@ QWidget* AnnotationDelegate::createEditor(QWidget *parent,
             editor->setMinimum(0);
             editor->setMaximum(pAnnotationModel->getFirstLastSample().second);
             connect(editor, QOverload<int>::of(&QSpinBox::valueChanged),
-                    this, &AnnotationDelegate::onSampleValueChanged);
+                    this, &EventDelegate::onSampleValueChanged);
             return editor;
         }
 
@@ -84,7 +84,7 @@ QWidget* AnnotationDelegate::createEditor(QWidget *parent,
             editor->setMaximum(pAnnotationModel->getFirstLastSample().second / pAnnotationModel->getSampleFreq());
             editor->setSingleStep(0.100);
             connect(editor, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
-                    this, &AnnotationDelegate::onTimeValueChanged);
+                    this, &EventDelegate::onTimeValueChanged);
             return editor;
         }
 
@@ -101,7 +101,7 @@ QWidget* AnnotationDelegate::createEditor(QWidget *parent,
 
 //=============================================================================================================
 
-void AnnotationDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
+void EventDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
     switch(index.column()) {
         case 0: {
@@ -129,7 +129,7 @@ void AnnotationDelegate::setEditorData(QWidget *editor, const QModelIndex &index
 
 //=============================================================================================================
 
-void AnnotationDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
+void EventDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
                                     const QModelIndex &index) const
 {
     switch(index.column()) {
@@ -163,7 +163,7 @@ void AnnotationDelegate::setModelData(QWidget *editor, QAbstractItemModel *model
 
 //=============================================================================================================
 
-void AnnotationDelegate::updateEditorGeometry(QWidget *editor,
+void EventDelegate::updateEditorGeometry(QWidget *editor,
     const QStyleOptionViewItem &option, const QModelIndex &/* index */) const
 {
     editor->setGeometry(option.rect);
@@ -171,14 +171,14 @@ void AnnotationDelegate::updateEditorGeometry(QWidget *editor,
 
 //=============================================================================================================
 
-void AnnotationDelegate::onSampleValueChanged(int iValue)
+void EventDelegate::onSampleValueChanged(int iValue)
 {
     emit sampleValueChanged(iValue);
 }
 
 //=============================================================================================================
 
-void AnnotationDelegate::onTimeValueChanged(double dValue)
+void EventDelegate::onTimeValueChanged(double dValue)
 {
     emit timeValueChanged(dValue);
 }
