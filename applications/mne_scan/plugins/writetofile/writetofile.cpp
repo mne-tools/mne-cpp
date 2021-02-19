@@ -289,7 +289,7 @@ void WriteToFile::run()
                     }
 
                     if(m_pOutfid) {
-                        m_pOutfid->write_raw_buffer(matData);
+                        m_pOutfid->write_raw_buffer(matData, m_mCals);
                     }
                 } else {
                     size = 0;
@@ -392,10 +392,17 @@ void WriteToFile::toggleRecordingFile()
 
         //Start/Prepare writing process. Actual writing is done in run() method.
         m_mutex.lock();
-        RowVectorXd cals;
+        //RowVectorXd cals;
         m_pOutfid = FiffStream::start_writing_raw(m_qFileOut,
                                                   *m_pFiffInfo,
-                                                  cals);
+                                                  m_mCals);
+//        qDebug() << "====== CALS ====";
+////        qDebug() << cals[0] << cals[1] << cals[2] << cals[3];
+
+//        qDebug() << "SIZE OF CALS:" << cals.size();
+
+//        m_mCals = cals;
+
         fiff_int_t first = 0;
         m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
         m_mutex.unlock();
@@ -414,7 +421,7 @@ void WriteToFile::toggleRecordingFile()
 }
 
 //=============================================================================================================
-
+#include <iostream>
 void WriteToFile::splitRecordingFile()
 {
     //qDebug() << "Split recording file";
@@ -445,6 +452,7 @@ void WriteToFile::splitRecordingFile()
                                               cals,
                                               sel,
                                               false);
+
     fiff_int_t first = 0;
     m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
 }
