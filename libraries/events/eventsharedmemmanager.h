@@ -14,7 +14,7 @@
 
 namespace EVENTSLIB {
 
-enum SharedMemoryMode { READ, WRITE, BYDIRECTIONAL };
+enum SharedMemoryMode { READ, WRITE, READWRITE };
 class EventManager;
 }
 
@@ -23,7 +23,8 @@ namespace EVENTSINTERNAL {
 class EventUpdate
 {
 public:
-    enum type{NewEvent, DeleteEvent};
+    enum type{ NULL_EVENT, NEW_EVENT, DELETE_EVENT};
+    const char* typeString[3] = {"Null Event", "New Event", "Delete Event"};
 
     EventUpdate();
     EventUpdate(int sample, int creator,type t);
@@ -38,12 +39,13 @@ public:
 
     void setType(type t);
 
+    std::string eventTypeToText();
+
 protected:
     int                 m_EventSample;
     int                 m_CreatorId;
     long long           m_CreationTime;
     EventUpdate::type   m_TypeOfUpdate;
-
 };
 
 class EventSharedMemManager
@@ -71,7 +73,6 @@ private:
 
     void detachFromSharedMemory();
     inline static int generateId();
-    std::string EventTypeToText(EventUpdate::type t);
     void processNewEvent(const EventUpdate& n);
     void processDeleteEvent(const EventUpdate& n);
     void printLocalBuffer();
