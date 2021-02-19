@@ -162,54 +162,58 @@ bool EventModel::insertRows(int position,
 {
     Q_UNUSED(parent);
 
-    if (m_iSelectedGroup == ALLGROUPS){
-        return false;
-    }
+//    if (m_iSelectedGroup == ALLGROUPS){
+//        return false;
+//    }
 
-    if(m_dataSamples.isEmpty()) {
-        m_dataSamples.insert(0, m_iSamplePos);
-        m_dataTypes.insert(0, m_iType);
-        m_dataIsUserEvent.insert(0, 1);
-        m_dataGroup.insert(0, m_iSelectedGroup);
-    }
-    else {
-        for (int i = 0; i < span; ++i) {
-            for(int t = 0; t<m_dataSamples.size(); t++) {
-                if(m_dataSamples[t] >= m_iSamplePos) {
-                    m_dataSamples.insert(t, m_iSamplePos);
+    //    if(m_dataSamples.isEmpty()) {
+    //        m_dataSamples.insert(0, m_iSamplePos);
+    //        m_dataTypes.insert(0, m_iType);
+    //        m_dataIsUserEvent.insert(0, 1);
+    //        m_dataGroup.insert(0, m_iSelectedGroup);
+    //    }
+    //    else {
+    //        for (int i = 0; i < span; ++i) {
+    //            for(int t = 0; t<m_dataSamples.size(); t++) {
+    //                if(m_dataSamples[t] >= m_iSamplePos) {
+    //                    m_dataSamples.insert(t, m_iSamplePos);
 
-                    if(m_sFilterEventType == "All")
-                        m_dataTypes.insert(t, m_iType);
-                    else
-                        m_dataTypes.insert(t, m_sFilterEventType.toInt());
+    //                    if(m_sFilterEventType == "All")
+    //                        m_dataTypes.insert(t, m_iType);
+    //                    else
+    //                        m_dataTypes.insert(t, m_sFilterEventType.toInt());
 
-                    m_dataIsUserEvent.insert(t, 1);
-                    m_dataGroup.insert(t, m_iSelectedGroup);
-                    break;
-                }
+    //                    m_dataIsUserEvent.insert(t, 1);
+    //                    m_dataGroup.insert(t, m_iSelectedGroup);
+    //                    break;
+    //                }
 
-                if(t == m_dataSamples.size()-1) {
-                    m_dataSamples.append(m_iSamplePos);
+    //                if(t == m_dataSamples.size()-1) {
+    //                    m_dataSamples.append(m_iSamplePos);
 
-                    if(m_sFilterEventType == "All")
-                        m_dataTypes.append(m_iType);
-                    else
-                        m_dataTypes.append(m_sFilterEventType.toInt());
+    //                    if(m_sFilterEventType == "All")
+    //                        m_dataTypes.append(m_iType);
+    //                    else
+    //                        m_dataTypes.append(m_sFilterEventType.toInt());
 
-                    m_dataIsUserEvent.append(1);
-                    m_dataGroup.append(m_iSelectedGroup);
-                    break;
-                }
-            }
-        }
-    }
+    //                    m_dataIsUserEvent.append(1);
+    //                    m_dataGroup.append(m_iSelectedGroup);
+    //                    break;
+    //                }
+    //            }
+    //        }
+    //    }
+
+    m_EventManager.addEvent(m_iSamplePos);
 
     beginInsertRows(QModelIndex(), position, position+span-1);
 
     endInsertRows();
 
-    //Update filtered event data
+//    Update filtered event data
     setEventFilterType(m_sFilterEventType);
+
+    eventsUpdated();
 
     return true;
 }
@@ -226,7 +230,7 @@ void EventModel::setSamplePos(int iSamplePos)
 int EventModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
-    return m_dataSamplesFiltered.size();
+    return m_EventManager.getAllEvents()->size();
 }
 
 //=============================================================================================================
@@ -248,7 +252,7 @@ QVariant EventModel::data(const QModelIndex &index,
     if(role != Qt::DisplayRole && role != Qt::BackgroundRole)
         return QVariant();
 
-    if(index.row()>=m_dataSamplesFiltered.size())
+    if(index.row() >= m_EventManager.getAllEvents()->size())
         return QVariant();
 
     if (index.isValid()) {
@@ -489,11 +493,12 @@ void EventModel::setSampleFreq(float fFreq)
 
 int EventModel::getNumberOfAnnotations() const
 {
-    if (m_iSelectedCheckState){
-        return m_dataSelectedRows.size();
-    } else {
-        return m_dataSamplesFiltered.size();
-    }
+//    if (m_iSelectedCheckState){
+//        return m_dataSelectedRows.size();
+//    } else {
+//        return m_dataSamplesFiltered.size();
+//    }
+    return m_EventManager.getNumEvents();
 }
 
 //=============================================================================================================
@@ -1039,7 +1044,11 @@ void EventModel::applyOffset(int iFirstSampleOffset)
 
 void EventModel::onAddEvent(int iSample)
 {
-    m_EventManager.addEvent(iSample);
+    setSamplePos(iSample);
+    insertRow(0, QModelIndex());
+
+//    m_EventManager.addEvent(iSample);
+//    eventsUpdated();
 }
 
 //=============================================================================================================
@@ -1057,4 +1066,12 @@ void EventModel::onAddGroup(QString sName, QColor color)
 std::unique_ptr<std::vector<EVENTSLIB::Event> > EventModel::getEventsToDraw(int iBegin, int iEnd) const
 {
     return m_EventManager.getEventsBetween(iBegin, iEnd);
+}
+
+//=============================================================================================================
+
+void EventModel::eventsUpdated()
+{
+    emit dataChanged(createIndex(0,0), createIndex(m_EventManager.getAllEvents()->size(), 0));
+    emit headerDataChanged(Qt::Vertical, 0, m_EventManager.getAllEvents()->size());
 }

@@ -667,12 +667,6 @@ signals:
      */
     void updateEventTypes(const QString& currentFilterType);
 
-    //=========================================================================================================
-    /**
-     * Signals for new event to be added to the model, based on current m_iSamplePos
-     */
-    void addNewAnnotation();
-
 private:
 
     //=========================================================================================================
@@ -695,7 +689,8 @@ private:
      */
     void initFromFile(const QString& sFilePath);
 
-
+    //=========================================================================================================
+    void eventsUpdated();
 
     QStringList                         m_eventTypeList;                /** <List of the possible event types */
 

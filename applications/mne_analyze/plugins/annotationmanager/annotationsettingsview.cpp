@@ -212,16 +212,20 @@ void EventView::updateComboBox(const QString &currentAnnotationType)
 
 void EventView::addAnnotationToModel(int iSamplePos)
 {
-    if(!(m_pAnnModel->getHubSize())){
-        newUserGroup("User Events",
-                     0,
-                     true);
-        m_pUi->m_listWidget_groupListWidget->setCurrentRow(0);
+    if(!m_pAnnModel){
+        return;
     }
 
-    m_pAnnModel->setSamplePos(iSamplePos);
+//    if(!(m_pAnnModel->getHubSize())){
+//        newUserGroup("User Events",
+//                     0,
+//                     true);
+//        m_pUi->m_listWidget_groupListWidget->setCurrentRow(0);
+//    }
 
-    m_pAnnModel->insertRow(0, QModelIndex());
+//    m_pAnnModel->setSamplePos(iSamplePos);
+
+//    m_pAnnModel->insertRow(0, QModelIndex());
 
     emit addEvent(iSamplePos);
 
