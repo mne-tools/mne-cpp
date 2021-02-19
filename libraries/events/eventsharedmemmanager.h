@@ -5,6 +5,7 @@
 #include <memory>
 #include <chrono>
 #include <thread>
+#include <mutex>
 #include <atomic>
 #include <QSharedMemory>
 
@@ -62,13 +63,13 @@ public:
     void processEvent(const EventUpdate& ne);
 
 private:
-
     void attachToSharedSegment(QSharedMemory::AccessMode mode);
     bool createSharedSegment(int bufferSize, QSharedMemory::AccessMode mode);
     void launchSharedMemoryWatcherThread();
     void attachToOrCreateSharedSegment(QSharedMemory::AccessMode mode);
+    void stopSharedMemoryWatcherThread();
 
-    void ensureSharedMemoryDetached(QSharedMemory& m);
+    void detachFromSharedMemory();
     inline static int generateId();
     std::string EventTypeToText(EventUpdate::type t);
     void processNewEvent(const EventUpdate& n);
@@ -89,8 +90,10 @@ private:
     bool                            m_bGroupCreated;
     idNum                           m_GroupId;
     int                             m_SharedMemorySize;
-    float                           m_fTimerCheckBuffer;
+    int                             m_fTimerCheckBuffer;
     std::thread                     m_BufferWatcherThread;
+    std::atomic_bool                m_BufferWatcherThreadRunning;
+    std::atomic_bool                m_WritingToSharedMemory;
     long long                       m_lastCheckTime;
     EventUpdate*                    m_LocalBuffer;
     EventUpdate*                    m_SharedBuffer;
