@@ -213,9 +213,7 @@ private:
 
     SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr      m_pWriteToFileInput;   /**< The RealTimeMultiSampleArray of the WriteToFile input.*/
 
-    Eigen::RowVectorXd                             m_mCals;
-
-    QSharedPointer<Eigen::RowVectorXd>          m_pCals;
+    Eigen::RowVectorXd                      m_mCals;                        /**< Row vector with channel calibration values. */
 };
 } // NAMESPACE
 
