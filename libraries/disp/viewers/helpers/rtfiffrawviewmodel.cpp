@@ -106,7 +106,7 @@ RtFiffRawViewModel::RtFiffRawViewModel(QObject *parent)
 , m_colBackground(Qt::white)
 {
 
-    m_EventManager.initSharedMemory(EVENTSLIB::SharedMemoryMode::BYDIRECTIONAL);
+    m_EventManager.initSharedMemory(EVENTSLIB::SharedMemoryMode::READWRITE);
 }
 
 RtFiffRawViewModel::~RtFiffRawViewModel()

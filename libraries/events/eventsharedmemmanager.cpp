@@ -20,7 +20,7 @@ constexpr static int bufferLength(5);
 static long long defatult_timerBufferWatch(200);
 
 EventUpdate::EventUpdate()
-:EventUpdate(0,0,type::NewEvent)
+:EventUpdate(0,0,type::NULL_EVENT)
 { }
 
 EventUpdate::EventUpdate(int sample, int creator,type t)
@@ -29,7 +29,6 @@ EventUpdate::EventUpdate(int sample, int creator,type t)
 , m_TypeOfUpdate(t)
 {
     m_CreationTime = EventSharedMemManager::getTimeNow();
-
 }
 
 long long EventUpdate::getCreationTime() const
@@ -55,6 +54,11 @@ EventUpdate::type EventUpdate::getType() const
 void EventUpdate::setType(type t)
 {
     m_TypeOfUpdate = t;
+}
+
+std::string EventUpdate::eventTypeToText()
+{
+    return typeString[m_TypeOfUpdate];
 }
 
 EventSharedMemManager::EventSharedMemManager(EVENTSLIB::EventManager* parent)
@@ -100,7 +104,7 @@ void EventSharedMemManager::init(EVENTSLIB::SharedMemoryMode mode)
         } else if(m_Mode == EVENTSLIB::SharedMemoryMode::WRITE)
         {
             attachToOrCreateSharedSegment( QSharedMemory::AccessMode::ReadWrite);
-        } else if(m_Mode == EVENTSLIB::SharedMemoryMode::BYDIRECTIONAL)
+        } else if(m_Mode == EVENTSLIB::SharedMemoryMode::READWRITE)
         {
             attachToOrCreateSharedSegment( QSharedMemory::AccessMode::ReadWrite);
             launchSharedMemoryWatcherThread();
@@ -178,9 +182,9 @@ void EventSharedMemManager::addEvent(int sample)
 {
     if(m_IsInit &&
       (m_Mode == EVENTSLIB::SharedMemoryMode::WRITE  ||
-       m_Mode == EVENTSLIB::SharedMemoryMode::BYDIRECTIONAL  )  )
+       m_Mode == EVENTSLIB::SharedMemoryMode::READWRITE  )  )
     {
-        EventUpdate newUpdate(sample, m_Id, EventUpdate::type::NewEvent);
+        EventUpdate newUpdate(sample, m_Id, EventUpdate::type::NEW_EVENT);
         copyNewUpdateToSharedMemory(newUpdate);
     }
 }
@@ -189,9 +193,9 @@ void EventSharedMemManager::deleteEvent(int sample)
 {
     if(m_IsInit &&
           (m_Mode == EVENTSLIB::SharedMemoryMode::WRITE  ||
-           m_Mode == EVENTSLIB::SharedMemoryMode::BYDIRECTIONAL  )  )
+           m_Mode == EVENTSLIB::SharedMemoryMode::READWRITE  )  )
     {
-        EventUpdate newUpdate(sample, m_Id, EventUpdate::type::DeleteEvent);
+        EventUpdate newUpdate(sample, m_Id, EventUpdate::type::DELETE_EVENT);
         copyNewUpdateToSharedMemory(newUpdate);
     }
 }
@@ -217,7 +221,7 @@ void EventSharedMemManager::initializeSharedMemory()
 void EventSharedMemManager::copyNewUpdateToSharedMemory(EventUpdate& newUpdate)
 {
     qDebug() << "Sending Buffer ========  id: " << m_Id;
-    printLocalBuffer();
+
     char* sharedBuffer = static_cast<char*>(m_SharedMemory.data()) + sizeof(int);
     int indexIterator(0);
     m_WritingToSharedMemory = true;
@@ -226,7 +230,7 @@ void EventSharedMemManager::copyNewUpdateToSharedMemory(EventUpdate& newUpdate)
         m_SharedMemory.lock();
         memcpy(&indexIterator, m_SharedMemory.data(), sizeof(int));
         memcpy(m_SharedMemory.data(), &(++indexIterator), sizeof(int));
-        int index = indexIterator % bufferLength;
+        int index = (indexIterator-1) % bufferLength;
         memcpy(sharedBuffer + (index * sizeof(EventUpdate)), static_cast<void*>(&newUpdate), sizeof(EventUpdate));
         m_SharedMemory.unlock();
     }
@@ -281,19 +285,20 @@ void EventSharedMemManager::processLocalBuffer()
 void EventSharedMemManager::processEvent(const EventUpdate& ne)
 {
     qDebug() << "process new update";
-
     switch (ne.getType())
     {
-        case EventUpdate::type::NewEvent :
+        case EventUpdate::type::NEW_EVENT :
         {
             processNewEvent(ne);
             break;
         }
-        case EventUpdate::type::DeleteEvent :
+        case EventUpdate::type::DELETE_EVENT :
         {
             processDeleteEvent(ne);
             break;
         }
+        default :
+            break;
     }
 }
 
@@ -338,23 +343,12 @@ void EventSharedMemManager::printLocalBuffer()
 {
     for(int i = 0; i < bufferLength; ++i)
     {
-        qDebug() << "[" << i << "] -"<< EventTypeToText(m_LocalBuffer[i].getType()).c_str()
+        qDebug() << "[" << i << "] -" << m_LocalBuffer[i].eventTypeToText().c_str()
                  << "-" << m_LocalBuffer[i].getSample()
                  << "-" << m_LocalBuffer[i].getCreatorId()
                  << "-" << m_LocalBuffer[i].getCreationTime() << "\n";
     }
 }
 
-std::string EventSharedMemManager::EventTypeToText(EventUpdate::type t)
-{
-    switch (t)
-    {
-    case EventUpdate::type::NewEvent:
-        return "New Event";
-    case EventUpdate::type::DeleteEvent:
-        return "Delete Event";
-    default:
-        return "DUNNO";
-    }
-}
+
 
