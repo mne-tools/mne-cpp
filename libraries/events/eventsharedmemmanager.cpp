@@ -17,7 +17,7 @@ int EventSharedMemManager::m_iLastUpdateIndex(0);
 // So, in order to say: The library is capable of correctly handle a
 // maximum of "sharedMemBufferLength"/"m_fTimerCheckBuffer" events per second.
 constexpr static int bufferLength(5);
-static long long timerBufferWatch(5000);
+static long long defatult_timerBufferWatch(5000);
 
 EventUpdate::EventUpdate()
 :EventUpdate(0,0,type::NewEvent)
@@ -65,6 +65,10 @@ EventSharedMemManager::EventSharedMemManager(EVENTSLIB::EventManager* parent)
 , m_bGroupCreated(false)
 , m_GroupId(0)
 , m_SharedMemorySize(sizeof(int) + bufferLength * sizeof(EventUpdate))
+, m_fTimerCheckBuffer(defatult_timerBufferWatch)
+, m_BufferWatcherThreadRunning(false)
+, m_WritingToSharedMemory(false)
+, m_lastCheckTime(0)
 , m_LocalBuffer(new EventUpdate[bufferLength])
 , m_SharedBuffer(nullptr)
 , m_Id(generateId())
@@ -75,17 +79,17 @@ EventSharedMemManager::EventSharedMemManager(EVENTSLIB::EventManager* parent)
 
 EventSharedMemManager::~EventSharedMemManager()
 {
-    stop();
+    detachFromSharedMemory();
     delete[] m_LocalBuffer;
 }
 void EventSharedMemManager::init(EVENTSLIB::SharedMemoryMode mode)
 {
     qDebug() << " ========================================================";
-    qDebug() << "Init started!       !!! \n";
+    qDebug() << "Init started!\n";
 
     if(!m_IsInit)
     {
-        ensureSharedMemoryDetached(m_SharedMemory);
+        detachFromSharedMemory();
 
         m_Mode = mode;
         if(m_Mode == EVENTSLIB::SharedMemoryMode::READ)
@@ -138,19 +142,30 @@ void EventSharedMemManager::launchSharedMemoryWatcherThread()
     m_BufferWatcherThread = std::thread(&EventSharedMemManager::bufferWatcher, this);
 }
 
-void EventSharedMemManager::ensureSharedMemoryDetached(QSharedMemory& m)
+void EventSharedMemManager::detachFromSharedMemory()
 {
-    if(m.isAttached())
+    stopSharedMemoryWatcherThread();
+    if(!m_BufferWatcherThreadRunning && !m_WritingToSharedMemory)
     {
-        m.detach();
+        if(m_SharedMemory.isAttached())
+        {
+            m_SharedMemory.detach();
+        }
+    }
+}
+
+void EventSharedMemManager::stopSharedMemoryWatcherThread()
+{
+    if(m_BufferWatcherThreadRunning)
+    {
+        m_IsInit = false;
+        m_BufferWatcherThread.join();
     }
 }
 
 void EventSharedMemManager::stop()
 {
-    m_IsInit = false;
-    m_BufferWatcherThread.join();
-    //ensureSharedMemoryDetached(m_SharedMemoryBuffer);
+    detachFromSharedMemory();
 }
 
 bool EventSharedMemManager::isInit() const
@@ -187,6 +202,7 @@ void EventSharedMemManager::initializeSharedMemory()
     void* localBuffer = static_cast<void*>(m_LocalBuffer);
     char* sharedBuffer = static_cast<char*>(m_SharedMemory.data()) + sizeof(int);
     int indexIterator(0);
+    m_WritingToSharedMemory = true;
     if(m_SharedMemory.isAttached())
     {
         m_SharedMemory.lock();
@@ -194,6 +210,7 @@ void EventSharedMemManager::initializeSharedMemory()
         memcpy(sharedBuffer, localBuffer, bufferLength * sizeof(EventUpdate));
         m_SharedMemory.unlock();
     }
+    m_WritingToSharedMemory = false;
 }
 
 void EventSharedMemManager::copyNewUpdateToSharedMemory(EventUpdate& newUpdate)
@@ -202,6 +219,7 @@ void EventSharedMemManager::copyNewUpdateToSharedMemory(EventUpdate& newUpdate)
     printLocalBuffer();
     char* sharedBuffer = static_cast<char*>(m_SharedMemory.data()) + sizeof(int);
     int indexIterator(0);
+    m_WritingToSharedMemory = true;
     if(m_SharedMemory.isAttached())
     {
         m_SharedMemory.lock();
@@ -211,6 +229,7 @@ void EventSharedMemManager::copyNewUpdateToSharedMemory(EventUpdate& newUpdate)
         memcpy(sharedBuffer + (index * sizeof(EventUpdate)), static_cast<void*>(&newUpdate), sizeof(EventUpdate));
         m_SharedMemory.unlock();
     }
+    m_WritingToSharedMemory = false;
 }
 
 void EventSharedMemManager::copySharedMemoryToLocalBuffer()
@@ -229,6 +248,7 @@ void EventSharedMemManager::copySharedMemoryToLocalBuffer()
 
 void EventSharedMemManager::bufferWatcher()
 {
+    m_BufferWatcherThreadRunning = true;
     qDebug() << "buffer Watcher thread launched";
     while(m_IsInit)
     {
@@ -237,8 +257,9 @@ void EventSharedMemManager::bufferWatcher()
         auto timeCheck = getTimeNow();
         processLocalBuffer();
         m_lastCheckTime = timeCheck;
-        std::this_thread::sleep_for(std::chrono::milliseconds(timerBufferWatch));
+        std::this_thread::sleep_for(std::chrono::milliseconds(m_fTimerCheckBuffer));
     }
+    m_BufferWatcherThreadRunning = false;
 }
 
 
@@ -258,7 +279,7 @@ void EventSharedMemManager::processLocalBuffer()
 
 void EventSharedMemManager::processEvent(const EventUpdate& ne)
 {
-    qDebug() << "process event new update";
+    qDebug() << "process new update";
 
     switch (ne.getType())
     {
