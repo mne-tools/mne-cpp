@@ -650,7 +650,7 @@ void RtFiffRawViewDelegate::createMarkerPath(const QModelIndex &index,
     const RtFiffRawViewModel* t_pModel = static_cast<const RtFiffRawViewModel*>(index.model());
 
     int iOffset = t_pModel->getFirstSampleOffset();
-    int iCurrentSample = t_pModel->getCurrentSampleIndex();
+    int iTimeCursorSample = t_pModel->getCurrentSampleIndex();
     int iMaxSample = t_pModel->getMaxSamples();
 
     double dDx = static_cast<double>(option.rect.width()) / static_cast<double>(iMaxSample);
@@ -658,26 +658,21 @@ void RtFiffRawViewDelegate::createMarkerPath(const QModelIndex &index,
     float yStart = option.rect.topLeft().y();
     float yEnd = option.rect.bottomRight().y();
 
-    int iEarliestDrawnSample = iOffset - iMaxSample + iCurrentSample;
-    int iLatestDrawnSample = iOffset + iMaxSample;
+    int iEarliestDrawnSample = iOffset - iMaxSample + iTimeCursorSample;
+    int iLatestDrawnSample = iOffset + iTimeCursorSample;
 
     auto events = t_pModel->getEventsToDraw(iEarliestDrawnSample, iLatestDrawnSample);
 
-    for(int i = 0; i < events->size(); i++)
+    for(auto& e : *events)
     {
-        int iEventSample = (*events)[i].sample;
-        int iEarliestDrawnSample = iOffset - iMaxSample + iCurrentSample;
-        int iLatestDrawnSample = iOffset + iMaxSample;
+        int iEventSample = e.sample;
+        int iLastStartingSample = iOffset - iMaxSample;
+        int iDrawPositionInSamples = (iEventSample - iLastStartingSample) % iMaxSample;
 
-        if(iEventSample >= iEarliestDrawnSample && iEventSample <= iLatestDrawnSample){
-            int iLastStartingSample = iOffset - iMaxSample;
-            int iDrawPositionInSamples = (iEventSample - iLastStartingSample) % iMaxSample;
+        float iPositionInPixels = static_cast<float>(iDrawPositionInSamples) * dDx;
 
-            float iPositionInPixels = static_cast<float>(iDrawPositionInSamples) * dDx;
-
-            path.moveTo(iPositionInPixels,yStart);
-            path.lineTo(iPositionInPixels,yEnd);
-        }
+        path.moveTo(iPositionInPixels,yStart);
+        path.lineTo(iPositionInPixels,yEnd);
     }
 }
 
