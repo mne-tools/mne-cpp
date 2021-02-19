@@ -109,6 +109,11 @@ RtFiffRawViewModel::RtFiffRawViewModel(QObject *parent)
     m_EventManager.initSharedMemory(EVENTSLIB::SharedMemoryMode::BYDIRECTIONAL);
 }
 
+RtFiffRawViewModel::~RtFiffRawViewModel()
+{
+    m_EventManager.stopSharedMemory();
+}
+
 //=============================================================================================================
 //virtual functions
 int RtFiffRawViewModel::rowCount(const QModelIndex & /*parent*/) const
