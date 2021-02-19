@@ -5,6 +5,7 @@
 #include <memory>
 #include <chrono>
 #include <thread>
+#include <atomic>
 #include <QSharedMemory>
 
 #include "event.h"
@@ -61,13 +62,20 @@ public:
     void processEvent(const EventUpdate& ne);
 
 private:
+
+    void attachToSharedSegment(QSharedMemory::AccessMode mode);
+    bool createSharedSegment(int bufferSize, QSharedMemory::AccessMode mode);
+    void launchSharedMemoryWatcherThread();
+    void attachToOrCreateSharedSegment(QSharedMemory::AccessMode mode);
+
+    void ensureSharedMemoryDetached(QSharedMemory& m);
     inline static int generateId();
     std::string EventTypeToText(EventUpdate::type t);
     void processNewEvent(const EventUpdate& n);
     void processDeleteEvent(const EventUpdate& n);
     void printLocalBuffer();
-    void storeUpdateInSharedMemory(const EventUpdate& nu);
-    void copyLocalBufferToSharedMemory();
+    void copyNewUpdateToSharedMemory(EventUpdate& newUpdate);
+    void initializeSharedMemory();
     void copySharedMemoryToLocalBuffer();
     void processLocalBuffer();
     void bufferWatcher();
@@ -76,10 +84,11 @@ private:
     static int                      m_iLastUpdateIndex;
     EVENTSLIB::EventManager*        m_pEventManager;
     QSharedMemory                   m_SharedMemory;
-    bool                            m_bIsInit;
+    std::atomic_bool                m_IsInit;
     std::string                     m_sGroupName;
     bool                            m_bGroupCreated;
     idNum                           m_GroupId;
+    int                             m_SharedMemorySize;
     float                           m_fTimerCheckBuffer;
     std::thread                     m_BufferWatcherThread;
     long long                       m_lastCheckTime;
@@ -97,3 +106,4 @@ inline int EventSharedMemManager::generateId()
 
 } //namespace
 #endif // EVENTSHAREDMEMMANAGER_EVENTS_H
+

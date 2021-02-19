@@ -7,7 +7,7 @@
 
 using namespace EVENTSINTERNAL;
 
-static const std::string defaultSharedMemoryKey("MNE_SHAREDMEMORY_S");
+static const std::string defaultSharedMemoryBufferKey("MNE_EVENTS_SHAREDMEMORY_BUFFER");
 static const std::string defaultGroupName("external");
 
 int EventSharedMemManager::m_iLastUpdateIndex(0);
@@ -16,9 +16,8 @@ int EventSharedMemManager::m_iLastUpdateIndex(0);
 // is measured in terms of buffer length divided by the time interval between checks for updates.
 // So, in order to say: The library is capable of correctly handle a
 // maximum of "sharedMemBufferLength"/"m_fTimerCheckBuffer" events per second.
-constexpr static int bufferLength(1);
-static long long timerBufferWatch(4000);
-
+constexpr static int bufferLength(5);
+static long long timerBufferWatch(5000);
 
 EventUpdate::EventUpdate()
 :EventUpdate(0,0,type::NewEvent)
@@ -30,6 +29,7 @@ EventUpdate::EventUpdate(int sample, int creator,type t)
 , m_TypeOfUpdate(t)
 {
     m_CreationTime = EventSharedMemManager::getTimeNow();
+
 }
 
 long long EventUpdate::getCreationTime() const
@@ -59,11 +59,12 @@ void EventUpdate::setType(type t)
 
 EventSharedMemManager::EventSharedMemManager(EVENTSLIB::EventManager* parent)
 : m_pEventManager(parent)
-, m_SharedMemory(QString::fromStdString(defaultSharedMemoryKey))
-, m_bIsInit(false)
+, m_SharedMemory(QString::fromStdString(defaultSharedMemoryBufferKey))
+, m_IsInit(false)
 , m_sGroupName(defaultGroupName)
 , m_bGroupCreated(false)
-, m_GroupId()
+, m_GroupId(0)
+, m_SharedMemorySize(sizeof(int) + bufferLength * sizeof(EventUpdate))
 , m_LocalBuffer(new EventUpdate[bufferLength])
 , m_SharedBuffer(nullptr)
 , m_Id(generateId())
@@ -82,126 +83,146 @@ void EventSharedMemManager::init(EVENTSLIB::SharedMemoryMode mode)
     qDebug() << " ========================================================";
     qDebug() << "Init started!       !!! \n";
 
-    if(!m_bIsInit)
+    if(!m_IsInit)
     {
+        ensureSharedMemoryDetached(m_SharedMemory);
+
         m_Mode = mode;
         if(m_Mode == EVENTSLIB::SharedMemoryMode::READ)
         {
-            if(!m_SharedMemory.isAttached())
-            {
-                m_bIsInit = m_SharedMemory.attach(QSharedMemory::ReadOnly);
-                if(m_bIsInit)
-                {
-                    m_SharedBuffer = static_cast<EventUpdate*>(m_SharedMemory.data());
-                }
-                m_BufferWatcherThread = std::thread(&EventSharedMemManager::bufferWatcher, this);
-            }
+            attachToSharedSegment(QSharedMemory::AccessMode::ReadOnly);
+            launchSharedMemoryWatcherThread();
+
         } else if(m_Mode == EVENTSLIB::SharedMemoryMode::WRITE)
         {
-            if(m_SharedMemory.isAttached())
-            {
-                m_SharedMemory.detach();
-            }
-            m_bIsInit = m_SharedMemory.create(
-                        bufferLength * sizeof(EventUpdate),
-                        QSharedMemory::AccessMode::ReadWrite);
-
-            if(m_bIsInit)
-            {
-                m_SharedBuffer = static_cast<EventUpdate*>(m_SharedMemory.data());
-            }
-
+            attachToOrCreateSharedSegment( QSharedMemory::AccessMode::ReadWrite);
         } else if(m_Mode == EVENTSLIB::SharedMemoryMode::BYDIRECTIONAL)
         {
-            qDebug() << "Bydirectional mode!\n";
-            if(m_SharedMemory.isAttached())
-            {
-                m_SharedMemory.detach();
-            }
-
-            m_bIsInit = m_SharedMemory.attach(QSharedMemory::AccessMode::ReadWrite);
-            qDebug() << "Checking for attach. m_bIsInit = " << m_bIsInit;
-
-            if(!m_bIsInit)
-            {
-                m_bIsInit = m_SharedMemory.create(
-                            bufferLength * sizeof(EventUpdate),
-                            QSharedMemory::AccessMode::ReadWrite);
-                qDebug() << "Creating segment: " << m_bIsInit;
-            }
-
-
-            if(m_bIsInit)
-            {
-                m_SharedBuffer = static_cast<EventUpdate*>(m_SharedMemory.data());
-                qDebug() << " m_Buffer " << m_SharedBuffer;
-                m_BufferWatcherThread = std::thread(&EventSharedMemManager::bufferWatcher, this);
-            }
+            attachToOrCreateSharedSegment( QSharedMemory::AccessMode::ReadWrite);
+            launchSharedMemoryWatcherThread();
         }
+    }
+}
+
+void EventSharedMemManager::attachToOrCreateSharedSegment(QSharedMemory::AccessMode mode)
+{
+    attachToSharedSegment(mode);
+    if(!m_IsInit)
+    {
+        m_IsInit = createSharedSegment(m_SharedMemorySize, mode);
+    }
+}
+
+void EventSharedMemManager::attachToSharedSegment(QSharedMemory::AccessMode mode)
+{
+    m_IsInit = m_SharedMemory.attach(mode);
+    if(m_IsInit)
+    {
+        m_SharedBuffer = static_cast<EventUpdate*>(m_SharedMemory.data());
+    }
+}
+
+bool EventSharedMemManager::createSharedSegment(int bufferSize, QSharedMemory::AccessMode mode)
+{
+    bool output = m_SharedMemory.create(bufferSize,mode);
+    if(output)
+    {
+        m_SharedBuffer = static_cast<EventUpdate*>(m_SharedMemory.data());
+        initializeSharedMemory();
+    }
+    return output;
+}
+
+void EventSharedMemManager::launchSharedMemoryWatcherThread()
+{
+    m_BufferWatcherThread = std::thread(&EventSharedMemManager::bufferWatcher, this);
+}
+
+void EventSharedMemManager::ensureSharedMemoryDetached(QSharedMemory& m)
+{
+    if(m.isAttached())
+    {
+        m.detach();
     }
 }
 
 void EventSharedMemManager::stop()
 {
-    m_bIsInit = false;
+    m_IsInit = false;
     m_BufferWatcherThread.join();
-    if(m_SharedMemory.isAttached())
-    {
-        m_SharedMemory.detach();
-    }
+    //ensureSharedMemoryDetached(m_SharedMemoryBuffer);
 }
 
 bool EventSharedMemManager::isInit() const
 {
-    return m_bIsInit;
+    return m_IsInit;
 }
 
 void EventSharedMemManager::addEvent(int sample)
 {
-    if(m_bIsInit &&
+    if(m_IsInit &&
       (m_Mode == EVENTSLIB::SharedMemoryMode::WRITE  ||
        m_Mode == EVENTSLIB::SharedMemoryMode::BYDIRECTIONAL  )  )
     {
         EventUpdate newUpdate(sample, m_Id, EventUpdate::type::NewEvent);
-        storeUpdateInSharedMemory(newUpdate);
+        copyNewUpdateToSharedMemory(newUpdate);
     }
 }
 
 void EventSharedMemManager::deleteEvent(int sample)
 {
-    if(m_bIsInit &&
+    if(m_IsInit &&
           (m_Mode == EVENTSLIB::SharedMemoryMode::WRITE  ||
            m_Mode == EVENTSLIB::SharedMemoryMode::BYDIRECTIONAL  )  )
     {
         EventUpdate newUpdate(sample, m_Id, EventUpdate::type::DeleteEvent);
-        storeUpdateInSharedMemory(newUpdate);
+        copyNewUpdateToSharedMemory(newUpdate);
     }
 }
 
-void EventSharedMemManager::storeUpdateInSharedMemory(const EventUpdate& newUpdate)
+void EventSharedMemManager::initializeSharedMemory()
 {
-    m_LocalBuffer[m_iLastUpdateIndex % bufferLength] = newUpdate;
-    m_iLastUpdateIndex++;
-    copyLocalBufferToSharedMemory();
+    qDebug() << "Initializing Shared Memory Buffer ========  id: " << m_Id;
+    printLocalBuffer();
+    void* localBuffer = static_cast<void*>(m_LocalBuffer);
+    char* sharedBuffer = static_cast<char*>(m_SharedMemory.data()) + sizeof(int);
+    int indexIterator(0);
+    if(m_SharedMemory.isAttached())
+    {
+        m_SharedMemory.lock();
+        memcpy(m_SharedMemory.data(), &indexIterator, sizeof(int));
+        memcpy(sharedBuffer, localBuffer, bufferLength * sizeof(EventUpdate));
+        m_SharedMemory.unlock();
+    }
 }
 
-void EventSharedMemManager::copyLocalBufferToSharedMemory()
+void EventSharedMemManager::copyNewUpdateToSharedMemory(EventUpdate& newUpdate)
 {
     qDebug() << "Sending Buffer ========  id: " << m_Id;
     printLocalBuffer();
-    void* localBuffer = static_cast<void*>(m_LocalBuffer);
-    m_SharedMemory.lock();
-    memcpy(m_SharedMemory.data(),localBuffer,bufferLength * sizeof(EventUpdate));
-    m_SharedMemory.unlock();
-
+    char* sharedBuffer = static_cast<char*>(m_SharedMemory.data()) + sizeof(int);
+    int indexIterator(0);
+    if(m_SharedMemory.isAttached())
+    {
+        m_SharedMemory.lock();
+        memcpy(&indexIterator, m_SharedMemory.data(), sizeof(int));
+        memcpy(m_SharedMemory.data(), &(++indexIterator), sizeof(int));
+        int index = indexIterator % bufferLength;
+        memcpy(sharedBuffer + (index * sizeof(EventUpdate)), static_cast<void*>(&newUpdate), sizeof(EventUpdate));
+        m_SharedMemory.unlock();
+    }
 }
 
 void EventSharedMemManager::copySharedMemoryToLocalBuffer()
 {
     void* localBuffer = static_cast<void*>(m_LocalBuffer);
-    m_SharedMemory.lock();
-    memcpy(localBuffer, m_SharedBuffer,bufferLength * sizeof(EventUpdate));
-    m_SharedMemory.unlock();
+    char* sharedBuffer = static_cast<char*>(m_SharedMemory.data()) + sizeof(int);
+    if(m_SharedMemory.isAttached())
+    {
+        m_SharedMemory.lock();
+        memcpy(localBuffer, sharedBuffer, bufferLength * sizeof(EventUpdate));
+        m_SharedMemory.unlock();
+    }
     qDebug() << "Receiving Buffer ========  id: " << m_Id;
     printLocalBuffer();
 }
@@ -209,14 +230,12 @@ void EventSharedMemManager::copySharedMemoryToLocalBuffer()
 void EventSharedMemManager::bufferWatcher()
 {
     qDebug() << "buffer Watcher thread launched";
-    while(m_bIsInit)
+    while(m_IsInit)
     {
         qDebug() << "Running buffer watcher!";
         copySharedMemoryToLocalBuffer();
         auto timeCheck = getTimeNow();
-
         processLocalBuffer();
-
         m_lastCheckTime = timeCheck;
         std::this_thread::sleep_for(std::chrono::milliseconds(timerBufferWatch));
     }
