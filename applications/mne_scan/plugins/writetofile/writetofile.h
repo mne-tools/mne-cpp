@@ -212,6 +212,10 @@ private:
     QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>                      m_pCircularBuffer;      /**< Holds incoming raw data. */
 
     SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr      m_pWriteToFileInput;   /**< The RealTimeMultiSampleArray of the WriteToFile input.*/
+
+    Eigen::RowVectorXd                             m_mCals;
+
+    QSharedPointer<Eigen::RowVectorXd>          m_pCals;
 };
 } // NAMESPACE
 
