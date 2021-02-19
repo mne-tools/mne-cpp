@@ -17,7 +17,7 @@ int EventSharedMemManager::m_iLastUpdateIndex(0);
 // So, in order to say: The library is capable of correctly handle a
 // maximum of "sharedMemBufferLength"/"m_fTimerCheckBuffer" events per second.
 constexpr static int bufferLength(5);
-static long long defatult_timerBufferWatch(5000);
+static long long defatult_timerBufferWatch(200);
 
 EventUpdate::EventUpdate()
 :EventUpdate(0,0,type::NewEvent)
@@ -128,7 +128,7 @@ void EventSharedMemManager::attachToSharedSegment(QSharedMemory::AccessMode mode
 
 bool EventSharedMemManager::createSharedSegment(int bufferSize, QSharedMemory::AccessMode mode)
 {
-    bool output = m_SharedMemory.create(bufferSize,mode);
+    bool output = m_SharedMemory.create(bufferSize, mode);
     if(output)
     {
         m_SharedBuffer = static_cast<EventUpdate*>(m_SharedMemory.data());
@@ -166,6 +166,7 @@ void EventSharedMemManager::stopSharedMemoryWatcherThread()
 void EventSharedMemManager::stop()
 {
     detachFromSharedMemory();
+    m_IsInit = false;
 }
 
 bool EventSharedMemManager::isInit() const
