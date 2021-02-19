@@ -114,6 +114,13 @@ public:
 
     //=========================================================================================================
     /**
+     * Destructs RtFiffRawViewModel and stops the use of Shared Memory within the Event Manager.
+     *
+     */
+
+    ~RtFiffRawViewModel();
+    //=========================================================================================================
+    /**
      * Returns the number of rows under the given parent. When the parent is valid it means that rowCount is returning the number of children of parent.
      *
      * @param[in] parent     not used.
