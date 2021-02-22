@@ -37,7 +37,16 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = app
 
-CONFIG   += console network concurrent
+QT += network concurrent
+
+CONFIG += console
+
+DESTDIR =  $${MNE_BINARY_DIR}
+
+TARGET = mne_edf2fiff
+CONFIG(debug, debug|release) {
+    TARGET = $$join(TARGET,,,d)
+}
 
 !contains(MNECPP_CONFIG, withAppBundles) {
     CONFIG -= app_bundle
@@ -48,37 +57,14 @@ contains(MNECPP_CONFIG, static) {
     DEFINES += STATICBUILD
 }
 
-#TARGET = mne_edf2fiff
-CONFIG(debug, debug|release) {
-    TARGET = $$join(TARGET,,,d)
-}
-
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lmnecppDisp3Dd \
-            -lmnecppDispd \
-            -lmnecppRtProcessingd \
-            -lmnecppConnectivityd \
-            -lmnecppInversed \
-            -lmnecppFwdd \
-            -lmnecppMned \
-            -lmnecppFiffd \
-            -lmnecppFsd \
+    LIBS += -lmnecppFiffd \
             -lmnecppUtilsd \
 } else {
-    LIBS += -lmnecppDisp3D \
-            -lmnecppDisp \
-            -lmnecppRtProcessing \
-            -lmnecppConnectivity \
-            -lmnecppInverse \
-            -lmnecppFwd \
-            -lmnecppMne \
-            -lmnecppFiff \
-            -lmnecppFs \
+    LIBS += -lmnecppFiff \
             -lmnecppUtils \
 }
-
-DESTDIR =  $${MNE_BINARY_DIR}
 
 SOURCES +=  main.cpp \
             edf_info.cpp \
