@@ -366,6 +366,9 @@ private:
     void updateVerticalScrollPosition(qint32 newScrollPosition);
 
     //=========================================================================================================
+    /**
+     * Updates file labels with info from current set model
+     */
     void updateFileLabels();
 
     QPointer<QTableView>                                m_pTableView;                   /**< Pointer to table view ui element */
@@ -387,9 +390,9 @@ private:
     QLabel*                                             m_pLeftLabel;                   /**< Left 'Sample | Seconds' display label */
     QLabel*                                             m_pRightLabel;                  /**< Right 'Sample | Seconds' display label */
 
-    QPointer<QLabel>                                    m_pFileName;
-    QPointer<QLabel>                                    m_pFileLength;
-    QPointer<QLabel>                                    m_pFileSampFreq;
+    QPointer<QLabel>                                    m_pFileName;                    /**< Label to display file name */
+    QPointer<QLabel>                                    m_pFileLength;                  /**< Label to display file length in seconds */
+    QPointer<QLabel>                                    m_pFileSampFreq;                /**< Label to display file sampling frequency */
 
 signals:
     void tableViewDataWidthChanged(int iWidth);
