@@ -296,9 +296,9 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief getSamplingFrequency
+     * Returns the smapling frequency of the associated fiff file
      *
-     * @return
+     * @return sampling frequency
      */
     inline float getSamplingFrequency() const;
 
