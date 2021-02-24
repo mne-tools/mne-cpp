@@ -42,6 +42,8 @@ TEMPLATE = app
 
 QT += widgets network
 
+CONFIG += console
+
 !contains(MNECPP_CONFIG, withAppBundles) {
     CONFIG -= app_bundle
 }
