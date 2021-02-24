@@ -296,6 +296,14 @@ public:
 
     //=========================================================================================================
     /**
+     * @brief getSamplingFrequency
+     *
+     * @return
+     */
+    inline float getSamplingFrequency() const;
+
+    //=========================================================================================================
+    /**
      * @brief getFiffInfo
      *
      * @return Shared Pointer pointing to m_pFiffInfo
@@ -708,6 +716,21 @@ inline qint32 FiffRawViewModel::numVLines() const
 inline bool FiffRawViewModel::isEmpty() const
 {
     return m_lData.empty();
+}
+
+//=============================================================================================================
+
+inline float FiffRawViewModel::getSamplingFrequency() const
+{
+    float fFreq;
+
+    if(m_pFiffInfo){
+        fFreq = m_pFiffInfo->sfreq;
+    } else {
+        fFreq = 0;
+    }
+
+    return fFreq;
 }
 
 //=============================================================================================================
