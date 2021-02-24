@@ -541,6 +541,9 @@ void FiffRawView::createLabels()
     m_pRightLabel->setAlignment(Qt::AlignRight);
 
     LabelLayout->addWidget(m_pLeftLabel);
+    LabelLayout->addWidget(m_pFileName);
+    LabelLayout->addWidget(m_pFileLength);
+    LabelLayout->addWidget(m_pFileSampFreq);
     LabelLayout->addWidget(m_pRightLabel);
     labelBar->setLayout(LabelLayout);
 
@@ -684,6 +687,8 @@ void FiffRawView::clearView()
 {
     reset();
 }
+
+//=============================================================================================================
 
 void FiffRawView::updateFileLabels()
 {
