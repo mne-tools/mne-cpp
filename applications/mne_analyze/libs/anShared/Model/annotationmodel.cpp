@@ -505,11 +505,12 @@ int EventModel::getNumberOfAnnotations() const
 
 int EventModel::getAnnotation(int iIndex) const
 {
-    if (m_iSelectedCheckState){
-        return m_dataSamplesFiltered.at(m_dataSelectedRows.at(iIndex));
-    } else {
-        return m_dataSamplesFiltered.at(iIndex);
-    }
+//    if (m_iSelectedCheckState){
+//        return m_dataSamplesFiltered.at(m_dataSelectedRows.at(iIndex));
+//    } else {
+//        return m_dataSamplesFiltered.at(iIndex);
+//    }
+    return m_EventManager.getAllEvents()->at(iIndex).sample;
 }
 
 //=============================================================================================================
