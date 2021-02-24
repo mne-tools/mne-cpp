@@ -237,6 +237,7 @@ void FiffRawView::setModel(const QSharedPointer<FiffRawViewModel>& pModel)
 //    m_pTableView->grabGesture(Qt::PinchGesture);
 //    m_pTableView->grabGesture(Qt::TapAndHoldGesture);
     updateLabels(0);
+    updateFileLabels();
 }
 
 //=============================================================================================================
@@ -517,11 +518,25 @@ void FiffRawView::createLabels()
     QWidget* labelBar = new QWidget(this);
 
     m_pLeftLabel = new QLabel(this);
-    m_pRightLabel = new QLabel(this);
-
     m_pLeftLabel->setText(" ");
     m_pLeftLabel->setAlignment(Qt::AlignLeft);
 
+    m_pFileName = new QLabel(this);
+    m_pFileName->setText(" ");
+    m_pFileName->setAlignment(Qt::AlignHCenter);
+
+
+    m_pFileLength = new QLabel(this);
+    m_pFileLength->setText(" ");
+    m_pFileLength->setAlignment(Qt::AlignHCenter);
+
+
+    m_pFileSampFreq = new QLabel(this);
+    m_pFileSampFreq->setText(" ");
+    m_pFileSampFreq->setAlignment(Qt::AlignHCenter);
+
+
+    m_pRightLabel = new QLabel(this);
     m_pRightLabel->setText(" ");
     m_pRightLabel->setAlignment(Qt::AlignRight);
 
@@ -670,3 +685,23 @@ void FiffRawView::clearView()
     reset();
 }
 
+void FiffRawView::updateFileLabels()
+{
+    //Name
+    m_pFileName->setText("File: " + m_pModel->getModelName());
+
+    //Frequency
+    float fFrequency = m_pModel->getSamplingFrequency();
+    QString sFrequency;
+    sFrequency.setNum(fFrequency);
+
+    m_pFileSampFreq->setText("Sampling Frequency: " + sFrequency + " Hz");
+
+    //Length
+    int iFileLengthInSamples = m_pModel->absoluteLastSample() - m_pModel->absoluteFirstSample();
+    float fFileLengthInSeconds = static_cast<float>(iFileLengthInSamples) / fFrequency;
+    QString sLength;
+    sLength.setNum(fFileLengthInSeconds);
+
+    m_pFileLength->setText("File Length: " + sLength + " sec");
+}
