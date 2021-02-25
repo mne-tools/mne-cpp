@@ -1043,18 +1043,15 @@ void EventModel::applyOffset(int iFirstSampleOffset)
 
 //=============================================================================================================
 
-void EventModel::onAddEvent(int iSample)
+void EventModel::addEvent(int iSample)
 {
     setSamplePos(iSample);
     insertRow(0, QModelIndex());
-
-//    m_EventManager.addEvent(iSample);
-//    eventsUpdated();
 }
 
 //=============================================================================================================
 
-void EventModel::onAddGroup(QString sName, QColor color)
+void EventModel::addGroup(QString sName, QColor color)
 {
     int red, green, blue;
     color.getRgb(&red, &green, &blue);

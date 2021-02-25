@@ -651,9 +651,9 @@ public:
      */
     QSharedPointer<FiffRawViewModel> getFiffModel();
 
-    void onAddEvent(int iSample);
+    void addEvent(int iSample);
 
-    void onAddGroup(QString sName, QColor color);
+    void addGroup(QString sName, QColor color);
 
     std::unique_ptr<std::vector<EVENTSLIB::Event> > getEventsToDraw(int iBegin, int iEnd) const;
 
@@ -666,6 +666,8 @@ signals:
      * @param[in] currentFilterType    Type to be updated in GUI.
      */
     void updateEventTypes(const QString& currentFilterType);
+
+    void eventGroupsUpdated();
 
 private:
 
@@ -691,6 +693,7 @@ private:
 
     //=========================================================================================================
     void eventsUpdated();
+
 
     QStringList                         m_eventTypeList;                /** <List of the possible event types */
 
