@@ -495,6 +495,12 @@ void FiffRawViewModel::setFilter(const FilterKernel& filterData)
         reloadAllData();
     }
 }
+//=============================================================================================================
+
+const FilterKernel& FiffRawViewModel::getFilter()
+{
+    return m_filterKernel;
+}
 
 //=============================================================================================================
 
