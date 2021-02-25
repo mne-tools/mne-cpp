@@ -237,7 +237,7 @@ void FiffRawView::setModel(const QSharedPointer<FiffRawViewModel>& pModel)
 //    m_pTableView->grabGesture(Qt::PinchGesture);
 //    m_pTableView->grabGesture(Qt::TapAndHoldGesture);
     updateLabels(0);
-    updateFileLabels();
+    updateBottomFileLabels();
 }
 
 //=============================================================================================================
@@ -495,8 +495,8 @@ void FiffRawView::setFilterActive(bool state)
     if(!m_pModel) {
         return;
     }
-
     m_pModel->setFilterActive(state);
+    updateLabels(0);
 }
 
 //=============================================================================================================
@@ -517,40 +517,42 @@ void FiffRawView::createLabels()
     QHBoxLayout *LabelLayout = new QHBoxLayout(this);
     QWidget* labelBar = new QWidget(this);
 
-    m_pLeftLabel = new QLabel(this);
-    m_pLeftLabel->setText(" ");
-    m_pLeftLabel->setAlignment(Qt::AlignLeft);
+    m_pInitialTimeLabel = new QLabel(this);
+    m_pInitialTimeLabel->setText(" ");
+    m_pInitialTimeLabel->setAlignment(Qt::AlignLeft);
 
-    m_pFileName = new QLabel(this);
-    m_pFileName->setText(" ");
-    m_pFileName->setAlignment(Qt::AlignHCenter);
+    m_pFilterStateLabel = new QLabel(this);
+    m_pFilterStateLabel->setText(" ");
+    m_pFilterStateLabel->setAlignment(Qt::AlignCenter);
 
+    m_pFileNameLabel = new QLabel(this);
+    m_pFileNameLabel->setText(" ");
+    m_pFileNameLabel->setAlignment(Qt::AlignHCenter);
 
-    m_pFileLength = new QLabel(this);
-    m_pFileLength->setText(" ");
-    m_pFileLength->setAlignment(Qt::AlignHCenter);
-
+    m_pFileLengthLabel = new QLabel(this);
+    m_pFileLengthLabel->setText(" ");
+    m_pFileLengthLabel->setAlignment(Qt::AlignHCenter);
 
     m_pFileSampFreq = new QLabel(this);
     m_pFileSampFreq->setText(" ");
     m_pFileSampFreq->setAlignment(Qt::AlignHCenter);
 
+    m_pEndTimeLabel = new QLabel(this);
+    m_pEndTimeLabel->setText(" ");
+    m_pEndTimeLabel->setAlignment(Qt::AlignRight);
 
-    m_pRightLabel = new QLabel(this);
-    m_pRightLabel->setText(" ");
-    m_pRightLabel->setAlignment(Qt::AlignRight);
-
-    LabelLayout->addWidget(m_pLeftLabel);
-    LabelLayout->addWidget(m_pFileName);
-    LabelLayout->addWidget(m_pFileLength);
+    LabelLayout->addWidget(m_pInitialTimeLabel);
+    LabelLayout->addWidget(m_pFilterStateLabel);
+    LabelLayout->addWidget(m_pFileNameLabel);
+    LabelLayout->addWidget(m_pFileLengthLabel);
     LabelLayout->addWidget(m_pFileSampFreq);
-    LabelLayout->addWidget(m_pRightLabel);
+    LabelLayout->addWidget(m_pEndTimeLabel);
     labelBar->setLayout(LabelLayout);
 
     this->layout()->addWidget(labelBar);
 
-    m_pLeftLabel->show();
-    m_pRightLabel->show();
+    m_pInitialTimeLabel->show();
+    m_pEndTimeLabel->show();
     labelBar->show();
 }
 
@@ -567,20 +569,28 @@ void FiffRawView::updateLabels(int iValue)
     QString strLeft, strRight;
 
     if(m_pModel->isEmpty()) {
-        m_pRightLabel->setText("0 | 0 sec");
-        m_pLeftLabel->setText("0 | 0 sec");
+        m_pEndTimeLabel->setText("0 | 0 sec");
+        m_pInitialTimeLabel->setText("0 | 0 sec");
         return;
     }
 
     //Left Label
     int iSample = static_cast<int>(m_pTableView->horizontalScrollBar()->value() / m_pModel->pixelDifference());
     strLeft = QString("%1 | %2 sec").arg(QString().number(iSample)).arg(QString().number(iSample / m_pModel->getFiffInfo()->sfreq, 'f', 2));
-    m_pLeftLabel->setText(strLeft);
+    m_pInitialTimeLabel->setText(strLeft);
 
     //Right Label
     iSample += m_iT * m_pModel->getFiffInfo()->sfreq;
     strRight = QString("%1 | %2 sec").arg(QString().number(iSample)).arg(QString().number(iSample / m_pModel->getFiffInfo()->sfreq, 'f', 2));
-    m_pRightLabel->setText(strRight);
+    m_pEndTimeLabel->setText(strRight);
+
+    if(m_pModel->isFilterActive())
+    {
+        m_pFilterStateLabel->setText("Filter ON");
+    } else
+    {
+        m_pFilterStateLabel->setText("Filter OFF");
+    }
 }
 
 //=============================================================================================================
@@ -690,10 +700,10 @@ void FiffRawView::clearView()
 
 //=============================================================================================================
 
-void FiffRawView::updateFileLabels()
+void FiffRawView::updateBottomFileLabels()
 {
     //Name
-    m_pFileName->setText("File: " + m_pModel->getModelName());
+    m_pFileNameLabel->setText("File: " + m_pModel->getModelName());
 
     //Frequency
     float fFrequency = m_pModel->getSamplingFrequency();
@@ -708,5 +718,8 @@ void FiffRawView::updateFileLabels()
     QString sLength;
     sLength.setNum(fFileLengthInSeconds);
 
-    m_pFileLength->setText("File Length: " + sLength + " sec");
+    m_pFileLengthLabel->setText("File Length: " + sLength + " sec");
+
+
 }
+
