@@ -82,9 +82,9 @@ using namespace RTPROCESSINGLIB;
 
 FiffRawView::FiffRawView(QWidget *parent)
 : DISPLIB::AbstractView(parent)
+, m_pTableView(new QTableView())
 , m_fDefaultSectionSize(80.0f)
 {
-    m_pTableView = new QTableView;
 
     //set vertical layout
     QVBoxLayout *neLayout = new QVBoxLayout(this);
@@ -103,13 +103,6 @@ FiffRawView::FiffRawView(QWidget *parent)
 
     connect(m_pTableView->horizontalScrollBar(), &QScrollBar::valueChanged,
             this, &FiffRawView::updateLabels, Qt::UniqueConnection);
-}
-
-//=============================================================================================================
-
-FiffRawView::~FiffRawView()
-{
-    delete m_pTableView;
 }
 
 //=============================================================================================================
@@ -533,9 +526,9 @@ void FiffRawView::createLabels()
     m_pFileLengthLabel->setText(" ");
     m_pFileLengthLabel->setAlignment(Qt::AlignHCenter);
 
-    m_pFileSampFreq = new QLabel(this);
-    m_pFileSampFreq->setText(" ");
-    m_pFileSampFreq->setAlignment(Qt::AlignHCenter);
+    m_pFileSampFreqLabel = new QLabel(this);
+    m_pFileSampFreqLabel->setText(" ");
+    m_pFileSampFreqLabel->setAlignment(Qt::AlignHCenter);
 
     m_pEndTimeLabel = new QLabel(this);
     m_pEndTimeLabel->setText(" ");
@@ -545,7 +538,7 @@ void FiffRawView::createLabels()
     LabelLayout->addWidget(m_pFilterStateLabel);
     LabelLayout->addWidget(m_pFileNameLabel);
     LabelLayout->addWidget(m_pFileLengthLabel);
-    LabelLayout->addWidget(m_pFileSampFreq);
+    LabelLayout->addWidget(m_pFileSampFreqLabel);
     LabelLayout->addWidget(m_pEndTimeLabel);
     labelBar->setLayout(LabelLayout);
 
@@ -710,7 +703,7 @@ void FiffRawView::updateBottomFileLabels()
     QString sFrequency;
     sFrequency.setNum(fFrequency);
 
-    m_pFileSampFreq->setText("Sampling Frequency: " + sFrequency + " Hz");
+    m_pFileSampFreqLabel->setText("Sampling Frequency: " + sFrequency + " Hz");
 
     //Length
     int iFileLengthInSamples = m_pModel->absoluteLastSample() - m_pModel->absoluteFirstSample();
