@@ -235,7 +235,7 @@ public:
     FilterParameter getFilterType() const;
     void setFilterType(int iFilterType);
 
-    QString getShortDescription();
+    QString getShortDescription() const;
 
     static QVector<FilterParameter> m_designMethods;  /**< Vector of possible filter design methods */
     static QVector<FilterParameter> m_filterTypes;    /**< Vector of possible filter design types */

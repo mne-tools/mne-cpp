@@ -335,7 +335,7 @@ private:
     /**
      * Creates the lables for sample/time values displayed beneath the data view
      */
-    void createLabels();
+    void createBottomLabels();
 
     //=========================================================================================================
     /**
@@ -363,7 +363,7 @@ private:
     /**
      * Updates file labels with info from current set model
      */
-    void updateBottomFileLabels();
+    void updatePluginWindowTitle();
 
     QPointer<QTableView>                                m_pTableView;                   /**< Pointer to table view ui element */
 
@@ -375,18 +375,14 @@ private:
 
     float                                               m_fDefaultSectionSize;          /**< Default row height */
     float                                               m_fZoomFactor;                  /**< Zoom factor */
-    float                                               m_fLastClickedSample;            /**< Stores last clicked sample on screen */
+    float                                               m_fLastClickedSample;           /**< Stores last clicked sample on screen */
 
     qint32                                              m_iT;                           /**< Display window size in seconds */
 
     QScroller*                                          m_pKineticScroller;             /**< Used for kinetic scrolling through data view */
 
-    QLabel*                                             m_pInitialTimeLabel;                   /**< Left 'Sample | Seconds' display label */
-    QLabel*                                             m_pEndTimeLabel;                  /**< Right 'Sample | Seconds' display label */
-    QPointer<QLabel>                                    m_pFilterStateLabel;                   /**< State of the filter activation. */
-    QPointer<QLabel>                                    m_pFileNameLabel;                    /**< Label to display file name */
-    QPointer<QLabel>                                    m_pFileLengthLabel;                  /**< Label to display file length in seconds */
-    QPointer<QLabel>                                    m_pFileSampFreqLabel;                /**< Label to display file sampling frequency */
+    QLabel*                                             m_pInitialTimeLabel;            /**< Left 'Sample | Seconds' display label */
+    QLabel*                                             m_pEndTimeLabel;                /**< Right 'Sample | Seconds' display label */
 
 signals:
     void tableViewDataWidthChanged(int iWidth);

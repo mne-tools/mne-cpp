@@ -458,6 +458,14 @@ public:
 
     //=========================================================================================================
     /**
+     * Get reference to the filterKernel stored in the model.
+     *
+     * @param[out] Reference to filterKernel in model.
+     */
+    const RTPROCESSINGLIB::FilterKernel& getFilter();
+
+    //=========================================================================================================
+    /**
      * Set filter activation
      *
      * @param[in] bState    filter on/off flag
