@@ -184,10 +184,6 @@ signals:
      */
     void loadingEnd(QString sMessage = "Loading Events...");
 
-    void addEvent(int iSample);
-
-    void addGroup(QString sName, QColor color);
-
 protected slots:
 
     //=========================================================================================================
@@ -282,6 +278,8 @@ private slots:
      * Gets event map from QFuture and creates new groups baseed on it.
      */
     void createGroupsFromTriggers();
+
+    void redrawGroups();
 
 private:
     //=========================================================================================================
@@ -421,8 +419,8 @@ private:
     int                                             m_iCheckSelectedState;          /** < State of the show selected checkbox (0 unchecked, 2 checked) */
     int                                             m_iLastSampClicked;             /** < Number of the last sample clicked */
 
-    QSharedPointer<EventDelegate>              m_pAnnDelegate;                 /** < Pointer to associated delegate */
-    QSharedPointer<ANSHAREDLIB::EventModel>    m_pAnnModel;                    /** < Pointer to associated model. Points to currently loaded. */
+    QSharedPointer<EventDelegate>                   m_pAnnDelegate;                 /** < Pointer to associated delegate */
+    QSharedPointer<ANSHAREDLIB::EventModel>         m_pAnnModel;                    /** < Pointer to associated model. Points to currently loaded. */
     QSharedPointer<ANSHAREDLIB::FiffRawViewModel>   m_pFiffRawModel;                /** < Pointer to currently loaded FIffRawViewModel */
 
     QSharedPointer<DISPLIB::TriggerDetectionView>   m_pTriggerDetectView;           /** < Pointer to viewer to control GUI for detecting triggers */

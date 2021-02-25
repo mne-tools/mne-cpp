@@ -115,9 +115,6 @@ void EventView::initMVCSettings()
     connect(m_pAnnModel.data(),&ANSHAREDLIB::EventModel::dataChanged,
             this, &EventView::onDataChanged, Qt::UniqueConnection);
 
-    connect(this, &EventView::addEvent,
-            m_pAnnModel.data(), &ANSHAREDLIB::EventModel::onAddEvent, Qt::UniqueConnection);
-
     //Delegate
     m_pAnnDelegate = QSharedPointer<EventDelegate>(new EventDelegate(this));
     m_pUi->m_tableView_eventTableView->setItemDelegate(m_pAnnDelegate.data());
@@ -130,6 +127,9 @@ void EventView::initMVCSettings()
 
     m_pUi->m_tableView_eventTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     m_pUi->m_tableView_eventTableView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+
+    connect(m_pAnnModel.data(), &ANSHAREDLIB::EventModel::eventGroupsUpdated,
+            this, &EventView::groupsUpdated, Qt::UniqueConnection);
 }
 
 //=============================================================================================================
@@ -227,7 +227,7 @@ void EventView::addAnnotationToModel(int iSamplePos)
 
 //    m_pAnnModel->insertRow(0, QModelIndex());
 
-    emit addEvent(iSamplePos);
+    m_pAnnModel->addEvent(iSamplePos);
 
     emit triggerRedraw();
 }
@@ -337,8 +337,8 @@ void EventView::disconnectFromModel()
             this, &EventView::onStimButtonClicked);
     disconnect(m_pTriggerDetectView.data(), &DISPLIB::TriggerDetectionView::detectTriggers,
             this, &EventView::onDetectTriggers);
-    disconnect(this, &EventView::addEvent,
-            m_pAnnModel.data(), &ANSHAREDLIB::EventModel::onAddEvent);
+    disconnect(m_pAnnModel.data(), &ANSHAREDLIB::EventModel::eventGroupsUpdated,
+            this, &EventView::redrawGroups);
 
 
     saveGroupSettings();
@@ -417,14 +417,14 @@ bool EventView::newUserGroup(const QString& sName,
                                           int iType,
                                           bool bDefaultColor)
 {
-    if (!(m_pUi->m_listWidget_groupListWidget->findItems(sName, Qt::MatchExactly).isEmpty())){
-        //Name already in use
-        QMessageBox msgBox;
-        msgBox.setText("Group name already in use");
-        msgBox.setInformativeText("Please select a new name");
-        msgBox.exec();
-        return false;
-    }
+//    if (!(m_pUi->m_listWidget_groupListWidget->findItems(sName, Qt::MatchExactly).isEmpty())){
+//        //Name already in use
+//        QMessageBox msgBox;
+//        msgBox.setText("Group name already in use");
+//        msgBox.setInformativeText("Please select a new name");
+//        msgBox.exec();
+//        return false;
+//    }
 
     QColor groupColor;
 
@@ -437,20 +437,22 @@ bool EventView::newUserGroup(const QString& sName,
         groupColor = QColor(Qt::blue);
     }
 
-    int iCat = m_pAnnModel->createGroup(sName,
-                                        true,
-                                        iType,
-                                        groupColor);
+    m_pAnnModel->addGroup(sName, groupColor);
 
-    QListWidgetItem* newItem = new QListWidgetItem(sName);
-    newItem->setData(Qt::UserRole, QVariant(iCat));
-    newItem->setData(Qt::DecorationRole, groupColor);
-    newItem->setFlags (newItem->flags () | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+//    int iCat = m_pAnnModel->createGroup(sName,
+//                                        true,
+//                                        iType,
+//                                        groupColor);
 
-    m_pUi->m_listWidget_groupListWidget->addItem(newItem);
-    emit m_pUi->m_listWidget_groupListWidget->setCurrentItem(newItem);
+//    QListWidgetItem* newItem = new QListWidgetItem(sName);
+//    newItem->setData(Qt::UserRole, QVariant(iCat));
+//    newItem->setData(Qt::DecorationRole, groupColor);
+//    newItem->setFlags (newItem->flags () | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
 
-    m_pUi->lineEdit->setText("New Group " + QString::number(iCat + 1));
+//    m_pUi->m_listWidget_groupListWidget->addItem(newItem);
+//    emit m_pUi->m_listWidget_groupListWidget->setCurrentItem(newItem);
+
+    m_pUi->lineEdit->setText("New Group "/* + QString::number(iCat + 1)*/);
 
     emit groupsUpdated();
     return true;
@@ -766,4 +768,11 @@ void EventView::clearView(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedMod
     } else if (qSharedPointerCast<ANSHAREDLIB::AbstractModel>(m_pFiffRawModel) == pRemovedModel){
         m_pFiffRawModel = Q_NULLPTR;
     }
+}
+
+//=============================================================================================================
+
+void EventView::redrawGroups()
+{
+    //m_pAnnModel.get
 }
