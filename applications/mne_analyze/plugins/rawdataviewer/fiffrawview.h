@@ -109,12 +109,6 @@ public:
 
     //=========================================================================================================
     /**
-     * Destructor.
-     */
-    virtual ~FiffRawView();
-
-    //=========================================================================================================
-    /**
      * Resets the view to its default settings.
      */
     void reset();
@@ -392,7 +386,7 @@ private:
     QPointer<QLabel>                                    m_pFilterStateLabel;                   /**< State of the filter activation. */
     QPointer<QLabel>                                    m_pFileNameLabel;                    /**< Label to display file name */
     QPointer<QLabel>                                    m_pFileLengthLabel;                  /**< Label to display file length in seconds */
-    QPointer<QLabel>                                    m_pFileSampFreq;                /**< Label to display file sampling frequency */
+    QPointer<QLabel>                                    m_pFileSampFreqLabel;                /**< Label to display file sampling frequency */
 
 signals:
     void tableViewDataWidthChanged(int iWidth);
