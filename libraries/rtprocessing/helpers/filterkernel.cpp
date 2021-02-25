@@ -496,10 +496,10 @@ void FilterKernel::designFilter()
 
 //=============================================================================================================
 
-QString FilterKernel::getShortDescription()
+QString FilterKernel::getShortDescription() const
 {
-    QString description(m_designMethods.at(m_iDesignMethod).getName() + " | " + \
-                                QString::number(m_dHighpassFreq,'g',4) + "Hz - " + QString::number(m_dLowpassFreq,'g',4) + "Hz | " \
+    QString description(m_designMethods.at(m_iDesignMethod).getName() + "  -  " + \
+                                QString::number(m_dHighpassFreq,'g',4) + "Hz to " + QString::number(m_dLowpassFreq,'g',4) + "Hz  -  " \
                                 "Ord: " + QString::number(m_iFilterOrder));
     return description;
 }
