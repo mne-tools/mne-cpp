@@ -95,16 +95,17 @@ QVector<RTPROCESSINGLIB::FilterParameter> FilterKernel::m_filterTypes ({
 //=============================================================================================================
 
 FilterKernel::FilterKernel()
-: m_iFilterType(m_filterTypes.indexOf(FilterParameter("BPF")))
-, m_iFilterOrder(80)
-, m_sFilterName("Unknown")
-, m_dParksWidth(0.1)
-, m_iDesignMethod(m_designMethods.indexOf(FilterParameter("Cosine")))
+: m_sFreq(1000)
 , m_dCenterFreq(0.5)
 , m_dBandwidth(0.1)
-, m_sFreq(1000)
+, m_dParksWidth(0.1)
 , m_dLowpassFreq(40)
 , m_dHighpassFreq(4)
+, m_iFilterOrder(80)
+, m_iDesignMethod(m_designMethods.indexOf(FilterParameter("Cosine")))
+, m_iFilterType(m_filterTypes.indexOf(FilterParameter("BPF")))
+, m_sFilterName("Unknown")
+, m_sFilterShortDescription("")
 {
     designFilter();
 }
@@ -119,14 +120,15 @@ FilterKernel::FilterKernel(const QString& sFilterName,
                            double dParkswidth,
                            double dSFreq,
                            int iDesignMethod)
-: m_iDesignMethod(iDesignMethod)
-, m_iFilterType(iFilterType)
-, m_sFreq(dSFreq)
+: m_sFreq(dSFreq)
 , m_dCenterFreq(dCenterfreq)
 , m_dBandwidth(dBandwidth)
 , m_dParksWidth(dParkswidth)
 , m_iFilterOrder(iOrder)
+, m_iDesignMethod(iDesignMethod)
+, m_iFilterType(iFilterType)
 , m_sFilterName(sFilterName)
+, m_sFilterShortDescription()
 {
     if(iOrder < 9) {
        qWarning() << "[FilterKernel::FilterKernel] Less than 9 taps were provided. Setting number of taps to 9.";
@@ -489,6 +491,17 @@ void FilterKernel::designFilter()
             m_dHighpassFreq = (m_dCenterFreq - m_dBandwidth/2)*(m_sFreq/2);
         break;
     }
+    getShortDescription();
+}
+
+//=============================================================================================================
+
+QString FilterKernel::getShortDescription()
+{
+    QString description(m_designMethods.at(m_iDesignMethod).getName() + " | " + \
+                                QString::number(m_dHighpassFreq,'g',4) + "Hz - " + QString::number(m_dLowpassFreq,'g',4) + "Hz | " \
+                                "Ord: " + QString::number(m_iFilterOrder));
+    return description;
 }
 
 //=============================================================================================================
@@ -563,3 +576,5 @@ QString FilterParameter::getName() const
 {
     return m_sName;
 }
+
+//=============================================================================================================

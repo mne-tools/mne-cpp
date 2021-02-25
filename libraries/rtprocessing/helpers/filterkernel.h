@@ -235,6 +235,8 @@ public:
     FilterParameter getFilterType() const;
     void setFilterType(int iFilterType);
 
+    QString getShortDescription();
+
     static QVector<FilterParameter> m_designMethods;  /**< Vector of possible filter design methods */
     static QVector<FilterParameter> m_filterTypes;    /**< Vector of possible filter design types */
 
@@ -253,6 +255,7 @@ private:
      */
     void designFilter();
 
+
     double          m_sFreq;                /**< the sampling frequency. */
     double          m_dCenterFreq;          /**< contains center freq of the filter. */
     double          m_dBandwidth;           /**< contains bandwidth of the filter. */
@@ -265,6 +268,7 @@ private:
     int             m_iFilterType;          /**< represents the type of the filter instance.*/
 
     QString         m_sFilterName;          /**< contains name of the filter. */
+    QString         m_sFilterShortDescription; /**< contains a short string describign some filter parameters. */
 
     Eigen::RowVectorXd     m_vecCoeff;       /**< contains the forward filter coefficient set. */
     Eigen::RowVectorXcd    m_vecFftCoeff;    /**< the FFT-transformed forward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFftLength. */
