@@ -657,6 +657,8 @@ public:
 
     std::unique_ptr<std::vector<EVENTSLIB::Event> > getEventsToDraw(int iBegin, int iEnd) const;
 
+    std::unique_ptr<std::vector<EVENTSLIB::EventGroup> > getGroupsToDraw() const;
+
 signals:
 
     //=========================================================================================================
