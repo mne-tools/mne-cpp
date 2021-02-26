@@ -129,7 +129,7 @@ void EventView::initMVCSettings()
     m_pUi->m_tableView_eventTableView->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
     connect(m_pAnnModel.data(), &ANSHAREDLIB::EventModel::eventGroupsUpdated,
-            this, &EventView::groupsUpdated, Qt::UniqueConnection);
+            this, &EventView::redrawGroups, Qt::UniqueConnection);
 }
 
 //=============================================================================================================
@@ -289,12 +289,14 @@ void EventView::removeEvent()
 
 void EventView::addNewAnnotationType()
 {
-    if(newUserGroup(m_pUi->lineEdit->text(), m_pUi->m_spinBox_addEventType->value())) {
-        m_pAnnModel->addNewAnnotationType(QString().number(m_pUi->m_spinBox_addEventType->value()),
-                                      QColor(Qt::black));
+    qDebug() << "EventView::addNewAnnotationType";
 
-        emit triggerRedraw();
-    }
+    newUserGroup(m_pUi->lineEdit->text(), m_pUi->m_spinBox_addEventType->value());
+
+//    if(newUserGroup(m_pUi->lineEdit->text(), m_pUi->m_spinBox_addEventType->value())) {
+//        m_pAnnModel->addNewAnnotationType(QString().number(m_pUi->m_spinBox_addEventType->value()),
+//                                      QColor(Qt::black));
+//    }
 }
 
 //=============================================================================================================
@@ -426,11 +428,19 @@ bool EventView::newUserGroup(const QString& sName,
 //        return false;
 //    }
 
+    if(!m_pAnnModel){
+        qDebug() << "returning false 1";
+        return false;
+    }
+
+    qDebug() << "EventView::newUserGroup";
+
     QColor groupColor;
 
     if (!bDefaultColor) {
         groupColor = m_pColordialog->getColor(Qt::black, this);
         if(!groupColor.isValid()){
+            qDebug() << "returning false 2";
             return false;
         }
     } else {
@@ -454,7 +464,6 @@ bool EventView::newUserGroup(const QString& sName,
 
     m_pUi->lineEdit->setText("New Group "/* + QString::number(iCat + 1)*/);
 
-    emit groupsUpdated();
     return true;
 }
 
@@ -774,5 +783,24 @@ void EventView::clearView(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedMod
 
 void EventView::redrawGroups()
 {
+    if(!m_pAnnModel){
+        return;
+    }
+    auto groups = m_pAnnModel->getGroupsToDraw();
+
+    m_pUi->m_listWidget_groupListWidget->clear();
+
+    for (auto eventGroup : *groups){
+        QListWidgetItem* newItem = new QListWidgetItem(QString::fromStdString(eventGroup.name));
+        newItem->setData(Qt::UserRole, QVariant(eventGroup.id));
+        newItem->setData(Qt::DecorationRole, QColor(eventGroup.color.r, eventGroup.color.g, eventGroup.color.b));
+        newItem->setFlags (newItem->flags () | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+
+        m_pUi->m_listWidget_groupListWidget->addItem(newItem);
+    }
+
+    qDebug() << "EventView::redrawGroups";
     //m_pAnnModel.get
+    emit groupsUpdated();
+    emit triggerRedraw();
 }
