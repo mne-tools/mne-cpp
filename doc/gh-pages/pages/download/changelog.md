@@ -6,6 +6,79 @@ nav_exclude: true
 
 # Changelog
 
+## Version 0.1.9 - 2021/02/26
+
+### Applications
+
+MNE Analyze
+ * Handle removal and deletion of child item models
+ * Add event for model removal
+ * Changed event documentation format
+ * Gave AnalyzeData a communicator to send events
+ * Implemented clearing of views in plugins that use models
+ * Data Loader now saves last folder data was loaded from.
+ * Code cleanup to fix some compiler warnings and memory leaks
+
+MNE Anonymize
+ * Fix bug when anonymizing dates
+ * Update date command line option
+ * Fix link to documentation web page
+ * Use QDate instead of QDateTime when referring to birthday date
+ * add console to CONFIG in pro file
+
+MNE Scan
+* Change saving to file to account for calibration values when saving data
+
+EDF-To-Fiff Converter
+* Added edf to fiff converter command line application
+
+### API librariers
+
+Disp
+ * Added clearView() function to AbstractView
+ * Change default loaded values for ScalingView and FiffRawViewSettings
+ * Made FilterSettingsView and FilterDesignView reflect filter parameter changes made in each other
+ * Fix updating filter parameters in FilterDesignView after loading filter from file
+ * Update scaling of FilterDesignView plotting and removed scroll bars.
+ * Made updateFilterPlot public in FilterDesignView
+ * Text color in the FilterPlotScene class is now dependant on the FilterDesignView colors, dependent on the Qt stylesheet
+
+Disp3D
+ * Fix applying the same rotation animation on the parent and children of a Renderable3DEntity.
+ * Make use of parallel animation starting via QParallelAnimationGroup
+ * Orbit camera instead of rotating objects in 3D view
+
+RtProcessing
+ * Changed enums in FilterKernel to static class members of new FilterParameter class and replaced static functions
+
+### Continuous Integration
+
+ * Update CI to use Qt 5.15.2, which solves a problem with Qt3D on MacOS
+ * Remove setting the noOpenGLWidget flag when Qt version is > 5.15.0 to fix signal plotting in macOs
+ * Add scripts (/tools/testing) and outsource calling of tests from CI so devs can run tests locally more easily.
+ * Make test_win powershell script callable from anywhere
+
+### Documentation
+
+ * fixed some layout issues in the changelog
+ * fixed website page links with wrong path
+ * Docu fixes in Renderable3DEntity
+ * Add CI testing documentation to contribution guide
+ * Update eegosports docu
+ * Include more about event system and using event system when creating plugin
+ * Update E-Mail addresses in the contact page
+ * Reorganize and restructure webpage
+
+ ### Authors
+
+ People who contributed to this release (preceded by number of commits):
+
+(87) Juan GPC,
+(49) Gabriel Motta,
+(22) Simon Heinke,
+(17) Lorenz Esch,
+(10) Alex Rockhill
+
 ## Version 0.1.8 - 2020/11/19
 
 ### Applications
@@ -24,7 +97,7 @@ MNE Scan
  * Remove no longer needed applications/mne_analyze/libs/anShared/Interfaces/IStandardView.h
  * Remove no longer needed applications/mne_analyze/libs/anShared/Management/analyzesettings.cpp
  * Rename interfaces to abstract classes, since they are described better as abstract classes
- * Improve Babymeg plugin to feature connection GUI elements. Also fix some bugs which led to crashing when 
+ * Improve Babymeg plugin to feature connection GUI elements. Also fix some bugs which led to crashing when
    connecting to the acquisition boards.
  * Update include path of ui_ files
  * Rename data function in measurement classes to measurementData() since QSharedPointer already has a data() function.
@@ -47,7 +120,7 @@ Disp3D
 Disp
  * New Dipole Fit View.
 
-### Continuous Integration 
+### Continuous Integration
 
  * Cleanup qmake files for transition to cmake (Qt6 only supports cmake)
  * Move deployment to CI
