@@ -26,7 +26,7 @@ defineTest(minQtVersion) {
 
 ############################################### GLOBAL DEFINES ################################################
 
-VERSION = 0.1.8
+VERSION = 0.1.9
 
 QMAKE_TARGET_PRODUCT = MNE-CPP
 QMAKE_TARGET_DESCRIPTION = A Framework for Electrophysiology.
