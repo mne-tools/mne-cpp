@@ -80,7 +80,7 @@ AverageSceneItem::AverageSceneItem(const QString& channelName,
 , m_iMaxHeigth(150)
 , m_bIsBad(false)
 , m_qpChannelPosition(channelPosition)
-, m_colorDefault(Qt::yellow)
+, m_colorDefault(color)
 {
     m_rectBoundingRect = QRectF(-m_iMaxWidth/2, -m_iMaxHeigth/2, m_iMaxWidth, m_iMaxHeigth);
 }
