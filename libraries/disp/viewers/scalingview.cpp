@@ -190,20 +190,22 @@ ScalingView::~ScalingView()
 
 void ScalingView::keyReleaseEvent(QKeyEvent *event)
 {
-    if(event->key() == 16777248)
+    if(event->key() == Qt::Key_Shift)
     {
         m_bIsShiftKeyPressed = false;
     }
+    QWidget::keyReleaseEvent(event);
 }
 
 //=============================================================================================================
 
 void ScalingView::keyPressEvent(QKeyEvent *event)
 {
-    if(event->key() == 16777248)
+    if(event->key() == Qt::Key_Shift)
     {
         m_bIsShiftKeyPressed = true;
     }
+    QWidget::keyPressEvent(event);
 }
 
 //=============================================================================================================
