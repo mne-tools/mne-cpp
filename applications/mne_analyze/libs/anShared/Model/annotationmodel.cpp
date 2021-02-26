@@ -1053,10 +1053,14 @@ void EventModel::addEvent(int iSample)
 
 void EventModel::addGroup(QString sName, QColor color)
 {
+    qDebug() << "EventModel::addGroup";
+
     int red, green, blue;
     color.getRgb(&red, &green, &blue);
 
     m_EventManager.addGroup(sName.toStdString(), EVENTSLIB::RgbColor(red, green, blue));
+
+    emit eventGroupsUpdated();
 }
 
 //=============================================================================================================
@@ -1072,4 +1076,11 @@ void EventModel::eventsUpdated()
 {
     emit dataChanged(createIndex(0,0), createIndex(m_EventManager.getAllEvents()->size(), 0));
     emit headerDataChanged(Qt::Vertical, 0, m_EventManager.getAllEvents()->size());
+}
+
+//=============================================================================================================
+
+std::unique_ptr<std::vector<EVENTSLIB::EventGroup> > EventModel::getGroupsToDraw() const
+{
+    return m_EventManager.getAllGroups();
 }
