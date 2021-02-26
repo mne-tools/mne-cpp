@@ -204,14 +204,14 @@ signals:
      * Slot for processing the use of shortcut keypresses.
      * @param event
      */
-    void keyReleaseEvent(QKeyEvent* event);
+    void keyReleaseEvent(QKeyEvent* event) override;
 
     //=========================================================================================================
     /**
      * Slot for processing the use of shortcut releases.
      * @param event
      */
-    void keyPressEvent(QKeyEvent* event);
+    void keyPressEvent(QKeyEvent* event) override;
 
     //=========================================================================================================
     void MAGScaleSpinBoxChanged(double value);
