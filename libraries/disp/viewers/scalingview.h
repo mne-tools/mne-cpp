@@ -76,19 +76,6 @@ namespace DISPLIB
 
 //=========================================================================================================
 /**
- * Default scales for each channel by type.
- */
-const float m_fScaleMAG = 1e-12f;      /**< Default scale for channel kind and unit of MAG */
-const float m_fScaleGRAD = 1e-15f;     /**< Default scale for channel kind and unit of GRAD */
-const float m_fScaleEEG = 1e-5f;       /**< Default scale for channel kind and unit of EEG */
-const float m_fScaleEOG = 1e-6f;       /**< Default scale for channel kind and unit of EOG */
-const float m_fScaleECG = 1e-2f;       /**< Default scale for channel kind and unit of ECG */
-const float m_fScaleSTIM = 1e-3f;      /**< Default scale for channel kind and unit of STIM */
-const float m_fScaleMISC = 1e-3f;      /**< Default scale for channel kind and unit of MISC */
-const float m_fScaleEMG = 1e-3f;       /**< Default scale for channel kind and unit of EMG */
-
-//=========================================================================================================
-/**
  * Get the default scaling values by channel type
  *
  * @param [in] iChannelKind     The channel kind to return the default scaling value for.
@@ -117,6 +104,16 @@ DISPSHARED_EXPORT float getDefaultScalingValue(int iChannelKind,
 DISPSHARED_EXPORT float getScalingValue(const QMap<qint32, float>& qMapChScaling,
                                         int iChannelKind,
                                         int iChannelUnit);
+
+//=============================================================================================================
+
+class DISPSHARED_EXPORT ScaleControl
+{
+    ScaleControl();
+
+
+};
+
 
 //=============================================================================================================
 /**
@@ -181,6 +178,71 @@ public:
      */
     void clearView();
 
+    //=========================================================================================================
+    /**
+     * Slot for processing the use of shortcut keypresses.
+     * @param event
+     */
+    void keyReleaseEvent(QKeyEvent* event);
+
+    //=========================================================================================================
+    /**
+     * Slot for processing the use of shortcut releases.
+     * @param event
+     */
+    void keyPressEvent(QKeyEvent* event);
+
+    //=========================================================================================================
+    void MAGScaleSpinBoxChanged(double value);
+
+    //=========================================================================================================
+    void GRADScaleSpinBoxChanged(double value);
+
+    //=========================================================================================================
+    void EEGScaleSpinBoxChanged(double value);
+
+    //=========================================================================================================
+    void EOGScaleSpinBoxChanged(double value);
+
+    //=========================================================================================================
+    void EMGScaleSpinBoxChanged(double value);
+
+    //=========================================================================================================
+    void ECGScaleSpinBoxChanged(double value);
+
+    //=========================================================================================================
+    void MISCScaleSpinBoxChanged(double value);
+
+    //=========================================================================================================
+    void STIMScaleSpinBoxChanged(double value);
+
+    //=============================================================================================================
+    void MAGScaleSliderChanged(int value);
+
+    //=============================================================================================================
+    void GRADScaleSliderChanged(int value);
+
+    //=============================================================================================================
+    void EEGScaleSliderChanged(int value);
+
+    //=============================================================================================================
+    void EOGScaleSliderChanged(int value);
+
+    //=============================================================================================================
+    void EMGScaleSliderChanged(int value);
+
+    //=============================================================================================================
+    void ECGScaleSliderChanged(int value);
+
+    //=============================================================================================================
+    void MISCScaleSliderChanged(int value);
+
+    //=============================================================================================================
+    void STIMScaleSliderChanged(int value);
+
+    //=============================================================================================================
+    void emitScalingChangedAndSaveSettings();
+
 protected:
     //=========================================================================================================
     /**
@@ -208,13 +270,13 @@ protected:
     /**
      * Slot called when scaling spin boxes change
      */
-    void onUpdateSpinBoxScaling(double value);
+//    void onUpdateSpinBoxScaling(double value);
 
     //=========================================================================================================
     /**
      * Slot called when slider scaling change
      */
-    void onUpdateSliderScaling(int value);
+//    void onUpdateSliderScaling(int value);
 
     QMap<qint32, float>                 m_qMapChScaling;                /**< Channel scaling values. */
     QMap<qint32, QDoubleSpinBox*>       m_qMapScalingDoubleSpinBox;     /**< Map of types and channel scaling line edits. */
@@ -224,8 +286,10 @@ protected:
 
     QStringList                         m_lChannelTypesToShow;          /**< The channel types as strings to show the sliders for. */
 
-    Ui::ScalingViewWidget*              m_pUi;
-
+    Ui::ScalingViewWidget*              m_pUi;                          /**< Pointer to the user interface object. */
+    bool                                m_bIsShiftKeyPressed;           /**< Bool member value to store the use of the shiftkey. */
+    bool                                m_bManagingSpinBoxChange;
+    bool                                m_bManagingSliderChange;
 signals:
     //=========================================================================================================
     /**
