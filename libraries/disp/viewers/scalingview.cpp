@@ -583,9 +583,9 @@ void ScalingView::redrawGUI()
         t_pDoubleSpinBoxScale->setMinimum(0.001);
         t_pDoubleSpinBoxScale->setMaximum(50000);
         t_pDoubleSpinBoxScale->setMaximumWidth(100);
-        t_pDoubleSpinBoxScale->setSingleStep(0.01);
+        t_pDoubleSpinBoxScale->setSingleStep(0.0001);
         t_pDoubleSpinBoxScale->setDecimals(3);
-        t_pDoubleSpinBoxScale->setPrefix("+/- ");
+        //t_pDoubleSpinBoxScale->setPrefix("+/- ");
         t_pDoubleSpinBoxScale->setValue(m_qMapChScaling.value(FIFF_UNIT_T)/(m_fScaleMAG));
         t_pDoubleSpinBoxScale->setToolTip(tip);
         m_qMapSpinBox.insert(FIFF_UNIT_T,t_pDoubleSpinBoxScale);
@@ -657,7 +657,7 @@ void ScalingView::redrawGUI()
 
         QDoubleSpinBox* t_pDoubleSpinBoxScale = new QDoubleSpinBox;
         t_pDoubleSpinBoxScale->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
-        t_pDoubleSpinBoxScale->setMinimum(0.1);
+        t_pDoubleSpinBoxScale->setMinimum(0.01);
         t_pDoubleSpinBoxScale->setMaximum(25000);
         t_pDoubleSpinBoxScale->setMaximumWidth(100);
         t_pDoubleSpinBoxScale->setSingleStep(0.1);
