@@ -107,12 +107,17 @@ DISPSHARED_EXPORT float getScalingValue(const QMap<qint32, float>& qMapChScaling
 
 //=============================================================================================================
 
-class DISPSHARED_EXPORT ScaleControl
-{
-    ScaleControl();
+//class DISPSHARED_EXPORT ScaleControl
+//{
+//public:
+//    ScaleControl(const QString& label);
+
+//private:
 
 
-};
+
+
+//};
 
 
 //=============================================================================================================
@@ -214,52 +219,52 @@ signals:
     void keyPressEvent(QKeyEvent* event) override;
 
     //=========================================================================================================
-    void MAGScaleSpinBoxChanged(double value);
+    void MAGSpinBoxChanged(double value);
 
     //=========================================================================================================
-    void GRADScaleSpinBoxChanged(double value);
+    void GRADSpinBoxChanged(double value);
 
     //=========================================================================================================
-    void EEGScaleSpinBoxChanged(double value);
+    void EEGSpinBoxChanged(double value);
 
     //=========================================================================================================
-    void EOGScaleSpinBoxChanged(double value);
+    void EOGSpinBoxChanged(double value);
 
     //=========================================================================================================
-    void EMGScaleSpinBoxChanged(double value);
+    void EMGSpinBoxChanged(double value);
 
     //=========================================================================================================
-    void ECGScaleSpinBoxChanged(double value);
+    void ECGSpinBoxChanged(double value);
 
     //=========================================================================================================
-    void MISCScaleSpinBoxChanged(double value);
+    void MISCSpinBoxChanged(double value);
 
     //=========================================================================================================
-    void STIMScaleSpinBoxChanged(double value);
+    void STIMSpinBoxChanged(double value);
 
     //=============================================================================================================
-    void MAGScaleSliderChanged(int value);
+    void MAGSliderChanged(int value);
 
     //=============================================================================================================
-    void GRADScaleSliderChanged(int value);
+    void GRADSliderChanged(int value);
 
     //=============================================================================================================
-    void EEGScaleSliderChanged(int value);
+    void EEGSliderChanged(int value);
 
     //=============================================================================================================
-    void EOGScaleSliderChanged(int value);
+    void EOGSliderChanged(int value);
 
     //=============================================================================================================
-    void EMGScaleSliderChanged(int value);
+    void EMGSliderChanged(int value);
 
     //=============================================================================================================
-    void ECGScaleSliderChanged(int value);
+    void ECGSliderChanged(int value);
 
     //=============================================================================================================
-    void MISCScaleSliderChanged(int value);
+    void MISCSliderChanged(int value);
 
     //=============================================================================================================
-    void STIMScaleSliderChanged(int value);
+    void STIMSliderChanged(int value);
 
     //=============================================================================================================
     void emitScalingChangedAndSaveSettings();
