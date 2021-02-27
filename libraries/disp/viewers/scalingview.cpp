@@ -322,7 +322,7 @@ void ScalingView::updateProcessingMode(ProcessingMode mode)
 
 //=============================================================================================================
 
-void ScalingView::emitScalingChangedAndSaveSettings()
+void ScalingView::processScalingChange()
 {
     emit scalingChanged(m_qMapChScaling);
     saveSettings();
@@ -332,14 +332,13 @@ void ScalingView::emitScalingChangedAndSaveSettings()
 
 void ScalingView::MAGSpinBoxChanged(double value)
 {
-    qDebug() << "spinbox mag : " << value;
     m_bManagingSpinBoxChange = true;
     if(!m_bManagingSliderChange)
     {
         m_qMapSlider[FIFF_UNIT_T]->setValue(-value * 10.0);
     }
     m_qMapChScaling.insert(FIFF_UNIT_T, value * m_fScaleMAG);
-    emitScalingChangedAndSaveSettings();
+    processScalingChange();
     m_bManagingSpinBoxChange = false;
     linkMagToGrad();
 }
@@ -353,7 +352,6 @@ void ScalingView::linkMagToGrad()
     }
     m_qMapSpinBox[FIFF_UNIT_T_M]->setValue(m_dMAGtoGRADSpinboxConverter * m_qMapSpinBox[FIFF_UNIT_T]->value());
     m_bManagingLinkMagToGrad = false;
-    qDebug() << "MagtoGradConverter: " << m_dMAGtoGRADSpinboxConverter;
 }
 
 //=============================================================================================================
@@ -376,14 +374,13 @@ void ScalingView::linkGradToMag()
 
 void ScalingView::GRADSpinBoxChanged(double value)
 {
-    qDebug() << "spinbox grad : " << value;
     m_bManagingSpinBoxChange = true;
     if(!m_bManagingSliderChange)
     {
         m_qMapSlider[FIFF_UNIT_T_M]->setValue(-value * 1.0);
     }
     m_qMapChScaling.insert(FIFF_UNIT_T_M, value * m_fScaleGRAD * 100.0);//*100 because data in fiff files is stored as fT/m not fT/cm
-    emitScalingChangedAndSaveSettings();
+    processScalingChange();
     m_bManagingSpinBoxChange = false;
     linkGradToMag();
 }
@@ -398,7 +395,7 @@ void ScalingView::EEGSpinBoxChanged(double value)
         m_qMapSlider[FIFFV_EEG_CH]->setValue(-value * 10.0);
     }
     m_qMapChScaling.insert(FIFFV_EEG_CH, value * m_fScaleEEG);
-    emitScalingChangedAndSaveSettings();
+    processScalingChange();
     m_bManagingSpinBoxChange = false;
 }
 
@@ -412,7 +409,7 @@ void ScalingView::EOGSpinBoxChanged(double value)
         m_qMapSlider[FIFFV_EOG_CH]->setValue(-value * 10.0);
     }
     m_qMapChScaling.insert(FIFFV_EOG_CH, value * m_fScaleEOG);
-    emitScalingChangedAndSaveSettings();
+    processScalingChange();
     m_bManagingSpinBoxChange = false;
 }
 
@@ -426,7 +423,7 @@ void ScalingView::EMGSpinBoxChanged(double value)
         m_qMapSlider[FIFFV_EMG_CH]->setValue(-value * 10.0);
     }
     m_qMapChScaling.insert(FIFFV_EMG_CH, value * m_fScaleEMG);
-    emitScalingChangedAndSaveSettings();
+    processScalingChange();
     m_bManagingSpinBoxChange = false;
 }
 
@@ -440,7 +437,7 @@ void ScalingView::ECGSpinBoxChanged(double value)
         m_qMapSlider[FIFFV_ECG_CH]->setValue(-value * 10.0);
     }
     m_qMapChScaling.insert(FIFFV_ECG_CH, value * m_fScaleECG);
-    emitScalingChangedAndSaveSettings();
+    processScalingChange();
     m_bManagingSpinBoxChange = false;
 }
 
@@ -454,7 +451,7 @@ void ScalingView::MISCSpinBoxChanged(double value)
         m_qMapSlider[FIFFV_MISC_CH]->setValue(-value * 10.0);
     }
     m_qMapChScaling.insert(FIFFV_MISC_CH, value * m_fScaleMISC);
-    emitScalingChangedAndSaveSettings();
+    processScalingChange();
     m_bManagingSpinBoxChange = false;
 }
 
@@ -468,7 +465,7 @@ void ScalingView::STIMSpinBoxChanged(double value)
         m_qMapSlider[FIFFV_STIM_CH]->setValue(-value * 10.0);
     }
     m_qMapChScaling.insert(FIFFV_STIM_CH, value * m_fScaleSTIM);
-    emitScalingChangedAndSaveSettings();
+    processScalingChange();
     m_bManagingSpinBoxChange = false;
 }
 
@@ -476,7 +473,6 @@ void ScalingView::STIMSpinBoxChanged(double value)
 
 void ScalingView::MAGSliderChanged(int value)
 {
-    qDebug() << "slider mag : " << value;
     m_bManagingSliderChange = true;
     if(!m_bManagingSpinBoxChange)
     {
@@ -489,7 +485,6 @@ void ScalingView::MAGSliderChanged(int value)
 
 void ScalingView::GRADSliderChanged(int value)
 {
-    qDebug() << "slider grad : " << value;
     m_bManagingSliderChange = true;
     if(!m_bManagingSpinBoxChange)
     {
