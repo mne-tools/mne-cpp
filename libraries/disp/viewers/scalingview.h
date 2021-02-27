@@ -182,7 +182,20 @@ public:
      */
     void keyPressEvent(QKeyEvent* event) override;
 
+signals:
+    //=========================================================================================================
+    /**
+     * Emit this signal whenever the scaling sliders or spin boxes changed.
+     */
+    void scalingChanged(const QMap<qint32, float>& scalingMap);
+
 protected:
+
+    //=============================================================================================================
+    /**
+     * Emit signal to save scale status and update views.
+     */
+    void processScalingChange();
 
     /**
      * Callback to process a change in the MAGs scale spinbox.
@@ -344,18 +357,6 @@ protected:
     bool                                m_bManagingSliderChange;        /**< Bool member mutex the state of the slider. */
     bool                                m_bManagingLinkMagToGrad;       /**< Bool member mutex the link between MAGs and GRADs. */
     static double                       m_dMAGtoGRADSpinboxConverter;   /**< Stores the conversion ratio between MAGs and GRADs. */
-signals:
-    //=========================================================================================================
-    /**
-     * Emit this signal whenever the scaling sliders or spin boxes changed.
-     */
-    void scalingChanged(const QMap<qint32, float>& scalingMap);
-
-    //=============================================================================================================
-    /**
-     * Emit signal to save scale status and update views.
-     */
-    void emitScalingChangedAndSaveSettings();
 };
 } // NAMESPACE
 

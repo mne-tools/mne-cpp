@@ -358,7 +358,7 @@ void ScalingView::linkMagToGrad()
 
 //=============================================================================================================
 
-void ScalingView::updateMagSpinbox()
+void ScalingView::linkGradToMag()
 {
     if(!m_bManagingLinkMagToGrad)
     {
@@ -385,7 +385,7 @@ void ScalingView::GRADSpinBoxChanged(double value)
     m_qMapChScaling.insert(FIFF_UNIT_T_M, value * m_fScaleGRAD * 100.0);//*100 because data in fiff files is stored as fT/m not fT/cm
     emitScalingChangedAndSaveSettings();
     m_bManagingSpinBoxChange = false;
-    updateMagSpinbox();
+    linkGradToMag();
 }
 
 //=============================================================================================================
