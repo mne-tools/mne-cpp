@@ -328,7 +328,7 @@ protected:
     /**
      * Link Gradiometers scale with magnetometers.
      */
-    void updateMagSpinbox();
+    void linkGradToMag();
 
     QMap<qint32, float>                 m_qMapChScaling;                /**< Channel scaling values. */
     QMap<qint32, QDoubleSpinBox*>       m_qMapSpinBox;                  /**< Map of types and channel scaling line edits. */
