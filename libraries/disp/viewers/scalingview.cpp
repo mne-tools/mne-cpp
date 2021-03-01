@@ -72,14 +72,17 @@ using namespace FIFFLIB;
 /**
  * Default scales for each channel by type.
  */
-const static float m_fScaleMAG = 1e-12f;      /**< Default scale for channel kind and unit of MAG */
-const static float m_fScaleGRAD = 1e-15f;     /**< Default scale for channel kind and unit of GRAD */
-const static float m_fScaleEEG = 1e-5f;       /**< Default scale for channel kind and unit of EEG */
-const static float m_fScaleEOG = 1e-6f;       /**< Default scale for channel kind and unit of EOG */
-const static float m_fScaleECG = 1e-2f;       /**< Default scale for channel kind and unit of ECG */
-const static float m_fScaleSTIM = 1e-3f;      /**< Default scale for channel kind and unit of STIM */
-const static float m_fScaleMISC = 1e-3f;      /**< Default scale for channel kind and unit of MISC */
-const static float m_fScaleEMG = 1e-3f;       /**< Default scale for channel kind and unit of EMG */
+const static float m_fScaleMAG = 1e-12f;            /**< Default scale for channel kind and unit of MAG */
+const static float m_fScaleGRAD = 1e-15f;           /**< Default scale for channel kind and unit of GRAD */
+const static float m_fScaleEEG = 1e-5f;             /**< Default scale for channel kind and unit of EEG */
+const static float m_fScaleEOG = 1e-6f;             /**< Default scale for channel kind and unit of EOG */
+const static float m_fScaleECG = 1e-2f;             /**< Default scale for channel kind and unit of ECG */
+const static float m_fScaleSTIM = 1e-3f;            /**< Default scale for channel kind and unit of STIM */
+const static float m_fScaleMISC = 1e-3f;            /**< Default scale for channel kind and unit of MISC */
+const static float m_fScaleEMG = 1e-3f;             /**< Default scale for channel kind and unit of EMG */
+const static double m_dDefaultMagToGradRatio(100);  /**< Stores the conversion ratio between MAGs and GRADs. */
+#define MAG_TO_GRAD_RATIO 31337
+const static double magicNumber(1);
 
 float DISPLIB::getDefaultScalingValue(int iChannelKind,
                                       int iChannelUnit)
@@ -156,7 +159,6 @@ float DISPLIB::getScalingValue(const QMap<qint32, float>& qMapChScaling,
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-double ScalingView::m_dMAGtoGRADSpinboxConverter(100);
 
 ScalingView::ScalingView(const QString& sSettingsPath,
                          QWidget *parent,
@@ -350,9 +352,9 @@ void ScalingView::linkMagToGrad()
     m_bManagingLinkMagToGrad = true;
     if(m_bIsShiftKeyPressed)
     {
-        m_dMAGtoGRADSpinboxConverter = m_qMapSpinBox[FIFF_UNIT_T_M]->value() / m_qMapSpinBox[FIFF_UNIT_T]->value();
+        m_qMapSpinBox[MAG_TO_GRAD_RATIO]->setValue((m_qMapSpinBox[FIFF_UNIT_T]->value()/magicNumber) / m_qMapSpinBox[FIFF_UNIT_T_M]->value());// (pT/1000) / fT/cm  = cm
     }
-    m_qMapSpinBox[FIFF_UNIT_T_M]->setValue(m_dMAGtoGRADSpinboxConverter * m_qMapSpinBox[FIFF_UNIT_T]->value());
+    m_qMapSpinBox[FIFF_UNIT_T_M]->setValue(m_qMapSpinBox[FIFF_UNIT_T]->value() / (magicNumber * m_qMapSpinBox[MAG_TO_GRAD_RATIO]->value()));
     m_bManagingLinkMagToGrad = false;
 }
 
@@ -365,9 +367,9 @@ void ScalingView::linkGradToMag()
         m_bManagingLinkMagToGrad = true;
         if(m_bIsShiftKeyPressed)
         {
-            m_dMAGtoGRADSpinboxConverter = m_qMapSpinBox[FIFF_UNIT_T_M]->value() / m_qMapSpinBox[FIFF_UNIT_T]->value();
+            m_qMapSpinBox[MAG_TO_GRAD_RATIO]->setValue((m_qMapSpinBox[FIFF_UNIT_T]->value()/magicNumber) / m_qMapSpinBox[FIFF_UNIT_T_M]->value());// (pT/1000) / fT/cm  = cm
         }
-        m_qMapSpinBox[FIFF_UNIT_T]->setValue( m_qMapSpinBox[FIFF_UNIT_T_M]->value() / m_dMAGtoGRADSpinboxConverter);
+        m_qMapSpinBox[FIFF_UNIT_T]->setValue( m_qMapSpinBox[FIFF_UNIT_T_M]->value() * (magicNumber * m_qMapSpinBox[MAG_TO_GRAD_RATIO]->value()));
         m_bManagingLinkMagToGrad = false;
     }
 }
@@ -378,7 +380,7 @@ float ScalingView::sliderNonLinearMap(float minInput, float maxInput, float sens
 {
     float Y = atanf(sensitivity * (minInput - centerPoint));
     float K = (maxOutput - minOutput) / (atanf(sensitivity * (maxInput-centerPoint)) - Y);
-    return K * atanf(sensitivity * (x-centerPoint)) - Y;
+    return K * (atanf(sensitivity * (x-centerPoint)) - Y);
 }
 
 //=============================================================================================================
@@ -399,7 +401,7 @@ void ScalingView::GRADSpinBoxChanged(double value)
     {
         m_qMapSlider[FIFF_UNIT_T_M]->setValue(-value * 1.0);
     }
-    m_qMapChScaling.insert(FIFF_UNIT_T_M, value * m_fScaleGRAD * 100.0);//*100 because data in fiff files is stored as fT/m not fT/cm
+    m_qMapChScaling.insert(FIFF_UNIT_T_M, value * m_fScaleGRAD * 100.0);//*100 because we have data in fT/cm and we want it in ft/m.
     processScalingChange();
     m_bManagingSpinBoxChange = false;
     linkGradToMag();
@@ -588,6 +590,16 @@ void ScalingView::STIMSliderChanged(int value)
 
 //=============================================================================================================
 
+void ScalingView::MagGradRatioSpinBoxChanged(double value)
+{
+    if(!m_bManagingLinkMagToGrad && !m_bManagingSliderChange && !m_bManagingSpinBoxChange)
+    {
+        m_qMapSpinBox[FIFF_UNIT_T_M]->setValue(m_qMapSpinBox[FIFF_UNIT_T]->value() / (magicNumber * value));
+    }
+}
+
+//=============================================================================================================
+
 void ScalingView::redrawGUI()
 {
     qint32 i = 0;
@@ -627,6 +639,27 @@ void ScalingView::redrawGUI()
                 this,&ScalingView::MAGSliderChanged);
         m_pUi->m_formLayout_Scaling->addWidget(t_pHorizontalSlider,i+1,1,1,1);
 
+        i+=2;
+    }
+
+    //MagToGradRatio Spinbox
+    {
+        QLabel* t_pLabelMagGradRatio = new QLabel("MAG-GRAD ratio [cm]");
+        m_pUi->m_formLayout_Scaling->addWidget(t_pLabelMagGradRatio,i,0,1,1);
+        QDoubleSpinBox* t_pSpinBox = new QDoubleSpinBox;
+        t_pSpinBox->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
+        t_pSpinBox->setKeyboardTracking(false);
+        t_pSpinBox->setMinimum(0.001);
+        t_pSpinBox->setMaximum(50000);
+        t_pSpinBox->setMaximumWidth(100);
+        t_pSpinBox->setSingleStep(0.01);
+        t_pSpinBox->setDecimals(1);
+        t_pSpinBox->setPrefix("+/- ");
+        t_pSpinBox->setValue(m_dDefaultMagToGradRatio);
+        m_qMapSpinBox.insert(MAG_TO_GRAD_RATIO,t_pSpinBox);
+        connect(t_pSpinBox,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+                this,&ScalingView::MagGradRatioSpinBoxChanged);
+        m_pUi->m_formLayout_Scaling->addWidget(t_pSpinBox,i+1,0,1,1);
         i+=2;
     }
 
