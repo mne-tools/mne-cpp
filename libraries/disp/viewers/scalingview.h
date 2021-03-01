@@ -466,6 +466,33 @@ protected:
      */
     void linkGradToMag();
 
+    //=========================================================================================================
+    /**
+     * Maps a segment in the real line to a nonilnear transformation of increased sensitivity.
+     * @param [in] minInput
+     * @param [in] maxInput
+     * @param [in] sensitivity
+     * @param [in] centerPoint
+     * @param [in] minOutput
+     * @param [in] maxOutput
+     * @param [in] x
+     * @return
+     */
+    static float sliderNonLinearMap(float minInput, float maxInput, float sensitivity, float centerPoint, float minOutput, float maxOutput, float x);
+
+    //=========================================================================================================
+    /**
+     * Unmaps to a linear real segment from a previously mapped one (with sliderNonLinearMap method).
+     * @param [in] minInput
+     * @param [in] maxInput
+     * @param [in] sensitivity
+     * @param [in] centerPoint
+     * @param [in] minOutput
+     * @param [in] maxOutput
+     * @param [in] x
+     */
+    static float sliderNonLinearUnMap(float minInput, float maxInput, float sensitivity, float centerPoint, float minOutput, float maxOutput, float x);
+
     QMap<qint32, float>                 m_qMapChScaling;                /**< Channel scaling values. */
     QMap<qint32, QDoubleSpinBox*>       m_qMapSpinBox;                  /**< Map of types and channel scaling line edits. */
     QMap<qint32, QSlider*>              m_qMapSlider;                   /**< Map of types and channel scaling line edits. */
@@ -481,6 +508,7 @@ protected:
     bool                                m_bManagingLinkMagToGrad;       /**< Bool member mutex the link between MAGs and GRADs. */
     static double                       m_dMAGtoGRADSpinboxConverter;   /**< Stores the conversion ratio between MAGs and GRADs. */
 };
+
 } // NAMESPACE
 
 #endif // SCALINGVIEW_H
