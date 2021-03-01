@@ -335,6 +335,13 @@ protected:
 
     //=========================================================================================================
     /**
+     * Link Magnetometers and Gradiometers through this ratio. Just for viewing purposes.
+     * @param [in] value
+     */
+    void MagGradRatioSpinBoxChanged(double value);
+
+    //=========================================================================================================
+    /**
      * Callback to process a change in the EEG scale spinbox.
      * @param [in] value
      */
@@ -431,7 +438,6 @@ protected:
      */
     void STIMSliderChanged(int value);
 
-
     //=========================================================================================================
     /**
      * Update the views GUI based on the set GuiMode (Clinical=0, Research=1).
@@ -506,7 +512,7 @@ protected:
     bool                                m_bManagingSpinBoxChange;       /**< Bool member mutex the state of the spinbox. */
     bool                                m_bManagingSliderChange;        /**< Bool member mutex the state of the slider. */
     bool                                m_bManagingLinkMagToGrad;       /**< Bool member mutex the link between MAGs and GRADs. */
-    static double                       m_dMAGtoGRADSpinboxConverter;   /**< Stores the conversion ratio between MAGs and GRADs. */
+//    static double                       m_dMAGtoGRADSpinboxConverter;   /**< Stores the conversion ratio between MAGs and GRADs. */
 };
 
 } // NAMESPACE
