@@ -333,7 +333,7 @@ void ScalingView::processScalingChange()
 void ScalingView::MAGSpinBoxChanged(double value)
 {
     m_bManagingSpinBoxChange = true;
-    if(!m_bManagingSliderChange)
+    if(!m_bManagingSliderChange || m_bManagingLinkMagToGrad)
     {
         m_qMapSlider[FIFF_UNIT_T]->setValue(-value * 10.0);
     }
@@ -342,6 +342,8 @@ void ScalingView::MAGSpinBoxChanged(double value)
     m_bManagingSpinBoxChange = false;
     linkMagToGrad();
 }
+
+//=============================================================================================================
 
 void ScalingView::linkMagToGrad()
 {
@@ -372,10 +374,28 @@ void ScalingView::linkGradToMag()
 
 //=============================================================================================================
 
+float ScalingView::sliderNonLinearMap(float minInput, float maxInput, float sensitivity, float centerPoint, float minOutput, float maxOutput, float x)
+{
+    float Y = atanf(sensitivity * (minInput - centerPoint));
+    float K = (maxOutput - minOutput) / (atanf(sensitivity * (maxInput-centerPoint)) - Y);
+    return K * atanf(sensitivity * (x-centerPoint)) - Y;
+}
+
+//=============================================================================================================
+
+float ScalingView::sliderNonLinearUnMap(float minInput, float maxInput, float sensitivity, float centerPoint, float minOutput, float maxOutput, float x)
+{
+    float Y = atanf(sensitivity * (minInput - centerPoint));
+    float K = (maxOutput - minOutput) / (atanf(sensitivity * (maxInput-centerPoint)) - Y);
+    return (1/sensitivity) * tanf((x / K) + Y) + centerPoint;
+}
+
+//=============================================================================================================
+
 void ScalingView::GRADSpinBoxChanged(double value)
 {
     m_bManagingSpinBoxChange = true;
-    if(!m_bManagingSliderChange)
+    if(!m_bManagingSliderChange || m_bManagingLinkMagToGrad)
     {
         m_qMapSlider[FIFF_UNIT_T_M]->setValue(-value * 1.0);
     }
@@ -596,7 +616,7 @@ void ScalingView::redrawGUI()
 
         QSlider* t_pHorizontalSlider = new QSlider(Qt::Horizontal);
         t_pHorizontalSlider->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
-        t_pHorizontalSlider->setMinimum(-500);
+        t_pHorizontalSlider->setMinimum(-1000);
         t_pHorizontalSlider->setMaximum(-1);
         t_pHorizontalSlider->setSingleStep(1);
         t_pHorizontalSlider->setPageStep(1);
