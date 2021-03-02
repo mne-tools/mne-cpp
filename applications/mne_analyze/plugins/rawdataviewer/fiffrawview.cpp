@@ -378,10 +378,16 @@ void FiffRawView::customContextMenuRequested(const QPoint &pos)
         return;
     }
 
-    //double dScrollDiff = static_cast<double>(m_pTableView->horizontalScrollBar()->maximum()) / static_cast<double>(m_pModel->absoluteLastSample() - m_pModel->absoluteFirstSample());
-    m_fLastClickedSample = floor((float)m_pModel->absoluteFirstSample() + //accounting for first sample offset
-                             (m_pTableView->horizontalScrollBar()->value() / m_pModel->pixelDifference()) + //accounting for scroll offset
-                             ((float)pos.x() / m_pModel->pixelDifference())); //accounting for mouse position offset
+    int iFirstSampleOffset = m_pModel->absoluteFirstSample();
+    int iScrollBarOffset = m_pTableView->horizontalScrollBar()->value() / m_pModel->pixelDifference();
+    int iMouseOffset = pos.x() / m_pModel->pixelDifference();
+
+//    //double dScrollDiff = static_cast<double>(m_pTableView->horizontalScrollBar()->maximum()) / static_cast<double>(m_pModel->absoluteLastSample() - m_pModel->absoluteFirstSample());
+//    m_iLastClickedSample = floor((float)m_pModel->absoluteFirstSample() + //accounting for first sample offset
+//                             (m_pTableView->horizontalScrollBar()->value() / m_pModel->pixelDifference()) + //accounting for scroll offset
+//                             ((float)pos.x() / m_pModel->pixelDifference())); //accounting for mouse position offset
+
+    m_iLastClickedSample = iFirstSampleOffset + iScrollBarOffset + iMouseOffset;
 
     QMenu* menu = new QMenu(this);
 
@@ -402,7 +408,7 @@ void FiffRawView::addTimeMark(bool con)
         return;
     }
 
-    emit sendSamplePos(static_cast<int>(m_fLastClickedSample));
+    emit sendSamplePos(m_iLastClickedSample);
 }
 
 //=============================================================================================================
@@ -436,7 +442,7 @@ bool FiffRawView::eventFilter(QObject *object, QEvent *event)
         && event->type() == QEvent::Enter) {
         QScroller::ungrabGesture(m_pTableView);
         return true;
-    }
+    } else
 
     //Activate grabbing gesture when scrollbars or vertical header are deselected
     if ((object == m_pTableView->horizontalScrollBar() ||
@@ -445,9 +451,39 @@ bool FiffRawView::eventFilter(QObject *object, QEvent *event)
         && event->type() == QEvent::Leave) {
         QScroller::grabGesture(m_pTableView, QScroller::LeftMouseButtonGesture);
         return true;
+    } else
+
+    if(event->type() == QEvent::KeyPress){
+        qDebug() << "Key Press";
+        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+        switch(keyEvent->key()){
+        case Qt::Key_E :{
+            if(m_pModel){
+                m_iLastClickedSample = m_pModel->getScrollerPosition();
+                addTimeMark(true);
+            }
+        }
+        }
     }
 
-    return false;
+    if(event->type() == QEvent::MouseButtonPress){
+        QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+        switch(mouseEvent->button()){
+        case Qt::LeftButton:{
+            if(m_pModel && object == m_pTableView->viewport()){
+            QPoint pos = mouseEvent->pos();
+            m_pModel->setScrollerSample(static_cast<int>(floor((float)m_pModel->absoluteFirstSample() + //accounting for first sample offset
+                                     (m_pTableView->horizontalScrollBar()->value() / m_pModel->pixelDifference()) + //accounting for scroll offset
+                                     ((float)pos.x() / m_pModel->pixelDifference())))); //accounting for mouse position offset
+            m_pTableView->viewport()->repaint();
+            }
+        }
+        }
+
+    }
+
+
+    return QWidget::eventFilter(object, event);
 }
 
 //=============================================================================================================

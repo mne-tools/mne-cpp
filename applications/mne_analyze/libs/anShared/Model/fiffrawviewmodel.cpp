@@ -110,6 +110,7 @@ FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
 , m_pRtFilter(FilterOverlapAdd::SPtr::create())
 , m_bPerformFiltering(false)
 , m_iDistanceTimerSpacer(1000)
+, m_iScroller(0)
 , m_iScrollPos(0)
 , m_bDispAnnotation(true)
 //, m_pAnnotationModel(QSharedPointer<AnnotationModel>::create())
@@ -1012,4 +1013,17 @@ bool FiffRawViewModel::hasSavedEvents()
 void FiffRawViewModel::setAnnotationModel(QSharedPointer<ANSHAREDLIB::EventModel> pModel)
 {
     m_pAnnotationModel = pModel;
+}
+
+//=============================================================================================================
+
+void FiffRawViewModel::setScrollerSample(int iScrollerPos){
+    m_iScroller = iScrollerPos;
+}
+
+//=============================================================================================================
+
+int FiffRawViewModel::getScrollerPosition() const
+{
+    return m_iScroller;
 }

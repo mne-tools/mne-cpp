@@ -135,6 +135,13 @@ void FiffRawViewDelegate::paint(QPainter *painter,
 
                 QPainterPath path = QPainterPath(QPointF(option.rect.x()+pos, option.rect.y()));
 
+                createScroller(index,
+                               option,
+                               path,
+                               painter);
+
+                path = QPainterPath(QPointF(option.rect.x()+pos, option.rect.y()));
+
                 //Plot data
                 createPlotPath(option,
                                path,
@@ -350,6 +357,36 @@ void FiffRawViewDelegate::createMarksPath(const QModelIndex &index,
         painter->drawLine(fInitX + static_cast<float>(eventSample - iStart) * dDx,
                           fTop,
                           fInitX + static_cast<float>(eventSample - iStart) * dDx,
+                          fBottom);
+    }
+}
+
+//=============================================================================================================
+
+void FiffRawViewDelegate::createScroller(const QModelIndex &index,
+                                         const QStyleOptionViewItem &option,
+                                         QPainterPath& path,
+                                         QPainter* painter) const
+{
+    const FiffRawViewModel* t_pModel = static_cast<const FiffRawViewModel*>(index.model());
+
+    painter->setPen(QPen(Qt::blue, 2, Qt::SolidLine));
+
+    int iFirstSampleDrawn = t_pModel->currentFirstSample();
+    int iLastSampleDrawn = t_pModel->currentLastSample();
+
+    int iScroller = t_pModel->getScrollerPosition();
+
+    float fTop = option.rect.topLeft().y();
+    float fBottom = option.rect.bottomRight().y();
+    float fInitX = path.currentPosition().x();
+
+    double dDx = t_pModel->pixelDifference();
+
+    if(iScroller >= iFirstSampleDrawn && iScroller <= iLastSampleDrawn){
+        painter->drawLine(fInitX + static_cast<float>(iScroller - iFirstSampleDrawn) * dDx,
+                          fTop,
+                          fInitX + static_cast<float>(iScroller - iFirstSampleDrawn) * dDx,
                           fBottom);
     }
 }
