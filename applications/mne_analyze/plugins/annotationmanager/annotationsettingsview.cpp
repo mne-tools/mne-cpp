@@ -471,17 +471,27 @@ bool EventView::newUserGroup(const QString& sName,
 
 void EventView::groupChanged()
 {
-    if(!m_pUi->m_listWidget_groupListWidget->selectionModel()->selectedRows().size()){
+    m_pAnnModel->clearSelectedGroups();
+
+    auto selection = m_pUi->m_listWidget_groupListWidget->selectionModel()->selectedRows();
+
+    if(!selection.size()){
         return;
     }
 
-    if(m_pUi->m_checkBox_showAll->isChecked()){
-        m_pUi->m_checkBox_showAll->setCheckState(Qt::Unchecked);
+//    if(m_pUi->m_checkBox_showAll->isChecked()){
+//        m_pUi->m_checkBox_showAll->setCheckState(Qt::Unchecked);
+//    }
+
+//    m_pAnnModel->switchGroup(m_pUi->m_listWidget_groupListWidget->selectedItems().first()->data(Qt::UserRole).toInt());
+    for(auto row : selection){
+        m_pAnnModel->addToSelectedGroups(row.data(Qt::UserRole).toInt());
     }
 
-    m_pAnnModel->switchGroup(m_pUi->m_listWidget_groupListWidget->selectedItems().first()->data(Qt::UserRole).toInt());
     m_pUi->m_listWidget_groupListWidget->repaint();
+    m_pUi->m_tableView_eventTableView->repaint();
     m_pUi->m_tableView_eventTableView->reset();
+
     this->onDataChanged();
 }
 
