@@ -343,13 +343,7 @@ private:
      *
      * @param [in] iValue   Horizontal scroll bar position (unused)
      */
-    void updateLabels(int iValue);
-
-    //=========================================================================================================
-    /**
-     *  Update labels related to the time of the signals shown in the data viewer window.
-     */
-    void updateTimeLabels();
+    void updateTimeLabels(int iValue);
 
     //=========================================================================================================
     /**

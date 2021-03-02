@@ -102,7 +102,7 @@ FiffRawView::FiffRawView(QWidget *parent)
     //m_pTableView->setShowGrid(true);
 
     connect(m_pTableView->horizontalScrollBar(), &QScrollBar::valueChanged,
-            this, &FiffRawView::updateLabels, Qt::UniqueConnection);
+            this, &FiffRawView::updateTimeLabels, Qt::UniqueConnection);
 }
 
 //=============================================================================================================
@@ -229,8 +229,9 @@ void FiffRawView::setModel(const QSharedPointer<FiffRawViewModel>& pModel)
 //    //Gestures
 //    m_pTableView->grabGesture(Qt::PinchGesture);
 //    m_pTableView->grabGesture(Qt::TapAndHoldGesture);
-    updateLabels(0);
+    updateTimeLabels(0);
     updateFileLabel();
+    updateFilterLabel();
 }
 
 //=============================================================================================================
@@ -319,7 +320,7 @@ void FiffRawView::setWindowSize(int iT)
 
     m_pTableView->horizontalScrollBar()->setValue(iNewPos);
     m_pTableView->viewport()->repaint();
-    updateLabels(m_pTableView->horizontalScrollBar()->value());
+    updateTimeLabels(m_pTableView->horizontalScrollBar()->value());
 }
 
 //=============================================================================================================
@@ -479,7 +480,7 @@ void FiffRawView::setFilter(const FilterKernel& filterData)
     }
 
     m_pModel->setFilter(filterData);
-    updateFileLabel();
+    updateFilterLabel();
 }
 
 //=============================================================================================================
@@ -490,7 +491,7 @@ void FiffRawView::setFilterActive(bool state)
         return;
     }
     m_pModel->setFilterActive(state);
-    updateFileLabel();
+    updateFilterLabel();
 }
 
 //=============================================================================================================
@@ -542,22 +543,10 @@ void FiffRawView::createBottomLabels()
 
 //=============================================================================================================
 
-void FiffRawView::updateLabels(int iValue)
+void FiffRawView::updateTimeLabels(int iValue)
 {
     Q_UNUSED(iValue);
 
-    if(!m_pModel) {
-        return;
-    }
-
-    updateTimeLabels();
-    updateFileLabel();
-    updateFilterLabel();
-}
-
-
-void FiffRawView::updateTimeLabels()
-{
     if(m_pModel->isEmpty()) {
         m_pEndTimeLabel->setText("0 | 0 sec");
         m_pInitialTimeLabel->setText("0 | 0 sec");
@@ -575,6 +564,7 @@ void FiffRawView::updateTimeLabels()
     strRight = QString("%1 | %2 sec").arg(QString().number(iSample)).arg(QString().number(iSample / m_pModel->getFiffInfo()->sfreq, 'f', 2));
     m_pEndTimeLabel->setText(strRight);
 }
+
 
 //=============================================================================================================
 
