@@ -347,6 +347,24 @@ private:
 
     //=========================================================================================================
     /**
+     *  Update labels related to the time of the signals shown in the data viewer window.
+     */
+    void updateTimeLabels();
+
+    //=========================================================================================================
+    /**
+     * Updates file labels with info from current set model
+     */
+    void updateFileLabel();
+
+    //=========================================================================================================
+    /**
+     * Updates the information about the filter shown in the filterLabel.
+     */
+    void updateFilterLabel();
+
+    //=========================================================================================================
+    /**
      * Disconnects the model from the view's scrollbar and resizing
      */
     void disconnectModel();
@@ -359,31 +377,27 @@ private:
      */
     void updateVerticalScrollPosition(qint32 newScrollPosition);
 
-    //=========================================================================================================
-    /**
-     * Updates file labels with info from current set model
-     */
-    void updatePluginWindowTitle();
 
-    QPointer<QTableView>                                m_pTableView;                   /**< Pointer to table view ui element */
+    QPointer<QTableView>                                m_pTableView;                   /**< Pointer to table view ui element. */
 
-    QSharedPointer<ANSHAREDLIB::FiffRawViewModel>       m_pModel;                       /**< Pointer to associated Model */
+    QSharedPointer<ANSHAREDLIB::FiffRawViewModel>       m_pModel;                       /**< Pointer to associated Model. */
 
-    QSharedPointer<FiffRawViewDelegate>                 m_pDelegate;                    /**< Pointer to associated Delegate */
+    QSharedPointer<FiffRawViewDelegate>                 m_pDelegate;                    /**< Pointer to associated Delegate. */
 
     QMap<qint32,float>                                  m_qMapChScaling;                /**< Channel scaling values. */
 
-    float                                               m_fDefaultSectionSize;          /**< Default row height */
-    float                                               m_fZoomFactor;                  /**< Zoom factor */
-    float                                               m_fLastClickedSample;           /**< Stores last clicked sample on screen */
+    float                                               m_fDefaultSectionSize;          /**< Default row height. */
+    float                                               m_fZoomFactor;                  /**< Zoom factor. */
+    float                                               m_fLastClickedSample;           /**< Stores last clicked sample on screen. */
 
-    qint32                                              m_iT;                           /**< Display window size in seconds */
+    qint32                                              m_iT;                           /**< Display window size in seconds. */
 
-    QScroller*                                          m_pKineticScroller;             /**< Used for kinetic scrolling through data view */
+    QScroller*                                          m_pKineticScroller;             /**< Used for kinetic scrolling through data view. */
 
-    QLabel*                                             m_pInitialTimeLabel;            /**< Left 'Sample | Seconds' display label */
-    QLabel*                                             m_pEndTimeLabel;                /**< Right 'Sample | Seconds' display label */
-
+    QLabel*                                             m_pInitialTimeLabel;            /**< Left 'Sample | Seconds' display label. */
+    QLabel*                                             m_pEndTimeLabel;                /**< Right 'Sample | Seconds' display label. */
+    QLabel*                                             m_pFileLabel;                   /**< File name and path, Fs and duration. */
+    QLabel*                                             m_pFilterLabel;                 /**< Short filter description to be shown under the time-series. */
 signals:
     void tableViewDataWidthChanged(int iWidth);
 };
