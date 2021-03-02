@@ -6,7 +6,7 @@ nav_exclude: true
 
 # Changelog
 
-## Version 0.1.9 - 2021/02/26
+## Version 0.1.9 - 2021/03/02
 
 ### Applications
 
@@ -18,6 +18,7 @@ MNE Analyze
  * Implemented clearing of views in plugins that use models
  * Data Loader now saves last folder data was loaded from.
  * Code cleanup to fix some compiler warnings and memory leaks
+ * Show file and filter info in signal viewer.
 
 MNE Anonymize
  * Fix bug when anonymizing dates
@@ -73,7 +74,7 @@ RtProcessing
 
  People who contributed to this release (preceded by number of commits):
 
-(87) Juan GPC,
+(89) Juan GPC,
 (49) Gabriel Motta,
 (22) Simon Heinke,
 (17) Lorenz Esch,
