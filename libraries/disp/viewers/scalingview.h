@@ -58,6 +58,8 @@
 
 class QDoubleSpinBox;
 class QSlider;
+class QLabel;
+class QGridLayout;
 
 namespace Ui {
     class ScalingViewWidget;
@@ -104,6 +106,7 @@ DISPSHARED_EXPORT float getDefaultScalingValue(int iChannelKind,
 DISPSHARED_EXPORT float getScalingValue(const QMap<qint32, float>& qMapChScaling,
                                         int iChannelKind,
                                         int iChannelUnit);
+
 
 //=============================================================================================================
 /**
