@@ -34,6 +34,7 @@ public:
     std::unique_ptr<std::vector<Event> > getEventsBetween(int sampleStart, int sampleEnd, idNum groupid) const ;
     std::unique_ptr<std::vector<Event> > getEventsBetween(int sampleStart, int sampleEnd, const std::vector<idNum>& groupIdsList) const ;
     std::unique_ptr<std::vector<Event> > getEventsInGroup(const idNum groupId) const;
+    std::unique_ptr<std::vector<Event> > getEventsInGroups(const std::vector<idNum>& groupIdsList) const;
 
     //event setters
     Event addEvent(int sample);
