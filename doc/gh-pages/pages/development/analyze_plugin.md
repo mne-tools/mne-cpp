@@ -25,8 +25,7 @@ AbstractPlugin has a number of pure virtual functions that need to be defined by
 Returns an instance of the plugin. This is not a copy. Most of the existing plugins do something like this:
 
 ```
-QSharedPointer<myNewPlugin> pMyNewPluginClone(new myNewPluginClone);
-return pMyNewPluginClone;
+    return QSharedPointer<AbstractPlugin> (new Averaging);
 ```
 
 ### init()
