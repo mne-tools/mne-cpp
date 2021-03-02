@@ -230,7 +230,7 @@ void FiffRawView::setModel(const QSharedPointer<FiffRawViewModel>& pModel)
 //    m_pTableView->grabGesture(Qt::PinchGesture);
 //    m_pTableView->grabGesture(Qt::TapAndHoldGesture);
     updateLabels(0);
-    updatePluginWindowTitle();
+    updateFileLabel();
 }
 
 //=============================================================================================================
@@ -479,7 +479,7 @@ void FiffRawView::setFilter(const FilterKernel& filterData)
     }
 
     m_pModel->setFilter(filterData);
-    updatePluginWindowTitle();
+    updateFileLabel();
 }
 
 //=============================================================================================================
@@ -490,7 +490,7 @@ void FiffRawView::setFilterActive(bool state)
         return;
     }
     m_pModel->setFilterActive(state);
-    updatePluginWindowTitle();
+    updateFileLabel();
 }
 
 //=============================================================================================================
@@ -519,7 +519,17 @@ void FiffRawView::createBottomLabels()
     m_pEndTimeLabel->setText(" ");
     m_pEndTimeLabel->setAlignment(Qt::AlignRight);
 
+    m_pFileLabel = new QLabel(this);
+    m_pFileLabel->setText(" ");
+    m_pFileLabel->setAlignment(Qt::AlignRight);
+
+    m_pFilterLabel = new QLabel(this);
+    m_pFilterLabel->setText(" ");
+    m_pFilterLabel->setAlignment(Qt::AlignRight);
+
     LabelLayout->addWidget(m_pInitialTimeLabel);
+    LabelLayout->addWidget(m_pFileLabel);
+    LabelLayout->addWidget(m_pFilterLabel);
     LabelLayout->addWidget(m_pEndTimeLabel);
     labelBar->setLayout(LabelLayout);
 
@@ -540,14 +550,21 @@ void FiffRawView::updateLabels(int iValue)
         return;
     }
 
-    QString strLeft, strRight;
+    updateTimeLabels();
+    updateFileLabel();
+    updateFilterLabel();
+}
 
+
+void FiffRawView::updateTimeLabels()
+{
     if(m_pModel->isEmpty()) {
         m_pEndTimeLabel->setText("0 | 0 sec");
         m_pInitialTimeLabel->setText("0 | 0 sec");
         return;
     }
 
+    QString strLeft, strRight;
     //Left Label
     int iSample = static_cast<int>(m_pTableView->horizontalScrollBar()->value() / m_pModel->pixelDifference());
     strLeft = QString("%1 | %2 sec").arg(QString().number(iSample)).arg(QString().number(iSample / m_pModel->getFiffInfo()->sfreq, 'f', 2));
@@ -670,30 +687,36 @@ void FiffRawView::clearView()
 
 //=============================================================================================================
 
-void FiffRawView::updatePluginWindowTitle()
+void FiffRawView::updateFileLabel()
 {
     if(parentWidget())
     {
-        QString title("Signal Viewer");
+        QString label;
 
         float fFrequency = m_pModel->getSamplingFrequency();
 
         int iFileLengthInSamples = m_pModel->absoluteLastSample() - m_pModel->absoluteFirstSample();
         float fFileLengthInSeconds = static_cast<float>(iFileLengthInSamples) / fFrequency;
 
-        title += "   |   " + m_pModel->getModelName();
-        title += "  -  Sampling Freq. " + QString::number(m_pModel->getSamplingFrequency(),'g',5) + "Hz";
-        title += "  -  Lenght: " + QString::number(fFileLengthInSeconds,'g',5) + "s.";
-        if(m_pModel->isFilterActive())
-        {
-            title += "   |   Filter ON";
-        } else
-        {
-            title += "   |   Filter OFF";
-        }
-        title += "  -  " + m_pModel->getFilter().getShortDescription();
-
-        parentWidget()->setWindowTitle(title);
+        label += "   |   " + m_pModel->getModelName();
+        label += "  -  Sampling Freq. " + QString::number(m_pModel->getSamplingFrequency(),'g',5) + "Hz";
+        label += "  -  Length: " + QString::number(fFileLengthInSeconds,'g',5) + "s.";
+        m_pFileLabel->setText(label);
     }
 }
 
+//=============================================================================================================
+
+void FiffRawView::updateFilterLabel()
+{
+    QString label;
+    if(m_pModel->isFilterActive())
+    {
+        label += "   |   Filter ON";
+    } else
+    {
+        label += "   |   Filter OFF";
+    }
+    label += "  -  " + m_pModel->getFilter().getShortDescription() + "  |";
+    m_pFilterLabel->setText(label);
+}
