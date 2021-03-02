@@ -204,7 +204,11 @@ bool EventModel::insertRows(int position,
     //        }
     //    }
 
-    m_EventManager.addEvent(m_iSamplePos);
+    if(!m_selectedEventGroups.size()){
+        return false;
+    }
+
+    m_EventManager.addEvent(m_iSamplePos, m_selectedEventGroups.front());
 
     beginInsertRows(QModelIndex(), position, position+span-1);
 
@@ -230,7 +234,7 @@ void EventModel::setSamplePos(int iSamplePos)
 int EventModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
-    return m_EventManager.getAllEvents()->size();
+    return m_EventManager.getEventsInGroups(m_selectedEventGroups)->size();
 }
 
 //=============================================================================================================
@@ -252,7 +256,9 @@ QVariant EventModel::data(const QModelIndex &index,
     if(role != Qt::DisplayRole && role != Qt::BackgroundRole)
         return QVariant();
 
-    if(index.row() >= m_EventManager.getAllEvents()->size())
+    auto events = m_EventManager.getEventsInGroups(m_selectedEventGroups);
+
+    if(index.row() >= events->size())
         return QVariant();
 
     if (index.isValid()) {
@@ -260,8 +266,7 @@ QVariant EventModel::data(const QModelIndex &index,
         if(index.column()==0) {
             switch(role) {
             case Qt::DisplayRole:{
-                auto pEvents = m_EventManager.getAllEvents();
-                return QVariant((*pEvents)[index.row()].sample - m_iFirstSample);
+                return QVariant((*events)[index.row()].sample - m_iFirstSample);
 //                    return QVariant(m_dataSamplesFiltered.at(index.row())-m_iFirstSample);
             }
             case Qt::BackgroundRole:{
@@ -281,8 +286,7 @@ QVariant EventModel::data(const QModelIndex &index,
         if(index.column()==1){
             switch(role) {
             case Qt::DisplayRole: {
-                auto pEvents = m_EventManager.getAllEvents();
-                int iSample = (*pEvents)[index.row()].sample - m_iFirstSample;
+                int iSample = (*events)[index.row()].sample - m_iFirstSample;
                 float fTime = static_cast<float>(iSample) / m_fFreq;
                 return QVariant(fTime);
 //                    int time = ((m_dataSamplesFiltered.at(index.row()) - m_iFirstSample) / m_fFreq) * 1000;
@@ -304,7 +308,7 @@ QVariant EventModel::data(const QModelIndex &index,
         if(index.column()==2) {
             switch(role) {
                 case Qt::DisplayRole:
-                    return QVariant(0); //hardcoded for testing, CHANGE ASAP
+                    return QVariant((*events)[index.row()].id);
 
                 case Qt::BackgroundRole: {
                     QBrush brush;
@@ -420,7 +424,7 @@ QVariant EventModel::headerData(int section,
             case 1: //time value column
                 return QVariant("Time (s)");
             case 2: //event type column
-                return QVariant("Type");
+                return QVariant("Id");
             }
     }
     else if(orientation == Qt::Vertical) {
@@ -1067,14 +1071,14 @@ void EventModel::addGroup(QString sName, QColor color)
 
 std::unique_ptr<std::vector<EVENTSLIB::Event> > EventModel::getEventsToDraw(int iBegin, int iEnd) const
 {
-    return m_EventManager.getEventsBetween(iBegin, iEnd);
+    return m_EventManager.getEventsBetween(iBegin, iEnd, m_selectedEventGroups);
 }
 
 //=============================================================================================================
 
 void EventModel::eventsUpdated()
 {
-    emit dataChanged(createIndex(0,0), createIndex(m_EventManager.getAllEvents()->size(), 0));
+    emit dataChanged(createIndex(0,0), createIndex(rowCount(), columnCount()));
     emit headerDataChanged(Qt::Vertical, 0, m_EventManager.getAllEvents()->size());
 }
 
@@ -1083,4 +1087,20 @@ void EventModel::eventsUpdated()
 std::unique_ptr<std::vector<EVENTSLIB::EventGroup> > EventModel::getGroupsToDraw() const
 {
     return m_EventManager.getAllGroups();
+}
+
+//=============================================================================================================
+
+void EventModel::clearSelectedGroups()
+{
+    m_selectedEventGroups.clear();
+    eventsUpdated();
+}
+
+//=============================================================================================================
+
+void EventModel::addToSelectedGroups(int iGroupId)
+{
+    m_selectedEventGroups.push_back(iGroupId);
+    eventsUpdated();
 }

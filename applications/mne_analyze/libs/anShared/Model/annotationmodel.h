@@ -659,6 +659,10 @@ public:
 
     std::unique_ptr<std::vector<EVENTSLIB::EventGroup> > getGroupsToDraw() const;
 
+    void clearSelectedGroups();
+
+    void addToSelectedGroups(int iGroupId);
+
 signals:
 
     //=========================================================================================================
@@ -739,7 +743,7 @@ private:
     QSharedPointer<FiffRawViewModel>    m_pFiffModel;                   /**< Pointer to FiffRawViewModel associated with the events stored in this model. */
 
     EVENTSLIB::EventManager             m_EventManager;
-    std::list<EVENTSLIB::EventGroup>    m_selectedEventGroups;
+    std::vector<idNum>                  m_selectedEventGroups;
 };
 
 //=============================================================================================================
