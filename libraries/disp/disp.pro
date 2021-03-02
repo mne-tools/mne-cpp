@@ -103,6 +103,7 @@ SOURCES += \
     viewers/filterdesignview.cpp \
     viewers/averagelayoutview.cpp \
     viewers/fwdsettingsview.cpp \
+    viewers/helpers/scalecontrol.cpp \
     viewers/progressview.cpp \
     viewers/spectrumview.cpp \
     viewers/modalityselectionview.cpp \
@@ -161,6 +162,7 @@ HEADERS += \
     viewers/filterdesignview.h \
     viewers/averagelayoutview.h \
     viewers/fwdsettingsview.h \
+    viewers/helpers/scalecontrol.h \
     viewers/progressview.h \
     viewers/spectrumview.h \
     viewers/modalityselectionview.h \
