@@ -174,6 +174,16 @@ EventManager::getEventsInGroup(const idNum groupId) const
 
 //=============================================================================================================
 
+std::unique_ptr<std::vector<Event> > EventManager::getEventsInGroups(const std::vector<idNum>& groupIdsList) const
+{
+
+    return getEventsBetween(m_EventsListBySample.begin()->second.getSample(),
+                            m_EventsListBySample.end()->second.getSample(),
+                            groupIdsList);
+}
+
+//=============================================================================================================
+
 idNum EventManager::generateNewEventId()
 {
     return ++m_iEventIdCounter;
