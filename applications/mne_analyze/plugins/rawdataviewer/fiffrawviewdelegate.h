@@ -184,6 +184,12 @@ private:
                                ANSHAREDLIB::ChannelData &data,
                                QPainter* painter) const;
 
+    //=========================================================================================================
+    void createScroller(const QModelIndex &index,
+                        const QStyleOptionViewItem &option,
+                        QPainterPath& path,
+                        QPainter* painter) const;
+
     int         m_iUpperItemIndex;          /**< The current upper item index visible in the QTableView. */
 
     QPen        m_penGrid;                  /**< Pen for drawing the data grid. */
