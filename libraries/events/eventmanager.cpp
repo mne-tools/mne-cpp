@@ -261,7 +261,7 @@ bool EventManager::deleteEvent(idNum eventId) noexcept
 {
     bool eventFound(false);
     eventFound = eraseEvent(eventId);
-    if(eventFound)
+    if(eventFound && m_pSharedMemManager->isInit())
     {
         m_pSharedMemManager->deleteEvent(m_MapIdToSample.at(eventId));
     }
