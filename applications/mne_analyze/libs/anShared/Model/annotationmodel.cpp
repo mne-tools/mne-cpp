@@ -399,11 +399,9 @@ void EventModel::setEventFilterType(const QString eventType)
 
 Qt::ItemFlags EventModel::flags(const QModelIndex &index) const
 {
-    //Return editable mode only for user events an when event type filtering is deactivated
-    if(m_dataIsUserEventFiltered[index.row()] == 1 && m_sFilterEventType == "All")
-        return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
-    else
-        return Qt::ItemIsEnabled | Qt::ItemIsSelectable;}
+    Q_UNUSED(index);
+    return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
+}
 
 //=============================================================================================================
 
@@ -444,19 +442,22 @@ bool EventModel::removeRows(int position,
 
     beginRemoveRows(QModelIndex(), position, position+span-1);
 
+    auto events = m_EventManager.getEventsInGroups(m_selectedEventGroups);
+
     for (int i = 0; i < span; ++i) {
-        //Only user events can be deleted
-        if(m_dataIsUserEvent[position] == 1) {
-            m_dataSamples.removeAt(position);
-            m_dataTypes.removeAt(position);
-            m_dataIsUserEvent.removeAt(position);
-        }
+//        //Only user events can be deleted
+//        if(m_dataIsUserEvent[position] == 1) {
+//            m_dataSamples.removeAt(position);
+//            m_dataTypes.removeAt(position);
+//            m_dataIsUserEvent.removeAt(position);
+//        }
+        m_EventManager.deleteEvent(events->at(position + i).id);
     } 
 
     endRemoveRows();
 
     //Update filtered event data
-    setEventFilterType(m_sFilterEventType);
+//    setEventFilterType(m_sFilterEventType);
 
     return true;
 }
