@@ -179,7 +179,7 @@ ScalingView::ScalingView(const QString& sSettingsPath,
     m_pUi->setupUi(this);
 
     this->setWindowTitle("Scaling");
-    this->setMinimumWidth(330);
+    this->setMinimumWidth(270);
 
     loadSettings();
     redrawGUI();
