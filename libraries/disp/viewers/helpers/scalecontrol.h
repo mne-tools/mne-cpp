@@ -3,7 +3,7 @@
 
 
 #include "disp_global.h"
-#include <QObject>
+#include <QWidget>
 
 class QLabel;
 class QDoubleSpinBox;
@@ -18,7 +18,7 @@ namespace DISPLIB {
  * @brief The ScaleControl class packs togethere a DoubleSpinbox and a Slider with the necessary facilities for the
  * interaction between them.
  */
-class DISPSHARED_EXPORT ScaleControl : public QObject
+class DISPSHARED_EXPORT ScaleControl : public QWidget
 {
     Q_OBJECT
 
@@ -28,9 +28,9 @@ public:
 
     void addToLayout(QGridLayout* layout, int i) const;
 
-//    QLabel* getLabel() const;
-//    QDoubleSpinBox* getSpinBox() const;
-//    QSlider* getSlider();
+    QLabel* getLabel() const;
+    QDoubleSpinBox* getSpinBox() const;
+    QSlider* getSlider();
 
     void setMaxSensitivityValue(double s);
     void setSensitivity(double s);

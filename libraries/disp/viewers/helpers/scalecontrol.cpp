@@ -35,15 +35,6 @@ ScaleControl::ScaleControl(const char* label, double min, double max)
 
 //=============================================================================================================
 
-void ScaleControl::addToLayout(QGridLayout *layout, int i) const
-{
-    layout->addWidget(m_pLabel,i,0,1,1);
-    layout->addWidget(m_pSpinBox,i+1,0,1,1);
-    layout->addWidget(m_pSlider,i+1,1,1,1);
-}
-
-//=============================================================================================================
-
 void ScaleControl::setValue(double value)
 {
     m_pSpinBox->setValue(value);
