@@ -94,8 +94,7 @@ jobs:
         make install -j4
     - name: Deploy binaries
       run: |
-        ./tools/deployment/deploy.bat static
-        ./tools/deployment/pack_bin_folder.bat static
+        ./tools/deployment/deploy.bat static pack
     - name: Deploy binaries with stable release on Github
       if: endsWith(github.ref, 'master') == false
       uses: svenstaro/upload-release-action@v1-release
@@ -150,8 +149,7 @@ jobs:
         make install -j
     - name: Deploy binaries
       run: |
-        ./tools/deployment/deploy.bat static
-        ./tools/deployment/pack_bin_folder.bat static
+        ./tools/deployment/deploy.bat static pack
     - name: Deploy binaries with stable release on Github
       if: endsWith(github.ref, 'master') == false
       uses: svenstaro/upload-release-action@v1-release
@@ -220,8 +218,7 @@ jobs:
         jom -j4
     - name: Deploy binaries
       run: |
-        ./tools/deployment/deploy.bat static
-        ./tools/deployment/pack_bin_folder.bat static
+        ./tools/deployment/deploy.bat static pack
     - name: Deploy binaries with stable release on Github
       if: endsWith(github.ref, 'master') == false
       uses: svenstaro/upload-release-action@v1-release
@@ -284,8 +281,7 @@ jobs:
         make -j4
     - name: Deploy binaries
       run: |
-        ./tools/deployment/deploy.bat dynamic
-        ./tools/deployment/pack_bin_folder.bat dynamic
+        ./tools/deployment/deploy.bat dynamic pack
     - name: Deploy binaries with stable release on Github
       if: endsWith(github.ref, 'master') == false
       uses: svenstaro/upload-release-action@v1-release
@@ -347,8 +343,7 @@ jobs:
         make -j4
     - name: Deploy binaries (MacOS)
       run: |
-        ./tools/deployment/deploy.bat dynamic
-        ./tools/deployment/pack_bin_folder.bat dynamic
+        ./tools/deployment/deploy.bat dynamic pack
     - name: Deploy binaries with stable release on Github
       if: endsWith(github.ref, 'master') == false
       uses: svenstaro/upload-release-action@v1-release
@@ -417,8 +412,7 @@ jobs:
         jom -j4
     - name: Deploy binaries (Windows)
       run: |
-        ./tools/deployment/deploy.bat dynamic
-        ./tools/deployment/pack_bin_folder.bat dynamic
+        ./tools/deployment/deploy.bat dynamic pack
     - name: Deploy binaries with stable release on Github
       if: endsWith(github.ref, 'master') == false
       uses: svenstaro/upload-release-action@v1-release
