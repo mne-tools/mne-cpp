@@ -37,11 +37,8 @@
 //=============================================================================================================
 
 #include "scalingview.h"
-
 #include "ui_scalingview.h"
-
 #include <fiff/fiff_constants.h>
-
 #include "helpers/scalecontrol.h"
 
 //=============================================================================================================
@@ -82,9 +79,8 @@ const static float m_fScaleECG = 1e-2f;             /**< Default scale for chann
 const static float m_fScaleSTIM = 1e-3f;            /**< Default scale for channel kind and unit of STIM */
 const static float m_fScaleMISC = 1e-3f;            /**< Default scale for channel kind and unit of MISC */
 const static float m_fScaleEMG = 1e-3f;             /**< Default scale for channel kind and unit of EMG */
-const static double m_dDefaultMagToGradRatio(100);  /**< Stores the conversion ratio between MAGs and GRADs. */
-#define MAG_TO_GRAD_RATIO 31337
-const static double magicNumber(1);
+
+//const static double m_dDefaultMagToGradRatio(100);  /**< Stores the conversion ratio between MAGs and GRADs. */
 
 float DISPLIB::getDefaultScalingValue(int iChannelKind,
                                       int iChannelUnit)
@@ -336,255 +332,255 @@ void ScalingView::processScalingChange()
 
 //=============================================================================================================
 
-void ScalingView::MAGSpinBoxChanged(double value)
-{
-    m_bManagingSpinBoxChange = true;
-    if(!m_bManagingSliderChange || m_bManagingLinkMagToGrad)
-    {
-        m_qMapSlider[FIFF_UNIT_T]->setValue(-value * 10.0);
-    }
-    m_qMapChScaling.insert(FIFF_UNIT_T, value * m_fScaleMAG);
-    processScalingChange();
-    m_bManagingSpinBoxChange = false;
-    linkMagToGrad();
-}
+//void ScalingView::MAGSpinBoxChanged(double value)
+//{
+//    m_bManagingSpinBoxChange = true;
+//    if(!m_bManagingSliderChange || m_bManagingLinkMagToGrad)
+//    {
+//        m_qMapSlider[FIFF_UNIT_T]->setValue(-value * 10.0);
+//    }
+//    m_qMapChScaling.insert(FIFF_UNIT_T, value * m_fScaleMAG);
+//    processScalingChange();
+//    m_bManagingSpinBoxChange = false;
+//    linkMagToGrad();
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-void ScalingView::linkMagToGrad()
-{
-    m_bManagingLinkMagToGrad = true;
-    if(m_bIsShiftKeyPressed)
-    {
-        m_qMapSpinBox[MAG_TO_GRAD_RATIO]->setValue((m_qMapSpinBox[FIFF_UNIT_T]->value()/magicNumber) / m_qMapSpinBox[FIFF_UNIT_T_M]->value());// (pT/1000) / fT/cm  = cm
-    }
-    m_qMapSpinBox[FIFF_UNIT_T_M]->setValue(m_qMapSpinBox[FIFF_UNIT_T]->value() / (magicNumber * m_qMapSpinBox[MAG_TO_GRAD_RATIO]->value()));
-    m_bManagingLinkMagToGrad = false;
-}
+//void ScalingView::linkMagToGrad()
+//{
+//    m_bManagingLinkMagToGrad = true;
+//    if(m_bIsShiftKeyPressed)
+//    {
+//        m_qMapSpinBox[MAG_TO_GRAD_RATIO]->setValue((m_qMapSpinBox[FIFF_UNIT_T]->value()/magicNumber) / m_qMapSpinBox[FIFF_UNIT_T_M]->value());// (pT/1000) / fT/cm  = cm
+//    }
+//    m_qMapSpinBox[FIFF_UNIT_T_M]->setValue(m_qMapSpinBox[FIFF_UNIT_T]->value() / (magicNumber * m_qMapSpinBox[MAG_TO_GRAD_RATIO]->value()));
+//    m_bManagingLinkMagToGrad = false;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-void ScalingView::linkGradToMag()
-{
-    if(!m_bManagingLinkMagToGrad)
-    {
-        m_bManagingLinkMagToGrad = true;
-        if(m_bIsShiftKeyPressed)
-        {
-            m_qMapSpinBox[MAG_TO_GRAD_RATIO]->setValue((m_qMapSpinBox[FIFF_UNIT_T]->value()/magicNumber) / m_qMapSpinBox[FIFF_UNIT_T_M]->value());// (pT/1000) / fT/cm  = cm
-        }
-        m_qMapSpinBox[FIFF_UNIT_T]->setValue( m_qMapSpinBox[FIFF_UNIT_T_M]->value() * (magicNumber * m_qMapSpinBox[MAG_TO_GRAD_RATIO]->value()));
-        m_bManagingLinkMagToGrad = false;
-    }
-}
+//void ScalingView::linkGradToMag()
+//{
+//    if(!m_bManagingLinkMagToGrad)
+//    {
+//        m_bManagingLinkMagToGrad = true;
+//        if(m_bIsShiftKeyPressed)
+//        {
+//            m_qMapSpinBox[MAG_TO_GRAD_RATIO]->setValue((m_qMapSpinBox[FIFF_UNIT_T]->value()/magicNumber) / m_qMapSpinBox[FIFF_UNIT_T_M]->value());// (pT/1000) / fT/cm  = cm
+//        }
+//        m_qMapSpinBox[FIFF_UNIT_T]->setValue( m_qMapSpinBox[FIFF_UNIT_T_M]->value() * (magicNumber * m_qMapSpinBox[MAG_TO_GRAD_RATIO]->value()));
+//        m_bManagingLinkMagToGrad = false;
+//    }
+//}
 
 
 
-//=============================================================================================================
+////=============================================================================================================
 
-void ScalingView::GRADSpinBoxChanged(double value)
-{
-    m_bManagingSpinBoxChange = true;
-    if(!m_bManagingSliderChange || m_bManagingLinkMagToGrad)
-    {
-        m_qMapSlider[FIFF_UNIT_T_M]->setValue(-value * 1.0);
-    }
-    m_qMapChScaling.insert(FIFF_UNIT_T_M, value * m_fScaleGRAD * 100.0);//*100 because we have data in fT/cm and we want it in ft/m.
-    processScalingChange();
-    m_bManagingSpinBoxChange = false;
-    linkGradToMag();
-}
+//void ScalingView::GRADSpinBoxChanged(double value)
+//{
+//    m_bManagingSpinBoxChange = true;
+//    if(!m_bManagingSliderChange || m_bManagingLinkMagToGrad)
+//    {
+//        m_qMapSlider[FIFF_UNIT_T_M]->setValue(-value * 1.0);
+//    }
+//    m_qMapChScaling.insert(FIFF_UNIT_T_M, value * m_fScaleGRAD * 100.0);//*100 because we have data in fT/cm and we want it in ft/m.
+//    processScalingChange();
+//    m_bManagingSpinBoxChange = false;
+//    linkGradToMag();
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-void ScalingView::EEGSpinBoxChanged(double value)
-{
-    m_bManagingSpinBoxChange = true;
-    if(!m_bManagingSliderChange)
-    {
-        m_qMapSlider[FIFFV_EEG_CH]->setValue(-value * 10.0);
-    }
-    m_qMapChScaling.insert(FIFFV_EEG_CH, value * m_fScaleEEG);
-    processScalingChange();
-    m_bManagingSpinBoxChange = false;
-}
+//void ScalingView::EEGSpinBoxChanged(double value)
+//{
+//    m_bManagingSpinBoxChange = true;
+//    if(!m_bManagingSliderChange)
+//    {
+//        m_qMapSlider[FIFFV_EEG_CH]->setValue(-value * 10.0);
+//    }
+//    m_qMapChScaling.insert(FIFFV_EEG_CH, value * m_fScaleEEG);
+//    processScalingChange();
+//    m_bManagingSpinBoxChange = false;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-void ScalingView::EOGSpinBoxChanged(double value)
-{
-    m_bManagingSpinBoxChange = true;
-    if(!m_bManagingSliderChange)
-    {
-        m_qMapSlider[FIFFV_EOG_CH]->setValue(-value * 10.0);
-    }
-    m_qMapChScaling.insert(FIFFV_EOG_CH, value * m_fScaleEOG);
-    processScalingChange();
-    m_bManagingSpinBoxChange = false;
-}
+//void ScalingView::EOGSpinBoxChanged(double value)
+//{
+//    m_bManagingSpinBoxChange = true;
+//    if(!m_bManagingSliderChange)
+//    {
+//        m_qMapSlider[FIFFV_EOG_CH]->setValue(-value * 10.0);
+//    }
+//    m_qMapChScaling.insert(FIFFV_EOG_CH, value * m_fScaleEOG);
+//    processScalingChange();
+//    m_bManagingSpinBoxChange = false;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-void ScalingView::EMGSpinBoxChanged(double value)
-{
-    m_bManagingSpinBoxChange = true;
-    if(!m_bManagingSliderChange)
-    {
-        m_qMapSlider[FIFFV_EMG_CH]->setValue(-value * 10.0);
-    }
-    m_qMapChScaling.insert(FIFFV_EMG_CH, value * m_fScaleEMG);
-    processScalingChange();
-    m_bManagingSpinBoxChange = false;
-}
+//void ScalingView::EMGSpinBoxChanged(double value)
+//{
+//    m_bManagingSpinBoxChange = true;
+//    if(!m_bManagingSliderChange)
+//    {
+//        m_qMapSlider[FIFFV_EMG_CH]->setValue(-value * 10.0);
+//    }
+//    m_qMapChScaling.insert(FIFFV_EMG_CH, value * m_fScaleEMG);
+//    processScalingChange();
+//    m_bManagingSpinBoxChange = false;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-void ScalingView::ECGSpinBoxChanged(double value)
-{
-    m_bManagingSpinBoxChange = true;
-    if(!m_bManagingSliderChange)
-    {
-        m_qMapSlider[FIFFV_ECG_CH]->setValue(-value * 10.0);
-    }
-    m_qMapChScaling.insert(FIFFV_ECG_CH, value * m_fScaleECG);
-    processScalingChange();
-    m_bManagingSpinBoxChange = false;
-}
+//void ScalingView::ECGSpinBoxChanged(double value)
+//{
+//    m_bManagingSpinBoxChange = true;
+//    if(!m_bManagingSliderChange)
+//    {
+//        m_qMapSlider[FIFFV_ECG_CH]->setValue(-value * 10.0);
+//    }
+//    m_qMapChScaling.insert(FIFFV_ECG_CH, value * m_fScaleECG);
+//    processScalingChange();
+//    m_bManagingSpinBoxChange = false;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-void ScalingView::MISCSpinBoxChanged(double value)
-{
-    m_bManagingSpinBoxChange = true;
-    if(!m_bManagingSliderChange)
-    {
-        m_qMapSlider[FIFFV_MISC_CH]->setValue(-value * 10.0);
-    }
-    m_qMapChScaling.insert(FIFFV_MISC_CH, value * m_fScaleMISC);
-    processScalingChange();
-    m_bManagingSpinBoxChange = false;
-}
+//void ScalingView::MISCSpinBoxChanged(double value)
+//{
+//    m_bManagingSpinBoxChange = true;
+//    if(!m_bManagingSliderChange)
+//    {
+//        m_qMapSlider[FIFFV_MISC_CH]->setValue(-value * 10.0);
+//    }
+//    m_qMapChScaling.insert(FIFFV_MISC_CH, value * m_fScaleMISC);
+//    processScalingChange();
+//    m_bManagingSpinBoxChange = false;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-void ScalingView::STIMSpinBoxChanged(double value)
-{
-    m_bManagingSpinBoxChange = true;
-    if(!m_bManagingSliderChange)
-    {
-        m_qMapSlider[FIFFV_STIM_CH]->setValue(-value * 10.0);
-    }
-    m_qMapChScaling.insert(FIFFV_STIM_CH, value * m_fScaleSTIM);
-    processScalingChange();
-    m_bManagingSpinBoxChange = false;
-}
+//void ScalingView::STIMSpinBoxChanged(double value)
+//{
+//    m_bManagingSpinBoxChange = true;
+//    if(!m_bManagingSliderChange)
+//    {
+//        m_qMapSlider[FIFFV_STIM_CH]->setValue(-value * 10.0);
+//    }
+//    m_qMapChScaling.insert(FIFFV_STIM_CH, value * m_fScaleSTIM);
+//    processScalingChange();
+//    m_bManagingSpinBoxChange = false;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-void ScalingView::MAGSliderChanged(int value)
-{
-    qDebug() << "slider mag : " << value;
-    m_bManagingSliderChange = true;
-    if(!m_bManagingSpinBoxChange)
-    {
-        m_qMapSpinBox[FIFF_UNIT_T]->setValue(abs(value) / 10.0);
-    }
-    m_bManagingSliderChange = false;
-}
+//void ScalingView::MAGSliderChanged(int value)
+//{
+//    qDebug() << "slider mag : " << value;
+//    m_bManagingSliderChange = true;
+//    if(!m_bManagingSpinBoxChange)
+//    {
+//        m_qMapSpinBox[FIFF_UNIT_T]->setValue(abs(value) / 10.0);
+//    }
+//    m_bManagingSliderChange = false;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-void ScalingView::GRADSliderChanged(int value)
-{
-    m_bManagingSliderChange = true;
-    if(!m_bManagingSpinBoxChange)
-    {
-        m_qMapSpinBox[FIFF_UNIT_T_M]->setValue(abs(value) / 1.0);
-    }
-    m_bManagingSliderChange = false;
-}
+//void ScalingView::GRADSliderChanged(int value)
+//{
+//    m_bManagingSliderChange = true;
+//    if(!m_bManagingSpinBoxChange)
+//    {
+//        m_qMapSpinBox[FIFF_UNIT_T_M]->setValue(abs(value) / 1.0);
+//    }
+//    m_bManagingSliderChange = false;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-void ScalingView::EEGSliderChanged(int value)
-{
-    m_bManagingSliderChange = true;
-    if(!m_bManagingSpinBoxChange)
-    {
-        m_qMapSpinBox[FIFFV_EEG_CH]->setValue(abs(value) / 10.0);
-    }
-    m_bManagingSliderChange = false;
-}
+//void ScalingView::EEGSliderChanged(int value)
+//{
+//    m_bManagingSliderChange = true;
+//    if(!m_bManagingSpinBoxChange)
+//    {
+//        m_qMapSpinBox[FIFFV_EEG_CH]->setValue(abs(value) / 10.0);
+//    }
+//    m_bManagingSliderChange = false;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-void ScalingView::EOGSliderChanged(int value)
-{
-    m_bManagingSliderChange = true;
-    if(!m_bManagingSpinBoxChange)
-    {
-        m_qMapSpinBox[FIFFV_EOG_CH]->setValue(abs(value) / 10.0);
-    }
-    m_bManagingSliderChange = false;
-}
+//void ScalingView::EOGSliderChanged(int value)
+//{
+//    m_bManagingSliderChange = true;
+//    if(!m_bManagingSpinBoxChange)
+//    {
+//        m_qMapSpinBox[FIFFV_EOG_CH]->setValue(abs(value) / 10.0);
+//    }
+//    m_bManagingSliderChange = false;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-void ScalingView::EMGSliderChanged(int value)
-{
-    m_bManagingSliderChange = true;
-    if(!m_bManagingSpinBoxChange)
-    {
-        m_qMapSpinBox[FIFFV_EMG_CH]->setValue(abs(value) / 10.0);
-    }
-    m_bManagingSliderChange = false;
-}
+//void ScalingView::EMGSliderChanged(int value)
+//{
+//    m_bManagingSliderChange = true;
+//    if(!m_bManagingSpinBoxChange)
+//    {
+//        m_qMapSpinBox[FIFFV_EMG_CH]->setValue(abs(value) / 10.0);
+//    }
+//    m_bManagingSliderChange = false;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-void ScalingView::ECGSliderChanged(int value)
-{
-    m_bManagingSliderChange = true;
-    if(!m_bManagingSpinBoxChange)
-    {
-        m_qMapSpinBox[FIFFV_ECG_CH]->setValue(abs(value) / 10.0);
-    }
-    m_bManagingSliderChange = false;
-}
+//void ScalingView::ECGSliderChanged(int value)
+//{
+//    m_bManagingSliderChange = true;
+//    if(!m_bManagingSpinBoxChange)
+//    {
+//        m_qMapSpinBox[FIFFV_ECG_CH]->setValue(abs(value) / 10.0);
+//    }
+//    m_bManagingSliderChange = false;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-void ScalingView::MISCSliderChanged(int value)
-{
-    m_bManagingSliderChange = true;
-    if(!m_bManagingSpinBoxChange)
-    {
-        m_qMapSpinBox[FIFFV_MISC_CH]->setValue(abs(value) / 10.0);
-    }
-    m_bManagingSliderChange = false;
-}
+//void ScalingView::MISCSliderChanged(int value)
+//{
+//    m_bManagingSliderChange = true;
+//    if(!m_bManagingSpinBoxChange)
+//    {
+//        m_qMapSpinBox[FIFFV_MISC_CH]->setValue(abs(value) / 10.0);
+//    }
+//    m_bManagingSliderChange = false;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-void ScalingView::STIMSliderChanged(int value)
-{
-    m_bManagingSliderChange = true;
-    if(!m_bManagingSpinBoxChange)
-    {
-        m_qMapSpinBox[FIFFV_STIM_CH]->setValue(abs(value) / 10.0);
-    }
-    m_bManagingSliderChange = false;
-}
+//void ScalingView::STIMSliderChanged(int value)
+//{
+//    m_bManagingSliderChange = true;
+//    if(!m_bManagingSpinBoxChange)
+//    {
+//        m_qMapSpinBox[FIFFV_STIM_CH]->setValue(abs(value) / 10.0);
+//    }
+//    m_bManagingSliderChange = false;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-void ScalingView::MagGradRatioSpinBoxChanged(double value)
-{
-    if(!m_bManagingLinkMagToGrad && !m_bManagingSliderChange && !m_bManagingSpinBoxChange)
-    {
-        m_qMapSpinBox[FIFF_UNIT_T_M]->setValue(m_qMapSpinBox[FIFF_UNIT_T]->value() / (magicNumber * value));
-    }
-}
+//void ScalingView::MagGradRatioSpinBoxChanged(double value)
+//{
+//    if(!m_bManagingLinkMagToGrad && !m_bManagingSliderChange && !m_bManagingSpinBoxChange)
+//    {
+//        m_qMapSpinBox[FIFF_UNIT_T_M]->setValue(m_qMapSpinBox[FIFF_UNIT_T]->value() / (magicNumber * value));
+//    }
+//}
 
 //=============================================================================================================
 
