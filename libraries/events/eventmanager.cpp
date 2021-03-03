@@ -282,6 +282,7 @@ bool EventManager::eraseEvent(idNum eventId)
     return false;
 }
 
+//=============================================================================================================
 
 bool EventManager::deleteEvents(const std::vector<idNum>& eventIds)
 {

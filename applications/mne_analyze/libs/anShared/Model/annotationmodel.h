@@ -659,6 +659,8 @@ public:
 
     std::unique_ptr<std::vector<EVENTSLIB::EventGroup> > getGroupsToDraw() const;
 
+    QColor getGroupColor(int iGroupId) const;
+
     void clearSelectedGroups();
 
     void addToSelectedGroups(int iGroupId);
