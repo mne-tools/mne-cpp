@@ -1105,3 +1105,13 @@ void EventModel::addToSelectedGroups(int iGroupId)
     m_selectedEventGroups.push_back(iGroupId);
     eventsUpdated();
 }
+
+//=============================================================================================================
+
+QColor EventModel::getGroupColor(int iGroupId) const
+{
+    auto group = m_EventManager.getGroup(iGroupId);
+    auto color = group.color;
+
+    return QColor(color.r, color.g, color.g);
+}
