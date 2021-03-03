@@ -176,10 +176,21 @@ EventManager::getEventsInGroup(const idNum groupId) const
 
 std::unique_ptr<std::vector<Event> > EventManager::getEventsInGroups(const std::vector<idNum>& groupIdsList) const
 {
+    auto pEventsList(allocateOutputContainer<Event>());
 
-    return getEventsBetween(m_EventsListBySample.begin()->second.getSample(),
-                            m_EventsListBySample.end()->second.getSample(),
-                            groupIdsList);
+    for(const auto& e: m_EventsListBySample)
+    {
+        for (const auto groupId : groupIdsList)
+        {
+            if(e.second.getGroupId() == groupId)
+            {
+                pEventsList->emplace_back(Event(e.second));
+                break;
+            }
+        }
+    }
+
+    return pEventsList;
 }
 
 //=============================================================================================================
