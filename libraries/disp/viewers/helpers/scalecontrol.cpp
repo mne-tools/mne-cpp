@@ -202,3 +202,12 @@ double ScaleControl::mapSliderToSpinBox(int value)
     }
     return out;
 }
+
+//=============================================================================================================
+
+void ScaleControl::setToolTip(const QString &s)
+{
+    m_pLabel->setToolTip(s);
+    m_pSlider->setToolTip(s);
+    m_pSpinBox->setToolTip(s);
+}
