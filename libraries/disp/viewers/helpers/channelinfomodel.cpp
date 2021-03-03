@@ -622,7 +622,7 @@ void ChannelInfoModel::mapLayoutToChannels()
         switch(chInfo.kind) {
             case FIFFV_MEG_CH:
                 //Scan for MEG string and other characters
-                regExpRemove = QRegExp("(MEG|-|_|/|\| )");
+                regExpRemove = QRegExp("(MEG|-|_|/|\\| )");
                 chName.remove(regExpRemove);
 
                 //After cleaning the string try to convert the residual to an int number
@@ -633,7 +633,7 @@ void ChannelInfoModel::mapLayoutToChannels()
 
             case FIFFV_EEG_CH: {
                 //Scan for EEG string and other characters
-                regExpRemove = QRegExp("(EEG|-|_|/|\| )");
+                regExpRemove = QRegExp("(EEG|-|_|/|\\| )");
                 chName.remove(regExpRemove);
 
                 //After cleaning the string try to convert the residual to an int number
