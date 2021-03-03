@@ -352,8 +352,8 @@ void FiffRawViewDelegate::createMarksPath(const QModelIndex &index,
 //                              fBottom);
 //        }
 
-        painter->setPen(QPen(Qt::red, 1, Qt::SolidLine));
-        int eventSample = (*events)[i].sample;
+        painter->setPen(QPen(t_pAnnModel->getGroupColor(events->at(i).groupId), 1, Qt::SolidLine));
+        int eventSample = events->at(i).sample;
         painter->drawLine(fInitX + static_cast<float>(eventSample - iStart) * dDx,
                           fTop,
                           fInitX + static_cast<float>(eventSample - iStart) * dDx,
