@@ -73,6 +73,7 @@ Spline::Spline(QWidget* parent, const QString& title)
 , m_pRightThreshold(new QLineSeries())
 , m_iMaximumFrequency(0)
 {
+    Q_UNUSED(title)
     m_pChart = new QChart();
     //m_pChart->setTitle(title);
     m_pChart->setAnimationOptions(QChart::SeriesAnimations);
