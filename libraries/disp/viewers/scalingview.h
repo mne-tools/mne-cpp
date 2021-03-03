@@ -286,8 +286,7 @@ signals:
 //     */
 //    void STIMSliderChanged(int value);
 
-
-protected:
+private:
 
     //=============================================================================================================
     /**
@@ -295,124 +294,124 @@ protected:
      */
     void processScalingChange();
 
-    //=============================================================================================================
-    /**
-     * Callback to process a change in the MAGs scale spinbox.
-     * @param [in] value
-     */
-    void MAGSpinBoxChanged(double value);
+//    //=============================================================================================================
+//    /**
+//     * Callback to process a change in the MAGs scale spinbox.
+//     * @param [in] value
+//     */
+//    void MAGSpinBoxChanged(double value);
 
-    //=========================================================================================================
-    /**
-     * Callback to process a change in the gradiometers scale spinbox.
-     * @param [in] value
-     */
-    void GRADSpinBoxChanged(double value);
+//    //=========================================================================================================
+//    /**
+//     * Callback to process a change in the gradiometers scale spinbox.
+//     * @param [in] value
+//     */
+//    void GRADSpinBoxChanged(double value);
 
-    //=========================================================================================================
-    /**
-     * Link Magnetometers and Gradiometers through this ratio. Just for viewing purposes.
-     * @param [in] value
-     */
-    void MagGradRatioSpinBoxChanged(double value);
+//    //=========================================================================================================
+//    /**
+//     * Link Magnetometers and Gradiometers through this ratio. Just for viewing purposes.
+//     * @param [in] value
+//     */
+//    void MagGradRatioSpinBoxChanged(double value);
 
-    //=========================================================================================================
-    /**
-     * Callback to process a change in the EEG scale spinbox.
-     * @param [in] value
-     */
-    void EEGSpinBoxChanged(double value);
+//    //=========================================================================================================
+//    /**
+//     * Callback to process a change in the EEG scale spinbox.
+//     * @param [in] value
+//     */
+//    void EEGSpinBoxChanged(double value);
 
-    //=========================================================================================================
-    /**
-     * Callback to process a change in the EOG scale spinbox.
-     * @param [in] value
-     */
-    void EOGSpinBoxChanged(double value);
+//    //=========================================================================================================
+//    /**
+//     * Callback to process a change in the EOG scale spinbox.
+//     * @param [in] value
+//     */
+//    void EOGSpinBoxChanged(double value);
 
-    //=========================================================================================================
-    /**
-     * Callback to process a change in the EMG scale spinbox.
-     * @param [in] value
-     */
-    void EMGSpinBoxChanged(double value);
+//    //=========================================================================================================
+//    /**
+//     * Callback to process a change in the EMG scale spinbox.
+//     * @param [in] value
+//     */
+//    void EMGSpinBoxChanged(double value);
 
-    //=========================================================================================================
-    /**
-     * Callback to process a change in the ECG scale spinbox.
-     * @param [in] value
-     */
-    void ECGSpinBoxChanged(double value);
+//    //=========================================================================================================
+//    /**
+//     * Callback to process a change in the ECG scale spinbox.
+//     * @param [in] value
+//     */
+//    void ECGSpinBoxChanged(double value);
 
-    //=========================================================================================================
-    /**
-     * Callback to process a change in the MISC scale spinbox.
-     * @param [in] value
-     */
-    void MISCSpinBoxChanged(double value);
+//    //=========================================================================================================
+//    /**
+//     * Callback to process a change in the MISC scale spinbox.
+//     * @param [in] value
+//     */
+//    void MISCSpinBoxChanged(double value);
 
-    //=========================================================================================================
-    /**
-     * Callback to process a change in the STIM scale spinbox.
-     * @param [in] value
-     */
-    void STIMSpinBoxChanged(double value);
+//    //=========================================================================================================
+//    /**
+//     * Callback to process a change in the STIM scale spinbox.
+//     * @param [in] value
+//     */
+//    void STIMSpinBoxChanged(double value);
 
-    //=============================================================================================================
-    /**
-     * Callback to process a change in the MAG scale slider.
-     * @param [in] value
-     */
-    void MAGSliderChanged(int value);
+//    //=============================================================================================================
+//    /**
+//     * Callback to process a change in the MAG scale slider.
+//     * @param [in] value
+//     */
+//    void MAGSliderChanged(int value);
 
-    //=============================================================================================================
-    /**
-     * Callback to process a change in the GRAD scale slider.
-     * @param [in] value
-     */
-    void GRADSliderChanged(int value);
+//    //=============================================================================================================
+//    /**
+//     * Callback to process a change in the GRAD scale slider.
+//     * @param [in] value
+//     */
+//    void GRADSliderChanged(int value);
 
-    //=============================================================================================================
-    /**
-     * Callback to process a change in the EEG scale slider.
-     * @param [in] value
-     */
-    void EEGSliderChanged(int value);
+//    //=============================================================================================================
+//    /**
+//     * Callback to process a change in the EEG scale slider.
+//     * @param [in] value
+//     */
+//    void EEGSliderChanged(int value);
 
-    //=============================================================================================================
-    /**
-     * Callback to process a change in the EOG scale slider.
-     * @param [in] value
-     */
-    void EOGSliderChanged(int value);
+//    //=============================================================================================================
+//    /**
+//     * Callback to process a change in the EOG scale slider.
+//     * @param [in] value
+//     */
+//    void EOGSliderChanged(int value);
 
-    //=============================================================================================================
-    /**
-     * Callback to process a change in the EOG scale slider.
-     * @param [in] value
-     */
-    void EMGSliderChanged(int value);
+//    //=============================================================================================================
+//    /**
+//     * Callback to process a change in the EOG scale slider.
+//     * @param [in] value
+//     */
+//    void EMGSliderChanged(int value);
 
-    //=============================================================================================================
-    /**
-     * Callback to process a change in the ECG scale slider.
-     * @param [in] value
-     */
-    void ECGSliderChanged(int value);
+//    //=============================================================================================================
+//    /**
+//     * Callback to process a change in the ECG scale slider.
+//     * @param [in] value
+//     */
+//    void ECGSliderChanged(int value);
 
-    //=============================================================================================================
-    /**
-     * Callback to process a change in the MISC scale slider.
-     * @param [in] value
-     */
-    void MISCSliderChanged(int value);
+//    //=============================================================================================================
+//    /**
+//     * Callback to process a change in the MISC scale slider.
+//     * @param [in] value
+//     */
+//    void MISCSliderChanged(int value);
 
-    //=============================================================================================================
-    /**
-     * Callback to process a change in the STIM scale slider.
-     * @param [in] value
-     */
-    void STIMSliderChanged(int value);
+//    //=============================================================================================================
+//    /**
+//     * Callback to process a change in the STIM scale slider.
+//     * @param [in] value
+//     */
+//    void STIMSliderChanged(int value);
 
     //=========================================================================================================
     /**
@@ -436,19 +435,18 @@ protected:
      */
     void redrawGUI();
 
-    //=========================================================================================================
-    /**
-     * Link Gradiometers scale with magnetometers.
-     */
-    void linkMagToGrad();
+//    //=========================================================================================================
+//    /**
+//     * Link Gradiometers scale with magnetometers.
+//     */
+//    void linkMagToGrad();
 
-    //=========================================================================================================
-    /**
-     * Link Gradiometers scale with magnetometers.
-     */
-    void linkGradToMag();
+//    //=========================================================================================================
+//    /**
+//     * Link Gradiometers scale with magnetometers.
+//     */
+//    void linkGradToMag();
 
-private:
     //=========================================================================================================
     /**
      * Slot for processing the use of shortcut keypresses.

@@ -1,5 +1,6 @@
 #include "scalecontrol.h"
 
+#include <QDebug>
 #include <QLabel>
 #include <QDoubleSpinBox>
 #include <QSlider>
@@ -21,13 +22,70 @@ ScaleControl::ScaleControl(const char* label)
     initLabel(label);
     initSpinBox();
     initSlider();
-    updateMapConstants();
+    updateNLMapConstants();
 }
+
+//=============================================================================================================
 
 ScaleControl::ScaleControl(const char* label, double min, double max)
 : ScaleControl(label)
 {
     m_pSpinBox->setRange(min, max);
+}
+
+//=============================================================================================================
+
+void ScaleControl::addToLayout(QGridLayout *layout, int i) const
+{
+    layout->addWidget(m_pLabel,i,0,1,1);
+    layout->addWidget(m_pSpinBox,i+1,0,1,1);
+    layout->addWidget(m_pSlider,i+1,1,1,1);
+}
+
+//=============================================================================================================
+
+void ScaleControl::setValue(double value)
+{
+    m_pSpinBox->setValue(value);
+}
+
+//=============================================================================================================
+
+void ScaleControl::setMaxSensitivityValue(double s)
+{
+    m_fMaxSensitivityPoint = s;
+    updateNLMapConstants();
+}
+
+//=============================================================================================================
+
+void ScaleControl::setSensitivity(double s)
+{
+    m_fSensitivity = s;
+    updateNLMapConstants();
+}
+
+//=============================================================================================================
+
+void ScaleControl::setRange(double min, double max)
+{
+    m_pSpinBox->setRange(min, max);
+    updateNLMapConstants();
+}
+
+//=============================================================================================================
+
+void ScaleControl::setInverted(bool inverted)
+{
+    if(inverted)
+    {
+        setSliderRange(-1000,-1);
+        m_bSliderInverted = true;
+    } else
+    {
+        setSliderRange(1,1000);
+        m_bSliderInverted = false;
+    }
 }
 
 //=============================================================================================================
@@ -53,6 +111,8 @@ void ScaleControl::initSpinBox()
             this,&ScaleControl::spinBoxChanged);
 }
 
+//=============================================================================================================
+
 void ScaleControl::initSlider()
 {
     m_pSlider = new QSlider(Qt::Horizontal);
@@ -65,52 +125,31 @@ void ScaleControl::initSlider()
             this,&ScaleControl::sliderChanged);
 }
 
-void ScaleControl::addToLayout(QGridLayout *layout, int i) const
-{
-    layout->addWidget(m_pLabel,i,0,1,1);
-    layout->addWidget(m_pSpinBox,i+1,0,1,1);
-    layout->addWidget(m_pSlider,i+1,1,1,1);
-}
-
-void ScaleControl::setSliderInverted(bool s)
-{
-    m_bSliderInverted = s;
-}
-
-void ScaleControl::setValue(double value)
-{
-    m_pSpinBox->setValue(value);
-}
-
-void ScaleControl::setMaxSensitivityValue(double s)
-{
-    m_fMaxSensitivityPoint = s;
-    updateMapConstants();
-}
-
-void ScaleControl::setSensitivity(double s)
-{
-    m_fSensitivity = s;
-    updateMapConstants();
-}
-
-void ScaleControl::setRange(double min, double max)
-{
-    m_pSpinBox->setRange(min, max);
-    updateMapConstants();
-}
+//=============================================================================================================
 
 void ScaleControl::setSliderRange(int min, int max)
 {
+    if( (min >= max)            ||
+         min == 0               ||
+         max == 0               ||
+        (min < 0 && max > 0)    )
+    {
+        qDebug() << "Error. Invalid slider range";
+        return;
+    }
     m_pSlider->setRange(min, max);
-    updateMapConstants();
+    updateNLMapConstants();
 }
 
-void ScaleControl::updateMapConstants()
+//=============================================================================================================
+
+void ScaleControl::updateNLMapConstants()
 {
     m_fMapYconstant = atanf(m_fSensitivity * (m_pSpinBox->minimum() - m_fMaxSensitivityPoint));
     m_fMapKconstant = (m_pSlider->maximum() - m_pSlider->minimum()) / (atanf(m_fSensitivity * (m_pSpinBox->maximum() - m_fMaxSensitivityPoint)) - m_fMapYconstant);
 }
+
+//=============================================================================================================
 
 void ScaleControl::spinBoxChanged(double value)
 {

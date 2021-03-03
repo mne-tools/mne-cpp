@@ -20,28 +20,25 @@ namespace DISPLIB {
  */
 class DISPSHARED_EXPORT ScaleControl : public QObject
 {
+    Q_OBJECT
+
 public:
     ScaleControl(const char* label);
     ScaleControl(const char* label, double min, double max);
 
-//    void addToLayout(QGridLayout* layout) const;
     void addToLayout(QGridLayout* layout, int i) const;
 
 //    QLabel* getLabel() const;
 //    QDoubleSpinBox* getSpinBox() const;
 //    QSlider* getSlider();
 
-    void setLabelVisible();
-    void setSpinboxVisible();
-    void setSliderVisible();
-    void setSliderInverted(bool s);
-
     void setMaxSensitivityValue(double s);
     void setSensitivity(double s);
     void setRange(double min, double max);
+    void setInverted(bool inverted);
+
+public slots:
     void setValue(double value);
-
-
 
 signals:
     void valueChanged(double value);
@@ -61,7 +58,7 @@ private:
 
     inline double mapSliderToSpinBox(int in);
 
-    void updateMapConstants();
+    void updateNLMapConstants();
 
 
     QLabel*             m_pLabel;                       /**< Weak pointer to label control. */
@@ -69,11 +66,11 @@ private:
     QSlider*            m_pSlider;                      /**< Weak pointer to slider control. */
     bool                m_bManagingSpinBoxChange;       /**< Bool member guarding the state of the spinbox. */
     bool                m_bManagingSliderChange;        /**< Bool member guarding the state of the slider. */
-    float               m_fSensitivity;
-    float               m_fMaxSensitivityPoint;
-    float               m_fMapYconstant;
-    float               m_fMapKconstant;
-    float               m_bSliderInverted;
+    float               m_fSensitivity;                 /**< Sensitivity of the non-linear mapping fcn for the slider. */
+    float               m_fMaxSensitivityPoint;         /**< Max sensitivity point of the non-linear mapping fcn for the slider. */
+    float               m_fMapYconstant;                /**< Y constant in the non-linear mapping curve for the slider. */
+    float               m_fMapKconstant;                /**< K constant in the non-linear mapping curve for the slider. */
+    float               m_bSliderInverted;              /**< State variable to store the inverted or not state of the slider. */
 };
 
 
