@@ -22,8 +22,8 @@ jobs:
         if [[ "$currentVersionPatch" == 0 ]]; then
           echo Branching off $currentVersionPatch
           # Setup Git
-          git config --global user.email lorenzesch@hotmail.com
-          git config --global user.name LorenzE
+          git config --global user.email juangpc@gmail.com
+          git config --global user.name juangpc
           # Create new branch named after the new version tag
           git checkout -b ${GITHUB_REF#refs/tags/}
           git push origin refs/heads/${GITHUB_REF#refs/tags/}
@@ -36,10 +36,10 @@ jobs:
     - name: Update dev_build tag and release (dev release only)
       if: endsWith(github.ref, 'master') == true
       env:
-        GITHUB_USER: LorenzE
+        GITHUB_USER: juangpc
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        git config --global user.email lorenzesch@hotmail.com
+        git config --global user.email juangpc@gmail.com
         git config --global user.name $GITHUB_USER
         # Delete current dev_build release remotley. 
         # Must be done before deleting the remote tag associated with the dev_build release. 
@@ -508,8 +508,8 @@ jobs:
     - name: Update documentation at Github pages
       run: |
         cd doc/doxygen
-        git config --global user.email lorenzesch@hotmail.com
-        git config --global user.name LorenzE
+        git config --global user.email juangpc@gmail.com
+        git config --global user.name juangpc
         git clone -b gh-pages https://github.com/mne-cpp/doxygen-api gh-pages
         cd gh-pages
         # Remove all files first
@@ -539,8 +539,8 @@ jobs:
         credentials: ${{secrets.GIT_CREDENTIALS}}
     - name: Clone doc/gh-pages into gh-pages branch
       run: |
-        git config --global user.email lorenzesch@hotmail.com
-        git config --global user.name LorenzE
+        git config --global user.email juangpc@gmail.com
+        git config --global user.name juangpc
         git clone -b master --single-branch https://github.com/mne-cpp/mne-cpp.github.io.git
         cd mne-cpp.github.io
         # Remove all files first
@@ -611,8 +611,8 @@ jobs:
         # Replace logo
         cp -RT tools/design/logos/qtlogo.svg bin/qtlogo.svg
         # Clone repo and update with new wasm versions
-        git config --global user.email lorenzesch@hotmail.com
-        git config --global user.name LorenzE
+        git config --global user.email juangpc@gmail.com
+        git config --global user.name juangpc
         git clone -b gh-pages --single-branch https://github.com/mne-cpp/wasm.git
         cd wasm
         # Remove all files first
