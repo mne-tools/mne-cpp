@@ -449,8 +449,9 @@ void ChannelSelectionView::loadSettings()
 
     QPoint pos = settings.value(m_sSettingsPath + QString("/ChannelSelectionView/channelSelectionViewPos"), QPoint(100,100)).toPoint();
 
-    QRect screenRect = QApplication::desktop()->screenGeometry();
-    if(!screenRect.contains(pos) && QGuiApplication::screens().size() == 1) {
+    QList<QScreen*> screensList = QGuiApplication::screens();
+    if(screensList.isEmpty())
+    {
         move(QPoint(100,100));
     } else {
         move(pos);
