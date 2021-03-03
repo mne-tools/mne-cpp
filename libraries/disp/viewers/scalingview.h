@@ -60,6 +60,7 @@ class QDoubleSpinBox;
 class QSlider;
 class QLabel;
 class QGridLayout;
+class ScaleControl;
 
 namespace Ui {
     class ScalingViewWidget;
@@ -462,8 +463,7 @@ private:
     void keyPressEvent(QKeyEvent* event) override;
 
     QMap<qint32, float>                 m_qMapChScaling;                /**< Channel scaling values. */
-    QMap<qint32, QDoubleSpinBox*>       m_qMapSpinBox;                  /**< Map of types and channel scaling line edits. */
-    QMap<qint32, QSlider*>              m_qMapSlider;                   /**< Map of types and channel scaling line edits. */
+    QMap<qint32, ScaleControl*>         m_qMapSpinBox;                  /**< Map of types and channel scaling controls. */
 
     QString                             m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
 

@@ -586,14 +586,15 @@ void ScalingView::processScalingChange()
 
 void ScalingView::redrawGUI()
 {
+    //MAG
+    if(m_qMapChScaling.contains(FIFF_UNIT_T) && (m_lChannelTypesToShow.contains("mag") || m_lChannelTypesToShow.contains("all")))
+    {
+        ScaleControl* control = new ScaleControl("MAG (pT)");
+        control->addToLayout(m_pUi->m_formLayout_Scaling, 0);
+        control->setToolTip("Press SHIFT to unlock link with GRADs.");
+    }
 
-
-
-//    qint32 i = 0;
-//    //MAG
-//    if(m_qMapChScaling.contains(FIFF_UNIT_T) && (m_lChannelTypesToShow.contains("mag") || m_lChannelTypesToShow.contains("all")))
-//    {
-//        QString tip("Press SHIFT to unlock link with GRADs.");
+//        QString tip();
 //        QLabel* t_pLabelModality = new QLabel("MAG (pT)");
 //        m_pUi->m_formLayout_Scaling->addWidget(t_pLabelModality,i,0,1,1);
 
