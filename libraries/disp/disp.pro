@@ -238,6 +238,7 @@ FORMS += \
     viewers/formfiles/control3dview.ui \
     viewers/formfiles/hpisettingsview.ui \
     viewers/formfiles/scalingview.ui \
+    viewers/formfiles/scalecontrol.ui \
     viewers/formfiles/filtersettingsview.ui \
     viewers/formfiles/applytoview.ui \
     viewers/formfiles/bidsview.ui \
