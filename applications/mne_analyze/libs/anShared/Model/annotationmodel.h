@@ -570,6 +570,8 @@ public:
     void setGroupName(int iGroupIndex,
                       const QString& sGroupName);
 
+    void setSelectedGroupName(const QString &currentText);
+
     //=========================================================================================================
     /**
      * Saves event group to m_mAnnotationHub

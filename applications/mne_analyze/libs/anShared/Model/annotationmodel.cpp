@@ -923,11 +923,18 @@ void EventModel::setGroupColor(int iGroupIndex,
 void EventModel::setGroupName(int iGroupIndex,
                                    const QString &sGroupName)
 {
-    m_mAnnotationHub[iGroupIndex]->groupName = sGroupName;
+//    m_mAnnotationHub[iGroupIndex]->groupName = sGroupName;
 
     m_EventManager.renameGroup(iGroupIndex, sGroupName.toStdString());
 
     emit eventGroupsUpdated();
+}
+
+//=============================================================================================================
+
+void EventModel::setSelectedGroupName(const QString &currentText)
+{
+    m_EventManager.renameGroup(m_selectedEventGroups.front(), currentText.toStdString());
 }
 
 //=============================================================================================================
