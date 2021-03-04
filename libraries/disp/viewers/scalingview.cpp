@@ -589,9 +589,9 @@ void ScalingView::redrawGUI()
     //MAG
     if(m_qMapChScaling.contains(FIFF_UNIT_T) && (m_lChannelTypesToShow.contains("mag") || m_lChannelTypesToShow.contains("all")))
     {
-        ScaleControl* control = new ScaleControl("MAG (pT)");
-        control->addToLayout(m_pUi->m_formLayout_Scaling, 0);
-        control->setToolTip("Press SHIFT to unlock link with GRADs.");
+//        ScaleControl* control = new ScaleControl("MAG (pT)");
+//        control->addToLayout(m_pUi->m_formLayout_Scaling, 0);
+//        control->setToolTip("Press SHIFT to unlock link with GRADs.");
     }
 
 //        QString tip();
