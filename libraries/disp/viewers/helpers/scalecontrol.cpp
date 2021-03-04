@@ -10,30 +10,32 @@
 using namespace DISPLIB;
 
 
-const static double m_dDefaultSpinBoxMinValue(0.0);
-const static double m_dDefaultSpinBoxMaxValue(1.0);
+const static double m_dDefaultSpinBoxMin(0.0);
+const static double m_dDefaultSpinBoxMax(1.0);
+const static double m_dDefaultMaxSensitivityPoint(0.5);
+const static double m_dDefaultSensitivity(3.0);
 
 //=============================================================================================================
 
 ScaleControl::ScaleControl(const char* label)
-: ScaleControl(label, nullptr, m_dDefaultSpinBoxMinValue, m_dDefaultSpinBoxMaxValue))
+: ScaleControl(label, nullptr, m_dDefaultSpinBoxMin, m_dDefaultSpinBoxMax)
 { }
 
 //=============================================================================================================
 
 ScaleControl::ScaleControl(const char* label, QWidget* parent)
-: ScaleControl(label, parent, m_dDefaultSpinBoxMinValue, m_dDefaultSpinBoxMaxValue)
+: ScaleControl(label, parent, m_dDefaultSpinBoxMin, m_dDefaultSpinBoxMax)
 { }
 
 //=============================================================================================================
 
 ScaleControl::ScaleControl(const char* label, QWidget* parent, double min, double max)
-: QWidget(nullptr)
+: QWidget(parent)
 , m_pUi(new Ui::ScaleControlWidget)
 , m_bManagingSpinBoxChange(false)
 , m_bManagingSliderChange(false)
-, m_fSensitivity(3.0)
-, m_fMaxSensitivityPoint(0.0)
+, m_fSensitivity(m_dDefaultSensitivity)
+, m_fMaxSensitivityPoint(m_dDefaultMaxSensitivityPoint)
 , m_fMapYconstant(0.0)
 , m_fMapKconstant(0.0)
 , m_bSliderInverted(false)
@@ -47,6 +49,47 @@ ScaleControl::ScaleControl(const char* label, QWidget* parent, double min, doubl
 
 //=============================================================================================================
 
+void ScaleControl::initLabel(const char* label)
+{
+    m_pUi->label->setText(label);
+}
+
+//=============================================================================================================
+
+void ScaleControl::initSpinBox()
+{
+    m_pUi->spinBox->setKeyboardTracking(false);
+    m_pUi->spinBox->setSingleStep(0.01);
+    m_pUi->spinBox->setDecimals(2);
+    m_pUi->spinBox->setPrefix("+/- ");
+
+    connect(m_pUi->spinBox,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this,&ScaleControl::spinBoxChanged);
+}
+
+//=============================================================================================================
+
+void ScaleControl::initSlider()
+{
+    m_pUi->slider = new QSlider(Qt::Horizontal);
+    m_pUi->slider->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
+    m_pUi->slider->setSingleStep(1);
+    m_pUi->slider->setPageStep(1);
+    setSliderRange(1,1000);
+
+    connect(m_pUi->slider,static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
+            this,&ScaleControl::sliderChanged);
+}
+
+//=============================================================================================================
+
+Ui::ScaleControlWidget* ScaleControl::getUI()
+{
+    return m_pUi;
+}
+
+//=============================================================================================================
+
 void ScaleControl::setValue(double value)
 {
     m_pUi->spinBox->setValue(value);
@@ -54,7 +97,7 @@ void ScaleControl::setValue(double value)
 
 //=============================================================================================================
 
-void ScaleControl::setMaxSensitivityValue(double s)
+void ScaleControl::setMaxSensitivityPoint(double s)
 {
     m_fMaxSensitivityPoint = s;
     updateNLMapConstants();
@@ -72,7 +115,7 @@ void ScaleControl::setSensitivity(double s)
 
 void ScaleControl::setRange(double min, double max)
 {
-    m_pSpinBox->setRange(min, max);
+    m_pUi->spinBox->setRange(min, max);
     updateNLMapConstants();
 }
 
@@ -93,43 +136,6 @@ void ScaleControl::setInverted(bool inverted)
 
 //=============================================================================================================
 
-void ScaleControl::initLabel(const char* label)
-{
-    m_pLabel = new QLabel(label);
-}
-
-//=============================================================================================================
-
-void ScaleControl::initSpinBox()
-{
-    m_pSpinBox = new QDoubleSpinBox;
-    m_pSpinBox->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
-    m_pSpinBox->setKeyboardTracking(false);
-    m_pSpinBox->setMaximumWidth(100);
-    m_pSpinBox->setSingleStep(0.01);
-    m_pSpinBox->setDecimals(2);
-    m_pSpinBox->setPrefix("+/- ");
-
-    connect(m_pSpinBox,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            this,&ScaleControl::spinBoxChanged);
-}
-
-//=============================================================================================================
-
-void ScaleControl::initSlider()
-{
-    m_pSlider = new QSlider(Qt::Horizontal);
-    m_pSlider->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
-    m_pSlider->setSingleStep(1);
-    m_pSlider->setPageStep(1);
-    setSliderRange(1,1000);
-
-    connect(m_pSlider,static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
-            this,&ScaleControl::sliderChanged);
-}
-
-//=============================================================================================================
-
 void ScaleControl::setSliderRange(int min, int max)
 {
     if( (min >= max)            ||
@@ -140,7 +146,7 @@ void ScaleControl::setSliderRange(int min, int max)
         qDebug() << "Error. Invalid slider range";
         return;
     }
-    m_pSlider->setRange(min, max);
+    m_pUi->slider->setRange(min, max);
     updateNLMapConstants();
 }
 
@@ -148,8 +154,8 @@ void ScaleControl::setSliderRange(int min, int max)
 
 void ScaleControl::updateNLMapConstants()
 {
-    m_fMapYconstant = atanf(m_fSensitivity * (m_pSpinBox->minimum() - m_fMaxSensitivityPoint));
-    m_fMapKconstant = (m_pSlider->maximum() - m_pSlider->minimum()) / (atanf(m_fSensitivity * (m_pSpinBox->maximum() - m_fMaxSensitivityPoint)) - m_fMapYconstant);
+    m_fMapYconstant = atanf(m_fSensitivity * (m_pUi->spinBox->minimum() - m_fMaxSensitivityPoint));
+    m_fMapKconstant = (m_pUi->slider->maximum() - m_pUi->slider->minimum()) / (atanf(m_fSensitivity * (m_pUi->spinBox->maximum() - m_fMaxSensitivityPoint)) - m_fMapYconstant);
 }
 
 //=============================================================================================================
@@ -159,7 +165,7 @@ void ScaleControl::spinBoxChanged(double value)
     m_bManagingSpinBoxChange = true;
     if(!m_bManagingSliderChange)
     {
-        m_pSlider->setValue(mapSpinBoxToSlider(value));
+        m_pUi->slider->setValue(mapSpinBoxToSlider(value));
     }
     m_bManagingSpinBoxChange = false;
     emit valueChanged(value);
@@ -170,7 +176,7 @@ void ScaleControl::sliderChanged(int value)
     m_bManagingSliderChange = true;
     if(!m_bManagingSpinBoxChange)
     {
-        m_pSpinBox->setValue(mapSliderToSpinBox(value));
+        m_pUi->spinBox->setValue(mapSliderToSpinBox(value));
     }
     m_bManagingSliderChange = false;
 }
@@ -183,7 +189,7 @@ int ScaleControl::mapSpinBoxToSlider(double value)
     int out;
     if(m_bSliderInverted)
     {
-        out = static_cast<int> (m_pSlider->maximum() - map);
+        out = static_cast<int> (m_pUi->slider->maximum() - map);
     } else {
         out = static_cast<int> (map);
     }
@@ -199,7 +205,7 @@ double ScaleControl::mapSliderToSpinBox(int value)
     double out;
     if(m_bSliderInverted)
     {
-        out = static_cast<double>(m_pSpinBox->maximum() - map);
+        out = static_cast<double>(m_pUi->spinBox->maximum() - map);
     } else {
         out = static_cast<double>(map);
     }
@@ -208,9 +214,4 @@ double ScaleControl::mapSliderToSpinBox(int value)
 
 //=============================================================================================================
 
-//void ScaleControl::setToolTip(const QString &s)
-//{
-//    m_pLabel->setToolTip(s);
-//    m_pSlider->setToolTip(s);
-//    m_pSpinBox->setToolTip(s);
-//}
+
