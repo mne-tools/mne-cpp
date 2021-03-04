@@ -347,7 +347,7 @@ private:
     /**
      * Prompts user to rename selected group
      */
-    void renameGroup();
+    void renameGroup(const QString &currentText);
 
     //=========================================================================================================
     /**
@@ -413,12 +413,14 @@ private:
                                                       FIFFLIB::FiffInfo fiffInfo,
                                                       FIFFLIB::FiffRawData fiffRaw);
 
+    void itemChanged(QListWidgetItem *item);
+
     Ui::EventWindowDockWidget*                      m_pUi;                          /** < Pointer to GUI elements */
 
     int                                             m_iCheckState;                  /** < State of show annotations checkbox (0 unchecked, 2 checked) */
     int                                             m_iCheckSelectedState;          /** < State of the show selected checkbox (0 unchecked, 2 checked) */
     int                                             m_iLastSampClicked;             /** < Number of the last sample clicked */
-    int                                             m_iLastGroupAdded;
+    int                                             m_iLastGroupSelected;
 
     QSharedPointer<EventDelegate>                   m_pAnnDelegate;                 /** < Pointer to associated delegate */
     QSharedPointer<ANSHAREDLIB::EventModel>         m_pAnnModel;                    /** < Pointer to associated model. Points to currently loaded. */

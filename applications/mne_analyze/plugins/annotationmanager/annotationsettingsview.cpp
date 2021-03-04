@@ -73,7 +73,7 @@ EventView::EventView()
 : m_pUi(new Ui::EventWindowDockWidget)
 , m_iCheckState(0)
 , m_iLastSampClicked(0)
-, m_iLastGroupAdded(-1)
+, m_iLastGroupSelected(-1)
 , m_pAnnModel(Q_NULLPTR)
 , m_pFiffRawModel(Q_NULLPTR)
 , m_pColordialog(new QColorDialog(this))
@@ -176,6 +176,12 @@ void EventView::initGUIFunctionality()
     m_pUi->m_listWidget_groupListWidget->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(m_pUi->m_listWidget_groupListWidget, &QWidget::customContextMenuRequested,
             this, &EventView::customGroupContextMenuRequested, Qt::UniqueConnection);
+
+//    connect(m_pUi->m_listWidget_groupListWidget, &QListWidget::currentTextChanged,
+//            this, &EventView::renameGroup, Qt::UniqueConnection);
+
+    connect(m_pUi->m_listWidget_groupListWidget, &QListWidget::itemChanged,
+                this, &EventView::itemChanged, Qt::UniqueConnection);
 
     connect(m_pUi->m_pushButtonStim, &QPushButton::clicked,
             this, &EventView::onStimButtonClicked, Qt::UniqueConnection);
@@ -334,8 +340,6 @@ void EventView::disconnectFromModel()
             this, &EventView::customEventContextMenuRequested);
     disconnect(m_pUi->m_listWidget_groupListWidget, &QWidget::customContextMenuRequested,
             this, &EventView::customGroupContextMenuRequested);
-    disconnect(m_pUi->m_listWidget_groupListWidget, &QListWidget::itemChanged,
-            this, &EventView::renameGroup);
     disconnect(m_pUi->m_pushButtonStim, &QPushButton::clicked,
             this, &EventView::onStimButtonClicked);
     disconnect(m_pTriggerDetectView.data(), &DISPLIB::TriggerDetectionView::detectTriggers,
@@ -448,7 +452,7 @@ bool EventView::newUserGroup(const QString& sName,
         groupColor = QColor(Qt::blue);
     }
 
-    m_pAnnModel->addGroup(sName, groupColor, m_iLastGroupAdded);
+    m_pAnnModel->addGroup(sName, groupColor, m_iLastGroupSelected);
 
 //    int iCat = m_pAnnModel->createGroup(sName,
 //                                        true,
@@ -537,10 +541,6 @@ void EventView::customGroupContextMenuRequested(const QPoint &pos)
 {
     QMenu* menu = new QMenu(this);
 
-    QAction* renameGroup =  menu->addAction(tr("Rename"));
-    connect(renameGroup, &QAction::triggered,
-            this, &EventView::renameGroup, Qt::UniqueConnection);
-
     QAction* colorChange = menu->addAction(tr("Change color"));
     connect(colorChange, &QAction::triggered,
             this, &EventView::changeGroupColor, Qt::UniqueConnection);
@@ -585,10 +585,10 @@ void EventView::loadGroupSettings()
 
 //=============================================================================================================
 
-void EventView::renameGroup()
+void EventView::renameGroup(const QString &currentText)
 {
-    QString text = QInputDialog::getText(this, tr("Event Viewer Group Settings"),
-                                             tr("Group Name:"), QLineEdit::Normal);
+//    QString text = QInputDialog::getText(this, tr("Event Viewer Group Settings"),
+//                                             tr("Group Name:"), QLineEdit::Normal);
 
 //    if (m_pUi->m_listWidget_groupListWidget->findItems(text, Qt::MatchExactly).size() > 0){
 //        QMessageBox* msgBox = new QMessageBox();
@@ -601,9 +601,11 @@ void EventView::renameGroup()
 //        msgBox->setInformativeText("Please select a new name");
 //        msgBox->open();
 //    }else {
-        m_pUi->m_listWidget_groupListWidget->currentItem()->setText(text);
-        m_pAnnModel->setGroupName(m_pUi->m_listWidget_groupListWidget->currentItem()->data(Qt::UserRole).toInt(), text);
-//        emit groupsUpdated();
+//        m_pUi->m_listWidget_groupListWidget->currentItem()->setText(text);
+    if(m_pAnnModel){
+        m_pAnnModel->setSelectedGroupName(currentText);
+    }
+    //        emit groupsUpdated();
 //    }
 }
 
@@ -808,9 +810,8 @@ void EventView::redrawGroups()
         newItem->setFlags (newItem->flags () | Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable);
 
         m_pUi->m_listWidget_groupListWidget->addItem(newItem);
-        if (eventGroup.id == m_iLastGroupAdded){
+        if (eventGroup.id == m_iLastGroupSelected){
             m_pUi->m_listWidget_groupListWidget->setCurrentItem(newItem);
-            m_iLastGroupAdded = -1;
         }
     }
 
@@ -818,4 +819,18 @@ void EventView::redrawGroups()
     //m_pAnnModel.get
     emit groupsUpdated();
     emit triggerRedraw();
+}
+
+//=============================================================================================================
+
+void EventView::itemChanged(QListWidgetItem *item)
+{
+    qDebug() << "Item -" << item;
+
+    int iGroupId = item->data(Qt::UserRole).toInt();
+    m_iLastGroupSelected = iGroupId;
+
+    if(m_pAnnModel){
+        m_pAnnModel->setGroupName(iGroupId, item->text());
+    }
 }
