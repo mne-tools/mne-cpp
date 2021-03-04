@@ -36,7 +36,7 @@ public:
     void setMaxSensitivityPoint(double s);
     void setSensitivity(double s);
     void setRange(double min, double max);
-    void setInverted(bool inverted);
+    void invertSlider(bool inverted);
 
 public slots:
     void setValue(double value);
