@@ -1078,7 +1078,7 @@ QColor EventModel::getGroupColor(int iGroupId) const
     auto group = m_EventManager.getGroup(iGroupId);
     auto color = group.color;
 
-    return QColor(color.r, color.g, color.g);
+    return QColor(color.r, color.g, color.b);
 }
 
 //=============================================================================================================
@@ -1086,4 +1086,19 @@ QColor EventModel::getGroupColor(int iGroupId) const
 const std::vector<idNum> EventModel::getSelectedGroups() const
 {
     return m_selectedEventGroups;
+}
+
+//=============================================================================================================
+
+void EventModel::deleteSelectedGroups()
+{
+    if (m_selectedEventGroups.size()){
+        for (int groupId : m_selectedEventGroups){
+            m_EventManager.deleteEventsInGroup(groupId);
+            m_EventManager.deleteGroup(groupId);
+        }
+
+        emit eventGroupsUpdated();
+        emit eventsUpdated();
+    }
 }
