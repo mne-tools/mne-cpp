@@ -45,6 +45,8 @@
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <disp/viewers/triggerdetectionview.h>
 
+#include <set>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -278,16 +280,27 @@ void EventView::removeEvent()
 {
     QModelIndexList indexList = m_pUi->m_tableView_eventTableView->selectionModel()->selectedIndexes();
 
-    int iTracker = 9999;
-    for(int i = indexList.size() - 1; i >= 0; i--) {
 
-        if (indexList.at(i).row() == iTracker){
-            continue;
-        }
+    std::set<int> set;
 
-        m_pAnnModel->removeRow(indexList.at(i).row());
-        iTracker = indexList.at(i).row();
+    for (auto index : indexList){
+        set.insert(index.row());
     }
+//    int iTracker = 9999;
+//    for(int i = indexList.size() - 1; i >= 0; i--) {
+
+//        if (indexList.at(i).row() == iTracker){
+//            continue;
+//        }
+
+//        m_pAnnModel->removeRow(indexList.at(i).row());
+//        iTracker = indexList.at(i).row();
+//    }
+
+    for (auto it = set.crbegin(); it != set.crend(); ++it){
+        m_pAnnModel->removeRow(*it);
+    }
+
 
     emit triggerRedraw();
 }
