@@ -814,6 +814,7 @@ void EventView::redrawGroups()
         return;
     }
     auto groups = m_pAnnModel->getGroupsToDraw();
+    auto selection = m_pAnnModel->getSelectedGroups();
 
     m_pUi->m_listWidget_groupListWidget->clear();
 
@@ -824,7 +825,6 @@ void EventView::redrawGroups()
         newItem->setFlags (newItem->flags () | Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable);
 
         m_pUi->m_listWidget_groupListWidget->addItem(newItem);
-        auto selection = m_pAnnModel->getSelectedGroups();
         for (auto group : selection){
             if (group == eventGroup.id){
                 m_pUi->m_listWidget_groupListWidget->setCurrentItem(newItem);
