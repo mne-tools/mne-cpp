@@ -1,4 +1,5 @@
 #include "scalecontrol.h"
+#include "ui_scalecontrol.h"
 
 #include <QDebug>
 #include <QLabel>
@@ -10,8 +11,10 @@ using namespace DISPLIB;
 
 //=============================================================================================================
 
-ScaleControl::ScaleControl(const char* label)
-: m_bManagingSpinBoxChange(false)
+ScaleControl::ScaleControl(const char* label, QWidget* parent)
+: QWidget(parent)
+, m_pUi(new Ui::ScaleControlWidget)
+, m_bManagingSpinBoxChange(false)
 , m_bManagingSliderChange(false)
 , m_fSensitivity(3.0)
 , m_fMaxSensitivityPoint(0.0)
@@ -196,9 +199,9 @@ double ScaleControl::mapSliderToSpinBox(int value)
 
 //=============================================================================================================
 
-void ScaleControl::setToolTip(const QString &s)
-{
-    m_pLabel->setToolTip(s);
-    m_pSlider->setToolTip(s);
-    m_pSpinBox->setToolTip(s);
-}
+//void ScaleControl::setToolTip(const QString &s)
+//{
+//    m_pLabel->setToolTip(s);
+//    m_pSlider->setToolTip(s);
+//    m_pSpinBox->setToolTip(s);
+//}
