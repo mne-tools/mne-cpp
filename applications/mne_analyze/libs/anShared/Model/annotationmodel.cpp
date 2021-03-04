@@ -1101,12 +1101,13 @@ void EventModel::addGroup(QString sName, QColor color)
     int red, green, blue;
     color.getRgb(&red, &green, &blue);
 
-    auto newGroup =m_EventManager.addGroup(sName.toStdString(), EVENTSLIB::RgbColor(red, green, blue));
+    auto newGroup = m_EventManager.addGroup(sName.toStdString(), EVENTSLIB::RgbColor(red, green, blue));
 
-    clearSelectedGroups();
-    addToSelectedGroups(newGroup.id);
+    m_selectedEventGroups.clear();
+    m_selectedEventGroups.push_back(newGroup.id);
 
     emit eventGroupsUpdated();
+    emit eventsUpdated();
 }
 
 //=============================================================================================================
