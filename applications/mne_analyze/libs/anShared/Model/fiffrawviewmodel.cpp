@@ -429,7 +429,7 @@ float FiffRawViewModel::getNumberOfTimeSpacers() const
 int FiffRawViewModel::getTimeMarks(int iIndex) const
 {
     if (m_pAnnotationModel){
-        return m_pAnnotationModel->getAnnotation(iIndex);
+        return m_pAnnotationModel->getEvent(iIndex);
     } else {
         return 0;
     }
@@ -440,7 +440,7 @@ int FiffRawViewModel::getTimeMarks(int iIndex) const
 int FiffRawViewModel::getTimeListSize() const
 {
     if(m_pAnnotationModel){
-        return m_pAnnotationModel->getNumberOfAnnotations();
+        return m_pAnnotationModel->getNumberOfEvents();
     } else {
         return 0;
     }
