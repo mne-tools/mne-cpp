@@ -28,8 +28,8 @@
   <property name="styleSheet">
    <string notr="true"/>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="0">
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -45,10 +45,7 @@
      </property>
     </spacer>
    </item>
-   <item row="0" column="0">
-    <layout class="QGridLayout" name="m_formLayout_Scaling" rowminimumheight="0" columnminimumwidth="0"/>
-   </item>
-   <item row="2" column="0">
+   <item>
     <spacer name="horizontalSpacer">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
