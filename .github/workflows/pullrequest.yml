@@ -94,18 +94,9 @@ jobs:
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow MNECPP_CONFIG+=withLsl
         jom -j4
-    - name: Deploy binaries (Linux)
-      if: matrix.os == 'ubuntu-16.04'
+    - name: Deploy binaries 
       run: |
-        ./tools/deployment/deploy_linux
-    - name: Deploy binaries (MacOS)
-      if: matrix.os == 'macos-latest'
-      run: |
-        ./tools/deployment/deploy_macos
-    - name: Deploy binaries (Windows)
-      if: matrix.os == 'windows-2016'
-      run: |
-        ./tools/deployment/deploy_win.bat
+        ./tools/deployment/deploy.bat dynamic pack
 
   MaxQtDynamic:
     runs-on: ${{ matrix.os }}
@@ -195,18 +186,9 @@ jobs:
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow MNECPP_CONFIG+=withLsl
         jom -j4
-    - name: Deploy binaries (Linux)
-      if: matrix.os == 'ubuntu-16.04'
+    - name: Deploy binaries
       run: |
-        ./tools/deployment/deploy_linux
-    - name: Deploy binaries (MacOS)
-      if: matrix.os == 'macos-latest'
-      run: |
-        ./tools/deployment/deploy_macos
-    - name: Deploy binaries (Windows)
-      if: matrix.os == 'windows-2019'
-      run: |
-        ./tools/deployment/deploy_win.bat
+        ./tools/deployment/deploy dynamic pack
         
   QtStatic:
     runs-on: ${{ matrix.os }}
@@ -268,18 +250,9 @@ jobs:
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         ..\Qt5_binaries\bin\qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=static
         jom -j4
-    - name: Deploy binaries (Linux)
-      if: matrix.os == 'ubuntu-16.04'
+    - name: Deploy binaries
       run: |
-        ./tools/deployment/deploy_linux_static
-    - name: Deploy binaries (MacOS)
-      if: matrix.os == 'macos-latest'
-      run: |
-        ./tools/deployment/deploy_macos_static
-    - name: Deploy binaries (Windows)
-      if: matrix.os == 'windows-2019'
-      run: |
-        ./tools/deployment/deploy_win_static.bat
+        ./tools/deployment/deploy.bat static pack
 
   Tests:
     runs-on: ${{ matrix.os }}
