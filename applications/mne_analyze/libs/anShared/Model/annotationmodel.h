@@ -669,6 +669,8 @@ public:
 
     const std::vector<idNum> getSelectedGroups() const;
 
+    void deleteSelectedGroups();
+
 signals:
 
     //=========================================================================================================
