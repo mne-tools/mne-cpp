@@ -119,11 +119,11 @@ void EventView::initMVCSettings()
     m_pAnnDelegate = QSharedPointer<EventDelegate>(new EventDelegate(this));
     m_pUi->m_tableView_eventTableView->setItemDelegate(m_pAnnDelegate.data());
 
-    connect(m_pAnnDelegate.data(), &EventDelegate::sampleValueChanged,
-            this, &EventView::realTimeDataSample, Qt::UniqueConnection);
+//    connect(m_pAnnDelegate.data(), &EventDelegate::sampleValueChanged,
+//            this, &EventView::realTimeDataSample, Qt::UniqueConnection);
 
-    connect(m_pAnnDelegate.data(), &EventDelegate::timeValueChanged,
-            this, &EventView::realTimeDataTime, Qt::UniqueConnection);
+//    connect(m_pAnnDelegate.data(), &EventDelegate::timeValueChanged,
+//            this, &EventView::realTimeDataTime, Qt::UniqueConnection);
 
     m_pUi->m_tableView_eventTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     m_pUi->m_tableView_eventTableView->setSelectionMode(QAbstractItemView::ExtendedSelection);
@@ -162,8 +162,8 @@ void EventView::initGUIFunctionality()
             this, &EventView::addNewAnnotationType, Qt::UniqueConnection);
 
     //Switching groups
-    connect(m_pUi->m_listWidget_groupListWidget->selectionModel(), &QItemSelectionModel::selectionChanged,
-            this, &EventView::groupChanged, Qt::UniqueConnection);
+//    connect(m_pUi->m_listWidget_groupListWidget->selectionModel(), &QItemSelectionModel::selectionChanged,
+//            this, &EventView::groupChanged, Qt::UniqueConnection);
 
     m_pUi->m_tableView_eventTableView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(m_pUi->m_tableView_eventTableView, &QWidget::customContextMenuRequested,

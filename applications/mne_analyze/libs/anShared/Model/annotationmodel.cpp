@@ -242,7 +242,7 @@ int EventModel::rowCount(const QModelIndex &parent) const
 int EventModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
-    return 3;
+    return 2;
 }
 
 //=============================================================================================================
@@ -305,23 +305,23 @@ QVariant EventModel::data(const QModelIndex &index,
         }
 
         //******** third column (event type plot) ********
-        if(index.column()==2) {
-            switch(role) {
-                case Qt::DisplayRole:
-                    return QVariant((*events)[index.row()].id);
+//        if(index.column()==2) {
+//            switch(role) {
+//                case Qt::DisplayRole:
+//                    return QVariant((*events)[index.row()].id);
 
-                case Qt::BackgroundRole: {
-                    QBrush brush;
-                    brush.setStyle(Qt::SolidPattern);
-                    brush.setColor(Qt::white);
+//                case Qt::BackgroundRole: {
+//                    QBrush brush;
+//                    brush.setStyle(Qt::SolidPattern);
+//                    brush.setColor(Qt::white);
 
-                    QColor colorTemp = brush.color();
-                    colorTemp.setAlpha(110);
-                    brush.setColor(colorTemp);
-                    return QVariant(brush);
-                }
-            }
-        }
+//                    QColor colorTemp = brush.color();
+//                    colorTemp.setAlpha(110);
+//                    brush.setColor(colorTemp);
+//                    return QVariant(brush);
+//                }
+//            }
+//        }
 
     }
     return QVariant();
@@ -333,29 +333,33 @@ bool EventModel::setData(const QModelIndex &index,
                               const QVariant &value,
                               int role)
 {
-    if(index.row() >= m_dataSamples.size() || index.column() >= columnCount())
+    if(index.row() >= rowCount() || index.column() >= columnCount())
         return false;
 
     if(role == Qt::EditRole) {
         int column = index.column();
+        auto events = m_EventManager.getEventsInGroups(m_selectedEventGroups);
         switch(column) {
             case 0: //sample values
-                m_dataSamples[index.row()] = value.toInt() + m_iFirstSample;
+                m_EventManager.moveEvent(events->at(index.row()).id, value.toInt() + m_iFirstSample);
+                //m_dataSamples[index.row()] = value.toInt() + m_iFirstSample;
                 break;
 
             case 1: //time values
-                m_dataSamples[index.row()] = value.toDouble() * m_fFreq + m_iFirstSample;
+                m_EventManager.moveEvent(events->at(index.row()).id, value.toDouble() * m_fFreq + m_iFirstSample);
+                //m_dataSamples[index.row()] = value.toDouble() * m_fFreq + m_iFirstSample;
                 break;
 
-            case 2: //type
-                QString string = value.toString();
-                m_dataTypes[index.row()] = string.toInt();
-                break;
+//            case 2: //type
+//                QString string = value.toString();
+//                m_dataTypes[index.row()] = string.toInt();
+//                break;
         }
     }
 
+    emit dataChanged(index, index);
     //Update filtered event data
-    setEventFilterType(m_sFilterEventType);
+    //setEventFilterType(m_sFilterEventType);
 
     return true;
 }
@@ -421,8 +425,8 @@ QVariant EventModel::headerData(int section,
                 return QVariant("Sample");
             case 1: //time value column
                 return QVariant("Time (s)");
-            case 2: //event type column
-                return QVariant("Id");
+//            case 2: //event type column
+//                return QVariant("Id");
             }
     }
     else if(orientation == Qt::Vertical) {
