@@ -332,18 +332,17 @@ void ScalingView::processScalingChange()
 
 //=============================================================================================================
 
-//void ScalingView::MAGSpinBoxChanged(double value)
-//{
-//    m_bManagingSpinBoxChange = true;
+void ScalingView::updateMAGScale(double value)
+{
+    m_qMapChScaling.insert(FIFF_UNIT_T, value * m_fScaleMAG);
+    processScalingChange();
 //    if(!m_bManagingSliderChange || m_bManagingLinkMagToGrad)
 //    {
 //        m_qMapSlider[FIFF_UNIT_T]->setValue(-value * 10.0);
 //    }
-//    m_qMapChScaling.insert(FIFF_UNIT_T, value * m_fScaleMAG);
-//    processScalingChange();
 //    m_bManagingSpinBoxChange = false;
 //    linkMagToGrad();
-//}
+}
 
 ////=============================================================================================================
 
@@ -589,9 +588,15 @@ void ScalingView::redrawGUI()
     //MAG
     if(m_qMapChScaling.contains(FIFF_UNIT_T) && (m_lChannelTypesToShow.contains("mag") || m_lChannelTypesToShow.contains("all")))
     {
-//        ScaleControl* control = new ScaleControl("MAG (pT)");
-//        control->addToLayout(m_pUi->m_formLayout_Scaling, 0);
-//        control->setToolTip("Press SHIFT to unlock link with GRADs.");
+        ScaleControl* controlMAG = new ScaleControl("MAG (pT)");
+        controlMAG->setRange(0.2,10.);
+        controlMAG->setMaxSensitivityPoint(2.5);
+        controlMAG->setSensitivity(1);
+        controlMAG->invertSlider(true);
+        connect(controlMAG, &ScaleControl::valueChanged, this, &ScalingView::updateMAGScale);
+//        controlMAG->setToolTip("Press SHIFT to unlock link with GRADs.");
+        m_pUi->verticalLayout->insertWidget(0,controlMAG);
+
     }
 
 //        QString tip();

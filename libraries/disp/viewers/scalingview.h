@@ -295,12 +295,12 @@ private:
      */
     void processScalingChange();
 
-//    //=============================================================================================================
-//    /**
-//     * Callback to process a change in the MAGs scale spinbox.
-//     * @param [in] value
-//     */
-//    void MAGSpinBoxChanged(double value);
+    //=============================================================================================================
+    /**
+     * Callback to process a change in the MAGs scale spinbox.
+     * @param [in] value
+     */
+    void updateMAGScale(double value);
 
 //    //=========================================================================================================
 //    /**
