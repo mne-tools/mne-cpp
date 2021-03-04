@@ -494,7 +494,7 @@ void FiffRawView::updateScrollPositionToAnnotation()
         return;
     }
 
-    int iSample = m_pModel->getAnnotationModel()->getAnnotation(m_pModel->getAnnotationModel()->getSelectedAnn()) - m_pModel->absoluteFirstSample();
+    int iSample = m_pModel->getAnnotationModel()->getEvent(m_pModel->getAnnotationModel()->getSelectedAnn()) - m_pModel->absoluteFirstSample();
     double dDx = m_pModel->pixelDifference();
 
     //qDebug() << "Div:" << iSample * dDx;

@@ -285,7 +285,7 @@ public:
      *
      * @return number on annotations to display.
      */
-    int getNumberOfAnnotations() const;
+    int getNumberOfEvents() const;
 
     //=========================================================================================================
     /**
@@ -295,7 +295,7 @@ public:
      *
      * @return Returns annotation at index given by input parameter.
      */
-    int getAnnotation(int iIndex) const;
+    int getEvent(int iIndex) const;
 
     //=========================================================================================================
     /**

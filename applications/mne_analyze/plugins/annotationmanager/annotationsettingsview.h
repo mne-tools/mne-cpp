@@ -196,7 +196,7 @@ protected slots:
     /**
      * Creates new annotation of the type currently on the Spin Box widget.
      */
-    void addNewAnnotationType();
+    void addEventGroup();
 
     //=========================================================================================================
     /**
