@@ -1094,24 +1094,19 @@ void EventModel::addEvent(int iSample)
 
 //=============================================================================================================
 
-void EventModel::addGroup(QString sName, QColor color, int& iGroup)
+void EventModel::addGroup(QString sName, QColor color)
 {
     qDebug() << "EventModel::addGroup";
 
     int red, green, blue;
     color.getRgb(&red, &green, &blue);
 
-    auto group = m_EventManager.addGroup(sName.toStdString(), EVENTSLIB::RgbColor(red, green, blue));
+    auto newGroup =m_EventManager.addGroup(sName.toStdString(), EVENTSLIB::RgbColor(red, green, blue));
 
-    iGroup = group.id;
+    clearSelectedGroups();
+    addToSelectedGroups(newGroup.id);
 
     emit eventGroupsUpdated();
-}
-
-void EventModel::addGroup(QString sName, QColor color)
-{
-    int i = 1;
-    addGroup(sName, color, i);
 }
 
 //=============================================================================================================
@@ -1160,4 +1155,11 @@ QColor EventModel::getGroupColor(int iGroupId) const
     auto color = group.color;
 
     return QColor(color.r, color.g, color.g);
+}
+
+//=============================================================================================================
+
+const std::vector<idNum> EventModel::getSelectedGroups() const
+{
+    return m_selectedEventGroups;
 }
