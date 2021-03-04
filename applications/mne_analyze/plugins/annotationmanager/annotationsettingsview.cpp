@@ -148,8 +148,8 @@ void EventView::initGUIFunctionality()
             this, &EventView::onCurrentSelectedChanged, Qt::UniqueConnection);
 
     //'Show all' checkbox
-    connect(m_pUi->m_checkBox_showAll, &QCheckBox::stateChanged,
-            this, &EventView::onShowAllChecked, Qt::UniqueConnection);
+//    connect(m_pUi->m_checkBox_showAll, &QCheckBox::stateChanged,
+//            this, &EventView::onShowAllChecked, Qt::UniqueConnection);
 
     //Annotation types combo box
     connect(m_pUi->m_comboBox_filterTypes, &QComboBox::currentTextChanged,
@@ -162,8 +162,8 @@ void EventView::initGUIFunctionality()
             this, &EventView::addNewAnnotationType, Qt::UniqueConnection);
 
     //Switching groups
-//    connect(m_pUi->m_listWidget_groupListWidget->selectionModel(), &QItemSelectionModel::selectionChanged,
-//            this, &EventView::groupChanged, Qt::UniqueConnection);
+    connect(m_pUi->m_listWidget_groupListWidget->selectionModel(), &QItemSelectionModel::selectionChanged,
+            this, &EventView::groupChanged, Qt::UniqueConnection);
 
     m_pUi->m_tableView_eventTableView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(m_pUi->m_tableView_eventTableView, &QWidget::customContextMenuRequested,
@@ -327,8 +327,8 @@ void EventView::disconnectFromModel()
             this, &EventView::addNewAnnotationType);
     disconnect(m_pUi->m_listWidget_groupListWidget->selectionModel(), &QItemSelectionModel::selectionChanged,
             this, &EventView::groupChanged);
-    disconnect(m_pUi->m_checkBox_showAll, &QCheckBox::stateChanged,
-            this, &EventView::onShowAllChecked);
+//    disconnect(m_pUi->m_checkBox_showAll, &QCheckBox::stateChanged,
+//            this, &EventView::onShowAllChecked);
     disconnect(m_pUi->m_tableView_eventTableView, &QWidget::customContextMenuRequested,
             this, &EventView::customEventContextMenuRequested);
     disconnect(m_pUi->m_listWidget_groupListWidget, &QWidget::customContextMenuRequested,
