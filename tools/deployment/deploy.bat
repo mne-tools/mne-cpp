@@ -29,9 +29,9 @@
         
         IF "%PACK_OPTION%"=="pack" (
             Rem Delete folders which we do not want to ship
-            Remove-Item '%BASE_PATH%\bin\mne-cpp-test-data' -Recurse
+            rmdir %BASE_PATH%\bin\mne-cpp-test-data /s /q 
             Rem Creating archive of all win deployed applications
-            7z a %BAS_PATH%\mne-cpp-windows-dynamic-x86_64.zip %BASE_PATH%/bin
+            7z a %BASE_PATH%\mne-cpp-windows-dynamic-x86_64.zip %BASE_PATH%\bin
         )
 
     ) ELSE IF "%LINK_OPTION%"=="static" (
@@ -39,13 +39,13 @@
         IF "%PACK_OPTION%"=="pack" (
             Rem This script needs to be run from the top level mne-cpp repo folder
             Rem Delete folders which we do not want to ship
-            Remove-Item '%BASE_PATH%\bin\mne_rt_server_plugins' -Recurse
-            Remove-Item '%BASE_PATH%\bin\mne-cpp-test-data' -Recurse
-            Remove-Item '%BASE_PATH%\bin\mne_scan_plugins' -Recurse
-            Remove-Item '%BASE_PATH%\bin\mne_analyze_plugins' -Recurse
+            rmdir %BASE_PATH%\bin\mne_rt_server_plugins /s /q
+            rmdir %BASE_PATH%\bin\mne-cpp-test-data /s /q
+            rmdir %BASE_PATH%\bin\mne_scan_plugins /s /q
+            rmdir %BASE_PATH%\bin\mne_analyze_plugins /s /q
             
             Rem Creating archive of everything in the bin directory
-            7z a mne-cpp-windows-static-x86_64.zip ./bin        
+            7z a %BASE_PATH%\mne-cpp-windows-static-x86_64.zip %BASE_PATH%\bin        
         )
         
     ) ELSE (
@@ -240,6 +240,7 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
             tar cfvz ../mne-cpp-linux-dynamic-x86_64.tar.gz ./*    
         fi
         rm -fr mne-cpp
+
 
     elif [[ ${LINK_OPTION} == static ]]; then
 
