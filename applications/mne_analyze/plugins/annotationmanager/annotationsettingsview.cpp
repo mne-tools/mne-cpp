@@ -121,12 +121,6 @@ void EventView::initMVCSettings()
     m_pAnnDelegate = QSharedPointer<EventDelegate>(new EventDelegate(this));
     m_pUi->m_tableView_eventTableView->setItemDelegate(m_pAnnDelegate.data());
 
-//    connect(m_pAnnDelegate.data(), &EventDelegate::sampleValueChanged,
-//            this, &EventView::realTimeDataSample, Qt::UniqueConnection);
-
-//    connect(m_pAnnDelegate.data(), &EventDelegate::timeValueChanged,
-//            this, &EventView::realTimeDataTime, Qt::UniqueConnection);
-
     m_pUi->m_tableView_eventTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     m_pUi->m_tableView_eventTableView->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
@@ -161,7 +155,7 @@ void EventView::initGUIFunctionality()
 
     //Add type button
     connect(m_pUi->m_pushButton_addEventType, &QPushButton::clicked,
-            this, &EventView::addNewAnnotationType, Qt::UniqueConnection);
+            this, &EventView::addEventGroup, Qt::UniqueConnection);
 
     //Switching groups
     connect(m_pUi->m_listWidget_groupListWidget->selectionModel(), &QItemSelectionModel::selectionChanged,
@@ -224,17 +218,6 @@ void EventView::addAnnotationToModel(int iSamplePos)
         return;
     }
 
-//    if(!(m_pAnnModel->getHubSize())){
-//        newUserGroup("User Events",
-//                     0,
-//                     true);
-//        m_pUi->m_listWidget_groupListWidget->setCurrentRow(0);
-//    }
-
-//    m_pAnnModel->setSamplePos(iSamplePos);
-
-//    m_pAnnModel->insertRow(0, QModelIndex());
-
     m_pAnnModel->addEvent(iSamplePos);
 
     emit triggerRedraw();
@@ -266,8 +249,8 @@ void EventView::onDataChanged()
 //=============================================================================================================
 
 void EventView::passFiffParams(int iFirst,
-                                            int iLast,
-                                            float fFreq)
+                               int iLast,
+                               float fFreq)
 {
     m_pAnnModel->setFirstLastSample(iFirst, iLast);
     m_pAnnModel->setSampleFreq(fFreq);
@@ -279,22 +262,11 @@ void EventView::removeEvent()
 {
     QModelIndexList indexList = m_pUi->m_tableView_eventTableView->selectionModel()->selectedIndexes();
 
-
     std::set<int> set;
 
     for (auto index : indexList){
         set.insert(index.row());
     }
-//    int iTracker = 9999;
-//    for(int i = indexList.size() - 1; i >= 0; i--) {
-
-//        if (indexList.at(i).row() == iTracker){
-//            continue;
-//        }
-
-//        m_pAnnModel->removeRow(indexList.at(i).row());
-//        iTracker = indexList.at(i).row();
-//    }
 
     for (auto it = set.crbegin(); it != set.crend(); ++it){
         m_pAnnModel->removeRow(*it);
@@ -306,16 +278,11 @@ void EventView::removeEvent()
 
 //=============================================================================================================
 
-void EventView::addNewAnnotationType()
+void EventView::addEventGroup()
 {
     qDebug() << "EventView::addNewAnnotationType";
 
     newUserGroup(m_pUi->lineEdit->text(), m_pUi->m_spinBox_addEventType->value());
-
-//    if(newUserGroup(m_pUi->lineEdit->text(), m_pUi->m_spinBox_addEventType->value())) {
-//        m_pAnnModel->addNewAnnotationType(QString().number(m_pUi->m_spinBox_addEventType->value()),
-//                                      QColor(Qt::black));
-//    }
 }
 
 //=============================================================================================================
@@ -343,7 +310,7 @@ void EventView::disconnectFromModel()
     disconnect(m_pAnnModel.data(), &ANSHAREDLIB::EventModel::updateEventTypes,
             this, &EventView::updateComboBox);
     disconnect(m_pUi->m_pushButton_addEventType, &QPushButton::clicked,
-            this, &EventView::addNewAnnotationType);
+            this, &EventView::addEventGroup);
     disconnect(m_pUi->m_listWidget_groupListWidget->selectionModel(), &QItemSelectionModel::selectionChanged,
             this, &EventView::groupChanged);
 //    disconnect(m_pUi->m_checkBox_showAll, &QCheckBox::stateChanged,
@@ -436,15 +403,6 @@ bool EventView::newUserGroup(const QString& sName,
                                           int iType,
                                           bool bDefaultColor)
 {
-//    if (!(m_pUi->m_listWidget_groupListWidget->findItems(sName, Qt::MatchExactly).isEmpty())){
-//        //Name already in use
-//        QMessageBox msgBox;
-//        msgBox.setText("Group name already in use");
-//        msgBox.setInformativeText("Please select a new name");
-//        msgBox.exec();
-//        return false;
-//    }
-
     if(!m_pAnnModel){
         qDebug() << "returning false 1";
         return false;
@@ -466,19 +424,6 @@ bool EventView::newUserGroup(const QString& sName,
 
     m_pAnnModel->addGroup(sName, groupColor);
 
-//    int iCat = m_pAnnModel->createGroup(sName,
-//                                        true,
-//                                        iType,
-//                                        groupColor);
-
-//    QListWidgetItem* newItem = new QListWidgetItem(sName);
-//    newItem->setData(Qt::UserRole, QVariant(iCat));
-//    newItem->setData(Qt::DecorationRole, groupColor);
-//    newItem->setFlags (newItem->flags () | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-
-//    m_pUi->m_listWidget_groupListWidget->addItem(newItem);
-//    emit m_pUi->m_listWidget_groupListWidget->setCurrentItem(newItem);
-
     m_pUi->lineEdit->setText("New Group "/* + QString::number(iCat + 1)*/);
 
     return true;
@@ -496,11 +441,6 @@ void EventView::groupChanged()
         return;
     }
 
-//    if(m_pUi->m_checkBox_showAll->isChecked()){
-//        m_pUi->m_checkBox_showAll->setCheckState(Qt::Unchecked);
-//    }
-
-//    m_pAnnModel->switchGroup(m_pUi->m_listWidget_groupListWidget->selectedItems().first()->data(Qt::UserRole).toInt());
     for(auto row : selection){
         m_pAnnModel->addToSelectedGroups(row.data(Qt::UserRole).toInt());
     }
@@ -599,26 +539,9 @@ void EventView::loadGroupSettings()
 
 void EventView::renameGroup(const QString &currentText)
 {
-//    QString text = QInputDialog::getText(this, tr("Event Viewer Group Settings"),
-//                                             tr("Group Name:"), QLineEdit::Normal);
-
-//    if (m_pUi->m_listWidget_groupListWidget->findItems(text, Qt::MatchExactly).size() > 0){
-//        QMessageBox* msgBox = new QMessageBox();
-//        msgBox->setText("Group name already in use");
-//        msgBox->setInformativeText("Please select a new name");
-//        msgBox->open();
-//    }else if(text.isEmpty()){
-//        QMessageBox* msgBox = new QMessageBox();
-//        msgBox->setText("Group name not valid");
-//        msgBox->setInformativeText("Please select a new name");
-//        msgBox->open();
-//    }else {
-//        m_pUi->m_listWidget_groupListWidget->currentItem()->setText(text);
     if(m_pAnnModel){
         m_pAnnModel->setSelectedGroupName(currentText);
     }
-    //        emit groupsUpdated();
-//    }
 }
 
 //=============================================================================================================
@@ -744,19 +667,6 @@ bool EventView::newStimGroup(const QString &sName,
                                           int iType,
                                           const QColor &groupColor)
 {
-//    int iCat = m_pAnnModel->createGroup(sName + "_" + QString::number(iType),
-//                                        false,
-//                                        iType,
-//                                        groupColor);
-
-//    QListWidgetItem* newItem = new QListWidgetItem(sName + "_" + QString::number(iType));
-//    newItem->setData(Qt::UserRole, QVariant(iCat));
-//    newItem->setData(Qt::DecorationRole, groupColor);
-//    newItem->setFlags (newItem->flags () | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-
-//    m_pUi->m_listWidget_groupListWidget->addItem(newItem);
-//    emit m_pUi->m_listWidget_groupListWidget->setCurrentItem(newItem);
-
     m_pAnnModel->addGroup(sName + "_" + QString::number(iType), groupColor);
 
     return true;
@@ -781,11 +691,8 @@ void EventView::createGroupsFromTriggers()
             newStimGroup(m_pTriggerDetectView->getSelectedStimChannel(),
                          static_cast<int>(keyList[i]),
                          colors[i % 10]);
-//            groupChanged();
             for (int j : mEventGroupMap[keyList[i]]){
                 m_pAnnModel->addEvent(j + iFirstSample);
-//                m_pAnnModel->setSamplePos(j + iFirstSample);
-//                m_pAnnModel->insertRow(0, QModelIndex());
             }
         }
     }

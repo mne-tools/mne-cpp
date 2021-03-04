@@ -162,48 +162,6 @@ bool EventModel::insertRows(int position,
 {
     Q_UNUSED(parent);
 
-//    if (m_iSelectedGroup == ALLGROUPS){
-//        return false;
-//    }
-
-    //    if(m_dataSamples.isEmpty()) {
-    //        m_dataSamples.insert(0, m_iSamplePos);
-    //        m_dataTypes.insert(0, m_iType);
-    //        m_dataIsUserEvent.insert(0, 1);
-    //        m_dataGroup.insert(0, m_iSelectedGroup);
-    //    }
-    //    else {
-    //        for (int i = 0; i < span; ++i) {
-    //            for(int t = 0; t<m_dataSamples.size(); t++) {
-    //                if(m_dataSamples[t] >= m_iSamplePos) {
-    //                    m_dataSamples.insert(t, m_iSamplePos);
-
-    //                    if(m_sFilterEventType == "All")
-    //                        m_dataTypes.insert(t, m_iType);
-    //                    else
-    //                        m_dataTypes.insert(t, m_sFilterEventType.toInt());
-
-    //                    m_dataIsUserEvent.insert(t, 1);
-    //                    m_dataGroup.insert(t, m_iSelectedGroup);
-    //                    break;
-    //                }
-
-    //                if(t == m_dataSamples.size()-1) {
-    //                    m_dataSamples.append(m_iSamplePos);
-
-    //                    if(m_sFilterEventType == "All")
-    //                        m_dataTypes.append(m_iType);
-    //                    else
-    //                        m_dataTypes.append(m_sFilterEventType.toInt());
-
-    //                    m_dataIsUserEvent.append(1);
-    //                    m_dataGroup.append(m_iSelectedGroup);
-    //                    break;
-    //                }
-    //            }
-    //        }
-    //    }
-
     if(!m_selectedEventGroups.size()){
         return false;
     }
@@ -242,16 +200,6 @@ int EventModel::rowCount(const QModelIndex &parent) const
 int EventModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
-
-    int iCol;
-
-//    if(m_selectedEventGroups.size() < 2){
-//        iCol = 2;
-//    } else {
-//        iCol = 3;
-//    }
-
-//    return iCol;
 
     return 2;
 }
@@ -381,8 +329,6 @@ bool EventModel::setData(const QModelIndex &index,
     }
 
     emit dataChanged(index, index);
-    //Update filtered event data
-    //setEventFilterType(m_sFilterEventType);
 
     return true;
 }
@@ -472,19 +418,10 @@ bool EventModel::removeRows(int position,
     auto events = m_EventManager.getEventsInGroups(m_selectedEventGroups);
 
     for (int i = 0; i < span; ++i) {
-//        //Only user events can be deleted
-//        if(m_dataIsUserEvent[position] == 1) {
-//            m_dataSamples.removeAt(position);
-//            m_dataTypes.removeAt(position);
-//            m_dataIsUserEvent.removeAt(position);
-//        }
         m_EventManager.deleteEvent(events->at(position + i).id);
     } 
 
     endRemoveRows();
-
-    //Update filtered event data
-//    setEventFilterType(m_sFilterEventType);
 
     return true;
 }
@@ -523,25 +460,15 @@ void EventModel::setSampleFreq(float fFreq)
 
 //=============================================================================================================
 
-int EventModel::getNumberOfAnnotations() const
+int EventModel::getNumberOfEvents() const
 {
-//    if (m_iSelectedCheckState){
-//        return m_dataSelectedRows.size();
-//    } else {
-//        return m_dataSamplesFiltered.size();
-//    }
     return m_EventManager.getNumEvents();
 }
 
 //=============================================================================================================
 
-int EventModel::getAnnotation(int iIndex) const
+int EventModel::getEvent(int iIndex) const
 {
-//    if (m_iSelectedCheckState){
-//        return m_dataSamplesFiltered.at(m_dataSelectedRows.at(iIndex));
-//    } else {
-//        return m_dataSamplesFiltered.at(iIndex);
-//    }
     return m_EventManager.getAllEvents()->at(iIndex).sample;
 }
 
@@ -639,8 +566,8 @@ bool EventModel::saveToFile(const QString& sPath)
     }
 
     QTextStream out(&file);
-    for(int i = 0; i < this->getNumberOfAnnotations(); i++) {
-        int iAnnotation = this->getAnnotation(i);
+    for(int i = 0; i < this->getNumberOfEvents(); i++) {
+        int iAnnotation = this->getEvent(i);
         out << "  " << iAnnotation << "   " << QString::number(static_cast<float>(iAnnotation - m_pFiffModel->absoluteFirstSample()) / this->getFreq(), 'f', 4) << "          0         1" << endl;
         out << "  " << iAnnotation << "   " << QString::number(static_cast<float>(iAnnotation - m_pFiffModel->absoluteFirstSample()) / this->getFreq(), 'f', 4) << "          1         0" << endl;
     }
@@ -692,9 +619,9 @@ MatrixXi EventModel::getAnnotationMatrix(int iGroup)
 
     if(iGroup == 9999){
         //Current selecting in Event Plugin
-        matEventDataMatrix.resize(getNumberOfAnnotations(), 3);
-        for (int i = 0; i < getNumberOfAnnotations(); i++){
-            matEventDataMatrix(i,0) = getAnnotation(i);
+        matEventDataMatrix.resize(getNumberOfEvents(), 3);
+        for (int i = 0; i < getNumberOfEvents(); i++){
+            matEventDataMatrix(i,0) = getEvent(i);
             matEventDataMatrix(i,1) = 0;
             matEventDataMatrix(i,2) = 1;
         }
@@ -877,7 +804,6 @@ void EventModel::removeGroup(int iGroupIndex)
 
 int EventModel::currentGroup(int iIndex)
 {
-    //return m_dataGroup[iIndex];
     if (m_iSelectedCheckState){
         return m_dataGroup[m_dataSelectedRows.at(iIndex)];
     } else {
@@ -923,10 +849,7 @@ void EventModel::setGroupColor(int iGroupIndex,
 void EventModel::setGroupName(int iGroupIndex,
                                    const QString &sGroupName)
 {
-//    m_mAnnotationHub[iGroupIndex]->groupName = sGroupName;
-
     m_EventManager.renameGroup(iGroupIndex, sGroupName.toStdString());
-
     emit eventGroupsUpdated();
 }
 
