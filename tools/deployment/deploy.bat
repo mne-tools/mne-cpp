@@ -14,6 +14,7 @@
     SET LINK_OPTION=%1
     SET PACK_OPTION=%2
     
+    SETX VCINSTALLDIR "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\VC\"
     :;IF "%LINK_OPTION%"=="" (
     :;    SET LINK_OPTION=dynamic
     :;)
