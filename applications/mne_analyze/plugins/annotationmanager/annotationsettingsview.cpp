@@ -73,6 +73,7 @@ EventView::EventView()
 : m_pUi(new Ui::EventWindowDockWidget)
 , m_iCheckState(0)
 , m_iLastSampClicked(0)
+, m_iLastGroupAdded(-1)
 , m_pAnnModel(Q_NULLPTR)
 , m_pFiffRawModel(Q_NULLPTR)
 , m_pColordialog(new QColorDialog(this))
@@ -447,7 +448,7 @@ bool EventView::newUserGroup(const QString& sName,
         groupColor = QColor(Qt::blue);
     }
 
-    m_pAnnModel->addGroup(sName, groupColor);
+    m_pAnnModel->addGroup(sName, groupColor, m_iLastGroupAdded);
 
 //    int iCat = m_pAnnModel->createGroup(sName,
 //                                        true,
@@ -589,21 +590,21 @@ void EventView::renameGroup()
     QString text = QInputDialog::getText(this, tr("Event Viewer Group Settings"),
                                              tr("Group Name:"), QLineEdit::Normal);
 
-    if (m_pUi->m_listWidget_groupListWidget->findItems(text, Qt::MatchExactly).size() > 0){
-        QMessageBox* msgBox = new QMessageBox();
-        msgBox->setText("Group name already in use");
-        msgBox->setInformativeText("Please select a new name");
-        msgBox->open();
-    }else if(text.isEmpty()){
-        QMessageBox* msgBox = new QMessageBox();
-        msgBox->setText("Group name not valid");
-        msgBox->setInformativeText("Please select a new name");
-        msgBox->open();
-    }else {
+//    if (m_pUi->m_listWidget_groupListWidget->findItems(text, Qt::MatchExactly).size() > 0){
+//        QMessageBox* msgBox = new QMessageBox();
+//        msgBox->setText("Group name already in use");
+//        msgBox->setInformativeText("Please select a new name");
+//        msgBox->open();
+//    }else if(text.isEmpty()){
+//        QMessageBox* msgBox = new QMessageBox();
+//        msgBox->setText("Group name not valid");
+//        msgBox->setInformativeText("Please select a new name");
+//        msgBox->open();
+//    }else {
         m_pUi->m_listWidget_groupListWidget->currentItem()->setText(text);
         m_pAnnModel->setGroupName(m_pUi->m_listWidget_groupListWidget->currentItem()->data(Qt::UserRole).toInt(), text);
-        emit groupsUpdated();
-    }
+//        emit groupsUpdated();
+//    }
 }
 
 //=============================================================================================================
@@ -804,9 +805,13 @@ void EventView::redrawGroups()
         QListWidgetItem* newItem = new QListWidgetItem(QString::fromStdString(eventGroup.name));
         newItem->setData(Qt::UserRole, QVariant(eventGroup.id));
         newItem->setData(Qt::DecorationRole, QColor(eventGroup.color.r, eventGroup.color.g, eventGroup.color.b));
-        newItem->setFlags (newItem->flags () | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+        newItem->setFlags (newItem->flags () | Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable);
 
         m_pUi->m_listWidget_groupListWidget->addItem(newItem);
+        if (eventGroup.id == m_iLastGroupAdded){
+            m_pUi->m_listWidget_groupListWidget->setCurrentItem(newItem);
+            m_iLastGroupAdded = -1;
+        }
     }
 
     qDebug() << "EventView::redrawGroups";

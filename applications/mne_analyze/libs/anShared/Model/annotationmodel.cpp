@@ -242,6 +242,17 @@ int EventModel::rowCount(const QModelIndex &parent) const
 int EventModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
+
+    int iCol;
+
+//    if(m_selectedEventGroups.size() < 2){
+//        iCol = 2;
+//    } else {
+//        iCol = 3;
+//    }
+
+//    return iCol;
+
     return 2;
 }
 
@@ -271,9 +282,14 @@ QVariant EventModel::data(const QModelIndex &index,
             }
             case Qt::BackgroundRole:{
                 QBrush brush;
-                brush.setStyle(Qt::SolidPattern);
-                brush.setColor(Qt::white);
-
+                if(m_selectedEventGroups.size() < 2){
+                    brush.setStyle(Qt::SolidPattern);
+                    brush.setColor(Qt::white);
+                } else {
+                    auto groupColor = m_EventManager.getGroup(events->at(index.row()).groupId).color;
+                    brush.setStyle(Qt::SolidPattern);
+                    brush.setColor(QColor(groupColor.r, groupColor.g, groupColor.b));
+                }
                 QColor colorTemp = brush.color();
                 colorTemp.setAlpha(110);
                 brush.setColor(colorTemp);
@@ -294,8 +310,14 @@ QVariant EventModel::data(const QModelIndex &index,
             }
             case Qt::BackgroundRole:
                 QBrush brush;
-                brush.setStyle(Qt::SolidPattern);
-                brush.setColor(Qt::white);
+                if(m_selectedEventGroups.size() < 2){
+                    brush.setStyle(Qt::SolidPattern);
+                    brush.setColor(Qt::white);
+                } else {
+                    auto groupColor = m_EventManager.getGroup(events->at(index.row()).groupId).color;
+                    brush.setStyle(Qt::SolidPattern);
+                    brush.setColor(QColor(groupColor.r, groupColor.g, groupColor.b));
+                }
 
                 QColor colorTemp = brush.color();
                 colorTemp.setAlpha(110);
@@ -305,23 +327,24 @@ QVariant EventModel::data(const QModelIndex &index,
         }
 
         //******** third column (event type plot) ********
-//        if(index.column()==2) {
-//            switch(role) {
-//                case Qt::DisplayRole:
-//                    return QVariant((*events)[index.row()].id);
+        if(index.column()==2) {
+            switch(role) {
+                case Qt::DisplayRole:
+                    return QVariant(/*(*events)[index.row()].id*/);
 
-//                case Qt::BackgroundRole: {
-//                    QBrush brush;
-//                    brush.setStyle(Qt::SolidPattern);
-//                    brush.setColor(Qt::white);
+                case Qt::BackgroundRole: {
+                    auto groupColor = m_EventManager.getGroup(events->at(index.row()).groupId).color;
+                    QBrush brush;
+                    brush.setStyle(Qt::SolidPattern);
+                    brush.setColor(QColor(groupColor.r, groupColor.g, groupColor.b));
 
-//                    QColor colorTemp = brush.color();
-//                    colorTemp.setAlpha(110);
-//                    brush.setColor(colorTemp);
-//                    return QVariant(brush);
-//                }
-//            }
-//        }
+                    QColor colorTemp = brush.color();
+                    colorTemp.setAlpha(110);
+                    brush.setColor(colorTemp);
+                    return QVariant(brush);
+                }
+            }
+        }
 
     }
     return QVariant();
@@ -426,7 +449,7 @@ QVariant EventModel::headerData(int section,
             case 1: //time value column
                 return QVariant("Time (s)");
 //            case 2: //event type column
-//                return QVariant("Id");
+//                return QVariant("Group");
             }
     }
     else if(orientation == Qt::Vertical) {
@@ -901,6 +924,10 @@ void EventModel::setGroupName(int iGroupIndex,
                                    const QString &sGroupName)
 {
     m_mAnnotationHub[iGroupIndex]->groupName = sGroupName;
+
+    m_EventManager.renameGroup(iGroupIndex, sGroupName.toStdString());
+
+    emit eventGroupsUpdated();
 }
 
 //=============================================================================================================
@@ -1060,16 +1087,24 @@ void EventModel::addEvent(int iSample)
 
 //=============================================================================================================
 
-void EventModel::addGroup(QString sName, QColor color)
+void EventModel::addGroup(QString sName, QColor color, int& iGroup)
 {
     qDebug() << "EventModel::addGroup";
 
     int red, green, blue;
     color.getRgb(&red, &green, &blue);
 
-    m_EventManager.addGroup(sName.toStdString(), EVENTSLIB::RgbColor(red, green, blue));
+    auto group = m_EventManager.addGroup(sName.toStdString(), EVENTSLIB::RgbColor(red, green, blue));
+
+    iGroup = group.id;
 
     emit eventGroupsUpdated();
+}
+
+void EventModel::addGroup(QString sName, QColor color)
+{
+    int i = 1;
+    addGroup(sName, color, i);
 }
 
 //=============================================================================================================
