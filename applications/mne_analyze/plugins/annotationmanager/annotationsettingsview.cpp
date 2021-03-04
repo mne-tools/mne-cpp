@@ -369,7 +369,11 @@ void EventView::keyReleaseEvent(QKeyEvent* event)
 {
     switch (event->key()) {
         case  Qt::Key_Delete:
-            this->removeEvent();
+            if(m_pUi->m_tableView_eventTableView->hasFocus()){
+                removeEvent();
+            } else if(m_pUi->m_listWidget_groupListWidget->hasFocus()){
+                deleteGroup();
+            }
             break;
         case Qt::Key_J:
             emit jumpToSelected();
@@ -508,11 +512,13 @@ void EventView::customGroupContextMenuRequested(const QPoint &pos)
 
 void EventView::deleteGroup()
 {
-    int iSelected = m_pUi->m_listWidget_groupListWidget->selectionModel()->selectedRows().first().row();
-    QListWidgetItem* itemToDelete = m_pUi->m_listWidget_groupListWidget->takeItem(iSelected);
-    m_pAnnModel->removeGroup(itemToDelete->data(Qt::UserRole).toInt());
-    m_pUi->m_listWidget_groupListWidget->selectionModel()->clearSelection();
-    delete itemToDelete;
+//    int iSelected = m_pUi->m_listWidget_groupListWidget->selectionModel()->selectedRows().first().row();
+//    QListWidgetItem* itemToDelete = m_pUi->m_listWidget_groupListWidget->takeItem(iSelected);
+//    m_pAnnModel->removeGroup(itemToDelete->data(Qt::UserRole).toInt());
+//    m_pUi->m_listWidget_groupListWidget->selectionModel()->clearSelection();
+//    delete itemToDelete;
+
+    m_pAnnModel->deleteSelectedGroups();
     onDataChanged();
     emit groupsUpdated();
 }
