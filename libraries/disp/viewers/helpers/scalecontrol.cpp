@@ -9,10 +9,26 @@
 
 using namespace DISPLIB;
 
+
+const static double m_dDefaultSpinBoxMinValue(0.0);
+const static double m_dDefaultSpinBoxMaxValue(1.0);
+
+//=============================================================================================================
+
+ScaleControl::ScaleControl(const char* label)
+: ScaleControl(label, nullptr, m_dDefaultSpinBoxMinValue, m_dDefaultSpinBoxMaxValue))
+{ }
+
 //=============================================================================================================
 
 ScaleControl::ScaleControl(const char* label, QWidget* parent)
-: QWidget(parent)
+: ScaleControl(label, parent, m_dDefaultSpinBoxMinValue, m_dDefaultSpinBoxMaxValue)
+{ }
+
+//=============================================================================================================
+
+ScaleControl::ScaleControl(const char* label, QWidget* parent, double min, double max)
+: QWidget(nullptr)
 , m_pUi(new Ui::ScaleControlWidget)
 , m_bManagingSpinBoxChange(false)
 , m_bManagingSliderChange(false)
@@ -26,21 +42,14 @@ ScaleControl::ScaleControl(const char* label, QWidget* parent)
     initSpinBox();
     initSlider();
     updateNLMapConstants();
-}
-
-//=============================================================================================================
-
-ScaleControl::ScaleControl(const char* label, double min, double max)
-: ScaleControl(label)
-{
-    m_pSpinBox->setRange(min, max);
+    m_pUi->spinBox->setRange(min, max);
 }
 
 //=============================================================================================================
 
 void ScaleControl::setValue(double value)
 {
-    m_pSpinBox->setValue(value);
+    m_pUi->spinBox->setValue(value);
 }
 
 //=============================================================================================================
