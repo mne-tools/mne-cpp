@@ -757,7 +757,7 @@ bool EventView::newStimGroup(const QString &sName,
 //    m_pUi->m_listWidget_groupListWidget->addItem(newItem);
 //    emit m_pUi->m_listWidget_groupListWidget->setCurrentItem(newItem);
 
-    m_pAnnModel->addGroup(sName, groupColor);
+    m_pAnnModel->addGroup(sName + "_" + QString::number(iType), groupColor);
 
     return true;
 }
@@ -781,10 +781,11 @@ void EventView::createGroupsFromTriggers()
             newStimGroup(m_pTriggerDetectView->getSelectedStimChannel(),
                          static_cast<int>(keyList[i]),
                          colors[i % 10]);
-            groupChanged();
+//            groupChanged();
             for (int j : mEventGroupMap[keyList[i]]){
-                m_pAnnModel->setSamplePos(j + iFirstSample);
-                m_pAnnModel->insertRow(0, QModelIndex());
+                m_pAnnModel->addEvent(j + iFirstSample);
+//                m_pAnnModel->setSamplePos(j + iFirstSample);
+//                m_pAnnModel->insertRow(0, QModelIndex());
             }
         }
     }
