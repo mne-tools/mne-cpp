@@ -75,7 +75,6 @@ EventView::EventView()
 : m_pUi(new Ui::EventWindowDockWidget)
 , m_iCheckState(0)
 , m_iLastSampClicked(0)
-, m_iLastGroupSelected(-1)
 , m_pAnnModel(Q_NULLPTR)
 , m_pFiffRawModel(Q_NULLPTR)
 , m_pColordialog(new QColorDialog(this))
@@ -465,7 +464,7 @@ bool EventView::newUserGroup(const QString& sName,
         groupColor = QColor(Qt::blue);
     }
 
-    m_pAnnModel->addGroup(sName, groupColor, m_iLastGroupSelected);
+    m_pAnnModel->addGroup(sName, groupColor);
 
 //    int iCat = m_pAnnModel->createGroup(sName,
 //                                        true,
@@ -745,18 +744,20 @@ bool EventView::newStimGroup(const QString &sName,
                                           int iType,
                                           const QColor &groupColor)
 {
-    int iCat = m_pAnnModel->createGroup(sName + "_" + QString::number(iType),
-                                        false,
-                                        iType,
-                                        groupColor);
+//    int iCat = m_pAnnModel->createGroup(sName + "_" + QString::number(iType),
+//                                        false,
+//                                        iType,
+//                                        groupColor);
 
-    QListWidgetItem* newItem = new QListWidgetItem(sName + "_" + QString::number(iType));
-    newItem->setData(Qt::UserRole, QVariant(iCat));
-    newItem->setData(Qt::DecorationRole, groupColor);
-    newItem->setFlags (newItem->flags () | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+//    QListWidgetItem* newItem = new QListWidgetItem(sName + "_" + QString::number(iType));
+//    newItem->setData(Qt::UserRole, QVariant(iCat));
+//    newItem->setData(Qt::DecorationRole, groupColor);
+//    newItem->setFlags (newItem->flags () | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
 
-    m_pUi->m_listWidget_groupListWidget->addItem(newItem);
-    emit m_pUi->m_listWidget_groupListWidget->setCurrentItem(newItem);
+//    m_pUi->m_listWidget_groupListWidget->addItem(newItem);
+//    emit m_pUi->m_listWidget_groupListWidget->setCurrentItem(newItem);
+
+    m_pAnnModel->addGroup(sName, groupColor);
 
     return true;
 }
@@ -823,8 +824,11 @@ void EventView::redrawGroups()
         newItem->setFlags (newItem->flags () | Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable);
 
         m_pUi->m_listWidget_groupListWidget->addItem(newItem);
-        if (eventGroup.id == m_iLastGroupSelected){
-            m_pUi->m_listWidget_groupListWidget->setCurrentItem(newItem);
+        auto selection = m_pAnnModel->getSelectedGroups();
+        for (auto group : selection){
+            if (group == eventGroup.id){
+                m_pUi->m_listWidget_groupListWidget->setCurrentItem(newItem);
+            }
         }
     }
 
@@ -841,7 +845,6 @@ void EventView::itemChanged(QListWidgetItem *item)
     qDebug() << "Item -" << item;
 
     int iGroupId = item->data(Qt::UserRole).toInt();
-    m_iLastGroupSelected = iGroupId;
 
     if(m_pAnnModel){
         m_pAnnModel->setGroupName(iGroupId, item->text());

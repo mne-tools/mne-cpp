@@ -655,8 +655,6 @@ public:
 
     void addEvent(int iSample);
 
-    void addGroup(QString sName, QColor color, int& iGroupId);
-
     void addGroup(QString sName, QColor color);
 
     std::unique_ptr<std::vector<EVENTSLIB::Event> > getEventsToDraw(int iBegin, int iEnd) const;
@@ -668,6 +666,8 @@ public:
     void clearSelectedGroups();
 
     void addToSelectedGroups(int iGroupId);
+
+    const std::vector<idNum> getSelectedGroups() const;
 
 signals:
 
