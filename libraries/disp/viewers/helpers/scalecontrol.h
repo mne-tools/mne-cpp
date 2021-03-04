@@ -5,10 +5,10 @@
 #include "disp_global.h"
 #include <QWidget>
 
-class QLabel;
-class QDoubleSpinBox;
-class QSlider;
-class QGridLayout;
+//class QLabel;
+//class QDoubleSpinBox;
+//class QSlider;
+//class QGridLayout;
 
 namespace Ui {
     class ScaleControlWidget;
@@ -27,14 +27,14 @@ class DISPSHARED_EXPORT ScaleControl : public QWidget
     Q_OBJECT
 
 public:
-    ScaleControl(const char* label, QWidget* parent = nullptr);
-    ScaleControl(const char* label, double min, double max);
+    ScaleControl(const char* label, QWidget* parent);
+    ScaleControl(const char* label, QWidget* parent, double min, double max);
 
 //    void addToLayout(QGridLayout* layout, int i) const;
 
-    QLabel* getLabel() const;
-    QDoubleSpinBox* getSpinBox() const;
-    QSlider* getSlider();
+//    QLabel* getLabel() const;
+//    QDoubleSpinBox* getSpinBox() const;
+//    QSlider* getSlider();
 
     void setMaxSensitivityValue(double s);
     void setSensitivity(double s);
@@ -65,9 +65,9 @@ private:
     void updateNLMapConstants();
 
     Ui::ScaleControlWidget* m_pUi;                          /**< Pointer to the user interface object. */
-    QLabel*                 m_pLabel;                       /**< Weak pointer to label control. */
-    QDoubleSpinBox*         m_pSpinBox;                     /**< Weak pointer to spinbox control. */
-    QSlider*                m_pSlider;                      /**< Weak pointer to slider control. */
+//    QLabel*                 m_pLabel;                       /**< Weak pointer to label control. */
+//    QDoubleSpinBox*         m_pSpinBox;                     /**< Weak pointer to spinbox control. */
+//    QSlider*                m_pSlider;                      /**< Weak pointer to slider control. */
     bool                    m_bManagingSpinBoxChange;       /**< Bool member guarding the state of the spinbox. */
     bool                    m_bManagingSliderChange;        /**< Bool member guarding the state of the slider. */
     float                   m_fSensitivity;                 /**< Sensitivity of the non-linear mapping fcn for the slider. */
