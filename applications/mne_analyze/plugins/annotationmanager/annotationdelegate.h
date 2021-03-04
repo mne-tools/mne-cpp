@@ -66,14 +66,14 @@ public:
 //    bool eventFilter(QObject *object, QEvent *event);
 private slots:
 
-    void onSampleValueChanged(int iValue);
+//    void onSampleValueChanged(int iValue);
 
-    void onTimeValueChanged(double dValue);
+//    void onTimeValueChanged(double dValue);
 
-signals:
+//signals:
 
-    void sampleValueChanged(int iValue);
-    void timeValueChanged(double dValue);
+//    void sampleValueChanged(int iValue);
+//    void timeValueChanged(double dValue);
 };
 
 #endif // ANNOTATIONDELEGATE_H
