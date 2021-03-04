@@ -27,16 +27,13 @@ class DISPSHARED_EXPORT ScaleControl : public QWidget
     Q_OBJECT
 
 public:
+    ScaleControl(const char* label);
     ScaleControl(const char* label, QWidget* parent);
     ScaleControl(const char* label, QWidget* parent, double min, double max);
 
-//    void addToLayout(QGridLayout* layout, int i) const;
+    Ui::ScaleControlWidget* getUI();
 
-//    QLabel* getLabel() const;
-//    QDoubleSpinBox* getSpinBox() const;
-//    QSlider* getSlider();
-
-    void setMaxSensitivityValue(double s);
+    void setMaxSensitivityPoint(double s);
     void setSensitivity(double s);
     void setRange(double min, double max);
     void setInverted(bool inverted);
@@ -65,9 +62,6 @@ private:
     void updateNLMapConstants();
 
     Ui::ScaleControlWidget* m_pUi;                          /**< Pointer to the user interface object. */
-//    QLabel*                 m_pLabel;                       /**< Weak pointer to label control. */
-//    QDoubleSpinBox*         m_pSpinBox;                     /**< Weak pointer to spinbox control. */
-//    QSlider*                m_pSlider;                      /**< Weak pointer to slider control. */
     bool                    m_bManagingSpinBoxChange;       /**< Bool member guarding the state of the spinbox. */
     bool                    m_bManagingSliderChange;        /**< Bool member guarding the state of the slider. */
     float                   m_fSensitivity;                 /**< Sensitivity of the non-linear mapping fcn for the slider. */
