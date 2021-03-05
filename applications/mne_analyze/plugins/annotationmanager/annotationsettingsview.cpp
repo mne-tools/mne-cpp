@@ -560,12 +560,8 @@ void EventView::changeGroupColor()
         return;
     }
 
-    int iSelected = m_pUi->m_listWidget_groupListWidget->selectionModel()->selectedRows().first().row();
-    QListWidgetItem* itemToChange = m_pUi->m_listWidget_groupListWidget->item(iSelected);
+    m_pAnnModel->setGroupColor(groupColor);
 
-    itemToChange->setData(Qt::DecorationRole, groupColor);
-    m_pAnnModel->setGroupColor(itemToChange->data(Qt::UserRole).toInt(),
-                               groupColor);
     onDataChanged();
 }
 
