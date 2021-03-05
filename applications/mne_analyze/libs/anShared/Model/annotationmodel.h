@@ -557,8 +557,7 @@ public:
      * @param[in] iGroupIndex   Index of the goup to be changed.
      * @param[in] groupColor    Color the group should be changed to.
      */
-    void setGroupColor(int iGroupIndex,
-                       const QColor& groupColor);
+    void setGroupColor(const QColor& groupColor);
 
     //=========================================================================================================
     /**

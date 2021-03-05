@@ -838,10 +838,15 @@ int EventModel::getGroupStackSize()
 
 //=============================================================================================================
 
-void EventModel::setGroupColor(int iGroupIndex,
-                                    const QColor& groupColor)
+void EventModel::setGroupColor(const QColor& groupColor)
 {
-    m_eventGroupColor[iGroupIndex] = groupColor;
+    for(int group : m_selectedEventGroups){
+
+        int red, green, blue;
+        groupColor.getRgb(&red, &green, &blue);
+        m_EventManager.setGroupColor(group, EVENTSLIB::RgbColor(red, green, blue));
+    }
+    emit eventGroupsUpdated();
 }
 
 //=============================================================================================================
