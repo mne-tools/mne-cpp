@@ -36,6 +36,7 @@ public:
     void setMaxSensitivityPoint(double s);
     void setSensitivity(double s);
     void setRange(double min, double max);
+    void setDecimals(int d);
     void invertSlider(bool inverted);
 
 public slots:
@@ -51,7 +52,6 @@ private:
     void initSlider();
 
     void spinBoxChanged(double value);
-
     void sliderChanged(int value);
     void setSliderRange(int min, int max);
 
@@ -60,11 +60,13 @@ private:
     inline double mapSliderToSpinBox(int in);
 
     void updateNLMapConstants();
+    inline float weightedSensitivity(float s);
 
     Ui::ScaleControlWidget* m_pUi;                          /**< Pointer to the user interface object. */
     bool                    m_bManagingSpinBoxChange;       /**< Bool member guarding the state of the spinbox. */
     bool                    m_bManagingSliderChange;        /**< Bool member guarding the state of the slider. */
     float                   m_fSensitivity;                 /**< Sensitivity of the non-linear mapping fcn for the slider. */
+    float                   m_fSensitivityWeighted;         /**< Sensitivity of the non-linear mapping fcn, weighted by the max value of the spinbox. */
     float                   m_fMaxSensitivityPoint;         /**< Max sensitivity point of the non-linear mapping fcn for the slider. */
     float                   m_fMapYconstant;                /**< Y constant in the non-linear mapping curve for the slider. */
     float                   m_fMapKconstant;                /**< K constant in the non-linear mapping curve for the slider. */
