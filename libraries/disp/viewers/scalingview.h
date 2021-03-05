@@ -56,12 +56,6 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class QDoubleSpinBox;
-class QSlider;
-class QLabel;
-class QGridLayout;
-class ScaleControl;
-
 namespace Ui {
     class ScalingViewWidget;
 }
@@ -76,6 +70,7 @@ namespace DISPLIB
 //=============================================================================================================
 // DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
+class ScaleControl;
 
 //=========================================================================================================
 /**
@@ -179,114 +174,6 @@ signals:
      */
     void scalingChanged(const QMap<qint32, float>& scalingMap);
 
-//    //=========================================================================================================
-//    void MAGSpinBoxChanged(double value);
-
-//    //=========================================================================================================
-//    /**
-//     * Callback to process a change in the gradiometers scale spinbox.
-//     * @param [in] value
-//     */
-//    void GRADSpinBoxChanged(double value);
-
-//    //=========================================================================================================
-//    /**
-//     * Callback to process a change in the EEG scale spinbox.
-//     * @param [in] value
-//     */
-//    void EEGSpinBoxChanged(double value);
-
-//    //=========================================================================================================
-//    /**
-//     * Callback to process a change in the EOG scale spinbox.
-//     * @param [in] value
-//     */
-//    void EOGSpinBoxChanged(double value);
-
-//    //=========================================================================================================
-//    /**
-//     * Callback to process a change in the EMG scale spinbox.
-//     * @param [in] value
-//     */
-//    void EMGSpinBoxChanged(double value);
-
-//    //=========================================================================================================
-//    /**
-//     * Callback to process a change in the ECG scale spinbox.
-//     * @param [in] value
-//     */
-//    void ECGSpinBoxChanged(double value);
-
-//    //=========================================================================================================
-//    /**
-//     * Callback to process a change in the MISC scale spinbox.
-//     * @param [in] value
-//     */
-//    void MISCSpinBoxChanged(double value);
-
-//    //=========================================================================================================
-//    /**
-//     * Callback to process a change in the STIM scale spinbox.
-//     * @param [in] value
-//     */
-//    void STIMSpinBoxChanged(double value);
-
-//    //=============================================================================================================
-//    /**
-//     * Callback to process a change in the MAG scale slider.
-//     * @param [in] value
-//     */
-//    void MAGSliderChanged(int value);
-
-//    //=============================================================================================================
-//    /**
-//     * Callback to process a change in the GRAD scale slider.
-//     * @param [in] value
-//     */
-//    void GRADSliderChanged(int value);
-
-//    //=============================================================================================================
-//    /**
-//     * Callback to process a change in the EEG scale slider.
-//     * @param [in] value
-//     */
-//    void EEGSliderChanged(int value);
-
-//    //=============================================================================================================
-//    /**
-//     * Callback to process a change in the EOG scale slider.
-//     * @param [in] value
-//     */
-//    void EOGSliderChanged(int value);
-
-//    //=============================================================================================================
-//    /**
-//     * Callback to process a change in the EOG scale slider.
-//     * @param [in] value
-//     */
-//    void EMGSliderChanged(int value);
-
-//    //=============================================================================================================
-//    /**
-//     * Callback to process a change in the ECG scale slider.
-//     * @param [in] value
-//     */
-//    void ECGSliderChanged(int value);
-
-//    //=============================================================================================================
-//    /**
-//     * Callback to process a change in the MISC scale slider.
-//     * @param [in] value
-//     */
-//    void MISCSliderChanged(int value);
-
-//    //=============================================================================================================
-//    /**
-//     * Callback to process a change in the STIM scale slider.
-//     * @param [in] value
-//     */
-//    void STIMSliderChanged(int value);
-
 private:
 
     //=============================================================================================================
@@ -302,117 +189,61 @@ private:
      */
     void updateMAGScale(double value);
 
-//    //=========================================================================================================
-//    /**
-//     * Callback to process a change in the gradiometers scale spinbox.
-//     * @param [in] value
-//     */
-//    void GRADSpinBoxChanged(double value);
+    //=========================================================================================================
+    /**
+     * Callback to process a change in the gradiometers scale spinbox.
+     * @param [in] value
+     */
+    void updateGRADScale(double value);
 
-//    //=========================================================================================================
+    //=========================================================================================================
 //    /**
 //     * Link Magnetometers and Gradiometers through this ratio. Just for viewing purposes.
 //     * @param [in] value
 //     */
 //    void MagGradRatioSpinBoxChanged(double value);
 
-//    //=========================================================================================================
-//    /**
-//     * Callback to process a change in the EEG scale spinbox.
-//     * @param [in] value
-//     */
-//    void EEGSpinBoxChanged(double value);
+    //=========================================================================================================
+    /**
+     * Callback to process a change in the EEG scale spinbox.
+     * @param [in] value
+     */
+    void updateEEGScale(double value);
 
-//    //=========================================================================================================
-//    /**
-//     * Callback to process a change in the EOG scale spinbox.
-//     * @param [in] value
-//     */
-//    void EOGSpinBoxChanged(double value);
+    //=========================================================================================================
+    /**
+     * Callback to process a change in the EOG scale spinbox.
+     * @param [in] value
+     */
+    void updateEOGScale(double value);
 
-//    //=========================================================================================================
-//    /**
-//     * Callback to process a change in the EMG scale spinbox.
-//     * @param [in] value
-//     */
-//    void EMGSpinBoxChanged(double value);
+    //=========================================================================================================
+    /**
+     * Callback to process a change in the EMG scale spinbox.
+     * @param [in] value
+     */
+    void updateEMGScale(double value);
 
-//    //=========================================================================================================
-//    /**
-//     * Callback to process a change in the ECG scale spinbox.
-//     * @param [in] value
-//     */
-//    void ECGSpinBoxChanged(double value);
+    //=========================================================================================================
+    /**
+     * Callback to process a change in the ECG scale spinbox.
+     * @param [in] value
+     */
+    void updateECGScale(double value);
 
-//    //=========================================================================================================
-//    /**
-//     * Callback to process a change in the MISC scale spinbox.
-//     * @param [in] value
-//     */
-//    void MISCSpinBoxChanged(double value);
+    //=========================================================================================================
+    /**
+     * Callback to process a change in the MISC scale spinbox.
+     * @param [in] value
+     */
+    void updateMISCScale(double value);
 
-//    //=========================================================================================================
-//    /**
-//     * Callback to process a change in the STIM scale spinbox.
-//     * @param [in] value
-//     */
-//    void STIMSpinBoxChanged(double value);
-
-//    //=============================================================================================================
-//    /**
-//     * Callback to process a change in the MAG scale slider.
-//     * @param [in] value
-//     */
-//    void MAGSliderChanged(int value);
-
-//    //=============================================================================================================
-//    /**
-//     * Callback to process a change in the GRAD scale slider.
-//     * @param [in] value
-//     */
-//    void GRADSliderChanged(int value);
-
-//    //=============================================================================================================
-//    /**
-//     * Callback to process a change in the EEG scale slider.
-//     * @param [in] value
-//     */
-//    void EEGSliderChanged(int value);
-
-//    //=============================================================================================================
-//    /**
-//     * Callback to process a change in the EOG scale slider.
-//     * @param [in] value
-//     */
-//    void EOGSliderChanged(int value);
-
-//    //=============================================================================================================
-//    /**
-//     * Callback to process a change in the EOG scale slider.
-//     * @param [in] value
-//     */
-//    void EMGSliderChanged(int value);
-
-//    //=============================================================================================================
-//    /**
-//     * Callback to process a change in the ECG scale slider.
-//     * @param [in] value
-//     */
-//    void ECGSliderChanged(int value);
-
-//    //=============================================================================================================
-//    /**
-//     * Callback to process a change in the MISC scale slider.
-//     * @param [in] value
-//     */
-//    void MISCSliderChanged(int value);
-
-//    //=============================================================================================================
-//    /**
-//     * Callback to process a change in the STIM scale slider.
-//     * @param [in] value
-//     */
-//    void STIMSliderChanged(int value);
+    //=========================================================================================================
+    /**
+     * Callback to process a change in the STIM scale spinbox.
+     * @param [in] value
+     */
+    void updateSTIMScale(double value);
 
     //=========================================================================================================
     /**
@@ -463,7 +294,7 @@ private:
     void keyPressEvent(QKeyEvent* event) override;
 
     QMap<qint32, float>                 m_qMapChScaling;                /**< Channel scaling values. */
-    QMap<qint32, ScaleControl*>         m_qMapSpinBox;                  /**< Map of types and channel scaling controls. */
+    QMap<qint32, ScaleControl*>         m_qMapScaleControls;            /**< Map of channel scaling controls. */
 
     QString                             m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
 
