@@ -1,19 +1,19 @@
 #include "scalecontrol.h"
 #include "ui_scalecontrol.h"
 
-#include <QDebug>
-#include <QLabel>
-#include <QDoubleSpinBox>
-#include <QSlider>
-#include <QGridLayout>
+//#include <QDebug>
+//#include <QLabel>
+//#include <QDoubleSpinBox>
+//#include <QSlider>
+//#include <QGridLayout>
 
 using namespace DISPLIB;
 
 
-const static float m_dDefaultMin(0.0);
-const static float m_dDefaultMax(1.0);
-const static float m_dDefaultMaxSensitivityPoint((m_dDefaultMin+m_dDefaultMax)/2.0);
-const static float m_dDefaultSensitivity(0.3);
+const static float  m_dDefaultMin(0.0f);
+const static float  m_dDefaultMax(1.0f);
+const static float  m_dDefaultMaxSensitivityPoint((m_dDefaultMin+m_dDefaultMax)/2.0f);
+const static float  m_dDefaultSensitivity(0.3f);
 const static int    m_iDefaultSliderMin(1);
 const static int    m_iDefaultSliderMax(1000);
 const static int    m_iDefaultSliderStep(1);
@@ -64,8 +64,8 @@ void ScaleControl::initLabel(const char* label)
 void ScaleControl::initSpinBox()
 {
     m_pUi->spinBox->setKeyboardTracking(false);
-    m_pUi->spinBox->setSingleStep(0.01);
-    m_pUi->spinBox->setDecimals(2);
+//    m_pUi->spinBox->setSingleStep(0.01);
+//    m_pUi->spinBox->setDecimals(2);
     m_pUi->spinBox->setPrefix("+/- ");
 //    m_pUi->spinBox->setStepType(QAbstractSpinBox::StepType::AdaptiveDecimalStepType);
 
@@ -145,15 +145,11 @@ void ScaleControl::invertSlider(bool inverted)
 
 void ScaleControl::setSliderRange(int min, int max)
 {
-    if( (min < 0)   ||
-        (max < 0)   ||
-        (min > max) )
+    if( (0 < min) && (min < max) )
     {
-        qDebug() << "Error. Invalid slider range";
-        return;
+        m_pUi->slider->setRange(min, max);
+        updateNLMapConstants();
     }
-    m_pUi->slider->setRange(min, max);
-    updateNLMapConstants();
 }
 
 //=============================================================================================================
@@ -167,7 +163,6 @@ void ScaleControl::setDecimals(int d)
 
 void ScaleControl::spinBoxChanged(double value)
 {
-    qDebug() << "spinBox changed - Value: " << value << " - setting slider to: " << mapSpinBoxToSlider(value);
     m_bManagingSpinBoxChange = true;
     if(!m_bManagingSliderChange)
     {
@@ -181,7 +176,6 @@ void ScaleControl::spinBoxChanged(double value)
 
 void ScaleControl::sliderChanged(int value)
 {
-    qDebug() << "slider changed - Value: " << value << " - setting spinbox to: " << mapSpinBoxToSlider(value);
     m_bManagingSliderChange = true;
     if(!m_bManagingSpinBoxChange)
     {
@@ -218,14 +212,12 @@ int ScaleControl::mapSpinBoxToSlider(double value)
         out = static_cast<int> (roundf(map));
     }
     return out;
-
 }
 
 //=============================================================================================================
 
 double ScaleControl::mapSliderToSpinBox(int value)
 {
-    qDebug() << "y value: " << m_fMapYconstant << " - K value: " << m_fMapKconstant << " sensitivity: " << m_fSensitivity << " - weighted sens: " << weightedSensitivity(m_fSensitivity);
     int valueCorrected = m_bSliderInverted? m_pUi->slider->maximum() - value : value;
     float map = (1/weightedSensitivity(m_fSensitivity)) * tanf((static_cast<float>(valueCorrected) / m_fMapKconstant) + m_fMapYconstant) + m_fMaxSensitivityPoint;
     return static_cast<double>(map);
@@ -233,3 +225,7 @@ double ScaleControl::mapSliderToSpinBox(int value)
 
 //=============================================================================================================
 
+double ScaleControl::value() const
+{
+    return m_pUi->spinBox->value();
+}

@@ -47,6 +47,7 @@
 //=============================================================================================================
 
 #include <QMap>
+#include <QPointer>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -56,6 +57,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class QCheckBox;
 namespace Ui {
     class ScalingViewWidget;
 }
@@ -167,6 +169,13 @@ public:
      */
     void clearView() override;
 
+    //=========================================================================================================
+    /**
+     * Link the Magnetometers to the Gradiometers scale.
+     * @param [in] l Set the link between MAGs and GRADs active or inactive.
+     */
+    void setMagGradLink(int l);
+
 signals:
     //=========================================================================================================
     /**
@@ -183,6 +192,10 @@ private:
     void processScalingChange();
 
     //=============================================================================================================
+
+    void updateGUI();
+
+    //=============================================================================================================
     /**
      * Callback to process a change in the MAGs scale spinbox.
      * @param [in] value
@@ -197,11 +210,11 @@ private:
     void updateGRADScale(double value);
 
     //=========================================================================================================
-//    /**
-//     * Link Magnetometers and Gradiometers through this ratio. Just for viewing purposes.
-//     * @param [in] value
-//     */
-//    void MagGradRatioSpinBoxChanged(double value);
+    /**
+     * Link Magnetometers and Gradiometers through this ratio. Just for viewing purposes.
+     * @param [in] value
+     */
+    void updateMAGtoGRADlink(double value);
 
     //=========================================================================================================
     /**
@@ -263,21 +276,33 @@ private:
 
     //=========================================================================================================
     /**
-     * Redraw the GUI.
+     * Create the controls.
      */
-    void redrawGUI();
+    void createScaleControls();
 
-//    //=========================================================================================================
-//    /**
-//     * Link Gradiometers scale with magnetometers.
-//     */
-//    void linkMagToGrad();
+    //=========================================================================================================
+    /**
+     * Create the controls.
+     */
+    void drawScalingGUI();
 
-//    //=========================================================================================================
-//    /**
-//     * Link Gradiometers scale with magnetometers.
-//     */
-//    void linkGradToMag();
+    //=========================================================================================================
+    /**
+     * Link Gradiometers scale with magnetometers.
+     */
+    void linkMagToGrad();
+
+    //=========================================================================================================
+    /**
+     * Link Gradiometers scale with magnetometers.
+     */
+    void linkGradToMag();
+
+    //=========================================================================================================
+    /**
+     * Create the checkbox for enabling or disabling the link between Magnetometers and Gradiometers.
+     */
+    void createLinkMagGradCheckBox();
 
     //=========================================================================================================
     /**
@@ -293,19 +318,20 @@ private:
      */
     void keyPressEvent(QKeyEvent* event) override;
 
-    QMap<qint32, float>                 m_qMapChScaling;                /**< Channel scaling values. */
-    QMap<qint32, ScaleControl*>         m_qMapScaleControls;            /**< Map of channel scaling controls. */
+    QMap<qint32, float>                     m_qMapChScaling;                /**< Channel scaling values. */
+    QMap<qint32, QPointer<ScaleControl> >   m_qMapScaleControls;            /**< Map of channel scaling controls. */
 
-    QString                             m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
+    QString                                 m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
 
-    QStringList                         m_lChannelTypesToShow;          /**< The channel types as strings to show the sliders for. */
+    QStringList                             m_lChannelTypesToShow;          /**< The channel types as strings to show the sliders for. */
 
-    Ui::ScalingViewWidget*              m_pUi;                          /**< Pointer to the user interface object. */
-    bool                                m_bIsShiftKeyPressed;           /**< Bool member value to store the use of the shiftkey. */
-    bool                                m_bManagingSpinBoxChange;       /**< Bool member mutex the state of the spinbox. */
-    bool                                m_bManagingSliderChange;        /**< Bool member mutex the state of the slider. */
-    bool                                m_bManagingLinkMagToGrad;       /**< Bool member mutex the link between MAGs and GRADs. */
-//    static double                       m_dMAGtoGRADSpinboxConverter;   /**< Stores the conversion ratio between MAGs and GRADs. */
+    Ui::ScalingViewWidget*                  m_pUi;                          /**< Pointer to the user interface object. */
+    bool                                    m_bLinkMAGtoGRAD;               /**< If this member is set, we link MAGs and GRad scales. */
+    bool                                    m_bIsShiftKeyPressed;           /**< Bool member value to store the use of the shiftkey. */
+    bool                                    m_bManagingSpinBoxChange;       /**< Bool member mutex the state of the spinbox. */
+    bool                                    m_bManagingSliderChange;        /**< Bool member mutex the state of the slider. */
+    bool                                    m_bManagingLinkMagToGrad;       /**< Bool member mutex the link between MAGs and GRADs. */
+    QPointer<QCheckBox>                     m_pCheckBox;                    /**< Stores the conversion ratio between MAGs and GRADs. */
 };
 
 } // NAMESPACE

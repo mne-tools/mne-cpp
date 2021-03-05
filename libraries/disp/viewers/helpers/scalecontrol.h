@@ -33,6 +33,7 @@ public:
 
     Ui::ScaleControlWidget* getUI();
 
+    double value() const;
     void setMaxSensitivityPoint(double s);
     void setSensitivity(double s);
     void setRange(double min, double max);
