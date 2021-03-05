@@ -224,8 +224,8 @@ void AveragingSettingsView::redrawGUI()
     connect(m_pUi->m_checkBox_reject, &QCheckBox::clicked,
             this, &AveragingSettingsView::changeDropActive);
 
-    connect(m_pUi->comboBox_EventGroup, &QComboBox::currentTextChanged,
-            this, &AveragingSettingsView::changeGroupSelect, Qt::UniqueConnection);
+    connect(m_pUi->comboBox_EventGroup, &QComboBox::currentIndexChanged,
+            this, &AveragingSettingsView::onChangeGroupSelect, Qt::UniqueConnection);
 
     m_pUi->m_pushButton_compute->hide();
     m_pUi->m_checkBox_reject->hide();
@@ -446,9 +446,10 @@ void AveragingSettingsView::onChangeStimChannel()
 
 //=============================================================================================================
 
-void AveragingSettingsView::addSelectionGroup(const QString& sGroupName)
+void AveragingSettingsView::addSelectionGroup(const QString& sGroupName,
+                                              int iGroupId)
 {
-    m_pUi->comboBox_EventGroup->addItem(sGroupName);
+    m_pUi->comboBox_EventGroup->addItem(sGroupName, QVariant(iGroupId));
 }
 
 //=============================================================================================================
@@ -456,7 +457,7 @@ void AveragingSettingsView::addSelectionGroup(const QString& sGroupName)
 void AveragingSettingsView::clearSelectionGroup()
 {
     m_pUi->comboBox_EventGroup->clear();
-    m_pUi->comboBox_EventGroup->addItem("Current Selection");
+    m_pUi->comboBox_EventGroup->addItem("Current Selection", 9999);
 }
 
 //=============================================================================================================
@@ -471,4 +472,11 @@ QString AveragingSettingsView::getCurrentSelectGroup()
 void AveragingSettingsView::clearView()
 {
 
+}
+
+//=============================================================================================================
+
+void AveragingSettingsView::onChangeGroupSelect(int iIndex)
+{
+    emit changeGroupSelect(m_pUi->comboBox_EventGroup->itemData(iIndex).toInt());
 }
