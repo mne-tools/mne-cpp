@@ -344,7 +344,7 @@ void ScalingView::updateMAGScale(double value)
 //    linkMagToGrad();
 }
 
-////=============================================================================================================
+//=============================================================================================================
 
 //void ScalingView::linkMagToGrad()
 //{
@@ -357,7 +357,7 @@ void ScalingView::updateMAGScale(double value)
 //    m_bManagingLinkMagToGrad = false;
 //}
 
-////=============================================================================================================
+//=============================================================================================================
 
 //void ScalingView::linkGradToMag()
 //{
@@ -373,205 +373,70 @@ void ScalingView::updateMAGScale(double value)
 //    }
 //}
 
+//=============================================================================================================
 
-
-////=============================================================================================================
-
-//void ScalingView::GRADSpinBoxChanged(double value)
-//{
+void ScalingView::updateGRADScale(double value)
+{
+    m_qMapChScaling.insert(FIFF_UNIT_T_M, value * m_fScaleGRAD * 100.0);//*100 because we have data in fT/cm and we want it in ft/m.
+    processScalingChange();
 //    m_bManagingSpinBoxChange = true;
 //    if(!m_bManagingSliderChange || m_bManagingLinkMagToGrad)
 //    {
 //        m_qMapSlider[FIFF_UNIT_T_M]->setValue(-value * 1.0);
 //    }
-//    m_qMapChScaling.insert(FIFF_UNIT_T_M, value * m_fScaleGRAD * 100.0);//*100 because we have data in fT/cm and we want it in ft/m.
-//    processScalingChange();
 //    m_bManagingSpinBoxChange = false;
 //    linkGradToMag();
-//}
+}
 
-////=============================================================================================================
+//=============================================================================================================
 
-//void ScalingView::EEGSpinBoxChanged(double value)
-//{
-//    m_bManagingSpinBoxChange = true;
-//    if(!m_bManagingSliderChange)
-//    {
-//        m_qMapSlider[FIFFV_EEG_CH]->setValue(-value * 10.0);
-//    }
-//    m_qMapChScaling.insert(FIFFV_EEG_CH, value * m_fScaleEEG);
-//    processScalingChange();
-//    m_bManagingSpinBoxChange = false;
-//}
+void ScalingView::updateEEGScale(double value)
+{
+    m_qMapChScaling.insert(FIFFV_EEG_CH, value * m_fScaleEEG);
+    processScalingChange();
+}
 
-////=============================================================================================================
+//=============================================================================================================
 
-//void ScalingView::EOGSpinBoxChanged(double value)
-//{
-//    m_bManagingSpinBoxChange = true;
-//    if(!m_bManagingSliderChange)
-//    {
-//        m_qMapSlider[FIFFV_EOG_CH]->setValue(-value * 10.0);
-//    }
-//    m_qMapChScaling.insert(FIFFV_EOG_CH, value * m_fScaleEOG);
-//    processScalingChange();
-//    m_bManagingSpinBoxChange = false;
-//}
+void ScalingView::updateEOGScale(double value)
+{
+    m_qMapChScaling.insert(FIFFV_EOG_CH, value * m_fScaleEOG);
+    processScalingChange();
+}
 
-////=============================================================================================================
+//=============================================================================================================
 
-//void ScalingView::EMGSpinBoxChanged(double value)
-//{
-//    m_bManagingSpinBoxChange = true;
-//    if(!m_bManagingSliderChange)
-//    {
-//        m_qMapSlider[FIFFV_EMG_CH]->setValue(-value * 10.0);
-//    }
-//    m_qMapChScaling.insert(FIFFV_EMG_CH, value * m_fScaleEMG);
-//    processScalingChange();
-//    m_bManagingSpinBoxChange = false;
-//}
+void ScalingView::updateEMGScale(double value)
+{
+    m_qMapChScaling.insert(FIFFV_EMG_CH, value * m_fScaleEMG);
+    processScalingChange();
+}
 
-////=============================================================================================================
+//=============================================================================================================
 
-//void ScalingView::ECGSpinBoxChanged(double value)
-//{
-//    m_bManagingSpinBoxChange = true;
-//    if(!m_bManagingSliderChange)
-//    {
-//        m_qMapSlider[FIFFV_ECG_CH]->setValue(-value * 10.0);
-//    }
-//    m_qMapChScaling.insert(FIFFV_ECG_CH, value * m_fScaleECG);
-//    processScalingChange();
-//    m_bManagingSpinBoxChange = false;
-//}
+void ScalingView::updateECGScale(double value)
+{
+    m_qMapChScaling.insert(FIFFV_ECG_CH, value * m_fScaleECG);
+    processScalingChange();
+}
 
-////=============================================================================================================
+//=============================================================================================================
 
-//void ScalingView::MISCSpinBoxChanged(double value)
-//{
-//    m_bManagingSpinBoxChange = true;
-//    if(!m_bManagingSliderChange)
-//    {
-//        m_qMapSlider[FIFFV_MISC_CH]->setValue(-value * 10.0);
-//    }
-//    m_qMapChScaling.insert(FIFFV_MISC_CH, value * m_fScaleMISC);
-//    processScalingChange();
-//    m_bManagingSpinBoxChange = false;
-//}
+void ScalingView::updateMISCScale(double value)
+{
+    m_qMapChScaling.insert(FIFFV_MISC_CH, value * m_fScaleMISC);
+    processScalingChange();
+}
 
-////=============================================================================================================
+//=============================================================================================================
 
-//void ScalingView::STIMSpinBoxChanged(double value)
-//{
-//    m_bManagingSpinBoxChange = true;
-//    if(!m_bManagingSliderChange)
-//    {
-//        m_qMapSlider[FIFFV_STIM_CH]->setValue(-value * 10.0);
-//    }
-//    m_qMapChScaling.insert(FIFFV_STIM_CH, value * m_fScaleSTIM);
-//    processScalingChange();
-//    m_bManagingSpinBoxChange = false;
-//}
+void ScalingView::updateSTIMScale(double value)
+{
+    m_qMapChScaling.insert(FIFFV_STIM_CH, value * m_fScaleSTIM);
+    processScalingChange();
+}
 
-////=============================================================================================================
-
-//void ScalingView::MAGSliderChanged(int value)
-//{
-//    qDebug() << "slider mag : " << value;
-//    m_bManagingSliderChange = true;
-//    if(!m_bManagingSpinBoxChange)
-//    {
-//        m_qMapSpinBox[FIFF_UNIT_T]->setValue(abs(value) / 10.0);
-//    }
-//    m_bManagingSliderChange = false;
-//}
-
-////=============================================================================================================
-
-//void ScalingView::GRADSliderChanged(int value)
-//{
-//    m_bManagingSliderChange = true;
-//    if(!m_bManagingSpinBoxChange)
-//    {
-//        m_qMapSpinBox[FIFF_UNIT_T_M]->setValue(abs(value) / 1.0);
-//    }
-//    m_bManagingSliderChange = false;
-//}
-
-////=============================================================================================================
-
-//void ScalingView::EEGSliderChanged(int value)
-//{
-//    m_bManagingSliderChange = true;
-//    if(!m_bManagingSpinBoxChange)
-//    {
-//        m_qMapSpinBox[FIFFV_EEG_CH]->setValue(abs(value) / 10.0);
-//    }
-//    m_bManagingSliderChange = false;
-//}
-
-////=============================================================================================================
-
-//void ScalingView::EOGSliderChanged(int value)
-//{
-//    m_bManagingSliderChange = true;
-//    if(!m_bManagingSpinBoxChange)
-//    {
-//        m_qMapSpinBox[FIFFV_EOG_CH]->setValue(abs(value) / 10.0);
-//    }
-//    m_bManagingSliderChange = false;
-//}
-
-////=============================================================================================================
-
-//void ScalingView::EMGSliderChanged(int value)
-//{
-//    m_bManagingSliderChange = true;
-//    if(!m_bManagingSpinBoxChange)
-//    {
-//        m_qMapSpinBox[FIFFV_EMG_CH]->setValue(abs(value) / 10.0);
-//    }
-//    m_bManagingSliderChange = false;
-//}
-
-////=============================================================================================================
-
-//void ScalingView::ECGSliderChanged(int value)
-//{
-//    m_bManagingSliderChange = true;
-//    if(!m_bManagingSpinBoxChange)
-//    {
-//        m_qMapSpinBox[FIFFV_ECG_CH]->setValue(abs(value) / 10.0);
-//    }
-//    m_bManagingSliderChange = false;
-//}
-
-////=============================================================================================================
-
-//void ScalingView::MISCSliderChanged(int value)
-//{
-//    m_bManagingSliderChange = true;
-//    if(!m_bManagingSpinBoxChange)
-//    {
-//        m_qMapSpinBox[FIFFV_MISC_CH]->setValue(abs(value) / 10.0);
-//    }
-//    m_bManagingSliderChange = false;
-//}
-
-////=============================================================================================================
-
-//void ScalingView::STIMSliderChanged(int value)
-//{
-//    m_bManagingSliderChange = true;
-//    if(!m_bManagingSpinBoxChange)
-//    {
-//        m_qMapSpinBox[FIFFV_STIM_CH]->setValue(abs(value) / 10.0);
-//    }
-//    m_bManagingSliderChange = false;
-//}
-
-////=============================================================================================================
+//=============================================================================================================
 
 //void ScalingView::MagGradRatioSpinBoxChanged(double value)
 //{
@@ -585,18 +450,102 @@ void ScalingView::updateMAGScale(double value)
 
 void ScalingView::redrawGUI()
 {
+    int i(0);
     //MAG
     if(m_qMapChScaling.contains(FIFF_UNIT_T) && (m_lChannelTypesToShow.contains("mag") || m_lChannelTypesToShow.contains("all")))
     {
-        ScaleControl* controlMAG = new ScaleControl("MAG (pT)");
-        controlMAG->setRange(0.2,10.);
-        controlMAG->setMaxSensitivityPoint(2.5);
-        controlMAG->setSensitivity(1);
-        controlMAG->invertSlider(true);
-        connect(controlMAG, &ScaleControl::valueChanged, this, &ScalingView::updateMAGScale);
-//        controlMAG->setToolTip("Press SHIFT to unlock link with GRADs.");
-        m_pUi->verticalLayout->insertWidget(0,controlMAG);
+        ScaleControl* pControlMAG = new ScaleControl("MAG (pT)");
+        m_qMapScaleControls.insert(FIFF_UNIT_T, pControlMAG);
+        pControlMAG->setRange(0.2,15.0);
+        pControlMAG->setMaxSensitivityPoint(2.5);
+        pControlMAG->setSensitivity(0.4);
+        pControlMAG->invertSlider(true);
+        connect(pControlMAG, &ScaleControl::valueChanged, this, &ScalingView::updateMAGScale);
+        pControlMAG->setToolTip("Press SHIFT to unlock link with GRADs.");
+        m_pUi->verticalLayout->insertWidget(i++, pControlMAG);
+    }
+    {
+        //MAGtoGRADlink
 
+    }
+
+    //GRAD
+    if(m_qMapChScaling.contains(FIFF_UNIT_T_M) && (m_lChannelTypesToShow.contains("grad") || m_lChannelTypesToShow.contains("all")))
+    {
+        ScaleControl* pControlGRAD = new ScaleControl("GRAD (fT/cm)");
+        m_qMapScaleControls.insert(FIFF_UNIT_T, pControlGRAD);
+        pControlGRAD->setToolTip("Press SHIFT to unlock link with MAGs.");
+        pControlGRAD->setRange(30.0, 50000.0);
+        pControlGRAD->setMaxSensitivityPoint(300.0);
+        pControlGRAD->setSensitivity(0.4);
+        pControlGRAD->invertSlider(true);
+        connect(pControlGRAD, &ScaleControl::valueChanged, this, &ScalingView::updateGRADScale);
+        m_pUi->verticalLayout->insertWidget(i++, pControlGRAD);
+    }
+
+    //EEG
+    if(m_qMapChScaling.contains(FIFFV_EEG_CH) && (m_lChannelTypesToShow.contains("eeg") || m_lChannelTypesToShow.contains("all")))
+    {
+        ScaleControl* pControlEEG = new ScaleControl("EEG (uV)");
+        m_qMapScaleControls.insert(FIFFV_EEG_CH, pControlEEG);
+        pControlEEG->setRange(0.1, 25000.0);
+        pControlEEG->setMaxSensitivityPoint(800.0);
+        pControlEEG->setSensitivity(0.4);
+        pControlEEG->invertSlider(true);
+        connect(pControlEEG, &ScaleControl::valueChanged, this, &ScalingView::updateEEGScale);
+        m_pUi->verticalLayout->insertWidget(i++, pControlEEG);
+    }
+
+    //EOG
+    if(m_qMapChScaling.contains(FIFFV_EOG_CH) && (m_lChannelTypesToShow.contains("eog") || m_lChannelTypesToShow.contains("all")))
+    {
+        ScaleControl* pControlEOG = new ScaleControl("EOG (uV)");
+        m_qMapScaleControls.insert(FIFFV_EOG_CH, pControlEOG);
+        pControlEOG->setRange(0.1, 25000.0);
+        pControlEOG->setMaxSensitivityPoint(800.0);
+        pControlEOG->setSensitivity(0.4);
+        pControlEOG->invertSlider(true);
+        connect(pControlEOG, &ScaleControl::valueChanged, this, &ScalingView::updateEOGScale);
+        m_pUi->verticalLayout->insertWidget(i++, pControlEOG);
+    }
+
+    //ECG
+    if(m_qMapChScaling.contains(FIFFV_ECG_CH) && (m_lChannelTypesToShow.contains("ecg") || m_lChannelTypesToShow.contains("all")))
+    {
+        ScaleControl* pControlECG = new ScaleControl("ECG (uV)");
+        m_qMapScaleControls.insert(FIFFV_ECG_CH, pControlECG);
+        pControlECG->setRange(0.1, 25000.0);
+        pControlECG->setMaxSensitivityPoint(800.0);
+        pControlECG->setSensitivity(0.4);
+        pControlECG->invertSlider(true);
+        connect(pControlECG, &ScaleControl::valueChanged, this, &ScalingView::updateECGScale);
+        m_pUi->verticalLayout->insertWidget(i++, pControlECG);
+    }
+
+    //STIM
+    if(m_qMapChScaling.contains(FIFFV_STIM_CH) && (m_lChannelTypesToShow.contains("stim") || m_lChannelTypesToShow.contains("all")))
+    {
+        ScaleControl* pControlSTIM = new ScaleControl("STIM");
+        m_qMapScaleControls.insert(FIFFV_STIM_CH, pControlSTIM);
+        pControlSTIM->setRange(0.1, 25000.0);
+        pControlSTIM->setMaxSensitivityPoint(800.0);
+        pControlSTIM->setSensitivity(0.4);
+        pControlSTIM->invertSlider(true);
+        connect(pControlSTIM, &ScaleControl::valueChanged, this, &ScalingView::updateSTIMScale);
+        m_pUi->verticalLayout->insertWidget(i++, pControlSTIM);
+    }
+
+    //MISC
+    if(m_qMapChScaling.contains(FIFFV_MISC_CH) && (m_lChannelTypesToShow.contains("misc") || m_lChannelTypesToShow.contains("all")))
+    {
+        ScaleControl* pControlMISC = new ScaleControl("MISC");
+        m_qMapScaleControls.insert(FIFFV_MISC_CH, pControlMISC);
+        pControlMISC->setRange(0.1, 25000.0);
+        pControlMISC->setMaxSensitivityPoint(800.0);
+        pControlMISC->setSensitivity(0.4);
+        pControlMISC->invertSlider(true);
+        connect(pControlMISC, &ScaleControl::valueChanged, this, &ScalingView::updateMISCScale);
+        m_pUi->verticalLayout->insertWidget(i++, pControlMISC);
     }
 
 //        QString tip();
