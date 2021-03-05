@@ -65,6 +65,8 @@
 #include <fiff/fiff_evoked.h>
 #include <fiff/fiff_info.h>
 
+#include <events/eventmanager.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -606,17 +608,21 @@ void Averaging::onMakeScreenshot(const QString& imageType)
 void Averaging::updateGroups()
 {
     m_pAveragingSettingsView->clearSelectionGroup();
-    for(int i = 0; i < m_pFiffRawModel->getAnnotationModel()->getHubSize(); i++){
-        m_pAveragingSettingsView->addSelectionGroup(m_pFiffRawModel->getAnnotationModel()->getGroupNameFromList(i));
+    auto groups = m_pFiffRawModel->getAnnotationModel()->getGroupsToDraw();
+    for (auto group : *groups){
+        m_pAveragingSettingsView->addSelectionGroup((group.name).c_str(), group.id);
     }
+//    for(int i = 0; i < m_pFiffRawModel->getAnnotationModel()->getHubSize(); i++){
+//        m_pAveragingSettingsView->addSelectionGroup(m_pFiffRawModel->getAnnotationModel()->getGroupNameFromList(i));
+//    }
 }
 
 //=============================================================================================================
 
-void Averaging::onChangeGroupSelect(const QString &text)
+void Averaging::onChangeGroupSelect(int iId)
 {
     QMutexLocker lock(&m_ParameterMutex);
-    m_iCurrentGroup = m_pFiffRawModel->getAnnotationModel()->getIndexFromName(text);
+    m_iCurrentGroup = iId;
 }
 
 //=============================================================================================================

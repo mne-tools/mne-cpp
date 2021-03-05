@@ -545,10 +545,9 @@ bool EventModel::saveToFile(const QString& sPath)
     QByteArray* bufferOut = new QByteArray;
 
     QTextStream out(bufferOut, QIODevice::ReadWrite);
-    for(int i = 0; i < this->getNumberOfEvents(); i++) {
-        int iEvent = this->getEvent(i);
-        out << "  " << iEvent << "   " << QString::number(static_cast<float>(iEvent - m_pFiffModel->absoluteFirstSample()) / this->getFreq(), 'f', 4) << "          0         1" << endl;
-        out << "  " << iEvent << "   " << QString::number(static_cast<float>(iEvent - m_pFiffModel->absoluteFirstSample()) / this->getFreq(), 'f', 4) << "          1         0" << endl;
+    auto events = m_EventManager.getEventsInGroups(m_selectedEventGroups);
+    for (auto event : *events){
+        out << "  " << event.sample << "   " << QString::number(static_cast<float>(event.sample - m_pFiffModel->absoluteFirstSample()) / this->getFreq(), 'f', 4) << "          0         1" << endl;
     }
 
     // Wee need to call the QFileDialog here instead of the data load plugin since we need access to the QByteArray
@@ -567,11 +566,12 @@ bool EventModel::saveToFile(const QString& sPath)
     }
 
     QTextStream out(&file);
-    for(int i = 0; i < this->getNumberOfEvents(); i++) {
-        int iEvent = this->getEvent(i);
-        out << "  " << iEvent << "   " << QString::number(static_cast<float>(iEvent - m_pFiffModel->absoluteFirstSample()) / this->getFreq(), 'f', 4) << "          0         1" << endl;
+    auto events = m_EventManager.getEventsInGroups(m_selectedEventGroups);
+    for (auto event : *events){
+        out << "  " << event.sample << "   " << QString::number(static_cast<float>(event.sample - m_pFiffModel->absoluteFirstSample()) / this->getFreq(), 'f', 4) << "          0         1" << endl;
 //        out << "  " << iEvent << "   " << QString::number(static_cast<float>(iEvent - m_pFiffModel->absoluteFirstSample()) / this->getFreq(), 'f', 4) << "          1         0" << endl;
     }
+
     return true;
     #endif
 }
@@ -620,6 +620,8 @@ MatrixXi EventModel::getAnnotationMatrix(int iGroup)
 
     if(iGroup == 9999){
         //Current selecting in Event Plugin
+
+
         matEventDataMatrix.resize(getNumberOfEvents(), 3);
         for (int i = 0; i < getNumberOfEvents(); i++){
             matEventDataMatrix(i,0) = getEvent(i);
@@ -628,9 +630,9 @@ MatrixXi EventModel::getAnnotationMatrix(int iGroup)
         }
     } else {
         //User selection on dropdown
-        if(iGroup == m_iSelectedGroup){
-            saveGroup();
-        }
+//        if(iGroup == m_iSelectedGroup){
+//            saveGroup();
+//        }
         matEventDataMatrix.resize(m_mAnnotationHub[iGroup]->dataSamples_Filtered.size(), 3);
         for (int i = 0; i < m_mAnnotationHub[iGroup]->dataSamples_Filtered.size(); i++){
             matEventDataMatrix(i,0) = m_mAnnotationHub[iGroup]->dataSamples_Filtered[i];

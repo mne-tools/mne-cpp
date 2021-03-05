@@ -259,7 +259,7 @@ private:
      *
      * @param[in] text  name of group selected in the GUI.
      */
-    void onChangeGroupSelect(const QString &text);
+    void onChangeGroupSelect(int iId);
 
     //=========================================================================================================
     /**
