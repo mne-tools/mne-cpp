@@ -173,7 +173,7 @@ bool EventModel::insertRows(int position,
     endInsertRows();
 
 //    Update filtered event data
-    setEventFilterType(m_sFilterEventType);
+//    setEventFilterType(m_sFilterEventType);
 
     eventsUpdated();
 
@@ -462,7 +462,7 @@ void EventModel::setSampleFreq(float fFreq)
 
 int EventModel::getNumberOfEvents() const
 {
-    return m_EventManager.getNumEvents();
+    return rowCount();
 }
 
 //=============================================================================================================
@@ -545,9 +545,10 @@ bool EventModel::saveToFile(const QString& sPath)
     QByteArray* bufferOut = new QByteArray;
 
     QTextStream out(bufferOut, QIODevice::ReadWrite);
-    for(int i = 0; i < this->getNumberOfAnnotations(); i++) {
-        out << "  " << this->getAnnotation(i) << "   " << QString::number(static_cast<float>(this->getAnnotation(i)) / this->getFreq(), 'f', 4) << "          0         1" << endl;
-        out << "  " << this->getAnnotation(i) << "   " << QString::number(static_cast<float>(this->getAnnotation(i)) / this->getFreq(), 'f', 4) << "          1         0" << endl;
+    for(int i = 0; i < this->getNumberOfEvents(); i++) {
+        int iEvent = this->getEvent(i);
+        out << "  " << iEvent << "   " << QString::number(static_cast<float>(iEvent - m_pFiffModel->absoluteFirstSample()) / this->getFreq(), 'f', 4) << "          0         1" << endl;
+        out << "  " << iEvent << "   " << QString::number(static_cast<float>(iEvent - m_pFiffModel->absoluteFirstSample()) / this->getFreq(), 'f', 4) << "          1         0" << endl;
     }
 
     // Wee need to call the QFileDialog here instead of the data load plugin since we need access to the QByteArray
@@ -567,9 +568,9 @@ bool EventModel::saveToFile(const QString& sPath)
 
     QTextStream out(&file);
     for(int i = 0; i < this->getNumberOfEvents(); i++) {
-        int iAnnotation = this->getEvent(i);
-        out << "  " << iAnnotation << "   " << QString::number(static_cast<float>(iAnnotation - m_pFiffModel->absoluteFirstSample()) / this->getFreq(), 'f', 4) << "          0         1" << endl;
-        out << "  " << iAnnotation << "   " << QString::number(static_cast<float>(iAnnotation - m_pFiffModel->absoluteFirstSample()) / this->getFreq(), 'f', 4) << "          1         0" << endl;
+        int iEvent = this->getEvent(i);
+        out << "  " << iEvent << "   " << QString::number(static_cast<float>(iEvent - m_pFiffModel->absoluteFirstSample()) / this->getFreq(), 'f', 4) << "          0         1" << endl;
+//        out << "  " << iEvent << "   " << QString::number(static_cast<float>(iEvent - m_pFiffModel->absoluteFirstSample()) / this->getFreq(), 'f', 4) << "          1         0" << endl;
     }
     return true;
     #endif
@@ -962,38 +963,28 @@ void EventModel::initFromFile(const QString& sFilePath)
 {
     QFileInfo fileInfo(sFilePath);
 
+    Eigen::MatrixXi eventList;
+
     if(fileInfo.exists() && (fileInfo.completeSuffix() == "eve")){
-        QFile file(sFilePath);
-
-        int iGroupIndex = createGroup(fileInfo.baseName(),
-                    false,
-                    1,
-                    QColor("red"));
-
-        switchGroup(iGroupIndex);
-
-        QListWidgetItem* newItem = new QListWidgetItem(fileInfo.baseName());
-        newItem->setData(Qt::UserRole, QVariant(iGroupIndex));
-        newItem->setData(Qt::DecorationRole, QColor("red"));
-        newItem->setFlags (newItem->flags () | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-        pushGroup(newItem);
-
-        Eigen::MatrixXi eventList;
-        MNELIB::MNE::read_events_from_ascii(file, eventList);
-
-        for(int i = 0; i < eventList.size(); i++){
-            setSamplePos(eventList(i,0));
-            insertRow(0, QModelIndex());
-        }
-
+        QFile file(sFilePath);       
+        MNELIB::MNE::read_events_from_ascii(file, eventList); 
     } else if(fileInfo.exists() && (fileInfo.completeSuffix() == "fif")){
         QFile file(sFilePath);
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
             return;
         }
-        Eigen::MatrixXi eventlist;
-        MNELIB::MNE::read_events_from_fif(file, eventlist);
+        MNELIB::MNE::read_events_from_fif(file, eventList);
+    } else {
+        return;
     }
+
+    addGroup(fileInfo.baseName(),
+             QColor("red"));
+
+    for(int i = 0; i < eventList.size(); i++){
+        addEvent(eventList(i,0));
+    }
+
 }
 
 //=============================================================================================================

@@ -91,6 +91,8 @@ EventView::EventView()
     m_pUi->m_comboBox_filterTypes->hide();
     m_pUi->line->hide();
     m_pUi->m_label_filterEvents->hide();
+    m_pUi->m_spinBox_addEventType->hide();
+    m_pUi->label_2->hide();
 
     onDataChanged();
 
@@ -231,7 +233,9 @@ void EventView::setModel(QSharedPointer<ANSHAREDLIB::EventModel> pAnnModel)
 
     initMVCSettings();
     initGUIFunctionality();
-    loadGroupSettings();
+    redrawGroups();
+//    loadGroupSettings();
+
     onDataChanged();
 }
 
