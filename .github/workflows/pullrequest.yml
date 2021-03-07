@@ -188,7 +188,7 @@ jobs:
         jom -j4
     - name: Deploy binaries
       run: |
-        ./tools/deployment/deploy dynamic pack
+        ./tools/deployment/deploy.bat dynamic pack
         
   QtStatic:
     runs-on: ${{ matrix.os }}
