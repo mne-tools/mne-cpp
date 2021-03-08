@@ -138,6 +138,8 @@ public:
      */
     void initPluginControlWidgets();
 
+    void setContinuous(bool bState);
+
 private:
     //=========================================================================================================
     /**
@@ -188,7 +190,7 @@ private:
     void changeRecordingButton();
 
     //=========================================================================================================
-    void createRecordingInstance();
+    void createRecordingInstance(bool bChecked);
 
     bool                                    m_bWriteToFile;                 /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
     bool                                    m_bUseRecordTimer;              /**< Flag whether to use data recording timer.*/
@@ -213,6 +215,7 @@ private:
     QTime                                   m_recordingStartedTime;         /**< The time when the recording started.*/
 
     QPointer<QAction>                       m_pActionRecordFile;            /**< start recording action. */
+    QPointer<QAction>                       m_pActionClipRecording;
 
     QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>                      m_pCircularBuffer;      /**< Holds incoming raw data. */
 
