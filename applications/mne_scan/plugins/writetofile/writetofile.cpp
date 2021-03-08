@@ -83,6 +83,14 @@ WriteToFile::WriteToFile()
             this, &WriteToFile::toggleRecordingFile);
     addPluginAction(m_pActionRecordFile);
 
+    m_pActionClipRecording = new QAction(QIcon(":/images/record.png"), tr("Clip Recording"),this);
+    m_pActionClipRecording->setStatusTip(tr("Clip Recording"));
+    connect(m_pActionClipRecording.data(), &QAction::triggered,
+            this, &WriteToFile::toggleRecordingFile);
+    addPluginAction(m_pActionClipRecording);
+
+
+
     //Init timers
     if(!m_pRecordTimer) {
         m_pRecordTimer = QSharedPointer<QTimer>(new QTimer(this));
@@ -341,22 +349,18 @@ void WriteToFile::toggleRecordingFile()
 {
     //Setup writing to file
     if(m_bWriteToFile) {
-        if(!m_bContinuous){
-            m_mutex.lock();
-            m_pOutfid->finish_writing_raw();
-            m_mutex.unlock();
+        m_mutex.lock();
+        m_pOutfid->finish_writing_raw();
+        m_mutex.unlock();
 
-            m_bWriteToFile = false;
-            m_iSplitCount = 0;
+        m_bWriteToFile = false;
+        m_iSplitCount = 0;
 
-            //Stop record timer
-            m_pRecordTimer->stop();
-            m_pBlinkingRecordButtonTimer->stop();
-            m_pActionRecordFile->setIcon(QIcon(":/images/record.png"));
-            m_pUpdateTimeInfoTimer->stop();
-        } else {
-            createRecordingInstance();
-        }
+        //Stop record timer
+        m_pRecordTimer->stop();
+        m_pBlinkingRecordButtonTimer->stop();
+        m_pActionRecordFile->setIcon(QIcon(":/images/record.png"));
+        m_pUpdateTimeInfoTimer->stop();
     } else {
         m_iSplitCount = 0;
 
@@ -472,16 +476,26 @@ void WriteToFile::changeRecordingButton()
 
 //=============================================================================================================
 
-void WriteToFile::createRecordingInstance()
+void WriteToFile::createRecordingInstance(bool bChecked)
 {
+    Q_UNUSED(bChecked);
+
     QMutexLocker locker1(&m_copymutex);
     QMutexLocker locker2(&m_mutex);
 
     auto fileParams = m_qFileOut.openMode();
 
-    m_qFileOut.copy("test");
+    m_qFileOut.copy("testfilepleaseignore.fif");
+
 
     m_qFileOut.open(fileParams);
+}
+
+//=============================================================================================================
+
+void WriteToFile::setContinuous(bool bState)
+{
+    m_bContinuous = bState;
 }
 
 
