@@ -39,6 +39,8 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <vector>
+
 #include "brainflowboard_global.h"
 
 #include "board_shim.h"
@@ -115,17 +117,13 @@ protected:
     virtual void run();
 
 private:
-    std::string     m_sStreamerParams;
-
-    BoardShim*      m_pBoardShim;
-
-    QAction*        m_pShowSettingsAction;
-
-    int     m_iBoardId;
-    int     m_iNumberChannels;
-    int     m_uiSamplesPerBlock;            /**< The samples per block defined by the user via the GUI.*/
-    int*    m_pChannels;
-    int     m_iSamplingFreq;
+    std::string         m_sStreamerParams;
+    BoardShim*          m_pBoardShim;
+    QAction*            m_pShowSettingsAction;
+    int                 m_iBoardId;
+    int                 m_uiSamplesPerBlock;            /**< The samples per block defined by the user via the GUI.*/
+    std::vector<int>    m_vChannels;
+    int                 m_iSamplingFreq;
 
     QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> > m_pOutput;
     QSharedPointer<FIFFLIB::FiffInfo>   m_pFiffInfo;        /**< Fiff measurement info.*/
