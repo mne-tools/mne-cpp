@@ -187,14 +187,19 @@ private:
      */
     void changeRecordingButton();
 
+    //=========================================================================================================
+    void createRecordingInstance();
+
     bool                                    m_bWriteToFile;                 /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
     bool                                    m_bUseRecordTimer;              /**< Flag whether to use data recording timer.*/
+    bool                                    m_bContinuous;
 
     qint16                                  m_iBlinkStatus;                 /**< The blink status of the recording button.*/
     qint32                                  m_iSplitCount;                  /**< File split count. */
     int                                     m_iRecordingMSeconds;           /**< Recording length in mseconds.*/
 
     QMutex                                  m_mutex;                        /**< The threads mutex.*/
+    QMutex                                  m_copymutex;
 
     QSharedPointer<FIFFLIB::FiffInfo>       m_pFiffInfo;                    /**< Fiff measurement info.*/
     QSharedPointer<FIFFLIB::FiffStream>     m_pOutfid;                      /**< FiffStream to write to.*/
