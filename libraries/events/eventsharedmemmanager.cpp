@@ -88,8 +88,8 @@ EventSharedMemManager::~EventSharedMemManager()
 }
 void EventSharedMemManager::init(EVENTSLIB::SharedMemoryMode mode)
 {
-    qDebug() << " ========================================================";
-    qDebug() << "Init started!\n";
+//    qDebug() << " ========================================================";
+//    qDebug() << "Init started!\n";
 
     if(!m_IsInit)
     {
@@ -202,8 +202,8 @@ void EventSharedMemManager::deleteEvent(int sample)
 
 void EventSharedMemManager::initializeSharedMemory()
 {
-    qDebug() << "Initializing Shared Memory Buffer ========  id: " << m_Id;
-    printLocalBuffer();
+//    qDebug() << "Initializing Shared Memory Buffer ========  id: " << m_Id;
+//    printLocalBuffer();
     void* localBuffer = static_cast<void*>(m_LocalBuffer);
     char* sharedBuffer = static_cast<char*>(m_SharedMemory.data()) + sizeof(int);
     int indexIterator(0);
@@ -220,7 +220,7 @@ void EventSharedMemManager::initializeSharedMemory()
 
 void EventSharedMemManager::copyNewUpdateToSharedMemory(EventUpdate& newUpdate)
 {
-    qDebug() << "Sending Buffer ========  id: " << m_Id;
+//    qDebug() << "Sending Buffer ========  id: " << m_Id;
 
     char* sharedBuffer = static_cast<char*>(m_SharedMemory.data()) + sizeof(int);
     int indexIterator(0);
@@ -247,17 +247,17 @@ void EventSharedMemManager::copySharedMemoryToLocalBuffer()
         memcpy(localBuffer, sharedBuffer, bufferLength * sizeof(EventUpdate));
         m_SharedMemory.unlock();
     }
-    qDebug() << "Receiving Buffer ========  id: " << m_Id;
-    printLocalBuffer();
+//    qDebug() << "Receiving Buffer ========  id: " << m_Id;
+//    printLocalBuffer();
 }
 
 void EventSharedMemManager::bufferWatcher()
 {
     m_BufferWatcherThreadRunning = true;
-    qDebug() << "buffer Watcher thread launched";
+//    qDebug() << "buffer Watcher thread launched";
     while(m_IsInit)
     {
-        qDebug() << "Running buffer watcher!";
+//        qDebug() << "Running buffer watcher!";
         copySharedMemoryToLocalBuffer();
         auto timeCheck = getTimeNow();
         processLocalBuffer();
@@ -272,7 +272,7 @@ void EventSharedMemManager::processLocalBuffer()
 {
     for(int i = 0; i < bufferLength; ++i)
     {
-        qDebug() << "Checking update: " << i;
+//        qDebug() << "Checking update: " << i;
         if(m_LocalBuffer[i].getCreationTime() > m_lastCheckTime &&
            m_LocalBuffer[i].getCreatorId() != m_Id )
         {
@@ -284,7 +284,7 @@ void EventSharedMemManager::processLocalBuffer()
 
 void EventSharedMemManager::processEvent(const EventUpdate& ne)
 {
-    qDebug() << "process new update";
+//    qDebug() << "process new update";
     switch (ne.getType())
     {
         case EventUpdate::type::NEW_EVENT :
