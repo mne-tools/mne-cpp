@@ -618,28 +618,27 @@ MatrixXi EventModel::getAnnotationMatrix(int iGroup)
 {
     MatrixXi matEventDataMatrix;
 
+
     if(iGroup == 9999){
         //Current selecting in Event Plugin
 
+        auto events = m_EventManager.getEventsInGroups(m_selectedEventGroups);
 
-        matEventDataMatrix.resize(getNumberOfEvents(), 3);
-        for (int i = 0; i < getNumberOfEvents(); i++){
-            matEventDataMatrix(i,0) = getEvent(i);
+        matEventDataMatrix.resize(events->size(), 3);
+        for (int i = 0; i < events->size(); i++){
+            matEventDataMatrix(i,0) = events->at(i).sample;
             matEventDataMatrix(i,1) = 0;
             matEventDataMatrix(i,2) = 1;
         }
     } else {
-        //User selection on dropdown
-//        if(iGroup == m_iSelectedGroup){
-//            saveGroup();
-//        }
-        matEventDataMatrix.resize(m_mAnnotationHub[iGroup]->dataSamples_Filtered.size(), 3);
-        for (int i = 0; i < m_mAnnotationHub[iGroup]->dataSamples_Filtered.size(); i++){
-            matEventDataMatrix(i,0) = m_mAnnotationHub[iGroup]->dataSamples_Filtered[i];
+        auto events = m_EventManager.getEventsInGroup(iGroup);
+
+        matEventDataMatrix.resize(events->size(), 3);
+        for (int i = 0; i < events->size(); i++){
+            matEventDataMatrix(i,0) = events->at(i).sample;
             matEventDataMatrix(i,1) = 0;
             matEventDataMatrix(i,2) = 1;
         }
-
     }
 
     return matEventDataMatrix;

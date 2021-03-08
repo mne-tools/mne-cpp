@@ -224,7 +224,7 @@ void AveragingSettingsView::redrawGUI()
     connect(m_pUi->m_checkBox_reject, &QCheckBox::clicked,
             this, &AveragingSettingsView::changeDropActive);
 
-    connect(m_pUi->comboBox_EventGroup, &QComboBox::currentIndexChanged,
+    connect(m_pUi->comboBox_EventGroup, qOverload<int>(&QComboBox::currentIndexChanged),
             this, &AveragingSettingsView::onChangeGroupSelect, Qt::UniqueConnection);
 
     m_pUi->m_pushButton_compute->hide();
