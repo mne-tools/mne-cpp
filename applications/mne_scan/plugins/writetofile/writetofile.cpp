@@ -71,6 +71,7 @@ using namespace Eigen;
 WriteToFile::WriteToFile()
 : m_bWriteToFile(false)
 , m_bUseRecordTimer(false)
+, m_bContinuous(true) //CHANGE TO USER TOGGLE ASAP
 , m_iBlinkStatus(0)
 , m_iSplitCount(0)
 , m_iRecordingMSeconds(5*60*1000)
@@ -277,6 +278,7 @@ void WriteToFile::run()
     while(!isInterruptionRequested()) {
         if(m_pCircularBuffer) {
             //pop matrix
+            m_copymutex.lock();
             if(m_pCircularBuffer->pop(matData)) {
                 //Write raw data to fif file
                 m_mutex.lock();
@@ -296,11 +298,13 @@ void WriteToFile::run()
                 }
                 m_mutex.unlock();
             }
+            m_copymutex.unlock();
         }
     }
 
     //Close the fif output stream
     if(m_bWriteToFile) {
+        m_bContinuous = false;
         this->toggleRecordingFile();
     }
 }
@@ -337,18 +341,22 @@ void WriteToFile::toggleRecordingFile()
 {
     //Setup writing to file
     if(m_bWriteToFile) {
-        m_mutex.lock();
-        m_pOutfid->finish_writing_raw();
-        m_mutex.unlock();
+        if(!m_bContinuous){
+            m_mutex.lock();
+            m_pOutfid->finish_writing_raw();
+            m_mutex.unlock();
 
-        m_bWriteToFile = false;
-        m_iSplitCount = 0;
+            m_bWriteToFile = false;
+            m_iSplitCount = 0;
 
-        //Stop record timer
-        m_pRecordTimer->stop();
-        m_pBlinkingRecordButtonTimer->stop();
-        m_pActionRecordFile->setIcon(QIcon(":/images/record.png"));
-        m_pUpdateTimeInfoTimer->stop();
+            //Stop record timer
+            m_pRecordTimer->stop();
+            m_pBlinkingRecordButtonTimer->stop();
+            m_pActionRecordFile->setIcon(QIcon(":/images/record.png"));
+            m_pUpdateTimeInfoTimer->stop();
+        } else {
+            createRecordingInstance();
+        }
     } else {
         m_iSplitCount = 0;
 
@@ -461,6 +469,21 @@ void WriteToFile::changeRecordingButton()
         m_iBlinkStatus = 0;
     }
 }
+
+//=============================================================================================================
+
+void WriteToFile::createRecordingInstance()
+{
+    QMutexLocker locker1(&m_copymutex);
+    QMutexLocker locker2(&m_mutex);
+
+    auto fileParams = m_qFileOut.openMode();
+
+    m_qFileOut.copy("test");
+
+    m_qFileOut.open(fileParams);
+}
+
 
 //=============================================================================================================
 // This needs to be connected to Hpi fitting plugin
