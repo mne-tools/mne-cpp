@@ -86,10 +86,8 @@ WriteToFile::WriteToFile()
     m_pActionClipRecording = new QAction(QIcon(":/images/record.png"), tr("Clip Recording"),this);
     m_pActionClipRecording->setStatusTip(tr("Clip Recording"));
     connect(m_pActionClipRecording.data(), &QAction::triggered,
-            this, &WriteToFile::toggleRecordingFile);
+            this, &WriteToFile::createRecordingInstance);
     addPluginAction(m_pActionClipRecording);
-
-
 
     //Init timers
     if(!m_pRecordTimer) {
@@ -485,8 +483,17 @@ void WriteToFile::createRecordingInstance(bool bChecked)
 
     auto fileParams = m_qFileOut.openMode();
 
-    m_qFileOut.copy("testfilepleaseignore.fif");
+    m_qFileOut.close();
 
+    qDebug() << "File Name: " << m_qFileOut.fileName();
+
+//    bool success = m_qFileOut.copy("testfilepleaseignore.fif");
+
+    bool success = QFile::copy(m_qFileOut.fileName(), QDir::currentPath() + "/testfile_raw.fif");
+
+    qDebug() << "QDir::currentPath():" << QDir::currentPath();
+
+    //QDebug() << "Did it work? " << (success ? "Yes." : "No.");
 
     m_qFileOut.open(fileParams);
 }
