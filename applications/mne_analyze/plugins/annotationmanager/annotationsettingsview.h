@@ -216,14 +216,6 @@ protected slots:
 
     //=========================================================================================================
     /**
-     * Transmits the checkbox state ofthe 'Show events from all groups' checkbox
-     *
-     * @param[in] iCheckBoxState    0 for unchecked, 2 for checked.
-     */
-    void onShowAllChecked(int iCheckBoxState);
-
-    //=========================================================================================================
-    /**
      * Sets the current selected annotation in the gui and passes it to the model
      */
     void onCurrentSelectedChanged();
@@ -248,22 +240,6 @@ private slots:
      * Triggers the save file dialog. Calls the save file function in the Annotation Model
      */
     void onSaveButton();
-
-    //=========================================================================================================
-    /**
-     * Update selected annotation with new sample value iValue
-     *
-     * @param[in] iValue   new sample value for selected annotation.
-     */
-    void realTimeDataSample(int iValue);
-
-    //=========================================================================================================
-    /**
-     * Update selected annotation with new time value dValue
-     *
-     * @param[in] dValue   new time value for selected annotation.
-     */
-    void realTimeDataTime(double dValue);
 
     //=========================================================================================================
     /**

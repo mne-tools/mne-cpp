@@ -239,14 +239,6 @@ public:
 
     //=========================================================================================================
     /**
-     * Sets current filter setting sto only display selected annotation type
-     *
-     * @param[in] eventType    Type of annotation that is to be displayed when filterd.
-     */
-    void setEventFilterType(const QString eventType);
-
-    //=========================================================================================================
-    /**
      * Used to pass first and last sample parameters to the model
      *
      * @param[in] firstSample  sample number of the first sample in the currently loaded fiff file.
@@ -383,24 +375,6 @@ public:
 
     //=========================================================================================================
     /**
-     * Updates the value of a sample for real time annotation scrolling
-     *
-     * @param[in] iIndex   Index of sample to be changed.
-     * @param[in] iSample  Sample value to be changed to.
-     */
-    void updateFilteredSample(int iIndex,
-                              int iSample);
-
-    //=========================================================================================================
-    /**
-     * Updates the value of the currently selected sample for real time annotation scrolling
-     *
-     * @param[in] iSample  Sample value to be changed to.
-     */
-    void updateFilteredSample(int iSample);
-
-    //=========================================================================================================
-    /**
      * Clears list of currently sleected rows
      */
     void clearSelected();
@@ -438,22 +412,6 @@ public:
 
     //=========================================================================================================
     /**
-     * Switches to a group based on the index (map key), triggers view to update
-     *
-     * @param[in] iGroupIndex   index(map key) of desired group.
-     */
-    void switchGroup(int iGroupIndex);
-
-    //=========================================================================================================
-    /**
-     * Removes a group based on the index (map key), triggers view to update
-     *
-     * @param[in] iGroupIndex   index(map key) of the group to be deleted.
-     */
-    void removeGroup(int iGroupIndex);
-
-    //=========================================================================================================
-    /**
      * Returns how many groups are stored in m_mAnnotationHub
      *
      * @return the amount of groups stored.
@@ -472,34 +430,6 @@ public:
 
     //=========================================================================================================
     /**
-     * Retruns whether current slected group is made by the user
-     *
-     * @return whether current group is use made.
-     */
-    bool isUserMade();
-
-    //=========================================================================================================
-    /**
-     * Displays all events from all groups and triggers view updates
-     *
-     * @param[in] bSet      whether the checkbox is checked or not.
-     */
-    void showAll(bool bSet);
-
-    //=========================================================================================================
-    /**
-     * Loads events from all groups
-     */
-    void loadAllGroups();
-
-    //=========================================================================================================
-    /**
-     * Clears events and triggers view to update
-     */
-    void hideAll();
-
-    //=========================================================================================================
-    /**
      * Returns counting index that gives each group a unique number
      *
      * @return m_iIndexCount.
@@ -515,16 +445,6 @@ public:
      * @return index of group with name sGroupName.
      */
     int getIndexFromName(const QString& sGroupName);
-
-    //=========================================================================================================
-    /**
-     * Returns the group of the event pointed to by parameter iIndex
-     *
-     * @param[in] iIndex    Index for which we want to get the group.
-     *
-     * @return the group event at iIndex belongs to.
-     */
-    int currentGroup(int iIndex);
 
     //=========================================================================================================
     /**
@@ -570,12 +490,6 @@ public:
                       const QString& sGroupName);
 
     void setSelectedGroupName(const QString &currentText);
-
-    //=========================================================================================================
-    /**
-     * Saves event group to m_mAnnotationHub
-     */
-    void saveGroup();
 
     //=========================================================================================================
     /**
@@ -638,14 +552,6 @@ public:
 
     //=========================================================================================================
     /**
-     * Shift saved smaples based on offset iFirstSampleOffset
-     *
-     * @param[in] iFirstSampleOffset   offset due to sample index of first sample.
-     */
-    void applyOffset(int iFirstSampleOffset);
-
-    //=========================================================================================================
-    /**
      * Returns FiffRawViewModel associated with this annotation model
      *
      * @return pointer to cooresponding FiffRawViewModel.
@@ -686,12 +592,6 @@ private:
 
     //=========================================================================================================
     /**
-     * Clears selected group of events
-     */
-    void resetSelection();
-
-    //=========================================================================================================
-    /**
      * Sets up default paramaters ofr new model
      */
     void initModel();
@@ -716,21 +616,9 @@ private:
     int                                 m_iType;                        /** <Type of the currently selected event group */
     int                                 m_iIndexCount;
 
-    QVector<int>                        m_dataSamples;                  /**< Vector of samples of events of the currently loded event group. */
-    QVector<int>                        m_dataTypes;                    /**< Types of the events of the currently loaded event group. */
-    QVector<int>                        m_dataIsUserEvent;              /**< Whether the events in the currently loaded event group are user-made. */
-    QVector<int>                        m_dataGroup;
-
-    QVector<int>                        m_dataSamplesFiltered;         /**< Vector of samples of events to be displayed of the currently loded event group. */
-    QVector<int>                        m_dataTypesFiltered;           /**< Types of the events to be displayed of the currently loaded event group. */
-    QVector<int>                        m_dataIsUserEventFiltered;     /**< Whether the events to be displayed in the currently loaded event group are user-made. */
-    QVector<int>                        m_dataGroupFiltered;
-
-    bool                                m_bIsUserMade;                  /**< Whether the current loaded group is user made. */
-
-    int                                 m_iSamplePos;                   /**< Sample of event to be added. */
-    int                                 m_iFirstSample;                 /**< First sample of file. */
-    int                                 m_iLastSample;                  /**< Last sample of file. */
+    int                                 m_iSamplePos;                   /**< Sample of event to be added */
+    int                                 m_iFirstSample;                 /**< First sample of file */
+    int                                 m_iLastSample;                  /**< Last sample of file */
 
     int                                 m_iSelectedCheckState;          /**< State of checkbox of whether to show only selected events. */
     int                                 m_iSelectedAnn;                 /**< Index of selected events. */
