@@ -210,7 +210,7 @@ void ChannelSelectionView::setCurrentlyMappedFiffChannels(const QStringList &map
     m_pUi->m_listWidget_selectionGroups->clear();
 
     //Create group 'All' manually (because this group depends on the loaded channels from the fiff data file, not on the loaded selection file)
-    m_selectionGroupsMap.insert("All", m_currentlyLoadedFiffChannels);
+    m_selectionGroupsMap.replace("All", m_currentlyLoadedFiffChannels);
 
     //Add selection groups to list widget
     QMapIterator<QString, QStringList> selectionIndex(m_selectionGroupsMap);
@@ -569,6 +569,7 @@ bool ChannelSelectionView::loadLayout(QString path)
 
 bool ChannelSelectionView::loadSelectionGroups(QString path)
 {
+
     //Clear the visible channel list
     m_pUi->m_listWidget_visibleChannels->clear();
 
@@ -589,7 +590,7 @@ bool ChannelSelectionView::loadSelectionGroups(QString path)
     }
 
     //Create group 'All' and 'All EEG' manually (bcause this group depends on the loaded channels from the Info data file, not on the loaded selection file)
-    m_selectionGroupsMap.insert("All", m_currentlyLoadedFiffChannels);
+    m_selectionGroupsMap.replace("All", m_currentlyLoadedFiffChannels);
 
     QStringList names;
     for(int i = 0; i < m_pChannelInfoModel->rowCount(); i++) {
@@ -604,7 +605,7 @@ bool ChannelSelectionView::loadSelectionGroups(QString path)
     }
 
     //Add 'Add EEG' group to selection groups
-    m_selectionGroupsMap.insert("All EEG", names);
+    m_selectionGroupsMap.replace("All EEG", names);
 
     //Add selection groups to list widget
     QMapIterator<QString, QStringList> selectionIndex(m_selectionGroupsMap);
