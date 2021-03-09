@@ -86,7 +86,7 @@ WriteToFile::WriteToFile()
     m_pActionClipRecording = new QAction(QIcon(":/images/record.png"), tr("Clip Recording"),this);
     m_pActionClipRecording->setStatusTip(tr("Clip Recording"));
     connect(m_pActionClipRecording.data(), &QAction::triggered,
-            this, &WriteToFile::createRecordingInstance);
+            this, &WriteToFile::clipRecording);
     addPluginAction(m_pActionClipRecording);
 
     //Init timers
@@ -474,7 +474,7 @@ void WriteToFile::changeRecordingButton()
 
 //=============================================================================================================
 
-void WriteToFile::createRecordingInstance(bool bChecked)
+void WriteToFile::clipRecording(bool bChecked)
 {
     Q_UNUSED(bChecked);
 
@@ -485,17 +485,30 @@ void WriteToFile::createRecordingInstance(bool bChecked)
 
     m_qFileOut.close();
 
-    qDebug() << "File Name: " << m_qFileOut.fileName();
-
-//    bool success = m_qFileOut.copy("testfilepleaseignore.fif");
-
-    bool success = QFile::copy(m_qFileOut.fileName(), QDir::currentPath() + "/testfile_raw.fif");
-
-    qDebug() << "QDir::currentPath():" << QDir::currentPath();
-
-    //QDebug() << "Did it work? " << (success ? "Yes." : "No.");
+    QString newPath = QDir::currentPath() + "/testfile_raw.fif";
+    copyRecordingFile(newPath);
 
     m_qFileOut.open(fileParams);
+}
+
+//=============================================================================================================
+
+bool WriteToFile::copyRecordingFile(const QString& newFilePath)
+{
+    bool copySuccessful;
+
+    copySuccessful = QFile::copy(m_qFileOut.fileName(), newFilePath);
+
+    QFile newFile(newFilePath);
+    copySuccessful = newFile.open(QIODevice::ReadWrite);
+
+    FIFFLIB::FiffStream stream(&newFile);
+    stream.skipRawData(newFile.bytesAvailable());
+    stream.finish_writing_raw();
+
+    newFile.close();
+
+    return copySuccessful;
 }
 
 //=============================================================================================================

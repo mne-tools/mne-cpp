@@ -190,7 +190,10 @@ private:
     void changeRecordingButton();
 
     //=========================================================================================================
-    void createRecordingInstance(bool bChecked);
+    void clipRecording(bool bChecked);
+
+    //=========================================================================================================
+    bool copyRecordingFile(const QString& newFilePath);
 
     bool                                    m_bWriteToFile;                 /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
     bool                                    m_bUseRecordTimer;              /**< Flag whether to use data recording timer.*/
