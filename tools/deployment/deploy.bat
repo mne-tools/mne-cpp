@@ -1,9 +1,11 @@
-:;# This is a cross-platform script
-:;# Save this file with unix eol style
-:;# See each operating system's "section" 
-
-:;# Call this script with one argument which will be the type
-:;# static or dynamic
+:;# This script performs generates and copies the necesary library dependencies for running qt-projects both for 
+:;# dynamic and for staic builds. 
+:;#
+:;# This file is part of the MNE-CPP project. For more information visit: https://mne-cpp.github.io/
+:;#
+:;# This script is based on an open-source cross-platform script template.
+:;# For more information you can visit: https://github.com/juangpc/multiplatform_bash_cmd
+:;# 
 
 :<<BATCH
     :;@echo off
