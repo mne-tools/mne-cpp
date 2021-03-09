@@ -81,9 +81,9 @@ ScaleControl::ScaleControl(const char* label, QWidget* parent, double min, doubl
 
 //=============================================================================================================
 
-void ScaleControl::initLabel(const char* label)
+void ScaleControl::initLabel(const char* charTextLabel)
 {
-    m_pUi->label->setText(label);
+    m_pUi->label->setText(charTextLabel);
 }
 
 //=============================================================================================================
@@ -122,9 +122,9 @@ Ui::ScaleControlWidget* ScaleControl::getUI()
 
 //=============================================================================================================
 
-void ScaleControl::setValue(double value)
+void ScaleControl::setValue(double dScale)
 {
-    m_pUi->spinBox->setValue(value);
+    m_pUi->spinBox->setValue(dScale);
 }
 
 //=============================================================================================================
@@ -188,25 +188,25 @@ void ScaleControl::setDecimals(int d)
 
 //=============================================================================================================
 
-void ScaleControl::spinBoxChanged(double value)
+void ScaleControl::spinBoxChanged(double dScale)
 {
     m_bManagingSpinBoxChange = true;
     if(!m_bManagingSliderChange)
     {
-        m_pUi->slider->setValue(mapSpinBoxToSlider(value));
+        m_pUi->slider->setValue(mapSpinBoxToSlider(dScale));
     }
     m_bManagingSpinBoxChange = false;
-    emit valueChanged(value);
+    emit valueChanged(dScale);
 }
 
 //=============================================================================================================
 
-void ScaleControl::sliderChanged(int value)
+void ScaleControl::sliderChanged(int dScale)
 {
     m_bManagingSliderChange = true;
     if(!m_bManagingSpinBoxChange)
     {
-        m_pUi->spinBox->setValue(mapSliderToSpinBox(value));
+        m_pUi->spinBox->setValue(mapSliderToSpinBox(dScale));
     }
     m_bManagingSliderChange = false;
 }
@@ -228,9 +228,9 @@ void ScaleControl::updateNLMapConstants()
 
 //=============================================================================================================
 
-int ScaleControl::mapSpinBoxToSlider(double value)
+int ScaleControl::mapSpinBoxToSlider(double dScale)
 {
-    float map = m_fMapKconstant * (atanf(weightedSensitivity(m_fSensitivity) * (static_cast<float>(value) - m_fMaxSensitivityPoint)) - m_fMapYconstant);
+    float map = m_fMapKconstant * (atanf(weightedSensitivity(m_fSensitivity) * (static_cast<float>(dScale) - m_fMaxSensitivityPoint)) - m_fMapYconstant);
     int out;
     if(m_bSliderInverted)
     {
@@ -243,9 +243,9 @@ int ScaleControl::mapSpinBoxToSlider(double value)
 
 //=============================================================================================================
 
-double ScaleControl::mapSliderToSpinBox(int value)
+double ScaleControl::mapSliderToSpinBox(int dScale)
 {
-    int valueCorrected = m_bSliderInverted? m_pUi->slider->maximum() - value : value;
+    int valueCorrected = m_bSliderInverted? m_pUi->slider->maximum() - dScale : dScale;
     float map = (1/weightedSensitivity(m_fSensitivity)) * tanf((static_cast<float>(valueCorrected) / m_fMapKconstant) + m_fMapYconstant) + m_fMaxSensitivityPoint;
     return static_cast<double>(map);
 }
