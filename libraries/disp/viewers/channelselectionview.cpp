@@ -210,7 +210,7 @@ void ChannelSelectionView::setCurrentlyMappedFiffChannels(const QStringList &map
     m_pUi->m_listWidget_selectionGroups->clear();
 
     //Create group 'All' manually (because this group depends on the loaded channels from the fiff data file, not on the loaded selection file)
-    m_selectionGroupsMap.replace("All", m_currentlyLoadedFiffChannels);
+    m_selectionGroupsMap["All"] = m_currentlyLoadedFiffChannels;
 
     //Add selection groups to list widget
     QMapIterator<QString, QStringList> selectionIndex(m_selectionGroupsMap);
@@ -448,13 +448,19 @@ void ChannelSelectionView::loadSettings()
 
     QPoint pos = settings.value(m_sSettingsPath + QString("/ChannelSelectionView/channelSelectionViewPos"), QPoint(100,100)).toPoint();
 
-    QList<QScreen*> screensList = QGuiApplication::screens();
-    if(screensList.isEmpty())
-    {
+    QRect screenRect = QApplication::desktop()->screenGeometry();
+    if(!screenRect.contains(pos) && QGuiApplication::screens().size() == 1) {
         move(QPoint(100,100));
     } else {
         move(pos);
     }
+//    QList<QScreen*> screensList = QGuiApplication::screens();
+//    if(screensList.isEmpty())
+//    {
+//        move(QPoint(100,100));
+//    } else {
+//        move(pos);
+//    }
 }
 
 //=============================================================================================================
@@ -590,7 +596,7 @@ bool ChannelSelectionView::loadSelectionGroups(QString path)
     }
 
     //Create group 'All' and 'All EEG' manually (bcause this group depends on the loaded channels from the Info data file, not on the loaded selection file)
-    m_selectionGroupsMap.replace("All", m_currentlyLoadedFiffChannels);
+    m_selectionGroupsMap["All"] =  m_currentlyLoadedFiffChannels;
 
     QStringList names;
     for(int i = 0; i < m_pChannelInfoModel->rowCount(); i++) {
@@ -605,7 +611,7 @@ bool ChannelSelectionView::loadSelectionGroups(QString path)
     }
 
     //Add 'Add EEG' group to selection groups
-    m_selectionGroupsMap.replace("All EEG", names);
+    m_selectionGroupsMap["All EEG"] = names;
 
     //Add selection groups to list widget
     QMapIterator<QString, QStringList> selectionIndex(m_selectionGroupsMap);
@@ -676,7 +682,7 @@ void ChannelSelectionView::updateSelectionGroupsList(QListWidgetItem* current, Q
 
     //update visible channel list widget    
     m_pUi->m_listWidget_visibleChannels->clear();
-    m_pUi->m_listWidget_visibleChannels->addItems(m_selectionGroupsMap.value(current->text()));
+    m_pUi->m_listWidget_visibleChannels->addItems(m_selectionGroupsMap[current->text()]);
 
     //update scene items based o nthe new selection group
     updateSceneItems();
@@ -763,7 +769,7 @@ void ChannelSelectionView::onBtnAddToSelectionGroups()
     for(int i = 0; i < m_pUi->m_listWidget_userDefined->count(); i++)
         temp<<m_pUi->m_listWidget_userDefined->item(i)->text();
 
-    m_selectionGroupsMap.insert(m_pUi->m_lineEdit_selectionGroupName->text(), temp);
+    m_selectionGroupsMap.insertMulti(m_pUi->m_lineEdit_selectionGroupName->text(), temp);
     m_pUi->m_listWidget_selectionGroups->insertItem(m_pUi->m_listWidget_selectionGroups->count(), m_pUi->m_lineEdit_selectionGroupName->text());
 }
 
