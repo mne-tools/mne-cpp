@@ -150,8 +150,6 @@ void EventView::initGUIFunctionality()
 //            this, &EventView::onShowAllChecked, Qt::UniqueConnection);
 
     //Annotation types combo box
-    connect(m_pUi->m_comboBox_filterTypes, &QComboBox::currentTextChanged,
-            m_pAnnModel.data(), &ANSHAREDLIB::EventModel::setEventFilterType, Qt::UniqueConnection);
     connect(m_pAnnModel.data(), &ANSHAREDLIB::EventModel::updateEventTypes,
             this, &EventView::updateComboBox, Qt::UniqueConnection);
 
@@ -309,8 +307,6 @@ void EventView::disconnectFromModel()
             this, &EventView::onActiveEventsChecked);
     disconnect(m_pUi->m_checkBox_showSelectedEventsOnly,&QCheckBox::stateChanged,
             this, &EventView::onSelectedEventsChecked);
-    disconnect(m_pUi->m_comboBox_filterTypes, &QComboBox::currentTextChanged,
-            m_pAnnModel.data(), &ANSHAREDLIB::EventModel::setEventFilterType);
     disconnect(m_pAnnModel.data(), &ANSHAREDLIB::EventModel::updateEventTypes,
             this, &EventView::updateComboBox);
     disconnect(m_pUi->m_pushButton_addEventType, &QPushButton::clicked,
@@ -387,26 +383,6 @@ void EventView::keyReleaseEvent(QKeyEvent* event)
 
 //=============================================================================================================
 
-void EventView::realTimeDataSample(int iValue)
-{
-    m_pAnnModel->setSelectedAnn(m_pUi->m_tableView_eventTableView->selectionModel()->currentIndex().row());
-    m_pAnnModel->updateFilteredSample(iValue);
-    this->onDataChanged();
-}
-
-//=============================================================================================================
-
-void EventView::realTimeDataTime(double dValue)
-{
-    m_pAnnModel->setSelectedAnn(m_pUi->m_tableView_eventTableView->selectionModel()->currentIndex().row());
-    dValue *= m_pAnnModel->getFreq();
-    int t_iSample = static_cast<int>(dValue);
-    m_pAnnModel->updateFilteredSample(t_iSample);
-    this->onDataChanged();
-}
-
-//=============================================================================================================
-
 bool EventView::newUserGroup(const QString& sName,
                                           int iType,
                                           bool bDefaultColor)
@@ -458,24 +434,6 @@ void EventView::groupChanged()
     m_pUi->m_tableView_eventTableView->reset();
 
     this->onDataChanged();
-}
-
-//=============================================================================================================
-
-void EventView::onShowAllChecked(int iCheckBoxState)
-{
-    if (iCheckBoxState){
-        m_pUi->m_listWidget_groupListWidget->clearSelection();
-        m_pAnnModel->showAll(iCheckBoxState);
-        m_pUi->m_tableView_eventTableView->reset();
-        this->onDataChanged();
-    } else {
-        m_pAnnModel->hideAll();
-        if(m_pUi->m_listWidget_groupListWidget->selectedItems().isEmpty()){
-            m_pUi->m_listWidget_groupListWidget->setCurrentRow(0);
-        }
-        this->onDataChanged();
-    }
 }
 
 //=============================================================================================================
