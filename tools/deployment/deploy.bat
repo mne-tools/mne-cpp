@@ -15,9 +15,10 @@
     SET PACK_OPTION=%2
     
     SETX VCINSTALLDIR "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\VC\"
-    :;IF "%LINK_OPTION%"=="" (
-    :;    SET LINK_OPTION=dynamic
-    :;)
+
+    IF "%LINK_OPTION%"=="" (
+        SET LINK_OPTION=dynamic
+    )
 
     IF "%LINK_OPTION%"=="dynamic" (
         
@@ -72,6 +73,10 @@ if [ "$(uname)" == "Darwin" ]; then
         pwd -P
     )"
     BASE_PATH=${SCRIPT_PATH}/../..
+
+    if [ -z ${LINK_OPTION} ]; then
+        LINK_OPTION=dynamic
+    fi
 
     if [[ ${LINK_OPTION} == dynamic ]]; then
 
@@ -161,9 +166,6 @@ if [ "$(uname)" == "Darwin" ]; then
             tar cfvz mne-cpp-macos-static-x86_64.tar.gz bin/.
         fi
 
-    elif [ -z ${LINK_OPTION} ]; then
-        echo "Input argument link_option is not set."
-        echo "Use: static or dynamic"
     else 
         echo "Input argument link_option is invalid."
         echo "Input argument link_option is set to ${LINK_OPTION}."
@@ -185,6 +187,10 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
         pwd -P
     )"
     BASE_PATH=${SCRIPT_PATH}/../..
+
+    if [ -z ${LINK_OPTION} ]; then
+        LINK_OPTION=dynamic
+    fi
 
     if [[ ${LINK_OPTION} == dynamic ]]; then
 
@@ -289,9 +295,6 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
 
         rm -fr mne-cpp
 
-    elif [ -z ${LINK_OPTION} ]; then
-        echo "Input argument link_option is not set."
-        echo "Use: static or dynamic"
     else 
         echo "Input argument link_option is invalid."
         echo "Input argument link_option is set to ${LINK_OPTION}."
