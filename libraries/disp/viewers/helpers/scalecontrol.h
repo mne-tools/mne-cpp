@@ -145,15 +145,15 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief setDecimals
+     * Set the number of decimals to show in the spinbox of the control.
      * @param d
      */
     void setDecimals(int d);
 
     //=========================================================================================================
     /**
-     * @brief invertSlider
-     * @param inverted
+     * Invert the effect of sliding the control slider to the right. Slider right decreases the control value.
+     * @param [in] inverted [True = Invert the slider effect].
      */
     void invertSlider(bool inverted);
 
@@ -161,90 +161,98 @@ public slots:
 
     //=========================================================================================================
     /**
-     * @brief setValue
-     * @param value
+     * Set the value of the control.
+     * @param [in] dScale value to set the control to.
      */
-    void setValue(double value);
+    void setValue(double dScale);
 
 signals:
     //=========================================================================================================
     /**
-     * @brief valueChanged
-     * @param value
+     * Signal emited when the value of the control changes.
+     * @param dScale
      */
-    void valueChanged(double value);
+    void valueChanged(double dScale);
 
 private:
 
     //=========================================================================================================
     /**
-     * @brief initLabel
+     * Set the text label of the Control.
+     * @param [in] label New label text.
      */
-    void initLabel(const char*);
+    void initLabel(const char* charTextLabel);
 
     //=========================================================================================================
     /**
-     * @brief initSpinBox
+     * Initialize the spinbox settings.
      */
     void initSpinBox();
 
     //=========================================================================================================
     /**
-     * @brief initSlider
+     * Initialize the slider settings
      */
     void initSlider();
 
     //=========================================================================================================
     /**
-     * @brief spinBoxChanged
-     * @param value
+     * Callback executed whenever the value of the spinbox has changed.
+     * @param dScale
      */
-    void spinBoxChanged(double value);
+    void spinBoxChanged(double dScale);
 
     //=========================================================================================================
     /**
-     * @brief sliderChanged
-     * @param value
+     * Callback executed whenever the position of the slider has changed.
+     * @param dScale
      */
-    void sliderChanged(int value);
+    void sliderChanged(int dScale);
 
     //=========================================================================================================
     /**
-     * @brief setSliderRange
-     * @param min
-     * @param max
+     * Member method to set the range of the slider. Normally this is set to [1,1000] and there should be no reason
+     * to change it since the non-linear mapping function between the slider and the spinbox should take care of
+     * addapting the actual value of the control (the spinbox) with the values of the slider. Not even if there is
+     * a need to invert the behavior of the slider since the invertSlider should take care of that.
+     * @param [in] iMin Minimum value for the slider.
+     * @param [in] iMax Maximum value for the slider.
      */
     void setSliderRange(int min, int max);
 
     //=========================================================================================================
     /**
-     * @brief mapSpinBoxToSlider
-     * @param in
-     * @return
+     * Member function to map the value of the spinbox to a position in the slider bar consistent with the maximum
+     * and minimum levels of the control.
+     * @param [in] dIn Value of the spinbox or the control.
+     * @return [out] int value to set the slider to, consistent with the range of the slider.
      */
-    inline int mapSpinBoxToSlider(double in);
+    inline int mapSpinBoxToSlider(double dIn);
 
     //=========================================================================================================
     /**
-     * @brief mapSliderToSpinBox
-     * @param in
-     * @return
+     * Member function to map the value of a slider poisition with a value for the control or the spinbox. This
+     * functions adapts the ranges of the control/spinbox to the ranges of the slider for consistency between ranges.
+     * @param [in] iIn Integer value representing the position fo the slider.
+     * @return [out] dOut Double value to set the spinbox to.
      */
-    inline double mapSliderToSpinBox(int in);
+    inline double mapSliderToSpinBox(int iIn);
 
     //=========================================================================================================
     /**
-     * @brief updateNLMapConstants
+     * Memberfunction to update the constant values of the mapping functions between spinbox and the slider. These constant
+     * only have be updated whenever the ranges or the sensitivity values of the non-linear mapping functions between
+     * slider and spinbox are modified.
      */
     void updateNLMapConstants();
 
     //=========================================================================================================
     /**
-     * @brief weightedSensitivity
-     * @param s
-     * @return
+     * Memberfunction to addapt the sensitivity value to different range levels.
+     * @param [in] fSensitivity Sensitivity value
+     * @return [out] weighted sensitivity value
      */
-    inline float weightedSensitivity(float s);
+    inline float weightedSensitivity(float fSensitivity);
 
     Ui::ScaleControlWidget* m_pUi;                          /**< Pointer to the user interface object. */
     bool                    m_bManagingSpinBoxChange;       /**< Bool member guarding the state of the spinbox. */
@@ -254,7 +262,7 @@ private:
     float                   m_fMaxSensitivityPoint;         /**< Max sensitivity point of the non-linear mapping fcn for the slider. */
     float                   m_fMapYconstant;                /**< Y constant in the non-linear mapping curve for the slider. */
     float                   m_fMapKconstant;                /**< K constant in the non-linear mapping curve for the slider. */
-    bool                   m_bSliderInverted;              /**< State variable to store the inverted or not state of the slider. */
+    bool                    m_bSliderInverted;              /**< State variable to store the inverted or not state of the slider. */
 };
 
 
