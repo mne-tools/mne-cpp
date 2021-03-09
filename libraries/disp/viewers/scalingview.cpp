@@ -475,12 +475,12 @@ void ScalingView::setMagGradLink(int l)
     {
         m_qMapScaleControls[MAG_TO_GRAD_LINK]->setValue(100 * m_qMapScaleControls[FIFF_UNIT_T]->value() / m_qMapScaleControls[FIFF_UNIT_T_M]->value());
     }
-    updateGUI();
+    showLinkControl();
 }
 
 //=============================================================================================================
 
-void ScalingView::updateGUI()
+void ScalingView::showLinkControl()
 {
     if(m_qMapScaleControls.contains(MAG_TO_GRAD_LINK))
     {

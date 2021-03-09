@@ -192,8 +192,11 @@ private:
     void processScalingChange();
 
     //=============================================================================================================
+    /**
+     * Renders visible the control object that sets the link between Magnetometers and Gradiometers used in the controlView.
+     */
 
-    void updateGUI();
+    void showLinkControl();
 
     //=============================================================================================================
     /**
