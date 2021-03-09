@@ -396,7 +396,7 @@ private:
     QSharedPointer<ChannelInfoModel>    m_pChannelInfoModel;                /**< Pointer to the channel info model. */
 
     QMap<QString,QPointF>               m_layoutMap;                        /**< QMap with the loaded layout. each channel name correspond to a QPointF variable. */
-    QMultiMap<QString,QStringList>      m_selectionGroupsMap;               /**< QMap with the loaded selection groups. Each group name holds a string list with the corresponding channels of the group.*/
+    QMap<QString,QStringList>           m_selectionGroupsMap;               /**< QMap with the loaded selection groups. Each group name holds a string list with the corresponding channels of the group.*/
 
     SelectionScene*                     m_pSelectionScene;                  /**< Pointer to the selection scene class. */
 
