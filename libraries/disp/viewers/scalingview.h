@@ -172,6 +172,7 @@ public:
     //=========================================================================================================
     /**
      * Link the Magnetometers to the Gradiometers scale.
+     *
      * @param [in] l Set the link between MAGs and GRADs active or inactive.
      */
     void setMagGradLink(int l);
@@ -208,6 +209,7 @@ private:
     //=========================================================================================================
     /**
      * Callback to process a change in the gradiometers scale spinbox.
+     *
      * @param [in] value
      */
     void updateGRADScale(double value);
@@ -215,6 +217,7 @@ private:
     //=========================================================================================================
     /**
      * Link Magnetometers and Gradiometers through this ratio. Just for viewing purposes.
+     *
      * @param [in] value
      */
     void updateMAGtoGRADlink(double value);
@@ -222,6 +225,7 @@ private:
     //=========================================================================================================
     /**
      * Callback to process a change in the EEG scale spinbox.
+     *
      * @param [in] value
      */
     void updateEEGScale(double value);
@@ -229,6 +233,7 @@ private:
     //=========================================================================================================
     /**
      * Callback to process a change in the EOG scale spinbox.
+     *
      * @param [in] value
      */
     void updateEOGScale(double value);
@@ -236,6 +241,7 @@ private:
     //=========================================================================================================
     /**
      * Callback to process a change in the EMG scale spinbox.
+     *
      * @param [in] value
      */
     void updateEMGScale(double value);
@@ -250,6 +256,7 @@ private:
     //=========================================================================================================
     /**
      * Callback to process a change in the MISC scale spinbox.
+     *
      * @param [in] value
      */
     void updateMISCScale(double value);
@@ -257,6 +264,7 @@ private:
     //=========================================================================================================
     /**
      * Callback to process a change in the STIM scale spinbox.
+     *
      * @param [in] value
      */
     void updateSTIMScale(double value);
@@ -310,6 +318,7 @@ private:
     //=========================================================================================================
     /**
      * Slot for processing the use of shortcut keypresses.
+     *
      * @param event
      */
     void keyReleaseEvent(QKeyEvent* event) override;
@@ -317,6 +326,7 @@ private:
     //=========================================================================================================
     /**
      * Slot for processing the use of shortcut releases.
+     *
      * @param event
      */
     void keyPressEvent(QKeyEvent* event) override;
