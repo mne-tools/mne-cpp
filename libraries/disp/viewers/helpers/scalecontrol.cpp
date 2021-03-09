@@ -1,14 +1,7 @@
 #include "scalecontrol.h"
 #include "ui_scalecontrol.h"
 
-//#include <QDebug>
-//#include <QLabel>
-//#include <QDoubleSpinBox>
-//#include <QSlider>
-//#include <QGridLayout>
-
 using namespace DISPLIB;
-
 
 const static float  m_dDefaultMin(0.0f);
 const static float  m_dDefaultMax(1.0f);
