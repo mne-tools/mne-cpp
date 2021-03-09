@@ -933,28 +933,29 @@ QSharedPointer<FiffRawViewModel> EventModel::getFiffModel()
 
 void EventModel::initModel()
 {
-    m_eventTypeList<<"0";
+//    m_eventTypeList<<"0";
 
-    m_eventTypeColor[0] = QColor(Qt::black);
-    m_eventTypeColor[1] = QColor(Qt::black);
-    m_eventTypeColor[2] = QColor(Qt::magenta);
-    m_eventTypeColor[3] = QColor(Qt::green);
-    m_eventTypeColor[4] = QColor(Qt::red);
-    m_eventTypeColor[5] = QColor(Qt::cyan);
-    m_eventTypeColor[32] = QColor(Qt::yellow);
-    m_eventTypeColor[998] = QColor(Qt::darkBlue);
-    m_eventTypeColor[999] = QColor(Qt::darkCyan);
+//    m_eventTypeColor[0] = QColor(Qt::black);
+//    m_eventTypeColor[1] = QColor(Qt::black);
+//    m_eventTypeColor[2] = QColor(Qt::magenta);
+//    m_eventTypeColor[3] = QColor(Qt::green);
+//    m_eventTypeColor[4] = QColor(Qt::red);
+//    m_eventTypeColor[5] = QColor(Qt::cyan);
+//    m_eventTypeColor[32] = QColor(Qt::yellow);
+//    m_eventTypeColor[998] = QColor(Qt::darkBlue);
+//    m_eventTypeColor[999] = QColor(Qt::darkCyan);
 
-    m_eventGroupColor[0] = QColor(Qt::black);
-    m_eventGroupColor[1] = QColor(Qt::black);
-    m_eventGroupColor[2] = QColor(Qt::magenta);
-    m_eventGroupColor[3] = QColor(Qt::green);
-    m_eventGroupColor[4] = QColor(Qt::red);
-    m_eventGroupColor[5] = QColor(Qt::cyan);
-    m_eventGroupColor[32] = QColor(Qt::yellow);
-    m_eventGroupColor[998] = QColor(Qt::darkBlue);
-    m_eventGroupColor[999] = QColor(Qt::darkCyan);
+//    m_eventGroupColor[0] = QColor(Qt::black);
+//    m_eventGroupColor[1] = QColor(Qt::black);
+//    m_eventGroupColor[2] = QColor(Qt::magenta);
+//    m_eventGroupColor[3] = QColor(Qt::green);
+//    m_eventGroupColor[4] = QColor(Qt::red);
+//    m_eventGroupColor[5] = QColor(Qt::cyan);
+//    m_eventGroupColor[32] = QColor(Qt::yellow);
+//    m_eventGroupColor[998] = QColor(Qt::darkBlue);
+//    m_eventGroupColor[999] = QColor(Qt::darkCyan);
 
+    m_EventManager.initSharedMemory();
     m_bIsInit = true;
 }
 
