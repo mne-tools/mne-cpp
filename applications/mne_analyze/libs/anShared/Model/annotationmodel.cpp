@@ -955,7 +955,7 @@ void EventModel::initModel()
 //    m_eventGroupColor[998] = QColor(Qt::darkBlue);
 //    m_eventGroupColor[999] = QColor(Qt::darkCyan);
 
-    m_EventManager.initSharedMemory();
+    //m_EventManager.initSharedMemory();
     m_bIsInit = true;
 }
 
