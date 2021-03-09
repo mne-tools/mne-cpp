@@ -488,7 +488,8 @@ void WriteToFile::clipRecording(bool bChecked)
     QString newPath = QDir::currentPath() + "/testfile_raw.fif";
     copyRecordingFile(newPath);
 
-    m_qFileOut.open(fileParams);
+    m_qFileOut.open(QIODevice::ReadWrite);
+    m_pOutfid->skipRawData(m_qFileOut.bytesAvailable());
 }
 
 //=============================================================================================================
