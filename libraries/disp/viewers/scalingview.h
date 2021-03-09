@@ -124,7 +124,7 @@ public:
     /**
      * Constructs a ScalingView which is a child of parent.
      *
-     * @param [in] parent        parent of widget
+     * @param [in] parent Parent of widget.
      */
     ScalingView(const QString& sSettingsPath = "",
                 QWidget *parent = 0,
@@ -202,78 +202,78 @@ private:
     //=============================================================================================================
     /**
      * Callback to process a change in the MAGs scale spinbox.
-     * @param [in] value
+     * @param [in] dScale
      */
-    void updateMAGScale(double value);
+    void updateMAGScale(double dScale);
 
     //=========================================================================================================
     /**
      * Callback to process a change in the gradiometers scale spinbox.
      *
-     * @param [in] value
+     * @param [in] dScale
      */
-    void updateGRADScale(double value);
+    void updateGRADScale(double dScale);
 
     //=========================================================================================================
     /**
      * Link Magnetometers and Gradiometers through this ratio. Just for viewing purposes.
      *
-     * @param [in] value
+     * @param [in] dScale
      */
-    void updateMAGtoGRADlink(double value);
+    void updateMAGtoGRADlink(double dScale);
 
     //=========================================================================================================
     /**
      * Callback to process a change in the EEG scale spinbox.
      *
-     * @param [in] value
+     * @param [in] dScale
      */
-    void updateEEGScale(double value);
+    void updateEEGScale(double dScale);
 
     //=========================================================================================================
     /**
      * Callback to process a change in the EOG scale spinbox.
      *
-     * @param [in] value
+     * @param [in] dScale
      */
-    void updateEOGScale(double value);
+    void updateEOGScale(double dScale);
 
     //=========================================================================================================
     /**
      * Callback to process a change in the EMG scale spinbox.
      *
-     * @param [in] value
+     * @param [in] dScale
      */
-    void updateEMGScale(double value);
+    void updateEMGScale(double dScale);
 
     //=========================================================================================================
     /**
      * Callback to process a change in the ECG scale spinbox.
-     * @param [in] value
+     * @param [in] dScale
      */
-    void updateECGScale(double value);
+    void updateECGScale(double dScale);
 
     //=========================================================================================================
     /**
      * Callback to process a change in the MISC scale spinbox.
      *
-     * @param [in] value
+     * @param [in] dScale
      */
-    void updateMISCScale(double value);
+    void updateMISCScale(double dScale);
 
     //=========================================================================================================
     /**
      * Callback to process a change in the STIM scale spinbox.
      *
-     * @param [in] value
+     * @param [in] dScale
      */
-    void updateSTIMScale(double value);
+    void updateSTIMScale(double dScale);
 
     //=========================================================================================================
     /**
      * Update the views GUI based on the set GuiMode (Clinical=0, Research=1).
      *
-     * @param mode     The new mode (Clinical=0, Research=1).
+     * @param [in] mode The new mode (Clinical=0, Research=1).
      */
     void updateGuiMode(GuiMode mode) override;
 
@@ -281,7 +281,7 @@ private:
     /**
      * Update the views GUI based on the set ProcessingMode (RealTime=0, Offline=1).
      *
-     * @param mode     The new mode (RealTime=0, Offline=1).
+     * @param [in] mode The new mode (RealTime=0, Offline=1).
      */
     void updateProcessingMode(ProcessingMode mode) override;
 
@@ -319,7 +319,7 @@ private:
     /**
      * Slot for processing the use of shortcut keypresses.
      *
-     * @param event
+     * @param [in] event An keyboard-release event to be processed.
      */
     void keyReleaseEvent(QKeyEvent* event) override;
 
@@ -327,7 +327,7 @@ private:
     /**
      * Slot for processing the use of shortcut releases.
      *
-     * @param event
+     * @param [in] event An keyboard-press event to be processed.
      */
     void keyPressEvent(QKeyEvent* event) override;
 

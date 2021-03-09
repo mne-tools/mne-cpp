@@ -340,9 +340,9 @@ void ScalingView::processScalingChange()
 
 //=============================================================================================================
 
-void ScalingView::updateMAGScale(double value)
+void ScalingView::updateMAGScale(double dScale)
 {
-    m_qMapChScaling.insert(FIFF_UNIT_T, value * m_fScaleMAG);
+    m_qMapChScaling.insert(FIFF_UNIT_T, dScale * m_fScaleMAG);
     linkMagToGrad();
     processScalingChange();
 }
@@ -373,66 +373,66 @@ void ScalingView::linkGradToMag()
 
 //=============================================================================================================
 
-void ScalingView::updateGRADScale(double value)
+void ScalingView::updateGRADScale(double dScale)
 {
-    m_qMapChScaling.insert(FIFF_UNIT_T_M, value * m_fScaleGRAD * 100.0);//*100 because we have data in fT/cm and we want it in ft/m.
+    m_qMapChScaling.insert(FIFF_UNIT_T_M, dScale * m_fScaleGRAD * 100.0);//*100 because we have data in fT/cm and we want it in ft/m.
     linkGradToMag();
     processScalingChange();
 }
 
 //=============================================================================================================
 
-void ScalingView::updateEEGScale(double value)
+void ScalingView::updateEEGScale(double dScale)
 {
-    m_qMapChScaling.insert(FIFFV_EEG_CH, value * m_fScaleEEG);
+    m_qMapChScaling.insert(FIFFV_EEG_CH, dScale * m_fScaleEEG);
     processScalingChange();
 }
 
 //=============================================================================================================
 
-void ScalingView::updateEOGScale(double value)
+void ScalingView::updateEOGScale(double dScale)
 {
-    m_qMapChScaling.insert(FIFFV_EOG_CH, value * m_fScaleEOG);
+    m_qMapChScaling.insert(FIFFV_EOG_CH, dScale * m_fScaleEOG);
     processScalingChange();
 }
 
 //=============================================================================================================
 
-void ScalingView::updateEMGScale(double value)
+void ScalingView::updateEMGScale(double dScale)
 {
-    m_qMapChScaling.insert(FIFFV_EMG_CH, value * m_fScaleEMG);
+    m_qMapChScaling.insert(FIFFV_EMG_CH, dScale * m_fScaleEMG);
     processScalingChange();
 }
 
 //=============================================================================================================
 
-void ScalingView::updateECGScale(double value)
+void ScalingView::updateECGScale(double dScale)
 {
-    m_qMapChScaling.insert(FIFFV_ECG_CH, value * m_fScaleECG);
+    m_qMapChScaling.insert(FIFFV_ECG_CH, dScale * m_fScaleECG);
     processScalingChange();
 }
 
 //=============================================================================================================
 
-void ScalingView::updateMISCScale(double value)
+void ScalingView::updateMISCScale(double dScale)
 {
-    m_qMapChScaling.insert(FIFFV_MISC_CH, value * m_fScaleMISC);
+    m_qMapChScaling.insert(FIFFV_MISC_CH, dScale * m_fScaleMISC);
     processScalingChange();
 }
 
 //=============================================================================================================
 
-void ScalingView::updateSTIMScale(double value)
+void ScalingView::updateSTIMScale(double scale)
 {
-    m_qMapChScaling.insert(FIFFV_STIM_CH, value * m_fScaleSTIM);
+    m_qMapChScaling.insert(FIFFV_STIM_CH, scale * m_fScaleSTIM);
     processScalingChange();
 }
 
 //=============================================================================================================
 
-void ScalingView::updateMAGtoGRADlink(double value)
+void ScalingView::updateMAGtoGRADlink(double dScale)
 {
-    Q_UNUSED(value)
+    Q_UNUSED(dScale)
 
     linkMagToGrad();
 }
