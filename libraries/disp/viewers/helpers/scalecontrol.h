@@ -254,7 +254,7 @@ private:
     float                   m_fMaxSensitivityPoint;         /**< Max sensitivity point of the non-linear mapping fcn for the slider. */
     float                   m_fMapYconstant;                /**< Y constant in the non-linear mapping curve for the slider. */
     float                   m_fMapKconstant;                /**< K constant in the non-linear mapping curve for the slider. */
-    float                   m_bSliderInverted;              /**< State variable to store the inverted or not state of the slider. */
+    bool                   m_bSliderInverted;              /**< State variable to store the inverted or not state of the slider. */
 };
 
 

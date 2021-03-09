@@ -351,7 +351,6 @@ void ScalingView::updateMAGScale(double value)
 
 void ScalingView::linkMagToGrad()
 {
-    qDebug() << "linkRunning!";
     if(m_bLinkMAGtoGRAD && !m_bManagingLinkMagToGrad)
     {
         m_bManagingLinkMagToGrad = true;
