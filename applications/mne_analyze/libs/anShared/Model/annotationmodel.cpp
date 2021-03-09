@@ -335,41 +335,6 @@ bool EventModel::setData(const QModelIndex &index,
 
 //=============================================================================================================
 
-void EventModel::setEventFilterType(const QString eventType)
-{
-    m_sFilterEventType = eventType;
-
-    //Clear filtered event data
-    m_dataSamplesFiltered.clear();
-    m_dataTypesFiltered.clear();
-    m_dataIsUserEventFiltered.clear();
-    m_dataGroupFiltered.clear();
-
-    //Fill filtered event data depending on the user defined event filter type
-    if(eventType == "All") {
-        m_dataSamplesFiltered = m_dataSamples;
-        m_dataTypesFiltered = m_dataTypes;
-        m_dataIsUserEventFiltered = m_dataIsUserEvent;
-        m_dataGroupFiltered = m_dataGroup;
-    }
-    else {
-        for(int i = 0; i<m_dataSamples.size(); i++) {
-            if(m_dataTypes[i] == eventType.toInt()) {
-                m_dataSamplesFiltered.append(m_dataSamples[i]);
-                m_dataTypesFiltered.append(m_dataTypes[i]);
-                m_dataIsUserEventFiltered.append(m_dataIsUserEvent[i]);
-                m_dataGroupFiltered.append(m_dataGroup[i]);
-            }
-        }
-        m_iLastTypeAdded = eventType.toInt();
-    }
-
-    emit dataChanged(createIndex(0,0), createIndex(m_dataSamplesFiltered.size(), 0));
-    emit headerDataChanged(Qt::Vertical, 0, m_dataSamplesFiltered.size());
-}
-
-//=============================================================================================================
-
 Qt::ItemFlags EventModel::flags(const QModelIndex &index) const
 {
     Q_UNUSED(index);
@@ -585,21 +550,6 @@ void EventModel::setLastType(int iType)
 
 //=============================================================================================================
 
-void EventModel::updateFilteredSample(int iIndex,
-                                           int iSample)
-{
-    m_dataSamplesFiltered[iIndex] = iSample + m_iFirstSample;
-}
-
-//=============================================================================================================
-
-void EventModel::updateFilteredSample(int iSample)
-{
-    m_dataSamplesFiltered[m_iSelectedAnn] = iSample + m_iFirstSample;
-}
-
-//=============================================================================================================
-
 void EventModel::clearSelected()
 {
     m_dataSelectedRows.clear();
@@ -674,43 +624,6 @@ int EventModel::createGroup(const QString& sGroupName,
 
 //=============================================================================================================
 
-void EventModel::switchGroup(int iGroupIndex)
-{
-    beginResetModel();
-
-    if ((!m_dataSamples.isEmpty()) && (m_iSelectedGroup != ALLGROUPS)){
-        saveGroup();
-    }
-
-    m_dataSamples = m_mAnnotationHub[iGroupIndex]->dataSamples;
-    m_dataTypes = m_mAnnotationHub[iGroupIndex]->dataTypes;
-    m_dataIsUserEvent = m_mAnnotationHub[iGroupIndex]->dataIsUserEvent;
-
-    m_dataSamplesFiltered = m_mAnnotationHub[iGroupIndex]->dataSamples_Filtered;
-    m_dataTypesFiltered = m_mAnnotationHub[iGroupIndex]->dataTypes_Filtered;
-    m_dataIsUserEventFiltered = m_mAnnotationHub[iGroupIndex]->dataIsUserEvent_Filtered;
-
-    m_iSelectedGroup = m_mAnnotationHub[iGroupIndex]->groupNumber;
-    m_bIsUserMade = m_mAnnotationHub[iGroupIndex]->isUserMade;
-    m_iType = m_mAnnotationHub[iGroupIndex]->groupType;
-
-    m_dataGroup.clear();
-    for(int i = 0; i < m_mAnnotationHub[iGroupIndex]->dataSamples.size(); i++){
-        m_dataGroup.append(m_iSelectedGroup);
-    }
-
-    endResetModel();
-}
-
-//=============================================================================================================
-
-bool EventModel::isUserMade()
-{
-    return m_bIsUserMade;
-}
-
-//=============================================================================================================
-
 int EventModel::getHubSize()
 {
     return m_mAnnotationHub.size();
@@ -725,92 +638,8 @@ bool EventModel::getHubUserMade(int iIndex)
 
 //=============================================================================================================
 
-void EventModel::showAll(bool bSet)
-{
-    beginResetModel();
-
-    if (bSet) {
-        if ((!m_dataSamples.isEmpty()) && (m_iSelectedGroup != ALLGROUPS)){
-            saveGroup();
-        }
-
-        m_iSelectedGroup = ALLGROUPS;
-
-        resetSelection();
-        loadAllGroups();
-    }
-
-    endResetModel();
-}
-
-//=============================================================================================================
-
-void EventModel::loadAllGroups()
-{
-    for (EventGroup* e : m_mAnnotationHub) {
-        m_dataSamples.append(e->dataSamples);
-        m_dataTypes.append(e->dataTypes);
-        m_dataIsUserEvent.append(e->dataIsUserEvent);
-
-        m_dataSamplesFiltered.append(e->dataSamples_Filtered);
-        m_dataTypesFiltered.append(e->dataTypes_Filtered);
-        m_dataIsUserEventFiltered = e->dataIsUserEvent_Filtered;
-
-        for(int i = 0; i < e->dataSamples.size(); i++){
-            m_dataGroup.append(e->groupNumber);
-        }
-    }
-}
-
-//=============================================================================================================
-
-void EventModel::resetSelection()
-{
-    m_dataSamples.clear();
-    m_dataTypes.clear();
-    m_dataIsUserEvent.clear();
-
-    m_dataSamplesFiltered.clear();
-    m_dataTypesFiltered.clear();
-    m_dataIsUserEventFiltered.clear();
-
-    m_dataGroup.clear();
-}
-
-//=============================================================================================================
-
-void EventModel::hideAll()
-{
-    beginResetModel();
-    resetSelection();
-    endResetModel();
-}
-
-//=============================================================================================================
-
 int EventModel::getIndexCount(){
     return m_iIndexCount;
-}
-
-//=============================================================================================================
-
-void EventModel::removeGroup(int iGroupIndex)
-{
-    beginResetModel();
-    resetSelection();
-    m_mAnnotationHub.remove(iGroupIndex);
-    endResetModel();
-}
-
-//=============================================================================================================
-
-int EventModel::currentGroup(int iIndex)
-{
-    if (m_iSelectedCheckState){
-        return m_dataGroup[m_dataSelectedRows.at(iIndex)];
-    } else {
-        return m_dataGroup[iIndex];
-    }
 }
 
 //=============================================================================================================
@@ -904,19 +733,6 @@ int EventModel::getIndexFromName(const QString &sGroupName)
 
 //=============================================================================================================
 
-void EventModel::saveGroup()
-{
-    m_mAnnotationHub[m_iSelectedGroup]->dataSamples = m_dataSamples;
-    m_mAnnotationHub[m_iSelectedGroup]->dataTypes = m_dataTypes;
-    m_mAnnotationHub[m_iSelectedGroup]->dataIsUserEvent = m_dataIsUserEvent;
-
-    m_mAnnotationHub[m_iSelectedGroup]->dataSamples_Filtered = m_dataSamplesFiltered;
-    m_mAnnotationHub[m_iSelectedGroup]->dataTypes_Filtered = m_dataTypesFiltered;
-    m_mAnnotationHub[m_iSelectedGroup]->dataIsUserEvent_Filtered = m_dataIsUserEventFiltered;
-}
-
-//=============================================================================================================
-
 void EventModel::setFiffModel(QSharedPointer<FiffRawViewModel> pModel)
 {
     m_pFiffModel = pModel;
@@ -955,7 +771,7 @@ void EventModel::initModel()
 //    m_eventGroupColor[998] = QColor(Qt::darkBlue);
 //    m_eventGroupColor[999] = QColor(Qt::darkCyan);
 
-    //m_EventManager.initSharedMemory();
+    m_EventManager.initSharedMemory(EVENTSLIB::SharedMemoryMode::READWRITE);
     m_bIsInit = true;
 }
 
@@ -987,22 +803,6 @@ void EventModel::initFromFile(const QString& sFilePath)
         addEvent(eventList(i,0));
     }
 
-}
-
-//=============================================================================================================
-
-void EventModel::applyOffset(int iFirstSampleOffset)
-{
-    for (int i = 0; i < m_dataSamples.size(); i++){
-        if (iFirstSampleOffset <= m_dataSamples[i]){
-            m_dataSamples[i] -= iFirstSampleOffset;
-        } else {
-            qWarning() << "[AnnotationModel::applyOffset] Offset greater than event sample";
-        }
-    }
-
-    //Update data to be diplayed
-    setEventFilterType(m_sFilterEventType);
 }
 
 //=============================================================================================================
