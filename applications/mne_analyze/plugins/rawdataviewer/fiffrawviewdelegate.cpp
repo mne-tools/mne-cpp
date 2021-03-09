@@ -335,7 +335,7 @@ void FiffRawViewDelegate::createMarksPath(const QModelIndex &index,
     float fInitX = path.currentPosition().x();
 
     //QMap<int, QColor> typeColor = t_pAnnModel->getTypeColors();
-    QMap<int, QColor> groupColor = t_pAnnModel->getGroupColors();
+//    QMap<int, QColor> groupColor = t_pAnnModel->getGroupColors();
 
     auto events = t_pAnnModel->getEventsToDraw(iStart, iStart + data.size());
 
