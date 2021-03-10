@@ -153,9 +153,6 @@ float DISPLIB::getScalingValue(const QMap<qint32, float>& qMapChScaling,
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-
-
-
 ScalingView::ScalingView(const QString& sSettingsPath,
                          QWidget *parent,
                          Qt::WindowFlags f,

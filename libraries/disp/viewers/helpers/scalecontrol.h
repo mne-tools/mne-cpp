@@ -2,7 +2,7 @@
 /**
  * @file     scalecontrol.h
  * @author   Juan Garcia-Prieto <jgarciaprieto@mgh.harvard.edu>
- * @since    0.1.0
+ * @since    0.1.9
  * @date     Feb, 2021
  *
  * @section  LICENSE
@@ -83,7 +83,7 @@ public:
      *
      * @param [in] label    text for the Qlabel
      */
-    ScaleControl(const char* label);
+     explicit ScaleControl(const char* label);
 
     //=========================================================================================================
     /**
@@ -93,7 +93,7 @@ public:
      * @param [in] label    text for the Qlabel
      * @param [in] parent   parent of widget
      */
-    ScaleControl(const char* label, QWidget* parent);
+    explicit ScaleControl(const char* label, QWidget* parent);
 
     //=========================================================================================================
     /**
@@ -105,7 +105,7 @@ public:
      * @param [in] min      min value of the control.
      * @param [in] max      max value of the control.
      */
-     ScaleControl(const char* label, QWidget* parent, double min, double max);
+     explicit ScaleControl(const char* label, QWidget* parent, double min, double max);
 
     //=========================================================================================================
      /**

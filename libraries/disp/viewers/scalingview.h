@@ -181,6 +181,9 @@ signals:
     //=========================================================================================================
     /**
      * Emit this signal whenever the scaling sliders or spin boxes changed.
+     *
+     * @param [in] scalingMap this is a list of scaling values ordered by integer keys. These keys are resolved with
+     * the use of defined macros with names of channel-types, vendors, etc.
      */
     void scalingChanged(const QMap<qint32, float>& scalingMap);
 
@@ -196,7 +199,6 @@ private:
     /**
      * Renders visible the control object that sets the link between Magnetometers and Gradiometers used in the controlView.
      */
-
     void showLinkControl();
 
     //=============================================================================================================
@@ -210,7 +212,7 @@ private:
     /**
      * Callback to process a change in the gradiometers scale spinbox.
      *
-     * @param [in] dScale
+     * @param [in] dScale The new Scale.
      */
     void updateGRADScale(double dScale);
 
@@ -218,7 +220,7 @@ private:
     /**
      * Link Magnetometers and Gradiometers through this ratio. Just for viewing purposes.
      *
-     * @param [in] dScale
+     * @param [in] dScale The new Scale.
      */
     void updateMAGtoGRADlink(double dScale);
 
@@ -226,7 +228,7 @@ private:
     /**
      * Callback to process a change in the EEG scale spinbox.
      *
-     * @param [in] dScale
+     * @param [in] dScale The new Scale.
      */
     void updateEEGScale(double dScale);
 
@@ -234,7 +236,7 @@ private:
     /**
      * Callback to process a change in the EOG scale spinbox.
      *
-     * @param [in] dScale
+     * @param [in] dScale The new Scale.
      */
     void updateEOGScale(double dScale);
 
@@ -242,14 +244,14 @@ private:
     /**
      * Callback to process a change in the EMG scale spinbox.
      *
-     * @param [in] dScale
+     * @param [in] dScale The new Scale.
      */
     void updateEMGScale(double dScale);
 
     //=========================================================================================================
     /**
      * Callback to process a change in the ECG scale spinbox.
-     * @param [in] dScale
+     * @param [in] dScale The new Scale.
      */
     void updateECGScale(double dScale);
 
@@ -257,7 +259,7 @@ private:
     /**
      * Callback to process a change in the MISC scale spinbox.
      *
-     * @param [in] dScale
+     * @param [in] dScale The new Scale.
      */
     void updateMISCScale(double dScale);
 
@@ -265,7 +267,7 @@ private:
     /**
      * Callback to process a change in the STIM scale spinbox.
      *
-     * @param [in] dScale
+     * @param [in] dScale The new Scale.
      */
     void updateSTIMScale(double dScale);
 
