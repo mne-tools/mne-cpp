@@ -78,7 +78,6 @@ using namespace ANSHAREDLIB;
 
 EventModel::EventModel(QObject* parent)
 : AbstractModel(parent)
-, m_iIndexCount(0)
 , m_iSamplePos(0)
 , m_iFirstSample(0)
 , m_iLastSample(0)
@@ -98,7 +97,6 @@ EventModel::EventModel(QObject* parent)
 EventModel::EventModel(QSharedPointer<FiffRawViewModel> pFiffModel,
                 QObject* parent)
 : AbstractModel(parent)
-, m_iIndexCount(0)
 , m_iSamplePos(0)
 , m_iFirstSample(0)
 , m_iLastSample(0)
@@ -120,7 +118,6 @@ EventModel::EventModel(const QString &sFilePath,
                                  int iFirstSampOffst,
                                  QObject* parent)
 : AbstractModel(parent)
-, m_iIndexCount(0)
 , m_iSamplePos(0)
 , m_iFirstSample(0)
 , m_iLastSample(0)
@@ -590,37 +587,6 @@ MatrixXi EventModel::getAnnotationMatrix(int iGroup)
     }
 
     return matEventDataMatrix;
-}
-
-//=============================================================================================================
-
-int EventModel::getIndexCount(){
-    return m_iIndexCount;
-}
-
-//=============================================================================================================
-
-void EventModel::pushGroup(QListWidgetItem *item)
-{
-    m_dataStoredGroups.push(item);
-}
-
-//=============================================================================================================
-
-QListWidgetItem* EventModel::popGroup()
-{
-    if(!m_dataStoredGroups.isEmpty()){
-        return m_dataStoredGroups.pop();
-    } else {
-        return Q_NULLPTR;
-    }
-}
-
-//=============================================================================================================
-
-int EventModel::getGroupStackSize()
-{
-    return m_dataStoredGroups.size();
 }
 
 //=============================================================================================================
