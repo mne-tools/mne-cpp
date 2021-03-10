@@ -932,6 +932,10 @@ void FiffRawViewModel::postBlockLoad(int result)
 
 void FiffRawViewModel::reloadAllData()
 {
+    if(!m_pFiffInfo){
+        return;
+    }
+
     m_lData.clear();
     m_lFilteredData.clear();
 
