@@ -724,7 +724,11 @@ void FiffRawView::updateFileLabel()
         int iFileLengthInSamples = m_pModel->absoluteLastSample() - m_pModel->absoluteFirstSample();
         float fFileLengthInSeconds = static_cast<float>(iFileLengthInSamples) / fFrequency;
 
-        label += "   |   " + m_pModel->getModelName();
+        if(m_pModel->isRealtime()){
+            label += "   |   MNE Scan Session";
+        } else {
+            label += "   |   " + m_pModel->getModelName();
+        }
         label += "  -  Sampling Freq. " + QString::number(m_pModel->getSamplingFrequency(),'g',5) + "Hz";
         label += "  -  Length: " + QString::number(fFileLengthInSeconds,'g',5) + "s.";
         m_pFileLabel->setText(label);
