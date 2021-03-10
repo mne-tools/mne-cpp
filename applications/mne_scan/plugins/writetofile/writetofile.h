@@ -225,6 +225,8 @@ private:
     SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr      m_pWriteToFileInput;   /**< The RealTimeMultiSampleArray of the WriteToFile input.*/
 
     Eigen::RowVectorXd                      m_mCals;                        /**< Row vector with channel calibration values. */
+
+    static int                              m_isClipCounter;
 };
 } // NAMESPACE
 
