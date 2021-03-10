@@ -79,8 +79,8 @@ make -j8 # On Linux and MacOS
 
 ### Running Applications
 
-Once built, applications can be run from within QtCreator using the run button on the bottom left side. To instead run applications from the command line, first execute the ```deploy.bat``` script in ```tools/deployment```.  For more information about this script, see our [Continous Integration documentation](ci_deployment.md). Once this is done, applications can be executed normally from the command line.
+Once built, applications can be run from within QtCreator using the run button on the bottom left side. To instead run applications from the command line, first execute the ```deploy.bat``` script in ```tools/deployment```.  For more information about this script, see our [Continuous Integration documentation](ci_deployment.md). Once this is done, applications can be executed normally from the command line.
 
 ## Test the Build
 
-You might have to add the folders inclduing the Qt libraries to your OS's corresponding environment variables. In order to run the examples you must download the MNE-Sample-Data-Set from [here](https://osf.io/86qa2/download){:target="_blank" rel="noopener"} and extract the files to `mne-cpp/bin/MNE-sample-data`. Once finished you can try to run one of the examples, e.g., ex_disp_3D. If the build was successfull the example should start and display a window including a 3D brain as well as a source localization result.
+You might have to add the folders including the Qt libraries to your OS's corresponding environment variables. In order to run the examples you must download the MNE-Sample-Data-Set from [here](https://osf.io/86qa2/download){:target="_blank" rel="noopener"} and extract the files to `mne-cpp/bin/MNE-sample-data`. Once finished you can try to run one of the examples, e.g., ex_disp_3D. If the build was successful the example should start and display a window including a 3D brain as well as a source localization result.
