@@ -608,9 +608,11 @@ void Averaging::onMakeScreenshot(const QString& imageType)
 void Averaging::updateGroups()
 {
     m_pAveragingSettingsView->clearSelectionGroup();
-    auto groups = m_pFiffRawModel->getAnnotationModel()->getGroupsToDraw();
-    for (auto group : *groups){
-        m_pAveragingSettingsView->addSelectionGroup((group.name).c_str(), group.id);
+    if (m_pFiffRawModel->hasSavedEvents()){
+        auto groups = m_pFiffRawModel->getAnnotationModel()->getGroupsToDraw();
+        for (auto group : *groups){
+            m_pAveragingSettingsView->addSelectionGroup((group.name).c_str(), group.id);
+        }
     }
 //    for(int i = 0; i < m_pFiffRawModel->getAnnotationModel()->getHubSize(); i++){
 //        m_pAveragingSettingsView->addSelectionGroup(m_pFiffRawModel->getAnnotationModel()->getGroupNameFromList(i));
