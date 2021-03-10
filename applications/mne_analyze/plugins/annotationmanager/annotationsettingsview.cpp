@@ -491,24 +491,6 @@ void EventView::deleteGroup()
 
 //=============================================================================================================
 
-void EventView::saveGroupSettings()
-{
-    while(m_pUi->m_listWidget_groupListWidget->count()){
-        m_pAnnModel->pushGroup(m_pUi->m_listWidget_groupListWidget->takeItem(m_pUi->m_listWidget_groupListWidget->count() - 1));
-    }
-}
-
-//=============================================================================================================
-
-void EventView::loadGroupSettings()
-{
-    while(m_pAnnModel->getGroupStackSize()){
-        m_pUi->m_listWidget_groupListWidget->addItem(m_pAnnModel->popGroup());
-    }
-}
-
-//=============================================================================================================
-
 void EventView::renameGroup(const QString &currentText)
 {
     if(m_pAnnModel){
