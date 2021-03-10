@@ -234,6 +234,10 @@ void EventView::setModel(QSharedPointer<ANSHAREDLIB::EventModel> pAnnModel)
     redrawGroups();
 //    loadGroupSettings();
 
+    if(m_pFiffRawModel){
+        m_pAnnModel->setSharedMemory(m_pFiffRawModel->isRealtime());
+    }
+
     onDataChanged();
 }
 
