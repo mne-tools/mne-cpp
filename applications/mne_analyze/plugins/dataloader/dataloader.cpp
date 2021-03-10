@@ -289,6 +289,7 @@ void DataLoader::onLoadFilePressed()
 void DataLoader::onLoadScanSessionPressed()
 {
     QSharedPointer<FiffRawViewModel> pModel = QSharedPointer<FiffRawViewModel>::create("");
+    pModel->setRealtime(true);
     m_pAnalyzeData->addModel<ANSHAREDLIB::FiffRawViewModel>(pModel, "MNE Scan Session");
 }
 

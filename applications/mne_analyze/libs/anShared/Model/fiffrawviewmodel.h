@@ -524,6 +524,10 @@ public:
 
     int getScrollerPosition() const;
 
+    void setRealtime(bool bRealtime);
+
+    bool isRealtime();
+
 private:
     //=========================================================================================================
     /**
@@ -636,6 +640,7 @@ private:
     qint32                                      m_iScrollPos;                               /**< Position of the scrollbar. */
 
     bool                                        m_bDispAnnotation;                          /**< Whether annotations wil be shown. */
+    bool                                        m_bRealtime;
 
     QSharedPointer<EventModel>             m_pAnnotationModel;                         /**< Model to stored annotations to be displayed. */
 
