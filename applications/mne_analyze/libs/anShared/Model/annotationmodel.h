@@ -576,6 +576,8 @@ public:
 
     void deleteSelectedGroups();
 
+    void setSharedMemory(bool bState);
+
 signals:
 
     //=========================================================================================================
