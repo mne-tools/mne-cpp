@@ -91,10 +91,7 @@ void ScaleControl::initLabel(const char* charTextLabel)
 void ScaleControl::initSpinBox()
 {
     m_pUi->spinBox->setKeyboardTracking(false);
-//    m_pUi->spinBox->setSingleStep(0.01);
-//    m_pUi->spinBox->setDecimals(2);
     m_pUi->spinBox->setPrefix("+/- ");
-//    m_pUi->spinBox->setStepType(QAbstractSpinBox::StepType::AdaptiveDecimalStepType);
 
     connect(m_pUi->spinBox,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
             this,&ScaleControl::spinBoxChanged);
