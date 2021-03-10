@@ -143,11 +143,6 @@ EventModel::EventModel(const QString &sFilePath,
 
 EventModel::~EventModel()
 {
-    for(EventGroup* eventGroup : m_mAnnotationHub){
-        if(eventGroup){
-            delete eventGroup;
-        }
-    }
 }
 
 //=============================================================================================================
@@ -599,48 +594,6 @@ MatrixXi EventModel::getAnnotationMatrix(int iGroup)
 
 //=============================================================================================================
 
-int EventModel::createGroup(const QString& sGroupName,
-                                 bool bIsUserMade,
-                                 int iType,
-                                 const QColor &typeColor)
-{
-    EventGroup* newEvent = new EventGroup();
-
-    *newEvent = {m_iIndexCount,                 //groupNumber
-                 iType,                         //groupType
-                 sGroupName,                    //groupName
-                 bIsUserMade,                   //isUserMade
-                 QVector<int>(),                //dataSamples
-                 QVector<int>(),                //dataTypes
-                 QVector<int>(),                //dataIsUserEvent
-                 QVector<int>(),                //dataSamples_Filtered
-                 QVector<int>(),                //dataTypes_Filtered
-                 QVector<int>()};               //dataIsUserEvent_Filtered
-
-    m_mAnnotationHub.insert(m_iIndexCount,
-                            newEvent);
-
-    m_eventGroupColor[m_iIndexCount] = typeColor;
-
-    return m_iIndexCount++;
-}
-
-//=============================================================================================================
-
-int EventModel::getHubSize()
-{
-    return m_mAnnotationHub.size();
-}
-
-//=============================================================================================================
-
-bool EventModel::getHubUserMade(int iIndex)
-{
-    return m_mAnnotationHub[iIndex]->isUserMade;
-}
-
-//=============================================================================================================
-
 int EventModel::getIndexCount(){
     return m_iIndexCount;
 }
@@ -701,41 +654,6 @@ void EventModel::setSelectedGroupName(const QString &currentText)
 
 //=============================================================================================================
 
-QString EventModel::getGroupName(int iMapKey)
-{
-    if(!m_mAnnotationHub.contains(iMapKey)){
-        qWarning() << "[AnnotationModel::getGroupName] Attempting to get name of group with invalid key.";
-        return "NAME NOT FOUND";
-    }
-
-    return m_mAnnotationHub[iMapKey]->groupName;
-}
-
-//=============================================================================================================
-
-QString EventModel::getGroupNameFromList(int iListIndex)
-{
-    if(m_mAnnotationHub.keys().size() <= iListIndex){
-        qWarning() << "[AnnotationModel::getGroupNameFromList] Attempting to get name of group with invalid key.";
-        return "NAME NOT FOUND";
-    }
-
-    return m_mAnnotationHub[m_mAnnotationHub.keys()[iListIndex]]->groupName;
-}
-//=============================================================================================================
-
-int EventModel::getIndexFromName(const QString &sGroupName)
-{
-    for(EventGroup* group : m_mAnnotationHub){
-        if(group->groupName == sGroupName){
-            return group->groupNumber;
-        }
-    }
-    return 9999;
-}
-
-//=============================================================================================================
-
 void EventModel::setFiffModel(QSharedPointer<FiffRawViewModel> pModel)
 {
     m_pFiffModel = pModel;
@@ -752,28 +670,6 @@ QSharedPointer<FiffRawViewModel> EventModel::getFiffModel()
 
 void EventModel::initModel()
 {
-//    m_eventTypeList<<"0";
-
-//    m_eventTypeColor[0] = QColor(Qt::black);
-//    m_eventTypeColor[1] = QColor(Qt::black);
-//    m_eventTypeColor[2] = QColor(Qt::magenta);
-//    m_eventTypeColor[3] = QColor(Qt::green);
-//    m_eventTypeColor[4] = QColor(Qt::red);
-//    m_eventTypeColor[5] = QColor(Qt::cyan);
-//    m_eventTypeColor[32] = QColor(Qt::yellow);
-//    m_eventTypeColor[998] = QColor(Qt::darkBlue);
-//    m_eventTypeColor[999] = QColor(Qt::darkCyan);
-
-//    m_eventGroupColor[0] = QColor(Qt::black);
-//    m_eventGroupColor[1] = QColor(Qt::black);
-//    m_eventGroupColor[2] = QColor(Qt::magenta);
-//    m_eventGroupColor[3] = QColor(Qt::green);
-//    m_eventGroupColor[4] = QColor(Qt::red);
-//    m_eventGroupColor[5] = QColor(Qt::cyan);
-//    m_eventGroupColor[32] = QColor(Qt::yellow);
-//    m_eventGroupColor[998] = QColor(Qt::darkBlue);
-//    m_eventGroupColor[999] = QColor(Qt::darkCyan);
-
     m_bIsInit = true;
 }
 
@@ -804,7 +700,6 @@ void EventModel::initFromFile(const QString& sFilePath)
     for(int i = 0; i < eventList.size(); i++){
         addEvent(eventList(i,0));
     }
-
 }
 
 //=============================================================================================================
