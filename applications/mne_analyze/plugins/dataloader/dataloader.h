@@ -145,6 +145,10 @@ private:
     void onLoadFilePressed();
 
     //=========================================================================================================
+
+    void onLoadScanSessionPressed();
+
+    //=========================================================================================================
     /**
      * This functions is called when the save to file button is pressed.
      *

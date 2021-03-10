@@ -618,9 +618,11 @@ void EventView::onNewFiffRawViewModel(QSharedPointer<ANSHAREDLIB::FiffRawViewMod
 {
     m_pFiffRawModel = pFiffRawModel;
 
+    if(auto info = pFiffRawModel->getFiffInfo()){
     passFiffParams(pFiffRawModel->absoluteFirstSample(),
                    pFiffRawModel->absoluteLastSample(),
                    pFiffRawModel->getFiffInfo()->sfreq);
+    }
 
     initTriggerDetect(m_pFiffRawModel->getFiffInfo());
 }

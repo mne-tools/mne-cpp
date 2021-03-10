@@ -122,6 +122,11 @@ QMenu *DataLoader::getMenu()
     connect(pActionLoadFile, &QAction::triggered,
             this, &DataLoader::onLoadFilePressed);
 
+    QAction* pActionLoadScanSession = new QAction(tr("Open MNE Scan Session"));
+    pActionLoadFile->setStatusTip(tr("Load a data file"));
+    connect(pActionLoadScanSession, &QAction::triggered,
+            this, &DataLoader::onLoadScanSessionPressed);
+
     QAction* pActionLoadSubject = new QAction(tr("Open Subject"));
     pActionLoadSubject->setStatusTip(tr("Load a subject folder"));
     connect(pActionLoadSubject, &QAction::triggered,
@@ -144,7 +149,7 @@ QMenu *DataLoader::getMenu()
                 onSaveFilePressed(AVERAGE_FILE);
             });
 
-    QAction* pActionSaveAnn = new QAction(tr("Save annotation"));
+    QAction* pActionSaveAnn = new QAction(tr("Save events"));
     pActionLoadFile->setStatusTip(tr("Save the selected data file"));
     connect(pActionSaveAnn, &QAction::triggered,[=] {
                 onSaveFilePressed(ANNOTATION_FILE);
@@ -160,6 +165,7 @@ QMenu *DataLoader::getMenu()
     //pSaveMenu->addAction(pActionSaveAvg);
 
     pMenuFile->addAction(pActionLoadFile);
+    pMenuFile->addAction(pActionLoadScanSession);
     //pMenuFile->addMenu(pBIDSMenu);
     pMenuFile->addMenu(pSaveMenu);
     //pMenuFile->addAction(pActionSave);
@@ -276,6 +282,14 @@ void DataLoader::onLoadFilePressed()
 
     loadFilePath(sFilePath);
     #endif
+}
+
+//=============================================================================================================
+
+void DataLoader::onLoadScanSessionPressed()
+{
+    QSharedPointer<FiffRawViewModel> pModel = QSharedPointer<FiffRawViewModel>::create("");
+    m_pAnalyzeData->addModel<ANSHAREDLIB::FiffRawViewModel>(pModel, "MNE Scan Session");
 }
 
 //=============================================================================================================

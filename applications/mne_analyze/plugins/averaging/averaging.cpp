@@ -307,7 +307,9 @@ void Averaging::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewMo
             }
         }
         m_pFiffRawModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
-        loadFullGui(m_pFiffRawModel->getFiffInfo());
+        if(auto info = m_pFiffRawModel->getFiffInfo()){
+            loadFullGui(info);
+        }
     } else if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_AVERAGING_MODEL) {
         loadFullGui(qSharedPointerCast<AveragingDataModel>(pNewModel)->getFiffInfo());
         onNewAveragingModel(qSharedPointerCast<AveragingDataModel>(pNewModel));
