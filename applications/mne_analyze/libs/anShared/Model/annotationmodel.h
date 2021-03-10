@@ -397,81 +397,6 @@ public:
 
     //=========================================================================================================
     /**
-     * Creates a new event group with the passed parameters
-     *
-     * @param[in] sGroupName        name of the group.
-     * @param[in] bIsUserMade       whether the group is user made.
-     * @param[in] iType             default group type when adding events.
-     *
-     * @return the index of the newly added group.
-     */
-    int createGroup(const QString& sGroupName,
-                    bool bIsUserMade = false,
-                    int iType = 0,
-                    const QColor &typeColor = QColor(Qt::black));
-
-    //=========================================================================================================
-    /**
-     * Returns how many groups are stored in m_mAnnotationHub
-     *
-     * @return the amount of groups stored.
-     */
-    int getHubSize();
-
-    //=========================================================================================================
-    /**
-     * Returns whether the group at a certain index is user made
-     *
-     * @param[in] iIndex    index of the stored group.
-     *
-     * @return whether the group is user made.
-     */
-    bool getHubUserMade(int iIndex);
-
-    //=========================================================================================================
-    /**
-     * Returns counting index that gives each group a unique number
-     *
-     * @return m_iIndexCount.
-     */
-    int getIndexCount();
-
-    //=========================================================================================================
-    /**
-     * Returns index of group with name sGroupName. Returns 9999 if no group present with that name
-     *
-     * @param[in] sGroupName     name of group of which we want the index.
-     *
-     * @return index of group with name sGroupName.
-     */
-    int getIndexFromName(const QString& sGroupName);
-
-    //=========================================================================================================
-    /**
-     * Push widget item into member stack - used for storing groups when file is unloaded
-     *
-     * @param[in] item      stores item in the member stack.
-     */
-    void pushGroup(QListWidgetItem* item);
-
-    //=========================================================================================================
-    /**
-     * Pops widget item from member stack - used for restroing groups when file is loaded
-     *
-     * @return retruns widget item on top of the member stack.
-     */
-    QListWidgetItem* popGroup();
-
-    //=========================================================================================================
-    /**
-     * Returns how many item are currently stored in the member stack
-     *
-     * @return size of member stack m_dataStoredGroups.
-     */
-    int getGroupStackSize();
-
-    //=========================================================================================================
-    /**
      * Sets the color of group iGroupIndex to color groupColor
      *
      * @param[in] iGroupIndex   Index of the goup to be changed.
@@ -490,26 +415,6 @@ public:
                       const QString& sGroupName);
 
     void setSelectedGroupName(const QString &currentText);
-
-    //=========================================================================================================
-    /**
-     * Returns group name of the group with map key iMapKey
-     *
-     * @param[in] iMapKey       map key(group index) of the group from which we are getting the name.
-     *
-     * @return name of group at from m_mAnnotationHub at iMapKey.
-     */
-    QString getGroupName(int iMapKey);
-
-    //=========================================================================================================
-    /**
-     * Returns the name of the event at index iListIndex as if the map of groups were an array. Does not use Group Index.
-     *
-     * @param[in] iListIndex    index of the group from which we are getting the name.
-     *
-     * @return name of the iListIndex-th event group for m_mAnnotationHub.
-     */
-    QString getGroupNameFromList(int iListIndex);
 
     //=========================================================================================================
     /**
@@ -612,10 +517,6 @@ private:
 
     QStringList                         m_eventTypeList;                /** <List of the possible event types */
 
-    int                                 m_iSelectedGroup;               /** <Index in m_mAnnotationHub of the current selected group */
-    int                                 m_iType;                        /** <Type of the currently selected event group */
-    int                                 m_iIndexCount;
-
     int                                 m_iSamplePos;                   /**< Sample of event to be added */
     int                                 m_iFirstSample;                 /**< First sample of file */
     int                                 m_iLastSample;                  /**< Last sample of file */
@@ -633,9 +534,7 @@ private:
     QMap<int, QColor>                   m_eventTypeColor;               /**< Stores colors to display for each event type. */
     QMap<int, QColor>                   m_eventGroupColor;              /**< Stores colors to display for each event group. */
 
-    QStack<QListWidgetItem*>            m_dataStoredGroups;             /**< Stores the groups for switching between files. */
-
-    QSharedPointer<FiffRawViewModel>    m_pFiffModel;                   /**< Pointer to FiffRawViewModel associated with the events stored in this model. */
+    QSharedPointer<FiffRawViewModel>    m_pFiffModel;                   /**< Pointer to FiffRawViewModel associated with the events stored in this model/ */
 
     EVENTSLIB::EventManager             m_EventManager;
     std::vector<idNum>                  m_selectedEventGroups;

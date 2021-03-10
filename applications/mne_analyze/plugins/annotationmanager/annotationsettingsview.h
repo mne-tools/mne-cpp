@@ -309,18 +309,6 @@ private:
 
     //=========================================================================================================
     /**
-     * Saves stored group settings from group list view
-     */
-    void saveGroupSettings();
-
-    //=========================================================================================================
-    /**
-     * Saves stored group settings from group list view
-     */
-    void loadGroupSettings();
-
-    //=========================================================================================================
-    /**
      * Prompts user to rename selected group
      */
     void renameGroup(const QString &currentText);
