@@ -211,6 +211,9 @@ void AnnotationManager::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel
             emit newAnnotationModelAvailable(pFiffRawModel->getAnnotationModel());
         } else {
             QSharedPointer<EventModel> pAnnModel = QSharedPointer<EventModel>::create(pFiffRawModel);
+            if (pFiffRawModel->isRealtime()){
+                pAnnModel->setSharedMemory(true);
+            }
             emit newAnnotationModelAvailable(pAnnModel);
             m_pAnalyzeData->addModel<ANSHAREDLIB::EventModel>(pAnnModel,
                                                                    "Events");

@@ -113,6 +113,7 @@ FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
 , m_iScroller(0)
 , m_iScrollPos(0)
 , m_bDispAnnotation(true)
+, m_bRealtime(false)
 //, m_pAnnotationModel(QSharedPointer<AnnotationModel>::create())
 {
     // connect data reloading: this will be run concurrently
@@ -1030,4 +1031,18 @@ void FiffRawViewModel::setScrollerSample(int iScrollerPos){
 int FiffRawViewModel::getScrollerPosition() const
 {
     return m_iScroller;
+}
+
+//=============================================================================================================
+
+void FiffRawViewModel::setRealtime(bool bRealtime)
+{
+    m_bRealtime = bRealtime;
+}
+
+//=============================================================================================================
+
+bool FiffRawViewModel::isRealtime()
+{
+    return m_bRealtime;
 }
