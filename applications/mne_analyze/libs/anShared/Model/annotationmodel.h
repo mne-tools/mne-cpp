@@ -612,8 +612,6 @@ private:
 
     QStringList                         m_eventTypeList;                /** <List of the possible event types */
 
-    QMap<int,EventGroup*>               m_mAnnotationHub;               /** <Map of the EventGroups, which holds groups of events */
-
     int                                 m_iSelectedGroup;               /** <Index in m_mAnnotationHub of the current selected group */
     int                                 m_iType;                        /** <Type of the currently selected event group */
     int                                 m_iIndexCount;
