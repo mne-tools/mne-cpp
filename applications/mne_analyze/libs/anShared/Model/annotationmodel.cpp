@@ -774,7 +774,6 @@ void EventModel::initModel()
 //    m_eventGroupColor[998] = QColor(Qt::darkBlue);
 //    m_eventGroupColor[999] = QColor(Qt::darkCyan);
 
-    m_EventManager.initSharedMemory(EVENTSLIB::SharedMemoryMode::READWRITE);
     m_bIsInit = true;
 }
 
@@ -901,5 +900,16 @@ void EventModel::deleteSelectedGroups()
 
         emit eventGroupsUpdated();
         emit eventsUpdated();
+    }
+}
+
+//=============================================================================================================
+
+void EventModel::setSharedMemory(bool bState)
+{
+    if(bState){
+        m_EventManager.initSharedMemory(EVENTSLIB::SharedMemoryMode::READWRITE);
+    } else {
+        m_EventManager.stopSharedMemory();
     }
 }

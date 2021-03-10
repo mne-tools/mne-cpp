@@ -68,6 +68,8 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
+int WriteToFile::m_isClipCounter = 0;
+
 WriteToFile::WriteToFile()
 : m_bWriteToFile(false)
 , m_bUseRecordTimer(false)
@@ -485,7 +487,7 @@ void WriteToFile::clipRecording(bool bChecked)
 
     m_qFileOut.close();
 
-    QString newPath = QDir::currentPath() + "/testfile_raw.fif";
+    QString newPath = QDir::currentPath() + "/mnescanfile" + QString::number(++m_isClipCounter) + "_raw.fif";
     copyRecordingFile(newPath);
 
     m_qFileOut.open(QIODevice::ReadWrite);
