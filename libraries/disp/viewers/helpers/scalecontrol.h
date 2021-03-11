@@ -68,7 +68,7 @@ namespace DISPLIB {
 /**
  * DECLARE CLASS ScaleControl
  *
- * @brief The ScaleControl class packs together a QLable, a DoubleSpinbox and a Slider with the necessary facilities for the
+ * @brief The ScaleControl class packs together a QLabel, a DoubleSpinbox and a Slider with the necessary facilities for the
  * interaction between them.
  */
 class DISPSHARED_EXPORT ScaleControl : public QWidget
@@ -238,7 +238,9 @@ private:
     //=========================================================================================================
     /**
      * Member function to map the value of a slider poisition with a value for the control or the spinbox. This
-     * functions adapts the ranges of the control/spinbox to the ranges of the slider for consistency between ranges.
+     * functions adapts the ranges of the control/spinbox to the ranges of the slider for consistency between
+     * ranges.
+     *
      * @param[in] iIn Integer value representing the position of the slider.
      * @return Double value to set the spinbox to.
      */
@@ -246,15 +248,16 @@ private:
 
     //=========================================================================================================
     /**
-     * Memberfunction to update the constant values of the mapping functions between spinbox and the slider. These constant
-     * only have be updated whenever the ranges or the sensitivity values of the non-linear mapping functions between
-     * slider and spinbox are modified.
+     * Member function to update the constant values of the mapping functions between spinbox and the slider.
+     * These constant only have be updated whenever the ranges or the sensitivity values of the non-linear mapping
+     * functions between slider and spinbox are modified.
      */
     void updateNLMapConstants();
 
     //=========================================================================================================
     /**
      * Memberfunction to addapt the sensitivity value to different range levels.
+     *
      * @param[in] fSensitivity Sensitivity value
      * @return Weighted sensitivity value
      */

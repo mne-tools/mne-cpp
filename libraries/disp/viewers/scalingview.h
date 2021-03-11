@@ -331,7 +331,7 @@ private:
     /**
      * Slot for processing the use of shortcut releases.
      *
-     * @param[in] event An keyboard-press event to be processed.
+     * @param[in] event A keyboard-press event to be processed.
      */
     void keyPressEvent(QKeyEvent* event) override;
 
