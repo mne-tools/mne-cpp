@@ -93,10 +93,10 @@ public:
     /**
      * Construts the surface set by reading it of the given files.
      *
-     * @param\[in\] subject_id         Name of subject
-     * @param\[in\] hemi               Which hemisphere to load {0 -> lh, 1 -> rh, 2 -> both}
-     * @param\[in\] atlas              Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...)
-     * @param\[in\] subjects_dir       Subjects directory
+     * @param[in] subject_id         Name of subject
+     * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh, 2 -> both}
+     * @param[in] atlas              Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...)
+     * @param[in] subjects_dir       Subjects directory
      */
     explicit AnnotationSet(const QString &subject_id, qint32 hemi, const QString &atlas, const QString &subjects_dir);
 
@@ -104,9 +104,9 @@ public:
     /**
      * Construts the surface set by reading it of the given files.
      *
-     * @param\[in\] path               path to surface directory
-     * @param\[in\] hemi               Which hemisphere to load {0 -> lh, 1 -> rh, 2 -> both}
-     * @param\[in\] atlas              Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...)
+     * @param[in] path               path to surface directory
+     * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh, 2 -> both}
+     * @param[in] atlas              Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...)
      */
     explicit AnnotationSet(const QString &path, qint32 hemi, const QString &atlas);
 
@@ -114,8 +114,8 @@ public:
     /**
      * Constructs an annotation set by assembling given annotations
      *
-     * @param\[in\] p_LHAnnotation    Left hemisphere annotation
-     * @param\[in\] p_RHAnnotation    Right hemisphere annotation
+     * @param[in] p_LHAnnotation    Left hemisphere annotation
+     * @param[in] p_RHAnnotation    Right hemisphere annotation
      */
     explicit AnnotationSet(const Annotation& p_LHAnnotation, const Annotation& p_RHAnnotation);
 
@@ -123,8 +123,8 @@ public:
     /**
      * Constructs an annotation set by reading from annotation files
      *
-     * @param\[in\] p_sLHFileName  Left hemisphere annotation file
-     * @param\[in\] p_sRHFileName  Right hemisphere annotation file
+     * @param[in] p_sLHFileName  Left hemisphere annotation file
+     * @param[in] p_sRHFileName  Right hemisphere annotation file
      */
     explicit AnnotationSet(const QString& p_sLHFileName, const QString& p_sRHFileName);
 
@@ -160,7 +160,7 @@ public:
     /**
      * Insert an annotation
      *
-     * @param\[in\] p_Annotation  Annotation to insert
+     * @param[in] p_Annotation  Annotation to insert
      */
     void insert(const Annotation& p_Annotation);
 
@@ -168,8 +168,8 @@ public:
     /**
      * Reads different annotation files and assembles them to a AnnotationSet
      *
-     * @param\[in\] p_sLHFileName  Left hemisphere annotation file
-     * @param\[in\] p_sRHFileName  Right hemisphere annotation file
+     * @param[in] p_sLHFileName  Left hemisphere annotation file
+     * @param[in] p_sRHFileName  Right hemisphere annotation file
      * @param[out] p_AnnotationSet   The read annotation set
      *
      * @return true if succesfull, false otherwise
@@ -182,7 +182,7 @@ public:
      *
      * Converts annotation to a label list and colortable
      *
-     * @param\[in\] p_surfSet              the SurfaceSet to read the vertex positions from
+     * @param[in] p_surfSet              the SurfaceSet to read the vertex positions from
      * @param[out] p_qListLabels         the converted labels are appended to a given list. Stored data are not affected.
      * @param[out] p_qListLabelRGBAs     the converted label RGBAs are appended to a given list. Stored data are not affected.
      * @param[out] lLabelPicks           the label names which should be picked.
@@ -198,7 +198,7 @@ public:
     /**
      * Subscript operator [] to access annotation by index
      *
-     * @param\[in\] idx    the hemisphere index (0 or 1).
+     * @param[in] idx    the hemisphere index (0 or 1).
      *
      * @return Annotation related to the parameter index.
      */
@@ -208,7 +208,7 @@ public:
     /**
      * Subscript operator [] to access annotation by index
      *
-     * @param\[in\] idx    the hemisphere index (0 or 1).
+     * @param[in] idx    the hemisphere index (0 or 1).
      *
      * @return Annotation related to the parameter index.
      */
@@ -218,7 +218,7 @@ public:
     /**
      * Subscript operator [] to access annotation by identifier
      *
-     * @param\[in\] idt    the hemisphere identifier ("lh" or "rh").
+     * @param[in] idt    the hemisphere identifier ("lh" or "rh").
      *
      * @return Annotation related to the parameter identifier.
      */
@@ -228,7 +228,7 @@ public:
     /**
      * Subscript operator [] to access annotation by identifier
      *
-     * @param\[in\] idt    the hemisphere identifier ("lh" or "rh").
+     * @param[in] idt    the hemisphere identifier ("lh" or "rh").
      *
      * @return Annotation related to the parameter identifier.
      */

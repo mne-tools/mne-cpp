@@ -85,8 +85,8 @@ public:
     /**
      * Constructs a HpiSettingsView object.
      *
-     * @param\[in\] pFiffInfo      The FiffInfo.
-     * @param\[in\] parent         The parent widget.
+     * @param[in] pFiffInfo      The FiffInfo.
+     * @param[in] parent         The parent widget.
      */
     HpiSettingsView(const QString& sSettingsPath = "",
                     QWidget *parent = 0,
@@ -98,8 +98,8 @@ public:
     /**
      * Updates the error related labels.
      *
-     * @param\[in\] vError            the new error values.
-     * @param\[in\] dMeanErrorDist    the mean error value.
+     * @param[in] vError            the new error values.
+     * @param[in] dMeanErrorDist    the mean error value.
      */
     void setErrorLabels(const QVector<double>& vError,
                         double dMeanErrorDist);
@@ -108,8 +108,8 @@ public:
     /**
      * Updates the movement refered to last reference head position.
      *
-     * @param\[in\] dMovement         the movement refered to last fit.
-     * @param\[in\] dRotation         the rotation refered to last fit.
+     * @param[in] dMovement         the movement refered to last fit.
+     * @param[in] dRotation         the rotation refered to last fit.
      */
     void setMovementResults(double dMovement,
                             double dRotation);
@@ -177,7 +177,7 @@ protected:
     /**
      * Update the views GUI based on the set GuiMode (Clinical=0, Research=1).
      *
-     * @param\[in\] mode     The new mode (Clinical=0, Research=1).
+     * @param[in] mode     The new mode (Clinical=0, Research=1).
      */
     void updateGuiMode(GuiMode mode);
 
@@ -185,7 +185,7 @@ protected:
     /**
      * Update the views GUI based on the set ProcessingMode (RealTime=0, Offline=1).
      *
-     * @param\[in\] mode     The new mode (RealTime=0, Offline=1).
+     * @param[in] mode     The new mode (RealTime=0, Offline=1).
      */
     void updateProcessingMode(ProcessingMode mode);
 
@@ -199,8 +199,8 @@ protected:
     /**
      * Called whenever a cell in the frequenc table widget is changed.
      *
-     * @param\[in\] row        the row of the changed cell.
-     * @param\[in\] col        the column of the changed cell.
+     * @param[in] row        the row of the changed cell.
+     * @param[in] col        the column of the changed cell.
      */
     void onFrequencyCellChanged(int row,
                                 int col);
@@ -234,7 +234,7 @@ signals:
     /**
      * Emit this signal whenever the coil frequencies changed.
      *
-     * @param\[in\] vCoilFreqs    The new coil frequencies.
+     * @param[in] vCoilFreqs    The new coil frequencies.
      */
     void coilFrequenciesChanged(const QVector<int>& vCoilFreqs);
 
@@ -242,7 +242,7 @@ signals:
     /**
      * Emit this signal whenever the user toggled the do HPI check box.
      *
-     * @param\[in\] state    Whether to do continous HPI.
+     * @param[in] state    Whether to do continous HPI.
      */
     void continousHPIToggled(bool state);
 
@@ -250,8 +250,8 @@ signals:
     /**
      * Emit this signal whenever new digitzers were loaded.
      *
-     * @param\[in\] lDigitzers    The new digitzers.
-     * @param\[in\] sFilePath     The file path to the new digitzers.
+     * @param[in] lDigitzers    The new digitzers.
+     * @param[in] sFilePath     The file path to the new digitzers.
      */
     void digitizersChanged(const QList<FIFFLIB::FiffDigPoint>& lDigitzers,
                            const QString& sFilePath);
@@ -272,7 +272,7 @@ signals:
     /**
      * Emit this signal whenever SSP checkbox changed.
      *
-     * @param\[in\] bChecked    Whether the SSP check box is checked.
+     * @param[in] bChecked    Whether the SSP check box is checked.
      */
     void sspStatusChanged(bool bChecked);
 
@@ -280,7 +280,7 @@ signals:
     /**
      * Emit this signal whenever compensator checkbox changed.
      *
-     * @param\[in\] bChecked    Whether the compensator check box is checked.
+     * @param[in] bChecked    Whether the compensator check box is checked.
      */
     void compStatusChanged(bool bChecked);
 
@@ -288,7 +288,7 @@ signals:
     /**
      * Emit this signal whenever continous HPI checkbox changed.
      *
-     * @param\[in\] bChecked    Whether the continous HPI check box is checked.
+     * @param[in] bChecked    Whether the continous HPI check box is checked.
      */
     void contHpiStatusChanged(bool bChecked);
 
@@ -296,7 +296,7 @@ signals:
     /**
      * Emit this signal whenever the allowed error changed.
      *
-     * @param\[in\] dAllowedMeanErrorDist    Allowed mean error in mm.
+     * @param[in] dAllowedMeanErrorDist    Allowed mean error in mm.
      */
     void allowedMeanErrorDistChanged(double dAllowedMeanErrorDist);
 
@@ -304,7 +304,7 @@ signals:
     /**
      * Emit this signal whenever the allowed head movement threshold changed.
      *
-     * @param\[in\] dAllowedMeanErrorDist    Allowed movement threshold.
+     * @param[in] dAllowedMeanErrorDist    Allowed movement threshold.
      */
     void allowedMovementChanged(double dAllowedMovement);
 
@@ -312,7 +312,7 @@ signals:
     /**
      * Emit this signal whenever the allowed head rotation threshold changed.
      *
-     * @param\[in\] dAllowedMeanErrorDist    Allowed rotation in degree.
+     * @param[in] dAllowedMeanErrorDist    Allowed rotation in degree.
      */
     void allowedRotationChanged(double dAllowedRotation);
 };

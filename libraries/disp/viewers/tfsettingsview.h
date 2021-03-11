@@ -87,7 +87,7 @@ public:
     /**
      * Constructs a TfSettingsView which is a child of parent.
      *
-     * @param\[in\] parent        parent of widget.
+     * @param[in] parent        parent of widget.
      */
     TfSettingsView(const QString& sSettingsPath = "",
                    QWidget *parent = 0,
@@ -122,7 +122,7 @@ protected:
     /**
      * Update the views GUI based on the set GuiMode (Clinical=0, Research=1).
      *
-     * @param\[in\] mode     The new mode (Clinical=0, Research=1).
+     * @param[in] mode     The new mode (Clinical=0, Research=1).
      */
     void updateGuiMode(GuiMode mode);
 
@@ -130,7 +130,7 @@ protected:
     /**
      * Update the views GUI based on the set ProcessingMode (RealTime=0, Offline=1).
      *
-     * @param\[in\] mode     The new mode (RealTime=0, Offline=1).
+     * @param[in] mode     The new mode (RealTime=0, Offline=1).
      */
     void updateProcessingMode(ProcessingMode mode);
 
@@ -149,8 +149,8 @@ signals:
     /**
      * Emit signal whenever trial number changed.
      *
-     * @param\[in\] iNumberTrial        The new trial number.
-     * @param\[in\] iNumberRow        The new row number.
+     * @param[in] iNumberTrial        The new trial number.
+     * @param[in] iNumberRow        The new row number.
      */
     void numberTrialRowChanged(int iNumberTrial, int iNumberRow);
 };

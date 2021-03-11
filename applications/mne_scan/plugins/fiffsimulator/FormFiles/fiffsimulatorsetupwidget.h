@@ -81,8 +81,8 @@ public:
     /**
      * Constructs a FiffSimulatorSetupWidget which is a child of parent.
      *
-     * @param\[in\] p_pFiffSimulator   a pointer to the corresponding FiffSimulator.
-     * @param\[in\] parent        pointer to parent widget; If parent is 0, the new FiffSimulatorSetupWidget becomes a window. If parent is another widget, FiffSimulatorSetupWidget becomes a child window inside parent. FiffSimulatorSetupWidget is deleted when its parent is deleted.
+     * @param[in] p_pFiffSimulator   a pointer to the corresponding FiffSimulator.
+     * @param[in] parent        pointer to parent widget; If parent is 0, the new FiffSimulatorSetupWidget becomes a window. If parent is another widget, FiffSimulatorSetupWidget becomes a child window inside parent. FiffSimulatorSetupWidget is deleted when its parent is deleted.
      */
     FiffSimulatorSetupWidget(FiffSimulator* p_pFiffSimulator, QWidget *parent = 0);
 
@@ -115,7 +115,7 @@ private:
     /**
      * Set command connection status
      *
-     * @param\[in\] p_bConnectionStatus    the connection status
+     * @param[in] p_bConnectionStatus    the connection status
      */
     void cmdConnectionChanged(bool p_bConnectionStatus);
 

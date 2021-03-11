@@ -144,8 +144,8 @@ public:
     /**
      * Default constructor.
      *
-     * @param\[in\] pFiffInfo        Associated Fiff Information
-     * @param\[in\] bDoFastFit       Do the fast fit by fitting to the more basic Model
+     * @param[in] pFiffInfo        Associated Fiff Information
+     * @param[in] bDoFastFit       Do the fast fit by fitting to the more basic Model
      */
     explicit HPIFit(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
                     bool bDoFastFit = false);
@@ -154,18 +154,18 @@ public:
     /**
      * Perform one single HPI fit.
      *
-     * @param\[in\]   t_mat                      Data to estimate the HPI positions from
-     * @param\[in\]   t_matProjectors            The projectors to apply. Bad channels are still included.
+     * @param[in]   t_mat                      Data to estimate the HPI positions from
+     * @param[in]   t_matProjectors            The projectors to apply. Bad channels are still included.
      * @param[out]   transDevHead               The final dev head transformation matrix
-     * @param\[in\]   vecFreqs                   The frequencies for each coil.
+     * @param[in]   vecFreqs                   The frequencies for each coil.
      * @param[out]   vecError                   The HPI estimation Error in mm for each fitted HPI coil.
      * @param[out]   vecGoF                     The goodness of fit for each fitted HPI coil
      * @param[out]   fittedPointSet             The final fitted positions in form of a digitizer set.
-     * @param\[in\]   pFiffInfo                  Associated Fiff Information.
-     * @param\[in\]   bDoDebug                   Print debug info to cmd line and write debug info to file.
-     * @param\[in\]   sHPIResourceDir            The path to the debug file which is to be written.
-     * @param\[in\]   iMaxIterations             The maximum allowed number of iterations used to fit the dipoles. Default is 500.
-     * @param\[in\]   fAbortError                The error which will lead to aborting the dipole fitting process. Default is 1e-9.
+     * @param[in]   pFiffInfo                  Associated Fiff Information.
+     * @param[in]   bDoDebug                   Print debug info to cmd line and write debug info to file.
+     * @param[in]   sHPIResourceDir            The path to the debug file which is to be written.
+     * @param[in]   iMaxIterations             The maximum allowed number of iterations used to fit the dipoles. Default is 500.
+     * @param[in]   fAbortError                The error which will lead to aborting the dipole fitting process. Default is 1e-9.
      */
     void fitHPI(const Eigen::MatrixXd& t_mat,
                 const Eigen::MatrixXd& t_matProjectors,
@@ -184,15 +184,15 @@ public:
     /**
      * assign frequencies to correct position
      *
-     * @param\[in\]   t_mat              Data to estimate the HPI positions from
-     * @param\[in\]   t_matProjectors    The projectors to apply. Bad channels are still included.
-     * @param\[in\]   transDevHead       The final dev head transformation matrix
-     * @param\[in\]   vecFreqs           The frequencies for each coil in unknown order.
+     * @param[in]   t_mat              Data to estimate the HPI positions from
+     * @param[in]   t_matProjectors    The projectors to apply. Bad channels are still included.
+     * @param[in]   transDevHead       The final dev head transformation matrix
+     * @param[in]   vecFreqs           The frequencies for each coil in unknown order.
      * @param[out]   vecFreqs           The frequencies for each coil in correct order.
-     * @param\[in\]   vecError           The HPI estimation Error in mm for each fitted HPI coil.
-     * @param\[in\]   vecGoF             The goodness of fit for each fitted HPI coil
-     * @param\[in\]   fittedPointSet     The final fitted positions in form of a digitizer set.
-     * @param\[in\]   pFiffInfo          Associated Fiff Information.
+     * @param[in]   vecError           The HPI estimation Error in mm for each fitted HPI coil.
+     * @param[in]   vecGoF             The goodness of fit for each fitted HPI coil
+     * @param[in]   fittedPointSet     The final fitted positions in form of a digitizer set.
+     * @param[in]   pFiffInfo          Associated Fiff Information.
      */
     void findOrder(const Eigen::MatrixXd& t_mat,
                    const Eigen::MatrixXd& t_matProjectors,
@@ -209,11 +209,11 @@ public:
      * get from Neuromag's MaxFilter.
      *
      *
-     * @param\[in\]  fTime           The corresponding time in the measurement for the fit.
-     * @param\[in\]  pFiffInfo       The FiffInfo file from the measurement.
+     * @param[in]  fTime           The corresponding time in the measurement for the fit.
+     * @param[in]  pFiffInfo       The FiffInfo file from the measurement.
      * @param[out]  matPosition     The matrix to store the results.
-     * @param\[in\]  vecGoF          The goodness of fit for each coil.
-     * @param\[in\]  vecError        The Hpi estimation Error per coil.
+     * @param[in]  vecGoF          The goodness of fit for each coil.
+     * @param[in]  vecError        The Hpi estimation Error per coil.
      *
      * ToDo: get estimated movement velocity and store it in channel 9
      */
@@ -227,13 +227,13 @@ protected:
     /**
      * Fits dipoles for the given coils and a given data set.
      *
-     * @param\[in\] CoilParam         The coil parameters.
-     * @param\[in\] sensors           The sensor information.
-     * @param\[in\] matData           The data which used to fit the coils.
-     * @param\[in\] iNumCoils         The number of coils.
-     * @param\[in\] t_matProjectors   The projectors to apply. Bad channels are still included.
-     * @param\[in\] iMaxIterations    The maximum allowed number of iterations used to fit the dipoles. Default is 500.
-     * @param\[in\] fAbortError       The error which will lead to aborting the dipole fitting process. Default is 1e-9.
+     * @param[in] CoilParam         The coil parameters.
+     * @param[in] sensors           The sensor information.
+     * @param[in] matData           The data which used to fit the coils.
+     * @param[in] iNumCoils         The number of coils.
+     * @param[in] t_matProjectors   The projectors to apply. Bad channels are still included.
+     * @param[in] iMaxIterations    The maximum allowed number of iterations used to fit the dipoles. Default is 500.
+     * @param[in] fAbortError       The error which will lead to aborting the dipole fitting process. Default is 1e-9.
      *
      * @return Returns the coil parameters.
      */
@@ -249,8 +249,8 @@ protected:
     /**
      * Computes the transformation matrix between two sets of 3D points.
      *
-     * @param\[in\] matNH    The first set of input 3D points (row-wise order).
-     * @param\[in\] matBT    The second set of input 3D points (row-wise order).
+     * @param[in] matNH    The first set of input 3D points (row-wise order).
+     * @param[in] matBT    The second set of input 3D points (row-wise order).
      *
      * @return Returns the transformation matrix.
      */
@@ -262,8 +262,8 @@ protected:
      * Read from FwdCoilSet and store into sensors struct.
      * Can be deleted as soon as FwdCoilSet is refactored to QList and EigenMatrix.
      *
-     * @param\[in\] sensors       The struct to save sensor information.
-     * @param\[in\] coils         The coilset to read the sensor information from.
+     * @param[in] sensors       The struct to save sensor information.
+     * @param[in] coils         The coilset to read the sensor information from.
      *
      */
     void createSensorSet(SensorSet& sensors,
@@ -297,10 +297,10 @@ private:
     /**
      * Update the model of sinoids for the hpi data
      *
-     * @param\[in\] iSamF             The sample frequency.
-     * @param\[in\] iSamLoc           The minimum samples required to localize numLoc times in a second
-     * @param\[in\] iLineF            The line frequency.
-     * @param\[in\] vecFreqs          The frequencies for each coil in unknown order.
+     * @param[in] iSamF             The sample frequency.
+     * @param[in] iSamLoc           The minimum samples required to localize numLoc times in a second
+     * @param[in] iLineF            The line frequency.
+     * @param[in] vecFreqs          The frequencies for each coil in unknown order.
      *
      * @return The updated model
      */

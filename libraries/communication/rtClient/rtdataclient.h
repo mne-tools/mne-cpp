@@ -80,7 +80,7 @@ public:
     /**
      * Creates the real-time data client.
      *
-     * @param\[in\] parent     Parent QObject (optional)
+     * @param[in] parent     Parent QObject (optional)
      */
     explicit RtDataClient(QObject *parent = Q_NULLPTR);
 
@@ -112,7 +112,7 @@ public:
     /**
      * Reads fiff measurement information of a data the connection
      *
-     * @param\[in\] p_nChannels    Number of channels to reshape the received data
+     * @param[in] p_nChannels    Number of channels to reshape the received data
      * @param[out] data          The read data - ToDo change this to raw buffer data object
      * @param[out] kind          Data kind
      */
@@ -124,7 +124,7 @@ public:
     /**
      * Sets the alias of the data client
      *
-     * @param\[in\] p_sAlias    The alias of the data client
+     * @param[in] p_sAlias    The alias of the data client
      */
     void setClientAlias(const QString &p_sAlias);
 

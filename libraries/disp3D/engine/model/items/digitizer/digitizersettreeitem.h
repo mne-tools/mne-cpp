@@ -101,8 +101,8 @@ public:
     /**
      * Default constructor.
      *
-     * @param\[in\] iType      The type of the item. See types.h for declaration and definition.
-     * @param\[in\] text       The text of this item. This is also by default the displayed name of the item in a view.
+     * @param[in] iType      The type of the item. See types.h for declaration and definition.
+     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
      */
     explicit DigitizerSetTreeItem(int iType = Data3DTreeModelItemTypes::DigitizerSetItem, const QString& text = "Source space");
 
@@ -110,7 +110,7 @@ public:
     /**
      * Adds digitizer data to this item.
      *
-     * @param\[in\] tDigitizer         The digitizer data.
+     * @param[in] tDigitizer         The digitizer data.
      */
     void addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Qt3DCore::QEntity* parent);
 
@@ -118,7 +118,7 @@ public:
     /**
      * Sets the entity's transformation. This will clear the old transformation.
      *
-     * @param\[in\] transform     The new entity's transform.
+     * @param[in] transform     The new entity's transform.
      */
     virtual void setTransform(const Qt3DCore::QTransform &transform);
 
@@ -126,8 +126,8 @@ public:
     /**
      * Sets the entity's transformation. This will clear the old transformation.
      *
-     * @param\[in\] transform     The new entity's transform.
-     * @param\[in\] bApplyInverse Whether to apply the inverse. False by default.
+     * @param[in] transform     The new entity's transform.
+     * @param[in] bApplyInverse Whether to apply the inverse. False by default.
      */
     virtual void setTransform(const FIFFLIB::FiffCoordTrans& transform,
                               bool bApplyInverse = false);
@@ -136,7 +136,7 @@ public:
     /**
      * Applies a transformation o ntop of the present one.
      *
-     * @param\[in\] transform     The new entity's transform.
+     * @param[in] transform     The new entity's transform.
      */
     virtual void applyTransform(const Qt3DCore::QTransform& transform);
 
@@ -144,8 +144,8 @@ public:
     /**
      * Applies a transformation o ntop of the present one.
      *
-     * @param\[in\] transform     The new entity's transform.
-     * @param\[in\] bApplyInverse Whether to apply the inverse. False by default.
+     * @param[in] transform     The new entity's transform.
+     * @param[in] bApplyInverse Whether to apply the inverse. False by default.
      */
     virtual void applyTransform(const FIFFLIB::FiffCoordTrans& transform,
                                 bool bApplyInverse = false);

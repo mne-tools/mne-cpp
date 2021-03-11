@@ -101,9 +101,9 @@ public:
     /**
      * Default constructor.
      *
-     * @param\[in\] p3DEntityParent    The parent 3D entity.
-     * @param\[in\] iType              The type of the item. See types.h for declaration and definition.
-     * @param\[in\] text               The text of this item. This is also by default the displayed name of the item in a view.
+     * @param[in] p3DEntityParent    The parent 3D entity.
+     * @param[in] iType              The type of the item. See types.h for declaration and definition.
+     * @param[in] text               The text of this item. This is also by default the displayed name of the item in a view.
      */
     explicit SensorPositionTreeItem(Qt3DCore::QEntity* p3DEntityParent = 0,
                                     int iType = Data3DTreeModelItemTypes::SensorPositionItem,
@@ -113,9 +113,9 @@ public:
     /**
      * Adds FreeSurfer data based on surface and annotation data to this item.
      *
-     * @param\[in\] lChInfo            The channel information used to plot the MEG channels.
-     * @param\[in\] sDataType          The data type: EEG, MEG.
-     * @param\[in\] bads               The bad channel list.
+     * @param[in] lChInfo            The channel information used to plot the MEG channels.
+     * @param[in] sDataType          The data type: EEG, MEG.
+     * @param[in] bads               The bad channel list.
      */
     void addData(const QList<FIFFLIB::FiffChInfo> &lChInfo,
                  const QString& sDataType,
@@ -126,8 +126,8 @@ protected:
     /**
      * Plots the MEG sensors.
      *
-     * @param\[in\] lChInfo            The channel information used to plot the MEG channels.
-     * @param\[in\] bads               The bad channel list.
+     * @param[in] lChInfo            The channel information used to plot the MEG channels.
+     * @param[in] bads               The bad channel list.
      */
     void plotMEGSensors(const QList<FIFFLIB::FiffChInfo>& lChInfo,
                         const QStringList& bads = QStringList());
@@ -136,8 +136,8 @@ protected:
     /**
      * Plots the EEG sensors.
      *
-     * @param\[in\] lChInfo            The channel information used to plot the EEG channels.
-     * @param\[in\] bads               The bad channel list.
+     * @param[in] lChInfo            The channel information used to plot the EEG channels.
+     * @param[in] bads               The bad channel list.
      */
     void plotEEGSensors(const QList<FIFFLIB::FiffChInfo>& lChInfo,
                         const QStringList& bads = QStringList());

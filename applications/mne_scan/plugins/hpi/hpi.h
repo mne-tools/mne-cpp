@@ -132,7 +132,7 @@ public:
     /**
      * Udates the plugin with new (incoming) data.
      *
-     * @param\[in\] pMeasurement    The incoming data in form of a generalized Measurement.
+     * @param[in] pMeasurement    The incoming data in form of a generalized Measurement.
      */
     void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
@@ -153,7 +153,7 @@ private:
     /**
      * Call this function whenever the allowed error changed.
      *
-     * @param\[in\] dAllowedMeanErrorDist    Allowed mean error in mm.
+     * @param[in] dAllowedMeanErrorDist    Allowed mean error in mm.
      */
     void onAllowedMeanErrorDistChanged(double dAllowedMeanErrorDist);
 
@@ -161,7 +161,7 @@ private:
     /**
      * Call this function whenever the allowed head movement threshold changed.
      *
-     * @param\[in\] dAllowedMeanErrorDist    Allowed movement threshold.
+     * @param[in] dAllowedMeanErrorDist    Allowed movement threshold.
      */
     void onAllowedMovementChanged(double dAllowedMovement);
 
@@ -169,7 +169,7 @@ private:
     /**
      * Call this function whenever the allowed head rotation threshold changed.
      *
-     * @param\[in\] dAllowedMeanErrorDist    Allowed rotation in degree.
+     * @param[in] dAllowedMeanErrorDist    Allowed rotation in degree.
      */
     void onAllowedRotationChanged(double dAllowedRotation);
 
@@ -177,8 +177,8 @@ private:
     /**
      * Call this funciton whenever new digitzers were loaded.
      *
-     * @param\[in\] lDigitzers    The new digitzers.
-     * @param\[in\] sFilePath     The file path to the new digitzers.
+     * @param[in] lDigitzers    The new digitzers.
+     * @param[in] sFilePath     The file path to the new digitzers.
      */
     void onDigitizersChanged(const QList<FIFFLIB::FiffDigPoint>& lDigitzers,
                              const QString& sFilePath);
@@ -199,7 +199,7 @@ private:
     /**
      * Call this funciton whenever the coil frequencies changed.
      *
-     * @param\[in\] vCoilFreqs    The new coil frequencies.
+     * @param[in] vCoilFreqs    The new coil frequencies.
      */
     void onCoilFrequenciesChanged(const QVector<int>& vCoilFreqs);
 
@@ -207,7 +207,7 @@ private:
     /**
      * Call this function whenever SSP checkbox changed.
      *
-     * @param\[in\] bChecked    Whether the SSP check box is checked.
+     * @param[in] bChecked    Whether the SSP check box is checked.
      */
     void onSspStatusChanged(bool bChecked);
 
@@ -215,7 +215,7 @@ private:
     /**
      * Call this function whenever compensator checkbox changed.
      *
-     * @param\[in\] bChecked    Whether the compensator check box is checked.
+     * @param[in] bChecked    Whether the compensator check box is checked.
      */
     void onCompStatusChanged(bool bChecked);
 
@@ -223,7 +223,7 @@ private:
     /**
      * Call this function whenever continous HPI checkbox changed.
      *
-     * @param\[in\] bChecked    Whether the continous HPI check box is checked.
+     * @param[in] bChecked    Whether the continous HPI check box is checked.
      */
     void onContHpiStatusChanged(bool bChecked);
 
@@ -231,7 +231,7 @@ private:
     /**
      * Call this function whenever the device to head transformation matrix changed.
      *
-     * @param\[in\] devHeadTrans    The new device to head transformation matrix changed.
+     * @param[in] devHeadTrans    The new device to head transformation matrix changed.
      */
     void onDevHeadTransAvailable(const FIFFLIB::FiffCoordTrans& devHeadTrans);
 

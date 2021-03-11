@@ -102,7 +102,7 @@ public:
     /**
      * Default constructor.
      *
-     * @param\[in\] parent         The parent of this entity.
+     * @param[in] parent         The parent of this entity.
      */
     explicit Renderable3DEntity(Qt3DCore::QEntity* parent = 0);
 
@@ -122,7 +122,7 @@ public:
     /**
      * Sets the entity's transformation. This will clear the old transformation.
      *
-     * @param\[in\] transform     The new entity's transform.
+     * @param[in] transform     The new entity's transform.
      */
     virtual void setTransform(const Qt3DCore::QTransform &transform);
 
@@ -130,8 +130,8 @@ public:
     /**
      * Sets the entity's transformation. This will clear the old transformation.
      *
-     * @param\[in\] transform     The new entity's transform.
-     * @param\[in\] bApplyInverse Whether to apply the inverse. False by default.
+     * @param[in] transform     The new entity's transform.
+     * @param[in] bApplyInverse Whether to apply the inverse. False by default.
      */
     virtual void setTransform(const FIFFLIB::FiffCoordTrans& transform,
                               bool bApplyInverse = false);
@@ -140,7 +140,7 @@ public:
     /**
      * Applies a transformation o ntop of the present one.
      *
-     * @param\[in\] transform     The new entity's transform.
+     * @param[in] transform     The new entity's transform.
      */
     virtual void applyTransform(const Qt3DCore::QTransform& transform);
 
@@ -148,8 +148,8 @@ public:
     /**
      * Applies a transformation o ntop of the present one.
      *
-     * @param\[in\] transform     The new entity's transform.
-     * @param\[in\] bApplyInverse Whether to apply the inverse. False by default.
+     * @param[in] transform     The new entity's transform.
+     * @param[in] bApplyInverse Whether to apply the inverse. False by default.
      */
     virtual void applyTransform(const FIFFLIB::FiffCoordTrans& transform,
                                 bool bApplyInverse = false);
@@ -198,7 +198,7 @@ public:
     /**
      * Applies the current rotation around the x-axis.
      *
-     * @param\[in\] rotX     The x-axis rotation value.
+     * @param[in] rotX     The x-axis rotation value.
      */
     virtual void applyRotX(float rotX);
 
@@ -206,7 +206,7 @@ public:
     /**
      * Sets the current rotation around the x-axis.
      *
-     * @param\[in\] rotX     The x-axis rotation value.
+     * @param[in] rotX     The x-axis rotation value.
      */
     virtual void setRotX(float rotX);
 
@@ -214,7 +214,7 @@ public:
     /**
      * Applies the current rotation around the y-axis.
      *
-     * @param\[in\] rotY     The y-axis rotation value.
+     * @param[in] rotY     The y-axis rotation value.
      */
     virtual void applyRotY(float rotY);
 
@@ -222,7 +222,7 @@ public:
     /**
      * Sets the current rotation around the x-axis.
      *
-     * @param\[in\] rotY     The y-axis rotation value.
+     * @param[in] rotY     The y-axis rotation value.
      */
     virtual void setRotY(float rotY);
 
@@ -230,7 +230,7 @@ public:
     /**
      * Applies the current rotation around the z-axis.
      *
-     * @param\[in\] rotZ     The z-axis rotation value.
+     * @param[in] rotZ     The z-axis rotation value.
      */
     virtual void applyRotZ(float rotZ);
 
@@ -238,7 +238,7 @@ public:
     /**
      * Sets the current rotation around the x-axis.
      *
-     * @param\[in\] rotZ     The z-axis rotation value.
+     * @param[in] rotZ     The z-axis rotation value.
      */
     virtual void setRotZ(float rotZ);
 
@@ -246,7 +246,7 @@ public:
     /**
      * Applies the current position/translation.
      *
-     * @param\[in\] position     The position/translation value.
+     * @param[in] position     The position/translation value.
      */
     virtual void applyPosition(const QVector3D& position);
 
@@ -254,7 +254,7 @@ public:
     /**
      * Sets the current position/translation.
      *
-     * @param\[in\] position     The position/translation value.
+     * @param[in] position     The position/translation value.
      */
     virtual void setPosition(const QVector3D& position);
 
@@ -262,7 +262,7 @@ public:
     /**
      * Applies the current scale.
      *
-     * @param\[in\] scale     The new scaling value.
+     * @param[in] scale     The new scaling value.
      */
     virtual void applyScale(float scale);
 
@@ -270,7 +270,7 @@ public:
     /**
      * Sets the current scale.
      *
-     * @param\[in\] scale     The new scaling value.
+     * @param[in] scale     The new scaling value.
      */
     virtual void setScale(float scale);
 
@@ -278,7 +278,7 @@ public:
     /**
      * Call this function whenever you want to change the visibilty of the 3D rendered content.
      *
-     * @param\[in\] state     The visiblity flag.
+     * @param[in] state     The visiblity flag.
      */
     virtual void setVisible(bool state);
 
@@ -286,8 +286,8 @@ public:
     /**
      * Sets the value of a specific parameter of the materials for this entity.
      *
-     * @param\[in\] data             The value to be set.
-     * @param\[in\] sParameterName   The parameters name.
+     * @param[in] data             The value to be set.
+     * @param[in] sParameterName   The parameters name.
      */
     virtual void setMaterialParameter(const QVariant &data,
                                       const QString &sParameterName);
@@ -296,7 +296,7 @@ public:
     /**
      * Gets the value of a specific parameter of the materials for this entity.
      *
-     * @param\[in\] sParameterName             The parameters name.
+     * @param[in] sParameterName             The parameters name.
      *
      * @return   The data of the parameter.
      */
@@ -307,9 +307,9 @@ protected:
     /**
      * Sets the value of a specific parameter of the materials for this entity.
      *
-     * @param\[in\] pObject            The QObject to be scanned for parameters.
-     * @param\[in\] data               The new data.
-     * @param\[in\] sParameterName     The parameters name.
+     * @param[in] pObject            The QObject to be scanned for parameters.
+     * @param[in] data               The new data.
+     * @param[in] sParameterName     The parameters name.
      */
     virtual void setMaterialParameterRecursive(QObject * pObject,
                                                const QVariant &data,
@@ -319,8 +319,8 @@ protected:
     /**
      * Gets the value of a specific parameter of the materials for this entity.
      *
-     * @param\[in\] pObject            The QObject to be scanned for parameters.
-     * @param\[in\] sParameterName     The parameters name.
+     * @param[in] pObject            The QObject to be scanned for parameters.
+     * @param[in] sParameterName     The parameters name.
      *
      * @return   The data of the parameter.
      */
@@ -340,7 +340,7 @@ signals:
     /**
      * Emit this signal whenever the scaling changed.
      *
-     * @param\[in\] scale     The scaling value.
+     * @param[in] scale     The scaling value.
      */
     void scaleChanged(float scale);
 
@@ -348,7 +348,7 @@ signals:
     /**
      * Emit this signal whenever the x-axis rotation changed.
      *
-     * @param\[in\] rotX     The x-axis rotation value.
+     * @param[in] rotX     The x-axis rotation value.
      */
     void rotXChanged(float rotX);
 
@@ -356,7 +356,7 @@ signals:
     /**
      * Emit this signal whenever the y-axis rotation changed.
      *
-     * @param\[in\] rotY     The y-axis rotation value.
+     * @param[in] rotY     The y-axis rotation value.
      */
     void rotYChanged(float rotY);
 
@@ -364,7 +364,7 @@ signals:
     /**
      * Emit this signal whenever the z-axis rotation changed.
      *
-     * @param\[in\] rotZ     The z-axis rotation value.
+     * @param[in] rotZ     The z-axis rotation value.
      */
     void rotZChanged(float rotZ);
 
@@ -372,7 +372,7 @@ signals:
     /**
      * Emit this signal whenever the position/translation changed.
      *
-     * @param\[in\] position     The position/translation value.
+     * @param[in] position     The position/translation value.
      */
     void positionChanged(QVector3D position);
 };

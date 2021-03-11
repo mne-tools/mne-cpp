@@ -81,7 +81,7 @@ public:
     /**
      * Constructs a TMSIProducer.
      *
-     * @param\[in\] pTMSI a pointer to the corresponding TMSI class.
+     * @param[in] pTMSI a pointer to the corresponding TMSI class.
      */
     TMSIProducer(TMSI* pTMSI);
 
@@ -94,15 +94,15 @@ public:
     //=========================================================================================================
     /**
      * Starts the TMSIProducer by starting the producer's thread and initialising the device.
-     * @param\[in\] iNumberOfChannels The number of channels defined by the user via the GUI.
-     * @param\[in\] iSamplingFrequency The sampling frequency defined by the user via the GUI (in Hertz).
-     * @param\[in\] iSamplesPerBlock The samples per block defined by the user via the GUI.
-     * @param\[in\] bUseChExponent Flag for using the channels exponent. Defined by the user via the GUI.
-     * @param\[in\] bUseUnitGain Flag for using the channels unit gain. Defined by the user via the GUI.
-     * @param\[in\] bWriteDriverDebugToFile Flag for writing the received samples to a file. Defined by the user via the GUI.
-     * @param\[in\] bUseUnitOffset Flag for using the channels unit offset. Defined by the user via the GUI.
-     * @param\[in\] bUseCommonAverage Flag for using common average when recording EEG data. Defined by the user via the GUI.
-     * @param\[in\] bMeasureImpedance Flag for measuring impedances.
+     * @param[in] iNumberOfChannels The number of channels defined by the user via the GUI.
+     * @param[in] iSamplingFrequency The sampling frequency defined by the user via the GUI (in Hertz).
+     * @param[in] iSamplesPerBlock The samples per block defined by the user via the GUI.
+     * @param[in] bUseChExponent Flag for using the channels exponent. Defined by the user via the GUI.
+     * @param[in] bUseUnitGain Flag for using the channels unit gain. Defined by the user via the GUI.
+     * @param[in] bWriteDriverDebugToFile Flag for writing the received samples to a file. Defined by the user via the GUI.
+     * @param[in] bUseUnitOffset Flag for using the channels unit offset. Defined by the user via the GUI.
+     * @param[in] bUseCommonAverage Flag for using common average when recording EEG data. Defined by the user via the GUI.
+     * @param[in] bMeasureImpedance Flag for measuring impedances.
      */
     virtual void start(int iNumberOfChannels,
                        int iSamplingFrequency,

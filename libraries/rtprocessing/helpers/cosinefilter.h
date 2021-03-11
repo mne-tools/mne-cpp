@@ -81,13 +81,13 @@ public:
     /**
      * Constructs a CosineFilter object.
      *
-     * @param\[in\] fftLength length of the fft (multiple integer of 2^x)
-     * @param\[in\] lowpass low cutoff frequency in Hz (not normed to sampling freq)
-     * @param\[in\] lowpass_width determines the width of the filter slopes (steepness) in Hz (not normed to sampling freq)
-     * @param\[in\] highpass highpass high cutoff frequency in Hz (not normed to sampling freq)
-     * @param\[in\] highpass_width determines the width of the filter slopes (steepness) in Hz (not normed to sampling freq)
-     * @param\[in\] sFreq sampling frequency
-     * @param\[in\] type filter type (lowpass, highpass, etc.)
+     * @param[in] fftLength length of the fft (multiple integer of 2^x)
+     * @param[in] lowpass low cutoff frequency in Hz (not normed to sampling freq)
+     * @param[in] lowpass_width determines the width of the filter slopes (steepness) in Hz (not normed to sampling freq)
+     * @param[in] highpass highpass high cutoff frequency in Hz (not normed to sampling freq)
+     * @param[in] highpass_width determines the width of the filter slopes (steepness) in Hz (not normed to sampling freq)
+     * @param[in] sFreq sampling frequency
+     * @param[in] type filter type (lowpass, highpass, etc.)
      */
     CosineFilter(int fftLength,
                  float lowpass,

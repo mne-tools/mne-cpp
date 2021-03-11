@@ -72,7 +72,7 @@ public:
     /**
      * Default constructor
      *
-     * @param\[in\] parent     Parent QObject (optional)
+     * @param[in] parent     Parent QObject (optional)
      */
     explicit CommandParser(QObject *parent = 0);
 
@@ -80,7 +80,7 @@ public:
     /**
      * Checks if a command exists
      *
-     * @param\[in\] p_sCommand     Command to check.
+     * @param[in] p_sCommand     Command to check.
      *
      * @return true if command exists, false otherwise.
      */
@@ -90,7 +90,7 @@ public:
     /**
      * Parses a CLI command or JSON command (list) and notifies all attached observers (command managers)
      *
-     * @param\[in\] p_sInput               Input to parse.
+     * @param[in] p_sInput               Input to parse.
      * @param[out] p_qListCommandsParsed  List of parsed commands.
      */
     bool parse(const QString &p_sInput, QStringList &p_qListCommandsParsed);
@@ -108,8 +108,8 @@ signals:
     /**
      * Response channel which is used by attached observers (command managers) to send data back to subject
      *
-     *@param\[in\] p_sResponse     Observer response/data.
-     *@param\[in\] p_command       Command which send the response
+     *@param[in] p_sResponse     Observer response/data.
+     *@param[in] p_command       Command which send the response
      */
     void response(QString p_sResponse, Command p_command);
 

@@ -91,7 +91,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param\[in\] p_FiffRawData  FIFF raw measurement which should be copied
+     * @param[in] p_FiffRawData  FIFF raw measurement which should be copied
      */
     FiffRawData(const FiffRawData &p_FiffRawData);
 
@@ -99,7 +99,7 @@ public:
     /**
      * Constructs fiff raw data, by reading from a IO device.
      *
-     * @param\[in\] p_IODevice     IO device to read the raw data from .
+     * @param[in] p_IODevice     IO device to read the raw data from .
      */
     FiffRawData(QIODevice &p_IODevice);
 
@@ -136,9 +136,9 @@ public:
      *
      * @param[out] data      returns the data matrix (channels x samples)
      * @param[out] times     returns the time values corresponding to the samples
-     * @param\[in\] from       first sample to include. If omitted, defaults to the first sample in data (optional)
-     * @param\[in\] to         last sample to include. If omitted, defaults to the last sample in data (optional)
-     * @param\[in\] sel        channel selection vector (optional)
+     * @param[in] from       first sample to include. If omitted, defaults to the first sample in data (optional)
+     * @param[in] to         last sample to include. If omitted, defaults to the last sample in data (optional)
+     * @param[in] sel        channel selection vector (optional)
      *
      * @return true if succeeded, false otherwise
      */
@@ -158,9 +158,9 @@ public:
      * @param[out] data      returns the data matrix (channels x samples)
      * @param[out] times     returns the time values corresponding to the samples
      * @param[out] multSegment used multiplication matrix (compensator,projection,calibration)
-     * @param\[in\] from       first sample to include. If omitted, defaults to the first sample in data (optional)
-     * @param\[in\] to         last sample to include. If omitted, defaults to the last sample in data (optional)
-     * @param\[in\] sel        channel selection vector (optional)
+     * @param[in] from       first sample to include. If omitted, defaults to the first sample in data (optional)
+     * @param[in] to         last sample to include. If omitted, defaults to the last sample in data (optional)
+     * @param[in] sel        channel selection vector (optional)
      *
      * @return true if succeeded, false otherwise
      */
@@ -180,9 +180,9 @@ public:
      *
      * @param[out] data      returns the data matrix (channels x samples)
      * @param[out] times     returns the time values corresponding to the samples
-     * @param\[in\] from       starting time of the segment in seconds
-     * @param\[in\] to         end time of the segment in seconds
-     * @param\[in\] sel        optional channel selection vector
+     * @param[in] from       starting time of the segment in seconds
+     * @param[in] to         end time of the segment in seconds
+     * @param[in] sel        optional channel selection vector
      *
      * @return true if succeeded, false otherwise
      */

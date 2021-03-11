@@ -91,9 +91,9 @@ public:
     /**
      * Constructs a RealTimeSpectrumWidget which is a child of parent.
      *
-     * @param\[in\] pNE           pointer to noise estimation measurement.
-     * @param\[in\] pTime         pointer to application time.
-     * @param\[in\] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
+     * @param[in] pNE           pointer to noise estimation measurement.
+     * @param[in] pTime         pointer to application time.
+     * @param[in] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
      */
     RealTimeSpectrumWidget(QSharedPointer<SCMEASLIB::RealTimeSpectrum> pNE,
                            QSharedPointer<QTime> &pTime,
@@ -115,7 +115,7 @@ public:
     /**
      * Is called when new data are available.
      *
-     * @param\[in\] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
+     * @param[in] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
      */
     virtual void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 

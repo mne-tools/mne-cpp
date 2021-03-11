@@ -84,7 +84,7 @@ public:
     /**
      * Constructs a SpectrumSettingsView which is a child of parent.
      *
-     * @param\[in\] parent    parent of widget
+     * @param[in] parent    parent of widget
      */
     SpectrumSettingsView(const QString& sSettingsPath = "",
                          QWidget *parent = Q_NULLPTR,
@@ -100,7 +100,7 @@ public:
     /**
      * Update slider value
      *
-     * @param\[in\] value    slider value
+     * @param[in] value    slider value
      */
     void updateValue(qint32 value);
 
@@ -120,9 +120,9 @@ public:
     /**
      * Sets the sampling frequency as well as boundaries and configure the GUI elements accordingly
      *
-     * @param\[in\] fSFreq           The sampling frequency
-     * @param\[in\] fLowerBound      The lower bound of the spectrum
-     * @param\[in\] fUpperBound      The upper bound of the spectrum
+     * @param[in] fSFreq           The sampling frequency
+     * @param[in] fLowerBound      The lower bound of the spectrum
+     * @param[in] fUpperBound      The upper bound of the spectrum
      */
     void setBoundaries(float fSFreq,
                        float fLowerBound,
@@ -155,7 +155,7 @@ protected:
     /**
      * Update the views GUI based on the set GuiMode (Clinical=0, Research=1).
      *
-     * @param\[in\] mode     The new mode (Clinical=0, Research=1).
+     * @param[in] mode     The new mode (Clinical=0, Research=1).
      */
     void updateGuiMode(GuiMode mode);
 
@@ -163,7 +163,7 @@ protected:
     /**
      * Update the views GUI based on the set ProcessingMode (RealTime=0, Offline=1).
      *
-     * @param\[in\] mode     The new mode (RealTime=0, Offline=1).
+     * @param[in] mode     The new mode (RealTime=0, Offline=1).
      */
     void updateProcessingMode(ProcessingMode mode);
 

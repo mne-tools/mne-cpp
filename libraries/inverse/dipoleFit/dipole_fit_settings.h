@@ -94,8 +94,8 @@ public:
     /**
      * Constructs Dipole Fit Settings
      *
-     * @param\[in\] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
-     * @param\[in\] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
+     * @param[in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
+     * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
      */
     explicit DipoleFitSettings(int *argc,char **argv);
 

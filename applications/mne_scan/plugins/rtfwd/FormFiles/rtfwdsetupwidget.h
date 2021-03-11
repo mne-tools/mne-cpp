@@ -85,8 +85,8 @@ public:
     /**
      * Constructs a RtFwdSetupWidget which is a child of parent.
      *
-     * @param\[in\] toolbox a pointer to the corresponding RtFwd.
-     * @param\[in\] parent pointer to parent widget; If parent is 0, the new RtFwdSetupWidget becomes a window. If parent is another widget, RtFwdSetupWidget becomes a child window inside parent. RtFwdSetupWidget is deleted when its parent is deleted.
+     * @param[in] toolbox a pointer to the corresponding RtFwd.
+     * @param[in] parent pointer to parent widget; If parent is 0, the new RtFwdSetupWidget becomes a window. If parent is another widget, RtFwdSetupWidget becomes a child window inside parent. RtFwdSetupWidget is deleted when its parent is deleted.
      */
     RtFwdSetupWidget(RtFwd* toolbox, QWidget *parent = 0);
 

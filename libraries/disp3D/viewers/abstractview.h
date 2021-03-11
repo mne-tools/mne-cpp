@@ -135,7 +135,7 @@ public:
     /**
      * Sets the extra control widgets in the quick control view. Takes ownership of the QWidgets.
      *
-     * @param\[in\] lControlWidgets    The new extra control widgets.
+     * @param[in] lControlWidgets    The new extra control widgets.
      */
     void setQuickControlWidgets(const QList<QWidget*> &lControlWidgets);
 

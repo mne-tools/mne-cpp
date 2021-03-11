@@ -208,7 +208,7 @@ public:
     /**
      * This function sets the function that is used in the interpolation process.
      * 
-     * @param sInterpolationFunction         Function that computes interpolation coefficients using the distance values.
+     * @param[in] sInterpolationFunction         Function that computes interpolation coefficients using the distance values.
      */
     virtual void setInterpolationFunction(const QString &sInterpolationFunction);
 

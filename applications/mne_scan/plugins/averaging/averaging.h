@@ -132,7 +132,7 @@ public:
     /**
      * Change the number of averages
      *
-     * @param\[in\] numAve     new number of averages
+     * @param[in] numAve     new number of averages
      */
     void onChangeNumAverages(qint32 numAve);
 
@@ -140,7 +140,7 @@ public:
     /**
      * Change the stim channel
      *
-     * @param\[in\] sStimCh     the new stim channel name
+     * @param[in] sStimCh     the new stim channel name
      */
     void onChangeStimChannel(const QString &sStimCh);
 
@@ -148,7 +148,7 @@ public:
     /**
      * Change the pre stim stim
      *
-     * @param\[in\] mseconds     the new pres stim in seconds
+     * @param[in] mseconds     the new pres stim in seconds
      */
     void onChangePreStim(qint32 mseconds);
 
@@ -156,7 +156,7 @@ public:
     /**
      * Change the post stim stim
      *
-     * @param\[in\] mseconds     the new post stim in seconds
+     * @param[in] mseconds     the new post stim in seconds
      */
     void onChangePostStim(qint32 mseconds);
 
@@ -164,7 +164,7 @@ public:
     /**
      * Change the threshold value for trial rejection
      *
-     * @param\[in\] mapThresholds       The new map including the current thresholds for the channels
+     * @param[in] mapThresholds       The new map including the current thresholds for the channels
      */
     void onChangeArtifactThreshold(const QMap<QString, double> &mapThresholds);
 
@@ -172,7 +172,7 @@ public:
     /**
      * Change the state of the artifact rejection based on variance
      *
-     * @param\[in\] state     the new state
+     * @param[in] state     the new state
      */
     void onChangeArtifactVarianceReductionActive(bool state);
 
@@ -180,7 +180,7 @@ public:
     /**
      * Change the baseline from value
      *
-     * @param\[in\] fromMS     the new baseline from value in seconds
+     * @param[in] fromMS     the new baseline from value in seconds
      */
     void onChangeBaselineFrom(qint32 fromMS);
 
@@ -188,7 +188,7 @@ public:
     /**
      * Change the baseline to value
      *
-     * @param\[in\] fromMS     the new baseline to value in seconds
+     * @param[in] fromMS     the new baseline to value in seconds
      */
     void onChangeBaselineTo(qint32 toMSeconds);
 
@@ -196,7 +196,7 @@ public:
     /**
      * Change the baseline active state
      *
-     * @param\[in\] state     the new state
+     * @param[in] state     the new state
      */
     void onChangeBaselineActive(bool state);
 
@@ -204,8 +204,8 @@ public:
     /**
      * Append new FiffEvokedSet to the buffer
      *
-     * @param\[in\] evokedSet                  The new FiffEvokedSet
-     * @param\[in\] lResponsibleTriggerTypes   List of all trigger types which lead to the recent emit of a new evoked set.
+     * @param[in] evokedSet                  The new FiffEvokedSet
+     * @param[in] lResponsibleTriggerTypes   List of all trigger types which lead to the recent emit of a new evoked set.
      */
     void onNewEvokedSet(const FIFFLIB::FiffEvokedSet& evokedSet,
                         const QStringList &lResponsibleTriggerTypes);
@@ -214,7 +214,7 @@ public:
     /**
      * Reset the averaging plugin and delete all currently stored data
      *
-     * @param\[in\] state     the new state
+     * @param[in] state     the new state
      */
     void onResetAverage(bool state);
 
