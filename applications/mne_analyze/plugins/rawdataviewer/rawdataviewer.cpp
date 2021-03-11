@@ -314,3 +314,11 @@ void RawDataViewer::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pR
         }
     }
 }
+
+//=============================================================================================================
+
+void RawDataViewer::onNewRealtimeData()
+{
+    m_pCommu->publishEvent(EVENT_TYPE::SELECTED_MODEL_CHANGED, QVariant::fromValue(m_pFiffRawView->getModel()));
+}
+}
