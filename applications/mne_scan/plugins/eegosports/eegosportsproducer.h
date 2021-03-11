@@ -79,7 +79,7 @@ public:
     /**
      * Constructs a EEGoSportsProducer.
      *
-     * @param\[in\] pEEGoSports a pointer to the corresponding EEGoSports class.
+     * @param[in] pEEGoSports a pointer to the corresponding EEGoSports class.
      */
     EEGoSportsProducer(EEGoSports* pEEGoSports);
 
@@ -93,8 +93,8 @@ public:
     /**
     * Initializes the EEGoSportsProducer by initialising the device.
     *
-    * @param\[in\] bWriteDriverDebugToFile Flag for writing the received samples to a file. Defined by the user via the GUI.
-    * @param\[in\] bMeasureImpedance Flag for measuring impedances.
+    * @param[in] bWriteDriverDebugToFile Flag for writing the received samples to a file. Defined by the user via the GUI.
+    * @param[in] bMeasureImpedance Flag for measuring impedances.
     */
     bool init(bool bWriteDriverDebugToFile,
               bool bMeasureImpedance);
@@ -103,9 +103,9 @@ public:
     /**
     * Starts the EEGoSportsProducer by starting the producer's thread and starting the stream from the device.
     *
-    * @param\[in\] iSamplesPerBlock The samples per block defined by the user via the GUI.
-    * @param\[in\] iSamplingFrequency The sampling frequency defined by the user via the GUI (in Hertz).
-    * @param\[in\] bMeasureImpedance Flag for measuring impedances.
+    * @param[in] iSamplesPerBlock The samples per block defined by the user via the GUI.
+    * @param[in] iSamplingFrequency The sampling frequency defined by the user via the GUI (in Hertz).
+    * @param[in] bMeasureImpedance Flag for measuring impedances.
     */
     virtual void start(int iSamplesPerBlock,
                        int iSamplingFrequency,

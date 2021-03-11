@@ -81,9 +81,9 @@ public:
     /**
      * Constructs a PluginConnector with the given parent.
      *
-     * @param\[in\] parent     pointer to parent plugin
-     * @param\[in\] name       connection name
-     * @param\[in\] descr      connection description
+     * @param[in] parent     pointer to parent plugin
+     * @param[in] name       connection name
+     * @param[in] descr      connection description
      */
     PluginConnector(AbstractPlugin *parent, const QString &name, const QString &descr);
     

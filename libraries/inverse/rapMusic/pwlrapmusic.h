@@ -93,11 +93,11 @@ public:
     /**
      * Constructor which initializes the POWELL RAP MUSIC algorithm with the given model.
      *
-     * @param\[in\] p_Fwd          The model which contains the gain matrix and its corresponding grid matrix.
-     * @param\[in\] p_bSparsed     True when sparse matrices should be used.
-     * @param\[in\] p_iN           The number (default 2) of uncorrelated sources, which should be found. Starting with
+     * @param[in] p_Fwd          The model which contains the gain matrix and its corresponding grid matrix.
+     * @param[in] p_bSparsed     True when sparse matrices should be used.
+     * @param[in] p_iN           The number (default 2) of uncorrelated sources, which should be found. Starting with
      *                           the strongest.
-     * @param\[in\] p_dThr         The correlation threshold (default 0.5) at which the search for sources stops.
+     * @param[in] p_dThr         The correlation threshold (default 0.5) at which the search for sources stops.
      */
     PwlRapMusic(MNELIB::MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN = 2, double p_dThr = 0.5);
 
@@ -109,8 +109,8 @@ public:
      * Note: Since they are virtual they have to be implemented to be called. Even so the base class RAP MUSIC
      *       implementation is called.
      *
-     * @param\[in\] p_fiffEvoked
-     * @param\[in\] pick_normal
+     * @param[in] p_fiffEvoked
+     * @param[in] pick_normal
      *
      * @return
      */
@@ -122,9 +122,9 @@ public:
      * Note: Since they are virtual they have to be implemented to be called. Even so the base class RAP MUSIC
      *       implementation is called.
      *
-     * @param\[in\] data
-     * @param\[in\] tmin
-     * @param\[in\] tstep
+     * @param[in] data
+     * @param[in] tmin
+     * @param[in] tstep
      *
      * @return
      */

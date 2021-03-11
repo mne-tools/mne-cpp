@@ -128,7 +128,7 @@ public:
     /**
      * Udates the pugin with new (incoming) data.
      *
-     * @param\[in\] pMeasurement    The incoming data in form of a generalized Measurement.
+     * @param[in] pMeasurement    The incoming data in form of a generalized Measurement.
      */
     void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
@@ -149,7 +149,7 @@ private:
     /**
      * Set the recording time in seconds.
      *
-     * @param\[in\] time   the new recording time.
+     * @param[in] time   the new recording time.
      */
     void setRecordingTimerChanged(int timeMSecs);
 
@@ -157,7 +157,7 @@ private:
     /**
      * Set the recording time active flag.
      *
-     * @param\[in\] state   whether the recording should be used or not.
+     * @param[in] state   whether the recording should be used or not.
      */
     void setRecordingTimerStateChanged(bool state);
 
@@ -165,7 +165,7 @@ private:
     /**
      * Set the recording file name.
      *
-     * @param\[in\] sFileName   the new file name.
+     * @param[in] sFileName   the new file name.
      */
     void onFileNameChanged(const QString& sFileName);
 

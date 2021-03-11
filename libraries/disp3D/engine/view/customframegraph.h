@@ -123,7 +123,7 @@ public:
     /**
      * This function sets active camera for use in the framegraphs camera selector.
      *
-     * @param tCamera               Pointer to QCamera object.
+     * @param[in] tCamera               Pointer to QCamera object.
      */
     void setCamera(Qt3DRender::QCamera *tCamera);
 
@@ -131,9 +131,9 @@ public:
     /**
      * This function sets the work group size for the computation in each dimension.
      *
-     * @param tX                     Size of X work group.
-     * @param tY                     Size of Y work group.
-     * @param tZ                     Size of Z work group.
+     * @param[in] tX                     Size of X work group.
+     * @param[in] tY                     Size of Y work group.
+     * @param[in] tZ                     Size of Z work group.
      */
     void setWorkGroupSize(const uint tX, const uint tY , const uint tZ);
 
@@ -141,7 +141,7 @@ public:
     /**
      * Sets the clear color of the framegraph.
      *
-     * @param tColor        New clear color.
+     * @param[in] tColor        New clear color.
      */
     void setClearColor(const QColor &tColor);
 

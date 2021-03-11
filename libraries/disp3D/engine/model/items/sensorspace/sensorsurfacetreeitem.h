@@ -98,9 +98,9 @@ public:
     /**
      * Default constructor.
      *
-     * @param\[in\] p3DEntityParent    The parent 3D entity.
-     * @param\[in\] text               The text of this item. This is also by default the displayed name of the item in a view.
-     * @param\[in\] iType              The type of the item. See types.h for declaration and definition.
+     * @param[in] p3DEntityParent    The parent 3D entity.
+     * @param[in] text               The text of this item. This is also by default the displayed name of the item in a view.
+     * @param[in] iType              The type of the item. See types.h for declaration and definition.
      */
     explicit SensorSurfaceTreeItem(Qt3DCore::QEntity *p3DEntityParent = 0,
                                    int iType = Data3DTreeModelItemTypes::SensorSurfaceItem,
@@ -110,7 +110,7 @@ public:
     /**
      * Adds BEM model data.
      *
-     * @param\[in\] tSensorSurface     The bem data.
+     * @param[in] tSensorSurface     The bem data.
      */
     void addData(const MNELIB::MNEBemSurface &tSensorSurface);
 

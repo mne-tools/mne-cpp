@@ -103,7 +103,7 @@ public:
      * @details Allows the controller to set the input file name and path.QFileInfo m_fiInFile member variable will be udpated
      * during this member function.
      *
-     * @param\[in\] s QString containing the complete absolute path of the input file.
+     * @param[in] s QString containing the complete absolute path of the input file.
      *
      */
     void setInFile(const QString& s);
@@ -116,7 +116,7 @@ public:
      * @details Allows the controller to set the output file name and path. QFileInfo m_fiOutFile member variable will be udpated
      * during this member function.
      *
-     * @param\[in\] s QString containing the complete absolute path of the output file.
+     * @param[in] s QString containing the complete absolute path of the output file.
      *
      */
     void setOutFile(const QString& s);
@@ -128,7 +128,7 @@ public:
      * @details Allows the controller to set state of the Brute Mode, according to the command line arguments of the
      * call to MNE_Anonymize application.
      *
-     * @param\[in\] b bool variable containing the desired state to set the checkbox to.
+     * @param[in] b bool variable containing the desired state to set the checkbox to.
      *
      */
     void setCheckBoxBruteMode(bool b);
@@ -140,7 +140,7 @@ public:
      * @details Allows the controller to set state of the measurement date control, according to the command line arguments of the
      * call to MNE_Anonymize application.
      *
-     * @param\[in\] QDateTime dt reference variable containing the desired measurement date to be used when anonymizing the input fif file..
+     * @param[in] QDateTime dt reference variable containing the desired measurement date to be used when anonymizing the input fif file..
      *
      */
     void setMeasurementDate(const QDateTime& dt);
@@ -152,7 +152,7 @@ public:
      * @details Allows the controller to set state of the use of the measurement date offset related checkbox, according to the command line arguments of the
      * call to MNE_Anonymize application.
      *
-     * @param\[in\] o bool variable representing the use or not of measurement offset when updating the mesasurement date of a file.
+     * @param[in] o bool variable representing the use or not of measurement offset when updating the mesasurement date of a file.
      *
      */
     void setCheckBoxMeasurementDateOffset(bool o);
@@ -164,7 +164,7 @@ public:
      * @details Measurement date offset. Minimal, Maximum values [-10000, 10000]. This method will update the user interface, according according
      * to the command line arguments of the call to MNE_Anonymize application.
      *
-     * @param\[in\] d Int. Number of days to offset the measurement date with.
+     * @param[in] d Int. Number of days to offset the measurement date with.
      *
      */
     void setMeasurementDateOffset(int d);
@@ -175,7 +175,7 @@ public:
      *
      * @details Allows to modify the date of the subject's birthday with a specific date.
      *
-     * @param\[in\] d Birthday of the subject.
+     * @param[in] d Birthday of the subject.
      *
      */
     void setSubjectBirthday(const QDate& d);
@@ -187,7 +187,7 @@ public:
      * @details Instead of using a specific date to modify the subject's birthday. offset by #days the original
      * Birthday.
      *
-     * @param\[in\] b Offset by number of days.
+     * @param[in] b Offset by number of days.
      *
      */
     void setCheckBoxSubjectBirthdayOffset(bool b);
@@ -198,7 +198,7 @@ public:
      *
      * @details Birtday offset by #days.
      *
-     * @param\[in\] d Offset days the birthday of the subject.
+     * @param[in] d Offset days the birthday of the subject.
      *
      */
     void setSubjectBirthdayOffset(int d);
@@ -210,7 +210,7 @@ public:
      * @details If the HisId tag appears in the file, its content, a string will be substituted with the text
      * specified with this methis.
      *
-     * @param\[in\] d Offset days the birthday of the subject.
+     * @param[in] d Offset days the birthday of the subject.
      *
      */
     void setSubjectHis(const QString& h);
@@ -228,8 +228,8 @@ public:
     /**
      * @brief Show message in the status bar.
      *
-     * @param\[in\] s String to show.
-     * @param\[in\] to time to show the message for.
+     * @param[in] s String to show.
+     * @param[in] to time to show the message for.
      *
      */
     void statusMsg(const QString& s, int to = 0);
@@ -246,7 +246,7 @@ signals:
     /**
      * @brief Signal triggered when the text for the input file is changed.
      *
-     * @param\[in\] s Absolute path of the input file.
+     * @param[in] s Absolute path of the input file.
      *
      */
     void fileInChanged(const QString& s) const;
@@ -255,7 +255,7 @@ signals:
     /**
      * @brief Signal triggered when the text for the output file is changed.
      *
-     * @param\[in\] s Absolute path of the output file.
+     * @param[in] s Absolute path of the output file.
      *
      */
     void fileOutChanged(const QString& s) const;
@@ -264,7 +264,7 @@ signals:
     /**
      * @brief Signal triggered when the checkbox specifying Brute mode on.
      *
-     * @param\[in\] s State of the checkbox Brute Mode.
+     * @param[in] s State of the checkbox Brute Mode.
      *
      */
     void bruteModeChanged(bool b) const;
@@ -273,7 +273,7 @@ signals:
     /**
      * @brief Signal triggered when the value of the measurement date has changed.
      *
-     * @param\[in\] t Date specified.
+     * @param[in] t Date specified.
      *
      */
     void measurementDateChanged(const QDateTime& t) const;
@@ -283,7 +283,7 @@ signals:
      * @brief Signal triggered when the checkbox for using measurement days of offset instead of a new measurement
      * date.
      *
-     * @param\[in\] f State of the checkbox.
+     * @param[in] f State of the checkbox.
      *
      */
     void useMeasurementOffset(bool f) const;
@@ -292,7 +292,7 @@ signals:
     /**
      * @brief Signal triggered when the number of days of offset for the measurement date is changed.
      *
-     * @param\[in\] o Number of days to offset the measurement.
+     * @param[in] o Number of days to offset the measurement.
      *
      */
     void measurementDateOffsetChanged(int o) const;
@@ -301,7 +301,7 @@ signals:
     /**
      * @brief Signal triggered when the number of days of offset for the birthday date is changed.
      *
-     * @param\[in\] o Number of days to offset the measurement.
+     * @param[in] o Number of days to offset the measurement.
      *
      */
     void birthdayDateChanged(const QDate& d) const;
@@ -310,7 +310,7 @@ signals:
     /**
      * @brief Signal triggered when the checkbox specifying to use number days to offset the birthday.
      *
-     * @param\[in\] o Number of days to offset the measurement.
+     * @param[in] o Number of days to offset the measurement.
      *
      */
     void useBirthdayOffset(bool f) const;
@@ -319,7 +319,7 @@ signals:
     /**
      * @brief Signal triggered when the number of days of offset for the birthday of the subject date is changed.
      *
-     * @param\[in\] o Number of days to offset the measurement.
+     * @param[in] o Number of days to offset the measurement.
      *
      */
     void birthdayOffsetChanged(int o) const;
@@ -328,7 +328,7 @@ signals:
     /**
      * @brief Signal triggered when the text to substitute the HisId tag info with, has changed.
      *
-     * @param\[in\] text New text to substitute HisId with.
+     * @param[in] text New text to substitute HisId with.
      *
      */
     void subjectHisIdChanged(const QString& text) const;
@@ -337,7 +337,7 @@ signals:
     /**
      * @brief Signal triggered when the checkbox to show options and input file info changed.
      *
-     * @param\[in\] b state of the checkbox.
+     * @param[in] b state of the checkbox.
      *
      */
     void showOptionsChanged(bool b);
@@ -362,7 +362,7 @@ public slots:
      * @brief Generate a window popup in order to show a message and make the user confirm acknowledging it by pressing
      * an OK button.
      *
-     * @param\[in\] s Text to show in the popup window.
+     * @param[in] s Text to show in the popup window.
      *
      */
     void winPopup(const QString& s);
@@ -373,7 +373,7 @@ public slots:
      *
      * @details The fileID tag has stored the file version.
      *
-     * @param\[in\] v Version number.
+     * @param[in] v Version number.
      *
      */
     void setLineEditIdFileVersion(double v);
@@ -384,7 +384,7 @@ public slots:
      *
      * @details Measurement date read from the Id Tag. It is shown in a QLineEdit element.
      *
-     * @param\[in\] d Measurement date.
+     * @param[in] d Measurement date.
      *
      */
     void setLineEditIdMeasurementDate(const QDateTime& d);
@@ -393,7 +393,7 @@ public slots:
     /**
      * @brief Specify the MAC address text in the input file information menu.
      *
-     * @param\[in\] mac MAC address as text.
+     * @param[in] mac MAC address as text.
      *
      */
     void setLineEditIdMacAddress(const QString& mac);
@@ -405,7 +405,7 @@ public slots:
      * @details Measurmenet date specified int he measurement date tag, not in the id tag which also contains
      * measurement information.
      *
-     * @param\[in\] d Date and time to show.
+     * @param[in] d Date and time to show.
      *
      */
     void setLineEditFileMeasurementDate(const QDateTime& d);
@@ -414,7 +414,7 @@ public slots:
     /**
      * @brief Specify the text to show as File comment in the input file information menu.
      *
-     * @param\[in\] s File comment.
+     * @param[in] s File comment.
      *
      */
     void setLineEditFileComment(const QString& c);
@@ -423,7 +423,7 @@ public slots:
     /**
      * @brief Specify the text to show as File experimenter in the input file information menu.
      *
-     * @param\[in\] e Experimenter text.
+     * @param[in] e Experimenter text.
      *
      */
     void setLineEditFileExperimenter(const QString& e);
@@ -432,7 +432,7 @@ public slots:
     /**
      * @brief Specify the integer to show as subject id in the input file information menu.
      *
-     * @param\[in\] i Subject id.
+     * @param[in] i Subject id.
      *
      */
     void setLineEditSubjectId(int i);
@@ -441,7 +441,7 @@ public slots:
     /**
      * @brief Specify the string to show as subject's first name in the input file information menu.
      *
-     * @param\[in\] fn First name of the subject.
+     * @param[in] fn First name of the subject.
      *
      */
     void setLineEditSubjectFirstName(const QString& fn);
@@ -450,7 +450,7 @@ public slots:
     /**
      * @brief Specify the string to show as subject's middle name in the input file information menu.
      *
-     * @param\[in\] mn Subject's middle name.
+     * @param[in] mn Subject's middle name.
      *
      */
     void setLineEditSubjectMiddleName(const QString& mn);
@@ -459,7 +459,7 @@ public slots:
     /**
      * @brief Specify the string to show as subject's last name in the input file information menu.
      *
-     * @param\[in\] ln Subject's last name.
+     * @param[in] ln Subject's last name.
      *
      */
     void setLineEditSubjectLastName(const QString& ln);
@@ -468,7 +468,7 @@ public slots:
     /**
      * @brief Specify the subject's birthday to show in the input file information menu.
      *
-     * @param\[in\] b Date and time for the birthday of the subject.
+     * @param[in] b Date and time for the birthday of the subject.
      *
      */
     void setLineEditSubjectBirthday(QDate b);
@@ -479,7 +479,7 @@ public slots:
      *
      * @details As per FIFF standard (v1.3) 0 = "unknown", 1 = "male", 2 = "female".
      *
-     * @param\[in\] s Code with the sex of the subject.
+     * @param[in] s Code with the sex of the subject.
      *
      */
     void setComboBoxSubjectSex(int s);
@@ -490,7 +490,7 @@ public slots:
      *
      * @details As per FIFF standard (v1.3) 0 = "unknown", 1 = "right", 2 = "left".
      *
-     * @param\[in\] w Code with the hand of the subject.
+     * @param[in] w Code with the hand of the subject.
      *
      */
     void setLineEditSubjectHand(int h);
@@ -501,7 +501,7 @@ public slots:
      *
      * @details Weigth of the subject is specified in a FIFF file as a floating point value (float).
      *
-     * @param\[in\] w Weight of the subject in kg.
+     * @param[in] w Weight of the subject in kg.
      *
      */
     void setLineEditSubjectWeight(float w);
@@ -512,7 +512,7 @@ public slots:
      *
      * @details The height of the subject is specified in a FIFF file as a floating point value (float).
      *
-     * @param\[in\] h Height of the subject.
+     * @param[in] h Height of the subject.
      *
      */
     void setLineEditSubjectHeight(float h);
@@ -521,7 +521,7 @@ public slots:
     /**
      * @brief Specify the value of the Subject comment line edit.
      *
-     * @param\[in\] c String to show.
+     * @param[in] c String to show.
      *
      */
     void setLineEditSubjectComment(const QString& c);
@@ -530,7 +530,7 @@ public slots:
     /**
      * @brief Specify the text to show in the His Id line edit.
      *
-     * @param\[in\] his String to show.
+     * @param[in] his String to show.
      *
      */
     void setLineEditSubjectHisId(const QString& his);
@@ -539,7 +539,7 @@ public slots:
     /**
      * @brief Specify the Project id number in the window.
      *
-     * @param\[in\] i Id of the project.
+     * @param[in] i Id of the project.
      *
      */
     void setLineEditProjectId(int i);
@@ -548,7 +548,7 @@ public slots:
     /**
      * @brief Specify the string to show in the Project name edit line.
      *
-     * @param\[in\] pname Text with the name of the project.
+     * @param[in] pname Text with the name of the project.
      *
      */
     void setLineEditProjectName(const QString& pname);
@@ -557,7 +557,7 @@ public slots:
     /**
      * @brief Specify the string to show in the Project aim edit line
      *
-     * @param\[in\] pAim Text containing the project aim.
+     * @param[in] pAim Text containing the project aim.
      *
      */
     void setLineEditProjectAim(const QString& pAim);
@@ -566,7 +566,7 @@ public slots:
     /**
      * @brief Specify the string containing the Persons involved in the project to show in that edit line.
      *
-     * @param\[in\] pPersons String text containing the persons involved in the project.
+     * @param[in] pPersons String text containing the persons involved in the project.
      *
      */
     void setLineEditProjectPersons(const QString& pPersons);
@@ -575,7 +575,7 @@ public slots:
     /**
      * @brief Specify the text to show as the project comment.
      *
-     * @param\[in\] pComment Text containing the project comment.
+     * @param[in] pComment Text containing the project comment.
      *
      */
     void setLineEditProjectComment(const QString& pComment);
@@ -584,7 +584,7 @@ public slots:
     /**
      * @brief Specify if the message warning the user that there is MRI data in the fif file should be shown.
      *
-     * @param\[in\] b Bool value to show or not the warning mri data message.
+     * @param[in] b Bool value to show or not the warning mri data message.
      *
      */
     void setLabelMriDataFoundVisible(bool b);
@@ -593,7 +593,7 @@ public slots:
     /**
      * @brief Specify the text to show in the MNE toolbox working directory line edit.
      *
-     * @param\[in\] s Text containing the working directory.
+     * @param[in] s Text containing the working directory.
      *
      */
     void setLineEditMNEWorkingDir(const QString& s);
@@ -602,7 +602,7 @@ public slots:
     /**
      * @brief Specify the text to show in the MNE toolbox command used line edit.
      *
-     * @param\[in\] s Text containing the command shown.
+     * @param[in] s Text containing the command shown.
      *
      */
     void setLineEditMNECommand(const QString& s);
@@ -619,7 +619,7 @@ protected:
     /**
      * @brief Event triggered when the close window icon is clicked.
      *
-     * @param\[in\] event Event triggered.
+     * @param[in] event Event triggered.
      *
      */
     void closeEvent(QCloseEvent *event) override;

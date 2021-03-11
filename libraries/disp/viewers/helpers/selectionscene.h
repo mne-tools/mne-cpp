@@ -90,8 +90,8 @@ public:
     /**
      * Updates layout data.
      *
-     * @param\[in\] layoutMap layout data map.
-     * @param\[in\] bad channel list.
+     * @param[in] layoutMap layout data map.
+     * @param[in] bad channel list.
      */
     void repaintItems(const QMap<QString, QPointF> &layoutMap,
                       QStringList badChannels);
@@ -100,7 +100,7 @@ public:
     /**
      * Hides all items described in list.
      *
-     * @param\[in\] list string list with items name which are to be hidden.
+     * @param[in] list string list with items name which are to be hidden.
      */
     void hideItems(QStringList visibleItems);
 

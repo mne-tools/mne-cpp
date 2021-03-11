@@ -91,7 +91,7 @@ public:
     /**
      * Constructs a covariance data matrix, by reading from a IO device.
      *
-     * @param\[in\] p_IODevice     IO device to read from the evoked data set.
+     * @param[in] p_IODevice     IO device to read from the evoked data set.
      */
     FiffCov(QIODevice &p_IODevice);
 
@@ -99,7 +99,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param\[in\] p_FiffCov   Covariance data matrix which should be copied
+     * @param[in] p_FiffCov   Covariance data matrix which should be copied
      */
     FiffCov(const FiffCov &p_FiffCov);
 
@@ -129,8 +129,8 @@ public:
      *
      * Pick channels from covariance matrix
      *
-     * @param\[in\] p_include  List of channels to include (if empty, include all available). (optional)
-     * @param\[in\] p_exclude  Channels to exclude (if empty, do not exclude any). (optional)
+     * @param[in] p_include  List of channels to include (if empty, include all available). (optional)
+     * @param[in] p_exclude  Channels to exclude (if empty, do not exclude any). (optional)
      *
      * @return Covariance solution restricted to selected channels.
      */
@@ -140,8 +140,8 @@ public:
     /**
      * Prepare noise covariance matrix. Before creating inverse operator.
      *
-     * @param\[in\] p_info     measurement info
-     * @param\[in\] p_chNames  Channels which should be taken into account
+     * @param[in] p_info     measurement info
+     * @param[in] p_chNames  Channels which should be taken into account
      *
      * @return the prepared noise covariance matrix
      */
@@ -154,12 +154,12 @@ public:
      * This method works by adding a constant to the diagonal for each channel type separatly.
      * Special care is taken to keep the rank of the data constant.
      *
-     * @param\[in\] p_info     The measurement info (used to get channel types and bad channels).
-     * @param\[in\] p_fMag      Regularization factor for MEG magnetometers.
-     * @param\[in\] p_fGrad     Regularization factor for MEG gradiometers.
-     * @param\[in\] p_fEeg      Regularization factor for EEG.
-     * @param\[in\] p_bProj     Apply or not projections to keep rank of data.
-     * @param\[in\] p_exclude  List of channels to mark as bad. If None, bads channels are extracted from both info['bads'] and cov['bads'].
+     * @param[in] p_info     The measurement info (used to get channel types and bad channels).
+     * @param[in] p_fMag      Regularization factor for MEG magnetometers.
+     * @param[in] p_fGrad     Regularization factor for MEG gradiometers.
+     * @param[in] p_fEeg      Regularization factor for EEG.
+     * @param[in] p_bProj     Apply or not projections to keep rank of data.
+     * @param[in] p_exclude  List of channels to mark as bad. If None, bads channels are extracted from both info['bads'] and cov['bads'].
      *
      * @return the regularized covariance matrix
      */
@@ -169,7 +169,7 @@ public:
     /**
      * Assignment Operator
      *
-     * @param\[in\] rhs     FiffCov which should be assigned.
+     * @param[in] rhs     FiffCov which should be assigned.
      *
      * @return the copied covariance matrix
      */
@@ -179,8 +179,8 @@ public:
     /**
      * overloading the stream out operator<<
      *
-     * @param\[in\] out           The stream to which the fiff covariance should be assigned to.
-     * @param\[in\] p_FiffCov     FiffCov which should be assigned to the stream.
+     * @param[in] out           The stream to which the fiff covariance should be assigned to.
+     * @param[in] p_FiffCov     FiffCov which should be assigned to the stream.
      *
      * @return the stream with the attached fiff covariance matrix
      */

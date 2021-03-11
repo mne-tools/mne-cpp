@@ -202,7 +202,7 @@ protected:
     /**
      * Sets the Fiff Info.
      *
-     * @param\[in\] p_FiffInfo    the Fiff Info.
+     * @param[in] p_FiffInfo    the Fiff Info.
      */
     void setFiffInfo(const FIFFLIB::FiffInfo& p_FiffInfo);
 
@@ -210,7 +210,7 @@ protected:
     /**
      * Sets the Fiff Info data.
      *
-     * @param\[in\] DATA    the Fiff Info data.
+     * @param[in] DATA    the Fiff Info data.
      */
     void setFiffData(QByteArray DATA);
 
@@ -218,7 +218,7 @@ protected:
     /**
      * Sets the CMD data.
      *
-     * @param\[in\] DATA    the CMD data.
+     * @param[in] DATA    the CMD data.
      */
     void setCMDData(QByteArray DATA);
 
@@ -226,7 +226,7 @@ protected:
     /**
      * Sets the gain info.
      *
-     * @param\[in\] GainInfo    a QStringList with all the gain information.
+     * @param[in] GainInfo    a QStringList with all the gain information.
      */
     void setFiffGainInfo(QStringList GainInfo);
 
@@ -234,7 +234,7 @@ protected:
     /**
      * Returns information from FLL hardware.
      *
-     * @param\[in\] t_sFLLControlCommand  FLL command.
+     * @param[in] t_sFLLControlCommand  FLL command.
      */
     void comFLL(QString t_sFLLControlCommand);
 
@@ -322,7 +322,7 @@ signals:
     /**
      * Emitted when command clients connection status changed.
      *
-     * @param\[in\] p_bStatus  connection status
+     * @param[in] p_bStatus  connection status
      */
     void cmdConnectionChanged(bool p_bStatus);
 
@@ -336,7 +336,7 @@ signals:
     /**
      * Emitted when data is ready.
      *
-     * @param\[in\] tmp    data to squid control
+     * @param[in] tmp    data to squid control
      */
     void dataToSquidCtrlGUI(Eigen::MatrixXf tmp);
 
@@ -344,7 +344,7 @@ signals:
     /**
      * Emitted when data received from tcp/ip socket.
      *
-     * @param\[in\] DATA    data to squid control
+     * @param[in] DATA    data to squid control
      */
     void sendCMDDataToSQUIDControl(QByteArray DATA);
 };

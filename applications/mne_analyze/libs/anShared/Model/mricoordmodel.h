@@ -74,7 +74,7 @@ public:
     /**
      * Returns the number of rows in the model
      *
-     * @param\[in\] parent     The parent index.
+     * @param[in] parent     The parent index.
      */
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 
@@ -82,7 +82,7 @@ public:
     /**
      * Returns the number of columns in the model
      *
-     * @param\[in\] parent     The parent index.
+     * @param[in] parent     The parent index.
      */
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
 
@@ -90,8 +90,8 @@ public:
     /**
      * Returns the data stored under the given role for the index.
      *
-     * @param\[in\] index   The index that referres to the requested item.
-     * @param\[in\] role    The requested role.
+     * @param[in] index   The index that referres to the requested item.
+     * @param[in] role    The requested role.
      */
     virtual QVariant data(const QModelIndex &index,
                           int role = Qt::DisplayRole) const override;
@@ -100,7 +100,7 @@ public:
     /**
      * Returns the item flags for the given index.
      *
-     * @param\[in\] index   The index that referres to the requested item.
+     * @param[in] index   The index that referres to the requested item.
      */
     Qt::ItemFlags flags(const QModelIndex & index) const override;
 
@@ -118,9 +118,9 @@ public:
      * Currently only Qt::DisplayRole is supported.
      * Index rows reflect channels, first column is channel names, second is raw data.
      *
-     * @param\[in\] row      The specified row.
-     * @param\[in\] column   The specified column.
-     * @param\[in\] parent   The parent index.
+     * @param[in] row      The specified row.
+     * @param[in] column   The specified column.
+     * @param[in] parent   The parent index.
      */
     inline QModelIndex index(int row,
                              int column,
@@ -131,7 +131,7 @@ public:
      * Returns the parent index of the given index.
      * In this Model the parent index in always QModelIndex().
      *
-     * @param\[in\] index   The index that referres to the child.
+     * @param[in] index   The index that referres to the child.
      */
     inline QModelIndex parent(const QModelIndex &index) const override;
 };

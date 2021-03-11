@@ -89,7 +89,7 @@ public:
     /**
      * The constructor.
      *
-     * @param\[in\] parent   The parent widget.
+     * @param[in] parent   The parent widget.
      */
     explicit Graph(QWidget *parent = 0);
 
@@ -103,7 +103,7 @@ public:
     /**
      * Sets the scaled image view title.
      *
-     * @param\[in\] p_sTitle   The title
+     * @param[in] p_sTitle   The title
      */
     void setTitle(const QString &p_sTitle);
 
@@ -111,7 +111,7 @@ public:
     /**
      * Sets the label of the y axes
      *
-     * @param\[in\] p_sXLabel   The x axes label
+     * @param[in] p_sXLabel   The x axes label
      */
     void setXLabel(const QString &p_sXLabel);
 
@@ -119,7 +119,7 @@ public:
     /**
      * Sets the label of the y axes
      *
-     * @param\[in\] p_sXLabel   The y axes label
+     * @param[in] p_sXLabel   The y axes label
      */
     void setYLabel(const QString &p_sYLabel);
 
@@ -129,7 +129,7 @@ protected:
     /**
      * Reimplemented resizeEvent
      *
-     * @param\[in\] event   The resize event.
+     * @param[in] event   The resize event.
      */
     void resizeEvent(QResizeEvent* event);
 
@@ -137,8 +137,8 @@ protected:
     /**
      * Draw the labels.
      *
-     * @param\[in\] p_iContentWidth    The contents width.
-     * @param\[in\] p_iContentHeight   The contents height.
+     * @param[in] p_iContentWidth    The contents width.
+     * @param[in] p_iContentHeight   The contents height.
      */
     void drawLabels(qint32 p_iContentWidth,
                     qint32 p_iContentHeight);

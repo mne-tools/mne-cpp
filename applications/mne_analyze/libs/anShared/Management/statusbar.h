@@ -107,7 +107,7 @@ public:
     /**
      * Sets a new timeout for messages in milliseconds.
      *
-     * @param\[in\] iTimeout       New timeout
+     * @param[in] iTimeout       New timeout
      */
     void setMsgTimeout(int iTimeout);
 
@@ -116,7 +116,7 @@ private:
     /**
      * This functions gets called when a new message is received from the event system.
      *
-     * @param\[in\] pEvent        The received event.
+     * @param[in] pEvent        The received event.
      */
     void onNewMessageReceived(const QSharedPointer<ANSHAREDLIB::Event> pEvent);
 
@@ -124,7 +124,7 @@ private:
     /**
      * Receives event when status bar is hovered over, shows hover widget if there are background processes
      *
-     * @param\[in\] event    event of type QHoverEvent that holds mouse position
+     * @param[in] event    event of type QHoverEvent that holds mouse position
      */
     void enterEvent(QEvent* event);
 
@@ -132,7 +132,7 @@ private:
     /**
      * Receives event when status bar is no longer hovered over, hides hover widget
      *
-     * @param\[in\] event    event of type QHoverEvent that holds mouse position
+     * @param[in] event    event of type QHoverEvent that holds mouse position
      */
     void leaveEvent(QEvent* event);
 

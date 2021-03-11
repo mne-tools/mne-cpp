@@ -95,8 +95,8 @@ public:
     /**
      * Constructs a Network object.
      *
-     * @param\[in\] sConnectivityMethod    The connectivity measure method used to create the data of this network structure.
-     * @param\[in\] dThreshold             The threshold of the network. Default is 0.0.
+     * @param[in] sConnectivityMethod    The connectivity measure method used to create the data of this network structure.
+     * @param[in] dThreshold             The threshold of the network. Default is 0.0.
      */
     explicit Network(const QString& sConnectivityMethod = "Unknown",
                      double dThreshold = 0.0);
@@ -105,7 +105,7 @@ public:
     /**
      * Returns the full connectivity matrix for this network structure.
      *
-     * @param\[in\] bGetMirroredVersion    Flag whether to return the mirrored version of the connectivity matrix, if the network
+     * @param[in] bGetMirroredVersion    Flag whether to return the mirrored version of the connectivity matrix, if the network
      *                                   is a non-directional one. Otherwise returns zeros for the lower part of the matrix.
      *                                   Default is set to true.
      *
@@ -117,7 +117,7 @@ public:
     /**
      * Returns the thresholded connectivity matrix for this network structure.
      *
-     * @param\[in\] bGetMirroredVersion    Flag whether to return the mirrored version of the connectivity matrix, if the network
+     * @param[in] bGetMirroredVersion    Flag whether to return the mirrored version of the connectivity matrix, if the network
      *                                   is a non-directional one. Otherwise returns zeros for the lower part of the matrix.
      *                                   Default is set to true.
      *
@@ -153,7 +153,7 @@ public:
     /**
      * Returns the edge at a specific position.
      *
-     * @param\[in\] i      The index to look up the edge. i must be a valid index position in the network list (i.e., 0 <= i < size()).
+     * @param[in] i      The index to look up the edge. i must be a valid index position in the network list (i.e., 0 <= i < size()).
      *
      * @return Returns the network edge.
      */
@@ -163,7 +163,7 @@ public:
     /**
      * Returns the node at a specific position.
      *
-     * @param\[in\] i      The index to look up the node. i must be a valid index position in the network list (i.e., 0 <= i < size()).
+     * @param[in] i      The index to look up the node. i must be a valid index position in the network list (i.e., 0 <= i < size()).
      *
      * @return Returns the network node.
      */
@@ -189,7 +189,7 @@ public:
     /**
      * Sets the connectivity measure method used to create the data of this network structure.
      *
-     * @param\[in\] sConnectivityMethod    The connectivity measure method used to create the data of this network structure.
+     * @param[in] sConnectivityMethod    The connectivity measure method used to create the data of this network structure.
      */
     void setConnectivityMethod(const QString& sConnectivityMethod);
 
@@ -269,7 +269,7 @@ public:
     /**
      * Sets the threshold of the network and updates the resulting active edges.
      *
-     * @param\[in\] dThreshold        The new threshold.
+     * @param[in] dThreshold        The new threshold.
      */
     void setThreshold(double dThreshold = 0.0);
 
@@ -285,8 +285,8 @@ public:
     /**
      * Sets the frequency range to average from/to.
      *
-     * @param\[in\] fLowerFreq        The new lower frequency edge to average from.
-     * @param\[in\] fUpperFreq        The new upper frequency edge to average to.
+     * @param[in] fLowerFreq        The new lower frequency edge to average from.
+     * @param[in] fUpperFreq        The new upper frequency edge to average to.
      */
     void setFrequencyRange(float fLowerFreq, float fUpperFreq);
 
@@ -302,7 +302,7 @@ public:
     /**
      * Appends a network edge to this network node.
      *
-     * @param\[in\] newEdge    The new edge item.
+     * @param[in] newEdge    The new edge item.
      */
     void append(QSharedPointer<NetworkEdge> newEdge);
 
@@ -310,7 +310,7 @@ public:
     /**
      * Appends a network edge to this network node.
      *
-     * @param\[in\] newNode    The new node item as a reference.
+     * @param[in] newNode    The new node item as a reference.
      */
     void append(QSharedPointer<NetworkNode> newNode);
 
@@ -340,7 +340,7 @@ public:
     /**
      * Set the current visualization info.
      *
-     * @param\[in\] visualizationInfo        The new visualization info.
+     * @param[in] visualizationInfo        The new visualization info.
      */
     void setVisualizationInfo(const VisualizationInfo& visualizationInfo);
 
@@ -356,7 +356,7 @@ public:
     /**
      * Set the new sampling frequency.
      *
-     * @param\[in\] sFreq        The new sampling frequency.
+     * @param[in] sFreq        The new sampling frequency.
      */
     void setSamplingFrequency(float fSFreq);
 
@@ -372,7 +372,7 @@ public:
     /**
      * Set the new number of used frequency bins.
      *
-     * @param\[in\] iNumberFreqBins        The new number of used frequency bins.
+     * @param[in] iNumberFreqBins        The new number of used frequency bins.
      */
     void setUsedFreqBins(int iNumberFreqBins);
 
@@ -380,7 +380,7 @@ public:
     /**
      * Set the new FFT size.
      *
-     * @param\[in\] iFFTSize        The used FFT size (number of total frequency bins for a half spectrum - only positive frequencies).
+     * @param[in] iFFTSize        The used FFT size (number of total frequency bins for a half spectrum - only positive frequencies).
      */
     void setFFTSize(int iFFTSize);
 

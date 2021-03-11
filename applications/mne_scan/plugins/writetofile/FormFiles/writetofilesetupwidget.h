@@ -77,8 +77,8 @@ public:
     /**
      * Constructs a WriteToFileSetupWidget which is a child of parent.
      *
-     * @param\[in\] toolbox a pointer to the corresponding WriteToFile.
-     * @param\[in\] parent pointer to parent widget; If parent is 0, the new WriteToFileSetupWidget becomes a window. If parent is another widget, WriteToFileSetupWidget becomes a child window inside parent. WriteToFileSetupWidget is deleted when its parent is deleted.
+     * @param[in] toolbox a pointer to the corresponding WriteToFile.
+     * @param[in] parent pointer to parent widget; If parent is 0, the new WriteToFileSetupWidget becomes a window. If parent is another widget, WriteToFileSetupWidget becomes a child window inside parent. WriteToFileSetupWidget is deleted when its parent is deleted.
      */
     WriteToFileSetupWidget(WriteToFile* toolbox, QWidget *parent = 0);
 

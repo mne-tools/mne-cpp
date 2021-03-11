@@ -88,7 +88,7 @@ public:
     /**
      * Constructs the DataManagerView
      *
-     * @param\[in\] parent     If parent is not NULL the QWidget becomes a child of QWidget inside parent.
+     * @param[in] parent     If parent is not NULL the QWidget becomes a child of QWidget inside parent.
      */
     explicit BidsView(QWidget *parent = 0);
 
@@ -102,7 +102,7 @@ public:
     /**
      * Sets the model to the tree view.
      *
-     * @param\[in\] pModel       The new model.
+     * @param[in] pModel       The new model.
      */
     void setModel(QAbstractItemModel *pModel);
 
@@ -122,7 +122,7 @@ public:
     /**
      * Update the views GUI based on the set GuiMode (Clinical=0, Research=1).
      *
-     * @param\[in\] mode     The new mode (Clinical=0, Research=1).
+     * @param[in] mode     The new mode (Clinical=0, Research=1).
      */
     virtual void updateGuiMode(GuiMode mode);
 
@@ -130,7 +130,7 @@ public:
     /**
      * Update the views GUI based on the set ProcessingMode (RealTime=0, Offline=1).
      *
-     * @param\[in\] mode     The new mode (RealTime=0, Offline=1).
+     * @param[in] mode     The new mode (RealTime=0, Offline=1).
      */
     virtual void updateProcessingMode(ProcessingMode mode);
 
@@ -146,7 +146,7 @@ private:
     /**
      * Brings up contextual menu for user to interact with data manager
      *
-     * @param\[in\] pos position on screen where the user right clicked
+     * @param[in] pos position on screen where the user right clicked
      */
     void customMenuRequested(QPoint pos);
 
@@ -154,8 +154,8 @@ private:
     /**
      * Sends signal to trigger model change when a new model is selcted
      *
-     * @param\[in\] selected     New item being selected
-     * @param\[in\] deselected   UNUSED - previously selected item
+     * @param[in] selected     New item being selected
+     * @param[in] deselected   UNUSED - previously selected item
      */
     void onCurrentItemChanged(const QItemSelection &selected,
                               const QItemSelection &deselected);
@@ -164,8 +164,8 @@ private:
     /**
      * Uses the indeces of newly added subject and file to select it in the GUI view
      *
-     * @param\[in\] iSubject     index of the subject the new file was added to
-     * @param\[in\] iModel       index of the new model file relative to the subject
+     * @param[in] iSubject     index of the subject the new file was added to
+     * @param[in] iModel       index of the new model file relative to the subject
      */
     void onNewFileLoaded(int iSubject,
                          int iModel);
@@ -174,7 +174,7 @@ private:
     /**
      * Select new item and expands parent's tree view heirarchy
      *
-     * @param\[in\] itemIndex    new item to be selected
+     * @param[in] itemIndex    new item to be selected
      */
     void onNewItemIndex(QModelIndex itemIndex);
 
@@ -188,7 +188,7 @@ private:
     /**
      * Procss keyobard input. Currently only delete.
      *
-     * @param\[in\] event    Key event for delete key to delete selected item
+     * @param[in] event    Key event for delete key to delete selected item
      */
     void keyPressEvent(QKeyEvent *event);
 
@@ -199,7 +199,7 @@ signals:
     /**
      * Sends index of item to be removed from model
      *
-     * @param\[in\] pIndex   index of item to be removed
+     * @param[in] pIndex   index of item to be removed
      */
     void removeItem(const QModelIndex& pIndex);
 
@@ -207,7 +207,7 @@ signals:
     /**
      * Sends model in 'data' to be send via the event manager
      *
-     * @param\[in\] data     new selected model in a QVariant
+     * @param[in] data     new selected model in a QVariant
      */
     void selectedModelChanged(const QVariant& data);
 
@@ -215,7 +215,7 @@ signals:
     /**
      * Sends the index of currently selected item to update saved current items
      *
-     * @param\[in\] pIndex   index of new item
+     * @param[in] pIndex   index of new item
      */
     void selectedItemChanged(const QModelIndex& pIndex);
 
@@ -223,7 +223,7 @@ signals:
     /**
      * Triggers a subject to be added with name sSubjectName
      *
-     * @param\[in\] sSubjectName     name of new subject
+     * @param[in] sSubjectName     name of new subject
      */
     void onAddSubject(const QString &sSubjectName);
 
@@ -231,8 +231,8 @@ signals:
     /**
      * Triggers a session  to be added with name sSessionName to subject at index subjectIndex
      *
-     * @param\[in\] subjectIndex     index of subject to which the session will be added
-     * @param\[in\] sSessionName     name of new session
+     * @param[in] subjectIndex     index of subject to which the session will be added
+     * @param[in] sSessionName     name of new session
      */
     void onAddSession(QModelIndex subjectIndex,
                       const QString &sSessionName);
@@ -241,8 +241,8 @@ signals:
     /**
      * Triggers session at sessionIndex to be moved to subject at subjectIndex
      *
-     * @param\[in\] subjectIndex     index of destination subject
-     * @param\[in\] sessionIndex     index of session to be moved
+     * @param[in] subjectIndex     index of destination subject
+     * @param[in] sessionIndex     index of session to be moved
      */
     void onMoveSession(QModelIndex subjectIndex,
                        QModelIndex sessionIndex);
@@ -251,8 +251,8 @@ signals:
     /**
      * Triggers data at dataIndex to be moved to session at sessionIndex
      *
-     * @param\[in\] sessionIndex     index of destination session
-     * @param\[in\] dataIndex        index of data to me moved
+     * @param[in] sessionIndex     index of destination session
+     * @param[in] dataIndex        index of data to me moved
      */
     void onMoveData(QModelIndex sessionIndex,
                     QModelIndex dataIndex);

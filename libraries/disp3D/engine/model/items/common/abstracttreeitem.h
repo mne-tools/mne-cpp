@@ -82,8 +82,8 @@ public :
     /**
      * Default constructor.
      *
-     * @param\[in\] iType      The type of the item. See types.h for declaration and definition.
-     * @param\[in\] text       The text of this item. This is also by default the displayed name of the item in a view.
+     * @param[in] iType      The type of the item. See types.h for declaration and definition.
+     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
      */
     AbstractTreeItem(int iType = Data3DTreeModelItemTypes::UnknownItem, const QString& text = "");
 
@@ -98,8 +98,8 @@ public :
     /**
      * Adds an item with its toolTip as second column item as description to the model.
      *
-     * @param\[in\] pItemParent         The parent item.
-     * @param\[in\] pItemAdd            The item which is added as a row to the parent item.
+     * @param[in] pItemParent         The parent item.
+     * @param[in] pItemAdd            The item which is added as a row to the parent item.
      */
     static void addItemWithDescription(QStandardItem* pItemParent, QStandardItem* pItemAdd);
 
@@ -107,7 +107,7 @@ public :
     /**
      * Returns all children of this item based on their type.
      *
-     * @param\[in\] type    The type of the child items which should be looked for.
+     * @param[in] type    The type of the child items which should be looked for.
      *
      * @return           List with all found items.
      */
@@ -117,7 +117,7 @@ public :
     /**
      * Returns all children of this item based on their text.
      *
-     * @param\[in\] text    The text of the child items which should be looked for.
+     * @param[in] text    The text of the child items which should be looked for.
      *
      * @return           List with all found items.
      */
@@ -127,7 +127,7 @@ public :
     /**
      * Overloaded stream operator to add a child to this item based on a pointer.
      *
-     * @param\[in\] newItem    The new item as a pointer.
+     * @param[in] newItem    The new item as a pointer.
      */
     AbstractTreeItem &operator<<(AbstractTreeItem* newItem);
 
@@ -135,7 +135,7 @@ public :
     /**
      * Overloaded stream operator to add a child to this item based on a reference.
      *
-     * @param\[in\] newItem    The new item as a reference.
+     * @param[in] newItem    The new item as a reference.
      */
     AbstractTreeItem &operator<<(AbstractTreeItem& newItem);
 
@@ -150,7 +150,7 @@ protected:
     /**
      * Call this function whenever the check box of this item was checked.
      *
-     * @param\[in\] checkState        The current checkstate.
+     * @param[in] checkState        The current checkstate.
      */
     virtual void onCheckStateChanged(const Qt::CheckState& checkState);
 
@@ -162,7 +162,7 @@ signals:
     /**
      * Emit this signal whenever this item's check state changed.
      *
-     * @param\[in\] checkState     The current check state.
+     * @param[in] checkState     The current check state.
      */
     void checkStateChanged(const Qt::CheckState& checkState);
 };

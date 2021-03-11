@@ -109,10 +109,10 @@ public:
     /**
      * @brief scdc                           Calculates surface constrained distances on a mesh.
      *
-     * @param\[in\] matVertices                The surface on which distances should be calculated.
-     * @param\[in\] vecNeighborVertices        The neighbor vertex information.
+     * @param[in] matVertices                The surface on which distances should be calculated.
+     * @param[in] vecNeighborVertices        The neighbor vertex information.
      * @param[in/out] pVecVertSubset         The subset of IDs for which the distances should be calculated.
-     * @param\[in\] dCancelDist                Distances higher than this are ignored, i.e. set to infinity.
+     * @param[in] dCancelDist                Distances higher than this are ignored, i.e. set to infinity.
      *
      * @return                               A double matrix. One column represents the distances for one vertex inside of the passed subset
      */
@@ -125,8 +125,8 @@ public:
     /**
      * @brief                            Calculates the nearest neighbor (euclidian distance) vertex to each sensor
      *
-     * @param\[in\] matVertices            Holds all vertex information that is needed.
-     * @param\[in\] vecSensorPositions     Each sensor postion in saved in an Eigen vector with x, y & z coord.
+     * @param[in] matVertices            Holds all vertex information that is needed.
+     * @param[in] vecSensorPositions     Each sensor postion in saved in an Eigen vector with x, y & z coord.
      *
      * @return                           Output vector where the vector index position represents the id of the sensor
      *                                   and the int in each cell is the vertex it is mapped to
@@ -139,8 +139,8 @@ public:
      * @brief filterBadChannels          Filters bad channels from distance table
      *
      * @param[out] matDistanceTable      Result of SCDC.
-     * @param\[in\] fiffInfo               Container for sensors.
-     * @param\[in\] iSensorType            Sensor type to be filtered out, use fiff constants.
+     * @param[in] fiffInfo               Container for sensors.
+     * @param[in] iSensorType            Sensor type to be filtered out, use fiff constants.
      *
      * @return Vector of bad channel indices.
      */
@@ -153,7 +153,7 @@ protected:
     /**
      * @brief squared        Implemented for better readability only
      *
-     * @param\[in\] dBase      Base double value
+     * @param[in] dBase      Base double value
      *
      * @return               Base squared
      */
@@ -163,9 +163,9 @@ protected:
     /**
      * @brief nearestNeighbor        Calculates the nearest vertex of an MNEmatVertices for each position between the two iterators
      *
-     * @param\[in\] matVertices        The MNEmatVertices that holds the vertex information
-     * @param\[in\] itSensorBegin      The iterator that indicates the start of the wanted section of positions
-     * @param\[in\] itSensorEnd        The iterator that indicates the end of the wanted section of positions
+     * @param[in] matVertices        The MNEmatVertices that holds the vertex information
+     * @param[in] itSensorBegin      The iterator that indicates the start of the wanted section of positions
+     * @param[in] itSensorEnd        The iterator that indicates the end of the wanted section of positions
      *
      * @return                       A vector of nearest vertex IDs that corresponds to the subvector between the two iterators
      */
@@ -178,12 +178,12 @@ protected:
      * @brief iterativeDijkstra     Calculates shortest distances on the mesh that is held by the MNEmatVertices for each vertex of the passed vector that lies between the two indices
      *
      * @param[out] matOutputDistMatrix  The matrix in which the distances will be stored
-     * @param\[in\] matVertices           The surface on which distances should be calculated
-     * @param\[in\] vecNeighborVertices   The neighbor vertex information.
-     * @param\[in\] vecVertSubset         The subset of vertices
-     * @param\[in\] iBegin                Start index of distance calculation
-     * @param\[in\] iEnd                  End index of distance calculation, exclusive
-     * @param\[in\] dCancelDistance       Distance threshold: all vertices that have a higher distance to the respective root vertex are set to infinity
+     * @param[in] matVertices           The surface on which distances should be calculated
+     * @param[in] vecNeighborVertices   The neighbor vertex information.
+     * @param[in] vecVertSubset         The subset of vertices
+     * @param[in] iBegin                Start index of distance calculation
+     * @param[in] iEnd                  End index of distance calculation, exclusive
+     * @param[in] dCancelDistance       Distance threshold: all vertices that have a higher distance to the respective root vertex are set to infinity
      */
     static void iterativeDijkstra(QSharedPointer<Eigen::MatrixXd> matOutputDistMatrix,
                                   const Eigen::MatrixX3f &matVertices,

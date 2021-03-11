@@ -258,7 +258,7 @@ public:
     /**
      * Sets the hub status of this node.
      *
-     * @param bIsHub   New hub status for this node.
+     * @param[in] bIsHub   New hub status for this node.
      */
     void setHubStatus(bool bIsHub);
 

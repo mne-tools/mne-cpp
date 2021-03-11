@@ -130,7 +130,7 @@ private:
     /**
      * Fiff data client list
      *
-     * @param\[in\] p_command  The connector list command.
+     * @param[in] p_command  The connector list command.
      */
     void comClist(COMMUNICATIONLIB::Command p_command);
 
@@ -138,7 +138,7 @@ private:
     /**
      * specifies to which client to send the requested fiff info
      *
-     * @param\[in\] p_command  The select connector command.
+     * @param[in] p_command  The select connector command.
      */
     void comMeasinfo(COMMUNICATIONLIB::Command p_command);
 
@@ -146,7 +146,7 @@ private:
     /**
      * Starts the Measurement of a specified client
      *
-     * @param\[in\] p_command  The start command.
+     * @param[in] p_command  The start command.
      */
     void comStart(COMMUNICATIONLIB::Command p_command);//comMeas
 
@@ -154,7 +154,7 @@ private:
     /**
      * Stops a fiff data client from receiving further data
      *
-     * @param\[in\] p_command  The stop command.
+     * @param[in] p_command  The stop command.
      */
     void comStop(COMMUNICATIONLIB::Command p_command);
 
@@ -162,7 +162,7 @@ private:
     /**
      * Stops all connectors
      *
-     * @param\[in\] p_command  The stop all command.
+     * @param[in] p_command  The stop all command.
      */
     void comStopAll(COMMUNICATIONLIB::Command p_command);
 

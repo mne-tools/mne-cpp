@@ -96,8 +96,8 @@ public:
     /**
      * Adds a QWidget to the top docking area.
      *
-     * @param\[in\] pWidget   The widget to be added.
-     * @param\[in\] sName     The window title shown in the QSplitter.
+     * @param[in] pWidget   The widget to be added.
+     * @param[in] sName     The window title shown in the QSplitter.
      *
      * @return Returns a pointer to the added widget in form of a MultiViewWindow.
      */
@@ -108,8 +108,8 @@ public:
     /**
      * Adds a QWidget to the bottom docking area. Please note that all bottom dock widgets are tabbified by default.
      *
-     * @param\[in\] pWidget   The widget to be added.
-     * @param\[in\] sName     The window title shown in the QSplitter.
+     * @param[in] pWidget   The widget to be added.
+     * @param[in] sName     The window title shown in the QSplitter.
      *
      * @return Returns a pointer to the added widget in form of a MultiViewWindow.
      */

@@ -127,8 +127,8 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &context, con
  * The function main marks the entry point of the program.
  * By default, main has the storage class extern.
  *
- * @param\[in\] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
- * @param\[in\] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
+ * @param[in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
+ * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
  * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
  */
 int main(int argc, char *argv[])
