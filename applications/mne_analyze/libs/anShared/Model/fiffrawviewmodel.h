@@ -137,7 +137,7 @@ public:
     /**
      * Helper function for initialization
      */
-    void initFiffData(QIODevice& p_IODevice);
+    bool initFiffData(QIODevice& p_IODevice);
 
     //=========================================================================================================
     /**
@@ -590,7 +590,10 @@ private:
     void reloadAllData();
 
     //=========================================================================================================
-    void updateFromRealtime(const QString &path);
+    void watchFile(const QString &path);
+
+    //=========================================================================================================
+    void readFromRealtimeFile(const QString &path);
 
     std::list<QSharedPointer<QPair<MatrixXd, MatrixXd> > > m_lData;             /**< Data. */
     std::list<QSharedPointer<QPair<MatrixXd, MatrixXd> > > m_lNewData;          /**< Data that is to be appended or prepended. */
@@ -657,6 +660,9 @@ signals:
      * Emits that new block data is loaded
      */
     void newBlocksLoaded();
+
+    //=========================================================================================================
+    void newRealtimeData();
 };
 
 //=============================================================================================================
