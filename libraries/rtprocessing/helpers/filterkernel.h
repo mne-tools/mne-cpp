@@ -190,7 +190,7 @@ public:
     /**
      * Applies the current filter to the input data using multiplication in frequency domain.
      *
-     * @param+[\[]in/out] vecData              Holds the data to be filtered. Gets overwritten with its filtered result.
+     * @param[in, out] vecData              Holds the data to be filtered. Gets overwritten with its filtered result.
      * @param[in] bKeepOverhead            Whether the result should still include the overhead information in front and back of the data.
      *                                      Default is set to false.
      *

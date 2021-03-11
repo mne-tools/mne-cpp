@@ -523,7 +523,7 @@ public:
      *
      * Transforms source space data to the desired coordinate system
      *
-     * @param+[\[]in, out] p_pMNESourceSpace the source space which is should be transformed
+     * @param[in, out] p_pMNESourceSpace the source space which is should be transformed
      * @param[in] dest destination check code
      * @param[in] trans transformation information
      *
