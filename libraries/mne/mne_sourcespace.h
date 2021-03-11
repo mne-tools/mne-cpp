@@ -172,7 +172,7 @@ public:
      *
      * @return true if succeeded, false otherwise
      */
-    static bool patch_info(MNEHemisphere &p_Hemisphere);//VectorXi& nearest, QList<VectorXi>& pinfo);@param[in] nearest   The nearest vector of the source space.@param+[\[]out] pinfo    The requested patch information.
+    static bool patch_info(MNEHemisphere &p_Hemisphere);//VectorXi& nearest, QList<VectorXi>& pinfo);@param[in] nearest   The nearest vector of the source space.@param[in, out] pinfo    The requested patch information.
 
     //=========================================================================================================
     /**
@@ -192,7 +192,7 @@ public:
      *
      * @param[in, out] p_pStream         The opened fif file
      * @param[in] add_geom          Add geometry information to the source spaces
-     * @param+[\[]out] p_SourceSpace    The read source spaces
+     * @param[in, out] p_SourceSpace    The read source spaces
      *
      * @return true if succeeded, false otherwise
      */
@@ -307,7 +307,7 @@ private:
      *
      * @param[in] p_pStream         The opened fif file
      * @param[in] p_Tree            Search for the source space here
-     * @param+[\[]out] p_pHemisphere    The read source space (hemisphere)
+     * @param[in, out] p_pHemisphere    The read source space (hemisphere)
      *
      * @return true if succeeded, false otherwise
      */

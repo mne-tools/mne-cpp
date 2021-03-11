@@ -123,7 +123,7 @@ public:
      * @param[in] add_geom      Add geometry information to the source spaces
      * @param[in] p_Tree        Search for the surfaces here
      *
-     * @param+[\[]out] p_Surfaces    The read bem surfaces
+     * @param[in, out] p_Surfaces    The read bem surfaces
      *
      * @return true if succeeded, false otherwise
      */
@@ -148,7 +148,7 @@ private:
      * @param[in] dir           Search for the surface here
      * @param[in] def_coord_frame Default coordinate frame
      *
-     * @param+[\[]out] surf         The read bem surface
+     * @param[in, out] surf         The read bem surface
      *
      * @return true if succeeded and surf was filled, false otherwise
      */

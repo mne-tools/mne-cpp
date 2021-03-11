@@ -143,7 +143,7 @@ public:
      * Reads a source estimate from a given file
      *
      * @param[in] p_IODevice    IO device to red the stc from.
-     * @param+[\[]out] p_stc        the read stc
+     * @param[in, out] p_stc        the read stc
      *
      * @return true if successful, false otherwise
      */

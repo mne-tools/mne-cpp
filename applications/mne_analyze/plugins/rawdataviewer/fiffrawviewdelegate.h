@@ -144,7 +144,7 @@ private:
      * createPlotPath creates the QPointer path for the data plot.
      *
      * @param[in] option     Describes the parameters used to draw an item in a view widget
-     * @param[in,out] path   The QPointerPath to create for the data plot.
+     * @param[in, out] path   The QPointerPath to create for the data plot.
      * @param[in] data       Current data for the given row.
      * @param[in] dDx        pixel difference to the next sample in pixels.
      */
@@ -160,7 +160,7 @@ private:
      *
      * @param[in] index      Used to locate data in a data model.
      * @param[in] option     Describes the parameters used to draw an item in a view widget
-     * @param[in,out] path   The QPointerPath to create for the data plot.
+     * @param[in, out] path   The QPointerPath to create for the data plot.
      * @param[in] data       Data for the given row.
      */
     void createTimeSpacersPath(const QModelIndex &index,

@@ -101,7 +101,7 @@ public:
      * Inserts the m_pActionPluginItem selected plugin into PluginSceneManager
      *
      * @param[in] pActionPluginItem     Current selected action item
-     * @param+[\[]out] pAddedPlugin         The added plugin
+     * @param[in, out] pAddedPlugin         The added plugin
      *
      * @return true if successfull
      */

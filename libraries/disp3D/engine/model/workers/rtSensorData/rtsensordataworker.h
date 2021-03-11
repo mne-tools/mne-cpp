@@ -183,7 +183,7 @@ protected:
      * @brief normalizeAndTransformToColor  This method normalizes final values for all vertices of the mesh and converts them to rgb using the specified color converter
      *
      * @param[in] vecData                       The final values for each vertex of the surface
-     * @param[in,out] matFinalVertColor         The color matrix which the results are to be written to
+     * @param[in, out] matFinalVertColor         The color matrix which the results are to be written to
      * @param[in] dThresholdX                   Lower threshold for normalizing
      * @param[in] dThreholdZ                    Upper threshold for normalizing
      * @param[in] functionHandlerColorMap       The pointer to the function which converts scalar values to rgb

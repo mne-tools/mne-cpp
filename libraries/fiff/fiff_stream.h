@@ -285,7 +285,7 @@ public:
      *
      * @param[in] p_Node          look for the matrix in here
      * @param[in] cov_kind      what kind of a covariance matrix do we want?
-     * @param+[\[]out] p_covData    the read covariance matrix
+     * @param[in, out] p_covData    the read covariance matrix
      *
      * @return true if succeeded, false otherwise
      */
