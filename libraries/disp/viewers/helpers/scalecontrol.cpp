@@ -54,13 +54,17 @@ ScaleControl::ScaleControl(const char* label)
 
 //=============================================================================================================
 
-ScaleControl::ScaleControl(const char* label, QWidget* parent)
+ScaleControl::ScaleControl(const char* label,
+                           QWidget* parent)
 : ScaleControl(label, parent, m_dDefaultMin, m_dDefaultMax)
 { }
 
 //=============================================================================================================
 
-ScaleControl::ScaleControl(const char* label, QWidget* parent, double min, double max)
+ScaleControl::ScaleControl(const char* label,
+                           QWidget* parent,
+                           double min,
+                           double max)
 : QWidget(parent)
 , m_pUi(new Ui::ScaleControlWidget)
 , m_bManagingSpinBoxChange(false)
@@ -148,7 +152,8 @@ void ScaleControl::setSensitivity(double s)
 
 //=============================================================================================================
 
-void ScaleControl::setRange(double min, double max)
+void ScaleControl::setRange(double min,
+                            double max)
 {
     m_pUi->spinBox->setRange(min, max);
     if(m_fMaxSensitivityPoint < m_pUi->spinBox->minimum() || m_pUi->spinBox->maximum() < m_fMaxSensitivityPoint)
@@ -167,7 +172,8 @@ void ScaleControl::invertSlider(bool inverted)
 
 //=============================================================================================================
 
-void ScaleControl::setSliderRange(int min, int max)
+void ScaleControl::setSliderRange(int min,
+                                  int max)
 {
     if( (0 < min) && (min < max) )
     {
