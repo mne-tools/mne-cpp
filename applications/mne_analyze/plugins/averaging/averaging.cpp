@@ -306,8 +306,9 @@ void Averaging::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewMo
                 return;
             }
         }
-        if(auto info = m_pFiffRawModel->getFiffInfo()){
-            m_pFiffRawModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
+        auto pModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
+        if(auto info = pModel->getFiffInfo()){
+            m_pFiffRawModel = pModel;
             loadFullGui(info);
         }
     } else if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_AVERAGING_MODEL) {
@@ -610,6 +611,10 @@ void Averaging::onMakeScreenshot(const QString& imageType)
 void Averaging::updateGroups()
 {
     m_pAveragingSettingsView->clearSelectionGroup();
+    if(!m_pFiffRawModel){
+        return;
+    }
+
     if (m_pFiffRawModel->hasSavedEvents()){
         auto groups = m_pFiffRawModel->getAnnotationModel()->getGroupsToDraw();
         for (auto group : *groups){
